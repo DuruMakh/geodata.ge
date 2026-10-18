@@ -98,6 +98,7 @@ export const SERVICE_MESSAGE_KEYS = [
   "errors.dataVersionChanged",
   "errors.inflationCityInput",
   "errors.invalidParameters",
+  "errors.internalError",
   "errors.measureSeriesMismatch",
   "errors.periodRangeReversed",
   "errors.periodsOutOfRange",
@@ -114,6 +115,8 @@ export const SERVICE_MESSAGE_KEYS = [
   "errors.rankValueYearOnly",
   "errors.resultTooLargeBytes",
   "errors.resultTooLargeCells",
+  "errors.resultTooLargeSources",
+  "errors.resultTooLargeCatalogue",
   "errors.sourceYearsOutOfRange",
   "errors.unknownEntity",
   "errors.unknownSeries",
@@ -170,6 +173,7 @@ export type ServiceMessageKey = (typeof SERVICE_MESSAGE_KEYS)[number];
 // Existing Georgian errors intentionally omit the SDK's English validation
 // detail. Keep each language's established parameters explicit.
 export const SERVICE_MESSAGE_PARAMETERS: Partial<Record<ServiceMessageKey, { ka: readonly string[]; en: readonly string[] }>> = {
+  "errors.internalError": { ka: ["bulkUrl"], en: ["bulkUrl"] },
   "ranking.productCumulativeDefinition": { ka: ["basePeriod", "order", "period"], en: ["basePeriod", "order", "period"] },
   "definitions.inflationProductCumulative": { ka: ["basePeriod"], en: ["basePeriod"] },
   "missing.inflationProductStart": { ka: ["first"], en: ["first"] },
@@ -242,6 +246,14 @@ export const SERVICE_MESSAGE_PARAMETERS: Partial<Record<ServiceMessageKey, { ka:
       "bulkUrl",
       "cells"
     ]
+  },
+  "errors.resultTooLargeSources": {
+    "ka": ["bulkUrl"],
+    "en": ["bulkUrl"]
+  },
+  "errors.resultTooLargeCatalogue": {
+    "ka": ["bulkUrl"],
+    "en": ["bulkUrl"]
   },
   "errors.sourceYearsOutOfRange": {
     "ka": [

@@ -90,10 +90,13 @@ describe("individual-product inflation model", () => {
   it("uses the current source vintage and derives the latest-four-year range", async () => {
     const [catalogue, facts] = await Promise.all([loadProductCatalogueCsv(), loadProductFactsCsv()]);
     const index = buildProductIndex(catalogue, packProductFacts(facts));
-    expect(index.latestPeriod).toBe(makePeriod(2026, 8));
+    expect(index.latestPeriod).toBe(makePeriod(2026, 9));
     expect(index.defaultRange).toEqual({ startYear: 2023, endYear: 2026 });
-    expect(productAnnual(index, "cpi.product.p0058", index.latestPeriod)).toBeCloseTo(57.5291);
-    expect(rankProducts(index)[0]).toBe("cpi.product.p0058");
+    expect(productAnnual(index, "cpi.product.p0264", index.latestPeriod)).toBeCloseTo(63.2766);
+    expect(rankProducts(index)[0]).toBe("cpi.product.p0264");
+    const august = buildProductIndex(catalogue, packProductFacts(facts.filter(fact => fact.period <= "2026-08")));
+    expect(productAnnual(august, "cpi.product.p0058", august.latestPeriod)).toBeCloseTo(57.5291);
+    expect(rankProducts(august)[0]).toBe("cpi.product.p0058");
   });
 
   // U14-06: the colour was EDITORIAL_PALETTE[(n - 1) % 14], so p0001, p0015, p0029 … all drew in one colour.

@@ -6,7 +6,7 @@
 import { buildContributionIndex } from "../data/inflation/contributions";
 import { periodFromKey, periodKey } from "../data/inflation/periods";
 import { categoryFactInput } from "../data/inflation/types";
-import { INFLATION_ENTITY_ID, NATIONAL_SERIES, TARGET_SERIES, TARGET_SERIES_ID, type InflationMeasure } from "./inflationSeries";
+import { CITY_SERIES_MEASURES, INFLATION_ENTITY_ID, NATIONAL_SERIES, TARGET_SERIES, TARGET_SERIES_ID, type InflationMeasure } from "./inflationSeries";
 import type { FactQuerySnapshot } from "./types";
 
 export type PeriodRange = [first: string, last: string];
@@ -132,7 +132,27 @@ export function weightYearRange(snapshot: FactQuerySnapshot): [number, number] {
 }
 
 /** Catalogue entries for describe_coverage. The residual is never listed: its value depends on the request. */
-export function inflationCatalogueSeries(snapshot: FactQuerySnapshot) {
+export function inflationCatalogueSeries(snapshot: FactQuerySnapshot, cityScope = false) {
+  if (cityScope) {
+    return Object.entries(CITY_SERIES_MEASURES).map(([seriesId, measures]) => {
+      const facts = snapshot.inflation.cities.filter(fact => fact.seriesId === seriesId && measures.includes(fact.measure));
+      const group = snapshot.inflation.groups.find(group => group.id === seriesId);
+      const periodsByMeasure = Object.fromEntries(measures.flatMap(measure => {
+        const periods = rangeOf(facts.filter(fact => fact.measure === measure).map(fact => fact.period));
+        return periods === null ? [] : [[measure, periods]];
+      })) as Record<string, PeriodRange>;
+      return {
+        seriesId,
+        labelKa: group?.labelKa ?? NATIONAL_SERIES["cpi.headline"].labelKa,
+        level: group?.level ?? "national",
+        parentSeriesId: group?.parentId ?? null,
+        availability: "served" as const,
+        years: [...new Set(facts.map(fact => yearOfPeriod(fact.period)))].sort((a, b) => a - b),
+        periods: rangeOf(facts.map(fact => fact.period))!,
+        periodsByMeasure,
+      };
+    });
+  }
   const coverage = inflationSeriesCoverage(snapshot);
   const entry = (seriesId: string, labelKa: string, level: string, parentSeriesId: string | null) => {
     const series = coverage.get(seriesId)!;
@@ -156,8 +176,9 @@ export function inflationCatalogueSeries(snapshot: FactQuerySnapshot) {
   ];
 }
 
-export function inflationDatasetPeriods(snapshot: FactQuerySnapshot): PeriodRange {
-  return rangeOf([...snapshot.inflation.facts, ...snapshot.inflation.categories].map((fact) => fact.period))!;
+export function inflationDatasetPeriods(snapshot: FactQuerySnapshot, cityScope = false): PeriodRange {
+  const facts = cityScope ? snapshot.inflation.cities : [...snapshot.inflation.facts, ...snapshot.inflation.categories];
+  return rangeOf(facts.map((fact) => fact.period))!;
 }
 
 /** First and last month of any city value, per city (describe_coverage). Late starts per series come back as missing cells. */

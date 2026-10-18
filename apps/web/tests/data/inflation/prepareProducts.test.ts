@@ -15,7 +15,7 @@ let catalogue: ProductCatalogueRow[];
 let prepared: Awaited<ReturnType<typeof prepareProducts>>;
 
 beforeAll(async () => {
-  rows = pairProductEditions(await readVerifiedProductFiles(path.join(INFLATION_PRODUCTS_RAW_ROOT, "2026-08")));
+  rows = pairProductEditions(await readVerifiedProductFiles(path.join(INFLATION_PRODUCTS_RAW_ROOT, "2026-09")));
   decisions = await loadProductDecisions();
   prepared = await prepareProducts({ previousFacts: null });
   catalogue = prepared.catalogue;
@@ -82,11 +82,15 @@ describe("reviewed product identity mapping", () => {
       if (!prior) continue;
       for (const cell of prior.momCells) if (cell.index100 !== null) priorYearMonthly.set(`${productId}:${cell.period}`, cell.index100);
     }
+    const throughAugust = prepared.facts.filter((fact) => fact.period <= "2026-08");
+    expect(validateProductIndices(throughAugust, priorYearMonthly).arithmeticChecked).toBe(41_830);
+    expect(throughAugust).toHaveLength(84_056);
+    expect(prepared.facts.filter((fact) => fact.period === "2026-09")).toHaveLength(610);
     const report = validateProductIndices(prepared.facts, priorYearMonthly);
-    expect(report.arithmeticChecked).toBe(41_830);
+    expect(report.arithmeticChecked).toBe(42_135);
     expect(report.arithmeticPriorYearChecked).toBe(3_157);
     expect(report.arithmeticUncomparable).toBe(22);
-    expect(prepared.validation.arithmeticChecked).toBe(41_830);
+    expect(prepared.validation.arithmeticChecked).toBe(42_135);
     const tampered2014 = new Map(priorYearMonthly);
     tampered2014.set("cpi.product.p0001:2014-12", "150");
     expect(() => validateProductIndices(prepared.facts, tampered2014)).toThrow(/annual index/);
@@ -142,7 +146,7 @@ describe("reviewed product identity mapping", () => {
     expect(catalogueCsv).toBe(serializeProductCatalogue(prepared.catalogue));
     expect(factsCsv).toBe(serializeProductFacts(prepared.facts));
     const report = JSON.parse(await fs.readFile(path.join(root, "data/reports/inflation-products-validation.json"), "utf8")) as Record<string, unknown>;
-    expect(report).toMatchObject({ latestPeriod: "2026-08", includedProducts: 305, reviewedLinks: 29, reviewedSplits: 18 });
+    expect(report).toMatchObject({ latestPeriod: "2026-09", includedProducts: 305, reviewedLinks: 29, reviewedSplits: 18 });
     expect(report.arithmeticChecked).toBeGreaterThan(38_000);
     await expect(writeProductArtifacts("check")).resolves.toMatchObject({ includedProducts: 305 });
   }, 90_000);

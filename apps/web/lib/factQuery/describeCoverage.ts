@@ -224,7 +224,8 @@ function buildExclusions(snapshot: FactQuerySnapshot): CoverageData["exclusions"
   return AGGREGATE_ONLY_MUNICIPAL_CODES.map((entityId) => ({ entityId, reason: serviceMessage(snapshot, "ka", "exclusions.catalogueMunicipality"), reasonEn: serviceMessage(snapshot, "en", "exclusions.catalogueMunicipality") }));
 }
 
-function buildDatasetSummary(snapshot: FactQuerySnapshot, datasetId: DatasetId): DatasetSummary {
+function buildDatasetSummary(snapshot: FactQuerySnapshot, datasetId: DatasetId, cityScope = false): DatasetSummary {
+  const citySeries = cityScope ? inflationCatalogueSeries(snapshot, true) : undefined;
   let years: [number, number];
 
   switch (datasetId) {
@@ -273,7 +274,7 @@ function buildDatasetSummary(snapshot: FactQuerySnapshot, datasetId: DatasetId):
       years = yearRange(snapshot.regionalEconomies.facts.map(f=>f.year), datasetId);
       break;
     case "inflation":
-      years = yearRange(inflationCatalogueSeries(snapshot).flatMap((series) => series.years), datasetId);
+      years = yearRange((citySeries ?? inflationCatalogueSeries(snapshot)).flatMap((series) => series.years), datasetId);
       break;
     case "inflation-products":
       years = yearRange(snapshot.inflationProducts.facts.map(row => Number(row.period.slice(0, 4))), datasetId);
@@ -297,8 +298,8 @@ function buildDatasetSummary(snapshot: FactQuerySnapshot, datasetId: DatasetId):
     datasetId,
     ...meta,
     labelEn: serviceLabelEn(snapshot, datasetId),
-    entityTypes: [...meta.entityTypes],
-    measures: [...meta.measures],
+    entityTypes: cityScope ? ["city"] : [...meta.entityTypes],
+    measures: citySeries ? INFLATION_MEASURES.filter(measure => citySeries.some(series => series.periodsByMeasure[measure] !== undefined)) : [...meta.measures],
     years,
     ...(datasetId === "economic-sectors"
       ? {
@@ -332,7 +333,7 @@ function buildDatasetSummary(snapshot: FactQuerySnapshot, datasetId: DatasetId):
           ),
         }
       : {}),
-    ...(datasetId === "inflation" ? { periods: inflationDatasetPeriods(snapshot) } : {}),
+    ...(datasetId === "inflation" ? { periods: inflationDatasetPeriods(snapshot, cityScope) } : {}),
     ...(datasetId === "inflation-products" ? {
       periods: [productPeriods[0]!, productPeriods.at(-1)!] as [string, string],
       measureNotesKa: { yoy_pct: serviceMessage(snapshot, "ka", "definitions.inflationProductAnnual"), cumulative_pct: serviceMessage(snapshot, "ka", "coverage.inflationProductCumulative") },
@@ -593,7 +594,7 @@ function deficitSeriesFor(snapshot: FactQuerySnapshot): BaseSeriesEntry[] {
   ];
 }
 
-function baseSeriesForDataset(snapshot: FactQuerySnapshot, datasetId: DatasetId): BaseSeriesEntry[] {
+function baseSeriesForDataset(snapshot: FactQuerySnapshot, datasetId: DatasetId, cityScope = false): BaseSeriesEntry[] {
   switch (datasetId) {
     case "national-revenue":
       return nationalSeriesFor(snapshot, "revenue");
@@ -661,7 +662,7 @@ function baseSeriesForDataset(snapshot: FactQuerySnapshot, datasetId: DatasetId)
         ),
       }));
     case "inflation":
-      return inflationCatalogueSeries(snapshot);
+      return inflationCatalogueSeries(snapshot, cityScope);
     case "inflation-products":
       return inflationProductCatalogue(snapshot);
   }
@@ -705,8 +706,8 @@ function municipalEntitiesFor(snapshot: FactQuerySnapshot): BaseEntityEntry[] {
   return [country, ...regions, ...municipalities];
 }
 
-function seriesForDataset(snapshot: FactQuerySnapshot, datasetId: DatasetId): SeriesEntry[] {
-  return baseSeriesForDataset(snapshot, datasetId).map(series => ({ ...series, labelEn: series.labelEn ?? serviceLabelEn(snapshot, series.seriesId) }));
+function seriesForDataset(snapshot: FactQuerySnapshot, datasetId: DatasetId, cityScope = false): SeriesEntry[] {
+  return baseSeriesForDataset(snapshot, datasetId, cityScope).map(series => ({ ...series, labelEn: series.labelEn ?? serviceLabelEn(snapshot, series.seriesId) }));
 }
 
 function entitiesForDataset(snapshot: FactQuerySnapshot, datasetId: DatasetId): EntityEntry[] | undefined {
@@ -858,8 +859,10 @@ export function describeCoverage(snapshot: FactQuerySnapshot, rawInput: unknown)
   // becoming about that one dataset. This is a real contract decision, not
   // just an implementation detail — asserted below by the
   // "narrows datasets to the requested one" test.
-  const datasets = DATASET_IDS.filter((id) => input.datasetId === undefined || id === input.datasetId).map((id) =>
-    buildDatasetSummary(snapshot, id),
+  const cityScope = input.entityType === "city";
+  const eligibleDatasets = DATASET_IDS.filter(id => !cityScope || DATASET_META[id].entityTypes.includes("city"));
+  const datasets = eligibleDatasets.filter((id) => input.datasetId === undefined || id === input.datasetId).map((id) =>
+    buildDatasetSummary(snapshot, id, cityScope),
   );
 
   if (input.datasetId === undefined) {
@@ -875,8 +878,8 @@ export function describeCoverage(snapshot: FactQuerySnapshot, rawInput: unknown)
     const foundSeries: (SeriesEntry & { datasetId: DatasetId })[] = [];
     const foundEntities: (EntityEntry & { datasetId: DatasetId })[] = [];
 
-    for (const id of DATASET_IDS) {
-      for (const entry of seriesForDataset(snapshot, id)) {
+    for (const id of eligibleDatasets) {
+      for (const entry of seriesForDataset(snapshot, id, cityScope)) {
         if (matchesLevel(entry, input.level, id) && matchesSearch(input.search, [entry.seriesId, entry.labelKa, entry.labelEn])) {
           // Tagged, because a match found without a dataset is useless until the
           // caller knows which dataset to ask.
@@ -911,7 +914,7 @@ export function describeCoverage(snapshot: FactQuerySnapshot, rawInput: unknown)
   }
 
   const datasetId = input.datasetId;
-  const series = seriesForDataset(snapshot, datasetId).filter(
+  const series = (eligibleDatasets.includes(datasetId) ? seriesForDataset(snapshot, datasetId, cityScope) : []).filter(
     (entry) =>
       matchesLevel(entry, input.level, datasetId) &&
       (input.search === undefined || matchesSearch(input.search, [entry.seriesId, entry.labelKa, entry.labelEn])),

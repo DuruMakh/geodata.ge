@@ -238,6 +238,11 @@ workbook. Original files, URLs, hashes, sizes, units and review notes are retain
 consolidated-revenue package: code `1332` for 2015–2018, and current/special code `1.3.3.1.2`
 plus capital code `1.3.3.2.2` for 2019–2025. Reserve or project-fund rows are not subtracted
 again. The loader validates exact cent-level arithmetic, unique years and dense coverage.
+The MCP evidence chain resolves the eleven existing 2015–2025 Treasury PDFs by
+explicit registry paths. Country totals cover originals for all 69 budgets plus
+republican payments and the same year's transfer original; territorial rows retain
+only their eligible member originals. Named workbooks must also cover the observation
+year, so 2015 rows do not cite 2016–2025 history books.
 
 The verified 2015 consolidated Adjara value is:
 

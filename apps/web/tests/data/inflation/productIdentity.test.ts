@@ -10,7 +10,7 @@ import type { PairedProductRow, ProductSourceCell } from "../../../lib/data/infl
 
 let rows: PairedProductRow[];
 beforeAll(async () => {
-  rows = pairProductEditions(await readVerifiedProductFiles(path.join(INFLATION_PRODUCTS_RAW_ROOT, "2026-08")));
+  rows = pairProductEditions(await readVerifiedProductFiles(path.join(INFLATION_PRODUCTS_RAW_ROOT, "2026-09")));
 });
 
 function row(year: number, ordinal: number, labelEn: string, labelKa: string): PairedProductRow {
@@ -25,7 +25,7 @@ describe("current-basket product identity audit", () => {
     expect(catalogue).toHaveLength(305);
     expect(new Set(catalogue.map((item) => item.productId)).size).toBe(305);
     expect(catalogue[0]!.productId).toBe("cpi.product.p0001");
-    expect(audit.latestPeriod).toBe("2026-08");
+    expect(audit.latestPeriod).toBe("2026-09");
     expect(audit.catalogue.filter((item) => item.firstPeriod === "2015-01")).toHaveLength(258);
     expect(audit.unresolvedTransitions).toHaveLength(47);
     expect(audit.transitions).toHaveLength(47);

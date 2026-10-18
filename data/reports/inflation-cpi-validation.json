@@ -1,16 +1,16 @@
 {
   "status": "PASS",
-  "vintage": "2026-08",
-  "lastPeriod": "2026-08",
+  "vintage": "2026-09",
+  "lastPeriod": "2026-09",
   "counts": {
-    "cpi.headline:index_2010": 320,
-    "cpi.headline:yoy_pct": 272,
-    "cpi.headline:mom_pct": 272,
-    "cpi.headline:avg12_pct": 296,
-    "cpi.core:yoy_pct": 200,
-    "cpi.core:mom_pct": 200,
-    "cpi.core_ex_tobacco:yoy_pct": 200,
-    "cpi.core_ex_tobacco:mom_pct": 200
+    "cpi.headline:index_2010": 321,
+    "cpi.headline:yoy_pct": 273,
+    "cpi.headline:mom_pct": 273,
+    "cpi.headline:avg12_pct": 297,
+    "cpi.core:yoy_pct": 201,
+    "cpi.core:mom_pct": 201,
+    "cpi.core_ex_tobacco:yoy_pct": 201,
+    "cpi.core_ex_tobacco:mom_pct": 201
   },
   "firstPeriods": {
     "cpi.headline:index_2010": "2000-01",
@@ -29,22 +29,22 @@
   },
   "languageParity": "PASS",
   "sourceHashes": {
-    "en/cpi-index-2010.xlsx": "4aa2a8b2d923f915855fa70c3aac54dff8080bcbe24dfcf784816edb915d5492",
-    "en/cpi-yoy.xlsx": "fbd93bf2891e3691975eea5e92f754e03e8e93c2c86a71b3e582ceaaf79863e9",
-    "en/cpi-mom.xlsx": "26f32d7a37a262c084afd935b01632e6dc02c4b21ef13608c27c2e50a0cc403c",
-    "en/cpi-avg12.xlsx": "32a8891f69d1786ab4fee21e285f465370159d097e0acf7a7875f45f7b7d5b80",
-    "en/core-yoy.xlsx": "19c93828962e0ec28a7b3d784e7bc473697924fa74f43e9f9f96dc525cc4bfb3",
-    "en/core-mom.xlsx": "14f2fffc80674fd8a3fef1820776af36bbfdeeb4799195b93a565d2b5a9676aa",
-    "ka/cpi-index-2010.xlsx": "e5a1c33a64a589c1c91f09524e79035d8b29565bbb254aeffd4fb1c42a11d5db",
-    "ka/cpi-yoy.xlsx": "77da6b090f6e727d5919c81ff0de36851fc2d7e1c09346da47fbfd32b2b22a17",
-    "ka/cpi-mom.xlsx": "5dc52f3ff44449641fe702a32639b72e95509fbd01c591712bc0bd8992fb427d",
-    "ka/cpi-avg12.xlsx": "004c85f71de48a99063561b3be1b0337169bb77d6ba03ef085574e0e8cda1237",
-    "ka/core-yoy.xlsx": "55b5274a90d05744b4529da3a2a0d0ec68bc4de28553dc6eeb54fa695f602c9a",
-    "ka/core-mom.xlsx": "592bb00db5bd953da88fb0101dd1ccd992652b47ec1a22a43a47523f3f033cf2"
+    "en/cpi-index-2010.xlsx": "46372d887769b0328fa45557fcdedf64e7282c0bb4178577249ba8250a9a7f97",
+    "en/cpi-yoy.xlsx": "68318dbcc6f43048c4778c8bbc75d7d657214f530122180987b0c63608073ec2",
+    "en/cpi-mom.xlsx": "0620e2f4f60c639488ff12b97e5d587cd5b157b43226de6e6a37b9bbc011c0b3",
+    "en/cpi-avg12.xlsx": "864d5e943cd9f1d0e6e2412312ff06fb5c6363ba490cdf2d2b82e68bf9d97ecf",
+    "en/core-yoy.xlsx": "d47a341726d230d4db5740858de5525de18aa394a28af4f80277f27415fb5dd4",
+    "en/core-mom.xlsx": "cdf47cda9ffa765aa21e38b2905a483cd6299658b5b6a7afb8cdd72f6de5565d",
+    "ka/cpi-index-2010.xlsx": "467eb31613f77d59a644b288cdc905fdd55a3ef38785c2c15381b36ff7e8de68",
+    "ka/cpi-yoy.xlsx": "de4fbdac7202bd222fbd717de8aa231549f2cb77f168527e6ed0d9d85529d41e",
+    "ka/cpi-mom.xlsx": "394ac58a89e4b1b72df6a8063cc094657200c72d2cebcc46ed508c8efdce0404",
+    "ka/cpi-avg12.xlsx": "38f6049f84daf8ad17d690634aec8c8b1e71fc5cc3ba8e2051431d56c8ce497a",
+    "ka/core-yoy.xlsx": "5644e035ca16b95c58e4a682f1337b4c8a362dad206532029ce2c6b81f99fa0e",
+    "ka/core-mom.xlsx": "24645ef7ccdc4e53d4556f7f9d60b6ecdbacdca5e2a8aa52cca8a64522191c6b"
   },
   "categories": {
     "categoryCount": 55,
-    "lastPeriod": "2026-08",
+    "lastPeriod": "2026-09",
     "gaps": [
       "cpi.cat.12_5:mom_pct after 2006-12",
       "cpi.cat.12_5:yoy_pct after 2006-12",
@@ -74,15 +74,15 @@
       "ka/basket-weights.xlsx": "e3e53072e6eadf43725ace7dd83b698a188fc5c2343530ab901b551df2b3ed3a"
     },
     "reconstruction": {
-      "months": 164,
+      "months": 165,
       "maxPp": 0.5848,
-      "meanPp": 0.0803,
+      "meanPp": 0.0815,
       "worstPeriod": "2021-03"
     }
   },
   "cities": {
     "cityCount": 6,
-    "lastPeriod": "2026-08",
+    "lastPeriod": "2026-09",
     "firstPeriods": {
       "city.tbilisi:cpi.headline:yoy_pct": "2016-01",
       "city.tbilisi:cpi.cat.01:yoy_pct": "2016-01",
@@ -381,16 +381,16 @@
       },
       {
         "year": 2026,
-        "months": 8,
+        "months": 9,
         "weights": {
-          "city.tbilisi": 0.55493,
-          "city.kutaisi": 0.121916,
-          "city.batumi": 0.107681,
-          "city.gori": 0.060174,
-          "city.telavi": 0.07869,
-          "city.zugdidi": 0.076608
+          "city.tbilisi": 0.554912,
+          "city.kutaisi": 0.121909,
+          "city.batumi": 0.107692,
+          "city.gori": 0.060185,
+          "city.telavi": 0.078692,
+          "city.zugdidi": 0.076609
         },
-        "maxResidualPp": 0.000049
+        "maxResidualPp": 0.000047
       }
     ],
     "skippedWeightYears": []

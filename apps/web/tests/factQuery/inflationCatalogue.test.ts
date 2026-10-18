@@ -19,8 +19,17 @@ function catalogue(input: unknown): CoverageData {
 }
 
 describe("inflation snapshot and catalogue", () => {
-  it("retains inflation city coverage under schema 1.5.0", () => {
-    expect(SCHEMA_VERSION).toBe("1.5.0");
+  it("preserves the national catalogue for country and unfiltered requests", () => {
+    const unfiltered = catalogue({ datasetId: "inflation" });
+    const country = catalogue({ datasetId: "inflation", entityType: "country" });
+    expect(country.series).toEqual(unfiltered.series);
+    expect(country.datasets).toEqual(unfiltered.datasets);
+    expect(country.series!.map(series => series.seriesId)).toContain("cpi.core");
+    expect(country.series!.map(series => series.seriesId)).toContain("cpi.cat.01_1");
+  });
+
+  it("retains inflation city coverage under schema 1.6.0", () => {
+    expect(SCHEMA_VERSION).toBe("1.6.0");
   });
 
   it("carries every served inflation row", async () => {

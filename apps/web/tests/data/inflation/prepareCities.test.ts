@@ -14,7 +14,9 @@ describe("prepareInflationCities", () => {
   it("extracts six cities from 2016 in three measures", async () => {
     const { facts, validation } = await prepared;
     expect(validation.cityCount).toBe(6);
-    expect(facts).toHaveLength(20570);
+    expect(facts.filter((fact) => fact.period <= "2026-08")).toHaveLength(20570);
+    expect(validation.lastPeriod).toBe("2026-09");
+    expect(facts.filter((fact) => fact.period === "2026-09")).toHaveLength(162);
     expect(facts.every((fact) => fact.period >= "2016-01")).toBe(true);
     expect(facts.filter((fact) => fact.measure === "avg12_pct").every((fact) => fact.seriesId === "cpi.headline")).toBe(true);
     expect(validation.firstPeriods["city.zugdidi:cpi.headline:yoy_pct"]).toBe("2016-12");

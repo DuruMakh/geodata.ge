@@ -1,6 +1,6 @@
 {
   "housing.title": "Housing and construction",
-  "housing.hubSummary": "Building permits, completed buildings and home prices",
+  "housing.hubSummary": "Permits, completions and home prices",
   "housing.metaTitle": "Housing and construction in Georgia",
   "housing.metaDescription": "Building permits and completed buildings in Georgia by type and region, the home price index and new-home prices in Tbilisi’s districts, from Geostat data.",
   "housing.page.permits.title": "Building permits",
@@ -67,8 +67,8 @@
   "housing.unitGelPerSquareMetre": "GEL per m²",
   "housing.latest.permits": "Permits",
   "housing.latest.completed": "Buildings completed",
-  "housing.latest.prices": "Home price index (2020 = 100)",
-  "housing.latestPeriod.prices": "{year}, 4th quarter",
+  "housing.latest.prices": "Index (2020 = 100)",
+  "housing.latestPeriod.prices": "{year} Q4",
   "housing.latest.regions": "Floor area permitted in {region}",
   "housing.latest.area": "Permits",
   "housing.mapLabel": "Floor area permitted",

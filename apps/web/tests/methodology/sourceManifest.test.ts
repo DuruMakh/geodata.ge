@@ -86,6 +86,27 @@ afterEach(async () => {
 });
 
 describe("reviewed source manifest", () => {
+  it("covers the reviewed 2014 column without renaming the 2015 workbook", async () => {
+    const rows = await loadReviewedSourceManifest(path.resolve(process.cwd(), "../.."), "expenditure");
+    expect(rows.find(row => row.source_id === "source.mof.expenditure.2015.mof_excel_fact")).toMatchObject({
+      year: "2014-2015", years: [2014, 2015], official_filename: "2015-fact.xlsx",
+      display_title_ka: "2015 წლის სახელმწიფო ბიუჯეტის შესრულების სამუშაო წიგნი",
+      repository_source_path: "docs/Raw Data/Expenditure/mof.ge/excel-fact-files-2004-2025/2015-fact.xlsx",
+      byte_size: 85702, sha256: "47f9c22fffcae56faecb79bc0cfe84bcddb42db265ff4da7089ba84abdb0906e",
+    });
+  });
+
+  it("retains all eleven reviewed Treasury originals with their exact annual scope", async () => {
+    const rows = await loadReviewedSourceManifest(path.resolve(process.cwd(), "../.."), "revenue");
+    const transfers = rows.filter(row => row.years[0]! >= 2015).sort((a, b) => a.year.localeCompare(b.year));
+    expect(transfers.map(row => [row.source_id, row.years, row.repository_source_path, row.downloadHref])).toEqual(
+      Array.from({ length: 11 }, (_, index) => {
+        const year = 2015 + index;
+        return [`source.mof.revenue.${year}.form_1`, [year], `docs/Raw Data/Revenue/${year}-jan-dec-consolidated-revenue.pdf`, `/downloads/methodology/revenue/files/${year}/mof-revenue-form-1.pdf`];
+      }),
+    );
+  });
+
   it("loads the two reviewed Regional GDP originals from their existing repository locations", async () => {
     const repositoryRoot = path.resolve(process.cwd(), "../..");
     const rows = await loadReviewedSourceManifest(repositoryRoot, "regional-economies" as never);

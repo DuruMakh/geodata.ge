@@ -43,6 +43,75 @@ const TOOL_NAMES = [
 ];
 
 describe("MCP tool surface", () => {
+  it("explains aggregate scope, bulk evidence and the existing unsupported-dataset alternative", () => {
+    const instructions = serverInstructions({}, ENTITY_COUNTS);
+    for (const required of [
+      "69 reviewed budgets", "64 territorial municipalities", "net Adjara adjustment exactly once",
+      "manifest.json inventories publication files", "sources.json contains the complete original-document catalogue",
+      "When asked for all underlying evidence", "https://fiscal.ge/downloads/data/sources.json",
+      "first/last examples alone are not a complete citation path",
+      "inflation-products.csv", "index_100", "mom_index_100", "yoy_index_100", "100 means no price change",
+      "Unemployment is not served by this MCP", "https://fiscal.ge/explorer/unemployment/overview",
+      "https://fiscal.ge/en/explorer/unemployment/overview",
+    ]) expect(instructions).toContain(required);
+  });
+
+  it("puts the complete discovery-to-evidence workflow in the opening 512 characters", () => {
+    const instructions = serverInstructions({}, ENTITY_COUNTS);
+    const opening = instructions.split("\n\n")[0]!;
+    expect(opening.length).toBeLessThanOrEqual(512);
+    for (const required of ["describe_coverage", "short keywords", "returned IDs", "supported measures", "expectedDataVersion", "units", "missing values", "projections", "caveats", "original documents", "Fiscal.ge", "product", "series and dates", "published files", "bulk"]) {
+      expect(opening).toContain(required);
+    }
+    // The short opening supplements the domain rules; it must not replace them.
+    for (const heading of ["BUDGET BOUNDARIES", "DEBT AND FISCAL BALANCE", "INFLATION", "PRODUCT INFLATION", "CITATIONS AND LICENCE", "CAVEATS", "WHAT YOU MUST NOT CLAIM"]) {
+      expect(instructions).toContain(heading);
+    }
+    expect(instructions).toContain("Missing is not zero");
+    expect(instructions).toContain("preceding December");
+  });
+
+  it("teaches recovery from empty phrase searches without treating them as absent data", async () => {
+    const instructions = serverInstructions({}, ENTITY_COUNTS);
+    expect(instructions).toContain("principal word");
+    expect(instructions).toContain("not proof that the data is absent");
+    const client = await connected();
+    try {
+      const { tools } = await client.listTools();
+      const discovery = tools.find(tool => tool.name === "describe_coverage")!.description!;
+      expect(discovery).toContain("one meaningful keyword");
+      expect(discovery).toContain("phrase returns no matches");
+      expect(discovery).toContain("browse the named dataset");
+    } finally {
+      await client.close();
+    }
+  });
+
+  it.each([
+    { name: "get_sources", args: { sourceIds: ["source.geostat_cpi_yoy"] }, guidance: "fewer source IDs" },
+    { name: "describe_coverage", args: { datasetId: "inflation" }, guidance: "short search term" },
+  ])("preserves $name recovery through the registered tool callback", async ({ name, args, guidance }) => {
+    const tool = TOOLS.find(tool => tool.name === name)!;
+    const response = tool.run(loadPackagedSnapshot(), args);
+    if (response.kind === "error") throw new Error("Expected data");
+    response.meta.generatedAt += "x".repeat(512 * 1024);
+    const run = vi.spyOn(tool, "run").mockReturnValue(response);
+    const client = await connected();
+    try {
+      const result = await client.callTool({ name, arguments: args });
+      expect(result.isError).toBe(true);
+      expect(result.structuredContent).toBeUndefined();
+      const text = (result.content as { text: string }[])[0]!.text;
+      expect(text).toContain("result_too_large");
+      expect(text).toContain(guidance);
+      expect(text).not.toContain("0 cells");
+      expect(text).toContain("https://fiscal.ge/downloads/data/manifest.json");
+    } finally {
+      run.mockRestore();
+      await client.close();
+    }
+  });
+
   it("preflights 501 product output cells before calculation while accepting a long input span", async () => {
     const product = TOOLS.find(tool => tool.name === "query_inflation_products");
     expect(product).toBeDefined();
@@ -325,12 +394,12 @@ describe("MCP tool surface", () => {
     try {
       const batumi = await client.callTool({ name: "query_inflation", arguments: { entityIds: ["city.batumi"], seriesIds: ["cpi.headline"], measure: "yoy_pct", fromPeriod: "2026-08", toPeriod: "2026-08" } });
       expect(batumi.isError).toBeFalsy();
-      expect(batumi.structuredContent).toMatchObject({ data: { observations: [{ value: 7.0857 }], coverage: { availablePeriods: ["2016-01", "2026-08"] } } });
+      expect(batumi.structuredContent).toMatchObject({ data: { observations: [{ value: 7.0857 }], coverage: { availablePeriods: ["2016-01", "2026-09"] } } });
       expect((batumi.content as { text: string }[])[0]!.text).toContain("\t2026-08\tyoy_pct\t7.0857\t");
 
       const zugdidi = await client.callTool({ name: "query_inflation", arguments: { entityIds: ["city.zugdidi"], seriesIds: ["cpi.headline"], measure: "avg12_pct", fromPeriod: "2016-06", toPeriod: "2016-06" } });
       expect(zugdidi.isError).toBeFalsy();
-      expect(zugdidi.structuredContent).toMatchObject({ status: "empty", data: { observations: [{ value: null }], coverage: { availablePeriods: ["2017-12", "2026-08"] } } });
+      expect(zugdidi.structuredContent).toMatchObject({ status: "empty", data: { observations: [{ value: null }], coverage: { availablePeriods: ["2017-12", "2026-09"] } } });
       expect((zugdidi.content as { text: string }[])[0]!.text).toContain("2017-12");
     } finally { await client.close(); }
   });
@@ -396,7 +465,7 @@ describe("MCP tool surface", () => {
     const instructions = serverInstructions({}, ENTITY_COUNTS);
     expect(instructions).toContain("INFLATION");
     expect(instructions).toContain("only monthly dataset");
-    expect(instructions).toContain("schema 1.5.0");
+    expect(instructions).toContain("schema 1.6.0");
     expect(instructions).not.toContain("Quarterly or monthly data, live budget execution");
   });
 

@@ -263,6 +263,7 @@ export const errorCodeSchema = z.enum([
   "data_version_changed",
   "rate_limited",
   "service_unavailable",
+  "internal_error",
 ]);
 
 export const caveatSchema = z.object({
