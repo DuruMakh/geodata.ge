@@ -304,12 +304,14 @@ class EducationPackageTests(unittest.TestCase):
             breaks = list(csv.DictReader(handle))
         self.assertEqual(list(breaks[0]), ['break_id', 'applies_to', 'reference_date', 'reason', 'source_note'])
         self.assertEqual([(b['break_id'], b['reference_date']) for b in breaks],
-                         [('kindergarten_staff_2020', '2020-09-01'), ('he_levels_2015', '2015-09-01')])
+                         [('kindergarten_staff_2020', '2020-09-01'), ('he_levels_2015', '2015-09-01'), ('he_levels_2015_graduates', '2014-09-01')])
         indicators = {r['indicator_id'] for r in self.rows}
         self.assertEqual(breaks[0]['applies_to'].split(';'), sorted(i for i in indicators if i.startswith('education.kg_staff.')))
         self.assertIn('caregiver-pedagogues/caregivers/assistant caregivers/Inclusive education special teachers', breaks[0]['reason'])
         self.assertEqual(breaks[1]['applies_to'].split(';'),
-                         sorted(i for i in indicators if i.startswith('education.he_') and i.endswith(('.level_bachelor', '.level_master'))))
+                         sorted(i for i in indicators if i.startswith(('education.he_students.', 'education.he_admitted.')) and i.endswith(('.level_bachelor', '.level_master'))))
+        self.assertEqual(breaks[2]['applies_to'].split(';'),
+                         sorted(i for i in indicators if i.startswith('education.he_graduates.') and i.endswith(('.level_bachelor', '.level_master'))))
         self.assertIn('certified doctor (veterinarian) program, residency - are included in the Masters level', breaks[1]['reason'])
 
     def test_committed_outputs_reproduce(self):

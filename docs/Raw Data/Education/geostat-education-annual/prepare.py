@@ -1012,6 +1012,8 @@ def manifest():
 def breaks(indicators):
     staff = [i for i in indicators if i.startswith('education.kg_staff.')]
     levels = [i for i in indicators if i.startswith('education.he_') and i.endswith(('.level_bachelor', '.level_master'))]
+    graduate_levels = [i for i in levels if i.startswith('education.he_graduates.')]
+    school_year_levels = [i for i in levels if i not in graduate_levels]
     kg_url = _media(75474, 'Indicators-on-Public-Preschool-Education-and-Care-%28PEC%29-Institutions.xlsx')[0]
     he_url = _media(77160, '01Number-of-Students-Admission-Graduates-by-Programmes-and-Sex.xlsx')[0]
     return [
@@ -1023,7 +1025,7 @@ def breaks(indicators):
          'source_note': f'Indicators-on-Public-Preschool-Education-and-Care-(PEC)-Institutions.xlsx ({kg_url}), sheet 1, row 3 '
                         'headings (D3 for 2017/18, M3 for 2020/21). Public kindergartens ("1)Actually operating institutions '
                         'during the accounting period").'},
-        {'break_id': 'he_levels_2015', 'applies_to': ';'.join(sorted(levels)), 'reference_date': '2015-09-01',
+        {'break_id': 'he_levels_2015', 'applies_to': ';'.join(sorted(school_year_levels)), 'reference_date': '2015-09-01',
          'reason': 'From 2015/16 Geostat counts certified physician (veterinarian) programmes and residency at master\'s level, '
                    'following ISCED 2011. Sheet Number, A103: "Note: From 2015-2016 school year in accordance with the '
                    'International Standard Classification of Education (ISCED 2011), certified doctor (veterinarian) program, '
@@ -1031,9 +1033,16 @@ def breaks(indicators):
                    'physician programme" and "Magistracy or Residency" to "Bachelor programme" and "Magistracy, Certified '
                    'physician (Veterinarian) or Residency". No change may be computed across this point.',
          'source_note': f'01Number-of-Students-Admission-Graduates-by-Programmes-and-Sex.xlsx ({he_url}): the same note in sheet '
-                        'Admission (A103, "From 2015/2016 school year") and sheet Graduates (A164, "From 2015"). Graduates are '
-                        'stored under the school year they end, so the new headings start in the "2015 year" column, stored as '
-                        '2014 (2014/15).'},
+                        'Admission (A103, "From 2015/2016 school year"). Graduates are published by calendar year and stored under '
+                        'the school year they end, so their change has its own break, he_levels_2015_graduates.'},
+        {'break_id': 'he_levels_2015_graduates', 'applies_to': ';'.join(sorted(graduate_levels)), 'reference_date': '2014-09-01',
+         'reason': 'From the "2015 year" column (stored as 2014, school year 2014/15) Geostat counts certified physician (veterinarian) programmes and residency at master\'s level, '
+                   'following ISCED 2011. Sheet Graduates, A164: "From 2015". The level headings change from "Bachelor or Certified '
+                   'physician programme" and "Magistracy or Residency" to "Bachelor programme" and "Magistracy, Certified '
+                   'physician (Veterinarian) or Residency". Graduates are stored under the school year they end, so this break is dated '
+                   '2014-09-01, a year before he_levels_2015 for students and admitted students. No change may be computed across this point.',
+         'source_note': f'01Number-of-Students-Admission-Graduates-by-Programmes-and-Sex.xlsx ({he_url}), sheet Graduates (A164, "From 2015"): '
+                        'the new headings start in the "2015 year" column, stored as 2014 (2014/15).'},
     ]
 
 

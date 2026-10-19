@@ -195,9 +195,10 @@ export function validateEducationFacts(facts: readonly EducationFact[], municipa
       if (georgia) compare(`${indicatorId} georgia`, [...EDUCATION_REGIONS, "unit.abkhazia_ar"].map(id => series(indicatorId, id)), georgia, "0", true);
     }
   }
-  const unexplained = [...found.filter(f => !EDUCATION_KNOWN_DIFFERENCES.some(k => k.check === f.check && k.year === f.year && k.difference === f.difference)),
-    ...EDUCATION_KNOWN_DIFFERENCES.filter(k => !found.some(f => f.check === k.check && f.year === k.year && f.difference === k.difference))];
-  if (unexplained.length) throw new Error(`The ${unexplained[0].check} parts do not add up to the total as recorded in ${unexplained[0].year} (expected the recorded difference, found ${unexplained[0].difference})`);
+  const unrecorded = found.find(f => !EDUCATION_KNOWN_DIFFERENCES.some(k => k.check === f.check && k.year === f.year && k.difference === f.difference));
+  if (unrecorded) throw new Error(`The ${unrecorded.check} parts do not add up to the total as recorded in ${unrecorded.year}: unrecorded difference found ${unrecorded.difference}`);
+  const gone = EDUCATION_KNOWN_DIFFERENCES.find(k => !found.some(f => f.check === k.check && f.year === k.year && f.difference === k.difference));
+  if (gone) throw new Error(`The ${gone.check} parts add up differently from the recorded Geostat difference in ${gone.year}: recorded difference no longer occurs, expected ${gone.difference}, found ${found.find(f => f.check === gone.check && f.year === gone.year)?.difference ?? "none"}`);
 
   if (municipalGeorgia) {
     const national = series("education.pupils_national.total");

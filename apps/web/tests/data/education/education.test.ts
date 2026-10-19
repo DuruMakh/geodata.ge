@@ -98,9 +98,10 @@ test("the canonical file is UTF-8 with a BOM and the agreed header", async () =>
 
 test("the series breaks cover the kindergarten staff counts and the master's-level series", async () => {
   const rows = await readCsv(path.join(root, "data/imports/education-series-breaks.csv"));
-  expect(rows.map(r => [r.break_id, r.reference_date])).toEqual([["kindergarten_staff_2020", "2020-09-01"], ["he_levels_2015", "2015-09-01"]]);
+  expect(rows.map(r => [r.break_id, r.reference_date])).toEqual([["kindergarten_staff_2020", "2020-09-01"], ["he_levels_2015", "2015-09-01"], ["he_levels_2015_graduates", "2014-09-01"]]);
   expect(rows[0].applies_to).toBe("education.kg_staff.total");
-  expect(new Set(rows[1].applies_to.split(";"))).toEqual(new Set(["he_students", "he_admitted", "he_graduates"].flatMap(m => [`education.${m}.level_bachelor`, `education.${m}.level_master`])));
+  expect(new Set(rows[1].applies_to.split(";"))).toEqual(new Set(["he_students", "he_admitted"].flatMap(m => [`education.${m}.level_bachelor`, `education.${m}.level_master`])));
+  expect(new Set(rows[2].applies_to.split(";"))).toEqual(new Set(["education.he_graduates.level_bachelor", "education.he_graduates.level_master"]));
 });
 
 test("geostat's three own sum mismatches are the only ones accepted", async () => {
@@ -124,11 +125,12 @@ test.each([
   ["a shown old vocational field", (facts: EducationFact[]) => { find(facts, "education.vet_admitted.old_law", EDUCATION_GEORGIA, 2015).shown = true; }, /shown flag/],
   ["a hidden current field", (facts: EducationFact[]) => { find(facts, "education.vet_admitted.field_ict", EDUCATION_GEORGIA, 2020).shown = false; }, /shown flag/],
   ["a wrong school-year label", (facts: EducationFact[]) => { find(facts, "education.schools.total", EDUCATION_GEORGIA, 2020).periodLabel = "2020"; }, /period label/],
-  ["a region row that no longer equals its parts", (facts: EducationFact[]) => { plus(find(facts, "education.pupils.total", "region.imereti", 2020), "1"); }, /pupils.*do not add up/],
+  ["a region row that no longer equals its parts", (facts: EducationFact[]) => { plus(find(facts, "education.pupils.total", "region.imereti", 2020), "1"); }, /pupils.*do not add up.*unrecorded difference found -1/],
   ["a municipality that no longer adds to its region", (facts: EducationFact[]) => { plus(find(facts, "education.teachers.women", "06", 2020), "1"); }, /do not add up/],
   ["a kept unit that no longer adds to its region", (facts: EducationFact[]) => { plus(find(facts, "education.schools.total", "unit.akhalgori", 2005), "1"); }, /do not add up/],
   ["regions no longer adding to Georgia", (facts: EducationFact[]) => { plus(find(facts, "education.kg_staff.total", "region.tbilisi", 2020), "1"); }, /do not add up/],
-  ["a recorded mismatch that stops recurring", (facts: EducationFact[]) => { plus(find(facts, "education.pupils.total", "region.guria", 2022), "-205"); }, /do not add up/],
+  ["a recorded mismatch that stops recurring", (facts: EducationFact[]) => { plus(find(facts, "education.pupils.total", "region.guria", 2022), "205"); }, /recorded difference no longer occurs, expected 205, found none/],
+  ["a recorded mismatch that changes into another", (facts: EducationFact[]) => { plus(find(facts, "education.pupils.total", "region.guria", 2022), "1"); }, /unrecorded difference found 204/],
   ["ownership not adding up", (facts: EducationFact[]) => { plus(find(facts, "education.schools.private", EDUCATION_GEORGIA, 2020), "1"); }, /do not add up/],
   ["university fields not adding up", (facts: EducationFact[]) => { plus(find(facts, "education.he_students.field_science", EDUCATION_GEORGIA, 2020), "1"); }, /do not add up/],
   ["vocational sexes not adding up", (facts: EducationFact[]) => { plus(find(facts, "education.vet_graduates.men", EDUCATION_GEORGIA, 2020), "1"); }, /do not add up/],

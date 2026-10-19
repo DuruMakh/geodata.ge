@@ -104,12 +104,13 @@ export async function prepareEducationData(repositoryRoot: string, mode: "write"
   const breakRows = (await readCsv(path.join(directory, "education-series-breaks.csv"))).map((row): EducationSeriesBreak => ({
     breakId: row.break_id, appliesTo: row.applies_to.split(";"), referenceDate: row.reference_date, reason: row.reason, sourceNote: row.source_note,
   }));
-  // Staff counts widen in 2020/21; the three higher-education measures re-define master's level in 2015/16.
+  // Staff counts widen in 2020/21; the three higher-education measures re-define master's level in 2015/16 (graduates are stored a year back, so their break is dated 2014-09-01).
   const expectedBreaks: Record<string, { date: string; appliesTo: string[] }> = {
     kindergarten_staff_2020: { date: "2020-09-01", appliesTo: ["education.kg_staff.total"] },
-    he_levels_2015: { date: "2015-09-01", appliesTo: ["he_students", "he_admitted", "he_graduates"].flatMap(measure => ["level_bachelor", "level_master"].map(group => `education.${measure}.${group}`)) },
+    he_levels_2015: { date: "2015-09-01", appliesTo: ["he_students", "he_admitted"].flatMap(measure => ["level_bachelor", "level_master"].map(group => `education.${measure}.${group}`)) },
+    he_levels_2015_graduates: { date: "2014-09-01", appliesTo: ["education.he_graduates.level_bachelor", "education.he_graduates.level_master"] },
   };
-  if (breakRows.length !== 2 || breakRows.some(row => {
+  if (breakRows.length !== 3 || breakRows.some(row => {
     const want = expectedBreaks[row.breakId];
     return !want || row.referenceDate !== want.date || !row.reason || !row.sourceNote || row.appliesTo.length !== want.appliesTo.length || want.appliesTo.some(id => !row.appliesTo.includes(id));
   })) throw new Error("Education series break register is invalid");
