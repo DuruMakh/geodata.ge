@@ -1,4 +1,3 @@
-import Decimal from "decimal.js";
 import { EDUCATION_GEORGIA, educationFactKey, type ClientEducationFact } from "../data/education/types";
 import type { Presentation } from "../i18n/types";
 import { message } from "../i18n/messages";
@@ -43,7 +42,7 @@ export function buildEducationWorkbookExportModel(input: EducationWorkbookInput,
   const inThousands = lead.decimals === 1;
   const unitLabel = t(inThousands ? "unitThousandPupils" : model.unit === "institutions" ? "unitInstitutions" : "unitPersons");
   const numberFormat = inThousands ? "#,##0.0" : "#,##0";
-  const toExport = (value: number | null) => value === null ? null : inThousands ? new Decimal(value).dividedBy(1000).toNumber() : value;
+  const toExport = (value: number | null) => value === null ? null : inThousands ? value / 1000 : value;
   const status = (id: string, year: number) => cellOf(id, year) ? t("status.official") : workbookMessage(locale, "workbook.unavailable");
   // A row whose name is its heading's ("Teachers" under Teachers) is named alone, never "Teachers — Teachers".
   const headingOf = (series: { id: string; heading: string }) => {

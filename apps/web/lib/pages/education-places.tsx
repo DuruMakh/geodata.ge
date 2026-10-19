@@ -31,15 +31,11 @@ import { loadSourcedWorkbookSources } from "../methodology/workbookSources";
 import { fiscalMetadata } from "../seo/metadata";
 import { explorerDatasetJsonLd } from "../seo/structuredData";
 import { resolveSiteUrl } from "../siteUrl";
+import { workbookScopeFor } from "./demography-population-place";
 
 /** The same three kinds of place page as Population, with the same 11 region ids and 63 municipality slugs. */
 export type EducationPlaceRoute = PlaceRoute;
 export { populationMunicipalityParams as educationMunicipalityParams, populationRegionParams as educationRegionParams } from "./demography-population-place";
-
-function workbookScopeFor(route: EducationPlaceRoute): string {
-  if (route.kind === "country") return "georgia";
-  return route.kind === "region" ? route.id : route.slug;
-}
 
 /** What the index and the place pages share: the shown facts, the registries, the language and the place list. */
 async function loadEducationPlaceBasics(locale: Locale) {

@@ -235,14 +235,7 @@ test("ticking a graduates row on Universities keeps a manual range clamped, neit
   expect([model.range.min, model.range.start, model.range.end]).toEqual([2010, 2011, 2025]);
 });
 
-// The catalogue keys Task 7 adds; the tests hand them over directly.
-const TEST_MESSAGES = {
-  "education.unitPersons": "persons", "education.unitInstitutions": "institutions", "education.unitThousandPupils": "thousand pupils", "education.unitThousand": "thousand",
-  "education.status.official": "Official",
-  "education.page.schools.summary": "schools", "education.page.kindergartens.summary": "kindergartens", "education.page.universities.summary": "universities", "education.page.vocational.summary": "vocational",
-  "common.educationSchools": "Schools", "common.educationKindergartens": "Kindergartens", "common.educationUniversities": "Universities", "common.educationVocational": "Vocational colleges",
-};
-const presentation = async (): Promise<Presentation> => ({ locale: "en", englishLabels: {}, messages: { ...await getMessages("en", ["workbook", "format", "common"]), ...TEST_MESSAGES } });
+const presentation = async (locale: "en" | "ka" = "en"): Promise<Presentation> => ({ locale, englishLabels: {}, messages: await getMessages(locale, ["education", "workbook", "format", "common"]) });
 const SOURCES = EDUCATION_SOURCES.map(sourceId => ({
   sourceId, years: Array.from({ length: 27 }, (_, i) => 1999 + i), title: sourceId, organization: "Geostat", retrievedAt: "2026-10-16",
   downloadHref: `/downloads/methodology/education/files/${sourceId}.xlsx` as const,
@@ -311,8 +304,8 @@ test("a Vocational workbook keeps calendar-year headers", async () => {
 });
 
 test("a Guria Schools pupils workbook is whole persons and cites table 11 alone", async () => {
-  const model = await placeWorkbook("schools", "region.guria", "guria", ["education.pupils.total"], 2005, 2025);
-  expect(model.filename).toBe("fiscal-education-schools-guria-2005-06-2025-26-en.xlsx");
+  const model = await placeWorkbook("schools", "region.guria", "region-guria", ["education.pupils.total"], 2005, 2025);
+  expect(model.filename).toBe("fiscal-education-schools-region-guria-2005-06-2025-26-en.xlsx");
   expect(model.readable.unitLabel).toBe("persons");
   expect(model.readable.numberFormat).toBe("#,##0");
   expect(model.analysis.numericFormats).toEqual({ 3: "#,##0" });
@@ -370,6 +363,14 @@ test("a Georgia pupils workbook is in thousands to one decimal, with every cell 
   expect(teachers.sources.map(s => s.title)).toEqual(["geostat_education_teachers_national"]);
   const none = await placeWorkbook("schools", "region.guria", "guria", [], 2005, 2025);
   expect(none.readable.rows).toEqual([]); expect(none.analysis.rows).toEqual([]); expect(none.sources).toEqual([]);
+});
+
+test("a Georgian workbook takes its unit label and status from the Georgian catalogue", async () => {
+  const input = { set: "schools" as const, placeId: "country.georgia", scope: "georgia", facts, sources: SOURCES, siteOrigin: "https://fiscal.ge", title: "Title", headingLabels: HEADINGS,
+    state: { mode: "table" as const, range: { kind: "manual" as const, start: 2024, end: 2025 }, selectedIds: ["education.pupils_national.total"] } };
+  const model = buildEducationWorkbookExportModel({ ...input, labels: labelsFor(input.state.selectedIds) }, await presentation("ka"));
+  expect(model.locale).toBe("ka");
+  expect(model.readable.unitLabel).toBe("ათასი მოსწავლე");
 });
 
 test("a Guria Schools teachers workbook names the total alone and the parts under their heading, in both sheets", async () => {

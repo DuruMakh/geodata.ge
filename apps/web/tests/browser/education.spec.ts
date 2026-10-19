@@ -256,7 +256,7 @@ test("a place page's Excel download is a workbook in school years", async ({ pag
   await page.goto("/explorer/education/schools/region/guria");
   await ready(page);
   const { name, workbook } = await download(page);
-  expect(name).toBe("fiscal-education-schools-guria-2005-06-2025-26.xlsx");
+  expect(name).toBe("fiscal-education-schools-region-guria-2005-06-2025-26.xlsx");
   expect(workbook.worksheets).toHaveLength(3);
   expect(sheetText(workbook.worksheets[0])).toContain("2025/26");
   // The Sources sheet links to the fiscal.ge archive copies of the Geostat workbooks.
@@ -278,9 +278,9 @@ for (const prefix of ["", "/en"]) test(`the methodology link opens the education
   expect(response.status()).toBe(200);
 });
 
-for (const prefix of ["", "/en"]) test(`education pages fit a 390px screen ${prefix || "ka"}`, async ({ page }) => {
+for (const prefix of ["", "/en"]) for (const width of [390, 768]) test(`education pages fit a ${width}px screen ${prefix || "ka"}`, async ({ page }) => {
   const errors: string[] = []; page.on("pageerror", error => errors.push(error.message));
-  await page.setViewportSize({ width: 390, height: 900 });
+  await page.setViewportSize({ width, height: 900 });
   for (const path of ["", "/schools", "/kindergartens", "/schools/region/guria", "/universities", "/vocational"].map(path => `/explorer/education${path}`)) {
     await page.goto(`${prefix}${path}`);
     if (path !== "/explorer/education") await ready(page);

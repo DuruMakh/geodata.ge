@@ -48,7 +48,7 @@ export function populationMunicipalityParams() {
   return populationMunicipalitySlugs().map((slug) => ({ slug }));
 }
 
-function workbookScopeFor(route: PopulationPlaceRoute): string {
+export function workbookScopeFor(route: PopulationPlaceRoute): string {
   if (route.kind === "country") return "georgia";
   return route.kind === "region" ? `region-${route.id}` : route.slug;
 }

@@ -97,8 +97,8 @@ describe("place pages", () => {
       ["/en/explorer/education/schools/chokhatauri", "03 Chokhatauri 2,218"],
     ]);
     // School years everywhere: the range strip's ends, never a bare year.
-    expect(html).toContain("2005/06");
-    expect(html).toContain("2025/26");
+    expect(html).toContain('data-testid="year-range-strip"');
+    expect(text(html.slice(html.indexOf('data-testid="year-range-strip"')))).toMatch(/Range 2005\/06–2025\/26/);
     expect(text(html)).toContain("Source: Geostat, general education");
     expect(html).toContain('href="/en/methodology/education"');
     expect(html).not.toMatch(GEORGIAN);
@@ -157,7 +157,7 @@ describe("what each page hands on", () => {
   it("only its own place's shown facts, every place's address and the workbook scope", async () => {
     const explorer = explorerIn(await renderEducationPlacePage({ kind: "region", id: "guria" }, "en", "schools"));
     expect(explorer?.key).toBe("region.guria");
-    expect(explorer?.props.workbookScope).toBe("guria");
+    expect(explorer?.props.workbookScope).toBe("region-guria");
     expect(new Set(explorer?.props.facts.map(f => f.geographyId))).toEqual(new Set(["region.guria"]));
     expect(explorer?.props.pickerOverrides.hrefById).toMatchObject({
       "04": "/explorer/education/schools/region/tbilisi",
