@@ -32,7 +32,7 @@ The kindergarten table covers public preschool education and care institutions o
 
 ## Universities
 
-Students, admitted students and graduates come from the Public-and-Private block of higher education table 01 (total, the three levels, female and male totals and the eight fields) and the total rows of its Public and Private blocks. Geostat's note: "From 2015-2016 school year in accordance with the International Standard Classification of Education (ISCED 2011), certified doctor (veterinarian) program, residency - are included in the Masters level." The level headings change at the same point. The change is recorded as `he_levels_2015` for the six bachelor's and master's series; graduates' new headings start in the "2015 year" column, stored as 2014 (2014/15).
+Students, admitted students and graduates come from the Public-and-Private block of higher education table 01 (total, the three levels, female and male totals and the eight fields) and the total rows of its Public and Private blocks. Geostat's note: "From 2015-2016 school year in accordance with the International Standard Classification of Education (ISCED 2011), certified doctor (veterinarian) program, residency - are included in the Masters level." The level headings change at the same point. The change is recorded as `he_levels_2015` for the four students and admitted bachelor's and master's series (from `2015-09-01`) and as `he_levels_2015_graduates` for the two graduates series (from `2014-09-01`), because graduates' new headings start in the "2015 year" column, stored as 2014 (2014/15).
 
 ## Vocational colleges
 
@@ -48,7 +48,7 @@ Where Geostat's printed parts do not add up to its printed total, every row is s
 
 ## Gaps, dashes and zeros
 
-A missing value is a gap in the chart, a dash in the table and a blank Excel cell, never zero. Geostat's `…`, `...` and `-` cells produce no row (for example table 06 private teachers 2010/11 and Abkhazia AR's kindergartens). A `0` inside a vocational field's active span is a published count and is served. Nothing is estimated, interpolated or derived.
+A missing value is a gap in the chart, a dash in the table and a blank Excel cell, never zero. Geostat's `…`, `...` and `-` cells produce no row (for example table 06 private teachers 2010/11 and Abkhazia AR's kindergartens). A `0` inside a vocational field's active span is a published count and is served, even where Geostat's sheet formats it as a dash. Nothing is estimated, interpolated or derived.
 
 ## Indicators
 

@@ -49,7 +49,7 @@ These rules apply to every Education page:
 - Series names carry no prefixes. Outside the list (chart legend, tooltip, table, Excel) a row under a heading is named in full, `Heading — Row`, for example `Graduates — Women`, as on Business.
 - Every series has a fixed, distinguishable colour. The default total is ink.
 - **School years.** Schools, Kindergartens and Universities count by school year. A school year is stored as its starting year (2025 for 2025/26) and labelled `2025/26` on the chart axis, tooltip, table, range strip, latest-value line, hub card and Excel, through the existing `formatPeriod` and `yearLabel` options. Vocational colleges count by calendar year, as Geostat does, and are labelled `2025`.
-- A year without a value is a gap in the chart, a dash in the table and a blank Excel cell, never zero. Geostat's `…` and `-` cells are unavailable values.
+- A year without a value is a gap in the chart, a dash in the table and a blank Excel cell, never zero. Geostat's text `…` and `-` cells and blank cells are unavailable values. A zero that Geostat's vocational sheet formats as a dash inside a field's years is stored and shown as 0 (see methodology "Gaps").
 - Chart | Table, the year range, the selection (including an empty one) and Excel work as on Business, kept in the URL hash through the shared hash state and kept across a language change.
 - Counts are whole numbers. The one exception is Georgia's pupils, which Geostat publishes in thousands with one decimal (§4).
 - The source line reads like the others, for example: "Source: Geostat, general education · 2005/06–2025/26 · Methodology and sources".
