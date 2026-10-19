@@ -128,6 +128,7 @@ describe("methodology footer attribution", () => {
     ["housing", "Geostat"],
     ["health", "Geostat"],
     ["crime", "Geostat"],
+    ["education", "Geostat"],
   ])("uses %s sources and leaves the review date with the article", async (dataset, source) => {
     const { renderMethodologyArticle } = await import("../../lib/pages/methodology-article");
     const markup = renderToStaticMarkup(await renderMethodologyArticle("en", { params: Promise.resolve({ dataset }) }));
@@ -212,6 +213,27 @@ describe("housing methodology", () => {
     for (const file of ["0503en020101_permissions.xls", "permissions_eng.zip", "0503en020102c_permissions-by-type_2006-2025-eng.xls", "residential-property-prices-in-tbilisi-by-district.xlsx", "geostat-category-698-2026-10-16.html.txt"]) {
       expect(markup).toContain(`/downloads/methodology/housing/files/${file}`);
     }
+  });
+});
+
+describe("education methodology", () => {
+  it.each([
+    ["ka", "განათლება", "9,836", "14,490"],
+    ["en", "Education", "9,836", "14,490"],
+  ] as const)("renders the %s article with its 45 archived originals, Geostat's own sums and Dataset markup", async (locale, title, samegrelo, guria) => {
+    const { renderMethodologyArticle } = await import("../../lib/pages/methodology-article");
+    const markup = renderToStaticMarkup(await renderMethodologyArticle(locale, { params: Promise.resolve({ dataset: "education" }) }));
+    expect(markup).toContain(title);
+    expect(markup).toContain("2000–2025");
+    expect(markup).toContain('"@type":"Dataset"');
+    // The two published sums that do not add up are named with Geostat's printed figures.
+    expect(markup).toContain(samegrelo);
+    expect(markup).toContain(guria);
+    expect(markup).toContain("/downloads/methodology/education/files/01number-of-students-admission-graduates-by-programmes-and-sex.xlsx");
+    expect(markup).toContain("/downloads/methodology/education/files/indicators-on-public-preschool-education-and-care-pec-institutions.xlsx");
+    expect(markup).toContain("/downloads/methodology/education/files/number-of-educational-institutions-that-conducted-admission-of-students-in-vocational-education-programs.xlsx");
+    expect(markup).toContain("/downloads/methodology/education/files/geostat-category-61-2026-10-16.html.txt");
+    expect(markup).not.toContain("geostat.ge/media");
   });
 });
 

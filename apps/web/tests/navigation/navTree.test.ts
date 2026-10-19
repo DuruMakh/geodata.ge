@@ -23,6 +23,23 @@ describe("the navigation tree", () => {
     expect(openHub("/explorer/housing/regions/guria").href).toBe("/explorer/housing");
     expect(currentEntry("/explorer/housing/regions/guria")).toBe("/explorer/housing/regions");
     expect(openHub("/explorer/demography/population/region/imereti").href).toBe("/explorer/demography");
+    expect(openHub("/explorer/education/schools/region/guria").href).toBe("/explorer/education");
+    expect(currentEntry("/explorer/education/schools/region/guria")).toBe("/explorer/education/schools");
+    expect(currentEntry("/explorer/education/kindergartens/ozurgeti")).toBe("/explorer/education/kindergartens");
+    expect(currentEntry("/explorer/education")).toBe("/explorer/education");
+  });
+
+  it("places Education after Health with its four pages", () => {
+    const hubs = NAV_TREE.map((hub) => hub.href);
+    expect(hubs.indexOf("/explorer/education")).toBe(hubs.indexOf("/explorer/health") + 1);
+    const hub = NAV_TREE.find((entry) => entry.href === "/explorer/education")!;
+    expect(hub).toMatchObject({ labelKey: "common.education", railLabelKey: "common.dataEducation", testId: "education-link" });
+    expect(hub.sections.map((section) => [section.href, section.testId])).toEqual([
+      ["/explorer/education/schools", "education-schools-link"],
+      ["/explorer/education/kindergartens", "education-kindergartens-link"],
+      ["/explorer/education/universities", "education-universities-link"],
+      ["/explorer/education/vocational", "education-vocational-link"],
+    ]);
   });
 
   it("appends Trade composition after the five existing Trade pages", () => {
@@ -91,5 +108,7 @@ describe("the explorer footer source note", () => {
     expect(sourceNoteKey("/explorer/external/reserves")).toBe("common.nbgSourceNote");
     expect(sourceNoteKey("/explorer/external/foreign-investment")).toBe("common.geostatSourceNote");
     expect(sourceNoteKey("/explorer/demography/population/region/imereti")).toBe("common.geostatSourceNote");
+    expect(sourceNoteKey("/explorer/education")).toBe("common.geostatSourceNote");
+    expect(sourceNoteKey("/explorer/education/schools/batumi")).toBe("common.geostatSourceNote");
   });
 });

@@ -396,6 +396,17 @@ const TOPIC_DATASETS: Record<TopicDatasetId, { keywords: Record<Locale, readonly
     },
     sources: ["geostat"],
   },
+  education: {
+    keywords: {
+      ka: ["განათლება", "სკოლები", "მოსწავლეები", "საბავშვო ბაღები", "უნივერსიტეტები", "პროფესიული კოლეჯები", "საქართველო"],
+      en: ["Georgia", "education", "schools", "pupils", "kindergartens", "universities", "vocational colleges"],
+    },
+    measurementTechnique: {
+      ka: "გადამოწმებული ამოღება საქსტატის განათლების ოფიციალური გამოქვეყნებული სტატისტიკიდან.",
+      en: "Reviewed extraction from Geostat's official published education statistics.",
+    },
+    sources: ["geostat"],
+  },
 };
 
 /** A dataset whose figures are official statistics Fiscal.ge reads from a named producer (`sourceAgenciesFor`). */

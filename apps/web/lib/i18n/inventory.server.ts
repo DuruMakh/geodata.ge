@@ -2,7 +2,7 @@ import path from "node:path";
 import { loadServedExplorerData, loadServedMunicipalData } from "../data/servedData";
 import { BUDGET_SECTIONS, BUDGET_SECTION_ORDER } from "../explorer/sections";
 import { CITY_PAGE_PATHS } from "../explorer/inflationCityRoutes";
-import { populationPlacePaths } from "../explorer/demographyPlaceRoutes";
+import { placePagePaths, populationPlacePaths } from "../explorer/demographyPlaceRoutes";
 import { DEMOGRAPHY_HUB_PATH, LIVE_DEMOGRAPHY_PAGES } from "../explorer/demographyRoutes";
 import { MUNICIPALITY_ROUTES } from "../explorer/municipalityRoutes";
 import { loadManifestDocuments } from "../factQuery/buildSnapshot";
@@ -35,6 +35,8 @@ import { BUSINESS_HUB_PATH, BUSINESS_SECTIONS } from "../explorer/business";
 import { BUSINESS_AREAS, businessAreaHref } from "../explorer/businessAreas";
 import { HOUSING_HUB_PATH, HOUSING_SECTIONS } from "../explorer/housing";
 import { HOUSING_AREAS, housingAreaHref } from "../explorer/housingAreas";
+import { EDUCATION_HUB_PATH, EDUCATION_SECTIONS } from "../explorer/education";
+import { educationPlaceBase } from "../explorer/educationPlaces";
 
 const sortedUnique = (ids: readonly string[]): string[] => [...new Set(ids)].sort();
 
@@ -55,6 +57,7 @@ export async function listPublicPagePaths(): Promise<string[]> {
     "/explorer/money", ...MONEY_BANKS_SECTIONS.map(section => section.href),
     BUSINESS_HUB_PATH, ...BUSINESS_SECTIONS.map(section => section.href), ...BUSINESS_AREAS.map(businessAreaHref),
     HOUSING_HUB_PATH, ...HOUSING_SECTIONS.map(section => section.href), ...HOUSING_AREAS.map(housingAreaHref),
+    EDUCATION_HUB_PATH, ...EDUCATION_SECTIONS.map(section => section.href), ...(["schools", "kindergartens"] as const).flatMap(set => placePagePaths(educationPlaceBase(set), regions.map(({ id }) => id))),
     ...regions.map(region => unemploymentRegionHref(region.id)),
     "/explorer/economy/regions",
     ...regions.map(({ id }) => `/explorer/economy/regions/${id.replace(/^region\./, "")}`),

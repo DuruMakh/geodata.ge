@@ -102,6 +102,8 @@ export type WorkbookExportModel = {
   sources: Array<WorkbookPublicSource & { absoluteUrl: string }>;
   /** Calendar years the sources sheet describes when the readable columns are not years. */
   sourceYears?: number[];
+  /** How the Sources sheet writes a year, for a dataset whose years are school years (stored as their start year). */
+  periodLabel?: (year: number) => string;
 };
 
 const statusLabel = (basis: WorkbookBasis, locale: Locale) => workbookMessage(locale, ({

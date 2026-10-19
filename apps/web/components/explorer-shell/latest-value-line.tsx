@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { withLari } from "../ui/lari";
 
 /** The budget, debt and deficit deck under the title: latest value, then its change or note. */
@@ -9,12 +10,21 @@ export const DECK_LINE_CLASS = "mb-[30px] flex min-h-[18px] flex-wrap items-base
  * on the first screen. The full indicators block further down is unchanged.
  */
 type LineParts = { measure: string; period: string | number; value: string; note?: string };
+/** A whole translated sentence in place of the parts, for a page whose line is one template; it sets its figures with `LatestFigure`. */
+type LineSentence = { sentence: ReactNode };
 
-function LineText({ measure, period, value, note }: LineParts) {
+/** A figure in the line: the value of "{measure} · {period}: {value}", or each figure of a `sentence`. */
+export function LatestFigure({ value }: { value: string }) {
+  return <span className="font-[family-name:var(--font-numeric)] font-medium text-[var(--ink)]">{withLari(value)}</span>;
+}
+
+function LineText(line: LineParts | LineSentence) {
+  if ("sentence" in line) return <>{line.sentence}</>;
+  const { measure, period, value, note } = line;
   return (
     <>
       {measure} · {period}:{" "}
-      <span className="font-[family-name:var(--font-numeric)] font-medium text-[var(--ink)]">{withLari(value)}</span>
+      <LatestFigure value={value} />
       {note ? ` · ${note}` : ""}
     </>
   );
@@ -25,7 +35,7 @@ function LineText({ measure, period, value, note }: LineParts) {
  * line changes with a control (the sectors measures) keeps one height and never moves what follows. Without it the
  * output is the plain paragraph.
  */
-export function LatestValueLine({ testId, reserve, ...line }: LineParts & { testId: string; reserve?: LineParts }) {
+export function LatestValueLine({ testId, reserve, ...line }: (LineParts | LineSentence) & { testId: string; reserve?: LineParts }) {
   if (!reserve) {
     return (
       <p data-testid={testId} className="mb-2 text-[0.8125rem] text-[var(--body)]">

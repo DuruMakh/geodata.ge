@@ -47,6 +47,8 @@ import { businessSourceDocumentId, type BusinessFact } from "../data/business/ty
 import { housingSourceDocumentId, type HousingFact } from "../data/housing/types";
 import { housingDisplayDecimals } from "../data/housing/validation";
 import { businessDisplayDecimals } from "../data/business/validation";
+import { educationSourceDocumentId, type EducationFact } from "../data/education/types";
+import { educationDisplayDecimals } from "../data/education/validation";
 import { householdSourceDocumentId, type HouseholdFact } from "../data/household/types";
 import type { DemographyObservation, Sex, Settlement } from "../data/demography/types";
 
@@ -853,6 +855,24 @@ export async function loadHousingFactsFromMirror(db: Pick<MirrorClient, "housing
       year: row.year, indicatorId: row.indicatorId as HousingFact["indicatorId"],
       value: row.value.toFixed(), publishedValue: row.publishedValue.toFixed(housingDisplayDecimals(row.indicatorId)), unit: row.unit as HousingFact["unit"], basis: row.basis as "actual", valueStatus: row.valueStatus as "official",
       sourceId: row.sourceId, sourceSheet: row.sourceSheet, sourceCell: row.sourceCell, lastReviewedAt: isoDate(row.lastReviewedAt),
+    };
+  });
+}
+
+export function educationMirrorCreateRows(facts: readonly EducationFact[], importRunId: string): Prisma.EducationFactCreateManyInput[] {
+  return facts.map(({ lastReviewedAt, ...fact }) => ({
+    ...fact, sourceDocumentId: educationSourceDocumentId(fact.sourceId), lastReviewedAt: new Date(`${lastReviewedAt}T00:00:00.000Z`), importRunId,
+  }));
+}
+
+export async function loadEducationFactsFromMirror(db: Pick<MirrorClient, "educationFact">): Promise<EducationFact[]> {
+  const rows = await db.educationFact.findMany({ orderBy: [{ indicatorId: "asc" }, { geographyId: "asc" }, { year: "asc" }] });
+  return rows.map(row => {
+    if (row.sourceDocumentId !== educationSourceDocumentId(row.sourceId)) throw new Error("Education source relation mismatch");
+    return {
+      year: row.year, periodLabel: row.periodLabel, indicatorId: row.indicatorId as EducationFact["indicatorId"], geographyId: row.geographyId,
+      value: row.value.toFixed(), publishedValue: row.publishedValue.toFixed(educationDisplayDecimals(row.indicatorId)), unit: row.unit as EducationFact["unit"], basis: row.basis as "actual", valueStatus: row.valueStatus as "official",
+      shown: row.shown, sourceId: row.sourceId, sourceSheet: row.sourceSheet, sourceCell: row.sourceCell, lastReviewedAt: isoDate(row.lastReviewedAt),
     };
   });
 }

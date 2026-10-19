@@ -25,6 +25,8 @@ export type MunicipalitiesIndexOverrides = {
   hrefById?: Readonly<Record<string, string>>;
   /** How a row's figure prints: the budget amount (default) or a whole number of persons. */
   valueFormat?: "amount" | "persons";
+  /** A row's figure as printed, by row id, in place of `valueFormat`'s (a figure published in thousands); rows not listed keep it. */
+  valueLabelById?: Readonly<Record<string, string>>;
   /** A second line under a row's figure, by row id; rows not listed keep the per-resident budget line, if they have one. */
   secondaryById?: Readonly<Record<string, string>>;
   /** The Georgia row's line under its name, in English only; the municipal-budget count by default. Georgian reads the row's own `subtitleKa`, so this has no effect there. */
@@ -177,7 +179,7 @@ export function MunicipalitiesIndex(props: MunicipalitiesIndexProps) {
               </span>
               <span className="min-w-0 text-right font-[family-name:var(--font-numeric)]">
                 <span data-testid="municipal-row-primary-amount" className="block text-[11.5px]">
-                  {formatValue(row.valueGel)}
+                  {overrides?.valueLabelById?.[row.id] ?? formatValue(row.valueGel)}
                 </span>
                 {overrides?.secondaryById?.[row.id] !== undefined ? (
                   <span data-testid="municipal-row-secondary" className="mt-0.5 block text-[11px] min-[768px]:text-[10px] leading-[1.25] text-[var(--muted)]">
@@ -222,7 +224,8 @@ export function MunicipalitiesIndex(props: MunicipalitiesIndexProps) {
           </div>
           {overrides?.mapNote}
 
-          <div className="mt-8 border-t-2 border-[var(--ink)] pt-5">
+          {/* An index without indicators (`kpis` empty) leaves the block out. */}
+          {props.kpis.length > 0 ? <div className="mt-8 border-t-2 border-[var(--ink)] pt-5">
             <h2 className="mb-[18px] font-[family-name:var(--font-display)] text-[22px] font-semibold">
               {message(messages, "municipal.indicators")}
             </h2>
@@ -239,7 +242,7 @@ export function MunicipalitiesIndex(props: MunicipalitiesIndexProps) {
                 </div>
               ))}
             </div>
-          </div>
+          </div> : null}
 
         </div>
 

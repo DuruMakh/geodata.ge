@@ -27,6 +27,7 @@ import { REGIONAL_GDP_TOTAL } from "../data/regionalEconomies/types";
 import { MONEY_BANKS_PUBLIC_SOURCES, moneyBanksSourceDocumentId } from "../data/moneyBanks/types";
 import { EXTERNAL_POSITION_PUBLIC_SOURCES, externalPositionSourceDocumentId } from "../data/externalPosition/types";
 import { BUSINESS_PUBLIC_SOURCES, businessSourceDocumentId } from "../data/business/types";
+import { EDUCATION_PUBLIC_SOURCES, educationSourceDocumentId } from "../data/education/types";
 import { REGIONAL_ECONOMY_DEFINITIONS } from "./regionalEconomySeries";
 import { loadServedInflationData } from "../data/inflation/importInflation";
 import { loadServedProductData } from "../data/inflation/importProducts";
@@ -65,6 +66,9 @@ const EXTERNAL_POSITION_SOURCE_DOCUMENT_IDS: ReadonlySet<string> = new Set(EXTER
 
 /** Business sources belong to a human explorer, outside the query/publication scope. */
 const BUSINESS_SOURCE_DOCUMENT_IDS: ReadonlySet<string> = new Set(BUSINESS_PUBLIC_SOURCES.map(businessSourceDocumentId));
+
+/** Education sources belong to a human explorer, outside the query/publication scope. */
+const EDUCATION_SOURCE_DOCUMENT_IDS: ReadonlySet<string> = new Set(EDUCATION_PUBLIC_SOURCES.map(educationSourceDocumentId));
 
 const GDP_SOURCE_MANIFEST_RELATIVE_PATH = ["docs", "Raw Data", "GDP", "national-nominal-gdp"] as const;
 
@@ -618,8 +622,8 @@ export async function buildFactQuerySnapshot(options: BuildSnapshotOptions): Pro
   // manifests' own source_id, unique across all four manifests — verified by
   // inspection, not just assumed).
   const sources: ResolvedSource[] = sortedBy(
-      // Unemployment, Trade, Services trade, Wages, Money from abroad, Foreign investment, Poverty, Household income and spending, Energy and food, Money and banks, Foreign debt and Reserves, Business, Health, Housing and Crime and justice are human explorers, outside the query/publication scope.
-      enrichSourceTranslations(resolvePublicSources({ sourceDocuments: explorer.sourceDocuments.filter(source => !source.sourceId.startsWith("source.geostat_lfs_") && !source.sourceId.startsWith("source.geostat_trade_") && !source.sourceId.startsWith("source.geostat_services_") && !source.sourceId.startsWith("source.geostat_earnings_") && !source.sourceId.startsWith("source.geostat_fdi_") && !source.sourceId.startsWith("source.geostat_poverty_") && !source.sourceId.startsWith("source.geostat_household_") && !source.sourceId.startsWith("source.geostat_energy_") && !source.sourceId.startsWith("source.geostat_food_") && !source.sourceId.startsWith("source.geostat_health_") && !source.sourceId.startsWith("source.geostat_housing_") && !source.sourceId.startsWith("source.geostat_death") && !source.sourceId.startsWith("source.geostat_crime_") && source.sourceId !== "source.geostat_gini" && source.sourceId !== "source.geostat_hies_metadata_2026" && source.sourceId !== "source.nbg_money_transfers_by_countries" && source.sourceId !== "source.nbg_balance_of_payments_bpm6" && !MONEY_BANKS_SOURCE_DOCUMENT_IDS.has(source.sourceId) && !EXTERNAL_POSITION_SOURCE_DOCUMENT_IDS.has(source.sourceId) && !BUSINESS_SOURCE_DOCUMENT_IDS.has(source.sourceId)), manifestDocuments }), catalogue, serviceKa),
+      // Unemployment, Trade, Services trade, Wages, Money from abroad, Foreign investment, Poverty, Household income and spending, Energy and food, Money and banks, Foreign debt and Reserves, Business, Health, Housing, Crime and justice and Education are human explorers, outside the query/publication scope.
+      enrichSourceTranslations(resolvePublicSources({ sourceDocuments: explorer.sourceDocuments.filter(source => !source.sourceId.startsWith("source.geostat_lfs_") && !source.sourceId.startsWith("source.geostat_trade_") && !source.sourceId.startsWith("source.geostat_services_") && !source.sourceId.startsWith("source.geostat_earnings_") && !source.sourceId.startsWith("source.geostat_fdi_") && !source.sourceId.startsWith("source.geostat_poverty_") && !source.sourceId.startsWith("source.geostat_household_") && !source.sourceId.startsWith("source.geostat_energy_") && !source.sourceId.startsWith("source.geostat_food_") && !source.sourceId.startsWith("source.geostat_health_") && !source.sourceId.startsWith("source.geostat_housing_") && !source.sourceId.startsWith("source.geostat_death") && !source.sourceId.startsWith("source.geostat_crime_") && source.sourceId !== "source.geostat_gini" && source.sourceId !== "source.geostat_hies_metadata_2026" && source.sourceId !== "source.nbg_money_transfers_by_countries" && source.sourceId !== "source.nbg_balance_of_payments_bpm6" && !MONEY_BANKS_SOURCE_DOCUMENT_IDS.has(source.sourceId) && !EXTERNAL_POSITION_SOURCE_DOCUMENT_IDS.has(source.sourceId) && !BUSINESS_SOURCE_DOCUMENT_IDS.has(source.sourceId) && !EDUCATION_SOURCE_DOCUMENT_IDS.has(source.sourceId)), manifestDocuments }), catalogue, serviceKa),
     (source) => source.sourceId,
   ).map((source) => ({
     ...source,

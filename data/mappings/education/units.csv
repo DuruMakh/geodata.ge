@@ -1,0 +1,81 @@
+﻿source_label,geography_id,mapping_note,reviewed_at
+GEORGIA – total,country.georgia,The country total row.,2026-10-16
+TBILISI,region.tbilisi,"The capital, a region of its own; served as region.tbilisi, never as municipal code 04.",2026-10-16
+ABKHAZIA AR,unit.abkhazia_ar,"Abkhazia Autonomous Republic: part of the Georgia total in Geostat's rows; kept with its own id, not drawn and no page.",2026-10-16
+ADJARA AR,region.adjara,Region row (Adjara Autonomous Republic).,2026-10-16
+City of Batumi,06,"Self-governing city; the Population geography map names it ""C. Batumi Municipality""; municipal code 06 in data/imports/municipalities.csv.",2026-10-16
+Keda Municipality,09,Same name as in the Population geography map; municipal code 09 in data/imports/municipalities.csv.,2026-10-16
+Kobuleti Municipality,07,Same name as in the Population geography map; municipal code 07 in data/imports/municipalities.csv.,2026-10-16
+Shuakhevi Municipality,10,Same name as in the Population geography map; municipal code 10 in data/imports/municipalities.csv.,2026-10-16
+Khelvachauri Municipality,08,Same name as in the Population geography map; municipal code 08 in data/imports/municipalities.csv.,2026-10-16
+Khulo Municipality,11,Same name as in the Population geography map; municipal code 11 in data/imports/municipalities.csv.,2026-10-16
+GURIA,region.guria,Region row.,2026-10-16
+Lanchkhuti Municipality,55,Same name as in the Population geography map; municipal code 55 in data/imports/municipalities.csv.,2026-10-16
+Ozurgeti Municipality,56,Same name as in the Population geography map; municipal code 56 in data/imports/municipalities.csv.,2026-10-16
+Chokhatauri Municipality,57,Same name as in the Population geography map; municipal code 57 in data/imports/municipalities.csv.,2026-10-16
+IMERETI,region.imereti,Region row.,2026-10-16
+City of Kutaisi,20,"Self-governing city; the Population geography map names it ""C. Kutaisi Municipality""; municipal code 20 in data/imports/municipalities.csv.",2026-10-16
+Tkibuli Municipality,22,"Geostat's spelling; the Population geography map writes ""Tqibuli Municipality""; municipal code 22 in data/imports/municipalities.csv.",2026-10-16
+Tskaltubo Municipality,23,"Geostat's spelling; the Population geography map writes ""Tsqaltubo Municipality""; municipal code 23 in data/imports/municipalities.csv.",2026-10-16
+Chiatura Municipality,21,Same name as in the Population geography map; municipal code 21 in data/imports/municipalities.csv.,2026-10-16
+Bagdati Municipality,24,"Geostat's spelling; the Population geography map writes ""Baghdati Municipality""; municipal code 24 in data/imports/municipalities.csv.",2026-10-16
+Vani Municipality,25,Same name as in the Population geography map; municipal code 25 in data/imports/municipalities.csv.,2026-10-16
+Zestaponi Municipality,26,Same name as in the Population geography map; municipal code 26 in data/imports/municipalities.csv.,2026-10-16
+Terjola Municipality,27,Same name as in the Population geography map; municipal code 27 in data/imports/municipalities.csv.,2026-10-16
+Samtredia Municipality,28,Same name as in the Population geography map; municipal code 28 in data/imports/municipalities.csv.,2026-10-16
+Sachkhere Municipality,29,Same name as in the Population geography map; municipal code 29 in data/imports/municipalities.csv.,2026-10-16
+Kharagauli Municipality,30,Same name as in the Population geography map; municipal code 30 in data/imports/municipalities.csv.,2026-10-16
+Khoni Municipality,31,Same name as in the Population geography map; municipal code 31 in data/imports/municipalities.csv.,2026-10-16
+KAKHETI,region.kakheti,Region row.,2026-10-16
+Akhmeta Municipality,12,Same name as in the Population geography map; municipal code 12 in data/imports/municipalities.csv.,2026-10-16
+Gurjaani Municipality,13,Same name as in the Population geography map; municipal code 13 in data/imports/municipalities.csv.,2026-10-16
+Dedoflis tskaros Municipality,14,"Geostat's spelling; the Population geography map writes ""Dedoplistsqaro Municipality""; municipal code 14 in data/imports/municipalities.csv.",2026-10-16
+Telavi Municipality,15,Same name as in the Population geography map; municipal code 15 in data/imports/municipalities.csv.,2026-10-16
+Lagodekhi Municipality,16,Same name as in the Population geography map; municipal code 16 in data/imports/municipalities.csv.,2026-10-16
+Sagarejo Municipality,17,Same name as in the Population geography map; municipal code 17 in data/imports/municipalities.csv.,2026-10-16
+Signagi Municipality,18,"Geostat's spelling; the Population geography map writes ""Sighnagi Municipality""; municipal code 18 in data/imports/municipalities.csv.",2026-10-16
+Kvareli Municipality,19,Same name as in the Population geography map; municipal code 19 in data/imports/municipalities.csv.,2026-10-16
+MTSKHETA-MTIANETI,region.mtskheta_mtianeti,Region row.,2026-10-16
+Akhalgori Municipality,unit.akhalgori,"Akhalgori Municipality, occupied since 2008: not one of the 63 municipalities of the site (code 64 stays excluded). Printed under MTSKHETA-MTIANETI and part of its region row; kept with its own id, not drawn and no page.",2026-10-16
+Dusheti Municipality,65,Same name as in the Population geography map; municipal code 65 in data/imports/municipalities.csv.,2026-10-16
+Tianeti Municipality,66,Same name as in the Population geography map; municipal code 66 in data/imports/municipalities.csv.,2026-10-16
+Mtskheta Municipality,67,Same name as in the Population geography map; municipal code 67 in data/imports/municipalities.csv.,2026-10-16
+Kazbegi Municipality,68,Same name as in the Population geography map; municipal code 68 in data/imports/municipalities.csv.,2026-10-16
+RACHA-LECHKHUMI AND KVEMO SVANETI,region.racha_lechkhumi_kvemo_svaneti,Region row.,2026-10-16
+Ambrolauri Municipality,69,Same name as in the Population geography map; municipal code 69 in data/imports/municipalities.csv.,2026-10-16
+Lentekhi Municipality,70,Same name as in the Population geography map; municipal code 70 in data/imports/municipalities.csv.,2026-10-16
+Oni Municipality,71,Same name as in the Population geography map; municipal code 71 in data/imports/municipalities.csv.,2026-10-16
+Tsageri Municipality,72,Same name as in the Population geography map; municipal code 72 in data/imports/municipalities.csv.,2026-10-16
+SAMEGRELO-ZEMO SVANETI,region.samegrelo_zemo_svaneti,Region row.,2026-10-16
+City of Poti,32,"Self-governing city; the Population geography map names it ""C. Poti Municipality""; municipal code 32 in data/imports/municipalities.csv.",2026-10-16
+Abasha Municipality,34,Same name as in the Population geography map; municipal code 34 in data/imports/municipalities.csv.,2026-10-16
+Zugdidi Municipality,33,Same name as in the Population geography map; municipal code 33 in data/imports/municipalities.csv.,2026-10-16
+Martvili Municipality,35,Same name as in the Population geography map; municipal code 35 in data/imports/municipalities.csv.,2026-10-16
+Mestia Municipality,36,Same name as in the Population geography map; municipal code 36 in data/imports/municipalities.csv.,2026-10-16
+Senaki Municipality,37,Same name as in the Population geography map; municipal code 37 in data/imports/municipalities.csv.,2026-10-16
+Chkhorotsku Municipality,38,Same name as in the Population geography map; municipal code 38 in data/imports/municipalities.csv.,2026-10-16
+Tsalenjikha Municipality,39,Same name as in the Population geography map; municipal code 39 in data/imports/municipalities.csv.,2026-10-16
+Khobi Municipality,40,Same name as in the Population geography map; municipal code 40 in data/imports/municipalities.csv.,2026-10-16
+SAMTSKHE-JAVAKHETI,region.samtskhe_javakheti,Region row.,2026-10-16
+Adigeni Municipality,59,Same name as in the Population geography map; municipal code 59 in data/imports/municipalities.csv.,2026-10-16
+Aspindza Municipality,60,Same name as in the Population geography map; municipal code 60 in data/imports/municipalities.csv.,2026-10-16
+Akhalkalaki Municipality,61,Same name as in the Population geography map; municipal code 61 in data/imports/municipalities.csv.,2026-10-16
+Akhaltsikhe Municipality,62,Same name as in the Population geography map; municipal code 62 in data/imports/municipalities.csv.,2026-10-16
+Borjomi Municipality,58,Same name as in the Population geography map; municipal code 58 in data/imports/municipalities.csv.,2026-10-16
+Ninotsminda Municipality,63,Same name as in the Population geography map; municipal code 63 in data/imports/municipalities.csv.,2026-10-16
+KVEMO KARTLI,region.kvemo_kartli,Region row.,2026-10-16
+City of Rustavi,48,"Self-governing city; the Population geography map names it ""C. Rustavi Municipality""; municipal code 48 in data/imports/municipalities.csv.",2026-10-16
+Bolnisi Municipality,49,Same name as in the Population geography map; municipal code 49 in data/imports/municipalities.csv.,2026-10-16
+Gardabani Municipality,50,Same name as in the Population geography map; municipal code 50 in data/imports/municipalities.csv.,2026-10-16
+Dmanisi Municipality,51,Same name as in the Population geography map; municipal code 51 in data/imports/municipalities.csv.,2026-10-16
+TeTri tskaro Municipality,52,"Geostat's spelling; the Population geography map writes ""Tetritsqaro Municipality""; municipal code 52 in data/imports/municipalities.csv.",2026-10-16
+Marneuli Municipality,53,Same name as in the Population geography map; municipal code 53 in data/imports/municipalities.csv.,2026-10-16
+Tsalka Municipality,54,Same name as in the Population geography map; municipal code 54 in data/imports/municipalities.csv.,2026-10-16
+SHIDA KARTLI,region.shida_kartli,Region row.,2026-10-16
+Gori Municipality,41,Same name as in the Population geography map; municipal code 41 in data/imports/municipalities.csv.,2026-10-16
+Kaspi Municipality,45,Same name as in the Population geography map; municipal code 45 in data/imports/municipalities.csv.,2026-10-16
+Kareli Municipality,44,Same name as in the Population geography map; municipal code 44 in data/imports/municipalities.csv.,2026-10-16
+Khashuri Municipality,47,Same name as in the Population geography map; municipal code 47 in data/imports/municipalities.csv.,2026-10-16
+Eredvi,unit.eredvi,"Eredvi, a unit in the occupied territory that Geostat prints with values only in early years: not one of the 63 municipalities of the site. Printed under SHIDA KARTLI and part of its region row; kept with its own id, not drawn and no page.",2026-10-16
+Tighva,unit.tighva,"Tighva, a unit in the occupied territory that Geostat prints with values only in early years: not one of the 63 municipalities of the site. Printed under SHIDA KARTLI and part of its region row; kept with its own id, not drawn and no page.",2026-10-16
+QurTa,unit.kurta,"Kurta (printed ""QurTa""), a unit in the occupied territory that Geostat prints with values only in early years: not one of the 63 municipalities of the site. Printed under SHIDA KARTLI and part of its region row; kept with its own id, not drawn and no page.",2026-10-16

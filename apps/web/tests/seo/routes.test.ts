@@ -109,7 +109,8 @@ describe("indexable Fiscal.ge routes", () => {
     // Crime and justice adds its hub and five pages: 6 bilingual pairs; its methodology one more.
     // Housing adds its hub, four pages and a page for Georgia and each of the 11 regions: 17 bilingual pairs.
     // The Housing methodology adds one more bilingual pair.
-    expect(urls).toHaveLength(708);
+    // Education adds its hub, four pages, the 75 Schools and 75 Kindergartens place pages and its methodology page: 156 bilingual pairs.
+    expect(urls).toHaveLength(1020);
     expect(new Set(urls).size).toBe(urls.length);
     expect(urls.every((url) => url.startsWith("https://fiscal.ge/"))).toBe(true);
     expect(urls).toContain("https://fiscal.ge/about");
@@ -130,6 +131,8 @@ describe("indexable Fiscal.ge routes", () => {
     expect(urls).toContain("https://fiscal.ge/en/methodology/business");
     expect(urls).toContain("https://fiscal.ge/methodology/housing");
     expect(urls).toContain("https://fiscal.ge/en/methodology/housing");
+    expect(urls).toContain("https://fiscal.ge/methodology/education");
+    expect(urls).toContain("https://fiscal.ge/en/methodology/education");
     expect(urls).toContain("https://fiscal.ge/explorer/wages/regions/adjara");
     for (const page of ["", "/income", "/spending", "/poverty", "/inequality"]) {
       expect(urls).toContain(`https://fiscal.ge/explorer/living-standards${page}`);
@@ -169,6 +172,17 @@ describe("indexable Fiscal.ge routes", () => {
       expect(urls).toContain(`https://fiscal.ge/en/explorer/housing${page}`);
     }
     expect(urls.filter((url) => url.includes("/explorer/housing"))).toHaveLength(34);
+    const educationRegions = ["tbilisi", "adjara", "guria", "imereti", "kakheti", "mtskheta_mtianeti", "racha_lechkhumi_kvemo_svaneti", "samegrelo_zemo_svaneti", "samtskhe_javakheti", "kvemo_kartli", "shida_kartli"];
+    for (const page of ["", "/universities", "/vocational", ...["schools", "kindergartens"].flatMap(set => [`/${set}`, `/${set}/georgia`, ...educationRegions.map(region => `/${set}/region/${region}`), `/${set}/batumi`, `/${set}/ozurgeti`])]) {
+      expect(urls).toContain(`https://fiscal.ge/explorer/education${page}`);
+      expect(urls).toContain(`https://fiscal.ge/en/explorer/education${page}`);
+    }
+    // Each set: Georgia, the 11 regions and the 63 municipalities other than Tbilisi, which is a region; never a municipality code.
+    for (const set of ["schools", "kindergartens"]) {
+      expect(urls.filter(url => url.startsWith(`https://fiscal.ge/explorer/education/${set}/`))).toHaveLength(75);
+      expect(urls).not.toContain(`https://fiscal.ge/explorer/education/${set}/tbilisi`);
+    }
+    expect(urls.some(url => /\/explorer\/education\/.*\/\d{2}$/.test(url))).toBe(false);
     expect(urls).toContain("https://fiscal.ge/explorer/trade/products");
     expect(urls).toContain("https://fiscal.ge/en/explorer/trade/products");
     expect(urls).toContain("https://fiscal.ge/explorer/trade/domestic-exports");
@@ -206,6 +220,7 @@ describe("indexable Fiscal.ge routes", () => {
       "/methodology/poverty",
       "/methodology/household-income",
       "/methodology/health",
+      "/methodology/education",
       "/methodology/crime",
       "/methodology/trade",
       "/methodology/external-flows",

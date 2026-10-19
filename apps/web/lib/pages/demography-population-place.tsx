@@ -14,11 +14,12 @@ import { ageYears, annualAgeFacts, censusAgeFactsForPlace } from "../explorer/de
 import { GEORGIA_PLACE_ID, TBILISI_PLACE_ID, placeLabel } from "../explorer/demographyAreas";
 import {
   POPULATION_PATH,
+  placeIdForRoute,
   placeNeighbours,
   populationHrefById,
-  populationMunicipalityCodeForSlug,
   populationMunicipalitySlugs,
   populationPlaceHref,
+  type PlaceRoute,
 } from "../explorer/demographyPlaceRoutes";
 import { buildPopulationHighlights, buildPopulationModel, placeYears } from "../explorer/demographyPopulation";
 import { buildPopulationIndexModel } from "../explorer/demographyPopulationIndex";
@@ -36,7 +37,7 @@ import { fiscalMetadata } from "../seo/metadata";
 import { resolveSiteUrl } from "../siteUrl";
 import { loadPopulationBasics, loadPopulationSources, loadTbilisiAreaLabel, populationSourceNote } from "./demography-population";
 
-export type PopulationPlaceRoute = { kind: "country" } | { kind: "region"; id: string } | { kind: "municipality"; slug: string };
+export type PopulationPlaceRoute = PlaceRoute;
 
 export async function populationRegionParams() {
   const { regions } = await loadServedMunicipalData();
@@ -47,21 +48,14 @@ export function populationMunicipalityParams() {
   return populationMunicipalitySlugs().map((slug) => ({ slug }));
 }
 
-/** The place a route names, or null: Georgia, `region.{id}`, or the municipality behind a slug (never Tbilisi's). */
-function placeIdFor(route: PopulationPlaceRoute): string | null {
-  if (route.kind === "country") return GEORGIA_PLACE_ID;
-  if (route.kind === "region") return `region.${route.id}`;
-  return populationMunicipalityCodeForSlug(route.slug);
-}
-
-function workbookScopeFor(route: PopulationPlaceRoute): string {
+export function workbookScopeFor(route: PopulationPlaceRoute): string {
   if (route.kind === "country") return "georgia";
   return route.kind === "region" ? `region-${route.id}` : route.slug;
 }
 
 export async function populationPlaceMetadata(route: PopulationPlaceRoute, locale: Locale) {
   const { clientFacts, presentation, places } = await loadPopulationBasics(locale);
-  const place = places.find((candidate) => candidate.id === placeIdFor(route));
+  const place = places.find((candidate) => candidate.id === placeIdForRoute(route));
   if (!place) notFound();
   const years = placeYears(clientFacts, place);
   const t = (key: string, values?: TemplateValues) => message(presentation.messages, `demography.${key}`, values);
@@ -85,7 +79,7 @@ export async function renderPopulationPlacePage(route: PopulationPlaceRoute, loc
     loadPopulationSources(locale),
     loadServedDemographyData(),
   ]);
-  const place = places.find((candidate) => candidate.id === placeIdFor(route));
+  const place = places.find((candidate) => candidate.id === placeIdForRoute(route));
   if (!place) notFound();
   // Only the two Population originals go to the browser; the loader returns the whole demography manifest.
   const populationSources = sources.filter((source) => source.sourceId === SOURCE_ID.populationUnits || source.sourceId === SOURCE_ID.density);

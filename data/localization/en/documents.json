@@ -6187,5 +6187,680 @@
       "reviewedAt": "2026-10-16"
     },
     "documentLanguage": "ka"
+  },
+  "geostat_education_schools_national": {
+    "title": {
+      "text": "Number of general education schools and pupils (table 01)",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_education_teachers_national": {
+    "title": {
+      "text": "Number of general education school teachers (table 06)",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_education_municipal": {
+    "title": {
+      "text": "Number of public and private schools, pupils and teachers by municipality (table 11)",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_education_kindergartens": {
+    "title": {
+      "text": "Indicators on public preschool education and care (PEC) institutions",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_education_higher": {
+    "title": {
+      "text": "Admission, number of students and graduates in public and private higher education institutions by programme and sex",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_education_vocational": {
+    "title": {
+      "text": "Number of students in public and private vocational education institutions' education programmes",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_education_schools_by_stage_region": {
+    "title": {
+      "text": "Number of schools by stage and region (table 02)",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_education_pupils_by_grade_age": {
+    "title": {
+      "text": "Number of general education school pupils by grade and age (table 04)",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_education_pupils_by_level_grade": {
+    "title": {
+      "text": "Distribution of public and private general school pupils by level of education and grade (table 05)",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_education_pupils_suspended": {
+    "title": {
+      "text": "Pupils whose status was suspended or terminated, by grade and sex (table 08)",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_education_pupils_ict": {
+    "title": {
+      "text": "Number of pupils studying ICT (table 10)",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_education_school_graduates": {
+    "title": {
+      "text": "Graduates from primary, basic and secondary schools (table 12)",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_education_pupils_social_status": {
+    "title": {
+      "text": "Number of general education school pupils by social status (table 13)",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_education_enrolment_rates": {
+    "title": {
+      "text": "Net and gross enrolment rates by sex and level of education",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_education_proficiency": {
+    "title": {
+      "text": "Percentage of students at each proficiency level",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_education_grade_progression": {
+    "title": {
+      "text": "Grade progression rates in general education schools (table 14)",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_education_school_to_vet": {
+    "title": {
+      "text": "Graduates of basic general education who entered vocational education institutions in their graduation year (table 15)",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_education_school_to_vet_sen": {
+    "title": {
+      "text": "Persons with special educational needs who completed basic education and enrolled in vocational education institutions (table 16)",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_education_vet_institutions": {
+    "title": {
+      "text": "Number of educational institutions that conducted admission of students in vocational education programmes",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_education_vet_regions_sex": {
+    "title": {
+      "text": "Indicators of vocational education by region and sex",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_education_vet_employees": {
+    "title": {
+      "text": "Number of employees in public and private educational institutions",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_education_vet_sen": {
+    "title": {
+      "text": "Number of admitted students with special educational needs by sex and region",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_education_secondary_professional_types": {
+    "title": {
+      "text": "Secondary professional schools and number of pupils by type of studies",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_education_secondary_professional_private": {
+    "title": {
+      "text": "Private secondary professional schools",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_education_secondary_professional_specialization": {
+    "title": {
+      "text": "Secondary professional schools and enrolment by specialization",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_education_secondary_professional_pupils_regions": {
+    "title": {
+      "text": "Pupils of secondary professional schools by region",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_education_secondary_professional_admitted": {
+    "title": {
+      "text": "Students admitted to secondary professional schools",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_education_secondary_professional_admitted_specialization": {
+    "title": {
+      "text": "Students admitted to secondary professional schools by specialization",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_education_secondary_professional_graduates": {
+    "title": {
+      "text": "Graduates from secondary professional schools",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_education_secondary_professional_graduates_specialization": {
+    "title": {
+      "text": "Graduates from secondary professional schools by specialization",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_education_secondary_professional_teachers": {
+    "title": {
+      "text": "Number of teachers of secondary professional schools",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_education_higher_subprogrammes": {
+    "title": {
+      "text": "Admission, number of students and graduates in higher education institutions by sub-programme and sex",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_education_higher_age_citizenship": {
+    "title": {
+      "text": "Students in higher education institutions by age, sex and citizenship",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_education_higher_foreign_students": {
+    "title": {
+      "text": "Foreign students in higher education institutions by programme and sex",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_education_higher_abroad": {
+    "title": {
+      "text": "Georgian citizens studying abroad and foreign students by sex",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_education_higher_professors": {
+    "title": {
+      "text": "Professors in higher education institutions by form of ownership",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_education_higher_institutions": {
+    "title": {
+      "text": "Higher education institutions by form of ownership and region",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_education_doctoral": {
+    "title": {
+      "text": "Doctoral studies: admission, doctoral students and graduates by programme",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_education_doctoral_age": {
+    "title": {
+      "text": "Doctoral students by age and citizenship",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_education_doctoral_heads": {
+    "title": {
+      "text": "Scientific heads of doctoral candidates",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_education_doctoral_foreign": {
+    "title": {
+      "text": "Foreign doctoral students by country",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_education_preschool_page": {
+    "title": {
+      "text": "Early and preschool education (source page capture)",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_education_general_page": {
+    "title": {
+      "text": "General education (source page capture)",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_education_vocational_page": {
+    "title": {
+      "text": "Professional education (source page capture)",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_education_higher_page": {
+    "title": {
+      "text": "Higher education (source page capture)",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
   }
 }

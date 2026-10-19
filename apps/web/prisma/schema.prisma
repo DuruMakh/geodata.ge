@@ -93,6 +93,7 @@ model SourceDocument {
   externalPositionFacts ExternalPositionFact[]
   businessFacts BusinessFact[]
   housingFacts HousingFact[]
+  educationFacts EducationFact[]
   householdIncomeSpendingFacts HouseholdIncomeSpendingFact[]
   moneyTransferFacts MoneyTransferFact[]
   foreignInvestmentFacts ForeignInvestmentFact[]
@@ -146,6 +147,7 @@ model ImportRun {
   externalPositionFacts ExternalPositionFact[]
   businessFacts BusinessFact[]
   housingFacts HousingFact[]
+  educationFacts EducationFact[]
   householdIncomeSpendingFacts HouseholdIncomeSpendingFact[]
   moneyTransferEntities MoneyTransferEntity[]
   moneyTransferFacts MoneyTransferFact[]
@@ -1040,6 +1042,32 @@ model HousingFact {
   importRun        ImportRun?     @relation(fields: [importRunId], references: [id])
 
   @@id([indicatorId, year])
+}
+
+// Mirror of data/imports/education-annual.csv: Geostat's yearly school, kindergarten, university and
+// vocational figures by place, exact stored decimals with their published rounding. `shown` is false for
+// the nine old vocational fields, which are kept for the sums and never reach a page.
+model EducationFact {
+  year             Int
+  periodLabel      String
+  indicatorId      String
+  geographyId      String
+  value            Decimal        @db.Decimal(40, 30)
+  publishedValue   Decimal        @db.Decimal(40, 30)
+  unit             String
+  basis            String
+  valueStatus      String
+  shown            Boolean
+  sourceId         String
+  sourceSheet      String
+  sourceCell       String
+  sourceDocumentId String
+  sourceDocument   SourceDocument @relation(fields: [sourceDocumentId], references: [id])
+  lastReviewedAt   DateTime       @db.Date
+  importRunId      String?
+  importRun        ImportRun?     @relation(fields: [importRunId], references: [id])
+
+  @@id([indicatorId, geographyId, year])
 }
 
 // Mirror of data/imports/household-income-spending-annual.csv: Geostat's average monthly
