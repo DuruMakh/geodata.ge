@@ -30,6 +30,7 @@ describe("product value ranking", () => {
     const ascending = data(rank(fixture(), { ...request, order: "ascending", limit: 100 }));
     expect(ascending.entries.map(row => [row.seriesId, row.value])).toEqual([[id(2), -2], [id(1), 0], [id(3), 5], [id(4), 5], [id(6), 5.00001]]);
     expect(ascending.entries.every(row => !("calculationBasePeriod" in row))).toBe(true);
+    expect(ascending.entries.every(row => row.unit === "percent")).toBe(true);
   });
   it("uses complete cumulative histories, baseline-aware entries and upstream evidence", () => {
     const snapshot = fixture();
@@ -38,6 +39,7 @@ describe("product value ranking", () => {
     const result = data(response);
     expect(result.universe).toMatchObject({ candidateCount: 6, eligibleCount: 5 });
     expect(result.entries[0]).toMatchObject({ value: 5.00001, calculationBasePeriod: "2025-12" });
+    expect(result.entries.every(row => row.unit === "percent")).toBe(true);
     expect(result.exclusions[0]).toMatchObject({ ids: [id(5)], reasonEn: expect.stringContaining("2026-01") });
     expect(result.rankingDefinitionEn).toContain("2025-12");
     expect(response.meta.caveats).toContainEqual(expect.objectContaining({ code: "inflation_product_cumulative_derived", affects: expect.arrayContaining([`${id(5)}:2026-02`]) }));

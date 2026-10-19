@@ -17,8 +17,12 @@ describe("prepareInflationCategories", () => {
   it("extracts every category for both measures", async () => {
     const { facts, validation } = await prepared;
     expect(validation.categoryCount).toBe(55);
-    expect(facts.filter((fact) => fact.measure === "yoy_pct")).toHaveLength(13492);
-    expect(facts.filter((fact) => fact.measure === "mom_pct")).toHaveLength(14176);
+    const throughAugust = facts.filter((fact) => fact.period <= "2026-08");
+    expect(throughAugust.filter((fact) => fact.measure === "yoy_pct")).toHaveLength(13492);
+    expect(throughAugust.filter((fact) => fact.measure === "mom_pct")).toHaveLength(14176);
+    expect(validation.lastPeriod).toBe("2026-09");
+    expect(facts.filter((fact) => fact.period === "2026-09" && fact.measure === "yoy_pct")).toHaveLength(53);
+    expect(facts.filter((fact) => fact.period === "2026-09" && fact.measure === "mom_pct")).toHaveLength(53);
   });
 
   it("keeps the reconstruction inside the published bounds", async () => {

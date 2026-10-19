@@ -100,7 +100,7 @@ source.municipal_mof_annual_and_history_workbooks,MoF annual functional-classifi
 source.geostat_national_gdp_sna_1993,"Geostat GDP at current prices, SNA 1993",docs/Raw Data/GDP/national-nominal-gdp/official/GDP-at-current-prices.xlsx,2026-08-13
 source.geostat_national_gdp_sna_2008,"Geostat GDP at current prices, SNA 2008",docs/Raw Data/GDP/national-nominal-gdp/official/03_GDP-at-Current-Prices.xlsx,2026-08-13
 source.adjara_republic_budget_actual,Adjara Autonomous Republic republican budget actual payments (2015-2025),docs/Raw Data/Municipalities/adjara-republic-budget-2015-2025,2026-08-16
-source.treasury_consolidated_revenue_actual,Treasury annual consolidated-revenue reports — transfers from autonomous republic,docs/Raw Data/Revenue/2015-jan-dec-consolidated-revenue.pdf + annual 2016-2025 files,2026-08-16
+source.treasury_consolidated_revenue_actual,Treasury annual consolidated-revenue reports — transfers from autonomous republic,docs/Raw Data/Revenue/2015-jan-dec-consolidated-revenue.pdf + docs/Raw Data/Revenue/2016-jan-dec-consolidated-revenue.pdf + docs/Raw Data/Revenue/2017-jan-dec-consolidated-revenue.pdf + docs/Raw Data/Revenue/2018-jan-dec-consolidated-revenue.pdf + docs/Raw Data/Revenue/2019-jan-dec-consolidated-revenue.pdf + docs/Raw Data/Revenue/2020-jan-dec-consolidated-revenue.pdf + docs/Raw Data/Revenue/2021-jan-dec-consolidated-revenue.pdf + docs/Raw Data/Revenue/2022-jan-dec-consolidated-revenue.pdf + docs/Raw Data/Revenue/2023-jan-dec-consolidated-revenue.pdf + docs/Raw Data/Revenue/2024-jan-dec-consolidated-revenue.pdf + docs/Raw Data/Revenue/2025-jan-dec-consolidated-revenue.pdf,2026-08-16
 source.adjara_consolidated_budget,Reviewed consolidated Adjara calculation — municipalities plus republican payments minus internal transfers,data/imports/municipal-adjara-budget-adjustments-2015-2025.csv,2026-08-16
 source.geostat_municipal_population,Geostat population as of 1 January by self-governed units,docs/Raw Data/Municipalities/geostat-population-regional-gdp/official/01-population-by-self-governed-unit.xlsx,2026-08-03
 source.imf_weo_april_2026_general_government_balance,IMF WEO April 2026 general government net lending or borrowing for Georgia,docs/Raw Data/Deficit/imf-weo-general-government-balance/official/WEOApr2026all.xlsx,2026-09-04
@@ -118,19 +118,19 @@ source.wb_gdp_real_usd_2015,World Bank GDP Georgia NY.GDP.MKTP.KD,docs/Raw Data/
 source.wb_gdp_real_growth_percent,World Bank GDP Georgia NY.GDP.MKTP.KD.ZG,docs/Raw Data/Economy/gdp-overview/sources/NY.GDP.MKTP.KD.ZG.json,2026-09-11
 source.geostat_sector_growth,Geostat real GDP growth by economic activity,docs/Raw Data/Economy/economic-sectors/sources/06_Real-GDP-Growth.xlsx,2026-09-11
 source.geostat_sector_volume,Geostat chain-linked GDP by economic activity at constant 2019 prices,docs/Raw Data/Economy/economic-sectors/sources/04_GDP-at-constant-prices.xlsx,2026-09-11
-source.geostat_cpi_index_2010,"Geostat consumer price index, 2010 average=100",docs/Raw Data/Inflation/geostat-cpi/2026-08/en/cpi-index-2010.xlsx,2026-09-11
-source.geostat_cpi_yoy,"Geostat consumer price index, same month of the previous year=100",docs/Raw Data/Inflation/geostat-cpi/2026-08/en/cpi-yoy.xlsx,2026-09-11
-source.geostat_cpi_mom,"Geostat consumer price index, previous month=100",docs/Raw Data/Inflation/geostat-cpi/2026-08/en/cpi-mom.xlsx,2026-09-11
-source.geostat_cpi_avg12,"Geostat consumer price index, 12-month average over the previous 12-month average",docs/Raw Data/Inflation/geostat-cpi/2026-08/en/cpi-avg12.xlsx,2026-09-11
-source.geostat_core_yoy,"Geostat core inflation, change on the same month of the previous year",docs/Raw Data/Inflation/geostat-cpi/2026-08/en/core-yoy.xlsx,2026-09-11
-source.geostat_core_mom,"Geostat core inflation, change on the previous month",docs/Raw Data/Inflation/geostat-cpi/2026-08/en/core-mom.xlsx,2026-09-11
+source.geostat_cpi_index_2010,"Geostat consumer price index, 2010 average=100",docs/Raw Data/Inflation/geostat-cpi/2026-09/en/cpi-index-2010.xlsx,2026-10-17
+source.geostat_cpi_yoy,"Geostat consumer price index, same month of the previous year=100",docs/Raw Data/Inflation/geostat-cpi/2026-09/en/cpi-yoy.xlsx,2026-10-17
+source.geostat_cpi_mom,"Geostat consumer price index, previous month=100",docs/Raw Data/Inflation/geostat-cpi/2026-09/en/cpi-mom.xlsx,2026-10-17
+source.geostat_cpi_avg12,"Geostat consumer price index, 12-month average over the previous 12-month average",docs/Raw Data/Inflation/geostat-cpi/2026-09/en/cpi-avg12.xlsx,2026-10-17
+source.geostat_core_yoy,"Geostat core inflation, change on the same month of the previous year",docs/Raw Data/Inflation/geostat-cpi/2026-09/en/core-yoy.xlsx,2026-10-17
+source.geostat_core_mom,"Geostat core inflation, change on the previous month",docs/Raw Data/Inflation/geostat-cpi/2026-09/en/core-mom.xlsx,2026-10-17
 source.nbg_inflation_target,National Bank of Georgia inflation target,docs/Raw Data/Inflation/nbg-inflation-target/official/monetary-policy-strategy-en.pdf,2026-09-11
 source.geostat_regional_gdp,Geostat regional GDP at current market prices,docs/Raw Data/Municipalities/geostat-population-regional-gdp/official/regional-GDP-ENG.xlsx,2026-09-13
 source.geostat_regional_gdp_by_activity,Geostat regional GDP by economic activity at current basic prices,docs/Raw Data/Economy/regional-economies/sources/regional-GDP-by-activities-ENG.xlsx,2026-09-13
 source.fiscal_regional_economy_share,Fiscal.ge regional activity share derived from reviewed Geostat regional GDP sources,docs/data-methodology/regional-economies.md,2026-09-13
 source.geostat_basket_weights,"Geostat consumer basket weights, %",docs/Raw Data/Inflation/geostat-basket-weights/2026/en/basket-weights.xlsx,2026-09-12
-source.geostat_product_mom,"Geostat detailed product price index, mom (en)",docs/Raw Data/Inflation/geostat-products/2026-08/en/products-mom.xlsx,2026-09-26
-source.geostat_product_yoy,"Geostat detailed product price index, yoy (en)",docs/Raw Data/Inflation/geostat-products/2026-08/en/products-yoy.xlsx,2026-09-26
+source.geostat_product_mom,"Geostat detailed product price index, mom (en)",docs/Raw Data/Inflation/geostat-products/2026-09/en/products-mom.xlsx,2026-10-17
+source.geostat_product_yoy,"Geostat detailed product price index, yoy (en)",docs/Raw Data/Inflation/geostat-products/2026-09/en/products-yoy.xlsx,2026-10-17
 source.geostat_demography_population_age_sex,Population as of 1 January by age group and sex,docs/Raw Data/Demography/geostat-demography/2026-10/official/02-population-by-age-groups-and-sex.xlsx,2026-10-01
 source.geostat_demography_births,Live births by regions and self-governed units,docs/Raw Data/Demography/geostat-demography/2026-10/official/09-number-of-live-births-by-self-governed-units.xlsx,2026-10-01
 source.geostat_demography_crude_birth_rate,Crude birth rate,docs/Raw Data/Demography/geostat-demography/2026-10/official/15-crude-birth-rate.xlsx,2026-10-01

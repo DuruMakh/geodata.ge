@@ -131,7 +131,7 @@ describe("/mcp route", () => {
   // ceiling. It is rejected before the transport sees it. An ordinary browser
   // GET returning 405 is not itself a failure.
   it("refuses to open a stream on GET", async () => {
-    const response = GET(new Request(ENDPOINT, { method: "GET" }));
+    const response = GET(new Request(ENDPOINT, { method: "GET", headers: { host: "fiscal.ge" } }));
 
     expect(response.status).toBe(405);
     expect(response.headers.get("allow")).toBe("POST");
@@ -145,7 +145,7 @@ describe("/mcp route", () => {
   });
 
   it("refuses a session DELETE, having no sessions", () => {
-    expect(DELETE(new Request(ENDPOINT, { method: "DELETE" })).status).toBe(405);
+    expect(DELETE(new Request(ENDPOINT, { method: "DELETE", headers: { host: "fiscal.ge" } })).status).toBe(405);
   });
 
   it("declares the runtime and duration the deployment needs", async () => {

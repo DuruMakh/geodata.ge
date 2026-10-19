@@ -36,7 +36,7 @@ describe("queryInflation", () => {
       ["cpi.cat.01", "contribution_pp", "2012-06", "2004-01"],
     ]) {
       expect(queryInflation(snapshot, { seriesIds: [seriesId], measure, fromPeriod: period, toPeriod: period })).toMatchObject({
-        data: { coverage: { availablePeriods: [first, "2026-08"], availableYears: Array.from({ length: 2026 - Number(first!.slice(0, 4)) + 1 }, (_, index) => Number(first!.slice(0, 4)) + index) } },
+        data: { coverage: { availablePeriods: [first, "2026-09"], availableYears: Array.from({ length: 2026 - Number(first!.slice(0, 4)) + 1 }, (_, index) => Number(first!.slice(0, 4)) + index) } },
       });
     }
     const weightResponse = queryInflation(snapshot, { seriesIds: ["cpi.cat.01"], measure: "basket_weight_pct", fromPeriod: "2024-06", toPeriod: "2025-02" });

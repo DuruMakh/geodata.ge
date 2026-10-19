@@ -40,7 +40,7 @@ import { SECTOR_QUERY_MEASURES, sectorMeasureYearSpans } from "../factQuery/econ
 import { MUNICIPAL_PER_RESIDENT_YEAR } from "../explorer/municipalData";
 import { serverInstructions, type SectorMeasureYears } from "./instructions";
 import { outputSchemaFor } from "./outputSchema";
-import { boundedToolResult, LIMITS, tooLargeResponse, toolResult } from "./result";
+import { boundedToolResult, internalErrorResult, LIMITS, resultSizeKind, tooLargeResponse, toolResult } from "./result";
 import { loadPackagedSnapshot } from "./snapshot";
 import type { DatasetId, FactQueryResponse, FactQuerySnapshot } from "../factQuery/types";
 
@@ -149,7 +149,8 @@ export const TOOLS: readonly ToolDefinition[] = [
       "actually exist. Optional `search` matches reviewed Georgian and English labels and Latin slugs, and works WITHOUT " +
       `a datasetId — search alone looks across all ${facts.datasetCount} datasets and each match names the dataset ` +
       "it belongs to, so you can find an id before you know where it lives. A search answers with the matches and " +
-      "the datasets they belong to, not the whole catalogue. Georgian case endings " +
+      "the datasets they belong to, not the whole catalogue. Use one meaningful keyword; if a phrase returns no matches, " +
+      "try the principal word or browse the named dataset. A failed phrase match is not proof that the data is absent. Georgian case endings " +
       "are handled: `ბათუმის` finds `ბათუმი`. Never guess a series or entity id; take it from here.",
     schema: describeCoverageInput,
     run: (snapshot, input) => describeCoverage(snapshot, input),
@@ -359,7 +360,7 @@ function compactJsonSchema(value: unknown, isPropertyMap = false): unknown {
  * Zod's own, so arguments and results are checked exactly as before; the
  * cached JSON is frozen so nothing can alter what the next client is shown.
  */
-function convertedOnce(schema: ZodTypeAny): StandardSchemaWithJSON {
+function convertedOnce(schema: ZodTypeAny, safeValidationError?: string): StandardSchemaWithJSON {
   const standard = schema["~standard"] as StandardSchemaWithJSON["~standard"];
   const converted = new Map<string, Record<string, unknown>>();
   const convert = (io: "input" | "output") => (options: Parameters<StandardSchemaWithJSON["~standard"]["jsonSchema"]["input"]>[0]) => {
@@ -371,15 +372,26 @@ function convertedOnce(schema: ZodTypeAny): StandardSchemaWithJSON {
     }
     return json;
   };
-  return { "~standard": { version: 1, vendor: standard.vendor, validate: standard.validate, jsonSchema: { input: convert("input"), output: convert("output") } } };
+  const validate: typeof standard.validate = safeValidationError === undefined ? standard.validate : async value => {
+    try {
+      const result = await standard.validate(value);
+      if (result.issues) throw new Error(safeValidationError);
+      return result;
+    } catch {
+      throw new Error(safeValidationError);
+    }
+  };
+  return { "~standard": { version: 1, vendor: standard.vendor, validate, jsonSchema: { input: convert("input"), output: convert("output") } } };
 }
 
 let registeredSchemas: Map<string, { input: StandardSchemaWithJSON; output: StandardSchemaWithJSON }> | undefined;
 
 export function createMcpServer(): McpServer {
   const snapshot = loadPackagedSnapshot();
+  const safeResult = internalErrorResult(snapshot);
+  const safeValidationError = safeResult.content[0]!.text;
   const { instructions, descriptions } = serviceText(snapshot);
-  registeredSchemas ??= new Map(TOOLS.map((tool) => [tool.name, { input: convertedOnce(tool.schema), output: convertedOnce(outputSchemaFor(tool.name)) }]));
+  registeredSchemas ??= new Map(TOOLS.map((tool) => [tool.name, { input: convertedOnce(tool.schema), output: convertedOnce(outputSchemaFor(tool.name), safeValidationError) }]));
 
   const server = new McpServer(
     { name: "fiscal-ge", version: "1.0.0" },
@@ -408,30 +420,36 @@ export function createMcpServer(): McpServer {
         annotations: ANNOTATIONS,
       },
       (args: unknown) => {
-        // The SDK has validated and deduplicated these arrays. Reject the
-        // requested product before calculating cells or resolving their sources.
-        const input = args as { years?: number[]; fromYear?: number; toYear?: number; seriesIds?: string[]; entityIds?: string[]; regionIds?: string[]; target?: { seriesIds?: string[]; entityIds?: string[] } };
-        const regionalYears = input.years?.length ?? (
-          input.fromYear !== undefined && input.toYear !== undefined
-            ? input.toYear - input.fromYear + 1
-            : snapshot.regionalEconomies.facts.length > 0
-              ? new Set(snapshot.regionalEconomies.facts.map((fact) => fact.year)).size
-              : 0
-        );
-        const count = tool.name === "compare"
-          ? (input.target?.entityIds?.length ?? 1) * (input.target?.seriesIds?.length ?? 1)
-          : tool.name === "query_regional_economies"
-            ? (input.regionIds?.length ?? snapshot.regionalEconomies.regions.length) * (input.seriesIds?.length ?? snapshot.regionalEconomies.registry.length) * regionalYears
-          : tool.name === "query_inflation"
-            ? inflationCellCount(args as Parameters<typeof inflationCellCount>[0])
-            : tool.name === "query_inflation_products"
-              ? productQueryCellCount(args as Parameters<typeof productQueryCellCount>[0])
-            : tool.name.startsWith("query_")
-              ? (input.entityIds?.length ?? 1) * (input.seriesIds?.length ?? 1) * (input.years?.length ?? 1)
-              : 0;
-        const limit = tool.name === "compare" ? LIMITS.comparisonPairs : LIMITS.cells;
-        if (count > limit) return toolResult(tooLargeResponse(snapshot, { returned: count, bytes: 0 }));
-        return boundedToolResult(snapshot, tool.run(snapshot, args));
+        try {
+          // The SDK has validated and deduplicated these arrays. Reject the
+          // requested product before calculating cells or resolving their sources.
+          const input = args as { years?: number[]; fromYear?: number; toYear?: number; seriesIds?: string[]; entityIds?: string[]; regionIds?: string[]; target?: { seriesIds?: string[]; entityIds?: string[] } };
+          const regionalYears = input.years?.length ?? (
+            input.fromYear !== undefined && input.toYear !== undefined
+              ? input.toYear - input.fromYear + 1
+              : snapshot.regionalEconomies.facts.length > 0
+                ? new Set(snapshot.regionalEconomies.facts.map((fact) => fact.year)).size
+                : 0
+          );
+          const count = tool.name === "compare"
+            ? (input.target?.entityIds?.length ?? 1) * (input.target?.seriesIds?.length ?? 1)
+            : tool.name === "query_regional_economies"
+              ? (input.regionIds?.length ?? snapshot.regionalEconomies.regions.length) * (input.seriesIds?.length ?? snapshot.regionalEconomies.registry.length) * regionalYears
+            : tool.name === "query_inflation"
+              ? inflationCellCount(args as Parameters<typeof inflationCellCount>[0])
+              : tool.name === "query_inflation_products"
+                ? productQueryCellCount(args as Parameters<typeof productQueryCellCount>[0])
+              : tool.name.startsWith("query_")
+                ? (input.entityIds?.length ?? 1) * (input.seriesIds?.length ?? 1) * (input.years?.length ?? 1)
+                : 0;
+          const limit = tool.name === "compare" ? LIMITS.comparisonPairs : LIMITS.cells;
+          if (count > limit) return toolResult(tooLargeResponse(snapshot, { returned: count, bytes: 0 }));
+          const result = boundedToolResult(snapshot, tool.run(snapshot, args), resultSizeKind(tool.name));
+          if (!result.isError && result.structuredContent === undefined) throw new Error(safeValidationError);
+          return result;
+        } catch {
+          return { ...safeResult, content: safeResult.content.map(item => ({ ...item })) };
+        }
       },
     );
   }

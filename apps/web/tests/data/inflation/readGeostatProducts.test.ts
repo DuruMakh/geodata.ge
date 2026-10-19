@@ -8,7 +8,7 @@ let files: VerifiedProductFile[];
 const file = (role: "mom" | "yoy", language: "en" | "ka") => files.find((row) => row.file_role === role && row.language === language)!;
 
 beforeAll(async () => {
-  files = await readVerifiedProductFiles(path.join(INFLATION_PRODUCTS_RAW_ROOT, "2026-08"));
+  files = await readVerifiedProductFiles(path.join(INFLATION_PRODUCTS_RAW_ROOT, "2026-09"));
 });
 
 function rewrite(source: VerifiedProductFile, edit: (sheet: XLSX.WorkSheet) => void): VerifiedProductFile {
@@ -24,10 +24,10 @@ describe("Geostat detailed product indices", () => {
     expect(byYear(2015)).toHaveLength(295);
     expect(byYear(2016)).toHaveLength(295);
     expect(byYear(2026)).toHaveLength(305);
-    expect(byYear(2026)[0]!.momCells.at(-1)!.period).toBe("2026-08");
+    expect(byYear(2026)[0]!.momCells.at(-1)!.period).toBe("2026-09");
     const gasoline = byYear(2026).find((row) => row.labelEn === "Gasoline")!;
-    expect(gasoline.momCells.at(-1)).toMatchObject({ index100: "103.258", locator: "2026!K222" });
-    expect(gasoline.yoyCells.at(-1)).toMatchObject({ index100: "123.1325", locator: "2026!K222" });
+    expect(gasoline.momCells.find((cell) => cell.period === "2026-08")).toMatchObject({ index100: "103.258", locator: "2026!K222" });
+    expect(gasoline.yoyCells.find((cell) => cell.period === "2026-08")).toMatchObject({ index100: "123.1325", locator: "2026!K222" });
     expect(rows.flatMap((row) => row.yoyCells).filter((cell) => cell.marker !== null)).toHaveLength(770);
     expect(rows.flatMap((row) => row.momCells).every((cell) => cell.index100 !== null)).toBe(true);
   });

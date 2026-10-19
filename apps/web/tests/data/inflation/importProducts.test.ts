@@ -17,7 +17,9 @@ beforeAll(async () => {
 describe("individual-product inflation serving", () => {
   it("serves the reviewed current roster and original index precision", async () => {
     expect(csv.catalogue).toHaveLength(305);
-    expect(csv.facts).toHaveLength(84_056);
+    expect(csv.facts.filter((row) => row.period <= "2026-08")).toHaveLength(84_056);
+    expect(csv.facts.filter((row) => row.period === "2026-09")).toHaveLength(610);
+    expect(csv.facts).toHaveLength(84_666);
     expect(csv.facts.filter((row) => row.availability === "not_published")).toHaveLength(176);
     expect(csv.catalogue.find((row) => row.productId === "cpi.product.p0179")?.firstPeriod).toBe("2019-01");
     expect(csv.facts.find((row) => row.productId === "cpi.product.p0058" && row.measure === "yoy_index_100" && row.period === "2026-08")?.index100).toBe("157.5291");

@@ -94,7 +94,7 @@ describe("complete ranked product list", () => {
   it("keeps the latest annual period label when the selected years change", () => {
     const past: ProductState = { indicator: "cumulative", range: { startYear: 2015, endYear: 2016 }, selected: [] };
     const html = renderGeorgianMarkup(<InflationProductTable index={index} state={past} onToggle={() => {}} />, { ...common, ...controls, ...inflation, ...main });
-    expect(html.includes("აგვისტო 2026")).toBe(true);
+    expect(html.includes("სექტემბერი 2026")).toBe(true);
     expect(html.includes("2015")).toBe(true);
     expect(html.includes("2016")).toBe(true);
   });

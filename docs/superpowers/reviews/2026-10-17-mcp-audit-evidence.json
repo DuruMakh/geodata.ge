@@ -1,0 +1,1997 @@
+{
+  "auditedOn": "2026-10-17",
+  "readonly": true,
+  "score": 7.5,
+  "release": {
+    "commit": "4a55558aa7da5ef2197186b3ffab5d2ee0b68474",
+    "dataVersion": "d09de86ea1f4b5c111fdf2accdebdb8c9f85500f5d785ad87f8d60ccafeff7c4",
+    "schemaVersion": "1.5.0",
+    "deploymentId": "dpl_Erifm5Fm3H6i9s4kx5GKH9mmq5nh",
+    "state": "READY"
+  },
+  "verification": {
+    "check": {
+      "exitCode": 0,
+      "unitFilesPassed": 523,
+      "unitFilesSkipped": 1,
+      "testsPassed": 4978,
+      "testsSkipped": 13,
+      "dataChecksPassed": 36
+    },
+    "build": {
+      "exitCode": 0,
+      "mcpFunctionSizeReportedMb": 54.7,
+      "projectFunctionBudgetMb": 200
+    },
+    "productionBrowser": {
+      "passed": 7,
+      "failed": 0
+    },
+    "liveTools": [
+      {
+        "name": "all-tools:query_regional_economies",
+        "status": "ok",
+        "referenceIntent": 35,
+        "sources": 1
+      },
+      {
+        "name": "all-tools:query_economic_sectors",
+        "status": "ok",
+        "referenceIntent": 27,
+        "sources": 1
+      },
+      {
+        "name": "all-tools:query_gdp",
+        "status": "ok",
+        "referenceIntent": 25,
+        "sources": 1
+      },
+      {
+        "name": "all-tools:query_inflation",
+        "status": "ok",
+        "referenceIntent": 29,
+        "sources": 1
+      },
+      {
+        "name": "all-tools:query_inflation_products",
+        "status": "ok",
+        "referenceIntent": 41,
+        "sources": 1
+      },
+      {
+        "name": "all-tools:describe_coverage",
+        "status": "ok",
+        "referenceIntent": null,
+        "sources": 0
+      },
+      {
+        "name": "all-tools:query_national",
+        "status": "ok",
+        "referenceIntent": 1,
+        "sources": 1
+      },
+      {
+        "name": "all-tools:query_ministries",
+        "status": "ok",
+        "referenceIntent": null,
+        "sources": 1
+      },
+      {
+        "name": "all-tools:query_municipal",
+        "status": "ok",
+        "referenceIntent": 11,
+        "sources": 1
+      },
+      {
+        "name": "all-tools:query_debt",
+        "status": "ok",
+        "referenceIntent": 21,
+        "sources": 1
+      },
+      {
+        "name": "all-tools:query_deficit",
+        "status": "ok",
+        "referenceIntent": 24,
+        "sources": 1
+      },
+      {
+        "name": "all-tools:compare",
+        "status": "ok",
+        "referenceIntent": 5,
+        "sources": 2
+      },
+      {
+        "name": "all-tools:rank",
+        "status": "ok",
+        "referenceIntent": 17,
+        "sources": 2
+      },
+      {
+        "name": "all-tools:get_sources",
+        "status": "ok",
+        "referenceIntent": null,
+        "sources": 1
+      }
+    ],
+    "clientCompatibility": [
+      {
+        "name": "modern-pinned:compatibility",
+        "outcome": "pass",
+        "era": "modern"
+      },
+      {
+        "name": "modern-auto:compatibility",
+        "outcome": "pass",
+        "era": "modern"
+      }
+    ],
+    "productionPublications": {
+      "files": 22,
+      "decodedBytes": 57002699,
+      "passed": true
+    },
+    "sourceLinks": {
+      "checked": 9,
+      "passed": true,
+      "checksum": {
+        "documentId": "source.geostat_cpi_yoy",
+        "status": 200,
+        "bytes": 847588,
+        "expectedBytes": 847588,
+        "sha256": "fbd93bf2891e3691975eea5e92f754e03e8e93c2c86a71b3e582ceaaf79863e9",
+        "expectedSha256": "fbd93bf2891e3691975eea5e92f754e03e8e93c2c86a71b3e582ceaaf79863e9",
+        "passed": true
+      }
+    },
+    "httpBoundaries": [
+      {
+        "name": "bad-json",
+        "status": 400
+      },
+      {
+        "name": "bad-content-type",
+        "status": 415
+      },
+      {
+        "name": "oversize-body",
+        "status": 413
+      },
+      {
+        "name": "unsupported-protocol",
+        "status": 400
+      },
+      {
+        "name": "unknown-method",
+        "status": 200
+      },
+      {
+        "name": "untrusted-origin-GET",
+        "status": 405
+      },
+      {
+        "name": "untrusted-origin-DELETE",
+        "status": 405
+      }
+    ],
+    "mcpHttpRequestCount": 67
+  },
+  "performance": {
+    "liveWarmMs": {
+      "samples": 10,
+      "min": 204.63930000000255,
+      "median": 214.97345000000132,
+      "max": 429.9395000000004
+    },
+    "correspondingServerMs": {
+      "samples": 10,
+      "min": 12,
+      "median": 14,
+      "max": 221
+    },
+    "snapshotBytes": 32096273,
+    "cold": {
+      "sampleCount": 5,
+      "samples": [
+        {
+          "pid": 37264,
+          "snapshotBytes": 32096273,
+          "dataVersion": "d09de86ea1f4b5c111fdf2accdebdb8c9f85500f5d785ad87f8d60ccafeff7c4",
+          "readMs": 64.83070000000009,
+          "parseMs": 127.26580000000001,
+          "validationMs": 0.10379999999997835,
+          "indexMs": 154.0949999999999,
+          "totalMs": 346.2953,
+          "productCount": 305,
+          "factCount": 84056,
+          "annualRunCount": 305,
+          "monthlyRunCount": 305,
+          "processElapsedMs": 1244.867
+        },
+        {
+          "pid": 42668,
+          "snapshotBytes": 32096273,
+          "dataVersion": "d09de86ea1f4b5c111fdf2accdebdb8c9f85500f5d785ad87f8d60ccafeff7c4",
+          "readMs": 59.99630000000002,
+          "parseMs": 112.40469999999999,
+          "validationMs": 0.10450000000003001,
+          "indexMs": 142.36999999999995,
+          "totalMs": 314.8755,
+          "productCount": 305,
+          "factCount": 84056,
+          "annualRunCount": 305,
+          "monthlyRunCount": 305,
+          "processElapsedMs": 727.8029000000001
+        },
+        {
+          "pid": 28252,
+          "snapshotBytes": 32096273,
+          "dataVersion": "d09de86ea1f4b5c111fdf2accdebdb8c9f85500f5d785ad87f8d60ccafeff7c4",
+          "readMs": 65.84800000000001,
+          "parseMs": 138.37879999999996,
+          "validationMs": 0.11329999999998108,
+          "indexMs": 168.61350000000004,
+          "totalMs": 372.9536,
+          "productCount": 305,
+          "factCount": 84056,
+          "annualRunCount": 305,
+          "monthlyRunCount": 305,
+          "processElapsedMs": 847.6795000000002
+        },
+        {
+          "pid": 10820,
+          "snapshotBytes": 32096273,
+          "dataVersion": "d09de86ea1f4b5c111fdf2accdebdb8c9f85500f5d785ad87f8d60ccafeff7c4",
+          "readMs": 78.10799999999995,
+          "parseMs": 132.3135000000001,
+          "validationMs": 0.18999999999994088,
+          "indexMs": 174.22160000000008,
+          "totalMs": 384.83310000000006,
+          "productCount": 305,
+          "factCount": 84056,
+          "annualRunCount": 305,
+          "monthlyRunCount": 305,
+          "processElapsedMs": 953.2073
+        },
+        {
+          "pid": 18728,
+          "snapshotBytes": 32096273,
+          "dataVersion": "d09de86ea1f4b5c111fdf2accdebdb8c9f85500f5d785ad87f8d60ccafeff7c4",
+          "readMs": 70.9579,
+          "parseMs": 124.02920000000006,
+          "validationMs": 0.16800000000000637,
+          "indexMs": 170.64389999999992,
+          "totalMs": 365.799,
+          "productCount": 305,
+          "factCount": 84056,
+          "annualRunCount": 305,
+          "monthlyRunCount": 305,
+          "processElapsedMs": 861.2469000000001
+        }
+      ],
+      "timings": {
+        "readMs": {
+          "min": 59.99630000000002,
+          "median": 65.84800000000001,
+          "p95": 78.10799999999995,
+          "max": 78.10799999999995,
+          "samples": [
+            64.83070000000009,
+            59.99630000000002,
+            65.84800000000001,
+            78.10799999999995,
+            70.9579
+          ]
+        },
+        "parseMs": {
+          "min": 112.40469999999999,
+          "median": 127.26580000000001,
+          "p95": 138.37879999999996,
+          "max": 138.37879999999996,
+          "samples": [
+            127.26580000000001,
+            112.40469999999999,
+            138.37879999999996,
+            132.3135000000001,
+            124.02920000000006
+          ]
+        },
+        "indexMs": {
+          "min": 142.36999999999995,
+          "median": 168.61350000000004,
+          "p95": 174.22160000000008,
+          "max": 174.22160000000008,
+          "samples": [
+            154.0949999999999,
+            142.36999999999995,
+            168.61350000000004,
+            174.22160000000008,
+            170.64389999999992
+          ]
+        },
+        "totalMs": {
+          "min": 314.8755,
+          "median": 365.799,
+          "p95": 384.83310000000006,
+          "max": 384.83310000000006,
+          "samples": [
+            346.2953,
+            314.8755,
+            372.9536,
+            384.83310000000006,
+            365.799
+          ]
+        },
+        "processElapsedMs": {
+          "min": 727.8029000000001,
+          "median": 861.2469000000001,
+          "p95": 1244.867,
+          "max": 1244.867,
+          "samples": [
+            1244.867,
+            727.8029000000001,
+            847.6795000000002,
+            953.2073,
+            861.2469000000001
+          ]
+        }
+      }
+    },
+    "localScenarioCount": 45,
+    "instructionChars": 14305,
+    "toolInventoryBytes": 113676,
+    "scenarios": [
+      {
+        "name": "catalogue-default",
+        "tool": "describeCoverage",
+        "status": "ok",
+        "bytes": 24457,
+        "boundedBytes": 24457,
+        "limitOutcome": "accepted",
+        "queryMs": 24.99310000000014,
+        "totalMs": 25.141650000000027
+      },
+      {
+        "name": "catalogue-national-revenue",
+        "tool": "describeCoverage",
+        "status": "ok",
+        "bytes": 14473,
+        "boundedBytes": 14473,
+        "limitOutcome": "accepted",
+        "queryMs": 0.17774999999983265,
+        "totalMs": 0.2826999999997497
+      },
+      {
+        "name": "catalogue-national-expenditure",
+        "tool": "describeCoverage",
+        "status": "ok",
+        "bytes": 14271,
+        "boundedBytes": 14271,
+        "limitOutcome": "accepted",
+        "queryMs": 0.15209999999979118,
+        "totalMs": 0.275749999999789
+      },
+      {
+        "name": "catalogue-ministries",
+        "tool": "describeCoverage",
+        "status": "ok",
+        "bytes": 58085,
+        "boundedBytes": 58085,
+        "limitOutcome": "accepted",
+        "queryMs": 0.38144999999985885,
+        "totalMs": 0.8284999999996217
+      },
+      {
+        "name": "catalogue-municipal-expenditure",
+        "tool": "describeCoverage",
+        "status": "ok",
+        "bytes": 33955,
+        "boundedBytes": 33955,
+        "limitOutcome": "accepted",
+        "queryMs": 1.1999000000000706,
+        "totalMs": 1.464799999999741
+      },
+      {
+        "name": "catalogue-government-debt",
+        "tool": "describeCoverage",
+        "status": "ok",
+        "bytes": 13801,
+        "boundedBytes": 13801,
+        "limitOutcome": "accepted",
+        "queryMs": 0.1222499999998945,
+        "totalMs": 0.20190000000002328
+      },
+      {
+        "name": "catalogue-general-government-balance",
+        "tool": "describeCoverage",
+        "status": "ok",
+        "bytes": 7413,
+        "boundedBytes": 7413,
+        "limitOutcome": "accepted",
+        "queryMs": 0.06309999999984939,
+        "totalMs": 0.10294999999996435
+      },
+      {
+        "name": "catalogue-gdp-overview",
+        "tool": "describeCoverage",
+        "status": "ok",
+        "bytes": 10189,
+        "boundedBytes": 10189,
+        "limitOutcome": "accepted",
+        "queryMs": 0.1141499999998814,
+        "totalMs": 0.19525000000021464
+      },
+      {
+        "name": "catalogue-economic-sectors",
+        "tool": "describeCoverage",
+        "status": "ok",
+        "bytes": 40073,
+        "boundedBytes": 40073,
+        "limitOutcome": "accepted",
+        "queryMs": 1.6370500000002721,
+        "totalMs": 1.9619000000002416
+      },
+      {
+        "name": "catalogue-regional-economies",
+        "tool": "describeCoverage",
+        "status": "ok",
+        "bytes": 35671,
+        "boundedBytes": 35671,
+        "limitOutcome": "accepted",
+        "queryMs": 9.02639999999974,
+        "totalMs": 9.298549999999977
+      },
+      {
+        "name": "catalogue-inflation",
+        "tool": "describeCoverage",
+        "status": "ok",
+        "bytes": 84123,
+        "boundedBytes": 84123,
+        "limitOutcome": "accepted",
+        "queryMs": 11.949499999999716,
+        "totalMs": 12.803749999999582
+      },
+      {
+        "name": "catalogue-inflation-products",
+        "tool": "describeCoverage",
+        "status": "ok",
+        "bytes": 469421,
+        "boundedBytes": 469421,
+        "limitOutcome": "accepted",
+        "queryMs": 51.143049999999675,
+        "totalMs": 57.59774999999945
+      },
+      {
+        "name": "national-expenditure-total-all-years",
+        "tool": "queryNational",
+        "status": "ok",
+        "bytes": 164146,
+        "boundedBytes": 164146,
+        "limitOutcome": "accepted",
+        "queryMs": 1.233850000000075,
+        "totalMs": 2.253400000000056
+      },
+      {
+        "name": "national-revenue-total-all-years",
+        "tool": "queryNational",
+        "status": "ok",
+        "bytes": 111414,
+        "boundedBytes": 111414,
+        "limitOutcome": "accepted",
+        "queryMs": 1.2204000000001543,
+        "totalMs": 2.1311000000000604
+      },
+      {
+        "name": "ministry-parent",
+        "tool": "queryMinistries",
+        "status": "ok",
+        "bytes": 117842,
+        "boundedBytes": 117842,
+        "limitOutcome": "accepted",
+        "queryMs": 0.9448000000002139,
+        "totalMs": 1.671450000000732
+      },
+      {
+        "name": "ministry-programmes",
+        "tool": "queryMinistries",
+        "status": "partial",
+        "bytes": 327913,
+        "boundedBytes": 327913,
+        "limitOutcome": "accepted",
+        "queryMs": 2.559950000000299,
+        "totalMs": 4.762349999999969
+      },
+      {
+        "name": "municipal-one-all-years",
+        "tool": "queryMunicipal",
+        "status": "ok",
+        "bytes": 38837,
+        "boundedBytes": 38837,
+        "limitOutcome": "accepted",
+        "queryMs": 3.9019499999999425,
+        "totalMs": 4.293049999999766
+      },
+      {
+        "name": "municipal-all-latest-year",
+        "tool": "queryMunicipal",
+        "status": "ok",
+        "bytes": 194708,
+        "boundedBytes": 194708,
+        "limitOutcome": "accepted",
+        "queryMs": 15.95049999999992,
+        "totalMs": 17.415700000000015
+      },
+      {
+        "name": "region-region.tbilisi",
+        "tool": "queryMunicipal",
+        "status": "ok",
+        "bytes": 38255,
+        "boundedBytes": 38255,
+        "limitOutcome": "accepted",
+        "queryMs": 3.54424999999992,
+        "totalMs": 3.9947000000001935
+      },
+      {
+        "name": "region-region.adjara",
+        "tool": "queryMunicipal",
+        "status": "ok",
+        "bytes": 70514,
+        "boundedBytes": 70514,
+        "limitOutcome": "accepted",
+        "queryMs": 4.366050000000087,
+        "totalMs": 5.052450000000135
+      },
+      {
+        "name": "municipal-495",
+        "tool": "queryMunicipal",
+        "status": "ok",
+        "bytes": 821377,
+        "boundedBytes": 1053,
+        "limitOutcome": "byte_limit",
+        "queryMs": 115.02145000000019,
+        "totalMs": 121.90529999999944
+      },
+      {
+        "name": "municipal-500",
+        "tool": "queryMunicipal",
+        "status": "ok",
+        "bytes": 833163,
+        "boundedBytes": 1053,
+        "limitOutcome": "byte_limit",
+        "queryMs": 126.85350000000017,
+        "totalMs": 132.88155000000097
+      },
+      {
+        "name": "501-existing-cells-result-gate",
+        "tool": "boundedToolResult fixture",
+        "status": "ok",
+        "bytes": 834691,
+        "boundedBytes": 1032,
+        "limitOutcome": "cell_limit",
+        "queryMs": 0,
+        "totalMs": 0.08705000000009022
+      },
+      {
+        "name": "municipal-506-valid-request",
+        "tool": "queryMunicipal",
+        "status": "ok",
+        "bytes": 839179,
+        "boundedBytes": 1032,
+        "limitOutcome": "cell_limit",
+        "queryMs": 114.10290000000077,
+        "totalMs": 114.19930000000022
+      },
+      {
+        "name": "municipal-input-year-limit",
+        "tool": "queryMunicipal",
+        "status": "error",
+        "bytes": 441,
+        "boundedBytes": 441,
+        "limitOutcome": "input_or_query_error",
+        "queryMs": 0.07204999999885331,
+        "totalMs": 0.07679999999891152
+      },
+      {
+        "name": "comparison-national",
+        "tool": "compare",
+        "status": "ok",
+        "bytes": 13797,
+        "boundedBytes": 13797,
+        "limitOutcome": "accepted",
+        "queryMs": 0.6181499999993321,
+        "totalMs": 0.7004499999984546
+      },
+      {
+        "name": "rank-national-expenditure-series",
+        "tool": "rank",
+        "status": "ok",
+        "bytes": 14692,
+        "boundedBytes": 14692,
+        "limitOutcome": "accepted",
+        "queryMs": 0.8518499999991036,
+        "totalMs": 0.9544999999989159
+      },
+      {
+        "name": "rank-national-revenue-series",
+        "tool": "rank",
+        "status": "ok",
+        "bytes": 12083,
+        "boundedBytes": 12083,
+        "limitOutcome": "accepted",
+        "queryMs": 0.8028999999996813,
+        "totalMs": 0.8905499999991662
+      },
+      {
+        "name": "rank-ministries-admin_category",
+        "tool": "rank",
+        "status": "ok",
+        "bytes": 13303,
+        "boundedBytes": 13303,
+        "limitOutcome": "accepted",
+        "queryMs": 0.7600999999995111,
+        "totalMs": 0.8762499999993452
+      },
+      {
+        "name": "rank-ministries-major_program",
+        "tool": "rank",
+        "status": "partial",
+        "bytes": 43745,
+        "boundedBytes": 43745,
+        "limitOutcome": "accepted",
+        "queryMs": 1.2107000000005428,
+        "totalMs": 1.506350000000566
+      },
+      {
+        "name": "rank-municipality",
+        "tool": "rank",
+        "status": "ok",
+        "bytes": 124343,
+        "boundedBytes": 124343,
+        "limitOutcome": "accepted",
+        "queryMs": 15.941550000000461,
+        "totalMs": 16.704400000000533
+      },
+      {
+        "name": "rank-region",
+        "tool": "rank",
+        "status": "ok",
+        "bytes": 111431,
+        "boundedBytes": 111431,
+        "limitOutcome": "accepted",
+        "queryMs": 3.75315000000046,
+        "totalMs": 4.443400000000111
+      },
+      {
+        "name": "debt-stock",
+        "tool": "queryDebt",
+        "status": "ok",
+        "bytes": 60750,
+        "boundedBytes": 60750,
+        "limitOutcome": "accepted",
+        "queryMs": 0.6237499999997453,
+        "totalMs": 1.07944999999836
+      },
+      {
+        "name": "debt-service",
+        "tool": "queryDebt",
+        "status": "ok",
+        "bytes": 85145,
+        "boundedBytes": 85145,
+        "limitOutcome": "accepted",
+        "queryMs": 0.41194999999970605,
+        "totalMs": 0.9788999999991574
+      },
+      {
+        "name": "debt-rate",
+        "tool": "queryDebt",
+        "status": "partial",
+        "bytes": 87147,
+        "boundedBytes": 87147,
+        "limitOutcome": "accepted",
+        "queryMs": 0.3342000000002372,
+        "totalMs": 0.8729500000008557
+      },
+      {
+        "name": "deficit-actual-and-projection",
+        "tool": "queryDeficit",
+        "status": "ok",
+        "bytes": 77360,
+        "boundedBytes": 77360,
+        "limitOutcome": "accepted",
+        "queryMs": 0.36635000000114815,
+        "totalMs": 0.7844500000001062
+      },
+      {
+        "name": "products-single-history",
+        "tool": "queryInflationProducts",
+        "status": "ok",
+        "bytes": 212261,
+        "boundedBytes": 212261,
+        "limitOutcome": "accepted",
+        "queryMs": 2.3381499999995867,
+        "totalMs": 4.306649999999536
+      },
+      {
+        "name": "products-annual-endpoints",
+        "tool": "queryInflationProducts",
+        "status": "ok",
+        "bytes": 312765,
+        "boundedBytes": 312765,
+        "limitOutcome": "accepted",
+        "queryMs": 40.712500000000546,
+        "totalMs": 44.42250000000058
+      },
+      {
+        "name": "products-cumulative-endpoints",
+        "tool": "queryInflationProducts",
+        "status": "ok",
+        "bytes": 436877,
+        "boundedBytes": 436877,
+        "limitOutcome": "accepted",
+        "queryMs": 127.57870000000003,
+        "totalMs": 132.24249999999938
+      },
+      {
+        "name": "products-500-output-cells",
+        "tool": "queryInflationProducts",
+        "status": "ok",
+        "bytes": 1052312,
+        "boundedBytes": 1055,
+        "limitOutcome": "byte_limit",
+        "queryMs": 73.31784999999945,
+        "totalMs": 78.74314999999842
+      },
+      {
+        "name": "products-annual-rank-100",
+        "tool": "rank",
+        "status": "ok",
+        "bytes": 63489,
+        "boundedBytes": 63489,
+        "limitOutcome": "accepted",
+        "queryMs": 52.00560000000041,
+        "totalMs": 52.63015000000087
+      },
+      {
+        "name": "products-cumulative-rank-100",
+        "tool": "rank",
+        "status": "partial",
+        "bytes": 105283,
+        "boundedBytes": 105283,
+        "limitOutcome": "accepted",
+        "queryMs": 169.98895000000084,
+        "totalMs": 170.8726000000006
+      },
+      {
+        "name": "products-missing-history-rank-100",
+        "tool": "rank",
+        "status": "partial",
+        "bytes": 70254,
+        "boundedBytes": 70254,
+        "limitOutcome": "accepted",
+        "queryMs": 53.11965000000055,
+        "totalMs": 53.62970000000132
+      },
+      {
+        "name": "sources-all-batch-1",
+        "tool": "getSources",
+        "status": "ok",
+        "bytes": 653312,
+        "boundedBytes": 1049,
+        "limitOutcome": "byte_limit",
+        "queryMs": 9.91885000000002,
+        "totalMs": 13.043800000001283
+      },
+      {
+        "name": "sources-all-batch-2",
+        "tool": "getSources",
+        "status": "ok",
+        "bytes": 568691,
+        "boundedBytes": 1049,
+        "limitOutcome": "byte_limit",
+        "queryMs": 8.854199999999764,
+        "totalMs": 11.542600000000675
+      }
+    ]
+  },
+  "dependencies": {
+    "production": {
+      "info": 0,
+      "low": 0,
+      "moderate": 3,
+      "high": 0,
+      "critical": 0,
+      "total": 3
+    },
+    "full": {
+      "info": 0,
+      "low": 0,
+      "moderate": 4,
+      "high": 5,
+      "critical": 0,
+      "total": 9
+    },
+    "acceptedHighAdvisory": "GHSA-vfj7-8cjw-p6xm",
+    "exceptionExpires": "2026-11-02T00:00:00Z",
+    "separatelyTracedFlaggedFiles": [],
+    "traceContainsSnapshot": true
+  },
+  "findings": [
+    {
+      "id": "sources",
+      "severity": "important",
+      "evidence": "live municipal-country-sources plus local data probes",
+      "value2025": 6110301258.08,
+      "problem": "country aggregate cites only Adjara republican payments; Adjara transfer source falls back to 2015"
+    },
+    {
+      "id": "units",
+      "severity": "important",
+      "evidence": "live rank-pp and GDP-2025",
+      "exampleValue": 1.1198120965560037,
+      "actualUnit": "percent",
+      "expectedUnit": "percentage_points"
+    },
+    {
+      "id": "city-sources",
+      "severity": "important",
+      "evidence": "live city-source-filter",
+      "error": "unknown_entity",
+      "entity": "city.batumi"
+    },
+    {
+      "id": "tool-exception",
+      "severity": "important",
+      "evidence": "local actual-route fault injection, modern and legacy",
+      "result": "SDK returns synthetic internal-path message as isError true"
+    },
+    {
+      "id": "freshness",
+      "severity": "important",
+      "servedThrough": "2026-08",
+      "requested": "2026-09",
+      "error": "year_out_of_range",
+      "officialReleaseDate": "2026-10-02",
+      "officialReleaseUrl": "https://www.geostat.ge/en/single-news/3862/inflation-rate-in-georgia-september-2026"
+    },
+    {
+      "id": "retention",
+      "severity": "important",
+      "providerMessage": "Vercel API request failed (400: bad_request). The hobby plan does not retain runtime logs for the requested time range. 400  The window may exceed your plan’s runtime-log retention or require Observability Plus. Try a recent window such as since: \"30m\"; Hobby retains 1 hour, Pro 1 day, and Enterprise 3 days without Plus.",
+      "externalRetentionVerified": false
+    },
+    {
+      "id": "capacity",
+      "severity": "important",
+      "basis": "documented free plan plus current command count",
+      "monthlyCommands": 500000,
+      "normalCommandsPerAcceptedRequest": 12,
+      "currentAccountUsageVerified": false
+    }
+  ],
+  "limits": {
+    "authenticatedAssistantApplicationsTested": false,
+    "productionLoadTestPerformed": false,
+    "providerFirewallVerified": false,
+    "externalMonitoringVerified": false,
+    "exceptionTextWasSynthetic": true
+  },
+  "diagnostics": [
+    "apps/web/.tmp/mcp-audit/",
+    ".tmp/mcp-audit-data/",
+    ".tmp/mcp-audit-security/",
+    ".tmp/mcp-audit-experience/"
+  ],
+  "secondReview": {
+    "reviewedOn": "2026-10-17",
+    "score": 7.5,
+    "applicationChanges": false,
+    "release": {
+      "status": 200,
+      "dataVersion": "d09de86ea1f4b5c111fdf2accdebdb8c9f85500f5d785ad87f8d60ccafeff7c4",
+      "schemaVersion": "1.5.0",
+      "releaseCommit": "4a55558aa7da5ef2197186b3ffab5d2ee0b68474"
+    },
+    "originalFindings": [
+      {
+        "id": 1,
+        "status": "confirmed",
+        "priority": "Important",
+        "refinement": "Source completeness, not arithmetic. Country evidence must preserve all 69 budgets rather than the 64 territorial codes.",
+        "affectedCountryCells": 132,
+        "adjaraCellsWith2015TransferEvidence": 121
+      },
+      {
+        "id": 2,
+        "status": "confirmed",
+        "priority": "Important",
+        "affectedDatasetMeasureCombinations": 7,
+        "refinement": "Values agree; incorrect unit is shared across four dataset families. GDP English wording is wrong; Georgian wording is correct."
+      },
+      {
+        "id": 3,
+        "status": "confirmed",
+        "priority": "Important",
+        "affectedCities": 6
+      },
+      {
+        "id": 4,
+        "status": "confirmed_with_bounded_impact",
+        "priority": "Important",
+        "refinement": "Synthetic internal faults leak error text in both eras. No natural exploit or real secret exposure demonstrated. SDK output validation lies outside a callback catch."
+      },
+      {
+        "id": 5,
+        "status": "confirmed_for_headline",
+        "priority": "Important",
+        "servedThrough": "2026-08",
+        "officialRelease": "2026-09",
+        "officialPublicationDate": "2026-10-02"
+      },
+      {
+        "id": 6,
+        "status": "confirmed_retention_gap",
+        "priority": "Important",
+        "accessibleVercelRetentionHours": 1,
+        "externalRetention": "unverified"
+      },
+      {
+        "id": 7,
+        "status": "reclassified_documented_constraint",
+        "priority": "Capacity planning",
+        "refinement": "Already explicitly documented in deployment.md; current Upstash plan and quota usage not independently verified."
+      }
+    ],
+    "additionalFindings": [
+      {
+        "id": "city-catalogue",
+        "priority": "Minor",
+        "offeredNationalOnlySubgroups": 43,
+        "affectedCityCatalogueEntities": 6,
+        "liveConfirmed": true
+      },
+      {
+        "id": "derived-source-filter-outcome",
+        "priority": "Minor",
+        "observation": "Filtered derived source reports not_requested; evidence preservation itself is intentional."
+      },
+      {
+        "id": "document-covered-year",
+        "priority": "Minor",
+        "observation": "2014 ministry source is legitimately col_4 in the 2015 workbook; public covered-year metadata omits 2014."
+      },
+      {
+        "id": "bundled-dependency",
+        "priority": "Maintenance",
+        "observation": "SDK embeds fast-uri 3.1.0; top-level override does not patch that copy. No exploit path demonstrated."
+      }
+    ],
+    "dataVerification": {
+      "structuralObservations": 92287,
+      "structuralCheckScopes": {
+        "fullMetadataReferenceAndAvailabilityChecks": 89119,
+        "programAvailabilityAndProvenancePresenceChecks": 3168
+      },
+      "numericTolerance": {
+        "relativeFloatingPointTolerance": 1e-10,
+        "countryMunicipalReconciliation": "exact decimal"
+      },
+      "rawInflationToQueryCells": 50198,
+      "independentNumericCounts": {
+        "rawAnnual": 1379,
+        "derivedAnnual": 5105,
+        "productAnnual": 42028,
+        "productCumulative": 270840,
+        "comparisonPairs": 16632,
+        "rankEntries": 15710
+      },
+      "countryTotals": [
+        {
+          "year": 2015,
+          "budgets": 69,
+          "expected": 2186717489.17,
+          "got": 2186717489.17,
+          "equal": true
+        },
+        {
+          "year": 2016,
+          "budgets": 69,
+          "expected": 2105497761.91,
+          "got": 2105497761.91,
+          "equal": true
+        },
+        {
+          "year": 2017,
+          "budgets": 69,
+          "expected": 2188905665.19,
+          "got": 2188905665.19,
+          "equal": true
+        },
+        {
+          "year": 2018,
+          "budgets": 69,
+          "expected": 2515499594.97,
+          "got": 2515499594.97,
+          "equal": true
+        },
+        {
+          "year": 2019,
+          "budgets": 69,
+          "expected": 2873229268.57,
+          "got": 2873229268.57,
+          "equal": true
+        },
+        {
+          "year": 2020,
+          "budgets": 69,
+          "expected": 2901619387.27,
+          "got": 2901619387.27,
+          "equal": true
+        },
+        {
+          "year": 2021,
+          "budgets": 69,
+          "expected": 3173846520.66,
+          "got": 3173846520.66,
+          "equal": true
+        },
+        {
+          "year": 2022,
+          "budgets": 69,
+          "expected": 3926089318.43,
+          "got": 3926089318.43,
+          "equal": true
+        },
+        {
+          "year": 2023,
+          "budgets": 69,
+          "expected": 4737511976.57,
+          "got": 4737511976.57,
+          "equal": true
+        },
+        {
+          "year": 2024,
+          "budgets": 69,
+          "expected": 5553107287.81,
+          "got": 5553107287.81,
+          "equal": true
+        },
+        {
+          "year": 2025,
+          "budgets": 69,
+          "expected": 6110301258.08,
+          "got": 6110301258.08,
+          "equal": true
+        }
+      ],
+      "countryFunctionTotals": 110,
+      "unresolvedArithmeticDisagreements": 0,
+      "documentedPrecisionDifferences": {
+        "count": 16,
+        "explanation": "Budget denominator uses reviewed 0.1 million GEL precision; all flags match rounding.",
+        "evidence": "docs/data-methodology/gdp-overview.md:11"
+      },
+      "correctedHarnessCases": {
+        "invalidProgramRequests": 66,
+        "correctedProgramObservations": 3168
+      },
+      "boundary": "Checks reconcile implementation to packaged snapshot and prepared reviewed CSVs; they do not re-extract or independently authenticate each original."
+    },
+    "rankingUnitReproductions": [
+      {
+        "args": {
+          "datasetId": "national-revenue",
+          "dimension": "series",
+          "measure": "share_of_total_pct",
+          "metric": "percentage_point_change",
+          "fromYear": 2024,
+          "toYear": 2025,
+          "limit": 100
+        },
+        "status": "ok",
+        "entries": 11,
+        "units": [
+          "percent"
+        ],
+        "sample": {
+          "position": 1,
+          "tied": false,
+          "entityId": "country.georgia",
+          "entityLabelKa": "საქართველო",
+          "entityLabelEn": "Georgia",
+          "seriesId": "revenue.other_revenue",
+          "seriesLabelKa": "სხვა შემოსავლები",
+          "seriesLabelEn": "Other revenue",
+          "value": 1.171987615010627,
+          "unit": "percent",
+          "basis": "actual",
+          "caveatIds": [
+            "revenue_internal_flows_netted"
+          ]
+        }
+      },
+      {
+        "args": {
+          "datasetId": "national-revenue",
+          "dimension": "series",
+          "measure": "share_of_gdp_pct",
+          "metric": "percentage_point_change",
+          "fromYear": 2024,
+          "toYear": 2025,
+          "limit": 100
+        },
+        "status": "ok",
+        "entries": 11,
+        "units": [
+          "percent"
+        ],
+        "sample": {
+          "position": 1,
+          "tied": false,
+          "entityId": "country.georgia",
+          "entityLabelKa": "საქართველო",
+          "entityLabelEn": "Georgia",
+          "seriesId": "revenue.other_revenue",
+          "seriesLabelKa": "სხვა შემოსავლები",
+          "seriesLabelEn": "Other revenue",
+          "value": 0.29056434777097895,
+          "unit": "percent",
+          "basis": "actual",
+          "caveatIds": [
+            "gdp_preliminary",
+            "revenue_internal_flows_netted"
+          ]
+        }
+      },
+      {
+        "args": {
+          "datasetId": "national-expenditure",
+          "dimension": "series",
+          "measure": "share_of_total_pct",
+          "metric": "percentage_point_change",
+          "fromYear": 2024,
+          "toYear": 2025,
+          "limit": 100
+        },
+        "status": "ok",
+        "entries": 13,
+        "units": [
+          "percent"
+        ],
+        "sample": {
+          "position": 1,
+          "tied": false,
+          "entityId": "country.georgia",
+          "entityLabelKa": "საქართველო",
+          "entityLabelEn": "Georgia",
+          "seriesId": "spending.social_protection",
+          "seriesLabelKa": "სოციალური დაცვა",
+          "seriesLabelEn": "Social protection",
+          "value": 1.1198120965560037,
+          "unit": "percent",
+          "basis": "actual",
+          "caveatIds": []
+        }
+      },
+      {
+        "args": {
+          "datasetId": "national-expenditure",
+          "dimension": "series",
+          "measure": "share_of_gdp_pct",
+          "metric": "percentage_point_change",
+          "fromYear": 2024,
+          "toYear": 2025,
+          "limit": 100
+        },
+        "status": "ok",
+        "entries": 13,
+        "units": [
+          "percent"
+        ],
+        "sample": {
+          "position": 1,
+          "tied": false,
+          "entityId": "country.georgia",
+          "entityLabelKa": "საქართველო",
+          "entityLabelEn": "Georgia",
+          "seriesId": "spending.agriculture_environment",
+          "seriesLabelKa": "სოფლის მეურნეობა და გარემო",
+          "seriesLabelEn": "Agriculture and environment",
+          "value": 0.22249790824346516,
+          "unit": "percent",
+          "basis": "actual",
+          "caveatIds": [
+            "gdp_preliminary"
+          ]
+        }
+      },
+      {
+        "args": {
+          "datasetId": "ministries",
+          "dimension": "series",
+          "measure": "share_of_total_pct",
+          "metric": "percentage_point_change",
+          "fromYear": 2024,
+          "toYear": 2025,
+          "limit": 100
+        },
+        "status": "ok",
+        "entries": 14,
+        "units": [
+          "percent"
+        ],
+        "sample": {
+          "position": 1,
+          "tied": false,
+          "entityId": "country.georgia",
+          "entityLabelKa": "საქართველო",
+          "entityLabelEn": "Georgia",
+          "seriesId": "admin_spending.health_social_affairs",
+          "seriesLabelKa": "ჯანმრთელობა, შრომა და სოციალური დაცვა",
+          "seriesLabelEn": "Health, labour and social affairs",
+          "value": 1.2305333608627365,
+          "unit": "percent",
+          "basis": "actual",
+          "caveatIds": []
+        }
+      },
+      {
+        "args": {
+          "datasetId": "ministries",
+          "dimension": "series",
+          "measure": "share_of_gdp_pct",
+          "metric": "percentage_point_change",
+          "fromYear": 2024,
+          "toYear": 2025,
+          "limit": 100
+        },
+        "status": "ok",
+        "entries": 14,
+        "units": [
+          "percent"
+        ],
+        "sample": {
+          "position": 1,
+          "tied": false,
+          "entityId": "country.georgia",
+          "entityLabelKa": "საქართველო",
+          "entityLabelEn": "Georgia",
+          "seriesId": "admin_spending.environment_agriculture",
+          "seriesLabelKa": "გარემოს დაცვა და სოფლის მეურნეობა",
+          "seriesLabelEn": "Environment and agriculture",
+          "value": 0.20228943502759988,
+          "unit": "percent",
+          "basis": "actual",
+          "caveatIds": [
+            "gdp_preliminary"
+          ]
+        }
+      },
+      {
+        "args": {
+          "datasetId": "municipal-expenditure",
+          "dimension": "entities",
+          "entityType": "municipality",
+          "seriesId": "municipal.total",
+          "measure": "share_of_total_pct",
+          "metric": "percentage_point_change",
+          "fromYear": 2024,
+          "toYear": 2025,
+          "limit": 100
+        },
+        "status": "partial",
+        "entries": 63,
+        "units": [
+          "percent"
+        ],
+        "sample": {
+          "position": 1,
+          "tied": true,
+          "entityId": "04",
+          "entityLabelKa": "თბილისი",
+          "entityLabelEn": "Tbilisi",
+          "seriesId": "municipal.total",
+          "seriesLabelKa": "საჯარო ჯამი",
+          "seriesLabelEn": "Total budget",
+          "value": 0,
+          "unit": "percent",
+          "basis": "actual",
+          "caveatIds": [
+            "municipal_financing_outside_functional",
+            "municipal_functional_total_gap"
+          ]
+        }
+      }
+    ],
+    "citySourceReproductions": [
+      {
+        "entity": "city.tbilisi",
+        "error": "unknown_entity"
+      },
+      {
+        "entity": "city.kutaisi",
+        "error": "unknown_entity"
+      },
+      {
+        "entity": "city.batumi",
+        "error": "unknown_entity"
+      },
+      {
+        "entity": "city.gori",
+        "error": "unknown_entity"
+      },
+      {
+        "entity": "city.telavi",
+        "error": "unknown_entity"
+      },
+      {
+        "entity": "city.zugdidi",
+        "error": "unknown_entity"
+      }
+    ],
+    "protocolSecurity": {
+      "localPostCases": 41,
+      "unsupportedMethodAndPreflightCases": 3,
+      "noNaturalExceptionOrBypassDemonstrated": true,
+      "syntheticToolFaultExposesTextInBothEras": true,
+      "modernLegacyParityCases": 10,
+      "parityVerified": true,
+      "outputSchemaFailuresRequireSeparateSanitizationVerification": true
+    },
+    "performance": {
+      "method": "21 warm local samples, no HTTP, SDK, rendering or limiter; no other gates running; distinguish endpoint calculations from coverage scan.",
+      "results": [
+        {
+          "name": "200-endpoint-calculations-only",
+          "medianMs": 0.36009999999998854,
+          "min": 0.3128000000000384,
+          "max": 1.167100000000005
+        },
+        {
+          "name": "200-coverage-only",
+          "medianMs": 46.37040000000002,
+          "min": 41.88689999999997,
+          "max": 62.04549999999995
+        },
+        {
+          "name": "200-full-query",
+          "medianMs": 51.84880000000021,
+          "min": 44.93399999999997,
+          "max": 97.39310000000023
+        }
+      ],
+      "interpretation": "Availability metadata scanning is the target; arithmetic is already cached. Earlier query-plus-render timings have a different scope."
+    },
+    "liveVerification": {
+      "observedAt": "2026-10-17T13:02:34.782Z",
+      "finalObservedAt": "2026-10-17T13:05:23.466Z",
+      "mcpRequests": 12,
+      "manifestStable": true,
+      "calls": [
+        {
+          "label": "catalogue",
+          "tool": "describe_coverage",
+          "arguments": {},
+          "httpStatus": 200,
+          "isError": false,
+          "data": {
+            "datasets": [
+              {
+                "datasetId": "national-revenue",
+                "years": [
+                  2004,
+                  2025
+                ]
+              },
+              {
+                "datasetId": "national-expenditure",
+                "years": [
+                  2004,
+                  2025
+                ]
+              },
+              {
+                "datasetId": "ministries",
+                "years": [
+                  2004,
+                  2025
+                ]
+              },
+              {
+                "datasetId": "municipal-expenditure",
+                "years": [
+                  2015,
+                  2025
+                ]
+              },
+              {
+                "datasetId": "government-debt",
+                "years": [
+                  2013,
+                  2030
+                ]
+              },
+              {
+                "datasetId": "general-government-balance",
+                "years": [
+                  1995,
+                  2031
+                ]
+              },
+              {
+                "datasetId": "gdp-overview",
+                "years": [
+                  1960,
+                  2025
+                ]
+              },
+              {
+                "datasetId": "economic-sectors",
+                "years": [
+                  2010,
+                  2025
+                ]
+              },
+              {
+                "datasetId": "regional-economies",
+                "years": [
+                  2010,
+                  2024
+                ]
+              },
+              {
+                "datasetId": "inflation",
+                "years": [
+                  2000,
+                  2026
+                ],
+                "periods": [
+                  "2000-01",
+                  "2026-08"
+                ]
+              },
+              {
+                "datasetId": "inflation-products",
+                "years": [
+                  2015,
+                  2026
+                ],
+                "periods": [
+                  "2015-01",
+                  "2026-08"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "label": "city-query",
+          "tool": "query_inflation",
+          "arguments": {
+            "entityIds": [
+              "city.batumi"
+            ],
+            "seriesIds": [
+              "cpi.headline"
+            ],
+            "measure": "yoy_pct",
+            "fromPeriod": "2026-08",
+            "toPeriod": "2026-08"
+          },
+          "httpStatus": 200,
+          "isError": false,
+          "data": {
+            "observations": [
+              {
+                "entityId": "city.batumi",
+                "seriesId": "cpi.headline",
+                "value": 7.0857,
+                "unit": "percent",
+                "valueDefinitionEn": "Change in consumer prices against the same month a year earlier, in percent as Geostat publishes it: 2.4 means 2.4%.",
+                "sourceIds": [
+                  "source.geostat_cpi_yoy"
+                ],
+                "documentIds": [
+                  "source.geostat_cpi_yoy"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "label": "city-sources",
+          "tool": "get_sources",
+          "arguments": {
+            "sourceIds": [
+              "source.geostat_cpi_yoy"
+            ],
+            "entityIds": [
+              "city.batumi"
+            ],
+            "years": [
+              2026
+            ]
+          },
+          "httpStatus": 200,
+          "isError": true,
+          "errorText": "fiscal.ge error — status error\ndataVersion d09de86ea1f4b5c111fdf2accdebdb8c9f85500f5d785ad87f8d60ccafeff7c4\nlicence CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/)\n\nerror unknown_entity (retryable: false)\nუცნობი ერთეულის იდენტიფიკატორი: city.batumi.\nUnknown entity id(s): city.batumi.\nvalid choices: 04, 06, 07, 08, 09, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 44, 45, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 65, 66, 67, 68, 69, 70, 71, 72, country.georgia, region.adjara, region.guria, region.imereti, region.kakheti, region.kvemo_kartli, region.mtskheta_mtianeti, region.racha_lechkhumi_kvemo_svaneti, region.samegrelo_zemo_svaneti, region.samtskhe_javakheti, region.shida_kartli, region.tbilisi"
+        },
+        {
+          "label": "share-change-unit",
+          "tool": "rank",
+          "arguments": {
+            "datasetId": "national-expenditure",
+            "dimension": "series",
+            "metric": "percentage_point_change",
+            "measure": "share_of_total_pct",
+            "fromYear": 2024,
+            "toYear": 2025,
+            "limit": 3
+          },
+          "httpStatus": 200,
+          "isError": false,
+          "data": {
+            "entries": [
+              {
+                "entityId": "country.georgia",
+                "seriesId": "spending.social_protection",
+                "value": 1.1198120965560037,
+                "unit": "percent"
+              },
+              {
+                "entityId": "country.georgia",
+                "seriesId": "spending.agriculture_environment",
+                "value": 1.0082455939608046,
+                "unit": "percent"
+              },
+              {
+                "entityId": "country.georgia",
+                "seriesId": "spending.defence",
+                "value": 0.4692225186232468,
+                "unit": "percent"
+              }
+            ]
+          }
+        },
+        {
+          "label": "gdp-growth-definition",
+          "tool": "query_gdp",
+          "arguments": {
+            "seriesIds": [
+              "gdp.real_growth_percent"
+            ],
+            "years": [
+              2025
+            ]
+          },
+          "httpStatus": 200,
+          "isError": true,
+          "harnessNote": "Initial diagnostic used an incorrect prefixed ID; ordinary validation worked. Corrected request follows.",
+          "errorText": "Input validation error: Invalid arguments for tool query_gdp: seriesIds.0: Invalid option: expected one of \"real_usd_2015\"|\"real_growth_percent\"|\"nominal_gel\"|\"nominal_usd\"|\"per_capita_gel\"|\"per_capita_usd\""
+        },
+        {
+          "label": "municipal-country-evidence",
+          "tool": "query_municipal",
+          "arguments": {
+            "entityIds": [
+              "country.georgia"
+            ],
+            "seriesIds": [
+              "municipal.total"
+            ],
+            "years": [
+              2025
+            ],
+            "measure": "amount_gel"
+          },
+          "httpStatus": 200,
+          "isError": false,
+          "data": {
+            "observations": [
+              {
+                "entityId": "country.georgia",
+                "seriesId": "municipal.total",
+                "value": 6110301258.08,
+                "unit": "GEL",
+                "valueDefinitionEn": "Georgia's consolidated municipal total already includes the Adjara consolidation; it is not added again.",
+                "sourceIds": [
+                  "source.adjara_consolidated_budget"
+                ],
+                "documentIds": [
+                  "source.adjara.republic.2016_2025.actual_payments"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "label": "municipal-adjara-evidence",
+          "tool": "query_municipal",
+          "arguments": {
+            "entityIds": [
+              "region.adjara"
+            ],
+            "seriesIds": [
+              "municipal.total"
+            ],
+            "years": [
+              2025
+            ],
+            "measure": "amount_gel"
+          },
+          "httpStatus": 200,
+          "isError": false,
+          "data": {
+            "observations": [
+              {
+                "entityId": "region.adjara",
+                "seriesId": "municipal.total",
+                "value": 1212519508.44,
+                "unit": "GEL",
+                "valueDefinitionEn": "The region's member municipalities plus net payments from Adjara's republican budget.",
+                "sourceIds": [
+                  "source.adjara_republic_budget_actual",
+                  "source.municipal_mof_annual_and_history_workbooks",
+                  "source.treasury_consolidated_revenue_actual"
+                ],
+                "documentIds": [
+                  "source.adjara.republic.2016_2025.actual_payments",
+                  "source.mof.municipalities.2016_2025.budget_history_06",
+                  "source.mof.municipalities.2016_2025.budget_history_07",
+                  "source.mof.municipalities.2016_2025.budget_history_08",
+                  "source.mof.municipalities.2016_2025.budget_history_09",
+                  "source.mof.municipalities.2016_2025.budget_history_10",
+                  "source.mof.municipalities.2016_2025.budget_history_11",
+                  "source.mof.municipalities.2025.functional_classification",
+                  "source.mof.revenue.2015.form_1"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "label": "transfers-evidence",
+          "tool": "get_sources",
+          "arguments": {
+            "sourceIds": [
+              "source.treasury_consolidated_revenue_actual"
+            ],
+            "years": [
+              2025
+            ]
+          },
+          "httpStatus": 200,
+          "isError": false,
+          "data": {
+            "sources": [
+              {
+                "sourceId": "source.treasury_consolidated_revenue_actual",
+                "narrowingOutcome": "dropped_no_match",
+                "documents": [
+                  {
+                    "documentId": "source.mof.revenue.2015.form_1",
+                    "years": [
+                      2015
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "label": "september-inflation",
+          "tool": "query_inflation",
+          "arguments": {
+            "seriesIds": [
+              "cpi.headline"
+            ],
+            "measure": "yoy_pct",
+            "fromPeriod": "2026-09",
+            "toPeriod": "2026-09"
+          },
+          "httpStatus": 200,
+          "isError": true,
+          "errorText": "fiscal.ge error — status error\ndataVersion d09de86ea1f4b5c111fdf2accdebdb8c9f85500f5d785ad87f8d60ccafeff7c4\nlicence CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/)\n\nerror year_out_of_range (retryable: false)\nმოთხოვნილი პერიოდ(ებ)ი 2026-09 სცილდება ამ მაჩვენებლის დაფარვას (2004-01–2026-08).\nRequested period(s) 2026-09 fall outside this measure's coverage (2004-01 to 2026-08)."
+        },
+        {
+          "label": "gdp-growth-definition-correct-id",
+          "tool": "query_gdp",
+          "arguments": {
+            "seriesIds": [
+              "real_growth_percent"
+            ],
+            "years": [
+              2025
+            ]
+          },
+          "httpStatus": 200,
+          "isError": false,
+          "data": {
+            "observations": [
+              {
+                "entityId": "country.georgia",
+                "seriesId": "real_growth_percent",
+                "value": 7.46161504152039,
+                "unit": "percent",
+                "valueDefinitionEn": "Annual real GDP growth in percentage points: 7.5 means 7.5%, not a fraction or share of GDP.",
+                "sourceIds": [
+                  "source.wb_gdp_real_growth_percent"
+                ],
+                "documentIds": [
+                  "source.wb_gdp_real_growth_percent"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "label": "city-subgroup-discovery",
+          "tool": "describe_coverage",
+          "arguments": {
+            "datasetId": "inflation",
+            "entityType": "city",
+            "level": "subgroup"
+          },
+          "httpStatus": 200,
+          "isError": false,
+          "data": {
+            "datasets": [
+              {
+                "datasetId": "inflation",
+                "years": [
+                  2000,
+                  2026
+                ],
+                "periods": [
+                  "2000-01",
+                  "2026-08"
+                ]
+              }
+            ],
+            "seriesCount": 43,
+            "entityCount": 6
+          }
+        },
+        {
+          "label": "city-discovered-subgroup-query",
+          "tool": "query_inflation",
+          "arguments": {
+            "entityIds": [
+              "city.batumi"
+            ],
+            "seriesIds": [
+              "cpi.cat.01_1"
+            ],
+            "measure": "yoy_pct",
+            "fromPeriod": "2026-08",
+            "toPeriod": "2026-08"
+          },
+          "httpStatus": 200,
+          "isError": true,
+          "errorText": "fiscal.ge error — status error\ndataVersion d09de86ea1f4b5c111fdf2accdebdb8c9f85500f5d785ad87f8d60ccafeff7c4\nlicence CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/)\n\nerror unknown_series (retryable: false)\nქალაქებისთვის ქვეყნდება მხოლოდ cpi.headline და cpi.cat.01–12: yoy_pct და mom_pct, ხოლო cpi.headline-ისთვის — avg12_pct. ქვეჯგუფები, საბაზო ინფლაცია, ინდექსი, წონები, წვლილი და მიზნობრივი მაჩვენებელი მხოლოდ ეროვნულ დონეზეა.\nCities publish cpi.headline and cpi.cat.01–12 only: yoy_pct and mom_pct, and avg12_pct for cpi.headline. Subgroups, core, the index, weights, contributions and the target are national only.\nvalid choices: cpi.headline, cpi.cat.01, cpi.cat.02, cpi.cat.03, cpi.cat.04, cpi.cat.05, cpi.cat.06, cpi.cat.07, cpi.cat.08, cpi.cat.09, cpi.cat.10, cpi.cat.11, cpi.cat.12"
+        }
+      ]
+    },
+    "operations": {
+      "deploymentId": "dpl_Erifm5Fm3H6i9s4kx5GKH9mmq5nh",
+      "deploymentState": "READY",
+      "releaseCommit": "4a55558aa7da5ef2197186b3ffab5d2ee0b68474",
+      "retentionRecheck": "Vercel API request failed (400: bad_request). The hobby plan does not retain runtime logs for the requested time range.",
+      "externalDrains": {
+        "status": 404,
+        "outcome": "unverified"
+      },
+      "recentRuntimeErrorQuery": [
+        {
+          "type": "text",
+          "text": "## Runtime Errors\n\n**Project:** prj_NLITyuy8RsVuiS0Rq19DOQBBDd7u\n\nNo runtime errors found in the selected time range."
+        }
+      ],
+      "latestRuntimeLogRead": {
+        "events": 12,
+        "ok": 8,
+        "expectedRefusals": 4,
+        "note": "Deployment-scoped read without full-text search returned all twelve probe events. Earlier full-text /mcp queries returned no rows and were not treated as evidence of absent logs."
+      }
+    },
+    "approvedDatasetCoverage": [
+      {
+        "datasetId": "national-revenue",
+        "years": [
+          2004,
+          2025
+        ],
+        "measures": [
+          "amount_gel",
+          "share_of_total_pct",
+          "share_of_gdp_pct"
+        ]
+      },
+      {
+        "datasetId": "national-expenditure",
+        "years": [
+          2004,
+          2025
+        ],
+        "measures": [
+          "amount_gel",
+          "share_of_total_pct",
+          "share_of_gdp_pct"
+        ]
+      },
+      {
+        "datasetId": "ministries",
+        "years": [
+          2004,
+          2025
+        ],
+        "measures": [
+          "amount_gel",
+          "share_of_total_pct",
+          "share_of_gdp_pct"
+        ]
+      },
+      {
+        "datasetId": "municipal-expenditure",
+        "years": [
+          2015,
+          2025
+        ],
+        "measures": [
+          "amount_gel",
+          "share_of_total_pct",
+          "gel_per_resident"
+        ]
+      },
+      {
+        "datasetId": "government-debt",
+        "years": [
+          2013,
+          2030
+        ],
+        "measures": [
+          "amount_gel",
+          "share_of_gdp_pct",
+          "rate_percent"
+        ]
+      },
+      {
+        "datasetId": "general-government-balance",
+        "years": [
+          1995,
+          2031
+        ],
+        "measures": [
+          "share_of_gdp_pct",
+          "amount_gel"
+        ]
+      },
+      {
+        "datasetId": "gdp-overview",
+        "years": [
+          1960,
+          2025
+        ],
+        "measures": [
+          "value"
+        ]
+      },
+      {
+        "datasetId": "economic-sectors",
+        "years": [
+          2010,
+          2025
+        ],
+        "measures": [
+          "amount_gel",
+          "share_of_gdp_pct",
+          "real_growth_pct"
+        ]
+      },
+      {
+        "datasetId": "regional-economies",
+        "years": [
+          2010,
+          2024
+        ],
+        "measures": [
+          "amount_gel",
+          "share_of_region_gdp_pct"
+        ]
+      },
+      {
+        "datasetId": "inflation",
+        "years": [
+          2000,
+          2026
+        ],
+        "periods": [
+          "2000-01",
+          "2026-08"
+        ],
+        "measures": [
+          "yoy_pct",
+          "mom_pct",
+          "avg12_pct",
+          "index_2010",
+          "target_pct",
+          "basket_weight_pct",
+          "contribution_pp"
+        ]
+      },
+      {
+        "datasetId": "inflation-products",
+        "years": [
+          2015,
+          2026
+        ],
+        "periods": [
+          "2015-01",
+          "2026-08"
+        ],
+        "measures": [
+          "yoy_pct",
+          "cumulative_pct"
+        ]
+      }
+    ],
+    "withdrawnWebsiteCoverageScore": {
+      "previous": 5,
+      "reason": "No approved coverage target or demand weighting."
+    },
+    "fullGates": "First-pass check/build/browser results retained unchanged; no implementation inputs changed and full gates were not rerun.",
+    "diagnosticHashes": [
+      {
+        "path": ".tmp/mcp-second-data/scan.ts",
+        "sha256": "912fc02ca5f469be04b961c4afef90dd28b2824d9ebb746d39590bc555be815b"
+      },
+      {
+        "path": ".tmp/mcp-second-data/scan.json",
+        "sha256": "55c320598bf18a16af54819c17f03101290685a12fc93d84bc724a4c73f2cff9"
+      },
+      {
+        "path": ".tmp/mcp-second-data/numeric.ts",
+        "sha256": "c614020df64e0f3677efe1f72a50fb19d89fe569231adb18a5c6105952e1b54c"
+      },
+      {
+        "path": ".tmp/mcp-second-data/numeric.json",
+        "sha256": "19d49a6161c69c4315878d9e28706c4169534c9aeffe093453b1bce86fa42b8d"
+      },
+      {
+        "path": ".tmp/mcp-second-data/final-probes.ts",
+        "sha256": "7b88c4f3ea9657bfb19b95ce8d274779835a4e2a6a66e49e2ab89f273004acb7"
+      },
+      {
+        "path": ".tmp/mcp-second-data/final-probes.json",
+        "sha256": "e17b0ca7dfcdc1684b5a016dc8cd22c7997dedd7627915b83190682fe1071b06"
+      },
+      {
+        "path": ".tmp/mcp-second-security/probe.ts",
+        "sha256": "5139a569fdfbff9d34e4434d07275284f1ede9541a4e55f6e570066716f250d1"
+      },
+      {
+        "path": ".tmp/mcp-second-security/results.json",
+        "sha256": "e7533d78a0cd80767800fe8c54cc1abe32f043eb1d1d863f3469423e85649929"
+      },
+      {
+        "path": ".tmp/mcp-second-experience/timing.json",
+        "sha256": "0a89799d90d1092d0a56cd1395ac70d271000151b42fae8796afcd4ff2fbfa1f"
+      },
+      {
+        "path": ".tmp/mcp-second-experience/parity.json",
+        "sha256": "ee35d9d11666c8964f75c782620302977a96df87e01d4ff0a6f7a2cbc9626a46"
+      },
+      {
+        "path": ".tmp/mcp-second-experience/payload-parts.json",
+        "sha256": "404792807b09d4d3cf38ade52cc627b37cf604cdd2b8f7dcb6554bf98c5252bd"
+      },
+      {
+        "path": "apps/web/.tmp/mcp-second-review/live.json",
+        "sha256": "47179ff0f57c4817e1e852813d30dcfd95917f894f898501262673d566b2fc65"
+      },
+      {
+        "path": "apps/web/.tmp/mcp-second-review/provider.json",
+        "sha256": "a0d6a439496c5fbdc67fd4f4b50a530655f70484cde312c72daeb7f148ff23be"
+      }
+    ]
+  }
+}

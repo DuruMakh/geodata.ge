@@ -4,7 +4,7 @@ This document is the single owner of the caveat catalogue used by the fact-query
 
 **A code appearing in this document is not evidence that its trigger is correct.** The firing and non-firing tests under `apps/web/tests/factQuery/caveats/` are what establish that, and they have twice caught a rule attaching a warning to figures it did not describe. Read this document to learn what a code means; read the tests to learn when it fires.
 
-## Bilingual response contract, schema 1.5.0
+## Bilingual response contract, schema 1.6.0
 
 The shared `/mcp` endpoint and the manifest-listed `/downloads/data/` publications
 use one reviewed snapshot. `tools/list`, `catalogue.json` and `manifest.json` own
@@ -26,14 +26,32 @@ evidence and shared document defaults retain both languages. Full source records
 retain the archived byte sizes and hashes.
 
 No language input is needed. Existing valid requests continue to work; catalogue
-search accepts either language. Schema 1.5.0 adds the reviewed current-product
-dataset, annual/cumulative query and optional `calculationBasePeriod`. Clients
-rejecting additive fields or requiring an earlier exact schema must update.
+search accepts either language. Schema 1.6.0 adds `internal_error` and the
+`preserved_derived` source narrowing outcome, retaining the current-product
+dataset, annual/cumulative query and optional `calculationBasePeriod`. Strict
+clients caching output enums must refresh discovery; clients rejecting additive
+fields or requiring an earlier exact schema must update their validation.
 Translation corrections change `dataVersion`, just as other snapshot changes do.
 Responses are not byte-identical to older schemas. The unchanged 512 KiB complete-result
 limit counts both structured and text output; a source-heavy request can now
 require fewer sources. `result_too_large` preserves narrower-query and shared
 bulk-manifest guidance. No evidence is silently removed to make an answer fit.
+
+City-scoped inflation discovery uses the existing city vocabulary and reviewed
+city facts: headline annual, monthly and twelve-month average rates, plus annual
+and monthly rates for the twelve divisions. Series and dataset coverage combine
+the published city histories; individual cities and series can start later or
+have missing months. National-only measures and subgroups are excluded from this
+scope, including global searches restricted to cities. Unfiltered and country
+catalogues retain their national coverage.
+
+Oversized source lists suggest fewer source IDs and relevant dataset/year/entity
+filters, while warning that derived calculations may require all input documents.
+Oversized catalogues suggest a dataset, short search term or supported type/level
+filter. Observation, comparison and ranking refusals retain cell-count guidance.
+Both the tool-result and complete protocol-response limits use the same recovery
+kind and published-file fallback; the 512 KiB limit and complete evidence rule
+are unchanged.
 
 Both `/connect` and `/en/connect` retain budget/economy examples and add national,
 city and current-product inflation examples derived from the snapshot's available
@@ -44,7 +62,7 @@ cumulative percentage is Fiscal.ge's calculation. Missing inputs stay unavailabl
 not zero, and annual/cumulative rankings preserve every exclusion.
 
 MCP modern `2026-07-28` and legacy `2025-11-25` are transport revisions, separate
-from schema 1.5.0. SDK tests prove protocol, serialization and response contracts;
+from schema 1.6.0. SDK tests prove protocol, serialization and response contracts;
 they do not prove an external AI client's menus, account eligibility or interpretation.
 Current official application guidance and the unverified human-flow boundary are
 recorded in `docs/deployment.md#human-application-guidance-and-evidence-boundary`.
@@ -740,8 +758,12 @@ municipality from a missing one.
 budget-history source archives one workbook per municipality, so a single
 municipality's figure cites its own workbook plus the cross-municipality
 functional-classification workbook for that year — not all 75. A region cites
-its members' workbooks; the Georgia row cites every served municipality's,
-because it really is built from all of them.
+its members' workbooks; the Georgia row covers all 69 constituent budgets, including
+the five aggregate-only budgets that remain excluded from territorial queries.
+Named municipal originals must match both the entity and observation year. The
+consolidated total and share denominators also cite the year's republican-payment
+and Treasury transfer originals; their derived source resolves through the existing
+logical-source sets and retains `derivation_upstream` roles.
 
 ### Regeneration and staleness
 

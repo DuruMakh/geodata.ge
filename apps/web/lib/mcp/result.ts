@@ -60,6 +60,12 @@ export type ToolResult = {
 
 export const BULK_DATA_URL = "https://fiscal.ge/downloads/data/manifest.json";
 
+type ResultSizeKind = "cells" | "sources" | "catalogue";
+
+export function resultSizeKind(toolName: string): ResultSizeKind {
+  return toolName === "get_sources" ? "sources" : toolName === "describe_coverage" ? "catalogue" : "cells";
+}
+
 function line(...cells: (string | number | null)[]): string {
   return cells.map((cell) => (cell === null ? "" : String(cell))).join("\t");
 }
@@ -132,8 +138,15 @@ function comparisonLine(comparison: Comparison): string {
   );
 }
 
+const SOURCE_NARROWING_EXPLANATIONS: Record<ResolvedSourceView["narrowingOutcome"], string> = {
+  not_requested: "ფილტრები არ მოთხოვნილა; ნაჩვენებია სრული წყარო. / No filters were requested; showing the full source.",
+  applied: "დოკუმენტები შეესაბამება მოთხოვნილ ფილტრებს; სია შესაძლოა სრულ წყაროს ემთხვეოდეს. / Documents match the requested filters; the matching list may equal the full source.",
+  dropped_no_match: "მოთხოვნილ ფილტრებს არცერთი დოკუმენტი არ შეესაბამება; ნაჩვენებია სრული წყარო. / No document matched the requested filters; showing the full source instead.",
+  preserved_derived: "გამოთვლის სრული მტკიცებულების შესანარჩუნებლად ყველა საწყისი დოკუმენტი ნაჩვენებია; მოთხოვნილი ფილტრები არ გამოყენებულა. / Preserving all inputs to the derived calculation; the requested filters were not applied.",
+};
+
 function sourceView(source: ResolvedSourceView): string {
-  return line(source.sourceId, source.name, source.documents.length, source.narrowingOutcome);
+  return line(source.sourceId, source.name, source.documents.length, source.documentCount, String(source.narrowed), source.narrowingOutcome);
 }
 
 type Defined = { valueDefinitionId: string; valueDefinition: string; valueDefinitionEn: string };
@@ -215,10 +228,10 @@ function bodyOf(response: Extract<FactQueryResponse, { kind: Exclude<FactQueryRe
   if (response.kind === "sources") {
     const { sources, narrowedBy } = data as GetSourcesData;
     return [
-      "# sourceId\tname\tdocuments\tscope",
+      "# sourceId\tname\tdocuments\tdocumentCount\tnarrowed\tscope",
       ...sources.flatMap((source) => [
         sourceView(source),
-        ...(source.narrowingOutcome === "dropped_no_match" ? ["No document matched the requested filters; showing the full source instead."] : []),
+        SOURCE_NARROWING_EXPLANATIONS[source.narrowingOutcome],
         ...sourceLines(source),
       ]),
       ...(narrowedBy === null ? [] : [`requested filters: ${JSON.stringify(narrowedBy)}`]),
@@ -316,12 +329,31 @@ export function toolResult(response: FactQueryResponse): ToolResult {
       { structuredContent: response as unknown as Record<string, unknown>, content, isError: false };
 }
 
+/** Prepare before tool execution so a failing formatter is never retried. */
+export function internalErrorResult(snapshot: FactQuerySnapshot): ToolResult {
+  return toolResult({
+    kind: "error",
+    status: "error",
+    error: {
+      code: "internal_error",
+      messageKa: serviceMessage(snapshot, "ka", "errors.internalError", { bulkUrl: BULK_DATA_URL }),
+      messageEn: serviceMessage(snapshot, "en", "errors.internalError", { bulkUrl: BULK_DATA_URL }),
+      retryable: true,
+    },
+    meta: buildResponseMeta(snapshot),
+  });
+}
+
 export function tooLargeResponse(
   snapshot: FactQuerySnapshot,
-  detail: { returned: number; bytes: number },
+  detail: { returned: number; bytes: number; kind?: ResultSizeKind },
 ): FactQueryResponse {
-  const key = detail.bytes > 0 ? "errors.resultTooLargeBytes" : "errors.resultTooLargeCells";
-  const values = { cells: detail.returned, ...(detail.bytes > 0 ? { kib: Math.round(detail.bytes / 1024) } : {}), bulkUrl: BULK_DATA_URL };
+  const key = detail.kind === "sources" ? "errors.resultTooLargeSources"
+    : detail.kind === "catalogue" ? "errors.resultTooLargeCatalogue"
+    : detail.bytes > 0 ? "errors.resultTooLargeBytes" : "errors.resultTooLargeCells";
+  const values = detail.kind === "sources" || detail.kind === "catalogue"
+    ? { bulkUrl: BULK_DATA_URL }
+    : { cells: detail.returned, ...(detail.bytes > 0 ? { kib: Math.round(detail.bytes / 1024) } : {}), bulkUrl: BULK_DATA_URL };
 
   return {
     kind: "error",
@@ -336,7 +368,7 @@ export function tooLargeResponse(
   };
 }
 
-function cellCount(response: FactQueryResponse): number {
+export function cellCount(response: FactQueryResponse): number {
   if (response.kind === "observations") {
     return (response.data as { observations: unknown[] }).observations.length;
   }
@@ -350,7 +382,11 @@ function cellCount(response: FactQueryResponse): number {
  * answer is a wrong answer wearing a correct one's shape, and section 11.3
  * forbids silently dropping sources or warnings to fit.
  */
-export function boundedToolResult(snapshot: FactQuerySnapshot, response: FactQueryResponse): ToolResult {
+export function boundedToolResult(
+  snapshot: FactQuerySnapshot,
+  response: FactQueryResponse,
+  kind: ResultSizeKind = response.kind === "sources" ? "sources" : response.kind === "catalogue" ? "catalogue" : "cells",
+): ToolResult {
   const returned = cellCount(response);
   // A comparison row is two endpoint cells, which is exactly why 11.3 gives it
   // its own smaller ceiling. Gating comparisons at `cells` allowed 500 rows -
@@ -361,5 +397,5 @@ export function boundedToolResult(snapshot: FactQuerySnapshot, response: FactQue
 
   const result = toolResult(response);
   const bytes = Buffer.byteLength(JSON.stringify(result), "utf8");
-  return bytes > LIMITS.resultBytes ? toolResult(tooLargeResponse(snapshot, { returned, bytes })) : result;
+  return bytes > LIMITS.resultBytes ? toolResult(tooLargeResponse(snapshot, { returned, bytes, kind })) : result;
 }

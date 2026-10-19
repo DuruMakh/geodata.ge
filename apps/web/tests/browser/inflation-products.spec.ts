@@ -17,7 +17,7 @@ for (const [locale, width] of [["ka", 390], ["en", 1440]] as const) {
     await expect(page.getByTestId("product-indicators")).toBeVisible();
     await expect(page.getByTestId("product-list").getByRole("heading", { name: locale === "en" ? "Browse products" : "პროდუქტების სია" })).toBeVisible();
     await expect(page.getByTestId("product-list-search")).toBeVisible();
-    await expect(page.getByTestId("series-row").first()).toHaveAttribute("data-series-id", "cpi.product.p0058");
+    await expect(page.getByTestId("series-row").first()).toHaveAttribute("data-series-id", "cpi.product.p0264");
     expect(await page.getByTestId("product-list").evaluate((section) => getComputedStyle(section).borderTopWidth)).toBe("0px");
     await expect(page.getByTestId("inflation-products-link")).toHaveAttribute("aria-current", "page");
     const icon = page.locator('[data-series-id="cpi.product.p0058"] img');
@@ -78,8 +78,8 @@ test("the lower list searches all products independently of the chart selector",
   await expect(listRows.first()).toHaveAttribute("data-product-id", "cpi.product.p0179");
   await listSearch.fill("პომიდორი");
   await expect(listRows.first()).toHaveAttribute("data-product-id", "cpi.product.p0058");
-  await expect(listRows.first().locator("td").nth(1)).toContainText("−26.6%");
-  await expect(listRows.first().locator("td").nth(2)).toContainText("+57.5%");
+  await expect(listRows.first().locator("td").nth(1)).toContainText("−32.5%");
+  await expect(listRows.first().locator("td").nth(2)).toContainText("+35.4%");
   await listSearch.fill("no-such-product");
   await expect(listRows).toHaveCount(0);
   await expect(page.getByTestId("product-list-empty")).toBeVisible();
@@ -172,13 +172,13 @@ test("an empty selection downloads a valid full Summary workbook", async ({ page
   const pending = page.waitForEvent("download");
   await page.getByTestId("inflation-product-download").click();
   const result = await pending;
-  expect(result.suggestedFilename()).toMatch(/^fiscal-inflation-products-2023-2026-08-en\.xlsx$/);
+  expect(result.suggestedFilename()).toMatch(/^fiscal-inflation-products-2023-2026-09-en\.xlsx$/);
   const output = testInfo.outputPath("products-empty.xlsx");
   await result.saveAs(output);
   const workbook = new ExcelJS.Workbook();
   await workbook.xlsx.readFile(output);
   expect(workbook.worksheets.map((sheet) => sheet.name)).toEqual(["Summary", "Data", "Sources"]);
-  expect(workbook.worksheets[0]!.getCell("B4").value).toBeCloseTo(0.575291);
+  expect(workbook.worksheets[0]!.getCell("B4").value).toBeCloseTo(0.632766);
   expect(workbook.worksheets[0]!.getCell("B4").numFmt).toBe("0.0%");
   expect(workbook.worksheets[0]!.rowCount).toBeGreaterThan(305);
   expect(workbook.worksheets[1]!.rowCount).toBe(1);

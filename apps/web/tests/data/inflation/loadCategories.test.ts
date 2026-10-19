@@ -8,7 +8,9 @@ import {
 describe("category loaders", () => {
   it("loads and validates every category fact", async () => {
     const facts = await loadCpiCategoryFacts();
-    expect(facts).toHaveLength(27668);
+    expect(facts).toHaveLength(27774);
+    expect(facts.filter(fact => fact.period <= "2026-08")).toHaveLength(27668);
+    expect(facts.filter(fact => fact.period === "2026-09")).toHaveLength(106);
     expect(new Set(facts.map((fact) => fact.categoryId)).size).toBe(55);
   });
 
@@ -23,6 +25,6 @@ describe("category loaders", () => {
     expect(weights.length).toBeGreaterThan(700);
     const served = await loadServedInflationData();
     expect(typeof served.weights[0]!.weightPct).toBe("number");
-    expect(served.categories.length).toBe(27668);
+    expect(served.categories.length).toBe(27774);
   });
 });

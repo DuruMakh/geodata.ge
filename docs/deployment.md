@@ -20,13 +20,16 @@ The two social images at `/opengraph-image` and `/en/opengraph-image` use explic
 are generated at build time. All human pages remain prerendered and `/mcp` remains
 the sole request-time route.
 
-Data schema **1.5.0** includes current-product inflation and reviewed language
+Data schema **1.6.0** includes current-product inflation and reviewed language
 companions. The authoritative tool inventory is `tools/list`; dataset families
 and coverage are in `catalogue.json`. `manifest.json` lists every publication
 with row count, bytes and SHA-256; the manifest itself is one additional artifact,
 not one of its listed files. Derive changing inventories from these owners rather
 than retaining old fixed counts. Requests do not gain a language argument.
-Clients must accept additive fields and data schema 1.5.0; byte-identical response
+Schema 1.6.0 adds `internal_error` and the `preserved_derived` source narrowing
+outcome. Strict clients caching output enums must refresh discovery; clients
+requiring schema 1.5.0 must update their validation. Request shapes stay unchanged.
+Clients must accept additive fields and data schema 1.6.0; byte-identical response
 compatibility is not promised. Transport revisions are a separate contract:
 modern `2026-07-28` and preserved legacy `2025-11-25` share the endpoint.
 Translation changes alter `dataVersion`. Retain the existing body, cell, pair,
@@ -196,6 +199,52 @@ and release during dependency maintenance; once an official fix is available,
 update the compatible dependency chain, verify lint/audit and remove this
 exception and its tests. Extending acceptance beyond expiry requires explicit
 owner approval and fresh exposure evidence. No automatic renewal is permitted.
+
+## Current dependency-security review (2026-10-17)
+
+The reviewed maintenance updates standalone `fast-uri` **3.1.7 → 3.1.8**
+([advisory](https://github.com/advisories/GHSA-hrr3-gc8f-f4qj)) and the existing
+development-only Hono resolution **4.13.5 → 4.13.7**
+([advisory](https://github.com/advisories/GHSA-hxh3-vqpv-xpqv)). Hono stays
+within legacy SDK 1.31.0's declared `^4.11.4` range; no direct dependency or
+additional override is introduced. Its affected JSX rendering operation was
+not found in Fiscal's application path; the legacy SDK imports Hono only in
+its example server.
+
+The full npm audit, including development tools, now reports **7 package
+findings: 2 moderate, 5 high, 0 critical**. The two moderate findings are
+`uuid@8.3.2` and its parent `exceljs@4.4.0`, from the
+[same advisory](https://github.com/advisories/GHSA-w5hq-g745-h8pq); they are
+not two independent vulnerabilities. ExcelJS remains on its latest supported
+release and declares uuid `^8.3.0`, which has no patched in-range version.
+The inspected ExcelJS path calls only zero-argument `uuidv4()`, rather than
+the advisory's affected v3/v5/v6 output-buffer operations. ExcelJS still ships
+for workbook downloads, so retain the finding and recheck upstream releases.
+Do not apply npm's suggested ExcelJS downgrade or a cross-major uuid override
+without separate compatibility review of workbook and browser exports.
+
+The npm report does **not** enumerate the SDK's embedded parser. Server and
+client remain **2.2.0**, with the legacy test SDK **1.31.0**. Official 2.3.1
+server/client tarballs were inspected and integrity-checked: the candidate
+server's AJV provider is byte-for-byte identical to installed 2.2.0 and both
+candidates retain executable `fast-uri@3.1.0` code. Actual resolver probes
+still return host `A.com` for `//%41.com`, whereas standalone 3.1.8 returns
+`a.com`. The advisory's separate `equal() === false` example did not reproduce;
+the observed parser discrepancy remains unresolved. The server uses this
+provider for schema validation. Fiscal owns the schemas, uses native `URL`
+and exact allowlists for Host/Origin checks, and fetches no caller URL; these
+limit the demonstrated exposure but do not establish a universal guarantee.
+Keep this embedded residual open until an upstream artifact actually fixes it.
+
+The five high findings are the exact temporary lint-chain exception above.
+The policy and its expiry remain unchanged: **2026-11-02 00:00 UTC / 04:00
+Tbilisi**. Before then, recheck an official braces patch or supported lint-chain
+replacement; if none exists, raise the unresolved release blocker for an
+explicit owner decision. Passing the policy command does not mean all findings
+are fixed. The focused policy, MCP failure/privacy, legacy/modern protocol,
+output-schema, security and unchanged reference tests verify this maintenance;
+the integrated completion gate and production function-size check remain
+separate release requirements.
 
 ## Methodology archive release checks
 
@@ -402,7 +451,7 @@ and publications remain static. The endpoint exposes the read-only tools listed
 by `tools/list` through pinned server SDK 2.2.0. Stateless Streamable HTTP supports
 modern `2026-07-28` discovery and per-request metadata, and preserved legacy
 `2025-11-25` initialization. Both return finite JSON responses; neither creates
-sessions or subscriptions. GET and DELETE remain 405. The data schema is 1.5.0,
+sessions or subscriptions. GET and DELETE remain 405. The data schema is 1.6.0,
 independent of either protocol revision.
 The legacy adapter also retains `2025-06-18`, `2025-03-26`, `2024-11-05` and
 `2024-10-07`; the modern era is never proposed during legacy initialization.
@@ -427,11 +476,21 @@ from a different release.
 
 ### Shared production rate limiter
 
-The `fiscal-mcp-limits` Upstash Redis resource is linked to `geodata-ge` Production
-through the Vercel Marketplace. It uses the **free** plan, primary region `iad1`,
+The setup record links `fiscal-mcp-limits` to `geodata-ge` Production
+through the Vercel Marketplace, on the **free** plan in `iad1`,
 with `autoUpgrade=false`, `eviction=false`, and `prodPack=false`. The user accepted
 the Marketplace terms and authorized production rate limiting. No paid SDK,
 subscription, or automatic plan upgrade is required.
+
+Read-only inspection on **17 October 2026** did not independently establish the
+current Upstash resource binding, assigned plan, billing period, allowance or
+command usage. The authenticated installation was identified, but resource-list
+inspection failed with a CLI error and the dashboard returned no usable content.
+These unavailable surfaces do not establish an absent resource or zero usage.
+Treat the plan/region/settings above and the 500,000-command setup allowance below
+as historical setup evidence. The project owner must provide a functioning
+resource/account inspection or dated account evidence before reporting current
+headroom or applying the proposed 70%/90% quota-pressure review thresholds.
 
 Set `MCP_RATE_LIMITER=upstash`. The integration provides `KV_REST_API_URL` and
 `KV_REST_API_TOKEN`. The adapter uses native HTTPS with a 1.5-second timeout and
@@ -558,32 +617,51 @@ After Vercel reports READY for the merge commit:
 
 ### Human application guidance and evidence boundary
 
-Official documentation was checked **2026-10-02**. [OpenAI's Codex MCP guide](https://learn.chatgpt.com/docs/extend/mcp?surface=cli)
+Official documentation was checked **2026-10-17**. [OpenAI's Codex MCP guide](https://learn.chatgpt.com/docs/extend/mcp?surface=cli)
 documents remote Streamable HTTP and shared configuration across desktop/CLI/IDE.
 The documented app path is Settings → MCP servers → Add server, name/transport/URL,
-then save/restart. [OpenAI's docs-MCP quickstart](https://developers.openai.com/learn/docs-mcp)
-also documents `codex mcp add <name> --url <url>`. Local `codex --version` reports
-**codex-cli 0.146.1**; that is executable-version evidence only. Current desktop
-menus, account/plan eligibility, selected protocol and a completed sourced model
-question were not tested. No configuration, login, credentials or model request
-was touched.
+then save/restart. Local `codex --version` reports **codex-cli 0.146.1** and
+`codex login status` reports an existing ChatGPT login. Subsequent authenticated
+[staged CLI acceptance](superpowers/reviews/2026-10-17-mcp-remediation-verification.md)
+executed all 22 English/Georgian prompts in isolated, ephemeral read-only runs:
+initially 16 passed/6 failed; six affected repeats yielded 4 passes/2 failures,
+then the final two yielded 2 passes/0 failures.
+These are staged observations, not one fresh clean 22-case run on the final build.
+The selected model and negotiated protocol were not visible. Authenticated desktop,
+Claude and ChatGPT acceptance, current desktop menus, and account/workspace
+eligibility for those other application setups remain unverified.
 
 [Claude's current remote-connector guide](https://support.claude.com/en/articles/11175166-get-started-with-custom-connectors-using-remote-mcp)
 documents remote connectors for Free/Pro/Max/Team/Enterprise, with one custom
 connector on Free; organization owners manage workspace permissions. The individual
 flow documented for Pro/Max is Customize → Connectors → Add → Add custom connector,
-then name/URL/authentication and confirmation. Fiscal.ge itself requires no bearer
+then name/URL/authentication and confirmation. Its official
+[connected-services guidance](https://support.claude.com/en/articles/11176164-use-connectors-to-extend-claude-s-capabilities)
+then requires opening the conversation's **+ → Connectors** menu and switching on
+the saved connector for that conversation. The two official pages differ slightly
+on the creation menu; `/connect` retains its version-dependent-menu caveat.
+Fiscal.ge itself requires no bearer
 token or extra headers; the documented No sign in option applies to this public
 server. Claude's authenticated application/version, personal eligibility, negotiated
 protocol and one sourced question remain unverified. SDK compatibility is not proof
 of an application's account access or menus.
 
 `/connect` labels these steps as official guidance and links the primary guides.
+After setup it points to the existing national-inflation example, whose latest
+month comes from reviewed data and whose question asks for the original source
+and limitations. It does not hardcode a release month.
 Historical owner clickthroughs are earlier provenance, not current app proof.
 Direct ChatGPT custom-connector setup remains unverified and is not advertised;
 the page retains its separate web-reading prompt and static-file fallback. Future
 human proof must record app/version, account eligibility, date, protocol and a
 completed question citing Fiscal.ge's source/limitations, without collecting secrets.
+The eleven paired English/Georgian prompts and review requirements live separately
+from the 48 numerical references in
+`apps/web/tests/factQuery/fixtures/mcpAssistantIntents.ts`. Record actual tool
+selection, units, original citations, caveats, missingness, version consistency
+and any required recovery in an authorized real client before marking a case
+passed. Task 10 supplies the rubric; Task 12 owns execution. SDK/unit tests do not
+establish assistant acceptance, and no acceptance prompts have been run by Task 10.
 
 ### Logs and privacy
 
@@ -594,9 +672,136 @@ tool and method names are recorded as fixed unknown labels, never echoed.
 
 Do not log raw prompts, request bodies, invalid parameter strings, credentials,
 addresses, or provider error text. The temporary hashed counter key is not an
-application log field. Retain detailed application events for 14 days and
-aggregated metrics for 90 days. Vercel/Upstash infrastructure logs are separate;
+application log field. The operating target is **14 days of detailed allowlisted
+application events and 90 days of aggregates**. Vercel/Upstash infrastructure logs are separate;
 do not claim providers never process request addresses.
+
+**Observed 17 October 2026:** authenticated Vercel inspection confirmed production
+`dpl_Erifm5Fm3H6i9s4kx5GKH9mmq5nh`, READY at
+`4a55558aa7da5ef2197186b3ffab5d2ee0b68474`, for `geodata-ge` in
+`durumakh-1974s-projects`. This is a dated observation, not the identity of a later
+release. A deployment-scoped two-hour runtime query was refused with an explicit
+Hobby **one-hour retention** limit. A 30-minute aggregate query without full-text
+`/mcp` filtering succeeded but returned no groups; it proves query access, not
+healthy MCP traffic. Application errors can be HTTP 200 and infrastructure `info`.
+The project drains API returned 404; external retention and alert delivery remain
+**unverified**, rather than proven absent. Smoke reports sample release checks and
+do not satisfy continuous production-log retention.
+
+The project owner assigns an operations maintainer to close this gap or explicitly
+accept a different target. Until then, operational verification remains outstanding.
+The current option is the accessible Vercel window, manual incident-evidence
+preservation and **$0 incremental cost**; continuous capture and alerts are unproved.
+First inspect any owner-identified, already-authorized destination, its retained
+records and actual alert path. Older Hobby drains may be grandfathered; a failed
+inspection is no reason to purchase a replacement.
+
+### Proposed monitoring arrangement — owner decision pending
+
+If no existing authorized arrangement meets the target, the minimum researched
+alternative is Vercel Pro provider-side export of this project's production
+function logs, without sampling, to a project-owned Better Stack HTTP source,
+proposed name `fiscal-mcp-production`, Germany region. The actual source/ingestion
+hostname and recipient have not been created or selected. No application log
+shipping is added: MCP runtime networking remains limited to Upstash.
+[Vercel Drains](https://vercel.com/docs/drains) requires Pro or Enterprise for new
+drains and charges $0.50/GB export; Hobby/Pro Trial cannot create this path.
+[Vercel Pro](https://vercel.com/pricing) starts at $20/month for one deploying seat,
+plus usage; this is not a capped $20 bill.
+
+As researched on 17 October, [Better Stack pricing](https://betterstack.com/pricing)
+lists logs at $0.10/GB ingest and $0.05/GB-month retention, with standard queries
+included; free logs last three days. Email/Slack appears in its personal free offer;
+a monthly responder licence is $34 if needed. Do not assume personal eligibility
+or custom retention is free. [EU metrics billing](https://betterstack.com/docs/logs/billing-for-metrics/)
+includes 30 GB retained metrics, then $0.50/GB-month. Obtain an actual account quote
+for 14-day logs, 90-day metrics, email alerts, limits and any minimum commitment
+before approval; volume and account entitlement are unverified, so no total bill
+is promised. No paid plan, destination, recipient, schedule or subscription is
+authorized by this proposal.
+
+Use the [documented Vercel integration](https://betterstack.com/docs/logs/vercel/log-drain/)
+and configure both retentions explicitly. Parse only the existing application
+allowlist plus an operational timestamp; discard other function messages and
+provider envelope fields. Extract bounded tool/outcome/error counts, bytes and
+duration aggregates that survive deletion of original logs. A provider drain
+envelope may reach the vendor with request metadata before filtering: approval
+must cover that processing. Vercel's IP-hiding setting is team-wide and needs its
+own authorization. The application-event source must never retain raw bodies,
+prompts, authorization, addresses, user agents or provider error text.
+
+The project owner adopts cost, processing/retention and a real operations email
+recipient. The operations maintainer configures and recovers delivery. Proposed
+starting signals are three `internal_error` events in five minutes, two consecutive
+failed bounded probes/repeated 503, quota review at 70%/90% of verified allowance,
+and repeated latency over two seconds or twice a comparable baseline. These are
+proposals, not validated norms. Ordinary expected bad-input refusals and sparse
+legitimate traffic alone must not trigger outage alerts.
+
+After authorization, prove the Vercel-to-destination path with a labelled drain
+test and safe fixtures from an isolated test deployment/source. Three synthetic
+internal failures (including an HTTP-200 tool error) must open one deduplicated
+alert at the actual approved recipient; ordinary bad input must not. Healthy
+fixtures must produce recovery after the configured window. Record rule/event
+identities, timestamps, receipt, parser rejection and delivery failure handling;
+direct sink injection alone does not prove Vercel delivery. Verify effective
+14/90 settings and retained records, then observe raw expiry and aggregate survival
+at their elapsed retention checkpoints. Backdated fixtures do not prove 90 days of
+durability. Never inject faults or exhaust quota in production. Retention and
+actual alert/recovery delivery must be demonstrated before operations is verified.
+
+### Bounded release probe
+
+From `apps/web`, use an explicit target and independently reviewed release identity:
+
+```text
+npx tsx scripts/smoke-mcp.ts --url <target-mcp-url> --expected-schema 1.6.0 --expected-data-version <reviewed-sha256> --output <existing-output-directory/report.json>
+```
+
+The operator command has no production default, authentication input, new secret
+or schedule. HTTPS is required remotely; loopback HTTP is permitted for local
+tests. It exits nonzero for a failed required check, wrong schema/data identity,
+tool error inside HTTP 200, malformed output or failed expected refusal. Its
+compact JSON stores only checks, validated identities, timings, statuses, sizes
+and safe classifications; no query/response bodies, target addresses, tokens or
+provider messages. Use an existing ignored output directory, not a public folder.
+Run it as a standalone process: tool discovery temporarily replaces process-wide
+`console.warn`, restores it in `finally`, and classifies an SDK warning
+as a protocol failure. Do not embed this operator command in a concurrent server.
+
+Pinned modern `2026-07-28` executes all 14 advertised required tools; automatic
+modern and real legacy `2025-11-25` repeat the sourced historical Batumi answer,
+city-filtered originals and stale-version refusal. The ranking checks share changes
+in **percentage points**. Historical query values stay fixed; returned coverage is
+validated against that query and the supplied release identity, allowing later
+clean source vintages. Listing a tool alone is insufficient. The real-client
+fixture measures **29 HTTP requests total**, including legacy initialization,
+initialized notification and its refused optional GET. Closing stateless clients
+aborts transport resources; it does not add a DELETE. Every transport uses one
+counting fetch, including implicit requests/retries/cleanup: **request 31 is never
+sent**. Any future compatibility expansion must use explicitly reported separate
+runs if necessary. This is not a load test.
+
+Calls run sequentially, at least 1.1 seconds apart, with a ten-second deadline
+covering headers and body, no redirects and at most 512 KiB per response. A 429/503
+stops every queued request and records bounded numeric Retry-After information.
+The default probe fetches no publication/archive sample, preserving budget margin.
+Verify provider READY/SHA separately: the probe's data identities do not establish
+the production deployment commit by themselves.
+
+For built-local proof, preserve build-time `NEXT_PUBLIC_SITE_URL=https://fiscal.ge`.
+Set only the dedicated server process to `MCP_ENABLED=true`,
+`MCP_RATE_LIMITER=memory`, `VERCEL_ENV=preview`, `VERCEL_URL=localhost:3100`;
+confirm discovery succeeds before the full probe. This uses the existing local
+Host allowance. Restore that process environment and stop its process tree after
+verification; never loosen production guards or change production settings.
+
+The data maintainer role separately reviews official CPI and product availability.
+Proposed, **not yet owner-adopted**, targets are availability review within two
+business days of publication and clean review/release within five business days
+after every required original is available. Record incomplete sources, revisions
+awaiting review or release blockers and a next review date. Scheduling and
+notifications need a separately approved owner/channel; this runbook creates none.
 
 Rollback restores the route and snapshot together. The Redis counters contain
 no budget data and require no migration when a code release is rolled back.

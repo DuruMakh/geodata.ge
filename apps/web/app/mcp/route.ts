@@ -13,7 +13,7 @@ import { TOOLS, createMcpServer } from "../../lib/mcp/tools";
 import { logToolCall } from "../../lib/mcp/log";
 import { errorCodeSchema } from "../../lib/factQuery/schemas";
 import { loadPackagedSnapshot } from "../../lib/mcp/snapshot";
-import { tooLargeResponse, toolResult } from "../../lib/mcp/result";
+import { cellCount, resultSizeKind, tooLargeResponse, toolResult } from "../../lib/mcp/result";
 
 // The only request-time code in the repository. Every other route is
 // prerendered. Node runtime because the snapshot loader reads the artifact from
@@ -367,7 +367,11 @@ async function serve(request: Request, context: RequestContext): Promise<Respons
   const text = await response.clone().text();
   if (Buffer.byteLength(text, "utf8") > LIMITS.resultBytes) {
     const reply = JSON.parse(text);
-    const result = toolResult(tooLargeResponse(loadPackagedSnapshot(), { returned: 0, bytes: Buffer.byteLength(text, "utf8") }));
+    const result = toolResult(tooLargeResponse(loadPackagedSnapshot(), {
+      returned: reply.result?.structuredContent ? cellCount(reply.result.structuredContent) : 0,
+      bytes: Buffer.byteLength(text, "utf8"),
+      kind: resultSizeKind(context.tool),
+    }));
     reply.result = { ...result, ...(reply.result?.resultType ? { resultType: reply.result.resultType } : {}), ...(reply.result?._meta ? { _meta: reply.result._meta } : {}) };
     response = new Response(JSON.stringify(reply), { status: response.status, headers: response.headers });
   }
@@ -380,6 +384,12 @@ export function OPTIONS(request: Request): Response {
   return withResponseHeaders(request, preflight(request));
 }
 function unsupportedMethod(request: Request): Response {
-  return withResponseHeaders(request, methodNotAllowed());
+  const verdict = checkRequest(request);
+  const response = verdict.ok ? methodNotAllowed() : rpcError(
+    verdict.status, verdict.code,
+    "მოთხოვნა უარყოფილია.",
+    "Request rejected: origin or host is not configured for this deployment.",
+  );
+  return withResponseHeaders(request, response);
 }
 export { unsupportedMethod as GET, unsupportedMethod as DELETE };

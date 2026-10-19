@@ -1,5 +1,17 @@
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { checkRequest, clientKey } from "../../lib/mcp/security";
+
+const untouched = vi.hoisted(() => ({ counter: vi.fn(), snapshot: vi.fn(), server: vi.fn() }));
+vi.mock("../../lib/mcp/limits", async importOriginal => ({
+  ...await importOriginal<typeof import("../../lib/mcp/limits")>(),
+  createCounter: untouched.counter,
+}));
+vi.mock("../../lib/mcp/snapshot", () => ({ loadPackagedSnapshot: untouched.snapshot }));
+vi.mock("../../lib/mcp/tools", async importOriginal => ({
+  ...await importOriginal<typeof import("../../lib/mcp/tools")>(),
+  createMcpServer: untouched.server,
+}));
+import { GET, DELETE } from "../../app/mcp/route";
 
 const ENDPOINT = "https://fiscal.ge/mcp";
 const original = { ...process.env };
@@ -150,5 +162,34 @@ describe("a preview deployment's own host", () => {
     process.env.VERCEL_URL = "geodata-ge-abc123-team.vercel.app";
 
     expect(checkRequest(request({ host: "geodata-ge-abc123-team.vercel.app" })).ok).toBe(false);
+  });
+});
+
+describe.each([GET, DELETE])("unsupported-method request policy %#", handle => {
+  it.each([
+    [{ host: "fiscal.ge" }, 405, undefined],
+    [{ host: "fiscal.ge", origin: "https://approved.example" }, 405, undefined],
+    [{ host: "fiscal.ge", origin: "https://evil.example" }, 403, "forbidden_origin"],
+    [{ host: "fiscal.ge", origin: "null" }, 403, "forbidden_origin"],
+    [{ host: "evil.example" }, 403, "forbidden_host"],
+    [{}, 403, "forbidden_host"],
+  ] as const)("refuses the request before data, sessions, streams or limiter work %#", async (headers, status, code) => {
+    process.env.MCP_ALLOWED_ORIGINS = "https://approved.example";
+    const response = handle(new Request(ENDPOINT, { method: handle === DELETE ? "DELETE" : "GET", headers: { ...headers, accept: "text/event-stream" } }));
+    expect(response.status).toBe(status);
+    expect(response.headers.get("content-type")).toContain("application/json");
+    expect(response.headers.get("cache-control")).toBe("no-store");
+    expect(response.headers.get("mcp-session-id")).toBeNull();
+    const body = await response.json();
+    if (status === 405) {
+      expect(response.headers.get("allow")).toBe("POST");
+      expect(body.error.message).toContain("POST only");
+    } else {
+      expect(body.error.data.code).toBe(code);
+      expect(body.error.data.messageKa).toMatch(/[Ⴀ-ჿ]/);
+    }
+    expect(untouched.counter).not.toHaveBeenCalled();
+    expect(untouched.snapshot).not.toHaveBeenCalled();
+    expect(untouched.server).not.toHaveBeenCalled();
   });
 });

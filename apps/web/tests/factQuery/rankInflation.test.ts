@@ -34,11 +34,14 @@ describe("rank on inflation", () => {
 
   it("ranks percentage-point change in the same figures compare returns", () => {
     const data = ranking(rank(snapshot, { datasetId: "inflation", dimension: "series", level: "division", fromPeriod: "2025-08", toPeriod: "2026-08", measure: "yoy_pct", metric: "percentage_point_change", limit: 12 }));
-    const response = compare(snapshot, { target: { dataset: "inflation", seriesIds: [data.entries[0]!.seriesId] }, fromPeriod: "2025-08", toPeriod: "2026-08", measure: "yoy_pct" });
+    const response = compare(snapshot, { target: { dataset: "inflation", seriesIds: data.entries.map(entry => entry.seriesId) }, fromPeriod: "2025-08", toPeriod: "2026-08", measure: "yoy_pct" });
     if (response.kind !== "comparisons") throw new Error(JSON.stringify(response));
-    const [comparison] = (response.data as { comparisons: Comparison[] }).comparisons;
-    expect(data.entries[0]!.value).toBe(comparison!.percentagePointChange);
-    expect(data.entries.every((entry) => entry.unit === "percentage_points")).toBe(true);
+    const { comparisons } = response.data as { comparisons: Comparison[] };
+    for (const entry of data.entries) {
+      const comparison = comparisons.find(row => row.seriesId === entry.seriesId)!;
+      expect(entry.value).toBe(comparison.percentagePointChange);
+      expect(entry.unit).toBe("percentage_points");
+    }
   });
 
   it("refuses rankings that do not fit inflation", () => {

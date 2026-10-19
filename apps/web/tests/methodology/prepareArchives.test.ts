@@ -156,6 +156,26 @@ afterEach(async () => {
 });
 
 describe("methodology archive preparation", () => {
+  it("publishes every annual transfer original unchanged with complete manifest and ZIP evidence", async () => {
+    const { repositoryRoot, rows } = await createFixtureRepository();
+    rows.revenue = await Promise.all(Array.from({ length: 11 }, (_, index) => {
+      const year = String(2015 + index);
+      return writeReviewedSource(repositoryRoot, "revenue", year, `docs/Raw Data/Revenue/${year}-jan-dec-consolidated-revenue.pdf`, `downloads/methodology/revenue/files/${year}/mof-revenue-form-1.pdf`, `transfer-${year}`);
+    }));
+    // Remove only this test fixture's old synthetic revenue original.
+    await rm(path.join(repositoryRoot, "docs/Raw Data/Revenue/source-c.pdf"));
+    await writeFile(path.join(repositoryRoot, "data/methodology/source-archives/revenue.csv"), manifestCsv(rows.revenue));
+    const publicRoot = path.join(repositoryRoot, "apps/web/public");
+    await prepareMethodologyArchives({ repositoryRoot, publicRoot, reportPath: path.join(repositoryRoot, "report.json"), mode: "write" });
+    const archiveRoot = path.join(publicRoot, "downloads/methodology/revenue");
+    const entries = unzipSync(await readFile(path.join(archiveRoot, "revenue-original-sources.zip")));
+    expect(Object.keys(entries)).toEqual([...rows.revenue.map(row => row.public_download_path.replace("downloads/methodology/revenue/", "")), "manifest.csv", "manifest.json"]);
+    for (const row of rows.revenue) {
+      expect(await sha256(path.join(publicRoot, row.public_download_path))).toBe(row.sha256);
+      expect(sha256Bytes(entries[row.public_download_path.replace("downloads/methodology/revenue/", "")]!)).toBe(row.sha256);
+    }
+  });
+
   it("publishes unchanged originals, BOM CSV, and an exact sorted ZIP membership", async () => {
     const { repositoryRoot, rows } = await createFixtureRepository();
     const publicRoot = path.join(repositoryRoot, "apps/web/public");

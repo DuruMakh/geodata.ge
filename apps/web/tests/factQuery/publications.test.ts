@@ -114,16 +114,24 @@ describe("sources.json", () => {
 
   it("keeps the derivation-upstream role on published documents", async () => {
     const published = parse(sourcesFile.bytes) as unknown as {
-      sources: { sourceId: string; documents: { role: string }[] }[];
+      sources: { sourceId: string; documents: { documentId: string; role: string }[] }[];
     };
     const derived = published.sources.find((source) => source.sourceId === "source.adjara_consolidated_budget");
 
-    // Without the role a consumer rendering documents presents the republican-
-    // payments PDF as the publication of the consolidated total.
-    expect(derived?.documents.map((document) => document.role)).toEqual([
-      "derivation_upstream",
-      "derivation_upstream",
-    ]);
+    // Preserve the complete municipal, republican-payment and Treasury chain;
+    // these inputs are not a publication of the derived consolidated total.
+    expect(derived?.documents).toHaveLength(89);
+    const documentIds = derived!.documents.map((document) => document.documentId);
+    expect(new Set(documentIds).size).toBe(documentIds.length);
+    expect(documentIds).toEqual(expect.arrayContaining([
+      "source.mof.municipalities.2016_2025.budget_history_04",
+      "source.adjara.republic.2016_2025.actual_payments",
+      "source.mof.revenue.2025.form_1",
+    ]));
+    expect(derived?.documents.map((document) => document.documentId)).toEqual(
+      snapshot.sources.find((source) => source.sourceId === "source.adjara_consolidated_budget")!.documents.map((document) => document.documentId),
+    );
+    expect(derived?.documents.map((document) => document.role)).toEqual(Array(89).fill("derivation_upstream"));
   });
 });
 
