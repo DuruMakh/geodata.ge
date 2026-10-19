@@ -1,6 +1,6 @@
 {
   "education.title": "Education",
-  "education.hubSummary": "Schools, kindergartens, universities and vocational colleges",
+  "education.hubSummary": "Schools, kindergartens, universities, colleges",
   "education.metaTitle": "Education in Georgia",
   "education.metaDescription": "Pupils, teachers and schools by region and municipality, kindergartens, university students and vocational college admissions in Georgia, from Geostat data.",
   "education.page.schools.title": "Schools",
@@ -76,7 +76,7 @@
   "education.unitThousandPupils": "thousand pupils",
   "education.unitThousand": "thousand",
   "education.latest.schools": "{period}: {pupils} pupils in {schools} schools",
-  "education.latest.kindergartens": "{period}: {children} children in {kindergartens} public kindergartens",
+  "education.latest.kindergartens": "{period}: {children} children, {kindergartens} public kindergartens",
   "education.latest.universities": "{period}: {students} university students",
   "education.latest.vocational": "{period}: {admitted} admitted to vocational colleges",
   "education.latest.place.schools": "{period}: {value} pupils · {place}",

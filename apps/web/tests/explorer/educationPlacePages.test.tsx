@@ -65,9 +65,9 @@ describe("the indexes", () => {
   });
 
   it("Kindergartens: children in public kindergartens, in both languages", async () => {
-    expect(latest(await index("kindergartens"))).toBe("2025/26: 130,337 children in 1,717 public kindergartens");
+    expect(latest(await index("kindergartens"))).toBe("2025/26: 130,337 children, 1,717 public kindergartens");
     const ka = await index("kindergartens", "ka");
-    expect(latest(ka)).toBe("2025/26: 130,337 ბავშვი 1,717 საჯარო საბავშვო ბაღში");
+    expect(latest(ka)).toBe("2025/26: 130,337 ბავშვი 1,717 საჯარო ბაღში");
     expect(ka).toContain('href="/explorer/education/kindergartens/region/tbilisi"');
   });
 

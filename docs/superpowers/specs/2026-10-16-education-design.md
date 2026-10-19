@@ -84,7 +84,7 @@ Geostat marks 2010/11 with "as at 5 April 2011". The methodology page says so, a
 
 The same index and place pages as Schools, under `/kindergartens`:
 
-- Index line: "2025/26: 130,337 children in 1,717 public kindergartens". The map is shaded by children.
+- Index line: "2025/26: 130,337 children, 1,717 public kindergartens". The map is shaded by children.
 - The series list has three headings: **Children** (ბავშვები, selected), **Staff** (აღმზრდელები) and **Kindergartens** (ბაღები), each with one row.
 - Every place, Georgia included, runs 2017/18–2025/26.
 - These are public kindergartens only, the only ones Geostat publishes. The source line says "public kindergartens".
