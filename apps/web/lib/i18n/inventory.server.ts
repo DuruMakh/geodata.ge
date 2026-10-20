@@ -12,6 +12,7 @@ import { loadReviewedSourceManifest } from "../methodology/sourceManifest";
 import { LIVE_METHODOLOGY_IDS } from "../methodology/types";
 import type { TranslationInventory } from "./types";
 import sectorRegistry from "../../../../data/taxonomy/economic-sectors.json";
+import gdpExpenditureRegistry from "../../../../data/taxonomy/gdp-expenditure.json";
 import unemploymentRegistry from "../../../../data/taxonomy/unemployment-groups.json";
 import tradePartnerRegistry from "../../../../data/taxonomy/trade-partners.json";
 import tradeCompositionRegistry from "../../../../data/taxonomy/trade-composition.json";
@@ -87,6 +88,7 @@ export async function loadTranslationInventory(): Promise<TranslationInventory> 
     pagePaths,
     labelIds: sortedUnique([
       ...sectorRegistry.map(row => row.id), "economic-sectors",
+      ...gdpExpenditureRegistry.map(row => row.id),
       ...unemploymentRegistry.map(row => row.id), "unemployment",
       ...tradePartnerRegistry.map(row => row.id),
       ...tradeServiceRegistry.map(row => row.id),

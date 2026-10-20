@@ -4,6 +4,8 @@ import { renderGdpExpenditurePage, gdpExpenditurePageMetadata } from "../../lib/
 import { LIVE_METHODOLOGY_IDS, getMethodologyContent } from "../../lib/methodology/catalog";
 import { loadReviewedSourceManifest } from "../../lib/methodology/sourceManifest";
 import { renderPageMarkup } from "../helpers/render-localized";
+import { GDP_EXPENDITURE } from "../../lib/data/gdpExpenditure/importGdpExpenditure";
+import { loadEnglishCatalogue } from "../../lib/i18n/catalogue.server";
 
 test.each(["ka", "en"] as const)("GDP by expenditure renders one dataset, its heading and the default lines: %s", async locale => {
   const metadata = await gdpExpenditurePageMetadata(locale);
@@ -18,6 +20,12 @@ test.each(["ka", "en"] as const)("GDP by expenditure renders one dataset, its he
   expect(html).not.toContain("sector-highlights");
   expect(html).not.toContain("/downloads/data/gdp-expenditure");
   expect(metadata.alternates?.canonical).toContain(`${locale === "en" ? "/en" : ""}/explorer/economy/expenditure`);
+});
+
+// The English table and workbook name rows from the reviewed catalogue, not the registry.
+test("every row has a reviewed English label in the catalogue", async () => {
+  const { labels } = await loadEnglishCatalogue(path.resolve(process.cwd(), "../.."));
+  for (const row of GDP_EXPENDITURE) expect(labels[row.id]?.text, row.id).toBe(row.labelEn);
 });
 
 test("has a bilingual methodology page with the three archived Geostat tables", async () => {

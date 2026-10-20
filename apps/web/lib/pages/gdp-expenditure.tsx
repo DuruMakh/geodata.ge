@@ -31,7 +31,7 @@ export async function gdpExpenditurePageMetadata(locale: Locale) {
 export async function renderGdpExpenditurePage(locale: Locale) {
   const root=path.resolve(/* turbopackIgnore: true */ process.cwd(),"../..");
   const [{facts},presentation,manifest,catalogue]=await Promise.all([
-    loadServedGdpExpenditureData(),getPresentation(locale,["gdpExpenditure","format","main","workbook"],[]),
+    loadServedGdpExpenditureData(),getPresentation(locale,["gdpExpenditure","format","main","workbook"],GDP_EXPENDITURE.map(r=>r.id)),
     loadReviewedSourceManifest(root,"gdp-expenditure"),loadEnglishCatalogue(root),
   ]);
   const publicSources=projectPublicSources(manifest,locale,catalogue.documents);
