@@ -6863,6 +6863,501 @@
     },
     "documentLanguage": "en"
   },
+  "geostat_science_researchers": {
+    "title": {
+      "text": "Number of researchers by level of education, age groups and fields of science",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_science_rd_staff": {
+    "title": {
+      "text": "Number of persons working on R&D by status",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_science_institutions": {
+    "title": {
+      "text": "Number of institutions that conducted R&D and their expenditures",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_science_patents": {
+    "title": {
+      "text": "Inventions and utility models (Sakpatenti)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_science_publications": {
+    "title": {
+      "text": "Number of scientific publications in the Georgian Abstracts Journal",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_culture_museums": {
+    "title": {
+      "text": "Museums (museum unions) and museum reserves, main characteristics",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_culture_museums_count_regions": {
+    "title": {
+      "text": "Number of museums (museum unions) and museum reserves by regions",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_culture_museums_regions": {
+    "title": {
+      "text": "Main characteristics of museums (museum unions) and museum reserves by regions",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_culture_museum_staff": {
+    "title": {
+      "text": "Number of staff employed in museums",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_culture_museum_exhibits": {
+    "title": {
+      "text": "The exhibits of museums (2011 only)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_culture_theatres": {
+    "title": {
+      "text": "Main indicators of professional theatres",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_culture_theatres_regions": {
+    "title": {
+      "text": "Main indicators of professional theatres by regions",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_culture_theatres_count_regions": {
+    "title": {
+      "text": "Number of professional theatres by regions",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_culture_theatre_staff": {
+    "title": {
+      "text": "Number of staff employed in theatres",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_culture_theatre_events": {
+    "title": {
+      "text": "Data on events held by theatres",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_culture_libraries": {
+    "title": {
+      "text": "Public and universal libraries (2001-2008)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_culture_libraries_regions": {
+    "title": {
+      "text": "Number of libraries by regions (2003-2008)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_culture_publishing": {
+    "title": {
+      "text": "Calculation of data on publishing materials (2005-2020)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_ka_science_institutions": {
+    "title": {
+      "text": "Number of institutions that conducted R&D and their expenditures (Georgian version)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_ka_science_rd_staff": {
+    "title": {
+      "text": "Number of persons working on R&D by status (Georgian version)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_ka_science_researchers": {
+    "title": {
+      "text": "Number of researchers by level of education, age groups and fields of science (Georgian version)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_ka_science_patents": {
+    "title": {
+      "text": "Inventions and utility models (Sakpatenti) (Georgian version)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_ka_culture_museums": {
+    "title": {
+      "text": "Museums (museum unions) and museum reserves, main characteristics (Georgian version)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_ka_culture_museums_count_regions": {
+    "title": {
+      "text": "Number of museums (museum unions) and museum reserves by regions (Georgian version)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_ka_culture_museum_staff": {
+    "title": {
+      "text": "Number of staff employed in museums (Georgian version)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_ka_culture_theatres": {
+    "title": {
+      "text": "Main indicators of professional theatres (Georgian version)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_ka_culture_theatres_regions": {
+    "title": {
+      "text": "Main indicators of professional theatres by regions (Georgian version)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_ka_culture_theatres_count_regions": {
+    "title": {
+      "text": "Number of professional theatres by regions (Georgian version)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_ka_culture_theatre_staff": {
+    "title": {
+      "text": "Number of staff employed in theatres (Georgian version)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_ka_culture_theatre_events": {
+    "title": {
+      "text": "Data on events held by theatres (Georgian version)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_ka_culture_museums_regions": {
+    "title": {
+      "text": "Main characteristics of museums (museum unions) and museum reserves by regions (Georgian version)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_science_page": {
+    "title": {
+      "text": "Science (source page capture)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_culture_page": {
+    "title": {
+      "text": "Culture (source page capture)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
   "source.geostat_demography_population_mid_year": {
     "title": { "text": "Mid-year population by self-governed units", "reviewedAt": "2026-10-20" },
     "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-20" },
