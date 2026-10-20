@@ -45,6 +45,7 @@ export const DATA_VALIDATE_CHECKS = [
   "data:check-business",
   "data:check-housing",
   "data:check-education",
+  "data:check-transport",
 ] as const;
 
 type Check = { main: (args: readonly string[]) => Promise<void> };

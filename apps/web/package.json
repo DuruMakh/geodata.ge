@@ -146,6 +146,8 @@
     "data:check-business": "tsx scripts/prepare-business.ts --check",
     "data:prepare-housing": "tsx scripts/prepare-housing.ts --write",
     "data:check-housing": "tsx scripts/prepare-housing.ts --check",
+    "data:prepare-transport": "tsx scripts/prepare-transport.ts --write",
+    "data:check-transport": "tsx scripts/prepare-transport.ts --check",
     "data:prepare-education": "tsx scripts/prepare-education.ts --write",
     "data:check-education": "tsx scripts/prepare-education.ts --check",
     "data:prepare-household-income": "tsx scripts/prepare-household-income.ts --write",
