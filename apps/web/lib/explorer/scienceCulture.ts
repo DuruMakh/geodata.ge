@@ -1,8 +1,8 @@
-import { SCIENCE_CULTURE_GROUPS, scienceCultureFactKey, scienceCultureIndicator, type ClientScienceCultureFact, type ScienceCultureGroup, type ScienceCultureIndicator, type ScienceCultureMeasure, type ScienceCultureSeriesBreak } from "../data/scienceCulture/types";
+import { SCIENCE_CULTURE_GROUPS, scienceCultureIndicator, type ClientScienceCultureFact, type ScienceCultureGroup, type ScienceCultureIndicator, type ScienceCultureMeasure, type ScienceCultureSeriesBreak } from "../data/scienceCulture/types";
 import { INK } from "./colors";
 import type { ResolvedPeriodRange } from "./periodRange";
-import { buildTopicModel, serializeTopicHash, topicSeriesColor, type TopicSeriesModel, type TopicState } from "./topicSeries";
-import { changeUnitListSelection, parseUnitListHash, unitListCoverage } from "./unitList";
+import { serializeTopicHash, topicSeriesColor, type TopicSeriesModel, type TopicState } from "./topicSeries";
+import { buildUnitListModel, changeUnitListSelection, parseUnitListHash, unitListCoverage } from "./unitList";
 
 export const SCIENCE_CULTURE_HUB_PATH = "/explorer/science-culture";
 export const SCIENCE_CULTURE_SECTIONS = [
@@ -78,18 +78,13 @@ export function scienceCultureDefaultSelection(section: ScienceCultureTopicId): 
 }
 
 /**
- * The reference is ink. A patent route keeps one colour under all four headings and a staff group one under museums and
- * theatres, each keyed by its position in its fixed list; every other row takes the palette by its place in its list.
+ * The reference is ink. A staff group takes the palette at its place in the eight staff groups, so it wears one colour under
+ * museums and theatres (two pages); every other row, patent rows included, takes the palette at its place in its list.
  */
 export function scienceCultureSeriesColor(series: ScienceCultureSeriesDefinition, index: number): string {
   if (series.reference) return INK;
   const [, measure, group] = series.id.split(".");
-  if (measure.startsWith("invention_") || measure.startsWith("utility_")) {
-    return topicSeriesColor(series, (SCIENCE_CULTURE_GROUPS.invention_applications as readonly string[]).indexOf(group), `science_culture.patents.${group}`);
-  }
-  if (measure.endsWith("_staff") && measure !== "rd_staff") {
-    return topicSeriesColor(series, (SCIENCE_CULTURE_GROUPS.museum_staff as readonly string[]).indexOf(group), `science_culture.staff.${group}`);
-  }
+  if (measure.endsWith("_staff") && measure !== "rd_staff") return topicSeriesColor(series, (SCIENCE_CULTURE_GROUPS.museum_staff as readonly string[]).indexOf(group));
   return topicSeriesColor(series, index);
 }
 
@@ -132,18 +127,10 @@ export type ScienceCultureModel = ScienceCultureListModel & {
  * The years (the selection's unit's coverage), values, colours and units of a list of series. A year Geostat left blank
  * is null, never zero. Shared by the topic and museum area pages.
  */
-export function buildScienceCultureSeriesModel(
+export const buildScienceCultureSeriesModel = (
   definitions: readonly ScienceCultureSeriesDefinition[], facts: readonly ClientScienceCultureFact[], state: TopicState,
   color: (definition: ScienceCultureSeriesDefinition, index: number) => string = scienceCultureSeriesColor,
-): ScienceCultureListModel {
-  const byCell = new Map(facts.map(f => [scienceCultureFactKey(f), f]));
-  const first = new Map<string, ClientScienceCultureFact>();
-  for (const fact of facts) if (!first.has(fact.indicatorId)) first.set(fact.indicatorId, fact);
-  const model = buildTopicModel({ range: state.range, coverage: scienceCultureListCoverage(definitions, state.selectedIds, facts), selectedIds: state.selectedIds, color,
-    definitions: definitions.map(definition => ({ ...definition, decimals: first.get(definition.id)?.decimals ?? 0, unit: first.get(definition.id)!.unit })),
-    value: (definition, year) => byCell.get(scienceCultureFactKey({ indicatorId: definition.id, year }))?.value });
-  return { ...model, unit: (model.selected[0] ?? model.series[0]).unit };
-}
+): ScienceCultureListModel => buildUnitListModel({ definitions, facts, state, color, coverage: scienceCultureListCoverage(definitions, state.selectedIds, facts) });
 
 const breakYear = (item: { referenceDate: string }) => Number(item.referenceDate.slice(0, 4));
 

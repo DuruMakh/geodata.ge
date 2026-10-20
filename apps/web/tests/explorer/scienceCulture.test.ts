@@ -7,9 +7,10 @@ import {
   scienceCultureDefaultSelection, scienceCultureSeriesColor, scienceCultureTopicSeries, serializeScienceCultureHash, type ScienceCultureTopicId,
 } from "../../lib/explorer/scienceCulture";
 import {
-  MUSEUM_AREAS, buildMuseumAreaModel, buildMuseumRegionMapModel, changeMuseumAreaSelection, museumAreaDefaultSelection, museumAreaHref, museumAreaOfMapId,
+  MUSEUM_AREAS, buildMuseumAreaModel, changeMuseumAreaSelection, museumAreaDefaultSelection, museumAreaHref, museumAreaOfMapId,
   museumAreaSelectionHash, museumAreaSeries, museumAreaSlug, museumMapId, museumRegionHref, parseMuseumAreaHash,
 } from "../../lib/explorer/scienceCultureMuseums";
+import { buildMuseumRegionMapModel } from "../../lib/explorer/scienceCultureMuseumsRegionMap";
 import { serializeTopicHash } from "../../lib/explorer/topicSeries";
 
 let facts: ClientScienceCultureFact[];
@@ -191,7 +192,7 @@ test("the Museums map ranks the eleven regions by visitors in the latest year", 
   expect(map.regions[0]).toMatchObject({ regionId: "region.tbilisi", rank: 1 });
 });
 
-test("colours: the reference is ink; a patent route and a staff group keep one colour wherever they appear", () => {
+test("colours: the reference is ink; a staff group keeps one colour on both pages; rows charted together are told apart", () => {
   const color = (list: ReturnType<typeof scienceCultureTopicSeries>, id: string) => {
     const index = list.findIndex(s => s.id === id);
     return scienceCultureSeriesColor(list[index], index);
@@ -200,13 +201,24 @@ test("colours: the reference is ink; a patent route and a staff group keep one c
   const theatres = scienceCultureTopicSeries("theatres");
   const georgia = museumAreaSeries("georgia");
   expect(color(patents, sc("invention_applications", "local"))).toBe(INK);
-  expect(color(patents, sc("invention_patents", "foreign"))).toBe(color(patents, sc("utility_applications", "foreign")));
-  expect(color(patents, sc("invention_patents", "foreign"))).toBe(color(patents, sc("utility_patents", "foreign")));
-  expect(color(patents, sc("invention_patents", "local"))).not.toBe(color(patents, sc("invention_patents", "foreign")));
+  // All four patent headings chart together, so each of the 12 rows has its own colour.
+  expect(new Set(patents.map((s, i) => scienceCultureSeriesColor(s, i))).size).toBe(12);
   for (const group of ["total", "women", "age_55_plus"]) expect(color(theatres, sc("theatre_staff", group))).toBe(color(georgia, sc("museum_staff", group)));
-  // Rows charted together are told apart.
   const people = scienceCultureTopicSeries("research").slice(0, 14);
   expect(new Set(people.map((s, i) => scienceCultureSeriesColor(s, i))).size).toBe(14);
   const staff = theatres.slice(13);
   expect(new Set(staff.map(s => color(theatres, s.id))).size).toBe(8);
+});
+
+test("every topic and museum area model builds over its full coverage", () => {
+  for (const section of TOPICS) {
+    const model = buildScienceCultureModel(section, facts, state(scienceCultureTopicSeries(section).map(s => s.id)), breaks);
+    expect(model.series).toHaveLength(scienceCultureTopicSeries(section).length);
+    expect(model.years.length).toBeGreaterThan(0);
+  }
+  for (const area of MUSEUM_AREAS) {
+    const model = buildMuseumAreaModel(area, facts, state(museumAreaSeries(area).map(s => s.id)));
+    expect(model.series).toHaveLength(museumAreaSeries(area).length);
+    expect(model.years.length).toBeGreaterThan(0);
+  }
 });
