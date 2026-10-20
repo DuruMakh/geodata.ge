@@ -1,7 +1,8 @@
-import { ENERGY_FOOD_UNIT_DECIMALS, type ClientEnergyFoodFact, type EnergyFoodFact, type EnergyFoodIndicator } from "../data/energyFood/types";
+import { ENERGY_FOOD_UNIT_DECIMALS, energyFoodIndicatorUnit, type ClientEnergyFoodFact, type EnergyFoodFact, type EnergyFoodIndicator } from "../data/energyFood/types";
 import { EDITORIAL_PALETTE, INK } from "./colors";
 import type { ResolvedPeriodRange } from "./periodRange";
-import { buildTopicModel, parseTopicHash, serializeTopicHash, topicCoverage, type TopicSeriesModel, type TopicState } from "./topicSeries";
+import { buildTopicModel, serializeTopicHash, type TopicSeriesModel, type TopicState } from "./topicSeries";
+import { changeUnitListSelection, parseUnitListHash, unitListCoverage } from "./unitList";
 
 export const ENERGY_FOOD_HUB_PATH = "/explorer/energy-food";
 export const ENERGY_FOOD_SECTIONS = [
@@ -9,17 +10,21 @@ export const ENERGY_FOOD_SECTIONS = [
   { id: "electricity", href: `${ENERGY_FOOD_HUB_PATH}/electricity`, labelKey: "common.electricity" },
   { id: "energy-use", href: `${ENERGY_FOOD_HUB_PATH}/energy-use`, labelKey: "common.energyUse" },
   { id: "food-self-sufficiency", href: `${ENERGY_FOOD_HUB_PATH}/food-self-sufficiency`, labelKey: "common.foodSelfSufficiency" },
+  { id: "farming", href: `${ENERGY_FOOD_HUB_PATH}/farming`, labelKey: "common.farming" },
 ] as const;
 export type EnergyFoodSectionId = typeof ENERGY_FOOD_SECTIONS[number]["id"];
 
-/** The series ID is the indicator ID. */
-export type EnergyFoodSeriesDefinition = { id: EnergyFoodIndicator; reference: boolean; parentId?: string };
+export type EnergyFoodHeading = "output" | "harvests" | "livestock" | "products" | "prices";
+/** The series ID is the indicator ID. Farming rows sit flat under a heading; the four energy and food pages have none. */
+export type EnergyFoodSeriesDefinition = { id: EnergyFoodIndicator; reference: boolean; parentId?: string; heading?: EnergyFoodHeading };
 
 /** A top-level row followed by its children, which nest under it. */
 function group(id: EnergyFoodIndicator, children: readonly EnergyFoodIndicator[], reference = false): EnergyFoodSeriesDefinition[] {
   return [{ id, reference }, ...children.map(child => ({ id: child, reference: false, parentId: id }))];
 }
 const row = (id: EnergyFoodIndicator): EnergyFoodSeriesDefinition[] => group(id, []);
+const headed = (heading: EnergyFoodHeading, ids: readonly EnergyFoodIndicator[]): EnergyFoodSeriesDefinition[] =>
+  ids.map(id => ({ id, reference: id === "farming.output.total", heading }));
 
 const SERIES: Record<EnergyFoodSectionId, readonly EnergyFoodSeriesDefinition[]> = {
   "energy-supply": [
@@ -59,7 +64,17 @@ const SERIES: Record<EnergyFoodSectionId, readonly EnergyFoodSeriesDefinition[]>
     ...row("food.self_sufficiency.milk"),
     ...row("food.self_sufficiency.eggs"),
   ],
+  farming: [
+    ...headed("output", ["farming.output.total", "farming.output.crops", "farming.output.livestock", "farming.output.services"]),
+    ...headed("harvests", (["wheat", "barley", "maize", "beans", "potatoes", "vegetables", "melons", "grapes", "apples", "peaches", "tangerines", "hazelnuts", "walnuts"] as const)
+      .map(crop => `farming.harvest.${crop}` as const)),
+    ...headed("livestock", (["cattle", "dairy_cows", "pigs", "sheep_goats", "poultry"] as const).map(animal => `farming.livestock.${animal}` as const)),
+    ...headed("products", (["meat", "beef", "pork", "sheep_goat_meat", "poultry_meat", "milk", "eggs"] as const).map(product => `farming.products.${product}` as const)),
+    ...headed("prices", (["wheat", "maize", "potatoes", "tomatoes", "apples", "grapes", "hazelnuts", "beef", "pork", "poultry_meat", "milk", "eggs"] as const)
+      .map(product => `farming.price.${product}` as const)),
+  ],
 };
+const HEADINGS = new Map<string, EnergyFoodHeading>(SERIES.farming.map(s => [s.id, s.heading!]));
 
 /** The series a section offers, reference first. */
 export function energyFoodSeries(section: EnergyFoodSectionId): EnergyFoodSeriesDefinition[] {
@@ -81,9 +96,17 @@ export function energyFoodDisplayLabels(section: EnergyFoodSectionId, labels: Re
 }
 
 export type EnergyFoodUnit = EnergyFoodFact["unit"];
-const UNITS: Record<EnergyFoodSectionId, EnergyFoodUnit> = { "energy-supply": "ktoe", electricity: "gwh", "energy-use": "ktoe", "food-self-sufficiency": "percent" };
-export function energyFoodUnit(section: EnergyFoodSectionId): EnergyFoodUnit {
-  return UNITS[section];
+
+/**
+ * The rows one chart can hold. A chart shows one group at a time: the four energy and food pages are one unit each; a farming
+ * row's group is its heading and unit, so harvests and meat (both thousand tonnes) stay separate charts, and the twelve
+ * farm-gate prices (per kg, litre or piece) share one.
+ */
+export function energyFoodGroup(id: string): string {
+  const unit = energyFoodIndicatorUnit(id as EnergyFoodIndicator);
+  const heading = HEADINGS.get(id);
+  if (!heading) return unit;
+  return heading === "prices" ? "price" : `${heading}:${unit}`;
 }
 
 /**
@@ -93,7 +116,7 @@ export function energyFoodUnit(section: EnergyFoodSectionId): EnergyFoodUnit {
  */
 const ENERGY_FOOD_PALETTE = [...EDITORIAL_PALETTE, "#0D89C2", "#474A02"] as const;
 
-/** The reference is drawn in ink; `index` is the series' position among the non-reference series, so no colour repeats on a page. */
+/** The reference is drawn in ink; `index` is the series' position among the non-reference series of its group, so no colour repeats on a chart. */
 function energyFoodSeriesColor(series: EnergyFoodSeriesDefinition, index: number): string {
   return series.reference ? INK : ENERGY_FOOD_PALETTE[index % ENERGY_FOOD_PALETTE.length];
 }
@@ -102,20 +125,30 @@ export type EnergyFoodState = TopicState;
 
 const cellKey = (f: { indicatorId: string; year: number }) => `${f.indicatorId}:${f.year}`;
 
-/** A section's years: every year any of its series has a value. */
-export function energyFoodCoverage(section: EnergyFoodSectionId, facts: readonly ClientEnergyFoodFact[]) {
+/** A section's years: every year any series of the selection's group has a value, or any of its series when nothing is selected. */
+export function energyFoodCoverage(section: EnergyFoodSectionId, facts: readonly ClientEnergyFoodFact[], selectedIds: readonly string[] = []) {
+  return unitListCoverage(energyFoodSeries(section), selectedIds, facts, `No energy and food years for ${section}`, energyFoodGroup);
+}
+
+/** A page's "updated" date: the latest review date among its own series' facts, so adding farming leaves the energy pages' dates as they were. */
+export function energyFoodLastReviewedAt(section: EnergyFoodSectionId, facts: readonly { indicatorId: string; lastReviewedAt: string }[]): string {
   const ids = new Set<string>(energyFoodSeries(section).map(s => s.id));
-  return topicCoverage(facts.filter(f => ids.has(f.indicatorId)).map(f => f.year), `No energy and food years for ${section}`);
+  return facts.filter(f => ids.has(f.indicatorId)).map(f => f.lastReviewedAt).sort().at(-1)!;
 }
 
 export function defaultEnergyFoodState(section: EnergyFoodSectionId): EnergyFoodState {
   return { mode: "line", range: { kind: "all" }, selectedIds: [energyFoodSeries(section)[0].id] };
 }
 
-/** The hash carries no tab: a legacy `tab=` key is ignored. */
+/** The hash carries no tab: a legacy `tab=` key is ignored. A selection that mixes groups keeps its first row's group. */
 export function parseEnergyFoodHash(hash: string, section: EnergyFoodSectionId, facts: readonly ClientEnergyFoodFact[]): EnergyFoodState {
   const series = energyFoodSeries(section);
-  return parseTopicHash(new URLSearchParams(hash.replace(/^#/, "")), series, [series[0].id], energyFoodCoverage(section, facts));
+  return parseUnitListHash(hash, series, [series[0].id], facts, `No energy and food years for ${section}`, energyFoodGroup);
+}
+
+/** A new selection, kept to one group; the years stay, clamped to that group's coverage. */
+export function changeEnergyFoodSelection(state: EnergyFoodState, section: EnergyFoodSectionId, next: readonly string[], facts: readonly ClientEnergyFoodFact[]): EnergyFoodState {
+  return changeUnitListSelection(state, energyFoodSeries(section), next, facts, `No energy and food years for ${section}`, energyFoodGroup);
 }
 
 export function serializeEnergyFoodHash(state: EnergyFoodState, _section: EnergyFoodSectionId): string {
@@ -123,16 +156,23 @@ export function serializeEnergyFoodHash(state: EnergyFoodState, _section: Energy
 }
 
 export type EnergyFoodSeriesModel = TopicSeriesModel<EnergyFoodSeriesDefinition>;
-export type EnergyFoodModel = { range: ResolvedPeriodRange; years: number[]; series: EnergyFoodSeriesModel[]; selected: EnergyFoodSeriesModel[]; decimals: number };
+/** `unit` is the first selected series' unit (else the first series'); `unitKey` names it, "price" for the farm-gate prices' shared axis. */
+export type EnergyFoodModel = {
+  range: ResolvedPeriodRange; years: number[]; series: EnergyFoodSeriesModel[]; selected: EnergyFoodSeriesModel[]; decimals: number; unit: EnergyFoodUnit; unitKey: string;
+};
 
 
 export function buildEnergyFoodModel(section: EnergyFoodSectionId, facts: readonly ClientEnergyFoodFact[], state: EnergyFoodState): EnergyFoodModel {
   const byCell = new Map(facts.map(f => [cellKey(f), f]));
-  let colorIndex = 0;
-  const { range, years, series, selected } = buildTopicModel({ range: state.range, coverage: energyFoodCoverage(section, facts), definitions: energyFoodSeries(section), selectedIds: state.selectedIds,
-    value: (definition, year) => byCell.get(cellKey({ indicatorId: definition.id, year }))?.value, color: definition => energyFoodSeriesColor(definition, definition.reference ? 0 : colorIndex++) });
+  const colorIndex = new Map<string, number>();
+  const nextColor = (id: string) => { const index = colorIndex.get(energyFoodGroup(id)) ?? 0; colorIndex.set(energyFoodGroup(id), index + 1); return index; };
+  const { range, years, series, selected } = buildTopicModel({ range: state.range, coverage: energyFoodCoverage(section, facts, state.selectedIds), definitions: energyFoodSeries(section), selectedIds: state.selectedIds,
+    value: (definition, year) => byCell.get(cellKey({ indicatorId: definition.id, year }))?.value, color: definition => energyFoodSeriesColor(definition, definition.reference ? 0 : nextColor(definition.id)) });
   const selectedIds = new Set<string>(selected.map(s => s.id));
+  const first = selected[0]?.id ?? series[0].id;
+  const unit = energyFoodIndicatorUnit(first);
+  const group = energyFoodGroup(first);
   const selectedDecimals = facts.filter(f => selectedIds.has(f.indicatorId)).map(f => f.decimals);
-  const decimals = selectedDecimals.length ? Math.max(...selectedDecimals) : ENERGY_FOOD_UNIT_DECIMALS[energyFoodUnit(section)]; // an empty selection falls back to the unit's own precision
-  return { range, years, series, selected, decimals };
+  const decimals = selectedDecimals.length ? Math.max(...selectedDecimals) : ENERGY_FOOD_UNIT_DECIMALS[unit]; // an empty selection falls back to the unit's own precision
+  return { range, years, series, selected, decimals, unit, unitKey: group === "price" ? "price" : unit };
 }

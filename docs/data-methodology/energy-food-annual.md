@@ -2,13 +2,13 @@
 
 ## Purpose and status
 
-This methodology governs the research package at `docs/Raw Data/EnergyFood/geostat-energy-food-annual/`, collected on 2026-10-11 from Geostat's "Energy Balance of Georgia" pages (2013–2024) and "Food Security" page. The research captures are immutable. The 681 primary values are served on the Energy and food pages under the approved design `docs/superpowers/specs/2026-10-11-energy-food-design.md`; see [Serving on the Energy and food pages](#serving-on-the-energy-and-food-pages). Nothing is published through MCP or included in central machine-readable publications.
+This methodology governs the research package at `docs/Raw Data/EnergyFood/geostat-energy-food-annual/`, collected on 2026-10-11 from Geostat's "Energy Balance of Georgia" pages (2013–2024) and "Food Security" page, and extended on 2026-10-20 with six workbooks from Geostat's "Agriculture" page for the Farming page. The research captures are immutable. The 1,389 primary values (681 energy and food, 708 farming) are served on the Energy and food pages under the approved designs `docs/superpowers/specs/2026-10-11-energy-food-design.md` and `docs/superpowers/specs/2026-10-20-farming-design.md`; see [Serving on the Energy and food pages](#serving-on-the-energy-and-food-pages). Nothing is published through MCP or included in central machine-readable publications.
 
-Annual data only. Monthly electricity and fuel figures, energy prices, the 2025 energy balance (not yet published), crop and livestock production, farm prices, food consumption per person and regional breakdowns are excluded.
+Annual data only. Monthly electricity and fuel figures, energy prices, the 2025 energy balance (not yet published), quarterly livestock tables, sown area and yields, farm rows Geostat publishes only from 2016, food consumption per person and regional breakdowns are excluded.
 
 ## Sources and coverage
 
-Geostat is the sole publisher. Forty-two originals are preserved under `official/`: 24 energy balance workbooks (for each year 2013–2024, "1. Aggregated Energy Balance" and "2. Electricity and heat"), the energy efficiency workbook (2013–2024), the food balance sheets (2014–2025), the Georgian-language editions of the 2024 aggregated balance and of the food balance sheets (label references, no value is read from them), and 14 captures of Geostat source pages. Exact URLs, retrieval dates, byte sizes and SHA-256 fingerprints live in `source-manifest.csv` and `source-manifest.json`; the same originals are published through `data/methodology/source-archives/energy-food.csv`.
+Geostat is the sole publisher. Fifty-five originals are preserved under `official/`: 24 energy balance workbooks (for each year 2013–2024, "1. Aggregated Energy Balance" and "2. Electricity and heat"), the energy efficiency workbook (2013–2024), the food balance sheets (2014–2025), six agriculture workbooks (general agro sector statistics, production of annual crops, production of permanent crops, livestock numbers, livestock products, agricultural production prices), the Georgian-language editions of the 2024 aggregated balance, of the food balance sheets and of the six agriculture workbooks (label references, no value is read from them), and 15 captures of Geostat source pages. Exact URLs, retrieval dates, byte sizes and SHA-256 fingerprints live in `source-manifest.csv` and `source-manifest.json`; the same originals are published through `data/methodology/source-archives/energy-food.csv`.
 
 | Page group | Contents | Served values |
 | --- | --- | --- |
@@ -16,10 +16,11 @@ Geostat is the sole publisher. Forty-two originals are preserved under `official
 | Energy use | `KTOE` sheet: final consumption (Total and seven users), final consumption by fuel | 168 |
 | Electricity | `Electricity (GWh)` column: production (Total, thermal, hydro, wind), imports, exports, final consumption (Total and six users), losses | 165 |
 | Food self-sufficiency | `Self-sufficiency ratio, %` row of 12 foods, 2014–2025 | 144 |
+| Farming | Farm output (4 rows, 2010–2025), harvests (13 crops), livestock (5), meat, milk and eggs (7), 2006–2025, and farm-gate prices (12, 2014–2025) | 708 |
 
 The energy efficiency workbook is used only to cross-check total supply and final consumption. It is not served.
 
-The package holds, besides `official/`: `source-manifest.csv` and `.json`, `prepare.py` (finds every row and column by its printed label, never by a fixed position, and writes `energy-food-annual.csv` and `coverage.csv`), `verify_independent.mjs`, `test_validation.py`, `validation-report.json`, `independent-validation.json` and a README with the cell map. Energy values come from the `KTOE` sheet of "1. Aggregated Energy Balance". Electricity values come from the `Electricity (GWh)` column of the `GWh&TJ` sheet of "2. Electricity and heat" (spelled `GWH&TJ` from 2014). Food ratios come from the row `Self-sufficiency ratio, %` on each of the 12 food sheets.
+The package holds, besides `official/`: `source-manifest.csv` and `.json`, `prepare.py` (finds every row and column by its printed label, never by a fixed position, and writes `energy-food-annual.csv` and `coverage.csv`), `verify_independent.mjs`, `test_validation.py`, `validation-report.json`, `independent-validation.json` and a README with the cell map. Energy values come from the `KTOE` sheet of "1. Aggregated Energy Balance". Electricity values come from the `Electricity (GWh)` column of the `GWh&TJ` sheet of "2. Electricity and heat" (spelled `GWH&TJ` from 2014). Food ratios come from the row `Self-sufficiency ratio, %` on each of the 12 food sheets. Farming values come from sheet `AG. output` of the general workbook, `Production` of the annual crops workbook, `Permanent Crops production`, `Number of livestock`, `Livestock products` and `Prices`; each farming source keeps its own retrieval date (2026-10-20).
 
 ## Energy balance, units and definitions
 
@@ -37,13 +38,19 @@ Geostat's balance has no wind column before 2016, so `electricity.production.win
 
 The ratio is Geostat's published number for each of 12 foods and each year 2014–2025 (wheat, maize, potatoes, vegetables, grapes, meat, beef, pork, sheep and goat meat, poultry meat, milk and milk products, eggs). It is not recalculated. In plain terms it relates production to the quantity available, production divided by production plus imports minus exports, times 100; Geostat's published ratios mostly match that formula and a few differ (sheep and goat meat in 2017: 299 published, 291 by the formula); no reason for the difference is given. Geostat's footnotes: wheat and maize balances include products made from them converted into wheat and maize; the grape balance counts wine converted into grapes. Sheep and goat meat reaches 345% in 2018 and is kept as published. Food values show as whole percents.
 
+## Farming
+
+Farm output is the value of everything farms produce in a year, at current prices in million lari, not adjusted for inflation; Geostat splits it into crops, livestock and agricultural services. Harvests are thousand tonnes of crops gathered. Livestock is the number of animals at the end of the year, in thousand head. Meat is slaughter weight in thousand tonnes, milk million litres, eggs million pieces. Farm-gate prices are the average prices farmers receive when they sell, in lari per kilogram (milk per litre, eggs per piece).
+
+Geostat enlarged its farm survey in 2016 and revised 2006–2015 so the years can be compared; detailed rows that exist only from 2016 (winter and spring wheat, white and red grapes, chicken) are not served, so every served farming row runs without gaps. Geostat prints 2025 farm output as `2025*`, a preliminary figure: those four values are stored with `value_status = preliminary`, and every other farming value is `published`. In the farming workbooks a dash "-" means the figure is not available, unlike the energy balance; no served farming cell may contain one and validation fails if it does. Quantities and output show one decimal and prices two, following each cell's number format. The pages describe the figures and state no causes.
+
 ## Dashes, gaps and unpublished cells
 
 Geostat writes "-" where a flow did not occur. A served dash is stored as `0` with `value_status = no_flow` and listed in the validation report; charts and tables show it as a plain 0.0 and only the Excel Data sheet marks it "No flow"; there are three: crude oil imports in 2013 and 2021 and crude oil supply in 2013. Cells marked "…" (not published) occur only in an industry sub-row (non-ferrous metals) of several 2013–2020 workbooks that is never served; no served series may contain one and validation fails if it does. Nothing is estimated, interpolated or derived.
 
 ## Indicators
 
-The 57 indicator IDs (17 energy supply, 14 energy use, 14 electricity, 12 food) are stable lowercase ASCII identifiers; Georgian and English labels are display data.
+The 98 indicator IDs (17 energy supply, 14 energy use, 14 electricity, 12 food, 41 farming) are stable lowercase ASCII identifiers; Georgian and English labels are display data.
 
 | Indicator IDs | Meaning | Source | Coverage |
 | --- | --- | --- | --- |
@@ -53,6 +60,12 @@ The 57 indicator IDs (17 energy supply, 14 energy use, 14 electricity, 12 food) 
 | `electricity.production.{total, thermal, hydro}`, `electricity.imports`, `electricity.exports`, `electricity.losses`, `electricity.final.{total, industry, transport, commercial_public, households, agriculture, other_unspecified}` | Electricity, GWh | `GWh&TJ`, column `Electricity (GWh)` | 2013–2024 |
 | `electricity.production.wind` | Wind plants, GWh | same column | 2016–2024 |
 | `food.self_sufficiency.{wheat, maize, potato, vegetables, grapes, meat, beef, pork, sheep_goat_meat, poultry_meat, milk, eggs}` | Self-sufficiency ratio, % | the 12 food sheets of the food balance sheets | 2014–2025 |
+| `farming.output.{total, crops, livestock, services}` | Farm output, million ₾ at current prices | `AG. output` | 2010–2025 |
+| `farming.harvest.{wheat, barley, maize, beans, potatoes, vegetables, melons}` | Annual crop harvests, thousand tonnes | `Production` | 2006–2025 |
+| `farming.harvest.{grapes, apples, peaches, tangerines, hazelnuts, walnuts}` | Permanent crop harvests, thousand tonnes | `Permanent Crops production` | 2006–2025 |
+| `farming.livestock.{cattle, dairy_cows, pigs, sheep_goats, poultry}` | Animals at the end of the year, thousand head | `Number of livestock` | 2006–2025 |
+| `farming.products.{meat, beef, pork, sheep_goat_meat, poultry_meat}`, `farming.products.milk`, `farming.products.eggs` | Meat in thousand tonnes, milk in million litres, eggs in million pieces | `Livestock products` | 2006–2025 |
+| `farming.price.{wheat, maize, potatoes, tomatoes, apples, grapes, hazelnuts, beef, pork, poultry_meat}`, `farming.price.milk`, `farming.price.eggs` | Farm-gate prices, ₾ per kg (milk per litre, eggs per piece) | `Prices` | 2014–2025 |
 
 All rows use `basis=actual`. Each keeps its source ID, sheet, cell, printed row and column label and number format.
 
@@ -65,18 +78,23 @@ All rows use `basis=actual`. Each keeps its source ID, sheet, cell, printed row 
 3. final consumption to equal the sum of its users (and non-energy use) within 0.5, and electricity production to equal thermal + hydro + wind within 0.5 GWh;
 4. electricity supply − energy sector − losses to equal final consumption within 0.5 GWh;
 5. every food ratio to lie within 10 percentage points of production ÷ (production + imports − exports) × 100 on the same sheet;
-6. no negative value except electricity supply in 2016 and 2023.
+6. no negative value except electricity supply in 2016 and 2023;
+7. farm output to equal crops + livestock + services within 0.5;
+8. meat to equal beef + pork + sheep and goat + poultry + other meat within 0.2, and milk to equal its two printed parts within 0.2;
+9. dairy cows never to exceed cattle;
+10. where the food balance sheets give production of wheat, maize, potatoes, grapes, meat, milk or eggs for the same year, the farming table to match it within 0.6 (the balance sheets print whole thousand tonnes); the one known exception, grapes in 2014 (165 against 172.6), is listed in the validation report;
+11. only the 2025 farm output values to be preliminary.
 
-`node verify_independent.mjs` re-reads every workbook with SheetJS and separately written label tables, matches all 681 values, and requires total supply and final consumption to equal the energy efficiency workbook for all 12 years. Spot values: 2024 energy supply 5,914.5, 2024 imports 5,099.0, 2024 electricity production 14,234.1 GWh, 2025 wheat 19%.
+`node verify_independent.mjs` re-reads every workbook with SheetJS and separately written label tables, matches all 1,389 values, and requires total supply and final consumption to equal the energy efficiency workbook for all 12 years. Spot values: 2024 energy supply 5,914.5, 2024 imports 5,099.0, 2024 electricity production 14,234.1 GWh, 2025 wheat 19%, 2025 farm output 8,384.9 million ₾, 2025 grapes 348.9 thousand tonnes, 2025 wheat farm-gate price 0.57 ₾ per kg.
 
 ## Serving on the Energy and food pages
 
 `npm run data:prepare-energy-food` re-reads the package, requires both its report and the independent verification to have passed, and writes `data/imports/energy-food-annual.csv` (UTF-8 with BOM) and `data/reports/energy-food-validation.json`. `npm run data:check-energy-food` (part of `data:validate`) rebuilds both in memory and fails on any difference. The Prisma mirror table `EnergyFoodFact` is filled only by the transactional, parity-checked `npm run data:import`; CSV and database modes serve identical rows.
 
-Refreshing the data is a deliberate sequence. In the package, run `python3 -B prepare.py --check && python3 -B -m unittest test_validation -v && node verify_independent.mjs` (and `python3 prepare.py` / `node verify_independent.mjs --write` after a source change), then run `npm run data:prepare-energy-food` and `npm run data:check-energy-food` in `apps/web`. The canonical CSV has the columns `year, indicator_id, value, published_value, unit, basis, value_status, source_id, source_sheet, source_cell, source_number_format, last_reviewed_at`; `value_status` is `published` or `no_flow`, and `unit` is `ktoe`, `gwh` or `percent`. The 681 rows are the whole table: `EnergyFoodFact` is created by migration `20261011120000_energy_food` with row-level security on and public grants revoked, and `data:import` compares it with the CSV field by field.
+Refreshing the data is a deliberate sequence. In the package, run `python3 -B prepare.py --check && python3 -B -m unittest test_validation -v && node verify_independent.mjs` (and `python3 prepare.py` / `node verify_independent.mjs --write` after a source change), then run `npm run data:prepare-energy-food` and `npm run data:check-energy-food` in `apps/web`. The canonical CSV has the columns `year, indicator_id, value, published_value, unit, basis, value_status, source_id, source_sheet, source_cell, source_number_format, last_reviewed_at`; `value_status` is `published`, `no_flow` or `preliminary`, and `unit` is `ktoe`, `gwh`, `percent`, `million_gel`, `thousand_tonnes`, `thousand_head`, `million_litres`, `million_pieces`, `gel_per_kg`, `gel_per_litre` or `gel_per_piece`. The 1,389 rows are the whole table: `EnergyFoodFact` is created by migration `20261011120000_energy_food` with row-level security on and public grants revoked; its `unit` and `value_status` columns are text, so the farming rows need no new migration, and `data:import` compares it with the CSV field by field.
 
 The pages show energy and electricity to one decimal and food ratios as whole percents, as Geostat publishes them. The wind gap before 2016 is a gap, never zero. The pages describe the figures and state no causes. The energy-food sources are registered sources of a human explorer only and are excluded from the fact-query snapshot.
 
-Excel downloads hold Summary, Data and Sources sheets in the reader's language, with the selected series and years, explicit units and validated links to the archived copies of the Geostat workbooks on fiscal.ge. Energy and electricity values use the number format `#,##0.0` and food ratios `0`. The Data sheet's status column reads "Published" or "No flow (Geostat shows “-”)"; a year with no value (for example wind before 2016) is an empty cell and is marked unavailable, never zero. Internal cell references are not exported.
+Excel downloads hold Summary, Data and Sources sheets in the reader's language, with the selected series and years, explicit units and validated links to the archived copies of the Geostat workbooks on fiscal.ge. Energy, electricity and farming quantities use the number format `#,##0.0`, food ratios `0` and farm-gate prices `0.00`. The Data sheet's status column reads "Published", "Preliminary" or "No flow (Geostat shows “-”)"; a year with no value (for example wind before 2016) is an empty cell and is marked unavailable, never zero. Internal cell references are not exported.
 
-Original sources: [Energy Balance of Georgia (Geostat)](https://www.geostat.ge/en/modules/categories/328/energy-balance-of-georgia) and [Food Security (Geostat)](https://www.geostat.ge/en/modules/categories/297/food-security).
+Original sources: [Energy Balance of Georgia (Geostat)](https://www.geostat.ge/en/modules/categories/328/energy-balance-of-georgia), [Food Security (Geostat)](https://www.geostat.ge/en/modules/categories/297/food-security) and [Agriculture (Geostat)](https://www.geostat.ge/en/modules/categories/196/agriculture).

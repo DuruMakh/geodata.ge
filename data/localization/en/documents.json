@@ -4214,6 +4214,84 @@
     "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
     "documentLanguage": "en"
   },
+  "geostat_farming_general": {
+    "title": { "text": "General agricultural statistics", "reviewedAt": "2026-10-20" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-20" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-20" },
+    "documentLanguage": "en"
+  },
+  "geostat_farming_annual_crops": {
+    "title": { "text": "Production of annual crops", "reviewedAt": "2026-10-20" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-20" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-20" },
+    "documentLanguage": "en"
+  },
+  "geostat_farming_permanent_crops": {
+    "title": { "text": "Production of permanent crops", "reviewedAt": "2026-10-20" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-20" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-20" },
+    "documentLanguage": "en"
+  },
+  "geostat_farming_livestock_numbers": {
+    "title": { "text": "Number of livestock (annual)", "reviewedAt": "2026-10-20" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-20" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-20" },
+    "documentLanguage": "en"
+  },
+  "geostat_farming_livestock_products": {
+    "title": { "text": "Production of livestock products (annual)", "reviewedAt": "2026-10-20" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-20" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-20" },
+    "documentLanguage": "en"
+  },
+  "geostat_farming_prices": {
+    "title": { "text": "Agricultural production prices (farm-gate prices)", "reviewedAt": "2026-10-20" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-20" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-20" },
+    "documentLanguage": "en"
+  },
+  "geostat_farming_general_ka": {
+    "title": { "text": "General agricultural statistics (Georgian labels)", "reviewedAt": "2026-10-20" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-20" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-20" },
+    "documentLanguage": "ka"
+  },
+  "geostat_farming_annual_crops_ka": {
+    "title": { "text": "Production of annual crops (Georgian labels)", "reviewedAt": "2026-10-20" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-20" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-20" },
+    "documentLanguage": "ka"
+  },
+  "geostat_farming_permanent_crops_ka": {
+    "title": { "text": "Production of permanent crops (Georgian labels)", "reviewedAt": "2026-10-20" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-20" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-20" },
+    "documentLanguage": "ka"
+  },
+  "geostat_farming_livestock_numbers_ka": {
+    "title": { "text": "Number of livestock (annual) (Georgian labels)", "reviewedAt": "2026-10-20" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-20" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-20" },
+    "documentLanguage": "ka"
+  },
+  "geostat_farming_livestock_products_ka": {
+    "title": { "text": "Production of livestock products (annual) (Georgian labels)", "reviewedAt": "2026-10-20" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-20" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-20" },
+    "documentLanguage": "ka"
+  },
+  "geostat_farming_prices_ka": {
+    "title": { "text": "Agricultural production prices (farm-gate prices) (Georgian labels)", "reviewedAt": "2026-10-20" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-20" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-20" },
+    "documentLanguage": "ka"
+  },
+  "geostat_agriculture_page": {
+    "title": { "text": "Agriculture (source page capture)", "reviewedAt": "2026-10-20" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-20" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-20" },
+    "documentLanguage": "en"
+  },
   "nbg_money_aggregates": {
     "title": { "text": "Money aggregates and monetary ratios (M2.1)", "reviewedAt": "2026-10-11" },
     "publisher": { "text": "National Bank of Georgia (NBG)", "reviewedAt": "2026-10-11" },
