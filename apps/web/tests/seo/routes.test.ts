@@ -110,8 +110,8 @@ describe("indexable Fiscal.ge routes", () => {
     // Housing adds its hub, four pages and a page for Georgia and each of the 11 regions: 17 bilingual pairs.
     // The Housing methodology adds one more bilingual pair.
     // Education adds its hub, four pages, the 75 Schools and 75 Kindergartens place pages and its methodology page: 156 bilingual pairs.
-    // Transport adds its hub, five pages and a page for Georgia and each of the 11 regions: 18 bilingual pairs.
-    expect(urls).toHaveLength(1056);
+    // Transport adds its hub, five pages, a page for Georgia and each of the 11 regions and its methodology page: 19 bilingual pairs.
+    expect(urls).toHaveLength(1058);
     expect(new Set(urls).size).toBe(urls.length);
     expect(urls.every((url) => url.startsWith("https://fiscal.ge/"))).toBe(true);
     expect(urls).toContain("https://fiscal.ge/about");
@@ -134,6 +134,8 @@ describe("indexable Fiscal.ge routes", () => {
     expect(urls).toContain("https://fiscal.ge/en/methodology/housing");
     expect(urls).toContain("https://fiscal.ge/methodology/education");
     expect(urls).toContain("https://fiscal.ge/en/methodology/education");
+    expect(urls).toContain("https://fiscal.ge/methodology/transport");
+    expect(urls).toContain("https://fiscal.ge/en/methodology/transport");
     expect(urls).toContain("https://fiscal.ge/explorer/wages/regions/adjara");
     for (const page of ["", "/income", "/spending", "/poverty", "/inequality"]) {
       expect(urls).toContain(`https://fiscal.ge/explorer/living-standards${page}`);
@@ -231,6 +233,7 @@ describe("indexable Fiscal.ge routes", () => {
       "/methodology/trade",
       "/methodology/external-flows",
       "/methodology/energy-food",
+      "/methodology/transport",
       "/methodology/demography",
     ]);
   }, 90_000);

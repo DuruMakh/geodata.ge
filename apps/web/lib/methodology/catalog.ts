@@ -14,6 +14,7 @@ import { POVERTY_METHODOLOGY_CONTENT as EN_POVERTY } from "./content/en/poverty"
 import { HOUSEHOLD_INCOME_METHODOLOGY_CONTENT } from "./content/household-income";
 import { HOUSEHOLD_INCOME_METHODOLOGY_CONTENT as EN_HOUSEHOLD_INCOME } from "./content/en/household-income";
 import { ENERGY_FOOD_METHODOLOGY_CONTENT } from "./content/energyFood";
+import { TRANSPORT_METHODOLOGY_CONTENT } from "./content/transport";
 import { HEALTH_METHODOLOGY_CONTENT } from "./content/health";
 import { HEALTH_METHODOLOGY_CONTENT as EN_HEALTH } from "./content/en/health";
 import { CRIME_METHODOLOGY_CONTENT } from "./content/crime";
@@ -21,6 +22,7 @@ import { CRIME_METHODOLOGY_CONTENT as EN_CRIME } from "./content/en/crime";
 import { EDUCATION_METHODOLOGY_CONTENT } from "./content/education";
 import { EDUCATION_METHODOLOGY_CONTENT as EN_EDUCATION } from "./content/en/education";
 import { ENERGY_FOOD_METHODOLOGY_CONTENT as EN_ENERGY_FOOD } from "./content/en/energyFood";
+import { TRANSPORT_METHODOLOGY_CONTENT as EN_TRANSPORT } from "./content/en/transport";
 import { MONEY_BANKS_METHODOLOGY_CONTENT as EN_MONEY_BANKS } from "./content/en/moneyBanks";
 import { BUSINESS_METHODOLOGY_CONTENT } from "./content/business";
 import { BUSINESS_METHODOLOGY_CONTENT as EN_BUSINESS } from "./content/en/business";
@@ -78,6 +80,7 @@ export const METHODOLOGY_CONTENT: Readonly<Record<MethodologyDatasetId, Methodol
   trade: TRADE_METHODOLOGY_CONTENT,
   "external-flows": EXTERNAL_FLOWS_METHODOLOGY_CONTENT,
   "energy-food": ENERGY_FOOD_METHODOLOGY_CONTENT,
+  transport: TRANSPORT_METHODOLOGY_CONTENT,
   demography: DEMOGRAPHY_METHODOLOGY,
 };
 
@@ -96,6 +99,7 @@ const ENGLISH_METHODOLOGY_CONTENT: Readonly<Record<MethodologyDatasetId, Methodo
   education: EN_EDUCATION,
   crime: EN_CRIME,
   "energy-food": EN_ENERGY_FOOD,
+  transport: EN_TRANSPORT,
   money: EN_MONEY_BANKS,
   business: EN_BUSINESS,
   housing: EN_HOUSING,

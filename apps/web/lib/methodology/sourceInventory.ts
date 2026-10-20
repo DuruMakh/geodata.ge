@@ -58,6 +58,8 @@ const inventoryRules = {
   // official/ka/ holds Georgian copies of the served workbooks, kept only for their labels.
   "household-income": [{ root: "docs/Raw Data/Households/geostat-household-income-spending-annual/official", include: (candidatePath: string) => !candidatePath.includes("/official/ka/") }],
   "energy-food": [{ root: "docs/Raw Data/EnergyFood/geostat-energy-food-annual/official", include: () => true }],
+  // The thirteen served workbooks, seven kept for reference and the five Geostat page captures they were downloaded from.
+  transport: [{ root: "docs/Raw Data/Transport/geostat-transport-annual/official", include: () => true }],
   // The healthcare and deaths workbooks (official/deaths/) and both page captures; served and archived-only alike.
   health: [{ root: "docs/Raw Data/Health/geostat-health-annual/official", include: () => true }],
   // The six served workbooks, the 35 archived-only ones and the four category page captures.

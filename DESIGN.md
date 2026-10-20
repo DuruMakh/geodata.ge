@@ -1,9 +1,9 @@
 # Fiscal.ge Design System — Editorial
 
 Version: 4.1
-Last updated: 2026-10-16
+Last updated: 2026-10-20
 Status: Production visual system for Fiscal.ge
-Scope: Explorer product UI (the sixteen dataset hubs of §6.7), charts, tables, controls, export surfaces, responsive behavior, and future pages that reuse the Budget Explorer shell.
+Scope: Explorer product UI (the seventeen dataset hubs of §6.7), charts, tables, controls, export surfaces, responsive behavior, and future pages that reuse the Budget Explorer shell.
 
 ---
 
@@ -26,7 +26,7 @@ Superseded and must not appear in production:
 
 ## 2. Product Scope Boundary
 
-Fiscal.ge is a Georgian-first explorer of reviewed annual public-finance and economy data in sixteen dataset hubs (§6.7), plus monthly national inflation. It is not a broad public-data catalog. `Project_Definition.md` §2 owns scope; this section only frames the visual system.
+Fiscal.ge is a Georgian-first explorer of reviewed annual public-finance and economy data in seventeen dataset hubs (§6.7), plus monthly national inflation. It is not a broad public-data catalog. `Project_Definition.md` §2 owns scope; this section only frames the visual system.
 
 Included: the budget hub, multi-year explorer (line + table) with fields/ministries grouping, single-year analysis view, the one-chart Government Debt explorer, the one-series general-government deficit explorer, the Economy hub (GDP overview, national sectors, regional economies), the Business hub (§35), the Housing hub (§37), the Inflation hub (overview, categories, products, cities), the Money and banks hub (§34), the Unemployment hub (§27), the Wages hub (§31), the Living standards hub (§32), the Health hub (§36), the Education hub (§39), the Crime and justice hub (§38), the Trade hub (overview, trading partners, products, domestic exports, services trade; §28), the External flows hub (§30), the Energy and food hub (§33), the Demography hub (population, age and sex, migration, births and deaths; §29), methodology pages, the `/about` mission page (§23), the `/connect` page, Excel workbook export, Georgian-first UI with an English mirror (§2.2), minimal public source label, internal provenance metadata.
 
@@ -324,7 +324,7 @@ No screen card, no outer container. Content sits directly on paper.
 
 ### 6.2 Information Architecture
 
-The landing lives at `/` (მთავარი — see §19). Everything else is the data platform: the Budget, Economy, Business, Housing and construction, Inflation, Money and banks, Unemployment, Wages, Living standards, Health and social protection, Education, Crime and justice, Trade, External flows, Energy and food and Demography hubs and their sections, all mounted under `/explorer` inside the shell of §6.7. Every route below also exists under `/en` (§2.2).
+The landing lives at `/` (მთავარი — see §19). Everything else is the data platform: the Budget, Economy, Business, Housing and construction, Inflation, Money and banks, Unemployment, Wages, Living standards, Health and social protection, Education, Crime and justice, Trade, External flows, Energy and food, Transport and Demography hubs and their sections, all mounted under `/explorer` inside the shell of §6.7. Every route below also exists under `/en` (§2.2).
 
 ```text
 /explorer                              budget hub — the six sections as cards
@@ -424,6 +424,13 @@ The landing lives at `/` (მთავარი — see §19). Everything else i
 /explorer/energy-food/electricity                       Electricity (§33)
 /explorer/energy-food/energy-use                        Energy use (§33)
 /explorer/energy-food/food-self-sufficiency             Food self-sufficiency (§33)
+/explorer/transport                  ტრანსპორტი         Transport hub (§40)
+/explorer/transport/vehicles                            Vehicle fleet by type and fuel (§40)
+/explorer/transport/vehicle-age                         Vehicle fleet by cumulative age (§40)
+/explorer/transport/passengers                          Passenger-km and passengers carried (§40)
+/explorer/transport/freight                             Tonne-km and goods carried (§40)
+/explorer/transport/regions                             Region map and ranked list (§40)
+/explorer/transport/regions/[id]                        Georgia and 11 region transport pages (§40)
 /explorer/demography                  დემოგრაფია        Demography hub (§29)
 /explorer/demography/population                         Population on 1 January: index — municipality map, key figures, ranked list (§29)
 /explorer/demography/population/georgia                 Georgia page (§29)
@@ -475,7 +482,7 @@ Restore on load with validation (unknown values fall back to defaults; ranges cl
 
 Links shared before the route split still work: `/explorer#nav=expenditure|revenue|analysis` is honored once by a client component mounted on the hub, which reads the hash on mount and `router.replace`s to the matching route with `nav` stripped and the rest of the hash preserved.
 
-The landing links into the dataset hubs (hero CTA → `/explorer`, the dataset row, the footer, which lists all sixteen) and into the budget sections from its ledger (§19).
+The landing links into the dataset hubs (hero CTA → `/explorer`, the dataset row, the footer, which lists all seventeen) and into the budget sections from its ledger (§19).
 
 ### 6.4 Rule Hierarchy (replaces cards)
 
@@ -515,8 +522,8 @@ Everything under `/explorer` renders inside a persistent shell: a dark sidebar o
 
 - Brand block → `/`: the reversed mark at approximately 30px, followed by live serif text `Fiscal.ge` in `paper` and live mono text `ღია მონაცემები` (8.5px, 0.1em) beneath in `ink-fg-faint`. This identity is shared by the expanded desktop sidebar and the mobile top bar.
 - `მონაცემები /` overline: mono 9.5px, 0.12em, `ink-fg-faint`.
-- Sixteen dataset links, in order (one navigation config, `lib/navigation/navTree.ts`, which also feeds the header menu, footer and 404 hub lists): `ბიუჯეტი` → `/explorer`, `ეკონომიკა` → `/explorer/economy`, `ბიზნესი` → `/explorer/business`, `საცხოვრებელი და მშენებლობა` → `/explorer/housing`, `ინფლაცია` → `/explorer/inflation`, `ფული და ბანკები` → `/explorer/money`, `უმუშევრობა` → `/explorer/unemployment`, `ხელფასები` → `/explorer/wages`, `ცხოვრების დონე` → `/explorer/living-standards`, `ჯანდაცვა და სოციალური დაცვა` → `/explorer/health`, `განათლება` → `/explorer/education`, `დანაშაული და მართლმსაჯულება` → `/explorer/crime`, `საგარეო ვაჭრობა` → `/explorer/trade`, `საგარეო ნაკადები` → `/explorer/external`, `ენერგეტიკა და სურსათი` → `/explorer/energy-food`, `დემოგრაფია` → `/explorer/demography`. The active dataset wears a `2px accent` left border, active-row background and sans 12.5/600 in `paper`; inactive ones are `ink-fg-muted`.
-- Only the active dataset's sections nest beneath it: the six budget sections (below), Economy's GDP / sectors / regions, Business's Sales / Jobs / Investment and profit / Firms opened and closed / Regions, Housing's Permits / Completed buildings / Home prices / Regions, Inflation's overview / categories / products / cities, Money and banks' Money supply / Loans and deposits / Interest rates / Bank health, Unemployment's national overview / regions / age groups / gender, Wages' overview / industries / regions, Living standards' Income / Spending / Poverty / Inequality, Health's Doctors and hospitals / Illnesses / Causes of death, Education's Schools / Kindergartens / Universities / Vocational colleges, Crime and justice's Recorded crimes / Convictions / Prisons / Victims / Road accidents, Trade's Overview / Trading partners / Products / Domestic exports / Services trade, External flows' Money from abroad / Foreign investment / Current account / Foreign debt / Reserves, Energy and food's Energy supply / Electricity / Energy use / Food self-sufficiency, or Demography's Population / Age and sex / Migration / Births and deaths (Population stays current on its place pages too), all in the section-row style below.
+- Seventeen dataset links, in order (one navigation config, `lib/navigation/navTree.ts`, which also feeds the header menu, footer and 404 hub lists): `ბიუჯეტი` → `/explorer`, `ეკონომიკა` → `/explorer/economy`, `ბიზნესი` → `/explorer/business`, `საცხოვრებელი და მშენებლობა` → `/explorer/housing`, `ინფლაცია` → `/explorer/inflation`, `ფული და ბანკები` → `/explorer/money`, `უმუშევრობა` → `/explorer/unemployment`, `ხელფასები` → `/explorer/wages`, `ცხოვრების დონე` → `/explorer/living-standards`, `ჯანდაცვა და სოციალური დაცვა` → `/explorer/health`, `განათლება` → `/explorer/education`, `დანაშაული და მართლმსაჯულება` → `/explorer/crime`, `საგარეო ვაჭრობა` → `/explorer/trade`, `საგარეო ნაკადები` → `/explorer/external`, `ენერგეტიკა და სურსათი` → `/explorer/energy-food`, `ტრანსპორტი` → `/explorer/transport`, `დემოგრაფია` → `/explorer/demography`. The active dataset wears a `2px accent` left border, active-row background and sans 12.5/600 in `paper`; inactive ones are `ink-fg-muted`.
+- Only the active dataset's sections nest beneath it: the six budget sections (below), Economy's GDP / sectors / regions, Business's Sales / Jobs / Investment and profit / Firms opened and closed / Regions, Housing's Permits / Completed buildings / Home prices / Regions, Inflation's overview / categories / products / cities, Money and banks' Money supply / Loans and deposits / Interest rates / Bank health, Unemployment's national overview / regions / age groups / gender, Wages' overview / industries / regions, Living standards' Income / Spending / Poverty / Inequality, Health's Doctors and hospitals / Illnesses / Causes of death, Education's Schools / Kindergartens / Universities / Vocational colleges, Crime and justice's Recorded crimes / Convictions / Prisons / Victims / Road accidents, Trade's Overview / Trading partners / Products / Domestic exports / Services trade, External flows' Money from abroad / Foreign investment / Current account / Foreign debt / Reserves, Energy and food's Energy supply / Electricity / Energy use / Food self-sufficiency, Transport's Vehicles / Vehicle age / Passengers / Freight / Regions, or Demography's Population / Age and sex / Migration / Births and deaths (Population stays current on its place pages too), all in the section-row style below.
 - Teaser datasets (none today) — an `ink-fg-muted` label with a `მალე` badge (1px `#6C6860` border — **3.09:1** on `ink`, above the WCAG 1.4.11 3:1 floor for a component boundary — 2px radius, mono 9px, `ink-fg-faint`), rendered at reduced emphasis (opacity 0.6) so it never reads as a live row. Markers only: not links, not focusable, no route, no data. With none, the sidebar renders no teaser list at all.
 - Foot, above a 1px divider: `← მთავარი`. No version string.
 - Top-right: the collapse toggle — a 26px box, 1px `rgba(247,242,233,0.18)` border, Lucide `ChevronsLeft` (expanded) / `ChevronsRight` (collapsed) (§7.2a). `ChevronsLeft`/`ChevronsRight` are desktop-only; below 900px the toggle is the Lucide `Menu` / `X` pair (accessible name `მენიუ` / `Menu`, 44×44, no border).
@@ -526,7 +533,7 @@ Everything under `/explorer` renders inside a persistent shell: a dark sidebar o
 **Collapsed rail (≥900px).** 52px, same `ink` surface, radius 0:
 
 - The toggle stays in place at the top, icon flipped to `ChevronsRight`.
-- Below it, the context line runs vertically down the rail, naming the active dataset (`მონაცემები · ბიუჯეტი`, or the Economy / Business / Housing and construction / Inflation / Money and banks / Unemployment / Wages / Living standards / Health and social protection / Education / Crime and justice / Trade / Energy and food / Demography equivalent), mono 9.5px, `ink-fg-faint`, 0.1em, via `writing-mode: vertical-rl` plus `rotate(180deg)` so it reads **bottom-to-top**. It carries the same two facts the expanded overline and active row carry, which is why the section list can disappear without losing orientation.
+- Below it, the context line runs vertically down the rail, naming the active dataset (`მონაცემები · ბიუჯეტი`, or the Economy / Business / Housing and construction / Inflation / Money and banks / Unemployment / Wages / Living standards / Health and social protection / Education / Crime and justice / Trade / Energy and food / Transport / Demography equivalent), mono 9.5px, `ink-fg-faint`, 0.1em, via `writing-mode: vertical-rl` plus `rotate(180deg)` so it reads **bottom-to-top**. It carries the same two facts the expanded overline and active row carry, which is why the section list can disappear without losing orientation.
 - Beneath it, the compact language switch; at the foot, a Lucide `House` icon is the collapsed `← მთავარი` link, with a 26×26 hit area, `aria-label="მთავარი"`, and a `title` tooltip. The collapsed rail remains logo-free.
 - **Sections are not reachable while collapsed** — the list is unmounted, not hidden. A 52px rail cannot carry Georgian section names, and reducing them to invented initials would trade one extra click for three ambiguous glyphs. Collapse is a reading posture: it hands the width back to the data and keeps only orientation and escape.
 
@@ -1045,7 +1052,7 @@ The Georgia page's total and function rows are dedicated `country.georgia` facts
 
 Approved visual and behavioral specification: `docs/superpowers/specs/2026-08-11-methodology-portal-design.md`. The approved preview (variant D, Editorial Fieldbook) was not kept in the repository.
 
-The public structure is `/methodology` plus live category pages for expenditure, revenue, municipalities, Government Debt, GDP, national economic sectors, regional economies, inflation, money and banks, unemployment, wages, household income and spending, poverty and inequality, health, education, crime and justice, housing and construction, energy and food, trade, external flows, and demography. Methodology is not a top-header item. Discovery comes from the numbered landing methodology section and the retained site-footer link; since every `/explorer` route renders `SiteFooter` too (§6.7), the footer path is available on the data surfaces as well. Explorer and about pages do not repeat methodology promotions, contextual links, or long introductory SEO copy inside their analytical content: the footer link sits below the content rather than inside it.
+The public structure is `/methodology` plus live category pages for expenditure, revenue, municipalities, Government Debt, GDP, national economic sectors, regional economies, inflation, money and banks, unemployment, wages, household income and spending, poverty and inequality, health, education, crime and justice, housing and construction, energy and food, transport, trade, external flows, and demography. Methodology is not a top-header item. Discovery comes from the numbered landing methodology section and the retained site-footer link; since every `/explorer` route renders `SiteFooter` too (§6.7), the footer path is available on the data surfaces as well. Explorer and about pages do not repeat methodology promotions, contextual links, or long introductory SEO copy inside their analytical content: the footer link sits below the content rather than inside it.
 
 Methodology surfaces reuse this document's paper, ink-rule, typography, radius, shadow, and accessibility contracts. The hub uses rule-separated dataset rows rather than cards; below 768px each row's arrow shares the title line. Category pages use layered, curated public explanation, an explicit official-versus-Fiscal.ge disclosure, sticky contents, a four-step source-to-data journey, and a searchable archive of untouched upstream originals. Below 1100px, where the contents list is not sticky, a small `სარჩევი ↑` / `Contents ↑` link — a bordered paper button with no shadow — stays at the bottom of the screen while the article scrolls and jumps back to the list. Complete canonical decisions and retrieval/hash provenance remain internal records and downloadable manifest integrity data. Future datasets are non-clickable `მალე` markers only; none is listed today.
 
@@ -1053,7 +1060,7 @@ The approved public visibility is dataset-specific: expenditure hides its histor
 
 ## 22. Not-found Recovery
 
-Unknown HTML routes retain their HTTP 404 status and use a minimal editorial recovery surface. It uses the existing paper, ink, body, muted, tint, and accent-focus tokens: a compact Fiscal.ge identifier, one Georgian H1, a short explanation, and ordinary visible links to the homepage, the sixteen dataset hubs in sidebar order and methodology; the English page mirrors them. Below 768px it has no top spacer. It does not load data, reuse the application shell, add an illustration, or introduce a separate visual system.
+Unknown HTML routes retain their HTTP 404 status and use a minimal editorial recovery surface. It uses the existing paper, ink, body, muted, tint, and accent-focus tokens: a compact Fiscal.ge identifier, one Georgian H1, a short explanation, and ordinary visible links to the homepage, the seventeen dataset hubs in sidebar order and methodology; the English page mirrors them. Below 768px it has no top spacer. It does not load data, reuse the application shell, add an illustration, or introduce a separate visual system.
 
 ## 23. Mission Surface (მიზანი)
 
@@ -1514,3 +1521,20 @@ Schools and Kindergartens reuse the Population page set (§29): the same index, 
 **State.** Chart | Table, years and selection (including an empty one) live in the URL hash through the shared hook `components/explorer-shell/use-hash-state.ts`, and survive reloads and language switches. Every index, topic and place page carries one Dataset JSON-LD node (a place page as a slice of its index); a school year runs into the next calendar year, so `2005/06–2025/26` covers 2005–2026.
 
 Only annual data is shown, Excel keeps the stored units and one number format per file with blank missing cells, and the pages state no causes. The authoritative scope is `Project_Definition.md` §2O; bounded decisions are in `docs/superpowers/specs/2026-10-16-education-design.md`.
+
+## 40. Transport surfaces
+
+The Transport hub at `/explorer/transport` reuses the budget hub cards: Vehicles, Vehicle age, Passengers, Freight and Regions, in that order. The first four carry an `ink` sparkline of passenger cars, passenger cars over 10 years old, all passenger-km and all tonne-km, the latest figure and their coverage from served facts; Regions shows only its map years. The sidebar lists the five pages under `ტრანსპორტი` / Transport, directly after Energy and food.
+
+The four topic pages and the area pages reuse the Housing workspace (§37): the latest-value line, the editorial line chart, table, RangeStrip, right-hand series panel and three-sheet Excel action. Under the H1 is only the latest-value line (§17), in the `measure · year: value` form (`Passenger cars · 2025: 1.65 million`; passenger-km and tonne-km in billions, registered vehicles in thousands), and the only line under the chart is the source note. No transport page has a tab row or a measure switch; every row is listed from the start under a heading that names its unit, and the chart shows one unit at a time (§37, "One unit at a time").
+
+- **Vehicles** lists `Vehicles by type · thousand` (Passenger cars, selected; Buses and minibuses; Trucks; Special vehicles) and one fuel heading per type (`Passenger cars by fuel · thousand`, …). **Vehicle age** lists one heading per type with Geostat's cumulative age rows (Up to 2, Up to 5, Up to 10, Over 10 years, Unknown); Passenger cars over 10 years is selected. Neither page has a reference row. Outside the list a fuel or age row carries its heading's name (`Diesel — Trucks by fuel`).
+- **Passengers** lists `Passenger-km · million` (All transport, selected, ink; Road; Rail; Metro; Air; Sea), `Passenger-km per person` (All transport, ink) and `Passengers carried · thousand`. **Freight** lists `Tonne-km · million` (All transport, selected, ink; Road; Rail; Air; Sea) and `Goods carried · thousand tonnes`.
+- **Regions** is an index, as the Housing Regions index is: the latest-value line, then the shared `RegionIndex` map and ranked list of the 11 regions coloured by the latest year's registered vehicles, with Georgia as the list's first, unranked row. There is no map switch and no chart workspace.
+- **Area pages** (`/explorer/transport/regions/[id]`, Georgia and the 11 regions, 12 per locale) follow the Housing area pages: `ტრანსპორტი — [გურია ▾]` / `Transport — [Guria ▾]` with the `RegionPicker` and previous/next links, the latest-value line with the area's name as its note, and five headings: `Registered vehicles · thousand` (All motor vehicles, selected, ink, then the four types), `By fuel`, `By age` (separate bands), `By owner` and `Roads · km` (All roads, ink, then international, secondary and local). Links to another area keep the selection, moved to that area.
+
+**Series colours.** References are ink. A vehicle type wears one colour (palette positions 0–3) and a fuel one (positions 4–11) on every page and heading, so a type and a fuel charted together never share a colour; an age band wears one colour under every type. Other rows take their colour by position.
+
+**Units.** Thousand vehicles, passengers and tonnes, million passenger-km and tonne-km, and road km to one decimal; passenger-km per person in whole km. Axis ticks and table cells carry numbers only and the chart panel names the unit. **State** lives in the URL hash as on Housing.
+
+Only yearly data is shown; Geostat's 2026 and quarterly figures are not served, and the pages state no causes. The methodology page says that H-4's age rows are cumulative while the regional bands are separate, that road figures from 2005 are estimates, that airport and airline figures overlap, and that Georgia's register includes Abkhazia and region unknown. The authoritative scope is `Project_Definition.md` §2P; bounded decisions are in `docs/superpowers/specs/2026-10-20-transport-design.md`.

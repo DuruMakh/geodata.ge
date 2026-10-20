@@ -126,6 +126,7 @@ Budget and GDP data are annual, so it does not provide sub-annual or live budget
 - [Trade methodology](https://fiscal.ge/methodology/trade) — FOB exports, CIF imports, partner and product identities, re-exports and original files.
 - [External flows methodology](https://fiscal.ge/methodology/external-flows) — money transfers, BPM6 balance of payments, Geostat FDI and original files.
 - [Energy and food methodology](https://fiscal.ge/methodology/energy-food) — Geostat's energy balance and food balance sheets, units and original files.
+- [Transport methodology](https://fiscal.ge/methodology/transport) — Geostat's vehicle register, passenger-km and tonne-km (road figures from 2005 are estimates), passengers and goods carried, registered vehicles and roads by region, gaps and original files.
 - [Demography methodology](https://fiscal.ge/methodology/demography) — Geostat population and density, the 1 January 2025 census re-base, definitions and original files.
 
 ## Bulk data files

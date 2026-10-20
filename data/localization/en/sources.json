@@ -2575,5 +2575,105 @@
       "reviewedAt": "2026-10-16"
     },
     "derivation": null
+  },
+  "source.geostat_transport_passenger_demand": {
+    "name": { "text": "Passenger transport demand by mode (table H-1)", "reviewedAt": "2026-10-20" },
+    "derivation": null
+  },
+  "source.geostat_transport_freight_demand": {
+    "name": { "text": "Freight transport demand by mode (table H-2)", "reviewedAt": "2026-10-20" },
+    "derivation": null
+  },
+  "source.geostat_transport_fleet_fuel": {
+    "name": { "text": "Road motor vehicle fleet by fuel type (table H-3)", "reviewedAt": "2026-10-20" },
+    "derivation": null
+  },
+  "source.geostat_transport_fleet_age": {
+    "name": { "text": "Road motor vehicle fleet by age (table H-4)", "reviewedAt": "2026-10-20" },
+    "derivation": null
+  },
+  "source.geostat_transport_rail_turnover": {
+    "name": { "text": "Railway freight turnover", "reviewedAt": "2026-10-20" },
+    "derivation": null
+  },
+  "source.geostat_transport_rail_goods": {
+    "name": { "text": "Goods transported by railway", "reviewedAt": "2026-10-20" },
+    "derivation": null
+  },
+  "source.geostat_transport_rail_passengers": {
+    "name": { "text": "Passengers transported by railway", "reviewedAt": "2026-10-20" },
+    "derivation": null
+  },
+  "source.geostat_transport_rail_infrastructure": {
+    "name": { "text": "Railway infrastructure", "reviewedAt": "2026-10-20" },
+    "derivation": null
+  },
+  "source.geostat_transport_metro": {
+    "name": { "text": "Passengers transported by metro", "reviewedAt": "2026-10-20" },
+    "derivation": null
+  },
+  "source.geostat_transport_rail_regions": {
+    "name": { "text": "Goods transported by railway by region of loading and unloading", "reviewedAt": "2026-10-20" },
+    "derivation": null
+  },
+  "source.geostat_transport_airlines": {
+    "name": { "text": "Airlines registered in Georgia", "reviewedAt": "2026-10-20" },
+    "derivation": null
+  },
+  "source.geostat_transport_airports": {
+    "name": { "text": "Airports of Georgia", "reviewedAt": "2026-10-20" },
+    "derivation": null
+  },
+  "source.geostat_transport_air_infrastructure": {
+    "name": { "text": "Air transport infrastructure, 2025", "reviewedAt": "2026-10-20" },
+    "derivation": null
+  },
+  "source.geostat_transport_roads": {
+    "name": { "text": "Length of common use roads by region", "reviewedAt": "2026-10-20" },
+    "derivation": null
+  },
+  "source.geostat_transport_taxi_licences": {
+    "name": { "text": "Taxi licences in Tbilisi", "reviewedAt": "2026-10-20" },
+    "derivation": null
+  },
+  "source.geostat_transport_registered": {
+    "name": { "text": "Registered vehicles by region", "reviewedAt": "2026-10-20" },
+    "derivation": null
+  },
+  "source.geostat_transport_technical_inspections": {
+    "name": { "text": "Technical inspections, 2021-2025", "reviewedAt": "2026-10-20" },
+    "derivation": null
+  },
+  "source.geostat_transport_sea_passengers": {
+    "name": { "text": "Passengers carried in sea ports and terminals", "reviewedAt": "2026-10-20" },
+    "derivation": null
+  },
+  "source.geostat_transport_sea_ships": {
+    "name": { "text": "Ships entering sea ports and terminals", "reviewedAt": "2026-10-20" },
+    "derivation": null
+  },
+  "source.geostat_transport_sea_freight": {
+    "name": { "text": "Freight carried in sea ports and terminals", "reviewedAt": "2026-10-20" },
+    "derivation": null
+  },
+  "source.geostat_transport_environment_page": {
+    "name": { "text": "Environmental indicators (source page capture)", "reviewedAt": "2026-10-20" },
+    "derivation": null
+  },
+  "source.geostat_transport_rail_page": {
+    "name": { "text": "Railway transport (source page capture)", "reviewedAt": "2026-10-20" },
+    "derivation": null
+  },
+  "source.geostat_transport_air_page": {
+    "name": { "text": "Air transport (source page capture)", "reviewedAt": "2026-10-20" },
+    "derivation": null
+  },
+  "source.geostat_transport_road_page": {
+    "name": { "text": "Road transport (source page capture)", "reviewedAt": "2026-10-20" },
+    "derivation": null
+  },
+  "source.geostat_transport_sea_page": {
+    "name": { "text": "Maritime transport (source page capture)", "reviewedAt": "2026-10-20" },
+    "derivation": null
   }
 }

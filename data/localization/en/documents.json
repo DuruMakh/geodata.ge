@@ -6862,5 +6862,380 @@
       "reviewedAt": "2026-10-16"
     },
     "documentLanguage": "en"
+  },
+  "geostat_transport_passenger_demand": {
+    "title": {
+      "text": "Passenger transport demand by mode (table H-1)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_transport_freight_demand": {
+    "title": {
+      "text": "Freight transport demand by mode (table H-2)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_transport_fleet_fuel": {
+    "title": {
+      "text": "Road motor vehicle fleet by fuel type (table H-3)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_transport_fleet_age": {
+    "title": {
+      "text": "Road motor vehicle fleet by age (table H-4)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_transport_rail_turnover": {
+    "title": {
+      "text": "Railway freight turnover",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_transport_rail_goods": {
+    "title": {
+      "text": "Goods transported by railway",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_transport_rail_passengers": {
+    "title": {
+      "text": "Passengers transported by railway",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_transport_rail_infrastructure": {
+    "title": {
+      "text": "Railway infrastructure",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_transport_metro": {
+    "title": {
+      "text": "Passengers transported by metro",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_transport_rail_regions": {
+    "title": {
+      "text": "Goods transported by railway by region of loading and unloading",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_transport_airlines": {
+    "title": {
+      "text": "Airlines registered in Georgia",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_transport_airports": {
+    "title": {
+      "text": "Airports of Georgia",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_transport_air_infrastructure": {
+    "title": {
+      "text": "Air transport infrastructure, 2025",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_transport_roads": {
+    "title": {
+      "text": "Length of common use roads by region",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_transport_taxi_licences": {
+    "title": {
+      "text": "Taxi licences in Tbilisi",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_transport_registered": {
+    "title": {
+      "text": "Registered vehicles by region",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_transport_technical_inspections": {
+    "title": {
+      "text": "Technical inspections, 2021-2025",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_transport_sea_passengers": {
+    "title": {
+      "text": "Passengers carried in sea ports and terminals",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_transport_sea_ships": {
+    "title": {
+      "text": "Ships entering sea ports and terminals",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_transport_sea_freight": {
+    "title": {
+      "text": "Freight carried in sea ports and terminals",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_transport_environment_page": {
+    "title": {
+      "text": "Environmental indicators (source page capture)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_transport_rail_page": {
+    "title": {
+      "text": "Railway transport (source page capture)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_transport_air_page": {
+    "title": {
+      "text": "Air transport (source page capture)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_transport_road_page": {
+    "title": {
+      "text": "Road transport (source page capture)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_transport_sea_page": {
+    "title": {
+      "text": "Maritime transport (source page capture)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
   }
 }
