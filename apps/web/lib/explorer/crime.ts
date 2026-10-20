@@ -44,6 +44,8 @@ export type CrimePopulation = readonly { year: number; persons: number }[];
 export type CrimeMeasureFact = ClientCrimeFact & { decimals: number; calculated: boolean };
 
 const PER_100K = 100000;
+/** A count per `per` residents, rounded to 15 digits to remove the binary noise. Shared with Social protection's shares of residents. */
+export const perPopulation = (count: number, persons: number, per: number): number => Number((count / persons * per).toPrecision(15));
 /**
  * The facts a measure shows. Counts are the published whole numbers. The per-100,000 rate is the count divided by the
  * population of 1 January of the same year, times 100,000, shown with one decimal and marked calculated; a year
@@ -54,7 +56,7 @@ export function crimeMeasureFacts(measure: CrimeMeasure, facts: readonly ClientC
   const personsByYear = new Map(population.map(p => [p.year, p.persons]));
   return facts.flatMap(f => {
     const persons = personsByYear.get(f.year);
-    return persons === undefined ? [] : [{ ...f, value: Number((f.value / persons * PER_100K).toPrecision(15)), decimals: 1, calculated: true }];
+    return persons === undefined ? [] : [{ ...f, value: perPopulation(f.value, persons, PER_100K), decimals: 1, calculated: true }];
   });
 }
 
