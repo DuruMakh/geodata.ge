@@ -1,7 +1,7 @@
 # Fiscal.ge Design System — Editorial
 
 Version: 4.1
-Last updated: 2026-10-16
+Last updated: 2026-10-20
 Status: Production visual system for Fiscal.ge
 Scope: Explorer product UI (the seventeen dataset hubs of §6.7), charts, tables, controls, export surfaces, responsive behavior, and future pages that reuse the Budget Explorer shell.
 
@@ -28,7 +28,7 @@ Superseded and must not appear in production:
 
 Fiscal.ge is a Georgian-first explorer of reviewed annual public-finance and economy data in seventeen dataset hubs (§6.7), plus monthly national inflation. It is not a broad public-data catalog. `Project_Definition.md` §2 owns scope; this section only frames the visual system.
 
-Included: the budget hub, multi-year explorer (line + table) with fields/ministries grouping, single-year analysis view, the one-chart Government Debt explorer, the one-series general-government deficit explorer, the Economy hub (GDP overview, national sectors, regional economies), the Business hub (§35), the Housing hub (§37), the Inflation hub (overview, categories, products, cities), the Money and banks hub (§34), the Unemployment hub (§27), the Wages hub (§31), the Living standards hub (§32), the Health hub (§36), the Education hub (§39), the Crime and justice hub (§38), the Trade hub (overview, trading partners, products, domestic exports, services trade; §28), the External flows hub (§30), the Energy and food hub (§33), the Demography hub (population, age and sex, migration, births and deaths; §29), methodology pages, the `/about` mission page (§23), the `/connect` page, Excel workbook export, Georgian-first UI with an English mirror (§2.2), minimal public source label, internal provenance metadata.
+Included: the budget hub, multi-year explorer (line + table) with fields/ministries grouping, single-year analysis view, the one-chart Government Debt explorer, the one-series general-government deficit explorer, the Economy hub (GDP overview, national sectors, regional economies), the Business hub (§35), the Housing hub (§37), the Inflation hub (overview, categories, products, cities), the Money and banks hub (§34), the Unemployment hub (§27), the Wages hub (§31), the Living standards hub (§32), the Health hub (§36), the Education hub (§39), the Science and culture hub (§40), the Crime and justice hub (§38), the Trade hub (overview, trading partners, products, domestic exports, services trade; §28), the External flows hub (§30), the Energy and food hub (§33), the Demography hub (population, age and sex, migration, births and deaths; §29), methodology pages, the `/about` mission page (§23), the `/connect` page, Excel workbook export, Georgian-first UI with an English mirror (§2.2), minimal public source label, internal provenance metadata.
 
 Excluded: data catalog, capital explorer, admin UI, a public API beyond the read-only MCP and static publications, uploads, sub-annual data other than inflation (§25) and the one latest 2026 amount on Foreign debt and Reserves (§30.3, §30.4), automated document extraction, clickable drilldown pages (series selection in the explorer is not drilldown). The Government Debt explorer does not alter the existing `spending.debt_service` expenditure series.
 
