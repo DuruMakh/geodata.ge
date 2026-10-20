@@ -1,0 +1,45 @@
+{
+  "status": "passed",
+  "reader": "SheetJS 0.20.3",
+  "workbooks": 6,
+  "indicators": 160,
+  "indicators_without_observations": [
+    "labour.hours.men.sector_t"
+  ],
+  "observations": 1014,
+  "cells_found_again_from_labels": 1014,
+  "source_cells_matched": 1014,
+  "stored_values_matched": 1014,
+  "published_values_matched": 1014,
+  "units_matched": 1014,
+  "basis_and_status_matched": 1014,
+  "cross_checks": [
+    "the 19 industry rows of each jobs group = its total, every year (tolerance 0.000001)",
+    "jobs of women + men = jobs of all persons, 2020-2025 (tolerance 0.000001)",
+    "hours table 10 all-persons block = table 09 all-persons block, 17 rows x 6 years (tolerance 0.000000001, equal published values)"
+  ],
+  "georgian_copies": {
+    "pairs": 6,
+    "numeric_cells_compared": 1905,
+    "differences": 0
+  },
+  "manifest_files_matched": 14,
+  "negative_controls": {
+    "altered_value_detected": true,
+    "altered_published_value_detected": true,
+    "omitted_row_detected": true,
+    "omitted_zero_detected": true,
+    "shifted_year_detected": true,
+    "wrong_cell_detected": true,
+    "wrong_sheet_detected": true,
+    "wrong_unit_detected": true,
+    "wrong_status_detected": true,
+    "extra_2026_row_detected": true,
+    "placeholder_served_detected": true,
+    "jobs_sum_break_detected": true,
+    "jobs_total_break_detected": true,
+    "jobs_sex_break_detected": true,
+    "hours_block_break_detected": true
+  },
+  "failures": []
+}
