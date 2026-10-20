@@ -139,6 +139,8 @@ test("the topic Excel download is a workbook linking the archived Geostat tables
   await page.goto("/explorer/internet/online");
   await ready(page);
   await expect(page.getByTestId("internet-latest")).toContainText("38.6");
+  // The share counts internet users, not everyone.
+  await expect(page.getByTestId("internet-latest")).toContainText("მომხმარებლების");
   const promise = page.waitForEvent("download");
   await page.getByTestId("internet-excel-download").click();
   const download = await promise;

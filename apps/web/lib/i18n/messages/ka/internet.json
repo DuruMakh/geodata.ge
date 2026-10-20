@@ -58,7 +58,7 @@
   "internet.series.area.computer": "კომპიუტერით",
   "internet.unitPercent": "%",
   "internet.latest.users": "{year}: ინტერნეტი გამოიყენა {value}-მა",
-  "internet.latest.online": "{year}: ინტერნეტით იყიდა {value}-მა",
+  "internet.latest.online": "{year}: მომხმარებლების {value}-მა იყიდა ონლაინ",
   "internet.latest.devices": "{year}: {value} ფლობს მობილურ ტელეფონს",
   "internet.latest.homes": "{year}: შინამეურნეობების {value}-ს აქვს ინტერნეტი",
   "internet.mapLabel": "ინტერნეტით უზრუნველყოფილი შინამეურნეობები",
