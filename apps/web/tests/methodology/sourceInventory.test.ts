@@ -87,6 +87,18 @@ describe("original-source inventory", () => {
     expect(rows.every((row) => row.path.startsWith("docs/Raw Data/Business/geostat-business-annual/official/"))).toBe(true);
   });
 
+  it("inventories the 36 internet originals: the English and Georgian tables and both page captures", async () => {
+    const rows = await expectedOriginalSourcePaths(REPOSITORY_ROOT, "internet");
+    expect(rows).toHaveLength(36);
+    expect(rows.every((row) => row.path.startsWith("docs/Raw Data/Internet/geostat-ict-households-annual/official/"))).toBe(true);
+    expect(rows.map((row) => row.path)).toEqual(expect.arrayContaining([
+      "docs/Raw Data/Internet/geostat-ict-households-annual/official/01_Share_of_households_with_internet_access.xlsx",
+      "docs/Raw Data/Internet/geostat-ict-households-annual/official/ka/01_internetit_uzrunvelyopili_shinameurneobebi.xlsx",
+      "docs/Raw Data/Internet/geostat-ict-households-annual/official/geostat-category-106-2026-10-20.html",
+      "docs/Raw Data/Internet/geostat-ict-households-annual/official/ka/geostat-category-106-ka-2026-10-20.html",
+    ]));
+  });
+
   it("inventories the 22 crime and justice originals: the English and Georgian workbooks and both page captures", async () => {
     const rows = await expectedOriginalSourcePaths(REPOSITORY_ROOT, "crime");
     expect(rows).toHaveLength(22);

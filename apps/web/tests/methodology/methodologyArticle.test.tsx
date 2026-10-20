@@ -128,6 +128,7 @@ describe("methodology footer attribution", () => {
     ["housing", "Geostat"],
     ["health", "Geostat"],
     ["crime", "Geostat"],
+    ["internet", "Geostat"],
     ["education", "Geostat"],
   ])("uses %s sources and leaves the review date with the article", async (dataset, source) => {
     const { renderMethodologyArticle } = await import("../../lib/pages/methodology-article");
@@ -192,6 +193,23 @@ describe("crime methodology", () => {
     expect(markup).toContain("https://geostat.ge/media/76844/Unified-Report-on-Criminal-Justice-Statistics-%28Dec%2C-2025%29.pdf");
     expect(markup).not.toContain("/downloads/methodology/crime/files/unified-report");
     expect(markup).not.toContain("geostat.ge/media/81890");
+  });
+});
+
+describe("internet methodology", () => {
+  it.each([
+    ["ka", "ინტერნეტი და ტექნოლოგიები", ["2020 წლიდან გაიზარდა გამოკვლევის შერჩევის ზომა.", "2016-2019 წლები მოიცავს იმერეთის, რაჭა-ლეჩხუმისა და ქვემო სვანეთის რეგიონებს.", "ივნისში ან ივლისში", "მიზეზებს არ ასახელებს"]],
+    ["en", "Internet and technology", ["Survey sample size has been increased since 2020.", "The data of 2016-2019 includes Imereti, Racha-Lechkhumi and Kvemo Svaneti regions.", "in June or July", "state no causes"]],
+  ] as const)("renders the %s article with its 36 archived originals, the survey, sample and Imereti notes and Dataset markup", async (locale, title, statements) => {
+    const { renderMethodologyArticle } = await import("../../lib/pages/methodology-article");
+    const markup = renderToStaticMarkup(await renderMethodologyArticle(locale, { params: Promise.resolve({ dataset: "internet" }) }));
+    expect(markup).toContain(title);
+    expect(markup).toContain("2016–2026");
+    expect(markup).toContain('"@type":"Dataset"');
+    for (const statement of statements) expect(markup).toContain(statement);
+    for (const file of ["01_share_of_households_with_internet_access.xlsx", "01_internetit_uzrunvelyopili_shinameurneobebi.xlsx", "17_ict_skills.xlsx", "geostat-category-106-2026-10-20.html.txt", "geostat-category-106-ka-2026-10-20.html.txt"]) {
+      expect(markup).toContain(`/downloads/methodology/internet/files/${file}`);
+    }
   });
 });
 

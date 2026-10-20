@@ -6862,5 +6862,545 @@
       "reviewedAt": "2026-10-16"
     },
     "documentLanguage": "en"
+  },
+  "geostat_ict_homes_internet": {
+    "title": {
+      "text": "Share of households with internet access (table 01)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_ict_homes_internet_ka": {
+    "title": {
+      "text": "Share of households with internet access (table 01), Georgian edition",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_ict_last_internet_use": {
+    "title": {
+      "text": "Distribution of population aged 6 and older by last internet use (table 02)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_ict_last_internet_use_ka": {
+    "title": {
+      "text": "Distribution of population aged 6 and older by last internet use (table 02), Georgian edition",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_ict_purposes": {
+    "title": {
+      "text": "Share of population aged 15 and older by purposes of internet use (table 03)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_ict_purposes_ka": {
+    "title": {
+      "text": "Share of population aged 15 and older by purposes of internet use (table 03), Georgian edition",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_ict_internet_frequency": {
+    "title": {
+      "text": "Frequency of internet use (table 04)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_ict_internet_frequency_ka": {
+    "title": {
+      "text": "Frequency of internet use (table 04), Georgian edition",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_ict_ecommerce": {
+    "title": {
+      "text": "E-commerce (table 05)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_ict_ecommerce_ka": {
+    "title": {
+      "text": "E-commerce (table 05), Georgian edition",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_ict_mobile_internet": {
+    "title": {
+      "text": "Using mobile devices to access the internet (table 06)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_ict_mobile_internet_ka": {
+    "title": {
+      "text": "Using mobile devices to access the internet (table 06), Georgian edition",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_ict_internet_activities": {
+    "title": {
+      "text": "Internet related activities (table 07)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_ict_internet_activities_ka": {
+    "title": {
+      "text": "Internet related activities (table 07), Georgian edition",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_ict_homes_computer": {
+    "title": {
+      "text": "Share of households with computer access (table 08)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_ict_homes_computer_ka": {
+    "title": {
+      "text": "Share of households with computer access (table 08), Georgian edition",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_ict_last_computer_use": {
+    "title": {
+      "text": "Distribution of population aged 6 and older by last computer use (table 09)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_ict_last_computer_use_ka": {
+    "title": {
+      "text": "Distribution of population aged 6 and older by last computer use (table 09), Georgian edition",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_ict_computer_frequency": {
+    "title": {
+      "text": "Frequency of computer use (table 10)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_ict_computer_frequency_ka": {
+    "title": {
+      "text": "Frequency of computer use (table 10), Georgian edition",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_ict_software_activities": {
+    "title": {
+      "text": "Software related activities (table 11)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_ict_software_activities_ka": {
+    "title": {
+      "text": "Software related activities (table 11), Georgian edition",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_ict_own_mobile": {
+    "title": {
+      "text": "Share of population aged 6 and older who own mobile phone (table 12)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_ict_own_mobile_ka": {
+    "title": {
+      "text": "Share of population aged 6 and older who own mobile phone (table 12), Georgian edition",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_ict_use_mobile": {
+    "title": {
+      "text": "Share of population aged 6 and older who uses mobile phone (table 13)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_ict_use_mobile_ka": {
+    "title": {
+      "text": "Share of population aged 6 and older who uses mobile phone (table 13), Georgian edition",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_ict_own_smartphone": {
+    "title": {
+      "text": "Share of population aged 6 and older who own smartphone (table 14)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_ict_own_smartphone_ka": {
+    "title": {
+      "text": "Share of population aged 6 and older who own smartphone (table 14), Georgian edition",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_ict_use_smartphone": {
+    "title": {
+      "text": "Share of population aged 6 and older who uses smartphone (table 15)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_ict_use_smartphone_ka": {
+    "title": {
+      "text": "Share of population aged 6 and older who uses smartphone (table 15), Georgian edition",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_ict_public_services": {
+    "title": {
+      "text": "Interaction with public authorities or public services over the internet (table 16)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_ict_public_services_ka": {
+    "title": {
+      "text": "Interaction with public authorities or public services over the internet (table 16), Georgian edition",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_ict_skills": {
+    "title": {
+      "text": "ICT skills (table 17)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_ict_skills_ka": {
+    "title": {
+      "text": "ICT skills (table 17), Georgian edition",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_ict_page": {
+    "title": {
+      "text": "ICT usage in households (source page capture)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_ict_page_ka": {
+    "title": {
+      "text": "ICT usage in households (Georgian source page capture)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
   }
 }

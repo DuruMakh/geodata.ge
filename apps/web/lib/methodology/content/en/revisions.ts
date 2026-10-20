@@ -20,6 +20,7 @@ export const METHODOLOGY_TRANSLATION_REVIEWED_AT: Readonly<Record<MethodologyDat
   health: "2026-10-15",
   education: "2026-10-16",
   crime: "2026-10-16",
+  internet: "2026-10-20",
   "energy-food": "2026-10-11",
   money: "2026-10-11",
   business: "2026-10-15",
