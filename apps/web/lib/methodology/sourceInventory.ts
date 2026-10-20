@@ -60,7 +60,7 @@ const inventoryRules = {
   "energy-food": [{ root: "docs/Raw Data/EnergyFood/geostat-energy-food-annual/official", include: () => true }],
   // The healthcare and deaths workbooks (official/deaths/) and both page captures; served and archived-only alike.
   health: [{ root: "docs/Raw Data/Health/geostat-health-annual/official", include: () => true }],
-  // SSA's topic page captures and link lists (never its 1,027 workbooks, 217 MB; nor the pre-2012 list, which no served
+  // SSA's topic page captures and link lists (never its 1,027 workbooks, 206 MB; nor the pre-2012 list, which no served
   // value uses), and the Geostat population, price index and GDP workbooks the calculated rows divide by.
   "social-protection": [
     { root: "docs/Raw Data/Social/ssa-statistics/official/pages", include: (candidatePath: string) => !candidatePath.endsWith("/ssa-links-pre2012.json") },

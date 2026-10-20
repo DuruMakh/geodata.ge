@@ -327,7 +327,7 @@ The methodology page also notes these points without drawing them:
 
 ## 11. Sources, Excel and methodology
 
-- **Source archive.** SSA and Geostat files are listed in a new source archive, `data/methodology/source-archives/social-protection.csv`, pointing at the SSA topic pages. The methodology bundle must not pull the 219 MB of raw workbooks (the PR #170 rule).
+- **Source archive.** SSA and Geostat files are listed in a new source archive, `data/methodology/source-archives/social-protection.csv`, pointing at the SSA topic pages. The methodology bundle must not pull the 206 MB of raw workbooks (the PR #170 rule).
 - **Excel.** It reuses the three-sheet writer (Summary, Data, Sources) in the reader's language, with the active heading's selected series and years.
   - It has explicit units, blank missing cells and validated source links.
   - A "calculated by fiscal.ge" note sits on the Summary sheet when any calculated series is included.

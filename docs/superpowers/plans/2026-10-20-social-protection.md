@@ -66,7 +66,7 @@ Social payments and Social package follow Education's topic pages (`components/e
   - Akhalgori and Upper Abkhazia are kept as `unit.akhalgori` and `unit.upper_abkhazia`, never drawn and given no page.
   - Codes 05, 42, 43, 46 and 64 stay excluded.
 - **IDs.** Stable lowercase ASCII IDs `social.{programme}.{measure}` plus a `geography_id` (`country.georgia`, `region.<id>`, a two-digit code, or `unit.*`).
-- **Files.** The canonical CSV is UTF-8 with BOM. The methodology bundle must not pull `docs/Raw Data/Social` (219 MB; PR #170 rule). No MCP tools or central publications, and the fact-query snapshot must not include SSA sources.
+- **Files.** The canonical CSV is UTF-8 with BOM. The methodology bundle must not pull `docs/Raw Data/Social` (206 MB; PR #170 rule). No MCP tools or central publications, and the fact-query snapshot must not include SSA sources.
 - **Review before pushing.**
   - Commit locally. Pushing the branch without a PR is allowed only for the Task 10 preview.
   - Full gates and the PR come only after Duru's OK (Task 12).

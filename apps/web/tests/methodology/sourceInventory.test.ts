@@ -95,7 +95,7 @@ describe("original-source inventory", () => {
       "docs/Raw Data/Inflation/geostat-cpi/2026-09/ka/cpi-index-2010.xlsx",
       "docs/Raw Data/Municipalities/geostat-population-regional-gdp/official/01-population-by-self-governed-unit.xlsx",
     ]);
-    // The PR #170 rule: the 219 MB of SSA workbooks stay out of the published archive and the methodology bundle.
+    // The PR #170 rule: the 206 MB of SSA workbooks stay out of the published archive and the methodology bundle.
     expect(rows.reduce(sumBytes, 0)).toBeLessThan(1_000_000);
     // Every SSA table the served facts cite is registered on one of these captures.
     const registry = parse(await readFile(path.join(REPOSITORY_ROOT, "data/sources/source-documents.csv"), "utf8"), { bom: true, columns: true }) as { source_id: string; source_url_or_file: string }[];

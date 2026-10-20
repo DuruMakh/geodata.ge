@@ -257,7 +257,7 @@ describe("social protection methodology", () => {
     // The SSA workbooks are never published: only the topic pages that list them (the PR #170 rule).
     expect(markup).not.toContain("/workbooks/");
     // The recorded source difference and the partial years are named with their figures.
-    expect(markup).toContain("56");
+    expect(markup).toContain(locale === "ka" ? "56 ლარით" : "56 GEL");
     expect(markup).toMatch(/2020[^.]*2021/);
   });
 });
