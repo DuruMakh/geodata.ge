@@ -1,6 +1,6 @@
 import { expect, test } from "vitest";
-import { changeUnitListSelection, keepOneUnit, listLatest, listLatestByHeading, parseUnitListHash, unitListCoverage } from "../../lib/explorer/unitList";
-import type { TopicState } from "../../lib/explorer/topicSeries";
+import { buildUnitListModel, changeUnitListSelection, keepOneUnit, listLatest, listLatestByHeading, parseUnitListHash, unitListCoverage } from "../../lib/explorer/unitList";
+import { topicCoverage, type TopicState } from "../../lib/explorer/topicSeries";
 
 // Two measures in one unit (persons), plus one count of another unit.
 const rows: [string, string, number[]][] = [
@@ -70,4 +70,33 @@ test("a list row shows its latest value up to the list's last year, and a headin
     "schools.total": { latest: undefined, headingYear: undefined },
   });
   expect(listLatestByHeading(valued, series, 2024)["graduates.total"]).toEqual({ latest: { value: 2024, year: 2024 }, headingYear: undefined });
+});
+
+test("a list's model leaves a missing year a gap, takes the selection's unit and merges each series' extra fields", () => {
+  const modelFacts = [
+    { indicatorId: "pupils.total", year: 2010, unit: "persons", value: 5, decimals: 0 },
+    { indicatorId: "pupils.total", year: 2012, unit: "persons", value: 7, decimals: 0 },
+    { indicatorId: "schools.total", year: 2010, unit: "count", value: 3, decimals: 1 },
+    { indicatorId: "schools.total", year: 2011, unit: "count", value: 4, decimals: 1 },
+  ];
+  const modelDefinitions = [{ id: "pupils.total", reference: false }, { id: "schools.total", reference: false }];
+  const build = (selectedIds: string[]) => buildUnitListModel({
+    definitions: modelDefinitions, facts: modelFacts, state: { mode: "line", range: { kind: "all" }, selectedIds },
+    coverage: topicCoverage([2010, 2011, 2012], "none"), color: (_, index) => `c${index}`, extra: definition => ({ stroke: `s:${definition.id}` }),
+  });
+
+  const model = build(["schools.total"]);
+  expect(model.years).toEqual([2010, 2011, 2012]);
+  // 2011 has no pupils fact and 2012 no schools fact: both are null, not 0.
+  expect(model.series[0].valuesByYear).toEqual({ 2010: 5, 2011: null, 2012: 7 });
+  expect(model.series[1].valuesByYear).toEqual({ 2010: 3, 2011: 4, 2012: null });
+  expect(model.series[1].endValue).toBeNull();
+  // The model's unit is the selection's, and each series keeps its own unit and decimals.
+  expect(model.unit).toBe("count");
+  expect(model.series.map(s => [s.unit, s.decimals])).toEqual([["persons", 0], ["count", 1]]);
+  expect(model.selected.map(s => s.id)).toEqual(["schools.total"]);
+  // `extra` is merged into every series next to the definition and the colour.
+  expect(model.series.map(s => [s.stroke, s.color])).toEqual([["s:pupils.total", "c0"], ["s:schools.total", "c1"]]);
+  // With nothing selected the unit is the list's first series'.
+  expect(build([]).unit).toBe("persons");
 });

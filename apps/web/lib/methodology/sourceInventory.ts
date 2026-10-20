@@ -63,6 +63,8 @@ const inventoryRules = {
   health: [{ root: "docs/Raw Data/Health/geostat-health-annual/official", include: () => true }],
   // The six served workbooks, the 35 archived-only ones and the four category page captures.
   education: [{ root: "docs/Raw Data/Education/geostat-education-annual/official", include: () => true }],
+  // The English workbooks, their Georgian versions (official/ka/, kept for the Georgian labels) and both page captures; served and archived-only alike.
+  "science-culture": [{ root: "docs/Raw Data/ScienceCulture/geostat-science-culture-annual/official", include: () => true }],
   // The English workbooks, their Georgian versions (kept for the Georgian labels) and both page captures; served and archived-only alike.
   crime: [{ root: "docs/Raw Data/Crime/geostat-crime-annual/official", include: () => true }],
   money: [{ root: "docs/Raw Data/Money/nbg-money-banks-annual/official", include: () => true }],

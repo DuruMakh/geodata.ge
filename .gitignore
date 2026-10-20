@@ -45,6 +45,7 @@ data/reports/*.json
 !data/reports/business-validation.json
 !data/reports/housing-validation.json
 !data/reports/education-validation.json
+!data/reports/science-culture-validation.json
 !data/reports/household-income-spending-validation.json
 !data/reports/gdp-expenditure-validation.json
 data/reports/*.txt

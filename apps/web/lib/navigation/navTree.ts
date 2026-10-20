@@ -9,6 +9,7 @@ import { MONEY_BANKS_SECTIONS } from "../explorer/moneyBanks";
 import { BUSINESS_HUB_PATH, BUSINESS_SECTIONS } from "../explorer/business";
 import { HOUSING_HUB_PATH, HOUSING_SECTIONS } from "../explorer/housing";
 import { EDUCATION_HUB_PATH, EDUCATION_SECTIONS } from "../explorer/education";
+import { SCIENCE_CULTURE_HUB_PATH, SCIENCE_CULTURE_SECTIONS } from "../explorer/scienceCulture";
 import { DEMOGRAPHY_HUB_PATH, LIVE_DEMOGRAPHY_PAGES } from "../explorer/demographyRoutes";
 
 /** A page under a hub: its sidebar row. `labelKey` is a `common` message. */
@@ -137,6 +138,14 @@ export const NAV_TREE: readonly NavHub[] = [
     sections: sectionRows(EDUCATION_SECTIONS, "education"),
   },
   {
+    href: SCIENCE_CULTURE_HUB_PATH,
+    labelKey: "common.scienceCulture",
+    railLabelKey: "common.dataScienceCulture",
+    testId: "science-culture-link",
+    spaced: true,
+    sections: sectionRows(SCIENCE_CULTURE_SECTIONS, "science-culture"),
+  },
+  {
     href: CRIME_HUB_PATH,
     labelKey: "common.crime",
     railLabelKey: "common.dataCrime",
@@ -241,6 +250,7 @@ const TREE_SOURCE_NOTES: Readonly<Record<string, string>> = {
   [LIVING_STANDARDS_HUB_PATH]: "common.geostatSourceNote",
   [HEALTH_HUB_PATH]: "common.geostatSourceNote",
   [EDUCATION_HUB_PATH]: "common.geostatSourceNote",
+  [SCIENCE_CULTURE_HUB_PATH]: "common.geostatSourceNote",
   [CRIME_HUB_PATH]: "common.geostatSourceNote",
   "/explorer/trade": "common.geostatSourceNote",
   "/explorer/external": "common.nbgSourceNote",
