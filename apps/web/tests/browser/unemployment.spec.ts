@@ -9,22 +9,26 @@ import { loadReviewedSourceManifest } from "../../lib/methodology/sourceManifest
 // Each locale once; page overflow at 390/768/1440 is in the layout pass of mobile-fit-charts.spec.ts,
 // and the regions index map and the 14 / 14 bulk check are in unemployment-regions.spec.ts.
 for (const [prefix, width] of [["", 390], ["/en", 1440]] as const) {
-  test(`four unemployment cards open the matching pages ${prefix || "ka"} at ${width}px`, async ({ page }) => {
+  test(`eight unemployment cards open the matching pages ${prefix || "ka"} at ${width}px`, async ({ page }) => {
     const errors: string[] = []; page.on("pageerror", error => errors.push(error.message));
     await page.setViewportSize({ width, height: 1000 });
-    const sections = ["overview", "regions", "age", "gender"], breakdowns = ["national", "region", "age", "sex"];
+    const sections = ["overview", "regions", "age", "gender", "industries", "hours", "informal", "young-people"], breakdowns = ["national", "region", "age", "sex"];
     // U28-19: English says "sex", as the Georgian "სქესი" and the demography pages do.
-    const titles = prefix ? ["Unemployment overview", "Regions", "Age groups", "Sex"] : ["უმუშევრობის მიმოხილვა", "რეგიონები", "ასაკობრივი ჯგუფები", "სქესი"];
+    const titles = prefix
+      ? ["Unemployment overview", "Regions", "Age groups", "Sex", "Jobs by industry", "Hours worked", "Informal jobs", "Young people not in work or study"]
+      : ["უმუშევრობის მიმოხილვა", "რეგიონები", "ასაკობრივი ჯგუფები", "სქესი", "დასაქმება დარგების მიხედვით", "სამუშაო საათები", "არაფორმალური დასაქმება", "ახალგაზრდები სწავლისა და დასაქმების გარეშე"];
     for (const [index, section] of sections.entries()) {
       await page.goto(`${prefix}/explorer/unemployment`);
       await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
       const cards = page.getByTestId("unemployment-hub").getByTestId("hub-card");
-      await expect(cards).toHaveCount(4);
+      await expect(cards).toHaveCount(8);
       await expect(cards.nth(index)).toHaveAttribute("href", `${prefix}/explorer/unemployment/${section}`);
       await expect(cards.nth(index).getByRole("heading")).toHaveText(titles[index]);
       await cards.nth(index).click();
       await expect(page).toHaveURL(new RegExp(`${prefix}/explorer/unemployment/${section}$`));
-      if (section !== "regions") await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-breakdown", breakdowns[index]);
+      // The four Labour Force Survey detail pages (05–08) have one list each, no breakdown.
+      if (index >= 4) await expect(page.getByTestId(`labour-${section}`)).toBeVisible();
+      else if (section !== "regions") await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-breakdown", breakdowns[index]);
       await expect(page.getByTestId("unemployment-headline")).toHaveCount(0);
       await expect(page.getByTestId("unemployment-breakdown")).toHaveCount(0);
       await expect(page.getByTestId("unemployment-composition")).toHaveCount(section === "overview" ? 1 : 0);
@@ -386,14 +390,17 @@ for (const prefix of ["", "/en"]) test(`new controls and year handles work with 
   await expect(page.getByTestId("explorer-table")).toBeVisible();
 });
 
-test("both methodology pages link nine byte-identical originals without a nonexistent bulk dataset", async ({ page, request }) => {
+test("both methodology pages link 23 byte-identical originals without a nonexistent bulk dataset", async ({ page, request }) => {
   const root = path.resolve(process.cwd(), "../..");
-  const manifest = JSON.parse(await readFile(path.join(root, "docs/Raw Data/Unemployment/geostat-labour-force-annual/source-manifest.json"), "utf8")) as { source_id: string; sha256: string }[];
+  // The nine survey originals and the 14 of the labour detail pages (12 workbooks, two page captures).
+  const manifest = (await Promise.all(["geostat-labour-force-annual", "geostat-labour-force-detail"].map(async (folder) =>
+    JSON.parse(await readFile(path.join(root, "docs/Raw Data/Unemployment", folder, "source-manifest.json"), "utf8")) as { source_id: string; sha256: string }[]))).flat();
+  expect(manifest).toHaveLength(23);
   // The site links each original under its reviewed public path (an archived web page is published as .html.txt).
   const publishedPath = new Map((await loadReviewedSourceManifest(root, "unemployment")).map((row) => [row.source_id, row.public_download_path]));
   for (const prefix of ["", "/en"]) {
     await page.goto(`${prefix}/methodology/unemployment`);
-    await expect(page.locator('a[href^="/downloads/methodology/unemployment/files/"]')).toHaveCount(9);
+    await expect(page.locator('a[href^="/downloads/methodology/unemployment/files/"]')).toHaveCount(23);
     await expect(page.getByTestId("processed-dataset-download")).toHaveCount(0);
   }
   for (const source of manifest) {

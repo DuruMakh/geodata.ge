@@ -104,7 +104,10 @@ async function createFixtureRepository() {
       await writeReviewedSource(repositoryRoot, "external-flows", "1996-2025", "docs/Raw Data/External/2026-10-10/official/geostat/FDI_Eng-countries.xlsx", "downloads/methodology/external-flows/files/fdi_eng-countries.xlsx", "external-fdi-countries"),
       await writeReviewedSource(repositoryRoot, "external-flows", "2006-2026", "docs/Raw Data/External/nbg-external-position/official/edbpm6eng.xlsx", "downloads/methodology/external-flows/files/edbpm6eng.xlsx", "external-debt"),
     ],
-    unemployment: [await writeReviewedSource(repositoryRoot, "unemployment", "2010-2025", "docs/Raw Data/Unemployment/geostat-labour-force-annual/official/lfs.xlsx", "downloads/methodology/unemployment/files/lfs.xlsx", "lfs")],
+    unemployment: [
+      await writeReviewedSource(repositoryRoot, "unemployment", "2010-2025", "docs/Raw Data/Unemployment/geostat-labour-force-annual/official/lfs.xlsx", "downloads/methodology/unemployment/files/lfs.xlsx", "lfs"),
+      await writeReviewedSource(repositoryRoot, "unemployment", "2017-2025", "docs/Raw Data/Unemployment/geostat-labour-force-detail/official/07-employment-by-branch-nace_eng.xlsx", "downloads/methodology/unemployment/files/07-employment-by-branch-nace_eng.xlsx", "lfs-jobs-industry"),
+    ],
     "economic-sectors": [await writeReviewedSource(repositoryRoot,"economic-sectors","2011-2025","docs/Raw Data/Economy/economic-sectors/sources/growth.xlsx","downloads/methodology/economic-sectors/files/growth.xlsx","sector-growth")],
     "regional-economies": [
       await writeReviewedSource(repositoryRoot, "regional-economies", "2010-2024", "docs/Raw Data/Economy/regional-economies/sources/regional-GDP-by-activities-ENG.xlsx", "downloads/methodology/regional-economies/files/regional-gdp-by-activities-eng.xlsx", "regional-activities"),
