@@ -6,7 +6,7 @@ import type { Municipality, MunicipalRegion } from "../../lib/data/municipal/typ
 import { loadNationalGdpFacts } from "../../lib/data/nationalGdp/importNationalGdp";
 import { SERVED_DATA_FILES, loadServedMunicipalData } from "../../lib/data/servedData";
 import { loadSocialBreaks, loadSocialFacts, toClientSocialFact } from "../../lib/data/social/importSocial";
-import type { ClientSocialFact, SocialSeriesBreak } from "../../lib/data/social/types";
+import { SOCIAL_AGE_BANDS, type ClientSocialFact, type SocialSeriesBreak } from "../../lib/data/social/types";
 import { projectGdpFact, type ClientNationalGdpFact } from "../../lib/explorer/clientData";
 import { INK } from "../../lib/explorer/colors";
 import { createWorkbookBuffer } from "../../lib/explorer/workbookWriter.client";
@@ -96,8 +96,10 @@ test("each page lists its rows under its headings", () => {
   ]);
   expect(pensions.filter(row => row.calculated).map(row => [row.id, row.calculated])).toEqual([["social.pension.recipients#share", "share"], ["social.pension.avg_monthly#real", "real"]]);
   const subsistence = socialPlaceSeries("subsistence-allowance");
-  expect(subsistence).toHaveLength(10);
-  expect(headings(subsistence)).toEqual(["families", "people", "share", "money", "average"]);
+  expect(subsistence).toHaveLength(18);
+  expect(headings(subsistence)).toEqual(["families", "people", "share", "money", "average", "ages"]);
+  // SSA's eight age bands of the people in receiving families: all listed, none the reference, none with a share row.
+  expect(subsistence.filter(row => row.heading === "ages")).toEqual(SOCIAL_AGE_BANDS.map(band => ({ id: `social.subsistence.persons_age_${band}`, reference: false, heading: "ages" })));
   expect(subsistence.filter(row => row.heading === "share").map(row => row.id)).toEqual(["social.subsistence.persons#share", "social.subsistence.registered_persons#share"]);
   const socialPackage = socialTopicSeries("social-package");
   expect(socialPackage).toHaveLength(30);
@@ -110,6 +112,24 @@ test("each page lists its rows under its headings", () => {
   expect(socialPackage.find(row => row.heading === "average")).toEqual({ id: "social.social_package.total.avg_monthly", reference: false, heading: "average" });
   expect(socialPackage.at(-1)).toEqual({ id: "social.social_package.other.avg_monthly", reference: false, heading: "average" });
   for (const rows of [payments, pensions, subsistence, socialPackage]) expect(rows.filter(row => row.reference)).toHaveLength(1);
+});
+
+test("the age groups chart people, start in 2013, keep their own colours and cross the 2022 counting change", () => {
+  const subsistence = socialPlaceFacts("subsistence-allowance", "region.imereti", facts, extras());
+  const ids = ["social.subsistence.persons_age_0_6", "social.subsistence.persons_age_70_plus"];
+  const model = buildSocialPlaceModel("subsistence-allowance", "region.imereti", subsistence, { mode: "line", range: { kind: "all" }, selectedIds: ids }, breaks);
+  expect([model.heading, model.unit, model.range.start, model.range.end]).toEqual(["ages", "persons", 2013, 2025]);
+  expect(model.selected.map(series => series.valuesByYear[2025])).toEqual(ids.map(id => value(id, "region.imereti", 2025)));
+  expect(model.selected.every(series => series.decimals === 0 && !Object.keys(series.partialMonths).length)).toBe(true);
+  const colors = model.series.filter(series => series.heading === "ages").map(series => series.color);
+  expect(new Set(colors).size).toBe(8);
+  expect(colors).not.toContain(INK);
+  expect(model.breaks).toEqual([{ year: 2022, label: "newCounting" }]);
+  // Ticking an age band after Families replaces the selection; the default stays Families alone.
+  const ticked = changeSocialPlaceSelection({ mode: "line", range: { kind: "all" }, selectedIds: ["social.subsistence.families"] }, "subsistence-allowance", "region.imereti", ["social.subsistence.families", ids[0]], subsistence);
+  expect(ticked.selectedIds).toEqual([ids[0]]);
+  // No share of residents is calculated for an age band.
+  expect(subsistence.some(f => f.indicatorId.startsWith("social.subsistence.persons_age_") && f.indicatorId.includes("#"))).toBe(false);
 });
 
 test("a selection keeps to one heading, from the hash and from a tick", () => {
@@ -287,14 +307,14 @@ const sourceFor = (sourceId: string, years: number[]) => ({
   sourceId, years, title: sourceId, organization: "SSA", retrievedAt: "2026-10-20", downloadHref: `/downloads/methodology/social-protection/files/${sourceId}.html` as const,
 });
 const YEARS = Array.from({ length: 13 }, (_, i) => 2013 + i);
-const SSA_SOURCES = ["ssa_pension_01", "ssa_pension_02", "ssa_pension_04", "ssa_tsa_allowance_01", "ssa_tsa_allowance_02", "ssa_socpackage_01", "ssa_socpackage_02", "ssa_statistics", "ssa_other_04", "ssa_workinjury_03"].map(id => sourceFor(id, YEARS));
+const SSA_SOURCES = ["ssa_pension_01", "ssa_pension_02", "ssa_pension_04", "ssa_tsa_allowance_01", "ssa_tsa_allowance_02", "ssa_tsa_allowance_03", "ssa_socpackage_01", "ssa_socpackage_02", "ssa_statistics", "ssa_other_04", "ssa_workinjury_03"].map(id => sourceFor(id, YEARS));
 const GEOSTAT = {
   populationSources: [sourceFor("source.geostat_municipal_population", YEARS)],
   cpiSources: [sourceFor("source.geostat_cpi_index_2010", YEARS)],
   gdpSources: [sourceFor("source.geostat_national_gdp_sna_2008", YEARS)],
 };
 const labelsFor = (ids: readonly string[]) => Object.fromEntries(ids.map(id => [id, id]));
-const HEADINGS = { money: "Money paid", pensioners: "Pensioners", share: "Share of residents", average: "Average a month", families: "Families", people: "People", recipients: "Recipients" };
+const HEADINGS = { money: "Money paid", pensioners: "Pensioners", share: "Share of residents", average: "Average a month", families: "Families", people: "People", recipients: "Recipients", ages: "Age groups" };
 const placeWorkbook = async (set: "pensions" | "subsistence-allowance", placeId: string, scope: string, selectedIds: string[], start: number, end: number, locale: "en" | "ka" = "en") =>
   buildSocialWorkbookExportModel({
     set, placeId, scope, facts, extras: extras(), sources: SSA_SOURCES, ...GEOSTAT, siteOrigin: "https://fiscal.ge", labels: labelsFor(selectedIds), headingLabels: HEADINGS, title: "Title",
@@ -363,6 +383,12 @@ test("a workbook lists only the SSA tables behind the exported series and years"
   const families = await placeWorkbook("subsistence-allowance", GEORGIA, "georgia", ["social.subsistence.families"], 2013, 2025);
   expect([families.readable.unitLabel, families.readable.numberFormat]).toEqual(["families", "#,##0"]);
   expect(families.sources.map(source => source.title)).toEqual(["ssa_tsa_allowance_01"]);
+  // The age groups are persons, printed December counts, and cite the age-group table alone.
+  const ages = await placeWorkbook("subsistence-allowance", "45", "45", ["social.subsistence.persons_age_0_6", "social.subsistence.persons_age_6_18"], 2013, 2025);
+  expect([ages.readable.unitLabel, ages.readable.numberFormat, ages.readable.subtitle]).toEqual(["persons", "#,##0", "2013–2025 · persons"]);
+  expect(ages.sources.map(source => source.title)).toEqual(["ssa_tsa_allowance_03"]);
+  expect(ages.readable.rows.map(row => row.parentLabel)).toEqual(["Age groups", "Age groups"]);
+  expect(ages.analysis.rows.find(row => row[0] === 2025 && String(row[1]).endsWith("persons_age_6_18"))).toEqual([2025, "Age groups — social.subsistence.persons_age_6_18", value("social.subsistence.persons_age_6_18", "45", 2025), "Official"]);
   // A missing public source is an error, never an uncited value.
   const ready = await presentation();
   expect(() => buildSocialWorkbookExportModel({

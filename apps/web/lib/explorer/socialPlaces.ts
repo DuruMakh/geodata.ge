@@ -1,4 +1,4 @@
-import type { ClientSocialFact, SocialSeriesBreak } from "../data/social/types";
+import { SOCIAL_AGE_BANDS, type ClientSocialFact, type SocialSeriesBreak } from "../data/social/types";
 import { placeIdForMunicipalityCode } from "./demographyAreas";
 import { HEALTH_HUB_PATH } from "./health";
 import { resolveRange } from "./periodRange";
@@ -12,7 +12,11 @@ import { changeUnitListSelection, listLatestByHeading, parseUnitListHash, unitLi
 /** The base path a set's index and place pages sit under; `placePageHref` adds the place. */
 export const socialPlaceBase = (set: SocialPlaceSet): `${typeof HEALTH_HUB_PATH}/${SocialPlaceSet}` => `${HEALTH_HUB_PATH}/${set}`;
 
-/** A place's series under their headings (spec §5 and §6); the first row, the default, is the reference. Every place lists the same rows. */
+/**
+ * A place's series under their headings (spec §5 and §6); the first row, the default, is the reference. Every place lists the same rows.
+ * Subsistence allowance ends with SSA's eight age bands of the people in receiving families, after the existing headings so
+ * their palette positions do not move.
+ */
 export function socialPlaceSeries(set: SocialPlaceSet): SocialSeriesDefinition[] {
   if (set === "pensions") return [
     ...socialRows("pensioners", ["social.pension.recipients", "social.pension_idp.recipients", "social.pension_highmountain.recipients"], true),
@@ -26,6 +30,7 @@ export function socialPlaceSeries(set: SocialPlaceSet): SocialSeriesDefinition[]
     ...socialRows("share", ["social.subsistence.persons#share", "social.subsistence.registered_persons#share"]),
     ...socialRows("money", ["social.subsistence.amount", "social.subsistence.employment_amount"]),
     ...socialRows("average", ["social.subsistence.avg_monthly"]),
+    ...socialRows("ages", SOCIAL_AGE_BANDS.map(band => `social.subsistence.persons_age_${band}`)),
   ];
 }
 

@@ -163,6 +163,26 @@ test("Georgia's Subsistence allowance page draws the 2022 counting change, and t
   await expect(await cell(page, employment, "2022")).toHaveText(/^\d{1,3}(,\d{3})*$/);
 });
 
+test("Georgia's Subsistence allowance page lists the age groups last, unselected, and charts two of them", async ({ page }) => {
+  await page.goto("/explorer/health/subsistence-allowance/georgia");
+  await ready(page);
+  await expect(page.getByTestId("series-heading").last()).toHaveText(/^ასაკობრივი ჯგუფები/);
+  const ages = page.locator('[data-testid="series-row"][data-series-id^="social.subsistence.persons_age_"]');
+  await expect(ages).toHaveCount(8);
+  await expect(ages.first()).toContainText("0–6 წლის");
+  await expect(ages.first()).toContainText("47,751");
+  await expect(pressedRows(page)).toHaveCount(1);
+  await expect(page.locator(toggle("social.subsistence.families"))).toHaveAttribute("aria-pressed", "true");
+  // Ticking an age group replaces Families; a second adds to it, under the same heading.
+  await page.locator(toggle("social.subsistence.persons_age_0_6")).click();
+  await page.locator(toggle("social.subsistence.persons_age_70_plus")).click();
+  await expect(pressedRows(page)).toHaveCount(2);
+  await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-heading", "ages");
+  await expect(page.getByTestId("social-unit-label")).toHaveText("ადამიანი");
+  await page.getByTestId("chart-mode-table").click();
+  await expect(await cell(page, "0–6 წლის", "2025")).toHaveText("47,751");
+});
+
 test("Social package: the 2025 group redesign is drawn when Other groups is ticked", async ({ page }) => {
   await page.goto("/explorer/health/social-package");
   await ready(page);

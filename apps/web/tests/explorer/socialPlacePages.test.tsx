@@ -87,15 +87,15 @@ describe("place pages", () => {
     expect(html).not.toMatch(GEORGIAN);
   });
 
-  it("Georgia: no neighbours and no member list; Subsistence lists five headings", async () => {
+  it("Georgia: no neighbours and no member list; Subsistence lists six headings, the age groups last", async () => {
     const html = await place({ kind: "country" });
     expect(latest(html)).toBe("2025: 888,518 pensioners");
     expect(html).not.toContain('data-testid="municipal-entity-navigation"');
     expect(html).not.toContain("region-member-row");
     const subsistence = await place({ kind: "country" }, "subsistence-allowance");
     expect(latest(subsistence)).toBe("2025: 129,506 families");
-    expect(count(subsistence, /data-testid="series-heading"/g)).toBe(5);
-    expect(count(subsistence, /data-testid="series-row"/g)).toBe(10);
+    expect(count(subsistence, /data-testid="series-heading"/g)).toBe(6);
+    expect(count(subsistence, /data-testid="series-row"/g)).toBe(18);
   });
 
   it("a municipality: its crumbs pass through its region; Tbilisi and unknown places are not found", async () => {

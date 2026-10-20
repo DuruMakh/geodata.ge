@@ -23,7 +23,7 @@ export type SocialTopicId = "social-payments" | "social-package";
 export type SocialPlaceSet = "pensions" | "subsistence-allowance";
 
 /** The small heading a row is listed under. A chart shows the rows of one heading at a time. */
-export type SocialHeading = "money" | "pensioners" | "share" | "average" | "families" | "people" | "recipients";
+export type SocialHeading = "money" | "pensioners" | "share" | "average" | "families" | "people" | "recipients" | "ages";
 /**
  * A listed row. A calculated row's id is its base indicator plus `#share` (per 100 residents) or `#real` (at 2025 prices),
  * so a hash naming it stays stable.
