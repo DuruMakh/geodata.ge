@@ -137,7 +137,6 @@
   "common.dataBusiness": "Data · Business",
   "common.dataHousing": "Data · Housing and construction",
   "common.dataEducation": "Data · Education",
-  "common.dataSocial": "Data · Social protection",
   "common.dataLoading": "Loading the data…",
   "common.dataLoadError": "The data could not be loaded. Reload the page to try again."
 }

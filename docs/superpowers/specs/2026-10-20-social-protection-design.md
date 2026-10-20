@@ -1,7 +1,7 @@
 # Health and social protection hub: Pensions and social help pages
 
 Date: 2026-10-20
-Status: Draft for Duru's review.
+Status: Approved by Duru on 2026-10-20 11:28 Tbilisi.
 
 How it was approved so far:
 

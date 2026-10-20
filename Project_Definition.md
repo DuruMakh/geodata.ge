@@ -18,7 +18,7 @@ The first version focuses on annual national budget data: expenditure by public 
 
 This v1 scope is deliberate. A narrow, high-quality budget explorer is more valuable than a broad but shallow data catalog.
 
-Now (2026-10-16): the site serves sixteen dataset hubs, in sidebar order Budget, Economy, Business, Housing and construction, Inflation, Money and banks, Unemployment, Wages, Living standards, Health and social protection, Education, Crime and justice, Trade, External flows, Energy and food and Demography, each approved in section 2 or one of its extensions (2C to 2P). `DESIGN.md` §6.7 specifies the sidebar.
+Now (2026-10-20): the site serves sixteen dataset hubs, in sidebar order Budget, Economy, Business, Housing and construction, Inflation, Money and banks, Unemployment, Wages, Living standards, Health and social protection, Education, Crime and justice, Trade, External flows, Energy and food and Demography, each approved in section 2 or one of its extensions (2C to 2P). `DESIGN.md` §6.7 specifies the sidebar.
 
 ## 2. V1 Scope
 

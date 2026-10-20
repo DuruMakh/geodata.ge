@@ -254,6 +254,9 @@ test("no list repeats a colour within a heading, and a Social package group keep
   const colorOf = (id: string) => socialPackage.series.find(s => s.id === id)!.color;
   for (const group of ["disability", "survivors", "war_participants", "other"]) expect(colorOf(`social.social_package.${group}.amount`)).toBe(colorOf(`social.social_package.${group}.recipients`));
   expect(colorOf("social.social_package.total.recipients")).toBe(INK);
+  // The Money total is the reference row of its heading too, so it is ink; the groups under it keep their colours.
+  expect(colorOf("social.social_package.total.amount")).toBe(INK);
+  expect(socialPackage.series.filter(s => s.heading === "money" && s.id !== "social.social_package.total.amount").map(s => s.color)).not.toContain(INK);
 });
 
 // ---- Excel workbooks and hub cards ------------------------------------------------------------------------------------

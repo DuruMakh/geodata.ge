@@ -62,12 +62,14 @@ const FIXED_PAYMENT_COLORS: Readonly<Record<string, string>> = {
 /**
  * The default series is ink. As on Housing, a row is keyed by its position in a fixed list, so no list repeats a colour:
  * a Social payments programme by `SOCIAL_PAYMENT_PROGRAMMES` (four of them fixed), and a Social package group by
- * `SOCIAL_PACKAGE_GROUPS`, so a group wears one colour under Recipients and Money. Place rows take the palette by position.
+ * `SOCIAL_PACKAGE_GROUPS`, so a group wears one colour under Recipients and Money; the Money total, the reference row of its
+ * heading like "All recipients" under Recipients, is ink. Place rows take the palette by position.
  */
 export function socialSeriesColor(series: SocialSeriesDefinition, index: number): string {
   if (series.reference) return INK;
   const [, programme, group] = series.id.split(".");
   if (programme === "payments") return FIXED_PAYMENT_COLORS[group!] ?? topicSeriesColor(series, SOCIAL_PAYMENT_PROGRAMMES.indexOf(group as typeof SOCIAL_PAYMENT_PROGRAMMES[number]));
+  if (programme === "social_package" && group === "total" && series.id.endsWith(".amount")) return INK;
   if (programme === "social_package") return topicSeriesColor(series, SOCIAL_PACKAGE_GROUPS.indexOf(group as typeof SOCIAL_PACKAGE_GROUPS[number]));
   return topicSeriesColor(series, index);
 }
