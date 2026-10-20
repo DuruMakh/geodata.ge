@@ -101,7 +101,7 @@
   "transport.unitMillion": "მლნ",
   "transport.unitBillion": "მლრდ",
   "transport.latest.vehicles": "მსუბუქი ავტომობილები",
-  "transport.latest.vehicle-age": "10 წელზე ძველი მსუბუქი ავტომობილები",
+  "transport.latest.vehicle-age": "10+ წლის ავტომობილები",
   "transport.latest.passengers": "მგზავრთბრუნვა",
   "transport.latest.freight": "ტვირთბრუნვა",
   "transport.latest.regions": "რეგისტრირებული ავტომობილები · {region}",
