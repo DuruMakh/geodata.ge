@@ -321,3 +321,23 @@ test("the hub has four cards with each default series' latest value and years", 
   expect(cards.every(card => card.seriesColor === INK && !card.comingSoon)).toBe(true);
   expect(cards.map(card => card.index)).toEqual(["01", "02", "03", "04"]);
 });
+
+test("the workbook Sources sheet lists the eleven served Geostat workbooks, archived at fiscal.ge and named in the page's language", async () => {
+  const { loadScienceCultureWorkbookSources } = await import("../../lib/pages/science-culture-shared");
+  const en = await loadScienceCultureWorkbookSources("en");
+  // Keyed by the facts' raw source id, so a page's facts find their file, and Geostat's .xls files are listed with the .xlsx ones.
+  expect(en.map(source => source.sourceId).sort()).toEqual([...SCIENCE_CULTURE_SOURCES].sort());
+  expect(en.find(source => source.sourceId === "geostat_culture_museums_regions")).toEqual({
+    sourceId: "geostat_culture_museums_regions", years: Array.from({ length: 21 }, (_, i) => 2005 + i), title: "Main characteristics of museums (museum unions) and museum reserves by regions",
+    organization: "National Statistics Office of Georgia (Geostat)", downloadHref: "/downloads/methodology/science-culture/files/main-charasteristics-of-museums-by-regions.xls", retrievedAt: "2026-10-20",
+  });
+  expect(en.find(source => source.sourceId === "geostat_science_researchers")).toMatchObject({ years: [2019, 2020, 2021, 2022, 2023, 2024], downloadHref: "/downloads/methodology/science-culture/files/researchers.xlsx" });
+  expect(en.every(source => source.downloadHref.startsWith("/downloads/methodology/science-culture/files/"))).toBe(true);
+  const ka = await loadScienceCultureWorkbookSources("ka");
+  expect(ka.find(source => source.sourceId === "geostat_culture_theatre_events")).toMatchObject({ title: "თეატრების მიერ გამართული ღონისძიებები", organization: "საქსტატი" });
+  // The workbook cites only the files behind the exported values: a Guria visitors workbook cites the by-region file.
+  const id = sc("museum_visitors", "region_guria");
+  const model = buildScienceCultureWorkbookExportModel({ ...base, sources: en, facts, area: "region_guria", labels: { [id]: "Visitors" }, state: state([id]) }, await presentation());
+  expect(model.sources.map(source => source.title)).toEqual(["Main characteristics of museums (museum unions) and museum reserves by regions"]);
+  expect(model.sources[0].absoluteUrl).toBe("https://fiscal.ge/downloads/methodology/science-culture/files/main-charasteristics-of-museums-by-regions.xls");
+});

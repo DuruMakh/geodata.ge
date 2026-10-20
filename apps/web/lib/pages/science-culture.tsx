@@ -27,7 +27,7 @@ export async function scienceCulturePageMetadata(locale: Locale, section: Scienc
 /** Research, Patents or Theatres: the latest line, then the chart workspace over Georgia's series. */
 export async function renderScienceCulturePage(locale: Locale, section: ScienceCultureTopicId) {
   const [data, presentation, sources] = await Promise.all([
-    loadServedScienceCultureData(), getPresentation(locale, ["scienceCulture", "format", "main", "workbook"], []), loadScienceCultureWorkbookSources(),
+    loadServedScienceCultureData(), getPresentation(locale, ["scienceCulture", "format", "main", "workbook"], []), loadScienceCultureWorkbookSources(locale),
   ]);
   const series = scienceCultureTopicSeries(section);
   // Each page receives only the observations its list can show, and the counting changes that touch them.

@@ -38,8 +38,7 @@ export type FiscalDatasetId = Exclude<DatasetId, "ministries" | "inflation" | "i
  */
 export type TopicDatasetId =
   | Exclude<MethodologyDatasetId, "expenditure" | "revenue" | "municipalities" | "debt" | "gdp" | "economic-sectors" | "regional-economies" | "demography">
-  | "inflation-products"
-  | "science-culture";
+  | "inflation-products";
 
 /** An official statistics producer whose published figures a dataset is read from. */
 export type SourceAgencyId = "geostat" | "nbg";

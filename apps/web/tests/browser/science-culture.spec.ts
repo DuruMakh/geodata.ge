@@ -9,6 +9,14 @@ const sc = (measure: string, group: string) => `science_culture.${measure}.${gro
 const SECTIONS = ["research", "patents", "museums", "theatres"];
 const english = (page: Page) => page.getByTestId("language-switch").first().getByRole("link", { name: "English", exact: true });
 
+/** The Sources sheet's hyperlinks: each must be a fiscal.ge archive copy of a Geostat science and culture workbook. */
+async function expectArchivedSources(workbook: ExcelJS.Workbook) {
+  const links: string[] = [];
+  workbook.worksheets[2].eachRow(row => row.eachCell(cell => { const value = cell.value as { hyperlink?: string } | null; if (value && typeof value === "object" && value.hyperlink) links.push(value.hyperlink); }));
+  expect(links.length).toBeGreaterThan(0);
+  for (const link of links) expect(link).toContain("/downloads/methodology/science-culture/files/");
+}
+
 /** The table cell of the row labelled `label` in the `year` column (the wide, year-columns layout). */
 async function cell(page: Page, label: string, year: number) {
   const table = page.getByTestId("explorer-table");
@@ -105,6 +113,18 @@ test("theatres: the audience marks the 2021 counting change; seats alone and eve
   await expect(page.getByTestId("explorer-table").locator("thead th", { hasText: "new counting" })).toHaveCount(0);
 });
 
+test("theatres from 2021 on: the range does not cross the counting change, so no rule or table mark is drawn (Review Focus 4)", async ({ page }) => {
+  await page.goto("/en/explorer/science-culture/theatres#start=2021&end=2025");
+  await ready(page);
+  await expect(ticked(page)).toHaveCount(1);
+  await expect(page.locator(pressed(sc("theatre_audience", "total")))).toHaveAttribute("aria-pressed", "true");
+  await expect(page.getByTestId("year-range-strip")).toContainText("2021–2025");
+  await expect(page.getByTestId("chart-panel").getByTestId("chart-break")).toHaveCount(0);
+  await page.getByTestId("chart-mode-table").click();
+  await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-mode", "table");
+  await expect(page.getByTestId("explorer-table").locator("thead th", { hasText: "new counting" })).toHaveCount(0);
+});
+
 test("museums is the map and list with Georgia first, and a region opens its own page", async ({ page }) => {
   await page.goto("/explorer/science-culture/museums");
   await ready(page);
@@ -167,12 +187,17 @@ test("the Guria page: picker, neighbours carrying group tours, Excel and the lan
   await expect(ticked(page)).toHaveCount(2);
   await expect(page).toHaveURL(/#view=line&sel=science_culture\.museum_visitors\.region_guria%2Cscience_culture\.museum_tours\.region_guria/);
   await expect(navigation.getByRole("link").last()).toHaveAttribute("href", "/explorer/science-culture/museums/imereti#sel=science_culture.museum_visitors.region_imereti%2Cscience_culture.museum_tours.region_imereti");
+  // The picker's Imereti option carries the same selection as the Next link.
+  await page.getByTestId("region-picker-trigger").click();
+  await expect(page.getByTestId("region-picker-option").filter({ hasText: "იმერეთი" })).toHaveAttribute("href", await navigation.getByRole("link").last().getAttribute("href") as string);
+  await page.keyboard.press("Escape");
   const promise = page.waitForEvent("download");
   await page.getByTestId("science-culture-excel-download").click();
   const download = await promise;
   expect(download.suggestedFilename()).toMatch(/^fiscal-science-culture-museums-guria-2005-2025\.xlsx$/);
   const workbook = new ExcelJS.Workbook(); await workbook.xlsx.readFile((await download.path())!);
   expect(workbook.worksheets).toHaveLength(3);
+  await expectArchivedSources(workbook);
   // The language switch keeps the selection.
   await english(page).click();
   await expect(page).toHaveURL(/\/en\/explorer\/science-culture\/museums\/guria#view=line&sel=science_culture\.museum_visitors\.region_guria%2Cscience_culture\.museum_tours\.region_guria/);
@@ -185,6 +210,24 @@ test("the Guria page: picker, neighbours carrying group tours, Excel and the lan
   await ready(page);
   await expect(ticked(page)).toHaveCount(2);
   await expect(page.locator(pressed(sc("museum_tours", "region_imereti")))).toHaveAttribute("aria-pressed", "true");
+});
+
+test("the language switch keeps table mode and the years on the Guria page (Review Focus 5)", async ({ page }) => {
+  await page.goto("/explorer/science-culture/museums/guria#view=line&start=2010&end=2020");
+  await ready(page);
+  await expect(page.getByTestId("year-range-strip")).toContainText("2010–2020");
+  await page.getByTestId("chart-mode-table").click();
+  await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-mode", "table");
+  await expect(page).toHaveURL(/#view=table&/);
+  const hash = new URL(page.url()).hash;
+  expect(hash).toContain("start=2010");
+  await english(page).click();
+  await expect(page).toHaveURL(/\/en\/explorer\/science-culture\/museums\/guria#/);
+  expect(new URL(page.url()).hash).toBe(hash);
+  await ready(page);
+  await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-mode", "table");
+  await expect(page.getByTestId("year-range-strip")).toContainText("2010–2020");
+  await expect(ticked(page)).toHaveCount(1);
 });
 
 test("the language switch keeps the selection, years and table mode on research (Review Focus 5)", async ({ page }) => {
@@ -214,6 +257,21 @@ test("the topic Excel download is a workbook", async ({ page }) => {
   expect(download.suggestedFilename()).toMatch(/^fiscal-science-culture-research-2019-2024\.xlsx$/);
   const workbook = new ExcelJS.Workbook(); await workbook.xlsx.readFile((await download.path())!);
   expect(workbook.worksheets).toHaveLength(3);
+  // The Sources sheet links to the fiscal.ge archive copies of the Geostat workbooks.
+  await expectArchivedSources(workbook);
+});
+
+for (const prefix of ["", "/en"]) test(`the methodology link opens the science and culture methodology with its original files ${prefix || "ka"}`, async ({ page }) => {
+  await page.goto(`${prefix}/explorer/science-culture/theatres`);
+  await ready(page);
+  await page.getByTestId("source-label").getByRole("link").click();
+  await expect(page).toHaveURL(new RegExp(`${prefix}/methodology/science-culture$`));
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText(prefix ? "Science and culture" : "მეცნიერება და კულტურა");
+  await expect(page.locator("main")).toContainText(prefix ? "*2006-2020 data includes only performances." : "*2006-2020 წლების მონაცემები მოიცავს მხოლოდ სპექტაკლებს.");
+  const archived = page.locator('a[href^="/downloads/methodology/science-culture/files/"]');
+  expect(await archived.count()).toBeGreaterThan(0);
+  const response = await page.request.get(await archived.first().getAttribute("href") as string);
+  expect(response.status()).toBe(200);
 });
 
 for (const prefix of ["", "/en"]) test(`science and culture pages fit a 375px screen with a one-line latest line ${prefix || "ka"}`, async ({ page }) => {

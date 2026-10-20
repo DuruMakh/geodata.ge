@@ -8,7 +8,7 @@ import { AREA_PAGES, loadScienceCultureWorkbookSources, museumAreaForSlug, rende
 /** A museum area's page: Georgia's or a region's visitors, group tours, exhibitions and museums (the frame is science-culture-shared.tsx's). */
 export async function renderMuseumAreaPage(locale: Locale, slug: string) {
   const area = museumAreaForSlug(slug);
-  const sources = await loadScienceCultureWorkbookSources();
+  const sources = await loadScienceCultureWorkbookSources(locale);
   const series = museumAreaSeries(area);
   const ids = new Set<string>(series.map(item => item.id));
   const areaFacts = (facts: ScienceCultureFact[]) => facts.map(toClientScienceCultureFact).filter(f => ids.has(f.indicatorId));

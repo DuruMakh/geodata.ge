@@ -7,11 +7,10 @@ import { BreadcrumbJsonLd } from "../../components/seo/breadcrumb-json-ld";
 import type { MunicipalRegion } from "../data/municipal/types";
 import { REGIONAL_ECONOMY_REGIONS } from "../data/regionalEconomies/importRegionalEconomies";
 import { loadServedScienceCultureData } from "../data/scienceCulture/importScienceCulture";
-import { SCIENCE_CULTURE_REGIONS, type ScienceCultureFact } from "../data/scienceCulture/types";
+import { SCIENCE_CULTURE_REGIONS, SCIENCE_CULTURE_SOURCES, type ScienceCultureFact } from "../data/scienceCulture/types";
 import { coverageLabel } from "../explorer/coverageLabel";
 import { SCIENCE_CULTURE_HUB_PATH, type ScienceCultureSeriesDefinition } from "../explorer/scienceCulture";
 import { MUSEUMS_HREF, MUSEUM_AREAS, museumAreaHref, museumAreaSeries, museumAreaSlug, museumMapId, type MuseumArea } from "../explorer/scienceCultureMuseums";
-import type { WorkbookPublicSource } from "../explorer/workbookModel";
 import { I18nProvider } from "../i18n/provider";
 import { clientPresentation, getPresentation } from "../i18n/presentation.server";
 import { getMessages } from "../i18n/messages.server";
@@ -19,6 +18,7 @@ import { message } from "../i18n/messages";
 import { publicLabel } from "../i18n/labels";
 import { pageHref } from "../i18n/routes";
 import type { Locale, Messages, Presentation } from "../i18n/types";
+import { loadSourcedWorkbookSources, type SourcedWorkbookPublicSource } from "../methodology/workbookSources";
 import { fiscalMetadata } from "../seo/metadata";
 import { explorerDatasetJsonLd } from "../seo/structuredData";
 import { resolveSiteUrl } from "../siteUrl";
@@ -27,12 +27,12 @@ import { resolveSiteUrl } from "../siteUrl";
 // modules, so each ships only its own explorer: keep explorer components out of this file.
 
 /**
- * The Sources sheet of a Science and culture workbook: the archived Geostat workbooks behind the exported values, keyed by
- * the facts' `sourceId`. The source archive (`data/methodology/source-archives/science-culture.csv`) is not published yet,
- * so the sheet lists none until it is.
+ * The Sources sheet of a Science and culture workbook: the archived Geostat workbooks behind the exported values, in the page's
+ * language and keyed by the facts' `sourceId`. Only the eleven workbooks the values are read from are listed, not the files kept
+ * for reference (the spreadsheet default would drop Geostat's `.xls` files).
  */
-export async function loadScienceCultureWorkbookSources(): Promise<(WorkbookPublicSource & { sourceId: string })[]> {
-  return [];
+export async function loadScienceCultureWorkbookSources(locale: Locale): Promise<SourcedWorkbookPublicSource[]> {
+  return loadSourcedWorkbookSources("science-culture", locale, row => SCIENCE_CULTURE_SOURCES.includes(row.source_id));
 }
 
 /** Display names of the series a list shows; a region's row is named as Georgia's (the heading says what it counts, the page names the area). */
