@@ -160,7 +160,7 @@ export function socialPaymentsViewFacts(view: SocialPayView, facts: readonly Cli
 }
 
 /** A topic page's shown facts: Georgia's rows of its series, in the view's unit. */
-function socialTopicFacts(section: SocialTopicId, view: SocialPayView, facts: readonly ClientSocialFact[], gdpFacts: readonly ClientNationalGdpFact[]): SocialShownFact[] {
+export function socialTopicFacts(section: SocialTopicId, view: SocialPayView, facts: readonly ClientSocialFact[], gdpFacts: readonly ClientNationalGdpFact[]): SocialShownFact[] {
   if (section === "social-payments") return socialPaymentsViewFacts(view, facts, gdpFacts);
   const ids = new Set<string>(socialTopicSeries(section).map(s => s.id));
   return facts.filter(f => ids.has(f.indicatorId) && f.geographyId === SOCIAL_GEORGIA).map(shown);
