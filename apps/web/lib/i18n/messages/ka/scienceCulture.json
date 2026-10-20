@@ -125,7 +125,7 @@
   "scienceCulture.latest.patents": "{period}: {value} ადგილობრივი განაცხადი გამოგონებაზე",
   "scienceCulture.latest.theatres": "{period}: {value} ათასი მაყურებელი თეატრებში",
   "scienceCulture.latest.museumsIndex": "{period}: {value} მლნ დამთვალიერებელი მუზეუმებში",
-  "scienceCulture.latest.area": "{period}: {value} ათასი მნახველი · {area}",
+  "scienceCulture.latest.area": "{period}: {value} ათასი დამთვალიერებელი",
   "scienceCulture.mapLabel": "მუზეუმების დამთვალიერებლები",
   "scienceCulture.regionMapAria": "რუკა: {total} რეგიონების მიხედვით, {unit}, {year}",
   "scienceCulture.regionMapEntityAria": "{name}: {amount}, {year}",
