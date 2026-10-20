@@ -14,11 +14,16 @@ import type { ClientUnemploymentObservation } from "../../lib/data/unemployment/
 const navigation = vi.hoisted(() => ({ pathname: "/en/explorer/unemployment" }));
 vi.mock("next/navigation", async importOriginal => ({ ...await importOriginal<typeof import("next/navigation")>(), usePathname: () => navigation.pathname, useRouter: () => ({ replace: () => {} }) }));
 
-test.each(["ka", "en"] as const)("the %s landing page offers four cards in the approved order", async locale => {
+test.each(["ka", "en"] as const)("the %s landing page offers eight cards in the approved order", async locale => {
   const markup = renderToStaticMarkup(await (locale === "ka" ? GeorgianUnemploymentHub() : EnglishUnemploymentHub()));
   expect(markup).toContain('data-testid="unemployment-hub"');
   const hrefs = [...markup.matchAll(/<a\b[^>]*data-testid="hub-card"[^>]*>/g)].map(match => /href="([^"]+)"/.exec(match[0])![1]);
-  expect(hrefs).toEqual(["overview", "regions", "age", "gender"].map(section => `${locale === "en" ? "/en" : ""}/explorer/unemployment/${section}`));
+  expect(hrefs).toEqual(["overview", "regions", "age", "gender", "industries", "hours", "informal", "young-people"].map(section => `${locale === "en" ? "/en" : ""}/explorer/unemployment/${section}`));
+  const common = await getMessages(locale, ["common"]);
+  const titles = [...markup.matchAll(/data-testid="hub-card"[\s\S]*?<\/a>/g)].map(match => match[0]);
+  expect(titles).toHaveLength(8);
+  ["unemploymentIndustries", "unemploymentHours", "unemploymentInformal", "unemploymentYoungPeople"].forEach((key, offset) => expect(titles[4 + offset]).toContain(common[`common.${key}`]));
+  expect(markup.match(/>0[1-8]</g)).toEqual(["01", "02", "03", "04", "05", "06", "07", "08"].map(n => `>${n}<`));
   expect(markup).not.toContain('data-testid="unemployment-explorer"');
 });
 
