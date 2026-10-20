@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useMemo, useState, type ReactNode } from "react";
 import type { RegionalEconomyMapModel, RegionMapModel } from "../../lib/explorer/regionalEconomyMap";
 import { regionalEconomyHref } from "../../lib/explorer/regionalEconomyRoutes";
-import { formatAmount } from "../../lib/explorer/format";
+import { MISSING, formatAmount } from "../../lib/explorer/format";
 import { matchesLabelQuery } from "../../lib/i18n/search";
 import { publicLabel } from "../../lib/i18n/labels";
 import { message } from "../../lib/i18n/messages";
@@ -57,6 +57,7 @@ export function RegionIndex({ model, sourceNote, metric, summary = [], leadRow, 
     ]));
   }, [englishLabels, model.regions, query]);
   const lead = leadRow && matchesLabelQuery(query, [leadRow.label]) ? leadRow : null;
+  const unvalued = (model.withoutValue ?? []).filter(region => matchesLabelQuery(query.trim(), [region.nameKa, publicLabel("en", region.regionId, region.nameKa, englishLabels)]));
   const linkFor = metric.hrefForRegion;
   // Linked rows end in an arrow column; plain rows (no hrefForRegion) have none.
   const rowClass = (id: string) => `grid ${linkFor === undefined ? "grid-cols-[22px_minmax(0,1fr)_112px]" : "grid-cols-[22px_minmax(0,1fr)_112px_12px]"} items-center gap-[9px] border-b border-[var(--row-border)] py-[9px] pr-1 transition-colors hover:bg-[var(--tint)] ${id === activeRegionId ? "bg-[var(--tint)]" : "bg-transparent"}`;
@@ -99,7 +100,7 @@ export function RegionIndex({ model, sourceNote, metric, summary = [], leadRow, 
             />
             <span className="font-[family-name:var(--font-numeric)] text-[11px] min-[768px]:text-[10.5px] text-[var(--faint)]">{rows.length === model.regions.length ? rows.length : `${rows.length} / ${model.regions.length}`}</span>
           </div>
-          {rows.length === 0 && !lead ? (
+          {rows.length === 0 && !lead && !unvalued.length ? (
             <div className="px-1 py-[26px] text-center text-[13px] text-[var(--body)]">
               {message(messages, "regionalEconomies.empty")}
               <button type="button" onClick={() => setQuery("")} className="mt-3 block w-full text-[12px] text-[var(--accent)]">{message(messages, "regionalEconomies.clearSearch")}</button>
@@ -148,6 +149,23 @@ export function RegionIndex({ model, sourceNote, metric, summary = [], leadRow, 
                     onBlur={() => setFocusActive(null)}
                     className={rowClass(region.regionId)}
                   >
+                    {cells}
+                    <span aria-hidden className="text-[var(--faint)]">→</span>
+                  </Link>
+                );
+              })}
+              {/* Regions without a value come last, unranked, with a dash. */}
+              {unvalued.map((region) => {
+                const cells = (
+                  <>
+                    <span aria-hidden />
+                    <span className="min-w-0 text-[12.5px] font-medium">{publicLabel(locale, region.regionId, region.nameKa, englishLabels)}</span>
+                    <span className="text-right font-[family-name:var(--font-numeric)] text-[11.5px] text-[var(--faint)]">{MISSING}</span>
+                  </>
+                );
+                const rowProps = { "data-testid": "regional-list-row", "data-region-id": region.regionId, "data-no-value": "", onMouseEnter: () => setPointerActive(region.regionId), onMouseLeave: () => setPointerActive(null) };
+                return linkFor === undefined ? <div key={region.regionId} {...rowProps} className={rowClass(region.regionId)}>{cells}</div> : (
+                  <Link key={region.regionId} href={pageHref(linkFor(region.regionId), locale)} prefetch={false} {...rowProps} className={rowClass(region.regionId)}>
                     {cells}
                     <span aria-hidden className="text-[var(--faint)]">→</span>
                   </Link>

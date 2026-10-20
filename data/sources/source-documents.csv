@@ -461,6 +461,52 @@ source.geostat_education_preschool_page,ადრეული და სკო�
 source.geostat_education_general_page,ზოგადი განათლება (წყაროს გვერდი),docs/Raw Data/Education/geostat-education-annual/official/geostat-category-59-2026-10-16.html,2026-10-16
 source.geostat_education_vocational_page,პროფესიული განათლება (წყაროს გვერდი),docs/Raw Data/Education/geostat-education-annual/official/geostat-category-60-2026-10-16.html,2026-10-16
 source.geostat_education_higher_page,უმაღლესი განათლება (წყაროს გვერდი),docs/Raw Data/Education/geostat-education-annual/official/geostat-category-61-2026-10-16.html,2026-10-16
+source.geostat_env_ghg,B-3. სათბურის გაზების ემისიები,docs/Raw Data/Environment/geostat-environment-annual/official/B-3.-Greenhouse-gas-emissions-ENG.XLSX,2026-10-20
+source.geostat_env_air_emissions,A-1. ატმოსფერულ ჰაერში გაფრქვეული მავნე ნივთიერებები,docs/Raw Data/Environment/geostat-environment-annual/official/A-1.-Emissions-of-pollutants-into-the-atmospheric-air_ENG.XLSX,2026-10-20
+source.geostat_env_air_quality,A-2. ატმოსფერული ჰაერის ხარისხი ურბანულ ტერიტორიებზე,docs/Raw Data/Environment/geostat-environment-annual/official/A-2_Ambient_air_quality_in_urban_areas_ENG.XLSX,2026-10-20
+source.geostat_env_temperature,B-1. ჰაერის ტემპერატურა,docs/Raw Data/Environment/geostat-environment-annual/official/B-1_Air-Temperature_ENG.XLSX,2026-10-20
+source.geostat_env_precipitation,B-2. ატმოსფერული ნალექი,docs/Raw Data/Environment/geostat-environment-annual/official/B-2_Atmospheric_precipitation_ENG.XLSX,2026-10-20
+source.geostat_env_water_household,C-4. წყლის გამოყენება შინამეურნეობებში ერთ სულ მოსახლეზე,docs/Raw Data/Environment/geostat-environment-annual/official/C-4.-Household-water-use-per-capita_ENG.xlsx,2026-10-20
+source.geostat_env_water_supply,C-5. წყალმომარაგება და წყალმომარაგების სისტემაზე მიერთებული მოსახლეობა,docs/Raw Data/Environment/geostat-environment-annual/official/C-5.-Water-supply-industry-and-population-connected-to-water-supply-industry_ENG.xlsx,2026-10-20
+source.geostat_env_water_losses,C-7. წყლის დანაკარგები,docs/Raw Data/Environment/geostat-environment-annual/official/C-7.-Water-losses_ENG.xlsx,2026-10-20
+source.geostat_env_wastewater,C-14. წყალარინების ქსელზე მიერთებული მოსახლეობა,docs/Raw Data/Environment/geostat-environment-annual/official/C-14.-Population-connected-to-wastewater-treatment_ENG.XLSX,2026-10-20
+source.geostat_env_waste,რეგიონებიდან ნაგავსაყრელებზე განთავსებული მუნიციპალური ნარჩენები,docs/Raw Data/Environment/geostat-environment-annual/official/Municipal_Waste_ENG.xlsx,2026-10-20
+source.geostat_env_timber,ხე-ტყის დამზადების/ჭრის შედეგად მიღებული მერქნის მოცულობა,docs/Raw Data/Environment/geostat-environment-annual/official/Volume-of-felled-timber.xls,2026-10-20
+source.geostat_env_illegal_logging,ტყის უკანონო ჭრა,docs/Raw Data/Environment/geostat-environment-annual/official/Illegal-logging.xls,2026-10-20
+source.geostat_env_fires,ტყისა და ველის ხანძრები,docs/Raw Data/Environment/geostat-environment-annual/official/Forest-and-field-fires.xls,2026-10-20
+source.geostat_env_ods,A-3. ოზონდამშლელი ნივთიერებების მოხმარება,docs/Raw Data/Environment/geostat-environment-annual/official/A-3.-Consumption-of-ozone-depleting-substances-(ODS)_ENG.XLSX,2026-10-20
+source.geostat_env_protected_areas_indicator,D-1. დაცული ტერიტორიები,docs/Raw Data/Environment/geostat-environment-annual/official/D-1-Protected-areas.xlsx,2026-10-20
+source.geostat_env_fertilizer,F-2. სასუქების გამოყენება,docs/Raw Data/Environment/geostat-environment-annual/official/F-2.-Fertilizer-consumption_ENG.XLSX,2026-10-20
+source.geostat_env_pesticide,F-4. პესტიციდების მოხმარება,docs/Raw Data/Environment/geostat-environment-annual/official/F-4.-Pesticide-consumption_ENG.XLSX,2026-10-20
+source.geostat_env_final_energy,G-1. ენერგიის საბოლოო მოხმარება,docs/Raw Data/Environment/geostat-environment-annual/official/G-1.-Final-energy-consumption_ENG.xlsx,2026-10-20
+source.geostat_env_primary_energy,G-2. პირველადი ენერგიის ჯამური მიწოდება,docs/Raw Data/Environment/geostat-environment-annual/official/G-2.-Total-primary-energy-supply_ENG.xlsx,2026-10-20
+source.geostat_env_renewable_energy,G-4. განახლებადი ენერგიის მიწოდება,docs/Raw Data/Environment/geostat-environment-annual/official/G-4.-Renewable-energy-supply_ENG.xlsx,2026-10-20
+source.geostat_env_stationary_air_pollution,ატმოსფერული ჰაერის დაბინძურება,docs/Raw Data/Environment/geostat-environment-annual/official/Air-Pollution.xls,2026-10-20
+source.geostat_env_protected_areas,დაცული ტერიტორიები,docs/Raw Data/Environment/geostat-environment-annual/official/Protected-Areas.xls,2026-10-20
+source.geostat_env_violations,სამართალდარღვევები გარემოს დაცვის სფეროში,docs/Raw Data/Environment/geostat-environment-annual/official/Violations-of-Law.xls,2026-10-20
+source.geostat_env_protected_area_visitors,ვიზიტორთა რაოდენობა დაცული ტერიტორიების მიხედვით,docs/Raw Data/Environment/geostat-environment-annual/official/Number-of-visitors-by-protected-areas.xlsx,2026-10-20
+source.geostat_env_water_quality,წყლის ხარისხის მაჩვენებლები,docs/Raw Data/Environment/geostat-environment-annual/official/Water-quality_ENG.XLSX,2026-10-20
+source.geostat_env_forest_area,ტყის ფონდი,docs/Raw Data/Environment/geostat-environment-annual/official/Forest_Area.xls,2026-10-20
+source.geostat_env_timber_purpose,ხე-ტყის მოცულობა ჭრის მიზნების მიხედვით,docs/Raw Data/Environment/geostat-environment-annual/official/Volume-of-felled-timber-by-cutting-purpose.xls,2026-10-20
+source.geostat_env_ghg_ka,"B-3. სათბურის გაზების ემისიები, ქართული ვერსია",docs/Raw Data/Environment/geostat-environment-annual/official/B-3.-Greenhouse-gas-emissions-GEO.xlsx,2026-10-20
+source.geostat_env_air_emissions_ka,"A-1. ატმოსფერულ ჰაერში გაფრქვეული მავნე ნივთიერებები, ქართული ვერსია",docs/Raw Data/Environment/geostat-environment-annual/official/A-1.-Emissions-of-pollutants-into-the-atmospheric-air_GEO.XLSX,2026-10-20
+source.geostat_env_air_quality_ka,"A-2. ატმოსფერული ჰაერის ხარისხი ურბანულ ტერიტორიებზე, ქართული ვერსია",docs/Raw Data/Environment/geostat-environment-annual/official/A-2-air-quality-GEO.xlsx,2026-10-20
+source.geostat_env_temperature_ka,"B-1. ჰაერის ტემპერატურა, ქართული ვერსია",docs/Raw Data/Environment/geostat-environment-annual/official/B-1-Air_Temperature_GEO.XLSX,2026-10-20
+source.geostat_env_precipitation_ka,"B-2. ატმოსფერული ნალექი, ქართული ვერსია",docs/Raw Data/Environment/geostat-environment-annual/official/B-2-Atmospheric_precipitation_GEO.XLSX,2026-10-20
+source.geostat_env_water_household_ka,"C-4. წყლის გამოყენება შინამეურნეობებში ერთ სულ მოსახლეზე, ქართული ვერსია",docs/Raw Data/Environment/geostat-environment-annual/official/C-4.-Household-water-use-per-capita_GEO.xlsx,2026-10-20
+source.geostat_env_water_supply_ka,"C-5. წყალმომარაგება და წყალმომარაგების სისტემაზე მიერთებული მოსახლეობა, ქართული ვერსია",docs/Raw Data/Environment/geostat-environment-annual/official/C-5.-Water-supply-industry-and-population-connected-to-water-supply-industry_GEO.xlsx,2026-10-20
+source.geostat_env_water_losses_ka,"C-7. წყლის დანაკარგები, ქართული ვერსია",docs/Raw Data/Environment/geostat-environment-annual/official/C-7.-Water-losses_GEO.xlsx,2026-10-20
+source.geostat_env_wastewater_ka,"C-14. წყალარინების ქსელზე მიერთებული მოსახლეობა, ქართული ვერსია",docs/Raw Data/Environment/geostat-environment-annual/official/C-14.-Population-connected-to-wastewater-treatment_GEO.XLSX,2026-10-20
+source.geostat_env_waste_ka,"რეგიონებიდან ნაგავსაყრელებზე განთავსებული მუნიციპალური ნარჩენები, ქართული ვერსია",docs/Raw Data/Environment/geostat-environment-annual/official/Municipal_Waste_GEO.xlsx,2026-10-20
+source.geostat_env_timber_ka,"ხე-ტყის დამზადების/ჭრის შედეგად მიღებული მერქნის მოცულობა, ქართული ვერსია",docs/Raw Data/Environment/geostat-environment-annual/official/felled-timber-GEO.xls,2026-10-20
+source.geostat_env_illegal_logging_ka,"ტყის უკანონო ჭრა, ქართული ვერსია",docs/Raw Data/Environment/geostat-environment-annual/official/illegal-logging-GEO.xls,2026-10-20
+source.geostat_env_fires_ka,"ტყისა და ველის ხანძრები, ქართული ვერსია",docs/Raw Data/Environment/geostat-environment-annual/official/forest-fires-GEO.xls,2026-10-20
+source.geostat_env_page_565,გარემოსდაცვითი ინდიკატორები (წყაროს გვერდი),docs/Raw Data/Environment/geostat-environment-annual/official/page-565-en.html,2026-10-20
+source.geostat_env_page_565_ka,"გარემოსდაცვითი ინდიკატორები (წყაროს გვერდი, ქართული ვერსია)",docs/Raw Data/Environment/geostat-environment-annual/official/page-565-ka.html,2026-10-20
+source.geostat_env_page_73,გარემოს სტატისტიკა (წყაროს გვერდი),docs/Raw Data/Environment/geostat-environment-annual/official/page-73-en.html,2026-10-20
+source.geostat_env_page_73_ka,"გარემოს სტატისტიკა (წყაროს გვერდი, ქართული ვერსია)",docs/Raw Data/Environment/geostat-environment-annual/official/page-73-ka.html,2026-10-20
+source.geostat_env_page_822,ტყის რესურსები (წყაროს გვერდი),docs/Raw Data/Environment/geostat-environment-annual/official/page-822-en.html,2026-10-20
+source.geostat_env_page_822_ka,"ტყის რესურსები (წყაროს გვერდი, ქართული ვერსია)",docs/Raw Data/Environment/geostat-environment-annual/official/page-822-ka.html,2026-10-20
 source.geostat_science_researchers,"მკვლევართა რაოდენობა (ხარისხი, ასაკი, სამეცნიერო დარგი)",docs/Raw Data/ScienceCulture/geostat-science-culture-annual/official/Researchers.xlsx,2026-10-20
 source.geostat_science_rd_staff,კვლევებსა და განვითარებაში დასაქმებული პერსონალი სტატუსის მიხედვით,docs/Raw Data/ScienceCulture/geostat-science-culture-annual/official/R&D-Personal.xlsx,2026-10-20
 source.geostat_science_institutions,კვლევებსა და განვითარებაში ჩართული დაწესებულებები და მათი ხარჯები,docs/Raw Data/ScienceCulture/geostat-science-culture-annual/official/Institutions.xlsx,2026-10-20

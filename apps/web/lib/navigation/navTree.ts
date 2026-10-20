@@ -6,6 +6,7 @@ import { LIVING_STANDARDS_HUB_PATH, LIVING_STANDARDS_SECTIONS } from "../explore
 import { HEALTH_HUB_PATH, HEALTH_SECTIONS } from "../explorer/health";
 import { CRIME_HUB_PATH, CRIME_SECTIONS } from "../explorer/crime";
 import { ENERGY_FOOD_HUB_PATH, ENERGY_FOOD_SECTIONS } from "../explorer/energyFood";
+import { ENVIRONMENT_HUB_PATH, ENVIRONMENT_SECTIONS } from "../explorer/environment";
 import { MONEY_BANKS_SECTIONS } from "../explorer/moneyBanks";
 import { BUSINESS_HUB_PATH, BUSINESS_SECTIONS } from "../explorer/business";
 import { HOUSING_HUB_PATH, HOUSING_SECTIONS } from "../explorer/housing";
@@ -190,6 +191,14 @@ export const NAV_TREE: readonly NavHub[] = [
     testId: "energy-food-link",
     spaced: true,
     sections: sectionRows(ENERGY_FOOD_SECTIONS, "energy-food"),
+  },
+  {
+    href: ENVIRONMENT_HUB_PATH,
+    labelKey: "common.environment",
+    railLabelKey: "common.dataEnvironment",
+    testId: "environment-link",
+    spaced: true,
+    sections: sectionRows(ENVIRONMENT_SECTIONS, "environment"),
   },
   {
     href: DEMOGRAPHY_HUB_PATH,

@@ -418,6 +418,17 @@ const TOPIC_DATASETS: Record<TopicDatasetId, { keywords: Record<Locale, readonly
     },
     sources: ["geostat"],
   },
+  environment: {
+    keywords: {
+      ka: ["სათბურის გაზები", "ჰაერის დაბინძურება", "ჰაერის ხარისხი", "ტემპერატურა", "ნალექი", "წყალი", "ნარჩენები", "ტყეები", "საქართველო"],
+      en: ["Georgia", "environment", "climate", "greenhouse gases", "air pollution", "air quality", "temperature", "rainfall", "water", "waste", "forests"],
+    },
+    measurementTechnique: {
+      ka: "გადამოწმებული ამოღება საქსტატის გარემოს დაცვის ოფიციალური გამოქვეყნებული სტატისტიკიდან, ისე, როგორც ცხრილები ბეჭდავს.",
+      en: "Reviewed extraction from Geostat's official published environment statistics, as its tables print them.",
+    },
+    sources: ["geostat"],
+  },
   "science-culture": {
     keywords: {
       ka: ["მეცნიერება", "კულტურა", "მკვლევარები", "პატენტები", "მუზეუმები", "თეატრები", "საქართველო"],

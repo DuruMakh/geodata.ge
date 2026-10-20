@@ -36,6 +36,7 @@ import {
   loadBusinessFactsFromMirror,
   loadHousingFactsFromMirror,
   loadEducationFactsFromMirror,
+  loadEnvironmentFactsFromMirror,
   loadScienceCultureFactsFromMirror,
   loadHouseholdFactsFromMirror,
   loadTradePartnersDataFromMirror,
@@ -194,6 +195,10 @@ export async function loadHousingFactsFromDb() {
 
 export async function loadEducationFactsFromDb() {
   return loadEducationFactsFromMirror(prisma);
+}
+
+export async function loadEnvironmentFactsFromDb() {
+  return loadEnvironmentFactsFromMirror(prisma);
 }
 
 export async function loadScienceCultureFactsFromDb() {

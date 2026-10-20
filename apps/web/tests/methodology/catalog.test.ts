@@ -67,7 +67,7 @@ const registerRow = (overrides: Partial<DecisionRegisterRow> = {}): DecisionRegi
 
 describe("methodology catalog", () => {
   it("exposes the approved live datasets", () => {
-    expect(LIVE_METHODOLOGY_IDS).toEqual(["expenditure", "revenue", "municipalities", "debt", "gdp", "economic-sectors", "gdp-expenditure", "regional-economies", "business", "housing", "inflation", "money", "unemployment", "wages", "poverty", "household-income", "health", "education", "science-culture", "crime", "trade", "external-flows", "energy-food", "demography"]);
+    expect(LIVE_METHODOLOGY_IDS).toEqual(["expenditure", "revenue", "municipalities", "debt", "gdp", "economic-sectors", "gdp-expenditure", "regional-economies", "business", "housing", "inflation", "money", "unemployment", "wages", "poverty", "household-income", "health", "education", "science-culture", "crime", "trade", "external-flows", "energy-food", "environment", "demography"]);
     expect(Object.keys(METHODOLOGY_CONTENT)).toEqual(LIVE_METHODOLOGY_IDS);
   });
 
@@ -356,6 +356,7 @@ describe("methodology catalog", () => {
       "household-income": { fileCount: 21, totalBytes: 100, latestRetrievedAt: "2026-10-11", validated: true, minYear: 2002, maxYear: 2025 },
       health: { fileCount: 36, totalBytes: 100, latestRetrievedAt: "2026-10-15", validated: true, minYear: 2002, maxYear: 2025 },
       crime: { fileCount: 22, totalBytes: 100, latestRetrievedAt: "2026-10-16", validated: true, minYear: 2001, maxYear: 2025 },
+      environment: { fileCount: 46, totalBytes: 100, latestRetrievedAt: "2026-10-20", validated: true, minYear: 1990, maxYear: 2025 },
       education: { fileCount: 45, totalBytes: 100, latestRetrievedAt: "2026-10-16", validated: true, minYear: 2000, maxYear: 2025 },
       "science-culture": { fileCount: 33, totalBytes: 100, latestRetrievedAt: "2026-10-20", validated: true, minYear: 2005, maxYear: 2025 },
       money: { fileCount: 20, totalBytes: 100, latestRetrievedAt: "2026-10-11", validated: true, minYear: 1995, maxYear: 2025 },
@@ -428,6 +429,7 @@ describe("methodology catalog", () => {
       { id: "trade", title: METHODOLOGY_CONTENT.trade.title, summary: METHODOLOGY_CONTENT.trade.summary, href: "/methodology/trade", coverage: { firstYear: 1995, lastYear: 2025 }, originalFileCount: 3, reviewedAt: METHODOLOGY_CONTENT.trade.reviewedAt },
       { id: "external-flows", title: METHODOLOGY_CONTENT["external-flows"].title, summary: METHODOLOGY_CONTENT["external-flows"].summary, href: "/methodology/external-flows", coverage: { firstYear: 2000, lastYear: 2025 }, originalFileCount: 3, reviewedAt: METHODOLOGY_CONTENT["external-flows"].reviewedAt },
       { id: "energy-food", title: METHODOLOGY_CONTENT["energy-food"].title, summary: METHODOLOGY_CONTENT["energy-food"].summary, href: "/methodology/energy-food", coverage: { firstYear: 2006, lastYear: 2025 }, originalFileCount: 55, reviewedAt: METHODOLOGY_CONTENT["energy-food"].reviewedAt },
+      { id: "environment", title: METHODOLOGY_CONTENT.environment.title, summary: METHODOLOGY_CONTENT.environment.summary, href: "/methodology/environment", coverage: { firstYear: 1990, lastYear: 2025 }, originalFileCount: 46, reviewedAt: METHODOLOGY_CONTENT.environment.reviewedAt },
       { id: "demography", title: METHODOLOGY_CONTENT.demography.title, summary: METHODOLOGY_CONTENT.demography.summary, href: "/methodology/demography", coverage: { firstYear: 2004, lastYear: 2026 }, originalFileCount: 2, reviewedAt: METHODOLOGY_CONTENT.demography.reviewedAt },
     ]);
   });
@@ -452,6 +454,7 @@ describe("methodology catalog", () => {
       "household-income": { fileCount: 21, totalBytes: 100, latestRetrievedAt: "2026-10-11", validated: true, minYear: 2002, maxYear: 2025 },
       health: { fileCount: 36, totalBytes: 100, latestRetrievedAt: "2026-10-15", validated: true, minYear: 2002, maxYear: 2025 },
       crime: { fileCount: 22, totalBytes: 100, latestRetrievedAt: "2026-10-16", validated: true, minYear: 2001, maxYear: 2025 },
+      environment: { fileCount: 46, totalBytes: 100, latestRetrievedAt: "2026-10-20", validated: true, minYear: 1990, maxYear: 2025 },
       education: { fileCount: 45, totalBytes: 100, latestRetrievedAt: "2026-10-16", validated: true, minYear: 2000, maxYear: 2025 },
       "science-culture": { fileCount: 33, totalBytes: 100, latestRetrievedAt: "2026-10-20", validated: true, minYear: 2005, maxYear: 2025 },
       money: { fileCount: 20, totalBytes: 100, latestRetrievedAt: "2026-10-11", validated: true, minYear: 1995, maxYear: 2025 },

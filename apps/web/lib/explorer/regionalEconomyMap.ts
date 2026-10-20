@@ -126,6 +126,8 @@ export type RegionMapModel = {
   firstYear: number;
   year: number;
   regions: Array<{ regionId: string; nameKa: string; value: number; rank: number; bucket: number; pathD: string }>;
+  /** Regions drawn and listed without a value or rank (Tbilisi on the Forests map, which has no timber figure). */
+  withoutValue?: Array<{ regionId: string; nameKa: string; pathD: string }>;
   occupiedAreas: RegionalEconomyMapModel["occupiedAreas"];
   legendMin: number;
   legendMax: number;
@@ -161,17 +163,24 @@ export function latestCompleteRegionYear(facts: readonly { indicatorId: string; 
 
 /**
  * The eleven regions coloured by one latest-year value each and ranked from the highest (Unemployment, Wages). Every
- * listed region needs a value and a shape, and every value a listed region; `measure` names the value in errors.
+ * listed region needs a value and a shape, and every value a listed region; `measure` names the value in errors. The
+ * regions named in `withoutValue` need only a shape: they are kept apart, unranked and uncoloured.
  */
-export function buildLatestValueRegionMapModel({ regions, latest, year, firstYear, measure }: {
+export function buildLatestValueRegionMapModel({ regions, latest, year, firstYear, measure, withoutValue }: {
   regions: readonly { id: string; kaLabel: string; sortOrder: number }[];
   latest: ReadonlyMap<string, number>;
   year: number;
   firstYear: number;
   measure: string;
+  withoutValue?: readonly string[];
 }): RegionMapModel {
   const geometry = regionalMapGeometry();
-  const placed = regions.map(region => {
+  const unvalued = regions.filter(region => withoutValue?.includes(region.id)).map(region => {
+    const pathD = geometry.pathByRegion.get(region.id);
+    if (!pathD || latest.has(region.id)) throw new Error(`Invalid regional ${measure} region without a value: ${region.id}`);
+    return { regionId: region.id, nameKa: region.kaLabel, pathD };
+  });
+  const placed = regions.filter(region => !withoutValue?.includes(region.id)).map(region => {
     const value = latest.get(region.id);
     if (value === undefined) throw new Error(`Missing latest regional ${measure} for ${region.id}`);
     const pathD = geometry.pathByRegion.get(region.id);
@@ -184,6 +193,7 @@ export function buildLatestValueRegionMapModel({ regions, latest, year, firstYea
     viewBox: geometry.viewBox, occupiedAreas: geometry.occupiedAreas, firstYear, year,
     regions: placed.sort((a, b) => b.value - a.value || a.sortOrder - b.sortOrder).map((region, index) => ({ regionId: region.regionId, nameKa: region.nameKa, value: region.value, pathD: region.pathD, rank: index + 1, bucket: bucketOf(region.value) })),
     legendMin: Math.min(...placed.map(region => region.value)), legendMax: Math.max(...placed.map(region => region.value)),
+    ...(withoutValue ? { withoutValue: unvalued } : {}),
   };
 }
 
