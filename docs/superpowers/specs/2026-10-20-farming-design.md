@@ -1,7 +1,7 @@
 # Farming page in the Energy and food hub
 
 Date: 2026-10-20
-Status: Draft for Duru's review. Duru picked "Farming, as a small page" from the second more-data list on 2026-10-20 and asked for it in its own thread. A full farming hub was judged too niche on 2026-10-11, so this adds **one page** to the existing Energy and food hub. Food self-sufficiency stays as it is. The page serves about 710 Geostat values.
+Status: Approved by Duru on 2026-10-20 ("Approve one page"). Duru picked "Farming, as a small page" from the second more-data list on 2026-10-20 and asked for it in its own thread. A full farming hub was judged too niche on 2026-10-11, so this adds **one page** to the existing Energy and food hub. Food self-sufficiency stays as it is. The page serves about 710 Geostat values.
 
 ## 1. Intended result
 

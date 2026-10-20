@@ -417,6 +417,13 @@ async function sitemapDates(): Promise<Map<string, string | undefined>> {
 }
 
 describe("sitemap lastmod reports each entity's own reviewed date", () => {
+  it("dates each energy and food page by its own facts, and the hub by the newest", async () => {
+    const dates = await sitemapDates();
+    for (const page of ["energy-supply", "electricity", "energy-use", "food-self-sufficiency"]) expect(dates.get(`${SITE}/explorer/energy-food/${page}`), page).toBe("2026-10-11");
+    expect(dates.get(`${SITE}/explorer/energy-food/farming`)).toBe("2026-10-20");
+    expect(dates.get(`${SITE}/explorer/energy-food`)).toBe("2026-10-20");
+  });
+
   it("gives every municipality the date its own facts were reviewed", async () => {
     const [dates, municipalData, { sourceDocuments }] = await Promise.all([
       sitemapDates(),

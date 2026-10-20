@@ -28,7 +28,7 @@ import { loadServedEducationData } from "../data/education/importEducation";
 import { EDUCATION_HUB_PATH, EDUCATION_SECTIONS } from "../explorer/education";
 import { educationPlaceBase } from "../explorer/educationPlaces";
 import { loadServedEnergyFoodData } from "../data/energyFood/importEnergyFood";
-import { ENERGY_FOOD_HUB_PATH, ENERGY_FOOD_SECTIONS } from "../explorer/energyFood";
+import { ENERGY_FOOD_HUB_PATH, ENERGY_FOOD_SECTIONS, energyFoodLastReviewedAt } from "../explorer/energyFood";
 import { loadServedMoneyBanksData } from "../data/moneyBanks/importMoneyBanks";
 import { MONEY_BANKS_SECTIONS } from "../explorer/moneyBanks";
 import { loadServedBusinessData } from "../data/business/importBusiness";
@@ -205,7 +205,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...EDUCATION_SECTIONS.map(section => ({ url: `${siteUrl}${section.href}`, lastModified: educationModified })),
     ...(["schools", "kindergartens"] as const).flatMap(set => placePagePaths(educationPlaceBase(set), regions.map((region) => region.id)).map((path) => ({ url: `${siteUrl}${path}`, lastModified: educationModified }))),
     { url: `${siteUrl}${ENERGY_FOOD_HUB_PATH}`, lastModified: energyFoodModified },
-    ...ENERGY_FOOD_SECTIONS.map(section => ({ url: `${siteUrl}${section.href}`, lastModified: energyFoodModified })),
+    // Each page carries its own facts' review date, as its header and Dataset JSON-LD do; the hub the newest.
+    ...ENERGY_FOOD_SECTIONS.map(section => ({ url: `${siteUrl}${section.href}`, lastModified: new Date(energyFoodLastReviewedAt(section.id, energyFoodFacts)) })),
     { url: `${siteUrl}/explorer/trade`, lastModified: tradeHubModified },
     { url: `${siteUrl}/explorer/trade/overview`, lastModified: tradeModified },
     { url: `${siteUrl}/explorer/trade/partners`, lastModified: tradePartnersModified },

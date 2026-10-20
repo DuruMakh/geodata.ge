@@ -195,14 +195,14 @@ test("within a chart's group every non-reference series has its own readable col
 const COPY: Record<Locale, Record<string, string>> = {
   en: {
     "energyFood.unit.ktoe": "ktoe", "energyFood.unit.gwh": "GWh", "energyFood.unit.percent": "%", "energyFood.series": "Series",
-    "energyFood.status.published": "Published", "energyFood.status.no_flow": "No flow", "energyFood.status.preliminary": "Preliminary", "energyFood.unit.price": "₾",
+    "energyFood.status.published": "Published", "energyFood.status.no_flow": "No flow", "energyFood.status.preliminary": "Preliminary", "energyFood.unit.price": "₾", "energyFood.unit.priceLong": "₾ per kg (milk per litre, eggs per piece)",
     "common.energySupply": "Energy supply", "common.electricity": "Electricity", "common.energyUse": "Energy use", "common.foodSelfSufficiency": "Food self-sufficiency",
     "common.farming": "Farming", "energyFood.unit.million_gel": "million ₾",
     ...Object.fromEntries(ENERGY_FOOD_SECTIONS.flatMap(({ id }) => [[`energyFood.page.${id}.title`, `${id} title`], [`energyFood.page.${id}.summary`, `${id} summary`]])),
   },
   ka: {
     "energyFood.unit.ktoe": "ათასი ტ.ნ.ე.", "energyFood.unit.gwh": "გვტ.სთ", "energyFood.unit.percent": "%", "energyFood.series": "სერია",
-    "energyFood.status.published": "გამოქვეყნებული", "energyFood.status.no_flow": "ნაკადი არ არის", "energyFood.status.preliminary": "წინასწარი", "energyFood.unit.price": "₾",
+    "energyFood.status.published": "გამოქვეყნებული", "energyFood.status.no_flow": "ნაკადი არ არის", "energyFood.status.preliminary": "წინასწარი", "energyFood.unit.price": "₾", "energyFood.unit.priceLong": "₾ 1 კგ-ზე (რძე 1 ლიტრზე, კვერცხი 1 ცალზე)",
     "common.energySupply": "ენერგიის მიწოდება", "common.electricity": "ელექტროენერგია", "common.energyUse": "ენერგიის მოხმარება", "common.foodSelfSufficiency": "სურსათის თვითუზრუნველყოფა",
     "common.farming": "სოფლის მეურნეობა", "energyFood.unit.million_gel": "მლნ ₾",
     ...Object.fromEntries(ENERGY_FOOD_SECTIONS.flatMap(({ id }) => [[`energyFood.page.${id}.title`, `${id} სათაური`], [`energyFood.page.${id}.summary`, `${id} აღწერა`]])),
@@ -417,8 +417,10 @@ test("the farming price workbook formats values 0.00 and names the price unit", 
   expect(model.filename).toBe("fiscal-energy-food-farming-2024-2025-en.xlsx");
   expect(model.readable.numberFormat).toBe("0.00");
   expect(model.readable.amountDecimals).toBe(2);
-  expect(model.readable.unitLabel).toBe("₾");
-  expect(model.analysis.headers[2]).toBe("₾");
+  // The file names the price unit in full: a price without "per kg" would read as lari per anything.
+  expect(model.readable.unitLabel).toBe("₾ per kg (milk per litre, eggs per piece)");
+  expect(model.readable.subtitle).toBe("2024–2025 · ₾ per kg (milk per litre, eggs per piece)");
+  expect(model.analysis.headers[2]).toBe("₾ per kg (milk per litre, eggs per piece)");
   expect(model.analysis.numericFormats).toEqual({ 3: "0.00" });
   expect(model.analysis.rows.find(r => r[0] === 2025 && r[1] === "Wheat")!.slice(2)).toEqual([0.57, "Published"]);
   expect(model.sources.map(source => source.title)).toEqual(["geostat_farming_prices"]);
