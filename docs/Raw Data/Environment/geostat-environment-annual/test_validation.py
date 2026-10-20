@@ -73,9 +73,17 @@ class EnvironmentPackageTests(unittest.TestCase):
         self.assertEqual(self.values('environment.forest.timber_cut.region_kakheti')[2023], '52954.015')  # stored as 52954.01500000112
         self.assertEqual(self.values('environment.ghg.gas_sf6')[2022], '1.14')
         for row in self.rows:
-            self.assertEqual(row['decimals'], len(row['value'].split('.')[1]) if '.' in row['value'] else 0)
-            self.assertEqual(row['published_value'], row['value'])
-        self.assertEqual(find(self.rows, 'environment.forest.timber_cut.region_kakheti', 2023)['decimals'], 3)
+            self.assertEqual(row['decimals'], len(row['published_value'].split('.')[1]) if '.' in row['published_value'] else 0)
+            places = Decimal(1).scaleb(-row['decimals'])
+            self.assertEqual(Decimal(row['value']).quantize(places, rounding='ROUND_HALF_UP'), Decimal(row['published_value']))
+        # The published value is the figure the table prints, which can have fewer decimals than the stored cell.
+        shown = {(row['indicator_id'], row['year']): (row['value'], row['published_value']) for row in self.rows if row['published_value'] != row['value']}
+        self.assertEqual(len(shown), 89)
+        self.assertEqual(shown[('environment.ghg.total', 2018)], ('17.66', '17.7'))
+        self.assertEqual(shown[('environment.ghg.gas_sf6', 2022)], ('1.14', '1.1'))
+        self.assertEqual(shown[('environment.aq.pm10_avg.rustavi_d2', 2025)], ('44.5', '45'))
+        self.assertEqual(shown[('environment.forest.timber_cut.region_kakheti', 2023)], ('52954.015', '52954'))
+        self.assertEqual(find(self.rows, 'environment.forest.timber_cut.region_kakheti', 2023)['decimals'], 0)
 
     def test_placeholders(self):
         self.assertNotIn(2000, self.values('environment.ghg.gas_hfcs'))  # "…"

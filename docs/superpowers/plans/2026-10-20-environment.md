@@ -30,6 +30,7 @@
 **Amended while planning (2026-10-20).** None of this changes what a reader sees:
 - The place (station, city, region, Georgia) is part of the indicator ID, as on Housing (`environment.waste.collected.region_tbilisi`). So `EnvironmentFact` has the same columns as `CrimeFact`, plus `decimals`, and no area column. Spec §11's "area" is the ID's last segment.
 - **Changed while executing (2026-10-20):** `decimals` is not stored. It is read from the published value (`toClientEnvironmentFact` gives `Decimal.decimalPlaces()`), so the canonical CSV has exactly Crime's columns and the database model has no `decimals` column. Values are 12 significant digits, not 15, wherever this plan says 15. The climate rows name their region ("Guria (warmest region)"): Geostat names the four regions in its block titles, and they are fixed. `loadServedEnvironmentData()` returns the facts array.
+- **Also changed (2026-10-20):** `published_value` is the figure Geostat's table prints, the stored cell rounded half up to its number format's decimals (`0.0` is one, `#,##0` none; General prints the value). 89 rows differ from `value`, such as greenhouse gases 2018 (17.66 printed 17.7) and Rustavi D2 PM10 2025 (44.5 printed 45). Pages and Excel show `published_value`; sum checks use `value`.
 - Water keeps the three treatment levels (primary, secondary, tertiary; million persons) as served rows that no page lists. Septic tanks and self-supplied households stay in the research package only.
 
 ## Review Focus

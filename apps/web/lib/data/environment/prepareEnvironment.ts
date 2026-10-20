@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { parse } from "csv-parse/sync";
+import Decimal from "decimal.js";
 import * as XLSX from "xlsx";
 import { serializeBomCsvRows } from "../csvEscape";
 import { readVerifiedPackageFile } from "../sourcePackage";
@@ -33,6 +34,14 @@ export function environmentCellValue(cell: XLSX.CellObject | undefined, sourceId
   return starred ? String(Number(starred[1])) : undefined;
 }
 
+/** The figure the table prints: a number cell rounded half up to its number format's decimals, a General cell as stored. */
+export function environmentShownValue(cell: XLSX.CellObject, value: string): string {
+  if (cell.t !== "n" || cell.z === "General") return value;
+  if (!/^(0(\.0+)?|#,##0|#\\ ##0)$/.test(String(cell.z))) throw new Error(`Unexpected environment number format: ${cell.z}`);
+  const places = String(cell.z).includes(".") ? String(cell.z).split(".")[1].length : 0;
+  return new Decimal(value).toDecimalPlaces(places, Decimal.ROUND_HALF_UP).toFixed();
+}
+
 /**
  * Promotes the research package's 2,125 observations into the canonical serving CSV. Every value is re-read from its
  * archived workbook cell (SheetJS reads both the .xlsx and the old .xls files); nothing is calculated.
@@ -47,7 +56,7 @@ export async function prepareEnvironmentData(repositoryRoot: string, mode: "writ
   for (const source of manifest) {
     const { bytes } = await readVerifiedPackageFile(directory, source.local_file, source, `Environment source capture mismatch: ${source.local_file}`);
     // The Georgian versions, the other workbooks and the page captures are archived only; none of their cells is served.
-    if (ENVIRONMENT_SOURCES.includes(source.source_id)) books.set(source.source_id, XLSX.read(bytes, { type: "buffer" }));
+    if (ENVIRONMENT_SOURCES.includes(source.source_id)) books.set(source.source_id, XLSX.read(bytes, { type: "buffer", cellNF: true }));
   }
   const report = JSON.parse(await fs.readFile(path.join(directory, "validation-report.json"), "utf8")) as {
     status: string; primary_observation_count: number; reconciliation_failed_count: number; imputed_values: number; calculated_values: number; placeholder_cells_in_served_values: number;
@@ -60,8 +69,8 @@ export async function prepareEnvironmentData(repositoryRoot: string, mode: "writ
   const rows = parse(await fs.readFile(path.join(directory, "environment-annual.csv")), { columns: true, bom: true, skip_empty_lines: true }) as CsvRecord[];
   if (rows.length !== report.primary_observation_count) throw new Error("Environment observation count differs from the research report");
   const facts: EnvironmentFact[] = rows.map(row => {
-    const book = books.get(row.source_id);
-    if (!book || environmentCellValue(book.Sheets[row.source_sheet]?.[row.source_cell], row.source_id) !== row.value) {
+    const cell = books.get(row.source_id)?.Sheets[row.source_sheet]?.[row.source_cell];
+    if (!cell || environmentCellValue(cell, row.source_id) !== row.value || environmentShownValue(cell, row.value) !== row.published_value) {
       throw new Error(`Environment source cell mismatch: ${row.source_id}:${row.source_sheet}:${row.source_cell}`);
     }
     return {

@@ -4,7 +4,7 @@
 // sheets by walking each station block line by line, keeping the current pollutant heading. The label tables are written here,
 // not copied from prepare.py. Every number (or number printed with a footnote mark) in a served row's year columns counts as an
 // observation, so the served year ranges are derived here. It then compares all rows of environment-annual.csv with what it
-// found: value, published value, decimals, cell, sheet, unit, source ID, basis and status. It re-checks the sums, that each city's
+// found: value, published value (the cell rounded to its number format), decimals, cell, sheet, unit, source ID, basis and status. It re-checks the sums, that each city's
 // stations print one set of limits, that every served cell holds the same number in the Georgian workbook (one known
 // difference), and the manifest's SHA-256 and size of every archived file. Writes independent-validation.json unless --no-write.
 import { createRequire } from 'node:module';
@@ -25,7 +25,7 @@ const MANIFEST = JSON.parse(readFileSync(join(root, 'source-manifest.json'), 'ut
 const fileOf = id => MANIFEST.find(s => s.source_id === id).local_file;
 const books = new Map();
 const workbook = id => {
-  if (!books.has(id)) books.set(id, XLSX.read(readFileSync(join(root, fileOf(id))), { type: 'buffer' }));
+  if (!books.has(id)) books.set(id, XLSX.read(readFileSync(join(root, fileOf(id))), { type: 'buffer', cellNF: true }));
   return books.get(id);
 };
 const NIL = 'geostat_env_illegal_logging';
@@ -39,6 +39,12 @@ const valueOf = (cell, source) => {
   const starred = /^(\d+(?:\.\d+)?)\*$/.exec(text);
   if (starred) return String(Number(starred[1]));
   throw new Error(`Unexpected cell ${source} ${cell.v}`);
+};
+/** The figure the table prints: a number cell rounded to its number format's decimals ("0.0" is one), General as stored. */
+const shownOf = (cell, value) => {
+  if (cell.t !== 'n' || cell.z === 'General') return value;
+  if (!/^(0(\.0+)?|#,##0|#\\ ##0)$/.test(cell.z)) throw new Error(`Unexpected number format ${cell.z}`);
+  return String(Number(cell.v.toFixed(cell.z.includes('.') ? cell.z.split('.')[1].length : 0)));
 };
 const rowCells = (sheet, row) => addresses(sheet).filter(a => rowOf(a) === row);
 const label = (sheet, row) => (sheet[`A${row}`]?.t === 's' ? compact(sheet[`A${row}`].v) : '');
@@ -189,7 +195,8 @@ function verify(rows) {
     seen.add(key);
     if (!expected) { failures.push(`not found again: ${key}`); continue; }
     if (expected.cell === row.source_cell && expected.sheet === row.source_sheet && expected.source === row.source_id) counts.cells += 1; else failures.push(`cell differs: ${key}`);
-    if (expected.value === row.value && row.published_value === row.value && Number(row.decimals) === decimalsOf(row.value)) counts.values += 1; else failures.push(`value differs: ${key}`);
+    const shown = shownOf(workbook(expected.source).Sheets[expected.sheet][expected.cell], expected.value);
+    if (expected.value === row.value && row.published_value === shown && Number(row.decimals) === decimalsOf(shown)) counts.values += 1; else failures.push(`value differs: ${key}`);
     if (expected.unit === row.unit) counts.units += 1; else failures.push(`unit differs: ${key}`);
     if (row.basis === 'actual' && row.value_status === 'official') counts.statuses += 1; else failures.push(`basis or status: ${key}`);
   }

@@ -216,6 +216,7 @@ None of these changes what a reader sees.
 - The area is part of the indicator ID, as on Housing, for example `environment.aq.pm10_avg.tbilisi_a1` and `environment.waste.collected.region_tbilisi`. The row has no separate area column; "area" above means the ID's last segment.
 - Geostat names the warmest, coldest, wettest and driest regions in its climate block titles, so the rows carry those names (§7 corrected).
 - Values are kept to 12 significant digits, not 15: 12 removes Geostat's floating noise and moves no published figure.
+- The published value is the figure the table prints: the stored cell rounded to its number format's decimals (17.66 is printed 17.7, 44.5 µg/m³ is printed 45). The pages and Excel show it; the sum checks use the stored value.
 - A value's shown decimals are read from its published text, so the data file and database store no separate decimals column.
 - Tbilisi has no timber value, so the Forests map draws Tbilisi's shape without a value or rank ("no data") instead of leaving it out. This uses a small optional addition to the shared map builder, which leaves every existing map unchanged.
 

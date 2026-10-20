@@ -13,7 +13,7 @@ Downloaded workbooks are untrusted data: run the scripts with `python3 -I` from 
 import argparse
 from collections import defaultdict
 import csv
-from decimal import Decimal
+from decimal import ROUND_HALF_UP, Decimal
 import functools
 import hashlib
 import html
@@ -312,11 +312,22 @@ def _text(xml):
     return html.unescape(''.join(re.findall(r'<t\b[^>]*>([\s\S]*?)</t>', re.sub(r'<rPh\b[\s\S]*?</rPh>', '', xml))))
 
 
+BUILT_IN_FORMATS = {0: 'General', 1: '0', 2: '0.00', 3: '#,##0', 4: '#,##0.00'}
+
+
+def _xlsx_formats(archive):
+    """The number format of each cell style (the `s` attribute of a cell): a built-in or the workbook's own format code."""
+    styles = ET.fromstring(archive.read('xl/styles.xml'))
+    codes = {int(item.get('numFmtId')): item.get('formatCode') for item in styles.findall('x:numFmts/x:numFmt', NS)}
+    return [codes.get(int(xf.get('numFmtId', 0)), BUILT_IN_FORMATS.get(int(xf.get('numFmtId', 0)))) for xf in styles.findall('x:cellXfs/x:xf', NS)]
+
+
 def _read_xlsx(path):
-    """{sheet name: {row: {column: {value, cell, kind}}}} of every worksheet of a .xlsx. Numbers stay exact decimal tokens
-    ('n', Decimal); text is 'content' ('s'). A self-closing or valueless cell is absent."""
+    """{sheet name: {row: {column: {value, cell, kind, format}}}} of every worksheet of a .xlsx. Numbers stay exact decimal tokens
+    ('n', Decimal) with their number format; text is 'content' ('s'). A self-closing or valueless cell is absent."""
     out = {}
     with ZipFile(path) as archive:
+        formats = _xlsx_formats(archive)
         workbook = ET.fromstring(archive.read('xl/workbook.xml'))
         relations = {rel.get('Id'): rel.get('Target') for rel in ET.fromstring(archive.read('xl/_rels/workbook.xml.rels'))}
         strings = []
@@ -345,7 +356,7 @@ def _read_xlsx(path):
                     value = Decimal(token.group(1))
                 else:
                     raise ValueError(f'Unsupported cell type {kind}: {coordinate}')
-                rows[int(row)][column] = {'value': value, 'cell': coordinate, 'kind': 'n' if kind == 'n' else 's'}
+                rows[int(row)][column] = {'value': value, 'cell': coordinate, 'kind': 'n' if kind == 'n' else 's', 'format': formats[int(attributes.get('s', 0))]}
             out[sheet.get('name')] = {number: dict(sorted(cells.items(), key=lambda item: _column_number(item[0]))) for number, cells in sorted(rows.items())}
     return out
 
@@ -356,7 +367,7 @@ def _read_xls(path):
         import xlrd
     except ImportError as error:
         raise SystemExit('xlrd 2.0.1 is needed to read the .xls workbooks: python3 -m pip install xlrd==2.0.1') from error
-    book = xlrd.open_workbook(str(path))
+    book = xlrd.open_workbook(str(path), formatting_info=True)
     out = {}
     for sheet in book.sheets():
         rows = defaultdict(dict)
@@ -371,7 +382,8 @@ def _read_xls(path):
                     value, kind = sheet.cell_value(row, column), 's'
                 else:
                     raise ValueError(f'Unsupported cell type {cell_type}: {_column_letters(column)}{row + 1} in {Path(path).name}')
-                rows[row + 1][_column_letters(column)] = {'value': value, 'cell': f'{_column_letters(column)}{row + 1}', 'kind': kind}
+                number_format = book.format_map[book.xf_list[sheet.cell_xf_index(row, column)].format_key].format_str
+                rows[row + 1][_column_letters(column)] = {'value': value, 'cell': f'{_column_letters(column)}{row + 1}', 'kind': kind, 'format': number_format}
         out[sheet.name] = dict(sorted(rows.items()))
     return out
 
@@ -505,6 +517,21 @@ def decimals(text):
     return len(text.split('.')[1]) if '.' in text else 0
 
 
+FIXED_FORMAT = re.compile(r'0(\.0+)?|#,##0|#\\ ##0')
+
+
+def displayed(cell, value):
+    """The figure Geostat's table shows: a number cell rounded half up to the decimals of its number format, or the value itself
+    when the format is General (and for a number printed as text). Geostat often stores more decimals than it prints, such as
+    17.66 printed as 17.7, or 44.5 µg/m³ printed as 45."""
+    if cell['kind'] != 'n' or cell['format'] == 'General':
+        return value
+    if not FIXED_FORMAT.fullmatch(cell['format']):
+        raise ValueError(f'Unexpected number format: {cell}')
+    places = decimals(cell['format'])
+    return _plain(cell['value'].quantize(Decimal(1).scaleb(-places), rounding=ROUND_HALF_UP))
+
+
 # ---------------------------------------------------------------- extraction
 
 def _spec(key):
@@ -570,7 +597,8 @@ def extract():
 
 
 def _row(year, indicator_id, value, spec, cell):
-    return {'year': year, 'indicator_id': indicator_id, 'value': value, 'published_value': value, 'unit': spec.unit, 'decimals': decimals(value),
+    shown = displayed(cell, value)
+    return {'year': year, 'indicator_id': indicator_id, 'value': value, 'published_value': shown, 'unit': spec.unit, 'decimals': decimals(shown),
             'basis': 'actual', 'value_status': 'official', 'source_id': spec.source_id, 'source_sheet': sheet_name(spec), 'source_cell': cell['cell']}
 
 
@@ -605,9 +633,9 @@ def validate(rows):
         keys.add(key)
         if row['indicator_id'] not in ORDER:
             raise ValueError(f'Unexpected indicator: {key}')
-        if row['basis'] != 'actual' or row['value_status'] != 'official' or row['published_value'] != row['value']:
-            raise ValueError(f'Unexpected basis, status or published value: {key}')
-        if not re.fullmatch(r'-?\d+(\.\d+)?', row['value']) or row['decimals'] != decimals(row['value']):
+        if row['basis'] != 'actual' or row['value_status'] != 'official':
+            raise ValueError(f'Unexpected basis or status: {key}')
+        if not re.fullmatch(r'-?\d+(\.\d+)?', row['value']) or row['decimals'] != decimals(row['published_value']):
             raise ValueError(f'Value is not a plain decimal: {key} {row["value"]}')
         if not 1990 <= row['year'] <= 2025:
             raise ValueError(f'Year outside the published tables: {key}')
@@ -681,7 +709,7 @@ def validate(rows):
     for row in rows:  # last, so an altered value is reported by the cross-check that notices it first
         cell = reread(row['source_id'], row['source_sheet'], row['source_cell'])
         value = published(cell, row['source_id'])
-        if value is None or value[0] != row['value']:
+        if value is None or value[0] != row['value'] or displayed(cell, value[0]) != row['published_value']:
             raise ValueError(f"Row disagrees with its source cell: {row['indicator_id']} {row['year']} {row['source_cell']}")
     return differences
 

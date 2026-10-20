@@ -154,6 +154,9 @@ describe("loading and parity", () => {
       year: 2022, indicatorId: "environment.ghg.sector_land", sourceId: "geostat_env_ghg", unit: "mt_co2e", value: -5.8, decimals: 1,
     });
     expect(toClientEnvironmentFact(find(facts, "environment.aq.pm10_avg.tbilisi_a1", 2025))).toMatchObject({ value: 31, decimals: 0 });
+    // Geostat stores 17.66 and 44.5 but its tables print 17.7 and 45: the page shows the printed figure.
+    expect(find(facts, "environment.ghg.total", 2018)).toMatchObject({ value: "17.66", publishedValue: "17.7" });
+    expect(toClientEnvironmentFact(find(facts, "environment.aq.pm10_avg.rustavi_d2", 2025))).toMatchObject({ value: 45, decimals: 0 });
     expect(facts.every(f => toClientEnvironmentFact(f).value === Number(f.publishedValue))).toBe(true);
     expect(Object.keys(toClientEnvironmentFact(facts[0])).sort()).toEqual(["decimals", "indicatorId", "sourceId", "unit", "value", "year"]);
   });

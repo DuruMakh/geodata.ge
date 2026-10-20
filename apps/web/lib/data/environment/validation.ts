@@ -84,7 +84,11 @@ export function validateEnvironmentFacts(facts: readonly EnvironmentFact[], repo
     ) throw new Error(`Invalid environment source contract: ${key}`);
     // A plain decimal with no trailing zero and at most 12 significant digits; a Geostat placeholder is no value.
     if (!/^-?(0|[1-9]\d*)(\.\d*[1-9])?$/.test(fact.value) || fact.value === "-0" || new Decimal(fact.value).sd() > 12) throw new Error(`Invalid environment value: ${key}`);
-    if (fact.publishedValue !== fact.value) throw new Error(`Environment published value does not match its stored value: ${key}`);
+    // The printed figure is the stored value rounded half up to the decimals Geostat's table shows.
+    const shown = new Decimal(fact.publishedValue);
+    if (!/^-?(0|[1-9]\d*)(\.\d*[1-9])?$/.test(fact.publishedValue) || !new Decimal(fact.value).toDecimalPlaces(shown.decimalPlaces(), Decimal.ROUND_HALF_UP).equals(shown)) {
+      throw new Error(`Environment published value is not its stored value as printed: ${key}`);
+    }
     seen.set(key, new Decimal(fact.value));
   }
   const missing = [...expected].filter(key => !seen.has(key));

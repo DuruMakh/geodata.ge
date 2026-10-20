@@ -78,9 +78,9 @@ export const ENVIRONMENT_RESEARCH_DIRECTORY = "docs/Raw Data/Environment/geostat
 export type EnvironmentFact = {
   year: number;
   indicatorId: string;
-  /** The published number as plain decimal text: 12 significant digits, no trailing zeros. */
+  /** The number stored in the cell as plain decimal text: 12 significant digits, no trailing zeros. */
   value: string;
-  /** Equals `value`: every served cell is the published figure. */
+  /** The figure the table prints: `value` rounded to the decimals of the cell's number format. The pages show it. */
   publishedValue: string;
   unit: EnvironmentUnit;
   basis: "actual";

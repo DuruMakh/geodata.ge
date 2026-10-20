@@ -63,13 +63,15 @@ Transport tables H-1 to H-4 belong to the Transport hub and are not downloaded h
 
 The 2,125 served observations (195 indicators). Columns: `year, indicator_id, value, published_value, unit, decimals, basis, value_status, source_id, source_sheet, source_cell`.
 
-- **`value`** is the published number rounded to 12 significant digits. This only ever drops the floating noise that Geostat's formulas leave behind:
+- **`value`** is the number stored in the cell, rounded to 12 significant digits. This only ever drops the floating noise that Geostat's formulas leave behind:
   - `3.8000000000000003` is `3.8`.
   - `52954.01500000112` is `52954.015`.
   - `prepare.py` fails if the rounding would move a value by more than one part in a billion.
   - Trailing zeros are dropped (`876749.0` is `876749`).
-- **`published_value`** equals `value`.
-- **`decimals`** is the number of decimals in `value`. The pages use it to print the value as published.
+- **`published_value`** is the figure the table prints: `value` rounded half up to the decimals of the cell's number format (`0.0` is one decimal, `#,##0` none). A cell formatted General prints `value` itself.
+  - Geostat often stores more decimals than it prints. In 89 rows the two differ, for example greenhouse gases 2018 (`17.66`, printed `17.7`), Rustavi D2 PM10 2025 (`44.5`, printed `45`) and timber cut in Kakheti 2023 (`52954.015`, printed `52954`).
+  - The sum checks use `value`; the pages show `published_value`.
+- **`decimals`** is the number of decimals in `published_value`. The pages use it to print the value as published.
 - **`basis`** is `actual` and **`value_status`** is `official` in every row.
 - **`source_cell`** is the A1 address; **`source_sheet`** is the sheet name. Only A-2 has several sheets, one per city plus "Other Cities".
 
