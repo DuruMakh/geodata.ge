@@ -44,6 +44,7 @@ export const DATA_VALIDATE_CHECKS = [
   "data:check-money",
   "data:check-business",
   "data:check-housing",
+  "data:check-gdp-expenditure",
   "data:check-education",
 ] as const;
 

@@ -1,0 +1,123 @@
+{
+  "capturedOn": "2026-10-20",
+  "reviewedAt": "2026-10-20",
+  "sourcePage": "https://www.geostat.ge/en/modules/categories/23/gross-domestic-product-gdp",
+  "accountingStandard": "sna_2008",
+  "identityToleranceGel": "0.01",
+  "growthCheckTolerancePercentagePoints": "0.0000000001",
+  "files": [
+    {
+      "role": "nominal",
+      "sourceId": "source.geostat_gdp_use_current",
+      "file": "docs/Raw Data/Economy/gdp-expenditure/sources/08_GDP-by-use-categories.xlsx",
+      "originalFilename": "08_GDP-by-use-categories.xlsx",
+      "url": "https://www.geostat.ge/media/83012/08_GDP-by-use-categories.xlsx",
+      "sha256": "d5455e69eff2f37164441192de30b2cf62c9d4521dd4f03ca9c2c4e199dddf96",
+      "bytes": 40966,
+      "releasedAt": "2026-09-28",
+      "sheet": "GDP by categories of USE",
+      "unit": "million_gel",
+      "annualYears": [2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025],
+      "firstAnnualColumn": "G",
+      "lastAnnualColumn": "CD",
+      "preliminaryYears": [2025],
+      "rows": {
+        "economy.gdp_total": [7, "B.1*g", "(=) GDP at market prices"],
+        "gdp_use.consumption": [9, "P.3", "Final Consumption Expenditures"],
+        "gdp_use.households": [10, "P.3", "Households"],
+        "gdp_use.npish": [11, "P.3", "NPISH"],
+        "gdp_use.government": [12, "P.3", "General government"],
+        "gdp_use.government_individual": [13, "P.31", "Individual  Goods and Services"],
+        "gdp_use.government_collective": [14, "P.32", "Collective Services"],
+        "gdp_use.investment": [15, "P.5", "(+) Gross Capital Formation"],
+        "gdp_use.fixed_capital": [16, "P.51", "Gross Fixed Capital Formation"],
+        "gdp_use.inventories": [17, "P.52", "Changes in Inventories"],
+        "gdp_use.exports": [19, "P.6", "(+) Exports of Goods and Services"],
+        "gdp_use.exports_goods": [20, "P.61", "Exports of goods"],
+        "gdp_use.exports_services": [21, "P.62", "Exports of Services"],
+        "gdp_use.imports": [22, "P.7", "(-) Imports of Goods and Services"],
+        "gdp_use.imports_goods": [23, "P.71", "Imports of Goods"],
+        "gdp_use.imports_services": [24, "P.72", "Imports of Services"]
+      },
+      "controlRows": {
+        "valuables": [18, "P.53", "Net Acquisition of Valuables"],
+        "gdpCheck": [25, "B.1*g", "(=) GDP at market prices"]
+      },
+      "notes": ["* Revised data will be published on November 13, 2026.", "Last update: 28.09.2026"]
+    },
+    {
+      "role": "growth",
+      "sourceId": "source.geostat_gdp_use_growth",
+      "file": "docs/Raw Data/Economy/gdp-expenditure/sources/09_Real-GDP-growth-by-categories-of-use.xlsx",
+      "originalFilename": "09_Real-GDP-growth-by-categories-of-use.xlsx",
+      "url": "https://www.geostat.ge/media/83016/09_Real-GDP-growth-by-categories-of-use.xlsx",
+      "sha256": "584d67a7cc9d71cb469a0a520c716eebcbe45bd438ace7aceb3b59975961db95",
+      "bytes": 21303,
+      "releasedAt": "2026-09-28",
+      "sheet": "Real GDP growth_USE category",
+      "unit": "previous_year_100_index",
+      "conversion": "subtract 100 using decimal arithmetic",
+      "annualYears": [2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025],
+      "firstAnnualColumn": "C",
+      "lastAnnualColumn": "AO",
+      "preliminaryYears": [2025],
+      "rows": {
+        "economy.gdp_total": [18, "B.1*g", "GDP at market prices"],
+        "gdp_use.consumption": [3, "P.3", "Final Consumption Expenditures"],
+        "gdp_use.households_npish": [4, "P.3", "Households and NPISH"],
+        "gdp_use.government": [5, "P.3", "General government"],
+        "gdp_use.government_individual": [6, "P.31", "Individual  Goods and Services"],
+        "gdp_use.government_collective": [7, "P.32", "Collective Services"],
+        "gdp_use.investment": [8, "P.5", "Gross Capital Formation"],
+        "gdp_use.fixed_capital": [9, "P.51", "Gross Fixed Capital Formation"],
+        "gdp_use.exports": [12, "P.6", "Exports of Goods and Services"],
+        "gdp_use.exports_goods": [13, "P.61", "Exports of goods"],
+        "gdp_use.exports_services": [14, "P.62", "Exports of Services"],
+        "gdp_use.imports": [15, "P.7", "Imports of Goods and Services"],
+        "gdp_use.imports_goods": [16, "P.71", "Imports of Goods"],
+        "gdp_use.imports_services": [17, "P.72", "Imports of Services"]
+      },
+      "controlRows": {
+        "inventories": [10, "P.52", "Changes in Inventories"],
+        "valuables": [11, "P.53", "Net Acquisition of Valuables"]
+      },
+      "notes": ["* Revised data will be published on November 13, 2026.", "Last update: 28.09.2026"]
+    },
+    {
+      "role": "growth_validation",
+      "sourceId": "source.geostat_gdp_use_volume",
+      "file": "docs/Raw Data/Economy/gdp-expenditure/sources/10_GDP-by-categories-of-use-at-constant-prices.xlsx",
+      "originalFilename": "10_GDP-by-categories-of-use-at-constant-prices.xlsx",
+      "url": "https://www.geostat.ge/media/83014/10_GDP-by-categories-of-use-at-constant-prices.xlsx",
+      "sha256": "2d46069b6731492212c293823df36783aac659462e52673cc7ed34a5bb12ba6a",
+      "bytes": 22044,
+      "releasedAt": "2026-09-28",
+      "sheet": "GDP by USE side_2019 prices",
+      "unit": "million_gel_constant_2019",
+      "annualYears": [2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025],
+      "firstAnnualColumn": "C",
+      "lastAnnualColumn": "AP",
+      "preliminaryYears": [2025],
+      "rows": {
+        "economy.gdp_total": [17, "B.1*g", "GDP at market prices"],
+        "gdp_use.consumption": [3, "P.3", "Final Consumption Expenditures"],
+        "gdp_use.households_npish": [4, "P.3", "Households and NPISH"],
+        "gdp_use.government": [5, "P.3", "General government"],
+        "gdp_use.government_individual": [6, "P.31", "Individual  Goods and Services"],
+        "gdp_use.government_collective": [7, "P.32", "Collective Services"],
+        "gdp_use.investment": [8, "P.5", "Gross Capital Formation"],
+        "gdp_use.fixed_capital": [9, "P.51", "Gross Fixed Capital Formation"],
+        "gdp_use.exports": [11, "P.6", "Exports of Goods and Services"],
+        "gdp_use.exports_goods": [12, "P.61", "Exports of goods"],
+        "gdp_use.exports_services": [13, "P.62", "Exports of Services"],
+        "gdp_use.imports": [14, "P.7", "Imports of Goods and Services"],
+        "gdp_use.imports_goods": [15, "P.71", "Imports of Goods"],
+        "gdp_use.imports_services": [16, "P.72", "Imports of Services"]
+      },
+      "controlRows": {
+        "inventories": [10, "P.52", "Changes in Inventories"]
+      },
+      "notes": ["* Revised data will be published on November 13, 2026.", "Last update: 28.09.2026"]
+    }
+  ]
+}
