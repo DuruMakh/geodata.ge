@@ -1,5 +1,5 @@
 import { buildBreakRegister } from "../data/demography/breaks";
-import { SERIES } from "../data/demography/series";
+import { SERIES, SOURCE_ID } from "../data/demography/series";
 import type { ServedDemographyObservation } from "../data/demography/types";
 import type { Municipality, MunicipalRegion } from "../data/municipal/types";
 import { GEORGIA_PLACE_ID } from "./demographyAreas";
@@ -28,18 +28,20 @@ export type MarriageHeading = "number" | "ageMarriage" | "ageDivorce" | "duratio
 /** `group` is the list's unit: counts and years never share a chart. */
 export type MarriageSeriesDefinition = { id: MarriageSeriesId; reference: boolean; heading: MarriageHeading; group: "count" | "years" };
 
-/** The served series behind each row: its series id and, for an average age, the sex. */
-const SOURCES: Record<MarriageSeriesId, { seriesId: string; sex?: "male" | "female" }> = {
-  marriages: { seriesId: SERIES.marriages },
-  divorces: { seriesId: SERIES.divorces },
-  age_marriage_male: { seriesId: SERIES.meanAgeAtMarriage, sex: "male" },
-  age_marriage_female: { seriesId: SERIES.meanAgeAtMarriage, sex: "female" },
-  age_first_marriage_male: { seriesId: SERIES.meanAgeAtFirstMarriage, sex: "male" },
-  age_first_marriage_female: { seriesId: SERIES.meanAgeAtFirstMarriage, sex: "female" },
-  age_divorce_male: { seriesId: SERIES.meanAgeAtDivorce, sex: "male" },
-  age_divorce_female: { seriesId: SERIES.meanAgeAtDivorce, sex: "female" },
-  duration: { seriesId: SERIES.meanMarriageDuration },
+/** The served series behind each row: its series id, the Geostat table it is read from and, for an average age, the sex. */
+const SOURCES: Record<MarriageSeriesId, { seriesId: string; sourceId: string; sex?: "male" | "female" }> = {
+  marriages: { seriesId: SERIES.marriages, sourceId: SOURCE_ID.marriages },
+  divorces: { seriesId: SERIES.divorces, sourceId: SOURCE_ID.divorces },
+  age_marriage_male: { seriesId: SERIES.meanAgeAtMarriage, sourceId: SOURCE_ID.meanAgeSpouses, sex: "male" },
+  age_marriage_female: { seriesId: SERIES.meanAgeAtMarriage, sourceId: SOURCE_ID.meanAgeSpouses, sex: "female" },
+  age_first_marriage_male: { seriesId: SERIES.meanAgeAtFirstMarriage, sourceId: SOURCE_ID.meanAgeSpouses, sex: "male" },
+  age_first_marriage_female: { seriesId: SERIES.meanAgeAtFirstMarriage, sourceId: SOURCE_ID.meanAgeSpouses, sex: "female" },
+  age_divorce_male: { seriesId: SERIES.meanAgeAtDivorce, sourceId: SOURCE_ID.meanAgeDivorced, sex: "male" },
+  age_divorce_female: { seriesId: SERIES.meanAgeAtDivorce, sourceId: SOURCE_ID.meanAgeDivorced, sex: "female" },
+  duration: { seriesId: SERIES.meanMarriageDuration, sourceId: SOURCE_ID.marriageDuration },
 };
+/** The Geostat table a row's published values come from. */
+export const marriageSourceId = (id: MarriageSeriesId): string => SOURCES[id].sourceId;
 
 const row = (id: MarriageSeriesId, heading: MarriageHeading): MarriageSeriesDefinition => ({ id, reference: false, heading, group: heading === "number" ? "count" : "years" });
 export const MARRIAGE_SERIES: readonly MarriageSeriesDefinition[] = [

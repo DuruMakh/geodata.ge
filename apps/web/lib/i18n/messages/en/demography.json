@@ -233,5 +233,10 @@
   "demography.heatNote": "Each cell is the age group’s share of that year’s population. Diagonals running up and to the right are people born in the same years, growing older. The 2025 census re-base moved some groups’ shares.",
   "demography.heatScale": "share of the population",
   "demography.annualSource": "Source: Geostat, population on 1 January by five-year age groups and sex, {first}–{last}.",
-  "demography.ageSexCardFooter": "{year} · {share} aged 65+ · {first}–{last}"
+  "demography.ageSexCardFooter": "{year} · {share} aged 65+ · {first}–{last}",
+  "demography.marriageUnitCount": "number",
+  "demography.marriageUnitPer1000": "per 1,000 residents",
+  "demography.marriageUnitYears": "years",
+  "demography.marriageCalculated": "Calculated by Fiscal.ge",
+  "demography.marriageRatesNote": "Rates per 1,000 residents are calculated by fiscal.ge from Geostat's counts and its mid-year population, the method of Geostat's own crude rates."
 }

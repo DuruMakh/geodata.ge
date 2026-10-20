@@ -233,5 +233,10 @@
   "demography.heatNote": "თითოეული უჯრა ასაკობრივი ჯგუფის წილია იმ წლის მოსახლეობაში. მარჯვნივ და ზემოთ მიმავალი დიაგონალები ერთ წლებში დაბადებული ადამიანები არიან, რომლებიც ბერდებიან. 2025 წლის აღწერით გადათვლამ ზოგი ჯგუფის წილი შეცვალა.",
   "demography.heatScale": "წილი მოსახლეობაში",
   "demography.annualSource": "წყარო: საქსტატი, მოსახლეობა 1 იანვრის მდგომარეობით 5-წლიანი ასაკობრივი ჯგუფებისა და სქესის მიხედვით, {first}–{last}.",
-  "demography.ageSexCardFooter": "{year} · 65+ — {share} · {first}–{last}"
+  "demography.ageSexCardFooter": "{year} · 65+ — {share} · {first}–{last}",
+  "demography.marriageUnitCount": "რაოდენობა",
+  "demography.marriageUnitPer1000": "1 000 მცხოვრებზე",
+  "demography.marriageUnitYears": "წელი",
+  "demography.marriageCalculated": "Fiscal.ge-ის მიერ გამოთვლილი",
+  "demography.marriageRatesNote": "1 000 მცხოვრებზე მაჩვენებლები fiscal.ge-მ გამოთვალა საქსტატის მონაცემებითა და წლის საშუალო მოსახლეობით, საქსტატის ზოგადი კოეფიციენტების მეთოდით."
 }
