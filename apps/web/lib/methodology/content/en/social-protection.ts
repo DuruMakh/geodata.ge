@@ -19,7 +19,7 @@ export const SOCIAL_PROTECTION_METHODOLOGY_CONTENT: MethodologyContent = {
   "slug": "social-protection",
   "title": "Social protection",
   "summary": "Pensions, the subsistence allowance, the social package and the money paid in social benefits in Georgia, its regions and municipalities, from the Social Service Agency’s monthly statistics.",
-  "metaDescription": "Pensions, subsistence allowance, social package and social payments in Georgia: the Social Service Agency’s figures, the December and 12-month rules, and what Fiscal.ge calculates.",
+  "metaDescription": "Pensions, subsistence allowance, social package and social payments in Georgia: Social Service Agency figures, yearly rules and what Fiscal.ge calculates.",
   "reviewedAt": "2026-10-20",
   "archiveManifestId": "social-protection",
   "coverageSource": {

@@ -27,6 +27,9 @@ import { CRIME_HUB_PATH, CRIME_SECTIONS } from "../explorer/crime";
 import { loadServedEducationData } from "../data/education/importEducation";
 import { EDUCATION_HUB_PATH, EDUCATION_SECTIONS } from "../explorer/education";
 import { educationPlaceBase } from "../explorer/educationPlaces";
+import { loadServedSocialData } from "../data/social/importSocial";
+import { SOCIAL_SECTIONS } from "../explorer/social";
+import { socialPlaceBase } from "../explorer/socialPlaces";
 import { loadServedEnergyFoodData } from "../data/energyFood/importEnergyFood";
 import { ENERGY_FOOD_HUB_PATH, ENERGY_FOOD_SECTIONS } from "../explorer/energyFood";
 import { loadServedMoneyBanksData } from "../data/moneyBanks/importMoneyBanks";
@@ -72,7 +75,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     countryFunctionFacts,
     countryTotalFacts,
     adjaraBudgetAdjustments,
-  }, { facts: debtFacts }, { facts: balanceFacts }, { facts: inflationFacts }, { facts: productFacts }, { facts: regionalEconomyFacts }, { facts: gdpOverviewFacts }, { facts: sectorFacts }, { facts: unemploymentFacts }, { facts: tradeFacts }, { facts: tradePartnerFacts }, { facts: moneyTransferFacts }, { facts: demographyFacts }, { facts: tradeProductFacts }, { facts: tradeDomesticFacts }, { facts: foreignInvestmentFacts }, { facts: wagesFacts }, currentAccountFacts, { facts: povertyFacts }, { facts: householdFacts }, { facts: energyFoodFacts }, { facts: moneyBanksFacts }, { facts: tradeServicesFacts }, { facts: tradeCompositionFacts }, { facts: externalPositionFacts }, { facts: businessFacts }, { facts: healthFacts }, { facts: crimeFacts }, { facts: housingFacts }, { facts: educationFacts }] = await Promise.all([
+  }, { facts: debtFacts }, { facts: balanceFacts }, { facts: inflationFacts }, { facts: productFacts }, { facts: regionalEconomyFacts }, { facts: gdpOverviewFacts }, { facts: sectorFacts }, { facts: unemploymentFacts }, { facts: tradeFacts }, { facts: tradePartnerFacts }, { facts: moneyTransferFacts }, { facts: demographyFacts }, { facts: tradeProductFacts }, { facts: tradeDomesticFacts }, { facts: foreignInvestmentFacts }, { facts: wagesFacts }, currentAccountFacts, { facts: povertyFacts }, { facts: householdFacts }, { facts: energyFoodFacts }, { facts: moneyBanksFacts }, { facts: tradeServicesFacts }, { facts: tradeCompositionFacts }, { facts: externalPositionFacts }, { facts: businessFacts }, { facts: healthFacts }, { facts: crimeFacts }, { facts: housingFacts }, { facts: educationFacts }, { facts: socialFacts }] = await Promise.all([
     loadServedLandingData(),
     loadServedMunicipalData(),
     loadServedGovernmentDebtData(),
@@ -104,6 +107,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     loadServedCrimeData(),
     loadServedHousingData(),
     loadServedEducationData(),
+    loadServedSocialData(),
   ]);
   const inflationModified = new Date(inflationFacts.map((fact) => fact.lastReviewedAt).sort().at(-1)!);
   const productModified = new Date(productFacts.map((fact) => fact.lastReviewedAt).sort().at(-1)!);
@@ -119,6 +123,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const householdModified = new Date(householdFacts.map(fact => fact.lastReviewedAt).sort().at(-1)!);
   const livingStandardsModified = householdModified > povertyModified ? householdModified : povertyModified;
   const healthModified = new Date(healthFacts.map(fact => fact.lastReviewedAt).sort().at(-1)!);
+  const socialModified = new Date(socialFacts.map(fact => fact.lastReviewedAt).sort().at(-1)!);
+  // The hub's cards follow both Geostat's health pages and the Social Service Agency's pages.
+  const healthHubModified = socialModified > healthModified ? socialModified : healthModified;
   const crimeModified = new Date(crimeFacts.map(fact => fact.lastReviewedAt).sort().at(-1)!);
   const educationModified = new Date(educationFacts.map(fact => fact.lastReviewedAt).sort().at(-1)!);
   const energyFoodModified = new Date(energyFoodFacts.map(fact => fact.lastReviewedAt).sort().at(-1)!);
@@ -196,9 +203,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...HOUSEHOLD_SECTIONS.map(section => ({ url: `${siteUrl}${section.href}`, lastModified: householdModified })),
     ...HOUSEHOLD_SECTIONS.flatMap(section => HOUSEHOLD_PAGE_AREAS.map(id => ({ url: `${siteUrl}${householdRegionHref(section.id, id)}`, lastModified: householdModified }))),
     ...POVERTY_SECTIONS.map(section => ({ url: `${siteUrl}${section.href}`, lastModified: povertyModified })),
-    { url: `${siteUrl}${HEALTH_HUB_PATH}`, lastModified: healthModified },
+    { url: `${siteUrl}${HEALTH_HUB_PATH}`, lastModified: healthHubModified },
     ...HEALTH_SECTIONS.map(section => ({ url: `${siteUrl}${section.href}`, lastModified: healthModified })),
     ...HEALTH_DEATH_AREAS.map(area => ({ url: `${siteUrl}${healthDeathsAreaHref(area)}`, lastModified: healthModified })),
+    ...SOCIAL_SECTIONS.map(section => ({ url: `${siteUrl}${section.href}`, lastModified: socialModified })),
+    ...(["pensions", "subsistence-allowance"] as const).flatMap(set => placePagePaths(socialPlaceBase(set), regions.map((region) => region.id)).map((path) => ({ url: `${siteUrl}${path}`, lastModified: socialModified }))),
     { url: `${siteUrl}${CRIME_HUB_PATH}`, lastModified: crimeModified },
     ...CRIME_SECTIONS.map(section => ({ url: `${siteUrl}${section.href}`, lastModified: crimeModified })),
     { url: `${siteUrl}${EDUCATION_HUB_PATH}`, lastModified: educationModified },

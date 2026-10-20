@@ -5,7 +5,7 @@ import type { ClientSocialFact, SocialSeriesBreak } from "../../lib/data/social/
 import { updatedDate } from "../../lib/explorer/coverageLabel";
 import { placeLabel, type DemographyPlace } from "../../lib/explorer/demographyAreas";
 import { educationFullLabel } from "../../lib/explorer/education";
-import { formatInUnit, type ValueUnit } from "../../lib/explorer/format";
+import { formatInUnit, formatShare, type ValueUnit } from "../../lib/explorer/format";
 import { rangeFromPatch } from "../../lib/explorer/periodRange";
 import type { SocialPlaceSet, SocialPopulation, SocialPriceIndex, SocialShownFact, SocialUnit } from "../../lib/explorer/social";
 import {
@@ -128,7 +128,9 @@ export function SocialPlaceExplorer({
         rows={model.series.map(series => {
           const { latest, headingYear } = list.rows[series.id]!;
           const heading = COUNT_UNITS.includes(series.unit) ? headingLabels[series.heading] : `${headingLabels[series.heading]} · ${unitLabelOf(series.unit)}`;
-          return { id: series.id, label: labels[series.id], color: series.color, value: formatInUnit(latest?.value, { divisor: 1, label: "", decimals: series.decimals }),
+          // A share of residents reads as the map and the list print it, "27.6%".
+          const value = series.unit === "percent" ? formatShare(latest === undefined ? null : latest.value / 100, false, series.decimals) : formatInUnit(latest?.value, { divisor: 1, label: "", decimals: series.decimals });
+          return { id: series.id, label: labels[series.id], color: series.color, value,
             heading: headingYear ? `${heading} · ${headingYear}` : heading };
         })}
         totalId={reference?.id} pinTotal selectedIds={state.selectedIds} onSelectionChange={selectedIds => update(s => changeSocialPlaceSelection(s, set, place.id, selectedIds, shown), true)} searchable={false}

@@ -6,9 +6,9 @@ import { CENSUS_BREAK, perPopulation } from "./crime";
 import { shareOfGdp } from "./debtExplorer";
 import { placeIdForMunicipalityCode } from "./demographyAreas";
 import { HEALTH_HUB_PATH } from "./health";
-import { refitRange, type ResolvedPeriodRange } from "./periodRange";
+import { refitRange, resolveRange, type ResolvedPeriodRange } from "./periodRange";
 import { buildTopicModel, serializeTopicHash, topicHashView, topicSeriesColor, type TopicCoverage, type TopicSeriesModel, type TopicState } from "./topicSeries";
-import { changeUnitListSelection, parseUnitListHash, unitListCoverage } from "./unitList";
+import { changeUnitListSelection, listLatestByHeading, parseUnitListHash, unitListCoverage } from "./unitList";
 
 /** The four pages sit on the Health and social protection hub, after its Health sections. */
 export const SOCIAL_SECTIONS = [
@@ -206,6 +206,15 @@ export function changeSocialSelection(state: SocialState, section: SocialTopicId
 /** Switching Social payments between million GEL and % of GDP keeps the selection and mode; the years are clamped to the view's (never collapsed to "all"). */
 export function changeSocialView(state: SocialState, view: SocialPayView, facts: readonly ClientSocialFact[], gdpFacts: readonly ClientNationalGdpFact[]): SocialState {
   return { ...state, view, range: refitRange(state.range, socialCoverage("social-payments", view, facts, gdpFacts, state.selectedIds), { collapseToAll: false }) };
+}
+
+/**
+ * A topic page's list, as on the place pages (`socialPlaceList`): it reads at the chosen years' end over all of the view's
+ * years, never the selection's, and each row shows its latest value up to then (COVID-19 compensation its 2021 figure).
+ */
+export function socialTopicList(section: SocialTopicId, facts: readonly ClientSocialFact[], gdpFacts: readonly ClientNationalGdpFact[], state: SocialState) {
+  const end = resolveRange(state.range, socialCoverage(section, state.view, facts, gdpFacts)).end;
+  return { end, rows: listLatestByHeading(socialTopicFacts(section, state.view, facts, gdpFacts), socialTopicSeries(section), end) };
 }
 
 export function serializeSocialHash(state: SocialState, section: SocialTopicId): string {

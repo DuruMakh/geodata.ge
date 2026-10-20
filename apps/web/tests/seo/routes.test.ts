@@ -111,7 +111,7 @@ describe("indexable Fiscal.ge routes", () => {
     // The Housing methodology adds one more bilingual pair.
     // Education adds its hub, four pages, the 75 Schools and 75 Kindergartens place pages and its methodology page: 156 bilingual pairs.
     // The Social protection methodology adds one more bilingual pair.
-    expect(urls).toHaveLength(1022);
+    expect(urls).toHaveLength(1330);
     expect(new Set(urls).size).toBe(urls.length);
     expect(urls.every((url) => url.startsWith("https://fiscal.ge/"))).toBe(true);
     expect(urls).toContain("https://fiscal.ge/about");
@@ -186,6 +186,17 @@ describe("indexable Fiscal.ge routes", () => {
       expect(urls).not.toContain(`https://fiscal.ge/explorer/education/${set}/tbilisi`);
     }
     expect(urls.some(url => /\/explorer\/education\/.*\/\d{2}$/.test(url))).toBe(false);
+    // Social protection sits on the Health hub: two topic pages, and two map indexes with 75 place pages each.
+    for (const page of ["/social-payments", "/social-package", ...["pensions", "subsistence-allowance"].flatMap(set => [`/${set}`, `/${set}/georgia`, ...educationRegions.map(region => `/${set}/region/${region}`), `/${set}/batumi`, `/${set}/ozurgeti`])]) {
+      expect(urls).toContain(`https://fiscal.ge/explorer/health${page}`);
+      expect(urls).toContain(`https://fiscal.ge/en/explorer/health${page}`);
+    }
+    for (const set of ["pensions", "subsistence-allowance"]) {
+      expect(urls.filter(url => url.startsWith(`https://fiscal.ge/explorer/health/${set}/`))).toHaveLength(75);
+      expect(urls.filter(url => url.startsWith(`https://fiscal.ge/en/explorer/health/${set}/`))).toHaveLength(75);
+      expect(urls).not.toContain(`https://fiscal.ge/explorer/health/${set}/tbilisi`);
+    }
+    expect(urls.some(url => /\/explorer\/health\/(pensions|subsistence-allowance)\/\d{2}$/.test(url))).toBe(false);
     expect(urls).toContain("https://fiscal.ge/explorer/trade/products");
     expect(urls).toContain("https://fiscal.ge/en/explorer/trade/products");
     expect(urls).toContain("https://fiscal.ge/explorer/trade/domestic-exports");
