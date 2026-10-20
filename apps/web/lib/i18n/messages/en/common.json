@@ -123,6 +123,10 @@
   "common.educationKindergartens": "Kindergartens",
   "common.educationUniversities": "Universities",
   "common.educationVocational": "Vocational colleges",
+  "common.socialPayments": "Social payments",
+  "common.socialPensions": "Pensions",
+  "common.socialSubsistence": "Subsistence allowance",
+  "common.socialPackage": "Social package",
   "common.dataWages": "Data · Wages",
   "common.dataLivingStandards": "Data · Living standards",
   "common.dataHealth": "Data · Health and social protection",
@@ -132,6 +136,7 @@
   "common.dataBusiness": "Data · Business",
   "common.dataHousing": "Data · Housing and construction",
   "common.dataEducation": "Data · Education",
+  "common.dataSocial": "Data · Social protection",
   "common.dataLoading": "Loading the data…",
   "common.dataLoadError": "The data could not be loaded. Reload the page to try again."
 }

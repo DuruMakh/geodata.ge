@@ -123,6 +123,10 @@
   "common.educationKindergartens": "საბავშვო ბაღები",
   "common.educationUniversities": "უნივერსიტეტები",
   "common.educationVocational": "პროფესიული კოლეჯები",
+  "common.socialPayments": "სოციალური გასაცემლები",
+  "common.socialPensions": "პენსიები",
+  "common.socialSubsistence": "საარსებო შემწეობა",
+  "common.socialPackage": "სოციალური პაკეტი",
   "common.dataWages": "მონაცემები · ხელფასები",
   "common.dataLivingStandards": "მონაცემები · ცხოვრების დონე",
   "common.dataHealth": "მონაცემები · ჯანდაცვა და სოციალური დაცვა",
@@ -132,6 +136,7 @@
   "common.dataBusiness": "მონაცემები · ბიზნესი",
   "common.dataHousing": "მონაცემები · საცხოვრებელი და მშენებლობა",
   "common.dataEducation": "მონაცემები · განათლება",
+  "common.dataSocial": "მონაცემები · სოციალური დაცვა",
   "common.dataLoading": "მონაცემები იტვირთება…",
   "common.dataLoadError": "მონაცემები ვერ ჩაიტვირთა — განაახლეთ გვერდი და სცადეთ თავიდან."
 }
