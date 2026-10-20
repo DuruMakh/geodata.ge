@@ -38,7 +38,7 @@ export function environmentTopicSeries(section: EnvironmentTopicId): Environment
       ...rows("energyDetail", "environment.ghg", ["energy_stationary", "energy_transport", "energy_fugitive"]),
       ...rows("byGas", "environment.ghg", ["gas_co2", "gas_methane", "gas_nitrous_oxide"]),
       ...rows("fluorinated", "environment.ghg", ["gas_hfcs", "gas_sf6"]),
-      row("perPerson", "environment.ghg.per_person"),
+      row("ghgPerPerson", "environment.ghg.per_person"),
     ];
     // Eight pollutants share one unit and are all selected on arrival, so no total is the ink reference.
     case "air-pollution": return ENVIRONMENT_POLLUTANTS.flatMap(pollutant => rows(pollutant, `environment.air.${pollutant}`, ["total", "stationary", "mobile"]));
@@ -51,7 +51,7 @@ export function environmentTopicSeries(section: EnvironmentTopicId): Environment
       row("lostShare", "environment.water.lost_share"),
       ...rows("people", "environment.water", ["people_piped", "people_sewers", "people_treatment"]),
       ...rows("peopleShare", "environment.water", ["share_piped", "share_sewers", "share_treatment"]),
-      row("perPerson", "environment.water.per_person"),
+      row("waterPerPerson", "environment.water.per_person"),
     ];
   }
 }
@@ -160,16 +160,30 @@ export const environmentValueUnit = (decimals: number): ValueUnit => ({ divisor:
 /** The message key of a unit's name. */
 export const environmentUnitLabelKey = (unit: EnvironmentUnit) => `unit.${unit}`;
 
-/** A tooltip or list value with its unit's name, or the missing dash. */
+/** A tooltip or list value with its unit's name (a per cent or degree sign follows the number directly), or the missing dash. */
 export function environmentValueLabel(value: number | null | undefined, unit: EnvironmentUnit, decimals: number, t: EnvironmentTranslate): string {
-  return value == null ? MISSING : `${formatInUnit(value, environmentValueUnit(decimals))} ${t(environmentUnitLabelKey(unit))}`;
+  if (value == null) return MISSING;
+  const number = formatInUnit(value, environmentValueUnit(decimals));
+  return unit === "percent" || unit === "celsius" ? `${number}${t(environmentUnitLabelKey(unit))}` : `${number}\u00a0${t(environmentUnitLabelKey(unit))}`;
+}
+
+/**
+ * The message key of a series' name (`environment.{key}`). A station's averages and days are named by the station, a city's
+ * limit is its yearly limit, a pollutant's rows by their source, a climate row by its place and an area row by its measure.
+ */
+export function environmentLabelKey(id: string): string {
+  const [, topic, item, place] = id.split(".");
+  if (topic === "aq") return item.endsWith("_limit") ? "series.limit" : `station.${place}`;
+  if (topic === "air") return `series.air.${place}`;
+  if (topic === "climate") return `series.climate.${place}`;
+  return `series.${topic}.${item}`;
 }
 
 /**
  * Headings whose rows repeat one another's names: a pollutant's Total and its two sources, a place under each climate
  * measure, a station under each city measure, and the timber and logging rows of the Forests area pages.
  */
-const NAMED_BY_HEADING = new Set<string>([...ENVIRONMENT_POLLUTANTS, "temperature", "anomaly", "precipitation", "pm10", "pm25", "no2", "pm10Days", "tsp", "so2", "mno2", "timber", "protected"]);
+const NAMED_BY_HEADING = new Set<string>([...ENVIRONMENT_POLLUTANTS, "temperature", "anomaly", "precipitation", "pm10Avg", "pm25Avg", "no2Avg", "pm10Days", "tspAvg", "so2Avg", "mno2Avg", "timber", "protected"]);
 
 /** A series' name outside the list (chart, table, workbook): a row whose name repeats under another heading carries its heading's text before the unit. */
 export function environmentSeriesLabel(series: Pick<EnvironmentSeriesDefinition, "id" | "heading">, labels: Readonly<Record<string, string>>, t: EnvironmentTranslate): string {

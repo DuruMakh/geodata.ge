@@ -21,7 +21,7 @@ const AREA_MEASURES = ["environment.waste.collected", "environment.forest.timber
 /** An area's whole list, before rows without facts are dropped; its first row is the default and the ink reference. */
 function areaDefinitions(topic: EnvironmentAreaTopic, area: EnvironmentArea): EnvironmentSeriesDefinition[] {
   const row = (heading: string, id: string, reference = false): EnvironmentSeriesDefinition => ({ id, reference, heading });
-  if (topic === "waste") return [row("collected", `environment.waste.collected.${area}`, true), ...(area === "georgia" ? [row("perPerson", "environment.waste.per_person")] : [])];
+  if (topic === "waste") return [row("collected", `environment.waste.collected.${area}`, true), ...(area === "georgia" ? [row("wastePerPerson", "environment.waste.per_person")] : [])];
   const timber = [row("timber", `environment.forest.timber_cut.${area}`, true), row("timber", `environment.forest.illegal_logging.${area}`)];
   if (area !== "georgia") return timber;
   return [

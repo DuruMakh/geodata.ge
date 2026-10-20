@@ -21,10 +21,10 @@ test("nine city pages in Geostat's order, wrapping at the ends", () => {
 });
 
 test("Tbilisi's PM10 heading lists its five stations, then the dashed grey limit", () => {
-  const pm10 = environmentCitySeries("tbilisi", facts).filter(s => s.heading === "pm10");
+  const pm10 = environmentCitySeries("tbilisi", facts).filter(s => s.heading === "pm10Avg");
   expect(pm10.map(s => s.id)).toEqual([...["a1", "a2", "a3", "a4", "a5"].map(code => `environment.aq.pm10_avg.tbilisi_${code}`), "environment.aq.pm10_limit.tbilisi"]);
   expect(pm10.at(-1)).toMatchObject({ stroke: "dashed", reference: false, color: OTHER_COLOR });
-  expect([...new Set(environmentCitySeries("tbilisi", facts).map(s => s.heading))]).toEqual(["pm10", "pm25", "no2", "pm10Days"]);
+  expect([...new Set(environmentCitySeries("tbilisi", facts).map(s => s.heading))]).toEqual(["pm10Avg", "pm25Avg", "no2Avg", "pm10Days"]);
   expect(environmentCityDefaultSelection("tbilisi", facts)).toEqual(pm10.map(s => s.id));
 });
 
@@ -41,7 +41,7 @@ test("a city lists only what it published, and a limit only with its station row
 
 test("Zestaponi's manual station has four averages, no limit, and defaults to dust", () => {
   const series = environmentCitySeries("zestaponi", facts);
-  expect([...new Set(series.map(s => s.heading))]).toEqual(["tsp", "so2", "no2", "mno2"]);
+  expect([...new Set(series.map(s => s.heading))]).toEqual(["tspAvg", "so2Avg", "no2Avg", "mno2Avg"]);
   expect(series.some(s => s.id.includes("_limit."))).toBe(false);
   expect(environmentCityDefaultSelection("zestaponi", facts)).toEqual(["environment.aq.tsp_avg.zestaponi_e1"]);
 });

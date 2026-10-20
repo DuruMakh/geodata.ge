@@ -27,11 +27,11 @@ export const environmentCityStations = (city: EnvironmentCity) => ENVIRONMENT_ST
 export function environmentCitySeries(city: EnvironmentCity, facts: readonly ClientEnvironmentFact[]): EnvironmentSeriesDefinition[] {
   const stations = environmentCityStations(city);
   const definitions: EnvironmentSeriesDefinition[] = city === "zestaponi"
-    ? ENVIRONMENT_MANUAL_MEASURES.map(measure => ({ id: `environment.aq.${measure}_avg.zestaponi_e1`, reference: false, heading: measure }))
+    ? ENVIRONMENT_MANUAL_MEASURES.map(measure => ({ id: `environment.aq.${measure}_avg.zestaponi_e1`, reference: false, heading: `${measure}Avg` }))
     : [
       ...ENVIRONMENT_STATION_MEASURES.flatMap(measure => [
-        ...stations.map(id => ({ id: `environment.aq.${measure}_avg.${id}`, reference: false, heading: measure })),
-        { id: `environment.aq.${measure}_limit.${city}`, reference: false, heading: measure, stroke: "dashed" as const, color: OTHER_COLOR },
+        ...stations.map(id => ({ id: `environment.aq.${measure}_avg.${id}`, reference: false, heading: `${measure}Avg` })),
+        { id: `environment.aq.${measure}_limit.${city}`, reference: false, heading: `${measure}Avg`, stroke: "dashed" as const, color: OTHER_COLOR },
       ]),
       ...stations.map(id => ({ id: `environment.aq.pm10_days.${id}`, reference: false, heading: "pm10Days" })),
     ];
@@ -41,7 +41,7 @@ export function environmentCitySeries(city: EnvironmentCity, facts: readonly Cli
 /** The PM10 average at every station of the city and the PM10 limit; Zestaponi's dust. */
 export function environmentCityDefaultSelection(city: EnvironmentCity, facts: readonly ClientEnvironmentFact[]): string[] {
   const series = environmentCitySeries(city, facts);
-  return city === "zestaponi" ? [series[0].id] : series.filter(s => s.heading === "pm10").map(s => s.id);
+  return city === "zestaponi" ? [series[0].id] : series.filter(s => s.heading === "pm10Avg").map(s => s.id);
 }
 
 /** A limit wears the shared grey; a station keeps one colour under every measure, by its place in the city. */
@@ -64,3 +64,16 @@ export const changeEnvironmentCitySelection = (city: EnvironmentCity, state: Env
 
 export const buildEnvironmentCityModel = (city: EnvironmentCity, facts: readonly ClientEnvironmentFact[], state: EnvironmentState): EnvironmentModel =>
   buildEnvironmentSeriesModel(environmentCitySeries(city, facts), facts, state, environmentCityColor);
+
+/** The station average a city's card and line follow: its first station's PM10, Zestaponi's dust. */
+export const environmentCityHeadline = (city: EnvironmentCity) =>
+  city === "zestaponi" ? "environment.aq.tsp_avg.zestaponi_e1" : `environment.aq.pm10_avg.${environmentCityStations(city)[0]}`;
+
+/** The station with the highest yearly PM10 average in the latest year any station has one: the City air quality index's line. */
+export function environmentHighestPm10(facts: readonly ClientEnvironmentFact[]): { city: EnvironmentCity; indicatorId: string; year: number; value: number } {
+  const pm10 = facts.filter(f => f.indicatorId.startsWith("environment.aq.pm10_avg."));
+  const year = Math.max(...pm10.map(f => f.year));
+  const highest = pm10.filter(f => f.year === year).sort((a, b) => b.value - a.value)[0];
+  const station = ENVIRONMENT_STATIONS.find(s => s.id === highest.indicatorId.split(".")[3])!;
+  return { city: station.city, indicatorId: highest.indicatorId, year, value: highest.value };
+}

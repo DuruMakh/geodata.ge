@@ -21,10 +21,10 @@ test("the hub lists seven pages in the design's order", () => {
 test("each list follows the design's headings and order, and every listed row has facts", () => {
   const ghg = environmentTopicSeries("greenhouse-gases");
   expect(ghg.slice(0, 3).map(s => s.id)).toEqual(["environment.ghg.total", "environment.ghg.net", "environment.ghg.sector_energy"]);
-  expect([...new Set(ghg.map(s => s.heading))]).toEqual(["totals", "bySector", "energyDetail", "byGas", "fluorinated", "perPerson"]);
+  expect([...new Set(ghg.map(s => s.heading))]).toEqual(["totals", "bySector", "energyDetail", "byGas", "fluorinated", "ghgPerPerson"]);
   expect([...new Set(environmentTopicSeries("air-pollution").map(s => s.heading))]).toEqual(["co", "nox", "so2", "nh3", "nmvoc", "tsp", "pm10", "pm25"]);
   expect([...new Set(environmentTopicSeries("climate").map(s => s.heading))]).toEqual(["temperature", "anomaly", "precipitation"]);
-  expect([...new Set(environmentTopicSeries("water").map(s => s.heading))]).toEqual(["water", "lostShare", "people", "peopleShare", "perPerson"]);
+  expect([...new Set(environmentTopicSeries("water").map(s => s.heading))]).toEqual(["water", "lostShare", "people", "peopleShare", "waterPerPerson"]);
   for (const topic of TOPICS) {
     const ids = new Set(facts.map(f => f.indicatorId));
     expect(environmentTopicSeries(topic).every(s => ids.has(s.id)), topic).toBe(true);
