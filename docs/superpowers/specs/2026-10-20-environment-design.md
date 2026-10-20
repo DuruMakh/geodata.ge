@@ -125,7 +125,7 @@ Years: 1990, 1995, then 2000–2024, as Geostat publishes. 1990 and 1995 show as
 - *Difference from the 1961–1990 average (°C)*: the same four.
 - *Rain and snow in the year (mm)*: the same four.
 
-"Warmest region" and "coldest region" are Geostat's "region with the maximum / minimum average annual temperature"; Geostat does not name them, and neither does the page. The precipitation table uses "region with the maximum / minimum average precipitation"; those rows are labelled Wettest region and Driest region. The 1961–1990 averages are served as one-value rows only in the methodology text, not as chart series. Monthly maxima and minima and the precipitation ratio rows are not served. The source is the World Bank's Climate Change Knowledge Portal, published by Geostat.
+"Warmest region" and "coldest region" are Geostat's "region with the maximum / minimum average annual temperature", and "wettest" and "driest" its "region with the maximum / minimum average precipitation". Geostat names them in its block titles, and they are the same every year (the regions with the highest and lowest 1961–1990 averages): warmest Guria (Tbilisi aside), coldest Racha-Lechkhumi and Kvemo Svaneti, wettest Samegrelo-Zemo Svaneti, driest Kvemo Kartli. The rows carry the region's name, for example "Guria (warmest region)". The 1961–1990 averages are served as one-value rows only in the methodology text, not as chart series. Monthly maxima and minima and the precipitation ratio rows are not served. The source is the World Bank's Climate Change Knowledge Portal, published by Geostat.
 
 ## 8. Water page (Geostat tables C-4, C-5, C-7 and C-14, 2015–2025)
 
@@ -178,7 +178,7 @@ Downloaded from Geostat in the cloud workspace on 2026-10-20: categories/565 (en
 
 Archived but not served: energy tables G-1 to G-4 (the Energy and food hub covers energy), ozone-depleting substances, fertiliser and pesticides, protected areas and visitors, water quality, `Air-Pollution.xls`, violations of law, forest area and timber by purpose. Transport tables H-1 to H-4 belong to the Transport thread and are not downloaded here.
 
-Every value comes from the published cell. Values are rounded from the 15-significant-digit display value, so Geostat's floating noise (`-6.699999999999999`) is served as `-6.7`, never as the raw double.
+Every value comes from the published cell. Values are rounded to 12 significant digits (a change of more than one part in a billion fails the check), so Geostat's floating noise (`-6.699999999999999`) is served as `-6.7`, never as the raw double.
 
 Rough size: greenhouse gases about 380 values, air pollution 288, city air quality about 450, climate about 330, water about 160, waste 110, forests about 400. About 2,100 values in all; the plan fixes the exact count.
 
@@ -214,11 +214,14 @@ Rough size: greenhouse gases about 380 values, air pollution 288, city air quali
 None of these changes what a reader sees.
 
 - The area is part of the indicator ID, as on Housing, for example `environment.aq.pm10_avg.tbilisi_a1` and `environment.waste.collected.region_tbilisi`. The row has no separate area column; "area" above means the ID's last segment.
+- Geostat names the warmest, coldest, wettest and driest regions in its climate block titles, so the rows carry those names (§7 corrected).
+- Values are kept to 12 significant digits, not 15: 12 removes Geostat's floating noise and moves no published figure.
+- A value's shown decimals are read from its published text, so the data file and database store no separate decimals column.
 - Tbilisi has no timber value, so the Forests map draws Tbilisi's shape without a value or rank ("no data") instead of leaving it out. This uses a small optional addition to the shared map builder, which leaves every existing map unchanged.
 
 ## 12. Methodology page
 
-`/methodology/environment` (and `/en`) follows Crime: sources and agencies, what each page shows, what is left out and why, the units, CO₂ equivalent in one sentence, what the limit lines are (Georgian air-quality standards as Geostat prints them, with the PM2.5 change in 2020), the unnamed warmest/coldest regions, the 2019 wastewater re-sorting, Geostat's asterisk footnotes, and the downloadable originals. A decision-register entry records the choices in this document.
+`/methodology/environment` (and `/en`) follows Crime: sources and agencies, what each page shows, what is left out and why, the units, CO₂ equivalent in one sentence, what the limit lines are (Georgian air-quality standards as Geostat prints them, with the PM2.5 change in 2020), which regions are the warmest, coldest, wettest and driest, the 2019 wastewater re-sorting, Geostat's asterisk footnotes, and the downloadable originals. A decision-register entry records the choices in this document.
 
 ## 13. Reuse
 

@@ -19,7 +19,7 @@
 - No tabs and no icon switches. Measures are rows under `FlatSeriesPanel` headings, with the total first. Nothing is nested under a caret. Names carry no prefixes.
 - One unit at a time (`lib/explorer/unitList.ts`). Ticking a row of another unit replaces the selection.
 - Missing is a gap, a table dash and a blank Excel cell, never zero. `…`, `...` and an unavailable `-` are no value. `-` is zero only where the table's legend says "Magnitude nil" (`Illegal-logging.xls`).
-- Values are the published cell, rounded from the 15-significant-digit display value: `-6.699999999999999` is served as `-6.7`.
+- Values are the published cell, rounded to 12 significant digits (a change of more than one part in a billion fails): `-6.699999999999999` is served as `-6.7`.
 - Yearly values only. Every served fact has `basis=actual` and `valueStatus=official`.
 - Stable lowercase ASCII IDs `environment.{topic}.{measure}[.{place}]`. Labels are display data.
 - No new production dependency, chart type or icon family. Environment is not added to `/mcp` or the JSON publications.
@@ -29,6 +29,7 @@
 
 **Amended while planning (2026-10-20).** None of this changes what a reader sees:
 - The place (station, city, region, Georgia) is part of the indicator ID, as on Housing (`environment.waste.collected.region_tbilisi`). So `EnvironmentFact` has the same columns as `CrimeFact`, plus `decimals`, and no area column. Spec §11's "area" is the ID's last segment.
+- **Changed while executing (2026-10-20):** `decimals` is not stored. It is read from the published value (`toClientEnvironmentFact` gives `Decimal.decimalPlaces()`), so the canonical CSV has exactly Crime's columns and the database model has no `decimals` column. Values are 12 significant digits, not 15, wherever this plan says 15. The climate rows name their region ("Guria (warmest region)"): Geostat names the four regions in its block titles, and they are fixed. `loadServedEnvironmentData()` returns the facts array.
 - Water keeps the three treatment levels (primary, secondary, tertiary; million persons) as served rows that no page lists. Septic tanks and self-supplied households stay in the research package only.
 
 ## Review Focus
