@@ -2,11 +2,15 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { parse } from "csv-parse/sync";
 import Decimal from "decimal.js";
-import { expect, test } from "vitest";
+import os from "node:os";
+import { expect, test, vi } from "vitest";
 import { HOUSING_REGIONS } from "../../../lib/data/housing/types";
+import { assertInternetParity, loadInternetFacts, toClientInternetFact } from "../../../lib/data/internet/importInternet";
+import { internetMirrorCreateRows, loadInternetFactsFromMirror } from "../../../lib/db/mirrorRows";
+import type { Prisma } from "../../../lib/generated/prisma/client";
 import { INTERNET_CSV_HEADERS, REVIEWED_AT, prepareInternetData } from "../../../lib/data/internet/prepareInternet";
 import {
-  INTERNET_INDICATORS, INTERNET_PUBLIC_SOURCES, INTERNET_REGIONS, INTERNET_SOURCES, type InternetFact, type InternetIndicator,
+  INTERNET_INDICATORS, INTERNET_PUBLIC_SOURCES, INTERNET_REGIONS, INTERNET_SOURCES, internetSourceDocumentId, type InternetFact, type InternetIndicator,
 } from "../../../lib/data/internet/types";
 import { expectedInternetKeys, validateInternetFacts } from "../../../lib/data/internet/validation";
 
@@ -88,4 +92,70 @@ test.each([
   validateInternetFacts(facts);
   mutate(facts);
   expect(() => validateInternetFacts(facts)).toThrow(error);
+});
+
+test("loading serves the same 1,055 values as the canonical file", async () => {
+  const facts = await loadInternetFacts();
+  expect(facts).toHaveLength(1055);
+  expect(facts).toEqual(await loadFacts());
+});
+
+test("loading refuses a canonical file whose fingerprint differs from the report", async () => {
+  const dir = await fs.mkdtemp(path.join(os.tmpdir(), "internet-"));
+  try {
+    await fs.mkdir(path.join(dir, "apps/web"), { recursive: true });
+    await fs.mkdir(path.join(dir, "data/imports"), { recursive: true });
+    await fs.mkdir(path.join(dir, "data/reports"), { recursive: true });
+    const csv = await fs.readFile(path.join(root, "data/imports/internet-annual.csv"), "utf8");
+    const altered = csv.replace("2016,internet.homes_internet.total,70.0516890004974,70.1", "2016,internet.homes_internet.total,70.0516890004975,70.1");
+    expect(altered).not.toBe(csv);
+    await fs.writeFile(path.join(dir, "data/imports/internet-annual.csv"), altered);
+    await fs.copyFile(path.join(root, "data/reports/internet-validation.json"), path.join(dir, "data/reports/internet-validation.json"));
+    const cwd = vi.spyOn(process, "cwd").mockReturnValue(path.join(dir, "apps/web"));
+    try {
+      await expect(loadInternetFacts()).rejects.toThrow(/fingerprint/);
+    } finally {
+      cwd.mockRestore();
+    }
+  } finally {
+    await fs.rm(dir, { recursive: true, force: true });
+  }
+});
+
+test("parity accepts equal decimals written differently and rejects a changed or missing value", async () => {
+  const facts = await loadFacts();
+  const at = facts.findIndex(f => f.indicatorId === "internet.own_mobile.total" && f.year === 2026);
+  expect(facts[at].publishedValue).toBe("93.3");
+  expect(() => assertInternetParity(facts, facts.map(f => ({ ...f })))).not.toThrow();
+  const padded = facts.map(f => ({ ...f }));
+  padded[at].publishedValue = "93.30";
+  expect(() => assertInternetParity(facts, padded)).not.toThrow();
+  const changed = facts.map(f => ({ ...f }));
+  setValue(changed[at], "93.4");
+  expect(() => assertInternetParity(facts, changed)).toThrow();
+  expect(() => assertInternetParity(facts, facts.slice(1))).toThrow();
+});
+
+test("client facts carry the published one-decimal shares", async () => {
+  const facts = await loadFacts();
+  expect(toClientInternetFact(find(facts, "internet.own_mobile.total", 2026))).toEqual({ year: 2026, indicatorId: "internet.own_mobile.total", sourceId: "geostat_ict_own_mobile", value: 93.3, unit: "percent", decimals: 1 });
+  expect(toClientInternetFact(find(facts, "internet.homes_internet.total", 2016))).toMatchObject({ value: 70.1, unit: "percent", decimals: 1 });
+});
+
+test("the database mirror round-trips exact decimals and source relations", async () => {
+  const facts = await loadFacts();
+  const rows = internetMirrorCreateRows(facts, "internet-run-1").map(row => ({ ...row, value: new Decimal(row.value as string), publishedValue: new Decimal(row.publishedValue as string) }));
+  const db = (list: typeof rows) => ({ internetFact: { findMany: async () => list } }) as unknown as Pick<Prisma.TransactionClient, "internetFact">;
+  const mirror = await loadInternetFactsFromMirror(db(rows));
+  expect(() => assertInternetParity(facts, mirror)).not.toThrow();
+  expect(mirror).toEqual(facts);
+  expect(rows[0].importRunId).toBe("internet-run-1");
+  expect(rows.every(row => row.sourceDocumentId === `source.${row.sourceId}`)).toBe(true);
+  await expect(loadInternetFactsFromMirror(db([{ ...rows[0], sourceDocumentId: "source.other" }]))).rejects.toThrow(/source relation/);
+});
+
+test("every archived source has a source-document row", async () => {
+  const csv = await fs.readFile(path.join(root, "data/sources/source-documents.csv"));
+  const ids = new Set((parse(csv, { columns: true, bom: true }) as Record<string, string>[]).map(r => r.source_id));
+  expect(INTERNET_PUBLIC_SOURCES.filter(id => !ids.has(internetSourceDocumentId(id)))).toEqual([]);
 });

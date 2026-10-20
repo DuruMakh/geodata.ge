@@ -46,6 +46,7 @@ import { externalPositionSourceDocumentId, type ExternalPositionFact } from "../
 import { businessSourceDocumentId, type BusinessFact } from "../data/business/types";
 import { housingSourceDocumentId, type HousingFact } from "../data/housing/types";
 import { housingDisplayDecimals } from "../data/housing/validation";
+import { internetSourceDocumentId, type InternetFact } from "../data/internet/types";
 import { businessDisplayDecimals } from "../data/business/validation";
 import { educationSourceDocumentId, type EducationFact } from "../data/education/types";
 import { educationDisplayDecimals } from "../data/education/validation";
@@ -854,6 +855,24 @@ export async function loadHousingFactsFromMirror(db: Pick<MirrorClient, "housing
     return {
       year: row.year, indicatorId: row.indicatorId as HousingFact["indicatorId"],
       value: row.value.toFixed(), publishedValue: row.publishedValue.toFixed(housingDisplayDecimals(row.indicatorId)), unit: row.unit as HousingFact["unit"], basis: row.basis as "actual", valueStatus: row.valueStatus as "official",
+      sourceId: row.sourceId, sourceSheet: row.sourceSheet, sourceCell: row.sourceCell, lastReviewedAt: isoDate(row.lastReviewedAt),
+    };
+  });
+}
+
+export function internetMirrorCreateRows(facts: readonly InternetFact[], importRunId: string): Prisma.InternetFactCreateManyInput[] {
+  return facts.map(({ lastReviewedAt, ...fact }) => ({
+    ...fact, sourceDocumentId: internetSourceDocumentId(fact.sourceId), lastReviewedAt: new Date(`${lastReviewedAt}T00:00:00.000Z`), importRunId,
+  }));
+}
+
+export async function loadInternetFactsFromMirror(db: Pick<MirrorClient, "internetFact">): Promise<InternetFact[]> {
+  const rows = await db.internetFact.findMany({ orderBy: [{ indicatorId: "asc" }, { year: "asc" }] });
+  return rows.map(row => {
+    if (row.sourceDocumentId !== internetSourceDocumentId(row.sourceId)) throw new Error("Internet source relation mismatch");
+    return {
+      year: row.year, indicatorId: row.indicatorId as InternetFact["indicatorId"],
+      value: row.value.toFixed(), publishedValue: row.publishedValue.toFixed(1), unit: row.unit as "percent", basis: row.basis as "actual", valueStatus: row.valueStatus as "survey_estimate",
       sourceId: row.sourceId, sourceSheet: row.sourceSheet, sourceCell: row.sourceCell, lastReviewedAt: isoDate(row.lastReviewedAt),
     };
   });
