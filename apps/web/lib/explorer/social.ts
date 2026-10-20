@@ -1,5 +1,5 @@
 import { buildBreakRegister } from "../data/demography/breaks";
-import { SOCIAL_GEORGIA, SOCIAL_PACKAGE_GROUPS, SOCIAL_PAYMENT_PROGRAMMES, type ClientSocialFact, type SocialSeriesBreak } from "../data/social/types";
+import { SOCIAL_AGE_BANDS, SOCIAL_GEORGIA, SOCIAL_PACKAGE_GROUPS, SOCIAL_PAYMENT_PROGRAMMES, type ClientSocialFact, type SocialSeriesBreak } from "../data/social/types";
 import type { ClientNationalGdpFact } from "./clientData";
 import { INK } from "./colors";
 import { CENSUS_BREAK, perPopulation } from "./crime";
@@ -63,7 +63,8 @@ const FIXED_PAYMENT_COLORS: Readonly<Record<string, string>> = {
  * The default series is ink. As on Housing, a row is keyed by its position in a fixed list, so no list repeats a colour:
  * a Social payments programme by `SOCIAL_PAYMENT_PROGRAMMES` (four of them fixed), and a Social package group by
  * `SOCIAL_PACKAGE_GROUPS`, so a group wears one colour under Recipients, Money and Average per month; the Money and average
- * totals, the reference rows of their headings like "All recipients" under Recipients, are ink. Place rows take the palette by position.
+ * totals, the reference rows of their headings like "All recipients" under Recipients, are ink. A subsistence age group is keyed by
+ * its band in `SOCIAL_AGE_BANDS`, so the eight bands take palette 0–7 wherever the heading sits. Other place rows take the palette by position.
  */
 export function socialSeriesColor(series: SocialSeriesDefinition, index: number): string {
   if (series.reference) return INK;
@@ -71,6 +72,7 @@ export function socialSeriesColor(series: SocialSeriesDefinition, index: number)
   if (programme === "payments") return FIXED_PAYMENT_COLORS[group!] ?? topicSeriesColor(series, SOCIAL_PAYMENT_PROGRAMMES.indexOf(group as typeof SOCIAL_PAYMENT_PROGRAMMES[number]));
   if (programme === "social_package" && group === "total") return INK;
   if (programme === "social_package") return topicSeriesColor(series, SOCIAL_PACKAGE_GROUPS.indexOf(group as typeof SOCIAL_PACKAGE_GROUPS[number]));
+  if (group?.startsWith("persons_age_")) return topicSeriesColor(series, SOCIAL_AGE_BANDS.indexOf(group.slice("persons_age_".length) as typeof SOCIAL_AGE_BANDS[number]));
   return topicSeriesColor(series, index);
 }
 

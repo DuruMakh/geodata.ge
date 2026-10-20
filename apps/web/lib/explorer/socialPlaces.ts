@@ -14,8 +14,8 @@ export const socialPlaceBase = (set: SocialPlaceSet): `${typeof HEALTH_HUB_PATH}
 
 /**
  * A place's series under their headings (spec §5 and §6); the first row, the default, is the reference. Every place lists the same rows.
- * Subsistence allowance ends with SSA's eight age bands of the people in receiving families, after the existing headings so
- * their palette positions do not move.
+ * Subsistence allowance ends with SSA's eight age bands of the people in receiving families; each band takes its colour by
+ * its place in `SOCIAL_AGE_BANDS` (`socialSeriesColor`), not by its row.
  */
 export function socialPlaceSeries(set: SocialPlaceSet): SocialSeriesDefinition[] {
   if (set === "pensions") return [

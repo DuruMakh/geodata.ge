@@ -8,7 +8,7 @@ import { SERVED_DATA_FILES, loadServedMunicipalData } from "../../lib/data/serve
 import { loadSocialBreaks, loadSocialFacts, toClientSocialFact } from "../../lib/data/social/importSocial";
 import { SOCIAL_AGE_BANDS, type ClientSocialFact, type SocialSeriesBreak } from "../../lib/data/social/types";
 import { projectGdpFact, type ClientNationalGdpFact } from "../../lib/explorer/clientData";
-import { INK } from "../../lib/explorer/colors";
+import { EDITORIAL_PALETTE, INK } from "../../lib/explorer/colors";
 import { createWorkbookBuffer } from "../../lib/explorer/workbookWriter.client";
 import { getMessages } from "../../lib/i18n/messages.server";
 import type { Presentation } from "../../lib/i18n/types";
@@ -121,9 +121,10 @@ test("the age groups chart people, start in 2013, keep their own colours and cro
   expect([model.heading, model.unit, model.range.start, model.range.end]).toEqual(["ages", "persons", 2013, 2025]);
   expect(model.selected.map(series => series.valuesByYear[2025])).toEqual(ids.map(id => value(id, "region.imereti", 2025)));
   expect(model.selected.every(series => series.decimals === 0 && !Object.keys(series.partialMonths).length)).toBe(true);
+  // Each band is keyed by its place in SOCIAL_AGE_BANDS (palette 0–7), as Social package's groups are, never by its row on the page.
   const colors = model.series.filter(series => series.heading === "ages").map(series => series.color);
-  expect(new Set(colors).size).toBe(8);
-  expect(colors).not.toContain(INK);
+  expect(colors).toEqual(["#B3402A", "#1F6E56", "#3D5A98", "#A5822B", "#7A4E8C", "#4A707A", "#C26E4C", "#2F4B3A"]);
+  expect(colors).toEqual(SOCIAL_AGE_BANDS.map((_, index) => EDITORIAL_PALETTE[index]));
   expect(model.breaks).toEqual([{ year: 2022, label: "newCounting" }]);
   // Ticking an age band after Families replaces the selection; the default stays Families alone.
   const ticked = changeSocialPlaceSelection({ mode: "line", range: { kind: "all" }, selectedIds: ["social.subsistence.families"] }, "subsistence-allowance", "region.imereti", ["social.subsistence.families", ids[0]], subsistence);
