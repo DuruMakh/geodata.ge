@@ -9,6 +9,7 @@ import { loadServedExternalPositionData } from "../data/externalPosition/importE
 import { EXTERNAL_POSITION_SECTIONS } from "../explorer/externalPosition";
 import { loadServedGdpOverviewData } from "../data/gdpOverview/importGdpOverview";
 import { loadServedEconomicSectorsData } from "../data/economicSectors/importEconomicSectors";
+import { loadServedGdpExpenditureData } from "../data/gdpExpenditure/importGdpExpenditure";
 import { loadServedUnemploymentData } from "../data/unemployment/importUnemployment";
 import { loadServedTradeOverviewData } from "../data/tradeOverview/importTradeOverview";
 import { loadServedWagesData } from "../data/wages/importWages";
@@ -72,7 +73,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     countryFunctionFacts,
     countryTotalFacts,
     adjaraBudgetAdjustments,
-  }, { facts: debtFacts }, { facts: balanceFacts }, { facts: inflationFacts }, { facts: productFacts }, { facts: regionalEconomyFacts }, { facts: gdpOverviewFacts }, { facts: sectorFacts }, { facts: unemploymentFacts }, { facts: tradeFacts }, { facts: tradePartnerFacts }, { facts: moneyTransferFacts }, { facts: demographyFacts }, { facts: tradeProductFacts }, { facts: tradeDomesticFacts }, { facts: foreignInvestmentFacts }, { facts: wagesFacts }, currentAccountFacts, { facts: povertyFacts }, { facts: householdFacts }, { facts: energyFoodFacts }, { facts: moneyBanksFacts }, { facts: tradeServicesFacts }, { facts: tradeCompositionFacts }, { facts: externalPositionFacts }, { facts: businessFacts }, { facts: healthFacts }, { facts: crimeFacts }, { facts: housingFacts }, { facts: educationFacts }] = await Promise.all([
+  }, { facts: debtFacts }, { facts: balanceFacts }, { facts: inflationFacts }, { facts: productFacts }, { facts: regionalEconomyFacts }, { facts: gdpOverviewFacts }, { facts: sectorFacts }, { facts: unemploymentFacts }, { facts: tradeFacts }, { facts: tradePartnerFacts }, { facts: moneyTransferFacts }, { facts: demographyFacts }, { facts: tradeProductFacts }, { facts: tradeDomesticFacts }, { facts: foreignInvestmentFacts }, { facts: wagesFacts }, currentAccountFacts, { facts: povertyFacts }, { facts: householdFacts }, { facts: energyFoodFacts }, { facts: moneyBanksFacts }, { facts: tradeServicesFacts }, { facts: tradeCompositionFacts }, { facts: externalPositionFacts }, { facts: businessFacts }, { facts: healthFacts }, { facts: crimeFacts }, { facts: housingFacts }, { facts: educationFacts }, { facts: gdpExpenditureFacts }] = await Promise.all([
     loadServedLandingData(),
     loadServedMunicipalData(),
     loadServedGovernmentDebtData(),
@@ -104,6 +105,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     loadServedCrimeData(),
     loadServedHousingData(),
     loadServedEducationData(),
+    loadServedGdpExpenditureData(),
   ]);
   const inflationModified = new Date(inflationFacts.map((fact) => fact.lastReviewedAt).sort().at(-1)!);
   const productModified = new Date(productFacts.map((fact) => fact.lastReviewedAt).sort().at(-1)!);
@@ -112,6 +114,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // inflation or debt refresh moves theirs. They used to carry the budget date.
   const gdpModified = new Date(gdpOverviewFacts.map((fact) => fact.lastReviewedAt).sort().at(-1)!);
   const sectorsModified = new Date(sectorFacts.map((fact) => fact.lastReviewedAt).sort().at(-1)!);
+  const gdpExpenditureModified = new Date(gdpExpenditureFacts.map((fact) => fact.lastReviewedAt).sort().at(-1)!);
   const unemploymentModified = new Date(unemploymentFacts.map(fact => fact.lastReviewedAt).sort().at(-1)!);
   const tradeModified = new Date(tradeFacts.map(fact => fact.lastReviewedAt).sort().at(-1)!);
   const wagesModified = new Date(wagesFacts.map(fact => fact.lastReviewedAt).sort().at(-1)!);
@@ -137,7 +140,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const tradeDomesticModified = new Date(tradeDomesticFacts.map(fact => fact.lastReviewedAt).sort().at(-1)!);
   // A hub is dated by the latest of every dataset its cards read.
   const tradeHubModified = new Date(Math.max(tradeModified.getTime(), tradePartnersModified.getTime(), tradeProductsModified.getTime(), tradeDomesticModified.getTime(), tradeServicesModified.getTime(), tradeCompositionModified.getTime()));
-  const economyModified = new Date(Math.max(gdpModified.getTime(), sectorsModified.getTime(), regionalModified.getTime()));
+  const economyModified = new Date(Math.max(gdpModified.getTime(), sectorsModified.getTime(), gdpExpenditureModified.getTime(), regionalModified.getTime()));
   const inflationHubModified = productModified > inflationModified ? productModified : inflationModified;
   const demographyModified = new Date(demographyFacts.map((fact) => fact.lastReviewedAt).sort().at(-1)!);
   const lastReviewedAt = sourceDocuments
@@ -182,6 +185,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${siteUrl}/explorer/economy`, lastModified: economyModified },
     { url: `${siteUrl}/explorer/economy/gdp`, lastModified: gdpModified },
     { url: `${siteUrl}/explorer/economy/sectors`, lastModified: sectorsModified },
+    { url: `${siteUrl}/explorer/economy/expenditure`, lastModified: gdpExpenditureModified },
     { url: `${siteUrl}${BUSINESS_HUB_PATH}`, lastModified: businessModified },
     ...BUSINESS_SECTIONS.map(section => ({ url: `${siteUrl}${section.href}`, lastModified: businessModified })),
     ...BUSINESS_AREAS.map(area => ({ url: `${siteUrl}${businessAreaHref(area)}`, lastModified: businessModified })),

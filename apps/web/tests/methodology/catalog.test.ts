@@ -67,7 +67,7 @@ const registerRow = (overrides: Partial<DecisionRegisterRow> = {}): DecisionRegi
 
 describe("methodology catalog", () => {
   it("exposes the approved live datasets", () => {
-    expect(LIVE_METHODOLOGY_IDS).toEqual(["expenditure", "revenue", "municipalities", "debt", "gdp", "economic-sectors", "regional-economies", "business", "housing", "inflation", "money", "unemployment", "wages", "poverty", "household-income", "health", "education", "crime", "trade", "external-flows", "energy-food", "demography"]);
+    expect(LIVE_METHODOLOGY_IDS).toEqual(["expenditure", "revenue", "municipalities", "debt", "gdp", "economic-sectors", "gdp-expenditure", "regional-economies", "business", "housing", "inflation", "money", "unemployment", "wages", "poverty", "household-income", "health", "education", "crime", "trade", "external-flows", "energy-food", "demography"]);
     expect(Object.keys(METHODOLOGY_CONTENT)).toEqual(LIVE_METHODOLOGY_IDS);
   });
 
@@ -339,6 +339,7 @@ describe("methodology catalog", () => {
   it("builds live hub rows from facts, content metadata, and validated archives", () => {
     const archives: Record<(typeof LIVE_METHODOLOGY_IDS)[number], MethodologyArchiveSummary> = {
       "economic-sectors": {fileCount:3,totalBytes:100,latestRetrievedAt:"2026-09-11",validated:true,minYear:2010,maxYear:2025},
+      "gdp-expenditure": {fileCount:3,totalBytes:100,latestRetrievedAt:"2026-10-20",validated:true,minYear:2010,maxYear:2025},
       "regional-economies": {fileCount:2,totalBytes:100,latestRetrievedAt:"2026-09-13",validated:true,minYear:2010,maxYear:2024},
       expenditure: { fileCount: 42, totalBytes: 100, latestRetrievedAt: "2026-08-10", validated: true },
       revenue: { fileCount: 21, totalBytes: 200, latestRetrievedAt: "2026-08-09", validated: true },
@@ -401,6 +402,7 @@ describe("methodology catalog", () => {
       },
       {id:"gdp",title:METHODOLOGY_CONTENT.gdp.title,summary:METHODOLOGY_CONTENT.gdp.summary,href:"/methodology/gdp",coverage:{firstYear:1960,lastYear:2025},originalFileCount:5,reviewedAt:METHODOLOGY_CONTENT.gdp.reviewedAt},
       {id:"economic-sectors",title:METHODOLOGY_CONTENT["economic-sectors"].title,summary:METHODOLOGY_CONTENT["economic-sectors"].summary,href:"/methodology/economic-sectors",coverage:{firstYear:2010,lastYear:2025},originalFileCount:3,reviewedAt:METHODOLOGY_CONTENT["economic-sectors"].reviewedAt},
+      {id:"gdp-expenditure",title:METHODOLOGY_CONTENT["gdp-expenditure"].title,summary:METHODOLOGY_CONTENT["gdp-expenditure"].summary,href:"/methodology/gdp-expenditure",coverage:{firstYear:2010,lastYear:2025},originalFileCount:3,reviewedAt:METHODOLOGY_CONTENT["gdp-expenditure"].reviewedAt},
       {id:"regional-economies",title:METHODOLOGY_CONTENT["regional-economies"].title,summary:METHODOLOGY_CONTENT["regional-economies"].summary,href:"/methodology/regional-economies",coverage:{firstYear:2010,lastYear:2024},originalFileCount:2,reviewedAt:METHODOLOGY_CONTENT["regional-economies"].reviewedAt},
       { id: "business", title: METHODOLOGY_CONTENT.business.title, summary: METHODOLOGY_CONTENT.business.summary, href: "/methodology/business", coverage: { firstYear: 1999, lastYear: 2025 }, originalFileCount: 26, reviewedAt: METHODOLOGY_CONTENT.business.reviewedAt },
       { id: "housing", title: METHODOLOGY_CONTENT.housing.title, summary: METHODOLOGY_CONTENT.housing.summary, href: "/methodology/housing", coverage: { firstYear: 2006, lastYear: 2025 }, originalFileCount: 21, reviewedAt: METHODOLOGY_CONTENT.housing.reviewedAt },
@@ -431,6 +433,7 @@ describe("methodology catalog", () => {
   it("rejects a hub row without a validated archive", () => {
     const archives = {
       "economic-sectors": {fileCount:3,totalBytes:100,latestRetrievedAt:"2026-09-11",validated:true,minYear:2010,maxYear:2025},
+      "gdp-expenditure": {fileCount:3,totalBytes:100,latestRetrievedAt:"2026-10-20",validated:true,minYear:2010,maxYear:2025},
       "regional-economies": {fileCount:2,totalBytes:100,latestRetrievedAt:"2026-09-13",validated:true,minYear:2010,maxYear:2024},
       expenditure: { fileCount: 1, totalBytes: 1, latestRetrievedAt: "2026-08-10", validated: true },
       revenue: { fileCount: 1, totalBytes: 1, latestRetrievedAt: "2026-08-10", validated: false },

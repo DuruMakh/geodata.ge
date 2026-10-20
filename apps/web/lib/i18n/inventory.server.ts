@@ -44,7 +44,7 @@ export async function listPublicPagePaths(): Promise<string[]> {
   const { regions } = await loadServedMunicipalData();
   return [
     "/", "/about", "/connect", "/explorer", "/explorer/economy", "/explorer/economy/gdp",
-    "/explorer/economy/sectors",
+    "/explorer/economy/sectors", "/explorer/economy/expenditure",
     "/explorer/unemployment",
     "/explorer/trade", "/explorer/trade/overview", "/explorer/trade/partners", "/explorer/trade/products", "/explorer/trade/domestic-exports", "/explorer/trade/services", "/explorer/trade/composition", "/explorer/external", "/explorer/external/money-from-abroad", "/explorer/external/foreign-investment", "/explorer/external/current-account", ...EXTERNAL_POSITION_SECTIONS.map(section => section.href),
     ...UNEMPLOYMENT_SECTIONS.map(section => section.href),

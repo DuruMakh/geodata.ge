@@ -58,6 +58,7 @@ export const NAV_TREE: readonly NavHub[] = [
     sections: sectionRows([
       { id: "gdp", href: "/explorer/economy/gdp", labelKey: "common.gdpOverview" },
       { id: "sectors", href: "/explorer/economy/sectors", labelKey: "common.economicSectors" },
+      { id: "expenditure", href: "/explorer/economy/expenditure", labelKey: "common.gdpExpenditure" },
       { id: "regions", href: "/explorer/economy/regions", labelKey: "common.regionalEconomies" },
     ], "economy"),
   },
@@ -219,6 +220,7 @@ const PAGE_SOURCE_NOTES: Readonly<Record<string, string>> = {
   "/explorer/municipalities": "common.budgetStatisticsSourceNote",
   "/explorer/deficit": "common.deficitSourceNote",
   "/explorer/economy/sectors": "common.geostatSourceNote",
+  "/explorer/economy/expenditure": "common.geostatSourceNote",
   "/explorer/inflation/categories": "common.geostatSourceNote",
   "/explorer/inflation/products": "common.geostatSourceNote",
   "/explorer/external": "common.externalHubSourceNote",
