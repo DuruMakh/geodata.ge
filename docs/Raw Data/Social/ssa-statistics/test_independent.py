@@ -42,6 +42,9 @@ class IndependentReader(unittest.TestCase):
                 writer.writerows([['fixture-01', 2025, 'სულ', 'B', 'sum_of_months', 1, 1, 9999],
                                   ['fixture-01', 2025, 'სულ', 'AZ', 'last_month', 1, 1, 42]])
             (root / 'ssa-programmes-monthly.csv').write_text('programme,year,month,recipients,amount_gel,recipients_source,amount_source\n', encoding='utf-8')
+            served = ('programme,measure,geography_id,year,value,months,value_status,source_table,source_workbook,source_sheet,source_cell\n'
+                      'pension,amount,country.georgia,2025,10041,1,calculated,fixture-01,wide.xlsx,*,B10000+AZ10000\n')
+            (root / 'ssa-served-annual.csv').write_text(served, encoding='utf-8')
             try:
                 result = subprocess.run(['node', str(ROOT / 'verify_independent.mjs'), '--official', str(root), '--out', str(root)],
                                         capture_output=True, text=True, encoding='utf-8', timeout=15)
@@ -50,7 +53,15 @@ class IndependentReader(unittest.TestCase):
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
             report = json.loads(result.stdout)
             self.assertEqual(report['national_annual_rows_checked'], 2)
+            self.assertEqual(report['served_rows_checked'], 1)
             self.assertEqual(report['problems'], 0)
+            # A served row naming the wrong place is rejected although its cells add up.
+            (root / 'ssa-served-annual.csv').write_text(served.replace('country.georgia', '06'), encoding='utf-8')
+            misplaced = subprocess.run(['node', str(ROOT / 'verify_independent.mjs'), '--official', str(root), '--out', str(root)],
+                                       capture_output=True, text=True, encoding='utf-8', timeout=15)
+            self.assertEqual(misplaced.returncode, 1, misplaced.stdout + misplaced.stderr)
+            self.assertEqual(json.loads(misplaced.stdout)['problems'], 2)  # one for each of its two cells
+            (root / 'ssa-served-annual.csv').write_text(served, encoding='utf-8')
             csv_path = root / 'ssa-national-annual.csv'
             csv_path.write_bytes(csv_path.read_text(encoding='utf-8-sig').replace(',9999\n', ',9998\n').encode('utf-8-sig'))
             changed = subprocess.run(['node', str(ROOT / 'verify_independent.mjs'), '--official', str(root), '--out', str(root)],

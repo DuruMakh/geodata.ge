@@ -2,6 +2,7 @@
  "reader": "SheetJS 0.20.3",
  "national_annual_rows_checked": 26417,
  "programme_monthly_values_checked": 5777,
+ "served_rows_checked": 16335,
  "problems": 0,
  "first_problems": [],
  "passed": true

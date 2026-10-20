@@ -142,6 +142,202 @@ class ValidationFailures(unittest.TestCase):
         self.assertTrue(prepare.validate(self.index, self.manifest, [], [], self.built, self.browser, reviews))
 
 
+def served_row(programme, measure, geography_id, year, value, **extra):
+    return {'programme': programme, 'measure': measure, 'geography_id': geography_id, 'year': year,
+            'value': str(value), 'months': extra.get('months', 1), 'value_status': 'official', **extra}
+
+
+class ServedValidationFailures(unittest.TestCase):
+    """validate_served rejects rows the served file must never hold."""
+
+    def setUp(self):
+        self.national = [{'programme': 'pension', 'year': 2025, 'recipients': '10', 'amount_gel': '100'}]
+        self.areas = [{'programme': 'pension', 'year': 2025, 'area_level': 'municipality', 'area_id': '06',
+                       'recipients': '4', 'recipients_month': 12, 'amount_gel': '40'},
+                      {'programme': 'pension', 'year': 2025, 'area_level': 'region', 'area_id': 'region.tbilisi',
+                       'recipients': '6', 'recipients_month': 12, 'amount_gel': '60'}]
+        self.served = [served_row('pension', 'recipients', 'country.georgia', 2025, 10),
+                       served_row('pension', 'amount', 'country.georgia', 2025, 100, months=12),
+                       served_row('pension', 'recipients', '06', 2025, 4),
+                       served_row('pension', 'amount', '06', 2025, 40, months=12),
+                       served_row('pension', 'recipients', 'region.tbilisi', 2025, 6),
+                       served_row('pension', 'amount', 'region.tbilisi', 2025, 60, months=12)]
+
+    def failures(self):
+        return prepare.validate_served(self.served, self.national, self.areas)
+
+    def test_clean_rows_pass(self):
+        self.assertEqual(self.failures(), [])
+
+    def test_a_tbilisi_municipality_row_fails(self):
+        self.served.append(served_row('pension', 'recipients', '04', 2025, 6))
+        self.assertTrue(self.failures())
+
+    def test_a_year_outside_2013_to_2025_fails(self):
+        self.served.append(served_row('pension', 'recipients', 'country.georgia', 2026, 10))
+        self.assertTrue(self.failures())
+
+    def test_a_duplicate_row_fails(self):
+        self.served.append(dict(self.served[0]))
+        self.assertTrue(self.failures())
+
+    def test_a_value_differing_from_the_reviewed_extraction_fails(self):
+        self.served[2]['value'] = '5'
+        self.assertTrue(self.failures())
+
+    def test_a_value_missing_from_the_served_file_fails(self):
+        del self.served[3]
+        self.assertTrue(self.failures())
+
+    def test_social_package_groups_that_do_not_add_up_fail(self):
+        groups = {'total': 10, 'disability': 5, 'survivors': 2, 'war_participants': 1, 'political_repression': 1,
+                  'other': 1, 'disability_children': 1, 'disability_severe': 2, 'disability_significant': 1,
+                  'disability_moderate': 1}
+        self.served += [served_row('social_package_group', f'group.{group}.recipients', 'country.georgia', 2025, value)
+                        for group, value in groups.items()]
+        self.assertEqual(self.failures(), [])
+        self.served[-6]['value'] = '2'  # other
+        self.assertTrue(self.failures())
+
+
+def served_rows():
+    return read('ssa-served-annual.csv')
+
+
+def served_values():
+    return {(row['programme'], row['measure'], row['geography_id'], int(row['year'])): row for row in served_rows()}
+
+
+SITE_MUNICIPALITIES = {row['municipality_code'] for row in csv.DictReader(
+    open(prepare.MUNICIPALITIES, encoding='utf-8-sig', newline=''))} - {'04'}
+GROUP_MEMBERS = ('disability', 'survivors', 'war_participants', 'political_repression', 'other')
+DISABILITY_PARTS = ('disability_children', 'disability_severe', 'disability_significant', 'disability_moderate')
+
+
+class ServedFile(unittest.TestCase):
+    """ssa-served-annual.csv: the yearly values the explorer serves, each traceable to a workbook cell."""
+
+    def test_tsa_registered(self):
+        values = served_values()
+        self.assertEqual(values[('tsa_registered', 'recipients', 'country.georgia', 2025)]['value'], '397144')
+        self.assertEqual(values[('tsa_registered', 'recipients', 'country.georgia', 2013)]['value'], '524482')
+        places_2025 = {key[2] for key in values if key[:2] == ('tsa_registered', 'recipients') and key[3] == 2025}
+        self.assertLessEqual(SITE_MUNICIPALITIES | {'region.tbilisi'}, places_2025)
+        recorded = {(row['table_id'], int(row['year']), row['month'], row['column']): Decimal(row['difference'])
+                    for row in read('source-findings.csv') if row['table_id'] == 'tsa_db-01' and row['difference']}
+        columns = {'recipients': 'B', 'persons': 'C'}
+        checked = 0
+        for year in range(2013, 2026):
+            for measure, column in columns.items():
+                total = Decimal(values[('tsa_registered', measure, 'country.georgia', year)]['value'])
+                parts = sum(Decimal(row['value']) for key, row in values.items()
+                            if key[:2] == ('tsa_registered', measure) and key[3] == year
+                            and (key[2] in SITE_MUNICIPALITIES or key[2] == 'region.tbilisi' or key[2].startswith('unit.')))
+                difference = recorded.get(('tsa_db-01', year, '12', column), Decimal(0))
+                self.assertEqual(total - parts, difference, (measure, year))
+                checked += 1
+        self.assertEqual(checked, 26)
+
+    def test_served_anchors(self):
+        values = served_values()
+        anchors = {('pension', 'recipients', 2025): '888518',
+                   ('pension', 'amount', 2025): '4262309090',
+                   ('subsistence_allowance', 'recipients', 2025): '129506',
+                   ('subsistence_allowance', 'persons', 2025): '463122',
+                   ('subsistence_allowance', 'employment_families', 2025): '54842',
+                   ('tsa_registered', 'recipients', 2025): '397144',
+                   ('subsistence_allowance', 'amount', 2025): '855291818',
+                   ('social_package', 'recipients', 2025): '187764',
+                   ('social_package', 'amount', 2025): '544241359'}
+        for (programme, measure, year), expected in anchors.items():
+            with self.subTest(programme=programme, measure=measure):
+                row = values[(programme, measure, 'country.georgia', year)]
+                self.assertEqual(row['value'], expected)
+                self.assertEqual(row['value_status'], 'official' if measure != 'amount' else 'calculated')
+
+    def test_partial_months(self):
+        values = served_values()
+        self.assertEqual(values[('workplace_injury', 'amount', 'country.georgia', 2013)]['months'], '9')
+        for year in (2020, 2021):
+            self.assertEqual(values[('covid_vulnerable_compensation', 'amount', 'country.georgia', year)]['months'], '6')
+        self.assertEqual(values[('pension', 'amount', 'country.georgia', 2025)]['months'], '12')
+        self.assertEqual(values[('pension', 'recipients', 'country.georgia', 2025)]['source_sheet'].lower()[:3], 'dec')
+        years = {key[3] for key in values}
+        self.assertEqual((min(years), max(years)), (2013, 2025))
+
+    def test_tbilisi(self):
+        values = served_values()
+        self.assertFalse([key for key in values if key[2] == '04'])
+        fields = {'recipients': 'recipients', 'persons': 'persons', 'employment_families': 'emp_families',
+                  'amount': 'amount_gel', 'employment_amount': 'amount_emp_gel'}
+        checked = 0
+        for row in read('ssa-programmes-areas-annual.csv'):
+            if row['area_id'] != '04' or not 2013 <= int(row['year']) <= 2025:
+                continue
+            for measure, field in fields.items():
+                key = (row['programme'], measure, 'region.tbilisi', int(row['year']))
+                if row.get(field) and key in values:
+                    self.assertEqual(values[key]['value'], row[field], key)
+                    checked += 1
+        programmes = {key[0] for key in values if key[2] == 'region.tbilisi'}
+        self.assertEqual(programmes, {'pension', 'pension_idp', 'pension_highmountain', 'subsistence_allowance',
+                                      'tsa_registered'})
+        self.assertEqual(checked, 145)  # every Tbilisi figure of these measures in the reviewed yearly file, 2013–2025
+
+    def test_social_package_groups(self):
+        values = served_values()
+        # SSA's May 2022 printed money total (socpackage-02 L85) is 56 GEL less than its own group columns.
+        recorded = {(2022, 'amount'): Decimal(56)}
+        for year in range(2013, 2026):
+            for measure, tolerance in (('recipients', Decimal(0)), ('amount', Decimal(3))):
+                def group(name):
+                    row = values.get(('social_package_group', f'group.{name}.{measure}', 'country.georgia', year))
+                    return Decimal(row['value']) if row else None
+                with self.subTest(year=year, measure=measure):
+                    total = group('total')
+                    self.assertEqual(str(total), values[('social_package', measure, 'country.georgia', year)]['value'])
+                    members = sum(group(name) or Decimal(0) for name in GROUP_MEMBERS)
+                    self.assertLessEqual(abs(members - total - recorded.get((year, measure), 0)), tolerance)
+                    # The severity columns start in October 2017: 2017 money covers only their three months.
+                    if year >= 2017 and (measure == 'recipients' or year > 2017):
+                        self.assertLessEqual(abs(sum(group(name) for name in DISABILITY_PARTS) - group('disability')),
+                                             tolerance)
+        disability = values[('social_package_group', 'group.disability.recipients', 'country.georgia', 2025)]
+        self.assertEqual(disability['value'], str(18819 + 32151 + 73514 + 5998))
+        self.assertEqual(disability['value_status'], 'calculated')
+        war = [key[3] for key in values if key[:3] == ('social_package_group', 'group.war_participants.recipients',
+                                                       'country.georgia')]
+        self.assertEqual(min(war), 2019)
+
+    def test_cells(self):
+        import random
+        rows = random.Random(20251231).sample(served_rows(), 20)
+        books = {}
+        for row in rows:
+            with self.subTest(row={key: row[key] for key in ('programme', 'measure', 'geography_id', 'year')}):
+                name = row['source_workbook']
+                if name not in books:
+                    books[name] = [sheet for sheet in prepare.read_workbook(ROOT / 'official' / 'workbooks' / name)
+                                   if not sheet['hidden'] and prepare.EXPLANATIONS not in sheet['name']]
+                sheets = {sheet['name']: sheet for sheet in books[name]}
+                if ';' in row['source_cell']:
+                    readings = [item.split('!') for item in row['source_cell'].split(';')]
+                elif row['source_sheet'] == '*':
+                    readings = [(sheet['name'], row['source_cell']) for sheet in books[name]
+                                if prepare.month_of(sheet['name']) is not None]
+                else:
+                    readings = [(row['source_sheet'], row['source_cell'])]
+                total = Decimal(0)
+                for sheet_name, expression in readings:
+                    for ref in expression.split('+'):
+                        column, number = prepare.re.fullmatch(r'([A-Z]+)(\d+)', ref).groups()
+                        total += sheets[sheet_name]['cells'][int(number)][column]
+                if row['source_sheet'] == '*':
+                    self.assertEqual(len(readings), int(row['months']))
+                tolerance = Decimal(1) if 'amount' in row['measure'] else Decimal('0.000001')
+                self.assertLessEqual(abs(total - Decimal(row['value'])), tolerance)
+
+
 @unittest.skipUnless((ROOT / 'annual-amounts.csv').exists(), 'generated files not built yet')
 class CommittedOutputs(unittest.TestCase):
     def test_validation_report_passed(self):

@@ -2,7 +2,8 @@
 // Reads every preserved workbook again with SheetJS, the web app's own dependency, not prepare.py's XML reader. Month
 // names, the legacy Georgian font, hidden sheets and row lookup are implemented here separately. It then recomputes:
 //   - every row of ssa-national-annual.csv from its cells (summed months, last month or the single published sheet);
-//   - every recipients and money value of ssa-programmes-monthly.csv from the table and columns named in its source fields.
+//   - every recipients and money value of ssa-programmes-monthly.csv from the table and columns named in its source fields;
+//   - every row of ssa-served-annual.csv from the workbook, sheets and cells it names, checking each cell's area name.
 // Writes independent-validation.json only with --write.
 //
 //   node verify_independent.mjs [--write] [--official DIR] [--out DIR]
@@ -143,8 +144,66 @@ for (const row of readCsv(join(out, 'ssa-programmes-monthly.csv'))) {
   }
 }
 
+// Every ssa-served-annual.csv row: its cells are read again by address, added up and compared, and the area name printed
+// in column A of each cell's row must be the place the row is served for.
+let servedChecked = 0;
+const servedPath = join(out, 'ssa-served-annual.csv');
+if (existsSync(servedPath)) {
+  const places = new Map(readCsv(join(root, 'area-mapping.csv')).map(row => [row.ssa_label, row]));
+  const placeOf = label => {
+    if (TOTAL.test(label)) return 'country.georgia';
+    const row = places.get(label);
+    if (!row) return undefined;
+    if (row.kind === 'region') return row.region_id;
+    if (row.kind === 'tbilisi_total') return 'region.tbilisi';
+    if (row.kind === 'municipality' || row.kind === 'city_merged') return row.municipality_code;
+    if (row.kind === 'excluded_area') return label.includes('ახალგორ') ? 'unit.akhalgori' : label === 'ზემო აფხაზეთი' ? 'unit.upper_abkhazia' : undefined;
+    return undefined;
+  };
+  const books = new Map();
+  const bookOf = name => {
+    if (!books.has(name)) {
+      const workbook = XLSX.read(readFileSync(join(official, 'workbooks', name)), { type: 'buffer' });
+      const meta = workbook.Workbook?.Sheets ?? [];
+      const monthly = workbook.SheetNames.filter((sheetName, i) => !meta[i]?.Hidden && !sheetName.includes('განმარტ')
+        && monthNumber(sheetName) !== null && workbook.Sheets[sheetName]['!ref']);
+      books.set(name, { sheets: workbook.Sheets, monthly });
+      if (books.size > 40) books.delete(books.keys().next().value);
+    }
+    return books.get(name);
+  };
+  const rows = readCsv(servedPath).sort((a, b) => a.source_workbook.localeCompare(b.source_workbook));
+  for (const row of rows) {
+    const where = `${row.programme} ${row.measure} ${row.geography_id} ${row.year}`;
+    servedChecked += 1;
+    if (fileOf.get(`${row.source_table}|${row.year}`) !== row.source_workbook) {
+      problems.push(`${where}: ${row.source_workbook} is not the ${row.source_table} ${row.year} workbook`); continue;
+    }
+    const book = bookOf(row.source_workbook);
+    const readings = row.source_cell.includes(';')
+      ? row.source_cell.split(';').map(item => [item.slice(0, item.lastIndexOf('!')), item.slice(item.lastIndexOf('!') + 1)])
+      : row.source_sheet === '*' ? book.monthly.map(sheetName => [sheetName, row.source_cell]) : [[row.source_sheet, row.source_cell]];
+    if (row.source_sheet === '*' && readings.length !== Number(row.months)) problems.push(`${where}: ${readings.length} sheets, ${row.months} months`);
+    if (Number(row.months) === 1 && /recipients|persons|families/.test(row.measure) && monthNumber(row.source_sheet) !== 12) {
+      problems.push(`${where}: a December count read from sheet ${row.source_sheet}`);
+    }
+    let value = 0;
+    for (const [sheetName, expression] of readings) {
+      for (const ref of expression.split('+')) {
+        const cell = book.sheets[sheetName]?.[ref];
+        if (!cell || cell.t !== 'n') { problems.push(`${where}: ${sheetName}!${ref} holds no number`); continue; }
+        value += cell.v;
+        const label = georgian(book.sheets[sheetName][`A${XLSX.utils.decode_cell(ref).r + 1}`]?.v);
+        if (placeOf(label) !== row.geography_id) problems.push(`${where}: ${sheetName}!${ref} is in the row of ${label}`);
+      }
+    }
+    if (!close(value, Number(row.value), /amount/.test(row.measure) ? 1 : 1e-6)) problems.push(`${where}: SheetJS ${value}, CSV ${row.value}`);
+  }
+}
+
 const report = { reader: `SheetJS ${XLSX.version}`, national_annual_rows_checked: annualChecked,
-  programme_monthly_values_checked: monthlyChecked, problems: problems.length, first_problems: problems.slice(0, 50),
+  programme_monthly_values_checked: monthlyChecked, served_rows_checked: servedChecked, problems: problems.length,
+  first_problems: problems.slice(0, 50),
   passed: problems.length === 0 };
 console.log(JSON.stringify(report, null, 1));
 if (process.argv.includes('--write')) writeFileSync(join(out, 'independent-validation.json'), JSON.stringify(report, null, 1) + '\n');

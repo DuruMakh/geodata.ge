@@ -487,8 +487,10 @@ MATERNITY_BY_MONTH = ('maternity-02', 'maternity-03')
 SOURCES = {}  # (field series id, year, month) -> 'table!columns', recorded for traceability
 
 
-def monthly_values(parsed, table_id, chooser, rows_of, failures):
-    """{(year, month, row label): Decimal} for the chosen columns (summed when several are chosen)."""
+def monthly_values(parsed, table_id, chooser, rows_of, failures, where=None):
+    """{(year, month, row label): Decimal} for the chosen columns (summed when several are chosen).
+
+    With a `where` dict, also records {(year, month, row label): (sheet name, [cell addresses])} for each value."""
     values = {}
     sources = {}
     for year, months in parsed.get(table_id, {}).items():
@@ -506,9 +508,12 @@ def monthly_values(parsed, table_id, chooser, rows_of, failures):
                     if note not in HEADING_NOTES:
                         HEADING_NOTES.append(note)
             sources[(year, month)] = f"{table_id}!{'+'.join(columns)}"
-            for _, label, cells in rows_of(shape):
+            for row, label, cells in rows_of(shape):
                 if any(column in cells for column in columns):
                     values[(year, month, label)] = sum(cells.get(column, Decimal(0)) for column in columns)
+                    if where is not None:
+                        where[(year, month, label)] = (sheet_name, [f'{column}{row}' for column in columns
+                                                                    if column in cells])
     SOURCES[id(values)] = sources
     return values
 
@@ -666,13 +671,252 @@ def area_rows(series_areas, mapping, failures):
         unknown = set()
         keyed = by_area(fields, mapping, unknown)
         failures.extend(f'{programme}: row label {label!r} is not in area-mapping.csv' for label in sorted(unknown))
-        figures_by_key = annual(keyed, PROGRAMMES[programme][5])
+        figures_by_key = annual(keyed, PROGRAMMES[programme][5] if programme in PROGRAMMES else False)
         for (year, (level, area_id)) in sorted(figures_by_key, key=lambda k: (k[0], LEVELS.index(k[1][0]), k[1][1])):
             figures = figures_by_key[(year, (level, area_id))]
             region = area_id if level == 'region' else regions.get(area_id, '') if level == 'municipality' else ''
             rows.append({'programme': programme, 'year': year, 'area_level': level, 'area_id': area_id,
                          'region_id': region, **figures})
     return rows
+
+
+# ---------------------------------------------------------------------------------------------------------------------
+# Served file: the 2013–2025 yearly values the explorer serves, each with the workbook, sheet and cells it is read from.
+# People and families are the December count; money is the sum of the monthly sheets. Places use the site's own ids:
+# country.georgia, region ids, two-digit municipality codes and unit.* for areas outside every municipality. Tbilisi is
+# region.tbilisi only, never municipality 04, so it is not served twice.
+
+SERVED_YEARS = range(2013, 2026)
+UNITS = {'ახალგორის მუნიციპალიტეტი': 'unit.akhalgori', 'ახალგორის რაიონი': 'unit.akhalgori',
+         'ზემო აფხაზეთი': 'unit.upper_abkhazia'}
+# Families and persons registered in the targeted social assistance database, whether or not they are paid.
+TSA_REGISTERED = {'recipients': ('tsa_db-01', pick(r'^რეგისტრირებულთა რაოდენობა / ოჯახი$')),
+                  'persons': ('tsa_db-01', pick(r'^რეგისტრირებულთა რაოდენობა / მოსახლეობა$'))}
+AREA_SERVED = ('pension', 'pension_idp', 'pension_highmountain', 'subsistence_allowance', 'tsa_registered')
+# The other programmes on the Social payments page: national money only.
+MONEY_ONLY = ('social_package_highmountain', 'idp_refugee_allowance', 'compensation_stipend', 'maternity',
+              'child_benefit_3rd_plus', 'child_benefit_highmountain', 'utility_subsidy', 'electricity_tariff_subsidy',
+              'highmountain_electricity', 'electricity_large_families', 'water_subsidy', 'highmountain_doctors_nurses',
+              'workplace_injury', 'covid_vulnerable_compensation')
+
+# Social package eligibility groups (socpackage-01 people, socpackage-02 money) by printed heading. Up to 2024 each group
+# is one column, and the four disability-severity columns (2017–) are parts of "people with disabilities". From 2025 each
+# group has breakdown columns and a "/ სულ" total: only the "/ სულ" columns are read, and people with disabilities are
+# the four severity totals added together. Any other heading stops preparation.
+SOCIAL_PACKAGE_GROUPS = {
+    'სულ': 'total', 'სოციალური პაკეტი სულ': 'total',
+    'შეზღუდული შესაძლებლობის მქონე პირები': 'disability',
+    '0-18 წლამდე შშმ პირი': 'disability_children',
+    'მკვეთრად გამოხატული ხარისხის მქონე შშმ პირი': 'disability_severe', 'მკვეთრად გამოხატული შშმ პირი': 'disability_severe',
+    'მნიშვნელოვნად გამოხატული ხარისხის მქონე შშმ პირი': 'disability_significant',
+    'მნიშვნელოვნად გამოხატული შშმ პირი': 'disability_significant',
+    'ზომიერად გამოხატული ხარისხის მქონე შშმ პირი': 'disability_moderate',
+    'ზომიერად გამოხატული შშმ პირი': 'disability_moderate',
+    'მარჩენალ დაკარგული ოჯახის წევრი': 'survivors',
+    'პოლიტ. რეპრესირებულები': 'political_repression',
+    'ომის მონაწილეები': 'war_participants', 'ომის მონაწილე': 'war_participants',
+    # Other groups: to 2024 compensation and utility-subsidy recipients and "other"; from 2025 defence veterans and
+    # "social package by acquired right".
+    'სახელმწიფო კომპესაციის მიმღებები': 'other', 'საყოფაცხოვრებო სუბსიდიის მიმღებები': 'other', 'სხვა': 'other',
+    'თავდაცვის ძალების ვეტერანები': 'other', 'სოციალური პაკეტი მოპოვებული უფლებით': 'other',
+}
+SOCIAL_PACKAGE_BREAKDOWNS = ('სოციალური პაკეტის მიმღები', 'სახელმწიფო კომპენსაციის მიმღები', 'შშმპ ბავშვობიდან')
+DISABILITY_PARTS = ('disability_children', 'disability_severe', 'disability_significant', 'disability_moderate')
+# Where SSA's printed total differs from its own group columns. May 2022 money: the total (socpackage-02 L85,
+# 27,464,062.75) is 56 GEL less than the group columns F:K. The check allows exactly these differences.
+SOCIAL_PACKAGE_GROUP_DIFFERENCES = {(2022, 'amount'): Decimal(56)}
+GROUP_MEMBERS = ('disability', 'survivors', 'war_participants', 'political_repression', 'other')  # partition the total
+GROUPS = ('total', 'disability', *DISABILITY_PARTS, 'survivors', 'war_participants', 'political_repression', 'other')
+
+
+def social_package_columns(shape):
+    """{group: [columns]} of one social package sheet."""
+    groups = defaultdict(list)
+    for column in shape['columns']:
+        label = shape['labels'][column]
+        name, _, part = label.rpartition(' / ') if ' / ' in label else (label, '', 'სულ')
+        if name not in SOCIAL_PACKAGE_GROUPS or (part != 'სულ' and part not in SOCIAL_PACKAGE_BREAKDOWNS):
+            raise LookupError(f'social package heading {label!r} is not mapped to a group')
+        if part == 'სულ':
+            groups[SOCIAL_PACKAGE_GROUPS[name]].append(column)
+    if 'disability' not in groups:
+        groups['disability'] = [column for part in DISABILITY_PARTS for column in groups.get(part, [])]
+    return groups
+
+
+def group_columns(group):
+    return lambda shape, year: social_package_columns(shape).get(group, [])
+
+
+def served_geography(label, mapping, failures):
+    """The site id of an area row, or None for rows served otherwise (national, Tbilisi districts, not areas)."""
+    row = mapping.get(label)
+    kind = row['kind'] if row else None
+    if kind == 'region':
+        return row['region_id']
+    if kind == 'tbilisi_total':
+        return 'region.tbilisi'
+    if kind in ('municipality', 'city_merged'):
+        return row['municipality_code']
+    if kind == 'excluded_area':
+        if label not in UNITS:
+            failures.append(f'excluded area {label!r} has no served unit id')
+        return UNITS.get(label)
+    return None  # an unknown label is reported by area_rows
+
+
+def served_readings(parsed, table_id, chooser, scope, mapping, failures):
+    """{(year, site id): {month: (value, sheet name, [cells])}} for 2013–2025; areas mapping to one id are added."""
+    def rows_of(shape):
+        if scope == 'national':
+            entry = total_row(shape)
+            return [entry] if entry else []
+        return shape['data']
+
+    where = {}
+    values = monthly_values(parsed, table_id, lambda shape, year: chooser(shape, year) if year in SERVED_YEARS else [],
+                            rows_of, failures, where)
+    out = defaultdict(dict)
+    for (year, month, label), value in values.items():
+        geography = 'country.georgia' if scope == 'national' else served_geography(label, mapping, failures)
+        if geography is None:
+            continue
+        sheet, cells = where[(year, month, label)]
+        if month in out[(year, geography)]:
+            before, _, earlier = out[(year, geography)][month]
+            value, cells = before + value, earlier + cells
+        out[(year, geography)][month] = (value, sheet, cells)
+    return out
+
+
+def month_column_readings(parsed, table_id):
+    """National readings of a single-sheet table with one column per month (maternity money to 2013)."""
+    out = defaultdict(dict)
+    for year, months in parsed.get(table_id, {}).items():
+        for _, sheet_name, shape in months:
+            entry = total_row(shape)
+            if year not in SERVED_YEARS or entry is None or len(shape['columns']) != 12:
+                continue  # maternity_by_month reports a layout without 12 month columns
+            row, _, cells = entry
+            for month, column in enumerate(shape['columns'], 1):
+                if column in cells:
+                    out[(year, 'country.georgia')][month] = (cells[column], sheet_name, [f'{column}{row}'])
+    return out
+
+
+def combined(first, second):
+    """Two readings of the same sheets added month by month (subsistence money: regular plus employment programme)."""
+    out = defaultdict(dict)
+    for key in set(first) | set(second):
+        for month in set(first.get(key, {})) | set(second.get(key, {})):
+            parts = [readings[key][month] for readings in (first, second) if month in readings.get(key, {})]
+            out[key][month] = (sum(part[0] for part in parts), parts[0][1], [cell for part in parts for cell in part[2]])
+    return out
+
+
+def served_source(parsed, table_id, year, readings):
+    """(source_sheet, source_cell) for the [(sheet, cells)] a value adds up. One sheet: its name and cells. Every monthly
+    sheet with the same cells: '*' and those cells. Otherwise '*' and 'Sheet!cells' for each sheet, separated by ';'."""
+    sheets = [sheet for sheet, _ in readings]
+    expressions = ['+'.join(cells) for _, cells in readings]
+    if len(set(sheets)) == 1:
+        return sheets[0], '+'.join(expressions)
+    monthly = [name for _, name, _ in parsed[table_id][year]]
+    if sorted(sheets) == sorted(monthly) and len(set(expressions)) == 1:
+        return '*', expressions[0]
+    return '*', ';'.join(f'{sheet}!{expression}' for sheet, expression in zip(sheets, expressions))
+
+
+SERVED_COLUMNS = ['programme', 'measure', 'geography_id', 'year', 'value', 'months', 'value_status', 'source_table',
+                  'source_workbook', 'source_sheet', 'source_cell']
+
+
+def served_annual(parsed, index, mapping, failures):
+    workbooks = {(record['table_id'], record['year']): record['name'] for record in index['files'] if record['year']}
+    rows = []
+
+    def add(programme, measure, table_id, key, value, readings):
+        year, geography = key
+        sheet, cells = served_source(parsed, table_id, year, readings)
+        single = len(readings) == 1 and len(readings[0][1]) == 1  # one printed cell; anything added up is calculated
+        rows.append({'programme': programme, 'measure': measure, 'geography_id': geography, 'year': year,
+                     'value': value, 'months': len(readings), 'value_status': 'official' if single else 'calculated',
+                     'source_table': table_id, 'source_workbook': workbooks[(table_id, year)],
+                     'source_sheet': sheet, 'source_cell': cells})
+
+    def december(programme, measure, table_id, readings):
+        for key, months in readings.items():
+            if 12 not in months:
+                failures.append(f'{programme} {measure} {key}: monthly figures without a December sheet')
+                continue
+            value, sheet, cells = months[12]
+            add(programme, measure, table_id, key, plain(value), [(sheet, cells)])
+
+    def summed(programme, measure, table_id, readings, money=True, months_of=None):
+        """The year's sum; with months_of, only the months that reading also has (the months an average uses)."""
+        for key, months in readings.items():
+            if None in months:
+                failures.append(f'{programme} {measure} {key}: a sheet is not a month')
+                continue
+            used = sorted(month for month in months if months_of is None or month in months_of.get(key, {}))
+            if used:
+                total = sum(months[month][0] for month in used)
+                add(programme, measure, table_id, key, whole(total) if money else plain(total),
+                    [months[month][1:] for month in used])
+
+    def read(table_id, chooser, scope):
+        return served_readings(parsed, table_id, chooser, scope, mapping, failures if scope == 'national' else [])
+
+    for scope in ('national', 'areas'):
+        for programme in ('pension', 'pension_idp', 'pension_highmountain'):
+            count_table, count_pick, money_table, money_pick = PROGRAMMES[programme][:4]
+            counts, money = read(count_table, count_pick, scope), read(money_table, money_pick, scope)
+            december(programme, 'recipients', count_table, counts)
+            summed(programme, 'amount', money_table, money)
+            summed(programme, 'count_months_sum', count_table, counts, money=False, months_of=money)
+        families, persons = read('tsa_allowance-01', tsa_families, scope), read('tsa_allowance-01', tsa_persons, scope)
+        regular, employment = (read('tsa_allowance-02', chooser, scope) for chooser in (tsa_amount_main, tsa_amount_emp))
+        december('subsistence_allowance', 'recipients', 'tsa_allowance-01', families)
+        december('subsistence_allowance', 'persons', 'tsa_allowance-01', persons)
+        december('subsistence_allowance', 'employment_families', 'tsa_allowance-01',
+                 read('tsa_allowance-01', tsa_emp('ოჯახი'), scope))
+        summed('subsistence_allowance', 'amount', 'tsa_allowance-02', combined(regular, employment))
+        summed('subsistence_allowance', 'employment_amount', 'tsa_allowance-02', employment)
+        summed('subsistence_allowance', 'regular_amount', 'tsa_allowance-02', regular)
+        summed('subsistence_allowance', 'regular_count_months_sum', 'tsa_allowance-01', families, money=False,
+               months_of=regular)
+        for measure, (table_id, chooser) in TSA_REGISTERED.items():
+            december('tsa_registered', measure, table_id, read(table_id, chooser, scope))
+
+    counts, money = read('socpackage-01', PROGRAMMES['social_package'][1], 'national'), \
+        read('socpackage-02', PROGRAMMES['social_package'][3], 'national')
+    december('social_package', 'recipients', 'socpackage-01', counts)
+    summed('social_package', 'amount', 'socpackage-02', money)
+    summed('social_package', 'count_months_sum', 'socpackage-01', counts, money=False, months_of=money)
+    for group in GROUPS:
+        december('social_package_group', f'group.{group}.recipients', 'socpackage-01',
+                 read('socpackage-01', group_columns(group), 'national'))
+        summed('social_package_group', f'group.{group}.amount', 'socpackage-02',
+               read('socpackage-02', group_columns(group), 'national'))
+    for programme in MONEY_ONLY:
+        money_table, money_pick = PROGRAMMES[programme][2:4]
+        summed(programme, 'amount', money_table, read(money_table, money_pick, 'national'))
+    summed('maternity', 'amount', MATERNITY_BY_MONTH[1], month_column_readings(parsed, MATERNITY_BY_MONTH[1]))
+
+    # Regular money is the total less the employment-programme money, so the three money rows agree exactly.
+    totals = {(row['measure'], row['geography_id'], row['year']): row['value'] for row in rows
+              if row['programme'] == 'subsistence_allowance'}
+    for row in rows:
+        if row['programme'] == 'subsistence_allowance' and row['measure'] == 'regular_amount':
+            key = (row['geography_id'], row['year'])
+            row['value'] = plain(Decimal(totals[('amount', *key)]) - Decimal(totals.get(('employment_amount', *key), 0)))
+
+    order = {}
+    for row in rows:
+        order.setdefault((row['programme'], row['measure']), len(order))
+    place = {'country': 0, 'region': 1, 'unit': 3}
+    return sorted(rows, key=lambda row: (order[(row['programme'], row['measure'])],
+                                         place.get(row['geography_id'].split('.')[0], 2), row['geography_id'], row['year']))
 
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -753,6 +997,86 @@ def validate(index, manifest_rows, problems, failures, national_programmes, brow
     return failures
 
 
+# Served measures that the reviewed yearly files also hold, by their field there.
+SERVED_FIELDS = {'recipients': 'recipients', 'persons': 'persons', 'employment_families': 'emp_families',
+                 'amount': 'amount_gel', 'employment_amount': 'amount_emp_gel'}
+
+
+def validate_served(served, national_programmes, programme_areas):
+    """Failures of the served file: places, years and duplicates, agreement with the reviewed yearly figures (the same
+    values reached without cell tracking), and social package groups that add up to SSA's printed total."""
+    failures = []
+    with open(MUNICIPALITIES, encoding='utf-8-sig', newline='') as handle:
+        municipalities = list(csv.DictReader(handle))
+    places = ({'country.georgia'} | {row['region_id'] for row in municipalities} | set(UNITS.values()) |
+              {row['municipality_code'] for row in municipalities if row['municipality_code'] != '04'})
+    values, seen = {}, Counter()
+    for row in served:
+        key = (row['programme'], row['measure'], row['geography_id'], int(row['year']))
+        seen[key] += 1
+        values[key] = row
+        if key[3] not in SERVED_YEARS:
+            failures.append(f'served {key}: year outside {SERVED_YEARS.start}–{SERVED_YEARS.stop - 1}')
+        if key[2] not in places:
+            failures.append(f'served {key}: {key[2]!r} is not a served place')
+        if row['value_status'] not in ('official', 'calculated') or int(row['months']) < 1:
+            failures.append(f'served {key}: status {row["value_status"]!r}, months {row["months"]!r}')
+    failures.extend(f'served {key}: {count} rows' for key, count in seen.items() if count > 1)
+
+    expected = {}
+    national = {row['programme'] for row in national_programmes}
+    reviewed = [('country.georgia', row) for row in national_programmes]
+    reviewed += [('country.georgia' if row['area_level'] == 'national' else row['area_id'], row)
+                 for row in programme_areas if row['programme'] in AREA_SERVED and row['area_level'] != 'excluded_area'
+                 and row['area_id'] != '04' and (row['area_level'] != 'national' or row['programme'] not in national)]
+    for geography, row in reviewed:
+        if int(row['year']) not in SERVED_YEARS:
+            continue
+        for measure, field in SERVED_FIELDS.items():
+            if row.get(field) in (None, '') or (field in ('recipients', 'persons', 'emp_families')
+                                               and str(row.get('recipients_month', 12)) != '12'):
+                continue
+            expected[(row['programme'], measure, geography, int(row['year']))] = (row[field], row.get('amount_months')
+                                                                                  if measure == 'amount' else None)
+    compared = {key[:2] for key in values}
+    for key, (value, months) in expected.items():
+        if key[:2] not in compared:
+            continue
+        if key not in values:
+            failures.append(f'served {key}: missing; the reviewed yearly figure is {value}')
+        elif Decimal(values[key]['value']) != Decimal(value):
+            failures.append(f"served {key}: {values[key]['value']}, the reviewed yearly figure is {value}")
+        elif months not in (None, '') and str(values[key]['months']) != str(months):
+            failures.append(f"served {key}: {values[key]['months']} months, the reviewed yearly figure has {months}")
+    reviewed_pairs = {key[:2] for key in expected}
+    for key in values:
+        if key not in expected and key[:2] in reviewed_pairs and not key[2].startswith('unit.') \
+                and (key[2] == 'country.georgia' or key[0] in AREA_SERVED):
+            failures.append(f'served {key}: not in the reviewed yearly figures')
+
+    for year in SERVED_YEARS:
+        # Yearly money is rounded to whole GEL member by member, so it may differ from the total by the rounding.
+        for measure, tolerance in (('recipients', Decimal(0)), ('amount', Decimal(3))):
+            rows = {name: values.get(('social_package_group', f'group.{name}.{measure}', 'country.georgia', year))
+                    for name in GROUPS}
+            if rows['total'] is None:
+                continue
+            total = Decimal(rows['total']['value'])
+            members = sum(Decimal(rows[name]['value']) for name in GROUP_MEMBERS if rows[name])
+            recorded = SOCIAL_PACKAGE_GROUP_DIFFERENCES.get((year, measure), Decimal(0))
+            if abs(members - total - recorded) > tolerance:
+                failures.append(f'social package {year} {measure}: groups add up to {members}, total {total}')
+            parts = [rows[name] for name in DISABILITY_PARTS]
+            # The severity columns start in October 2017, so 2017 money is compared only once they cover the same months.
+            if None not in parts and rows['disability'] and all(part['months'] == rows['disability']['months']
+                                                                for part in parts):
+                added = sum(Decimal(part['value']) for part in parts)
+                if abs(added - Decimal(rows['disability']['value'])) > tolerance:
+                    failures.append(f"social package {year} {measure}: disability parts add up to {added}, "
+                                    f"disability {rows['disability']['value']}")
+    return failures
+
+
 # ---------------------------------------------------------------------------------------------------------------------
 # Build
 
@@ -785,7 +1109,10 @@ def build(official, out, check=False):
     series_areas = programme_monthly(parsed, 'areas', [])  # column failures are already reported nationally
     monthly = programme_monthly_rows(series_national)
     national_programmes = national_programme_rows(series_national)
-    programme_areas = area_rows(series_areas, mapping, failures)
+    registered = {'tsa_registered': {field: monthly_values(parsed, table_id, chooser, lambda shape: shape['data'], [])
+                                     for field, (table_id, chooser) in TSA_REGISTERED.items()}}
+    programme_areas = area_rows({**series_areas, **registered}, mapping, failures)
+    served = served_annual(parsed, index, mapping, failures)
     browser_path = ROOT / 'browser-annual-amounts.csv'
     browser_check = None
     reviewed_differences = {}
@@ -802,6 +1129,7 @@ def build(official, out, check=False):
                   'note': 'heading is blank; taken as the grand total because it is the last column'}
                  for table_id, year, month, column in HEADING_NOTES]
     failures = validate(index, manifest_rows, problems, failures, national_programmes, browser_check, reviewed_differences)
+    failures += validate_served(served, national_programmes, programme_areas)
 
     coverage = []
     for table_id, row in sorted(catalogue.items(), key=lambda item: item[0]):
@@ -824,6 +1152,7 @@ def build(official, out, check=False):
                                         ['program', 'year'] + ANNUAL_FIELDS),
         'ssa-programmes-areas-annual.csv': write_csv(programme_areas, ['programme', 'year', 'area_level', 'area_id',
                                                                        'region_id'] + ANNUAL_FIELDS),
+        'ssa-served-annual.csv': write_csv(served, SERVED_COLUMNS),
         'source-findings.csv': write_csv(findings, ['table_id', 'year', 'month', 'column', 'column_label', 'printed_total',
                                                     'sum_of_areas', 'difference', 'note']),
     }
@@ -835,6 +1164,7 @@ def build(official, out, check=False):
                    'monthly_sheets': sum(len(months) for years in parsed.values() for months in years.values()),
                    'national_annual_rows': len(national), 'programme_monthly_rows': len(monthly),
                    'programme_annual_rows': len(national_programmes), 'programme_area_rows': len(programme_areas),
+                   'served_rows': len(served),
                    'area_total_checks': checked, 'area_total_differences': len(findings),
                    'independent_browser_rows_compared': len(browser_check or []),
                    'reviewed_browser_differences': len(reviewed_differences)},
