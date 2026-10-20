@@ -477,3 +477,36 @@ source.geostat_env_page_73,გარემოს სტატისტიკა 
 source.geostat_env_page_73_ka,"გარემოს სტატისტიკა (წყაროს გვერდი, ქართული ვერსია)",docs/Raw Data/Environment/geostat-environment-annual/official/page-73-ka.html,2026-10-20
 source.geostat_env_page_822,ტყის რესურსები (წყაროს გვერდი),docs/Raw Data/Environment/geostat-environment-annual/official/page-822-en.html,2026-10-20
 source.geostat_env_page_822_ka,"ტყის რესურსები (წყაროს გვერდი, ქართული ვერსია)",docs/Raw Data/Environment/geostat-environment-annual/official/page-822-ka.html,2026-10-20
+source.geostat_science_researchers,"მკვლევართა რაოდენობა (ხარისხი, ასაკი, სამეცნიერო დარგი)",docs/Raw Data/ScienceCulture/geostat-science-culture-annual/official/Researchers.xlsx,2026-10-20
+source.geostat_science_rd_staff,კვლევებსა და განვითარებაში დასაქმებული პერსონალი სტატუსის მიხედვით,docs/Raw Data/ScienceCulture/geostat-science-culture-annual/official/R&D-Personal.xlsx,2026-10-20
+source.geostat_science_institutions,კვლევებსა და განვითარებაში ჩართული დაწესებულებები და მათი ხარჯები,docs/Raw Data/ScienceCulture/geostat-science-culture-annual/official/Institutions.xlsx,2026-10-20
+source.geostat_science_patents,გამოგონებები და სასარგებლო მოდელები (საქპატენტი),docs/Raw Data/ScienceCulture/geostat-science-culture-annual/official/Invention-Utility-Model.xlsx,2026-10-20
+source.geostat_science_publications,პუბლიკაციების რაოდენობა (ტექინფორმი),docs/Raw Data/ScienceCulture/geostat-science-culture-annual/official/Number-of-publication.xlsx,2026-10-20
+source.geostat_culture_museums,"მუზეუმები და ნაკრძალ-მუზეუმები, ძირითადი მახასიათებლები",docs/Raw Data/ScienceCulture/geostat-science-culture-annual/official/Main-charasteristics-of-Museums.xls,2026-10-20
+source.geostat_culture_museums_count_regions,მუზეუმების რაოდენობა რეგიონების მიხედვით,docs/Raw Data/ScienceCulture/geostat-science-culture-annual/official/Number-of-Museums-by-Regions.xls,2026-10-20
+source.geostat_culture_museums_regions,მუზეუმების ძირითადი მახასიათებლები რეგიონების მიხედვით,docs/Raw Data/ScienceCulture/geostat-science-culture-annual/official/Main-charasteristics-of-Museums-by-Regions.xls,2026-10-20
+source.geostat_culture_museum_staff,მუზეუმებში დასაქმებული პერსონალი,docs/Raw Data/ScienceCulture/geostat-science-culture-annual/official/Employed-Staff-in-Museums.xls,2026-10-20
+source.geostat_culture_museum_exhibits,მუზეუმების ექსპონატები (მხოლოდ 2011 წელი),docs/Raw Data/ScienceCulture/geostat-science-culture-annual/official/The-exhibits-of-Museums.xls,2026-10-20
+source.geostat_culture_theatres,პროფესიული თეატრების ძირითადი მაჩვენებლები,docs/Raw Data/ScienceCulture/geostat-science-culture-annual/official/Main-Indicators-Of-Professional-Theatres.xls,2026-10-20
+source.geostat_culture_theatres_regions,პროფესიული თეატრების ძირითადი მაჩვენებლები რეგიონების მიხედვით,docs/Raw Data/ScienceCulture/geostat-science-culture-annual/official/Main-Indicators-Of-Professional-Theatres-by-Regions.xls,2026-10-20
+source.geostat_culture_theatres_count_regions,პროფესიული თეატრების რაოდენობა რეგიონების მიხედვით,docs/Raw Data/ScienceCulture/geostat-science-culture-annual/official/Number-of-Theatres-by-Regions.xls,2026-10-20
+source.geostat_culture_theatre_staff,თეატრებში დასაქმებული პერსონალი,docs/Raw Data/ScienceCulture/geostat-science-culture-annual/official/Employed-Staff-in-Theatres.xls,2026-10-20
+source.geostat_culture_theatre_events,თეატრების მიერ გამართული ღონისძიებები,docs/Raw Data/ScienceCulture/geostat-science-culture-annual/official/Events.xls,2026-10-20
+source.geostat_culture_libraries,საჯარო და უნივერსალური ბიბლიოთეკები (2001-2008),docs/Raw Data/ScienceCulture/geostat-science-culture-annual/official/Public-and-Universal-Libraries.xls,2026-10-20
+source.geostat_culture_libraries_regions,ბიბლიოთეკების რაოდენობა რეგიონების მიხედვით (2003-2008),docs/Raw Data/ScienceCulture/geostat-science-culture-annual/official/Number-of-Libraries-by-Regions.xls,2026-10-20
+source.geostat_culture_publishing,გამომცემლობის მასალების მონაცემთა გაანგარიშება (2005-2020),docs/Raw Data/ScienceCulture/geostat-science-culture-annual/official/Calculation-of-data-on-publishing-materials.xls,2026-10-20
+source.geostat_ka_science_institutions,დაწესებულებები (ქართული ვერსია),docs/Raw Data/ScienceCulture/geostat-science-culture-annual/official/ka/dawesebulebebi.xlsx,2026-10-20
+source.geostat_ka_science_rd_staff,კვლევებსა და განვითარებაში დასაქმებული პერსონალი (ქართული ვერსია),docs/Raw Data/ScienceCulture/geostat-science-culture-annual/official/ka/personali.xlsx,2026-10-20
+source.geostat_ka_science_researchers,მკვლევრები (ქართული ვერსია),docs/Raw Data/ScienceCulture/geostat-science-culture-annual/official/ka/mkvlevarebi.xlsx,2026-10-20
+source.geostat_ka_science_patents,გამოგონებები და სასარგებლო მოდელები (ქართული ვერსია),docs/Raw Data/ScienceCulture/geostat-science-culture-annual/official/ka/patentebi.xlsx,2026-10-20
+source.geostat_ka_culture_museums,მუზეუმების ძირითადი მახასიათებლები (ქართული ვერსია),docs/Raw Data/ScienceCulture/geostat-science-culture-annual/official/ka/muzeumebis_ZiriTadi_maCveneblebi.xls,2026-10-20
+source.geostat_ka_culture_museums_count_regions,მუზეუმების რაოდენობა რეგიონების მიხედვით (ქართული ვერსია),docs/Raw Data/ScienceCulture/geostat-science-culture-annual/official/ka/muzeumebis_raodenoba_regionebis_mixedviT.XLS,2026-10-20
+source.geostat_ka_culture_museum_staff,მუზეუმებში დასაქმებული პერსონალი (ქართული ვერსია),docs/Raw Data/ScienceCulture/geostat-science-culture-annual/official/ka/dasakmebulebi_muzeumebSi.xls,2026-10-20
+source.geostat_ka_culture_theatres,პროფესიული თეატრების ძირითადი მაჩვენებლები (ქართული ვერსია),docs/Raw Data/ScienceCulture/geostat-science-culture-annual/official/ka/Teatrebis-ZiriTadi-maCveneblebi.xls,2026-10-20
+source.geostat_ka_culture_theatres_regions,პროფესიული თეატრების ძირითადი მაჩვენებლები რეგიონების მიხედვით (ქართული ვერსია),docs/Raw Data/ScienceCulture/geostat-science-culture-annual/official/ka/Teatrebis-ZiriTadi-maCveneblebi-regionebis-mixedvit.xls,2026-10-20
+source.geostat_ka_culture_theatres_count_regions,პროფესიული თეატრების რაოდენობა რეგიონების მიხედვით (ქართული ვერსია),docs/Raw Data/ScienceCulture/geostat-science-culture-annual/official/ka/Teatrebis_raodenoba_regionebis_mixedviT.XLS,2026-10-20
+source.geostat_ka_culture_theatre_staff,პროფესიულ თეატრებში დასაქმებული პერსონალი (ქართული ვერსია),docs/Raw Data/ScienceCulture/geostat-science-culture-annual/official/ka/dasakmebulebi_propesiul_TeatrebSi.xls,2026-10-20
+source.geostat_ka_culture_theatre_events,თეატრების ღონისძიებები (ქართული ვერსია),docs/Raw Data/ScienceCulture/geostat-science-culture-annual/official/ka/RonisZiebebi.xls,2026-10-20
+source.geostat_ka_culture_museums_regions,მუზეუმების ძირითადი მახასიათებლები რეგიონების მიხედვით (ქართული ვერსია),docs/Raw Data/ScienceCulture/geostat-science-culture-annual/official/ka/muzeumebis_ZiriTadi_maCveneblebi_regionebis_mixedviT.XLS,2026-10-20
+source.geostat_science_page,მეცნიერება (წყაროს გვერდი),docs/Raw Data/ScienceCulture/geostat-science-culture-annual/official/geostat-category-194-2026-10-20.html,2026-10-20
+source.geostat_culture_page,კულტურა (წყაროს გვერდი),docs/Raw Data/ScienceCulture/geostat-science-culture-annual/official/geostat-category-615-2026-10-20.html,2026-10-20

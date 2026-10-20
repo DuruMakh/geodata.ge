@@ -112,6 +112,19 @@ describe("original-source inventory", () => {
     ]));
   });
 
+  it("inventories the 33 science and culture originals: the English workbooks, their Georgian versions and both page captures", async () => {
+    const rows = await expectedOriginalSourcePaths(REPOSITORY_ROOT, "science-culture");
+    expect(rows).toHaveLength(33);
+    expect(rows.every((row) => row.path.startsWith("docs/Raw Data/ScienceCulture/geostat-science-culture-annual/official/"))).toBe(true);
+    expect(rows.filter((row) => row.path.includes("/official/ka/"))).toHaveLength(13);
+    expect(rows.map((row) => row.path)).toEqual(expect.arrayContaining([
+      "docs/Raw Data/ScienceCulture/geostat-science-culture-annual/official/R&D-Personal.xlsx",
+      "docs/Raw Data/ScienceCulture/geostat-science-culture-annual/official/ka/mkvlevarebi.xlsx",
+      "docs/Raw Data/ScienceCulture/geostat-science-culture-annual/official/geostat-category-194-2026-10-20.html",
+      "docs/Raw Data/ScienceCulture/geostat-science-culture-annual/official/geostat-category-615-2026-10-20.html",
+    ]));
+  });
+
   it("returns forward-slash paths in lexical order", async () => {
     const inventory = await expectedOriginalSourcePaths(REPOSITORY_ROOT);
     for (const rows of Object.values(inventory)) {

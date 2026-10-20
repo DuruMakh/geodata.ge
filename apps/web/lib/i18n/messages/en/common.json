@@ -131,6 +131,11 @@
   "common.environmentWater": "Water",
   "common.environmentWaste": "Waste",
   "common.environmentForests": "Forests",
+  "common.scienceCulture": "Science and culture",
+  "common.scienceCultureResearch": "Research",
+  "common.scienceCulturePatents": "Patents",
+  "common.scienceCultureMuseums": "Museums",
+  "common.scienceCultureTheatres": "Theatres",
   "common.dataWages": "Data · Wages",
   "common.dataLivingStandards": "Data · Living standards",
   "common.dataHealth": "Data · Health and social protection",
@@ -141,6 +146,7 @@
   "common.dataHousing": "Data · Housing and construction",
   "common.dataEducation": "Data · Education",
   "common.dataEnvironment": "Data · Environment and climate",
+  "common.dataScienceCulture": "Data · Science and culture",
   "common.dataLoading": "Loading the data…",
   "common.dataLoadError": "The data could not be loaded. Reload the page to try again."
 }

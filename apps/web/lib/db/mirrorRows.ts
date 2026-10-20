@@ -50,6 +50,8 @@ import { businessDisplayDecimals } from "../data/business/validation";
 import { educationSourceDocumentId, type EducationFact } from "../data/education/types";
 import { environmentSourceDocumentId, type EnvironmentFact } from "../data/environment/types";
 import { educationDisplayDecimals } from "../data/education/validation";
+import { scienceCultureSourceDocumentId, type ScienceCultureFact } from "../data/scienceCulture/types";
+import { scienceCultureDisplayDecimals } from "../data/scienceCulture/validation";
 import { householdSourceDocumentId, type HouseholdFact } from "../data/household/types";
 import type { DemographyObservation, Sex, Settlement } from "../data/demography/types";
 
@@ -891,6 +893,24 @@ export async function loadEnvironmentFactsFromMirror(db: Pick<MirrorClient, "env
     return {
       year: row.year, indicatorId: row.indicatorId, value: row.value.toFixed(), publishedValue: row.publishedValue.toFixed(),
       unit: row.unit as EnvironmentFact["unit"], basis: row.basis as "actual", valueStatus: row.valueStatus as "official",
+      sourceId: row.sourceId, sourceSheet: row.sourceSheet, sourceCell: row.sourceCell, lastReviewedAt: isoDate(row.lastReviewedAt),
+    };
+  });
+}
+
+export function scienceCultureMirrorCreateRows(facts: readonly ScienceCultureFact[], importRunId: string): Prisma.ScienceCultureFactCreateManyInput[] {
+  return facts.map(({ lastReviewedAt, ...fact }) => ({
+    ...fact, sourceDocumentId: scienceCultureSourceDocumentId(fact.sourceId), lastReviewedAt: new Date(`${lastReviewedAt}T00:00:00.000Z`), importRunId,
+  }));
+}
+
+export async function loadScienceCultureFactsFromMirror(db: Pick<MirrorClient, "scienceCultureFact">): Promise<ScienceCultureFact[]> {
+  const rows = await db.scienceCultureFact.findMany({ orderBy: [{ indicatorId: "asc" }, { year: "asc" }] });
+  return rows.map(row => {
+    if (row.sourceDocumentId !== scienceCultureSourceDocumentId(row.sourceId)) throw new Error("Science and culture source relation mismatch");
+    return {
+      year: row.year, indicatorId: row.indicatorId as ScienceCultureFact["indicatorId"],
+      value: row.value.toFixed(), publishedValue: row.publishedValue.toFixed(Math.max(scienceCultureDisplayDecimals(row.indicatorId), row.value.decimalPlaces())), unit: row.unit as ScienceCultureFact["unit"], basis: row.basis as "actual", valueStatus: row.valueStatus as "official",
       sourceId: row.sourceId, sourceSheet: row.sourceSheet, sourceCell: row.sourceCell, lastReviewedAt: isoDate(row.lastReviewedAt),
     };
   });
