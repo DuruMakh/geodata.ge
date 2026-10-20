@@ -3,7 +3,7 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import { updatedDate } from "../../lib/explorer/coverageLabel";
 import type { ClientEnergyFoodFact } from "../../lib/data/energyFood/types";
-import { buildEnergyFoodModel, energyFoodCoverage, energyFoodDisplayLabels, energyFoodUnit, parseEnergyFoodHash, serializeEnergyFoodHash, type EnergyFoodSectionId, type EnergyFoodState } from "../../lib/explorer/energyFood";
+import { buildEnergyFoodModel, energyFoodCoverage, energyFoodDisplayLabels, parseEnergyFoodHash, serializeEnergyFoodHash, type EnergyFoodSectionId, type EnergyFoodState } from "../../lib/explorer/energyFood";
 import { buildEnergyFoodWorkbookExportModel } from "../../lib/explorer/energyFoodWorkbook";
 import { formatInUnit, type ValueUnit } from "../../lib/explorer/format";
 import { rangeFromPatch, resolveRange } from "../../lib/explorer/periodRange";
@@ -43,7 +43,7 @@ export function EnergyFoodExplorer({ section, facts, labels, sources, lastReview
   const model = buildEnergyFoodModel(section, facts, state);
   // Energy is in thousand tonnes of oil equivalent or GWh; food is a self-sufficiency percent, drawn on a percent axis.
   // The chart panel names the unit, so axis ticks and cells carry numbers only; the latest line adds "GWh" to its value.
-  const unitKind = energyFoodUnit(section), percent = unitKind === "percent";
+  const unitKind = model.unitKey, percent = unitKind === "percent";
   const unit: ValueUnit = { divisor: 1, label: "", decimals: model.decimals };
   const unitLabel = t(`unit.${unitKind}Long`);
   const format = (value: number | null | undefined, decimals = model.decimals) => formatInUnit(value, { ...unit, decimals });

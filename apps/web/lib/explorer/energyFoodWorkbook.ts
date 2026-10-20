@@ -2,7 +2,7 @@ import type { ClientEnergyFoodFact } from "../data/energyFood/types";
 import type { Presentation } from "../i18n/types";
 import { message } from "../i18n/messages";
 import { workbookMessage } from "../i18n/workbook";
-import { buildEnergyFoodModel, energyFoodDisplayLabels, energyFoodUnit, type EnergyFoodSectionId, type EnergyFoodState } from "./energyFood";
+import { buildEnergyFoodModel, energyFoodDisplayLabels, type EnergyFoodSectionId, type EnergyFoodState } from "./energyFood";
 import { SHEET_NAMES, neededSourceYears, sourcesForNeededYears, withAbsoluteUrls, workbookFilename, type WorkbookExportModel, type WorkbookPublicSource } from "./workbookModel";
 
 /** The Data sheet's columns in order; the numeric format is keyed by the 1-based position of each `value` column. */
@@ -19,7 +19,7 @@ export function buildEnergyFoodWorkbookExportModel(input: { section: EnergyFoodS
   const known = new Set(input.sources.map(source => source.sourceId));
   for (const sourceId of neededYears.keys()) if (!known.has(sourceId)) throw new Error(`Missing public source for energy and food source ${sourceId}`);
   const originals = sourcesForNeededYears(input.sources, neededYears);
-  const unit = energyFoodUnit(section);
+  const unit = model.unitKey;
   const numberFormat = unit === "percent" ? "0" : "#,##0.0";
   const status = (fact: ClientEnergyFoodFact | undefined) => fact ? t(`status.${fact.valueStatus}`) : workbookMessage(locale, "workbook.unavailable");
   const header: Record<typeof ANALYSIS_COLUMNS[number], string> = { year: workbookMessage(locale, "workbook.year"), series: t("series"), value: t(`unit.${unit}`), status: workbookMessage(locale, "workbook.status") };
