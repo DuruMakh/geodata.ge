@@ -13,6 +13,7 @@ import { BUSINESS_HUB_PATH, BUSINESS_SECTIONS } from "../explorer/business";
 import { HOUSING_HUB_PATH, HOUSING_SECTIONS } from "../explorer/housing";
 import { EDUCATION_HUB_PATH, EDUCATION_SECTIONS } from "../explorer/education";
 import { SCIENCE_CULTURE_HUB_PATH, SCIENCE_CULTURE_SECTIONS } from "../explorer/scienceCulture";
+import { INTERNET_HUB_PATH, INTERNET_SECTIONS } from "../explorer/internet";
 import { DEMOGRAPHY_HUB_PATH, LIVE_DEMOGRAPHY_PAGES } from "../explorer/demographyRoutes";
 
 /** A page under a hub: its sidebar row. `labelKey` is a `common` message. */
@@ -157,6 +158,14 @@ export const NAV_TREE: readonly NavHub[] = [
     sections: sectionRows(CRIME_SECTIONS, "crime"),
   },
   {
+    href: INTERNET_HUB_PATH,
+    labelKey: "common.internet",
+    railLabelKey: "common.dataInternet",
+    testId: "internet-link",
+    spaced: true,
+    sections: sectionRows(INTERNET_SECTIONS, "internet"),
+  },
+  {
     href: "/explorer/trade",
     labelKey: "common.trade",
     railLabelKey: "common.dataTrade",
@@ -270,6 +279,7 @@ const TREE_SOURCE_NOTES: Readonly<Record<string, string>> = {
   [EDUCATION_HUB_PATH]: "common.geostatSourceNote",
   [SCIENCE_CULTURE_HUB_PATH]: "common.geostatSourceNote",
   [CRIME_HUB_PATH]: "common.geostatSourceNote",
+  [INTERNET_HUB_PATH]: "common.geostatSourceNote",
   "/explorer/trade": "common.geostatSourceNote",
   "/explorer/external": "common.nbgSourceNote",
   [ENERGY_FOOD_HUB_PATH]: "common.geostatSourceNote",

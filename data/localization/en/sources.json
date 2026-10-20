@@ -2271,6 +2271,150 @@
     "name": { "text": "Construction cost index (source page capture)", "reviewedAt": "2026-10-16" },
     "derivation": null
   },
+  "source.geostat_ict_homes_internet": {
+    "name": { "text": "Share of households with internet access (table 01)", "reviewedAt": "2026-10-20" },
+    "derivation": null
+  },
+  "source.geostat_ict_homes_internet_ka": {
+    "name": { "text": "Share of households with internet access (table 01), Georgian edition", "reviewedAt": "2026-10-20" },
+    "derivation": null
+  },
+  "source.geostat_ict_last_internet_use": {
+    "name": { "text": "Distribution of population aged 6 and older by last internet use (table 02)", "reviewedAt": "2026-10-20" },
+    "derivation": null
+  },
+  "source.geostat_ict_last_internet_use_ka": {
+    "name": { "text": "Distribution of population aged 6 and older by last internet use (table 02), Georgian edition", "reviewedAt": "2026-10-20" },
+    "derivation": null
+  },
+  "source.geostat_ict_purposes": {
+    "name": { "text": "Share of population aged 15 and older by purposes of internet use (table 03)", "reviewedAt": "2026-10-20" },
+    "derivation": null
+  },
+  "source.geostat_ict_purposes_ka": {
+    "name": { "text": "Share of population aged 15 and older by purposes of internet use (table 03), Georgian edition", "reviewedAt": "2026-10-20" },
+    "derivation": null
+  },
+  "source.geostat_ict_internet_frequency": {
+    "name": { "text": "Frequency of internet use (table 04)", "reviewedAt": "2026-10-20" },
+    "derivation": null
+  },
+  "source.geostat_ict_internet_frequency_ka": {
+    "name": { "text": "Frequency of internet use (table 04), Georgian edition", "reviewedAt": "2026-10-20" },
+    "derivation": null
+  },
+  "source.geostat_ict_ecommerce": {
+    "name": { "text": "E-commerce (table 05)", "reviewedAt": "2026-10-20" },
+    "derivation": null
+  },
+  "source.geostat_ict_ecommerce_ka": {
+    "name": { "text": "E-commerce (table 05), Georgian edition", "reviewedAt": "2026-10-20" },
+    "derivation": null
+  },
+  "source.geostat_ict_mobile_internet": {
+    "name": { "text": "Using mobile devices to access the internet (table 06)", "reviewedAt": "2026-10-20" },
+    "derivation": null
+  },
+  "source.geostat_ict_mobile_internet_ka": {
+    "name": { "text": "Using mobile devices to access the internet (table 06), Georgian edition", "reviewedAt": "2026-10-20" },
+    "derivation": null
+  },
+  "source.geostat_ict_internet_activities": {
+    "name": { "text": "Internet related activities (table 07)", "reviewedAt": "2026-10-20" },
+    "derivation": null
+  },
+  "source.geostat_ict_internet_activities_ka": {
+    "name": { "text": "Internet related activities (table 07), Georgian edition", "reviewedAt": "2026-10-20" },
+    "derivation": null
+  },
+  "source.geostat_ict_homes_computer": {
+    "name": { "text": "Share of households with computer access (table 08)", "reviewedAt": "2026-10-20" },
+    "derivation": null
+  },
+  "source.geostat_ict_homes_computer_ka": {
+    "name": { "text": "Share of households with computer access (table 08), Georgian edition", "reviewedAt": "2026-10-20" },
+    "derivation": null
+  },
+  "source.geostat_ict_last_computer_use": {
+    "name": { "text": "Distribution of population aged 6 and older by last computer use (table 09)", "reviewedAt": "2026-10-20" },
+    "derivation": null
+  },
+  "source.geostat_ict_last_computer_use_ka": {
+    "name": { "text": "Distribution of population aged 6 and older by last computer use (table 09), Georgian edition", "reviewedAt": "2026-10-20" },
+    "derivation": null
+  },
+  "source.geostat_ict_computer_frequency": {
+    "name": { "text": "Frequency of computer use (table 10)", "reviewedAt": "2026-10-20" },
+    "derivation": null
+  },
+  "source.geostat_ict_computer_frequency_ka": {
+    "name": { "text": "Frequency of computer use (table 10), Georgian edition", "reviewedAt": "2026-10-20" },
+    "derivation": null
+  },
+  "source.geostat_ict_software_activities": {
+    "name": { "text": "Software related activities (table 11)", "reviewedAt": "2026-10-20" },
+    "derivation": null
+  },
+  "source.geostat_ict_software_activities_ka": {
+    "name": { "text": "Software related activities (table 11), Georgian edition", "reviewedAt": "2026-10-20" },
+    "derivation": null
+  },
+  "source.geostat_ict_own_mobile": {
+    "name": { "text": "Share of population aged 6 and older who own mobile phone (table 12)", "reviewedAt": "2026-10-20" },
+    "derivation": null
+  },
+  "source.geostat_ict_own_mobile_ka": {
+    "name": { "text": "Share of population aged 6 and older who own mobile phone (table 12), Georgian edition", "reviewedAt": "2026-10-20" },
+    "derivation": null
+  },
+  "source.geostat_ict_use_mobile": {
+    "name": { "text": "Share of population aged 6 and older who uses mobile phone (table 13)", "reviewedAt": "2026-10-20" },
+    "derivation": null
+  },
+  "source.geostat_ict_use_mobile_ka": {
+    "name": { "text": "Share of population aged 6 and older who uses mobile phone (table 13), Georgian edition", "reviewedAt": "2026-10-20" },
+    "derivation": null
+  },
+  "source.geostat_ict_own_smartphone": {
+    "name": { "text": "Share of population aged 6 and older who own smartphone (table 14)", "reviewedAt": "2026-10-20" },
+    "derivation": null
+  },
+  "source.geostat_ict_own_smartphone_ka": {
+    "name": { "text": "Share of population aged 6 and older who own smartphone (table 14), Georgian edition", "reviewedAt": "2026-10-20" },
+    "derivation": null
+  },
+  "source.geostat_ict_use_smartphone": {
+    "name": { "text": "Share of population aged 6 and older who uses smartphone (table 15)", "reviewedAt": "2026-10-20" },
+    "derivation": null
+  },
+  "source.geostat_ict_use_smartphone_ka": {
+    "name": { "text": "Share of population aged 6 and older who uses smartphone (table 15), Georgian edition", "reviewedAt": "2026-10-20" },
+    "derivation": null
+  },
+  "source.geostat_ict_public_services": {
+    "name": { "text": "Interaction with public authorities or public services over the internet (table 16)", "reviewedAt": "2026-10-20" },
+    "derivation": null
+  },
+  "source.geostat_ict_public_services_ka": {
+    "name": { "text": "Interaction with public authorities or public services over the internet (table 16), Georgian edition", "reviewedAt": "2026-10-20" },
+    "derivation": null
+  },
+  "source.geostat_ict_skills": {
+    "name": { "text": "ICT skills (table 17)", "reviewedAt": "2026-10-20" },
+    "derivation": null
+  },
+  "source.geostat_ict_skills_ka": {
+    "name": { "text": "ICT skills (table 17), Georgian edition", "reviewedAt": "2026-10-20" },
+    "derivation": null
+  },
+  "source.geostat_ict_page": {
+    "name": { "text": "ICT usage in households (source page capture)", "reviewedAt": "2026-10-20" },
+    "derivation": null
+  },
+  "source.geostat_ict_page_ka": {
+    "name": { "text": "ICT usage in households (Georgian source page capture)", "reviewedAt": "2026-10-20" },
+    "derivation": null
+  },
   "source.geostat_crime_recorded": {
     "name": {
       "text": "Number of recorded crimes",

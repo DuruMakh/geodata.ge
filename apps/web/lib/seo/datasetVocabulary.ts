@@ -407,6 +407,17 @@ const TOPIC_DATASETS: Record<TopicDatasetId, { keywords: Record<Locale, readonly
     },
     sources: ["geostat"],
   },
+  internet: {
+    keywords: {
+      ka: ["ინტერნეტი", "კომპიუტერი", "მობილური ტელეფონი", "სმარტფონი", "ონლაინ შესყიდვები", "საქართველო"],
+      en: ["Georgia", "internet", "computers", "mobile phones", "smartphones", "online shopping"],
+    },
+    measurementTechnique: {
+      ka: "გადამოწმებული ამოღება საქსტატის შინამეურნეობებში საინფორმაციო და საკომუნიკაციო ტექნოლოგიების გამოყენების წლიური კვლევის ოფიციალური გამოქვეყნებული ცხრილებიდან.",
+      en: "Reviewed extraction from the official published tables of Geostat's annual survey of ICT usage in households.",
+    },
+    sources: ["geostat"],
+  },
   education: {
     keywords: {
       ka: ["განათლება", "სკოლები", "მოსწავლეები", "საბავშვო ბაღები", "უნივერსიტეტები", "პროფესიული კოლეჯები", "საქართველო"],

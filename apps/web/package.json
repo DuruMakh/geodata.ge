@@ -150,6 +150,8 @@
     "data:check-gdp-expenditure": "tsx scripts/prepare-gdp-expenditure.ts --check",
     "data:prepare-housing": "tsx scripts/prepare-housing.ts --write",
     "data:check-housing": "tsx scripts/prepare-housing.ts --check",
+    "data:prepare-internet": "tsx scripts/prepare-internet.ts --write",
+    "data:check-internet": "tsx scripts/prepare-internet.ts --check",
     "data:prepare-transport": "tsx scripts/prepare-transport.ts --write",
     "data:check-transport": "tsx scripts/prepare-transport.ts --check",
     "data:prepare-education": "tsx scripts/prepare-education.ts --write",
@@ -170,7 +172,7 @@
     "data:check-external-position": "tsx scripts/prepare-external-position.ts --check"
   },
   "dependencies": {
-    "@modelcontextprotocol/server": "2.2.0",
+    "@modelcontextprotocol/server": "2.3.1",
     "@prisma/adapter-pg": "^7.10.0",
     "@prisma/client": "^7.10.0",
     "@vercel/analytics": "^2.0.1",

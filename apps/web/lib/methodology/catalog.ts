@@ -21,6 +21,8 @@ import { HEALTH_METHODOLOGY_CONTENT } from "./content/health";
 import { HEALTH_METHODOLOGY_CONTENT as EN_HEALTH } from "./content/en/health";
 import { CRIME_METHODOLOGY_CONTENT } from "./content/crime";
 import { CRIME_METHODOLOGY_CONTENT as EN_CRIME } from "./content/en/crime";
+import { INTERNET_METHODOLOGY_CONTENT } from "./content/internet";
+import { INTERNET_METHODOLOGY_CONTENT as EN_INTERNET } from "./content/en/internet";
 import { EDUCATION_METHODOLOGY_CONTENT } from "./content/education";
 import { EDUCATION_METHODOLOGY_CONTENT as EN_EDUCATION } from "./content/en/education";
 import { SCIENCE_CULTURE_METHODOLOGY_CONTENT } from "./content/science-culture";
@@ -85,6 +87,7 @@ export const METHODOLOGY_CONTENT: Readonly<Record<MethodologyDatasetId, Methodol
   education: EDUCATION_METHODOLOGY_CONTENT,
   "science-culture": SCIENCE_CULTURE_METHODOLOGY_CONTENT,
   crime: CRIME_METHODOLOGY_CONTENT,
+  internet: INTERNET_METHODOLOGY_CONTENT,
   trade: TRADE_METHODOLOGY_CONTENT,
   "external-flows": EXTERNAL_FLOWS_METHODOLOGY_CONTENT,
   "energy-food": ENERGY_FOOD_METHODOLOGY_CONTENT,
@@ -109,6 +112,7 @@ const ENGLISH_METHODOLOGY_CONTENT: Readonly<Record<MethodologyDatasetId, Methodo
   education: EN_EDUCATION,
   "science-culture": EN_SCIENCE_CULTURE,
   crime: EN_CRIME,
+  internet: EN_INTERNET,
   "energy-food": EN_ENERGY_FOOD,
   environment: EN_ENVIRONMENT,
   transport: EN_TRANSPORT,

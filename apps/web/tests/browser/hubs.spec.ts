@@ -119,6 +119,24 @@ test("the crime hub shows one card per page, each linking to it, and the sidebar
   await expect(page.getByTestId("crime-hub").locator("a").first()).toContainText("2025 · 54,134 · 2015–2025");
 });
 
+test("the internet hub shows one card per page, each linking to it, and the sidebar lists Internet and technology after Crime and justice", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  const sections = ["homes", "users", "online", "devices"];
+  for (const prefix of ["", "/en"]) {
+    await page.goto(`${prefix}/explorer/internet`);
+    const cards = page.getByTestId("internet-hub").locator("a");
+    await expect(cards).toHaveCount(4);
+    expect(await cards.evaluateAll(elements => elements.map(element => element.getAttribute("href")))).toEqual(sections.map(section => `${prefix}/explorer/internet/${section}`));
+    for (let index = 0; index < 4; index += 1) await expect(cards.nth(index).locator("svg")).toHaveCount(1);
+    const entry = page.getByTestId("internet-link");
+    await expect(entry).toHaveAttribute("aria-current", "page");
+    expect(await page.getByTestId("crime-link").evaluate((crime, internet) => Boolean(crime.compareDocumentPosition(internet!) & Node.DOCUMENT_POSITION_FOLLOWING), await entry.elementHandle())).toBe(true);
+    for (const id of sections) await expect(page.getByTestId(`internet-${id}-link`)).toBeVisible();
+  }
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Internet and technology");
+  await expect(page.getByTestId("internet-hub").locator("a").first()).toContainText("2026 · 93.5% · 2016–2026");
+});
+
 test("the housing hub shows one card per page, each linking to it, and the sidebar lists Housing after Business", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   for (const prefix of ["", "/en"]) {

@@ -33,6 +33,8 @@ import { loadLabourFacts, assertLabourParity } from "../lib/data/labour/importLa
 import { labourSourceDocumentId } from "../lib/data/labour/types";
 import { loadHousingFacts, assertHousingParity } from "../lib/data/housing/importHousing";
 import { housingSourceDocumentId } from "../lib/data/housing/types";
+import { loadInternetFacts, assertInternetParity } from "../lib/data/internet/importInternet";
+import { internetSourceDocumentId } from "../lib/data/internet/types";
 import { loadTransportFacts, assertTransportParity } from "../lib/data/transport/importTransport";
 import { transportSourceDocumentId } from "../lib/data/transport/types";
 import { loadTradePartnersData, assertTradePartnersParity } from "../lib/data/tradePartners/importTradePartners";
@@ -101,6 +103,8 @@ import {
   labourMirrorCreateRows,
   loadHousingFactsFromMirror,
   housingMirrorCreateRows,
+  loadInternetFactsFromMirror,
+  internetMirrorCreateRows,
   loadTransportFactsFromMirror,
   transportMirrorCreateRows,
   tradePartnerEntityMirrorCreateRows,
@@ -396,6 +400,8 @@ async function main() {
   assertSubset("Labour source IDs", labourFacts.map(f => labourSourceDocumentId(f.sourceId)), sourceIds);
   const housingFacts = await loadHousingFacts();
   assertSubset("Housing source IDs", housingFacts.map(f => housingSourceDocumentId(f.sourceId)), sourceIds);
+  const internetFacts = await loadInternetFacts();
+  assertSubset("Internet source IDs", internetFacts.map(f => internetSourceDocumentId(f.sourceId)), sourceIds);
   const transportFacts = await loadTransportFacts();
   assertSubset("Transport source IDs", transportFacts.map(f => transportSourceDocumentId(f.sourceId)), sourceIds);
   const tradePartners = await loadTradePartnersData();
@@ -612,6 +618,7 @@ async function main() {
         await tx.environmentFact.deleteMany();
         await tx.labourFact.deleteMany();
         await tx.housingFact.deleteMany();
+        await tx.internetFact.deleteMany();
         await tx.transportFact.deleteMany();
         await tx.tradePartnerFact.deleteMany();
         await tx.tradePartnerEntity.deleteMany();
@@ -946,6 +953,9 @@ async function main() {
         await tx.housingFact.createMany({ data: housingMirrorCreateRows(housingFacts, run.id) });
         const mirrorHousingFacts = await loadHousingFactsFromMirror(tx);
         assertHousingParity(housingFacts, mirrorHousingFacts);
+        await tx.internetFact.createMany({ data: internetMirrorCreateRows(internetFacts, run.id) });
+        const mirrorInternetFacts = await loadInternetFactsFromMirror(tx);
+        assertInternetParity(internetFacts, mirrorInternetFacts);
         await tx.transportFact.createMany({ data: transportMirrorCreateRows(transportFacts, run.id) });
         const mirrorTransportFacts = await loadTransportFactsFromMirror(tx);
         assertTransportParity(transportFacts, mirrorTransportFacts);
@@ -1297,6 +1307,7 @@ async function main() {
             { table: "EnvironmentFact", csvRows: environmentFacts.length, dbRows: mirrorEnvironmentFacts.length },
             { table: "LabourFact", csvRows: labourFacts.length, dbRows: mirrorLabourFacts.length },
             { table: "HousingFact", csvRows: housingFacts.length, dbRows: mirrorHousingFacts.length },
+            { table: "InternetFact", csvRows: internetFacts.length, dbRows: mirrorInternetFacts.length },
             { table: "TransportFact", csvRows: transportFacts.length, dbRows: mirrorTransportFacts.length },
             { table: "TradePartnerEntity", csvRows: tradePartners.entities.length, dbRows: mirrorTradePartners.entities.length },
             { table: "TradePartnerFact", csvRows: tradePartners.facts.length, dbRows: mirrorTradePartners.facts.length },

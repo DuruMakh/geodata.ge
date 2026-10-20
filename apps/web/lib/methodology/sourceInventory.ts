@@ -75,6 +75,8 @@ const inventoryRules = {
   crime: [{ root: "docs/Raw Data/Crime/geostat-crime-annual/official", include: () => true }],
   // The 13 served English workbooks, their Georgian versions (kept for the Georgian labels), the 14 archived-only workbooks and the six page captures.
   environment: [{ root: "docs/Raw Data/Environment/geostat-environment-annual/official", include: () => true }],
+  // The 17 English tables, their Georgian editions (official/ka/) and both page captures; served and archived-only alike.
+  internet: [{ root: "docs/Raw Data/Internet/geostat-ict-households-annual/official", include: () => true }],
   money: [{ root: "docs/Raw Data/Money/nbg-money-banks-annual/official", include: () => true }],
   business: [{ root: "docs/Raw Data/Business/geostat-business-annual/official", include: () => true }],
   // The six served workbooks, the two zips and their members, the other price and cost workbooks, and the three page captures.

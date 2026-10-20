@@ -117,7 +117,8 @@ describe("indexable Fiscal.ge routes", () => {
     // Farming adds one Energy and food page: 1 bilingual pair. GDP by expenditure adds its page and methodology page: 2 more.
     // Marriages and divorces adds one demography page: one bilingual pair.
     // Transport adds its hub, five pages, a page for Georgia and each of the 11 regions and its methodology page: 19 bilingual pairs.
-    expect(urls).toHaveLength(1194);
+    // Internet and technology adds its hub, four pages, a page for Georgia and each of the 11 regions and its methodology page: 18 bilingual pairs.
+    expect(urls).toHaveLength(1230);
     expect(new Set(urls).size).toBe(urls.length);
     expect(urls.every((url) => url.startsWith("https://fiscal.ge/"))).toBe(true);
     expect(urls).toContain("https://fiscal.ge/about");
@@ -183,6 +184,13 @@ describe("indexable Fiscal.ge routes", () => {
       expect(urls).toContain(`https://fiscal.ge/en/explorer/housing${page}`);
     }
     expect(urls.filter((url) => url.includes("/explorer/housing"))).toHaveLength(34);
+    for (const page of ["", "/homes", "/users", "/online", "/devices", ...businessAreas.map(area => `/homes/${area}`)]) {
+      expect(urls).toContain(`https://fiscal.ge/explorer/internet${page}`);
+      expect(urls).toContain(`https://fiscal.ge/en/explorer/internet${page}`);
+    }
+    expect(urls.filter((url) => url.includes("/explorer/internet"))).toHaveLength(34);
+    expect(urls).toContain("https://fiscal.ge/methodology/internet");
+    expect(urls).toContain("https://fiscal.ge/en/methodology/internet");
     for (const page of ["", "/vehicles", "/vehicle-age", "/passengers", "/freight", "/regions", ...businessAreas.map(area => `/regions/${area}`)]) {
       expect(urls).toContain(`https://fiscal.ge/explorer/transport${page}`);
       expect(urls).toContain(`https://fiscal.ge/en/explorer/transport${page}`);
@@ -245,6 +253,7 @@ describe("indexable Fiscal.ge routes", () => {
       "/methodology/education",
       "/methodology/science-culture",
       "/methodology/crime",
+      "/methodology/internet",
       "/methodology/trade",
       "/methodology/external-flows",
       "/methodology/energy-food",
