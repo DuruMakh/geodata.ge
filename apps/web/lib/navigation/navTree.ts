@@ -1,5 +1,6 @@
 import { BUDGET_SECTIONS, BUDGET_SECTION_ORDER } from "../explorer/sections";
 import { UNEMPLOYMENT_SECTIONS } from "../explorer/unemploymentSections";
+import { LABOUR_SECTIONS } from "../explorer/labour";
 import { WAGES_SECTIONS } from "../explorer/wages";
 import { LIVING_STANDARDS_HUB_PATH, LIVING_STANDARDS_SECTIONS } from "../explorer/livingStandards";
 import { HEALTH_HUB_PATH, HEALTH_SECTIONS } from "../explorer/health";
@@ -102,7 +103,7 @@ export const NAV_TREE: readonly NavHub[] = [
     railLabelKey: "common.dataUnemployment",
     testId: "unemployment-link",
     spaced: true,
-    sections: sectionRows(UNEMPLOYMENT_SECTIONS, "unemployment"),
+    sections: sectionRows([...UNEMPLOYMENT_SECTIONS, ...LABOUR_SECTIONS], "unemployment"),
   },
   {
     href: "/explorer/wages",

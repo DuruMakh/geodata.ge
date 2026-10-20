@@ -52,7 +52,11 @@ const inventoryRules = {
   debt: [
     { root: "docs/Raw Data/Debt/government-debt-annual/official", include: () => true },
   ],
-  unemployment: [{ root: "docs/Raw Data/Unemployment/geostat-labour-force-annual/official", include: () => true }],
+  // The annual labour-force originals, then the detail package: six English workbooks, their Georgian versions and both page captures; served and archived-only alike.
+  unemployment: [
+    { root: "docs/Raw Data/Unemployment/geostat-labour-force-annual/official", include: () => true },
+    { root: "docs/Raw Data/Unemployment/geostat-labour-force-detail/official", include: () => true },
+  ],
   wages: [{ root: "docs/Raw Data/Wages/geostat-earnings-annual/official", include: () => true }],
   poverty: [{ root: "docs/Raw Data/Poverty/geostat-poverty-annual/official", include: () => true }],
   // official/ka/ holds Georgian copies of the served workbooks, kept only for their labels.
