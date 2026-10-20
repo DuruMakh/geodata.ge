@@ -5,6 +5,7 @@ import { LIVING_STANDARDS_HUB_PATH, LIVING_STANDARDS_SECTIONS } from "../explore
 import { HEALTH_HUB_PATH, HEALTH_SECTIONS } from "../explorer/health";
 import { CRIME_HUB_PATH, CRIME_SECTIONS } from "../explorer/crime";
 import { ENERGY_FOOD_HUB_PATH, ENERGY_FOOD_SECTIONS } from "../explorer/energyFood";
+import { TRANSPORT_HUB_PATH, TRANSPORT_SECTIONS } from "../explorer/transport";
 import { MONEY_BANKS_SECTIONS } from "../explorer/moneyBanks";
 import { BUSINESS_HUB_PATH, BUSINESS_SECTIONS } from "../explorer/business";
 import { HOUSING_HUB_PATH, HOUSING_SECTIONS } from "../explorer/housing";
@@ -181,6 +182,13 @@ export const NAV_TREE: readonly NavHub[] = [
     sections: sectionRows(ENERGY_FOOD_SECTIONS, "energy-food"),
   },
   {
+    href: TRANSPORT_HUB_PATH,
+    labelKey: "common.transport",
+    railLabelKey: "common.dataTransport",
+    testId: "transport-link",
+    sections: sectionRows(TRANSPORT_SECTIONS, "transport"),
+  },
+  {
     href: DEMOGRAPHY_HUB_PATH,
     labelKey: "common.demography",
     railLabelKey: "common.dataDemography",
@@ -243,6 +251,7 @@ const TREE_SOURCE_NOTES: Readonly<Record<string, string>> = {
   "/explorer/trade": "common.geostatSourceNote",
   "/explorer/external": "common.nbgSourceNote",
   [ENERGY_FOOD_HUB_PATH]: "common.geostatSourceNote",
+  [TRANSPORT_HUB_PATH]: "common.geostatSourceNote",
   [DEMOGRAPHY_HUB_PATH]: "common.geostatSourceNote",
 };
 

@@ -4,7 +4,7 @@ import { TRANSPORT_INDICATORS, TRANSPORT_REGIONS, TRANSPORT_SOURCES, type Client
 import { INK } from "../../lib/explorer/colors";
 import {
   TRANSPORT_HUB_PATH, TRANSPORT_SECTIONS, buildTransportModel, changeTransportSelection, transportCoverage, transportDefaultSelection, transportSeriesColor,
-  transportSeriesLabel, transportTopicSeries, transportValueLabel, parseTransportHash, type TransportTopicId,
+  transportLatestValue, transportSeriesLabel, transportTopicSeries, transportValueLabel, parseTransportHash, type TransportTopicId,
 } from "../../lib/explorer/transport";
 import {
   TRANSPORT_AREAS, buildTransportAreaModel, transportAreaDefaultSelection, transportAreaHref, transportAreaSelectionHash, transportAreaSeries,
@@ -21,7 +21,7 @@ beforeAll(async () => { facts = (await loadTransportFacts()).map(toClientTranspo
 const span = (coverage: { min: number; max: number }) => [coverage.min, coverage.max];
 const TOPICS: readonly TransportTopicId[] = ["vehicles", "vehicle-age", "passengers", "freight"];
 const state = (selectedIds: string[], range: { kind: "all" } | { kind: "manual"; start: number; end: number } = { kind: "all" }) => ({ mode: "line" as const, range, selectedIds });
-const t = (key: string) => ({ "heading.carsFuel": "Passenger cars by fuel · thousand", "heading.busesAge": "Buses and minibuses · thousand", unitThousandVehicles: "thousand vehicles", unitPkmPerPerson: "passenger-km per person" })[key] ?? key;
+const t = (key: string) => ({ "heading.carsFuel": "Passenger cars by fuel · thousand", "heading.busesAge": "Buses and minibuses · thousand", unitThousandVehicles: "thousand vehicles", unitPkmPerPerson: "passenger-km per person", unitThousand: "thousand", unitMillion: "million", unitBillion: "billion" })[key] ?? key;
 
 test("the hub lists four topic pages and the regions page", () => {
   expect(TRANSPORT_HUB_PATH).toBe("/explorer/transport");
@@ -113,6 +113,13 @@ test("labels: a fuel or age row names its heading, other rows keep their own nam
   expect(transportValueLabel(1650, "vehicles", t)).toBe("1,650.0 thousand vehicles");
   expect(transportValueLabel(2858, "pkmPerPerson", t)).toBe("2,858 passenger-km per person");
   expect(transportValueLabel(null, "vehicles", t)).toBe("—");
+});
+
+test("the latest-value line reads in thousands, millions or billions of the published figure", () => {
+  // Published in thousand vehicles or million passenger-km and tonne-km.
+  expect(transportLatestValue(1650.04, "million", t)).toBe("1.65 million");
+  expect(transportLatestValue(11262.1, "billion", t)).toBe("11.3 billion");
+  expect(transportLatestValue(855, "thousand", t)).toBe("855.0 thousand");
 });
 
 test("a link to another area page carries the selection moved to that area", () => {

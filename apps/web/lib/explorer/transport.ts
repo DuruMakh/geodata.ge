@@ -163,3 +163,12 @@ const NAMED_BY_HEADING: ReadonlySet<TransportHeading> = new Set(["carsFuel", "bu
 export function transportSeriesLabel(series: Pick<TransportSeriesDefinition, "id" | "heading">, labels: Readonly<Record<string, string>>, t: TransportTranslate): string {
   return NAMED_BY_HEADING.has(series.heading) ? `${labels[series.id]} — ${t(`heading.${series.heading}`).split(" · ")[0]}` : labels[series.id];
 }
+
+/**
+ * A latest-value line's figure, from Geostat's thousands (vehicles) or millions (passenger-km, tonne-km): kept in
+ * thousands, or shown in millions to two decimals or billions to one.
+ */
+export function transportLatestValue(value: number, scale: "thousand" | "million" | "billion", t: TransportTranslate): string {
+  const unit: ValueUnit = scale === "thousand" ? { divisor: 1, label: "", decimals: 1 } : { divisor: 1000, label: "", decimals: scale === "million" ? 2 : 1 };
+  return `${formatInUnit(value, unit)} ${t(`unit${scale[0].toUpperCase()}${scale.slice(1)}`)}`;
+}

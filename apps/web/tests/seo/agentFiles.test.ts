@@ -127,6 +127,13 @@ const statedCoverage: { url: string; file: string; rows?: (row: CsvRow) => boole
   { url: "/explorer/external/reserves", file: "external-position-annual.csv", rows: (row) => row.indicator_id.startsWith("reserves.") },
   { url: "/explorer/energy-food", file: "energy-food-annual.csv", rows: (row) => !row.indicator_id.startsWith("food.") },
   { url: "/explorer/energy-food", file: "energy-food-annual.csv", rows: (row) => row.indicator_id.startsWith("food.") },
+  { url: "/explorer/transport", file: "transport-annual.csv", rows: (row) => row.indicator_id.startsWith("transport.fleet.") && !/_(fuel|age)_/.test(row.indicator_id), text: (first, last) => `road vehicle fleet, ${first}–${last}` },
+  { url: "/explorer/transport/vehicles", file: "transport-annual.csv", rows: (row) => row.indicator_id.startsWith("transport.fleet.") && !row.indicator_id.includes("_age_") },
+  { url: "/explorer/transport/vehicle-age", file: "transport-annual.csv", rows: (row) => row.indicator_id.includes("fleet.") && row.indicator_id.includes("_age_") },
+  { url: "/explorer/transport/passengers", file: "transport-annual.csv", rows: (row) => /^transport\.passenger_km/.test(row.indicator_id) },
+  { url: "/explorer/transport/freight", file: "transport-annual.csv", rows: (row) => row.indicator_id.startsWith("transport.tonne_km.") },
+  { url: "/explorer/transport/regions", file: "transport-annual.csv", rows: (row) => row.indicator_id.startsWith("transport.registered."), text: (first, last) => `registered vehicles by region, ${first}–${last}` },
+  { url: "/explorer/transport/regions", file: "transport-annual.csv", rows: (row) => row.indicator_id.startsWith("transport.road_km."), text: (first, last) => `road length, ${first}–${last}` },
   { url: "/explorer/demography/migration", file: "demography-migration-annual.csv" },
 ];
 
