@@ -1,6 +1,6 @@
 import { beforeAll, expect, test } from "vitest";
 import { loadInternetFacts, toClientInternetFact } from "../../lib/data/internet/importInternet";
-import { INTERNET_GROUPS, INTERNET_REGIONS, type ClientInternetFact } from "../../lib/data/internet/types";
+import { INTERNET_GROUPS, INTERNET_REGIONS, INTERNET_SOURCES, type ClientInternetFact } from "../../lib/data/internet/types";
 import { INK } from "../../lib/explorer/colors";
 import {
   INTERNET_HUB_PATH, INTERNET_SECTIONS, buildInternetModel, changeInternetSelection, internetCoverage, internetDefaultSelection, internetPercent,
@@ -10,7 +10,11 @@ import {
   INTERNET_AREAS, buildInternetAreaModel, changeInternetAreaSelection, internetAreaDefaultSelection, internetAreaHref, internetAreaOfMapId,
   internetAreaSelectionHash, internetAreaSeries, internetMapId, internetRegionHref, parseInternetAreaHash,
 } from "../../lib/explorer/internetAreas";
+import { buildInternetHubCards } from "../../lib/explorer/internetHubCards";
 import { buildInternetRegionMapModel } from "../../lib/explorer/internetRegionMap";
+import { buildInternetWorkbookExportModel } from "../../lib/explorer/internetWorkbook";
+import { getMessages } from "../../lib/i18n/messages.server";
+import type { Locale, Presentation } from "../../lib/i18n/types";
 
 let facts: ClientInternetFact[];
 beforeAll(async () => { facts = (await loadInternetFacts()).map(toClientInternetFact); });
@@ -159,4 +163,54 @@ test("the homes map colours each region by its 2026 share of homes with internet
   expect(map.regions).toHaveLength(11);
   const top = [...map.regions].sort((a, b) => a.rank - b.rank)[0];
   expect(top.regionId).toBe("region.tbilisi");
+});
+
+const presentation = async (locale: Locale = "en"): Promise<Presentation> => ({ locale, englishLabels: {}, messages: await getMessages(locale, ["workbook", "format", "common", "internet"]) });
+const SOURCES = INTERNET_SOURCES.map(sourceId => ({
+  sourceId, years: Array.from({ length: 11 }, (_, i) => 2016 + i), title: sourceId, organization: "Geostat", retrievedAt: "2026-10-20",
+  downloadHref: `/downloads/methodology/internet/files/${sourceId}.xlsx` as const,
+}));
+
+test("an area workbook leaves the years before a region's first survey blank and cites only its two tables", async () => {
+  const ids = ["internet.homes_internet.region_guria", "internet.homes_computer.region_guria"];
+  const model = buildInternetWorkbookExportModel({
+    area: "region_guria", facts, sources: SOURCES, siteOrigin: "https://fiscal.ge", labels: { [ids[0]]: "With internet", [ids[1]]: "With a computer" }, title: "Title",
+    state: { mode: "table", range: { kind: "manual", start: 2016, end: 2026 }, selectedIds: ids },
+  }, await presentation());
+  expect(model.filename).toBe("fiscal-internet-homes-guria-2020-2026-en.xlsx");
+  expect(model.readable.unitLabel).toBe("%");
+  expect(model.readable.numberFormat).toBe("0.0");
+  expect(model.readable.rows.map(row => row.label)).toEqual(["With internet", "With a computer"]);
+  expect(model.readable.rows[0].valuesByYear[2026]).toBe(91.1);
+  expect(model.readable.rows[0].valuesByYear[2019]).toBeUndefined();
+  expect(model.sources.map(s => s.title)).toEqual(["geostat_ict_homes_internet", "geostat_ict_homes_computer"]);
+  expect(model.analysis.rows[0]).toEqual([2020, "With internet", facts.find(f => f.indicatorId === ids[0] && f.year === 2020)!.value, "Survey estimate"]);
+  // Georgia's page reaches back to 2016; Guria has no row before 2020, so a mixed range keeps Guria's own years.
+  const wide = buildInternetWorkbookExportModel({
+    area: "georgia", facts, sources: SOURCES, siteOrigin: "https://fiscal.ge", labels: { "internet.homes_internet.urban": "Towns" }, title: "Title",
+    state: { mode: "table", range: { kind: "all" }, selectedIds: ["internet.homes_internet.urban"] },
+  }, await presentation("ka"));
+  expect(wide.filename).toBe("fiscal-internet-homes-georgia-2016-2026.xlsx");
+  expect(wide.readable.rows.map(row => row.label)).toEqual(["Towns — ინტერნეტით უზრუნველყოფილი შინამეურნეობები"]);
+});
+
+test("a users workbook names each group with its heading and cites only the table behind it", async () => {
+  const ids = ["internet.used_3m.urban", "internet.used_3m.rural"];
+  const model = buildInternetWorkbookExportModel({
+    section: "users", facts, sources: SOURCES, siteOrigin: "https://fiscal.ge", labels: { [ids[0]]: "Towns", [ids[1]]: "Villages" }, title: "Title",
+    state: { mode: "table", range: { kind: "manual", start: 2016, end: 2026 }, selectedIds: ids },
+  }, await presentation());
+  expect(model.filename).toBe("fiscal-internet-users-2016-2026-en.xlsx");
+  expect(model.readable.rows.map(row => row.label)).toEqual(["Towns — Used the internet in the last 3 months", "Villages — Used the internet in the last 3 months"]);
+  expect(model.sources.map(s => s.title)).toEqual(["geostat_ict_last_internet_use"]);
+  const empty = buildInternetWorkbookExportModel({ section: "users", facts, sources: SOURCES, siteOrigin: "https://fiscal.ge", labels: {}, title: "Title", state: state([]) }, await presentation());
+  expect(empty.readable.rows).toEqual([]); expect(empty.sources).toEqual([]);
+});
+
+test("the hub cards follow each page's default series", async () => {
+  const cards = buildInternetHubCards(facts, await presentation());
+  expect(cards.map(card => card.href)).toEqual(INTERNET_SECTIONS.map(section => section.href));
+  expect(cards.map(card => card.title)).toEqual(["Internet at home", "Internet users", "Shopping and services online", "Phones and computers"]);
+  expect(cards.map(card => card.footer)).toEqual(["2026 · 93.5% · 2016–2026", "2026 · 89.6% · 2016–2026", "2026 · 38.6% · 2016–2026", "2026 · 93.3% · 2016–2026"]);
+  expect(cards.every(card => card.series?.length === 11 && card.seriesColor === INK)).toBe(true);
 });
