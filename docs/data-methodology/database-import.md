@@ -65,6 +65,7 @@ Unemployment uses the existing single import transaction. Source IDs retain thei
 | `BusinessFact` | `data/imports/business-annual.csv` (see `business-annual.md`) |
 | `CrimeFact` | `data/imports/crime-annual.csv` (see `crime-annual.md`; the counting-change register `crime-series-breaks.csv` is read from the CSV and not mirrored) |
 | `HousingFact` | `data/imports/housing-annual.csv` (see `housing-annual.md`) |
+| `GdpExpenditureFact` | `data/imports/gdp-expenditure-annual.csv` (see `gdp-expenditure.md`) |
 | `EducationFact` | `data/imports/education-annual.csv` (see `education-annual.md`) |
 | `NationalGdpFact` | `data/imports/national-gdp-annual-1996-2025.csv` (one reviewed nominal-GDP denominator per year) |
 | `GovernmentDebtFact` | `data/imports/government-debt-facts-2013-2030.csv` (nine public Government Debt series; generated from the approved normalized debt package) |

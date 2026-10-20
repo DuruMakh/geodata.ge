@@ -1,6 +1,7 @@
 import { loadGdpOverviewFacts, assertGdpParity } from "../lib/data/gdpOverview/importGdpOverview";
 import { loadGdpOverviewFactsFromMirror } from "../lib/db/mirrorRows";
 import { loadEconomicSectorFacts, assertEconomicSectorParity } from "../lib/data/economicSectors/importEconomicSectors";
+import { loadGdpExpenditureFacts, assertGdpExpenditureParity } from "../lib/data/gdpExpenditure/importGdpExpenditure";
 import { loadUnemploymentFacts, assertUnemploymentParity } from "../lib/data/unemployment/importUnemployment";
 import { loadTradeOverviewFacts, assertTradeOverviewParity } from "../lib/data/tradeOverview/importTradeOverview";
 import { TRADE_OVERVIEW_DOCUMENT_ID } from "../lib/data/tradeOverview/types";
@@ -58,6 +59,8 @@ import {
 import { assertProductParity, loadProductCatalogueCsv, loadProductFactsCsv } from "../lib/data/inflation/importProducts";
 import {
   loadEconomicSectorFactsFromMirror,
+  loadGdpExpenditureFactsFromMirror,
+  gdpExpenditureMirrorCreateRows,
   loadUnemploymentFactsFromMirror,
   unemploymentMirrorCreateRows,
   loadTradeOverviewFactsFromMirror,
@@ -343,6 +346,8 @@ async function main() {
   const gdpOverviewFacts = await loadGdpOverviewFacts(SERVED_DATA_FILES.gdpOverviewFacts);
   const economicSectorFacts = await loadEconomicSectorFacts(SERVED_DATA_FILES.economicSectorFacts);
   assertSubset("Economic sector source IDs", economicSectorFacts.map(f => f.sourceId), sourceIds);
+  const gdpExpenditureFacts = await loadGdpExpenditureFacts();
+  assertSubset("GDP by expenditure source IDs", gdpExpenditureFacts.map(f => f.sourceId), sourceIds);
   const unemploymentFacts = await loadUnemploymentFacts();
   assertSubset("Unemployment source IDs", unemploymentFacts.map(f => `source.${f.sourceId}`), sourceIds);
   const tradeOverviewFacts = await loadTradeOverviewFacts();
@@ -564,6 +569,7 @@ async function main() {
         await tx.governmentDebtFact.deleteMany();
         await tx.gdpOverviewFact.deleteMany();
         await tx.economicSectorFact.deleteMany();
+        await tx.gdpExpenditureFact.deleteMany();
         await tx.unemploymentFact.deleteMany();
         await tx.tradeOverviewFact.deleteMany();
         await tx.wagesFact.deleteMany();
@@ -859,6 +865,9 @@ async function main() {
         })) });
         const mirrorEconomicSectorFacts = await loadEconomicSectorFactsFromMirror(tx);
         assertEconomicSectorParity(economicSectorFacts, mirrorEconomicSectorFacts);
+        await tx.gdpExpenditureFact.createMany({ data: gdpExpenditureMirrorCreateRows(gdpExpenditureFacts, run.id) });
+        const mirrorGdpExpenditureFacts = await loadGdpExpenditureFactsFromMirror(tx);
+        assertGdpExpenditureParity(gdpExpenditureFacts, mirrorGdpExpenditureFacts);
         await tx.unemploymentFact.createMany({ data: unemploymentMirrorCreateRows(unemploymentFacts, run.id) });
         const mirrorUnemploymentFacts = await loadUnemploymentFactsFromMirror(tx);
         assertUnemploymentParity(unemploymentFacts, mirrorUnemploymentFacts);
@@ -1229,6 +1238,7 @@ async function main() {
               csvRows: gdpOverviewFacts.length, dbRows: mirrorGdpOverviewFacts.length,
             },
             { table: "EconomicSectorFact", csvRows: economicSectorFacts.length, dbRows: mirrorEconomicSectorFacts.length },
+            { table: "GdpExpenditureFact", csvRows: gdpExpenditureFacts.length, dbRows: mirrorGdpExpenditureFacts.length },
             { table: "UnemploymentFact", csvRows: unemploymentFacts.length, dbRows: mirrorUnemploymentFacts.length },
             { table: "TradeOverviewFact", csvRows: tradeOverviewFacts.length, dbRows: mirrorTradeOverviewFacts.length },
             { table: "WagesFact", csvRows: wagesFacts.length, dbRows: mirrorWagesFacts.length },

@@ -55,7 +55,7 @@ async function tampered(file: string, edit: (bytes: Buffer) => Buffer, rehash: b
   }
   const manifest = JSON.parse(await fs.readFile(path.join(root, manifestPath), "utf8"));
   for (const source of manifest.files) {
-    let bytes = await fs.readFile(path.join(root, source.file));
+    let bytes: Buffer = await fs.readFile(path.join(root, source.file));
     if (path.basename(source.file) === file) {
       bytes = edit(bytes);
       if (rehash) Object.assign(source, { sha256: createHash("sha256").update(bytes).digest("hex"), bytes: bytes.length });
