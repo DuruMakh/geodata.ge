@@ -1,5 +1,7 @@
 import { UnemploymentLegacyLink } from "../../../components/unemployment/unemployment-legacy-link";
 import { loadServedUnemploymentData } from "../../data/unemployment/importUnemployment";
+import { loadServedLabourData, toClientLabourFact } from "../../data/labour/importLabour";
+import { buildLabourHubCards } from "../../explorer/labourHubCards";
 import { buildUnemploymentHubCards } from "../../explorer/unemploymentHubCards";
 import { coverageLabel } from "../../explorer/coverageLabel";
 import { getPresentation } from "../../i18n/presentation.server";
@@ -15,7 +17,8 @@ export async function unemploymentHubMetadata(locale: Locale) {
 }
 
 export async function renderUnemploymentHub(locale: Locale) {
-  const [{ facts }, presentation] = await Promise.all([loadServedUnemploymentData(), getPresentation(locale, ["unemployment"], [])]);
+  const [{ facts }, { facts: labourFacts }, presentation] = await Promise.all([loadServedUnemploymentData(), loadServedLabourData(), getPresentation(locale, ["unemployment", "labour"], [])]);
   const title = message(presentation.messages, "unemployment.title");
-  return <TopicHub locale={locale} presentation={presentation} title={title} summary={message(presentation.messages, "unemployment.hubSummary")} path={"/explorer/unemployment"} coverage={coverageLabel(presentation.messages, locale, Math.min(...facts.map(f => f.year)), Math.max(...facts.map(f => f.year)), facts.map(f => f.lastReviewedAt).sort().at(-1))} cards={buildUnemploymentHubCards(facts, presentation)} testId="unemployment-hub" after={<UnemploymentLegacyLink locale={locale} />} />;
+  const years = [...facts, ...labourFacts].map(f => f.year);
+  return <TopicHub locale={locale} presentation={presentation} title={title} summary={message(presentation.messages, "unemployment.hubSummary")} path={"/explorer/unemployment"} coverage={coverageLabel(presentation.messages, locale, Math.min(...years), Math.max(...years), [...facts, ...labourFacts].map(f => f.lastReviewedAt).sort().at(-1))} cards={[...buildUnemploymentHubCards(facts, presentation), ...buildLabourHubCards(labourFacts.map(toClientLabourFact), presentation, 5)]} testId="unemployment-hub" after={<UnemploymentLegacyLink locale={locale} />} />;
 }
