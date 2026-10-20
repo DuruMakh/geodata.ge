@@ -1,12 +1,13 @@
 import type { ClientSocialFact, SocialSeriesBreak } from "../data/social/types";
 import { placeIdForMunicipalityCode } from "./demographyAreas";
 import { HEALTH_HUB_PATH } from "./health";
+import { resolveRange } from "./periodRange";
 import {
   atPrices, buildSocialSeriesModel, sharePerHundred, socialHeadingOf, socialRows, socialUnitOf,
   type SocialModel, type SocialPlaceSet, type SocialPopulation, type SocialPriceIndex, type SocialSeriesDefinition, type SocialShownFact,
 } from "./social";
 import type { TopicCoverage, TopicState } from "./topicSeries";
-import { changeUnitListSelection, parseUnitListHash, unitListCoverage } from "./unitList";
+import { changeUnitListSelection, listLatestByHeading, parseUnitListHash, unitListCoverage } from "./unitList";
 
 /** The base path a set's index and place pages sit under; `placePageHref` adds the place. */
 export const socialPlaceBase = (set: SocialPlaceSet): `${typeof HEALTH_HUB_PATH}/${SocialPlaceSet}` => `${HEALTH_HUB_PATH}/${set}`;
@@ -76,4 +77,14 @@ export function changeSocialPlaceSelection(state: TopicState, set: SocialPlaceSe
 /** A place page's model; `breaks` are the counting-change register, of which the model keeps the ones touching the selection. */
 export function buildSocialPlaceModel(set: SocialPlaceSet, placeId: string, facts: readonly SocialShownFact[], state: TopicState, breaks: readonly SocialSeriesBreak[]): SocialModel {
   return buildSocialSeriesModel(socialPlaceSeries(set), facts, state, socialPlaceCoverage(set, placeId, facts, state.selectedIds), breaks);
+}
+
+/**
+ * A place's series list, as Education's place list reads it: the list ends at the chosen years' end over all of the place's
+ * years (never the selection's, so ticking a row never changes the numbers it shows), each row shows its latest value up to
+ * then, and a heading whose rows stop earlier names their year.
+ */
+export function socialPlaceList(set: SocialPlaceSet, placeId: string, facts: readonly SocialShownFact[], state: TopicState) {
+  const end = resolveRange(state.range, socialPlaceCoverage(set, placeId, facts)).end;
+  return { end, rows: listLatestByHeading(facts, socialPlaceSeries(set), end) };
 }

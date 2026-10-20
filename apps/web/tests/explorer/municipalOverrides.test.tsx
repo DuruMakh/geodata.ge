@@ -147,6 +147,20 @@ describe("MunicipalitiesIndex overrides", () => {
   });
 });
 
+describe("the percent value format", () => {
+  const perHundred = { ...country, valueGel: 22.46 };
+  test("prints a per-100 share as a percent to one decimal, in the index and in the picker", () => {
+    const html = wrap(<MunicipalitiesIndex viewBox={EMPTY_MAP_VIEW_BOX} shapes={[]} markers={[]} occupiedAreas={[]} touchTargets={[]} legendMin="1.0%" legendMax="9.0%"
+      municipalities={rows.map(row => ({ ...row, valueGel: 12.34 }))} regions={regionRows} country={perHundred} kpis={[]} sourceNote="Source" overrides={{ valueFormat: "percent" }} />);
+    expect(listRow(html, "06")).toContain("12.3%");
+    expect(listRow(html, "06")).not.toContain("GEL");
+    const picker = wrap(<EntityPicker open onClose={() => {}} country={{ id: MUNICIPAL_COUNTRY_ID, nameKa: "საქართველო", valueGel: 22.46, budgetCount: 64 }}
+      groups={[{ regionId: "region.adjara", nameKa: "აჭარა", valueGel: 18.04, members: [{ code: "06", nameKa: "ბათუმი", valueGel: 12.34 }] }]} activeId="06" overrides={{ valueFormat: "percent", countryDetail: "22.5%" }} />);
+    expect(picker).toContain("18.0%");
+    expect(picker).toContain("12.3%");
+  });
+});
+
 describe("EntityPicker overrides", () => {
   const groups = [{ regionId: "region.adjara", nameKa: "აჭარა", valueGel: 413_214, members: [{ code: "06", nameKa: "ბათუმი", valueGel: 246_267 }] }];
   const picker = (overrides?: Parameters<typeof EntityPicker>[0]["overrides"]) =>

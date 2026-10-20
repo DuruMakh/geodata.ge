@@ -101,6 +101,7 @@
   "social.mapAria": "Map: {measure} by municipality, {year}",
   "social.mapLegend.pensions": "pensioners per 100 residents, {year}",
   "social.mapLegend.subsistence-allowance": "people in receiving families per 100 residents, {year}",
+  "social.break.newCounting": "new counting",
   "social.months.partial": "{n} months",
   "social.workbook.calculatedNote": "“Calculated by Fiscal.ge” marks values calculated from Social Service Agency and Geostat data.",
   "social.methodology": "Methodology and sources",

@@ -101,6 +101,7 @@
   "social.mapAria": "რუკა: {measure} მუნიციპალიტეტების მიხედვით, {year}",
   "social.mapLegend.pensions": "პენსიონერი 100 მოსახლეზე, {year}",
   "social.mapLegend.subsistence-allowance": "შემწეობის მიმღებ ოჯახებში მყოფი ადამიანი 100 მოსახლეზე, {year}",
+  "social.break.newCounting": "ახალი აღრიცხვა",
   "social.months.partial": "{n} თვე",
   "social.workbook.calculatedNote": "„Fiscal.ge-ის მიერ გამოთვლილი“ აღნიშნავს მნიშვნელობებს, რომლებიც გამოთვლილია სოციალური მომსახურების სააგენტოს და საქსტატის მონაცემებით.",
   "social.methodology": "მეთოდოლოგია და წყაროები",

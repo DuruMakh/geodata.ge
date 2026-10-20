@@ -10,7 +10,7 @@ import { pageHref } from "../../lib/i18n/routes";
 import { useRouter } from "next/navigation";
 import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { MUNICIPAL_COUNTRY_ID } from "../../lib/data/municipal/types";
-import { formatAmount, formatInUnit, UNIT_PERSONS } from "../../lib/explorer/format";
+import { formatAmount, formatInUnit, formatShare, UNIT_PERSONS } from "../../lib/explorer/format";
 import { municipalEntityHref } from "../../lib/seo/internalLinks";
 
 // Entity picker for the 64 municipality and 11 region pages. A plain popover
@@ -44,8 +44,8 @@ export type EntityPickerCountry = {
 export type EntityPickerOverrides = {
   /** Where each option opens, by id (country id, region id, municipality code). Ids not listed open the Budget page. */
   hrefById?: Readonly<Record<string, string>>;
-  /** How a figure prints: the budget amount (default) or a whole number of persons. */
-  valueFormat?: "amount" | "persons";
+  /** How a figure prints: the budget amount (default), a whole number of persons, or a per-100 share as a percent to one decimal. */
+  valueFormat?: "amount" | "persons" | "percent";
   /** The country row's right-hand text; the budget amount and count by default. */
   countryDetail?: string;
 };
@@ -179,7 +179,7 @@ export function EntityPicker({ open, onClose, country, groups, activeId, overrid
   const hrefFor = (kind: "country" | "region" | "municipality", id: string) => overrides?.hrefById?.[id] ?? municipalEntityHref(kind, id);
   // The popover only renders once opened, in the browser, so the hash is read at that point (U09-17).
   const placeHref = (kind: "country" | "region" | "municipality", id: string) => `${pageHref(hrefFor(kind, id), locale)}${carryHash ? window.location.hash : ""}`;
-  const formatValue = (value: number) => (overrides?.valueFormat === "persons" ? formatInUnit(value, UNIT_PERSONS) : formatAmount(value, locale));
+  const formatValue = (value: number) => (overrides?.valueFormat === "persons" ? formatInUnit(value, UNIT_PERSONS) : overrides?.valueFormat === "percent" ? formatShare(value / 100) : formatAmount(value, locale));
 
   function selectOption(option: PickerOption) {
     onClose();

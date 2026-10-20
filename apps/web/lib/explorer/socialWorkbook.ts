@@ -29,7 +29,8 @@ type SocialWorkbookInput = {
   | { set: SocialPlaceSet; placeId: string; scope: string; state: TopicState; extras: SocialPlaceExtras }
 );
 
-const UNIT_KEYS: Record<SocialUnit, string> = { persons: "unitPersons", families: "unitFamilies", gel_million: "unitMlnGel", gel: "unitGel", percent: "unitPercent" };
+/** The `social.` message key of each display unit. */
+export const SOCIAL_UNIT_KEYS: Record<SocialUnit, string> = { persons: "unitPersons", families: "unitFamilies", gel_million: "unitMlnGel", gel: "unitGel", percent: "unitPercent" };
 const numberFormatOf = (decimals: number) => decimals ? `#,##0.${"0".repeat(decimals)}` : "#,##0";
 
 /**
@@ -67,7 +68,7 @@ export function buildSocialWorkbookExportModel(input: SocialWorkbookInput, prese
   ];
   const anyCalculated = model.selected.some(series => model.years.some(year => isCalculated(series.id, year)));
   const lead = model.selected[0] ?? model.series[0];
-  const unitLabel = t(gdpView ? "unitPercentGdp" : UNIT_KEYS[model.unit]);
+  const unitLabel = t(gdpView ? "unitPercentGdp" : SOCIAL_UNIT_KEYS[model.unit]);
   const numberFormat = numberFormatOf(lead.decimals);
   // Only a figure the page derives (a share of residents, a value at 2025 prices, a % of GDP) is written to the decimals shown, so the cell
   // holds what the reader sees; SSA's sums and averages keep their served precision and the number format does the display rounding.

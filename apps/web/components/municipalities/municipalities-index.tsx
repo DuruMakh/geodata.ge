@@ -10,7 +10,7 @@ import { MUNICIPAL_COUNTRY_BUDGET_COUNT } from "../../lib/explorer/municipalData
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import type { MunicipalKpi, MunicipalListRow } from "../../lib/explorer/municipalData";
-import { formatAmount, formatInUnit, formatPerResidentGel, UNIT_PERSONS } from "../../lib/explorer/format";
+import { formatAmount, formatInUnit, formatPerResidentGel, formatShare, UNIT_PERSONS } from "../../lib/explorer/format";
 import type { MunicipalityMapModel } from "../../lib/explorer/municipalityMapData";
 import { parseMunicipalLevel } from "../../lib/explorer/urlState";
 import { municipalEntityHref, type MunicipalEntityKind } from "../../lib/seo/internalLinks";
@@ -23,8 +23,8 @@ import { useAppReady } from "../explorer-shell/use-app-ready";
 export type MunicipalitiesIndexOverrides = {
   /** Where each row and each map shape opens, by id (country id, region id, municipality code). Ids not listed open the Budget page. */
   hrefById?: Readonly<Record<string, string>>;
-  /** How a row's figure prints: the budget amount (default) or a whole number of persons. */
-  valueFormat?: "amount" | "persons";
+  /** How a row's figure prints: the budget amount (default), a whole number of persons, or a per-100 share as a percent to one decimal. */
+  valueFormat?: "amount" | "persons" | "percent";
   /** A row's figure as printed, by row id, in place of `valueFormat`'s (a figure published in thousands); rows not listed keep it. */
   valueLabelById?: Readonly<Record<string, string>>;
   /** A second line under a row's figure, by row id; rows not listed keep the per-resident budget line, if they have one. */
@@ -57,7 +57,7 @@ export function MunicipalitiesIndex(props: MunicipalitiesIndexProps) {
   const { locale, messages, englishLabels } = useI18n();
   const { overrides } = props;
   const hrefFor = (kind: MunicipalEntityKind, id: string) => overrides?.hrefById?.[id] ?? municipalEntityHref(kind, id);
-  const formatValue = (value: number) => (overrides?.valueFormat === "persons" ? formatInUnit(value, UNIT_PERSONS) : formatAmount(value, locale));
+  const formatValue = (value: number) => (overrides?.valueFormat === "persons" ? formatInUnit(value, UNIT_PERSONS) : overrides?.valueFormat === "percent" ? formatShare(value / 100) : formatAmount(value, locale));
   function subtitleFor(row: MunicipalListRow): string {
     if (locale === "ka") return row.subtitleKa;
     if (row.kind === "municipality" && row.regionId) return publicLabel(locale, row.regionId, row.subtitleKa, englishLabels);
