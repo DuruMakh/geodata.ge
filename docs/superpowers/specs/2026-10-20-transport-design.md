@@ -31,7 +31,7 @@ The pages keep the production editorial look and reuse the Housing hub as built 
 | Methodology | `/methodology/transport` | `/en/methodology/transport` | ტრანსპორტი |
 
 - The hub has five clickable cards in the order of the table, reusing the hub cards. Vehicles, Vehicle age, Passengers and Freight each show a sparkline of their default series, the latest figure and coverage from served facts. Regions shows only its coverage, as the Housing Regions card does.
-- The sidebar places **Transport** directly after Energy and food, and its five pages show beneath it when the section is active.
+- The sidebar places **Transport** after Energy and food and Environment and climate (which went live first), and its five pages show beneath it when the section is active.
 - Breadcrumbs, headings, language links, metadata, Dataset JSON-LD and the sitemap follow the existing pattern.
 - The Georgian names are proposals; final wording follows Geostat's Georgian tables.
 

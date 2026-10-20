@@ -36,10 +36,11 @@ describe("break register", () => {
       SERIES.lifeExpectancyFemale,
       SERIES.populationDensity,
       SERIES.ageSpecificFertilityRate,
+      SERIES.midYearPopulation,
     ]);
   });
 
-  test("leaves out event counts, the infant mortality rate, migration, its citizenship groups and the single-date census counts", () => {
+  test("leaves out event counts, the infant mortality rate, migration, its citizenship groups, the single-date census counts and the marriage series", () => {
     expect(UNAFFECTED_BY_CENSUS).toEqual([
       SERIES.liveBirths,
       SERIES.deaths,
@@ -52,6 +53,12 @@ describe("break register", () => {
       SERIES.emigrantsByCitizenshipGroup,
       SERIES.censusPopulationByAge,
       SERIES.censusPopulationBySettlement,
+      SERIES.marriages,
+      SERIES.divorces,
+      SERIES.meanAgeAtMarriage,
+      SERIES.meanAgeAtFirstMarriage,
+      SERIES.meanAgeAtDivorce,
+      SERIES.meanMarriageDuration,
     ]);
   });
 

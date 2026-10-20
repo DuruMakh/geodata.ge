@@ -1,4 +1,5 @@
 import { MUNICIPAL_COUNTRY_ID } from "../municipal/types";
+import type { ReviewedAnomalies } from "./anomalies";
 import type { DensityRows } from "./densityRows";
 import type { DemographyGeography } from "./geography";
 import { CENSUS_SETTLEMENTS, CENSUS_SEXES, readCensusGrid } from "./readCensusAge";
@@ -458,6 +459,82 @@ export function checkMigrationTotals(sources: DemographySources): void {
   for (const [year, values] of totals(SOURCE_ID.migrationCitizenship)) {
     if (byAge.get(year)?.join() !== values.join()) {
       throw new DemographyStopError("identity_failed", `The migration totals of tables 32 and 33 differ in ${year}`);
+    }
+  }
+}
+
+/**
+ * Geostat's crude marriage and divorce rates are events per 1,000 of its mid-year population. Georgia's are
+ * recomputed from the served counts and mid-year population in every served year, and Georgia's and each region's
+ * row of the regional table from the first year places are served, within the one decimal displayed. This is the
+ * method the site uses for the municipalities, which Geostat publishes no rate for. A reviewed `ignore` cell (two
+ * regional divorce rates of 2018 that follow a different split of that year's divorces) is left out.
+ */
+export function checkMarriageRates(
+  sources: DemographySources,
+  geography: DemographyGeography,
+  anomalies: ReviewedAnomalies,
+  lookup: Lookup,
+  years: readonly number[],
+): RateCheck[] {
+  const perThousand = (seriesId: string, geographyId: string, year: number) =>
+    (lookup(seriesId, geographyId, year) * 1000) / lookup(SERIES.midYearPopulation, geographyId, year);
+  const checks = [
+    { check: "crude_marriage_rate", seriesId: SERIES.marriages, country: SOURCE_ID.crudeMarriageRate, regions: SOURCE_ID.crudeMarriageRateRegions },
+    { check: "crude_divorce_rate", seriesId: SERIES.divorces, country: SOURCE_ID.crudeDivorceRate, regions: SOURCE_ID.crudeDivorceRateRegions },
+  ];
+  return checks.map(({ check, seriesId, country, regions }) => {
+    const table = yearTable(sources, country, 5, [["B4", "Rate"]]);
+    const points: Point[] = years.map((year) => ({ year, label: String(year), published: table.rate(year, "B"), recomputed: perThousand(seriesId, GEORGIA, year) }));
+
+    const sheet = sheetOf(sources, regions);
+    sheet.expectLabel("A4", "regions");
+    const columns = findYearColumns(sheet, 4);
+    const placeYears = years.filter((year) => year >= COVERAGE.marriageUnitsFrom);
+    const seen = new Set<string>();
+    for (let row = 5; sheet.label(sheet.ref("A", row)) !== null; row += 1) {
+      const label = sheet.label(sheet.ref("A", row))!;
+      const unit = geography.resolve(label, "events");
+      if (unit.kind === "excluded") {
+        for (const year of placeYears) {
+          const ref = sheet.ref(columns.get(year)![0]!, row);
+          if (sheet.number(ref) !== null) throw new DemographyStopError("unexpected_value", `Excluded unit ${label} holds a rate at ${regions} ${sheet.name}!${ref}`);
+        }
+        continue;
+      }
+      // Tbilisi's one municipality is its region, and the regional table prints it under the city's name.
+      const soleMember = unit.kind === "municipality" && geography.municipalities.filter((municipality) => municipality.regionId === unit.regionId).length === 1;
+      const geographyId = unit.kind === "country" || unit.kind === "region" ? unit.geographyId : soleMember ? unit.regionId : null;
+      if (geographyId === null || seen.has(geographyId)) throw new DemographyStopError("layout_changed", `${regions} has an unexpected row ${label}`);
+      seen.add(geographyId);
+      for (const year of placeYears) {
+        const ref = sheet.ref(columns.get(year)![0]!, row);
+        const published = Number(required(sheet.published(ref, 1), `${regions} ${sheet.name}!${ref}`));
+        if (geographyId === GEORGIA && published !== table.rate(year, "B")) {
+          throw new DemographyStopError("identity_failed", `${regions} prints Georgia's ${year} rate as ${published}, but ${country} as ${table.rate(year, "B")}`);
+        }
+        if (anomalies.accepts(regions, ref, published)) continue;
+        points.push({ year, label: `${year} ${geographyId}`, published, recomputed: perThousand(seriesId, geographyId, year) });
+      }
+    }
+    if (seen.size !== 1 + geography.regions.length) throw new DemographyStopError("layout_changed", `${regions} covers ${seen.size} of Georgia and the ${geography.regions.length} regions`);
+    return worst(check, ONE_DECIMAL, points);
+  });
+}
+
+/** Georgia's marriages and divorces equal the totals of the tables by previous marital status (both sexes' columns) and by marriage duration, every year. */
+export function checkMarriageTotals(sources: DemographySources, lookup: Lookup, years: readonly number[]): void {
+  const status = yearTable(sources, SOURCE_ID.marriagesPreviousStatus, 6, [["B4", "Males"], ["B5", "Total"], ["G4", "Females"], ["G5", "Total"]]);
+  const duration = yearTable(sources, SOURCE_ID.divorcesByDuration, 6, [["B4", "Total number of divorces"]]);
+  for (const year of years) {
+    const marriages = lookup(SERIES.marriages, GEORGIA, year);
+    const divorces = lookup(SERIES.divorces, GEORGIA, year);
+    for (const [what, value, total] of [
+      ["married men by previous status", status.count(year, "B"), marriages],
+      ["married women by previous status", status.count(year, "G"), marriages],
+      ["divorces by marriage duration", duration.count(year, "B"), divorces],
+    ] as const) {
+      if (value !== total) throw new DemographyStopError("identity_failed", `${year}: ${what} add to ${value}, not Georgia's ${total}`);
     }
   }
 }

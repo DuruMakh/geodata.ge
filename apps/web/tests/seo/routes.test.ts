@@ -18,6 +18,7 @@ import { loadServedProductData } from "../../lib/data/inflation/importProducts";
 import { loadServedDemographyData } from "../../lib/data/demography/importDemography";
 import { loadServedGdpOverviewData } from "../../lib/data/gdpOverview/importGdpOverview";
 import { loadServedEconomicSectorsData } from "../../lib/data/economicSectors/importEconomicSectors";
+import { loadServedGdpExpenditureData } from "../../lib/data/gdpExpenditure/importGdpExpenditure";
 import {
   aggregateFactsForEntity,
   applyAdjaraBudgetAdjustment,
@@ -111,10 +112,12 @@ describe("indexable Fiscal.ge routes", () => {
     // The Housing methodology adds one more bilingual pair.
     // Education adds its hub, four pages, the 75 Schools and 75 Kindergartens place pages and its methodology page: 156 bilingual pairs.
     // Science and culture adds its hub, four pages, a Museums page for Georgia and each of the 11 regions and its methodology page: 18 bilingual pairs.
+    // Environment and climate adds its hub, seven pages, nine city pages, a Waste and a Forests page for Georgia and each of the 11 regions and its methodology page: 42 bilingual pairs.
     // Unemployment adds four Labour Force Survey detail pages (industries, hours, informal, young people): 4 bilingual pairs.
-    // Farming adds one Energy and food page: 1 bilingual pair.
+    // Farming adds one Energy and food page: 1 bilingual pair. GDP by expenditure adds its page and methodology page: 2 more.
+    // Marriages and divorces adds one demography page: one bilingual pair.
     // Transport adds its hub, five pages, a page for Georgia and each of the 11 regions and its methodology page: 19 bilingual pairs.
-    expect(urls).toHaveLength(1104);
+    expect(urls).toHaveLength(1194);
     expect(new Set(urls).size).toBe(urls.length);
     expect(urls.every((url) => url.startsWith("https://fiscal.ge/"))).toBe(true);
     expect(urls).toContain("https://fiscal.ge/about");
@@ -228,6 +231,7 @@ describe("indexable Fiscal.ge routes", () => {
       "/methodology/debt",
       "/methodology/gdp",
       "/methodology/economic-sectors",
+      "/methodology/gdp-expenditure",
       "/methodology/regional-economies",
       "/methodology/business",
       "/methodology/housing",
@@ -244,6 +248,7 @@ describe("indexable Fiscal.ge routes", () => {
       "/methodology/trade",
       "/methodology/external-flows",
       "/methodology/energy-food",
+      "/methodology/environment",
       "/methodology/transport",
       "/methodology/demography",
     ]);
@@ -286,6 +291,7 @@ const PAGES = [
   "/explorer/demography/age-sex",
   "/explorer/demography/migration",
   "/explorer/demography/births-deaths",
+  "/explorer/demography/marriages-divorces",
   "/methodology/demography",
 ] as const;
 
@@ -353,6 +359,7 @@ describe("demography discovery", () => {
         "/explorer/demography/age-sex",
         "/explorer/demography/migration",
         "/explorer/demography/births-deaths",
+        "/explorer/demography/marriages-divorces",
         "/explorer/demography/population/batumi",
       ]) {
         const entry = entries.find((candidate) => candidate.url === `https://fiscal.ge${path}`);
@@ -555,12 +562,12 @@ describe("sitemap lastmod reports each entity's own reviewed date", () => {
   it("dates each hub by the newest dataset its cards read", async () => {
     const latest = (...datasets: { facts: readonly { lastReviewedAt: string }[] }[]) =>
       datasets.flatMap(({ facts }) => facts.map((fact) => fact.lastReviewedAt)).sort().at(-1);
-    const [dates, gdp, sectors, regional, trade, partners, products, domestic, services, composition, inflation, inflationProducts, { sourceDocuments }, debt, balance] = await Promise.all([
-      sitemapDates(), loadServedGdpOverviewData(), loadServedEconomicSectorsData(), loadServedRegionalEconomyData(),
+    const [dates, gdp, sectors, expenditure, regional, trade, partners, products, domestic, services, composition, inflation, inflationProducts, { sourceDocuments }, debt, balance] = await Promise.all([
+      sitemapDates(), loadServedGdpOverviewData(), loadServedEconomicSectorsData(), loadServedGdpExpenditureData(), loadServedRegionalEconomyData(),
       loadServedTradeOverviewData(), loadServedTradePartnersData(), loadServedTradeProductsData(), loadServedTradeDomesticData(), loadServedTradeServicesData(), loadServedTradeCompositionData(),
       loadServedInflationData(), loadServedProductData(), loadServedLandingData(), loadServedGovernmentDebtData(), loadServedGeneralGovernmentBalanceData(),
     ]);
-    expect(dates.get(`${SITE}/explorer/economy`)).toBe(latest(gdp, sectors, regional));
+    expect(dates.get(`${SITE}/explorer/economy`)).toBe(latest(gdp, sectors, expenditure, regional));
     expect(dates.get(`${SITE}/explorer/trade`)).toBe(latest(trade, partners, products, domestic, services, composition));
     expect(dates.get(`${SITE}/explorer/inflation`)).toBe(latest(inflation, inflationProducts));
     expect(dates.get(`${SITE}/explorer`)).toBe(latest({ facts: sourceDocuments }, debt, balance));

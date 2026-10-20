@@ -17,14 +17,14 @@ async function editManifest(root: string, edit: (lines: string[]) => string[]) {
 describe("demography source package", () => {
   cleanUpTempRoots();
 
-  test("lists the 28 reviewed files with their roles", async () => {
+  test("lists the 47 reviewed files with their roles", async () => {
     const sources = await loadDemographySources(repositoryRoot);
 
     expect(sources.vintage).toBe("2026-10");
-    expect(sources.rows).toHaveLength(28);
+    expect(sources.rows).toHaveLength(47);
     const count = (role: string) => sources.rows.filter((row) => row.role === role).length;
     expect([count("canonical_input"), count("validation_only"), count("archived_not_served"), count("definitions")]).toEqual([
-      14, 9, 1, 4,
+      20, 14, 7, 6,
     ]);
   });
 

@@ -1,0 +1,170 @@
+[
+  {
+    "id": "economy.gdp_total",
+    "classificationCode": null,
+    "sortOrder": 0,
+    "officialName": "(=) GDP at market prices",
+    "labelKa": "მთლიანი მშპ",
+    "labelEn": "Total GDP"
+  },
+  {
+    "id": "gdp_use.consumption",
+    "classificationCode": "P.3",
+    "sortOrder": 1,
+    "officialName": "Final Consumption Expenditures",
+    "labelKa": "მოხმარება, სულ",
+    "labelEn": "Total consumption",
+    "headingKa": "მოხმარება",
+    "headingEn": "Consumption"
+  },
+  {
+    "id": "gdp_use.households",
+    "classificationCode": "P.3",
+    "sortOrder": 2,
+    "officialName": "Households",
+    "labelKa": "შინამეურნეობები",
+    "labelEn": "Households",
+    "headingKa": "მოხმარება",
+    "headingEn": "Consumption"
+  },
+  {
+    "id": "gdp_use.npish",
+    "classificationCode": "P.3",
+    "sortOrder": 3,
+    "officialName": "NPISH",
+    "labelKa": "შინამეურნეობების მომსახურე არაკომერციული ორგანიზაციები",
+    "labelEn": "Non-profits serving households",
+    "headingKa": "მოხმარება",
+    "headingEn": "Consumption"
+  },
+  {
+    "id": "gdp_use.households_npish",
+    "classificationCode": "P.3",
+    "sortOrder": 4,
+    "officialName": "Households and NPISH",
+    "labelKa": "შინამეურნეობები და არაკომერციული ორგანიზაციები",
+    "labelEn": "Households and non-profits",
+    "headingKa": "მოხმარება",
+    "headingEn": "Consumption"
+  },
+  {
+    "id": "gdp_use.government",
+    "classificationCode": "P.3",
+    "sortOrder": 5,
+    "officialName": "General government",
+    "labelKa": "სახელმწიფო",
+    "labelEn": "Government",
+    "headingKa": "მოხმარება",
+    "headingEn": "Consumption"
+  },
+  {
+    "id": "gdp_use.government_individual",
+    "classificationCode": "P.31",
+    "sortOrder": 6,
+    "officialName": "Individual  Goods and Services",
+    "labelKa": "სახელმწიფოს ინდივიდუალური მომსახურება",
+    "labelEn": "Government individual services",
+    "headingKa": "მოხმარება",
+    "headingEn": "Consumption"
+  },
+  {
+    "id": "gdp_use.government_collective",
+    "classificationCode": "P.32",
+    "sortOrder": 7,
+    "officialName": "Collective Services",
+    "labelKa": "სახელმწიფოს კოლექტიური მომსახურება",
+    "labelEn": "Government collective services",
+    "headingKa": "მოხმარება",
+    "headingEn": "Consumption"
+  },
+  {
+    "id": "gdp_use.investment",
+    "classificationCode": "P.5",
+    "sortOrder": 8,
+    "officialName": "Gross Capital Formation",
+    "labelKa": "ინვესტიცია, სულ",
+    "labelEn": "Total investment",
+    "headingKa": "ინვესტიცია",
+    "headingEn": "Investment"
+  },
+  {
+    "id": "gdp_use.fixed_capital",
+    "classificationCode": "P.51",
+    "sortOrder": 9,
+    "officialName": "Gross Fixed Capital Formation",
+    "labelKa": "შენობები და აღჭურვილობა",
+    "labelEn": "Buildings and equipment",
+    "headingKa": "ინვესტიცია",
+    "headingEn": "Investment"
+  },
+  {
+    "id": "gdp_use.inventories",
+    "classificationCode": "P.52",
+    "sortOrder": 10,
+    "officialName": "Changes in Inventories",
+    "labelKa": "მარაგების ცვლილება",
+    "labelEn": "Change in inventories",
+    "headingKa": "ინვესტიცია",
+    "headingEn": "Investment"
+  },
+  {
+    "id": "gdp_use.exports",
+    "classificationCode": "P.6",
+    "sortOrder": 11,
+    "officialName": "Exports of Goods and Services",
+    "labelKa": "ექსპორტი, სულ",
+    "labelEn": "Total exports",
+    "headingKa": "ექსპორტი",
+    "headingEn": "Exports"
+  },
+  {
+    "id": "gdp_use.exports_goods",
+    "classificationCode": "P.61",
+    "sortOrder": 12,
+    "officialName": "Exports of goods",
+    "labelKa": "საქონლის ექსპორტი",
+    "labelEn": "Goods exports",
+    "headingKa": "ექსპორტი",
+    "headingEn": "Exports"
+  },
+  {
+    "id": "gdp_use.exports_services",
+    "classificationCode": "P.62",
+    "sortOrder": 13,
+    "officialName": "Exports of Services",
+    "labelKa": "მომსახურების ექსპორტი",
+    "labelEn": "Services exports",
+    "headingKa": "ექსპორტი",
+    "headingEn": "Exports"
+  },
+  {
+    "id": "gdp_use.imports",
+    "classificationCode": "P.7",
+    "sortOrder": 14,
+    "officialName": "Imports of Goods and Services",
+    "labelKa": "იმპორტი, სულ",
+    "labelEn": "Total imports",
+    "headingKa": "იმპორტი",
+    "headingEn": "Imports"
+  },
+  {
+    "id": "gdp_use.imports_goods",
+    "classificationCode": "P.71",
+    "sortOrder": 15,
+    "officialName": "Imports of Goods",
+    "labelKa": "საქონლის იმპორტი",
+    "labelEn": "Goods imports",
+    "headingKa": "იმპორტი",
+    "headingEn": "Imports"
+  },
+  {
+    "id": "gdp_use.imports_services",
+    "classificationCode": "P.72",
+    "sortOrder": 16,
+    "officialName": "Imports of Services",
+    "labelKa": "მომსახურების იმპორტი",
+    "labelEn": "Services imports",
+    "headingKa": "იმპორტი",
+    "headingEn": "Imports"
+  }
+]

@@ -39,7 +39,7 @@ test("the inflation hub loads no explorer chunk", async ({ request }) => {
 // Every explorer renders a chart panel; no hub does.
 test("no topic hub loads explorer code", async ({ request }) => {
   expect(await testIdsShipped(request, "/explorer/wages/overview", ["chart-panel"])).toEqual(["chart-panel"]);
-  for (const hub of ["trade", "wages", "unemployment", "external", "money", "energy-food", "economy", "demography", "living-standards", "health", "crime", "housing", "science-culture", "transport"]) {
+  for (const hub of ["trade", "wages", "unemployment", "external", "money", "energy-food", "economy", "demography", "living-standards", "health", "crime", "housing", "science-culture", "environment", "transport"]) {
     expect(await testIdsShipped(request, `/explorer/${hub}`, ["chart-panel"]), hub).toEqual([]);
   }
 });

@@ -78,9 +78,9 @@ describe("the navigation tree", () => {
     expect(hub.sections.map((section) => [section.href, section.testId])).toEqual(["permits", "completed", "prices", "regions"].map((id) => [`/explorer/housing/${id}`, `housing-${id}-link`]));
   });
 
-  it("places Transport directly after Energy and food, with its five pages", () => {
+  it("places Transport directly after Environment and climate, with its five pages", () => {
     const hubs = NAV_TREE.map((hub) => hub.href);
-    expect(hubs.indexOf("/explorer/transport")).toBe(hubs.indexOf("/explorer/energy-food") + 1);
+    expect(hubs.indexOf("/explorer/transport")).toBe(hubs.indexOf("/explorer/environment") + 1);
     const hub = NAV_TREE.find((entry) => entry.href === "/explorer/transport")!;
     expect(hub).toMatchObject({ labelKey: "common.transport", railLabelKey: "common.dataTransport", testId: "transport-link" });
     expect(hub.sections.map((section) => [section.href, section.testId])).toEqual(["vehicles", "vehicle-age", "passengers", "freight", "regions"].map((id) => [`/explorer/transport/${id}`, `transport-${id}-link`]));

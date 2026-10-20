@@ -308,6 +308,17 @@ const TOPIC_DATASETS: Record<TopicDatasetId, { keywords: Record<Locale, readonly
     },
     sources: ["geostat"],
   },
+  "gdp-expenditure": {
+    keywords: {
+      ka: ["მშპ დანახარჯების მიხედვით", "მოხმარება", "ინვესტიცია", "ექსპორტი", "იმპორტი", "საქართველო"],
+      en: ["Georgia", "GDP by expenditure", "consumption", "investment", "exports", "imports"],
+    },
+    measurementTechnique: {
+      ka: "საქსტატის წლიური ეროვნული ანგარიშები; მშპ-ის გამოყენების კატეგორიები მიმდინარე ფასებში, მშპ-ის წილები და რეალური ზრდა.",
+      en: "Reviewed Geostat annual national accounts: GDP by categories of use at current prices, GDP shares and real volume growth.",
+    },
+    sources: ["geostat"],
+  },
   housing: {
     keywords: {
       ka: ["მშენებლობის ნებართვები", "ექსპლუატაციაში მიღებული ობიექტები", "საცხოვრებლის ფასები", "მშენებლობა", "საქართველო"],
@@ -404,6 +415,17 @@ const TOPIC_DATASETS: Record<TopicDatasetId, { keywords: Record<Locale, readonly
     measurementTechnique: {
       ka: "გადამოწმებული ამოღება საქსტატის განათლების ოფიციალური გამოქვეყნებული სტატისტიკიდან.",
       en: "Reviewed extraction from Geostat's official published education statistics.",
+    },
+    sources: ["geostat"],
+  },
+  environment: {
+    keywords: {
+      ka: ["სათბურის გაზები", "ჰაერის დაბინძურება", "ჰაერის ხარისხი", "ტემპერატურა", "ნალექი", "წყალი", "ნარჩენები", "ტყეები", "საქართველო"],
+      en: ["Georgia", "environment", "climate", "greenhouse gases", "air pollution", "air quality", "temperature", "rainfall", "water", "waste", "forests"],
+    },
+    measurementTechnique: {
+      ka: "გადამოწმებული ამოღება საქსტატის გარემოს დაცვის ოფიციალური გამოქვეყნებული სტატისტიკიდან, ისე, როგორც ცხრილები ბეჭდავს.",
+      en: "Reviewed extraction from Geostat's official published environment statistics, as its tables print them.",
     },
     sources: ["geostat"],
   },

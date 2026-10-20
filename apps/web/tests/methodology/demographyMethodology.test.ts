@@ -47,7 +47,7 @@ describe("demography methodology", () => {
     }
   });
 
-  it("archives exactly the fourteen Geostat originals it serves, with their recorded hashes", async () => {
+  it("archives exactly the twenty Geostat originals it serves, with their recorded hashes", async () => {
     const rows = await loadReviewedSourceManifest(root, "demography");
     expect(rows.map((row) => [row.source_id, row.byte_size, row.sha256])).toEqual([
       ["source.geostat_demography_density", 13_917, "77d29d84cb7530f4fb6294f17a768e220f02636d77debfc438509b5c17ac28b8"],
@@ -57,16 +57,22 @@ describe("demography methodology", () => {
       ["source.geostat_demography_crude_birth_rate", 10_365, "9a22452c6363f3b55f43487811fbf9169e6d94b01432a0f8ad393f39d63c55db"],
       ["source.geostat_demography_crude_death_rate", 10_249, "76c2f5d4a152d7e0241c0a7582efbc59c7b2a12d41243fee1a5fed9e3cfce07e"],
       ["source.geostat_demography_deaths", 25_857, "e3f63ef59c1dc81973d38077b062ddc7d63fb4c77650358f7a5295ebeb911a5f"],
+      ["source.geostat_demography_divorces", 25_697, "62d4c28949048205d1cbe06f1242b8745e45888a0e52c85e751b02080faeaca5"],
       ["source.geostat_demography_fertility", 12_201, "86bf7dc84062e4356cd62626dcda9bbf0e9bb56a74e063e08b1dfa04413a75aa"],
       ["source.geostat_demography_infant_mortality", 11_517, "ca9e127b04eeef4be4af0038ffc4605ed11fddddb14b38f7b432e5a6753160d1"],
       ["source.geostat_demography_life_expectancy", 11_040, "fc679c041fe6190848056081977afa8d0e17db103667176a5c02e918d70fb6d6"],
+      ["source.geostat_demography_marriage_duration", 10_795, "a1fed7dd3880fb0a5f5cbafb71a9779a12ba18a2d7e15060d95959e7284f8255"],
+      ["source.geostat_demography_marriages", 27_775, "97bcacae08ab6ecf440e6e47700d50e3bebefcc754e374ead9931ecf9e1ba1ca"],
+      ["source.geostat_demography_mean_age_divorced", 12_053, "85f9546a3b2cc5095b232489442a374fc1009941c2ab7f2c4dbaff8752b02424"],
+      ["source.geostat_demography_mean_age_spouses", 11_918, "9197bcc024a78fcea5569ecee765f07ed1604831403f21e007c962d7464b2d38"],
       ["source.geostat_demography_migration_citizenship", 25_694, "6b7fc1d8714e3acacaa5167b8e7c424a3ddb2a13f9c60a95cbd700cd83bb20a0"],
       ["source.geostat_demography_natural_increase", 26_528, "db4c2d808f17936de45cf5b8be6eb2f7c267c9b09ce7a182f873c3fd4591417e"],
       ["source.geostat_demography_net_migration", 11_440, "05aedd93e72ba63ab12b13feec8c46d6ce8870dadef3ece94fc7b87f65fa2196"],
+      ["source.geostat_demography_population_mid_year", 35_244, "1b443df324a99d7036bbff3dffbc9a8a0ae4ef0c3e0f2ccace45626e440458d6"],
       ["source.geostat_census2024_population_by_age_settlement", 111_570, "691329dbd890070a888234f2f182496e4132f67948879675a188584c5e34dec7"],
     ]);
     expect(rows.every((row) => row.downloadHref.startsWith("/downloads/methodology/demography/files/"))).toBe(true);
-    expect(rows.map((row) => [row.years[0], row.years.at(-1)])).toEqual([[2014, 2026], [2004, 2026], [2004, 2026], ...Array(7).fill([2014, 2025]), [2012, 2025], [2014, 2025], [2012, 2025], [2024, 2024]]);
+    expect(rows.map((row) => [row.years[0], row.years.at(-1)])).toEqual([[2014, 2026], [2004, 2026], [2004, 2026], ...Array(4).fill([2014, 2025]), [1994, 2025], ...Array(3).fill([2014, 2025]), ...Array(4).fill([1994, 2025]), [2012, 2025], [2014, 2025], [2012, 2025], [1994, 2025], [2024, 2024]]);
   });
 
   it("keeps the UTF-8 BOM on its Georgian archive manifest, as AGENTS.md requires of Georgian methodology manifests", async () => {
@@ -85,12 +91,18 @@ describe("demography methodology", () => {
       "Crude birth rate (Live births per 1 000 population)",
       "Crude death rate (death per 1 000 population)",
       "Number of deaths by regions and self-governed units",
+      "Number of registered divorces by regions and self-governed units",
       "Age specific fertility rates and total fertility rate (TFR)",
       "Infant mortality rate by sex (infant deaths per 1,000 live births)",
       "Life expectancy at births by sex",
+      "Average duration of marriage (years)",
+      "Number of registered marriages by regions and self-governed units",
+      "Mean age of divorced people by order of marriages and sex",
+      "Mean age of spouses by order of marriages and sex",
       "Number of immigrants and emigrants by sex and citizenship",
       "Natural increase by regions and self-governed units",
       "Net migration (number and rate)",
+      "Mid-year population by self-governed units",
       "Population by regions, self-governed units, 5-year age groups, urban-rural settlements and sex (as of November 14, 2024)",
     ]);
   });

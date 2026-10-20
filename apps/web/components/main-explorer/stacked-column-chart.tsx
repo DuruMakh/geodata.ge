@@ -57,6 +57,8 @@ export type StackedColumnChartProps = {
   periodsPerYear?: number;
   /** A colour key drawn as a swatch row above the plot, so colour is never the only cue (DESIGN.md §13); none when absent or empty. */
   legend?: { id: string; label: string; color: string }[];
+  /** Counting changes drawn as a dashed rule before their period, as the line chart draws them; none when absent. */
+  breaks?: ReadonlyArray<{ period: number; label: string }>;
 };
 
 const W = 920;
@@ -150,6 +152,7 @@ export function StackedColumnChart({
   frameLabel,
   periodsPerYear = 12,
   legend,
+  breaks,
 }: StackedColumnChartProps) {
   const captionId = useId();
   const { ref: layoutRef, mobileWidth } = useChartLayout<HTMLElement>();
@@ -401,6 +404,22 @@ export function StackedColumnChart({
         {hover !== null && isActive ? (
           <line data-hover-guide x1={x(hover)} x2={x(hover)} y1={PAD_T - 6} y2={height - PAD_B} stroke={CHART_LATTICE} strokeWidth={1} />
         ) : null}
+
+        {(breaks ?? []).map((entry) => {
+          // A break needs the period before it on the axis; a range that starts at it has nothing to separate.
+          const index = periods.indexOf(entry.period);
+          if (index < 1) return null;
+          const bx = px(x(index) - band / 2);
+          const toTheLeft = bx > width / 2;
+          return (
+            <g key={`break-${entry.period}`} data-testid="chart-break">
+              <line x1={bx} x2={bx} y1={PAD_T} y2={height - PAD_B} stroke={CHART_AXIS_LABEL} strokeWidth={1} strokeDasharray="4 3" />
+              <text x={toTheLeft ? bx - 5 : bx + 5} y={PAD_T + 10} fontSize={FONT} fill={CHART_AXIS_LABEL} textAnchor={toTheLeft ? "end" : "start"} style={{ fontFamily: "var(--font-numeric)" }}>
+                {entry.label}
+              </text>
+            </g>
+          );
+        })}
 
         {overlayPath !== null && overlayPath !== "" && (
           <path data-overlay d={overlayPath} fill="none" stroke={INK} strokeWidth={1.5} />

@@ -16,8 +16,8 @@ for (const locale of ["ka", "en"] as const) {
       await page.keyboard.press("Enter");
       await expect(toggle).toHaveAttribute("aria-expanded", "true");
       const nav = header.getByRole("navigation", { includeHidden: false });
-      // მთავარი, the seventeen dataset hubs (in place of the single budget-only data link), AI, მიზანი.
-      await expect(nav.getByRole("link")).toHaveCount(21);
+      // მთავარი, the nineteen dataset hubs (in place of the single budget-only data link), AI, მიზანი.
+      await expect(nav.getByRole("link")).toHaveCount(22);
       await expect(nav.getByRole("link").first()).toHaveAttribute("aria-current", "page");
       const languages = header.getByRole("group");
       await expect(languages).toBeVisible();

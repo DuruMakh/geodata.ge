@@ -126,6 +126,24 @@ export function RegionMap({ model, activeRegionId, onActiveRegionChange, metric 
             </a>
           );
         })}
+        {/* A region without a value is drawn in the no-data fill; its list row links to its page. */}
+        {(model.withoutValue ?? []).map((region) => (
+          <path
+            key={region.regionId}
+            data-testid="regional-map-path"
+            data-region-id={region.regionId}
+            data-no-value=""
+            d={region.pathD}
+            fill={MAP_NO_DATA_FILL}
+            fillRule="evenodd"
+            clipRule="evenodd"
+            stroke={region.regionId === activeRegionId ? "var(--ink)" : "var(--hairline-soft)"}
+            strokeWidth={region.regionId === activeRegionId ? 2.2 : 0.7}
+            strokeLinejoin="round"
+            pointerEvents="none"
+            aria-hidden="true"
+          />
+        ))}
         {/* Fingertip-sized hit areas for regions smaller than 24px on a phone
             (Tbilisi). Coarse pointers only, so mouse hover and clicks are unchanged;
             hidden from assistive technology, which reaches the region's own link. */}

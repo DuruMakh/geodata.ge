@@ -40,13 +40,14 @@ const inventoryRules = {
     { root: "docs/Raw Data/Economy/economic-sectors/sources", include: extension(".xlsx") },
     { root: "docs/Raw Data/Economy/gdp-overview/sources", include: (candidatePath: string) => path.posix.basename(candidatePath) === "geostat_nominal_current.xlsx" },
   ],
+  "gdp-expenditure": [{ root: "docs/Raw Data/Economy/gdp-expenditure/sources", include: extension(".xlsx") }],
   "regional-economies": [
     { root: "docs/Raw Data/Economy/regional-economies/sources", include: (candidatePath: string) => path.posix.basename(candidatePath) === "regional-GDP-by-activities-ENG.xlsx" },
     { root: "docs/Raw Data/Municipalities/geostat-population-regional-gdp/official", include: (candidatePath: string) => path.posix.basename(candidatePath) === "regional-GDP-ENG.xlsx" },
   ],
   demography: [
     { root: "docs/Raw Data/Municipalities/geostat-population-regional-gdp/official", include: (candidatePath: string) => path.posix.basename(candidatePath) === "01-population-by-self-governed-unit.xlsx" },
-    { root: "docs/Raw Data/Demography/geostat-demography/2026-10/official", include: (candidatePath: string) => ["02-population-by-age-groups-and-sex.xlsx", "03-density-by-regions.xlsx", "09-number-of-live-births-by-self-governed-units.xlsx", "15-crude-birth-rate.xlsx", "16-age-specific-fertility-rates-and-total-fertility-rate.xlsx", "19-number-of-deaths-by-self-governed-units.xlsx", "24-crude-death-rate.xlsx", "25-infant-mortality-rate-by-sex.xlsx", "28-life-expectancy-at-births-by-sex.xlsx", "29-Natural-increase-by-regions-and-self-governed-units.xlsx", "31-net-migration.xlsx", "33-number-of-immigrants-and-emigrants-by-sex-and-citizenship.xlsx", "1.1-population-by-region-unit-age-settlement-sex.xlsx"].includes(path.posix.basename(candidatePath)) },
+    { root: "docs/Raw Data/Demography/geostat-demography/2026-10/official", include: (candidatePath: string) => ["02-population-by-age-groups-and-sex.xlsx", "03-density-by-regions.xlsx", "09-number-of-live-births-by-self-governed-units.xlsx", "15-crude-birth-rate.xlsx", "16-age-specific-fertility-rates-and-total-fertility-rate.xlsx", "19-number-of-deaths-by-self-governed-units.xlsx", "24-crude-death-rate.xlsx", "25-infant-mortality-rate-by-sex.xlsx", "28-life-expectancy-at-births-by-sex.xlsx", "29-Natural-increase-by-regions-and-self-governed-units.xlsx", "31-net-migration.xlsx", "33-number-of-immigrants-and-emigrants-by-sex-and-citizenship.xlsx", "1.1-population-by-region-unit-age-settlement-sex.xlsx", "04-mid-year-population-by-self-governed-units.xlsx", "34-Marriages-by-self-governed-units.xlsx", "40-Mean-age-of-spouses.xlsx", "41-Divorces-by-self-governed-units.xlsx", "47-Average-duration-of-marriage.xlsx", "48-Mean-age-of-divorced-people.xlsx"].includes(path.posix.basename(candidatePath)) },
   ],
   inflation: [{ root: "docs/Raw Data/Inflation", include: (candidatePath: string) => [".xlsx", ".pdf"].includes(path.posix.extname(candidatePath).toLowerCase()) }],
   debt: [
@@ -72,6 +73,8 @@ const inventoryRules = {
   "science-culture": [{ root: "docs/Raw Data/ScienceCulture/geostat-science-culture-annual/official", include: () => true }],
   // The English workbooks, their Georgian versions (kept for the Georgian labels) and both page captures; served and archived-only alike.
   crime: [{ root: "docs/Raw Data/Crime/geostat-crime-annual/official", include: () => true }],
+  // The 13 served English workbooks, their Georgian versions (kept for the Georgian labels), the 14 archived-only workbooks and the six page captures.
+  environment: [{ root: "docs/Raw Data/Environment/geostat-environment-annual/official", include: () => true }],
   money: [{ root: "docs/Raw Data/Money/nbg-money-banks-annual/official", include: () => true }],
   business: [{ root: "docs/Raw Data/Business/geostat-business-annual/official", include: () => true }],
   // The six served workbooks, the two zips and their members, the other price and cost workbooks, and the three page captures.
