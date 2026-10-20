@@ -17,9 +17,10 @@ Budget and GDP data are annual, so it does not provide sub-annual or live budget
 - [Government debt explorer](https://fiscal.ge/explorer/debt) — annual government debt stock, debt service and weighted-average interest rates.
 - [Deficit explorer](https://fiscal.ge/explorer/deficit) — the IMF general-government balance as a share of GDP and in GEL, with IMF projection years marked.
 
-- [Economy](https://fiscal.ge/explorer/economy) — the economy section: GDP, national economic sectors and regional economies.
+- [Economy](https://fiscal.ge/explorer/economy) — the economy section: GDP, national economic sectors, GDP by expenditure and regional economies.
 - [Economy overview](https://fiscal.ge/explorer/economy/gdp) — real GDP, annual real growth, nominal GDP and nominal GDP per person.
 - [Economic sectors](https://fiscal.ge/explorer/economy/sectors) — 20 national economic activities plus a Total GDP reference.
+- [GDP by expenditure](https://fiscal.ge/explorer/economy/expenditure) — what GDP is spent on: household and government consumption, investment, exports and imports, 2010–2025, as amounts, shares of GDP and real growth. Browse-only: there is no MCP tool and no bulk file for it.
 - [Regional economies](https://fiscal.ge/explorer/economy/regions) — choose one of 11 regions and explore total regional GDP plus 20 activities, 2010–2024.
 - [Business](https://fiscal.ge/explorer/business) — the business section: Geostat's annual business statistics on firms' sales, jobs, investment, profit and loss, and firms opened and closed, 1999–2025. Browse-only: there is no MCP tool and no bulk file for business.
 - [Sales](https://fiscal.ge/explorer/business/sales) — firms' turnover in million GEL, 1999–2025, in total, by firm size (large, medium, small) and by Geostat's 14 industry groups.
@@ -123,6 +124,7 @@ Budget and GDP data are annual, so it does not provide sub-annual or live budget
 
 - [GDP methodology](https://fiscal.ge/methodology/gdp) — price bases, series coverage, preliminary status and original sources.
 - [Economic sectors methodology](https://fiscal.ge/methodology/economic-sectors) — sector GVA versus GDP, GDP shares, annual real growth and preliminary status.
+- [GDP by expenditure methodology](https://fiscal.ge/methodology/gdp-expenditure) — the expenditure identity, imports shown as positive amounts, GDP shares, real growth and preliminary status.
 - [Regional economies methodology](https://fiscal.ge/methodology/regional-economies) — regional GVA at basic prices, regional GDP at market prices, calculations and original sources.
 - [Business methodology](https://fiscal.ge/methodology/business) — Geostat's survey of enterprises and business demography: turnover, persons employed, investment, profit and loss, firm sizes, the 2006 coverage change, regions and original files.
 - [Housing methodology](https://fiscal.ge/methodology/housing) — Geostat's building permits and completed buildings, the home price index (fourth quarter of each year), Tbilisi asking prices, definitions, gaps and original files.

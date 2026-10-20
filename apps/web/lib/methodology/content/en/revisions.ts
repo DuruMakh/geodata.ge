@@ -9,6 +9,7 @@ export const METHODOLOGY_TRANSLATION_REVIEWED_AT: Readonly<Record<MethodologyDat
   debt: "2026-09-06",
   gdp: "2026-09-11",
   "economic-sectors": "2026-09-11",
+  "gdp-expenditure": "2026-10-20",
   "regional-economies": "2026-09-13",
   inflation: "2026-09-11",
   unemployment: "2026-10-20",

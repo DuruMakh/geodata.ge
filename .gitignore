@@ -48,6 +48,7 @@ data/reports/*.json
 !data/reports/education-validation.json
 !data/reports/science-culture-validation.json
 !data/reports/household-income-spending-validation.json
+!data/reports/gdp-expenditure-validation.json
 data/reports/*.txt
 
 # local-only planning/source/prototype material

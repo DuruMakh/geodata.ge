@@ -81,6 +81,7 @@ model SourceDocument {
   governmentDebtFacts GovernmentDebtFact[]
   gdpOverviewFacts GdpOverviewFact[]
   economicSectorFacts EconomicSectorFact[]
+  gdpExpenditureFacts GdpExpenditureFact[]
   unemploymentFacts UnemploymentFact[]
   tradeOverviewFacts TradeOverviewFact[]
   tradePartnerFacts TradePartnerFact[]
@@ -137,6 +138,7 @@ model ImportRun {
   generalGovernmentBalanceFacts GeneralGovernmentBalanceFact[]
   gdpOverviewFacts GdpOverviewFact[]
   economicSectorFacts EconomicSectorFact[]
+  gdpExpenditureFacts GdpExpenditureFact[]
   unemploymentFacts UnemploymentFact[]
   tradeOverviewFacts TradeOverviewFact[]
   tradePartnerEntities TradePartnerEntity[]
@@ -514,6 +516,27 @@ model UnemploymentFact {
 }
 
 model EconomicSectorFact {
+  seriesId String
+  measure String
+  year Int
+  value Decimal @db.Decimal(40,20)
+  unit String
+  valuation String
+  priceBasis String
+  calculation String
+  status String
+  sourceLocator String
+  sourceDocumentId String
+  sourceDocument SourceDocument @relation(fields: [sourceDocumentId], references: [id])
+  lastReviewedAt DateTime @db.Date
+  importRunId String?
+  importRun ImportRun? @relation(fields: [importRunId], references: [id])
+  @@id([seriesId, measure, year])
+}
+
+// Mirror of data/imports/gdp-expenditure-annual.csv: Geostat's GDP by categories of use, the
+// economic-sector columns, exact stored decimals.
+model GdpExpenditureFact {
   seriesId String
   measure String
   year Int

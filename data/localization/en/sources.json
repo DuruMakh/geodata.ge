@@ -835,6 +835,27 @@
     },
     "derivation": null
   },
+  "source.geostat_gdp_use_current": {
+    "name": {
+      "text": "Geostat GDP by categories of use at current prices",
+      "reviewedAt": "2026-10-20"
+    },
+    "derivation": null
+  },
+  "source.geostat_gdp_use_growth": {
+    "name": {
+      "text": "Geostat real GDP growth by categories of use",
+      "reviewedAt": "2026-10-20"
+    },
+    "derivation": null
+  },
+  "source.geostat_gdp_use_volume": {
+    "name": {
+      "text": "Geostat GDP by categories of use at constant 2019 prices",
+      "reviewedAt": "2026-10-20"
+    },
+    "derivation": null
+  },
   "source.geostat_cpi_index_2010": {
     "name": {
       "text": "Geostat consumer price index, 2010 average = 100",

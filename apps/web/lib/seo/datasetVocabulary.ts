@@ -308,6 +308,17 @@ const TOPIC_DATASETS: Record<TopicDatasetId, { keywords: Record<Locale, readonly
     },
     sources: ["geostat"],
   },
+  "gdp-expenditure": {
+    keywords: {
+      ka: ["მშპ დანახარჯების მიხედვით", "მოხმარება", "ინვესტიცია", "ექსპორტი", "იმპორტი", "საქართველო"],
+      en: ["Georgia", "GDP by expenditure", "consumption", "investment", "exports", "imports"],
+    },
+    measurementTechnique: {
+      ka: "საქსტატის წლიური ეროვნული ანგარიშები; მშპ-ის გამოყენების კატეგორიები მიმდინარე ფასებში, მშპ-ის წილები და რეალური ზრდა.",
+      en: "Reviewed Geostat annual national accounts: GDP by categories of use at current prices, GDP shares and real volume growth.",
+    },
+    sources: ["geostat"],
+  },
   housing: {
     keywords: {
       ka: ["მშენებლობის ნებართვები", "ექსპლუატაციაში მიღებული ობიექტები", "საცხოვრებლის ფასები", "მშენებლობა", "საქართველო"],

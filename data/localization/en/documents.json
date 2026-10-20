@@ -2984,6 +2984,51 @@
     },
     "documentLanguage": "en"
   },
+  "source.geostat_gdp_use_current": {
+    "title": {
+      "text": "Geostat GDP by categories of use at current prices",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "source.geostat_gdp_use_growth": {
+    "title": {
+      "text": "Geostat real GDP growth by categories of use",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "source.geostat_gdp_use_volume": {
+    "title": {
+      "text": "Geostat GDP by categories of use at constant 2019 prices",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
   "source.geostat_cpi_index_2010": {
     "title": {
       "text": "Consumer price indices in Georgia, 2010 average = 100",

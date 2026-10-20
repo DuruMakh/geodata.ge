@@ -573,5 +573,7 @@
   "/explorer/environment/forests/samtskhe_javakheti": "2026-10-20",
   "/explorer/environment/forests/kvemo_kartli": "2026-10-20",
   "/explorer/environment/forests/shida_kartli": "2026-10-20",
-  "/methodology/environment": "2026-10-20"
+  "/methodology/environment": "2026-10-20",
+  "/explorer/economy/expenditure": "2026-10-20",
+  "/methodology/gdp-expenditure": "2026-10-20"
 }
