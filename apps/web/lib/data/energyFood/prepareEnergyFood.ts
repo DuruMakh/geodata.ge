@@ -12,6 +12,8 @@ import { validateEnergyFoodFacts } from "./validation";
 
 const RESEARCH = "docs/Raw Data/EnergyFood/geostat-energy-food-annual";
 export const REVIEWED_AT = "2026-10-11";
+/** The farming rows were added and reviewed later than the energy and food rows. */
+export const FARMING_REVIEWED_AT = "2026-10-20";
 export const ENERGY_FOOD_CSV_HEADERS = ["year", "indicator_id", "value", "published_value", "unit", "basis", "value_status", "source_id", "source_sheet", "source_cell", "source_number_format", "last_reviewed_at"];
 type Source = { source_id: string; local_file: string; sha256: string; bytes: number };
 export type WorkbookCell = { token?: string; text?: string };
@@ -65,7 +67,7 @@ export function readWorkbookCells(bytes: Uint8Array): Map<string, WorkbookCell> 
 const isDash = (cell: WorkbookCell | undefined) => cell?.text?.replace(/\s/g, "") === "-";
 
 /**
- * Promotes the research package's 681 primary observations into the canonical
+ * Promotes the research package's 1,389 primary observations into the canonical
  * serving CSV. Every value is re-read from its archived workbook cell.
  */
 export async function prepareEnergyFoodData(repositoryRoot: string, mode: "write" | "check"): Promise<void> {
@@ -89,7 +91,8 @@ export async function prepareEnergyFoodData(repositoryRoot: string, mode: "write
     return {
       year: Number(row.year), indicatorId: row.indicator_id as EnergyFoodFact["indicatorId"], value: row.value, publishedValue: row.published_value,
       unit: row.unit as EnergyFoodFact["unit"], basis: row.basis as "actual", valueStatus: row.value_status as EnergyFoodFact["valueStatus"],
-      sourceId: row.source_id, sourceSheet: row.source_sheet, sourceCell: row.source_cell, sourceNumberFormat: row.source_number_format, lastReviewedAt: REVIEWED_AT,
+      sourceId: row.source_id, sourceSheet: row.source_sheet, sourceCell: row.source_cell, sourceNumberFormat: row.source_number_format,
+      lastReviewedAt: row.indicator_id.startsWith("farming.") ? FARMING_REVIEWED_AT : REVIEWED_AT,
     };
   });
   validateEnergyFoodFacts(facts);
@@ -98,7 +101,7 @@ export async function prepareEnergyFoodData(repositoryRoot: string, mode: "write
   const years = facts.map(f => f.year);
   const acceptance: EnergyFoodAcceptance = {
     status: "passed", years: { min: Math.min(...years), max: Math.max(...years) }, observations: facts.length,
-    researchStatus: report.status, canonicalSha256: createHash("sha256").update(csv).digest("hex"), reviewedAt: REVIEWED_AT,
+    researchStatus: report.status, canonicalSha256: createHash("sha256").update(csv).digest("hex"), reviewedAt: facts.map(f => f.lastReviewedAt).sort().at(-1)!,
   };
   for (const [relative, content] of [["data/imports/energy-food-annual.csv", csv], ["data/reports/energy-food-validation.json", `${JSON.stringify(acceptance, null, 2)}\n`]]) {
     const target = path.join(repositoryRoot, relative);
