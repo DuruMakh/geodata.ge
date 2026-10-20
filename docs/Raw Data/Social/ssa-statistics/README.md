@@ -20,7 +20,7 @@ Start with these files. The CSVs use UTF-8 with BOM, so they open correctly in E
 - `browser-annual-amounts.csv` retains the original preliminary browser-read totals unchanged. The narrative figures below describe that research snapshot; use the generated tables and review notes for subsequent analysis.
 - `annual-amounts.csv` contains 256 programme-year records for 22 programmes, with the number of observed months and the last recipient month retained.
 - `ssa-national-annual.csv`, `ssa-programmes-monthly.csv`, and `ssa-programmes-areas-annual.csv` retain the broader national table values, monthly programme values with source columns, and annual area figures.
-- `source-findings.csv` preserves differences between printed totals and sums of area rows, blank headings and working rows; it does not replace official values with reconciled estimates.
+- `source-findings.csv` preserves differences between printed totals and sums of area rows, blank headings and working rows, and the months where the social package people table's national row leaves a group cell blank or prints a total that differs from its groups (`sum_of_areas` then holds the groups' sum); it does not replace official values with reconciled estimates.
 - `reviewed-browser-differences.csv` documents five exact differences from the preliminary file, with the affected source cells and reasons. Validation rejects any changed or unused exception.
 
 ## Extraction decisions reviewed on 18 October 2026
@@ -40,12 +40,12 @@ Source collection and successful extraction checks do not approve these data for
 
 ## Served file
 
-`ssa-served-annual.csv` (UTF-8 with BOM) holds the 2013–2025 yearly values the Pensions, Subsistence allowance, Social package and Social payments pages are built from: 16,335 rows, one for each programme, measure, place and year. Every value keeps the workbook, sheet and cells it is read from. `prepare.py` writes it, `--check` covers it, and `verify_independent.mjs` reads every row's cells again with SheetJS.
+`ssa-served-annual.csv` (UTF-8 with BOM) holds the 2013–2025 yearly values the Pensions, Subsistence allowance, Social package and Social payments pages are built from: 16,443 rows, one for each programme, measure, place and year. Every value keeps the workbook, sheet and cells it is read from. `prepare.py` writes it, `--check` covers it, and `verify_independent.mjs` reads every row's cells again with SheetJS.
 
 | Column | Meaning |
 | --- | --- |
 | `programme` | The package's programme id, as in `annual-amounts.csv`, plus `tsa_registered` (families and persons registered in the targeted social assistance database, table `tsa_db-01`) and `social_package_group`. |
-| `measure` | `recipients` (the December count; families for `subsistence_allowance` and `tsa_registered`), `persons`, `employment_families`, `amount` (the sum of the monthly "amount transferred"), `employment_amount`, `regular_amount`, `count_months_sum`, `regular_count_months_sum`, and `group.<group>.recipients` / `group.<group>.amount`. |
+| `measure` | `recipients` (the December count; families for `subsistence_allowance` and `tsa_registered`), `persons`, `employment_families`, `amount` (the sum of the monthly "amount transferred"), `employment_amount`, `regular_amount`, `count_months_sum`, `regular_count_months_sum`, and `group.<group>.recipients` / `group.<group>.amount` / `group.<group>.count_months_sum`. |
 | `geography_id` | The site's own ids. `country.georgia` is SSA's national total row. `region.<id>` is SSA's printed region subtotal row, and `region.tbilisi` SSA's Tbilisi total row. Two-digit municipality codes add up the SSA rows `area-mapping.csv` assigns to that municipality. `unit.akhalgori` covers both Akhalgori labels and `unit.upper_abkhazia` the Upper Abkhazia row. Tbilisi is never served as municipality `04`. |
 | `months` | How many monthly sheets (or month columns) the value is read from: 1 for a December count. A year SSA published in part keeps its published months, for example workplace injury 2013 (9), COVID-19 compensation 2020 and 2021 (6 each) and the high-mountain supplements 2016 (4). |
 | `value_status` | `official` for one printed cell, `calculated` for anything the package adds up: a 12-month sum, a month-count sum, a municipality made of several SSA rows, and the calculated social package groups. |
@@ -57,10 +57,10 @@ What is served:
 - **Pensions** (`pension`, `pension_idp`, `pension_highmountain`) and **subsistence allowance**, nationally and for every region, municipality and unit. `tsa_registered`: `recipients` and `persons` for the same places. The registered counts are also in `ssa-programmes-areas-annual.csv`.
 - Pensions: `recipients`, `amount`, and `count_months_sum`, which adds the monthly recipient counts over the months that also have money. The average monthly payment is `amount / count_months_sum`.
 - Subsistence allowance: `recipients` and `persons` are the regular recipients. From 2022 `employment_families` counts the families kept on the allowance through the employment programme. `amount` includes the employment programme's money and `employment_amount` is that part. `regular_amount = amount - employment_amount`, and `regular_count_months_sum` adds the monthly regular family counts. The average per family is `regular_amount / regular_count_months_sum`.
-- **Social package**, nationally: `recipients`, `amount` and `count_months_sum`, and the eligibility groups as `social_package_group`.
+- **Social package**, nationally: `recipients`, `amount` and `count_months_sum`, and the eligibility groups as `social_package_group`. Each group has `recipients`, `amount` and `count_months_sum`, which adds the group's monthly people counts over the months that also have its money, with the same column mapping as its December count. A group's average monthly benefit is `group.<group>.amount / group.<group>.count_months_sum`. `group.total.count_months_sum` equals `count_months_sum`.
 - The **other programmes** on the Social payments page: national `amount` only. No recipient counts are served for them, so the two blank March 2020 counts of the electricity programmes are not used here.
 
-**Social package groups.** SSA prints one column for each eligibility group. The groups `disability`, `survivors`, `war_participants`, `political_repression` and `other` partition SSA's printed total every year. The disability severity columns are parts of `disability` and are not added to the partition. The checks confirm both, in people and in money. Each SSA design maps as follows:
+**Social package groups.** SSA prints one column for each eligibility group. The groups `disability`, `survivors`, `war_participants`, `political_repression` and `other` partition SSA's printed total every year. The disability severity columns are parts of `disability` and are not added to the partition. The checks confirm both, in people and in money, and the partition also in the yearly month-count sums. Each SSA design maps as follows:
 
 | Design (both tables) | Printed columns |
 | --- | --- |
@@ -70,11 +70,13 @@ What is served:
 | 2022 – 2024 | The utility-subsidy column is gone: `other` is compensation recipients and "other". |
 | 2025 | Each group has breakdown columns (social package recipient, state compensation recipient, disabled from childhood) and a "/ სულ" total. Only the "/ სულ" columns are read. `disability` is the four severity "/ სულ" columns added (`calculated`; 2025 December: 18,819 + 32,151 + 73,514 + 5,998). `other` is defence veterans (თავდაცვის ძალების ვეტერანები) and social package by acquired right (სოციალური პაკეტი მოპოვებული უფლებით). |
 
-Columns are matched by heading on every monthly sheet, because SSA changed the design in the middle of 2017 and 2019. A heading not in this mapping stops preparation. Three source points are handled explicitly:
+Columns are matched by heading on every monthly sheet, because SSA changed the design in the middle of 2017 and 2019. A heading not in this mapping stops preparation. Five source points are handled explicitly:
 
 - **2019 money headings (reviewed override).** In January–May 2019 the money table (`socpackage-02`) already prints the June design's heading "war participants" over column J. For the same column, the people table (`socpackage-01`) prints utility-subsidy recipients, and it has no war participants until June 2019. Column J's money is a steady 22.45 GEL a month per utility-subsidy recipient, and the money table has no other utility-subsidy column in those months. `HEADING_OVERRIDES` in `prepare.py` therefore uses the people table's heading for those five money sheets. The 746,479 GEL is in `other`, and `group.war_participants.amount` 2019 covers June–December (`months` 7). An override that no longer matches its sheet's printed heading stops preparation.
 - **May 2022 money total.** SSA's printed total (`socpackage-02` L85, 27,464,062.75 GEL) is 56 GEL less than its own group columns F:K. That printed total is served. The partition check allows exactly this recorded difference, and no other.
 - **2017 severity money** covers October–December only (`months` 3), because the columns start in October 2017. The December 2017 counts are complete.
+- **May 2021 people total.** SSA's printed total (`socpackage-01` M91, 176,572) is 1 more than its own group columns F:L (176,571). The printed total is used, so the groups' 2021 month-count sums add up to 1 less than the total's. The partition check allows exactly this recorded difference (a `source-findings.csv` row).
+- **July 2022 moderate disability count.** SSA's national row leaves the moderate-disability cell blank (`socpackage-01` July E85; the area rows above it are filled). Blank is not zero: `group.disability_moderate.count_months_sum` 2022 covers 11 months while its money covers 12, so no 2022 average is calculated for that group (a `source-findings.csv` row).
 
 ## In short
 

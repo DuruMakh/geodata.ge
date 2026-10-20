@@ -11,9 +11,9 @@
   "programme_monthly_rows": 2904,
   "programme_annual_rows": 256,
   "programme_area_rows": 21464,
-  "served_rows": 16335,
+  "served_rows": 16443,
   "area_total_checks": 131047,
-  "area_total_differences": 748,
+  "area_total_differences": 750,
   "independent_browser_rows_compared": 256,
   "reviewed_browser_differences": 5
  },

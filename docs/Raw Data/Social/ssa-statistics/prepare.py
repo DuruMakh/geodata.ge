@@ -722,9 +722,11 @@ SOCIAL_PACKAGE_GROUPS = {
 }
 SOCIAL_PACKAGE_BREAKDOWNS = ('სოციალური პაკეტის მიმღები', 'სახელმწიფო კომპენსაციის მიმღები', 'შშმპ ბავშვობიდან')
 DISABILITY_PARTS = ('disability_children', 'disability_severe', 'disability_significant', 'disability_moderate')
-# Where SSA's printed total differs from its own group columns. May 2022 money: the total (socpackage-02 L85,
-# 27,464,062.75) is 56 GEL less than the group columns F:K. The check allows exactly these differences.
-SOCIAL_PACKAGE_GROUP_DIFFERENCES = {(2022, 'amount'): Decimal(56)}
+# Where SSA's printed total differs from its own group columns (the groups less the total). May 2022 money: the total
+# (socpackage-02 L85, 27,464,062.75) is 56 GEL less than the group columns F:K. May 2021 people: the total (socpackage-01
+# M91, 176,572) is 1 more than the group columns F:L, so the year's month-count sums differ by -1. The check allows
+# exactly these differences.
+SOCIAL_PACKAGE_GROUP_DIFFERENCES = {(2022, 'amount'): Decimal(56), (2021, 'count_months_sum'): Decimal(-1)}
 GROUP_MEMBERS = ('disability', 'survivors', 'war_participants', 'political_repression', 'other')  # partition the total
 GROUPS = ('total', 'disability', *DISABILITY_PARTS, 'survivors', 'war_participants', 'political_repression', 'other')
 
@@ -921,10 +923,13 @@ def served_annual(parsed, index, mapping, failures):
     summed('social_package', 'count_months_sum', 'socpackage-01', counts, money=False, months_of=money)
     corrected = with_heading_overrides(parsed, failures)
     for group in GROUPS:
-        december('social_package_group', f'group.{group}.recipients', 'socpackage-01',
-                 read('socpackage-01', group_columns(group), 'national'))
-        summed('social_package_group', f'group.{group}.amount', 'socpackage-02',
-               served_readings(corrected, 'socpackage-02', group_columns(group), 'national', mapping, failures))
+        people = read('socpackage-01', group_columns(group), 'national')
+        group_money = served_readings(corrected, 'socpackage-02', group_columns(group), 'national', mapping, failures)
+        december('social_package_group', f'group.{group}.recipients', 'socpackage-01', people)
+        summed('social_package_group', f'group.{group}.amount', 'socpackage-02', group_money)
+        # The group's average per month divides its money by this sum of its monthly people counts.
+        summed('social_package_group', f'group.{group}.count_months_sum', 'socpackage-01', people, money=False,
+               months_of=group_money)
     for programme in MONEY_ONLY:
         money_table, money_pick = PROGRAMMES[programme][2:4]
         summed(programme, 'amount', money_table, read(money_table, money_pick, 'national'))
@@ -984,6 +989,42 @@ def arithmetic_findings(parsed, areas, mapping):
                                          'column_label': label, 'printed_total': plain(printed),
                                          'sum_of_areas': plain(summed), 'difference': plain(printed - summed), 'note': ''})
     return findings, checked
+
+
+def social_package_findings(parsed):
+    """Months where SSA's national people row breaks the social package groups (a source finding, not a failure): a group
+    column left blank, or a printed total that differs from the sum of the groups that partition it."""
+    findings = []
+    for year, months in sorted(parsed.get('socpackage-01', {}).items()):
+        if year not in SERVED_YEARS:
+            continue
+        for month, _, shape in months:
+            entry = total_row(shape)
+            try:
+                groups = social_package_columns(shape)
+            except LookupError:
+                continue  # reported by the served extraction
+            if entry is None:
+                continue  # reported by arithmetic_findings
+            cells = entry[2]
+            for group in GROUPS:
+                for column in groups.get(group, []):
+                    if column not in cells:
+                        findings.append({'table_id': 'socpackage-01', 'year': year, 'month': month or '', 'column': column,
+                                         'column_label': shape['labels'][column],
+                                         'note': 'the national total row has no value in this group column'})
+            total = groups.get('total', [])
+            printed = sum((cells.get(column, Decimal(0)) for column in total), Decimal(0))
+            members = sum((cells.get(column, Decimal(0)) for name in GROUP_MEMBERS for column in groups.get(name, [])),
+                          Decimal(0))
+            if printed != members:
+                findings.append({'table_id': 'socpackage-01', 'year': year, 'month': month or '', 'column': '+'.join(total),
+                                 'column_label': ' + '.join(shape['labels'][column] for column in total),
+                                 'printed_total': plain(printed), 'sum_of_areas': plain(members),
+                                 'difference': plain(printed - members),
+                                 'note': 'the printed total differs from the sum of the groups that partition it '
+                                         '(sum_of_areas holds the sum of the groups)'})
+    return findings
 
 
 COMPARED = ['amount_months', 'amount_gel', 'count_months', 'recipients', 'recipients_month', 'avg_monthly_gel',
@@ -1082,8 +1123,14 @@ def validate_served(served, national_programmes, programme_areas):
             failures.append(f'served {key}: not in the reviewed yearly figures')
 
     for year in SERVED_YEARS:
+        # The group total's month-count sum is the package's own, the divisor of its average.
+        group_total = values.get(('social_package_group', 'group.total.count_months_sum', 'country.georgia', year))
+        package = values.get(('social_package', 'count_months_sum', 'country.georgia', year))
+        if group_total and (not package or (group_total['value'], str(group_total['months'])) !=
+                            (package['value'], str(package['months']))):
+            failures.append(f'social package {year}: group total month-count sum differs from the package total')
         # Yearly money is rounded to whole GEL member by member, so it may differ from the total by the rounding.
-        for measure, tolerance in (('recipients', Decimal(0)), ('amount', Decimal(3))):
+        for measure, tolerance in (('recipients', Decimal(0)), ('amount', Decimal(3)), ('count_months_sum', Decimal(0))):
             rows = {name: values.get(('social_package_group', f'group.{name}.{measure}', 'country.georgia', year))
                     for name in GROUPS}
             if rows['total'] is None:
@@ -1095,7 +1142,7 @@ def validate_served(served, national_programmes, programme_areas):
                 failures.append(f'social package {year} {measure}: groups add up to {members}, total {total}')
             parts = [rows[name] for name in DISABILITY_PARTS]
             # The severity columns start in October 2017, so 2017 money is compared only once they cover the same months.
-            if None not in parts and rows['disability'] and all(part['months'] == rows['disability']['months']
+            if measure != 'count_months_sum' and None not in parts and rows['disability'] and all(part['months'] == rows['disability']['months']
                                                                 for part in parts):
                 added = sum(Decimal(part['value']) for part in parts)
                 if abs(added - Decimal(rows['disability']['value'])) > tolerance:
@@ -1155,6 +1202,7 @@ def build(official, out, check=False):
     findings += [{'table_id': table_id, 'year': year, 'month': month or '', 'column': column,
                   'note': 'heading is blank; taken as the grand total because it is the last column'}
                  for table_id, year, month, column in HEADING_NOTES]
+    findings += social_package_findings(parsed)
     failures = validate(index, manifest_rows, problems, failures, national_programmes, browser_check, reviewed_differences)
     failures += validate_served(served, national_programmes, programme_areas)
 

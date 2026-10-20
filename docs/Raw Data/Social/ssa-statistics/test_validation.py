@@ -199,6 +199,24 @@ class ServedValidationFailures(unittest.TestCase):
         self.served[-6]['value'] = '2'  # other
         self.assertTrue(self.failures())
 
+    def test_social_package_group_month_counts_that_do_not_add_up_fail(self):
+        groups = {'total': 120, 'disability': 60, 'survivors': 24, 'war_participants': 12, 'political_repression': 12,
+                  'other': 12}
+        self.served += [served_row('social_package_group', f'group.{group}.count_months_sum', 'country.georgia', 2025,
+                                   value, months=12) for group, value in groups.items()]
+        self.served.append(served_row('social_package', 'count_months_sum', 'country.georgia', 2025, 120, months=12))
+        self.assertEqual(self.failures(), [])
+        self.served[-2]['value'] = '13'  # other
+        self.assertTrue(self.failures())
+
+    def test_a_group_total_month_count_differing_from_the_package_total_fails(self):
+        self.served += [served_row('social_package_group', 'group.total.count_months_sum', 'country.georgia', 2025, 120,
+                                   months=12),
+                        served_row('social_package_group', 'group.other.count_months_sum', 'country.georgia', 2025, 120,
+                                   months=12),
+                        served_row('social_package', 'count_months_sum', 'country.georgia', 2025, 120, months=11)]
+        self.assertTrue(self.failures())
+
 
 def served_rows():
     return read('ssa-served-annual.csv')
@@ -309,6 +327,45 @@ class ServedFile(unittest.TestCase):
                                                        'country.georgia')]
         self.assertEqual(min(war), 2019)
 
+    def test_social_package_group_month_count_sums(self):
+        # Each group's monthly people counts added over the months that also have its money: the divisor of its average.
+        values = served_values()
+        recorded = {2021: Decimal(-1)}  # SSA's May 2021 printed total (socpackage-01 M91) is 1 more than its groups
+        checked = 0
+        for key, amount in values.items():
+            if key[0] != 'social_package_group' or not key[1].endswith('.amount'):
+                continue
+            group = key[1].split('.')[1]
+            with self.subTest(group=group, year=key[3]):
+                count = values[('social_package_group', f'group.{group}.count_months_sum', key[2], key[3])]
+                self.assertEqual((count['value_status'], count['source_table']), ('calculated', 'socpackage-01'))
+                self.assertLessEqual(int(count['months']), int(amount['months']))
+                checked += 1
+        self.assertEqual(checked, 108)
+        for year in range(2013, 2026):
+            def count(name):
+                row = values.get(('social_package_group', f'group.{name}.count_months_sum', 'country.georgia', year))
+                return Decimal(row['value']) if row else Decimal(0)
+            with self.subTest(year=year):
+                package = values[('social_package', 'count_months_sum', 'country.georgia', year)]
+                total = values[('social_package_group', 'group.total.count_months_sum', 'country.georgia', year)]
+                self.assertEqual((total['value'], total['months']), (package['value'], package['months']))
+                self.assertEqual(sum(count(name) for name in GROUP_MEMBERS) - count('total'), recorded.get(year, 0))
+        war = values[('social_package_group', 'group.war_participants.count_months_sum', 'country.georgia', 2025)]
+        self.assertEqual((war['value'], war['months'], war['source_sheet']), ('394271', '12', '*'))
+        self.assertEqual(values[('social_package_group', 'group.war_participants.count_months_sum', 'country.georgia',
+                                 2019)]['months'], '7')
+        # SSA left the July 2022 national count of moderate disability blank, so that year has 11 months of counts.
+        moderate = values[('social_package_group', 'group.disability_moderate.count_months_sum', 'country.georgia', 2022)]
+        self.assertEqual(moderate['months'], '11')
+        self.assertNotIn('July!', moderate['source_cell'])
+
+    def test_social_package_group_findings(self):
+        findings = [row for row in read('source-findings.csv') if row['table_id'] == 'socpackage-01'
+                    and row['note'].startswith(('the printed total', 'the national total row has no value'))]
+        self.assertEqual([(row['year'], row['month'], row['column'], row['difference']) for row in findings],
+                         [('2021', '5', 'M', '1'), ('2022', '7', 'E', '')])
+
     def test_2019_money_follows_the_people_table_headings(self):
         # January–May 2019 money column J (746,479 GEL) is utility-subsidy recipients, as the people table prints it.
         values = served_values()
@@ -354,6 +411,13 @@ class CommittedOutputs(unittest.TestCase):
         import json
         report = json.loads((ROOT / 'validation-report.json').read_text(encoding='utf-8'))
         self.assertTrue(report['passed'], report['failures'][:5])
+
+    def test_independent_read_covers_every_served_row(self):
+        import json
+        report = json.loads((ROOT / 'independent-validation.json').read_text(encoding='utf-8'))
+        self.assertTrue(report['passed'], report['first_problems'][:5])
+        self.assertEqual(report['served_rows_checked'], len(served_rows()))
+        self.assertEqual(report['social_package_group_count_rows_checked'], 108)
 
     def test_regions_and_municipalities_add_up_to_the_national_total(self):
         rows = [row for row in read('ssa-programmes-areas-annual.csv') if row['recipients_month'] == '12']

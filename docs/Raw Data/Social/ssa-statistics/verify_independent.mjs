@@ -3,7 +3,8 @@
 // names, the legacy Georgian font, hidden sheets and row lookup are implemented here separately. It then recomputes:
 //   - every row of ssa-national-annual.csv from its cells (summed months, last month or the single published sheet);
 //   - every recipients and money value of ssa-programmes-monthly.csv from the table and columns named in its source fields;
-//   - every row of ssa-served-annual.csv from the workbook, sheets and cells it names, checking each cell's area name.
+//   - every row of ssa-served-annual.csv from the workbook, sheets and cells it names, checking each cell's area name
+//     (the social package groups' month-count sums included: each must read the people table, socpackage-01).
 // Writes independent-validation.json only with --write.
 //
 //   node verify_independent.mjs [--write] [--official DIR] [--out DIR]
@@ -146,7 +147,7 @@ for (const row of readCsv(join(out, 'ssa-programmes-monthly.csv'))) {
 
 // Every ssa-served-annual.csv row: its cells are read again by address, added up and compared, and the area name printed
 // in column A of each cell's row must be the place the row is served for.
-let servedChecked = 0;
+let servedChecked = 0, groupCountsChecked = 0;
 const servedPath = join(out, 'ssa-served-annual.csv');
 if (existsSync(servedPath)) {
   const places = new Map(readCsv(join(root, 'area-mapping.csv')).map(row => [row.ssa_label, row]));
@@ -176,6 +177,10 @@ if (existsSync(servedPath)) {
   for (const row of rows) {
     const where = `${row.programme} ${row.measure} ${row.geography_id} ${row.year}`;
     servedChecked += 1;
+    if (/^group\.[a-z_]+\.count_months_sum$/.test(row.measure)) {
+      groupCountsChecked += 1;
+      if (row.source_table !== 'socpackage-01') problems.push(`${where}: a month-count sum read from ${row.source_table}`);
+    }
     if (fileOf.get(`${row.source_table}|${row.year}`) !== row.source_workbook) {
       problems.push(`${where}: ${row.source_workbook} is not the ${row.source_table} ${row.year} workbook`); continue;
     }
@@ -202,7 +207,8 @@ if (existsSync(servedPath)) {
 }
 
 const report = { reader: `SheetJS ${XLSX.version}`, national_annual_rows_checked: annualChecked,
-  programme_monthly_values_checked: monthlyChecked, served_rows_checked: servedChecked, problems: problems.length,
+  programme_monthly_values_checked: monthlyChecked, served_rows_checked: servedChecked,
+  social_package_group_count_rows_checked: groupCountsChecked, problems: problems.length,
   first_problems: problems.slice(0, 50),
   passed: problems.length === 0 };
 console.log(JSON.stringify(report, null, 1));
