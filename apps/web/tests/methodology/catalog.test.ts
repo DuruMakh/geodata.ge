@@ -349,7 +349,7 @@ describe("methodology catalog", () => {
       unemployment: { fileCount: 9, totalBytes: 100, latestRetrievedAt: "2026-10-03", validated: true, minYear: 2010, maxYear: 2025 },
       trade: { fileCount: 3, totalBytes: 520677, latestRetrievedAt: "2026-10-07", validated: true, minYear: 1995, maxYear: 2025 },
       "external-flows": { fileCount: 3, totalBytes: 100, latestRetrievedAt: "2026-10-10", validated: true, minYear: 2000, maxYear: 2025 },
-      "energy-food": { fileCount: 42, totalBytes: 100, latestRetrievedAt: "2026-10-11", validated: true, minYear: 2013, maxYear: 2025 },
+      "energy-food": { fileCount: 55, totalBytes: 100, latestRetrievedAt: "2026-10-20", validated: true, minYear: 2006, maxYear: 2025 },
       demography: { fileCount: 2, totalBytes: 100, latestRetrievedAt: "2026-10-03", validated: true, minYear: 2004, maxYear: 2026 },
       wages: { fileCount: 12, totalBytes: 100, latestRetrievedAt: "2026-10-09", validated: true, minYear: 1995, maxYear: 2025 },
       poverty: { fileCount: 7, totalBytes: 100, latestRetrievedAt: "2026-10-10", validated: true, minYear: 2004, maxYear: 2025 },
@@ -427,7 +427,7 @@ describe("methodology catalog", () => {
       { id: "crime", title: METHODOLOGY_CONTENT.crime.title, summary: METHODOLOGY_CONTENT.crime.summary, href: "/methodology/crime", coverage: { firstYear: 2001, lastYear: 2025 }, originalFileCount: 22, reviewedAt: METHODOLOGY_CONTENT.crime.reviewedAt },
       { id: "trade", title: METHODOLOGY_CONTENT.trade.title, summary: METHODOLOGY_CONTENT.trade.summary, href: "/methodology/trade", coverage: { firstYear: 1995, lastYear: 2025 }, originalFileCount: 3, reviewedAt: METHODOLOGY_CONTENT.trade.reviewedAt },
       { id: "external-flows", title: METHODOLOGY_CONTENT["external-flows"].title, summary: METHODOLOGY_CONTENT["external-flows"].summary, href: "/methodology/external-flows", coverage: { firstYear: 2000, lastYear: 2025 }, originalFileCount: 3, reviewedAt: METHODOLOGY_CONTENT["external-flows"].reviewedAt },
-      { id: "energy-food", title: METHODOLOGY_CONTENT["energy-food"].title, summary: METHODOLOGY_CONTENT["energy-food"].summary, href: "/methodology/energy-food", coverage: { firstYear: 2013, lastYear: 2025 }, originalFileCount: 42, reviewedAt: METHODOLOGY_CONTENT["energy-food"].reviewedAt },
+      { id: "energy-food", title: METHODOLOGY_CONTENT["energy-food"].title, summary: METHODOLOGY_CONTENT["energy-food"].summary, href: "/methodology/energy-food", coverage: { firstYear: 2006, lastYear: 2025 }, originalFileCount: 55, reviewedAt: METHODOLOGY_CONTENT["energy-food"].reviewedAt },
       { id: "demography", title: METHODOLOGY_CONTENT.demography.title, summary: METHODOLOGY_CONTENT.demography.summary, href: "/methodology/demography", coverage: { firstYear: 2004, lastYear: 2026 }, originalFileCount: 2, reviewedAt: METHODOLOGY_CONTENT.demography.reviewedAt },
     ]);
   });

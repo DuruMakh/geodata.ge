@@ -33,6 +33,7 @@ _spec.loader.exec_module(_shared)
 clean, csv_bytes, read_sheet, NS = _shared.clean, _shared.csv_bytes, _shared.read_sheet, _shared.NS
 
 RETRIEVED_AT = '2026-10-11'
+FARMING_RETRIEVED_AT = '2026-10-20'
 PUBLISHER = 'National Statistics Office of Georgia (Geostat)'
 XLSX = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
 XLS = 'application/vnd.ms-excel'
@@ -55,6 +56,21 @@ BALANCE_MEDIA = {
     2022: ('59325/1.-Aggregated-Energy-Balance-ENG.xlsx', '59209/2.-Electricity-and-heat_ENG.xlsx'),
     2023: ('67504/1.-Aggregated-Energy-Balance-ENG.xlsx', '67505/2.-Electricity-and-heat_ENG.xlsx'),
     2024: ('75762/1.-Aggregated-Energy-Balance-ENG.xlsx', '75706/2.-Electricity-and-heat_ENG.xlsx'),
+}
+# Geostat Agriculture (categories/196): (title, English media path, Georgian media path), under https://geostat.ge/media/.
+FARMING_FILES = {
+    'general': ('General agricultural statistics', '80145/1.General_Agro_Sector_Statistics_ENG.xlsx',
+                '80131/1.soflis_meurneobis_seqtoris_zogadi_statistika_GEO.xlsx'),
+    'annual_crops': ('Production of annual crops', '80146/3.Production_of_Annual_Crops_ENG.XLSX',
+                     '80132/3.ertwliani_kulturebis_warmoeba_GEO.XLSX'),
+    'permanent_crops': ('Production of permanent crops', '80149/6.Production_of_Permanent_Crops_ENG.xlsx',
+                        '80135/6.mravalwlovani_kulturebis_warmoeba_GEO.xlsx'),
+    'livestock_numbers': ('Number of livestock (annual)', '80150/8.Livestock_Numbers_%28Annual%29_ENG.xlsx',
+                          '80136/8.pirutyvis_suladoba_%28wliuri%29_GEO.xlsx'),
+    'livestock_products': ('Production of livestock products (annual)', '82387/10.Livestock_Products_%28Annual%29_ENG.XLSX',
+                           '82386/10.mecxoveleobis_produqtebis_warmoeba_%28wliuri%29_GEO.XLSX'),
+    'prices': ('Agricultural production prices (farm-gate prices)', '81972/17.Agricultural_Production_Prices_ENG.XLSX',
+               '81971/17.sasoflo_sameurneo_produqtebis_fasebi_GEO.XLSX'),
 }
 
 
@@ -94,7 +110,20 @@ def _sources():
              f'{index}/energy-balance-of-georgia', 'official/energy-balance-index-page.html', HTML),
             ('geostat_food_security_page', 'Food Security (source page capture)', food_page, food_page,
              f'{food_page}/food-security', 'official/food-security-page.html', HTML)]
+    farming, farming_ka = f'{SITE}/en/modules/categories/196', f'{SITE}/ka/modules/categories/196'
+    for key, (title, media, media_ka) in FARMING_FILES.items():
+        local = key.replace('_', '-')
+        out.append((f'geostat_farming_{key}', f'{title} (Agriculture)', farming, f'https://geostat.ge/media/{media}', f'{SITE}/media/{media}',
+                    f'official/farming-{local}.xlsx', XLSX))
+        out.append((f'geostat_farming_{key}_ka', f'{title} (Georgian labels)', farming_ka, f'https://geostat.ge/media/{media_ka}',
+                    f'{SITE}/media/{media_ka}', f'official/ka/farming-{local}-ka.xlsx', XLSX))
+    out.append(('geostat_agriculture_page', 'Agriculture (source page capture)', farming, farming, f'{farming}/agriculture',
+                'official/agriculture-page.html', HTML))
     return out
+
+
+def retrieved_at(source_id):
+    return FARMING_RETRIEVED_AT if source_id.startswith(('geostat_farming_', 'geostat_agriculture_')) else RETRIEVED_AT
 
 
 SOURCES = _sources()
@@ -144,6 +173,42 @@ FOODS = {'wheat': 'Wheat', 'maize': 'Maize', 'potato': 'Potato', 'vegetables': '
          'meat': 'Meat', 'beef': 'Beef', 'pork': 'Pork', 'sheep_goat_meat': 'Sheep and Goat Meat',
          'poultry_meat': 'Poultry Meat', 'milk': 'Milk and Milk Products', 'eggs': 'Egg'}
 FOOD_YEARS = range(2014, 2026)
+# (indicator ID, source key, sheet, printed row label, unit). The list order is the page's list order.
+FARMING_SHEETS = {'general': 'AG. output', 'annual_crops': 'Production', 'permanent_crops': 'Permanent Crops production',
+                  'livestock_numbers': 'Number of livestock', 'livestock_products': 'Livestock products', 'prices': 'Prices'}
+FARMING_CELLS = (
+    [(f'farming.output.{key}', 'general', label, 'million_gel') for key, label in
+     (('total', 'output of agriculture, total'), ('crops', 'plant growing'), ('livestock', 'animal husbandry'),
+      ('services', 'agricultural services'))] +
+    [(f'farming.harvest.{key}', 'annual_crops', label, 'thousand_tonnes') for key, label in
+     (('wheat', 'wheat, total'), ('barley', 'barley, total'), ('maize', 'maize'), ('beans', 'haricot beans'), ('potatoes', 'potato'),
+      ('vegetables', 'vegetables, total'), ('melons', 'melons'))] +
+    [(f'farming.harvest.{key}', 'permanent_crops', label, 'thousand_tonnes') for key, label in
+     (('grapes', 'grapes'), ('apples', 'apple'), ('peaches', 'peach, nectarine'), ('tangerines', 'tangerine'),
+      ('hazelnuts', 'hazelnut'), ('walnuts', 'walnut'))] +
+    [(f'farming.livestock.{key}', 'livestock_numbers', label, 'thousand_head') for key, label in
+     (('cattle', 'bovine animals'), ('dairy_cows', 'dairy cows and buffaloes'), ('pigs', 'pigs'), ('sheep_goats', 'sheep and goats'),
+      ('poultry', 'poultry, ths. heads'))] +
+    [(f'farming.products.{key}', 'livestock_products', label, unit) for key, label, unit in
+     (('meat', 'meat, total', 'thousand_tonnes'), ('beef', 'beef', 'thousand_tonnes'), ('pork', 'pork', 'thousand_tonnes'),
+      ('sheep_goat_meat', 'sheep and goat', 'thousand_tonnes'), ('poultry_meat', 'poultry', 'thousand_tonnes'),
+      ('milk', 'milk (mill. litres)', 'million_litres'), ('eggs', 'egg (mill. pieces)', 'million_pieces'))] +
+    [(f'farming.price.{key}', 'prices', label, unit) for key, label, unit in
+     (('wheat', 'wheat', 'gel_per_kg'), ('maize', 'maize', 'gel_per_kg'), ('potatoes', 'potato', 'gel_per_kg'),
+      ('tomatoes', 'tomato', 'gel_per_kg'), ('apples', 'apple', 'gel_per_kg'), ('grapes', 'grapes', 'gel_per_kg'),
+      ('hazelnuts', 'hazelnut', 'gel_per_kg'), ('beef', 'beef', 'gel_per_kg'), ('pork', 'pork', 'gel_per_kg'),
+      ('poultry_meat', 'poultry meat', 'gel_per_kg'), ('milk', 'milk (1 litre)', 'gel_per_litre'), ('eggs', 'egg (1 piece)', 'gel_per_piece'))])
+FARMING_UNITS = {indicator_id: unit for indicator_id, _, _, unit in FARMING_CELLS}
+FARMING_YEARS = {'output': (2010, 2025), 'price': (2014, 2025)}  # every other farming row runs 2006-2025
+# Decimals a farming cell's number format shows. A price cell may also be General (shows the stored value, at most 2 decimals).
+FARMING_FORMAT_DECIMALS = {'#,##0.0': 1, '0.0': 1, '#\\ ##0.0': 1, '0.00': 2}
+# The food balance sheet's "Domestic production" (whole thousand tonnes) against the farm table it should repeat.
+FOOD_PRODUCTION = {'wheat': 'farming.harvest.wheat', 'maize': 'farming.harvest.maize', 'potato': 'farming.harvest.potatoes',
+                   'vegetables': 'farming.harvest.vegetables', 'grapes': 'farming.harvest.grapes', 'meat': 'farming.products.meat',
+                   'beef': 'farming.products.beef', 'pork': 'farming.products.pork', 'sheep_goat_meat': 'farming.products.sheep_goat_meat',
+                   'poultry_meat': 'farming.products.poultry_meat', 'milk': 'farming.products.milk', 'eggs': 'farming.products.eggs'}
+# Known differences, with no reason given by Geostat: grapes 2014 is 165 in the balance sheet and 172.6 in the crop table.
+FOOD_PRODUCTION_EXCEPTIONS = {('grapes', 2014)}
 
 
 def _coverage():
@@ -154,6 +219,8 @@ def _coverage():
         coverage[indicator_id] = (WIND_FIRST_YEAR if indicator_id.endswith('.wind') else 2013, 2024)
     for food in FOODS:
         coverage[f'food.self_sufficiency.{food}'] = (2014, 2025)
+    for indicator_id in FARMING_UNITS:
+        coverage[indicator_id] = FARMING_YEARS.get(indicator_id.split('.')[1], (2006, 2025))
     return coverage
 
 
@@ -228,9 +295,30 @@ def header_row(sheet, kind):
     for number in sorted(sheet):
         texts = [norm(cell['value']) for cell in sheet[number].values() if cell['kind'] == 's']
         if (kind == 'ktoe' and 'coal' in texts and 'total' in texts) or \
-                (kind == 'electricity' and 'electricity (gwh)' in texts) or (kind == 'food' and _row_label(sheet, number) == 'indicators'):
+                (kind == 'electricity' and 'electricity (gwh)' in texts) or (kind == 'food' and _row_label(sheet, number) == 'indicators') or \
+                (kind == 'farming' and len(_year_cells(sheet[number])) >= 5):
             return number
     raise ValueError(f'No heading row found in the {kind} sheet')
+
+
+YEAR = re.compile(r'(\d{4})(\*?)')
+
+
+def _year_cells(row):
+    """{column: (year, preliminary)} for the cells of a row that are years: 2006 as a number, or "2025*" (preliminary)."""
+    years = {}
+    for column, cell in row.items():
+        if column == 'A':
+            continue
+        text = str(int(cell['value'])) if cell['kind'] == 'n' and cell['value'] == int(cell['value']) else clean(str(cell['value']))
+        match = YEAR.fullmatch(text)
+        if match and 2000 <= int(match[1]) <= 2100:
+            years[column] = (int(match[1]), bool(match[2]))
+    return years
+
+
+def farming_years(sheet):
+    return _year_cells(sheet[header_row(sheet, 'farming')])
 
 
 def _heading(sheet, kind, column):
@@ -266,14 +354,17 @@ def read_electricity(year):
     return sheet, name, found[0]
 
 
-def cell_value(cell):
-    """(exact stored token, status). A dash means the flow did not occur and is served as 0; an ellipsis is a gap."""
+def cell_value(cell, farming=False):
+    """(exact stored token, status). In an energy balance a dash means the flow did not occur and is served as 0; in a
+    farming table it means no data (the survey sample was too small), which no served cell may be. An ellipsis is a gap."""
     if cell is None:
         raise ValueError('Unexpected empty cell')
     if cell['kind'] == 'n' and isinstance(cell['value'], Decimal):
         return str(cell['value']), 'published'
     if cell['kind'] == 's':
         text = clean(cell['value'])
+        if text == '-' and farming:
+            raise ValueError('Dash (data not available) in a served farming cell')
         if text == '-':
             return '0', 'no_flow'
         if text == '…':
@@ -285,6 +376,14 @@ def display(indicator_id, year, value, number_format=None):
     """The value as Geostat shows it. Energy shows one decimal. A food ratio follows its own cell's number format:
     "0" shows whole percent (47.1 shows as 47) and "General" shows the stored value."""
     shown = Decimal(format(float(value), '.15g'))  # Excel keeps 15 significant digits, so 2235.4499999999998 shows as 2235.45
+    if indicator_id.startswith('farming.'):
+        if number_format == 'General' and indicator_id.startswith('farming.price.'):
+            if -shown.normalize().as_tuple().exponent > 2:
+                raise ValueError(f'A General price cell has more than 2 decimals: {indicator_id}:{year}')
+            return str(shown.quantize(Decimal('0.01')))
+        if number_format not in FARMING_FORMAT_DECIMALS:
+            raise ValueError(f'Unexpected farming number format {number_format}: {indicator_id}:{year}')
+        return str(shown.quantize(Decimal(1).scaleb(-FARMING_FORMAT_DECIMALS[number_format]), rounding=ROUND_HALF_UP))
     if indicator_id.startswith('food.'):
         if number_format == '0':
             return str(int(shown.quantize(Decimal(1), rounding=ROUND_HALF_UP)))
@@ -295,12 +394,16 @@ def display(indicator_id, year, value, number_format=None):
 
 
 def _unit(indicator_id):
+    if indicator_id.startswith('farming.'):
+        return FARMING_UNITS[indicator_id]
     return 'percent' if indicator_id.startswith('food.') else 'gwh' if indicator_id.startswith('electricity.') else 'ktoe'
 
 
-def _observation(rows, source_id, name, indicator_id, year, sheet, kind, number, column):
+def _observation(rows, source_id, name, indicator_id, year, sheet, kind, number, column, preliminary=False):
     cell = sheet.get(number, {}).get(column)
-    token, status = cell_value(cell)
+    token, status = cell_value(cell, farming=kind == 'farming')
+    if preliminary:
+        status = 'preliminary'
     if not NUMBER.fullmatch(token):
         raise ValueError(f'Stored value is not a plain decimal: {indicator_id}:{year}: {token}')
     rows.append({
@@ -351,7 +454,39 @@ def extract():
         number = find_row(sheet, 'self-sufficiency ratio, %')
         for column, year in years.items():
             _observation(rows, 'geostat_food_balance_sheets', sheet_name(path, name), f'food.self_sufficiency.{food}', year, sheet, 'food', number, column)
+
+    for indicator_id, key, label, _ in FARMING_CELLS:
+        source_id, name = f'geostat_farming_{key}', FARMING_SHEETS[key]
+        sheet = farming_sheet(key)
+        number = find_row(sheet, label)
+        first, last = COVERAGE[indicator_id]
+        for column, (year, preliminary) in farming_years(sheet).items():
+            if first <= year <= last:
+                _observation(rows, source_id, name, indicator_id, year, sheet, 'farming', number, column, preliminary)
     return sorted(rows, key=lambda row: (row['indicator_id'], row['year']))
+
+
+def farming_sheet(key):
+    return _cached_sheet(f'geostat_farming_{key}', FARMING_SHEETS[key])
+
+
+def farming_status(source_id, sheet, column):
+    """A farming cell's status: preliminary where its year heading carries a star ("2025*")."""
+    return 'preliminary' if farming_years(sheet)[column][1] else 'published'
+
+
+def check_food_balance_production(rows):
+    """Each food balance sheet's domestic production (printed in whole thousand tonnes, eggs and milk in millions) repeats the
+    farm table within 0.6, every year 2014-2025. Returns the known exceptions that still differ; any other difference fails."""
+    published = {(row['indicator_id'], row['year']): Decimal(row['published_value']) for row in rows}
+    flows, differing = food_flows(), []
+    for food, indicator_id in FOOD_PRODUCTION.items():
+        for year in FOOD_YEARS:
+            if abs(Decimal(str(flows[(food, year)][0])) - published[(indicator_id, year)]) > Decimal('0.6'):
+                if (food, year) not in FOOD_PRODUCTION_EXCEPTIONS:
+                    raise ValueError(f'Food balance production differs from the farm table: {food} {year}')
+                differing.append((food, year))
+    return differing
 
 
 def _food_years(sheet):
@@ -426,7 +561,8 @@ def validate(rows):
         value = Decimal(row['value'])
         if display(row['indicator_id'], row['year'], value, row['source_number_format']) != row['published_value']:
             raise ValueError(f'Stored and published value disagree: {key}')
-        if row['unit'] != _unit(row['indicator_id']) or row['basis'] != 'actual' or row['value_status'] not in ('published', 'no_flow'):
+        statuses = ('published', 'preliminary') if row['indicator_id'].startswith('farming.') else ('published', 'no_flow')
+        if row['unit'] != _unit(row['indicator_id']) or row['basis'] != 'actual' or row['value_status'] not in statuses:
             raise ValueError(f'Unexpected unit, basis or status: {key}')
         if row['value_status'] == 'no_flow' and value != 0:
             raise ValueError(f'A no-flow cell must be 0: {key}')
@@ -458,6 +594,25 @@ def validate(rows):
         check_energy_balance(year)
         check_electricity_losses(year)
 
+    for year in range(2010, 2026):
+        parts = sum(v(f'farming.output.{part}', year) for part in ('crops', 'livestock', 'services'))
+        if not _close(v('farming.output.total', year), parts, '0.5'):
+            raise ValueError(f'Farm output total differs from crops + livestock + services: {year}')
+    products = farming_sheet('livestock_products')
+    other_meat, product_years = find_row(products, 'other meet'), {year: column for column, (year, _) in farming_years(products).items()}
+    milk_rows = [find_row(products, label) for label in ('dairy cow and buffalo milk', 'sheep and goat milk')]
+    for year in range(2006, 2026):
+        column = product_years[year]
+        meats = sum(v(f'farming.products.{kind}', year) for kind in ('beef', 'pork', 'sheep_goat_meat', 'poultry_meat'))
+        if not _close(v('farming.products.meat', year), meats + Decimal(cell_value(products[other_meat][column], farming=True)[0]), '0.2'):
+            raise ValueError(f'Meat differs from the sum of its kinds: {year}')
+        milk = sum(Decimal(cell_value(products[number][column], farming=True)[0]) for number in milk_rows)
+        if not _close(v('farming.products.milk', year), milk, '0.2'):
+            raise ValueError(f'Milk differs from the sum of cow and buffalo milk and sheep and goat milk: {year}')
+        if v('farming.livestock.dairy_cows', year) > v('farming.livestock.cattle', year):
+            raise ValueError(f'Dairy cows exceed cattle: {year}')
+    check_food_balance_production(rows)
+
     flows = food_flows()
     for food in FOODS:
         for year in FOOD_YEARS:
@@ -467,9 +622,13 @@ def validate(rows):
     for row in rows:
         cell = reread(row['source_id'], row['source_sheet'], row['source_cell'])
         sheet = _cached_sheet(row['source_id'], row['source_sheet'])
-        kind = 'ktoe' if row['source_id'].endswith('_aggregated') else 'electricity' if row['source_id'].endswith('_electricity') else 'food'
+        kind = 'ktoe' if row['source_id'].endswith('_aggregated') else 'electricity' if row['source_id'].endswith('_electricity') else \
+            'farming' if row['source_id'].startswith('geostat_farming_') else 'food'
         column, number = re.fullmatch(r'([A-Z]+)(\d+)', row['source_cell']).groups()
-        if (cell_value(cell) != (row['value'], row['value_status']) or cell['format'] != row['source_number_format'] or
+        reread_value = cell_value(cell, farming=kind == 'farming')
+        if kind == 'farming':
+            reread_value = (reread_value[0], farming_status(row['source_id'], sheet, column))
+        if (reread_value != (row['value'], row['value_status']) or cell['format'] != row['source_number_format'] or
                 _label(sheet, kind, int(number), column) != row['source_label']):
             raise ValueError(f"Row disagrees with its source cell: {row['indicator_id']}:{row['year']} {row['source_cell']}")
 
@@ -481,7 +640,7 @@ def manifest():
     for source_id, title, page, url, resolved, local_file, content_type in SOURCES:
         data = (ROOT / local_file).read_bytes()
         records.append({'source_id': source_id, 'dataset_title': title, 'publisher': PUBLISHER, 'source_page_url': page,
-                        'retrieved_file_url': url, 'resolved_file_url': resolved, 'retrieved_at': RETRIEVED_AT,
+                        'retrieved_file_url': url, 'resolved_file_url': resolved, 'retrieved_at': retrieved_at(source_id),
                         'local_file': local_file, 'sha256': hashlib.sha256(data).hexdigest().upper(), 'bytes': len(data),
                         'content_type': content_type})
     return records
@@ -497,18 +656,23 @@ def build(check=False):
         coverage[row['indicator_id']].append(row['year'])
         counts[row['source_id']] += 1
         family = row['indicator_id'].split('.')
-        groups['electricity' if family[0] == 'electricity' else 'food' if family[0] == 'food' else
+        groups['electricity' if family[0] == 'electricity' else 'food' if family[0] == 'food' else 'farming' if family[0] == 'farming' else
                next(group for group, names in PAGE_GROUPS.items() if family[1] in names)] += 1
     coverage_rows = [{'indicator_id': i, 'first_year': min(y), 'last_year': max(y), 'observations': len(y)} for i, y in sorted(coverage.items())]
     no_flow = [{key: row[key] for key in ('indicator_id', 'year', 'source_id', 'source_sheet', 'source_cell')}
                for row in rows if row['value_status'] == 'no_flow']
+    preliminary = [{key: row[key] for key in ('indicator_id', 'year', 'source_id', 'source_sheet', 'source_cell')}
+                   for row in rows if row['value_status'] == 'preliminary']
     report = {
-        'status': 'passed', 'retrieved_at': RETRIEVED_AT,
-        'scope': 'Annual research only: Geostat energy balances 2013-2024 (supply, imports, exports, final consumption, electricity) '
-                 'and food self-sufficiency ratios 2014-2025; no monthly data, prices or serving',
+        'status': 'passed', 'retrieved_at': {'energy and food': RETRIEVED_AT, 'farming': FARMING_RETRIEVED_AT},
+        'scope': 'Annual research only: Geostat energy balances 2013-2024 (supply, imports, exports, final consumption, electricity), '
+                 'food self-sufficiency ratios 2014-2025, and agriculture 2006-2025 (farm output, harvests, livestock, livestock '
+                 'products, farm-gate prices); no monthly or quarterly data, energy prices or serving',
         'primary_observation_count': len(rows), 'observations_by_group': dict(sorted(groups.items())),
         'observations_by_source': dict(sorted(counts.items())),
         'no_flow_count': len(no_flow), 'no_flow_cells': no_flow, 'ellipsis_cells_in_served_values': 0,
+        'preliminary_count': len(preliminary), 'preliminary_cells': preliminary, 'farming_dash_cells_in_served_values': 0,
+        'food_production_known_differences': [{'food': food, 'year': year} for food, year in check_food_balance_production(rows)],
         'imputed_values': 0, 'reconciliation_failed_count': 0,
         'checks': ['no duplicate, missing or extra observation', 'published value equals the stored value as Geostat displays it',
                    'every row equals its re-read source cell, number format and printed row and column label',
@@ -518,6 +682,11 @@ def build(check=False):
                    'electricity production = thermal + hydro + wind within 0.5 GWh',
                    'electricity supply - energy sector - losses = final consumption within 0.5 GWh',
                    'food ratio within 10 points of production / (production + import - export)',
+                   'farm output total = crops + livestock + services within 0.5',
+                   'meat = beef + pork + sheep and goat + poultry + other meat within 0.2; milk = cow and buffalo + sheep and goat milk within 0.2',
+                   'dairy cows never exceed cattle',
+                   'food balance domestic production repeats the farm table within 0.6, 2014-2025 (known difference: grapes 2014)',
+                   'no farming dash ("data not available") in a served cell; only the starred 2025 farm output is preliminary',
                    'efficiency workbook cross-check: see independent-validation.json'],
         'source_checks': [{'source_id': s['source_id'], 'sha256': s['sha256'], 'bytes': s['bytes'], 'passed': True} for s in sources],
     }

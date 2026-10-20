@@ -3,10 +3,11 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import { updatedDate } from "../../lib/explorer/coverageLabel";
 import type { ClientEnergyFoodFact } from "../../lib/data/energyFood/types";
-import { buildEnergyFoodModel, energyFoodCoverage, energyFoodDisplayLabels, energyFoodUnit, parseEnergyFoodHash, serializeEnergyFoodHash, type EnergyFoodSectionId, type EnergyFoodState } from "../../lib/explorer/energyFood";
+import { buildEnergyFoodModel, changeEnergyFoodSelection, energyFoodCoverage, energyFoodDisplayLabels, parseEnergyFoodHash, serializeEnergyFoodHash, type EnergyFoodSectionId, type EnergyFoodState, type EnergyFoodUnit } from "../../lib/explorer/energyFood";
 import { buildEnergyFoodWorkbookExportModel } from "../../lib/explorer/energyFoodWorkbook";
 import { formatInUnit, type ValueUnit } from "../../lib/explorer/format";
 import { rangeFromPatch, resolveRange } from "../../lib/explorer/periodRange";
+import { listLatestByHeading } from "../../lib/explorer/unitList";
 import type { WorkbookPublicSource } from "../../lib/explorer/workbookModel";
 import { useI18n } from "../../lib/i18n/provider";
 import { message } from "../../lib/i18n/messages";
@@ -41,15 +42,20 @@ export function EnergyFoodExplorer({ section, facts, labels, sources, lastReview
   const { state, update } = useHashState(hashData, parseEnergyFoodState, serializeEnergyFoodState);
   const [query, setQuery] = useState("");
   const model = buildEnergyFoodModel(section, facts, state);
-  // Energy is in thousand tonnes of oil equivalent or GWh; food is a self-sufficiency percent, drawn on a percent axis.
-  // The chart panel names the unit, so axis ticks and cells carry numbers only; the latest line adds "GWh" to its value.
-  const unitKind = energyFoodUnit(section), percent = unitKind === "percent";
+  // Energy is in thousand tonnes of oil equivalent or GWh; food is a self-sufficiency percent, drawn on a percent axis; farming
+  // shows one heading's unit at a time (the twelve farm-gate prices share one ₾ axis). The chart panel names the unit, so axis
+  // ticks and cells carry numbers only; values add "%", "GWh" or "million ₾" where that is their unit.
+  const unitKind = model.unitKey, percent = unitKind === "percent";
   const unit: ValueUnit = { divisor: 1, label: "", decimals: model.decimals };
   const unitLabel = t(`unit.${unitKind}Long`);
   const format = (value: number | null | undefined, decimals = model.decimals) => formatInUnit(value, { ...unit, decimals });
-  const suffix = percent ? "%" : unitKind === "gwh" ? ` ${t("unit.gwh")}` : "";
-  const valueLabel = (value: number | null | undefined, decimals?: number) => value == null ? "—" : `${format(value, decimals)}${suffix}`;
+  const suffixFor = (kind: EnergyFoodUnit) => kind === "percent" ? "%" : kind === "gwh" || kind === "million_gel" ? ` ${t(`unit.${kind}`)}` : "";
+  const valueLabel = (value: number | null | undefined, decimals?: number, kind: EnergyFoodUnit = model.unit) => value == null ? "—" : `${format(value, decimals)}${suffixFor(kind)}`;
+  const headed = model.series.some(series => series.heading);
   const reference = model.series[0];
+  // A headed list reads at the chosen years' end over the whole page's years, so ticking a row of another group never changes its numbers.
+  const listEnd = resolveRange(state.range, energyFoodCoverage(section, facts)).end;
+  const listRows = listLatestByHeading(facts, model.series, listEnd);
   // The list nests plain names; the chart and table name a repeated child with its parent.
   const shown = energyFoodDisplayLabels(section, labels);
   const rows = model.selected.map(series => ({ itemId: series.id, kaLabel: shown[series.id], color: series.color, valuesByYear: series.valuesByYear }));
@@ -68,7 +74,7 @@ export function EnergyFoodExplorer({ section, facts, labels, sources, lastReview
   }} />;
   return <div data-testid={`energy-food-${section}`} className="@container">
     <ExplorerHeading>{title}</ExplorerHeading>
-    <LatestValueLine testId="energy-food-latest" measure={t(`latest.${section}`)} period={latest.year} value={valueLabel(latest.value, latest.decimals)} note={note} />
+    <LatestValueLine testId="energy-food-latest" measure={t(`latest.${section}`)} period={latest.year} value={valueLabel(latest.value, latest.decimals, latest.unit)} note={note} />
     <ExplorerWorkspace>
       <div className="flex min-w-0 flex-col">
         <section data-testid="chart-panel" data-mode={state.mode} data-unit={unitKind} className="border-t border-[var(--ink)] pt-4">
@@ -81,16 +87,22 @@ export function EnergyFoodExplorer({ section, facts, labels, sources, lastReview
             // Food ratios are whole percents, as Geostat prints them.
             : <ExplorerTable caption={`${title} · ${unitLabel} · ${model.range.start}–${model.range.end}`} rows={rows.filter(row => row.itemId !== reference.id)} totalRow={total} showTotal={Boolean(total)} totalFirst wrapRowLabels rowLabelsLocalized years={model.years} firstColumnLabel={t("series")} unit={unit} share={percent} percentDecimals={0} showChangeColumn={false} shareValueForYear={(row, year) => { const value = row.valuesByYear[year]; return value == null ? null : value / 100; }} />}
           <ChartSelectionAids series={lineSeries} chartShown={state.mode === "line"} share={percent} unit={unit} formatValue={value => valueLabel(value)} />
-          <RangeStrip years={energyFoodCoverage(section, facts).years} range={model.range} onChange={patch => update(s => ({ ...s, range: rangeFromPatch(resolveRange(s.range, energyFoodCoverage(section, facts)), patch) }))} />
+          <RangeStrip years={energyFoodCoverage(section, facts, state.selectedIds).years} range={model.range} onChange={patch => update(s => ({ ...s, range: rangeFromPatch(resolveRange(s.range, energyFoodCoverage(section, facts, s.selectedIds)), patch) }))} />
         </section>
-        <div className="mt-[18px]"><SourceNote testId="source-label">{t(percent ? "sourceNote.food" : "sourceNote.energy")} · {unitLabel} · {model.range.start}–{model.range.end} · <span className="whitespace-nowrap">{updatedDate(lastReviewedAt, locale)}</span>
+        <div className="mt-[18px]"><SourceNote testId="source-label">{t(section === "farming" ? "sourceNote.farming" : percent ? "sourceNote.food" : "sourceNote.energy")} · {unitLabel} · {model.range.start}–{model.range.end} · <span className="whitespace-nowrap">{updatedDate(lastReviewedAt, locale)}</span>
           <Link href={pageHref("/methodology/energy-food", locale)} prefetch={false} className="ml-2 text-[var(--accent)] underline underline-offset-4">{t("methodology")}</Link>
         </SourceNote></div>
       </div>
-      {/* Breakdowns nest under their total, listed by their plain names. */}
-      <FlatSeriesPanel asideLabel={message(messages, "controls.series")} caption={<>{model.range.end} · {unitLabel}</>} downloadAction={downloadAction}
-        rows={model.series.map(series => ({ id: series.id, label: labels[series.id], color: series.color, value: format(series.endValue), parentId: series.parentId }))}
-        totalId={model.series.find(series => series.reference)?.id} pinTotal selectedIds={state.selectedIds} onSelectionChange={selectedIds => update(s => ({ ...s, selectedIds }), true)}
+      {/* Breakdowns nest under their total, listed by their plain names. Farming's rows sit under headings that name their unit,
+          so the caption gives the year only and each row reads its latest figure in its own precision. */}
+      <FlatSeriesPanel asideLabel={message(messages, "controls.series")} caption={headed ? listEnd : <>{model.range.end} · {unitLabel}</>} downloadAction={downloadAction}
+        rows={model.series.map(series => {
+          if (!series.heading) return { id: series.id, label: labels[series.id], color: series.color, value: format(series.endValue), parentId: series.parentId };
+          const { latest: row, headingYear } = listRows[series.id]!;
+          const heading = t(`heading.${series.heading}`);
+          return { id: series.id, label: labels[series.id], color: series.color, value: format(row?.value, row && factFor(series.id, row.year)?.decimals), heading: headingYear ? `${heading} · ${headingYear}` : heading };
+        })}
+        totalId={model.series.find(series => series.reference)?.id} pinTotal selectedIds={state.selectedIds} onSelectionChange={selectedIds => update(s => changeEnergyFoodSelection(s, section, selectedIds, facts), true)}
         query={query} onQueryChange={setQuery} searchPlaceholder={t("search")} searchable={model.series.length > SEARCHABLE_MIN_ROWS}
         nesting={{ selectedLabel: t("nestedSelected"), expansionLabel: label => t("subcategoriesFor", { label }) }} />
     </ExplorerWorkspace>

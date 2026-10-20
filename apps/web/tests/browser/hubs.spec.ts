@@ -2,7 +2,7 @@ import { expect, test, type Page } from "@playwright/test";
 
 // The section hubs: rendered cards, their order and links, and where they lead.
 const ready = (page: Page) => expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
-const ENERGY_FOOD_SECTIONS = ["energy-supply", "electricity", "energy-use", "food-self-sufficiency"] as const;
+const ENERGY_FOOD_SECTIONS = ["energy-supply", "electricity", "energy-use", "food-self-sufficiency", "farming"] as const;
 
 test("Economy links the delivered overview, national sectors, GDP by expenditure and regional economies", async ({ page }) => {
   await page.goto("/en/explorer/economy");
@@ -80,7 +80,7 @@ test("the wages hub links its three pages", async ({ page }) => {
 test("the energy and food hub shows one card per page, each linking to it", async ({ page }) => {
   await page.goto("/explorer/energy-food");
   const cards = page.getByTestId("energy-food-hub").locator("a");
-  await expect(cards).toHaveCount(4);
+  await expect(cards).toHaveCount(ENERGY_FOOD_SECTIONS.length);
   for (const [index, section] of ENERGY_FOOD_SECTIONS.entries()) await expect(cards.nth(index)).toHaveAttribute("href", `/explorer/energy-food/${section}`);
 });
 
