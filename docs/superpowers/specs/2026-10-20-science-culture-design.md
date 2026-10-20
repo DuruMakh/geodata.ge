@@ -1,7 +1,7 @@
 # Science and culture hub
 
 Date: 2026-10-20
-Status: Draft for Duru's review. Duru asked for Science and culture in its own thread on 2026-10-20 (project chat, "sience and culture in diff thread"), picked "Four pages" on the card "Which pages should the Science and culture hub have?" and "Looks right" on the card "Approve this page layout for the Science and culture hub?" (layout note: `/mnt/project-files/science-culture-preview/page-design.md`). This document writes that design down. It covers the data foundation and the pages.
+Status: Approved by Duru on 2026-10-20 ("Approve" on the card "Approve the written Science and culture design so I can plan the build?"). Duru asked for Science and culture in its own thread on 2026-10-20 (project chat, "sience and culture in diff thread"), picked "Four pages" on the card "Which pages should the Science and culture hub have?" and "Looks right" on the card "Approve this page layout for the Science and culture hub?" (layout note: `/mnt/project-files/science-culture-preview/page-design.md`). This document writes that design down. It covers the data foundation and the pages.
 
 ## 1. Intended result
 
