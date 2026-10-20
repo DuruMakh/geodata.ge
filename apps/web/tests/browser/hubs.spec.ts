@@ -4,23 +4,26 @@ import { expect, test, type Page } from "@playwright/test";
 const ready = (page: Page) => expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
 const ENERGY_FOOD_SECTIONS = ["energy-supply", "electricity", "energy-use", "food-self-sufficiency", "farming"] as const;
 
-test("Economy links the delivered overview, national sectors and regional economies", async ({ page }) => {
+test("Economy links the delivered overview, national sectors, GDP by expenditure and regional economies", async ({ page }) => {
   await page.goto("/en/explorer/economy");
   const cards = page.getByTestId("economy-hub").getByTestId("hub-card");
-  await expect(cards).toHaveCount(3);
-  await expect(page.getByTestId("economy-hub").locator("a")).toHaveCount(3);
+  await expect(cards).toHaveCount(4);
+  await expect(page.getByTestId("economy-hub").locator("a")).toHaveCount(4);
   await expect(page.getByTestId("economy-hub").locator('a[href="/en/explorer/economy/sectors"]')).toHaveCount(1);
+  await expect(page.getByTestId("economy-hub").locator('a[href="/en/explorer/economy/expenditure"]')).toHaveCount(1);
   await expect(page.getByTestId("economy-hub").locator('a[href="/en/explorer/economy/regions"]')).toHaveCount(1);
-  for (let index = 0; index < 3; index += 1) await expect(cards.nth(index).locator("svg")).toHaveCount(1);
+  for (let index = 0; index < 4; index += 1) await expect(cards.nth(index).locator("svg")).toHaveCount(1);
   await expect(cards.nth(1)).toContainText("Top 3 sectors’ GDP share");
-  await expect(cards.nth(2)).toContainText("Total regional GDP (Current prices)");
+  await expect(cards.nth(2)).toContainText(/Households \d+\.\d% of GDP/);
+  await expect(cards.nth(3)).toContainText("Total regional GDP (Current prices)");
   await page.getByTestId("economy-hub").locator('a[href="/en/explorer/economy/gdp"]').click();
   await expect(page.getByTestId("gdp-overview")).toBeVisible();
   await page.goto("/explorer/economy");
-  for (let index = 0; index < 3; index += 1) await expect(cards.nth(index).locator("svg")).toHaveCount(1);
+  for (let index = 0; index < 4; index += 1) await expect(cards.nth(index).locator("svg")).toHaveCount(1);
   await expect(cards.first().locator("p").last()).toHaveText(/^\d{4} · ნომინალური მშპ \d+\.\d მლრდ ₾$/);
   await expect(cards.nth(1)).toContainText("ტოპ 3-ის წილი მშპ-ში");
-  await expect(cards.nth(2)).toContainText("რეგიონის მთლიანი მშპ (მიმდინარე ფასები)");
+  await expect(cards.nth(2)).toContainText(/შინამეურნეობების მოხმარება მშპ-ის \d+\.\d%/);
+  await expect(cards.nth(3)).toContainText("რეგიონის მთლიანი მშპ (მიმდინარე ფასები)");
 });
 
 test("the inflation hub links all four live sections and the sidebar reaches Overview and Categories", async ({ page }) => {

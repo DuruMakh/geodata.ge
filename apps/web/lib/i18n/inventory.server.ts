@@ -12,6 +12,7 @@ import { loadReviewedSourceManifest } from "../methodology/sourceManifest";
 import { LIVE_METHODOLOGY_IDS } from "../methodology/types";
 import type { TranslationInventory } from "./types";
 import sectorRegistry from "../../../../data/taxonomy/economic-sectors.json";
+import gdpExpenditureRegistry from "../../../../data/taxonomy/gdp-expenditure.json";
 import unemploymentRegistry from "../../../../data/taxonomy/unemployment-groups.json";
 import tradePartnerRegistry from "../../../../data/taxonomy/trade-partners.json";
 import tradeCompositionRegistry from "../../../../data/taxonomy/trade-composition.json";
@@ -40,6 +41,10 @@ import { INTERNET_HUB_PATH, INTERNET_SECTIONS } from "../explorer/internet";
 import { INTERNET_AREAS, internetAreaHref } from "../explorer/internetAreas";
 import { EDUCATION_HUB_PATH, EDUCATION_SECTIONS } from "../explorer/education";
 import { educationPlaceBase } from "../explorer/educationPlaces";
+import { ENVIRONMENT_HUB_PATH, ENVIRONMENT_SECTIONS } from "../explorer/environment";
+import { ENVIRONMENT_AREAS, environmentAreaRoutes } from "../explorer/environmentAreas";
+import { ENVIRONMENT_CITIES } from "../data/environment/types";
+import { environmentCityHref } from "../explorer/environmentCities";
 import { SCIENCE_CULTURE_HUB_PATH, SCIENCE_CULTURE_SECTIONS } from "../explorer/scienceCulture";
 import { MUSEUM_AREAS, museumAreaHref } from "../explorer/scienceCultureMuseums";
 
@@ -49,7 +54,7 @@ export async function listPublicPagePaths(): Promise<string[]> {
   const { regions } = await loadServedMunicipalData();
   return [
     "/", "/about", "/connect", "/explorer", "/explorer/economy", "/explorer/economy/gdp",
-    "/explorer/economy/sectors",
+    "/explorer/economy/sectors", "/explorer/economy/expenditure",
     "/explorer/unemployment",
     "/explorer/trade", "/explorer/trade/overview", "/explorer/trade/partners", "/explorer/trade/products", "/explorer/trade/domestic-exports", "/explorer/trade/services", "/explorer/trade/composition", "/explorer/external", "/explorer/external/money-from-abroad", "/explorer/external/foreign-investment", "/explorer/external/current-account", ...EXTERNAL_POSITION_SECTIONS.map(section => section.href),
     ...UNEMPLOYMENT_SECTIONS.map(section => section.href), ...LABOUR_SECTIONS.map(section => section.href),
@@ -62,6 +67,8 @@ export async function listPublicPagePaths(): Promise<string[]> {
     "/explorer/money", ...MONEY_BANKS_SECTIONS.map(section => section.href),
     BUSINESS_HUB_PATH, ...BUSINESS_SECTIONS.map(section => section.href), ...BUSINESS_AREAS.map(businessAreaHref),
     HOUSING_HUB_PATH, ...HOUSING_SECTIONS.map(section => section.href), ...HOUSING_AREAS.map(housingAreaHref),
+    ENVIRONMENT_HUB_PATH, ...ENVIRONMENT_SECTIONS.map(section => section.href), ...ENVIRONMENT_CITIES.map(environmentCityHref),
+    ...(["waste", "forests"] as const).flatMap(topic => ENVIRONMENT_AREAS.map(environmentAreaRoutes(topic).areaHref)),
     INTERNET_HUB_PATH, ...INTERNET_SECTIONS.map(section => section.href), ...INTERNET_AREAS.map(internetAreaHref),
     EDUCATION_HUB_PATH, ...EDUCATION_SECTIONS.map(section => section.href), ...(["schools", "kindergartens"] as const).flatMap(set => placePagePaths(educationPlaceBase(set), regions.map(({ id }) => id))),
     SCIENCE_CULTURE_HUB_PATH, ...SCIENCE_CULTURE_SECTIONS.map(section => section.href), ...MUSEUM_AREAS.map(museumAreaHref),
@@ -94,6 +101,7 @@ export async function loadTranslationInventory(): Promise<TranslationInventory> 
     pagePaths,
     labelIds: sortedUnique([
       ...sectorRegistry.map(row => row.id), "economic-sectors",
+      ...gdpExpenditureRegistry.map(row => row.id),
       ...unemploymentRegistry.map(row => row.id), "unemployment",
       ...tradePartnerRegistry.map(row => row.id),
       ...tradeServiceRegistry.map(row => row.id),

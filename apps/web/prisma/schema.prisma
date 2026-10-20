@@ -81,6 +81,7 @@ model SourceDocument {
   governmentDebtFacts GovernmentDebtFact[]
   gdpOverviewFacts GdpOverviewFact[]
   economicSectorFacts EconomicSectorFact[]
+  gdpExpenditureFacts GdpExpenditureFact[]
   unemploymentFacts UnemploymentFact[]
   tradeOverviewFacts TradeOverviewFact[]
   tradePartnerFacts TradePartnerFact[]
@@ -96,6 +97,7 @@ model SourceDocument {
   housingFacts HousingFact[]
   internetFacts InternetFact[]
   educationFacts EducationFact[]
+  environmentFacts EnvironmentFact[]
   scienceCultureFacts ScienceCultureFact[]
   householdIncomeSpendingFacts HouseholdIncomeSpendingFact[]
   moneyTransferFacts MoneyTransferFact[]
@@ -137,6 +139,7 @@ model ImportRun {
   generalGovernmentBalanceFacts GeneralGovernmentBalanceFact[]
   gdpOverviewFacts GdpOverviewFact[]
   economicSectorFacts EconomicSectorFact[]
+  gdpExpenditureFacts GdpExpenditureFact[]
   unemploymentFacts UnemploymentFact[]
   tradeOverviewFacts TradeOverviewFact[]
   tradePartnerEntities TradePartnerEntity[]
@@ -153,6 +156,7 @@ model ImportRun {
   housingFacts HousingFact[]
   internetFacts InternetFact[]
   educationFacts EducationFact[]
+  environmentFacts EnvironmentFact[]
   scienceCultureFacts ScienceCultureFact[]
   householdIncomeSpendingFacts HouseholdIncomeSpendingFact[]
   moneyTransferEntities MoneyTransferEntity[]
@@ -514,6 +518,27 @@ model UnemploymentFact {
 }
 
 model EconomicSectorFact {
+  seriesId String
+  measure String
+  year Int
+  value Decimal @db.Decimal(40,20)
+  unit String
+  valuation String
+  priceBasis String
+  calculation String
+  status String
+  sourceLocator String
+  sourceDocumentId String
+  sourceDocument SourceDocument @relation(fields: [sourceDocumentId], references: [id])
+  lastReviewedAt DateTime @db.Date
+  importRunId String?
+  importRun ImportRun? @relation(fields: [importRunId], references: [id])
+  @@id([seriesId, measure, year])
+}
+
+// Mirror of data/imports/gdp-expenditure-annual.csv: Geostat's GDP by categories of use, the
+// economic-sector columns, exact stored decimals.
+model GdpExpenditureFact {
   seriesId String
   measure String
   year Int
@@ -964,6 +989,29 @@ model HealthFact {
 // Mirror of data/imports/crime-annual.csv: Geostat's annual recorded-crime, conviction, prison,
 // victim and road-accident counts, whole numbers. The counting-change register stays in the CSV.
 model CrimeFact {
+  year             Int
+  indicatorId      String
+  value            Decimal        @db.Decimal(40, 30)
+  publishedValue   Decimal        @db.Decimal(40, 30)
+  unit             String
+  basis            String
+  valueStatus      String
+  sourceId         String
+  sourceSheet      String
+  sourceCell       String
+  sourceDocumentId String
+  sourceDocument   SourceDocument @relation(fields: [sourceDocumentId], references: [id])
+  lastReviewedAt   DateTime       @db.Date
+  importRunId      String?
+  importRun        ImportRun?     @relation(fields: [importRunId], references: [id])
+
+  @@id([indicatorId, year])
+}
+
+// Mirror of data/imports/environment-annual.csv: Geostat's yearly greenhouse gas, air pollution,
+// city air quality, climate, water, waste and forest figures, exact published decimals. A value's
+// displayed decimals are read from its published value, so no decimals column is stored.
+model EnvironmentFact {
   year             Int
   indicatorId      String
   value            Decimal        @db.Decimal(40, 30)

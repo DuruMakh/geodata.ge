@@ -67,7 +67,7 @@ const registerRow = (overrides: Partial<DecisionRegisterRow> = {}): DecisionRegi
 
 describe("methodology catalog", () => {
   it("exposes the approved live datasets", () => {
-    expect(LIVE_METHODOLOGY_IDS).toEqual(["expenditure", "revenue", "municipalities", "debt", "gdp", "economic-sectors", "regional-economies", "business", "housing", "inflation", "money", "unemployment", "wages", "poverty", "household-income", "health", "education", "science-culture", "crime", "internet", "trade", "external-flows", "energy-food", "demography"]);
+    expect(LIVE_METHODOLOGY_IDS).toEqual(["expenditure", "revenue", "municipalities", "debt", "gdp", "economic-sectors", "gdp-expenditure", "regional-economies", "business", "housing", "inflation", "money", "unemployment", "wages", "poverty", "household-income", "health", "education", "science-culture", "crime", "internet", "trade", "external-flows", "energy-food", "environment", "demography"]);
     expect(Object.keys(METHODOLOGY_CONTENT)).toEqual(LIVE_METHODOLOGY_IDS);
   });
 
@@ -339,6 +339,7 @@ describe("methodology catalog", () => {
   it("builds live hub rows from facts, content metadata, and validated archives", () => {
     const archives: Record<(typeof LIVE_METHODOLOGY_IDS)[number], MethodologyArchiveSummary> = {
       "economic-sectors": {fileCount:3,totalBytes:100,latestRetrievedAt:"2026-09-11",validated:true,minYear:2010,maxYear:2025},
+      "gdp-expenditure": {fileCount:3,totalBytes:100,latestRetrievedAt:"2026-10-20",validated:true,minYear:2010,maxYear:2025},
       "regional-economies": {fileCount:2,totalBytes:100,latestRetrievedAt:"2026-09-13",validated:true,minYear:2010,maxYear:2024},
       expenditure: { fileCount: 42, totalBytes: 100, latestRetrievedAt: "2026-08-10", validated: true },
       revenue: { fileCount: 21, totalBytes: 200, latestRetrievedAt: "2026-08-09", validated: true },
@@ -355,6 +356,7 @@ describe("methodology catalog", () => {
       "household-income": { fileCount: 21, totalBytes: 100, latestRetrievedAt: "2026-10-11", validated: true, minYear: 2002, maxYear: 2025 },
       health: { fileCount: 36, totalBytes: 100, latestRetrievedAt: "2026-10-15", validated: true, minYear: 2002, maxYear: 2025 },
       crime: { fileCount: 22, totalBytes: 100, latestRetrievedAt: "2026-10-16", validated: true, minYear: 2001, maxYear: 2025 },
+      environment: { fileCount: 46, totalBytes: 100, latestRetrievedAt: "2026-10-20", validated: true, minYear: 1990, maxYear: 2025 },
       internet: { fileCount: 36, totalBytes: 100, latestRetrievedAt: "2026-10-20", validated: true, minYear: 2016, maxYear: 2026 },
       education: { fileCount: 45, totalBytes: 100, latestRetrievedAt: "2026-10-16", validated: true, minYear: 2000, maxYear: 2025 },
       "science-culture": { fileCount: 33, totalBytes: 100, latestRetrievedAt: "2026-10-20", validated: true, minYear: 2005, maxYear: 2025 },
@@ -403,6 +405,7 @@ describe("methodology catalog", () => {
       },
       {id:"gdp",title:METHODOLOGY_CONTENT.gdp.title,summary:METHODOLOGY_CONTENT.gdp.summary,href:"/methodology/gdp",coverage:{firstYear:1960,lastYear:2025},originalFileCount:5,reviewedAt:METHODOLOGY_CONTENT.gdp.reviewedAt},
       {id:"economic-sectors",title:METHODOLOGY_CONTENT["economic-sectors"].title,summary:METHODOLOGY_CONTENT["economic-sectors"].summary,href:"/methodology/economic-sectors",coverage:{firstYear:2010,lastYear:2025},originalFileCount:3,reviewedAt:METHODOLOGY_CONTENT["economic-sectors"].reviewedAt},
+      {id:"gdp-expenditure",title:METHODOLOGY_CONTENT["gdp-expenditure"].title,summary:METHODOLOGY_CONTENT["gdp-expenditure"].summary,href:"/methodology/gdp-expenditure",coverage:{firstYear:2010,lastYear:2025},originalFileCount:3,reviewedAt:METHODOLOGY_CONTENT["gdp-expenditure"].reviewedAt},
       {id:"regional-economies",title:METHODOLOGY_CONTENT["regional-economies"].title,summary:METHODOLOGY_CONTENT["regional-economies"].summary,href:"/methodology/regional-economies",coverage:{firstYear:2010,lastYear:2024},originalFileCount:2,reviewedAt:METHODOLOGY_CONTENT["regional-economies"].reviewedAt},
       { id: "business", title: METHODOLOGY_CONTENT.business.title, summary: METHODOLOGY_CONTENT.business.summary, href: "/methodology/business", coverage: { firstYear: 1999, lastYear: 2025 }, originalFileCount: 26, reviewedAt: METHODOLOGY_CONTENT.business.reviewedAt },
       { id: "housing", title: METHODOLOGY_CONTENT.housing.title, summary: METHODOLOGY_CONTENT.housing.summary, href: "/methodology/housing", coverage: { firstYear: 2006, lastYear: 2025 }, originalFileCount: 21, reviewedAt: METHODOLOGY_CONTENT.housing.reviewedAt },
@@ -428,6 +431,7 @@ describe("methodology catalog", () => {
       { id: "trade", title: METHODOLOGY_CONTENT.trade.title, summary: METHODOLOGY_CONTENT.trade.summary, href: "/methodology/trade", coverage: { firstYear: 1995, lastYear: 2025 }, originalFileCount: 3, reviewedAt: METHODOLOGY_CONTENT.trade.reviewedAt },
       { id: "external-flows", title: METHODOLOGY_CONTENT["external-flows"].title, summary: METHODOLOGY_CONTENT["external-flows"].summary, href: "/methodology/external-flows", coverage: { firstYear: 2000, lastYear: 2025 }, originalFileCount: 3, reviewedAt: METHODOLOGY_CONTENT["external-flows"].reviewedAt },
       { id: "energy-food", title: METHODOLOGY_CONTENT["energy-food"].title, summary: METHODOLOGY_CONTENT["energy-food"].summary, href: "/methodology/energy-food", coverage: { firstYear: 2006, lastYear: 2025 }, originalFileCount: 55, reviewedAt: METHODOLOGY_CONTENT["energy-food"].reviewedAt },
+      { id: "environment", title: METHODOLOGY_CONTENT.environment.title, summary: METHODOLOGY_CONTENT.environment.summary, href: "/methodology/environment", coverage: { firstYear: 1990, lastYear: 2025 }, originalFileCount: 46, reviewedAt: METHODOLOGY_CONTENT.environment.reviewedAt },
       { id: "demography", title: METHODOLOGY_CONTENT.demography.title, summary: METHODOLOGY_CONTENT.demography.summary, href: "/methodology/demography", coverage: { firstYear: 2004, lastYear: 2026 }, originalFileCount: 2, reviewedAt: METHODOLOGY_CONTENT.demography.reviewedAt },
     ]);
   });
@@ -435,6 +439,7 @@ describe("methodology catalog", () => {
   it("rejects a hub row without a validated archive", () => {
     const archives = {
       "economic-sectors": {fileCount:3,totalBytes:100,latestRetrievedAt:"2026-09-11",validated:true,minYear:2010,maxYear:2025},
+      "gdp-expenditure": {fileCount:3,totalBytes:100,latestRetrievedAt:"2026-10-20",validated:true,minYear:2010,maxYear:2025},
       "regional-economies": {fileCount:2,totalBytes:100,latestRetrievedAt:"2026-09-13",validated:true,minYear:2010,maxYear:2024},
       expenditure: { fileCount: 1, totalBytes: 1, latestRetrievedAt: "2026-08-10", validated: true },
       revenue: { fileCount: 1, totalBytes: 1, latestRetrievedAt: "2026-08-10", validated: false },
@@ -451,6 +456,7 @@ describe("methodology catalog", () => {
       "household-income": { fileCount: 21, totalBytes: 100, latestRetrievedAt: "2026-10-11", validated: true, minYear: 2002, maxYear: 2025 },
       health: { fileCount: 36, totalBytes: 100, latestRetrievedAt: "2026-10-15", validated: true, minYear: 2002, maxYear: 2025 },
       crime: { fileCount: 22, totalBytes: 100, latestRetrievedAt: "2026-10-16", validated: true, minYear: 2001, maxYear: 2025 },
+      environment: { fileCount: 46, totalBytes: 100, latestRetrievedAt: "2026-10-20", validated: true, minYear: 1990, maxYear: 2025 },
       internet: { fileCount: 36, totalBytes: 100, latestRetrievedAt: "2026-10-20", validated: true, minYear: 2016, maxYear: 2026 },
       education: { fileCount: 45, totalBytes: 100, latestRetrievedAt: "2026-10-16", validated: true, minYear: 2000, maxYear: 2025 },
       "science-culture": { fileCount: 33, totalBytes: 100, latestRetrievedAt: "2026-10-20", validated: true, minYear: 2005, maxYear: 2025 },

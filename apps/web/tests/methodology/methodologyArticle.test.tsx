@@ -128,6 +128,7 @@ describe("methodology footer attribution", () => {
     ["housing", "Geostat"],
     ["health", "Geostat"],
     ["crime", "Geostat"],
+    ["environment", "Geostat"],
     ["internet", "Geostat"],
     ["education", "Geostat"],
     ["science-culture", "Geostat"],
@@ -211,6 +212,26 @@ describe("internet methodology", () => {
     for (const file of ["01_share_of_households_with_internet_access.xlsx", "01_internetit_uzrunvelyopili_shinameurneobebi.xlsx", "17_ict_skills.xlsx", "geostat-category-106-2026-10-20.html.txt", "geostat-category-106-ka-2026-10-20.html.txt"]) {
       expect(markup).toContain(`/downloads/methodology/internet/files/${file}`);
     }
+  });
+});
+
+describe("environment methodology", () => {
+  it.each([
+    ["ka", "გარემო და კლიმატი", "ზესტაფონის არაავტომატურ სადგურზე სინჯების აღების მეთოდოლოგიას არ იძლევა საშუალებას", "სადგური ამოქმედდა 2019 წლის მაისიდან"],
+    ["en", "Environment and climate", "Sampling methodology at Zestaponi non-automatic station can provide neigther daily avarage concentrations", "The station has been operational since May 2019"],
+  ] as const)("renders the %s article with its 46 archived originals, Geostat's notes and Dataset markup", async (locale, title, zestaponiNote, stationNote) => {
+    const { renderMethodologyArticle } = await import("../../lib/pages/methodology-article");
+    const markup = renderToStaticMarkup(await renderMethodologyArticle(locale, { params: Promise.resolve({ dataset: "environment" }) }));
+    expect(markup).toContain(title);
+    expect(markup).toContain("1990–2025");
+    expect(markup).toContain('"@type":"Dataset"');
+    expect(markup).toContain(zestaponiNote);
+    expect(markup).toContain(stationNote);
+    expect(markup).toContain("/downloads/methodology/environment/files/b-3.-greenhouse-gas-emissions-eng.xlsx");
+    expect(markup).toContain("/downloads/methodology/environment/files/volume-of-felled-timber.xls");
+    expect(markup).toContain("/downloads/methodology/environment/files/b-3.-greenhouse-gas-emissions-geo.xlsx");
+    expect(markup).toContain("/downloads/methodology/environment/files/page-565-en.html.txt");
+    expect(markup).not.toContain("geostat.ge/media");
   });
 });
 

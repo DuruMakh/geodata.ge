@@ -1,0 +1,705 @@
+{
+  "status": "passed",
+  "retrieved_at": "2026-10-20",
+  "scope": "Annual research only: Geostat environment statistics (greenhouse gases 2000-2022, air pollutant emissions 2013-2024, city air quality by monitoring station 2005-2025, temperature and precipitation 1990, 1995 and 2000-2024, water supply 2015-2025, municipal waste 2015-2024, timber, illegal logging and fires 2010-2024); no derived values and no serving",
+  "primary_observation_count": 2125,
+  "observations_by_family": {
+    "air": 288,
+    "aq": 475,
+    "climate": 324,
+    "forest": 386,
+    "ghg": 357,
+    "waste": 130,
+    "water": 165
+  },
+  "observations_by_source": {
+    "geostat_env_air_emissions": 288,
+    "geostat_env_air_quality": 475,
+    "geostat_env_fires": 24,
+    "geostat_env_ghg": 357,
+    "geostat_env_illegal_logging": 185,
+    "geostat_env_precipitation": 108,
+    "geostat_env_temperature": 216,
+    "geostat_env_timber": 177,
+    "geostat_env_waste": 130,
+    "geostat_env_wastewater": 77,
+    "geostat_env_water_household": 22,
+    "geostat_env_water_losses": 11,
+    "geostat_env_water_supply": 55
+  },
+  "indicators": 195,
+  "footnoted_number_cells": [
+    {
+      "indicator_id": "environment.aq.pm10_avg.tbilisi_a4",
+      "year": 2019,
+      "source_sheet": "Tbilisi",
+      "source_cell": "X141",
+      "value": "47",
+      "printed": "47*"
+    },
+    {
+      "indicator_id": "environment.aq.no2_avg.tbilisi_a4",
+      "year": 2019,
+      "source_sheet": "Tbilisi",
+      "source_cell": "X160",
+      "value": "36",
+      "printed": "36*"
+    },
+    {
+      "indicator_id": "environment.aq.pm10_days.tbilisi_a4",
+      "year": 2019,
+      "source_sheet": "Tbilisi",
+      "source_cell": "X143",
+      "value": "83",
+      "printed": "83*"
+    },
+    {
+      "indicator_id": "environment.aq.no2_avg.kutaisi_b1",
+      "year": 2019,
+      "source_sheet": "Kutaisi",
+      "source_cell": "X28",
+      "value": "46",
+      "printed": "46*"
+    }
+  ],
+  "magnitude_nil_cells": [
+    {
+      "indicator_id": "environment.forest.illegal_logging.region_guria",
+      "year": 2011,
+      "source_cell": "C6"
+    },
+    {
+      "indicator_id": "environment.forest.illegal_logging.region_imereti",
+      "year": 2010,
+      "source_cell": "B7"
+    },
+    {
+      "indicator_id": "environment.forest.illegal_logging.region_mtskheta_mtianeti",
+      "year": 2010,
+      "source_cell": "B9"
+    },
+    {
+      "indicator_id": "environment.forest.illegal_logging.region_mtskheta_mtianeti",
+      "year": 2011,
+      "source_cell": "C9"
+    },
+    {
+      "indicator_id": "environment.forest.illegal_logging.region_racha_lechkhumi_kvemo_svaneti",
+      "year": 2010,
+      "source_cell": "B10"
+    },
+    {
+      "indicator_id": "environment.forest.illegal_logging.region_racha_lechkhumi_kvemo_svaneti",
+      "year": 2011,
+      "source_cell": "C10"
+    }
+  ],
+  "placeholder_cells_in_served_values": 0,
+  "imputed_values": 0,
+  "calculated_values": 0,
+  "reconciliation_failed_count": 0,
+  "published_rounding_differences": [
+    {
+      "check": "ghg_gases",
+      "year": 2002,
+      "difference": "0.001"
+    },
+    {
+      "check": "ghg_gases",
+      "year": 2003,
+      "difference": "-0.097"
+    },
+    {
+      "check": "ghg_gases",
+      "year": 2004,
+      "difference": "0.005"
+    },
+    {
+      "check": "ghg_gases",
+      "year": 2005,
+      "difference": "-0.091"
+    },
+    {
+      "check": "ghg_gases",
+      "year": 2006,
+      "difference": "-0.091"
+    },
+    {
+      "check": "ghg_gases",
+      "year": 2007,
+      "difference": "0.01"
+    },
+    {
+      "check": "ghg_sectors",
+      "year": 2008,
+      "difference": "-0.1"
+    },
+    {
+      "check": "ghg_gases",
+      "year": 2008,
+      "difference": "-0.085"
+    },
+    {
+      "check": "ghg_sectors",
+      "year": 2009,
+      "difference": "-0.1"
+    },
+    {
+      "check": "ghg_gases",
+      "year": 2009,
+      "difference": "-0.078"
+    },
+    {
+      "check": "ghg_net",
+      "year": 2009,
+      "difference": "0.1"
+    },
+    {
+      "check": "ghg_gases",
+      "year": 2010,
+      "difference": "0.05955"
+    },
+    {
+      "check": "ghg_gases",
+      "year": 2011,
+      "difference": "-0.02938"
+    },
+    {
+      "check": "ghg_gases",
+      "year": 2012,
+      "difference": "-0.00032"
+    },
+    {
+      "check": "ghg_net",
+      "year": 2012,
+      "difference": "0.1"
+    },
+    {
+      "check": "ghg_gases",
+      "year": 2013,
+      "difference": "0.00968"
+    },
+    {
+      "check": "ghg_gases",
+      "year": 2014,
+      "difference": "-0.07426"
+    },
+    {
+      "check": "ghg_gases",
+      "year": 2015,
+      "difference": "0.04579"
+    },
+    {
+      "check": "ghg_gases",
+      "year": 2016,
+      "difference": "-0.04517"
+    },
+    {
+      "check": "ghg_gases",
+      "year": 2017,
+      "difference": "-0.10713"
+    },
+    {
+      "check": "ghg_sectors",
+      "year": 2018,
+      "difference": "-0.06"
+    },
+    {
+      "check": "ghg_gases",
+      "year": 2018,
+      "difference": "-0.01407"
+    },
+    {
+      "check": "ghg_net",
+      "year": 2018,
+      "difference": "-0.04"
+    },
+    {
+      "check": "ghg_sectors",
+      "year": 2020,
+      "difference": "0.1"
+    },
+    {
+      "check": "ghg_gases",
+      "year": 2020,
+      "difference": "0.04506"
+    },
+    {
+      "check": "ghg_gases",
+      "year": 2021,
+      "difference": "-0.11488"
+    },
+    {
+      "check": "ghg_gases",
+      "year": 2022,
+      "difference": "-0.01886"
+    },
+    {
+      "check": "air_co",
+      "year": 2013,
+      "difference": "0.1"
+    },
+    {
+      "check": "air_co",
+      "year": 2015,
+      "difference": "-0.1"
+    },
+    {
+      "check": "air_co",
+      "year": 2017,
+      "difference": "0.1"
+    },
+    {
+      "check": "air_co",
+      "year": 2018,
+      "difference": "-0.1"
+    },
+    {
+      "check": "air_nox",
+      "year": 2018,
+      "difference": "-0.1"
+    },
+    {
+      "check": "air_nox",
+      "year": 2019,
+      "difference": "0.1"
+    },
+    {
+      "check": "air_nox",
+      "year": 2021,
+      "difference": "0.1"
+    },
+    {
+      "check": "air_nox",
+      "year": 2024,
+      "difference": "0.1"
+    },
+    {
+      "check": "air_so2",
+      "year": 2013,
+      "difference": "-0.1"
+    },
+    {
+      "check": "air_so2",
+      "year": 2014,
+      "difference": "-0.1"
+    },
+    {
+      "check": "air_so2",
+      "year": 2017,
+      "difference": "-0.1"
+    },
+    {
+      "check": "air_nh3",
+      "year": 2024,
+      "difference": "-0.1"
+    },
+    {
+      "check": "air_tsp",
+      "year": 2017,
+      "difference": "0.1"
+    },
+    {
+      "check": "air_tsp",
+      "year": 2018,
+      "difference": "0.1"
+    },
+    {
+      "check": "air_tsp",
+      "year": 2019,
+      "difference": "-0.1"
+    },
+    {
+      "check": "air_pm25",
+      "year": 2016,
+      "difference": "-0.1"
+    },
+    {
+      "check": "air_pm25",
+      "year": 2018,
+      "difference": "0.1"
+    },
+    {
+      "check": "air_pm25",
+      "year": 2019,
+      "difference": "-0.1"
+    },
+    {
+      "check": "air_pm25",
+      "year": 2022,
+      "difference": "0.1"
+    },
+    {
+      "check": "water_volumes",
+      "year": 2018,
+      "difference": "-0.1"
+    },
+    {
+      "check": "water_volumes",
+      "year": 2020,
+      "difference": "0.1"
+    },
+    {
+      "check": "forest_timber_cut",
+      "year": 2017,
+      "difference": "1"
+    },
+    {
+      "check": "forest_timber_cut",
+      "year": 2019,
+      "difference": "2"
+    },
+    {
+      "check": "forest_timber_cut",
+      "year": 2020,
+      "difference": "-1"
+    },
+    {
+      "check": "forest_timber_cut",
+      "year": 2021,
+      "difference": "-0.02"
+    },
+    {
+      "check": "forest_timber_cut",
+      "year": 2022,
+      "difference": "-0.2"
+    },
+    {
+      "check": "forest_timber_cut",
+      "year": 2023,
+      "difference": "0.303"
+    },
+    {
+      "check": "forest_illegal_logging",
+      "year": 2013,
+      "difference": "2"
+    },
+    {
+      "check": "forest_illegal_logging",
+      "year": 2014,
+      "difference": "2"
+    },
+    {
+      "check": "forest_illegal_logging",
+      "year": 2016,
+      "difference": "1"
+    },
+    {
+      "check": "forest_illegal_logging",
+      "year": 2017,
+      "difference": "2"
+    },
+    {
+      "check": "forest_illegal_logging",
+      "year": 2019,
+      "difference": "1"
+    },
+    {
+      "check": "forest_illegal_logging",
+      "year": 2021,
+      "difference": "0.331"
+    },
+    {
+      "check": "forest_illegal_logging",
+      "year": 2022,
+      "difference": "-0.12"
+    },
+    {
+      "check": "forest_illegal_logging",
+      "year": 2023,
+      "difference": "-0.04"
+    }
+  ],
+  "checks": [
+    "no duplicate observation and no year outside the published tables; every value is a plain decimal with its decimals count",
+    "a \"…\", \"...\" or \"-\" cell is never served as a value, except \"-\" in Illegal-logging.xls, whose legend says \"Magnitude nil\" (served as 0)",
+    "numbers are the published cells rounded to 12 significant digits, which only drops floating noise; a number printed with a footnote mark (\"47*\") is served as the number",
+    "every row equals a fresh read of its source cell, row label, block heading, printed unit and year heading",
+    "greenhouse gases: energy, industry, agriculture and waste add up to the total; the three energy rows add up to energy; CO2, methane, nitrous oxide and HFCs and SF6 (thousand tonnes / 1,000) add up to the total; the total plus land use equals the net total (tolerance 0.15, every difference recorded)",
+    "air pollutants: stationary and mobile sources add up to each total (tolerance 0.15)",
+    "water: losses and net volume add up to the gross volume; the published loss share matches the volumes; C-7 prints the C-5 volumes",
+    "waste: the eleven regions add up to Georgia (tolerance 0.15)",
+    "timber cut and illegal logging: the regions and protected areas add up to Georgia (tolerance 2 m3)",
+    "city air quality: every station block of a city prints the same yearly limits; a limit is served only in years with a station value",
+    "anchor values of the design document",
+    "independent-validation.json re-reads every cell with SheetJS and compares the Georgian copies with the English workbooks"
+  ],
+  "source_checks": [
+    {
+      "source_id": "geostat_env_ghg",
+      "sha256": "0B5BDB04BFD21E1E2D9F728BAE60CCB34F2542717D22932DF01F69C4847E60FA",
+      "bytes": 15399,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_env_ghg_ka",
+      "sha256": "C090D9812892439503D3CD58178233B14A8A922BB5DD2CAF196590CBF6D9D7E6",
+      "bytes": 18250,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_env_air_emissions",
+      "sha256": "57FAB79C0CBD3E917EDBB97E8873187B61416FF02E1AE74278086EDF2C674374",
+      "bytes": 20414,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_env_air_emissions_ka",
+      "sha256": "52FDF566295600A066578B1899090217BB1576629D0E379D6F874E7F0D7C98E6",
+      "bytes": 20637,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_env_air_quality",
+      "sha256": "AE1283221967F1333415529CC5FE5C506F88A1F6505A50182465404EB8CB58A4",
+      "bytes": 111998,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_env_air_quality_ka",
+      "sha256": "02AC3AE63AEB24A3310F64BA3972497F48A7166A0F361FE23205D28FC07B8A8F",
+      "bytes": 114900,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_env_temperature",
+      "sha256": "523D3E4419ED524B9C2A8E96EB2557D628AE87C0A5870AD18CE9B1F71BB641EC",
+      "bytes": 15006,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_env_temperature_ka",
+      "sha256": "1C17A1DD77D625155F0265D36AFCD46F5F5FDEA04176FF693E33C25C2B9BE9A5",
+      "bytes": 15579,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_env_precipitation",
+      "sha256": "DB17ADAFBFCB6562960EB7894A58767FD62A90FC95DA1D8EE65827061E4DA114",
+      "bytes": 15098,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_env_precipitation_ka",
+      "sha256": "687017CC6FEAC833ABAAE7A66EB6F128DEE0B3CB4284E70100EC63E093752E2A",
+      "bytes": 15487,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_env_water_household",
+      "sha256": "58765DD65E33612EADF36B14BA3826499EC7863FBD81E8B7562DA37E7A5A04C9",
+      "bytes": 12650,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_env_water_household_ka",
+      "sha256": "1E842C89BE0E831B371D9D88CE58DDBA30F1D2C0136D7915D7C22B81B0689D0B",
+      "bytes": 14873,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_env_water_supply",
+      "sha256": "71BBBA91382197DA3B8C11472E860B5EFD340D90760006A56DC4642CA930593B",
+      "bytes": 11771,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_env_water_supply_ka",
+      "sha256": "412C87F0A3D9BD4CB2A6375E8510AF4C7D928A6FE6EE266EF8AA008CC651D0CC",
+      "bytes": 13152,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_env_water_losses",
+      "sha256": "BC9EAD793ABA83A4CA47167FF689521C11A540D9A43AB062331F240C29091020",
+      "bytes": 12895,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_env_water_losses_ka",
+      "sha256": "2D10CF45DF88330EE3B827E1D674CE290B3DA73E274752AF1D2B6E2B4F165476",
+      "bytes": 13494,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_env_wastewater",
+      "sha256": "EC36CD4B220A576638774D3B3B6A3C217AFDDF3625CFF7DC08055BA45026349A",
+      "bytes": 13982,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_env_wastewater_ka",
+      "sha256": "E380EB6EE5E3166A2A93944C2F0FEAFE9F088DC9DD02E549553701D9D82BB479",
+      "bytes": 14835,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_env_waste",
+      "sha256": "FC8635494FD1F1F3244D1ED6223157BCD2F87276CB4189533EED29356D88BE49",
+      "bytes": 14988,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_env_waste_ka",
+      "sha256": "0B9232C7996929C59E1B407CBBF7465D72B4B0EC08B0DD86999D807DC7AC1C65",
+      "bytes": 15464,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_env_timber",
+      "sha256": "8877BA0CAFD1AD376A65D9E45DD0ADE92B2DF44AEBE278259BE1AAFBB88BDF07",
+      "bytes": 38912,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_env_timber_ka",
+      "sha256": "2D1179ED9BEB74AA8061172F877A6C60CCA7090040E1F7F7CCABB61213F8462D",
+      "bytes": 32256,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_env_illegal_logging",
+      "sha256": "65A98FD71BFBE247BC4A5D459CC4759559A65E3789426017356AD3782FB74BBD",
+      "bytes": 28672,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_env_illegal_logging_ka",
+      "sha256": "6A087C468D94F3727C385FB3A89C8EFC4A9075DAE934524DF73209D5820F393B",
+      "bytes": 28672,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_env_fires",
+      "sha256": "CBC69A92EF23B9F9B56305DCA7F2863E8F7D7B9CABF502D0526A0F3F09EC11C2",
+      "bytes": 27648,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_env_fires_ka",
+      "sha256": "51DA8554B321569814862D72DFB36237DFB7234AAFA41ABBF8A65E5D18F779EA",
+      "bytes": 34816,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_env_ods",
+      "sha256": "FB0CFB0F0977E4DC264D40FD1C2D4AF07D149E9137E2F386B641488F916EEDEC",
+      "bytes": 14916,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_env_protected_areas_indicator",
+      "sha256": "60753D817185E3B257BB7194B6B54B3CEA4D11AF331B757D95A325D9CA29FC94",
+      "bytes": 12116,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_env_fertilizer",
+      "sha256": "12F2B31FA0BC28EBA89EEF37068F11029710A3C5FA31CC483D93EE688064B048",
+      "bytes": 15964,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_env_pesticide",
+      "sha256": "B2C74A548454BA36FDD28DEDA88A7DCCD1412E3906F870EC1F86F6B7DEE56E7C",
+      "bytes": 13833,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_env_final_energy",
+      "sha256": "A9CE3E2817AE4313F2A5D0B9FB90C78BB6BD78003A3357108EC0E5687281A48F",
+      "bytes": 13872,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_env_primary_energy",
+      "sha256": "0EB8D381476321CAB6F7C08347D38FC170C76AACA78736F32BDD1C39CCCC8C8A",
+      "bytes": 14757,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_env_renewable_energy",
+      "sha256": "06338A25115FBB570639AA64C5E1DDDEC8E6C29EF8E290B22D96B93F443A3B0B",
+      "bytes": 13750,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_env_stationary_air_pollution",
+      "sha256": "FC5CD56C1EE8640A3655583C10B4C69EAC6D45CE80ACCEEFDFC9DB13ED4BA8E5",
+      "bytes": 50176,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_env_protected_areas",
+      "sha256": "810E285B4D1CDF9A80C238332CB41F58E7B2A2903B47201BF3FEFD3D65B1779D",
+      "bytes": 54784,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_env_violations",
+      "sha256": "B4E680678471D7E4C49EF3E0DCBC076B7146D5D2E2EED54765793F3C89D5169C",
+      "bytes": 28672,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_env_protected_area_visitors",
+      "sha256": "A8157CAC480F341A96462BCD8D405BAC1B2F0FFF9A98763AB1DFA5554A4D0B56",
+      "bytes": 12484,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_env_water_quality",
+      "sha256": "DC8E717A8F8D0036A8BE29FEC799E8E872CEFF4F91C660B20721955CC6A24271",
+      "bytes": 13125,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_env_forest_area",
+      "sha256": "E8CCD8482E25F01215469B7D5AAC2C0B014020643E20F51A59098AACC1B337B3",
+      "bytes": 36864,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_env_timber_purpose",
+      "sha256": "0ED67E8508DB67665561AFE6828E0B451E858125EF7DBC66C5EDF60FC9A36811",
+      "bytes": 27136,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_env_page_565",
+      "sha256": "0C450EDD4C0990CA8964A49A116DAE5799AE8F80CB744BD324350236695EA67D",
+      "bytes": 131764,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_env_page_565_ka",
+      "sha256": "9AC7E9ABF0B3DE9747970528CC748467669214B4D44D98EAC167011AE9525DA2",
+      "bytes": 148538,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_env_page_73",
+      "sha256": "FB4F524C14DFEA87F203AAE9B9FD9026DA62E86354AED7DCE72977D6C4B36706",
+      "bytes": 89873,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_env_page_73_ka",
+      "sha256": "1AB444E4F81BC502A2F5BC9ACAB65FF9D40C7EAC20064F25C510D9EE168258E1",
+      "bytes": 100174,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_env_page_822",
+      "sha256": "5829B431168A19721F76451A8FB8C62889A582DBB31E3214C26A92E089E7A5DE",
+      "bytes": 79209,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_env_page_822_ka",
+      "sha256": "625FE912307B75F96682DD6238E06C9F68E09F37AADEBEFB622B196D96DB0990",
+      "bytes": 89445,
+      "passed": true
+    }
+  ]
+}

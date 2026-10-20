@@ -13,6 +13,7 @@ import {
 import { demographyMigrationPageMetadata, renderDemographyMigrationPage } from "../../lib/pages/demography-migration";
 import { demographyBirthsDeathsPageMetadata, renderDemographyBirthsDeathsPage } from "../../lib/pages/demography-births-deaths";
 import { demographyAgeSexPageMetadata, renderDemographyAgeSexPage } from "../../lib/pages/demography-age-sex";
+import { demographyMarriagesDivorcesPageMetadata, renderDemographyMarriagesDivorcesPage } from "../../lib/pages/demography-marriages-divorces";
 import {
   demographyPopulationPageMetadata,
   loadPopulationBasics,
@@ -30,27 +31,28 @@ beforeEach(() => { process.env.NEXT_PUBLIC_SITE_URL = "https://fiscal.ge"; });
 afterEach(() => { process.env.NEXT_PUBLIC_SITE_URL = original; });
 
 describe("demography hub page", () => {
-  it("renders the four cards with a breadcrumb and no Georgian text in English", async () => {
+  it("renders the five cards with a breadcrumb and no Georgian text in English", async () => {
     const html = renderPageMarkup("en", await renderDemographyPage("en"));
     expect(html).toContain('data-testid="demography-hub"');
-    expect((html.match(/data-testid="hub-card"/g) ?? []).length).toBe(4);
+    expect((html.match(/data-testid="hub-card"/g) ?? []).length).toBe(5);
     expect((html.match(/aria-disabled="true"/g) ?? []).length).toBe(0);
     expect(html).toContain('href="/en/explorer/demography/population"');
     expect(html).toContain('href="/en/explorer/demography/age-sex"');
     expect(html).toContain('href="/en/explorer/demography/migration"');
     expect(html).toContain('href="/en/explorer/demography/births-deaths"');
+    expect(html).toContain('href="/en/explorer/demography/marriages-divorces"');
     expect(html).toContain('data-testid="breadcrumb-json-ld"');
     expect(html).not.toContain('data-testid="explorer-dataset-json-ld"');
     expect(html).not.toContain("/downloads/data/");
     expect(html).not.toMatch(GEORGIAN);
   });
 
-  it("links the four pages in order in Georgian, without the /en prefix", async () => {
+  it("links the five pages in order in Georgian, without the /en prefix", async () => {
     const html = renderPageMarkup("ka", await renderDemographyPage("ka"));
     const hub = html.slice(html.indexOf('data-testid="demography-hub"'));
-    expect((hub.match(/data-testid="hub-card"/g) ?? []).length).toBe(4);
-    expect([...hub.matchAll(/href="([^"]+)"/g)].map((match) => match[1]).slice(0, 4)).toEqual(
-      ["population", "age-sex", "migration", "births-deaths"].map((page) => `/explorer/demography/${page}`),
+    expect((hub.match(/data-testid="hub-card"/g) ?? []).length).toBe(5);
+    expect([...hub.matchAll(/href="([^"]+)"/g)].map((match) => match[1]).slice(0, 5)).toEqual(
+      ["population", "age-sex", "migration", "births-deaths", "marriages-divorces"].map((page) => `/explorer/demography/${page}`),
     );
   });
 
@@ -216,6 +218,36 @@ describe("births and deaths page", () => {
   });
 });
 
+describe("marriages and divorces page", () => {
+  it("renders one latest line and no paragraph under the heading, the explorer, then the places block, with no dataset markup or Georgian in English", async () => {
+    const html = renderPageMarkup("en", await renderDemographyMarriagesDivorcesPage("en"));
+    expect(html).toContain(">Marriages and divorces</h1>");
+    const heading = html.slice(html.indexOf(">Marriages and divorces</h1>"), html.indexOf('data-testid="chart-panel"'));
+    expect((heading.match(/data-testid="marriage-latest"/g) ?? []).length).toBe(1);
+    // The latest line is itself the one paragraph there.
+    expect((heading.match(/<p[ >]/g) ?? []).length).toBe(1);
+    expect(html).toContain("22,285");
+    expect(html.indexOf('data-testid="marriage-explorer"')).toBeLessThan(html.indexOf('href="/en/explorer/demography/population/georgia#marriages-divorces"'));
+    expect(html).toContain('href="/en/explorer/demography/population/region/tbilisi#marriages-divorces"');
+    expect(html).toContain('href="/en/explorer/demography/population/kazbegi#marriages-divorces"');
+    expect(html).toContain('data-testid="breadcrumb-json-ld"');
+    expect(html).not.toContain('"@type":"Dataset"');
+    expect(html).not.toMatch(GEORGIAN);
+  });
+
+  it("links the Georgian map rows without the /en prefix", async () => {
+    const html = renderPageMarkup("ka", await renderDemographyMarriagesDivorcesPage("ka"));
+    expect(html).toContain('href="/explorer/demography/population/georgia#marriages-divorces"');
+  });
+
+  it("has its own canonical address and title", async () => {
+    const metadata = await demographyMarriagesDivorcesPageMetadata("ka");
+    expect(metadata.alternates?.canonical).toBe("https://fiscal.ge/explorer/demography/marriages-divorces");
+    expect(String(metadata.title)).toBe("ქორწინება და განქორწინება — დემოგრაფია | Fiscal.ge");
+    expect(String((await demographyMarriagesDivorcesPageMetadata("en")).description)).not.toMatch(GEORGIAN);
+  });
+});
+
 describe("age and sex page", () => {
   it("renders the pyramid, the heat map and a regional glance, in that order, with no dataset markup or Georgian in English", async () => {
     const html = renderPageMarkup("en", await renderDemographyAgeSexPage("en"));
@@ -268,7 +300,7 @@ describe("age and sex page", () => {
   });
 });
 
-// The fourteen Geostat originals listed in data/methodology/source-archives/demography.csv.
+// The twenty Geostat originals listed in data/methodology/source-archives/demography.csv.
 const REVIEWED_SOURCE_IDS = [
   "source.geostat_census2024_population_by_age_settlement",
   "source.geostat_demography_births",
@@ -276,21 +308,27 @@ const REVIEWED_SOURCE_IDS = [
   "source.geostat_demography_crude_death_rate",
   "source.geostat_demography_deaths",
   "source.geostat_demography_density",
+  "source.geostat_demography_divorces",
   "source.geostat_demography_fertility",
   "source.geostat_demography_infant_mortality",
   "source.geostat_demography_life_expectancy",
+  "source.geostat_demography_marriage_duration",
+  "source.geostat_demography_marriages",
+  "source.geostat_demography_mean_age_divorced",
+  "source.geostat_demography_mean_age_spouses",
   "source.geostat_demography_migration_citizenship",
   "source.geostat_demography_natural_increase",
   "source.geostat_demography_net_migration",
   "source.geostat_demography_population_age_sex",
+  "source.geostat_demography_population_mid_year",
   "source.geostat_municipal_population",
 ];
 
 describe("population sources", () => {
-  it("are the fourteen reviewed demography sources in either language, each downloadable from the demography files", async () => {
+  it("are the twenty reviewed demography sources in either language, each downloadable from the demography files", async () => {
     for (const locale of ["en", "ka"] as const) {
       const sources = await loadPopulationSources(locale);
-      expect(sources, locale).toHaveLength(14);
+      expect(sources, locale).toHaveLength(20);
       expect(sources.map((source) => source.sourceId).sort(), locale).toEqual(REVIEWED_SOURCE_IDS);
       for (const source of sources) expect(source.downloadHref, locale).toMatch(/^\/downloads\/methodology\/demography\/files\/[^/]+$/);
     }

@@ -1,0 +1,21 @@
+{
+  "gdpExpenditure.metaTitle": "Georgia GDP by expenditure",
+  "gdpExpenditure.metaDescription": "What Georgia’s GDP is spent on: household and government consumption, investment, exports and imports over time, with Geostat sources and Excel downloads.",
+  "gdpExpenditure.heading": "GDP by expenditure",
+  "gdpExpenditure.measure": "Measure",
+  "gdpExpenditure.nominal": "Value in GEL",
+  "gdpExpenditure.shareOfGdp": "% of GDP",
+  "gdpExpenditure.realGrowth": "Real growth %",
+  "gdpExpenditure.reference": "Total GDP",
+  "gdpExpenditure.largest": "Household consumption",
+  "gdpExpenditure.householdsShare": "Households {share} of GDP",
+  "gdpExpenditure.preliminary": "Preliminary",
+  "gdpExpenditure.nominalContext": "Current prices. Imports are shown as positive amounts and are subtracted from GDP.",
+  "gdpExpenditure.shareContext": "Share of the same year’s GDP. Because of imports, the shares do not add up to 100%.",
+  "gdpExpenditure.growthContext": "Annual growth, adjusted for price changes. Households and non-profits are combined.",
+  "gdpExpenditure.source": "Source: Geostat · Annual national accounts.",
+  "gdpExpenditure.rowYear": "Values for {year}",
+  "gdpExpenditure.rangeChanged": "Period: {start}–{end}",
+  "gdpExpenditure.sector": "Category",
+  "gdpExpenditure.workbookTitle": "GDP by expenditure · {measure}"
+}

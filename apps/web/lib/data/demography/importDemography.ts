@@ -18,12 +18,14 @@ export const SERVED_DEMOGRAPHY_FILES = [
   "../../data/imports/demography-fertility-age-annual.csv",
   "../../data/imports/demography-structure-annual.csv",
   "../../data/imports/demography-census-2024-population.csv",
+  "../../data/imports/demography-mid-year-annual.csv",
+  "../../data/imports/demography-marriage-annual.csv",
 ] as const;
 
-// The migration, vital-events, fertility, age-structure and census files are mirrored whole, as the import mirrors files as they are.
+// The migration, vital-events, fertility, age-structure, census, mid-year and marriage files are mirrored whole, as the import mirrors files as they are.
 // Pages read only the series they show; the infant mortality rate and the crude rates are mirrored, not shown.
 const MIGRATION_SERIES = new Set<string>(FAMILIES.migration);
-const REGISTERED_SERIES = new Set<string>([...FAMILIES.vital, ...FAMILIES.fertility]);
+const REGISTERED_SERIES = new Set<string>([...FAMILIES.vital, ...FAMILIES.fertility, ...FAMILIES.marriage]);
 const CENSUS_SERIES = new Set<string>(FAMILIES.census);
 const SERVED_SERIES = new Set<string>([
   SERIES.populationTotal,
@@ -32,9 +34,10 @@ const SERVED_SERIES = new Set<string>([
   ...REGISTERED_SERIES,
   ...FAMILIES.structure,
   ...CENSUS_SERIES,
+  ...FAMILIES.midYear,
 ]);
 
-/** Population, density and the age structure follow the lineage of their year; migration is border-police data, vital events are registered events in every year, and the census tables are counts. */
+/** Population, the mid-year population, density and the age structure follow the lineage of their year; migration is border-police data, vital events and marriages are registered events in every year, and the census tables are counts. */
 function expectedBasis(fact: DemographyObservation): EstimateBasis {
   if (MIGRATION_SERIES.has(fact.seriesId)) return "border_police";
   if (REGISTERED_SERIES.has(fact.seriesId)) return "registered";

@@ -2984,6 +2984,51 @@
     },
     "documentLanguage": "en"
   },
+  "source.geostat_gdp_use_current": {
+    "title": {
+      "text": "Geostat GDP by categories of use at current prices",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "source.geostat_gdp_use_growth": {
+    "title": {
+      "text": "Geostat real GDP growth by categories of use",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "source.geostat_gdp_use_volume": {
+    "title": {
+      "text": "Geostat GDP by categories of use at constant 2019 prices",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
   "source.geostat_cpi_index_2010": {
     "title": {
       "text": "Consumer price indices in Georgia, 2010 average = 100",
@@ -7645,6 +7690,732 @@
       "reviewedAt": "2026-10-20"
     },
     "documentLanguage": "ka"
+  },
+  "geostat_env_ghg": {
+    "title": {
+      "text": "Table B-3: Greenhouse gas emissions",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_env_air_emissions": {
+    "title": {
+      "text": "Table A-1: Emissions of pollutants into the atmospheric air",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_env_air_quality": {
+    "title": {
+      "text": "Table A-2: Ambient air quality in urban areas",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_env_temperature": {
+    "title": {
+      "text": "Table B-1: Air temperature",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_env_precipitation": {
+    "title": {
+      "text": "Table B-2: Atmospheric precipitation",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_env_water_household": {
+    "title": {
+      "text": "Table C-4: Household water use per capita",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_env_water_supply": {
+    "title": {
+      "text": "Table C-5: Water supply industry and population connected to water supply industry",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_env_water_losses": {
+    "title": {
+      "text": "Table C-7: Water losses",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_env_wastewater": {
+    "title": {
+      "text": "Table C-14: Population connected to wastewater treatment",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_env_waste": {
+    "title": {
+      "text": "Amount of municipal waste disposed in landfills from the regions",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_env_timber": {
+    "title": {
+      "text": "Volume of felled timber",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_env_illegal_logging": {
+    "title": {
+      "text": "Illegal logging",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_env_fires": {
+    "title": {
+      "text": "Forest and field fires",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_env_ods": {
+    "title": {
+      "text": "Table A-3: Consumption of ozone-depleting substances",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_env_protected_areas_indicator": {
+    "title": {
+      "text": "Table D-1: Protected areas",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_env_fertilizer": {
+    "title": {
+      "text": "Table F-2: Fertilizer consumption",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_env_pesticide": {
+    "title": {
+      "text": "Table F-4: Pesticide consumption",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_env_final_energy": {
+    "title": {
+      "text": "Table G-1: Final energy consumption",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_env_primary_energy": {
+    "title": {
+      "text": "Table G-2: Total primary energy supply",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_env_renewable_energy": {
+    "title": {
+      "text": "Table G-4: Renewable energy supply",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_env_stationary_air_pollution": {
+    "title": {
+      "text": "Air pollution from stationary sources",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_env_protected_areas": {
+    "title": {
+      "text": "Protected areas",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_env_violations": {
+    "title": {
+      "text": "Violations of environmental law",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_env_protected_area_visitors": {
+    "title": {
+      "text": "Number of visitors by protected areas",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_env_water_quality": {
+    "title": {
+      "text": "Water quality",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_env_forest_area": {
+    "title": {
+      "text": "Forest area",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_env_timber_purpose": {
+    "title": {
+      "text": "Volume of felled timber by cutting purpose",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_env_ghg_ka": {
+    "title": {
+      "text": "Table B-3: Greenhouse gas emissions (Georgian version)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_env_air_emissions_ka": {
+    "title": {
+      "text": "Table A-1: Emissions of pollutants into the atmospheric air (Georgian version)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_env_air_quality_ka": {
+    "title": {
+      "text": "Table A-2: Ambient air quality in urban areas (Georgian version)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_env_temperature_ka": {
+    "title": {
+      "text": "Table B-1: Air temperature (Georgian version)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_env_precipitation_ka": {
+    "title": {
+      "text": "Table B-2: Atmospheric precipitation (Georgian version)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_env_water_household_ka": {
+    "title": {
+      "text": "Table C-4: Household water use per capita (Georgian version)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_env_water_supply_ka": {
+    "title": {
+      "text": "Table C-5: Water supply industry and population connected to water supply industry (Georgian version)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_env_water_losses_ka": {
+    "title": {
+      "text": "Table C-7: Water losses (Georgian version)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_env_wastewater_ka": {
+    "title": {
+      "text": "Table C-14: Population connected to wastewater treatment (Georgian version)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_env_waste_ka": {
+    "title": {
+      "text": "Amount of municipal waste disposed in landfills from the regions (Georgian version)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_env_timber_ka": {
+    "title": {
+      "text": "Volume of felled timber (Georgian version)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_env_illegal_logging_ka": {
+    "title": {
+      "text": "Illegal logging (Georgian version)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_env_fires_ka": {
+    "title": {
+      "text": "Forest and field fires (Georgian version)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_env_page_565": {
+    "title": {
+      "text": "Environmental indicators (source page capture)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_env_page_565_ka": {
+    "title": {
+      "text": "Environmental indicators, Georgian (source page capture)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_env_page_73": {
+    "title": {
+      "text": "Environment statistics (source page capture)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_env_page_73_ka": {
+    "title": {
+      "text": "Environment statistics, Georgian (source page capture)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_env_page_822": {
+    "title": {
+      "text": "Forest resources (source page capture)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_env_page_822_ka": {
+    "title": {
+      "text": "Forest resources, Georgian (source page capture)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "source.geostat_demography_population_mid_year": {
+    "title": { "text": "Mid-year population by self-governed units", "reviewedAt": "2026-10-20" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-20" },
+    "attribution": null,
+    "documentLanguage": "en"
+  },
+  "source.geostat_demography_marriages": {
+    "title": { "text": "Number of registered marriages by regions and self-governed units", "reviewedAt": "2026-10-20" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-20" },
+    "attribution": null,
+    "documentLanguage": "en"
+  },
+  "source.geostat_demography_mean_age_spouses": {
+    "title": { "text": "Mean age of spouses by order of marriages and sex", "reviewedAt": "2026-10-20" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-20" },
+    "attribution": null,
+    "documentLanguage": "en"
+  },
+  "source.geostat_demography_divorces": {
+    "title": { "text": "Number of registered divorces by regions and self-governed units", "reviewedAt": "2026-10-20" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-20" },
+    "attribution": null,
+    "documentLanguage": "en"
+  },
+  "source.geostat_demography_marriage_duration": {
+    "title": { "text": "Average duration of marriage (years)", "reviewedAt": "2026-10-20" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-20" },
+    "attribution": null,
+    "documentLanguage": "en"
+  },
+  "source.geostat_demography_mean_age_divorced": {
+    "title": { "text": "Mean age of divorced people by order of marriages and sex", "reviewedAt": "2026-10-20" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-20" },
+    "attribution": null,
+    "documentLanguage": "en"
   },
   "geostat_ict_homes_internet": {
     "title": {

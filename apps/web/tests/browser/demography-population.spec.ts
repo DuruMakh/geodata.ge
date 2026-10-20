@@ -234,8 +234,8 @@ test.describe("phone layouts at 390px", () => {
     test(`${locale}: the phone chart keeps its gap, its legend and tap readout print levels`, async ({ page }) => {
       await page.goto(`${prefix}/explorer/demography/population/georgia#${twoPlaces}`);
       await ready(page);
-      // The births-and-deaths section below also draws a phone chart; this test is about the population one.
-      const drawing = page.locator('svg[data-geometry="mobile"]:not([data-testid="vital-section"] *)');
+      // The births-and-deaths and marriages sections below also draw phone charts; this test is about the population one.
+      const drawing = page.locator('svg[data-geometry="mobile"]:not([data-testid="vital-section"] *):not([data-testid="marriage-section"] *)');
       await expect(drawing).toBeVisible();
       await expect(drawing.getByTestId("chart-break")).toHaveCount(1);
       await expect(drawing.getByTestId("chart-break")).toContainText(label);

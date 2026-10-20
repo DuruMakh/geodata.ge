@@ -1171,6 +1171,70 @@
     "text": "Total GDP",
     "reviewedAt": "2026-09-11"
   },
+  "gdp_use.consumption": {
+    "text": "Total consumption",
+    "reviewedAt": "2026-10-20"
+  },
+  "gdp_use.households": {
+    "text": "Households",
+    "reviewedAt": "2026-10-20"
+  },
+  "gdp_use.npish": {
+    "text": "Non-profits serving households",
+    "reviewedAt": "2026-10-20"
+  },
+  "gdp_use.households_npish": {
+    "text": "Households and non-profits",
+    "reviewedAt": "2026-10-20"
+  },
+  "gdp_use.government": {
+    "text": "Government",
+    "reviewedAt": "2026-10-20"
+  },
+  "gdp_use.government_individual": {
+    "text": "Government individual services",
+    "reviewedAt": "2026-10-20"
+  },
+  "gdp_use.government_collective": {
+    "text": "Government collective services",
+    "reviewedAt": "2026-10-20"
+  },
+  "gdp_use.investment": {
+    "text": "Total investment",
+    "reviewedAt": "2026-10-20"
+  },
+  "gdp_use.fixed_capital": {
+    "text": "Buildings and equipment",
+    "reviewedAt": "2026-10-20"
+  },
+  "gdp_use.inventories": {
+    "text": "Change in inventories",
+    "reviewedAt": "2026-10-20"
+  },
+  "gdp_use.exports": {
+    "text": "Total exports",
+    "reviewedAt": "2026-10-20"
+  },
+  "gdp_use.exports_goods": {
+    "text": "Goods exports",
+    "reviewedAt": "2026-10-20"
+  },
+  "gdp_use.exports_services": {
+    "text": "Services exports",
+    "reviewedAt": "2026-10-20"
+  },
+  "gdp_use.imports": {
+    "text": "Total imports",
+    "reviewedAt": "2026-10-20"
+  },
+  "gdp_use.imports_goods": {
+    "text": "Goods imports",
+    "reviewedAt": "2026-10-20"
+  },
+  "gdp_use.imports_services": {
+    "text": "Services imports",
+    "reviewedAt": "2026-10-20"
+  },
   "economic-sectors": {
     "text": "Economic sectors",
     "reviewedAt": "2026-09-11"

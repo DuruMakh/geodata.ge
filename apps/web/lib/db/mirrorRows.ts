@@ -50,6 +50,7 @@ import { housingDisplayDecimals } from "../data/housing/validation";
 import { internetSourceDocumentId, type InternetFact } from "../data/internet/types";
 import { businessDisplayDecimals } from "../data/business/validation";
 import { educationSourceDocumentId, type EducationFact } from "../data/education/types";
+import { environmentSourceDocumentId, type EnvironmentFact } from "../data/environment/types";
 import { educationDisplayDecimals } from "../data/education/validation";
 import { scienceCultureSourceDocumentId, type ScienceCultureFact } from "../data/scienceCulture/types";
 import { scienceCultureDisplayDecimals } from "../data/scienceCulture/validation";
@@ -917,6 +918,24 @@ export async function loadEducationFactsFromMirror(db: Pick<MirrorClient, "educa
   });
 }
 
+export function environmentMirrorCreateRows(facts: readonly EnvironmentFact[], importRunId: string): Prisma.EnvironmentFactCreateManyInput[] {
+  return facts.map(({ lastReviewedAt, ...fact }) => ({
+    ...fact, sourceDocumentId: environmentSourceDocumentId(fact.sourceId), lastReviewedAt: new Date(`${lastReviewedAt}T00:00:00.000Z`), importRunId,
+  }));
+}
+
+export async function loadEnvironmentFactsFromMirror(db: Pick<MirrorClient, "environmentFact">): Promise<EnvironmentFact[]> {
+  const rows = await db.environmentFact.findMany({ orderBy: [{ indicatorId: "asc" }, { year: "asc" }] });
+  return rows.map(row => {
+    if (row.sourceDocumentId !== environmentSourceDocumentId(row.sourceId)) throw new Error("Environment source relation mismatch");
+    return {
+      year: row.year, indicatorId: row.indicatorId, value: row.value.toFixed(), publishedValue: row.publishedValue.toFixed(),
+      unit: row.unit as EnvironmentFact["unit"], basis: row.basis as "actual", valueStatus: row.valueStatus as "official",
+      sourceId: row.sourceId, sourceSheet: row.sourceSheet, sourceCell: row.sourceCell, lastReviewedAt: isoDate(row.lastReviewedAt),
+    };
+  });
+}
+
 export function scienceCultureMirrorCreateRows(facts: readonly ScienceCultureFact[], importRunId: string): Prisma.ScienceCultureFactCreateManyInput[] {
   return facts.map(({ lastReviewedAt, ...fact }) => ({
     ...fact, sourceDocumentId: scienceCultureSourceDocumentId(fact.sourceId), lastReviewedAt: new Date(`${lastReviewedAt}T00:00:00.000Z`), importRunId,
@@ -957,6 +976,23 @@ export async function loadUnemploymentFactsFromMirror(db: MirrorClient): Promise
 
 export async function loadEconomicSectorFactsFromMirror(db: MirrorClient): Promise<SectorObservation[]> {
   const rows = await db.economicSectorFact.findMany({ orderBy: [{ seriesId: "asc" }, { measure: "asc" }, { year: "asc" }] });
+  return rows.map(row => ({
+    seriesId: row.seriesId, measure: row.measure as SectorObservation["measure"], year: row.year,
+    value: row.value.toFixed(), unit: row.unit as SectorObservation["unit"],
+    valuation: row.valuation as SectorObservation["valuation"], priceBasis: row.priceBasis as SectorObservation["priceBasis"],
+    calculation: row.calculation as SectorObservation["calculation"], status: row.status as SectorObservation["status"],
+    sourceId: row.sourceDocumentId, sourceLocator: row.sourceLocator, lastReviewedAt: isoDate(row.lastReviewedAt),
+  }));
+}
+
+export function gdpExpenditureMirrorCreateRows(facts: readonly SectorObservation[], importRunId: string): Prisma.GdpExpenditureFactCreateManyInput[] {
+  return facts.map(({ sourceId, lastReviewedAt, ...fact }) => ({
+    ...fact, sourceDocumentId: sourceId, lastReviewedAt: new Date(`${lastReviewedAt}T00:00:00.000Z`), importRunId,
+  }));
+}
+
+export async function loadGdpExpenditureFactsFromMirror(db: Pick<MirrorClient, "gdpExpenditureFact">): Promise<SectorObservation[]> {
+  const rows = await db.gdpExpenditureFact.findMany({ orderBy: [{ seriesId: "asc" }, { measure: "asc" }, { year: "asc" }] });
   return rows.map(row => ({
     seriesId: row.seriesId, measure: row.measure as SectorObservation["measure"], year: row.year,
     value: row.value.toFixed(), unit: row.unit as SectorObservation["unit"],
