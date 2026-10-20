@@ -1428,6 +1428,58 @@
     "name": { "text": "Food Security (source page capture)", "reviewedAt": "2026-10-11" },
     "derivation": null
   },
+  "source.geostat_farming_general": {
+    "name": { "text": "General agricultural statistics (Agriculture)", "reviewedAt": "2026-10-20" },
+    "derivation": null
+  },
+  "source.geostat_farming_general_ka": {
+    "name": { "text": "General agricultural statistics (Georgian labels)", "reviewedAt": "2026-10-20" },
+    "derivation": null
+  },
+  "source.geostat_farming_annual_crops": {
+    "name": { "text": "Production of annual crops (Agriculture)", "reviewedAt": "2026-10-20" },
+    "derivation": null
+  },
+  "source.geostat_farming_annual_crops_ka": {
+    "name": { "text": "Production of annual crops (Georgian labels)", "reviewedAt": "2026-10-20" },
+    "derivation": null
+  },
+  "source.geostat_farming_permanent_crops": {
+    "name": { "text": "Production of permanent crops (Agriculture)", "reviewedAt": "2026-10-20" },
+    "derivation": null
+  },
+  "source.geostat_farming_permanent_crops_ka": {
+    "name": { "text": "Production of permanent crops (Georgian labels)", "reviewedAt": "2026-10-20" },
+    "derivation": null
+  },
+  "source.geostat_farming_livestock_numbers": {
+    "name": { "text": "Number of livestock (annual) (Agriculture)", "reviewedAt": "2026-10-20" },
+    "derivation": null
+  },
+  "source.geostat_farming_livestock_numbers_ka": {
+    "name": { "text": "Number of livestock (annual) (Georgian labels)", "reviewedAt": "2026-10-20" },
+    "derivation": null
+  },
+  "source.geostat_farming_livestock_products": {
+    "name": { "text": "Production of livestock products (annual) (Agriculture)", "reviewedAt": "2026-10-20" },
+    "derivation": null
+  },
+  "source.geostat_farming_livestock_products_ka": {
+    "name": { "text": "Production of livestock products (annual) (Georgian labels)", "reviewedAt": "2026-10-20" },
+    "derivation": null
+  },
+  "source.geostat_farming_prices": {
+    "name": { "text": "Agricultural production prices (farm-gate prices) (Agriculture)", "reviewedAt": "2026-10-20" },
+    "derivation": null
+  },
+  "source.geostat_farming_prices_ka": {
+    "name": { "text": "Agricultural production prices (farm-gate prices) (Georgian labels)", "reviewedAt": "2026-10-20" },
+    "derivation": null
+  },
+  "source.geostat_agriculture_page": {
+    "name": { "text": "Agriculture (source page capture)", "reviewedAt": "2026-10-20" },
+    "derivation": null
+  },
   "source.nbg_money_aggregates": {
     "name": { "text": "Money aggregates and monetary ratios (M2.1)", "reviewedAt": "2026-10-11" },
     "derivation": null

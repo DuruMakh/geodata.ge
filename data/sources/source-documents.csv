@@ -228,6 +228,19 @@ source.geostat_energy_balance_page_2023,საქართველოს ენ
 source.geostat_energy_balance_page_2024,საქართველოს ენერგეტიკული ბალანსი 2024 (წყაროს გვერდი),docs/Raw Data/EnergyFood/geostat-energy-food-annual/official/energy-balance-page-2024.html,2026-10-11
 source.geostat_energy_balance_index_page,საქართველოს ენერგეტიკული ბალანსი (საინდექსო გვერდი),docs/Raw Data/EnergyFood/geostat-energy-food-annual/official/energy-balance-index-page.html,2026-10-11
 source.geostat_food_security_page,სურსათის უსაფრთხოება (წყაროს გვერდი),docs/Raw Data/EnergyFood/geostat-energy-food-annual/official/food-security-page.html,2026-10-11
+source.geostat_farming_general,სოფლის მეურნეობის სექტორის ზოგადი სტატისტიკა,docs/Raw Data/EnergyFood/geostat-energy-food-annual/official/farming-general.xlsx,2026-10-20
+source.geostat_farming_general_ka,სოფლის მეურნეობის სექტორის ზოგადი სტატისტიკა (ქართული წარწერები),docs/Raw Data/EnergyFood/geostat-energy-food-annual/official/ka/farming-general-ka.xlsx,2026-10-20
+source.geostat_farming_annual_crops,ერთწლიანი კულტურების წარმოება,docs/Raw Data/EnergyFood/geostat-energy-food-annual/official/farming-annual-crops.xlsx,2026-10-20
+source.geostat_farming_annual_crops_ka,ერთწლიანი კულტურების წარმოება (ქართული წარწერები),docs/Raw Data/EnergyFood/geostat-energy-food-annual/official/ka/farming-annual-crops-ka.xlsx,2026-10-20
+source.geostat_farming_permanent_crops,მრავალწლოვანი კულტურების წარმოება,docs/Raw Data/EnergyFood/geostat-energy-food-annual/official/farming-permanent-crops.xlsx,2026-10-20
+source.geostat_farming_permanent_crops_ka,მრავალწლოვანი კულტურების წარმოება (ქართული წარწერები),docs/Raw Data/EnergyFood/geostat-energy-food-annual/official/ka/farming-permanent-crops-ka.xlsx,2026-10-20
+source.geostat_farming_livestock_numbers,პირუტყვის სულადობა (წლიური),docs/Raw Data/EnergyFood/geostat-energy-food-annual/official/farming-livestock-numbers.xlsx,2026-10-20
+source.geostat_farming_livestock_numbers_ka,პირუტყვის სულადობა (წლიური) (ქართული წარწერები),docs/Raw Data/EnergyFood/geostat-energy-food-annual/official/ka/farming-livestock-numbers-ka.xlsx,2026-10-20
+source.geostat_farming_livestock_products,მეცხოველეობის პროდუქტების წარმოება (წლიური),docs/Raw Data/EnergyFood/geostat-energy-food-annual/official/farming-livestock-products.xlsx,2026-10-20
+source.geostat_farming_livestock_products_ka,მეცხოველეობის პროდუქტების წარმოება (წლიური) (ქართული წარწერები),docs/Raw Data/EnergyFood/geostat-energy-food-annual/official/ka/farming-livestock-products-ka.xlsx,2026-10-20
+source.geostat_farming_prices,სასოფლო-სამეურნეო პროდუქტების ფასები,docs/Raw Data/EnergyFood/geostat-energy-food-annual/official/farming-prices.xlsx,2026-10-20
+source.geostat_farming_prices_ka,სასოფლო-სამეურნეო პროდუქტების ფასები (ქართული წარწერები),docs/Raw Data/EnergyFood/geostat-energy-food-annual/official/ka/farming-prices-ka.xlsx,2026-10-20
+source.geostat_agriculture_page,სოფლის მეურნეობა (წყაროს გვერდი),docs/Raw Data/EnergyFood/geostat-energy-food-annual/official/agriculture-page.html,2026-10-20
 source.nbg_money_aggregates,ფულის აგრეგატები და მონეტარული კოეფიციენტები (M2.1),docs/Raw Data/Money/nbg-money-banks-annual/official/money-aggregates-and-monetary-ratioseng.xlsx,2026-10-11
 source.nbg_loans_l3_5,ბანკების მიერ გაცემული სესხები ეკონომიკაზე (L3.5),docs/Raw Data/Money/nbg-money-banks-annual/official/loans-to-the-economy-l3-5eng.xlsx,2026-10-11
 source.nbg_deposits_d3_17,დეპოზიტები სახეების მიხედვით (D3.17),docs/Raw Data/Money/nbg-money-banks-annual/official/depositsinterest-rates-d3-17eng.xlsx,2026-10-11
