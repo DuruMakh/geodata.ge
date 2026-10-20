@@ -94,6 +94,7 @@ model SourceDocument {
   businessFacts BusinessFact[]
   housingFacts HousingFact[]
   educationFacts EducationFact[]
+  scienceCultureFacts ScienceCultureFact[]
   householdIncomeSpendingFacts HouseholdIncomeSpendingFact[]
   moneyTransferFacts MoneyTransferFact[]
   foreignInvestmentFacts ForeignInvestmentFact[]
@@ -148,6 +149,7 @@ model ImportRun {
   businessFacts BusinessFact[]
   housingFacts HousingFact[]
   educationFacts EducationFact[]
+  scienceCultureFacts ScienceCultureFact[]
   householdIncomeSpendingFacts HouseholdIncomeSpendingFact[]
   moneyTransferEntities MoneyTransferEntity[]
   moneyTransferFacts MoneyTransferFact[]
@@ -1068,6 +1070,29 @@ model EducationFact {
   importRun        ImportRun?     @relation(fields: [importRunId], references: [id])
 
   @@id([indicatorId, geographyId, year])
+}
+
+// Mirror of data/imports/science-culture-annual.csv: Geostat's researchers, R&D, patents, museums and
+// theatres, exact stored decimals with their published rounding. The counting-change register
+// science-culture-series-breaks.csv is read from the CSV and not mirrored.
+model ScienceCultureFact {
+  year             Int
+  indicatorId      String
+  value            Decimal        @db.Decimal(40, 30)
+  publishedValue   Decimal        @db.Decimal(40, 30)
+  unit             String
+  basis            String
+  valueStatus      String
+  sourceId         String
+  sourceSheet      String
+  sourceCell       String
+  sourceDocumentId String
+  sourceDocument   SourceDocument @relation(fields: [sourceDocumentId], references: [id])
+  lastReviewedAt   DateTime       @db.Date
+  importRunId      String?
+  importRun        ImportRun?     @relation(fields: [importRunId], references: [id])
+
+  @@id([indicatorId, year])
 }
 
 // Mirror of data/imports/household-income-spending-annual.csv: Geostat's average monthly

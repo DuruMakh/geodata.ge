@@ -1,9 +1,9 @@
-import { HOUSING_DISTRICTS, HOUSING_INDICATORS, HOUSING_TYPES, housingFactKey, housingIndicator, type ClientHousingFact, type HousingGroup, type HousingIndicator, type HousingMeasure } from "../data/housing/types";
+import { HOUSING_DISTRICTS, HOUSING_INDICATORS, HOUSING_TYPES, housingIndicator, type ClientHousingFact, type HousingGroup, type HousingIndicator, type HousingMeasure } from "../data/housing/types";
 import { INK, OTHER_COLOR } from "./colors";
 import { MISSING, formatInUnit, type ValueUnit } from "./format";
 import type { ResolvedPeriodRange } from "./periodRange";
-import { buildTopicModel, serializeTopicHash, topicSeriesColor, type TopicSeriesModel, type TopicState } from "./topicSeries";
-import { changeUnitListSelection, parseUnitListHash, unitListCoverage } from "./unitList";
+import { serializeTopicHash, topicSeriesColor, type TopicSeriesModel, type TopicState } from "./topicSeries";
+import { buildUnitListModel, changeUnitListSelection, parseUnitListHash, unitListCoverage } from "./unitList";
 
 export const HOUSING_HUB_PATH = "/explorer/housing";
 export const HOUSING_SECTIONS = [
@@ -120,14 +120,8 @@ export type HousingModel = { range: ResolvedPeriodRange; years: number[]; series
 export function buildHousingSeriesModel(
   definitions: readonly HousingSeriesDefinition[], facts: readonly ClientHousingFact[], state: TopicState, color: (definition: HousingSeriesDefinition, index: number) => string = housingSeriesColor,
 ): HousingModel {
-  const byCell = new Map(facts.map(f => [housingFactKey(f), f]));
-  const first = new Map<string, ClientHousingFact>();
-  for (const fact of facts) if (!first.has(fact.indicatorId)) first.set(fact.indicatorId, fact);
-  const model = buildTopicModel({ range: state.range, coverage: housingListCoverage(definitions, state.selectedIds, facts), selectedIds: state.selectedIds, color,
-    definitions: definitions.map(definition => ({ ...definition, decimals: first.get(definition.id)?.decimals ?? 0, unit: first.get(definition.id)!.unit,
-      stroke: definition.heading === "houses" ? "dashed" as const : "solid" as const })),
-    value: (definition, year) => byCell.get(housingFactKey({ indicatorId: definition.id, year }))?.value });
-  return { ...model, unit: (model.selected[0] ?? model.series[0]).unit };
+  return buildUnitListModel({ definitions, facts, state, color, coverage: housingListCoverage(definitions, state.selectedIds, facts),
+    extra: definition => ({ stroke: definition.heading === "houses" ? "dashed" as const : "solid" as const }) });
 }
 
 export const buildHousingModel = (section: HousingTopicId, facts: readonly ClientHousingFact[], state: HousingState): HousingModel =>
