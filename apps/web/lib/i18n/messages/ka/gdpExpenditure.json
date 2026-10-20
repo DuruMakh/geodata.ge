@@ -1,0 +1,21 @@
+{
+  "gdpExpenditure.metaTitle": "საქართველოს მშპ დანახარჯების მიხედვით",
+  "gdpExpenditure.metaDescription": "რაზე იხარჯება საქართველოს მშპ: შინამეურნეობების და სახელმწიფოს მოხმარება, ინვესტიცია, ექსპორტი და იმპორტი წლების მიხედვით; საქსტატის წყაროები და Excel.",
+  "gdpExpenditure.heading": "მშპ დანახარჯების მიხედვით",
+  "gdpExpenditure.measure": "მაჩვენებელი",
+  "gdpExpenditure.nominal": "ღირებულება ლარში",
+  "gdpExpenditure.shareOfGdp": "% მშპ-ში",
+  "gdpExpenditure.realGrowth": "რეალური ზრდა %",
+  "gdpExpenditure.reference": "მთლიანი მშპ",
+  "gdpExpenditure.largest": "შინამეურნეობების მოხმარება",
+  "gdpExpenditure.householdsShare": "შინამეურნეობების მოხმარება მშპ-ის {share}",
+  "gdpExpenditure.preliminary": "წინასწარი",
+  "gdpExpenditure.nominalContext": "მიმდინარე ფასებში. იმპორტი ნაჩვენებია დადებითი თანხით და მშპ-ს აკლდება.",
+  "gdpExpenditure.shareContext": "წილი იმავე წლის მშპ-ში. იმპორტის გამო წილების ჯამი 100% არ არის.",
+  "gdpExpenditure.growthContext": "წლიური ზრდა, ფასების ცვლილების გამოკლებით. შინამეურნეობები და არაკომერციული ორგანიზაციები ერთადაა.",
+  "gdpExpenditure.source": "წყარო: საქსტატი · წლიური ეროვნული ანგარიშები.",
+  "gdpExpenditure.rowYear": "მნიშვნელობები: {year} წელი",
+  "gdpExpenditure.rangeChanged": "პერიოდი: {start}–{end}",
+  "gdpExpenditure.sector": "კატეგორია",
+  "gdpExpenditure.workbookTitle": "მშპ დანახარჯების მიხედვით · {measure}"
+}

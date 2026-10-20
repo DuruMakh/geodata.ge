@@ -1,7 +1,7 @@
 import type { MunicipalTotalFact } from "../data/municipal/types";
 import type { ServedBudgetFact, ServedGovernmentDebtFact } from "../servedRows";
 
-export const LIVE_METHODOLOGY_IDS = ["expenditure", "revenue", "municipalities", "debt", "gdp", "economic-sectors", "regional-economies", "business", "housing", "inflation", "money", "unemployment", "wages", "poverty", "household-income", "health", "education", "science-culture", "crime", "trade", "external-flows", "energy-food", "demography"] as const;
+export const LIVE_METHODOLOGY_IDS = ["expenditure", "revenue", "municipalities", "debt", "gdp", "economic-sectors", "gdp-expenditure", "regional-economies", "business", "housing", "inflation", "money", "unemployment", "wages", "poverty", "household-income", "health", "education", "science-culture", "crime", "trade", "external-flows", "energy-food", "environment", "demography"] as const;
 
 export type MethodologyDatasetId = (typeof LIVE_METHODOLOGY_IDS)[number];
 

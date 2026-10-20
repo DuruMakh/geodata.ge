@@ -6,6 +6,7 @@ import { LIVING_STANDARDS_HUB_PATH, LIVING_STANDARDS_SECTIONS } from "../explore
 import { HEALTH_HUB_PATH, HEALTH_SECTIONS } from "../explorer/health";
 import { CRIME_HUB_PATH, CRIME_SECTIONS } from "../explorer/crime";
 import { ENERGY_FOOD_HUB_PATH, ENERGY_FOOD_SECTIONS } from "../explorer/energyFood";
+import { ENVIRONMENT_HUB_PATH, ENVIRONMENT_SECTIONS } from "../explorer/environment";
 import { MONEY_BANKS_SECTIONS } from "../explorer/moneyBanks";
 import { BUSINESS_HUB_PATH, BUSINESS_SECTIONS } from "../explorer/business";
 import { HOUSING_HUB_PATH, HOUSING_SECTIONS } from "../explorer/housing";
@@ -60,6 +61,7 @@ export const NAV_TREE: readonly NavHub[] = [
     sections: sectionRows([
       { id: "gdp", href: "/explorer/economy/gdp", labelKey: "common.gdpOverview" },
       { id: "sectors", href: "/explorer/economy/sectors", labelKey: "common.economicSectors" },
+      { id: "expenditure", href: "/explorer/economy/expenditure", labelKey: "common.gdpExpenditure" },
       { id: "regions", href: "/explorer/economy/regions", labelKey: "common.regionalEconomies" },
     ], "economy"),
   },
@@ -191,6 +193,14 @@ export const NAV_TREE: readonly NavHub[] = [
     sections: sectionRows(ENERGY_FOOD_SECTIONS, "energy-food"),
   },
   {
+    href: ENVIRONMENT_HUB_PATH,
+    labelKey: "common.environment",
+    railLabelKey: "common.dataEnvironment",
+    testId: "environment-link",
+    spaced: true,
+    sections: sectionRows(ENVIRONMENT_SECTIONS, "environment"),
+  },
+  {
     href: DEMOGRAPHY_HUB_PATH,
     labelKey: "common.demography",
     railLabelKey: "common.dataDemography",
@@ -229,6 +239,7 @@ const PAGE_SOURCE_NOTES: Readonly<Record<string, string>> = {
   "/explorer/municipalities": "common.budgetStatisticsSourceNote",
   "/explorer/deficit": "common.deficitSourceNote",
   "/explorer/economy/sectors": "common.geostatSourceNote",
+  "/explorer/economy/expenditure": "common.geostatSourceNote",
   "/explorer/inflation/categories": "common.geostatSourceNote",
   "/explorer/inflation/products": "common.geostatSourceNote",
   "/explorer/external": "common.externalHubSourceNote",

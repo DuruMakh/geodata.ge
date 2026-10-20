@@ -66,7 +66,9 @@ Unemployment uses the existing single import transaction. Source IDs retain thei
 | `CrimeFact` | `data/imports/crime-annual.csv` (see `crime-annual.md`; the counting-change register `crime-series-breaks.csv` is read from the CSV and not mirrored) |
 | `LabourFact` | `data/imports/labour-annual.csv` (see `labour-detail-annual.md`) |
 | `HousingFact` | `data/imports/housing-annual.csv` (see `housing-annual.md`) |
+| `GdpExpenditureFact` | `data/imports/gdp-expenditure-annual.csv` (see `gdp-expenditure.md`) |
 | `EducationFact` | `data/imports/education-annual.csv` (see `education-annual.md`) |
+| `EnvironmentFact` | `data/imports/environment-annual.csv` (see `environment-annual.md`; migration `20261020160000_environment`; a value's shown decimals are read from its published value, so none is stored) |
 | `ScienceCultureFact` | `data/imports/science-culture-annual.csv` (see `science-culture-annual.md`; the counting-change register `science-culture-series-breaks.csv` is read from the CSV and not mirrored) |
 | `NationalGdpFact` | `data/imports/national-gdp-annual-1996-2025.csv` (one reviewed nominal-GDP denominator per year) |
 | `GovernmentDebtFact` | `data/imports/government-debt-facts-2013-2030.csv` (nine public Government Debt series; generated from the approved normalized debt package) |

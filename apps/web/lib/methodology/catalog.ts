@@ -1,6 +1,8 @@
 import { GDP_METHODOLOGY_CONTENT } from "./content/gdp";
 import { ECONOMIC_SECTORS_METHODOLOGY } from "./content/economic-sectors";
 import { ECONOMIC_SECTORS_METHODOLOGY as EN_SECTORS } from "./content/en/economic-sectors";
+import { GDP_EXPENDITURE_METHODOLOGY } from "./content/gdp-expenditure";
+import { GDP_EXPENDITURE_METHODOLOGY as EN_GDP_EXPENDITURE } from "./content/en/gdp-expenditure";
 import { GDP_METHODOLOGY_CONTENT as EN_GDP } from "./content/en/gdp";
 import { INFLATION_METHODOLOGY_CONTENT } from "./content/inflation";
 import { INFLATION_METHODOLOGY_CONTENT as EN_INFLATION } from "./content/en/inflation";
@@ -23,6 +25,8 @@ import { EDUCATION_METHODOLOGY_CONTENT as EN_EDUCATION } from "./content/en/educ
 import { SCIENCE_CULTURE_METHODOLOGY_CONTENT } from "./content/science-culture";
 import { SCIENCE_CULTURE_METHODOLOGY_CONTENT as EN_SCIENCE_CULTURE } from "./content/en/science-culture";
 import { ENERGY_FOOD_METHODOLOGY_CONTENT as EN_ENERGY_FOOD } from "./content/en/energyFood";
+import { ENVIRONMENT_METHODOLOGY_CONTENT } from "./content/environment";
+import { ENVIRONMENT_METHODOLOGY_CONTENT as EN_ENVIRONMENT } from "./content/en/environment";
 import { MONEY_BANKS_METHODOLOGY_CONTENT as EN_MONEY_BANKS } from "./content/en/moneyBanks";
 import { BUSINESS_METHODOLOGY_CONTENT } from "./content/business";
 import { BUSINESS_METHODOLOGY_CONTENT as EN_BUSINESS } from "./content/en/business";
@@ -65,6 +69,7 @@ export const METHODOLOGY_CONTENT: Readonly<Record<MethodologyDatasetId, Methodol
   debt: DEBT_METHODOLOGY_CONTENT,
   gdp: GDP_METHODOLOGY_CONTENT,
   "economic-sectors": ECONOMIC_SECTORS_METHODOLOGY,
+  "gdp-expenditure": GDP_EXPENDITURE_METHODOLOGY,
   "regional-economies": REGIONAL_ECONOMIES_METHODOLOGY,
   business: BUSINESS_METHODOLOGY_CONTENT,
   housing: HOUSING_METHODOLOGY_CONTENT,
@@ -81,11 +86,13 @@ export const METHODOLOGY_CONTENT: Readonly<Record<MethodologyDatasetId, Methodol
   trade: TRADE_METHODOLOGY_CONTENT,
   "external-flows": EXTERNAL_FLOWS_METHODOLOGY_CONTENT,
   "energy-food": ENERGY_FOOD_METHODOLOGY_CONTENT,
+  environment: ENVIRONMENT_METHODOLOGY_CONTENT,
   demography: DEMOGRAPHY_METHODOLOGY,
 };
 
 const ENGLISH_METHODOLOGY_CONTENT: Readonly<Record<MethodologyDatasetId, MethodologyContent>> = {
   "economic-sectors": EN_SECTORS,
+  "gdp-expenditure": EN_GDP_EXPENDITURE,
   "regional-economies": EN_REGIONAL_ECONOMIES,
   unemployment: EN_UNEMPLOYMENT,
   trade: EN_TRADE,
@@ -100,6 +107,7 @@ const ENGLISH_METHODOLOGY_CONTENT: Readonly<Record<MethodologyDatasetId, Methodo
   "science-culture": EN_SCIENCE_CULTURE,
   crime: EN_CRIME,
   "energy-food": EN_ENERGY_FOOD,
+  environment: EN_ENVIRONMENT,
   money: EN_MONEY_BANKS,
   business: EN_BUSINESS,
   housing: EN_HOUSING,

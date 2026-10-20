@@ -40,6 +40,7 @@ const inventoryRules = {
     { root: "docs/Raw Data/Economy/economic-sectors/sources", include: extension(".xlsx") },
     { root: "docs/Raw Data/Economy/gdp-overview/sources", include: (candidatePath: string) => path.posix.basename(candidatePath) === "geostat_nominal_current.xlsx" },
   ],
+  "gdp-expenditure": [{ root: "docs/Raw Data/Economy/gdp-expenditure/sources", include: extension(".xlsx") }],
   "regional-economies": [
     { root: "docs/Raw Data/Economy/regional-economies/sources", include: (candidatePath: string) => path.posix.basename(candidatePath) === "regional-GDP-by-activities-ENG.xlsx" },
     { root: "docs/Raw Data/Municipalities/geostat-population-regional-gdp/official", include: (candidatePath: string) => path.posix.basename(candidatePath) === "regional-GDP-ENG.xlsx" },
@@ -70,6 +71,8 @@ const inventoryRules = {
   "science-culture": [{ root: "docs/Raw Data/ScienceCulture/geostat-science-culture-annual/official", include: () => true }],
   // The English workbooks, their Georgian versions (kept for the Georgian labels) and both page captures; served and archived-only alike.
   crime: [{ root: "docs/Raw Data/Crime/geostat-crime-annual/official", include: () => true }],
+  // The 13 served English workbooks, their Georgian versions (kept for the Georgian labels), the 14 archived-only workbooks and the six page captures.
+  environment: [{ root: "docs/Raw Data/Environment/geostat-environment-annual/official", include: () => true }],
   money: [{ root: "docs/Raw Data/Money/nbg-money-banks-annual/official", include: () => true }],
   business: [{ root: "docs/Raw Data/Business/geostat-business-annual/official", include: () => true }],
   // The six served workbooks, the two zips and their members, the other price and cost workbooks, and the three page captures.
