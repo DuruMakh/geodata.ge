@@ -258,16 +258,8 @@ test("no list repeats a colour within a heading, and a Social package group keep
 
 // ---- Excel workbooks and hub cards ------------------------------------------------------------------------------------
 
-// Task 6 adds the real copy; these are the keys the builders read, with the English the brief fixes.
-const TEST_COPY: Record<string, string> = {
-  "social.unitPersons": "persons", "social.unitFamilies": "families", "social.unitMlnGel": "million GEL", "social.unitGel": "GEL a month",
-  "social.unitPercent": "% of residents", "social.unitPercentGdp": "% of GDP", "social.status.official": "Official", "social.status.calculated": "Calculated by Fiscal.ge", "social.months.partial": "{n} months",
-  "social.workbook.calculatedNote": "Values marked calculated are calculated by fiscal.ge from SSA and Geostat data.",
-  "common.socialPayments": "Social payments", "common.socialPensions": "Pensions", "common.socialSubsistence": "Subsistence allowance", "common.socialPackage": "Social package",
-  ...Object.fromEntries(SOCIAL_SECTIONS.map(section => [`social.page.${section.id}.summary`, `${section.id} summary`])),
-};
 const presentation = async (locale: "en" | "ka" = "en"): Promise<Presentation> => ({
-  locale, englishLabels: {}, messages: { ...await getMessages(locale, ["workbook", "format", "common"]), ...TEST_COPY },
+  locale, englishLabels: {}, messages: { ...await getMessages(locale, ["workbook", "format", "common", "social"]) },
 });
 const sourceFor = (sourceId: string, years: number[]) => ({
   sourceId, years, title: sourceId, organization: "SSA", retrievedAt: "2026-10-20", downloadHref: `/downloads/methodology/social-protection/files/${sourceId}.html` as const,
@@ -314,7 +306,7 @@ test("a Guria pensions money workbook is in million GEL to one decimal, marked c
   expect(model.sources.map(source => source.title)).toEqual(["ssa_pension_01"]);
   expect(model.sources[0].absoluteUrl).toBe("https://fiscal.ge/downloads/methodology/social-protection/files/ssa_pension_01.html");
   // The Summary note shows because the exported sums are calculated; no row divides by Geostat, so no Geostat source.
-  expect(model.readable.subtitle).toBe("2013–2025 · million GEL · Values marked calculated are calculated by fiscal.ge from SSA and Geostat data.");
+  expect(model.readable.subtitle).toBe("2013–2025 · million GEL · “Calculated by Fiscal.ge” marks values calculated from Social Service Agency and Geostat data.");
   expect(model.readable.fitSubtitle).toBe(true);
 });
 
@@ -363,7 +355,7 @@ test("a Georgia average workbook with the 2025-prices row carries the calculated
   expect(model.readable.unitLabel).toBe("GEL a month");
   expect(model.readable.numberFormat).toBe("#,##0.00");
   expect(model.analysis.numericFormats).toEqual({ 3: "#,##0.00" });
-  expect(model.readable.subtitle).toBe("2013–2025 · GEL a month · Values marked calculated are calculated by fiscal.ge from SSA and Geostat data.");
+  expect(model.readable.subtitle).toBe("2013–2025 · GEL a month · “Calculated by Fiscal.ge” marks values calculated from Social Service Agency and Geostat data.");
   expect(model.readable.fitSubtitle).toBe(true);
   expect(model.sources.map(source => source.title)).toEqual(["ssa_pension_01", "source.geostat_cpi_index_2010"]);
   const [nominal, real] = model.readable.rows;
@@ -375,11 +367,11 @@ test("a Georgia average workbook with the 2025-prices row carries the calculated
   expect(status("social.pension.avg_monthly#real", 2013)).toBe("Calculated by Fiscal.ge");
   // The note sits on the Summary sheet; the Data sheet has no identifier or cell-reference column.
   const excel = await loadWorkbook(model);
-  expect(String(excel.getWorksheet(model.sheetNames[0])!.getCell("A2").value)).toContain("calculated by fiscal.ge");
+  expect(String(excel.getWorksheet(model.sheetNames[0])!.getCell("A2").value)).toContain("Calculated by Fiscal.ge");
   expect(excel.getWorksheet(model.sheetNames[1])!.getRow(1).values).toEqual([undefined, "Year", "Category", "GEL a month", "Status"]);
   // The nominal average is calculated from SSA's rows, so it carries the note, but it needs no CPI.
   const nominalOnly = await placeWorkbook("pensions", GEORGIA, "georgia", ["social.pension.avg_monthly"], 2013, 2025);
-  expect(nominalOnly.readable.subtitle).toContain("calculated by fiscal.ge");
+  expect(nominalOnly.readable.subtitle).toContain("Calculated by Fiscal.ge");
   expect(nominalOnly.sources.map(source => source.title)).toEqual(["ssa_pension_01"]);
 });
 
@@ -388,7 +380,7 @@ test("a share of residents workbook cites the population file and rounds to the 
   expect([model.readable.unitLabel, model.readable.numberFormat]).toEqual(["% of residents", "#,##0.0"]);
   expect(model.readable.rows[0].valuesByYear[2025]).toBe(22.5);
   expect(model.readable.rows[0].valuesByYear[2013]).toBeUndefined();
-  expect(model.readable.subtitle).toContain("calculated by fiscal.ge");
+  expect(model.readable.subtitle).toContain("Calculated by Fiscal.ge");
   expect(model.sources.map(source => source.title)).toEqual(["ssa_pension_01", "source.geostat_municipal_population"]);
   const ka = await placeWorkbook("pensions", GEORGIA, "georgia", ["social.pension.recipients#share"], 2014, 2025, "ka");
   expect(ka.filename).toBe("fiscal-social-pensions-georgia-2014-2025.xlsx");
@@ -406,7 +398,7 @@ test("Social payments workbooks: million GEL, or % of GDP calculated with the GD
   expect(gdp.filename).toBe("fiscal-social-payments-2013-2025-en.xlsx");
   expect([gdp.readable.unitLabel, gdp.readable.numberFormat]).toEqual(["% of GDP", "#,##0.00"]);
   expect(gdp.readable.rows[0].valuesByYear[2025]).toBe(Number(socialPaymentsViewFacts("gdp", facts, gdpFacts).find(f => f.indicatorId === "social.payments.total.amount" && f.year === 2025)!.value.toFixed(2)));
-  expect(gdp.readable.subtitle).toContain("calculated by fiscal.ge");
+  expect(gdp.readable.subtitle).toContain("Calculated by Fiscal.ge");
   expect(gdp.analysis.rows.at(-1)![3]).toBe("Calculated by Fiscal.ge");
   expect(gdp.sources.map(source => source.title)).toContain("source.geostat_national_gdp_sna_2008");
   const packageRecipients = await topicWorkbook("social-package", "amount", ["social.social_package.total.recipients"], 2013, 2025);
