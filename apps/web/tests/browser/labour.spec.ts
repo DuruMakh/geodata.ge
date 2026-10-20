@@ -143,7 +143,7 @@ test("Hours: men in households as employers is all dashes in the table, and the 
   await expect(page.getByTestId("labour-unit-label")).toHaveText("hours per week");
   // Alone, the row Geostat does not publish has nothing to draw: a short message, not an empty chart.
   await page.locator(toggle("labour.hours.all.total")).click();
-  await expect(page.getByTestId("no-values-callout")).toHaveText("No published values for this selection");
+  await expect(page.getByTestId("no-values-callout")).toHaveText("No published values for this selection.");
 });
 
 for (const prefix of ["", "/en"]) test(`the source line's methodology link opens the unemployment methodology ${prefix || "ka"}`, async ({ page }) => {
