@@ -6,10 +6,13 @@ import {
   checkDensity,
   checkFertilityByAge,
   checkMidYear,
+  checkMarriageRates,
+  checkMarriageTotals,
   checkMigrationTotals,
   checkRates,
   readMidYear,
 } from "./crossChecks";
+import type { ReviewedAnomalies } from "./anomalies";
 import type { Balancing, CensusAnchor, CensusSnapshot, Lookup, RateCheck } from "./crossChecks";
 import type { DensityRows } from "./densityRows";
 import { readUnitRows } from "./geography";
@@ -31,7 +34,15 @@ const DIRECTIONS = [
 ] as const;
 const CITIZENSHIP_SERIES: readonly string[] = DIRECTIONS.flatMap((direction) => [direction.published, direction.grouped]);
 /** Series published for Georgia, every region and every municipality. The rest are Georgia-level only. */
-const UNIT_SERIES: readonly string[] = [SERIES.populationTotal, SERIES.liveBirths, SERIES.deaths, SERIES.naturalIncrease];
+const UNIT_SERIES: readonly string[] = [
+  SERIES.populationTotal,
+  SERIES.liveBirths,
+  SERIES.deaths,
+  SERIES.naturalIncrease,
+  SERIES.marriages,
+  SERIES.divorces,
+  SERIES.midYearPopulation,
+];
 /** Series published for Georgia and the 11 regions only: Geostat's density table has no municipal rows. */
 const REGION_SERIES: readonly string[] = [SERIES.populationDensity, SERIES.censusPopulationByAge];
 /** Series with a row for Georgia, every region and every municipality. The census split is read for all of them; the census ages for Georgia and the regions only. */
@@ -45,7 +56,12 @@ const FAMILY_START: Record<Family, number> = {
   density: COVERAGE.densityFrom,
   census: CENSUS_YEAR,
   fertility: COVERAGE.vitalFrom,
+  midYear: COVERAGE.marriageFrom,
+  marriage: COVERAGE.marriageFrom,
 };
+/** Regions and municipalities start in COVERAGE.unitsFrom, except in the families that serve them from an earlier year. */
+const UNITS_START: Partial<Record<Family, number>> = { midYear: COVERAGE.marriageUnitsFrom, marriage: COVERAGE.marriageUnitsFrom };
+const unitsStart = (family: Family) => UNITS_START[family] ?? COVERAGE.unitsFrom;
 const FAMILY_OF = new Map<string, Family>(Object.entries(FAMILIES).flatMap(([family, ids]) => ids.map((id) => [id, family as Family] as const)));
 
 export type ValidationInput = {
@@ -54,6 +70,8 @@ export type ValidationInput = {
   geography: DemographyGeography;
   /** The reviewed areas behind Geostat's densities. */
   density: DensityRows;
+  /** The reviewed cells, among them a Georgia total that exceeds its printed parts. */
+  anomalies: ReviewedAnomalies;
   /** The committed canonical rows. A change to any of them stops preparation. Omit on a first build. */
   previous?: readonly DemographyObservation[];
 };
@@ -102,7 +120,7 @@ function checkCoverage(rows: readonly DemographyObservation[], geography: Demogr
     if (row.geographyId !== GEORGIA && !ALL_UNIT_SERIES.includes(row.seriesId) && !(regionSeries && regional.has(row.geographyId))) {
       throw new DemographyStopError("layout_changed", `${row.seriesId} is published for ${regionSeries ? "Georgia and the regions" : "Georgia"} only, not ${row.geographyId}`);
     }
-    const start = row.geographyId === GEORGIA ? FAMILY_START[family] : COVERAGE.unitsFrom;
+    const start = row.geographyId === GEORGIA ? FAMILY_START[family] : unitsStart(family);
     if (row.year < start) throw new DemographyStopError("layout_changed", `${row.seriesId} has a ${row.geographyId} row for ${row.year}, before its start year ${start}`);
     geographiesOf.set(row.seriesId, (geographiesOf.get(row.seriesId) ?? new Set()).add(row.geographyId));
   }
@@ -129,17 +147,30 @@ function checkServedYears(sources: DemographySources, rows: readonly DemographyO
   }
 }
 
-/** Parts add to wholes exactly, in whole persons, for every identity the audit established. */
-function checkWholes(rows: readonly DemographyObservation[], lookup: Lookup, geography: DemographyGeography): void {
+/**
+ * Parts add to wholes exactly, in whole persons, for every identity the audit established. A Georgia total that
+ * exceeds its municipalities by a reviewed amount (divorces Geostat assigns to no unit) is checked with that amount.
+ */
+function checkWholes(rows: readonly DemographyObservation[], lookup: Lookup, geography: DemographyGeography, anomalies: ReviewedAnomalies): void {
   const equal = (what: string, parts: number, whole: number) => {
     if (parts !== whole) throw new DemographyStopError("identity_failed", `${what}: the parts add to ${parts}, not ${whole}`);
   };
   const georgiaYears = (seriesId: string) => unique(rows.filter((row) => row.seriesId === seriesId && row.geographyId === GEORGIA).map((row) => row.year));
 
+  const unallocated = (seriesId: string, year: number) => {
+    const row = rows.find((entry) => entry.seriesId === seriesId && entry.geographyId === GEORGIA && entry.year === year)!;
+    const cell = /!([A-Z]+\d+)/.exec(row.sourceLocator)?.[1];
+    return cell ? anomalies.unallocated(row.sourceId, cell) : 0;
+  };
+
   for (const seriesId of UNIT_SERIES) {
-    for (const year of georgiaYears(seriesId).filter((year) => year >= COVERAGE.unitsFrom)) {
+    for (const year of georgiaYears(seriesId).filter((year) => year >= unitsStart(FAMILY_OF.get(seriesId)!))) {
       const municipal = geography.municipalities.map((municipality) => ({ regionId: municipality.regionId, value: lookup(seriesId, municipality.code, year) }));
-      equal(`${seriesId} ${year}: the municipalities against Georgia`, sum(municipal.map((entry) => entry.value)), lookup(seriesId, GEORGIA, year));
+      equal(
+        `${seriesId} ${year}: the municipalities against Georgia`,
+        sum(municipal.map((entry) => entry.value)) + unallocated(seriesId, year),
+        lookup(seriesId, GEORGIA, year),
+      );
       for (const region of geography.regions) {
         const members = municipal.filter((entry) => entry.regionId === region.id);
         equal(`${seriesId} ${year}: the members of ${region.id}`, sum(members.map((entry) => entry.value)), lookup(seriesId, region.id, year));
@@ -267,7 +298,7 @@ function findRevisions(previous: readonly DemographyObservation[], index: Readon
  * territories, a city row outside the years Geostat prints it, and the reviewed stray cell. A served cell
  * that is blank has already stopped preparation.
  */
-function unitTableInventory(sources: DemographySources, geography: DemographyGeography, sourceId: string, scope: UnitScope) {
+function unitTableInventory(sources: DemographySources, geography: DemographyGeography, sourceId: string, scope: UnitScope, from: number = COVERAGE.unitsFrom) {
   const sheet = readStoredSheet(sources.get(sourceId).bytes, "1");
   const columns = findYearColumns(sheet, 4);
   const lastYear = Math.max(...columns.keys());
@@ -275,7 +306,7 @@ function unitTableInventory(sources: DemographySources, geography: DemographyGeo
   for (const { row, label } of readUnitRows(sheet)) {
     const unit = geography.resolve(label, scope);
     if (unit.kind !== "excluded" && unit.kind !== "city_component") continue;
-    for (let year = COVERAGE.unitsFrom; year <= lastYear; year += 1) {
+    for (let year = from; year <= lastYear; year += 1) {
       if (unit.kind === "city_component" && year >= unit.startYear && year <= unit.endYear) continue;
       if (sheet.number(sheet.ref(columns.get(year)![0]!, row)) !== null) tally.ignoredValueCells += 1;
       else if (unit.kind === "excluded") tally.excludedUnitCells += 1;
@@ -299,7 +330,7 @@ function absentCitizenshipRows(rows: readonly DemographyObservation[]): number {
  * matters: the archive balance runs before the identities, so a changed census step is named as such.
  */
 export function validateDemography(input: ValidationInput): DemographyValidationReport {
-  const { observations: rows, sources, geography, density, previous } = input;
+  const { observations: rows, sources, geography, density, anomalies, previous } = input;
   const index = indexRows(rows);
   const lookup: Lookup = (seriesId, geographyId, year, dims = {}) => {
     const key = keyOf({ seriesId, geographyId, year, ...dims });
@@ -308,20 +339,28 @@ export function validateDemography(input: ValidationInput): DemographyValidation
     return Number(row.value);
   };
 
+  const georgiaYearsOf = (seriesId: string) => unique(rows.filter((row) => row.seriesId === seriesId && row.geographyId === GEORGIA).map((row) => row.year));
+
   checkCoverage(rows, geography);
   checkServedYears(sources, rows);
   const balancing = checkBalancing(sources);
-  checkWholes(rows, lookup, geography);
+  checkWholes(rows, lookup, geography, anomalies);
   checkCensusWholes(lookup, geography);
   checkMigrationTotals(sources);
+  const marriageYears = georgiaYearsOf(SERIES.marriages);
+  checkMarriageTotals(sources, lookup, marriageYears);
 
-  const georgiaYears = (seriesId: string) => unique(rows.filter((row) => row.seriesId === seriesId && row.geographyId === GEORGIA).map((row) => row.year));
-  const years = { vital: georgiaYears(SERIES.liveBirths), structure: georgiaYears(SERIES.populationByAgeSex) };
+  const years = { vital: georgiaYearsOf(SERIES.liveBirths), structure: georgiaYearsOf(SERIES.populationByAgeSex) };
   const midYearValues = readMidYear(sources);
   const midYear = checkMidYear(midYearValues, lookup, years.vital);
   const censusAnchor = checkCensusAnchor(sources, geography, lookup);
   const censusSnapshot = checkCensusAge(sources, geography);
-  const rates = [...checkRates(sources, lookup, midYearValues, years), checkDensity(rows, lookup, density), checkFertilityByAge(rows, lookup)];
+  const rates = [
+    ...checkRates(sources, lookup, midYearValues, years),
+    checkDensity(rows, lookup, density),
+    checkFertilityByAge(rows, lookup),
+    ...checkMarriageRates(sources, geography, anomalies, lookup, marriageYears),
+  ];
 
   const problems = previous ? findRevisions(previous, index) : [];
   if (problems.length > 0) {
@@ -351,6 +390,9 @@ export function validateDemography(input: ValidationInput): DemographyValidation
         unitTableInventory(sources, geography, SOURCE_ID.births, "events"),
         unitTableInventory(sources, geography, SOURCE_ID.deaths, "events"),
         unitTableInventory(sources, geography, SOURCE_ID.naturalIncrease, "events"),
+        unitTableInventory(sources, geography, SOURCE_ID.marriages, "events", COVERAGE.marriageUnitsFrom),
+        unitTableInventory(sources, geography, SOURCE_ID.divorces, "events", COVERAGE.marriageUnitsFrom),
+        unitTableInventory(sources, geography, SOURCE_ID.midYear, "events", COVERAGE.marriageUnitsFrom),
       ],
       absentCitizenshipRows: absentCitizenshipRows(rows),
     },

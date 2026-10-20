@@ -14,7 +14,8 @@ const rowSchema = z.object({
   source_id: z.string().min(1),
   source_locator: z.string().min(1),
   last_reviewed_at: z.string().min(1),
-  sex: z.enum(["total", "male", "female"]).optional(),
+  // Blank in a file whose other series are by sex (the marriage file's counts and duration).
+  sex: z.enum(["total", "male", "female"]).or(z.literal("")).optional(),
   age_group: z.string().optional(),
   citizenship_id: z.string().optional(),
   settlement: z.enum(["total", "urban", "rural"]).optional(),

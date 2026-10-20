@@ -2575,5 +2575,47 @@
       "reviewedAt": "2026-10-16"
     },
     "derivation": null
+  },
+  "source.geostat_demography_population_mid_year": {
+    "name": {
+      "text": "Mid-year population by self-governed units",
+      "reviewedAt": "2026-10-20"
+    },
+    "derivation": null
+  },
+  "source.geostat_demography_marriages": {
+    "name": {
+      "text": "Registered marriages by regions and self-governed units",
+      "reviewedAt": "2026-10-20"
+    },
+    "derivation": null
+  },
+  "source.geostat_demography_mean_age_spouses": {
+    "name": {
+      "text": "Mean age of spouses by order of marriages and sex",
+      "reviewedAt": "2026-10-20"
+    },
+    "derivation": null
+  },
+  "source.geostat_demography_divorces": {
+    "name": {
+      "text": "Registered divorces by regions and self-governed units",
+      "reviewedAt": "2026-10-20"
+    },
+    "derivation": null
+  },
+  "source.geostat_demography_marriage_duration": {
+    "name": {
+      "text": "Average duration of marriage",
+      "reviewedAt": "2026-10-20"
+    },
+    "derivation": null
+  },
+  "source.geostat_demography_mean_age_divorced": {
+    "name": {
+      "text": "Mean age of divorced people by order of marriages and sex",
+      "reviewedAt": "2026-10-20"
+    },
+    "derivation": null
   }
 }

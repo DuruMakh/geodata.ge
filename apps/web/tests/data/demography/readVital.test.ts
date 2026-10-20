@@ -132,7 +132,7 @@ describe("registered vital-event counts", () => {
   });
 
   test("ignores the one reviewed stray zero and nothing else", () => {
-    const ignoresNothing = { accepts: () => false };
+    const ignoresNothing = { accepts: () => false, unallocated: () => 0, blank: () => false };
     const changedValue = editSource(sources, SOURCE.naturalIncrease, (sheet) => setCell(sheet, "AB85", 1));
     const otherCell = editSource(sources, SOURCE.naturalIncrease, (sheet) => setCell(sheet, unitCell(sheet, "C. Telavi*", 2020), 0));
 
