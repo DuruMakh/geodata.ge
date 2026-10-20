@@ -29,7 +29,19 @@ describe("demography loader", () => {
       SERVED_DATA_FILES.demographyFertilityFacts,
       SERVED_DATA_FILES.demographyStructureFacts,
       SERVED_DATA_FILES.demographyCensusFacts,
+      SERVED_DATA_FILES.demographyMidYearFacts,
+      SERVED_DATA_FILES.demographyMarriageFacts,
     ]);
+  });
+
+  test("serves marriages and divorces as registered events and the mid-year population with the lineage of its year", () => {
+    const at = (seriesId: string, year: number) => facts.find((row) => row.seriesId === seriesId && row.geographyId === "country.georgia" && row.year === year && row.sex === undefined);
+    expect(at(SERIES.marriages, 2025)).toMatchObject({ value: "22285", estimateBasis: "registered" });
+    expect(facts.filter((row) => FAMILIES.marriage.includes(row.seriesId as never)).every((row) => row.estimateBasis === "registered")).toBe(true);
+    expect(facts.filter((row) => FAMILIES.marriage.includes(row.seriesId as never))).toHaveLength(2_838);
+    expect(at(SERIES.midYearPopulation, 2008)?.estimateBasis).toBe("retro_projection");
+    expect(at(SERIES.midYearPopulation, 2024)?.estimateBasis).toBe("pre_census");
+    expect(at(SERIES.midYearPopulation, 2025)).toMatchObject({ value: "3935765.5", estimateBasis: "census_based" });
   });
 
   test("loads every canonical row of both files", () => {
@@ -57,7 +69,7 @@ describe("demography loader", () => {
 
   test("every row's basis is the one its series and year require", () => {
     const migration = new Set<string>(FAMILIES.migration);
-    const registered = new Set<string>([...FAMILIES.vital, ...FAMILIES.fertility]);
+    const registered = new Set<string>([...FAMILIES.vital, ...FAMILIES.fertility, ...FAMILIES.marriage]);
     const census = new Set<string>(FAMILIES.census);
     const lineage = facts.filter((row) => !migration.has(row.seriesId) && !registered.has(row.seriesId) && !census.has(row.seriesId));
     expect(lineage.every((row) => row.estimateBasis === populationEstimateBasis(row.year))).toBe(true);
@@ -165,13 +177,19 @@ describe("demography loader", () => {
       "source.geostat_demography_crude_death_rate",
       "source.geostat_demography_deaths",
       "source.geostat_demography_density",
+      "source.geostat_demography_divorces",
       "source.geostat_demography_fertility",
       "source.geostat_demography_infant_mortality",
       "source.geostat_demography_life_expectancy",
+      "source.geostat_demography_marriage_duration",
+      "source.geostat_demography_marriages",
+      "source.geostat_demography_mean_age_divorced",
+      "source.geostat_demography_mean_age_spouses",
       "source.geostat_demography_migration_citizenship",
       "source.geostat_demography_natural_increase",
       "source.geostat_demography_net_migration",
       "source.geostat_demography_population_age_sex",
+      "source.geostat_demography_population_mid_year",
       "source.geostat_municipal_population",
     ]);
     expect(facts.every((row) => registered.has(row.sourceId))).toBe(true);

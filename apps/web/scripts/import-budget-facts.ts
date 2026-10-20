@@ -418,6 +418,8 @@ async function main() {
     SERVED_DATA_FILES.demographyFertilityFacts,
     SERVED_DATA_FILES.demographyStructureFacts,
     SERVED_DATA_FILES.demographyCensusFacts,
+    SERVED_DATA_FILES.demographyMidYearFacts,
+    SERVED_DATA_FILES.demographyMarriageFacts,
   ]);
   assertSubset("Demography source IDs", demographyFacts.map((fact) => fact.sourceId), sourceIds);
   assertSubset("GDP overview source IDs",gdpOverviewFacts.map(f=>f.sourceId),sourceIds);

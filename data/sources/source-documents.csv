@@ -147,6 +147,12 @@ source.geostat_demography_net_migration,Net migration (number and rate),docs/Raw
 source.geostat_demography_migration_citizenship,Immigrants and emigrants by sex and citizenship,docs/Raw Data/Demography/geostat-demography/2026-10/official/33-number-of-immigrants-and-emigrants-by-sex-and-citizenship.xlsx,2026-10-01
 source.geostat_demography_density,Population density by regions,docs/Raw Data/Demography/geostat-demography/2026-10/official/03-density-by-regions.xlsx,2026-10-03
 source.geostat_census2024_population_by_age_settlement,"2024 census population by region, age, sex and urban or rural settlement",docs/Raw Data/Demography/geostat-demography/2026-10/official/census-2024/1.1-population-by-region-unit-age-settlement-sex.xlsx,2026-10-03
+source.geostat_demography_population_mid_year,Mid-year population by self-governed units,docs/Raw Data/Demography/geostat-demography/2026-10/official/04-mid-year-population-by-self-governed-units.xlsx,2026-10-20
+source.geostat_demography_marriages,Registered marriages by regions and self-governed units,docs/Raw Data/Demography/geostat-demography/2026-10/official/34-Marriages-by-self-governed-units.xlsx,2026-10-20
+source.geostat_demography_mean_age_spouses,Mean age of spouses by order of marriages and sex,docs/Raw Data/Demography/geostat-demography/2026-10/official/40-Mean-age-of-spouses.xlsx,2026-10-20
+source.geostat_demography_divorces,Registered divorces by regions and self-governed units,docs/Raw Data/Demography/geostat-demography/2026-10/official/41-Divorces-by-self-governed-units.xlsx,2026-10-20
+source.geostat_demography_marriage_duration,Average duration of marriage,docs/Raw Data/Demography/geostat-demography/2026-10/official/47-Average-duration-of-marriage.xlsx,2026-10-20
+source.geostat_demography_mean_age_divorced,Mean age of divorced people by order of marriages and sex,docs/Raw Data/Demography/geostat-demography/2026-10/official/48-Mean-age-of-divorced-people.xlsx,2026-10-20
 source.geostat_lfs_annual_total,შრომის ძალის მაჩვენებლები,docs/Raw Data/Unemployment/geostat-labour-force-annual/official/01-labour-force-indicators.xlsx,2026-10-04
 source.geostat_lfs_annual_sex,შრომის ძალის მაჩვენებლები სქესის მიხედვით,docs/Raw Data/Unemployment/geostat-labour-force-annual/official/02-labour-force-indicators-by-sex.xlsx,2026-10-04
 source.geostat_lfs_annual_settlement,შრომის ძალის მაჩვენებლები ქალაქისა და სოფლის მიხედვით,docs/Raw Data/Unemployment/geostat-labour-force-annual/official/03-labour-force-indicators-urban-rural.xlsx,2026-10-04

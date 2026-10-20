@@ -14,13 +14,15 @@ export type UnitCell = {
 
 export type UnitTableOptions = {
   scope: UnitScope;
-  /** Population tables publish thousands of persons; event tables publish counts. */
-  scale: "thousands" | "count";
+  /** Population tables publish thousands of persons, the mid-year table thousands to the half person; event tables publish counts. */
+  scale: "thousands" | "half_thousands" | "count";
   /** First year served for Georgia, and for regions and municipalities. The last year is whatever the header holds. */
   countryFrom: number;
   unitsFrom: number;
   /** A reviewed stray cell: a value Geostat prints where none is published, which no total may use. */
   acceptStray?: (ref: string, value: number) => boolean;
+  /** A reviewed blank city-row cell inside the row's years: the municipality row already holds the city, so nothing is added. */
+  acceptBlank?: (ref: string) => boolean;
 };
 
 /**
@@ -42,7 +44,7 @@ export function readUnitTable(sheet: StoredSheet, geography: DemographyGeography
     }
     return sheet.ref(block[0]!, row);
   };
-  const read = (ref: string) => (scale === "thousands" ? sheet.persons(ref) : sheet.count(ref));
+  const read = (ref: string) => (scale === "thousands" ? sheet.persons(ref) : scale === "half_thousands" ? sheet.halfPersons(ref) : sheet.count(ref));
   const stray = (ref: string) => {
     const value = read(ref);
     return value !== null && !options.acceptStray?.(ref, value);
@@ -72,6 +74,7 @@ export function readUnitTable(sheet: StoredSheet, geography: DemographyGeography
       for (const year of years(unitsFrom)) {
         const ref = refAt(row, year);
         if (year >= unit.startYear && year <= unit.endYear) {
+          if (read(ref) === null && options.acceptBlank?.(ref)) continue;
           cityRows.push({ hostId: unit.geographyId, year, value: required(ref, label), ref });
         } else if (stray(ref)) {
           throw new DemographyStopError("unexpected_value", `City row ${label} holds a value outside its published years at ${sheet.name}!${ref}`);

@@ -14,6 +14,7 @@ for (const path of ["", "/en"].flatMap((prefix) => [
   `${prefix}/explorer/demography/migration`,
   `${prefix}/explorer/demography/births-deaths`,
   `${prefix}/explorer/demography/age-sex`,
+  `${prefix}/explorer/demography/marriages-divorces`,
   `${prefix}/explorer/demography/population/georgia`,
   `${prefix}/explorer/demography/population/region/adjara`,
   `${prefix}/explorer/demography/population/batumi`,

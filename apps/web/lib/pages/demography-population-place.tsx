@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { AgeSexSection } from "../../components/demography/age-sex-section";
+import { MarriageSection } from "../../components/demography/marriage-section";
 import { PopulationPlaceExplorer } from "../../components/demography/population-place-explorer";
 import { VitalSection } from "../../components/demography/vital-section";
 import { ExplorerPage } from "../../components/explorer-shell/explorer-page";
@@ -23,7 +24,8 @@ import {
 } from "../explorer/demographyPlaceRoutes";
 import { buildPopulationHighlights, buildPopulationModel, placeYears } from "../explorer/demographyPopulation";
 import { buildPopulationIndexModel } from "../explorer/demographyPopulationIndex";
-import { AGE_SEX_PATH, BIRTHS_DEATHS_PATH, DEMOGRAPHY_HUB_PATH } from "../explorer/demographyRoutes";
+import { marriageFactsForPlace } from "../explorer/demographyMarriage";
+import { AGE_SEX_PATH, BIRTHS_DEATHS_PATH, DEMOGRAPHY_HUB_PATH, MARRIAGES_DIVORCES_PATH } from "../explorer/demographyRoutes";
 import { vitalFactsForPlace } from "../explorer/demographyVital";
 import { formatInUnit, UNIT_PERSONS } from "../explorer/format";
 import { buildPickerCountry, pickerGroupsFromRows } from "../explorer/municipalData";
@@ -88,6 +90,10 @@ export async function renderPopulationPlacePage(route: PopulationPlaceRoute, loc
     source.sourceId === SOURCE_ID.births || source.sourceId === SOURCE_ID.deaths || source.sourceId === SOURCE_ID.naturalIncrease);
   // Only this place's births, deaths and natural increase go to the browser.
   const vitalFacts = vitalFactsForPlace(served.facts, place.id);
+  // Likewise its marriages, divorces and mid-year population, with the two counts' originals and the population they divide by.
+  const marriageFacts = marriageFactsForPlace(served.facts, place.id);
+  const marriageSources = sources.filter((source) =>
+    source.sourceId === SOURCE_ID.marriages || source.sourceId === SOURCE_ID.divorces || source.sourceId === SOURCE_ID.midYear);
   const { messages } = presentation;
   const t = (key: string, values?: TemplateValues) => message(messages, `demography.${key}`, values);
   const years = placeYears(clientFacts, place);
@@ -190,6 +196,14 @@ export async function renderPopulationPlacePage(route: PopulationPlaceRoute, loc
           siteOrigin={resolveSiteUrl()}
           workbookScope={workbookScopeFor(route)}
           nationalHref={BIRTHS_DEATHS_PATH}
+        />
+        <MarriageSection
+          place={place}
+          facts={marriageFacts}
+          sources={marriageSources}
+          siteOrigin={resolveSiteUrl()}
+          workbookScope={workbookScopeFor(route)}
+          nationalHref={MARRIAGES_DIVORCES_PATH}
         />
         <AgeSexSection
           place={place}

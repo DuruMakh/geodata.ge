@@ -8380,5 +8380,41 @@
       "reviewedAt": "2026-10-20"
     },
     "documentLanguage": "ka"
+  },
+  "source.geostat_demography_population_mid_year": {
+    "title": { "text": "Mid-year population by self-governed units", "reviewedAt": "2026-10-20" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-20" },
+    "attribution": null,
+    "documentLanguage": "en"
+  },
+  "source.geostat_demography_marriages": {
+    "title": { "text": "Number of registered marriages by regions and self-governed units", "reviewedAt": "2026-10-20" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-20" },
+    "attribution": null,
+    "documentLanguage": "en"
+  },
+  "source.geostat_demography_mean_age_spouses": {
+    "title": { "text": "Mean age of spouses by order of marriages and sex", "reviewedAt": "2026-10-20" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-20" },
+    "attribution": null,
+    "documentLanguage": "en"
+  },
+  "source.geostat_demography_divorces": {
+    "title": { "text": "Number of registered divorces by regions and self-governed units", "reviewedAt": "2026-10-20" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-20" },
+    "attribution": null,
+    "documentLanguage": "en"
+  },
+  "source.geostat_demography_marriage_duration": {
+    "title": { "text": "Average duration of marriage (years)", "reviewedAt": "2026-10-20" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-20" },
+    "attribution": null,
+    "documentLanguage": "en"
+  },
+  "source.geostat_demography_mean_age_divorced": {
+    "title": { "text": "Mean age of divorced people by order of marriages and sex", "reviewedAt": "2026-10-20" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-20" },
+    "attribution": null,
+    "documentLanguage": "en"
   }
 }

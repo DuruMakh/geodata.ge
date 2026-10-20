@@ -11,8 +11,8 @@ export type BreakRow = {
 
 /**
  * Served series that do not depend on the 1 January population: event counts, the infant mortality
- * rate (per live births) and border-police migration, plus the census counts themselves, which hold
- * a single date and so span nothing. Every other served series is on one side of the census break
+ * rate (per live births), border-police migration, marriages and divorces with their average ages and
+ * length, plus the census counts themselves, which hold a single date and so span nothing. Every other served series is on one side of the census break
  * or the other, so a series added without a decision here fails its test.
  */
 export const UNAFFECTED_BY_CENSUS: readonly string[] = [
@@ -27,6 +27,12 @@ export const UNAFFECTED_BY_CENSUS: readonly string[] = [
   SERIES.emigrantsByCitizenshipGroup,
   SERIES.censusPopulationByAge,
   SERIES.censusPopulationBySettlement,
+  SERIES.marriages,
+  SERIES.divorces,
+  SERIES.meanAgeAtMarriage,
+  SERIES.meanAgeAtFirstMarriage,
+  SERIES.meanAgeAtDivorce,
+  SERIES.meanMarriageDuration,
 ];
 
 /** The breaks inside the served data. The method changes of 2014 and 2012 are series start dates, not breaks. */

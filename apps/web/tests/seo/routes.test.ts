@@ -115,7 +115,8 @@ describe("indexable Fiscal.ge routes", () => {
     // Environment and climate adds its hub, seven pages, nine city pages, a Waste and a Forests page for Georgia and each of the 11 regions and its methodology page: 42 bilingual pairs.
     // Unemployment adds four Labour Force Survey detail pages (industries, hours, informal, young people): 4 bilingual pairs.
     // Farming adds one Energy and food page: 1 bilingual pair. GDP by expenditure adds its page and methodology page: 2 more.
-    expect(urls).toHaveLength(1154);
+    // Marriages and divorces adds one demography page: one bilingual pair.
+    expect(urls).toHaveLength(1156);
     expect(new Set(urls).size).toBe(urls.length);
     expect(urls.every((url) => url.startsWith("https://fiscal.ge/"))).toBe(true);
     expect(urls).toContain("https://fiscal.ge/about");
@@ -281,6 +282,7 @@ const PAGES = [
   "/explorer/demography/age-sex",
   "/explorer/demography/migration",
   "/explorer/demography/births-deaths",
+  "/explorer/demography/marriages-divorces",
   "/methodology/demography",
 ] as const;
 
@@ -348,6 +350,7 @@ describe("demography discovery", () => {
         "/explorer/demography/age-sex",
         "/explorer/demography/migration",
         "/explorer/demography/births-deaths",
+        "/explorer/demography/marriages-divorces",
         "/explorer/demography/population/batumi",
       ]) {
         const entry = entries.find((candidate) => candidate.url === `https://fiscal.ge${path}`);

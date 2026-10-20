@@ -1262,6 +1262,7 @@ test("ships no unread provenance columns on the dataset routes", async ({ reques
     "/explorer/demography/population/batumi",
     "/explorer/demography/births-deaths",
     "/explorer/demography/age-sex",
+    "/explorer/demography/marriages-divorces",
   ]) {
     const occurrences = await readPayloadOccurrences(request, route);
 
