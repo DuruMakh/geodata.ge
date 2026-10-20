@@ -54,6 +54,6 @@ export function loadServedEnergyFoodData(): Promise<{ facts: EnergyFoodFact[] }>
 
 /** Client values are the figures Geostat prints (published precision); exact stored values stay server-side. */
 export function toClientEnergyFoodFact(fact: EnergyFoodFact): ClientEnergyFoodFact {
-  const { year, indicatorId, sourceId, valueStatus } = fact;
-  return { year, indicatorId, sourceId, valueStatus, value: Number(fact.publishedValue), decimals: ENERGY_FOOD_UNIT_DECIMALS[fact.unit] };
+  const { year, indicatorId, sourceId, valueStatus, unit } = fact;
+  return { year, indicatorId, sourceId, valueStatus, unit, value: Number(fact.publishedValue), decimals: ENERGY_FOOD_UNIT_DECIMALS[unit] };
 }

@@ -2,7 +2,7 @@ import type { ClientEnergyFoodFact } from "../data/energyFood/types";
 import type { Presentation } from "../i18n/types";
 import { message } from "../i18n/messages";
 import { workbookMessage } from "../i18n/workbook";
-import { buildEnergyFoodModel, energyFoodDisplayLabels, energyFoodUnit, type EnergyFoodSectionId, type EnergyFoodState } from "./energyFood";
+import { buildEnergyFoodModel, energyFoodDisplayLabels, type EnergyFoodSectionId, type EnergyFoodState } from "./energyFood";
 import { SHEET_NAMES, neededSourceYears, sourcesForNeededYears, withAbsoluteUrls, workbookFilename, type WorkbookExportModel, type WorkbookPublicSource } from "./workbookModel";
 
 /** The Data sheet's columns in order; the numeric format is keyed by the 1-based position of each `value` column. */
@@ -19,15 +19,18 @@ export function buildEnergyFoodWorkbookExportModel(input: { section: EnergyFoodS
   const known = new Set(input.sources.map(source => source.sourceId));
   for (const sourceId of neededYears.keys()) if (!known.has(sourceId)) throw new Error(`Missing public source for energy and food source ${sourceId}`);
   const originals = sourcesForNeededYears(input.sources, neededYears);
-  const unit = energyFoodUnit(section);
-  const numberFormat = unit === "percent" ? "0" : "#,##0.0";
+  // Food ratios are whole percents and farm-gate prices carry two decimals, as Geostat prints them.
+  const unit = model.unitKey;
+  const numberFormat = unit === "percent" ? "0" : unit === "price" ? "0.00" : "#,##0.0";
   const status = (fact: ClientEnergyFoodFact | undefined) => fact ? t(`status.${fact.valueStatus}`) : workbookMessage(locale, "workbook.unavailable");
-  const header: Record<typeof ANALYSIS_COLUMNS[number], string> = { year: workbookMessage(locale, "workbook.year"), series: t("series"), value: t(`unit.${unit}`), status: workbookMessage(locale, "workbook.status") };
+  // Prices name their unit in full ("₾ per kg (milk per litre, eggs per piece)"); a bare "₾" would not say per what.
+  const unitLabel = t(unit === "price" ? "unit.priceLong" : `unit.${unit}`);
+  const header: Record<typeof ANALYSIS_COLUMNS[number], string> = { year: workbookMessage(locale, "workbook.year"), series: t("series"), value: unitLabel, status: workbookMessage(locale, "workbook.status") };
   return {
     locale, filename: workbookFilename(`energy-food-${section}-${model.range.start}-${model.range.end}`, locale), sheetNames: SHEET_NAMES[locale],
     readable: {
-      title: input.title ?? t(`page.${section}.title`), subtitle: `${model.range.start}–${model.range.end} · ${t(`unit.${unit}`)}`,
-      unitLabel: t(`unit.${unit}`), amountDecimals: model.decimals, years: model.years, showChangeColumn: false, numberFormat,
+      title: input.title ?? t(`page.${section}.title`), subtitle: `${model.range.start}–${model.range.end} · ${unitLabel}`,
+      unitLabel, amountDecimals: model.decimals, years: model.years, showChangeColumn: false, numberFormat,
       rows: model.selected.map(series => ({ kind: series.reference ? "total" : "item", parentLabel: null, label: labels[series.id], change: null,
         valuesByYear: Object.fromEntries(model.years.map(year => [year, series.valuesByYear[year]])),
         basisByYear: Object.fromEntries(model.years.map(year => [year, series.valuesByYear[year] === null ? null : "published"])),
