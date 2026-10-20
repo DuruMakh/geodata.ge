@@ -209,6 +209,13 @@ Rough size: greenhouse gases about 380 values, air pollution 288, city air quali
 - Like Crime and Housing, Environment is not added to the `/mcp` fact-query snapshot or the JSON publications.
 - Excel workbooks follow Crime: one sheet of the selected series with basis status and the validated source hyperlink, no internal metadata columns.
 
+### Amended while planning (2026-10-20)
+
+None of these changes what a reader sees.
+
+- The area is part of the indicator ID, as on Housing, for example `environment.aq.pm10_avg.tbilisi_a1` and `environment.waste.collected.region_tbilisi`. The row has no separate area column; "area" above means the ID's last segment.
+- Tbilisi has no timber value, so the Forests map draws Tbilisi's shape without a value or rank ("no data") instead of leaving it out. This uses a small optional addition to the shared map builder, which leaves every existing map unchanged.
+
 ## 12. Methodology page
 
 `/methodology/environment` (and `/en`) follows Crime: sources and agencies, what each page shows, what is left out and why, the units, CO₂ equivalent in one sentence, what the limit lines are (Georgian air-quality standards as Geostat prints them, with the PM2.5 change in 2020), the unnamed warmest/coldest regions, the 2019 wastewater re-sorting, Geostat's asterisk footnotes, and the downloadable originals. A decision-register entry records the choices in this document.
