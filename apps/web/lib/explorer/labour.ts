@@ -14,7 +14,7 @@ export const LABOUR_SECTIONS = [
 ] as const;
 export type LabourSectionId = typeof LABOUR_SECTIONS[number]["id"];
 
-export type LabourHeading = "all" | "women" | "men" | "urban" | "rural" | "informal" | "underuse" | "age_15_24" | "age_15_29";
+export type LabourHeading = "all" | "women" | "men" | "urban" | "rural" | "informal" | "age_15_24" | "age_15_29";
 /** `heading` is the group a row is listed under; `item` keys its name (`labour.row.<item>`), the same under every heading. */
 export type LabourSeriesDefinition = { id: LabourIndicator; reference: boolean; heading: LabourHeading; item: string };
 
@@ -29,7 +29,7 @@ export function labourSeries(section: LabourSectionId): LabourSeriesDefinition[]
       case "industries": return (["all", "women", "men"] as const).flatMap(group => rows(`labour.jobs.${group}.`, group));
       case "hours": return LABOUR_HOURS_GROUPS.flatMap(group => rows(`labour.hours.${group}.`, group));
       // Geostat's informal total is Georgia's row, so it is named "Georgia", not "Total".
-      case "informal": return [...rows("labour.informal.", "informal", item => item === "total" ? "georgia" : item), ...rows("labour.underuse.", "underuse")];
+      case "informal": return rows("labour.informal.", "informal", item => item === "total" ? "georgia" : item);
       case "young-people": return (["age_15_24", "age_15_29"] as const).flatMap(age => rows(`labour.neet.${age}.`, age));
     }
   })();

@@ -30,9 +30,9 @@ test("the four pages sit under Unemployment", () => {
 });
 
 test("lists every split under its heading", () => {
-  const counts: Record<LabourSectionId, number> = { industries: 60, hours: 85, informal: 9, "young-people": 6 };
+  const counts: Record<LabourSectionId, number> = { industries: 60, hours: 85, informal: 5, "young-people": 6 };
   const headings: Record<LabourSectionId, string[]> = {
-    industries: ["all", "women", "men"], hours: ["all", "women", "men", "urban", "rural"], informal: ["informal", "underuse"], "young-people": ["age_15_24", "age_15_29"],
+    industries: ["all", "women", "men"], hours: ["all", "women", "men", "urban", "rural"], informal: ["informal"], "young-people": ["age_15_24", "age_15_29"],
   };
   for (const section of SECTIONS) {
     const series = labourSeries(section);
@@ -56,10 +56,9 @@ test("lists every split under its heading", () => {
     "sector_m", "sector_n", "sector_o", "sector_p", "sector_q", "sector_r", "sector_s", "sector_t", "sector_u", "not_identified",
   ]);
   expect(labourSeries("hours").filter(s => s.heading === "rural").map(s => s.item)).not.toContain("sector_l");
-  // The informal total is Georgia's row; the other rows are named by their own key.
+  // The informal total is Georgia's row; the other rows are named by their own key. Geostat's unused-labour rates are not listed (owner, 2026-10-20).
   expect(labourSeries("informal").map(s => [s.id, s.item])).toEqual([
     ["labour.informal.total", "georgia"], ["labour.informal.women", "women"], ["labour.informal.men", "men"], ["labour.informal.urban", "urban"], ["labour.informal.rural", "rural"],
-    ["labour.underuse.unemployment_rate", "unemployment_rate"], ["labour.underuse.time_related", "time_related"], ["labour.underuse.potential", "potential"], ["labour.underuse.composite", "composite"],
   ]);
   expect(labourSeries("young-people").map(s => s.item)).toEqual(["total", "women", "men", "total", "women", "men"]);
 });

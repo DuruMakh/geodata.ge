@@ -34,7 +34,8 @@ test("the labour detail workbooks and page captures are archived with unchanged 
     expect(row.retrieved_at).toBe(source.retrieved_at);
     expect(row.repository_source_path).toBe(`${LABOUR_RESEARCH_DIRECTORY}/${source.local_file}`);
     expect(row.public_download_path).toBe(`downloads/methodology/unemployment/files/${path.posix.basename(source.local_file)}${source.local_file.endsWith(".html") ? ".txt" : ""}`);
-    expect(row.notes).toMatch(source.source_id.endsWith("_ka") && !source.local_file.endsWith(".html") ? /^Georgian version of .+, with the same numbers in the same cells; archived for its Georgian labels, and no value is read from it\.$/ : /^(Served: |Capture of )/);
+    // The owner removed the unused-labour rates from the Informal jobs page (2026-10-20): workbook 12 is archived only.
+    expect(row.notes).toMatch(source.source_id.startsWith("geostat_lfs_underuse") ? /^Archived only: / : source.source_id.endsWith("_ka") && !source.local_file.endsWith(".html") ? /^Georgian version of .+, with the same numbers in the same cells; archived for its Georgian labels, and no value is read from it\.$/ : /^(Served: |Capture of )/);
     expect(row.years[0]).toBe(source.source_id.startsWith("geostat_lfs_jobs_industry") || source.source_id.startsWith("geostat_lfs_detail_page") ? 2017 : 2020);
     expect(row.years.at(-1)).toBe(2025);
   }

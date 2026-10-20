@@ -49,7 +49,7 @@ Budget and GDP data are annual, so it does not provide sub-annual or live budget
 - [Unemployment by gender](https://fiscal.ge/explorer/unemployment/gender) — men and women beside the national rate.
 - [Jobs by industry](https://fiscal.ge/explorer/unemployment/industries) — the number of jobs by industry, 2017–2025, with the split for women and men from 2020.
 - [Hours worked](https://fiscal.ge/explorer/unemployment/hours) — usual weekly working hours, 2020–2025.
-- [Informal jobs](https://fiscal.ge/explorer/unemployment/informal) — the informal share of jobs and the unused-labour measures, 2020–2025.
+- [Informal jobs](https://fiscal.ge/explorer/unemployment/informal) — the informal share of non-farm jobs, 2020–2025.
 - [Young people not in work or study](https://fiscal.ge/explorer/unemployment/young-people) — the share of people aged 15–24 and 15–29 who are not in employment, education or training, 2020–2025.
 - [Wages](https://fiscal.ge/explorer/wages) — the wages section: Geostat's annual average monthly nominal earnings and the Revenue Service median, gross lari per month, not adjusted for inflation. Browse-only: there is no MCP tool and no bulk file for wages.
 - [Wages overview](https://fiscal.ge/explorer/wages/overview) — Georgia's average monthly wage from 1995, for women and men from 1999 and public and non-public employers from 2000, and the median from 2018.

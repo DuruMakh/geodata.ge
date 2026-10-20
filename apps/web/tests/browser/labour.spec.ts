@@ -15,7 +15,7 @@ const status = (selected: number, all: number) => new RegExp(`^\\D*${selected} /
 const PAGES = [
   { section: "industries", total: "labour.jobs.all.total", rows: 60, ka: "დასაქმებული · 2025: 1,389.7 ათასი", en: "Employed · 2025: 1,389.7 thousand" },
   { section: "hours", total: "labour.hours.all.total", rows: 85, ka: "ჩვეულებრივი საათები კვირაში · 2025: 41.0", en: "Usual weekly hours · 2025: 41.0" },
-  { section: "informal", total: "labour.informal.total", rows: 9, ka: "არაფორმალური დასაქმების წილი · 2025: 28.3%", en: "Informal share of non-farm jobs · 2025: 28.3%" },
+  { section: "informal", total: "labour.informal.total", rows: 5, ka: "არაფორმალური დასაქმების წილი · 2025: 28.3%", en: "Informal share of non-farm jobs · 2025: 28.3%" },
   { section: "young-people", total: "labour.neet.age_15_24.total", rows: 6, ka: "15–24 წლის ახალგაზრდები · 2025: 17.6%", en: "Aged 15–24, not in work or study · 2025: 17.6%" },
 ] as const;
 

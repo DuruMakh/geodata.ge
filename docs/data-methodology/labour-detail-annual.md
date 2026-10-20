@@ -2,13 +2,13 @@
 
 ## Purpose and status
 
-This methodology governs the research package at `docs/Raw Data/Unemployment/geostat-labour-force-detail/`, collected on 2026-10-20 from Geostat's Employment and Unemployment page (`https://www.geostat.ge/en/modules/categories/683`, Georgian `https://www.geostat.ge/ka/modules/categories/683`). The research captures are immutable. The 1,014 primary observations are served on four pages of the Unemployment hub, under the approved design `docs/superpowers/specs/2026-10-20-labour-detail-design.md`:
+This methodology governs the research package at `docs/Raw Data/Unemployment/geostat-labour-force-detail/`, collected on 2026-10-20 from Geostat's Employment and Unemployment page (`https://www.geostat.ge/en/modules/categories/683`, Georgian `https://www.geostat.ge/ka/modules/categories/683`). The research captures are immutable. The 1,014 primary observations are reviewed and validated; 990 of them are served on four pages of the Unemployment hub (the 24 labour-underuse values are not, see below), under the approved design `docs/superpowers/specs/2026-10-20-labour-detail-design.md`:
 
 | Page | Geostat table | Unit | Years |
 | --- | --- | --- | --- |
 | Jobs by industry (`/explorer/unemployment/industries`) | 07, sheets `NACE2` and `NACE2 sex` | thousand persons | 2017–2025; women and men 2020–2025 |
 | Hours worked (`/explorer/unemployment/hours`) | 09 and 10, sheet `1` | hours per week | 2020–2025 |
-| Informal jobs (`/explorer/unemployment/informal`) | 11 and 12 | percent | 2020–2025 |
+| Informal jobs (`/explorer/unemployment/informal`) | 11 | percent | 2020–2025 |
 | Young people not in work or study (`/explorer/unemployment/young-people`) | 14 | percent | 2020–2025 |
 
 All four are national and annual. Nothing is published through MCP or included in the central machine-readable publications. The existing annual Labour Force Survey series (unemployment, labour force, education, long-term unemployment) are described in `unemployment-annual.md` and are not changed.
@@ -23,7 +23,7 @@ Every value comes from Geostat's household Labour Force Survey, so every value i
 | `geostat_lfs_hours_sex` | `09-Hours-by-sex.xlsx` (78743) | `09-dasaqmeba-saatebi-sqesi.xlsx` (78725) | 300 values: usual weekly hours, everyone, women, men |
 | `geostat_lfs_hours_settlement` | `10-Hours-by-urban-rular-areas.xlsx` (78744) | `10-dasaqmeba-saatebi-qalaqi-sofeli.xlsx` (78726) | 204 values: usual weekly hours, towns and villages |
 | `geostat_lfs_informal` | `11-Informal-Employment.xlsx` (78745) | `11-araformaluri-dasaqmeba.xlsx` (78727) | 30 values: five informal-employment shares |
-| `geostat_lfs_underuse` | `12-Labour-underutilization.xlsx` (78746) | `12-arasrulad-gamoyenebuli-samushao-dzala.xlsx` (78728) | 24 values: four underutilization rates |
+| `geostat_lfs_underuse` | `12-Labour-underutilization.xlsx` (78746) | `12-arasrulad-gamoyenebuli-samushao-dzala.xlsx` (78728) | none: its four underutilization rates (24 values) stay in the reviewed CSV, validated but not served on a page |
 | `geostat_lfs_neet` | `14-NEET_Eng.xlsx` (78748) | `14-NEET.xlsx` (78730) | 36 values: six NEET shares |
 
 Each Georgian version has its English source ID plus `_ka`. The two captures of the category pages are `geostat_lfs_detail_page` and `geostat_lfs_detail_page_ka`. The package holds 14 originals under `official/`. Exact URLs, retrieval dates, byte sizes and SHA-256 fingerprints live in `source-manifest.csv` and `source-manifest.json`. The same 14 files are published, byte for byte, through `data/methodology/source-archives/unemployment.csv` (which now has 23 rows with the nine annual originals), and the source inventory in `apps/web/lib/methodology/sourceInventory.ts` has a second `unemployment` rule rooted at the new `official/` folder. The page captures download as `.html.txt`. Together the 14 files are about 570 KB, so the methodology bundle stays small and `docs/Raw Data` stays outside the methodology function bundle.
@@ -33,6 +33,7 @@ Archived and not served:
 - sheet `NACE1` of table 07 (the older NACE rev. 1.1 industries, 2017–2020);
 - sheet `2` of tables 09 and 10 (hours actually worked in the last 7 days);
 - the all-persons block of table 10, which repeats table 09;
+- table 12 (labour underutilization): its 24 values stay in `labour-annual.csv` and are validated, but no page shows them (the owner removed them from the Informal jobs page on 2026-10-20);
 - the six Georgian workbooks and the two page captures.
 
 Workbooks 08 and 13, listed on the same Geostat pages, are not used. The new folder sits beside `geostat-labour-force-annual`, which is untouched because its prepare step requires its exact source list.
@@ -51,7 +52,7 @@ Indicator IDs are stable lowercase ASCII `labour.{topic}.{group}.{item}`; Georgi
 | `labour.jobs.women.*`, `labour.jobs.men.*` (20 each) | thousand persons | 2020–2025 | 240 |
 | `labour.hours.{all, women, men, urban, rural}.{total, sector_a … sector_t}` (17 each) | hours | 2020–2025 | 504 |
 | `labour.informal.{total, women, men, urban, rural}` | percent | 2020–2025 | 30 |
-| `labour.underuse.{unemployment_rate, time_related, potential, composite}` | percent | 2020–2025 | 24 |
+| `labour.underuse.{unemployment_rate, time_related, potential, composite}` | percent | 2020–2025 | 24 (not served) |
 | `labour.neet.{age_15_24, age_15_29}.{total, women, men}` | percent | 2020–2025 | 36 |
 
 That is 160 indicators and 1,014 values (420 + 504 + 30 + 24 + 36). Industry items follow the NACE sections: `sector_b_e` is Geostat's single "Industry" row (sections B to E), and `sector_l` (real estate), `sector_u` (extra-territorial organisations) and `not_identified` exist for jobs only, because the hours tables leave them out. All values use `basis=actual` and `value_status=survey_estimate` and keep their source ID, sheet and cell.
@@ -62,7 +63,7 @@ That is 160 indicators and 1,014 values (420 + 504 + 30 + 24 + 36). Industry ite
 - **Industry.** Geostat publishes NACE B–E as one row, "Industry". Fiscal.ge does not split it.
 - **Hours.** Average usual weekly hours in the main job, an average over employed persons ("hours most commonly worked per week during a long period, including usual overtime"). Hours actually worked are archived but not shown.
 - **Informal employment.** A share of non-agricultural employment, not of all jobs.
-- **Unused labour.** Four Geostat measures with different bases, so their percentages are not interchangeable: the unemployment rate (listed as "Unemployment rate"); the combined rate of time-related underemployment and unemployment ("Unemployed and part-time workers who want more hours"); the combined rate of the unemployed and the potential labour force ("Unemployed and potential labour force"); and the composite measure of labour underutilization ("All unused labour"). Geostat's tables (workbook 12 in either language and the page captures) do not print the bases. Only the unemployment rate over the labour force was confirmed, by recomputing it from the served counts (13.9% in 2025). For the other three, the standard International Labour Organization definitions are applied: the first two are shares of the labour force and the last two are shares of the extended labour force (the labour force plus the potential labour force); this is the ILO definition, not a statement Geostat prints. Informal shares are of non-farm jobs (printed by Geostat), so the informal and unused-labour percentages have different bases.
+- **Labour underuse.** Geostat's labour-underuse table (workbook 12) is kept in the archive but not shown on a page. Its 24 values stay in the reviewed CSV and are validated, including the unemployment-rate reconciliation below, but are not served.
 - **NEET.** Young people aged 15–24 or 15–29 who are not in employment, education or training. The 15–24 total is the page reference, because the UN Sustainable Development Goal indicator 8.6.1 is defined for ages 15–24; that is the UN definition, not a claim Geostat makes.
 - **No map.** Geostat publishes none of these tables by region.
 

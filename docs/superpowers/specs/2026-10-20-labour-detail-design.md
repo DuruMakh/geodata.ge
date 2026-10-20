@@ -9,7 +9,7 @@ Readers of fiscal.ge should be able to see, year by year, where Georgia's worker
 
 - **In which industries do people work?** In 2025, 1,389,700 people were employed. Farming employed 289,500 in 2017 and 218,300 in 2025. Construction employed 84,300 and 122,600 in the same years, and education 168,100 in 2025. Women held 143,900 of the education jobs and 6,000 of the construction jobs.
 - **How many hours do they work?** The usual working week in the main job was 41.0 hours in 2025: 38.0 for women and 43.5 for men, 42.6 in towns and 38.8 in villages. By industry it ran from 30.8 hours in education and 33.0 in farming to 46.5 in construction and 47.2 in transport.
-- **How much work is informal?** In 2025, 28.3% of jobs outside farming were informal: 23.3% for women, 32.6% for men, 26.1% in towns and 33.0% in villages. Geostat's wider measure of unused labour (the unemployed, people who want more hours and people who would work but are not looking) was 27.8% in 2025, down from 39.5% in 2020.
+- **How much work is informal?** In 2025, 28.3% of jobs outside farming were informal: 23.3% for women, 32.6% for men, 26.1% in towns and 33.0% in villages.
 - **How many young people are neither working nor studying?** In 2025, 17.6% of people aged 15–24 were not in employment, education or training (28.5% in 2020), and 23.4% of those aged 15–29 (35.1% in 2020). For ages 15–29, the share for women was 26.1% and for men 21.0%.
 
 The pages keep the production editorial look. They reuse the Education, Business and Crime and justice workspace: chart or table, years, the series list under headings with search, and the Excel download. No new chart type, chart library, map or visual direction is added. All four pages are national. Geostat publishes none of these tables by region (section 10).
@@ -75,19 +75,14 @@ These rules apply to all four pages, as on Education and Crime and justice:
 
 ## 6. Informal jobs page
 
-- **Data:** Geostat table 11, "Share of informal employment in non-agricultural employment", and table 12, "Indicators of the labour underutilization".
+- Owner removed the unused-labour rates from the page, 2026-10-20.
+- **Data:** Geostat table 11, "Share of informal employment in non-agricultural employment". Table 12, "Indicators of the labour underutilization", stays in the archive and the reviewed CSV, validated but not shown.
 - **Unit:** percent.
 - **Latest line:** "არაფორმალური დასაქმების წილი · 2025: 28.3%" / "Informal jobs, share outside farming · 2025: 28.3%".
-- **List, under two headings:**
+- **List, under one heading:**
   - **Informal jobs** (share of non-farm jobs): Georgia (the page reference, selected by default), Women, Men, Towns and Villages.
-  - **Unused labour** (share of the labour force, extended where Geostat says so). It has four rows:
-    - Unemployment rate
-    - Unemployed and part-time workers who want more hours
-    - Unemployed and potential labour force
-    - All unused labour (Geostat's composite measure)
 - All rows cover 2020–2025.
-- Both headings are percentages and chart together. The methodology states that their bases differ: informal shares are of non-farm jobs, while the unused-labour rates are of the (extended) labour force.
-- 9 rows in all.
+- 5 rows in all.
 
 ## 7. Young people not in work or study page
 
@@ -134,7 +129,7 @@ The files come from Geostat's Employment and Unemployment page (categories/683).
 | `09-Hours-by-sex.xlsx` | Hours: Everyone, Women, Men (sheet 1) | 2020–2025 |
 | `10-Hours-by-urban-rular-areas.xlsx` | Hours: Towns, Villages (sheet 1) | 2020–2025 |
 | `11-Informal-Employment.xlsx` | Informal jobs | 2020–2025 |
-| `12-Labour-underutilization.xlsx` | Unused labour | 2020–2025 |
+| `12-Labour-underutilization.xlsx` | Unused labour: archived and validated, not shown on a page | 2020–2025 |
 | `14-NEET_Eng.xlsx` | Young people | 2020–2025 |
 | The six Georgian versions and both page captures | Georgian labels and provenance only | — |
 
@@ -186,7 +181,7 @@ Source IDs start with `geostat_lfs_`, like the existing Labour Force Survey sour
   - that Geostat publishes "Industry" (NACE B–E) as one row;
   - what usual hours are, and that actual hours are archived but not shown;
   - what informal employment is, and that its share is of jobs outside farming;
-  - the four unused-labour measures and their bases;
+  - that Geostat's labour-underuse table (workbook 12) is kept in the archive but not shown;
   - what "not in employment, education or training" means;
   - why there is no map;
   - that the pages state no causes.
