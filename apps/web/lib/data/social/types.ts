@@ -37,6 +37,7 @@ export const SOCIAL_INDICATORS = [
   ...SOCIAL_PACKAGE_GROUPS.map(group => `social.social_package.${group}.recipients` as const),
   ...SOCIAL_PACKAGE_GROUPS.map(group => `social.social_package.${group}.amount` as const),
   "social.social_package.total.avg_monthly",
+  ...SOCIAL_PACKAGE_GROUPS.filter(group => group !== "total").map(group => `social.social_package.${group}.avg_monthly` as const),
   "social.payments.total.amount",
   ...SOCIAL_PAYMENT_PROGRAMMES.map(programme => `social.payments.${programme}.amount` as const),
 ] as const;

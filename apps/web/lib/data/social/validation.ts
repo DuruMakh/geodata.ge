@@ -1,6 +1,6 @@
 import Decimal from "decimal.js";
 import {
-  SOCIAL_GEORGIA, SOCIAL_INDICATORS, SOCIAL_MUNICIPALITIES, SOCIAL_PAYMENT_PROGRAMMES, SOCIAL_PUBLIC_SOURCES, SOCIAL_REGIONS, SOCIAL_UNITS,
+  SOCIAL_GEORGIA, SOCIAL_INDICATORS, SOCIAL_MUNICIPALITIES, SOCIAL_PACKAGE_GROUPS, SOCIAL_PAYMENT_PROGRAMMES, SOCIAL_PUBLIC_SOURCES, SOCIAL_REGIONS, SOCIAL_UNITS,
   socialFactKey, type SocialFact, type SocialIndicator, type SocialPaymentProgramme,
 } from "./types";
 
@@ -39,8 +39,18 @@ export const SOCIAL_AVERAGES: Readonly<Record<string, SocialIndicator>> = {
   "social.pension.avg_monthly": "social.pension.amount",
   "social.pension_highmountain.avg_monthly": "social.pension_highmountain.amount",
   "social.subsistence.avg_monthly": "social.subsistence.amount",
-  "social.social_package.total.avg_monthly": "social.social_package.total.amount",
+  ...Object.fromEntries(SOCIAL_PACKAGE_GROUPS.map(group => [`social.social_package.${group}.avg_monthly`, `social.social_package.${group}.amount` as SocialIndicator])),
 };
+/**
+ * Averages left out although their money is served, because SSA's monthly counts miss a month the money has (blank is not
+ * zero, so money ÷ counts would overstate the average). Each has its `source-findings.csv` row, checked by prepare. SSA's
+ * July 2022 national row leaves the moderate-disability count blank (socpackage-01 July E85).
+ */
+export const SOCIAL_AVERAGE_GAPS: readonly { indicatorId: SocialIndicator; year: number; finding: { table: string; column: string } }[] = [
+  { indicatorId: "social.social_package.disability_moderate.avg_monthly", year: 2022, finding: { table: "socpackage-01", column: "E" } },
+];
+/** The partition check of the social package groups' month-count sums, which only the average inputs hold. */
+const COUNT_PARTITION = "social.social_package.count_months_sum groups";
 /** The national programme value each payments row repeats. */
 const PAYMENT_PROGRAMME_FACTS: Partial<Record<SocialPaymentProgramme, SocialIndicator>> = {
   pension: "social.pension.amount", pension_highmountain: "social.pension_highmountain.amount",
@@ -57,12 +67,14 @@ const PAYMENT_SOURCES: Record<SocialPaymentProgramme, string> = {
  * SSA's printed subtotals that differ from their own parts, with the source finding that shows the same difference in
  * the national total (`source-findings.csv`, checked by prepare). `difference` is the parts less the printed total. The
  * May 2022 social package money total (socpackage-02 L85) is 56 GEL less than its group columns, a reviewed finding of
- * the research package README.
+ * the research package README; the May 2021 people total (socpackage-01 M91) is 1 more than its group columns, so the
+ * groups' 2021 month-count sums add up to 1 less than the total's.
  */
 export const SOCIAL_KNOWN_DIFFERENCES: readonly { check: string; year: number; difference: string; finding?: { table: string; column: string } }[] = [
   { check: "social.pension_idp.amount region.shida_kartli", year: 2015, difference: "404686", finding: { table: "pension-02", column: "D" } },
   { check: "social.subsistence.amount region.kvemo_kartli", year: 2013, difference: "-126", finding: { table: "tsa_allowance-02", column: "J" } },
   { check: "social.social_package.amount groups", year: 2022, difference: "56" },
+  { check: COUNT_PARTITION, year: 2021, difference: "-1", finding: { table: "socpackage-01", column: "M" } },
 ];
 /** Spec §8's anchors, as published or calculated. */
 const ANCHORS: readonly (readonly [SocialIndicator, number, string])[] = [
@@ -131,8 +143,11 @@ export function expectedSocialKeys(): Set<string> {
   return keys;
 }
 
-/** Money and count inputs of each average, by the average's key: the package's money (regular money for the subsistence allowance) and month-count sum. */
-export type SocialAverageInputs = ReadonlyMap<string, { amount: string; count: string }>;
+/**
+ * Money and count inputs of each average, by the average's key: the package's money (regular money for the subsistence
+ * allowance) and month-count sum, with the months each covers.
+ */
+export type SocialAverageInputs = ReadonlyMap<string, { amount: string; count: string; amountMonths: number; countMonths: number }>;
 type Mismatch = { check: string; year: number; difference: string };
 
 /**
@@ -164,10 +179,14 @@ export function validateSocialFacts(facts: readonly SocialFact[], averageInputs?
   }
   const missing = [...expected].filter(key => !byKey.has(key));
   if (missing.length) throw new Error(`Incomplete social coverage: ${missing.length} missing, first ${missing[0]}`);
+  const recordedGap = (key: string) => SOCIAL_AVERAGE_GAPS.some(gap => socialFactKey({ ...gap, geographyId: SOCIAL_GEORGIA }) === key);
   for (const [average, amount] of Object.entries(SOCIAL_AVERAGES)) {
-    const gap = facts.find(f => f.indicatorId === amount && !/^0+$/.test(f.value) && !byKey.has(socialFactKey({ ...f, indicatorId: average as SocialIndicator })));
+    const gap = facts.find(f => f.indicatorId === amount && !/^0+$/.test(f.value) && !byKey.has(socialFactKey({ ...f, indicatorId: average as SocialIndicator }))
+      && !recordedGap(socialFactKey({ ...f, indicatorId: average as SocialIndicator })));
     if (gap) throw new Error(`Incomplete social coverage: no ${average} for ${socialFactKey(gap)}`);
   }
+  const servedGap = SOCIAL_AVERAGE_GAPS.find(gap => byKey.has(socialFactKey({ ...gap, geographyId: SOCIAL_GEORGIA })));
+  if (servedGap) throw new Error(`Social recorded average gap is served: ${socialFactKey({ ...servedGap, geographyId: SOCIAL_GEORGIA })}`);
 
   const indexed = new Map<string, Map<number, SocialFact>>();
   for (const fact of facts) {
@@ -189,6 +208,13 @@ export function validateSocialFacts(facts: readonly SocialFact[], averageInputs?
       if (!input) throw new Error(`Social average has no money and count inputs: ${socialFactKey(fact)}`);
       if (fact.indicatorId !== "social.subsistence.avg_monthly" && input.amount !== amountOf(fact)!.value) throw new Error(`Social average input money differs from the served money: ${socialFactKey(fact)}`);
       if (socialAverage(input.amount, input.count) !== fact.value) throw new Error(`Social average does not equal its money ÷ month-count sum: ${socialFactKey(fact)}`);
+      if (fact.indicatorId.startsWith("social.social_package.") && input.countMonths !== input.amountMonths) {
+        throw new Error(`Social package average counts cover ${input.countMonths} months and its money ${input.amountMonths}: ${socialFactKey(fact)}`);
+      }
+    }
+    for (const gap of SOCIAL_AVERAGE_GAPS) {
+      const input = averageInputs.get(socialFactKey({ ...gap, geographyId: SOCIAL_GEORGIA }));
+      if (!input || input.countMonths === input.amountMonths) throw new Error(`Social recorded average gap no longer has counts missing a month: ${socialFactKey({ ...gap, geographyId: SOCIAL_GEORGIA })}`);
     }
   }
 
@@ -222,9 +248,17 @@ export function validateSocialFacts(facts: readonly SocialFact[], averageInputs?
     const parts = DISABILITY_PARTS.map(group);
     compare(`social.social_package.${measure} disability`, parts, new Map([...group("disability")].filter(([year]) => parts.every(part => part.has(year)))), measure === "amount");
   }
+  if (averageInputs) {
+    // The groups' monthly people counts summed over the year partition the total's, as their December counts do.
+    const counts = (name: string): ReadonlyMap<number, Decimal> => new Map(range(SOCIAL_FIRST_YEAR, SOCIAL_LAST_YEAR).flatMap(year => {
+      const input = averageInputs.get(socialFactKey({ indicatorId: `social.social_package.${name}.avg_monthly` as SocialIndicator, geographyId: SOCIAL_GEORGIA, year }));
+      return input ? [[year, new D(input.count)] as const] : [];
+    }));
+    compare(COUNT_PARTITION, PACKAGE_MEMBERS.map(counts), counts("total"), false);
+  }
   const unrecorded = found.find(f => !SOCIAL_KNOWN_DIFFERENCES.some(k => k.check === f.check && k.year === f.year && k.difference === f.difference));
   if (unrecorded) throw new Error(`The ${unrecorded.check} parts do not add up to the total as recorded in ${unrecorded.year}: unrecorded difference found ${unrecorded.difference}`);
-  const gone = SOCIAL_KNOWN_DIFFERENCES.find(k => !found.some(f => f.check === k.check && f.year === k.year && f.difference === k.difference));
+  const gone = SOCIAL_KNOWN_DIFFERENCES.find(k => (averageInputs || k.check !== COUNT_PARTITION) && !found.some(f => f.check === k.check && f.year === k.year && f.difference === k.difference));
   if (gone) throw new Error(`The ${gone.check} parts add up differently from the recorded SSA difference in ${gone.year}: recorded difference no longer occurs, expected ${gone.difference}, found ${found.find(f => f.check === gone.check && f.year === gone.year)?.difference ?? "none"}`);
 
   for (const [programme, indicatorId] of Object.entries(PAYMENT_PROGRAMME_FACTS)) {

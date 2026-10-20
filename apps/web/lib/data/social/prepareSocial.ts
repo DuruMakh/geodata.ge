@@ -11,14 +11,14 @@ import {
   SOCIAL_GEORGIA, SOCIAL_INDICATORS, SOCIAL_MUNICIPALITIES, SOCIAL_PACKAGE_GROUPS, SOCIAL_PAYMENT_PROGRAMMES, SOCIAL_REGIONS, SOCIAL_SOURCES, SOCIAL_UNITS,
   socialFactKey, socialSourceId, type SocialAcceptance, type SocialFact, type SocialIndicator, type SocialSeriesBreak,
 } from "./types";
-import { SOCIAL_AVERAGES, SOCIAL_KNOWN_DIFFERENCES, socialAverage, socialUnit, validateSocialFacts, type SocialAverageInputs } from "./validation";
+import { SOCIAL_AVERAGES, SOCIAL_AVERAGE_GAPS, SOCIAL_KNOWN_DIFFERENCES, socialAverage, socialUnit, validateSocialFacts, type SocialAverageInputs } from "./validation";
 
 const RESEARCH = "docs/Raw Data/Social/ssa-statistics";
 export const REVIEWED_AT = "2026-10-20";
 export const SOCIAL_CSV_HEADERS = ["year", "indicator_id", "geography_id", "value", "unit", "months", "basis", "value_status", "source_id", "source_workbook", "source_sheet", "source_cell", "last_reviewed_at"];
 const PACKAGE_HEADERS = ["programme", "measure", "geography_id", "year", "value", "months", "value_status", "source_table", "source_workbook", "source_sheet", "source_cell"];
 const BREAK_HEADERS = ["break_id", "applies_to", "reference_date", "reason", "source_note"];
-const SERVED_ROWS = 16335;
+const SERVED_ROWS = 16443;
 type Source = { source_id: string; kind: string; table_id: string; local_file: string; sha256: string; bytes: number };
 
 /** The package's own measures served as an indicator of their own (social package groups are mapped by name below). */
@@ -31,15 +31,21 @@ const OWN: Readonly<Record<string, SocialIndicator>> = {
   "subsistence_allowance|employment_amount": "social.subsistence.employment_amount",
   "tsa_registered|recipients": "social.subsistence.registered_families", "tsa_registered|persons": "social.subsistence.registered_persons",
 };
-/** Where each average's money and month-count sum come from. The subsistence average covers regular recipients only. */
+/**
+ * Where each average's money and month-count sum come from. The subsistence average covers regular recipients only; a
+ * social package group divides its money by its own monthly people counts.
+ */
 const AVERAGE_INPUTS: Readonly<Record<string, { programme: string; amount: string; count: string }>> = {
   "social.pension.avg_monthly": { programme: "pension", amount: "amount", count: "count_months_sum" },
   "social.pension_highmountain.avg_monthly": { programme: "pension_highmountain", amount: "amount", count: "count_months_sum" },
   "social.subsistence.avg_monthly": { programme: "subsistence_allowance", amount: "regular_amount", count: "regular_count_months_sum" },
   "social.social_package.total.avg_monthly": { programme: "social_package", amount: "amount", count: "count_months_sum" },
+  ...Object.fromEntries(SOCIAL_PACKAGE_GROUPS.filter(group => group !== "total").map(group => [
+    `social.social_package.${group}.avg_monthly`, { programme: "social_package_group", amount: `group.${group}.amount`, count: `group.${group}.count_months_sum` },
+  ])),
 };
-/** Rows used only to calculate averages, and the social package total that `group.total` repeats. */
-const INPUT_ONLY = (row: CsvRecord) => ["count_months_sum", "regular_amount", "regular_count_months_sum"].includes(row.measure) || row.programme === "social_package";
+/** Rows used only to calculate averages (every month-count sum), and the social package total that `group.total` repeats. */
+const INPUT_ONLY = (row: CsvRecord) => row.measure.endsWith("count_months_sum") || row.measure === "regular_amount" || row.programme === "social_package";
 
 const readCsv = async (file: string) => parse(await fs.readFile(file), { columns: true, bom: true, skip_empty_lines: true }) as CsvRecord[];
 const packageKey = (programme: string, measure: string, geographyId: string, year: string | number) => `${programme}|${measure}|${geographyId}|${year}`;
@@ -54,14 +60,15 @@ async function readServedPackage(repositoryRoot: string): Promise<CsvRecord[]> {
 }
 
 function averageInputs(rows: readonly CsvRecord[]): SocialAverageInputs {
-  const values = new Map(rows.map(row => [packageKey(row.programme, row.measure, row.geography_id, row.year), row.value]));
-  const inputs = new Map<string, { amount: string; count: string }>();
+  const byKey = new Map(rows.map(row => [packageKey(row.programme, row.measure, row.geography_id, row.year), row]));
+  const inputs = new Map<string, { amount: string; count: string; amountMonths: number; countMonths: number }>();
   for (const row of rows) {
     for (const [indicatorId, source] of Object.entries(AVERAGE_INPUTS)) {
       if (row.programme !== source.programme || row.measure !== source.amount) continue;
-      const count = values.get(packageKey(row.programme, source.count, row.geography_id, row.year));
-      if (count === undefined) throw new Error(`Social month-count sum missing: ${row.programme} ${row.geography_id} ${row.year}`);
-      inputs.set(socialFactKey({ indicatorId: indicatorId as SocialIndicator, geographyId: row.geography_id, year: Number(row.year) }), { amount: row.value, count });
+      const count = byKey.get(packageKey(row.programme, source.count, row.geography_id, row.year));
+      if (count === undefined) throw new Error(`Social month-count sum missing: ${row.programme} ${row.measure} ${row.geography_id} ${row.year}`);
+      inputs.set(socialFactKey({ indicatorId: indicatorId as SocialIndicator, geographyId: row.geography_id, year: Number(row.year) }),
+        { amount: row.value, count: count.value, amountMonths: Number(row.months), countMonths: Number(count.months) });
     }
   }
   return inputs;
@@ -118,6 +125,11 @@ async function checkKnownDifferences(directory: string): Promise<void> {
     // A finding is the printed total less its areas; the recorded difference is the parts less the printed total.
     if (!rows.length || total.toDecimalPlaces(0, Decimal.ROUND_HALF_UP).neg().toFixed() !== known.difference) throw new Error(`Social recorded difference has no matching source finding: ${known.check} ${known.year}`);
   }
+  // A recorded average gap is a blank national cell SSA left in that year's count table.
+  for (const gap of SOCIAL_AVERAGE_GAPS) {
+    const { table, column } = gap.finding;
+    if (!findings.some(row => row.table_id === table && row.year === String(gap.year) && row.column === column && !row.difference)) throw new Error(`Social recorded average gap has no matching source finding: ${gap.indicatorId} ${gap.year}`);
+  }
 }
 
 /** Spec §10's counting changes. */
@@ -131,7 +143,10 @@ const SOCIAL_BREAKS: readonly SocialSeriesBreak[] = [
   },
   {
     breakId: "social_package_groups_2025",
-    appliesTo: ["social.social_package.other.recipients", "social.social_package.other.amount", "social.social_package.disability.recipients", "social.social_package.disability.amount"],
+    appliesTo: [
+      "social.social_package.other.recipients", "social.social_package.other.amount", "social.social_package.other.avg_monthly",
+      "social.social_package.disability.recipients", "social.social_package.disability.amount", "social.social_package.disability.avg_monthly",
+    ],
     referenceDate: "2025-01-01",
     reason: "SSA redesigned the group table: disability is split by severity, and state-compensation recipients become a cross-cutting column. From 2025 People with disabilities is the sum of SSA's four disability \"/ სულ\" columns, and Other groups is defence veterans and social package by acquired right instead of compensation recipients, utility-subsidy recipients and \"other\". No change may be computed across this point.",
     sourceNote: "SSA social package tables 1 and 2 (socpackage-01, socpackage-02), 2025 workbooks: each group prints breakdown columns and a \"/ სულ\" total, and only the totals are read. The column mapping for each design is in the research package README, \"Social package groups\".",
@@ -156,7 +171,7 @@ export async function prepareSocialData(repositoryRoot: string, mode: "write" | 
   await checkPlaces(repositoryRoot, rows);
   await checkKnownDifferences(directory);
   const byKey = new Map(rows.map(row => [packageKey(row.programme, row.measure, row.geography_id, row.year), row]));
-  for (const row of rows.filter(r => r.programme === "social_package" && (r.measure === "recipients" || r.measure === "amount"))) {
+  for (const row of rows.filter(r => r.programme === "social_package" && ["recipients", "amount", "count_months_sum"].includes(r.measure))) {
     const group = byKey.get(packageKey("social_package_group", `group.total.${row.measure}`, row.geography_id, row.year));
     if (!group || (["value", "months", "source_table", "source_workbook", "source_sheet", "source_cell"] as const).some(field => group[field] !== row[field])) throw new Error(`Social package total differs from its group total: ${row.measure} ${row.year}`);
   }
@@ -183,7 +198,7 @@ export async function prepareSocialData(repositoryRoot: string, mode: "write" | 
   const averages: SocialFact[] = [];
   for (const money of served) {
     const average = Object.keys(SOCIAL_AVERAGES).find(id => SOCIAL_AVERAGES[id] === money.indicatorId) as SocialIndicator | undefined;
-    if (!average || money.value === "0") continue;
+    if (!average || money.value === "0" || SOCIAL_AVERAGE_GAPS.some(gap => gap.indicatorId === average && gap.year === money.year && money.geographyId === SOCIAL_GEORGIA)) continue;
     const input = inputs.get(socialFactKey({ ...money, indicatorId: average }))!;
     const source = AVERAGE_INPUTS[average];
     const [amount, count] = [source.amount, source.count].map(measure => byKey.get(packageKey(source.programme, measure, money.geographyId, money.year))!);

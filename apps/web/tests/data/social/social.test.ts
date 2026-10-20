@@ -10,7 +10,7 @@ import { REVIEWED_AT, SOCIAL_CSV_HEADERS, loadSocialAverageInputs, prepareSocial
 import {
   SOCIAL_GEORGIA, SOCIAL_INDICATORS, SOCIAL_PAYMENT_PROGRAMMES, SOCIAL_PUBLIC_SOURCES, SOCIAL_SOURCES, socialFactKey, socialSourceDocumentId, type SocialFact, type SocialIndicator,
 } from "../../../lib/data/social/types";
-import { SOCIAL_KNOWN_DIFFERENCES, expectedSocialKeys, validateSocialFacts } from "../../../lib/data/social/validation";
+import { SOCIAL_AVERAGE_GAPS, SOCIAL_KNOWN_DIFFERENCES, expectedSocialKeys, socialAverage, validateSocialFacts, type SocialAverageInputs } from "../../../lib/data/social/validation";
 
 const root = path.resolve(process.cwd(), "../..");
 const research = path.join(root, "docs/Raw Data/Social/ssa-statistics");
@@ -23,6 +23,7 @@ const loadFacts = async (): Promise<SocialFact[]> =>
   }));
 const find = (facts: readonly SocialFact[], indicatorId: string, geographyId: string, year: number) => facts.find(f => f.indicatorId === indicatorId && f.geographyId === geographyId && f.year === year)!;
 const has = (facts: readonly SocialFact[], indicatorId: string, geographyId: string, year: number) => facts.some(f => f.indicatorId === indicatorId && f.geographyId === geographyId && f.year === year);
+type SocialInput = SocialAverageInputs extends ReadonlyMap<string, infer V> ? V : never;
 const plus = (f: SocialFact, amount: string) => Object.assign(f, { value: new Decimal(f.value).plus(amount).toFixed(f.indicatorId.endsWith(".avg_monthly") ? 2 : 0) });
 
 test("the committed canonical files match a fresh preparation from the research package", async () => {
@@ -32,9 +33,9 @@ test("the committed canonical files match a fresh preparation from the research 
 test("serves the package's place, social package and programme values, with the averages and payments rows added", async () => {
   const facts = await loadFacts();
   const rows = await readCsv(path.join(research, "ssa-served-annual.csv"));
-  expect(rows).toHaveLength(16335);
+  expect(rows).toHaveLength(16443);
   // Inputs only: month-count sums, the regular subsistence money and social package rows the group total repeats.
-  const inputsOnly = (row: Record<string, string>) => ["count_months_sum", "regular_amount", "regular_count_months_sum"].includes(row.measure) || row.programme === "social_package";
+  const inputsOnly = (row: Record<string, string>) => row.measure.endsWith("count_months_sum") || row.measure === "regular_amount" || row.programme === "social_package";
   const national = (row: Record<string, string>) => row.geography_id === SOCIAL_GEORGIA && row.measure === "amount";
   // The other programmes on Social payments have no indicators of their own, only their payments row.
   const moneyOnly = (row: Record<string, string>) => national(row) && !["pension", "pension_idp", "pension_highmountain", "subsistence_allowance", "social_package"].includes(row.programme);
@@ -47,12 +48,14 @@ test("serves the package's place, social package and programme values, with the 
   }
   const served = own.filter(row => !/amount$/.test(row.measure) || Number(row.year) >= firstFull.get(`${row.programme}|${row.measure}|${row.geography_id}`)!);
   const averaged = served.filter(row => (row.programme === "pension" || row.programme === "pension_highmountain" || row.programme === "subsistence_allowance") && row.measure === "amount"
-    || row.programme === "social_package_group" && row.measure === "group.total.amount").filter(row => row.value !== "0");
+    || row.programme === "social_package_group" && /^group\.[a-z_]+\.amount$/.test(row.measure)).filter(row => row.value !== "0")
+    // SSA left the July 2022 national count of moderate disability blank: 11 months of counts for 12 of money, so no average.
+    .filter(row => !(row.measure === "group.disability_moderate.amount" && row.year === "2022"));
   const payments = rows.filter(row => national(row) && row.programme !== "pension_idp");
   const years = new Set(rows.map(row => row.year)).size;
   expect(facts).toHaveLength(served.length + averaged.length + payments.length + years);
-  expect(facts).toHaveLength(13891);
-  expect(SOCIAL_INDICATORS).toHaveLength(56);
+  expect(facts).toHaveLength(13980);
+  expect(SOCIAL_INDICATORS).toHaveLength(65);
   expect(SOCIAL_PAYMENT_PROGRAMMES).toHaveLength(18);
   expect(SOCIAL_SOURCES).toHaveLength(23);
   expect(SOCIAL_PUBLIC_SOURCES).toEqual([...SOCIAL_SOURCES, "ssa_statistics"]);
@@ -89,6 +92,29 @@ test("the spec's anchors and the calculated averages", async () => {
   expect(find(facts, "social.subsistence.persons", "06", 2025).unit).toBe("persons");
 });
 
+test("every social package group has an exact average per month: its money ÷ its monthly people counts", async () => {
+  const facts = await loadFacts();
+  const rows = await readCsv(path.join(research, "ssa-served-annual.csv"));
+  const served = new Map(rows.map(row => [`${row.measure}|${row.year}`, row]));
+  const averages = facts.filter(f => /^social\.social_package\.[a-z_]+\.avg_monthly$/.test(f.indicatorId));
+  expect(new Set(averages.map(f => f.indicatorId.split(".")[2]))).toEqual(new Set(["total", "disability", "disability_children", "disability_severe", "disability_significant", "disability_moderate", "survivors", "war_participants", "political_repression", "other"]));
+  expect(averages).toHaveLength(102);
+  for (const f of averages) {
+    const group = f.indicatorId.split(".")[2];
+    const amount = served.get(`group.${group}.amount|${f.year}`)!;
+    const count = served.get(`group.${group}.count_months_sum|${f.year}`)!;
+    expect(f.value, socialFactKey(f)).toBe(new Decimal(amount.value).div(count.value).toDecimalPlaces(2, Decimal.ROUND_HALF_UP).toFixed(2));
+    expect(f).toMatchObject({ unit: "gel", months: 12, valueStatus: "calculated", sourceId: "ssa_socpackage_02", geographyId: SOCIAL_GEORGIA });
+    expect(Number(count.months)).toBe(12);
+  }
+  const value = (group: string, year: number) => find(facts, `social.social_package.${group}.avg_monthly`, SOCIAL_GEORGIA, year).value;
+  // 2025: 40,060,338 GEL paid to war participants over 394,271 recipient-months; 25,626,678 GEL to survivors over 249,033.
+  expect(value("war_participants", 2025)).toBe("101.61");
+  expect(value("survivors", 2025)).toBe("102.90");
+  expect(value("total", 2025)).toBe("242.72");
+  expect(find(facts, "social.social_package.war_participants.avg_monthly", SOCIAL_GEORGIA, 2025).sourceCell).toMatch(/^\(.+\)\/\(.+\)$/);
+});
+
 test("partial years: payments keep their published months, place and social package money starts in its first full year", async () => {
   const facts = await loadFacts();
   expect(find(facts, "social.payments.covid_vulnerable_compensation.amount", SOCIAL_GEORGIA, 2020).months).toBe(6);
@@ -104,6 +130,16 @@ test("partial years: payments keep their published months, place and social pack
   expect(has(facts, "social.social_package.disability_severe.amount", SOCIAL_GEORGIA, 2017)).toBe(false);
   expect(has(facts, "social.social_package.war_participants.recipients", SOCIAL_GEORGIA, 2019)).toBe(true);
   expect(has(facts, "social.social_package.war_participants.amount", SOCIAL_GEORGIA, 2019)).toBe(false);
+  // A group's average starts with its money, in the group's first 12-month year.
+  expect(has(facts, "social.social_package.disability_severe.avg_monthly", SOCIAL_GEORGIA, 2017)).toBe(false);
+  expect(has(facts, "social.social_package.disability_severe.avg_monthly", SOCIAL_GEORGIA, 2018)).toBe(true);
+  expect(has(facts, "social.social_package.war_participants.avg_monthly", SOCIAL_GEORGIA, 2019)).toBe(false);
+  expect(has(facts, "social.social_package.war_participants.avg_monthly", SOCIAL_GEORGIA, 2020)).toBe(true);
+  expect(has(facts, "social.social_package.survivors.avg_monthly", SOCIAL_GEORGIA, 2013)).toBe(true);
+  // SSA's blank July 2022 national moderate-disability count leaves that year's average out; the money stays.
+  expect(has(facts, "social.social_package.disability_moderate.amount", SOCIAL_GEORGIA, 2022)).toBe(true);
+  expect(has(facts, "social.social_package.disability_moderate.avg_monthly", SOCIAL_GEORGIA, 2022)).toBe(false);
+  expect(has(facts, "social.social_package.disability_moderate.avg_monthly", SOCIAL_GEORGIA, 2023)).toBe(true);
   expect(has(facts, "social.subsistence.employment_families", SOCIAL_GEORGIA, 2022)).toBe(true);
   expect(has(facts, "social.subsistence.employment_amount", SOCIAL_GEORGIA, 2022)).toBe(false);
   // A later partial year stays, marked with its months.
@@ -123,7 +159,10 @@ test("the series breaks cover the employment programme and the 2025 group redesi
   const rows = await readCsv(path.join(root, "data/imports/social-protection-series-breaks.csv"));
   expect(rows.map(r => [r.break_id, r.reference_date])).toEqual([["subsistence_employment_2022", "2022-01-01"], ["social_package_groups_2025", "2025-01-01"]]);
   expect(rows[0].applies_to.split(";")).toEqual(["social.subsistence.families", "social.subsistence.persons"]);
-  expect(new Set(rows[1].applies_to.split(";"))).toEqual(new Set(["social.social_package.other.recipients", "social.social_package.other.amount", "social.social_package.disability.recipients", "social.social_package.disability.amount"]));
+  expect(new Set(rows[1].applies_to.split(";"))).toEqual(new Set([
+    "social.social_package.other.recipients", "social.social_package.other.amount", "social.social_package.other.avg_monthly",
+    "social.social_package.disability.recipients", "social.social_package.disability.amount", "social.social_package.disability.avg_monthly",
+  ]));
   expect(rows.every(r => r.reason && r.source_note)).toBe(true);
 });
 
@@ -134,7 +173,9 @@ test("validation accepts the recorded source findings, and only those", async ()
   expect(() => validateSocialFacts(facts)).not.toThrow();
   expect(SOCIAL_KNOWN_DIFFERENCES.map(k => `${k.check}|${k.year}|${k.difference}`)).toEqual([
     "social.pension_idp.amount region.shida_kartli|2015|404686", "social.subsistence.amount region.kvemo_kartli|2013|-126", "social.social_package.amount groups|2022|56",
+    "social.social_package.count_months_sum groups|2021|-1",
   ]);
+  expect(SOCIAL_AVERAGE_GAPS.map(g => `${g.indicatorId}|${g.year}`)).toEqual(["social.social_package.disability_moderate.avg_monthly|2022"]);
   expect(expectedSocialKeys().has(socialFactKey({ indicatorId: "social.pension.recipients", geographyId: "04", year: 2020 }))).toBe(false);
   expect(expectedSocialKeys().has(socialFactKey({ indicatorId: "social.pension.recipients", geographyId: "region.tbilisi", year: 2020 }))).toBe(true);
 });
@@ -166,10 +207,34 @@ test.each([
   expect(() => validateSocialFacts(facts, inputs)).toThrow(error);
 });
 
+test.each([
+  ["a group average off by 0.01", (facts: SocialFact[]) => { plus(find(facts, "social.social_package.war_participants.avg_monthly", SOCIAL_GEORGIA, 2025), "0.01"); }, /average/],
+  ["a group's month counts no longer adding up to the total's", (facts: SocialFact[], inputs: Map<string, SocialInput>) => {
+    const key = "social.social_package.survivors.avg_monthly:country.georgia:2020";
+    const input = inputs.get(key)!;
+    inputs.set(key, { ...input, count: new Decimal(input.count).plus(1).toFixed() });
+    find(facts, "social.social_package.survivors.avg_monthly", SOCIAL_GEORGIA, 2020).value = socialAverage(input.amount, new Decimal(input.count).plus(1).toFixed());
+  }, /count_months_sum groups.*2020/],
+  ["a group average whose counts miss a month its money has", (_: SocialFact[], inputs: Map<string, SocialInput>) => {
+    const key = "social.social_package.survivors.avg_monthly:country.georgia:2020";
+    inputs.set(key, { ...inputs.get(key)!, countMonths: 11 });
+  }, /months/],
+  ["a recorded average gap that is served", (facts: SocialFact[]) => {
+    facts.push({ ...find(facts, "social.social_package.disability_moderate.avg_monthly", SOCIAL_GEORGIA, 2023), year: 2022 });
+  }, /gap/],
+  ["a missing group average", (facts: SocialFact[]) => { facts.splice(facts.indexOf(find(facts, "social.social_package.other.avg_monthly", SOCIAL_GEORGIA, 2016)), 1); }, /Incomplete/],
+] as const)("validation with the month-count sums rejects %s", async (_, mutate, error) => {
+  const facts = (await loadFacts()).map(f => ({ ...f }));
+  const inputs = new Map(await loadSocialAverageInputs(root));
+  validateSocialFacts(facts, inputs);
+  mutate(facts, inputs);
+  expect(() => validateSocialFacts(facts, inputs)).toThrow(error);
+});
+
 test("the loader reads the committed canonical file and its break register", async () => {
   const facts = await loadSocialFacts();
   expect(facts).toEqual(await loadFacts());
-  expect(facts).toHaveLength(13891);
+  expect(facts).toHaveLength(13980);
   const breaks = await loadSocialBreaks();
   expect(breaks.map(b => b.breakId)).toEqual(["subsistence_employment_2022", "social_package_groups_2025"]);
   expect(breaks[0].appliesTo).toEqual(["social.subsistence.families", "social.subsistence.persons"]);
