@@ -49,6 +49,7 @@ import { housingSourceDocumentId, type HousingFact } from "../data/housing/types
 import { housingDisplayDecimals } from "../data/housing/validation";
 import { businessDisplayDecimals } from "../data/business/validation";
 import { educationSourceDocumentId, type EducationFact } from "../data/education/types";
+import { environmentSourceDocumentId, type EnvironmentFact } from "../data/environment/types";
 import { educationDisplayDecimals } from "../data/education/validation";
 import { scienceCultureSourceDocumentId, type ScienceCultureFact } from "../data/scienceCulture/types";
 import { scienceCultureDisplayDecimals } from "../data/scienceCulture/validation";
@@ -894,6 +895,24 @@ export async function loadEducationFactsFromMirror(db: Pick<MirrorClient, "educa
       year: row.year, periodLabel: row.periodLabel, indicatorId: row.indicatorId as EducationFact["indicatorId"], geographyId: row.geographyId,
       value: row.value.toFixed(), publishedValue: row.publishedValue.toFixed(educationDisplayDecimals(row.indicatorId)), unit: row.unit as EducationFact["unit"], basis: row.basis as "actual", valueStatus: row.valueStatus as "official",
       shown: row.shown, sourceId: row.sourceId, sourceSheet: row.sourceSheet, sourceCell: row.sourceCell, lastReviewedAt: isoDate(row.lastReviewedAt),
+    };
+  });
+}
+
+export function environmentMirrorCreateRows(facts: readonly EnvironmentFact[], importRunId: string): Prisma.EnvironmentFactCreateManyInput[] {
+  return facts.map(({ lastReviewedAt, ...fact }) => ({
+    ...fact, sourceDocumentId: environmentSourceDocumentId(fact.sourceId), lastReviewedAt: new Date(`${lastReviewedAt}T00:00:00.000Z`), importRunId,
+  }));
+}
+
+export async function loadEnvironmentFactsFromMirror(db: Pick<MirrorClient, "environmentFact">): Promise<EnvironmentFact[]> {
+  const rows = await db.environmentFact.findMany({ orderBy: [{ indicatorId: "asc" }, { year: "asc" }] });
+  return rows.map(row => {
+    if (row.sourceDocumentId !== environmentSourceDocumentId(row.sourceId)) throw new Error("Environment source relation mismatch");
+    return {
+      year: row.year, indicatorId: row.indicatorId, value: row.value.toFixed(), publishedValue: row.publishedValue.toFixed(),
+      unit: row.unit as EnvironmentFact["unit"], basis: row.basis as "actual", valueStatus: row.valueStatus as "official",
+      sourceId: row.sourceId, sourceSheet: row.sourceSheet, sourceCell: row.sourceCell, lastReviewedAt: isoDate(row.lastReviewedAt),
     };
   });
 }

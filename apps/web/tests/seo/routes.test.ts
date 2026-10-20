@@ -111,9 +111,10 @@ describe("indexable Fiscal.ge routes", () => {
     // The Housing methodology adds one more bilingual pair.
     // Education adds its hub, four pages, the 75 Schools and 75 Kindergartens place pages and its methodology page: 156 bilingual pairs.
     // Science and culture adds its hub, four pages, a Museums page for Georgia and each of the 11 regions and its methodology page: 18 bilingual pairs.
+    // Environment and climate adds its hub, seven pages, nine city pages, a Waste and a Forests page for Georgia and each of the 11 regions and its methodology page: 42 bilingual pairs.
     // Unemployment adds four Labour Force Survey detail pages (industries, hours, informal, young people): 4 bilingual pairs.
     // Farming adds one Energy and food page: 1 bilingual pair.
-    expect(urls).toHaveLength(1066);
+    expect(urls).toHaveLength(1150);
     expect(new Set(urls).size).toBe(urls.length);
     expect(urls.every((url) => url.startsWith("https://fiscal.ge/"))).toBe(true);
     expect(urls).toContain("https://fiscal.ge/about");
@@ -236,6 +237,7 @@ describe("indexable Fiscal.ge routes", () => {
       "/methodology/trade",
       "/methodology/external-flows",
       "/methodology/energy-food",
+      "/methodology/environment",
       "/methodology/demography",
     ]);
   }, 90_000);
