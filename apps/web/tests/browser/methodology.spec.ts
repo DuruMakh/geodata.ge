@@ -104,8 +104,8 @@ test("future routes stay on the static 404 surface", async ({ page }) => {
     const response = await page.goto(`${TEST_BASE_URL}/methodology/${slug}`);
     expect(response?.status(), slug).toBe(404);
     await expect(page.getByRole("heading", { level: 1, name: "გვერდი ვერ მოიძებნა" })).toHaveCount(1);
-    // Home, the sixteen dataset hubs and methodology.
-    await expect(page.getByTestId("not-found-recovery").getByRole("link")).toHaveCount(18);
+    // Home, the seventeen dataset hubs and methodology.
+    await expect(page.getByTestId("not-found-recovery").getByRole("link")).toHaveCount(19);
     await expect(page.locator(`link[rel="canonical"][href*="/methodology/${slug}"]`)).toHaveCount(0);
     await expect(page.locator(`meta[property="og:url"][content*="/methodology/${slug}"]`)).toHaveCount(0);
     await expect(page.getByTestId("site-json-ld")).toHaveCount(1);

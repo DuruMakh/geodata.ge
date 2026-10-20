@@ -110,7 +110,8 @@ describe("indexable Fiscal.ge routes", () => {
     // Housing adds its hub, four pages and a page for Georgia and each of the 11 regions: 17 bilingual pairs.
     // The Housing methodology adds one more bilingual pair.
     // Education adds its hub, four pages, the 75 Schools and 75 Kindergartens place pages and its methodology page: 156 bilingual pairs.
-    expect(urls).toHaveLength(1020);
+    // Science and culture adds its hub, four pages and a Museums page for Georgia and each of the 11 regions: 17 bilingual pairs.
+    expect(urls).toHaveLength(1054);
     expect(new Set(urls).size).toBe(urls.length);
     expect(urls.every((url) => url.startsWith("https://fiscal.ge/"))).toBe(true);
     expect(urls).toContain("https://fiscal.ge/about");
@@ -183,6 +184,11 @@ describe("indexable Fiscal.ge routes", () => {
       expect(urls).not.toContain(`https://fiscal.ge/explorer/education/${set}/tbilisi`);
     }
     expect(urls.some(url => /\/explorer\/education\/.*\/\d{2}$/.test(url))).toBe(false);
+    for (const page of ["", "/research", "/patents", "/museums", "/theatres", ...businessAreas.map(area => `/museums/${area}`)]) {
+      expect(urls).toContain(`https://fiscal.ge/explorer/science-culture${page}`);
+      expect(urls).toContain(`https://fiscal.ge/en/explorer/science-culture${page}`);
+    }
+    expect(urls.filter((url) => url.includes("/explorer/science-culture"))).toHaveLength(34);
     expect(urls).toContain("https://fiscal.ge/explorer/trade/products");
     expect(urls).toContain("https://fiscal.ge/en/explorer/trade/products");
     expect(urls).toContain("https://fiscal.ge/explorer/trade/domestic-exports");

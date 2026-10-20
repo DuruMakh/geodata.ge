@@ -1,6 +1,7 @@
 import { SCIENCE_CULTURE_GROUPS, scienceCultureIndicator, type ClientScienceCultureFact, type ScienceCultureGroup, type ScienceCultureIndicator, type ScienceCultureMeasure, type ScienceCultureSeriesBreak } from "../data/scienceCulture/types";
 import { INK } from "./colors";
 import { educationFullLabel } from "./education";
+import { MISSING, formatInUnit, type ValueUnit } from "./format";
 import type { ResolvedPeriodRange } from "./periodRange";
 import { serializeTopicHash, topicSeriesColor, type TopicSeriesModel, type TopicState } from "./topicSeries";
 import { buildUnitListModel, changeUnitListSelection, parseUnitListHash, unitListCoverage } from "./unitList";
@@ -149,4 +150,16 @@ export function buildScienceCultureModel(section: ScienceCultureTopicId, facts: 
 export function scienceCultureSeriesLabel(series: Pick<ScienceCultureSeriesDefinition, "id" | "heading">, labels: Readonly<Record<string, string>>, t: (key: string) => string): string {
   const heading = t(`heading.${series.heading}`).split(" · ")[0];
   return educationFullLabel(heading, labels[series.id]);
+}
+
+/** A unit's figures: thousands and million GEL to one decimal, persons and counts whole. */
+export function scienceCultureValueUnit(unit: ScienceCultureUnit): ValueUnit {
+  return { divisor: 1, label: "", decimals: unit === "thousand" || unit === "gel" ? 1 : 0 };
+}
+
+/** A tooltip value: thousands and million GEL name their unit, a count of persons or things stands alone. */
+export function scienceCultureValueLabel(value: number | null | undefined, unit: ScienceCultureUnit, t: (key: string) => string): string {
+  if (value == null) return MISSING;
+  const number = formatInUnit(value, scienceCultureValueUnit(unit));
+  return unit === "thousand" || unit === "gel" ? `${number} ${t(`unit.${unit}`)}` : number;
 }
