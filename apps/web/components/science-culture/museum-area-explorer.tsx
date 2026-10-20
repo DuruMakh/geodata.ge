@@ -7,9 +7,9 @@ import type { MunicipalRegion } from "../../lib/data/municipal/types";
 import { updatedDate } from "../../lib/explorer/coverageLabel";
 import { formatInUnit } from "../../lib/explorer/format";
 import { rangeFromPatch } from "../../lib/explorer/periodRange";
-import { SCIENCE_CULTURE_SECTIONS, scienceCultureSeriesLabel, scienceCultureValueLabel, scienceCultureValueUnit, serializeScienceCultureHash, type ScienceCultureSeriesModel } from "../../lib/explorer/scienceCulture";
+import { scienceCultureSeriesLabel, scienceCultureValueLabel, scienceCultureValueUnit, serializeScienceCultureHash, type ScienceCultureSeriesModel } from "../../lib/explorer/scienceCulture";
 import {
-  buildMuseumAreaModel, changeMuseumAreaSelection, museumAreaCoverage, museumAreaOfMapId, museumAreaSelectionHash, museumMapId, museumRegionHref, parseMuseumAreaHash, type MuseumArea,
+  MUSEUMS_HREF, buildMuseumAreaModel, changeMuseumAreaSelection, museumAreaCoverage, museumAreaOfMapId, museumAreaSelectionHash, museumMapId, museumRegionHref, parseMuseumAreaHash, type MuseumArea,
 } from "../../lib/explorer/scienceCultureMuseums";
 import { buildScienceCultureWorkbookExportModel } from "../../lib/explorer/scienceCultureWorkbook";
 import type { WorkbookPublicSource } from "../../lib/explorer/workbookModel";
@@ -32,8 +32,6 @@ import { SEARCHABLE_MIN_ROWS } from "../main-explorer/series-selector";
 import { ExcelDownloadButton } from "../explorer/excel-download-button";
 import { RegionPicker, useRefocusAfterPick } from "../regional-economies/region-picker";
 import { Callout, SourceNote } from "../ui/editorial";
-
-const MUSEUMS_HREF = SCIENCE_CULTURE_SECTIONS.find(section => section.id === "museums")!.href;
 
 export type MuseumAreaExplorerProps = {
   area: MuseumArea; facts: ClientScienceCultureFact[];

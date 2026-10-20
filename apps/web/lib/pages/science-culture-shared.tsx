@@ -9,8 +9,8 @@ import { REGIONAL_ECONOMY_REGIONS } from "../data/regionalEconomies/importRegion
 import { loadServedScienceCultureData } from "../data/scienceCulture/importScienceCulture";
 import { SCIENCE_CULTURE_REGIONS, type ScienceCultureFact } from "../data/scienceCulture/types";
 import { coverageLabel } from "../explorer/coverageLabel";
-import { SCIENCE_CULTURE_HUB_PATH, SCIENCE_CULTURE_SECTIONS, type ScienceCultureSeriesDefinition } from "../explorer/scienceCulture";
-import { MUSEUM_AREAS, museumAreaHref, museumAreaSeries, museumAreaSlug, museumMapId, type MuseumArea } from "../explorer/scienceCultureMuseums";
+import { SCIENCE_CULTURE_HUB_PATH, type ScienceCultureSeriesDefinition } from "../explorer/scienceCulture";
+import { MUSEUMS_HREF, MUSEUM_AREAS, museumAreaHref, museumAreaSeries, museumAreaSlug, museumMapId, type MuseumArea } from "../explorer/scienceCultureMuseums";
 import type { WorkbookPublicSource } from "../explorer/workbookModel";
 import { I18nProvider } from "../i18n/provider";
 import { clientPresentation, getPresentation } from "../i18n/presentation.server";
@@ -34,9 +34,6 @@ import { resolveSiteUrl } from "../siteUrl";
 export async function loadScienceCultureWorkbookSources(): Promise<(WorkbookPublicSource & { sourceId: string })[]> {
   return [];
 }
-
-/** The Museums index, whose map and list open the area pages. */
-export const MUSEUMS_HREF = SCIENCE_CULTURE_SECTIONS.find(section => section.id === "museums")!.href;
 
 /** Display names of the series a list shows; a region's row is named as Georgia's (the heading says what it counts, the page names the area). */
 export function scienceCultureLabels(messages: Messages, definitions: readonly ScienceCultureSeriesDefinition[]): Record<string, string> {

@@ -10,7 +10,7 @@ import type { TopicState } from "./topicSeries";
 export const MUSEUM_AREAS = ["georgia", ...SCIENCE_CULTURE_REGIONS] as const;
 export type MuseumArea = typeof MUSEUM_AREAS[number];
 /** The Museums index, whose map and list open the area pages. */
-const MUSEUMS_HREF = SCIENCE_CULTURE_SECTIONS.find(section => section.id === "museums")!.href;
+export const MUSEUMS_HREF = SCIENCE_CULTURE_SECTIONS.find(section => section.id === "museums")!.href;
 /** An area's slug and URL, its id on the shared region map and picker, the area of such an id and that area's page (`areaRoutes.ts`). */
 export const { areaSlug: museumAreaSlug, areaHref: museumAreaHref, mapId: museumMapId, areaOfMapId: museumAreaOfMapId, regionHref: museumRegionHref } = areaRoutes<MuseumArea>(MUSEUMS_HREF);
 

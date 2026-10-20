@@ -64,7 +64,7 @@ export function ScienceCultureExplorer({ section, facts, breaks, labels, sources
   const headline = model.series.find(series => series.reference)!;
   const latest = facts.filter(f => f.indicatorId === headline.id).sort((a, b) => a.year - b.year).at(-1)!;
   const title = t(`page.${section}.title`);
-  const downloadAction = <ExcelDownloadButton testId="science-culture-excel-download" disabled={!model.selected.length} onDownload={async () => {
+  const downloadAction = <ExcelDownloadButton testId="science-culture-excel-download" disabled={!state.selectedIds.length} onDownload={async () => {
     const { downloadWorkbook } = await import("../../lib/explorer/workbookWriter.client");
     await downloadWorkbook(buildScienceCultureWorkbookExportModel({ section, facts, state, labels, sources, siteOrigin, title }, presentation));
   }} />;
