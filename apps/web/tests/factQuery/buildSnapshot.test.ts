@@ -43,6 +43,8 @@ describe("buildFactQuerySnapshot", () => {
     // The 24 Social protection sources (23 SSA tables and the statistics page) are registered, and none of them reaches the snapshot.
     expect(sources.filter(source => source.sourceId.startsWith("source.ssa_"))).toHaveLength(24);
     expect(snapshot.sources.some(source => source.sourceId.startsWith("source.ssa_"))).toBe(false);
+    // Nor does any document of the Social protection methodology archive (SSA's page captures and the Geostat files it repeats).
+    expect(snapshot.sources.some(source => source.documents.some(document => document.datasetId === "social-protection"))).toBe(false);
     expect(snapshot.sources.some(source => MONEY_BANKS_PUBLIC_SOURCES.map(moneyBanksSourceDocumentId).includes(source.sourceId))).toBe(false);
     expect(snapshot.sources.some(source => HEALTH_PUBLIC_SOURCES.map(healthSourceDocumentId).includes(source.sourceId))).toBe(false);
     expect(snapshot.sources.some(source => CRIME_PUBLIC_SOURCES.map(crimeSourceDocumentId).includes(source.sourceId))).toBe(false);

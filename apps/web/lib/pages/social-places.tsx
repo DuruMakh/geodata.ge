@@ -6,6 +6,7 @@ import { LatestFigure, LatestValueLine } from "../../components/explorer-shell/l
 import { EntityMemberList } from "../../components/municipalities/entity-member-list";
 import { MunicipalitiesIndex } from "../../components/municipalities/municipalities-index";
 import { BreadcrumbJsonLd } from "../../components/seo/breadcrumb-json-ld";
+import { JsonLd } from "../../components/seo/json-ld";
 import { PageHeader } from "../../components/shell/page-header";
 import { SocialPlaceExplorer } from "../../components/social/social-place-explorer";
 import { loadServedDemographyData } from "../data/demography/importDemography";
@@ -13,7 +14,7 @@ import { SOURCE_ID } from "../data/demography/series";
 import { loadServedInflationData } from "../data/inflation/importInflation";
 import { loadServedMunicipalData } from "../data/servedData";
 import { loadServedSocialData, toClientSocialFact } from "../data/social/importSocial";
-import { SOCIAL_GEORGIA, type ClientSocialFact } from "../data/social/types";
+import { SOCIAL_GEORGIA, SOCIAL_PUBLIC_SOURCES, socialArchiveSourceId, type ClientSocialFact } from "../data/social/types";
 import { coverageLabel } from "../explorer/coverageLabel";
 import { GEORGIA_PLACE_ID, TBILISI_PLACE_ID, buildDemographyPlaces, placeLabel, type DemographyPlace } from "../explorer/demographyAreas";
 import { placeHrefById, placeIdForRoute, placeNeighbours, placePageHref, type PlaceRoute } from "../explorer/demographyPlaceRoutes";
@@ -33,6 +34,7 @@ import { pageHref } from "../i18n/routes";
 import type { Locale, Messages, TemplateValues } from "../i18n/types";
 import { loadSourcedWorkbookSources, type SourcedWorkbookPublicSource } from "../methodology/workbookSources";
 import { fiscalMetadata } from "../seo/metadata";
+import { explorerDatasetJsonLd } from "../seo/structuredData";
 import { resolveSiteUrl } from "../siteUrl";
 import { workbookScopeFor } from "./demography-population-place";
 
@@ -65,17 +67,28 @@ async function loadSocialPlaceBasics(locale: Locale) {
 }
 
 /**
- * The Excel Sources sheet's files: Geostat's population table (shares of residents) and price index (2025 prices), from the
- * Population and Inflation archives, in the page's language. The SSA tables have no archive copy yet, so `ssa` is empty until
- * the social protection archive is published.
+ * The Excel Sources sheet's files, in the page's language: each SSA table the facts cite, as its archived topic page
+ * (data/methodology/source-archives/social-protection.csv) under the table's own id, and Geostat's population table (shares of
+ * residents) and price index (2025 prices) from the Population and Inflation archives.
  */
 export async function loadSocialWorkbookSources(locale: Locale): Promise<{ ssa: SourcedWorkbookPublicSource[]; population: WorkbookPublicSource[]; cpi: WorkbookPublicSource[] }> {
   const cpiId = locale === "ka" ? "source.geostat_cpi_index_2010_ka" : "source.geostat_cpi_index_2010";
-  const [population, cpi] = await Promise.all([
+  const [pages, population, cpi] = await Promise.all([
+    loadSourcedWorkbookSources("social-protection", locale, row => row.source_id.startsWith("ssa_")),
     loadSourcedWorkbookSources("demography", locale, row => row.source_id === SOURCE_ID.populationUnits),
     loadSourcedWorkbookSources("inflation", locale, row => row.source_id === cpiId),
   ]);
-  return { ssa: [], population, cpi };
+  const ssa = SOCIAL_PUBLIC_SOURCES.map(sourceId => {
+    const page = pages.find(row => row.sourceId === socialArchiveSourceId(sourceId));
+    if (!page) throw new Error(`No archived SSA page for ${sourceId}`);
+    return { ...page, sourceId };
+  });
+  return { ssa, population, cpi };
+}
+
+/** The headings a set's pages list, named in the page's language: the measures the Dataset markup says the page shows. */
+function headingNames(messages: Messages, set: SocialPlaceSet): string[] {
+  return [...new Set(socialPlaceSeries(set).map(({ heading }) => message(messages, `social.heading.${heading}`)))];
 }
 
 /** The latest served fact of a place's series. */
@@ -125,6 +138,11 @@ export async function renderSocialIndexPage(locale: Locale, set: SocialPlaceSet)
   const crumbs = [...hubCrumbs(messages, locale), { label: title }];
   return (
     <I18nProvider {...clientPresentation(presentation)}>
+      {/* The index is the set's dataset; each place page is a slice of it. */}
+      <JsonLd testId="explorer-dataset-json-ld" data={explorerDatasetJsonLd({
+        locale, origin: resolveSiteUrl(), path: base, datasetId: "social-protection", name: title, description: t(`page.${set}.summary`),
+        firstYear: min, lastYear: max, dateModified: lastReviewedAt, variableMeasured: headingNames(messages, set),
+      })} />
       <BreadcrumbJsonLd items={[
         { name: crumbs[0].label, path: pageHref("/", locale) },
         { name: crumbs[2].label, path: pageHref(HEALTH_HUB_PATH, locale) },
@@ -214,8 +232,15 @@ export async function renderSocialPlacePage(route: SocialPlaceRoute, locale: Loc
         return { id: row.id, href: href(member), rank: position + 1, label: placeLabel(member, locale), value: shareLabel(row.valueGel) };
       })
     : [];
+  const pageValues = { section: sectionTitle, place: name };
   return (
     <I18nProvider {...clientPresentation(presentation)}>
+      <JsonLd testId="explorer-dataset-json-ld" data={explorerDatasetJsonLd({
+        locale, origin: resolveSiteUrl(), path: placePageHref(base, place.id), datasetId: "social-protection",
+        name: t("place.metaTitle", pageValues), description: t("place.metaDescription", pageValues),
+        firstYear: min, lastYear: max, dateModified: lastReviewedAt, variableMeasured: headingNames(messages, set),
+        spatialCoverageName: name, withinGeorgia: place.id !== GEORGIA_PLACE_ID, partOf: { path: base, name: sectionTitle, description: t(`page.${set}.summary`) },
+      })} />
       <BreadcrumbJsonLd items={[
         { name: crumbs[0].label, path: pageHref("/", locale) },
         { name: crumbs[2].label, path: pageHref(HEALTH_HUB_PATH, locale) },

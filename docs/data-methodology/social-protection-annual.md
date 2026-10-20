@@ -1,0 +1,51 @@
+# Annual social protection data collection and validation
+
+## Purpose and status
+
+This methodology governs the 13,891 values of `data/imports/social-protection-annual.csv`, built from the Social Service Agency (SSA) research package at `docs/Raw Data/Social/ssa-statistics/` (collected 16–18 October 2026), and served on the Social payments, Pensions, Subsistence allowance and Social package pages of the Health and social protection hub under the approved design `docs/superpowers/specs/2026-10-20-social-protection-design.md`. The research captures are immutable. Nothing is published through MCP or included in central machine-readable publications, and the SSA sources are excluded from the fact-query snapshot.
+
+Annual data only, 2013–2025. 2026 is left out until its 12 months are published. Children and maternity pages, the IDP allowance page, a table of the small programmes, funded pensions, care institutions, disability healthcare, pensions by age and sex, the subsistence allowance by age, household size or score band, monthly figures, pre-2013 data and budget comparisons are excluded.
+
+## Sources and coverage
+
+SSA is the only source of the people and money served. SSA publishes its statistics at `ssa.moh.gov.ge/statistiklist.php` as one workbook a year per table, with one sheet or column per month. Twenty-three tables supply values (`SOCIAL_SOURCES` in `lib/data/social/types.ts`): pension tables 1, 2 and 4; subsistence allowance tables 1 and 2; targeted social assistance database table 1 (`tsa_db-01`); social package tables 1, 2 and 10; and one table for each other programme on Social payments. The Social payments total cites SSA's statistics list (`ssa_statistics`). All 24 are registered in `data/sources/source-documents.csv` as `source.ssa_*`.
+
+Geostat's social protection tables (`docs/Raw Data/Social/geostat-social-protection/`) are a cross-check only: the 46 recorded December comparisons with SSA's national counts all match, and nothing from them is served. Geostat's municipal population (Population pages), headline consumer price index (Inflation pages) and nominal GDP (Economy pages) are the divisors of the calculated rows; they are already served and are not copied into the social file.
+
+SSA renames its files on every upload, so source links point to SSA's topic pages, not to files. The public archive `data/methodology/source-archives/social-protection.csv` lists 17 originals: captures of the statistics list and eight topic pages (16 October 2026), the link lists of four more topic pages (18 October 2026), and the four Geostat divisor workbooks with the ids and bytes of the Demography, Inflation and GDP archives. The 1,027 SSA workbooks (217 MB) are never in the archive or the methodology bundle (the PR #170 rule); `lib/methodology/sourceInventory.ts` reads only `official/pages/` and leaves out the pre-2012 link list. Each served table maps to its topic page's archive row by its topic (`socialArchiveSourceId`), which is how place-page and topic-page Excel cite it.
+
+## The yearly rule
+
+People and families are SSA's December count, as published (`months` 1). Money is the sum of SSA's 12 monthly "amount transferred" totals, added up by Fiscal.ge (`value_status=calculated`). A series starts at its first December (counts) or its first full 12-month year (money and averages): the high-mountain pension supplement has pensioners from 2016 and money from 2017, the social package severity groups recipients from 2017 and money from 2018, war participants recipients from 2019 and money from 2020, employment-programme families from 2022 and their money from 2023 (SSA prints it only from the December 2022 table). Social payments keeps every year SSA published; partial years keep their published months: workplace injury 2013 (9), child benefit for the third and later child 2014 (6), electricity tariff subsidy 2015 (5), the high-mountain pension and social package supplements 2016 (4 each), high-mountain child benefit 2016 (10), high-mountain doctors' and nurses' supplement 2016 (3), large-family electricity subsidy 2019 (6) and COVID-19 compensation 2020 and 2021 (6 each). The table and Excel mark them. All programmes counts what was paid in each year.
+
+## Figures calculated by Fiscal.ge
+
+SSA's own figures are the December counts, the monthly amounts and the social package group columns. Fiscal.ge calculates, and marks calculated in the table, tooltip and Excel: each year's money; the average per month (year's money ÷ the sum of the 12 monthly counts; for the subsistence allowance, regular money ÷ regular family months); All programmes (sum of the programme rows); people with disabilities in 2025 (sum of SSA's four disability "/ სულ" totals); a municipality SSA prints as two rows (their sum); and, on the page from served Geostat facts, the share of residents, the average at 2025 prices and Social payments as % of GDP.
+
+- **Share of residents** = December count ÷ `demography.population_total` on 1 January of year+1 × 100. Population starts on 1 January 2015, so shares start in 2014; a place with no population has no share; excluded areas have none. Geostat recalculated 1 January 2025 from the 2024 census, so the 2024 share is marked with the census break and is not comparable with earlier years. SSA's own printed share in `tsa_db-01` is not used.
+- **At 2025 prices** = average × (mean of 2025's 12 monthly headline `index_2010` ÷ the same mean for the year), the national index for every place.
+- **% of GDP** = year's money ÷ served nominal GDP × 100.
+
+People are never summed across programmes; money is, in All programmes.
+
+## Subsistence allowance and the employment programme
+
+From 2022, families with a member in the state employment programme keep their database registration and payment for up to four years. SSA counts them in a column of their own from December 2022, so from 2022 receiving families and people in them leave them out. This is recorded as `subsistence_employment_2022` in `data/imports/social-protection-series-breaks.csv` (demography's break format) on the families and persons rows and their shares. `social.subsistence.employment_families` starts in 2022; `social.subsistence.employment_amount` (part of `social.subsistence.amount`) in 2023. "Registered in the database" counts every family and person scored in `tsa_db-01`, receiving or not. No people count is served for employment-programme families.
+
+## Social package groups
+
+SSA prints one column per eligibility group. `disability`, `survivors`, `war_participants`, `political_repression` and `other` partition SSA's total every year; the four severity groups (from October 2017) are parts of `disability`. In 2025 SSA redesigned the table: disability is split by severity and state-compensation recipients become a cross-cutting column, so `disability` 2025 is the sum of four printed totals and `other` changes from compensation recipients, utility-subsidy recipients and "other" to defence veterans and the social package by acquired right. This is recorded as `social_package_groups_2025`. In January–May 2019 SSA's money table heads column J "war participants" while the people table prints utility-subsidy recipients; the people table's heading is used, so that money is in `other`. War participants' 2019 money covers June–December only and is not served, so the 2019 money partition is checked month by month in the research package.
+
+## Places
+
+SSA's rows use old district names and five combined Tbilisi districts. They map to the site's municipality codes and region ids through the package's reviewed `area-mapping.csv`; an unknown label stops preparation. Region values are SSA's printed region subtotal rows and Georgia's SSA's printed national total, never sums by Fiscal.ge. Tbilisi is `region.tbilisi` only. Akhalgori and Upper Abkhazia are kept as `unit.akhalgori` and `unit.upper_abkhazia`, part of SSA's Georgia total, never drawn and with no page or share. Municipal codes 05, 42, 43, 46 and 64 stay excluded.
+
+## SSA's own sums
+
+Printed totals that differ from their parts are served as printed, and validation allows exactly the recorded differences (`SOCIAL_KNOWN_DIFFERENCES` in `lib/data/social/validation.ts`): the May 2022 social package money total (socpackage-02 L85) is 56 GEL less than its group columns; IDP-status pension money in Shida Kartli 2015 (municipalities 404,686 GEL above the region); subsistence allowance money in Kvemo Kartli 2013 (126 GEL below). The last two recur in SSA's Georgia total (`source-findings.csv`).
+
+## Validation and serving
+
+`npm run data:prepare-social` writes the canonical file (UTF-8 with BOM), the break register and `data/reports/social-protection-validation.json`; `--check` reproduces them and runs in `data:validate`. The research package's `prepare.py --check`, `verify_independent.mjs` (every served cell re-read with SheetJS) and unit tests must have passed. Validation rejects a changed value, a missing, extra or duplicate observation, a year outside 2013–2025, a 12-month sum with fewer months than SSA published and a zero where SSA's cell is blank, and checks that money equals its monthly cells, places add up to their region and Georgia, groups add up to the total, All programmes equals its rows, and the anchors match (2025: 888,518 pensioners, 4,262,309,090 GEL of pensions, average pension 405.13 GEL; 133.23 GEL in 2013; 129,506 receiving families, 463,122 people, 54,842 employment-programme families, 397,144 registered families, 855,291,818 GEL of subsistence allowance, 187,764 social package recipients, 544,241,359 GEL of social package, 6,166,123,811 GEL across all programmes).
+
+The Prisma mirror `SocialFact` is filled only by the parity-checked `npm run data:import`. Pages are prerendered. Excel downloads hold Summary, Data and Sources sheets in the reader's language, with blank missing cells, the "calculated by Fiscal.ge" note when a calculated value is included, and validated links to the archived SSA topic pages and Geostat files on fiscal.ge.

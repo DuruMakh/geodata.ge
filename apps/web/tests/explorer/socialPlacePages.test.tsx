@@ -10,6 +10,8 @@ vi.mock("next/navigation", async (importOriginal) => ({
 }));
 
 import { SocialPlaceExplorer } from "../../components/social/social-place-explorer";
+import { buildSocialWorkbookExportModel } from "../../lib/explorer/socialWorkbook";
+import { getMessages } from "../../lib/i18n/messages.server";
 import { socialPlaceSeries } from "../../lib/explorer/socialPlaces";
 import {
   renderSocialIndexPage, renderSocialPlacePage, socialIndexMetadata, socialMunicipalityParams, socialPlaceMetadata, socialRegionParams,
@@ -140,6 +142,41 @@ describe("what each page hands on", () => {
     expect(explorer?.props.pickerOverrides.countryDetail).toMatch(/^\d+\.\d% · 64 municipalities$/);
     expect(explorer?.props.labels["social.pension.avg_monthly#real"]).toBe("Average pension at 2025 prices");
     expect(explorer?.props.headingLabels.share).toBe("Share of residents");
+  });
+
+  it("hands on every SSA table as its archived topic page, so a workbook of every heading builds with real links", async () => {
+    for (const [set, page] of [["pensions", "ssa-page-pension.html.txt"], ["subsistence-allowance", "ssa-page-tsa_allowance.html.txt"]] as const) {
+      for (const locale of ["en", "ka"] as const) {
+        const { props } = explorerIn(await renderSocialPlacePage({ kind: "region", id: "guria" }, locale, set))!;
+        const presentation = { locale, englishLabels: {}, messages: await getMessages(locale, ["workbook", "format", "common", "social"]) };
+        const urls = new Set<string>();
+        for (const heading of new Set(socialPlaceSeries(set).map(series => series.heading))) {
+          const selectedIds = socialPlaceSeries(set).filter(series => series.heading === heading).map(series => series.id);
+          const model = buildSocialWorkbookExportModel({
+            set, placeId: props.place.id, scope: props.workbookScope, facts: props.facts, extras: { population: props.population, cpi: props.cpi },
+            labels: props.labels, headingLabels: props.headingLabels, sources: props.sources, populationSources: props.populationSources, cpiSources: props.cpiSources,
+            gdpSources: [], siteOrigin: "https://fiscal.ge", title: "Title", state: { mode: "table", range: { kind: "all" }, selectedIds },
+          }, presentation);
+          expect(model.sources.length, `${set} ${heading}`).toBeGreaterThan(0);
+          for (const source of model.sources) urls.add(source.absoluteUrl);
+        }
+        expect([...urls].every(url => /^https:\/\/fiscal\.ge\/downloads\/methodology\/(social-protection|demography|inflation)\/files\//.test(url)), [...urls].join(" ")).toBe(true);
+        expect(urls).toContain(`https://fiscal.ge/downloads/methodology/social-protection/files/${page}`);
+        if (set === "subsistence-allowance") expect(urls).toContain("https://fiscal.ge/downloads/methodology/social-protection/files/ssa-page-tsa_db.html.txt");
+      }
+    }
+  });
+
+  it("carries Dataset markup: the index is the set's dataset and a place page a slice of it", async () => {
+    const dataset = (html: string) => JSON.parse(html.match(/<script data-testid="explorer-dataset-json-ld"[^>]*>(.*?)<\/script>/)![1]!);
+    const indexNode = dataset(await index("pensions"));
+    expect(indexNode).toMatchObject({ "@type": "Dataset", name: "Pensions", temporalCoverage: "2013/2025" });
+    expect(JSON.stringify(indexNode)).toContain("Social Service Agency");
+    const placeNode = dataset(await place({ kind: "region", id: "guria" }));
+    expect(placeNode).toMatchObject({ "@type": "Dataset", name: "Pensions — Guria", isPartOf: { url: "https://fiscal.ge/en/explorer/health/pensions" } });
+    expect(placeNode.variableMeasured).toEqual(["Pensioners", "Share of residents", "Money paid", "Average per month"]);
+    const ka = dataset(await place({ kind: "municipality", slug: "ozurgeti" }, "subsistence-allowance", "ka"));
+    expect(ka).toMatchObject({ "@type": "Dataset", isPartOf: { url: "https://fiscal.ge/explorer/health/subsistence-allowance" } });
   });
 
   it("builds every place page of both sets", async () => {

@@ -95,6 +95,11 @@ async function createFixtureRepository() {
     health: [await writeReviewedSource(repositoryRoot, "health", "2014-2025", "docs/Raw Data/Health/geostat-health-annual/official/deaths/23-2-deaths-by-chapters-regions.xlsx", "downloads/methodology/health/files/23-2-deaths-by-chapters-regions.xlsx", "health-deaths-by-cause-region")],
     crime: [await writeReviewedSource(repositoryRoot, "crime", "2015-2025", "docs/Raw Data/Crime/geostat-crime-annual/official/Number-of-Recorded-Crimes.xlsx", "downloads/methodology/crime/files/number-of-recorded-crimes.xlsx", "crime-recorded")],
     education: [await writeReviewedSource(repositoryRoot, "education", "2010-2025", "docs/Raw Data/Education/geostat-education-annual/official/01Number-of-Students-Admission-Graduates-by-Programmes-and-Sex.xlsx", "downloads/methodology/education/files/01number-of-students-admission-graduates-by-programmes-and-sex.xlsx", "education-higher")],
+    // SSA's topic page capture, and the population table Demography archives too (the same bytes, so the same contents here).
+    "social-protection": [
+      await writeReviewedSource(repositoryRoot, "social-protection", "2013-2025", "docs/Raw Data/Social/ssa-statistics/official/pages/ssa-page-pension.html", "downloads/methodology/social-protection/files/ssa-page-pension.html.txt", "ssa-pension-page"),
+      await writeReviewedSource(repositoryRoot, "social-protection", "2014-2025", "docs/Raw Data/Municipalities/geostat-population-regional-gdp/official/01-population-by-self-governed-unit.xlsx", "downloads/methodology/social-protection/files/01-population-by-self-governed-unit.xlsx", "demography-population"),
+    ],
     "energy-food": [await writeReviewedSource(repositoryRoot, "energy-food", "2013-2024", "docs/Raw Data/EnergyFood/geostat-energy-food-annual/official/energy-balance-2024-aggregated.xlsx", "downloads/methodology/energy-food/files/energy-balance-2024-aggregated.xlsx", "energy-balance-2024-aggregated")],
     trade: [await writeReviewedSource(repositoryRoot, "trade", "1995-2025", "docs/Raw Data/Trade/geostat-external-trade/2026-10-07/official/FTrade_1995-2026.xlsx", "downloads/methodology/trade/files/ftrade_1995-2026.xlsx", "trade-total")],
     "external-flows": [

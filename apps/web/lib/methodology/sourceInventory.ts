@@ -60,6 +60,14 @@ const inventoryRules = {
   "energy-food": [{ root: "docs/Raw Data/EnergyFood/geostat-energy-food-annual/official", include: () => true }],
   // The healthcare and deaths workbooks (official/deaths/) and both page captures; served and archived-only alike.
   health: [{ root: "docs/Raw Data/Health/geostat-health-annual/official", include: () => true }],
+  // SSA's topic page captures and link lists (never its 1,027 workbooks, 217 MB; nor the pre-2012 list, which no served
+  // value uses), and the Geostat population, price index and GDP workbooks the calculated rows divide by.
+  "social-protection": [
+    { root: "docs/Raw Data/Social/ssa-statistics/official/pages", include: (candidatePath: string) => !candidatePath.endsWith("/ssa-links-pre2012.json") },
+    { root: "docs/Raw Data/Municipalities/geostat-population-regional-gdp/official", include: (candidatePath: string) => path.posix.basename(candidatePath) === "01-population-by-self-governed-unit.xlsx" },
+    { root: "docs/Raw Data/Inflation", include: (candidatePath: string) => /^Inflation\/geostat-cpi\/2026-09\/(en|ka)\/cpi-index-2010\.xlsx$/.test(candidatePath) },
+    { root: "docs/Raw Data/Economy/gdp-overview/sources", include: (candidatePath: string) => path.posix.basename(candidatePath) === "geostat_nominal_current.xlsx" },
+  ],
   // The six served workbooks, the 35 archived-only ones and the four category page captures.
   education: [{ root: "docs/Raw Data/Education/geostat-education-annual/official", include: () => true }],
   // The English workbooks, their Georgian versions (kept for the Georgian labels) and both page captures; served and archived-only alike.

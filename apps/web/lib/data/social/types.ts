@@ -51,6 +51,14 @@ export const SOCIAL_SOURCES = [
 ];
 /** The served tables and SSA's statistics page, which the Social payments total (a sum of the tables' rows) cites. */
 export const SOCIAL_PUBLIC_SOURCES = [...SOCIAL_SOURCES, "ssa_statistics"];
+/**
+ * The archived SSA topic page (data/methodology/source-archives/social-protection.csv) that lists a served table: SSA renames
+ * its workbooks on every upload, so a table is cited by its topic's page (`ssa_pension_04` → `ssa_pension`), and the statistics
+ * list cites itself.
+ */
+export function socialArchiveSourceId(sourceId: string): string {
+  return sourceId.replace(/_\d+$/, "");
+}
 export function socialSourceId(tableId: string): string {
   return `ssa_${tableId.replace(/-/g, "_")}`;
 }
