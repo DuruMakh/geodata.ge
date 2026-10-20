@@ -12,7 +12,7 @@ import { sharePerHundred, type SocialPlaceSet, type SocialPopulation } from "./s
 
 /** What an index lists and draws, as on the Education index; the rows' money-named `valueGel` carries a share of residents in % here. */
 export type SocialIndexModel = {
-  /** The latest year every municipality has a share for; the map and the rows use it. */
+  /** The latest year any municipality has a share for; every place must have one then (the model throws otherwise). The map and the rows use it. */
   year: number;
   map: MunicipalityMapModel;
   /** The 64 registry municipalities ranked highest first; Tbilisi is code `04`, with its region's value. */

@@ -116,7 +116,8 @@ export type CrimeModel = {
   breaks: { year: number; label: "newCounting" }[];
 };
 
-const CENSUS_BREAK = "census_recalculation_2025";
+/** The census recalculation of the 1 January population, which every rate on a population crosses. Shared with Social protection's shares of residents. */
+export const CENSUS_BREAK = "census_recalculation_2025";
 const breakYear = (item: { referenceDate: string }) => Number(item.referenceDate.slice(0, 4));
 
 export function buildCrimeModel(section: CrimeSectionId, facts: readonly ClientCrimeFact[], population: CrimePopulation, state: CrimeState, breaks: readonly CrimeSeriesBreak[]): CrimeModel {

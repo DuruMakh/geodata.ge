@@ -55,7 +55,7 @@ test("the four sections sit under the Health and social protection hub", () => {
 
 test("each page starts on its default series, with coverage from the facts", () => {
   expect(defaultSocialState("social-payments")).toEqual({ mode: "line", range: { kind: "all" }, view: "amount", selectedIds: ["social.payments.total.amount"] });
-  expect(span(socialCoverage("social-payments", "amount", facts, ["social.payments.total.amount"]))).toEqual([2013, 2025]);
+  expect(span(socialCoverage("social-payments", "amount", facts, gdpFacts, ["social.payments.total.amount"]))).toEqual([2013, 2025]);
   expect(defaultSocialState("social-package").selectedIds).toEqual(["social.social_package.total.recipients"]);
   expect(socialPlaceDefaultSelection("pensions")).toEqual(["social.pension.recipients"]);
   expect(socialPlaceDefaultSelection("subsistence-allowance")).toEqual(["social.subsistence.families"]);
@@ -109,16 +109,18 @@ test("a selection keeps to one heading, from the hash and from a tick", () => {
   expect(ticked.selectedIds).toEqual(["social.pension.amount"]);
   // The share heading starts in 2014, so a hash range from 2013 refits to it.
   expect(parseSocialPlaceHash("#sel=social.pension.recipients%23share&start=2013&end=2020", "pensions", GEORGIA, pensions).range).toEqual({ kind: "manual", start: 2014, end: 2020 });
+  const share = { mode: "table" as const, range: { kind: "manual" as const, start: 2016, end: 2024 }, selectedIds: ["social.pension.recipients#share"] };
+  expect(parseSocialPlaceHash(`#${serializeSocialHash({ ...share, view: "amount" }, "social-package")}`, "pensions", GEORGIA, pensions)).toEqual(share);
   // Social package: the same one-heading rule, and the hash round-trips.
   const start = defaultSocialState("social-package");
-  const money = changeSocialSelection(start, "social-package", [...start.selectedIds, "social.social_package.total.amount"], facts);
+  const money = changeSocialSelection(start, "social-package", [...start.selectedIds, "social.social_package.total.amount"], facts, []);
   expect(money.selectedIds).toEqual(["social.social_package.total.amount"]);
-  expect(parseSocialHash(`#${serializeSocialHash(money, "social-package")}`, "social-package", facts)).toEqual(money);
+  expect(parseSocialHash(`#${serializeSocialHash(money, "social-package")}`, "social-package", facts, [])).toEqual(money);
   expect(serializeSocialHash(money, "social-package")).not.toContain("tab=");
   const gdp = { ...defaultSocialState("social-payments"), view: "gdp" as const };
   expect(serializeSocialHash(gdp, "social-payments")).toContain("tab=gdp");
   expect(parseSocialHash(`#${serializeSocialHash(gdp, "social-payments")}`, "social-payments", facts, gdpFacts)).toEqual(gdp);
-  expect(parseSocialHash("#sel=", "social-payments", facts).selectedIds).toEqual([]);
+  expect(parseSocialHash("#sel=", "social-payments", facts, gdpFacts).selectedIds).toEqual([]);
 });
 
 test("pensioners per 100 residents use the next 1 January's population, from 2014, and only where it exists", () => {
@@ -168,6 +170,8 @@ test("Social payments as % of GDP divides each year's money by the served nomina
   expect(model).toMatchObject({ unit: "percent", heading: "money" });
   expect(model.selected[0].valuesByYear[2025]).toBeCloseTo(total2025 * 1e6 / gdp2025 * 100, 10);
   expect(socialPaymentsViewFacts("amount", facts, gdpFacts).find(f => f.indicatorId === "social.payments.total.amount" && f.year === 2025)!.value).toBe(total2025);
+  // The % of GDP view needs the GDP facts: none is an error, never a silently empty page.
+  expect(() => socialPaymentsViewFacts("gdp", facts, [])).toThrow(/No GDP facts/);
   // Switching view keeps the selection and the years.
   const manual = { ...defaultSocialState("social-payments"), range: { kind: "manual" as const, start: 2015, end: 2020 }, selectedIds: ["social.payments.pension.amount"] };
   expect(changeSocialView(manual, "gdp", facts, gdpFacts)).toEqual({ ...manual, view: "gdp" });
@@ -182,17 +186,23 @@ test("counting changes mark the rows they touch", () => {
   const state = (selectedIds: string[]) => ({ mode: "line" as const, range: { kind: "all" as const }, selectedIds });
   expect(buildSocialPlaceModel("subsistence-allowance", GEORGIA, subsistence, state(["social.subsistence.families"]), breaks).breaks).toEqual([{ year: 2022, label: "newCounting" }]);
   // The share of people in receiving families inherits its count's break; registered families have none.
-  expect(buildSocialPlaceModel("subsistence-allowance", GEORGIA, subsistence, state(["social.subsistence.persons#share"]), breaks).breaks).toEqual([{ year: 2022, label: "newCounting" }]);
+  // A share also crosses the census recalculation of 1 January 2025, which first reaches the 2024 share (its divisor is 1 January 2025).
+  const breakYears = (set: "pensions" | "subsistence-allowance", selectedIds: string[]) =>
+    buildSocialPlaceModel(set, GEORGIA, socialPlaceFacts(set, GEORGIA, facts, extras()), state(selectedIds), breaks).breaks.map(item => item.year);
+  expect(breakYears("subsistence-allowance", ["social.subsistence.persons#share"])).toEqual([2022, 2024]);
+  expect(breakYears("pensions", ["social.pension.recipients#share"])).toEqual([2024]);
+  expect(breakYears("pensions", ["social.pension.recipients"])).toEqual([]);
+  expect(breakYears("subsistence-allowance", ["social.subsistence.persons"])).toEqual([2022]);
   expect(buildSocialPlaceModel("subsistence-allowance", GEORGIA, subsistence, state(["social.subsistence.registered_families"]), breaks).breaks).toEqual([]);
   // A range that starts at the break year has nothing to cross.
   expect(buildSocialPlaceModel("subsistence-allowance", GEORGIA, subsistence, { ...state(["social.subsistence.families"]), range: { kind: "manual", start: 2022, end: 2025 } }, breaks).breaks).toEqual([]);
-  const other = buildSocialModel("social-package", facts, { ...defaultSocialState("social-package"), selectedIds: ["social.social_package.other.recipients"] }, { breaks });
+  const other = buildSocialModel("social-package", facts, { ...defaultSocialState("social-package"), selectedIds: ["social.social_package.other.recipients"] }, { breaks, gdpFacts: [] });
   expect(other.breaks).toEqual([{ year: 2025, label: "newCounting" }]);
-  expect(buildSocialModel("social-package", facts, defaultSocialState("social-package"), { breaks }).breaks).toEqual([]);
+  expect(buildSocialModel("social-package", facts, defaultSocialState("social-package"), { breaks, gdpFacts: [] }).breaks).toEqual([]);
 });
 
 test("a programme that ran part of a year shows its published months", () => {
-  const model = buildSocialModel("social-payments", facts, { ...defaultSocialState("social-payments"), selectedIds: ["social.payments.covid_vulnerable_compensation.amount"] }, { breaks });
+  const model = buildSocialModel("social-payments", facts, { ...defaultSocialState("social-payments"), selectedIds: ["social.payments.covid_vulnerable_compensation.amount"] }, { breaks, gdpFacts: [] });
   const covid = model.series.find(s => s.id === "social.payments.covid_vulnerable_compensation.amount")!;
   expect(covid.partialMonths).toEqual({ 2020: 6, 2021: 6 });
   expect(covid.valuesByYear[2019]).toBeNull();
@@ -219,4 +229,23 @@ test("the Pensions and Subsistence allowance indexes shade the latest year's sha
   const subsistence = buildSocialIndexModel("subsistence-allowance", facts, population, regions, municipalities);
   expect(subsistence.year).toBe(2025);
   expect(subsistence.country.valueGel).toBe(sharePerHundred(facts, population, GEORGIA).find(f => f.indicatorId === "social.subsistence.persons#share" && f.year === 2025)!.value);
+});
+
+test("no list repeats a colour within a heading, and a Social package group keeps its colour across headings", () => {
+  const colors = (rows: ReturnType<typeof socialTopicSeries>, model: { series: { id: string; heading: string; color: string }[] }) =>
+    [...new Set(rows.map(row => row.heading))].map(heading => model.series.filter(s => s.heading === heading).map(s => s.color));
+  const line = { mode: "line" as const, range: { kind: "all" as const } };
+  const payments = buildSocialModel("social-payments", facts, defaultSocialState("social-payments"), { breaks, gdpFacts });
+  const socialPackage = buildSocialModel("social-package", facts, defaultSocialState("social-package"), { breaks, gdpFacts: [] });
+  const pensions = buildSocialPlaceModel("pensions", GEORGIA, socialPlaceFacts("pensions", GEORGIA, facts, extras()), { ...line, selectedIds: [] }, breaks);
+  const subsistence = buildSocialPlaceModel("subsistence-allowance", GEORGIA, socialPlaceFacts("subsistence-allowance", GEORGIA, facts, extras()), { ...line, selectedIds: [] }, breaks);
+  for (const [rows, model] of [[socialTopicSeries("social-payments"), payments], [socialTopicSeries("social-package"), socialPackage], [socialPlaceSeries("pensions"), pensions], [socialPlaceSeries("subsistence-allowance"), subsistence]] as const) {
+    for (const heading of colors(rows, model)) expect(new Set(heading).size, heading.join()).toBe(heading.length);
+  }
+  expect(payments.series[0].color).toBe(INK);
+  expect(payments.series.slice(1).map(s => s.color)).not.toContain(INK);
+  // A group wears one colour under Recipients and Money; the reference total is ink under Recipients.
+  const colorOf = (id: string) => socialPackage.series.find(s => s.id === id)!.color;
+  for (const group of ["disability", "survivors", "war_participants", "other"]) expect(colorOf(`social.social_package.${group}.amount`)).toBe(colorOf(`social.social_package.${group}.recipients`));
+  expect(colorOf("social.social_package.total.recipients")).toBe(INK);
 });

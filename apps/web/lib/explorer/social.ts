@@ -1,6 +1,8 @@
+import { buildBreakRegister } from "../data/demography/breaks";
 import { SOCIAL_GEORGIA, SOCIAL_PACKAGE_GROUPS, SOCIAL_PAYMENT_PROGRAMMES, type ClientSocialFact, type SocialSeriesBreak } from "../data/social/types";
 import type { ClientNationalGdpFact } from "./clientData";
-import { perPopulation } from "./crime";
+import { INK } from "./colors";
+import { CENSUS_BREAK, perPopulation } from "./crime";
 import { shareOfGdp } from "./debtExplorer";
 import { placeIdForMunicipalityCode } from "./demographyAreas";
 import { HEALTH_HUB_PATH } from "./health";
@@ -48,8 +50,27 @@ export function socialTopicSeries(section: SocialTopicId): SocialSeriesDefinitio
 
 export const socialDefaultSelection = (section: SocialTopicId): string[] => [socialTopicSeries(section)[0].id];
 
-/** The default series is ink, every other row its palette colour. */
-export const socialSeriesColor = (series: SocialSeriesDefinition, index: number): string => topicSeriesColor(series, index);
+/**
+ * Social payments' last four programmes have a fixed colour: the palette (14 hexes) cannot colour 18 programmes by position.
+ * They wear existing site hexes that no palette hex is within 15 CIEDE2000 of: the three Housing gives its overflow types
+ * and Energy and food's extra olive. The other 14 take the palette by position in `SOCIAL_PAYMENT_PROGRAMMES`.
+ */
+const FIXED_PAYMENT_COLORS: Readonly<Record<string, string>> = {
+  water_subsidy: "#C16671", highmountain_doctors_nurses: "#667722", workplace_injury: "#0D89C2", covid_vulnerable_compensation: "#474A02",
+};
+
+/**
+ * The default series is ink. As on Housing, a row is keyed by its position in a fixed list, so no list repeats a colour:
+ * a Social payments programme by `SOCIAL_PAYMENT_PROGRAMMES` (four of them fixed), and a Social package group by
+ * `SOCIAL_PACKAGE_GROUPS`, so a group wears one colour under Recipients and Money. Place rows take the palette by position.
+ */
+export function socialSeriesColor(series: SocialSeriesDefinition, index: number): string {
+  if (series.reference) return INK;
+  const [, programme, group] = series.id.split(".");
+  if (programme === "payments") return FIXED_PAYMENT_COLORS[group!] ?? topicSeriesColor(series, SOCIAL_PAYMENT_PROGRAMMES.indexOf(group as typeof SOCIAL_PAYMENT_PROGRAMMES[number]));
+  if (programme === "social_package") return topicSeriesColor(series, SOCIAL_PACKAGE_GROUPS.indexOf(group as typeof SOCIAL_PACKAGE_GROUPS[number]));
+  return topicSeriesColor(series, index);
+}
 
 /** A served or calculated id's display unit; the % of GDP view overrides money with `percent`. */
 export function socialUnitOf(indicatorId: string): SocialUnit {
@@ -130,6 +151,7 @@ export function socialPaymentsViewFacts(view: SocialPayView, facts: readonly Cli
   const ids = new Set<string>(socialTopicSeries("social-payments").map(s => s.id));
   const payments = facts.filter(f => ids.has(f.indicatorId) && f.geographyId === SOCIAL_GEORGIA).map(shown);
   if (view === "amount") return payments;
+  if (!gdpFacts.length) throw new Error("No GDP facts for the Social payments % of GDP view");
   const gdpByYear = new Map(gdpFacts.map(f => [f.year, f]));
   return payments.flatMap(f => {
     const share = shareOfGdp(f.value * 1e6, f.year, gdpByYear);
@@ -159,28 +181,31 @@ export function defaultSocialState(section: SocialTopicId): SocialState {
   return { mode: "line", range: { kind: "all" }, view: socialViews(section)[0], selectedIds: socialDefaultSelection(section) };
 }
 
-/** A topic page's years for a selection: every year any row of the selection's heading has a value in the view (any row when nothing is selected). */
-export function socialCoverage(section: SocialTopicId, view: SocialPayView, facts: readonly ClientSocialFact[], selectedIds: readonly string[] = [], gdpFacts: readonly ClientNationalGdpFact[] = []): TopicCoverage {
+/**
+ * A topic page's years for a selection: every year any row of the selection's heading has a value in the view (any row when
+ * nothing is selected). `gdpFacts` is required: Social payments' % of GDP view divides by it (Social package passes none).
+ */
+export function socialCoverage(section: SocialTopicId, view: SocialPayView, facts: readonly ClientSocialFact[], gdpFacts: readonly ClientNationalGdpFact[], selectedIds: readonly string[] = []): TopicCoverage {
   const definitions = socialTopicSeries(section);
   return unitListCoverage(definitions, selectedIds, socialTopicFacts(section, view, facts, gdpFacts), noSocialYears(section), socialHeadingOf(definitions));
 }
 
 /** Reads a topic page's hash: `tab` names Social payments' view; a selection that mixes headings keeps its first row's heading, and the years fit it. */
-export function parseSocialHash(hash: string, section: SocialTopicId, facts: readonly ClientSocialFact[], gdpFacts: readonly ClientNationalGdpFact[] = []): SocialState {
+export function parseSocialHash(hash: string, section: SocialTopicId, facts: readonly ClientSocialFact[], gdpFacts: readonly ClientNationalGdpFact[]): SocialState {
   const view = topicHashView(new URLSearchParams(hash.replace(/^#/, "")), socialViews(section));
   const definitions = socialTopicSeries(section);
   return { ...parseUnitListHash(hash, definitions, socialDefaultSelection(section), socialTopicFacts(section, view, facts, gdpFacts), noSocialYears(section), socialHeadingOf(definitions)), view };
 }
 
 /** A topic page's new selection: a row under another heading replaces it. The years stay, clamped to the heading's (never collapsed to "all"). */
-export function changeSocialSelection(state: SocialState, section: SocialTopicId, next: readonly string[], facts: readonly ClientSocialFact[], gdpFacts: readonly ClientNationalGdpFact[] = []): SocialState {
+export function changeSocialSelection(state: SocialState, section: SocialTopicId, next: readonly string[], facts: readonly ClientSocialFact[], gdpFacts: readonly ClientNationalGdpFact[]): SocialState {
   const definitions = socialTopicSeries(section);
   return { ...changeUnitListSelection(state, definitions, next, socialTopicFacts(section, state.view, facts, gdpFacts), noSocialYears(section), socialHeadingOf(definitions)), view: state.view };
 }
 
 /** Switching Social payments between million GEL and % of GDP keeps the selection and mode; the years are clamped to the view's (never collapsed to "all"). */
 export function changeSocialView(state: SocialState, view: SocialPayView, facts: readonly ClientSocialFact[], gdpFacts: readonly ClientNationalGdpFact[]): SocialState {
-  return { ...state, view, range: refitRange(state.range, socialCoverage("social-payments", view, facts, state.selectedIds, gdpFacts), { collapseToAll: false }) };
+  return { ...state, view, range: refitRange(state.range, socialCoverage("social-payments", view, facts, gdpFacts, state.selectedIds), { collapseToAll: false }) };
 }
 
 export function serializeSocialHash(state: SocialState, section: SocialTopicId): string {
@@ -207,7 +232,7 @@ export type SocialSeriesModel = TopicSeriesModel<SocialSeriesDefinition & { deci
 /** `unit` and `heading` are the selection's (the list's first row's when nothing is selected). */
 export type SocialModel = {
   range: ResolvedPeriodRange; years: number[]; series: SocialSeriesModel[]; selected: SocialSeriesModel[]; unit: SocialUnit; heading: SocialHeading;
-  /** The counting changes inside the range that touch the selection: the chart draws a gap and a rule, the table marks the year. */
+  /** The counting changes inside the range that touch the selection (a share also crosses the census recalculation): the chart draws a gap and a rule, the table marks the year. */
   breaks: { year: number; label: "newCounting" }[];
 };
 
@@ -239,15 +264,17 @@ export function buildSocialSeriesModel(definitions: readonly SocialSeriesDefinit
   const selected = series.filter(s => state.selectedIds.includes(s.id));
   const lead = selected[0] ?? series[0];
   const selectedBases = new Set(state.selectedIds.map(baseId));
-  const years = breaks.filter(item => item.appliesTo.some(id => selectedBases.has(id))).map(breakYear).filter(year => year > model.range.start && year <= model.range.end);
+  // A share divides by the next 1 January's population, so the census recalculation of 1 January 2025 first reaches the 2024 share.
+  const census = buildBreakRegister().find(item => item.breakId === CENSUS_BREAK)!;
+  const censusYears = state.selectedIds.some(id => id.endsWith("#share")) ? [breakYear(census) - 1] : [];
+  const years = [...breaks.filter(item => item.appliesTo.some(id => selectedBases.has(id))).map(breakYear), ...censusYears].filter(year => year > model.range.start && year <= model.range.end);
   return {
     ...model, series, selected, unit: lead.unit, heading: lead.heading,
     breaks: [...new Set(years)].sort((a, b) => a - b).map(year => ({ year, label: "newCounting" as const })),
   };
 }
 
-export function buildSocialModel(section: SocialTopicId, facts: readonly ClientSocialFact[], state: SocialState, extras: { breaks: readonly SocialSeriesBreak[]; gdpFacts?: readonly ClientNationalGdpFact[] }): SocialModel {
-  const gdpFacts = extras.gdpFacts ?? [];
-  return buildSocialSeriesModel(socialTopicSeries(section), socialTopicFacts(section, state.view, facts, gdpFacts), state,
-    socialCoverage(section, state.view, facts, state.selectedIds, gdpFacts), extras.breaks);
+export function buildSocialModel(section: SocialTopicId, facts: readonly ClientSocialFact[], state: SocialState, extras: { breaks: readonly SocialSeriesBreak[]; gdpFacts: readonly ClientNationalGdpFact[] }): SocialModel {
+  return buildSocialSeriesModel(socialTopicSeries(section), socialTopicFacts(section, state.view, facts, extras.gdpFacts), state,
+    socialCoverage(section, state.view, facts, extras.gdpFacts, state.selectedIds), extras.breaks);
 }
