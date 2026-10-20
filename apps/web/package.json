@@ -172,7 +172,7 @@
     "data:check-external-position": "tsx scripts/prepare-external-position.ts --check"
   },
   "dependencies": {
-    "@modelcontextprotocol/server": "2.2.0",
+    "@modelcontextprotocol/server": "2.3.1",
     "@prisma/adapter-pg": "^7.10.0",
     "@prisma/client": "^7.10.0",
     "@vercel/analytics": "^2.0.1",
