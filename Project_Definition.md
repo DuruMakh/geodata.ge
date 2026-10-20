@@ -57,7 +57,7 @@ The approved national-sector page also includes four point-in-time highlights: l
 - Broad public data catalog.
 - Historical municipal per-capita series, detail-page per-capita measures, and per-capita exports. V1 includes only the bounded 2025 index map, supporting list values, and median KPI described above.
 - The six selected-detail municipal categories. Only the ten main functions are served.
-- Any public use of demography data beyond the Population page's population and density, the Migration page's migration by citizenship, the Births, deaths and fertility page's births, deaths, fertility rates and life expectancy the Age and sex page's population by five-year age group and sex for Georgia (annual) and the 2024 census for Georgia and the 11 regions, and the Marriages and divorces page's marriages, divorces, average ages and marriage length (the rest of the reviewed foundation, such as municipal age rows, is stored and not served). Unemployment is bounded by the approved extension in 2D.
+- Any public use of demography data beyond the Population page's population and density, the Migration page's migration by citizenship, the Births, deaths and fertility page's births, deaths, fertility rates and life expectancy, the Age and sex page's population by five-year age group and sex for Georgia (annual) and the 2024 census for Georgia and the 11 regions, and the Marriages and divorces page's marriages, divorces, average ages and marriage length (the rest of the reviewed foundation, such as municipal age rows, is stored and not served). Unemployment is bounded by the approved extension in 2D.
 - Capital projects explorer.
 - Admin UI.
 - Public API.

@@ -238,7 +238,7 @@
   "demography.marriageUnitPer1000": "per 1,000 residents",
   "demography.marriageUnitYears": "years",
   "demography.marriageCalculated": "Calculated by Fiscal.ge",
-  "demography.marriageRatesNote": "Rates per 1,000 residents are calculated by fiscal.ge from Geostat's counts and its mid-year population, the method of Geostat's own crude rates.",
+  "demography.marriageRatesNote": "Rates per 1,000 residents are calculated by Fiscal.ge from Geostat's counts and its mid-year population, the method of Geostat's own crude rates.",
   "demography.marriagesTitle": "Marriages and divorces",
   "demography.marriagesDescription": "Marriages and divorces, ages at marriage and marriage length.",
   "demography.marriagesMetaTitle": "Marriages and divorces — Demography",
