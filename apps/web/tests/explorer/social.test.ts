@@ -100,10 +100,15 @@ test("each page lists its rows under its headings", () => {
   expect(headings(subsistence)).toEqual(["families", "people", "share", "money", "average"]);
   expect(subsistence.filter(row => row.heading === "share").map(row => row.id)).toEqual(["social.subsistence.persons#share", "social.subsistence.registered_persons#share"]);
   const socialPackage = socialTopicSeries("social-package");
-  expect(socialPackage).toHaveLength(21);
+  expect(socialPackage).toHaveLength(30);
   expect(headings(socialPackage)).toEqual(["recipients", "money", "average"]);
   expect(socialPackage.filter(row => row.heading === "recipients")).toHaveLength(10);
-  expect(socialPackage.at(-1)).toEqual({ id: "social.social_package.total.avg_monthly", reference: false, heading: "average" });
+  // Average per month lists the total first, then the groups in the order of Recipients and Money.
+  const groupsUnder = (heading: string) => socialPackage.filter(row => row.heading === heading).map(row => row.id.split(".")[2]);
+  expect(groupsUnder("average")).toEqual(groupsUnder("recipients"));
+  expect(groupsUnder("average")).toEqual(groupsUnder("money"));
+  expect(socialPackage.find(row => row.heading === "average")).toEqual({ id: "social.social_package.total.avg_monthly", reference: false, heading: "average" });
+  expect(socialPackage.at(-1)).toEqual({ id: "social.social_package.other.avg_monthly", reference: false, heading: "average" });
   for (const rows of [payments, pensions, subsistence, socialPackage]) expect(rows.filter(row => row.reference)).toHaveLength(1);
 });
 
@@ -257,6 +262,20 @@ test("no list repeats a colour within a heading, and a Social package group keep
   // The Money total is the reference row of its heading too, so it is ink; the groups under it keep their colours.
   expect(colorOf("social.social_package.total.amount")).toBe(INK);
   expect(socialPackage.series.filter(s => s.heading === "money" && s.id !== "social.social_package.total.amount").map(s => s.color)).not.toContain(INK);
+  // Under Average per month too: the total is ink and each group keeps its colour.
+  expect(colorOf("social.social_package.total.avg_monthly")).toBe(INK);
+  for (const group of ["disability", "disability_moderate", "survivors", "war_participants", "political_repression", "other"]) expect(colorOf(`social.social_package.${group}.avg_monthly`)).toBe(colorOf(`social.social_package.${group}.recipients`));
+  expect(socialPackage.series.filter(s => s.heading === "average" && s.id !== "social.social_package.total.avg_monthly").map(s => s.color)).not.toContain(INK);
+});
+
+test("a social package group's average per month is its money ÷ its monthly people counts, in GEL to two decimals", () => {
+  const value = (id: string, year: number) => facts.find(f => f.indicatorId === id && f.geographyId === GEORGIA && f.year === year)!.value;
+  expect(value("social.social_package.war_participants.avg_monthly", 2025)).toBe(101.61);
+  expect(value("social.social_package.survivors.avg_monthly", 2025)).toBe(102.9);
+  const model = buildSocialModel("social-package", facts, { ...defaultSocialState("social-package"), selectedIds: ["social.social_package.total.avg_monthly", "social.social_package.war_participants.avg_monthly"] }, { breaks, gdpFacts: [] });
+  const war = model.selected.find(s => s.id === "social.social_package.war_participants.avg_monthly")!;
+  expect(war.valuesByYear[2019]).toBeNull();
+  expect(war.valuesByYear[2025]).toBe(101.61);
 });
 
 // ---- Excel workbooks and hub cards ------------------------------------------------------------------------------------
