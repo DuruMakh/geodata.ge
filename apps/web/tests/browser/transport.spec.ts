@@ -107,7 +107,7 @@ test("the topic Excel download is a workbook citing the archived Geostat files",
 test("regions is the map and list with Georgia first, and the map opens Tbilisi's page", async ({ page }) => {
   await page.goto("/explorer/transport/regions");
   await ready(page);
-  await expect(page.getByTestId("transport-latest")).toHaveText("რეგისტრირებული ავტომობილები · თბილისი · 2025: 855.0 ათასი");
+  await expect(page.getByTestId("transport-latest")).toHaveText("ავტომობილები · თბილისი · 2025: 855.0 ათასი");
   await expect(page.getByTestId("transport-region-map").getByTestId("regional-map-path")).toHaveCount(11);
   const rows = page.getByTestId("regional-list-row");
   await expect(rows).toHaveCount(12);
@@ -142,7 +142,7 @@ test("an area page: headings, picker and neighbours carry a Roads selection, the
   await guria.click();
   await expect(page).toHaveURL(/\/explorer\/transport\/regions\/guria#sel=transport\.road_km\.region_guria_local$/);
   await ready(page);
-  await expect(page.getByTestId("transport-latest")).toHaveText("რეგისტრირებული ავტომობილები · 2025: 40.7 ათასი · გურია");
+  await expect(page.getByTestId("transport-latest")).toHaveText("ავტომობილები · 2025: 40.7 ათასი");
   await expect(page.locator(pressed("transport.road_km.region_guria_local"))).toHaveAttribute("aria-pressed", "true");
   await page.getByTestId("language-switch").first().getByRole("link", { name: "English", exact: true }).click();
   await expect(page).toHaveURL(/\/en\/explorer\/transport\/regions\/guria#sel=transport\.road_km\.region_guria_local$/);
@@ -153,6 +153,17 @@ test("an area page: headings, picker and neighbours carry a Roads selection, the
   await page.getByTestId("transport-excel-download").click();
   const download = await promise;
   expect(download.suggestedFilename()).toMatch(/^fiscal-transport-guria-2011-2024-en\.xlsx$/);
+});
+
+const AREAS = ["georgia", "tbilisi", "imereti", "kvemo_kartli", "kakheti", "adjara", "samegrelo_zemo_svaneti", "shida_kartli", "samtskhe_javakheti", "mtskheta_mtianeti", "guria", "racha_lechkhumi_kvemo_svaneti"];
+for (const prefix of ["", "/en"]) test(`the regions and area latest lines fit one line of a 375px screen ${prefix || "ka"}`, async ({ page }) => {
+  await page.setViewportSize({ width: 375, height: 800 });
+  for (const path of ["regions", ...AREAS.map(area => `regions/${area}`)]) {
+    await page.goto(`${prefix}/explorer/transport/${path}`);
+    const line = page.getByTestId("transport-latest");
+    await expect(line).toBeVisible();
+    expect(await line.evaluate(element => element.getBoundingClientRect().height / parseFloat(getComputedStyle(element).lineHeight)), path).toBeLessThanOrEqual(1.1);
+  }
 });
 
 for (const prefix of ["", "/en"]) test(`the methodology link opens the transport methodology with its original files ${prefix || "ka"}`, async ({ page }) => {

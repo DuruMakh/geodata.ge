@@ -86,8 +86,7 @@ export function TransportAreaExplorer({ area, facts, labels, areaLabels, sources
         previous={{ href: pageHref(areaHref(neighbours.previous.id), locale), label: nameOf(neighbours.previous.id) }}
         next={{ href: pageHref(areaHref(neighbours.next.id), locale), label: nameOf(neighbours.next.id) }} />
     </div>
-    <LatestValueLine testId="transport-latest" measure={t("latest.area")} period={latest.year} value={transportLatestValue(latest.value, "thousand", t)}
-      note={areaName} />
+    <LatestValueLine testId="transport-latest" measure={t("latest.area")} period={latest.year} value={transportLatestValue(latest.value, "thousand", t)} />
     <ExplorerWorkspace>
       <div className="flex min-w-0 flex-col">
         <section aria-label={chartLabel} data-testid="chart-panel" data-mode={state.mode} data-area={area} data-unit={model.unit} className="border-t border-[var(--ink)] pt-4">
