@@ -97,7 +97,7 @@ Patents by region (2022–2025, sheet 3) are archived and not served.
 **Area pages** (`/explorer/science-culture/museums/[id]`), following the Housing area pages:
 
 - The heading is `მუზეუმები — [გურია ▾]` / `Museums — [Guria ▾]`, with the `RegionPicker` (Georgia first, and an all-regions entry that returns to the index) and previous/next links in the order Georgia then the regions.
-- One latest-value line, for example "2025: 164.9 thousand visitors · Samtskhe-Javakheti".
+- One latest-value line, for example "2025: 164.9 thousand visitors" (Samtskhe-Javakheti's page; the region is named in the heading, not in the line).
 - One list, 2005–2025, under four headings, each one row on a region's page:
   - **Visitors · thousand**: Visitors (selected).
   - **Group tours · thousand**: Group tours (Geostat's excursions).
@@ -108,7 +108,7 @@ Patents by region (2022–2025, sheet 3) are archived and not served.
   - a fifth heading **Staff** (2020–2025): All staff, Women, Men, Permanent staff, On contract, Under 25, 25–54, 55 and over.
 - A link to another area keeps the selection where the row exists there (Visitors stays Visitors); rows that exist only on Georgia's page fall back to the default, as Housing's area links do.
 
-Georgia's visitors, group tours and exhibitions come from the by-region workbook's Georgia row (thousand, as published); the national workbook's million figures are a cross-check only. Museum counts by region come from Geostat's count-by-region workbook, Georgia's count and types from the national workbook. Geostat lists no museums for Abkhazia AR, and the 11 regions add up to Georgia.
+Georgia's visitors, group tours and exhibitions come from the by-region workbook's Georgia row (thousand, as published); the national workbook's million figures are a cross-check only. Museum counts by region come from Geostat's count-by-region workbook, Georgia's count and types from the national workbook. Geostat lists no museums for Abkhazia AR. The 11 regions add up to Georgia for museums and exhibitions, and for visitors except in three years (§9 Checks).
 
 ## 7. Theatres page
 
@@ -174,7 +174,7 @@ Validation rejects a changed value, a missing, extra or duplicate observation, a
 - researchers, technicians, support staff and not specified add up to all R&D staff, and the R&D staff table's researchers equal the researchers table;
 - permanent plus contract staff, and the three age groups, each equal all staff;
 - museum types add up to all museums, and theatre types to all theatres;
-- the 11 regions add up to Georgia for museums, visitors and exhibitions exactly, and for group tours within 0.2 thousand (Geostat rounds those to one decimal in early years);
+- the 11 regions add up to Georgia for museums and exhibitions exactly, and for group tours within 0.2 thousand (Geostat rounds those to one decimal in early years). For visitors they add up exactly except in three years, recorded as known differences and checked to the amount: the regions come out lower than Georgia's total by 13 visitors in 2005 (−0.013 thousand), 19 in 2013 (−0.019) and 30 in 2023 (−0.030). Both figures are served as Geostat published them;
 - the national museum visitors (million) match the by-region Georgia row (thousand) to the national file's precision;
 - the theatre audience in `Events.xls` equals the by-region workbook's Georgia row;
 - anchor values match Geostat: researchers 2024 14,046 (women 7,732); R&D staff 2024 16,191; institutions 2024 66; spending 2024 242.9; invention applications from Georgian applicants 2025 79, granted 41; museums 2025 261, visitors 1,998.924 thousand; theatres 2025 53, audience 620.322 thousand.
@@ -193,7 +193,7 @@ Validation rejects a changed value, a missing, extra or duplicate observation, a
   - who collects each table (Geostat, the Ministry of Education from 2020, Sakpatenti);
   - what researchers and R&D staff are, and the 2019/2020 change of collector;
   - patents and utility models, and the national and international routes;
-  - what a museum visitor and a group tour count, and that the regions add up to Georgia;
+  - what a museum visitor and a group tour count, and that the regions add up to Georgia except for the three recorded visitor differences;
   - the 2021 theatre audience break and that events are counted from 2021;
   - that `-` means none in these tables, except the events rows before 2021;
   - that the pages state no causes (for example of the 2020 fall).
