@@ -271,8 +271,8 @@ test("a theatres workbook exports audience in thousands as stored and leaves the
   expect(row.getCell(3).numFmt).toBe("#,##0.0");
 });
 
-test("a theatres workbook of audience and events blanks the events cells before 2021 when both are exported", async () => {
-  // Audience and events differ in unit, so a mixed link keeps one; the events row alone covers 2006–2025 because the audience rows set the coverage.
+test("a theatres workbook of shows and events blanks the events cells before 2021 when both are exported", async () => {
+  // Shows and events share a unit; the events row has no values before 2021, so those cells stay blank.
   const ids = [sc("theatre_shows", "total"), sc("theatre_events", "total")];
   const model = buildScienceCultureWorkbookExportModel({ ...base, facts, section: "theatres", labels: labelsFor(ids), state: state(ids, { kind: "manual", start: 2006, end: 2025 }) }, await presentation());
   const events = model.readable.rows[1];

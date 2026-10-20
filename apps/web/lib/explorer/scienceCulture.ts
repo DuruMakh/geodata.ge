@@ -1,5 +1,6 @@
 import { SCIENCE_CULTURE_GROUPS, scienceCultureIndicator, type ClientScienceCultureFact, type ScienceCultureGroup, type ScienceCultureIndicator, type ScienceCultureMeasure, type ScienceCultureSeriesBreak } from "../data/scienceCulture/types";
 import { INK } from "./colors";
+import { educationFullLabel } from "./education";
 import type { ResolvedPeriodRange } from "./periodRange";
 import { serializeTopicHash, topicSeriesColor, type TopicSeriesModel, type TopicState } from "./topicSeries";
 import { buildUnitListModel, changeUnitListSelection, parseUnitListHash, unitListCoverage } from "./unitList";
@@ -147,5 +148,5 @@ export function buildScienceCultureModel(section: ScienceCultureTopicId, facts: 
  */
 export function scienceCultureSeriesLabel(series: Pick<ScienceCultureSeriesDefinition, "id" | "heading">, labels: Readonly<Record<string, string>>, t: (key: string) => string): string {
   const heading = t(`heading.${series.heading}`).split(" · ")[0];
-  return heading === labels[series.id] ? heading : `${heading} — ${labels[series.id]}`;
+  return educationFullLabel(heading, labels[series.id]);
 }
