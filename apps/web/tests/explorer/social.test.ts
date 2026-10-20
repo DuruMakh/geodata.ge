@@ -261,7 +261,7 @@ test("no list repeats a colour within a heading, and a Social package group keep
 // Task 6 adds the real copy; these are the keys the builders read, with the English the brief fixes.
 const TEST_COPY: Record<string, string> = {
   "social.unitPersons": "persons", "social.unitFamilies": "families", "social.unitMlnGel": "million GEL", "social.unitGel": "GEL a month",
-  "social.unitPercent": "% of residents", "social.unitPercentGdp": "% of GDP", "social.status.official": "Official", "social.status.calculated": "Calculated by Fiscal.ge",
+  "social.unitPercent": "% of residents", "social.unitPercentGdp": "% of GDP", "social.status.official": "Official", "social.status.calculated": "Calculated by Fiscal.ge", "social.months.partial": "{n} months",
   "social.workbook.calculatedNote": "Values marked calculated are calculated by fiscal.ge from SSA and Geostat data.",
   "common.socialPayments": "Social payments", "common.socialPensions": "Pensions", "common.socialSubsistence": "Subsistence allowance", "common.socialPackage": "Social package",
   ...Object.fromEntries(SOCIAL_SECTIONS.map(section => [`social.page.${section.id}.summary`, `${section.id} summary`])),
@@ -273,7 +273,7 @@ const sourceFor = (sourceId: string, years: number[]) => ({
   sourceId, years, title: sourceId, organization: "SSA", retrievedAt: "2026-10-20", downloadHref: `/downloads/methodology/social-protection/files/${sourceId}.html` as const,
 });
 const YEARS = Array.from({ length: 13 }, (_, i) => 2013 + i);
-const SSA_SOURCES = ["ssa_pension_01", "ssa_pension_02", "ssa_pension_04", "ssa_tsa_allowance_01", "ssa_tsa_allowance_02", "ssa_socpackage_01", "ssa_socpackage_02", "ssa_statistics"].map(id => sourceFor(id, YEARS));
+const SSA_SOURCES = ["ssa_pension_01", "ssa_pension_02", "ssa_pension_04", "ssa_tsa_allowance_01", "ssa_tsa_allowance_02", "ssa_socpackage_01", "ssa_socpackage_02", "ssa_statistics", "ssa_other_04", "ssa_workinjury_03"].map(id => sourceFor(id, YEARS));
 const GEOSTAT = {
   populationSources: [sourceFor("source.geostat_municipal_population", YEARS)],
   cpiSources: [sourceFor("source.geostat_cpi_index_2010", YEARS)],
@@ -293,7 +293,7 @@ const topicWorkbook = async (section: "social-payments" | "social-package", view
   }, await presentation());
 const loadWorkbook = async (model: Parameters<typeof createWorkbookBuffer>[0]) => { const excel = new ExcelJS.Workbook(); await excel.xlsx.load(await createWorkbookBuffer(model)); return excel; };
 
-test("a Guria pensions money workbook is in million GEL to one decimal and cites pension-01 alone", async () => {
+test("a Guria pensions money workbook is in million GEL to one decimal, marked calculated, and cites pension-01 alone", async () => {
   const model = await placeWorkbook("pensions", "region.guria", "region-guria", ["social.pension.amount"], 2013, 2025);
   expect(model.filename).toBe("fiscal-social-pensions-region-guria-2013-2025-en.xlsx");
   expect(model.readable.unitLabel).toBe("million GEL");
@@ -301,19 +301,21 @@ test("a Guria pensions money workbook is in million GEL to one decimal and cites
   expect(model.readable.amountDecimals).toBe(1);
   expect(model.analysis.numericFormats).toEqual({ 3: "#,##0.0" });
   expect(model.analysis.headers).toEqual(["Year", "Category", "million GEL", "Status"]);
-  expect(model.readable.rows[0].valuesByYear[2025]).toBe(value("social.pension.amount", "region.guria", 2025));
+  // SSA's 12-month sums are calculated in the data, so they are written to the decimal shown and marked so.
+  const guria2025 = Number(value("social.pension.amount", "region.guria", 2025).toFixed(1));
+  expect(model.readable.rows[0].valuesByYear[2025]).toBe(guria2025);
   expect(model.readable.rows[0]).toMatchObject({ kind: "item", parentLabel: "Money paid" });
   expect(model.analysis.rows).toHaveLength(13);
-  expect(model.analysis.rows.at(-1)).toEqual([2025, "Money paid — social.pension.amount", value("social.pension.amount", "region.guria", 2025), "Official"]);
+  expect(model.analysis.rows.at(-1)).toEqual([2025, "Money paid — social.pension.amount", guria2025, "Calculated by Fiscal.ge"]);
   const excel = await loadWorkbook(model);
   const data = excel.getWorksheet(model.sheetNames[1])!;
   expect(data.getCell(14, 3).numFmt).toBe("#,##0.0");
-  expect(data.getCell(14, 3).value).toBe(value("social.pension.amount", "region.guria", 2025));
+  expect(data.getCell(14, 3).value).toBe(guria2025);
   expect(model.sources.map(source => source.title)).toEqual(["ssa_pension_01"]);
   expect(model.sources[0].absoluteUrl).toBe("https://fiscal.ge/downloads/methodology/social-protection/files/ssa_pension_01.html");
-  // Nothing in the money workbook is calculated by fiscal.ge: no note, no Geostat source.
-  expect(model.readable.subtitle).toBe("2013–2025 · million GEL");
-  expect(model.readable.fitSubtitle).toBeUndefined();
+  // The Summary note shows because the exported sums are calculated; no row divides by Geostat, so no Geostat source.
+  expect(model.readable.subtitle).toBe("2013–2025 · million GEL · Values marked calculated are calculated by fiscal.ge from SSA and Geostat data.");
+  expect(model.readable.fitSubtitle).toBe(true);
 });
 
 test("a workbook lists only the SSA tables behind the exported series and years", async () => {
@@ -323,6 +325,12 @@ test("a workbook lists only the SSA tables behind the exported series and years"
   expect(both.sources.find(source => source.title === "ssa_pension_04")!.years).toEqual(YEARS.filter(year => year >= 2016));
   expect(both.readable.numberFormat).toBe("#,##0");
   expect(both.readable.unitLabel).toBe("persons");
+  // A printed December count is official: no calculated mark and no note.
+  const printed = facts.find(f => f.indicatorId === "social.pension.recipients" && f.geographyId === GEORGIA && f.year === 2025)!;
+  expect(printed.valueStatus).toBe("official");
+  expect(both.analysis.rows.find(row => row[0] === 2025 && String(row[1]).endsWith("social.pension.recipients"))![3]).toBe("Official");
+  expect(both.readable.subtitle).toBe("2013–2025 · persons");
+  expect(both.readable.fitSubtitle).toBeUndefined();
   const highMountain = both.readable.rows[2];
   expect(highMountain.valuesByYear[2015]).toBeNull();
   expect(highMountain.basisByYear[2015]).toBeNull();
@@ -353,15 +361,15 @@ test("a Georgia average workbook with the 2025-prices row carries the calculated
   expect(real.valuesByYear[2013]).toBe(231.03);
   expect(real.valuesByYear[2025]).toBe(nominal.valuesByYear[2025]);
   const status = (id: string, year: number) => model.analysis.rows.find(row => row[0] === year && String(row[1]).endsWith(id))![3];
-  expect(status("social.pension.avg_monthly", 2013)).toBe("Official");
+  expect(status("social.pension.avg_monthly", 2013)).toBe("Calculated by Fiscal.ge");
   expect(status("social.pension.avg_monthly#real", 2013)).toBe("Calculated by Fiscal.ge");
   // The note sits on the Summary sheet; the Data sheet has no identifier or cell-reference column.
   const excel = await loadWorkbook(model);
   expect(String(excel.getWorksheet(model.sheetNames[0])!.getCell("A2").value)).toContain("calculated by fiscal.ge");
   expect(excel.getWorksheet(model.sheetNames[1])!.getRow(1).values).toEqual([undefined, "Year", "Category", "GEL a month", "Status"]);
-  // The nominal average alone needs neither the note nor the CPI.
+  // The nominal average is calculated from SSA's rows, so it carries the note, but it needs no CPI.
   const nominalOnly = await placeWorkbook("pensions", GEORGIA, "georgia", ["social.pension.avg_monthly"], 2013, 2025);
-  expect(nominalOnly.readable.subtitle).toBe("2013–2025 · GEL a month");
+  expect(nominalOnly.readable.subtitle).toContain("calculated by fiscal.ge");
   expect(nominalOnly.sources.map(source => source.title)).toEqual(["ssa_pension_01"]);
 });
 
@@ -378,14 +386,14 @@ test("a share of residents workbook cites the population file and rounds to the 
 
 test("Social payments workbooks: million GEL, or % of GDP calculated with the GDP source", async () => {
   const amount = await topicWorkbook("social-payments", "amount", ["social.payments.total.amount", "social.payments.pension.amount"], 2013, 2025);
-  expect(amount.filename).toBe("fiscal-social-social-payments-2013-2025-en.xlsx");
+  expect(amount.filename).toBe("fiscal-social-payments-2013-2025-en.xlsx");
   expect([amount.readable.unitLabel, amount.readable.numberFormat]).toEqual(["million GEL", "#,##0.0"]);
-  expect(amount.readable.rows[0].valuesByYear[2025]).toBe(value("social.payments.total.amount", GEORGIA, 2025));
+  expect(amount.readable.rows[0].valuesByYear[2025]).toBe(Number(value("social.payments.total.amount", GEORGIA, 2025).toFixed(1)));
   expect(amount.readable.rows[0].kind).toBe("total");
-  expect(amount.readable.subtitle).toBe("2013–2025 · million GEL");
+  expect(amount.readable.subtitle).toContain("2013–2025 · million GEL · ");
   expect(amount.sources.map(source => source.title)).not.toContain("source.geostat_national_gdp_sna_2008");
   const gdp = await topicWorkbook("social-payments", "gdp", ["social.payments.total.amount"], 2013, 2025);
-  expect(gdp.filename).toBe("fiscal-social-social-payments-2013-2025-en.xlsx");
+  expect(gdp.filename).toBe("fiscal-social-payments-2013-2025-en.xlsx");
   expect([gdp.readable.unitLabel, gdp.readable.numberFormat]).toEqual(["% of GDP", "#,##0.00"]);
   expect(gdp.readable.rows[0].valuesByYear[2025]).toBe(Number(socialPaymentsViewFacts("gdp", facts, gdpFacts).find(f => f.indicatorId === "social.payments.total.amount" && f.year === 2025)!.value.toFixed(2)));
   expect(gdp.readable.subtitle).toContain("calculated by fiscal.ge");
@@ -393,7 +401,21 @@ test("Social payments workbooks: million GEL, or % of GDP calculated with the GD
   expect(gdp.sources.map(source => source.title)).toContain("source.geostat_national_gdp_sna_2008");
   const packageRecipients = await topicWorkbook("social-package", "amount", ["social.social_package.total.recipients"], 2013, 2025);
   expect([packageRecipients.readable.unitLabel, packageRecipients.readable.numberFormat]).toEqual(["persons", "#,##0"]);
+  expect(packageRecipients.filename).toBe("fiscal-social-package-2013-2025-en.xlsx");
   expect(packageRecipients.sources.map(source => source.title)).toEqual(["ssa_socpackage_01"]);
+});
+
+test("a programme that ran part of a year is marked with its months on the Data sheet", async () => {
+  const model = await topicWorkbook("social-payments", "amount", ["social.payments.covid_vulnerable_compensation.amount", "social.payments.workplace_injury.amount"], 2013, 2025);
+  const row = (year: number, id: string) => model.analysis.rows.find(r => r[0] === year && String(r[1]).endsWith(id))!;
+  expect(row(2020, "covid_vulnerable_compensation.amount")[3]).toBe("Calculated by Fiscal.ge · 6 months");
+  expect(row(2021, "covid_vulnerable_compensation.amount")[3]).toBe("Calculated by Fiscal.ge · 6 months");
+  expect(row(2013, "workplace_injury.amount")[3]).toBe("Calculated by Fiscal.ge · 9 months");
+  // A full year, a year without a value and a December count carry no months.
+  expect(row(2014, "workplace_injury.amount")[3]).toBe("Calculated by Fiscal.ge");
+  expect(row(2019, "covid_vulnerable_compensation.amount")[3]).toBe("Not available");
+  const counts = await placeWorkbook("pensions", GEORGIA, "georgia", ["social.pension.recipients"], 2013, 2025);
+  expect(counts.analysis.rows.every(r => !String(r[3]).includes("months"))).toBe(true);
 });
 
 test("the hub has four cards: Georgia's headline series with their latest values and years", async () => {

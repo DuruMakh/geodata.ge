@@ -34,13 +34,14 @@ const numberFormatOf = (decimals: number) => decimals ? `#,##0.${"0".repeat(deci
 
 /**
  * A topic page's or a place page's selection as a workbook, in the page's unit and to the decimals it shows. A year without
- * a value is an empty cell, never zero. A row fiscal.ge calculates (a share of residents, an average at 2025 prices, Social
- * payments as % of GDP) is written to the decimals shown, is marked calculated, carries the Summary note and cites the
- * Geostat file it divides by; every other figure is SSA's, from the tables the Sources sheet lists.
+ * a value is an empty cell, never zero. A figure whose fact is calculated (a 12-month sum, an average, a share of residents,
+ * an average at 2025 prices, Social payments as % of GDP) is written to the decimals shown and marked calculated, and the
+ * Summary sheet carries the note; the rows that divide by Geostat's population, price index or GDP cite that file. Every
+ * figure's SSA table is on the Sources sheet.
  */
 export function buildSocialWorkbookExportModel(input: SocialWorkbookInput, presentation: Presentation): WorkbookExportModel {
   const { labels, headingLabels } = input, { locale, messages } = presentation;
-  const t = (key: string) => message(messages, `social.${key}`);
+  const t = (key: string, values?: Record<string, string | number>) => message(messages, `social.${key}`, values);
   const place = "set" in input;
   // The workbook holds the page's shown facts: served rows, and the rows calculated from them.
   const shown = place ? socialPlaceFacts(input.set, input.placeId, input.facts, input.extras) : socialTopicFacts(input.section, input.state.view, input.facts, input.gdpFacts);
@@ -51,25 +52,32 @@ export function buildSocialWorkbookExportModel(input: SocialWorkbookInput, prese
   const cell = (id: string, year: number) => byCell.get(`${id}:${year}`);
   const hasValue = (series: { id: string }) => model.years.some(year => cell(series.id, year));
   const gdpView = !place && input.state.view === "gdp";
-  const isCalculated = (series: { calculated?: "share" | "real" }) => series.calculated !== undefined || gdpView;
+  // A figure is calculated by fiscal.ge when its fact says so: a 12-month sum or an average of SSA's rows, a share of residents, a value at 2025 prices or a % of GDP.
+  const isCalculated = (id: string, year: number) => cell(id, year)?.valueStatus === "calculated";
   const neededYears = neededSourceYears(model.selected, model.years, (series, year) => cell(series.id, year)?.sourceId);
   // A value without its source link would leave the workbook uncited.
   const known = new Set(input.sources.map(source => source.sourceId));
   for (const sourceId of neededYears.keys()) if (!known.has(sourceId)) throw new Error(`Missing public source for social source ${sourceId}`);
-  const calculatedRows = model.selected.filter(series => isCalculated(series) && hasValue(series));
+  // Geostat's files join only for the rows that divide by them.
+  const geostatRows = model.selected.filter(hasValue);
   const geostat = [
-    ...(calculatedRows.some(series => series.calculated === "share") ? input.populationSources : []),
-    ...(calculatedRows.some(series => series.calculated === "real") ? input.cpiSources : []),
-    ...(calculatedRows.length && gdpView ? input.gdpSources : []),
+    ...(geostatRows.some(series => series.calculated === "share") ? input.populationSources : []),
+    ...(geostatRows.some(series => series.calculated === "real") ? input.cpiSources : []),
+    ...(gdpView && geostatRows.length ? input.gdpSources : []),
   ];
+  const anyCalculated = model.selected.some(series => model.years.some(year => isCalculated(series.id, year)));
   const lead = model.selected[0] ?? model.series[0];
   const unitLabel = t(gdpView ? "unitPercentGdp" : UNIT_KEYS[model.unit]);
   const numberFormat = numberFormatOf(lead.decimals);
   // A calculated figure is written to the decimals the page shows it with, so the cell holds the figure the reader sees.
-  const valueOf = (series: { calculated?: "share" | "real" }, value: number | null) =>
-    value === null ? null : isCalculated(series) ? Number(value.toFixed(lead.decimals)) : value;
-  const status = (series: { id: string; calculated?: "share" | "real" }, year: number) =>
-    !cell(series.id, year) ? workbookMessage(locale, "workbook.unavailable") : isCalculated(series) ? t("status.calculated") : t("status.official");
+  const valueOf = (id: string, year: number, value: number | null) => value === null ? null : isCalculated(id, year) ? Number(value.toFixed(lead.decimals)) : value;
+  // A programme that ran part of a year says how many months its money or average covers.
+  const status = (series: { id: string; partialMonths: Record<number, number> }, year: number) => {
+    if (!cell(series.id, year)) return workbookMessage(locale, "workbook.unavailable");
+    const base = isCalculated(series.id, year) ? t("status.calculated") : t("status.official");
+    const months = series.partialMonths[year];
+    return months === undefined ? base : `${base} · ${t("months.partial", { n: months })}`;
+  };
   // A row whose name is its heading's is named alone, never "Money paid — Money paid".
   const headingOf = (series: { id: string; heading: string }) => {
     const heading = headingLabels[series.heading];
@@ -79,15 +87,17 @@ export function buildSocialWorkbookExportModel(input: SocialWorkbookInput, prese
     const heading = headingOf(series);
     return heading === null ? labels[series.id] : educationFullLabel(heading, labels[series.id]);
   };
-  const stem = `social-${place ? `${input.set}-${input.scope}` : input.section}-${model.range.start}-${model.range.end}`;
+  // `social-payments` and `social-package` already say social; Pensions and Subsistence allowance get the prefix.
+  const part = place ? `${input.set}-${input.scope}` : input.section;
+  const stem = `${part.startsWith("social-") ? "" : "social-"}${part}-${model.range.start}-${model.range.end}`;
   const cells = model.years.flatMap(year => model.selected.map(series => ({ year, series })));
   return {
     locale, filename: workbookFilename(stem, locale), sheetNames: SHEET_NAMES[locale],
     readable: {
-      title: input.title, subtitle: [`${model.range.start}–${model.range.end} · ${unitLabel}`, ...(calculatedRows.length ? [t("workbook.calculatedNote")] : [])].join(" · "),
-      unitLabel, amountDecimals: lead.decimals, years: model.years, showChangeColumn: false, numberFormat, ...(calculatedRows.length ? { fitSubtitle: true } : {}),
+      title: input.title, subtitle: [`${model.range.start}–${model.range.end} · ${unitLabel}`, ...(anyCalculated ? [t("workbook.calculatedNote")] : [])].join(" · "),
+      unitLabel, amountDecimals: lead.decimals, years: model.years, showChangeColumn: false, numberFormat, ...(anyCalculated ? { fitSubtitle: true } : {}),
       rows: model.selected.map(series => {
-        const values = Object.fromEntries(model.years.map(year => [year, valueOf(series, series.valuesByYear[year])]));
+        const values = Object.fromEntries(model.years.map(year => [year, valueOf(series.id, year, series.valuesByYear[year])]));
         return {
           kind: series.reference ? "total" : "item", parentLabel: headingOf(series), label: labels[series.id], change: null, valuesByYear: values,
           basisByYear: Object.fromEntries(model.years.map(year => [year, values[year] === null ? null : "actual"])),
@@ -96,7 +106,7 @@ export function buildSocialWorkbookExportModel(input: SocialWorkbookInput, prese
     },
     analysis: {
       headers: [workbookMessage(locale, "workbook.year"), workbookMessage(locale, "workbook.category"), unitLabel, workbookMessage(locale, "workbook.status")],
-      rows: cells.map(({ year, series }) => [year, labelled(series), valueOf(series, series.valuesByYear[year]), status(series, year)]),
+      rows: cells.map(({ year, series }) => [year, labelled(series), valueOf(series.id, year, series.valuesByYear[year]), status(series, year)]),
       numericFormats: { 3: numberFormat },
     },
     sources: withAbsoluteUrls([...sourcesForNeededYears(input.sources, neededYears), ...geostat], input.siteOrigin),
