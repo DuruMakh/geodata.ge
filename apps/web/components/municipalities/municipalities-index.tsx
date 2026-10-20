@@ -101,9 +101,19 @@ export function MunicipalitiesIndex(props: MunicipalitiesIndexProps) {
 
   useAppReady();
 
+  // Georgia heads both tabs, so its data is one click away from either list.
   const sources = useMemo(
-    () => ({ muni: props.municipalities, region: [props.country, ...props.regions] }),
+    () => ({ muni: [props.country, ...props.municipalities], region: [props.country, ...props.regions] }),
     [props.country, props.municipalities, props.regions],
+  );
+  // What the bars scale to: the largest municipality on its tab (Georgia's own bar stops at 100%), and on the regions
+  // tab the largest of Georgia and the regions, as before the Georgia row joined the municipalities tab.
+  const barMax = useMemo(
+    () => ({
+      muni: Math.max(...props.municipalities.map((row) => row.valueGel)),
+      region: Math.max(...sources.region.map((row) => row.valueGel)),
+    }),
+    [props.municipalities, sources],
   );
   const rowsByLevel = useMemo(() => {
     const needle = query.trim();
@@ -112,14 +122,17 @@ export function MunicipalitiesIndex(props: MunicipalitiesIndexProps) {
       rows.filter((row) => matchesLabelQuery(needle, [row.nameKa, row.subtitleKa, publicLabel("en", row.id, row.nameKa, englishLabels), ...(row.regionId ? [publicLabel("en", row.regionId, row.subtitleKa, englishLabels)] : [])]));
     return { muni: filter(sources.muni), region: filter(sources.region) };
   }, [sources, query, englishLabels]);
-  const source = sources[level];
+  // The count beside the search counts municipalities on their tab, never the Georgia row.
+  const counted = (list: MunicipalListRow[]) => (level === "muni" ? list.filter((row) => row.kind !== "country") : list);
+  const source = counted(sources[level]);
   const rows = rowsByLevel[level];
+  const shownCount = counted(rows).length;
 
   const openMunicipality = (code: string) => router.push(pageHref(hrefFor("municipality", code), locale));
 
   function renderRowsFor(panelLevel: "muni" | "region") {
     const panelRows = rowsByLevel[panelLevel];
-    const max = sources[panelLevel][0]?.valueGel ?? 1;
+    const max = barMax[panelLevel];
     const activePanel = panelLevel === level;
 
     return (
@@ -173,7 +186,7 @@ export function MunicipalitiesIndex(props: MunicipalitiesIndexProps) {
                   <span
                     data-testid="municipal-row-bar"
                     className="block h-[3px] bg-[var(--accent)]"
-                    style={{ width: `${((row.valueGel / max) * 100).toFixed(1)}%` }}
+                    style={{ width: `${(Math.min(row.valueGel / max, 1) * 100).toFixed(1)}%` }}
                   />
                 </span>
               </span>
@@ -278,11 +291,11 @@ export function MunicipalitiesIndex(props: MunicipalitiesIndexProps) {
               className="h-[34px] min-w-0 flex-1 scroll-mt-3 appearance-none rounded-none border-0 border-b border-[var(--control)] bg-transparent px-0.5 text-[13px] text-[var(--ink)] outline-none placeholder:text-[var(--muted)] focus:border-[var(--ink)]"
             />
             <span data-testid="row-count" aria-hidden="true" className="font-[family-name:var(--font-numeric)] text-[11px] min-[768px]:text-[10.5px] whitespace-nowrap text-[var(--faint)]">
-              {rows.length === source.length ? `${source.length}` : `${rows.length} / ${source.length}`}
+              {shownCount === source.length ? `${source.length}` : `${shownCount} / ${source.length}`}
             </span>
             {/* The bare count names nothing for a screen reader: this polite live region says it in words as the list narrows (DESIGN §20). */}
             <span data-testid="municipal-search-status" role="status" className="sr-only">
-              {message(messages, "municipal.resultCount", { count: rows.length, total: source.length })}
+              {message(messages, "municipal.resultCount", { count: shownCount, total: source.length })}
             </span>
           </div>
 

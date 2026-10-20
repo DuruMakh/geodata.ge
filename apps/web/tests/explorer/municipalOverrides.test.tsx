@@ -147,6 +147,47 @@ describe("MunicipalitiesIndex overrides", () => {
   });
 });
 
+describe("Georgia on the municipalities tab", () => {
+  // One tab panel's markup (the municipalities panel is followed by the regions panel, which ends before the source note),
+  // and its rows' names and bar widths in order.
+  const panel = (html: string, level: "muni" | "region") =>
+    level === "muni" ? html.split('data-testid="municipal-list-muni"')[1]?.split('data-testid="municipal-list-region"')[0] ?? "" : html.split('data-testid="municipal-list-region"')[1]?.split('data-testid="municipal-source-note"')[0] ?? "";
+  const rowNames = (markup: string) => [...markup.matchAll(/data-testid="municipal-row-name"[^>]*>([^<]*)</g)].map((match) => match[1]);
+  const barWidths = (markup: string) => [...markup.matchAll(/data-testid="municipal-row-bar"[^>]*style="width:([\d.]+)%"/g)].map((match) => Number(match[1]));
+
+  test("lists Georgia first, unranked and linked as on the regions tab, then the ranked municipalities", () => {
+    const html = index();
+    const muni = panel(html, "muni");
+    expect(rowNames(muni)).toEqual(["Georgia", "Tbilisi", "Batumi"]);
+    const georgia = muni.match(/<a [^>]*>[\s\S]*?<\/a>/)?.[0] ?? "";
+    expect(georgia).toContain('href="/en/explorer/municipalities/georgia"');
+    expect(georgia).toContain(">—<");
+    expect(georgia).not.toContain("data-municipality-row-code");
+    expect(rowNames(panel(html, "region"))).toEqual(["Georgia", "Adjara"]);
+  });
+
+  test("the count beside the search counts municipalities only", () => {
+    const html = index();
+    expect(html).toMatch(/data-testid="row-count"[^>]*>2</);
+    expect(html).toContain("2 of 2 shown");
+  });
+
+  test("municipality bars scale to the largest municipality, and Georgia's bar stops at 100%", () => {
+    const html = index();
+    expect(barWidths(panel(html, "muni"))).toEqual([100, 100, 18]);
+    // The regions tab keeps Georgia in its scale, as before: where Georgia is the largest, its bars do not move.
+    expect(barWidths(panel(html, "region"))).toEqual([100, 10.5]);
+  });
+
+  test("with a share, no bar passes 100% on either tab", () => {
+    const shares = wrap(<MunicipalitiesIndex viewBox={EMPTY_MAP_VIEW_BOX} shapes={[]} markers={[]} occupiedAreas={[]} touchTargets={[]} legendMin="1.0%" legendMax="9.0%"
+      municipalities={[{ ...rows[0], valueGel: 38 }, { ...rows[1], valueGel: 19 }]} regions={[{ ...regionRows[0], valueGel: 30 }]} country={{ ...country, valueGel: 22.5 }}
+      kpis={[]} sourceNote="Source" overrides={{ valueFormat: "percent" }} />);
+    expect(barWidths(panel(shares, "muni"))).toEqual([59.2, 100, 50]);
+    expect(barWidths(panel(shares, "region"))).toEqual([75, 100]);
+  });
+});
+
 describe("the percent value format", () => {
   const perHundred = { ...country, valueGel: 22.46 };
   test("prints a per-100 share as a percent to one decimal, in the index and in the picker", () => {

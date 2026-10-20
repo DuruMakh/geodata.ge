@@ -375,6 +375,8 @@ test("municipality navigation uses crawlable links", async ({ page }) => {
   const municipalityHrefs = await page
     .getByTestId("municipal-list-row")
     .evaluateAll((links) => links.map((link) => link.getAttribute("href")));
+  // Georgia heads the list, then the 64 municipalities.
+  expect(municipalityHrefs.shift()).toBe("/explorer/municipalities/georgia");
   expect(municipalityHrefs).toHaveLength(64);
   expect(new Set(municipalityHrefs)).toEqual(
     new Set(MUNICIPALITY_ROUTES.map(({ slug }) => `/explorer/municipalities/${slug}`)),
@@ -467,7 +469,8 @@ test("municipality index server-renders the existing country and region tab link
   const municipalityHrefs = [
     ...html.matchAll(/href="(\/explorer\/municipalities\/(?!georgia")[a-z][a-z0-9-]*)"/g),
   ].map((match) => match[1]);
-  expect(countryHrefs).toHaveLength(1);
+  // Georgia heads both tabs.
+  expect(countryHrefs).toHaveLength(2);
   expect(regionHrefs).toHaveLength(11);
   expect(municipalityHrefs).toHaveLength(64);
   expect(new Set(municipalityHrefs)).toEqual(
@@ -479,14 +482,16 @@ test("municipality index server-renders the existing country and region tab link
 
   const country = page.locator('a[href="/explorer/municipalities/georgia"]');
   const regions = page.locator('a[href^="/explorer/municipalities/region/"]');
-  await expect(country).toHaveCount(1);
+  await expect(country).toHaveCount(2);
   await expect(regions).toHaveCount(11);
-  await expect(country).toBeHidden();
+  await expect(country.first()).toBeVisible();
+  await expect(country.last()).toBeHidden();
   await expect(regions.first()).toBeHidden();
-  await expect(page.getByTestId("municipal-list-row")).toHaveCount(64);
+  await expect(page.getByTestId("municipal-list-row")).toHaveCount(65);
 
   await page.getByTestId("level-region").click();
-  await expect(country).toBeVisible();
+  await expect(country.first()).toBeHidden();
+  await expect(country.last()).toBeVisible();
   await expect(regions.first()).toBeVisible();
   await expect(page.getByTestId("municipal-list-row")).toHaveCount(12);
 });

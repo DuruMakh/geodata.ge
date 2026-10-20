@@ -26,7 +26,8 @@ for (const route of ["", "/tbilisi", "/region/imereti", "/region/adjara", "/geor
 test("the index searches both languages, retains its 64 territories and opens English pages from the map and list", async ({ page }) => {
   await page.goto("/en/explorer/municipalities");
   await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
-  await expect(page.getByTestId("municipal-list-row")).toHaveCount(64);
+  // Georgia, then the 64 municipalities.
+  await expect(page.getByTestId("municipal-list-row")).toHaveCount(65);
   for (const query of ["ბათუმი", "BATUMI"]) {
     await page.getByTestId("municipal-search").fill(query);
     await expect(page.getByTestId("municipal-list-row")).toHaveCount(1);

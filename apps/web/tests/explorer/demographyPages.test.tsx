@@ -70,12 +70,13 @@ describe("population index page", () => {
     expect(new Set(clientFacts.map((fact) => fact.seriesId))).toEqual(new Set([SERIES.populationTotal, SERIES.populationDensity]));
   });
 
-  it("is the Budget index layout with population: map, four key figures, 64 and 12 rows, links to place pages, no button row", async () => {
+  it("is the Budget index layout with population: map, four key figures, 65 and 12 rows, links to place pages, no button row", async () => {
     const html = renderPageMarkup("en", await renderDemographyPopulationPage("en"));
     expect(html).toContain('data-testid="municipal-index-workspace"');
     expect(html).toContain('data-testid="municipality-map"');
     expect(count(html, /data-testid="index-kpi"/g)).toBe(4);
-    expect(count(html, /data-testid="municipal-list-row"/g)).toBe(64);
+    // Georgia, then the 64 municipalities.
+    expect(count(html, /data-testid="municipal-list-row"/g)).toBe(65);
     // The Regions list is in the markup too, hidden behind its tab: Georgia and the 11 regions.
     const regionList = html.slice(html.indexOf('data-testid="municipal-list-region"'), html.indexOf('data-testid="municipal-source-note"'));
     expect(count(regionList, /data-testid="municipal-row-name"/g)).toBe(12);

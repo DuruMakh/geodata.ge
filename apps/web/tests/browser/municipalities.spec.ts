@@ -356,7 +356,8 @@ test.describe("municipalities index", () => {
   test("lists all municipalities and the country-first region grain", async ({ page }) => {
     await page.goto(`${TEST_BASE_URL}/explorer/municipalities`);
     await expectMunicipalAppReady(page);
-    await expect(page.getByTestId("municipal-list-row")).toHaveCount(64);
+    // Georgia, then the 64 municipalities.
+    await expect(page.getByTestId("municipal-list-row")).toHaveCount(65);
     await page.getByTestId("level-region").click();
     await expect(page.getByTestId("municipal-list-row")).toHaveCount(12);
     await expect(page).toHaveURL(/#lvl=region/);
@@ -367,6 +368,29 @@ test.describe("municipalities index", () => {
     await expect(regionRow).toHaveCSS("background-color", "rgb(241, 234, 220)");
     await expect(page.locator('[data-municipality-code][data-active="true"]')).toHaveCount(0);
     await expect(page.getByTestId("municipality-map").locator("[data-municipality-shape]")).toHaveCount(60);
+  });
+
+  test("puts Georgia first in the municipality list, counts only the municipalities and routes it to the country explorer", async ({ page }) => {
+    await page.goto(`${TEST_BASE_URL}/explorer/municipalities`);
+    await expectMunicipalAppReady(page);
+
+    const rows = page.getByTestId("municipal-list-row");
+    await expect(rows).toHaveCount(65);
+    await expect(page.getByTestId("row-count")).toHaveText("64");
+    const country = rows.first();
+    await expect(country.getByTestId("municipal-row-name")).toHaveText("საქართველო");
+    await expect(country.locator("span").first()).toHaveText("—");
+    await expect(country.getByTestId("municipal-row-per-resident")).toHaveCount(0);
+    // Georgia's total is larger than any municipality's: the bars still scale to Tbilisi, and Georgia's stops at 100%.
+    const widths = await rows.getByTestId("municipal-row-bar").evaluateAll((bars) => bars.map((bar) => Number.parseFloat((bar as HTMLElement).style.width)));
+    expect(widths.slice(0, 2)).toEqual([100, 100]);
+    expect(widths[2]).toBeLessThan(100);
+
+    await page.getByTestId("municipal-search").fill("საქართველო");
+    await expect(rows).toHaveCount(1);
+    await expect(page.getByTestId("row-count")).toHaveText("0 / 64");
+    await country.click();
+    await expect(page).toHaveURL(/\/explorer\/municipalities\/georgia(#|$)/);
   });
 
   test("puts Georgia first in the region list and routes it to the country explorer", async ({ page }) => {
@@ -391,7 +415,8 @@ test.describe("municipalities index", () => {
     await page.goto(`${TEST_BASE_URL}/explorer/municipalities`);
     await expectMunicipalAppReady(page);
 
-    const municipality = page.getByTestId("municipal-list-row").first();
+    // The first municipality, after Georgia.
+    const municipality = page.getByTestId("municipal-list-row").nth(1);
     await expect(municipality.getByTestId("municipal-row-primary-amount")).toContainText(/მლნ ₾|მლრდ ₾/);
     await expect(municipality.getByTestId("municipal-row-per-resident")).toHaveText(/^\d{1,3}(?:,\d{3})* ერთ მოსახლეზე$/);
     // D8: no informational text below 11px on phones.
@@ -436,7 +461,7 @@ test.describe("municipalities index", () => {
     await page.getByTestId("municipal-empty").getByRole("button", { name: "ძებნის გასუფთავება" }).click();
     await expect(page.getByTestId("municipal-search")).toHaveValue("");
     await expect(page.getByTestId("municipal-empty")).toHaveCount(0);
-    await expect(page.getByTestId("municipal-list-row")).toHaveCount(64);
+    await expect(page.getByTestId("municipal-list-row")).toHaveCount(65);
     await page.getByTestId("level-region").click();
     await expect(page.getByTestId("municipal-search")).toHaveAttribute("placeholder", "ძებნა");
   });
@@ -462,7 +487,8 @@ test.describe("municipalities index", () => {
     await expectMunicipalAppReady(page);
 
     const rows = page.getByTestId("municipal-list-row");
-    const comparisonRow = rows.nth(1);
+    // Georgia, then the leader, then the row to compare.
+    const comparisonRow = rows.nth(2);
     const query = await comparisonRow.getByTestId("municipal-row-name").textContent();
     const widthBefore = await comparisonRow.getByTestId("municipal-row-bar").getAttribute("style");
     expect(query).toBeTruthy();
@@ -477,7 +503,7 @@ test.describe("municipalities index", () => {
   test("opens a municipality from the list", async ({ page }) => {
     await page.goto(`${TEST_BASE_URL}/explorer/municipalities`);
     await expectMunicipalAppReady(page);
-    await page.getByTestId("municipal-list-row").first().click();
+    await page.getByTestId("municipal-list-row").nth(1).click();
     await expect(page).toHaveURL((url) => url.pathname === "/explorer/municipalities/tbilisi");
   });
 

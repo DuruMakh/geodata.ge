@@ -94,6 +94,26 @@ test("the Pensions index draws the map, lists Georgia first and opens Tbilisi's 
   await expect(page.getByTestId("entity-picker-trigger")).toHaveText("თბილისი");
 });
 
+test("the Pensions municipalities tab lists Georgia first, finds it by name, keeps every bar within its track and opens Georgia's page", async ({ page }) => {
+  await page.goto("/explorer/health/pensions");
+  await ready(page);
+  const rows = page.getByTestId("municipal-list-row");
+  // Georgia, then the 64 municipalities; the count beside the search counts the municipalities only.
+  await expect(rows).toHaveCount(65);
+  await expect(page.getByTestId("row-count")).toHaveText("64");
+  await expect(rows.first().getByTestId("municipal-row-name")).toHaveText("საქართველო");
+  await expect(rows.first().locator("span").first()).toHaveText("—");
+  await expect(rows.first()).toHaveAttribute("href", "/explorer/health/pensions/georgia");
+  // A share: Georgia's is below the highest municipality's, so the bars scale to that municipality, and none passes 100%.
+  const widths = await rows.getByTestId("municipal-row-bar").evaluateAll((bars) => bars.map((bar) => Number.parseFloat((bar as HTMLElement).style.width)));
+  expect(Math.max(...widths)).toBe(100);
+  expect(widths[0]).toBeLessThan(100);
+  await page.getByTestId("municipal-search").fill("საქართველო");
+  await expect(rows).toHaveCount(1);
+  await rows.first().click();
+  await expect(page).toHaveURL(/\/explorer\/health\/pensions\/georgia$/);
+});
+
 test("Guria's Pensions page: the latest line, four headings, one heading at a time, 2025 prices and the next region", async ({ page }) => {
   await page.goto("/en/explorer/health/pensions/region/guria");
   await ready(page);
