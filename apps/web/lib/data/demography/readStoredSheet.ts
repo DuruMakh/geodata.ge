@@ -109,6 +109,12 @@ export class StoredSheet {
     return this.whole(ref, 1000);
   }
 
+  /** A value published in thousands that is an average of two whole counts (the mid-year population), to the half person. */
+  halfPersons(ref: string): number | null {
+    const halves = this.whole(ref, 2000);
+    return halves === null ? null : halves / 2;
+  }
+
   /** A value published as a count, checked to be a whole number. */
   count(ref: string): number | null {
     return this.whole(ref, 1);

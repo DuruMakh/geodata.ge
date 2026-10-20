@@ -4,7 +4,7 @@ import type {
   SectorDefinition,
   SectorMeasure,
 } from "../../lib/data/economicSectors/types";
-import { SECTOR_GDP, sectorColor, rankSectorDefinitions } from "../../lib/explorer/economicSectors";
+import { SECTOR_GDP, SECTORS_PAGE_CONFIG, orderSectorDefinitions, sectorColor, type SectorPageConfig } from "../../lib/explorer/economicSectors";
 import { formatAmount, formatShare } from "../../lib/explorer/format";
 import { useI18n } from "../../lib/i18n/provider";
 import { message } from "../../lib/i18n/messages";
@@ -18,6 +18,8 @@ export function SectorSeriesPanel({
   measure,
   onSelectionChange,
   downloadAction,
+  visibleIds,
+  config = SECTORS_PAGE_CONFIG,
 }: {
   registry: SectorDefinition[];
   selectedIds: string[];
@@ -26,9 +28,12 @@ export function SectorSeriesPanel({
   measure: SectorMeasure;
   onSelectionChange: (ids: string[]) => void;
   downloadAction: ReactNode;
+  /** The rows the measure has data for; the others are not listed. Every row when omitted. */
+  visibleIds?: string[];
+  config?: SectorPageConfig;
 }) {
   const { locale, messages } = useI18n();
-  const ordered = rankSectorDefinitions(registry, endValues);
+  const ordered = orderSectorDefinitions(registry, endValues, config).filter((r) => !visibleIds || visibleIds.includes(r.id));
   // Total GDP stays pinned whatever the query, like every panel's total row.
   return (
     <FlatSeriesPanel
@@ -40,6 +45,7 @@ export function SectorSeriesPanel({
           color: sectorColor(r.id),
           value: measure === "nominal" ? formatAmount(value, locale) : formatShare(value == null ? null : value / 100),
           searchTerms: [r.labelKa, r.labelEn, r.classificationCode ?? ""],
+          heading: config.ranked ? undefined : (locale === "en" ? r.headingEn : r.headingKa),
         };
       })}
       selectedIds={selectedIds}
@@ -48,9 +54,9 @@ export function SectorSeriesPanel({
       pinTotal
       wrapLabel={false}
       asideLabel={message(messages, "controls.series")}
-      caption={message(messages, "sectors.rowYear", { year: endYear })}
+      caption={message(messages, `${config.scope}.rowYear`, { year: endYear })}
       searchPlaceholder={message(messages, "controls.search")}
-      totalCount={registry.length}
+      totalCount={ordered.length}
       downloadAction={downloadAction}
     />
   );

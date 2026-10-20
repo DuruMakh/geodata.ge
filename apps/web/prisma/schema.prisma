@@ -81,6 +81,7 @@ model SourceDocument {
   governmentDebtFacts GovernmentDebtFact[]
   gdpOverviewFacts GdpOverviewFact[]
   economicSectorFacts EconomicSectorFact[]
+  gdpExpenditureFacts GdpExpenditureFact[]
   unemploymentFacts UnemploymentFact[]
   tradeOverviewFacts TradeOverviewFact[]
   tradePartnerFacts TradePartnerFact[]
@@ -94,6 +95,8 @@ model SourceDocument {
   externalPositionFacts ExternalPositionFact[]
   businessFacts BusinessFact[]
   housingFacts HousingFact[]
+  internetFacts InternetFact[]
+  transportFacts TransportFact[]
   educationFacts EducationFact[]
   socialFacts SocialFact[]
   environmentFacts EnvironmentFact[]
@@ -138,6 +141,7 @@ model ImportRun {
   generalGovernmentBalanceFacts GeneralGovernmentBalanceFact[]
   gdpOverviewFacts GdpOverviewFact[]
   economicSectorFacts EconomicSectorFact[]
+  gdpExpenditureFacts GdpExpenditureFact[]
   unemploymentFacts UnemploymentFact[]
   tradeOverviewFacts TradeOverviewFact[]
   tradePartnerEntities TradePartnerEntity[]
@@ -152,6 +156,8 @@ model ImportRun {
   externalPositionFacts ExternalPositionFact[]
   businessFacts BusinessFact[]
   housingFacts HousingFact[]
+  internetFacts InternetFact[]
+  transportFacts TransportFact[]
   educationFacts EducationFact[]
   socialFacts SocialFact[]
   environmentFacts EnvironmentFact[]
@@ -516,6 +522,27 @@ model UnemploymentFact {
 }
 
 model EconomicSectorFact {
+  seriesId String
+  measure String
+  year Int
+  value Decimal @db.Decimal(40,20)
+  unit String
+  valuation String
+  priceBasis String
+  calculation String
+  status String
+  sourceLocator String
+  sourceDocumentId String
+  sourceDocument SourceDocument @relation(fields: [sourceDocumentId], references: [id])
+  lastReviewedAt DateTime @db.Date
+  importRunId String?
+  importRun ImportRun? @relation(fields: [importRunId], references: [id])
+  @@id([seriesId, measure, year])
+}
+
+// Mirror of data/imports/gdp-expenditure-annual.csv: Geostat's GDP by categories of use, the
+// economic-sector columns, exact stored decimals.
+model GdpExpenditureFact {
   seriesId String
   measure String
   year Int
@@ -1078,6 +1105,52 @@ model BusinessFact {
 // residential property price index and Tbilisi district prices, exact stored decimals with their
 // published rounding. Sheet names are kept verbatim (the 2012 sheet is "2012 ").
 model HousingFact {
+  year             Int
+  indicatorId      String
+  value            Decimal        @db.Decimal(40, 30)
+  publishedValue   Decimal        @db.Decimal(40, 30)
+  unit             String
+  basis            String
+  valueStatus      String
+  sourceId         String
+  sourceSheet      String
+  sourceCell       String
+  sourceDocumentId String
+  sourceDocument   SourceDocument @relation(fields: [sourceDocumentId], references: [id])
+  lastReviewedAt   DateTime       @db.Date
+  importRunId      String?
+  importRun        ImportRun?     @relation(fields: [importRunId], references: [id])
+
+  @@id([indicatorId, year])
+}
+
+// Mirror of data/imports/internet-annual.csv: Geostat's yearly ICT household survey shares (homes with
+// internet or a computer, internet, phone and computer use), exact stored decimals with their published
+// one-decimal rounding.
+model InternetFact {
+  year             Int
+  indicatorId      String
+  value            Decimal        @db.Decimal(40, 30)
+  publishedValue   Decimal        @db.Decimal(40, 30)
+  unit             String
+  basis            String
+  valueStatus      String
+  sourceId         String
+  sourceSheet      String
+  sourceCell       String
+  sourceDocumentId String
+  sourceDocument   SourceDocument @relation(fields: [sourceDocumentId], references: [id])
+  lastReviewedAt   DateTime       @db.Date
+  importRunId      String?
+  importRun        ImportRun?     @relation(fields: [importRunId], references: [id])
+
+  @@id([indicatorId, year])
+}
+
+// Mirror of data/imports/transport-annual.csv: Geostat's road vehicle fleet, passenger and freight
+// transport demand and carriage, registered vehicles and road length, exact stored decimals with their
+// published rounding. Sheet names are kept verbatim (the owner sheet is " type of owner ").
+model TransportFact {
   year             Int
   indicatorId      String
   value            Decimal        @db.Decimal(40, 30)

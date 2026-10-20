@@ -47,6 +47,9 @@ import { externalPositionSourceDocumentId, type ExternalPositionFact } from "../
 import { businessSourceDocumentId, type BusinessFact } from "../data/business/types";
 import { housingSourceDocumentId, type HousingFact } from "../data/housing/types";
 import { housingDisplayDecimals } from "../data/housing/validation";
+import { internetSourceDocumentId, type InternetFact } from "../data/internet/types";
+import { transportSourceDocumentId, type TransportFact } from "../data/transport/types";
+import { transportDisplayDecimals } from "../data/transport/validation";
 import { businessDisplayDecimals } from "../data/business/validation";
 import { educationSourceDocumentId, type EducationFact } from "../data/education/types";
 import { environmentSourceDocumentId, type EnvironmentFact } from "../data/environment/types";
@@ -883,6 +886,42 @@ export async function loadHousingFactsFromMirror(db: Pick<MirrorClient, "housing
   });
 }
 
+export function internetMirrorCreateRows(facts: readonly InternetFact[], importRunId: string): Prisma.InternetFactCreateManyInput[] {
+  return facts.map(({ lastReviewedAt, ...fact }) => ({
+    ...fact, sourceDocumentId: internetSourceDocumentId(fact.sourceId), lastReviewedAt: new Date(`${lastReviewedAt}T00:00:00.000Z`), importRunId,
+  }));
+}
+
+export async function loadInternetFactsFromMirror(db: Pick<MirrorClient, "internetFact">): Promise<InternetFact[]> {
+  const rows = await db.internetFact.findMany({ orderBy: [{ indicatorId: "asc" }, { year: "asc" }] });
+  return rows.map(row => {
+    if (row.sourceDocumentId !== internetSourceDocumentId(row.sourceId)) throw new Error("Internet source relation mismatch");
+    return {
+      year: row.year, indicatorId: row.indicatorId as InternetFact["indicatorId"],
+      value: row.value.toFixed(), publishedValue: row.publishedValue.toFixed(1), unit: row.unit as "percent", basis: row.basis as "actual", valueStatus: row.valueStatus as "survey_estimate",
+      sourceId: row.sourceId, sourceSheet: row.sourceSheet, sourceCell: row.sourceCell, lastReviewedAt: isoDate(row.lastReviewedAt),
+    };
+  });
+}
+
+export function transportMirrorCreateRows(facts: readonly TransportFact[], importRunId: string): Prisma.TransportFactCreateManyInput[] {
+  return facts.map(({ lastReviewedAt, ...fact }) => ({
+    ...fact, sourceDocumentId: transportSourceDocumentId(fact.sourceId), lastReviewedAt: new Date(`${lastReviewedAt}T00:00:00.000Z`), importRunId,
+  }));
+}
+
+export async function loadTransportFactsFromMirror(db: Pick<MirrorClient, "transportFact">): Promise<TransportFact[]> {
+  const rows = await db.transportFact.findMany({ orderBy: [{ indicatorId: "asc" }, { year: "asc" }] });
+  return rows.map(row => {
+    if (row.sourceDocumentId !== transportSourceDocumentId(row.sourceId)) throw new Error("Transport source relation mismatch");
+    return {
+      year: row.year, indicatorId: row.indicatorId as TransportFact["indicatorId"],
+      value: row.value.toFixed(), publishedValue: row.publishedValue.toFixed(transportDisplayDecimals(row.indicatorId)), unit: row.unit as TransportFact["unit"], basis: row.basis as "actual", valueStatus: row.valueStatus as "official",
+      sourceId: row.sourceId, sourceSheet: row.sourceSheet, sourceCell: row.sourceCell, lastReviewedAt: isoDate(row.lastReviewedAt),
+    };
+  });
+}
+
 export function educationMirrorCreateRows(facts: readonly EducationFact[], importRunId: string): Prisma.EducationFactCreateManyInput[] {
   return facts.map(({ lastReviewedAt, ...fact }) => ({
     ...fact, sourceDocumentId: educationSourceDocumentId(fact.sourceId), lastReviewedAt: new Date(`${lastReviewedAt}T00:00:00.000Z`), importRunId,
@@ -977,6 +1016,23 @@ export async function loadUnemploymentFactsFromMirror(db: MirrorClient): Promise
 
 export async function loadEconomicSectorFactsFromMirror(db: MirrorClient): Promise<SectorObservation[]> {
   const rows = await db.economicSectorFact.findMany({ orderBy: [{ seriesId: "asc" }, { measure: "asc" }, { year: "asc" }] });
+  return rows.map(row => ({
+    seriesId: row.seriesId, measure: row.measure as SectorObservation["measure"], year: row.year,
+    value: row.value.toFixed(), unit: row.unit as SectorObservation["unit"],
+    valuation: row.valuation as SectorObservation["valuation"], priceBasis: row.priceBasis as SectorObservation["priceBasis"],
+    calculation: row.calculation as SectorObservation["calculation"], status: row.status as SectorObservation["status"],
+    sourceId: row.sourceDocumentId, sourceLocator: row.sourceLocator, lastReviewedAt: isoDate(row.lastReviewedAt),
+  }));
+}
+
+export function gdpExpenditureMirrorCreateRows(facts: readonly SectorObservation[], importRunId: string): Prisma.GdpExpenditureFactCreateManyInput[] {
+  return facts.map(({ sourceId, lastReviewedAt, ...fact }) => ({
+    ...fact, sourceDocumentId: sourceId, lastReviewedAt: new Date(`${lastReviewedAt}T00:00:00.000Z`), importRunId,
+  }));
+}
+
+export async function loadGdpExpenditureFactsFromMirror(db: Pick<MirrorClient, "gdpExpenditureFact">): Promise<SectorObservation[]> {
+  const rows = await db.gdpExpenditureFact.findMany({ orderBy: [{ seriesId: "asc" }, { measure: "asc" }, { year: "asc" }] });
   return rows.map(row => ({
     seriesId: row.seriesId, measure: row.measure as SectorObservation["measure"], year: row.year,
     value: row.value.toFixed(), unit: row.unit as SectorObservation["unit"],

@@ -312,6 +312,17 @@ const TOPIC_DATASETS: Record<TopicDatasetId, { keywords: Record<Locale, readonly
     },
     sources: ["geostat"],
   },
+  "gdp-expenditure": {
+    keywords: {
+      ka: ["მშპ დანახარჯების მიხედვით", "მოხმარება", "ინვესტიცია", "ექსპორტი", "იმპორტი", "საქართველო"],
+      en: ["Georgia", "GDP by expenditure", "consumption", "investment", "exports", "imports"],
+    },
+    measurementTechnique: {
+      ka: "საქსტატის წლიური ეროვნული ანგარიშები; მშპ-ის გამოყენების კატეგორიები მიმდინარე ფასებში, მშპ-ის წილები და რეალური ზრდა.",
+      en: "Reviewed Geostat annual national accounts: GDP by categories of use at current prices, GDP shares and real volume growth.",
+    },
+    sources: ["geostat"],
+  },
   housing: {
     keywords: {
       ka: ["მშენებლობის ნებართვები", "ექსპლუატაციაში მიღებული ობიექტები", "საცხოვრებლის ფასები", "მშენებლობა", "საქართველო"],
@@ -400,6 +411,17 @@ const TOPIC_DATASETS: Record<TopicDatasetId, { keywords: Record<Locale, readonly
     },
     sources: ["geostat"],
   },
+  internet: {
+    keywords: {
+      ka: ["ინტერნეტი", "კომპიუტერი", "მობილური ტელეფონი", "სმარტფონი", "ონლაინ შესყიდვები", "საქართველო"],
+      en: ["Georgia", "internet", "computers", "mobile phones", "smartphones", "online shopping"],
+    },
+    measurementTechnique: {
+      ka: "გადამოწმებული ამოღება საქსტატის შინამეურნეობებში საინფორმაციო და საკომუნიკაციო ტექნოლოგიების გამოყენების წლიური კვლევის ოფიციალური გამოქვეყნებული ცხრილებიდან.",
+      en: "Reviewed extraction from the official published tables of Geostat's annual survey of ICT usage in households.",
+    },
+    sources: ["geostat"],
+  },
   education: {
     keywords: {
       ka: ["განათლება", "სკოლები", "მოსწავლეები", "საბავშვო ბაღები", "უნივერსიტეტები", "პროფესიული კოლეჯები", "საქართველო"],
@@ -441,6 +463,17 @@ const TOPIC_DATASETS: Record<TopicDatasetId, { keywords: Record<Locale, readonly
     measurementTechnique: {
       ka: "გადამოწმებული ამოღება საქსტატის მეცნიერებისა და კულტურის ოფიციალური გამოქვეყნებული სტატისტიკიდან.",
       en: "Reviewed extraction from Geostat's official published science and culture statistics.",
+    },
+    sources: ["geostat"],
+  },
+  transport: {
+    keywords: {
+      ka: ["ტრანსპორტი", "ავტოპარკი", "ავტომობილები", "მგზავრთბრუნვა", "ტვირთბრუნვა", "რკინიგზა", "საქართველო"],
+      en: ["Georgia", "transport", "vehicles", "cars", "passenger-km", "tonne-km", "railway", "registered vehicles"],
+    },
+    measurementTechnique: {
+      ka: "გადამოწმებული ამოღება საქსტატის ტრანსპორტისა და გარემოს მდგომარეობის ინდიკატორების ოფიციალური გამოქვეყნებული ცხრილებიდან.",
+      en: "Reviewed extraction from Geostat's official published transport and environmental indicator tables.",
     },
     sources: ["geostat"],
   },

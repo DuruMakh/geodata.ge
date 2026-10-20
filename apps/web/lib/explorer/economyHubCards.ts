@@ -16,6 +16,7 @@ export function buildEconomyHubCards(
   p: Presentation,
   sectorFacts: ServedSectorObservation[] = [],
   regionalFacts: ServedRegionalEconomyObservation[] = [],
+  expenditureFacts: ServedSectorObservation[] = [],
 ): HubCardModel[] {
   const t = (k: string) => message(p.messages, `gdp.${k}`);
   const real = facts
@@ -29,6 +30,10 @@ export function buildEconomyHubCards(
   const sectorHighlights = latestSectorYear === null
     ? null
     : buildSectorHighlights(sectorFacts, ECONOMIC_SECTORS, latestSectorYear);
+  const households = expenditureFacts
+    .filter((f) => f.seriesId === "gdp_use.households" && f.measure === "share_of_gdp")
+    .sort((a, b) => a.year - b.year);
+  const latestHouseholds = households.at(-1);
   const regionalTotals = regionalFacts.filter((f) => f.measure === "nominal" && f.seriesId === REGIONAL_GDP_TOTAL);
   const regionalYears = regionalTotals.map((f) => f.year);
   const firstRegionalYear = regionalYears.length ? Math.min(...regionalYears) : null;
@@ -68,6 +73,18 @@ export function buildEconomyHubCards(
     },
     {
       index: "03",
+      title: t("expenditure"),
+      description: t("expenditureDescription"),
+      href: latestHouseholds ? "/explorer/economy/expenditure" : null,
+      comingSoon: latestHouseholds === undefined,
+      series: latestHouseholds ? households.map((f) => f.value) : null,
+      seriesColor: latestHouseholds ? INK : null,
+      footer: latestHouseholds
+        ? `${latestHouseholds.year} · ${message(p.messages, "gdpExpenditure.householdsShare", { share: formatShare(latestHouseholds.value / 100) })} · ${households[0].year}–${latestHouseholds.year}${latestHouseholds.status === "preliminary" ? ` · ${t("preliminary")}` : ""}`
+        : null,
+    },
+    {
+      index: "04",
       title: t("regions"),
       description: t("regionsDescription"),
       href: largestRegion ? "/explorer/economy/regions" : null,

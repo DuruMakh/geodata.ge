@@ -126,9 +126,11 @@ describe("methodology footer attribution", () => {
     ["household-income", "Geostat"],
     ["business", "Geostat"],
     ["housing", "Geostat"],
+    ["transport", "Geostat"],
     ["health", "Geostat"],
     ["crime", "Geostat"],
     ["environment", "Geostat"],
+    ["internet", "Geostat"],
     ["education", "Geostat"],
     ["social-protection", "Social Service Agency and Geostat"],
     ["science-culture", "Geostat"],
@@ -198,6 +200,23 @@ describe("crime methodology", () => {
   });
 });
 
+describe("internet methodology", () => {
+  it.each([
+    ["ka", "ინტერნეტი და ტექნოლოგიები", ["2020 წლიდან გაიზარდა გამოკვლევის შერჩევის ზომა.", "2016-2019 წლები მოიცავს იმერეთის, რაჭა-ლეჩხუმისა და ქვემო სვანეთის რეგიონებს.", "ივნისში ან ივლისში", "მიზეზებს არ ასახელებს"]],
+    ["en", "Internet and technology", ["Survey sample size has been increased since 2020.", "The data of 2016-2019 includes Imereti, Racha-Lechkhumi and Kvemo Svaneti regions.", "in June or July", "state no causes"]],
+  ] as const)("renders the %s article with its 36 archived originals, the survey, sample and Imereti notes and Dataset markup", async (locale, title, statements) => {
+    const { renderMethodologyArticle } = await import("../../lib/pages/methodology-article");
+    const markup = renderToStaticMarkup(await renderMethodologyArticle(locale, { params: Promise.resolve({ dataset: "internet" }) }));
+    expect(markup).toContain(title);
+    expect(markup).toContain("2016–2026");
+    expect(markup).toContain('"@type":"Dataset"');
+    for (const statement of statements) expect(markup).toContain(statement);
+    for (const file of ["01_share_of_households_with_internet_access.xlsx", "01_internetit_uzrunvelyopili_shinameurneobebi.xlsx", "17_ict_skills.xlsx", "geostat-category-106-2026-10-20.html.txt", "geostat-category-106-ka-2026-10-20.html.txt"]) {
+      expect(markup).toContain(`/downloads/methodology/internet/files/${file}`);
+    }
+  });
+});
+
 describe("environment methodology", () => {
   it.each([
     ["ka", "გარემო და კლიმატი", "ზესტაფონის არაავტომატურ სადგურზე სინჯების აღების მეთოდოლოგიას არ იძლევა საშუალებას", "სადგური ამოქმედდა 2019 წლის მაისიდან"],
@@ -239,6 +258,25 @@ describe("science and culture methodology", () => {
     expect(markup).toContain("/downloads/methodology/science-culture/files/mkvlevarebi.xlsx");
     expect(markup).toContain("/downloads/methodology/science-culture/files/geostat-category-615-2026-10-20.html.txt");
     expect(markup).not.toContain("geostat.ge/media");
+  });
+});
+
+describe("transport methodology", () => {
+  it.each([
+    ["ka", "ტრანსპორტი", ["შსს-ის", "2008 წლიდან", "კუმულაციური", "ერთი მგზავრის ერთი კილომეტრით", "არ უნდა შეიკრიბოს", "ტრანზიტი", "აფხაზეთის", "საავტომობილო გზების დეპარტამენტის", "მგზავრთა გადაყვანის საქმიანობის საწარმოებს", "უმნიშვნელო სიდიდე"]],
+    ["en", "Transport", ["Ministry of Internal Affairs", "end of each year", "agricultural machinery from 2008", "cumulative", "one passenger carried one kilometre", "should not be added together", "Transit is goods carried across Georgia", "Abkhazia", "Roads Department of Georgia manages", "state no causes", "Table covers enterprises of passenger transport activities in Georgia.", "Table covers data on enterprises of transport activities in Georgia.", "Negligible magnitude"]],
+  ] as const)("renders the %s article with its 25 archived originals, the spec's notes and Dataset markup", async (locale, title, statements) => {
+    const { renderMethodologyArticle } = await import("../../lib/pages/methodology-article");
+    const markup = renderToStaticMarkup(await renderMethodologyArticle(locale, { params: Promise.resolve({ dataset: "transport" }) }));
+    expect(markup).toContain(title);
+    expect(markup).toContain("2000–2025");
+    expect(markup).toContain('"@type":"Dataset"');
+    for (const statement of statements) expect(markup).toContain(statement);
+    // Geostat's railway, air and sea metadata are linked, not archived.
+    for (const pdf of ["79116/0527_200526_EN.PDF", "79115/0526_200526_EN.PDF", "79117/0532_200526_EN.PDF"]) expect(markup).toContain(`https://www.geostat.ge/media/${pdf}`);
+    for (const file of ["h-1-passenger-transport-demand_eng.xlsx", "number-of-registered-vehicles.xlsx", "length-of-road-eng-2024.xls", "geostat-category-565-2026-10-20.html.txt"]) {
+      expect(markup).toContain(`/downloads/methodology/transport/files/${file}`);
+    }
   });
 });
 

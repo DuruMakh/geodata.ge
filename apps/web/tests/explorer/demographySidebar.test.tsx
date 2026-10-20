@@ -39,6 +39,13 @@ describe("sidebar demography group", () => {
     expect(markup).not.toContain('data-testid="demography-population-link" aria-current="page"');
   });
 
+  it("lists the five demography pages and marks Marriages and divorces current on its page", async () => {
+    const markup = await render("/en/explorer/demography/marriages-divorces");
+    for (const page of ["population", "age-sex", "migration", "births-deaths"]) expect(markup).toContain(`data-testid="demography-${page}-link"`);
+    expect(markup).toContain('data-testid="demography-marriages-divorces-link" aria-current="page"');
+    expect(markup).not.toContain('data-testid="demography-population-link" aria-current="page"');
+  });
+
   it("keeps the Population link current on every place page, in both languages", async () => {
     for (const [pathname, locale] of [
       ["/explorer/demography/population/georgia", "ka"],

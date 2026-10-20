@@ -64,6 +64,17 @@ describe("original-source inventory", () => {
     ]));
   });
 
+  it("inventories the 25 transport originals: 20 workbooks and 5 page captures", async () => {
+    const rows = await expectedOriginalSourcePaths(REPOSITORY_ROOT, "transport");
+    expect(rows).toHaveLength(25);
+    expect(rows.every((row) => row.path.startsWith("docs/Raw Data/Transport/geostat-transport-annual/official/"))).toBe(true);
+    expect(rows.map((row) => row.path)).toEqual(expect.arrayContaining([
+      "docs/Raw Data/Transport/geostat-transport-annual/official/H-1-Passenger-transport-demand_ENG.XLSX",
+      "docs/Raw Data/Transport/geostat-transport-annual/official/Length-of-road-Eng-2024.xls",
+      "docs/Raw Data/Transport/geostat-transport-annual/official/geostat-category-565-2026-10-20.html",
+    ]));
+  });
+
   it("inventories the 21 housing originals, the zips with their members and the page captures alike", async () => {
     const rows = await expectedOriginalSourcePaths(REPOSITORY_ROOT, "housing");
     expect(rows).toHaveLength(21);
@@ -108,6 +119,18 @@ describe("original-source inventory", () => {
     const rows = await expectedOriginalSourcePaths(REPOSITORY_ROOT, "business");
     expect(rows).toHaveLength(26);
     expect(rows.every((row) => row.path.startsWith("docs/Raw Data/Business/geostat-business-annual/official/"))).toBe(true);
+  });
+
+  it("inventories the 36 internet originals: the English and Georgian tables and both page captures", async () => {
+    const rows = await expectedOriginalSourcePaths(REPOSITORY_ROOT, "internet");
+    expect(rows).toHaveLength(36);
+    expect(rows.every((row) => row.path.startsWith("docs/Raw Data/Internet/geostat-ict-households-annual/official/"))).toBe(true);
+    expect(rows.map((row) => row.path)).toEqual(expect.arrayContaining([
+      "docs/Raw Data/Internet/geostat-ict-households-annual/official/01_Share_of_households_with_internet_access.xlsx",
+      "docs/Raw Data/Internet/geostat-ict-households-annual/official/ka/01_internetit_uzrunvelyopili_shinameurneobebi.xlsx",
+      "docs/Raw Data/Internet/geostat-ict-households-annual/official/geostat-category-106-2026-10-20.html",
+      "docs/Raw Data/Internet/geostat-ict-households-annual/official/ka/geostat-category-106-ka-2026-10-20.html",
+    ]));
   });
 
   it("inventories the 22 crime and justice originals: the English and Georgian workbooks and both page captures", async () => {

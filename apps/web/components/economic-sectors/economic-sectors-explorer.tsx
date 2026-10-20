@@ -8,6 +8,8 @@ import {
   buildEconomicSectorsModel,
   changeSectorMeasure,
   SECTOR_GDP,
+  SECTORS_PAGE_CONFIG,
+  type SectorPageConfig,
 } from "../../lib/explorer/economicSectors";
 import { buildEconomicSectorsWorkbookExportModel } from "../../lib/explorer/economicSectorsWorkbook";
 import {
@@ -41,6 +43,8 @@ export type EconomicSectorsExplorerProps = {
   registry: SectorDefinition[];
   sources: (WorkbookPublicSource & { sourceId: string })[];
   siteOrigin: string;
+  /** GDP by expenditure reuses this explorer; Sectors keeps the default. */
+  config?: SectorPageConfig;
 };
 
 export function EconomicSectorsExplorer({
@@ -49,16 +53,17 @@ export function EconomicSectorsExplorer({
   registry,
   sources,
   siteOrigin,
+  config = SECTORS_PAGE_CONFIG,
 }: EconomicSectorsExplorerProps) {
   const facts = unpackFacts(shippedFacts);
   const presentation = useI18n();
   const { locale, messages } = presentation;
-  const t = (key: string) => message(messages, `sectors.${key}`);
-  const { state, update } = useEconomicSectorsState(facts, registry);
+  const t = (key: string) => message(messages, `${config.scope}.${key}`);
+  const { state, update } = useEconomicSectorsState(facts, registry, config);
   const [announcement, setAnnouncement] = useState("");
   const model = useMemo(
-    () => buildEconomicSectorsModel(facts, registry, state, sourceIdByMeasure),
-    [facts, registry, state, sourceIdByMeasure],
+    () => buildEconomicSectorsModel(facts, registry, state, sourceIdByMeasure, config),
+    [facts, registry, state, sourceIdByMeasure, config],
   );
   const percent = state.measure !== "nominal";
   const measureLabel = t(
@@ -137,10 +142,10 @@ export function EconomicSectorsExplorer({
                 onChange={(measure) => {
                   // Build on the hook's current state, not this render's: a click can
                   // land after a deep link is applied but before it re-renders.
-                  const next = update((s) => changeSectorMeasure(s, measure, facts), "push");
+                  const next = update((s) => changeSectorMeasure(s, measure, facts, config), "push");
                   // Announce the period the new measure lands on, as GDP does on a tab change.
-                  const nextModel = buildEconomicSectorsModel(facts, registry, next, sourceIdByMeasure);
-                  setAnnouncement(message(messages, "sectors.rangeChanged", {
+                  const nextModel = buildEconomicSectorsModel(facts, registry, next, sourceIdByMeasure, config);
+                  setAnnouncement(message(messages, `${config.scope}.rangeChanged`, {
                     start: nextModel.range.start,
                     end: nextModel.range.end,
                   }));
@@ -225,6 +230,8 @@ export function EconomicSectorsExplorer({
           endYear={model.range.end}
           endValues={model.endValues}
           measure={state.measure}
+          visibleIds={model.visibleIds}
+          config={config}
           onSelectionChange={(selectedIds) =>
             update((s) => ({ ...s, selectedIds }))
           }
@@ -244,6 +251,7 @@ export function EconomicSectorsExplorer({
                     sources,
                     siteOrigin,
                     sourceIdByMeasure,
+                    config,
                   ),
                 );
               }}
@@ -251,7 +259,7 @@ export function EconomicSectorsExplorer({
           }
         />
       </ExplorerWorkspace>
-      <SectorHighlights facts={facts} registry={registry} year={model.range.end} />
+      {config.highlights ? <SectorHighlights facts={facts} registry={registry} year={model.range.end} /> : null}
     </div>
   );
 }

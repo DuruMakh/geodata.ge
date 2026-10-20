@@ -85,6 +85,8 @@ export const SERVED_DATA_FILES = {
   demographyFertilityFacts: "../../data/imports/demography-fertility-age-annual.csv",
   demographyStructureFacts: "../../data/imports/demography-structure-annual.csv",
   demographyCensusFacts: "../../data/imports/demography-census-2024-population.csv",
+  demographyMidYearFacts: "../../data/imports/demography-mid-year-annual.csv",
+  demographyMarriageFacts: "../../data/imports/demography-marriage-annual.csv",
   inflationCpiFacts: "../../data/imports/cpi-national-monthly.csv",
   inflationTargets: "../../data/imports/nbg-inflation-target.csv",
   inflationCategoryFacts: "../../data/imports/cpi-categories-monthly.csv",

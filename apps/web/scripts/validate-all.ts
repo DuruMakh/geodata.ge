@@ -44,11 +44,14 @@ export const DATA_VALIDATE_CHECKS = [
   "data:check-money",
   "data:check-business",
   "data:check-housing",
+  "data:check-gdp-expenditure",
+  "data:check-internet",
   "data:check-education",
   "data:check-social",
   "data:check-environment",
   "data:check-science-culture",
   "data:check-labour",
+  "data:check-transport",
 ] as const;
 
 type Check = { main: (args: readonly string[]) => Promise<void> };

@@ -1,0 +1,288 @@
+{
+  "status": "passed",
+  "retrieved_at": "2026-10-20",
+  "scope": "Annual research only: Geostat ICT usage in households survey, 2016-2026 (one survey each June or July): homes with internet and with a computer for Georgia, towns, villages and 11 regions; internet use in the last 3 months, never, and every day; online shopping; nine online activities and four public-service rows for everyone; mobile phone and smartphone ownership; computer use in the last 3 months, by town and village, sex and age",
+  "primary_observation_count": 1055,
+  "observations_by_measure": {
+    "homes_internet": 134,
+    "homes_computer": 134,
+    "used_3m": 99,
+    "never_used": 99,
+    "daily": 88,
+    "bought_online": 88,
+    "activity_social": 11,
+    "activity_news": 11,
+    "activity_email": 11,
+    "activity_calls": 11,
+    "activity_health": 11,
+    "activity_goods_info": 11,
+    "activity_jobs": 11,
+    "activity_banking": 11,
+    "activity_software": 11,
+    "egov_any": 11,
+    "egov_info": 11,
+    "egov_download_forms": 11,
+    "egov_submit_forms": 11,
+    "own_mobile": 99,
+    "own_smartphone": 72,
+    "computer_3m": 99
+  },
+  "observations_by_source": {
+    "geostat_ict_ecommerce": 88,
+    "geostat_ict_homes_computer": 134,
+    "geostat_ict_homes_internet": 134,
+    "geostat_ict_internet_frequency": 88,
+    "geostat_ict_last_computer_use": 99,
+    "geostat_ict_last_internet_use": 198,
+    "geostat_ict_own_mobile": 99,
+    "geostat_ict_own_smartphone": 72,
+    "geostat_ict_public_services": 44,
+    "geostat_ict_purposes": 99
+  },
+  "indicator_count": 102,
+  "imputed_values": 0,
+  "calculated_values": 0,
+  "reconciliation_failed_count": 0,
+  "checks": {
+    "coverage_matches_year_ranges": true,
+    "values_match_source_cells": true,
+    "published_values_are_one_decimal_half_up_of_15_significant_digits": true,
+    "distributions_close_to_100_within": "0.01",
+    "distribution_sums_checked": 374,
+    "total_between_sex_and_settlement_within": "0.01",
+    "brackets_checked": 170,
+    "georgian_editions_agree": 1055,
+    "columns_and_rows_found_by_printed_text": true,
+    "other_regions_and_15_plus_columns_not_served": true,
+    "anchor_values": {
+      "internet.homes_internet.total:2016": "70.1",
+      "internet.homes_internet.total:2026": "93.5",
+      "internet.homes_internet.region_tbilisi:2026": "98.2",
+      "internet.homes_internet.rural:2026": "89.0",
+      "internet.homes_internet.region_guria:2026": "91.1",
+      "internet.used_3m.total:2026": "89.6",
+      "internet.bought_online.total:2026": "38.6",
+      "internet.bought_online.age_15_29:2026": "63.0",
+      "internet.activity_banking.total:2026": "61.0",
+      "internet.own_mobile.total:2026": "93.3"
+    }
+  },
+  "source_checks": [
+    {
+      "source_id": "geostat_ict_homes_internet",
+      "sha256": "0F65F0ECC424D89B6CABB872D00147E82DF5D9D13BCABFAE868026B43DED84E7",
+      "bytes": 12789,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_ict_homes_internet_ka",
+      "sha256": "5249A596D52EDDE50FC155313D8B954B514C7C42B5907B7B17C0920861190361",
+      "bytes": 13027,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_ict_last_internet_use",
+      "sha256": "CB41C2CEC5507E9CF5F88DE3EE9E0CE2A29564F564526CD6BBA5909AC3929332",
+      "bytes": 15596,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_ict_last_internet_use_ka",
+      "sha256": "35C76BFA821F859226FCC66B72E115AEFCEA6D422AD61840653B9F26E855BFA0",
+      "bytes": 16403,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_ict_purposes",
+      "sha256": "EB442B72D997ABBAAD73B51B413734A686A63460E3810911E7AB9053E3A96F76",
+      "bytes": 26078,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_ict_purposes_ka",
+      "sha256": "6CF4B3E4FE458972F83053C6AFD5080A93315134C38E22B7B570845933E3B207",
+      "bytes": 27405,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_ict_internet_frequency",
+      "sha256": "7A925AD77FF2545D99F858995D6AC33EE242906374F2D2CD807AF3D092DD2EC8",
+      "bytes": 14834,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_ict_internet_frequency_ka",
+      "sha256": "3F5EE6AFDE25233E92C3F2B6793AEA505C04E3DE94F3F07E2A9EF02AAFAD64A6",
+      "bytes": 15136,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_ict_ecommerce",
+      "sha256": "F0E71AF0AA167ECD846A9262C604037D5D3CAB358594CFC947D0311EC8321A0F",
+      "bytes": 11581,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_ict_ecommerce_ka",
+      "sha256": "8B2C1E754EBD2EA6B5559B0E345891CBA563FF08ED42AD4D3440CA10E9E98C35",
+      "bytes": 12641,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_ict_mobile_internet",
+      "sha256": "764BD7830841C9A53994EAB6568946EAAB2FB943F5DC872EDC42547A23078CBA",
+      "bytes": 11029,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_ict_mobile_internet_ka",
+      "sha256": "52637E586D0E69488E77135B7990B70B02B3E6D07D578C2048EC59764A8679CA",
+      "bytes": 11703,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_ict_internet_activities",
+      "sha256": "16AD42D6C74A3D5405048BB340C031752C1CB924DA66D53496BE9154766535A2",
+      "bytes": 21031,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_ict_internet_activities_ka",
+      "sha256": "807B81468326F0AC96E9DBB16B5ADDE99FC1CC8331D82EF9871F8E4316FEE82D",
+      "bytes": 21507,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_ict_homes_computer",
+      "sha256": "4C9961C4ED71BBB6475C67DED91BD797A9C36E3FE98BE5B8CAAD73C50F06F3B6",
+      "bytes": 12584,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_ict_homes_computer_ka",
+      "sha256": "85F3C14AF3E6B1FBD18332A017E9BEFBCB4C292C151D1FB61FBE1548241C4483",
+      "bytes": 13196,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_ict_last_computer_use",
+      "sha256": "18FEA8E944FACF3C888B2B19C62A49410C6CC3499E008EDFE32ACF505E5E047C",
+      "bytes": 15319,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_ict_last_computer_use_ka",
+      "sha256": "8FAF34DB146EC44F320D83E2599EC20850B3B33CF1727BEBE0A8CBB8A6C9764A",
+      "bytes": 15739,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_ict_computer_frequency",
+      "sha256": "8160F1C4241D96FA4F4C0F72B53B6569E00A62C611F551B37A9CD5F177B83228",
+      "bytes": 14506,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_ict_computer_frequency_ka",
+      "sha256": "E30A83C61645C55BD98B96802F3861CEB421EAB43B85A206528AE74EF916466D",
+      "bytes": 15040,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_ict_software_activities",
+      "sha256": "B8476F8A31B5F51AD8C5596222201C424EFD53C8239C0542B45855F929D1817B",
+      "bytes": 21425,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_ict_software_activities_ka",
+      "sha256": "1E7AB98E9A20899B7AEF476BC1852E98924848B924F0F4B1CDEED1F548C7664D",
+      "bytes": 23244,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_ict_own_mobile",
+      "sha256": "EB2611F73C2B30143BDC2564EDD0A0120AA6519AFA0045873BBDB06CEB4B138C",
+      "bytes": 10956,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_ict_own_mobile_ka",
+      "sha256": "8DF0AEBBBFBADD2751B5B09B76A0C68ADC1F7BC0C3E511796F3B4CCB1B7F68F6",
+      "bytes": 11563,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_ict_use_mobile",
+      "sha256": "9124739399A5C54B4E845A0AE1748ABD4899E03C0F16838F9643C04F3137DF02",
+      "bytes": 10755,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_ict_use_mobile_ka",
+      "sha256": "43422CF3BE1ECD1A31C3EB2C729F9686B6AA7DA53AACECACB410F2D2C40F2ED3",
+      "bytes": 11324,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_ict_own_smartphone",
+      "sha256": "8F3C97B4ED919FC8286B55DC5D0E402912DE3E686DC0D5D844EEC4D81A81C447",
+      "bytes": 10480,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_ict_own_smartphone_ka",
+      "sha256": "D56ECA624C046CC145D75F5B702FE501797EF38D253999FAEA9945EBAC615731",
+      "bytes": 11059,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_ict_use_smartphone",
+      "sha256": "E2C7A3AB331FF54E1679BB52A6BFAB3022CE654131EDC4B1AAE612FC519221FA",
+      "bytes": 10459,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_ict_use_smartphone_ka",
+      "sha256": "9E34D2944ADE520B23501C6082C986C620154EA4C1409AD92ACF4DD4B6EFBE60",
+      "bytes": 11351,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_ict_public_services",
+      "sha256": "D57E9CD69262A628E554B0FF06DC0E9CF64E70DDBD838B6D5D5A0D083FE53130",
+      "bytes": 17064,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_ict_public_services_ka",
+      "sha256": "FBF09268ACD35125651850C30506825F5DCF9340793651B9B76173DAEEB1CDB3",
+      "bytes": 17861,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_ict_skills",
+      "sha256": "05133EE16D1FB03FC6A07BEFF7A89E6FCEEEA8D82CFF1A8D25D86E90C447E5FF",
+      "bytes": 12520,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_ict_skills_ka",
+      "sha256": "C8CFE6EC7A74FA6DC4C0ED7C0254030C1E6019AFFBEE69F7C07EDC8DC20C274F",
+      "bytes": 13118,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_ict_page",
+      "sha256": "4592062948175E28E7A1C2F7067992D98F6DD7D55160A03C306492B7DC71B871",
+      "bytes": 96735,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_ict_page_ka",
+      "sha256": "9026F1001EC2C700A26B96EB24A3E1187B15C963445FC23EE6E1D21BF16236D3",
+      "bytes": 106160,
+      "passed": true
+    }
+  ]
+}

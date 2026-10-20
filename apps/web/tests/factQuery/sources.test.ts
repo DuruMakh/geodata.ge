@@ -192,9 +192,9 @@ describe("public source resolution", () => {
 
       expect(unresolved).toEqual([]);
       expect(snapshot.sources.some(source => source.sourceId.startsWith("source.geostat_services_"))).toBe(false);
-      // The thirteen demography canonical inputs (twelve annual tables and the census snapshot) extend the existing inventory;
+      // The nineteen demography canonical inputs (eighteen annual tables and the census snapshot) extend the existing inventory;
       // the package's validation inputs and definitions are evidence, not sources.
-      expect(snapshot.sources.length).toBe(145);
+      expect(snapshot.sources.length).toBe(151);
     });
 
     it("resolves an extracted file to the archived original it came from", async () => {
@@ -227,7 +227,7 @@ describe("public source resolution", () => {
       const births = demography.find((source) => source.sourceId === "source.geostat_demography_births");
       const documentIds = snapshot.sources.flatMap((source) => source.documents.map((document) => document.documentId));
 
-      expect(demography).toHaveLength(12);
+      expect(demography).toHaveLength(18);
       expect(births?.documents).toHaveLength(1);
       expect(births?.documents[0]).toMatchObject({
         officialUrl: "https://geostat.ge/media/77847/09-number-of-live-births-by-self-governed-units.xlsx",
@@ -254,7 +254,11 @@ describe("public source resolution", () => {
       // The validation inputs and definition PDFs stay evidence, and table 01 stays the municipal package's one document.
       expect(documentIds).not.toContain("source.geostat_demography_median_age");
       expect(documentIds).not.toContain("source.geostat_demography_metadata_population");
-      expect(documentIds.filter((id) => id.startsWith("source.geostat_demography_"))).toHaveLength(12);
+      expect(documentIds).not.toContain("source.geostat_demography_crude_marriage_rate");
+      expect(documentIds).not.toContain("source.geostat_demography_marriages_previous_status");
+      expect(documentIds.filter((id) => id.startsWith("source.geostat_demography_"))).toHaveLength(18);
+      const midYear = demography.find((source) => source.sourceId === "source.geostat_demography_population_mid_year");
+      expect(midYear?.documents[0]?.years).toEqual(Array.from({ length: 32 }, (_, index) => 1994 + index));
       expect(snapshot.sources.find((source) => source.sourceId === "source.geostat_municipal_population")?.documents).toHaveLength(1);
     });
 

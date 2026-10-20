@@ -22,6 +22,8 @@ describe("the navigation tree", () => {
     expect(currentEntry("/explorer/business/regions/guria")).toBe("/explorer/business/regions");
     expect(openHub("/explorer/housing/regions/guria").href).toBe("/explorer/housing");
     expect(currentEntry("/explorer/housing/regions/guria")).toBe("/explorer/housing/regions");
+    expect(openHub("/explorer/transport/regions/guria").href).toBe("/explorer/transport");
+    expect(currentEntry("/explorer/transport/regions/guria")).toBe("/explorer/transport/regions");
     expect(openHub("/explorer/demography/population/region/imereti").href).toBe("/explorer/demography");
     expect(openHub("/explorer/education/schools/region/guria").href).toBe("/explorer/education");
     expect(currentEntry("/explorer/education/schools/region/guria")).toBe("/explorer/education/schools");
@@ -93,6 +95,14 @@ describe("the navigation tree", () => {
     expect(hub.sections.map((section) => [section.href, section.testId])).toEqual(["permits", "completed", "prices", "regions"].map((id) => [`/explorer/housing/${id}`, `housing-${id}-link`]));
   });
 
+  it("places Transport directly after Environment and climate, with its five pages", () => {
+    const hubs = NAV_TREE.map((hub) => hub.href);
+    expect(hubs.indexOf("/explorer/transport")).toBe(hubs.indexOf("/explorer/environment") + 1);
+    const hub = NAV_TREE.find((entry) => entry.href === "/explorer/transport")!;
+    expect(hub).toMatchObject({ labelKey: "common.transport", railLabelKey: "common.dataTransport", testId: "transport-link" });
+    expect(hub.sections.map((section) => [section.href, section.testId])).toEqual(["vehicles", "vehicle-age", "passengers", "freight", "regions"].map((id) => [`/explorer/transport/${id}`, `transport-${id}-link`]));
+  });
+
   it("matches a row's own page and the pages below it, not a sibling that shares its start", () => {
     expect(isActivePath("/explorer/wages/regions", "/explorer/wages/regions")).toBe(true);
     expect(isActivePath("/explorer/wages/regions/adjara", "/explorer/wages/regions")).toBe(true);
@@ -129,6 +139,8 @@ describe("the explorer footer source note", () => {
     expect(sourceNoteKey("/explorer/business/regions/guria")).toBe("common.geostatSourceNote");
     expect(sourceNoteKey("/explorer/housing/prices")).toBe("common.geostatSourceNote");
     expect(sourceNoteKey("/explorer/housing/regions/guria")).toBe("common.geostatSourceNote");
+    expect(sourceNoteKey("/explorer/transport/freight")).toBe("common.geostatSourceNote");
+    expect(sourceNoteKey("/explorer/transport/regions/guria")).toBe("common.geostatSourceNote");
     expect(sourceNoteKey("/explorer/external")).toBe("common.externalHubSourceNote");
     expect(sourceNoteKey("/explorer/external/current-account")).toBe("common.nbgSourceNote");
     expect(sourceNoteKey("/explorer/external/foreign-debt")).toBe("common.nbgSourceNote");

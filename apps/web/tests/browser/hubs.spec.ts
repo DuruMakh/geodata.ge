@@ -4,23 +4,26 @@ import { expect, test, type Page } from "@playwright/test";
 const ready = (page: Page) => expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
 const ENERGY_FOOD_SECTIONS = ["energy-supply", "electricity", "energy-use", "food-self-sufficiency", "farming"] as const;
 
-test("Economy links the delivered overview, national sectors and regional economies", async ({ page }) => {
+test("Economy links the delivered overview, national sectors, GDP by expenditure and regional economies", async ({ page }) => {
   await page.goto("/en/explorer/economy");
   const cards = page.getByTestId("economy-hub").getByTestId("hub-card");
-  await expect(cards).toHaveCount(3);
-  await expect(page.getByTestId("economy-hub").locator("a")).toHaveCount(3);
+  await expect(cards).toHaveCount(4);
+  await expect(page.getByTestId("economy-hub").locator("a")).toHaveCount(4);
   await expect(page.getByTestId("economy-hub").locator('a[href="/en/explorer/economy/sectors"]')).toHaveCount(1);
+  await expect(page.getByTestId("economy-hub").locator('a[href="/en/explorer/economy/expenditure"]')).toHaveCount(1);
   await expect(page.getByTestId("economy-hub").locator('a[href="/en/explorer/economy/regions"]')).toHaveCount(1);
-  for (let index = 0; index < 3; index += 1) await expect(cards.nth(index).locator("svg")).toHaveCount(1);
+  for (let index = 0; index < 4; index += 1) await expect(cards.nth(index).locator("svg")).toHaveCount(1);
   await expect(cards.nth(1)).toContainText("Top 3 sectors’ GDP share");
-  await expect(cards.nth(2)).toContainText("Total regional GDP (Current prices)");
+  await expect(cards.nth(2)).toContainText(/Households \d+\.\d% of GDP/);
+  await expect(cards.nth(3)).toContainText("Total regional GDP (Current prices)");
   await page.getByTestId("economy-hub").locator('a[href="/en/explorer/economy/gdp"]').click();
   await expect(page.getByTestId("gdp-overview")).toBeVisible();
   await page.goto("/explorer/economy");
-  for (let index = 0; index < 3; index += 1) await expect(cards.nth(index).locator("svg")).toHaveCount(1);
+  for (let index = 0; index < 4; index += 1) await expect(cards.nth(index).locator("svg")).toHaveCount(1);
   await expect(cards.first().locator("p").last()).toHaveText(/^\d{4} · ნომინალური მშპ \d+\.\d მლრდ ₾$/);
   await expect(cards.nth(1)).toContainText("ტოპ 3-ის წილი მშპ-ში");
-  await expect(cards.nth(2)).toContainText("რეგიონის მთლიანი მშპ (მიმდინარე ფასები)");
+  await expect(cards.nth(2)).toContainText(/შინამეურნეობების მოხმარება მშპ-ის \d+\.\d%/);
+  await expect(cards.nth(3)).toContainText("რეგიონის მთლიანი მშპ (მიმდინარე ფასები)");
 });
 
 test("the inflation hub links all four live sections and the sidebar reaches Overview and Categories", async ({ page }) => {
@@ -118,6 +121,24 @@ test("the crime hub shows one card per page, each linking to it, and the sidebar
   await expect(page.getByTestId("crime-hub").locator("a").first()).toContainText("2025 · 54,134 · 2015–2025");
 });
 
+test("the internet hub shows one card per page, each linking to it, and the sidebar lists Internet and technology after Crime and justice", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  const sections = ["homes", "users", "online", "devices"];
+  for (const prefix of ["", "/en"]) {
+    await page.goto(`${prefix}/explorer/internet`);
+    const cards = page.getByTestId("internet-hub").locator("a");
+    await expect(cards).toHaveCount(4);
+    expect(await cards.evaluateAll(elements => elements.map(element => element.getAttribute("href")))).toEqual(sections.map(section => `${prefix}/explorer/internet/${section}`));
+    for (let index = 0; index < 4; index += 1) await expect(cards.nth(index).locator("svg")).toHaveCount(1);
+    const entry = page.getByTestId("internet-link");
+    await expect(entry).toHaveAttribute("aria-current", "page");
+    expect(await page.getByTestId("crime-link").evaluate((crime, internet) => Boolean(crime.compareDocumentPosition(internet!) & Node.DOCUMENT_POSITION_FOLLOWING), await entry.elementHandle())).toBe(true);
+    for (const id of sections) await expect(page.getByTestId(`internet-${id}-link`)).toBeVisible();
+  }
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Internet and technology");
+  await expect(page.getByTestId("internet-hub").locator("a").first()).toContainText("2026 · 93.5% · 2016–2026");
+});
+
 test("the housing hub shows one card per page, each linking to it, and the sidebar lists Housing after Business", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   for (const prefix of ["", "/en"]) {
@@ -136,6 +157,27 @@ test("the housing hub shows one card per page, each linking to it, and the sideb
   await expect(page.getByTestId("housing-hub").locator("a").first()).toContainText("2025 · 11,578 · 2006–2025");
   await expect(page.getByTestId("housing-hub").locator("a").nth(2)).toContainText("2025 · 159.4 · 2020–2025");
   await expect(page.getByTestId("housing-hub").locator("a").nth(3)).toContainText("2006–2025");
+});
+
+test("the transport hub shows one card per page, each linking to it, and the sidebar lists Transport after Energy and food", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  const sections = ["vehicles", "vehicle-age", "passengers", "freight", "regions"];
+  for (const prefix of ["", "/en"]) {
+    await page.goto(`${prefix}/explorer/transport`);
+    const cards = page.getByTestId("transport-hub").locator("a");
+    await expect(cards).toHaveCount(5);
+    expect(await cards.evaluateAll(elements => elements.map(element => element.getAttribute("href")))).toEqual(sections.map(section => `${prefix}/explorer/transport/${section}`));
+    // Four sparklines; Regions shows only its years.
+    for (let index = 0; index < 4; index += 1) await expect(cards.nth(index).locator("svg")).toHaveCount(1);
+    const entry = page.getByTestId("transport-link");
+    await expect(entry).toHaveAttribute("aria-current", "page");
+    expect(await page.getByTestId("energy-food-link").evaluate((energy, transport) => Boolean(energy.compareDocumentPosition(transport!) & Node.DOCUMENT_POSITION_FOLLOWING), await entry.elementHandle())).toBe(true);
+    for (const id of sections) await expect(page.getByTestId(`transport-${id}-link`)).toBeVisible();
+  }
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Transport");
+  await expect(page.getByTestId("transport-hub").locator("a").first()).toContainText("2025 · 1,650.0 · 2000–2025");
+  await expect(page.getByTestId("transport-hub").locator("a").nth(1)).toContainText("2025 · 1,318.9 · 2017–2025");
+  await expect(page.getByTestId("transport-hub").locator("a").nth(4)).toContainText("2017–2025");
 });
 
 // One hub test for the five external pages (moved from the 18 page-spec defaults runs): count, hrefs and a click to each.

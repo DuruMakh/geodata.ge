@@ -7,6 +7,9 @@ export type SectorDefinition = {
   officialName: string;
   labelKa: string;
   labelEn: string;
+  // GDP by expenditure lists its rows under these headings, in registry order; Sectors has none.
+  headingKa?: string;
+  headingEn?: string;
 };
 
 export type SectorObservation = {
