@@ -112,8 +112,9 @@ describe("indexable Fiscal.ge routes", () => {
     // Education adds its hub, four pages, the 75 Schools and 75 Kindergartens place pages and its methodology page: 156 bilingual pairs.
     // Science and culture adds its hub, four pages, a Museums page for Georgia and each of the 11 regions and its methodology page: 18 bilingual pairs.
     // Unemployment adds four Labour Force Survey detail pages (industries, hours, informal, young people): 4 bilingual pairs.
+    // Farming adds one Energy and food page: 1 bilingual pair.
     // Internet and technology adds its hub, four pages, a page for Georgia and each of the 11 regions and its methodology page: 18 bilingual pairs.
-    expect(urls).toHaveLength(1100);
+    expect(urls).toHaveLength(1102);
     expect(new Set(urls).size).toBe(urls.length);
     expect(urls.every((url) => url.startsWith("https://fiscal.ge/"))).toBe(true);
     expect(urls).toContain("https://fiscal.ge/about");
@@ -150,7 +151,7 @@ describe("indexable Fiscal.ge routes", () => {
       expect(urls).toContain(`https://fiscal.ge/en/explorer/living-standards/${section}/regions/georgia`);
     }
     expect(urls.some((url) => url.includes("/explorer/poverty"))).toBe(false);
-    for (const page of ["", "/energy-supply", "/electricity", "/energy-use", "/food-self-sufficiency"]) {
+    for (const page of ["", "/energy-supply", "/electricity", "/energy-use", "/food-self-sufficiency", "/farming"]) {
       expect(urls).toContain(`https://fiscal.ge/explorer/energy-food${page}`);
       expect(urls).toContain(`https://fiscal.ge/en/explorer/energy-food${page}`);
     }
@@ -435,6 +436,13 @@ async function sitemapDates(): Promise<Map<string, string | undefined>> {
 }
 
 describe("sitemap lastmod reports each entity's own reviewed date", () => {
+  it("dates each energy and food page by its own facts, and the hub by the newest", async () => {
+    const dates = await sitemapDates();
+    for (const page of ["energy-supply", "electricity", "energy-use", "food-self-sufficiency"]) expect(dates.get(`${SITE}/explorer/energy-food/${page}`), page).toBe("2026-10-11");
+    expect(dates.get(`${SITE}/explorer/energy-food/farming`)).toBe("2026-10-20");
+    expect(dates.get(`${SITE}/explorer/energy-food`)).toBe("2026-10-20");
+  });
+
   it("gives every municipality the date its own facts were reviewed", async () => {
     const [dates, municipalData, { sourceDocuments }] = await Promise.all([
       sitemapDates(),

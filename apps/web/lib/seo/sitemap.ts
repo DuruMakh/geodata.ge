@@ -32,7 +32,7 @@ import { loadServedScienceCultureData } from "../data/scienceCulture/importScien
 import { SCIENCE_CULTURE_HUB_PATH, SCIENCE_CULTURE_SECTIONS } from "../explorer/scienceCulture";
 import { MUSEUM_AREAS, museumAreaHref } from "../explorer/scienceCultureMuseums";
 import { loadServedEnergyFoodData } from "../data/energyFood/importEnergyFood";
-import { ENERGY_FOOD_HUB_PATH, ENERGY_FOOD_SECTIONS } from "../explorer/energyFood";
+import { ENERGY_FOOD_HUB_PATH, ENERGY_FOOD_SECTIONS, energyFoodLastReviewedAt } from "../explorer/energyFood";
 import { loadServedMoneyBanksData } from "../data/moneyBanks/importMoneyBanks";
 import { MONEY_BANKS_SECTIONS } from "../explorer/moneyBanks";
 import { loadServedBusinessData } from "../data/business/importBusiness";
@@ -225,7 +225,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...SCIENCE_CULTURE_SECTIONS.map(section => ({ url: `${siteUrl}${section.href}`, lastModified: scienceCultureModified })),
     ...MUSEUM_AREAS.map(area => ({ url: `${siteUrl}${museumAreaHref(area)}`, lastModified: scienceCultureModified })),
     { url: `${siteUrl}${ENERGY_FOOD_HUB_PATH}`, lastModified: energyFoodModified },
-    ...ENERGY_FOOD_SECTIONS.map(section => ({ url: `${siteUrl}${section.href}`, lastModified: energyFoodModified })),
+    // Each page carries its own facts' review date, as its header and Dataset JSON-LD do; the hub the newest.
+    ...ENERGY_FOOD_SECTIONS.map(section => ({ url: `${siteUrl}${section.href}`, lastModified: new Date(energyFoodLastReviewedAt(section.id, energyFoodFacts)) })),
     { url: `${siteUrl}/explorer/trade`, lastModified: tradeHubModified },
     { url: `${siteUrl}/explorer/trade/overview`, lastModified: tradeModified },
     { url: `${siteUrl}/explorer/trade/partners`, lastModified: tradePartnersModified },

@@ -147,8 +147,10 @@ const statedCoverage: { url: string; file: string; rows?: (row: CsvRow) => boole
   { url: "/explorer/external/current-account", file: "current-account-annual.csv" },
   { url: "/explorer/external/foreign-debt", file: "external-position-annual.csv", rows: (row) => row.indicator_id.startsWith("ext_debt.") },
   { url: "/explorer/external/reserves", file: "external-position-annual.csv", rows: (row) => row.indicator_id.startsWith("reserves.") },
-  { url: "/explorer/energy-food", file: "energy-food-annual.csv", rows: (row) => !row.indicator_id.startsWith("food.") },
+  { url: "/explorer/energy-food", file: "energy-food-annual.csv", rows: (row) => row.indicator_id.startsWith("energy.") || row.indicator_id.startsWith("electricity.") },
   { url: "/explorer/energy-food", file: "energy-food-annual.csv", rows: (row) => row.indicator_id.startsWith("food.") },
+  { url: "/explorer/energy-food", file: "energy-food-annual.csv", rows: (row) => row.indicator_id.startsWith("farming.") },
+  { url: "/explorer/energy-food/farming", file: "energy-food-annual.csv", rows: (row) => row.indicator_id.startsWith("farming.") },
   { url: "/explorer/demography/migration", file: "demography-migration-annual.csv" },
 ];
 
