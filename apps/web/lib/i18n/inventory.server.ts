@@ -35,6 +35,8 @@ import { BUSINESS_HUB_PATH, BUSINESS_SECTIONS } from "../explorer/business";
 import { BUSINESS_AREAS, businessAreaHref } from "../explorer/businessAreas";
 import { HOUSING_HUB_PATH, HOUSING_SECTIONS } from "../explorer/housing";
 import { HOUSING_AREAS, housingAreaHref } from "../explorer/housingAreas";
+import { INTERNET_HUB_PATH, INTERNET_SECTIONS } from "../explorer/internet";
+import { INTERNET_AREAS, internetAreaHref } from "../explorer/internetAreas";
 import { EDUCATION_HUB_PATH, EDUCATION_SECTIONS } from "../explorer/education";
 import { educationPlaceBase } from "../explorer/educationPlaces";
 
@@ -57,6 +59,7 @@ export async function listPublicPagePaths(): Promise<string[]> {
     "/explorer/money", ...MONEY_BANKS_SECTIONS.map(section => section.href),
     BUSINESS_HUB_PATH, ...BUSINESS_SECTIONS.map(section => section.href), ...BUSINESS_AREAS.map(businessAreaHref),
     HOUSING_HUB_PATH, ...HOUSING_SECTIONS.map(section => section.href), ...HOUSING_AREAS.map(housingAreaHref),
+    INTERNET_HUB_PATH, ...INTERNET_SECTIONS.map(section => section.href), ...INTERNET_AREAS.map(internetAreaHref),
     EDUCATION_HUB_PATH, ...EDUCATION_SECTIONS.map(section => section.href), ...(["schools", "kindergartens"] as const).flatMap(set => placePagePaths(educationPlaceBase(set), regions.map(({ id }) => id))),
     ...regions.map(region => unemploymentRegionHref(region.id)),
     "/explorer/economy/regions",
