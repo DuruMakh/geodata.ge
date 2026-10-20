@@ -77,12 +77,22 @@ const PACKAGE_MEMBERS = ["disability", "survivors", "war_participants", "politic
 const DISABILITY_PARTS = ["disability_children", "disability_severe", "disability_significant", "disability_moderate"];
 
 const isAverage = (indicatorId: string) => indicatorId.endsWith(".avg_monthly");
-const isMoney = (indicatorId: string) => /\.(amount|employment_amount)$/.test(indicatorId);
+export const isMoney = (indicatorId: string) => /\.(amount|employment_amount)$/.test(indicatorId);
 const isPayment = (indicatorId: string) => indicatorId.startsWith("social.payments.");
 
 export function socialUnit(indicatorId: SocialIndicator): SocialFact["unit"] {
   if (isMoney(indicatorId) || isAverage(indicatorId)) return "gel";
   return /\.(families|employment_families|registered_families)$/.test(indicatorId) ? "families" : "persons";
+}
+
+/**
+ * A stored value as the file writes it: whole units, or two decimals for an average. The database drops trailing zeros (`150.5`) and
+ * the mirror pads them back; a value with more decimals than its indicator allows is left as it is, so validation rejects it.
+ */
+export function socialValueText(indicatorId: string, value: string): string {
+  const places = isAverage(indicatorId) ? 2 : 0;
+  const decimal = new D(value);
+  return decimal.decimalPlaces() <= places ? decimal.toFixed(places) : decimal.toFixed();
 }
 
 /** An average in GEL: the year's money ÷ the sum of its monthly counts, rounded half-up to two decimals (50 significant digits before rounding). */

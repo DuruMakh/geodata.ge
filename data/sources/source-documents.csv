@@ -431,3 +431,27 @@ source.geostat_education_preschool_page,ადრეული და სკო�
 source.geostat_education_general_page,ზოგადი განათლება (წყაროს გვერდი),docs/Raw Data/Education/geostat-education-annual/official/geostat-category-59-2026-10-16.html,2026-10-16
 source.geostat_education_vocational_page,პროფესიული განათლება (წყაროს გვერდი),docs/Raw Data/Education/geostat-education-annual/official/geostat-category-60-2026-10-16.html,2026-10-16
 source.geostat_education_higher_page,უმაღლესი განათლება (წყაროს გვერდი),docs/Raw Data/Education/geostat-education-annual/official/geostat-category-61-2026-10-16.html,2026-10-16
+source.ssa_pension_01,SSA — Pension recipients and the amount payable to them,docs/Raw Data/Social/ssa-statistics/official/pages/ssa-page-pension.html,2026-10-20
+source.ssa_pension_02,SSA — Pension recipients with IDP status and the amount payable to them,docs/Raw Data/Social/ssa-statistics/official/pages/ssa-page-pension.html,2026-10-20
+source.ssa_pension_04,SSA — High-mountain state pension supplement: recipients and amount transferred,docs/Raw Data/Social/ssa-statistics/official/pages/ssa-page-pension.html,2026-10-20
+source.ssa_tsa_allowance_01,SSA — Families and persons receiving subsistence allowance,docs/Raw Data/Social/ssa-statistics/official/pages/ssa-page-tsa_allowance.html,2026-10-20
+source.ssa_tsa_allowance_02,SSA — Amount transferred as subsistence allowance,docs/Raw Data/Social/ssa-statistics/official/pages/ssa-page-tsa_allowance.html,2026-10-20
+source.ssa_tsa_db_01,SSA — Families registered in the database and families receiving subsistence allowance,docs/Raw Data/Social/ssa-statistics/official/pages/ssa-page-tsa_db.html,2026-10-20
+source.ssa_socpackage_01,SSA — Social package recipients by group,docs/Raw Data/Social/ssa-statistics/official/pages/ssa-page-socpackage.html,2026-10-20
+source.ssa_socpackage_02,SSA — Amount transferred to fund the social package by group,docs/Raw Data/Social/ssa-statistics/official/pages/ssa-page-socpackage.html,2026-10-20
+source.ssa_socpackage_10,SSA — High-mountain social package supplement: recipients and amount transferred,docs/Raw Data/Social/ssa-statistics/official/pages/ssa-page-socpackage.html,2026-10-20
+source.ssa_idp_refugee_02,SSA — Amount transferred as IDP and refugee allowance,docs/Raw Data/Social/ssa-statistics/official/pages/ssa-links-idp_refugee.json,2026-10-20
+source.ssa_compensation_04,SSA — Monthly amount transferred for compensation and stipends by agency,docs/Raw Data/Social/ssa-statistics/official/pages/ssa-page-compensation.html,2026-10-20
+source.ssa_maternity_01,"SSA statistics: Maternity, childcare and adoption cases by parent's age and amount transferred",docs/Raw Data/Social/ssa-statistics/official/pages/ssa-links-maternity.json,2026-10-20
+source.ssa_maternity_03,"SSA statistics: Amount transferred for maternity, childcare and adoption cases by month",docs/Raw Data/Social/ssa-statistics/official/pages/ssa-links-maternity.json,2026-10-20
+source.ssa_demography_02,SSA — Third and later children receiving the benefit by sex and amount transferred,docs/Raw Data/Social/ssa-statistics/official/pages/ssa-page-demography.html,2026-10-20
+source.ssa_demography_04,SSA — High-mountain children receiving the benefit by sex and amount transferred,docs/Raw Data/Social/ssa-statistics/official/pages/ssa-page-demography.html,2026-10-20
+source.ssa_utilitysubsidy_02,SSA — Amount transferred to utility subsidy recipients,docs/Raw Data/Social/ssa-statistics/official/pages/ssa-page-utilitysubsidy.html,2026-10-20
+source.ssa_other_01,SSA — Subscribers subsidised for the electricity tariff increase and amount transferred,docs/Raw Data/Social/ssa-statistics/official/pages/ssa-links-other.json,2026-10-20
+source.ssa_other_02,SSA — Electricity subsidy for parents of large families: beneficiaries and amount transferred,docs/Raw Data/Social/ssa-statistics/official/pages/ssa-links-other.json,2026-10-20
+source.ssa_other_03,SSA — Drinking water and sewerage subsidy: subscribers and amount transferred,docs/Raw Data/Social/ssa-statistics/official/pages/ssa-links-other.json,2026-10-20
+source.ssa_other_04,SSA — COVID-19 compensation for socially vulnerable and disabled people: beneficiaries and amount,docs/Raw Data/Social/ssa-statistics/official/pages/ssa-links-other.json,2026-10-20
+source.ssa_highmountain_01,SSA — High-mountain doctors and nurses receiving a salary supplement and amount transferred,docs/Raw Data/Social/ssa-statistics/official/pages/ssa-links-highmountain.json,2026-10-20
+source.ssa_highmountain_03,SSA — High-mountain residents receiving the electricity discount and amount transferred,docs/Raw Data/Social/ssa-statistics/official/pages/ssa-links-highmountain.json,2026-10-20
+source.ssa_workinjury_03,SSA — Amount transferred,docs/Raw Data/Social/ssa-statistics/official/pages/ssa-page-workinjury.html,2026-10-20
+source.ssa_statistics,SSA statistics list (source page),docs/Raw Data/Social/ssa-statistics/official/pages/ssa-page-statistiklist.html,2026-10-20

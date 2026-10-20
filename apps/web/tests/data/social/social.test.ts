@@ -3,9 +3,12 @@ import path from "node:path";
 import { parse } from "csv-parse/sync";
 import Decimal from "decimal.js";
 import { expect, test } from "vitest";
+import { assertSocialParity, loadSocialBreaks, loadSocialFacts, toClientSocialFact } from "../../../lib/data/social/importSocial";
+import { loadSocialFactsFromMirror, socialMirrorCreateRows } from "../../../lib/db/mirrorRows";
+import type { Prisma } from "../../../lib/generated/prisma/client";
 import { REVIEWED_AT, SOCIAL_CSV_HEADERS, loadSocialAverageInputs, prepareSocialData } from "../../../lib/data/social/prepareSocial";
 import {
-  SOCIAL_GEORGIA, SOCIAL_INDICATORS, SOCIAL_PAYMENT_PROGRAMMES, SOCIAL_PUBLIC_SOURCES, SOCIAL_SOURCES, socialFactKey, type SocialFact, type SocialIndicator,
+  SOCIAL_GEORGIA, SOCIAL_INDICATORS, SOCIAL_PAYMENT_PROGRAMMES, SOCIAL_PUBLIC_SOURCES, SOCIAL_SOURCES, socialFactKey, socialSourceDocumentId, type SocialFact, type SocialIndicator,
 } from "../../../lib/data/social/types";
 import { SOCIAL_KNOWN_DIFFERENCES, expectedSocialKeys, validateSocialFacts } from "../../../lib/data/social/validation";
 
@@ -161,4 +164,65 @@ test.each([
   validateSocialFacts(facts, inputs);
   mutate(facts);
   expect(() => validateSocialFacts(facts, inputs)).toThrow(error);
+});
+
+test("the loader reads the committed canonical file and its break register", async () => {
+  const facts = await loadSocialFacts();
+  expect(facts).toEqual(await loadFacts());
+  expect(facts).toHaveLength(13891);
+  const breaks = await loadSocialBreaks();
+  expect(breaks.map(b => b.breakId)).toEqual(["subsistence_employment_2022", "social_package_groups_2025"]);
+  expect(breaks[0].appliesTo).toEqual(["social.subsistence.families", "social.subsistence.persons"]);
+});
+
+test("parity accepts equal rows and the same decimal written differently, and rejects a changed value or a missing row", async () => {
+  const facts = await loadFacts();
+  expect(() => assertSocialParity(facts, facts.map(f => ({ ...f })))).not.toThrow();
+  const average = facts.findIndex(f => f.indicatorId === "social.pension.avg_monthly" && f.geographyId === SOCIAL_GEORGIA && f.year === 2025);
+  expect(facts[average].value).toBe("405.13");
+  const padded = facts.map(f => ({ ...f }));
+  padded[average].value = "405.130";
+  expect(() => assertSocialParity(facts, padded)).not.toThrow();
+  const changed = facts.map(f => ({ ...f }));
+  changed[average].value = "405.14";
+  expect(() => assertSocialParity(facts, changed)).toThrow();
+  expect(() => assertSocialParity(facts, facts.slice(1))).toThrow();
+});
+
+test("client facts give money in million GEL and leave averages and counts as they are", async () => {
+  const facts = await loadFacts();
+  expect(toClientSocialFact(find(facts, "social.pension.amount", SOCIAL_GEORGIA, 2025))).toEqual({
+    year: 2025, indicatorId: "social.pension.amount", geographyId: SOCIAL_GEORGIA, sourceId: "ssa_pension_01", months: 12, valueStatus: "calculated", value: 4262.30909,
+  });
+  expect(toClientSocialFact(find(facts, "social.pension.avg_monthly", SOCIAL_GEORGIA, 2025))).toMatchObject({ value: 405.13, valueStatus: "calculated" });
+  expect(toClientSocialFact(find(facts, "social.pension.recipients", SOCIAL_GEORGIA, 2025)).value).toBe(888518);
+  expect(toClientSocialFact(find(facts, "social.subsistence.employment_amount", SOCIAL_GEORGIA, 2025)).value).toBe(Number(find(facts, "social.subsistence.employment_amount", SOCIAL_GEORGIA, 2025).value) / 1e6);
+  expect(toClientSocialFact(find(facts, "social.payments.total.amount", SOCIAL_GEORGIA, 2025)).value).toBe(6166.123811);
+  expect(toClientSocialFact(find(facts, "social.subsistence.avg_monthly", SOCIAL_GEORGIA, 2025)).value).toBe(Number(find(facts, "social.subsistence.avg_monthly", SOCIAL_GEORGIA, 2025).value));
+});
+
+test("every converted money value is a clean million-GEL decimal, with no floating-point drift", async () => {
+  const facts = await loadFacts();
+  const money = facts.filter(f => /\.(amount|employment_amount)$/.test(f.indicatorId));
+  expect(money.length).toBeGreaterThan(0);
+  expect(money.every(f => toClientSocialFact(f).value === Number(new Decimal(f.value).div(1e6).toFixed()))).toBe(true);
+  expect(facts.filter(f => !/\.(amount|employment_amount)$/.test(f.indicatorId)).every(f => toClientSocialFact(f).value === Number(f.value))).toBe(true);
+});
+
+test("the database mirror round-trips exact decimals, months and source relations", async () => {
+  const facts = await loadFacts();
+  const rows = socialMirrorCreateRows(facts, "social-run-1").map(row => ({ ...row, value: new Decimal(row.value as string) }));
+  const db = (list: typeof rows) => ({ socialFact: { findMany: async () => list } }) as unknown as Pick<Prisma.TransactionClient, "socialFact">;
+  const mirror = await loadSocialFactsFromMirror(db(rows));
+  expect(() => assertSocialParity(facts, mirror)).not.toThrow();
+  expect(mirror.find(f => f.indicatorId === "social.payments.covid_vulnerable_compensation.amount" && f.year === 2020)!.months).toBe(6);
+  expect(rows[0].importRunId).toBe("social-run-1");
+  expect(rows.every(row => row.sourceDocumentId === `source.${row.sourceId}` && row.sourceDocumentId === socialSourceDocumentId(row.sourceId))).toBe(true);
+  await expect(loadSocialFactsFromMirror(db([{ ...rows[0], sourceDocumentId: "source.other" }]))).rejects.toThrow(/source relation/);
+});
+
+test("every cited source has a source-document row", async () => {
+  const csv = await fs.readFile(path.join(root, "data/sources/source-documents.csv"));
+  const ids = new Set((parse(csv, { columns: true, bom: true }) as Record<string, string>[]).map(r => r.source_id));
+  expect(SOCIAL_PUBLIC_SOURCES.filter(id => !ids.has(socialSourceDocumentId(id)))).toEqual([]);
 });

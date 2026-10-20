@@ -92,3 +92,6 @@ export type SocialSeriesBreak = BreakRow;
 export function socialFactKey(fact: Pick<SocialFact, "indicatorId" | "geographyId" | "year">): string {
   return `${fact.indicatorId}:${fact.geographyId}:${fact.year}`;
 }
+export function socialSourceDocumentId(sourceId: string): string {
+  return `source.${sourceId}`;
+}

@@ -94,6 +94,7 @@ model SourceDocument {
   businessFacts BusinessFact[]
   housingFacts HousingFact[]
   educationFacts EducationFact[]
+  socialFacts SocialFact[]
   householdIncomeSpendingFacts HouseholdIncomeSpendingFact[]
   moneyTransferFacts MoneyTransferFact[]
   foreignInvestmentFacts ForeignInvestmentFact[]
@@ -148,6 +149,7 @@ model ImportRun {
   businessFacts BusinessFact[]
   housingFacts HousingFact[]
   educationFacts EducationFact[]
+  socialFacts SocialFact[]
   householdIncomeSpendingFacts HouseholdIncomeSpendingFact[]
   moneyTransferEntities MoneyTransferEntity[]
   moneyTransferFacts MoneyTransferFact[]
@@ -1059,6 +1061,31 @@ model EducationFact {
   valueStatus      String
   shown            Boolean
   sourceId         String
+  sourceSheet      String
+  sourceCell       String
+  sourceDocumentId String
+  sourceDocument   SourceDocument @relation(fields: [sourceDocumentId], references: [id])
+  lastReviewedAt   DateTime       @db.Date
+  importRunId      String?
+  importRun        ImportRun?     @relation(fields: [importRunId], references: [id])
+
+  @@id([indicatorId, geographyId, year])
+}
+
+// Mirror of data/imports/social-protection-annual.csv: SSA's yearly pensions, subsistence allowance, social package and
+// social payments by place, exact stored decimals (GEL as summed, an average to two decimals). `months` is how many
+// monthly sheets the value covers: 1 for a December count, fewer than 12 for a partial year.
+model SocialFact {
+  year             Int
+  indicatorId      String
+  geographyId      String
+  value            Decimal        @db.Decimal(30, 20)
+  unit             String
+  months           Int
+  basis            String
+  valueStatus      String
+  sourceId         String
+  sourceWorkbook   String
   sourceSheet      String
   sourceCell       String
   sourceDocumentId String
