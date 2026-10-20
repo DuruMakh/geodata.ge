@@ -407,6 +407,17 @@ const TOPIC_DATASETS: Record<TopicDatasetId, { keywords: Record<Locale, readonly
     },
     sources: ["geostat"],
   },
+  "science-culture": {
+    keywords: {
+      ka: ["მეცნიერება", "კულტურა", "მკვლევარები", "პატენტები", "მუზეუმები", "თეატრები", "საქართველო"],
+      en: ["Georgia", "science", "culture", "researchers", "patents", "museums", "theatres"],
+    },
+    measurementTechnique: {
+      ka: "გადამოწმებული ამოღება საქსტატის მეცნიერებისა და კულტურის ოფიციალური გამოქვეყნებული სტატისტიკიდან.",
+      en: "Reviewed extraction from Geostat's official published science and culture statistics.",
+    },
+    sources: ["geostat"],
+  },
 };
 
 /** A dataset whose figures are official statistics Fiscal.ge reads from a named producer (`sourceAgenciesFor`). */
