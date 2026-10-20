@@ -1079,7 +1079,7 @@ model SocialFact {
   year             Int
   indicatorId      String
   geographyId      String
-  value            Decimal        @db.Decimal(30, 20)
+  value            Decimal        @db.Decimal(30, 12)
   unit             String
   months           Int
   basis            String

@@ -3,7 +3,7 @@ CREATE TABLE "SocialFact" (
     "year" INTEGER NOT NULL,
     "indicatorId" TEXT NOT NULL,
     "geographyId" TEXT NOT NULL,
-    "value" DECIMAL(30,20) NOT NULL,
+    "value" DECIMAL(30,12) NOT NULL,
     "unit" TEXT NOT NULL,
     "months" INTEGER NOT NULL,
     "basis" TEXT NOT NULL,
