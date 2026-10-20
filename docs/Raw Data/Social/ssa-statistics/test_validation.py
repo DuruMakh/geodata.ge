@@ -90,6 +90,24 @@ class ReadingRules(unittest.TestCase):
     def test_yearly_money_normalizes_sub_tetri_float_noise_before_rounding(self):
         self.assertEqual(prepare.whole(Decimal('1040360.49999999996')), '1040361')
 
+    def test_subsistence_age_bands_are_read_by_heading_and_an_unknown_band_stops_preparation(self):
+        bands = ['0_6', '6_18', '18_30', '30_40', '40_60', '60_65', '65_70', '70 და მეტი']
+        regular = 'საარსებო შემწეობის მიმღები / ასაკობრივი ჯგუფები / '
+        employment = 'საზოგადოებრივი დასაქმების ხელშეწყობის პროგრამა / ასაკობრივი ჯგუფები / '
+        labels = {column: regular + band for column, band in zip('BCDEFGHI', bands)}
+        labels.update({'J': regular + 'სულ', 'K': employment + '0_6', 'L': employment + 'სულ'})
+        shape = {'columns': list(labels), 'labels': labels}
+        self.assertEqual(prepare.tsa_age_columns(shape), dict(zip(prepare.TSA_AGE_BANDS.values(), 'BCDEFGHI')))
+        self.assertEqual(list(prepare.TSA_AGE_BANDS.values()),
+                         ['0_6', '6_18', '18_30', '30_40', '40_60', '60_65', '65_70', '70_plus'])
+        self.assertEqual(prepare.tsa_age('70_plus')(shape, 2025), ['I'])
+        changed = {**labels, 'C': regular + '6_15'}
+        with self.assertRaises(LookupError):
+            prepare.tsa_age_columns({'columns': list(changed), 'labels': changed})
+        missing = {column: label for column, label in labels.items() if column != 'D'}
+        with self.assertRaises(LookupError):
+            prepare.tsa_age_columns({'columns': list(missing), 'labels': missing})
+
     def test_missing_recipient_month_is_not_zero_and_average_uses_matching_months(self):
         fields = {'recipients': {(2020, 1, 'georgia'): Decimal(10)},
                   'amount_gel': {(2020, 1, 'georgia'): Decimal(100), (2020, 2, 'georgia'): Decimal(300)}}
@@ -208,6 +226,17 @@ class ServedValidationFailures(unittest.TestCase):
         self.assertEqual(self.failures(), [])
         self.served[-2]['value'] = '13'  # other
         self.assertTrue(self.failures())
+
+    def test_subsistence_age_bands_that_do_not_add_up_to_the_persons_fail(self):
+        bands = dict(zip(prepare.TSA_AGE_BANDS.values(), (1, 2, 3, 4, 5, 6, 7, 8)))
+        self.served.append(served_row('subsistence_allowance', 'persons', '06', 2025, 36))
+        self.served += [served_row('subsistence_allowance', f'age.{band}.persons', '06', 2025, value)
+                        for band, value in bands.items()]
+        self.assertEqual(self.failures(), [])
+        self.served[-1]['value'] = '9'  # 70_plus
+        self.assertIn('subsistence allowance 06 2025: age bands add up to 37, persons 36', self.failures())
+        del self.served[-1]
+        self.assertIn('subsistence allowance 06 2025: age bands add up to 28, persons 36', self.failures())
 
     def test_a_group_total_month_count_differing_from_the_package_total_fails(self):
         self.served += [served_row('social_package_group', 'group.total.count_months_sum', 'country.georgia', 2025, 120,
@@ -365,6 +394,35 @@ class ServedFile(unittest.TestCase):
                     and row['note'].startswith(('the printed total', 'the national total row has no value'))]
         self.assertEqual([(row['year'], row['month'], row['column'], row['difference']) for row in findings],
                          [('2021', '5', 'M', '1'), ('2022', '7', 'E', '')])
+
+    def test_subsistence_age_groups(self):
+        # tsa_allowance-03's eight bands of regular recipients, December of each year, for every place with persons.
+        values = served_values()
+        bands = list(prepare.TSA_AGE_BANDS.values())
+        persons = {key: row for key, row in values.items() if key[:2] == ('subsistence_allowance', 'persons')}
+        ages = {key: row for key, row in values.items() if key[0] == 'subsistence_allowance' and key[1].startswith('age.')}
+        self.assertEqual(len(ages), len(persons) * 8)
+        for (_, _, geography, year), row in persons.items():
+            with self.subTest(geography=geography, year=year):
+                parts = [values[('subsistence_allowance', f'age.{band}.persons', geography, year)] for band in bands]
+                self.assertEqual(sum(Decimal(part['value']) for part in parts), Decimal(row['value']))
+                self.assertTrue(all(part['source_table'] == 'tsa_allowance-03' and part['months'] == '1'
+                                    and part['source_sheet'].lower().startswith('dec') for part in parts))
+        georgia = {band: values[('subsistence_allowance', f'age.{band}.persons', 'country.georgia', 2025)] for band in bands}
+        self.assertEqual({band: row['value'] for band, row in georgia.items()},
+                         {'0_6': '47751', '6_18': '142684', '18_30': '42569', '30_40': '67960', '40_60': '82482',
+                          '60_65': '18292', '65_70': '19641', '70_plus': '41743'})
+        self.assertEqual((georgia['0_6']['source_workbook'], georgia['0_6']['source_cell'], georgia['0_6']['value_status']),
+                         ('ssa-tsa_allowance-03-2025.xlsx', 'B93', 'official'))
+
+    def test_subsistence_age_group_findings(self):
+        # Months where the bands differ from tsa_allowance-01's persons; no December, so nothing served is affected.
+        findings = [row for row in read('source-findings.csv') if row['table_id'] == 'tsa_allowance-03']
+        self.assertEqual([(row['year'], row['month'], row['printed_total'], row['sum_of_areas'], row['difference'])
+                          for row in findings],
+                         [('2014', '10', '', '0', ''), ('2023', '11', '38784', '38785', '-1'),
+                          ('2023', '11', '108268', '108269', '-1'), ('2023', '11', '439792', '439793', '-1')])
+        self.assertTrue(all(row['month'] != '12' for row in findings))
 
     def test_2019_money_follows_the_people_table_headings(self):
         # January–May 2019 money column J (746,479 GEL) is utility-subsidy recipients, as the people table prints it.

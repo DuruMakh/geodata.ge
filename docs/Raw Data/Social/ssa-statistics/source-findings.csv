@@ -749,3 +749,7 @@ utilitysubsidy-04,2022,9,C,ბ,60,0,60,
 compensation-04,2023,5,BY,,,,,heading is blank; taken as the grand total because it is the last column
 socpackage-01,2021,5,M,სულ,176572,176571,1,the printed total differs from the sum of the groups that partition it (sum_of_areas holds the sum of the groups)
 socpackage-01,2022,7,E,ზომიერად გამოხატული ხარისხის მქონე შშმ პირი,,,,the national total row has no value in this group column
+tsa_allowance-03,2014,10,B+C+D+E+F+G+H+I,ასაკობრივი ჯგუფები,,0,,"row ზემო აფხაზეთი: the age bands differ from the persons in tsa_allowance-01 (printed_total holds those persons, sum_of_areas the sum of the bands)"
+tsa_allowance-03,2023,11,B+C+D+E+F+G+H+I,ასაკობრივი ჯგუფები,38784,38785,-1,"row ისანი-სამგორის რაიონი: the age bands differ from the persons in tsa_allowance-01 (printed_total holds those persons, sum_of_areas the sum of the bands)"
+tsa_allowance-03,2023,11,B+C+D+E+F+G+H+I,ასაკობრივი ჯგუფები,108268,108269,-1,"row ქ. თბილისი: the age bands differ from the persons in tsa_allowance-01 (printed_total holds those persons, sum_of_areas the sum of the bands)"
+tsa_allowance-03,2023,11,B+C+D+E+F+G+H+I,ასაკობრივი ჯგუფები,439792,439793,-1,"row სულ: the age bands differ from the persons in tsa_allowance-01 (printed_total holds those persons, sum_of_areas the sum of the bands)"

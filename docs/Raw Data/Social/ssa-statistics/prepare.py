@@ -430,6 +430,36 @@ def tsa_emp(word):
     return choose
 
 
+# Subsistence allowance recipients by age group (tsa_allowance-03): the people in receiving families, by SSA's eight printed
+# bands, the same in every year 2012–2026. From December 2022 the employment-programme people have eight bands of their
+# own, which are not read, as tsa_allowance-01's persons leave them out. A band heading not listed here stops preparation.
+TSA_AGE_BANDS = {'0_6': '0_6', '6_18': '6_18', '18_30': '18_30', '30_40': '30_40', '40_60': '40_60', '60_65': '60_65',
+                 '65_70': '65_70', '70 და მეტი': '70_plus'}
+AGE_GROUPS = 'ასაკობრივი ჯგუფები / '
+
+
+def tsa_age_columns(shape):
+    """{band: column} of the regular recipients' age bands on one tsa_allowance-03 sheet."""
+    found = {}
+    for column in shape['columns']:
+        label = shape['labels'][column]
+        if EMPLOYMENT in label or AGE_GROUPS not in label:
+            continue
+        printed = label.rpartition(' / ')[2]
+        if printed == 'სულ':
+            continue
+        if printed not in TSA_AGE_BANDS or TSA_AGE_BANDS[printed] in found:
+            raise LookupError(f'age band heading {label!r} is not mapped once')
+        found[TSA_AGE_BANDS[printed]] = column
+    if set(found) != set(TSA_AGE_BANDS.values()):
+        raise LookupError(f'age bands {sorted(set(TSA_AGE_BANDS.values()) - set(found))} are missing')
+    return found
+
+
+def tsa_age(band):
+    return lambda shape, year: [tsa_age_columns(shape)[band]]
+
+
 def tsa_amount_main(shape, year):
     if not any(EMPLOYMENT in label for label in shape['labels'].values()):
         return last_column(r'თანხა|მიმღებ')(shape, year)
@@ -906,6 +936,9 @@ def served_annual(parsed, index, mapping, failures):
         regular, employment = (read('tsa_allowance-02', chooser, scope) for chooser in (tsa_amount_main, tsa_amount_emp))
         december('subsistence_allowance', 'recipients', 'tsa_allowance-01', families)
         december('subsistence_allowance', 'persons', 'tsa_allowance-01', persons)
+        for band in TSA_AGE_BANDS.values():
+            december('subsistence_allowance', f'age.{band}.persons', 'tsa_allowance-03',
+                     read('tsa_allowance-03', tsa_age(band), scope))
         december('subsistence_allowance', 'employment_families', 'tsa_allowance-01',
                  read('tsa_allowance-01', tsa_emp('ოჯახი'), scope))
         summed('subsistence_allowance', 'amount', 'tsa_allowance-02', combined(regular, employment))
@@ -1027,6 +1060,37 @@ def social_package_findings(parsed):
     return findings
 
 
+def subsistence_age_findings(parsed):
+    """Rows where tsa_allowance-03's age bands differ from tsa_allowance-01's persons in the same month (a source finding,
+    not a failure; validate_served fails a served December that differs). printed_total holds the persons and
+    sum_of_areas the bands' sum; a blank persons cell leaves both printed_total and difference blank."""
+    findings = []
+    for year, months in sorted(parsed.get('tsa_allowance-03', {}).items()):
+        if year not in SERVED_YEARS:
+            continue
+        persons_sheets = {month: shape for month, _, shape in parsed['tsa_allowance-01'].get(year, [])}
+        for month, _, shape in months:
+            try:
+                columns = tsa_age_columns(shape)
+                one = persons_sheets[month]
+                persons_column = tsa_persons(one, year)[0]
+            except (LookupError, KeyError, StopIteration):
+                continue  # reported by the served extraction
+            persons = {label: cells.get(persons_column) for _, label, cells in one['data']}
+            for _, label, cells in shape['data']:
+                bands = sum((cells.get(column, Decimal(0)) for column in columns.values()), Decimal(0))
+                printed = persons.get(label)
+                if printed == bands:
+                    continue
+                findings.append({'table_id': 'tsa_allowance-03', 'year': year, 'month': month or '',
+                                 'column': '+'.join(columns.values()), 'column_label': AGE_GROUPS.rstrip(' /'),
+                                 'printed_total': plain(printed) if printed is not None else '', 'sum_of_areas': plain(bands),
+                                 'difference': plain(printed - bands) if printed is not None else '',
+                                 'note': f'row {label}: the age bands differ from the persons in tsa_allowance-01 '
+                                         '(printed_total holds those persons, sum_of_areas the sum of the bands)'})
+    return findings
+
+
 COMPARED = ['amount_months', 'amount_gel', 'count_months', 'recipients', 'recipients_month', 'avg_monthly_gel',
             'persons', 'emp_families', 'amount_emp_gel', 'required_gel']
 
@@ -1122,6 +1186,17 @@ def validate_served(served, national_programmes, programme_areas):
                 and (key[2] == 'country.georgia' or key[0] in AREA_SERVED):
             failures.append(f'served {key}: not in the reviewed yearly figures')
 
+    # The age bands of the people in receiving families add up to those people, in every place and year served.
+    for (programme, measure, geography, year), row in values.items():
+        if (programme, measure) != ('subsistence_allowance', 'persons'):
+            continue
+        bands = sum(Decimal(values[key]['value']) for key in
+                    (('subsistence_allowance', f'age.{band}.persons', geography, year) for band in TSA_AGE_BANDS.values())
+                    if key in values)
+        if bands != Decimal(row['value']):
+            failures.append(f"subsistence allowance {geography} {year}: age bands add up to {plain(bands)}, "
+                            f"persons {row['value']}")
+
     for year in SERVED_YEARS:
         # The group total's month-count sum is the package's own, the divisor of its average.
         group_total = values.get(('social_package_group', 'group.total.count_months_sum', 'country.georgia', year))
@@ -1203,6 +1278,7 @@ def build(official, out, check=False):
                   'note': 'heading is blank; taken as the grand total because it is the last column'}
                  for table_id, year, month, column in HEADING_NOTES]
     findings += social_package_findings(parsed)
+    findings += subsistence_age_findings(parsed)
     failures = validate(index, manifest_rows, problems, failures, national_programmes, browser_check, reviewed_differences)
     failures += validate_served(served, national_programmes, programme_areas)
 
