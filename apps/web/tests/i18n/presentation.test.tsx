@@ -37,6 +37,9 @@ import { renderEnvironmentAreaPage, renderEnvironmentRegionIndex } from "../../l
 import { renderExternalHub } from "../../lib/pages/hubs/external";
 import { renderHealthHub } from "../../lib/pages/hubs/health";
 import { renderCrimeHub } from "../../lib/pages/hubs/crime";
+import { renderTransportHub } from "../../lib/pages/hubs/transport";
+import { renderTransportPage } from "../../lib/pages/transport";
+import { renderTransportAreaPage } from "../../lib/pages/transport-area";
 import { renderInflationHub } from "../../lib/pages/hubs/inflation";
 import { renderMoneyBanksHub } from "../../lib/pages/hubs/moneyBanks";
 import { renderTradeHub } from "../../lib/pages/hubs/trade";
@@ -118,6 +121,9 @@ const pages: PageRender[] = [
   ["causes of death", renderHealthDeathsIndex, 1],
   ["causes of death area", (locale) => renderHealthDeathsAreaPage(locale, "guria"), 1],
   ["crime hub", renderCrimeHub, 0],
+  ["transport hub", renderTransportHub, 0],
+  ["transport", (locale) => renderTransportPage(locale, "freight"), 1],
+  ["transport area", (locale) => renderTransportAreaPage(locale, "guria"), 1],
   ["crime", (locale) => renderCrimePage(locale, "road-accidents"), 1],
   ["trade hub", renderTradeHub, 0],
   ["trade overview", renderTradeOverviewPage, 1],

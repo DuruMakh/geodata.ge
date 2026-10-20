@@ -116,7 +116,8 @@ describe("indexable Fiscal.ge routes", () => {
     // Unemployment adds four Labour Force Survey detail pages (industries, hours, informal, young people): 4 bilingual pairs.
     // Farming adds one Energy and food page: 1 bilingual pair. GDP by expenditure adds its page and methodology page: 2 more.
     // Marriages and divorces adds one demography page: one bilingual pair.
-    expect(urls).toHaveLength(1156);
+    // Transport adds its hub, five pages, a page for Georgia and each of the 11 regions and its methodology page: 19 bilingual pairs.
+    expect(urls).toHaveLength(1194);
     expect(new Set(urls).size).toBe(urls.length);
     expect(urls.every((url) => url.startsWith("https://fiscal.ge/"))).toBe(true);
     expect(urls).toContain("https://fiscal.ge/about");
@@ -141,6 +142,8 @@ describe("indexable Fiscal.ge routes", () => {
     expect(urls).toContain("https://fiscal.ge/en/methodology/education");
     expect(urls).toContain("https://fiscal.ge/methodology/science-culture");
     expect(urls).toContain("https://fiscal.ge/en/methodology/science-culture");
+    expect(urls).toContain("https://fiscal.ge/methodology/transport");
+    expect(urls).toContain("https://fiscal.ge/en/methodology/transport");
     expect(urls).toContain("https://fiscal.ge/explorer/wages/regions/adjara");
     for (const page of ["", "/income", "/spending", "/poverty", "/inequality"]) {
       expect(urls).toContain(`https://fiscal.ge/explorer/living-standards${page}`);
@@ -180,6 +183,11 @@ describe("indexable Fiscal.ge routes", () => {
       expect(urls).toContain(`https://fiscal.ge/en/explorer/housing${page}`);
     }
     expect(urls.filter((url) => url.includes("/explorer/housing"))).toHaveLength(34);
+    for (const page of ["", "/vehicles", "/vehicle-age", "/passengers", "/freight", "/regions", ...businessAreas.map(area => `/regions/${area}`)]) {
+      expect(urls).toContain(`https://fiscal.ge/explorer/transport${page}`);
+      expect(urls).toContain(`https://fiscal.ge/en/explorer/transport${page}`);
+    }
+    expect(urls.filter((url) => url.includes("/explorer/transport"))).toHaveLength(36);
     const educationRegions = ["tbilisi", "adjara", "guria", "imereti", "kakheti", "mtskheta_mtianeti", "racha_lechkhumi_kvemo_svaneti", "samegrelo_zemo_svaneti", "samtskhe_javakheti", "kvemo_kartli", "shida_kartli"];
     for (const page of ["", "/universities", "/vocational", ...["schools", "kindergartens"].flatMap(set => [`/${set}`, `/${set}/georgia`, ...educationRegions.map(region => `/${set}/region/${region}`), `/${set}/batumi`, `/${set}/ozurgeti`])]) {
       expect(urls).toContain(`https://fiscal.ge/explorer/education${page}`);
@@ -241,6 +249,7 @@ describe("indexable Fiscal.ge routes", () => {
       "/methodology/external-flows",
       "/methodology/energy-food",
       "/methodology/environment",
+      "/methodology/transport",
       "/methodology/demography",
     ]);
   }, 90_000);

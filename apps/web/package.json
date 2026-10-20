@@ -150,6 +150,8 @@
     "data:check-gdp-expenditure": "tsx scripts/prepare-gdp-expenditure.ts --check",
     "data:prepare-housing": "tsx scripts/prepare-housing.ts --write",
     "data:check-housing": "tsx scripts/prepare-housing.ts --check",
+    "data:prepare-transport": "tsx scripts/prepare-transport.ts --write",
+    "data:check-transport": "tsx scripts/prepare-transport.ts --check",
     "data:prepare-education": "tsx scripts/prepare-education.ts --write",
     "data:check-education": "tsx scripts/prepare-education.ts --check",
     "data:prepare-environment": "tsx scripts/prepare-environment.ts --write",
@@ -187,8 +189,8 @@
     "zod": "^4.6.5"
   },
   "devDependencies": {
-    "@modelcontextprotocol/client": "2.2.0",
-    "@modelcontextprotocol/sdk": "1.31.0",
+    "@modelcontextprotocol/client": "2.3.1",
+    "@modelcontextprotocol/sdk": "1.32.1",
     "@playwright/test": "^1.63.0",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^24.19.0",

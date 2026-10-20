@@ -126,6 +126,7 @@ describe("methodology footer attribution", () => {
     ["household-income", "Geostat"],
     ["business", "Geostat"],
     ["housing", "Geostat"],
+    ["transport", "Geostat"],
     ["health", "Geostat"],
     ["crime", "Geostat"],
     ["environment", "Geostat"],
@@ -238,6 +239,25 @@ describe("science and culture methodology", () => {
     expect(markup).toContain("/downloads/methodology/science-culture/files/mkvlevarebi.xlsx");
     expect(markup).toContain("/downloads/methodology/science-culture/files/geostat-category-615-2026-10-20.html.txt");
     expect(markup).not.toContain("geostat.ge/media");
+  });
+});
+
+describe("transport methodology", () => {
+  it.each([
+    ["ka", "ტრანსპორტი", ["შსს-ის", "2008 წლიდან", "კუმულაციური", "ერთი მგზავრის ერთი კილომეტრით", "არ უნდა შეიკრიბოს", "ტრანზიტი", "აფხაზეთის", "საავტომობილო გზების დეპარტამენტის", "მგზავრთა გადაყვანის საქმიანობის საწარმოებს", "უმნიშვნელო სიდიდე"]],
+    ["en", "Transport", ["Ministry of Internal Affairs", "end of each year", "agricultural machinery from 2008", "cumulative", "one passenger carried one kilometre", "should not be added together", "Transit is goods carried across Georgia", "Abkhazia", "Roads Department of Georgia manages", "state no causes", "Table covers enterprises of passenger transport activities in Georgia.", "Table covers data on enterprises of transport activities in Georgia.", "Negligible magnitude"]],
+  ] as const)("renders the %s article with its 25 archived originals, the spec's notes and Dataset markup", async (locale, title, statements) => {
+    const { renderMethodologyArticle } = await import("../../lib/pages/methodology-article");
+    const markup = renderToStaticMarkup(await renderMethodologyArticle(locale, { params: Promise.resolve({ dataset: "transport" }) }));
+    expect(markup).toContain(title);
+    expect(markup).toContain("2000–2025");
+    expect(markup).toContain('"@type":"Dataset"');
+    for (const statement of statements) expect(markup).toContain(statement);
+    // Geostat's railway, air and sea metadata are linked, not archived.
+    for (const pdf of ["79116/0527_200526_EN.PDF", "79115/0526_200526_EN.PDF", "79117/0532_200526_EN.PDF"]) expect(markup).toContain(`https://www.geostat.ge/media/${pdf}`);
+    for (const file of ["h-1-passenger-transport-demand_eng.xlsx", "number-of-registered-vehicles.xlsx", "length-of-road-eng-2024.xls", "geostat-category-565-2026-10-20.html.txt"]) {
+      expect(markup).toContain(`/downloads/methodology/transport/files/${file}`);
+    }
   });
 });
 

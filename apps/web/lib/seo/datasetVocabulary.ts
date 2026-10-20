@@ -440,6 +440,17 @@ const TOPIC_DATASETS: Record<TopicDatasetId, { keywords: Record<Locale, readonly
     },
     sources: ["geostat"],
   },
+  transport: {
+    keywords: {
+      ka: ["ტრანსპორტი", "ავტოპარკი", "ავტომობილები", "მგზავრთბრუნვა", "ტვირთბრუნვა", "რკინიგზა", "საქართველო"],
+      en: ["Georgia", "transport", "vehicles", "cars", "passenger-km", "tonne-km", "railway", "registered vehicles"],
+    },
+    measurementTechnique: {
+      ka: "გადამოწმებული ამოღება საქსტატის ტრანსპორტისა და გარემოს მდგომარეობის ინდიკატორების ოფიციალური გამოქვეყნებული ცხრილებიდან.",
+      en: "Reviewed extraction from Geostat's official published transport and environmental indicator tables.",
+    },
+    sources: ["geostat"],
+  },
 };
 
 /** A dataset whose figures are official statistics Fiscal.ge reads from a named producer (`sourceAgenciesFor`). */
