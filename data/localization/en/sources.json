@@ -1085,21 +1085,21 @@
   },
   "source.geostat_lfs_jobs_industry": {
     "name": {
-      "text": "Employed persons by economic activity",
+      "text": "Employed persons by economic activity (NACE rev. 2)",
       "reviewedAt": "2026-10-20"
     },
     "derivation": null
   },
   "source.geostat_lfs_hours_sex": {
     "name": {
-      "text": "Average weekly hours of work by economic activity and sex",
+      "text": "Average usual weekly hours of work in the main job, by economic activity and sex",
       "reviewedAt": "2026-10-20"
     },
     "derivation": null
   },
   "source.geostat_lfs_hours_settlement": {
     "name": {
-      "text": "Average weekly hours of work by economic activity and urban or rural area",
+      "text": "Average usual weekly hours of work in the main job, by economic activity and urban or rural area",
       "reviewedAt": "2026-10-20"
     },
     "derivation": null
@@ -1120,49 +1120,49 @@
   },
   "source.geostat_lfs_neet": {
     "name": {
-      "text": "Youth not in employment, education or training (NEET)",
+      "text": "Young people not in employment, education or training (NEET)",
       "reviewedAt": "2026-10-20"
     },
     "derivation": null
   },
   "source.geostat_lfs_jobs_industry_ka": {
     "name": {
-      "text": "Employed persons by economic activity, Georgian",
+      "text": "Employed persons by economic activity (NACE rev. 2) (Georgian version)",
       "reviewedAt": "2026-10-20"
     },
     "derivation": null
   },
   "source.geostat_lfs_hours_sex_ka": {
     "name": {
-      "text": "Average weekly hours of work by economic activity and sex, Georgian",
+      "text": "Average usual weekly hours of work in the main job, by economic activity and sex (Georgian version)",
       "reviewedAt": "2026-10-20"
     },
     "derivation": null
   },
   "source.geostat_lfs_hours_settlement_ka": {
     "name": {
-      "text": "Average weekly hours of work by economic activity and urban or rural area, Georgian",
+      "text": "Average usual weekly hours of work in the main job, by economic activity and urban or rural area (Georgian version)",
       "reviewedAt": "2026-10-20"
     },
     "derivation": null
   },
   "source.geostat_lfs_informal_ka": {
     "name": {
-      "text": "Share of informal employment in non-agricultural employment, Georgian",
+      "text": "Share of informal employment in non-agricultural employment (Georgian version)",
       "reviewedAt": "2026-10-20"
     },
     "derivation": null
   },
   "source.geostat_lfs_underuse_ka": {
     "name": {
-      "text": "Indicators of labour underutilization, Georgian",
+      "text": "Indicators of labour underutilization (Georgian version)",
       "reviewedAt": "2026-10-20"
     },
     "derivation": null
   },
   "source.geostat_lfs_neet_ka": {
     "name": {
-      "text": "Youth not in employment, education or training (NEET), Georgian",
+      "text": "Young people not in employment, education or training (NEET) (Georgian version)",
       "reviewedAt": "2026-10-20"
     },
     "derivation": null
