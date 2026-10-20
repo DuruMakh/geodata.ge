@@ -4,10 +4,13 @@ import { parse } from "csv-parse/sync";
 import Decimal from "decimal.js";
 import { expect, test } from "vitest";
 import { BUSINESS_REGIONS } from "../../../lib/data/business/types";
+import { assertScienceCultureParity, loadScienceCultureBreaks, loadScienceCultureFacts, toClientScienceCultureFact } from "../../../lib/data/scienceCulture/importScienceCulture";
+import { scienceCultureMirrorCreateRows, loadScienceCultureFactsFromMirror } from "../../../lib/db/mirrorRows";
+import type { Prisma } from "../../../lib/generated/prisma/client";
 import { REVIEWED_AT, SCIENCE_CULTURE_CSV_HEADERS, prepareScienceCultureData } from "../../../lib/data/scienceCulture/prepareScienceCulture";
 import {
   SCIENCE_CULTURE_GROUPS, SCIENCE_CULTURE_INDICATORS, SCIENCE_CULTURE_MEASURES, SCIENCE_CULTURE_PUBLIC_SOURCES, SCIENCE_CULTURE_REGIONS,
-  SCIENCE_CULTURE_SOURCES, scienceCultureIndicator, type ScienceCultureFact, type ScienceCultureIndicator,
+  SCIENCE_CULTURE_SOURCES, scienceCultureIndicator, scienceCultureSourceDocumentId, type ScienceCultureFact, type ScienceCultureIndicator,
 } from "../../../lib/data/scienceCulture/types";
 import { expectedScienceCultureKeys, scienceCultureDisplayDecimals, validateScienceCultureFacts } from "../../../lib/data/scienceCulture/validation";
 
@@ -141,4 +144,62 @@ test.each([
   validateScienceCultureFacts(facts);
   mutate(facts);
   expect(() => validateScienceCultureFacts(facts)).toThrow(error);
+});
+
+test("loading returns the reviewed canonical rows and the series-break register", async () => {
+  const facts = await loadScienceCultureFacts();
+  expect(facts).toHaveLength(1733);
+  expect(facts).toEqual(await loadFacts());
+  const breaks = await loadScienceCultureBreaks();
+  expect(breaks).toHaveLength(1);
+  expect(breaks[0]).toMatchObject({ breakId: "theatre_audience_2021", appliesTo: ["science_culture.theatre_audience.total"], referenceDate: "2021-01-01" });
+});
+
+test("parity accepts equal decimals written differently and rejects a changed or missing value", async () => {
+  const facts = await loadFacts();
+  const at = facts.findIndex(f => f.indicatorId === "science_culture.museums.total" && f.year === 2025);
+  expect(facts[at].value).toBe("261");
+  expect(() => assertScienceCultureParity(facts, facts.map(f => ({ ...f })))).not.toThrow();
+  const padded = facts.map(f => ({ ...f }));
+  padded[at].value = "261.0";
+  padded[at].publishedValue = "261.0";
+  expect(() => assertScienceCultureParity(facts, padded)).not.toThrow();
+  const trimmed = facts.map(f => ({ ...f }));
+  find(trimmed, "science_culture.rd_spending.total", 2022).publishedValue = "171";
+  expect(() => assertScienceCultureParity(facts, trimmed)).not.toThrow();
+  const changed = facts.map(f => ({ ...f }));
+  changed[at].value = "262";
+  changed[at].publishedValue = "262";
+  expect(() => assertScienceCultureParity(facts, changed)).toThrow();
+  expect(() => assertScienceCultureParity(facts, facts.slice(1))).toThrow();
+});
+
+test("client facts carry the published number, a unit family and the display precision", async () => {
+  const facts = await loadFacts();
+  expect(toClientScienceCultureFact(find(facts, "science_culture.museum_visitors.total", 2025))).toEqual({
+    year: 2025, indicatorId: "science_culture.museum_visitors.total", sourceId: "geostat_culture_museums_regions", value: 1998.924, unit: "thousand", decimals: 1,
+  });
+  expect(toClientScienceCultureFact(find(facts, "science_culture.rd_spending.total", 2024))).toMatchObject({ value: 242.9, unit: "gel", decimals: 1 });
+  expect(toClientScienceCultureFact(find(facts, "science_culture.researchers.total", 2024))).toMatchObject({ value: 14046, unit: "persons", decimals: 0 });
+  expect(toClientScienceCultureFact(find(facts, "science_culture.museums.total", 2025))).toMatchObject({ value: 261, unit: "count", decimals: 0 });
+  expect(toClientScienceCultureFact(find(facts, "science_culture.theatre_seats.total", 2025))).toMatchObject({ unit: "thousand", decimals: 1 });
+  expect(toClientScienceCultureFact(find(facts, "science_culture.theatre_audience.total", 2025))).toMatchObject({ value: 620.322, unit: "thousand" });
+});
+
+test("the database mirror round-trips exact decimals and source relations", async () => {
+  const facts = await loadFacts();
+  const rows = scienceCultureMirrorCreateRows(facts, "science-culture-run-1").map(row => ({ ...row, value: new Decimal(row.value as string), publishedValue: new Decimal(row.publishedValue as string) }));
+  const db = (list: typeof rows) => ({ scienceCultureFact: { findMany: async () => list } }) as unknown as Pick<Prisma.TransactionClient, "scienceCultureFact">;
+  const mirror = await loadScienceCultureFactsFromMirror(db(rows));
+  expect(() => assertScienceCultureParity(facts, mirror)).not.toThrow();
+  expect(mirror).toEqual(facts);
+  expect(rows[0].importRunId).toBe("science-culture-run-1");
+  expect(rows.every(row => row.sourceDocumentId === `source.${row.sourceId}`)).toBe(true);
+  await expect(loadScienceCultureFactsFromMirror(db([{ ...rows[0], sourceDocumentId: "source.other" }]))).rejects.toThrow(/source relation/);
+});
+
+test("every archived source has a source-document row", async () => {
+  const csv = await fs.readFile(path.join(root, "data/sources/source-documents.csv"));
+  const ids = new Set((parse(csv, { columns: true, bom: true }) as Record<string, string>[]).map(r => r.source_id));
+  expect(SCIENCE_CULTURE_PUBLIC_SOURCES.filter(id => !ids.has(scienceCultureSourceDocumentId(id)))).toEqual([]);
 });

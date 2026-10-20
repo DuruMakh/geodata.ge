@@ -99,3 +99,6 @@ export type ScienceCultureAcceptance = {
 export function scienceCultureFactKey(fact: Pick<ScienceCultureFact, "indicatorId" | "year">): string {
   return `${fact.indicatorId}:${fact.year}`;
 }
+export function scienceCultureSourceDocumentId(sourceId: string): string {
+  return `source.${sourceId}`;
+}
