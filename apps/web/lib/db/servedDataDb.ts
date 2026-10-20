@@ -29,12 +29,14 @@ import {
   loadEnergyFoodFactsFromMirror,
   loadHealthFactsFromMirror,
   loadCrimeFactsFromMirror,
+  loadLabourFactsFromMirror,
   loadMoneyBanksFactsFromMirror,
   loadExternalPositionFactsFromMirror,
   loadBusinessFactsFromMirror,
   loadHousingFactsFromMirror,
   loadInternetFactsFromMirror,
   loadEducationFactsFromMirror,
+  loadScienceCultureFactsFromMirror,
   loadHouseholdFactsFromMirror,
   loadTradePartnersDataFromMirror,
   loadMoneyTransfersDataFromMirror,
@@ -162,6 +164,10 @@ export async function loadCrimeFactsFromDb() {
   return loadCrimeFactsFromMirror(prisma);
 }
 
+export async function loadLabourFactsFromDb() {
+  return loadLabourFactsFromMirror(prisma);
+}
+
 export async function loadMoneyBanksFactsFromDb() {
   return loadMoneyBanksFactsFromMirror(prisma);
 }
@@ -188,6 +194,10 @@ export async function loadInternetFactsFromDb() {
 
 export async function loadEducationFactsFromDb() {
   return loadEducationFactsFromMirror(prisma);
+}
+
+export async function loadScienceCultureFactsFromDb() {
+  return loadScienceCultureFactsFromMirror(prisma);
 }
 
 export async function loadTradePartnersDataFromDb() {

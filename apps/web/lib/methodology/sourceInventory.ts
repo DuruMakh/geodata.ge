@@ -52,7 +52,11 @@ const inventoryRules = {
   debt: [
     { root: "docs/Raw Data/Debt/government-debt-annual/official", include: () => true },
   ],
-  unemployment: [{ root: "docs/Raw Data/Unemployment/geostat-labour-force-annual/official", include: () => true }],
+  // The annual labour-force originals, then the detail package: six English workbooks, their Georgian versions and both page captures; served and archived-only alike.
+  unemployment: [
+    { root: "docs/Raw Data/Unemployment/geostat-labour-force-annual/official", include: () => true },
+    { root: "docs/Raw Data/Unemployment/geostat-labour-force-detail/official", include: () => true },
+  ],
   wages: [{ root: "docs/Raw Data/Wages/geostat-earnings-annual/official", include: () => true }],
   poverty: [{ root: "docs/Raw Data/Poverty/geostat-poverty-annual/official", include: () => true }],
   // official/ka/ holds Georgian copies of the served workbooks, kept only for their labels.
@@ -62,6 +66,8 @@ const inventoryRules = {
   health: [{ root: "docs/Raw Data/Health/geostat-health-annual/official", include: () => true }],
   // The six served workbooks, the 35 archived-only ones and the four category page captures.
   education: [{ root: "docs/Raw Data/Education/geostat-education-annual/official", include: () => true }],
+  // The English workbooks, their Georgian versions (official/ka/, kept for the Georgian labels) and both page captures; served and archived-only alike.
+  "science-culture": [{ root: "docs/Raw Data/ScienceCulture/geostat-science-culture-annual/official", include: () => true }],
   // The English workbooks, their Georgian versions (kept for the Georgian labels) and both page captures; served and archived-only alike.
   crime: [{ root: "docs/Raw Data/Crime/geostat-crime-annual/official", include: () => true }],
   // The 17 English tables, their Georgian editions (official/ka/) and both page captures; served and archived-only alike.

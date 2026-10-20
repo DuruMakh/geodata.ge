@@ -40,6 +40,7 @@ import { energyFoodSourceDocumentId, type EnergyFoodFact } from "../data/energyF
 import { healthSourceDocumentId, type HealthFact } from "../data/health/types";
 import { healthDisplayDecimals } from "../data/health/validation";
 import { crimeSourceDocumentId, type CrimeFact } from "../data/crime/types";
+import { labourSourceDocumentId, type LabourFact } from "../data/labour/types";
 import { moneyBanksSourceDocumentId, type MoneyBanksFact } from "../data/moneyBanks/types";
 import { moneyBanksDisplayDecimals } from "../data/moneyBanks/validation";
 import { externalPositionSourceDocumentId, type ExternalPositionFact } from "../data/externalPosition/types";
@@ -50,6 +51,8 @@ import { internetSourceDocumentId, type InternetFact } from "../data/internet/ty
 import { businessDisplayDecimals } from "../data/business/validation";
 import { educationSourceDocumentId, type EducationFact } from "../data/education/types";
 import { educationDisplayDecimals } from "../data/education/validation";
+import { scienceCultureSourceDocumentId, type ScienceCultureFact } from "../data/scienceCulture/types";
+import { scienceCultureDisplayDecimals } from "../data/scienceCulture/validation";
 import { householdSourceDocumentId, type HouseholdFact } from "../data/household/types";
 import type { DemographyObservation, Sex, Settlement } from "../data/demography/types";
 
@@ -842,6 +845,24 @@ export async function loadCrimeFactsFromMirror(db: Pick<MirrorClient, "crimeFact
   });
 }
 
+export function labourMirrorCreateRows(facts: readonly LabourFact[], importRunId: string): Prisma.LabourFactCreateManyInput[] {
+  return facts.map(({ lastReviewedAt, ...fact }) => ({
+    ...fact, sourceDocumentId: labourSourceDocumentId(fact.sourceId), lastReviewedAt: new Date(`${lastReviewedAt}T00:00:00.000Z`), importRunId,
+  }));
+}
+
+export async function loadLabourFactsFromMirror(db: Pick<MirrorClient, "labourFact">): Promise<LabourFact[]> {
+  const rows = await db.labourFact.findMany({ orderBy: [{ indicatorId: "asc" }, { year: "asc" }] });
+  return rows.map(row => {
+    if (row.sourceDocumentId !== labourSourceDocumentId(row.sourceId)) throw new Error("Labour source relation mismatch");
+    return {
+      year: row.year, indicatorId: row.indicatorId as LabourFact["indicatorId"], value: row.value.toFixed(), publishedValue: row.publishedValue.toFixed(),
+      unit: row.unit as LabourFact["unit"], basis: row.basis as "actual", valueStatus: row.valueStatus as "survey_estimate",
+      sourceId: row.sourceId, sourceSheet: row.sourceSheet, sourceCell: row.sourceCell, lastReviewedAt: isoDate(row.lastReviewedAt),
+    };
+  });
+}
+
 export function housingMirrorCreateRows(facts: readonly HousingFact[], importRunId: string): Prisma.HousingFactCreateManyInput[] {
   return facts.map(({ lastReviewedAt, ...fact }) => ({
     ...fact, sourceDocumentId: housingSourceDocumentId(fact.sourceId), lastReviewedAt: new Date(`${lastReviewedAt}T00:00:00.000Z`), importRunId,
@@ -892,6 +913,24 @@ export async function loadEducationFactsFromMirror(db: Pick<MirrorClient, "educa
       year: row.year, periodLabel: row.periodLabel, indicatorId: row.indicatorId as EducationFact["indicatorId"], geographyId: row.geographyId,
       value: row.value.toFixed(), publishedValue: row.publishedValue.toFixed(educationDisplayDecimals(row.indicatorId)), unit: row.unit as EducationFact["unit"], basis: row.basis as "actual", valueStatus: row.valueStatus as "official",
       shown: row.shown, sourceId: row.sourceId, sourceSheet: row.sourceSheet, sourceCell: row.sourceCell, lastReviewedAt: isoDate(row.lastReviewedAt),
+    };
+  });
+}
+
+export function scienceCultureMirrorCreateRows(facts: readonly ScienceCultureFact[], importRunId: string): Prisma.ScienceCultureFactCreateManyInput[] {
+  return facts.map(({ lastReviewedAt, ...fact }) => ({
+    ...fact, sourceDocumentId: scienceCultureSourceDocumentId(fact.sourceId), lastReviewedAt: new Date(`${lastReviewedAt}T00:00:00.000Z`), importRunId,
+  }));
+}
+
+export async function loadScienceCultureFactsFromMirror(db: Pick<MirrorClient, "scienceCultureFact">): Promise<ScienceCultureFact[]> {
+  const rows = await db.scienceCultureFact.findMany({ orderBy: [{ indicatorId: "asc" }, { year: "asc" }] });
+  return rows.map(row => {
+    if (row.sourceDocumentId !== scienceCultureSourceDocumentId(row.sourceId)) throw new Error("Science and culture source relation mismatch");
+    return {
+      year: row.year, indicatorId: row.indicatorId as ScienceCultureFact["indicatorId"],
+      value: row.value.toFixed(), publishedValue: row.publishedValue.toFixed(Math.max(scienceCultureDisplayDecimals(row.indicatorId), row.value.decimalPlaces())), unit: row.unit as ScienceCultureFact["unit"], basis: row.basis as "actual", valueStatus: row.valueStatus as "official",
+      sourceId: row.sourceId, sourceSheet: row.sourceSheet, sourceCell: row.sourceCell, lastReviewedAt: isoDate(row.lastReviewedAt),
     };
   });
 }

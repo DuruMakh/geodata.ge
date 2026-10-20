@@ -41,11 +41,13 @@ data/reports/*.json
 !data/reports/energy-food-validation.json
 !data/reports/health-validation.json
 !data/reports/crime-validation.json
+!data/reports/labour-validation.json
 !data/reports/money-banks-validation.json
 !data/reports/business-validation.json
 !data/reports/housing-validation.json
 !data/reports/internet-validation.json
 !data/reports/education-validation.json
+!data/reports/science-culture-validation.json
 !data/reports/household-income-spending-validation.json
 data/reports/*.txt
 

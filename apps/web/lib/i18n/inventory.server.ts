@@ -20,6 +20,7 @@ import moneyTransferRegistry from "../../../../data/taxonomy/money-transfer-coun
 import foreignInvestmentRegistry from "../../../../data/taxonomy/foreign-investment.json";
 import { readTradeProductCatalogue } from "../data/tradeProducts/catalogue";
 import { UNEMPLOYMENT_SECTIONS } from "../explorer/unemploymentSections";
+import { LABOUR_SECTIONS } from "../explorer/labour";
 import { unemploymentRegionHref } from "../explorer/unemploymentRegionRoutes";
 import { WAGES_SECTIONS, wagesRegionHref } from "../explorer/wages";
 import { WAGES_REGIONS } from "../data/wages/types";
@@ -39,6 +40,8 @@ import { INTERNET_HUB_PATH, INTERNET_SECTIONS } from "../explorer/internet";
 import { INTERNET_AREAS, internetAreaHref } from "../explorer/internetAreas";
 import { EDUCATION_HUB_PATH, EDUCATION_SECTIONS } from "../explorer/education";
 import { educationPlaceBase } from "../explorer/educationPlaces";
+import { SCIENCE_CULTURE_HUB_PATH, SCIENCE_CULTURE_SECTIONS } from "../explorer/scienceCulture";
+import { MUSEUM_AREAS, museumAreaHref } from "../explorer/scienceCultureMuseums";
 
 const sortedUnique = (ids: readonly string[]): string[] => [...new Set(ids)].sort();
 
@@ -49,7 +52,7 @@ export async function listPublicPagePaths(): Promise<string[]> {
     "/explorer/economy/sectors",
     "/explorer/unemployment",
     "/explorer/trade", "/explorer/trade/overview", "/explorer/trade/partners", "/explorer/trade/products", "/explorer/trade/domestic-exports", "/explorer/trade/services", "/explorer/trade/composition", "/explorer/external", "/explorer/external/money-from-abroad", "/explorer/external/foreign-investment", "/explorer/external/current-account", ...EXTERNAL_POSITION_SECTIONS.map(section => section.href),
-    ...UNEMPLOYMENT_SECTIONS.map(section => section.href),
+    ...UNEMPLOYMENT_SECTIONS.map(section => section.href), ...LABOUR_SECTIONS.map(section => section.href),
     "/explorer/wages", ...WAGES_SECTIONS.map(section => section.href), ...WAGES_REGIONS.map(wagesRegionHref),
     LIVING_STANDARDS_HUB_PATH, ...LIVING_STANDARDS_SECTIONS.map(section => section.href),
     ...HOUSEHOLD_SECTIONS.flatMap(section => HOUSEHOLD_PAGE_AREAS.map(id => householdRegionHref(section.id, id))),
@@ -61,6 +64,7 @@ export async function listPublicPagePaths(): Promise<string[]> {
     HOUSING_HUB_PATH, ...HOUSING_SECTIONS.map(section => section.href), ...HOUSING_AREAS.map(housingAreaHref),
     INTERNET_HUB_PATH, ...INTERNET_SECTIONS.map(section => section.href), ...INTERNET_AREAS.map(internetAreaHref),
     EDUCATION_HUB_PATH, ...EDUCATION_SECTIONS.map(section => section.href), ...(["schools", "kindergartens"] as const).flatMap(set => placePagePaths(educationPlaceBase(set), regions.map(({ id }) => id))),
+    SCIENCE_CULTURE_HUB_PATH, ...SCIENCE_CULTURE_SECTIONS.map(section => section.href), ...MUSEUM_AREAS.map(museumAreaHref),
     ...regions.map(region => unemploymentRegionHref(region.id)),
     "/explorer/economy/regions",
     ...regions.map(({ id }) => `/explorer/economy/regions/${id.replace(/^region\./, "")}`),

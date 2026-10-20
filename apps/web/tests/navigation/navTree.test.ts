@@ -27,6 +27,16 @@ describe("the navigation tree", () => {
     expect(currentEntry("/explorer/education/schools/region/guria")).toBe("/explorer/education/schools");
     expect(currentEntry("/explorer/education/kindergartens/ozurgeti")).toBe("/explorer/education/kindergartens");
     expect(currentEntry("/explorer/education")).toBe("/explorer/education");
+    expect(openHub("/explorer/science-culture/museums/guria").href).toBe("/explorer/science-culture");
+    expect(currentEntry("/explorer/science-culture/museums/guria")).toBe("/explorer/science-culture/museums");
+  });
+
+  it("places Science and culture after Education with its four pages", () => {
+    const hubs = NAV_TREE.map((hub) => hub.href);
+    expect(hubs.indexOf("/explorer/science-culture")).toBe(hubs.indexOf("/explorer/education") + 1);
+    const hub = NAV_TREE.find((entry) => entry.href === "/explorer/science-culture")!;
+    expect(hub).toMatchObject({ labelKey: "common.scienceCulture", railLabelKey: "common.dataScienceCulture", testId: "science-culture-link" });
+    expect(hub.sections.map((section) => [section.href, section.testId])).toEqual(["research", "patents", "museums", "theatres"].map((id) => [`/explorer/science-culture/${id}`, `science-culture-${id}-link`]));
   });
 
   it("places Education after Health with its four pages", () => {
@@ -110,5 +120,7 @@ describe("the explorer footer source note", () => {
     expect(sourceNoteKey("/explorer/demography/population/region/imereti")).toBe("common.geostatSourceNote");
     expect(sourceNoteKey("/explorer/education")).toBe("common.geostatSourceNote");
     expect(sourceNoteKey("/explorer/education/schools/batumi")).toBe("common.geostatSourceNote");
+    expect(sourceNoteKey("/explorer/science-culture")).toBe("common.geostatSourceNote");
+    expect(sourceNoteKey("/explorer/science-culture/museums/guria")).toBe("common.geostatSourceNote");
   });
 });

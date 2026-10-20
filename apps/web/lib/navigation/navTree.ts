@@ -1,5 +1,6 @@
 import { BUDGET_SECTIONS, BUDGET_SECTION_ORDER } from "../explorer/sections";
 import { UNEMPLOYMENT_SECTIONS } from "../explorer/unemploymentSections";
+import { LABOUR_SECTIONS } from "../explorer/labour";
 import { WAGES_SECTIONS } from "../explorer/wages";
 import { LIVING_STANDARDS_HUB_PATH, LIVING_STANDARDS_SECTIONS } from "../explorer/livingStandards";
 import { HEALTH_HUB_PATH, HEALTH_SECTIONS } from "../explorer/health";
@@ -9,6 +10,7 @@ import { MONEY_BANKS_SECTIONS } from "../explorer/moneyBanks";
 import { BUSINESS_HUB_PATH, BUSINESS_SECTIONS } from "../explorer/business";
 import { HOUSING_HUB_PATH, HOUSING_SECTIONS } from "../explorer/housing";
 import { EDUCATION_HUB_PATH, EDUCATION_SECTIONS } from "../explorer/education";
+import { SCIENCE_CULTURE_HUB_PATH, SCIENCE_CULTURE_SECTIONS } from "../explorer/scienceCulture";
 import { INTERNET_HUB_PATH, INTERNET_SECTIONS } from "../explorer/internet";
 import { DEMOGRAPHY_HUB_PATH, LIVE_DEMOGRAPHY_PAGES } from "../explorer/demographyRoutes";
 
@@ -102,7 +104,7 @@ export const NAV_TREE: readonly NavHub[] = [
     railLabelKey: "common.dataUnemployment",
     testId: "unemployment-link",
     spaced: true,
-    sections: sectionRows(UNEMPLOYMENT_SECTIONS, "unemployment"),
+    sections: sectionRows([...UNEMPLOYMENT_SECTIONS, ...LABOUR_SECTIONS], "unemployment"),
   },
   {
     href: "/explorer/wages",
@@ -135,6 +137,14 @@ export const NAV_TREE: readonly NavHub[] = [
     testId: "education-link",
     spaced: true,
     sections: sectionRows(EDUCATION_SECTIONS, "education"),
+  },
+  {
+    href: SCIENCE_CULTURE_HUB_PATH,
+    labelKey: "common.scienceCulture",
+    railLabelKey: "common.dataScienceCulture",
+    testId: "science-culture-link",
+    spaced: true,
+    sections: sectionRows(SCIENCE_CULTURE_SECTIONS, "science-culture"),
   },
   {
     href: CRIME_HUB_PATH,
@@ -248,6 +258,7 @@ const TREE_SOURCE_NOTES: Readonly<Record<string, string>> = {
   [LIVING_STANDARDS_HUB_PATH]: "common.geostatSourceNote",
   [HEALTH_HUB_PATH]: "common.geostatSourceNote",
   [EDUCATION_HUB_PATH]: "common.geostatSourceNote",
+  [SCIENCE_CULTURE_HUB_PATH]: "common.geostatSourceNote",
   [CRIME_HUB_PATH]: "common.geostatSourceNote",
   [INTERNET_HUB_PATH]: "common.geostatSourceNote",
   "/explorer/trade": "common.geostatSourceNote",

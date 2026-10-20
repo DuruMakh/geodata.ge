@@ -18,12 +18,16 @@ import { loadBusinessFacts, assertBusinessParity } from "../lib/data/business/im
 import { businessSourceDocumentId } from "../lib/data/business/types";
 import { loadEducationFacts, assertEducationParity } from "../lib/data/education/importEducation";
 import { educationSourceDocumentId } from "../lib/data/education/types";
+import { loadScienceCultureFacts, assertScienceCultureParity } from "../lib/data/scienceCulture/importScienceCulture";
+import { scienceCultureSourceDocumentId } from "../lib/data/scienceCulture/types";
 import { loadHouseholdFacts, assertHouseholdParity } from "../lib/data/household/importHousehold";
 import { householdSourceDocumentId } from "../lib/data/household/types";
 import { loadHealthFacts, assertHealthParity } from "../lib/data/health/importHealth";
 import { healthSourceDocumentId } from "../lib/data/health/types";
 import { loadCrimeFacts, assertCrimeParity } from "../lib/data/crime/importCrime";
 import { crimeSourceDocumentId } from "../lib/data/crime/types";
+import { loadLabourFacts, assertLabourParity } from "../lib/data/labour/importLabour";
+import { labourSourceDocumentId } from "../lib/data/labour/types";
 import { loadHousingFacts, assertHousingParity } from "../lib/data/housing/importHousing";
 import { housingSourceDocumentId } from "../lib/data/housing/types";
 import { loadInternetFacts, assertInternetParity } from "../lib/data/internet/importInternet";
@@ -78,12 +82,16 @@ import {
   businessMirrorCreateRows,
   loadEducationFactsFromMirror,
   educationMirrorCreateRows,
+  loadScienceCultureFactsFromMirror,
+  scienceCultureMirrorCreateRows,
   loadHouseholdFactsFromMirror,
   householdMirrorCreateRows,
   loadHealthFactsFromMirror,
   healthMirrorCreateRows,
   loadCrimeFactsFromMirror,
   crimeMirrorCreateRows,
+  loadLabourFactsFromMirror,
+  labourMirrorCreateRows,
   loadHousingFactsFromMirror,
   housingMirrorCreateRows,
   loadInternetFactsFromMirror,
@@ -363,6 +371,8 @@ async function main() {
   assertSubset("Business source IDs", businessFacts.map(f => businessSourceDocumentId(f.sourceId)), sourceIds);
   const educationFacts = await loadEducationFacts();
   assertSubset("Education source IDs", educationFacts.map(f => educationSourceDocumentId(f.sourceId)), sourceIds);
+  const scienceCultureFacts = await loadScienceCultureFacts();
+  assertSubset("Science and culture source IDs", scienceCultureFacts.map(f => scienceCultureSourceDocumentId(f.sourceId)), sourceIds);
   const householdFacts = await loadHouseholdFacts();
   assertSubset("Household source IDs", householdFacts.map(f => householdSourceDocumentId(f.sourceId)), sourceIds);
   const externalPositionFacts = await loadExternalPositionFacts();
@@ -371,6 +381,8 @@ async function main() {
   assertSubset("Health source IDs", healthFacts.map(f => healthSourceDocumentId(f.sourceId)), sourceIds);
   const crimeFacts = await loadCrimeFacts();
   assertSubset("Crime source IDs", crimeFacts.map(f => crimeSourceDocumentId(f.sourceId)), sourceIds);
+  const labourFacts = await loadLabourFacts();
+  assertSubset("Labour source IDs", labourFacts.map(f => labourSourceDocumentId(f.sourceId)), sourceIds);
   const housingFacts = await loadHousingFacts();
   assertSubset("Housing source IDs", housingFacts.map(f => housingSourceDocumentId(f.sourceId)), sourceIds);
   const internetFacts = await loadInternetFacts();
@@ -579,9 +591,11 @@ async function main() {
         await tx.externalPositionFact.deleteMany();
         await tx.businessFact.deleteMany();
         await tx.educationFact.deleteMany();
+        await tx.scienceCultureFact.deleteMany();
         await tx.householdIncomeSpendingFact.deleteMany();
         await tx.healthFact.deleteMany();
         await tx.crimeFact.deleteMany();
+        await tx.labourFact.deleteMany();
         await tx.housingFact.deleteMany();
         await tx.internetFact.deleteMany();
         await tx.tradePartnerFact.deleteMany();
@@ -893,6 +907,9 @@ async function main() {
         await tx.educationFact.createMany({ data: educationMirrorCreateRows(educationFacts, run.id) });
         const mirrorEducationFacts = await loadEducationFactsFromMirror(tx);
         assertEducationParity(educationFacts, mirrorEducationFacts);
+        await tx.scienceCultureFact.createMany({ data: scienceCultureMirrorCreateRows(scienceCultureFacts, run.id) });
+        const mirrorScienceCultureFacts = await loadScienceCultureFactsFromMirror(tx);
+        assertScienceCultureParity(scienceCultureFacts, mirrorScienceCultureFacts);
         await tx.householdIncomeSpendingFact.createMany({ data: householdMirrorCreateRows(householdFacts, run.id) });
         const mirrorHouseholdFacts = await loadHouseholdFactsFromMirror(tx);
         assertHouseholdParity(householdFacts, mirrorHouseholdFacts);
@@ -902,6 +919,9 @@ async function main() {
         await tx.crimeFact.createMany({ data: crimeMirrorCreateRows(crimeFacts, run.id) });
         const mirrorCrimeFacts = await loadCrimeFactsFromMirror(tx);
         assertCrimeParity(crimeFacts, mirrorCrimeFacts);
+        await tx.labourFact.createMany({ data: labourMirrorCreateRows(labourFacts, run.id) });
+        const mirrorLabourFacts = await loadLabourFactsFromMirror(tx);
+        assertLabourParity(labourFacts, mirrorLabourFacts);
         await tx.housingFact.createMany({ data: housingMirrorCreateRows(housingFacts, run.id) });
         const mirrorHousingFacts = await loadHousingFactsFromMirror(tx);
         assertHousingParity(housingFacts, mirrorHousingFacts);
@@ -1248,9 +1268,11 @@ async function main() {
             { table: "ExternalPositionFact", csvRows: externalPositionFacts.length, dbRows: mirrorExternalPositionFacts.length },
             { table: "BusinessFact", csvRows: businessFacts.length, dbRows: mirrorBusinessFacts.length },
             { table: "EducationFact", csvRows: educationFacts.length, dbRows: mirrorEducationFacts.length },
+            { table: "ScienceCultureFact", csvRows: scienceCultureFacts.length, dbRows: mirrorScienceCultureFacts.length },
             { table: "HouseholdIncomeSpendingFact", csvRows: householdFacts.length, dbRows: mirrorHouseholdFacts.length },
             { table: "HealthFact", csvRows: healthFacts.length, dbRows: mirrorHealthFacts.length },
             { table: "CrimeFact", csvRows: crimeFacts.length, dbRows: mirrorCrimeFacts.length },
+            { table: "LabourFact", csvRows: labourFacts.length, dbRows: mirrorLabourFacts.length },
             { table: "HousingFact", csvRows: housingFacts.length, dbRows: mirrorHousingFacts.length },
             { table: "InternetFact", csvRows: internetFacts.length, dbRows: mirrorInternetFacts.length },
             { table: "TradePartnerEntity", csvRows: tradePartners.entities.length, dbRows: mirrorTradePartners.entities.length },
