@@ -4,9 +4,9 @@ export const ENERGY_FOOD_METHODOLOGY_CONTENT: MethodologyContent = {
   "id": "energy-food",
   "slug": "energy-food",
   "title": "Energy and food",
-  "summary": "Georgia’s energy supply, electricity and final energy use from Geostat’s annual energy balance, and the share of twelve main foods that the country produces itself, from Geostat’s food balance sheets.",
-  "metaDescription": "Georgia’s energy supply, electricity and final energy use from Geostat’s energy balance, and self-sufficiency in twelve main foods from its food balance sheets.",
-  "reviewedAt": "2026-10-11",
+  "summary": "Georgia’s energy supply, electricity and final energy use from Geostat’s annual energy balance, and the share of twelve main foods that the country produces itself, from Geostat’s food balance sheets, and Georgia’s farm output, harvests, livestock and farm-gate prices from Geostat’s agriculture statistics.",
+  "metaDescription": "Georgia’s energy balance, electricity and energy use, self-sufficiency in twelve main foods, and farm output, harvests, livestock and farm prices, from Geostat.",
+  "reviewedAt": "2026-10-20",
   "archiveManifestId": "energy-food",
   "coverageSource": {
     "kind": "archive"
@@ -14,7 +14,7 @@ export const ENERGY_FOOD_METHODOLOGY_CONTENT: MethodologyContent = {
   "canonicalDocuments": [
     "docs/data-methodology/energy-food-annual.md"
   ],
-  "disclosure": "All values are figures published by Geostat. The pages describe them and give no reasons; monthly data, energy prices and 2025 energy figures are not included.",
+  "disclosure": "All values are figures published by Geostat. The pages describe them and give no reasons; monthly and quarterly data, energy prices and 2025 energy figures are not included.",
   "keyFacts": [
     {
       "label": "Coverage",
@@ -33,7 +33,7 @@ export const ENERGY_FOOD_METHODOLOGY_CONTENT: MethodologyContent = {
     {
       "label": "Units",
       "valueKind": "unit",
-      "value": "Thousand tonnes of oil equivalent; GWh; self-sufficiency %"
+      "value": "Thousand tonnes of oil equivalent; GWh; self-sufficiency %; million ₾; thousand tonnes; thousand head; million litres; million eggs; ₾ per kg"
     }
   ],
   "sections": [
@@ -42,7 +42,7 @@ export const ENERGY_FOOD_METHODOLOGY_CONTENT: MethodologyContent = {
       "kind": "scope",
       "title": "What do the pages cover?",
       "paragraphs": [
-        "Annual figures for Georgia from Geostat: the Energy Balance of Georgia for 2013–2024 and the food balance sheets for 2014–2025. Energy supply: domestic supply by fuel, production, imports and exports, in thousand tonnes of oil equivalent. Electricity: production by plant type, imports, exports, final consumption by user and network losses, in GWh. Energy use: final energy consumption by user and by fuel, in thousand tonnes of oil equivalent. Food: the self-sufficiency ratio, in percent, for twelve foods — wheat, maize, potatoes, vegetables, grapes, meat (with beef, pork, sheep and goat meat and poultry), milk and milk products, and eggs. Monthly data, energy prices and 2025 energy figures are not shown."
+        "Annual figures for Georgia from Geostat: the Energy Balance of Georgia for 2013–2024, the food balance sheets for 2014–2025 and the agriculture statistics for 2006–2025. Energy supply: domestic supply by fuel, production, imports and exports, in thousand tonnes of oil equivalent. Electricity: production by plant type, imports, exports, final consumption by user and network losses, in GWh. Energy use: final energy consumption by user and by fuel, in thousand tonnes of oil equivalent. Food: the self-sufficiency ratio, in percent, for twelve foods — wheat, maize, potatoes, vegetables, grapes, meat (with beef, pork, sheep and goat meat and poultry), milk and milk products, and eggs. Farming: farm output in million ₾ (2010–2025), harvests of thirteen crops in thousand tonnes, livestock in thousand head, meat, milk and eggs (2006–2025), and twelve farm-gate prices in ₾ (2014–2025). Monthly data, energy prices and 2025 energy figures are not shown."
       ]
     },
     {
@@ -50,7 +50,7 @@ export const ENERGY_FOOD_METHODOLOGY_CONTENT: MethodologyContent = {
       "kind": "sources",
       "title": "Where do the figures come from?",
       "paragraphs": [
-        "All figures are Geostat’s own. Energy data come from Geostat’s annual publication “Energy Balance of Georgia”, issued separately for each year from 2013 to 2024. Each edition contains an aggregated energy balance workbook and an electricity and heat workbook; Fiscal.ge uses the oil-equivalent sheet of the first and the electricity (GWh) column of the second. The 2025 balance has not been published, so the energy pages end in 2024. Food data come from Geostat’s food balance sheets and cover 2014–2025. Geostat also publishes monthly electricity and fuel figures from 2018 and energy prices every half year. They are not used: the pages show yearly data only, and adding up months would be Fiscal.ge’s own calculation. Every value is shown as Geostat published it: Fiscal.ge adds no shares, differences, sums or per-person figures."
+        "All figures are Geostat’s own. Energy data come from Geostat’s annual publication “Energy Balance of Georgia”, issued separately for each year from 2013 to 2024. Each edition contains an aggregated energy balance workbook and an electricity and heat workbook; Fiscal.ge uses the oil-equivalent sheet of the first and the electricity (GWh) column of the second. The 2025 balance has not been published, so the energy pages end in 2024. Food data come from Geostat’s food balance sheets and cover 2014–2025. Farming data come from six workbooks on Geostat’s Agriculture page: general agricultural statistics (farm output), production of annual crops, production of permanent crops, livestock numbers, livestock products and agricultural production prices. Geostat also publishes monthly electricity and fuel figures from 2018 and energy prices every half year. They are not used: the pages show yearly data only, and adding up months would be Fiscal.ge’s own calculation. Every value is shown as Geostat published it: Fiscal.ge adds no shares, differences, sums or per-person figures."
       ]
     },
     {
@@ -94,11 +94,19 @@ export const ENERGY_FOOD_METHODOLOGY_CONTENT: MethodologyContent = {
       ]
     },
     {
+      "id": "farming",
+      "kind": "classification",
+      "title": "Farming: output, harvests, livestock and farm-gate prices",
+      "paragraphs": [
+        "The Farming page shows Geostat’s agriculture statistics. Farm output is the value of everything farms produce in a year, in million lari at current prices, not adjusted for inflation; Geostat splits it into crops, livestock and agricultural services, and the series starts in 2010. Harvests are thousand tonnes of thirteen crops. Livestock is the number of animals at the end of each year, in thousand head. Meat is in thousand tonnes, milk in million litres and eggs in millions. Farm-gate prices are the average prices farmers receive when they sell, in lari per kilogram (milk per litre, eggs per piece), from 2014. Geostat enlarged its farm survey in 2016 and revised 2006–2015 so the years can be compared; rows that Geostat publishes only from 2016, such as winter and spring wheat, white and red grapes or chicken, are not shown. Geostat marks 2025 farm output as preliminary, and the Data sheet of the Excel download marks those four values “Preliminary”. In Geostat’s farming tables a dash means a figure is not available; no shown series contains one, and validation fails if one ever does. Quarterly livestock tables are not used: the page shows yearly data only. Quantities show one decimal and prices two, as Geostat prints them. The page describes the figures and gives no reasons for their changes."
+      ]
+    },
+    {
       "id": "limitations",
       "kind": "limitations",
       "title": "What the pages leave out",
       "paragraphs": [
-        "The pages describe the figures and do not explain why they changed. Fiscal.ge creates no shares, changes, sums, per-person figures or forecasts. The lack of wind data before 2016 and the large undivided “Other (not specified)” electricity row are features of Geostat’s balance. The 2025 energy balance, monthly data, energy prices, crop and livestock production, farm prices, food consumption per person and regional breakdowns are not included."
+        "The pages describe the figures and do not explain why they changed. Fiscal.ge creates no shares, changes, sums, per-person figures or forecasts. The lack of wind data before 2016 and the large undivided “Other (not specified)” electricity row are features of Geostat’s balance. The 2025 energy balance, monthly data, energy prices, sown area and yields, quarterly livestock figures, food consumption per person and regional breakdowns are not included."
       ]
     },
     {
@@ -106,7 +114,7 @@ export const ENERGY_FOOD_METHODOLOGY_CONTENT: MethodologyContent = {
       "kind": "validation",
       "title": "How are the figures checked?",
       "paragraphs": [
-        "681 values are published. Each is read again from a cell of Geostat’s original workbook and compared with the cell’s stored value, sheet, printed row and column label and number format; the original files are checked against their recorded fingerprints. For every year the checks also require that: the balance adds up (production plus imports, minus exports and bunkers, plus stock changes equals domestic supply within 0.2); the Total column equals the sum of the fuel columns within 0.5 for supply, imports and final consumption; final consumption equals the sum of its users within 0.5, and electricity production equals thermal plus hydro plus wind plants within 0.5 GWh; total supply and final consumption match Geostat’s separate energy efficiency workbook in all twelve years; and every food ratio lies within 10 percentage points of the value calculated from production, imports and exports on the same sheet. Energy supply in 2024 (5,914.5), imports in 2024 (5,099.0), electricity production in 2024 (14,234.1 GWh) and the wheat ratio in 2025 (19%) are compared with fixed values. The pages show values at Geostat’s precision: energy and electricity to one decimal, food ratios as whole numbers."
+        "1,389 values are published: 681 for energy and food and 708 for farming. Each is read again from a cell of Geostat’s original workbook and compared with the cell’s stored value, sheet, printed row and column label and number format; the original files are checked against their recorded fingerprints. For every year the checks also require that: the balance adds up (production plus imports, minus exports and bunkers, plus stock changes equals domestic supply within 0.2); the Total column equals the sum of the fuel columns within 0.5 for supply, imports and final consumption; final consumption equals the sum of its users within 0.5, and electricity production equals thermal plus hydro plus wind plants within 0.5 GWh; total supply and final consumption match Geostat’s separate energy efficiency workbook in all twelve years; and every food ratio lies within 10 percentage points of the value calculated from production, imports and exports on the same sheet. For farming they require that farm output equals crops plus livestock plus services within 0.5; meat equals its kinds plus other meat, and milk its two kinds, within 0.2; dairy cows never exceed cattle; and the production that the food balance sheets print in whole thousand tonnes matches the farming tables within 0.6, with one difference, grapes in 2014 (165 against 172.6), listed in the validation report. Energy supply in 2024 (5,914.5), imports in 2024 (5,099.0), electricity production in 2024 (14,234.1 GWh), the wheat ratio in 2025 (19%) and farm output in 2025 (8,384.9 million ₾) are compared with fixed values. The pages show values at Geostat’s precision: energy and electricity to one decimal, food ratios as whole numbers, farming quantities to one decimal and farm-gate prices to two."
       ]
     },
     {
@@ -114,7 +122,7 @@ export const ENERGY_FOOD_METHODOLOGY_CONTENT: MethodologyContent = {
       "kind": "archive",
       "title": "Original sources",
       "paragraphs": [
-        "42 originals from Geostat, retrieved on 11 October 2026, are available: 24 energy balance workbooks (the aggregated balance and the electricity and heat workbook for each year, 2013–2024), the energy efficiency workbook (used only for cross-checking), the food balance sheets, Georgian-language editions of the 2024 aggregated balance and of the food balance sheets (kept for reference labels) and 14 captures of source pages. HTML pages download as text files. Excel follows the selected series and years and lists their source files."
+        "55 originals from Geostat, retrieved on 11 and 20 October 2026, are available: 24 energy balance workbooks (the aggregated balance and the electricity and heat workbook for each year, 2013–2024), the energy efficiency workbook (used only for cross-checking), the food balance sheets, six agriculture workbooks (retrieved on 20 October 2026), Georgian-language editions of the 2024 aggregated balance, of the food balance sheets and of the six agriculture workbooks (kept for reference labels) and 15 captures of source pages. HTML pages download as text files. Excel follows the selected series and years and lists their source files."
       ]
     }
   ],
@@ -124,7 +132,7 @@ export const ENERGY_FOOD_METHODOLOGY_CONTENT: MethodologyContent = {
       "group": "energy-food",
       "title": "What do the pages cover?",
       "statusLabel": "Fiscal.ge decision",
-      "summary": "Annual figures for Georgia from Geostat: the Energy Balance of Georgia for 2013–2024 and the food balance sheets for 2014–2025. Energy supply: domestic supply by fuel, production, imports and exports, in thousand tonnes of oil equivalent. Electricity: production by plant type, imports, exports, final consumption by user and network losses, in GWh. Energy use: final energy consumption by user and by fuel, in thousand tonnes of oil equivalent. Food: the self-sufficiency ratio, in percent, for twelve foods — wheat, maize, potatoes, vegetables, grapes, meat (with beef, pork, sheep and goat meat and poultry), milk and milk products, and eggs. Monthly data, energy prices and 2025 energy figures are not shown.",
+      "summary": "Annual figures for Georgia from Geostat: the Energy Balance of Georgia for 2013–2024, the food balance sheets for 2014–2025 and the agriculture statistics for 2006–2025. Energy supply: domestic supply by fuel, production, imports and exports, in thousand tonnes of oil equivalent. Electricity: production by plant type, imports, exports, final consumption by user and network losses, in GWh. Energy use: final energy consumption by user and by fuel, in thousand tonnes of oil equivalent. Food: the self-sufficiency ratio, in percent, for twelve foods — wheat, maize, potatoes, vegetables, grapes, meat (with beef, pork, sheep and goat meat and poultry), milk and milk products, and eggs. Farming: farm output in million ₾ (2010–2025), harvests of thirteen crops in thousand tonnes, livestock in thousand head, meat, milk and eggs (2006–2025), and twelve farm-gate prices in ₾ (2014–2025). Monthly data, energy prices and 2025 energy figures are not shown.",
       "detail": [],
       "canonicalDecisionIds": [
         "energy-food.scope"
@@ -135,7 +143,7 @@ export const ENERGY_FOOD_METHODOLOGY_CONTENT: MethodologyContent = {
       "group": "energy-food",
       "title": "Where do the figures come from?",
       "statusLabel": "Fiscal.ge decision",
-      "summary": "All figures are Geostat’s own. Energy data come from Geostat’s annual publication “Energy Balance of Georgia”, issued separately for each year from 2013 to 2024. Each edition contains an aggregated energy balance workbook and an electricity and heat workbook; Fiscal.ge uses the oil-equivalent sheet of the first and the electricity (GWh) column of the second. The 2025 balance has not been published, so the energy pages end in 2024. Food data come from Geostat’s food balance sheets and cover 2014–2025. Geostat also publishes monthly electricity and fuel figures from 2018 and energy prices every half year. They are not used: the pages show yearly data only, and adding up months would be Fiscal.ge’s own calculation. Every value is shown as Geostat published it: Fiscal.ge adds no shares, differences, sums or per-person figures.",
+      "summary": "All figures are Geostat’s own. Energy data come from Geostat’s annual publication “Energy Balance of Georgia”, issued separately for each year from 2013 to 2024. Each edition contains an aggregated energy balance workbook and an electricity and heat workbook; Fiscal.ge uses the oil-equivalent sheet of the first and the electricity (GWh) column of the second. The 2025 balance has not been published, so the energy pages end in 2024. Food data come from Geostat’s food balance sheets and cover 2014–2025. Farming data come from six workbooks on Geostat’s Agriculture page: general agricultural statistics (farm output), production of annual crops, production of permanent crops, livestock numbers, livestock products and agricultural production prices. Geostat also publishes monthly electricity and fuel figures from 2018 and energy prices every half year. They are not used: the pages show yearly data only, and adding up months would be Fiscal.ge’s own calculation. Every value is shown as Geostat published it: Fiscal.ge adds no shares, differences, sums or per-person figures.",
       "detail": [],
       "canonicalDecisionIds": [
         "energy-food.sources"
@@ -194,6 +202,17 @@ export const ENERGY_FOOD_METHODOLOGY_CONTENT: MethodologyContent = {
       "detail": [],
       "canonicalDecisionIds": [
         "energy-food.dashes"
+      ]
+    },
+    {
+      "id": "energy-food.farming",
+      "group": "energy-food",
+      "title": "Farming: output, harvests, livestock and farm-gate prices",
+      "statusLabel": "Fiscal.ge decision",
+      "summary": "The Farming page shows Geostat’s agriculture statistics. Farm output is the value of everything farms produce in a year, in million lari at current prices, not adjusted for inflation; Geostat splits it into crops, livestock and agricultural services, and the series starts in 2010. Harvests are thousand tonnes of thirteen crops. Livestock is the number of animals at the end of each year, in thousand head. Meat is in thousand tonnes, milk in million litres and eggs in millions. Farm-gate prices are the average prices farmers receive when they sell, in lari per kilogram (milk per litre, eggs per piece), from 2014. Geostat enlarged its farm survey in 2016 and revised 2006–2015 so the years can be compared; rows that Geostat publishes only from 2016, such as winter and spring wheat, white and red grapes or chicken, are not shown. Geostat marks 2025 farm output as preliminary, and the Data sheet of the Excel download marks those four values “Preliminary”. In Geostat’s farming tables a dash means a figure is not available; no shown series contains one, and validation fails if one ever does. Quarterly livestock tables are not used: the page shows yearly data only. Quantities show one decimal and prices two, as Geostat prints them. The page describes the figures and gives no reasons for their changes.",
+      "detail": [],
+      "canonicalDecisionIds": [
+        "energy-food.farming"
       ]
     }
   ],

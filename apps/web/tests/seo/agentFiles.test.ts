@@ -141,7 +141,7 @@ const statedCoverage: { url: string; file: string; rows?: (row: CsvRow) => boole
   { url: "/explorer/external/current-account", file: "current-account-annual.csv" },
   { url: "/explorer/external/foreign-debt", file: "external-position-annual.csv", rows: (row) => row.indicator_id.startsWith("ext_debt.") },
   { url: "/explorer/external/reserves", file: "external-position-annual.csv", rows: (row) => row.indicator_id.startsWith("reserves.") },
-  { url: "/explorer/energy-food", file: "energy-food-annual.csv", rows: (row) => !row.indicator_id.startsWith("food.") },
+  { url: "/explorer/energy-food", file: "energy-food-annual.csv", rows: (row) => row.indicator_id.startsWith("energy.") || row.indicator_id.startsWith("electricity.") },
   { url: "/explorer/energy-food", file: "energy-food-annual.csv", rows: (row) => row.indicator_id.startsWith("food.") },
   { url: "/explorer/transport", file: "transport-annual.csv", rows: (row) => row.indicator_id.startsWith("transport.fleet.") && !/_(fuel|age)_/.test(row.indicator_id), text: (first, last) => `road vehicle fleet, ${first}–${last}` },
   { url: "/explorer/transport/vehicles", file: "transport-annual.csv", rows: (row) => row.indicator_id.startsWith("transport.fleet.") && !row.indicator_id.includes("_age_") },
@@ -150,6 +150,8 @@ const statedCoverage: { url: string; file: string; rows?: (row: CsvRow) => boole
   { url: "/explorer/transport/freight", file: "transport-annual.csv", rows: (row) => row.indicator_id.startsWith("transport.tonne_km.") },
   { url: "/explorer/transport/regions", file: "transport-annual.csv", rows: (row) => row.indicator_id.startsWith("transport.registered."), text: (first, last) => `registered vehicles by region, ${first}–${last}` },
   { url: "/explorer/transport/regions", file: "transport-annual.csv", rows: (row) => row.indicator_id.startsWith("transport.road_km."), text: (first, last) => `road length, ${first}–${last}` },
+  { url: "/explorer/energy-food", file: "energy-food-annual.csv", rows: (row) => row.indicator_id.startsWith("farming.") },
+  { url: "/explorer/energy-food/farming", file: "energy-food-annual.csv", rows: (row) => row.indicator_id.startsWith("farming.") },
   { url: "/explorer/demography/migration", file: "demography-migration-annual.csv" },
 ];
 

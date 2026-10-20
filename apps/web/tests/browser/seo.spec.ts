@@ -425,7 +425,7 @@ test("sitemap keeps its XML contract and offers a readable browser view", async 
   const xml = await response.text();
   expect(xml).toContain('<?xml-stylesheet type="text/xsl" href="/sitemap.xsl"?>');
   // The sitemap builder's URLs, the trade pages among them, are asserted in tests/seo/routes.test.ts.
-  expect([...xml.matchAll(/<loc>https:\/\/[^<]+<\/loc>/g)]).toHaveLength(1102);
+  expect([...xml.matchAll(/<loc>https:\/\/[^<]+<\/loc>/g)]).toHaveLength(1104);
 
   const consoleIssues: string[] = [];
   page.on("console", (message) => {
@@ -442,7 +442,7 @@ test("sitemap keeps its XML contract and offers a readable browser view", async 
     expect(navigation?.status()).toBe(200);
     await expect(page).toHaveTitle("Fiscal.ge / XML sitemap");
     await expect(page.getByRole("heading", { name: "Public pages" })).toHaveCount(1);
-    await expect(page.locator(".sitemap-row")).toHaveCount(1102);
+    await expect(page.locator(".sitemap-row")).toHaveCount(1104);
     await expectNoPageOverflow(page);
 
     if (viewport.width < 720) {
