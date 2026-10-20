@@ -48,6 +48,13 @@ describe("marriages and divorces workbook", () => {
     expect(cited(model)).toEqual([SOURCE_ID.divorces, SOURCE_ID.marriages, SOURCE_ID.midYear].sort());
   });
 
+  it("marks the 2025 rate column with the census re-base, and leaves the count columns plain", () => {
+    expect(build({ measure: "per1000" }).readable.headerLabels?.columns.at(-1)).toBe("2025 · Census re-base");
+    expect(build({ measure: "per1000" }).readable.headerLabels?.columns.at(-2)).toBe("2024");
+    expect(build({}).readable.headerLabels).toBeUndefined();
+    expect(build({ measure: "per1000", selectedIds: ["age_first_marriage_male"] }).readable.headerLabels).toBeUndefined();
+  });
+
   it("writes the ages as published and cites the ages table", () => {
     const model = build({ selectedIds: ["age_first_marriage_male", "age_first_marriage_female"] });
 

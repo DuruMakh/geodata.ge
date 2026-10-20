@@ -46,6 +46,14 @@ export function buildMarriageWorkbookExportModel(input: MarriageWorkbookInput, p
     readable: {
       title: input.title, subtitle: [`${model.range.start}–${model.range.end} · ${unitLabel}`, ...(rateYears.length ? [t("marriageRatesNote")] : [])].join(" · "),
       unitLabel, amountDecimals: model.decimals, years: model.years, showChangeColumn: false, numberFormat, ...(rateYears.length ? { fitSubtitle: true } : {}),
+      // A rate across the census re-base names it in its year's column, as the other demography workbooks do.
+      ...(model.breaks.length ? {
+        headerLabels: {
+          category: workbookMessage(locale, "workbook.category"),
+          columns: model.years.map((year) => (model.breaks.some((item) => item.year === year) ? `${year} · ${t("breakLabel")}` : String(year))),
+          wrap: true,
+        },
+      } : {}),
       rows: model.selected.map((series) => ({
         kind: "item", parentLabel: null, label: labels[series.id], change: null,
         valuesByYear: Object.fromEntries(model.years.map((year) => [year, valueOf(series.valuesByYear[year])])),
