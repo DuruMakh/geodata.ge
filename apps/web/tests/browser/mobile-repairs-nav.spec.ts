@@ -141,8 +141,8 @@ for (const { path, labels } of [
     // The data line no longer repeats its own heading.
     await expect(footer.getByText(path === "/en" ? "Data" : "მონაცემები", { exact: true })).toHaveCount(0);
     const height = (await footer.boundingBox())?.height ?? 0;
-    // ~660px since the footer lists all eighteen hubs (Q3, 2026-10-12; Business, Health, Housing, Crime and justice and Education added 2026-10-15/16, Science and culture and Environment and climate 2026-10-20): twenty links make ten 44px rows in two columns.
-    expect(height).toBeLessThanOrEqual(672);
+    // ~704px since the footer lists all eighteen hubs (Q3, 2026-10-12; Business, Health, Housing, Crime and justice and Education added 2026-10-15/16, Science and culture and Environment and climate 2026-10-20): twenty-one links make eleven 44px rows in two columns.
+    expect(height).toBeLessThanOrEqual(716);
     const marginTop = await footer.evaluate((element) => parseFloat(getComputedStyle(element).marginTop));
     expect(marginTop).toBeLessThanOrEqual(48);
   });
