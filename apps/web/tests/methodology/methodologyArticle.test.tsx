@@ -198,13 +198,15 @@ describe("crime methodology", () => {
 
 describe("science and culture methodology", () => {
   it.each([
-    ["ka", "მეცნიერება და კულტურა", "*2006-2020 წლების მონაცემები მოიცავს მხოლოდ სპექტაკლებს.", "13, 19 და 30 დამთვალიერებლით"],
-    ["en", "Science and culture", "*2006-2020 data includes only performances.", "13, 19 and 30 visitors"],
-  ] as const)("renders the %s article with its 33 archived originals, Geostat's notes, the visitor differences and Dataset markup", async (locale, title, audienceNote, visitorDifferences) => {
+    ["ka", "მეცნიერება და კულტურა", "*2006-2020 წლების მონაცემები მოიცავს მხოლოდ სპექტაკლებს.", "13, 19 და 30 დამთვალიერებლით", "სასარგებლო მოდელი პატენტის უფრო მოკლე და მარტივი სახეა მცირე გამოგონებებისთვის."],
+    ["en", "Science and culture", "*2006-2020 data includes only performances.", "13, 19 and 30 visitors", "A utility model is a shorter, simpler kind of patent for smaller inventions."],
+  ] as const)("renders the %s article with its 33 archived originals, Geostat's notes, the visitor differences, the utility model and Dataset markup", async (locale, title, audienceNote, visitorDifferences, utilityModel) => {
     const { renderMethodologyArticle } = await import("../../lib/pages/methodology-article");
     const markup = renderToStaticMarkup(await renderMethodologyArticle(locale, { params: Promise.resolve({ dataset: "science-culture" }) }));
     expect(markup).toContain(title);
-    expect(markup).toContain("2001–2025");
+    expect(markup).toContain("2005–2025");
+    expect(markup).not.toContain("2001–2025");
+    expect(markup).toContain(utilityModel);
     expect(markup).toContain('"@type":"Dataset"');
     expect(markup).toContain(audienceNote);
     expect(markup).toContain(visitorDifferences);
