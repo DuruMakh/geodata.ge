@@ -3,7 +3,7 @@ import {
   type ClientInternetFact, type InternetIndicator, type InternetMeasure,
 } from "../data/internet/types";
 import { INK, colorForItem } from "./colors";
-import { formatInUnit } from "./format";
+import { formatInUnit, type ValueUnit } from "./format";
 import type { ResolvedPeriodRange } from "./periodRange";
 import { buildTopicModel, serializeTopicHash, topicSeriesColor, type TopicSeriesModel, type TopicState } from "./topicSeries";
 import { changeUnitListSelection, parseUnitListHash, unitListCoverage } from "./unitList";
@@ -125,8 +125,11 @@ export const buildInternetModel = (section: InternetTopicId, facts: readonly Cli
 /** Reads an `internet.*` message. */
 export type InternetTranslate = (key: string, values?: Record<string, string | number>) => string;
 
+/** Shares read to one decimal, as Geostat prints them; the heading or the unit label names the per cent. */
+export const INTERNET_PERCENT: ValueUnit = { divisor: 1, label: "", decimals: 1 };
+
 /** A share as Geostat prints it: one decimal and a per cent sign. */
-export const internetPercent = (value: number) => `${formatInUnit(value, { divisor: 1, label: "", decimals: 1 })}%`;
+export const internetPercent = (value: number) => `${formatInUnit(value, INTERNET_PERCENT)}%`;
 
 /**
  * A series' name outside the list (chart, table, workbook): a group row carries its heading's text before the "·", since
