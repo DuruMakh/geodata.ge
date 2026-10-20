@@ -153,8 +153,11 @@ export function transportValueLabel(value: number | null | undefined, unit: Tran
   return value == null ? MISSING : `${formatInUnit(value, transportValueUnit(unit))} ${transportUnitLabel(unit, t)}`;
 }
 
-/** Headings whose rows repeat one another's names in one unit: a fuel under each vehicle type, an age row under each type. */
-const NAMED_BY_HEADING: ReadonlySet<TransportHeading> = new Set(["carsFuel", "busesFuel", "trucksFuel", "specialFuel", "carsAge", "busesAge", "trucksAge", "specialAge"]);
+/**
+ * Headings whose rows repeat one another's names in one unit: a fuel under each vehicle type, an age row under each type, and
+ * an area page's fuel, age and owner rows (fuel and age both have "Unknown").
+ */
+const NAMED_BY_HEADING: ReadonlySet<TransportHeading> = new Set(["carsFuel", "busesFuel", "trucksFuel", "specialFuel", "carsAge", "busesAge", "trucksAge", "specialAge", "fuel", "age", "owner"]);
 
 /**
  * A series' name outside the list (chart, table, workbook): a fuel or age row carries its heading's text before the unit;

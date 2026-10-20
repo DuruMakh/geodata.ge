@@ -1,7 +1,7 @@
 import Decimal from "decimal.js";
 import {
   TRANSPORT_FLEET_FUELS, TRANSPORT_FREIGHT_MODES, TRANSPORT_INDICATORS, TRANSPORT_PASSENGER_MODES, TRANSPORT_REGISTER_AREAS, TRANSPORT_REGISTER_PARTS,
-  TRANSPORT_ROAD_AREAS, TRANSPORT_ROAD_PARTS, TRANSPORT_SOURCES, TRANSPORT_VEHICLE_TYPES, transportFactKey, type TransportFact, type TransportMeasure,
+  TRANSPORT_ROAD_AREAS, TRANSPORT_ROAD_PARTS, TRANSPORT_ZERO_ROWS, TRANSPORT_SOURCES, TRANSPORT_VEHICLE_TYPES, transportFactKey, type TransportFact, type TransportMeasure,
 } from "./types";
 
 const D = Decimal.clone({ precision: 50, rounding: Decimal.ROUND_HALF_UP });
@@ -152,6 +152,8 @@ export function validateTransportFacts(facts: readonly TransportFact[]): void {
   }
   const missing = [...expected].filter(key => !values.has(key));
   if (missing.length) throw new Error(`Incomplete transport coverage: ${missing.length} missing, first ${missing[0]}`);
+
+  for (const [key, value] of values) if (TRANSPORT_ZERO_ROWS.includes(key.slice(0, key.lastIndexOf(":"))) && !value.isZero()) throw new Error(`A not-listed transport row is no longer zero: ${key}`);
 
   for (const { name, total, parts: groups, tolerance } of sums()) {
     const recorded = KNOWN_DIFFERENCES[name] ?? {};

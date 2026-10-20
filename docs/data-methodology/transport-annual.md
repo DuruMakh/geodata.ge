@@ -41,7 +41,7 @@ H-4's rows are cumulative (up to 2 years ⊂ up to 5 ⊂ up to 10); a type's tot
 
 ## Passenger-km and tonne-km
 
-One passenger-km is one passenger carried one kilometre; one tonne-km one tonne carried one kilometre. Geostat's air metadata: passenger turnover is "The number of passengers multiplied by flight distance"; its railway metadata counts only the distance inside Georgia on international journeys. H-1 and H-2 note: "Data about road transport in 2005-2025 - according to statistical surveys and experts’ estimation." The spec's draft line that the modes "cover transport enterprises in Georgia" is not published, because no archived or linked Geostat text states it.
+One passenger-km is one passenger carried one kilometre; one tonne-km one tonne carried one kilometre. Geostat's air metadata: passenger turnover is "The number of passengers multiplied by flight distance"; its railway metadata counts only the distance inside Georgia on international journeys. H-1 and H-2 note: "Data about road transport in 2005-2025 - according to statistical surveys and experts’ estimation." Their notes on coverage read: "Table covers enterprises of passenger transport activities in Georgia." (H-1) and "Table covers data on enterprises of transport activities in Georgia." (H-2); both are quoted on the methodology page.
 
 ## Passengers and goods carried
 
@@ -49,7 +49,7 @@ Airport and airline figures overlap and are never added: airports count passenge
 
 ## Regions and roads
 
-Georgia's registered vehicles equal the 11 regions plus Abkhazia and region unknown (within 0.2 thousand); Abkhazia and region unknown have no page. Three columns are served but not listed on the area pages: `type_unknown` (from 2022), `fuel_diesel_gas` (2020 and from 2022) and `fuel_hybrid_diesel` (from 2022). Road length comes from the Roads Department of Georgia and municipal administrations; Tbilisi's roads are "Managed by Roads Department of Georgia since 2012"; from 2021 local roads include roads within settlements and exclude self-governing cities; the 2024 data use the road list of Prime Minister's Decree No. 407 and updated municipal boundaries. Georgia's road length equals the regions plus Abkhazia within 0.2 km.
+Georgia's registered vehicles equal the 11 regions plus Abkhazia and region unknown (within 0.2 thousand); Abkhazia and region unknown have no page. Three columns are served but not listed on the area pages: `type_unknown` (from 2022), `fuel_diesel_gas` (2020 and from 2022) and `fuel_hybrid_diesel` (from 2022). Road length comes from the Roads Department of Georgia and municipal administrations; Tbilisi's roads are "Managed by Roads Department of Georgia since 2012"; from 2021 local roads include roads within settlements and exclude self-governing cities; the 2024 data use the road list of Prime Minister's Decree No. 407 and updated municipal boundaries. Georgia's road length equals the regions plus Abkhazia within 0.2 km. Tbilisi's local roads and Racha-Lechkhumi and Kvemo Svaneti's international roads are 0 in every year; they are served but not listed on the area pages (`TRANSPORT_ZERO_ROWS`), and validation fails if either becomes non-zero. Tbilisi's 0 means not counted, since local roads exclude self-governing cities.
 
 ## Rows that are not listed
 
@@ -57,7 +57,7 @@ Nil or zero in every year, checked on every run and not served: inland waterways
 
 ## Values as Geostat publishes them
 
-The pages show Geostat's published values and calculate nothing. `-` follows each table's legend: nil (served as 0) in H-1, H-4, the railway, airport and sea port tables (the airport tables write `_`; the road table prints one `_`, Tbilisi secondary roads 2015, served as 0); "Data not available" in H-2, so a gap (sea tonne-km 2009, 2010 and from 2013). Only 17 served values come from nil cells. Missing years are gaps, dashes and blank Excel cells, never zero. The pages state no causes.
+The pages show Geostat's published values and calculate nothing. `-` is nil (served as 0) in H-1, H-4, the railway, airport and sea port tables (the airport tables write `_`; the road table prints one `_`, Tbilisi secondary roads 2015, served as 0). `…` ("Data not available") is a gap, as for sea tonne-km 2009, 2010 and from 2013; H-2's only `-` cells are the unserved inland waterways row. Geostat's legend marks `0.0` as "Negligible magnitude": below 0.05 of the unit, not necessarily none. Only 17 served values come from nil cells. Missing years are gaps, dashes and blank Excel cells, never zero. The pages state no causes.
 
 ## Extraction and validation
 

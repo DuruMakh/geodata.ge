@@ -40,6 +40,11 @@ export const TRANSPORT_REGISTER_PARTS = [
 /** The road-length workbook's rows: Georgia, the 11 regions and Abkhazia. */
 export const TRANSPORT_ROAD_AREAS = ["total", ...TRANSPORT_REGIONS, "region_abkhazia"] as const;
 export const TRANSPORT_ROAD_PARTS = ["international", "secondary", "local"] as const;
+/**
+ * Served rows Geostat prints as 0 in every year, so no area page lists them: Tbilisi's local roads (not counted, as local
+ * roads exclude self-governing cities) and Racha-Lechkhumi and Kvemo Svaneti's international roads. Validation keeps them 0.
+ */
+export const TRANSPORT_ZERO_ROWS: readonly string[] = ["transport.road_km.region_tbilisi_local", "transport.road_km.region_racha_lechkhumi_kvemo_svaneti_international"];
 export type TransportIndicator = `transport.${TransportMeasure}.${string}`;
 export function transportIndicator(measure: TransportMeasure, group: string): TransportIndicator {
   return `transport.${measure}.${group}`;

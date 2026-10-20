@@ -198,8 +198,8 @@ describe("crime methodology", () => {
 
 describe("transport methodology", () => {
   it.each([
-    ["ka", "ტრანსპორტი", ["შსს-ის", "2008 წლიდან", "კუმულაციური", "ერთი მგზავრის ერთი კილომეტრით", "არ უნდა შეიკრიბოს", "ტრანზიტი", "აფხაზეთის", "საავტომობილო გზების დეპარტამენტის"]],
-    ["en", "Transport", ["Ministry of Internal Affairs", "end of each year", "agricultural machinery from 2008", "cumulative", "one passenger carried one kilometre", "should not be added together", "Transit is goods carried across Georgia", "Abkhazia", "Roads Department of Georgia manages", "state no causes"]],
+    ["ka", "ტრანსპორტი", ["შსს-ის", "2008 წლიდან", "კუმულაციური", "ერთი მგზავრის ერთი კილომეტრით", "არ უნდა შეიკრიბოს", "ტრანზიტი", "აფხაზეთის", "საავტომობილო გზების დეპარტამენტის", "მგზავრთა გადაყვანის საქმიანობის საწარმოებს", "უმნიშვნელო სიდიდე"]],
+    ["en", "Transport", ["Ministry of Internal Affairs", "end of each year", "agricultural machinery from 2008", "cumulative", "one passenger carried one kilometre", "should not be added together", "Transit is goods carried across Georgia", "Abkhazia", "Roads Department of Georgia manages", "state no causes", "Table covers enterprises of passenger transport activities in Georgia.", "Table covers data on enterprises of transport activities in Georgia.", "Negligible magnitude"]],
   ] as const)("renders the %s article with its 25 archived originals, the spec's notes and Dataset markup", async (locale, title, statements) => {
     const { renderMethodologyArticle } = await import("../../lib/pages/methodology-article");
     const markup = renderToStaticMarkup(await renderMethodologyArticle(locale, { params: Promise.resolve({ dataset: "transport" }) }));

@@ -99,6 +99,7 @@ test.each([
   ["cumulative age rows added as bands", (facts: TransportFact[]) => { plus(find(facts, "transport.fleet.cars_age_up_to_10", 2025), "1"); }, /fleet\.cars by age do not add up/],
   ["a calculated status", (facts: TransportFact[]) => { (find(facts, "transport.fleet.cars", 2020) as { valueStatus: string }).valueStatus = "calculated"; }, /source contract/],
   ["a value from another sheet", (facts: TransportFact[]) => { find(facts, "transport.registered.total_owner_companies", 2025).sourceSheet = "fuel type"; }, /source contract/],
+  ["a not-listed zero row that is no longer zero", (facts: TransportFact[]) => { plus(find(facts, "transport.road_km.region_tbilisi_local", 2020), "1"); }, /no longer zero/],
   ["a changed anchor", (facts: TransportFact[]) => { plus(find(facts, "transport.passengers.metro", 2025), "0.1"); }, /anchor/],
 ] as const)("validation rejects %s", async (_, mutate, error) => {
   const facts = (await loadFacts()).map(f => ({ ...f }));

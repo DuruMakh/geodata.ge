@@ -21,7 +21,7 @@ beforeAll(async () => { facts = (await loadTransportFacts()).map(toClientTranspo
 const span = (coverage: { min: number; max: number }) => [coverage.min, coverage.max];
 const TOPICS: readonly TransportTopicId[] = ["vehicles", "vehicle-age", "passengers", "freight"];
 const state = (selectedIds: string[], range: { kind: "all" } | { kind: "manual"; start: number; end: number } = { kind: "all" }) => ({ mode: "line" as const, range, selectedIds });
-const t = (key: string) => ({ "heading.carsFuel": "Passenger cars by fuel · thousand", "heading.busesAge": "Buses and minibuses · thousand", unitThousandVehicles: "thousand vehicles", unitPkmPerPerson: "passenger-km per person", unitThousand: "thousand", unitMillion: "million", unitBillion: "billion" })[key] ?? key;
+const t = (key: string) => ({ "heading.carsFuel": "Passenger cars by fuel · thousand", "heading.busesAge": "Buses and minibuses · thousand", "heading.fuel": "By fuel · thousand", "heading.age": "By age · thousand", "heading.owner": "By owner · thousand", unitThousandVehicles: "thousand vehicles", unitPkmPerPerson: "passenger-km per person", unitThousand: "thousand", unitMillion: "million", unitBillion: "billion" })[key] ?? key;
 
 test("the hub lists four topic pages and the regions page", () => {
   expect(TRANSPORT_HUB_PATH).toBe("/explorer/transport");
@@ -63,6 +63,12 @@ test("the lists have the spec's rows under their headings, every one a served in
     ...Array(5).fill("registered"), ...Array(8).fill("fuel"), ...Array(5).fill("age"), ...Array(2).fill("owner"), ...Array(4).fill("roads"),
   ]);
   expect(transportAreaSeries("georgia")[0]).toEqual({ id: "transport.registered.total", reference: true, heading: "registered" });
+  // A road row Geostat prints as 0 in every year is not listed: Tbilisi's local roads (not counted, since the length excludes
+  // self-governing cities) and Racha-Lechkhumi and Kvemo Svaneti's international roads.
+  const roads = (area: Parameters<typeof transportAreaSeries>[0]) => transportAreaSeries(area).filter(s => s.heading === "roads").map(s => s.id.replace(`transport.road_km.${area}`, ""));
+  expect(roads("region_tbilisi")).toEqual(["", "_international", "_secondary"]);
+  expect(roads("region_racha_lechkhumi_kvemo_svaneti")).toEqual(["", "_secondary", "_local"]);
+  expect(roads("region_guria")).toEqual(["", "_international", "_secondary", "_local"]);
   const listed = [...TOPICS.flatMap(transportTopicSeries), ...TRANSPORT_AREAS.flatMap(transportAreaSeries)].map(s => s.id);
   expect(listed.filter(id => !TRANSPORT_INDICATORS.includes(id))).toEqual([]);
   expect(listed.some(id => /type_unknown|diesel_gas|hybrid_diesel|abkhazia|region_unknown/.test(id))).toBe(false);
@@ -110,6 +116,11 @@ test("labels: a fuel or age row names its heading, other rows keep their own nam
   expect(transportSeriesLabel({ id: "transport.fleet.cars_fuel_petrol", heading: "carsFuel" }, labels, t)).toBe("Petrol — Passenger cars by fuel");
   expect(transportSeriesLabel({ id: "transport.fleet.buses_age_up_to_2", heading: "busesAge" }, labels, t)).toBe("Up to 2 years — Buses and minibuses");
   expect(transportSeriesLabel({ id: "transport.fleet.cars", heading: "types" }, labels, t)).toBe("Passenger cars");
+  // An area page's fuel and age lists both have an "Unknown" row in the same unit.
+  const area = { "transport.registered.region_guria_fuel_unknown": "Unknown", "transport.registered.region_guria_age_unknown": "Unknown", "transport.registered.region_guria_owner_companies": "Companies" };
+  expect(transportSeriesLabel({ id: "transport.registered.region_guria_fuel_unknown", heading: "fuel" }, area, t)).toBe("Unknown — By fuel");
+  expect(transportSeriesLabel({ id: "transport.registered.region_guria_age_unknown", heading: "age" }, area, t)).toBe("Unknown — By age");
+  expect(transportSeriesLabel({ id: "transport.registered.region_guria_owner_companies", heading: "owner" }, area, t)).toBe("Companies — By owner");
   expect(transportValueLabel(1650, "vehicles", t)).toBe("1,650.0 thousand vehicles");
   expect(transportValueLabel(2858, "pkmPerPerson", t)).toBe("2,858 passenger-km per person");
   expect(transportValueLabel(null, "vehicles", t)).toBe("—");

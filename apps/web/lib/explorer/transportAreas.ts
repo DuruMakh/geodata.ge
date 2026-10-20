@@ -1,4 +1,4 @@
-import { TRANSPORT_REGIONS, TRANSPORT_ROAD_PARTS, transportIndicator, type ClientTransportFact } from "../data/transport/types";
+import { TRANSPORT_REGIONS, TRANSPORT_ROAD_PARTS, TRANSPORT_ZERO_ROWS, transportIndicator, type ClientTransportFact } from "../data/transport/types";
 import { TRANSPORT_SECTIONS, buildTransportSeriesModel, changeTransportSelection, parseTransportListHash, transportListCoverage, type TransportModel, type TransportSeriesDefinition } from "./transport";
 import { areaRoutes } from "./areaRoutes";
 import type { TopicState } from "./topicSeries";
@@ -22,13 +22,16 @@ const AREA_ROWS = [
   { heading: "owner", parts: ["owner_companies", "owner_individuals"] },
 ] as const;
 
-/** An area's list: registered vehicles by type, fuel, age and owner (all motor vehicles the ink reference), then its roads (all roads the reference). */
+/**
+ * An area's list: registered vehicles by type, fuel, age and owner (all motor vehicles the ink reference), then its roads (all
+ * roads the reference), without a road row that is 0 in every year (`TRANSPORT_ZERO_ROWS`).
+ */
 export function transportAreaSeries(area: TransportArea): TransportSeriesDefinition[] {
   const group = groupOf(area);
   return [
     ...AREA_ROWS.flatMap(({ heading, parts }) => parts.map(part => ({ id: transportIndicator("registered", part ? `${group}_${part}` : group), reference: part === "", heading }))),
     ...["", ...TRANSPORT_ROAD_PARTS].map(part => ({ id: transportIndicator("road_km", part ? `${group}_${part}` : group), reference: part === "", heading: "roads" as const })),
-  ];
+  ].filter(row => !TRANSPORT_ZERO_ROWS.includes(row.id));
 }
 
 export const transportAreaDefaultSelection = (area: TransportArea): string[] => [transportAreaSeries(area)[0].id];

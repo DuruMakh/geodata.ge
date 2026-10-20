@@ -25,7 +25,7 @@ test("the hub shows five cards, each opening its page", async ({ page }) => {
 
 const DEFAULTS = [
   { section: "vehicles", id: "transport.fleet.cars", latest: "მსუბუქი ავტომობილები · 2025: 1.65 მლნ" },
-  { section: "vehicle-age", id: "transport.fleet.cars_age_over_10", latest: "10+ წლის ავტომობილები · 2025: 1.32 მლნ" },
+  { section: "vehicle-age", id: "transport.fleet.cars_age_over_10", latest: "10+ წლის მსუბუქი მანქანები · 2025: 1.32 მლნ" },
   { section: "passengers", id: "transport.passenger_km.total", latest: "მგზავრთბრუნვა · 2025: 11.3 მლრდ" },
   { section: "freight", id: "transport.tonne_km.total", latest: "ტვირთბრუნვა · 2025: 5.1 მლრდ" },
 ];
