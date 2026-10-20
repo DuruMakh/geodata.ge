@@ -1,13 +1,17 @@
 import fs from "node:fs/promises";
+import os from "node:os";
 import path from "node:path";
 import { parse } from "csv-parse/sync";
 import Decimal from "decimal.js";
-import { expect, test } from "vitest";
+import { expect, test, vi } from "vitest";
 import { BUSINESS_REGIONS } from "../../../lib/data/business/types";
+import { assertTransportParity, loadTransportFacts, toClientTransportFact } from "../../../lib/data/transport/importTransport";
+import { loadTransportFactsFromMirror, transportMirrorCreateRows } from "../../../lib/db/mirrorRows";
+import type { Prisma } from "../../../lib/generated/prisma/client";
 import { REVIEWED_AT, TRANSPORT_CSV_HEADERS, prepareTransportData } from "../../../lib/data/transport/prepareTransport";
 import {
   TRANSPORT_INDICATORS, TRANSPORT_MEASURES, TRANSPORT_PUBLIC_SOURCES, TRANSPORT_REGIONS, TRANSPORT_SOURCES,
-  type TransportFact, type TransportIndicator,
+  transportSourceDocumentId, type TransportFact, type TransportIndicator,
 } from "../../../lib/data/transport/types";
 import { expectedTransportKeys, transportDisplayDecimals, validateTransportFacts } from "../../../lib/data/transport/validation";
 
@@ -101,4 +105,76 @@ test.each([
   validateTransportFacts(facts);
   mutate(facts);
   expect(() => validateTransportFacts(facts)).toThrow(error);
+});
+
+test("loading serves the same 4,301 values as the canonical file, keeping the spaces of the owner sheet name", async () => {
+  const facts = await loadTransportFacts();
+  expect(facts).toHaveLength(4301);
+  expect(facts).toEqual(await loadFacts());
+  expect(find(facts, "transport.registered.total_owner_individuals", 2017).sourceSheet).toBe(" type of owner ");
+});
+
+test("loading refuses a canonical file whose fingerprint differs from the report", async () => {
+  const dir = await fs.mkdtemp(path.join(os.tmpdir(), "transport-"));
+  try {
+    await fs.mkdir(path.join(dir, "apps/web"), { recursive: true });
+    await fs.mkdir(path.join(dir, "data/imports"), { recursive: true });
+    await fs.mkdir(path.join(dir, "data/reports"), { recursive: true });
+    const csv = await fs.readFile(path.join(root, "data/imports/transport-annual.csv"), "utf8");
+    const altered = csv.replace("2025,transport.fleet.cars,1650,1650.0", "2025,transport.fleet.cars,1650.1,1650.1");
+    expect(altered).not.toBe(csv);
+    await fs.writeFile(path.join(dir, "data/imports/transport-annual.csv"), altered);
+    await fs.copyFile(path.join(root, "data/reports/transport-validation.json"), path.join(dir, "data/reports/transport-validation.json"));
+    const cwd = vi.spyOn(process, "cwd").mockReturnValue(path.join(dir, "apps/web"));
+    try {
+      await expect(loadTransportFacts()).rejects.toThrow(/fingerprint/);
+    } finally {
+      cwd.mockRestore();
+    }
+  } finally {
+    await fs.rm(dir, { recursive: true, force: true });
+  }
+});
+
+test("parity accepts equal decimals written differently and rejects a changed or missing value", async () => {
+  const facts = await loadFacts();
+  const at = facts.findIndex(f => f.indicatorId === "transport.fleet.cars" && f.year === 2025);
+  expect(facts[at].value).toBe("1650");
+  expect(() => assertTransportParity(facts, facts.map(f => ({ ...f })))).not.toThrow();
+  const padded = facts.map(f => ({ ...f }));
+  padded[at].value = "1650.0";
+  expect(() => assertTransportParity(facts, padded)).not.toThrow();
+  const changed = facts.map(f => ({ ...f }));
+  changed[at].value = "1650.04";
+  expect(() => assertTransportParity(facts, changed)).toThrow();
+  expect(() => assertTransportParity(facts, facts.slice(1))).toThrow();
+});
+
+test("client facts carry the published values with their unit family and display precision", async () => {
+  const facts = await loadFacts();
+  expect(toClientTransportFact(find(facts, "transport.fleet.cars", 2025))).toMatchObject({ year: 2025, indicatorId: "transport.fleet.cars", value: 1650, unit: "vehicles", decimals: 1 });
+  expect(toClientTransportFact(find(facts, "transport.passenger_km_per_person.total", 2025))).toMatchObject({ value: 2858, unit: "pkmPerPerson", decimals: 0 });
+  expect(toClientTransportFact(find(facts, "transport.passenger_km.total", 2025))).toMatchObject({ value: 11262.1, unit: "pkm" });
+  expect(toClientTransportFact(find(facts, "transport.passengers.metro", 2025))).toMatchObject({ unit: "passengers" });
+  expect(toClientTransportFact(find(facts, "transport.tonne_km.rail", 2025))).toMatchObject({ unit: "tkm" });
+  expect(toClientTransportFact(find(facts, "transport.freight_tonnes.rail", 2025))).toMatchObject({ unit: "tonnes" });
+  expect(toClientTransportFact(find(facts, "transport.road_km.total", 2024))).toMatchObject({ unit: "km", decimals: 1 });
+});
+
+test("the database mirror round-trips exact decimals, the owner sheet name and source relations", async () => {
+  const facts = await loadFacts();
+  const rows = transportMirrorCreateRows(facts, "transport-run-1").map(row => ({ ...row, value: new Decimal(row.value as string), publishedValue: new Decimal(row.publishedValue as string) }));
+  const db = (list: typeof rows) => ({ transportFact: { findMany: async () => list } }) as unknown as Pick<Prisma.TransactionClient, "transportFact">;
+  const mirror = await loadTransportFactsFromMirror(db(rows));
+  expect(() => assertTransportParity(facts, mirror)).not.toThrow();
+  expect(mirror).toEqual(facts);
+  expect(rows[0].importRunId).toBe("transport-run-1");
+  expect(rows.every(row => row.sourceDocumentId === `source.${row.sourceId}`)).toBe(true);
+  await expect(loadTransportFactsFromMirror(db([{ ...rows[0], sourceDocumentId: "source.other" }]))).rejects.toThrow(/source relation/);
+});
+
+test("every archived source has a source-document row", async () => {
+  const csv = await fs.readFile(path.join(root, "data/sources/source-documents.csv"));
+  const ids = new Set((parse(csv, { columns: true, bom: true }) as Record<string, string>[]).map(r => r.source_id));
+  expect(TRANSPORT_PUBLIC_SOURCES.filter(id => !ids.has(transportSourceDocumentId(id)))).toEqual([]);
 });

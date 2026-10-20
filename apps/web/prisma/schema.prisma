@@ -93,6 +93,7 @@ model SourceDocument {
   externalPositionFacts ExternalPositionFact[]
   businessFacts BusinessFact[]
   housingFacts HousingFact[]
+  transportFacts TransportFact[]
   educationFacts EducationFact[]
   householdIncomeSpendingFacts HouseholdIncomeSpendingFact[]
   moneyTransferFacts MoneyTransferFact[]
@@ -147,6 +148,7 @@ model ImportRun {
   externalPositionFacts ExternalPositionFact[]
   businessFacts BusinessFact[]
   housingFacts HousingFact[]
+  transportFacts TransportFact[]
   educationFacts EducationFact[]
   householdIncomeSpendingFacts HouseholdIncomeSpendingFact[]
   moneyTransferEntities MoneyTransferEntity[]
@@ -1025,6 +1027,29 @@ model BusinessFact {
 // residential property price index and Tbilisi district prices, exact stored decimals with their
 // published rounding. Sheet names are kept verbatim (the 2012 sheet is "2012 ").
 model HousingFact {
+  year             Int
+  indicatorId      String
+  value            Decimal        @db.Decimal(40, 30)
+  publishedValue   Decimal        @db.Decimal(40, 30)
+  unit             String
+  basis            String
+  valueStatus      String
+  sourceId         String
+  sourceSheet      String
+  sourceCell       String
+  sourceDocumentId String
+  sourceDocument   SourceDocument @relation(fields: [sourceDocumentId], references: [id])
+  lastReviewedAt   DateTime       @db.Date
+  importRunId      String?
+  importRun        ImportRun?     @relation(fields: [importRunId], references: [id])
+
+  @@id([indicatorId, year])
+}
+
+// Mirror of data/imports/transport-annual.csv: Geostat's road vehicle fleet, passenger and freight
+// transport demand and carriage, registered vehicles and road length, exact stored decimals with their
+// published rounding. Sheet names are kept verbatim (the owner sheet is " type of owner ").
+model TransportFact {
   year             Int
   indicatorId      String
   value            Decimal        @db.Decimal(40, 30)
