@@ -115,6 +115,17 @@ describe("place pages", () => {
     expect(batumi).not.toContain("with natural increase, Georgia");
   });
 
+  it("follows births and deaths with one marriages and divorces section on every place page, Tbilisi included", async () => {
+    for (const route of [{ kind: "country" } as const, { kind: "region", id: "tbilisi" } as const, { kind: "municipality", slug: "kazbegi" } as const]) {
+      const html = await page(route);
+      expect(count(html, /id="marriages-divorces"/g), JSON.stringify(route)).toBe(1);
+      expect(html.indexOf('id="births-deaths"'), JSON.stringify(route)).toBeLessThan(html.indexOf('id="marriages-divorces"'));
+    }
+    const tbilisi = await page({ kind: "region", id: "tbilisi" });
+    expect(tbilisi).toContain("Tbilisi, 2009–2025");
+    expect(tbilisi).toContain('href="/en/explorer/demography/marriages-divorces"');
+  });
+
   it("ends Georgia and every region page with the census age and sex block, after births and deaths, and no municipality page with one", async () => {
     for (const route of [{ kind: "country" } as const, { kind: "region", id: "imereti" } as const, { kind: "region", id: "tbilisi" } as const]) {
       const html = await page(route);

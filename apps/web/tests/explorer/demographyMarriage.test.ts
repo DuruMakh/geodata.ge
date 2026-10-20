@@ -2,7 +2,6 @@ import { beforeAll, describe, expect, it } from "vitest";
 import { loadServedDemographyData } from "../../lib/data/demography/importDemography";
 import { loadServedMunicipalData } from "../../lib/data/servedData";
 import {
-  buildMarriageIndexModel,
   buildMarriageModel,
   changeMarriageSelection,
   MARRIAGE_DEFAULT_SELECTION,
@@ -11,10 +10,10 @@ import {
   parseMarriageHash,
   perThousand,
   serializeMarriageHash,
-  type MarriageIndexModel,
   type MarriagePlaceFacts,
   type MarriageState,
 } from "../../lib/explorer/demographyMarriage";
+import { buildMarriageIndexModel, type MarriageIndexModel } from "../../lib/explorer/demographyMarriageIndex";
 
 let facts: Awaited<ReturnType<typeof loadServedDemographyData>>["facts"];
 let georgia: MarriagePlaceFacts;

@@ -110,7 +110,8 @@ describe("indexable Fiscal.ge routes", () => {
     // Housing adds its hub, four pages and a page for Georgia and each of the 11 regions: 17 bilingual pairs.
     // The Housing methodology adds one more bilingual pair.
     // Education adds its hub, four pages, the 75 Schools and 75 Kindergartens place pages and its methodology page: 156 bilingual pairs.
-    expect(urls).toHaveLength(1020);
+    // Marriages and divorces adds one demography page: one bilingual pair.
+    expect(urls).toHaveLength(1022);
     expect(new Set(urls).size).toBe(urls.length);
     expect(urls.every((url) => url.startsWith("https://fiscal.ge/"))).toBe(true);
     expect(urls).toContain("https://fiscal.ge/about");
@@ -266,6 +267,7 @@ const PAGES = [
   "/explorer/demography/age-sex",
   "/explorer/demography/migration",
   "/explorer/demography/births-deaths",
+  "/explorer/demography/marriages-divorces",
   "/methodology/demography",
 ] as const;
 
@@ -333,6 +335,7 @@ describe("demography discovery", () => {
         "/explorer/demography/age-sex",
         "/explorer/demography/migration",
         "/explorer/demography/births-deaths",
+        "/explorer/demography/marriages-divorces",
         "/explorer/demography/population/batumi",
       ]) {
         const entry = entries.find((candidate) => candidate.url === `https://fiscal.ge${path}`);

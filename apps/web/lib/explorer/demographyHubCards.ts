@@ -27,6 +27,9 @@ export function buildDemographyHubCards(
   const births = facts
     .filter((fact) => fact.seriesId === SERIES.liveBirths && fact.geographyId === GEORGIA_PLACE_ID)
     .sort((left, right) => left.year - right.year);
+  const marriages = facts
+    .filter((fact) => fact.seriesId === SERIES.marriages && fact.geographyId === GEORGIA_PLACE_ID)
+    .sort((left, right) => left.year - right.year);
   // Georgia's share aged 65+ on 1 January: the 65+ band over the three bands, both sexes.
   const bandsByYear = new Map<number, { all: number; old: number }>();
   for (const fact of facts) {
@@ -73,6 +76,15 @@ export function buildDemographyHubCards(
         series: births.map((fact) => fact.value),
         seriesColor: INK,
         footer: t("birthsCardFooter", { year: lastBirths.year, births: formatInUnit(lastBirths.value, UNIT_PERSONS), first: firstBirths.year, last: lastBirths.year }),
+      };
+    }
+    if (page.id === "marriages-divorces" && page.live && marriages.length) {
+      const [firstMarriages, lastMarriages] = [marriages[0]!, marriages.at(-1)!];
+      return {
+        ...card,
+        series: marriages.map((fact) => fact.value),
+        seriesColor: INK,
+        footer: t("marriagesCardFooter", { year: lastMarriages.year, marriages: formatInUnit(lastMarriages.value, UNIT_PERSONS), first: firstMarriages.year, last: lastMarriages.year }),
       };
     }
     if (page.id !== "population" || !first || !last) return { ...card, series: null, seriesColor: null, footer: null };
