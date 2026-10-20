@@ -130,6 +130,12 @@ export function energyFoodCoverage(section: EnergyFoodSectionId, facts: readonly
   return unitListCoverage(energyFoodSeries(section), selectedIds, facts, `No energy and food years for ${section}`, energyFoodGroup);
 }
 
+/** A page's "updated" date: the latest review date among its own series' facts, so adding farming leaves the energy pages' dates as they were. */
+export function energyFoodLastReviewedAt(section: EnergyFoodSectionId, facts: readonly { indicatorId: string; lastReviewedAt: string }[]): string {
+  const ids = new Set<string>(energyFoodSeries(section).map(s => s.id));
+  return facts.filter(f => ids.has(f.indicatorId)).map(f => f.lastReviewedAt).sort().at(-1)!;
+}
+
 export function defaultEnergyFoodState(section: EnergyFoodSectionId): EnergyFoodState {
   return { mode: "line", range: { kind: "all" }, selectedIds: [energyFoodSeries(section)[0].id] };
 }

@@ -19,8 +19,9 @@ export function buildEnergyFoodWorkbookExportModel(input: { section: EnergyFoodS
   const known = new Set(input.sources.map(source => source.sourceId));
   for (const sourceId of neededYears.keys()) if (!known.has(sourceId)) throw new Error(`Missing public source for energy and food source ${sourceId}`);
   const originals = sourcesForNeededYears(input.sources, neededYears);
+  // Food ratios are whole percents and farm-gate prices carry two decimals, as Geostat prints them.
   const unit = model.unitKey;
-  const numberFormat = unit === "percent" ? "0" : "#,##0.0";
+  const numberFormat = unit === "percent" ? "0" : unit === "price" ? "0.00" : "#,##0.0";
   const status = (fact: ClientEnergyFoodFact | undefined) => fact ? t(`status.${fact.valueStatus}`) : workbookMessage(locale, "workbook.unavailable");
   const header: Record<typeof ANALYSIS_COLUMNS[number], string> = { year: workbookMessage(locale, "workbook.year"), series: t("series"), value: t(`unit.${unit}`), status: workbookMessage(locale, "workbook.status") };
   return {

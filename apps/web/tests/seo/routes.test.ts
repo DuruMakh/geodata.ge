@@ -110,7 +110,8 @@ describe("indexable Fiscal.ge routes", () => {
     // Housing adds its hub, four pages and a page for Georgia and each of the 11 regions: 17 bilingual pairs.
     // The Housing methodology adds one more bilingual pair.
     // Education adds its hub, four pages, the 75 Schools and 75 Kindergartens place pages and its methodology page: 156 bilingual pairs.
-    expect(urls).toHaveLength(1020);
+    // Farming adds one Energy and food page: 1 bilingual pair.
+    expect(urls).toHaveLength(1022);
     expect(new Set(urls).size).toBe(urls.length);
     expect(urls.every((url) => url.startsWith("https://fiscal.ge/"))).toBe(true);
     expect(urls).toContain("https://fiscal.ge/about");
@@ -145,7 +146,7 @@ describe("indexable Fiscal.ge routes", () => {
       expect(urls).toContain(`https://fiscal.ge/en/explorer/living-standards/${section}/regions/georgia`);
     }
     expect(urls.some((url) => url.includes("/explorer/poverty"))).toBe(false);
-    for (const page of ["", "/energy-supply", "/electricity", "/energy-use", "/food-self-sufficiency"]) {
+    for (const page of ["", "/energy-supply", "/electricity", "/energy-use", "/food-self-sufficiency", "/farming"]) {
       expect(urls).toContain(`https://fiscal.ge/explorer/energy-food${page}`);
       expect(urls).toContain(`https://fiscal.ge/en/explorer/energy-food${page}`);
     }

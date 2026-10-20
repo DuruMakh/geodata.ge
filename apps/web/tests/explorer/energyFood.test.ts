@@ -3,7 +3,7 @@ import { beforeAll, expect, test } from "vitest";
 import { loadEnergyFoodFacts, toClientEnergyFoodFact } from "../../lib/data/energyFood/importEnergyFood";
 import type { ClientEnergyFoodFact } from "../../lib/data/energyFood/types";
 import {
-  buildEnergyFoodModel, changeEnergyFoodSelection, defaultEnergyFoodState, energyFoodCoverage, energyFoodDisplayLabels, energyFoodGroup, energyFoodSeries,
+  buildEnergyFoodModel, changeEnergyFoodSelection, defaultEnergyFoodState, energyFoodCoverage, energyFoodDisplayLabels, energyFoodGroup, energyFoodLastReviewedAt, energyFoodSeries,
   ENERGY_FOOD_SECTIONS, parseEnergyFoodHash, serializeEnergyFoodHash, type EnergyFoodSectionId,
 } from "../../lib/explorer/energyFood";
 import { EDITORIAL_PALETTE, INK } from "../../lib/explorer/colors";
@@ -195,14 +195,14 @@ test("within a chart's group every non-reference series has its own readable col
 const COPY: Record<Locale, Record<string, string>> = {
   en: {
     "energyFood.unit.ktoe": "ktoe", "energyFood.unit.gwh": "GWh", "energyFood.unit.percent": "%", "energyFood.series": "Series",
-    "energyFood.status.published": "Published", "energyFood.status.no_flow": "No flow",
+    "energyFood.status.published": "Published", "energyFood.status.no_flow": "No flow", "energyFood.status.preliminary": "Preliminary", "energyFood.unit.price": "₾",
     "common.energySupply": "Energy supply", "common.electricity": "Electricity", "common.energyUse": "Energy use", "common.foodSelfSufficiency": "Food self-sufficiency",
     "common.farming": "Farming", "energyFood.unit.million_gel": "million ₾",
     ...Object.fromEntries(ENERGY_FOOD_SECTIONS.flatMap(({ id }) => [[`energyFood.page.${id}.title`, `${id} title`], [`energyFood.page.${id}.summary`, `${id} summary`]])),
   },
   ka: {
     "energyFood.unit.ktoe": "ათასი ტ.ნ.ე.", "energyFood.unit.gwh": "გვტ.სთ", "energyFood.unit.percent": "%", "energyFood.series": "სერია",
-    "energyFood.status.published": "გამოქვეყნებული", "energyFood.status.no_flow": "ნაკადი არ არის",
+    "energyFood.status.published": "გამოქვეყნებული", "energyFood.status.no_flow": "ნაკადი არ არის", "energyFood.status.preliminary": "წინასწარი", "energyFood.unit.price": "₾",
     "common.energySupply": "ენერგიის მიწოდება", "common.electricity": "ელექტროენერგია", "common.energyUse": "ენერგიის მოხმარება", "common.foodSelfSufficiency": "სურსათის თვითუზრუნველყოფა",
     "common.farming": "სოფლის მეურნეობა", "energyFood.unit.million_gel": "მლნ ₾",
     ...Object.fromEntries(ENERGY_FOOD_SECTIONS.flatMap(({ id }) => [[`energyFood.page.${id}.title`, `${id} სათაური`], [`energyFood.page.${id}.summary`, `${id} აღწერა`]])),
@@ -218,6 +218,8 @@ const SOURCES = [
   ...BALANCE_YEARS.map(year => sourceFor(`geostat_energy_balance_${year}_aggregated`, [year])),
   ...BALANCE_YEARS.map(year => sourceFor(`geostat_energy_balance_${year}_electricity`, [year])),
   sourceFor("geostat_food_balance_sheets", Array.from({ length: 12 }, (_, i) => 2014 + i)),
+  sourceFor("geostat_farming_general", Array.from({ length: 16 }, (_, i) => 2010 + i)),
+  sourceFor("geostat_farming_prices", Array.from({ length: 12 }, (_, i) => 2014 + i)),
 ];
 const loadWorkbook = async (model: Parameters<typeof createWorkbookBuffer>[0]) => { const excel = new ExcelJS.Workbook(); await excel.xlsx.load(await createWorkbookBuffer(model)); return excel; };
 
@@ -405,4 +407,37 @@ test("the model's unit and unitKey follow the selection", () => {
   const empty = buildEnergyFoodModel("farming", facts, { ...defaultEnergyFoodState("farming"), selectedIds: [] });
   expect([empty.unit, empty.unitKey]).toEqual(["million_gel", "million_gel"]);
   expect(empty.years[0]).toBe(2006);
+});
+
+test("the farming price workbook formats values 0.00 and names the price unit", async () => {
+  const model = buildEnergyFoodWorkbookExportModel({
+    section: "farming", facts, sources: SOURCES, siteOrigin: "https://fiscal.ge", labels: { "farming.price.wheat": "Wheat", "farming.price.milk": "Milk, per litre" },
+    state: { mode: "table", range: { kind: "manual", start: 2024, end: 2025 }, selectedIds: ["farming.price.wheat", "farming.price.milk"] },
+  }, await presentationFor("en"));
+  expect(model.filename).toBe("fiscal-energy-food-farming-2024-2025-en.xlsx");
+  expect(model.readable.numberFormat).toBe("0.00");
+  expect(model.readable.amountDecimals).toBe(2);
+  expect(model.readable.unitLabel).toBe("₾");
+  expect(model.analysis.headers[2]).toBe("₾");
+  expect(model.analysis.numericFormats).toEqual({ 3: "0.00" });
+  expect(model.analysis.rows.find(r => r[0] === 2025 && r[1] === "Wheat")!.slice(2)).toEqual([0.57, "Published"]);
+  expect(model.sources.map(source => source.title)).toEqual(["geostat_farming_prices"]);
+});
+
+test("the output workbook marks 2025 preliminary in the status column", async () => {
+  const model = buildEnergyFoodWorkbookExportModel({
+    section: "farming", facts, sources: SOURCES, siteOrigin: "https://fiscal.ge", labels: { "farming.output.total": "Farm output, total" },
+    state: { mode: "table", range: { kind: "manual", start: 2023, end: 2025 }, selectedIds: ["farming.output.total"] },
+  }, await presentationFor("en"));
+  expect(model.readable.numberFormat).toBe("#,##0.0");
+  expect(model.readable.unitLabel).toBe("million ₾");
+  expect(model.analysis.rows.map(r => r.slice(0, 1).concat(r.slice(3)))).toEqual([[2023, "Published"], [2024, "Published"], [2025, "Preliminary"]]);
+  expect(model.analysis.rows.at(-1)![2]).toBe(8384.9);
+});
+
+test("each page's updated date comes from its own facts", async () => {
+  const served = await loadEnergyFoodFacts();
+  expect(energyFoodLastReviewedAt("energy-supply", served)).toBe("2026-10-11");
+  expect(energyFoodLastReviewedAt("food-self-sufficiency", served)).toBe("2026-10-11");
+  expect(energyFoodLastReviewedAt("farming", served)).toBe("2026-10-20");
 });
