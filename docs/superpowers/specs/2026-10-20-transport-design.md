@@ -109,10 +109,11 @@ Sea tonne-km is published 2000–2008 and in 2011–2012; the rest are `...` gap
 - One latest-value line, for example "2025: 40.7 thousand registered vehicles · Guria".
 - One series list under these headings:
   - **Registered vehicles · thousand** (2017–2025): **All motor vehicles** (selected), Passenger cars, Buses and minibuses, Trucks, Special vehicles.
-  - **By fuel · thousand** (2017–2025): Petrol, Petrol and gas, Diesel, Gas, Electric, Hybrid, Unknown.
+  - **By fuel · thousand** (2017–2025): Petrol, Petrol and gas, Diesel, Gas, Electric, Hybrid, Hybrid and gas (2022–2025), Unknown.
   - **By age · thousand** (2017–2025): Up to 2 years, 2 to 5 years, 5 to 10 years, Over 10 years, Unknown (this table's bands are separate, not cumulative).
   - **By owner · thousand** (2017–2025): Companies, Individuals.
   - **Roads · km** (2011–2024): All roads, International, Secondary, Local.
+- Geostat's three tiny columns of this table (vehicle type unknown from 2022, diesel and gas, hybrid diesel; at most 0.2 thousand in Georgia, 0.0 in every region at Geostat's precision) are kept in the data file for the sum checks but not listed.
 - The first four headings share one unit, so they can be charted together; Roads replaces the selection.
 - Georgia's page uses the Georgia rows of the same regional tables, so its figures can differ from the Vehicles page by rounding. Georgia's total also includes vehicles registered under Abkhazia's authorities in exile and "region unknown", which have no area page; the methodology says so. Tbilisi's roads are only the 52 km the Roads Department manages, as Geostat notes.
 
