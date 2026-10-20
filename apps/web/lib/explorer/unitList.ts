@@ -1,5 +1,5 @@
-import { refitRange } from "./periodRange";
-import { parseTopicHash, topicCoverage, type TopicState } from "./topicSeries";
+import { refitRange, type ResolvedPeriodRange } from "./periodRange";
+import { buildTopicModel, parseTopicHash, topicCoverage, type TopicCoverage, type TopicSeriesDefinition, type TopicSeriesModel, type TopicState } from "./topicSeries";
 
 // The "one unit at a time" rule of a list whose rows have different units (Business, Housing, Crime and justice, and
 // Education's place pages by heading), and a list row's latest figure: the rules live here once.
@@ -77,4 +77,28 @@ export function parseUnitListHash(hash: string, definitions: readonly { id: stri
 export function changeUnitListSelection(state: TopicState, definitions: readonly { id: string }[], next: readonly string[], facts: readonly UnitFact[], missing = noYears(definitions), groupOf?: GroupOf): TopicState {
   const selectedIds = keepOneUnit(next, state.selectedIds, facts, groupOf);
   return { ...state, selectedIds, range: refitRange(state.range, unitListCoverage(definitions, selectedIds, facts, missing, groupOf), { collapseToAll: false }) };
+}
+
+/** What a list's model needs of a fact: the unit-list fields plus its value and display decimals. */
+export type ListFact = UnitFact & { value: number; decimals: number };
+export type UnitListModel<D extends TopicSeriesDefinition, F extends ListFact, X extends object> = {
+  range: ResolvedPeriodRange; years: number[]; series: TopicSeriesModel<D & { decimals: number; unit: F["unit"] } & X>[];
+  selected: TopicSeriesModel<D & { decimals: number; unit: F["unit"] } & X>[]; unit: F["unit"];
+};
+
+/**
+ * The years (`coverage`, the selection's unit's), values, colours, decimals and units of a list of series (Housing and
+ * Science and culture). A year without a fact is null, never zero. `extra` adds fields of a page's own to each series
+ * (Housing's stroke). `unit` is the selection's (the list's first series' when nothing is selected).
+ */
+export function buildUnitListModel<D extends TopicSeriesDefinition, F extends ListFact, X extends object = Record<never, never>>(input: {
+  definitions: readonly D[]; facts: readonly F[]; state: TopicState; coverage: TopicCoverage; color: (definition: D, index: number) => string; extra?: (definition: D) => X;
+}): UnitListModel<D, F, X> {
+  const byCell = new Map(input.facts.map(f => [`${f.indicatorId}:${f.year}`, f.value]));
+  const first = new Map<string, F>();
+  for (const fact of input.facts) if (!first.has(fact.indicatorId)) first.set(fact.indicatorId, fact);
+  const model = buildTopicModel({ range: input.state.range, coverage: input.coverage, selectedIds: input.state.selectedIds, color: input.color,
+    definitions: input.definitions.map(definition => ({ ...definition, decimals: first.get(definition.id)?.decimals ?? 0, unit: first.get(definition.id)!.unit, ...input.extra?.(definition) as X })),
+    value: (definition, year) => byCell.get(`${definition.id}:${year}`) });
+  return { ...model, unit: (model.selected[0] ?? model.series[0]).unit };
 }

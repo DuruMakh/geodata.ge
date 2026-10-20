@@ -129,6 +129,11 @@
   "common.educationKindergartens": "საბავშვო ბაღები",
   "common.educationUniversities": "უნივერსიტეტები",
   "common.educationVocational": "პროფესიული კოლეჯები",
+  "common.scienceCulture": "მეცნიერება და კულტურა",
+  "common.scienceCultureResearch": "კვლევები",
+  "common.scienceCulturePatents": "პატენტები",
+  "common.scienceCultureMuseums": "მუზეუმები",
+  "common.scienceCultureTheatres": "თეატრები",
   "common.dataWages": "მონაცემები · ხელფასები",
   "common.dataLivingStandards": "მონაცემები · ცხოვრების დონე",
   "common.dataHealth": "მონაცემები · ჯანდაცვა და სოციალური დაცვა",
@@ -139,6 +144,7 @@
   "common.dataHousing": "მონაცემები · საცხოვრებელი და მშენებლობა",
   "common.dataTransport": "მონაცემები · ტრანსპორტი",
   "common.dataEducation": "მონაცემები · განათლება",
+  "common.dataScienceCulture": "მონაცემები · მეცნიერება და კულტურა",
   "common.dataLoading": "მონაცემები იტვირთება…",
   "common.dataLoadError": "მონაცემები ვერ ჩაიტვირთა — განაახლეთ გვერდი და სცადეთ თავიდან."
 }

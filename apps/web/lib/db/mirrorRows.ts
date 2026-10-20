@@ -51,6 +51,8 @@ import { transportDisplayDecimals } from "../data/transport/validation";
 import { businessDisplayDecimals } from "../data/business/validation";
 import { educationSourceDocumentId, type EducationFact } from "../data/education/types";
 import { educationDisplayDecimals } from "../data/education/validation";
+import { scienceCultureSourceDocumentId, type ScienceCultureFact } from "../data/scienceCulture/types";
+import { scienceCultureDisplayDecimals } from "../data/scienceCulture/validation";
 import { householdSourceDocumentId, type HouseholdFact } from "../data/household/types";
 import type { DemographyObservation, Sex, Settlement } from "../data/demography/types";
 
@@ -893,6 +895,24 @@ export async function loadEducationFactsFromMirror(db: Pick<MirrorClient, "educa
       year: row.year, periodLabel: row.periodLabel, indicatorId: row.indicatorId as EducationFact["indicatorId"], geographyId: row.geographyId,
       value: row.value.toFixed(), publishedValue: row.publishedValue.toFixed(educationDisplayDecimals(row.indicatorId)), unit: row.unit as EducationFact["unit"], basis: row.basis as "actual", valueStatus: row.valueStatus as "official",
       shown: row.shown, sourceId: row.sourceId, sourceSheet: row.sourceSheet, sourceCell: row.sourceCell, lastReviewedAt: isoDate(row.lastReviewedAt),
+    };
+  });
+}
+
+export function scienceCultureMirrorCreateRows(facts: readonly ScienceCultureFact[], importRunId: string): Prisma.ScienceCultureFactCreateManyInput[] {
+  return facts.map(({ lastReviewedAt, ...fact }) => ({
+    ...fact, sourceDocumentId: scienceCultureSourceDocumentId(fact.sourceId), lastReviewedAt: new Date(`${lastReviewedAt}T00:00:00.000Z`), importRunId,
+  }));
+}
+
+export async function loadScienceCultureFactsFromMirror(db: Pick<MirrorClient, "scienceCultureFact">): Promise<ScienceCultureFact[]> {
+  const rows = await db.scienceCultureFact.findMany({ orderBy: [{ indicatorId: "asc" }, { year: "asc" }] });
+  return rows.map(row => {
+    if (row.sourceDocumentId !== scienceCultureSourceDocumentId(row.sourceId)) throw new Error("Science and culture source relation mismatch");
+    return {
+      year: row.year, indicatorId: row.indicatorId as ScienceCultureFact["indicatorId"],
+      value: row.value.toFixed(), publishedValue: row.publishedValue.toFixed(Math.max(scienceCultureDisplayDecimals(row.indicatorId), row.value.decimalPlaces())), unit: row.unit as ScienceCultureFact["unit"], basis: row.basis as "actual", valueStatus: row.valueStatus as "official",
+      sourceId: row.sourceId, sourceSheet: row.sourceSheet, sourceCell: row.sourceCell, lastReviewedAt: isoDate(row.lastReviewedAt),
     };
   });
 }

@@ -39,6 +39,8 @@ import { EDUCATION_HUB_PATH, EDUCATION_SECTIONS } from "../explorer/education";
 import { TRANSPORT_HUB_PATH, TRANSPORT_SECTIONS } from "../explorer/transport";
 import { TRANSPORT_AREAS, transportAreaHref } from "../explorer/transportAreas";
 import { educationPlaceBase } from "../explorer/educationPlaces";
+import { SCIENCE_CULTURE_HUB_PATH, SCIENCE_CULTURE_SECTIONS } from "../explorer/scienceCulture";
+import { MUSEUM_AREAS, museumAreaHref } from "../explorer/scienceCultureMuseums";
 
 const sortedUnique = (ids: readonly string[]): string[] => [...new Set(ids)].sort();
 
@@ -61,6 +63,7 @@ export async function listPublicPagePaths(): Promise<string[]> {
     BUSINESS_HUB_PATH, ...BUSINESS_SECTIONS.map(section => section.href), ...BUSINESS_AREAS.map(businessAreaHref),
     HOUSING_HUB_PATH, ...HOUSING_SECTIONS.map(section => section.href), ...HOUSING_AREAS.map(housingAreaHref),
     EDUCATION_HUB_PATH, ...EDUCATION_SECTIONS.map(section => section.href), ...(["schools", "kindergartens"] as const).flatMap(set => placePagePaths(educationPlaceBase(set), regions.map(({ id }) => id))),
+    SCIENCE_CULTURE_HUB_PATH, ...SCIENCE_CULTURE_SECTIONS.map(section => section.href), ...MUSEUM_AREAS.map(museumAreaHref),
     ...regions.map(region => unemploymentRegionHref(region.id)),
     "/explorer/economy/regions",
     ...regions.map(({ id }) => `/explorer/economy/regions/${id.replace(/^region\./, "")}`),

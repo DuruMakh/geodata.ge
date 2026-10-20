@@ -2576,6 +2576,237 @@
     },
     "derivation": null
   },
+  "source.geostat_science_researchers": {
+    "name": {
+      "text": "Number of researchers by level of education, age groups and fields of science",
+      "reviewedAt": "2026-10-20"
+    },
+    "derivation": null
+  },
+  "source.geostat_science_rd_staff": {
+    "name": {
+      "text": "Number of persons working on R&D by status",
+      "reviewedAt": "2026-10-20"
+    },
+    "derivation": null
+  },
+  "source.geostat_science_institutions": {
+    "name": {
+      "text": "Number of institutions that conducted R&D and their expenditures",
+      "reviewedAt": "2026-10-20"
+    },
+    "derivation": null
+  },
+  "source.geostat_science_patents": {
+    "name": {
+      "text": "Inventions and utility models (Sakpatenti)",
+      "reviewedAt": "2026-10-20"
+    },
+    "derivation": null
+  },
+  "source.geostat_science_publications": {
+    "name": {
+      "text": "Number of scientific publications in the Georgian Abstracts Journal",
+      "reviewedAt": "2026-10-20"
+    },
+    "derivation": null
+  },
+  "source.geostat_culture_museums": {
+    "name": {
+      "text": "Museums (museum unions) and museum reserves, main characteristics",
+      "reviewedAt": "2026-10-20"
+    },
+    "derivation": null
+  },
+  "source.geostat_culture_museums_count_regions": {
+    "name": {
+      "text": "Number of museums (museum unions) and museum reserves by regions",
+      "reviewedAt": "2026-10-20"
+    },
+    "derivation": null
+  },
+  "source.geostat_culture_museums_regions": {
+    "name": {
+      "text": "Main characteristics of museums (museum unions) and museum reserves by regions",
+      "reviewedAt": "2026-10-20"
+    },
+    "derivation": null
+  },
+  "source.geostat_culture_museum_staff": {
+    "name": {
+      "text": "Number of staff employed in museums",
+      "reviewedAt": "2026-10-20"
+    },
+    "derivation": null
+  },
+  "source.geostat_culture_museum_exhibits": {
+    "name": {
+      "text": "The exhibits of museums (2011 only)",
+      "reviewedAt": "2026-10-20"
+    },
+    "derivation": null
+  },
+  "source.geostat_culture_theatres": {
+    "name": {
+      "text": "Main indicators of professional theatres",
+      "reviewedAt": "2026-10-20"
+    },
+    "derivation": null
+  },
+  "source.geostat_culture_theatres_regions": {
+    "name": {
+      "text": "Main indicators of professional theatres by regions",
+      "reviewedAt": "2026-10-20"
+    },
+    "derivation": null
+  },
+  "source.geostat_culture_theatres_count_regions": {
+    "name": {
+      "text": "Number of professional theatres by regions",
+      "reviewedAt": "2026-10-20"
+    },
+    "derivation": null
+  },
+  "source.geostat_culture_theatre_staff": {
+    "name": {
+      "text": "Number of staff employed in theatres",
+      "reviewedAt": "2026-10-20"
+    },
+    "derivation": null
+  },
+  "source.geostat_culture_theatre_events": {
+    "name": {
+      "text": "Data on events held by theatres",
+      "reviewedAt": "2026-10-20"
+    },
+    "derivation": null
+  },
+  "source.geostat_culture_libraries": {
+    "name": {
+      "text": "Public and universal libraries (2001-2008)",
+      "reviewedAt": "2026-10-20"
+    },
+    "derivation": null
+  },
+  "source.geostat_culture_libraries_regions": {
+    "name": {
+      "text": "Number of libraries by regions (2003-2008)",
+      "reviewedAt": "2026-10-20"
+    },
+    "derivation": null
+  },
+  "source.geostat_culture_publishing": {
+    "name": {
+      "text": "Calculation of data on publishing materials (2005-2020)",
+      "reviewedAt": "2026-10-20"
+    },
+    "derivation": null
+  },
+  "source.geostat_ka_science_institutions": {
+    "name": {
+      "text": "Number of institutions that conducted R&D and their expenditures (Georgian version)",
+      "reviewedAt": "2026-10-20"
+    },
+    "derivation": null
+  },
+  "source.geostat_ka_science_rd_staff": {
+    "name": {
+      "text": "Number of persons working on R&D by status (Georgian version)",
+      "reviewedAt": "2026-10-20"
+    },
+    "derivation": null
+  },
+  "source.geostat_ka_science_researchers": {
+    "name": {
+      "text": "Number of researchers by level of education, age groups and fields of science (Georgian version)",
+      "reviewedAt": "2026-10-20"
+    },
+    "derivation": null
+  },
+  "source.geostat_ka_science_patents": {
+    "name": {
+      "text": "Inventions and utility models (Sakpatenti) (Georgian version)",
+      "reviewedAt": "2026-10-20"
+    },
+    "derivation": null
+  },
+  "source.geostat_ka_culture_museums": {
+    "name": {
+      "text": "Museums (museum unions) and museum reserves, main characteristics (Georgian version)",
+      "reviewedAt": "2026-10-20"
+    },
+    "derivation": null
+  },
+  "source.geostat_ka_culture_museums_count_regions": {
+    "name": {
+      "text": "Number of museums (museum unions) and museum reserves by regions (Georgian version)",
+      "reviewedAt": "2026-10-20"
+    },
+    "derivation": null
+  },
+  "source.geostat_ka_culture_museum_staff": {
+    "name": {
+      "text": "Number of staff employed in museums (Georgian version)",
+      "reviewedAt": "2026-10-20"
+    },
+    "derivation": null
+  },
+  "source.geostat_ka_culture_theatres": {
+    "name": {
+      "text": "Main indicators of professional theatres (Georgian version)",
+      "reviewedAt": "2026-10-20"
+    },
+    "derivation": null
+  },
+  "source.geostat_ka_culture_theatres_regions": {
+    "name": {
+      "text": "Main indicators of professional theatres by regions (Georgian version)",
+      "reviewedAt": "2026-10-20"
+    },
+    "derivation": null
+  },
+  "source.geostat_ka_culture_theatres_count_regions": {
+    "name": {
+      "text": "Number of professional theatres by regions (Georgian version)",
+      "reviewedAt": "2026-10-20"
+    },
+    "derivation": null
+  },
+  "source.geostat_ka_culture_theatre_staff": {
+    "name": {
+      "text": "Number of staff employed in theatres (Georgian version)",
+      "reviewedAt": "2026-10-20"
+    },
+    "derivation": null
+  },
+  "source.geostat_ka_culture_theatre_events": {
+    "name": {
+      "text": "Data on events held by theatres (Georgian version)",
+      "reviewedAt": "2026-10-20"
+    },
+    "derivation": null
+  },
+  "source.geostat_ka_culture_museums_regions": {
+    "name": {
+      "text": "Main characteristics of museums (museum unions) and museum reserves by regions (Georgian version)",
+      "reviewedAt": "2026-10-20"
+    },
+    "derivation": null
+  },
+  "source.geostat_science_page": {
+    "name": {
+      "text": "Science (source page capture)",
+      "reviewedAt": "2026-10-20"
+    },
+    "derivation": null
+  },
+  "source.geostat_culture_page": {
+    "name": {
+      "text": "Culture (source page capture)",
+      "reviewedAt": "2026-10-20"
+    },
+    "derivation": null
+  },
   "source.geostat_transport_passenger_demand": {
     "name": { "text": "Passenger transport demand by mode (table H-1)", "reviewedAt": "2026-10-20" },
     "derivation": null

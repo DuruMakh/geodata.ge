@@ -39,7 +39,7 @@ test("the inflation hub loads no explorer chunk", async ({ request }) => {
 // Every explorer renders a chart panel; no hub does.
 test("no topic hub loads explorer code", async ({ request }) => {
   expect(await testIdsShipped(request, "/explorer/wages/overview", ["chart-panel"])).toEqual(["chart-panel"]);
-  for (const hub of ["trade", "wages", "unemployment", "external", "money", "energy-food", "economy", "demography", "living-standards", "health", "crime", "housing", "transport"]) {
+  for (const hub of ["trade", "wages", "unemployment", "external", "money", "energy-food", "economy", "demography", "living-standards", "health", "crime", "housing", "science-culture", "transport"]) {
     expect(await testIdsShipped(request, `/explorer/${hub}`, ["chart-panel"]), hub).toEqual([]);
   }
 });
@@ -52,7 +52,7 @@ test("expenditure and revenue load no analysis view, and the analysis no multi-y
   expect(await testIdsShipped(request, "/explorer/analysis", testIds)).toEqual(["budget-radar"]);
 });
 
-test("the wages, household, causes-of-death, housing and transport map indexes load no explorer, and their pages no map index", async ({ request }) => {
+test("the wages, household, causes-of-death, housing, museums and transport map indexes load no explorer, and their pages no map index", async ({ request }) => {
   const wages = ["wages-region-map", "wages-excel-download"];
   expect(await testIdsShipped(request, "/explorer/wages/regions", wages)).toEqual(["wages-region-map"]);
   expect(await testIdsShipped(request, "/explorer/wages/regions/imereti", wages)).toEqual(["wages-excel-download"]);
@@ -65,6 +65,9 @@ test("the wages, household, causes-of-death, housing and transport map indexes l
   const housing = ["housing-region-map", "housing-excel-download"];
   expect(await testIdsShipped(request, "/explorer/housing/regions", housing)).toEqual(["housing-region-map"]);
   expect(await testIdsShipped(request, "/explorer/housing/regions/guria", housing)).toEqual(["housing-excel-download"]);
+  const museums = ["science-culture-region-map", "science-culture-excel-download"];
+  expect(await testIdsShipped(request, "/explorer/science-culture/museums", museums)).toEqual(["science-culture-region-map"]);
+  expect(await testIdsShipped(request, "/explorer/science-culture/museums/guria", museums)).toEqual(["science-culture-excel-download"]);
   const transport = ["transport-region-map", "transport-excel-download"];
   expect(await testIdsShipped(request, "/explorer/transport/regions", transport)).toEqual(["transport-region-map"]);
   expect(await testIdsShipped(request, "/explorer/transport/regions/guria", transport)).toEqual(["transport-excel-download"]);

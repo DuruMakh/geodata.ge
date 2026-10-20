@@ -1,0 +1,311 @@
+{
+  "status": "passed",
+  "retrieved_at": "2026-10-20",
+  "scope": "Annual research only, calendar years: researchers (total, women, men, by degree, age and field of science), R&D staff, research institutions and R&D spending, 2019-2024; patent applications and registered patents (inventions and utility models; local, foreign and international), 2016-2025; museums (types, regions, visitors, group tours, exhibitions) 2005-2025 and museum staff 2020-2025; professional theatres (types, seats, audience, performances) 2006-2025, events 2021-2025, and theatre staff 2020-2025; no derived value, no monthly or quarterly value",
+  "primary_observation_count": 1733,
+  "observations_by_measure": {
+    "institutions": 6,
+    "invention_applications": 30,
+    "invention_patents": 30,
+    "museum_exhibitions": 252,
+    "museum_staff": 48,
+    "museum_tours": 252,
+    "museum_visitors": 252,
+    "museums": 378,
+    "rd_spending": 6,
+    "rd_staff": 36,
+    "researchers": 120,
+    "theatre_audience": 20,
+    "theatre_events": 15,
+    "theatre_seats": 20,
+    "theatre_shows": 60,
+    "theatre_staff": 48,
+    "theatres": 100,
+    "utility_applications": 30,
+    "utility_patents": 30
+  },
+  "observations_by_source": {
+    "geostat_culture_museum_staff": 48,
+    "geostat_culture_museums": 147,
+    "geostat_culture_museums_count_regions": 231,
+    "geostat_culture_museums_regions": 756,
+    "geostat_culture_theatre_events": 95,
+    "geostat_culture_theatre_staff": 48,
+    "geostat_culture_theatres": 120,
+    "geostat_science_institutions": 12,
+    "geostat_science_patents": 120,
+    "geostat_science_rd_staff": 36,
+    "geostat_science_researchers": 120
+  },
+  "indicator_count": 123,
+  "imputed_values": 0,
+  "calculated_values": 0,
+  "reconciliation_failed_count": 0,
+  "checks": {
+    "coverage_matches_year_ranges": true,
+    "values_match_source_cells": true,
+    "published_values_are_rounded_stored_values_at_stored_or_displayed_decimals": true,
+    "dash_cells_read_as_zero": [
+      "geostat_culture_museum_staff",
+      "geostat_culture_theatre_staff",
+      "geostat_science_patents",
+      "geostat_science_rd_staff",
+      "geostat_science_researchers"
+    ],
+    "dash_cells_in_events_rows_before_2021_are_not_collected_and_have_no_row": true,
+    "women_and_men_add_up_to_total": [
+      "researchers",
+      "rd_staff",
+      "museum_staff",
+      "theatre_staff"
+    ],
+    "degrees_ages_and_fields_add_up_to_all_researchers": true,
+    "researchers_and_other_rd_staff_add_up_to_all_rd_staff": true,
+    "contract_types_and_age_groups_add_up_to_all_staff": [
+      "museum_staff",
+      "theatre_staff"
+    ],
+    "museum_types_and_regions_add_up_to_museums": true,
+    "regions_add_up_to_georgia": {
+      "museum_visitors": "0",
+      "museum_exhibitions": "0",
+      "museum_tours": "0.2"
+    },
+    "recorded_differences_parts_minus_total": {
+      "museum_visitors": {
+        "2005": "-0.013",
+        "2013": "-0.019",
+        "2023": "-0.030"
+      }
+    },
+    "theatre_types_add_up_to_theatres": true,
+    "researchers_repeated_in_other_sheets_and_rd_staff_agree": 54,
+    "national_visitors_times_1000_equal_regional_georgia_within": {
+      "tolerance": "0.1",
+      "years": 21
+    },
+    "events_audience_equals_theatre_regions_georgia_row_years_needing_one_decimal_rounding": [
+      2006,
+      2007,
+      2008,
+      2009
+    ],
+    "no_events_rows_before_2021": true,
+    "rows_found_by_printed_label_and_year_never_by_position": true,
+    "anchor_values": {
+      "science_culture.researchers.total:2024": "14046",
+      "science_culture.researchers.women:2024": "7732",
+      "science_culture.rd_staff.total:2024": "16191",
+      "science_culture.institutions.total:2024": "66",
+      "science_culture.rd_spending.total:2024": "242.9",
+      "science_culture.invention_applications.local:2025": "79",
+      "science_culture.invention_patents.local:2025": "41",
+      "science_culture.invention_applications.international:2025": "85",
+      "science_culture.museums.total:2025": "261",
+      "science_culture.museum_visitors.total:2025": "1998.924",
+      "science_culture.museum_visitors.region_samtskhe_javakheti:2025": "164.893",
+      "science_culture.theatres.total:2025": "53",
+      "science_culture.theatre_audience.total:2025": "620.322"
+    }
+  },
+  "source_checks": [
+    {
+      "source_id": "geostat_science_researchers",
+      "sha256": "613B58F5CA802016B067DB7336B932CE062FECC3F0A3D160FD935ED78AC58487",
+      "bytes": 19916,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_science_rd_staff",
+      "sha256": "7EB47C3EC9C8986C44D0B687300C56F71443A7A5AD2C5D981D252DBF6A0F2FFB",
+      "bytes": 13212,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_science_institutions",
+      "sha256": "E878FDA047044A3DD06AA2A567D1443DA2792670AFE42C244AE089EE18637779",
+      "bytes": 10826,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_science_patents",
+      "sha256": "CDEE1F822244D5A702FCA44307CF1F809FAF23ED4101891C5934B7D008EC0BAF",
+      "bytes": 20321,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_science_publications",
+      "sha256": "F77CD194BCBFD33BCC04994A2CE7D12A933AAF85935FE9BD5FCE0CF821E9AFF9",
+      "bytes": 11157,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_culture_museums",
+      "sha256": "41D6D491E46460A3C4769DBF74F71902DB69D4A360127685686FE7EDDF10842F",
+      "bytes": 36864,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_culture_museums_count_regions",
+      "sha256": "96B256B2A0D9ECDF321D847E8DEB0C5F6F9104CE80CE8EB61C552B0E451569A6",
+      "bytes": 34816,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_culture_museums_regions",
+      "sha256": "65F41A293177D2004384EE4F48C69CD68E8BA4885E7235927F42FA5D0A482946",
+      "bytes": 42496,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_culture_museum_staff",
+      "sha256": "A208CDAF3CD048AAE636B2999D741989A94C5FAD8AA95FA4B1115ABDF05C2318",
+      "bytes": 27648,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_culture_museum_exhibits",
+      "sha256": "4B3679F51D4DA2FB957C0535B626E0C18C2B1EE81C0C17F4E8747B103E151350",
+      "bytes": 28160,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_culture_theatres",
+      "sha256": "0179B84DFC8595A852A338C8AD0B4DC8BCEFF359A3EE7C324AB5DBA7D2400375",
+      "bytes": 34304,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_culture_theatres_regions",
+      "sha256": "A5085DAC77CE23D67BA1FCB4187C017BD2C8168F3607ECEE6439CF7877E95486",
+      "bytes": 39424,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_culture_theatres_count_regions",
+      "sha256": "7E1AFCEC7AE16B429F87C3E96A92EB1F0B9780513B89272B69BA09E68AF69B4B",
+      "bytes": 33280,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_culture_theatre_staff",
+      "sha256": "B4D09D7C93EEC62F2300C1762B6F4A9B0D3B04826DA4FB704374017FEFA7B063",
+      "bytes": 27648,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_culture_theatre_events",
+      "sha256": "BD4746E99C9584F0ADA5EA8D29E4F054AD1CA3E0920F767A0124E52DA2E60D1F",
+      "bytes": 35840,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_culture_libraries",
+      "sha256": "D93A6A863563CA76FEBE11D457F44ECF606493A7D90B4513F4B52BBB5DA9F053",
+      "bytes": 27136,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_culture_libraries_regions",
+      "sha256": "01E26F39C82BC18E80CB20B7DFD39C42377744E7238C2ACD04F0FE183466C2E3",
+      "bytes": 35328,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_culture_publishing",
+      "sha256": "85AC369AC845E501DD6BF6E00CF3CCDE9F2DB70C12F95690827EBC6A15234087",
+      "bytes": 36352,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_ka_science_institutions",
+      "sha256": "66D73ED4C130CD6115160CB363AEF01C6F2B89BD11E1DECB315F89542568872D",
+      "bytes": 11065,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_ka_science_rd_staff",
+      "sha256": "85557C7D5E23C10F1AD9CE622E51811D846A8BA9145F305C2AF04A9ACC3E368C",
+      "bytes": 12597,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_ka_science_researchers",
+      "sha256": "AEB1EA70FF99632380EA9EE423DA6B567E8FE4BF138E5555C3E13DD8807F107C",
+      "bytes": 20132,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_ka_science_patents",
+      "sha256": "602C374F8174BD500EC709B95B06F32EC11C547F6580D6103C36EC411D244F9A",
+      "bytes": 19889,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_ka_culture_museums",
+      "sha256": "47ACC741AE9383D30CAFA709677EBFB4F57CBBC3D0A4869A11626978AF6C05C5",
+      "bytes": 31232,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_ka_culture_museums_count_regions",
+      "sha256": "7F9A27B9A1B32BF6EB470C0420B4CC6ADB9B9638F8F72D1CC7A8CE27374B8031",
+      "bytes": 36352,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_ka_culture_museum_staff",
+      "sha256": "1AE35D8E265EAD7BF8F6887C47A0CB1DFF14D3B1DC3470A4759ECFBF31209500",
+      "bytes": 27648,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_ka_culture_theatres",
+      "sha256": "557E5D9774159EDE95DE47412CE18C38568A64A127E97C795B8A8ABE615813A9",
+      "bytes": 27136,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_ka_culture_theatres_regions",
+      "sha256": "0B49210395C60465FCF17031BEDBF92423BA1E84770F4A5221FF1A2BC2A7B91E",
+      "bytes": 41984,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_ka_culture_theatres_count_regions",
+      "sha256": "0BC4E263ED6B6CFF70F9861D61FB192667AECC48E781680637E20E1EEB4C8552",
+      "bytes": 27648,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_ka_culture_theatre_staff",
+      "sha256": "27948ED065A3EFE169126EA98D1D428D760B15BADBD093F38C8AE145171F9894",
+      "bytes": 27648,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_ka_culture_theatre_events",
+      "sha256": "4771C24C3E39FC8A4FDBA6736A8F722632B66ECE2F34655704F25F8537E96345",
+      "bytes": 29184,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_ka_culture_museums_regions",
+      "sha256": "6A56A8A3D34D9B51ACAD396A24F71EC92FEBAF686A28E228BDF82B2BE1BDB7AA",
+      "bytes": 43008,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_science_page",
+      "sha256": "AD22E3E5A77A7A5A3AB9A58D9D0702C8EB44B66A8013A80053933CF020F769BF",
+      "bytes": 72361,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_culture_page",
+      "sha256": "E27CF0E97B596518B004170AC99DEA4D8549A6DB5220772D2DBE8A9B1C422CE8",
+      "bytes": 103594,
+      "passed": true
+    }
+  ]
+}
