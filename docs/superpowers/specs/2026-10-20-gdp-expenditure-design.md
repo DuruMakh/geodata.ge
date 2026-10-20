@@ -50,8 +50,8 @@ Nothing else sits under the heading. Under the chart there is one short source l
 - **GDP** (pinned at the top)
 - **Consumption**: Total consumption; Households; Non-profits serving households; Government; Government individual services (such as health and education); Government collective services (such as defence and public order)
 - **Investment**: Total investment; Buildings and equipment; Change in inventories
-- **Exports**: Total exports; Goods; Services
-- **Imports**: Total imports; Goods; Services
+- **Exports**: Total exports; Goods exports; Services exports (named in full so legend entries stay distinct)
+- **Imports**: Total imports; Goods imports; Services imports
 
 On arrival the chart shows **GDP, Households, Government, Total investment, Total exports and Total imports** (₾, all years). This departs from the site's "only the total on arrival" rule because GDP alone is one line and says nothing about the split; Duru's approval of this design approves that default for this page, and `Project_Definition.md` records it. The rest of the selection behaviour is the Sectors behaviour: unlimited selection, GDP first and removable, Chart | Table, year range, Excel, all kept in the URL.
 
