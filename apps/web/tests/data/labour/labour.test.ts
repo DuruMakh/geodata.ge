@@ -6,7 +6,9 @@ import Decimal from "decimal.js";
 import { describe, expect, test } from "vitest";
 import { assertLabourParity, loadLabourFacts, loadServedLabourData, toClientLabourFact } from "../../../lib/data/labour/importLabour";
 import { prepareLabourData } from "../../../lib/data/labour/prepareLabour";
-import { LABOUR_INDICATORS, LABOUR_PUBLIC_SOURCES, LABOUR_RESEARCH_DIRECTORY, LABOUR_SOURCES, labourFactKey, type LabourFact } from "../../../lib/data/labour/types";
+import { LABOUR_INDICATORS, LABOUR_PUBLIC_SOURCES, LABOUR_RESEARCH_DIRECTORY, LABOUR_SOURCES, labourFactKey, labourSourceDocumentId, type LabourFact } from "../../../lib/data/labour/types";
+import { labourMirrorCreateRows, loadLabourFactsFromMirror } from "../../../lib/db/mirrorRows";
+import type { Prisma } from "../../../lib/generated/prisma/client";
 import { validateLabourFacts } from "../../../lib/data/labour/validation";
 
 const root = path.resolve(process.cwd(), "../..");
@@ -141,5 +143,48 @@ describe("loading and parity", () => {
     });
     expect(facts.every(f => toClientLabourFact(f).value === Number(f.publishedValue))).toBe(true);
     expect(Object.keys(toClientLabourFact(facts[0])).sort()).toEqual(["indicatorId", "sourceId", "unit", "value", "year"]);
+  });
+});
+
+describe("the database mirror", () => {
+  const mirrorOf = (facts: readonly LabourFact[]) =>
+    labourMirrorCreateRows(facts, "labour-run-1").map(row => ({ ...row, value: new Decimal(row.value as string), publishedValue: new Decimal(row.publishedValue as string) }));
+  const db = (list: ReturnType<typeof mirrorOf>) => ({ labourFact: { findMany: async () => list } }) as unknown as Pick<Prisma.TransactionClient, "labourFact">;
+
+  test("mirror rows round-trip to identical served rows", async () => {
+    const facts = await loadLabourFacts();
+    const rows = mirrorOf(facts);
+    const mirror = await loadLabourFactsFromMirror(db(rows));
+    expect(() => assertLabourParity(facts, mirror)).not.toThrow();
+    expect(rows[0].importRunId).toBe("labour-run-1");
+    expect(rows.every(row => row.sourceDocumentId === labourSourceDocumentId(row.sourceId))).toBe(true);
+    // One changed mirrored value is not a round trip.
+    const changed = rows.map(row => ({ ...row }));
+    const target = changed.find(row => row.indicatorId === "labour.informal.total" && row.year === 2025)!;
+    target.value = new Decimal("28.9");
+    target.publishedValue = new Decimal("28.9");
+    await expect(loadLabourFactsFromMirror(db(changed)).then(mirrored => assertLabourParity(facts, mirrored))).rejects.toThrow();
+    await expect(loadLabourFactsFromMirror(db([{ ...rows[0], sourceDocumentId: "source.other" }]))).rejects.toThrow(/source relation/);
+  });
+
+  test("every served source is a registered document", async () => {
+    const facts = await loadLabourFacts();
+    const documents = new Set(records(path.join(root, "data/sources/source-documents.csv")).map(row => row.source_id));
+    for (const sourceId of new Set(facts.map(f => f.sourceId))) expect(documents.has(labourSourceDocumentId(sourceId)), sourceId).toBe(true);
+  });
+
+  test("every archived source has one source-document row with a Georgian title and the local file", () => {
+    const documents = new Map(records(path.join(root, "data/sources/source-documents.csv")).map(row => [row.source_id, row]));
+    const manifest = records(path.join(root, LABOUR_RESEARCH_DIRECTORY, "source-manifest.csv"));
+    expect(new Set(manifest.map(row => row.source_id))).toEqual(new Set(LABOUR_PUBLIC_SOURCES));
+    for (const row of manifest) {
+      const document = documents.get(labourSourceDocumentId(row.source_id));
+      expect(document, row.source_id).toBeDefined();
+      expect(document!.source_name, row.source_id).toMatch(/^[^A-Za-z]*[ა-ჿ]/);
+      expect(document!.source_url_or_file).toBe(`${LABOUR_RESEARCH_DIRECTORY}/${row.local_file}`);
+      expect(fs.existsSync(path.join(root, document!.source_url_or_file)), row.source_id).toBe(true);
+      expect(document!.last_reviewed_at).toBe("2026-10-20");
+    }
+    expect([...documents.keys()].filter(id => id.startsWith("source.geostat_lfs_detail") || /^source\.geostat_lfs_(jobs|hours|informal|underuse|neet)/.test(id))).toHaveLength(LABOUR_PUBLIC_SOURCES.length);
   });
 });

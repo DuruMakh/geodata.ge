@@ -40,6 +40,7 @@ import { energyFoodSourceDocumentId, type EnergyFoodFact } from "../data/energyF
 import { healthSourceDocumentId, type HealthFact } from "../data/health/types";
 import { healthDisplayDecimals } from "../data/health/validation";
 import { crimeSourceDocumentId, type CrimeFact } from "../data/crime/types";
+import { labourSourceDocumentId, type LabourFact } from "../data/labour/types";
 import { moneyBanksSourceDocumentId, type MoneyBanksFact } from "../data/moneyBanks/types";
 import { moneyBanksDisplayDecimals } from "../data/moneyBanks/validation";
 import { externalPositionSourceDocumentId, type ExternalPositionFact } from "../data/externalPosition/types";
@@ -836,6 +837,24 @@ export async function loadCrimeFactsFromMirror(db: Pick<MirrorClient, "crimeFact
     return {
       year: row.year, indicatorId: row.indicatorId as CrimeFact["indicatorId"], value: row.value.toFixed(), publishedValue: row.publishedValue.toFixed(),
       unit: row.unit as CrimeFact["unit"], basis: row.basis as "actual", valueStatus: row.valueStatus as "official",
+      sourceId: row.sourceId, sourceSheet: row.sourceSheet, sourceCell: row.sourceCell, lastReviewedAt: isoDate(row.lastReviewedAt),
+    };
+  });
+}
+
+export function labourMirrorCreateRows(facts: readonly LabourFact[], importRunId: string): Prisma.LabourFactCreateManyInput[] {
+  return facts.map(({ lastReviewedAt, ...fact }) => ({
+    ...fact, sourceDocumentId: labourSourceDocumentId(fact.sourceId), lastReviewedAt: new Date(`${lastReviewedAt}T00:00:00.000Z`), importRunId,
+  }));
+}
+
+export async function loadLabourFactsFromMirror(db: Pick<MirrorClient, "labourFact">): Promise<LabourFact[]> {
+  const rows = await db.labourFact.findMany({ orderBy: [{ indicatorId: "asc" }, { year: "asc" }] });
+  return rows.map(row => {
+    if (row.sourceDocumentId !== labourSourceDocumentId(row.sourceId)) throw new Error("Labour source relation mismatch");
+    return {
+      year: row.year, indicatorId: row.indicatorId as LabourFact["indicatorId"], value: row.value.toFixed(), publishedValue: row.publishedValue.toFixed(),
+      unit: row.unit as LabourFact["unit"], basis: row.basis as "actual", valueStatus: row.valueStatus as "survey_estimate",
       sourceId: row.sourceId, sourceSheet: row.sourceSheet, sourceCell: row.sourceCell, lastReviewedAt: isoDate(row.lastReviewedAt),
     };
   });

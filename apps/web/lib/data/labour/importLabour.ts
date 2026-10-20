@@ -4,6 +4,7 @@ import path from "node:path";
 import Decimal from "decimal.js";
 import { parse } from "csv-parse/sync";
 import { assertSameServedRows } from "../servedDataParity";
+import { resolveServedDataSource } from "../servedDataSource";
 import { labourFactKey, type ClientLabourFact, type LabourFact } from "./types";
 import { validateLabourFacts } from "./validation";
 
@@ -40,7 +41,16 @@ export function assertLabourParity(csv: readonly LabourFact[], mirror: readonly 
 
 let servedPromise: Promise<{ facts: LabourFact[] }> | null = null;
 export function loadServedLabourData(): Promise<{ facts: LabourFact[] }> {
-  servedPromise ??= loadLabourFacts().then(facts => ({ facts }));
+  servedPromise ??= (async () => {
+    let facts = await loadLabourFacts();
+    if (resolveServedDataSource() === "db") {
+      const { loadLabourFactsFromDb } = await import("../../db/servedDataDb");
+      const mirror = await loadLabourFactsFromDb();
+      assertLabourParity(facts, mirror);
+      facts = mirror;
+    }
+    return { facts };
+  })();
   return servedPromise;
 }
 
