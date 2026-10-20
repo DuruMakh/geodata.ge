@@ -3,11 +3,14 @@ import os from "node:os";
 import path from "node:path";
 import { parse } from "csv-parse/sync";
 import * as XLSX from "xlsx";
+import Decimal from "decimal.js";
 import { describe, expect, test } from "vitest";
+import { environmentMirrorCreateRows, loadEnvironmentFactsFromMirror } from "../../../lib/db/mirrorRows";
+import type { Prisma } from "../../../lib/generated/prisma/client";
 import { assertEnvironmentParity, loadEnvironmentFacts, toClientEnvironmentFact } from "../../../lib/data/environment/importEnvironment";
 import { ENVIRONMENT_CSV_HEADERS, REVIEWED_AT, environmentCellValue, prepareEnvironmentData } from "../../../lib/data/environment/prepareEnvironment";
 import {
-  ENVIRONMENT_INDICATORS, ENVIRONMENT_PUBLIC_SOURCES, ENVIRONMENT_RESEARCH_DIRECTORY, ENVIRONMENT_SOURCES, ENVIRONMENT_UNITS, environmentFactKey, type EnvironmentFact,
+  ENVIRONMENT_INDICATORS, ENVIRONMENT_PUBLIC_SOURCES, ENVIRONMENT_RESEARCH_DIRECTORY, ENVIRONMENT_SOURCES, ENVIRONMENT_UNITS, environmentFactKey, environmentSourceDocumentId, type EnvironmentFact,
 } from "../../../lib/data/environment/types";
 import { expectedEnvironmentKeys, validateEnvironmentFacts } from "../../../lib/data/environment/validation";
 
@@ -153,5 +156,23 @@ describe("loading and parity", () => {
     expect(toClientEnvironmentFact(find(facts, "environment.aq.pm10_avg.tbilisi_a1", 2025))).toMatchObject({ value: 31, decimals: 0 });
     expect(facts.every(f => toClientEnvironmentFact(f).value === Number(f.publishedValue))).toBe(true);
     expect(Object.keys(toClientEnvironmentFact(facts[0])).sort()).toEqual(["decimals", "indicatorId", "sourceId", "unit", "value", "year"]);
+  });
+
+  test("the database mirror round-trips exact decimals and source relations for every unit", async () => {
+    const facts = await loadEnvironmentFacts();
+    // The database returns Decimal(40, 30) values; Decimal keeps "-5.8" and "376215" as written.
+    const rows = environmentMirrorCreateRows(facts, "environment-run-1").map(row => ({ ...row, value: new Decimal(row.value as string), publishedValue: new Decimal(row.publishedValue as string) }));
+    const db = (list: typeof rows) => ({ environmentFact: { findMany: async () => list } }) as unknown as Pick<Prisma.TransactionClient, "environmentFact">;
+    const mirror = await loadEnvironmentFactsFromMirror(db(rows));
+    expect(() => assertEnvironmentParity(facts, mirror)).not.toThrow();
+    const byKey = new Map(mirror.map(f => [environmentFactKey(f), f]));
+    for (const unit of ENVIRONMENT_UNITS) {
+      const fact = facts.find(f => f.unit === unit)!;
+      expect(byKey.get(environmentFactKey(fact)), unit).toEqual(fact);
+      expect(toClientEnvironmentFact(byKey.get(environmentFactKey(fact))!), unit).toEqual(toClientEnvironmentFact(fact));
+    }
+    expect(rows[0].importRunId).toBe("environment-run-1");
+    expect(rows.every(row => row.sourceDocumentId === environmentSourceDocumentId(row.sourceId))).toBe(true);
+    await expect(loadEnvironmentFactsFromMirror(db([{ ...rows[0], sourceDocumentId: "source.other" }]))).rejects.toThrow(/source relation/);
   });
 });

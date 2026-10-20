@@ -94,6 +94,7 @@ model SourceDocument {
   businessFacts BusinessFact[]
   housingFacts HousingFact[]
   educationFacts EducationFact[]
+  environmentFacts EnvironmentFact[]
   householdIncomeSpendingFacts HouseholdIncomeSpendingFact[]
   moneyTransferFacts MoneyTransferFact[]
   foreignInvestmentFacts ForeignInvestmentFact[]
@@ -148,6 +149,7 @@ model ImportRun {
   businessFacts BusinessFact[]
   housingFacts HousingFact[]
   educationFacts EducationFact[]
+  environmentFacts EnvironmentFact[]
   householdIncomeSpendingFacts HouseholdIncomeSpendingFact[]
   moneyTransferEntities MoneyTransferEntity[]
   moneyTransferFacts MoneyTransferFact[]
@@ -958,6 +960,29 @@ model HealthFact {
 // Mirror of data/imports/crime-annual.csv: Geostat's annual recorded-crime, conviction, prison,
 // victim and road-accident counts, whole numbers. The counting-change register stays in the CSV.
 model CrimeFact {
+  year             Int
+  indicatorId      String
+  value            Decimal        @db.Decimal(40, 30)
+  publishedValue   Decimal        @db.Decimal(40, 30)
+  unit             String
+  basis            String
+  valueStatus      String
+  sourceId         String
+  sourceSheet      String
+  sourceCell       String
+  sourceDocumentId String
+  sourceDocument   SourceDocument @relation(fields: [sourceDocumentId], references: [id])
+  lastReviewedAt   DateTime       @db.Date
+  importRunId      String?
+  importRun        ImportRun?     @relation(fields: [importRunId], references: [id])
+
+  @@id([indicatorId, year])
+}
+
+// Mirror of data/imports/environment-annual.csv: Geostat's yearly greenhouse gas, air pollution,
+// city air quality, climate, water, waste and forest figures, exact published decimals. A value's
+// displayed decimals are read from its published value, so no decimals column is stored.
+model EnvironmentFact {
   year             Int
   indicatorId      String
   value            Decimal        @db.Decimal(40, 30)
