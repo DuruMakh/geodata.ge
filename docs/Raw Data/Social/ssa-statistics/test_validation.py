@@ -309,6 +309,16 @@ class ServedFile(unittest.TestCase):
                                                        'country.georgia')]
         self.assertEqual(min(war), 2019)
 
+    def test_2019_money_follows_the_people_table_headings(self):
+        # January–May 2019 money column J (746,479 GEL) is utility-subsidy recipients, as the people table prints it.
+        values = served_values()
+        war = values[('social_package_group', 'group.war_participants.amount', 'country.georgia', 2019)]
+        self.assertEqual((war['value'], war['months']), ('1749795', '7'))
+        self.assertNotIn('January!', war['source_cell'])
+        other = values[('social_package_group', 'group.other.amount', 'country.georgia', 2019)]
+        self.assertEqual(other['value'], '3910297')
+        self.assertIn('January!I91+J91+K91', other['source_cell'])
+
     def test_cells(self):
         import random
         rows = random.Random(20251231).sample(served_rows(), 20)

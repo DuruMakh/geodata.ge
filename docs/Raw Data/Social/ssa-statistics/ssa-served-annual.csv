@@ -16134,7 +16134,7 @@ social_package_group,group.war_participants.recipients,country.georgia,2022,2283
 social_package_group,group.war_participants.recipients,country.georgia,2023,23896,1,official,socpackage-01,ssa-socpackage-01-2023.xlsx,December,J85
 social_package_group,group.war_participants.recipients,country.georgia,2024,24298,1,official,socpackage-01,ssa-socpackage-01-2024.xlsx,December,J85
 social_package_group,group.war_participants.recipients,country.georgia,2025,32871,1,official,socpackage-01,ssa-socpackage-01-2025.xlsx,December,U86
-social_package_group,group.war_participants.amount,country.georgia,2019,2496274,12,calculated,socpackage-02,ssa-socpackage-02-2019.xlsx,*,J91
+social_package_group,group.war_participants.amount,country.georgia,2019,1749795,7,calculated,socpackage-02,ssa-socpackage-02-2019.xlsx,*,June!J91;July!J91;August!J91;September!J91;October!J91;November!J91;December!J91
 social_package_group,group.war_participants.amount,country.georgia,2020,3893029,12,calculated,socpackage-02,ssa-socpackage-02-2020.xlsx,*,J91
 social_package_group,group.war_participants.amount,country.georgia,2021,4307219,12,calculated,socpackage-02,ssa-socpackage-02-2021.xlsx,*,J91
 social_package_group,group.war_participants.amount,country.georgia,2022,25506814,12,calculated,socpackage-02,ssa-socpackage-02-2022.xlsx,*,J85
@@ -16186,7 +16186,7 @@ social_package_group,group.other.amount,country.georgia,2015,5427038,12,calculat
 social_package_group,group.other.amount,country.georgia,2016,5198435,12,calculated,socpackage-02,ssa-socpackage-02-2016.xlsx,*,E92+F92+G92
 social_package_group,group.other.amount,country.georgia,2017,5075612,12,calculated,socpackage-02,ssa-socpackage-02-2017.xlsx,*,January!E92+F92+G92;February!E92+F92+G92;March!E92+F92+G92;April!E92+F92+G92;May!E92+F92+G92;June!E92+F92+G92;July!E92+F92+G92;August!E92+F92+G92;September!E92+F92+G92;October!I92+J92+K92;November!I92+J92+K92;December!I92+J92+K92
 social_package_group,group.other.amount,country.georgia,2018,4971468,12,calculated,socpackage-02,ssa-socpackage-02-2018.xlsx,*,I92+J92+K92
-social_package_group,group.other.amount,country.georgia,2019,3163818,12,calculated,socpackage-02,ssa-socpackage-02-2019.xlsx,*,January!I91+K91;February!I91+K91;March!I91+K91;April!I91+K91;May!I91+K91;June!I91+K91+L91;July!I91+K91+L91;August!I91+K91+L91;September!I91+K91+L91;October!I91+K91+L91;November!I91+K91+L91;December!I91+K91+L91
+social_package_group,group.other.amount,country.georgia,2019,3910297,12,calculated,socpackage-02,ssa-socpackage-02-2019.xlsx,*,January!I91+J91+K91;February!I91+J91+K91;March!I91+J91+K91;April!I91+J91+K91;May!I91+J91+K91;June!I91+K91+L91;July!I91+K91+L91;August!I91+K91+L91;September!I91+K91+L91;October!I91+K91+L91;November!I91+K91+L91;December!I91+K91+L91
 social_package_group,group.other.amount,country.georgia,2020,3178216,12,calculated,socpackage-02,ssa-socpackage-02-2020.xlsx,*,I91+K91+L91
 social_package_group,group.other.amount,country.georgia,2021,3101363,12,calculated,socpackage-02,ssa-socpackage-02-2021.xlsx,*,I91+K91+L91
 social_package_group,group.other.amount,country.georgia,2022,10599596,12,calculated,socpackage-02,ssa-socpackage-02-2022.xlsx,*,I85+K85

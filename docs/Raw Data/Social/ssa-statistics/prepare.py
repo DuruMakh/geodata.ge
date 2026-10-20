@@ -729,6 +729,32 @@ GROUP_MEMBERS = ('disability', 'survivors', 'war_participants', 'political_repre
 GROUPS = ('total', 'disability', *DISABILITY_PARTS, 'survivors', 'war_participants', 'political_repression', 'other')
 
 
+# Reviewed heading corrections, used for the social package groups only: (table, year, month, column) -> (printed, used).
+# In January–May 2019 the money table prints "war participants" over column J, but the people table prints
+# utility-subsidy recipients for the same column and has no war participants until June 2019. Column J's money is a
+# steady 22.45 GEL a month per utility-subsidy recipient, and the money table has no other utility-subsidy column in
+# those months. The people table's heading is used, so that money is in "other".
+HEADING_OVERRIDES = {('socpackage-02', 2019, month, 'J'): ('ომის მონაწილეები', 'საყოფაცხოვრებო სუბსიდიის მიმღებები')
+                     for month in range(1, 6)}
+
+
+def with_heading_overrides(parsed, failures):
+    """A copy of the parsed tables with HEADING_OVERRIDES applied; an override that no longer matches its sheet fails."""
+    out = dict(parsed)
+    for (table_id, year, month, column), (printed, used) in HEADING_OVERRIDES.items():
+        out[table_id] = dict(out[table_id])
+        months = list(out[table_id].get(year, []))
+        found = [i for i, (number, _, shape) in enumerate(months) if number == month
+                 and shape['labels'].get(column) == printed]
+        if len(found) != 1:
+            failures.append(f'heading override {table_id} {year} month {month} {column}: {printed!r} not found once')
+            continue
+        number, name, shape = months[found[0]]
+        months[found[0]] = (number, name, {**shape, 'labels': {**shape['labels'], column: used}})
+        out[table_id][year] = months
+    return out
+
+
 def social_package_columns(shape):
     """{group: [columns]} of one social package sheet."""
     groups = defaultdict(list)
@@ -893,11 +919,12 @@ def served_annual(parsed, index, mapping, failures):
     december('social_package', 'recipients', 'socpackage-01', counts)
     summed('social_package', 'amount', 'socpackage-02', money)
     summed('social_package', 'count_months_sum', 'socpackage-01', counts, money=False, months_of=money)
+    corrected = with_heading_overrides(parsed, failures)
     for group in GROUPS:
         december('social_package_group', f'group.{group}.recipients', 'socpackage-01',
                  read('socpackage-01', group_columns(group), 'national'))
         summed('social_package_group', f'group.{group}.amount', 'socpackage-02',
-               read('socpackage-02', group_columns(group), 'national'))
+               served_readings(corrected, 'socpackage-02', group_columns(group), 'national', mapping, failures))
     for programme in MONEY_ONLY:
         money_table, money_pick = PROGRAMMES[programme][2:4]
         summed(programme, 'amount', money_table, read(money_table, money_pick, 'national'))
