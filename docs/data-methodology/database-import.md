@@ -71,6 +71,7 @@ Unemployment uses the existing single import transaction. Source IDs retain thei
 | `EducationFact` | `data/imports/education-annual.csv` (see `education-annual.md`) |
 | `EnvironmentFact` | `data/imports/environment-annual.csv` (see `environment-annual.md`; migration `20261020160000_environment`; a value's shown decimals are read from its published value, so none is stored) |
 | `ScienceCultureFact` | `data/imports/science-culture-annual.csv` (see `science-culture-annual.md`; the counting-change register `science-culture-series-breaks.csv` is read from the CSV and not mirrored) |
+| `TransportFact` | `data/imports/transport-annual.csv` (see `transport-annual.md`) |
 | `NationalGdpFact` | `data/imports/national-gdp-annual-1996-2025.csv` (one reviewed nominal-GDP denominator per year) |
 | `GovernmentDebtFact` | `data/imports/government-debt-facts-2013-2030.csv` (nine public Government Debt series; generated from the approved normalized debt package) |
 | `GeneralGovernmentBalanceFact` | `data/imports/general-government-balance-annual-1995-2031.csv` (IMF general-government balance as percent of GDP and nominal GEL, with actual/projection status) |

@@ -25,6 +25,7 @@ export const METHODOLOGY_TRANSLATION_REVIEWED_AT: Readonly<Record<MethodologyDat
   internet: "2026-10-20",
   "energy-food": "2026-10-11",
   environment: "2026-10-20",
+  transport: "2026-10-20",
   money: "2026-10-11",
   business: "2026-10-15",
   housing: "2026-10-16",

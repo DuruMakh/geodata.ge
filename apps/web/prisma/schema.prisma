@@ -96,6 +96,7 @@ model SourceDocument {
   businessFacts BusinessFact[]
   housingFacts HousingFact[]
   internetFacts InternetFact[]
+  transportFacts TransportFact[]
   educationFacts EducationFact[]
   environmentFacts EnvironmentFact[]
   scienceCultureFacts ScienceCultureFact[]
@@ -155,6 +156,7 @@ model ImportRun {
   businessFacts BusinessFact[]
   housingFacts HousingFact[]
   internetFacts InternetFact[]
+  transportFacts TransportFact[]
   educationFacts EducationFact[]
   environmentFacts EnvironmentFact[]
   scienceCultureFacts ScienceCultureFact[]
@@ -1124,6 +1126,29 @@ model HousingFact {
 // internet or a computer, internet, phone and computer use), exact stored decimals with their published
 // one-decimal rounding.
 model InternetFact {
+  year             Int
+  indicatorId      String
+  value            Decimal        @db.Decimal(40, 30)
+  publishedValue   Decimal        @db.Decimal(40, 30)
+  unit             String
+  basis            String
+  valueStatus      String
+  sourceId         String
+  sourceSheet      String
+  sourceCell       String
+  sourceDocumentId String
+  sourceDocument   SourceDocument @relation(fields: [sourceDocumentId], references: [id])
+  lastReviewedAt   DateTime       @db.Date
+  importRunId      String?
+  importRun        ImportRun?     @relation(fields: [importRunId], references: [id])
+
+  @@id([indicatorId, year])
+}
+
+// Mirror of data/imports/transport-annual.csv: Geostat's road vehicle fleet, passenger and freight
+// transport demand and carriage, registered vehicles and road length, exact stored decimals with their
+// published rounding. Sheet names are kept verbatim (the owner sheet is " type of owner ").
+model TransportFact {
   year             Int
   indicatorId      String
   value            Decimal        @db.Decimal(40, 30)

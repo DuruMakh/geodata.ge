@@ -546,6 +546,31 @@ source.geostat_ka_culture_theatre_events,თეატრების ღონ�
 source.geostat_ka_culture_museums_regions,მუზეუმების ძირითადი მახასიათებლები რეგიონების მიხედვით (ქართული ვერსია),docs/Raw Data/ScienceCulture/geostat-science-culture-annual/official/ka/muzeumebis_ZiriTadi_maCveneblebi_regionebis_mixedviT.XLS,2026-10-20
 source.geostat_science_page,მეცნიერება (წყაროს გვერდი),docs/Raw Data/ScienceCulture/geostat-science-culture-annual/official/geostat-category-194-2026-10-20.html,2026-10-20
 source.geostat_culture_page,კულტურა (წყაროს გვერდი),docs/Raw Data/ScienceCulture/geostat-science-culture-annual/official/geostat-category-615-2026-10-20.html,2026-10-20
+source.geostat_transport_passenger_demand,მგზავრთბრუნვა ტრანსპორტის სახეების მიხედვით (ცხრილი H-1),docs/Raw Data/Transport/geostat-transport-annual/official/H-1-Passenger-transport-demand_ENG.XLSX,2026-10-20
+source.geostat_transport_freight_demand,ტვირთბრუნვა ტრანსპორტის სახეების მიხედვით (ცხრილი H-2),docs/Raw Data/Transport/geostat-transport-annual/official/H-2-Freight-transport-demand_ENG.XLSX,2026-10-20
+source.geostat_transport_fleet_fuel,ავტოსატრანსპორტო საშუალებების პარკი საწვავის ტიპის მიხედვით (ცხრილი H-3),docs/Raw Data/Transport/geostat-transport-annual/official/H-3.-Composition-of-road-motor-vehicle-fleet-by-fuel-type_ENG.xlsx,2026-10-20
+source.geostat_transport_fleet_age,ავტოსატრანსპორტო საშუალებების პარკი ასაკის მიხედვით (ცხრილი H-4),docs/Raw Data/Transport/geostat-transport-annual/official/H-4.-Age-of-road-motor-vehicle-fleet_ENG.xlsx,2026-10-20
+source.geostat_transport_rail_turnover,სარკინიგზო ტვირთბრუნვა,docs/Raw Data/Transport/geostat-transport-annual/official/0504EN030101_Railway-Freight-Turnover.xlsx,2026-10-20
+source.geostat_transport_rail_goods,რკინიგზით გადაზიდული ტვირთი,docs/Raw Data/Transport/geostat-transport-annual/official/0504EN030102_Goods-Transported-by-Railway.xlsx,2026-10-20
+source.geostat_transport_rail_passengers,რკინიგზით გადაყვანილი მგზავრები,docs/Raw Data/Transport/geostat-transport-annual/official/0504EN030103_Passengers-Transported-by-Railway.xlsx,2026-10-20
+source.geostat_transport_rail_infrastructure,სარკინიგზო ინფრასტრუქტურა,docs/Raw Data/Transport/geostat-transport-annual/official/0504EN030104_Railway-Infrustructure.xlsx,2026-10-20
+source.geostat_transport_metro,მეტროპოლიტენით გადაყვანილი მგზავრები,docs/Raw Data/Transport/geostat-transport-annual/official/0504EN030105_Passengers-transported-by-Metro.xlsx,2026-10-20
+source.geostat_transport_rail_regions,რკინიგზით გადაზიდული ტვირთი დატვირთვისა და განტვირთვის რეგიონების მიხედვით,docs/Raw Data/Transport/geostat-transport-annual/official/0504EN030106_Goods-transported-by-region-of-loading-and-unloading.xlsx,2026-10-20
+source.geostat_transport_airlines,საქართველოში რეგისტრირებული ავიაკომპანიები,docs/Raw Data/Transport/geostat-transport-annual/official/0504EN030201_Airlines-Registered-in-Georgia.xlsx,2026-10-20
+source.geostat_transport_airports,საქართველოს აეროპორტები,docs/Raw Data/Transport/geostat-transport-annual/official/0504EN030202_Airports-in-Georgia.xlsx,2026-10-20
+source.geostat_transport_air_infrastructure,"საჰაერო ტრანსპორტის ინფრასტრუქტურა, 2025",docs/Raw Data/Transport/geostat-transport-annual/official/0504EN030203_Infrastructure_2025.xlsx,2026-10-20
+source.geostat_transport_roads,საერთო სარგებლობის საავტომობილო გზების სიგრძე რეგიონების მიხედვით,docs/Raw Data/Transport/geostat-transport-annual/official/Length-of-road-Eng-2024.xls,2026-10-20
+source.geostat_transport_taxi_licences,ტაქსის ლიცენზიები თბილისში,docs/Raw Data/Transport/geostat-transport-annual/official/Taxi_Licenses_Tbilisi-EN.XLSX,2026-10-20
+source.geostat_transport_registered,რეგისტრირებული ავტოსატრანსპორტო საშუალებები რეგიონების მიხედვით,docs/Raw Data/Transport/geostat-transport-annual/official/Number-of-Registered-Vehicles.xlsx,2026-10-20
+source.geostat_transport_technical_inspections,"ტექნიკური დათვალიერება, 2021-2025",docs/Raw Data/Transport/geostat-transport-annual/official/Technical-Inspections_2021-2025.xlsx,2026-10-20
+source.geostat_transport_sea_passengers,საზღვაო პორტებსა და ტერმინალებში გადაყვანილი მგზავრები,docs/Raw Data/Transport/geostat-transport-annual/official/0504EN030401_Passenger-carried-in-seaports-and-terminals.xlsx,2026-10-20
+source.geostat_transport_sea_ships,საზღვაო პორტებსა და ტერმინალებში შემოსული გემები,docs/Raw Data/Transport/geostat-transport-annual/official/0504EN030402_Ships-entering-in-seaports-and-terminals.xlsx,2026-10-20
+source.geostat_transport_sea_freight,საზღვაო პორტებსა და ტერმინალებში გადაზიდული ტვირთი,docs/Raw Data/Transport/geostat-transport-annual/official/0504EN030403_Volume-of-carried-freight-in-seaports-and-terminals.xlsx,2026-10-20
+source.geostat_transport_environment_page,გარემოს მდგომარეობის ინდიკატორები (წყაროს გვერდი),docs/Raw Data/Transport/geostat-transport-annual/official/geostat-category-565-2026-10-20.html,2026-10-20
+source.geostat_transport_rail_page,სარკინიგზო ტრანსპორტი (წყაროს გვერდი),docs/Raw Data/Transport/geostat-transport-annual/official/geostat-category-795-2026-10-20.html,2026-10-20
+source.geostat_transport_air_page,საჰაერო ტრანსპორტი (წყაროს გვერდი),docs/Raw Data/Transport/geostat-transport-annual/official/geostat-category-796-2026-10-20.html,2026-10-20
+source.geostat_transport_road_page,საავტომობილო ტრანსპორტი (წყაროს გვერდი),docs/Raw Data/Transport/geostat-transport-annual/official/geostat-category-797-2026-10-20.html,2026-10-20
+source.geostat_transport_sea_page,საზღვაო ტრანსპორტი (წყაროს გვერდი),docs/Raw Data/Transport/geostat-transport-annual/official/geostat-category-802-2026-10-20.html,2026-10-20
 source.geostat_ict_homes_internet,ინტერნეტით უზრუნველყოფილი შინამეურნეობების წილი (ცხრილი 01),docs/Raw Data/Internet/geostat-ict-households-annual/official/01_Share_of_households_with_internet_access.xlsx,2026-10-20
 source.geostat_ict_homes_internet_ka,"ინტერნეტით უზრუნველყოფილი შინამეურნეობების წილი (ცხრილი 01, ქართული ვერსია)",docs/Raw Data/Internet/geostat-ict-households-annual/official/ka/01_internetit_uzrunvelyopili_shinameurneobebi.xlsx,2026-10-20
 source.geostat_ict_last_internet_use,6 წლის და უფროსი ასაკის მოსახლეობის განაწილება ინტერნეტის ბოლო გამოყენების დროის მიხედვით (ცხრილი 02),docs/Raw Data/Internet/geostat-ict-households-annual/official/02_Distribution_of_population_aged_6_and_older_by_last_internet_use.xlsx,2026-10-20

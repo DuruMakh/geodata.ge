@@ -48,6 +48,8 @@ import { businessSourceDocumentId, type BusinessFact } from "../data/business/ty
 import { housingSourceDocumentId, type HousingFact } from "../data/housing/types";
 import { housingDisplayDecimals } from "../data/housing/validation";
 import { internetSourceDocumentId, type InternetFact } from "../data/internet/types";
+import { transportSourceDocumentId, type TransportFact } from "../data/transport/types";
+import { transportDisplayDecimals } from "../data/transport/validation";
 import { businessDisplayDecimals } from "../data/business/validation";
 import { educationSourceDocumentId, type EducationFact } from "../data/education/types";
 import { environmentSourceDocumentId, type EnvironmentFact } from "../data/environment/types";
@@ -895,6 +897,24 @@ export async function loadInternetFactsFromMirror(db: Pick<MirrorClient, "intern
     return {
       year: row.year, indicatorId: row.indicatorId as InternetFact["indicatorId"],
       value: row.value.toFixed(), publishedValue: row.publishedValue.toFixed(1), unit: row.unit as "percent", basis: row.basis as "actual", valueStatus: row.valueStatus as "survey_estimate",
+      sourceId: row.sourceId, sourceSheet: row.sourceSheet, sourceCell: row.sourceCell, lastReviewedAt: isoDate(row.lastReviewedAt),
+    };
+  });
+}
+
+export function transportMirrorCreateRows(facts: readonly TransportFact[], importRunId: string): Prisma.TransportFactCreateManyInput[] {
+  return facts.map(({ lastReviewedAt, ...fact }) => ({
+    ...fact, sourceDocumentId: transportSourceDocumentId(fact.sourceId), lastReviewedAt: new Date(`${lastReviewedAt}T00:00:00.000Z`), importRunId,
+  }));
+}
+
+export async function loadTransportFactsFromMirror(db: Pick<MirrorClient, "transportFact">): Promise<TransportFact[]> {
+  const rows = await db.transportFact.findMany({ orderBy: [{ indicatorId: "asc" }, { year: "asc" }] });
+  return rows.map(row => {
+    if (row.sourceDocumentId !== transportSourceDocumentId(row.sourceId)) throw new Error("Transport source relation mismatch");
+    return {
+      year: row.year, indicatorId: row.indicatorId as TransportFact["indicatorId"],
+      value: row.value.toFixed(), publishedValue: row.publishedValue.toFixed(transportDisplayDecimals(row.indicatorId)), unit: row.unit as TransportFact["unit"], basis: row.basis as "actual", valueStatus: row.valueStatus as "official",
       sourceId: row.sourceId, sourceSheet: row.sourceSheet, sourceCell: row.sourceCell, lastReviewedAt: isoDate(row.lastReviewedAt),
     };
   });
