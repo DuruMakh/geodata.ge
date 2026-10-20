@@ -301,8 +301,8 @@ test("a Guria pensions money workbook is in million GEL to one decimal, marked c
   expect(model.readable.amountDecimals).toBe(1);
   expect(model.analysis.numericFormats).toEqual({ 3: "#,##0.0" });
   expect(model.analysis.headers).toEqual(["Year", "Category", "million GEL", "Status"]);
-  // SSA's 12-month sums are calculated in the data, so they are written to the decimal shown and marked so.
-  const guria2025 = Number(value("social.pension.amount", "region.guria", 2025).toFixed(1));
+  // SSA's 12-month sums are calculated in the data, so they are marked so, but keep their served precision: the number format rounds for display.
+  const guria2025 = value("social.pension.amount", "region.guria", 2025);
   expect(model.readable.rows[0].valuesByYear[2025]).toBe(guria2025);
   expect(model.readable.rows[0]).toMatchObject({ kind: "item", parentLabel: "Money paid" });
   expect(model.analysis.rows).toHaveLength(13);
@@ -316,6 +316,16 @@ test("a Guria pensions money workbook is in million GEL to one decimal, marked c
   // The Summary note shows because the exported sums are calculated; no row divides by Geostat, so no Geostat source.
   expect(model.readable.subtitle).toBe("2013–2025 · million GEL · Values marked calculated are calculated by fiscal.ge from SSA and Geostat data.");
   expect(model.readable.fitSubtitle).toBe(true);
+});
+
+test("SSA sums and averages are written at full served precision", async () => {
+  const model = await placeWorkbook("pensions", GEORGIA, "georgia", ["social.pension.amount"], 2013, 2025);
+  expect(model.readable.rows[0].valuesByYear[2025]).toBe(4262.30909);
+  const data = (await loadWorkbook(model)).getWorksheet(model.sheetNames[1])!;
+  expect(data.getCell(14, 3).value).toBe(4262.30909);
+  expect(data.getCell(14, 3).numFmt).toBe("#,##0.0");
+  const average = await placeWorkbook("pensions", GEORGIA, "georgia", ["social.pension.avg_monthly"], 2013, 2025);
+  expect(average.readable.rows[0].valuesByYear[2013]).toBe(133.23);
 });
 
 test("a workbook lists only the SSA tables behind the exported series and years", async () => {
@@ -388,7 +398,7 @@ test("Social payments workbooks: million GEL, or % of GDP calculated with the GD
   const amount = await topicWorkbook("social-payments", "amount", ["social.payments.total.amount", "social.payments.pension.amount"], 2013, 2025);
   expect(amount.filename).toBe("fiscal-social-payments-2013-2025-en.xlsx");
   expect([amount.readable.unitLabel, amount.readable.numberFormat]).toEqual(["million GEL", "#,##0.0"]);
-  expect(amount.readable.rows[0].valuesByYear[2025]).toBe(Number(value("social.payments.total.amount", GEORGIA, 2025).toFixed(1)));
+  expect(amount.readable.rows[0].valuesByYear[2025]).toBe(value("social.payments.total.amount", GEORGIA, 2025));
   expect(amount.readable.rows[0].kind).toBe("total");
   expect(amount.readable.subtitle).toContain("2013–2025 · million GEL · ");
   expect(amount.sources.map(source => source.title)).not.toContain("source.geostat_national_gdp_sna_2008");

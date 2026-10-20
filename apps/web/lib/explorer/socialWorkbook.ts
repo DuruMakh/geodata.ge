@@ -69,8 +69,10 @@ export function buildSocialWorkbookExportModel(input: SocialWorkbookInput, prese
   const lead = model.selected[0] ?? model.series[0];
   const unitLabel = t(gdpView ? "unitPercentGdp" : UNIT_KEYS[model.unit]);
   const numberFormat = numberFormatOf(lead.decimals);
-  // A calculated figure is written to the decimals the page shows it with, so the cell holds the figure the reader sees.
-  const valueOf = (id: string, year: number, value: number | null) => value === null ? null : isCalculated(id, year) ? Number(value.toFixed(lead.decimals)) : value;
+  // Only a figure the page derives (a share of residents, a value at 2025 prices, a % of GDP) is written to the decimals shown, so the cell
+  // holds what the reader sees; SSA's sums and averages keep their served precision and the number format does the display rounding.
+  const derived = (series: { calculated?: "share" | "real" }) => series.calculated !== undefined || gdpView;
+  const valueOf = (series: { calculated?: "share" | "real" }, value: number | null) => value === null ? null : derived(series) ? Number(value.toFixed(lead.decimals)) : value;
   // A programme that ran part of a year says how many months its money or average covers.
   const status = (series: { id: string; partialMonths: Record<number, number> }, year: number) => {
     if (!cell(series.id, year)) return workbookMessage(locale, "workbook.unavailable");
@@ -97,7 +99,7 @@ export function buildSocialWorkbookExportModel(input: SocialWorkbookInput, prese
       title: input.title, subtitle: [`${model.range.start}–${model.range.end} · ${unitLabel}`, ...(anyCalculated ? [t("workbook.calculatedNote")] : [])].join(" · "),
       unitLabel, amountDecimals: lead.decimals, years: model.years, showChangeColumn: false, numberFormat, ...(anyCalculated ? { fitSubtitle: true } : {}),
       rows: model.selected.map(series => {
-        const values = Object.fromEntries(model.years.map(year => [year, valueOf(series.id, year, series.valuesByYear[year])]));
+        const values = Object.fromEntries(model.years.map(year => [year, valueOf(series, series.valuesByYear[year])]));
         return {
           kind: series.reference ? "total" : "item", parentLabel: headingOf(series), label: labels[series.id], change: null, valuesByYear: values,
           basisByYear: Object.fromEntries(model.years.map(year => [year, values[year] === null ? null : "actual"])),
@@ -106,7 +108,7 @@ export function buildSocialWorkbookExportModel(input: SocialWorkbookInput, prese
     },
     analysis: {
       headers: [workbookMessage(locale, "workbook.year"), workbookMessage(locale, "workbook.category"), unitLabel, workbookMessage(locale, "workbook.status")],
-      rows: cells.map(({ year, series }) => [year, labelled(series), valueOf(series.id, year, series.valuesByYear[year]), status(series, year)]),
+      rows: cells.map(({ year, series }) => [year, labelled(series), valueOf(series, series.valuesByYear[year]), status(series, year)]),
       numericFormats: { 3: numberFormat },
     },
     sources: withAbsoluteUrls([...sourcesForNeededYears(input.sources, neededYears), ...geostat], input.siteOrigin),
