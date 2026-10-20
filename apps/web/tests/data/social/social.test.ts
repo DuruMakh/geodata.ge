@@ -9,7 +9,7 @@ import { loadSocialFactsFromMirror, socialMirrorCreateRows } from "../../../lib/
 import type { Prisma } from "../../../lib/generated/prisma/client";
 import { REVIEWED_AT, SOCIAL_CSV_HEADERS, checkKnownDifferences, loadSocialAverageInputs, prepareSocialData } from "../../../lib/data/social/prepareSocial";
 import {
-  SOCIAL_GEORGIA, SOCIAL_INDICATORS, SOCIAL_PAYMENT_PROGRAMMES, SOCIAL_PUBLIC_SOURCES, SOCIAL_SOURCES, socialFactKey, socialSourceDocumentId, type SocialFact, type SocialIndicator,
+  SOCIAL_AGE_BANDS, SOCIAL_GEORGIA, SOCIAL_INDICATORS, SOCIAL_PAYMENT_PROGRAMMES, SOCIAL_PUBLIC_SOURCES, SOCIAL_SOURCES, socialFactKey, socialSourceDocumentId, type SocialFact, type SocialIndicator,
 } from "../../../lib/data/social/types";
 import { SOCIAL_AVERAGE_GAPS, SOCIAL_KNOWN_DIFFERENCES, expectedSocialKeys, socialAverage, validateSocialFacts, type SocialAverageInputs } from "../../../lib/data/social/validation";
 
@@ -34,7 +34,7 @@ test("the committed canonical files match a fresh preparation from the research 
 test("serves the package's place, social package and programme values, with the averages and payments rows added", async () => {
   const facts = await loadFacts();
   const rows = await readCsv(path.join(research, "ssa-served-annual.csv"));
-  expect(rows).toHaveLength(16443);
+  expect(rows).toHaveLength(24451);
   // Inputs only: month-count sums, the regular subsistence money and social package rows the group total repeats.
   const inputsOnly = (row: Record<string, string>) => row.measure.endsWith("count_months_sum") || row.measure === "regular_amount" || row.programme === "social_package";
   const national = (row: Record<string, string>) => row.geography_id === SOCIAL_GEORGIA && row.measure === "amount";
@@ -56,10 +56,10 @@ test("serves the package's place, social package and programme values, with the 
   const payments = rows.filter(row => national(row) && row.programme !== "pension_idp");
   const years = new Set(rows.map(row => row.year)).size;
   expect(facts).toHaveLength(served.length + averaged.length + payments.length + years);
-  expect(facts).toHaveLength(13980);
-  expect(SOCIAL_INDICATORS).toHaveLength(65);
+  expect(facts).toHaveLength(21988);
+  expect(SOCIAL_INDICATORS).toHaveLength(73);
   expect(SOCIAL_PAYMENT_PROGRAMMES).toHaveLength(18);
-  expect(SOCIAL_SOURCES).toHaveLength(23);
+  expect(SOCIAL_SOURCES).toHaveLength(24);
   expect(SOCIAL_PUBLIC_SOURCES).toEqual([...SOCIAL_SOURCES, "ssa_statistics"]);
   expect(new Set(facts.map(f => f.indicatorId))).toEqual(new Set(SOCIAL_INDICATORS));
   expect(new Set(facts.map(f => f.sourceId))).toEqual(new Set(SOCIAL_PUBLIC_SOURCES));
@@ -92,6 +92,23 @@ test("the spec's anchors and the calculated averages", async () => {
   expect(facts.filter(f => f.indicatorId.endsWith(".amount") || f.indicatorId.endsWith(".employment_amount")).every(f => f.unit === "gel" && /^\d+$/.test(f.value))).toBe(true);
   expect(find(facts, "social.subsistence.families", "06", 2025).unit).toBe("families");
   expect(find(facts, "social.subsistence.persons", "06", 2025).unit).toBe("persons");
+});
+
+test("the people in receiving families are served by SSA's eight age bands, which add up to them in every place and year", async () => {
+  const facts = await loadFacts();
+  expect(SOCIAL_AGE_BANDS).toEqual(["0_6", "6_18", "18_30", "30_40", "40_60", "60_65", "65_70", "70_plus"]);
+  const georgia = Object.fromEntries(SOCIAL_AGE_BANDS.map(band => [band, find(facts, `social.subsistence.persons_age_${band}`, SOCIAL_GEORGIA, 2025).value]));
+  expect(georgia).toEqual({ "0_6": "47751", "6_18": "142684", "18_30": "42569", "30_40": "67960", "40_60": "82482", "60_65": "18292", "65_70": "19641", "70_plus": "41743" });
+  expect(find(facts, "social.subsistence.persons_age_0_6", SOCIAL_GEORGIA, 2025)).toMatchObject({
+    unit: "persons", months: 1, valueStatus: "official", sourceId: "ssa_tsa_allowance_03", sourceWorkbook: "ssa-tsa_allowance-03-2025.xlsx", sourceSheet: "December", sourceCell: "B93",
+  });
+  const persons = facts.filter(f => f.indicatorId === "social.subsistence.persons");
+  const ages = facts.filter(f => f.indicatorId.startsWith("social.subsistence.persons_age_"));
+  expect(ages).toHaveLength(persons.length * 8);
+  for (const total of persons) {
+    const sum = SOCIAL_AGE_BANDS.reduce((acc, band) => acc.plus(find(facts, `social.subsistence.persons_age_${band}`, total.geographyId, total.year).value), new Decimal(0));
+    expect(sum.toFixed(), socialFactKey(total)).toBe(total.value);
+  }
 });
 
 test("every social package group has an exact average per month: its money ÷ its monthly people counts", async () => {
@@ -160,7 +177,7 @@ test("the series breaks cover the employment programme and the 2025 group redesi
   expect([...bytes.subarray(0, 3)]).toEqual([0xef, 0xbb, 0xbf]);
   const rows = await readCsv(path.join(root, "data/imports/social-protection-series-breaks.csv"));
   expect(rows.map(r => [r.break_id, r.reference_date])).toEqual([["subsistence_employment_2022", "2022-01-01"], ["social_package_groups_2025", "2025-01-01"]]);
-  expect(rows[0].applies_to.split(";")).toEqual(["social.subsistence.families", "social.subsistence.persons"]);
+  expect(rows[0].applies_to.split(";")).toEqual(["social.subsistence.families", "social.subsistence.persons", ...SOCIAL_AGE_BANDS.map(band => `social.subsistence.persons_age_${band}`)]);
   expect(new Set(rows[1].applies_to.split(";"))).toEqual(new Set([
     "social.social_package.other.recipients", "social.social_package.other.amount", "social.social_package.other.avg_monthly",
     "social.social_package.disability.recipients", "social.social_package.disability.amount", "social.social_package.disability.avg_monthly",
@@ -194,6 +211,12 @@ test.each([
   ["a region row no longer equal to its parts", (facts: SocialFact[]) => { plus(find(facts, "social.pension.recipients", "region.imereti", 2020), "1"); }, /pension\.recipients region\.imereti.*do not add up.*unrecorded difference found -1/],
   ["regions no longer adding to Georgia", (facts: SocialFact[]) => { plus(find(facts, "social.subsistence.registered_persons", "region.tbilisi", 2020), "1"); }, /do not add up/],
   ["a recorded source finding that stops recurring", (facts: SocialFact[]) => { plus(find(facts, "social.subsistence.amount", "48", 2013), "126"); }, /recorded difference no longer occurs, expected -126, found none/],
+  ["age bands no longer adding up to the people in receiving families", (facts: SocialFact[]) => {
+    // The same band in Batumi, Adjara and Georgia, so every region and Georgia still add up and only the band sum breaks.
+    for (const place of ["06", "region.adjara", SOCIAL_GEORGIA]) plus(find(facts, "social.subsistence.persons_age_30_40", place, 2020), "1");
+  }, /subsistence\.persons age groups country\.georgia .*do not add up.*unrecorded difference found 1/],
+  ["a missing age band", (facts: SocialFact[]) => { facts.splice(facts.indexOf(find(facts, "social.subsistence.persons_age_70_plus", "06", 2020)), 1); }, /Incomplete/],
+  ["an age band citing the persons table", (facts: SocialFact[]) => { find(facts, "social.subsistence.persons_age_0_6", "06", 2020).sourceId = "ssa_tsa_allowance_01"; }, /source contract/],
   ["social package groups no longer adding to the total", (facts: SocialFact[]) => { plus(find(facts, "social.social_package.survivors.recipients", SOCIAL_GEORGIA, 2020), "1"); }, /groups.*do not add up/],
   ["disability parts no longer adding to disability", (facts: SocialFact[]) => { plus(find(facts, "social.social_package.disability_severe.recipients", SOCIAL_GEORGIA, 2020), "1"); }, /disability parts.*do not add up/],
   ["a payments row that no longer repeats its programme", (facts: SocialFact[]) => { plus(find(facts, "social.payments.pension.amount", SOCIAL_GEORGIA, 2020), "1"); plus(find(facts, "social.payments.total.amount", SOCIAL_GEORGIA, 2020), "1"); }, /payments row/],
@@ -258,10 +281,10 @@ test("prepare requires each recorded national average gap's blank cell in the so
 test("the loader reads the committed canonical file and its break register", async () => {
   const facts = await loadSocialFacts();
   expect(facts).toEqual(await loadFacts());
-  expect(facts).toHaveLength(13980);
+  expect(facts).toHaveLength(21988);
   const breaks = await loadSocialBreaks();
   expect(breaks.map(b => b.breakId)).toEqual(["subsistence_employment_2022", "social_package_groups_2025"]);
-  expect(breaks[0].appliesTo).toEqual(["social.subsistence.families", "social.subsistence.persons"]);
+  expect(breaks[0].appliesTo).toEqual(["social.subsistence.families", "social.subsistence.persons", ...SOCIAL_AGE_BANDS.map(band => `social.subsistence.persons_age_${band}`)]);
 });
 
 test("parity accepts equal rows and the same decimal written differently, and rejects a changed value or a missing row", async () => {

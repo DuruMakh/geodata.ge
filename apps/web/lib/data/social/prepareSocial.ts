@@ -8,7 +8,7 @@ import { readVerifiedPackageFile } from "../sourcePackage";
 import { assertGeneratedArtifactMatches } from "../generatedArtifacts";
 import type { CsvRecord } from "../csv";
 import {
-  SOCIAL_GEORGIA, SOCIAL_INDICATORS, SOCIAL_MUNICIPALITIES, SOCIAL_PACKAGE_GROUPS, SOCIAL_PAYMENT_PROGRAMMES, SOCIAL_REGIONS, SOCIAL_SOURCES, SOCIAL_UNITS,
+  SOCIAL_AGE_BANDS, SOCIAL_GEORGIA, SOCIAL_INDICATORS, SOCIAL_MUNICIPALITIES, SOCIAL_PACKAGE_GROUPS, SOCIAL_PAYMENT_PROGRAMMES, SOCIAL_REGIONS, SOCIAL_SOURCES, SOCIAL_UNITS,
   socialFactKey, socialSourceId, type SocialAcceptance, type SocialFact, type SocialIndicator, type SocialSeriesBreak,
 } from "./types";
 import { SOCIAL_AVERAGES, SOCIAL_AVERAGE_GAPS, SOCIAL_KNOWN_DIFFERENCES, socialAverage, socialUnit, validateSocialFacts, type SocialAverageInputs } from "./validation";
@@ -18,7 +18,7 @@ export const REVIEWED_AT = "2026-10-20";
 export const SOCIAL_CSV_HEADERS = ["year", "indicator_id", "geography_id", "value", "unit", "months", "basis", "value_status", "source_id", "source_workbook", "source_sheet", "source_cell", "last_reviewed_at"];
 const PACKAGE_HEADERS = ["programme", "measure", "geography_id", "year", "value", "months", "value_status", "source_table", "source_workbook", "source_sheet", "source_cell"];
 const BREAK_HEADERS = ["break_id", "applies_to", "reference_date", "reason", "source_note"];
-const SERVED_ROWS = 16443;
+const SERVED_ROWS = 24451;
 type Source = { source_id: string; kind: string; table_id: string; local_file: string; sha256: string; bytes: number };
 
 /** The package's own measures served as an indicator of their own (social package groups are mapped by name below). */
@@ -30,6 +30,7 @@ const OWN: Readonly<Record<string, SocialIndicator>> = {
   "subsistence_allowance|employment_families": "social.subsistence.employment_families", "subsistence_allowance|amount": "social.subsistence.amount",
   "subsistence_allowance|employment_amount": "social.subsistence.employment_amount",
   "tsa_registered|recipients": "social.subsistence.registered_families", "tsa_registered|persons": "social.subsistence.registered_persons",
+  ...Object.fromEntries(SOCIAL_AGE_BANDS.map(band => [`subsistence_allowance|age.${band}.persons`, `social.subsistence.persons_age_${band}` as const])),
 };
 /**
  * Where each average's money and month-count sum come from. The subsistence average covers regular recipients only; a
@@ -137,9 +138,9 @@ export async function checkKnownDifferences(directory: string): Promise<void> {
 const SOCIAL_BREAKS: readonly SocialSeriesBreak[] = [
   {
     breakId: "subsistence_employment_2022",
-    appliesTo: ["social.subsistence.families", "social.subsistence.persons"],
+    appliesTo: ["social.subsistence.families", "social.subsistence.persons", ...SOCIAL_AGE_BANDS.map(band => `social.subsistence.persons_age_${band}` as const)],
     referenceDate: "2022-01-01",
-    reason: "Families kept on the allowance through the public employment programme are counted separately from 2022. SSA prints them in a column of their own from December 2022, so from 2022 the families receiving the allowance and the people in them leave them out. No change may be computed across this point.",
+    reason: "Families kept on the allowance through the public employment programme are counted separately from 2022. SSA prints them in a column of their own from December 2022, so from 2022 the families receiving the allowance and the people in them leave them out. The age groups of those people leave them out too. No change may be computed across this point.",
     sourceNote: "SSA subsistence allowance table 1 (tsa_allowance-01), ssa-tsa_allowance-01-2022.xlsx, sheet December, heading D3: \"ოჯახების/პირების რაოდენობა, რომელთა ოჯახიდან ერთი წევრი მაინც ჩართულია საზოგადოებრივი დასაქმების ხელშეწყობის სახელმწიფო პროგრამაში და 4 წლის განმავლობაში უნარჩუნდებათ სოციალურად დაუცველი ოჯახების მონაცემთა ბაზაში რეგისტრაცია\" (spaces normalised). The January–November 2022 sheets have no such column.",
   },
   {

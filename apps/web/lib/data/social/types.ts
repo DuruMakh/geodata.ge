@@ -18,6 +18,11 @@ export const SOCIAL_PACKAGE_GROUPS = [
   "total", "disability", "disability_children", "disability_severe", "disability_significant", "disability_moderate",
   "survivors", "war_participants", "political_repression", "other",
 ] as const;
+/**
+ * SSA's eight age bands of the people in receiving families (tsa_allowance-03), as printed: `0_6` is SSA's "0_6", and
+ * `70_plus` its "70 და მეტი" (70 and over). SSA does not say which band a boundary age falls in.
+ */
+export const SOCIAL_AGE_BANDS = ["0_6", "6_18", "18_30", "30_40", "40_60", "60_65", "65_70", "70_plus"] as const;
 /** The Social payments rows after the total, in spec §4 order, by the research package's programme id. `pension_idp` is part of the state pension. */
 export const SOCIAL_PAYMENT_PROGRAMMES = [
   "pension", "pension_highmountain", "social_package", "social_package_highmountain", "subsistence_allowance", "idp_refugee_allowance",
@@ -33,6 +38,7 @@ export const SOCIAL_INDICATORS = [
   "social.pension_highmountain.recipients", "social.pension_highmountain.amount", "social.pension_highmountain.avg_monthly",
   "social.subsistence.families", "social.subsistence.employment_families", "social.subsistence.registered_families",
   "social.subsistence.persons", "social.subsistence.registered_persons",
+  ...SOCIAL_AGE_BANDS.map(band => `social.subsistence.persons_age_${band}` as const),
   "social.subsistence.amount", "social.subsistence.employment_amount", "social.subsistence.avg_monthly",
   ...SOCIAL_PACKAGE_GROUPS.map(group => `social.social_package.${group}.recipients` as const),
   ...SOCIAL_PACKAGE_GROUPS.map(group => `social.social_package.${group}.amount` as const),
@@ -45,7 +51,7 @@ export type SocialIndicator = (typeof SOCIAL_INDICATORS)[number];
 
 /** The SSA tables the served values are read from, as `ssa_` and the research package's table id. */
 export const SOCIAL_SOURCES = [
-  "ssa_pension_01", "ssa_pension_02", "ssa_pension_04", "ssa_tsa_allowance_01", "ssa_tsa_allowance_02", "ssa_tsa_db_01",
+  "ssa_pension_01", "ssa_pension_02", "ssa_pension_04", "ssa_tsa_allowance_01", "ssa_tsa_allowance_02", "ssa_tsa_allowance_03", "ssa_tsa_db_01",
   "ssa_socpackage_01", "ssa_socpackage_02", "ssa_socpackage_10", "ssa_idp_refugee_02", "ssa_compensation_04", "ssa_maternity_01",
   "ssa_maternity_03", "ssa_demography_02", "ssa_demography_04", "ssa_utilitysubsidy_02", "ssa_other_01", "ssa_other_02",
   "ssa_other_03", "ssa_other_04", "ssa_highmountain_01", "ssa_highmountain_03", "ssa_workinjury_03",

@@ -1,6 +1,6 @@
 import Decimal from "decimal.js";
 import {
-  SOCIAL_GEORGIA, SOCIAL_INDICATORS, SOCIAL_MUNICIPALITIES, SOCIAL_PACKAGE_GROUPS, SOCIAL_PAYMENT_PROGRAMMES, SOCIAL_PUBLIC_SOURCES, SOCIAL_REGIONS, SOCIAL_UNITS,
+  SOCIAL_AGE_BANDS, SOCIAL_GEORGIA, SOCIAL_INDICATORS, SOCIAL_MUNICIPALITIES, SOCIAL_PACKAGE_GROUPS, SOCIAL_PAYMENT_PROGRAMMES, SOCIAL_PUBLIC_SOURCES, SOCIAL_REGIONS, SOCIAL_UNITS,
   socialFactKey, type SocialFact, type SocialIndicator, type SocialPaymentProgramme,
 } from "./types";
 
@@ -21,6 +21,7 @@ const FIRST_YEARS: Partial<Record<SocialIndicator, number>> = {
   "social.pension_highmountain.recipients": 2016, "social.pension_highmountain.amount": 2017,
   "social.subsistence.families": 2013, "social.subsistence.employment_families": 2022, "social.subsistence.registered_families": 2013,
   "social.subsistence.persons": 2013, "social.subsistence.registered_persons": 2013, "social.subsistence.amount": 2013, "social.subsistence.employment_amount": 2023,
+  ...Object.fromEntries(SOCIAL_AGE_BANDS.map(band => [`social.subsistence.persons_age_${band}`, 2013])),
 };
 const PACKAGE_FIRST_YEARS: Record<string, readonly [recipients: number, amount: number]> = {
   total: [2013, 2013], disability: [2013, 2013], disability_children: [2017, 2018], disability_severe: [2017, 2018], disability_significant: [2017, 2018],
@@ -127,6 +128,7 @@ function expectedSource(indicatorId: SocialIndicator, year: number): string {
   if (programme === "pension_highmountain") return "ssa_pension_04";
   if (programme === "social_package") return measure === "recipients" ? "ssa_socpackage_01" : "ssa_socpackage_02";
   if (group === "registered_families" || group === "registered_persons") return "ssa_tsa_db_01";
+  if (group?.startsWith("persons_age_")) return "ssa_tsa_allowance_03";
   return isMoney(indicatorId) || isAverage(indicatorId) ? "ssa_tsa_allowance_02" : "ssa_tsa_allowance_01";
 }
 
@@ -243,6 +245,10 @@ export function validateSocialFacts(facts: readonly SocialFact[], averageInputs?
     }
     const parts = [...SOCIAL_REGIONS, ...Object.keys(SOCIAL_UNITS).filter(id => SOCIAL_UNITS[id] === null)].map(id => series(indicatorId, id));
     compare(`${indicatorId} georgia`, parts, series(indicatorId), money, year => parts.some(part => !part.has(year)));
+  }
+  // The age bands (tsa_allowance-03) add up to the people in receiving families (tsa_allowance-01) in every place and year.
+  for (const place of PLACES) {
+    compare(`social.subsistence.persons age groups ${place}`, SOCIAL_AGE_BANDS.map(band => series(`social.subsistence.persons_age_${band}`, place)), series("social.subsistence.persons", place), false);
   }
   for (const measure of ["recipients", "amount"] as const) {
     const group = (name: string) => series(`social.social_package.${name}.${measure}`);

@@ -100,7 +100,7 @@ describe("original-source inventory", () => {
     // Every SSA table the served facts cite is registered on one of these captures.
     const registry = parse(await readFile(path.join(REPOSITORY_ROOT, "data/sources/source-documents.csv"), "utf8"), { bom: true, columns: true }) as { source_id: string; source_url_or_file: string }[];
     const ssaRegistry = registry.filter((row) => row.source_id.startsWith("source.ssa_"));
-    expect(ssaRegistry).toHaveLength(24);
+    expect(ssaRegistry).toHaveLength(25);
     expect(ssaRegistry.filter((row) => !ssa.some((capture) => capture.path === row.source_url_or_file))).toEqual([]);
   });
 

@@ -2611,6 +2611,13 @@
     },
     "derivation": null
   },
+  "source.ssa_tsa_allowance_03": {
+    "name": {
+      "text": "Subsistence allowance recipients by age group",
+      "reviewedAt": "2026-10-20"
+    },
+    "derivation": null
+  },
   "source.ssa_tsa_db_01": {
     "name": {
       "text": "Families registered in the database and families receiving subsistence allowance",
