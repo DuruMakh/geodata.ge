@@ -253,13 +253,14 @@ SSA redesigned the group table in 2025: disability is split by severity there, a
 
 - **Prepare script.** `npm run data:prepare-social` reads the research package's generated CSVs and writes `data/imports/social-protection-annual.csv` (UTF-8 with BOM) and `data/reports/social-protection-validation.json`. With `--check` it reproduces both byte for byte, and it runs inside `data:validate`.
 - **Row contents.** Each row keeps:
-  - the indicator, area, year and unit (`persons`, `families`, `gel`, `gel_million`, `percent`);
+  - the indicator, area, year and unit (`persons`, `families`, `gel`);
   - `basis=actual`;
-  - a value status: `official` for a December count or printed national figure, `calculated` for a 12-month sum, an average, a share, a value at 2025 prices, a % of GDP or a sum of programmes;
+  - a value status: `official` for a December count or printed national figure, `calculated` for a 12-month sum, an average or a sum of programmes;
+  - the share of residents, the value at 2025 prices and the % of GDP are not stored: the page computes them from the population, price index and GDP facts the site already serves, as Crime's per-100,000 rate and Money and banks' % of GDP do, and marks them calculated in the table, tooltip and Excel;
   - the number of months the value covers;
   - the source id, workbook and cell, or, for a 12-month sum, the 12 cells.
 - **Stable IDs.** They are lowercase and follow `social.{programme}.{measure}`, for example:
-  - `social.pension.recipients`, `social.pension.amount`, `social.pension.avg_monthly`, `social.pension.avg_monthly_real`, `social.pension.share_residents`;
+  - `social.pension.recipients`, `social.pension.amount`, `social.pension.avg_monthly`;
   - `social.subsistence.families`, `social.subsistence.registered_families`, `social.subsistence.employment_families`;
   - `social.social_package.disability.recipients`;
   - `social.payments.total.amount`.
