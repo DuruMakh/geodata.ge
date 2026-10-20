@@ -46,14 +46,67 @@ class EnergyFoodPackageTests(unittest.TestCase):
     def setUpClass(cls):
         cls.rows = prepare.extract()
 
-    def test_primary_count_is_681(self):
+    def test_primary_count_is_1389(self):
         groups = Counter('electricity' if row['indicator_id'].startswith('electricity.') else
                          'food' if row['indicator_id'].startswith('food.') else
+                         'farming' if row['indicator_id'].startswith('farming.') else
                          'supply page' if row['indicator_id'].split('.')[1] in ('supply', 'production', 'imports', 'exports') else
                          'use page' for row in self.rows)
-        self.assertEqual(len(self.rows), 681)
-        self.assertEqual(groups, {'supply page': 204, 'use page': 168, 'electricity': 165, 'food': 144})
+        self.assertEqual(len(self.rows), 1389)
+        self.assertEqual(groups, {'supply page': 204, 'use page': 168, 'electricity': 165, 'food': 144, 'farming': 708})
         prepare.validate(self.rows)
+
+    def test_farming_spot_values(self):
+        expected = [('farming.output.total', 2025, '8384.9'), ('farming.output.total', 2010, '2777.4'),
+                    ('farming.harvest.wheat', 2025, '145.3'), ('farming.harvest.grapes', 2025, '348.9'),
+                    ('farming.harvest.hazelnuts', 2025, '49.3'), ('farming.livestock.cattle', 2006, '1080.3'),
+                    ('farming.livestock.cattle', 2025, '761.6'), ('farming.products.milk', 2025, '556.2'),
+                    ('farming.products.eggs', 2025, '692.9'), ('farming.price.wheat', 2025, '0.57'),
+                    ('farming.price.beef', 2025, '21.38'), ('farming.price.milk', 2025, '1.63')]
+        for indicator_id, year, published in expected:
+            self.assertEqual(find(self.rows, indicator_id, year)['published_value'], published, f'{indicator_id} {year}')
+        units = {row['indicator_id']: row['unit'] for row in self.rows if row['indicator_id'].startswith('farming.')}
+        self.assertEqual(len(units), 41)
+        self.assertEqual((units['farming.output.total'], units['farming.harvest.wheat'], units['farming.livestock.poultry'],
+                          units['farming.products.milk'], units['farming.products.eggs'], units['farming.price.beef'],
+                          units['farming.price.milk'], units['farming.price.eggs']),
+                         ('million_gel', 'thousand_tonnes', 'thousand_head', 'million_litres', 'million_pieces', 'gel_per_kg',
+                          'gel_per_litre', 'gel_per_piece'))
+        years = Counter(row['indicator_id'].split('.')[1] for row in self.rows if row['indicator_id'].startswith('farming.'))
+        self.assertEqual(years, {'output': 64, 'harvest': 260, 'livestock': 100, 'products': 140, 'price': 144})
+
+    def test_farming_dash_fails(self):
+        with self.assertRaisesRegex(ValueError, 'not available'):
+            prepare.cell_value({'kind': 's', 'value': '-'}, farming=True)
+        with self.assertRaisesRegex(ValueError, 'Ellipsis'):
+            prepare.cell_value({'kind': 's', 'value': '…'}, farming=True)
+
+    def test_output_sum_fails_when_violated(self):
+        current = Decimal(find(self.rows, 'farming.output.crops', 2020)['value'])
+        with self.assertRaisesRegex(ValueError, 'Farm output'):
+            prepare.validate(altered(self.rows, 'farming.output.crops', 2020, str(current + 1)))
+
+    def test_meat_and_milk_sums_fail_when_violated(self):
+        for indicator_id in ('farming.products.beef', 'farming.products.milk'):
+            current = Decimal(find(self.rows, indicator_id, 2019)['value'])
+            with self.assertRaisesRegex(ValueError, 'differs from the sum'):
+                prepare.validate(altered(self.rows, indicator_id, 2019, str(current + 1)))
+
+    def test_dairy_cows_never_exceed_cattle(self):
+        cattle = find(self.rows, 'farming.livestock.cattle', 2018)['value']
+        with self.assertRaisesRegex(ValueError, 'Dairy cows'):
+            prepare.validate(altered(self.rows, 'farming.livestock.dairy_cows', 2018, str(Decimal(cattle) + 1)))
+
+    def test_food_balance_production_matches(self):
+        self.assertEqual(prepare.check_food_balance_production(self.rows), [('grapes', 2014)])
+        current = Decimal(find(self.rows, 'farming.harvest.potatoes', 2017)['value'])
+        with self.assertRaisesRegex(ValueError, 'Food balance production'):
+            prepare.check_food_balance_production(altered(self.rows, 'farming.harvest.potatoes', 2017, str(current + 1)))
+
+    def test_only_output_2025_is_preliminary(self):
+        preliminary = sorted((row['indicator_id'], row['year']) for row in self.rows if row['value_status'] == 'preliminary')
+        self.assertEqual(preliminary, [(f'farming.output.{key}', 2025) for key in ('crops', 'livestock', 'services', 'total')])
+        self.assertFalse([row for row in self.rows if row['indicator_id'].startswith('farming.') and row['value_status'] == 'no_flow'])
 
     def test_altered_cell_fails(self):
         copied = [dict(row) for row in self.rows]

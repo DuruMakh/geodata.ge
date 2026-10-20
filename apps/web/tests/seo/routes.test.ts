@@ -111,7 +111,11 @@ describe("indexable Fiscal.ge routes", () => {
     // The Housing methodology adds one more bilingual pair.
     // Education adds its hub, four pages, the 75 Schools and 75 Kindergartens place pages and its methodology page: 156 bilingual pairs.
     // The Social protection methodology adds one more bilingual pair.
-    expect(urls).toHaveLength(1330);
+    // Science and culture adds its hub, four pages, a Museums page for Georgia and each of the 11 regions and its methodology page: 18 bilingual pairs.
+    // Environment and climate adds its hub, seven pages, nine city pages, a Waste and a Forests page for Georgia and each of the 11 regions and its methodology page: 42 bilingual pairs.
+    // Unemployment adds four Labour Force Survey detail pages (industries, hours, informal, young people): 4 bilingual pairs.
+    // Farming adds one Energy and food page: 1 bilingual pair.
+    expect(urls).toHaveLength(1460);
     expect(new Set(urls).size).toBe(urls.length);
     expect(urls.every((url) => url.startsWith("https://fiscal.ge/"))).toBe(true);
     expect(urls).toContain("https://fiscal.ge/about");
@@ -136,6 +140,8 @@ describe("indexable Fiscal.ge routes", () => {
     expect(urls).toContain("https://fiscal.ge/en/methodology/education");
     expect(urls).toContain("https://fiscal.ge/methodology/social-protection");
     expect(urls).toContain("https://fiscal.ge/en/methodology/social-protection");
+    expect(urls).toContain("https://fiscal.ge/methodology/science-culture");
+    expect(urls).toContain("https://fiscal.ge/en/methodology/science-culture");
     expect(urls).toContain("https://fiscal.ge/explorer/wages/regions/adjara");
     for (const page of ["", "/income", "/spending", "/poverty", "/inequality"]) {
       expect(urls).toContain(`https://fiscal.ge/explorer/living-standards${page}`);
@@ -148,7 +154,7 @@ describe("indexable Fiscal.ge routes", () => {
       expect(urls).toContain(`https://fiscal.ge/en/explorer/living-standards/${section}/regions/georgia`);
     }
     expect(urls.some((url) => url.includes("/explorer/poverty"))).toBe(false);
-    for (const page of ["", "/energy-supply", "/electricity", "/energy-use", "/food-self-sufficiency"]) {
+    for (const page of ["", "/energy-supply", "/electricity", "/energy-use", "/food-self-sufficiency", "/farming"]) {
       expect(urls).toContain(`https://fiscal.ge/explorer/energy-food${page}`);
       expect(urls).toContain(`https://fiscal.ge/en/explorer/energy-food${page}`);
     }
@@ -197,6 +203,11 @@ describe("indexable Fiscal.ge routes", () => {
       expect(urls).not.toContain(`https://fiscal.ge/explorer/health/${set}/tbilisi`);
     }
     expect(urls.some(url => /\/explorer\/health\/(pensions|subsistence-allowance)\/\d{2}$/.test(url))).toBe(false);
+    for (const page of ["", "/research", "/patents", "/museums", "/theatres", ...businessAreas.map(area => `/museums/${area}`)]) {
+      expect(urls).toContain(`https://fiscal.ge/explorer/science-culture${page}`);
+      expect(urls).toContain(`https://fiscal.ge/en/explorer/science-culture${page}`);
+    }
+    expect(urls.filter((url) => url.includes("/explorer/science-culture"))).toHaveLength(34);
     expect(urls).toContain("https://fiscal.ge/explorer/trade/products");
     expect(urls).toContain("https://fiscal.ge/en/explorer/trade/products");
     expect(urls).toContain("https://fiscal.ge/explorer/trade/domestic-exports");
@@ -236,10 +247,12 @@ describe("indexable Fiscal.ge routes", () => {
       "/methodology/health",
       "/methodology/social-protection",
       "/methodology/education",
+      "/methodology/science-culture",
       "/methodology/crime",
       "/methodology/trade",
       "/methodology/external-flows",
       "/methodology/energy-food",
+      "/methodology/environment",
       "/methodology/demography",
     ]);
   }, 90_000);
@@ -267,7 +280,7 @@ describe("unemployment discovery", () => {
     const paths = await listPublicPagePaths(); expect(paths).toContain("/explorer/unemployment"); expect(paths).toContain("/methodology/unemployment");
     const entries = await sitemap();
     for (const path of ["/explorer/unemployment", "/en/explorer/unemployment", "/methodology/unemployment", "/en/methodology/unemployment"]) expect(entries.some(entry => entry.url.endsWith(path))).toBe(true);
-    for (const section of ["overview", "regions", "age", "gender"]) {
+    for (const section of ["overview", "regions", "age", "gender", "industries", "hours", "informal", "young-people"]) {
       expect(paths).toContain(`/explorer/unemployment/${section}`);
       for (const prefix of ["", "/en"]) expect(entries.some(entry => entry.url.endsWith(`${prefix}/explorer/unemployment/${section}`))).toBe(true);
     }
@@ -431,6 +444,13 @@ async function sitemapDates(): Promise<Map<string, string | undefined>> {
 }
 
 describe("sitemap lastmod reports each entity's own reviewed date", () => {
+  it("dates each energy and food page by its own facts, and the hub by the newest", async () => {
+    const dates = await sitemapDates();
+    for (const page of ["energy-supply", "electricity", "energy-use", "food-self-sufficiency"]) expect(dates.get(`${SITE}/explorer/energy-food/${page}`), page).toBe("2026-10-11");
+    expect(dates.get(`${SITE}/explorer/energy-food/farming`)).toBe("2026-10-20");
+    expect(dates.get(`${SITE}/explorer/energy-food`)).toBe("2026-10-20");
+  });
+
   it("gives every municipality the date its own facts were reviewed", async () => {
     const [dates, municipalData, { sourceDocuments }] = await Promise.all([
       sitemapDates(),

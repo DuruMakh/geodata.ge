@@ -153,6 +153,20 @@ source.geostat_lfs_metadata_2026,შრომის ძალის გამო
 source.geostat_lfs_source_page,დასაქმებისა და უმუშევრობის წყაროს გვერდი,docs/Raw Data/Unemployment/geostat-labour-force-annual/official/employment-unemployment-en.html,2026-10-04
 source.geostat_lfs_annual_education,შრომის ძალის მაჩვენებლები განათლების მიხედვით,docs/Raw Data/Unemployment/geostat-labour-force-annual/official/13-labour-force-indicators-by-education.xlsx,2026-10-04
 source.geostat_lfs_annual_long_term,ხანგრძლივი უმუშევრობა,docs/Raw Data/Unemployment/geostat-labour-force-annual/official/16-long-term-unemployment.xlsx,2026-10-04
+source.geostat_lfs_jobs_industry,დასაქმებულთა განაწილება ეკონომიკური საქმიანობის სახეების მიხედვით,docs/Raw Data/Unemployment/geostat-labour-force-detail/official/07-employment-by-branch-nace_eng.xlsx,2026-10-20
+source.geostat_lfs_hours_sex,ძირითად სამუშაოზე კვირაში ნამუშევარი საათების საშუალო რაოდენობა ეკონომიკური საქმიანობისა და სქესის მიხედვით,docs/Raw Data/Unemployment/geostat-labour-force-detail/official/09-hours-by-sex.xlsx,2026-10-20
+source.geostat_lfs_hours_settlement,ძირითად სამუშაოზე კვირაში ნამუშევარი საათების საშუალო რაოდენობა ეკონომიკური საქმიანობისა და ქალაქ-სოფლის მიხედვით,docs/Raw Data/Unemployment/geostat-labour-force-detail/official/10-hours-by-urban-rular-areas.xlsx,2026-10-20
+source.geostat_lfs_informal,არაფორმალურად დასაქმებულთა წილი არასასოფლო-სამეურნეო სფეროს დასაქმებულებში,docs/Raw Data/Unemployment/geostat-labour-force-detail/official/11-informal-employment.xlsx,2026-10-20
+source.geostat_lfs_underuse,არასრულად გამოყენებული სამუშაო ძალის მაჩვენებლები,docs/Raw Data/Unemployment/geostat-labour-force-detail/official/12-labour-underutilization.xlsx,2026-10-20
+source.geostat_lfs_neet,"ახალგაზრდები, რომლებიც არ სწავლობენ, არ არიან დასაქმებულები და არ გადიან ტრენინგებს (NEET)",docs/Raw Data/Unemployment/geostat-labour-force-detail/official/14-neet_eng.xlsx,2026-10-20
+source.geostat_lfs_jobs_industry_ka,"დასაქმებულთა განაწილება ეკონომიკური საქმიანობის სახეების მიხედვით, ქართული ვერსია",docs/Raw Data/Unemployment/geostat-labour-force-detail/official/07-dasaqmeba-nace.xlsx,2026-10-20
+source.geostat_lfs_hours_sex_ka,"ძირითად სამუშაოზე კვირაში ნამუშევარი საათების საშუალო რაოდენობა ეკონომიკური საქმიანობისა და სქესის მიხედვით, ქართული ვერსია",docs/Raw Data/Unemployment/geostat-labour-force-detail/official/09-dasaqmeba-saatebi-sqesi.xlsx,2026-10-20
+source.geostat_lfs_hours_settlement_ka,"ძირითად სამუშაოზე კვირაში ნამუშევარი საათების საშუალო რაოდენობა ეკონომიკური საქმიანობისა და ქალაქ-სოფლის მიხედვით, ქართული ვერსია",docs/Raw Data/Unemployment/geostat-labour-force-detail/official/10-dasaqmeba-saatebi-qalaqi-sofeli.xlsx,2026-10-20
+source.geostat_lfs_informal_ka,"არაფორმალურად დასაქმებულთა წილი არასასოფლო-სამეურნეო სფეროს დასაქმებულებში, ქართული ვერსია",docs/Raw Data/Unemployment/geostat-labour-force-detail/official/11-araformaluri-dasaqmeba.xlsx,2026-10-20
+source.geostat_lfs_underuse_ka,"არასრულად გამოყენებული სამუშაო ძალის მაჩვენებლები, ქართული ვერსია",docs/Raw Data/Unemployment/geostat-labour-force-detail/official/12-arasrulad-gamoyenebuli-samushao-dzala.xlsx,2026-10-20
+source.geostat_lfs_neet_ka,"ახალგაზრდები, რომლებიც არ სწავლობენ, არ არიან დასაქმებულები და არ გადიან ტრენინგებს (NEET), ქართული ვერსია",docs/Raw Data/Unemployment/geostat-labour-force-detail/official/14-neet.xlsx,2026-10-20
+source.geostat_lfs_detail_page,დასაქმება და უმუშევრობა (წყაროს გვერდი),docs/Raw Data/Unemployment/geostat-labour-force-detail/official/labour-page.html,2026-10-20
+source.geostat_lfs_detail_page_ka,"დასაქმება და უმუშევრობა (წყაროს გვერდი, ქართული ვერსია)",docs/Raw Data/Unemployment/geostat-labour-force-detail/official/labour-page-ka.html,2026-10-20
 source.geostat_trade_ftrade_1995_2026,საქონლის ექსპორტი და იმპორტი 1995–2026,docs/Raw Data/Trade/geostat-external-trade/2026-10-07/official/FTrade_1995-2026.xlsx,2026-10-08
 source.geostat_trade_export_country_1995_2026,საქონლის ექსპორტი ქვეყნების მიხედვით 1995–2026,docs/Raw Data/Trade/geostat-external-trade/2026-10-07/official/Export-Country_1995-2026.xlsx,2026-10-08
 source.geostat_trade_import_country_1995_2026,საქონლის იმპორტი ქვეყნების მიხედვით 1995–2026,docs/Raw Data/Trade/geostat-external-trade/2026-10-07/official/Import-Country-1995-2026.xlsx,2026-10-08
@@ -228,6 +242,19 @@ source.geostat_energy_balance_page_2023,საქართველოს ენ
 source.geostat_energy_balance_page_2024,საქართველოს ენერგეტიკული ბალანსი 2024 (წყაროს გვერდი),docs/Raw Data/EnergyFood/geostat-energy-food-annual/official/energy-balance-page-2024.html,2026-10-11
 source.geostat_energy_balance_index_page,საქართველოს ენერგეტიკული ბალანსი (საინდექსო გვერდი),docs/Raw Data/EnergyFood/geostat-energy-food-annual/official/energy-balance-index-page.html,2026-10-11
 source.geostat_food_security_page,სურსათის უსაფრთხოება (წყაროს გვერდი),docs/Raw Data/EnergyFood/geostat-energy-food-annual/official/food-security-page.html,2026-10-11
+source.geostat_farming_general,სოფლის მეურნეობის სექტორის ზოგადი სტატისტიკა,docs/Raw Data/EnergyFood/geostat-energy-food-annual/official/farming-general.xlsx,2026-10-20
+source.geostat_farming_general_ka,სოფლის მეურნეობის სექტორის ზოგადი სტატისტიკა (ქართული წარწერები),docs/Raw Data/EnergyFood/geostat-energy-food-annual/official/ka/farming-general-ka.xlsx,2026-10-20
+source.geostat_farming_annual_crops,ერთწლიანი კულტურების წარმოება,docs/Raw Data/EnergyFood/geostat-energy-food-annual/official/farming-annual-crops.xlsx,2026-10-20
+source.geostat_farming_annual_crops_ka,ერთწლიანი კულტურების წარმოება (ქართული წარწერები),docs/Raw Data/EnergyFood/geostat-energy-food-annual/official/ka/farming-annual-crops-ka.xlsx,2026-10-20
+source.geostat_farming_permanent_crops,მრავალწლოვანი კულტურების წარმოება,docs/Raw Data/EnergyFood/geostat-energy-food-annual/official/farming-permanent-crops.xlsx,2026-10-20
+source.geostat_farming_permanent_crops_ka,მრავალწლოვანი კულტურების წარმოება (ქართული წარწერები),docs/Raw Data/EnergyFood/geostat-energy-food-annual/official/ka/farming-permanent-crops-ka.xlsx,2026-10-20
+source.geostat_farming_livestock_numbers,პირუტყვის სულადობა (წლიური),docs/Raw Data/EnergyFood/geostat-energy-food-annual/official/farming-livestock-numbers.xlsx,2026-10-20
+source.geostat_farming_livestock_numbers_ka,პირუტყვის სულადობა (წლიური) (ქართული წარწერები),docs/Raw Data/EnergyFood/geostat-energy-food-annual/official/ka/farming-livestock-numbers-ka.xlsx,2026-10-20
+source.geostat_farming_livestock_products,მეცხოველეობის პროდუქტების წარმოება (წლიური),docs/Raw Data/EnergyFood/geostat-energy-food-annual/official/farming-livestock-products.xlsx,2026-10-20
+source.geostat_farming_livestock_products_ka,მეცხოველეობის პროდუქტების წარმოება (წლიური) (ქართული წარწერები),docs/Raw Data/EnergyFood/geostat-energy-food-annual/official/ka/farming-livestock-products-ka.xlsx,2026-10-20
+source.geostat_farming_prices,სასოფლო-სამეურნეო პროდუქტების ფასები,docs/Raw Data/EnergyFood/geostat-energy-food-annual/official/farming-prices.xlsx,2026-10-20
+source.geostat_farming_prices_ka,სასოფლო-სამეურნეო პროდუქტების ფასები (ქართული წარწერები),docs/Raw Data/EnergyFood/geostat-energy-food-annual/official/ka/farming-prices-ka.xlsx,2026-10-20
+source.geostat_agriculture_page,სოფლის მეურნეობა (წყაროს გვერდი),docs/Raw Data/EnergyFood/geostat-energy-food-annual/official/agriculture-page.html,2026-10-20
 source.nbg_money_aggregates,ფულის აგრეგატები და მონეტარული კოეფიციენტები (M2.1),docs/Raw Data/Money/nbg-money-banks-annual/official/money-aggregates-and-monetary-ratioseng.xlsx,2026-10-11
 source.nbg_loans_l3_5,ბანკების მიერ გაცემული სესხები ეკონომიკაზე (L3.5),docs/Raw Data/Money/nbg-money-banks-annual/official/loans-to-the-economy-l3-5eng.xlsx,2026-10-11
 source.nbg_deposits_d3_17,დეპოზიტები სახეების მიხედვით (D3.17),docs/Raw Data/Money/nbg-money-banks-annual/official/depositsinterest-rates-d3-17eng.xlsx,2026-10-11
@@ -456,3 +483,82 @@ source.ssa_highmountain_01,მაღალმთიან დასახლე�
 source.ssa_highmountain_03,"მაღალმთიან დასახლებაში მუდმივად მცხოვრები, ელექტროენერგიის შეღავათით მოსარგებლე ბენეფიციართა რაოდენობა და მათზე გადარიცხული თანხა",docs/Raw Data/Social/ssa-statistics/official/pages/ssa-links-highmountain.json,2026-10-20
 source.ssa_workinjury_03,შრომითი მოვალეობის შესრულებისას მიყენებული ზიანის ანაზღაურება: გადარიცხული თანხა,docs/Raw Data/Social/ssa-statistics/official/pages/ssa-page-workinjury.html,2026-10-20
 source.ssa_statistics,SSA-ს სტატისტიკის სია (წყაროს გვერდი),docs/Raw Data/Social/ssa-statistics/official/pages/ssa-page-statistiklist.html,2026-10-20
+source.geostat_env_ghg,B-3. სათბურის გაზების ემისიები,docs/Raw Data/Environment/geostat-environment-annual/official/B-3.-Greenhouse-gas-emissions-ENG.XLSX,2026-10-20
+source.geostat_env_air_emissions,A-1. ატმოსფერულ ჰაერში გაფრქვეული მავნე ნივთიერებები,docs/Raw Data/Environment/geostat-environment-annual/official/A-1.-Emissions-of-pollutants-into-the-atmospheric-air_ENG.XLSX,2026-10-20
+source.geostat_env_air_quality,A-2. ატმოსფერული ჰაერის ხარისხი ურბანულ ტერიტორიებზე,docs/Raw Data/Environment/geostat-environment-annual/official/A-2_Ambient_air_quality_in_urban_areas_ENG.XLSX,2026-10-20
+source.geostat_env_temperature,B-1. ჰაერის ტემპერატურა,docs/Raw Data/Environment/geostat-environment-annual/official/B-1_Air-Temperature_ENG.XLSX,2026-10-20
+source.geostat_env_precipitation,B-2. ატმოსფერული ნალექი,docs/Raw Data/Environment/geostat-environment-annual/official/B-2_Atmospheric_precipitation_ENG.XLSX,2026-10-20
+source.geostat_env_water_household,C-4. წყლის გამოყენება შინამეურნეობებში ერთ სულ მოსახლეზე,docs/Raw Data/Environment/geostat-environment-annual/official/C-4.-Household-water-use-per-capita_ENG.xlsx,2026-10-20
+source.geostat_env_water_supply,C-5. წყალმომარაგება და წყალმომარაგების სისტემაზე მიერთებული მოსახლეობა,docs/Raw Data/Environment/geostat-environment-annual/official/C-5.-Water-supply-industry-and-population-connected-to-water-supply-industry_ENG.xlsx,2026-10-20
+source.geostat_env_water_losses,C-7. წყლის დანაკარგები,docs/Raw Data/Environment/geostat-environment-annual/official/C-7.-Water-losses_ENG.xlsx,2026-10-20
+source.geostat_env_wastewater,C-14. წყალარინების ქსელზე მიერთებული მოსახლეობა,docs/Raw Data/Environment/geostat-environment-annual/official/C-14.-Population-connected-to-wastewater-treatment_ENG.XLSX,2026-10-20
+source.geostat_env_waste,რეგიონებიდან ნაგავსაყრელებზე განთავსებული მუნიციპალური ნარჩენები,docs/Raw Data/Environment/geostat-environment-annual/official/Municipal_Waste_ENG.xlsx,2026-10-20
+source.geostat_env_timber,ხე-ტყის დამზადების/ჭრის შედეგად მიღებული მერქნის მოცულობა,docs/Raw Data/Environment/geostat-environment-annual/official/Volume-of-felled-timber.xls,2026-10-20
+source.geostat_env_illegal_logging,ტყის უკანონო ჭრა,docs/Raw Data/Environment/geostat-environment-annual/official/Illegal-logging.xls,2026-10-20
+source.geostat_env_fires,ტყისა და ველის ხანძრები,docs/Raw Data/Environment/geostat-environment-annual/official/Forest-and-field-fires.xls,2026-10-20
+source.geostat_env_ods,A-3. ოზონდამშლელი ნივთიერებების მოხმარება,docs/Raw Data/Environment/geostat-environment-annual/official/A-3.-Consumption-of-ozone-depleting-substances-(ODS)_ENG.XLSX,2026-10-20
+source.geostat_env_protected_areas_indicator,D-1. დაცული ტერიტორიები,docs/Raw Data/Environment/geostat-environment-annual/official/D-1-Protected-areas.xlsx,2026-10-20
+source.geostat_env_fertilizer,F-2. სასუქების გამოყენება,docs/Raw Data/Environment/geostat-environment-annual/official/F-2.-Fertilizer-consumption_ENG.XLSX,2026-10-20
+source.geostat_env_pesticide,F-4. პესტიციდების მოხმარება,docs/Raw Data/Environment/geostat-environment-annual/official/F-4.-Pesticide-consumption_ENG.XLSX,2026-10-20
+source.geostat_env_final_energy,G-1. ენერგიის საბოლოო მოხმარება,docs/Raw Data/Environment/geostat-environment-annual/official/G-1.-Final-energy-consumption_ENG.xlsx,2026-10-20
+source.geostat_env_primary_energy,G-2. პირველადი ენერგიის ჯამური მიწოდება,docs/Raw Data/Environment/geostat-environment-annual/official/G-2.-Total-primary-energy-supply_ENG.xlsx,2026-10-20
+source.geostat_env_renewable_energy,G-4. განახლებადი ენერგიის მიწოდება,docs/Raw Data/Environment/geostat-environment-annual/official/G-4.-Renewable-energy-supply_ENG.xlsx,2026-10-20
+source.geostat_env_stationary_air_pollution,ატმოსფერული ჰაერის დაბინძურება,docs/Raw Data/Environment/geostat-environment-annual/official/Air-Pollution.xls,2026-10-20
+source.geostat_env_protected_areas,დაცული ტერიტორიები,docs/Raw Data/Environment/geostat-environment-annual/official/Protected-Areas.xls,2026-10-20
+source.geostat_env_violations,სამართალდარღვევები გარემოს დაცვის სფეროში,docs/Raw Data/Environment/geostat-environment-annual/official/Violations-of-Law.xls,2026-10-20
+source.geostat_env_protected_area_visitors,ვიზიტორთა რაოდენობა დაცული ტერიტორიების მიხედვით,docs/Raw Data/Environment/geostat-environment-annual/official/Number-of-visitors-by-protected-areas.xlsx,2026-10-20
+source.geostat_env_water_quality,წყლის ხარისხის მაჩვენებლები,docs/Raw Data/Environment/geostat-environment-annual/official/Water-quality_ENG.XLSX,2026-10-20
+source.geostat_env_forest_area,ტყის ფონდი,docs/Raw Data/Environment/geostat-environment-annual/official/Forest_Area.xls,2026-10-20
+source.geostat_env_timber_purpose,ხე-ტყის მოცულობა ჭრის მიზნების მიხედვით,docs/Raw Data/Environment/geostat-environment-annual/official/Volume-of-felled-timber-by-cutting-purpose.xls,2026-10-20
+source.geostat_env_ghg_ka,"B-3. სათბურის გაზების ემისიები, ქართული ვერსია",docs/Raw Data/Environment/geostat-environment-annual/official/B-3.-Greenhouse-gas-emissions-GEO.xlsx,2026-10-20
+source.geostat_env_air_emissions_ka,"A-1. ატმოსფერულ ჰაერში გაფრქვეული მავნე ნივთიერებები, ქართული ვერსია",docs/Raw Data/Environment/geostat-environment-annual/official/A-1.-Emissions-of-pollutants-into-the-atmospheric-air_GEO.XLSX,2026-10-20
+source.geostat_env_air_quality_ka,"A-2. ატმოსფერული ჰაერის ხარისხი ურბანულ ტერიტორიებზე, ქართული ვერსია",docs/Raw Data/Environment/geostat-environment-annual/official/A-2-air-quality-GEO.xlsx,2026-10-20
+source.geostat_env_temperature_ka,"B-1. ჰაერის ტემპერატურა, ქართული ვერსია",docs/Raw Data/Environment/geostat-environment-annual/official/B-1-Air_Temperature_GEO.XLSX,2026-10-20
+source.geostat_env_precipitation_ka,"B-2. ატმოსფერული ნალექი, ქართული ვერსია",docs/Raw Data/Environment/geostat-environment-annual/official/B-2-Atmospheric_precipitation_GEO.XLSX,2026-10-20
+source.geostat_env_water_household_ka,"C-4. წყლის გამოყენება შინამეურნეობებში ერთ სულ მოსახლეზე, ქართული ვერსია",docs/Raw Data/Environment/geostat-environment-annual/official/C-4.-Household-water-use-per-capita_GEO.xlsx,2026-10-20
+source.geostat_env_water_supply_ka,"C-5. წყალმომარაგება და წყალმომარაგების სისტემაზე მიერთებული მოსახლეობა, ქართული ვერსია",docs/Raw Data/Environment/geostat-environment-annual/official/C-5.-Water-supply-industry-and-population-connected-to-water-supply-industry_GEO.xlsx,2026-10-20
+source.geostat_env_water_losses_ka,"C-7. წყლის დანაკარგები, ქართული ვერსია",docs/Raw Data/Environment/geostat-environment-annual/official/C-7.-Water-losses_GEO.xlsx,2026-10-20
+source.geostat_env_wastewater_ka,"C-14. წყალარინების ქსელზე მიერთებული მოსახლეობა, ქართული ვერსია",docs/Raw Data/Environment/geostat-environment-annual/official/C-14.-Population-connected-to-wastewater-treatment_GEO.XLSX,2026-10-20
+source.geostat_env_waste_ka,"რეგიონებიდან ნაგავსაყრელებზე განთავსებული მუნიციპალური ნარჩენები, ქართული ვერსია",docs/Raw Data/Environment/geostat-environment-annual/official/Municipal_Waste_GEO.xlsx,2026-10-20
+source.geostat_env_timber_ka,"ხე-ტყის დამზადების/ჭრის შედეგად მიღებული მერქნის მოცულობა, ქართული ვერსია",docs/Raw Data/Environment/geostat-environment-annual/official/felled-timber-GEO.xls,2026-10-20
+source.geostat_env_illegal_logging_ka,"ტყის უკანონო ჭრა, ქართული ვერსია",docs/Raw Data/Environment/geostat-environment-annual/official/illegal-logging-GEO.xls,2026-10-20
+source.geostat_env_fires_ka,"ტყისა და ველის ხანძრები, ქართული ვერსია",docs/Raw Data/Environment/geostat-environment-annual/official/forest-fires-GEO.xls,2026-10-20
+source.geostat_env_page_565,გარემოსდაცვითი ინდიკატორები (წყაროს გვერდი),docs/Raw Data/Environment/geostat-environment-annual/official/page-565-en.html,2026-10-20
+source.geostat_env_page_565_ka,"გარემოსდაცვითი ინდიკატორები (წყაროს გვერდი, ქართული ვერსია)",docs/Raw Data/Environment/geostat-environment-annual/official/page-565-ka.html,2026-10-20
+source.geostat_env_page_73,გარემოს სტატისტიკა (წყაროს გვერდი),docs/Raw Data/Environment/geostat-environment-annual/official/page-73-en.html,2026-10-20
+source.geostat_env_page_73_ka,"გარემოს სტატისტიკა (წყაროს გვერდი, ქართული ვერსია)",docs/Raw Data/Environment/geostat-environment-annual/official/page-73-ka.html,2026-10-20
+source.geostat_env_page_822,ტყის რესურსები (წყაროს გვერდი),docs/Raw Data/Environment/geostat-environment-annual/official/page-822-en.html,2026-10-20
+source.geostat_env_page_822_ka,"ტყის რესურსები (წყაროს გვერდი, ქართული ვერსია)",docs/Raw Data/Environment/geostat-environment-annual/official/page-822-ka.html,2026-10-20
+source.geostat_science_researchers,"მკვლევართა რაოდენობა (ხარისხი, ასაკი, სამეცნიერო დარგი)",docs/Raw Data/ScienceCulture/geostat-science-culture-annual/official/Researchers.xlsx,2026-10-20
+source.geostat_science_rd_staff,კვლევებსა და განვითარებაში დასაქმებული პერსონალი სტატუსის მიხედვით,docs/Raw Data/ScienceCulture/geostat-science-culture-annual/official/R&D-Personal.xlsx,2026-10-20
+source.geostat_science_institutions,კვლევებსა და განვითარებაში ჩართული დაწესებულებები და მათი ხარჯები,docs/Raw Data/ScienceCulture/geostat-science-culture-annual/official/Institutions.xlsx,2026-10-20
+source.geostat_science_patents,გამოგონებები და სასარგებლო მოდელები (საქპატენტი),docs/Raw Data/ScienceCulture/geostat-science-culture-annual/official/Invention-Utility-Model.xlsx,2026-10-20
+source.geostat_science_publications,პუბლიკაციების რაოდენობა (ტექინფორმი),docs/Raw Data/ScienceCulture/geostat-science-culture-annual/official/Number-of-publication.xlsx,2026-10-20
+source.geostat_culture_museums,"მუზეუმები და ნაკრძალ-მუზეუმები, ძირითადი მახასიათებლები",docs/Raw Data/ScienceCulture/geostat-science-culture-annual/official/Main-charasteristics-of-Museums.xls,2026-10-20
+source.geostat_culture_museums_count_regions,მუზეუმების რაოდენობა რეგიონების მიხედვით,docs/Raw Data/ScienceCulture/geostat-science-culture-annual/official/Number-of-Museums-by-Regions.xls,2026-10-20
+source.geostat_culture_museums_regions,მუზეუმების ძირითადი მახასიათებლები რეგიონების მიხედვით,docs/Raw Data/ScienceCulture/geostat-science-culture-annual/official/Main-charasteristics-of-Museums-by-Regions.xls,2026-10-20
+source.geostat_culture_museum_staff,მუზეუმებში დასაქმებული პერსონალი,docs/Raw Data/ScienceCulture/geostat-science-culture-annual/official/Employed-Staff-in-Museums.xls,2026-10-20
+source.geostat_culture_museum_exhibits,მუზეუმების ექსპონატები (მხოლოდ 2011 წელი),docs/Raw Data/ScienceCulture/geostat-science-culture-annual/official/The-exhibits-of-Museums.xls,2026-10-20
+source.geostat_culture_theatres,პროფესიული თეატრების ძირითადი მაჩვენებლები,docs/Raw Data/ScienceCulture/geostat-science-culture-annual/official/Main-Indicators-Of-Professional-Theatres.xls,2026-10-20
+source.geostat_culture_theatres_regions,პროფესიული თეატრების ძირითადი მაჩვენებლები რეგიონების მიხედვით,docs/Raw Data/ScienceCulture/geostat-science-culture-annual/official/Main-Indicators-Of-Professional-Theatres-by-Regions.xls,2026-10-20
+source.geostat_culture_theatres_count_regions,პროფესიული თეატრების რაოდენობა რეგიონების მიხედვით,docs/Raw Data/ScienceCulture/geostat-science-culture-annual/official/Number-of-Theatres-by-Regions.xls,2026-10-20
+source.geostat_culture_theatre_staff,თეატრებში დასაქმებული პერსონალი,docs/Raw Data/ScienceCulture/geostat-science-culture-annual/official/Employed-Staff-in-Theatres.xls,2026-10-20
+source.geostat_culture_theatre_events,თეატრების მიერ გამართული ღონისძიებები,docs/Raw Data/ScienceCulture/geostat-science-culture-annual/official/Events.xls,2026-10-20
+source.geostat_culture_libraries,საჯარო და უნივერსალური ბიბლიოთეკები (2001-2008),docs/Raw Data/ScienceCulture/geostat-science-culture-annual/official/Public-and-Universal-Libraries.xls,2026-10-20
+source.geostat_culture_libraries_regions,ბიბლიოთეკების რაოდენობა რეგიონების მიხედვით (2003-2008),docs/Raw Data/ScienceCulture/geostat-science-culture-annual/official/Number-of-Libraries-by-Regions.xls,2026-10-20
+source.geostat_culture_publishing,გამომცემლობის მასალების მონაცემთა გაანგარიშება (2005-2020),docs/Raw Data/ScienceCulture/geostat-science-culture-annual/official/Calculation-of-data-on-publishing-materials.xls,2026-10-20
+source.geostat_ka_science_institutions,დაწესებულებები (ქართული ვერსია),docs/Raw Data/ScienceCulture/geostat-science-culture-annual/official/ka/dawesebulebebi.xlsx,2026-10-20
+source.geostat_ka_science_rd_staff,კვლევებსა და განვითარებაში დასაქმებული პერსონალი (ქართული ვერსია),docs/Raw Data/ScienceCulture/geostat-science-culture-annual/official/ka/personali.xlsx,2026-10-20
+source.geostat_ka_science_researchers,მკვლევრები (ქართული ვერსია),docs/Raw Data/ScienceCulture/geostat-science-culture-annual/official/ka/mkvlevarebi.xlsx,2026-10-20
+source.geostat_ka_science_patents,გამოგონებები და სასარგებლო მოდელები (ქართული ვერსია),docs/Raw Data/ScienceCulture/geostat-science-culture-annual/official/ka/patentebi.xlsx,2026-10-20
+source.geostat_ka_culture_museums,მუზეუმების ძირითადი მახასიათებლები (ქართული ვერსია),docs/Raw Data/ScienceCulture/geostat-science-culture-annual/official/ka/muzeumebis_ZiriTadi_maCveneblebi.xls,2026-10-20
+source.geostat_ka_culture_museums_count_regions,მუზეუმების რაოდენობა რეგიონების მიხედვით (ქართული ვერსია),docs/Raw Data/ScienceCulture/geostat-science-culture-annual/official/ka/muzeumebis_raodenoba_regionebis_mixedviT.XLS,2026-10-20
+source.geostat_ka_culture_museum_staff,მუზეუმებში დასაქმებული პერსონალი (ქართული ვერსია),docs/Raw Data/ScienceCulture/geostat-science-culture-annual/official/ka/dasakmebulebi_muzeumebSi.xls,2026-10-20
+source.geostat_ka_culture_theatres,პროფესიული თეატრების ძირითადი მაჩვენებლები (ქართული ვერსია),docs/Raw Data/ScienceCulture/geostat-science-culture-annual/official/ka/Teatrebis-ZiriTadi-maCveneblebi.xls,2026-10-20
+source.geostat_ka_culture_theatres_regions,პროფესიული თეატრების ძირითადი მაჩვენებლები რეგიონების მიხედვით (ქართული ვერსია),docs/Raw Data/ScienceCulture/geostat-science-culture-annual/official/ka/Teatrebis-ZiriTadi-maCveneblebi-regionebis-mixedvit.xls,2026-10-20
+source.geostat_ka_culture_theatres_count_regions,პროფესიული თეატრების რაოდენობა რეგიონების მიხედვით (ქართული ვერსია),docs/Raw Data/ScienceCulture/geostat-science-culture-annual/official/ka/Teatrebis_raodenoba_regionebis_mixedviT.XLS,2026-10-20
+source.geostat_ka_culture_theatre_staff,პროფესიულ თეატრებში დასაქმებული პერსონალი (ქართული ვერსია),docs/Raw Data/ScienceCulture/geostat-science-culture-annual/official/ka/dasakmebulebi_propesiul_TeatrebSi.xls,2026-10-20
+source.geostat_ka_culture_theatre_events,თეატრების ღონისძიებები (ქართული ვერსია),docs/Raw Data/ScienceCulture/geostat-science-culture-annual/official/ka/RonisZiebebi.xls,2026-10-20
+source.geostat_ka_culture_museums_regions,მუზეუმების ძირითადი მახასიათებლები რეგიონების მიხედვით (ქართული ვერსია),docs/Raw Data/ScienceCulture/geostat-science-culture-annual/official/ka/muzeumebis_ZiriTadi_maCveneblebi_regionebis_mixedviT.XLS,2026-10-20
+source.geostat_science_page,მეცნიერება (წყაროს გვერდი),docs/Raw Data/ScienceCulture/geostat-science-culture-annual/official/geostat-category-194-2026-10-20.html,2026-10-20
+source.geostat_culture_page,კულტურა (წყაროს გვერდი),docs/Raw Data/ScienceCulture/geostat-science-culture-annual/official/geostat-category-615-2026-10-20.html,2026-10-20

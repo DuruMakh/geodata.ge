@@ -52,7 +52,11 @@ const inventoryRules = {
   debt: [
     { root: "docs/Raw Data/Debt/government-debt-annual/official", include: () => true },
   ],
-  unemployment: [{ root: "docs/Raw Data/Unemployment/geostat-labour-force-annual/official", include: () => true }],
+  // The annual labour-force originals, then the detail package: six English workbooks, their Georgian versions and both page captures; served and archived-only alike.
+  unemployment: [
+    { root: "docs/Raw Data/Unemployment/geostat-labour-force-annual/official", include: () => true },
+    { root: "docs/Raw Data/Unemployment/geostat-labour-force-detail/official", include: () => true },
+  ],
   wages: [{ root: "docs/Raw Data/Wages/geostat-earnings-annual/official", include: () => true }],
   poverty: [{ root: "docs/Raw Data/Poverty/geostat-poverty-annual/official", include: () => true }],
   // official/ka/ holds Georgian copies of the served workbooks, kept only for their labels.
@@ -70,8 +74,12 @@ const inventoryRules = {
   ],
   // The six served workbooks, the 35 archived-only ones and the four category page captures.
   education: [{ root: "docs/Raw Data/Education/geostat-education-annual/official", include: () => true }],
+  // The English workbooks, their Georgian versions (official/ka/, kept for the Georgian labels) and both page captures; served and archived-only alike.
+  "science-culture": [{ root: "docs/Raw Data/ScienceCulture/geostat-science-culture-annual/official", include: () => true }],
   // The English workbooks, their Georgian versions (kept for the Georgian labels) and both page captures; served and archived-only alike.
   crime: [{ root: "docs/Raw Data/Crime/geostat-crime-annual/official", include: () => true }],
+  // The 13 served English workbooks, their Georgian versions (kept for the Georgian labels), the 14 archived-only workbooks and the six page captures.
+  environment: [{ root: "docs/Raw Data/Environment/geostat-environment-annual/official", include: () => true }],
   money: [{ root: "docs/Raw Data/Money/nbg-money-banks-annual/official", include: () => true }],
   business: [{ root: "docs/Raw Data/Business/geostat-business-annual/official", include: () => true }],
   // The six served workbooks, the two zips and their members, the other price and cost workbooks, and the three page captures.

@@ -128,8 +128,10 @@ describe("methodology footer attribution", () => {
     ["housing", "Geostat"],
     ["health", "Geostat"],
     ["crime", "Geostat"],
+    ["environment", "Geostat"],
     ["education", "Geostat"],
     ["social-protection", "Social Service Agency and Geostat"],
+    ["science-culture", "Geostat"],
   ])("uses %s sources and leaves the review date with the article", async (dataset, source) => {
     const { renderMethodologyArticle } = await import("../../lib/pages/methodology-article");
     const markup = renderToStaticMarkup(await renderMethodologyArticle("en", { params: Promise.resolve({ dataset }) }));
@@ -193,6 +195,50 @@ describe("crime methodology", () => {
     expect(markup).toContain("https://geostat.ge/media/76844/Unified-Report-on-Criminal-Justice-Statistics-%28Dec%2C-2025%29.pdf");
     expect(markup).not.toContain("/downloads/methodology/crime/files/unified-report");
     expect(markup).not.toContain("geostat.ge/media/81890");
+  });
+});
+
+describe("environment methodology", () => {
+  it.each([
+    ["ka", "გარემო და კლიმატი", "ზესტაფონის არაავტომატურ სადგურზე სინჯების აღების მეთოდოლოგიას არ იძლევა საშუალებას", "სადგური ამოქმედდა 2019 წლის მაისიდან"],
+    ["en", "Environment and climate", "Sampling methodology at Zestaponi non-automatic station can provide neigther daily avarage concentrations", "The station has been operational since May 2019"],
+  ] as const)("renders the %s article with its 46 archived originals, Geostat's notes and Dataset markup", async (locale, title, zestaponiNote, stationNote) => {
+    const { renderMethodologyArticle } = await import("../../lib/pages/methodology-article");
+    const markup = renderToStaticMarkup(await renderMethodologyArticle(locale, { params: Promise.resolve({ dataset: "environment" }) }));
+    expect(markup).toContain(title);
+    expect(markup).toContain("1990–2025");
+    expect(markup).toContain('"@type":"Dataset"');
+    expect(markup).toContain(zestaponiNote);
+    expect(markup).toContain(stationNote);
+    expect(markup).toContain("/downloads/methodology/environment/files/b-3.-greenhouse-gas-emissions-eng.xlsx");
+    expect(markup).toContain("/downloads/methodology/environment/files/volume-of-felled-timber.xls");
+    expect(markup).toContain("/downloads/methodology/environment/files/b-3.-greenhouse-gas-emissions-geo.xlsx");
+    expect(markup).toContain("/downloads/methodology/environment/files/page-565-en.html.txt");
+    expect(markup).not.toContain("geostat.ge/media");
+  });
+});
+
+describe("science and culture methodology", () => {
+  it.each([
+    ["ka", "მეცნიერება და კულტურა", "*2006-2020 წლების მონაცემები მოიცავს მხოლოდ სპექტაკლებს.", "13, 19 და 30 დამთვალიერებლით", "სასარგებლო მოდელი პატენტის უფრო მოკლე და მარტივი სახეა მცირე გამოგონებებისთვის."],
+    ["en", "Science and culture", "*2006-2020 data includes only performances.", "13, 19 and 30 visitors", "A utility model is a shorter, simpler kind of patent for smaller inventions."],
+  ] as const)("renders the %s article with its 33 archived originals, Geostat's notes, the visitor differences, the utility model and Dataset markup", async (locale, title, audienceNote, visitorDifferences, utilityModel) => {
+    const { renderMethodologyArticle } = await import("../../lib/pages/methodology-article");
+    const markup = renderToStaticMarkup(await renderMethodologyArticle(locale, { params: Promise.resolve({ dataset: "science-culture" }) }));
+    expect(markup).toContain(title);
+    expect(markup).toContain("2005–2025");
+    expect(markup).not.toContain("2001–2025");
+    expect(markup).toContain(utilityModel);
+    expect(markup).toContain('"@type":"Dataset"');
+    expect(markup).toContain(audienceNote);
+    expect(markup).toContain(visitorDifferences);
+    expect(markup).toContain("1,012");
+    expect(markup).toContain("/downloads/methodology/science-culture/files/researchers.xlsx");
+    expect(markup).toContain("/downloads/methodology/science-culture/files/r-d-personal.xlsx");
+    expect(markup).toContain("/downloads/methodology/science-culture/files/events.xls");
+    expect(markup).toContain("/downloads/methodology/science-culture/files/mkvlevarebi.xlsx");
+    expect(markup).toContain("/downloads/methodology/science-culture/files/geostat-category-615-2026-10-20.html.txt");
+    expect(markup).not.toContain("geostat.ge/media");
   });
 });
 

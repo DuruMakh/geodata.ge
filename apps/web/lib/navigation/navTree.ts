@@ -1,15 +1,18 @@
 import { BUDGET_SECTIONS, BUDGET_SECTION_ORDER } from "../explorer/sections";
 import { UNEMPLOYMENT_SECTIONS } from "../explorer/unemploymentSections";
+import { LABOUR_SECTIONS } from "../explorer/labour";
 import { WAGES_SECTIONS } from "../explorer/wages";
 import { LIVING_STANDARDS_HUB_PATH, LIVING_STANDARDS_SECTIONS } from "../explorer/livingStandards";
 import { HEALTH_HUB_PATH, HEALTH_SECTIONS } from "../explorer/health";
 import { SOCIAL_SECTIONS } from "../explorer/social";
 import { CRIME_HUB_PATH, CRIME_SECTIONS } from "../explorer/crime";
 import { ENERGY_FOOD_HUB_PATH, ENERGY_FOOD_SECTIONS } from "../explorer/energyFood";
+import { ENVIRONMENT_HUB_PATH, ENVIRONMENT_SECTIONS } from "../explorer/environment";
 import { MONEY_BANKS_SECTIONS } from "../explorer/moneyBanks";
 import { BUSINESS_HUB_PATH, BUSINESS_SECTIONS } from "../explorer/business";
 import { HOUSING_HUB_PATH, HOUSING_SECTIONS } from "../explorer/housing";
 import { EDUCATION_HUB_PATH, EDUCATION_SECTIONS } from "../explorer/education";
+import { SCIENCE_CULTURE_HUB_PATH, SCIENCE_CULTURE_SECTIONS } from "../explorer/scienceCulture";
 import { DEMOGRAPHY_HUB_PATH, LIVE_DEMOGRAPHY_PAGES } from "../explorer/demographyRoutes";
 
 /** A page under a hub: its sidebar row. `labelKey` is a `common` message. */
@@ -102,7 +105,7 @@ export const NAV_TREE: readonly NavHub[] = [
     railLabelKey: "common.dataUnemployment",
     testId: "unemployment-link",
     spaced: true,
-    sections: sectionRows(UNEMPLOYMENT_SECTIONS, "unemployment"),
+    sections: sectionRows([...UNEMPLOYMENT_SECTIONS, ...LABOUR_SECTIONS], "unemployment"),
   },
   {
     href: "/explorer/wages",
@@ -135,6 +138,14 @@ export const NAV_TREE: readonly NavHub[] = [
     testId: "education-link",
     spaced: true,
     sections: sectionRows(EDUCATION_SECTIONS, "education"),
+  },
+  {
+    href: SCIENCE_CULTURE_HUB_PATH,
+    labelKey: "common.scienceCulture",
+    railLabelKey: "common.dataScienceCulture",
+    testId: "science-culture-link",
+    spaced: true,
+    sections: sectionRows(SCIENCE_CULTURE_SECTIONS, "science-culture"),
   },
   {
     href: CRIME_HUB_PATH,
@@ -180,6 +191,14 @@ export const NAV_TREE: readonly NavHub[] = [
     testId: "energy-food-link",
     spaced: true,
     sections: sectionRows(ENERGY_FOOD_SECTIONS, "energy-food"),
+  },
+  {
+    href: ENVIRONMENT_HUB_PATH,
+    labelKey: "common.environment",
+    railLabelKey: "common.dataEnvironment",
+    testId: "environment-link",
+    spaced: true,
+    sections: sectionRows(ENVIRONMENT_SECTIONS, "environment"),
   },
   {
     href: DEMOGRAPHY_HUB_PATH,
@@ -243,6 +262,7 @@ const TREE_SOURCE_NOTES: Readonly<Record<string, string>> = {
   [HEALTH_HUB_PATH]: "common.geostatSourceNote",
   ...Object.fromEntries(SOCIAL_SECTIONS.map(section => [section.href, "common.socialSourceNote"])),
   [EDUCATION_HUB_PATH]: "common.geostatSourceNote",
+  [SCIENCE_CULTURE_HUB_PATH]: "common.geostatSourceNote",
   [CRIME_HUB_PATH]: "common.geostatSourceNote",
   "/explorer/trade": "common.geostatSourceNote",
   "/explorer/external": "common.nbgSourceNote",

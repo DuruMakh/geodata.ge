@@ -1,0 +1,11 @@
+{
+  "status": "passed",
+  "years": {
+    "min": 2005,
+    "max": 2025
+  },
+  "observations": 1733,
+  "researchStatus": "passed",
+  "canonicalSha256": "83d837d08ea1b099f6a3c704c71efd82f56c03ae515b02eb6dfb32862fc3584a",
+  "reviewedAt": "2026-10-20"
+}

@@ -30,6 +30,10 @@ import { renderHealthDeathsIndex } from "../../lib/pages/health-deaths-index";
 import { renderHouseholdRegionPage } from "../../lib/pages/household";
 import { renderHubPage, TopicHub } from "../../lib/pages/hub";
 import { renderEnergyFoodHub } from "../../lib/pages/hubs/energy-food";
+import { renderEnvironmentHub } from "../../lib/pages/hubs/environment";
+import { renderEnvironmentPage } from "../../lib/pages/environment";
+import { renderEnvironmentAirQualityIndex, renderEnvironmentCityPage } from "../../lib/pages/environment-air-quality";
+import { renderEnvironmentAreaPage, renderEnvironmentRegionIndex } from "../../lib/pages/environment-areas";
 import { renderExternalHub } from "../../lib/pages/hubs/external";
 import { renderHealthHub } from "../../lib/pages/hubs/health";
 import { renderCrimeHub } from "../../lib/pages/hubs/crime";
@@ -42,6 +46,7 @@ import { renderInflationCategories } from "../../lib/pages/inflation-categories"
 import { renderInflationCities } from "../../lib/pages/inflation-cities";
 import { renderInflationOverview } from "../../lib/pages/inflation-overview";
 import { renderInflationProducts } from "../../lib/pages/inflation-products";
+import { renderLabourPage } from "../../lib/pages/labour";
 import { renderLivingStandardsHub } from "../../lib/pages/living-standards";
 import { renderMethodologyArticle } from "../../lib/pages/methodology-article";
 import { renderMoneyBanksPage } from "../../lib/pages/moneyBanks";
@@ -101,6 +106,7 @@ const pages: PageRender[] = [
   ["inflation products", renderInflationProducts, 1],
   ["unemployment hub", renderUnemploymentHub, 0],
   ["unemployment", (locale) => renderUnemploymentPage(locale, "overview"), 1],
+  ["unemployment industries", (locale) => renderLabourPage(locale, "industries"), 1],
   ["wages hub", renderWagesHub, 0],
   ["wages", (locale) => renderWagesPage(locale, "industries"), 1],
   ["wages regions index", renderWagesRegionsIndexPage, 1],
@@ -127,6 +133,12 @@ const pages: PageRender[] = [
   ["money and banks", (locale) => renderMoneyBanksPage(locale, "loans-deposits"), 1],
   ["energy and food hub", renderEnergyFoodHub, 0],
   ["energy and food", (locale) => renderEnergyFoodPage(locale, "electricity"), 1],
+  ["environment hub", renderEnvironmentHub, 0],
+  ["environment", (locale) => renderEnvironmentPage(locale, "climate"), 1],
+  ["city air quality", renderEnvironmentAirQualityIndex, 1],
+  ["city air quality city", (locale) => renderEnvironmentCityPage(locale, "rustavi"), 1],
+  ["waste", (locale) => renderEnvironmentRegionIndex(locale, "waste"), 1],
+  ["forests area", (locale) => renderEnvironmentAreaPage(locale, "forests", "tbilisi"), 1],
   ["demography hub", renderDemographyPage, 0],
   ["population", renderDemographyPopulationPage, 1],
   ["population place", (locale) => renderPopulationPlacePage({ kind: "region", id: "imereti" }, locale), 1],

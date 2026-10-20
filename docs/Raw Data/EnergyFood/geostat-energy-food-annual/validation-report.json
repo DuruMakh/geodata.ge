@@ -1,10 +1,14 @@
 {
   "status": "passed",
-  "retrieved_at": "2026-10-11",
-  "scope": "Annual research only: Geostat energy balances 2013-2024 (supply, imports, exports, final consumption, electricity) and food self-sufficiency ratios 2014-2025; no monthly data, prices or serving",
-  "primary_observation_count": 681,
+  "retrieved_at": {
+    "energy and food": "2026-10-11",
+    "farming": "2026-10-20"
+  },
+  "scope": "Annual research only: Geostat energy balances 2013-2024 (supply, imports, exports, final consumption, electricity), food self-sufficiency ratios 2014-2025, and agriculture 2006-2025 (farm output, harvests, livestock, livestock products, farm-gate prices); no monthly or quarterly data, energy prices or serving",
+  "primary_observation_count": 1389,
   "observations_by_group": {
     "electricity": 165,
+    "farming": 708,
     "food": 144,
     "supply page": 204,
     "use page": 168
@@ -34,6 +38,12 @@
     "geostat_energy_balance_2023_electricity": 14,
     "geostat_energy_balance_2024_aggregated": 31,
     "geostat_energy_balance_2024_electricity": 14,
+    "geostat_farming_annual_crops": 140,
+    "geostat_farming_general": 64,
+    "geostat_farming_livestock_numbers": 100,
+    "geostat_farming_livestock_products": 140,
+    "geostat_farming_permanent_crops": 120,
+    "geostat_farming_prices": 144,
     "geostat_food_balance_sheets": 144
   },
   "no_flow_count": 3,
@@ -61,6 +71,44 @@
     }
   ],
   "ellipsis_cells_in_served_values": 0,
+  "preliminary_count": 4,
+  "preliminary_cells": [
+    {
+      "indicator_id": "farming.output.crops",
+      "year": 2025,
+      "source_id": "geostat_farming_general",
+      "source_sheet": "AG. output",
+      "source_cell": "Q4"
+    },
+    {
+      "indicator_id": "farming.output.livestock",
+      "year": 2025,
+      "source_id": "geostat_farming_general",
+      "source_sheet": "AG. output",
+      "source_cell": "Q5"
+    },
+    {
+      "indicator_id": "farming.output.services",
+      "year": 2025,
+      "source_id": "geostat_farming_general",
+      "source_sheet": "AG. output",
+      "source_cell": "Q6"
+    },
+    {
+      "indicator_id": "farming.output.total",
+      "year": 2025,
+      "source_id": "geostat_farming_general",
+      "source_sheet": "AG. output",
+      "source_cell": "Q3"
+    }
+  ],
+  "farming_dash_cells_in_served_values": 0,
+  "food_production_known_differences": [
+    {
+      "food": "grapes",
+      "year": 2014
+    }
+  ],
   "imputed_values": 0,
   "reconciliation_failed_count": 0,
   "checks": [
@@ -73,6 +121,11 @@
     "electricity production = thermal + hydro + wind within 0.5 GWh",
     "electricity supply - energy sector - losses = final consumption within 0.5 GWh",
     "food ratio within 10 points of production / (production + import - export)",
+    "farm output total = crops + livestock + services within 0.5",
+    "meat = beef + pork + sheep and goat + poultry + other meat within 0.2; milk = cow and buffalo + sheep and goat milk within 0.2",
+    "dairy cows never exceed cattle",
+    "food balance domestic production repeats the farm table within 0.6, 2014-2025 (known difference: grapes 2014)",
+    "no farming dash (\"data not available\") in a served cell; only the starred 2025 farm output is preliminary",
     "efficiency workbook cross-check: see independent-validation.json"
   ],
   "source_checks": [
@@ -326,6 +379,84 @@
       "source_id": "geostat_food_security_page",
       "sha256": "527E1AEC05BF9D6D6862C87822C77FE3FB40315BA07027FCF60F79ED7078D460",
       "bytes": 92464,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_farming_general",
+      "sha256": "9C5EAA425A955FEB75D8829B691DA055A934A0B5EA20AACA28A366949A2EBCE2",
+      "bytes": 26661,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_farming_general_ka",
+      "sha256": "E151105F4C52B77BC7F91F220FD299B8E85BFC18D7BACB5DBDF3A399AE22D5BD",
+      "bytes": 28277,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_farming_annual_crops",
+      "sha256": "AA3051CCA85517F4F9B9844ECEBE4131EEF09F98ED13CB74264FBEA60BCB3293",
+      "bytes": 91060,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_farming_annual_crops_ka",
+      "sha256": "F3ED966E701F97C3B437EB0FAC2B16021432D345F6B049F468093747C4945F1C",
+      "bytes": 84175,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_farming_permanent_crops",
+      "sha256": "13742DE3B9CD02FAECD15ADE9502DBF1A9FB7893AE7799DABA7DAFE01B59838C",
+      "bytes": 59292,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_farming_permanent_crops_ka",
+      "sha256": "FB88E5E7E8DC21119C5B88D771EBEAEC4F86311D1F4705DA371EC62AF13B9628",
+      "bytes": 58963,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_farming_livestock_numbers",
+      "sha256": "F04A233300AF6F57672350A71E023BE430A40763FD5CC4B5143D4BEF5C0BE0F6",
+      "bytes": 36131,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_farming_livestock_numbers_ka",
+      "sha256": "F18100AE069BDCEB36B4F1333DCFEDBF80D2DADCB589ED9A1268451C7F4BF738",
+      "bytes": 35061,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_farming_livestock_products",
+      "sha256": "FA442E9BEBBBBA4EEC3A2CA26B03819335BE0A0067A30C445744746022B13444",
+      "bytes": 49183,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_farming_livestock_products_ka",
+      "sha256": "C4E21B82A192B62D713FE7654E065076DDD0DCB0D227B246F9F0EDA8F3B11A93",
+      "bytes": 52022,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_farming_prices",
+      "sha256": "12D4C7E09AD1E78F86FE52AA98BDA4E013A3E225B5D89596CDA9AAF2E20A65D2",
+      "bytes": 46998,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_farming_prices_ka",
+      "sha256": "CC1D12B7B460EBBF8C68EF74F74E24F8CB04E3912C4B4920E4C869C9F92A71C0",
+      "bytes": 46832,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_agriculture_page",
+      "sha256": "D1AF4FFDDED4F2BE7203CE8BE434D2A039E27822CF969A1D14BFBDB69E57AC9B",
+      "bytes": 123125,
       "passed": true
     }
   ]

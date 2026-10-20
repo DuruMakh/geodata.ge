@@ -1,0 +1,1015 @@
+﻿year,indicator_id,value,published_value,unit,basis,value_status,source_id,source_sheet,source_cell,last_reviewed_at
+2017,labour.jobs.all.total,1286.8741171247452,1286.9,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,B4,2026-10-20
+2018,labour.jobs.all.total,1296.2480620507829,1296.2,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,C4,2026-10-20
+2019,labour.jobs.all.total,1295.9004622914561,1295.9,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,D4,2026-10-20
+2020,labour.jobs.all.total,1241.8248882766691,1241.8,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,E4,2026-10-20
+2021,labour.jobs.all.total,1217.417335154601,1217.4,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,F4,2026-10-20
+2022,labour.jobs.all.total,1283.7064448297103,1283.7,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,G4,2026-10-20
+2023,labour.jobs.all.total,1334.5585539799731,1334.6,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,H4,2026-10-20
+2024,labour.jobs.all.total,1402.4593245611616,1402.5,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,I4,2026-10-20
+2025,labour.jobs.all.total,1389.6524984883797,1389.7,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,J4,2026-10-20
+2017,labour.jobs.all.sector_a,289.47849590812768,289.5,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,B5,2026-10-20
+2018,labour.jobs.all.sector_a,253.85258655851908,253.9,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,C5,2026-10-20
+2019,labour.jobs.all.sector_a,247.43897358441671,247.4,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,D5,2026-10-20
+2020,labour.jobs.all.sector_a,246.2734214519952,246.3,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,E5,2026-10-20
+2021,labour.jobs.all.sector_a,230.32719060629867,230.3,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,F5,2026-10-20
+2022,labour.jobs.all.sector_a,229.24340456268294,229.2,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,G5,2026-10-20
+2023,labour.jobs.all.sector_a,220.70054901226899,220.7,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,H5,2026-10-20
+2024,labour.jobs.all.sector_a,225.03138204513755,225.0,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,I5,2026-10-20
+2025,labour.jobs.all.sector_a,218.2932109194719,218.3,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,J5,2026-10-20
+2017,labour.jobs.all.sector_b_e,153.80122264874913,153.8,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,B6,2026-10-20
+2018,labour.jobs.all.sector_b_e,153.87015748315503,153.9,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,C6,2026-10-20
+2019,labour.jobs.all.sector_b_e,147.02389003833997,147.0,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,D6,2026-10-20
+2020,labour.jobs.all.sector_b_e,141.25376923744329,141.3,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,E6,2026-10-20
+2021,labour.jobs.all.sector_b_e,137.16379125623556,137.2,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,F6,2026-10-20
+2022,labour.jobs.all.sector_b_e,152.4357965449145,152.4,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,G6,2026-10-20
+2023,labour.jobs.all.sector_b_e,163.13250508941468,163.1,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,H6,2026-10-20
+2024,labour.jobs.all.sector_b_e,180.33308848989594,180.3,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,I6,2026-10-20
+2025,labour.jobs.all.sector_b_e,183.92163761674141,183.9,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,J6,2026-10-20
+2017,labour.jobs.all.sector_f,84.251116603446135,84.3,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,B7,2026-10-20
+2018,labour.jobs.all.sector_f,98.792235434509024,98.8,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,C7,2026-10-20
+2019,labour.jobs.all.sector_f,101.42939492812383,101.4,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,D7,2026-10-20
+2020,labour.jobs.all.sector_f,85.232473351674926,85.2,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,E7,2026-10-20
+2021,labour.jobs.all.sector_f,94.386272404114891,94.4,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,F7,2026-10-20
+2022,labour.jobs.all.sector_f,108.59354436059787,108.6,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,G7,2026-10-20
+2023,labour.jobs.all.sector_f,117.85349314574934,117.9,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,H7,2026-10-20
+2024,labour.jobs.all.sector_f,124.30246117477324,124.3,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,I7,2026-10-20
+2025,labour.jobs.all.sector_f,122.57072463927392,122.6,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,J7,2026-10-20
+2017,labour.jobs.all.sector_g,174.63300693687998,174.6,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,B8,2026-10-20
+2018,labour.jobs.all.sector_g,185.01723646465589,185.0,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,C8,2026-10-20
+2019,labour.jobs.all.sector_g,195.85868231025879,195.9,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,D8,2026-10-20
+2020,labour.jobs.all.sector_g,188.01226390484692,188.0,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,E8,2026-10-20
+2021,labour.jobs.all.sector_g,180.73075563090231,180.7,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,F8,2026-10-20
+2022,labour.jobs.all.sector_g,192.72280103551591,192.7,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,G8,2026-10-20
+2023,labour.jobs.all.sector_g,206.38480680661181,206.4,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,H8,2026-10-20
+2024,labour.jobs.all.sector_g,225.57140061156795,225.6,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,I8,2026-10-20
+2025,labour.jobs.all.sector_g,212.53054324999641,212.5,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,J8,2026-10-20
+2017,labour.jobs.all.sector_h,70.076294671071693,70.1,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,B9,2026-10-20
+2018,labour.jobs.all.sector_h,78.154201648860933,78.2,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,C9,2026-10-20
+2019,labour.jobs.all.sector_h,81.958997634444827,82.0,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,D9,2026-10-20
+2020,labour.jobs.all.sector_h,79.098244604064234,79.1,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,E9,2026-10-20
+2021,labour.jobs.all.sector_h,76.377457279388295,76.4,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,F9,2026-10-20
+2022,labour.jobs.all.sector_h,80.514241618208587,80.5,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,G9,2026-10-20
+2023,labour.jobs.all.sector_h,85.713127441408787,85.7,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,H9,2026-10-20
+2024,labour.jobs.all.sector_h,85.408290943338457,85.4,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,I9,2026-10-20
+2025,labour.jobs.all.sector_h,89.714150857926597,89.7,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,J9,2026-10-20
+2017,labour.jobs.all.sector_i,37.917954475810191,37.9,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,B10,2026-10-20
+2018,labour.jobs.all.sector_i,44.334326642827989,44.3,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,C10,2026-10-20
+2019,labour.jobs.all.sector_i,48.829661338657509,48.8,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,D10,2026-10-20
+2020,labour.jobs.all.sector_i,36.006926065715156,36.0,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,E10,2026-10-20
+2021,labour.jobs.all.sector_i,33.42119286549088,33.4,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,F10,2026-10-20
+2022,labour.jobs.all.sector_i,42.585750093716428,42.6,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,G10,2026-10-20
+2023,labour.jobs.all.sector_i,50.526773443767858,50.5,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,H10,2026-10-20
+2024,labour.jobs.all.sector_i,61.503040103322903,61.5,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,I10,2026-10-20
+2025,labour.jobs.all.sector_i,59.69657897025683,59.7,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,J10,2026-10-20
+2017,labour.jobs.all.sector_j,21.717343717852572,21.7,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,B11,2026-10-20
+2018,labour.jobs.all.sector_j,20.863561561605582,20.9,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,C11,2026-10-20
+2019,labour.jobs.all.sector_j,19.026005448745138,19.0,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,D11,2026-10-20
+2020,labour.jobs.all.sector_j,19.716639886691986,19.7,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,E11,2026-10-20
+2021,labour.jobs.all.sector_j,18.104146433363127,18.1,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,F11,2026-10-20
+2022,labour.jobs.all.sector_j,15.316515338599961,15.3,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,G11,2026-10-20
+2023,labour.jobs.all.sector_j,20.912924476414993,20.9,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,H11,2026-10-20
+2024,labour.jobs.all.sector_j,15.919806109568853,15.9,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,I11,2026-10-20
+2025,labour.jobs.all.sector_j,15.080455838960482,15.1,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,J11,2026-10-20
+2017,labour.jobs.all.sector_k,31.216683583054635,31.2,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,B12,2026-10-20
+2018,labour.jobs.all.sector_k,33.69398215819966,33.7,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,C12,2026-10-20
+2019,labour.jobs.all.sector_k,30.697244026288004,30.7,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,D12,2026-10-20
+2020,labour.jobs.all.sector_k,29.856351695517965,29.9,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,E12,2026-10-20
+2021,labour.jobs.all.sector_k,29.520565705371517,29.5,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,F12,2026-10-20
+2022,labour.jobs.all.sector_k,29.386881486974577,29.4,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,G12,2026-10-20
+2023,labour.jobs.all.sector_k,30.817368591292453,30.8,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,H12,2026-10-20
+2024,labour.jobs.all.sector_k,35.808668685348451,35.8,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,I12,2026-10-20
+2025,labour.jobs.all.sector_k,33.691770359301415,33.7,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,J12,2026-10-20
+2017,labour.jobs.all.sector_l,3.0617885934967375,3.1,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,B13,2026-10-20
+2018,labour.jobs.all.sector_l,4.401540244738416,4.4,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,C13,2026-10-20
+2019,labour.jobs.all.sector_l,3.8776752828113108,3.9,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,D13,2026-10-20
+2020,labour.jobs.all.sector_l,3.2458908111295655,3.2,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,E13,2026-10-20
+2021,labour.jobs.all.sector_l,5.1784848172086049,5.2,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,F13,2026-10-20
+2022,labour.jobs.all.sector_l,3.3652392224018675,3.4,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,G13,2026-10-20
+2023,labour.jobs.all.sector_l,3.665204335628387,3.7,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,H13,2026-10-20
+2024,labour.jobs.all.sector_l,3.7559132079389896,3.8,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,I13,2026-10-20
+2025,labour.jobs.all.sector_l,5.1473024152083555,5.1,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,J13,2026-10-20
+2017,labour.jobs.all.sector_m,22.028674375297847,22.0,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,B14,2026-10-20
+2018,labour.jobs.all.sector_m,21.238590306070027,21.2,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,C14,2026-10-20
+2019,labour.jobs.all.sector_m,19.006491244531517,19.0,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,D14,2026-10-20
+2020,labour.jobs.all.sector_m,19.176846934133792,19.2,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,E14,2026-10-20
+2021,labour.jobs.all.sector_m,21.483734372989176,21.5,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,F14,2026-10-20
+2022,labour.jobs.all.sector_m,22.626823660950617,22.6,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,G14,2026-10-20
+2023,labour.jobs.all.sector_m,22.555505409374046,22.6,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,H14,2026-10-20
+2024,labour.jobs.all.sector_m,26.799699511005628,26.8,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,I14,2026-10-20
+2025,labour.jobs.all.sector_m,25.867573739924033,25.9,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,J14,2026-10-20
+2017,labour.jobs.all.sector_n,18.505615617307864,18.5,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,B15,2026-10-20
+2018,labour.jobs.all.sector_n,21.325997690011185,21.3,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,C15,2026-10-20
+2019,labour.jobs.all.sector_n,22.374543602654391,22.4,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,D15,2026-10-20
+2020,labour.jobs.all.sector_n,19.560527242634461,19.6,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,E15,2026-10-20
+2021,labour.jobs.all.sector_n,19.374446108502589,19.4,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,F15,2026-10-20
+2022,labour.jobs.all.sector_n,22.999617957403167,23.0,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,G15,2026-10-20
+2023,labour.jobs.all.sector_n,24.19800099420646,24.2,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,H15,2026-10-20
+2024,labour.jobs.all.sector_n,24.599627178275803,24.6,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,I15,2026-10-20
+2025,labour.jobs.all.sector_n,24.49934176453656,24.5,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,J15,2026-10-20
+2017,labour.jobs.all.sector_o,89.847578296302686,89.8,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,B16,2026-10-20
+2018,labour.jobs.all.sector_o,91.349958683239379,91.3,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,C16,2026-10-20
+2019,labour.jobs.all.sector_o,93.153808218704285,93.2,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,D16,2026-10-20
+2020,labour.jobs.all.sector_o,94.482232403888716,94.5,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,E16,2026-10-20
+2021,labour.jobs.all.sector_o,92.386034696922806,92.4,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,F16,2026-10-20
+2022,labour.jobs.all.sector_o,91.630525868892079,91.6,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,G16,2026-10-20
+2023,labour.jobs.all.sector_o,92.168628781543163,92.2,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,H16,2026-10-20
+2024,labour.jobs.all.sector_o,87.384956424295012,87.4,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,I16,2026-10-20
+2025,labour.jobs.all.sector_o,87.002984961970796,87.0,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,J16,2026-10-20
+2017,labour.jobs.all.sector_p,159.17454146964428,159.2,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,B17,2026-10-20
+2018,labour.jobs.all.sector_p,155.05454077273035,155.1,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,C17,2026-10-20
+2019,labour.jobs.all.sector_p,153.35312061566947,153.4,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,D17,2026-10-20
+2020,labour.jobs.all.sector_p,145.8133048440032,145.8,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,E17,2026-10-20
+2021,labour.jobs.all.sector_p,145.86742185301034,145.9,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,F17,2026-10-20
+2022,labour.jobs.all.sector_p,149.94998257826205,149.9,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,G17,2026-10-20
+2023,labour.jobs.all.sector_p,153.83550531054445,153.8,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,H17,2026-10-20
+2024,labour.jobs.all.sector_p,164.76650923301725,164.8,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,I17,2026-10-20
+2025,labour.jobs.all.sector_p,168.0838388966545,168.1,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,J17,2026-10-20
+2017,labour.jobs.all.sector_q,68.007686925702799,68.0,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,B18,2026-10-20
+2018,labour.jobs.all.sector_q,65.301711500384741,65.3,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,C18,2026-10-20
+2019,labour.jobs.all.sector_q,60.230272889270609,60.2,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,D18,2026-10-20
+2020,labour.jobs.all.sector_q,61.963213296759399,62.0,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,E18,2026-10-20
+2021,labour.jobs.all.sector_q,66.336118546394616,66.3,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,F18,2026-10-20
+2022,labour.jobs.all.sector_q,69.877486864942057,69.9,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,G18,2026-10-20
+2023,labour.jobs.all.sector_q,70.560940478361232,70.6,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,H18,2026-10-20
+2024,labour.jobs.all.sector_q,60.625740590958351,60.6,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,I18,2026-10-20
+2025,labour.jobs.all.sector_q,58.795960474981435,58.8,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,J18,2026-10-20
+2017,labour.jobs.all.sector_r,26.879753186801977,26.9,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,B19,2026-10-20
+2018,labour.jobs.all.sector_r,28.442749027788704,28.4,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,C19,2026-10-20
+2019,labour.jobs.all.sector_r,29.920203686868359,29.9,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,D19,2026-10-20
+2020,labour.jobs.all.sector_r,30.049334945567541,30.0,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,E19,2026-10-20
+2021,labour.jobs.all.sector_r,28.683324829000242,28.7,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,F19,2026-10-20
+2022,labour.jobs.all.sector_r,31.334760475179419,31.3,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,G19,2026-10-20
+2023,labour.jobs.all.sector_r,30.44276103281414,30.4,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,H19,2026-10-20
+2024,labour.jobs.all.sector_r,32.377683301029265,32.4,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,I19,2026-10-20
+2025,labour.jobs.all.sector_r,35.859880987178599,35.9,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,J19,2026-10-20
+2017,labour.jobs.all.sector_s,21.06435367096941,21.1,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,B20,2026-10-20
+2018,labour.jobs.all.sector_s,20.034384542065034,20.0,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,C20,2026-10-20
+2019,labour.jobs.all.sector_s,22.048052913760298,22.0,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,D20,2026-10-20
+2020,labour.jobs.all.sector_s,25.020764100045636,25.0,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,E20,2026-10-20
+2021,labour.jobs.all.sector_s,22.124510403147177,22.1,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,F20,2026-10-20
+2022,labour.jobs.all.sector_s,22.380804443098452,22.4,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,G20,2026-10-20
+2023,labour.jobs.all.sector_s,21.656291091717272,21.7,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,H20,2026-10-20
+2024,labour.jobs.all.sector_s,28.626059911710279,28.6,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,I20,2026-10-20
+2025,labour.jobs.all.sector_s,30.345013068397229,30.3,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,J20,2026-10-20
+2017,labour.jobs.all.sector_t,14.445931045307919,14.4,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,B21,2026-10-20
+2018,labour.jobs.all.sector_t,19.391375909697064,19.4,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,C21,2026-10-20
+2019,labour.jobs.all.sector_t,17.891895667645404,17.9,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,D21,2026-10-20
+2020,labour.jobs.all.sector_t,15.038976753309623,15.0,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,E21,2026-10-20
+2021,labour.jobs.all.sector_t,12.924178307118607,12.9,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,F21,2026-10-20
+2022,labour.jobs.all.sector_t,16.993489866144834,17.0,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,G21,2026-10-20
+2023,labour.jobs.all.sector_t,17.18094506483439,17.2,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,H21,2026-10-20
+2024,labour.jobs.all.sector_t,17.73899170313905,17.7,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,I21,2026-10-20
+2025,labour.jobs.all.sector_t,16.314603083027535,16.3,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,J21,2026-10-20
+2017,labour.jobs.all.sector_u,0.51433423059405403,0.5,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,B22,2026-10-20
+2018,labour.jobs.all.sector_u,1.1289254217247584,1.1,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,C22,2026-10-20
+2019,labour.jobs.all.sector_u,1.3570240143309111,1.4,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,D22,2026-10-20
+2020,labour.jobs.all.sector_u,2.023706747247294,2.0,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,E22,2026-10-20
+2021,labour.jobs.all.sector_u,2.7276542560558297,2.7,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,F22,2026-10-20
+2022,labour.jobs.all.sector_u,1.4637640980179558,1.5,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,G22,2026-10-20
+2023,labour.jobs.all.sector_u,2.2532234740203445,2.3,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,H22,2026-10-20
+2024,labour.jobs.all.sector_u,1.8894380783381086,1.9,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,I22,2026-10-20
+2025,labour.jobs.all.sector_u,2.195816637648524,2.2,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,J22,2026-10-20
+2017,labour.jobs.all.not_identified,0.25174116832783316,0.3,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,B23,2026-10-20
+2018,labour.jobs.all.not_identified,0,0.0,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,C23,2026-10-20
+2019,labour.jobs.all.not_identified,0.42452484593454565,0.4,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,D23,2026-10-20
+2020,labour.jobs.all.not_identified,0,0.0,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,E23,2026-10-20
+2021,labour.jobs.all.not_identified,0.300054783085763,0.3,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,F23,2026-10-20
+2022,labour.jobs.all.not_identified,0.28501475320688674,0.3,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,G23,2026-10-20
+2023,labour.jobs.all.not_identified,0,0.0,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,H23,2026-10-20
+2024,labour.jobs.all.not_identified,1.6567258500672373E-2,0.0,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,I23,2026-10-20
+2025,labour.jobs.all.not_identified,4.1110006922881755E-2,0.0,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2,J23,2026-10-20
+2020,labour.jobs.women.total,546.85102013091307,546.9,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,B4,2026-10-20
+2021,labour.jobs.women.total,536.44760387614576,536.4,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,C4,2026-10-20
+2022,labour.jobs.women.total,568.92611258788679,568.9,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,D4,2026-10-20
+2023,labour.jobs.women.total,597.80263650248071,597.8,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,E4,2026-10-20
+2024,labour.jobs.women.total,636.67022519043167,636.7,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,F4,2026-10-20
+2025,labour.jobs.women.total,619.47560792423178,619.5,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,G4,2026-10-20
+2020,labour.jobs.women.sector_a,90.315768477247062,90.3,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,B5,2026-10-20
+2021,labour.jobs.women.sector_a,80.722911977176253,80.7,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,C5,2026-10-20
+2022,labour.jobs.women.sector_a,84.103510286240279,84.1,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,D5,2026-10-20
+2023,labour.jobs.women.sector_a,84.342392752558297,84.3,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,E5,2026-10-20
+2024,labour.jobs.women.sector_a,84.751815646324772,84.8,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,F5,2026-10-20
+2025,labour.jobs.women.sector_a,79.827126498267276,79.8,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,G5,2026-10-20
+2020,labour.jobs.women.sector_b_e,42.755736284099243,42.8,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,B6,2026-10-20
+2021,labour.jobs.women.sector_b_e,42.067379666101523,42.1,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,C6,2026-10-20
+2022,labour.jobs.women.sector_b_e,50.606802156887639,50.6,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,D6,2026-10-20
+2023,labour.jobs.women.sector_b_e,56.018379422082177,56.0,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,E6,2026-10-20
+2024,labour.jobs.women.sector_b_e,62.798491174321441,62.8,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,F6,2026-10-20
+2025,labour.jobs.women.sector_b_e,61.79114719628614,61.8,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,G6,2026-10-20
+2020,labour.jobs.women.sector_f,3.3694450721514517,3.4,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,B7,2026-10-20
+2021,labour.jobs.women.sector_f,2.6922559045291794,2.7,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,C7,2026-10-20
+2022,labour.jobs.women.sector_f,4.2430862453646245,4.2,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,D7,2026-10-20
+2023,labour.jobs.women.sector_f,5.255610080169987,5.3,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,E7,2026-10-20
+2024,labour.jobs.women.sector_f,5.0696940252772347,5.1,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,F7,2026-10-20
+2025,labour.jobs.women.sector_f,6.0175845372929189,6.0,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,G7,2026-10-20
+2020,labour.jobs.women.sector_g,93.703861095251469,93.7,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,B8,2026-10-20
+2021,labour.jobs.women.sector_g,89.890016309480046,89.9,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,C8,2026-10-20
+2022,labour.jobs.women.sector_g,93.183325732069889,93.2,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,D8,2026-10-20
+2023,labour.jobs.women.sector_g,100.13281100010811,100.1,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,E8,2026-10-20
+2024,labour.jobs.women.sector_g,107.25835814436186,107.3,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,F8,2026-10-20
+2025,labour.jobs.women.sector_g,103.85839327494369,103.9,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,G8,2026-10-20
+2020,labour.jobs.women.sector_h,7.8951835249326034,7.9,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,B9,2026-10-20
+2021,labour.jobs.women.sector_h,8.2270670103942134,8.2,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,C9,2026-10-20
+2022,labour.jobs.women.sector_h,10.052288562779429,10.1,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,D9,2026-10-20
+2023,labour.jobs.women.sector_h,9.9503879984574368,10.0,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,E9,2026-10-20
+2024,labour.jobs.women.sector_h,9.7012597635597775,9.7,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,F9,2026-10-20
+2025,labour.jobs.women.sector_h,9.1414175416727073,9.1,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,G9,2026-10-20
+2020,labour.jobs.women.sector_i,21.485204967810326,21.5,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,B10,2026-10-20
+2021,labour.jobs.women.sector_i,19.905551105903452,19.9,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,C10,2026-10-20
+2022,labour.jobs.women.sector_i,24.652862269548724,24.7,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,D10,2026-10-20
+2023,labour.jobs.women.sector_i,30.590317780684629,30.6,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,E10,2026-10-20
+2024,labour.jobs.women.sector_i,39.274729862021758,39.3,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,F10,2026-10-20
+2025,labour.jobs.women.sector_i,35.741229631934246,35.7,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,G10,2026-10-20
+2020,labour.jobs.women.sector_j,9.3696220125942098,9.4,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,B11,2026-10-20
+2021,labour.jobs.women.sector_j,7.3121669212546632,7.3,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,C11,2026-10-20
+2022,labour.jobs.women.sector_j,5.8417238068618236,5.8,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,D11,2026-10-20
+2023,labour.jobs.women.sector_j,8.8068436328393211,8.8,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,E11,2026-10-20
+2024,labour.jobs.women.sector_j,6.7090969672506118,6.7,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,F11,2026-10-20
+2025,labour.jobs.women.sector_j,6.2136088166120196,6.2,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,G11,2026-10-20
+2020,labour.jobs.women.sector_k,18.963802899570219,19.0,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,B12,2026-10-20
+2021,labour.jobs.women.sector_k,18.529754899248989,18.5,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,C12,2026-10-20
+2022,labour.jobs.women.sector_k,19.114925383124074,19.1,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,D12,2026-10-20
+2023,labour.jobs.women.sector_k,18.797448554905575,18.8,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,E12,2026-10-20
+2024,labour.jobs.women.sector_k,21.593516710161158,21.6,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,F12,2026-10-20
+2025,labour.jobs.women.sector_k,18.383750091654544,18.4,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,G12,2026-10-20
+2020,labour.jobs.women.sector_l,0.77341824776912282,0.8,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,B13,2026-10-20
+2021,labour.jobs.women.sector_l,2.5554172915999134,2.6,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,C13,2026-10-20
+2022,labour.jobs.women.sector_l,1.0389212109886421,1.0,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,D13,2026-10-20
+2023,labour.jobs.women.sector_l,0.56148625413619446,0.6,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,E13,2026-10-20
+2024,labour.jobs.women.sector_l,1.1897073036480008,1.2,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,F13,2026-10-20
+2025,labour.jobs.women.sector_l,2.7379613403100507,2.7,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,G13,2026-10-20
+2020,labour.jobs.women.sector_m,8.8326904767414831,8.8,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,B14,2026-10-20
+2021,labour.jobs.women.sector_m,12.438611684273761,12.4,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,C14,2026-10-20
+2022,labour.jobs.women.sector_m,12.426379417861661,12.4,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,D14,2026-10-20
+2023,labour.jobs.women.sector_m,10.579227276187705,10.6,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,E14,2026-10-20
+2024,labour.jobs.women.sector_m,12.75024247825764,12.8,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,F14,2026-10-20
+2025,labour.jobs.women.sector_m,11.746913683629588,11.7,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,G14,2026-10-20
+2020,labour.jobs.women.sector_n,7.6156044389749509,7.6,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,B15,2026-10-20
+2021,labour.jobs.women.sector_n,6.3516035109559352,6.4,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,C15,2026-10-20
+2022,labour.jobs.women.sector_n,9.7742056951130429,9.8,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,D15,2026-10-20
+2023,labour.jobs.women.sector_n,9.94979015744231,9.9,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,E15,2026-10-20
+2024,labour.jobs.women.sector_n,9.1194864062640111,9.1,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,F15,2026-10-20
+2025,labour.jobs.women.sector_n,8.2438202114383028,8.2,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,G15,2026-10-20
+2020,labour.jobs.women.sector_o,28.714495870500297,28.7,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,B16,2026-10-20
+2021,labour.jobs.women.sector_o,31.192829416534604,31.2,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,C16,2026-10-20
+2022,labour.jobs.women.sector_o,29.544892658278005,29.5,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,D16,2026-10-20
+2023,labour.jobs.women.sector_o,29.156547966920467,29.2,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,E16,2026-10-20
+2024,labour.jobs.women.sector_o,27.983273590746517,28.0,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,F16,2026-10-20
+2025,labour.jobs.women.sector_o,27.487824941127609,27.5,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,G16,2026-10-20
+2020,labour.jobs.women.sector_p,117.09625929007488,117.1,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,B17,2026-10-20
+2021,labour.jobs.women.sector_p,118.82796423592028,118.8,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,C17,2026-10-20
+2022,labour.jobs.women.sector_p,121.4977256152973,121.5,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,D17,2026-10-20
+2023,labour.jobs.women.sector_p,128.91791491194903,128.9,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,E17,2026-10-20
+2024,labour.jobs.women.sector_p,141.82287510507743,141.8,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,F17,2026-10-20
+2025,labour.jobs.women.sector_p,143.87096541760152,143.9,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,G17,2026-10-20
+2020,labour.jobs.women.sector_q,49.820135576948267,49.8,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,B18,2026-10-20
+2021,labour.jobs.women.sector_q,55.082844679164289,55.1,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,C18,2026-10-20
+2022,labour.jobs.women.sector_q,56.838297348552352,56.8,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,D18,2026-10-20
+2023,labour.jobs.women.sector_q,56.500821460545339,56.5,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,E18,2026-10-20
+2024,labour.jobs.women.sector_q,51.396569279782128,51.4,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,F18,2026-10-20
+2025,labour.jobs.women.sector_q,49.587526092171352,49.6,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,G18,2026-10-20
+2020,labour.jobs.women.sector_r,16.402760407181567,16.4,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,B19,2026-10-20
+2021,labour.jobs.women.sector_r,15.36518612345025,15.4,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,C19,2026-10-20
+2022,labour.jobs.women.sector_r,15.8474706949475,15.8,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,D19,2026-10-20
+2023,labour.jobs.women.sector_r,15.889029741716342,15.9,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,E19,2026-10-20
+2024,labour.jobs.women.sector_r,17.592738817321141,17.6,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,F19,2026-10-20
+2025,labour.jobs.women.sector_r,17.991564677914148,18.0,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,G19,2026-10-20
+2020,labour.jobs.women.sector_s,14.504469797141589,14.5,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,B20,2026-10-20
+2021,labour.jobs.women.sector_s,11.767249846682128,11.8,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,C20,2026-10-20
+2022,labour.jobs.women.sector_s,12.9268764580469,12.9,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,D20,2026-10-20
+2023,labour.jobs.women.sector_s,14.595433098595715,14.6,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,E20,2026-10-20
+2024,labour.jobs.women.sector_s,19.13316633425061,19.1,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,F20,2026-10-20
+2025,labour.jobs.women.sector_s,19.533593596199267,19.5,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,G20,2026-10-20
+2020,labour.jobs.women.sector_t,14.753161331629103,14.8,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,B21,2026-10-20
+2021,labour.jobs.women.sector_t,12.67269547115194,12.7,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,C21,2026-10-20
+2022,labour.jobs.women.sector_t,16.905240555164703,16.9,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,D21,2026-10-20
+2023,labour.jobs.women.sector_t,17.000092036113806,17.0,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,E21,2026-10-20
+2024,labour.jobs.women.sector_t,17.105124374482966,17.1,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,F21,2026-10-20
+2025,labour.jobs.women.sector_t,16.125346859313503,16.1,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,G21,2026-10-20
+2020,labour.jobs.women.sector_u,0.47940036029514344,0.5,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,B22,2026-10-20
+2021,labour.jobs.women.sector_u,0.84609782232436292,0.8,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,C22,2026-10-20
+2022,labour.jobs.women.sector_u,0.32757849076025825,0.3,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,D22,2026-10-20
+2023,labour.jobs.women.sector_u,0.75810237706847861,0.8,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,E22,2026-10-20
+2024,labour.jobs.women.sector_u,1.4200792073225574,1.4,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,F22,2026-10-20
+2025,labour.jobs.women.sector_u,1.134723508940042,1.1,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,G22,2026-10-20
+2020,labour.jobs.women.not_identified,0,0.0,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,B23,2026-10-20
+2021,labour.jobs.women.not_identified,0,0.0,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,C23,2026-10-20
+2022,labour.jobs.women.not_identified,0,0.0,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,D23,2026-10-20
+2023,labour.jobs.women.not_identified,0,0.0,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,E23,2026-10-20
+2024,labour.jobs.women.not_identified,0,0.0,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,F23,2026-10-20
+2025,labour.jobs.women.not_identified,4.1110006922881755E-2,0.0,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,G23,2026-10-20
+2020,labour.jobs.men.total,694.97386814575532,695.0,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,B27,2026-10-20
+2021,labour.jobs.men.total,680.96973127845536,681.0,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,C27,2026-10-20
+2022,labour.jobs.men.total,714.78033224182332,714.8,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,D27,2026-10-20
+2023,labour.jobs.men.total,736.75591747749343,736.8,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,E27,2026-10-20
+2024,labour.jobs.men.total,765.78909937073013,765.8,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,F27,2026-10-20
+2025,labour.jobs.men.total,770.17689056414736,770.2,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,G27,2026-10-20
+2020,labour.jobs.men.sector_a,155.95765297474776,156.0,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,B28,2026-10-20
+2021,labour.jobs.men.sector_a,149.60427862912215,149.6,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,C28,2026-10-20
+2022,labour.jobs.men.sector_a,145.13989427644208,145.1,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,D28,2026-10-20
+2023,labour.jobs.men.sector_a,136.35815625971233,136.4,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,E28,2026-10-20
+2024,labour.jobs.men.sector_a,140.27956639881279,140.3,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,F28,2026-10-20
+2025,labour.jobs.men.sector_a,138.46608442120464,138.5,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,G28,2026-10-20
+2020,labour.jobs.men.sector_b_e,98.498032953344193,98.5,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,B29,2026-10-20
+2021,labour.jobs.men.sector_b_e,95.096411590134096,95.1,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,C29,2026-10-20
+2022,labour.jobs.men.sector_b_e,101.82899438802703,101.8,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,D29,2026-10-20
+2023,labour.jobs.men.sector_b_e,107.11412566733277,107.1,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,E29,2026-10-20
+2024,labour.jobs.men.sector_b_e,117.5345973155745,117.5,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,F29,2026-10-20
+2025,labour.jobs.men.sector_b_e,122.13049042045552,122.1,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,G29,2026-10-20
+2020,labour.jobs.men.sector_f,81.863028279523377,81.9,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,B30,2026-10-20
+2021,labour.jobs.men.sector_f,91.694016499585629,91.7,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,C30,2026-10-20
+2022,labour.jobs.men.sector_f,104.35045811523318,104.4,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,D30,2026-10-20
+2023,labour.jobs.men.sector_f,112.59788306557918,112.6,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,E30,2026-10-20
+2024,labour.jobs.men.sector_f,119.23276714949601,119.2,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,F30,2026-10-20
+2025,labour.jobs.men.sector_f,116.553140101981,116.6,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,G30,2026-10-20
+2020,labour.jobs.men.sector_g,94.308402809595307,94.3,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,B31,2026-10-20
+2021,labour.jobs.men.sector_g,90.840739321422234,90.8,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,C31,2026-10-20
+2022,labour.jobs.men.sector_g,99.539475303446309,99.5,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,D31,2026-10-20
+2023,labour.jobs.men.sector_g,106.25199580650339,106.3,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,E31,2026-10-20
+2024,labour.jobs.men.sector_g,118.31304246720609,118.3,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,F31,2026-10-20
+2025,labour.jobs.men.sector_g,108.67214997505222,108.7,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,G31,2026-10-20
+2020,labour.jobs.men.sector_h,71.203061079131672,71.2,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,B32,2026-10-20
+2021,labour.jobs.men.sector_h,68.150390268994272,68.2,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,C32,2026-10-20
+2022,labour.jobs.men.sector_h,70.46195305542912,70.5,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,D32,2026-10-20
+2023,labour.jobs.men.sector_h,75.762739442951215,75.8,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,E32,2026-10-20
+2024,labour.jobs.men.sector_h,75.707031179778681,75.7,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,F32,2026-10-20
+2025,labour.jobs.men.sector_h,80.57273331625386,80.6,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,G32,2026-10-20
+2020,labour.jobs.men.sector_i,14.521721097904846,14.5,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,B33,2026-10-20
+2021,labour.jobs.men.sector_i,13.515641759587417,13.5,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,C33,2026-10-20
+2022,labour.jobs.men.sector_i,17.9328878241677,17.9,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,D33,2026-10-20
+2023,labour.jobs.men.sector_i,19.936455663083237,19.9,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,E33,2026-10-20
+2024,labour.jobs.men.sector_i,22.228310241301141,22.2,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,F33,2026-10-20
+2025,labour.jobs.men.sector_i,23.955349338322517,24.0,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,G33,2026-10-20
+2020,labour.jobs.men.sector_j,10.347017874097775,10.3,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,B34,2026-10-20
+2021,labour.jobs.men.sector_j,10.791979512108451,10.8,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,C34,2026-10-20
+2022,labour.jobs.men.sector_j,9.4747915317381288,9.5,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,D34,2026-10-20
+2023,labour.jobs.men.sector_j,12.106080843575679,12.1,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,E34,2026-10-20
+2024,labour.jobs.men.sector_j,9.2107091423182403,9.2,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,F34,2026-10-20
+2025,labour.jobs.men.sector_j,8.866847022348459,8.9,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,G34,2026-10-20
+2020,labour.jobs.men.sector_k,10.892548795947757,10.9,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,B35,2026-10-20
+2021,labour.jobs.men.sector_k,10.990810806122521,11.0,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,C35,2026-10-20
+2022,labour.jobs.men.sector_k,10.271956103850533,10.3,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,D35,2026-10-20
+2023,labour.jobs.men.sector_k,12.01992003638688,12.0,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,E35,2026-10-20
+2024,labour.jobs.men.sector_k,14.21515197518729,14.2,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,F35,2026-10-20
+2025,labour.jobs.men.sector_k,15.30802026764689,15.3,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,G35,2026-10-20
+2020,labour.jobs.men.sector_l,2.4724725633604425,2.5,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,B36,2026-10-20
+2021,labour.jobs.men.sector_l,2.6230675256086937,2.6,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,C36,2026-10-20
+2022,labour.jobs.men.sector_l,2.3263180114132243,2.3,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,D36,2026-10-20
+2023,labour.jobs.men.sector_l,3.1037180814921927,3.1,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,E36,2026-10-20
+2024,labour.jobs.men.sector_l,2.5662059042909888,2.6,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,F36,2026-10-20
+2025,labour.jobs.men.sector_l,2.4093410748983062,2.4,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,G36,2026-10-20
+2020,labour.jobs.men.sector_m,10.344156457392312,10.3,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,B37,2026-10-20
+2021,labour.jobs.men.sector_m,9.0451226887153897,9.0,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,C37,2026-10-20
+2022,labour.jobs.men.sector_m,10.200444243088977,10.2,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,D37,2026-10-20
+2023,labour.jobs.men.sector_m,11.976278133186343,12.0,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,E37,2026-10-20
+2024,labour.jobs.men.sector_m,14.049457032747988,14.0,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,F37,2026-10-20
+2025,labour.jobs.men.sector_m,14.120660056294438,14.1,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,G37,2026-10-20
+2020,labour.jobs.men.sector_n,11.944922803659507,11.9,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,B38,2026-10-20
+2021,labour.jobs.men.sector_n,13.022842597546649,13.0,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,C38,2026-10-20
+2022,labour.jobs.men.sector_n,13.225412262290146,13.2,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,D38,2026-10-20
+2023,labour.jobs.men.sector_n,14.248210836764175,14.2,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,E38,2026-10-20
+2024,labour.jobs.men.sector_n,15.48014077201179,15.5,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,F38,2026-10-20
+2025,labour.jobs.men.sector_n,16.255521553098227,16.3,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,G38,2026-10-20
+2020,labour.jobs.men.sector_o,65.767736533388501,65.8,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,B39,2026-10-20
+2021,labour.jobs.men.sector_o,61.19320528038822,61.2,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,C39,2026-10-20
+2022,labour.jobs.men.sector_o,62.085633210613935,62.1,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,D39,2026-10-20
+2023,labour.jobs.men.sector_o,63.012080814622564,63.0,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,E39,2026-10-20
+2024,labour.jobs.men.sector_o,59.401682833548499,59.4,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,F39,2026-10-20
+2025,labour.jobs.men.sector_o,59.51516002084319,59.5,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,G39,2026-10-20
+2020,labour.jobs.men.sector_p,28.717045553928035,28.7,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,B40,2026-10-20
+2021,labour.jobs.men.sector_p,27.039457617090044,27.0,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,C40,2026-10-20
+2022,labour.jobs.men.sector_p,28.452256962965038,28.5,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,D40,2026-10-20
+2023,labour.jobs.men.sector_p,24.9175903985956,24.9,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,E40,2026-10-20
+2024,labour.jobs.men.sector_p,22.943634127939816,22.9,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,F40,2026-10-20
+2025,labour.jobs.men.sector_p,24.21287347905313,24.2,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,G40,2026-10-20
+2020,labour.jobs.men.sector_q,12.1430777198111,12.1,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,B41,2026-10-20
+2021,labour.jobs.men.sector_q,11.253273867230414,11.3,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,C41,2026-10-20
+2022,labour.jobs.men.sector_q,13.039189516389685,13.0,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,D41,2026-10-20
+2023,labour.jobs.men.sector_q,14.060119017815911,14.1,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,E41,2026-10-20
+2024,labour.jobs.men.sector_q,9.2291713111762217,9.2,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,F41,2026-10-20
+2025,labour.jobs.men.sector_q,9.2084343828100721,9.2,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,G41,2026-10-20
+2020,labour.jobs.men.sector_r,13.646574538385982,13.6,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,B42,2026-10-20
+2021,labour.jobs.men.sector_r,13.318138705550005,13.3,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,C42,2026-10-20
+2022,labour.jobs.men.sector_r,15.487289780231945,15.5,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,D42,2026-10-20
+2023,labour.jobs.men.sector_r,14.553731291097806,14.6,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,E42,2026-10-20
+2024,labour.jobs.men.sector_r,14.78494448370812,14.8,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,F42,2026-10-20
+2025,labour.jobs.men.sector_r,17.868316309264475,17.9,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,G42,2026-10-20
+2020,labour.jobs.men.sector_s,10.516294302904043,10.5,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,B43,2026-10-20
+2021,labour.jobs.men.sector_s,10.357260556465025,10.4,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,C43,2026-10-20
+2022,labour.jobs.men.sector_s,9.4539279850515676,9.5,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,D43,2026-10-20
+2023,labour.jobs.men.sector_s,7.0608579931215489,7.1,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,E43,2026-10-20
+2024,labour.jobs.men.sector_s,9.4928935774596681,9.5,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,F43,2026-10-20
+2025,labour.jobs.men.sector_s,10.811419472197992,10.8,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,G43,2026-10-20
+2020,labour.jobs.men.sector_t,0.28581542168052138,0.3,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,B44,2026-10-20
+2021,labour.jobs.men.sector_t,0.25148283596668125,0.3,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,C44,2026-10-20
+2022,labour.jobs.men.sector_t,8.8249310980131501E-2,0.1,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,D44,2026-10-20
+2023,labour.jobs.men.sector_t,0.18085302872059372,0.2,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,E44,2026-10-20
+2024,labour.jobs.men.sector_t,0.63386732865608431,0.6,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,F44,2026-10-20
+2025,labour.jobs.men.sector_t,0.18925622371402251,0.2,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,G44,2026-10-20
+2020,labour.jobs.men.sector_u,1.5443063869521505,1.5,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,B45,2026-10-20
+2021,labour.jobs.men.sector_u,1.8815564337314654,1.9,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,C45,2026-10-20
+2022,labour.jobs.men.sector_u,1.1361856072576977,1.1,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,D45,2026-10-20
+2023,labour.jobs.men.sector_u,1.495121096951866,1.5,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,E45,2026-10-20
+2024,labour.jobs.men.sector_u,0.46935887101555118,0.5,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,F45,2026-10-20
+2025,labour.jobs.men.sector_u,1.0610931287084824,1.1,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,G45,2026-10-20
+2020,labour.jobs.men.not_identified,0,0.0,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,B46,2026-10-20
+2021,labour.jobs.men.not_identified,0.300054783085763,0.3,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,C46,2026-10-20
+2022,labour.jobs.men.not_identified,0.2850147532068868,0.3,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,D46,2026-10-20
+2023,labour.jobs.men.not_identified,0,0.0,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,E46,2026-10-20
+2024,labour.jobs.men.not_identified,1.6567258500672373E-2,0.0,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,F46,2026-10-20
+2025,labour.jobs.men.not_identified,0,0.0,thousand_persons,actual,survey_estimate,geostat_lfs_jobs_industry,NACE2 sex,G46,2026-10-20
+2020,labour.hours.all.total,42.090584267855462,42.1,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,B4,2026-10-20
+2021,labour.hours.all.total,41.421923120306992,41.4,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,C4,2026-10-20
+2022,labour.hours.all.total,41.759740878379574,41.8,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,D4,2026-10-20
+2023,labour.hours.all.total,41.481419293555774,41.5,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,E4,2026-10-20
+2024,labour.hours.all.total,41.069581640937898,41.1,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,F4,2026-10-20
+2025,labour.hours.all.total,41.031470328080751,41.0,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,G4,2026-10-20
+2020,labour.hours.all.sector_a,33.415908267183731,33.4,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,B5,2026-10-20
+2021,labour.hours.all.sector_a,34.179044061836109,34.2,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,C5,2026-10-20
+2022,labour.hours.all.sector_a,34.354726800806944,34.4,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,D5,2026-10-20
+2023,labour.hours.all.sector_a,33.575929836719695,33.6,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,E5,2026-10-20
+2024,labour.hours.all.sector_a,33.199338468573373,33.2,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,F5,2026-10-20
+2025,labour.hours.all.sector_a,33.01813282140251,33.0,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,G5,2026-10-20
+2020,labour.hours.all.sector_b_e,44.880737488689554,44.9,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,B6,2026-10-20
+2021,labour.hours.all.sector_b_e,44.176739421985573,44.2,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,C6,2026-10-20
+2022,labour.hours.all.sector_b_e,44.033641384114574,44.0,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,D6,2026-10-20
+2023,labour.hours.all.sector_b_e,43.35512900250172,43.4,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,E6,2026-10-20
+2024,labour.hours.all.sector_b_e,42.912979522912394,42.9,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,F6,2026-10-20
+2025,labour.hours.all.sector_b_e,43.073566020243774,43.1,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,G6,2026-10-20
+2020,labour.hours.all.sector_f,48.989003553624812,49.0,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,B7,2026-10-20
+2021,labour.hours.all.sector_f,48.025316398018191,48.0,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,C7,2026-10-20
+2022,labour.hours.all.sector_f,47.899255022604649,47.9,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,D7,2026-10-20
+2023,labour.hours.all.sector_f,46.877297039055485,46.9,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,E7,2026-10-20
+2024,labour.hours.all.sector_f,46.895370387966757,46.9,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,F7,2026-10-20
+2025,labour.hours.all.sector_f,46.475127477457612,46.5,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,G7,2026-10-20
+2020,labour.hours.all.sector_g,49.003997048155078,49.0,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,B8,2026-10-20
+2021,labour.hours.all.sector_g,47.976138337748203,48.0,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,C8,2026-10-20
+2022,labour.hours.all.sector_g,48.06245092871135,48.1,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,D8,2026-10-20
+2023,labour.hours.all.sector_g,47.586133319123121,47.6,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,E8,2026-10-20
+2024,labour.hours.all.sector_g,46.740202827941829,46.7,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,F8,2026-10-20
+2025,labour.hours.all.sector_g,46.57647299963498,46.6,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,G8,2026-10-20
+2020,labour.hours.all.sector_h,50.00889103265407,50.0,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,B9,2026-10-20
+2021,labour.hours.all.sector_h,48.941447159877725,48.9,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,C9,2026-10-20
+2022,labour.hours.all.sector_h,48.242779273762025,48.2,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,D9,2026-10-20
+2023,labour.hours.all.sector_h,47.694179893122161,47.7,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,E9,2026-10-20
+2024,labour.hours.all.sector_h,47.681502345509543,47.7,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,F9,2026-10-20
+2025,labour.hours.all.sector_h,47.162606065757309,47.2,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,G9,2026-10-20
+2020,labour.hours.all.sector_i,49.598302775274135,49.6,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,B10,2026-10-20
+2021,labour.hours.all.sector_i,48.879359653078836,48.9,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,C10,2026-10-20
+2022,labour.hours.all.sector_i,49.476565710681456,49.5,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,D10,2026-10-20
+2023,labour.hours.all.sector_i,47.847327222575551,47.8,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,E10,2026-10-20
+2024,labour.hours.all.sector_i,45.438512124182473,45.4,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,F10,2026-10-20
+2025,labour.hours.all.sector_i,45.15361290811768,45.2,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,G10,2026-10-20
+2020,labour.hours.all.sector_j,43.486331692083809,43.5,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,B11,2026-10-20
+2021,labour.hours.all.sector_j,42.97685387982186,43.0,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,C11,2026-10-20
+2022,labour.hours.all.sector_j,42.477064000972199,42.5,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,D11,2026-10-20
+2023,labour.hours.all.sector_j,39.993970246811564,40.0,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,E11,2026-10-20
+2024,labour.hours.all.sector_j,39.848010042393142,39.8,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,F11,2026-10-20
+2025,labour.hours.all.sector_j,40.574709917900783,40.6,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,G11,2026-10-20
+2020,labour.hours.all.sector_k,42.799222451805797,42.8,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,B12,2026-10-20
+2021,labour.hours.all.sector_k,42.56783191349345,42.6,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,C12,2026-10-20
+2022,labour.hours.all.sector_k,42.647702384493968,42.6,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,D12,2026-10-20
+2023,labour.hours.all.sector_k,41.369012543543299,41.4,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,E12,2026-10-20
+2024,labour.hours.all.sector_k,41.419387824615121,41.4,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,F12,2026-10-20
+2025,labour.hours.all.sector_k,41.620233355454701,41.6,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,G12,2026-10-20
+2020,labour.hours.all.sector_m,39.486209647233053,39.5,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,B13,2026-10-20
+2021,labour.hours.all.sector_m,38.9154838496952,38.9,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,C13,2026-10-20
+2022,labour.hours.all.sector_m,38.764379721434807,38.8,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,D13,2026-10-20
+2023,labour.hours.all.sector_m,40.309511478570158,40.3,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,E13,2026-10-20
+2024,labour.hours.all.sector_m,39.650972400398615,39.7,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,F13,2026-10-20
+2025,labour.hours.all.sector_m,39.846006354009596,39.8,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,G13,2026-10-20
+2020,labour.hours.all.sector_n,45.490554069625283,45.5,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,B14,2026-10-20
+2021,labour.hours.all.sector_n,41.625100767885058,41.6,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,C14,2026-10-20
+2022,labour.hours.all.sector_n,42.664865365626497,42.7,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,D14,2026-10-20
+2023,labour.hours.all.sector_n,44.076482681298266,44.1,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,E14,2026-10-20
+2024,labour.hours.all.sector_n,41.602213155178937,41.6,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,F14,2026-10-20
+2025,labour.hours.all.sector_n,43.827756871724496,43.8,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,G14,2026-10-20
+2020,labour.hours.all.sector_o,46.889135587559046,46.9,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,B15,2026-10-20
+2021,labour.hours.all.sector_o,45.706244652224868,45.7,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,C15,2026-10-20
+2022,labour.hours.all.sector_o,46.102781824627506,46.1,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,D15,2026-10-20
+2023,labour.hours.all.sector_o,45.757073850545922,45.8,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,E15,2026-10-20
+2024,labour.hours.all.sector_o,45.136965875798289,45.1,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,F15,2026-10-20
+2025,labour.hours.all.sector_o,45.087967020736592,45.1,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,G15,2026-10-20
+2020,labour.hours.all.sector_p,30.623649657141307,30.6,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,B16,2026-10-20
+2021,labour.hours.all.sector_p,29.208728089144248,29.2,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,C16,2026-10-20
+2022,labour.hours.all.sector_p,29.44603203390789,29.4,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,D16,2026-10-20
+2023,labour.hours.all.sector_p,29.94392043490727,29.9,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,E16,2026-10-20
+2024,labour.hours.all.sector_p,30.101704934685586,30.1,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,F16,2026-10-20
+2025,labour.hours.all.sector_p,30.819571555528633,30.8,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,G16,2026-10-20
+2020,labour.hours.all.sector_q,42.959625153059051,43.0,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,B17,2026-10-20
+2021,labour.hours.all.sector_q,42.895290891572614,42.9,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,C17,2026-10-20
+2022,labour.hours.all.sector_q,42.181395687300466,42.2,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,D17,2026-10-20
+2023,labour.hours.all.sector_q,42.118144786032865,42.1,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,E17,2026-10-20
+2024,labour.hours.all.sector_q,41.607913763349899,41.6,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,F17,2026-10-20
+2025,labour.hours.all.sector_q,41.347470193373269,41.3,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,G17,2026-10-20
+2020,labour.hours.all.sector_r,38.806146182143131,38.8,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,B18,2026-10-20
+2021,labour.hours.all.sector_r,36.607139945517886,36.6,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,C18,2026-10-20
+2022,labour.hours.all.sector_r,39.277521179738713,39.3,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,D18,2026-10-20
+2023,labour.hours.all.sector_r,40.789989259664139,40.8,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,E18,2026-10-20
+2024,labour.hours.all.sector_r,39.123375015447373,39.1,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,F18,2026-10-20
+2025,labour.hours.all.sector_r,38.24133124267621,38.2,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,G18,2026-10-20
+2020,labour.hours.all.sector_s,43.99597360570943,44.0,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,B19,2026-10-20
+2021,labour.hours.all.sector_s,42.678854531191,42.7,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,C19,2026-10-20
+2022,labour.hours.all.sector_s,40.178147332601426,40.2,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,D19,2026-10-20
+2023,labour.hours.all.sector_s,39.550202245520076,39.6,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,E19,2026-10-20
+2024,labour.hours.all.sector_s,40.780136067853917,40.8,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,F19,2026-10-20
+2025,labour.hours.all.sector_s,41.675040757667396,41.7,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,G19,2026-10-20
+2020,labour.hours.all.sector_t,48.434089996339871,48.4,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,B20,2026-10-20
+2021,labour.hours.all.sector_t,46.227844892732904,46.2,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,C20,2026-10-20
+2022,labour.hours.all.sector_t,51.489520041377929,51.5,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,D20,2026-10-20
+2023,labour.hours.all.sector_t,47.011801805621097,47.0,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,E20,2026-10-20
+2024,labour.hours.all.sector_t,48.183513643811075,48.2,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,F20,2026-10-20
+2025,labour.hours.all.sector_t,48.942964755521416,48.9,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,G20,2026-10-20
+2020,labour.hours.women.total,39.113896445452227,39.1,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,B24,2026-10-20
+2021,labour.hours.women.total,38.157709343804505,38.2,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,C24,2026-10-20
+2022,labour.hours.women.total,38.431711877271546,38.4,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,D24,2026-10-20
+2023,labour.hours.women.total,38.225923704504225,38.2,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,E24,2026-10-20
+2024,labour.hours.women.total,37.877243663765952,37.9,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,F24,2026-10-20
+2025,labour.hours.women.total,37.953468349416184,38.0,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,G24,2026-10-20
+2020,labour.hours.women.sector_a,29.662755397486293,29.7,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,B25,2026-10-20
+2021,labour.hours.women.sector_a,30.083106045847586,30.1,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,C25,2026-10-20
+2022,labour.hours.women.sector_a,30.432066875025747,30.4,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,D25,2026-10-20
+2023,labour.hours.women.sector_a,29.904548653258171,29.9,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,E25,2026-10-20
+2024,labour.hours.women.sector_a,29.600514921162116,29.6,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,F25,2026-10-20
+2025,labour.hours.women.sector_a,29.223235839691316,29.2,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,G25,2026-10-20
+2020,labour.hours.women.sector_b_e,44.030863237319146,44.0,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,B26,2026-10-20
+2021,labour.hours.women.sector_b_e,41.91233819026985,41.9,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,C26,2026-10-20
+2022,labour.hours.women.sector_b_e,41.4121704814957,41.4,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,D26,2026-10-20
+2023,labour.hours.women.sector_b_e,40.465484832908466,40.5,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,E26,2026-10-20
+2024,labour.hours.women.sector_b_e,40.711416890004941,40.7,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,F26,2026-10-20
+2025,labour.hours.women.sector_b_e,41.328224955829469,41.3,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,G26,2026-10-20
+2020,labour.hours.women.sector_f,39.040710965906818,39.0,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,B27,2026-10-20
+2021,labour.hours.women.sector_f,40.096086771448775,40.1,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,C27,2026-10-20
+2022,labour.hours.women.sector_f,40.307839136889051,40.3,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,D27,2026-10-20
+2023,labour.hours.women.sector_f,39.869998518135773,39.9,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,E27,2026-10-20
+2024,labour.hours.women.sector_f,39.806275902252452,39.8,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,F27,2026-10-20
+2025,labour.hours.women.sector_f,38.562706895022892,38.6,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,G27,2026-10-20
+2020,labour.hours.women.sector_g,48.013816555075834,48.0,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,B28,2026-10-20
+2021,labour.hours.women.sector_g,46.83693479393839,46.8,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,C28,2026-10-20
+2022,labour.hours.women.sector_g,46.440123595151007,46.4,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,D28,2026-10-20
+2023,labour.hours.women.sector_g,46.44219020482317,46.4,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,E28,2026-10-20
+2024,labour.hours.women.sector_g,45.752085245135383,45.8,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,F28,2026-10-20
+2025,labour.hours.women.sector_g,45.855820408569286,45.9,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,G28,2026-10-20
+2020,labour.hours.women.sector_h,46.661750264154286,46.7,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,B29,2026-10-20
+2021,labour.hours.women.sector_h,44.312884164809077,44.3,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,C29,2026-10-20
+2022,labour.hours.women.sector_h,45.601539030281288,45.6,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,D29,2026-10-20
+2023,labour.hours.women.sector_h,43.516534143891072,43.5,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,E29,2026-10-20
+2024,labour.hours.women.sector_h,41.38195097063651,41.4,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,F29,2026-10-20
+2025,labour.hours.women.sector_h,42.421784503379769,42.4,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,G29,2026-10-20
+2020,labour.hours.women.sector_i,49.756428613206587,49.8,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,B30,2026-10-20
+2021,labour.hours.women.sector_i,48.28604450609037,48.3,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,C30,2026-10-20
+2022,labour.hours.women.sector_i,47.676893760816561,47.7,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,D30,2026-10-20
+2023,labour.hours.women.sector_i,47.186533579311032,47.2,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,E30,2026-10-20
+2024,labour.hours.women.sector_i,44.62422573232012,44.6,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,F30,2026-10-20
+2025,labour.hours.women.sector_i,43.970041914862712,44.0,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,G30,2026-10-20
+2020,labour.hours.women.sector_j,44.060359669221356,44.1,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,B31,2026-10-20
+2021,labour.hours.women.sector_j,41.360157544650022,41.4,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,C31,2026-10-20
+2022,labour.hours.women.sector_j,38.885469658600066,38.9,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,D31,2026-10-20
+2023,labour.hours.women.sector_j,39.524085744240793,39.5,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,E31,2026-10-20
+2024,labour.hours.women.sector_j,38.752211482115619,38.8,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,F31,2026-10-20
+2025,labour.hours.women.sector_j,38.678885434634559,38.7,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,G31,2026-10-20
+2020,labour.hours.women.sector_k,41.907492013415656,41.9,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,B32,2026-10-20
+2021,labour.hours.women.sector_k,41.567505855757801,41.6,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,C32,2026-10-20
+2022,labour.hours.women.sector_k,42.268314601255888,42.3,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,D32,2026-10-20
+2023,labour.hours.women.sector_k,41.284455888052612,41.3,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,E32,2026-10-20
+2024,labour.hours.women.sector_k,41.338148198411254,41.3,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,F32,2026-10-20
+2025,labour.hours.women.sector_k,40.508730687857764,40.5,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,G32,2026-10-20
+2020,labour.hours.women.sector_m,38.00424548550513,38.0,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,B33,2026-10-20
+2021,labour.hours.women.sector_m,37.322693154892264,37.3,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,C33,2026-10-20
+2022,labour.hours.women.sector_m,37.26337604162326,37.3,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,D33,2026-10-20
+2023,labour.hours.women.sector_m,37.632631948520512,37.6,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,E33,2026-10-20
+2024,labour.hours.women.sector_m,38.055911428039536,38.1,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,F33,2026-10-20
+2025,labour.hours.women.sector_m,37.823660148583819,37.8,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,G33,2026-10-20
+2020,labour.hours.women.sector_n,40.491559495229453,40.5,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,B34,2026-10-20
+2021,labour.hours.women.sector_n,34.058792219620855,34.1,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,C34,2026-10-20
+2022,labour.hours.women.sector_n,34.976319212140638,35.0,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,D34,2026-10-20
+2023,labour.hours.women.sector_n,36.897958578190696,36.9,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,E34,2026-10-20
+2024,labour.hours.women.sector_n,33.661746071168821,33.7,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,F34,2026-10-20
+2025,labour.hours.women.sector_n,35.693668441691337,35.7,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,G34,2026-10-20
+2020,labour.hours.women.sector_o,40.587951387502997,40.6,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,B35,2026-10-20
+2021,labour.hours.women.sector_o,41.130822003710591,41.1,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,C35,2026-10-20
+2022,labour.hours.women.sector_o,41.062360372383147,41.1,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,D35,2026-10-20
+2023,labour.hours.women.sector_o,40.569066462402667,40.6,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,E35,2026-10-20
+2024,labour.hours.women.sector_o,41.040960078997628,41.0,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,F35,2026-10-20
+2025,labour.hours.women.sector_o,41.577089142731801,41.6,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,G35,2026-10-20
+2020,labour.hours.women.sector_p,30.095420487121331,30.1,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,B36,2026-10-20
+2021,labour.hours.women.sector_p,28.828128277949215,28.8,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,C36,2026-10-20
+2022,labour.hours.women.sector_p,29.043487804359227,29.0,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,D36,2026-10-20
+2023,labour.hours.women.sector_p,29.463323958769731,29.5,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,E36,2026-10-20
+2024,labour.hours.women.sector_p,29.352216853936369,29.4,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,F36,2026-10-20
+2025,labour.hours.women.sector_p,30.124825557234466,30.1,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,G36,2026-10-20
+2020,labour.hours.women.sector_q,42.766523801347617,42.8,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,B37,2026-10-20
+2021,labour.hours.women.sector_q,43.034129944145448,43.0,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,C37,2026-10-20
+2022,labour.hours.women.sector_q,42.337869282064062,42.3,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,D37,2026-10-20
+2023,labour.hours.women.sector_q,41.742630489415497,41.7,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,E37,2026-10-20
+2024,labour.hours.women.sector_q,41.231140732540638,41.2,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,F37,2026-10-20
+2025,labour.hours.women.sector_q,41.022591633651388,41.0,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,G37,2026-10-20
+2020,labour.hours.women.sector_r,39.331819855534825,39.3,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,B38,2026-10-20
+2021,labour.hours.women.sector_r,37.638502926104117,37.6,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,C38,2026-10-20
+2022,labour.hours.women.sector_r,40.326272616179111,40.3,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,D38,2026-10-20
+2023,labour.hours.women.sector_r,40.346254174515572,40.3,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,E38,2026-10-20
+2024,labour.hours.women.sector_r,38.592001129652729,38.6,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,F38,2026-10-20
+2025,labour.hours.women.sector_r,37.851521646558297,37.9,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,G38,2026-10-20
+2020,labour.hours.women.sector_s,46.163736910617999,46.2,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,B39,2026-10-20
+2021,labour.hours.women.sector_s,43.891482577610915,43.9,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,C39,2026-10-20
+2022,labour.hours.women.sector_s,40.26008572038085,40.3,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,D39,2026-10-20
+2023,labour.hours.women.sector_s,41.298706977592097,41.3,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,E39,2026-10-20
+2024,labour.hours.women.sector_s,42.124377596173375,42.1,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,F39,2026-10-20
+2025,labour.hours.women.sector_s,42.293182217110335,42.3,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,G39,2026-10-20
+2020,labour.hours.women.sector_t,48.454082577141719,48.5,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,B40,2026-10-20
+2021,labour.hours.women.sector_t,46.191889319090869,46.2,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,C40,2026-10-20
+2022,labour.hours.women.sector_t,51.58234283530205,51.6,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,D40,2026-10-20
+2023,labour.hours.women.sector_t,47.142323917794641,47.1,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,E40,2026-10-20
+2024,labour.hours.women.sector_t,48.45686953204423,48.5,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,F40,2026-10-20
+2025,labour.hours.women.sector_t,49.175888526745773,49.2,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,G40,2026-10-20
+2020,labour.hours.men.total,44.433064781311209,44.4,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,B44,2026-10-20
+2021,labour.hours.men.total,43.993596409310548,44.0,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,C44,2026-10-20
+2022,labour.hours.men.total,44.408670230202517,44.4,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,D44,2026-10-20
+2023,labour.hours.men.total,44.122923487944341,44.1,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,E44,2026-10-20
+2024,labour.hours.men.total,43.723662954553035,43.7,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,F44,2026-10-20
+2025,labour.hours.men.total,43.507196580433842,43.5,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,G44,2026-10-20
+2020,labour.hours.men.sector_a,35.589375738473471,35.6,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,B45,2026-10-20
+2021,labour.hours.men.sector_a,36.389114836271119,36.4,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,C45,2026-10-20
+2022,labour.hours.men.sector_a,36.62777151440612,36.6,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,D45,2026-10-20
+2023,labour.hours.men.sector_a,35.84681030484569,35.8,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,E45,2026-10-20
+2024,labour.hours.men.sector_a,35.373616858961107,35.4,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,F45,2026-10-20
+2025,labour.hours.men.sector_a,35.205930090844035,35.2,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,G45,2026-10-20
+2020,labour.hours.men.sector_b_e,45.249648402712118,45.2,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,B46,2026-10-20
+2021,labour.hours.men.sector_b_e,45.178432595661974,45.2,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,C46,2026-10-20
+2022,labour.hours.men.sector_b_e,45.336455578894494,45.3,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,D46,2026-10-20
+2023,labour.hours.men.sector_b_e,44.866350631568622,44.9,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,E46,2026-10-20
+2024,labour.hours.men.sector_b_e,44.089269864054565,44.1,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,F46,2026-10-20
+2025,labour.hours.men.sector_b_e,43.956610264540359,44.0,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,G46,2026-10-20
+2020,labour.hours.men.sector_f,49.398470759279128,49.4,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,B47,2026-10-20
+2021,labour.hours.men.sector_f,48.258128920529778,48.3,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,C47,2026-10-20
+2022,labour.hours.men.sector_f,48.207936296355612,48.2,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,D47,2026-10-20
+2023,labour.hours.men.sector_f,47.204369162781568,47.2,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,E47,2026-10-20
+2024,labour.hours.men.sector_f,47.196793736749818,47.2,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,F47,2026-10-20
+2025,labour.hours.men.sector_f,46.883642080391148,46.9,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,G47,2026-10-20
+2020,labour.hours.men.sector_g,49.987830223339365,50.0,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,B48,2026-10-20
+2021,labour.hours.men.sector_g,49.103419179998205,49.1,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,C48,2026-10-20
+2022,labour.hours.men.sector_g,49.581183631553948,49.6,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,D48,2026-10-20
+2023,labour.hours.men.sector_g,48.664195324355063,48.7,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,E48,2026-10-20
+2024,labour.hours.men.sector_g,47.635994765798308,47.6,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,F48,2026-10-20
+2025,labour.hours.men.sector_g,47.265203463095169,47.3,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,G48,2026-10-20
+2020,labour.hours.men.sector_h,50.380030843928786,50.4,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,B49,2026-10-20
+2021,labour.hours.men.sector_h,49.500204017644208,49.5,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,C49,2026-10-20
+2022,labour.hours.men.sector_h,48.619585591778836,48.6,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,D49,2026-10-20
+2023,labour.hours.men.sector_h,48.242855883861068,48.2,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,E49,2026-10-20
+2024,labour.hours.men.sector_h,48.488740237805338,48.5,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,F49,2026-10-20
+2025,labour.hours.men.sector_h,47.700478216899953,47.7,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,G49,2026-10-20
+2020,labour.hours.men.sector_i,49.364352128805983,49.4,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,B50,2026-10-20
+2021,labour.hours.men.sector_i,49.753181643211704,49.8,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,C50,2026-10-20
+2022,labour.hours.men.sector_i,51.950627063510304,52.0,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,D50,2026-10-20
+2023,labour.hours.men.sector_i,48.861243029704113,48.9,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,E50,2026-10-20
+2024,labour.hours.men.sector_i,46.877257477452424,46.9,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,F50,2026-10-20
+2025,labour.hours.men.sector_i,46.919493340842159,46.9,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,G50,2026-10-20
+2020,labour.hours.men.sector_j,42.966527315994256,43.0,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,B51,2026-10-20
+2021,labour.hours.men.sector_j,44.072255650228662,44.1,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,C51,2026-10-20
+2022,labour.hours.men.sector_j,44.691477067913503,44.7,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,D51,2026-10-20
+2023,labour.hours.men.sector_j,40.33579840681687,40.3,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,E51,2026-10-20
+2024,labour.hours.men.sector_j,40.646191668137696,40.6,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,F51,2026-10-20
+2025,labour.hours.men.sector_j,41.903244366987543,41.9,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,G51,2026-10-20
+2020,labour.hours.men.sector_k,44.351714948279131,44.4,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,B52,2026-10-20
+2021,labour.hours.men.sector_k,44.254313192822536,44.3,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,C52,2026-10-20
+2022,labour.hours.men.sector_k,43.353699284650688,43.4,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,D52,2026-10-20
+2023,labour.hours.men.sector_k,41.50124714882768,41.5,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,E52,2026-10-20
+2024,labour.hours.men.sector_k,41.54279482223437,41.5,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,F52,2026-10-20
+2025,labour.hours.men.sector_k,42.955062217060892,43.0,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,G52,2026-10-20
+2020,labour.hours.men.sector_m,40.751632380549488,40.8,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,B53,2026-10-20
+2021,labour.hours.men.sector_m,41.105847168005596,41.1,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,C53,2026-10-20
+2022,labour.hours.men.sector_m,40.592931575495662,40.6,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,D53,2026-10-20
+2023,labour.hours.men.sector_m,42.674128985314248,42.7,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,E53,2026-10-20
+2024,labour.hours.men.sector_m,41.09853112937855,41.1,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,F53,2026-10-20
+2025,labour.hours.men.sector_m,41.528387079757913,41.5,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,G53,2026-10-20
+2020,labour.hours.men.sector_n,48.677712822925621,48.7,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,B54,2026-10-20
+2021,labour.hours.men.sector_n,45.31540045323819,45.3,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,C54,2026-10-20
+2022,labour.hours.men.sector_n,48.347064915262877,48.3,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,D54,2026-10-20
+2023,labour.hours.men.sector_n,49.089379337892304,49.1,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,E54,2026-10-20
+2024,labour.hours.men.sector_n,46.28001180691605,46.3,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,F54,2026-10-20
+2025,labour.hours.men.sector_n,47.952875981689573,48.0,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,G54,2026-10-20
+2020,labour.hours.men.sector_o,49.643085425748644,49.6,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,B55,2026-10-20
+2021,labour.hours.men.sector_o,48.040790959168888,48.0,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,C55,2026-10-20
+2022,labour.hours.men.sector_o,48.501383611515351,48.5,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,D55,2026-10-20
+2023,labour.hours.men.sector_o,48.157635525538922,48.2,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,E55,2026-10-20
+2024,labour.hours.men.sector_o,47.066534961616071,47.1,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,F55,2026-10-20
+2025,labour.hours.men.sector_o,46.709510111042746,46.7,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,G55,2026-10-20
+2020,labour.hours.men.sector_p,32.777550194753665,32.8,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,B56,2026-10-20
+2021,labour.hours.men.sector_p,30.881317140054197,30.9,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,C56,2026-10-20
+2022,labour.hours.men.sector_p,31.164989106922963,31.2,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,D56,2026-10-20
+2023,labour.hours.men.sector_p,32.43041670627894,32.4,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,E56,2026-10-20
+2024,labour.hours.men.sector_p,34.734560997335493,34.7,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,F56,2026-10-20
+2025,labour.hours.men.sector_p,34.94769693399904,34.9,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,G56,2026-10-20
+2020,labour.hours.men.sector_q,43.751873687107036,43.8,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,B57,2026-10-20
+2021,labour.hours.men.sector_q,42.215697552025624,42.2,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,C57,2026-10-20
+2022,labour.hours.men.sector_q,41.499321644646322,41.5,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,D57,2026-10-20
+2023,labour.hours.men.sector_q,43.627155214904377,43.6,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,E57,2026-10-20
+2024,labour.hours.men.sector_q,43.706134776681054,43.7,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,F57,2026-10-20
+2025,labour.hours.men.sector_q,43.096945010403211,43.1,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,G57,2026-10-20
+2020,labour.hours.men.sector_r,38.174302689642289,38.2,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,B58,2026-10-20
+2021,labour.hours.men.sector_r,35.417252641600363,35.4,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,C58,2026-10-20
+2022,labour.hours.men.sector_r,38.204379404055878,38.2,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,D58,2026-10-20
+2023,labour.hours.men.sector_r,41.274436843884779,41.3,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,E58,2026-10-20
+2024,labour.hours.men.sector_r,39.755661595720461,39.8,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,F58,2026-10-20
+2025,labour.hours.men.sector_r,38.633829586629858,38.6,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,G58,2026-10-20
+2020,labour.hours.men.sector_s,41.006112683434232,41.0,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,B59,2026-10-20
+2021,labour.hours.men.sector_s,41.301144941331344,41.3,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,C59,2026-10-20
+2022,labour.hours.men.sector_s,40.066108461809243,40.1,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,D59,2026-10-20
+2023,labour.hours.men.sector_s,35.935884571322859,35.9,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,E59,2026-10-20
+2024,labour.hours.men.sector_s,38.070783377351383,38.1,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,F59,2026-10-20
+2025,labour.hours.men.sector_s,40.558210161576788,40.6,hours,actual,survey_estimate,geostat_lfs_hours_sex,1,G59,2026-10-20
+2020,labour.hours.urban.total,44.112824269523372,44.1,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,B24,2026-10-20
+2021,labour.hours.urban.total,42.946670495955722,42.9,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,C24,2026-10-20
+2022,labour.hours.urban.total,43.199691355380153,43.2,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,D24,2026-10-20
+2023,labour.hours.urban.total,42.945884351657313,42.9,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,E24,2026-10-20
+2024,labour.hours.urban.total,42.35688140031705,42.4,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,F24,2026-10-20
+2025,labour.hours.urban.total,42.610526696690492,42.6,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,G24,2026-10-20
+2020,labour.hours.urban.sector_a,33.70847454403205,33.7,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,B25,2026-10-20
+2021,labour.hours.urban.sector_a,34.349564510363741,34.3,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,C25,2026-10-20
+2022,labour.hours.urban.sector_a,35.405516558687069,35.4,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,D25,2026-10-20
+2023,labour.hours.urban.sector_a,36.330970057809701,36.3,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,E25,2026-10-20
+2024,labour.hours.urban.sector_a,34.441670778634254,34.4,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,F25,2026-10-20
+2025,labour.hours.urban.sector_a,36.551332815343869,36.6,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,G25,2026-10-20
+2020,labour.hours.urban.sector_b_e,44.873212722078435,44.9,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,B26,2026-10-20
+2021,labour.hours.urban.sector_b_e,44.006556142133519,44.0,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,C26,2026-10-20
+2022,labour.hours.urban.sector_b_e,43.950543650265985,44.0,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,D26,2026-10-20
+2023,labour.hours.urban.sector_b_e,44.103660319618392,44.1,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,E26,2026-10-20
+2024,labour.hours.urban.sector_b_e,43.595273815329804,43.6,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,F26,2026-10-20
+2025,labour.hours.urban.sector_b_e,43.840694504010003,43.8,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,G26,2026-10-20
+2020,labour.hours.urban.sector_f,48.703259541796733,48.7,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,B27,2026-10-20
+2021,labour.hours.urban.sector_f,47.336364835391493,47.3,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,C27,2026-10-20
+2022,labour.hours.urban.sector_f,47.776041551231785,47.8,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,D27,2026-10-20
+2023,labour.hours.urban.sector_f,45.717588590433337,45.7,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,E27,2026-10-20
+2024,labour.hours.urban.sector_f,46.094224745785858,46.1,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,F27,2026-10-20
+2025,labour.hours.urban.sector_f,46.285119963715864,46.3,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,G27,2026-10-20
+2020,labour.hours.urban.sector_g,48.8747940039977,48.9,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,B28,2026-10-20
+2021,labour.hours.urban.sector_g,47.872992667104391,47.9,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,C28,2026-10-20
+2022,labour.hours.urban.sector_g,47.721530606470736,47.7,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,D28,2026-10-20
+2023,labour.hours.urban.sector_g,47.533789912255784,47.5,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,E28,2026-10-20
+2024,labour.hours.urban.sector_g,46.545428895600395,46.5,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,F28,2026-10-20
+2025,labour.hours.urban.sector_g,46.64620998365578,46.6,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,G28,2026-10-20
+2020,labour.hours.urban.sector_h,51.246495084260971,51.2,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,B29,2026-10-20
+2021,labour.hours.urban.sector_h,49.177801227983345,49.2,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,C29,2026-10-20
+2022,labour.hours.urban.sector_h,48.324162272162837,48.3,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,D29,2026-10-20
+2023,labour.hours.urban.sector_h,48.024372100769256,48.0,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,E29,2026-10-20
+2024,labour.hours.urban.sector_h,47.834924601245227,47.8,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,F29,2026-10-20
+2025,labour.hours.urban.sector_h,47.380879973059237,47.4,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,G29,2026-10-20
+2020,labour.hours.urban.sector_i,48.806634820347867,48.8,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,B30,2026-10-20
+2021,labour.hours.urban.sector_i,47.981405729459084,48.0,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,C30,2026-10-20
+2022,labour.hours.urban.sector_i,48.855216848129693,48.9,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,D30,2026-10-20
+2023,labour.hours.urban.sector_i,47.341178820140208,47.3,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,E30,2026-10-20
+2024,labour.hours.urban.sector_i,45.054367369964069,45.1,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,F30,2026-10-20
+2025,labour.hours.urban.sector_i,45.060437230799756,45.1,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,G30,2026-10-20
+2020,labour.hours.urban.sector_j,43.202953296032788,43.2,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,B31,2026-10-20
+2021,labour.hours.urban.sector_j,43.21913072557836,43.2,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,C31,2026-10-20
+2022,labour.hours.urban.sector_j,42.188320690175061,42.2,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,D31,2026-10-20
+2023,labour.hours.urban.sector_j,40.054210794638081,40.1,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,E31,2026-10-20
+2024,labour.hours.urban.sector_j,39.685096537084256,39.7,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,F31,2026-10-20
+2025,labour.hours.urban.sector_j,40.683170914554289,40.7,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,G31,2026-10-20
+2020,labour.hours.urban.sector_k,42.643728969834314,42.6,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,B32,2026-10-20
+2021,labour.hours.urban.sector_k,42.449997233026252,42.4,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,C32,2026-10-20
+2022,labour.hours.urban.sector_k,42.389653619213767,42.4,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,D32,2026-10-20
+2023,labour.hours.urban.sector_k,41.18774185571074,41.2,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,E32,2026-10-20
+2024,labour.hours.urban.sector_k,41.632543849988188,41.6,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,F32,2026-10-20
+2025,labour.hours.urban.sector_k,41.769132958230941,41.8,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,G32,2026-10-20
+2020,labour.hours.urban.sector_m,39.169339758683748,39.2,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,B33,2026-10-20
+2021,labour.hours.urban.sector_m,39.09206874081336,39.1,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,C33,2026-10-20
+2022,labour.hours.urban.sector_m,39.028177244938753,39.0,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,D33,2026-10-20
+2023,labour.hours.urban.sector_m,40.415593894020482,40.4,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,E33,2026-10-20
+2024,labour.hours.urban.sector_m,39.800496780591473,39.8,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,F33,2026-10-20
+2025,labour.hours.urban.sector_m,39.649362438174393,39.6,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,G33,2026-10-20
+2020,labour.hours.urban.sector_n,44.906476473255715,44.9,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,B34,2026-10-20
+2021,labour.hours.urban.sector_n,41.023483079717515,41.0,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,C34,2026-10-20
+2022,labour.hours.urban.sector_n,41.841753042305562,41.8,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,D34,2026-10-20
+2023,labour.hours.urban.sector_n,44.743313040510415,44.7,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,E34,2026-10-20
+2024,labour.hours.urban.sector_n,41.755776772229488,41.8,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,F34,2026-10-20
+2025,labour.hours.urban.sector_n,43.962407052598422,44.0,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,G34,2026-10-20
+2020,labour.hours.urban.sector_o,45.910537019708407,45.9,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,B35,2026-10-20
+2021,labour.hours.urban.sector_o,44.897344298895511,44.9,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,C35,2026-10-20
+2022,labour.hours.urban.sector_o,45.467678446741061,45.5,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,D35,2026-10-20
+2023,labour.hours.urban.sector_o,44.828659224244269,44.8,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,E35,2026-10-20
+2024,labour.hours.urban.sector_o,44.253072372453531,44.3,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,F35,2026-10-20
+2025,labour.hours.urban.sector_o,44.616433687897164,44.6,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,G35,2026-10-20
+2020,labour.hours.urban.sector_p,31.08885368076713,31.1,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,B36,2026-10-20
+2021,labour.hours.urban.sector_p,29.661173277776594,29.7,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,C36,2026-10-20
+2022,labour.hours.urban.sector_p,29.748252661421986,29.7,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,D36,2026-10-20
+2023,labour.hours.urban.sector_p,29.91529764467596,29.9,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,E36,2026-10-20
+2024,labour.hours.urban.sector_p,30.048151979185096,30.0,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,F36,2026-10-20
+2025,labour.hours.urban.sector_p,31.133937048028248,31.1,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,G36,2026-10-20
+2020,labour.hours.urban.sector_q,42.353849428085532,42.4,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,B37,2026-10-20
+2021,labour.hours.urban.sector_q,42.439777845777122,42.4,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,C37,2026-10-20
+2022,labour.hours.urban.sector_q,41.689291497948069,41.7,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,D37,2026-10-20
+2023,labour.hours.urban.sector_q,41.727278733191028,41.7,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,E37,2026-10-20
+2024,labour.hours.urban.sector_q,41.158095317633411,41.2,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,F37,2026-10-20
+2025,labour.hours.urban.sector_q,40.485032843687378,40.5,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,G37,2026-10-20
+2020,labour.hours.urban.sector_r,39.378579897361512,39.4,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,B38,2026-10-20
+2021,labour.hours.urban.sector_r,37.055697714596114,37.1,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,C38,2026-10-20
+2022,labour.hours.urban.sector_r,39.730640684910789,39.7,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,D38,2026-10-20
+2023,labour.hours.urban.sector_r,41.098113810317798,41.1,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,E38,2026-10-20
+2024,labour.hours.urban.sector_r,39.367792034098905,39.4,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,F38,2026-10-20
+2025,labour.hours.urban.sector_r,37.731296513698936,37.7,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,G38,2026-10-20
+2020,labour.hours.urban.sector_s,44.372277924440866,44.4,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,B39,2026-10-20
+2021,labour.hours.urban.sector_s,42.843111005650741,42.8,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,C39,2026-10-20
+2022,labour.hours.urban.sector_s,40.132642214084825,40.1,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,D39,2026-10-20
+2023,labour.hours.urban.sector_s,39.037631878472496,39.0,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,E39,2026-10-20
+2024,labour.hours.urban.sector_s,39.809545916985698,39.8,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,F39,2026-10-20
+2025,labour.hours.urban.sector_s,41.22714143507671,41.2,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,G39,2026-10-20
+2020,labour.hours.urban.sector_t,46.291354193282601,46.3,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,B40,2026-10-20
+2021,labour.hours.urban.sector_t,43.314904434322983,43.3,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,C40,2026-10-20
+2022,labour.hours.urban.sector_t,49.501462280231813,49.5,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,D40,2026-10-20
+2023,labour.hours.urban.sector_t,44.367177244773181,44.4,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,E40,2026-10-20
+2024,labour.hours.urban.sector_t,44.851275618241559,44.9,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,F40,2026-10-20
+2025,labour.hours.urban.sector_t,48.422573584350069,48.4,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,G40,2026-10-20
+2020,labour.hours.rural.total,39.171323362923879,39.2,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,B44,2026-10-20
+2021,labour.hours.rural.total,39.235061138638322,39.2,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,C44,2026-10-20
+2022,labour.hours.rural.total,39.723375464008697,39.7,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,D44,2026-10-20
+2023,labour.hours.rural.total,39.336451102306683,39.3,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,E44,2026-10-20
+2024,labour.hours.rural.total,39.137124904075222,39.1,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,F44,2026-10-20
+2025,labour.hours.rural.total,38.812582556278144,38.8,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,G44,2026-10-20
+2020,labour.hours.rural.sector_a,33.395704651336608,33.4,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,B45,2026-10-20
+2021,labour.hours.rural.sector_a,34.169558693665159,34.2,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,C45,2026-10-20
+2022,labour.hours.rural.sector_a,34.274092111797181,34.3,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,D45,2026-10-20
+2023,labour.hours.rural.sector_a,33.385843800941018,33.4,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,E45,2026-10-20
+2024,labour.hours.rural.sector_a,33.095713682349128,33.1,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,F45,2026-10-20
+2025,labour.hours.rural.sector_a,32.747634783943909,32.7,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,G45,2026-10-20
+2020,labour.hours.rural.sector_b_e,44.897429493296414,44.9,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,B46,2026-10-20
+2021,labour.hours.rural.sector_b_e,44.579548813567015,44.6,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,C46,2026-10-20
+2022,labour.hours.rural.sector_b_e,44.195832653985001,44.2,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,D46,2026-10-20
+2023,labour.hours.rural.sector_b_e,42.140055186795678,42.1,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,E46,2026-10-20
+2024,labour.hours.rural.sector_b_e,41.82716894325425,41.8,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,F46,2026-10-20
+2025,labour.hours.rural.sector_b_e,41.863126308765352,41.9,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,G46,2026-10-20
+2020,labour.hours.rural.sector_f,49.392581895258573,49.4,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,B47,2026-10-20
+2021,labour.hours.rural.sector_f,48.975866346095337,49.0,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,C47,2026-10-20
+2022,labour.hours.rural.sector_f,48.072856049449321,48.1,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,D47,2026-10-20
+2023,labour.hours.rural.sector_f,48.344742358857616,48.3,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,E47,2026-10-20
+2024,labour.hours.rural.sector_f,47.995232156626564,48.0,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,F47,2026-10-20
+2025,labour.hours.rural.sector_f,46.72703063535775,46.7,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,G47,2026-10-20
+2020,labour.hours.rural.sector_g,49.380985356368157,49.4,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,B48,2026-10-20
+2021,labour.hours.rural.sector_g,48.280368767106957,48.3,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,C48,2026-10-20
+2022,labour.hours.rural.sector_g,49.06773177405212,49.1,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,D48,2026-10-20
+2023,labour.hours.rural.sector_g,47.747963057437325,47.7,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,E48,2026-10-20
+2024,labour.hours.rural.sector_g,47.347200163993932,47.3,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,F48,2026-10-20
+2025,labour.hours.rural.sector_g,46.384630168055722,46.4,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,G48,2026-10-20
+2020,labour.hours.rural.sector_h,46.596210378924738,46.6,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,B49,2026-10-20
+2021,labour.hours.rural.sector_h,48.335475865679996,48.3,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,C49,2026-10-20
+2022,labour.hours.rural.sector_h,48.064619892711498,48.1,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,D49,2026-10-20
+2023,labour.hours.rural.sector_h,46.903679707507521,46.9,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,E49,2026-10-20
+2024,labour.hours.rural.sector_h,47.299765086784916,47.3,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,F49,2026-10-20
+2025,labour.hours.rural.sector_h,46.67375530856458,46.7,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,G49,2026-10-20
+2020,labour.hours.rural.sector_i,52.256005836572236,52.3,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,B50,2026-10-20
+2021,labour.hours.rural.sector_i,51.81612681146737,51.8,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,C50,2026-10-20
+2022,labour.hours.rural.sector_i,51.424935734894767,51.4,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,D50,2026-10-20
+2023,labour.hours.rural.sector_i,49.404560930383198,49.4,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,E50,2026-10-20
+2024,labour.hours.rural.sector_i,46.779524935651537,46.8,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,F50,2026-10-20
+2025,labour.hours.rural.sector_i,45.441654705627215,45.4,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,G50,2026-10-20
+2020,labour.hours.rural.sector_j,47.497096746180432,47.5,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,B51,2026-10-20
+2021,labour.hours.rural.sector_j,40.460667942122491,40.5,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,C51,2026-10-20
+2022,labour.hours.rural.sector_j,44.652628546352062,44.7,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,D51,2026-10-20
+2023,labour.hours.rural.sector_j,39.204722951657047,39.2,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,E51,2026-10-20
+2024,labour.hours.rural.sector_j,41.640532069234354,41.6,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,F51,2026-10-20
+2025,labour.hours.rural.sector_j,39.777781063155111,39.8,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,G51,2026-10-20
+2020,labour.hours.rural.sector_k,43.635202140702013,43.6,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,B52,2026-10-20
+2021,labour.hours.rural.sector_k,43.027831962913837,43.0,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,C52,2026-10-20
+2022,labour.hours.rural.sector_k,43.440103420180179,43.4,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,D52,2026-10-20
+2023,labour.hours.rural.sector_k,42.21257458646469,42.2,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,E52,2026-10-20
+2024,labour.hours.rural.sector_k,40.579827383149485,40.6,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,F52,2026-10-20
+2025,labour.hours.rural.sector_k,40.992178996236255,41.0,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,G52,2026-10-20
+2020,labour.hours.rural.sector_m,42.311718305359072,42.3,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,B53,2026-10-20
+2021,labour.hours.rural.sector_m,37.66136951578919,37.7,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,C53,2026-10-20
+2022,labour.hours.rural.sector_m,36.874095668048696,36.9,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,D53,2026-10-20
+2023,labour.hours.rural.sector_m,39.081276017047522,39.1,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,E53,2026-10-20
+2024,labour.hours.rural.sector_m,37.132242286519748,37.1,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,F53,2026-10-20
+2025,labour.hours.rural.sector_m,42.440450968766406,42.4,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,G53,2026-10-20
+2020,labour.hours.rural.sector_n,48.664810717397096,48.7,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,B54,2026-10-20
+2021,labour.hours.rural.sector_n,44.606621891860719,44.6,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,C54,2026-10-20
+2022,labour.hours.rural.sector_n,46.015195237993403,46.0,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,D54,2026-10-20
+2023,labour.hours.rural.sector_n,40.912317656806792,40.9,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,E54,2026-10-20
+2024,labour.hours.rural.sector_n,41.134072998710835,41.1,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,F54,2026-10-20
+2025,labour.hours.rural.sector_n,43.267576848135533,43.3,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,G54,2026-10-20
+2020,labour.hours.rural.sector_o,49.180392698105535,49.2,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,B55,2026-10-20
+2021,labour.hours.rural.sector_o,47.426359291549467,47.4,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,C55,2026-10-20
+2022,labour.hours.rural.sector_o,47.460984404312413,47.5,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,D55,2026-10-20
+2023,labour.hours.rural.sector_o,47.71389052684134,47.7,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,E55,2026-10-20
+2024,labour.hours.rural.sector_o,46.863272781639211,46.9,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,F55,2026-10-20
+2025,labour.hours.rural.sector_o,45.88607951223748,45.9,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,G55,2026-10-20
+2020,labour.hours.rural.sector_p,29.875062724953906,29.9,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,B56,2026-10-20
+2021,labour.hours.rural.sector_p,28.472272530375683,28.5,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,C56,2026-10-20
+2022,labour.hours.rural.sector_p,28.994188585594038,29.0,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,D56,2026-10-20
+2023,labour.hours.rural.sector_p,29.987666755283001,30.0,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,E56,2026-10-20
+2024,labour.hours.rural.sector_p,30.188823010252257,30.2,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,F56,2026-10-20
+2025,labour.hours.rural.sector_p,30.374648323142221,30.4,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,G56,2026-10-20
+2020,labour.hours.rural.sector_q,45.224766312218108,45.2,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,B57,2026-10-20
+2021,labour.hours.rural.sector_q,44.465695149784636,44.5,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,C57,2026-10-20
+2022,labour.hours.rural.sector_q,43.838850913029759,43.8,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,D57,2026-10-20
+2023,labour.hours.rural.sector_q,43.62536736688206,43.6,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,E57,2026-10-20
+2024,labour.hours.rural.sector_q,43.151702978624691,43.2,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,F57,2026-10-20
+2025,labour.hours.rural.sector_q,43.619148392384716,43.6,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,G57,2026-10-20
+2020,labour.hours.rural.sector_r,36.080935358544615,36.1,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,B58,2026-10-20
+2021,labour.hours.rural.sector_r,34.733038583249751,34.7,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,C58,2026-10-20
+2022,labour.hours.rural.sector_r,37.872719315284456,37.9,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,D58,2026-10-20
+2023,labour.hours.rural.sector_r,39.573966895786633,39.6,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,E58,2026-10-20
+2024,labour.hours.rural.sector_r,38.052130972584919,38.1,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,F58,2026-10-20
+2025,labour.hours.rural.sector_r,39.938213115351154,39.9,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,G58,2026-10-20
+2020,labour.hours.rural.sector_s,41.753260523075646,41.8,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,B59,2026-10-20
+2021,labour.hours.rural.sector_s,41.937023567211,41.9,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,C59,2026-10-20
+2022,labour.hours.rural.sector_s,40.372611847482005,40.4,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,D59,2026-10-20
+2023,labour.hours.rural.sector_s,41.950720421090395,42.0,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,E59,2026-10-20
+2024,labour.hours.rural.sector_s,45.418729887028618,45.4,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,F59,2026-10-20
+2025,labour.hours.rural.sector_s,43.815744527326899,43.8,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,G59,2026-10-20
+2020,labour.hours.rural.sector_t,54.487524292587786,54.5,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,B60,2026-10-20
+2021,labour.hours.rural.sector_t,56.60585399346359,56.6,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,C60,2026-10-20
+2022,labour.hours.rural.sector_t,58.330528866126102,58.3,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,D60,2026-10-20
+2023,labour.hours.rural.sector_t,55.350260843395667,55.4,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,E60,2026-10-20
+2024,labour.hours.rural.sector_t,59.135056642244543,59.1,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,F60,2026-10-20
+2025,labour.hours.rural.sector_t,50.252086451695831,50.3,hours,actual,survey_estimate,geostat_lfs_hours_settlement,1,G60,2026-10-20
+2020,labour.informal.total,31.723349263458992,31.7,percent,actual,survey_estimate,geostat_lfs_informal,1,B3,2026-10-20
+2021,labour.informal.total,28.787858381340641,28.8,percent,actual,survey_estimate,geostat_lfs_informal,1,C3,2026-10-20
+2022,labour.informal.total,28.359832034035282,28.4,percent,actual,survey_estimate,geostat_lfs_informal,1,D3,2026-10-20
+2023,labour.informal.total,27.576507762813744,27.6,percent,actual,survey_estimate,geostat_lfs_informal,1,E3,2026-10-20
+2024,labour.informal.total,29.103043628862213,29.1,percent,actual,survey_estimate,geostat_lfs_informal,1,F3,2026-10-20
+2025,labour.informal.total,28.300427770562887,28.3,percent,actual,survey_estimate,geostat_lfs_informal,1,G3,2026-10-20
+2020,labour.informal.women,26.193610402336535,26.2,percent,actual,survey_estimate,geostat_lfs_informal,1,B4,2026-10-20
+2021,labour.informal.women,22.454685417424134,22.5,percent,actual,survey_estimate,geostat_lfs_informal,1,C4,2026-10-20
+2022,labour.informal.women,22.466916082322129,22.5,percent,actual,survey_estimate,geostat_lfs_informal,1,D4,2026-10-20
+2023,labour.informal.women,21.745751475445623,21.7,percent,actual,survey_estimate,geostat_lfs_informal,1,E4,2026-10-20
+2024,labour.informal.women,23.305927492121036,23.3,percent,actual,survey_estimate,geostat_lfs_informal,1,F4,2026-10-20
+2025,labour.informal.women,23.293411168625209,23.3,percent,actual,survey_estimate,geostat_lfs_informal,1,G4,2026-10-20
+2020,labour.informal.men,36.406920279482442,36.4,percent,actual,survey_estimate,geostat_lfs_informal,1,B5,2026-10-20
+2021,labour.informal.men,34.219493583316108,34.2,percent,actual,survey_estimate,geostat_lfs_informal,1,C5,2026-10-20
+2022,labour.informal.men,33.37530961680504,33.4,percent,actual,survey_estimate,geostat_lfs_informal,1,D5,2026-10-20
+2023,labour.informal.men,32.562971300728876,32.6,percent,actual,survey_estimate,geostat_lfs_informal,1,E5,2026-10-20
+2024,labour.informal.men,34.218129729838189,34.2,percent,actual,survey_estimate,geostat_lfs_informal,1,F5,2026-10-20
+2025,labour.informal.men,32.577747201282506,32.6,percent,actual,survey_estimate,geostat_lfs_informal,1,G5,2026-10-20
+2020,labour.informal.urban,30.20701813012359,30.2,percent,actual,survey_estimate,geostat_lfs_informal,1,B6,2026-10-20
+2021,labour.informal.urban,26.823610686243093,26.8,percent,actual,survey_estimate,geostat_lfs_informal,1,C6,2026-10-20
+2022,labour.informal.urban,26.951863681538907,27.0,percent,actual,survey_estimate,geostat_lfs_informal,1,D6,2026-10-20
+2023,labour.informal.urban,25.365085861172876,25.4,percent,actual,survey_estimate,geostat_lfs_informal,1,E6,2026-10-20
+2024,labour.informal.urban,26.847477310350076,26.8,percent,actual,survey_estimate,geostat_lfs_informal,1,F6,2026-10-20
+2025,labour.informal.urban,26.075793824644506,26.1,percent,actual,survey_estimate,geostat_lfs_informal,1,G6,2026-10-20
+2020,labour.informal.rural,35.640962003443498,35.6,percent,actual,survey_estimate,geostat_lfs_informal,1,B7,2026-10-20
+2021,labour.informal.rural,33.701383540156193,33.7,percent,actual,survey_estimate,geostat_lfs_informal,1,C7,2026-10-20
+2022,labour.informal.rural,31.608452872123959,31.6,percent,actual,survey_estimate,geostat_lfs_informal,1,D7,2026-10-20
+2023,labour.informal.rural,32.717555038374414,32.7,percent,actual,survey_estimate,geostat_lfs_informal,1,E7,2026-10-20
+2024,labour.informal.rural,34.370579461164311,34.4,percent,actual,survey_estimate,geostat_lfs_informal,1,F7,2026-10-20
+2025,labour.informal.rural,33.024697380943081,33.0,percent,actual,survey_estimate,geostat_lfs_informal,1,G7,2026-10-20
+2020,labour.underuse.unemployment_rate,18.500057680291793,18.5,percent,actual,survey_estimate,geostat_lfs_underuse,1,B3,2026-10-20
+2021,labour.underuse.unemployment_rate,20.617699718711066,20.6,percent,actual,survey_estimate,geostat_lfs_underuse,1,C3,2026-10-20
+2022,labour.underuse.unemployment_rate,17.264209145385173,17.3,percent,actual,survey_estimate,geostat_lfs_underuse,1,D3,2026-10-20
+2023,labour.underuse.unemployment_rate,16.396735818326299,16.4,percent,actual,survey_estimate,geostat_lfs_underuse,1,E3,2026-10-20
+2024,labour.underuse.unemployment_rate,13.931227716454798,13.9,percent,actual,survey_estimate,geostat_lfs_underuse,1,F3,2026-10-20
+2025,labour.underuse.unemployment_rate,13.881462779730649,13.9,percent,actual,survey_estimate,geostat_lfs_underuse,1,G3,2026-10-20
+2020,labour.underuse.time_related,19.647407434650795,19.6,percent,actual,survey_estimate,geostat_lfs_underuse,1,B4,2026-10-20
+2021,labour.underuse.time_related,21.549915248522712,21.5,percent,actual,survey_estimate,geostat_lfs_underuse,1,C4,2026-10-20
+2022,labour.underuse.time_related,18.072737070804521,18.1,percent,actual,survey_estimate,geostat_lfs_underuse,1,D4,2026-10-20
+2023,labour.underuse.time_related,17.050984485753677,17.1,percent,actual,survey_estimate,geostat_lfs_underuse,1,E4,2026-10-20
+2024,labour.underuse.time_related,14.5021334067472,14.5,percent,actual,survey_estimate,geostat_lfs_underuse,1,F4,2026-10-20
+2025,labour.underuse.time_related,14.337114941211105,14.3,percent,actual,survey_estimate,geostat_lfs_underuse,1,G4,2026-10-20
+2020,labour.underuse.potential,38.679186033957826,38.7,percent,actual,survey_estimate,geostat_lfs_underuse,1,B5,2026-10-20
+2021,labour.underuse.potential,38.58923704207109,38.6,percent,actual,survey_estimate,geostat_lfs_underuse,1,C5,2026-10-20
+2022,labour.underuse.potential,34.670701122757535,34.7,percent,actual,survey_estimate,geostat_lfs_underuse,1,D5,2026-10-20
+2023,labour.underuse.potential,31.573283403875628,31.6,percent,actual,survey_estimate,geostat_lfs_underuse,1,E5,2026-10-20
+2024,labour.underuse.potential,28.278163339448142,28.3,percent,actual,survey_estimate,geostat_lfs_underuse,1,F5,2026-10-20
+2025,labour.underuse.potential,27.401902618482698,27.4,percent,actual,survey_estimate,geostat_lfs_underuse,1,G5,2026-10-20
+2020,labour.underuse.composite,39.542455612297388,39.5,percent,actual,survey_estimate,geostat_lfs_underuse,1,B6,2026-10-20
+2021,labour.underuse.composite,39.310406203510176,39.3,percent,actual,survey_estimate,geostat_lfs_underuse,1,C6,2026-10-20
+2022,labour.underuse.composite,35.309125702310233,35.3,percent,actual,survey_estimate,geostat_lfs_underuse,1,D6,2026-10-20
+2023,labour.underuse.composite,32.108765942597586,32.1,percent,actual,survey_estimate,geostat_lfs_underuse,1,E6,2026-10-20
+2024,labour.underuse.composite,28.75390388484406,28.8,percent,actual,survey_estimate,geostat_lfs_underuse,1,F6,2026-10-20
+2025,labour.underuse.composite,27.786018292749766,27.8,percent,actual,survey_estimate,geostat_lfs_underuse,1,G6,2026-10-20
+2020,labour.neet.age_15_24.total,28.503552277420045,28.5,percent,actual,survey_estimate,geostat_lfs_neet,1,B3,2026-10-20
+2021,labour.neet.age_15_24.total,26.811211197919967,26.8,percent,actual,survey_estimate,geostat_lfs_neet,1,C3,2026-10-20
+2022,labour.neet.age_15_24.total,23.393213427848433,23.4,percent,actual,survey_estimate,geostat_lfs_neet,1,D3,2026-10-20
+2023,labour.neet.age_15_24.total,20.957467820640943,21.0,percent,actual,survey_estimate,geostat_lfs_neet,1,E3,2026-10-20
+2024,labour.neet.age_15_24.total,17.5235420759604,17.5,percent,actual,survey_estimate,geostat_lfs_neet,1,F3,2026-10-20
+2025,labour.neet.age_15_24.total,17.63918587649129,17.6,percent,actual,survey_estimate,geostat_lfs_neet,1,G3,2026-10-20
+2020,labour.neet.age_15_24.women,28.272932026912017,28.3,percent,actual,survey_estimate,geostat_lfs_neet,1,B4,2026-10-20
+2021,labour.neet.age_15_24.women,26.842585954261107,26.8,percent,actual,survey_estimate,geostat_lfs_neet,1,C4,2026-10-20
+2022,labour.neet.age_15_24.women,23.703102029421018,23.7,percent,actual,survey_estimate,geostat_lfs_neet,1,D4,2026-10-20
+2023,labour.neet.age_15_24.women,21.595235314779114,21.6,percent,actual,survey_estimate,geostat_lfs_neet,1,E4,2026-10-20
+2024,labour.neet.age_15_24.women,17.502883564585307,17.5,percent,actual,survey_estimate,geostat_lfs_neet,1,F4,2026-10-20
+2025,labour.neet.age_15_24.women,17.520760661899967,17.5,percent,actual,survey_estimate,geostat_lfs_neet,1,G4,2026-10-20
+2020,labour.neet.age_15_24.men,28.713530405906173,28.7,percent,actual,survey_estimate,geostat_lfs_neet,1,B5,2026-10-20
+2021,labour.neet.age_15_24.men,26.781103848865278,26.8,percent,actual,survey_estimate,geostat_lfs_neet,1,C5,2026-10-20
+2022,labour.neet.age_15_24.men,23.102098778372486,23.1,percent,actual,survey_estimate,geostat_lfs_neet,1,D5,2026-10-20
+2023,labour.neet.age_15_24.men,20.369353556251259,20.4,percent,actual,survey_estimate,geostat_lfs_neet,1,E5,2026-10-20
+2024,labour.neet.age_15_24.men,17.541906775355713,17.5,percent,actual,survey_estimate,geostat_lfs_neet,1,F5,2026-10-20
+2025,labour.neet.age_15_24.men,17.743009015370536,17.7,percent,actual,survey_estimate,geostat_lfs_neet,1,G5,2026-10-20
+2020,labour.neet.age_15_29.total,35.115330441158896,35.1,percent,actual,survey_estimate,geostat_lfs_neet,1,B9,2026-10-20
+2021,labour.neet.age_15_29.total,34.62661992702963,34.6,percent,actual,survey_estimate,geostat_lfs_neet,1,C9,2026-10-20
+2022,labour.neet.age_15_29.total,30.746493502545025,30.7,percent,actual,survey_estimate,geostat_lfs_neet,1,D9,2026-10-20
+2023,labour.neet.age_15_29.total,26.900748759181702,26.9,percent,actual,survey_estimate,geostat_lfs_neet,1,E9,2026-10-20
+2024,labour.neet.age_15_29.total,24.072515521333639,24.1,percent,actual,survey_estimate,geostat_lfs_neet,1,F9,2026-10-20
+2025,labour.neet.age_15_29.total,23.388541610961568,23.4,percent,actual,survey_estimate,geostat_lfs_neet,1,G9,2026-10-20
+2020,labour.neet.age_15_29.women,38.437375201656515,38.4,percent,actual,survey_estimate,geostat_lfs_neet,1,B10,2026-10-20
+2021,labour.neet.age_15_29.women,37.263933220469134,37.3,percent,actual,survey_estimate,geostat_lfs_neet,1,C10,2026-10-20
+2022,labour.neet.age_15_29.women,34.45761018477144,34.5,percent,actual,survey_estimate,geostat_lfs_neet,1,D10,2026-10-20
+2023,labour.neet.age_15_29.women,30.885103054215463,30.9,percent,actual,survey_estimate,geostat_lfs_neet,1,E10,2026-10-20
+2024,labour.neet.age_15_29.women,27.084135399296649,27.1,percent,actual,survey_estimate,geostat_lfs_neet,1,F10,2026-10-20
+2025,labour.neet.age_15_29.women,26.145948275901592,26.1,percent,actual,survey_estimate,geostat_lfs_neet,1,G10,2026-10-20
+2020,labour.neet.age_15_29.men,32.06643054660632,32.1,percent,actual,survey_estimate,geostat_lfs_neet,1,B11,2026-10-20
+2021,labour.neet.age_15_29.men,32.091511689450172,32.1,percent,actual,survey_estimate,geostat_lfs_neet,1,C11,2026-10-20
+2022,labour.neet.age_15_29.men,27.196894900584134,27.2,percent,actual,survey_estimate,geostat_lfs_neet,1,D11,2026-10-20
+2023,labour.neet.age_15_29.men,23.164283079316807,23.2,percent,actual,survey_estimate,geostat_lfs_neet,1,E11,2026-10-20
+2024,labour.neet.age_15_29.men,21.38442000072239,21.4,percent,actual,survey_estimate,geostat_lfs_neet,1,F11,2026-10-20
+2025,labour.neet.age_15_29.men,20.960113002420357,21.0,percent,actual,survey_estimate,geostat_lfs_neet,1,G11,2026-10-20

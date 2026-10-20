@@ -18,10 +18,12 @@ test("the header, footer and 404 list every sidebar hub, in sidebar order", () =
     "/explorer/living-standards",
     "/explorer/health",
     "/explorer/education",
+    "/explorer/science-culture",
     "/explorer/crime",
     "/explorer/trade",
     "/explorer/external",
     "/explorer/energy-food",
+    "/explorer/environment",
     "/explorer/demography",
   ]);
 });

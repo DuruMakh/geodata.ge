@@ -1,7 +1,7 @@
 import { expect, test, type Page } from "@playwright/test";
 import ExcelJS from "exceljs";
 
-const SECTIONS = ["energy-supply", "electricity", "energy-use", "food-self-sufficiency"] as const;
+const SECTIONS = ["energy-supply", "electricity", "energy-use", "food-self-sufficiency", "farming"] as const;
 const toggle = (id: string) => `[data-series-id="${id}"] [data-testid="series-row-toggle"]`;
 const caret = (id: string) => `[data-series-id="${id}"] [aria-expanded]`;
 const ready = (page: Page) => expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
@@ -92,6 +92,45 @@ test("food shows whole-number wheat self-sufficiency and nests four meats under 
   await expect(wheat).toContainText("Wheat");
   await expect(wheat.locator("td").last()).toHaveText("19%");
   await expect(page.getByTestId("explorer-table")).not.toContainText("19.0");
+});
+
+for (const [prefix, line] of [["", "პროდუქციის გამოშვება · 2025: 8,384.9 მლნ ₾"], ["/en", "Farm output · 2025: 8,384.9 million ₾"]] as const) {
+  test(`farming defaults to farm output and states the 2025 value on one line at 375px (${prefix || "ka"})`, async ({ page }) => {
+    await page.setViewportSize({ width: 375, height: 800 });
+    await page.goto(`${prefix}/explorer/energy-food/farming`);
+    await ready(page);
+    const latest = page.getByTestId("energy-food-latest");
+    await expect(latest).toHaveText(line);
+    const { height, lineHeight } = await latest.evaluate(element => ({ height: element.getBoundingClientRect().height, lineHeight: parseFloat(getComputedStyle(element).lineHeight) }));
+    expect(height, "the latest line stays on one line").toBeLessThan(lineHeight * 1.5);
+    await expect(page.locator(toggle("farming.output.total"))).toHaveAttribute("aria-pressed", "true");
+    await expect(page.locator('[data-testid="series-row-toggle"][aria-pressed="true"]')).toHaveCount(1);
+    await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-unit", "million_gel");
+  });
+}
+
+test("ticking a price replaces the output selection and the unit label reads ₾ per kg", async ({ page }) => {
+  await page.goto("/en/explorer/energy-food/farming");
+  await ready(page);
+  await page.locator(toggle("farming.price.wheat")).click();
+  await expect(page.locator(toggle("farming.price.wheat"))).toHaveAttribute("aria-pressed", "true");
+  await expect(page.locator(toggle("farming.output.total"))).toHaveAttribute("aria-pressed", "false");
+  await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-unit", "price");
+  await expect(page.getByTestId("chart-panel")).toContainText("₾ per kg");
+  await expect(page.getByTestId("range-start-handle")).toHaveAttribute("aria-valuenow", "2014");
+  await expect(page).toHaveURL(/sel=farming\.price\.wheat(&|$)/);
+  // Prices read two decimals in the list, quantities one.
+  await expect(page.locator('[data-series-id="farming.price.wheat"]')).toContainText("0.57");
+  await expect(page.locator('[data-series-id="farming.harvest.grapes"]')).toContainText("348.9");
+});
+
+test("the list shows five headings and every row from the start", async ({ page }) => {
+  await page.goto("/en/explorer/energy-food/farming");
+  await ready(page);
+  await expect(page.getByTestId("series-heading")).toHaveText(["Farm output, million ₾", "Harvests, thousand tonnes", "Livestock, thousand head", "Meat, milk and eggs", "Farm-gate prices, ₾ per kg"]);
+  await expect(page.locator("[data-series-id]")).toHaveCount(41);
+  await expect(page.locator("[data-series-id] [aria-expanded]")).toHaveCount(0);
+  await expect(page.getByTestId("source-label")).toContainText("Agriculture");
 });
 
 test("clearing the selection shows the empty callout and disables Excel", async ({ page }) => {
