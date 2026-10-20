@@ -1,5 +1,6 @@
 import { EnvironmentCityIndex } from "../../components/environment/environment-city-index";
 import { EnvironmentExplorer } from "../../components/environment/environment-explorer";
+import { BudgetHub } from "../../components/hub/budget-hub";
 import { ENVIRONMENT_STATIONS } from "../data/environment/types";
 import { buildEnvironmentCityCards } from "../explorer/environmentHubCards";
 import { AIR_QUALITY_PATH, environmentCityCoverage, environmentCityHeadline, environmentCityHref, environmentCitySeries, environmentHighestPm10 } from "../explorer/environmentCities";
@@ -33,7 +34,9 @@ export async function renderEnvironmentAirQualityIndex(locale: Locale) {
   return renderEnvironmentFrame({
     ...page, href: AIR_QUALITY_PATH, title: t("page.air-quality.title"), description: t("page.air-quality.summary"), firstYear: Math.min(...years), lastYear: Math.max(...years),
     measures: [t("heading.pm10Avg")],
-    children: <EnvironmentCityIndex cards={buildEnvironmentCityCards(aq, presentation)} latest={{ measure: `${t(`city.${highest.city}`)}, ${t("latest.pm10")}`, year: latest.year, value: latest.value }} />,
+    children: <EnvironmentCityIndex latest={{ measure: `${t(`city.${highest.city}`)}, ${t("latest.pm10")}`, year: latest.year, value: latest.value }}>
+      <BudgetHub cards={buildEnvironmentCityCards(aq, presentation)} locale={locale} testId="environment-city-cards" />
+    </EnvironmentCityIndex>,
   });
 }
 
