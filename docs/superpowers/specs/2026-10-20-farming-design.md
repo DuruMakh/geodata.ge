@@ -34,7 +34,7 @@ Same rules as the other Energy and food pages:
 - Under the heading only one short line: **"Farm output · 2025: 8,384.9 million ₾"**. It must fit on one line on a phone.
 - No tabs and no icon switches. One series list on the right holds every series, flat, under five small headings. Nothing is tucked under an expandable row.
 - Only **Farm output, total** is selected first. It stays first, selectable and removable.
-- The chart shows one unit at a time: ticking a row with a different unit replaces the selection (the Business rule). Crop harvests and meat share the unit "thousand tonnes", so they can be compared on one chart.
+- The chart shows one heading's unit at a time: ticking a row under another heading, or of another unit, replaces the selection (the Business rule, with the heading as the group as on Education's place pages). Harvests and meat are both in thousand tonnes but stay separate charts, so no chart holds more series than the palette has colours and no two lines share a colour. The twelve prices share one chart.
 - Each heading's rows show their latest value in the list. The year range fits the selected unit: prices start in 2014, farm output in 2010, everything else in 2006.
 - Chart | Table, the year range and Excel work as on the other pages, and the selection lives in the URL.
 - One short source line under the chart, with the methodology link.
@@ -51,7 +51,7 @@ Same rules as the other Energy and food pages:
 
 That is 41 rows. Each chosen row runs without gaps over its years. Rows Geostat only publishes from 2016 (winter and spring wheat, white and red grapes, chicken) are left out so no row starts with a long gap.
 
-The five prices share one ₾ axis; the list row names say "per litre" and "per piece" for milk and eggs, so nothing is compared without its unit.
+The twelve prices share one ₾ axis; the list row names say "per litre" and "per piece" for milk and eggs, so nothing is compared without its unit.
 
 Values show as Geostat prints them: one decimal for quantities and output, two decimals for prices.
 
