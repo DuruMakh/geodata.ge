@@ -1083,6 +1083,104 @@
     },
     "derivation": null
   },
+  "source.geostat_lfs_jobs_industry": {
+    "name": {
+      "text": "Employed persons by economic activity (NACE rev. 2)",
+      "reviewedAt": "2026-10-20"
+    },
+    "derivation": null
+  },
+  "source.geostat_lfs_hours_sex": {
+    "name": {
+      "text": "Average usual weekly hours of work in the main job, by economic activity and sex",
+      "reviewedAt": "2026-10-20"
+    },
+    "derivation": null
+  },
+  "source.geostat_lfs_hours_settlement": {
+    "name": {
+      "text": "Average usual weekly hours of work in the main job, by economic activity and urban or rural area",
+      "reviewedAt": "2026-10-20"
+    },
+    "derivation": null
+  },
+  "source.geostat_lfs_informal": {
+    "name": {
+      "text": "Share of informal employment in non-agricultural employment",
+      "reviewedAt": "2026-10-20"
+    },
+    "derivation": null
+  },
+  "source.geostat_lfs_underuse": {
+    "name": {
+      "text": "Indicators of labour underutilization",
+      "reviewedAt": "2026-10-20"
+    },
+    "derivation": null
+  },
+  "source.geostat_lfs_neet": {
+    "name": {
+      "text": "Young people not in employment, education or training (NEET)",
+      "reviewedAt": "2026-10-20"
+    },
+    "derivation": null
+  },
+  "source.geostat_lfs_jobs_industry_ka": {
+    "name": {
+      "text": "Employed persons by economic activity (NACE rev. 2) (Georgian version)",
+      "reviewedAt": "2026-10-20"
+    },
+    "derivation": null
+  },
+  "source.geostat_lfs_hours_sex_ka": {
+    "name": {
+      "text": "Average usual weekly hours of work in the main job, by economic activity and sex (Georgian version)",
+      "reviewedAt": "2026-10-20"
+    },
+    "derivation": null
+  },
+  "source.geostat_lfs_hours_settlement_ka": {
+    "name": {
+      "text": "Average usual weekly hours of work in the main job, by economic activity and urban or rural area (Georgian version)",
+      "reviewedAt": "2026-10-20"
+    },
+    "derivation": null
+  },
+  "source.geostat_lfs_informal_ka": {
+    "name": {
+      "text": "Share of informal employment in non-agricultural employment (Georgian version)",
+      "reviewedAt": "2026-10-20"
+    },
+    "derivation": null
+  },
+  "source.geostat_lfs_underuse_ka": {
+    "name": {
+      "text": "Indicators of labour underutilization (Georgian version)",
+      "reviewedAt": "2026-10-20"
+    },
+    "derivation": null
+  },
+  "source.geostat_lfs_neet_ka": {
+    "name": {
+      "text": "Young people not in employment, education or training (NEET) (Georgian version)",
+      "reviewedAt": "2026-10-20"
+    },
+    "derivation": null
+  },
+  "source.geostat_lfs_detail_page": {
+    "name": {
+      "text": "Employment and unemployment (source page capture)",
+      "reviewedAt": "2026-10-20"
+    },
+    "derivation": null
+  },
+  "source.geostat_lfs_detail_page_ka": {
+    "name": {
+      "text": "Employment and unemployment, Georgian (source page capture)",
+      "reviewedAt": "2026-10-20"
+    },
+    "derivation": null
+  },
   "source.geostat_trade_ftrade_1995_2026": {
     "name": {
       "text": "Goods exports and imports in 1995–2026",
