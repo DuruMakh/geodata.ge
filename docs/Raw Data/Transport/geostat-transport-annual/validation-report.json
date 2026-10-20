@@ -1,0 +1,222 @@
+{
+  "status": "passed",
+  "retrieved_at": "2026-10-20",
+  "scope": "Annual research only: the road vehicle fleet by type, fuel and age (H-3, H-4), passenger and freight transport demand by mode (H-1, H-2), passengers and freight carried by railway, metro, airports, Georgian airlines and sea ports, registered vehicles by region, type, fuel, owner and age, and road length by region; yearly values to 2025 only, no quarters, no 2026 values, no percentage rows",
+  "primary_observation_count": 4301,
+  "observations_by_measure": {
+    "fleet": 486,
+    "freight_tonnes": 89,
+    "passenger_km": 156,
+    "passenger_km_per_person": 26,
+    "passengers": 69,
+    "registered": 2632,
+    "road_km": 728,
+    "tonne_km": 115
+  },
+  "observations_by_source": {
+    "geostat_transport_airlines": 28,
+    "geostat_transport_airports": 22,
+    "geostat_transport_fleet_age": 171,
+    "geostat_transport_fleet_fuel": 315,
+    "geostat_transport_freight_demand": 115,
+    "geostat_transport_metro": 14,
+    "geostat_transport_passenger_demand": 182,
+    "geostat_transport_rail_goods": 40,
+    "geostat_transport_rail_passengers": 24,
+    "geostat_transport_registered": 2632,
+    "geostat_transport_roads": 728,
+    "geostat_transport_sea_freight": 24,
+    "geostat_transport_sea_passengers": 6
+  },
+  "indicator_count": 452,
+  "imputed_values": 0,
+  "calculated_values": 0,
+  "reconciliation_failed_count": 0,
+  "checks": {
+    "coverage_matches_year_ranges": true,
+    "values_match_source_cells": true,
+    "published_values_are_rounded_stored_values_at_unit_precision": true,
+    "nil_cells": "served as 0 where the table legend says magnitude nil; gaps in H-2, whose legend says data not available",
+    "parts_add_up_to_totals": {
+      "tolerance": {
+        "national": "0.1",
+        "modes": "0.2",
+        "regional": "0.2"
+      },
+      "totals_compared": 1103
+    },
+    "recorded_differences_parts_minus_total": {
+      "fleet.buses by fuel:2020": "0.2",
+      "fleet.special by fuel:2025": "-0.2"
+    },
+    "h3_and_h4_totals_equal": 104,
+    "rows_nil_in_every_year_not_served": true,
+    "no_2026_or_quarter_values": true,
+    "anchor_values": {
+      "transport.fleet.cars:2025": "1650.0",
+      "transport.fleet.cars:2000": "244.8",
+      "transport.fleet.cars_fuel_electric:2025": "15.2",
+      "transport.fleet.cars_age_over_10:2025": "1318.9",
+      "transport.passenger_km.total:2025": "11262.1",
+      "transport.passenger_km.air:2025": "1862.6",
+      "transport.tonne_km.rail:2025": "3814.9",
+      "transport.freight_tonnes.rail_transit:2025": "7616.6",
+      "transport.registered.region_tbilisi:2025": "855.0",
+      "transport.registered.total:2025": "1914.9",
+      "transport.registered.region_guria:2025": "40.7",
+      "transport.passengers.metro:2025": "147641.4"
+    }
+  },
+  "source_checks": [
+    {
+      "source_id": "geostat_transport_passenger_demand",
+      "sha256": "59B5F100EFFECE90D772CDBC16DE75D2F445416B6F585E1C8CC431D47A432B1C",
+      "bytes": 17378,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_transport_freight_demand",
+      "sha256": "A880BBF429829DA1623FB34772A1BDF1CA80A35B6FC524FD993FDC36A7B6DCFE",
+      "bytes": 16375,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_transport_fleet_fuel",
+      "sha256": "B29B16BFD028246A742EAF77C01CD04104912AE0E30DDEAC527283949D7DBB98",
+      "bytes": 22632,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_transport_fleet_age",
+      "sha256": "75BEC006719D3D4496C5923C53CE62D99171B79B4712678D312BA82CA4EFC774",
+      "bytes": 18454,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_transport_rail_turnover",
+      "sha256": "DF1309D2DE369C1C057F4210BC1BD280615624A5556C3C4BE141FAE9A5158031",
+      "bytes": 65706,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_transport_rail_goods",
+      "sha256": "DBA8C11E55D0AB785173F212365F0C4DE6C4A3FD568B7E399793997DBF2FD7BB",
+      "bytes": 89640,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_transport_rail_passengers",
+      "sha256": "27B4DF79D3A87F46FAD3870B8779A069306FC54E9B2A2E89598A5DBCDA3909F7",
+      "bytes": 15549,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_transport_rail_infrastructure",
+      "sha256": "83665453E77A851A486447DD4CFFC0EC845A1CFF1E138FD4BBEDD664FEBD16BC",
+      "bytes": 16149,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_transport_metro",
+      "sha256": "0E05D74A7B0CCE1EC4EB43251BD764C587883CAE11DF8A0ACE79AAF6F8DAB74B",
+      "bytes": 14215,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_transport_rail_regions",
+      "sha256": "C09BE8304DFEF8949C4CD53D13CD2B7E34CA0B296A30B901B0EF17943AF51452",
+      "bytes": 85465,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_transport_airlines",
+      "sha256": "F904B6D8370762B3F58104D842EA5C91E8D459C007F702479E4F0A635D6C3FA9",
+      "bytes": 16776,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_transport_airports",
+      "sha256": "DC354002D79813F37D865E1237E7B5A7C375B8C3599F2BF8E44AAE1D0768996E",
+      "bytes": 27271,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_transport_air_infrastructure",
+      "sha256": "93E736BD000C86D5C83CBF1A6354C510AD8A36C9660B890E0FAA882727F4463F",
+      "bytes": 14180,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_transport_roads",
+      "sha256": "F1F1C1275ABD3D0DF35ED9CB36856540253828168653E814E7F9223BEC67FE51",
+      "bytes": 47616,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_transport_taxi_licences",
+      "sha256": "8D48F2B3DF08F94BCA310FECD8988912E8D5F11816E496CB16ACE4AC9CB9048D",
+      "bytes": 13655,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_transport_registered",
+      "sha256": "F6459FB2D9E94AC788F11A9DC6FD2AD1ED1687FB381F3AF05487B9312B3816B8",
+      "bytes": 41601,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_transport_technical_inspections",
+      "sha256": "DBA4D643CFBE95E83FAF1537EAA6DF5CA9A4A376D3DE4DDD20FBB79D9EE597CF",
+      "bytes": 12921,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_transport_sea_passengers",
+      "sha256": "371BC6EB82618C4C5BFB577DCC2EA14CDB73A4FCE944E702A3CE97792E66CBA2",
+      "bytes": 11996,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_transport_sea_ships",
+      "sha256": "E6C96D20545CA82B00552293E356E25739C58FCB0BBC11CC052E0499D835BA9E",
+      "bytes": 39863,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_transport_sea_freight",
+      "sha256": "3ADEF2B2FCBB78650D9043DDF6C4ECF2AEDD06EF8D4747A865BB2D61AD8684F3",
+      "bytes": 12761,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_transport_environment_page",
+      "sha256": "0A1267369F05A46EA3112382043F9CA89C08B5C8E0C2BA0183518D9C969FCD06",
+      "bytes": 131668,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_transport_rail_page",
+      "sha256": "4ED2F6DF7398AC9036D592DED81D4B29612FAD7D5CB9743A5B9D352054939791",
+      "bytes": 74754,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_transport_air_page",
+      "sha256": "75F2682F25191DE29AC722D18F0A2BA29B91DC77140CE68BC94BB5DA5CFD9A47",
+      "bytes": 68859,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_transport_road_page",
+      "sha256": "1A59B0637BF8BD8604EFBC53C5465D57E00AB607582BC6D60AFF321ED21D0480",
+      "bytes": 70744,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_transport_sea_page",
+      "sha256": "6C6360AACC3EDEBA9AD49B61DE16212579B44C8DFFC7AEC49DB59FEE244856B1",
+      "bytes": 69106,
+      "passed": true
+    }
+  ]
+}
