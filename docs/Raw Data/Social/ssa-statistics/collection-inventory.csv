@@ -1,0 +1,87 @@
+﻿category_id,category_en,table_no,title_en,first_year,last_year,expected_files,saved_files,missing_files,status,source_page
+pension,State pension,1,Pension recipients and the amount payable to them,2012,2026,15,15,0,saved,https://ssa.moh.gov.ge/statistik.php?lang=1&id=202212062357308514338028&v=0
+pension,State pension,2,Pension recipients with IDP status and the amount payable to them,2012,2026,16,16,0,saved,https://ssa.moh.gov.ge/statistik.php?lang=1&id=202212062357308514338028&v=0
+pension,State pension,3,Pension recipients by age and sex,2012,2026,15,15,0,saved,https://ssa.moh.gov.ge/statistik.php?lang=1&id=202212062357308514338028&v=0
+pension,State pension,4,High-mountain state pension supplement: recipients and amount transferred,2016,2026,11,11,0,saved,https://ssa.moh.gov.ge/statistik.php?lang=1&id=202212062357308514338028&v=0
+pension,State pension,5,High-mountain state pension recipients by age and sex,2025,2026,2,2,0,saved,https://ssa.moh.gov.ge/statistik.php?lang=1&id=202212062357308514338028&v=0
+socpackage,Social package,1,Social package recipients by group,2012,2026,15,15,0,saved,https://ssa.moh.gov.ge/statistik.php?lang=1&id=202212062358125404245357&v=0
+socpackage,Social package,2,Amount transferred to fund the social package by group,2012,2026,15,15,0,saved,https://ssa.moh.gov.ge/statistik.php?lang=1&id=202212062358125404245357&v=0
+socpackage,Social package,3,Social package recipients with IDP status by group,2012,2026,15,15,0,saved,https://ssa.moh.gov.ge/statistik.php?lang=1&id=202212062358125404245357&v=0
+socpackage,Social package,4,Amount transferred for the social package of IDP-status recipients by group,2012,2026,15,15,0,saved,https://ssa.moh.gov.ge/statistik.php?lang=1&id=202212062358125404245357&v=0
+socpackage,Social package,5,Social package recipients by sex and age group,2012,2026,15,15,0,saved,https://ssa.moh.gov.ge/statistik.php?lang=1&id=202212062358125404245357&v=0
+socpackage,Social package,6,Social package recipients by group in a sex-age breakdown,2012,2026,15,15,0,saved,https://ssa.moh.gov.ge/statistik.php?lang=1&id=202212062358125404245357&v=0
+socpackage,Social package,7,Social package recipients by group and benefit amount,2012,2026,15,15,0,saved,https://ssa.moh.gov.ge/statistik.php?lang=1&id=202212062358125404245357&v=0
+socpackage,Social package,8,Social package recipients by district and benefit amount,2012,2026,15,15,0,saved,https://ssa.moh.gov.ge/statistik.php?lang=1&id=202212062358125404245357&v=0
+socpackage,Social package,9,Social package recipients by benefit amount within age groups,2012,2026,15,15,0,saved,https://ssa.moh.gov.ge/statistik.php?lang=1&id=202212062358125404245357&v=0
+socpackage,Social package,10,High-mountain social package supplement: recipients and amount transferred,2016,2026,11,11,0,saved,https://ssa.moh.gov.ge/statistik.php?lang=1&id=202212062358125404245357&v=0
+socpackage,Social package,11,Social package recipients with disability status: recipients and amount transferred,2025,2026,2,2,0,saved,https://ssa.moh.gov.ge/statistik.php?lang=1&id=202212062358125404245357&v=0
+workinjury,Workplace-injury compensation benefit,1,Beneficiaries by age group,2013,2026,14,14,0,saved,https://ssa.moh.gov.ge/statistik.php?lang=1&id=202212062359118261933941&v=0
+workinjury,Workplace-injury compensation benefit,2,Beneficiaries by assigned-amount band,2014,2026,13,13,0,saved,https://ssa.moh.gov.ge/statistik.php?lang=1&id=202212062359118261933941&v=0
+workinjury,Workplace-injury compensation benefit,3,Amount transferred,2013,2026,14,14,0,saved,https://ssa.moh.gov.ge/statistik.php?lang=1&id=202212062359118261933941&v=0
+compensation,State compensation and academic stipend,1,Compensation and stipend recipients by agency,2008,2026,19,19,0,saved,https://ssa.moh.gov.ge/statistik.php?lang=1&id=202212062359273510106635&v=0
+compensation,State compensation and academic stipend,2,Compensation and stipend recipients by sex and age,2014,2026,13,13,0,saved,https://ssa.moh.gov.ge/statistik.php?lang=1&id=202212062359273510106635&v=0
+compensation,State compensation and academic stipend,3,Monthly amount required for compensation and stipends by agency,2008,2026,20,20,0,saved,https://ssa.moh.gov.ge/statistik.php?lang=1&id=202212062359273510106635&v=0
+compensation,State compensation and academic stipend,4,Monthly amount transferred for compensation and stipends by agency,2009,2026,18,18,0,saved,https://ssa.moh.gov.ge/statistik.php?lang=1&id=202212062359273510106635&v=0
+compensation,State compensation and academic stipend,5,Compensation and stipend recipients and amount transferred by legal basis,2024,2026,3,3,0,saved,https://ssa.moh.gov.ge/statistik.php?lang=1&id=202212062359273510106635&v=0
+utilitysubsidy,Household (utility) subsidy,1,Utility subsidy recipients by subsidy amount,2009,2026,18,18,0,saved,https://ssa.moh.gov.ge/statistik.php?lang=1&id=202212070000046990201401&v=0
+utilitysubsidy,Household (utility) subsidy,2,Amount transferred to utility subsidy recipients,2009,2026,18,18,0,saved,https://ssa.moh.gov.ge/statistik.php?lang=1&id=202212070000046990201401&v=0
+utilitysubsidy,Household (utility) subsidy,3,Utility subsidy recipients by sex and age,2014,2026,13,13,0,saved,https://ssa.moh.gov.ge/statistik.php?lang=1&id=202212070000046990201401&v=0
+utilitysubsidy,Household (utility) subsidy,4,Utility subsidy recipients by subsidy category,2009,2026,18,18,0,saved,https://ssa.moh.gov.ge/statistik.php?lang=1&id=202212070000046990201401&v=0
+utilitysubsidy,Household (utility) subsidy,5,Utility subsidy recipients by subsidy category and amount,2009,2026,18,18,0,saved,https://ssa.moh.gov.ge/statistik.php?lang=1&id=202212070000046990201401&v=0
+tsa_db,Targeted social assistance database (registered families),1,Families registered in the database and families receiving subsistence allowance,2008,2026,19,19,0,saved,https://ssa.moh.gov.ge/statistik.php?lang=1&id=202212070000144333422303&v=0
+tsa_db,Targeted social assistance database (registered families),2,Registered persons by age group,2008,2026,19,19,0,saved,https://ssa.moh.gov.ge/statistik.php?lang=1&id=202212070000144333422303&v=0
+tsa_db,Targeted social assistance database (registered families),3,Registered families by household size,2008,2026,19,19,0,saved,https://ssa.moh.gov.ge/statistik.php?lang=1&id=202212070000144333422303&v=0
+tsa_db,Targeted social assistance database (registered families),4,Registered families by rating-score band,2008,2026,19,19,0,saved,https://ssa.moh.gov.ge/statistik.php?lang=1&id=202212070000144333422303&v=0
+tsa_db,Targeted social assistance database (registered families),5,Registered persons by rating-score band,2008,2026,19,19,0,saved,https://ssa.moh.gov.ge/statistik.php?lang=1&id=202212070000144333422303&v=0
+tsa_db,Targeted social assistance database (registered families),6,Registered persons by sex,2009,2026,18,18,0,saved,https://ssa.moh.gov.ge/statistik.php?lang=1&id=202212070000144333422303&v=0
+tsa_db,Targeted social assistance database (registered families),7,Registered persons with disabilities,2008,2026,19,19,0,saved,https://ssa.moh.gov.ge/statistik.php?lang=1&id=202212070000144333422303&v=0
+tsa_db,Targeted social assistance database (registered families),8,Registered families and persons by registration period,2008,2026,19,19,0,saved,https://ssa.moh.gov.ge/statistik.php?lang=1&id=202212070000144333422303&v=0
+tsa_db,Targeted social assistance database (registered families),9,Declarations filed by registered families by filing period,2009,2026,18,18,0,saved,https://ssa.moh.gov.ge/statistik.php?lang=1&id=202212070000144333422303&v=0
+tsa_db,Targeted social assistance database (registered families),10,Persons in families with a rating score of 70000 or less by age group,2010,2026,17,17,0,saved,https://ssa.moh.gov.ge/statistik.php?lang=1&id=202212070000144333422303&v=0
+tsa_allowance,Subsistence allowance (TSA cash benefit),1,Families and persons receiving subsistence allowance,2008,2026,19,19,0,saved,https://ssa.moh.gov.ge/statistik.php?lang=1&id=202212070002225855299551&v=0
+tsa_allowance,Subsistence allowance (TSA cash benefit),2,Amount transferred as subsistence allowance,2008,2026,19,19,0,saved,https://ssa.moh.gov.ge/statistik.php?lang=1&id=202212070002225855299551&v=0
+tsa_allowance,Subsistence allowance (TSA cash benefit),3,Subsistence allowance recipients by age group,2008,2026,19,19,0,saved,https://ssa.moh.gov.ge/statistik.php?lang=1&id=202212070002225855299551&v=0
+tsa_allowance,Subsistence allowance (TSA cash benefit),4,Subsistence allowance recipients by sex,2009,2026,18,18,0,saved,https://ssa.moh.gov.ge/statistik.php?lang=1&id=202212070002225855299551&v=0
+tsa_allowance,Subsistence allowance (TSA cash benefit),5,Recipient families by household size,2008,2026,19,19,0,saved,https://ssa.moh.gov.ge/statistik.php?lang=1&id=202212070002225855299551&v=0
+tsa_allowance,Subsistence allowance (TSA cash benefit),6,IDP families and persons receiving subsistence allowance,2008,2026,19,19,0,saved,https://ssa.moh.gov.ge/statistik.php?lang=1&id=202212070002225855299551&v=0
+tsa_allowance,Subsistence allowance (TSA cash benefit),7,Eligible families (score under the threshold) who were not paid the allowance,2009,2026,18,18,0,saved,https://ssa.moh.gov.ge/statistik.php?lang=1&id=202212070002225855299551&v=0
+tsa_allowance,Subsistence allowance (TSA cash benefit),8,Eligible persons (family score under the threshold) who were not paid the allowance,2009,2026,18,18,0,saved,https://ssa.moh.gov.ge/statistik.php?lang=1&id=202212070002225855299551&v=0
+tsa_allowance,Subsistence allowance (TSA cash benefit),9,Recipient families by rating-score band,2016,2026,11,11,0,saved,https://ssa.moh.gov.ge/statistik.php?lang=1&id=202212070002225855299551&v=0
+tsa_allowance,Subsistence allowance (TSA cash benefit),10,Recipient persons by rating-score band,2016,2026,11,11,0,saved,https://ssa.moh.gov.ge/statistik.php?lang=1&id=202212070002225855299551&v=0
+tsa_allowance,Subsistence allowance (TSA cash benefit),11,Recipients under 16 by rating-score band,2017,2026,10,10,0,saved,https://ssa.moh.gov.ge/statistik.php?lang=1&id=202212070002225855299551&v=0
+demography,Demographic support programme (child benefits),1,Recipient families with a third or later child by parent's age,2014,2026,13,13,0,saved,https://ssa.moh.gov.ge/statistik.php?lang=1&id=202212070003083437602993&v=0
+demography,Demographic support programme (child benefits),2,Third and later children receiving the benefit by sex and amount transferred,2014,2026,13,13,0,saved,https://ssa.moh.gov.ge/statistik.php?lang=1&id=202212070003083437602993&v=0
+demography,Demographic support programme (child benefits),3,High-mountain recipient families with a first or later child by parent's age,2016,2026,11,11,0,saved,https://ssa.moh.gov.ge/statistik.php?lang=1&id=202212070003083437602993&v=0
+demography,Demographic support programme (child benefits),4,High-mountain children receiving the benefit by sex and amount transferred,2016,2026,11,11,0,saved,https://ssa.moh.gov.ge/statistik.php?lang=1&id=202212070003083437602993&v=0
+highmountain,High-mountain settlement support,1,High-mountain doctors and nurses receiving a salary supplement and amount transferred,2016,2026,11,11,0,saved,https://ssa.moh.gov.ge/statistik.php?lang=1&id=202301201248106959919933&v=0
+highmountain,High-mountain settlement support,2,High-mountain doctors and nurses receiving the supplement by employing medical institution,2016,2026,11,11,0,saved,https://ssa.moh.gov.ge/statistik.php?lang=1&id=202301201248106959919933&v=0
+highmountain,High-mountain settlement support,3,High-mountain residents receiving the electricity discount and amount transferred,2017,2026,10,10,0,saved,https://ssa.moh.gov.ge/statistik.php?lang=1&id=202301201248106959919933&v=0
+idp_refugee,IDP and refugee allowance,1,IDP and refugee allowance recipients,2010,2026,17,17,0,saved,https://ssa.moh.gov.ge/statistik.php?lang=1&id=202212070009083804291872&v=0
+idp_refugee,IDP and refugee allowance,2,Amount transferred as IDP and refugee allowance,2010,2026,17,17,0,saved,https://ssa.moh.gov.ge/statistik.php?lang=1&id=202212070009083804291872&v=0
+idp_refugee,IDP and refugee allowance,3,IDP and refugee allowance recipients by sex and age,2014,2026,13,13,0,saved,https://ssa.moh.gov.ge/statistik.php?lang=1&id=202212070009083804291872&v=0
+maternity,"Maternity, childcare and adoption benefit",1,"Maternity, childcare and adoption cases by parent's age and amount transferred",2014,2026,13,13,0,saved,https://ssa.moh.gov.ge/statistik.php?lang=1&id=202212070009288678717789&v=0
+maternity,"Maternity, childcare and adoption benefit",2,"Maternity, childcare and adoption cases by month",2010,2013,4,4,0,saved,https://ssa.moh.gov.ge/statistik.php?lang=1&id=202212070009288678717789&v=0
+maternity,"Maternity, childcare and adoption benefit",3,"Amount transferred for maternity, childcare and adoption cases by month",2010,2013,4,4,0,saved,https://ssa.moh.gov.ge/statistik.php?lang=1&id=202212070009288678717789&v=0
+other,Other programmes,1,Subscribers subsidised for the electricity tariff increase and amount transferred,2015,2026,12,12,0,saved,https://ssa.moh.gov.ge/statistik.php?lang=1&id=202212070011506407356915&v=0
+other,Other programmes,2,Electricity subsidy for parents of large families: beneficiaries and amount transferred,2019,2026,8,8,0,saved,https://ssa.moh.gov.ge/statistik.php?lang=1&id=202212070011506407356915&v=0
+other,Other programmes,3,Drinking water and sewerage subsidy: subscribers and amount transferred,2021,2026,6,6,0,saved,https://ssa.moh.gov.ge/statistik.php?lang=1&id=202212070011506407356915&v=0
+other,Other programmes,4,COVID-19 compensation for socially vulnerable and disabled people: beneficiaries and amount,2020,2021,2,2,0,saved,https://ssa.moh.gov.ge/statistik.php?lang=1&id=202212070011506407356915&v=0
+other,Other programmes,5,COVID-19 government compensations: recipients and amount transferred,2020,2020,1,1,0,saved,https://ssa.moh.gov.ge/statistik.php?lang=1&id=202212070011506407356915&v=0
+pre2012,Statistics before 1 September 2012,1,State pension recipients by pension type,2008,2012,5,5,0,saved,https://ssa.moh.gov.ge/statistik.php?lang=1&id=202304060739071683744297&v=0
+pre2012,Statistics before 1 September 2012,2,Total monthly pension payable by pension type,2008,2012,5,5,0,saved,https://ssa.moh.gov.ge/statistik.php?lang=1&id=202304060739071683744297&v=0
+pre2012,Statistics before 1 September 2012,3,IDP-status pension recipients by pension type,2008,2012,5,5,0,saved,https://ssa.moh.gov.ge/statistik.php?lang=1&id=202304060739071683744297&v=0
+pre2012,Statistics before 1 September 2012,4,Total monthly pension payable to IDP-status recipients by pension type,2008,2012,5,5,0,saved,https://ssa.moh.gov.ge/statistik.php?lang=1&id=202304060739071683744297&v=0
+pre2012,Statistics before 1 September 2012,5,Pension recipients by sex,2008,2012,5,5,0,saved,https://ssa.moh.gov.ge/statistik.php?lang=1&id=202304060739071683744297&v=0
+pre2012,Statistics before 1 September 2012,6,Pension recipients by sex and pension type,2008,2012,5,5,0,saved,https://ssa.moh.gov.ge/statistik.php?lang=1&id=202304060739071683744297&v=0
+pre2012,Statistics before 1 September 2012,7,Terminated or suspended pensions by reason,2008,2012,5,5,0,saved,https://ssa.moh.gov.ge/statistik.php?lang=1&id=202304060739071683744297&v=0
+pre2012,Statistics before 1 September 2012,8,Pension recipients by district and age group,2008,2012,5,5,0,saved,https://ssa.moh.gov.ge/statistik.php?lang=1&id=202304060739071683744297&v=0
+pre2012,Statistics before 1 September 2012,9,Pension recipients by age group and pension type,2008,2012,5,5,0,saved,https://ssa.moh.gov.ge/statistik.php?lang=1&id=202304060739071683744297&v=0
+pre2012,Statistics before 1 September 2012,10,Pensioners by pension type and pension amount,2009,2012,4,4,0,saved,https://ssa.moh.gov.ge/statistik.php?lang=1&id=202304060739071683744297&v=0
+pre2012,Statistics before 1 September 2012,11,Pensioners by district and pension amount,2009,2012,4,4,0,saved,https://ssa.moh.gov.ge/statistik.php?lang=1&id=202304060739071683744297&v=0
+pre2012,Statistics before 1 September 2012,12,State pension recipients by amount within age groups,2010,2012,3,3,0,saved,https://ssa.moh.gov.ge/statistik.php?lang=1&id=202304060739071683744297&v=0
+pre2012,Statistics before 1 September 2012,13,Length-of-service supplement recipients by supplement amount,2011,2012,2,2,0,saved,https://ssa.moh.gov.ge/statistik.php?lang=1&id=202304060739071683744297&v=0
+pre2012,Statistics before 1 September 2012,14,Family assistance recipient families by category,2008,2012,5,5,0,saved,https://ssa.moh.gov.ge/statistik.php?lang=1&id=202304060739071683744297&v=0
+pre2012,Statistics before 1 September 2012,15,Monthly amount transferred to family assistance families,2008,2012,5,5,0,saved,https://ssa.moh.gov.ge/statistik.php?lang=1&id=202304060739071683744297&v=0
+pre2012,Statistics before 1 September 2012,16,Family assistance recipient families by transfer period,2008,2012,5,5,0,saved,https://ssa.moh.gov.ge/statistik.php?lang=1&id=202304060739071683744297&v=0
+pre2012,Statistics before 1 September 2012,17,State assistance recipients,2011,2012,2,2,0,saved,https://ssa.moh.gov.ge/statistik.php?lang=1&id=202304060739071683744297&v=0
+pre2012,Statistics before 1 September 2012,18,Amount transferred to state assistance recipients,2011,2012,2,2,0,saved,https://ssa.moh.gov.ge/statistik.php?lang=1&id=202304060739071683744297&v=0

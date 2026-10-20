@@ -1,0 +1,16 @@
+﻿source_id,sheets,rows,first_year,last_year,published_values,unavailable_values
+pension-social-package,1,11,2007,2025,210,0
+pension-social-package-regions-sex,2,24,2012,2025,1008,0
+pension-municipalities,1,82,2012,2025,1137,11
+social-package-municipalities,1,82,2012,2025,1137,11
+subsistence-families-municipalities,3,249,2012,2025,2622,34
+subsistence-beneficiaries,1,4,2007,2025,44,32
+child-care-institutions,1,2,2009,2023,21,9
+accumulative-pension,1,18,2020,2025,90,18
+nursing-homes,1,5,2004,2025,94,0
+uhc-disabled-patients,5,25,2021,2025,150,0
+oncology-drugs-disabled,5,40,2021,2025,596,4
+outpatient-disabled,5,60,2021,2025,900,0
+pensioners-registered-1995-2006,1,19,1995,2006,200,27
+household-allowance-recipients,1,7,2002,2011,70,0
+household-allowance-amount,1,7,2002,2009,56,0

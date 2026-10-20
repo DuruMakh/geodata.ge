@@ -1,0 +1,18 @@
+{
+ "checked_on": "2026-10-18",
+ "checks": 434,
+ "failures": [],
+ "passed": true,
+ "tolerance": "max(50 recipients, 0.1 percent of national total), unchanged",
+ "reviewed_coverage_case": {
+  "source_file": "official/workbooks/ssa-tsa_allowance-01-2008.xlsx",
+  "sheet": "December",
+  "national_B87": 131182,
+  "sum_of_regions": 131010,
+  "upper_abkhazia_B86_outside_regions": 172,
+  "akhalgori_B43_already_in_region": 699,
+  "mtskheta_mtianeti_B48": 7792,
+  "sum_B43_B47": 7792
+ },
+ "note": "Region checks distinguish Upper Abkhazia outside regional subtotals from Akhalgori already included in Mtskheta-Mtianeti. Source values are unchanged; detailed arithmetic differences remain in source-findings.csv."
+}

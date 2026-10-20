@@ -1,0 +1,21 @@
+{
+ "retrieved_on": "2026-10-16",
+ "publisher": "Social Service Agency of Georgia (სსიპ სოციალური მომსახურების სააგენტო)",
+ "counts": {
+  "workbooks": 1027,
+  "pages": 9,
+  "tables_parsed": 86,
+  "tables_with_area_rows": 77,
+  "monthly_sheets": 11355,
+  "national_annual_rows": 26417,
+  "programme_monthly_rows": 2904,
+  "programme_annual_rows": 256,
+  "programme_area_rows": 19982,
+  "area_total_checks": 131047,
+  "area_total_differences": 748,
+  "independent_browser_rows_compared": 256,
+  "reviewed_browser_differences": 5
+ },
+ "failures": [],
+ "passed": true
+}

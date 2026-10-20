@@ -1,0 +1,9 @@
+{
+  "verified_on": "2026-10-19",
+  "ssa_workbooks_verified_against_source_index": 1027,
+  "geostat_workbooks_verified": 30,
+  "geostat_sources_verified_against_manifest": 32,
+  "original_zip_fingerprint_and_integrity_passed": true,
+  "failures": [],
+  "passed": true
+}

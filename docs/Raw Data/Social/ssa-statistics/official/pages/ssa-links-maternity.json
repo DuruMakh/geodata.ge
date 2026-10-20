@@ -1,0 +1,110 @@
+{
+  "category_id": "maternity",
+  "source_url": "https://ssa.moh.gov.ge/statistik.php?lang=1&id=202212070009288678717789&v=0",
+  "captured_on": "2026-10-18",
+  "capture_method": "Visible source-page links read in Chrome",
+  "tables": [
+    {
+      "table_no": 1,
+      "updated": "2026-10-08",
+      "files": [
+        {
+          "label": "2026",
+          "href": "/upload/20261008031352-10.1-2026.xlsx"
+        },
+        {
+          "label": "2025",
+          "href": "/upload/20251231093236-10.1-2025.xlsx"
+        },
+        {
+          "label": "2024",
+          "href": "/upload/20241230024548-10.1.xlsx"
+        },
+        {
+          "label": "2023",
+          "href": "/upload/20240109103140-10.1.xlsx"
+        },
+        {
+          "label": "2022",
+          "href": "/upload/20230316044729-2022-10.1.xlsx"
+        },
+        {
+          "label": "2021",
+          "href": "/upload/20230321040030-10.1 (13).xlsx"
+        },
+        {
+          "label": "2020",
+          "href": "/upload/20230322104925-10.1 (7).xlsx"
+        },
+        {
+          "label": "2019",
+          "href": "/upload/20230327114521-10.1 (8).xlsx"
+        },
+        {
+          "label": "2018",
+          "href": "/upload/20230328103553-10.1 (9).xlsx"
+        },
+        {
+          "label": "2017",
+          "href": "/upload/20230331124447-10.1 (10).xlsx"
+        },
+        {
+          "label": "2016",
+          "href": "/upload/20230330044306-10.1 (11).xlsx"
+        },
+        {
+          "label": "2015",
+          "href": "/upload/20230403125839-10.1 (12).xlsx"
+        },
+        {
+          "label": "2014",
+          "href": "/upload/20230404105558-10.1 (13).xlsx"
+        }
+      ]
+    },
+    {
+      "table_no": 2,
+      "updated": "",
+      "files": [
+        {
+          "label": "2013",
+          "href": "/upload/20230406030311-10.1 2013.xlsx"
+        },
+        {
+          "label": "2012",
+          "href": "/upload/20230406031223-10.1 (15).xlsx"
+        },
+        {
+          "label": "2011",
+          "href": "/upload/20230406030601-10.1 (16).xlsx"
+        },
+        {
+          "label": "2010",
+          "href": "/upload/20230406045609-10.1 (17).xlsx"
+        }
+      ]
+    },
+    {
+      "table_no": 3,
+      "updated": "",
+      "files": [
+        {
+          "label": "2013",
+          "href": "/upload/20230406030319-10.2  2013.xlsx"
+        },
+        {
+          "label": "2012",
+          "href": "/upload/20230406031230-10.2 (1).xlsx"
+        },
+        {
+          "label": "2011",
+          "href": "/upload/20230406030608-10.2 (2).xlsx"
+        },
+        {
+          "label": "2010",
+          "href": "/upload/20230406045621-10.2 (3).xlsx"
+        }
+      ]
+    }
+  ]
+}
