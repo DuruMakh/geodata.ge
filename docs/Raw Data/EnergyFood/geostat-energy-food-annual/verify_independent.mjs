@@ -2,7 +2,8 @@
 // Reads the preserved workbooks (and the .xls efficiency workbook, which prepare.py cannot read) with SheetJS, the web
 // app's own dependency, not the Python XML reader. It finds every cell again from its printed row and column labels, using
 // label tables written separately from prepare.py, then compares all 681 rows of energy-food-annual.csv with what it found:
-// stored value, dash status, cell address, printed label, display text and unit. It also checks that total primary energy
+// stored value, dash status, cell address, printed label, display text and unit; the 708 farming rows (Geostat Agriculture,
+// six workbooks) the same way, where a dash is never served and a starred year heading ("2025*") marks a preliminary value. It also checks that total primary energy
 // supply and final energy consumption equal the efficiency workbook's ktoe rows for all 12 years (within 0.05).
 // Writes nothing unless --write.
 import { createRequire } from 'node:module';
@@ -58,9 +59,36 @@ const ELECTRICITY_FINAL = { total: 'finalconsumption', industry: 'industry', tra
 const FOODS = [['wheat', 'Wheat'], ['maize', 'Maize'], ['potato', 'Potato'], ['vegetables', 'Vegetables'], ['grapes', 'Grapes'], ['meat', 'Meat'],
   ['beef', 'Beef'], ['pork', 'Pork'], ['sheep_goat_meat', 'Sheep and Goat Meat'], ['poultry_meat', 'Poultry Meat'], ['milk', 'Milk and Milk Products'], ['eggs', 'Egg']];
 
+// Farming rows, written separately from prepare.py: [indicator, workbook key, sheet, label (compacted), unit, first year].
+const FARMING_FILES = { general: 'AG. output', 'annual-crops': 'Production', 'permanent-crops': 'Permanent Crops production',
+  'livestock-numbers': 'Number of livestock', 'livestock-products': 'Livestock products', prices: 'Prices' };
+const FARMING = [
+  ...[['total', 'outputofagriculture,total'], ['crops', 'plantgrowing'], ['livestock', 'animalhusbandry'], ['services', 'agriculturalservices']]
+    .map(([key, label]) => [`farming.output.${key}`, 'general', label, 'million_gel', 2010]),
+  ...[['wheat', 'wheat,total'], ['barley', 'barley,total'], ['maize', 'maize'], ['beans', 'haricotbeans'], ['potatoes', 'potato'],
+    ['vegetables', 'vegetables,total'], ['melons', 'melons']].map(([key, label]) => [`farming.harvest.${key}`, 'annual-crops', label, 'thousand_tonnes', 2006]),
+  ...[['grapes', 'grapes'], ['apples', 'apple'], ['peaches', 'peach,nectarine'], ['tangerines', 'tangerine'], ['hazelnuts', 'hazelnut'], ['walnuts', 'walnut']]
+    .map(([key, label]) => [`farming.harvest.${key}`, 'permanent-crops', label, 'thousand_tonnes', 2006]),
+  ...[['cattle', 'bovineanimals'], ['dairy_cows', 'dairycowsandbuffaloes'], ['pigs', 'pigs'], ['sheep_goats', 'sheepandgoats'], ['poultry', 'poultry,ths.heads']]
+    .map(([key, label]) => [`farming.livestock.${key}`, 'livestock-numbers', label, 'thousand_head', 2006]),
+  ...[['meat', 'meat,total', 'thousand_tonnes'], ['beef', 'beef', 'thousand_tonnes'], ['pork', 'pork', 'thousand_tonnes'], ['sheep_goat_meat', 'sheepandgoat', 'thousand_tonnes'],
+    ['poultry_meat', 'poultry', 'thousand_tonnes'], ['milk', 'milk(mill.litres)', 'million_litres'], ['eggs', 'egg(mill.pieces)', 'million_pieces']]
+    .map(([key, label, unit]) => [`farming.products.${key}`, 'livestock-products', label, unit, 2006]),
+  ...[['wheat', 'wheat'], ['maize', 'maize'], ['potatoes', 'potato'], ['tomatoes', 'tomato'], ['apples', 'apple'], ['grapes', 'grapes'], ['hazelnuts', 'hazelnut'],
+    ['beef', 'beef'], ['pork', 'pork'], ['poultry_meat', 'poultrymeat'], ['milk', 'milk(1litre)'], ['eggs', 'egg(1piece)']]
+    .map(([key, label]) => [`farming.price.${key}`, 'prices', label, key === 'milk' ? 'gel_per_litre' : key === 'eggs' ? 'gel_per_piece' : 'gel_per_kg', 2014]),
+];
+const FARMING_DECIMALS = { '#,##0.0': 1, '0.0': 1, '#\\ ##0.0': 1, '0.00': 2 };
+
 /** Excel keeps 15 significant digits. Energy shows one decimal; a food ratio follows its own cell's format ("0" whole percent, "General" as stored). */
 function shown(indicator, value, format) {
   const sig = Number(value.toPrecision(15));
+  if (indicator.startsWith('farming.')) {
+    if (format === 'General' && indicator.startsWith('farming.price.')) return sig.toFixed(2);
+    const decimals = FARMING_DECIMALS[format];
+    if (decimals === undefined) throw new Error(`${indicator}: unexpected number format ${format}`);
+    return (Math.round(sig * 10 ** decimals + 1e-9) / 10 ** decimals).toFixed(decimals);
+  }
   if (indicator.startsWith('food.')) {
     if (format === 'General') return String(sig);
     if (format !== '0') throw new Error(`${indicator}: unexpected number format ${format}`);
@@ -72,17 +100,19 @@ function shown(indicator, value, format) {
 
 const expected = new Map(); // `${indicator}|${year}` -> what the workbook holds
 const workbooks = new Set();
-function expect(indicator, year, file, name, sheet, address, heading) {
+function expect(indicator, year, file, name, sheet, address, heading, farming) {
   const key = `${indicator}|${year}`;
   if (expected.has(key)) throw new Error(`Derived ${key} twice`);
   const cell = sheet[address];
   if (!cell) throw new Error(`${file} ${address}: no cell for ${key}`);
   const dash = cell.t === 's' && spaced(cell.v).replace(/ /g, '') === '-';
   if (!dash && cell.t !== 'n') throw new Error(`${file} ${address}: ${key} is neither a number nor a dash (${cell.v})`);
+  if (dash && farming) throw new Error(`${file} ${address}: ${key} is a farming dash (data not available)`);
   workbooks.add(file);
   expected.set(key, { indicator, year, file, name, address, number: dash ? 0 : cell.v, dash, format: cell.z,
     label: `${spaced(sheet[`A${address.replace(/^[A-Z]+/, '')}`].v)} | ${heading}`,
-    unit: indicator.startsWith('food.') ? 'percent' : indicator.startsWith('electricity.') ? 'gwh' : 'ktoe' });
+    preliminary: farming?.preliminary ?? false,
+    unit: farming?.unit ?? (indicator.startsWith('food.') ? 'percent' : indicator.startsWith('electricity.') ? 'gwh' : 'ktoe') });
 }
 
 for (const year of YEARS) {
@@ -138,6 +168,22 @@ for (const year of YEARS) {
   }
 }
 
+for (const [key, sheetName] of Object.entries(FARMING_FILES)) {
+  const file = `official/farming-${key}.xlsx`;
+  const { name, sheet } = sheetOf(book(file), sheetName);
+  const labels = rowLabels(sheet);
+  // The year heading row: the first row with at least five year cells (2006, or "2025*" for a preliminary year).
+  const yearsOf = row => Object.keys(sheet).filter(a => /^[B-Z]+\d+$/.test(a) && Number(a.replace(/^[A-Z]+/, '')) === row && /^\d{4}\*?$/.test(spaced(sheet[a].v)))
+    .map(a => ({ column: a.replace(/\d+$/, ''), year: Number(String(sheet[a].v).slice(0, 4)), starred: String(sheet[a].v).endsWith('*'), heading: spaced(sheet[a].v) }));
+  const header = first(labels.map(entry => entry.row).filter(row => yearsOf(row).length >= 5), `${file} year heading row`);
+  for (const [indicator, , label, unit, firstYear] of FARMING.filter(entry => entry[1] === key)) {
+    const row = only(rowsLabelled(labels, label), `${file} ${label}`);
+    for (const { column, year, starred, heading } of yearsOf(header).filter(entry => entry.year >= firstYear && entry.year <= 2025)) {
+      expect(indicator, year, file, name, sheet, `${column}${row}`, heading, { unit, preliminary: starred });
+    }
+  }
+}
+
 // The efficiency workbook (.xls): total primary energy supply and final energy consumption, ktoe, 2013-2024.
 const efficiency = {};
 {
@@ -186,7 +232,7 @@ function verify(rows, efficiencyValues = efficiency) {
     else failures.push(`${where}: row points at ${row.source_id} ${row.source_sheet} ${row.source_cell}`);
     if (Number(row.value) === want.number) values += 1;
     else failures.push(`${where}: value ${row.value} != ${want.number}`);
-    if (row.value_status === (want.dash ? 'no_flow' : 'published')) statuses += 1;
+    if (row.value_status === (want.dash ? 'no_flow' : want.preliminary ? 'preliminary' : 'published')) statuses += 1;
     else failures.push(`${where}: status ${row.value_status}`);
     if (row.published_value === shown(want.indicator, want.number, want.format) && row.unit === want.unit && row.basis === 'actual') displays += 1;
     else failures.push(`${where}: display ${row.published_value}/${row.unit}/${row.basis} != ${shown(want.indicator, want.number, want.format)}/${want.unit}`);
@@ -194,7 +240,7 @@ function verify(rows, efficiencyValues = efficiency) {
     else failures.push(`${where}: label/format ${row.source_label} / ${row.source_number_format} != ${want.label} / ${want.format}`);
   }
   for (const key of expected.keys()) if (!seenKeys.has(key)) failures.push(`${key}: derived from the workbooks but missing from the CSV`);
-  if (rows.length !== 681) failures.push(`expected 681 observations, found ${rows.length}`);
+  if (rows.length !== 1389) failures.push(`expected 1389 observations, found ${rows.length}`);
   let efficiencyMatched = 0;
   for (const year of YEARS) {
     for (const [indicator, key] of [['energy.supply.total', 'supply'], ['energy.final.total', 'final']]) {
@@ -219,6 +265,8 @@ const negative = {
   wrong_cell_detected: detects(edit('electricity.imports', 2020, { source_cell: 'F6' })),
   wrong_label_detected: detects(edit('electricity.exports', 2020, { source_label: 'Imports | Electricity (GWh)' })),
   efficiency_mismatch_detected: detects(observations, shiftedEfficiency),
+  farming_value_altered_detected: detects(edit('farming.harvest.wheat', 2025, { value: '145.4', published_value: '145.4' })),
+  farming_status_altered_detected: detects(edit('farming.output.total', 2024, { value_status: 'preliminary' })),
 };
 
 const report = {
