@@ -1142,8 +1142,8 @@ def validate_served(served, national_programmes, programme_areas):
                 failures.append(f'social package {year} {measure}: groups add up to {members}, total {total}')
             parts = [rows[name] for name in DISABILITY_PARTS]
             # The severity columns start in October 2017, so 2017 money is compared only once they cover the same months.
-            if measure != 'count_months_sum' and None not in parts and rows['disability'] and all(part['months'] == rows['disability']['months']
-                                                                for part in parts):
+            if (measure != 'count_months_sum' and None not in parts and rows['disability']
+                    and all(part['months'] == rows['disability']['months'] for part in parts)):
                 added = sum(Decimal(part['value']) for part in parts)
                 if abs(added - Decimal(rows['disability']['value'])) > tolerance:
                     failures.append(f"social package {year} {measure}: disability parts add up to {added}, "
@@ -1240,6 +1240,7 @@ def build(official, out, check=False):
                    'national_annual_rows': len(national), 'programme_monthly_rows': len(monthly),
                    'programme_annual_rows': len(national_programmes), 'programme_area_rows': len(programme_areas),
                    'served_rows': len(served),
+                   # area_total_differences also counts the social package group-sum differences (socpackage findings).
                    'area_total_checks': checked, 'area_total_differences': len(findings),
                    'independent_browser_rows_compared': len(browser_check or []),
                    'reviewed_browser_differences': len(reviewed_differences)},

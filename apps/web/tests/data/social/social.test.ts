@@ -1,4 +1,5 @@
 import fs from "node:fs/promises";
+import os from "node:os";
 import path from "node:path";
 import { parse } from "csv-parse/sync";
 import Decimal from "decimal.js";
@@ -6,7 +7,7 @@ import { expect, test } from "vitest";
 import { assertSocialParity, loadSocialBreaks, loadSocialFacts, toClientSocialFact } from "../../../lib/data/social/importSocial";
 import { loadSocialFactsFromMirror, socialMirrorCreateRows } from "../../../lib/db/mirrorRows";
 import type { Prisma } from "../../../lib/generated/prisma/client";
-import { REVIEWED_AT, SOCIAL_CSV_HEADERS, loadSocialAverageInputs, prepareSocialData } from "../../../lib/data/social/prepareSocial";
+import { REVIEWED_AT, SOCIAL_CSV_HEADERS, checkKnownDifferences, loadSocialAverageInputs, prepareSocialData } from "../../../lib/data/social/prepareSocial";
 import {
   SOCIAL_GEORGIA, SOCIAL_INDICATORS, SOCIAL_PAYMENT_PROGRAMMES, SOCIAL_PUBLIC_SOURCES, SOCIAL_SOURCES, socialFactKey, socialSourceDocumentId, type SocialFact, type SocialIndicator,
 } from "../../../lib/data/social/types";
@@ -49,8 +50,9 @@ test("serves the package's place, social package and programme values, with the 
   const served = own.filter(row => !/amount$/.test(row.measure) || Number(row.year) >= firstFull.get(`${row.programme}|${row.measure}|${row.geography_id}`)!);
   const averaged = served.filter(row => (row.programme === "pension" || row.programme === "pension_highmountain" || row.programme === "subsistence_allowance") && row.measure === "amount"
     || row.programme === "social_package_group" && /^group\.[a-z_]+\.amount$/.test(row.measure)).filter(row => row.value !== "0")
-    // SSA left the July 2022 national count of moderate disability blank: 11 months of counts for 12 of money, so no average.
-    .filter(row => !(row.measure === "group.disability_moderate.amount" && row.year === "2022"));
+    // Counts that miss a month the money has (the recorded gaps) give no average.
+    .filter(row => !SOCIAL_AVERAGE_GAPS.some(gap => gap.geographyId === row.geography_id && String(gap.year) === row.year
+      && gap.indicatorId === (row.programme === "social_package_group" ? `social.social_package.${row.measure.split(".")[1]}` : `social.${row.programme === "subsistence_allowance" ? "subsistence" : row.programme}`) + ".avg_monthly"));
   const payments = rows.filter(row => national(row) && row.programme !== "pension_idp");
   const years = new Set(rows.map(row => row.year)).size;
   expect(facts).toHaveLength(served.length + averaged.length + payments.length + years);
@@ -175,7 +177,7 @@ test("validation accepts the recorded source findings, and only those", async ()
     "social.pension_idp.amount region.shida_kartli|2015|404686", "social.subsistence.amount region.kvemo_kartli|2013|-126", "social.social_package.amount groups|2022|56",
     "social.social_package.count_months_sum groups|2021|-1",
   ]);
-  expect(SOCIAL_AVERAGE_GAPS.map(g => `${g.indicatorId}|${g.year}`)).toEqual(["social.social_package.disability_moderate.avg_monthly|2022"]);
+  expect(SOCIAL_AVERAGE_GAPS.map(g => socialFactKey(g))).toEqual(["social.subsistence.avg_monthly:unit.upper_abkhazia:2014", "social.social_package.disability_moderate.avg_monthly:country.georgia:2022"]);
   expect(expectedSocialKeys().has(socialFactKey({ indicatorId: "social.pension.recipients", geographyId: "04", year: 2020 }))).toBe(false);
   expect(expectedSocialKeys().has(socialFactKey({ indicatorId: "social.pension.recipients", geographyId: "region.tbilisi", year: 2020 }))).toBe(true);
 });
@@ -219,6 +221,14 @@ test.each([
     const key = "social.social_package.survivors.avg_monthly:country.georgia:2020";
     inputs.set(key, { ...inputs.get(key)!, countMonths: 11 });
   }, /months/],
+  ["an unrecorded average whose counts miss a month, where the money is zero", (_: SocialFact[], inputs: Map<string, SocialInput>) => {
+    const key = "social.subsistence.avg_monthly:unit.upper_abkhazia:2015";
+    inputs.set(key, { ...inputs.get(key)!, countMonths: inputs.get(key)!.amountMonths - 1 });
+  }, /no gap is recorded/],
+  ["a recorded average gap whose counts no longer miss a month", (_: SocialFact[], inputs: Map<string, SocialInput>) => {
+    const key = "social.social_package.disability_moderate.avg_monthly:country.georgia:2022";
+    inputs.set(key, { ...inputs.get(key)!, countMonths: 12 });
+  }, /recorded average gap no longer has counts missing a month/],
   ["a recorded average gap that is served", (facts: SocialFact[]) => {
     facts.push({ ...find(facts, "social.social_package.disability_moderate.avg_monthly", SOCIAL_GEORGIA, 2023), year: 2022 });
   }, /gap/],
@@ -229,6 +239,20 @@ test.each([
   validateSocialFacts(facts, inputs);
   mutate(facts, inputs);
   expect(() => validateSocialFacts(facts, inputs)).toThrow(error);
+});
+
+test("prepare requires each recorded national average gap's blank cell in the source findings", async () => {
+  await expect(checkKnownDifferences(research)).resolves.toBeUndefined();
+  const directory = await fs.mkdtemp(path.join(os.tmpdir(), "social-findings-"));
+  try {
+    const findings = await fs.readFile(path.join(research, "source-findings.csv"), "utf8");
+    const blank = findings.split("\n").filter(line => line.startsWith("socpackage-01,2022,7,E,"));
+    expect(blank).toHaveLength(1);
+    await fs.writeFile(path.join(directory, "source-findings.csv"), findings.replace(`${blank[0]}\n`, ""));
+    await expect(checkKnownDifferences(directory)).rejects.toThrow(/average gap has no matching source finding: social\.social_package\.disability_moderate\.avg_monthly 2022/);
+  } finally {
+    await fs.rm(directory, { recursive: true, force: true });
+  }
 });
 
 test("the loader reads the committed canonical file and its break register", async () => {

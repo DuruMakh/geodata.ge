@@ -115,7 +115,7 @@ async function checkPlaces(repositoryRoot: string, rows: readonly CsvRecord[]): 
 }
 
 /** Each recorded subtotal difference must be the national total's source finding for the same table, year and column. */
-async function checkKnownDifferences(directory: string): Promise<void> {
+export async function checkKnownDifferences(directory: string): Promise<void> {
   const findings = await readCsv(path.join(directory, "source-findings.csv"));
   for (const known of SOCIAL_KNOWN_DIFFERENCES) {
     if (!known.finding) continue;
@@ -125,8 +125,9 @@ async function checkKnownDifferences(directory: string): Promise<void> {
     // A finding is the printed total less its areas; the recorded difference is the parts less the printed total.
     if (!rows.length || total.toDecimalPlaces(0, Decimal.ROUND_HALF_UP).neg().toFixed() !== known.difference) throw new Error(`Social recorded difference has no matching source finding: ${known.check} ${known.year}`);
   }
-  // A recorded average gap is a blank national cell SSA left in that year's count table.
+  // A recorded average gap in a national row is a blank cell SSA left in that year's count table.
   for (const gap of SOCIAL_AVERAGE_GAPS) {
+    if (!gap.finding) continue;
     const { table, column } = gap.finding;
     if (!findings.some(row => row.table_id === table && row.year === String(gap.year) && row.column === column && !row.difference)) throw new Error(`Social recorded average gap has no matching source finding: ${gap.indicatorId} ${gap.year}`);
   }
@@ -198,8 +199,10 @@ export async function prepareSocialData(repositoryRoot: string, mode: "write" | 
   const averages: SocialFact[] = [];
   for (const money of served) {
     const average = Object.keys(SOCIAL_AVERAGES).find(id => SOCIAL_AVERAGES[id] === money.indicatorId) as SocialIndicator | undefined;
-    if (!average || money.value === "0" || SOCIAL_AVERAGE_GAPS.some(gap => gap.indicatorId === average && gap.year === money.year && money.geographyId === SOCIAL_GEORGIA)) continue;
+    if (!average || money.value === "0") continue;
     const input = inputs.get(socialFactKey({ ...money, indicatorId: average }))!;
+    // Counts that miss a month the money has would overstate the average (blank is not zero): it is withheld.
+    if (input.countMonths !== input.amountMonths) continue;
     const source = AVERAGE_INPUTS[average];
     const [amount, count] = [source.amount, source.count].map(measure => byKey.get(packageKey(source.programme, measure, money.geographyId, money.year))!);
     const joined = (field: "source_workbook" | "source_sheet") => (amount[field] === count[field] ? amount[field] : `${amount[field]};${count[field]}`);

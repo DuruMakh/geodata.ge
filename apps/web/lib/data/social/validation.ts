@@ -42,12 +42,15 @@ export const SOCIAL_AVERAGES: Readonly<Record<string, SocialIndicator>> = {
   ...Object.fromEntries(SOCIAL_PACKAGE_GROUPS.map(group => [`social.social_package.${group}.avg_monthly`, `social.social_package.${group}.amount` as SocialIndicator])),
 };
 /**
- * Averages left out although their money is served, because SSA's monthly counts miss a month the money has (blank is not
- * zero, so money ÷ counts would overstate the average). Each has its `source-findings.csv` row, checked by prepare. SSA's
- * July 2022 national row leaves the moderate-disability count blank (socpackage-01 July E85).
+ * The reviewed register of averages whose monthly counts miss a month the money has. Prepare withholds every such average
+ * (blank is not zero, so money ÷ counts would overstate it), and validation holds this register equal to the data both
+ * ways. A gap in a national row has its `source-findings.csv` row, checked by prepare. SSA's July 2022 national row leaves
+ * the moderate-disability count blank (socpackage-01 July E85). Its October 2014 sheet leaves the Upper Abkhazia
+ * subsistence count blank (tsa_allowance-01 October B86); that year's Upper Abkhazia money is 0, so no average was served.
  */
-export const SOCIAL_AVERAGE_GAPS: readonly { indicatorId: SocialIndicator; year: number; finding: { table: string; column: string } }[] = [
-  { indicatorId: "social.social_package.disability_moderate.avg_monthly", year: 2022, finding: { table: "socpackage-01", column: "E" } },
+export const SOCIAL_AVERAGE_GAPS: readonly { indicatorId: SocialIndicator; geographyId: string; year: number; finding?: { table: string; column: string } }[] = [
+  { indicatorId: "social.subsistence.avg_monthly", geographyId: "unit.upper_abkhazia", year: 2014 },
+  { indicatorId: "social.social_package.disability_moderate.avg_monthly", geographyId: SOCIAL_GEORGIA, year: 2022, finding: { table: "socpackage-01", column: "E" } },
 ];
 /** The partition check of the social package groups' month-count sums, which only the average inputs hold. */
 const COUNT_PARTITION = "social.social_package.count_months_sum groups";
@@ -179,14 +182,14 @@ export function validateSocialFacts(facts: readonly SocialFact[], averageInputs?
   }
   const missing = [...expected].filter(key => !byKey.has(key));
   if (missing.length) throw new Error(`Incomplete social coverage: ${missing.length} missing, first ${missing[0]}`);
-  const recordedGap = (key: string) => SOCIAL_AVERAGE_GAPS.some(gap => socialFactKey({ ...gap, geographyId: SOCIAL_GEORGIA }) === key);
+  const recordedGap = (key: string) => SOCIAL_AVERAGE_GAPS.some(gap => socialFactKey(gap) === key);
   for (const [average, amount] of Object.entries(SOCIAL_AVERAGES)) {
     const gap = facts.find(f => f.indicatorId === amount && !/^0+$/.test(f.value) && !byKey.has(socialFactKey({ ...f, indicatorId: average as SocialIndicator }))
       && !recordedGap(socialFactKey({ ...f, indicatorId: average as SocialIndicator })));
     if (gap) throw new Error(`Incomplete social coverage: no ${average} for ${socialFactKey(gap)}`);
   }
-  const servedGap = SOCIAL_AVERAGE_GAPS.find(gap => byKey.has(socialFactKey({ ...gap, geographyId: SOCIAL_GEORGIA })));
-  if (servedGap) throw new Error(`Social recorded average gap is served: ${socialFactKey({ ...servedGap, geographyId: SOCIAL_GEORGIA })}`);
+  const servedGap = SOCIAL_AVERAGE_GAPS.find(gap => byKey.has(socialFactKey(gap)));
+  if (servedGap) throw new Error(`Social recorded average gap is served: ${socialFactKey(servedGap)}`);
 
   const indexed = new Map<string, Map<number, SocialFact>>();
   for (const fact of facts) {
@@ -208,13 +211,15 @@ export function validateSocialFacts(facts: readonly SocialFact[], averageInputs?
       if (!input) throw new Error(`Social average has no money and count inputs: ${socialFactKey(fact)}`);
       if (fact.indicatorId !== "social.subsistence.avg_monthly" && input.amount !== amountOf(fact)!.value) throw new Error(`Social average input money differs from the served money: ${socialFactKey(fact)}`);
       if (socialAverage(input.amount, input.count) !== fact.value) throw new Error(`Social average does not equal its money ÷ month-count sum: ${socialFactKey(fact)}`);
-      if (fact.indicatorId.startsWith("social.social_package.") && input.countMonths !== input.amountMonths) {
-        throw new Error(`Social package average counts cover ${input.countMonths} months and its money ${input.amountMonths}: ${socialFactKey(fact)}`);
-      }
+    }
+    // The register and the data agree both ways: every average whose counts cover other months than its money is recorded
+    // (and, above, not served), and every recorded gap still has them.
+    for (const [key, input] of averageInputs) {
+      if (input.countMonths !== input.amountMonths && !recordedGap(key)) throw new Error(`Social average counts cover ${input.countMonths} months and its money ${input.amountMonths}, and no gap is recorded: ${key}`);
     }
     for (const gap of SOCIAL_AVERAGE_GAPS) {
-      const input = averageInputs.get(socialFactKey({ ...gap, geographyId: SOCIAL_GEORGIA }));
-      if (!input || input.countMonths === input.amountMonths) throw new Error(`Social recorded average gap no longer has counts missing a month: ${socialFactKey({ ...gap, geographyId: SOCIAL_GEORGIA })}`);
+      const input = averageInputs.get(socialFactKey(gap));
+      if (!input || input.countMonths === input.amountMonths) throw new Error(`Social recorded average gap no longer has counts missing a month: ${socialFactKey(gap)}`);
     }
   }
 
