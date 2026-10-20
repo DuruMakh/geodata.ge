@@ -48,7 +48,9 @@ export function buildLabourWorkbookExportModel(input: LabourWorkbookInput, prese
       title: input.title, subtitle: `${model.range.start}–${model.range.end} · ${unitLabel}`,
       unitLabel, amountDecimals: 1, years: model.years, showChangeColumn: false, numberFormat: NUMBER_FORMAT,
       rows: model.selected.map(series => ({
-        kind: series.reference ? "total" : "item", parentLabel: parentOf(series), label: labels[series.id], change: null, valuesByYear: series.valuesByYear,
+        // The Summary sheet prefixes only an item with its heading, so the page total carries its full name ("Ages 15–24 — Total").
+        ...(series.reference ? { kind: "total" as const, parentLabel: null, label: fullLabel(series) } : { kind: "item" as const, parentLabel: parentOf(series), label: labels[series.id] }),
+        change: null, valuesByYear: series.valuesByYear,
         basisByYear: Object.fromEntries(model.years.map(year => [year, series.valuesByYear[year] === null ? null : "published"])),
       })),
     },

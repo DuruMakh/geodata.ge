@@ -4,9 +4,7 @@ import { message } from "../i18n/messages";
 import { INK } from "./colors";
 import { formatInUnit, formatShare } from "./format";
 import type { HubCardModel } from "./hubCards";
-import { LABOUR_SECTIONS, labourDefaultSelection, labourUnit } from "./labour";
-
-const ONE_DECIMAL = { divisor: 1, label: "", decimals: 1 };
+import { LABOUR_SECTIONS, labourDefaultSelection, labourUnit, ONE_DECIMAL } from "./labour";
 
 /**
  * Each card's sparkline and footer follow its page's total (spec §8), numbered on from Unemployment's own cards

@@ -1,4 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { LabourExplorer } from "../../components/unemployment/labour-explorer";
+import { loadLabourFacts, toClientLabourFact } from "../../lib/data/labour/importLabour";
 import { LABOUR_SECTIONS, labourFullLabel, labourSeries } from "../../lib/explorer/labour";
 import en from "../../lib/i18n/messages/en/labour.json";
 import ka from "../../lib/i18n/messages/ka/labour.json";
@@ -31,6 +33,23 @@ describe("the Labour pages", () => {
     const html = await page("en", "young-people");
     expect(latest(html)).toContain("17.6%");
     expect(html).toContain('href="/en/explorer/unemployment"');
+  });
+
+  it("a selection without any published value shows a short message, not an empty chart", async () => {
+    // Without the total's values the default selection (the total) has none, as when only Geostat's unpublished
+    // "Men — Households as employers" is ticked.
+    const facts = (await loadLabourFacts()).map(toClientLabourFact).filter(f => f.indicatorId.startsWith("labour.hours.") && f.indicatorId !== "labour.hours.all.total");
+    const series = labourSeries("hours");
+    for (const [locale, messages] of [["ka", ka], ["en", en]] as const) {
+      const html = renderPageMarkup(locale, <LabourExplorer section="hours" facts={facts}
+        labels={Object.fromEntries(series.map(({ id, item }) => [id, messages[`labour.row.${item}` as keyof typeof messages]]))}
+        headingLabels={Object.fromEntries(series.map(({ heading }) => [heading, messages[`labour.heading.${heading}` as keyof typeof messages]]))}
+        latestLine="" sources={[]} lastReviewedAt="2026-10-20" siteOrigin="https://fiscal.ge" />, messages);
+      expect(html).toContain('data-testid="no-values-callout"');
+      expect(text(html)).toContain(messages["labour.noValues"]);
+      expect(html).not.toContain('data-testid="no-selection-callout"');
+      expect(html).not.toContain('data-geometry=');
+    }
   });
 
   it("metadata names each page in its language", async () => {

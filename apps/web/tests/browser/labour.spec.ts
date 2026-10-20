@@ -9,12 +9,14 @@ import { tableSeriesValues } from "./explorer-table";
 const ready = (page: Page) => expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
 const toggle = (id: string) => `[data-series-id="${id}"] [data-testid="series-row-toggle"]`;
 const pressed = (page: Page) => page.locator('[data-testid="series-row-toggle"][aria-pressed="true"]');
+/** The list's count, anchored so "2 / 60" never matches "12 / 60". */
+const status = (selected: number, all: number) => new RegExp(`^\\D*${selected} / ${all}$`);
 
 const PAGES = [
   { section: "industries", total: "labour.jobs.all.total", rows: 60, ka: "დასაქმებული · 2025: 1,389.7 ათასი", en: "Employed · 2025: 1,389.7 thousand" },
   { section: "hours", total: "labour.hours.all.total", rows: 85, ka: "ჩვეულებრივი საათები კვირაში · 2025: 41.0", en: "Usual weekly hours · 2025: 41.0" },
   { section: "informal", total: "labour.informal.total", rows: 9, ka: "არაფორმალური დასაქმების წილი · 2025: 28.3%", en: "Informal share of non-farm jobs · 2025: 28.3%" },
-  { section: "young-people", total: "labour.neet.age_15_24.total", rows: 6, ka: "სწავლისა და დასაქმების გარეშე · 2025: 17.6%", en: "Aged 15–24, not in work or study · 2025: 17.6%" },
+  { section: "young-people", total: "labour.neet.age_15_24.total", rows: 6, ka: "15–24 წლის ახალგაზრდები · 2025: 17.6%", en: "Aged 15–24, not in work or study · 2025: 17.6%" },
 ] as const;
 
 /** How many line boxes an element's text takes: its height over its line height. */
@@ -38,7 +40,7 @@ for (const locale of ["ka", "en"] as const) for (const width of [375, 768, 1440]
       await expect(page.getByTestId("series-row")).toHaveCount(rows);
       await expect(pressed(page)).toHaveCount(1);
       await expect(page.locator(toggle(total))).toHaveAttribute("aria-pressed", "true");
-      await expect(page.getByTestId("series-status")).toContainText(`1 / ${rows}`);
+      await expect(page.getByTestId("series-status")).toHaveText(status(1, rows));
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), `${section} fits ${width}px`).toBe(true);
       if (locale === "en" && width === 1440) await expectEnglish(page);
     }
@@ -96,11 +98,11 @@ test("Jobs: three headings, Women — Construction starts in 2020, search keeps 
   await page.getByTestId("series-search").fill("მშენებლობა");
   await expect(page.getByTestId("series-row")).toHaveCount(4);
   await expect(page.getByTestId("series-label").filter({ hasText: /^მშენებლობა$/ })).toHaveCount(3);
-  await expect(page.getByTestId("series-status")).toContainText("2 / 60");
+  await expect(page.getByTestId("series-status")).toHaveText(status(2, 60));
   await page.getByTestId("series-toggle-all").click();
-  await expect(page.getByTestId("series-status")).toContainText("0 / 60");
+  await expect(page.getByTestId("series-status")).toHaveText(status(0, 60));
   await page.getByTestId("series-toggle-all").click();
-  await expect(page.getByTestId("series-status")).toContainText("60 / 60");
+  await expect(page.getByTestId("series-status")).toHaveText(status(60, 60));
   await expect(pressed(page)).toHaveCount(4);
   await page.getByTestId("series-search").fill("");
   await expect(pressed(page)).toHaveCount(60);
@@ -111,7 +113,10 @@ test("Jobs: three headings, Women — Construction starts in 2020, search keeps 
   const file = await promise;
   expect(file.suggestedFilename()).toBe("fiscal-labour-industries-2017-2025.xlsx");
   const workbook = new ExcelJS.Workbook(); await workbook.xlsx.readFile((await file.path())!);
-  expect(workbook.worksheets.length).toBeGreaterThan(1);
+  expect(workbook.worksheets.map(sheet => sheet.name)).toEqual(["მარტივი ცხრილი", "მონაცემები", "წყაროები"]);
+  // The Data sheet names a selected row with its heading.
+  const data = workbook.getWorksheet("მონაცემები")!.getColumn(2).values;
+  expect(data).toContain("ქალები — მშენებლობა");
 });
 
 test("Hours: men in households as employers is all dashes in the table, and the language switch keeps the hash", async ({ page }) => {
@@ -136,6 +141,9 @@ test("Hours: men in households as employers is all dashes in the table, and the 
   await expect(page.locator(toggle("labour.hours.men.sector_t"))).toHaveAttribute("aria-pressed", "true");
   expect(await tableSeriesValues(page.getByTestId("explorer-table"), "Men — Activities of households")).toEqual(Array(6).fill("—"));
   await expect(page.getByTestId("labour-unit-label")).toHaveText("hours per week");
+  // Alone, the row Geostat does not publish has nothing to draw: a short message, not an empty chart.
+  await page.locator(toggle("labour.hours.all.total")).click();
+  await expect(page.getByTestId("no-values-callout")).toHaveText("No published values for this selection");
 });
 
 for (const prefix of ["", "/en"]) test(`the source line's methodology link opens the unemployment methodology ${prefix || "ka"}`, async ({ page }) => {

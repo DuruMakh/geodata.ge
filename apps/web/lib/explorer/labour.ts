@@ -1,5 +1,6 @@
 import { LABOUR_HOURS_GROUPS, LABOUR_INDICATORS, labourFactKey, type ClientLabourFact, type LabourIndicator, type LabourUnit } from "../data/labour/types";
 import { colorForItem, colorForProgram, INK, OTHER_COLOR } from "./colors";
+import type { ValueUnit } from "./format";
 import { refitRange, resolveRange, type ResolvedPeriodRange } from "./periodRange";
 import { buildTopicModel, parseTopicHash, serializeTopicHash, topicCoverage, type TopicCoverage, type TopicSeriesModel, type TopicState } from "./topicSeries";
 import { listLatestByHeading } from "./unitList";
@@ -44,6 +45,9 @@ const UNITS: Record<LabourSectionId, LabourUnit> = { industries: "thousand_perso
 export function labourUnit(section: LabourSectionId): LabourUnit {
   return UNITS[section];
 }
+
+/** Thousands of people, hours and percentages all show Geostat's one decimal. */
+export const ONE_DECIMAL: ValueUnit = { divisor: 1, label: "", decimals: 1 };
 
 /** A row's name outside the list: alone under Everyone ("Construction"), else with its heading ("Women — Construction"). */
 export function labourFullLabel(heading: LabourHeading, headingLabel: string, rowLabel: string): string {

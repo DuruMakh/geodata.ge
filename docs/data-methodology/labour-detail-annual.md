@@ -62,7 +62,7 @@ That is 160 indicators and 1,014 values (420 + 504 + 30 + 24 + 36). Industry ite
 - **Industry.** Geostat publishes NACE B–E as one row, "Industry". Fiscal.ge does not split it.
 - **Hours.** Average usual weekly hours in the main job, an average over employed persons ("hours most commonly worked per week during a long period, including usual overtime"). Hours actually worked are archived but not shown.
 - **Informal employment.** A share of non-agricultural employment, not of all jobs.
-- **Unused labour.** Four Geostat measures with different bases, so their percentages are not interchangeable: the unemployment rate; the combined rate of time-related underemployment and unemployment; the combined rate of the unemployed and the potential labour force; and the composite measure of labour underutilization. Geostat's tables (workbook 12 in either language and the page captures) do not print the bases. Only the unemployment rate over the labour force was confirmed, by recomputing it from the served counts (13.9% in 2025). For the other three, the standard International Labour Organization definitions are applied: the first two are shares of the labour force and the last two are shares of the extended labour force (the labour force plus the potential labour force); this is the ILO definition, not a statement Geostat prints. Informal shares are of non-farm jobs (printed by Geostat), so the informal and unused-labour percentages have different bases.
+- **Unused labour.** Four Geostat measures with different bases, so their percentages are not interchangeable: the unemployment rate (listed as "Unemployment rate"); the combined rate of time-related underemployment and unemployment ("Unemployed and part-time workers who want more hours"); the combined rate of the unemployed and the potential labour force ("Unemployed and potential labour force"); and the composite measure of labour underutilization ("All unused labour"). Geostat's tables (workbook 12 in either language and the page captures) do not print the bases. Only the unemployment rate over the labour force was confirmed, by recomputing it from the served counts (13.9% in 2025). For the other three, the standard International Labour Organization definitions are applied: the first two are shares of the labour force and the last two are shares of the extended labour force (the labour force plus the potential labour force); this is the ILO definition, not a statement Geostat prints. Informal shares are of non-farm jobs (printed by Geostat), so the informal and unused-labour percentages have different bases.
 - **NEET.** Young people aged 15–24 or 15–29 who are not in employment, education or training. The 15–24 total is the page reference, because the UN Sustainable Development Goal indicator 8.6.1 is defined for ages 15–24; that is the UN definition, not a claim Geostat makes.
 - **No map.** Geostat publishes none of these tables by region.
 
@@ -74,8 +74,8 @@ The pages state no causes.
 
 ## Zero versus not available
 
-- A published `0` is a value and is served (`value` `0`, `published_value` `0.0`). Examples: `labour.jobs.all.not_identified` in 2018, 2020 and 2023, and the whole women "Not identified" row for 2020–2024.
-- A cell that Geostat prints as `...`, `…` or `-`, or leaves empty, is never a value and produces no row. The one such series is men in "Activities of households as employers" (`labour.hours.men.sector_t`): `...` in 2020, 2021, 2022, 2024 and 2025 and a blank cell in 2023. The indicator stays in the list of 160 with no rows.
+- A numeric `0` is a published zero and is served as 0.0 (`value` `0`, `published_value` `0.0`), including where Geostat's number format displays it as a dash: the cell stores the number zero. Examples: `labour.jobs.all.not_identified` in 2018, 2020 and 2023, and the whole women "Not identified" row for 2020–2024.
+- A text placeholder (`...`, `…` or `-` stored as text) or an empty cell is not a value and produces no row. The one such series is men in "Activities of households as employers; Undifferentiated goods and services-producing activities of households for own use" (`labour.hours.men.sector_t`): `...` in 2020, 2021, 2022, 2024 and 2025 and a blank cell in 2023. The indicator stays in the list of 160 with no rows.
 - A missing value is a gap in the chart, a dash in the table and a blank Excel cell, never zero.
 
 ## Validation and reconciliation
@@ -83,7 +83,7 @@ The pages state no causes.
 In the package, `python3 -I -B prepare.py --check && python3 -I -B test_validation.py -v && node verify_independent.mjs` rebuilds every output in memory and rejects:
 
 - a duplicate, missing or extra observation, a served year outside a table's coverage, and any 2026 or part-year value;
-- a `...`, `…` or `-` served as a value, and a zero written where Geostat printed no number;
+- a text placeholder (`...`, `…` or `-` stored as text) served as a value, and a zero written where Geostat stored no number;
 - a value that is not a non-negative number, a published value that differs from the rounding of the stored value, and a unit, basis, status, source or sheet that differs from the cell map;
 - a row that differs from a fresh read of its source cell, stored value, row label and year heading;
 - a Georgian workbook holding a different number from its English original (1,905 numeric cells compared in six pairs, no difference), and a workbook whose URL is not linked from the captured page of its language.

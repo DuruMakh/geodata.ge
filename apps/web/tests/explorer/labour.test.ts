@@ -180,8 +180,11 @@ const presentation = (locale: Locale): Presentation => ({ locale, englishLabels:
 const LABELS: Record<string, string> = {
   "labour.jobs.all.total": "Total", "labour.jobs.all.not_identified": "Not identified", "labour.jobs.women.sector_f": "Construction",
   "labour.hours.all.total": "Total", "labour.hours.men.sector_t": "Households as employers",
+  "labour.neet.age_15_24.total": "Total", "labour.neet.age_15_29.women": "Women", "labour.informal.total": "Georgia", "labour.informal.women": "Women",
 };
-const HEADINGS: Record<string, string> = { all: "Everyone", women: "Women", men: "Men", urban: "Towns", rural: "Villages" };
+const HEADINGS: Record<string, string> = {
+  all: "Everyone", women: "Women", men: "Men", urban: "Towns", rural: "Villages", informal: "Informal jobs", age_15_24: "Ages 15–24", age_15_29: "Ages 15–29",
+};
 const workbook = (section: LabourSectionId, selectedIds: string[], start: number, end: number, locale: Locale = "en") => buildLabourWorkbookExportModel({
   section, facts, state: { mode: "table", range: manual(start, end), selectedIds }, labels: LABELS, headingLabels: HEADINGS,
   sources: SOURCES, siteOrigin: "https://fiscal.ge", title: "Jobs by industry",
@@ -224,6 +227,20 @@ test("writes the selection to Excel", () => {
     sources: [], siteOrigin: "https://fiscal.ge", title: "Jobs",
   }, presentation("en"))).toThrow(/geostat_lfs_jobs_industry/);
   expect(workbook("industries", ["labour.jobs.all.total"], 2017, 2025, "ka").analysis.rows[0]).toEqual([2017, "Total", 1286.9, "ათასი კაცი", "საქსტატის მონაცემი"]);
+});
+
+test("names a page total under its heading on the Summary sheet, as on the Data sheet", () => {
+  // The Summary sheet prefixes only an item with its heading, so a total under a heading carries the full name itself.
+  const young = workbook("young-people", ["labour.neet.age_15_24.total", "labour.neet.age_15_29.women"], 2020, 2025);
+  expect(young.readable.rows.map(row => [row.kind, row.parentLabel, row.label])).toEqual([
+    ["total", null, "Ages 15–24 — Total"], ["item", "Ages 15–29", "Women"],
+  ]);
+  expect(young.analysis.rows[0][1]).toBe("Ages 15–24 — Total");
+  const informal = workbook("informal", ["labour.informal.total", "labour.informal.women"], 2020, 2025);
+  expect(informal.readable.rows.map(row => [row.kind, row.parentLabel, row.label])).toEqual([
+    ["total", null, "Informal jobs — Georgia"], ["item", "Informal jobs", "Women"],
+  ]);
+  expect(informal.analysis.rows[0][1]).toBe("Informal jobs — Georgia");
 });
 
 test("builds the four hub cards", () => {

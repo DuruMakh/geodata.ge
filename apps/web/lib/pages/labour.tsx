@@ -3,15 +3,13 @@ import { LabourExplorer } from "../../components/unemployment/labour-explorer";
 import { loadServedLabourData, toClientLabourFact } from "../data/labour/importLabour";
 import { LABOUR_SOURCES } from "../data/labour/types";
 import { formatInUnit, formatShare } from "../explorer/format";
-import { labourDefaultSelection, labourFullLabel, labourSeries, labourUnit, type LabourSectionId } from "../explorer/labour";
+import { labourDefaultSelection, labourFullLabel, labourSeries, labourUnit, ONE_DECIMAL, type LabourSectionId } from "../explorer/labour";
 import { getPresentation } from "../i18n/presentation.server";
 import { message } from "../i18n/messages";
 import type { Locale } from "../i18n/types";
 import { loadSourcedWorkbookSources } from "../methodology/workbookSources";
 import { resolveSiteUrl } from "../siteUrl";
 import { labourSectionHref, renderLabourFrame } from "./labour-shared";
-
-const ONE_DECIMAL = { divisor: 1, label: "", decimals: 1 };
 
 /** One Labour Force Survey detail page: Georgia's facts of the section's rows, the latest line of its total, the workspace. */
 export async function renderLabourPage(locale: Locale, section: LabourSectionId) {

@@ -3,9 +3,9 @@ import Link from "next/link";
 import { useMemo, useState, type ReactNode } from "react";
 import type { ClientLabourFact } from "../../lib/data/labour/types";
 import { updatedDate } from "../../lib/explorer/coverageLabel";
-import { formatInUnit, type ValueUnit } from "../../lib/explorer/format";
+import { formatInUnit } from "../../lib/explorer/format";
 import {
-  buildLabourModel, changeLabourSelection, labourCoverage, labourFullLabel, labourList, parseLabourHash, serializeLabourHash,
+  buildLabourModel, changeLabourSelection, labourCoverage, labourFullLabel, labourList, ONE_DECIMAL, parseLabourHash, serializeLabourHash,
   type LabourHeading, type LabourSectionId,
 } from "../../lib/explorer/labour";
 import { buildLabourWorkbookExportModel } from "../../lib/explorer/labourWorkbook";
@@ -29,8 +29,6 @@ import { Callout, SourceNote } from "../ui/editorial";
 
 type LabourHashData = { section: LabourSectionId; facts: ClientLabourFact[] };
 const parseLabourState = (hash: string, data: LabourHashData) => parseLabourHash(hash, data.section, data.facts);
-/** Thousands of people, hours and percentages all show Geostat's one decimal. */
-const ONE_DECIMAL: ValueUnit = { divisor: 1, label: "", decimals: 1 };
 
 export type LabourExplorerProps = {
   section: LabourSectionId;
@@ -70,6 +68,8 @@ export function LabourExplorer({ section, facts, labels, headingLabels, latestLi
   const reference = model.series.find(series => series.reference);
   const total = rows.find(row => row.itemId === reference?.id) ?? null;
   const title = t(`page.${section}.title`);
+  // Geostat publishes no figure for some rows (men in households as employers): such a selection alone has nothing to draw.
+  const hasValues = model.selected.some(series => model.years.some(year => series.valuesByYear[year] != null));
   const downloadAction = <ExcelDownloadButton testId="labour-excel-download" disabled={!model.selected.length} onDownload={async () => {
     const { downloadWorkbook } = await import("../../lib/explorer/workbookWriter.client");
     await downloadWorkbook(buildLabourWorkbookExportModel({ section, facts, state, labels, headingLabels, sources, siteOrigin, title }, presentation));
@@ -85,6 +85,7 @@ export function LabourExplorer({ section, facts, labels, headingLabels, latestLi
             <span data-testid="labour-unit-label" className="text-[11px] text-[var(--muted)]">{unitLabel}</span>
           </div>
           {!model.selected.length ? <div className="mt-5"><Callout testId="no-selection-callout">{t("emptySelection")}</Callout></div>
+            : !hasValues ? <div className="mt-5"><Callout testId="no-values-callout">{t("noValues")}</Callout></div>
             : state.mode === "line" ? <div className="mt-5"><EditorialLineChart years={model.years} series={lineSeries} share={false} unit={unit} shareLabel={title} formatTooltipValue={valueLabel} /></div>
             : <ExplorerTable caption={`${title} · ${unitLabel} · ${model.range.start}–${model.range.end}`} rows={rows.filter(row => row !== total)} totalRow={total} showTotal={Boolean(total)} totalFirst wrapRowLabels rowLabelsLocalized years={model.years} firstColumnLabel={t("series")} unit={unit} share={false} showChangeColumn={false} shareValueForYear={() => null} />}
           <ChartSelectionAids series={lineSeries} chartShown={state.mode === "line"} share={false} unit={unit} formatValue={valueLabel} />
