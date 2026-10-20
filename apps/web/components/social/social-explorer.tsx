@@ -112,10 +112,12 @@ export function SocialExplorer({ section, facts, gdpFacts, gdpSources, breaks, l
             </div>
           </div>
           {!model.selected.length ? <div className="mt-5"><Callout testId="no-selection-callout">{t("emptySelection")}</Callout></div>
-            : state.mode === "line" ? <div className="mt-5"><EditorialLineChart years={model.years} series={lineSeries} share={false} unit={unit} shareLabel={chartLabel} formatTooltipValue={valueLabel} breaks={model.breaks.map(item => ({ year: item.year, label: newCounting }))} /></div>
-            : <ExplorerTable caption={`${chartLabel} · ${unitLabel} · ${model.range.start}–${model.range.end}`} rows={rows.filter(row => row !== total)} totalRow={total} showTotal={Boolean(total)} totalFirst wrapRowLabels rowLabelsLocalized years={model.years} firstColumnLabel={t("series")} unit={unit} share={false} showChangeColumn={false} shareValueForYear={() => null}
+            : state.mode === "line" ? <div className="mt-5"><EditorialLineChart years={model.years} series={lineSeries} share={gdpView} unit={unit} shareLabel={gdpView ? t("tab.gdp") : chartLabel} formatTooltipValue={valueLabel} breaks={model.breaks.map(item => ({ year: item.year, label: newCounting }))} /></div>
+            : <ExplorerTable caption={`${chartLabel} · ${unitLabel} · ${model.range.start}–${model.range.end}`} rows={rows.filter(row => row !== total)} totalRow={total} showTotal={Boolean(total)} totalFirst wrapRowLabels rowLabelsLocalized years={model.years} firstColumnLabel={t("series")} unit={unit} share={gdpView} showChangeColumn={false}
+              // % of GDP cells print as Money and banks prints them, "5.90%".
+              shareValueForYear={(row, year) => { const value = row.valuesByYear[year]; return value == null ? null : value / 100; }} shareDecimalsForRow={() => lead.decimals}
               breakYears={model.breaks.map(item => item.year)} breakLabel={newCounting} />}
-          <ChartSelectionAids series={lineSeries} chartShown={state.mode === "line"} share={false} unit={unit} formatValue={valueLabel} />
+          <ChartSelectionAids series={lineSeries} chartShown={state.mode === "line"} share={gdpView} unit={unit} formatValue={valueLabel} />
           <RangeStrip years={socialCoverage(section, state.view, facts, gdpFacts, state.selectedIds).years} range={model.range}
             onChange={patch => update(s => ({ ...s, range: rangeFromPatch(buildSocialModel(section, facts, s, { breaks, gdpFacts }).range, patch) }))} />
         </section>

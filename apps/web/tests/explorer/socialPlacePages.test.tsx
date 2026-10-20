@@ -71,7 +71,7 @@ describe("place pages", () => {
   it("a region: Guria's latest line, four headings, its municipalities ranked by share and its neighbours", async () => {
     const html = await place({ kind: "region", id: "guria" });
     expect(html).toContain('data-testid="social-place-pensions"');
-    expect(latest(html)).toMatch(/^2025: [\d,]+ pensioners · Guria$/);
+    expect(latest(html)).toMatch(/^2025: [\d,]+ pensioners$/);
     expect(count(html, /data-testid="series-heading"/g)).toBe(4);
     expect(count(html, /data-testid="series-row"/g)).toBe(10);
     expect(html).toContain('data-testid="social-excel-download"');
@@ -89,18 +89,18 @@ describe("place pages", () => {
 
   it("Georgia: no neighbours and no member list; Subsistence lists five headings", async () => {
     const html = await place({ kind: "country" });
-    expect(latest(html)).toBe("2025: 888,518 pensioners · Georgia");
+    expect(latest(html)).toBe("2025: 888,518 pensioners");
     expect(html).not.toContain('data-testid="municipal-entity-navigation"');
     expect(html).not.toContain("region-member-row");
     const subsistence = await place({ kind: "country" }, "subsistence-allowance");
-    expect(latest(subsistence)).toBe("2025: 129,506 families · Georgia");
+    expect(latest(subsistence)).toBe("2025: 129,506 families");
     expect(count(subsistence, /data-testid="series-heading"/g)).toBe(5);
     expect(count(subsistence, /data-testid="series-row"/g)).toBe(10);
   });
 
   it("a municipality: its crumbs pass through its region; Tbilisi and unknown places are not found", async () => {
     const html = await place({ kind: "municipality", slug: "ozurgeti" });
-    expect(latest(html)).toMatch(/^2025: [\d,]+ pensioners · Ozurgeti$/);
+    expect(latest(html)).toMatch(/^2025: [\d,]+ pensioners$/);
     expect(html).toContain('href="/en/explorer/health/pensions/region/guria"');
     for (const route of [{ kind: "region", id: "nowhere" }, { kind: "municipality", slug: "nowhere" }, { kind: "municipality", slug: "tbilisi" }] as const) {
       await expect(renderSocialPlacePage(route, "en", "pensions"), JSON.stringify(route)).rejects.toThrow(/NEXT_HTTP_ERROR_FALLBACK;404/);

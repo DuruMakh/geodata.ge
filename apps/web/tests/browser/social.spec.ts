@@ -59,7 +59,7 @@ test("Social payments: one row, the 6.17 billion line, the % of GDP switch and C
   await expect(page.getByTestId("social-measure-gdp").locator("svg")).toHaveCount(1);
   await page.getByTestId("social-measure-gdp").click();
   await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-view", "gdp");
-  await expect(page.getByTestId("social-unit-label")).toHaveText("მშპ-ს %");
+  await expect(page.getByTestId("social-unit-label")).toHaveText("მშპ-ის %");
   await expect(page.getByTestId("source-label")).toContainText("მშპ");
   // The line keeps the money headline.
   await expect(page.getByTestId("social-latest")).toContainText("6.17");
@@ -67,7 +67,7 @@ test("Social payments: one row, the 6.17 billion line, the % of GDP switch and C
   expect(share).toBeGreaterThan(0);
   expect(share).toBeLessThan(20);
   await page.getByTestId("chart-mode-table").click();
-  await expect(await cell(page, "გაცემული თანხა — ყველა პროგრამა", "2025")).toHaveText(/^\d{1,2}\.\d{2}$/);
+  await expect(await cell(page, "გაცემული თანხა — ყველა პროგრამა", "2025")).toHaveText(/^\d{1,2}\.\d{2}%$/);
   await expect(page).toHaveURL(/#tab=gdp&view=table&sel=social\.payments\.total\.amount&range=all$/);
   // COVID-19 compensation ran six months in each of 2020 and 2021: the table marks the year.
   await page.getByTestId("social-measure-amount").click();
@@ -97,7 +97,10 @@ test("the Pensions index draws the map, lists Georgia first and opens Tbilisi's 
 test("Guria's Pensions page: the latest line, four headings, one heading at a time, 2025 prices and the next region", async ({ page }) => {
   await page.goto("/en/explorer/health/pensions/region/guria");
   await ready(page);
-  await expect(page.getByTestId("social-latest")).toContainText("Guria");
+  // The heading's picker names the place, so the line under it does not (one phone line).
+  await expect(page.getByTestId("entity-picker-trigger")).toHaveText("Guria");
+  await expect(page.getByTestId("social-latest")).toHaveText(/^2025: [\d,]+ pensioners$/);
+  await expect(page.getByTestId("social-latest")).not.toContainText("Guria");
   await expect(page.getByTestId("series-heading")).toHaveText([/^Pensioners$/, /^Share of residents/, /^Money paid/, /^Average per month/]);
   await expect(pressedRows(page)).toHaveCount(1);
   await expect(page.locator(toggle("social.pension.recipients"))).toHaveAttribute("aria-pressed", "true");
@@ -187,7 +190,10 @@ test("Excel downloads a workbook on a place page and on Social payments", async 
 for (const prefix of ["", "/en"]) test(`social protection pages fit a 390px screen with one-line latest lines ${prefix || "ka"}`, async ({ page }) => {
   const errors: string[] = []; page.on("pageerror", error => errors.push(error.message));
   await page.setViewportSize({ width: 390, height: 900 });
-  for (const path of ["", "/social-payments", "/pensions", "/subsistence-allowance", "/pensions/region/guria", "/social-package"].map(path => `/explorer/health${path}`)) {
+  // The place pages include the longest region names and a long municipality name, on both sets.
+  const places = ["/region/racha_lechkhumi_kvemo_svaneti", "/region/samegrelo_zemo_svaneti", "/dedoplistskaro", "/georgia"];
+  const paths = ["", "/social-payments", "/pensions", "/subsistence-allowance", "/pensions/region/guria", "/social-package", ...["/pensions", "/subsistence-allowance"].flatMap(set => places.map(place => `${set}${place}`))];
+  for (const path of paths.map(path => `/explorer/health${path}`)) {
     await page.goto(`${prefix}${path}`);
     if (path === "/explorer/health") {
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), path).toBe(true);

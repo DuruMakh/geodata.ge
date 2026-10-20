@@ -261,7 +261,7 @@ export async function renderSocialPlacePage(route: SocialPlaceRoute, locale: Loc
           labels={Object.fromEntries(series.map(({ id }) => [id, t(`series.${id}`)]))}
           headingLabels={Object.fromEntries(series.map(({ heading }) => [heading, t(`heading.${heading}`)]))}
           title={t(`place.headingLead.${set}`)}
-          metaLine={<Message messages={messages} id={`social.latest.place.${set}`} values={{ period: headline.year, value: <LatestFigure value={countLabel(headline)} />, place: name }} />}
+          metaLine={<Message messages={messages} id={`social.latest.place.${set}`} values={{ period: headline.year, value: <LatestFigure value={countLabel(headline)} /> }} />}
           navigation={navigation}
           pickerCountry={buildPickerCountry(index.country.valueGel, georgia.municipalityCount)}
           pickerGroups={pickerGroupsFromRows(index)}
