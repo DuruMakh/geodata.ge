@@ -42,6 +42,7 @@ import { renderInflationCategories } from "../../lib/pages/inflation-categories"
 import { renderInflationCities } from "../../lib/pages/inflation-cities";
 import { renderInflationOverview } from "../../lib/pages/inflation-overview";
 import { renderInflationProducts } from "../../lib/pages/inflation-products";
+import { renderLabourPage } from "../../lib/pages/labour";
 import { renderLivingStandardsHub } from "../../lib/pages/living-standards";
 import { renderMethodologyArticle } from "../../lib/pages/methodology-article";
 import { renderMoneyBanksPage } from "../../lib/pages/moneyBanks";
@@ -101,6 +102,7 @@ const pages: PageRender[] = [
   ["inflation products", renderInflationProducts, 1],
   ["unemployment hub", renderUnemploymentHub, 0],
   ["unemployment", (locale) => renderUnemploymentPage(locale, "overview"), 1],
+  ["unemployment industries", (locale) => renderLabourPage(locale, "industries"), 1],
   ["wages hub", renderWagesHub, 0],
   ["wages", (locale) => renderWagesPage(locale, "industries"), 1],
   ["wages regions index", renderWagesRegionsIndexPage, 1],

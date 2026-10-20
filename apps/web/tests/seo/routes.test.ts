@@ -110,7 +110,8 @@ describe("indexable Fiscal.ge routes", () => {
     // Housing adds its hub, four pages and a page for Georgia and each of the 11 regions: 17 bilingual pairs.
     // The Housing methodology adds one more bilingual pair.
     // Education adds its hub, four pages, the 75 Schools and 75 Kindergartens place pages and its methodology page: 156 bilingual pairs.
-    expect(urls).toHaveLength(1020);
+    // Unemployment adds four Labour Force Survey detail pages (industries, hours, informal, young people): 4 bilingual pairs.
+    expect(urls).toHaveLength(1028);
     expect(new Set(urls).size).toBe(urls.length);
     expect(urls.every((url) => url.startsWith("https://fiscal.ge/"))).toBe(true);
     expect(urls).toContain("https://fiscal.ge/about");
@@ -252,7 +253,7 @@ describe("unemployment discovery", () => {
     const paths = await listPublicPagePaths(); expect(paths).toContain("/explorer/unemployment"); expect(paths).toContain("/methodology/unemployment");
     const entries = await sitemap();
     for (const path of ["/explorer/unemployment", "/en/explorer/unemployment", "/methodology/unemployment", "/en/methodology/unemployment"]) expect(entries.some(entry => entry.url.endsWith(path))).toBe(true);
-    for (const section of ["overview", "regions", "age", "gender"]) {
+    for (const section of ["overview", "regions", "age", "gender", "industries", "hours", "informal", "young-people"]) {
       expect(paths).toContain(`/explorer/unemployment/${section}`);
       for (const prefix of ["", "/en"]) expect(entries.some(entry => entry.url.endsWith(`${prefix}/explorer/unemployment/${section}`))).toBe(true);
     }
