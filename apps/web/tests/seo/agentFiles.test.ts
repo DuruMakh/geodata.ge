@@ -127,6 +127,13 @@ const statedCoverage: { url: string; file: string; rows?: (row: CsvRow) => boole
   { url: "/explorer/external/reserves", file: "external-position-annual.csv", rows: (row) => row.indicator_id.startsWith("reserves.") },
   { url: "/explorer/energy-food", file: "energy-food-annual.csv", rows: (row) => !row.indicator_id.startsWith("food.") },
   { url: "/explorer/energy-food", file: "energy-food-annual.csv", rows: (row) => row.indicator_id.startsWith("food.") },
+  { url: "/explorer/environment/greenhouse-gases", file: "environment-annual.csv", rows: (row) => row.indicator_id.startsWith("environment.ghg.") },
+  { url: "/explorer/environment/air-pollution", file: "environment-annual.csv", rows: (row) => row.indicator_id.startsWith("environment.air.") },
+  { url: "/explorer/environment/air-quality", file: "environment-annual.csv", rows: (row) => row.indicator_id.startsWith("environment.aq.") },
+  { url: "/explorer/environment/climate", file: "environment-annual.csv", rows: (row) => row.indicator_id.startsWith("environment.climate.") && Number(row.year) >= 2000, text: (first, last) => `from ${first} to ${last}` },
+  { url: "/explorer/environment/water", file: "environment-annual.csv", rows: (row) => row.indicator_id.startsWith("environment.water.") },
+  { url: "/explorer/environment/waste", file: "environment-annual.csv", rows: (row) => row.indicator_id.startsWith("environment.waste.") },
+  { url: "/explorer/environment/forests", file: "environment-annual.csv", rows: (row) => /^environment\.forest\.(timber_cut|illegal_logging)\./.test(row.indicator_id) },
   { url: "/explorer/demography/migration", file: "demography-migration-annual.csv" },
 ];
 

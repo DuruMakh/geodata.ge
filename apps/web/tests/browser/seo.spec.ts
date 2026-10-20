@@ -238,8 +238,8 @@ test("404 recovery keeps a real not-found response with useful, accessible desti
     const recovery = page.getByTestId("not-found-recovery");
     await expect(recovery).toContainText("მისამართი არ არსებობს ან გვერდი გადატანილია.");
     const links = recovery.getByRole("link");
-    await expect(links).toHaveCount(18);
-    for (const href of ["/", "/explorer", "/explorer/economy", "/explorer/business", "/explorer/housing", "/explorer/inflation", "/explorer/money", "/explorer/unemployment", "/explorer/wages", "/explorer/living-standards", "/explorer/health", "/explorer/education", "/explorer/crime", "/explorer/trade", "/explorer/external", "/explorer/energy-food", "/explorer/demography", "/methodology"]) {
+    await expect(links).toHaveCount(19);
+    for (const href of ["/", "/explorer", "/explorer/economy", "/explorer/business", "/explorer/housing", "/explorer/inflation", "/explorer/money", "/explorer/unemployment", "/explorer/wages", "/explorer/living-standards", "/explorer/health", "/explorer/education", "/explorer/crime", "/explorer/trade", "/explorer/external", "/explorer/energy-food", "/explorer/environment", "/explorer/demography", "/methodology"]) {
       await expect(recovery.locator(`[href=\"${href}\"]`)).toHaveCount(1);
     }
     await expectNoPageOverflow(page);
@@ -425,7 +425,7 @@ test("sitemap keeps its XML contract and offers a readable browser view", async 
   const xml = await response.text();
   expect(xml).toContain('<?xml-stylesheet type="text/xsl" href="/sitemap.xsl"?>');
   // The sitemap builder's URLs, the trade pages among them, are asserted in tests/seo/routes.test.ts.
-  expect([...xml.matchAll(/<loc>https:\/\/[^<]+<\/loc>/g)]).toHaveLength(1020);
+  expect([...xml.matchAll(/<loc>https:\/\/[^<]+<\/loc>/g)]).toHaveLength(1104);
 
   const consoleIssues: string[] = [];
   page.on("console", (message) => {
@@ -442,7 +442,7 @@ test("sitemap keeps its XML contract and offers a readable browser view", async 
     expect(navigation?.status()).toBe(200);
     await expect(page).toHaveTitle("Fiscal.ge / XML sitemap");
     await expect(page.getByRole("heading", { name: "Public pages" })).toHaveCount(1);
-    await expect(page.locator(".sitemap-row")).toHaveCount(1020);
+    await expect(page.locator(".sitemap-row")).toHaveCount(1104);
     await expectNoPageOverflow(page);
 
     if (viewport.width < 720) {

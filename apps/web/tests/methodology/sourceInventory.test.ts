@@ -99,6 +99,19 @@ describe("original-source inventory", () => {
     ]));
   });
 
+  it("inventories the 46 environment originals: the English and Georgian workbooks, the archived-only workbooks and the six page captures", async () => {
+    const rows = await expectedOriginalSourcePaths(REPOSITORY_ROOT, "environment");
+    expect(rows).toHaveLength(46);
+    expect(rows.every((row) => row.path.startsWith("docs/Raw Data/Environment/geostat-environment-annual/official/"))).toBe(true);
+    expect(rows.filter((row) => row.path.endsWith(".html")).map((row) => path.posix.basename(row.path))).toEqual(["page-565-en.html", "page-565-ka.html", "page-73-en.html", "page-73-ka.html", "page-822-en.html", "page-822-ka.html"]);
+    expect(rows.map((row) => row.path)).toEqual(expect.arrayContaining([
+      "docs/Raw Data/Environment/geostat-environment-annual/official/B-3.-Greenhouse-gas-emissions-ENG.XLSX",
+      "docs/Raw Data/Environment/geostat-environment-annual/official/B-3.-Greenhouse-gas-emissions-GEO.xlsx",
+      "docs/Raw Data/Environment/geostat-environment-annual/official/Volume-of-felled-timber.xls",
+      "docs/Raw Data/Environment/geostat-environment-annual/official/G-1.-Final-energy-consumption_ENG.xlsx",
+    ]));
+  });
+
   it("returns forward-slash paths in lexical order", async () => {
     const inventory = await expectedOriginalSourcePaths(REPOSITORY_ROOT);
     for (const rows of Object.values(inventory)) {
