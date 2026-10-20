@@ -140,3 +140,12 @@ export function buildScienceCultureModel(section: ScienceCultureTopicId, facts: 
   const years = breaks.filter(item => item.appliesTo.some(id => selected.has(id))).map(breakYear).filter(year => year > model.range.start && year <= model.range.end);
   return { ...model, breaks: [...new Set(years)].sort((a, b) => a - b).map(year => ({ year, label: "newCounting" as const })) };
 }
+
+/**
+ * A series' name outside the list (chart, table, workbook): `Heading — Row`, the heading's text before its unit. A row that
+ * is named as its heading ("Visitors" under Visitors) keeps its own name, never "Visitors — Visitors".
+ */
+export function scienceCultureSeriesLabel(series: Pick<ScienceCultureSeriesDefinition, "id" | "heading">, labels: Readonly<Record<string, string>>, t: (key: string) => string): string {
+  const heading = t(`heading.${series.heading}`).split(" · ")[0];
+  return heading === labels[series.id] ? heading : `${heading} — ${labels[series.id]}`;
+}

@@ -1,6 +1,7 @@
+import ExcelJS from "exceljs";
 import { beforeAll, expect, test } from "vitest";
 import { loadServedScienceCultureData, toClientScienceCultureFact } from "../../lib/data/scienceCulture/importScienceCulture";
-import { SCIENCE_CULTURE_INDICATORS, SCIENCE_CULTURE_REGIONS, type ClientScienceCultureFact, type ScienceCultureSeriesBreak } from "../../lib/data/scienceCulture/types";
+import { SCIENCE_CULTURE_INDICATORS, SCIENCE_CULTURE_REGIONS, SCIENCE_CULTURE_SOURCES, type ClientScienceCultureFact, type ScienceCultureSeriesBreak } from "../../lib/data/scienceCulture/types";
 import { INK } from "../../lib/explorer/colors";
 import {
   SCIENCE_CULTURE_HUB_PATH, SCIENCE_CULTURE_SECTIONS, buildScienceCultureModel, changeScienceCultureSelection, parseScienceCultureHash, scienceCultureCoverage,
@@ -10,8 +11,13 @@ import {
   MUSEUM_AREAS, buildMuseumAreaModel, changeMuseumAreaSelection, museumAreaDefaultSelection, museumAreaHref, museumAreaOfMapId,
   museumAreaSelectionHash, museumAreaSeries, museumAreaSlug, museumMapId, museumRegionHref, parseMuseumAreaHash,
 } from "../../lib/explorer/scienceCultureMuseums";
+import { buildScienceCultureHubCards } from "../../lib/explorer/scienceCultureHubCards";
 import { buildMuseumRegionMapModel } from "../../lib/explorer/scienceCultureMuseumsRegionMap";
+import { buildScienceCultureWorkbookExportModel } from "../../lib/explorer/scienceCultureWorkbook";
 import { serializeTopicHash } from "../../lib/explorer/topicSeries";
+import { createWorkbookBuffer } from "../../lib/explorer/workbookWriter.client";
+import { getMessages } from "../../lib/i18n/messages.server";
+import type { Locale, Presentation } from "../../lib/i18n/types";
 
 let facts: ClientScienceCultureFact[];
 let breaks: ScienceCultureSeriesBreak[];
@@ -221,4 +227,97 @@ test("every topic and museum area model builds over its full coverage", () => {
     expect(model.series).toHaveLength(museumAreaSeries(area).length);
     expect(model.years.length).toBeGreaterThan(0);
   }
+});
+
+const presentation = async (locale: Locale = "en"): Promise<Presentation> => ({ locale, englishLabels: {}, messages: await getMessages(locale, ["workbook", "format", "common", "scienceCulture"]) });
+const SOURCES = SCIENCE_CULTURE_SOURCES.map(sourceId => ({
+  sourceId, years: Array.from({ length: 21 }, (_, i) => 2005 + i), title: sourceId, organization: "Geostat", retrievedAt: "2026-10-20",
+  downloadHref: `/downloads/methodology/science-culture/files/${sourceId}.xlsx` as const,
+}));
+const base = { sources: SOURCES, siteOrigin: "https://fiscal.ge", title: "Title" };
+const labelsFor = (ids: readonly string[]) => Object.fromEntries(ids.map(id => [id, id]));
+const ENGLISH: Record<string, string> = { [sc("theatre_audience", "total")]: "Audience", [sc("theatre_events", "total")]: "Events in Georgia" };
+
+test("a theatres workbook exports audience in thousands as stored and leaves the events before 2021 blank", async () => {
+  const ids = [sc("theatre_audience", "total"), sc("theatre_events", "total")];
+  // Audience (thousand) and events (count) are two units: the workbook follows the selection's unit, the first row's.
+  const audience = buildScienceCultureWorkbookExportModel({ ...base, facts, section: "theatres", labels: ENGLISH, state: state([ids[0]], { kind: "manual", start: 2006, end: 2025 }) }, await presentation());
+  expect(audience.filename).toBe("fiscal-science-culture-theatres-2006-2025-en.xlsx");
+  expect(audience.readable.unitLabel).toBe("thousand");
+  expect(audience.readable.numberFormat).toBe("#,##0.0");
+  expect(audience.readable.rows[0].valuesByYear[2025]).toBe(620.322);
+  expect(audience.analysis.rows.find(r => r[0] === 2025)).toEqual([2025, "Audience", 620.322, "Official"]);
+  expect(audience.analysis.numericFormats).toEqual({ 3: "#,##0.0" });
+
+  const events = buildScienceCultureWorkbookExportModel({ ...base, facts, section: "theatres", labels: ENGLISH, state: state([ids[1]], { kind: "manual", start: 2006, end: 2025 }) }, await presentation());
+  expect(events.readable.unitLabel).toBe("number");
+  expect(events.readable.numberFormat).toBe("#,##0");
+  expect(events.readable.years).toHaveLength(20);
+  expect(events.readable.rows[0].label).toBe("Events — Events in Georgia");
+  for (let year = 2006; year <= 2020; year++) {
+    expect(events.readable.rows[0].valuesByYear[year]).toBeNull();
+    expect(events.readable.rows[0].basisByYear[year]).toBeNull();
+    expect(events.analysis.rows.find(r => r[0] === year)!.slice(2)).toEqual([null, "Not available"]);
+  }
+  expect(events.readable.rows[0].valuesByYear[2021]).toBeGreaterThan(0);
+  expect(events.sources.map(s => s.title)).toEqual(["geostat_culture_theatre_events"]);
+
+  // The Excel cell holds the exact stored number; only the number format rounds it.
+  const excel = new ExcelJS.Workbook(); await excel.xlsx.load(await createWorkbookBuffer(audience));
+  expect(excel.worksheets).toHaveLength(3);
+  const data = excel.worksheets[1];
+  const row = data.getRows(2, data.rowCount - 1)!.find(r => r.getCell(1).value === 2025)!;
+  expect(row.getCell(3).value).toBe(620.322);
+  expect(row.getCell(3).numFmt).toBe("#,##0.0");
+});
+
+test("a theatres workbook of audience and events blanks the events cells before 2021 when both are exported", async () => {
+  // Audience and events differ in unit, so a mixed link keeps one; the events row alone covers 2006–2025 because the audience rows set the coverage.
+  const ids = [sc("theatre_shows", "total"), sc("theatre_events", "total")];
+  const model = buildScienceCultureWorkbookExportModel({ ...base, facts, section: "theatres", labels: labelsFor(ids), state: state(ids, { kind: "manual", start: 2006, end: 2025 }) }, await presentation());
+  const events = model.readable.rows[1];
+  expect(model.readable.rows.map(r => r.label)).toEqual([`Shows — ${ids[0]}`, `Events — ${ids[1]}`]);
+  expect(model.readable.years[0]).toBe(2006);
+  for (let year = 2006; year <= 2020; year++) expect(events.valuesByYear[year]).toBeNull();
+  expect(events.valuesByYear[2021]).not.toBeNull();
+  expect(model.analysis.rows).toHaveLength(40);
+});
+
+test("a Guria museums workbook is named for the area and cites only the by-region source", async () => {
+  const id = sc("museum_visitors", "region_guria");
+  const model = buildScienceCultureWorkbookExportModel({ ...base, facts, area: "region_guria", labels: { [id]: "Visitors" }, state: state([id], { kind: "manual", start: 2005, end: 2025 }) }, await presentation());
+  expect(model.filename).toBe("fiscal-science-culture-museums-guria-2005-2025-en.xlsx");
+  expect(model.readable.unitLabel).toBe("thousand");
+  expect(model.readable.rows.map(r => r.label)).toEqual(["Visitors"]);
+  expect(model.readable.rows[0].kind).toBe("total");
+  expect(model.sources.map(s => s.title)).toEqual(["geostat_culture_museums_regions"]);
+  expect(model.sources[0].absoluteUrl).toBe("https://fiscal.ge/downloads/methodology/science-culture/files/geostat_culture_museums_regions.xlsx");
+  const ka = await buildScienceCultureWorkbookExportModel({ ...base, facts, area: "region_guria", labels: { [id]: "Visitors" }, state: state([id]) }, await presentation("ka"));
+  expect(ka.filename).toBe("fiscal-science-culture-museums-guria-2005-2025.xlsx");
+  const empty = buildScienceCultureWorkbookExportModel({ ...base, facts, section: "research", labels: {}, state: state([]) }, await presentation());
+  expect(empty.readable.rows).toEqual([]); expect(empty.analysis.rows).toEqual([]); expect(empty.sources).toEqual([]);
+});
+
+test("a research workbook exports million GEL as stored and persons as whole numbers", async () => {
+  const spending = sc("rd_spending", "total");
+  const model = buildScienceCultureWorkbookExportModel({ ...base, facts, section: "research", labels: { [spending]: "Spending on research and development" }, state: state([spending]) }, await presentation());
+  expect(model.filename).toBe("fiscal-science-culture-research-2019-2024-en.xlsx");
+  expect(model.readable.unitLabel).toBe("million GEL");
+  expect(model.readable.numberFormat).toBe("#,##0.0");
+  expect(model.readable.rows[0].label).toBe("Spending — Spending on research and development");
+  expect(model.readable.rows[0].valuesByYear[2024]).toBe(facts.find(f => f.indicatorId === spending && f.year === 2024)!.value);
+  const people = buildScienceCultureWorkbookExportModel({ ...base, facts, section: "research", labels: labelsFor([sc("researchers", "total")]), state: state([sc("researchers", "total")]) }, await presentation());
+  expect(people.readable.numberFormat).toBe("#,##0");
+  expect(people.readable.rows[0].valuesByYear[2024]).toBe(14046);
+});
+
+test("the hub has four cards with each default series' latest value and years", async () => {
+  const cards = buildScienceCultureHubCards(facts, await presentation());
+  expect(cards.map(card => card.href)).toEqual(SCIENCE_CULTURE_SECTIONS.map(section => section.href));
+  expect(cards.map(card => card.title)).toEqual(["Research", "Patents", "Museums", "Theatres"]);
+  expect(cards.map(card => card.footer)).toEqual(["2024 · 14,046 · 2019–2024", "2025 · 79 · 2016–2025", "2025 · 1,998.9 · 2005–2025", "2025 · 620.3 · 2006–2025"]);
+  expect(cards.map(card => card.series!.length)).toEqual([6, 10, 21, 20]);
+  expect(cards[3].series!.at(-1)).toBe(620.322);
+  expect(cards.every(card => card.seriesColor === INK && !card.comingSoon)).toBe(true);
+  expect(cards.map(card => card.index)).toEqual(["01", "02", "03", "04"]);
 });
