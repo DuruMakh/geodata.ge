@@ -74,11 +74,11 @@ const BALANCE_FACTS: ServedGeneralGovernmentBalanceFact[] = [
 // and falls back to a literal cannot pass unnoticed.
 
 describe("buildHubCards", () => {
-  it("orders expenditure, revenue, municipalities, analysis, debt, deficit", () => {
+  it("orders expenditure, spending by type, revenue, municipalities, analysis, debt, deficit", () => {
     const cards = buildHubCards(FACTS, MUNICIPAL_TOTALS, DEBT_FACTS);
 
-    expect(cards.map((card) => card.title)).toEqual(["ხარჯები", "შემოსავლები", "მუნიციპალიტეტები", "ანალიზი", "ვალი", "დეფიციტი"]);
-    expect(cards.map((card) => card.index)).toEqual(["01", "02", "03", "04", "05", "06"]);
+    expect(cards.map((card) => card.title)).toEqual(["ხარჯები", "ხარჯების სახეები", "შემოსავლები", "მუნიციპალიტეტები", "ანალიზი", "ვალი", "დეფიციტი"]);
+    expect(cards.map((card) => card.index)).toEqual(["01", "02", "03", "04", "05", "06", "07"]);
   });
 
   it("derives each live card's footer from the latest year", () => {
@@ -88,14 +88,14 @@ describe("buildHubCards", () => {
     // 2025 expenditure carries an explicit total row, so the card reads it
     // rather than the 2bn category sum — see the parity test below.
     expect(cards[0].footer).toContain("9.0");
-    expect(cards[1].footer).toContain("4.0");
+    expect(cards[2].footer).toContain("4.0");
   });
 
   it("gives live cards a real series to draw", () => {
     const cards = buildHubCards(FACTS, MUNICIPAL_TOTALS, DEBT_FACTS);
 
     expect(cards[0].series).toEqual([1_000_000_000, 9_000_000_000]);
-    expect(cards[1].series).toEqual([3_000_000_000, 4_000_000_000]);
+    expect(cards[2].series).toEqual([3_000_000_000, 4_000_000_000]);
   });
 
   it("emits a null for a year with no facts instead of dropping it", () => {
@@ -118,7 +118,7 @@ describe("buildHubCards", () => {
     // category sum; 11.00 would be the sum with the total double-counted in.
     expect(cards[0].footer).toBe("2025 · 9.0 მლრდ ₾");
     // The total row is still not a category.
-    expect(cards[3].footer).toContain("1 კატეგორია");
+    expect(cards[4].footer).toContain("1 კატეგორია");
   });
 
   it("lets an actual value beat a planned value for the same year and item", () => {
@@ -126,11 +126,11 @@ describe("buildHubCards", () => {
 
     // 2025 VAT is planned 9bn then actual 4bn. Keeping the planned row, or
     // summing both, would put an unreviewed figure on the hub's revenue card.
-    expect(cards[1].series?.at(-1)).toBe(4_000_000_000);
+    expect(cards[2].series?.at(-1)).toBe(4_000_000_000);
   });
 
-  it("makes card 03 a live destination once municipal data is routed", () => {
-    const card = buildHubCards(FACTS, MUNICIPAL_TOTALS, DEBT_FACTS)[2]!;
+  it("makes card 04 a live destination once municipal data is routed", () => {
+    const card = buildHubCards(FACTS, MUNICIPAL_TOTALS, DEBT_FACTS)[3]!;
 
     expect(card.href).toBe("/explorer/municipalities");
     expect(card.comingSoon).toBe(false);
@@ -155,14 +155,14 @@ describe("buildHubCards", () => {
     // payments. Describing it as "64 მუნიციპალიტეტი და 11 რეგიონი" overstated
     // the local-budget total those entities sum to by 8.6%. The destination
     // page states 69 საბიუჯეტო ერთეული; the card now matches it.
-    const card = buildHubCards(FACTS, MUNICIPAL_TOTALS, DEBT_FACTS)[2]!;
+    const card = buildHubCards(FACTS, MUNICIPAL_TOTALS, DEBT_FACTS)[3]!;
 
     expect(card.description).toBe("69 მუნიციპალური საბიუჯეტო ერთეული — რაში იხარჯება ადგილობრივი ბიუჯეტები.");
     expect(card.description).not.toContain("მუნიციპალიტეტი და");
   });
 
   it("points the analysis card at the route it actually opens", () => {
-    const card = buildHubCards(FACTS, MUNICIPAL_TOTALS, DEBT_FACTS)[3];
+    const card = buildHubCards(FACTS, MUNICIPAL_TOTALS, DEBT_FACTS)[4];
 
     expect(card.href).toBe("/explorer/analysis");
     expect(card.comingSoon).toBe(false);
@@ -170,8 +170,8 @@ describe("buildHubCards", () => {
     expect(card.footer).toContain("კატეგორია");
   });
 
-  it("builds card 05 only from the served total-debt facts", () => {
-    const card = buildHubCards(FACTS, MUNICIPAL_TOTALS, DEBT_FACTS)[4]!;
+  it("builds card 06 only from the served total-debt facts", () => {
+    const card = buildHubCards(FACTS, MUNICIPAL_TOTALS, DEBT_FACTS)[5]!;
 
     expect(card.href).toBe("/explorer/debt");
     expect(card.comingSoon).toBe(false);
@@ -180,8 +180,18 @@ describe("buildHubCards", () => {
     expect(card.seriesColor).toBe(INK);
   });
 
-  it("builds card 06 from actual IMF deficit percentages, excluding projections", () => {
-    const card = buildHubCards(FACTS, MUNICIPAL_TOTALS, DEBT_FACTS, BALANCE_FACTS)[5]!;
+  it("builds card 02 from the general-government spending totals it is handed", () => {
+    const card = buildHubCards(FACTS, MUNICIPAL_TOTALS, DEBT_FACTS, BALANCE_FACTS, undefined, new Map([[2024, 27_000_000_000], [2025, 29_743_800_000]]))[1]!;
+
+    expect(card.href).toBe("/explorer/expenditure-types");
+    expect(card.comingSoon).toBe(false);
+    expect(card.series).toEqual([27_000_000_000, 29_743_800_000]);
+    expect(card.footer).toBe("2025 · 29.7 მლრდ ₾");
+    expect(card.seriesColor).toBe(INK);
+  });
+
+  it("builds card 07 from actual IMF deficit percentages, excluding projections", () => {
+    const card = buildHubCards(FACTS, MUNICIPAL_TOTALS, DEBT_FACTS, BALANCE_FACTS)[6]!;
 
     expect(card.href).toBe("/explorer/deficit");
     expect(card.comingSoon).toBe(false);

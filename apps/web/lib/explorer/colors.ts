@@ -151,6 +151,19 @@ export const SERIES_COLORS: Record<string, string> = {
   "gdp_use.imports_goods": "#C23A4A",
   "gdp_use.imports_services": "#6B4A3A",
 
+  // Spending by type (spec 2026-10-21): the total is ink; all new hexes, at least 14 CIEDE2000 apart
+  // and from ink, and at least 3:1 on paper and tint.
+  "spending_type.total": INK,
+  "spending_type.expense": "#7F5530",
+  "spending_type.compensation": "#B8603A",
+  "spending_type.goods_services": "#9C7A26",
+  "spending_type.interest": "#93363A",
+  "spending_type.subsidies": "#6E4A92",
+  "spending_type.grants": "#B85482",
+  "spending_type.social_benefits": "#34609E",
+  "spending_type.other": "#62664A",
+  "spending_type.investment": "#256B4E",
+
   // Migration citizenship groups (demography section spec 2026-10-04 §7). The
   // computed remainder is never a country and wears the shared "other" colour.
   "citizenship.georgia": "#3D5A98",

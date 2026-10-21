@@ -1,0 +1,100 @@
+[
+  {
+    "id": "spending_type.total",
+    "classificationCode": "2M",
+    "sortOrder": 0,
+    "officialName": "Total expenditure",
+    "labelKa": "სულ ხარჯები",
+    "labelEn": "Total spending"
+  },
+  {
+    "id": "spending_type.expense",
+    "classificationCode": "2",
+    "sortOrder": 1,
+    "officialName": "Expense",
+    "labelKa": "მიმდინარე ხარჯები, სულ",
+    "labelEn": "Total running costs",
+    "headingKa": "მიმდინარე ხარჯები",
+    "headingEn": "Running costs"
+  },
+  {
+    "id": "spending_type.compensation",
+    "classificationCode": "21",
+    "sortOrder": 2,
+    "officialName": "Compensation of employees",
+    "labelKa": "შრომის ანაზღაურება",
+    "labelEn": "Wages and salaries",
+    "headingKa": "მიმდინარე ხარჯები",
+    "headingEn": "Running costs"
+  },
+  {
+    "id": "spending_type.goods_services",
+    "classificationCode": "22",
+    "sortOrder": 3,
+    "officialName": "Use of goods and services",
+    "labelKa": "საქონელი და მომსახურება",
+    "labelEn": "Goods and services",
+    "headingKa": "მიმდინარე ხარჯები",
+    "headingEn": "Running costs"
+  },
+  {
+    "id": "spending_type.interest",
+    "classificationCode": "24",
+    "sortOrder": 4,
+    "officialName": "Interest",
+    "labelKa": "პროცენტი",
+    "labelEn": "Interest",
+    "headingKa": "მიმდინარე ხარჯები",
+    "headingEn": "Running costs"
+  },
+  {
+    "id": "spending_type.subsidies",
+    "classificationCode": "25",
+    "sortOrder": 5,
+    "officialName": "Subsidies",
+    "labelKa": "სუბსიდიები",
+    "labelEn": "Subsidies",
+    "headingKa": "მიმდინარე ხარჯები",
+    "headingEn": "Running costs"
+  },
+  {
+    "id": "spending_type.grants",
+    "classificationCode": "26",
+    "sortOrder": 6,
+    "officialName": "Grants",
+    "labelKa": "გრანტები",
+    "labelEn": "Grants",
+    "headingKa": "მიმდინარე ხარჯები",
+    "headingEn": "Running costs"
+  },
+  {
+    "id": "spending_type.social_benefits",
+    "classificationCode": "27",
+    "sortOrder": 7,
+    "officialName": "Social benefits",
+    "labelKa": "სოციალური უზრუნველყოფა",
+    "labelEn": "Social benefits",
+    "headingKa": "მიმდინარე ხარჯები",
+    "headingEn": "Running costs"
+  },
+  {
+    "id": "spending_type.other",
+    "classificationCode": "28",
+    "sortOrder": 8,
+    "officialName": "Other expense",
+    "labelKa": "სხვა ხარჯები",
+    "labelEn": "Other costs",
+    "headingKa": "მიმდინარე ხარჯები",
+    "headingEn": "Running costs"
+  },
+  {
+    "id": "spending_type.investment",
+    "classificationCode": "31",
+    "sortOrder": 9,
+    "officialName": "Net acquisition of nonfinancial assets",
+    "labelKa": "შენობები, გზები და სხვა აქტივები",
+    "labelEn": "Buildings, roads and other assets",
+    "headingKa": "ინვესტიციები",
+    "headingEn": "Investment"
+  }
+]

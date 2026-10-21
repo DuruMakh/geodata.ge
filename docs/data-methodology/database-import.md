@@ -67,6 +67,7 @@ Unemployment uses the existing single import transaction. Source IDs retain thei
 | `LabourFact` | `data/imports/labour-annual.csv` (see `labour-detail-annual.md`) |
 | `HousingFact` | `data/imports/housing-annual.csv` (see `housing-annual.md`) |
 | `GdpExpenditureFact` | `data/imports/gdp-expenditure-annual.csv` (see `gdp-expenditure.md`) |
+| `ExpenditureTypeFact` | `data/imports/expenditure-types-annual.csv` (see `expenditure-types.md`) |
 | `InternetFact` | `data/imports/internet-annual.csv` (see `internet-annual.md`) |
 | `EducationFact` | `data/imports/education-annual.csv` (see `education-annual.md`) |
 | `SocialFact` | `data/imports/social-protection-annual.csv` (21,988 SSA annual observations; exact values, GEL as summed, with the months each covers; the counting-change register `social-protection-series-breaks.csv` is read from the CSV and not mirrored) |

@@ -67,7 +67,7 @@ const registerRow = (overrides: Partial<DecisionRegisterRow> = {}): DecisionRegi
 
 describe("methodology catalog", () => {
   it("exposes the approved live datasets", () => {
-    expect(LIVE_METHODOLOGY_IDS).toEqual(["expenditure", "revenue", "municipalities", "debt", "gdp", "economic-sectors", "gdp-expenditure", "regional-economies", "business", "housing", "inflation", "money", "unemployment", "wages", "poverty", "household-income", "health", "social-protection", "education", "science-culture", "crime", "internet", "trade", "external-flows", "energy-food", "environment", "transport", "demography"]);
+    expect(LIVE_METHODOLOGY_IDS).toEqual(["expenditure", "expenditure-types", "revenue", "municipalities", "debt", "gdp", "economic-sectors", "gdp-expenditure", "regional-economies", "business", "housing", "inflation", "money", "unemployment", "wages", "poverty", "household-income", "health", "social-protection", "education", "science-culture", "crime", "internet", "trade", "external-flows", "energy-food", "environment", "transport", "demography"]);
     expect(Object.keys(METHODOLOGY_CONTENT)).toEqual(LIVE_METHODOLOGY_IDS);
   });
 
@@ -340,6 +340,7 @@ describe("methodology catalog", () => {
     const archives: Record<(typeof LIVE_METHODOLOGY_IDS)[number], MethodologyArchiveSummary> = {
       "economic-sectors": {fileCount:3,totalBytes:100,latestRetrievedAt:"2026-09-11",validated:true,minYear:2010,maxYear:2025},
       "gdp-expenditure": {fileCount:3,totalBytes:100,latestRetrievedAt:"2026-10-20",validated:true,minYear:2010,maxYear:2025},
+      "expenditure-types": {fileCount:1,totalBytes:100,latestRetrievedAt:"2026-10-21",validated:true,minYear:2002,maxYear:2025},
       "regional-economies": {fileCount:2,totalBytes:100,latestRetrievedAt:"2026-09-13",validated:true,minYear:2010,maxYear:2024},
       expenditure: { fileCount: 42, totalBytes: 100, latestRetrievedAt: "2026-08-10", validated: true },
       revenue: { fileCount: 21, totalBytes: 200, latestRetrievedAt: "2026-08-09", validated: true },
@@ -378,6 +379,7 @@ describe("methodology catalog", () => {
         originalFileCount: 42,
         reviewedAt: METHODOLOGY_CONTENT.expenditure.reviewedAt,
       },
+      {id:"expenditure-types",title:METHODOLOGY_CONTENT["expenditure-types"].title,summary:METHODOLOGY_CONTENT["expenditure-types"].summary,href:"/methodology/expenditure-types",coverage:{firstYear:2002,lastYear:2025},originalFileCount:1,reviewedAt:METHODOLOGY_CONTENT["expenditure-types"].reviewedAt},
       {
         id: "revenue",
         title: METHODOLOGY_CONTENT.revenue.title,
@@ -444,6 +446,7 @@ describe("methodology catalog", () => {
     const archives = {
       "economic-sectors": {fileCount:3,totalBytes:100,latestRetrievedAt:"2026-09-11",validated:true,minYear:2010,maxYear:2025},
       "gdp-expenditure": {fileCount:3,totalBytes:100,latestRetrievedAt:"2026-10-20",validated:true,minYear:2010,maxYear:2025},
+      "expenditure-types": {fileCount:1,totalBytes:100,latestRetrievedAt:"2026-10-21",validated:true,minYear:2002,maxYear:2025},
       "regional-economies": {fileCount:2,totalBytes:100,latestRetrievedAt:"2026-09-13",validated:true,minYear:2010,maxYear:2024},
       expenditure: { fileCount: 1, totalBytes: 1, latestRetrievedAt: "2026-08-10", validated: true },
       revenue: { fileCount: 1, totalBytes: 1, latestRetrievedAt: "2026-08-10", validated: false },
