@@ -34,7 +34,7 @@ export type TaxBreaksRefundsFact = {
   sourceCell: string;
   lastReviewedAt: string;
 };
-export type ClientTaxBreaksRefundsFact = Pick<TaxBreaksRefundsFact, "year" | "indicatorId" | "sourceId"> & { value: number; unit: "gel" };
+export type ClientTaxBreaksRefundsFact = Pick<TaxBreaksRefundsFact, "year" | "indicatorId" | "sourceId"> & { value: number; unit: "gel" | "percent" };
 export type TaxBreaksRefundsAcceptance = {
   status: "passed";
   years: { min: number; max: number };
