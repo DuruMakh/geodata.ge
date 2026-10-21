@@ -5,6 +5,7 @@ import { message } from "../i18n/messages";
 import { workbookMessage } from "../i18n/workbook";
 import { buildCrimeModel, crimeMeasureFacts, crimeUnitKey, type CrimePopulation, type CrimeSectionId, type CrimeState } from "./crime";
 import { SHEET_NAMES, neededSourceYears, sourcesForNeededYears, withAbsoluteUrls, workbookFilename, type WorkbookExportModel, type WorkbookPublicSource } from "./workbookModel";
+import { roundShown } from "./format";
 
 /** The Data sheet's columns in order; the numeric format is keyed by the 1-based position of the `value` column. */
 const ANALYSIS_COLUMNS = ["year", "series", "value", "unit", "status"] as const;
@@ -37,7 +38,7 @@ export function buildCrimeWorkbookExportModel(input: CrimeWorkbookInput, present
   const unitLabels = [...new Set(model.selected.map(series => unitLabel(series.id)))].join(" · ");
   const numberFormat = rates ? "#,##0.0" : "#,##0";
   // A rate is written to the one decimal the page shows it with, so the cell holds the figure the reader sees.
-  const valueOf = (value: number | null) => value === null ? null : Number(value.toFixed(model.decimals));
+  const valueOf = (value: number | null) => roundShown(value, model.decimals);
   // As on Money and banks, a rate fiscal.ge divides out is marked calculated; a count is Geostat's published figure.
   const status = (fact: ReturnType<typeof cell>) => !fact ? workbookMessage(locale, "workbook.unavailable") : fact.calculated ? t("status.calculated") : t("status.published");
   const cells = model.years.flatMap(year => model.selected.map(series => ({ year, series, fact: cell(series.id, year) })));

@@ -8,6 +8,7 @@ import { buildSocialPlaceModel, socialPlaceFacts, type SocialPlaceExtras } from 
 import type { ClientNationalGdpFact } from "./clientData";
 import type { TopicState } from "./topicSeries";
 import { SHEET_NAMES, neededSourceYears, sourcesForNeededYears, withAbsoluteUrls, workbookFilename, type WorkbookExportModel, type WorkbookPublicSource } from "./workbookModel";
+import { roundShown } from "./format";
 
 type SocialWorkbookInput = {
   facts: readonly ClientSocialFact[];
@@ -73,7 +74,7 @@ export function buildSocialWorkbookExportModel(input: SocialWorkbookInput, prese
   // Only a figure the page derives (a share of residents, a value at 2025 prices, a % of GDP) is written to the decimals shown, so the cell
   // holds what the reader sees; SSA's sums and averages keep their served precision and the number format does the display rounding.
   const derived = (series: { calculated?: "share" | "real" }) => series.calculated !== undefined || gdpView;
-  const valueOf = (series: { calculated?: "share" | "real" }, value: number | null) => value === null ? null : derived(series) ? Number(value.toFixed(lead.decimals)) : value;
+  const valueOf = (series: { calculated?: "share" | "real" }, value: number | null) => derived(series) ? roundShown(value, lead.decimals) : value;
   // A programme that ran part of a year says how many months its money or average covers.
   const status = (series: { id: string; partialMonths: Record<number, number> }, year: number) => {
     if (!cell(series.id, year)) return workbookMessage(locale, "workbook.unavailable");
