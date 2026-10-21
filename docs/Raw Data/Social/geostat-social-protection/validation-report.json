@@ -1,0 +1,12 @@
+{
+ "retrieved_on": "2026-10-17",
+ "publisher": "National Statistics Office of Georgia (Geostat)",
+ "counts": {
+  "workbooks": 30,
+  "value_cells": 8481,
+  "ssa_cross_checks": 46,
+  "findings": 32
+ },
+ "failures": [],
+ "passed": true
+}

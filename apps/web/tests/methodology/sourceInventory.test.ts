@@ -1,5 +1,6 @@
 import path from "node:path";
-import { mkdtemp, mkdir, rm, symlink, writeFile } from "node:fs/promises";
+import { mkdtemp, mkdir, readFile, rm, symlink, writeFile } from "node:fs/promises";
+import { parse } from "csv-parse/sync";
 import { tmpdir } from "node:os";
 import { afterEach, describe, expect, it } from "vitest";
 import { expectedOriginalSourcePaths } from "../../lib/methodology/sourceInventory";
@@ -90,6 +91,28 @@ describe("original-source inventory", () => {
     expect(rows).toHaveLength(45);
     expect(rows.every((row) => row.path.startsWith("docs/Raw Data/Education/geostat-education-annual/official/"))).toBe(true);
     expect(rows.filter((row) => row.path.endsWith(".html")).map((row) => path.posix.basename(row.path))).toEqual([58, 59, 60, 61].map((category) => `geostat-category-${category}-2026-10-16.html`));
+  });
+
+  it("inventories the 17 social protection originals: SSA's page captures and link lists and Geostat's four divisors, never the SSA workbooks", async () => {
+    const rows = await expectedOriginalSourcePaths(REPOSITORY_ROOT, "social-protection");
+    expect(rows).toHaveLength(17);
+    const ssa = rows.filter((row) => row.path.startsWith("docs/Raw Data/Social/"));
+    expect(ssa).toHaveLength(13);
+    expect(ssa.every((row) => row.path.startsWith("docs/Raw Data/Social/ssa-statistics/official/pages/"))).toBe(true);
+    expect(ssa.some((row) => row.path.includes("pre2012"))).toBe(false);
+    expect(rows.filter((row) => !row.path.startsWith("docs/Raw Data/Social/")).map((row) => row.path)).toEqual([
+      "docs/Raw Data/Economy/gdp-overview/sources/geostat_nominal_current.xlsx",
+      "docs/Raw Data/Inflation/geostat-cpi/2026-09/en/cpi-index-2010.xlsx",
+      "docs/Raw Data/Inflation/geostat-cpi/2026-09/ka/cpi-index-2010.xlsx",
+      "docs/Raw Data/Municipalities/geostat-population-regional-gdp/official/01-population-by-self-governed-unit.xlsx",
+    ]);
+    // The PR #170 rule: the 206 MB of SSA workbooks stay out of the published archive and the methodology bundle.
+    expect(rows.reduce(sumBytes, 0)).toBeLessThan(1_000_000);
+    // Every SSA table the served facts cite is registered on one of these captures.
+    const registry = parse(await readFile(path.join(REPOSITORY_ROOT, "data/sources/source-documents.csv"), "utf8"), { bom: true, columns: true }) as { source_id: string; source_url_or_file: string }[];
+    const ssaRegistry = registry.filter((row) => row.source_id.startsWith("source.ssa_"));
+    expect(ssaRegistry).toHaveLength(25);
+    expect(ssaRegistry.filter((row) => !ssa.some((capture) => capture.path === row.source_url_or_file))).toEqual([]);
   });
 
   it("inventories the 26 business originals", async () => {

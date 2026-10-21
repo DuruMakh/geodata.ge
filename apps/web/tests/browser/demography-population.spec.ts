@@ -29,7 +29,8 @@ for (const [locale, prefix, heading, coverage, khulo, batumi] of [
     await expect(page.getByTestId("explorer-header")).toContainText(coverage);
     await expect(page.getByTestId("municipality-map")).toBeVisible();
     await expect(page.getByTestId("index-kpi")).toHaveCount(4);
-    await expect(page.getByTestId("municipal-list-row")).toHaveCount(64);
+    // Georgia, then the 64 municipalities.
+    await expect(page.getByTestId("municipal-list-row")).toHaveCount(65);
     await expect(page.locator('[data-testid^="population-level-"], [data-testid^="population-measure-"], [data-testid="population-georgia-pill"]')).toHaveCount(0);
     await expect(page.getByTestId("breadcrumb-json-ld")).toHaveCount(1);
     await expect(page.getByTestId("explorer-dataset-json-ld")).toHaveCount(0);
@@ -101,7 +102,8 @@ test("Tbilisi opens one page from the map's city dot and from the lists", async 
 
   await page.goto("/en/explorer/demography/population");
   await ready(page);
-  await page.getByTestId("municipal-list-row").first().click();
+  // Georgia heads the list; Tbilisi, the most populous municipality, follows it.
+  await page.getByTestId("municipal-list-row").nth(1).click();
   await expect(page).toHaveURL(/\/population\/region\/tbilisi$/);
   await expect(page.getByTestId("region-member-row")).toHaveCount(0);
 

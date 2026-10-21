@@ -111,6 +111,7 @@ describe("indexable Fiscal.ge routes", () => {
     // Housing adds its hub, four pages and a page for Georgia and each of the 11 regions: 17 bilingual pairs.
     // The Housing methodology adds one more bilingual pair.
     // Education adds its hub, four pages, the 75 Schools and 75 Kindergartens place pages and its methodology page: 156 bilingual pairs.
+    // The Social protection methodology adds one more bilingual pair.
     // Science and culture adds its hub, four pages, a Museums page for Georgia and each of the 11 regions and its methodology page: 18 bilingual pairs.
     // Environment and climate adds its hub, seven pages, nine city pages, a Waste and a Forests page for Georgia and each of the 11 regions and its methodology page: 42 bilingual pairs.
     // Unemployment adds four Labour Force Survey detail pages (industries, hours, informal, young people): 4 bilingual pairs.
@@ -118,7 +119,7 @@ describe("indexable Fiscal.ge routes", () => {
     // Marriages and divorces adds one demography page: one bilingual pair.
     // Transport adds its hub, five pages, a page for Georgia and each of the 11 regions and its methodology page: 19 bilingual pairs.
     // Internet and technology adds its hub, four pages, a page for Georgia and each of the 11 regions and its methodology page: 18 bilingual pairs.
-    expect(urls).toHaveLength(1230);
+    expect(urls).toHaveLength(1540);
     expect(new Set(urls).size).toBe(urls.length);
     expect(urls.every((url) => url.startsWith("https://fiscal.ge/"))).toBe(true);
     expect(urls).toContain("https://fiscal.ge/about");
@@ -141,6 +142,8 @@ describe("indexable Fiscal.ge routes", () => {
     expect(urls).toContain("https://fiscal.ge/en/methodology/housing");
     expect(urls).toContain("https://fiscal.ge/methodology/education");
     expect(urls).toContain("https://fiscal.ge/en/methodology/education");
+    expect(urls).toContain("https://fiscal.ge/methodology/social-protection");
+    expect(urls).toContain("https://fiscal.ge/en/methodology/social-protection");
     expect(urls).toContain("https://fiscal.ge/methodology/science-culture");
     expect(urls).toContain("https://fiscal.ge/en/methodology/science-culture");
     expect(urls).toContain("https://fiscal.ge/methodology/transport");
@@ -207,6 +210,17 @@ describe("indexable Fiscal.ge routes", () => {
       expect(urls).not.toContain(`https://fiscal.ge/explorer/education/${set}/tbilisi`);
     }
     expect(urls.some(url => /\/explorer\/education\/.*\/\d{2}$/.test(url))).toBe(false);
+    // Social protection sits on the Health hub: two topic pages, and two map indexes with 75 place pages each.
+    for (const page of ["/social-payments", "/social-package", ...["pensions", "subsistence-allowance"].flatMap(set => [`/${set}`, `/${set}/georgia`, ...educationRegions.map(region => `/${set}/region/${region}`), `/${set}/batumi`, `/${set}/ozurgeti`])]) {
+      expect(urls).toContain(`https://fiscal.ge/explorer/health${page}`);
+      expect(urls).toContain(`https://fiscal.ge/en/explorer/health${page}`);
+    }
+    for (const set of ["pensions", "subsistence-allowance"]) {
+      expect(urls.filter(url => url.startsWith(`https://fiscal.ge/explorer/health/${set}/`))).toHaveLength(75);
+      expect(urls.filter(url => url.startsWith(`https://fiscal.ge/en/explorer/health/${set}/`))).toHaveLength(75);
+      expect(urls).not.toContain(`https://fiscal.ge/explorer/health/${set}/tbilisi`);
+    }
+    expect(urls.some(url => /\/explorer\/health\/(pensions|subsistence-allowance)\/\d{2}$/.test(url))).toBe(false);
     for (const page of ["", "/research", "/patents", "/museums", "/theatres", ...businessAreas.map(area => `/museums/${area}`)]) {
       expect(urls).toContain(`https://fiscal.ge/explorer/science-culture${page}`);
       expect(urls).toContain(`https://fiscal.ge/en/explorer/science-culture${page}`);
@@ -250,6 +264,7 @@ describe("indexable Fiscal.ge routes", () => {
       "/methodology/poverty",
       "/methodology/household-income",
       "/methodology/health",
+      "/methodology/social-protection",
       "/methodology/education",
       "/methodology/science-culture",
       "/methodology/crime",

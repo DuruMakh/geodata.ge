@@ -156,6 +156,8 @@
     "data:check-transport": "tsx scripts/prepare-transport.ts --check",
     "data:prepare-education": "tsx scripts/prepare-education.ts --write",
     "data:check-education": "tsx scripts/prepare-education.ts --check",
+    "data:prepare-social": "tsx scripts/prepare-social.ts --write",
+    "data:check-social": "tsx scripts/prepare-social.ts --check",
     "data:prepare-environment": "tsx scripts/prepare-environment.ts --write",
     "data:check-environment": "tsx scripts/prepare-environment.ts --check",
     "data:prepare-science-culture": "tsx scripts/prepare-science-culture.ts --write",
@@ -193,7 +195,7 @@
   "devDependencies": {
     "@modelcontextprotocol/client": "2.3.1",
     "@modelcontextprotocol/sdk": "1.32.1",
-    "@playwright/test": "^1.63.0",
+    "@playwright/test": "^1.64.1",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^24.19.0",
     "@types/react": "^19",

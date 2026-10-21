@@ -43,6 +43,8 @@ import { EDUCATION_HUB_PATH, EDUCATION_SECTIONS } from "../explorer/education";
 import { TRANSPORT_HUB_PATH, TRANSPORT_SECTIONS } from "../explorer/transport";
 import { TRANSPORT_AREAS, transportAreaHref } from "../explorer/transportAreas";
 import { educationPlaceBase } from "../explorer/educationPlaces";
+import { SOCIAL_SECTIONS } from "../explorer/social";
+import { socialPlaceBase } from "../explorer/socialPlaces";
 import { ENVIRONMENT_HUB_PATH, ENVIRONMENT_SECTIONS } from "../explorer/environment";
 import { ENVIRONMENT_AREAS, environmentAreaRoutes } from "../explorer/environmentAreas";
 import { ENVIRONMENT_CITIES } from "../data/environment/types";
@@ -74,6 +76,7 @@ export async function listPublicPagePaths(): Promise<string[]> {
     ...(["waste", "forests"] as const).flatMap(topic => ENVIRONMENT_AREAS.map(environmentAreaRoutes(topic).areaHref)),
     INTERNET_HUB_PATH, ...INTERNET_SECTIONS.map(section => section.href), ...INTERNET_AREAS.map(internetAreaHref),
     EDUCATION_HUB_PATH, ...EDUCATION_SECTIONS.map(section => section.href), ...(["schools", "kindergartens"] as const).flatMap(set => placePagePaths(educationPlaceBase(set), regions.map(({ id }) => id))),
+    ...SOCIAL_SECTIONS.map(section => section.href), ...(["pensions", "subsistence-allowance"] as const).flatMap(set => placePagePaths(socialPlaceBase(set), regions.map(({ id }) => id))),
     SCIENCE_CULTURE_HUB_PATH, ...SCIENCE_CULTURE_SECTIONS.map(section => section.href), ...MUSEUM_AREAS.map(museumAreaHref),
     ...regions.map(region => unemploymentRegionHref(region.id)),
     "/explorer/economy/regions",

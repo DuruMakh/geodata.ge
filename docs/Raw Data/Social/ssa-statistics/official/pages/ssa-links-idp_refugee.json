@@ -1,0 +1,214 @@
+{
+  "category_id": "idp_refugee",
+  "source_url": "https://ssa.moh.gov.ge/statistik.php?lang=1&id=202212070009083804291872&v=0",
+  "captured_on": "2026-10-18",
+  "capture_method": "Visible source-page links read in Chrome",
+  "tables": [
+    {
+      "table_no": 1,
+      "updated": "2026-10-08",
+      "files": [
+        {
+          "label": "2026",
+          "href": "/upload/20261008030640-9.1-2026.xlsx"
+        },
+        {
+          "label": "2025",
+          "href": "/upload/20251231092956-9.1-2025.xlsx"
+        },
+        {
+          "label": "2024",
+          "href": "/upload/20241230025011-9.1.xlsx"
+        },
+        {
+          "label": "2023",
+          "href": "/upload/20240109103308-9.1.xlsx"
+        },
+        {
+          "label": "2022",
+          "href": "/upload/20230321040227-9.1 (4).xlsx"
+        },
+        {
+          "label": "2021",
+          "href": "/upload/20230321035805-9.1 .xlsx"
+        },
+        {
+          "label": "2020",
+          "href": "/upload/20250715124006-დევნილები ლტოლვილები 2020 -9.1.xlsx"
+        },
+        {
+          "label": "2019",
+          "href": "/upload/20230327114703-9.1 (6).xlsx"
+        },
+        {
+          "label": "2018",
+          "href": "/upload/20230328115454-9.1 (7).xlsx"
+        },
+        {
+          "label": "2017",
+          "href": "/upload/20230331013054-9.1 (8).xlsx"
+        },
+        {
+          "label": "2016",
+          "href": "/upload/20230331111528-9.1 (9).xlsx"
+        },
+        {
+          "label": "2015",
+          "href": "/upload/20230403014458-9.1 (10).xlsx"
+        },
+        {
+          "label": "2014",
+          "href": "/upload/20230404113754-9.1 (11).xlsx"
+        },
+        {
+          "label": "2013",
+          "href": "/upload/20230405021633-9.1 (12).xlsx"
+        },
+        {
+          "label": "2012",
+          "href": "/upload/20230405035621-9.1 (13).xlsx"
+        },
+        {
+          "label": "2011",
+          "href": "/upload/20230407010029-9.1 (16).xlsx"
+        },
+        {
+          "label": "2010",
+          "href": "/upload/20230407122114-9.1 (14).xlsx"
+        }
+      ]
+    },
+    {
+      "table_no": 2,
+      "updated": "2026-10-08",
+      "files": [
+        {
+          "label": "2026",
+          "href": "/upload/20261008030651-9.2-2026.xlsx"
+        },
+        {
+          "label": "2025",
+          "href": "/upload/20251231093002-9.2-2025.xlsx"
+        },
+        {
+          "label": "2024",
+          "href": "/upload/20241230025107-9.2.xlsx"
+        },
+        {
+          "label": "2023",
+          "href": "/upload/20240109103316-9.2.xlsx"
+        },
+        {
+          "label": "2022",
+          "href": "/upload/20230317102457-2022-9.2.xlsx"
+        },
+        {
+          "label": "2021",
+          "href": "/upload/20230321035901-9.2 .xlsx"
+        },
+        {
+          "label": "2020",
+          "href": "/upload/20250715124026-დევნილები ლტოლვილები 2020-9.2.xlsx"
+        },
+        {
+          "label": "2019",
+          "href": "/upload/20230327114709-9.2 (3).xlsx"
+        },
+        {
+          "label": "2018",
+          "href": "/upload/20230328115535-9.2 (4).xlsx"
+        },
+        {
+          "label": "2017",
+          "href": "/upload/20230331013105-9.2 (5).xlsx"
+        },
+        {
+          "label": "2016",
+          "href": "/upload/20230331111711-9.2 (6).xlsx"
+        },
+        {
+          "label": "2015",
+          "href": "/upload/20230403014506-9.2 (7).xlsx"
+        },
+        {
+          "label": "2014",
+          "href": "/upload/20230404115111-9.2 2014.xlsx"
+        },
+        {
+          "label": "2013",
+          "href": "/upload/20230405021733-9.2 (9).xlsx"
+        },
+        {
+          "label": "2012",
+          "href": "/upload/20230405035628-9.2 (10).xlsx"
+        },
+        {
+          "label": "2011",
+          "href": "/upload/20230407010039-9.2 (12).xlsx"
+        },
+        {
+          "label": "2010",
+          "href": "/upload/20230407122122-9.2 (11).xlsx"
+        }
+      ]
+    },
+    {
+      "table_no": 3,
+      "updated": "2026-10-08",
+      "files": [
+        {
+          "label": "2026",
+          "href": "/upload/20261008030658-9.3-2026.xlsx"
+        },
+        {
+          "label": "2025",
+          "href": "/upload/20251231093009-9.3-2025.xlsx"
+        },
+        {
+          "label": "2024",
+          "href": "/upload/20241230025021-9.3.xlsx"
+        },
+        {
+          "label": "2023",
+          "href": "/upload/20240109103329-9.3.xlsx"
+        },
+        {
+          "label": "2022",
+          "href": "/upload/20230317102525-2022-9.3.xlsx"
+        },
+        {
+          "label": "2021",
+          "href": "/upload/20230321035936-9.3_ .xlsx"
+        },
+        {
+          "label": "2020",
+          "href": "/upload/20250715124034-დევნილები ლტოლვილები 2020 -9.3.xlsx"
+        },
+        {
+          "label": "2019",
+          "href": "/upload/20230327114717-9.3 (3).xlsx"
+        },
+        {
+          "label": "2018",
+          "href": "/upload/20230328115621-9.3 (4).xlsx"
+        },
+        {
+          "label": "2017",
+          "href": "/upload/20230331013114-9.3 (5).xlsx"
+        },
+        {
+          "label": "2016",
+          "href": "/upload/20230331111745-9.3 (6).xlsx"
+        },
+        {
+          "label": "2015",
+          "href": "/upload/20230403014516-9.3 (7).xlsx"
+        },
+        {
+          "label": "2014",
+          "href": "/upload/20230404113808-9.3 (8).xlsx"
+        }
+      ]
+    }
+  ]
+}

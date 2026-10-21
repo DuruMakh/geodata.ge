@@ -4,6 +4,7 @@ import { LABOUR_SECTIONS } from "../explorer/labour";
 import { WAGES_SECTIONS } from "../explorer/wages";
 import { LIVING_STANDARDS_HUB_PATH, LIVING_STANDARDS_SECTIONS } from "../explorer/livingStandards";
 import { HEALTH_HUB_PATH, HEALTH_SECTIONS } from "../explorer/health";
+import { SOCIAL_SECTIONS } from "../explorer/social";
 import { CRIME_HUB_PATH, CRIME_SECTIONS } from "../explorer/crime";
 import { ENERGY_FOOD_HUB_PATH, ENERGY_FOOD_SECTIONS } from "../explorer/energyFood";
 import { TRANSPORT_HUB_PATH, TRANSPORT_SECTIONS } from "../explorer/transport";
@@ -131,7 +132,7 @@ export const NAV_TREE: readonly NavHub[] = [
     railLabelKey: "common.dataHealth",
     testId: "health-link",
     spaced: true,
-    sections: sectionRows(HEALTH_SECTIONS, "health"),
+    sections: sectionRows([...HEALTH_SECTIONS, ...SOCIAL_SECTIONS], "health"),
   },
   {
     href: EDUCATION_HUB_PATH,
@@ -261,6 +262,8 @@ const PAGE_SOURCE_NOTES: Readonly<Record<string, string>> = {
   "/explorer/inflation/products": "common.geostatSourceNote",
   "/explorer/external": "common.externalHubSourceNote",
   "/explorer/external/foreign-investment": "common.geostatSourceNote",
+  // The hub lists Geostat's health pages and the Social Service Agency's pages.
+  [HEALTH_HUB_PATH]: "common.socialSourceNote",
 };
 
 /** Footer source notes for an address and every page below it; the longest address wins. */
@@ -276,6 +279,7 @@ const TREE_SOURCE_NOTES: Readonly<Record<string, string>> = {
   "/explorer/wages": "common.geostatSourceNote",
   [LIVING_STANDARDS_HUB_PATH]: "common.geostatSourceNote",
   [HEALTH_HUB_PATH]: "common.geostatSourceNote",
+  ...Object.fromEntries(SOCIAL_SECTIONS.map(section => [section.href, "common.socialSourceNote"])),
   [EDUCATION_HUB_PATH]: "common.geostatSourceNote",
   [SCIENCE_CULTURE_HUB_PATH]: "common.geostatSourceNote",
   [CRIME_HUB_PATH]: "common.geostatSourceNote",

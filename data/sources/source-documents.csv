@@ -467,6 +467,31 @@ source.geostat_education_preschool_page,ადრეული და სკო�
 source.geostat_education_general_page,ზოგადი განათლება (წყაროს გვერდი),docs/Raw Data/Education/geostat-education-annual/official/geostat-category-59-2026-10-16.html,2026-10-16
 source.geostat_education_vocational_page,პროფესიული განათლება (წყაროს გვერდი),docs/Raw Data/Education/geostat-education-annual/official/geostat-category-60-2026-10-16.html,2026-10-16
 source.geostat_education_higher_page,უმაღლესი განათლება (წყაროს გვერდი),docs/Raw Data/Education/geostat-education-annual/official/geostat-category-61-2026-10-16.html,2026-10-16
+source.ssa_pension_01,პენსიის მიმღებთა რაოდენობა და მათზე გასაცემი თანხა,docs/Raw Data/Social/ssa-statistics/official/pages/ssa-page-pension.html,2026-10-20
+source.ssa_pension_02,დევნილი სტატუსის მქონე პენსიის მიმღები პირების რაოდენობა და მათზე გასაცემი თანხა,docs/Raw Data/Social/ssa-statistics/official/pages/ssa-page-pension.html,2026-10-20
+source.ssa_pension_04,მაღალმთიან რეგიონში სახელმწიფო პენსიის დანამატის მიმღებ პირთა რაოდენობა და გადარიცხული თანხა,docs/Raw Data/Social/ssa-statistics/official/pages/ssa-page-pension.html,2026-10-20
+source.ssa_tsa_allowance_01,საარსებო შემწეობის მიმღები ოჯახებისა და მოსახლეობის რაოდენობა,docs/Raw Data/Social/ssa-statistics/official/pages/ssa-page-tsa_allowance.html,2026-10-20
+source.ssa_tsa_allowance_02,საარსებო შემწეობაზე გადარიცხული თანხა,docs/Raw Data/Social/ssa-statistics/official/pages/ssa-page-tsa_allowance.html,2026-10-20
+source.ssa_tsa_allowance_03,საარსებო შემწეობის მიმღებთა რაოდენობა ასაკობრივი ჯგუფების მიხედვით,docs/Raw Data/Social/ssa-statistics/official/pages/ssa-page-tsa_allowance.html,2026-10-20
+source.ssa_tsa_db_01,მონაცემთა ბაზაში რეგისტრირებული და საარსებო შემწეობის მიმღები ოჯახების რაოდენობა,docs/Raw Data/Social/ssa-statistics/official/pages/ssa-page-tsa_db.html,2026-10-20
+source.ssa_socpackage_01,სოციალური პაკეტის მიმღებთა რაოდენობა ჯგუფების მიხედვით,docs/Raw Data/Social/ssa-statistics/official/pages/ssa-page-socpackage.html,2026-10-20
+source.ssa_socpackage_02,სოციალური პაკეტის დასაფინანსებლად გადარიცხული თანხა ჯგუფების მიხედვით,docs/Raw Data/Social/ssa-statistics/official/pages/ssa-page-socpackage.html,2026-10-20
+source.ssa_socpackage_10,მაღალმთიან რეგიონში სოციალური პაკეტის დანამატის მიმღებ პირთა რაოდენობა და გადარიცხული თანხა,docs/Raw Data/Social/ssa-statistics/official/pages/ssa-page-socpackage.html,2026-10-20
+source.ssa_idp_refugee_02,იძულებით გადაადგილებული პირების და ლტოლვილის შემწეობაზე გადარიცხული თანხა,docs/Raw Data/Social/ssa-statistics/official/pages/ssa-links-idp_refugee.json,2026-10-20
+source.ssa_compensation_04,კომპენსაციისა და სტიპენდიისათვის გადარიცხული თანხა თვეში უწყებების მიხედვით,docs/Raw Data/Social/ssa-statistics/official/pages/ssa-page-compensation.html,2026-10-20
+source.ssa_maternity_01,"ორსულობის, მშობიარობის, ბავშვის მოვლის ასევე ახალშობილის შვილად აყვანის შემთხვევების რაოდენობა მშობლის ასაკის მიხედვით და მათზე გადარიცხული თანხა",docs/Raw Data/Social/ssa-statistics/official/pages/ssa-links-maternity.json,2026-10-20
+source.ssa_maternity_03,"ორსულობის, მშობიარობის, ბავშვის მოვლის ასევე ახალშობილის შვილად აყვანის შემთხვევებისათვის გადარიცხული თანხა ცალკეული თვეების განმავლობაში",docs/Raw Data/Social/ssa-statistics/official/pages/ssa-links-maternity.json,2026-10-20
+source.ssa_demography_02,"დახმარების მიმღები, მესამე და შემდეგი ბავშვების რაოდენობა სქესობრივ ჭრილში და მათზე გადარიცხული თანხა",docs/Raw Data/Social/ssa-statistics/official/pages/ssa-page-demography.html,2026-10-20
+source.ssa_demography_04,"დახმარების მიმღები, მაღალმთიან დასახლებაში მუდმივად მცხოვრები პირველი, მეორე, მესამე და შემდეგი ბავშვების რაოდენობა სქესობრივ ჭრილში და მათზე გადარიცხული თანხა",docs/Raw Data/Social/ssa-statistics/official/pages/ssa-page-demography.html,2026-10-20
+source.ssa_utilitysubsidy_02,საყოფაცხოვრებო სუბსიდიის მიმღებ პირებზე გადარიცხული თანხა,docs/Raw Data/Social/ssa-statistics/official/pages/ssa-page-utilitysubsidy.html,2026-10-20
+source.ssa_other_01,ელექტროენერგიის გაზრდილი ტარიფის შედეგად გამოწვეული სუბსიდირების მოსარგებლე აბონენტთა რაოდენობა და მათზე გადარიცხული თანხა,docs/Raw Data/Social/ssa-statistics/official/pages/ssa-links-other.json,2026-10-20
+source.ssa_other_02,"მრავალშვილიანი მშობლ(ებ)ისთვის ელექტროენერგიის ღირებულების სუბსიდია, ბენეფიციართა რაოდენობა და გადარიცხული თანხა",docs/Raw Data/Social/ssa-statistics/official/pages/ssa-links-other.json,2026-10-20
+source.ssa_other_03,სასმელი წყლის/წყალარინების საფასურის სუბსიდირებით მოსარგებლე აბონენტთა რაოდენობა და მათზე გადარიცხული თანხა,docs/Raw Data/Social/ssa-statistics/official/pages/ssa-links-other.json,2026-10-20
+source.ssa_other_04,"კორონავირუსით გამოწვეული ინფექციის შედეგად მიყენებული ზიანის შესამსუბუქებლად, სოციალურად დაუცველთა და შშმ პირთათვის დაწესებული კომპენსაცია, ბენეფიციართა რაოდენობა და გადარიცხული თანხა",docs/Raw Data/Social/ssa-statistics/official/pages/ssa-links-other.json,2026-10-20
+source.ssa_highmountain_01,მაღალმთიან დასახლებაში მუდმივად მცხოვრები/დასაქმებული/დაკონტრაქტებული დანამატის მიმღები ექიმებისა და ექთნების რაოდენობა და მათზე გადარიცხული თანხა,docs/Raw Data/Social/ssa-statistics/official/pages/ssa-links-highmountain.json,2026-10-20
+source.ssa_highmountain_03,"მაღალმთიან დასახლებაში მუდმივად მცხოვრები, ელექტროენერგიის შეღავათით მოსარგებლე ბენეფიციართა რაოდენობა და მათზე გადარიცხული თანხა",docs/Raw Data/Social/ssa-statistics/official/pages/ssa-links-highmountain.json,2026-10-20
+source.ssa_workinjury_03,შრომითი მოვალეობის შესრულებისას მიყენებული ზიანის ანაზღაურება: გადარიცხული თანხა,docs/Raw Data/Social/ssa-statistics/official/pages/ssa-page-workinjury.html,2026-10-20
+source.ssa_statistics,SSA-ს სტატისტიკის სია (წყაროს გვერდი),docs/Raw Data/Social/ssa-statistics/official/pages/ssa-page-statistiklist.html,2026-10-20
 source.geostat_env_ghg,B-3. სათბურის გაზების ემისიები,docs/Raw Data/Environment/geostat-environment-annual/official/B-3.-Greenhouse-gas-emissions-ENG.XLSX,2026-10-20
 source.geostat_env_air_emissions,A-1. ატმოსფერულ ჰაერში გაფრქვეული მავნე ნივთიერებები,docs/Raw Data/Environment/geostat-environment-annual/official/A-1.-Emissions-of-pollutants-into-the-atmospheric-air_ENG.XLSX,2026-10-20
 source.geostat_env_air_quality,A-2. ატმოსფერული ჰაერის ხარისხი ურბანულ ტერიტორიებზე,docs/Raw Data/Environment/geostat-environment-annual/official/A-2_Ambient_air_quality_in_urban_areas_ENG.XLSX,2026-10-20

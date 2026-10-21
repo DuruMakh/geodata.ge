@@ -2891,6 +2891,181 @@
     },
     "derivation": null
   },
+  "source.ssa_pension_01": {
+    "name": {
+      "text": "Pension recipients and the amount payable to them",
+      "reviewedAt": "2026-10-20"
+    },
+    "derivation": null
+  },
+  "source.ssa_pension_02": {
+    "name": {
+      "text": "Pension recipients with IDP status and the amount payable to them",
+      "reviewedAt": "2026-10-20"
+    },
+    "derivation": null
+  },
+  "source.ssa_pension_04": {
+    "name": {
+      "text": "High-mountain state pension supplement: recipients and amount transferred",
+      "reviewedAt": "2026-10-20"
+    },
+    "derivation": null
+  },
+  "source.ssa_tsa_allowance_01": {
+    "name": {
+      "text": "Families and persons receiving subsistence allowance",
+      "reviewedAt": "2026-10-20"
+    },
+    "derivation": null
+  },
+  "source.ssa_tsa_allowance_02": {
+    "name": {
+      "text": "Amount transferred as subsistence allowance",
+      "reviewedAt": "2026-10-20"
+    },
+    "derivation": null
+  },
+  "source.ssa_tsa_allowance_03": {
+    "name": {
+      "text": "Subsistence allowance recipients by age group",
+      "reviewedAt": "2026-10-20"
+    },
+    "derivation": null
+  },
+  "source.ssa_tsa_db_01": {
+    "name": {
+      "text": "Families registered in the database and families receiving subsistence allowance",
+      "reviewedAt": "2026-10-20"
+    },
+    "derivation": null
+  },
+  "source.ssa_socpackage_01": {
+    "name": {
+      "text": "Social package recipients by group",
+      "reviewedAt": "2026-10-20"
+    },
+    "derivation": null
+  },
+  "source.ssa_socpackage_02": {
+    "name": {
+      "text": "Amount transferred to fund the social package by group",
+      "reviewedAt": "2026-10-20"
+    },
+    "derivation": null
+  },
+  "source.ssa_socpackage_10": {
+    "name": {
+      "text": "High-mountain social package supplement: recipients and amount transferred",
+      "reviewedAt": "2026-10-20"
+    },
+    "derivation": null
+  },
+  "source.ssa_idp_refugee_02": {
+    "name": {
+      "text": "Amount transferred as IDP and refugee allowance",
+      "reviewedAt": "2026-10-20"
+    },
+    "derivation": null
+  },
+  "source.ssa_compensation_04": {
+    "name": {
+      "text": "Monthly amount transferred for compensation and stipends by agency",
+      "reviewedAt": "2026-10-20"
+    },
+    "derivation": null
+  },
+  "source.ssa_maternity_01": {
+    "name": {
+      "text": "Maternity, childcare and adoption cases by parent's age and amount transferred",
+      "reviewedAt": "2026-10-20"
+    },
+    "derivation": null
+  },
+  "source.ssa_maternity_03": {
+    "name": {
+      "text": "Amount transferred for maternity, childcare and adoption cases by month",
+      "reviewedAt": "2026-10-20"
+    },
+    "derivation": null
+  },
+  "source.ssa_demography_02": {
+    "name": {
+      "text": "Third and later children receiving the benefit by sex and amount transferred",
+      "reviewedAt": "2026-10-20"
+    },
+    "derivation": null
+  },
+  "source.ssa_demography_04": {
+    "name": {
+      "text": "High-mountain children receiving the benefit by sex and amount transferred",
+      "reviewedAt": "2026-10-20"
+    },
+    "derivation": null
+  },
+  "source.ssa_utilitysubsidy_02": {
+    "name": {
+      "text": "Amount transferred to utility subsidy recipients",
+      "reviewedAt": "2026-10-20"
+    },
+    "derivation": null
+  },
+  "source.ssa_other_01": {
+    "name": {
+      "text": "Subscribers subsidised for the electricity tariff increase and amount transferred",
+      "reviewedAt": "2026-10-20"
+    },
+    "derivation": null
+  },
+  "source.ssa_other_02": {
+    "name": {
+      "text": "Electricity subsidy for parents of large families: beneficiaries and amount transferred",
+      "reviewedAt": "2026-10-20"
+    },
+    "derivation": null
+  },
+  "source.ssa_other_03": {
+    "name": {
+      "text": "Drinking water and sewerage subsidy: subscribers and amount transferred",
+      "reviewedAt": "2026-10-20"
+    },
+    "derivation": null
+  },
+  "source.ssa_other_04": {
+    "name": {
+      "text": "COVID-19 compensation for socially vulnerable and disabled people: beneficiaries and amount",
+      "reviewedAt": "2026-10-20"
+    },
+    "derivation": null
+  },
+  "source.ssa_highmountain_01": {
+    "name": {
+      "text": "High-mountain doctors and nurses receiving a salary supplement and amount transferred",
+      "reviewedAt": "2026-10-20"
+    },
+    "derivation": null
+  },
+  "source.ssa_highmountain_03": {
+    "name": {
+      "text": "High-mountain residents receiving the electricity discount and amount transferred",
+      "reviewedAt": "2026-10-20"
+    },
+    "derivation": null
+  },
+  "source.ssa_workinjury_03": {
+    "name": {
+      "text": "Workplace-injury compensation: amount transferred",
+      "reviewedAt": "2026-10-20"
+    },
+    "derivation": null
+  },
+  "source.ssa_statistics": {
+    "name": {
+      "text": "Social Service Agency statistics list (source page)",
+      "reviewedAt": "2026-10-20"
+    },
+    "derivation": null
+  },
   "source.geostat_science_researchers": {
     "name": {
       "text": "Number of researchers by level of education, age groups and fields of science",

@@ -1,0 +1,154 @@
+{
+  "category_id": "other",
+  "source_url": "https://ssa.moh.gov.ge/statistik.php?lang=1&id=202212070011506407356915&v=0",
+  "captured_on": "2026-10-18",
+  "capture_method": "Visible source-page links read in Chrome",
+  "tables": [
+    {
+      "table_no": 1,
+      "updated": "2026-10-08",
+      "files": [
+        {
+          "label": "2026",
+          "href": "/upload/20261008031059-10.3.1-2026.xlsx"
+        },
+        {
+          "label": "2025",
+          "href": "/upload/20260206022153-10.3.1_2025.xlsx"
+        },
+        {
+          "label": "2024",
+          "href": "/upload/20250205042440-10.3.1.xlsx"
+        },
+        {
+          "label": "2023",
+          "href": "/upload/20240214013651-10.3.1.xlsx"
+        },
+        {
+          "label": "2022",
+          "href": "/upload/20230321035518-2022-10.3.1.xlsx"
+        },
+        {
+          "label": "2021",
+          "href": "/upload/20230321040129-10-3.1.xlsx"
+        },
+        {
+          "label": "2020",
+          "href": "/upload/20230322033303-10-3.1.xlsx"
+        },
+        {
+          "label": "2019",
+          "href": "/upload/20230327115958-10-3.1 (1).xlsx"
+        },
+        {
+          "label": "2018",
+          "href": "/upload/20230328051326-10-3.1 (2).xlsx"
+        },
+        {
+          "label": "2017",
+          "href": "/upload/20230331125409-10-3.1 (3).xlsx"
+        },
+        {
+          "label": "2016",
+          "href": "/upload/20230403104256-10-3.1 (4).xlsx"
+        },
+        {
+          "label": "2015",
+          "href": "/upload/20230403125718-10-3.1 (5).xlsx"
+        }
+      ]
+    },
+    {
+      "table_no": 2,
+      "updated": "2026-10-08",
+      "files": [
+        {
+          "label": "2026",
+          "href": "/upload/20261008031113-10.3.2-2026.xlsx"
+        },
+        {
+          "label": "2025",
+          "href": "/upload/20260206022159-10.3.2_2025.xlsx"
+        },
+        {
+          "label": "2024",
+          "href": "/upload/20250205042447-10.3.2.xlsx"
+        },
+        {
+          "label": "2023",
+          "href": "/upload/20240214013658-10.3.2.xlsx"
+        },
+        {
+          "label": "2022",
+          "href": "/upload/20230321035529-2022-10.3.2.xlsx"
+        },
+        {
+          "label": "2021",
+          "href": "/upload/20230321040223-10-3.2.xlsx"
+        },
+        {
+          "label": "2020",
+          "href": "/upload/20230322033352-10-3.2.xlsx"
+        },
+        {
+          "label": "2019",
+          "href": "/upload/20230327120041-10-3.2 (1).xlsx"
+        }
+      ]
+    },
+    {
+      "table_no": 3,
+      "updated": "2026-07-08",
+      "files": [
+        {
+          "label": "2026",
+          "href": "/upload/20260708021902-10.3.3-2026.xlsx"
+        },
+        {
+          "label": "2025",
+          "href": "/upload/20260306103445-10.3.3_2025.xlsx"
+        },
+        {
+          "label": "2024",
+          "href": "/upload/20250516053514-წყლის სუბსიდია 2024_10.3.3.xlsx"
+        },
+        {
+          "label": "2023",
+          "href": "/upload/20240311045213-10.3.3. 2023_12.xlsx"
+        },
+        {
+          "label": "2022",
+          "href": "/upload/20230412093909-20230316043618-2022-10.3.3.xlsx"
+        },
+        {
+          "label": "2021",
+          "href": "/upload/20230321040307-10.3.3 .xlsx"
+        }
+      ]
+    },
+    {
+      "table_no": 4,
+      "updated": "",
+      "files": [
+        {
+          "label": "2021",
+          "href": "/upload/20230321040646-10-3.4.xlsx"
+        },
+        {
+          "label": "2020",
+          "href": "/upload/20230322053129-10-3.3.xlsx"
+        }
+      ]
+    },
+    {
+      "table_no": 5,
+      "updated": "",
+      "files": [
+        {
+          "label": "2020",
+          "href": "/upload/20230322053249-10-3.4.xlsx"
+        }
+      ]
+    }
+  ]
+}
