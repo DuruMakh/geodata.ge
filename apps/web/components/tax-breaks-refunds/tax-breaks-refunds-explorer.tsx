@@ -59,10 +59,10 @@ export function TaxBreaksRefundsExplorer({ facts, labels, headings, sources, gdp
   const valueLabel = (value: number | null | undefined, id: string) => value == null ? "—" : percent ? `${format(value, id)}${unitLabel}` : `${format(value, id)} ${unitLabel}`;
   const rows = model.selected.map(series => ({ itemId: series.id, kaLabel: labels[series.id], color: series.color, valuesByYear: series.valuesByYear }));
   const lineSeries = model.selected.map(series => ({ id: series.id, label: labels[series.id], color: series.color, vals: model.years.map(year => series.valuesByYear[year]) }));
-  // The line names both totals at their latest year: billions in ₾, shares in % of GDP.
+  // The line names the latest refunds: billions in ₾, a share in % of GDP.
   const headline = taxBreaksRefundsHeadline(viewFacts);
-  const headlineValue = (value: number) => percent ? `${formatInUnit(value, { divisor: 1, label: "", decimals: 1 })}${t("unitPercent")}` : formatAmount(value, locale);
-  const latestLine = <>{t("latest.refunds")} {headline.refunds.year}: <LatestFigure value={headlineValue(headline.refunds.value)} /> · {t("latest.breaks")} {headline.breaks.year}: <LatestFigure value={headlineValue(headline.breaks.value)} /></>;
+  const headlineValue = percent ? `${formatInUnit(headline.value, { divisor: 1, label: "", decimals: 1 })}${t("unitPercent")}` : formatAmount(headline.value, locale);
+  const latestLine = <>{t("latest.refunds")} {headline.year}: <LatestFigure value={headlineValue} /></>;
   const preliminaryGdpYears = percent ? model.years.filter(year => gdpFacts.some(f => f.year === year && f.status === "preliminary")) : [];
   const title = t("title");
   const tabLabel = t(`tab.${state.view}`);

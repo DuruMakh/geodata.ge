@@ -1499,13 +1499,13 @@ test("sidebar is a full-width top bar with a sheet below 900px", async ({ page }
   expect(consoleProblems).toEqual([]);
 });
 
-test("hub lists six cards, all six live", async ({ page }) => {
+test("hub lists seven cards, all seven live", async ({ page }) => {
   const consoleProblems = collectConsoleProblems(page);
 
   await page.goto(`${TEST_BASE_URL}/explorer`);
   await expectAppReady(page);
 
-  await expect(page.getByTestId("hub-card")).toHaveCount(6);
+  await expect(page.getByTestId("hub-card")).toHaveCount(7);
   for (const card of await page.getByTestId("hub-card").all()) {
     await expect(card.locator("h2")).toHaveCount(1);
   }
@@ -1516,8 +1516,8 @@ test("hub lists six cards, all six live", async ({ page }) => {
     "/explorer/expenditure",
   );
 
-  // Card 03: routed like the other three, not a "მალე" marker any more.
-  const municipalities = page.getByTestId("hub-card").nth(2);
+  // Card 04: routed like the others, not a "მალე" marker any more.
+  const municipalities = page.getByTestId("hub-card").nth(3);
   await expect(municipalities).toContainText("მუნიციპალიტეტები");
   await expect(municipalities).not.toContainText("მალე");
   await expect(municipalities).not.toHaveAttribute("aria-disabled");
@@ -1531,17 +1531,17 @@ test("hub lists six cards, all six live", async ({ page }) => {
   // assert a real figure is there. The shape, not the figure: the number moves
   // with every dataset update, the "<year> · <n.n> მლრდ ₾" contract does not.
   await expect(page.getByTestId("hub-card").first()).toContainText(/\d{4} · [\d,]+\.\d მლრდ ₾/);
-  // Card 03 now carries the same contract — this is the figure this task adds.
+  // Card 04 now carries the same contract — this is the figure this task adds.
   await expect(municipalities).toContainText(/\d{4} · [\d,]+\.\d მლრდ ₾/);
 
-  await expect(page.getByTestId("hub-card").nth(3).getByRole("heading")).toHaveText("ანალიზი");
+  await expect(page.getByTestId("hub-card").nth(4).getByRole("heading")).toHaveText("ანალიზი");
 
-  const debt = page.getByTestId("hub-card").nth(4);
+  const debt = page.getByTestId("hub-card").nth(5);
   await expect(debt).toContainText("ვალი");
   await expect(debt).toHaveAttribute("href", "/explorer/debt");
   await expect(debt).toContainText(/2025 · [\d,]+\.\d მლრდ ₾/);
 
-  const deficit = page.getByTestId("hub-card").nth(5);
+  const deficit = page.getByTestId("hub-card").nth(6);
   await expect(deficit).toContainText("დეფიციტი");
   await expect(deficit).toHaveAttribute("href", "/explorer/deficit");
   await expect(deficit).toContainText(/\d{4} · [+−]?\d+\.\d% მშპ-ის/);

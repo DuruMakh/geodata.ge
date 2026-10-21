@@ -64,11 +64,8 @@ test("a % of GDP link survives a round trip", () => {
   expect(serializeTaxBreaksRefundsHash({ ...state, view: "amount" })).not.toContain("tab=");
 });
 
-test("the headline gives the latest refunds and tax breaks in lari", () => {
-  const headline = taxBreaksRefundsHeadline(facts);
-  expect(headline.refunds).toEqual({ year: 2025, value: 2.7211e9 });
-  expect(headline.breaks.year).toBe(2024);
-  expect(headline.breaks.value).toBeCloseTo(6.40318e9, -4);
+test("the headline gives the latest refunds in lari", () => {
+  expect(taxBreaksRefundsHeadline(facts)).toEqual({ year: 2025, value: 2.7211e9 });
 });
 
 test("every series has its own readable colour", () => {

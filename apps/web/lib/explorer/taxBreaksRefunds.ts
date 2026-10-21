@@ -69,11 +69,8 @@ export function buildTaxBreaksRefundsModel(allFacts: readonly ClientTaxBreaksRef
   };
 }
 
-/** The heading line's two figures: the latest year of each total, in lari. */
-export function taxBreaksRefundsHeadline(facts: readonly ClientTaxBreaksRefundsFact[]): Record<"refunds" | "breaks", { year: number; value: number }> {
-  const latest = (id: TaxBreaksRefundsIndicator) => {
-    const fact = facts.filter(f => f.indicatorId === id).sort((a, b) => a.year - b.year).at(-1)!;
-    return { year: fact.year, value: fact.value };
-  };
-  return { refunds: latest("tax_refunds.total"), breaks: latest("tax_breaks.total") };
+/** The heading line's figure: the latest refunds. Both totals do not fit one 375px line, so tax breaks are left to the list. */
+export function taxBreaksRefundsHeadline(facts: readonly ClientTaxBreaksRefundsFact[]): { year: number; value: number } {
+  const fact = facts.filter(f => f.indicatorId === "tax_refunds.total").sort((a, b) => a.year - b.year).at(-1)!;
+  return { year: fact.year, value: fact.value };
 }

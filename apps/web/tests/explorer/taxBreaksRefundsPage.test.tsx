@@ -11,14 +11,15 @@ const HEADINGS = {
   en: ["Tax breaks", "VAT", "Income and profit tax", "Refunds"],
 };
 
-test.each(["ka", "en"] as const)("the %s page shows its heading, both latest figures and the four list headings in order", async locale => {
+test.each(["ka", "en"] as const)("the %s page shows its heading, the latest refunds and the four list headings in order", async locale => {
   const metadata = await taxBreaksRefundsPageMetadata(locale);
   const html = renderPageMarkup(locale, await renderTaxBreaksRefundsPage(locale));
   expect(html).toContain(locale === "en" ? "Tax breaks and refunds" : "საგადასახადო შეღავათები და დაბრუნება");
   expect(html.match(/data-testid="explorer-dataset-json-ld"/g)).toHaveLength(1);
   const latest = html.match(/data-testid="tax-breaks-refunds-latest"[^>]*>([\s\S]*?)<\/p>/)![1];
   expect(latest).toContain("2.7");
-  expect(latest).toContain("6.4");
+  // Both totals do not fit one 375px line, so the line names refunds only (spec fallback).
+  expect(latest).not.toContain("6.4");
   const headings = [...html.matchAll(/data-testid="series-heading"[^>]*>([^<]*)</g)].map(match => match[1].split(" · ")[0]);
   expect(headings).toEqual(HEADINGS[locale]);
   // Browse-only: no bulk file.
