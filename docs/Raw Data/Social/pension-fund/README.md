@@ -36,6 +36,8 @@ The statements are the pension scheme's statements of changes in net assets, in 
 
 The 2025 annual report's text (page 4) gives the 2025 return as 11.8%, the same as the chart.
 
+The 2025 annual report's table of payout amounts appears to print 2023 in a different unit (14,014 against about 62.8 million for 2025), which is why the payout amounts are served from the IFRS statements and not from the report.
+
 ## Checks
 
 `extract.py` exits non-zero, and writes nothing, if any of these fails:
