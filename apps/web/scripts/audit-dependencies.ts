@@ -2,12 +2,12 @@ import { spawnSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import path from "node:path";
 
-// User-approved 2026-10-03; scope and removal procedure: docs/deployment.md.
+// User-approved 2026-10-03, renewed for the 16.4.2 lint chain 2026-10-21; scope and removal procedure: docs/deployment.md.
 const ADVISORY = "https://github.com/advisories/GHSA-vfj7-8cjw-p6xm";
-const EXPIRES = Date.parse("2026-11-02T00:00:00Z");
+const EXPIRES = Date.parse("2026-12-01T00:00:00Z");
 const LINT_CHAIN = new Map([
   ["braces", "3.0.3"], ["micromatch", "4.0.8"], ["fast-glob", "3.3.1"],
-  ["@next/eslint-plugin-next", "16.3.8"], ["eslint-config-next", "16.3.8"],
+  ["@next/eslint-plugin-next", "16.4.2"], ["eslint-config-next", "16.4.2"],
 ]);
 const SEVERITY: Record<string, number> = { info: 0, low: 1, moderate: 2, high: 3, critical: 4 };
 type Advisory = { name: string; url: string; severity: string };
@@ -67,7 +67,7 @@ function main(): number {
     console.log(JSON.stringify(report, null, 2));
     const lock: Lock = JSON.parse(readFileSync("package-lock.json", "utf8"));
     const result = evaluateAudit(report, lock);
-    for (const name of result.allowed) console.log(`TEMPORARY ACCEPTED RISK: ${ADVISORY} via ${name}; expires 2026-11-02 UTC`);
+    for (const name of result.allowed) console.log(`TEMPORARY ACCEPTED RISK: ${ADVISORY} via ${name}; expires 2026-12-01 UTC`);
     for (const name of result.blocked) console.error(`BLOCKING SECURITY FINDING: ${name}`);
     return result.blocked.length === 0 ? 0 : 1;
   } catch (error) {
