@@ -131,8 +131,11 @@ export function sharePerHundred(facts: readonly ClientSocialFact[], population: 
   });
 }
 
+/** The year whose prices "at … prices" averages use. The labels in both languages name it; a test ties them together. */
+export const SOCIAL_PRICE_BASE_YEAR = 2025;
+
 /** Averages at `baseYear` prices: value × (base year's average index ÷ that year's), marked calculated and shown with two decimals. A year without an index has none. */
-export function atPrices(facts: readonly ClientSocialFact[], cpi: SocialPriceIndex, baseYear = 2025): SocialShownFact[] {
+export function atPrices(facts: readonly ClientSocialFact[], cpi: SocialPriceIndex, baseYear = SOCIAL_PRICE_BASE_YEAR): SocialShownFact[] {
   const indexByYear = new Map(cpi.map(row => [row.year, row.index]));
   const base = indexByYear.get(baseYear);
   if (base === undefined) throw new Error(`No ${baseYear} price index`);
