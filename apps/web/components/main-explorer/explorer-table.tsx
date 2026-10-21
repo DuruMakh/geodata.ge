@@ -47,8 +47,8 @@ type ExplorerTableProps<Row extends ExplorerTableRowLike> = {
   shareValueForYear: (row: Row, year: number) => number | null;
   /** Decimals of a share cell in the year columns; one unless the publisher prints whole percents. */
   percentDecimals?: number;
-  /** Decimals of a row's share cells; overrides `percentDecimals` for that row when given. */
-  shareDecimalsForRow?: (row: Row) => number;
+  /** Decimals of a row's share cell in a year; overrides `percentDecimals` when given. */
+  shareDecimalsForRow?: (row: Row, year: number) => number;
   /** A row's own number of decimals, for tables whose rows are published at different precisions; omit to use `unit.decimals`. */
   decimalsForRow?: (row: Row) => number;
 };
@@ -133,7 +133,7 @@ export function ExplorerTable<Row extends ExplorerTableRowLike>({
     const amount = row.valuesByYear[year];
     if (amount === null || amount === undefined) return MISSING;
     if (!share) return formatInUnit(amount, decimalsForRow ? { ...unit, decimals: decimalsForRow(row) } : unit);
-    return formatShare(shareValueForYear(row, year), false, shareDecimalsForRow?.(row) ?? percentDecimals);
+    return formatShare(shareValueForYear(row, year), false, shareDecimalsForRow?.(row, year) ?? percentDecimals);
   };
 
   const cellPad = { paddingTop: 11, paddingBottom: 11 };

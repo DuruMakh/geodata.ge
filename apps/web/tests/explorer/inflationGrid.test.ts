@@ -3,6 +3,9 @@ import { makePeriod } from "../../lib/data/inflation/periods";
 import { GRID_TINTS, MOM_BINS, YOY_BINS, binFor, buildMonthGrid, decemberAverages, displayedValue, legendLabels } from "../../lib/explorer/inflationGrid";
 import { contrastRatio } from "../helpers/contrast";
 import { formatInflationValue } from "../../lib/explorer/inflationLabels";
+import { formatCategoryValue, formatContribution, formatWeight } from "../../lib/explorer/inflationCategoryLabels";
+import { formatShare } from "../../lib/explorer/format";
+import Decimal from "decimal.js";
 
 const series = new Map<number, number>();
 for (let period = makePeriod(2024, 3); period <= makePeriod(2026, 8); period += 1) series.set(period, (period % 13) - 2);
@@ -22,6 +25,28 @@ describe("month grid", () => {
     const [row] = buildMonthGrid({ values, range: { start: makePeriod(2025, 1), end: makePeriod(2025, 2) }, edges: YOY_BINS });
     expect(row!.cells.slice(0, 2)).toMatchObject([{ bin: 2 }, { bin: 1 }]);
     expect([formatInflationValue(2.96, "yoy"), formatInflationValue(-0.0078, "yoy"), formatInflationValue(-0.0078, "mom")]).toEqual(["3.0%", "0.0%", "0.0%"]);
+  });
+
+  it("rounds a last-digit 5 up, so the grid, its label and the Excel file agree", () => {
+    // Core ex-tobacco November 2014 is stored 1.65: the page printed 1.6, Excel 1.7.
+    expect(displayedValue(1.65)).toBe(1.7);
+    expect(displayedValue(0.95)).toBe(1);
+    expect(displayedValue(1.45)).toBe(1.5);
+    expect(displayedValue(7.35)).toBe(7.4);
+    expect(displayedValue(12.85)).toBe(12.9);
+    expect(displayedValue(-0.95)).toBe(-1);
+    expect(displayedValue(10.25)).toBe(10.3);
+    expect(Object.is(displayedValue(-0.04), 0)).toBe(true);
+    expect([formatInflationValue(1.65, "yoy"), formatInflationValue(0.35, "mom"), formatInflationValue(9.85, "index")]).toEqual(["1.7%", "+0.4%", "9.9"]);
+    expect([formatCategoryValue(0.35, "mom"), formatCategoryValue(9.85, "yoy"), formatContribution(-0.05)]).toEqual(["+0.4%", "9.9%", "−0.1"]);
+    expect(formatWeight(3.45)).toBe("3.5%");
+  });
+
+  it("rounds a product's annual change from its index exactly (99.05 → −1.0%)", () => {
+    // productAnnual subtracts 100 in decimal arithmetic; formatShare must not lose the tie.
+    expect(formatShare(new Decimal("99.05").minus(100).toNumber() / 100, true)).toBe("−1.0%");
+    expect(formatShare(new Decimal("106.85").minus(100).toNumber() / 100, true)).toBe("+6.9%");
+    expect(formatShare(new Decimal("105.05").minus(100).toNumber() / 100, true)).toBe("+5.1%");
   });
 
   it("passes WCAG AA for every tint and its text", () => {

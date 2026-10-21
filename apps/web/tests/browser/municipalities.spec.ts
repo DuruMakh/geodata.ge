@@ -514,7 +514,7 @@ test.describe("municipalities index", () => {
     await expect(kpis).toHaveCount(4);
     await expect(kpis.nth(0)).toContainText("2025 · 69 მუნიციპალური საბიუჯეტო ერთეული");
     await expect(kpis.nth(2)).toContainText("მედიანური ბიუჯეტი ერთ მოსახლეზე");
-    await expect(kpis.nth(2)).toContainText("1,335 ₾");
+    await expect(kpis.nth(2)).toContainText("1,334 ₾");
     await expect(kpis.nth(2)).toContainText("2025 · 64 მუნიციპალიტეტი");
 
     // The page starts directly with the comparison workspace: no intro paragraph (#68).

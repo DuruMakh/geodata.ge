@@ -35,6 +35,10 @@ test("serves all 730 reviewed values over the approved coverage", async () => {
   expect(facts.every(f => f.basis === "actual" && f.lastReviewedAt === REVIEWED_AT)).toBe(true);
   expect(find(facts, "money.m3", 2025).publishedValue).toBe("57680.2");
   expect(find(facts, "rates.policy", 2025).publishedValue).toBe("8.00");
+  // Every NBG interest rate is printed to two decimals (cell format 0.00); FSI ratios and aggregates to one.
+  expect(find(facts, "rates.loans_total", 2010).publishedValue).toBe("18.56");
+  expect(["rates.loans_gel", "rates.loans_fx", "rates.deposits_total", "rates.deposits_gel", "rates.deposits_fx"].map(moneyBanksDisplayDecimals)).toEqual([2, 2, 2, 2, 2]);
+  expect(["banks.roe", "money.m3", "deposits.fx_share"].map(moneyBanksDisplayDecimals)).toEqual([1, 1, 1]);
   expect(find(facts, "deposits.fx_share", 2025).publishedValue).toBe("48.6");
   expect(Math.min(...facts.filter(f => f.indicatorId === "rates.policy").map(f => f.year))).toBe(2008);
   expect(Math.max(...facts.map(f => f.year))).toBe(2025);
@@ -42,11 +46,15 @@ test("serves all 730 reviewed values over the approved coverage", async () => {
 
 test("published values round from the value as Excel displays it, as NBG prints them", async () => {
   const facts = await loadFacts();
-  expect(find(facts, "rates.deposits_gel", 2013)).toMatchObject({ value: "8.4499999999999993", publishedValue: "8.5" });
-  expect(find(facts, "rates.deposits_fx", 2003)).toMatchObject({ value: "8.9499999999999993", publishedValue: "9.0" });
+  // Interest rates publish to the two decimals NBG prints: 8.4499999999999993 is shown 8.45.
+  expect(find(facts, "rates.deposits_gel", 2013)).toMatchObject({ value: "8.4499999999999993", publishedValue: "8.45" });
+  expect(find(facts, "rates.deposits_fx", 2003)).toMatchObject({ value: "8.9499999999999993", publishedValue: "8.95" });
   validateMoneyBanksFacts(facts);
-  // 8.4499999999999993 is shown as 8.45 to 15 significant digits, so 8.4 (rounding the full double) is rejected.
-  find(facts, "rates.deposits_gel", 2013).publishedValue = "8.4";
+  // At one decimal the same stored value, shown 8.45 to 15 significant digits, publishes 8.5, so 8.4 (rounding the full double) is rejected.
+  const ratio = find(facts, "banks.roa", 2015);
+  Object.assign(ratio, { value: "8.4499999999999993", publishedValue: "8.5" });
+  validateMoneyBanksFacts(facts);
+  ratio.publishedValue = "8.4";
   expect(() => validateMoneyBanksFacts(facts)).toThrow(/published value/);
 });
 

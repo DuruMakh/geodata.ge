@@ -164,9 +164,10 @@ function readWorkbook(fileName: string, sheetName: string): SourceWorkbook {
   expect(workbook.SheetNames).toContain(sheetName);
 
   return {
+    // Stored cell values, as the pipeline reads them; the display rounds to one decimal.
     matrix: XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], {
       header: 1,
-      raw: false,
+      raw: true,
       blankrows: false,
       defval: null,
     }) as unknown[][],
@@ -184,6 +185,12 @@ function workbookNumber(value: unknown): number | null {
   const number = Number(normalized);
 
   return Number.isFinite(number) ? number : null;
+}
+
+// Stored population cells are whole persons in thousands but can carry float noise
+// (3930.4279999999999); round to the person.
+function wholePersonThousands(value: number): number {
+  return Math.round(value * 1000) / 1000;
 }
 
 function outputNumber(value: unknown): number | null {
@@ -367,16 +374,14 @@ function assertPopulationRowsReconcile(
     const components = componentRulesFor(code, year).map(([, sourceLabel]) =>
       sourcePopulationValue(source, sourceRows, sourceLabel, yearColumn),
     );
-    const sourceValue = Number(
-      [base, ...components]
-        .reduce((sum, sourceValue) => sum + sourceValue.value, 0)
-        .toFixed(10),
+    const sourceValue = wholePersonThousands(
+      [base, ...components].reduce((sum, sourceValue) => sum + sourceValue.value, 0),
     );
     const populationThousand = outputNumber(row.population_thousand);
     const populationPersons = outputNumber(row.population_persons);
 
     expect(populationThousand).toBe(sourceValue);
-    expect(populationPersons).toBe(sourceValue * 1000);
+    expect(populationPersons).toBe(Math.round(sourceValue * 1000));
     if (components.length === 0) {
       expect(row.transformation).toBe(
         `Source sheet "1"; source row ${base.rowNumber}; year ${year} column ${XLSX.utils.encode_col(yearColumn)} (cell ${base.cell}); retained published thousands; persons = thousands * 1000; no estimates.`,
@@ -662,11 +667,33 @@ describe("Geostat population and regional GDP research package", () => {
     const telavi2015 = affectedRows.find(
       (row) => row.municipality_code === "15" && row.year === 2015,
     );
-    expect(telavi2015?.population_thousand).toBe(58.2);
-    expect(telavi2015?.population_persons).toBe(58200);
+    // Stored cells W39 38.358 + W35 19.788 (displayed 38.4 + 19.8).
+    expect(telavi2015?.population_thousand).toBe(58.146);
+    expect(telavi2015?.population_persons).toBe(58146);
     expect(telavi2015?.transformation).toBe(
       'Source sheet "1"; source rows 39 + 35; year 2015 column W (cells W39 + W35); population_thousand = W39 + W35; persons = thousands * 1000; no estimates.',
     );
+  });
+
+  it("accepts float noise but stops on a population that is not a whole number of persons", async () => {
+    const { wholeThousandPersons } = await import("../../../lib/data/municipalIndicators/prepareGeostatPackage");
+    // 4929.9000000000015 thousand is 4,929,900.000000002 persons: noise of 2e-9 persons, rounded away.
+    expect(wholeThousandPersons(4929.9000000000015, "Georgia 1994")).toBe(4929.9);
+    expect(() => wholeThousandPersons(1.2340001, "test cell")).toThrow(/not a whole number of persons at test cell/);
+  });
+
+  it("reads Geostat's stored population, not the one-decimal display", async () => {
+    // The workbook displays Lentekhi 2025 as 5.1 thousand; the stored cell is 5.145.
+    const result = await buildPackage(false);
+    const population2025 = (code: string) =>
+      result.populationRows.find((row) => row.year === 2025 && row.municipality_code === code);
+
+    expect(population2025("70")).toMatchObject({ population_thousand: 5.145, population_persons: 5145 });
+    expect(population2025("04")).toMatchObject({ population_thousand: 1335.671, population_persons: 1_335_671 });
+    // The 64 municipalities add up to Geostat's stored Georgia total (3,930,428) with no residual.
+    expect(
+      result.validation.population.nationalReconciliation.find((row) => row.year === 2025),
+    ).toMatchObject({ published_total_thousand: 3930.428, difference_thousand: 0 });
   });
 
   it("reconciles all 64 municipality values to the published Georgia total", async () => {
@@ -681,7 +708,8 @@ describe("Geostat population and regional GDP research package", () => {
     const yearColumns = sourceYearColumns(source.matrix[2], POPULATION_YEARS);
     for (const year of POPULATION_YEARS) {
       const column = yearColumns.get(year) ?? -1;
-      const published = workbookNumber(sourceRows.get("Georgia")?.[column]);
+      const storedTotal = workbookNumber(sourceRows.get("Georgia")?.[column]);
+      const published = storedTotal === null ? null : wholePersonThousands(storedTotal);
       const values = result.populationRows
         .filter((row) => row.year === year)
         .map((row) => row.population_thousand);
@@ -802,6 +830,20 @@ describe("Geostat population and regional GDP research package", () => {
     expect(report.excluded_codes_present).toEqual([]);
     expect(report.source_hashes_match).toBe(true);
     expect(report.normalized_values_reconcile).toBe(true);
+  });
+
+  it("formats the review workbook's population and GDP values to show more than the one-decimal display", () => {
+    const workbook = XLSX.read(
+      fs.readFileSync(path.join(packageDir, "municipal-population-and-regional-gdp.xlsx")),
+      { type: "buffer", cellNF: true },
+    );
+    for (const sheetName of ["Population", "Regional GDP"]) {
+      const sheet = workbook.Sheets[sheetName]!;
+      const rows = XLSX.utils.decode_range(sheet["!ref"]!).e.r + 1;
+      const formats = new Set<string | undefined>();
+      for (let row = 2; row <= rows; row += 1) if (sheet[`E${row}`]?.t === "n") formats.add(sheet[`E${row}`]!.z as string | undefined);
+      expect([...formats], sheetName).toEqual(["#,##0.000"]);
+    }
   });
 
   it("matches every XLSX review-sheet field and type to the CSV artifacts", async () => {
