@@ -351,7 +351,7 @@ model MunicipalPopulationFact {
   year               Int
   municipalityCode   String
   municipality       Municipality   @relation(fields: [municipalityCode], references: [code])
-  populationThousand Decimal        @db.Decimal(10, 1)
+  populationThousand Decimal        @db.Decimal(10, 3)
   populationPersons  Int
   referenceDate      DateTime       @db.Date
   sourceDocumentId   String
