@@ -148,6 +148,8 @@
     "data:check-business": "tsx scripts/prepare-business.ts --check",
     "data:prepare-gdp-expenditure": "tsx scripts/prepare-gdp-expenditure.ts --write",
     "data:check-gdp-expenditure": "tsx scripts/prepare-gdp-expenditure.ts --check",
+    "data:prepare-tax-breaks-refunds": "tsx scripts/prepare-tax-breaks-refunds.ts --write",
+    "data:check-tax-breaks-refunds": "tsx scripts/prepare-tax-breaks-refunds.ts --check",
     "data:prepare-housing": "tsx scripts/prepare-housing.ts --write",
     "data:check-housing": "tsx scripts/prepare-housing.ts --check",
     "data:prepare-internet": "tsx scripts/prepare-internet.ts --write",
