@@ -1,4 +1,5 @@
 import { makePeriod, periodMonth, periodYear } from "../data/inflation/periods";
+import { roundForDisplay } from "./format";
 
 // The year × month grid behind ცხრილი (spec §7.1). Colour is never the only cue:
 // every cell prints its value, and a legend names the bins.
@@ -22,9 +23,9 @@ export const GRID_TINTS = [
   { background: "#B3402A", text: "#F7F2E9" },
 ] as const;
 
-/** The one-decimal value a reader sees; −0.0 reads as 0.0, so it prints and bins as zero. */
+/** The one-decimal value a reader sees (1.65 → 1.7, as in Excel); −0.0 reads as 0.0, so it prints and bins as zero. */
 export function displayedValue(value: number): number {
-  return Number(value.toFixed(1)) + 0;
+  return roundForDisplay(value, 1);
 }
 
 export function binFor(value: number, edges: readonly number[]): number {

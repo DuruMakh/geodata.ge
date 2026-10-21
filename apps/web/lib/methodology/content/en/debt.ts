@@ -50,7 +50,8 @@ export const DEBT_METHODOLOGY_CONTENT: MethodologyContent = {
       "kind": "sources",
       "title": "Official sources",
       "paragraphs": [
-        "Stock and debt-service figures come from Public Debt Statistical Bulletins. Average rates come from the Monthly Government Debt Report and debt management strategies. All ten reviewed official originals are available below."
+        "Stock and debt-service figures come from Public Debt Statistical Bulletins. Average rates come from the Monthly Government Debt Report and debt management strategies. All ten reviewed official originals are available below.",
+        "Each rate is shown with the decimals its source prints: the total, read from the monthly report's chart, and the 2018 domestic rate have one; the domestic and external rates from the strategy tables have two. A total of 3.9% can therefore stand beside a domestic rate of 9.20%."
       ]
     },
     {

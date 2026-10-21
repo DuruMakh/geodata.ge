@@ -101,11 +101,27 @@ function isDebtService(row: OfficialExpenditureRow): boolean {
   return isStateWidePayment(row) && row.labelKa.includes("ვალდებულებების მომსახურება და დაფარვა");
 }
 
+// Independent bodies whose official names contain a ministry keyword below but which are not part
+// of that ministry. Like the courts, the Prosecutor's Office and the Academy of Sciences they belong
+// in Other costs (methodology §6.10), so they are matched before the keyword rules:
+// High Council of Justice (10 00, 2004-2025), International Education Center (2014-2016),
+// Academy of Agricultural Sciences (2004) and the Lugar Public Health Research Center (2012-2014).
+const INDEPENDENT_BODIES_WITH_MINISTRY_KEYWORDS = [
+  "იუსტიციის უმაღლესი საბჭო",
+  "განათლების საერთაშორისო ცენტრი",
+  "სოფლის მეურნეობის მეცნიერებათა აკადემია",
+  "ლუგარის საზოგადოებრივი ჯანმრთელობის კვლევითი ცენტრი",
+];
+
 export function classifyAdminSpendingCategory(row: OfficialExpenditureRow): string {
   if (isDebtService(row)) return "admin_spending.debt_service";
   if (isStateWidePayment(row)) return "admin_spending.other_costs";
 
   const institution = row.institutionLabelKa ?? "";
+
+  if (textIncludesAny(institution, INDEPENDENT_BODIES_WITH_MINISTRY_KEYWORDS)) {
+    return "admin_spending.other_costs";
+  }
 
   // The standalone Refugees/IDP ministry (its label uses "ლტოლვილთა"/"გადაადგილებულ", not the
   // modern merged-ministry "დევნილ") → Health & Social. Traced against 2019-2025: when the ministry

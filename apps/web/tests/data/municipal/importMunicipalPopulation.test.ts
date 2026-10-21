@@ -128,8 +128,8 @@ describe("municipal population 2025 preparation", () => {
     expect(result.rows.every((entry) => entry.sourceId === "source.geostat_municipal_population")).toBe(true);
     expect(result.rows.every((entry) => entry.transformation.length > 0)).toBe(true);
     expect(result.rows.find((entry) => entry.municipalityCode === "15")).toMatchObject({
-      populationThousand: 57.2,
-      populationPersons: 57_200,
+      populationThousand: 57.183,
+      populationPersons: 57_183,
     });
   });
 

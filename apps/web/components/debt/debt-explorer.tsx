@@ -11,7 +11,7 @@ import { useI18n } from "../../lib/i18n/provider";
 import type { SourcedWorkbookPublicSource } from "../../lib/methodology/workbookSources";
 import type { WorkbookPublicSource } from "../../lib/explorer/workbookModel";
 import { downloadWorkbook } from "../../lib/explorer/workbookWriter.client";
-import { buildDebtDeck, buildDebtExplorerModel } from "../../lib/explorer/debtExplorer";
+import { buildDebtDeck, buildDebtExplorerModel, debtRateDecimalsFor, formatDebtRate } from "../../lib/explorer/debtExplorer";
 import { NEGATIVE, POSITIVE } from "../../lib/explorer/colors";
 import { formatAmount, formatPoints, formatShare, unitFor, unitsFor } from "../../lib/explorer/format";
 import { updatedDate } from "../../lib/explorer/coverageLabel";
@@ -107,11 +107,14 @@ export function DebtExplorerSurface(props: DebtExplorerSurfaceProps) {
       : {}),
   }));
   const totalItemId = model.items.find((item) => item.family === props.family && item.parentItemId === null)?.id;
+  // Interest rates keep the decimals their source prints (3.1%, 9.20%); every other figure keeps the page default.
+  const formatRate = props.family === "rate" ? formatDebtRate(props.facts) : undefined;
+  const rateDecimals = debtRateDecimalsFor(props.facts);
   const deck = buildDebtDeck(props.facts, props.family);
   const deckValue = deck === null
     ? "—"
-    : props.family === "rate"
-      ? formatShare(deck.value / 100)
+    : formatRate && totalItemId
+      ? formatRate(deck.value, totalItemId, deck.year)
       : formatAmount(deck.value, locale);
   const deckChange = deck?.change ?? null;
   const preliminaryGdpYears = props.family === "stock"
@@ -205,6 +208,9 @@ export function DebtExplorerSurface(props: DebtExplorerSurfaceProps) {
                 showChangeColumn={false}
                 forecastYears={forecastYears}
                 forecastLabel={message(messages, "debt.forecast")}
+                {...(props.family === "rate"
+                  ? { shareDecimalsForRow: (row: { itemId: string }, year: number) => rateDecimals(row.itemId, year) }
+                  : {})}
                 shareValueForYear={(row, year) => props.family === "rate"
                   ? row.valuesByYear[year] === null || row.valuesByYear[year] === undefined
                     ? null
@@ -220,10 +226,18 @@ export function DebtExplorerSurface(props: DebtExplorerSurfaceProps) {
                   unit={unit}
                   shareLabel={message(messages, props.family === "rate" ? "debt.rate" : "main.shareGdp")}
                   preliminaryLabel={message(messages, "debt.forecast")}
+                  {...(formatRate ? { formatTooltipValue: formatRate } : {})}
                 />
               </div>
             )}
-            <ChartSelectionAids series={chartSeries} chartShown={props.chartMode === "line"} share={isPercent} unit={unit} years={model.years} />
+            <ChartSelectionAids
+              series={chartSeries}
+              chartShown={props.chartMode === "line"}
+              share={isPercent}
+              unit={unit}
+              years={model.years}
+              {...(formatRate && model.years.length > 0 ? { formatValue: (value: number, seriesId: string) => formatRate(value, seriesId, model.years.at(-1)!) } : {})}
+            />
 
             <RangeStrip
               years={familyYears}

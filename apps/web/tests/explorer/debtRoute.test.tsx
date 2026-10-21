@@ -154,6 +154,36 @@ describe("Government Debt route composition", () => {
     expect(visibleText).not.toContain("2013: მთავრობის ვალი · 8.0 მლრდ ₾");
   });
 
+  it("shows the rate deck at its source's decimals", async () => {
+    const components = await loadDebtComponents();
+    expect(components).not.toBeNull();
+    if (!components) return;
+
+    const noop = () => {};
+    const twoDecimalTotal = facts.map((fact) => fact.seriesId === "debt.rate.total" && fact.year === 2025
+      ? { ...fact, value: 4.67, sourceId: "source.mof_debt_strategy_2025_2029" }
+      : fact);
+    const markup = renderGeorgianMarkup(createElement(components.DebtExplorerSurface, {
+      facts: twoDecimalTotal,
+      gdpFacts,
+      workbookSources: [],
+      lastUpdatedAt: reviewedAt,
+      family: "rate",
+      chartMode: "line",
+      shareOfGdp: false,
+      range: { start: 2015, end: 2025, min: 2015, max: 2025 },
+      selectedIds: ["debt.rate.total"],
+      onChartModeChange: noop,
+      onShareChange: noop,
+      onRangeChange: noop,
+      onSelectionChange: noop,
+      onToggleSeries: noop,
+    }));
+
+    const deck = markup.match(/<p data-testid="debt-deck"[^>]*>([\s\S]*?)<\/p>/)?.[1]?.replace(/<[^>]+>/g, "") ?? "";
+    expect(deck).toContain("2025: საპროცენტო განაკვეთი · 4.67%");
+  });
+
   it("uses actual service and latest published rate facts in real-data selector summaries", async () => {
     const components = await loadDebtComponents();
     expect(components).not.toBeNull();

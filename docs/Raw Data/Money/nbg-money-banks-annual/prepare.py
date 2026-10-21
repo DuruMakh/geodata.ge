@@ -61,7 +61,9 @@ SOURCES = [
 FILE = {source_id: local for source_id, _, _, local, _, _ in SOURCES}
 FIELDS = ['year', 'indicator_id', 'value', 'published_value', 'unit', 'basis', 'value_status', 'source_id', 'source_sheet', 'source_cell']
 BREAK_FIELDS = ['break_id', 'applies_to', 'reference_date', 'reason', 'source_note']
-PLACES = {'rates.policy': 2}  # Decimals shown; every other value is rounded to one decimal.
+# Decimals shown: NBG prints every interest rate to two decimals (cell format 0.00); every other value is rounded to one.
+PLACES = {indicator: 2 for indicator in ('rates.policy', 'rates.loans_total', 'rates.loans_gel', 'rates.loans_fx',
+                                          'rates.deposits_total', 'rates.deposits_gel', 'rates.deposits_fx')}
 
 MONEY = {'money.m3': 'Money Aggregates (M3)', 'money.m2': 'Money Aggregates (M2)', 'money.m1': 'Money Aggregates (M1)',
          'money.m0': 'Money Outside Banks (M0)'}
@@ -94,7 +96,7 @@ COVERAGE = {
     'banks.capital_ratio': (2014, 2025), 'banks.tier1_ratio': (2014, 2025)}
 CALCULATED = ('deposits.total', 'deposits.individuals', 'deposits.legal_entities', 'loans.fx_share', 'deposits.fx_share')
 UNITS_PERCENT_UNBOUNDED = ('banks.roa', 'banks.roe')  # May be negative, as they were in 2008.
-# Values NBG shows on its statistics page and in its FSI notes, as published (one decimal; two for the policy rate).
+# Values NBG shows on its statistics page and in its FSI notes, as published (one decimal; two for interest rates).
 ANCHORS = {('money.m3', 2025): '57680.2', ('loans.total', 2025): '72453.0', ('rates.policy', 2025): '8.00',
            ('banks.npl_ratio', 2025): '2.5', ('deposits.fx_share', 2025): '48.6', ('loans.fx_share', 2025): '41.9'}
 TOLERANCE = Decimal('0.01')

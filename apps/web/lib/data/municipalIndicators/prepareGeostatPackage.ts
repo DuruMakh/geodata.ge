@@ -5,6 +5,7 @@ import path from "node:path";
 import { parse } from "csv-parse/sync";
 import * as XLSX from "xlsx";
 import { serializeBomCsv } from "../csvEscape";
+import { WHOLE_PERSON_TOLERANCE } from "../demography/readStoredSheet";
 import { assertGeneratedArtifactMatches } from "../generatedArtifacts";
 
 const GEOSTAT_ARTIFACT_LABEL = "Geostat municipal indicators";
@@ -420,6 +421,8 @@ export function reconcileNationalValues(
   };
 }
 
+// Reads stored cell values (raw), not the workbook's one-decimal display: Geostat stores population
+// to the person (Lentekhi 2025 = 5.145 thousand, displayed 5.1) and regional GDP at full precision.
 function readMatrix(filePath: string, sheetName: string): SheetMatrix {
   const workbook = XLSX.read(readFileSync(filePath), { type: "buffer", cellDates: false });
   const sheet = workbook.Sheets[sheetName];
@@ -429,7 +432,7 @@ function readMatrix(filePath: string, sheetName: string): SheetMatrix {
   return {
     rows: XLSX.utils.sheet_to_json(sheet, {
       header: 1,
-      raw: false,
+      raw: true,
       blankrows: true,
       defval: null,
       range: sheetRange,
@@ -462,6 +465,17 @@ function sourceNumber(value: unknown, context: string): number {
     throw new OfficialGapError(context, "unavailable");
   }
   return requireSourceNumber(value, context);
+}
+
+// Population in thousands is a whole number of persons; stored cells can carry float noise
+// (4929.9000000000015), so persons are rounded and the thousands re-derived from them.
+export function wholeThousandPersons(thousand: number, context: string): number {
+  const scaled = thousand * 1000;
+  const persons = Math.round(scaled);
+  if (Math.abs(scaled - persons) > WHOLE_PERSON_TOLERANCE) {
+    throw new Error(`Population is not a whole number of persons at ${context}: ${scaled}`);
+  }
+  return persons / 1000;
 }
 
 function toMillionGel(value: number, sourceUnit: string): number {
@@ -706,13 +720,12 @@ export async function buildGeostatPackage(
       const populationThousand =
         basePopulationThousand === null
           ? null
-          : Number(
-              componentSources
-                .reduce((sum, component) => sum + component.value, basePopulationThousand)
-                .toFixed(10),
+          : wholeThousandPersons(
+              componentSources.reduce((sum, component) => sum + component.value, basePopulationThousand),
+              context,
             );
       const populationPersons =
-        populationThousand === null ? null : populationThousand * 1000;
+        populationThousand === null ? null : Math.round(populationThousand * 1000);
       const transformation =
         componentSources.length === 0
           ? `Source sheet "1"; source row ${source.rowNumber}; year ${year} column ${XLSX.utils.encode_col(columnIndex)} (cell ${sourceCell}); retained published thousands; persons = thousands * 1000; no estimates.`
@@ -758,8 +771,8 @@ export async function buildGeostatPackage(
     if (columnIndex === undefined) throw new Error(`Missing population year ${year}`);
     let publishedTotal: number | null;
     try {
-      publishedTotal = sourceNumber(
-        populationNationalRow.row[columnIndex],
+      publishedTotal = wholeThousandPersons(
+        sourceNumber(populationNationalRow.row[columnIndex], `population national total ${year}`),
         `population national total ${year}`,
       );
     } catch (error) {
