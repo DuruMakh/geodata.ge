@@ -1,6 +1,8 @@
 import fs from "node:fs/promises";
+import { parse } from "csv-parse/sync";
 import { Client } from "pg";
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, test } from "vitest";
+import { SERVED_DATA_FILES } from "../../../lib/data/servedData";
 
 test("demography import verifies its serving mapper before committing", async () => {
   const code = await fs.readFile("scripts/import-budget-facts.ts", "utf8");
@@ -26,31 +28,17 @@ describe.skipIf(!connectionString)("demography mirror integrity", () => {
   afterEach(async () => { await client.query("ROLLBACK"); });
 
   it("mirrors the served files", async () => {
-    const { rows } = await client.query('SELECT "seriesId", count(*)::int AS n FROM "DemographyFact" GROUP BY 1 ORDER BY 1');
-    expect(rows).toEqual([
-      { seriesId: "demography.age_specific_fertility_rate", n: 84 },
-      { seriesId: "demography.census_population_by_age", n: 1_944 },
-      { seriesId: "demography.census_population_by_settlement", n: 684 },
-      { seriesId: "demography.crude_birth_rate", n: 12 },
-      { seriesId: "demography.crude_death_rate", n: 12 },
-      { seriesId: "demography.deaths", n: 837 },
-      { seriesId: "demography.emigrants", n: 630 },
-      { seriesId: "demography.emigrants_by_citizenship_group", n: 252 },
-      { seriesId: "demography.immigrants", n: 630 },
-      { seriesId: "demography.immigrants_by_citizenship_group", n: 252 },
-      { seriesId: "demography.infant_mortality_rate", n: 12 },
-      { seriesId: "demography.life_expectancy_female", n: 12 },
-      { seriesId: "demography.life_expectancy_male", n: 12 },
-      { seriesId: "demography.life_expectancy_total", n: 12 },
-      { seriesId: "demography.live_births", n: 837 },
-      { seriesId: "demography.natural_increase", n: 837 },
-      { seriesId: "demography.net_migration", n: 14 },
-      { seriesId: "demography.population_age_band", n: 207 },
-      { seriesId: "demography.population_by_age_sex", n: 1_380 },
-      { seriesId: "demography.population_density", n: 145 },
-      { seriesId: "demography.population_total", n: 923 },
-      { seriesId: "demography.total_fertility_rate", n: 12 },
-    ]);
+    const { rows } = await client.query<{ seriesId: string; n: number }>('SELECT "seriesId", count(*)::int AS n FROM "DemographyFact" GROUP BY 1');
+    // Every served demography file's rows, counted by series, so a new demography page needs no edit here.
+    const counts = new Map<string, number>();
+    for (const [key, file] of Object.entries(SERVED_DATA_FILES)) {
+      if (!key.startsWith("demography")) continue;
+      for (const row of parse(await fs.readFile(file), { bom: true, columns: true, skip_empty_lines: true }) as Record<string, string>[]) {
+        if (row.series_id) counts.set(row.series_id, (counts.get(row.series_id) ?? 0) + 1);
+      }
+    }
+    const bySeries = (a: { seriesId: string }, b: { seriesId: string }) => (a.seriesId < b.seriesId ? -1 : 1);
+    expect([...rows].sort(bySeries)).toEqual([...counts].map(([seriesId, n]) => ({ seriesId, n })).sort(bySeries));
   });
 
   it("rejects a source outside the registry", async () => {

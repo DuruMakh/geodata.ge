@@ -70,6 +70,48 @@ jobs:
             exit 1
           fi
 
+  # The production deploy applies migrations and runs the parity-checked import
+  # against the live mirror; nothing else does. Rehearse both here on a throwaway
+  # database, so a schema that cannot hold the reviewed CSVs (a too-narrow decimal,
+  # a missing column) fails the pull request instead of the deploy.
+  mirror:
+    name: Database mirror (disposable PostgreSQL)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: geodata
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d geodata"
+          --health-interval 5s --health-timeout 5s --health-retries 20
+    env:
+      DIRECT_URL: postgresql://postgres:postgres@localhost:5432/geodata
+      GEODATA_TEST_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/geodata
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - run: npm ci --no-audit
+      # The migrations revoke table access from Supabase's two API roles, which
+      # plain PostgreSQL does not have.
+      - name: Create Supabase's API roles
+        run: psql "$DIRECT_URL" -c 'CREATE ROLE anon NOLOGIN;' -c 'CREATE ROLE authenticated NOLOGIN;'
+      - name: Apply every migration
+        run: npm run prisma:deploy
+      - name: Import the reviewed CSVs (parity-checked)
+        run: npm run data:import
+      - name: Database integration tests
+        run: npx vitest run tests/data/demography/importIntegration.test.ts tests/data/governmentDebt/mirrorIntegration.test.ts
+
   # The only build in the run, in parallel with the checks: the e2e job serves this
   # output instead of building again.
   build:
