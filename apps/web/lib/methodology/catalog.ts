@@ -21,6 +21,8 @@ import { HEALTH_METHODOLOGY_CONTENT } from "./content/health";
 import { HEALTH_METHODOLOGY_CONTENT as EN_HEALTH } from "./content/en/health";
 import { CRIME_METHODOLOGY_CONTENT } from "./content/crime";
 import { CRIME_METHODOLOGY_CONTENT as EN_CRIME } from "./content/en/crime";
+import { SOCIAL_PROTECTION_METHODOLOGY_CONTENT } from "./content/social-protection";
+import { SOCIAL_PROTECTION_METHODOLOGY_CONTENT as EN_SOCIAL_PROTECTION } from "./content/en/social-protection";
 import { INTERNET_METHODOLOGY_CONTENT } from "./content/internet";
 import { INTERNET_METHODOLOGY_CONTENT as EN_INTERNET } from "./content/en/internet";
 import { EDUCATION_METHODOLOGY_CONTENT } from "./content/education";
@@ -84,6 +86,7 @@ export const METHODOLOGY_CONTENT: Readonly<Record<MethodologyDatasetId, Methodol
   poverty: POVERTY_METHODOLOGY_CONTENT,
   "household-income": HOUSEHOLD_INCOME_METHODOLOGY_CONTENT,
   health: HEALTH_METHODOLOGY_CONTENT,
+  "social-protection": SOCIAL_PROTECTION_METHODOLOGY_CONTENT,
   education: EDUCATION_METHODOLOGY_CONTENT,
   "science-culture": SCIENCE_CULTURE_METHODOLOGY_CONTENT,
   crime: CRIME_METHODOLOGY_CONTENT,
@@ -109,6 +112,7 @@ const ENGLISH_METHODOLOGY_CONTENT: Readonly<Record<MethodologyDatasetId, Methodo
   poverty: EN_POVERTY,
   "household-income": EN_HOUSEHOLD_INCOME,
   health: EN_HEALTH,
+  "social-protection": EN_SOCIAL_PROTECTION,
   education: EN_EDUCATION,
   "science-culture": EN_SCIENCE_CULTURE,
   crime: EN_CRIME,

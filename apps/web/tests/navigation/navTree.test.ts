@@ -54,6 +54,23 @@ describe("the navigation tree", () => {
     ]);
   });
 
+  it("lists the four social protection pages under Health, after Causes of death", () => {
+    const hub = NAV_TREE.find((entry) => entry.href === "/explorer/health")!;
+    expect(hub.sections.map((section) => [section.href, section.testId])).toEqual([
+      ["/explorer/health/doctors-hospitals", "health-doctors-hospitals-link"],
+      ["/explorer/health/illnesses", "health-illnesses-link"],
+      ["/explorer/health/causes-of-death", "health-causes-of-death-link"],
+      ["/explorer/health/social-payments", "health-social-payments-link"],
+      ["/explorer/health/pensions", "health-pensions-link"],
+      ["/explorer/health/subsistence-allowance", "health-subsistence-allowance-link"],
+      ["/explorer/health/social-package", "health-social-package-link"],
+    ]);
+    expect(openHub("/explorer/health/pensions/region/guria")).toBe(hub);
+    expect(currentEntry("/explorer/health/pensions/region/guria")).toBe("/explorer/health/pensions");
+    expect(currentEntry("/explorer/health/subsistence-allowance/ozurgeti")).toBe("/explorer/health/subsistence-allowance");
+    expect(currentEntry("/explorer/health/social-package")).toBe("/explorer/health/social-package");
+  });
+
   it("appends Trade composition after the five existing Trade pages", () => {
     const hub = NAV_TREE.find((entry) => entry.href === "/explorer/trade")!;
     expect(hub.sections.map((section) => section.href)).toEqual([
@@ -132,6 +149,10 @@ describe("the explorer footer source note", () => {
     expect(sourceNoteKey("/explorer/demography/population/region/imereti")).toBe("common.geostatSourceNote");
     expect(sourceNoteKey("/explorer/education")).toBe("common.geostatSourceNote");
     expect(sourceNoteKey("/explorer/education/schools/batumi")).toBe("common.geostatSourceNote");
+    expect(sourceNoteKey("/explorer/health")).toBe("common.socialSourceNote");
+    expect(sourceNoteKey("/explorer/health/illnesses")).toBe("common.geostatSourceNote");
+    expect(sourceNoteKey("/explorer/health/social-payments")).toBe("common.socialSourceNote");
+    expect(sourceNoteKey("/explorer/health/pensions/region/guria")).toBe("common.socialSourceNote");
     expect(sourceNoteKey("/explorer/science-culture")).toBe("common.geostatSourceNote");
     expect(sourceNoteKey("/explorer/science-culture/museums/guria")).toBe("common.geostatSourceNote");
   });

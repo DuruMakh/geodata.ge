@@ -1,0 +1,84 @@
+{
+ "checked_on": "2026-10-18",
+ "scope": "Complete source recovery and verified extraction; analytical interpretation and public indicator approval remain separate.",
+ "source_integrity": {
+  "recovered_workbooks_compared_byte_for_byte_with_archive": 821,
+  "new_workbooks_checked_as_valid_xlsx": 206,
+  "recorded_file_fingerprints_verified": 1027,
+  "archive_integrity_passed": true
+ },
+ "source_inventory": {
+  "catalogue_files": 1027,
+  "saved_files": 1027,
+  "missing_files": 0,
+  "tables": 86,
+  "source_page_link_captures_compared_with_browser": 5,
+  "capture_comparison_passed": true
+ },
+ "package_tests": {
+  "command": "python -B -m unittest discover -p \"test_*.py\"",
+  "tests": 21,
+  "failures": 0,
+  "passed": true
+ },
+ "extraction": {
+  "command": "python -B prepare.py",
+  "passed": true,
+  "counts": {
+   "workbooks": 1027,
+   "pages": 9,
+   "tables_parsed": 86,
+   "tables_with_area_rows": 77,
+   "monthly_sheets": 11355,
+   "national_annual_rows": 26417,
+   "programme_monthly_rows": 2904,
+   "programme_annual_rows": 256,
+   "programme_area_rows": 19982,
+   "area_total_checks": 131047,
+   "area_total_differences": 748,
+   "independent_browser_rows_compared": 256,
+   "reviewed_browser_differences": 5
+  }
+ },
+ "independent_numeric_check": {
+  "reader": "SheetJS 0.20.3",
+  "national_annual_rows_checked": 26417,
+  "programme_monthly_values_checked": 5777,
+  "problems": 0,
+  "first_problems": [],
+  "passed": true
+ },
+ "independent_input_sha256": {
+  "ssa-national-annual.csv": "849d5cb7ca8f440fd92e9c196894f8dfe0de07c4447d92a6c48d1d3f43f7476d",
+  "ssa-programmes-monthly.csv": "1df2ee3c4c837715b9464d9efea09096e89a40866b25d12abbfa24c2b254f668"
+ },
+ "geographic_checks": {
+  "checked": 434,
+  "failures": 0,
+  "passed": true,
+  "coverage_note": "December 2008 TSA regional coverage documented in geographic-validation.json; no tolerance increase."
+ },
+ "geostat": {
+  "workbooks": 30,
+  "value_cells": 8481,
+  "ssa_cross_checks": 46,
+  "source_findings": 32,
+  "passed": true
+ },
+ "repository_gates": {
+  "npm_run_check": "passed",
+  "unit_tests_passed": 4845,
+  "unit_tests_skipped": 13,
+  "npm_run_build": "passed",
+  "static_pages_generated": 667,
+  "browser_tests": "not run; no UI changes"
+ },
+ "remaining_analytical_review": {
+  "source_findings": 748,
+  "printed_total_vs_area_sum_differences": 717,
+  "unlabelled_extra_workbooks": 2,
+  "public_indicator_scope_approved": false
+ },
+ "full_dataset_validated": false,
+ "note": "Extraction checks passed with five exact, source-reviewed differences from the unchanged preliminary browser file. Original source differences and two unlabelled workbook versions are preserved; this does not certify every official figure or authorize public use."
+}

@@ -1,0 +1,14 @@
+{
+ "recovered_on": "2026-10-18",
+ "source_archive": "ssa-statistics.zip",
+ "archive_sha256": "ebbfa553b819838fa26173b07f3ce55acef6998a18ea72a4a78a4eba14bb3230",
+ "archive_crc_check_passed": true,
+ "recovered_workbooks": 821,
+ "recovered_pages": 9,
+ "verified_byte_for_byte": 821,
+ "catalogue_files": 1027,
+ "missing_files": 206,
+ "collection_complete": false,
+ "analytical_validation_complete": false,
+ "note": "Recovery fingerprints were calculated from the preserved ZIP, not at original browser download. No original workbook or page content was edited."
+}

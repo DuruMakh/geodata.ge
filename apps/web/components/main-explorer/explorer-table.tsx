@@ -15,6 +15,8 @@ import { SwatchBar } from "../ui/editorial";
 type ExplorerTableRowLike = Pick<ExplorerTableRow, "itemId" | "kaLabel" | "color" | "valuesByYear"> & {
   basisByYear?: ExplorerTableRow["basisByYear"];
   preliminaryByYear?: Record<number, boolean>;
+  /** A year's own status mark for this row, such as the months a partial year covers. */
+  markByYear?: Record<number, string>;
   change?: ExplorerTableRow["change"];
 };
 
@@ -175,6 +177,7 @@ export function ExplorerTable<Row extends ExplorerTableRowLike>({
       {(row.preliminaryByYear?.[year] ?? preliminaryYears?.includes(year)) ? <sup className={STATUS_MARK_CLASS}>{preliminaryLabel}</sup> : null}
       {row.basisByYear?.[year] === "planned" ? <sup className={STATUS_MARK_CLASS}>{message(messages, "controls.planned")}</sup> : null}
       {forecastLabel && forecastYears?.includes(year) ? <sup className={STATUS_MARK_CLASS}>{forecastLabel}</sup> : null}
+      {row.markByYear?.[year] ? <sup className={STATUS_MARK_CLASS}>{row.markByYear[year]}</sup> : null}
     </>
   );
 

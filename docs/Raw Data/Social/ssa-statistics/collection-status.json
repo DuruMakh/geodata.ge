@@ -1,0 +1,18 @@
+{
+ "checked_on": "2026-10-18",
+ "catalogue_files": 1027,
+ "saved_files": 1027,
+ "missing_files": 0,
+ "recovered_from_zip": 821,
+ "new_browser_downloads": 206,
+ "source_link_captures_verified": 5,
+ "collection_complete": true,
+ "analytical_validation_complete": false,
+ "missing_by_topic": {},
+ "extraction_validation_passed": true,
+ "independent_numeric_validation_passed": true,
+ "geographic_checks_passed": true,
+ "source_findings": 748,
+ "unlabelled_workbooks_preserved_without_year_assignment": 2,
+ "next_stage": "Review findings for the selected indicators and approve analysis scope; no public data import or UI release."
+}

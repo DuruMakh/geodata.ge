@@ -1,0 +1,424 @@
+{
+  "category_id": "pre2012",
+  "source_url": "https://ssa.moh.gov.ge/statistik.php?lang=1&id=202304060739071683744297&v=0",
+  "captured_on": "2026-10-18",
+  "capture_method": "Visible source-page links read across all three pagination states in Chrome",
+  "tables": [
+    {
+      "table_no": 1,
+      "updated": "",
+      "files": [
+        {
+          "label": "2012",
+          "href": "/upload/20230406021829-1.1 (7).xlsx"
+        },
+        {
+          "label": "2011",
+          "href": "/upload/20230406044423-1.1 (8).xlsx"
+        },
+        {
+          "label": "2010",
+          "href": "/upload/20230407032727-1.1 (9).xlsx"
+        },
+        {
+          "label": "2009",
+          "href": "/upload/20230410023912-1.1 (10).xlsx"
+        },
+        {
+          "label": "2008",
+          "href": "/upload/20230411092304-1.1 (11).xlsx"
+        }
+      ]
+    },
+    {
+      "table_no": 2,
+      "updated": "",
+      "files": [
+        {
+          "label": "2012",
+          "href": "/upload/20230406021836-1.2.xlsx"
+        },
+        {
+          "label": "2011",
+          "href": "/upload/20230406044439-1.2 (1).xlsx"
+        },
+        {
+          "label": "2010",
+          "href": "/upload/20230407032735-1.2 (2).xlsx"
+        },
+        {
+          "label": "2009",
+          "href": "/upload/20230410023920-1.2 (3).xlsx"
+        },
+        {
+          "label": "2008",
+          "href": "/upload/20230411092415-1.2 (4).xlsx"
+        }
+      ]
+    },
+    {
+      "table_no": 3,
+      "updated": "",
+      "files": [
+        {
+          "label": "2012",
+          "href": "/upload/20230406021841-1.3.xlsx"
+        },
+        {
+          "label": "2011",
+          "href": "/upload/20230406044501-1.3 (1).xlsx"
+        },
+        {
+          "label": "2010",
+          "href": "/upload/20230407032747-1.3 (2).xlsx"
+        },
+        {
+          "label": "2009",
+          "href": "/upload/20230410023926-1.3 (3).xlsx"
+        },
+        {
+          "label": "2008",
+          "href": "/upload/20230411092508-1.3 (4).xlsx"
+        }
+      ]
+    },
+    {
+      "table_no": 4,
+      "updated": "",
+      "files": [
+        {
+          "label": "2012",
+          "href": "/upload/20230406021848-1.4.xlsx"
+        },
+        {
+          "label": "2011",
+          "href": "/upload/20230406044509-1.4 (1).xlsx"
+        },
+        {
+          "label": "2010",
+          "href": "/upload/20230407032756-1.4 (2).xlsx"
+        },
+        {
+          "label": "2009",
+          "href": "/upload/20230410023935-1.4 (3).xlsx"
+        },
+        {
+          "label": "2008",
+          "href": "/upload/20230411092603-1.4 (4).xlsx"
+        }
+      ]
+    },
+    {
+      "table_no": 5,
+      "updated": "",
+      "files": [
+        {
+          "label": "2012",
+          "href": "/upload/20230406021855-1.5.xlsx"
+        },
+        {
+          "label": "2011",
+          "href": "/upload/20230406044517-1.5 (1).xlsx"
+        },
+        {
+          "label": "2010",
+          "href": "/upload/20230407032803-1.5 (2).xlsx"
+        },
+        {
+          "label": "2009",
+          "href": "/upload/20230410023942-1.5 (3).xlsx"
+        },
+        {
+          "label": "2008",
+          "href": "/upload/20230411092708-1.5 (4).xlsx"
+        }
+      ]
+    },
+    {
+      "table_no": 6,
+      "updated": "",
+      "files": [
+        {
+          "label": "2012",
+          "href": "/upload/20230406021902-1.6.xlsx"
+        },
+        {
+          "label": "2011",
+          "href": "/upload/20230406044524-1.6 (1).xlsx"
+        },
+        {
+          "label": "2010",
+          "href": "/upload/20230407032811-1.6 (2).xlsx"
+        },
+        {
+          "label": "2009",
+          "href": "/upload/20230410023949-1.6 (3).xlsx"
+        },
+        {
+          "label": "2008",
+          "href": "/upload/20230411092806-1.6 (4).xlsx"
+        }
+      ]
+    },
+    {
+      "table_no": 7,
+      "updated": "",
+      "files": [
+        {
+          "label": "2012",
+          "href": "/upload/20230406021909-1.7.xlsx"
+        },
+        {
+          "label": "2011",
+          "href": "/upload/20230406044531-1.7 (1).xlsx"
+        },
+        {
+          "label": "2010",
+          "href": "/upload/20230407051634-1.7 (2).xlsx"
+        },
+        {
+          "label": "2009",
+          "href": "/upload/20230410023958-1.7 (3).xlsx"
+        },
+        {
+          "label": "2008",
+          "href": "/upload/20230411111127-1.7 (4).xlsx"
+        }
+      ]
+    },
+    {
+      "table_no": 8,
+      "updated": "",
+      "files": [
+        {
+          "label": "2012",
+          "href": "/upload/20230406021918-1.8.xlsx"
+        },
+        {
+          "label": "2011",
+          "href": "/upload/20230406044537-1.8 (1).xlsx"
+        },
+        {
+          "label": "2010",
+          "href": "/upload/20230407050227-1.8 (2).xlsx"
+        },
+        {
+          "label": "2009",
+          "href": "/upload/20230410024008-1.8 (3).xlsx"
+        },
+        {
+          "label": "2008",
+          "href": "/upload/20230411111222-1.8 (4).xlsx"
+        }
+      ]
+    },
+    {
+      "table_no": 9,
+      "updated": "",
+      "files": [
+        {
+          "label": "2012",
+          "href": "/upload/20230406021926-1.9.xlsx"
+        },
+        {
+          "label": "2011",
+          "href": "/upload/20230406044548-1.9 (1).xlsx"
+        },
+        {
+          "label": "2010",
+          "href": "/upload/20230407050219-1.9 (2).xlsx"
+        },
+        {
+          "label": "2009",
+          "href": "/upload/20230410024016-1.9 (3).xlsx"
+        },
+        {
+          "label": "2008",
+          "href": "/upload/20230411112014-1.9 (4).xlsx"
+        }
+      ]
+    },
+    {
+      "table_no": 10,
+      "updated": "",
+      "files": [
+        {
+          "label": "2012",
+          "href": "/upload/20230406021934-1.10.xlsx"
+        },
+        {
+          "label": "2011",
+          "href": "/upload/20230406034054-1.10 (1).xlsx"
+        },
+        {
+          "label": "2010",
+          "href": "/upload/20230407050212-1.10 (2).xlsx"
+        },
+        {
+          "label": "2009",
+          "href": "/upload/20230410024026-1.10 (3).xlsx"
+        }
+      ]
+    },
+    {
+      "table_no": 11,
+      "updated": "",
+      "files": [
+        {
+          "label": "2012",
+          "href": "/upload/20230406021942-1.11.xlsx"
+        },
+        {
+          "label": "2011",
+          "href": "/upload/20230406034316-1.11 (1).xlsx"
+        },
+        {
+          "label": "2010",
+          "href": "/upload/20230407044017-1.11 (2).xlsx"
+        },
+        {
+          "label": "2009",
+          "href": "/upload/20230410024035-1.11 (3).xlsx"
+        }
+      ]
+    },
+    {
+      "table_no": 12,
+      "updated": "",
+      "files": [
+        {
+          "label": "2012",
+          "href": "/upload/20230406021949-1.12.xlsx"
+        },
+        {
+          "label": "2011",
+          "href": "/upload/20230406034412-1.12 (1).xlsx"
+        },
+        {
+          "label": "2010",
+          "href": "/upload/20230407044010-1.12 (2).xlsx"
+        }
+      ]
+    },
+    {
+      "table_no": 13,
+      "updated": "",
+      "files": [
+        {
+          "label": "2012",
+          "href": "/upload/20230406021957-1.13.xlsx"
+        },
+        {
+          "label": "2011",
+          "href": "/upload/20230406042751-1.13 (1).xlsx"
+        }
+      ]
+    },
+    {
+      "table_no": 14,
+      "updated": "",
+      "files": [
+        {
+          "label": "2012",
+          "href": "/upload/20230406022021-1.14.xlsx"
+        },
+        {
+          "label": "2011",
+          "href": "/upload/20230406042845-1.14 (1).xlsx"
+        },
+        {
+          "label": "2010",
+          "href": "/upload/20230407041712-1.14 (2).xlsx"
+        },
+        {
+          "label": "2009",
+          "href": "/upload/20230410024044-1.14 (3).xlsx"
+        },
+        {
+          "label": "2008",
+          "href": "/upload/20230411113207-1.14 (4).xlsx"
+        }
+      ]
+    },
+    {
+      "table_no": 15,
+      "updated": "",
+      "files": [
+        {
+          "label": "2012",
+          "href": "/upload/20230406022029-1.15.xlsx"
+        },
+        {
+          "label": "2011",
+          "href": "/upload/20230406043000-1.15 (1).xlsx"
+        },
+        {
+          "label": "2010",
+          "href": "/upload/20230407041654-1.15 (2).xlsx"
+        },
+        {
+          "label": "2009",
+          "href": "/upload/20230410024052-1.15 (3).xlsx"
+        },
+        {
+          "label": "2008",
+          "href": "/upload/20230411113321-1.15 (5).xlsx"
+        }
+      ]
+    },
+    {
+      "table_no": 16,
+      "updated": "",
+      "files": [
+        {
+          "label": "2012",
+          "href": "/upload/20230406022036-1.16.xlsx"
+        },
+        {
+          "label": "2011",
+          "href": "/upload/20230406050258-1.16 (1).xlsx"
+        },
+        {
+          "label": "2010",
+          "href": "/upload/20230407041645-1.16 (2).xlsx"
+        },
+        {
+          "label": "2009",
+          "href": "/upload/20230410024059-1.16 (3).xlsx"
+        },
+        {
+          "label": "2008",
+          "href": "/upload/20230411113413-1.16 (4).xlsx"
+        }
+      ]
+    },
+    {
+      "table_no": 17,
+      "updated": "",
+      "files": [
+        {
+          "label": "2012",
+          "href": "/upload/20230406022043-1.17.xlsx"
+        },
+        {
+          "label": "2011",
+          "href": "/upload/20230406050405-1.17 (1).xlsx"
+        }
+      ]
+    },
+    {
+      "table_no": 18,
+      "updated": "",
+      "files": [
+        {
+          "label": "2012",
+          "href": "/upload/20230406022050-1.18.xlsx"
+        },
+        {
+          "label": "2011",
+          "href": "/upload/20230406050452-1.18 (1).xlsx"
+        }
+      ]
+    }
+  ]
+}

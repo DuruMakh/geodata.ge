@@ -6986,6 +6986,201 @@
     },
     "documentLanguage": "en"
   },
+  "ssa_statistics": {
+    "title": {
+      "text": "Social Service Agency statistics list (source page)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "Social Service Agency (SSA)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Social Service Agency",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "ssa_pension": {
+    "title": {
+      "text": "State pension (source page)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "Social Service Agency (SSA)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Social Service Agency",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "ssa_socpackage": {
+    "title": {
+      "text": "Social package (source page)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "Social Service Agency (SSA)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Social Service Agency",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "ssa_tsa_allowance": {
+    "title": {
+      "text": "Subsistence allowance (source page)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "Social Service Agency (SSA)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Social Service Agency",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "ssa_tsa_db": {
+    "title": {
+      "text": "Targeted social assistance database (source page)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "Social Service Agency (SSA)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Social Service Agency",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "ssa_compensation": {
+    "title": {
+      "text": "State compensation and academic stipend (source page)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "Social Service Agency (SSA)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Social Service Agency",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "ssa_utilitysubsidy": {
+    "title": {
+      "text": "Household utility subsidy (source page)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "Social Service Agency (SSA)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Social Service Agency",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "ssa_demography": {
+    "title": {
+      "text": "Targeted state programme to support demographic improvement (source page)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "Social Service Agency (SSA)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Social Service Agency",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "ssa_workinjury": {
+    "title": {
+      "text": "Workplace-injury compensation benefit (source page)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "Social Service Agency (SSA)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Social Service Agency",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "ssa_idp_refugee": {
+    "title": {
+      "text": "IDP and refugee allowance (source page links)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "Social Service Agency (SSA)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Social Service Agency",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": null
+  },
+  "ssa_maternity": {
+    "title": {
+      "text": "Maternity, childcare and adoption benefit (source page links)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "Social Service Agency (SSA)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Social Service Agency",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": null
+  },
+  "ssa_highmountain": {
+    "title": {
+      "text": "Support for permanent residents of high-mountain settlements (source page links)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "Social Service Agency (SSA)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Social Service Agency",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": null
+  },
+  "ssa_other": {
+    "title": {
+      "text": "Other programmes (source page links)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "Social Service Agency (SSA)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Social Service Agency",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": null
+  },
   "geostat_science_researchers": {
     "title": {
       "text": "Number of researchers by level of education, age groups and fields of science",

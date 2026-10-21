@@ -67,7 +67,7 @@ const registerRow = (overrides: Partial<DecisionRegisterRow> = {}): DecisionRegi
 
 describe("methodology catalog", () => {
   it("exposes the approved live datasets", () => {
-    expect(LIVE_METHODOLOGY_IDS).toEqual(["expenditure", "revenue", "municipalities", "debt", "gdp", "economic-sectors", "gdp-expenditure", "regional-economies", "business", "housing", "inflation", "money", "unemployment", "wages", "poverty", "household-income", "health", "education", "science-culture", "crime", "internet", "trade", "external-flows", "energy-food", "environment", "transport", "demography"]);
+    expect(LIVE_METHODOLOGY_IDS).toEqual(["expenditure", "revenue", "municipalities", "debt", "gdp", "economic-sectors", "gdp-expenditure", "regional-economies", "business", "housing", "inflation", "money", "unemployment", "wages", "poverty", "household-income", "health", "social-protection", "education", "science-culture", "crime", "internet", "trade", "external-flows", "energy-food", "environment", "transport", "demography"]);
     expect(Object.keys(METHODOLOGY_CONTENT)).toEqual(LIVE_METHODOLOGY_IDS);
   });
 
@@ -360,6 +360,7 @@ describe("methodology catalog", () => {
       environment: { fileCount: 46, totalBytes: 100, latestRetrievedAt: "2026-10-20", validated: true, minYear: 1990, maxYear: 2025 },
       internet: { fileCount: 36, totalBytes: 100, latestRetrievedAt: "2026-10-20", validated: true, minYear: 2016, maxYear: 2026 },
       education: { fileCount: 45, totalBytes: 100, latestRetrievedAt: "2026-10-16", validated: true, minYear: 2000, maxYear: 2025 },
+      "social-protection": { fileCount: 17, totalBytes: 100, latestRetrievedAt: "2026-10-18", validated: true, minYear: 2013, maxYear: 2025 },
       "science-culture": { fileCount: 33, totalBytes: 100, latestRetrievedAt: "2026-10-20", validated: true, minYear: 2005, maxYear: 2025 },
       money: { fileCount: 20, totalBytes: 100, latestRetrievedAt: "2026-10-11", validated: true, minYear: 1995, maxYear: 2025 },
       business: { fileCount: 26, totalBytes: 100, latestRetrievedAt: "2026-10-15", validated: true, minYear: 1999, maxYear: 2025 },
@@ -425,6 +426,7 @@ describe("methodology catalog", () => {
       { id: "poverty", title: METHODOLOGY_CONTENT.poverty.title, summary: METHODOLOGY_CONTENT.poverty.summary, href: "/methodology/poverty", coverage: { firstYear: 2004, lastYear: 2025 }, originalFileCount: 7, reviewedAt: METHODOLOGY_CONTENT.poverty.reviewedAt },
       { id: "household-income", title: METHODOLOGY_CONTENT["household-income"].title, summary: METHODOLOGY_CONTENT["household-income"].summary, href: "/methodology/household-income", coverage: { firstYear: 2002, lastYear: 2025 }, originalFileCount: 21, reviewedAt: METHODOLOGY_CONTENT["household-income"].reviewedAt },
       { id: "health", title: METHODOLOGY_CONTENT.health.title, summary: METHODOLOGY_CONTENT.health.summary, href: "/methodology/health", coverage: { firstYear: 2002, lastYear: 2025 }, originalFileCount: 36, reviewedAt: METHODOLOGY_CONTENT.health.reviewedAt },
+      { id: "social-protection", title: METHODOLOGY_CONTENT["social-protection"].title, summary: METHODOLOGY_CONTENT["social-protection"].summary, href: "/methodology/social-protection", coverage: { firstYear: 2013, lastYear: 2025 }, originalFileCount: 17, reviewedAt: METHODOLOGY_CONTENT["social-protection"].reviewedAt },
       { id: "education", title: METHODOLOGY_CONTENT.education.title, summary: METHODOLOGY_CONTENT.education.summary, href: "/methodology/education", coverage: { firstYear: 2000, lastYear: 2025 }, originalFileCount: 45, reviewedAt: METHODOLOGY_CONTENT.education.reviewedAt },
       { id: "science-culture", title: METHODOLOGY_CONTENT["science-culture"].title, summary: METHODOLOGY_CONTENT["science-culture"].summary, href: "/methodology/science-culture", coverage: { firstYear: 2005, lastYear: 2025 }, originalFileCount: 33, reviewedAt: METHODOLOGY_CONTENT["science-culture"].reviewedAt },
       { id: "crime", title: METHODOLOGY_CONTENT.crime.title, summary: METHODOLOGY_CONTENT.crime.summary, href: "/methodology/crime", coverage: { firstYear: 2001, lastYear: 2025 }, originalFileCount: 22, reviewedAt: METHODOLOGY_CONTENT.crime.reviewedAt },
@@ -462,6 +464,7 @@ describe("methodology catalog", () => {
       environment: { fileCount: 46, totalBytes: 100, latestRetrievedAt: "2026-10-20", validated: true, minYear: 1990, maxYear: 2025 },
       internet: { fileCount: 36, totalBytes: 100, latestRetrievedAt: "2026-10-20", validated: true, minYear: 2016, maxYear: 2026 },
       education: { fileCount: 45, totalBytes: 100, latestRetrievedAt: "2026-10-16", validated: true, minYear: 2000, maxYear: 2025 },
+      "social-protection": { fileCount: 17, totalBytes: 100, latestRetrievedAt: "2026-10-18", validated: true, minYear: 2013, maxYear: 2025 },
       "science-culture": { fileCount: 33, totalBytes: 100, latestRetrievedAt: "2026-10-20", validated: true, minYear: 2005, maxYear: 2025 },
       money: { fileCount: 20, totalBytes: 100, latestRetrievedAt: "2026-10-11", validated: true, minYear: 1995, maxYear: 2025 },
       business: { fileCount: 26, totalBytes: 100, latestRetrievedAt: "2026-10-15", validated: true, minYear: 1999, maxYear: 2025 },

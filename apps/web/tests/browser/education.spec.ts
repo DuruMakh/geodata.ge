@@ -77,6 +77,23 @@ test("the Schools index draws the municipality map, lists Georgia first and open
   await expect(page.getByTestId("region-member-row")).toHaveCount(0);
 });
 
+test("the Schools municipalities tab lists Georgia first and opens Georgia's page", async ({ page }) => {
+  await page.goto("/en/explorer/education/schools");
+  await ready(page);
+  const rows = page.getByTestId("municipal-list-row");
+  // Georgia, then the 64 municipalities; the count beside the search counts the municipalities only.
+  await expect(rows).toHaveCount(65);
+  await expect(page.getByTestId("row-count")).toHaveText("64");
+  await expect(rows.first().getByTestId("municipal-row-name")).toHaveText("Georgia");
+  await expect(rows.first()).toContainText("644.2");
+  // Georgia's pupils outnumber any municipality's: its bar stops at the end of its track.
+  expect(await rows.first().getByTestId("municipal-row-bar").evaluate((bar) => Number.parseFloat((bar as HTMLElement).style.width))).toBe(100);
+  await page.getByTestId("municipal-search").fill("Georgia");
+  await expect(rows).toHaveCount(1);
+  await rows.first().click();
+  await expect(page).toHaveURL(/\/en\/explorer\/education\/schools\/georgia$/);
+});
+
 test("Guria's Schools page: latest line, three headings, one heading at a time, its municipalities and the next region", async ({ page }) => {
   await page.goto("/explorer/education/schools/region/guria");
   await ready(page);
