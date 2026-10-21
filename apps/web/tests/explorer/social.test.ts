@@ -7,6 +7,7 @@ import { loadNationalGdpFacts } from "../../lib/data/nationalGdp/importNationalG
 import { SERVED_DATA_FILES, loadServedMunicipalData } from "../../lib/data/servedData";
 import { loadSocialBreaks, loadSocialFacts, toClientSocialFact } from "../../lib/data/social/importSocial";
 import { SOCIAL_AGE_BANDS, type ClientSocialFact, type SocialSeriesBreak } from "../../lib/data/social/types";
+import { shareOfGdp } from "../../lib/explorer/debtExplorer";
 import { projectGdpFact, type ClientNationalGdpFact } from "../../lib/explorer/clientData";
 import { EDITORIAL_PALETTE, INK } from "../../lib/explorer/colors";
 import { createWorkbookBuffer } from "../../lib/explorer/workbookWriter.client";
@@ -15,7 +16,7 @@ import type { Presentation } from "../../lib/i18n/types";
 import { placePageHref } from "../../lib/explorer/demographyPlaceRoutes";
 import {
   SOCIAL_SECTIONS, atPrices, buildSocialModel, changeSocialSelection, changeSocialView, defaultSocialState, parseSocialHash, serializeSocialHash, sharePerHundred,
-  socialAnnualCpi, socialCoverage, socialPaymentsViewFacts, socialPopulation, socialTopicSeries, type SocialPopulation, type SocialPriceIndex,
+  socialAnnualCpi, socialCoverage, socialPaymentsViewFacts, socialPopulation, socialSeriesColor, socialTopicFacts, socialTopicSeries, socialViews, type SocialPopulation, type SocialPriceIndex,
 } from "../../lib/explorer/social";
 import { buildSocialHubCards } from "../../lib/explorer/socialHubCards";
 import { buildSocialIndexModel } from "../../lib/explorer/socialIndex";
@@ -48,12 +49,13 @@ const extras = () => ({ population, cpi });
 const firstYear = (id: string, geographyId = GEORGIA) => Math.min(...facts.filter(f => f.indicatorId === id && f.geographyId === geographyId).map(f => f.year));
 const value = (id: string, geographyId: string, year: number) => facts.find(f => f.indicatorId === id && f.geographyId === geographyId && f.year === year)!.value;
 
-test("the four sections sit under the Health and social protection hub", () => {
+test("the five sections sit under the Health and social protection hub", () => {
   expect(SOCIAL_SECTIONS.map(s => [s.id, s.href, s.labelKey])).toEqual([
     ["social-payments", "/explorer/health/social-payments", "common.socialPayments"],
     ["pensions", "/explorer/health/pensions", "common.socialPensions"],
     ["subsistence-allowance", "/explorer/health/subsistence-allowance", "common.socialSubsistence"],
     ["social-package", "/explorer/health/social-package", "common.socialPackage"],
+    ["funded-pension", "/explorer/health/funded-pension", "common.socialFundedPension"],
   ]);
   expect(socialPlaceBase("pensions")).toBe("/explorer/health/pensions");
   expect(socialPlaceBase("subsistence-allowance")).toBe("/explorer/health/subsistence-allowance");
@@ -206,7 +208,7 @@ test("Social payments as % of GDP divides each year's money by the served nomina
   expect(() => socialPaymentsViewFacts("gdp", facts, [])).toThrow(/No GDP facts/);
   // Switching view keeps the selection and the years.
   const manual = { ...defaultSocialState("social-payments"), range: { kind: "manual" as const, start: 2015, end: 2020 }, selectedIds: ["social.payments.pension.amount"] };
-  expect(changeSocialView(manual, "gdp", facts, gdpFacts)).toEqual({ ...manual, view: "gdp" });
+  expect(changeSocialView(manual, "social-payments", "gdp", facts, gdpFacts)).toEqual({ ...manual, view: "gdp" });
   const amount = buildSocialModel("social-payments", facts, defaultSocialState("social-payments"), { breaks, gdpFacts });
   expect(amount).toMatchObject({ unit: "gel_million", heading: "money" });
   expect(amount.selected[0]).toMatchObject({ color: INK, decimals: 1 });
@@ -469,15 +471,132 @@ test("a programme that ran part of a year is marked with its months on the Data 
   expect(counts.analysis.rows.every(r => !String(r[3]).includes("months"))).toBe(true);
 });
 
-test("the hub has four cards: Georgia's headline series with their latest values and years", async () => {
+test("the hub has five cards: Georgia's headline series with their latest values and years", async () => {
   const cards = buildSocialHubCards(facts, await presentation());
   expect(cards.map(card => card.href)).toEqual(SOCIAL_SECTIONS.map(section => section.href));
-  expect(cards.map(card => card.title)).toEqual(["Social payments", "Pensions", "Subsistence allowance", "Social package"]);
+  expect(cards.map(card => card.title)).toEqual(["Social payments", "Pensions", "Subsistence allowance", "Social package", "Funded pension"]);
   expect(cards.map(card => card.footer)).toEqual([
-    "2025 · 6,166.1 million GEL · 2013–2025", "2025 · 888,518 · 2013–2025", "2025 · 129,506 · 2013–2025", "2025 · 187,764 · 2013–2025",
+    "2025 · 6,166.1 million GEL · 2013–2025", "2025 · 888,518 · 2013–2025", "2025 · 129,506 · 2013–2025", "2025 · 187,764 · 2013–2025", "2025 · 8,237.5 million GEL · 2019–2025",
   ]);
-  expect(cards.map(card => card.series?.length)).toEqual([13, 13, 13, 13]);
+  expect(cards.map(card => card.series?.length)).toEqual([13, 13, 13, 13, 7]);
   expect(cards[1].series!.at(-1)).toBe(888518);
-  expect(cards.map(card => card.index)).toEqual(["04", "05", "06", "07"]);
+  expect(cards.map(card => card.index)).toEqual(["04", "05", "06", "07", "08"]);
   expect(cards.every(card => card.seriesColor === INK && !card.comingSoon)).toBe(true);
+});
+
+// ---- Funded pension -------------------------------------------------------------------------------------------------
+
+const FUNDED = "social.funded_pension.";
+const FUNDED_MONEY_IDS = ["savings", "net_assets", "contributions", "contributions_private", "contributions_public", "contributions_state", "interest", "securities_gains", "dividends", "payouts"].map(m => `${FUNDED}${m}.amount`);
+const fundedState = (selectedIds: string[], view: "amount" | "gdp" = "amount") => ({ ...defaultSocialState("funded-pension"), view, selectedIds });
+
+test("funded pension opens on savings in members' accounts", () => {
+  const state = defaultSocialState("funded-pension");
+  expect(state.selectedIds).toEqual([`${FUNDED}savings.amount`]);
+  expect(state.view).toBe("amount");
+  expect(span(socialCoverage("funded-pension", "amount", facts, gdpFacts, state.selectedIds))).toEqual([2019, 2025]);
+  const model = buildSocialModel("funded-pension", facts, state, { breaks, gdpFacts });
+  expect(model).toMatchObject({ unit: "gel_million", heading: "savings" });
+  expect(model.selected[0]).toMatchObject({ color: INK, decimals: 1 });
+  expect(model.selected[0].valuesByYear[2025]).toBe(8237.53);
+  expect(model.selected[0].partialMonths).toEqual({});
+});
+
+test("funded pension lists five headings in order", () => {
+  const series = socialTopicSeries("funded-pension");
+  const rows = (heading: string) => series.filter(s => s.heading === heading).map(s => s.id);
+  expect([...new Set(series.map(s => s.heading))]).toEqual(["savings", "flows", "members", "employers", "return"]);
+  expect(rows("savings")).toEqual([`${FUNDED}savings.amount`, `${FUNDED}net_assets.amount`]);
+  expect(rows("flows")).toEqual(["contributions", "contributions_private", "contributions_public", "contributions_state", "interest", "securities_gains", "dividends", "payouts"].map(m => `${FUNDED}${m}.amount`));
+  expect(rows("members")).toEqual([`${FUNDED}members`, `${FUNDED}left`, `${FUNDED}paid_persons`]);
+  expect(rows("employers")).toEqual([`${FUNDED}employers`]);
+  expect(rows("return")).toEqual([`${FUNDED}return`]);
+  expect(series).toHaveLength(15);
+  expect(series.find(s => s.id === `${FUNDED}savings.amount`)!.reference).toBe(true);
+  expect(series.find(s => s.id === `${FUNDED}net_assets.amount`)!.reference).toBe(false);
+  // Every listed row is served for Georgia.
+  for (const { id } of series) expect(facts.some(f => f.indicatorId === id && f.geographyId === GEORGIA)).toBe(true);
+});
+
+test("funded pension colours: the first row of a heading is ink, the others take the palette by position in the scheme's lists", () => {
+  const series = socialTopicSeries("funded-pension");
+  const colorOf = (id: string) => socialSeriesColor(series.find(s => s.id === id)!, series.findIndex(s => s.id === id));
+  for (const id of [`${FUNDED}savings.amount`, `${FUNDED}contributions.amount`, `${FUNDED}members`, `${FUNDED}employers`, `${FUNDED}return`]) expect(colorOf(id)).toBe(INK);
+  // A row keeps its colour under any heading: net assets is position 1 of the money list, left position 1 of the counts.
+  expect(colorOf(`${FUNDED}net_assets.amount`)).toBe(EDITORIAL_PALETTE[1]);
+  expect(colorOf(`${FUNDED}payouts.amount`)).toBe(EDITORIAL_PALETTE[9]);
+  expect(colorOf(`${FUNDED}left`)).toBe(EDITORIAL_PALETTE[1]);
+  expect(colorOf(`${FUNDED}paid_persons`)).toBe(EDITORIAL_PALETTE[2]);
+  const flows = series.filter(s => s.heading === "flows").map(s => colorOf(s.id));
+  expect(new Set(flows).size).toBe(flows.length);
+});
+
+test("funded pension flows keep the heading's years; a measure the statements do not print is a gap, never zero", () => {
+  const state = fundedState([`${FUNDED}dividends.amount`]);
+  expect(span(socialCoverage("funded-pension", "amount", facts, gdpFacts, state.selectedIds))).toEqual([2019, 2025]);
+  const model = buildSocialModel("funded-pension", facts, state, { breaks, gdpFacts });
+  expect(model.heading).toBe("flows");
+  expect(model.years).toEqual([2019, 2020, 2021, 2022, 2023, 2024, 2025]);
+  expect([2019, 2020, 2021].map(year => model.selected[0].valuesByYear[year])).toEqual([null, null, null]);
+  expect(model.selected[0].valuesByYear[2022]).toBe(3.543);
+  const gains = buildSocialModel("funded-pension", facts, fundedState([`${FUNDED}securities_gains.amount`]), { breaks, gdpFacts });
+  expect(gains.selected[0].valuesByYear[2022]).toBe(-31.187);
+});
+
+test("funded pension counts and the return are shown as they are, the return to one decimal", async () => {
+  const options = { breaks, gdpFacts };
+  const members = buildSocialModel("funded-pension", facts, fundedState([`${FUNDED}members`]), options);
+  expect(members).toMatchObject({ unit: "persons", heading: "members" });
+  expect(members.selected[0]).toMatchObject({ decimals: 0 });
+  expect(members.selected[0].valuesByYear[2025]).toBe(1705365);
+  const employers = buildSocialModel("funded-pension", facts, fundedState([`${FUNDED}employers`]), options);
+  expect(employers).toMatchObject({ unit: "employers", heading: "employers" });
+  expect(employers.selected[0]).toMatchObject({ decimals: 0 });
+  expect(employers.selected[0].valuesByYear[2025]).toBe(145780);
+  const rate = buildSocialModel("funded-pension", facts, fundedState([`${FUNDED}return`]), options);
+  expect(rate).toMatchObject({ unit: "return", heading: "return" });
+  expect(rate.selected[0]).toMatchObject({ decimals: 1 });
+  expect(rate.selected[0].valuesByYear[2025]).toBe(11.8);
+  // The unit label of the return is "%", not the "% of residents" of a share.
+  expect((await getMessages("en", ["social"]))["social.unitReturn"]).toBe("%");
+  expect((await getMessages("ka", ["social"]))["social.unitReturn"]).toBe("%");
+});
+
+test("a non-money funded pension heading resets the view to amount", () => {
+  expect(socialViews("funded-pension")).toEqual(["amount", "gdp"]);
+  expect(socialViews("funded-pension", "savings")).toEqual(["amount", "gdp"]);
+  expect(socialViews("funded-pension", "flows")).toEqual(["amount", "gdp"]);
+  for (const heading of ["members", "employers", "return"] as const) expect(socialViews("funded-pension", heading)).toEqual(["amount"]);
+  expect(socialViews("funded-pension", "members")).toEqual(["amount"]);
+  // The other sections ignore the heading.
+  expect(socialViews("social-payments", "money")).toEqual(["amount", "gdp"]);
+  expect(socialViews("social-package", "recipients")).toEqual(["amount"]);
+  const fromGdp = fundedState([`${FUNDED}savings.amount`], "gdp");
+  expect(changeSocialSelection(fromGdp, "funded-pension", [`${FUNDED}members`], facts, gdpFacts)).toMatchObject({ view: "amount", selectedIds: [`${FUNDED}members`] });
+  expect(changeSocialSelection(fromGdp, "funded-pension", [`${FUNDED}contributions.amount`], facts, gdpFacts).view).toBe("gdp");
+  expect(changeSocialSelection(fromGdp, "funded-pension", [], facts, gdpFacts).view).toBe("gdp");
+  expect(parseSocialHash(`#tab=gdp&sel=${FUNDED}return`, "funded-pension", facts, gdpFacts)).toMatchObject({ view: "amount", selectedIds: [`${FUNDED}return`] });
+  expect(parseSocialHash(`#tab=gdp&sel=${FUNDED}interest.amount`, "funded-pension", facts, gdpFacts).view).toBe("gdp");
+});
+
+test("funded pension as % of GDP divides the money rows by GDP and leaves the counts as they are", () => {
+  const shown = socialTopicFacts("funded-pension", "gdp", facts, gdpFacts);
+  const gdpByYear = new Map(gdpFacts.map(f => [f.year, f]));
+  const savings2025 = shown.find(f => f.indicatorId === `${FUNDED}savings.amount` && f.year === 2025)!;
+  expect(savings2025).toMatchObject({ valueStatus: "calculated", unit: "percent" });
+  expect(savings2025.value).toBeCloseTo(shareOfGdp(8237530000, 2025, gdpByYear)! * 100, 10);
+  const members2025 = shown.find(f => f.indicatorId === `${FUNDED}members` && f.year === 2025)!;
+  expect(members2025).toMatchObject({ value: 1705365, valueStatus: "official", unit: "persons" });
+  const rate = shown.find(f => f.indicatorId === `${FUNDED}return` && f.year === 2025)!;
+  expect(rate).toMatchObject({ value: 11.8, valueStatus: "official", unit: "return" });
+  // The amount view serves the same money in million GEL.
+  expect(socialTopicFacts("funded-pension", "amount", facts, gdpFacts).find(f => f.indicatorId === `${FUNDED}savings.amount` && f.year === 2025)).toMatchObject({ value: 8237.53, unit: "gel_million", valueStatus: "official" });
+  const model = buildSocialModel("funded-pension", facts, fundedState([`${FUNDED}savings.amount`], "gdp"), { breaks, gdpFacts });
+  expect(model).toMatchObject({ unit: "percent", heading: "savings" });
+  expect(model.selected[0]).toMatchObject({ decimals: 2 });
+  // Every money row of the scheme is in the shown facts of the gdp view.
+  for (const id of FUNDED_MONEY_IDS) expect(shown.some(f => f.indicatorId === id)).toBe(true);
+  // A gap stays a gap in the gdp view too.
+  expect(shown.some(f => f.indicatorId === `${FUNDED}dividends.amount` && f.year < 2022)).toBe(false);
+  expect(changeSocialView(fundedState([`${FUNDED}savings.amount`]), "funded-pension", "gdp", facts, gdpFacts)).toMatchObject({ view: "gdp" });
 });

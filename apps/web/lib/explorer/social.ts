@@ -1,5 +1,5 @@
 import { buildBreakRegister } from "../data/demography/breaks";
-import { SOCIAL_AGE_BANDS, SOCIAL_GEORGIA, SOCIAL_PACKAGE_GROUPS, SOCIAL_PAYMENT_PROGRAMMES, type ClientSocialFact, type SocialSeriesBreak } from "../data/social/types";
+import { FUNDED_PENSION_COUNTS, FUNDED_PENSION_MONEY, SOCIAL_AGE_BANDS, SOCIAL_GEORGIA, SOCIAL_PACKAGE_GROUPS, SOCIAL_PAYMENT_PROGRAMMES, type ClientSocialFact, type SocialSeriesBreak } from "../data/social/types";
 import type { ClientNationalGdpFact } from "./clientData";
 import { INK } from "./colors";
 import { CENSUS_BREAK, perPopulation } from "./crime";
@@ -10,27 +10,28 @@ import { refitRange, resolveRange, type ResolvedPeriodRange } from "./periodRang
 import { buildTopicModel, serializeTopicHash, topicHashView, topicSeriesColor, type TopicCoverage, type TopicSeriesModel, type TopicState } from "./topicSeries";
 import { changeUnitListSelection, listLatestByHeading, parseUnitListHash, unitListCoverage } from "./unitList";
 
-/** The four pages sit on the Health and social protection hub, after its Health sections. */
+/** The five pages sit on the Health and social protection hub, after its Health sections. */
 export const SOCIAL_SECTIONS = [
   { id: "social-payments", href: `${HEALTH_HUB_PATH}/social-payments`, labelKey: "common.socialPayments" },
   { id: "pensions", href: `${HEALTH_HUB_PATH}/pensions`, labelKey: "common.socialPensions" },
   { id: "subsistence-allowance", href: `${HEALTH_HUB_PATH}/subsistence-allowance`, labelKey: "common.socialSubsistence" },
   { id: "social-package", href: `${HEALTH_HUB_PATH}/social-package`, labelKey: "common.socialPackage" },
+  { id: "funded-pension", href: `${HEALTH_HUB_PATH}/funded-pension`, labelKey: "common.socialFundedPension" },
 ] as const;
 export type SocialSectionId = typeof SOCIAL_SECTIONS[number]["id"];
-/** The two pages with a chart of national series; Pensions and Subsistence allowance are map indexes of place pages (socialPlaces.ts). */
-export type SocialTopicId = "social-payments" | "social-package";
+/** The three pages with a chart of national series; Pensions and Subsistence allowance are map indexes of place pages (socialPlaces.ts). */
+export type SocialTopicId = "social-payments" | "social-package" | "funded-pension";
 export type SocialPlaceSet = "pensions" | "subsistence-allowance";
 
 /** The small heading a row is listed under. A chart shows the rows of one heading at a time. */
-export type SocialHeading = "money" | "pensioners" | "share" | "average" | "families" | "people" | "recipients" | "ages";
+export type SocialHeading = "money" | "pensioners" | "share" | "average" | "families" | "people" | "recipients" | "ages" | "savings" | "flows" | "members" | "employers" | "return";
 /**
  * A listed row. A calculated row's id is its base indicator plus `#share` (per 100 residents) or `#real` (at 2025 prices),
  * so a hash naming it stays stable.
  */
 export type SocialSeriesDefinition = { id: string; reference: boolean; heading: SocialHeading; calculated?: "share" | "real" };
-/** How a page shows a value: money in million GEL (or % of GDP), averages in GEL a month, shares in %, counts as they are. */
-export type SocialUnit = "persons" | "families" | "gel_million" | "gel" | "percent";
+/** How a page shows a value: money in million GEL (or % of GDP), averages in GEL a month, shares in %, counts as they are, a fund's return in %. */
+export type SocialUnit = "persons" | "families" | "employers" | "gel_million" | "gel" | "percent" | "return";
 /** A value as a page shows it: a served fact, or one calculated from it (whose id carries the `#` suffix). */
 export type SocialShownFact = Omit<ClientSocialFact, "indicatorId"> & { indicatorId: string; unit: SocialUnit };
 
@@ -38,8 +39,24 @@ export type SocialShownFact = Omit<ClientSocialFact, "indicatorId"> & { indicato
 export const socialRows = (heading: SocialHeading, ids: readonly string[], reference = false): SocialSeriesDefinition[] =>
   ids.map((id, index) => ({ id, reference: reference && index === 0, heading, ...(id.endsWith("#share") ? { calculated: "share" as const } : id.endsWith("#real") ? { calculated: "real" as const } : {}) }));
 
-/** The series a topic page lists: Social payments' total and its 18 programmes in spec order; Social package's 10 groups under each of its three headings. */
+const FUNDED = "social.funded_pension.";
+const fundedMoneyIds = (measures: readonly string[]) => measures.map(measure => `${FUNDED}${measure}.amount`);
+const FUNDED_FLOWS = FUNDED_PENSION_MONEY.slice(2);
+
+/**
+ * The series a topic page lists: Social payments' total and its 18 programmes in spec order; Social package's 10 groups under each
+ * of its three headings; the funded pension's savings, flows, members, employers and return (the first row of each heading the reference).
+ */
 export function socialTopicSeries(section: SocialTopicId): SocialSeriesDefinition[] {
+  if (section === "funded-pension") {
+    return [
+      ...socialRows("savings", fundedMoneyIds(FUNDED_PENSION_MONEY.slice(0, 2)), true),
+      ...socialRows("flows", fundedMoneyIds(FUNDED_FLOWS), true),
+      ...socialRows("members", FUNDED_PENSION_COUNTS.slice(0, 3).map(measure => `${FUNDED}${measure}`), true),
+      ...socialRows("employers", [`${FUNDED}employers`], true),
+      ...socialRows("return", [`${FUNDED}return`], true),
+    ];
+  }
   if (section === "social-payments") return socialRows("money", ["social.payments.total.amount", ...SOCIAL_PAYMENT_PROGRAMMES.map(programme => `social.payments.${programme}.amount`)], true);
   return [
     ...socialRows("recipients", SOCIAL_PACKAGE_GROUPS.map(group => `social.social_package.${group}.recipients`), true),
@@ -64,12 +81,17 @@ const FIXED_PAYMENT_COLORS: Readonly<Record<string, string>> = {
  * a Social payments programme by `SOCIAL_PAYMENT_PROGRAMMES` (four of them fixed), and a Social package group by
  * `SOCIAL_PACKAGE_GROUPS`, so a group wears one colour under Recipients, Money and Average per month; the Money and average
  * totals, the reference rows of their headings like "All recipients" under Recipients, are ink. A subsistence age group is keyed by
- * its band in `SOCIAL_AGE_BANDS`, so the eight bands take palette 0–7 wherever the heading sits. Other place rows take the palette by position.
+ * its band in `SOCIAL_AGE_BANDS`, so the eight bands take palette 0–7 wherever the heading sits. A funded pension row is keyed by its
+ * place in `FUNDED_PENSION_MONEY` or `FUNDED_PENSION_COUNTS`; the first row of each of its headings is ink. Other place rows take the palette by position.
  */
 export function socialSeriesColor(series: SocialSeriesDefinition, index: number): string {
   if (series.reference) return INK;
   const [, programme, group] = series.id.split(".");
   if (programme === "payments") return FIXED_PAYMENT_COLORS[group!] ?? topicSeriesColor(series, SOCIAL_PAYMENT_PROGRAMMES.indexOf(group as typeof SOCIAL_PAYMENT_PROGRAMMES[number]));
+  if (programme === "funded_pension") {
+    const position = FUNDED_PENSION_MONEY.indexOf(group as typeof FUNDED_PENSION_MONEY[number]);
+    return topicSeriesColor(series, position >= 0 ? position : FUNDED_PENSION_COUNTS.indexOf(group as typeof FUNDED_PENSION_COUNTS[number]));
+  }
   if (programme === "social_package" && group === "total") return INK;
   if (programme === "social_package") return topicSeriesColor(series, SOCIAL_PACKAGE_GROUPS.indexOf(group as typeof SOCIAL_PACKAGE_GROUPS[number]));
   if (group?.startsWith("persons_age_")) return topicSeriesColor(series, SOCIAL_AGE_BANDS.indexOf(group.slice("persons_age_".length) as typeof SOCIAL_AGE_BANDS[number]));
@@ -79,6 +101,8 @@ export function socialSeriesColor(series: SocialSeriesDefinition, index: number)
 /** A served or calculated id's display unit; the % of GDP view overrides money with `percent`. */
 export function socialUnitOf(indicatorId: string): SocialUnit {
   if (indicatorId.endsWith("#share")) return "percent";
+  if (indicatorId === `${FUNDED}employers`) return "employers";
+  if (indicatorId === `${FUNDED}return`) return "return";
   if (indicatorId.endsWith("#real") || indicatorId.endsWith(".avg_monthly")) return "gel";
   if (indicatorId.endsWith("amount")) return "gel_million";
   return indicatorId.includes("families") ? "families" : "persons";
@@ -142,22 +166,33 @@ export function atPrices(facts: readonly ClientSocialFact[], cpi: SocialPriceInd
   });
 }
 
-/** Social payments' two views: million GEL, or the same money as % of GDP. */
+/** A topic page's views: million GEL, or the same money as % of GDP (Social payments and the funded pension). */
 export type SocialPayView = "amount" | "gdp";
-const VIEWS: Record<SocialTopicId, readonly SocialPayView[]> = { "social-payments": ["amount", "gdp"], "social-package": ["amount"] };
-export const socialViews = (section: SocialTopicId): readonly SocialPayView[] => VIEWS[section];
+const VIEWS: Record<SocialTopicId, readonly SocialPayView[]> = { "social-payments": ["amount", "gdp"], "social-package": ["amount"], "funded-pension": ["amount", "gdp"] };
+/** The funded pension headings whose rows are money, the only ones with a % of GDP view. */
+const FUNDED_GDP_HEADINGS: readonly SocialHeading[] = ["savings", "flows"];
+/** A section's views; with a heading, the views that heading has: the funded pension's counts and return have no % of GDP. Without one, every view of the section. */
+export const socialViews = (section: SocialTopicId, heading?: SocialHeading): readonly SocialPayView[] =>
+  section === "funded-pension" && heading !== undefined && !FUNDED_GDP_HEADINGS.includes(heading) ? ["amount"] : VIEWS[section];
+/** The view a selection can keep: its own, or the amount view when its heading has no % of GDP. */
+const viewForSelection = (section: SocialTopicId, view: SocialPayView, selectedIds: readonly string[]): SocialPayView => {
+  const heading = selectedIds.length ? socialHeadingOf(socialTopicSeries(section))(selectedIds[0]) as SocialHeading | undefined : undefined;
+  return socialViews(section, heading).includes(view) ? view : "amount";
+};
 
 /**
- * The values a Social payments view shows. The % of GDP view divides each year's money by Fiscal.ge's nominal GDP for the
- * year (the debt page's share of GDP, as on Money and banks), marked calculated; a year without GDP has none.
+ * The values a Social payments or funded pension view shows. The % of GDP view divides each year's money by Fiscal.ge's nominal GDP
+ * for the year (the debt page's share of GDP, as on Money and banks), marked calculated; a year without GDP has none. The funded
+ * pension's counts and return are not money and stay as they are.
  */
-export function socialPaymentsViewFacts(view: SocialPayView, facts: readonly ClientSocialFact[], gdpFacts: readonly ClientNationalGdpFact[]): SocialShownFact[] {
-  const ids = new Set<string>(socialTopicSeries("social-payments").map(s => s.id));
+export function socialPaymentsViewFacts(view: SocialPayView, facts: readonly ClientSocialFact[], gdpFacts: readonly ClientNationalGdpFact[], section: SocialTopicId = "social-payments"): SocialShownFact[] {
+  const ids = new Set<string>(socialTopicSeries(section).map(s => s.id));
   const payments = facts.filter(f => ids.has(f.indicatorId) && f.geographyId === SOCIAL_GEORGIA).map(shown);
   if (view === "amount") return payments;
   if (!gdpFacts.length) throw new Error("No GDP facts for the Social payments % of GDP view");
   const gdpByYear = new Map(gdpFacts.map(f => [f.year, f]));
   return payments.flatMap(f => {
+    if (f.unit !== "gel_million") return [f];
     const share = shareOfGdp(f.value * 1e6, f.year, gdpByYear);
     return share === null ? [] : [{ ...f, value: calculated(share * 100), valueStatus: "calculated" as const, unit: "percent" as const }];
   });
@@ -165,7 +200,7 @@ export function socialPaymentsViewFacts(view: SocialPayView, facts: readonly Cli
 
 /** A topic page's shown facts: Georgia's rows of its series, in the view's unit. */
 export function socialTopicFacts(section: SocialTopicId, view: SocialPayView, facts: readonly ClientSocialFact[], gdpFacts: readonly ClientNationalGdpFact[]): SocialShownFact[] {
-  if (section === "social-payments") return socialPaymentsViewFacts(view, facts, gdpFacts);
+  if (section !== "social-package") return socialPaymentsViewFacts(view, facts, gdpFacts, section);
   const ids = new Set<string>(socialTopicSeries(section).map(s => s.id));
   return facts.filter(f => ids.has(f.indicatorId) && f.geographyId === SOCIAL_GEORGIA).map(shown);
 }
@@ -198,18 +233,23 @@ export function socialCoverage(section: SocialTopicId, view: SocialPayView, fact
 export function parseSocialHash(hash: string, section: SocialTopicId, facts: readonly ClientSocialFact[], gdpFacts: readonly ClientNationalGdpFact[]): SocialState {
   const view = topicHashView(new URLSearchParams(hash.replace(/^#/, "")), socialViews(section));
   const definitions = socialTopicSeries(section);
-  return { ...parseUnitListHash(hash, definitions, socialDefaultSelection(section), socialTopicFacts(section, view, facts, gdpFacts), noSocialYears(section), socialHeadingOf(definitions)), view };
+  const state = parseUnitListHash(hash, definitions, socialDefaultSelection(section), socialTopicFacts(section, view, facts, gdpFacts), noSocialYears(section), socialHeadingOf(definitions));
+  return { ...state, view: viewForSelection(section, view, state.selectedIds) };
 }
 
-/** A topic page's new selection: a row under another heading replaces it. The years stay, clamped to the heading's (never collapsed to "all"). */
+/**
+ * A topic page's new selection: a row under another heading replaces it. The years stay, clamped to the heading's (never collapsed
+ * to "all"). A heading without a % of GDP view (the funded pension's counts and return) puts the page back on the amount view.
+ */
 export function changeSocialSelection(state: SocialState, section: SocialTopicId, next: readonly string[], facts: readonly ClientSocialFact[], gdpFacts: readonly ClientNationalGdpFact[]): SocialState {
   const definitions = socialTopicSeries(section);
-  return { ...changeUnitListSelection(state, definitions, next, socialTopicFacts(section, state.view, facts, gdpFacts), noSocialYears(section), socialHeadingOf(definitions)), view: state.view };
+  const changed = changeUnitListSelection(state, definitions, next, socialTopicFacts(section, state.view, facts, gdpFacts), noSocialYears(section), socialHeadingOf(definitions));
+  return { ...changed, view: viewForSelection(section, state.view, changed.selectedIds) };
 }
 
-/** Switching Social payments between million GEL and % of GDP keeps the selection and mode; the years are clamped to the view's (never collapsed to "all"). */
-export function changeSocialView(state: SocialState, view: SocialPayView, facts: readonly ClientSocialFact[], gdpFacts: readonly ClientNationalGdpFact[]): SocialState {
-  return { ...state, view, range: refitRange(state.range, socialCoverage("social-payments", view, facts, gdpFacts, state.selectedIds), { collapseToAll: false }) };
+/** Switching a page between million GEL and % of GDP keeps the selection and mode; the years are clamped to the view's (never collapsed to "all"). */
+export function changeSocialView(state: SocialState, section: SocialTopicId, view: SocialPayView, facts: readonly ClientSocialFact[], gdpFacts: readonly ClientNationalGdpFact[]): SocialState {
+  return { ...state, view, range: refitRange(state.range, socialCoverage(section, view, facts, gdpFacts, state.selectedIds), { collapseToAll: false }) };
 }
 
 /**
@@ -229,13 +269,15 @@ export function serializeSocialHash(state: SocialState, section: SocialTopicId):
 
 // ---- Model ----------------------------------------------------------------------------------------------------------
 
-/** A heading's unit and decimals: million GEL to one decimal (% of GDP to two), averages to two, shares to one, counts whole. */
+/** A heading's unit and decimals: million GEL to one decimal (% of GDP to two), averages to two, shares and a fund's return to one, counts whole. */
 function socialDisplay(heading: SocialHeading, view: SocialPayView): { unit: SocialUnit; decimals: number } {
   switch (heading) {
-    case "money": return view === "gdp" ? { unit: "percent", decimals: 2 } : { unit: "gel_million", decimals: 1 };
+    case "money": case "savings": case "flows": return view === "gdp" ? { unit: "percent", decimals: 2 } : { unit: "gel_million", decimals: 1 };
     case "average": return { unit: "gel", decimals: 2 };
     case "share": return { unit: "percent", decimals: 1 };
     case "families": return { unit: "families", decimals: 0 };
+    case "employers": return { unit: "employers", decimals: 0 };
+    case "return": return { unit: "return", decimals: 1 };
     default: return { unit: "persons", decimals: 0 };
   }
 }

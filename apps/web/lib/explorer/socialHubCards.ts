@@ -11,6 +11,7 @@ import { SOCIAL_SECTIONS, type SocialSectionId } from "./social";
 const HEADLINE: Record<SocialSectionId, string> = {
   "social-payments": "social.payments.total.amount", pensions: "social.pension.recipients",
   "subsistence-allowance": "social.subsistence.families", "social-package": "social.social_package.total.recipients",
+  "funded-pension": "social.funded_pension.savings.amount",
 };
 
 /** The four cards follow the Health hub's three, so their numbers continue from 04. */
@@ -20,7 +21,7 @@ export function buildSocialHubCards(facts: readonly ClientSocialFact[], presenta
     const headline = facts.filter(f => f.indicatorId === HEADLINE[section.id] && f.geographyId === SOCIAL_GEORGIA).sort((a, b) => a.year - b.year);
     const last = headline.at(-1)!;
     // Money is million GEL to one decimal; the others are whole counts.
-    const value = section.id === "social-payments" ? `${formatInUnit(last.value, { divisor: 1, label: "", decimals: 1 })} ${t("unitMlnGel")}` : formatInUnit(last.value, UNIT_PERSONS);
+    const value = section.id === "social-payments" || section.id === "funded-pension" ? `${formatInUnit(last.value, { divisor: 1, label: "", decimals: 1 })} ${t("unitMlnGel")}` : formatInUnit(last.value, UNIT_PERSONS);
     return {
       index: String(HEALTH_SECTIONS.length + index + 1).padStart(2, "0"), title: message(presentation.messages, section.labelKey), description: t(`page.${section.id}.summary`),
       href: section.href, comingSoon: false,

@@ -30,7 +30,7 @@ type SocialWorkbookInput = {
 );
 
 /** The `social.` message key of each display unit. */
-export const SOCIAL_UNIT_KEYS: Record<SocialUnit, string> = { persons: "unitPersons", families: "unitFamilies", gel_million: "unitMlnGel", gel: "unitGel", percent: "unitPercent" };
+export const SOCIAL_UNIT_KEYS: Record<SocialUnit, string> = { persons: "unitPersons", families: "unitFamilies", employers: "unitEmployers", gel_million: "unitMlnGel", gel: "unitGel", percent: "unitPercent", return: "unitReturn" };
 const numberFormatOf = (decimals: number) => decimals ? `#,##0.${"0".repeat(decimals)}` : "#,##0";
 
 /**

@@ -85,10 +85,10 @@ export function SocialExplorer({ section, facts, gdpFacts, gdpSources, breaks, l
   const title = t(`page.${section}.title`);
   const chartLabel = `${title} · ${headingLabels[model.heading]}`;
   const newCounting = t("break.newCounting");
-  const views = socialViews(section);
+  const views = socialViews(section, model.heading);
   // % of GDP divides by the debt page's GDP: the source line names it and its preliminary years, as on Money and banks.
   const preliminaryGdpYears = gdpView ? model.years.filter(year => gdpFacts.some(f => f.year === year && f.status === "preliminary")) : [];
-  const changeView = (view: SocialPayView) => { if (view !== state.view) update(s => changeSocialView(s, view, facts, gdpFacts), true); };
+  const changeView = (view: SocialPayView) => { if (view !== state.view) update(s => changeSocialView(s, section, view, facts, gdpFacts), true); };
   const downloadAction = <ExcelDownloadButton testId="social-excel-download" disabled={!model.selected.length} onDownload={async () => {
     const { downloadWorkbook } = await import("../../lib/explorer/workbookWriter.client");
     await downloadWorkbook(buildSocialWorkbookExportModel({
