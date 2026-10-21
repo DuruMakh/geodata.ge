@@ -119,7 +119,8 @@ describe("indexable Fiscal.ge routes", () => {
     // Marriages and divorces adds one demography page: one bilingual pair.
     // Transport adds its hub, five pages, a page for Georgia and each of the 11 regions and its methodology page: 19 bilingual pairs.
     // Internet and technology adds its hub, four pages, a page for Georgia and each of the 11 regions and its methodology page: 18 bilingual pairs.
-    expect(urls).toHaveLength(1540);
+    // Spending by type adds its Budget page and its methodology page: 2 bilingual pairs.
+    expect(urls).toHaveLength(1544);
     expect(new Set(urls).size).toBe(urls.length);
     expect(urls.every((url) => url.startsWith("https://fiscal.ge/"))).toBe(true);
     expect(urls).toContain("https://fiscal.ge/about");
@@ -248,6 +249,7 @@ describe("indexable Fiscal.ge routes", () => {
     expect(urls.map((url) => new URL(url).pathname).filter((pathname) => pathname === "/methodology" || pathname.startsWith("/methodology/"))).toEqual([
       "/methodology",
       "/methodology/expenditure",
+      "/methodology/expenditure-types",
       "/methodology/revenue",
       "/methodology/municipalities",
       "/methodology/debt",

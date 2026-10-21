@@ -252,6 +252,7 @@ export function currentEntry(pathname: string): string | undefined {
 const PAGE_SOURCE_NOTES: Readonly<Record<string, string>> = {
   "/explorer": "common.budgetHubSourceNote",
   "/explorer/expenditure": "common.budgetStatisticsSourceNote",
+  "/explorer/expenditure-types": "common.budgetStatisticsSourceNote",
   "/explorer/revenue": "common.budgetStatisticsSourceNote",
   "/explorer/debt": "common.budgetStatisticsSourceNote",
   "/explorer/municipalities": "common.budgetStatisticsSourceNote",

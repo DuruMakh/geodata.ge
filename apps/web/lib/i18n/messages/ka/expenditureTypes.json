@@ -1,0 +1,19 @@
+{
+  "expenditureTypes.metaTitle": "საქართველოს მთავრობის ხარჯები ეკონომიკური კლასიფიკაციით",
+  "expenditureTypes.metaDescription": "ზოგადი მთავრობის ხარჯები სახეების მიხედვით 2002 წლიდან: შრომის ანაზღაურება, საქონელი და მომსახურება, პროცენტი, სუბსიდიები, სოციალური უზრუნველყოფა, ინვესტიცია.",
+  "expenditureTypes.heading": "ხარჯები ეკონომიკური კლასიფიკაციით",
+  "expenditureTypes.measure": "მაჩვენებელი",
+  "expenditureTypes.nominal": "ღირებულება ლარში",
+  "expenditureTypes.shareOfGdp": "% მშპ-ში",
+  "expenditureTypes.realGrowth": "რეალური ზრდა %",
+  "expenditureTypes.reference": "ხარჯები",
+  "expenditureTypes.largest": "ხარჯები",
+  "expenditureTypes.preliminary": "წინასწარი",
+  "expenditureTypes.nominalContext": "ზოგადი მთავრობა: სახელმწიფო ბიუჯეტი, ავტონომიური რესპუბლიკები და მუნიციპალიტეტები.",
+  "expenditureTypes.shareContext": "წილი იმავე წლის მშპ-ში.",
+  "expenditureTypes.source": "წყარო: საქართველოს ფინანსთა სამინისტრო · ზოგადი მთავრობის ოპერაციები.",
+  "expenditureTypes.rowYear": "მნიშვნელობები: {year} წელი",
+  "expenditureTypes.rangeChanged": "პერიოდი: {start}–{end}",
+  "expenditureTypes.sector": "ხარჯის სახე",
+  "expenditureTypes.workbookTitle": "ხარჯები ეკონომიკური კლასიფიკაციით · {measure}"
+}

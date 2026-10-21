@@ -51,6 +51,7 @@ const DATASET_SCHEMA_IDS = {
   gdp: "gdp-overview",
   "economic-sectors": "economic-sectors",
   "gdp-expenditure": "gdp-expenditure",
+  "expenditure-types": "expenditure-types",
   "regional-economies": "regional-economies",
   inflation: "inflation",
   unemployment: "unemployment",
@@ -81,6 +82,7 @@ const DATASET_SOURCE_NOTES = {
   gdp: "common.economySourceNote",
   "economic-sectors": "common.geostatSourceNote",
   "gdp-expenditure": "common.geostatSourceNote",
+  "expenditure-types": "common.budgetStatisticsSourceNote",
   "regional-economies": "common.geostatSourceNote",
   inflation: "common.inflationSourceNote",
   unemployment: "common.geostatSourceNote",
@@ -112,6 +114,7 @@ const DATASET_DOWNLOADS = {
   gdp: "/downloads/data/gdp-overview.csv",
   "economic-sectors": "/downloads/data/economic-sectors.csv",
   "gdp-expenditure": null,
+  "expenditure-types": null,
   "regional-economies": "/downloads/data/regional-economies.csv",
   inflation: "/downloads/data/inflation-cpi-national.csv",
   unemployment: null,
@@ -142,6 +145,7 @@ const DATASET_DOWNLOADS = {
 const DATASET_JSON_DOWNLOADS = {
   "economic-sectors": [{ href: "/downloads/data/economic-sectors.json", labelKey: "methodology.jsonSectors" }],
   "gdp-expenditure": [],
+  "expenditure-types": [],
   "regional-economies": [{ href: "/downloads/data/regional-economies.json", labelKey: "methodology.jsonRegionalEconomies" }],
   expenditure: [
     { href: "/downloads/data/national-expenditure.json", labelKey: "methodology.jsonExpenditure" },
@@ -183,6 +187,7 @@ const DATASET_JSON_DOWNLOADS = {
 const DATASET_JSON_DISTRIBUTIONS = {
   "economic-sectors": ["/downloads/data/economic-sectors.json"],
   "gdp-expenditure": [],
+  "expenditure-types": [],
   "regional-economies": ["/downloads/data/regional-economies.json"],
   expenditure: ["/downloads/data/national-expenditure.json"],
   revenue: ["/downloads/data/national-revenue.json"],

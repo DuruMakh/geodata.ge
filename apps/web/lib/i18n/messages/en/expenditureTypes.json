@@ -1,0 +1,19 @@
+{
+  "expenditureTypes.metaTitle": "Georgia government spending by type",
+  "expenditureTypes.metaDescription": "General government spending by type since 2002: wages, goods and services, interest, subsidies, social benefits and investment. Ministry of Finance data.",
+  "expenditureTypes.heading": "Government spending by type",
+  "expenditureTypes.measure": "Measure",
+  "expenditureTypes.nominal": "Value in GEL",
+  "expenditureTypes.shareOfGdp": "% of GDP",
+  "expenditureTypes.realGrowth": "Real growth %",
+  "expenditureTypes.reference": "Spending",
+  "expenditureTypes.largest": "Spending",
+  "expenditureTypes.preliminary": "Preliminary",
+  "expenditureTypes.nominalContext": "General government: the state budget, the autonomous republics and the municipalities.",
+  "expenditureTypes.shareContext": "Share of the same year’s GDP.",
+  "expenditureTypes.source": "Source: Ministry of Finance of Georgia · General government operations.",
+  "expenditureTypes.rowYear": "Values for {year}",
+  "expenditureTypes.rangeChanged": "Period: {start}–{end}",
+  "expenditureTypes.sector": "Type of spending",
+  "expenditureTypes.workbookTitle": "Government spending by type · {measure}"
+}

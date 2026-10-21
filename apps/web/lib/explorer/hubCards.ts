@@ -66,6 +66,8 @@ export function buildHubCards(
   debtFacts: ServedGovernmentDebtFact[],
   balanceFacts: ServedGeneralGovernmentBalanceFact[] = [],
   presentation?: Presentation,
+  /** General-government total spending by year, from the spending-by-type page. */
+  expenditureTypeTotals: Map<number, number> = new Map(),
 ): HubCardModel[] {
   const locale = presentation?.locale ?? "ka";
   const translated = (key: string, originalKa: string, values?: TemplateValues) => presentation ? message(presentation.messages, key, values) : originalKa;
@@ -93,6 +95,7 @@ export function buildHubCards(
   };
 
   const spend = build(expenditure);
+  const spendByType = build(expenditureTypeTotals);
   const revenues = build(revenue);
   const municipal = build(municipalTotals);
   const debtTotals = new Map<number, number>();
@@ -120,6 +123,16 @@ export function buildHubCards(
     },
     {
       index: "02",
+      title: translated("common.expenditureTypes", BUDGET_SECTIONS.expenditureTypes.label),
+      description: translated("hub.expenditureTypesDescription", "ხელფასები, პროცენტი, სუბსიდიები, სოციალური უზრუნველყოფა და ინვესტიცია — რა სახის ხარჯებია."),
+      href: BUDGET_SECTIONS.expenditureTypes.href,
+      comingSoon: BUDGET_SECTIONS.expenditureTypes.href === null,
+      series: spendByType.series,
+      seriesColor: spendByType.series === null ? null : INK,
+      footer: spendByType.footer,
+    },
+    {
+      index: "03",
       title: translated("common.revenue", BUDGET_SECTIONS.revenue.label),
       description: translated("hub.revenueDescription", "გადასახადები, გრანტები და სხვა შემოსულობები წლების მიხედვით."),
       href: BUDGET_SECTIONS.revenue.href,
@@ -129,7 +142,7 @@ export function buildHubCards(
       footer: revenues.footer,
     },
     {
-      index: "03",
+      index: "04",
       title: translated("common.municipalities", BUDGET_SECTIONS.municipalities.label),
       // The figure beside this is countryTotalFacts — the national roll-up,
       // which carries five excluded budget units and the Adjara A.R. republican
@@ -146,7 +159,7 @@ export function buildHubCards(
       footer: municipal.footer,
     },
     {
-      index: "04",
+      index: "05",
       title: translated("common.analysis", BUDGET_SECTIONS.analysis.label),
       description: translated("hub.analysisDescription", "ერთი წლის სურათი — სტრუქტურა, რეიტინგი და ყოველი 100 ₾."),
       href: BUDGET_SECTIONS.analysis.href,
@@ -159,7 +172,7 @@ export function buildHubCards(
           : translated("hub.analysisFooter", `${analysisYear} · ${categoryCount(facts, "expenditure", analysisYear)} კატეგორია`, { year: analysisYear, count: categoryCount(facts, "expenditure", analysisYear) }),
     },
     {
-      index: "05",
+      index: "06",
       title: translated("common.debt", BUDGET_SECTIONS.debt.label),
       description: translated("hub.debtDescription", "მთავრობის ვალის მოცულობა, გადახდა და საპროცენტო განაკვეთები."),
       href: BUDGET_SECTIONS.debt.href,
@@ -169,7 +182,7 @@ export function buildHubCards(
       footer: debt.footer,
     },
     {
-      index: "06",
+      index: "07",
       title: translated("common.deficit", BUDGET_SECTIONS.deficit.label),
       description: translated("hub.deficitDescription", "ზოგადი მთავრობის დეფიციტი ან პროფიციტი — მშპ-ის წილი და თანხა ლარში."),
       href: BUDGET_SECTIONS.deficit.href,
