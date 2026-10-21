@@ -129,8 +129,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     loadServedScienceCultureData(),
     loadServedLabourData(),
     loadServedGdpExpenditureData(),
-    loadServedInternetData(),
     loadServedTransportData(),
+    loadServedInternetData(),
   ]);
   const inflationModified = new Date(inflationFacts.map((fact) => fact.lastReviewedAt).sort().at(-1)!);
   const productModified = new Date(productFacts.map((fact) => fact.lastReviewedAt).sort().at(-1)!);
