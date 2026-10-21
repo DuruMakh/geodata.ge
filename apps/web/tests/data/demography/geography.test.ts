@@ -94,9 +94,10 @@ describe("demography geography", () => {
     expect(geography.resolve("Dedoplistskaro Municipality", "events")).toMatchObject({ kind: "municipality" });
     expect(geography.resolve("Sighnaghi Municipality", "census")).toMatchObject({ kind: "municipality" });
     expect(geography.resolve("C. Tbilisi", "census")).toMatchObject({ kind: "municipality", geographyId: "04" });
+    expect(geography.resolve("C. Tbilisi", "events")).toMatchObject({ kind: "municipality", geographyId: "04" });
 
     expect(() => geography.resolve("Dedoplistskaro Municipality", "population")).toThrow(/Unreviewed geography label/);
-    expect(() => geography.resolve("C. Tbilisi", "events")).toThrow(/Unreviewed geography label/);
+    expect(() => geography.resolve("C. Tbilisi", "population")).toThrow(/Unreviewed geography label/);
   });
 
   test("refuses an invented label", () => {

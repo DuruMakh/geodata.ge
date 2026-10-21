@@ -6,7 +6,8 @@ import { unitFor, type ValueUnit } from "./format";
 import { resolveRange, type ResolvedPeriodRange } from "./periodRange";
 import { tradeOverviewCoverage, tradeOverviewIndicators, type TradeOverviewState } from "./tradeOverviewState";
 
-export const TRADE_OVERVIEW_COLORS: Record<TradeChartIndicator, string> = { "trade.turnover": INK, "trade.exports": "#1F6E56", "trade.imports": "#3D5A98", "trade.balance": "#8A7B65", "trade.domestic_exports": "#3D5A98", "trade.reexports": "#8A7B65" };
+// The domestic series take palette colours of their own: blue is Imports and brown the Balance on the Overview (U21-10).
+export const TRADE_OVERVIEW_COLORS: Record<TradeChartIndicator, string> = { "trade.turnover": INK, "trade.exports": "#1F6E56", "trade.imports": "#3D5A98", "trade.balance": "#8A7B65", "trade.domestic_exports": "#4A707A", "trade.reexports": "#A5822B" };
 export type TradeOverviewModel = {
   years: number[]; range: ResolvedPeriodRange; unit: ValueUnit; selectedIds: TradeChartIndicator[];
   valuesByIndicator: Record<TradeChartIndicator, Record<number, number | null>>;

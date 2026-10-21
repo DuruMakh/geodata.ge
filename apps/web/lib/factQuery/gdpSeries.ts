@@ -26,7 +26,7 @@ export const GDP_QUERY_SERIES: Record<
     definitionKa:
       "რეალური მშპ-ის წლიური ცვლილება პროცენტებში: 7.5 ნიშნავს 7.5%-ს; არ არის მშპ-ის წილი.",
     definitionEn:
-      "Annual real GDP growth in percentage points: 7.5 means 7.5%, not a fraction or share of GDP.",
+      "Annual real GDP growth in percent: 7.5 means 7.5%, not a fraction or share of GDP.",
   },
   nominal_gel: {
     labelKa: "ნომინალური მშპ, ლარი",

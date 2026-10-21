@@ -1,9 +1,10 @@
 import { beforeAll, describe, expect, it } from "vitest";
-import { buildFactQuerySnapshot } from "../../lib/factQuery/buildSnapshot";
+import { testSnapshot } from "../helpers/factQuerySnapshot";
 import { compare } from "../../lib/factQuery/compare";
 import { queryMunicipal } from "../../lib/factQuery/queryMunicipal";
 import { queryNational } from "../../lib/factQuery/queryNational";
 import { queryInflation } from "../../lib/factQuery/queryInflation";
+import * as resultModule from "../../lib/mcp/result";
 import { LIMITS, boundedToolResult, toolResult, tooLargeResponse } from "../../lib/mcp/result";
 import type { FactQuerySnapshot } from "../../lib/factQuery/types";
 import { queryInflationProducts } from "../../lib/factQuery/queryInflationProducts";
@@ -12,18 +13,80 @@ import { rank } from "../../lib/factQuery/rank";
 import type { Observation } from "../../lib/factQuery/observations";
 import type { RankData } from "../../lib/factQuery/rank";
 
+import { getSources, type GetSourcesData } from "../../lib/factQuery/getSources";
+
 let snapshot: FactQuerySnapshot;
 beforeAll(async () => {
-  snapshot = await buildFactQuerySnapshot({ releaseCommit: "test", generatedAt: "2026-09-02T00:00:00.000Z" });
+  snapshot = testSnapshot({ releaseCommit: "test", generatedAt: "2026-09-02T00:00:00.000Z" });
 });
 
 const size = (value: unknown) => Buffer.byteLength(JSON.stringify(value), "utf8");
 
 describe("MCP tool results", () => {
   it.each([
-    { name: "Batumi", entityIds: ["city.batumi"], measure: "yoy_pct", periods: ["2016-01", "2026-08"], years: Array.from({ length: 11 }, (_, i) => 2016 + i) },
-    { name: "Zugdidi average", entityIds: ["city.zugdidi"], measure: "avg12_pct", periods: ["2017-12", "2026-08"], years: Array.from({ length: 10 }, (_, i) => 2017 + i) },
-    { name: "country and city", entityIds: ["country.georgia", "city.batumi"], measure: "yoy_pct", periods: ["2004-01", "2026-08"], years: Array.from({ length: 23 }, (_, i) => 2004 + i) },
+    ["sources", "fewer source IDs"],
+    ["catalogue", "short search term"],
+    ["observations", "1 cells"],
+  ] as const)("gives actionable recovery for oversized %s", (kind, guidance) => {
+    const response = kind === "sources"
+      ? getSources(snapshot, { sourceIds: ["source.geostat_cpi_yoy"] })
+      : kind === "catalogue"
+        ? describeCoverage(snapshot, { datasetId: "inflation" })
+        : queryNational(snapshot, { side: "expenditure", seriesIds: ["expenditure.total"], years: [2024], measure: "amount_gel" });
+    expect(response.kind).toBe(kind);
+    response.meta.generatedAt += "x".repeat(LIMITS.resultBytes);
+    const result = boundedToolResult(snapshot, response);
+    expect(result.isError).toBe(true);
+    expect(result.structuredContent).toBeUndefined();
+    expect(result.content[0]!.text).toContain("error result_too_large (retryable: true)");
+    expect(result.content[0]!.text).toContain(guidance);
+    expect(result.content[0]!.text).not.toContain("0 cells");
+    expect(result.content[0]!.text).toContain("https://fiscal.ge/downloads/data/manifest.json");
+    expect(size(result)).toBeLessThanOrEqual(LIMITS.resultBytes);
+  });
+
+  it("prepares a fixed bilingual retryable internal error with the published-file fallback", () => {
+    expect(resultModule).toHaveProperty("internalErrorResult");
+    const result = resultModule.internalErrorResult(snapshot);
+    expect(result.isError).toBe(true);
+    expect(result.structuredContent).toBeUndefined();
+    expect(result.content[0]!.text).toContain("error internal_error (retryable: true)");
+    expect(result.content[0]!.text).toContain("Try again later");
+    expect(result.content[0]!.text).toContain("https://fiscal.ge/downloads/data/manifest.json");
+    expect(result.content[0]!.text).toMatch(/[Ⴀ-ჿ]/);
+    expect(result.content[0]!.text).toContain(`dataVersion ${snapshot.dataVersion}`);
+  });
+
+  it("explains all four actual source-filter outcomes in Georgian and English", () => {
+    const grouped = "source.municipal_mof_annual_and_history_workbooks";
+    for (const [input, outcome, narrowed, phrases] of [
+      [{ sourceIds: [grouped] }, "not_requested", false, ["ფილტრები არ მოთხოვნილა", "No filters were requested"]],
+      [{ sourceIds: ["source.mof_2017_revenue_form1_pdf"], years: [2017] }, "applied", false, ["დოკუმენტები შეესაბამება მოთხოვნილ ფილტრებს", "Documents match the requested filters"]],
+      [{ sourceIds: [grouped], entityIds: ["11"] }, "applied", true, ["დოკუმენტები შეესაბამება მოთხოვნილ ფილტრებს", "Documents match the requested filters"]],
+      [{ sourceIds: [grouped], datasetId: "national-revenue" }, "dropped_no_match", false, ["მოთხოვნილ ფილტრებს არცერთი დოკუმენტი არ შეესაბამება", "No document matched the requested filters"]],
+      [{ sourceIds: ["source.adjara_consolidated_budget"], years: [2020] }, "preserved_derived", false, ["გამოთვლის სრული მტკიცებულების შესანარჩუნებლად", "Preserving all inputs to the derived calculation"]],
+    ] as const) {
+      const response = getSources(snapshot, input);
+      if (response.kind !== "sources") throw new Error("Expected sources");
+      const data = response.data as GetSourcesData;
+      const source = data.sources[0]!;
+      expect(source).toMatchObject({ narrowingOutcome: outcome, narrowed, documentCount: snapshot.sources.find(original => original.sourceId === source.sourceId)!.documents.length });
+      expect(source.documents.length < source.documentCount).toBe(narrowed);
+      const result = toolResult(response);
+      expect(result.structuredContent).toEqual(response);
+      const text = result.content[0]!.text;
+      for (const phrase of phrases) expect(text).toContain(phrase);
+      expect(text).toContain(`\t${source.documents.length}\t${source.documentCount}\t${source.narrowed}\t${outcome}`);
+      if (data.narrowedBy === null) expect(text).not.toContain("requested filters:");
+      else expect(text).toContain(`requested filters: ${JSON.stringify(data.narrowedBy)}`);
+      for (const document of source.documents) expect(text).toContain(document.documentId);
+    }
+  });
+
+  it.each([
+    { name: "Batumi", entityIds: ["city.batumi"], measure: "yoy_pct", periods: ["2016-01", "2026-09"], years: Array.from({ length: 11 }, (_, i) => 2016 + i) },
+    { name: "Zugdidi average", entityIds: ["city.zugdidi"], measure: "avg12_pct", periods: ["2017-12", "2026-09"], years: Array.from({ length: 10 }, (_, i) => 2017 + i) },
+    { name: "country and city", entityIds: ["country.georgia", "city.batumi"], measure: "yoy_pct", periods: ["2004-01", "2026-09"], years: Array.from({ length: 23 }, (_, i) => 2004 + i) },
     { name: "no city facts", entityIds: ["city.batumi"], measure: "yoy_pct", periods: null, years: [], synthetic: "empty" },
     { name: "sparse city years", entityIds: ["city.batumi"], measure: "yoy_pct", periods: ["2018-02", "2020-03"], years: [2018, 2020], synthetic: "sparse" },
   ])("preserves $name availability in the text a client reads", ({ entityIds, measure, periods, years, synthetic }) => {

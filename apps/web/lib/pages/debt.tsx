@@ -1,7 +1,6 @@
 import type { Locale } from "../i18n/types";
 import { I18nProvider } from "../i18n/provider";
-import { getPresentation } from "../i18n/presentation.server";
-import { getMessages } from "../i18n/messages.server";
+import { clientPresentation, getPresentation } from "../i18n/presentation.server";
 import { message } from "../i18n/messages";
 import { pageHref } from "../i18n/routes";
 import type { Metadata } from "next";
@@ -10,7 +9,7 @@ import { BreadcrumbJsonLd } from "../../components/seo/breadcrumb-json-ld";
 import { JsonLd } from "../../components/seo/json-ld";
 import { loadServedExplorerData, loadServedGovernmentDebtData } from "../data/servedData";
 import { projectDebtFact, projectGdpFact } from "../explorer/clientData";
-import { coverageFromYears, fiscalMetadata, governmentDebtMetadata } from "../seo/metadata";
+import { coverageFromYears, governmentDebtMetadata } from "../seo/metadata";
 import { DEBT_EXPLORER_PATH } from "../seo/internalLinks";
 import { explorerDatasetJsonLd } from "../seo/structuredData";
 import { resolveSiteUrl } from "../siteUrl";
@@ -18,10 +17,7 @@ import { loadDebtWorkbookSources, loadGdpWorkbookSources } from "../methodology/
 
 export async function debtPageMetadata(locale: Locale): Promise<Metadata> {
   const { facts } = await loadServedGovernmentDebtData();
-  if (locale === "ka") return governmentDebtMetadata(facts);
-  const { firstYear, lastYear } = coverageFromYears(facts.filter(fact => fact.status === "actual" && fact.family === "stock"));
-  const messages = await getMessages(locale, ["debt"]);
-  return fiscalMetadata({ locale, title: message(messages, "debt.metaTitle", { first: firstYear, last: lastYear }), description: message(messages, "debt.description", { first: firstYear, last: lastYear }), path: DEBT_EXPLORER_PATH });
+  return governmentDebtMetadata(facts, locale);
 }
 
 export async function renderDebtPage(locale: Locale) {
@@ -31,7 +27,9 @@ export async function renderDebtPage(locale: Locale) {
     loadDebtWorkbookSources(locale),
     loadGdpWorkbookSources(locale),
   ]);
-  const presentation = await getPresentation(locale, ["common", "controls", "format", "main", "debt"], [...new Set(facts.map(fact => fact.seriesId))]);
+  // The debt model builds each series' English name beside the Georgian on both pages.
+  const seriesIds = [...new Set(facts.map(fact => fact.seriesId))];
+  const presentation = await getPresentation(locale, ["format", "main", "debt"], seriesIds, seriesIds);
   const { messages } = presentation;
   const stockFacts = facts.filter((fact) => fact.family === "stock" && fact.status === "actual");
   const { firstYear, lastYear } = coverageFromYears(stockFacts);
@@ -63,10 +61,10 @@ export async function renderDebtPage(locale: Locale) {
         { name: message(messages, "common.budget"), path: pageHref("/explorer", locale) },
         { name: message(messages, "common.debt"), path: pageHref(DEBT_EXPLORER_PATH, locale) },
       ]} />
-      <I18nProvider {...presentation}>
+      <I18nProvider {...clientPresentation(presentation)}>
       <DebtExplorer
         facts={facts.map(projectDebtFact)}
-        gdpFacts={gdpFacts.map(projectGdpFact)}
+        gdpFacts={gdpFacts.filter((fact) => fact.year >= datasetFirstYear && fact.year <= datasetLastYear).map(projectGdpFact)}
         workbookSources={workbookSources}
         gdpWorkbookSources={gdpWorkbookSources}
         siteOrigin={resolveSiteUrl()}

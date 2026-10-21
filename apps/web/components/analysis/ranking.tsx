@@ -16,15 +16,6 @@ type FullRankingProps = {
   year: number;
 };
 
-function truncate(text: string, length: number): string {
-  return text.length > length ? `${text.slice(0, length - 1)}…` : text;
-}
-
-function compactLabel(text: string): string {
-  const words = text.trim().split(/\s+/);
-  return words.length > 2 ? `${words.slice(0, 2).join(" ")}…` : text;
-}
-
 export function FullRanking({ rows, side, grouping, year }: FullRankingProps) {
   const { locale, messages, englishLabels } = useI18n();
   const labelFor = (item: Pick<SnapshotItem, "itemId" | "kaLabel">) => publicLabel(locale, item.itemId, item.kaLabel, englishLabels);
@@ -69,9 +60,8 @@ export function FullRanking({ rows, side, grouping, year }: FullRankingProps) {
                       {String(index + 1).padStart(2, "0")}
                     </span>
                     <SwatchBar color={row.color} className="mt-[5px] flex-none min-[768px]:mt-0" />
-                    <span className="min-w-0 text-[11.5px] font-medium leading-[1.25] text-[var(--ink)] min-[768px]:text-[13px] min-[768px]:leading-normal">
-                      <span className="min-[768px]:hidden">{compactLabel(labelFor(row))}</span>
-                      <span className="hidden min-[768px]:inline">{truncate(labelFor(row), 52)}</span>
+                    <span className="line-clamp-2 min-w-0 break-words text-[11.5px] font-medium leading-[1.25] text-[var(--ink)] min-[768px]:text-[13px] min-[768px]:leading-normal">
+                      {labelFor(row)}
                     </span>
                   </span>
                 </td>

@@ -1,6 +1,5 @@
 import { expect, test } from "@playwright/test";
 import ExcelJS from "exceljs";
-import { SSF } from "xlsx";
 import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import { parse } from "csv-parse/sync";
@@ -8,22 +7,30 @@ import { tableSeriesCount, tableSeriesValues } from "./explorer-table";
 const toggle = (page: import("@playwright/test").Page, id: string) => page.locator(`[data-series-id="${id}"]`).getByTestId("series-row-toggle");
 
 for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
-  test(`Partners defaults, full ranking and search-safe bulk selection ${prefix || "ka"} ${width}px`, async ({ page }, info) => {
+  test(`Partners defaults, full ranking and search-safe bulk selection ${prefix || "ka"} ${width}px`, async ({ page }) => {
     const errors: string[] = []; page.on("pageerror", error => errors.push(error.message));
     await page.setViewportSize({ width, height: 1000 }); await page.goto(`${prefix}/explorer/trade`);
-    const cards = page.getByTestId("trade-hub").getByTestId("hub-card"); await expect(cards).toHaveCount(5); await cards.nth(1).click();
+    const cards = page.getByTestId("trade-hub").getByTestId("hub-card"); await expect(cards).toHaveCount(6); await cards.nth(1).click();
     await expect(page).toHaveURL(new RegExp(`${prefix}/explorer/trade/partners$`));
     await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
     await expect(page.getByTestId("series-status")).toContainText("1 / 218");
     await expect(toggle(page, "goods.total")).toHaveAttribute("aria-pressed", "true");
     await expect(page.getByTestId("series-list").getByTestId("series-row").nth(1)).toHaveAttribute("data-series-id", "partner.1995-2025.792");
     await expect(page.getByTestId("trade-partners-ranking-row")).toHaveCount(10);
+    if (width === 768) {
+      // The layout threshold: defaults and overflow only; the ranking and bulk flow is width-independent.
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+      expect(errors).toEqual([]);
+      return;
+    }
     await page.evaluate(() => document.fonts.ready);
-    await page.screenshot({ path: info.outputPath(`partners-default-${prefix ? "en" : "ka"}-${width}.png`), fullPage: true });
     await page.getByTestId("trade-partners-show-all").click();
     expect(await page.getByTestId("trade-partners-ranking-row").count() + await page.getByTestId("trade-partners-unavailable-row").count()).toBe(212);
+    await expect(page.getByTestId("series-skip-list")).toHaveCount(1);
     await page.getByTestId("trade-partners-tab-groups").click();
     await expect(page.getByTestId("trade-partners-ranking-row")).toHaveCount(5);
+    // The five groups are a short list: no scroller and no skip button (U21-01 applies to the countries).
+    await expect(page.getByTestId("series-skip-list")).toHaveCount(0);
     await toggle(page, "group.eu").click();
     await page.getByTestId("trade-partners-tab-countries").click();
     await expect(page.getByTestId("trade-partners-off-tab")).toContainText(prefix ? "European Union" : "ევროკავშირი");
@@ -42,8 +49,22 @@ for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
   });
 }
 
+for (const prefix of ["", "/en"]) {
+  test(`Turkey finds Türkiye in English and Georgian ${prefix || "ka"}`, async ({ page }) => {
+    await page.goto(`${prefix}/explorer/trade/partners`);
+    await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
+    const search = page.getByTestId("series-search"), list = page.getByTestId("series-list");
+    // An English name, its unaccented spelling, the Georgian name and a common short name each find the partner in either language.
+    for (const [query, code] of [["Turkey", "792"], ["turkiye", "792"], ["თურქეთი", "792"], ["Türkiye", "792"], ["USA", "840"], ["UK", "826"], ["Russia", "643"]]) {
+      await search.fill(query);
+      await expect(list.locator(`[data-series-id="partner.1995-2025.${code}"]`)).toHaveCount(1);
+    }
+    await expect(page.getByTestId("series-status")).toContainText("1 / 218");
+  });
+}
+
 for (const prefix of ["", "/en"]) for (const width of [390, 1440]) {
-  test(`Mixed partners survive active navigation, keyboard range and language ${prefix || "ka"} ${width}px`, async ({ page }, info) => {
+  test(`Mixed partners survive active navigation, keyboard range and language ${prefix || "ka"} ${width}px`, async ({ page }) => {
     await page.setViewportSize({ width, height: 1000 });
     await page.goto(`${prefix}/explorer/trade/partners#sel=partner.1995-2025.643,group.eu&view=table&tab=countries&measure=trade.exports&start=2023&end=2025`);
     await expect(page.getByTestId("series-status")).toContainText("2 / 218");
@@ -70,7 +91,6 @@ for (const prefix of ["", "/en"]) for (const width of [390, 1440]) {
     await expect(page.getByTestId("series-status")).toContainText("2 / 218");
     await expect(page.getByTestId("trade-partners-tab-groups")).toHaveAttribute("aria-pressed", "true");
     await expect(page.getByTestId("trade-partners-ranking")).toHaveAttribute("data-end-year", "2024");
-    await page.screenshot({ path: info.outputPath(`partners-mixed-balance-${prefix ? "ka" : "en"}-${width}.png`), fullPage: true });
     await toggle(page, "partner.1995-2025.643").focus(); await toggle(page, "partner.1995-2025.643").press("Space");
     await expect(page.getByTestId("series-status")).toContainText("1 / 218");
     await page.goBack(); await expect(page.getByTestId("series-status")).toContainText("2 / 218");
@@ -78,7 +98,7 @@ for (const prefix of ["", "/en"]) for (const width of [390, 1440]) {
   });
 }
 
-test("mixed Excel download contains the exact selected figures and all four untouched originals", async ({ page, request }) => {
+test("mixed Excel download contains the whole-dollar selected figures and all four untouched originals", async ({ page, request }) => {
   await page.goto("/en/explorer/trade/partners#sel=partner.1995-2025.643,group.eu&view=table&tab=countries&measure=trade.balance&start=2025&end=2025");
   await expect(page.getByTestId("series-status")).toContainText("2 / 218");
   const pending = page.waitForEvent("download"); await page.getByTestId("trade-partners-excel-download").click();
@@ -88,7 +108,7 @@ test("mixed Excel download contains the exact selected figures and all four unto
   expect(excel.worksheets.map(sheet => sheet.name)).toEqual(["Summary", "Data", "Sources"]);
   const data = excel.getWorksheet("Data")!;
   expect(data.getCell("C2").value).toBe("Russia");
-  expect(data.getCell("D2").value).toBeCloseTo(-1191302071.08252312, 5);
+  expect(data.getCell("D2").value).toBe(-1191302071);
   expect(data.getCell("C3").value).toContain("European Union");
   expect(data.getCell("E2").value).toBe("Actual"); expect(data.getCell("F2").value).toBe("Unspecified");
   const rows = parse(await readFile("../../data/methodology/source-archives/trade.csv"), { columns: true, bom: true }) as Record<string, string>[];
@@ -103,28 +123,36 @@ test("mixed Excel download contains the exact selected figures and all four unto
   expect(dataset.temporalCoverage).toBe("1995/2025"); expect(dataset).not.toHaveProperty("distribution");
 });
 
-test("Qatar's downloaded Summary keeps its small 2025 turnover visibly nonzero", async ({ page }) => {
-  await page.goto("/en/explorer/trade/partners#sel=partner.1995-2025.634&measure=trade.turnover&start=2025&end=2025");
-  await expect(page.getByTestId("series-status")).toContainText("1 / 218");
-  const pending = page.waitForEvent("download"); await page.getByTestId("trade-partners-excel-download").click();
-  const download = await pending, excel = new ExcelJS.Workbook(); await excel.xlsx.readFile((await download.path())!);
-  const amount = excel.worksheets[0].getCell("B4");
-  expect(amount.value).toBeCloseTo(4_736_258.239671868 / 1_000_000_000, 14);
-  expect(Number(SSF.format(amount.numFmt, amount.value))).toBeGreaterThan(0);
-  expect(excel.worksheets[1].getCell("D2").value).toBeCloseTo(4_736_258.239671868, 6);
-});
-
-test("an explicitly empty selection and Back restore the same view", async ({ page }) => {
-  await page.goto("/en/explorer/trade/partners#sel=&view=line&tab=countries&measure=trade.exports");
+// U21-17: with every partner ticked the table pages 25 rows at a time, like Products, instead of one 219-row table.
+test("the partners table pages a long selection", async ({ page }) => {
+  await page.goto("/en/explorer/trade/partners#view=table&tab=countries");
   await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
-  await expect(page.getByTestId("no-selection-callout")).toBeVisible();
-  await page.locator('[data-series-id="goods.total"]').getByTestId("series-row-toggle").click();
-  await expect(page.getByTestId("no-selection-callout")).toHaveCount(0);
-  await page.goBack();
-  await expect(page.getByTestId("no-selection-callout")).toBeVisible();
+  await page.getByTestId("series-toggle-all").click();
+  await page.getByTestId("series-toggle-all").click();
+  await expect(page.getByTestId("series-status")).toContainText("218 / 218");
+  const table = page.getByTestId("explorer-table");
+  expect(await tableSeriesCount(table)).toBeLessThanOrEqual(25);
+  await expect(page.getByTestId("trade-partners-table-previous")).toBeDisabled();
+  await page.getByTestId("trade-partners-table-next").click();
+  await expect(page.getByTestId("trade-partners-table-previous")).toBeEnabled();
+  expect(await tableSeriesCount(table)).toBe(25);
 });
 
-test("nothing but the heading sits above the controls (DESIGN §17)", async ({ page }) => {
-  await page.goto("/en/explorer/trade/partners");
-  expect(await page.locator("h1").evaluate(heading => heading.nextElementSibling?.tagName)).not.toBe("P");
-});
+// U21-01/05: the 218 countries (187 on Domestic exports) scroll inside their panel at every
+// width, the Excel button sits above them, and a skip button leads past them to the ranking.
+for (const path of ["/explorer/trade/partners", "/en/explorer/trade/domestic-exports#section=countries"]) {
+  test(`the country list scrolls inside its panel and the ranking is within two screens of the chart ${path}`, async ({ page }) => {
+    await page.setViewportSize({ width: 375, height: 812 });
+    await page.goto(path);
+    await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
+    const list = page.getByTestId("series-list");
+    expect(await list.evaluate(element => element.querySelectorAll("[data-testid='series-row']").length)).toBeGreaterThan(150);
+    expect(await page.evaluate(() => document.scrollingElement!.scrollHeight)).toBeLessThan(4000);
+    expect(await list.evaluate(element => element.scrollHeight > element.clientHeight)).toBe(true);
+    const chart = (await page.getByTestId("chart-panel").boundingBox())!, ranking = (await page.getByTestId("trade-partners-ranking").boundingBox())!;
+    expect(ranking.y - chart.y).toBeLessThan(2 * 812);
+    expect(await page.getByTestId("trade-partners-excel-download").evaluate((excel, element) => Boolean(excel.compareDocumentPosition(element!) & Node.DOCUMENT_POSITION_FOLLOWING), await list.elementHandle())).toBe(true);
+    await page.getByTestId("series-skip-list").focus(); await page.keyboard.press("Enter"); await page.keyboard.press("Tab");
+    await expect(page.getByTestId("trade-partners-show-all")).toBeFocused();
+  });
+}

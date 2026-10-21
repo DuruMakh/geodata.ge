@@ -88,16 +88,35 @@ async function createFixtureRepository() {
   const rows: Record<MethodologyDatasetId, ReviewedSourceManifestRow[]> = {
     wages: [await writeReviewedSource(repositoryRoot, "wages", "1995-2025", "docs/Raw Data/Wages/geostat-earnings-annual/official/01-earnings-annual.xlsx", "downloads/methodology/wages/files/01-earnings-annual.xlsx", "wages-headline")],
     money: [await writeReviewedSource(repositoryRoot, "money", "1995-2025", "docs/Raw Data/Money/nbg-money-banks-annual/official/money-aggregates-and-monetary-ratioseng.xlsx", "downloads/methodology/money/files/money-aggregates-and-monetary-ratioseng.xlsx", "money-aggregates")],
+    housing: [await writeReviewedSource(repositoryRoot, "housing", "2006-2025", "docs/Raw Data/Housing/geostat-housing-annual/official/0503EN020101_Permissions.xls", "downloads/methodology/housing/files/0503en020101_permissions.xls", "housing-permits-regions")],
+    business: [await writeReviewedSource(repositoryRoot, "business", "1999-2025", "docs/Raw Data/Business/geostat-business-annual/official/0502EN0101_Turnover.xlsx", "downloads/methodology/business/files/0502en0101_turnover.xlsx", "business-turnover")],
     poverty: [await writeReviewedSource(repositoryRoot, "poverty", "2004-2025", "docs/Raw Data/Poverty/geostat-poverty-annual/official/302-absolute-poverty.xlsx", "downloads/methodology/poverty/files/302-absolute-poverty.xlsx", "poverty-absolute")],
     "household-income": [await writeReviewedSource(repositoryRoot, "household-income", "2002-2025", "docs/Raw Data/Households/geostat-household-income-spending-annual/official/104-income-per-household.xlsx", "downloads/methodology/household-income/files/104-income-per-household.xlsx", "household-income-household")],
+    health: [await writeReviewedSource(repositoryRoot, "health", "2014-2025", "docs/Raw Data/Health/geostat-health-annual/official/deaths/23-2-deaths-by-chapters-regions.xlsx", "downloads/methodology/health/files/23-2-deaths-by-chapters-regions.xlsx", "health-deaths-by-cause-region")],
+    crime: [await writeReviewedSource(repositoryRoot, "crime", "2015-2025", "docs/Raw Data/Crime/geostat-crime-annual/official/Number-of-Recorded-Crimes.xlsx", "downloads/methodology/crime/files/number-of-recorded-crimes.xlsx", "crime-recorded")],
+    internet: [await writeReviewedSource(repositoryRoot, "internet", "2016-2026", "docs/Raw Data/Internet/geostat-ict-households-annual/official/01_Share_of_households_with_internet_access.xlsx", "downloads/methodology/internet/files/01_share_of_households_with_internet_access.xlsx", "internet-homes")],
+    education: [await writeReviewedSource(repositoryRoot, "education", "2010-2025", "docs/Raw Data/Education/geostat-education-annual/official/01Number-of-Students-Admission-Graduates-by-Programmes-and-Sex.xlsx", "downloads/methodology/education/files/01number-of-students-admission-graduates-by-programmes-and-sex.xlsx", "education-higher")],
+    // SSA's topic page capture, and the population table Demography archives too (the same bytes, so the same contents here).
+    "social-protection": [
+      await writeReviewedSource(repositoryRoot, "social-protection", "2013-2025", "docs/Raw Data/Social/ssa-statistics/official/pages/ssa-page-pension.html", "downloads/methodology/social-protection/files/ssa-page-pension.html.txt", "ssa-pension-page"),
+      await writeReviewedSource(repositoryRoot, "social-protection", "2014-2025", "docs/Raw Data/Municipalities/geostat-population-regional-gdp/official/01-population-by-self-governed-unit.xlsx", "downloads/methodology/social-protection/files/01-population-by-self-governed-unit.xlsx", "demography-population"),
+    ],
+    "science-culture": [await writeReviewedSource(repositoryRoot, "science-culture", "2019-2024", "docs/Raw Data/ScienceCulture/geostat-science-culture-annual/official/Researchers.xlsx", "downloads/methodology/science-culture/files/researchers.xlsx", "science-culture-researchers")],
+    transport: [await writeReviewedSource(repositoryRoot, "transport", "2000-2025", "docs/Raw Data/Transport/geostat-transport-annual/official/H-1-Passenger-transport-demand_ENG.XLSX", "downloads/methodology/transport/files/h-1-passenger-transport-demand_eng.xlsx", "transport-passenger-demand")],
     "energy-food": [await writeReviewedSource(repositoryRoot, "energy-food", "2013-2024", "docs/Raw Data/EnergyFood/geostat-energy-food-annual/official/energy-balance-2024-aggregated.xlsx", "downloads/methodology/energy-food/files/energy-balance-2024-aggregated.xlsx", "energy-balance-2024-aggregated")],
+    environment: [await writeReviewedSource(repositoryRoot, "environment", "2000-2022", "docs/Raw Data/Environment/geostat-environment-annual/official/B-3.-Greenhouse-gas-emissions-ENG.XLSX", "downloads/methodology/environment/files/b-3.-greenhouse-gas-emissions-eng.xlsx", "environment-ghg")],
     trade: [await writeReviewedSource(repositoryRoot, "trade", "1995-2025", "docs/Raw Data/Trade/geostat-external-trade/2026-10-07/official/FTrade_1995-2026.xlsx", "downloads/methodology/trade/files/ftrade_1995-2026.xlsx", "trade-total")],
     "external-flows": [
       await writeReviewedSource(repositoryRoot, "external-flows", "2000-2025", "docs/Raw Data/External/2026-10-10/official/nbg/REMC_money-transfers-by-countries-eng.xlsx", "downloads/methodology/external-flows/files/remc_money-transfers-by-countries-eng.xlsx", "external-remc"),
       await writeReviewedSource(repositoryRoot, "external-flows", "1996-2025", "docs/Raw Data/External/2026-10-10/official/geostat/FDI_Eng-countries.xlsx", "downloads/methodology/external-flows/files/fdi_eng-countries.xlsx", "external-fdi-countries"),
+      await writeReviewedSource(repositoryRoot, "external-flows", "2006-2026", "docs/Raw Data/External/nbg-external-position/official/edbpm6eng.xlsx", "downloads/methodology/external-flows/files/edbpm6eng.xlsx", "external-debt"),
     ],
-    unemployment: [await writeReviewedSource(repositoryRoot, "unemployment", "2010-2025", "docs/Raw Data/Unemployment/geostat-labour-force-annual/official/lfs.xlsx", "downloads/methodology/unemployment/files/lfs.xlsx", "lfs")],
+    unemployment: [
+      await writeReviewedSource(repositoryRoot, "unemployment", "2010-2025", "docs/Raw Data/Unemployment/geostat-labour-force-annual/official/lfs.xlsx", "downloads/methodology/unemployment/files/lfs.xlsx", "lfs"),
+      await writeReviewedSource(repositoryRoot, "unemployment", "2017-2025", "docs/Raw Data/Unemployment/geostat-labour-force-detail/official/07-employment-by-branch-nace_eng.xlsx", "downloads/methodology/unemployment/files/07-employment-by-branch-nace_eng.xlsx", "lfs-jobs-industry"),
+    ],
     "economic-sectors": [await writeReviewedSource(repositoryRoot,"economic-sectors","2011-2025","docs/Raw Data/Economy/economic-sectors/sources/growth.xlsx","downloads/methodology/economic-sectors/files/growth.xlsx","sector-growth")],
+    "gdp-expenditure": [await writeReviewedSource(repositoryRoot,"gdp-expenditure","2010-2025","docs/Raw Data/Economy/gdp-expenditure/sources/08_GDP-by-use-categories.xlsx","downloads/methodology/gdp-expenditure/files/08_gdp-by-use-categories.xlsx","gdp-use-current")],
     "regional-economies": [
       await writeReviewedSource(repositoryRoot, "regional-economies", "2010-2024", "docs/Raw Data/Economy/regional-economies/sources/regional-GDP-by-activities-ENG.xlsx", "downloads/methodology/regional-economies/files/regional-gdp-by-activities-eng.xlsx", "regional-activities"),
       await writeReviewedSource(repositoryRoot, "regional-economies", "2010-2024", "docs/Raw Data/Municipalities/geostat-population-regional-gdp/official/regional-GDP-ENG.xlsx", "downloads/methodology/regional-economies/files/regional-gdp-eng.xlsx", "regional-totals"),
@@ -150,6 +169,26 @@ afterEach(async () => {
 });
 
 describe("methodology archive preparation", () => {
+  it("publishes every annual transfer original unchanged with complete manifest and ZIP evidence", async () => {
+    const { repositoryRoot, rows } = await createFixtureRepository();
+    rows.revenue = await Promise.all(Array.from({ length: 11 }, (_, index) => {
+      const year = String(2015 + index);
+      return writeReviewedSource(repositoryRoot, "revenue", year, `docs/Raw Data/Revenue/${year}-jan-dec-consolidated-revenue.pdf`, `downloads/methodology/revenue/files/${year}/mof-revenue-form-1.pdf`, `transfer-${year}`);
+    }));
+    // Remove only this test fixture's old synthetic revenue original.
+    await rm(path.join(repositoryRoot, "docs/Raw Data/Revenue/source-c.pdf"));
+    await writeFile(path.join(repositoryRoot, "data/methodology/source-archives/revenue.csv"), manifestCsv(rows.revenue));
+    const publicRoot = path.join(repositoryRoot, "apps/web/public");
+    await prepareMethodologyArchives({ repositoryRoot, publicRoot, reportPath: path.join(repositoryRoot, "report.json"), mode: "write" });
+    const archiveRoot = path.join(publicRoot, "downloads/methodology/revenue");
+    const entries = unzipSync(await readFile(path.join(archiveRoot, "revenue-original-sources.zip")));
+    expect(Object.keys(entries)).toEqual([...rows.revenue.map(row => row.public_download_path.replace("downloads/methodology/revenue/", "")), "manifest.csv", "manifest.json"]);
+    for (const row of rows.revenue) {
+      expect(await sha256(path.join(publicRoot, row.public_download_path))).toBe(row.sha256);
+      expect(sha256Bytes(entries[row.public_download_path.replace("downloads/methodology/revenue/", "")]!)).toBe(row.sha256);
+    }
+  });
+
   it("publishes unchanged originals, BOM CSV, and an exact sorted ZIP membership", async () => {
     const { repositoryRoot, rows } = await createFixtureRepository();
     const publicRoot = path.join(repositoryRoot, "apps/web/public");
@@ -235,6 +274,24 @@ describe("methodology archive preparation", () => {
       reportPath: path.join(repositoryRoot, "data/reports/methodology-archive-validation.json"),
       mode: "write",
     })).rejects.toThrow(/does not equal the approved original inventory/i);
+  });
+
+  it.each([
+    ["a text/html archive row whose public path does not end in .txt", "text/html", "downloads/methodology/wages/files/x.html"],
+    ["an .htm public path whatever its media type", "application/pdf", "downloads/methodology/wages/files/x.htm"],
+  ])("rejects %s", async (_case, mediaType, publicPath) => {
+    const { repositoryRoot, rows } = await createFixtureRepository();
+    const htmlRow = { ...rows.wages[0], media_type: mediaType, public_download_path: publicPath };
+    await writeFile(path.join(repositoryRoot, "data/methodology/source-archives/wages.csv"), manifestCsv([htmlRow]));
+
+    const preparation = prepareMethodologyArchives({
+      repositoryRoot,
+      publicRoot: path.join(repositoryRoot, "apps/web/public"),
+      reportPath: path.join(repositoryRoot, "data/reports/methodology-archive-validation.json"),
+      mode: "write",
+    });
+    await expect(preparation).rejects.toThrow(htmlRow.source_id);
+    await expect(preparation).rejects.toThrow(/must be published as \.html\.txt/);
   });
 
   it("checks two fresh generations without mutating the public tree", async () => {

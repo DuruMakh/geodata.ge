@@ -32,6 +32,60 @@ test("the real client payload stays under 1 MB of JSON", async () => {
   expect(JSON.stringify(client).length).toBeLessThan(1_000_000);
 });
 
+test("client trade values are whole dollars", async () => {
+  const { loadTradePartnersData, toClientTradePartnersData } = await loader();
+  const { loadTradeOverviewFacts } = await import("../../../lib/data/tradeOverview/importTradeOverview");
+  const [data, national] = await Promise.all([loadTradePartnersData(), loadTradeOverviewFacts()]);
+  const client = toClientTradePartnersData(data, national), flows = ["trade.exports", "trade.imports"];
+  // A missing value stays missing; a published flow moves by less than a dollar.
+  client.facts.forEach(([, , , value], index) => {
+    const source = data.facts[index]!;
+    if (source.valueUsd === null) return expect(value).toBeNull();
+    expect(Number.isInteger(value)).toBe(true);
+    if (flows.includes(source.indicatorId)) expect(Math.abs(value! - Number(source.valueUsd))).toBeLessThan(1);
+  });
+  client.nationalFacts.forEach((fact, index) => {
+    expect(Number.isInteger(fact.valueUsd)).toBe(true);
+    if (flows.includes(fact.indicatorId)) expect(fact.valueUsd).toBe(Math.round(Number(national[index]!.valueUsd)));
+  });
+});
+
+test("turnover and balance follow the rounded flows, as the workbook's formulas state", async () => {
+  const { loadTradePartnersData, toClientTradePartnersData } = await loader();
+  const { loadTradeOverviewFacts } = await import("../../../lib/data/tradeOverview/importTradeOverview");
+  const { TRADE_CHART_INDICATORS } = await import("../../../lib/data/tradeOverview/types");
+  const [data, national] = await Promise.all([loadTradePartnersData(), loadTradeOverviewFacts()]);
+  const client = toClientTradePartnersData(data, national);
+  const rows = [...client.facts.map(([entity, year, measure, value]) => ({ key: `${entity}:${year}`, indicator: TRADE_CHART_INDICATORS[measure]!, value })), ...client.nationalFacts.map(fact => ({ key: `national:${fact.year}`, indicator: fact.indicatorId, value: fact.valueUsd }))];
+  const amount = new Map(rows.map(row => [`${row.key}:${row.indicator}`, row.value]));
+  const derived = rows.filter(row => row.value !== null && (row.indicator === "trade.turnover" || row.indicator === "trade.balance"));
+  expect(derived.length).toBeGreaterThan(10_000);
+  for (const row of derived) {
+    const exports = amount.get(`${row.key}:trade.exports`)!, imports = amount.get(`${row.key}:trade.imports`)!;
+    expect(row.value, `${row.key} ${row.indicator}`).toBe(row.indicator === "trade.turnover" ? exports + imports : exports - imports);
+  }
+});
+
+test("a workbook total equals the sum of its rows", async () => {
+  const { loadTradePartnersData, toClientTradePartnersData } = await loader();
+  const { loadTradeOverviewFacts } = await import("../../../lib/data/tradeOverview/importTradeOverview");
+  const { buildTradePartnersWorkbookModel } = await import("../../../lib/explorer/tradePartnersWorkbook");
+  const { DEFAULT_TRADE_PARTNERS_STATE } = await import("../../../lib/explorer/tradePartnersState");
+  const { getMessages } = await import("../../../lib/i18n/messages.server");
+  const [data, national, messages] = await Promise.all([loadTradePartnersData(), loadTradeOverviewFacts(), getMessages("ka", ["workbook", "trade"])]);
+  const client = toClientTradePartnersData(data, national), presentation = { locale: "ka" as const, messages, englishLabels: {} };
+  const selectedIds = ["goods.total", ...client.entities.filter(entity => entity.kind === "country").map(entity => entity.id)];
+  for (const measure of ["trade.exports", "trade.imports"] as const) {
+    const model = buildTradePartnersWorkbookModel({ data: client, state: { ...DEFAULT_TRADE_PARTNERS_STATE, measure, selectedIds }, sources: [], siteOrigin: "https://fiscal.ge" }, presentation);
+    const totalLabel = model.readable.rows.find(row => row.kind === "total")!.label, years = model.readable.years;
+    expect(years.length).toBeGreaterThan(30);
+    for (const year of years) {
+      const rows = model.analysis.rows.filter(row => row[0] === year), total = rows.find(row => row[2] === totalLabel)![3];
+      expect(rows.filter(row => row[2] !== totalLabel).reduce((sum, row) => sum + (row[3] as number | null ?? 0), 0), `${measure} ${year}`).toBe(total);
+    }
+  }
+});
+
 test.each(["trade-partners-annual.csv", "trade-partners.json", "labels.json", "trade-partners-validation.json"])("rejects a stale %s fingerprint", async filename => {
   const original = await vi.importActual<typeof import("node:fs/promises")>("node:fs/promises");
   vi.mocked(readFile).mockImplementation((async (...args: Parameters<typeof readFile>) => {

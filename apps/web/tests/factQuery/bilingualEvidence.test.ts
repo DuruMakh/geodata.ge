@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, it } from "vitest";
-import { buildFactQuerySnapshot } from "../../lib/factQuery/buildSnapshot";
+import { testSnapshot } from "../helpers/factQuerySnapshot";
 import { compare, type Comparison } from "../../lib/factQuery/compare";
 import { rank, type RankData } from "../../lib/factQuery/rank";
 import { queryMunicipal } from "../../lib/factQuery/queryMunicipal";
@@ -9,7 +9,7 @@ import { serviceMessage } from "../../lib/factQuery/localization";
 import type { FactQueryResponse, FactQuerySnapshot } from "../../lib/factQuery/types";
 
 let snapshot: FactQuerySnapshot;
-beforeAll(async () => { snapshot = await buildFactQuerySnapshot({ releaseCommit: "test", generatedAt: "2026-09-05T00:00:00Z" }); });
+beforeAll(async () => { snapshot = testSnapshot({ releaseCommit: "test", generatedAt: "2026-09-05T00:00:00Z" }); });
 
 function comparisons(response: FactQueryResponse): Comparison[] {
   if (response.kind !== "comparisons") throw Error(`Expected comparisons, got ${response.kind}`);

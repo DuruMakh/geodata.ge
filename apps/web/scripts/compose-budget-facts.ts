@@ -1,9 +1,9 @@
 ﻿import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
-import { pathToFileURL } from "node:url";
 import { budgetFactsToCsv, type BudgetFactCsvRow } from "../lib/data/factCsv";
 import { EXPENDITURE_DETAILED_YEARS, EXPENDITURE_YEARS, REVENUE_YEARS } from "../lib/data/coverage";
 import { loadBudgetFactRows, type BudgetFactImportRow } from "../lib/data/importBudgetFacts";
+import { runAsCli } from "../lib/runAsCli";
 
 const expenditureYears = EXPENDITURE_YEARS;
 const detailedExpenditureYears = EXPENDITURE_DETAILED_YEARS;
@@ -70,9 +70,4 @@ async function main() {
   console.log(`Composed budget fact rows: ${rows.length}`);
 }
 
-if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
-  main().catch((error) => {
-    console.error(error);
-    process.exit(1);
-  });
-}
+runAsCli(import.meta.url, main);

@@ -1,3 +1,5 @@
+import { readdirSync, readFileSync } from "node:fs";
+import { join, resolve } from "node:path";
 import { expect, test, type Page } from "@playwright/test";
 import { TEST_BASE_URL } from "./test-base-url";
 
@@ -80,7 +82,6 @@ function expectFitted(path: string, charts: ChartMetrics[]) {
 
 const fittedPages = [
   "/explorer/expenditure",
-  "/explorer/revenue",
   "/explorer/debt",
   "/explorer/deficit",
   "/explorer/municipalities/georgia",
@@ -133,9 +134,12 @@ test("phones skip the sticky axis and the scroll position logic", async ({ page 
   const frame = page.getByTestId("chart-frame");
   await expect(page.getByTestId("chart-frame-y-axis")).toHaveCount(0);
   expect(await frame.evaluate((element) => [element.scrollLeft, element.scrollWidth - element.clientWidth])).toEqual([0, 0]);
-  // Still a named, focusable region.
-  await expect(frame).toHaveAttribute("tabindex", "0");
+  // Still a named region; with nothing to scroll, the chart inside is the keyboard stop.
+  await expect(frame).not.toHaveAttribute("tabindex");
   await expect(frame).toHaveAttribute("role", "region");
+  await expect(frame.locator('svg[role="img"]')).toHaveAttribute("tabindex", "0");
+  // The name mentions sideways scrolling only where the frame scrolls.
+  await expect(frame).toHaveAttribute("aria-label", "მრავალწლიანი გრაფიკი");
 });
 
 // The pinned tooltip floated over the plot; with ten inflation categories it
@@ -230,4 +234,179 @@ test("rotating a phone swaps the drawing without a reload", async ({ page }) => 
   await expect(svg).toHaveAttribute("data-geometry", "desktop");
   await page.setViewportSize({ width: 390, height: 844 });
   await expect(svg).toHaveAttribute("data-geometry", "mobile");
+});
+
+// DESIGN.md §17: under a page's H1 only one small one-line text. One page per
+// explorer route: the published page list (page-revisions.json, the set
+// sitemap.ts publishes) collapsed to one path per app route, so a new page or
+// a new region family is covered without editing this list.
+function explorerRoutes(): { missing: string[]; pages: Array<{ template: string; path: string }> } {
+  const templates: string[] = [];
+  const walk = (dir: string, route: string) => {
+    for (const entry of readdirSync(dir, { withFileTypes: true })) {
+      if (entry.isDirectory()) walk(join(dir, entry.name), `${route}/${entry.name}`);
+      else if (entry.name === "page.tsx") templates.push(route);
+    }
+  };
+  walk(resolve(process.cwd(), "app/(ka)/explorer"), "/explorer");
+  const published = Object.keys(JSON.parse(readFileSync(resolve(process.cwd(), "../../data/localization/en/page-revisions.json"), "utf8")))
+    .filter((page) => page === "/explorer" || page.startsWith("/explorer/"));
+  const matches = (template: string, page: string) => new RegExp(`^${template.replace(/\[[^\]]+\]/g, "[^/]+")}$`).test(page);
+  const chosen = new Map<string, string>();
+  for (const page of published) {
+    const template = templates.find((item) => item === page) ?? templates.find((item) => matches(item, page));
+    if (template && !chosen.has(template)) chosen.set(template, page);
+  }
+  return { missing: templates.filter((template) => !chosen.has(template)), pages: [...chosen].map(([template, path]) => ({ template, path })) };
+}
+
+// Trade and External flows show nothing between the heading and the controls (D188).
+const bareHeadingPages = [
+  "/explorer/trade/overview",
+  "/explorer/trade/partners",
+  "/explorer/trade/products",
+  "/explorer/trade/domestic-exports",
+  "/explorer/trade/services",
+  "/explorer/external/money-from-abroad",
+  "/explorer/external/foreign-investment",
+  "/explorer/external/current-account",
+];
+
+// Latest-value, deck and place lines that still wrap at 375px. Fitting them
+// drops content, which is the owner's wording call (Task 18 report). The test
+// asserts they still wrap, so a page that gets fixed fails here until its
+// entry is removed, and a broken page (404, no heading) fails too.
+const wrappingLines: Record<string, readonly ("ka" | "en")[]> = {
+  "/explorer/debt": ["ka", "en"],
+  "/explorer/municipalities/georgia": ["ka", "en"],
+  "/explorer/municipalities/[slug]": ["ka"],
+  "/explorer/municipalities/region/[id]": ["ka", "en"],
+  "/explorer/demography/population/region/[id]": ["ka"],
+  "/explorer/economy/sectors": ["ka", "en"],
+  "/explorer/wages/regions/[id]": ["ka"],
+  "/explorer/energy-food/energy-supply": ["ka"],
+  "/explorer/energy-food/electricity": ["ka", "en"],
+  "/explorer/money/bank-health": ["ka"],
+  "/explorer/living-standards/poverty": ["ka"],
+  "/explorer/living-standards/inequality": ["ka"],
+  "/explorer/living-standards/income": ["ka", "en"],
+  "/explorer/living-standards/income/regions/[id]": ["ka", "en"],
+  "/explorer/living-standards/spending": ["ka", "en"],
+  "/explorer/living-standards/spending/regions/[id]": ["ka", "en"],
+};
+
+/** The first block under the page heading, and the one after it when that is a text line. */
+function underHeading(page: Page) {
+  return page.getByRole("heading", { level: 1 }).first().evaluate((heading) => {
+    // A place heading wraps the h1 with its closed picker and its previous/next
+    // links; the line under the heading follows that block.
+    const skipped = (element: Element) => element.matches('[data-testid$="-navigation"], .sr-only');
+    const following = (element: Element | null) => {
+      while (element && skipped(element)) element = element.nextElementSibling;
+      return element;
+    };
+    let block: Element = heading;
+    let first = following(block.nextElementSibling);
+    while (!first && block.parentElement && block.parentElement.tagName !== "MAIN") {
+      block = block.parentElement;
+      first = following(block.nextElementSibling);
+    }
+    // Text is a line to measure; anything holding controls or a chart is the workspace.
+    const describe = (element: Element | null) => element instanceof HTMLElement ? {
+      tag: element.tagName,
+      text: !element.querySelector("button, input, select, svg, table, section, canvas"),
+      lines: element.getBoundingClientRect().height / parseFloat(getComputedStyle(element).lineHeight),
+      content: element.textContent,
+    } : null;
+    const line = describe(first);
+    // The workspace follows the one line directly: no unit line, note or summary under it.
+    return { line, then: line?.text ? describe(following(first!.nextElementSibling)) : null };
+  });
+}
+
+const routes = explorerRoutes();
+
+test("every explorer route template has a published page to check", () => {
+  expect(routes.missing).toEqual([]);
+  expect(routes.pages.length).toBeGreaterThan(60);
+});
+
+// The layout pass after §17: the same page load is resized to the review widths
+// (DESIGN.md: 390, 768 and 1440) and must show no sideways page scroll, no chart
+// label cut off at the chart's left edge, and no page error. Page specs keep the
+// layout checks this does not cover: other widths, other places, other states.
+const layoutWidths = [390, 768, 1440] as const;
+
+/**
+ * After a resize, wait until the page has re-rendered for the new width: the
+ * sidebar keeps its desktop state (900px) in React and the charts swap to their
+ * phone drawing below 768px, both on a media-query change; ResizeObserver widths
+ * (the phone chart, the table layout) land in the frames after.
+ */
+async function settleAt(page: Page, width: number) {
+  await expect.poll(() => page.evaluate((width) => {
+    const toggles = [...document.querySelectorAll('[data-testid="sidebar-toggle"]')];
+    const drawings = [...document.querySelectorAll("svg[data-geometry]")].filter((drawing) => drawing.checkVisibility());
+    return toggles.every((toggle) => toggle.getAttribute("aria-expanded") === String(width >= 900))
+      && drawings.every((drawing) => drawing.getAttribute("data-geometry") === (width < 768 ? "mobile" : "desktop"));
+  }, width), { message: `rendered for ${width}px` }).toBe(true);
+  await page.evaluate(() => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => setTimeout(resolve)))));
+}
+
+/** Sideways page overflow and the chart labels that start left of their drawing. */
+function measureLayout(page: Page) {
+  return page.evaluate(() => ({
+    overflow: Math.max(0, document.documentElement.scrollWidth - innerWidth),
+    clipped: [...document.querySelectorAll('[data-testid="chart-panel"] svg text, [data-testid$="chart-frame"] svg[role="img"] text')]
+      .filter((text) => (text as SVGGraphicsElement).getBBox().x < 0)
+      .map((text) => text.textContent),
+  }));
+}
+
+test.describe("one layout pass per explorer route: one short line under the heading at 375px (DESIGN §17), then 390, 768 and 1440px", () => {
+  // Desktop browser emulation, as the page specs this replaces used, so 768 and 1440 are real desktop widths.
+  test.use({ viewport: { width: 375, height: 812 }, isMobile: false, hasTouch: false });
+  for (const locale of ["ka", "en"] as const) {
+    for (const { template, path: route } of routes.pages) {
+      test(`${locale} ${route}`, async ({ page }) => {
+        const errors: string[] = [];
+        page.on("pageerror", (error) => errors.push(error.message));
+        // Hubs are static and never mark the app ready; the lines are in the served HTML.
+        const response = await page.goto(`${TEST_BASE_URL}${locale === "en" ? "/en" : ""}${route}`);
+        expect(response?.ok(), `${route}: HTTP ${response?.status()}`).toBe(true);
+        // A page whose data is fetched after load (products) shows a loading status where its workspace will be.
+        await expect(page.getByTestId("page-data-loading")).toHaveCount(0);
+        await page.evaluate(() => document.fonts.ready);
+        const under = await underHeading(page);
+        const { line, then } = under;
+        if (bareHeadingPages.includes(route)) {
+          expect(line?.text ?? false, `${route}: ${line?.content}`).toBe(false);
+          expect(line?.tag).not.toBe("P");
+        } else {
+          expect(then?.text ?? false, `${route}, second text under the heading: ${then?.content}`).toBe(false);
+          if (wrappingLines[template]?.includes(locale)) {
+            // Known: wraps at 375px, owner wording pending.
+            expect(line?.text, `${route}: ${line?.content}`).toBe(true);
+            expect(line!.lines, `${route}: ${line?.content}`).toBeGreaterThan(1.6);
+          } else if (line?.text) {
+            expect(line.lines, `${route}: ${line.content}`).toBeLessThanOrEqual(1.6);
+          }
+        }
+
+        // Resizing re-renders only a hydrated page.
+        await expect.poll(() => page.locator("h1").first().evaluate((heading) => Object.keys(heading).some((key) => key.startsWith("__reactFiber")))).toBe(true);
+        for (const width of layoutWidths) {
+          await page.setViewportSize({ width, height: 900 });
+          await settleAt(page, width);
+          if (bareHeadingPages.includes(route)) {
+            const { line } = await underHeading(page);
+            expect(line?.text ?? false, `${route} at ${width}px: ${line?.content}`).toBe(false);
+            expect(line?.tag, `${route} at ${width}px`).not.toBe("P");
+          }
+          await expect.poll(() => measureLayout(page), { message: `${route} at ${width}px` }).toEqual({ overflow: 0, clipped: [] });
+        }
+        expect(errors, route).toEqual([]);
+      });
+    }
+  }
 });

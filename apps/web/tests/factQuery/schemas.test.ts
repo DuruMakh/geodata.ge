@@ -33,6 +33,9 @@ describe("query input schemas", () => {
 });
 
 describe("envelope schema", () => {
+  it("accepts internal faults as a distinct error code", () => {
+    expect(envelopeSchema.safeParse({ kind: "error", status: "error", meta: {}, error: { code: "internal_error", messageKa: "შეცდომა", messageEn: "Internal error", retryable: false } }).success).toBe(true);
+  });
   // meta is deliberately VALID here. An earlier version passed `meta: null`, which
   // fails the meta validator on its own — so that test would have passed even if the
   // union never enforced the error requirement it claims to test.

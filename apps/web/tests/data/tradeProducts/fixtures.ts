@@ -11,9 +11,18 @@ const directories: string[] = [];
 const blocks = ["1995-1999", "2000-2014", "2015-2019", "2020-2025"];
 const originals = ["Export-Product-by-4-digit-1995-1999.xlsx", "Export-Product-by-4-digit-2000-2014.xlsx", "Export-Product-by-4-digit-2015-2026.xlsx", "Import-products--1995-1999_eng.xlsx", "Import-Product-by-4-digit-2000-2014.xlsx", "Import-Product-by-4-digit-2015-2026.xlsx"];
 
+let pristine: Promise<string> | undefined;
+
+/** A fresh, writable copy of the reviewed package. The package is assembled once per test file and copied after that. */
 export async function createTradeProductsPackageFixture(): Promise<string> {
-  await mkdir(scratch, { recursive: true });
+  const source = await (pristine ??= assemblePackageFixture());
   const directory = await mkdtemp(path.join(scratch, "fixture-")); directories.push(directory);
+  await cp(source, directory, { recursive: true });
+  return directory;
+}
+async function assemblePackageFixture(): Promise<string> {
+  await mkdir(scratch, { recursive: true });
+  const directory = await mkdtemp(path.join(scratch, "pristine-")); directories.push(directory);
   const files = ["full-source-manifest.json", "source-layouts.json", "expected-observation-inventory.json", "coverage.csv", "prepared-validation.json", "prepared-reconciliation.csv", "unresolved-source-issues.json", "identity-review.csv", ...originals.map(file => `official/${file}`), ...blocks.map(block => `goods-products-annual/hs4-${block}.csv`)];
   for (const file of files) {
     const target = path.join(directory, TRADE_RESEARCH, file);
@@ -39,6 +48,7 @@ export async function createTradeProductsPackageFixture(): Promise<string> {
   return directory;
 }
 export async function cleanupTradeProductsFixtures() {
+  pristine = undefined;
   for (const directory of directories) {
     if (!path.resolve(directory).startsWith(`${scratch}${path.sep}`)) throw new Error("Trade products fixture outside owned workspace");
     await rm(directory, { recursive: true, force: true });

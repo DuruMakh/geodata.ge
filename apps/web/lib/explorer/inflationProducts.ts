@@ -2,14 +2,15 @@ import Decimal from "decimal.js";
 import { makePeriod, periodFromKey, periodYear } from "../data/inflation/periods";
 import type { ProductCatalogueRow } from "../data/inflation/productIdentity";
 import type { ProductFactRow } from "../data/inflation/productTypes";
-import { EDITORIAL_PALETTE } from "./colors";
+import { colorForProgram, EDITORIAL_PALETTE } from "./colors";
 
 export type ClientProduct = Pick<ProductCatalogueRow, "productId" | "labelEn" | "labelKa" | "firstPeriod">;
 
 /** One dense, source-precision index run. `q` converts each safe integer back to its published index. */
 export type PackedProductSeries = { k: string; s: string; q: number; v: Array<number | null> };
 
-type ProductRun = { start: number; values: Array<number | null>; scale: number; prefix: Decimal[]; bad: number[] };
+/** `prefix` and `bad` are the running products a cumulative change reads; built on a run's first cumulative use (U14-04). */
+type ProductRun = { start: number; values: Array<number | null>; scale: number; prefix?: Decimal[]; bad?: number[] };
 
 export type ProductIndex = {
   products: ClientProduct[];
@@ -19,6 +20,12 @@ export type ProductIndex = {
   earliestYear: number;
   latestPeriod: number;
   defaultRange: { startYear: number; endYear: number };
+  /** Every product ranked by its latest annual change, computed once with the index (U14-03). */
+  ranked: readonly string[];
+  /** The latest annual change by product, read by every selector row. */
+  latestAnnual: ReadonlyMap<string, number | null>;
+  /** The lower list's cumulative order per `startYear:endPeriod`, so a selection click never re-sorts it. */
+  cumulativeOrder: Map<string, readonly string[]>;
 };
 
 function runKey(fact: Pick<ProductFactRow, "productId" | "measure">): string {
@@ -57,13 +64,33 @@ function unpack(run: PackedProductSeries): ProductRun {
   if (!Number.isSafeInteger(run.q) || run.q <= 0 || run.v.some((value) => value !== null && !Number.isSafeInteger(value))) {
     throw new Error(`Unsafe packed product series ${run.k}`);
   }
-  const prefix: Decimal[] = [new Decimal(1)];
-  const bad: number[] = [0];
-  for (const value of run.v) {
-    prefix.push(value === null ? prefix.at(-1)! : prefix.at(-1)!.mul(new Decimal(value).div(run.q * 100)));
-    bad.push(bad.at(-1)! + Number(value === null));
+  return { start: periodFromKey(run.s), values: run.v, scale: run.q };
+}
+
+function cumulativeInputs(run: ProductRun): { prefix: Decimal[]; bad: number[] } {
+  if (!run.prefix || !run.bad) {
+    const prefix: Decimal[] = [new Decimal(1)];
+    const bad: number[] = [0];
+    for (const value of run.values) {
+      prefix.push(value === null ? prefix.at(-1)! : prefix.at(-1)!.mul(new Decimal(value).div(run.scale * 100)));
+      bad.push(bad.at(-1)! + Number(value === null));
+    }
+    run.prefix = prefix;
+    run.bad = bad;
   }
-  return { start: periodFromKey(run.s), values: run.v, scale: run.q, prefix, bad };
+  return { prefix: run.prefix, bad: run.bad };
+}
+
+/** The first and last month any run covers, read from the packed runs without unpacking them. */
+export function productRunBounds(series: readonly PackedProductSeries[]): { earliestYear: number; latestPeriod: number } {
+  let earliest = Infinity;
+  let latest = -Infinity;
+  for (const run of series) {
+    const start = periodFromKey(run.s);
+    earliest = Math.min(earliest, start);
+    latest = Math.max(latest, start + run.v.length - 1);
+  }
+  return { earliestYear: periodYear(earliest), latestPeriod: latest };
 }
 
 export function buildProductIndex(products: ClientProduct[], series: PackedProductSeries[]): ProductIndex {
@@ -71,8 +98,6 @@ export function buildProductIndex(products: ClientProduct[], series: PackedProdu
   if (productById.size !== products.length || series.length === 0) throw new Error("Product index needs unique products and data");
   const annual = new Map<string, ProductRun>();
   const monthly = new Map<string, ProductRun>();
-  let earliest = Infinity;
-  let latest = -Infinity;
   for (const packed of series) {
     const separator = packed.k.lastIndexOf(":");
     const id = packed.k.slice(0, separator);
@@ -82,17 +107,24 @@ export function buildProductIndex(products: ClientProduct[], series: PackedProdu
     }
     const target = measure === "a" ? annual : monthly;
     if (target.has(id)) throw new Error(`Duplicate product run ${packed.k}`);
-    const run = unpack(packed);
-    target.set(id, run);
-    earliest = Math.min(earliest, run.start);
-    latest = Math.max(latest, run.start + run.values.length - 1);
+    target.set(id, unpack(packed));
   }
-  const earliestYear = periodYear(earliest);
-  const endYear = periodYear(latest);
-  return {
-    products, productById, annual, monthly, earliestYear, latestPeriod: latest,
+  const { earliestYear, latestPeriod } = productRunBounds(series);
+  const endYear = periodYear(latestPeriod);
+  const index: ProductIndex = {
+    products, productById, annual, monthly, earliestYear, latestPeriod,
     defaultRange: { startYear: Math.max(earliestYear, endYear - 3), endYear },
+    ranked: [], latestAnnual: new Map(), cumulativeOrder: new Map(),
   };
+  const latestAnnual = new Map(products.map((item) => [item.productId, productAnnual(index, item.productId, latestPeriod)]));
+  const ranked = products.map((item) => item.productId).sort((a, b) => {
+    const left = latestAnnual.get(a)!;
+    const right = latestAnnual.get(b)!;
+    if (left === null) return right === null ? a.localeCompare(b) : 1;
+    if (right === null) return -1;
+    return right - left || a.localeCompare(b);
+  });
+  return { ...index, ranked, latestAnnual };
 }
 
 function packedValue(run: ProductRun | undefined, period: number): Decimal | null {
@@ -116,6 +148,11 @@ export type ProductCumulative = {
   missingPeriod: number | null;
 };
 
+/** The last month a products view covers: December of its end year, or the latest published month before that. */
+export function productEndPeriod(index: Pick<ProductIndex, "latestPeriod">, endYear: number): number {
+  return Math.min(makePeriod(endYear, 12), index.latestPeriod);
+}
+
 export function productCumulative(index: ProductIndex, id: string, startYear: number, endPeriod: number): ProductCumulative {
   const start = makePeriod(startYear, 1);
   const run = index.monthly.get(id);
@@ -128,28 +165,60 @@ export function productCumulative(index: ProductIndex, id: string, startYear: nu
   }
   const left = start - run.start;
   const right = Math.min(endPeriod - run.start + 1, run.values.length);
-  if (run.bad[right]! > run.bad[left]!) {
+  const { prefix, bad } = cumulativeInputs(run);
+  if (bad[right]! > bad[left]!) {
     const missing = run.values.findIndex((value, offset) => offset >= left && offset < right && value === null);
     return { value: null, reason: "missing_month", missingPeriod: run.start + missing };
   }
   if (endPeriod >= run.start + run.values.length) {
     return { value: null, reason: "missing_month", missingPeriod: Math.max(start, run.start + run.values.length) };
   }
-  return { value: run.prefix[right]!.div(run.prefix[left]!).minus(1).mul(100).toNumber(), reason: null, missingPeriod: null };
+  return { value: prefix[right]!.div(prefix[left]!).minus(1).mul(100).toNumber(), reason: null, missingPeriod: null };
 }
 
+/** Every product, highest latest annual change first; ranked once when the index is built. */
 export function rankProducts(index: ProductIndex): string[] {
-  return index.products.map((item) => item.productId).sort((a, b) => {
-    const left = productAnnual(index, a, index.latestPeriod);
-    const right = productAnnual(index, b, index.latestPeriod);
-    if (left === null) return right === null ? a.localeCompare(b) : 1;
-    if (right === null) return -1;
-    return right - left || a.localeCompare(b);
-  });
+  return [...index.ranked];
 }
+
+/**
+ * The lower list's order over a range: highest cumulative change first, unavailable last, otherwise rank order.
+ * Kept per range on the index, so only a range change sorts again.
+ */
+export function productsByCumulative(index: ProductIndex, startYear: number, endPeriod: number): readonly string[] {
+  const key = `${startYear}:${endPeriod}`;
+  let order = index.cumulativeOrder.get(key);
+  if (!order) {
+    const cumulative = new Map(index.ranked.map((id) => [id, productCumulative(index, id, startYear, endPeriod).value] as const));
+    order = [...index.ranked].sort((a, b) => {
+      const left = cumulative.get(a)!;
+      const right = cumulative.get(b)!;
+      if (left === null) return right === null ? 0 : 1;
+      if (right === null) return -1;
+      return right - left;
+    });
+    index.cumulativeOrder.set(key, order);
+  }
+  return order;
+}
+
+// Product numbers run far past the 14 palette colours. Products 1–14 wear the palette; each later run of 14
+// wears the next colorForProgram shade of the same palette colour, so p0015 is a lighter #B3402A rather than a
+// second copy of it (U14-06). Colours resolve in product-number order and skip a shade an earlier product already
+// wears, so a colour depends only on the product number: adding a product never recolours another.
+const productColors: string[] = [];
+const wornProductColors = new Set<string>();
 
 export function productColor(id: string): string {
   const ordinal = Number(id.split(".").at(-1)?.slice(1));
   if (!Number.isInteger(ordinal) || ordinal < 1) throw new Error(`Invalid product colour ID ${id}`);
-  return EDITORIAL_PALETTE[(ordinal - 1) % EDITORIAL_PALETTE.length]!;
+  for (let next = productColors.length; next < ordinal; next += 1) {
+    const base = EDITORIAL_PALETTE[next % EDITORIAL_PALETTE.length]!;
+    let shade = Math.floor(next / EDITORIAL_PALETTE.length) - 1;
+    let color = shade < 0 ? base : colorForProgram(base, shade);
+    while (wornProductColors.has(color)) color = colorForProgram(base, ++shade);
+    productColors.push(color);
+    wornProductColors.add(color);
+  }
+  return productColors[ordinal - 1]!;
 }

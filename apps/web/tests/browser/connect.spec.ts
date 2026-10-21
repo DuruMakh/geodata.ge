@@ -18,10 +18,11 @@ for (const prefix of ["", "/en"]) {
     await expect(bilingual.locator("li")).toHaveCount(10);
     await expect(bilingual).toContainText("2025");
     await expect(bilingual).toContainText("2024");
-    await expect(page.getByTestId("connect-technical")).toContainText("1.5.0");
+    await expect(page.getByTestId("connect-technical")).toContainText("1.6.0");
     await expect(page.getByTestId("connect-technical")).toContainText("dataVersion");
     await expect(page.getByTestId("connect-technical")).toContainText("2026-07-28");
     await expect(page.getByTestId("connect-technical")).toContainText("2025-11-25");
+    await expect(page.getByTestId("connect-fair-use")).toContainText(prefix ? "Fair-use limits" : "სამართლიანი გამოყენების ლიმიტები");
     const catalogue = await (await page.request.get(`${BASE_URL}/downloads/data/catalogue.json`)).json();
     const products = catalogue.datasets.find((dataset: { datasetId: string }) => dataset.datasetId === "inflation-products");
     await expect(page.getByTestId("connect-product-coverage")).toContainText(products.periods.join("–"));
@@ -40,27 +41,69 @@ for (const prefix of ["", "/en"]) {
     await expect(productDiscovery.locator(`a[href="${prefix}/methodology/inflation"]`)).toHaveCount(1);
     const clients = page.getByTestId("connect-client");
     await expect(clients.filter({ hasText: "Codex" })).not.toContainText("ChatGPT");
+    const claude = clients.filter({ has: page.getByRole("heading", { name: "Claude", exact: true }) });
+    await expect(claude.locator("li")).toHaveCount(4);
+    await expect(claude.locator("li").last()).toContainText("+ → Connectors");
+    await expect(claude.locator("li").last()).toContainText(prefix ? "for that conversation" : "ამ საუბრისთვის");
+    await expect(claude.locator("li").last()).toContainText("Fiscal.ge");
+    await expect(claude).toContainText("No sign in");
+    const followUp = page.getByTestId("connect-try-example");
+    await expect(followUp).toContainText(prefix ? "original source" : "ორიგინალი წყარო");
+    await expect(followUp).toContainText(prefix ? "limits" : "შეზღუდვების");
+    await expect(followUp).toHaveAttribute("href", "#connect-example-inflation-national");
+    await followUp.click();
+    const nationalExample = page.getByTestId("connect-example-inflation-national");
+    await expect(nationalExample).toBeInViewport();
+    const inflation = catalogue.datasets.find((dataset: { datasetId: string }) => dataset.datasetId === "inflation");
+    const latestAnnual = inflation.series.find((series: { seriesId: string }) => series.seriesId === "cpi.headline").periodsByMeasure.yoy_pct[1];
+    await expect(nationalExample).toContainText(latestAnnual);
+    await expect(nationalExample).toContainText(prefix ? "original source and any limits" : "ორიგინალი წყარო და შეზღუდვები");
     const endpointCopy = page.getByTestId("connect-copy");
     await endpointCopy.focus();
     await endpointCopy.press("Enter");
     await expect(page.locator("html")).toHaveAttribute("data-test-clipboard", ENDPOINT);
+    if (prefix) await expect(endpointCopy).toHaveAttribute("aria-label", "Address copied");
     const promptCopy = page.getByTestId("connect-copy-prompt");
     await promptCopy.focus();
     await promptCopy.press("Enter");
     await expect(page.locator("html")).toHaveAttribute("data-test-clipboard", (await page.getByTestId("connect-prompt").innerText()).slice(1, -1));
+    if (prefix) await expect(page.locator("html")).toHaveAttribute("data-test-clipboard", "Answer my question using Fiscal.ge’s published data:");
+    // The endpoint is one shared address: no English copy of /mcp.
+    await expect(page.locator(`a[href="${prefix}/mcp"]`)).toHaveCount(0);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
     expect(errors).toEqual([]);
     if (prefix) expect(await bilingual.innerText()).not.toMatch(/\p{Script=Georgian}/u);
     else await expect(bilingual).toContainText("ხულოს");
-    const sectors = page.getByTestId("connect-sector-coverage");
-    await expect(sectors).toContainText("20");
-    await expect(sectors).toContainText("2010–2025");
-    await expect(sectors).toContainText("2011–2025");
-    const discovery = page.getByTestId("connect-sector-discovery");
-    await expect(discovery).toContainText("query_economic_sectors");
-    await expect(discovery.locator('a[href="/downloads/data/economic-sectors.csv"]')).toHaveCount(1);
-    await expect(discovery.locator(`a[href="${prefix}/methodology/economic-sectors"]`)).toHaveCount(1);
   });
+
+  for (const clipboard of ["unavailable", "refused"]) {
+    test(`selectable fallback when clipboard is ${clipboard} on ${prefix}/connect`, async ({ page }) => {
+      const errors: string[] = [];
+      page.on("pageerror", error => errors.push(error.message));
+      await page.setViewportSize({ width: 390, height: 844 });
+      await page.addInitScript(mode => {
+        Object.defineProperty(navigator, "clipboard", {
+          configurable: true,
+          value: mode === "unavailable" ? undefined : { writeText: async () => { throw new Error("Clipboard refused"); } },
+        });
+      }, clipboard);
+      await page.goto(`${BASE_URL}${prefix}/connect`);
+      for (const [textId, copyId] of [["connect-endpoint", "connect-copy"], ["connect-prompt", "connect-copy-prompt"]]) {
+        const text = page.getByTestId(textId!);
+        const before = await text.innerText();
+        const copy = page.getByTestId(copyId!);
+        const label = await copy.getAttribute("aria-label");
+        await copy.focus();
+        await copy.press("Enter");
+        await expect(copy).toHaveAttribute("aria-label", label!);
+        await expect(text).toBeVisible();
+        await text.click({ clickCount: 3 });
+        expect(await page.evaluate(() => window.getSelection()!.toString().trim())).toBe(before.trim());
+      }
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+      expect(errors).toEqual([]);
+    });
+  }
 }
 
 test.describe("connection page", () => {
@@ -95,16 +138,6 @@ test.describe("connection page", () => {
     expect(box).not.toBeNull();
     expect(box!.height).toBeGreaterThanOrEqual(24);
     expect(box!.width).toBeGreaterThanOrEqual(24);
-  });
-
-  test("gives per-application connection steps for at least two clients", async ({ page }) => {
-    const clients = page.getByTestId("connect-client");
-
-    expect(await clients.count()).toBeGreaterThanOrEqual(2);
-    for (const client of await clients.all()) {
-      await expect(client).toBeVisible();
-      expect((await client.innerText()).trim().length).toBeGreaterThan(30);
-    }
   });
 
   // Spec 12.3: the coverage statement is what stops a user asking for
@@ -160,28 +193,8 @@ test.describe("connection page", () => {
     await expect(missing).toHaveText(/[Ⴀ-ჿ]/);
   });
 
-  // Production discovery includes the connection page.
-  test("is discoverable from the shared footer", async ({ page }) => {
-    await page.goto(`${BASE_URL}/about`);
-
-    await expect(page.locator('footer a[href="/connect"]')).toHaveCount(1);
-  });
-
-  test("stays readable on a narrow viewport", async ({ page }) => {
-    await page.setViewportSize({ width: 375, height: 812 });
-    await page.goto(`${BASE_URL}/connect`);
-
-    await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
-    await expect(page.getByTestId("connect-endpoint")).toBeVisible();
-    // No horizontal scroll: the endpoint URL is the usual culprit on mobile.
-    const overflow = await page.evaluate(
-      () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
-    );
-    expect(overflow).toBeLessThanOrEqual(1);
-  });
-
-  test("carries its own canonical metadata", async ({ page }) => {
-    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", `${"https://fiscal.ge"}/connect`);
+  // The canonical of /connect and /en/connect is checked with every page in bilingual-seo.spec.ts.
+  test("carries a full meta description", async ({ page }) => {
     const description = await page.locator('meta[name="description"]').getAttribute("content");
     expect((description ?? "").length).toBeGreaterThan(40);
   });

@@ -1,7 +1,7 @@
 // apps/web/tests/factQuery/queryInflation.test.ts
 import { beforeAll, describe, expect, it } from "vitest";
 import { periodFromKey } from "../../lib/data/inflation/periods";
-import { buildFactQuerySnapshot } from "../../lib/factQuery/buildSnapshot";
+import { testSnapshot } from "../helpers/factQuerySnapshot";
 import { contributionIndex } from "../../lib/factQuery/inflationData";
 import type { Observation } from "../../lib/factQuery/observations";
 import { inflationCellCount, queryInflation } from "../../lib/factQuery/queryInflation";
@@ -10,7 +10,7 @@ import type { FactQueryResponse, FactQuerySnapshot } from "../../lib/factQuery/t
 
 let snapshot: FactQuerySnapshot;
 beforeAll(async () => {
-  snapshot = await buildFactQuerySnapshot({ releaseCommit: "test", generatedAt: "2026-09-14T00:00:00Z" });
+  snapshot = testSnapshot({ releaseCommit: "test", generatedAt: "2026-09-14T00:00:00Z" });
 });
 
 function rows(response: FactQueryResponse): Observation[] {
@@ -36,7 +36,7 @@ describe("queryInflation", () => {
       ["cpi.cat.01", "contribution_pp", "2012-06", "2004-01"],
     ]) {
       expect(queryInflation(snapshot, { seriesIds: [seriesId], measure, fromPeriod: period, toPeriod: period })).toMatchObject({
-        data: { coverage: { availablePeriods: [first, "2026-08"], availableYears: Array.from({ length: 2026 - Number(first!.slice(0, 4)) + 1 }, (_, index) => Number(first!.slice(0, 4)) + index) } },
+        data: { coverage: { availablePeriods: [first, "2026-09"], availableYears: Array.from({ length: 2026 - Number(first!.slice(0, 4)) + 1 }, (_, index) => Number(first!.slice(0, 4)) + index) } },
       });
     }
     const weightResponse = queryInflation(snapshot, { seriesIds: ["cpi.cat.01"], measure: "basket_weight_pct", fromPeriod: "2024-06", toPeriod: "2025-02" });

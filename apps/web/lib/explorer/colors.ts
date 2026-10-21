@@ -131,6 +131,26 @@ export const SERIES_COLORS: Record<string, string> = {
   "sector.s": "#588E54",
   "sector.t": "#26958A",
 
+  // GDP by expenditure (spec 2026-10-20): one hue family per part (consumption warm, government blue, investment
+  // green, exports teal, imports red-brown), all new hexes, at least 11 CIEDE2000 apart and from ink, and at least
+  // 3:1 on paper and tint. Households and non-profits (real growth only) is households' own line in that view.
+  "gdp_use.consumption": "#8A5A2B",
+  "gdp_use.households": "#B5562F",
+  "gdp_use.households_npish": "#B5562F",
+  "gdp_use.npish": "#A3477A",
+  "gdp_use.government": "#4E5FA8",
+  "gdp_use.government_individual": "#6F7FC0",
+  "gdp_use.government_collective": "#2E3F7A",
+  "gdp_use.investment": "#2E6B3F",
+  "gdp_use.fixed_capital": "#5E8A2E",
+  "gdp_use.inventories": "#85803A",
+  "gdp_use.exports": "#127A9A",
+  "gdp_use.exports_goods": "#1A8C8A",
+  "gdp_use.exports_services": "#0E5A6E",
+  "gdp_use.imports": "#8E2F2F",
+  "gdp_use.imports_goods": "#C23A4A",
+  "gdp_use.imports_services": "#6B4A3A",
+
   // Migration citizenship groups (demography section spec 2026-10-04 §7). The
   // computed remainder is never a country and wears the shared "other" colour.
   "citizenship.georgia": "#3D5A98",

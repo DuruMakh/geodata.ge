@@ -12,7 +12,7 @@ import { FOREIGN_INVESTMENT_OTHERS_ID, foreignInvestmentCoverage, type ForeignIn
 const TOP_COUNTRIES = 10;
 
 /** The same stable per-id colour rule as Money from abroad; the total is ink. */
-export const foreignInvestmentColor = (id: string): string => moneyTransferColor(id === FOREIGN_INVESTMENT_TOTAL_ID ? "transfer.total" : id);
+const foreignInvestmentColor = (id: string): string => moneyTransferColor(id === FOREIGN_INVESTMENT_TOTAL_ID ? "transfer.total" : id);
 export type ForeignInvestmentRankingRow = { entityId: string; label: string; valueUsd: number | null; share: number | null; rank: number | null; color: string };
 export type ForeignInvestmentSeries = { id: string; label: string; color: string };
 export type ForeignInvestmentModel = {

@@ -24,6 +24,10 @@ it("returns source values with distinct price bases and preliminary status", () 
     (r) => observationSchema.parse(r),
   );
   expect(rows).toHaveLength(6);
+  const growth = rows.find((r) => r.seriesId === "real_growth_percent")!;
+  expect(growth.unit).toBe("percent");
+  expect(growth.valueDefinitionEn).toContain("growth in percent:");
+  expect(growth.valueDefinitionEn).not.toContain("percentage points");
   expect(
     rows.find((r) => r.seriesId === "real_growth_percent")?.value,
   ).toBeGreaterThan(7);

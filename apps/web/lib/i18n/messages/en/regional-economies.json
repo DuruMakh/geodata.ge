@@ -1,9 +1,10 @@
 {
   "regionalEconomies.heading": "Regional economies",
-  "regionalEconomies.description": "GDP and economic activities for Georgia’s 11 published regions at current prices, 2010–2024.",
-  "regionalEconomies.indexMetaTitle": "Regional economies of Georgia, 2010–2024",
-  "regionalEconomies.detailMetaTitle": "{region} regional economy, 2010–2024",
-  "regionalEconomies.detailMetaDescription": "Explore {region} GDP and 20 economic activities at current prices from 2010 through 2024, in GEL and as shares of regional GDP.",
+  "regionalEconomies.description": "GDP and economic activities for Georgia’s {regionCount} published regions at current prices, {firstYear}–{lastYear}.",
+  "regionalEconomies.lead": "GDP and economic activities by region",
+  "regionalEconomies.indexMetaTitle": "Regional economies of Georgia, {firstYear}–{lastYear}",
+  "regionalEconomies.detailMetaTitle": "{region} regional economy, {firstYear}–{lastYear}",
+  "regionalEconomies.detailMetaDescription": "Explore {region} GDP and {sectorCount} economic activities at current prices from {firstYear} through {lastYear}, in GEL and as shares of regional GDP.",
   "regionalEconomies.mapAria": "Regional GDP map for {year}",
   "regionalEconomies.mapEntityAria": "{name}: {amount}, {year}",
   "regionalEconomies.legend": "Regional GDP · current prices",
@@ -17,7 +18,8 @@
   "regionalEconomies.largestRegion": "Largest regional economy",
   "regionalEconomies.period": "Available period",
   "regionalEconomies.currentPrices": "Current prices",
-  "regionalEconomies.sourceNote": "Source: Geostat regional GDP publications, reviewed 13 September 2026.",
+  "regionalEconomies.sourceNote": "Source: Geostat regional GDP publications, reviewed {reviewedDate}.",
+  "regionalEconomies.spatialCoverage": "Regions of Georgia",
   "regionalEconomies.boundaries": "Map boundaries:",
   "regionalEconomies.total": "Total regional GDP",
   "regionalEconomies.detailHeadingLead": "Regional economy —",
@@ -44,7 +46,7 @@
   "regionalEconomies.topThree": "Top three share",
   "regionalEconomies.sectorCount": "Published activities",
   "regionalEconomies.ofRegionalGdp": "of regional GDP",
-  "regionalEconomies.highlightsScope": "All 20 published activities at the selected final year; current prices.",
+  "regionalEconomies.highlightsScope": "All {sectorCount} published activities at the selected final year; current prices.",
   "regionalEconomies.unavailable": "Unavailable",
   "regionalEconomies.workbookTitle": "{region} regional economy — {measure}"
 }

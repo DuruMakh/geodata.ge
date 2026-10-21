@@ -29,7 +29,7 @@ Preliminary years are declared in the manifests — `preliminary_years` in the G
 
 When Geostat finalises a year, `query_gdp` and the GDP page stop showing `gdp_world_bank_preliminary_basis` automatically: its scope follows the manifest's preliminary years, not a written-in year.
 
-Serving imports the pure observation validator without loading workbook preparation. The public GDP CSV is generated during prebuild and independently checked during postbuild, after it exists; canonical source validation remains available on a clean checkout before any build.
+Serving imports the pure observation validator without loading workbook preparation. The public GDP CSV is generated during prebuild and verified by the step that writes it; canonical source validation remains available on a clean checkout before any build.
 
 ## Serving
 `loadServedGdpOverviewData` supports reviewed CSV and db mirror modes. `GdpOverviewFact` stores exact decimals; the import checks every field inside its existing transaction. Browser data are numbers. RLS is enabled and no anonymous Data API access is granted. Migration/application to a live database is a delivery operation, not a local source-edit side effect.

@@ -41,6 +41,15 @@ describe("population pyramid", () => {
     expect(html).not.toMatch(GEORGIAN);
   });
 
+  // U27-06: the server drawing (laid out at 520px) and the measured one occupy one box: the svg's height is fixed to its
+  // viewBox height, which depends on the rows only, so nothing below moves when the page hydrates.
+  it("fixes the drawing's height to its rows", () => {
+    const html = wrap(<PopulationPyramid pyramid={now} year={2026} compare={null} measure="share" ariaLabel="Georgia, 1 January 2026" testId="pyramid" />);
+    const svg = html.match(/<svg viewBox="0 [\d.-]+ [\d.]+ ([\d.]+)"[^>]*>/)!;
+    expect(svg[0]).not.toContain("h-auto");
+    expect(svg[0]).toContain(`style="height:${svg[1]}px"`);
+  });
+
   it("with a comparison year, draws its outline and names both years", () => {
     const html = wrap(<PopulationPyramid pyramid={now} year={2026} compare={{ pyramid: then, year: 2004 }} measure="share" ariaLabel="Georgia" testId="pyramid" />);
     expect(count(html, /data-testid="pyramid-outline-left"/g)).toBe(1);

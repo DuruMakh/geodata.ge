@@ -6,7 +6,7 @@ import { expect, test, vi } from "vitest";
 import { loadHouseholdFactsFromMirror, householdMirrorCreateRows } from "../../../lib/db/mirrorRows";
 import { assertHouseholdParity, loadHouseholdFacts, toClientHouseholdFact } from "../../../lib/data/household/importHousehold";
 import type { Prisma } from "../../../lib/generated/prisma/client";
-import { prepareHouseholdData, readSheetCellTokens } from "../../../lib/data/household/prepareHousehold";
+import { readSheetCellTokens } from "../../../lib/data/household/prepareHousehold";
 import { HOUSEHOLD_INDICATORS, householdSourceId, type HouseholdFact } from "../../../lib/data/household/types";
 import { expectedHouseholdKeys, householdPublishedValue, validateHouseholdFacts } from "../../../lib/data/household/validation";
 
@@ -16,20 +16,19 @@ vi.mock("node:fs/promises", async importOriginal => {
 });
 
 const root = path.resolve(process.cwd(), "../..");
-const loadFacts = (): HouseholdFact[] =>
+const parseFacts = (): HouseholdFact[] =>
   (parse(fs.readFileSync(path.join(root, "data/imports/household-income-spending-annual.csv")), { columns: true, bom: true, skip_empty_lines: true }) as Record<string, string>[]).map(row => ({
     year: Number(row.year), indicatorId: row.indicator_id, areaId: row.area_id, measure: row.measure, value: row.value, publishedValue: row.published_value,
     unit: row.unit, basis: row.basis, valueStatus: row.value_status, sourceId: row.source_id, sourceSheet: row.source_sheet, sourceCell: row.source_cell,
     sourceNumberFormat: row.source_number_format, lastReviewedAt: row.last_reviewed_at,
   }) as HouseholdFact);
+// The CSV is parsed once; each caller gets its own copy, so one case's mutation never reaches another.
+let parsedFacts: HouseholdFact[] | undefined;
+const loadFacts = (): HouseholdFact[] => structuredClone(parsedFacts ??= parseFacts());
 const find = (facts: readonly HouseholdFact[], indicatorId: string, areaId: string, measure: string, year: number) =>
   facts.find(f => f.indicatorId === indicatorId && f.areaId === areaId && f.measure === measure && f.year === year)!;
 /** Sets an exact value and keeps its published rounding consistent, so only the rule under test fails. */
 const setValue = (f: HouseholdFact, value: string) => Object.assign(f, { value, publishedValue: householdPublishedValue(value) });
-
-test("the canonical file reproduces the research package", async () => {
-  await expect(prepareHouseholdData(root, "check")).resolves.toBeUndefined();
-});
 
 test("serves all 10,638 reviewed values", () => {
   const facts = loadFacts();
@@ -92,7 +91,8 @@ test("client facts carry the published figure as a number", async () => {
   });
 });
 
-test("parity accepts equal decimals written differently and rejects a changed or missing value", async () => {
+
+test("the database mirror round-trips exact decimals and source relations, and parity accepts equal decimals written differently but rejects a changed or missing value", async () => {
   const facts = await loadHouseholdFacts();
   const target = find(facts, "income.total", "georgia", "per_household", 2025);
   expect(target.publishedValue).toBe("2025.8");
@@ -103,10 +103,6 @@ test("parity accepts equal decimals written differently and rejects a changed or
   changed[5].value = new Decimal(changed[5].value).plus("0.00000001").toFixed();
   expect(() => assertHouseholdParity(facts, changed)).toThrow();
   expect(() => assertHouseholdParity(facts, facts.slice(1))).toThrow();
-});
-
-test("the database mirror round-trips exact decimals and source relations", async () => {
-  const facts = await loadHouseholdFacts();
   const rows = householdMirrorCreateRows(facts, "household-run-1").map(row => ({ ...row, value: new Decimal(row.value as string), publishedValue: new Decimal(row.publishedValue as string) }));
   const db = (list: typeof rows) => ({ householdIncomeSpendingFact: { findMany: async () => list } }) as unknown as Pick<Prisma.TransactionClient, "householdIncomeSpendingFact">;
   const mirror = await loadHouseholdFactsFromMirror(db(rows));

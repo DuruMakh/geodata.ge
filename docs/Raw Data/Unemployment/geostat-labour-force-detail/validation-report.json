@@ -1,0 +1,157 @@
+{
+  "status": "passed",
+  "retrieved_at": "2026-10-20",
+  "scope": "Annual research only: Geostat Labour Force Survey detail tables (jobs by industry 2017-2025 and by sex 2020-2025, usual weekly hours by industry, sex and urban or rural area, informal employment, labour underutilization and NEET, 2020-2025); no derived values and no serving",
+  "primary_observation_count": 1014,
+  "observations_by_family": {
+    "hours": 504,
+    "informal": 30,
+    "jobs": 420,
+    "neet": 36,
+    "underuse": 24
+  },
+  "observations_by_source": {
+    "geostat_lfs_hours_settlement": 204,
+    "geostat_lfs_hours_sex": 300,
+    "geostat_lfs_informal": 30,
+    "geostat_lfs_jobs_industry": 420,
+    "geostat_lfs_neet": 36,
+    "geostat_lfs_underuse": 24
+  },
+  "indicators": 160,
+  "indicators_without_observations": [
+    "labour.hours.men.sector_t"
+  ],
+  "unserved_rows": [
+    {
+      "indicator_id": "labour.hours.men.sector_t",
+      "source_id": "geostat_lfs_hours_sex",
+      "source_sheet": "1",
+      "row": 60,
+      "printed": {
+        "B": "...",
+        "C": "...",
+        "D": "...",
+        "F": "...",
+        "G": "..."
+      },
+      "blank_columns": [
+        "E"
+      ]
+    }
+  ],
+  "placeholder_cells_in_served_values": 0,
+  "imputed_values": 0,
+  "calculated_values": 0,
+  "reconciliation_failed_count": 0,
+  "largest_sum_difference": {
+    "jobs_industries_vs_total": "3.045e-13",
+    "jobs_women_plus_men_vs_all": "1.040e-12",
+    "tolerance": "0.000001",
+    "hours_table_09_vs_10": "2.210e-13",
+    "hours_tolerance": "0.000000001"
+  },
+  "georgian_copies": {
+    "pairs": 6,
+    "numeric_cells_compared": 1905,
+    "differences": 0
+  },
+  "checks": [
+    "no duplicate, missing or extra observation; every served year is 2017-2025 (jobs for all persons) or 2020-2025; no quarterly, part-year or 2026 value",
+    "a \"…\", \"...\" or \"-\" cell, or a blank one, is never served as a value; any other text in a year column, and any cell outside the year columns, fails",
+    "value is the cell's stored text exactly; published value is that text rounded to 15 significant digits and then to one decimal, half up",
+    "every row equals a fresh read of its source cell, row label inside its block, and year heading",
+    "the 19 industry rows of each jobs group (all, women, men) add up to the group total within 0.000001, every year",
+    "jobs of women plus men equal jobs of all persons within 0.000001, 2020-2025",
+    "table 10's all-persons block equals table 09's, cell for cell, to within 0.000000001 (floating-point noise) and with equal published values; it is not served",
+    "the six Georgian workbooks hold the same numbers at the same addresses as their English originals",
+    "every workbook's retrieved URL is linked from the captured source page of its language",
+    "independent-validation.json re-reads every cell with SheetJS"
+  ],
+  "source_checks": [
+    {
+      "source_id": "geostat_lfs_jobs_industry",
+      "sha256": "BC57965FDE2EB23F96F8AE11459C0F97E7F5366472ECA6642899ADBD277A2F1E",
+      "bytes": 24810,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_lfs_hours_sex",
+      "sha256": "0DE31061CD381EAC2643BF089AFFEBDCF8E8D8D537D254ACA946BE129964A4FA",
+      "bytes": 23215,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_lfs_hours_settlement",
+      "sha256": "63A78A8ADB3D4FB6D5E48B4E18A5ADBF796AECA3C91F66B23731D935BC71ABC0",
+      "bytes": 23419,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_lfs_informal",
+      "sha256": "CE047C3D4E078A8FF633A53B42328B528FEE786A0B143AAE6EEA0645D5BEDE3C",
+      "bytes": 10221,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_lfs_underuse",
+      "sha256": "3BFBFCB6F5C1F4B1A0E0CC0A59A5E3FB3612AB930CDF2905FF4573193320BC8A",
+      "bytes": 10148,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_lfs_neet",
+      "sha256": "32E07D58392C1A2904F3DD4CA9392C3C0C1DE7173A7197905FE702520ECEFF35",
+      "bytes": 10875,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_lfs_jobs_industry_ka",
+      "sha256": "B08850A322598E92E457B2138644029D4FEDD9545D7EF817DE0FBD9A951AB7C9",
+      "bytes": 24696,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_lfs_hours_sex_ka",
+      "sha256": "990DAF82187E57D88E89441EC160F943101A22E9A6BD0E27C9BC21087E0EABD8",
+      "bytes": 77373,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_lfs_hours_settlement_ka",
+      "sha256": "04D90661F1DAE7E0ADB321BD0F86F61A8AF531BAD3EB5889303C29033341D1D9",
+      "bytes": 76986,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_lfs_informal_ka",
+      "sha256": "C7B1DBC6FB2F7261B44B858FD56FB871F09856CA584EEA481F51800EFF9E1B92",
+      "bytes": 11159,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_lfs_underuse_ka",
+      "sha256": "16C3E1765DE1344207734B54C8C40F6A2DBE1F4F4202912E640508B760DED903",
+      "bytes": 10312,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_lfs_neet_ka",
+      "sha256": "AD2E9CE0943D5BD5757FB78BB02DB47E0472F1DC2F00EB6A7A12B4FBEE0A1BF8",
+      "bytes": 10942,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_lfs_detail_page",
+      "sha256": "A5AAC35C275E8668D55219C4527D7E246AF9A5DC4B7556F0768035DC4B11AE39",
+      "bytes": 120974,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_lfs_detail_page_ka",
+      "sha256": "6EE0807943F4CB3A3723DAB32A7CC0EADC2A9E11A9CBF81C2304FE6641DBD9C6",
+      "bytes": 133287,
+      "passed": true
+    }
+  ]
+}

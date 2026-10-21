@@ -2,9 +2,18 @@ import { describe, expect, it, vi } from "vitest";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
 import { describeCoverage } from "../../lib/factQuery/describeCoverage";
+import { ID_MAX_LENGTH } from "../../lib/factQuery/schemas";
+import { MUNICIPAL_PER_RESIDENT_YEAR } from "../../lib/explorer/municipalData";
 import { serverInstructions } from "../../lib/mcp/instructions";
 import { loadPackagedSnapshot } from "../../lib/mcp/snapshot";
 import { TOOLS, createMcpServer } from "../../lib/mcp/tools";
+
+// Passes straight through to the real catalogue; the spy only counts calls, so
+// a test can see whether a request rebuilt the coverage text or reused it.
+vi.mock("../../lib/factQuery/describeCoverage", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("../../lib/factQuery/describeCoverage")>();
+  return { ...actual, describeCoverage: vi.fn(actual.describeCoverage) };
+});
 
 async function connected(): Promise<Client> {
   const [clientTransport, serverTransport] = InMemoryTransport.createLinkedPair();
@@ -34,12 +43,81 @@ const TOOL_NAMES = [
 ];
 
 describe("MCP tool surface", () => {
-  it("preflights 501 product output cells before calculation while accepting a long input span", async () => {
+  it("explains aggregate scope, bulk evidence and the existing unsupported-dataset alternative", () => {
+    const instructions = serverInstructions({}, ENTITY_COUNTS);
+    for (const required of [
+      "69 reviewed budgets", "64 territorial municipalities", "net Adjara adjustment exactly once",
+      "manifest.json inventories publication files", "sources.json contains the complete original-document catalogue",
+      "When asked for all underlying evidence", "https://fiscal.ge/downloads/data/sources.json",
+      "first/last examples alone are not a complete citation path",
+      "inflation-products.csv", "index_100", "mom_index_100", "yoy_index_100", "100 means no price change",
+      "Unemployment is not served by this MCP", "https://fiscal.ge/explorer/unemployment/overview",
+      "https://fiscal.ge/en/explorer/unemployment/overview",
+    ]) expect(instructions).toContain(required);
+  });
+
+  it("puts the complete discovery-to-evidence workflow in the opening 512 characters", () => {
+    const instructions = serverInstructions({}, ENTITY_COUNTS);
+    const opening = instructions.split("\n\n")[0]!;
+    expect(opening.length).toBeLessThanOrEqual(512);
+    for (const required of ["describe_coverage", "short keywords", "returned IDs", "supported measures", "expectedDataVersion", "units", "missing values", "projections", "caveats", "original documents", "Fiscal.ge", "product", "series and dates", "published files", "bulk"]) {
+      expect(opening).toContain(required);
+    }
+    // The short opening supplements the domain rules; it must not replace them.
+    for (const heading of ["BUDGET BOUNDARIES", "DEBT AND FISCAL BALANCE", "INFLATION", "PRODUCT INFLATION", "CITATIONS AND LICENCE", "CAVEATS", "WHAT YOU MUST NOT CLAIM"]) {
+      expect(instructions).toContain(heading);
+    }
+    expect(instructions).toContain("Missing is not zero");
+    expect(instructions).toContain("preceding December");
+  });
+
+  it("teaches recovery from empty phrase searches without treating them as absent data", async () => {
+    const instructions = serverInstructions({}, ENTITY_COUNTS);
+    expect(instructions).toContain("principal word");
+    expect(instructions).toContain("not proof that the data is absent");
     const client = await connected();
     try {
-      const product = TOOLS.find(tool => tool.name === "query_inflation_products");
-      expect(product).toBeDefined();
-      const calculate = vi.spyOn(product!, "run");
+      const { tools } = await client.listTools();
+      const discovery = tools.find(tool => tool.name === "describe_coverage")!.description!;
+      expect(discovery).toContain("one meaningful keyword");
+      expect(discovery).toContain("phrase returns no matches");
+      expect(discovery).toContain("browse the named dataset");
+    } finally {
+      await client.close();
+    }
+  });
+
+  it.each([
+    { name: "get_sources", args: { sourceIds: ["source.geostat_cpi_yoy"] }, guidance: "fewer source IDs" },
+    { name: "describe_coverage", args: { datasetId: "inflation" }, guidance: "short search term" },
+  ])("preserves $name recovery through the registered tool callback", async ({ name, args, guidance }) => {
+    const tool = TOOLS.find(tool => tool.name === name)!;
+    const response = tool.run(loadPackagedSnapshot(), args);
+    if (response.kind === "error") throw new Error("Expected data");
+    response.meta.generatedAt += "x".repeat(512 * 1024);
+    const run = vi.spyOn(tool, "run").mockReturnValue(response);
+    const client = await connected();
+    try {
+      const result = await client.callTool({ name, arguments: args });
+      expect(result.isError).toBe(true);
+      expect(result.structuredContent).toBeUndefined();
+      const text = (result.content as { text: string }[])[0]!.text;
+      expect(text).toContain("result_too_large");
+      expect(text).toContain(guidance);
+      expect(text).not.toContain("0 cells");
+      expect(text).toContain("https://fiscal.ge/downloads/data/manifest.json");
+    } finally {
+      run.mockRestore();
+      await client.close();
+    }
+  });
+
+  it("preflights 501 product output cells before calculation while accepting a long input span", async () => {
+    const product = TOOLS.find(tool => tool.name === "query_inflation_products");
+    expect(product).toBeDefined();
+    const calculate = vi.spyOn(product!, "run");
+    const client = await connected();
+    try {
       const refused = await client.callTool({ name: "query_inflation_products", arguments: {
         seriesIds: loadPackagedSnapshot().inflationProducts.catalogue.slice(0, 167).map(product => product.productId),
         measure: "yoy_pct", fromPeriod: "2026-06", toPeriod: "2026-08",
@@ -54,8 +132,10 @@ describe("MCP tool surface", () => {
       expect(endpoint.isError).toBeFalsy();
       expect(endpoint.structuredContent).toMatchObject({ data: { coverage: { expectedCount: 5 } } });
       expect((endpoint.structuredContent as { data: { observations: { calculationBasePeriod: string }[] } }).data.observations.every(row => row.calculationBasePeriod === "2014-12")).toBe(true);
+    } finally {
       calculate.mockRestore();
-    } finally { await client.close(); }
+      await client.close();
+    }
   });
   it("advertises exactly the read-only query functions", async () => {
     const { tools } = await (await connected()).listTools();
@@ -154,24 +234,31 @@ describe("MCP tool surface", () => {
     expect(text).toMatch(/[a-z]{4,}\s+[a-z]{4,}/i);
   });
 
-  it("refuses an oversized request rather than truncating it", async () => {
-    const result = await (await connected()).callTool({
-      name: "query_municipal",
-      arguments: {
-        // 14 municipalities x 7 series x 11 years = 1,078 cells, over the 500 cap.
-        entityIds: ["04", "06", "07", "08", "09", "10", "11", "12", "13", "14", "15", "16", "17", "18"],
-        seriesIds: [
-          "municipal.total", "municipal.education", "municipal.health", "municipal.social_protection",
-          "municipal.housing_communal", "municipal.recreation_culture", "municipal.economic_affairs",
-        ],
-        years: [2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025],
-        measure: "amount_gel",
-      },
-    });
+  it("refuses an oversized request rather than truncating it, before running the query", async () => {
+    const run = vi.spyOn(TOOLS.find((tool) => tool.name === "query_municipal")!, "run");
+    try {
+      const result = await (await connected()).callTool({
+        name: "query_municipal",
+        arguments: {
+          // 14 municipalities x 7 series x 11 years = 1,078 cells, over the 500 cap.
+          entityIds: ["04", "06", "07", "08", "09", "10", "11", "12", "13", "14", "15", "16", "17", "18"],
+          seriesIds: [
+            "municipal.total", "municipal.education", "municipal.health", "municipal.social_protection",
+            "municipal.housing_communal", "municipal.recreation_culture", "municipal.economic_affairs",
+          ],
+          years: [2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025],
+          measure: "amount_gel",
+        },
+      });
 
-    expect(result.isError).toBe(true);
-    expect((result.content as { text: string }[])[0]!.text).toContain("result_too_large");
-    expect((result.content as { text: string }[])[0]!.text).toContain("/downloads/data/");
+      expect(result.isError).toBe(true);
+      expect((result.content as { text: string }[])[0]!.text).toContain("result_too_large");
+      expect((result.content as { text: string }[])[0]!.text).toContain("/downloads/data/");
+      // Rejected before the query runs (moved from reviewRegression.test.ts).
+      expect(run).not.toHaveBeenCalled();
+    } finally {
+      run.mockRestore();
+    }
   });
 
   it("requires an all-regions regional request to be narrowed instead of truncating it", async () => {
@@ -307,12 +394,12 @@ describe("MCP tool surface", () => {
     try {
       const batumi = await client.callTool({ name: "query_inflation", arguments: { entityIds: ["city.batumi"], seriesIds: ["cpi.headline"], measure: "yoy_pct", fromPeriod: "2026-08", toPeriod: "2026-08" } });
       expect(batumi.isError).toBeFalsy();
-      expect(batumi.structuredContent).toMatchObject({ data: { observations: [{ value: 7.0857 }], coverage: { availablePeriods: ["2016-01", "2026-08"] } } });
+      expect(batumi.structuredContent).toMatchObject({ data: { observations: [{ value: 7.0857 }], coverage: { availablePeriods: ["2016-01", "2026-09"] } } });
       expect((batumi.content as { text: string }[])[0]!.text).toContain("\t2026-08\tyoy_pct\t7.0857\t");
 
       const zugdidi = await client.callTool({ name: "query_inflation", arguments: { entityIds: ["city.zugdidi"], seriesIds: ["cpi.headline"], measure: "avg12_pct", fromPeriod: "2016-06", toPeriod: "2016-06" } });
       expect(zugdidi.isError).toBeFalsy();
-      expect(zugdidi.structuredContent).toMatchObject({ status: "empty", data: { observations: [{ value: null }], coverage: { availablePeriods: ["2017-12", "2026-08"] } } });
+      expect(zugdidi.structuredContent).toMatchObject({ status: "empty", data: { observations: [{ value: null }], coverage: { availablePeriods: ["2017-12", "2026-09"] } } });
       expect((zugdidi.content as { text: string }[])[0]!.text).toContain("2017-12");
     } finally { await client.close(); }
   });
@@ -378,8 +465,100 @@ describe("MCP tool surface", () => {
     const instructions = serverInstructions({}, ENTITY_COUNTS);
     expect(instructions).toContain("INFLATION");
     expect(instructions).toContain("only monthly dataset");
-    expect(instructions).toContain("schema 1.5.0");
+    expect(instructions).toContain("schema 1.6.0");
     expect(instructions).not.toContain("Quarterly or monthly data, live budget execution");
+  });
+
+  // Every request builds a fresh server, so before this cache each one - even a
+  // ping - rebuilt the whole catalogue to write the descriptions (U30-01).
+  it("the second request reuses the cached coverage", () => {
+    createMcpServer();
+    vi.mocked(describeCoverage).mockClear();
+    createMcpServer();
+    expect(describeCoverage).not.toHaveBeenCalled();
+  });
+
+  // Each session downloads this before its first question (U30-03). It was
+  // 120 KB; the integer bounds and empty `additionalProperties` Zod emitted
+  // carried nothing. Most of what remains is the evidence envelope each of the
+  // 14 output schemas must declare in full, because MCP gives tools no way to
+  // share a definition.
+  it("tools/list stays under 115 KB", async () => {
+    const client = await connected();
+    try {
+      const listed = await client.listTools();
+      expect(Buffer.byteLength(JSON.stringify(listed), "utf8")).toBeLessThan(115 * 1024);
+      expect(JSON.stringify(listed)).not.toContain("9007199254740991");
+    } finally { await client.close(); }
+  });
+
+  // A narrow lookup used to ship the whole catalogue with it (U30-08).
+  it("a search returns only matching entries", async () => {
+    const client = await connected();
+    try {
+      const all = await client.callTool({ name: "describe_coverage", arguments: {} });
+      const batumi = await client.callTool({ name: "describe_coverage", arguments: { search: "Batumi" } });
+      const found = batumi.structuredContent as { status: string; data: { datasets: { datasetId: string }[]; entities: { datasetId: string }[]; series: unknown[]; exclusions: unknown[] } };
+      expect(found.status).toBe("ok");
+      expect(found.data.datasets.map(dataset => dataset.datasetId).sort()).toEqual([...new Set(found.data.entities.map(entity => entity.datasetId))].sort());
+      expect(found.data.exclusions).toEqual([]);
+      expect(Buffer.byteLength(JSON.stringify(batumi))).toBeLessThan(Buffer.byteLength(JSON.stringify(all)) / 2);
+
+      const nothing = await client.callTool({ name: "describe_coverage", arguments: { search: "zzzznotathing" } });
+      expect(nothing.structuredContent).toMatchObject({ status: "empty", data: { datasets: [], series: [], entities: [], exclusions: [] } });
+
+      const excluded = await client.callTool({ name: "describe_coverage", arguments: { search: "05" } });
+      expect((excluded.structuredContent as { data: { exclusions: { entityId: string }[] } }).data.exclusions.map(exclusion => exclusion.entityId)).toEqual(["05"]);
+    } finally { await client.close(); }
+  });
+
+  // English-language clients saw Georgian-only titles on most tools (U30-12).
+  it("titles every tool in Georgian and English", async () => {
+    const { tools } = await (await connected()).listTools();
+    for (const tool of tools) expect(tool.title, tool.name).toMatch(/^\p{Script=Georgian}[^/]* \/ [A-Z][A-Za-z ,-]+$/u);
+  });
+
+  // An unknown id is echoed back (twice, and in the valid choices), so an
+  // uncapped one reflected 32 KiB of caller text into what the model reads (U30-07).
+  it("refuses an over-long id before echoing it", async () => {
+    const result = await (await connected()).callTool({
+      name: "query_national",
+      arguments: { side: "revenue", seriesIds: ["a".repeat(30_000)], years: [2024], measure: "amount_gel" },
+    });
+    const text = (result.content as { text: string }[])[0]!.text;
+    expect(result.isError).toBe(true);
+    expect(text.length).toBeLessThan(2_000);
+  });
+
+  it("fits every published id inside the id length limit", () => {
+    const longest = [...JSON.stringify(loadPackagedSnapshot()).matchAll(/"(?:\w*Id|id|code)":"([^"]*)"/g)].reduce((max, match) => Math.max(max, match[1]!.length), 0);
+    expect(longest).toBeGreaterThan(0);
+    expect(longest).toBeLessThanOrEqual(ID_MAX_LENGTH);
+  });
+
+  // The counts in the text are read from the snapshot like the year ranges are,
+  // so a new region, city or year cannot leave a stale number behind (U30-09).
+  it("states regional, city and municipal counts from the snapshot", async () => {
+    const snapshot = loadPackagedSnapshot();
+    const { tools } = await (await connected()).listTools();
+    const describe = (name: string) => tools.find((tool) => tool.name === name)!.description!;
+    const regionalYears = snapshot.regionalEconomies.facts.map((fact) => fact.year);
+    const activities = snapshot.regionalEconomies.registry.filter((series) => series.classificationCode !== null).length;
+    const cities = snapshot.inflation.cityEntities;
+
+    expect(describe("query_regional_economies")).toContain(`${activities} NACE Rev.2 economic activities for Georgia's ${snapshot.regionalEconomies.regions.length} published regions`);
+    expect(describe("query_regional_economies")).toContain(`No year after ${Math.max(...regionalYears)}`);
+    expect(describe("query_inflation")).toContain(`the ${cities.length} city.* ids from describe_coverage — ${cities.map((city) => city.labelEn).join(", ")} —`);
+    expect(describe("query_municipal")).toContain(`for ${snapshot.municipal.municipalities.length} municipalities, ${snapshot.municipal.regions.length} regions`);
+    expect(describe("query_municipal")).toContain(`gel_per_resident (${MUNICIPAL_PER_RESIDENT_YEAR} municipality/region totals only)`);
+
+    const filled = serverInstructions({}, { ...ENTITY_COUNTS, regionalEconomyRegions: 4, regionalActivities: 9, regionalLastYear: 2001, sectorActivities: 8, cities: 2, cityDivisions: 3, cityFirstPeriod: "1999-01" });
+    expect(filled).toContain("4 regions, Total regional GDP and 9 NACE Rev.2 activities");
+    expect(filled).toContain("No year after 2001, real growth");
+    expect(filled).toContain("8 NACE Rev.2 activities and a separately published Total GDP reference");
+    expect(filled).toContain("cover the 2 cities where Geostat records prices, from 1999-01, for the");
+    expect(filled).toContain("total and the 3 divisions");
+    expect(serverInstructions({}, ENTITY_COUNTS)).not.toMatch(/No 2025|Eleven regions|twenty NACE|six cities|12 divisions/i);
   });
 
   it("keeps every tool name in the advertised set", () => {

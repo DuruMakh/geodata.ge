@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo } from "react";
 import type { DebtFamily, DebtSeriesId, ClientGovernmentDebtFact } from "../../lib/servedRows";
 import {
   debtRangeForFamily,
@@ -11,10 +11,18 @@ import {
 } from "../../lib/explorer/debtExplorer";
 import { parseDebtHash, serializeDebtHash } from "../../lib/explorer/debtUrlState";
 import type { ChartMode } from "../../lib/explorer/types";
-import { useReplaceHash } from "../explorer-shell/use-replace-hash";
+import { useHashState } from "../explorer-shell/use-hash-state";
 
 type Range = { start: number; end: number; min: number; max: number };
 type RangePatch = { start?: number; end?: number };
+type FullRanges = Record<DebtFamily, Range>;
+type DebtState = {
+  family: DebtFamily;
+  chartMode: ChartMode;
+  shareOfGdp: boolean;
+  range: { start: number; end: number };
+  selectedIds: DebtSeriesId[];
+};
 
 function normalizeRange(rawStart: number, rawEnd: number, range: Range): { start: number; end: number } {
   const start = Math.min(Math.max(rawStart, range.min), range.max);
@@ -22,94 +30,81 @@ function normalizeRange(rawStart: number, rawEnd: number, range: Range): { start
   return start <= end ? { start, end } : { start: end, end: start };
 }
 
+function parseDebtState(hash: string, fullRanges: FullRanges): DebtState {
+  const parsed = parseDebtHash(hash);
+  const fullRange = fullRanges[parsed.family];
+  return {
+    family: parsed.family,
+    chartMode: parsed.chartMode ?? "line",
+    shareOfGdp: parsed.family === "stock" && parsed.share === true,
+    range: parsed.range
+      ? normalizeRange(parsed.range.start, parsed.range.end, fullRange)
+      : { start: fullRange.start, end: fullRange.end },
+    selectedIds: parsed.selection ?? getDefaultDebtSelection(parsed.family),
+  };
+}
+
+function serializeDebtState(state: DebtState): string {
+  return serializeDebtHash({
+    family: state.family,
+    chartMode: state.chartMode,
+    share: state.family === "stock" && state.shareOfGdp,
+    rangeStart: state.range.start,
+    rangeEnd: state.range.end,
+    selectedIds: state.selectedIds,
+  });
+}
+
+function withFamily(state: DebtState, family: DebtFamily, selection: DebtSeriesId[], fullRanges: FullRanges): DebtState {
+  return {
+    ...state,
+    family,
+    range: { start: fullRanges[family].start, end: fullRanges[family].end },
+    selectedIds: normalizeDebtSelection(selection, family),
+    shareOfGdp: family === "stock" && state.shareOfGdp,
+  };
+}
+
 export function useDebtExplorerState(facts: ClientGovernmentDebtFact[]) {
-  const fullRanges = useMemo<Record<DebtFamily, Range>>(() => {
+  const fullRanges = useMemo<FullRanges>(() => {
     const range = (family: DebtFamily): Range => {
       const resolved = debtRangeForFamily(facts, family);
       return { ...resolved, min: resolved.start, max: resolved.end };
     };
     return { stock: range("stock"), service: range("service"), rate: range("rate") };
   }, [facts]);
-  const [activeFamily, setActiveFamily] = useState<DebtFamily>("stock");
-  const [chartMode, setChartMode] = useState<ChartMode>("line");
-  const [shareOfGdp, setShareOfGdp] = useState(false);
-  const [ranges, setRanges] = useState<Record<DebtFamily, { start: number; end: number }>>(() => ({
-    stock: fullRanges.stock,
-    service: fullRanges.service,
-    rate: fullRanges.rate,
-  }));
-  const [selectedIds, setSelectedIds] = useState<DebtSeriesId[]>(getDefaultDebtSelection("stock"));
-  const parsedRef = useRef(false);
-
-  useEffect(() => {
-    if (parsedRef.current) return;
-    parsedRef.current = true;
-    const parsed = parseDebtHash(window.location.hash);
-    const fullRange = fullRanges[parsed.family];
-    const range = parsed.range
-      ? normalizeRange(parsed.range.start, parsed.range.end, fullRange)
-      : { start: fullRange.start, end: fullRange.end };
-
-    /* eslint-disable react-hooks/set-state-in-effect */
-    setActiveFamily(parsed.family);
-    if (parsed.chartMode) setChartMode(parsed.chartMode);
-    setShareOfGdp(parsed.family === "stock" && parsed.share === true);
-    setRanges((current) => ({ ...current, [parsed.family]: range }));
-    setSelectedIds(parsed.selection ?? getDefaultDebtSelection(parsed.family));
-    /* eslint-enable react-hooks/set-state-in-effect */
-    // The hash belongs to the initial browser location, not to later prop changes.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const range = { ...fullRanges[activeFamily], ...ranges[activeFamily] };
-  const hash = serializeDebtHash({
-    family: activeFamily,
-    chartMode,
-    share: activeFamily === "stock" && shareOfGdp,
-    rangeStart: range.start,
-    rangeEnd: range.end,
-    selectedIds,
-  });
-
-  useReplaceHash(hash);
+  const { state, update } = useHashState(fullRanges, parseDebtState, serializeDebtState);
 
   function setRange(patch: RangePatch) {
-    const current = ranges[activeFamily];
-    const resolved = normalizeRange(patch.start ?? current.start, patch.end ?? current.end, fullRanges[activeFamily]);
-    setRanges((previous) => ({ ...previous, [activeFamily]: resolved }));
+    update((current) => ({
+      ...current,
+      range: normalizeRange(patch.start ?? current.range.start, patch.end ?? current.range.end, fullRanges[current.family]),
+    }));
   }
 
   function setSelectedSeries(ids: DebtSeriesId[]) {
-    setSelectedIds(normalizeDebtSelection(ids, activeFamily));
-  }
-
-  function switchFamily(family: DebtFamily, selection = getDefaultDebtSelection(family)) {
-    setActiveFamily(family);
-    setRanges((previous) => ({ ...previous, [family]: fullRanges[family] }));
-    setSelectedIds(normalizeDebtSelection(selection, family));
-    if (family !== "stock") setShareOfGdp(false);
+    update((current) => ({ ...current, selectedIds: normalizeDebtSelection(ids, current.family) }));
   }
 
   function toggleSeries(seriesId: DebtSeriesId) {
-    const family = familyForDebtSeries(seriesId);
-    if (family !== activeFamily) {
-      switchFamily(family, [seriesId]);
-      return;
-    }
-    setSelectedIds((current) => selectDebtSeries(current, seriesId));
+    update((current) => {
+      const family = familyForDebtSeries(seriesId);
+      return family !== current.family
+        ? withFamily(current, family, [seriesId], fullRanges)
+        : { ...current, selectedIds: selectDebtSeries(current.selectedIds, seriesId) };
+    });
   }
 
   return {
-    activeFamily,
-    chartMode,
-    setChartMode,
-    shareOfGdp: activeFamily === "stock" && shareOfGdp,
-    setShareOfGdp,
-    range,
+    activeFamily: state.family,
+    chartMode: state.chartMode,
+    setChartMode: (chartMode: ChartMode) => update((current) => ({ ...current, chartMode })),
+    shareOfGdp: state.family === "stock" && state.shareOfGdp,
+    setShareOfGdp: (shareOfGdp: boolean) => update((current) => ({ ...current, shareOfGdp })),
+    range: { ...fullRanges[state.family], ...state.range },
     setRange,
-    selectedIds,
+    selectedIds: state.selectedIds,
     setSelectedSeries,
     toggleSeries,
-    switchFamily,
   };
 }

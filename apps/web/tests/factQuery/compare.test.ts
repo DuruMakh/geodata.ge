@@ -1,6 +1,6 @@
 // apps/web/tests/factQuery/compare.test.ts
 import { beforeAll, describe, expect, it } from "vitest";
-import { buildFactQuerySnapshot } from "../../lib/factQuery/buildSnapshot";
+import { testSnapshot } from "../helpers/factQuerySnapshot";
 import { compare } from "../../lib/factQuery/compare";
 import { queryMinistries } from "../../lib/factQuery/queryMinistries";
 import { queryMunicipal } from "../../lib/factQuery/queryMunicipal";
@@ -12,7 +12,7 @@ import type { FactQuerySnapshot } from "../../lib/factQuery/types";
 let snapshot: FactQuerySnapshot;
 
 beforeAll(async () => {
-  snapshot = await buildFactQuerySnapshot({ releaseCommit: "test", generatedAt: "2026-08-29T00:00:00.000Z" });
+  snapshot = testSnapshot({ releaseCommit: "test", generatedAt: "2026-08-29T00:00:00.000Z" });
 });
 
 const data = (result: ReturnType<typeof compare>) => (result as { data: { comparisons: Comparison[] } }).data;

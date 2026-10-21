@@ -1,17 +1,28 @@
-import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
+import { existsSync } from "node:fs";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
-import { buildFactQuerySnapshot } from "../lib/factQuery/buildSnapshot";
 import { buildAllPublications } from "../lib/factQuery/publications";
+import type { FactQuerySnapshot } from "../lib/factQuery/types";
+import { loadPackagedSnapshot } from "../lib/mcp/snapshot";
 
 const OUTPUT_DIR = path.join(process.cwd(), "public", "downloads", "data");
+const SNAPSHOT_FILE = "lib/factQuery/generated/snapshot.json";
 
-function releaseCommit(): string {
+// The publications are cut from the snapshot the route serves, which
+// data:prepare-fact-query-snapshot has just written earlier in the same chain
+// (prebuild, predev). Rebuilding it here would cost a second full build; a
+// missing or unreadable file stops the step instead of falling back to one.
+function packagedSnapshot(): FactQuerySnapshot {
   try {
-    return execFileSync("git", ["rev-parse", "HEAD"], { encoding: "utf8" }).trim();
-  } catch {
-    return "unknown";
+    return loadPackagedSnapshot();
+  } catch (error) {
+    const problem = !existsSync(path.join(process.cwd(), SNAPSHOT_FILE))
+      ? "is missing"
+      : error instanceof Error && error.message === "snapshot_incompatible"
+        ? "is from an older schema"
+        : "is unreadable";
+    throw new Error(`${SNAPSHOT_FILE} ${problem}. Run npm run data:prepare-fact-query-snapshot first.`);
   }
 }
 
@@ -20,10 +31,7 @@ async function main() {
   const check = process.argv.includes("--check");
   if (write === check) throw new Error("Pass exactly one of --write or --check");
 
-  const snapshot = await buildFactQuerySnapshot({
-    releaseCommit: releaseCommit(),
-    generatedAt: new Date().toISOString(),
-  });
+  const snapshot = packagedSnapshot();
   const artifacts = buildAllPublications(snapshot);
 
   if (write) {
@@ -36,12 +44,12 @@ async function main() {
       process.stdout.write(`${artifact.fileName}: ${artifact.rowCount} rows, ${artifact.bytes.byteLength} bytes\n`);
     }
     process.stdout.write(`wrote ${artifacts.length} publications dataVersion=${snapshot.dataVersion}\n`);
-    return;
   }
 
   // Check: the files on disk must be the files this snapshot produces. A stale
   // publication would let a download disagree with the explorer and with any
-  // MCP answer built from the same release.
+  // MCP answer built from the same release. --write runs it over what it has
+  // just written, so the build needs no separate re-check after it.
   //
   // Two separate things are verified, because neither alone is sufficient:
   //

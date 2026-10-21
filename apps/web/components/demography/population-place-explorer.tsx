@@ -7,7 +7,6 @@ import { partsOf, placeColor, placeLabel, type DemographyPlace } from "../../lib
 import { buildPopulationHighlights, buildPopulationModel, placeYears, populationBasisKey } from "../../lib/explorer/demographyPopulation";
 import { buildPopulationWorkbookExportModel } from "../../lib/explorer/demographyPopulationWorkbook";
 import { formatInUnit, thousandsUnit, UNIT_PERSONS } from "../../lib/explorer/format";
-import type { ChartMode } from "../../lib/explorer/types";
 import type { WorkbookPublicSource } from "../../lib/explorer/workbookModel";
 import { message } from "../../lib/i18n/messages";
 import { useI18n } from "../../lib/i18n/provider";
@@ -15,7 +14,9 @@ import { pageHref } from "../../lib/i18n/routes";
 import { matchesLabelQuery } from "../../lib/i18n/search";
 import type { TemplateValues } from "../../lib/i18n/types";
 import type { ClientDemographyObservation } from "../../lib/servedRows";
+import { unpackFacts, type FactsInput } from "../../lib/data/packedFacts";
 import { ExcelDownloadButton } from "../explorer/excel-download-button";
+import { ModeTabs } from "../explorer-shell/mode-tabs";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { useAppReady } from "../explorer-shell/use-app-ready";
 import { EditorialLineChart } from "../main-explorer/editorial-line-chart";
@@ -26,13 +27,14 @@ import { EntityHeading, type EntityNavigation } from "../municipalities/entity-h
 import type { EntityPickerCountry, EntityPickerGroup, EntityPickerOverrides } from "../municipalities/entity-picker";
 import { EntityWorkspaceShell } from "../municipalities/entity-workspace-shell";
 import { useMunicipalState } from "../municipalities/use-municipal-state";
-import { Callout, SegmentedTabs, SourceNote } from "../ui/editorial";
+import { Callout, SourceNote } from "../ui/editorial";
+import { saveWorkbook } from "./demography-helpers";
 import { PopulationHighlightsSection } from "./population-highlights";
 
 export function PopulationPlaceExplorer({
   place,
   places,
-  facts,
+  facts: shippedFacts,
   title,
   metaLine,
   navigation,
@@ -49,7 +51,7 @@ export function PopulationPlaceExplorer({
 }: {
   place: DemographyPlace;
   places: DemographyPlace[];
-  facts: ClientDemographyObservation[];
+  facts: FactsInput<ClientDemographyObservation>;
   title: string;
   metaLine: string;
   navigation?: EntityNavigation;
@@ -67,6 +69,7 @@ export function PopulationPlaceExplorer({
   backHref: string;
   children?: ReactNode;
 }) {
+  const facts = unpackFacts(shippedFacts);
   const presentation = useI18n();
   const { locale, messages } = presentation;
   const t = (key: string, values?: TemplateValues) => message(messages, `demography.${key}`, values);
@@ -118,19 +121,12 @@ export function PopulationPlaceExplorer({
       <p role="status" className="sr-only">{t("rangeChanged", { start: model.range.start, end: model.range.end })}</p>
       <EntityWorkspaceShell
         testId="population-place-workspace"
+        asideLabel={message(messages, "controls.series")}
         main={
           <>
             <section data-testid="population-chart-panel" data-mode={state.chartMode}>
               <div className="mb-[18px] flex flex-col items-start gap-3 min-[520px]:flex-row min-[520px]:items-center min-[520px]:gap-5">
-                <SegmentedTabs<ChartMode>
-                  ariaLabel={message(messages, "municipal.viewMode")}
-                  value={state.chartMode}
-                  onChange={state.setChartMode}
-                  options={[
-                    { value: "line", label: message(messages, "municipal.line"), testId: "population-mode-line" },
-                    { value: "table", label: message(messages, "municipal.table"), testId: "population-mode-table" },
-                  ]}
-                />
+                <ModeTabs value={state.chartMode} onChange={state.setChartMode} testId="population" />
                 <span className="min-w-0 font-[family-name:var(--font-numeric)] text-[11px] min-[768px]:text-[10.5px] text-[var(--faint)]">{t("unitLine")}</span>
               </div>
               {!hasSelection ? (
@@ -151,7 +147,8 @@ export function PopulationPlaceExplorer({
                 />
               ) : (
                 <ExplorerTable
-                  caption={`${t("tableCaption")} · ${model.range.start}–${model.range.end} · ${t("censusNote", { count: rebase })}`}
+                  // The census re-base sentence is the note right under the chart panel, not repeated here (U26-12).
+                  caption={`${t("tableCaption")} · ${model.range.start}–${model.range.end}`}
                   rows={model.rows.filter((row) => row.itemId !== place.id)}
                   totalRow={placeRow}
                   showTotal={placeRow !== null}
@@ -196,6 +193,9 @@ export function PopulationPlaceExplorer({
               query={seriesQuery}
               onQueryChange={setSeriesQuery}
               searchPlaceholder={message(messages, "municipal.search")}
+              // A municipality lists only itself: no search, bulk toggle or "1 / 1" count (U26-05).
+              searchable={listed.length > 1}
+              bulkActions={listed.length > 1}
               selectedCount={state.selectedIds.length}
               totalCount={listed.length}
               hasSelection={hasSelection}
@@ -220,9 +220,8 @@ export function PopulationPlaceExplorer({
             <ExcelDownloadButton
               testId="population-excel-download"
               disabled={!hasSelection || !model.hasData}
-              onDownload={async () => {
-                const { downloadWorkbook } = await import("../../lib/explorer/workbookWriter.client");
-                await downloadWorkbook(
+              onDownload={() =>
+                saveWorkbook(() =>
                   buildPopulationWorkbookExportModel(
                     facts,
                     places,
@@ -233,11 +232,12 @@ export function PopulationPlaceExplorer({
                     workbookScope,
                     place.id,
                   ),
-                );
-              }}
+                )
+              }
             />
             <Link
               href={pageHref(backHref, locale)}
+              prefetch={false}
               data-testid="population-back-link"
               className="mt-1.5 flex min-h-11 items-center text-[12px] text-[var(--muted)] no-underline hover:text-[var(--ink)]"
             >

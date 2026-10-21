@@ -1,13 +1,13 @@
-import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 import { renderExplorerLayout } from "../../lib/pages/explorer-layout";
+import { renderPageMarkup } from "../helpers/render-localized";
 
 const route = vi.hoisted(() => ({ pathname: "/en/explorer/demography/population" }));
 vi.mock("next/navigation", () => ({ usePathname: () => route.pathname }));
 
 const render = async (pathname: string, locale: "ka" | "en" = "en") => {
   route.pathname = pathname;
-  return renderToStaticMarkup(await renderExplorerLayout(locale, null));
+  return renderPageMarkup(locale, await renderExplorerLayout(locale, null));
 };
 
 describe("sidebar demography group", () => {
@@ -36,6 +36,13 @@ describe("sidebar demography group", () => {
   it("marks the Age and sex link current on its page", async () => {
     const markup = await render("/en/explorer/demography/age-sex");
     expect(markup).toContain('data-testid="demography-age-sex-link" aria-current="page"');
+    expect(markup).not.toContain('data-testid="demography-population-link" aria-current="page"');
+  });
+
+  it("lists the five demography pages and marks Marriages and divorces current on its page", async () => {
+    const markup = await render("/en/explorer/demography/marriages-divorces");
+    for (const page of ["population", "age-sex", "migration", "births-deaths"]) expect(markup).toContain(`data-testid="demography-${page}-link"`);
+    expect(markup).toContain('data-testid="demography-marriages-divorces-link" aria-current="page"');
     expect(markup).not.toContain('data-testid="demography-population-link" aria-current="page"');
   });
 

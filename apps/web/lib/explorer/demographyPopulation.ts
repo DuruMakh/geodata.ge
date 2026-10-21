@@ -68,7 +68,6 @@ export function buildPopulationModel({
     label: placeLabel(place, locale),
     color: placeColor(place),
     vals: years.map((year) => valueAt(place.id, year)),
-    planned: years.map(() => false),
   }));
   return {
     range,

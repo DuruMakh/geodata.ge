@@ -7,7 +7,7 @@ import { message } from "../../lib/i18n/messages";
 import { publicLabel } from "../../lib/i18n/labels";
 import { pageHref } from "../../lib/i18n/routes";
 import { municipalityHrefForCode } from "../../lib/explorer/municipalityRoutes";
-import { useTouchPreview } from "../explorer-shell/use-touch-preview";
+import { useMapTouchDisks, useTouchPreview } from "../explorer-shell/use-touch-preview";
 import { MUNICIPAL_PER_RESIDENT_YEAR } from "../../lib/explorer/municipalData";
 import { MAP_NO_DATA_FILL, MAP_NO_DATA_STROKE, MAP_RAMP } from "../../lib/explorer/colors";
 import { formatAmount, formatPerResidentGel } from "../../lib/explorer/format";
@@ -56,6 +56,7 @@ export function MunicipalityMap({
   const [pointerCode, setPointerCode] = useState<string | null>(null);
   const [focusCode, setFocusCode] = useState<string | null>(null);
   const preview = useTouchPreview();
+  const touchDisks = useMapTouchDisks(svgRef, touchTargets, viewBox);
   const openOnClick = (code: string) => {
     if (preview.opens(code)) onOpenMunicipality(code);
   };
@@ -259,10 +260,10 @@ export function MunicipalityMap({
           })}
 
           {/* Fingertip-sized hit areas for municipalities and city markers under
-              24px on a phone. Coarse pointers only, so mouse hover and clicks are
-              unchanged; hidden from assistive technology, which reaches each
-              municipality through its own target. */}
-          {touchTargets.map((target) => (
+              24px at the map's drawn width. Coarse pointers only, so mouse hover
+              and clicks are unchanged; hidden from assistive technology, which
+              reaches each municipality through its own target. */}
+          {touchDisks.disks.map((target) => (
             <circle
               key={`touch:${target.id}`}
               data-map-touch-target={target.id}
@@ -272,7 +273,7 @@ export function MunicipalityMap({
               fill="transparent"
               aria-hidden="true"
               className="pointer-events-none pointer-coarse:pointer-events-auto"
-              onClick={() => openOnClick(target.id)}
+              onClick={(event) => openOnClick(touchDisks.diskIdAt(event, target.id))}
             />
           ))}
 
@@ -301,6 +302,7 @@ export function MunicipalityMap({
         {previewTarget ? (
           <Link
             href={pageHref((hrefForCode ?? municipalityHrefForCode)(previewTarget.code), locale)}
+            prefetch={false}
             data-testid="map-touch-preview"
             className="mt-2 flex min-h-11 items-center justify-between gap-3 border-t border-[var(--hairline-soft)] text-[13px] text-[var(--ink)]"
           >

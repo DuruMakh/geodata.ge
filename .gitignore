@@ -39,8 +39,19 @@ data/reports/*.json
 !data/reports/wages-validation.json
 !data/reports/poverty-validation.json
 !data/reports/energy-food-validation.json
+!data/reports/health-validation.json
+!data/reports/crime-validation.json
+!data/reports/labour-validation.json
 !data/reports/money-banks-validation.json
+!data/reports/business-validation.json
+!data/reports/housing-validation.json
+!data/reports/internet-validation.json
+!data/reports/education-validation.json
+!data/reports/social-protection-validation.json
+!data/reports/transport-validation.json
+!data/reports/science-culture-validation.json
 !data/reports/household-income-spending-validation.json
+!data/reports/gdp-expenditure-validation.json
 data/reports/*.txt
 
 # local-only planning/source/prototype material
@@ -57,6 +68,8 @@ docs/Prototpy variatints experiments/
 # generated public methodology archives
 apps/web/public/downloads/methodology/
 apps/web/public/downloads/data/
+# generated page data (lib/data/pageDataFiles.ts)
+apps/web/public/page-data/
 
 # local Products verification evidence
 /apps/web/output/trade-products*

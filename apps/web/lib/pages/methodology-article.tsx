@@ -21,8 +21,7 @@ import { loadGeneratedArchiveSummaries } from "../methodology/prepareArchives";
 import { loadReviewedSourceManifest } from "../methodology/sourceManifest";
 import type { MethodologyDatasetId } from "../methodology/types";
 import { fiscalMetadata } from "../seo/metadata";
-import { catalogReference, datasetJsonLd } from "../seo/structuredData";
-import { seoMessage } from "../seo/strings";
+import { datasetJsonLd } from "../seo/structuredData";
 import { resolveSiteUrl } from "../siteUrl";
 
 export type MethodologyDatasetPageProps = {
@@ -51,7 +50,27 @@ const DATASET_SCHEMA_IDS = {
   debt: "government-debt",
   gdp: "gdp-overview",
   "economic-sectors": "economic-sectors",
+  "gdp-expenditure": "gdp-expenditure",
   "regional-economies": "regional-economies",
+  inflation: "inflation",
+  unemployment: "unemployment",
+  trade: "trade",
+  "external-flows": "external-flows",
+  wages: "wages",
+  poverty: "poverty",
+  "household-income": "household-income",
+  health: "health",
+  "social-protection": "social-protection",
+  education: "education",
+  "science-culture": "science-culture",
+  crime: "crime",
+  internet: "internet",
+  "energy-food": "energy-food",
+  environment: "environment",
+  transport: "transport",
+  money: "money",
+  business: "business",
+  housing: "housing",
 } as const;
 
 const DATASET_SOURCE_NOTES = {
@@ -61,6 +80,7 @@ const DATASET_SOURCE_NOTES = {
   debt: "common.budgetSourceNote",
   gdp: "common.economySourceNote",
   "economic-sectors": "common.geostatSourceNote",
+  "gdp-expenditure": "common.geostatSourceNote",
   "regional-economies": "common.geostatSourceNote",
   inflation: "common.inflationSourceNote",
   unemployment: "common.geostatSourceNote",
@@ -70,8 +90,18 @@ const DATASET_SOURCE_NOTES = {
   wages: "common.geostatSourceNote",
   poverty: "common.geostatSourceNote",
   "household-income": "common.geostatSourceNote",
+  health: "common.geostatSourceNote",
+  "social-protection": "common.socialSourceNote",
+  education: "common.geostatSourceNote",
+  "science-culture": "common.geostatSourceNote",
+  crime: "common.geostatSourceNote",
+  internet: "common.geostatSourceNote",
   "energy-food": "common.geostatSourceNote",
+  environment: "common.geostatSourceNote",
+  transport: "common.geostatSourceNote",
   money: "common.nbgSourceNote",
+  business: "common.geostatSourceNote",
+  housing: "common.geostatSourceNote",
 } as const;
 
 const DATASET_DOWNLOADS = {
@@ -81,6 +111,7 @@ const DATASET_DOWNLOADS = {
   debt: "/downloads/data/government-debt.csv",
   gdp: "/downloads/data/gdp-overview.csv",
   "economic-sectors": "/downloads/data/economic-sectors.csv",
+  "gdp-expenditure": null,
   "regional-economies": "/downloads/data/regional-economies.csv",
   inflation: "/downloads/data/inflation-cpi-national.csv",
   unemployment: null,
@@ -91,8 +122,18 @@ const DATASET_DOWNLOADS = {
   wages: null,
   poverty: null,
   "household-income": null,
+  health: null,
+  "social-protection": null,
+  education: null,
+  "science-culture": null,
+  crime: null,
+  internet: null,
   "energy-food": null,
+  environment: null,
+  transport: null,
   money: null,
+  business: null,
+  housing: null,
 } as const;
 
 // Spec 12.2: the expenditure methodology links both the expenditure and the
@@ -100,6 +141,7 @@ const DATASET_DOWNLOADS = {
 // this page is its only published entry point.
 const DATASET_JSON_DOWNLOADS = {
   "economic-sectors": [{ href: "/downloads/data/economic-sectors.json", labelKey: "methodology.jsonSectors" }],
+  "gdp-expenditure": [],
   "regional-economies": [{ href: "/downloads/data/regional-economies.json", labelKey: "methodology.jsonRegionalEconomies" }],
   expenditure: [
     { href: "/downloads/data/national-expenditure.json", labelKey: "methodology.jsonExpenditure" },
@@ -116,8 +158,18 @@ const DATASET_JSON_DOWNLOADS = {
   wages: [],
   poverty: [],
   "household-income": [],
+  health: [],
+  "social-protection": [],
+  education: [],
+  "science-culture": [],
+  crime: [],
+  internet: [],
   "energy-food": [],
+  environment: [],
+  transport: [],
   money: [],
+  business: [],
+  housing: [],
   debt: [
     { href: "/downloads/data/government-debt.json", labelKey: "methodology.jsonDebt" },
     { href: "/downloads/data/government-debt-rates.json", labelKey: "methodology.jsonRates" },
@@ -130,6 +182,7 @@ const DATASET_JSON_DOWNLOADS = {
 // distribution of national expenditure.
 const DATASET_JSON_DISTRIBUTIONS = {
   "economic-sectors": ["/downloads/data/economic-sectors.json"],
+  "gdp-expenditure": [],
   "regional-economies": ["/downloads/data/regional-economies.json"],
   expenditure: ["/downloads/data/national-expenditure.json"],
   revenue: ["/downloads/data/national-revenue.json"],
@@ -146,20 +199,33 @@ const DATASET_JSON_DISTRIBUTIONS = {
   wages: [],
   poverty: [],
   "household-income": [],
+  health: [],
+  "social-protection": [],
+  education: [],
+  "science-culture": [],
+  crime: [],
+  internet: [],
   "energy-food": [],
+  environment: [],
+  transport: [],
   money: [],
+  business: [],
+  housing: [],
 } as const;
+
+const METHODOLOGY_WORD = /methodology|მეთოდოლოგია/i;
 
 export async function methodologyArticleMetadata(locale: Locale, { params }: MethodologyDatasetPageProps): Promise<Metadata> {
   const dataset = validatedDataset((await params).dataset);
   const content = getMethodologyContent(dataset, locale);
   const messages = await getMessages(locale, ["common", "methodology"]);
-  const title = message(messages, "methodology.articleMetaTitle", { title: content.title });
+  // "Expenditure methodology" already says what the suffix would add.
+  const title = METHODOLOGY_WORD.test(content.title) ? content.title : message(messages, "methodology.articleMetaTitle", { title: content.title });
   const canonical = `/methodology/${dataset}` as const;
 
   return fiscalMetadata({ locale,
     title,
-    description: content.summary,
+    description: content.metaDescription ?? content.summary,
     path: canonical,
     type: "article",
   });
@@ -170,16 +236,16 @@ export async function renderMethodologyArticle(locale: Locale, { params }: Metho
   const content = getMethodologyContent(dataset, locale);
   const messages = await getMessages(locale, ["common", "methodology"]);
   const repositoryRoot = path.resolve(/* turbopackIgnore: true */ process.cwd(), "../..");
+  // Only an article whose coverage line is drawn from served facts loads them,
+  // and only the facts its coverage source names; a build renders every article
+  // in two locales. The kind is not hard-coded here: this reads the same record
+  // deriveMethodologyCoverage reads — the Georgian one, whatever the locale — so
+  // the two cannot drift.
+  const coverageKind = METHODOLOGY_CONTENT[dataset].coverageSource.kind;
   const [landingData, municipalData, debtData, archiveSummaries, rows, catalogue] = await Promise.all([
-    loadServedLandingData(),
-    loadServedMunicipalData(),
-    // Only an article whose coverage line is drawn from the debt facts needs
-    // them, and a build renders eight articles in two locales. The id is not
-    // hard-coded here: this reads the same record deriveMethodologyCoverage
-    // reads — the Georgian one, whatever the locale — so the two cannot drift.
-    METHODOLOGY_CONTENT[dataset].coverageSource.kind === "governmentDebt"
-      ? loadServedGovernmentDebtData()
-      : Promise.resolve({ facts: [] }),
+    coverageKind === "budgetSide" ? loadServedLandingData() : Promise.resolve({ facts: [] }),
+    coverageKind === "municipalTotals" ? loadServedMunicipalData() : Promise.resolve({ totalFacts: [] }),
+    coverageKind === "governmentDebt" ? loadServedGovernmentDebtData() : Promise.resolve({ facts: [] }),
     loadGeneratedArchiveSummaries(repositoryRoot),
     loadReviewedSourceManifest(repositoryRoot, content.archiveManifestId),
     loadEnglishCatalogue(repositoryRoot),
@@ -192,21 +258,8 @@ export async function renderMethodologyArticle(locale: Locale, { params }: Metho
       {/* Demography has no Dataset markup yet (spec section 10): its page keeps the breadcrumb and the archived originals. */}
       {dataset === "demography" ? null : (
       <JsonLd
-        data={dataset === "unemployment" || dataset === "trade" || dataset === "wages" || dataset === "poverty" || dataset === "household-income" || dataset === "energy-food" || dataset === "money" || dataset === "external-flows" ? {
-          "@context": "https://schema.org", "@type": "Dataset", name: content.title, description: content.summary,
-          url: `${resolveSiteUrl()}${pageHref(`/methodology/${dataset}`, locale)}`,
-          temporalCoverage: `${coverage.firstYear}/${coverage.lastYear}`, inLanguage: ["ka", "en"], dateModified: content.reviewedAt,
-          spatialCoverage: { "@type": "Place", name: seoMessage(locale, "seo.country") },
-          creator: dataset === "external-flows" || dataset === "money" ? { "@type": "Organization", name: "National Bank of Georgia", url: "https://nbg.gov.ge" } : { "@type": "Organization", name: "Geostat", url: "https://www.geostat.ge" },
-          publisher: { "@id": `${resolveSiteUrl()}/#organization` },
-        } : dataset === "inflation" ? {
-          "@context":"https://schema.org", "@type":"Dataset", "@id":`${resolveSiteUrl()}/methodology/${dataset}`, name:content.title, description:content.summary,
-          url:`${resolveSiteUrl()}${pageHref(`/methodology/${dataset}`,locale)}`, temporalCoverage:`${coverage.firstYear}/${coverage.lastYear}`,
-          inLanguage:["ka","en"], dateModified:content.reviewedAt, spatialCoverage:{"@type":"Place",name:seoMessage(locale,"seo.country")},
-          creator:{"@id":`${resolveSiteUrl()}/#organization`}, publisher:{"@id":`${resolveSiteUrl()}/#organization`},
-          includedInDataCatalog:catalogReference(resolveSiteUrl(),locale), license:"https://creativecommons.org/licenses/by/4.0/",
-          distribution:{"@type":"DataDownload",encodingFormat:"text/csv",contentUrl:`${resolveSiteUrl()}${DATASET_DOWNLOADS[dataset]}`}
-        } : datasetJsonLd({ locale,
+        // A dataset with no bulk file (DATASET_DOWNLOADS null) claims no distribution.
+        data={datasetJsonLd({ locale,
           origin: resolveSiteUrl(),
           path: locale === "en" ? `/en/methodology/${dataset}` : `/methodology/${dataset}`,
           datasetId: DATASET_SCHEMA_IDS[dataset],

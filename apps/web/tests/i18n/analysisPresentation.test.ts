@@ -11,7 +11,7 @@ let en: Presentation;
 beforeAll(async () => {
   data = await loadServedExplorerData();
   const ids = [...data.glossary.keys(), ...data.adminCategories.map(category => category.id), "snapshot.other"];
-  [ka, en] = await Promise.all(["ka", "en"].map(locale => getPresentation(locale as "ka" | "en", ["analysis"], ids)));
+  [ka, en] = await Promise.all(["ka", "en"].map(locale => getPresentation(locale as "ka" | "en", ["analysis"], ids, ids)));
 });
 
 describe("single-year analysis language parity", () => {

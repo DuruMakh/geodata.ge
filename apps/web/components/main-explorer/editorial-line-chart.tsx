@@ -1,7 +1,9 @@
 "use client";
 
+import { useId, useState, type KeyboardEvent, type PointerEvent as ReactPointerEvent } from "react";
 import { useI18n } from "../../lib/i18n/provider";
 import { message } from "../../lib/i18n/messages";
+import { stepPeriodIndex } from "../../lib/explorer/chartNavigation";
 import { buildDotLattice, type DotLattice } from "../../lib/explorer/dotLattice";
 import { formatInUnit, formatShare, roundForDisplay, type ValueUnit } from "../../lib/explorer/format";
 import { periodLabelIndices } from "../../lib/explorer/periodAxis";
@@ -34,11 +36,14 @@ export type ChartSeries = {
   label: string;
   color: string;
   vals: (number | null)[];
-  planned: boolean[];
+  /** Planned (budget) values draw a hollow point; omitted, no value is planned. */
+  planned?: boolean[];
   preliminary?: boolean[];
   forecastFromYear?: number;
   /** Reference lines (the NBG target) draw dashed and without an end dot. */
   dashed?: boolean;
+  /** Draws dotted and, like a dashed line, without an end dot: a third pattern beside solid and dashed. */
+  dotted?: boolean;
   /** Draws a hollow point on each `preliminary` value, so it is marked without hovering. */
   hollowPreliminary?: boolean;
 };
@@ -59,7 +64,7 @@ type EditorialLineChartProps = {
   formatPeriod?: (period: number, kind: "axis" | "tooltip") => string;
   /** Annual charts only. No line joins the year before one of these years to it; a dashed rule and the short label mark the gap. */
   breaks?: ReadonlyArray<{ year: number; label: string }>;
-  /** The chart's accessible name; the generic trend label by default. */
+  /** The chart's accessible name; by default the first series, the number of series and the first–last period. */
   ariaLabel?: string;
 };
 
@@ -116,6 +121,36 @@ export function buildTooltipRows(
   return { rows: present.slice(0, cap), hidden: Math.max(0, present.length - cap) };
 }
 
+export type SpokenLabels = { notAvailable: string; other: string; planned: string; preliminary?: string };
+
+/** The status a drawn value carries (hollow planned point, preliminary superscript), said in words. */
+function spokenStatus(line: ChartSeries, index: number, labels: SpokenLabels): string {
+  const marks: string[] = [];
+  if (line.planned?.[index]) marks.push(labels.planned);
+  if (labels.preliminary && line.preliminary?.[index]) marks.push(labels.preliminary);
+  return marks.length === 0 ? "" : ` (${marks.join(", ")})`;
+}
+
+/**
+ * One period of the readout as a sentence for a screen reader. It reads the rows the
+ * hover readout shows, so a line with no value that period is left out (never read
+ * as 0), and a period where no line has a value says it is not available.
+ */
+export function periodReadoutText(
+  series: ChartSeries[],
+  index: number,
+  period: string,
+  formatValue: (value: number, seriesId: string) => string,
+  labels: SpokenLabels,
+): string {
+  const { rows, hidden } = buildTooltipRows(series, index);
+  if (rows.length === 0) return `${period}: ${labels.notAvailable}`;
+  const byId = new Map(series.map((line) => [line.id, line]));
+  const parts = rows.map((row) => `${row.label} ${formatValue(row.value, row.id)}${spokenStatus(byId.get(row.id)!, index, labels)}`);
+  if (hidden > 0) parts.push(`+${hidden} ${labels.other}`);
+  return `${period}: ${parts.join(", ")}`;
+}
+
 /** Phone lattices keep the 12px floor by joining whole periods into one column. */
 export function coarsenLattice(lattice: DotLattice | null): DotLattice | null {
   if (lattice === null || lattice.colPitch >= MIN_LATTICE_PITCH) return lattice;
@@ -151,7 +186,8 @@ export function EditorialLineChart({
   ariaLabel,
 }: EditorialLineChartProps) {
   const { messages } = useI18n();
-  const { ref: layoutRef, mobileWidth } = useChartLayout();
+  const captionId = useId();
+  const { ref: layoutRef, mobileWidth } = useChartLayout<HTMLElement>();
   const n = years.length;
 
   // The domain must cover negative values (e.g. revenue.other_taxes 2019-2020):
@@ -192,6 +228,21 @@ export function EditorialLineChart({
   const formatValue = (value: number | null, seriesId: string, year: number) =>
     formatTooltipValue && value !== null ? formatTooltipValue(value, seriesId, year) : share ? formatShare(value === null ? null : value / 100) : formatInUnit(value, unit);
   const axisPeriod = (index: number) => (formatPeriod ? formatPeriod(years[index]!, "axis") : String(years[index]));
+  const tooltipPeriod = (index: number) => (formatPeriod ? formatPeriod(years[index]!, "tooltip") : String(years[index]));
+  // Text read aloud has no axis beside it, so an amount carries its unit.
+  const spokenValue = (value: number, seriesId: string, year: number) =>
+    formatTooltipValue || share || unit.label.trim() === "" ? formatValue(value, seriesId, year) : `${formatValue(value, seriesId, year)} ${unit.label}`;
+  const spokenLabels: SpokenLabels = {
+    notAvailable: message(messages, "controls.notAvailable"),
+    other: message(messages, "controls.other"),
+    planned: message(messages, "controls.planned"),
+    preliminary: preliminaryLabel,
+  };
+  const chartName =
+    ariaLabel ??
+    (series.length === 0 || n === 0
+      ? message(messages, "controls.chartTrend")
+      : message(messages, "controls.chartSummary", { series: series[0]!.label, count: series.length, start: tooltipPeriod(0), end: tooltipPeriod(n - 1) }));
 
   const gridLines = Array.from({ length: Math.round(span / step) + 1 }, (_, index) => bottom + step * index);
   // A break needs the year before it on the axis too; a range that starts at the break year has nothing to separate.
@@ -237,7 +288,29 @@ export function EditorialLineChart({
   const measured = mobileWidth !== undefined;
   const active = mobileWidth === null || mobileWidth === undefined ? desktop : phone!;
 
-  const { svgRef, hover, pinned, handlers } = useChartPointer(n, active.width, active.padLeft, active.padRight);
+  const { svgRef, hover, pinned, setHover, handlers } = useChartPointer(n, active.width, active.padLeft, active.padRight);
+  // The live line speaks only for the keys: a pointer already sees the readout.
+  const [keyboardReading, setKeyboardReading] = useState(false);
+  const pointerHandlers = {
+    ...handlers,
+    onPointerDown: (event: ReactPointerEvent<SVGSVGElement>) => {
+      setKeyboardReading(false);
+      handlers.onPointerDown(event);
+    },
+    onPointerMove: (event: ReactPointerEvent<SVGSVGElement>) => {
+      setKeyboardReading(false);
+      handlers.onPointerMove(event);
+    },
+  };
+
+  // The keys step the same period the pointer hovers, so the readout follows them.
+  function handleKeyDown(event: KeyboardEvent<SVGSVGElement>) {
+    const next = stepPeriodIndex(event.key, hover, n);
+    if (next === undefined) return;
+    event.preventDefault();
+    setKeyboardReading(true);
+    setHover(next);
+  }
 
   const axisText = (plot: Plot, value: number, index: number) => (
     <text key={`axis-${index}`} x={plot.padLeft - AXIS_LABEL_GAP} y={plot.y(value) + 3} fontSize={FONT} fill={CHART_AXIS_LABEL} textAnchor="end" style={{ fontFamily: "var(--font-numeric)" }}>
@@ -263,7 +336,7 @@ export function EditorialLineChart({
       <ChartTooltip
         leftPercent={(active.x(hover) / active.width) * 100}
         pinned={pinned}
-        header={formatPeriod ? formatPeriod(years[hover]!, "tooltip") : String(years[hover])}
+        header={tooltipPeriod(hover)}
         headerRight={share ? shareLabel : null}
         rows={tooltip.rows}
         hidden={tooltip.hidden}
@@ -283,9 +356,13 @@ export function EditorialLineChart({
         data-geometry={plot.mobile ? "mobile" : "desktop"}
         viewBox={`0 0 ${width} ${height}`}
         role="img"
-        aria-label={ariaLabel ?? message(messages, "controls.chartTrend")}
-        className={`h-auto w-full ${className}`}
-        {...handlers}
+        aria-label={chartName}
+        aria-describedby={captionId}
+        tabIndex={0}
+        className={`h-auto w-full [&:focus:not(:focus-visible)]:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] ${className}`}
+        {...pointerHandlers}
+        onKeyDown={handleKeyDown}
+        onBlur={() => setHover(null)}
       >
         {lattice ? (
           <>
@@ -356,15 +433,23 @@ export function EditorialLineChart({
         {hover !== null && plot === active ? (
           <line x1={x(hover)} x2={x(hover)} y1={padTop - 6} y2={height - PAD_B} stroke={CHART_LATTICE} strokeWidth={1} />
         ) : null}
-        {breakMarks.map((entry) => {
+        {breakMarks.map((entry, markIndex) => {
           const bx = (x(entry.index - 1) + x(entry.index)) / 2;
           const toTheLeft = bx > width / 2;
+          // Labels of nearby breaks would print over each other on a narrow chart: a repeat of the previous
+          // label is left out, and a different one drops one line. The width is an estimate; no font metrics here.
+          const previous = breakMarks[markIndex - 1];
+          const previousX = previous === undefined ? null : (x(previous.index - 1) + x(previous.index)) / 2;
+          const reach = (label: string) => label.length * FONT * 0.62 + 10;
+          const clash = previousX !== null && previous !== undefined && bx - previousX < reach(entry.label) + reach(previous.label);
+          const repeat = clash && entry.label === previous?.label;
+          const labelY = padTop + 10 + (clash && markIndex % 2 === 1 ? FONT + 4 : 0);
           return (
             <g key={`break-${entry.year}`} data-testid="chart-break">
               <line x1={bx} x2={bx} y1={padTop} y2={height - PAD_B} stroke={CHART_AXIS_LABEL} strokeWidth={1} strokeDasharray="4 3" />
-              <text x={toTheLeft ? bx - 5 : bx + 5} y={padTop + 10} fontSize={FONT} fill={CHART_AXIS_LABEL} textAnchor={toTheLeft ? "end" : "start"} style={{ fontFamily: "var(--font-numeric)" }}>
+              {repeat ? null : <text x={toTheLeft ? bx - 5 : bx + 5} y={labelY} fontSize={FONT} fill={CHART_AXIS_LABEL} textAnchor={toTheLeft ? "end" : "start"} style={{ fontFamily: "var(--font-numeric)" }}>
                 {entry.label}
-              </text>
+              </text>}
             </g>
           );
         })}
@@ -428,12 +513,14 @@ export function EditorialLineChart({
                     ? { "data-testid": `chart-series-${line.id}-actual` }
                     : line.dashed
                       ? { "data-testid": `chart-series-${line.id}-dashed` }
-                      : {})}
+                      : line.dotted
+                        ? { "data-testid": `chart-series-${line.id}-dotted` }
+                        : {})}
                   d={actualPath}
                   fill="none"
                   stroke={line.color}
                   strokeWidth={2.2}
-                  strokeDasharray={line.dashed ? "6 5" : undefined}
+                  strokeDasharray={line.dashed ? "6 5" : line.dotted ? "0.1 4.5" : undefined}
                   strokeLinejoin="round"
                   strokeLinecap="round"
                 />
@@ -453,9 +540,9 @@ export function EditorialLineChart({
               {isolated.map(([px, py, index]) => (
                 <circle key={`isolated-${index}`} cx={px} cy={py} r={2.5} fill={line.color} />
               ))}
-              {line.dashed ? null : <circle cx={last[0]} cy={last[1]} r={3.5} fill={line.color} />}
+              {line.dashed || line.dotted ? null : <circle cx={last[0]} cy={last[1]} r={3.5} fill={line.color} />}
               {points
-                .filter(([, , index]) => line.planned[index] || (line.hollowPreliminary && line.preliminary?.[index]))
+                .filter(([, , index]) => line.planned?.[index] || (line.hollowPreliminary && line.preliminary?.[index]))
                 .map(([px, py, index]) => (
                   <circle key={`planned-${index}`} cx={px} cy={py} r={3} fill="#F7F2E9" stroke={line.color} strokeWidth={1.5} />
                 ))}
@@ -470,7 +557,8 @@ export function EditorialLineChart({
   };
 
   return (
-    <div ref={layoutRef}>
+    // role="img" belongs on the svg, not the figure: on the figure it would hide the sr-only figcaption.
+    <figure ref={layoutRef} className="m-0">
       <ChartScrollFrame
         scrollKey={scrollKey}
         fit={active.mobile}
@@ -488,6 +576,25 @@ export function EditorialLineChart({
         {!active.mobile && pinned === null ? readout : null}
       </ChartScrollFrame>
       {active.mobile ? readout : null}
-    </div>
+
+      {/* The chart is never colour-only: each line's latest value reads as text. */}
+      <figcaption id={captionId} className="sr-only">
+        <ul>
+          {series.map((line) => {
+            const latest = line.vals.findLastIndex((value) => value !== null && value !== undefined);
+            return (
+              <li key={line.id}>
+                {latest === -1
+                  ? `${line.label}: ${spokenLabels.notAvailable}`
+                  : `${line.label}, ${tooltipPeriod(latest)}: ${spokenValue(line.vals[latest]!, line.id, years[latest]!)}${spokenStatus(line, latest, spokenLabels)}`}
+              </li>
+            );
+          })}
+        </ul>
+      </figcaption>
+      <p className="sr-only" aria-live="polite">
+        {hover === null || !keyboardReading ? "" : periodReadoutText(series, hover, tooltipPeriod(hover), (value, seriesId) => spokenValue(value, seriesId, years[hover]!), spokenLabels)}
+      </p>
+    </figure>
   );
 }

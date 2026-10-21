@@ -14,7 +14,7 @@ export function findTradeProducts(input: { data: ClientTradeProductsData; model:
   const rowsById = new Map([...model.ranking, ...model.missingRanking].map(row => [row.entityId, row]));
   const matches = data.entities.filter(entity => (view !== "selected" || selected.has(entity.id)) && (!categoryId || entity.categoryId === categoryId)).map(entity => {
     const label = publicLabel(presentation.locale, entity.id, entity.labelKa, presentation.englishLabels);
-    const names = [label, entity.labelKa, entity.sourceLabelEn, entity.code, ...entity.aliasesKa, ...entity.aliasesEn];
+    const names = [label, entity.labelKa, entity.sourceLabelEn ?? label, entity.code, ...entity.aliasesKa ?? [], ...entity.aliasesEn ?? []];
     const exact = names.slice(0, 4).some(name => name.normalize("NFC").trim().toLocaleLowerCase("en") === query);
     return { row: rowsById.get(entity.id)!, matches: matchesLabelQuery(query, names), exact };
   }).filter(item => item.matches);

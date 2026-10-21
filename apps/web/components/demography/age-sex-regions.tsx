@@ -8,7 +8,7 @@ import { useI18n } from "../../lib/i18n/provider";
 import type { TemplateValues } from "../../lib/i18n/types";
 import { RegionIndex } from "../regional-economies/regional-economies-index";
 import { SectionTitle } from "../ui/editorial";
-import { SECTION_CLASS } from "./age-sex-explorer";
+import { SECTION_CLASS } from "./demography-helpers";
 
 const percent = (value: number) => formatShare(value / 100);
 
@@ -24,6 +24,7 @@ export function AgeSexRegions({ model, georgiaShare, sourceNote }: { model: Regi
       <SectionTitle>{t("regionsTitle")}</SectionTitle>
       <div className="mt-6">
         <RegionIndex
+          headingLevel={3}
           model={model}
           sourceNote={sourceNote}
           metric={{

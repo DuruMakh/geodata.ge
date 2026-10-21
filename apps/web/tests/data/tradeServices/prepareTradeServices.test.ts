@@ -6,14 +6,23 @@ import { parse } from "csv-parse/sync";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { serializeBomCsvRows } from "../../../lib/data/csvEscape";
 import { buildTradeServicesData, prepareTradeServicesData, tradeServicesCsv } from "../../../lib/data/tradeServices/prepareTradeServices";
+import type { TradeParseCache } from "../../../lib/data/parsing/tradeSourceWorkbook";
 
 const root = path.resolve(process.cwd(), "../.."), research = "docs/Raw Data/Trade/geostat-external-trade/2026-10-07";
 const hash = (bytes: Buffer | string) => createHash("sha256").update(bytes).digest("hex");
 type Row = Record<string, string>;
-describe("accepted annual services types", () => {
+describe("accepted annual services types and published country totals", () => {
   let result: Awaited<ReturnType<typeof buildTradeServicesData>>;
   const fixtures: string[] = [];
-  beforeAll(async () => { result = await buildTradeServicesData(root); }, 60_000);
+  // Every case below reruns the preparation over a copy of the package with one file changed. The unchanged large
+  // inputs (the 70 MB reconciliation, the 30 MB layouts) are parsed once, here, and shared; a changed file has a new
+  // hash and is parsed again, so each case still runs the whole preparation over its own bytes.
+  const parsed: TradeParseCache = new Map();
+  let annualRows: Row[];
+  beforeAll(async () => {
+    result = await buildTradeServicesData(root, parsed);
+    annualRows = parse(await fs.readFile(path.join(root, research, "services-annual.csv")), { columns: true, bom: true }) as Row[];
+  }, 60_000);
   afterAll(async () => { for (const fixture of fixtures) if (fixture.startsWith(path.join(root, ".tmp") + path.sep)) await fs.rm(fixture, { recursive: true, force: true }); });
   async function fixture() {
     await fs.mkdir(path.join(root, ".tmp"), { recursive: true });
@@ -30,16 +39,30 @@ describe("accepted annual services types", () => {
   }
   async function mutateRows(directory: string, change: (rows: Row[]) => void) {
     const filename = path.join(directory, research, "services-annual.csv");
-    const rows = parse(await fs.readFile(filename), { columns: true, bom: true }) as Row[];
+    const rows = annualRows.map(row => ({ ...row }));
     change(rows); const fields = Object.keys(rows[0]);
     await fs.writeFile(filename, serializeBomCsvRows([fields, ...rows.map(row => fields.map(field => row[field]))]));
     await refresh(directory, "services-annual.csv");
   }
+  it("uses published country totals for both flows and preserves missing counterparts", () => {
+    expect(result.data.entities.find(e => e.id === "partner.2020-2024.826")).toMatchObject({ kind: "country", labelEn: "United Kingdom" });
+    for (const [year, value] of [[2022, "32357843.120000005"], [2024, "96175488.549999951"]] as const) {
+      expect(result.data.facts.find(f => f.entityId === "partner.2020-2024.826" && f.year === year && f.indicatorId === "trade.imports")).toMatchObject({ valueUsd: value, sourceId: "geostat_services_georgian-imports-of-services-by-countries" });
+    }
+    expect(result.data.facts.some(f => f.entityId === "partner.2020-2024.826" && f.indicatorId === "trade.exports")).toBe(true);
+    const mongolia = result.data.facts.filter(f => f.entityId === "partner.2020-2024.496" && f.year === 2020);
+    expect(mongolia.find(f => f.indicatorId === "trade.imports")).toMatchObject({ valueUsd: null, sourceValue: "-", valueStatus: "not_applicable" });
+    expect(mongolia.some(f => f.role === "derived")).toBe(false);
+    const comoros = result.data.facts.filter(f => f.entityId === "partner.2020-2024.174");
+    expect(comoros).toHaveLength(5);
+    expect(comoros.every(f => f.indicatorId === "trade.exports")).toBe(true);
+    expect(result.report).toMatchObject({ countrySourcePolicy: "published_country_totals", outsideScopeHoldCount: 2 });
+  });
   it("preserves the independently reviewed counts, precise national amount and published dash", () => {
-    expect(result.data.entities).toHaveLength(13);
-    expect(result.data.facts).toHaveLength(258);
-    expect(result.report.primaryObservations).toBe(130);
-    expect(result.report.derivedObservations).toBe(128);
+    expect(result.data.entities).toHaveLength(166);
+    expect(result.data.facts).toHaveLength(2557);
+    expect(result.report.primaryObservations).toBe(1415);
+    expect(result.report.derivedObservations).toBe(1142);
     expect(result.report.outsideScopeHoldCount).toBe(2);
     const totalExports2024 = result.data.facts.find(f => f.entityId === "services.total" && f.year === 2024 && f.indicatorId === "trade.exports")!;
     expect(totalExports2024.valueUsd).toBe("7706284984.7599976");
@@ -47,10 +70,10 @@ describe("accepted annual services types", () => {
     expect(repair.find(f => f.indicatorId === "trade.exports")).toMatchObject({ valueUsd: null, sourceValue: "-", valueStatus: "not_applicable" });
     expect(repair.filter(f => f.role === "derived")).toHaveLength(0);
     expect(result.data.facts.filter(f => f.entityId === "services.total")).toHaveLength(20);
-    expect(result.data.facts.filter(f => f.entityId !== "services.total")).toHaveLength(238);
+    expect(result.data.facts.filter(f => result.data.entities.find(e => e.id === f.entityId)?.kind === "service_type")).toHaveLength(238);
     expect(result.report.years).toEqual([2020, 2021, 2022, 2023, 2024]);
-    expect(Object.keys(result.report.sourceSha256).sort()).toEqual(["geostat_services_georgian-exports-of-services-by-types", "geostat_services_georgian-imports-of-services-by-types"]);
-    expect(result.data.entities.every(e => ["national", "service_type"].includes(e.kind) && e.id.startsWith("services."))).toBe(true);
+    expect(Object.keys(result.report.sourceSha256).sort()).toEqual(["geostat_services_georgian-exports-of-services-by-countries", "geostat_services_georgian-exports-of-services-by-types", "geostat_services_georgian-imports-of-services-by-countries", "geostat_services_georgian-imports-of-services-by-types"]);
+    expect(result.data.entities.every(e => ["national", "service_type", "country", "residual"].includes(e.kind))).toBe(true);
     expect(result.report.researchPackageStatus).toBe("requires_source_resolution");
     expect(result.report.outsideScopeHolds.map(h => [h.year, h.status, h.item_id])).toEqual([["2022", "fail", "partner.2020-2024.826"], ["2024", "fail", "partner.2020-2024.826"]]);
   });
@@ -58,7 +81,7 @@ describe("accepted annual services types", () => {
     const sums = ["1581909003.41000031132", "2550384057.07000188342", "5705111931.7386012421", "7061808375.2399975591", "7706284984.7600001411", "1455905286.6499996264", "1822270146.0600014751", "3028876282.600000906", "3618913901.1500015797", "3814814493.90999816404"];
     const D = Decimal.clone({ precision: 50 });
     for (const [flowIndex, indicatorId] of ["trade.exports", "trade.imports"].entries()) for (const [yearIndex, year] of result.report.years.entries()) {
-      const sum = result.data.facts.filter(f => f.entityId !== "services.total" && f.year === year && f.indicatorId === indicatorId && f.valueUsd !== null).reduce((sum, f) => sum.plus(f.valueUsd!), new D(0));
+      const sum = result.data.facts.filter(f => result.data.entities.find(e => e.id === f.entityId)?.kind === "service_type" && f.year === year && f.indicatorId === indicatorId && f.valueUsd !== null).reduce((sum, f) => sum.plus(f.valueUsd!), new D(0));
       expect(sum.toFixed()).toBe(sums[flowIndex * 5 + yearIndex]);
     }
   });
@@ -88,7 +111,7 @@ describe("accepted annual services types", () => {
       else if (mutation === "rounded") { row.value_usd = "7706284984.76"; row.source_value = "7706284.98476"; }
       else { const dash = rows.find(r => r.dimension === "type" && r.value_status === "not_applicable")!; dash.source_value = "0"; dash.value_usd = "0"; dash.value_status = "numeric"; }
     });
-    await expect(buildTradeServicesData(directory)).rejects.toThrow(/coverage|inventory|source|cell|metadata|conversion/i);
+    await expect(buildTradeServicesData(directory, parsed)).rejects.toThrow(/coverage|inventory|source|cell|metadata|conversion/i);
   }, 60_000);
   it.each(["original", "inventory", "stale input", "affected hold"])("rejects changed %s", async mutation => {
     const directory = await fixture();
@@ -103,16 +126,26 @@ describe("accepted annual services types", () => {
       report.input_sha256["unresolved-source-issues.json"] = hash(await fs.readFile(filename)); report.unresolved_source_issues = issues.issues;
       await fs.writeFile(reportFile, JSON.stringify(report)); await refresh(directory, "prepared-validation.json");
     }
-    await expect(buildTradeServicesData(directory)).rejects.toThrow(/hash|fingerprint|hold|source|inventory/i);
+    await expect(buildTradeServicesData(directory, parsed)).rejects.toThrow(/hash|fingerprint|hold|source|inventory/i);
+  }, 60_000);
+  it.each(["omitted country", "joint amount", "country dash as zero"])("rejects %s after refreshing the input fingerprint", async mutation => {
+    const directory = await fixture();
+    await mutateRows(directory, rows => {
+      const index = rows.findIndex(r => r.dimension === "country" && r.item_id === "partner.2020-2024.826" && r.year === "2024" && r.flow === "import");
+      if (mutation === "omitted country") rows.splice(index, 1);
+      else if (mutation === "joint amount") { rows[index].value_usd = "96555372.41999999725"; rows[index].source_value = "96555.37241999999725"; }
+      else { const dash = rows.find(r => r.dimension === "country" && r.value_status === "not_applicable")!; dash.value_usd = "0"; dash.source_value = "0"; dash.value_status = "numeric"; }
+    });
+    await expect(buildTradeServicesData(directory, parsed)).rejects.toThrow(/coverage|inventory|source|cell|conversion/i);
   }, 60_000);
   it("writes BOM bytes and checks deterministic artifacts without accepting the wider package", async () => {
     const directory = await fixture();
-    await prepareTradeServicesData(directory, "write");
+    await prepareTradeServicesData(directory, "write", parsed);
     const filename = path.join(directory, "data/imports/trade-services-annual.csv"), bytes = await fs.readFile(filename);
     expect([...bytes.subarray(0, 3)]).toEqual([239, 187, 191]);
     expect(bytes.toString()).toBe(tradeServicesCsv(result.data));
-    await prepareTradeServicesData(directory, "check");
+    await prepareTradeServicesData(directory, "check", parsed);
     await fs.appendFile(filename, "\n");
-    await expect(prepareTradeServicesData(directory, "check")).rejects.toThrow(/stale/i);
+    await expect(prepareTradeServicesData(directory, "check", parsed)).rejects.toThrow(/stale/i);
   }, 60_000);
 });

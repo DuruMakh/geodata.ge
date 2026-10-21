@@ -229,4 +229,25 @@ describe("StackedColumnChart", () => {
     // The default keeps one formatter for both.
     expect(markup).toContain("Headline: 1.0");
   });
+
+  it("renders a swatch row when legend is given and nothing when it is not", () => {
+    const legend = [
+      { id: "a", label: "Food", color: "#B3402A" },
+      { id: "b", label: "Communication", color: "#4A707A" },
+      { id: "headline", label: "Headline", color: "#1E1B16" },
+    ];
+    const html = renderGeorgianMarkup(<StackedColumnChart {...props} legend={legend} />);
+    const row = /<ul[^>]*data-testid="stack-chart-legend"[^>]*>.*?<\/ul>/.exec(html)?.[0] ?? "";
+    expect(row.match(/<li/g)).toHaveLength(3);
+    for (const entry of legend) {
+      expect(row).toContain(`>${entry.label}</span>`);
+      expect(row).toContain(`background-color:${entry.color}`);
+    }
+    // The key sits above the plot.
+    expect(html.indexOf("stack-chart-legend")).toBeLessThan(html.indexOf('data-testid="stack-chart-frame"'));
+    // Without it the chart is exactly what it was.
+    expect(markup).not.toContain("stack-chart-legend");
+    expect(html.replace(row, "")).toBe(markup);
+    expect(renderGeorgianMarkup(<StackedColumnChart {...props} legend={[]} />)).toBe(markup);
+  });
 });

@@ -1,6 +1,8 @@
+import { isValidElement, type ReactNode } from "react";
 import { describe, expect, it } from "vitest";
 import { InflationCities } from "../../components/inflation/inflation-cities";
-import { packCityFacts } from "../../lib/explorer/inflationCities";
+import { packCityFacts, type PackedCitySeries } from "../../lib/explorer/inflationCities";
+import { renderInflationCities, renderInflationCityPage } from "../../lib/pages/inflation-cities";
 import { GEORGIA_VIEW } from "../../lib/explorer/inflationCityRoutes";
 import common from "../../lib/i18n/messages/ka/common.json";
 import controls from "../../lib/i18n/messages/ka/controls.json";
@@ -83,5 +85,33 @@ describe("InflationCities — city page", () => {
     expect(block(indicators, "inflation-city-category-hero")).toContain("ბათუმი");
     expect(indicators).toContain("ყველაზე გაძვირებული");
     expect(indicators).toContain("ინფლაციის სიგანე");
+  });
+});
+
+// Moved from inflation-cities.spec.ts: over the served data, the pages ship the
+// annual rate (and the 12-month average) and never the monthly rate.
+/** The packed facts the page hands to the client InflationCities component. */
+function shippedFacts(node: ReactNode): PackedCitySeries[] | null {
+  if (Array.isArray(node)) {
+    for (const child of node) {
+      const found = shippedFacts(child);
+      if (found) return found;
+    }
+    return null;
+  }
+  if (!isValidElement(node)) return null;
+  const props = node.props as { facts?: PackedCitySeries[]; children?: ReactNode };
+  if (node.type === InflationCities) return props.facts ?? null;
+  return shippedFacts(props.children);
+}
+
+describe("served city page payloads", () => {
+  it.each([
+    ["the Georgia page", () => renderInflationCities("ka")],
+    ["the Batumi page", () => renderInflationCityPage("batumi", "ka")],
+  ] as const)("%s carries yoy_pct and never mom_pct", async (_name, render) => {
+    const keys = shippedFacts(await render())!.map((series) => series.k);
+    expect(keys.some((key) => key.endsWith("|yoy_pct"))).toBe(true);
+    expect(keys.some((key) => key.endsWith("|mom_pct"))).toBe(false);
   });
 });

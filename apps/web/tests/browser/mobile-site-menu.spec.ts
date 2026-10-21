@@ -12,25 +12,17 @@ for (const locale of ["ka", "en"] as const) {
       await expect(header.getByRole("navigation")).toBeHidden();
       await expect(header.getByRole("group")).toBeHidden();
       expect((await header.boundingBox())!.height).toBeLessThanOrEqual(64);
-      if (width === 390) {
-        await page.evaluate(() => window.scrollTo(0, 0));
-        await page.screenshot({ path: `../../.tmp/bilingual/mobile-menu-${locale}-closed.png` });
-      }
       await toggle.focus();
       await page.keyboard.press("Enter");
       await expect(toggle).toHaveAttribute("aria-expanded", "true");
       const nav = header.getByRole("navigation", { includeHidden: false });
-      // მთავარი, the five datasets (in place of the single budget-only data link), AI, მიზანი.
-      await expect(nav.getByRole("link")).toHaveCount(8);
+      // მთავარი, the twenty dataset hubs (in place of the single budget-only data link), AI, მიზანი.
+      await expect(nav.getByRole("link")).toHaveCount(23);
       await expect(nav.getByRole("link").first()).toHaveAttribute("aria-current", "page");
       const languages = header.getByRole("group");
       await expect(languages).toBeVisible();
       await expect(languages).toContainText("KA");
       await expect(languages).toContainText("EN");
-      if (width === 390) {
-        await page.evaluate(() => window.scrollTo(0, 0));
-        await page.screenshot({ path: `../../.tmp/bilingual/mobile-menu-${locale}-open.png` });
-      }
       await page.keyboard.press("Tab");
       await expect(nav.getByRole("link").first()).toBeFocused();
       await page.keyboard.press("Escape");
@@ -55,7 +47,6 @@ for (const locale of ["ka", "en"] as const) {
       const nav = (await header.getByRole("navigation").boundingBox())!;
       expect(Math.abs(nav.x + nav.width / 2 - box.x - box.width / 2)).toBeLessThan(1);
     }
-    await page.screenshot({ path: `../../.tmp/bilingual/mobile-menu-${locale}-desktop.png` });
     await page.setViewportSize({ width: 390, height: 900 });
     await header.getByRole("button").click();
     await expect(header.getByRole("button")).toHaveAttribute("aria-expanded", "true");
@@ -65,3 +56,64 @@ for (const locale of ["ka", "en"] as const) {
     await expect(header.getByRole("group")).toBeHidden();
   });
 }
+
+test("shared brand identity uses the full desktop lockup, the standalone mobile symbol and the compact footer logo", async ({ page, request }) => {
+  for (const viewport of [
+    { width: 1440, height: 900, asset: "fiscal-logo-horizontal.svg", minimumWidth: 280 },
+    { width: 900, height: 900, asset: "fiscal-logo-horizontal.svg", minimumWidth: 280 },
+    { width: 768, height: 900, asset: "icon.svg", minimumWidth: 44 },
+    { width: 767, height: 900, asset: "icon.svg", minimumWidth: 44 },
+    { width: 390, height: 844, asset: "icon.svg", minimumWidth: 44 },
+  ] as const) {
+    await page.setViewportSize(viewport);
+    await page.goto("/");
+    const logo = page.getByTestId("site-header-logo");
+    await expect(logo).toBeVisible();
+    const currentSrc = await logo.evaluate((image: HTMLImageElement) => image.currentSrc);
+    expect(currentSrc).toContain(viewport.asset);
+    const assetResponse = await request.get(currentSrc);
+    expect(assetResponse.status()).toBe(200);
+    expect(assetResponse.headers()["content-type"]).toMatch(/^image\/svg\+xml/);
+    await expect.poll(() => logo.evaluate((image: HTMLImageElement) => image.naturalWidth)).toBeGreaterThan(0);
+    expect((await logo.boundingBox())?.width ?? 0).toBeGreaterThanOrEqual(viewport.minimumWidth);
+    await expect(page.getByTestId("landing-header").getByRole("link", { name: "Fiscal.ge — მთავარი", exact: true })).toHaveCount(1);
+    await expect(logo).toHaveAttribute("alt", "");
+  }
+
+  // The shared footer uses the compact logo as its home link.
+  const footer = page.getByTestId("site-footer");
+  await expect(footer.getByTestId("site-footer-logo")).toHaveAttribute("src", "/brand/fiscal-logo-compact.svg");
+  await expect(footer.getByRole("link", { name: "Fiscal.ge — მთავარი", exact: true })).toHaveCount(1);
+});
+
+test.describe("explorer data sidebar", () => {
+  test.use({ viewport: { width: 390, height: 844 } });
+
+  test("tapping the current page closes the menu", async ({ page }) => {
+    // Budget's hub, a dataset hub and a section page: the link to the page you are on must still close the sheet.
+    for (const path of ["/explorer", "/en/explorer/economy", "/explorer/economy/gdp"]) {
+      await page.goto(path);
+      const toggle = page.getByTestId("sidebar-toggle");
+      // Hubs do not mark data-app-ready; the toggle names the sheet it controls once hydrated below 900px.
+      await expect(toggle).toHaveAttribute("aria-controls", "data-sidebar-navigation");
+      await toggle.click();
+      await expect(toggle).toHaveAttribute("aria-expanded", "true");
+      await page.locator(`#data-sidebar-navigation nav a[href="${path}"]`).click();
+      await expect(toggle, path).toHaveAttribute("aria-expanded", "false");
+      await expect(page.locator("#data-sidebar-navigation")).toBeHidden();
+      expect(new URL(page.url()).pathname).toBe(path);
+    }
+  });
+
+  test("Budget is current on /explorer", async ({ page }) => {
+    for (const prefix of ["", "/en"]) {
+      await page.goto(`${prefix}/explorer`);
+      const budget = page.locator(`#data-sidebar-navigation nav a[href="${prefix}/explorer"]`);
+      await expect(budget).toHaveAttribute("aria-current", "page");
+      await expect(page.locator('#data-sidebar-navigation nav a[aria-current="page"]')).toHaveCount(1);
+      // A section page is current in its own right; Budget then only stays highlighted.
+      await page.goto(`${prefix}/explorer/expenditure`);
+      await expect(page.locator(`#data-sidebar-navigation nav a[href="${prefix}/explorer"]`)).not.toHaveAttribute("aria-current", "page");
+    }
+  });
+});

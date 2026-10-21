@@ -1,0 +1,2420 @@
+{
+  "status": "PASS",
+  "reviewedAt": "2026-10-20",
+  "capturedOn": "2026-10-20",
+  "counts": {
+    "nominal": 256,
+    "share_of_gdp": 256,
+    "real_growth": 210
+  },
+  "preliminaryYears": [
+    2025
+  ],
+  "identityToleranceGel": "0.01",
+  "growthCheckTolerancePercentagePoints": "0.0000000001",
+  "notServed": "Net acquisition of valuables (Geostat prints …), growth of change in inventories (x), quarterly and 2026 columns, GDP at basic prices, product taxes and subsidies.",
+  "sourceHashes": {
+    "docs/Raw Data/Economy/gdp-expenditure/sources/08_GDP-by-use-categories.xlsx": "d5455e69eff2f37164441192de30b2cf62c9d4521dd4f03ca9c2c4e199dddf96",
+    "docs/Raw Data/Economy/gdp-expenditure/sources/09_Real-GDP-growth-by-categories-of-use.xlsx": "584d67a7cc9d71cb469a0a520c716eebcbe45bd438ace7aceb3b59975961db95",
+    "docs/Raw Data/Economy/gdp-expenditure/sources/10_GDP-by-categories-of-use-at-constant-prices.xlsx": "2d46069b6731492212c293823df36783aac659462e52673cc7ed34a5bb12ba6a"
+  },
+  "sources": [
+    {
+      "role": "nominal",
+      "sourceId": "source.geostat_gdp_use_current",
+      "file": "docs/Raw Data/Economy/gdp-expenditure/sources/08_GDP-by-use-categories.xlsx",
+      "originalFilename": "08_GDP-by-use-categories.xlsx",
+      "url": "https://www.geostat.ge/media/83012/08_GDP-by-use-categories.xlsx",
+      "sha256": "d5455e69eff2f37164441192de30b2cf62c9d4521dd4f03ca9c2c4e199dddf96",
+      "bytes": 40966,
+      "releasedAt": "2026-09-28",
+      "sheet": "GDP by categories of USE",
+      "unit": "million_gel",
+      "annualYears": [
+        2010,
+        2011,
+        2012,
+        2013,
+        2014,
+        2015,
+        2016,
+        2017,
+        2018,
+        2019,
+        2020,
+        2021,
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "firstAnnualColumn": "G",
+      "lastAnnualColumn": "CD",
+      "preliminaryYears": [
+        2025
+      ],
+      "notes": [
+        "* Revised data will be published on November 13, 2026.",
+        "Last update: 28.09.2026"
+      ]
+    },
+    {
+      "role": "growth",
+      "sourceId": "source.geostat_gdp_use_growth",
+      "file": "docs/Raw Data/Economy/gdp-expenditure/sources/09_Real-GDP-growth-by-categories-of-use.xlsx",
+      "originalFilename": "09_Real-GDP-growth-by-categories-of-use.xlsx",
+      "url": "https://www.geostat.ge/media/83016/09_Real-GDP-growth-by-categories-of-use.xlsx",
+      "sha256": "584d67a7cc9d71cb469a0a520c716eebcbe45bd438ace7aceb3b59975961db95",
+      "bytes": 21303,
+      "releasedAt": "2026-09-28",
+      "sheet": "Real GDP growth_USE category",
+      "unit": "previous_year_100_index",
+      "conversion": "subtract 100 using decimal arithmetic",
+      "annualYears": [
+        2011,
+        2012,
+        2013,
+        2014,
+        2015,
+        2016,
+        2017,
+        2018,
+        2019,
+        2020,
+        2021,
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "firstAnnualColumn": "C",
+      "lastAnnualColumn": "AO",
+      "preliminaryYears": [
+        2025
+      ],
+      "notes": [
+        "* Revised data will be published on November 13, 2026.",
+        "Last update: 28.09.2026"
+      ]
+    },
+    {
+      "role": "growth_validation",
+      "sourceId": "source.geostat_gdp_use_volume",
+      "file": "docs/Raw Data/Economy/gdp-expenditure/sources/10_GDP-by-categories-of-use-at-constant-prices.xlsx",
+      "originalFilename": "10_GDP-by-categories-of-use-at-constant-prices.xlsx",
+      "url": "https://www.geostat.ge/media/83014/10_GDP-by-categories-of-use-at-constant-prices.xlsx",
+      "sha256": "2d46069b6731492212c293823df36783aac659462e52673cc7ed34a5bb12ba6a",
+      "bytes": 22044,
+      "releasedAt": "2026-09-28",
+      "sheet": "GDP by USE side_2019 prices",
+      "unit": "million_gel_constant_2019",
+      "annualYears": [
+        2010,
+        2011,
+        2012,
+        2013,
+        2014,
+        2015,
+        2016,
+        2017,
+        2018,
+        2019,
+        2020,
+        2021,
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "firstAnnualColumn": "C",
+      "lastAnnualColumn": "AP",
+      "preliminaryYears": [
+        2025
+      ],
+      "notes": [
+        "* Revised data will be published on November 13, 2026.",
+        "Last update: 28.09.2026"
+      ]
+    }
+  ],
+  "identities": [
+    {
+      "year": 2010,
+      "gdpByUseDifferenceGel": "0.000005",
+      "gdpCheckRowDifferenceGel": "0.000003",
+      "sectorsGdpDifferenceGel": "0",
+      "consumptionDifferenceGel": "-0.00000121",
+      "governmentDifferenceGel": "-0.00000004",
+      "investmentDifferenceGel": "0",
+      "exportsDifferenceGel": "-0.0000005",
+      "importsDifferenceGel": "0.0000008"
+    },
+    {
+      "year": 2011,
+      "gdpByUseDifferenceGel": "-0.0000046",
+      "gdpCheckRowDifferenceGel": "-0.000003",
+      "sectorsGdpDifferenceGel": "0",
+      "consumptionDifferenceGel": "0.00000262",
+      "governmentDifferenceGel": "0.0000004",
+      "investmentDifferenceGel": "0.00000075",
+      "exportsDifferenceGel": "0",
+      "importsDifferenceGel": "-0.0000001"
+    },
+    {
+      "year": 2012,
+      "gdpByUseDifferenceGel": "-0.0000035",
+      "gdpCheckRowDifferenceGel": "0",
+      "sectorsGdpDifferenceGel": "0",
+      "consumptionDifferenceGel": "0.0000003",
+      "governmentDifferenceGel": "-0.0000002",
+      "investmentDifferenceGel": "0.0000006",
+      "exportsDifferenceGel": "-0.0000001",
+      "importsDifferenceGel": "-0.0000017"
+    },
+    {
+      "year": 2013,
+      "gdpByUseDifferenceGel": "0.0000008",
+      "gdpCheckRowDifferenceGel": "0",
+      "sectorsGdpDifferenceGel": "0",
+      "consumptionDifferenceGel": "-0.00000385",
+      "governmentDifferenceGel": "0.0000002",
+      "investmentDifferenceGel": "0.0000001",
+      "exportsDifferenceGel": "0.0000015",
+      "importsDifferenceGel": "0.0000012"
+    },
+    {
+      "year": 2014,
+      "gdpByUseDifferenceGel": "0.0000025",
+      "gdpCheckRowDifferenceGel": "0",
+      "sectorsGdpDifferenceGel": "0",
+      "consumptionDifferenceGel": "0.00000111",
+      "governmentDifferenceGel": "0.0000004",
+      "investmentDifferenceGel": "0.0000009",
+      "exportsDifferenceGel": "-0.0000007",
+      "importsDifferenceGel": "-0.0000022"
+    },
+    {
+      "year": 2015,
+      "gdpByUseDifferenceGel": "-0.0000021",
+      "gdpCheckRowDifferenceGel": "0",
+      "sectorsGdpDifferenceGel": "0",
+      "consumptionDifferenceGel": "0.00000421",
+      "governmentDifferenceGel": "0",
+      "investmentDifferenceGel": "-0.0000017",
+      "exportsDifferenceGel": "0.0000001",
+      "importsDifferenceGel": "-0.0000025"
+    },
+    {
+      "year": 2016,
+      "gdpByUseDifferenceGel": "0",
+      "gdpCheckRowDifferenceGel": "0",
+      "sectorsGdpDifferenceGel": "0",
+      "consumptionDifferenceGel": "-0.00000067",
+      "governmentDifferenceGel": "0",
+      "investmentDifferenceGel": "0.0000004",
+      "exportsDifferenceGel": "-0.0000017",
+      "importsDifferenceGel": "-0.0000008"
+    },
+    {
+      "year": 2017,
+      "gdpByUseDifferenceGel": "0.000009",
+      "gdpCheckRowDifferenceGel": "0",
+      "sectorsGdpDifferenceGel": "0",
+      "consumptionDifferenceGel": "-0.00000254",
+      "governmentDifferenceGel": "0.0000005",
+      "investmentDifferenceGel": "0.0000000175",
+      "exportsDifferenceGel": "0.0000013",
+      "importsDifferenceGel": "0.0000018"
+    },
+    {
+      "year": 2018,
+      "gdpByUseDifferenceGel": "0.000007",
+      "gdpCheckRowDifferenceGel": "0.000008",
+      "sectorsGdpDifferenceGel": "0",
+      "consumptionDifferenceGel": "-0.0000011",
+      "governmentDifferenceGel": "-0.0000004",
+      "investmentDifferenceGel": "0.0000005",
+      "exportsDifferenceGel": "0",
+      "importsDifferenceGel": "0.0000008"
+    },
+    {
+      "year": 2019,
+      "gdpByUseDifferenceGel": "-0.000002",
+      "gdpCheckRowDifferenceGel": "0",
+      "sectorsGdpDifferenceGel": "0",
+      "consumptionDifferenceGel": "-0.0000032",
+      "governmentDifferenceGel": "0.0000004",
+      "investmentDifferenceGel": "0.0000008",
+      "exportsDifferenceGel": "0",
+      "importsDifferenceGel": "-0.0000008"
+    },
+    {
+      "year": 2020,
+      "gdpByUseDifferenceGel": "-0.000019",
+      "gdpCheckRowDifferenceGel": "0",
+      "sectorsGdpDifferenceGel": "0",
+      "consumptionDifferenceGel": "0.0000032",
+      "governmentDifferenceGel": "0.0000004",
+      "investmentDifferenceGel": "0.0000011",
+      "exportsDifferenceGel": "0.000003",
+      "importsDifferenceGel": "0.0000016"
+    },
+    {
+      "year": 2021,
+      "gdpByUseDifferenceGel": "0.000007",
+      "gdpCheckRowDifferenceGel": "0",
+      "sectorsGdpDifferenceGel": "0",
+      "consumptionDifferenceGel": "-0.0000043",
+      "governmentDifferenceGel": "-0.0000005",
+      "investmentDifferenceGel": "-0.000002084",
+      "exportsDifferenceGel": "-0.0000008",
+      "importsDifferenceGel": "0.0000016"
+    },
+    {
+      "year": 2022,
+      "gdpByUseDifferenceGel": "-0.000004",
+      "gdpCheckRowDifferenceGel": "0",
+      "sectorsGdpDifferenceGel": "0",
+      "consumptionDifferenceGel": "-0.000004",
+      "governmentDifferenceGel": "0.0000005",
+      "investmentDifferenceGel": "0.0000008",
+      "exportsDifferenceGel": "0",
+      "importsDifferenceGel": "0.000003"
+    },
+    {
+      "year": 2023,
+      "gdpByUseDifferenceGel": "0.000019",
+      "gdpCheckRowDifferenceGel": "0.000014",
+      "sectorsGdpDifferenceGel": "-0.000015",
+      "consumptionDifferenceGel": "-0.00000313",
+      "governmentDifferenceGel": "0.0000018",
+      "investmentDifferenceGel": "-0.0000038",
+      "exportsDifferenceGel": "0.000003",
+      "importsDifferenceGel": "0.0000041"
+    },
+    {
+      "year": 2024,
+      "gdpByUseDifferenceGel": "-0.000015",
+      "gdpCheckRowDifferenceGel": "-0.000015",
+      "sectorsGdpDifferenceGel": "0.000014",
+      "consumptionDifferenceGel": "0.0000115",
+      "governmentDifferenceGel": "-0.0000005",
+      "investmentDifferenceGel": "-0.0000026",
+      "exportsDifferenceGel": "0",
+      "importsDifferenceGel": "-0.000011"
+    },
+    {
+      "year": 2025,
+      "gdpByUseDifferenceGel": "0.000014",
+      "gdpCheckRowDifferenceGel": "0.00002",
+      "sectorsGdpDifferenceGel": "-0.00001",
+      "consumptionDifferenceGel": "0.0000019",
+      "governmentDifferenceGel": "-0.0000004",
+      "investmentDifferenceGel": "0.0000028",
+      "exportsDifferenceGel": "0",
+      "importsDifferenceGel": "0"
+    }
+  ],
+  "growthChecks": [
+    {
+      "seriesId": "economy.gdp_total",
+      "year": 2011,
+      "publishedIndex": "107.94915853127958",
+      "growthPercent": "7.94915853127958",
+      "calculatedGrowthPercent": "7.94915853127957295517",
+      "differencePercentagePoints": "0.00000000000000704483",
+      "indexLocator": "Real GDP growth_USE category!C18 [2011]",
+      "volumeLocators": "GDP by USE side_2019 prices!D17 [2011]; GDP by USE side_2019 prices!C17 [2010]"
+    },
+    {
+      "seriesId": "gdp_use.consumption",
+      "year": 2011,
+      "publishedIndex": "105.4014039552906",
+      "growthPercent": "5.4014039552906",
+      "calculatedGrowthPercent": "5.40140395529059675347",
+      "differencePercentagePoints": "0.00000000000000324653",
+      "indexLocator": "Real GDP growth_USE category!C3 [2011]",
+      "volumeLocators": "GDP by USE side_2019 prices!D3 [2011]; GDP by USE side_2019 prices!C3 [2010]"
+    },
+    {
+      "seriesId": "gdp_use.households_npish",
+      "year": 2011,
+      "publishedIndex": "108.69290639162126",
+      "growthPercent": "8.69290639162126",
+      "calculatedGrowthPercent": "8.69290639162125504702",
+      "differencePercentagePoints": "0.00000000000000495298",
+      "indexLocator": "Real GDP growth_USE category!C4 [2011]",
+      "volumeLocators": "GDP by USE side_2019 prices!D4 [2011]; GDP by USE side_2019 prices!C4 [2010]"
+    },
+    {
+      "seriesId": "gdp_use.government",
+      "year": 2011,
+      "publishedIndex": "90.467093200462372",
+      "growthPercent": "-9.532906799537628",
+      "calculatedGrowthPercent": "-9.53290679953761927653",
+      "differencePercentagePoints": "-0.00000000000000872347",
+      "indexLocator": "Real GDP growth_USE category!C5 [2011]",
+      "volumeLocators": "GDP by USE side_2019 prices!D5 [2011]; GDP by USE side_2019 prices!C5 [2010]"
+    },
+    {
+      "seriesId": "gdp_use.government_individual",
+      "year": 2011,
+      "publishedIndex": "86.696769514720003",
+      "growthPercent": "-13.303230485279997",
+      "calculatedGrowthPercent": "-13.30323048527999977583",
+      "differencePercentagePoints": "0.00000000000000277583",
+      "indexLocator": "Real GDP growth_USE category!C6 [2011]",
+      "volumeLocators": "GDP by USE side_2019 prices!D6 [2011]; GDP by USE side_2019 prices!C6 [2010]"
+    },
+    {
+      "seriesId": "gdp_use.government_collective",
+      "year": 2011,
+      "publishedIndex": "91.750725315797425",
+      "growthPercent": "-8.249274684202575",
+      "calculatedGrowthPercent": "-8.24927468420257388964",
+      "differencePercentagePoints": "-0.00000000000000111036",
+      "indexLocator": "Real GDP growth_USE category!C7 [2011]",
+      "volumeLocators": "GDP by USE side_2019 prices!D7 [2011]; GDP by USE side_2019 prices!C7 [2010]"
+    },
+    {
+      "seriesId": "gdp_use.investment",
+      "year": 2011,
+      "publishedIndex": "119.12902432789745",
+      "growthPercent": "19.12902432789745",
+      "calculatedGrowthPercent": "19.12902432789745096944",
+      "differencePercentagePoints": "-0.00000000000000096944",
+      "indexLocator": "Real GDP growth_USE category!C8 [2011]",
+      "volumeLocators": "GDP by USE side_2019 prices!D8 [2011]; GDP by USE side_2019 prices!C8 [2010]"
+    },
+    {
+      "seriesId": "gdp_use.fixed_capital",
+      "year": 2011,
+      "publishedIndex": "114.59913852394533",
+      "growthPercent": "14.59913852394533",
+      "calculatedGrowthPercent": "14.59913852394531643051",
+      "differencePercentagePoints": "0.00000000000001356949",
+      "indexLocator": "Real GDP growth_USE category!C9 [2011]",
+      "volumeLocators": "GDP by USE side_2019 prices!D9 [2011]; GDP by USE side_2019 prices!C9 [2010]"
+    },
+    {
+      "seriesId": "gdp_use.exports",
+      "year": 2011,
+      "publishedIndex": "111.64210964100454",
+      "growthPercent": "11.64210964100454",
+      "calculatedGrowthPercent": "11.6421096410045419768",
+      "differencePercentagePoints": "-0.0000000000000019768",
+      "indexLocator": "Real GDP growth_USE category!C12 [2011]",
+      "volumeLocators": "GDP by USE side_2019 prices!D11 [2011]; GDP by USE side_2019 prices!C11 [2010]"
+    },
+    {
+      "seriesId": "gdp_use.exports_goods",
+      "year": 2011,
+      "publishedIndex": "111.19772719150581",
+      "growthPercent": "11.19772719150581",
+      "calculatedGrowthPercent": "11.19772719150581439431",
+      "differencePercentagePoints": "-0.00000000000000439431",
+      "indexLocator": "Real GDP growth_USE category!C13 [2011]",
+      "volumeLocators": "GDP by USE side_2019 prices!D12 [2011]; GDP by USE side_2019 prices!C12 [2010]"
+    },
+    {
+      "seriesId": "gdp_use.exports_services",
+      "year": 2011,
+      "publishedIndex": "112.29026241845548",
+      "growthPercent": "12.29026241845548",
+      "calculatedGrowthPercent": "12.29026241845550010533",
+      "differencePercentagePoints": "-0.00000000000002010533",
+      "indexLocator": "Real GDP growth_USE category!C14 [2011]",
+      "volumeLocators": "GDP by USE side_2019 prices!D13 [2011]; GDP by USE side_2019 prices!C13 [2010]"
+    },
+    {
+      "seriesId": "gdp_use.imports",
+      "year": 2011,
+      "publishedIndex": "110.18041964959819",
+      "growthPercent": "10.18041964959819",
+      "calculatedGrowthPercent": "10.18041964959819506284",
+      "differencePercentagePoints": "-0.00000000000000506284",
+      "indexLocator": "Real GDP growth_USE category!C15 [2011]",
+      "volumeLocators": "GDP by USE side_2019 prices!D14 [2011]; GDP by USE side_2019 prices!C14 [2010]"
+    },
+    {
+      "seriesId": "gdp_use.imports_goods",
+      "year": 2011,
+      "publishedIndex": "112.2177166651072",
+      "growthPercent": "12.2177166651072",
+      "calculatedGrowthPercent": "12.21771666510720792367",
+      "differencePercentagePoints": "-0.00000000000000792367",
+      "indexLocator": "Real GDP growth_USE category!C16 [2011]",
+      "volumeLocators": "GDP by USE side_2019 prices!D15 [2011]; GDP by USE side_2019 prices!C15 [2010]"
+    },
+    {
+      "seriesId": "gdp_use.imports_services",
+      "year": 2011,
+      "publishedIndex": "100.81674857126571",
+      "growthPercent": "0.81674857126571",
+      "calculatedGrowthPercent": "0.81674857126570349775",
+      "differencePercentagePoints": "0.00000000000000650225",
+      "indexLocator": "Real GDP growth_USE category!C17 [2011]",
+      "volumeLocators": "GDP by USE side_2019 prices!D16 [2011]; GDP by USE side_2019 prices!C16 [2010]"
+    },
+    {
+      "seriesId": "economy.gdp_total",
+      "year": 2012,
+      "publishedIndex": "106.57903969286875",
+      "growthPercent": "6.57903969286875",
+      "calculatedGrowthPercent": "6.57903969286873488678",
+      "differencePercentagePoints": "0.00000000000001511322",
+      "indexLocator": "Real GDP growth_USE category!D18 [2012]",
+      "volumeLocators": "GDP by USE side_2019 prices!E17 [2012]; GDP by USE side_2019 prices!D17 [2011]"
+    },
+    {
+      "seriesId": "gdp_use.consumption",
+      "year": 2012,
+      "publishedIndex": "106.00231626768736",
+      "growthPercent": "6.00231626768736",
+      "calculatedGrowthPercent": "6.00231626768737484745",
+      "differencePercentagePoints": "-0.00000000000001484745",
+      "indexLocator": "Real GDP growth_USE category!D3 [2012]",
+      "volumeLocators": "GDP by USE side_2019 prices!E3 [2012]; GDP by USE side_2019 prices!D3 [2011]"
+    },
+    {
+      "seriesId": "gdp_use.households_npish",
+      "year": 2012,
+      "publishedIndex": "107.33578645741562",
+      "growthPercent": "7.33578645741562",
+      "calculatedGrowthPercent": "7.33578645741562343639",
+      "differencePercentagePoints": "-0.00000000000000343639",
+      "indexLocator": "Real GDP growth_USE category!D4 [2012]",
+      "volumeLocators": "GDP by USE side_2019 prices!E4 [2012]; GDP by USE side_2019 prices!D4 [2011]"
+    },
+    {
+      "seriesId": "gdp_use.government",
+      "year": 2012,
+      "publishedIndex": "99.213970693656393",
+      "growthPercent": "-0.786029306343607",
+      "calculatedGrowthPercent": "-0.78602930634361543003",
+      "differencePercentagePoints": "0.00000000000000843003",
+      "indexLocator": "Real GDP growth_USE category!D5 [2012]",
+      "volumeLocators": "GDP by USE side_2019 prices!E5 [2012]; GDP by USE side_2019 prices!D5 [2011]"
+    },
+    {
+      "seriesId": "gdp_use.government_individual",
+      "year": 2012,
+      "publishedIndex": "95.980474103387735",
+      "growthPercent": "-4.019525896612265",
+      "calculatedGrowthPercent": "-4.01952589661226161322",
+      "differencePercentagePoints": "-0.00000000000000338678",
+      "indexLocator": "Real GDP growth_USE category!D6 [2012]",
+      "volumeLocators": "GDP by USE side_2019 prices!E6 [2012]; GDP by USE side_2019 prices!D6 [2011]"
+    },
+    {
+      "seriesId": "gdp_use.government_collective",
+      "year": 2012,
+      "publishedIndex": "100.35303961087595",
+      "growthPercent": "0.35303961087595",
+      "calculatedGrowthPercent": "0.35303961087595338197",
+      "differencePercentagePoints": "-0.00000000000000338197",
+      "indexLocator": "Real GDP growth_USE category!D7 [2012]",
+      "volumeLocators": "GDP by USE side_2019 prices!E7 [2012]; GDP by USE side_2019 prices!D7 [2011]"
+    },
+    {
+      "seriesId": "gdp_use.investment",
+      "year": 2012,
+      "publishedIndex": "111.15199227994839",
+      "growthPercent": "11.15199227994839",
+      "calculatedGrowthPercent": "11.15199227994839113434",
+      "differencePercentagePoints": "-0.00000000000000113434",
+      "indexLocator": "Real GDP growth_USE category!D8 [2012]",
+      "volumeLocators": "GDP by USE side_2019 prices!E8 [2012]; GDP by USE side_2019 prices!D8 [2011]"
+    },
+    {
+      "seriesId": "gdp_use.fixed_capital",
+      "year": 2012,
+      "publishedIndex": "105.41278007537547",
+      "growthPercent": "5.41278007537547",
+      "calculatedGrowthPercent": "5.4127800753754569568",
+      "differencePercentagePoints": "0.0000000000000130432",
+      "indexLocator": "Real GDP growth_USE category!D9 [2012]",
+      "volumeLocators": "GDP by USE side_2019 prices!E9 [2012]; GDP by USE side_2019 prices!D9 [2011]"
+    },
+    {
+      "seriesId": "gdp_use.exports",
+      "year": 2012,
+      "publishedIndex": "109.34345639076932",
+      "growthPercent": "9.34345639076932",
+      "calculatedGrowthPercent": "9.34345639076932644383",
+      "differencePercentagePoints": "-0.00000000000000644383",
+      "indexLocator": "Real GDP growth_USE category!D12 [2012]",
+      "volumeLocators": "GDP by USE side_2019 prices!E11 [2012]; GDP by USE side_2019 prices!D11 [2011]"
+    },
+    {
+      "seriesId": "gdp_use.exports_goods",
+      "year": 2012,
+      "publishedIndex": "102.49102006464035",
+      "growthPercent": "2.49102006464035",
+      "calculatedGrowthPercent": "2.4910200646403487952",
+      "differencePercentagePoints": "0.0000000000000012048",
+      "indexLocator": "Real GDP growth_USE category!D13 [2012]",
+      "volumeLocators": "GDP by USE side_2019 prices!E12 [2012]; GDP by USE side_2019 prices!D12 [2011]"
+    },
+    {
+      "seriesId": "gdp_use.exports_services",
+      "year": 2012,
+      "publishedIndex": "120.28252528830758",
+      "growthPercent": "20.28252528830758",
+      "calculatedGrowthPercent": "20.2825252883075824559",
+      "differencePercentagePoints": "-0.0000000000000024559",
+      "indexLocator": "Real GDP growth_USE category!D14 [2012]",
+      "volumeLocators": "GDP by USE side_2019 prices!E13 [2012]; GDP by USE side_2019 prices!D13 [2011]"
+    },
+    {
+      "seriesId": "gdp_use.imports",
+      "year": 2012,
+      "publishedIndex": "109.38458894180118",
+      "growthPercent": "9.38458894180118",
+      "calculatedGrowthPercent": "9.38458894180118728842",
+      "differencePercentagePoints": "-0.00000000000000728842",
+      "indexLocator": "Real GDP growth_USE category!D15 [2012]",
+      "volumeLocators": "GDP by USE side_2019 prices!E14 [2012]; GDP by USE side_2019 prices!D14 [2011]"
+    },
+    {
+      "seriesId": "gdp_use.imports_goods",
+      "year": 2012,
+      "publishedIndex": "108.61825908569891",
+      "growthPercent": "8.61825908569891",
+      "calculatedGrowthPercent": "8.61825908569891181934",
+      "differencePercentagePoints": "-0.00000000000000181934",
+      "indexLocator": "Real GDP growth_USE category!D16 [2012]",
+      "volumeLocators": "GDP by USE side_2019 prices!E15 [2012]; GDP by USE side_2019 prices!D15 [2011]"
+    },
+    {
+      "seriesId": "gdp_use.imports_services",
+      "year": 2012,
+      "publishedIndex": "113.45641040443736",
+      "growthPercent": "13.45641040443736",
+      "calculatedGrowthPercent": "13.45641040443735215777",
+      "differencePercentagePoints": "0.00000000000000784223",
+      "indexLocator": "Real GDP growth_USE category!D17 [2012]",
+      "volumeLocators": "GDP by USE side_2019 prices!E16 [2012]; GDP by USE side_2019 prices!D16 [2011]"
+    },
+    {
+      "seriesId": "economy.gdp_total",
+      "year": 2013,
+      "publishedIndex": "105.13355465853913",
+      "growthPercent": "5.13355465853913",
+      "calculatedGrowthPercent": "5.13355465853911872506",
+      "differencePercentagePoints": "0.00000000000001127494",
+      "indexLocator": "Real GDP growth_USE category!E18 [2013]",
+      "volumeLocators": "GDP by USE side_2019 prices!F17 [2013]; GDP by USE side_2019 prices!E17 [2012]"
+    },
+    {
+      "seriesId": "gdp_use.consumption",
+      "year": 2013,
+      "publishedIndex": "102.78498681603172",
+      "growthPercent": "2.78498681603172",
+      "calculatedGrowthPercent": "2.78498681603171445079",
+      "differencePercentagePoints": "0.00000000000000554921",
+      "indexLocator": "Real GDP growth_USE category!E3 [2013]",
+      "volumeLocators": "GDP by USE side_2019 prices!F3 [2013]; GDP by USE side_2019 prices!E3 [2012]"
+    },
+    {
+      "seriesId": "gdp_use.households_npish",
+      "year": 2013,
+      "publishedIndex": "102.11373768041886",
+      "growthPercent": "2.11373768041886",
+      "calculatedGrowthPercent": "2.11373768041885436659",
+      "differencePercentagePoints": "0.00000000000000563341",
+      "indexLocator": "Real GDP growth_USE category!E4 [2013]",
+      "volumeLocators": "GDP by USE side_2019 prices!F4 [2013]; GDP by USE side_2019 prices!E4 [2012]"
+    },
+    {
+      "seriesId": "gdp_use.government",
+      "year": 2013,
+      "publishedIndex": "106.51679101774994",
+      "growthPercent": "6.51679101774994",
+      "calculatedGrowthPercent": "6.51679101774993381482",
+      "differencePercentagePoints": "0.00000000000000618518",
+      "indexLocator": "Real GDP growth_USE category!E5 [2013]",
+      "volumeLocators": "GDP by USE side_2019 prices!F5 [2013]; GDP by USE side_2019 prices!E5 [2012]"
+    },
+    {
+      "seriesId": "gdp_use.government_individual",
+      "year": 2013,
+      "publishedIndex": "106.58840643058394",
+      "growthPercent": "6.58840643058394",
+      "calculatedGrowthPercent": "6.58840643058394576163",
+      "differencePercentagePoints": "-0.00000000000000576163",
+      "indexLocator": "Real GDP growth_USE category!E6 [2013]",
+      "volumeLocators": "GDP by USE side_2019 prices!F6 [2013]; GDP by USE side_2019 prices!E6 [2012]"
+    },
+    {
+      "seriesId": "gdp_use.government_collective",
+      "year": 2013,
+      "publishedIndex": "106.49191145294894",
+      "growthPercent": "6.49191145294894",
+      "calculatedGrowthPercent": "6.49191145294894307254",
+      "differencePercentagePoints": "-0.00000000000000307254",
+      "indexLocator": "Real GDP growth_USE category!E7 [2013]",
+      "volumeLocators": "GDP by USE side_2019 prices!F7 [2013]; GDP by USE side_2019 prices!E7 [2012]"
+    },
+    {
+      "seriesId": "gdp_use.investment",
+      "year": 2013,
+      "publishedIndex": "87.119639433127887",
+      "growthPercent": "-12.880360566872113",
+      "calculatedGrowthPercent": "-12.88036056687211578464",
+      "differencePercentagePoints": "0.00000000000000278464",
+      "indexLocator": "Real GDP growth_USE category!E8 [2013]",
+      "volumeLocators": "GDP by USE side_2019 prices!F8 [2013]; GDP by USE side_2019 prices!E8 [2012]"
+    },
+    {
+      "seriesId": "gdp_use.fixed_capital",
+      "year": 2013,
+      "publishedIndex": "89.187371622769078",
+      "growthPercent": "-10.812628377230922",
+      "calculatedGrowthPercent": "-10.81262837723092024758",
+      "differencePercentagePoints": "-0.00000000000000175242",
+      "indexLocator": "Real GDP growth_USE category!E9 [2013]",
+      "volumeLocators": "GDP by USE side_2019 prices!F9 [2013]; GDP by USE side_2019 prices!E9 [2012]"
+    },
+    {
+      "seriesId": "gdp_use.exports",
+      "year": 2013,
+      "publishedIndex": "115.45846970474958",
+      "growthPercent": "15.45846970474958",
+      "calculatedGrowthPercent": "15.45846970474958376272",
+      "differencePercentagePoints": "-0.00000000000000376272",
+      "indexLocator": "Real GDP growth_USE category!E12 [2013]",
+      "volumeLocators": "GDP by USE side_2019 prices!F11 [2013]; GDP by USE side_2019 prices!E11 [2012]"
+    },
+    {
+      "seriesId": "gdp_use.exports_goods",
+      "year": 2013,
+      "publishedIndex": "116.20592361235471",
+      "growthPercent": "16.20592361235471",
+      "calculatedGrowthPercent": "16.20592361235471073386",
+      "differencePercentagePoints": "-0.00000000000000073386",
+      "indexLocator": "Real GDP growth_USE category!E13 [2013]",
+      "volumeLocators": "GDP by USE side_2019 prices!F12 [2013]; GDP by USE side_2019 prices!E12 [2012]"
+    },
+    {
+      "seriesId": "gdp_use.exports_services",
+      "year": 2013,
+      "publishedIndex": "114.44928189182271",
+      "growthPercent": "14.44928189182271",
+      "calculatedGrowthPercent": "14.44928189182269851344",
+      "differencePercentagePoints": "0.00000000000001148656",
+      "indexLocator": "Real GDP growth_USE category!E14 [2013]",
+      "volumeLocators": "GDP by USE side_2019 prices!F13 [2013]; GDP by USE side_2019 prices!E13 [2012]"
+    },
+    {
+      "seriesId": "gdp_use.imports",
+      "year": 2013,
+      "publishedIndex": "99.255850329912676",
+      "growthPercent": "-0.744149670087324",
+      "calculatedGrowthPercent": "-0.74414967008731470994",
+      "differencePercentagePoints": "-0.00000000000000929006",
+      "indexLocator": "Real GDP growth_USE category!E15 [2013]",
+      "volumeLocators": "GDP by USE side_2019 prices!F14 [2013]; GDP by USE side_2019 prices!E14 [2012]"
+    },
+    {
+      "seriesId": "gdp_use.imports_goods",
+      "year": 2013,
+      "publishedIndex": "97.44565444334917",
+      "growthPercent": "-2.55434555665083",
+      "calculatedGrowthPercent": "-2.55434555665082466559",
+      "differencePercentagePoints": "-0.00000000000000533441",
+      "indexLocator": "Real GDP growth_USE category!E16 [2013]",
+      "volumeLocators": "GDP by USE side_2019 prices!F15 [2013]; GDP by USE side_2019 prices!E15 [2012]"
+    },
+    {
+      "seriesId": "gdp_use.imports_services",
+      "year": 2013,
+      "publishedIndex": "108.82478141224993",
+      "growthPercent": "8.82478141224993",
+      "calculatedGrowthPercent": "8.8247814122499367449",
+      "differencePercentagePoints": "-0.0000000000000067449",
+      "indexLocator": "Real GDP growth_USE category!E17 [2013]",
+      "volumeLocators": "GDP by USE side_2019 prices!F16 [2013]; GDP by USE side_2019 prices!E16 [2012]"
+    },
+    {
+      "seriesId": "economy.gdp_total",
+      "year": 2014,
+      "publishedIndex": "104.09060703814245",
+      "growthPercent": "4.09060703814245",
+      "calculatedGrowthPercent": "4.09060703814244564704",
+      "differencePercentagePoints": "0.00000000000000435296",
+      "indexLocator": "Real GDP growth_USE category!F18 [2014]",
+      "volumeLocators": "GDP by USE side_2019 prices!G17 [2014]; GDP by USE side_2019 prices!F17 [2013]"
+    },
+    {
+      "seriesId": "gdp_use.consumption",
+      "year": 2014,
+      "publishedIndex": "105.73647722547199",
+      "growthPercent": "5.73647722547199",
+      "calculatedGrowthPercent": "5.73647722547199944559",
+      "differencePercentagePoints": "-0.00000000000000944559",
+      "indexLocator": "Real GDP growth_USE category!F3 [2014]",
+      "volumeLocators": "GDP by USE side_2019 prices!G3 [2014]; GDP by USE side_2019 prices!F3 [2013]"
+    },
+    {
+      "seriesId": "gdp_use.households_npish",
+      "year": 2014,
+      "publishedIndex": "105.62959608771322",
+      "growthPercent": "5.62959608771322",
+      "calculatedGrowthPercent": "5.62959608771321962347",
+      "differencePercentagePoints": "0.00000000000000037653",
+      "indexLocator": "Real GDP growth_USE category!F4 [2014]",
+      "volumeLocators": "GDP by USE side_2019 prices!G4 [2014]; GDP by USE side_2019 prices!F4 [2013]"
+    },
+    {
+      "seriesId": "gdp_use.government",
+      "year": 2014,
+      "publishedIndex": "106.28823550663189",
+      "growthPercent": "6.28823550663189",
+      "calculatedGrowthPercent": "6.28823550663189216606",
+      "differencePercentagePoints": "-0.00000000000000216606",
+      "indexLocator": "Real GDP growth_USE category!F5 [2014]",
+      "volumeLocators": "GDP by USE side_2019 prices!G5 [2014]; GDP by USE side_2019 prices!F5 [2013]"
+    },
+    {
+      "seriesId": "gdp_use.government_individual",
+      "year": 2014,
+      "publishedIndex": "107.43361123758615",
+      "growthPercent": "7.43361123758615",
+      "calculatedGrowthPercent": "7.43361123758614197886",
+      "differencePercentagePoints": "0.00000000000000802114",
+      "indexLocator": "Real GDP growth_USE category!F6 [2014]",
+      "volumeLocators": "GDP by USE side_2019 prices!G6 [2014]; GDP by USE side_2019 prices!F6 [2013]"
+    },
+    {
+      "seriesId": "gdp_use.government_collective",
+      "year": 2014,
+      "publishedIndex": "105.86598905417657",
+      "growthPercent": "5.86598905417657",
+      "calculatedGrowthPercent": "5.86598905417657507411",
+      "differencePercentagePoints": "-0.00000000000000507411",
+      "indexLocator": "Real GDP growth_USE category!F7 [2014]",
+      "volumeLocators": "GDP by USE side_2019 prices!G7 [2014]; GDP by USE side_2019 prices!F7 [2013]"
+    },
+    {
+      "seriesId": "gdp_use.investment",
+      "year": 2014,
+      "publishedIndex": "128.08778385614156",
+      "growthPercent": "28.08778385614156",
+      "calculatedGrowthPercent": "28.08778385614157132491",
+      "differencePercentagePoints": "-0.00000000000001132491",
+      "indexLocator": "Real GDP growth_USE category!F8 [2014]",
+      "volumeLocators": "GDP by USE side_2019 prices!G8 [2014]; GDP by USE side_2019 prices!F8 [2013]"
+    },
+    {
+      "seriesId": "gdp_use.fixed_capital",
+      "year": 2014,
+      "publishedIndex": "126.64445252984112",
+      "growthPercent": "26.64445252984112",
+      "calculatedGrowthPercent": "26.64445252984111533386",
+      "differencePercentagePoints": "0.00000000000000466614",
+      "indexLocator": "Real GDP growth_USE category!F9 [2014]",
+      "volumeLocators": "GDP by USE side_2019 prices!G9 [2014]; GDP by USE side_2019 prices!F9 [2013]"
+    },
+    {
+      "seriesId": "gdp_use.exports",
+      "year": 2014,
+      "publishedIndex": "98.122586431236002",
+      "growthPercent": "-1.877413568763998",
+      "calculatedGrowthPercent": "-1.87741356876399020644",
+      "differencePercentagePoints": "-0.00000000000000779356",
+      "indexLocator": "Real GDP growth_USE category!F12 [2014]",
+      "volumeLocators": "GDP by USE side_2019 prices!G11 [2014]; GDP by USE side_2019 prices!F11 [2013]"
+    },
+    {
+      "seriesId": "gdp_use.exports_goods",
+      "year": 2014,
+      "publishedIndex": "93.034431548193169",
+      "growthPercent": "-6.965568451806831",
+      "calculatedGrowthPercent": "-6.96556845180683797456",
+      "differencePercentagePoints": "0.00000000000000697456",
+      "indexLocator": "Real GDP growth_USE category!F13 [2014]",
+      "volumeLocators": "GDP by USE side_2019 prices!G12 [2014]; GDP by USE side_2019 prices!F12 [2013]"
+    },
+    {
+      "seriesId": "gdp_use.exports_services",
+      "year": 2014,
+      "publishedIndex": "105.2757822089887",
+      "growthPercent": "5.2757822089887",
+      "calculatedGrowthPercent": "5.27578220898870842318",
+      "differencePercentagePoints": "-0.00000000000000842318",
+      "indexLocator": "Real GDP growth_USE category!F14 [2014]",
+      "volumeLocators": "GDP by USE side_2019 prices!G13 [2014]; GDP by USE side_2019 prices!F13 [2013]"
+    },
+    {
+      "seriesId": "gdp_use.imports",
+      "year": 2014,
+      "publishedIndex": "112.12708139595745",
+      "growthPercent": "12.12708139595745",
+      "calculatedGrowthPercent": "12.12708139595744389117",
+      "differencePercentagePoints": "0.00000000000000610883",
+      "indexLocator": "Real GDP growth_USE category!F15 [2014]",
+      "volumeLocators": "GDP by USE side_2019 prices!G14 [2014]; GDP by USE side_2019 prices!F14 [2013]"
+    },
+    {
+      "seriesId": "gdp_use.imports_goods",
+      "year": 2014,
+      "publishedIndex": "111.69771327179126",
+      "growthPercent": "11.69771327179126",
+      "calculatedGrowthPercent": "11.69771327179126823643",
+      "differencePercentagePoints": "-0.00000000000000823643",
+      "indexLocator": "Real GDP growth_USE category!F16 [2014]",
+      "volumeLocators": "GDP by USE side_2019 prices!G15 [2014]; GDP by USE side_2019 prices!F15 [2013]"
+    },
+    {
+      "seriesId": "gdp_use.imports_services",
+      "year": 2014,
+      "publishedIndex": "114.23931077791596",
+      "growthPercent": "14.23931077791596",
+      "calculatedGrowthPercent": "14.23931077791597059037",
+      "differencePercentagePoints": "-0.00000000000001059037",
+      "indexLocator": "Real GDP growth_USE category!F17 [2014]",
+      "volumeLocators": "GDP by USE side_2019 prices!G16 [2014]; GDP by USE side_2019 prices!F16 [2013]"
+    },
+    {
+      "seriesId": "economy.gdp_total",
+      "year": 2015,
+      "publishedIndex": "103.35080619669405",
+      "growthPercent": "3.35080619669405",
+      "calculatedGrowthPercent": "3.3508061966940635046",
+      "differencePercentagePoints": "-0.0000000000000135046",
+      "indexLocator": "Real GDP growth_USE category!G18 [2015]",
+      "volumeLocators": "GDP by USE side_2019 prices!H17 [2015]; GDP by USE side_2019 prices!G17 [2014]"
+    },
+    {
+      "seriesId": "gdp_use.consumption",
+      "year": 2015,
+      "publishedIndex": "103.22896377550389",
+      "growthPercent": "3.22896377550389",
+      "calculatedGrowthPercent": "3.22896377550387588106",
+      "differencePercentagePoints": "0.00000000000001411894",
+      "indexLocator": "Real GDP growth_USE category!G3 [2015]",
+      "volumeLocators": "GDP by USE side_2019 prices!H3 [2015]; GDP by USE side_2019 prices!G3 [2014]"
+    },
+    {
+      "seriesId": "gdp_use.households_npish",
+      "year": 2015,
+      "publishedIndex": "103.79663714964265",
+      "growthPercent": "3.79663714964265",
+      "calculatedGrowthPercent": "3.79663714964265332152",
+      "differencePercentagePoints": "-0.00000000000000332152",
+      "indexLocator": "Real GDP growth_USE category!G4 [2015]",
+      "volumeLocators": "GDP by USE side_2019 prices!H4 [2015]; GDP by USE side_2019 prices!G4 [2014]"
+    },
+    {
+      "seriesId": "gdp_use.government",
+      "year": 2015,
+      "publishedIndex": "100.35871260426201",
+      "growthPercent": "0.35871260426201",
+      "calculatedGrowthPercent": "0.3587126042620015614",
+      "differencePercentagePoints": "0.0000000000000084386",
+      "indexLocator": "Real GDP growth_USE category!G5 [2015]",
+      "volumeLocators": "GDP by USE side_2019 prices!H5 [2015]; GDP by USE side_2019 prices!G5 [2014]"
+    },
+    {
+      "seriesId": "gdp_use.government_individual",
+      "year": 2015,
+      "publishedIndex": "113.52675985263794",
+      "growthPercent": "13.52675985263794",
+      "calculatedGrowthPercent": "13.52675985263793238277",
+      "differencePercentagePoints": "0.00000000000000761723",
+      "indexLocator": "Real GDP growth_USE category!G6 [2015]",
+      "volumeLocators": "GDP by USE side_2019 prices!H6 [2015]; GDP by USE side_2019 prices!G6 [2014]"
+    },
+    {
+      "seriesId": "gdp_use.government_collective",
+      "year": 2015,
+      "publishedIndex": "95.151192342848162",
+      "growthPercent": "-4.848807657151838",
+      "calculatedGrowthPercent": "-4.8488076571518454439",
+      "differencePercentagePoints": "0.0000000000000074439",
+      "indexLocator": "Real GDP growth_USE category!G7 [2015]",
+      "volumeLocators": "GDP by USE side_2019 prices!H7 [2015]; GDP by USE side_2019 prices!G7 [2014]"
+    },
+    {
+      "seriesId": "gdp_use.investment",
+      "year": 2015,
+      "publishedIndex": "108.37459210716493",
+      "growthPercent": "8.37459210716493",
+      "calculatedGrowthPercent": "8.37459210716491420631",
+      "differencePercentagePoints": "0.00000000000001579369",
+      "indexLocator": "Real GDP growth_USE category!G8 [2015]",
+      "volumeLocators": "GDP by USE side_2019 prices!H8 [2015]; GDP by USE side_2019 prices!G8 [2014]"
+    },
+    {
+      "seriesId": "gdp_use.fixed_capital",
+      "year": 2015,
+      "publishedIndex": "115.20095691351848",
+      "growthPercent": "15.20095691351848",
+      "calculatedGrowthPercent": "15.20095691351847936883",
+      "differencePercentagePoints": "0.00000000000000063117",
+      "indexLocator": "Real GDP growth_USE category!G9 [2015]",
+      "volumeLocators": "GDP by USE side_2019 prices!H9 [2015]; GDP by USE side_2019 prices!G9 [2014]"
+    },
+    {
+      "seriesId": "gdp_use.exports",
+      "year": 2015,
+      "publishedIndex": "103.15972369203965",
+      "growthPercent": "3.15972369203965",
+      "calculatedGrowthPercent": "3.15972369203965603079",
+      "differencePercentagePoints": "-0.00000000000000603079",
+      "indexLocator": "Real GDP growth_USE category!G12 [2015]",
+      "volumeLocators": "GDP by USE side_2019 prices!H11 [2015]; GDP by USE side_2019 prices!G11 [2014]"
+    },
+    {
+      "seriesId": "gdp_use.exports_goods",
+      "year": 2015,
+      "publishedIndex": "95.064828422362694",
+      "growthPercent": "-4.935171577637306",
+      "calculatedGrowthPercent": "-4.93517157763729401119",
+      "differencePercentagePoints": "-0.00000000000001198881",
+      "indexLocator": "Real GDP growth_USE category!G13 [2015]",
+      "volumeLocators": "GDP by USE side_2019 prices!H12 [2015]; GDP by USE side_2019 prices!G12 [2014]"
+    },
+    {
+      "seriesId": "gdp_use.exports_services",
+      "year": 2015,
+      "publishedIndex": "113.78522076908075",
+      "growthPercent": "13.78522076908075",
+      "calculatedGrowthPercent": "13.78522076908075373958",
+      "differencePercentagePoints": "-0.00000000000000373958",
+      "indexLocator": "Real GDP growth_USE category!G14 [2015]",
+      "volumeLocators": "GDP by USE side_2019 prices!H13 [2015]; GDP by USE side_2019 prices!G13 [2014]"
+    },
+    {
+      "seriesId": "gdp_use.imports",
+      "year": 2015,
+      "publishedIndex": "105.32852171173639",
+      "growthPercent": "5.32852171173639",
+      "calculatedGrowthPercent": "5.32852171173637867826",
+      "differencePercentagePoints": "0.00000000000001132174",
+      "indexLocator": "Real GDP growth_USE category!G15 [2015]",
+      "volumeLocators": "GDP by USE side_2019 prices!H14 [2015]; GDP by USE side_2019 prices!G14 [2014]"
+    },
+    {
+      "seriesId": "gdp_use.imports_goods",
+      "year": 2015,
+      "publishedIndex": "102.34348794142582",
+      "growthPercent": "2.34348794142582",
+      "calculatedGrowthPercent": "2.34348794142582377201",
+      "differencePercentagePoints": "-0.00000000000000377201",
+      "indexLocator": "Real GDP growth_USE category!G16 [2015]",
+      "volumeLocators": "GDP by USE side_2019 prices!H15 [2015]; GDP by USE side_2019 prices!G15 [2014]"
+    },
+    {
+      "seriesId": "gdp_use.imports_services",
+      "year": 2015,
+      "publishedIndex": "119.55367935262329",
+      "growthPercent": "19.55367935262329",
+      "calculatedGrowthPercent": "19.55367935262329372108",
+      "differencePercentagePoints": "-0.00000000000000372108",
+      "indexLocator": "Real GDP growth_USE category!G17 [2015]",
+      "volumeLocators": "GDP by USE side_2019 prices!H16 [2015]; GDP by USE side_2019 prices!G16 [2014]"
+    },
+    {
+      "seriesId": "economy.gdp_total",
+      "year": 2016,
+      "publishedIndex": "103.44992893977829",
+      "growthPercent": "3.44992893977829",
+      "calculatedGrowthPercent": "3.44992893977828740315",
+      "differencePercentagePoints": "0.00000000000000259685",
+      "indexLocator": "Real GDP growth_USE category!H18 [2016]",
+      "volumeLocators": "GDP by USE side_2019 prices!I17 [2016]; GDP by USE side_2019 prices!H17 [2015]"
+    },
+    {
+      "seriesId": "gdp_use.consumption",
+      "year": 2016,
+      "publishedIndex": "100.87329152665005",
+      "growthPercent": "0.87329152665005",
+      "calculatedGrowthPercent": "0.8732915266500489335",
+      "differencePercentagePoints": "0.0000000000000010665",
+      "indexLocator": "Real GDP growth_USE category!H3 [2016]",
+      "volumeLocators": "GDP by USE side_2019 prices!I3 [2016]; GDP by USE side_2019 prices!H3 [2015]"
+    },
+    {
+      "seriesId": "gdp_use.households_npish",
+      "year": 2016,
+      "publishedIndex": "99.886199675692268",
+      "growthPercent": "-0.113800324307732",
+      "calculatedGrowthPercent": "-0.11380032430772718123",
+      "differencePercentagePoints": "-0.00000000000000481877",
+      "indexLocator": "Real GDP growth_USE category!H4 [2016]",
+      "volumeLocators": "GDP by USE side_2019 prices!I4 [2016]; GDP by USE side_2019 prices!H4 [2015]"
+    },
+    {
+      "seriesId": "gdp_use.government",
+      "year": 2016,
+      "publishedIndex": "105.95787707537411",
+      "growthPercent": "5.95787707537411",
+      "calculatedGrowthPercent": "5.95787707537410190747",
+      "differencePercentagePoints": "0.00000000000000809253",
+      "indexLocator": "Real GDP growth_USE category!H5 [2016]",
+      "volumeLocators": "GDP by USE side_2019 prices!I5 [2016]; GDP by USE side_2019 prices!H5 [2015]"
+    },
+    {
+      "seriesId": "gdp_use.government_individual",
+      "year": 2016,
+      "publishedIndex": "114.99379517212141",
+      "growthPercent": "14.99379517212141",
+      "calculatedGrowthPercent": "14.99379517212139694667",
+      "differencePercentagePoints": "0.00000000000001305333",
+      "indexLocator": "Real GDP growth_USE category!H6 [2016]",
+      "volumeLocators": "GDP by USE side_2019 prices!I6 [2016]; GDP by USE side_2019 prices!H6 [2015]"
+    },
+    {
+      "seriesId": "gdp_use.government_collective",
+      "year": 2016,
+      "publishedIndex": "101.27652822338038",
+      "growthPercent": "1.27652822338038",
+      "calculatedGrowthPercent": "1.27652822338037266539",
+      "differencePercentagePoints": "0.00000000000000733461",
+      "indexLocator": "Real GDP growth_USE category!H7 [2016]",
+      "volumeLocators": "GDP by USE side_2019 prices!I7 [2016]; GDP by USE side_2019 prices!H7 [2015]"
+    },
+    {
+      "seriesId": "gdp_use.investment",
+      "year": 2016,
+      "publishedIndex": "106.12314534829788",
+      "growthPercent": "6.12314534829788",
+      "calculatedGrowthPercent": "6.12314534829787834155",
+      "differencePercentagePoints": "0.00000000000000165845",
+      "indexLocator": "Real GDP growth_USE category!H8 [2016]",
+      "volumeLocators": "GDP by USE side_2019 prices!I8 [2016]; GDP by USE side_2019 prices!H8 [2015]"
+    },
+    {
+      "seriesId": "gdp_use.fixed_capital",
+      "year": 2016,
+      "publishedIndex": "106.68013818098916",
+      "growthPercent": "6.68013818098916",
+      "calculatedGrowthPercent": "6.68013818098916754408",
+      "differencePercentagePoints": "-0.00000000000000754408",
+      "indexLocator": "Real GDP growth_USE category!H9 [2016]",
+      "volumeLocators": "GDP by USE side_2019 prices!I9 [2016]; GDP by USE side_2019 prices!H9 [2015]"
+    },
+    {
+      "seriesId": "gdp_use.exports",
+      "year": 2016,
+      "publishedIndex": "104.08323579349754",
+      "growthPercent": "4.08323579349754",
+      "calculatedGrowthPercent": "4.08323579349752498422",
+      "differencePercentagePoints": "0.00000000000001501578",
+      "indexLocator": "Real GDP growth_USE category!H12 [2016]",
+      "volumeLocators": "GDP by USE side_2019 prices!I11 [2016]; GDP by USE side_2019 prices!H11 [2015]"
+    },
+    {
+      "seriesId": "gdp_use.exports_goods",
+      "year": 2016,
+      "publishedIndex": "99.904004398192342",
+      "growthPercent": "-0.095995601807658",
+      "calculatedGrowthPercent": "-0.09599560180765496867",
+      "differencePercentagePoints": "-0.00000000000000303133",
+      "indexLocator": "Real GDP growth_USE category!H13 [2016]",
+      "volumeLocators": "GDP by USE side_2019 prices!I12 [2016]; GDP by USE side_2019 prices!H12 [2015]"
+    },
+    {
+      "seriesId": "gdp_use.exports_services",
+      "year": 2016,
+      "publishedIndex": "108.17300598852513",
+      "growthPercent": "8.17300598852513",
+      "calculatedGrowthPercent": "8.17300598852514493156",
+      "differencePercentagePoints": "-0.00000000000001493156",
+      "indexLocator": "Real GDP growth_USE category!H14 [2016]",
+      "volumeLocators": "GDP by USE side_2019 prices!I13 [2016]; GDP by USE side_2019 prices!H13 [2015]"
+    },
+    {
+      "seriesId": "gdp_use.imports",
+      "year": 2016,
+      "publishedIndex": "101.08909218245759",
+      "growthPercent": "1.08909218245759",
+      "calculatedGrowthPercent": "1.08909218245759874749",
+      "differencePercentagePoints": "-0.00000000000000874749",
+      "indexLocator": "Real GDP growth_USE category!H15 [2016]",
+      "volumeLocators": "GDP by USE side_2019 prices!I14 [2016]; GDP by USE side_2019 prices!H14 [2015]"
+    },
+    {
+      "seriesId": "gdp_use.imports_goods",
+      "year": 2016,
+      "publishedIndex": "100.10393052561525",
+      "growthPercent": "0.10393052561525",
+      "calculatedGrowthPercent": "0.10393052561525987261",
+      "differencePercentagePoints": "-0.00000000000000987261",
+      "indexLocator": "Real GDP growth_USE category!H16 [2016]",
+      "volumeLocators": "GDP by USE side_2019 prices!I15 [2016]; GDP by USE side_2019 prices!H15 [2015]"
+    },
+    {
+      "seriesId": "gdp_use.imports_services",
+      "year": 2016,
+      "publishedIndex": "105.17084755761022",
+      "growthPercent": "5.17084755761022",
+      "calculatedGrowthPercent": "5.17084755761022073362",
+      "differencePercentagePoints": "-0.00000000000000073362",
+      "indexLocator": "Real GDP growth_USE category!H17 [2016]",
+      "volumeLocators": "GDP by USE side_2019 prices!I16 [2016]; GDP by USE side_2019 prices!H16 [2015]"
+    },
+    {
+      "seriesId": "economy.gdp_total",
+      "year": 2017,
+      "publishedIndex": "105.16109792776768",
+      "growthPercent": "5.16109792776768",
+      "calculatedGrowthPercent": "5.16109792776767629553",
+      "differencePercentagePoints": "0.00000000000000370447",
+      "indexLocator": "Real GDP growth_USE category!I18 [2017]",
+      "volumeLocators": "GDP by USE side_2019 prices!J17 [2017]; GDP by USE side_2019 prices!I17 [2016]"
+    },
+    {
+      "seriesId": "gdp_use.consumption",
+      "year": 2017,
+      "publishedIndex": "107.0561831050761",
+      "growthPercent": "7.0561831050761",
+      "calculatedGrowthPercent": "7.05618310507609765991",
+      "differencePercentagePoints": "0.00000000000000234009",
+      "indexLocator": "Real GDP growth_USE category!I3 [2017]",
+      "volumeLocators": "GDP by USE side_2019 prices!J3 [2017]; GDP by USE side_2019 prices!I3 [2016]"
+    },
+    {
+      "seriesId": "gdp_use.households_npish",
+      "year": 2017,
+      "publishedIndex": "108.51241378637455",
+      "growthPercent": "8.51241378637455",
+      "calculatedGrowthPercent": "8.51241378637453858055",
+      "differencePercentagePoints": "0.00000000000001141945",
+      "indexLocator": "Real GDP growth_USE category!I4 [2017]",
+      "volumeLocators": "GDP by USE side_2019 prices!J4 [2017]; GDP by USE side_2019 prices!I4 [2016]"
+    },
+    {
+      "seriesId": "gdp_use.government",
+      "year": 2017,
+      "publishedIndex": "100.26305979373259",
+      "growthPercent": "0.26305979373259",
+      "calculatedGrowthPercent": "0.26305979373259439216",
+      "differencePercentagePoints": "-0.00000000000000439216",
+      "indexLocator": "Real GDP growth_USE category!I5 [2017]",
+      "volumeLocators": "GDP by USE side_2019 prices!J5 [2017]; GDP by USE side_2019 prices!I5 [2016]"
+    },
+    {
+      "seriesId": "gdp_use.government_individual",
+      "year": 2017,
+      "publishedIndex": "100.44435332551707",
+      "growthPercent": "0.44435332551707",
+      "calculatedGrowthPercent": "0.44435332551707382273",
+      "differencePercentagePoints": "-0.00000000000000382273",
+      "indexLocator": "Real GDP growth_USE category!I6 [2017]",
+      "volumeLocators": "GDP by USE side_2019 prices!J6 [2017]; GDP by USE side_2019 prices!I6 [2016]"
+    },
+    {
+      "seriesId": "gdp_use.government_collective",
+      "year": 2017,
+      "publishedIndex": "100.15744907799224",
+      "growthPercent": "0.15744907799224",
+      "calculatedGrowthPercent": "0.15744907799223879482",
+      "differencePercentagePoints": "0.00000000000000120518",
+      "indexLocator": "Real GDP growth_USE category!I7 [2017]",
+      "volumeLocators": "GDP by USE side_2019 prices!J7 [2017]; GDP by USE side_2019 prices!I7 [2016]"
+    },
+    {
+      "seriesId": "gdp_use.investment",
+      "year": 2017,
+      "publishedIndex": "92.561595468336009",
+      "growthPercent": "-7.438404531663991",
+      "calculatedGrowthPercent": "-7.43840453166399357601",
+      "differencePercentagePoints": "0.00000000000000257601",
+      "indexLocator": "Real GDP growth_USE category!I8 [2017]",
+      "volumeLocators": "GDP by USE side_2019 prices!J8 [2017]; GDP by USE side_2019 prices!I8 [2016]"
+    },
+    {
+      "seriesId": "gdp_use.fixed_capital",
+      "year": 2017,
+      "publishedIndex": "102.93087679062789",
+      "growthPercent": "2.93087679062789",
+      "calculatedGrowthPercent": "2.93087679062790388873",
+      "differencePercentagePoints": "-0.00000000000001388873",
+      "indexLocator": "Real GDP growth_USE category!I9 [2017]",
+      "volumeLocators": "GDP by USE side_2019 prices!J9 [2017]; GDP by USE side_2019 prices!I9 [2016]"
+    },
+    {
+      "seriesId": "gdp_use.exports",
+      "year": 2017,
+      "publishedIndex": "112.29998563118519",
+      "growthPercent": "12.29998563118519",
+      "calculatedGrowthPercent": "12.2999856311852098308",
+      "differencePercentagePoints": "-0.0000000000000198308",
+      "indexLocator": "Real GDP growth_USE category!I12 [2017]",
+      "volumeLocators": "GDP by USE side_2019 prices!J11 [2017]; GDP by USE side_2019 prices!I11 [2016]"
+    },
+    {
+      "seriesId": "gdp_use.exports_goods",
+      "year": 2017,
+      "publishedIndex": "106.214616649992",
+      "growthPercent": "6.214616649992",
+      "calculatedGrowthPercent": "6.2146166499919955632",
+      "differencePercentagePoints": "0.0000000000000044368",
+      "indexLocator": "Real GDP growth_USE category!I13 [2017]",
+      "volumeLocators": "GDP by USE side_2019 prices!J12 [2017]; GDP by USE side_2019 prices!I12 [2016]"
+    },
+    {
+      "seriesId": "gdp_use.exports_services",
+      "year": 2017,
+      "publishedIndex": "117.56185040047191",
+      "growthPercent": "17.56185040047191",
+      "calculatedGrowthPercent": "17.56185040047190805597",
+      "differencePercentagePoints": "0.00000000000000194403",
+      "indexLocator": "Real GDP growth_USE category!I14 [2017]",
+      "volumeLocators": "GDP by USE side_2019 prices!J13 [2017]; GDP by USE side_2019 prices!I13 [2016]"
+    },
+    {
+      "seriesId": "gdp_use.imports",
+      "year": 2017,
+      "publishedIndex": "106.69788601504067",
+      "growthPercent": "6.69788601504067",
+      "calculatedGrowthPercent": "6.69788601504066590131",
+      "differencePercentagePoints": "0.00000000000000409869",
+      "indexLocator": "Real GDP growth_USE category!I15 [2017]",
+      "volumeLocators": "GDP by USE side_2019 prices!J14 [2017]; GDP by USE side_2019 prices!I14 [2016]"
+    },
+    {
+      "seriesId": "gdp_use.imports_goods",
+      "year": 2017,
+      "publishedIndex": "105.06460229236747",
+      "growthPercent": "5.06460229236747",
+      "calculatedGrowthPercent": "5.06460229236746549249",
+      "differencePercentagePoints": "0.00000000000000450751",
+      "indexLocator": "Real GDP growth_USE category!I16 [2017]",
+      "volumeLocators": "GDP by USE side_2019 prices!J15 [2017]; GDP by USE side_2019 prices!I15 [2016]"
+    },
+    {
+      "seriesId": "gdp_use.imports_services",
+      "year": 2017,
+      "publishedIndex": "113.04579876913546",
+      "growthPercent": "13.04579876913546",
+      "calculatedGrowthPercent": "13.04579876913545731822",
+      "differencePercentagePoints": "0.00000000000000268178",
+      "indexLocator": "Real GDP growth_USE category!I17 [2017]",
+      "volumeLocators": "GDP by USE side_2019 prices!J16 [2017]; GDP by USE side_2019 prices!I16 [2016]"
+    },
+    {
+      "seriesId": "economy.gdp_total",
+      "year": 2018,
+      "publishedIndex": "106.06219010644861",
+      "growthPercent": "6.06219010644861",
+      "calculatedGrowthPercent": "6.06219010644861127535",
+      "differencePercentagePoints": "-0.00000000000000127535",
+      "indexLocator": "Real GDP growth_USE category!J18 [2018]",
+      "volumeLocators": "GDP by USE side_2019 prices!K17 [2018]; GDP by USE side_2019 prices!J17 [2017]"
+    },
+    {
+      "seriesId": "gdp_use.consumption",
+      "year": 2018,
+      "publishedIndex": "102.62522988061522",
+      "growthPercent": "2.62522988061522",
+      "calculatedGrowthPercent": "2.6252298806152211504",
+      "differencePercentagePoints": "-0.0000000000000011504",
+      "indexLocator": "Real GDP growth_USE category!J3 [2018]",
+      "volumeLocators": "GDP by USE side_2019 prices!K3 [2018]; GDP by USE side_2019 prices!J3 [2017]"
+    },
+    {
+      "seriesId": "gdp_use.households_npish",
+      "year": 2018,
+      "publishedIndex": "103.0847086472549",
+      "growthPercent": "3.0847086472549",
+      "calculatedGrowthPercent": "3.08470864725490204861",
+      "differencePercentagePoints": "-0.00000000000000204861",
+      "indexLocator": "Real GDP growth_USE category!J4 [2018]",
+      "volumeLocators": "GDP by USE side_2019 prices!K4 [2018]; GDP by USE side_2019 prices!J4 [2017]"
+    },
+    {
+      "seriesId": "gdp_use.government",
+      "year": 2018,
+      "publishedIndex": "100.2498279255982",
+      "growthPercent": "0.2498279255982",
+      "calculatedGrowthPercent": "0.24982792559820290917",
+      "differencePercentagePoints": "-0.00000000000000290917",
+      "indexLocator": "Real GDP growth_USE category!J5 [2018]",
+      "volumeLocators": "GDP by USE side_2019 prices!K5 [2018]; GDP by USE side_2019 prices!J5 [2017]"
+    },
+    {
+      "seriesId": "gdp_use.government_individual",
+      "year": 2018,
+      "publishedIndex": "103.18098683871311",
+      "growthPercent": "3.18098683871311",
+      "calculatedGrowthPercent": "3.1809868387131035506",
+      "differencePercentagePoints": "0.0000000000000064494",
+      "indexLocator": "Real GDP growth_USE category!J6 [2018]",
+      "volumeLocators": "GDP by USE side_2019 prices!K6 [2018]; GDP by USE side_2019 prices!J6 [2017]"
+    },
+    {
+      "seriesId": "gdp_use.government_collective",
+      "year": 2018,
+      "publishedIndex": "98.521756686781586",
+      "growthPercent": "-1.478243313218414",
+      "calculatedGrowthPercent": "-1.4782433132184139221",
+      "differencePercentagePoints": "-0.0000000000000000779",
+      "indexLocator": "Real GDP growth_USE category!J7 [2018]",
+      "volumeLocators": "GDP by USE side_2019 prices!K7 [2018]; GDP by USE side_2019 prices!J7 [2017]"
+    },
+    {
+      "seriesId": "gdp_use.investment",
+      "year": 2018,
+      "publishedIndex": "115.28873379542166",
+      "growthPercent": "15.28873379542166",
+      "calculatedGrowthPercent": "15.2887337954216607233",
+      "differencePercentagePoints": "-0.0000000000000007233",
+      "indexLocator": "Real GDP growth_USE category!J8 [2018]",
+      "volumeLocators": "GDP by USE side_2019 prices!K8 [2018]; GDP by USE side_2019 prices!J8 [2017]"
+    },
+    {
+      "seriesId": "gdp_use.fixed_capital",
+      "year": 2018,
+      "publishedIndex": "101.88454611229692",
+      "growthPercent": "1.88454611229692",
+      "calculatedGrowthPercent": "1.88454611229691678416",
+      "differencePercentagePoints": "0.00000000000000321584",
+      "indexLocator": "Real GDP growth_USE category!J9 [2018]",
+      "volumeLocators": "GDP by USE side_2019 prices!K9 [2018]; GDP by USE side_2019 prices!J9 [2017]"
+    },
+    {
+      "seriesId": "gdp_use.exports",
+      "year": 2018,
+      "publishedIndex": "111.35750402037021",
+      "growthPercent": "11.35750402037021",
+      "calculatedGrowthPercent": "11.35750402037021674329",
+      "differencePercentagePoints": "-0.00000000000000674329",
+      "indexLocator": "Real GDP growth_USE category!J12 [2018]",
+      "volumeLocators": "GDP by USE side_2019 prices!K11 [2018]; GDP by USE side_2019 prices!J11 [2017]"
+    },
+    {
+      "seriesId": "gdp_use.exports_goods",
+      "year": 2018,
+      "publishedIndex": "116.39993865641436",
+      "growthPercent": "16.39993865641436",
+      "calculatedGrowthPercent": "16.39993865641435455308",
+      "differencePercentagePoints": "0.00000000000000544692",
+      "indexLocator": "Real GDP growth_USE category!J13 [2018]",
+      "volumeLocators": "GDP by USE side_2019 prices!K12 [2018]; GDP by USE side_2019 prices!J12 [2017]"
+    },
+    {
+      "seriesId": "gdp_use.exports_services",
+      "year": 2018,
+      "publishedIndex": "106.846088981196",
+      "growthPercent": "6.846088981196",
+      "calculatedGrowthPercent": "6.84608898119600546445",
+      "differencePercentagePoints": "-0.00000000000000546445",
+      "indexLocator": "Real GDP growth_USE category!J14 [2018]",
+      "volumeLocators": "GDP by USE side_2019 prices!K13 [2018]; GDP by USE side_2019 prices!J13 [2017]"
+    },
+    {
+      "seriesId": "gdp_use.imports",
+      "year": 2018,
+      "publishedIndex": "109.23950990476925",
+      "growthPercent": "9.23950990476925",
+      "calculatedGrowthPercent": "9.2395099047692503421",
+      "differencePercentagePoints": "-0.0000000000000003421",
+      "indexLocator": "Real GDP growth_USE category!J15 [2018]",
+      "volumeLocators": "GDP by USE side_2019 prices!K14 [2018]; GDP by USE side_2019 prices!J14 [2017]"
+    },
+    {
+      "seriesId": "gdp_use.imports_goods",
+      "year": 2018,
+      "publishedIndex": "108.27659902461318",
+      "growthPercent": "8.27659902461318",
+      "calculatedGrowthPercent": "8.27659902461318631318",
+      "differencePercentagePoints": "-0.00000000000000631318",
+      "indexLocator": "Real GDP growth_USE category!J16 [2018]",
+      "volumeLocators": "GDP by USE side_2019 prices!K15 [2018]; GDP by USE side_2019 prices!J15 [2017]"
+    },
+    {
+      "seriesId": "gdp_use.imports_services",
+      "year": 2018,
+      "publishedIndex": "112.85404347081192",
+      "growthPercent": "12.85404347081192",
+      "calculatedGrowthPercent": "12.8540434708119255447",
+      "differencePercentagePoints": "-0.0000000000000055447",
+      "indexLocator": "Real GDP growth_USE category!J17 [2018]",
+      "volumeLocators": "GDP by USE side_2019 prices!K16 [2018]; GDP by USE side_2019 prices!J16 [2017]"
+    },
+    {
+      "seriesId": "economy.gdp_total",
+      "year": 2019,
+      "publishedIndex": "105.3802771856454",
+      "growthPercent": "5.3802771856454",
+      "calculatedGrowthPercent": "5.38027718564539057913",
+      "differencePercentagePoints": "0.00000000000000942087",
+      "indexLocator": "Real GDP growth_USE category!K18 [2019]",
+      "volumeLocators": "GDP by USE side_2019 prices!L17 [2019]; GDP by USE side_2019 prices!K17 [2018]"
+    },
+    {
+      "seriesId": "gdp_use.consumption",
+      "year": 2019,
+      "publishedIndex": "104.73527323974716",
+      "growthPercent": "4.73527323974716",
+      "calculatedGrowthPercent": "4.73527323974717453703",
+      "differencePercentagePoints": "-0.00000000000001453703",
+      "indexLocator": "Real GDP growth_USE category!K3 [2019]",
+      "volumeLocators": "GDP by USE side_2019 prices!L3 [2019]; GDP by USE side_2019 prices!K3 [2018]"
+    },
+    {
+      "seriesId": "gdp_use.households_npish",
+      "year": 2019,
+      "publishedIndex": "105.15481395031489",
+      "growthPercent": "5.15481395031489",
+      "calculatedGrowthPercent": "5.15481395031489327708",
+      "differencePercentagePoints": "-0.00000000000000327708",
+      "indexLocator": "Real GDP growth_USE category!K4 [2019]",
+      "volumeLocators": "GDP by USE side_2019 prices!L4 [2019]; GDP by USE side_2019 prices!K4 [2018]"
+    },
+    {
+      "seriesId": "gdp_use.government",
+      "year": 2019,
+      "publishedIndex": "102.58701448502383",
+      "growthPercent": "2.58701448502383",
+      "calculatedGrowthPercent": "2.58701448502382279307",
+      "differencePercentagePoints": "0.00000000000000720693",
+      "indexLocator": "Real GDP growth_USE category!K5 [2019]",
+      "volumeLocators": "GDP by USE side_2019 prices!L5 [2019]; GDP by USE side_2019 prices!K5 [2018]"
+    },
+    {
+      "seriesId": "gdp_use.government_individual",
+      "year": 2019,
+      "publishedIndex": "108.09672178415548",
+      "growthPercent": "8.09672178415548",
+      "calculatedGrowthPercent": "8.0967217841554858745",
+      "differencePercentagePoints": "-0.0000000000000058745",
+      "indexLocator": "Real GDP growth_USE category!K6 [2019]",
+      "volumeLocators": "GDP by USE side_2019 prices!L6 [2019]; GDP by USE side_2019 prices!K6 [2018]"
+    },
+    {
+      "seriesId": "gdp_use.government_collective",
+      "year": 2019,
+      "publishedIndex": "99.244983146645595",
+      "growthPercent": "-0.755016853354405",
+      "calculatedGrowthPercent": "-0.75501685335440238737",
+      "differencePercentagePoints": "-0.00000000000000261263",
+      "indexLocator": "Real GDP growth_USE category!K7 [2019]",
+      "volumeLocators": "GDP by USE side_2019 prices!L7 [2019]; GDP by USE side_2019 prices!K7 [2018]"
+    },
+    {
+      "seriesId": "gdp_use.investment",
+      "year": 2019,
+      "publishedIndex": "100.48362013830263",
+      "growthPercent": "0.48362013830263",
+      "calculatedGrowthPercent": "0.4836201383026303577",
+      "differencePercentagePoints": "-0.0000000000000003577",
+      "indexLocator": "Real GDP growth_USE category!K8 [2019]",
+      "volumeLocators": "GDP by USE side_2019 prices!L8 [2019]; GDP by USE side_2019 prices!K8 [2018]"
+    },
+    {
+      "seriesId": "gdp_use.fixed_capital",
+      "year": 2019,
+      "publishedIndex": "99.706042004261448",
+      "growthPercent": "-0.293957995738552",
+      "calculatedGrowthPercent": "-0.29395799573855385258",
+      "differencePercentagePoints": "0.00000000000000185258",
+      "indexLocator": "Real GDP growth_USE category!K9 [2019]",
+      "volumeLocators": "GDP by USE side_2019 prices!L9 [2019]; GDP by USE side_2019 prices!K9 [2018]"
+    },
+    {
+      "seriesId": "gdp_use.exports",
+      "year": 2019,
+      "publishedIndex": "110.93391294392356",
+      "growthPercent": "10.93391294392356",
+      "calculatedGrowthPercent": "10.93391294392355739541",
+      "differencePercentagePoints": "0.00000000000000260459",
+      "indexLocator": "Real GDP growth_USE category!K12 [2019]",
+      "volumeLocators": "GDP by USE side_2019 prices!L11 [2019]; GDP by USE side_2019 prices!K11 [2018]"
+    },
+    {
+      "seriesId": "gdp_use.exports_goods",
+      "year": 2019,
+      "publishedIndex": "115.27913891329595",
+      "growthPercent": "15.27913891329595",
+      "calculatedGrowthPercent": "15.27913891329594573017",
+      "differencePercentagePoints": "0.00000000000000426983",
+      "indexLocator": "Real GDP growth_USE category!K13 [2019]",
+      "volumeLocators": "GDP by USE side_2019 prices!L12 [2019]; GDP by USE side_2019 prices!K12 [2018]"
+    },
+    {
+      "seriesId": "gdp_use.exports_services",
+      "year": 2019,
+      "publishedIndex": "106.66960037390294",
+      "growthPercent": "6.66960037390294",
+      "calculatedGrowthPercent": "6.66960037390293141009",
+      "differencePercentagePoints": "0.00000000000000858991",
+      "indexLocator": "Real GDP growth_USE category!K14 [2019]",
+      "volumeLocators": "GDP by USE side_2019 prices!L13 [2019]; GDP by USE side_2019 prices!K13 [2018]"
+    },
+    {
+      "seriesId": "gdp_use.imports",
+      "year": 2019,
+      "publishedIndex": "106.81019199056716",
+      "growthPercent": "6.81019199056716",
+      "calculatedGrowthPercent": "6.81019199056715851836",
+      "differencePercentagePoints": "0.00000000000000148164",
+      "indexLocator": "Real GDP growth_USE category!K15 [2019]",
+      "volumeLocators": "GDP by USE side_2019 prices!L14 [2019]; GDP by USE side_2019 prices!K14 [2018]"
+    },
+    {
+      "seriesId": "gdp_use.imports_goods",
+      "year": 2019,
+      "publishedIndex": "104.59640091384304",
+      "growthPercent": "4.59640091384304",
+      "calculatedGrowthPercent": "4.59640091384303660333",
+      "differencePercentagePoints": "0.00000000000000339667",
+      "indexLocator": "Real GDP growth_USE category!K16 [2019]",
+      "volumeLocators": "GDP by USE side_2019 prices!L15 [2019]; GDP by USE side_2019 prices!K15 [2018]"
+    },
+    {
+      "seriesId": "gdp_use.imports_services",
+      "year": 2019,
+      "publishedIndex": "115.20908069156243",
+      "growthPercent": "15.20908069156243",
+      "calculatedGrowthPercent": "15.20908069156243172678",
+      "differencePercentagePoints": "-0.00000000000000172678",
+      "indexLocator": "Real GDP growth_USE category!K17 [2019]",
+      "volumeLocators": "GDP by USE side_2019 prices!L16 [2019]; GDP by USE side_2019 prices!K16 [2018]"
+    },
+    {
+      "seriesId": "economy.gdp_total",
+      "year": 2020,
+      "publishedIndex": "93.708746027694133",
+      "growthPercent": "-6.291253972305867",
+      "calculatedGrowthPercent": "-6.29125397230588284935",
+      "differencePercentagePoints": "0.00000000000001584935",
+      "indexLocator": "Real GDP growth_USE category!P18 [2020]",
+      "volumeLocators": "GDP by USE side_2019 prices!Q17 [2020]; GDP by USE side_2019 prices!L17 [2019]"
+    },
+    {
+      "seriesId": "gdp_use.consumption",
+      "year": 2020,
+      "publishedIndex": "109.5709014622656",
+      "growthPercent": "9.5709014622656",
+      "calculatedGrowthPercent": "9.57090146226562116261",
+      "differencePercentagePoints": "-0.00000000000002116261",
+      "indexLocator": "Real GDP growth_USE category!P3 [2020]",
+      "volumeLocators": "GDP by USE side_2019 prices!Q3 [2020]; GDP by USE side_2019 prices!L3 [2019]"
+    },
+    {
+      "seriesId": "gdp_use.households_npish",
+      "year": 2020,
+      "publishedIndex": "110.13714479390799",
+      "growthPercent": "10.13714479390799",
+      "calculatedGrowthPercent": "10.13714479390797858551",
+      "differencePercentagePoints": "0.00000000000001141449",
+      "indexLocator": "Real GDP growth_USE category!P4 [2020]",
+      "volumeLocators": "GDP by USE side_2019 prices!Q4 [2020]; GDP by USE side_2019 prices!L4 [2019]"
+    },
+    {
+      "seriesId": "gdp_use.government",
+      "year": 2020,
+      "publishedIndex": "106.60320586123868",
+      "growthPercent": "6.60320586123868",
+      "calculatedGrowthPercent": "6.60320586123867812383",
+      "differencePercentagePoints": "0.00000000000000187617",
+      "indexLocator": "Real GDP growth_USE category!P5 [2020]",
+      "volumeLocators": "GDP by USE side_2019 prices!Q5 [2020]; GDP by USE side_2019 prices!L5 [2019]"
+    },
+    {
+      "seriesId": "gdp_use.government_individual",
+      "year": 2020,
+      "publishedIndex": "103.33700917134745",
+      "growthPercent": "3.33700917134745",
+      "calculatedGrowthPercent": "3.33700917134744912137",
+      "differencePercentagePoints": "0.00000000000000087863",
+      "indexLocator": "Real GDP growth_USE category!P6 [2020]",
+      "volumeLocators": "GDP by USE side_2019 prices!Q6 [2020]; GDP by USE side_2019 prices!L6 [2019]"
+    },
+    {
+      "seriesId": "gdp_use.government_collective",
+      "year": 2020,
+      "publishedIndex": "108.71735518346897",
+      "growthPercent": "8.71735518346897",
+      "calculatedGrowthPercent": "8.7173551834689699932",
+      "differencePercentagePoints": "0.0000000000000000068",
+      "indexLocator": "Real GDP growth_USE category!P7 [2020]",
+      "volumeLocators": "GDP by USE side_2019 prices!Q7 [2020]; GDP by USE side_2019 prices!L7 [2019]"
+    },
+    {
+      "seriesId": "gdp_use.investment",
+      "year": 2020,
+      "publishedIndex": "84.095554006424379",
+      "growthPercent": "-15.904445993575621",
+      "calculatedGrowthPercent": "-15.90444599357561515564",
+      "differencePercentagePoints": "-0.00000000000000584436",
+      "indexLocator": "Real GDP growth_USE category!P8 [2020]",
+      "volumeLocators": "GDP by USE side_2019 prices!Q8 [2020]; GDP by USE side_2019 prices!L8 [2019]"
+    },
+    {
+      "seriesId": "gdp_use.fixed_capital",
+      "year": 2020,
+      "publishedIndex": "86.932919762109819",
+      "growthPercent": "-13.067080237890181",
+      "calculatedGrowthPercent": "-13.06708023789018780057",
+      "differencePercentagePoints": "0.00000000000000680057",
+      "indexLocator": "Real GDP growth_USE category!P9 [2020]",
+      "volumeLocators": "GDP by USE side_2019 prices!Q9 [2020]; GDP by USE side_2019 prices!L9 [2019]"
+    },
+    {
+      "seriesId": "gdp_use.exports",
+      "year": 2020,
+      "publishedIndex": "62.447806224428092",
+      "growthPercent": "-37.552193775571908",
+      "calculatedGrowthPercent": "-37.55219377557189229677",
+      "differencePercentagePoints": "-0.00000000000001570323",
+      "indexLocator": "Real GDP growth_USE category!P12 [2020]",
+      "volumeLocators": "GDP by USE side_2019 prices!Q11 [2020]; GDP by USE side_2019 prices!L11 [2019]"
+    },
+    {
+      "seriesId": "gdp_use.exports_goods",
+      "year": 2020,
+      "publishedIndex": "86.153803098011565",
+      "growthPercent": "-13.846196901988435",
+      "calculatedGrowthPercent": "-13.84619690198839616336",
+      "differencePercentagePoints": "-0.00000000000003883664",
+      "indexLocator": "Real GDP growth_USE category!P13 [2020]",
+      "volumeLocators": "GDP by USE side_2019 prices!Q12 [2020]; GDP by USE side_2019 prices!L12 [2019]"
+    },
+    {
+      "seriesId": "gdp_use.exports_services",
+      "year": 2020,
+      "publishedIndex": "36.994958904309478",
+      "growthPercent": "-63.005041095690522",
+      "calculatedGrowthPercent": "-63.00504109569052357399",
+      "differencePercentagePoints": "0.00000000000000157399",
+      "indexLocator": "Real GDP growth_USE category!P14 [2020]",
+      "volumeLocators": "GDP by USE side_2019 prices!Q13 [2020]; GDP by USE side_2019 prices!L13 [2019]"
+    },
+    {
+      "seriesId": "gdp_use.imports",
+      "year": 2020,
+      "publishedIndex": "83.354661471352856",
+      "growthPercent": "-16.645338528647144",
+      "calculatedGrowthPercent": "-16.6453385286471553544",
+      "differencePercentagePoints": "0.0000000000000113544",
+      "indexLocator": "Real GDP growth_USE category!P15 [2020]",
+      "volumeLocators": "GDP by USE side_2019 prices!Q14 [2020]; GDP by USE side_2019 prices!L14 [2019]"
+    },
+    {
+      "seriesId": "gdp_use.imports_goods",
+      "year": 2020,
+      "publishedIndex": "88.869951334955957",
+      "growthPercent": "-11.130048665044043",
+      "calculatedGrowthPercent": "-11.13004866504403996247",
+      "differencePercentagePoints": "-0.00000000000000303753",
+      "indexLocator": "Real GDP growth_USE category!P16 [2020]",
+      "volumeLocators": "GDP by USE side_2019 prices!Q15 [2020]; GDP by USE side_2019 prices!L15 [2019]"
+    },
+    {
+      "seriesId": "gdp_use.imports_services",
+      "year": 2020,
+      "publishedIndex": "63.478336668619704",
+      "growthPercent": "-36.521663331380296",
+      "calculatedGrowthPercent": "-36.52166333138029996223",
+      "differencePercentagePoints": "0.00000000000000396223",
+      "indexLocator": "Real GDP growth_USE category!P17 [2020]",
+      "volumeLocators": "GDP by USE side_2019 prices!Q16 [2020]; GDP by USE side_2019 prices!L16 [2019]"
+    },
+    {
+      "seriesId": "economy.gdp_total",
+      "year": 2021,
+      "publishedIndex": "110.64401290352342",
+      "growthPercent": "10.64401290352342",
+      "calculatedGrowthPercent": "10.64401290352343941378",
+      "differencePercentagePoints": "-0.00000000000001941378",
+      "indexLocator": "Real GDP growth_USE category!U18 [2021]",
+      "volumeLocators": "GDP by USE side_2019 prices!V17 [2021]; GDP by USE side_2019 prices!Q17 [2020]"
+    },
+    {
+      "seriesId": "gdp_use.consumption",
+      "year": 2021,
+      "publishedIndex": "111.46515961890611",
+      "growthPercent": "11.46515961890611",
+      "calculatedGrowthPercent": "11.46515961890607892656",
+      "differencePercentagePoints": "0.00000000000003107344",
+      "indexLocator": "Real GDP growth_USE category!U3 [2021]",
+      "volumeLocators": "GDP by USE side_2019 prices!V3 [2021]; GDP by USE side_2019 prices!Q3 [2020]"
+    },
+    {
+      "seriesId": "gdp_use.households_npish",
+      "year": 2021,
+      "publishedIndex": "112.26415530948535",
+      "growthPercent": "12.26415530948535",
+      "calculatedGrowthPercent": "12.26415530948536017626",
+      "differencePercentagePoints": "-0.00000000000001017626",
+      "indexLocator": "Real GDP growth_USE category!U4 [2021]",
+      "volumeLocators": "GDP by USE side_2019 prices!V4 [2021]; GDP by USE side_2019 prices!Q4 [2020]"
+    },
+    {
+      "seriesId": "gdp_use.government",
+      "year": 2021,
+      "publishedIndex": "107.0942676360543",
+      "growthPercent": "7.0942676360543",
+      "calculatedGrowthPercent": "7.09426763605429859233",
+      "differencePercentagePoints": "0.00000000000000140767",
+      "indexLocator": "Real GDP growth_USE category!U5 [2021]",
+      "volumeLocators": "GDP by USE side_2019 prices!V5 [2021]; GDP by USE side_2019 prices!Q5 [2020]"
+    },
+    {
+      "seriesId": "gdp_use.government_individual",
+      "year": 2021,
+      "publishedIndex": "95.565111176615162",
+      "growthPercent": "-4.434888823384838",
+      "calculatedGrowthPercent": "-4.43488882338483873516",
+      "differencePercentagePoints": "0.00000000000000073516",
+      "indexLocator": "Real GDP growth_USE category!U6 [2021]",
+      "volumeLocators": "GDP by USE side_2019 prices!V6 [2021]; GDP by USE side_2019 prices!Q6 [2020]"
+    },
+    {
+      "seriesId": "gdp_use.government_collective",
+      "year": 2021,
+      "publishedIndex": "114.2453550403043",
+      "growthPercent": "14.2453550403043",
+      "calculatedGrowthPercent": "14.24535504030430360099",
+      "differencePercentagePoints": "-0.00000000000000360099",
+      "indexLocator": "Real GDP growth_USE category!U7 [2021]",
+      "volumeLocators": "GDP by USE side_2019 prices!V7 [2021]; GDP by USE side_2019 prices!Q7 [2020]"
+    },
+    {
+      "seriesId": "gdp_use.investment",
+      "year": 2021,
+      "publishedIndex": "83.941333595923567",
+      "growthPercent": "-16.058666404076433",
+      "calculatedGrowthPercent": "-16.0586664040764458797",
+      "differencePercentagePoints": "0.0000000000000128797",
+      "indexLocator": "Real GDP growth_USE category!U8 [2021]",
+      "volumeLocators": "GDP by USE side_2019 prices!V8 [2021]; GDP by USE side_2019 prices!Q8 [2020]"
+    },
+    {
+      "seriesId": "gdp_use.fixed_capital",
+      "year": 2021,
+      "publishedIndex": "95.239982738005963",
+      "growthPercent": "-4.760017261994037",
+      "calculatedGrowthPercent": "-4.76001726199404376756",
+      "differencePercentagePoints": "0.00000000000000676756",
+      "indexLocator": "Real GDP growth_USE category!U9 [2021]",
+      "volumeLocators": "GDP by USE side_2019 prices!V9 [2021]; GDP by USE side_2019 prices!Q9 [2020]"
+    },
+    {
+      "seriesId": "gdp_use.exports",
+      "year": 2021,
+      "publishedIndex": "123.54102267913558",
+      "growthPercent": "23.54102267913558",
+      "calculatedGrowthPercent": "23.54102267913557959367",
+      "differencePercentagePoints": "0.00000000000000040633",
+      "indexLocator": "Real GDP growth_USE category!U12 [2021]",
+      "volumeLocators": "GDP by USE side_2019 prices!V11 [2021]; GDP by USE side_2019 prices!Q11 [2020]"
+    },
+    {
+      "seriesId": "gdp_use.exports_goods",
+      "year": 2021,
+      "publishedIndex": "113.24650619698322",
+      "growthPercent": "13.24650619698322",
+      "calculatedGrowthPercent": "13.24650619698320808374",
+      "differencePercentagePoints": "0.00000000000001191626",
+      "indexLocator": "Real GDP growth_USE category!U13 [2021]",
+      "volumeLocators": "GDP by USE side_2019 prices!V12 [2021]; GDP by USE side_2019 prices!Q12 [2020]"
+    },
+    {
+      "seriesId": "gdp_use.exports_services",
+      "year": 2021,
+      "publishedIndex": "152.39848217740629",
+      "growthPercent": "52.39848217740629",
+      "calculatedGrowthPercent": "52.39848217740627668669",
+      "differencePercentagePoints": "0.00000000000001331331",
+      "indexLocator": "Real GDP growth_USE category!U14 [2021]",
+      "volumeLocators": "GDP by USE side_2019 prices!V13 [2021]; GDP by USE side_2019 prices!Q13 [2020]"
+    },
+    {
+      "seriesId": "gdp_use.imports",
+      "year": 2021,
+      "publishedIndex": "108.79462141692811",
+      "growthPercent": "8.79462141692811",
+      "calculatedGrowthPercent": "8.79462141692813251351",
+      "differencePercentagePoints": "-0.00000000000002251351",
+      "indexLocator": "Real GDP growth_USE category!U15 [2021]",
+      "volumeLocators": "GDP by USE side_2019 prices!V14 [2021]; GDP by USE side_2019 prices!Q14 [2020]"
+    },
+    {
+      "seriesId": "gdp_use.imports_goods",
+      "year": 2021,
+      "publishedIndex": "107.69516819665046",
+      "growthPercent": "7.69516819665046",
+      "calculatedGrowthPercent": "7.6951681966504600654",
+      "differencePercentagePoints": "-0.0000000000000000654",
+      "indexLocator": "Real GDP growth_USE category!U16 [2021]",
+      "volumeLocators": "GDP by USE side_2019 prices!V15 [2021]; GDP by USE side_2019 prices!Q15 [2020]"
+    },
+    {
+      "seriesId": "gdp_use.imports_services",
+      "year": 2021,
+      "publishedIndex": "114.50376027103472",
+      "growthPercent": "14.50376027103472",
+      "calculatedGrowthPercent": "14.50376027103475143309",
+      "differencePercentagePoints": "-0.00000000000003143309",
+      "indexLocator": "Real GDP growth_USE category!U17 [2021]",
+      "volumeLocators": "GDP by USE side_2019 prices!V16 [2021]; GDP by USE side_2019 prices!Q16 [2020]"
+    },
+    {
+      "seriesId": "economy.gdp_total",
+      "year": 2022,
+      "publishedIndex": "110.95953828397205",
+      "growthPercent": "10.95953828397205",
+      "calculatedGrowthPercent": "10.95953828397203329605",
+      "differencePercentagePoints": "0.00000000000001670395",
+      "indexLocator": "Real GDP growth_USE category!Z18 [2022]",
+      "volumeLocators": "GDP by USE side_2019 prices!AA17 [2022]; GDP by USE side_2019 prices!V17 [2021]"
+    },
+    {
+      "seriesId": "gdp_use.consumption",
+      "year": 2022,
+      "publishedIndex": "97.473304783928853",
+      "growthPercent": "-2.526695216071147",
+      "calculatedGrowthPercent": "-2.5266952160711158567",
+      "differencePercentagePoints": "-0.0000000000000311433",
+      "indexLocator": "Real GDP growth_USE category!Z3 [2022]",
+      "volumeLocators": "GDP by USE side_2019 prices!AA3 [2022]; GDP by USE side_2019 prices!V3 [2021]"
+    },
+    {
+      "seriesId": "gdp_use.households_npish",
+      "year": 2022,
+      "publishedIndex": "97.172672108623303",
+      "growthPercent": "-2.827327891376697",
+      "calculatedGrowthPercent": "-2.82732789137668106855",
+      "differencePercentagePoints": "-0.00000000000001593145",
+      "indexLocator": "Real GDP growth_USE category!Z4 [2022]",
+      "volumeLocators": "GDP by USE side_2019 prices!AA4 [2022]; GDP by USE side_2019 prices!V4 [2021]"
+    },
+    {
+      "seriesId": "gdp_use.government",
+      "year": 2022,
+      "publishedIndex": "99.188243926283732",
+      "growthPercent": "-0.811756073716268",
+      "calculatedGrowthPercent": "-0.81175607371628913324",
+      "differencePercentagePoints": "0.00000000000002113324",
+      "indexLocator": "Real GDP growth_USE category!Z5 [2022]",
+      "volumeLocators": "GDP by USE side_2019 prices!AA5 [2022]; GDP by USE side_2019 prices!V5 [2021]"
+    },
+    {
+      "seriesId": "gdp_use.government_individual",
+      "year": 2022,
+      "publishedIndex": "106.9672659139169",
+      "growthPercent": "6.9672659139169",
+      "calculatedGrowthPercent": "6.96726591391689346739",
+      "differencePercentagePoints": "0.00000000000000653261",
+      "indexLocator": "Real GDP growth_USE category!Z6 [2022]",
+      "volumeLocators": "GDP by USE side_2019 prices!AA6 [2022]; GDP by USE side_2019 prices!V6 [2021]"
+    },
+    {
+      "seriesId": "gdp_use.government_collective",
+      "year": 2022,
+      "publishedIndex": "95.194939906203274",
+      "growthPercent": "-4.805060093796726",
+      "calculatedGrowthPercent": "-4.80506009379674896176",
+      "differencePercentagePoints": "0.00000000000002296176",
+      "indexLocator": "Real GDP growth_USE category!Z7 [2022]",
+      "volumeLocators": "GDP by USE side_2019 prices!AA7 [2022]; GDP by USE side_2019 prices!V7 [2021]"
+    },
+    {
+      "seriesId": "gdp_use.investment",
+      "year": 2022,
+      "publishedIndex": "135.72611411438987",
+      "growthPercent": "35.72611411438987",
+      "calculatedGrowthPercent": "35.72611411438992100762",
+      "differencePercentagePoints": "-0.00000000000005100762",
+      "indexLocator": "Real GDP growth_USE category!Z8 [2022]",
+      "volumeLocators": "GDP by USE side_2019 prices!AA8 [2022]; GDP by USE side_2019 prices!V8 [2021]"
+    },
+    {
+      "seriesId": "gdp_use.fixed_capital",
+      "year": 2022,
+      "publishedIndex": "109.8885675396764",
+      "growthPercent": "9.8885675396764",
+      "calculatedGrowthPercent": "9.88856753967637846794",
+      "differencePercentagePoints": "0.00000000000002153206",
+      "indexLocator": "Real GDP growth_USE category!Z9 [2022]",
+      "volumeLocators": "GDP by USE side_2019 prices!AA9 [2022]; GDP by USE side_2019 prices!V9 [2021]"
+    },
+    {
+      "seriesId": "gdp_use.exports",
+      "year": 2022,
+      "publishedIndex": "137.42074094930453",
+      "growthPercent": "37.42074094930453",
+      "calculatedGrowthPercent": "37.42074094930451279971",
+      "differencePercentagePoints": "0.00000000000001720029",
+      "indexLocator": "Real GDP growth_USE category!Z12 [2022]",
+      "volumeLocators": "GDP by USE side_2019 prices!AA11 [2022]; GDP by USE side_2019 prices!V11 [2021]"
+    },
+    {
+      "seriesId": "gdp_use.exports_goods",
+      "year": 2022,
+      "publishedIndex": "114.33199237686536",
+      "growthPercent": "14.33199237686536",
+      "calculatedGrowthPercent": "14.33199237686531782532",
+      "differencePercentagePoints": "0.00000000000004217468",
+      "indexLocator": "Real GDP growth_USE category!Z13 [2022]",
+      "volumeLocators": "GDP by USE side_2019 prices!AA12 [2022]; GDP by USE side_2019 prices!V12 [2021]"
+    },
+    {
+      "seriesId": "gdp_use.exports_services",
+      "year": 2022,
+      "publishedIndex": "187.94760826243677",
+      "growthPercent": "87.94760826243677",
+      "calculatedGrowthPercent": "87.94760826243677776477",
+      "differencePercentagePoints": "-0.00000000000000776477",
+      "indexLocator": "Real GDP growth_USE category!Z14 [2022]",
+      "volumeLocators": "GDP by USE side_2019 prices!AA13 [2022]; GDP by USE side_2019 prices!V13 [2021]"
+    },
+    {
+      "seriesId": "gdp_use.imports",
+      "year": 2022,
+      "publishedIndex": "116.94040478785041",
+      "growthPercent": "16.94040478785041",
+      "calculatedGrowthPercent": "16.94040478785041278447",
+      "differencePercentagePoints": "-0.00000000000000278447",
+      "indexLocator": "Real GDP growth_USE category!Z15 [2022]",
+      "volumeLocators": "GDP by USE side_2019 prices!AA14 [2022]; GDP by USE side_2019 prices!V14 [2021]"
+    },
+    {
+      "seriesId": "gdp_use.imports_goods",
+      "year": 2022,
+      "publishedIndex": "114.15399964801971",
+      "growthPercent": "14.15399964801971",
+      "calculatedGrowthPercent": "14.15399964801969839329",
+      "differencePercentagePoints": "0.00000000000001160671",
+      "indexLocator": "Real GDP growth_USE category!Z16 [2022]",
+      "volumeLocators": "GDP by USE side_2019 prices!AA15 [2022]; GDP by USE side_2019 prices!V15 [2021]"
+    },
+    {
+      "seriesId": "gdp_use.imports_services",
+      "year": 2022,
+      "publishedIndex": "131.24854853464311",
+      "growthPercent": "31.24854853464311",
+      "calculatedGrowthPercent": "31.24854853464306533638",
+      "differencePercentagePoints": "0.00000000000004466362",
+      "indexLocator": "Real GDP growth_USE category!Z17 [2022]",
+      "volumeLocators": "GDP by USE side_2019 prices!AA16 [2022]; GDP by USE side_2019 prices!V16 [2021]"
+    },
+    {
+      "seriesId": "economy.gdp_total",
+      "year": 2023,
+      "publishedIndex": "107.83172263123224",
+      "growthPercent": "7.83172263123224",
+      "calculatedGrowthPercent": "7.8317226312322398399",
+      "differencePercentagePoints": "0.0000000000000001601",
+      "indexLocator": "Real GDP growth_USE category!AE18 [2023]",
+      "volumeLocators": "GDP by USE side_2019 prices!AF17 [2023]; GDP by USE side_2019 prices!AA17 [2022]"
+    },
+    {
+      "seriesId": "gdp_use.consumption",
+      "year": 2023,
+      "publishedIndex": "105.07320238500199",
+      "growthPercent": "5.07320238500199",
+      "calculatedGrowthPercent": "5.07320238500199778747",
+      "differencePercentagePoints": "-0.00000000000000778747",
+      "indexLocator": "Real GDP growth_USE category!AE3 [2023]",
+      "volumeLocators": "GDP by USE side_2019 prices!AF3 [2023]; GDP by USE side_2019 prices!AA3 [2022]"
+    },
+    {
+      "seriesId": "gdp_use.households_npish",
+      "year": 2023,
+      "publishedIndex": "104.65689050807549",
+      "growthPercent": "4.65689050807549",
+      "calculatedGrowthPercent": "4.65689050807550308297",
+      "differencePercentagePoints": "-0.00000000000001308297",
+      "indexLocator": "Real GDP growth_USE category!AE4 [2023]",
+      "volumeLocators": "GDP by USE side_2019 prices!AF4 [2023]; GDP by USE side_2019 prices!AA4 [2022]"
+    },
+    {
+      "seriesId": "gdp_use.government",
+      "year": 2023,
+      "publishedIndex": "107.4986620999878",
+      "growthPercent": "7.4986620999878",
+      "calculatedGrowthPercent": "7.49866209998780546773",
+      "differencePercentagePoints": "-0.00000000000000546773",
+      "indexLocator": "Real GDP growth_USE category!AE5 [2023]",
+      "volumeLocators": "GDP by USE side_2019 prices!AF5 [2023]; GDP by USE side_2019 prices!AA5 [2022]"
+    },
+    {
+      "seriesId": "gdp_use.government_individual",
+      "year": 2023,
+      "publishedIndex": "119.11604025407772",
+      "growthPercent": "19.11604025407772",
+      "calculatedGrowthPercent": "19.11604025407770375134",
+      "differencePercentagePoints": "0.00000000000001624866",
+      "indexLocator": "Real GDP growth_USE category!AE6 [2023]",
+      "volumeLocators": "GDP by USE side_2019 prices!AF6 [2023]; GDP by USE side_2019 prices!AA6 [2022]"
+    },
+    {
+      "seriesId": "gdp_use.government_collective",
+      "year": 2023,
+      "publishedIndex": "100.46239582980847",
+      "growthPercent": "0.46239582980847",
+      "calculatedGrowthPercent": "0.46239582980847699934",
+      "differencePercentagePoints": "-0.00000000000000699934",
+      "indexLocator": "Real GDP growth_USE category!AE7 [2023]",
+      "volumeLocators": "GDP by USE side_2019 prices!AF7 [2023]; GDP by USE side_2019 prices!AA7 [2022]"
+    },
+    {
+      "seriesId": "gdp_use.investment",
+      "year": 2023,
+      "publishedIndex": "119.5498508040414",
+      "growthPercent": "19.5498508040414",
+      "calculatedGrowthPercent": "19.54985080404139725199",
+      "differencePercentagePoints": "0.00000000000000274801",
+      "indexLocator": "Real GDP growth_USE category!AE8 [2023]",
+      "volumeLocators": "GDP by USE side_2019 prices!AF8 [2023]; GDP by USE side_2019 prices!AA8 [2022]"
+    },
+    {
+      "seriesId": "gdp_use.fixed_capital",
+      "year": 2023,
+      "publishedIndex": "129.39804568753129",
+      "growthPercent": "29.39804568753129",
+      "calculatedGrowthPercent": "29.39804568753129806062",
+      "differencePercentagePoints": "-0.00000000000000806062",
+      "indexLocator": "Real GDP growth_USE category!AE9 [2023]",
+      "volumeLocators": "GDP by USE side_2019 prices!AF9 [2023]; GDP by USE side_2019 prices!AA9 [2022]"
+    },
+    {
+      "seriesId": "gdp_use.exports",
+      "year": 2023,
+      "publishedIndex": "109.49186395571611",
+      "growthPercent": "9.49186395571611",
+      "calculatedGrowthPercent": "9.49186395571610729919",
+      "differencePercentagePoints": "0.00000000000000270081",
+      "indexLocator": "Real GDP growth_USE category!AE12 [2023]",
+      "volumeLocators": "GDP by USE side_2019 prices!AF11 [2023]; GDP by USE side_2019 prices!AA11 [2022]"
+    },
+    {
+      "seriesId": "gdp_use.exports_goods",
+      "year": 2023,
+      "publishedIndex": "114.21566682685639",
+      "growthPercent": "14.21566682685639",
+      "calculatedGrowthPercent": "14.21566682685640243652",
+      "differencePercentagePoints": "-0.00000000000001243652",
+      "indexLocator": "Real GDP growth_USE category!AE13 [2023]",
+      "volumeLocators": "GDP by USE side_2019 prices!AF12 [2023]; GDP by USE side_2019 prices!AA12 [2022]"
+    },
+    {
+      "seriesId": "gdp_use.exports_services",
+      "year": 2023,
+      "publishedIndex": "103.19334835812903",
+      "growthPercent": "3.19334835812903",
+      "calculatedGrowthPercent": "3.19334835812903292063",
+      "differencePercentagePoints": "-0.00000000000000292063",
+      "indexLocator": "Real GDP growth_USE category!AE14 [2023]",
+      "volumeLocators": "GDP by USE side_2019 prices!AF13 [2023]; GDP by USE side_2019 prices!AA13 [2022]"
+    },
+    {
+      "seriesId": "gdp_use.imports",
+      "year": 2023,
+      "publishedIndex": "109.96641380478962",
+      "growthPercent": "9.96641380478962",
+      "calculatedGrowthPercent": "9.9664138047896289938",
+      "differencePercentagePoints": "-0.0000000000000089938",
+      "indexLocator": "Real GDP growth_USE category!AE15 [2023]",
+      "volumeLocators": "GDP by USE side_2019 prices!AF14 [2023]; GDP by USE side_2019 prices!AA14 [2022]"
+    },
+    {
+      "seriesId": "gdp_use.imports_goods",
+      "year": 2023,
+      "publishedIndex": "109.4668387474826",
+      "growthPercent": "9.4668387474826",
+      "calculatedGrowthPercent": "9.46683874748259767242",
+      "differencePercentagePoints": "0.00000000000000232758",
+      "indexLocator": "Real GDP growth_USE category!AE16 [2023]",
+      "volumeLocators": "GDP by USE side_2019 prices!AF15 [2023]; GDP by USE side_2019 prices!AA15 [2022]"
+    },
+    {
+      "seriesId": "gdp_use.imports_services",
+      "year": 2023,
+      "publishedIndex": "112.05395668130782",
+      "growthPercent": "12.05395668130782",
+      "calculatedGrowthPercent": "12.05395668130782640438",
+      "differencePercentagePoints": "-0.00000000000000640438",
+      "indexLocator": "Real GDP growth_USE category!AE17 [2023]",
+      "volumeLocators": "GDP by USE side_2019 prices!AF16 [2023]; GDP by USE side_2019 prices!AA16 [2022]"
+    },
+    {
+      "seriesId": "economy.gdp_total",
+      "year": 2024,
+      "publishedIndex": "109.67979392614731",
+      "growthPercent": "9.67979392614731",
+      "calculatedGrowthPercent": "9.67979392614729885346",
+      "differencePercentagePoints": "0.00000000000001114654",
+      "indexLocator": "Real GDP growth_USE category!AJ18 [2024]",
+      "volumeLocators": "GDP by USE side_2019 prices!AK17 [2024]; GDP by USE side_2019 prices!AF17 [2023]"
+    },
+    {
+      "seriesId": "gdp_use.consumption",
+      "year": 2024,
+      "publishedIndex": "111.44316253702063",
+      "growthPercent": "11.44316253702063",
+      "calculatedGrowthPercent": "11.44316253702062093017",
+      "differencePercentagePoints": "0.00000000000000906983",
+      "indexLocator": "Real GDP growth_USE category!AJ3 [2024]",
+      "volumeLocators": "GDP by USE side_2019 prices!AK3 [2024]; GDP by USE side_2019 prices!AF3 [2023]"
+    },
+    {
+      "seriesId": "gdp_use.households_npish",
+      "year": 2024,
+      "publishedIndex": "109.51244452026914",
+      "growthPercent": "9.51244452026914",
+      "calculatedGrowthPercent": "9.5124445202691378196",
+      "differencePercentagePoints": "0.0000000000000021804",
+      "indexLocator": "Real GDP growth_USE category!AJ4 [2024]",
+      "volumeLocators": "GDP by USE side_2019 prices!AK4 [2024]; GDP by USE side_2019 prices!AF4 [2023]"
+    },
+    {
+      "seriesId": "gdp_use.government",
+      "year": 2024,
+      "publishedIndex": "122.85011667557457",
+      "growthPercent": "22.85011667557457",
+      "calculatedGrowthPercent": "22.85011667557457323523",
+      "differencePercentagePoints": "-0.00000000000000323523",
+      "indexLocator": "Real GDP growth_USE category!AJ5 [2024]",
+      "volumeLocators": "GDP by USE side_2019 prices!AK5 [2024]; GDP by USE side_2019 prices!AF5 [2023]"
+    },
+    {
+      "seriesId": "gdp_use.government_individual",
+      "year": 2024,
+      "publishedIndex": "129.69771567664731",
+      "growthPercent": "29.69771567664731",
+      "calculatedGrowthPercent": "29.69771567664730260625",
+      "differencePercentagePoints": "0.00000000000000739375",
+      "indexLocator": "Real GDP growth_USE category!AJ6 [2024]",
+      "volumeLocators": "GDP by USE side_2019 prices!AK6 [2024]; GDP by USE side_2019 prices!AF6 [2023]"
+    },
+    {
+      "seriesId": "gdp_use.government_collective",
+      "year": 2024,
+      "publishedIndex": "117.62326899681132",
+      "growthPercent": "17.62326899681132",
+      "calculatedGrowthPercent": "17.623268996811333973",
+      "differencePercentagePoints": "-0.000000000000013973",
+      "indexLocator": "Real GDP growth_USE category!AJ7 [2024]",
+      "volumeLocators": "GDP by USE side_2019 prices!AK7 [2024]; GDP by USE side_2019 prices!AF7 [2023]"
+    },
+    {
+      "seriesId": "gdp_use.investment",
+      "year": 2024,
+      "publishedIndex": "111.06114874627242",
+      "growthPercent": "11.06114874627242",
+      "calculatedGrowthPercent": "11.06114874627242667837",
+      "differencePercentagePoints": "-0.00000000000000667837",
+      "indexLocator": "Real GDP growth_USE category!AJ8 [2024]",
+      "volumeLocators": "GDP by USE side_2019 prices!AK8 [2024]; GDP by USE side_2019 prices!AF8 [2023]"
+    },
+    {
+      "seriesId": "gdp_use.fixed_capital",
+      "year": 2024,
+      "publishedIndex": "112.45347378735315",
+      "growthPercent": "12.45347378735315",
+      "calculatedGrowthPercent": "12.4534737873531578957",
+      "differencePercentagePoints": "-0.0000000000000078957",
+      "indexLocator": "Real GDP growth_USE category!AJ9 [2024]",
+      "volumeLocators": "GDP by USE side_2019 prices!AK9 [2024]; GDP by USE side_2019 prices!AF9 [2023]"
+    },
+    {
+      "seriesId": "gdp_use.exports",
+      "year": 2024,
+      "publishedIndex": "105.47742671902284",
+      "growthPercent": "5.47742671902284",
+      "calculatedGrowthPercent": "5.47742671902285074393",
+      "differencePercentagePoints": "-0.00000000000001074393",
+      "indexLocator": "Real GDP growth_USE category!AJ12 [2024]",
+      "volumeLocators": "GDP by USE side_2019 prices!AK11 [2024]; GDP by USE side_2019 prices!AF11 [2023]"
+    },
+    {
+      "seriesId": "gdp_use.exports_goods",
+      "year": 2024,
+      "publishedIndex": "102.21237665203731",
+      "growthPercent": "2.21237665203731",
+      "calculatedGrowthPercent": "2.21237665203730835351",
+      "differencePercentagePoints": "0.00000000000000164649",
+      "indexLocator": "Real GDP growth_USE category!AJ13 [2024]",
+      "volumeLocators": "GDP by USE side_2019 prices!AK12 [2024]; GDP by USE side_2019 prices!AF12 [2023]"
+    },
+    {
+      "seriesId": "gdp_use.exports_services",
+      "year": 2024,
+      "publishedIndex": "109.23596451981395",
+      "growthPercent": "9.23596451981395",
+      "calculatedGrowthPercent": "9.23596451981395500904",
+      "differencePercentagePoints": "-0.00000000000000500904",
+      "indexLocator": "Real GDP growth_USE category!AJ14 [2024]",
+      "volumeLocators": "GDP by USE side_2019 prices!AK13 [2024]; GDP by USE side_2019 prices!AF13 [2023]"
+    },
+    {
+      "seriesId": "gdp_use.imports",
+      "year": 2024,
+      "publishedIndex": "109.24692481245515",
+      "growthPercent": "9.24692481245515",
+      "calculatedGrowthPercent": "9.24692481245514994809",
+      "differencePercentagePoints": "0.00000000000000005191",
+      "indexLocator": "Real GDP growth_USE category!AJ15 [2024]",
+      "volumeLocators": "GDP by USE side_2019 prices!AK14 [2024]; GDP by USE side_2019 prices!AF14 [2023]"
+    },
+    {
+      "seriesId": "gdp_use.imports_goods",
+      "year": 2024,
+      "publishedIndex": "109.97553224814425",
+      "growthPercent": "9.97553224814425",
+      "calculatedGrowthPercent": "9.97553224814423840378",
+      "differencePercentagePoints": "0.00000000000001159622",
+      "indexLocator": "Real GDP growth_USE category!AJ16 [2024]",
+      "volumeLocators": "GDP by USE side_2019 prices!AK15 [2024]; GDP by USE side_2019 prices!AF15 [2023]"
+    },
+    {
+      "seriesId": "gdp_use.imports_services",
+      "year": 2024,
+      "publishedIndex": "106.38900239124484",
+      "growthPercent": "6.38900239124484",
+      "calculatedGrowthPercent": "6.38900239124484789377",
+      "differencePercentagePoints": "-0.00000000000000789377",
+      "indexLocator": "Real GDP growth_USE category!AJ17 [2024]",
+      "volumeLocators": "GDP by USE side_2019 prices!AK16 [2024]; GDP by USE side_2019 prices!AF16 [2023]"
+    },
+    {
+      "seriesId": "economy.gdp_total",
+      "year": 2025,
+      "publishedIndex": "107.46161492416432",
+      "growthPercent": "7.46161492416432",
+      "calculatedGrowthPercent": "7.46161492416433922153",
+      "differencePercentagePoints": "-0.00000000000001922153",
+      "indexLocator": "Real GDP growth_USE category!AO18 [2025*]",
+      "volumeLocators": "GDP by USE side_2019 prices!AP17 [2025*]; GDP by USE side_2019 prices!AK17 [2024]"
+    },
+    {
+      "seriesId": "gdp_use.consumption",
+      "year": 2025,
+      "publishedIndex": "110.32708806032454",
+      "growthPercent": "10.32708806032454",
+      "calculatedGrowthPercent": "10.32708806032453000479",
+      "differencePercentagePoints": "0.00000000000000999521",
+      "indexLocator": "Real GDP growth_USE category!AO3 [2025*]",
+      "volumeLocators": "GDP by USE side_2019 prices!AP3 [2025*]; GDP by USE side_2019 prices!AK3 [2024]"
+    },
+    {
+      "seriesId": "gdp_use.households_npish",
+      "year": 2025,
+      "publishedIndex": "108.62533753219843",
+      "growthPercent": "8.62533753219843",
+      "calculatedGrowthPercent": "8.62533753219843278012",
+      "differencePercentagePoints": "-0.00000000000000278012",
+      "indexLocator": "Real GDP growth_USE category!AO4 [2025*]",
+      "volumeLocators": "GDP by USE side_2019 prices!AP4 [2025*]; GDP by USE side_2019 prices!AK4 [2024]"
+    },
+    {
+      "seriesId": "gdp_use.government",
+      "year": 2025,
+      "publishedIndex": "119.63903783211566",
+      "growthPercent": "19.63903783211566",
+      "calculatedGrowthPercent": "19.6390378321156718839",
+      "differencePercentagePoints": "-0.0000000000000118839",
+      "indexLocator": "Real GDP growth_USE category!AO5 [2025*]",
+      "volumeLocators": "GDP by USE side_2019 prices!AP5 [2025*]; GDP by USE side_2019 prices!AK5 [2024]"
+    },
+    {
+      "seriesId": "gdp_use.government_individual",
+      "year": 2025,
+      "publishedIndex": "122.20231454274222",
+      "growthPercent": "22.20231454274222",
+      "calculatedGrowthPercent": "22.20231454274220944908",
+      "differencePercentagePoints": "0.00000000000001055092",
+      "indexLocator": "Real GDP growth_USE category!AO6 [2025*]",
+      "volumeLocators": "GDP by USE side_2019 prices!AP6 [2025*]; GDP by USE side_2019 prices!AK6 [2024]"
+    },
+    {
+      "seriesId": "gdp_use.government_collective",
+      "year": 2025,
+      "publishedIndex": "117.45836409122265",
+      "growthPercent": "17.45836409122265",
+      "calculatedGrowthPercent": "17.45836409122264784625",
+      "differencePercentagePoints": "0.00000000000000215375",
+      "indexLocator": "Real GDP growth_USE category!AO7 [2025*]",
+      "volumeLocators": "GDP by USE side_2019 prices!AP7 [2025*]; GDP by USE side_2019 prices!AK7 [2024]"
+    },
+    {
+      "seriesId": "gdp_use.investment",
+      "year": 2025,
+      "publishedIndex": "94.531970655434066",
+      "growthPercent": "-5.468029344565934",
+      "calculatedGrowthPercent": "-5.46802934456592437397",
+      "differencePercentagePoints": "-0.00000000000000962603",
+      "indexLocator": "Real GDP growth_USE category!AO8 [2025*]",
+      "volumeLocators": "GDP by USE side_2019 prices!AP8 [2025*]; GDP by USE side_2019 prices!AK8 [2024]"
+    },
+    {
+      "seriesId": "gdp_use.fixed_capital",
+      "year": 2025,
+      "publishedIndex": "97.168814011412934",
+      "growthPercent": "-2.831185988587066",
+      "calculatedGrowthPercent": "-2.83118598858705407841",
+      "differencePercentagePoints": "-0.00000000000001192159",
+      "indexLocator": "Real GDP growth_USE category!AO9 [2025*]",
+      "volumeLocators": "GDP by USE side_2019 prices!AP9 [2025*]; GDP by USE side_2019 prices!AK9 [2024]"
+    },
+    {
+      "seriesId": "gdp_use.exports",
+      "year": 2025,
+      "publishedIndex": "107.01924776942187",
+      "growthPercent": "7.01924776942187",
+      "calculatedGrowthPercent": "7.01924776942187514263",
+      "differencePercentagePoints": "-0.00000000000000514263",
+      "indexLocator": "Real GDP growth_USE category!AO12 [2025*]",
+      "volumeLocators": "GDP by USE side_2019 prices!AP11 [2025*]; GDP by USE side_2019 prices!AK11 [2024]"
+    },
+    {
+      "seriesId": "gdp_use.exports_goods",
+      "year": 2025,
+      "publishedIndex": "107.10967391584747",
+      "growthPercent": "7.10967391584747",
+      "calculatedGrowthPercent": "7.10967391584748160685",
+      "differencePercentagePoints": "-0.00000000000001160685",
+      "indexLocator": "Real GDP growth_USE category!AO13 [2025*]",
+      "volumeLocators": "GDP by USE side_2019 prices!AP12 [2025*]; GDP by USE side_2019 prices!AK12 [2024]"
+    },
+    {
+      "seriesId": "gdp_use.exports_services",
+      "year": 2025,
+      "publishedIndex": "106.91793770569768",
+      "growthPercent": "6.91793770569768",
+      "calculatedGrowthPercent": "6.91793770569767654353",
+      "differencePercentagePoints": "0.00000000000000345647",
+      "indexLocator": "Real GDP growth_USE category!AO14 [2025*]",
+      "volumeLocators": "GDP by USE side_2019 prices!AP13 [2025*]; GDP by USE side_2019 prices!AK13 [2024]"
+    },
+    {
+      "seriesId": "gdp_use.imports",
+      "year": 2025,
+      "publishedIndex": "105.67954159708877",
+      "growthPercent": "5.67954159708877",
+      "calculatedGrowthPercent": "5.67954159708877339111",
+      "differencePercentagePoints": "-0.00000000000000339111",
+      "indexLocator": "Real GDP growth_USE category!AO15 [2025*]",
+      "volumeLocators": "GDP by USE side_2019 prices!AP14 [2025*]; GDP by USE side_2019 prices!AK14 [2024]"
+    },
+    {
+      "seriesId": "gdp_use.imports_goods",
+      "year": 2025,
+      "publishedIndex": "106.46307106531037",
+      "growthPercent": "6.46307106531037",
+      "calculatedGrowthPercent": "6.4630710653103546683",
+      "differencePercentagePoints": "0.0000000000000153317",
+      "indexLocator": "Real GDP growth_USE category!AO16 [2025*]",
+      "volumeLocators": "GDP by USE side_2019 prices!AP15 [2025*]; GDP by USE side_2019 prices!AK15 [2024]"
+    },
+    {
+      "seriesId": "gdp_use.imports_services",
+      "year": 2025,
+      "publishedIndex": "102.55855574174799",
+      "growthPercent": "2.55855574174799",
+      "calculatedGrowthPercent": "2.55855574174799639556",
+      "differencePercentagePoints": "-0.00000000000000639556",
+      "indexLocator": "Real GDP growth_USE category!AO17 [2025*]",
+      "volumeLocators": "GDP by USE side_2019 prices!AP16 [2025*]; GDP by USE side_2019 prices!AK16 [2024]"
+    }
+  ]
+}

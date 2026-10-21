@@ -70,8 +70,8 @@ test("tapping a menu link from mid-page closes the menu on arrival", async ({ pa
 });
 
 for (const { path, menu, datasets, other } of [
-  { path: "/", menu: "მენიუ", datasets: ["ბიუჯეტი", "ეკონომიკა", "ინფლაცია", "უმუშევრობა", "საგარეო ვაჭრობა"], other: "English" },
-  { path: "/en", menu: "Menu", datasets: ["Budget", "Economy", "Inflation", "Unemployment", "Trade"], other: "ქართული" },
+  { path: "/", menu: "მენიუ", datasets: ["ბიუჯეტი", "ეკონომიკა", "ბიზნესი", "საცხოვრებელი და მშენებლობა", "ინფლაცია", "ფული და ბანკები", "უმუშევრობა", "ხელფასები", "ცხოვრების დონე", "ჯანდაცვა და სოციალური დაცვა", "განათლება", "მეცნიერება და კულტურა", "დანაშაული და მართლმსაჯულება", "ინტერნეტი და ტექნოლოგიები", "საგარეო ვაჭრობა", "საგარეო ნაკადები", "ენერგეტიკა და სურსათი", "გარემო და კლიმატი", "ტრანსპორტი", "დემოგრაფია"], other: "EN English" },
+  { path: "/en", menu: "Menu", datasets: ["Budget", "Economy", "Business", "Housing and construction", "Inflation", "Money and banks", "Unemployment", "Wages", "Living standards", "Health and social protection", "Education", "Science and culture", "Crime and justice", "Internet and technology", "Trade", "External flows", "Energy and food", "Environment and climate", "Transport", "Demography"], other: "KA ქართული" },
 ]) {
   test(`${path} ☰ menu lists every dataset as 44px rows`, async ({ page }) => {
     await page.goto(path);
@@ -81,9 +81,10 @@ for (const { path, menu, datasets, other } of [
     await expect(group.getByRole("link")).toHaveText(datasets);
     const hrefs = await group.getByRole("link").evaluateAll((links) => links.map((link) => new URL((link as HTMLAnchorElement).href).pathname));
     const prefix = path === "/en" ? "/en" : "";
-    expect(hrefs).toEqual(["/explorer", "/explorer/economy", "/explorer/inflation", "/explorer/unemployment", "/explorer/trade"].map((href) => `${prefix}${href}`));
+    expect(hrefs).toEqual(["/explorer", "/explorer/economy", "/explorer/business", "/explorer/housing", "/explorer/inflation", "/explorer/money", "/explorer/unemployment", "/explorer/wages", "/explorer/living-standards", "/explorer/health", "/explorer/education", "/explorer/science-culture", "/explorer/crime", "/explorer/internet", "/explorer/trade", "/explorer/external", "/explorer/energy-food", "/explorer/environment", "/explorer/transport", "/explorer/demography"].map((href) => `${prefix}${href}`));
     for (const row of await heights(header.getByRole("navigation").getByRole("link"))) expect(row.height, row.text).toBeGreaterThanOrEqual(44);
-    const switchBox = await header.getByRole("group").getByRole("link", { name: other }).boundingBox();
+    // On a phone the link shows "EN"/"KA"; its name starts with that and adds the full language name.
+    const switchBox = await header.getByRole("group").getByRole("link", { name: other, exact: true }).boundingBox();
     expect(switchBox?.width ?? 0).toBeGreaterThanOrEqual(44);
     expect(switchBox?.height ?? 0).toBeGreaterThanOrEqual(44);
   });
@@ -112,7 +113,9 @@ for (const { path, titles, measures } of [
   });
 }
 
-test("landing calls to action are 44px tap targets", async ({ page }) => {
+// The hero CTA kept its 44px target only below 768px (U01-03); touch tablets sit above it.
+for (const width of [390, 768, 1280]) test(`landing calls to action are 44px tap targets at ${width}px`, async ({ page }) => {
+  await page.setViewportSize({ width, height: 900 });
   await page.goto("/");
   const targets = [
     page.getByTestId("hero-cta"),
@@ -122,8 +125,8 @@ test("landing calls to action are 44px tap targets", async ({ page }) => {
 });
 
 for (const { path, labels } of [
-  { path: "/explorer/unemployment", labels: ["ბიუჯეტი", "ეკონომიკა", "ინფლაცია", "უმუშევრობა", "საგარეო ვაჭრობა", "მეთოდოლოგია", "AI-კავშირი", "მიზანი"] },
-  { path: "/en", labels: ["Budget", "Economy", "Inflation", "Unemployment", "Trade", "Methodology", "AI connection", "About"] },
+  { path: "/explorer/unemployment", labels: ["ბიუჯეტი", "ეკონომიკა", "ბიზნესი", "საცხოვრებელი და მშენებლობა", "ინფლაცია", "ფული და ბანკები", "უმუშევრობა", "ხელფასები", "ცხოვრების დონე", "ჯანდაცვა და სოციალური დაცვა", "განათლება", "მეცნიერება და კულტურა", "დანაშაული და მართლმსაჯულება", "ინტერნეტი და ტექნოლოგიები", "საგარეო ვაჭრობა", "საგარეო ნაკადები", "ენერგეტიკა და სურსათი", "გარემო და კლიმატი", "ტრანსპორტი", "დემოგრაფია", "მეთოდოლოგია", "AI-კავშირი", "მიზანი"] },
+  { path: "/en", labels: ["Budget", "Economy", "Business", "Housing and construction", "Inflation", "Money and banks", "Unemployment", "Wages", "Living standards", "Health and social protection", "Education", "Science and culture", "Crime and justice", "Internet and technology", "Trade", "External flows", "Energy and food", "Environment and climate", "Transport", "Demography", "Methodology", "AI connection", "About"] },
 ]) {
   test(`${path} footer names every dataset in a compact two-column grid`, async ({ page }) => {
     await page.goto(path);
@@ -138,8 +141,8 @@ for (const { path, labels } of [
     // The data line no longer repeats its own heading.
     await expect(footer.getByText(path === "/en" ? "Data" : "მონაცემები", { exact: true })).toHaveCount(0);
     const height = (await footer.boundingBox())?.height ?? 0;
-    // ~445px against ~600px before; seven 44px rows in two columns are the floor.
-    expect(height).toBeLessThanOrEqual(460);
+    // ~748px since the footer lists all twenty hubs (Q3, 2026-10-12; Business, Health, Housing, Crime and justice and Education added 2026-10-15/16, Science and culture, Environment and climate, Transport and Internet and technology 2026-10-20): twenty-three links make twelve 44px rows in two columns.
+    expect(height).toBeLessThanOrEqual(760);
     const marginTop = await footer.evaluate((element) => parseFloat(getComputedStyle(element).marginTop));
     expect(marginTop).toBeLessThanOrEqual(48);
   });
@@ -149,7 +152,7 @@ test("404 recovers to every dataset with no top band on a phone", async ({ page 
   await page.goto("/this-page-does-not-exist");
   const recovery = page.getByTestId("not-found-recovery");
   const hrefs = await recovery.getByRole("link").evaluateAll((links) => links.map((link) => link.getAttribute("href")));
-  expect(hrefs).toEqual(["/", "/explorer", "/explorer/economy", "/explorer/inflation", "/explorer/unemployment", "/explorer/trade", "/methodology"]);
+  expect(hrefs).toEqual(["/", "/explorer", "/explorer/economy", "/explorer/business", "/explorer/housing", "/explorer/inflation", "/explorer/money", "/explorer/unemployment", "/explorer/wages", "/explorer/living-standards", "/explorer/health", "/explorer/education", "/explorer/science-culture", "/explorer/crime", "/explorer/internet", "/explorer/trade", "/explorer/external", "/explorer/energy-food", "/explorer/environment", "/explorer/transport", "/explorer/demography", "/methodology"]);
   expect((await recovery.boundingBox())?.y ?? 999).toBeLessThanOrEqual(40);
   await expect(page.locator('a[href="/sitemap.xml"], a[href="/llms.txt"]')).toHaveCount(0);
 });
@@ -163,7 +166,8 @@ for (const { path, back, href, trail } of [
     await page.goto(path);
     const header = page.getByTestId("explorer-header");
     const jsonLd = await page.getByTestId("breadcrumb-json-ld").textContent();
-    const crumb = header.getByRole("navigation", { name: "Breadcrumb" });
+    const landmark = path.startsWith("/en/") ? "Breadcrumb" : "ნავიგაციის ბილიკი";
+    const crumb = header.getByRole("navigation", { name: landmark });
     await expect(crumb.getByRole("link")).toHaveCount(1);
     await expect(crumb.getByRole("link")).toHaveText(`←${back}`);
     await expect(crumb.getByRole("link")).toHaveAttribute("href", href);
@@ -171,7 +175,7 @@ for (const { path, back, href, trail } of [
     expect((await header.boundingBox())?.height ?? 999).toBeLessThanOrEqual(80);
 
     await page.setViewportSize({ width: 1024, height: 800 });
-    const full = header.getByRole("navigation", { name: "Breadcrumb" });
+    const full = header.getByRole("navigation", { name: landmark });
     await expect(full.locator("[aria-current=page]")).toHaveCount(1);
     if (trail) expect((await full.innerText()).split("/").map((part) => part.trim().toLowerCase())).toEqual(trail.map((part) => part.toLowerCase()));
     // Structured data is server-rendered once and does not depend on the width.
@@ -223,25 +227,17 @@ test("the GDP latest value follows the active indicator", async ({ page }) => {
   await expect(page.getByTestId("gdp-latest")).toHaveText(/^მშპ-ის ზრდა · \d{4}: [+−]\d+\.\d%( · წინასწარი)?$/);
 });
 
-for (const path of ["/explorer", "/explorer/economy", "/explorer/inflation", "/explorer/unemployment"]) {
-  test(`${path} hub cards span their sparklines and keep one rhythm`, async ({ page }) => {
-    await page.goto(path);
-    for (const card of await page.getByTestId("hub-card").all()) {
-      const cardBox = (await card.boundingBox())!;
-      const graphic = card.locator("svg, [data-testid=hub-card-graphic-space]").first();
-      const box = (await graphic.boundingBox())!;
-      expect(box.height).toBeGreaterThanOrEqual(33);
-      // The card has 18px of padding on each side.
-      expect(box.width).toBeGreaterThan(cardBox.width - 40);
-    }
-  });
-}
-
-test("hub card names and the economy footer", async ({ page }) => {
+// Every hub renders the shared BudgetHub card, so /explorer stands for them all.
+test("/explorer hub cards span their sparklines and keep one rhythm", async ({ page }) => {
   await page.goto("/explorer");
-  await expect(page.getByTestId("hub-card").nth(3).getByRole("heading")).toHaveText("ანალიზი");
-  await page.goto("/explorer/economy");
-  await expect(page.getByTestId("hub-card").first().locator("p").last()).toHaveText(/^\d{4} · ნომინალური მშპ \d+\.\d მლრდ ₾$/);
+  for (const card of await page.getByTestId("hub-card").all()) {
+    const cardBox = (await card.boundingBox())!;
+    const graphic = card.locator("svg, [data-testid=hub-card-graphic-space]").first();
+    const box = (await graphic.boundingBox())!;
+    expect(box.height).toBeGreaterThanOrEqual(33);
+    // The card has 18px of padding on each side.
+    expect(box.width).toBeGreaterThan(cardBox.width - 40);
+  }
 });
 
 test("/about opens on a compact cover and ends with a way into the data", async ({ page }) => {

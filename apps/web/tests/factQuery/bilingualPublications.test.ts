@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 import { beforeAll, describe, expect, it } from "vitest";
-import { buildFactQuerySnapshot } from "../../lib/factQuery/buildSnapshot";
+import { testSnapshot } from "../helpers/factQuerySnapshot";
 import { buildAllPublications, type PublicationArtifact } from "../../lib/factQuery/publications";
 import type { FactQuerySnapshot } from "../../lib/factQuery/types";
 import type { Observation } from "../../lib/factQuery/observations";
@@ -8,7 +8,7 @@ import type { Observation } from "../../lib/factQuery/observations";
 let snapshot: FactQuerySnapshot;
 let artifacts: PublicationArtifact[];
 beforeAll(async () => {
-  snapshot = await buildFactQuerySnapshot({ releaseCommit: "test", generatedAt: "2026-09-06T00:00:00Z" });
+  snapshot = testSnapshot({ releaseCommit: "test", generatedAt: "2026-09-06T00:00:00Z" });
   artifacts = buildAllPublications(snapshot);
 });
 const read = (name: string) => JSON.parse(artifacts.find(file => file.fileName === name)!.bytes.toString("utf8"));
@@ -18,7 +18,7 @@ describe("bilingual bulk publications", () => {
     expect(artifacts.map(file => file.fileName).sort()).toEqual(["manifest.json", "catalogue.json", "sources.json", "national-revenue.json", "national-expenditure.json", "ministries.json", "municipal-expenditure.json", "government-debt.json", "government-debt-rates.json", "general-government-balance.json", "gdp-overview.json", "gdp-overview.csv", "economic-sectors.json", "economic-sectors.csv", "regional-economies.json", "regional-economies.csv", "inflation-national.json", "inflation-categories.csv", "inflation-categories.json", "inflation-cities.csv", "inflation-cities.json", "inflation-products.csv", "inflation-products.json"].sort());
     for (const artifact of artifacts.filter(file=>file.fileName.endsWith(".json"))) {
       const published = read(artifact.fileName);
-      expect(published.schemaVersion).toBe("1.5.0");
+      expect(published.schemaVersion).toBe("1.6.0");
       expect(published.dataVersion).toBe(snapshot.dataVersion);
     }
     for (const entry of read("manifest.json").files) {

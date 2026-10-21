@@ -41,7 +41,7 @@ test("national table numbers and GDP-share settings survive a language switch", 
   const hash = new URL(page.url()).hash;
   // Hydration may serialize the comma as %2C; all selected settings must agree.
   const settings = (hash: string) => Object.fromEntries(new URLSearchParams(hash.slice(1)));
-  const numbers = () => page.getByTestId("explorer-table").locator("tbody tr").evaluateAll(rows => rows.map(row => Array.from(row.querySelectorAll("td")).slice(1).map(cell => cell.textContent?.trim())));
+  const numbers = () => page.getByTestId("explorer-table").locator("tbody tr").evaluateAll(rows => rows.map(row => Array.from(row.querySelectorAll("td")).map(cell => cell.textContent?.trim())));
   const before = await numbers();
   await page.getByTestId("language-switch").getByRole("link", { name: "English", exact: true }).click();
   await expect(page.locator("html")).toHaveAttribute("lang", "en");

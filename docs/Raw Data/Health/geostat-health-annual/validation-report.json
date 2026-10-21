@@ -1,0 +1,273 @@
+{
+  "status": "passed",
+  "retrieved_at": "2026-10-15",
+  "scope": "Annual research only: Geostat healthcare tables 2002-2025 (staff, facilities, visits, illness) and causes of death and death rates by region 2014-2025; no derived values and no serving",
+  "primary_observation_count": 4204,
+  "observations_by_family": {
+    "death rate": 144,
+    "deaths by cause": 2952,
+    "facilities and visits": 96,
+    "illness": 540,
+    "staff": 472
+  },
+  "observations_by_source": {
+    "geostat_death_rate_region": 144,
+    "geostat_deaths_by_cause_region": 2952,
+    "geostat_health_anaemia": 10,
+    "geostat_health_diabetes": 10,
+    "geostat_health_hiv": 24,
+    "geostat_health_main": 96,
+    "geostat_health_morbidity_groups": 424,
+    "geostat_health_nurses": 112,
+    "geostat_health_physicians": 360,
+    "geostat_health_sti": 48,
+    "geostat_health_tuberculosis": 24
+  },
+  "indicators": 73,
+  "areas": 12,
+  "footnote_marked_cells": [
+    {
+      "indicator_id": "health.deaths.pregnancy",
+      "area_id": "georgia",
+      "year": 2021,
+      "source_id": "geostat_deaths_by_cause_region",
+      "source_cell": "J20",
+      "value": "34",
+      "printed": "34***"
+    }
+  ],
+  "placeholder_cells_in_served_values": 0,
+  "imputed_values": 0,
+  "calculated_values": 0,
+  "reconciliation_failed_count": 0,
+  "checks": [
+    "no duplicate, missing or extra observation, and no served year outside a table's coverage",
+    "a \"…\", \"...\" or \"-\" cell is never served as a value; anything but a number or one of these in a year column fails",
+    "published value equals the stored value at the precision Geostat prints (see README)",
+    "every row equals a fresh read of its source cell, number format, row label and year heading",
+    "doctors and nurses equal the main characteristics thousands x 1,000, every year 2002-2025",
+    "the 14 doctor specialities add up to doctors, every year",
+    "causes of death (chapters I-XIX and XXII) add up to all deaths for Georgia and each region, every year",
+    "the 11 regions add up to Georgia for all deaths and for each cause, every year",
+    "every footnote quoted in health-series-breaks.csv is printed in its workbook",
+    "all-deaths values equal demography.deaths in test_validation.py; independent-validation.json re-reads every cell with SheetJS"
+  ],
+  "source_checks": [
+    {
+      "source_id": "geostat_health_main",
+      "sha256": "19C3450E625135C103D4825ABC560F19A46EF658CBF181BC289D27FAF0540168",
+      "bytes": 13025,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_health_physicians",
+      "sha256": "EE9DF21FE3DA6BDD7E4BF4D17A37BA61B10A4A647A51340997155AC843DB4807",
+      "bytes": 15434,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_health_nurses",
+      "sha256": "5A8A79F7F51F9837007148177177CABA3346068AF71CDB42BEFA3A0D221FB468",
+      "bytes": 14340,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_health_abortions",
+      "sha256": "C05858AA81FD5E20476D86B25F1839E3DFEEB5DEC66636CB3CD05B48F8D5314E",
+      "bytes": 12206,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_health_morbidity_groups",
+      "sha256": "283A87DAD84756943982513909AD9E1812E5B33E45A42145145C9052DFD19CAC",
+      "bytes": 16198,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_health_morbidity_of_children_0_14_years_old_with_acute_and_chronic_diseases",
+      "sha256": "44ED590E56AF58261F776717E962D6EA48EDC87A41F4A55D24B7B63347ABA57F",
+      "bytes": 15990,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_health_morbidity_caused_by_some_infectious_disease",
+      "sha256": "0CFAA684E5E91CE850BFAB971F7431D67462D9491A068B9ADBA5B45974536F1F",
+      "bytes": 15870,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_health_sti",
+      "sha256": "554FD2F36D08E5E8A058CDE92169E5C08DC481CD3F38F61C3835A7BB0257D64F",
+      "bytes": 11297,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_health_tuberculosis",
+      "sha256": "C9B71CE035949118CDBCD4667638920102029B24FEFAEA0610AD2A507B0663E0",
+      "bytes": 10844,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_health_hiv",
+      "sha256": "9E238754D7C2A8DC8AB60A4936F8520B41CD0F5585E7372970FB0277CA8A9689",
+      "bytes": 12066,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_health_emergent_medical_care",
+      "sha256": "D17D03888302EF39CE5EDF74E0943B3B69EB5DDB8994FCC41F0E515B103A45B8",
+      "bytes": 12294,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_health_anaemia",
+      "sha256": "775EAAE5CC070FA359EF6303F8CAA211CF7BBB1A67FF6034DDD73066D684F66E",
+      "bytes": 11626,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_health_diabetes",
+      "sha256": "58B7CFE652A066FFC950C580C3917B0FF5767D84BD01A60D277EA11802D95750",
+      "bytes": 11516,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_health_circulatory_system",
+      "sha256": "25999029998E4A5E4C02E4D13CBFA93A6D51F0125F3AA156F86CCDA64867B5D2",
+      "bytes": 10108,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_health_respiratory_system",
+      "sha256": "15245D0049D8A7879F90DC98AF91FF20414F5C9745E411D1AFC55F68ED204B0D",
+      "bytes": 10110,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_health_16_number_of_persons_medicines",
+      "sha256": "60BABB50E023D1FC40D81007C695211724B1A57CC2D372F1FD2A066C3E4C56D2",
+      "bytes": 12688,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_health_17_the_cost_of_medicines",
+      "sha256": "345076BCF9F8314A0A2F287D471B6623F4890F27404C727C69373BFD47F082F5",
+      "bytes": 13555,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_health_18_the_number_of_beneficiaries_with_disabilities",
+      "sha256": "AD4A9C91BB6C5B3CEBE27AF38C446E3E2B3E86ED9E6618F99B3C199D11C531D3",
+      "bytes": 26597,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_health_19_number_of_cases_services_of_persons_with_disabilities",
+      "sha256": "08F18C7DD1776BDF4333E6515747D6DE781ADD6FBD0195906C9C668A028012B8",
+      "bytes": 25662,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_health_20_number_of_cases_services_of_persons_with_disabilities_by_regions",
+      "sha256": "F0BF0087F0BB83CD7FDB1C0456C1FA34F33BCBA81B5BD6011BE484E15A8385F3",
+      "bytes": 14202,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_health_number_of_beneficiaries_screened_for_malignant_neoplasms",
+      "sha256": "05CF68F96B77D41D1B8544FB6B30B848555D1DA3C9FEBFA6A9916CEE339A5FF1",
+      "bytes": 11577,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_deaths_25_1_infant_mortality_rate_by_regions_and_sex",
+      "sha256": "ED09F881504D21C3B5C26972853F617B80AB74E79E565953EA2732852F595B67",
+      "bytes": 18152,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_deaths_26_1_under_5_mortality_rate_by_regions_andsex",
+      "sha256": "4C9DA70808E67E621B3F75B7E8D22F07C3B72B5859EB2B550B1D8A12F3F65AD4",
+      "bytes": 16996,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_death_rate_region",
+      "sha256": "219DA43232071042BC2349DE1F2E04E88E7BDFA9C0880F2833BCB0B3BCF0A186",
+      "bytes": 12763,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_deaths_23_1_deaths_by_chapters_sex",
+      "sha256": "04A2D253CC00D1FF12AF3F1F88331D3B16A47A79B489EC5973E1EC6EC99F352E",
+      "bytes": 24924,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_deaths_by_cause_region",
+      "sha256": "A68009636B520AFD9CE4E95254BEBDE0063EED2E7610CC45B66838780943416B",
+      "bytes": 31220,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_deaths_23_3_deaths_by_chapters_urban_rural",
+      "sha256": "AD414BA37AF3307905DC1ACF730BF5CDFF2DFF06EA6662CCC077A3CB6B6204AE",
+      "bytes": 16787,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_deaths_23_4_deaths_by_chapters_age_sex",
+      "sha256": "FDD5F466AD0578D6C4AECAD437B4297F268BA2EDF1C09B5BF2CF746288BB6ED5",
+      "bytes": 102741,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_deaths_23_6_number_of_maternal_deaths_by_regions",
+      "sha256": "DCB02357929EAA54F01923E42E3CE4353F2FFF04CE29EA6EC0143E4715FFD5BA",
+      "bytes": 13209,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_deaths_23_7_number_of_maternal_deaths_by_age_groups",
+      "sha256": "3700BD091E7F7EEAEDFAF4D70100A66536479D4D27AC254570BA12B8A304C777",
+      "bytes": 12364,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_deaths_23_10_deaths_from_suicide_by_regions_and_sex",
+      "sha256": "2CA22E0E1BDB48FD87B6AAD2D29D4362CEA35741AF57D1CAE2A4892F837D3E5A",
+      "bytes": 14245,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_deaths_23_11_suicide_rate_by_sex",
+      "sha256": "E25FA22CE4BD1AD815DB90EC9B8E3E5A36D5D16B23529A0684D4FA50F6096B24",
+      "bytes": 11168,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_deaths_23_5_deaths_by_causes_age_sex",
+      "sha256": "47EA372B3FCAB0F3DA363DC7FC7CABA2C53166492B2C3ABB771AA98F6C0D7714",
+      "bytes": 273829,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_deaths_23_8_maternal_mortality_rate_by_regions",
+      "sha256": "19CC03E12C96F9768A635431E484BEBF2E93E39EEB0BE97BA43BBE2BAF10A598",
+      "bytes": 10443,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_health_page",
+      "sha256": "585C66E19826107CD3B9D6112DA62F0001B7DBC7E2FA10184B6826367583D9A9",
+      "bytes": 122509,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_deaths_page",
+      "sha256": "D15AF58C606DB97B2D727EFFD5C4B03517CF4FF2692DED379E715718049083F2",
+      "bytes": 127076,
+      "passed": true
+    }
+  ]
+}

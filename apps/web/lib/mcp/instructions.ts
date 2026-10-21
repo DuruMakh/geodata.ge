@@ -27,24 +27,41 @@ export type SectorMeasureYears = Partial<Record<keyof typeof SECTOR_QUERY_MEASUR
  */
 export function serverInstructions(
   coverage: Partial<Record<DatasetId, string>>,
-  entities: { municipalities: number; regions: number },
+  entities: {
+    municipalities: number;
+    regions: number;
+    regionalEconomyRegions?: number;
+    regionalActivities?: number;
+    regionalLastYear?: number;
+    sectorActivities?: number;
+    cities?: number;
+    cityDivisions?: number;
+    cityFirstPeriod?: string;
+  },
   sectorMeasureYears: SectorMeasureYears = {},
 ): string {
   const range = (id: DatasetId) => coverage[id] ?? "see describe_coverage";
   const sectorRange = (measure: keyof SectorMeasureYears) => sectorMeasureYears[measure] ?? "see describe_coverage";
+  // Counts read from the snapshot like the ranges; without one the sentence
+  // still reads, it just states no number.
+  const counted = (count: number | undefined) => (count === undefined ? "" : `${count} `);
 
-  return `Fiscal.ge serves reviewed data on Georgia's state and municipal budgets, government
+  return `Use describe_coverage with short keywords before querying. Use returned IDs and supported measures; keep expectedDataVersion consistent. Preserve units, missing values, projections and caveats. Cite the returned original documents and Fiscal.ge. For product questions, search first and request only the required series and dates. Use the published files for bulk analysis.
+
+Search with one meaningful keyword. If a phrase returns no matches, try the principal word or browse the named dataset. A failed phrase match is not proof that the data is absent.
+
+Fiscal.ge serves reviewed data on Georgia's state and municipal budgets, government
 debt and fiscal balance, GDP and national economic sectors (all annual), and monthly
 consumer-price inflation.
 
 WHAT IS SERVED
 - Regional economies, ${range("regional-economies")}, through query_regional_economies.
-  Eleven regions, Total regional GDP and twenty NACE Rev.2 activities. Values
+  ${counted(entities.regionalEconomyRegions)}regions, Total regional GDP and ${counted(entities.regionalActivities)}NACE Rev.2 activities. Values
   are current-price GEL; activity shares divide basic-price GVA by the same
-  region's complete market-price GDP. No 2025, real growth, per-capita value or
+  region's complete market-price GDP. No ${entities.regionalLastYear === undefined ? "" : `year after ${entities.regionalLastYear}, `}real growth, per-capita value or
   region share of Georgia's GDP is served. Do not imply a multi-region chart.
 - National economic sectors, ${range("economic-sectors")}, through query_economic_sectors.
-  Twenty NACE Rev.2 activities and a separately published Total GDP reference.
+  ${counted(entities.sectorActivities)}NACE Rev.2 activities and a separately published Total GDP reference.
   Nominal GEL and GDP shares cover ${sectorRange("amount_gel")}; annual real growth covers ${sectorRange("real_growth_pct")}.
   Inspect yearsByMeasure in describe_coverage. Sectors are GVA at basic prices;
   shares divide by market-price GDP and need not sum to 100%. Growth 7.5 means 7.5%.
@@ -52,7 +69,7 @@ WHAT IS SERVED
 - GDP overview, ${range("gdp-overview")}, through query_gdp. Choose one or more of
   six discovered series IDs; each fixes its units and price basis. Real GDP is
   constant-2015 USD; nominal GDP and nominal GDP per capita are current GEL/USD.
-  Annual real growth is percentage points (7.5 means 7.5%), not a fraction.
+  Annual real growth is percent (7.5 means 7.5%), not a fraction.
   Values are published or preliminary, never budget planned values. Per-capita
   GDP is output per person, not income. Preserve historical and revision caveats.
   Individual series have shorter year coverage. GDP ranking and cumulative
@@ -77,6 +94,7 @@ Coverage is derived from the loaded data and is reported by describe_coverage.
 Do not assume a year or a series exists; ask.
 
 LANGUAGES AND COMPATIBILITY
+Schema 1.6.0 adds internal_error and the preserved_derived source narrowing outcome.
 Schema 1.5.0 adds reviewed product inflation, cumulative_pct and optional
 calculationBasePeriod on cumulative observations and rankings. Schema 1.4.0 added
 inflation cities (the city entity type and query_inflation entityIds) after schema 1.3.0 added regional economies and schema 1.2.0 introduced the optional period (YYYY-MM) on inflation observations, comparison endpoints and ranking entries, while retaining reviewed Georgian (*Ka) and English (*En) names, definitions,
@@ -88,8 +106,9 @@ translated companions describe it without replacing it. documentLanguage is null
 when unverified; a translated title does not mean the source document was translated.
 Translation corrections change dataVersion because the text is part of the pinned
 data identity. Reuse a dataVersion only with responses from that same snapshot.
-Clients must accept additive fields and schema 1.5.0; exact-version or unknown-field
-validators need updating. Byte-for-byte response compatibility is not promised.
+Clients must accept additive fields and schema 1.6.0. Strict cached output-enum
+validators must refresh discovery; exact-version or unknown-field validators need
+updating. Byte-for-byte response compatibility is not promised.
 Both /connect and /en/connect describe the shared /mcp endpoint and /downloads/data/
 publications. Static publications carry the same bilingual evidence and remain
 available without an MCP connection. Text rows include both languages; values and
@@ -104,6 +123,10 @@ capital projects, procurement, and anything after the last reviewed year that is
 explicitly served as a projection. There
 is no such thing as a partial answer assembled from outside sources: if the data
 does not cover the question, say so.
+Unemployment is not served by this MCP. For that question, offer the existing
+Fiscal.ge unemployment explorer in the user's language: Georgian
+https://fiscal.ge/explorer/unemployment/overview or English
+https://fiscal.ge/en/explorer/unemployment/overview. Do not invent a rate.
 
 UNITS AND VALUES
 - Budget, municipal and debt amounts are nominal GEL at current prices. That is
@@ -133,6 +156,10 @@ whenever both totals are in play; report what it says, not the code it says it
 under.
 Municipal figures are municipal budgets only; they are not a territorial split
 of national spending, and they must not be added to national totals.
+The Georgia aggregate combines 69 reviewed budgets plus the net Adjara adjustment exactly once.
+It differs from the 64 territorial municipalities available for territorial comparisons:
+the five excluded municipal codes remain in the combined-budget aggregate.
+Do not reproduce that aggregate by summing territorial municipalities or regional rows.
 
 DEBT AND FISCAL BALANCE
 Two datasets sit outside the budget boundaries above, and neither may be
@@ -166,8 +193,8 @@ INFLATION
   two published numbers; it is not a verdict on the central bank. No target
   before the first reviewed month is verified; do not say none existed.
 - City figures (query_inflation entityIds, rank dimension entities with entityType
-  city) cover the six cities where Geostat records prices, from 2016-01, for the
-  total and the 12 divisions. A city's inflation is not its region's, nor that
+  city) cover the ${counted(entities.cities)}cities where Geostat records prices, from ${entities.cityFirstPeriod ?? "the first period describe_coverage reports"}, for the
+  total and the ${counted(entities.cityDivisions)}divisions. A city's inflation is not its region's, nor that
   city's cost of living or price level. Some prices are recorded once and applied
   to every city; say so when a city difference in a division is the point.
 - The national CPI is a weighted mean of the city indices. Geostat does not publish
@@ -202,6 +229,11 @@ PRODUCT INFLATION
 - Output cells count products times output months, not preceding compounding inputs.
   Narrow products/months if the 500-cell or 512 KiB evidence-inclusive limit refuses
   a call, or use the bulk inputs and metadata under /downloads/data/.
+- The bulk inflation-products.csv contains raw index_100 values, with measures
+  mom_index_100 and yoy_index_100: 100 means no price change, not 100% inflation.
+  These are not the query's percentage changes. Subtract 100 from the annual index;
+  compound complete monthly indices for cumulative changes using the preceding December base.
+  inflation-products.json supplies the catalogue, history limits and calculation metadata.
 
 HOW TO PRESENT AN ANSWER
 The reader is a member of the public asking about their country's budget, not a
@@ -227,7 +259,11 @@ CITATIONS AND LICENCE
 Every response carries meta.sources, narrowed to the public originals this
 particular answer rests on. Cite from those. Both structured observations and
 text rows carry documentIds for the specific figure, resolved by the source
-evidence in the same response. The data is
+evidence in the same response. For static evidence, manifest.json inventories publication files
+with their hashes and byte sizes; sources.json contains the complete original-document catalogue.
+When asked for all underlying evidence, include https://fiscal.ge/downloads/data/sources.json
+alongside the relevant source groups; first/last examples alone are not a complete citation path.
+Do not describe the manifest as the original-document list. The data is
 published under CC BY 4.0
 (https://creativecommons.org/licenses/by/4.0/); attribute Fiscal.ge.
 

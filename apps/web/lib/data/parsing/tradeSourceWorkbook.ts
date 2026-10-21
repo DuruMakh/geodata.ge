@@ -23,3 +23,17 @@ export function readTradeSourceWorksheet(bytes: Buffer, sheetName: string): { sh
   }
   return { sheet, storedValues };
 }
+
+/**
+ * Parsed trade research inputs keyed by file name and content hash. The preparation functions take one optionally:
+ * a caller that runs them many times over mostly unchanged inputs (the tests' negative cases) parses each unchanged
+ * file once, and a changed file has a new hash, so it is parsed again. Without one, every input is parsed as before.
+ * Callers must treat what it returns as read-only, because later runs share it.
+ */
+export type TradeParseCache = Map<string, unknown>;
+
+export function parseOnce<T>(cache: TradeParseCache | undefined, key: string, parse: () => T): T {
+  if (!cache) return parse();
+  if (!cache.has(key)) cache.set(key, parse());
+  return cache.get(key) as T;
+}

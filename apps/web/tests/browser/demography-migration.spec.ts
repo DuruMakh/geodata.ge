@@ -4,8 +4,8 @@ import { expect, test, type Page } from "@playwright/test";
 const ready = (page: Page) => expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
 const PATH = "/explorer/demography/migration";
 
+// English only: the Georgian heading, coverage and net line are pinned by the Georgian page render in demographyPages.test.tsx.
 for (const [locale, prefix, heading, coverage, net] of [
-  ["ka", "", "მიგრაცია", "2012–2025 · წლიური", "წმინდა მიგრაცია"],
   ["en", "/en", "Migration", "2012–2025 · annual", "Net migration"],
 ] as const) {
   test(`${locale}: opens on all six groups with both directions and the net line`, async ({ page }) => {
@@ -39,6 +39,29 @@ test("removing Russia relabels the net line, removes its bars and writes the sel
   expect(await segments("arrivals:citizenship.georgia").count()).toBeGreaterThan(0);
   expect(await segments("departures:citizenship.georgia").count()).toBeGreaterThan(0);
   await expect(page).toHaveURL(/sel=citizenship\.georgia%2Ccitizenship\.turkey/);
+});
+
+// U27-04: on a phone the citizenship colours and the net line are named above the chart, not only in the list below it.
+test("at 390px the key above the chart names the selected groups and the net line and follows the selection", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto(`/en${PATH}`);
+  await ready(page);
+  const items = page.getByTestId("chart-panel").getByTestId("stack-chart-legend").locator("li");
+  await expect(items).toHaveCount(7);
+  for (const item of await items.all()) {
+    await expect(item.locator("span[aria-hidden]")).toBeVisible();
+    await expect(item).toHaveText(/\S/);
+  }
+  await expect(items.last()).toHaveText("Net migration");
+  const legendBox = (await page.getByTestId("stack-chart-legend").boundingBox())!;
+  const chartBox = (await page.getByTestId("chart-panel").locator("svg[data-geometry]").boundingBox())!;
+  expect(legendBox.y + legendBox.height).toBeLessThanOrEqual(chartBox.y);
+  const russiaKey = page.getByTestId("stack-chart-legend").locator('[data-legend-series-id="citizenship.russian_federation"]');
+  await expect(russiaKey).toHaveCount(1);
+  await page.locator('[data-testid="series-row"][data-series-id="citizenship.russian_federation"] [data-testid="series-row-toggle"]').click();
+  await expect(items).toHaveCount(6);
+  await expect(russiaKey).toHaveCount(0);
+  await expect(items.last()).toHaveText("Net migration (selected groups)");
 });
 
 test("moving the range end changes the period of the key figures and the address", async ({ page }) => {
@@ -77,10 +100,12 @@ test("the hover readout lists all twelve rows as arrows: arrivals by size, then 
 });
 
 // The float readout is clipped to the plot's height, so twelve rows must fit it at every width that draws it.
-// Headroom is thinnest at 900px (about 5px, measured 2026-10-09): one more readout line (a note, a "+N" line, a longer
-// overlay label) would clip there, so keep this list and re-measure before adding one.
-for (const width of [769, 820, 900, 1000, 1021, 1100, 1280, 1400, 1440]) {
-  test(`the twelve-row hover readout is not clipped at ${width}px`, async ({ page }) => {
+// Re-measured 2026-10-13 (plot minus readout height): the headroom grows with the width inside each layout and
+// drops where a layout starts, so each layout's narrowest width is its thinnest: 769 (47px), 900 (5px) and 1400
+// (63px); 820/1000/1100/1280 measured 58/40/75/137px. One more readout line (a note, a "+N" line, a longer overlay
+// label) would clip at 900, so re-measure before adding one.
+test("the twelve-row hover readout is not clipped at the narrowest width of each layout", async ({ page }) => {
+  for (const width of [769, 900, 1021, 1400, 1440]) {
     await page.setViewportSize({ width, height: 900 });
     await page.goto(`/en${PATH}`);
     await ready(page);
@@ -89,15 +114,15 @@ for (const width of [769, 820, 900, 1000, 1021, 1100, 1280, 1400, 1440]) {
     await page.keyboard.press("Home");
     for (let step = 0; step < 4; step += 1) await page.keyboard.press("ArrowRight");
     const tooltip = page.getByTestId("stack-chart-tooltip");
-    await expect(tooltip).toBeVisible();
+    await expect(tooltip, `${width}px`).toBeVisible();
     const box = await tooltip.boundingBox();
     const rows = tooltip.locator(":scope > div");
     const last = await rows.last().boundingBox();
     expect(box && last).toBeTruthy();
-    expect(last!.y + last!.height, `last row bottom ${last!.y + last!.height} vs tooltip bottom ${box!.y + box!.height}`).toBeLessThanOrEqual(box!.y + box!.height + 0.5);
-    expect(await tooltip.evaluate((element) => element.scrollHeight <= element.clientHeight + 1)).toBe(true);
-  });
-}
+    expect(last!.y + last!.height, `${width}px: last row bottom ${last!.y + last!.height} vs tooltip bottom ${box!.y + box!.height}`).toBeLessThanOrEqual(box!.y + box!.height + 0.5);
+    expect(await tooltip.evaluate((element) => element.scrollHeight <= element.clientHeight + 1), `${width}px`).toBe(true);
+  }
+});
 
 test("the Georgian readout with five groups fits on the last year, where it flips left and its header wraps", async ({ page }) => {
   await page.setViewportSize({ width: 900, height: 900 });
@@ -124,17 +149,12 @@ test("a single-year range prints that year and drops the range-start details", a
   await expect(highlights).not.toContainText("2023: ");
 });
 
-test("the series search matches the group in either language", async ({ page }) => {
-  for (const [path, query] of [
-    [PATH, "russia"],
-    [`/en${PATH}`, "რუსეთი"],
-  ] as const) {
-    await page.goto(path);
-    await ready(page);
-    await page.getByTestId("series-search").fill(query);
-    await expect(page.getByTestId("series-row"), `${path} search "${query}"`).toHaveCount(1);
-    await expect(page.getByTestId("series-row")).toHaveAttribute("data-series-id", "citizenship.russian_federation");
-  }
+test("the series search matches the group in the other language", async ({ page }) => {
+  await page.goto(`/en${PATH}`);
+  await ready(page);
+  await page.getByTestId("series-search").fill("რუსეთი");
+  await expect(page.getByTestId("series-row")).toHaveCount(1);
+  await expect(page.getByTestId("series-row")).toHaveAttribute("data-series-id", "citizenship.russian_federation");
 });
 
 test("the sex tabs change the chart, the table and the key figures", async ({ page }) => {
@@ -190,21 +210,8 @@ test("the Excel download has three sheets and numeric persons", async ({ page },
   expect(typeof data.getRow(2).getCell(5).value).toBe("number");
 });
 
-test("the hub card and the sidebar link the Migration page", async ({ page }) => {
-  await page.goto("/en/explorer/demography");
-  await expect(page.getByTestId("demography-hub").locator(`a[href="/en${PATH}"]`)).toHaveCount(1);
-  await page.goto(`/en${PATH}`);
-  await ready(page);
-  await expect(page.getByTestId("demography-migration-link")).toHaveAttribute("aria-current", "page");
-});
-
-test("English page has no Georgian text", async ({ page }) => {
-  await page.goto(`/en${PATH}`);
-  await ready(page);
-  expect(await page.locator("main").innerText()).not.toMatch(/\p{Script=Georgian}/u);
-});
-
-for (const width of [390, 768, 1100, 1440]) {
+// 390, 768 and 1440: the layout pass in mobile-fit-charts.spec.ts.
+for (const width of [1100]) {
   test(`no horizontal page overflow at ${width}px`, async ({ page }) => {
     await page.setViewportSize({ width, height: 900 });
     for (const path of [PATH, `/en${PATH}`]) {

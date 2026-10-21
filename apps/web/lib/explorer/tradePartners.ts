@@ -4,7 +4,7 @@ import { TRADE_CHART_INDICATORS } from "../data/tradeOverview/types";
 import type { Presentation } from "../i18n/types";
 import { publicLabel } from "../i18n/labels";
 import { message } from "../i18n/messages";
-import { INK, SERIES_COLORS, stableSeriesColor } from "./colors";
+import { EDITORIAL_PALETTE, INK, SERIES_COLORS, stableSeriesColor } from "./colors";
 import { unitFor, type ValueUnit } from "./format";
 import { resolveRange, type ResolvedPeriodRange } from "./periodRange";
 import { TRADE_PARTNER_TOTAL_ID, tradePartnersTotalId, tradePartnersBulkSelection, tradePartnersCoverage, type TradePartnersState } from "./tradePartnersState";
@@ -12,6 +12,8 @@ import { TRADE_PARTNER_TOTAL_ID, tradePartnersTotalId, tradePartnersBulkSelectio
 const servicePalette = [...new Set(Object.values(SERIES_COLORS))].filter(color => color !== INK);
 export function tradePartnerColor(id: string): string {
   if (id === TRADE_PARTNER_TOTAL_ID || id === "services.total") return INK;
+  const composition = /^trade\.(sitc|bec)1\.(\d)$/.exec(id);
+  if (composition) return EDITORIAL_PALETTE[Number(composition[2]) - (composition[1] === "bec" ? 1 : 0)];
   const serviceIndex = (TRADE_SERVICE_IDS as readonly string[]).indexOf(id);
   return serviceIndex > 0 ? servicePalette[serviceIndex - 1] : stableSeriesColor(id);
 }
@@ -31,11 +33,12 @@ export function buildTradePartnersModel(data: ClientTradePartnersData, state: Tr
   const billion = values.some(value => Math.abs(value) >= 1_000_000_000);
   const unit = unitFor(values, { divisor: billion ? 1_000_000_000 : 1_000_000, label: message(presentation.messages, billion ? "trade.unit.billion" : "trade.unit.million"), decimals: 1 });
   unit.decimals = Math.max(1, unit.decimals);
-  const kind = data.dataset === "services" ? "service_type" : state.tab === "countries" ? "country" : "group";
-  const activeEntities = data.entities.filter(entity => entity.kind === kind);
-  const offTabSelected = data.entities.filter(entity => entity.kind !== kind && selectedIds.includes(entity.id));
+  const kind = data.dataset === "composition" ? "commodity_group" : data.dataset === "services" && data.dimension !== "countries" ? "service_type" : state.tab === "countries" ? "country" : "group";
+  const inView = (entity: ClientTradePartnerEntity) => entity.kind === kind || (data.dataset === "services" && data.dimension === "countries" && entity.kind === "residual");
+  const activeEntities = data.entities.filter(inView);
+  const offTabSelected = data.entities.filter(entity => !inView(entity) && selectedIds.includes(entity.id));
   const national = valuesByEntity[totalId][range.end];
-  const rows = activeEntities.map(entity => {
+  const rows = activeEntities.filter(entity => entity.kind !== "residual").map(entity => {
     const valueUsd = valuesByEntity[entity.id][range.end];
     return { entityId: entity.id, kind: entity.kind, label: publicLabel(presentation.locale, entity.id, entity.labelKa, presentation.englishLabels), valueUsd, shareOfNational: state.measure !== "trade.balance" && valueUsd !== null && national !== null && national > 0 ? valueUsd / national : null, rank: null, color: tradePartnerColor(entity.id) };
   });
@@ -43,6 +46,6 @@ export function buildTradePartnersModel(data: ClientTradePartnersData, state: Tr
   const ranking = rows.filter(row => row.valueUsd !== null).sort((a, b) => (state.measure === "trade.balance" ? Math.abs(b.valueUsd!) - Math.abs(a.valueUsd!) : b.valueUsd! - a.valueUsd!) || labelOrder(a, b)).map((row, index) => ({ ...row, rank: index + 1 }));
   const missingRanking = rows.filter(row => row.valueUsd === null).sort(labelOrder);
   const order = new Map([...ranking, ...missingRanking].map((row, index) => [row.entityId, index]));
-  activeEntities.sort((a, b) => order.get(a.id)! - order.get(b.id)!);
+  activeEntities.sort((a, b) => (order.get(a.id) ?? Infinity) - (order.get(b.id) ?? Infinity));
   return { years, range, unit, selectedIds, valuesByEntity, activeEntities, offTabSelected, ranking, missingRanking, selectedCount: selectedIds.length, totalCount: ids.length };
 }

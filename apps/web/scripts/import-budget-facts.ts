@@ -1,6 +1,7 @@
 import { loadGdpOverviewFacts, assertGdpParity } from "../lib/data/gdpOverview/importGdpOverview";
 import { loadGdpOverviewFactsFromMirror } from "../lib/db/mirrorRows";
 import { loadEconomicSectorFacts, assertEconomicSectorParity } from "../lib/data/economicSectors/importEconomicSectors";
+import { loadGdpExpenditureFacts, assertGdpExpenditureParity } from "../lib/data/gdpExpenditure/importGdpExpenditure";
 import { loadUnemploymentFacts, assertUnemploymentParity } from "../lib/data/unemployment/importUnemployment";
 import { loadTradeOverviewFacts, assertTradeOverviewParity } from "../lib/data/tradeOverview/importTradeOverview";
 import { TRADE_OVERVIEW_DOCUMENT_ID } from "../lib/data/tradeOverview/types";
@@ -12,8 +13,32 @@ import { loadEnergyFoodFacts, assertEnergyFoodParity } from "../lib/data/energyF
 import { energyFoodSourceDocumentId } from "../lib/data/energyFood/types";
 import { loadMoneyBanksFacts, assertMoneyBanksParity } from "../lib/data/moneyBanks/importMoneyBanks";
 import { moneyBanksSourceDocumentId } from "../lib/data/moneyBanks/types";
+import { loadExternalPositionFacts, assertExternalPositionParity } from "../lib/data/externalPosition/importExternalPosition";
+import { externalPositionSourceDocumentId } from "../lib/data/externalPosition/types";
+import { loadBusinessFacts, assertBusinessParity } from "../lib/data/business/importBusiness";
+import { businessSourceDocumentId } from "../lib/data/business/types";
+import { loadEducationFacts, assertEducationParity } from "../lib/data/education/importEducation";
+import { educationSourceDocumentId } from "../lib/data/education/types";
+import { loadSocialFacts, assertSocialParity } from "../lib/data/social/importSocial";
+import { socialSourceDocumentId } from "../lib/data/social/types";
+import { loadScienceCultureFacts, assertScienceCultureParity } from "../lib/data/scienceCulture/importScienceCulture";
+import { scienceCultureSourceDocumentId } from "../lib/data/scienceCulture/types";
 import { loadHouseholdFacts, assertHouseholdParity } from "../lib/data/household/importHousehold";
 import { householdSourceDocumentId } from "../lib/data/household/types";
+import { loadHealthFacts, assertHealthParity } from "../lib/data/health/importHealth";
+import { healthSourceDocumentId } from "../lib/data/health/types";
+import { loadCrimeFacts, assertCrimeParity } from "../lib/data/crime/importCrime";
+import { crimeSourceDocumentId } from "../lib/data/crime/types";
+import { loadEnvironmentFacts, assertEnvironmentParity } from "../lib/data/environment/importEnvironment";
+import { environmentSourceDocumentId } from "../lib/data/environment/types";
+import { loadLabourFacts, assertLabourParity } from "../lib/data/labour/importLabour";
+import { labourSourceDocumentId } from "../lib/data/labour/types";
+import { loadHousingFacts, assertHousingParity } from "../lib/data/housing/importHousing";
+import { housingSourceDocumentId } from "../lib/data/housing/types";
+import { loadInternetFacts, assertInternetParity } from "../lib/data/internet/importInternet";
+import { internetSourceDocumentId } from "../lib/data/internet/types";
+import { loadTransportFacts, assertTransportParity } from "../lib/data/transport/importTransport";
+import { transportSourceDocumentId } from "../lib/data/transport/types";
 import { loadTradePartnersData, assertTradePartnersParity } from "../lib/data/tradePartners/importTradePartners";
 import { TRADE_PARTNER_DOCUMENT_IDS } from "../lib/data/tradePartners/types";
 import { loadMoneyTransfersData, assertMoneyTransfersParity } from "../lib/data/externalFlows/importMoneyTransfers";
@@ -26,6 +51,7 @@ import { loadTradeDomesticData, assertTradeDomesticParity } from "../lib/data/tr
 import { TRADE_DOMESTIC_DOCUMENT_IDS } from "../lib/data/tradeDomestic/types";
 import { loadTradeServicesData, assertTradeServicesParity } from "../lib/data/tradeServices/importTradeServices";
 import { TRADE_SERVICES_DOCUMENT_IDS } from "../lib/data/tradeServices/types";
+import { loadTradeCompositionData, assertTradeCompositionParity } from "../lib/data/tradeComposition/importTradeComposition";
 import {
   assertRegionalEconomyParity,
   loadRegionalEconomyFacts,
@@ -45,6 +71,8 @@ import {
 import { assertProductParity, loadProductCatalogueCsv, loadProductFactsCsv } from "../lib/data/inflation/importProducts";
 import {
   loadEconomicSectorFactsFromMirror,
+  loadGdpExpenditureFactsFromMirror,
+  gdpExpenditureMirrorCreateRows,
   loadUnemploymentFactsFromMirror,
   unemploymentMirrorCreateRows,
   loadTradeOverviewFactsFromMirror,
@@ -57,8 +85,32 @@ import {
   energyFoodMirrorCreateRows,
   loadMoneyBanksFactsFromMirror,
   moneyBanksMirrorCreateRows,
+  loadExternalPositionFactsFromMirror,
+  externalPositionMirrorCreateRows,
+  loadBusinessFactsFromMirror,
+  businessMirrorCreateRows,
+  loadEducationFactsFromMirror,
+  educationMirrorCreateRows,
+  loadSocialFactsFromMirror,
+  socialMirrorCreateRows,
+  loadScienceCultureFactsFromMirror,
+  scienceCultureMirrorCreateRows,
   loadHouseholdFactsFromMirror,
   householdMirrorCreateRows,
+  loadHealthFactsFromMirror,
+  healthMirrorCreateRows,
+  loadCrimeFactsFromMirror,
+  crimeMirrorCreateRows,
+  loadEnvironmentFactsFromMirror,
+  environmentMirrorCreateRows,
+  loadLabourFactsFromMirror,
+  labourMirrorCreateRows,
+  loadHousingFactsFromMirror,
+  housingMirrorCreateRows,
+  loadInternetFactsFromMirror,
+  internetMirrorCreateRows,
+  loadTransportFactsFromMirror,
+  transportMirrorCreateRows,
   tradePartnerEntityMirrorCreateRows,
   tradePartnerFactMirrorCreateRows,
   loadTradePartnersDataFromMirror,
@@ -79,6 +131,10 @@ import {
   tradeServiceEntityMirrorCreateRows,
   tradeServiceFactMirrorCreateRows,
   loadTradeServicesDataFromMirror,
+  TRADE_COMPOSITION_DOCUMENT_IDS,
+  tradeCompositionEntityMirrorCreateRows,
+  tradeCompositionFactMirrorCreateRows,
+  loadTradeCompositionDataFromMirror,
   loadInflationBasketWeightsFromMirror,
   loadInflationCategoryFactsFromMirror,
   loadInflationCityFactsFromMirror,
@@ -314,6 +370,8 @@ async function main() {
   const gdpOverviewFacts = await loadGdpOverviewFacts(SERVED_DATA_FILES.gdpOverviewFacts);
   const economicSectorFacts = await loadEconomicSectorFacts(SERVED_DATA_FILES.economicSectorFacts);
   assertSubset("Economic sector source IDs", economicSectorFacts.map(f => f.sourceId), sourceIds);
+  const gdpExpenditureFacts = await loadGdpExpenditureFacts();
+  assertSubset("GDP by expenditure source IDs", gdpExpenditureFacts.map(f => f.sourceId), sourceIds);
   const unemploymentFacts = await loadUnemploymentFacts();
   assertSubset("Unemployment source IDs", unemploymentFacts.map(f => `source.${f.sourceId}`), sourceIds);
   const tradeOverviewFacts = await loadTradeOverviewFacts();
@@ -326,8 +384,32 @@ async function main() {
   assertSubset("Energy and food source IDs", energyFoodFacts.map(f => energyFoodSourceDocumentId(f.sourceId)), sourceIds);
   const moneyBanksFacts = await loadMoneyBanksFacts();
   assertSubset("Money and banks source IDs", moneyBanksFacts.map(f => moneyBanksSourceDocumentId(f.sourceId)), sourceIds);
+  const businessFacts = await loadBusinessFacts();
+  assertSubset("Business source IDs", businessFacts.map(f => businessSourceDocumentId(f.sourceId)), sourceIds);
+  const educationFacts = await loadEducationFacts();
+  assertSubset("Education source IDs", educationFacts.map(f => educationSourceDocumentId(f.sourceId)), sourceIds);
+  const socialFacts = await loadSocialFacts();
+  assertSubset("Social source IDs", socialFacts.map(f => socialSourceDocumentId(f.sourceId)), sourceIds);
+  const scienceCultureFacts = await loadScienceCultureFacts();
+  assertSubset("Science and culture source IDs", scienceCultureFacts.map(f => scienceCultureSourceDocumentId(f.sourceId)), sourceIds);
   const householdFacts = await loadHouseholdFacts();
   assertSubset("Household source IDs", householdFacts.map(f => householdSourceDocumentId(f.sourceId)), sourceIds);
+  const externalPositionFacts = await loadExternalPositionFacts();
+  assertSubset("External position source IDs", externalPositionFacts.map(f => externalPositionSourceDocumentId(f.sourceId)), sourceIds);
+  const healthFacts = await loadHealthFacts();
+  assertSubset("Health source IDs", healthFacts.map(f => healthSourceDocumentId(f.sourceId)), sourceIds);
+  const crimeFacts = await loadCrimeFacts();
+  assertSubset("Crime source IDs", crimeFacts.map(f => crimeSourceDocumentId(f.sourceId)), sourceIds);
+  const environmentFacts = await loadEnvironmentFacts();
+  assertSubset("Environment source IDs", environmentFacts.map(f => environmentSourceDocumentId(f.sourceId)), sourceIds);
+  const labourFacts = await loadLabourFacts();
+  assertSubset("Labour source IDs", labourFacts.map(f => labourSourceDocumentId(f.sourceId)), sourceIds);
+  const housingFacts = await loadHousingFacts();
+  assertSubset("Housing source IDs", housingFacts.map(f => housingSourceDocumentId(f.sourceId)), sourceIds);
+  const internetFacts = await loadInternetFacts();
+  assertSubset("Internet source IDs", internetFacts.map(f => internetSourceDocumentId(f.sourceId)), sourceIds);
+  const transportFacts = await loadTransportFacts();
+  assertSubset("Transport source IDs", transportFacts.map(f => transportSourceDocumentId(f.sourceId)), sourceIds);
   const tradePartners = await loadTradePartnersData();
   assertSubset("Trade partner source IDs", Object.values(TRADE_PARTNER_DOCUMENT_IDS), sourceIds);
   const moneyTransfers = await loadMoneyTransfersData();
@@ -342,6 +424,8 @@ async function main() {
   assertSubset("Domestic export source IDs", Object.values(TRADE_DOMESTIC_DOCUMENT_IDS), sourceIds);
   const tradeServices = await loadTradeServicesData();
   assertSubset("Services source IDs", Object.values(TRADE_SERVICES_DOCUMENT_IDS), sourceIds);
+  const tradeComposition = await loadTradeCompositionData();
+  assertSubset("Composition source IDs", Object.values(TRADE_COMPOSITION_DOCUMENT_IDS), sourceIds);
   const regionalEconomyFacts = await loadRegionalEconomyFacts(SERVED_DATA_FILES.regionalEconomyFacts);
   assertSubset("Regional economy source IDs", regionalEconomyFacts.map((fact) => fact.sourceId), sourceIds);
   const demographyFacts = await loadDemographyFacts([
@@ -352,6 +436,8 @@ async function main() {
     SERVED_DATA_FILES.demographyFertilityFacts,
     SERVED_DATA_FILES.demographyStructureFacts,
     SERVED_DATA_FILES.demographyCensusFacts,
+    SERVED_DATA_FILES.demographyMidYearFacts,
+    SERVED_DATA_FILES.demographyMarriageFacts,
   ]);
   assertSubset("Demography source IDs", demographyFacts.map((fact) => fact.sourceId), sourceIds);
   assertSubset("GDP overview source IDs",gdpOverviewFacts.map(f=>f.sourceId),sourceIds);
@@ -521,13 +607,26 @@ async function main() {
         await tx.governmentDebtFact.deleteMany();
         await tx.gdpOverviewFact.deleteMany();
         await tx.economicSectorFact.deleteMany();
+        await tx.gdpExpenditureFact.deleteMany();
         await tx.unemploymentFact.deleteMany();
         await tx.tradeOverviewFact.deleteMany();
         await tx.wagesFact.deleteMany();
         await tx.povertyFact.deleteMany();
         await tx.energyFoodFact.deleteMany();
         await tx.moneyBanksFact.deleteMany();
+        await tx.externalPositionFact.deleteMany();
+        await tx.businessFact.deleteMany();
+        await tx.educationFact.deleteMany();
+        await tx.socialFact.deleteMany();
+        await tx.scienceCultureFact.deleteMany();
         await tx.householdIncomeSpendingFact.deleteMany();
+        await tx.healthFact.deleteMany();
+        await tx.crimeFact.deleteMany();
+        await tx.environmentFact.deleteMany();
+        await tx.labourFact.deleteMany();
+        await tx.housingFact.deleteMany();
+        await tx.internetFact.deleteMany();
+        await tx.transportFact.deleteMany();
         await tx.tradePartnerFact.deleteMany();
         await tx.tradePartnerEntity.deleteMany();
         await tx.moneyTransferFact.deleteMany();
@@ -541,6 +640,8 @@ async function main() {
         await tx.tradeDomesticEntity.deleteMany();
         await tx.tradeServiceFact.deleteMany();
         await tx.tradeServiceEntity.deleteMany();
+        await tx.tradeCompositionFact.deleteMany();
+        await tx.tradeCompositionEntity.deleteMany();
         await tx.regionalEconomyFact.deleteMany();
         await tx.demographyFact.deleteMany();
         await tx.inflationCpiFact.deleteMany();
@@ -808,6 +909,9 @@ async function main() {
         })) });
         const mirrorEconomicSectorFacts = await loadEconomicSectorFactsFromMirror(tx);
         assertEconomicSectorParity(economicSectorFacts, mirrorEconomicSectorFacts);
+        await tx.gdpExpenditureFact.createMany({ data: gdpExpenditureMirrorCreateRows(gdpExpenditureFacts, run.id) });
+        const mirrorGdpExpenditureFacts = await loadGdpExpenditureFactsFromMirror(tx);
+        assertGdpExpenditureParity(gdpExpenditureFacts, mirrorGdpExpenditureFacts);
         await tx.unemploymentFact.createMany({ data: unemploymentMirrorCreateRows(unemploymentFacts, run.id) });
         const mirrorUnemploymentFacts = await loadUnemploymentFactsFromMirror(tx);
         assertUnemploymentParity(unemploymentFacts, mirrorUnemploymentFacts);
@@ -826,9 +930,45 @@ async function main() {
         await tx.moneyBanksFact.createMany({ data: moneyBanksMirrorCreateRows(moneyBanksFacts, run.id) });
         const mirrorMoneyBanksFacts = await loadMoneyBanksFactsFromMirror(tx);
         assertMoneyBanksParity(moneyBanksFacts, mirrorMoneyBanksFacts);
+        await tx.externalPositionFact.createMany({ data: externalPositionMirrorCreateRows(externalPositionFacts, run.id) });
+        const mirrorExternalPositionFacts = await loadExternalPositionFactsFromMirror(tx);
+        assertExternalPositionParity(externalPositionFacts, mirrorExternalPositionFacts);
+        await tx.businessFact.createMany({ data: businessMirrorCreateRows(businessFacts, run.id) });
+        const mirrorBusinessFacts = await loadBusinessFactsFromMirror(tx);
+        assertBusinessParity(businessFacts, mirrorBusinessFacts);
+        await tx.educationFact.createMany({ data: educationMirrorCreateRows(educationFacts, run.id) });
+        const mirrorEducationFacts = await loadEducationFactsFromMirror(tx);
+        assertEducationParity(educationFacts, mirrorEducationFacts);
+        await tx.socialFact.createMany({ data: socialMirrorCreateRows(socialFacts, run.id) });
+        const mirrorSocialFacts = await loadSocialFactsFromMirror(tx);
+        assertSocialParity(socialFacts, mirrorSocialFacts);
+        await tx.scienceCultureFact.createMany({ data: scienceCultureMirrorCreateRows(scienceCultureFacts, run.id) });
+        const mirrorScienceCultureFacts = await loadScienceCultureFactsFromMirror(tx);
+        assertScienceCultureParity(scienceCultureFacts, mirrorScienceCultureFacts);
         await tx.householdIncomeSpendingFact.createMany({ data: householdMirrorCreateRows(householdFacts, run.id) });
         const mirrorHouseholdFacts = await loadHouseholdFactsFromMirror(tx);
         assertHouseholdParity(householdFacts, mirrorHouseholdFacts);
+        await tx.healthFact.createMany({ data: healthMirrorCreateRows(healthFacts, run.id) });
+        const mirrorHealthFacts = await loadHealthFactsFromMirror(tx);
+        assertHealthParity(healthFacts, mirrorHealthFacts);
+        await tx.crimeFact.createMany({ data: crimeMirrorCreateRows(crimeFacts, run.id) });
+        const mirrorCrimeFacts = await loadCrimeFactsFromMirror(tx);
+        assertCrimeParity(crimeFacts, mirrorCrimeFacts);
+        await tx.environmentFact.createMany({ data: environmentMirrorCreateRows(environmentFacts, run.id) });
+        const mirrorEnvironmentFacts = await loadEnvironmentFactsFromMirror(tx);
+        assertEnvironmentParity(environmentFacts, mirrorEnvironmentFacts);
+        await tx.labourFact.createMany({ data: labourMirrorCreateRows(labourFacts, run.id) });
+        const mirrorLabourFacts = await loadLabourFactsFromMirror(tx);
+        assertLabourParity(labourFacts, mirrorLabourFacts);
+        await tx.housingFact.createMany({ data: housingMirrorCreateRows(housingFacts, run.id) });
+        const mirrorHousingFacts = await loadHousingFactsFromMirror(tx);
+        assertHousingParity(housingFacts, mirrorHousingFacts);
+        await tx.internetFact.createMany({ data: internetMirrorCreateRows(internetFacts, run.id) });
+        const mirrorInternetFacts = await loadInternetFactsFromMirror(tx);
+        assertInternetParity(internetFacts, mirrorInternetFacts);
+        await tx.transportFact.createMany({ data: transportMirrorCreateRows(transportFacts, run.id) });
+        const mirrorTransportFacts = await loadTransportFactsFromMirror(tx);
+        assertTransportParity(transportFacts, mirrorTransportFacts);
         await tx.tradePartnerEntity.createMany({ data: tradePartnerEntityMirrorCreateRows(tradePartners.entities, run.id) });
         await tx.tradePartnerFact.createMany({ data: tradePartnerFactMirrorCreateRows(tradePartners.facts, run.id) });
         const mirrorTradePartners = await loadTradePartnersDataFromMirror(tx);
@@ -863,6 +1003,13 @@ async function main() {
         }
         const mirrorTradeServices = await loadTradeServicesDataFromMirror(tx);
         assertTradeServicesParity(tradeServices, mirrorTradeServices);
+        await tx.tradeCompositionEntity.createMany({ data: tradeCompositionEntityMirrorCreateRows(tradeComposition.entities, run.id) });
+        const compositionRows = tradeCompositionFactMirrorCreateRows(tradeComposition.facts, run.id);
+        for (let start = 0; start < compositionRows.length; start += 1000) {
+          await tx.tradeCompositionFact.createMany({ data: compositionRows.slice(start, start + 1000) });
+        }
+        const mirrorTradeComposition = await loadTradeCompositionDataFromMirror(tx);
+        assertTradeCompositionParity(tradeComposition, mirrorTradeComposition);
         await tx.regionalEconomyFact.createMany({
           data: regionalEconomyFacts.map(({ sourceId, lastReviewedAt, ...fact }) => ({
             ...fact,
@@ -1153,13 +1300,26 @@ async function main() {
               csvRows: gdpOverviewFacts.length, dbRows: mirrorGdpOverviewFacts.length,
             },
             { table: "EconomicSectorFact", csvRows: economicSectorFacts.length, dbRows: mirrorEconomicSectorFacts.length },
+            { table: "GdpExpenditureFact", csvRows: gdpExpenditureFacts.length, dbRows: mirrorGdpExpenditureFacts.length },
             { table: "UnemploymentFact", csvRows: unemploymentFacts.length, dbRows: mirrorUnemploymentFacts.length },
             { table: "TradeOverviewFact", csvRows: tradeOverviewFacts.length, dbRows: mirrorTradeOverviewFacts.length },
             { table: "WagesFact", csvRows: wagesFacts.length, dbRows: mirrorWagesFacts.length },
             { table: "PovertyFact", csvRows: povertyFacts.length, dbRows: mirrorPovertyFacts.length },
             { table: "EnergyFoodFact", csvRows: energyFoodFacts.length, dbRows: mirrorEnergyFoodFacts.length },
             { table: "MoneyBanksFact", csvRows: moneyBanksFacts.length, dbRows: mirrorMoneyBanksFacts.length },
+            { table: "ExternalPositionFact", csvRows: externalPositionFacts.length, dbRows: mirrorExternalPositionFacts.length },
+            { table: "BusinessFact", csvRows: businessFacts.length, dbRows: mirrorBusinessFacts.length },
+            { table: "EducationFact", csvRows: educationFacts.length, dbRows: mirrorEducationFacts.length },
+            { table: "SocialFact", csvRows: socialFacts.length, dbRows: mirrorSocialFacts.length },
+            { table: "ScienceCultureFact", csvRows: scienceCultureFacts.length, dbRows: mirrorScienceCultureFacts.length },
             { table: "HouseholdIncomeSpendingFact", csvRows: householdFacts.length, dbRows: mirrorHouseholdFacts.length },
+            { table: "HealthFact", csvRows: healthFacts.length, dbRows: mirrorHealthFacts.length },
+            { table: "CrimeFact", csvRows: crimeFacts.length, dbRows: mirrorCrimeFacts.length },
+            { table: "EnvironmentFact", csvRows: environmentFacts.length, dbRows: mirrorEnvironmentFacts.length },
+            { table: "LabourFact", csvRows: labourFacts.length, dbRows: mirrorLabourFacts.length },
+            { table: "HousingFact", csvRows: housingFacts.length, dbRows: mirrorHousingFacts.length },
+            { table: "InternetFact", csvRows: internetFacts.length, dbRows: mirrorInternetFacts.length },
+            { table: "TransportFact", csvRows: transportFacts.length, dbRows: mirrorTransportFacts.length },
             { table: "TradePartnerEntity", csvRows: tradePartners.entities.length, dbRows: mirrorTradePartners.entities.length },
             { table: "TradePartnerFact", csvRows: tradePartners.facts.length, dbRows: mirrorTradePartners.facts.length },
             { table: "MoneyTransferEntity", csvRows: moneyTransfers.entities.length, dbRows: mirrorMoneyTransfers.entities.length },
@@ -1171,6 +1331,8 @@ async function main() {
             { table: "TradeProductFact", csvRows: tradeProducts.facts.length, dbRows: mirrorTradeProducts.facts.length },
             { table: "TradeServiceEntity", csvRows: tradeServices.entities.length, dbRows: mirrorTradeServices.entities.length },
             { table: "TradeServiceFact", csvRows: tradeServices.facts.length, dbRows: mirrorTradeServices.facts.length },
+            { table: "TradeCompositionEntity", csvRows: tradeComposition.entities.length, dbRows: mirrorTradeComposition.entities.length },
+            { table: "TradeCompositionFact", csvRows: tradeComposition.facts.length, dbRows: mirrorTradeComposition.facts.length },
             { table: "TradeDomesticEntity", csvRows: tradeDomestic.entities.length, dbRows: mirrorTradeDomestic.entities.length },
             { table: "TradeDomesticFact", csvRows: tradeDomestic.facts.length, dbRows: mirrorTradeDomestic.facts.length },
             { table: "RegionalEconomyFact", csvRows: regionalEconomyFacts.length, dbRows: mirrorRegionalEconomyFacts.length },

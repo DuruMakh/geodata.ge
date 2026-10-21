@@ -16,17 +16,24 @@ describe("general-government deficit workbook", () => {
     const input = { facts, range: { start: 2025, end: 2026 }, percentage: true, sources: [], siteOrigin: "https://fiscal.ge" };
     const ka = buildDeficitWorkbookExportModel(input);
     const en = buildDeficitWorkbookExportModel(input, presentation);
-    expect(en.analysis.rows.map(row => [row[0], row[3], row[5]])).toEqual(ka.analysis.rows.map(row => [row[0], row[3], row[5]]));
-    expect(en.analysis.rows.map(row => row[3])).toEqual([-1_526_000_000, -2_672_000_000]);
-    expect(en.analysis.rows.map(row => row[4])).toEqual(["Actual", "Forecast"]);
+    expect(en.analysis.rows.map(row => [row[0], row[2], row[4]])).toEqual(ka.analysis.rows.map(row => [row[0], row[2], row[4]]));
+    expect(en.analysis.rows.map(row => row[2])).toEqual([-1_526_000_000, -2_672_000_000]);
+    expect(en.analysis.rows.map(row => row[3])).toEqual(["Actual", "Forecast"]);
+    // The reviewed English label for the published series id.
+    expect(en.analysis.rows.every(row => row.includes("General government balance"))).toBe(true);
     expect(en.sheetNames).toEqual(["Summary", "Data", "Sources"]);
     expect(JSON.stringify(en)).not.toMatch(/\p{Script=Georgian}/u);
     const workbook = new ExcelJS.Workbook();
     await workbook.xlsx.load(await createWorkbookBuffer(en));
     const data = workbook.getWorksheet("Data")!;
-    expect(data.getCell("D2").value).toBe(-1_526_000_000);
-    expect(data.getCell("D2").type).toBe(ExcelJS.ValueType.Number);
-    expect(data.getCell("F2").value).toBe(-0.01455);
+    // U07-15: one series, so no Group column repeating the category.
+    expect(data.getRow(1).values).toEqual([undefined, "Year", "Category", "Amount (GEL)", "Status", "Share of GDP (%)"]);
+    expect(data.getCell("C2").value).toBe(-1_526_000_000);
+    expect(data.getCell("C2").type).toBe(ExcelJS.ValueType.Number);
+    expect(data.getCell("C2").numFmt).toBe("#,##0.00;[Red](#,##0.00);–");
+    expect(data.getCell("D2").numFmt).toBeUndefined();
+    expect(data.getCell("E2").value).toBe(-0.01455);
+    expect(data.getCell("E2").numFmt).toBe("0.0%");
   });
 
   it("exports the active percentage range with actual and projection statuses", () => {
@@ -47,8 +54,8 @@ describe("general-government deficit workbook", () => {
     expect(model.filename).toBe("fiscal-general-government-deficit-2025-2026.xlsx");
     expect(model.readable.unitLabel).toBe("% მშპ-ში");
     expect(model.analysis.rows).toEqual([
-      [2025, "ზოგადი მთავრობის ბალანსი", "ზოგადი მთავრობის ბალანსი", -1_526_000_000, "ფაქტი", -0.01455],
-      [2026, "ზოგადი მთავრობის ბალანსი", "ზოგადი მთავრობის ბალანსი", -2_672_000_000, "პროგნოზი", -0.02327],
+      [2025, "ზოგადი მთავრობის ბალანსი", -1_526_000_000, "ფაქტი", -0.01455],
+      [2026, "ზოგადი მთავრობის ბალანსი", -2_672_000_000, "პროგნოზი", -0.02327],
     ]);
     expect(model.sources).toHaveLength(1);
   });

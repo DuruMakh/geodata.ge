@@ -1,13 +1,28 @@
 import { buildProductIndex, packProductFacts, productAnnual, productCumulative, type ProductIndex } from "../explorer/inflationProducts";
 import { makePeriod, periodKey, periodYear } from "../data/inflation/periods";
 import type { PeriodRange } from "./inflationData";
-import type { QueryInflationProductsInput } from "./schemas";
+import { queryInflationProductsInput, type QueryInflationProductsInput } from "./schemas";
 import { PRODUCT_QUERY_MEASURES, type ProductQueryMeasure } from "./inflationProductSeries";
 import { serviceMessage } from "./localization";
 import { selectSources } from "./sources";
 import type { FactQuerySnapshot } from "./types";
 
-const indexCache = new WeakMap<FactQuerySnapshot, ProductIndex>();
+type CoverageSummary = { readonly first: number; readonly last: number; readonly years: readonly number[] };
+type ProductCache = {
+  index?: ProductIndex;
+  catalogue?: ReturnType<typeof buildProductCatalogue>;
+  annual: Map<string, CoverageSummary>;
+  cumulative: Map<number, Map<string, CoverageSummary>>;
+};
+const snapshotCache = new WeakMap<FactQuerySnapshot, ProductCache>();
+function productCache(snapshot: FactQuerySnapshot): ProductCache {
+  let cache = snapshotCache.get(snapshot);
+  if (!cache) {
+    cache = { annual: new Map(), cumulative: new Map() };
+    snapshotCache.set(snapshot, cache);
+  }
+  return cache;
+}
 
 /** A response-specific derivation view; registered originals stay unchanged. */
 export function inflationProductSources(snapshot: FactQuerySnapshot, measure: ProductQueryMeasure) {
@@ -23,6 +38,14 @@ export function inflationProductSources(snapshot: FactQuerySnapshot, measure: Pr
 
 /** Cumulative spans describe published inputs, conditional on the chosen startYear. */
 export function inflationProductCatalogue(snapshot: FactQuerySnapshot) {
+  const cache = productCache(snapshot);
+  cache.catalogue ??= buildProductCatalogue(snapshot);
+  // All nested arrays/notes belong to the caller; cached factual summaries
+  // never escape or borrow mutable arrays from the snapshot.
+  return structuredClone(cache.catalogue);
+}
+
+function buildProductCatalogue(snapshot: FactQuerySnapshot) {
   const byProduct = new Map<string, Record<ProductQueryMeasure, string[]>>();
   for (const fact of snapshot.inflationProducts.facts) {
     if (fact.index100 === null) continue;
@@ -55,31 +78,55 @@ export function inflationProductCatalogue(snapshot: FactQuerySnapshot) {
 }
 
 export function inflationProductIndex(snapshot: FactQuerySnapshot): ProductIndex {
-  let index = indexCache.get(snapshot);
-  if (index === undefined) {
-    index = buildProductIndex(snapshot.inflationProducts.catalogue, packProductFacts(snapshot.inflationProducts.facts));
-    indexCache.set(snapshot, index);
-  }
-  return index;
+  const cache = productCache(snapshot);
+  return cache.index ??= buildProductIndex(snapshot.inflationProducts.catalogue, packProductFacts(snapshot.inflationProducts.facts));
 }
 
 /** Aggregate available span for selected products; gaps and individual late starts remain possible. */
 export function productQueryCoverage(snapshot: FactQuerySnapshot, input: QueryInflationProductsInput): { availablePeriods: PeriodRange | null; availableYears: number[] } {
   const index = inflationProductIndex(snapshot);
+  // Query callers already validate these fields. Keep this internal entry
+  // bounded too: unsupported requests must never create cache keys.
+  const firstPeriod = Math.min(...[...index.annual.values(), ...index.monthly.values()].map(run => run.start));
+  if (!queryInflationProductsInput.safeParse(input).success
+    || (input.expectedDataVersion !== undefined && input.expectedDataVersion !== snapshot.dataVersion)
+    || input.seriesIds.some(id => !index.productById.has(id))
+    || input.fromPeriod < periodKey(firstPeriod) || input.toPeriod > periodKey(index.latestPeriod)
+    || (input.startYear !== undefined && (input.startYear < index.earliestYear || input.startYear > periodYear(index.latestPeriod)))) {
+    return { availablePeriods: null, availableYears: [] };
+  }
+  const cache = productCache(snapshot);
+  let summaries = cache.annual;
+  if (input.measure === "cumulative_pct") {
+    summaries = cache.cumulative.get(input.startYear!) ?? new Map();
+    cache.cumulative.set(input.startYear!, summaries);
+  }
   const years = new Set<number>();
   let first = Infinity;
   let last = -Infinity;
   for (const id of input.seriesIds) {
-    const run = (input.measure === "yoy_pct" ? index.annual : index.monthly).get(id);
-    if (!run) continue;
-    const start = input.measure === "cumulative_pct" ? Math.max(run.start, makePeriod(input.startYear!, 1)) : run.start;
-    for (let period = start; period < run.start + run.values.length; period++) {
-      const value = input.measure === "yoy_pct" ? productAnnual(index, id, period) : productCumulative(index, id, input.startYear!, period).value;
-      if (value === null) continue;
-      first = Math.min(first, period);
-      last = Math.max(last, period);
-      years.add(periodYear(period));
+    let summary = summaries.get(id);
+    if (!summary) {
+      const run = (input.measure === "yoy_pct" ? index.annual : index.monthly).get(id);
+      let productFirst = Infinity;
+      let productLast = -Infinity;
+      const productYears = new Set<number>();
+      if (run) {
+        const start = input.measure === "cumulative_pct" ? Math.max(run.start, makePeriod(input.startYear!, 1)) : run.start;
+        for (let period = start; period < run.start + run.values.length; period++) {
+          const value = input.measure === "yoy_pct" ? productAnnual(index, id, period) : productCumulative(index, id, input.startYear!, period).value;
+          if (value === null) continue;
+          productFirst = Math.min(productFirst, period);
+          productLast = Math.max(productLast, period);
+          productYears.add(periodYear(period));
+        }
+      }
+      summary = Object.freeze({ first: productFirst, last: productLast, years: Object.freeze([...productYears].sort((a, b) => a - b)) });
+      summaries.set(id, summary);
     }
+    first = Math.min(first, summary.first);
+    last = Math.max(last, summary.last);
+    for (const year of summary.years) years.add(year);
   }
   return { availablePeriods: first === Infinity ? null : [periodKey(first), periodKey(last)], availableYears: [...years].sort((a, b) => a - b) };
 }

@@ -9,6 +9,7 @@ import {
   type MunicipalTotalFact,
 } from "../data/municipal/types";
 import type { SourceDocumentRow } from "../data/sources";
+import type { ClientMunicipalFunctionFact, ClientMunicipalTotalFact } from "./clientData";
 import { message } from "../i18n/messages";
 import { publicLabel } from "../i18n/labels";
 import type { Presentation, TemplateValues } from "../i18n/types";
@@ -48,8 +49,8 @@ export type MunicipalEntityModel = {
 
 export type MunicipalEntityInput = {
   functions: MunicipalFunction[];
-  functionFacts: MunicipalFunctionFact[];
-  totalFacts: MunicipalTotalFact[];
+  functionFacts: ClientMunicipalFunctionFact[];
+  totalFacts: ClientMunicipalTotalFact[];
   startYear: number;
   endYear: number;
 };
@@ -305,6 +306,11 @@ export function buildMunicipalListRows(input: MunicipalListInput): {
     .map((row, index) => ({ ...row, rank: index + 1 }));
 
   return { municipalities: municipalityRows, regions: regionRows };
+}
+
+/** Georgia as the entity picker's first option: its total for the shown year and how many budgets it sums. */
+export function buildPickerCountry(valueGel: number, budgetCount: number = MUNICIPAL_COUNTRY_BUDGET_COUNT) {
+  return { id: MUNICIPAL_COUNTRY_ID, nameKa: "საქართველო" as const, valueGel, budgetCount };
 }
 
 export function buildCountryListRow(totalFacts: MunicipalTotalFact[], year: number): MunicipalListRow {

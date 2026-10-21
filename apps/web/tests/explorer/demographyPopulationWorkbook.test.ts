@@ -166,7 +166,7 @@ describe("population workbook", () => {
   test.each(["ka", "en"] as const)("the %s Data sheet leaves room for every cell (Georgian script weighted, approximate)", async (locale) => {
     const municipal = await loadServedMunicipalData();
     const ids = [GEORGIA_PLACE_ID, ...municipal.regions.map((region) => region.id), ...municipal.municipalities.map((m) => m.code)];
-    const real = await getPresentation(locale, ["demography", "common", "controls", "main", "format", "workbook", "municipal"], ids);
+    const real = await getPresentation(locale, ["demography", "common", "controls", "main", "format", "workbook", "municipal"], ids, ids);
     const realPlaces = buildDemographyPlaces({
       regions: municipal.regions,
       municipalities: municipal.municipalities,

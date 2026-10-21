@@ -62,6 +62,7 @@ function post(): Request {
 
 describe("an unexpected failure inside the handler", () => {
   it("preserves a modern request ID while keeping snapshot failures bilingual and private", async () => {
+    written.length = 0;
     const response = await POST(new Request(ENDPOINT, {
       method: "POST", headers: { host: "fiscal.ge", "content-type": "application/json", accept: "application/json, text/event-stream", "mcp-protocol-version": "2026-07-28", "mcp-method": "server/discover" },
       body: JSON.stringify({ jsonrpc: "2.0", id: "failed-modern-id", method: "server/discover", params: { _meta: {
@@ -73,6 +74,8 @@ describe("an unexpected failure inside the handler", () => {
     const text = await response.text();
     expect(response.status).toBe(500);
     expect(JSON.parse(text).id).toBe("failed-modern-id");
+    expect(written).toHaveLength(1);
+    expect(JSON.parse(written[0]!)).toMatchObject({ outcome: "error", errorCode: "internal_error" });
     expect(text).toContain("internal_error");
     expect(text).toMatch(/[Ⴀ-ჿ]/);
     expect(text).not.toContain("snapshot.json");

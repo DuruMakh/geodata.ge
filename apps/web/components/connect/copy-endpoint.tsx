@@ -11,14 +11,15 @@ import { useState } from "react";
  * below does nothing: there is no state to recover and nothing to report.
  */
 export function CopyEndpoint({
-  endpoint,
+  value,
   testId = "connect-copy",
   copyLabel = "მისამართის კოპირება",
   copiedLabel = "მისამართი დაკოპირდა",
   copyText = "კოპირება",
   copiedText = "დაკოპირდა",
 }: {
-  endpoint: string;
+  /** The text to copy: the endpoint address, or the chat prompt. */
+  value: string;
   testId?: string;
   copyLabel?: string;
   copiedLabel?: string;
@@ -41,7 +42,7 @@ export function CopyEndpoint({
         aria-label={copied ? copiedLabel : copyLabel}
         onClick={async () => {
           try {
-            await navigator.clipboard.writeText(endpoint);
+            await navigator.clipboard.writeText(value);
             setCopied(true);
             setTimeout(() => setCopied(false), 2000);
           } catch {

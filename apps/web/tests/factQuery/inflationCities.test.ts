@@ -1,10 +1,13 @@
 import { describe, expect, it } from "vitest";
 import { compare } from "../../lib/factQuery/compare";
-import { describeCoverage } from "../../lib/factQuery/describeCoverage";
+import { describeCoverage, type CoverageData } from "../../lib/factQuery/describeCoverage";
 import { queryInflation, inflationCellCount } from "../../lib/factQuery/queryInflation";
 import { rank } from "../../lib/factQuery/rank";
 import { SCHEMA_VERSION, type FactQuerySnapshot } from "../../lib/factQuery/types";
 import { loadPackagedSnapshot } from "../../lib/mcp/snapshot";
+
+import { getSources, type GetSourcesData } from "../../lib/factQuery/getSources";
+import type { Observation } from "../../lib/factQuery/observations";
 
 const snapshot = loadPackagedSnapshot();
 type Obs = { observationId: string; entityType: string; value: number | null; availability: string; missingReasonEn: string | null; caveatIds: string[] };
@@ -21,7 +24,7 @@ describe("query_inflation for cities", () => {
     const response = queryInflation(snapshot, { entityIds: ["city.batumi"], seriesIds: ["cpi.headline"], measure: "yoy_pct", fromPeriod: "2026-08", toPeriod: "2026-08" });
     expect(response.status).toBe("ok");
     expect(observations(response)[0]).toMatchObject({ observationId: "inflation:city.batumi:cpi.headline:2026-08:yoy_pct", entityType: "city", value: 7.0857 });
-    expect(response).toMatchObject({ data: { observations: [{ value: 7.0857 }], coverage: { availablePeriods: ["2016-01", "2026-08"] } } });
+    expect(response).toMatchObject({ data: { observations: [{ value: 7.0857 }], coverage: { availablePeriods: ["2016-01", "2026-09"] } } });
   });
 
   it("keeps the default answer for Georgia unchanged", () => {
@@ -34,12 +37,12 @@ describe("query_inflation for cities", () => {
     expect(response.status).toBe("empty");
     expect(observations(response)[0]).toMatchObject({ value: null, availability: "missing" });
     expect(observations(response)[0]!.missingReasonEn).toMatch(/2016-12/);
-    expect(response).toMatchObject({ data: { coverage: { availablePeriods: ["2016-12", "2026-08"] } } });
+    expect(response).toMatchObject({ data: { coverage: { availablePeriods: ["2016-12", "2026-09"] } } });
   });
 
   it("reports Zugdidi's average coverage while keeping earlier months missing", () => {
     const response = queryInflation(snapshot, { entityIds: ["city.zugdidi"], seriesIds: ["cpi.headline"], measure: "avg12_pct", fromPeriod: "2016-06", toPeriod: "2016-06" });
-    expect(response).toMatchObject({ data: { observations: [{ value: null }], coverage: { availablePeriods: ["2017-12", "2026-08"] } } });
+    expect(response).toMatchObject({ data: { observations: [{ value: null }], coverage: { availablePeriods: ["2017-12", "2026-09"] } } });
     expect(observations(response)[0]!.missingReasonEn).toContain("2017-12");
   });
 
@@ -72,7 +75,7 @@ describe("query_inflation for cities", () => {
     const synthetic = withCities([cityFact("city.batumi", "2018-02"), cityFact("city.batumi", "2020-03")]);
     const response = queryInflation(synthetic, { entityIds: ["country.georgia", "city.batumi"], seriesIds: ["cpi.headline"], measure: "yoy_pct", fromPeriod: "2014-06", toPeriod: "2014-06" });
     const national = snapshot.inflation.facts.find((fact) => fact.seriesId === "cpi.headline" && fact.measure === "yoy_pct" && fact.period === "2014-06")!;
-    expect(response).toMatchObject({ status: "partial", data: { observations: [{ value: national.value }, { value: null, availability: "missing" }], coverage: { availablePeriods: ["2004-01", "2026-08"], availableYears: Array.from({ length: 23 }, (_, index) => 2004 + index) } } });
+    expect(response).toMatchObject({ status: "partial", data: { observations: [{ value: national.value }, { value: null, availability: "missing" }], coverage: { availablePeriods: ["2004-01", "2026-09"], availableYears: Array.from({ length: 23 }, (_, index) => 2004 + index) } } });
     expect(observations(response)[1]!.missingReasonEn).toContain("2018-02");
   });
 
@@ -135,7 +138,85 @@ describe("query_inflation for cities", () => {
   });
 });
 
+describe("city query to original-source lookup", () => {
+  it.each(["city.tbilisi", "city.kutaisi", "city.batumi", "city.gori", "city.telavi", "city.zugdidi"])("resolves %s originals for every supported headline measure", (cityId) => {
+    for (const measure of ["yoy_pct", "mom_pct", "avg12_pct"]) {
+      const response = queryInflation(snapshot, { entityIds: [cityId], seriesIds: ["cpi.headline"], measure, fromPeriod: "2026-08", toPeriod: "2026-08" });
+      expect(response.status).toBe("ok");
+      if (response.kind !== "observations") throw new Error("Expected city observations");
+      const observation = (response.data as { observations: Observation[] }).observations[0]!;
+      expect(observation.sourceIds.length).toBeGreaterThan(0);
+      for (const datasetId of [undefined, "inflation"]) {
+        const result = getSources(snapshot, { sourceIds: observation.sourceIds, entityIds: [cityId], years: [2026], ...(datasetId ? { datasetId } : {}) });
+        expect(result.kind).toBe("sources");
+        const data = (result as { data: GetSourcesData }).data;
+        expect(data.narrowedBy).toMatchObject({ entityIds: [cityId], years: [2026], ...(datasetId ? { datasetId } : {}) });
+        expect(data.sources.flatMap(source => source.documents.map(document => document.documentId))).toEqual(observation.documentIds);
+        for (const source of data.sources) {
+          expect(source).toMatchObject({ narrowingOutcome: "applied", narrowed: false, documentCount: source.documents.length });
+          expect(source.documents).toEqual(snapshot.sources.find(original => original.sourceId === source.sourceId)!.documents);
+          for (const document of source.documents) {
+            expect(document.archiveUrl).toMatch(/^https:\/\/fiscal.ge\/downloads\//);
+            expect(document.sha256).toMatch(/^[0-9a-f]{64}$/);
+            expect(document.byteSize).toBeGreaterThan(0);
+          }
+        }
+      }
+    }
+  });
+
+  it("rejects an unregistered city and preserves explicit no-match outcomes for unrelated originals, datasets and years", () => {
+    expect(getSources(snapshot, { sourceIds: ["source.geostat_cpi_yoy"], entityIds: ["city.rustavi"] })).toMatchObject({ kind: "error", error: { code: "unknown_entity" } });
+    for (const filters of [
+      { sourceIds: ["source.mof_2017_revenue_form1_pdf"], years: [2017] },
+      { sourceIds: ["source.geostat_cpi_index_2010"], datasetId: "inflation", years: [2026] },
+      { sourceIds: ["source.geostat_cpi_yoy"], datasetId: "national-revenue", years: [2026] },
+      { sourceIds: ["source.geostat_cpi_yoy"], datasetId: "inflation", years: [1995] },
+    ]) {
+      const result = getSources(snapshot, { ...filters, entityIds: ["city.batumi"] });
+      expect(result.kind).toBe("sources");
+      const source = (result as { data: GetSourcesData }).data.sources[0]!;
+      expect(source).toMatchObject({ narrowingOutcome: "dropped_no_match", narrowed: false, documentCount: source.documents.length });
+      expect(source.documents).toEqual(snapshot.sources.find(original => original.sourceId === source.sourceId)!.documents);
+    }
+  });
+});
+
 describe("city rankings, comparisons and coverage", () => {
+  it("city discovery advertises only queryable combinations", () => {
+    const response = describeCoverage(snapshot, { datasetId: "inflation", entityType: "city" });
+    if (response.kind !== "catalogue") throw new Error("Expected catalogue");
+    const coverage = response.data as CoverageData;
+    const seriesIds = coverage.series!.map(series => series.seriesId);
+    const expectedCitySeriesIds = ["cpi.headline", ...Array.from({ length: 12 }, (_, i) => `cpi.cat.${String(i + 1).padStart(2, "0")}`)];
+    expect(seriesIds).toEqual(expectedCitySeriesIds);
+    expect(coverage.entities!.map(entity => entity.entityId).sort()).toEqual(["city.batumi", "city.gori", "city.kutaisi", "city.tbilisi", "city.telavi", "city.zugdidi"]);
+    for (const series of coverage.series!) {
+      const measures = series.seriesId === "cpi.headline" ? ["yoy_pct", "mom_pct", "avg12_pct"] : ["yoy_pct", "mom_pct"];
+      expect(Object.keys(series.periodsByMeasure!)).toEqual(measures);
+      expect(series.yearsByMeasure).toBeUndefined();
+      const facts = snapshot.inflation.cities.filter(fact => fact.seriesId === series.seriesId);
+      expect(series.years).toEqual([...new Set(facts.map(fact => Number(fact.period.slice(0, 4))))].sort((a, b) => a - b));
+      for (const measure of measures) {
+        const periods = facts.filter(fact => fact.measure === measure).map(fact => fact.period).sort();
+        expect(series.periodsByMeasure![measure]).toEqual([periods[0], periods.at(-1)]);
+        for (const entity of coverage.entities!) {
+          const available = facts.find(fact => fact.cityId === entity.entityId && fact.measure === measure)!;
+          expect(available).toBeDefined();
+          const query = queryInflation(snapshot, { entityIds: [entity.entityId], seriesIds: [series.seriesId], measure, fromPeriod: available.period, toPeriod: available.period });
+          expect(query.status).toBe("ok");
+          expect(observations(query)[0]!.value).toBe(available.value);
+        }
+      }
+    }
+    const periods = snapshot.inflation.cities.map(fact => fact.period).sort();
+    expect(coverage.datasets).toEqual([expect.objectContaining({ entityTypes: ["city"], measures: ["yoy_pct", "mom_pct", "avg12_pct"], periods: [periods[0], periods.at(-1)], years: [Number(periods[0].slice(0, 4)), Number(periods.at(-1)!.slice(0, 4))] })]);
+    for (const entity of coverage.entities!) {
+      const cityPeriods = snapshot.inflation.cities.filter(fact => fact.cityId === entity.entityId).map(fact => fact.period).sort();
+      expect(entity.periods).toEqual([cityPeriods[0], cityPeriods.at(-1)]);
+    }
+  });
+
   it("ranks the six cities for one series and month, without Georgia", () => {
     const response = rank(snapshot, { datasetId: "inflation", dimension: "entities", entityType: "city", seriesId: "cpi.cat.01", period: "2026-08", measure: "yoy_pct", metric: "value", limit: 3 });
     const data = (response as { data: { entries: { entityId: string; value: number }[]; universe: { candidateCount: number } } }).data;
@@ -160,7 +241,7 @@ describe("city rankings, comparisons and coverage", () => {
     expect(entities.find((entity) => entity.entityId === "city.zugdidi")!.periods![0]).toBe("2016-01");
   });
 
-  it("is schema 1.5.0", () => {
-    expect(SCHEMA_VERSION).toBe("1.5.0");
+  it("is schema 1.6.0", () => {
+    expect(SCHEMA_VERSION).toBe("1.6.0");
   });
 });

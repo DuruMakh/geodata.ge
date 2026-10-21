@@ -2,6 +2,7 @@ import { periodFromKey } from "../data/inflation/periods";
 import type { CpiMeasure, CpiSeriesId } from "../data/inflation/types";
 import type { ClientCpiFact, ClientInflationTargetRow } from "../servedRows";
 import { ACCENT, INK } from "./colors";
+import { packMonthlyRuns, unpackMonthlyRuns, type PackedCategorySeries } from "./inflationCategories";
 import { periodBounds, rangeFromPatch, refitRange, resolveRange, type PeriodRange, type ResolvedPeriodRange } from "./periodRange";
 import { parseMonthRangeKey, writeMonthRangeKey } from "./urlState";
 
@@ -27,7 +28,7 @@ export const INFLATION_COLORS: Record<InflationSelectionKey, string> = {
   target: ACCENT,
 };
 
-export type InflationRange = PeriodRange;
+type InflationRange = PeriodRange;
 export type InflationState = {
   tab: InflationTab;
   mode: "line" | "table";
@@ -44,6 +45,15 @@ export type { ResolvedPeriodRange };
 
 export function seriesGroup(key: InflationSeriesKey, tab: InflationTab): string {
   return `${SERIES_DATA_ID[key]}:${TAB_MEASURE[tab]}`;
+}
+
+/** The overview's facts on the wire: the categories page's run-length form, one dense run per series and measure (U13-05). */
+export function packCpiFacts(facts: readonly ClientCpiFact[]): PackedCategorySeries[] {
+  return packMonthlyRuns(facts, (fact) => fact.seriesId);
+}
+
+export function unpackCpiFacts(packed: readonly PackedCategorySeries[]): ClientCpiFact[] {
+  return unpackMonthlyRuns(packed).map(({ series: seriesId, measure, period, value }) => ({ seriesId, measure, period, value }));
 }
 
 export function indexInflationFacts(
@@ -65,7 +75,7 @@ export function seriesValues(index: InflationIndex, key: InflationSeriesKey, tab
   return index.values.get(seriesGroup(key, tab));
 }
 
-export function tabCoverage(index: InflationIndex, tab: InflationTab): { min: number; max: number } {
+function tabCoverage(index: InflationIndex, tab: InflationTab): { min: number; max: number } {
   return periodBounds(INFLATION_SERIES.map((key) => seriesValues(index, key, tab)), "Inflation data has no periods");
 }
 
@@ -83,6 +93,17 @@ export { rangeFromPatch };
 export function targetForPeriod(targets: ClientInflationTargetRow[], period: number): number | null {
   const row = targets.find((entry) => periodFromKey(entry.effectiveFrom) <= period && (entry.effectiveTo === null || period <= periodFromKey(entry.effectiveTo)));
   return row ? row.targetPct : null;
+}
+
+/** The rows that draw on a tab: the NBG target is an annual-inflation reference, and core has no published index. */
+export function drawableKeys(index: InflationIndex, tab: InflationTab): InflationSelectionKey[] {
+  return SELECTION_ORDER.filter((key) => (key === "target" ? tab === "yoy" : seriesValues(index, key, tab) !== undefined));
+}
+
+/** What the panel counts: the selection still holds the other rows, ready for the tab that draws them. */
+export function drawableSelection(index: InflationIndex, state: InflationState): InflationSelectionKey[] {
+  const drawable = drawableKeys(index, state.tab);
+  return state.selected.filter((key) => drawable.includes(key));
 }
 
 export function buildInflationLines(index: InflationIndex, targets: ClientInflationTargetRow[], state: InflationState, range: ResolvedPeriodRange) {

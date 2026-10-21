@@ -81,19 +81,33 @@ model SourceDocument {
   governmentDebtFacts GovernmentDebtFact[]
   gdpOverviewFacts GdpOverviewFact[]
   economicSectorFacts EconomicSectorFact[]
+  gdpExpenditureFacts GdpExpenditureFact[]
   unemploymentFacts UnemploymentFact[]
   tradeOverviewFacts TradeOverviewFact[]
   tradePartnerFacts TradePartnerFact[]
   wagesFacts WagesFact[]
   povertyFacts PovertyFact[]
   energyFoodFacts EnergyFoodFact[]
+  healthFacts HealthFact[]
+  crimeFacts CrimeFact[]
+  labourFacts LabourFact[]
   moneyBanksFacts MoneyBanksFact[]
+  externalPositionFacts ExternalPositionFact[]
+  businessFacts BusinessFact[]
+  housingFacts HousingFact[]
+  internetFacts InternetFact[]
+  transportFacts TransportFact[]
+  educationFacts EducationFact[]
+  socialFacts SocialFact[]
+  environmentFacts EnvironmentFact[]
+  scienceCultureFacts ScienceCultureFact[]
   householdIncomeSpendingFacts HouseholdIncomeSpendingFact[]
   moneyTransferFacts MoneyTransferFact[]
   foreignInvestmentFacts ForeignInvestmentFact[]
   currentAccountFacts CurrentAccountFact[]
   tradeProductFacts TradeProductFact[]
   tradeServiceFacts TradeServiceFact[]
+  tradeCompositionFacts TradeCompositionFact[]
   tradeDomesticFacts TradeDomesticFact[]
   regionalEconomyFacts RegionalEconomyFact[]
   demographyFacts   DemographyFact[]
@@ -127,6 +141,7 @@ model ImportRun {
   generalGovernmentBalanceFacts GeneralGovernmentBalanceFact[]
   gdpOverviewFacts GdpOverviewFact[]
   economicSectorFacts EconomicSectorFact[]
+  gdpExpenditureFacts GdpExpenditureFact[]
   unemploymentFacts UnemploymentFact[]
   tradeOverviewFacts TradeOverviewFact[]
   tradePartnerEntities TradePartnerEntity[]
@@ -134,7 +149,19 @@ model ImportRun {
   wagesFacts WagesFact[]
   povertyFacts PovertyFact[]
   energyFoodFacts EnergyFoodFact[]
+  healthFacts HealthFact[]
+  crimeFacts CrimeFact[]
+  labourFacts LabourFact[]
   moneyBanksFacts MoneyBanksFact[]
+  externalPositionFacts ExternalPositionFact[]
+  businessFacts BusinessFact[]
+  housingFacts HousingFact[]
+  internetFacts InternetFact[]
+  transportFacts TransportFact[]
+  educationFacts EducationFact[]
+  socialFacts SocialFact[]
+  environmentFacts EnvironmentFact[]
+  scienceCultureFacts ScienceCultureFact[]
   householdIncomeSpendingFacts HouseholdIncomeSpendingFact[]
   moneyTransferEntities MoneyTransferEntity[]
   moneyTransferFacts MoneyTransferFact[]
@@ -144,6 +171,8 @@ model ImportRun {
   tradeProductEntities TradeProductEntity[]
   tradeProductFacts TradeProductFact[]
   tradeServiceEntities TradeServiceEntity[]
+  tradeCompositionEntities TradeCompositionEntity[]
+  tradeCompositionFacts TradeCompositionFact[]
   tradeServiceFacts TradeServiceFact[]
   tradeDomesticEntities TradeDomesticEntity[]
   tradeDomesticFacts TradeDomesticFact[]
@@ -511,6 +540,27 @@ model EconomicSectorFact {
   @@id([seriesId, measure, year])
 }
 
+// Mirror of data/imports/gdp-expenditure-annual.csv: Geostat's GDP by categories of use, the
+// economic-sector columns, exact stored decimals.
+model GdpExpenditureFact {
+  seriesId String
+  measure String
+  year Int
+  value Decimal @db.Decimal(40,20)
+  unit String
+  valuation String
+  priceBasis String
+  calculation String
+  status String
+  sourceLocator String
+  sourceDocumentId String
+  sourceDocument SourceDocument @relation(fields: [sourceDocumentId], references: [id])
+  lastReviewedAt DateTime @db.Date
+  importRunId String?
+  importRun ImportRun? @relation(fields: [importRunId], references: [id])
+  @@id([seriesId, measure, year])
+}
+
 model RegionalEconomyFact {
   regionId          String
   seriesId          String
@@ -775,6 +825,48 @@ model TradeServiceFact {
   @@id([entityId, indicatorId, year])
 }
 
+model TradeCompositionEntity {
+  id             String @id
+  classification String
+  sourceCode     String
+  labelKa        String
+  labelEn        String
+  importRunId    String?
+  importRun      ImportRun? @relation(fields: [importRunId], references: [id])
+  facts          TradeCompositionFact[]
+
+  @@index([importRunId])
+}
+
+model TradeCompositionFact {
+  entityId           String
+  entity             TradeCompositionEntity @relation(fields: [entityId], references: [id])
+  year               Int
+  indicatorId        String
+  valueUsd           Decimal? @db.Decimal(40, 20)
+  unit               String
+  basis              String
+  valueStatus        String
+  publicationStatus  String
+  role               String
+  sourceId           String
+  sourceRefs         String
+  sourceValue        String?
+  sourceUnit         String?
+  sourceLabel        String?
+  sourceNumberFormat String?
+  sourceBlock        String
+  sourceDocumentId   String
+  sourceDocument     SourceDocument @relation(fields: [sourceDocumentId], references: [id], onDelete: Restrict)
+  lastReviewedAt     DateTime @db.Date
+  importRunId        String?
+  importRun          ImportRun? @relation(fields: [importRunId], references: [id])
+
+  @@id([entityId, indicatorId, year])
+  @@index([sourceDocumentId])
+  @@index([importRunId])
+}
+
 model TradeOverviewFact {
   year               Int
   indicatorId        String
@@ -873,9 +965,266 @@ model EnergyFoodFact {
   @@id([indicatorId, year])
 }
 
+// Mirror of data/imports/health-annual.csv: Geostat's annual health staff, facilities,
+// illness and causes-of-death figures for Georgia and its regions, exact stored decimals
+// with their published rounding. The counting-change register stays in the CSV.
+model HealthFact {
+  year               Int
+  indicatorId        String
+  areaId             String
+  value              Decimal        @db.Decimal(30, 20)
+  publishedValue     Decimal        @db.Decimal(30, 20)
+  unit               String
+  basis              String
+  valueStatus        String
+  sourceId           String
+  sourceSheet        String
+  sourceCell         String
+  sourceNumberFormat String
+  sourceDocumentId   String
+  sourceDocument     SourceDocument @relation(fields: [sourceDocumentId], references: [id])
+  lastReviewedAt     DateTime       @db.Date
+  importRunId        String?
+  importRun          ImportRun?     @relation(fields: [importRunId], references: [id])
+
+  @@id([indicatorId, areaId, year])
+}
+
+// Mirror of data/imports/crime-annual.csv: Geostat's annual recorded-crime, conviction, prison,
+// victim and road-accident counts, whole numbers. The counting-change register stays in the CSV.
+model CrimeFact {
+  year             Int
+  indicatorId      String
+  value            Decimal        @db.Decimal(40, 30)
+  publishedValue   Decimal        @db.Decimal(40, 30)
+  unit             String
+  basis            String
+  valueStatus      String
+  sourceId         String
+  sourceSheet      String
+  sourceCell       String
+  sourceDocumentId String
+  sourceDocument   SourceDocument @relation(fields: [sourceDocumentId], references: [id])
+  lastReviewedAt   DateTime       @db.Date
+  importRunId      String?
+  importRun        ImportRun?     @relation(fields: [importRunId], references: [id])
+
+  @@id([indicatorId, year])
+}
+
+// Mirror of data/imports/environment-annual.csv: Geostat's yearly greenhouse gas, air pollution,
+// city air quality, climate, water, waste and forest figures, exact published decimals. A value's
+// displayed decimals are read from its published value, so no decimals column is stored.
+model EnvironmentFact {
+  year             Int
+  indicatorId      String
+  value            Decimal        @db.Decimal(40, 30)
+  publishedValue   Decimal        @db.Decimal(40, 30)
+  unit             String
+  basis            String
+  valueStatus      String
+  sourceId         String
+  sourceSheet      String
+  sourceCell       String
+  sourceDocumentId String
+  sourceDocument   SourceDocument @relation(fields: [sourceDocumentId], references: [id])
+  lastReviewedAt   DateTime       @db.Date
+  importRunId      String?
+  importRun        ImportRun?     @relation(fields: [importRunId], references: [id])
+
+  @@id([indicatorId, year])
+}
+
+// Mirror of data/imports/labour-annual.csv: Geostat's labour-force detail (jobs by industry, usual weekly
+// hours, informal employment, labour underutilization and NEET shares), exact stored decimals with their published rounding.
+model LabourFact {
+  year             Int
+  indicatorId      String
+  value            Decimal        @db.Decimal(40, 30)
+  publishedValue   Decimal        @db.Decimal(40, 30)
+  unit             String
+  basis            String
+  valueStatus      String
+  sourceId         String
+  sourceSheet      String
+  sourceCell       String
+  sourceDocumentId String
+  sourceDocument   SourceDocument @relation(fields: [sourceDocumentId], references: [id])
+  lastReviewedAt   DateTime       @db.Date
+  importRunId      String?
+  importRun        ImportRun?     @relation(fields: [importRunId], references: [id])
+
+  @@id([indicatorId, year])
+}
+
 // Mirror of data/imports/money-banks-annual.csv: NBG's yearly money, loan, deposit,
 // interest-rate and bank-health figures, exact stored decimals with their published rounding.
 model MoneyBanksFact {
+  year             Int
+  indicatorId      String
+  value            Decimal        @db.Decimal(40, 30)
+  publishedValue   Decimal        @db.Decimal(40, 30)
+  unit             String
+  basis            String
+  valueStatus      String
+  sourceId         String
+  sourceSheet      String
+  sourceCell       String
+  sourceDocumentId String
+  sourceDocument   SourceDocument @relation(fields: [sourceDocumentId], references: [id])
+  lastReviewedAt   DateTime       @db.Date
+  importRunId      String?
+  importRun        ImportRun?     @relation(fields: [importRunId], references: [id])
+
+  @@id([indicatorId, year])
+}
+
+// Mirror of data/imports/business-annual.csv: Geostat's yearly enterprise survey and business demography
+// figures, exact stored decimals with their published rounding.
+model BusinessFact {
+  year             Int
+  indicatorId      String
+  value            Decimal        @db.Decimal(40, 30)
+  publishedValue   Decimal        @db.Decimal(40, 30)
+  unit             String
+  basis            String
+  valueStatus      String
+  sourceId         String
+  sourceSheet      String
+  sourceCell       String
+  sourceDocumentId String
+  sourceDocument   SourceDocument @relation(fields: [sourceDocumentId], references: [id])
+  lastReviewedAt   DateTime       @db.Date
+  importRunId      String?
+  importRun        ImportRun?     @relation(fields: [importRunId], references: [id])
+
+  @@id([indicatorId, year])
+}
+
+// Mirror of data/imports/housing-annual.csv: Geostat's construction permits, completed objects,
+// residential property price index and Tbilisi district prices, exact stored decimals with their
+// published rounding. Sheet names are kept verbatim (the 2012 sheet is "2012 ").
+model HousingFact {
+  year             Int
+  indicatorId      String
+  value            Decimal        @db.Decimal(40, 30)
+  publishedValue   Decimal        @db.Decimal(40, 30)
+  unit             String
+  basis            String
+  valueStatus      String
+  sourceId         String
+  sourceSheet      String
+  sourceCell       String
+  sourceDocumentId String
+  sourceDocument   SourceDocument @relation(fields: [sourceDocumentId], references: [id])
+  lastReviewedAt   DateTime       @db.Date
+  importRunId      String?
+  importRun        ImportRun?     @relation(fields: [importRunId], references: [id])
+
+  @@id([indicatorId, year])
+}
+
+// Mirror of data/imports/internet-annual.csv: Geostat's yearly ICT household survey shares (homes with
+// internet or a computer, internet, phone and computer use), exact stored decimals with their published
+// one-decimal rounding.
+model InternetFact {
+  year             Int
+  indicatorId      String
+  value            Decimal        @db.Decimal(40, 30)
+  publishedValue   Decimal        @db.Decimal(40, 30)
+  unit             String
+  basis            String
+  valueStatus      String
+  sourceId         String
+  sourceSheet      String
+  sourceCell       String
+  sourceDocumentId String
+  sourceDocument   SourceDocument @relation(fields: [sourceDocumentId], references: [id])
+  lastReviewedAt   DateTime       @db.Date
+  importRunId      String?
+  importRun        ImportRun?     @relation(fields: [importRunId], references: [id])
+
+  @@id([indicatorId, year])
+}
+
+// Mirror of data/imports/transport-annual.csv: Geostat's road vehicle fleet, passenger and freight
+// transport demand and carriage, registered vehicles and road length, exact stored decimals with their
+// published rounding. Sheet names are kept verbatim (the owner sheet is " type of owner ").
+model TransportFact {
+  year             Int
+  indicatorId      String
+  value            Decimal        @db.Decimal(40, 30)
+  publishedValue   Decimal        @db.Decimal(40, 30)
+  unit             String
+  basis            String
+  valueStatus      String
+  sourceId         String
+  sourceSheet      String
+  sourceCell       String
+  sourceDocumentId String
+  sourceDocument   SourceDocument @relation(fields: [sourceDocumentId], references: [id])
+  lastReviewedAt   DateTime       @db.Date
+  importRunId      String?
+  importRun        ImportRun?     @relation(fields: [importRunId], references: [id])
+
+  @@id([indicatorId, year])
+}
+
+// Mirror of data/imports/education-annual.csv: Geostat's yearly school, kindergarten, university and
+// vocational figures by place, exact stored decimals with their published rounding. `shown` is false for
+// the nine old vocational fields, which are kept for the sums and never reach a page.
+model EducationFact {
+  year             Int
+  periodLabel      String
+  indicatorId      String
+  geographyId      String
+  value            Decimal        @db.Decimal(40, 30)
+  publishedValue   Decimal        @db.Decimal(40, 30)
+  unit             String
+  basis            String
+  valueStatus      String
+  shown            Boolean
+  sourceId         String
+  sourceSheet      String
+  sourceCell       String
+  sourceDocumentId String
+  sourceDocument   SourceDocument @relation(fields: [sourceDocumentId], references: [id])
+  lastReviewedAt   DateTime       @db.Date
+  importRunId      String?
+  importRun        ImportRun?     @relation(fields: [importRunId], references: [id])
+
+  @@id([indicatorId, geographyId, year])
+}
+
+// Mirror of data/imports/social-protection-annual.csv: SSA's yearly pensions, subsistence allowance, social package and
+// social payments by place, exact stored decimals (GEL as summed, an average to two decimals). `months` is how many
+// monthly sheets the value covers: 1 for a December count, fewer than 12 for a partial year.
+model SocialFact {
+  year             Int
+  indicatorId      String
+  geographyId      String
+  value            Decimal        @db.Decimal(30, 12)
+  unit             String
+  months           Int
+  basis            String
+  valueStatus      String
+  sourceId         String
+  sourceWorkbook   String
+  sourceSheet      String
+  sourceCell       String
+  sourceDocumentId String
+  sourceDocument   SourceDocument @relation(fields: [sourceDocumentId], references: [id])
+  lastReviewedAt   DateTime       @db.Date
+  importRunId      String?
+  importRun        ImportRun?     @relation(fields: [importRunId], references: [id])
+
+  @@id([indicatorId, geographyId, year])
+}
+
+// Mirror of data/imports/science-culture-annual.csv: Geostat's researchers, R&D, patents, museums and
+// theatres, exact stored decimals with their published rounding. The counting-change register
+// science-culture-series-breaks.csv is read from the CSV and not mirrored.
+model ScienceCultureFact {
   year             Int
   indicatorId      String
   value            Decimal        @db.Decimal(40, 30)
@@ -918,6 +1267,29 @@ model HouseholdIncomeSpendingFact {
   importRun          ImportRun?     @relation(fields: [importRunId], references: [id])
 
   @@id([indicatorId, areaId, measure, year])
+}
+
+// Mirror of data/imports/external-position-annual.csv: NBG's gross external debt and official
+// reserve assets in million USD, exact stored decimals with their published rounding and period end.
+model ExternalPositionFact {
+  year             Int
+  indicatorId      String
+  value            Decimal        @db.Decimal(40, 30)
+  publishedValue   Decimal        @db.Decimal(40, 30)
+  unit             String
+  periodEnd        String
+  basis            String
+  valueStatus      String
+  sourceId         String
+  sourceSheet      String
+  sourceCell       String
+  sourceDocumentId String
+  sourceDocument   SourceDocument @relation(fields: [sourceDocumentId], references: [id])
+  lastReviewedAt   DateTime       @db.Date
+  importRunId      String?
+  importRun        ImportRun?     @relation(fields: [importRunId], references: [id])
+
+  @@id([indicatorId, year])
 }
 
 // Mirror of the served data/imports/demography-*.csv files: one flat observation table in the

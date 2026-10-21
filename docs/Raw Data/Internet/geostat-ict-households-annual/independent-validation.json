@@ -1,0 +1,19 @@
+{
+  "status": "passed",
+  "reader": "SheetJS 0.20.3",
+  "workbooks": 10,
+  "observations": 1055,
+  "stored_values_matched": 1055,
+  "published_values_matched_rounding": 1055,
+  "rows_with_matching_year_heading_and_label_context": 1055,
+  "negative_controls": {
+    "altered_value_detected": true,
+    "omitted_row_detected": true,
+    "shifted_year_detected": true,
+    "neighbouring_column_detected": true,
+    "neighbouring_row_label_detected": true,
+    "rounding_wrong_way_detected": true,
+    "unavailable_year_served_detected": true
+  },
+  "failures": []
+}

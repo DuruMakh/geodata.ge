@@ -1,73 +1,18 @@
 import { readFile } from "node:fs/promises";
+import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { afterEach, describe, expect, it } from "vitest";
-import sitemap from "../../lib/seo/sitemap";
+import { parse } from "csv-parse/sync";
+import { describe, expect, it } from "vitest";
 import { TOOLS } from "../../lib/mcp/tools";
 import { loadPackagedSnapshot } from "../../lib/mcp/snapshot";
 import { catalogueData } from "../../lib/factQuery/publications";
+import { schoolYearLabel } from "../../lib/explorer/education";
 
 const llmsPath = fileURLToPath(new URL("../../public/llms.txt", import.meta.url));
-const originalEnv = { ...process.env };
-const requiredTargets = [
-  "https://fiscal.ge/",
-  "https://fiscal.ge/explorer",
-  "https://fiscal.ge/explorer/expenditure",
-  "https://fiscal.ge/explorer/revenue",
-  "https://fiscal.ge/explorer/analysis",
-  "https://fiscal.ge/explorer/municipalities",
-  "https://fiscal.ge/explorer/debt",
-  "https://fiscal.ge/explorer/deficit",
-  "https://fiscal.ge/explorer/economy/gdp",
-  "https://fiscal.ge/explorer/economy/sectors",
-  "https://fiscal.ge/explorer/economy/regions",
-  "https://fiscal.ge/explorer/inflation",
-  "https://fiscal.ge/explorer/inflation/overview",
+// Pages are checked both ways against the sitemap in routes.test.ts ("links only to public sitemap pages",
+// "names every hub, section and methodology route"). Published files are not pages, so their exact list stays here.
+const requiredFileTargets = [
   "https://fiscal.ge/downloads/data/inflation-cpi-national.csv",
-  "https://fiscal.ge/explorer/inflation/categories",
-  "https://fiscal.ge/explorer/inflation/cities",
-  "https://fiscal.ge/explorer/inflation/products",
-  "https://fiscal.ge/explorer/unemployment",
-  "https://fiscal.ge/explorer/unemployment/overview",
-  "https://fiscal.ge/explorer/unemployment/regions",
-  "https://fiscal.ge/explorer/unemployment/age",
-  "https://fiscal.ge/explorer/unemployment/gender",
-  "https://fiscal.ge/explorer/wages",
-  "https://fiscal.ge/explorer/wages/overview",
-  "https://fiscal.ge/explorer/wages/industries",
-  "https://fiscal.ge/explorer/wages/regions",
-  "https://fiscal.ge/explorer/living-standards",
-  "https://fiscal.ge/explorer/living-standards/income",
-  "https://fiscal.ge/explorer/living-standards/spending",
-  "https://fiscal.ge/explorer/living-standards/poverty",
-  "https://fiscal.ge/explorer/living-standards/inequality",
-  "https://fiscal.ge/explorer/trade",
-  "https://fiscal.ge/explorer/trade/overview",
-  "https://fiscal.ge/explorer/trade/partners",
-  "https://fiscal.ge/explorer/trade/products",
-  "https://fiscal.ge/explorer/trade/domestic-exports",
-  "https://fiscal.ge/explorer/external",
-  "https://fiscal.ge/explorer/external/money-from-abroad",
-  "https://fiscal.ge/explorer/external/foreign-investment",
-  "https://fiscal.ge/explorer/external/current-account",
-  "https://fiscal.ge/explorer/demography",
-  "https://fiscal.ge/explorer/demography/population",
-  "https://fiscal.ge/explorer/demography/migration",
-  "https://fiscal.ge/explorer/demography/births-deaths",
-  "https://fiscal.ge/explorer/demography/age-sex",
-  "https://fiscal.ge/methodology",
-  "https://fiscal.ge/methodology/expenditure",
-  "https://fiscal.ge/methodology/revenue",
-  "https://fiscal.ge/methodology/municipalities",
-  "https://fiscal.ge/methodology/gdp",
-  "https://fiscal.ge/methodology/economic-sectors",
-  "https://fiscal.ge/methodology/regional-economies",
-  "https://fiscal.ge/methodology/inflation",
-  "https://fiscal.ge/methodology/unemployment",
-  "https://fiscal.ge/methodology/wages",
-  "https://fiscal.ge/methodology/poverty",
-  "https://fiscal.ge/methodology/trade",
-  "https://fiscal.ge/methodology/external-flows",
-  "https://fiscal.ge/methodology/demography",
   "https://fiscal.ge/downloads/data/gdp-overview.json",
   "https://fiscal.ge/downloads/data/gdp-overview.csv",
   "https://fiscal.ge/downloads/data/economic-sectors.json",
@@ -86,20 +31,167 @@ const requiredTargets = [
   "https://fiscal.ge/downloads/data/general-government-balance.json",
   "https://fiscal.ge/downloads/data/catalogue.json",
   "https://fiscal.ge/downloads/data/sources.json",
-  "https://fiscal.ge/connect",
-  "https://fiscal.ge/en/connect",
-  "https://fiscal.ge/en",
-  "https://fiscal.ge/en/explorer",
-  "https://fiscal.ge/en/methodology/expenditure",
-  "https://fiscal.ge/about",
   "https://fiscal.ge/sitemap.xml",
 ] as const;
 
-afterEach(() => {
-  process.env = { ...originalEnv };
-});
+type CsvRow = Record<string, string>;
+
+/** The per-measure first years on the Money sub-page lines ("bank loans from 2002", ...). */
+function moneyFirstYears() {
+  const indicator = (pattern: RegExp) => (row: CsvRow) => pattern.test(row.indicator_id);
+  const from = (prefix: string, suffix = "") => (first: number) => `${prefix} from ${first}${suffix}`;
+  const money = (url: string, pattern: RegExp, text: (first: number) => string, alsoIn?: string) =>
+    ({ url: `/explorer/money/${url}`, file: "money-banks-annual.csv", rows: indicator(pattern), text, alsoIn });
+  const supply = /^money\.m[0-3]$/;
+  return [
+    money("supply", supply, from("in million GEL")),
+    // The page divides each December amount by national GDP, so a share needs both years.
+    money("supply", supply, from("all four as a share of GDP"), "national-gdp-annual-1996-2025.csv"),
+    money("loans-deposits", /^loans\.(total|gel|fx)$/, from("bank loans")),
+    money("loans-deposits", /^deposits\.(total|gel|fx)$/, from("and deposits", ",")),
+    money("loans-deposits", /^deposits\.individuals$/, from("deposits of people")),
+    money("loans-deposits", /^deposits\.legal_entities$/, from("of companies and organisations")),
+    money("interest-rates", /^rates\.policy$/, from("policy rate")),
+    money("interest-rates", /^rates\.(loans|deposits)_/, from("on loans and on deposits")),
+    money("bank-health", /^banks\.npl_ratio$/, from("bad loans as a share of all loans")),
+    money("bank-health", /^banks\.ro[ae]$/, from("return on assets and on equity")),
+    money("bank-health", /^banks\.(capital|tier1)_ratio$/, from("the two capital ratios")),
+  ];
+}
+/** The Education lines: school years read `2025/26` (stored as 2025), vocational calendar years plain; never the old vocational fields. */
+function educationCoverage() {
+  const shown = (pattern: RegExp) => (row: CsvRow) => row.shown === "true" && pattern.test(row.indicator_id);
+  const schoolYears = (first: number, last: number) => `${schoolYearLabel(first)}–${schoolYearLabel(last)}`;
+  const education = (url: string, pattern: RegExp, text: (first: number, last: number) => string = schoolYears) =>
+    ({ url: `/explorer/education${url}`, file: "education-annual.csv", rows: shown(pattern), text });
+  return [
+    education("", /^education\.(schools|pupils_national|pupils|teachers)\./, (first, last) => `schools (${schoolYears(first, last)})`),
+    education("", /^education\.(kindergartens|kg_children|kg_staff)\./, (first, last) => `kindergartens (${schoolYears(first, last)})`),
+    education("", /^education\.he_/, (first, last) => `universities (${schoolYears(first, last)})`),
+    education("", /^education\.vet_/, (first, last) => `vocational colleges (${first}–${last})`),
+    education("/schools", /^education\.(schools|pupils_national)\./, (first) => `Georgia from ${schoolYearLabel(first)}`),
+    education("/kindergartens", /^education\.(kindergartens|kg_children|kg_staff)\./),
+    education("/universities", /^education\.he_(students|admitted)\./),
+    education("/universities", /^education\.he_graduates\./),
+    education("/vocational", /^education\.vet_/, (first, last) => `${first}–${last}`),
+  ];
+}
+/**
+ * Coverage years llms.txt states in prose, each checked against the reviewed CSV it describes: the line that
+ * links `url` must contain the first and last year of the matching rows (Task 19 review follow-up, D283).
+ * `alsoIn` keeps only the years another CSV has too, for a value the page derives from both.
+ */
+const statedCoverage: { url: string; file: string; rows?: (row: CsvRow) => boolean; alsoIn?: string; text?: (first: number, last: number) => string }[] = [
+  { url: "/explorer/economy/regions", file: "regional-economies-annual.csv" },
+  { url: "/explorer/money", file: "money-banks-annual.csv" },
+  { url: "/explorer/business", file: "business-annual.csv" },
+  { url: "/explorer/business/firms", file: "business-annual.csv", rows: (row) => /^business\.(active|births|deaths|birth_rate|death_rate)\./.test(row.indicator_id) },
+  { url: "/explorer/housing", file: "housing-annual.csv", rows: (row) => /^housing\.(permits|completed)_/.test(row.indicator_id), text: (first, last) => `completed buildings, ${first}–${last}` },
+  { url: "/explorer/housing/permits", file: "housing-annual.csv", rows: (row) => row.indicator_id.startsWith("housing.permits_") },
+  { url: "/explorer/housing/completed", file: "housing-annual.csv", rows: (row) => row.indicator_id.startsWith("housing.completed_") },
+  { url: "/explorer/housing/prices", file: "housing-annual.csv", rows: (row) => row.indicator_id.startsWith("housing.price_index."), text: (first, last) => `flats and houses, ${first}–${last}` },
+  { url: "/explorer/housing/prices", file: "housing-annual.csv", rows: (row) => /^housing\.price_(flat|house)\./.test(row.indicator_id), text: (first, last) => `ten districts, ${first}–${last}` },
+  { url: "/explorer/housing/regions", file: "housing-annual.csv", rows: (row) => /\.region_/.test(row.indicator_id) },
+  ...moneyFirstYears(),
+  { url: "/explorer/unemployment", file: "unemployment-annual.csv" },
+  { url: "/explorer/unemployment/industries", file: "labour-annual.csv", rows: (row) => row.indicator_id.startsWith("labour.jobs.") },
+  { url: "/explorer/unemployment/industries", file: "labour-annual.csv", rows: (row) => /^labour\.jobs\.(women|men)\./.test(row.indicator_id), text: (first) => `from ${first}` },
+  { url: "/explorer/unemployment/hours", file: "labour-annual.csv", rows: (row) => row.indicator_id.startsWith("labour.hours.") },
+  { url: "/explorer/unemployment/informal", file: "labour-annual.csv", rows: (row) => row.indicator_id.startsWith("labour.informal.") },
+  { url: "/explorer/unemployment/young-people", file: "labour-annual.csv", rows: (row) => row.indicator_id.startsWith("labour.neet.") },
+  { url: "/explorer/living-standards", file: "household-income-spending-annual.csv", text: (first) => `household income and spending from ${first}` },
+  { url: "/explorer/living-standards", file: "poverty-annual.csv", rows: (row) => row.indicator_id.startsWith("poverty."), text: (first) => `poverty rates from ${first}` },
+  { url: "/explorer/living-standards", file: "poverty-annual.csv", rows: (row) => row.indicator_id.startsWith("gini."), text: (first) => `inequality from ${first}` },
+  { url: "/explorer/living-standards/poverty", file: "poverty-annual.csv", rows: (row) => /^poverty\.(absolute|relative_)/.test(row.indicator_id) },
+  { url: "/explorer/living-standards/poverty", file: "poverty-annual.csv", rows: (row) => row.indicator_id.startsWith("poverty.international_") },
+  { url: "/explorer/living-standards/inequality", file: "poverty-annual.csv", rows: (row) => row.indicator_id.startsWith("gini.") },
+  { url: "/explorer/health", file: "health-annual.csv", rows: (row) => !/^health\.death/.test(row.indicator_id), text: (first, last) => `healthcare statistics, ${first}–${last}` },
+  { url: "/explorer/health", file: "health-annual.csv", rows: (row) => row.indicator_id.startsWith("health.deaths."), text: (first, last) => `by cause for Georgia and its 11 regions, ${first}–${last}` },
+  { url: "/explorer/health/doctors-hospitals", file: "health-annual.csv", rows: (row) => /^health\.(staff|facilities|visits)\./.test(row.indicator_id) },
+  { url: "/explorer/health/illnesses", file: "health-annual.csv", rows: (row) => row.indicator_id.startsWith("health.illness.") },
+  { url: "/explorer/health/illnesses", file: "health-annual.csv", rows: (row) => /^health\.illness\.(diabetes|anaemia)$/.test(row.indicator_id), text: (first) => `diabetes and anaemia from ${first}` },
+  { url: "/explorer/health/causes-of-death", file: "health-annual.csv", rows: (row) => /^health\.death/.test(row.indicator_id) },
+  { url: "/explorer/health", file: "social-protection-annual.csv", text: (first, last) => `social package and social payments, ${first}–${last}` },
+  { url: "/explorer/health/social-payments", file: "social-protection-annual.csv", rows: (row) => row.indicator_id.startsWith("social.payments.") },
+  { url: "/explorer/health/social-payments", file: "social-protection-annual.csv", rows: (row) => row.indicator_id === "social.payments.covid_vulnerable_compensation.amount", text: (first, last) => `${first} and ${last}` },
+  { url: "/explorer/health/pensions", file: "social-protection-annual.csv", rows: (row) => row.indicator_id.startsWith("social.pension.") },
+  { url: "/explorer/health/subsistence-allowance", file: "social-protection-annual.csv", rows: (row) => row.indicator_id.startsWith("social.subsistence.") },
+  { url: "/explorer/health/subsistence-allowance", file: "social-protection-annual.csv", rows: (row) => row.indicator_id === "social.subsistence.employment_families", text: (first) => `(from ${first})` },
+  { url: "/explorer/health/social-package", file: "social-protection-annual.csv", rows: (row) => row.indicator_id.startsWith("social.social_package.") },
+  { url: "/explorer/health/social-package", file: "social-protection-annual.csv", rows: (row) => /^social\.social_package\.disability_.+\.recipients$/.test(row.indicator_id), text: (first) => `four disability rows from ${first}` },
+  { url: "/explorer/health/social-package", file: "social-protection-annual.csv", rows: (row) => row.indicator_id === "social.social_package.war_participants.recipients", text: (first) => `war participants from ${first}` },
+  { url: "/explorer/crime", file: "crime-annual.csv" },
+  { url: "/explorer/crime/recorded", file: "crime-annual.csv", rows: (row) => row.indicator_id.startsWith("crime.recorded.") },
+  { url: "/explorer/crime/convictions", file: "crime-annual.csv", rows: (row) => row.indicator_id.startsWith("crime.convicted.") },
+  { url: "/explorer/crime/prisons", file: "crime-annual.csv", rows: (row) => row.indicator_id.startsWith("crime.prison.") },
+  { url: "/explorer/crime/prisons", file: "crime-annual.csv", rows: (row) => /^crime\.prison\.(sentenced|pretrial)$/.test(row.indicator_id), text: (first) => `awaiting trial from ${first}` },
+  { url: "/explorer/crime/victims", file: "crime-annual.csv", rows: (row) => row.indicator_id.startsWith("crime.victims.") && Number(row.year) < 2012 },
+  { url: "/explorer/crime/victims", file: "crime-annual.csv", rows: (row) => row.indicator_id.startsWith("crime.victims.") && Number(row.year) > 2014, text: (first, last) => `and ${first}–${last}` },
+  { url: "/explorer/crime/road-accidents", file: "crime-annual.csv", rows: (row) => row.indicator_id.startsWith("crime.road.") },
+  { url: "/explorer/internet", file: "internet-annual.csv" },
+  { url: "/explorer/internet/homes", file: "internet-annual.csv", rows: (row) => row.indicator_id.startsWith("internet.homes_") },
+  { url: "/explorer/internet/users", file: "internet-annual.csv", rows: (row) => /^internet\.(used_3m|never_used|daily)\./.test(row.indicator_id) },
+  { url: "/explorer/internet/online", file: "internet-annual.csv", rows: (row) => /^internet\.(bought_online|activity_|egov_)/.test(row.indicator_id) },
+  { url: "/explorer/internet/devices", file: "internet-annual.csv", rows: (row) => /^internet\.(own_mobile|own_smartphone|computer_3m)\./.test(row.indicator_id) },
+  { url: "/explorer/internet/devices", file: "internet-annual.csv", rows: (row) => row.indicator_id.startsWith("internet.own_smartphone."), text: (first) => `smartphone (from ${first})` },
+  ...educationCoverage(),
+  { url: "/explorer/science-culture", file: "science-culture-annual.csv", rows: (row) => /^science_culture\.(researchers|rd_staff|institutions|rd_spending)\./.test(row.indicator_id), text: (first, last) => `research spending (${first}–${last})` },
+  { url: "/explorer/science-culture", file: "science-culture-annual.csv", rows: (row) => /^science_culture\.(invention|utility)_/.test(row.indicator_id), text: (first, last) => `grants (${first}–${last})` },
+  { url: "/explorer/science-culture", file: "science-culture-annual.csv", rows: (row) => /^science_culture\.museum/.test(row.indicator_id), text: (first, last) => `visitors (${first}–${last})` },
+  { url: "/explorer/science-culture", file: "science-culture-annual.csv", rows: (row) => /^science_culture\.theatre/.test(row.indicator_id), text: (first, last) => `theatres (${first}–${last})` },
+  { url: "/explorer/science-culture/research", file: "science-culture-annual.csv", rows: (row) => /^science_culture\.(researchers|rd_staff|institutions|rd_spending)\./.test(row.indicator_id) },
+  { url: "/explorer/science-culture/patents", file: "science-culture-annual.csv", rows: (row) => /^science_culture\.(invention|utility)_/.test(row.indicator_id) },
+  { url: "/explorer/science-culture/museums", file: "science-culture-annual.csv", rows: (row) => /^science_culture\.museum/.test(row.indicator_id) },
+  { url: "/explorer/science-culture/museums", file: "science-culture-annual.csv", rows: (row) => row.indicator_id.startsWith("science_culture.museum_staff."), text: (first, last) => `staff (${first}–${last})` },
+  { url: "/explorer/science-culture/theatres", file: "science-culture-annual.csv", rows: (row) => /^science_culture\.theatre/.test(row.indicator_id) },
+  { url: "/explorer/science-culture/theatres", file: "science-culture-annual.csv", rows: (row) => row.indicator_id.startsWith("science_culture.theatre_events."), text: (first) => `events from ${first}` },
+  { url: "/explorer/science-culture/theatres", file: "science-culture-annual.csv", rows: (row) => row.indicator_id.startsWith("science_culture.theatre_staff."), text: (first) => `staff from ${first}` },
+  { url: "/explorer/trade/overview", file: "trade-overview-annual.csv" },
+  { url: "/explorer/trade/partners", file: "trade-partners-annual.csv" },
+  { url: "/explorer/trade/products", file: "trade-products-annual.csv", rows: (row) => row.source_block === "2020-2025" },
+  { url: "/explorer/trade/domestic-exports", file: "trade-domestic-annual.csv" },
+  { url: "/explorer/trade/services", file: "trade-services-annual.csv" },
+  { url: "/explorer/external/money-from-abroad", file: "money-transfers-annual.csv" },
+  ...(["country", "sector", "region"] as const).map((dimension) => ({ url: "/explorer/external/foreign-investment", file: "foreign-investment-annual.csv", rows: (row: CsvRow) => row.entity_id.startsWith(`fdi.${dimension}.`) })),
+  { url: "/explorer/external/current-account", file: "current-account-annual.csv" },
+  { url: "/explorer/external/foreign-debt", file: "external-position-annual.csv", rows: (row) => row.indicator_id.startsWith("ext_debt.") },
+  { url: "/explorer/external/reserves", file: "external-position-annual.csv", rows: (row) => row.indicator_id.startsWith("reserves.") },
+  { url: "/explorer/energy-food", file: "energy-food-annual.csv", rows: (row) => row.indicator_id.startsWith("energy.") || row.indicator_id.startsWith("electricity.") },
+  { url: "/explorer/energy-food", file: "energy-food-annual.csv", rows: (row) => row.indicator_id.startsWith("food.") },
+  { url: "/explorer/transport", file: "transport-annual.csv", rows: (row) => row.indicator_id.startsWith("transport.fleet.") && !/_(fuel|age)_/.test(row.indicator_id), text: (first, last) => `road vehicle fleet, ${first}–${last}` },
+  { url: "/explorer/transport/vehicles", file: "transport-annual.csv", rows: (row) => row.indicator_id.startsWith("transport.fleet.") && !row.indicator_id.includes("_age_") },
+  { url: "/explorer/transport/vehicle-age", file: "transport-annual.csv", rows: (row) => row.indicator_id.includes("fleet.") && row.indicator_id.includes("_age_") },
+  { url: "/explorer/transport/passengers", file: "transport-annual.csv", rows: (row) => /^transport\.passenger_km/.test(row.indicator_id) },
+  { url: "/explorer/transport/freight", file: "transport-annual.csv", rows: (row) => row.indicator_id.startsWith("transport.tonne_km.") },
+  { url: "/explorer/transport/regions", file: "transport-annual.csv", rows: (row) => row.indicator_id.startsWith("transport.registered."), text: (first, last) => `registered vehicles by region, ${first}–${last}` },
+  { url: "/explorer/transport/regions", file: "transport-annual.csv", rows: (row) => row.indicator_id.startsWith("transport.road_km."), text: (first, last) => `road length, ${first}–${last}` },
+  { url: "/explorer/energy-food", file: "energy-food-annual.csv", rows: (row) => row.indicator_id.startsWith("farming.") },
+  { url: "/explorer/energy-food/farming", file: "energy-food-annual.csv", rows: (row) => row.indicator_id.startsWith("farming.") },
+  { url: "/explorer/environment/greenhouse-gases", file: "environment-annual.csv", rows: (row) => row.indicator_id.startsWith("environment.ghg.") },
+  { url: "/explorer/environment/air-pollution", file: "environment-annual.csv", rows: (row) => row.indicator_id.startsWith("environment.air.") },
+  { url: "/explorer/environment/air-quality", file: "environment-annual.csv", rows: (row) => row.indicator_id.startsWith("environment.aq.") },
+  { url: "/explorer/environment/climate", file: "environment-annual.csv", rows: (row) => row.indicator_id.startsWith("environment.climate.") && Number(row.year) >= 2000, text: (first, last) => `from ${first} to ${last}` },
+  { url: "/explorer/environment/water", file: "environment-annual.csv", rows: (row) => row.indicator_id.startsWith("environment.water.") },
+  { url: "/explorer/environment/waste", file: "environment-annual.csv", rows: (row) => row.indicator_id.startsWith("environment.waste.") },
+  { url: "/explorer/environment/forests", file: "environment-annual.csv", rows: (row) => /^environment\.forest\.(timber_cut|illegal_logging)\./.test(row.indicator_id) },
+  { url: "/explorer/demography/migration", file: "demography-migration-annual.csv" },
+];
 
 describe("Fiscal.ge agent instructions", () => {
+  it("states each dataset's coverage years as its reviewed CSV has them", async () => {
+    const lines = (await readFile(llmsPath, "utf8")).split(/\r?\n/);
+    const imports = fileURLToPath(new URL("../../../../data/imports/", import.meta.url));
+    const readYears = async (file: string, rows: (row: CsvRow) => boolean = () => true) =>
+      (parse(await readFile(path.join(imports, file)), { columns: true, bom: true }) as CsvRow[]).filter(rows).map((row) => Number(row.year));
+    for (const { url, file, rows, alsoIn, text = (first: number, last: number) => `${first}–${last}` } of statedCoverage) {
+      const line = lines.find((candidate) => candidate.includes(`](https://fiscal.ge${url})`));
+      expect(line, url).toBeDefined();
+      const otherYears = alsoIn === undefined ? null : new Set(await readYears(alsoIn));
+      const years = (await readYears(file, rows)).filter((year) => otherYears === null || otherYears.has(year));
+      expect(years.length, `${url} ${file}`).toBeGreaterThan(0);
+      expect(line, `${url} ${file}`).toContain(text(Math.min(...years), Math.max(...years)));
+    }
+  });
   it("keeps authored sector counts and measure years consistent with the generated catalogue", async () => {
     const content = await readFile(llmsPath, "utf8");
     const snapshot = loadPackagedSnapshot();
@@ -153,25 +245,7 @@ describe("Fiscal.ge agent instructions", () => {
     expect(content).not.toContain("[About Fiscal.ge](https://fiscal.ge/about)");
 
     const targets = [...content.matchAll(/\]\((https:\/\/fiscal\.ge\/[^)]*)\)/g)].map((match) => match[1]);
-    expect(targets).toEqual(requiredTargets);
-    expect(targets).toHaveLength(84);
+    expect(targets.filter((target) => /\.(json|csv|xml)$/.test(new URL(target).pathname))).toEqual(requiredFileTargets);
     expect(new Set(targets).size).toBe(targets.length);
-  });
-
-  it("links only to public sitemap pages and the sitemap document", async () => {
-    process.env.NEXT_PUBLIC_SITE_URL = "https://fiscal.ge";
-    const content = await readFile(llmsPath, "utf8");
-    const targets = [...content.matchAll(/\]\((https:\/\/fiscal\.ge\/[^)]*)\)/g)].map((match) => match[1]!);
-    // Downloads are published files, not pages: they are deliberately absent
-    // from the sitemap, which lists public HTML routes. Spec section 16 said
-    // only requiredTargets needed updating here; it missed this filter, which
-    // treated any non-sitemap link as an HTML page owing a sitemap entry.
-    const htmlTargets = targets.filter((target) => !/\.(xml|json|csv)$/.test(new URL(target).pathname));
-    const sitemapTargets = (await sitemap()).map((entry) => entry.url);
-
-    expect(htmlTargets.every((target) => sitemapTargets.includes(target))).toBe(true);
-    expect(targets.filter((target) => new URL(target).pathname === "/sitemap.xml")).toEqual([
-      "https://fiscal.ge/sitemap.xml",
-    ]);
   });
 });

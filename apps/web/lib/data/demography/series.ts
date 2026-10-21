@@ -24,6 +24,13 @@ export const SERIES = {
   censusPopulationByAge: "demography.census_population_by_age",
   censusPopulationBySettlement: "demography.census_population_by_settlement",
   ageSpecificFertilityRate: "demography.age_specific_fertility_rate",
+  midYearPopulation: "demography.mid_year_population",
+  marriages: "demography.marriages",
+  divorces: "demography.divorces",
+  meanAgeAtMarriage: "demography.mean_age_at_marriage",
+  meanAgeAtFirstMarriage: "demography.mean_age_at_first_marriage",
+  meanAgeAtDivorce: "demography.mean_age_at_divorce",
+  meanMarriageDuration: "demography.mean_marriage_duration",
 } as const;
 
 /** The archived Geostat tables, by the source ids in the package manifest. */
@@ -43,6 +50,11 @@ export const SOURCE_ID = {
   migrationCitizenship: "source.geostat_demography_migration_citizenship",
   density: "source.geostat_demography_density",
   censusAge: "source.geostat_census2024_population_by_age_settlement",
+  marriages: "source.geostat_demography_marriages",
+  divorces: "source.geostat_demography_divorces",
+  meanAgeSpouses: "source.geostat_demography_mean_age_spouses",
+  meanAgeDivorced: "source.geostat_demography_mean_age_divorced",
+  marriageDuration: "source.geostat_demography_marriage_duration",
   /** Validation inputs: archived and compared with the served rows, never served. */
   infantDeaths: "source.geostat_demography_infant_deaths",
   lifeTables: "source.geostat_demography_life_tables",
@@ -51,6 +63,12 @@ export const SOURCE_ID = {
   ageDependency: "source.geostat_demography_age_dependency",
   migrationAgeSex: "source.geostat_demography_migration_age_sex",
   census: "source.geostat_census2024_population_by_unit",
+  marriagesPreviousStatus: "source.geostat_demography_marriages_previous_status",
+  divorcesByDuration: "source.geostat_demography_divorces_duration",
+  crudeMarriageRate: "source.geostat_demography_crude_marriage_rate",
+  crudeMarriageRateRegions: "source.geostat_demography_crude_marriage_rate_regions",
+  crudeDivorceRate: "source.geostat_demography_crude_divorce_rate",
+  crudeDivorceRateRegions: "source.geostat_demography_crude_divorce_rate_regions",
 } as const;
 
 /** The day the 2026-10 Geostat capture was reviewed; every observation carries it as `last_reviewed_at`. */
@@ -72,6 +90,13 @@ export const COVERAGE = {
   migrationFrom: 2012,
   /** Density rests on one area as of March 2014 (Geostat's note), so it starts there; earlier years use other areas. */
   densityFrom: 2014,
+  /** Marriages, divorces and their mid-year denominator: Geostat's method is unchanged since 1994 (its metadata says so). */
+  marriageFrom: 1994,
+  /**
+   * Places start in 2009: before it the occupied units (Akhalgori to 2008) hold values inside Georgia's and their region's
+   * totals, and Tbilisi's borders moved in 2007, so a place's series would step on a border change.
+   */
+  marriageUnitsFrom: 2009,
 } as const;
 
 /** Lineage of the 1 January population: Geostat's 2018 retro-projection, the 2014-census estimates, then the 2024 census. */
@@ -103,6 +128,15 @@ export const FAMILIES = {
   density: [SERIES.populationDensity],
   census: [SERIES.censusPopulationByAge, SERIES.censusPopulationBySettlement],
   fertility: [SERIES.ageSpecificFertilityRate],
+  midYear: [SERIES.midYearPopulation],
+  marriage: [
+    SERIES.marriages,
+    SERIES.divorces,
+    SERIES.meanAgeAtMarriage,
+    SERIES.meanAgeAtFirstMarriage,
+    SERIES.meanAgeAtDivorce,
+    SERIES.meanMarriageDuration,
+  ],
 } as const;
 
 /** The 2025 census recalculation of the 1 January population: the one balancing residual the archive may hold. */

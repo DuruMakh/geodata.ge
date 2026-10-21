@@ -26,6 +26,7 @@ import type {
 } from "../data/inflation/types";
 import type { ServedRegionalEconomyObservation } from "../data/regionalEconomies/types";
 import type { ServedDemographyObservation } from "../data/demography/types";
+import type { MunicipalFunctionFact, MunicipalTotalFact } from "../data/municipal/types";
 
 export type ClientBudgetFact = Omit<ServedBudgetFact, "sourceId">;
 export type ClientAdminFact = Omit<
@@ -33,6 +34,10 @@ export type ClientAdminFact = Omit<
   "sourceId" | "officialInstitutionLabelKa"
 >;
 export type ClientNationalGdpFact = Omit<ServedNationalGdpFact, "sourceId">;
+// The municipal explorer reads only these; the rest of a served row is source and
+// reconciliation bookkeeping that stays on the server.
+export type ClientMunicipalFunctionFact = Pick<MunicipalFunctionFact, "year" | "categoryId" | "amountGel">;
+export type ClientMunicipalTotalFact = Pick<MunicipalTotalFact, "year" | "publicTotalGel">;
 
 export function projectBudgetFact(fact: ServedBudgetFact): ClientBudgetFact {
   return {
@@ -54,6 +59,14 @@ export function projectAdminFact(fact: ServedAdminFact): ClientAdminFact {
     basis: fact.basis,
     officialLabelKa: fact.level === "major_program" ? fact.officialLabelKa : null,
   };
+}
+
+export function projectMunicipalFunctionFact(fact: MunicipalFunctionFact): ClientMunicipalFunctionFact {
+  return { year: fact.year, categoryId: fact.categoryId, amountGel: fact.amountGel };
+}
+
+export function projectMunicipalTotalFact(fact: MunicipalTotalFact): ClientMunicipalTotalFact {
+  return { year: fact.year, publicTotalGel: fact.publicTotalGel };
 }
 
 export function projectGdpFact(fact: ServedNationalGdpFact): ClientNationalGdpFact {

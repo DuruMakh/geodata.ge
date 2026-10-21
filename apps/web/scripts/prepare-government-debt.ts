@@ -1,8 +1,8 @@
 import { buildGovernmentDebtPackage } from "../lib/data/governmentDebt/prepareGovernmentDebtPackage";
 import { prepareGovernmentDebtFacts } from "../lib/data/governmentDebt/importGovernmentDebtFacts";
+import { runAsCli } from "../lib/runAsCli";
 
-async function main() {
-  const args = process.argv.slice(2);
+export async function main(args: readonly string[]) {
   if (args.length !== 1 || !["--write", "--check"].includes(args[0])) {
     throw new Error("Usage: prepare-government-debt.ts --write|--check");
   }
@@ -21,7 +21,4 @@ async function main() {
   console.log(`Validation: ${result.validation.status}`);
 }
 
-main().catch((error) => {
-  console.error(error);
-  process.exit(1);
-});
+runAsCli(import.meta.url, main);

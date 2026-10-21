@@ -1,0 +1,322 @@
+[
+ {
+  "source_id": "page-en",
+  "language": "en",
+  "url": "https://www.geostat.ge/en/modules/categories/55/social-protection",
+  "local_file": "official/pages/social-protection-page-en.html",
+  "content_type": "text/html; charset=UTF-8",
+  "bytes": 101245,
+  "sha256": "1523e3e1d74e05b5962c1b7d61f49aad28fd31b47c493e4538381654cad9829d",
+  "retrieved_on": "2026-10-17"
+ },
+ {
+  "source_id": "page-ka",
+  "language": "ka",
+  "url": "https://www.geostat.ge/ka/modules/categories/55/sotsialuri-datsva",
+  "local_file": "official/pages/social-protection-page-ka.html",
+  "content_type": "text/html; charset=UTF-8",
+  "bytes": 113075,
+  "sha256": "ce882a3bd60fa2d267edf617058bce1fe99a9b4457af32e0d44b950a1594e738",
+  "retrieved_on": "2026-10-17"
+ },
+ {
+  "source_id": "pension-social-package",
+  "language": "en",
+  "url": "https://geostat.ge/media/76715/Persons-receiving-pension-and-social-package.xls",
+  "local_file": "official/en/pension-social-package.en.xls",
+  "content_type": "application/vnd.ms-excel",
+  "bytes": 31744,
+  "sha256": "e09db87ca86969b85d56505641267b37d90adb87636ac46ca0f0816e87439bbe",
+  "retrieved_on": "2026-10-17"
+ },
+ {
+  "source_id": "pension-social-package",
+  "language": "ka",
+  "url": "https://geostat.ge/media/76709/pensiis-da-socialuri-paketis-mimRebTa-ricxovnoba.xls",
+  "local_file": "official/ka/pension-social-package.ka.xls",
+  "content_type": "application/vnd.ms-excel",
+  "bytes": 33792,
+  "sha256": "f024f1be94099cea188494ca4bf7829be366b8e07467b2b71aa77ae9c63418f0",
+  "retrieved_on": "2026-10-17"
+ },
+ {
+  "source_id": "pension-social-package-regions-sex",
+  "language": "en",
+  "url": "https://geostat.ge/media/76716/Persons-receiving-pension-and-social-package-by-regions-and-gender.xls",
+  "local_file": "official/en/pension-social-package-regions-sex.en.xls",
+  "content_type": "application/vnd.ms-excel",
+  "bytes": 47104,
+  "sha256": "18904a95653ab0f22ffd9d94001526d18c962577f0ae4cf2ad62432305e40128",
+  "retrieved_on": "2026-10-17"
+ },
+ {
+  "source_id": "pension-social-package-regions-sex",
+  "language": "ka",
+  "url": "https://geostat.ge/media/76710/pensiis-da-socialuri-paketis-mimRebTa-raodenoba-sqesis-da-regionebis-mix....xls",
+  "local_file": "official/ka/pension-social-package-regions-sex.ka.xls",
+  "content_type": "application/vnd.ms-excel",
+  "bytes": 71680,
+  "sha256": "2280c0f2babce768fccea3fb568e54e6fef7dc0a7acefb022af632b58daf85aa",
+  "retrieved_on": "2026-10-17"
+ },
+ {
+  "source_id": "pension-municipalities",
+  "language": "en",
+  "url": "https://geostat.ge/media/76717/Persons-receiving-pension-by-municipalities.xls",
+  "local_file": "official/en/pension-municipalities.en.xls",
+  "content_type": "application/vnd.ms-excel",
+  "bytes": 38912,
+  "sha256": "ae171acc0c2f4b560920536aaa79c4b6df508a9fd6e8ea1017f4fa633e015772",
+  "retrieved_on": "2026-10-17"
+ },
+ {
+  "source_id": "pension-municipalities",
+  "language": "ka",
+  "url": "https://geostat.ge/media/76711/pensiis-mimRebTa-ricxovnoba-municipalitetebis-mixedviT.XLS",
+  "local_file": "official/ka/pension-municipalities.ka.xls",
+  "content_type": "application/vnd.ms-excel",
+  "bytes": 40960,
+  "sha256": "f9e2d7405d0c9cc73c3dd211bd328a92c397ce34a38f52369c9092bcb0cd03a4",
+  "retrieved_on": "2026-10-17"
+ },
+ {
+  "source_id": "social-package-municipalities",
+  "language": "en",
+  "url": "https://geostat.ge/media/76718/Persons--receiving-social-package-by-municipalities.xls",
+  "local_file": "official/en/social-package-municipalities.en.xls",
+  "content_type": "application/vnd.ms-excel",
+  "bytes": 37888,
+  "sha256": "4cfcd28250a05f8c3eeae420a51e5e123c60072a5824f042e5f60cfe1fe7290a",
+  "retrieved_on": "2026-10-17"
+ },
+ {
+  "source_id": "social-package-municipalities",
+  "language": "ka",
+  "url": "https://geostat.ge/media/76712/socialuri-paketis-mimRebTa-ricxovnoba-municipalitetebis-mixedviT.XLS",
+  "local_file": "official/ka/social-package-municipalities.ka.xls",
+  "content_type": "application/vnd.ms-excel",
+  "bytes": 40448,
+  "sha256": "afad4d5f7fa69954d242efd5bb181c021bfe6ad0e9ba93ef71143afc44b122ba",
+  "retrieved_on": "2026-10-17"
+ },
+ {
+  "source_id": "subsistence-families-municipalities",
+  "language": "en",
+  "url": "https://geostat.ge/media/80710/Number-of-helpless-families-receiving-subsistence-allowance-by-municipal...-%281%29.xls",
+  "local_file": "official/en/subsistence-families-municipalities.en.xls",
+  "content_type": "application/vnd.ms-excel",
+  "bytes": 59392,
+  "sha256": "c75b3745347f2474fe871901d3b16dda128121086e520c5d202cb6a38cf770bb",
+  "retrieved_on": "2026-10-17"
+ },
+ {
+  "source_id": "subsistence-families-municipalities",
+  "language": "ka",
+  "url": "https://geostat.ge/media/80709/registrirebuli-da-saarsebo-Semweobis-mimRebi-ojaxebi-municipalitet....xls",
+  "local_file": "official/ka/subsistence-families-municipalities.ka.xls",
+  "content_type": "application/vnd.ms-excel",
+  "bytes": 60928,
+  "sha256": "13740829214836e4773882542c2d9c2600d38febbf628ed753b366d554aa33ec",
+  "retrieved_on": "2026-10-17"
+ },
+ {
+  "source_id": "subsistence-beneficiaries",
+  "language": "en",
+  "url": "https://geostat.ge/media/78594/Beneficiaries-of-Subsistence-Allowance.xls",
+  "local_file": "official/en/subsistence-beneficiaries.en.xls",
+  "content_type": "application/vnd.ms-excel",
+  "bytes": 36864,
+  "sha256": "baa6897c5874706a6dcceeb3ee6de688a223805009a7c7283e1efa780c313838",
+  "retrieved_on": "2026-10-17"
+ },
+ {
+  "source_id": "subsistence-beneficiaries",
+  "language": "ka",
+  "url": "https://geostat.ge/media/78590/Saarsebo-shemweobis-mimghebi-mosaxleoba.xls",
+  "local_file": "official/ka/subsistence-beneficiaries.ka.xls",
+  "content_type": "application/vnd.ms-excel",
+  "bytes": 37376,
+  "sha256": "006448309048e5742f97ee4501abceefc84f60c46681fba7bf22d04e6b190b1a",
+  "retrieved_on": "2026-10-17"
+ },
+ {
+  "source_id": "child-care-institutions",
+  "language": "en",
+  "url": "https://geostat.ge/media/60170/Child-care-institutions.xls",
+  "local_file": "official/en/child-care-institutions.en.xls",
+  "content_type": "application/vnd.ms-excel",
+  "bytes": 25088,
+  "sha256": "46aa49c23c1634a8fcf9f0a8be95204c1a981dfeb0f7d56596c343a9e607b947",
+  "retrieved_on": "2026-10-17"
+ },
+ {
+  "source_id": "child-care-institutions",
+  "language": "ka",
+  "url": "https://geostat.ge/media/60161/mzrunvelobamoklebul-bavSvTa-saxlebi.xls",
+  "local_file": "official/ka/child-care-institutions.ka.xls",
+  "content_type": "application/vnd.ms-excel",
+  "bytes": 26624,
+  "sha256": "95eb6f0725a4068e6e54cb703e5c1de9bf1b9bfaf221c510a5e3a28a10fcb869",
+  "retrieved_on": "2026-10-17"
+ },
+ {
+  "source_id": "accumulative-pension",
+  "language": "en",
+  "url": "https://geostat.ge/media/78001/Accumulative-Pension.xlsx",
+  "local_file": "official/en/accumulative-pension.en.xlsx",
+  "content_type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  "bytes": 13264,
+  "sha256": "c272ba1c8ac3bc62fd252004a7b204d8a75157ad0a1ff86dbb5aeb85eaaea0a7",
+  "retrieved_on": "2026-10-17"
+ },
+ {
+  "source_id": "accumulative-pension",
+  "language": "ka",
+  "url": "https://geostat.ge/media/78000/dagrovebiTi-pensia.xlsx",
+  "local_file": "official/ka/accumulative-pension.ka.xlsx",
+  "content_type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  "bytes": 17403,
+  "sha256": "dffe167dd4c063242be3204b0173dfd2002dcd518c04db9544c38b5de291b9a7",
+  "retrieved_on": "2026-10-17"
+ },
+ {
+  "source_id": "nursing-homes",
+  "language": "en",
+  "url": "https://geostat.ge/media/76720/10_Data-on-nursing-homes-for-elderly-and-disabled-persons.xls",
+  "local_file": "official/en/nursing-homes.en.xls",
+  "content_type": "application/vnd.ms-excel",
+  "bytes": 35840,
+  "sha256": "caf19bf0e2c866d549f66c7b6de8003c32bfdece89e7c5a394ddcd33a2c4b19e",
+  "retrieved_on": "2026-10-17"
+ },
+ {
+  "source_id": "nursing-homes",
+  "language": "ka",
+  "url": "https://geostat.ge/media/76714/monacemebi-xandazmulTa-da-SezRuduli-SesaZleblobis-mqone-pirTa-ganTavsebi....xls",
+  "local_file": "official/ka/nursing-homes.ka.xls",
+  "content_type": "application/vnd.ms-excel",
+  "bytes": 36864,
+  "sha256": "2e42cd63912130d694a766e16ca7853de69a4830280c080b76da257a4caf93a9",
+  "retrieved_on": "2026-10-17"
+ },
+ {
+  "source_id": "uhc-disabled-patients",
+  "language": "en",
+  "url": "https://geostat.ge/media/78595/under-the-universal-health-care-program_disabled-persons.xlsx",
+  "local_file": "official/en/uhc-disabled-patients.en.xlsx",
+  "content_type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  "bytes": 22997,
+  "sha256": "d0050d93e71ae1b5d5da44c539307a19ab5fdeed5a60b2f9f87098b5c57dcdaf",
+  "retrieved_on": "2026-10-17"
+ },
+ {
+  "source_id": "uhc-disabled-patients",
+  "language": "ka",
+  "url": "https://geostat.ge/media/78591/sayovelTao-jandacvit-mosargebleebi_SSmp.xlsx",
+  "local_file": "official/ka/uhc-disabled-patients.ka.xlsx",
+  "content_type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  "bytes": 19112,
+  "sha256": "960830b80b7d4b752f9dbf1985327eeee02934dbde37275736aac266d5e45b79",
+  "retrieved_on": "2026-10-17"
+ },
+ {
+  "source_id": "oncology-drugs-disabled",
+  "language": "en",
+  "url": "https://geostat.ge/media/78596/using-oncology-drugs-disabled-persons.xlsx",
+  "local_file": "official/en/oncology-drugs-disabled.en.xlsx",
+  "content_type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  "bytes": 27397,
+  "sha256": "2bf933f7f5d04c3e4019f18d4c79012d96f997cd6eadedc3e80655db26eb0a6f",
+  "retrieved_on": "2026-10-17"
+ },
+ {
+  "source_id": "oncology-drugs-disabled",
+  "language": "ka",
+  "url": "https://geostat.ge/media/78592/onkologiuri-preparatebiT-mosargebleebi_SSmp.xlsx",
+  "local_file": "official/ka/oncology-drugs-disabled.ka.xlsx",
+  "content_type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  "bytes": 26139,
+  "sha256": "f4c95e46497c53169467fdebc1a70c3006fd6aff46671397526eef234f56e815",
+  "retrieved_on": "2026-10-17"
+ },
+ {
+  "source_id": "outpatient-disabled",
+  "language": "en",
+  "url": "https://geostat.ge/media/78597/planned-outpatient-services_disabled-persons.xlsx",
+  "local_file": "official/en/outpatient-disabled.en.xlsx",
+  "content_type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  "bytes": 29041,
+  "sha256": "548635bc9da533d041eddff68411ee066891389913a3daffe215f5edb9a3cc6e",
+  "retrieved_on": "2026-10-17"
+ },
+ {
+  "source_id": "outpatient-disabled",
+  "language": "ka",
+  "url": "https://geostat.ge/media/78593/gegmiuri-ambolatoriiT-mosargebleebi_SSmp.xlsx",
+  "local_file": "official/ka/outpatient-disabled.ka.xlsx",
+  "content_type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  "bytes": 26410,
+  "sha256": "00da0ca50efddc79437e0e89969a7ffdf0335f3108748d37a4e21ff15fcadc7f",
+  "retrieved_on": "2026-10-17"
+ },
+ {
+  "source_id": "pensioners-registered-1995-2006",
+  "language": "en",
+  "url": "https://geostat.ge/media/43079/Number-of-people-registered-with-social-security_authorities.xls",
+  "local_file": "official/en/pensioners-registered-1995-2006.en.xls",
+  "content_type": "application/vnd.ms-excel",
+  "bytes": 33280,
+  "sha256": "f6fe150fa1f18004d7327888d9df581a1ff02f3a345782feeaeb1c0223e02a80",
+  "retrieved_on": "2026-10-17"
+ },
+ {
+  "source_id": "pensioners-registered-1995-2006",
+  "language": "ka",
+  "url": "https://geostat.ge/media/43078/mosaxleobis-socialuri-dacvis-organoebSi-aRricxuli-pensionerebi-kategoriebis_mixedviT.xls",
+  "local_file": "official/ka/pensioners-registered-1995-2006.ka.xls",
+  "content_type": "application/vnd.ms-excel",
+  "bytes": 41472,
+  "sha256": "0871a9ca76f20a7d1f49878397d8ce0ebdd2fd09a6e25773601f7d931afa3cfc",
+  "retrieved_on": "2026-10-17"
+ },
+ {
+  "source_id": "household-allowance-recipients",
+  "language": "en",
+  "url": "https://geostat.ge/media/43127/Number-of-household-allowance-recipients-by-categories.xls",
+  "local_file": "official/en/household-allowance-recipients.en.xls",
+  "content_type": "application/vnd.ms-excel",
+  "bytes": 26624,
+  "sha256": "f3b6bf0397bbb1744c1db964f9365e392cbe1285825b95164944af6d59ad0b1f",
+  "retrieved_on": "2026-10-17"
+ },
+ {
+  "source_id": "household-allowance-recipients",
+  "language": "ka",
+  "url": "https://geostat.ge/media/46954/saojaxo-daxmarebis-mimReb-ojaxTa-raodenoba-kategoriebis-mixedviT.XLS",
+  "local_file": "official/ka/household-allowance-recipients.ka.xls",
+  "content_type": "application/vnd.ms-excel",
+  "bytes": 28160,
+  "sha256": "778330544cbd8a421370e32c1040f5fc4effd80045b4c4a16d6723243944ae6b",
+  "retrieved_on": "2026-10-17"
+ },
+ {
+  "source_id": "household-allowance-amount",
+  "language": "en",
+  "url": "https://geostat.ge/media/26188/Amount-of-the-sum-transferred-for-the-household-benefit.xls",
+  "local_file": "official/en/household-allowance-amount.en.xls",
+  "content_type": "application/vnd.ms-excel",
+  "bytes": 36352,
+  "sha256": "a11264bc35bdf2479d8b55b11802363fc446ab6b4d9175d389d201d9de2ad874",
+  "retrieved_on": "2026-10-17"
+ },
+ {
+  "source_id": "household-allowance-amount",
+  "language": "ka",
+  "url": "https://geostat.ge/media/26187/saojaxo-daxmarebis-mimReb-pirebze-gadaricxuli-tanxa.xls",
+  "local_file": "official/ka/household-allowance-amount.ka.xls",
+  "content_type": "application/vnd.ms-excel",
+  "bytes": 29696,
+  "sha256": "cbf11fbf234e4b024eb9a895e94aceee6933a7148612c1fa50b5d9a2eef53281",
+  "retrieved_on": "2026-10-17"
+ }
+]

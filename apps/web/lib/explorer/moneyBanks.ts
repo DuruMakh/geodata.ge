@@ -1,9 +1,8 @@
 import type { ClientMoneyBanksFact, MoneyBanksIndicator } from "../data/moneyBanks/types";
 import type { ClientNationalGdpFact } from "./clientData";
-import { colorForItem, INK } from "./colors";
 import { shareOfGdp } from "./debtExplorer";
-import { resolveRange, refitRange, type PeriodRange, type ResolvedPeriodRange } from "./periodRange";
-import { parseYearRangeKeys, writeYearRangeKeys } from "./urlState";
+import { refitRange, type ResolvedPeriodRange } from "./periodRange";
+import { buildTopicModel, parseTopicHash, serializeTopicHash, topicCoverage, topicHashView, topicSeriesColor, type TopicSeriesModel, type TopicState } from "./topicSeries";
 
 export const MONEY_BANKS_SECTIONS = [
   { id: "supply", href: "/explorer/money/supply", labelKey: "common.moneySupply" },
@@ -62,11 +61,9 @@ const MEASURE_PAIRS: readonly (readonly [string, string])[] = [
 ];
 const counterpart = (id: string) => { const pair = MEASURE_PAIRS.find(([amount, share]) => amount === id || share === id); return pair ? (pair[0] === id ? pair[1] : pair[0]) : id; };
 
-export function moneyBanksSeriesColor(series: MoneyBanksSeriesDefinition, index: number): string {
-  return series.reference ? INK : colorForItem(series.id, index);
-}
+const moneyBanksSeriesColor = (series: MoneyBanksSeriesDefinition, index: number): string => topicSeriesColor(series, index);
 
-export type MoneyBanksState = { mode: "line" | "table"; range: PeriodRange; view: MoneyBanksView; selectedIds: string[] };
+export type MoneyBanksState = TopicState & { view: MoneyBanksView };
 
 const cellKey = (f: { indicatorId: string; year: number }) => `${f.indicatorId}:${f.year}`;
 
@@ -88,9 +85,7 @@ export function moneyBanksViewFacts(view: MoneyBanksView, facts: readonly Client
 /** A view's years: every year any of its series has a value. */
 export function moneyBanksCoverage(section: MoneyBanksSectionId, view: MoneyBanksView, facts: readonly ClientMoneyBanksFact[], gdpFacts: readonly ClientNationalGdpFact[] = []) {
   const ids = new Set<string>(moneyBanksViewSeries(section, view).map(s => s.id));
-  const years = [...new Set(moneyBanksViewFacts(view, facts, gdpFacts).filter(f => ids.has(f.indicatorId)).map(f => f.year))].sort((a, b) => a - b);
-  if (!years.length) throw new Error(`No money and banks years for ${section}:${view}`);
-  return { min: years[0], max: years.at(-1)!, years };
+  return topicCoverage(moneyBanksViewFacts(view, facts, gdpFacts).filter(f => ids.has(f.indicatorId)).map(f => f.year), `No money and banks years for ${section}:${view}`);
 }
 
 export function defaultMoneyBanksState(section: MoneyBanksSectionId): MoneyBanksState {
@@ -100,24 +95,14 @@ export function defaultMoneyBanksState(section: MoneyBanksSectionId): MoneyBanks
 
 export function parseMoneyBanksHash(hash: string, section: MoneyBanksSectionId, facts: readonly ClientMoneyBanksFact[], gdpFacts: readonly ClientNationalGdpFact[] = []): MoneyBanksState {
   const p = new URLSearchParams(hash.replace(/^#/, ""));
-  const views = moneyBanksViews(section);
-  const view = views.find(item => item === p.get("tab")) ?? views[0];
-  const series = moneyBanksViewSeries(section, view);
-  const requested = p.has("sel") ? p.get("sel")!.split(",") : moneyBanksDefaultSelection(section, view);
-  return {
-    mode: p.get("view") === "table" ? "table" : "line", view,
-    range: refitRange(parseYearRangeKeys(p), moneyBanksCoverage(section, view, facts, gdpFacts), { collapseToAll: true }),
-    selectedIds: series.map(s => s.id).filter(id => requested.includes(id)),
-  };
+  const view = topicHashView(p, moneyBanksViews(section));
+  return { ...parseTopicHash(p, moneyBanksViewSeries(section, view), moneyBanksDefaultSelection(section, view), moneyBanksCoverage(section, view, facts, gdpFacts)), view };
 }
 
 export function serializeMoneyBanksHash(state: MoneyBanksState, section: MoneyBanksSectionId): string {
   const p = new URLSearchParams();
   if (moneyBanksViews(section).length > 1) p.set("tab", state.view);
-  p.set("view", state.mode);
-  p.set("sel", state.selectedIds.join(","));
-  writeYearRangeKeys(p, state.range);
-  return p.toString();
+  return serializeTopicHash(state, p);
 }
 
 /**
@@ -133,20 +118,19 @@ export function changeMoneyBanksView(state: MoneyBanksState, section: MoneyBanks
   return { ...state, view, selectedIds: selectedIds.length ? selectedIds : moneyBanksDefaultSelection(section, view), range: refitRange(state.range, moneyBanksCoverage(section, view, facts, gdpFacts), { collapseToAll: false }) };
 }
 
-export type MoneyBanksSeriesModel = MoneyBanksSeriesDefinition & { color: string; valuesByYear: Record<number, number | null>; endValue: number | null; decimals: number };
+export type MoneyBanksSeriesModel = TopicSeriesModel<MoneyBanksSeriesDefinition & { decimals: number }>;
 export type MoneyBanksModel = { range: ResolvedPeriodRange; years: number[]; series: MoneyBanksSeriesModel[]; selected: MoneyBanksSeriesModel[]; unit: "gel" | "percent" };
 
 export function buildMoneyBanksModel(section: MoneyBanksSectionId, allFacts: readonly ClientMoneyBanksFact[], state: MoneyBanksState, gdpFacts: readonly ClientNationalGdpFact[] = []): MoneyBanksModel {
-  const range = resolveRange(state.range, moneyBanksCoverage(section, state.view, allFacts, gdpFacts));
+  const coverage = moneyBanksCoverage(section, state.view, allFacts, gdpFacts);
   const facts = moneyBanksViewFacts(state.view, allFacts, gdpFacts);
-  const years = Array.from({ length: range.end - range.start + 1 }, (_, i) => range.start + i);
   const byCell = new Map(facts.map(f => [cellKey(f), f]));
   const definitions = moneyBanksViewSeries(section, state.view);
-  const series = definitions.map((definition, index) => {
-    const valuesByYear = Object.fromEntries(years.map(year => [year, byCell.get(cellKey({ indicatorId: definition.id, year }))?.value ?? null]));
-    const decimals = facts.find(f => f.indicatorId === definition.id)?.decimals ?? 1;
-    return { ...definition, color: moneyBanksSeriesColor(definition, index), valuesByYear, endValue: valuesByYear[range.end], decimals };
-  });
   const unit = facts.find(f => f.indicatorId === definitions[0].id)!.unit;
-  return { range, years, series, selected: series.filter(s => state.selectedIds.includes(s.id)), unit };
+  return {
+    ...buildTopicModel({ range: state.range, coverage, selectedIds: state.selectedIds, color: moneyBanksSeriesColor,
+      definitions: definitions.map(definition => ({ ...definition, decimals: facts.find(f => f.indicatorId === definition.id)?.decimals ?? 1 })),
+      value: (definition, year) => byCell.get(cellKey({ indicatorId: definition.id, year }))?.value }),
+    unit,
+  };
 }

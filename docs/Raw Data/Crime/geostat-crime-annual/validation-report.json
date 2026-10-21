@@ -1,0 +1,272 @@
+{
+  "status": "passed",
+  "retrieved_at": "2026-10-16",
+  "scope": "Annual research only: Geostat criminal justice statistics (recorded crimes 2015-2025, convictions, prison population, victims and road traffic accidents, most from 2001); no derived values and no serving",
+  "primary_observation_count": 1262,
+  "observations_by_family": {
+    "convicted": 650,
+    "prison": 157,
+    "recorded": 132,
+    "road": 99,
+    "victims": 224
+  },
+  "observations_by_source": {
+    "geostat_crime_convicts_age_sex": 175,
+    "geostat_crime_convicts_penalties": 175,
+    "geostat_crime_convicts_types": 300,
+    "geostat_crime_prison": 157,
+    "geostat_crime_recorded": 132,
+    "geostat_crime_road": 99,
+    "geostat_crime_victims": 224
+  },
+  "indicators": 63,
+  "text_number_cells": [
+    {
+      "indicator_id": "crime.recorded.total",
+      "year": 2024,
+      "source_id": "geostat_crime_recorded",
+      "source_cell": "K3",
+      "value": "49976",
+      "printed": "49 976"
+    },
+    {
+      "indicator_id": "crime.recorded.life",
+      "year": 2024,
+      "source_id": "geostat_crime_recorded",
+      "source_cell": "K5",
+      "value": "1499",
+      "printed": "1 499"
+    },
+    {
+      "indicator_id": "crime.recorded.health",
+      "year": 2024,
+      "source_id": "geostat_crime_recorded",
+      "source_cell": "K6",
+      "value": "7821",
+      "printed": "7 821"
+    },
+    {
+      "indicator_id": "crime.recorded.rights",
+      "year": 2024,
+      "source_id": "geostat_crime_recorded",
+      "source_cell": "K7",
+      "value": "5108",
+      "printed": "5 108"
+    },
+    {
+      "indicator_id": "crime.recorded.property",
+      "year": 2024,
+      "source_id": "geostat_crime_recorded",
+      "source_cell": "K9",
+      "value": "17233",
+      "printed": "17 233"
+    },
+    {
+      "indicator_id": "crime.recorded.public_safety",
+      "year": 2024,
+      "source_id": "geostat_crime_recorded",
+      "source_cell": "K10",
+      "value": "1265",
+      "printed": "1 265"
+    },
+    {
+      "indicator_id": "crime.recorded.drugs",
+      "year": 2024,
+      "source_id": "geostat_crime_recorded",
+      "source_cell": "K11",
+      "value": "5598",
+      "printed": "5 598"
+    },
+    {
+      "indicator_id": "crime.recorded.transport",
+      "year": 2024,
+      "source_id": "geostat_crime_recorded",
+      "source_cell": "K12",
+      "value": "2743",
+      "printed": "2 743"
+    },
+    {
+      "indicator_id": "crime.recorded.government",
+      "year": 2024,
+      "source_id": "geostat_crime_recorded",
+      "source_cell": "K14",
+      "value": "3363",
+      "printed": "3 363"
+    },
+    {
+      "indicator_id": "crime.recorded.other",
+      "year": 2024,
+      "source_id": "geostat_crime_recorded",
+      "source_cell": "K15",
+      "value": "5076",
+      "printed": "5 076"
+    },
+    {
+      "indicator_id": "crime.road.accidents",
+      "year": 2023,
+      "source_id": "geostat_crime_road",
+      "source_cell": "X3",
+      "value": "5594",
+      "printed": "5 594"
+    },
+    {
+      "indicator_id": "crime.road.injured",
+      "year": 2023,
+      "source_id": "geostat_crime_road",
+      "source_cell": "X5",
+      "value": "7310",
+      "printed": "7 310"
+    }
+  ],
+  "placeholder_cells_in_served_values": 0,
+  "imputed_values": 0,
+  "calculated_values": 0,
+  "reconciliation_failed_count": 0,
+  "checks": [
+    "no duplicate, missing or extra observation, and no served year outside a table's coverage; no 2026 or part-year value",
+    "a \"…\", \"...\" or \"-\" cell is never served as a value; anything but a whole number, a whole number printed as text with a space for thousands, or one of these in a year column fails",
+    "published value equals the stored value (every served cell is a whole count)",
+    "every row equals a fresh read of its source cell, row label and year heading",
+    "the 11 recorded crime groups add up to all recorded crimes, every year 2015-2025 (tolerance 0)",
+    "convicts by crime type, by age, by sex and by sentence each add up to the total, every year 2001-2025 (tolerance 0)",
+    "the three convictions workbooks print the same total every year (the age-sex workbook twice)",
+    "prison: women and men, and adults and juveniles, add up to all inmates every year; convicted and defendants do from 2010",
+    "victims by sex, by age and by citizenship each add up to the total, every printed year",
+    "the footnote quoted in crime-series-breaks.csv is printed in its workbook; the 2017 and 2018 totals it quotes are the served ones",
+    "independent-validation.json re-reads every cell with SheetJS and compares the Georgian copies with the English workbooks"
+  ],
+  "source_checks": [
+    {
+      "source_id": "geostat_crime_recorded",
+      "sha256": "051043605B5CB58DFB2C61CAC84A354DB351808447871E5CD08A42F3A48CF95F",
+      "bytes": 12899,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_crime_recorded_2001_2011",
+      "sha256": "6A5A1B3B43DD9A0E14ADE2AF3E834640FA47E81476F005A134E382B9E0258DCC",
+      "bytes": 28160,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_crime_convicts_types",
+      "sha256": "613F63926B8FEFD68F81D0496CF4FF5FF054E7E32776C05A712B63947BB18F90",
+      "bytes": 36864,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_crime_convicts_age_sex",
+      "sha256": "D6E4799F6AE2A0F326A7C12CCB1F445B2B38010B97945C9F024E09D1761C6050",
+      "bytes": 35328,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_crime_convicts_penalties",
+      "sha256": "C0D9BCD45C2B829D5D04551F4B5C1C42C622E88B9B29556A2C9888D7FF91FD65",
+      "bytes": 34304,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_crime_juvenile",
+      "sha256": "5756E17209542B9B5F48694C768849099AFF0EC56B61908429529BA52D56AEDE",
+      "bytes": 43008,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_crime_prison",
+      "sha256": "3C125629EAA74C0F757446544C25EA7F3BD89270C81C5627A18BE05317075F0D",
+      "bytes": 49664,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_crime_victims",
+      "sha256": "DECD52175B23C7C57B8E55FE62E5E4741B1F9B864C06AE4899F0234E4EFC6F0C",
+      "bytes": 13327,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_crime_road",
+      "sha256": "FD5A9F1642AF4297C91A112F8D630986B484EA613F07C749922A2D6F0C00DFA8",
+      "bytes": 12127,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_crime_trafficking",
+      "sha256": "EF0E47ACB8FC3EDBF5C1E7DF36654F2E1BBD90A448900183CC2F8094560F0C6E",
+      "bytes": 11327,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_crime_registrirebuli_danasaulis_raodenoba_ka",
+      "sha256": "81483BC878AFC5852C3D1C485A4F90EA047A0129945838210BAEF002B464C106",
+      "bytes": 13191,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_crime_registrirebuli_danasauli_2011_ka",
+      "sha256": "BBC9E8EBBD096FDAA939DD9D4F53C978961341CBD310FBB94834688996AE143D",
+      "bytes": 27648,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_crime_msjavrdebulta_ricxovnoba_danasaulis_saxeebis_mixedvit_ka",
+      "sha256": "AF58471BED5C5F281907CB107ABD25604496BA0EA3192A054DCB7EAE1AE8568F",
+      "bytes": 37376,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_crime_msjavrdebulta_ricxovnoba_asakisa_da_skesis_mixedvit_ka",
+      "sha256": "66ABA9A023AA8A5956B868722CFC34F17946843C523CB727321C44D70BC5641B",
+      "bytes": 35840,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_crime_msjavrdebulta_ricxovnoba_sasjelis_ronisziebebis_mixedvit_ka",
+      "sha256": "0812E0AC49FFBF9B06C67E2AB2E7373F398381BAC06EC332BE5BC91B83CE64C3",
+      "bytes": 34816,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_crime_arasrulwlovani_msjavrdebulebis_raodenoba_cadenili_danasaulis_saxeebis_mi_ka",
+      "sha256": "CA763E55BF7BECF526700E8D607F4848B38E3977F38C49C2048F93A1CFA97F2D",
+      "bytes": 44544,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_crime_patimarta_ricxovnoba_ka",
+      "sha256": "7B88296E9A130C431040A3CE25866B2D959502C3E8CC465D4A4A04189BD8CA14",
+      "bytes": 49664,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_crime_dazaralebulta_raodenoba_ka",
+      "sha256": "FC9361EA9B74C4ED8264188BDC0A3A04A9727CF07523295C9658655BE85FFA79",
+      "bytes": 13436,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_crime_avtosagzao_semtxvevebi_ka",
+      "sha256": "CE05BB5DF73D1BE26BD358DBB87AC2D84EC6D9D30A3F37554599D04A9445EE74",
+      "bytes": 12637,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_crime_trefikingi_ka",
+      "sha256": "7319B041E1F3E8D3E68DFC75999EF60CB81249E556A743104F22F8DCC72A2E4B",
+      "bytes": 11436,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_crime_page",
+      "sha256": "24AB62941BF8FBA99EF09E8B4D43BAC48AF5FC3E0C4771B846FFD07A13D646F8",
+      "bytes": 98379,
+      "passed": true
+    },
+    {
+      "source_id": "geostat_crime_page_ka",
+      "sha256": "D2696FB9FF609D976ED1DCEBB5552C9ED7A9B294866EB8C165EE4AC7CDD86575",
+      "bytes": 112102,
+      "passed": true
+    }
+  ]
+}

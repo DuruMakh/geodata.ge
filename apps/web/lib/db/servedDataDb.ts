@@ -22,12 +22,25 @@ import {
   loadGeneralGovernmentBalanceFactsFromMirror,
   loadGdpOverviewFactsFromMirror,
   loadEconomicSectorFactsFromMirror,
+  loadGdpExpenditureFactsFromMirror,
   loadUnemploymentFactsFromMirror,
   loadTradeOverviewFactsFromMirror,
   loadWagesFactsFromMirror,
   loadPovertyFactsFromMirror,
   loadEnergyFoodFactsFromMirror,
+  loadHealthFactsFromMirror,
+  loadCrimeFactsFromMirror,
+  loadLabourFactsFromMirror,
   loadMoneyBanksFactsFromMirror,
+  loadExternalPositionFactsFromMirror,
+  loadBusinessFactsFromMirror,
+  loadHousingFactsFromMirror,
+  loadInternetFactsFromMirror,
+  loadTransportFactsFromMirror,
+  loadEducationFactsFromMirror,
+  loadSocialFactsFromMirror,
+  loadEnvironmentFactsFromMirror,
+  loadScienceCultureFactsFromMirror,
   loadHouseholdFactsFromMirror,
   loadTradePartnersDataFromMirror,
   loadMoneyTransfersDataFromMirror,
@@ -36,6 +49,7 @@ import {
   loadTradeProductsDataFromMirror,
   loadTradeDomesticDataFromMirror,
   loadTradeServicesDataFromMirror,
+  loadTradeCompositionDataFromMirror,
   loadRegionalEconomyFactsFromMirror,
   loadDemographyFactsFromMirror,
   loadInflationBasketWeightsFromMirror,
@@ -48,6 +62,7 @@ import {
   loadSourceDocumentsFromMirror,
 } from "./mirrorRows";
 import { prisma } from "./prisma";
+import type { TradeCompositionData } from "../data/tradeComposition/types";
 
 // Database-backed loaders for GEODATA_DATA_SOURCE=db, reading the mirror over
 // the pooled connection. The row shapes and mapping live in ./mirrorRows so
@@ -126,6 +141,10 @@ export async function loadGdpOverviewFactsFromDb() {
 export async function loadEconomicSectorFactsFromDb() {
   return loadEconomicSectorFactsFromMirror(prisma);
 }
+
+export async function loadGdpExpenditureFactsFromDb() {
+  return loadGdpExpenditureFactsFromMirror(prisma);
+}
 export async function loadUnemploymentFactsFromDb() {
   return loadUnemploymentFactsFromMirror(prisma);
 }
@@ -145,12 +164,60 @@ export async function loadEnergyFoodFactsFromDb() {
   return loadEnergyFoodFactsFromMirror(prisma);
 }
 
+export async function loadHealthFactsFromDb() {
+  return loadHealthFactsFromMirror(prisma);
+}
+
+export async function loadCrimeFactsFromDb() {
+  return loadCrimeFactsFromMirror(prisma);
+}
+
+export async function loadLabourFactsFromDb() {
+  return loadLabourFactsFromMirror(prisma);
+}
+
 export async function loadMoneyBanksFactsFromDb() {
   return loadMoneyBanksFactsFromMirror(prisma);
 }
 
 export async function loadHouseholdFactsFromDb() {
   return loadHouseholdFactsFromMirror(prisma);
+}
+
+export async function loadExternalPositionFactsFromDb() {
+  return loadExternalPositionFactsFromMirror(prisma);
+}
+
+export async function loadBusinessFactsFromDb() {
+  return loadBusinessFactsFromMirror(prisma);
+}
+
+export async function loadHousingFactsFromDb() {
+  return loadHousingFactsFromMirror(prisma);
+}
+
+export async function loadInternetFactsFromDb() {
+  return loadInternetFactsFromMirror(prisma);
+}
+
+export async function loadTransportFactsFromDb() {
+  return loadTransportFactsFromMirror(prisma);
+}
+
+export async function loadEducationFactsFromDb() {
+  return loadEducationFactsFromMirror(prisma);
+}
+
+export async function loadSocialFactsFromDb() {
+  return loadSocialFactsFromMirror(prisma);
+}
+
+export async function loadEnvironmentFactsFromDb() {
+  return loadEnvironmentFactsFromMirror(prisma);
+}
+
+export async function loadScienceCultureFactsFromDb() {
+  return loadScienceCultureFactsFromMirror(prisma);
 }
 
 export async function loadTradePartnersDataFromDb() {
@@ -176,6 +243,10 @@ export async function loadTradeDomesticDataFromDb() {
 }
 export async function loadTradeServicesDataFromDb() {
   return loadTradeServicesDataFromMirror(prisma);
+}
+
+export async function loadTradeCompositionDataFromDb(): Promise<TradeCompositionData> {
+  return loadTradeCompositionDataFromMirror(prisma);
 }
 export async function loadRegionalEconomyFactsFromDb() {
   return loadRegionalEconomyFactsFromMirror(prisma);

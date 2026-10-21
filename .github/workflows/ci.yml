@@ -5,6 +5,9 @@ on:
     branches: [main]
   pull_request:
 
+permissions:
+  contents: read
+
 concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
@@ -15,8 +18,9 @@ defaults:
 
 jobs:
   checks:
-    name: Lint, typecheck, tests, data, build
+    name: Lint, typecheck, tests, data
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -48,10 +52,6 @@ jobs:
       - run: npm run typecheck
       - run: npm test
       - run: npm run data:validate
-      # The e2e job also builds, inside Playwright's webServer. This runs the
-      # build directly so a build failure reports as a build failure instead of
-      # as a webServer timeout, and so the job name above stays true.
-      - run: npm run build
       # Nothing in this job may write into the repository. `git status --porcelain`
       # respects .gitignore, so the generated output under public/downloads/ and
       # data/reports/ stays invisible here — but unlike `git diff` it also reports
@@ -70,9 +70,77 @@ jobs:
             exit 1
           fi
 
+  # The only build in the run, in parallel with the checks: the e2e job serves this
+  # output instead of building again.
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - run: npm ci --no-audit
+      # Next.js keeps its compile cache in .next/cache. Keyed on the lockfile and
+      # the tracked source, so a re-run of the same commit restores it exactly; the
+      # two git-ignored generated folders under lib/ are left out of the hash
+      # because their content changes on every run. A source change restores the
+      # newest cache for the same lockfile and recompiles only what changed.
+      - name: Restore the Next.js build cache
+        uses: actions/cache@v4
+        with:
+          path: apps/web/.next/cache
+          key: nextjs-${{ runner.os }}-${{ hashFiles('apps/web/package-lock.json') }}-${{ hashFiles('apps/web/app/**', 'apps/web/components/**', 'apps/web/lib/**', '!apps/web/lib/factQuery/generated/**', '!apps/web/lib/generated/**', 'apps/web/next.config.ts') }}
+          restore-keys: |
+            nextjs-${{ runner.os }}-${{ hashFiles('apps/web/package-lock.json') }}-
+      # The site origin is baked into the static HTML at build time, so the browser
+      # tests need it here as well as on their own run. The checks job runs
+      # `npm run typecheck` on the same commit, so GEODATA_TYPECHECK_GATED skips
+      # next build's own second TypeScript pass (next.config.ts).
+      - run: npm run build
+        env:
+          NEXT_PUBLIC_SITE_URL: https://fiscal.ge
+          GEODATA_TYPECHECK_GATED: "1"
+      # Everything `next start` serves that is not in the checkout: the build, and
+      # the files prebuild generates (downloads, page data, the /mcp snapshot).
+      # .next/cache stays out (it is cached above and next start never reads it),
+      # and so do source maps, which no test reads, and a dev server's output.
+      # Kept 7 days so "Re-run failed jobs" on the browser job still finds it
+      # the next day; after a week, use "Re-run all jobs".
+      - name: Upload the build for the browser tests
+        uses: actions/upload-artifact@v4
+        with:
+          name: next-build
+          include-hidden-files: true
+          retention-days: 7
+          if-no-files-found: error
+          path: |
+            apps/web/.next
+            !apps/web/.next/cache
+            !apps/web/.next/dev
+            !apps/web/.next/**/*.map
+            apps/web/public/downloads
+            apps/web/public/page-data
+            apps/web/lib/factQuery/generated
+      # Same guard as the checks job: the build must not write into the repository.
+      - name: Fail if the job wrote into the repository
+        if: always()
+        working-directory: ${{ github.workspace }}
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "The build job modified the repository:"
+            git status --porcelain
+            exit 1
+          fi
+
   e2e:
     name: Browser tests (Playwright)
+    needs: build
     runs-on: ubuntu-latest
+    timeout-minutes: 45
     env:
       NEXT_PUBLIC_SITE_URL: https://fiscal.ge
     steps:
@@ -83,11 +151,64 @@ jobs:
           cache: npm
           cache-dependency-path: apps/web/package-lock.json
       - run: npm ci --no-audit
-      - run: npx playwright install --with-deps chromium
-      - run: npm run test:browser
+      - name: Read the Playwright version
+        id: playwright
+        run: echo "version=$(node -p "require('@playwright/test/package.json').version")" >> "$GITHUB_OUTPUT"
+      # The browser binaries are cached per Playwright version; the system
+      # packages they need are not, so a cache hit still installs those.
+      - name: Restore the Playwright browsers
+        id: playwright-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ steps.playwright.outputs.version }}-chromium
+      - name: Install Chromium and its system packages
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps chromium
+      - name: Install Chromium's system packages
+        if: steps.playwright-cache.outputs.cache-hit == 'true'
+        run: npx playwright install-deps chromium
+      - name: Download the build
+        uses: actions/download-artifact@v4
+        with:
+          name: next-build
+          path: apps/web
+      # The server keeps running for the steps below; the runner stops it when
+      # the job ends. The tests start only once it answers. Its log is printed
+      # below whenever the job fails.
+      - name: Start the production server
+        run: |
+          nohup npm run start -- --port 3100 > "$RUNNER_TEMP/next-start.log" 2>&1 &
+          for attempt in $(seq 1 60); do
+            if curl --silent --fail --output /dev/null http://localhost:3100/; then
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "The server did not answer on port 3100 within 60 seconds."
+          exit 1
+      # PLAYWRIGHT_BASE_URL makes playwright.config.ts skip its own webServer
+      # build and run four workers against the server above.
+      - name: Browser tests
+        run: npm run test:browser
+        env:
+          PLAYWRIGHT_BASE_URL: http://localhost:3100
+      - name: Print the server log
+        if: failure()
+        run: cat "$RUNNER_TEMP/next-start.log" || true
       - uses: actions/upload-artifact@v4
         if: failure()
         with:
           name: playwright-report
           path: apps/web/playwright-report/
           retention-days: 7
+      # Same guard as the checks job: a spec must not write into the repository.
+      - name: Fail if the job wrote into the repository
+        if: always()
+        working-directory: ${{ github.workspace }}
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "The browser job modified the repository:"
+            git status --porcelain
+            exit 1
+          fi

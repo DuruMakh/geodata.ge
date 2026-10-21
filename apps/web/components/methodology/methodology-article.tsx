@@ -1,4 +1,5 @@
 import { I18nProvider } from "../../lib/i18n/provider";
+import { withoutLayoutMessages } from "../../lib/i18n/presentation.server";
 import type { Locale } from "../../lib/i18n/types";
 import { METHODOLOGY_TRANSLATION_REVIEWED_AT } from "../../lib/methodology/content/en/revisions";
 import { message } from "../../lib/i18n/messages";
@@ -43,12 +44,12 @@ export function MethodologyArticle({ locale, messages, content, coverage, rows, 
   ];
 
   return (
-    <main className="@container mx-auto w-full max-w-[1240px] px-5 pt-8 min-[768px]:px-7 min-[768px]:pt-12">
-      <BreadcrumbTrail items={breadcrumbItems} />
+    <main id="content" tabIndex={-1} className="@container mx-auto outline-none w-full max-w-[1240px] px-5 pt-8 min-[768px]:px-7 min-[768px]:pt-12">
+      <BreadcrumbTrail items={breadcrumbItems} label={message(messages, "common.breadcrumb")} />
 
       <header className="border-b-2 border-[var(--ink)] pb-10 pt-9 min-[768px]:pb-14 min-[768px]:pt-12">
         <p className="text-[0.6875rem] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]">{message(messages, "methodology.articleOverline")}</p>
-        <h1 className="mt-4 max-w-[900px] text-balance font-[family-name:var(--font-display)] text-[38px] font-semibold leading-[1.12] tracking-[-0.02em] min-[768px]:text-[52px]">
+        <h1 className="mt-4 max-w-[900px] text-balance [overflow-wrap:anywhere] font-[family-name:var(--font-display)] text-[clamp(24px,8vw,30px)] font-semibold leading-[1.12] tracking-[-0.02em] min-[768px]:text-[52px]">
           {content.title}
         </h1>
         <p className="mt-6 max-w-[790px] text-pretty text-[0.9375rem] leading-[1.8] text-[var(--body)]">{content.summary}</p>
@@ -84,7 +85,7 @@ export function MethodologyArticle({ locale, messages, content, coverage, rows, 
         {/* A dataset with no JSON publication would otherwise render this
             as a bare " - JSON: ..." trailer with nothing before the dash. */}
         {processedDataJsonLinks.length > 0 ? (
-        <p data-testid="processed-dataset-json" className="mt-3 text-[0.71875rem] leading-relaxed text-[var(--muted)]">
+        <p data-testid="processed-dataset-json" className="mt-3 text-[0.71875rem] leading-relaxed text-[var(--muted)] max-[768px]:leading-[2.25] max-[768px]:[&_a]:py-[5px]">
           {processedDataJsonLinks.map((link, index) => (
             <span key={link.href}>
               {index > 0 ? " · " : null}
@@ -137,7 +138,7 @@ export function MethodologyArticle({ locale, messages, content, coverage, rows, 
             >
               <h2
                 id={`${section.id}-title`}
-                className="scroll-mt-6 font-[family-name:var(--font-display)] text-[27px] font-semibold tracking-[-0.01em]"
+                className="scroll-mt-6 [overflow-wrap:anywhere] font-[family-name:var(--font-display)] text-[clamp(22px,7vw,27px)] font-semibold tracking-[-0.01em]"
               >
                 {section.title}
               </h2>
@@ -163,7 +164,7 @@ export function MethodologyArticle({ locale, messages, content, coverage, rows, 
                 />
               ) : null}
               {section.kind === "archive" ? (
-                <I18nProvider locale={locale} messages={messages}>
+                <I18nProvider locale={locale} messages={withoutLayoutMessages(messages)}>
                   <SourceArchive datasetId={content.archiveManifestId} datasetLabel={content.title} rows={rows} summary={archiveSummary} />
                 </I18nProvider>
               ) : null}

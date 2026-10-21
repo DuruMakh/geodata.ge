@@ -55,6 +55,5 @@ export function loadServedTradeOverviewData(): Promise<{ facts: TradeOverviewFac
 }
 
 export function toClientTradeOverviewFact(fact: TradeOverviewFact): ClientTradeOverviewFact {
-  const { year, indicatorId, sourceId, publicationStatus, role, lastReviewedAt } = fact;
-  return { year, indicatorId, sourceId, publicationStatus, role, lastReviewedAt, valueUsd: Number(fact.valueUsd) };
+  return { year: fact.year, indicatorId: fact.indicatorId, valueUsd: Number(fact.valueUsd) };
 }

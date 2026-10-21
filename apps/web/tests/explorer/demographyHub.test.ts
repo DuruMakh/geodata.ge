@@ -8,15 +8,16 @@ import { getMessages } from "../../lib/i18n/messages.server";
 import { getPresentation } from "../../lib/i18n/presentation.server";
 
 describe("demography routes", () => {
-  it("name the four pages in hub order, all four live", () => {
-    expect(DEMOGRAPHY_PAGES.map((page) => page.id)).toEqual(["population", "age-sex", "migration", "births-deaths"]);
+  it("name the five pages in hub order, all five live", () => {
+    expect(DEMOGRAPHY_PAGES.map((page) => page.id)).toEqual(["population", "age-sex", "migration", "births-deaths", "marriages-divorces"]);
     expect(DEMOGRAPHY_PAGES.map((page) => page.path)).toEqual([
       "/explorer/demography/population",
       "/explorer/demography/age-sex",
       "/explorer/demography/migration",
       "/explorer/demography/births-deaths",
+      "/explorer/demography/marriages-divorces",
     ]);
-    expect(LIVE_DEMOGRAPHY_PAGES.map((page) => page.id)).toEqual(["population", "age-sex", "migration", "births-deaths"]);
+    expect(LIVE_DEMOGRAPHY_PAGES.map((page) => page.id)).toEqual(["population", "age-sex", "migration", "births-deaths", "marriages-divorces"]);
   });
 
   it("have a sidebar label in both languages for every live page", async () => {
@@ -31,15 +32,24 @@ describe("demography hub cards", () => {
   it("link every page and show none as coming soon", async () => {
     const [{ facts }, presentation] = await Promise.all([loadServedDemographyData(), getPresentation("en", ["demography", "common"], [])]);
     const cards = buildDemographyHubCards(facts, presentation);
-    expect(cards.map((card) => card.index)).toEqual(["01", "02", "03", "04"]);
-    expect(cards.map((card) => card.title)).toEqual(["Population", "Age and sex", "Migration", "Births, deaths and fertility"]);
+    expect(cards.map((card) => card.index)).toEqual(["01", "02", "03", "04", "05"]);
+    expect(cards.map((card) => card.title)).toEqual(["Population", "Age and sex", "Migration", "Births, deaths and fertility", "Marriages and divorces"]);
     expect(cards.map((card) => card.href)).toEqual([
       "/explorer/demography/population",
       "/explorer/demography/age-sex",
       "/explorer/demography/migration",
       "/explorer/demography/births-deaths",
+      "/explorer/demography/marriages-divorces",
     ]);
-    expect(cards.map((card) => card.comingSoon)).toEqual([false, false, false, false]);
+    expect(cards.map((card) => card.comingSoon)).toEqual([false, false, false, false, false]);
+  });
+
+  it("draws the marriages card from Georgia's registered marriages", async () => {
+    const [{ facts }, presentation] = await Promise.all([loadServedDemographyData(), getPresentation("en", ["demography", "common"], [])]);
+    const card = buildDemographyHubCards(facts, presentation)[4]!;
+    expect(card.series).toHaveLength(32);
+    expect(card.series![0]).toBe(21_908);
+    expect(card.footer).toBe("2025 · 22,285 marriages · 1994–2025");
   });
 
   it("draw the population card from Georgia's series with the census gap as a break in the line", async () => {
@@ -53,7 +63,8 @@ describe("demography hub cards", () => {
     expect(card.series![0]).toBe(georgia[0]!.value);
     expect(card.series!.at(-1)).toBe(georgia.at(-1)!.value);
     expect(card.seriesColor).toBe(INK);
-    expect(card.footer).toBe("2026: 3,941,103 people · 2004–2026");
+    // U28-10: the year is followed by " · " as on every other hub card, not a colon.
+    expect(card.footer).toBe("2026 · 3,941,103 people · 2004–2026");
   });
 
   it("draws the age and sex card from Georgia's share aged 65+ on 1 January", async () => {
@@ -66,7 +77,7 @@ describe("demography hub cards", () => {
     expect(card.series![0]).toBeCloseTo(14.07, 2);
     expect(card.series!.at(-1)).toBeCloseTo(18.08, 2);
     expect(card.seriesColor).toBe(INK);
-    expect(card.footer).toBe("2026: 18.1% aged 65+ · 2004–2026");
+    expect(card.footer).toBe("2026 · 18.1% aged 65+ · 2004–2026");
   });
 
   it("draws the migration card from Geostat's published net", async () => {
@@ -74,7 +85,7 @@ describe("demography hub cards", () => {
     const presentation = await getPresentation("en", ["demography"], []);
     const card = buildDemographyHubCards(facts, presentation)[2]!;
     expect(card.series).toHaveLength(14);
-    expect(card.footer).toBe("2025: net migration +17,127 · 2012–2025");
+    expect(card.footer).toBe("2025 · net migration +17,127 · 2012–2025");
   });
 
   it("draws the births card from Georgia's registered births", async () => {
@@ -83,6 +94,6 @@ describe("demography hub cards", () => {
     const card = buildDemographyHubCards(facts, presentation)[3]!;
     expect(card.series).toHaveLength(12);
     expect(card.series![0]).toBe(60_635);
-    expect(card.footer).toBe("2025: 37,867 births · 2014–2025");
+    expect(card.footer).toBe("2025 · 37,867 births · 2014–2025");
   });
 });

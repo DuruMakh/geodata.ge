@@ -1,0 +1,39 @@
+{
+  "status": "passed",
+  "reader": "SheetJS 0.20.3",
+  "workbooks": 26,
+  "observations": 2125,
+  "cells_found_again": 2125,
+  "source_cells_matched": 2125,
+  "values_matched": 2125,
+  "units_matched": 2125,
+  "basis_and_status_matched": 2125,
+  "cross_checks": [
+    "greenhouse gases: four sectors = total, three energy rows = energy, gases (HFCs and SF6 / 1,000) = total, total + land use = net (0.15)",
+    "air pollutants: stationary + mobile = total (0.15)",
+    "water: losses + net = gross (0.15)",
+    "waste: eleven regions = Georgia (0.15)",
+    "timber cut and illegal logging: regions + protected areas = Georgia (2 m3)",
+    "every station block of a city prints the same yearly limits"
+  ],
+  "georgian_copies": {
+    "served_cells_compared": 2125,
+    "differences": 0,
+    "known_differences": [
+      "environment.aq.pm25_avg.rustavi_d2 2025: 21.7 != 22"
+    ]
+  },
+  "manifest_files_matched": 46,
+  "negative_controls": {
+    "altered_value_detected": true,
+    "altered_published_value_detected": true,
+    "omitted_row_detected": true,
+    "shifted_year_detected": true,
+    "wrong_cell_detected": true,
+    "wrong_unit_detected": true,
+    "zero_over_placeholder_detected": true,
+    "ghg_sum_break_detected": true,
+    "forest_sum_break_detected": true
+  },
+  "failures": []
+}

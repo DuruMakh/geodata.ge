@@ -13,7 +13,33 @@ import { editClientPartnerFacts } from "../data/tradePartners/fixtures";
 
 // Task 4 registers these native originals in the public archive; this tests the shared writer independently.
 const sourceNames = ["Georgian-Exports-of-Services-by-Types.xlsx", "Georgian-Imports-of-Services-by-Types.xlsx"];
-const sources: WorkbookPublicSource[] = [...sourceNames, "FTrade_1995-2026.xlsx", "1004_180325_EN.PDF"].map(name => ({ years: [2020, 2021, 2022, 2023, 2024], title: name, organization: "Geostat", downloadHref: `/downloads/methodology/trade/${name}`, retrievedAt: "2026-10-07" }));
+const countrySourceNames = ["Georgian-Exports-of-services-by-countries.xlsx", "Georgian-Imports-of-services-by-countries.xlsx"];
+const sources: WorkbookPublicSource[] = [...sourceNames, ...countrySourceNames, "FTrade_1995-2026.xlsx", "1004_180325_EN.PDF"].map(name => ({ years: [2020, 2021, 2022, 2023, 2024], title: name, organization: "Geostat", downloadHref: `/downloads/methodology/trade/${name}`, retrievedAt: "2026-10-07" }));
+
+test.each(["en", "ka"] as const)("country %s workbooks cite the published country totals and leave absent values blank", async locale => {
+  const data = toClientTradeServicesData(await loadTradeServicesData()), presentation = { locale, englishLabels: data.englishLabels, messages: await getMessages(locale, ["trade", "workbook", "format"]) };
+  for (const measure of ["trade.exports", "trade.imports", "trade.balance", "trade.turnover"] as const) {
+    const state = parseTradePartnersHash(`#measure=${measure}&sel=partner.2020-2024.826,partner.2020-2024.496&start=2020&end=2024`, data.countries);
+    const model = buildTradePartnersWorkbookModel({ data: data.countries, state, sources, siteOrigin: "https://fiscal.ge" }, presentation);
+    expect(model.filename).toContain("trade-services-countries");
+    expect(model.analysis.rows).toHaveLength(10);
+    const applicable = measure === "trade.exports" ? [countrySourceNames[0]] : measure === "trade.imports" ? [countrySourceNames[1]] : countrySourceNames;
+    expect(model.sources.map(source => source.title).sort()).toEqual([...applicable].sort());
+    const excel = new ExcelJS.Workbook(); await excel.xlsx.load(await createWorkbookBuffer(model));
+    expect(excel.worksheets).toHaveLength(3);
+    model.analysis.rows.forEach((row, index) => expect(excel.worksheets[1].getCell(index + 2, 4).value).toBe(row[3]));
+    if (measure === "trade.imports") {
+      const uk2024 = model.analysis.rows.find(row => row.includes(2024) && row.includes(locale === "en" ? "United Kingdom" : data.countries.entities.find(e => e.id === "partner.2020-2024.826")!.labelKa))!;
+      expect(uk2024[3]).toBeCloseTo(96175488.549999951, 6);
+    }
+    if (measure !== "trade.exports") {
+      const mongolia2020 = model.analysis.rows.find(row => row.includes(2020) && row.includes(locale === "en" ? "Mongolia" : data.countries.entities.find(e => e.id === "partner.2020-2024.496")!.labelKa))!;
+      expect(mongolia2020[3]).toBeNull();
+    }
+    const withNational = buildTradePartnersWorkbookModel({ data: data.countries, state: { ...state, selectedIds: ["services.total", ...state.selectedIds] }, sources, siteOrigin: "https://fiscal.ge" }, presentation);
+    expect(withNational.sources).toHaveLength(applicable.length * 2);
+  }
+});
 test.each(["en", "ka"] as const)("services %s native workbooks preserve selections, missingness, status and applicable sources", async locale => {
   const data = toClientTradeServicesData(await loadTradeServicesData()), presentation = { locale, englishLabels: data.englishLabels, messages: await getMessages(locale, ["trade", "workbook", "format"]) }, siteOrigin = "https://fiscal.ge";
   for (const measure of ["trade.exports", "trade.imports", "trade.balance", "trade.turnover"] as const) {

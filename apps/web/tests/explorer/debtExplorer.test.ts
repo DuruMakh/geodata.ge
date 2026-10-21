@@ -37,24 +37,15 @@ const gdpFacts: ServedNationalGdpFact[] = [
 ];
 
 describe("Government Debt explorer model", () => {
-  it("defaults to only the total Government Debt series", () => {
+  it("defaults to the total, keeps unlimited selections within one family, replaces across families and clears completely", () => {
     expect(getDefaultDebtSelection("stock")).toEqual(["debt.stock.total"]);
-  });
-
-  it("keeps unlimited selections within one family", () => {
     expect(selectDebtSeries(["debt.stock.total"], "debt.stock.domestic")).toEqual([
       "debt.stock.total",
       "debt.stock.domestic",
     ]);
-  });
-
-  it("replaces a selection when a series belongs to another family", () => {
     expect(selectDebtSeries(["debt.stock.total", "debt.stock.domestic"], "debt.service.total")).toEqual([
       "debt.service.total",
     ]);
-  });
-
-  it("allows the active family to be cleared completely", () => {
     expect(selectDebtSeries(["debt.stock.total"], "debt.stock.total")).toEqual([]);
   });
 

@@ -1,5 +1,4 @@
 import { isValidElement, type ComponentProps, type ReactElement, type ReactNode } from "react";
-import { renderToStaticMarkup } from "react-dom/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("../../assets/municipality-map-definitions.svg", () => ({ default: { src: "/definitions.svg" } }));
@@ -18,6 +17,7 @@ import {
   populationRegionParams,
   renderPopulationPlacePage,
 } from "../../lib/pages/demography-population-place";
+import { renderPageMarkup } from "../helpers/render-localized";
 
 const GEORGIAN = /\p{Script=Georgian}/u;
 const original = process.env.NEXT_PUBLIC_SITE_URL;
@@ -25,7 +25,7 @@ beforeEach(() => { process.env.NEXT_PUBLIC_SITE_URL = "https://fiscal.ge"; });
 afterEach(() => { process.env.NEXT_PUBLIC_SITE_URL = original; });
 const count = (html: string, token: RegExp) => (html.match(token) ?? []).length;
 const page = async (route: Parameters<typeof renderPopulationPlacePage>[0], locale: "ka" | "en" = "en") =>
-  renderToStaticMarkup(await renderPopulationPlacePage(route, locale));
+  renderPageMarkup(locale, await renderPopulationPlacePage(route, locale));
 
 describe("route parameters", () => {
   it("are the 11 regions and the 63 municipalities, closed sets", async () => {
@@ -83,7 +83,8 @@ describe("place pages", () => {
 
   it("renders in Georgian with the Georgian ordinal", async () => {
     const html = await page({ kind: "municipality", slug: "batumi" }, "ka");
-    expect(html).toContain("მე-2 ადგილი 64-დან · 1 იანვარი 2026");
+    // U26-16: a word joiner keeps "64-დან" on one line on a phone.
+    expect(html).toContain("მე-2 ადგილი 64-\u2060დან · 1 იანვარი 2026");
     expect(html).toContain('href="/explorer/demography/population/region/adjara"');
   });
 
@@ -109,8 +110,20 @@ describe("place pages", () => {
       expect(html.indexOf('data-testid="population-highlights"')).toBeLessThan(html.indexOf('id="births-deaths"'));
     }
     const batumi = await page({ kind: "municipality", slug: "batumi" });
-    expect(batumi).toContain("Births and deaths registered in Batumi, 2015–2025.");
-    expect(batumi).not.toContain("Births and deaths registered in Georgia");
+    // The section's own chart names its place (U26-13 removed the lead line that used to).
+    expect(batumi).toContain("with natural increase, Batumi, 2015–2025");
+    expect(batumi).not.toContain("with natural increase, Georgia");
+  });
+
+  it("follows births and deaths with one marriages and divorces section on every place page, Tbilisi included", async () => {
+    for (const route of [{ kind: "country" } as const, { kind: "region", id: "tbilisi" } as const, { kind: "municipality", slug: "kazbegi" } as const]) {
+      const html = await page(route);
+      expect(count(html, /id="marriages-divorces"/g), JSON.stringify(route)).toBe(1);
+      expect(html.indexOf('id="births-deaths"'), JSON.stringify(route)).toBeLessThan(html.indexOf('id="marriages-divorces"'));
+    }
+    const tbilisi = await page({ kind: "region", id: "tbilisi" });
+    expect(tbilisi).toContain("Tbilisi, 2009–2025");
+    expect(tbilisi).toContain('href="/en/explorer/demography/marriages-divorces"');
   });
 
   it("ends Georgia and every region page with the census age and sex block, after births and deaths, and no municipality page with one", async () => {
@@ -149,7 +162,7 @@ describe("the density note", () => {
 });
 
 describe("place metadata", () => {
-  it("has the page's own canonical address and reciprocal alternates in both languages", async () => {
+  it("has the page's own canonical address, reciprocal alternates in both languages, and a title and description with the place's years", async () => {
     const en = await populationPlaceMetadata({ kind: "municipality", slug: "batumi" }, "en");
     expect(en.alternates?.canonical).toBe("https://fiscal.ge/en/explorer/demography/population/batumi");
     expect(en.alternates?.languages).toMatchObject({
@@ -162,6 +175,15 @@ describe("place metadata", () => {
     expect(String(ka.title)).toContain("მოსახლეობა");
     const georgia = await populationPlaceMetadata({ kind: "country" }, "en");
     expect(georgia.alternates?.canonical).toBe("https://fiscal.ge/en/explorer/demography/population/georgia");
+    // The title and description say what the page is, with the years the place has; a municipality names its region,
+    // and only Georgia and a region carry the census age section (U26-11).
+    expect(en.title).toBe("Batumi — Population | Fiscal.ge");
+    expect(en.description).toBe("Batumi, Adjara: population on 1 January, 2015–2026, and births and deaths, from Geostat data.");
+    expect(georgia.title).toBe("Georgia — Population | Fiscal.ge");
+    expect(georgia.description).toBe("Georgia: population on 1 January, 2004–2026, births and deaths, and the census age and sex structure, from Geostat data.");
+    const adjara = await populationPlaceMetadata({ kind: "region", id: "adjara" }, "ka");
+    expect(adjara.title).toBe("აჭარა — მოსახლეობა | Fiscal.ge");
+    expect(adjara.description).toBe("აჭარა: მოსახლეობა 1 იანვრის მდგომარეობით, 2015–2026, დაბადებები, გარდაცვალებები და აღწერის ასაკობრივ-სქესობრივი სტრუქტურა (საქსტატი).");
   });
 
   it("carries no Georgian text in English, for a region or a municipality", async () => {
@@ -213,22 +235,11 @@ describe("what each page hands on", () => {
     }
   });
 
-  it("says in its title and description what the page is, with the years the place has", async () => {
-    const batumi = await populationPlaceMetadata({ kind: "municipality", slug: "batumi" }, "en");
-    expect(batumi.title).toBe("Batumi — Population | Fiscal.ge");
-    expect(batumi.description).toBe("Batumi: population on 1 January, 2015–2026, from Geostat data.");
-    const georgia = await populationPlaceMetadata({ kind: "country" }, "en");
-    expect(georgia.title).toBe("Georgia — Population | Fiscal.ge");
-    expect(georgia.description).toBe("Georgia: population on 1 January, 2004–2026, from Geostat data.");
-    const adjara = await populationPlaceMetadata({ kind: "region", id: "adjara" }, "ka");
-    expect(adjara.title).toBe("აჭარა — მოსახლეობა | Fiscal.ge");
-    expect(adjara.description).toBe("აჭარა: მოსახლეობა 1 იანვრის მდგომარეობით, 2015–2026, საქსტატის მონაცემებით.");
-  });
-
   it("lists a region's municipalities largest first, numbered from 01, each with its persons", async () => {
     const html = await page({ kind: "region", id: "adjara" });
-    const rows = [...html.matchAll(/<a[^>]*href="([^"]*)"[^>]*data-testid="region-member-row"[^>]*>(.*?)<\/a>/g)].map((row) => [
-      row[1],
+    // Each row is a next/link Link, which writes its href after the other attributes.
+    const rows = [...html.matchAll(/<a([^>]*data-testid="region-member-row"[^>]*)>(.*?)<\/a>/g)].map((row) => [
+      row[1]!.match(/href="([^"]*)"/)?.[1],
       row[2]!.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim(),
     ]);
     expect(rows).toEqual([

@@ -1,3 +1,4 @@
+import { ADJARA_REGION_ID } from "../data/municipal/types";
 import { coverageLabel } from "../explorer/coverageLabel";
 import { I18nProvider } from "../i18n/provider";
 import type { Locale } from "../i18n/types";
@@ -27,6 +28,7 @@ import { MUNICIPALITY_ROUTES } from "../explorer/municipalityRoutes";
 import { REGION_GENITIVE_KA } from "../explorer/municipalLabels";
 import { explorerDatasetJsonLd } from "../seo/structuredData";
 import { resolveSiteUrl } from "../siteUrl";
+import { clientPresentation } from "../i18n/presentation.server";
 
 export async function municipalIndexMetadata(locale: Locale): Promise<Metadata> {
   const data = await loadServedMunicipalData();
@@ -79,7 +81,8 @@ export async function renderMunicipalIndex(locale: Locale) {
     })),
     ...regions.map((region) => ({
       path: `/explorer/municipalities/region/${region.id.replace("region.", "")}` as const,
-      name: message(messages, "municipal.regionDatasetName", {
+      // Named as each region page names itself: Adjara's figure includes the republican budget.
+      name: message(messages, region.id === ADJARA_REGION_ID ? "municipal.adjaraDatasetName" : "municipal.regionDatasetName", {
         name: publicLabel(locale, region.id, REGION_GENITIVE_KA[region.id] ?? region.kaLabel, presentation.englishLabels),
       }),
     })),
@@ -109,6 +112,8 @@ export async function renderMunicipalIndex(locale: Locale) {
       />
       <BreadcrumbJsonLd items={[{ name: message(messages, "common.home"), path: pageHref("/", locale) }, { name: message(messages, "common.budget"), path: pageHref("/explorer", locale) }, { name: message(messages, "common.municipalities"), path: pageHref("/explorer/municipalities", locale) }]} />
       <PageHeader
+        locale={locale}
+        messages={presentation.messages}
         crumbs={[
           { label: message(messages, "common.home"), href: pageHref("/", locale) },
           { label: message(messages, "common.data") },
@@ -120,7 +125,7 @@ export async function renderMunicipalIndex(locale: Locale) {
       <h1 className="mt-[34px] mb-2.5 max-w-[640px] font-[family-name:var(--font-display)] text-[30px] font-semibold leading-[1.15] tracking-[-0.01em] min-[768px]:text-[36px]">
         {message(messages, "municipal.indexTitle")}
       </h1>
-      <I18nProvider {...presentation}>
+      <I18nProvider {...clientPresentation(presentation)}>
       <MunicipalitiesIndex
         viewBox={map.viewBox}
         shapes={map.shapes}

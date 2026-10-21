@@ -54,23 +54,23 @@ test.each(["ka", "en"] as const)("Connect advertises monthly inflation coverage 
 test.each(["ka", "en"] as const)("Connect includes real national, city and product examples with calculation limits in %s", async locale => {
   const html = await connectHtml(locale);
   const item = (id: string) => html.match(new RegExp(`data-testid="connect-example-${id}">(.*?)</li>`))?.[1] ?? "";
-  expect(item("inflation-national")).toContain("2026-08");
-  expect(item("inflation-cities")).toContain("2026-08");
+  expect(item("inflation-national")).toContain("2026-09");
+  expect(item("inflation-cities")).toContain("2026-09");
   expect(item("inflation-cities")).toContain("6");
-  expect(item("inflation-batumi")).toContain("2026-07");
   expect(item("inflation-batumi")).toContain("2026-08");
+  expect(item("inflation-batumi")).toContain("2026-09");
   expect(item("inflation-batumi")).toMatch(/percentage points|პროცენტული პუნქტ/);
-  expect(item("products-annual")).toContain("2026-08");
+  expect(item("products-annual")).toContain("2026-09");
   expect(item("products-cumulative")).toContain("2015-01");
-  expect(item("products-cumulative")).toContain("2026-08");
+  expect(item("products-cumulative")).toContain("2026-09");
   expect(item("products-cumulative")).toContain("2014-12");
   const products = html.match(/data-testid="connect-product-coverage">(.*?)<\/li>/)?.[1];
   expect(products).toContain("305");
-  expect(products).toContain("2015-01–2026-08");
+  expect(products).toContain("2015-01–2026-09");
   expect(html).toContain("query_inflation_products");
   for (const name of ["inflation-products.csv", "inflation-products.json"]) expect(html).toContain(`href="/downloads/data/${name}"`);
   expect(item("products-cumulative")).toMatch(/December|დეკემბ/);
-  expect(html).toContain("1.5.0");
+  expect(html).toContain("1.6.0");
   expect(html).toContain("2026-07-28");
   expect(html).toContain("2025-11-25");
   expect(html).not.toContain("Codex / ChatGPT");
@@ -97,4 +97,17 @@ test("Connect examples move with the loaded facts rather than retaining the rele
   expect(examples).toContain("2025-11");
   expect(examples).not.toContain("2026-08");
   expect(examples).toContain("2014-12");
+});
+
+test.each(["ka", "en"] as const)("Connect gives numbered steps for at least two clients and lists unemployment as not served in %s", async locale => {
+  const html = await connectHtml(locale);
+  const clients = html.split('data-testid="connect-client"').slice(1).map(chunk => chunk.slice(0, chunk.indexOf("</ol>") + "</ol>".length));
+  expect(clients.length).toBeGreaterThanOrEqual(2);
+  for (const client of clients) {
+    // Each application gets numbered steps (DESIGN: real menu paths), not a paragraph.
+    expect(client).toMatch(/<ol\b[^>]*><li\b/);
+    expect(client.replace(/<[^>]+>/g, "").trim().length).toBeGreaterThan(30);
+  }
+  const excluded = html.slice(html.indexOf('data-testid="connect-coverage-excluded"'));
+  expect(excluded.slice(0, excluded.indexOf("</ul>"))).toContain(locale === "en" ? "Unemployment data" : "უმუშევრობის მონაცემები");
 });

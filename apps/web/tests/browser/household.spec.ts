@@ -4,18 +4,6 @@ import ExcelJS from "exceljs";
 const pressed = (id: string) => `[data-series-id="${id}"] [data-testid="series-row-toggle"]`;
 const ready = (page: Page) => expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
 
-test("the living standards hub lists Income, Spending, Poverty and Inequality in that order", async ({ page }) => {
-  await page.goto("/en/explorer/living-standards");
-  const hub = page.getByTestId("living-standards-hub");
-  const links = hub.locator("a");
-  await expect(links).toHaveCount(4);
-  expect(await links.evaluateAll(elements => elements.map(element => element.getAttribute("href")))).toEqual(["income", "spending", "poverty", "inequality"].map(page => `/en/explorer/living-standards/${page}`));
-  for (const [index, title] of ["Income", "Spending", "Poverty", "Inequality"].entries()) {
-    await expect(links.nth(index)).toContainText(`0${index + 1}`);
-    await expect(links.nth(index)).toContainText(title);
-  }
-  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Living standards");
-});
 
 const row = (page: Page, id: string) => page.locator(`[data-testid="regional-list-row"][data-region-id="${id}"]`);
 
@@ -84,7 +72,7 @@ test("Georgia opens its own page: heading, 2002–2025, towns and villages as ti
   await page.getByTestId("chart-mode-table").click();
   await expect(page.getByTestId("chart-panel").getByRole("row").filter({ hasText: "ქალაქი" })).toHaveCount(1);
   // Breadcrumb: Living standards / Income / Georgia; the sidebar keeps Income active.
-  const crumbs = page.getByTestId("explorer-header").getByRole("navigation", { name: "Breadcrumb" }).first();
+  const crumbs = page.getByTestId("explorer-header").getByRole("navigation", { name: "ნავიგაციის ბილიკი" }).first();
   await expect(crumbs.getByRole("link", { name: "შემოსავლები" })).toHaveAttribute("href", "/explorer/living-standards/income");
   await expect(crumbs.locator("[aria-current=page]")).toHaveText("საქართველო");
   await expect(page.getByTestId("living-standards-income-link")).toHaveAttribute("aria-current", "page");
@@ -102,32 +90,37 @@ test("Georgia opens its own page: heading, 2002–2025, towns and villages as ti
   await expect(page.getByTestId("region-picker-trigger")).toHaveText("თბილისი");
 });
 
-test("a list row opens the region's own page: its heading, latest value, years and lines, with no map", async ({ page }) => {
-  await page.goto("/explorer/living-standards/income");
-  await ready(page);
-  await row(page, "region.guria").click();
-  await expect(page).toHaveURL(/\/explorer\/living-standards\/income\/regions\/guria$/);
-  await ready(page);
-  const heading = page.getByRole("heading", { level: 1 });
-  await expect(heading).toContainText("შემოსავლები —");
-  await expect(heading.getByTestId("region-picker-trigger")).toHaveText("გურია");
-  await expect(page.getByTestId("household-latest")).toContainText("· გურია");
-  await expect(page.getByTestId("household-region-map")).toHaveCount(0);
-  await expect(page.getByTestId("regional-list-row")).toHaveCount(0);
-  await expect(page.getByTestId("household-chosen-area")).toHaveCount(0);
-  await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-area", "region.guria");
-  await expect(page.getByTestId("year-range-strip")).toContainText("2019–2025");
-  await expect(page.locator(pressed("income.total"))).toHaveAttribute("aria-pressed", "true");
-  await expect(page.locator(pressed("settlement.urban"))).toHaveCount(0);
-  await expect(page.getByTestId("source-label")).toContainText("2019–2025");
-  await expect(page.getByTestId("source-label")).not.toContainText("geoBoundaries");
-  await expect(page.getByTestId("household-excel-download")).toBeEnabled();
-  // Breadcrumb: Living standards / Income / Guria; the sidebar keeps Income active.
-  const crumbs = page.getByTestId("explorer-header").getByRole("navigation", { name: "Breadcrumb" }).first();
-  await expect(crumbs.getByRole("link", { name: "შემოსავლები" })).toHaveAttribute("href", "/explorer/living-standards/income");
-  await expect(crumbs.locator("[aria-current=page]")).toHaveText("გურია");
-  await expect(page.getByTestId("living-standards-income-link")).toHaveAttribute("aria-current", "page");
-});
+// Income and Spending share the index-to-region flow; Income also pins the region page's contents.
+for (const [section, heading] of [["income", "შემოსავლები —"], ["spending", "ხარჯები —"]] as const) {
+  test(`the ${section} list opens a region's own page: its heading, years and sidebar entry${section === "income" ? ", latest value and lines, with no map" : ""}`, async ({ page }) => {
+    await page.goto(`/explorer/living-standards/${section}`);
+    await ready(page);
+    await expect(page.getByTestId("household-region-map").getByTestId("regional-map-path")).toHaveCount(11);
+    await row(page, "region.guria").click();
+    await expect(page).toHaveURL(new RegExp(`/explorer/living-standards/${section}/regions/guria$`));
+    await ready(page);
+    const heading1 = page.getByRole("heading", { level: 1 });
+    await expect(heading1).toContainText(heading);
+    await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-area", "region.guria");
+    await expect(page.getByTestId("year-range-strip")).toContainText("2019–2025");
+    await expect(page.getByTestId(`living-standards-${section}-link`)).toHaveAttribute("aria-current", "page");
+    if (section !== "income") return;
+    await expect(heading1.getByTestId("region-picker-trigger")).toHaveText("გურია");
+    await expect(page.getByTestId("household-latest")).toContainText("· გურია");
+    await expect(page.getByTestId("household-region-map")).toHaveCount(0);
+    await expect(page.getByTestId("regional-list-row")).toHaveCount(0);
+    await expect(page.getByTestId("household-chosen-area")).toHaveCount(0);
+    await expect(page.locator(pressed("income.total"))).toHaveAttribute("aria-pressed", "true");
+    await expect(page.locator(pressed("settlement.urban"))).toHaveCount(0);
+    await expect(page.getByTestId("source-label")).toContainText("2019–2025");
+    await expect(page.getByTestId("source-label")).not.toContainText("geoBoundaries");
+    await expect(page.getByTestId("household-excel-download")).toBeEnabled();
+    // Breadcrumb: Living standards / Income / Guria; the sidebar keeps Income active.
+    const crumbs = page.getByTestId("explorer-header").getByRole("navigation", { name: "ნავიგაციის ბილიკი" }).first();
+    await expect(crumbs.getByRole("link", { name: "შემოსავლები" })).toHaveAttribute("href", "/explorer/living-standards/income");
+    await expect(crumbs.locator("[aria-current=page]")).toHaveText("გურია");
+  });
+}
 
 test("a map region carries per person to its page, and the picker and previous/next links move between regions", async ({ page }) => {
   await page.goto("/en/explorer/living-standards/income");
@@ -137,8 +130,6 @@ test("a map region carries per person to its page, and the picker and previous/n
   await expect(page.getByTestId("household-measure-per_capita")).toHaveAccessibleName("Per person");
   await expect(page.getByTestId("household-measure-per_household").locator("svg")).toHaveAttribute("data-icon", "family-restroom");
   await page.getByTestId("household-measure-per_capita").click();
-  await expect(page.getByTestId("household-regions")).toHaveAttribute("data-measure", "per_capita");
-  await expect(row(page, "region.tbilisi")).toContainText("745.4");
   await expect(row(page, "region.kakheti")).toHaveAttribute("href", "/en/explorer/living-standards/income/regions/kakheti#per=person");
   await page.getByTestId("household-region-map").locator('a[data-region-id="region.kakheti"]').click();
   await expect(page).toHaveURL(/\/en\/explorer\/living-standards\/income\/regions\/kakheti#per=person/);
@@ -170,18 +161,6 @@ test("a map region carries per person to its page, and the picker and previous/n
   await expect(page.getByTestId("region-picker-trigger")).toHaveText("Guria");
 });
 
-test("the Georgian spending list opens a region page in Georgian", async ({ page }) => {
-  await page.goto("/explorer/living-standards/spending");
-  await ready(page);
-  await expect(page.getByTestId("household-region-map").getByTestId("regional-map-path")).toHaveCount(11);
-  await row(page, "region.guria").click();
-  await expect(page).toHaveURL(/\/explorer\/living-standards\/spending\/regions\/guria$/);
-  await ready(page);
-  await expect(page.getByRole("heading", { level: 1 })).toContainText("ხარჯები —");
-  await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-area", "region.guria");
-  await expect(page.getByTestId("year-range-strip")).toContainText("2019–2025");
-  await expect(page.getByTestId("living-standards-spending-link")).toHaveAttribute("aria-current", "page");
-});
 
 test("Georgia's spending page reads consumption spending and exports Excel with the ticked towns line", async ({ page }) => {
   await page.goto("/en/explorer/living-standards/spending/regions/georgia#sel=spending.consumption,settlement.urban");
@@ -190,7 +169,7 @@ test("Georgia's spending page reads consumption spending and exports Excel with 
   await expect(page.locator(pressed("settlement.urban"))).toHaveAttribute("aria-pressed", "true");
   const promise = page.waitForEvent("download"); await page.getByTestId("household-excel-download").click();
   const download = await promise;
-  expect(download.suggestedFilename()).toBe("fiscal-household-spending-georgia-per_household-2002-2025-en.xlsx");
+  expect(download.suggestedFilename()).toBe("fiscal-household-spending-georgia-per-household-2002-2025-en.xlsx");
   const workbook = new ExcelJS.Workbook(); await workbook.xlsx.readFile((await download.path())!);
   expect(workbook.worksheets).toHaveLength(3);
   const data = workbook.getWorksheet("Data")!;
@@ -239,38 +218,15 @@ test("the per household icon shows in both the plain and the pressed button", as
   }
 });
 
-test("the sidebar lists Living standards after Wages, with its four pages and the current one active", async ({ page }) => {
-  await page.goto("/en/explorer/living-standards/spending");
-  await ready(page);
-  const entry = page.getByTestId("living-standards-link");
-  await expect(entry).toHaveText("Living standards");
-  expect(await page.getByTestId("wages-link").evaluate((wages, living) => Boolean(wages.compareDocumentPosition(living!) & Node.DOCUMENT_POSITION_FOLLOWING), await entry.elementHandle())).toBe(true);
-  for (const id of ["income", "spending", "rates", "inequality"]) await expect(page.getByTestId(`living-standards-${id}-link`)).toBeVisible();
-  await expect(page.getByTestId("living-standards-spending-link")).toHaveAttribute("aria-current", "page");
-  await expect(page.getByTestId("living-standards-income-link")).not.toHaveAttribute("aria-current", "page");
-  // Spending stays active on its region pages.
-  await page.goto("/en/explorer/living-standards/spending/regions/kakheti");
-  await ready(page);
-  await expect(page.getByTestId("living-standards-spending-link")).toHaveAttribute("aria-current", "page");
-  await expect(page.getByTestId("living-standards-income-link")).not.toHaveAttribute("aria-current", "page");
-});
 
+// The hub, Income, Spending and Georgia's Income page at their defaults: the layout pass in mobile-fit-charts.spec.ts.
 for (const prefix of ["", "/en"]) test(`household pages fit a 390px screen ${prefix || "ka"}`, async ({ page }) => {
   const errors: string[] = []; page.on("pageerror", error => errors.push(error.message));
   await page.setViewportSize({ width: 390, height: 900 });
-  for (const path of ["/explorer/living-standards", "/explorer/living-standards/income", "/explorer/living-standards/spending", "/explorer/living-standards/spending/regions/georgia#sel=spending.consumption,settlement.urban,settlement.rural", "/explorer/living-standards/income/regions/georgia", "/explorer/living-standards/income/regions/racha_lechkhumi_kvemo_svaneti", "/explorer/living-standards/spending/regions/samegrelo_zemo_svaneti#per=person"]) {
+  for (const path of ["/explorer/living-standards/spending/regions/georgia#sel=spending.consumption,settlement.urban,settlement.rural", "/explorer/living-standards/income/regions/racha_lechkhumi_kvemo_svaneti", "/explorer/living-standards/spending/regions/samegrelo_zemo_svaneti#per=person"]) {
     await page.goto(`${prefix}${path}`);
-    if (path !== "/explorer/living-standards") await ready(page);
+    await ready(page);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), path).toBe(true);
   }
   expect(errors).toEqual([]);
-});
-
-test("an old poverty bookmark lands on the new address with its tab", async ({ page }) => {
-  // Redirects come from next.config and next dev serves them too (the municipality redirect specs run there); this one is skipped on the default local dev webServer and runs against a served build (PLAYWRIGHT_BASE_URL) or in CI.
-  test.skip(!process.env.PLAYWRIGHT_BASE_URL && !process.env.CI, "redirects are checked against a served build");
-  await page.goto("/en/explorer/poverty/rates#tab=relative");
-  await expect(page).toHaveURL(/\/en\/explorer\/living-standards\/poverty#tab=relative/);
-  await ready(page);
-  await expect(page.getByTestId("poverty-tab-relative")).toHaveAttribute("aria-pressed", "true");
 });

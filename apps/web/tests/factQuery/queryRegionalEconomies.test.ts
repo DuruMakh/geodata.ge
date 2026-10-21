@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, it } from "vitest";
-import { buildFactQuerySnapshot } from "../../lib/factQuery/buildSnapshot";
+import { testSnapshot } from "../helpers/factQuerySnapshot";
 import { queryRegionalEconomies } from "../../lib/factQuery/queryRegionalEconomies";
 import type { Observation } from "../../lib/factQuery/observations";
 import type { FactQuerySnapshot } from "../../lib/factQuery/types";
@@ -7,7 +7,7 @@ import type { FactQuerySnapshot } from "../../lib/factQuery/types";
 let snapshot: FactQuerySnapshot;
 
 beforeAll(async () => {
-  snapshot = await buildFactQuerySnapshot({
+  snapshot = testSnapshot({
     releaseCommit: "test",
     generatedAt: "2026-09-13T00:00:00.000Z",
   });

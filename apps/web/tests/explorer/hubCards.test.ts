@@ -1,6 +1,9 @@
-import { describe, expect, it } from "vitest";
+import { beforeAll, describe, expect, it } from "vitest";
 import { buildHubCards } from "../../lib/explorer/hubCards";
 import { ACCENT, INK } from "../../lib/explorer/colors";
+import { loadServedGeneralGovernmentBalanceData, loadServedGovernmentDebtData, loadServedLandingData, loadServedMunicipalData } from "../../lib/data/servedData";
+import { getPresentation } from "../../lib/i18n/presentation.server";
+import type { Presentation } from "../../lib/i18n/types";
 import type { BudgetFactImportRow } from "../../lib/data/importBudgetFacts";
 import type {
   ServedGeneralGovernmentBalanceFact,
@@ -185,5 +188,27 @@ describe("buildHubCards", () => {
     expect(card.series).toEqual([-2.267, -1.455]);
     expect(card.footer).toBe("2025 · −1.5% მშპ-ის");
     expect(card.seriesColor).toBe(INK);
+  });
+});
+
+describe("buildHubCards over the served data", () => {
+  let input: { facts: Parameters<typeof buildHubCards>[0]; municipalCountryTotalFacts: { year: number; publicTotalGel: number }[]; debtFacts: ServedGovernmentDebtFact[]; balanceFacts: ServedGeneralGovernmentBalanceFact[] };
+  let ka: Presentation, en: Presentation;
+  beforeAll(async () => {
+    const [landing, municipal, debt, balance] = await Promise.all([loadServedLandingData(), loadServedMunicipalData(), loadServedGovernmentDebtData(), loadServedGeneralGovernmentBalanceData()]);
+    input = { facts: landing.facts, municipalCountryTotalFacts: municipal.countryTotalFacts, debtFacts: debt.facts, balanceFacts: balance.facts };
+    const ids = [...landing.glossary.keys(), ...municipal.municipalities.map(entity => entity.code), "debt.stock.domestic", "debt.stock.external"];
+    [ka, en] = await Promise.all([getPresentation("ka", ["common", "landing", "hub"], ids), getPresentation("en", ["common", "landing", "hub"], ids)]);
+  });
+
+  it("keeps hub destinations, sparkline values, coverage and ordering unchanged", () => {
+    const totals = new Map(input.municipalCountryTotalFacts.map(fact => [fact.year, fact.publicTotalGel]));
+    const original = buildHubCards(input.facts, totals, input.debtFacts, input.balanceFacts, ka);
+    const english = buildHubCards(input.facts, totals, input.debtFacts, input.balanceFacts, en);
+    const data = (cards: typeof original) => cards.map(card => ({ ...card, title: undefined, description: undefined, footer: card.footer?.match(/[−+]?\d[\d,.]*%?/g) }));
+    expect(data(english)).toEqual(data(original));
+    expect(original).toEqual(buildHubCards(input.facts, totals, input.debtFacts, input.balanceFacts));
+    expect(english.flatMap(card => [card.title, card.description, card.footer ?? ""]).join(" ")).not.toMatch(/\p{Script=Georgian}/u);
+    expect(english.find(card => card.href === "/explorer/municipalities")?.description).toContain("69");
   });
 });

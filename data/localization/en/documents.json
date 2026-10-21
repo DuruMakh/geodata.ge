@@ -2911,8 +2911,8 @@
   },
   "source.wb_gdp_real_usd_2015": {
     "title": {
-      "text": "NY.GDP.MKTP.KD.json",
-      "reviewedAt": "2026-09-11"
+      "text": "World Bank · Real GDP",
+      "reviewedAt": "2026-10-13"
     },
     "publisher": {
       "text": "World Bank",
@@ -2926,8 +2926,8 @@
   },
   "source.wb_gdp_real_growth_percent": {
     "title": {
-      "text": "NY.GDP.MKTP.KD.ZG.json",
-      "reviewedAt": "2026-09-11"
+      "text": "World Bank · Annual GDP growth",
+      "reviewedAt": "2026-10-13"
     },
     "publisher": {
       "text": "World Bank",
@@ -2941,8 +2941,8 @@
   },
   "source.wb_gdp_metadata": {
     "title": {
-      "text": "wb_indicator_metadata.json",
-      "reviewedAt": "2026-09-11"
+      "text": "World Bank · GDP indicator metadata",
+      "reviewedAt": "2026-10-13"
     },
     "publisher": {
       "text": "World Bank",
@@ -2981,6 +2981,51 @@
     "attribution": {
       "text": "Geostat",
       "reviewedAt": "2026-09-11"
+    },
+    "documentLanguage": "en"
+  },
+  "source.geostat_gdp_use_current": {
+    "title": {
+      "text": "Geostat GDP by categories of use at current prices",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "source.geostat_gdp_use_growth": {
+    "title": {
+      "text": "Geostat real GDP growth by categories of use",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "source.geostat_gdp_use_volume": {
+    "title": {
+      "text": "Geostat GDP by categories of use at constant 2019 prices",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
     },
     "documentLanguage": "en"
   },
@@ -4214,6 +4259,84 @@
     "attribution": { "text": "Geostat", "reviewedAt": "2026-10-11" },
     "documentLanguage": "en"
   },
+  "geostat_farming_general": {
+    "title": { "text": "General agricultural statistics", "reviewedAt": "2026-10-20" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-20" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-20" },
+    "documentLanguage": "en"
+  },
+  "geostat_farming_annual_crops": {
+    "title": { "text": "Production of annual crops", "reviewedAt": "2026-10-20" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-20" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-20" },
+    "documentLanguage": "en"
+  },
+  "geostat_farming_permanent_crops": {
+    "title": { "text": "Production of permanent crops", "reviewedAt": "2026-10-20" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-20" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-20" },
+    "documentLanguage": "en"
+  },
+  "geostat_farming_livestock_numbers": {
+    "title": { "text": "Number of livestock (annual)", "reviewedAt": "2026-10-20" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-20" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-20" },
+    "documentLanguage": "en"
+  },
+  "geostat_farming_livestock_products": {
+    "title": { "text": "Production of livestock products (annual)", "reviewedAt": "2026-10-20" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-20" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-20" },
+    "documentLanguage": "en"
+  },
+  "geostat_farming_prices": {
+    "title": { "text": "Agricultural production prices (farm-gate prices)", "reviewedAt": "2026-10-20" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-20" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-20" },
+    "documentLanguage": "en"
+  },
+  "geostat_farming_general_ka": {
+    "title": { "text": "General agricultural statistics (Georgian labels)", "reviewedAt": "2026-10-20" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-20" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-20" },
+    "documentLanguage": "ka"
+  },
+  "geostat_farming_annual_crops_ka": {
+    "title": { "text": "Production of annual crops (Georgian labels)", "reviewedAt": "2026-10-20" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-20" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-20" },
+    "documentLanguage": "ka"
+  },
+  "geostat_farming_permanent_crops_ka": {
+    "title": { "text": "Production of permanent crops (Georgian labels)", "reviewedAt": "2026-10-20" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-20" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-20" },
+    "documentLanguage": "ka"
+  },
+  "geostat_farming_livestock_numbers_ka": {
+    "title": { "text": "Number of livestock (annual) (Georgian labels)", "reviewedAt": "2026-10-20" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-20" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-20" },
+    "documentLanguage": "ka"
+  },
+  "geostat_farming_livestock_products_ka": {
+    "title": { "text": "Production of livestock products (annual) (Georgian labels)", "reviewedAt": "2026-10-20" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-20" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-20" },
+    "documentLanguage": "ka"
+  },
+  "geostat_farming_prices_ka": {
+    "title": { "text": "Agricultural production prices (farm-gate prices) (Georgian labels)", "reviewedAt": "2026-10-20" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-20" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-20" },
+    "documentLanguage": "ka"
+  },
+  "geostat_agriculture_page": {
+    "title": { "text": "Agriculture (source page capture)", "reviewedAt": "2026-10-20" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-20" },
+    "attribution": { "text": "Geostat", "reviewedAt": "2026-10-20" },
+    "documentLanguage": "en"
+  },
   "nbg_money_aggregates": {
     "title": { "text": "Money aggregates and monetary ratios (M2.1)", "reviewedAt": "2026-10-11" },
     "publisher": { "text": "National Bank of Georgia (NBG)", "reviewedAt": "2026-10-11" },
@@ -4504,5 +4627,4904 @@
       "reviewedAt": "2026-10-11"
     },
     "documentLanguage": "en"
+  },
+  "geostat_trade_export-bec-2000-2026": {
+    "title": {
+      "text": "Goods exports by BEC, 2000–2025",
+      "reviewedAt": "2026-10-14"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-14"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-14"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_trade_export-sitc-2000-2026": {
+    "title": {
+      "text": "Goods exports by SITC, 2000–2025",
+      "reviewedAt": "2026-10-14"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-14"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-14"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_trade_import-bec-2000-2026": {
+    "title": {
+      "text": "Goods imports by BEC, 2000–2025",
+      "reviewedAt": "2026-10-14"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-14"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-14"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_trade_import-sitc-2000-2026": {
+    "title": {
+      "text": "Goods imports by SITC, 2000–2025",
+      "reviewedAt": "2026-10-14"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-14"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-14"
+    },
+    "documentLanguage": "en"
+  },
+  "nbg_gross_external_debt_bpm6": {
+    "title": { "text": "Gross external debt by sector (ED-6, BPM6)", "reviewedAt": "2026-10-15" },
+    "publisher": { "text": "National Bank of Georgia (NBG)", "reviewedAt": "2026-10-15" },
+    "attribution": { "text": "National Bank of Georgia", "reviewedAt": "2026-10-15" },
+    "documentLanguage": "en"
+  },
+  "nbg_official_reserve_assets": {
+    "title": { "text": "Official reserve assets (OIR)", "reviewedAt": "2026-10-15" },
+    "publisher": { "text": "National Bank of Georgia (NBG)", "reviewedAt": "2026-10-15" },
+    "attribution": { "text": "National Bank of Georgia", "reviewedAt": "2026-10-15" },
+    "documentLanguage": "en"
+  },
+  "nbg_api_category_24": {
+    "title": { "text": "National Bank file list - category 24 (external sector)", "reviewedAt": "2026-10-15" },
+    "publisher": { "text": "National Bank of Georgia (NBG)", "reviewedAt": "2026-10-15" },
+    "attribution": { "text": "National Bank of Georgia", "reviewedAt": "2026-10-15" },
+    "documentLanguage": "en"
+  },
+  "geostat_services_georgian-exports-of-services-by-countries": {
+    "title": {
+      "text": "Services exports by country, 2020–2024",
+      "reviewedAt": "2026-10-14"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-14"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-14"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_services_georgian-imports-of-services-by-countries": {
+    "title": {
+      "text": "Services imports by country, 2020–2024",
+      "reviewedAt": "2026-10-14"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-14"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-14"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_business_turnover": {
+    "title": {
+      "text": "Turnover (0502EN0101)",
+      "reviewedAt": "2026-10-15"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-15"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-15"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_business_production_value": {
+    "title": {
+      "text": "Production value (0502EN0102)",
+      "reviewedAt": "2026-10-15"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-15"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-15"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_business_employed": {
+    "title": {
+      "text": "Number of persons employed (0502EN0103)",
+      "reviewedAt": "2026-10-15"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-15"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-15"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_business_employees": {
+    "title": {
+      "text": "Number of employees (0502EN0104)",
+      "reviewedAt": "2026-10-15"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-15"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-15"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_business_earnings": {
+    "title": {
+      "text": "Average monthly earnings (0502EN0105)",
+      "reviewedAt": "2026-10-15"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-15"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-15"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_business_value_added": {
+    "title": {
+      "text": "Value added (0502EN0106)",
+      "reviewedAt": "2026-10-15"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-15"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-15"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_business_intermediate_consumption": {
+    "title": {
+      "text": "Intermediate consumption (0502EN0107)",
+      "reviewedAt": "2026-10-15"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-15"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-15"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_business_personnel_costs": {
+    "title": {
+      "text": "Personnel costs (0502EN0108)",
+      "reviewedAt": "2026-10-15"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-15"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-15"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_business_purchases": {
+    "title": {
+      "text": "Purchase of goods and services (0502EN0109)",
+      "reviewedAt": "2026-10-15"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-15"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-15"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_business_purchases_for_resale": {
+    "title": {
+      "text": "Purchase of goods and services for resale (0502EN0110)",
+      "reviewedAt": "2026-10-15"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-15"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-15"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_business_investment": {
+    "title": {
+      "text": "Investments in fixed assets (0502EN0111)",
+      "reviewedAt": "2026-10-15"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-15"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-15"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_business_gender": {
+    "title": {
+      "text": "Business statistics by gender (0502EN0112)",
+      "reviewedAt": "2026-10-15"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-15"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-15"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_business_fixed_assets": {
+    "title": {
+      "text": "Fixed assets (0502EN0113)",
+      "reviewedAt": "2026-10-15"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-15"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-15"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_business_profit_loss": {
+    "title": {
+      "text": "Profit and loss (0502EN0114)",
+      "reviewedAt": "2026-10-15"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-15"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-15"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_business_labour_productivity": {
+    "title": {
+      "text": "Labour productivity (0502EN0115)",
+      "reviewedAt": "2026-10-15"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-15"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-15"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_business_remarks": {
+    "title": {
+      "text": "Business statistics remarks",
+      "reviewedAt": "2026-10-15"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-15"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-15"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_business_demography": {
+    "title": {
+      "text": "Business demography: main results",
+      "reviewedAt": "2026-10-15"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-15"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-15"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_business_demography_other": {
+    "title": {
+      "text": "Business demography: other indicators",
+      "reviewedAt": "2026-10-15"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-15"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-15"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_business_demography_births": {
+    "title": {
+      "text": "Business demography: enterprise births",
+      "reviewedAt": "2026-10-15"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-15"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-15"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_business_demography_deaths": {
+    "title": {
+      "text": "Business demography: enterprise deaths",
+      "reviewedAt": "2026-10-15"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-15"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-15"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_business_survey_page": {
+    "title": {
+      "text": "Statistical survey of enterprises (source page capture)",
+      "reviewedAt": "2026-10-15"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-15"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-15"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_business_demography_page": {
+    "title": {
+      "text": "Business demography indicators (source page capture)",
+      "reviewedAt": "2026-10-15"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-15"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-15"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_business_survey_metadata": {
+    "title": {
+      "text": "Metadata: statistical survey of enterprises (annual)",
+      "reviewedAt": "2026-10-15"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-15"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-15"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_business_demography_metadata": {
+    "title": {
+      "text": "Metadata: business demography",
+      "reviewedAt": "2026-10-15"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-15"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-15"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_business_survey_metadata_ka": {
+    "title": {
+      "text": "Metadata: statistical survey of enterprises (annual), Georgian edition",
+      "reviewedAt": "2026-10-15"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-15"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-15"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_business_demography_metadata_ka": {
+    "title": {
+      "text": "Metadata: business demography, Georgian edition",
+      "reviewedAt": "2026-10-15"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-15"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-15"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_health_main": {
+    "title": {
+      "text": "Main characteristics of public health",
+      "reviewedAt": "2026-10-15"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-15"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-15"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_health_physicians": {
+    "title": {
+      "text": "Number of physicians by occupation",
+      "reviewedAt": "2026-10-15"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-15"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-15"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_health_nurses": {
+    "title": {
+      "text": "Number of paramedical personnel by basic speciality",
+      "reviewedAt": "2026-10-15"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-15"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-15"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_health_abortions": {
+    "title": {
+      "text": "Abortions",
+      "reviewedAt": "2026-10-15"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-15"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-15"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_health_morbidity_groups": {
+    "title": {
+      "text": "Morbidity with acute and chronic diseases by main disease group",
+      "reviewedAt": "2026-10-15"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-15"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-15"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_health_morbidity_of_children_0_14_years_old_with_acute_and_chronic_diseases": {
+    "title": {
+      "text": "Morbidity of children (0–14 years old) with acute and chronic diseases",
+      "reviewedAt": "2026-10-15"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-15"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-15"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_health_morbidity_caused_by_some_infectious_disease": {
+    "title": {
+      "text": "Morbidity caused by some infectious diseases",
+      "reviewedAt": "2026-10-15"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-15"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-15"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_health_sti": {
+    "title": {
+      "text": "Morbidity of patients with syphilis and gonorrhoea",
+      "reviewedAt": "2026-10-15"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-15"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-15"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_health_tuberculosis": {
+    "title": {
+      "text": "Morbidity of patients with tuberculosis",
+      "reviewedAt": "2026-10-15"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-15"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-15"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_health_hiv": {
+    "title": {
+      "text": "Morbidity of patients with HIV/AIDS",
+      "reviewedAt": "2026-10-15"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-15"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-15"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_health_emergent_medical_care": {
+    "title": {
+      "text": "Emergency medical care",
+      "reviewedAt": "2026-10-15"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-15"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-15"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_health_anaemia": {
+    "title": {
+      "text": "New cases of anaemia",
+      "reviewedAt": "2026-10-15"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-15"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-15"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_health_diabetes": {
+    "title": {
+      "text": "New cases of diabetes mellitus",
+      "reviewedAt": "2026-10-15"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-15"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-15"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_health_circulatory_system": {
+    "title": {
+      "text": "Diseases of the circulatory system",
+      "reviewedAt": "2026-10-15"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-15"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-15"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_health_respiratory_system": {
+    "title": {
+      "text": "Diseases of the respiratory system",
+      "reviewedAt": "2026-10-15"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-15"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-15"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_health_16_number_of_persons_medicines": {
+    "title": {
+      "text": "Persons with disabilities who received medicines under the state health programme (table 16)",
+      "reviewedAt": "2026-10-15"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-15"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-15"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_health_17_the_cost_of_medicines": {
+    "title": {
+      "text": "Cost of medicines issued to persons with disabilities under the state health programme (table 17)",
+      "reviewedAt": "2026-10-15"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-15"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-15"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_health_18_the_number_of_beneficiaries_with_disabilities": {
+    "title": {
+      "text": "Number of beneficiaries with disabilities (table 18)",
+      "reviewedAt": "2026-10-15"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-15"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-15"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_health_19_number_of_cases_services_of_persons_with_disabilities": {
+    "title": {
+      "text": "Number of cases (services) of persons with disabilities (table 19)",
+      "reviewedAt": "2026-10-15"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-15"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-15"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_health_20_number_of_cases_services_of_persons_with_disabilities_by_regions": {
+    "title": {
+      "text": "Number of cases (services) of persons with disabilities by region (table 20)",
+      "reviewedAt": "2026-10-15"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-15"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-15"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_health_number_of_beneficiaries_screened_for_malignant_neoplasms": {
+    "title": {
+      "text": "Number of beneficiaries screened for malignant neoplasms",
+      "reviewedAt": "2026-10-15"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-15"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-15"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_deaths_25_1_infant_mortality_rate_by_regions_and_sex": {
+    "title": {
+      "text": "Infant mortality rate by region and sex (table 25-1)",
+      "reviewedAt": "2026-10-15"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-15"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-15"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_deaths_26_1_under_5_mortality_rate_by_regions_andsex": {
+    "title": {
+      "text": "Under-5 mortality rate by region and sex (table 26-1)",
+      "reviewedAt": "2026-10-15"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-15"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-15"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_death_rate_region": {
+    "title": {
+      "text": "Crude death rate by region (table 24-1)",
+      "reviewedAt": "2026-10-15"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-15"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-15"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_deaths_23_1_deaths_by_chapters_sex": {
+    "title": {
+      "text": "Deaths by cause chapter and sex (table 23-1)",
+      "reviewedAt": "2026-10-15"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-15"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-15"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_deaths_by_cause_region": {
+    "title": {
+      "text": "Deaths by cause chapter and region (table 23-2)",
+      "reviewedAt": "2026-10-15"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-15"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-15"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_deaths_23_3_deaths_by_chapters_urban_rural": {
+    "title": {
+      "text": "Deaths by cause chapter, urban and rural (table 23-3)",
+      "reviewedAt": "2026-10-15"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-15"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-15"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_deaths_23_4_deaths_by_chapters_age_sex": {
+    "title": {
+      "text": "Deaths by cause chapter, age and sex (table 23-4)",
+      "reviewedAt": "2026-10-15"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-15"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-15"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_deaths_23_6_number_of_maternal_deaths_by_regions": {
+    "title": {
+      "text": "Number of maternal deaths by region (table 23-6)",
+      "reviewedAt": "2026-10-15"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-15"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-15"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_deaths_23_7_number_of_maternal_deaths_by_age_groups": {
+    "title": {
+      "text": "Number of maternal deaths by age group (table 23-7)",
+      "reviewedAt": "2026-10-15"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-15"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-15"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_deaths_23_10_deaths_from_suicide_by_regions_and_sex": {
+    "title": {
+      "text": "Deaths from suicide by region and sex (table 23-10)",
+      "reviewedAt": "2026-10-15"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-15"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-15"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_deaths_23_11_suicide_rate_by_sex": {
+    "title": {
+      "text": "Suicide rate by sex (table 23-11)",
+      "reviewedAt": "2026-10-15"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-15"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-15"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_deaths_23_5_deaths_by_causes_age_sex": {
+    "title": {
+      "text": "Deaths by cause, age and sex (table 23-5)",
+      "reviewedAt": "2026-10-15"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-15"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-15"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_deaths_23_8_maternal_mortality_rate_by_regions": {
+    "title": {
+      "text": "Maternal mortality rate by region (table 23-8)",
+      "reviewedAt": "2026-10-15"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-15"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-15"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_health_page": {
+    "title": {
+      "text": "Healthcare (source page capture)",
+      "reviewedAt": "2026-10-15"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-15"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-15"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_deaths_page": {
+    "title": {
+      "text": "Deaths (source page capture)",
+      "reviewedAt": "2026-10-15"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-15"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-15"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_housing_permits_regions": {
+    "title": {
+      "text": "Permissions granted for construction by region",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_housing_permits_zip": {
+    "title": {
+      "text": "Permissions granted for construction by type and municipality (English zip archive)",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_housing_completed_regions": {
+    "title": {
+      "text": "Completed construction objects by region",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_housing_completed_zip": {
+    "title": {
+      "text": "Completed construction objects by type (English zip archive)",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_housing_permits_municipalities": {
+    "title": {
+      "text": "Permissions granted for construction and completed objects by municipality",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_housing_permits_quarterly": {
+    "title": {
+      "text": "Permissions granted for construction by type, quarterly 2019–2026",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_housing_permits_types": {
+    "title": {
+      "text": "Permissions granted for construction by type, 2006–2025",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_housing_completed_quarterly": {
+    "title": {
+      "text": "Completed construction objects by type, quarterly 2019–2026",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_housing_completed_types": {
+    "title": {
+      "text": "Completed construction objects by type, 2006–2025",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_housing_price_index_quarterly": {
+    "title": {
+      "text": "Residential property price index, previous quarter = 100",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_housing_price_index_annual": {
+    "title": {
+      "text": "Residential property price index, same quarter of the previous year = 100",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_housing_price_index": {
+    "title": {
+      "text": "Residential property price index, 2020 average = 100",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_housing_tbilisi_prices": {
+    "title": {
+      "text": "Residential property prices in Tbilisi by district",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_housing_cci_monthly": {
+    "title": {
+      "text": "Construction cost index, previous month = 100",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_housing_cci_2022": {
+    "title": {
+      "text": "Construction cost index, February 2022 = 100",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_housing_cci_annual": {
+    "title": {
+      "text": "Construction cost index, same month of the previous year = 100",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_housing_construction": {
+    "title": {
+      "text": "Construction by region",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_housing_infrastructure": {
+    "title": {
+      "text": "Infrastructure of dwellings by region",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_housing_permits_page": {
+    "title": {
+      "text": "Permissions and completed objects (source page capture)",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_housing_prices_page": {
+    "title": {
+      "text": "Residential property price index (source page capture)",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_housing_cost_page": {
+    "title": {
+      "text": "Construction cost index (source page capture)",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_crime_recorded": {
+    "title": {
+      "text": "Number of recorded crimes",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_crime_recorded_2001_2011": {
+    "title": {
+      "text": "Number of recorded crimes 2001-2011 (old classification)",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_crime_convicts_types": {
+    "title": {
+      "text": "Number of convicts by types of crime",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_crime_convicts_age_sex": {
+    "title": {
+      "text": "Composition of convicts by age and sex",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_crime_convicts_penalties": {
+    "title": {
+      "text": "Number of convicts and penalties prescribed by court",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_crime_juvenile": {
+    "title": {
+      "text": "Juvenile offenders convicted by type of offence",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_crime_prison": {
+    "title": {
+      "text": "Prison population",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_crime_victims": {
+    "title": {
+      "text": "Data on victim statistics",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_crime_road": {
+    "title": {
+      "text": "Data on road traffic accidents",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_crime_trafficking": {
+    "title": {
+      "text": "Human trafficking",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_crime_registrirebuli_danasaulis_raodenoba_ka": {
+    "title": {
+      "text": "Number of recorded crimes (Georgian version)",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_crime_registrirebuli_danasauli_2011_ka": {
+    "title": {
+      "text": "Number of recorded crimes 2001-2011 (old classification) (Georgian version)",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_crime_msjavrdebulta_ricxovnoba_danasaulis_saxeebis_mixedvit_ka": {
+    "title": {
+      "text": "Number of convicts by types of crime (Georgian version)",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_crime_msjavrdebulta_ricxovnoba_asakisa_da_skesis_mixedvit_ka": {
+    "title": {
+      "text": "Composition of convicts by age and sex (Georgian version)",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_crime_msjavrdebulta_ricxovnoba_sasjelis_ronisziebebis_mixedvit_ka": {
+    "title": {
+      "text": "Number of convicts and penalties prescribed by court (Georgian version)",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_crime_arasrulwlovani_msjavrdebulebis_raodenoba_cadenili_danasaulis_saxeebis_mi_ka": {
+    "title": {
+      "text": "Juvenile offenders convicted by type of offence (Georgian version)",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_crime_patimarta_ricxovnoba_ka": {
+    "title": {
+      "text": "Prison population (Georgian version)",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_crime_dazaralebulta_raodenoba_ka": {
+    "title": {
+      "text": "Data on victim statistics (Georgian version)",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_crime_avtosagzao_semtxvevebi_ka": {
+    "title": {
+      "text": "Data on road traffic accidents (Georgian version)",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_crime_trefikingi_ka": {
+    "title": {
+      "text": "Human trafficking (Georgian version)",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_crime_page": {
+    "title": {
+      "text": "Criminal justice statistics (source page capture)",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_crime_page_ka": {
+    "title": {
+      "text": "Criminal justice statistics, Georgian (source page capture)",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_education_schools_national": {
+    "title": {
+      "text": "Number of general education schools and pupils (table 01)",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_education_teachers_national": {
+    "title": {
+      "text": "Number of general education school teachers (table 06)",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_education_municipal": {
+    "title": {
+      "text": "Number of public and private schools, pupils and teachers by municipality (table 11)",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_education_kindergartens": {
+    "title": {
+      "text": "Indicators on public preschool education and care (PEC) institutions",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_education_higher": {
+    "title": {
+      "text": "Admission, number of students and graduates in public and private higher education institutions by programme and sex",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_education_vocational": {
+    "title": {
+      "text": "Number of students in public and private vocational education institutions' education programmes",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_education_schools_by_stage_region": {
+    "title": {
+      "text": "Number of schools by stage and region (table 02)",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_education_pupils_by_grade_age": {
+    "title": {
+      "text": "Number of general education school pupils by grade and age (table 04)",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_education_pupils_by_level_grade": {
+    "title": {
+      "text": "Distribution of public and private general school pupils by level of education and grade (table 05)",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_education_pupils_suspended": {
+    "title": {
+      "text": "Pupils whose status was suspended or terminated, by grade and sex (table 08)",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_education_pupils_ict": {
+    "title": {
+      "text": "Number of pupils studying ICT (table 10)",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_education_school_graduates": {
+    "title": {
+      "text": "Graduates from primary, basic and secondary schools (table 12)",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_education_pupils_social_status": {
+    "title": {
+      "text": "Number of general education school pupils by social status (table 13)",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_education_enrolment_rates": {
+    "title": {
+      "text": "Net and gross enrolment rates by sex and level of education",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_education_proficiency": {
+    "title": {
+      "text": "Percentage of students at each proficiency level",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_education_grade_progression": {
+    "title": {
+      "text": "Grade progression rates in general education schools (table 14)",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_education_school_to_vet": {
+    "title": {
+      "text": "Graduates of basic general education who entered vocational education institutions in their graduation year (table 15)",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_education_school_to_vet_sen": {
+    "title": {
+      "text": "Persons with special educational needs who completed basic education and enrolled in vocational education institutions (table 16)",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_education_vet_institutions": {
+    "title": {
+      "text": "Number of educational institutions that conducted admission of students in vocational education programmes",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_education_vet_regions_sex": {
+    "title": {
+      "text": "Indicators of vocational education by region and sex",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_education_vet_employees": {
+    "title": {
+      "text": "Number of employees in public and private educational institutions",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_education_vet_sen": {
+    "title": {
+      "text": "Number of admitted students with special educational needs by sex and region",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_education_secondary_professional_types": {
+    "title": {
+      "text": "Secondary professional schools and number of pupils by type of studies",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_education_secondary_professional_private": {
+    "title": {
+      "text": "Private secondary professional schools",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_education_secondary_professional_specialization": {
+    "title": {
+      "text": "Secondary professional schools and enrolment by specialization",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_education_secondary_professional_pupils_regions": {
+    "title": {
+      "text": "Pupils of secondary professional schools by region",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_education_secondary_professional_admitted": {
+    "title": {
+      "text": "Students admitted to secondary professional schools",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_education_secondary_professional_admitted_specialization": {
+    "title": {
+      "text": "Students admitted to secondary professional schools by specialization",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_education_secondary_professional_graduates": {
+    "title": {
+      "text": "Graduates from secondary professional schools",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_education_secondary_professional_graduates_specialization": {
+    "title": {
+      "text": "Graduates from secondary professional schools by specialization",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_education_secondary_professional_teachers": {
+    "title": {
+      "text": "Number of teachers of secondary professional schools",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_education_higher_subprogrammes": {
+    "title": {
+      "text": "Admission, number of students and graduates in higher education institutions by sub-programme and sex",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_education_higher_age_citizenship": {
+    "title": {
+      "text": "Students in higher education institutions by age, sex and citizenship",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_education_higher_foreign_students": {
+    "title": {
+      "text": "Foreign students in higher education institutions by programme and sex",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_education_higher_abroad": {
+    "title": {
+      "text": "Georgian citizens studying abroad and foreign students by sex",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_education_higher_professors": {
+    "title": {
+      "text": "Professors in higher education institutions by form of ownership",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_education_higher_institutions": {
+    "title": {
+      "text": "Higher education institutions by form of ownership and region",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_education_doctoral": {
+    "title": {
+      "text": "Doctoral studies: admission, doctoral students and graduates by programme",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_education_doctoral_age": {
+    "title": {
+      "text": "Doctoral students by age and citizenship",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_education_doctoral_heads": {
+    "title": {
+      "text": "Scientific heads of doctoral candidates",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_education_doctoral_foreign": {
+    "title": {
+      "text": "Foreign doctoral students by country",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_education_preschool_page": {
+    "title": {
+      "text": "Early and preschool education (source page capture)",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_education_general_page": {
+    "title": {
+      "text": "General education (source page capture)",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_education_vocational_page": {
+    "title": {
+      "text": "Professional education (source page capture)",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_education_higher_page": {
+    "title": {
+      "text": "Higher education (source page capture)",
+      "reviewedAt": "2026-10-16"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-16"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-16"
+    },
+    "documentLanguage": "en"
+  },
+  "ssa_statistics": {
+    "title": {
+      "text": "Social Service Agency statistics list (source page)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "Social Service Agency (SSA)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Social Service Agency",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "ssa_pension": {
+    "title": {
+      "text": "State pension (source page)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "Social Service Agency (SSA)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Social Service Agency",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "ssa_socpackage": {
+    "title": {
+      "text": "Social package (source page)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "Social Service Agency (SSA)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Social Service Agency",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "ssa_tsa_allowance": {
+    "title": {
+      "text": "Subsistence allowance (source page)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "Social Service Agency (SSA)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Social Service Agency",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "ssa_tsa_db": {
+    "title": {
+      "text": "Targeted social assistance database (source page)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "Social Service Agency (SSA)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Social Service Agency",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "ssa_compensation": {
+    "title": {
+      "text": "State compensation and academic stipend (source page)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "Social Service Agency (SSA)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Social Service Agency",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "ssa_utilitysubsidy": {
+    "title": {
+      "text": "Household utility subsidy (source page)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "Social Service Agency (SSA)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Social Service Agency",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "ssa_demography": {
+    "title": {
+      "text": "Targeted state programme to support demographic improvement (source page)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "Social Service Agency (SSA)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Social Service Agency",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "ssa_workinjury": {
+    "title": {
+      "text": "Workplace-injury compensation benefit (source page)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "Social Service Agency (SSA)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Social Service Agency",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "ssa_idp_refugee": {
+    "title": {
+      "text": "IDP and refugee allowance (source page links)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "Social Service Agency (SSA)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Social Service Agency",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": null
+  },
+  "ssa_maternity": {
+    "title": {
+      "text": "Maternity, childcare and adoption benefit (source page links)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "Social Service Agency (SSA)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Social Service Agency",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": null
+  },
+  "ssa_highmountain": {
+    "title": {
+      "text": "Support for permanent residents of high-mountain settlements (source page links)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "Social Service Agency (SSA)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Social Service Agency",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": null
+  },
+  "ssa_other": {
+    "title": {
+      "text": "Other programmes (source page links)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "Social Service Agency (SSA)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Social Service Agency",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": null
+  },
+  "geostat_science_researchers": {
+    "title": {
+      "text": "Number of researchers by level of education, age groups and fields of science",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_science_rd_staff": {
+    "title": {
+      "text": "Number of persons working on R&D by status",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_science_institutions": {
+    "title": {
+      "text": "Number of institutions that conducted R&D and their expenditures",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_science_patents": {
+    "title": {
+      "text": "Inventions and utility models (Sakpatenti)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_science_publications": {
+    "title": {
+      "text": "Number of scientific publications in the Georgian Abstracts Journal",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_culture_museums": {
+    "title": {
+      "text": "Museums (museum unions) and museum reserves, main characteristics",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_culture_museums_count_regions": {
+    "title": {
+      "text": "Number of museums (museum unions) and museum reserves by regions",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_culture_museums_regions": {
+    "title": {
+      "text": "Main characteristics of museums (museum unions) and museum reserves by regions",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_culture_museum_staff": {
+    "title": {
+      "text": "Number of staff employed in museums",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_culture_museum_exhibits": {
+    "title": {
+      "text": "The exhibits of museums (2011 only)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_culture_theatres": {
+    "title": {
+      "text": "Main indicators of professional theatres",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_culture_theatres_regions": {
+    "title": {
+      "text": "Main indicators of professional theatres by regions",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_culture_theatres_count_regions": {
+    "title": {
+      "text": "Number of professional theatres by regions",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_culture_theatre_staff": {
+    "title": {
+      "text": "Number of staff employed in theatres",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_culture_theatre_events": {
+    "title": {
+      "text": "Data on events held by theatres",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_culture_libraries": {
+    "title": {
+      "text": "Public and universal libraries (2001-2008)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_culture_libraries_regions": {
+    "title": {
+      "text": "Number of libraries by regions (2003-2008)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_culture_publishing": {
+    "title": {
+      "text": "Calculation of data on publishing materials (2005-2020)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_ka_science_institutions": {
+    "title": {
+      "text": "Number of institutions that conducted R&D and their expenditures (Georgian version)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_ka_science_rd_staff": {
+    "title": {
+      "text": "Number of persons working on R&D by status (Georgian version)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_ka_science_researchers": {
+    "title": {
+      "text": "Number of researchers by level of education, age groups and fields of science (Georgian version)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_ka_science_patents": {
+    "title": {
+      "text": "Inventions and utility models (Sakpatenti) (Georgian version)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_ka_culture_museums": {
+    "title": {
+      "text": "Museums (museum unions) and museum reserves, main characteristics (Georgian version)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_ka_culture_museums_count_regions": {
+    "title": {
+      "text": "Number of museums (museum unions) and museum reserves by regions (Georgian version)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_ka_culture_museum_staff": {
+    "title": {
+      "text": "Number of staff employed in museums (Georgian version)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_ka_culture_theatres": {
+    "title": {
+      "text": "Main indicators of professional theatres (Georgian version)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_ka_culture_theatres_regions": {
+    "title": {
+      "text": "Main indicators of professional theatres by regions (Georgian version)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_ka_culture_theatres_count_regions": {
+    "title": {
+      "text": "Number of professional theatres by regions (Georgian version)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_ka_culture_theatre_staff": {
+    "title": {
+      "text": "Number of staff employed in theatres (Georgian version)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_ka_culture_theatre_events": {
+    "title": {
+      "text": "Data on events held by theatres (Georgian version)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_ka_culture_museums_regions": {
+    "title": {
+      "text": "Main characteristics of museums (museum unions) and museum reserves by regions (Georgian version)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_science_page": {
+    "title": {
+      "text": "Science (source page capture)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_culture_page": {
+    "title": {
+      "text": "Culture (source page capture)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_lfs_jobs_industry": {
+    "title": {
+      "text": "Employed persons by economic activity (NACE rev. 2)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_lfs_hours_sex": {
+    "title": {
+      "text": "Average usual weekly hours of work in the main job, by economic activity and sex",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_lfs_hours_settlement": {
+    "title": {
+      "text": "Average usual weekly hours of work in the main job, by economic activity and urban or rural area",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_lfs_informal": {
+    "title": {
+      "text": "Share of informal employment in non-agricultural employment",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_lfs_underuse": {
+    "title": {
+      "text": "Indicators of labour underutilization",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_lfs_neet": {
+    "title": {
+      "text": "Young people not in employment, education or training (NEET)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_lfs_jobs_industry_ka": {
+    "title": {
+      "text": "Employed persons by economic activity (NACE rev. 2) (Georgian version)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_lfs_hours_sex_ka": {
+    "title": {
+      "text": "Average usual weekly hours of work in the main job, by economic activity and sex (Georgian version)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_lfs_hours_settlement_ka": {
+    "title": {
+      "text": "Average usual weekly hours of work in the main job, by economic activity and urban or rural area (Georgian version)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_lfs_informal_ka": {
+    "title": {
+      "text": "Share of informal employment in non-agricultural employment (Georgian version)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_lfs_underuse_ka": {
+    "title": {
+      "text": "Indicators of labour underutilization (Georgian version)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_lfs_neet_ka": {
+    "title": {
+      "text": "Young people not in employment, education or training (NEET) (Georgian version)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_lfs_detail_page": {
+    "title": {
+      "text": "Employment and unemployment (source page capture)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_lfs_detail_page_ka": {
+    "title": {
+      "text": "Employment and unemployment, Georgian (source page capture)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_env_ghg": {
+    "title": {
+      "text": "Table B-3: Greenhouse gas emissions",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_env_air_emissions": {
+    "title": {
+      "text": "Table A-1: Emissions of pollutants into the atmospheric air",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_env_air_quality": {
+    "title": {
+      "text": "Table A-2: Ambient air quality in urban areas",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_env_temperature": {
+    "title": {
+      "text": "Table B-1: Air temperature",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_env_precipitation": {
+    "title": {
+      "text": "Table B-2: Atmospheric precipitation",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_env_water_household": {
+    "title": {
+      "text": "Table C-4: Household water use per capita",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_env_water_supply": {
+    "title": {
+      "text": "Table C-5: Water supply industry and population connected to water supply industry",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_env_water_losses": {
+    "title": {
+      "text": "Table C-7: Water losses",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_env_wastewater": {
+    "title": {
+      "text": "Table C-14: Population connected to wastewater treatment",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_env_waste": {
+    "title": {
+      "text": "Amount of municipal waste disposed in landfills from the regions",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_env_timber": {
+    "title": {
+      "text": "Volume of felled timber",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_env_illegal_logging": {
+    "title": {
+      "text": "Illegal logging",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_env_fires": {
+    "title": {
+      "text": "Forest and field fires",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_env_ods": {
+    "title": {
+      "text": "Table A-3: Consumption of ozone-depleting substances",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_env_protected_areas_indicator": {
+    "title": {
+      "text": "Table D-1: Protected areas",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_env_fertilizer": {
+    "title": {
+      "text": "Table F-2: Fertilizer consumption",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_env_pesticide": {
+    "title": {
+      "text": "Table F-4: Pesticide consumption",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_env_final_energy": {
+    "title": {
+      "text": "Table G-1: Final energy consumption",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_env_primary_energy": {
+    "title": {
+      "text": "Table G-2: Total primary energy supply",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_env_renewable_energy": {
+    "title": {
+      "text": "Table G-4: Renewable energy supply",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_env_stationary_air_pollution": {
+    "title": {
+      "text": "Air pollution from stationary sources",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_env_protected_areas": {
+    "title": {
+      "text": "Protected areas",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_env_violations": {
+    "title": {
+      "text": "Violations of environmental law",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_env_protected_area_visitors": {
+    "title": {
+      "text": "Number of visitors by protected areas",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_env_water_quality": {
+    "title": {
+      "text": "Water quality",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_env_forest_area": {
+    "title": {
+      "text": "Forest area",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_env_timber_purpose": {
+    "title": {
+      "text": "Volume of felled timber by cutting purpose",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_env_ghg_ka": {
+    "title": {
+      "text": "Table B-3: Greenhouse gas emissions (Georgian version)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_env_air_emissions_ka": {
+    "title": {
+      "text": "Table A-1: Emissions of pollutants into the atmospheric air (Georgian version)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_env_air_quality_ka": {
+    "title": {
+      "text": "Table A-2: Ambient air quality in urban areas (Georgian version)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_env_temperature_ka": {
+    "title": {
+      "text": "Table B-1: Air temperature (Georgian version)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_env_precipitation_ka": {
+    "title": {
+      "text": "Table B-2: Atmospheric precipitation (Georgian version)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_env_water_household_ka": {
+    "title": {
+      "text": "Table C-4: Household water use per capita (Georgian version)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_env_water_supply_ka": {
+    "title": {
+      "text": "Table C-5: Water supply industry and population connected to water supply industry (Georgian version)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_env_water_losses_ka": {
+    "title": {
+      "text": "Table C-7: Water losses (Georgian version)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_env_wastewater_ka": {
+    "title": {
+      "text": "Table C-14: Population connected to wastewater treatment (Georgian version)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_env_waste_ka": {
+    "title": {
+      "text": "Amount of municipal waste disposed in landfills from the regions (Georgian version)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_env_timber_ka": {
+    "title": {
+      "text": "Volume of felled timber (Georgian version)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_env_illegal_logging_ka": {
+    "title": {
+      "text": "Illegal logging (Georgian version)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_env_fires_ka": {
+    "title": {
+      "text": "Forest and field fires (Georgian version)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_env_page_565": {
+    "title": {
+      "text": "Environmental indicators (source page capture)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_env_page_565_ka": {
+    "title": {
+      "text": "Environmental indicators, Georgian (source page capture)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_env_page_73": {
+    "title": {
+      "text": "Environment statistics (source page capture)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_env_page_73_ka": {
+    "title": {
+      "text": "Environment statistics, Georgian (source page capture)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_env_page_822": {
+    "title": {
+      "text": "Forest resources (source page capture)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_env_page_822_ka": {
+    "title": {
+      "text": "Forest resources, Georgian (source page capture)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "source.geostat_demography_population_mid_year": {
+    "title": { "text": "Mid-year population by self-governed units", "reviewedAt": "2026-10-20" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-20" },
+    "attribution": null,
+    "documentLanguage": "en"
+  },
+  "source.geostat_demography_marriages": {
+    "title": { "text": "Number of registered marriages by regions and self-governed units", "reviewedAt": "2026-10-20" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-20" },
+    "attribution": null,
+    "documentLanguage": "en"
+  },
+  "source.geostat_demography_mean_age_spouses": {
+    "title": { "text": "Mean age of spouses by order of marriages and sex", "reviewedAt": "2026-10-20" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-20" },
+    "attribution": null,
+    "documentLanguage": "en"
+  },
+  "source.geostat_demography_divorces": {
+    "title": { "text": "Number of registered divorces by regions and self-governed units", "reviewedAt": "2026-10-20" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-20" },
+    "attribution": null,
+    "documentLanguage": "en"
+  },
+  "source.geostat_demography_marriage_duration": {
+    "title": { "text": "Average duration of marriage (years)", "reviewedAt": "2026-10-20" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-20" },
+    "attribution": null,
+    "documentLanguage": "en"
+  },
+  "source.geostat_demography_mean_age_divorced": {
+    "title": { "text": "Mean age of divorced people by order of marriages and sex", "reviewedAt": "2026-10-20" },
+    "publisher": { "text": "National Statistics Office of Georgia (Geostat)", "reviewedAt": "2026-10-20" },
+    "attribution": null,
+    "documentLanguage": "en"
+  },
+  "geostat_transport_passenger_demand": {
+    "title": {
+      "text": "Passenger transport demand by mode (table H-1)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_transport_freight_demand": {
+    "title": {
+      "text": "Freight transport demand by mode (table H-2)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_transport_fleet_fuel": {
+    "title": {
+      "text": "Road motor vehicle fleet by fuel type (table H-3)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_transport_fleet_age": {
+    "title": {
+      "text": "Road motor vehicle fleet by age (table H-4)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_transport_rail_turnover": {
+    "title": {
+      "text": "Railway freight turnover",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_transport_rail_goods": {
+    "title": {
+      "text": "Goods transported by railway",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_transport_rail_passengers": {
+    "title": {
+      "text": "Passengers transported by railway",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_transport_rail_infrastructure": {
+    "title": {
+      "text": "Railway infrastructure",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_transport_metro": {
+    "title": {
+      "text": "Passengers transported by metro",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_transport_rail_regions": {
+    "title": {
+      "text": "Goods transported by railway by region of loading and unloading",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_transport_airlines": {
+    "title": {
+      "text": "Airlines registered in Georgia",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_transport_airports": {
+    "title": {
+      "text": "Airports of Georgia",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_transport_air_infrastructure": {
+    "title": {
+      "text": "Air transport infrastructure, 2025",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_transport_roads": {
+    "title": {
+      "text": "Length of common use roads by region",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_transport_taxi_licences": {
+    "title": {
+      "text": "Taxi licences in Tbilisi",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_transport_registered": {
+    "title": {
+      "text": "Registered vehicles by region",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_transport_technical_inspections": {
+    "title": {
+      "text": "Technical inspections, 2021-2025",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_transport_sea_passengers": {
+    "title": {
+      "text": "Passengers carried in sea ports and terminals",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_transport_sea_ships": {
+    "title": {
+      "text": "Ships entering sea ports and terminals",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_transport_sea_freight": {
+    "title": {
+      "text": "Freight carried in sea ports and terminals",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_transport_environment_page": {
+    "title": {
+      "text": "Environmental indicators (source page capture)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_transport_rail_page": {
+    "title": {
+      "text": "Railway transport (source page capture)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_transport_air_page": {
+    "title": {
+      "text": "Air transport (source page capture)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_transport_road_page": {
+    "title": {
+      "text": "Road transport (source page capture)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_transport_sea_page": {
+    "title": {
+      "text": "Maritime transport (source page capture)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_ict_homes_internet": {
+    "title": {
+      "text": "Share of households with internet access (table 01)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_ict_homes_internet_ka": {
+    "title": {
+      "text": "Share of households with internet access (table 01), Georgian edition",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_ict_last_internet_use": {
+    "title": {
+      "text": "Distribution of population aged 6 and older by last internet use (table 02)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_ict_last_internet_use_ka": {
+    "title": {
+      "text": "Distribution of population aged 6 and older by last internet use (table 02), Georgian edition",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_ict_purposes": {
+    "title": {
+      "text": "Share of population aged 15 and older by purposes of internet use (table 03)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_ict_purposes_ka": {
+    "title": {
+      "text": "Share of population aged 15 and older by purposes of internet use (table 03), Georgian edition",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_ict_internet_frequency": {
+    "title": {
+      "text": "Frequency of internet use (table 04)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_ict_internet_frequency_ka": {
+    "title": {
+      "text": "Frequency of internet use (table 04), Georgian edition",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_ict_ecommerce": {
+    "title": {
+      "text": "E-commerce (table 05)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_ict_ecommerce_ka": {
+    "title": {
+      "text": "E-commerce (table 05), Georgian edition",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_ict_mobile_internet": {
+    "title": {
+      "text": "Using mobile devices to access the internet (table 06)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_ict_mobile_internet_ka": {
+    "title": {
+      "text": "Using mobile devices to access the internet (table 06), Georgian edition",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_ict_internet_activities": {
+    "title": {
+      "text": "Internet related activities (table 07)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_ict_internet_activities_ka": {
+    "title": {
+      "text": "Internet related activities (table 07), Georgian edition",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_ict_homes_computer": {
+    "title": {
+      "text": "Share of households with computer access (table 08)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_ict_homes_computer_ka": {
+    "title": {
+      "text": "Share of households with computer access (table 08), Georgian edition",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_ict_last_computer_use": {
+    "title": {
+      "text": "Distribution of population aged 6 and older by last computer use (table 09)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_ict_last_computer_use_ka": {
+    "title": {
+      "text": "Distribution of population aged 6 and older by last computer use (table 09), Georgian edition",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_ict_computer_frequency": {
+    "title": {
+      "text": "Frequency of computer use (table 10)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_ict_computer_frequency_ka": {
+    "title": {
+      "text": "Frequency of computer use (table 10), Georgian edition",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_ict_software_activities": {
+    "title": {
+      "text": "Software related activities (table 11)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_ict_software_activities_ka": {
+    "title": {
+      "text": "Software related activities (table 11), Georgian edition",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_ict_own_mobile": {
+    "title": {
+      "text": "Share of population aged 6 and older who own mobile phone (table 12)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_ict_own_mobile_ka": {
+    "title": {
+      "text": "Share of population aged 6 and older who own mobile phone (table 12), Georgian edition",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_ict_use_mobile": {
+    "title": {
+      "text": "Share of population aged 6 and older who uses mobile phone (table 13)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_ict_use_mobile_ka": {
+    "title": {
+      "text": "Share of population aged 6 and older who uses mobile phone (table 13), Georgian edition",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_ict_own_smartphone": {
+    "title": {
+      "text": "Share of population aged 6 and older who own smartphone (table 14)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_ict_own_smartphone_ka": {
+    "title": {
+      "text": "Share of population aged 6 and older who own smartphone (table 14), Georgian edition",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_ict_use_smartphone": {
+    "title": {
+      "text": "Share of population aged 6 and older who uses smartphone (table 15)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_ict_use_smartphone_ka": {
+    "title": {
+      "text": "Share of population aged 6 and older who uses smartphone (table 15), Georgian edition",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_ict_public_services": {
+    "title": {
+      "text": "Interaction with public authorities or public services over the internet (table 16)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_ict_public_services_ka": {
+    "title": {
+      "text": "Interaction with public authorities or public services over the internet (table 16), Georgian edition",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_ict_skills": {
+    "title": {
+      "text": "ICT skills (table 17)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_ict_skills_ka": {
+    "title": {
+      "text": "ICT skills (table 17), Georgian edition",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "geostat_ict_page": {
+    "title": {
+      "text": "ICT usage in households (source page capture)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "en"
+  },
+  "geostat_ict_page_ka": {
+    "title": {
+      "text": "ICT usage in households (Georgian source page capture)",
+      "reviewedAt": "2026-10-20"
+    },
+    "publisher": {
+      "text": "National Statistics Office of Georgia (Geostat)",
+      "reviewedAt": "2026-10-20"
+    },
+    "attribution": {
+      "text": "Geostat",
+      "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
   }
 }

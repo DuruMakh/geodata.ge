@@ -29,6 +29,7 @@ export function SiteHeader({ active, testId, locale = "ka" }: SiteHeaderProps) {
     >
       <Link
         href={pageHref("/", locale)}
+        prefetch={false}
         aria-label={message(messages, "common.brandHome")}
         className="flex h-12 w-11 items-center min-[900px]:mb-1 min-[900px]:block min-[900px]:h-auto min-[900px]:aspect-[1600/400] min-[900px]:w-[280px]"
       >
@@ -54,6 +55,7 @@ export function SiteHeader({ active, testId, locale = "ka" }: SiteHeaderProps) {
         >
           <Link
             href={pageHref("/", locale)}
+            prefetch={false}
             aria-current={active === "home" ? "page" : undefined}
             className={navLinkClass(active === "home")}
           >
@@ -61,19 +63,20 @@ export function SiteHeader({ active, testId, locale = "ka" }: SiteHeaderProps) {
           </Link>
           <Link
             href={pageHref("/explorer", locale)}
+            prefetch={false}
             aria-current={active === "explorer" ? "page" : undefined}
             className={`${navLinkClass(active === "explorer")} max-[900px]:hidden`}
           >
             {message(messages, "common.data")}
           </Link>
           {/* In the ☰ panel the single data link would open the budget hub only;
-              the panel names all four datasets under a plain label instead. */}
+              the panel names every dataset hub under a plain label instead. */}
           <div data-testid="menu-datasets" className="min-[900px]:hidden">
             <span className="flex min-h-9 items-center text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--faint)]">{message(messages, "common.data")}</span>
             <ul className="flex list-none flex-col border-l border-[var(--hairline)] pl-4">
               {DATASET_HUBS.map(({ href, labelKey }) => (
                 <li key={href}>
-                  <Link href={pageHref(href, locale)} className={navLinkClass(false)}>
+                  <Link href={pageHref(href, locale)} prefetch={false} className={navLinkClass(false)}>
                     {message(messages, labelKey)}
                   </Link>
                 </li>
@@ -82,6 +85,7 @@ export function SiteHeader({ active, testId, locale = "ka" }: SiteHeaderProps) {
           </div>
           <Link
             href={pageHref("/connect", locale)}
+            prefetch={false}
             aria-current={active === "connect" ? "page" : undefined}
             className={navLinkClass(active === "connect")}
           >
@@ -89,6 +93,7 @@ export function SiteHeader({ active, testId, locale = "ka" }: SiteHeaderProps) {
           </Link>
           <Link
             href={pageHref("/about", locale)}
+            prefetch={false}
             aria-current={active === "mission" ? "page" : undefined}
             className={navLinkClass(active === "mission")}
           >

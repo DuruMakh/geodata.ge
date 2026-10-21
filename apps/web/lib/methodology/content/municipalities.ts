@@ -47,6 +47,7 @@ export const MUNICIPALITIES_METHODOLOGY_CONTENT: MethodologyContent = {
   slug: "municipalities",
   title: "მუნიციპალიტეტების მეთოდოლოგია",
   summary: "როგორ ერთიანდება 64 საჯარო მუნიციპალიტეტის ხარჯი, აჭარის რესპუბლიკური გადასახდელები და 69-სერიანი საქართველოს ჯამი ისე, რომ შიდა ტრანსფერები ორჯერ არ დაითვალოს.",
+  metaDescription: "როგორ ერთიანდება საჯარო მუნიციპალიტეტების ხარჯი, აჭარის რესპუბლიკური გადასახდელები და საქართველოს ჯამი ისე, რომ შიდა ტრანსფერები ორჯერ არ დაითვალოს.",
   reviewedAt: "2026-08-16",
   archiveManifestId: "municipalities",
   coverageSource: { kind: "municipalTotals" },

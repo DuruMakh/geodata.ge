@@ -7,6 +7,7 @@ import { parse } from "csv-parse/sync";
 import { describe, expect, it, vi } from "vitest";
 import * as XLSX from "xlsx";
 import type { GovernmentDebtPackageBuild } from "../../../lib/data/governmentDebt/types";
+import { DATA_VALIDATE_CHECKS } from "../../../scripts/validate-all";
 
 type CsvRow = Record<string, string>;
 
@@ -761,9 +762,7 @@ describe("government debt research package", () => {
     expect(packageJson.scripts["data:check-government-debt"]).toBe(
       "tsx scripts/prepare-government-debt.ts --check",
     );
-    expect(packageJson.scripts["data:validate"]).toContain(
-      "npm run data:check-government-debt",
-    );
+    expect(DATA_VALIDATE_CHECKS).toContain("data:check-government-debt");
 
     const readmePath = path.join(packageDir, "README.md");
     const methodologyPath = path.join(
@@ -793,7 +792,7 @@ describe("government debt research package", () => {
     }
 
     const vitestConfig = fs.readFileSync(
-      path.join(repoRoot, "apps/web/vitest.config.ts"),
+      path.join(repoRoot, "apps/web/vitest.config.mts"),
       "utf8",
     );
     expect(vitestConfig).toContain(

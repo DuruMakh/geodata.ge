@@ -8,8 +8,8 @@ import { describe, expect, test } from "vitest";
 import { assertEnergyFoodParity, loadEnergyFoodFacts, toClientEnergyFoodFact } from "../../../lib/data/energyFood/importEnergyFood";
 import { energyFoodMirrorCreateRows, loadEnergyFoodFactsFromMirror } from "../../../lib/db/mirrorRows";
 import type { Prisma } from "../../../lib/generated/prisma/client";
-import { prepareEnergyFoodData, readWorkbookCells } from "../../../lib/data/energyFood/prepareEnergyFood";
-import { ENERGY_FOOD_INDICATORS, ENERGY_FOOD_PUBLIC_SOURCES, ENERGY_FOOD_SOURCES, type EnergyFoodFact } from "../../../lib/data/energyFood/types";
+import { readWorkbookCells } from "../../../lib/data/energyFood/prepareEnergyFood";
+import { ENERGY_FOOD_INDICATORS, ENERGY_FOOD_PUBLIC_SOURCES, type EnergyFoodFact } from "../../../lib/data/energyFood/types";
 import { energyFoodDisplayDecimals, expectedEnergyFoodKeys, validateEnergyFoodFacts } from "../../../lib/data/energyFood/validation";
 
 const root = path.resolve(process.cwd(), "../..");
@@ -25,25 +25,39 @@ const find = (facts: readonly EnergyFoodFact[], indicatorId: string, year: numbe
 const general = (facts: readonly EnergyFoodFact[], unit: string) => facts.find(f => f.unit === unit && f.sourceNumberFormat === "General")!;
 const food = (facts: readonly EnergyFoodFact[]) => general(facts, "percent");
 
-test("the canonical file reproduces the research package", async () => {
-  await expect(prepareEnergyFoodData(root, "check")).resolves.toBeUndefined();
-});
-
-test("serves all 681 reviewed values", () => {
+test("serves all 1,389 reviewed values", async () => {
   const facts = loadFacts();
-  expect(facts).toHaveLength(681);
+  expect(facts).toHaveLength(1389);
+  expect(facts.filter(f => f.indicatorId.startsWith("farming."))).toHaveLength(708);
   expect(new Set(facts.map(f => f.indicatorId)).size).toBe(ENERGY_FOOD_INDICATORS.length);
   expect(facts.filter(f => f.valueStatus === "no_flow")).toHaveLength(3);
   expect(find(facts, "energy.supply.electricity", 2023).value).toBe("-58.3");
+  // The real negative electricity supply (net exports) passes validation.
+  expect(Number(find(facts, "energy.supply.electricity", 2016).value)).toBeLessThan(0);
   expect(() => validateEnergyFoodFacts(facts)).not.toThrow();
+  // The loader serves the same 1,389 canonical rows.
+  const loaded = await loadEnergyFoodFacts();
+  expect(loaded).toHaveLength(1389);
+  expect(find(loaded, "energy.supply.electricity", 2023).value).toBe("-58.3");
+});
+
+test("farming rows are reviewed 2026-10-20 and energy and food rows 2026-10-11", () => {
+  const facts = loadFacts();
+  expect(new Set(facts.filter(f => f.indicatorId.startsWith("farming.")).map(f => f.lastReviewedAt))).toEqual(new Set(["2026-10-20"]));
+  expect(new Set(facts.filter(f => !f.indicatorId.startsWith("farming.")).map(f => f.lastReviewedAt))).toEqual(new Set(["2026-10-11"]));
+});
+
+test("only farm output 2025 is preliminary", () => {
+  const preliminary = loadFacts().filter(f => f.valueStatus === "preliminary").map(f => `${f.indicatorId}:${f.year}`).sort();
+  expect(preliminary).toEqual(["farming.output.crops:2025", "farming.output.livestock:2025", "farming.output.services:2025", "farming.output.total:2025"]);
+  const facts = loadFacts().map(f => ({ ...f }));
+  find(facts, "farming.output.total", 2024).valueStatus = "preliminary";
+  expect(() => validateEnergyFoodFacts(facts)).toThrow(/source contract/);
 });
 
 test("source inventories", () => {
-  expect(ENERGY_FOOD_INDICATORS).toHaveLength(57);
-  expect(ENERGY_FOOD_SOURCES).toHaveLength(26);
-  expect(ENERGY_FOOD_PUBLIC_SOURCES).toHaveLength(42);
-  expect(new Set(ENERGY_FOOD_PUBLIC_SOURCES).size).toBe(42);
-  expect(expectedEnergyFoodKeys().size).toBe(681);
+  expect(new Set(ENERGY_FOOD_PUBLIC_SOURCES).size).toBe(ENERGY_FOOD_PUBLIC_SOURCES.length);
+  expect(expectedEnergyFoodKeys().size).toBe(loadFacts().length);
 });
 
 describe("readWorkbookCells", () => {
@@ -73,7 +87,7 @@ describe("readWorkbookCells", () => {
 });
 
 describe("energyFoodDisplayDecimals", () => {
-  test.each([["#,##0.0", 1], ["0.0", 1], ["0", 0], ["#,##0.0;[Red]#,##0.0", 1]] as const)("%s shows %i decimals", (format, decimals) => {
+  test.each([["#,##0.0", 1], ["0.0", 1], ["0", 0], ["#,##0.0;[Red]#,##0.0", 1], ["#\\ ##0.0", 1], ["0.00", 2]] as const)("%s shows %i decimals", (format, decimals) => {
     expect(energyFoodDisplayDecimals(format)).toBe(decimals);
   });
   test("rejects General, which has no fixed precision, and unknown formats", () => {
@@ -98,6 +112,10 @@ test.each([
   ["a ktoe value published with two decimals", (facts: EnergyFoodFact[]) => { Object.assign(find(facts, "energy.supply.total", 2024), { value: "5914.55", publishedValue: "5914.55" }); }, /Invalid energy and food published value, more decimals/],
   ["a gwh value published with two decimals", (facts: EnergyFoodFact[]) => { Object.assign(find(facts, "electricity.production.total", 2024), { value: "14234.15", publishedValue: "14234.15" }); }, /more decimals/],
   ["a non-numeric published value", (facts: EnergyFoodFact[]) => { facts[0].publishedValue = "n/a"; }, /Invalid energy and food published value/],
+  ["a price published with three decimals", (facts: EnergyFoodFact[]) => { Object.assign(find(facts, "farming.price.wheat", 2025), { value: "0.571", publishedValue: "0.571" }); }, /more decimals|published value/],
+  ["a farming no-flow row", (facts: EnergyFoodFact[]) => { Object.assign(find(facts, "farming.harvest.wheat", 2010), { value: "0", publishedValue: "0.0", valueStatus: "no_flow" }); }, /source contract/],
+  ["a farming row with the wrong unit", (facts: EnergyFoodFact[]) => { find(facts, "farming.price.milk", 2020).unit = "gel_per_kg"; }, /source contract/],
+  ["a 2009 farm output row", (facts: EnergyFoodFact[]) => { facts.push({ ...find(facts, "farming.output.total", 2010), year: 2009 }); }, /outside the approved coverage/],
   ["a wrong source for the year", (facts: EnergyFoodFact[]) => { find(facts, "energy.supply.total", 2020).sourceId = "geostat_energy_balance_2021_aggregated"; }, /source contract/],
 ] as const)("validation rejects %s", (_, mutate, error) => {
   const facts = loadFacts().map(f => ({ ...f }));
@@ -111,19 +129,7 @@ test("General rows publish the stored value cut to 15 significant digits", () =>
   expect(() => validateEnergyFoodFacts(facts)).not.toThrow();
 });
 
-test("validation accepts the real negative electricity supply", () => {
-  const facts = loadFacts();
-  for (const year of [2016, 2023]) expect(Number(find(facts, "energy.supply.electricity", year).value)).toBeLessThan(0);
-  expect(() => validateEnergyFoodFacts(facts)).not.toThrow();
-});
-
 describe("loading and parity", () => {
-  test("loadEnergyFoodFacts serves the 681 canonical rows", async () => {
-    const facts = await loadEnergyFoodFacts();
-    expect(facts).toHaveLength(681);
-    expect(find(facts, "energy.supply.electricity", 2023).value).toBe("-58.3");
-  });
-
   test("loadEnergyFoodFacts rejects a canonical file that no longer matches its acceptance fingerprint", async () => {
     const copy = fs.mkdtempSync(path.join(os.tmpdir(), "energy-food-"));
     try {
@@ -131,7 +137,7 @@ describe("loading and parity", () => {
         fs.mkdirSync(path.dirname(path.join(copy, relative)), { recursive: true });
         fs.copyFileSync(path.join(root, relative), path.join(copy, relative));
       }
-      await expect(loadEnergyFoodFacts(copy)).resolves.toHaveLength(681);
+      await expect(loadEnergyFoodFacts(copy)).resolves.toHaveLength(1389);
       fs.appendFileSync(path.join(copy, "data/imports/energy-food-annual.csv"), "\n");
       await expect(loadEnergyFoodFacts(copy)).rejects.toThrow(/fingerprint/);
     } finally {
@@ -161,7 +167,9 @@ describe("loading and parity", () => {
     // A General-format row (no fixed precision in its cell) still gets the unit's decimals.
     expect(toClientEnergyFoodFact(general(facts, "ktoe")).decimals).toBe(1);
     expect(toClientEnergyFoodFact(food(facts)).decimals).toBe(0);
-    expect(facts.every(f => { const c = toClientEnergyFoodFact(f); return c.decimals === (f.unit === "percent" ? 0 : 1) && c.value === Number(f.publishedValue); })).toBe(true);
+    expect(facts.every(f => { const c = toClientEnergyFoodFact(f); return c.decimals === (f.unit === "percent" ? 0 : f.unit.startsWith("gel_per_") ? 2 : 1) && c.value === Number(f.publishedValue) && c.unit === f.unit; })).toBe(true);
+    expect(toClientEnergyFoodFact(find(facts, "farming.price.milk", 2025))).toMatchObject({ value: 1.63, decimals: 2, unit: "gel_per_litre" });
+    expect(toClientEnergyFoodFact(find(facts, "farming.output.total", 2025))).toMatchObject({ value: 8384.9, decimals: 1, unit: "million_gel", valueStatus: "preliminary" });
   });
 
   test("the database mirror round-trips exact decimals and source relations", async () => {

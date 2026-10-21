@@ -1,32 +1,74 @@
 // apps/web/tests/factQuery/buildSnapshot.test.ts
-import { describe, expect, it } from "vitest";
+import { beforeAll, describe, expect, it } from "vitest";
 import { buildFactQuerySnapshot } from "../../lib/factQuery/buildSnapshot";
-import { AGGREGATE_ONLY_MUNICIPAL_CODES } from "../../lib/factQuery/types";
+import { AGGREGATE_ONLY_MUNICIPAL_CODES, type FactQuerySnapshot } from "../../lib/factQuery/types";
 import { loadTaxonomyFiles } from "../../lib/data/taxonomy";
 import { loadSourceDocuments } from "../../lib/data/sources";
+import { CRIME_PUBLIC_SOURCES, crimeSourceDocumentId } from "../../lib/data/crime/types";
+import { ENVIRONMENT_PUBLIC_SOURCES, environmentSourceDocumentId } from "../../lib/data/environment/types";
+import { HEALTH_PUBLIC_SOURCES, healthSourceDocumentId } from "../../lib/data/health/types";
 import { MONEY_BANKS_PUBLIC_SOURCES, moneyBanksSourceDocumentId } from "../../lib/data/moneyBanks/types";
+import { EXTERNAL_POSITION_PUBLIC_SOURCES, externalPositionSourceDocumentId } from "../../lib/data/externalPosition/types";
+import { BUSINESS_PUBLIC_SOURCES, businessSourceDocumentId } from "../../lib/data/business/types";
+import { HOUSING_PUBLIC_SOURCES, housingSourceDocumentId } from "../../lib/data/housing/types";
+import { INTERNET_PUBLIC_SOURCES, internetSourceDocumentId } from "../../lib/data/internet/types";
+import { EDUCATION_PUBLIC_SOURCES, educationSourceDocumentId } from "../../lib/data/education/types";
+import { SOCIAL_PUBLIC_SOURCES, socialSourceDocumentId } from "../../lib/data/social/types";
+import { SCIENCE_CULTURE_PUBLIC_SOURCES, scienceCultureSourceDocumentId } from "../../lib/data/scienceCulture/types";
+import { TRANSPORT_PUBLIC_SOURCES, transportSourceDocumentId } from "../../lib/data/transport/types";
+import { testSnapshot } from "../helpers/factQuerySnapshot";
 
 const OPTIONS = { releaseCommit: "test-commit", generatedAt: "2026-08-28T00:00:00.000Z" };
 
+// Every test but the determinism one reads the shared snapshot; that one builds twice on purpose.
+let snapshot: FactQuerySnapshot;
+beforeAll(() => { snapshot = testSnapshot(OPTIONS); });
+
 describe("buildFactQuerySnapshot", () => {
   it("preserves approved query sources, including the sector growth and volume originals", async () => {
-    const [snapshot, sources] = await Promise.all([
-      buildFactQuerySnapshot(OPTIONS),
-      loadSourceDocuments("../../data/sources/source-documents.csv"),
-    ]);
-    // The thirteen demography canonical inputs (twelve annual tables and the census snapshot) supply new fact sources; the
+    const sources = await loadSourceDocuments("../../data/sources/source-documents.csv");
+    // The nineteen demography canonical inputs (eighteen annual tables, six of them for marriages and divorces, and the census snapshot) supply new fact sources; the
     // package's validation inputs and definitions remain evidence.
-    // The seven Wages workbooks, the seven Poverty documents, the 21 Household income and spending documents, the 42 Energy and food sources and the twenty Money and banks documents and the two Services trade workbooks are registered sources of human explorers only.
-    expect(sources).toHaveLength(272);
+    // The seven Wages workbooks, the seven Poverty documents, the 21 Household income and spending documents, the 55 Energy and food sources, the twenty Money and banks documents, the 26 Business documents, the 21 Housing archived sources, the 36 Health archived sources, the 22 Crime and justice archived sources, the 14 Labour detail archived sources, the 46 Education documents, the 46 Environment and climate archived sources, the 33 Science and culture archived sources, the 25 Social Service Agency sources, the 25 Transport archived sources, the 36 Internet and technology archived sources, the four Services trade workbooks, the four Trade composition originals and the three Foreign debt and Reserves originals are registered sources of human explorers only.
+    expect(sources).toHaveLength(633);
     expect(sources.filter(source => source.sourceId.startsWith("source.geostat_services_")).map(source => source.sourceId).sort()).toEqual([
+      "source.geostat_services_georgian_exports_of_services_by_countries",
       "source.geostat_services_georgian_exports_of_services_by_types",
+      "source.geostat_services_georgian_imports_of_services_by_countries",
       "source.geostat_services_georgian_imports_of_services_by_types",
     ]);
     expect(snapshot.sources.some(source => source.sourceId.startsWith("source.geostat_services_"))).toBe(false);
-    expect(sources.filter(source => source.sourceId.startsWith("source.geostat_trade_"))).toHaveLength(13);
-    expect(snapshot.sources.map(source => source.sourceId).sort()).toEqual(sources.filter(source => !source.sourceId.startsWith("source.geostat_lfs_") && !source.sourceId.startsWith("source.geostat_trade_") && !source.sourceId.startsWith("source.geostat_services_") && !source.sourceId.startsWith("source.geostat_earnings_") && !source.sourceId.startsWith("source.geostat_fdi_") && !source.sourceId.startsWith("source.geostat_poverty_") && !source.sourceId.startsWith("source.geostat_household_") && !source.sourceId.startsWith("source.geostat_energy_") && !source.sourceId.startsWith("source.geostat_food_") && !["source.nbg_money_transfers_by_countries", "source.nbg_balance_of_payments_bpm6", "source.geostat_gini", "source.geostat_hies_metadata_2026", ...MONEY_BANKS_PUBLIC_SOURCES.map(moneyBanksSourceDocumentId)].includes(source.sourceId)).map(source => source.sourceId).sort());
+    expect(sources.filter(source => source.sourceId.startsWith("source.geostat_trade_"))).toHaveLength(17);
+    const compositionSources = ["source.geostat_trade_export_sitc_2000_2026", "source.geostat_trade_import_sitc_2000_2026", "source.geostat_trade_export_bec_2000_2026", "source.geostat_trade_import_bec_2000_2026"];
+    expect(sources.filter(source => compositionSources.includes(source.sourceId)).map(source => source.sourceId).sort()).toEqual([...compositionSources].sort());
+    expect(snapshot.sources.filter(source => compositionSources.includes(source.sourceId))).toEqual([]);
+    expect(snapshot.sources.map(source => source.sourceId).sort()).toEqual(sources.filter(source => !source.sourceId.startsWith("source.geostat_lfs_") && !source.sourceId.startsWith("source.geostat_transport_") && !source.sourceId.startsWith("source.geostat_trade_") && !source.sourceId.startsWith("source.geostat_services_") && !source.sourceId.startsWith("source.geostat_earnings_") && !source.sourceId.startsWith("source.geostat_fdi_") && !source.sourceId.startsWith("source.geostat_poverty_") && !source.sourceId.startsWith("source.geostat_household_") && !source.sourceId.startsWith("source.geostat_energy_") && !source.sourceId.startsWith("source.geostat_housing_") && !source.sourceId.startsWith("source.geostat_ict_") && !source.sourceId.startsWith("source.geostat_food_") && !source.sourceId.startsWith("source.geostat_farming_") && !source.sourceId.startsWith("source.geostat_gdp_use_") && !["source.geostat_agriculture_page", "source.nbg_money_transfers_by_countries", "source.nbg_balance_of_payments_bpm6", "source.geostat_gini", "source.geostat_hies_metadata_2026", ...MONEY_BANKS_PUBLIC_SOURCES.map(moneyBanksSourceDocumentId), ...EXTERNAL_POSITION_PUBLIC_SOURCES.map(externalPositionSourceDocumentId), ...BUSINESS_PUBLIC_SOURCES.map(businessSourceDocumentId), ...HEALTH_PUBLIC_SOURCES.map(healthSourceDocumentId), ...CRIME_PUBLIC_SOURCES.map(crimeSourceDocumentId), ...ENVIRONMENT_PUBLIC_SOURCES.map(environmentSourceDocumentId), ...EDUCATION_PUBLIC_SOURCES.map(educationSourceDocumentId), ...SCIENCE_CULTURE_PUBLIC_SOURCES.map(scienceCultureSourceDocumentId), ...SOCIAL_PUBLIC_SOURCES.map(socialSourceDocumentId), ...TRANSPORT_PUBLIC_SOURCES.map(transportSourceDocumentId)].includes(source.sourceId)).map(source => source.sourceId).sort());
     expect(snapshot.sources.some(source => source.sourceId.startsWith("source.geostat_trade_"))).toBe(false);
+    // The 25 Social protection sources (24 SSA tables and the statistics page) are registered, and none of them reaches the snapshot.
+    expect(sources.filter(source => source.sourceId.startsWith("source.ssa_"))).toHaveLength(25);
+    expect(snapshot.sources.some(source => source.sourceId.startsWith("source.ssa_"))).toBe(false);
+    // Nor does any document of the Social protection methodology archive (SSA's page captures and the Geostat files it repeats).
+    expect(snapshot.sources.some(source => source.documents.some(document => document.datasetId === "social-protection"))).toBe(false);
     expect(snapshot.sources.some(source => MONEY_BANKS_PUBLIC_SOURCES.map(moneyBanksSourceDocumentId).includes(source.sourceId))).toBe(false);
+    expect(snapshot.sources.some(source => HEALTH_PUBLIC_SOURCES.map(healthSourceDocumentId).includes(source.sourceId))).toBe(false);
+    expect(snapshot.sources.some(source => CRIME_PUBLIC_SOURCES.map(crimeSourceDocumentId).includes(source.sourceId))).toBe(false);
+    expect(snapshot.sources.some(source => EXTERNAL_POSITION_PUBLIC_SOURCES.map(externalPositionSourceDocumentId).includes(source.sourceId))).toBe(false);
+    expect(snapshot.sources.some(source => source.sourceId.startsWith("source.geostat_housing_"))).toBe(false);
+    expect(snapshot.sources.some(source => source.sourceId.startsWith("source.geostat_gdp_use_"))).toBe(false);
+    // All 21 registered housing sources are in the registry, and none of them reaches the snapshot.
+    expect(HOUSING_PUBLIC_SOURCES.map(housingSourceDocumentId).filter(id => !sources.some(source => source.sourceId === id))).toEqual([]);
+    expect(snapshot.sources.some(source => HOUSING_PUBLIC_SOURCES.map(housingSourceDocumentId).includes(source.sourceId))).toBe(false);
+    // All 36 registered internet sources are in the registry, and none of them reaches the snapshot.
+    expect(INTERNET_PUBLIC_SOURCES.map(internetSourceDocumentId).filter(id => !sources.some(source => source.sourceId === id))).toEqual([]);
+    expect(snapshot.sources.some(source => INTERNET_PUBLIC_SOURCES.map(internetSourceDocumentId).includes(source.sourceId))).toBe(false);
+    expect(snapshot.sources.some(source => BUSINESS_PUBLIC_SOURCES.map(businessSourceDocumentId).includes(source.sourceId))).toBe(false);
+    expect(snapshot.sources.some(source => EDUCATION_PUBLIC_SOURCES.map(educationSourceDocumentId).includes(source.sourceId))).toBe(false);
+    // All 33 registered science and culture sources are in the registry, and none of them reaches the snapshot.
+    expect(SCIENCE_CULTURE_PUBLIC_SOURCES.map(scienceCultureSourceDocumentId).filter(id => !sources.some(source => source.sourceId === id))).toEqual([]);
+    expect(snapshot.sources.some(source => SCIENCE_CULTURE_PUBLIC_SOURCES.map(scienceCultureSourceDocumentId).includes(source.sourceId))).toBe(false);
+    // All 25 registered transport sources are in the registry, and none of them reaches the snapshot.
+    expect(TRANSPORT_PUBLIC_SOURCES.map(transportSourceDocumentId).filter(id => !sources.some(source => source.sourceId === id))).toEqual([]);
+    expect(snapshot.sources.some(source => TRANSPORT_PUBLIC_SOURCES.map(transportSourceDocumentId).includes(source.sourceId))).toBe(false);
     expect(snapshot.sources.some(source => source.sourceId.startsWith("source.nbg_money_transfers_") || source.sourceId.startsWith("source.geostat_fdi_") || source.sourceId === "source.nbg_balance_of_payments_bpm6")).toBe(false);
     expect(snapshot.sources.map(source => source.sourceId)).toEqual(expect.arrayContaining([
       "source.geostat_sector_growth", "source.geostat_sector_volume",
@@ -35,8 +77,6 @@ describe("buildFactQuerySnapshot", () => {
   });
 
   it("carries the national, ministries, municipal and gdp facts", async () => {
-    const snapshot = await buildFactQuerySnapshot(OPTIONS);
-
     expect(snapshot.national.facts.length).toBe(527);
     expect(snapshot.ministries.facts.length).toBe(852);
     expect(snapshot.municipal.functionFacts.length).toBe(7040);
@@ -45,8 +85,6 @@ describe("buildFactQuerySnapshot", () => {
   });
 
   it("carries the debt and balance facts", async () => {
-    const snapshot = await buildFactQuerySnapshot(OPTIONS);
-
     expect(new Set(snapshot.debt.facts.map((f) => f.seriesId))).toEqual(
       new Set([
         "debt.stock.total",
@@ -76,8 +114,6 @@ describe("buildFactQuerySnapshot", () => {
   });
 
   it("exposes a url slug for every municipality and none for excluded codes", async () => {
-    const snapshot = await buildFactQuerySnapshot(OPTIONS);
-
     expect(Object.keys(snapshot.municipal.slugByCode)).toHaveLength(64);
     expect(snapshot.municipal.slugByCode["11"]).toBe("khulo");
     for (const code of AGGREGATE_ONLY_MUNICIPAL_CODES) {
@@ -102,7 +138,6 @@ describe("buildFactQuerySnapshot", () => {
   // exact totals here is what keeps program_historical_join honest: a derivation that
   // silently widened to whole series would blow past 190.
   it("resolves historical joins to the exact served cells that came in through a join", async () => {
-    const snapshot = await buildFactQuerySnapshot(OPTIONS);
     const servedProgramCells = new Set(
       snapshot.ministries.facts.filter((f) => f.level === "major_program").map((f) => `${f.itemId}:${f.year}`),
     );
@@ -124,7 +159,6 @@ describe("buildFactQuerySnapshot", () => {
   });
 
   it("leaves a joined series' native years out of the join list", async () => {
-    const snapshot = await buildFactQuerySnapshot(OPTIONS);
     // Common courts: 2006-2011 arrive through the legacy "09 02" lines, 2012-2025 are
     // served natively under the series' own code 09 01.
     const seriesId = "admin_program.09_01.f5bec61a";
@@ -147,7 +181,6 @@ describe("buildFactQuerySnapshot", () => {
   // against a fresh, independent load of the taxonomy files (not the snapshot's own
   // computation) is mode-invariant by construction and needs no database.
   it("takes each item's sortOrder from the taxonomy files, not glossary order", async () => {
-    const snapshot = await buildFactQuerySnapshot(OPTIONS);
     const taxonomy = await loadTaxonomyFiles("../../data/taxonomy");
     const taxonomySortOrderById = new Map(taxonomy.map((item) => [item.id, item.sortOrder]));
 
@@ -194,42 +227,34 @@ function expectPinnedOrder<T>(rows: T[], keyOf: (row: T) => readonly (string | n
 
 describe("hashed array order is pinned to each dataset's canonical sort keys", () => {
   it("national.facts: year, side, itemId, basis", async () => {
-    const snapshot = await buildFactQuerySnapshot(OPTIONS);
     expectPinnedOrder(snapshot.national.facts, (f) => [f.year, f.side, f.itemId, f.basis]);
   });
 
   it("ministries.facts: year, itemId", async () => {
-    const snapshot = await buildFactQuerySnapshot(OPTIONS);
     expectPinnedOrder(snapshot.ministries.facts, (f) => [f.year, f.itemId]);
   });
 
   it("ministries.categories: sortOrder, id", async () => {
-    const snapshot = await buildFactQuerySnapshot(OPTIONS);
     expectPinnedOrder(snapshot.ministries.categories, (c) => [c.sortOrder, c.id]);
   });
 
   it("municipal.functions: sortOrder, id", async () => {
-    const snapshot = await buildFactQuerySnapshot(OPTIONS);
     expectPinnedOrder(snapshot.municipal.functions, (f) => [f.sortOrder, f.id]);
   });
 
   it("municipal.regions: sortOrder, id", async () => {
-    const snapshot = await buildFactQuerySnapshot(OPTIONS);
     expectPinnedOrder(snapshot.municipal.regions, (r) => [r.sortOrder, r.id]);
   });
 
   it("municipal.municipalities: sortId, code", async () => {
-    const snapshot = await buildFactQuerySnapshot(OPTIONS);
     expectPinnedOrder(snapshot.municipal.municipalities, (m) => [m.sortId, m.code]);
   });
 
   it("municipal.functionFacts: year, municipalityCode, categoryId", async () => {
-    const snapshot = await buildFactQuerySnapshot(OPTIONS);
     expectPinnedOrder(snapshot.municipal.functionFacts, (f) => [f.year, f.municipalityCode, f.categoryId]);
   });
 
   it("municipal.totalFacts: year, municipalityCode", async () => {
-    const snapshot = await buildFactQuerySnapshot(OPTIONS);
     expectPinnedOrder(snapshot.municipal.totalFacts, (f) => [f.year, f.municipalityCode]);
   });
 
@@ -239,28 +264,23 @@ describe("hashed array order is pinned to each dataset's canonical sort keys", (
   // (lib/db/mirrorRows.ts) copies row.scopeId into the served municipalityCode
   // field, so municipalityCode is where the mirror's scopeId ordering lands here.
   it("municipal.countryFunctionFacts: year, municipalityCode (mirror's scopeId), categoryId", async () => {
-    const snapshot = await buildFactQuerySnapshot(OPTIONS);
     expectPinnedOrder(snapshot.municipal.countryFunctionFacts, (f) => [f.year, f.municipalityCode, f.categoryId]);
   });
 
   // Same scopeId -> municipalityCode translation as countryFunctionFacts above.
   it("municipal.countryTotalFacts: year, municipalityCode (mirror's scopeId)", async () => {
-    const snapshot = await buildFactQuerySnapshot(OPTIONS);
     expectPinnedOrder(snapshot.municipal.countryTotalFacts, (f) => [f.year, f.municipalityCode]);
   });
 
   it("municipal.populationFacts: year, municipalityCode", async () => {
-    const snapshot = await buildFactQuerySnapshot(OPTIONS);
     expectPinnedOrder(snapshot.municipal.populationFacts, (f) => [f.year, f.municipalityCode]);
   });
 
   it("municipal.adjaraBudgetAdjustments: year", async () => {
-    const snapshot = await buildFactQuerySnapshot(OPTIONS);
     expectPinnedOrder(snapshot.municipal.adjaraBudgetAdjustments, (a) => [a.year]);
   });
 
   it("gdpFacts: year", async () => {
-    const snapshot = await buildFactQuerySnapshot(OPTIONS);
     expectPinnedOrder(snapshot.gdpFacts, (f) => [f.year]);
   });
 });

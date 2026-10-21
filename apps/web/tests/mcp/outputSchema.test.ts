@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, it } from "vitest";
-import { buildFactQuerySnapshot } from "../../lib/factQuery/buildSnapshot";
+import { testSnapshot } from "../helpers/factQuerySnapshot";
 import { TOOLS } from "../../lib/mcp/tools";
 import { outputSchemaFor, toolOutput } from "../../lib/mcp/outputSchema";
 import { toolResult } from "../../lib/mcp/result";
@@ -10,7 +10,16 @@ import { rank } from "../../lib/factQuery/rank";
 let snapshot: FactQuerySnapshot;
 
 beforeAll(async () => {
-  snapshot = await buildFactQuerySnapshot({ releaseCommit: "test", generatedAt: "2026-09-04T00:00:00.000Z" });
+  snapshot = testSnapshot({ releaseCommit: "test", generatedAt: "2026-09-04T00:00:00.000Z" });
+});
+
+it("validates scoped city discovery without changing the catalogue contract", () => {
+  const response = describeCoverage(snapshot, { datasetId: "inflation", entityType: "city" });
+  expect(outputSchemaFor("describe_coverage").safeParse(response).success).toBe(true);
+  expect(response).toMatchObject({ kind: "catalogue", data: { datasets: [{ entityTypes: ["city"], measures: ["yoy_pct", "mom_pct", "avg12_pct"] }] } });
+  const result = toolResult(response);
+  expect(result.isError).toBe(false);
+  expect(result.structuredContent).toEqual(response);
 });
 
 it("retains two-element period/year ranges with exact element types", () => {
@@ -74,6 +83,35 @@ const CALLS: Record<string, unknown> = {
 };
 
 describe("every tool's structured output matches its declared schema", () => {
+  it("validates all four outcomes emitted by the source lookup", () => {
+    const getSourcesTool = TOOLS.find(tool => tool.name === "get_sources")!;
+    for (const [input, outcome] of [
+      [{ sourceIds: ["source.mof_2017_revenue_form1_pdf"] }, "not_requested"],
+      [{ sourceIds: ["source.mof_2017_revenue_form1_pdf"], years: [2017] }, "applied"],
+      [{ sourceIds: ["source.mof_2017_revenue_form1_pdf"], years: [2020] }, "dropped_no_match"],
+      [{ sourceIds: ["source.adjara_consolidated_budget"], years: [2020] }, "preserved_derived"],
+    ]) {
+      const response = getSourcesTool.run(snapshot, input);
+      expect(response).toMatchObject({ kind: "sources", data: { sources: [{ narrowingOutcome: outcome, narrowed: false }] } });
+      expect(outputSchemaFor("get_sources").parse(response)).toEqual(response);
+      expect(toolOutput.parse(response)).toEqual(response);
+    }
+  });
+
+  it("accepts preserved derived evidence alongside every existing narrowing outcome", () => {
+    const response = TOOLS.find(tool => tool.name === "get_sources")!.run(snapshot, CALLS.get_sources);
+    if (response.kind !== "sources") throw new Error("Expected sources");
+    const schema = outputSchemaFor("get_sources");
+    for (const outcome of ["not_requested", "applied", "dropped_no_match", "preserved_derived"]) {
+      const sample = structuredClone(response);
+      (sample.data as { sources: { narrowingOutcome: string }[] }).sources[0]!.narrowingOutcome = outcome;
+      expect(schema.safeParse(sample).success, outcome).toBe(true);
+      expect(toolOutput.safeParse(sample).success, outcome).toBe(true);
+    }
+    const invalid = structuredClone(response);
+    (invalid.data as { sources: { narrowingOutcome: string }[] }).sources[0]!.narrowingOutcome = "invented_outcome";
+    expect(schema.safeParse(invalid).success).toBe(false);
+  });
   it("declares and retains every public product catalogue field", () => {
     const response = describeCoverage(snapshot, { datasetId: "inflation-products" });
     if (response.kind !== "catalogue") throw new Error("Expected product catalogue");
@@ -105,6 +143,7 @@ describe("every tool's structured output matches its declared schema", () => {
 
       const result = toolResult(response);
       expect(result.structuredContent).toBeDefined();
+      expect(outputSchemaFor(tool.name).parse(result.structuredContent)).toEqual(result.structuredContent);
 
       const parsed = toolOutput.safeParse(result.structuredContent);
       if (!parsed.success) {

@@ -1,6 +1,6 @@
 // apps/web/tests/factQuery/describeCoverage.test.ts
 import { beforeAll, describe, expect, it } from "vitest";
-import { buildFactQuerySnapshot } from "../../lib/factQuery/buildSnapshot";
+import { testSnapshot } from "../helpers/factQuerySnapshot";
 import { describeCoverage } from "../../lib/factQuery/describeCoverage";
 import { queryMinistries } from "../../lib/factQuery/queryMinistries";
 import { envelopeSchema } from "../../lib/factQuery/schemas";
@@ -9,7 +9,7 @@ import { AGGREGATE_ONLY_MUNICIPAL_CODES, type FactQuerySnapshot } from "../../li
 let snapshot: FactQuerySnapshot;
 
 beforeAll(async () => {
-  snapshot = await buildFactQuerySnapshot({ releaseCommit: "test", generatedAt: "2026-08-29T00:00:00.000Z" });
+  snapshot = testSnapshot({ releaseCommit: "test", generatedAt: "2026-08-29T00:00:00.000Z" });
 });
 
 type CoverageData = {
@@ -233,6 +233,15 @@ describe("describeCoverage", () => {
 // Before this, search without a datasetId returned nothing, silently, and read
 // as "no such thing" rather than "wrong call".
 describe("search before you know the dataset", () => {
+  it("scopes global city searches and summaries to city-supported inflation", () => {
+    const result = data(describeCoverage(snapshot, { entityType: "city", search: "cpi" }));
+    expect(result.datasets).toEqual([expect.objectContaining({ datasetId: "inflation", entityTypes: ["city"], measures: ["yoy_pct", "mom_pct", "avg12_pct"] })]);
+    expect(result.series!.map(series => series.seriesId)).toEqual(["cpi.headline", ...Array.from({ length: 12 }, (_, i) => `cpi.cat.${String(i + 1).padStart(2, "0")}`)]);
+    expect(data(describeCoverage(snapshot, { entityType: "city", search: "revenue" })).datasets).toEqual([]);
+    expect(data(describeCoverage(snapshot, { entityType: "city", search: "cpi", level: "subgroup" })).series).toEqual([]);
+    expect(data(describeCoverage(snapshot, { entityType: "city" })).datasets.map(dataset => dataset.datasetId)).toEqual(["inflation"]);
+  });
+
   it("finds a municipal entity with no datasetId given", () => {
     const entities = data(describeCoverage(snapshot, { search: "ბათუმი" })).entities ?? [];
     expect(entities.map((e) => e.entityId)).toContain("06");

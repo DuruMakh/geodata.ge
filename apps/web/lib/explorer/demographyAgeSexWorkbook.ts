@@ -100,7 +100,7 @@ function pyramidWorkbook(
       ],
     },
     analysis: {
-      headers: [w("workbook.year"), t("sexHeader"), t("ageGroupHeader"), t("personsHeader"), t("shareHeader"), t("basisHeader")],
+      headers: [w("workbook.year"), t("sexHeader"), t("ageGroupHeader"), t("personsHeader"), t("sharePercentHeader"), t("basisHeader")],
       rows: spec.parts.flatMap((part) =>
         SEXES.flatMap((sex) =>
           OLDEST_FIRST.map((group) => {
@@ -197,7 +197,7 @@ export function buildAgeYearWorkbookExportModel(input: Input, presentation: Pres
     stem: "demography-age-by-year",
     years,
     lines,
-    headers: [w("workbook.year"), t("ageGroupHeader"), t("personsHeader"), t("shareHeader"), t("basisHeader")],
+    headers: [w("workbook.year"), t("ageGroupHeader"), t("personsHeader"), t("sharePercentHeader"), t("basisHeader")],
     dataRows: years.flatMap((year, yearIndex) =>
       heat.rows.map((row) => {
         const pyramidRow = pyramids[yearIndex]!.rows[AGE_SEX_GROUPS.indexOf(row.id)]!;

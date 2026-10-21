@@ -12,6 +12,7 @@ import { resetGovernmentDebtCacheForTests } from "./governmentDebt/importGovernm
 import { resetInflationCacheForTests } from "./inflation/importInflation";
 import { resetRegionalEconomyCacheForTests } from "./regionalEconomies/importRegionalEconomies";
 import { resetDemographyCacheForTests } from "./demography/importDemography";
+import { resetTradeCompositionCacheForTests } from "./tradeComposition/importTradeComposition";
 import { resolveServedDataSource, type ServedDataSource } from "./servedDataSource";
 import { loadSourceDocuments, type SourceDocumentRow } from "./sources";
 import type {
@@ -74,6 +75,8 @@ export const SERVED_DATA_FILES = {
   tradeProductFacts: "../../data/imports/trade-products-annual.csv",
   tradeServiceEntities: "../../data/taxonomy/trade-services.json",
   tradeServiceFacts: "../../data/imports/trade-services-annual.csv",
+  tradeCompositionEntities: "../../data/taxonomy/trade-composition.json",
+  tradeCompositionFacts: "../../data/imports/trade-composition-annual.csv",
   regionalEconomyFacts: "../../data/imports/regional-economies-annual.csv",
   demographyPopulationFacts: "../../data/imports/demography-population-annual.csv",
   demographyDensityFacts: "../../data/imports/demography-density-annual.csv",
@@ -82,6 +85,8 @@ export const SERVED_DATA_FILES = {
   demographyFertilityFacts: "../../data/imports/demography-fertility-age-annual.csv",
   demographyStructureFacts: "../../data/imports/demography-structure-annual.csv",
   demographyCensusFacts: "../../data/imports/demography-census-2024-population.csv",
+  demographyMidYearFacts: "../../data/imports/demography-mid-year-annual.csv",
+  demographyMarriageFacts: "../../data/imports/demography-marriage-annual.csv",
   inflationCpiFacts: "../../data/imports/cpi-national-monthly.csv",
   inflationTargets: "../../data/imports/nbg-inflation-target.csv",
   inflationCategoryFacts: "../../data/imports/cpi-categories-monthly.csv",
@@ -479,6 +484,7 @@ export function resetServedDataCacheForTests(): void {
   resetRegionalEconomyCacheForTests();
   resetDemographyCacheForTests();
   resetInflationCacheForTests();
+  resetTradeCompositionCacheForTests();
 }
 
 export function loadServedLandingData(): Promise<LandingData> {

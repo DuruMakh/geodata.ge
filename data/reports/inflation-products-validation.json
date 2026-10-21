@@ -1,5 +1,5 @@
 {
-  "latestPeriod": "2026-08",
+  "latestPeriod": "2026-09",
   "includedProducts": 305,
   "sourceRowsRead": 4778,
   "rosterByYear": {
@@ -22,20 +22,20 @@
   },
   "languageParity": "PASS",
   "sourceHashes": {
-    "en/products-mom.xlsx": "26d9b429229cbad2ad6ee2bbefd5e86f52d4482d49abdcc14e270d4a956dcf20",
-    "en/products-yoy.xlsx": "ec9cd520693db0479f7fd576f0d2f4cfa65c9c9ba607c46ec7679e13b900faf9",
-    "ka/products-mom.xlsx": "7154963abfe05c0f8e5edd953ef0fb91274fde4911ce0a45eac7f3efc02bbd9c",
-    "ka/products-yoy.xlsx": "c4f87ab0b44d94538d7a0783371c28d639359977d8d00d12dcf588fa4b9390df"
+    "en/products-mom.xlsx": "ec596f4daa4dfb3256387298268ba9824d808752fbb96e4e0a4e62bf3900900a",
+    "en/products-yoy.xlsx": "1a9876bac321b40b1213f1e21978398c1c919d6a1c32bf6e481a77c7274fb0ff",
+    "ka/products-mom.xlsx": "835a70e49c5f46f6d632a9d350610d4053aff77b455f8db2472fa9b3def5672f",
+    "ka/products-yoy.xlsx": "5239bffbeb6549a9c455e1416ec5c627dbedd231f8426266d534ac33621f069c"
   },
   "reviewedLinks": 29,
   "reviewedSplits": 18,
   "sourceRowsOutsideCurrentTrace": 1174,
   "excludedSourceRowsSince2015": 37,
   "reviewedRevisions": [],
-  "factCount": 84056,
-  "publishedCells": 83880,
+  "factCount": 84666,
+  "publishedCells": 84490,
   "unavailableCells": 176,
-  "arithmeticChecked": 41830,
+  "arithmeticChecked": 42135,
   "arithmeticPriorYearChecked": 3157,
   "arithmeticUncomparable": 22,
   "maxArithmeticError": 0.00061239483704408,

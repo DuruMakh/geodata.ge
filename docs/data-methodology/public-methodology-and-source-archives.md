@@ -61,6 +61,8 @@ Every status still requires non-empty `license_id` and `attribution_text`. Gener
 
 Validation rejects missing or extra inventory rows, duplicate IDs or public paths, path traversal, absolute or symlinked paths, paths outside the repository or category download root, non-ASCII/unstable public paths, missing files, byte-size or SHA-256 drift, blank attribution, unknown date bases, and unapproved redistribution statuses.
 
+Every archived web page (`text/html` or `application/xhtml+xml`, or any public path ending in `.html`, `.htm` or `.xhtml`) is published as `.html.txt`, which validation enforces, and every non-PDF archived original under `/downloads/methodology/:dataset/files/` is served sandboxed (`Content-Security-Policy: sandbox; default-src 'none'`), so a captured page's scripts never run on fiscal.ge. PDFs are left out of the sandbox so browser PDF viewers can still open them; every archived original stays `noindex, follow`.
+
 ## Deterministic generated outputs
 
 Run archive commands from `apps/web`:
@@ -84,6 +86,25 @@ For every category:
 - two clean generations must have identical output membership, byte sizes, and SHA-256 values.
 
 Both `predev` and `prebuild` run the write alias automatically. The entire generated download tree and `data/reports/*.json` are ignored build artifacts, not a second source of truth; they must remain unstaged.
+
+The municipal MCP calculation evidence reuses the existing municipal originals and
+eleven Treasury revenue forms (2015–2025). Logical derived sources compose these
+reviewed sets without creating duplicate manifest entries or changing original bytes,
+hashes or public paths. Country evidence includes all 69 constituent budgets;
+municipal and regional evidence remains scoped to eligible members and the reviewed year.
+
+The existing 2015 expenditure workbook also supplies the reviewed 2014 ministry
+actuals from column 4. Its manifest coverage is `2014-2015`, so a 2014 source
+lookup matches that original. Its 2015 publication title, filename, bytes and
+source-cell mapping remain unchanged.
+
+Inflation city source lookup uses the six registered cities and the source IDs on
+their reviewed facts to retain shared CPI workbooks; dataset and document-year
+constraints still apply. Source lookup reports whether filters were absent,
+applied (even if the list stayed the same), dropped because no document matched,
+or left unapplied to preserve a derived calculation's complete inputs. The last
+case is `preserved_derived`; readable output explains all four cases in Georgian
+and English, with the requested filters and original/returned document counts.
 
 ## Adding or updating a source year
 

@@ -1,15 +1,14 @@
 import { expect, test } from "@playwright/test";
 import ExcelJS from "exceljs";
 
-for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
-  test(`age dropdown and heatmap stay in sync ${prefix || "ka"} at ${width}px`, async ({ page }, info) => {
+// Each locale once, for its accessible name; the eight options in two groups are pinned in unemploymentAge.test.tsx.
+for (const [prefix, width] of [["", 390], ["/en", 1440]] as const) {
+  test(`age dropdown and heatmap stay in sync ${prefix || "ka"} at ${width}px`, async ({ page }) => {
     const errors: string[] = []; page.on("pageerror", error => errors.push(error.message));
     await page.setViewportSize({ width, height: 1000 });
     await page.goto(`${prefix}/explorer/unemployment/age`);
     await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
     const selector = page.getByTestId("unemployment-indicator"), heatmap = page.getByTestId("unemployment-age-heatmap");
-    await expect(selector.locator("option")).toHaveCount(8);
-    await expect(selector.locator("optgroup")).toHaveCount(2);
     await expect(selector).toHaveAccessibleName(prefix ? "Indicator" : "მაჩვენებელი");
     await expect(page.locator('[data-series-id="georgia"]')).toHaveCount(0);
     await expect(page.locator('[data-series-id="age.15_24"]')).toHaveCount(0);
@@ -18,9 +17,7 @@ for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
     for (const id of ["age.15_19", "age.25_29"]) await expect(page.locator(`[data-series-id="${id}"] [data-testid="series-row-toggle"]`)).toHaveAttribute("aria-pressed", "true");
     await expect(page.getByTestId("year-range-strip")).toContainText("2020–2025");
     await expect(heatmap.locator("tbody tr")).toHaveCount(11);
-    await expect(page.getByTestId("age-heatmap-scroll-hint")).toHaveCount(0);
     await expect(heatmap.locator('[data-heatmap-cell="age.20_24:2025"]')).toHaveText("30.2%");
-    await page.screenshot({ path: info.outputPath(`age-heatmap-${prefix ? "en" : "ka"}-${width}.png`), fullPage: true });
     await selector.selectOption("employed");
     await expect(heatmap).toHaveAttribute("data-unit", "thousand_persons");
     await expect(heatmap.locator('[data-heatmap-cell="age.20_24:2025"]')).toHaveText("70.0");

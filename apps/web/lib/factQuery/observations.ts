@@ -109,7 +109,7 @@ export function uniqueSorted(values: readonly string[]): string[] {
  *
  * `entityCodes` is the set whose own published workbook stands behind this
  * row: one code for a municipality row, its member codes for a region row,
- * every served code for the country row. A document naming a municipality
+ * all 69 constituent codes for the country row. A document naming a municipality
  * outside that set is not an original supporting this figure, and citing it
  * makes a false provenance claim (spec section 7.2).
  *
@@ -163,8 +163,8 @@ export function resolveDocumentIds(
       owner = namedMunicipality(document.documentId, scope.allCodes);
       codeOwners.set(document.documentId, owner);
     }
-    // Names a municipality: keep it only for the entities this row covers.
-    if (owner !== undefined) return scope.entityCodes.includes(owner);
+    // Names a municipality: require its entity AND the reviewed year below.
+    if (owner !== undefined && !scope.entityCodes.includes(owner)) return false;
     // Names none: a cross-municipality workbook, narrowed by its reviewed
     // `years` field. An empty `years` means the metadata does not record
     // coverage, so the document is kept rather than dropped on a guess.
@@ -180,10 +180,8 @@ export function resolveDocumentIds(
     // then show nothing to look at - worse than showing an imprecise
     // original. Fall back to everything the source archives.
     //
-    // This is reachable: source.treasury_consolidated_revenue_actual is cited
-    // on region.adjara for 2016-2025 but archives only a 2015 form. The
-    // fallback keeps that visible rather than silently dropping it, so the
-    // underlying metadata gap stays inspectable instead of disappearing.
+    // Known municipal 2015–2025 inputs resolve completely; retain this
+    // inspectable fallback for genuinely incomplete future metadata.
     for (const document of supported.length > 0 ? supported : documents) {
       if (seen.has(document.documentId)) continue;
       seen.add(document.documentId);

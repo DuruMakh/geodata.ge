@@ -5,6 +5,7 @@ export const MONEY_BANKS_METHODOLOGY_CONTENT: MethodologyContent = {
   "slug": "money",
   "title": "Money and banks",
   "summary": "Georgia’s money supply, bank loans and deposits in lari and foreign currency, interest rates and bank-health measures, year by year, from National Bank of Georgia data.",
+  "metaDescription": "Georgia’s money supply, bank loans and deposits, interest rates and bank-health measures, year by year, from National Bank of Georgia data.",
   "reviewedAt": "2026-10-11",
   "archiveManifestId": "money",
   "coverageSource": {

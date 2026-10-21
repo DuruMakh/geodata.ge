@@ -3,15 +3,12 @@
 import Link from "next/link";
 import { useMemo, useRef, useState } from "react";
 import { MAP_NO_DATA_FILL, MAP_NO_DATA_STROKE, MAP_RAMP } from "../../lib/explorer/colors";
-import { mapTouchTargets, pathBounds } from "../../lib/explorer/mapTouchTargets";
+import { pathBounds } from "../../lib/explorer/mapTouchTargets";
 import type { RegionalEconomyMapModel, RegionMapModel } from "../../lib/explorer/regionalEconomyMap";
-import { regionalEconomyHref } from "../../lib/explorer/regionalEconomyRoutes";
-import { formatAmount } from "../../lib/explorer/format";
 import { useI18n } from "../../lib/i18n/provider";
-import { message } from "../../lib/i18n/messages";
 import { publicLabel } from "../../lib/i18n/labels";
 import { pageHref } from "../../lib/i18n/routes";
-import { useTouchPreview } from "../explorer-shell/use-touch-preview";
+import { useMapTouchDisks, useTouchPreview } from "../explorer-shell/use-touch-preview";
 
 export type RegionMapMetric = {
   /** Absent, the regions are plain shapes and rows: no links, no tab stops, no touch preview (used only by Age and sex). */
@@ -33,15 +30,6 @@ export function regionalEconomyMapData(model: RegionalEconomyMapModel): RegionMa
   return { ...model, regions: model.regions.map(region => ({ ...region, value: region.totalGdpGel })), legendMin: model.legendMinGel, legendMax: model.legendMaxGel };
 }
 
-export function RegionalEconomyMap({ model, activeRegionId, onActiveRegionChange }: Omit<Props, "model" | "metric"> & { model: RegionalEconomyMapModel }) {
-  const { locale, messages } = useI18n();
-  return <RegionMap model={regionalEconomyMapData(model)} activeRegionId={activeRegionId} onActiveRegionChange={onActiveRegionChange} metric={{
-    hrefForRegion: regionalEconomyHref, formatValue: value => formatAmount(value, locale), mapAria: message(messages, "regionalEconomies.mapAria", { year: model.year }),
-    entityAria: (name, value, year) => message(messages, "regionalEconomies.mapEntityAria", { name, amount: formatAmount(value, locale), year }),
-    legend: message(messages, "regionalEconomies.legend"), testId: "regional-economy-map",
-  }} />;
-}
-
 export function RegionMap({ model, activeRegionId, onActiveRegionChange, metric }: Props) {
   const { locale, englishLabels } = useI18n();
   const hatchId = `${metric.testId}-no-data-hatch`;
@@ -52,10 +40,9 @@ export function RegionMap({ model, activeRegionId, onActiveRegionChange, metric 
   const linkFor = metric.hrefForRegion;
   const hrefFor = (regionId: string) => pageHref(linkFor!(regionId), locale);
   const labelFor = (region: RegionMapModel["regions"][number]) => publicLabel(locale, region.regionId, region.nameKa, englishLabels);
-  const touchTargets = useMemo(
-    () => mapTouchTargets(model.regions.map((region) => ({ id: region.regionId, bounds: pathBounds(region.pathD) })), Number(model.viewBox.split(" ")[2])),
-    [model.regions, model.viewBox],
-  );
+  const svgRef = useRef<SVGSVGElement>(null);
+  const targetBounds = useMemo(() => model.regions.map((region) => ({ id: region.regionId, bounds: pathBounds(region.pathD) })), [model.regions]);
+  const touchTargets = useMapTouchDisks(svgRef, targetBounds, model.viewBox).disks;
   const previewRegion = model.regions.find((region) => region.regionId === preview.previewId) ?? null;
   const move = (index: number, key: string) => {
     if (key === "ArrowRight" || key === "ArrowDown") return (index + 1) % model.regions.length;
@@ -68,6 +55,7 @@ export function RegionMap({ model, activeRegionId, onActiveRegionChange, metric 
   return (
     <div data-testid={metric.testId}>
       <svg
+        ref={svgRef}
         viewBox={model.viewBox}
         role="group"
         aria-label={metric.mapAria}
@@ -138,6 +126,24 @@ export function RegionMap({ model, activeRegionId, onActiveRegionChange, metric 
             </a>
           );
         })}
+        {/* A region without a value is drawn in the no-data fill; its list row links to its page. */}
+        {(model.withoutValue ?? []).map((region) => (
+          <path
+            key={region.regionId}
+            data-testid="regional-map-path"
+            data-region-id={region.regionId}
+            data-no-value=""
+            d={region.pathD}
+            fill={MAP_NO_DATA_FILL}
+            fillRule="evenodd"
+            clipRule="evenodd"
+            stroke={region.regionId === activeRegionId ? "var(--ink)" : "var(--hairline-soft)"}
+            strokeWidth={region.regionId === activeRegionId ? 2.2 : 0.7}
+            strokeLinejoin="round"
+            pointerEvents="none"
+            aria-hidden="true"
+          />
+        ))}
         {/* Fingertip-sized hit areas for regions smaller than 24px on a phone
             (Tbilisi). Coarse pointers only, so mouse hover and clicks are unchanged;
             hidden from assistive technology, which reaches the region's own link. */}
@@ -176,6 +182,7 @@ export function RegionMap({ model, activeRegionId, onActiveRegionChange, metric 
         {linkFor && previewRegion ? (
           <Link
             href={hrefFor(previewRegion.regionId)}
+            prefetch={false}
             data-testid="map-touch-preview"
             className="mt-2 flex min-h-11 items-center justify-between gap-3 border-t border-[var(--hairline-soft)] text-[13px] text-[var(--ink)]"
           >

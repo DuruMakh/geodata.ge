@@ -30,6 +30,16 @@ describe("packaged snapshot", () => {
     expect(result.kind).toBe("observations");
   });
 
+  // Pretty-printing made the bundled file 46 MB instead of 32 MB, and every
+  // cold start read and parsed the whitespace (U30-02).
+  it("the packaged snapshot has no indentation", async () => {
+    const { readFile } = await import("node:fs/promises");
+    const text = await readFile("lib/factQuery/generated/snapshot.json", "utf8");
+
+    expect(text.startsWith("{\"")).toBe(true);
+    expect(text.trimEnd()).not.toContain("\n");
+  });
+
   it("is traced into the /mcp function bundle", async () => {
     // The artifact is written by prebuild and read at request time rather than
     // imported, so Next cannot see it statically. Without this entry the

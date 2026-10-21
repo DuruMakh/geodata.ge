@@ -1,11 +1,12 @@
 import { beforeAll, describe, expect, it } from "vitest";
-import { buildFactQuerySnapshot } from "../../lib/factQuery/buildSnapshot";
+import { testSnapshot } from "../helpers/factQuerySnapshot";
 import { describeCoverage, type CoverageData } from "../../lib/factQuery/describeCoverage";
 import { getSources, type GetSourcesData } from "../../lib/factQuery/getSources";
+import { inflationProductCatalogue } from "../../lib/factQuery/inflationProductData";
 import type { FactQuerySnapshot } from "../../lib/factQuery/types";
 
 let real: FactQuerySnapshot;
-beforeAll(async () => { real = await buildFactQuerySnapshot({ releaseCommit: "test", generatedAt: "2026-10-01T00:00:00Z" }); });
+beforeAll(async () => { real = testSnapshot({ releaseCommit: "test", generatedAt: "2026-10-01T00:00:00Z" }); });
 const catalogue = (snapshot: FactQuerySnapshot, input: unknown): CoverageData => {
   const result = describeCoverage(snapshot, input);
   if (result.kind !== "catalogue") throw new Error(JSON.stringify(result));
@@ -13,6 +14,29 @@ const catalogue = (snapshot: FactQuerySnapshot, input: unknown): CoverageData =>
 };
 
 describe("product discovery", () => {
+  it("reuses one snapshot catalogue without exposing shared mutable arrays", () => {
+    const snapshot = { ...real, inflationProducts: { ...real.inflationProducts } };
+    const facts = snapshot.inflationProducts.facts;
+    let reads = 0;
+    Object.defineProperty(snapshot.inflationProducts, "facts", { get() { reads++; return facts; } });
+    const expected = inflationProductCatalogue(snapshot);
+    const initialReads = reads;
+    const warm = inflationProductCatalogue(snapshot);
+    expect(warm).toEqual(expected);
+    expect(reads).toBe(initialReads);
+    warm[0]!.years.push(9999);
+    warm[0]!.yearsByMeasure.yoy_pct!.push(9999);
+    warm[0]!.periodsByMeasure.yoy_pct![0] = "9999-01";
+    warm[0]!.measures.splice(0);
+    warm[0]!.labelEn = "mutated";
+    const noted = warm.find(row => row.historyNotes?.length)!;
+    noted.historyNotes![0]!.noteEn = "mutated";
+    warm.pop();
+    expect(inflationProductCatalogue(snapshot)).toEqual(expected);
+    const second = { ...snapshot, inflationProducts: { ...snapshot.inflationProducts, facts: facts.filter(row => row.productId !== expected[0]!.seriesId) } };
+    expect(inflationProductCatalogue(second)[0]!.availability).toBe("taxonomy_only");
+    expect(inflationProductCatalogue(snapshot)[0]!.availability).toBe("served");
+  });
   it("finds the same reviewed product by Georgian, English and stable ID", () => {
     const product = real.inflationProducts.catalogue[0]!;
     for (const search of [product.labelKa, product.labelEn, product.productId]) {
@@ -27,7 +51,7 @@ describe("product discovery", () => {
   it("returns the entire compact catalogue with reviewed notes and conditional cumulative coverage", () => {
     const result = catalogue(real, { datasetId: "inflation-products" });
     expect(result.series).toHaveLength(real.inflationProducts.catalogue.length);
-    expect(result.datasets[0]?.periods).toEqual(["2015-01", "2026-08"]);
+    expect(result.datasets[0]?.periods).toEqual(["2015-01", "2026-09"]);
     expect(result.datasets[0]?.measureNotesEn?.cumulative_pct).toMatch(/startYear.*complete|complete.*startYear/);
     const noted = result.series?.find(row => row.seriesId === "cpi.product.p0088") as { historyNotes?: { noteKa: string; noteEn: string }[] };
     expect(noted.historyNotes?.some(note => note.noteEn.includes("generic mineral water") && note.noteKa.length > 0)).toBe(true);

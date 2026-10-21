@@ -41,9 +41,9 @@ describe("readGeostatCpiCategories", () => {
   it("rebases the =100 index to percentage change", async () => {
     const series = await categories("en", "yoy");
     const transport = series.find((row) => row.coicopCode === "7" && row.level === 2)!;
-    const last = transport.cells.at(-1)!;
-    expect(periodKey(last.period)).toBe("2026-08");
-    expect(Number(last.value)).toBeCloseTo(15.2, 1);
+    const august = transport.cells.find((cell) => periodKey(cell.period) === "2026-08")!;
+    expect(Number(august.value)).toBeCloseTo(15.2, 1);
+    expect(periodKey(transport.cells.at(-1)!.period)).toBe("2026-09");
   });
 
   it("tolerates discontinued and late-starting categories", async () => {

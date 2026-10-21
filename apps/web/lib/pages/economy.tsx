@@ -1,5 +1,6 @@
 import { loadServedGdpOverviewData } from "../data/gdpOverview/importGdpOverview";
 import { loadServedEconomicSectorsData } from "../data/economicSectors/importEconomicSectors";
+import { loadServedGdpExpenditureData } from "../data/gdpExpenditure/importGdpExpenditure";
 import { loadServedRegionalEconomyData, REGIONAL_ECONOMY_REGIONS } from "../data/regionalEconomies/importRegionalEconomies";
 import { getPresentation } from "../i18n/presentation.server";
 import { message } from "../i18n/messages";
@@ -13,16 +14,17 @@ export async function economyPageMetadata(locale: Locale) {
   return fiscalMetadata({
     locale,
     path: "/explorer/economy",
-    title: `${message(p.messages, "gdp.economy")} | Fiscal.ge`,
-    description: message(p.messages, "gdp.hubDescription"),
+    title: message(p.messages, "gdp.economy"),
+    description: message(p.messages, "gdp.hubMetaDescription"),
   });
 }
 export async function renderEconomyPage(locale: Locale) {
-  const [{ facts }, p, sectors, regional] = await Promise.all([
+  const [{ facts }, p, sectors, regional, expenditure] = await Promise.all([
     loadServedGdpOverviewData(),
-    getPresentation(locale, ["gdp", "common", "sectors", "regionalEconomies"], REGIONAL_ECONOMY_REGIONS.map((region) => region.id)),
+    getPresentation(locale, ["gdp", "sectors", "gdpExpenditure", "regionalEconomies"], REGIONAL_ECONOMY_REGIONS.map((region) => region.id)),
     loadServedEconomicSectorsData(),
     loadServedRegionalEconomyData(),
+    loadServedGdpExpenditureData(),
   ]);
   const t = (k: string) => message(p.messages, `gdp.${k}`);
   return (
@@ -31,7 +33,7 @@ export async function renderEconomyPage(locale: Locale) {
               locale,
               Math.min(...facts.map((f) => f.year)),
               Math.max(...facts.map((f) => f.year)),
-              [...facts, ...sectors.facts, ...regional.facts].map((f) => f.lastReviewedAt).sort().at(-1),
-            )} cards={buildEconomyHubCards(facts, p, sectors.facts, regional.facts)} testId="economy-hub" />
+              [...facts, ...sectors.facts, ...expenditure.facts, ...regional.facts].map((f) => f.lastReviewedAt).sort().at(-1),
+            )} cards={buildEconomyHubCards(facts, p, sectors.facts, regional.facts, expenditure.facts)} testId="economy-hub" />
   );
 }

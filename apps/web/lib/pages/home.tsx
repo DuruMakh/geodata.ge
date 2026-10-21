@@ -1,7 +1,7 @@
 import { LandingPage } from "../../components/landing/landing-page";
 import { loadServedGeneralGovernmentBalanceData, loadServedGovernmentDebtData, loadServedLandingData, loadServedMunicipalData } from "../data/servedData";
 import { buildLandingModel } from "../landing/landingData";
-import { buildLandingDatasetLinks } from "../landing/landingDatasets";
+import { buildLandingDatasetLinks, landingGdpFigure } from "../landing/landingDatasets";
 import { loadServedGdpOverviewData } from "../data/gdpOverview/importGdpOverview";
 import { loadServedInflationData } from "../data/inflation/importInflation";
 import { loadServedUnemploymentData } from "../data/unemployment/importUnemployment";
@@ -27,7 +27,7 @@ export async function renderHomePage(locale: Locale) {
     loadServedGdpOverviewData(), loadServedInflationData(), loadServedUnemploymentData(), loadServedTradeOverviewData(),
   ]);
   // "inflation" supplies the short month names of the inflation figure's period.
-  const presentation = await getPresentation(locale, ["common", "landing", "inflation", "trade"], [...landingData.glossary.keys(), ...municipalData.municipalities.map(entity => entity.code)]);
+  const presentation = await getPresentation(locale, ["landing", "inflation", "trade"], [...landingData.glossary.keys(), ...municipalData.municipalities.map(entity => entity.code)]);
   const model = buildLandingModel({
     ...landingData,
     municipalities: municipalData.municipalities,
@@ -46,5 +46,5 @@ export async function renderHomePage(locale: Locale) {
   const rootUrl = new URL(pageHref("/", locale), `${resolveSiteUrl()}/`).href;
   const ka = `${resolveSiteUrl()}/`;
   const en = `${resolveSiteUrl()}/en`;
-  return <><link rel="canonical" href={rootUrl} /><link rel="alternate" hrefLang="ka" href={ka} /><link rel="alternate" hrefLang="en" href={en} /><link rel="alternate" hrefLang="x-default" href={ka} /><meta property="og:url" content={rootUrl} /><LandingPage model={model} datasets={datasets} presentation={presentation} /></>;
+  return <><link rel="canonical" href={rootUrl} /><link rel="alternate" hrefLang="ka" href={ka} /><link rel="alternate" hrefLang="en" href={en} /><link rel="alternate" hrefLang="x-default" href={ka} /><meta property="og:url" content={rootUrl} /><LandingPage model={model} datasets={datasets} gdpFigure={landingGdpFigure(gdpData.facts, presentation.messages)} presentation={presentation} /></>;
 }

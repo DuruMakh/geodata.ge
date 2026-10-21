@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { AgeSexSection } from "../../components/demography/age-sex-section";
+import { MarriageSection } from "../../components/demography/marriage-section";
 import { PopulationPlaceExplorer } from "../../components/demography/population-place-explorer";
 import { VitalSection } from "../../components/demography/vital-section";
 import { ExplorerPage } from "../../components/explorer-shell/explorer-page";
@@ -8,34 +9,37 @@ import { BreadcrumbJsonLd } from "../../components/seo/breadcrumb-json-ld";
 import { PageHeader } from "../../components/shell/page-header";
 import { loadServedDemographyData } from "../data/demography/importDemography";
 import { SOURCE_ID } from "../data/demography/series";
-import { MUNICIPAL_COUNTRY_ID } from "../data/municipal/types";
+import { packFacts } from "../data/packedFacts";
 import { loadServedMunicipalData } from "../data/servedData";
 import { ageYears, annualAgeFacts, censusAgeFactsForPlace } from "../explorer/demographyAgeSex";
 import { GEORGIA_PLACE_ID, TBILISI_PLACE_ID, placeLabel } from "../explorer/demographyAreas";
 import {
   POPULATION_PATH,
+  placeIdForRoute,
   placeNeighbours,
   populationHrefById,
-  populationMunicipalityCodeForSlug,
   populationMunicipalitySlugs,
   populationPlaceHref,
+  type PlaceRoute,
 } from "../explorer/demographyPlaceRoutes";
 import { buildPopulationHighlights, buildPopulationModel, placeYears } from "../explorer/demographyPopulation";
 import { buildPopulationIndexModel } from "../explorer/demographyPopulationIndex";
-import { AGE_SEX_PATH, BIRTHS_DEATHS_PATH, DEMOGRAPHY_HUB_PATH } from "../explorer/demographyRoutes";
+import { marriageFactsForPlace } from "../explorer/demographyMarriage";
+import { AGE_SEX_PATH, BIRTHS_DEATHS_PATH, DEMOGRAPHY_HUB_PATH, MARRIAGES_DIVORCES_PATH } from "../explorer/demographyRoutes";
 import { vitalFactsForPlace } from "../explorer/demographyVital";
 import { formatInUnit, UNIT_PERSONS } from "../explorer/format";
-import { pickerGroupsFromRows } from "../explorer/municipalData";
+import { buildPickerCountry, pickerGroupsFromRows } from "../explorer/municipalData";
 import { municipalRankLabel } from "../explorer/municipalLabels";
 import { message } from "../i18n/messages";
 import { I18nProvider } from "../i18n/provider";
+import { clientPresentation } from "../i18n/presentation.server";
 import { pageHref } from "../i18n/routes";
 import type { Locale, TemplateValues } from "../i18n/types";
 import { fiscalMetadata } from "../seo/metadata";
 import { resolveSiteUrl } from "../siteUrl";
 import { loadPopulationBasics, loadPopulationSources, loadTbilisiAreaLabel, populationSourceNote } from "./demography-population";
 
-export type PopulationPlaceRoute = { kind: "country" } | { kind: "region"; id: string } | { kind: "municipality"; slug: string };
+export type PopulationPlaceRoute = PlaceRoute;
 
 export async function populationRegionParams() {
   const { regions } = await loadServedMunicipalData();
@@ -46,30 +50,28 @@ export function populationMunicipalityParams() {
   return populationMunicipalitySlugs().map((slug) => ({ slug }));
 }
 
-/** The place a route names, or null: Georgia, `region.{id}`, or the municipality behind a slug (never Tbilisi's). */
-function placeIdFor(route: PopulationPlaceRoute): string | null {
-  if (route.kind === "country") return GEORGIA_PLACE_ID;
-  if (route.kind === "region") return `region.${route.id}`;
-  return populationMunicipalityCodeForSlug(route.slug);
-}
-
-function workbookScopeFor(route: PopulationPlaceRoute): string {
+export function workbookScopeFor(route: PopulationPlaceRoute): string {
   if (route.kind === "country") return "georgia";
   return route.kind === "region" ? `region-${route.id}` : route.slug;
 }
 
 export async function populationPlaceMetadata(route: PopulationPlaceRoute, locale: Locale) {
   const { clientFacts, presentation, places } = await loadPopulationBasics(locale);
-  const place = places.find((candidate) => candidate.id === placeIdFor(route));
+  const place = places.find((candidate) => candidate.id === placeIdForRoute(route));
   if (!place) notFound();
   const years = placeYears(clientFacts, place);
   const t = (key: string, values?: TemplateValues) => message(presentation.messages, `demography.${key}`, values);
   const name = placeLabel(place, locale);
+  const span = { name, first: years[0]!, last: years.at(-1)! };
+  // A municipality's page names its region and has no census age section; Georgia's and a region's carry both.
+  const region = places.find((candidate) => candidate.id === place.regionId);
   return fiscalMetadata({
     locale,
     path: populationPlaceHref(place.id),
-    title: `${t("placeMetaTitle", { name })} | Fiscal.ge`,
-    description: t("placeMetaDescription", { name, first: years[0]!, last: years.at(-1)! }),
+    title: t("placeMetaTitle", { name }),
+    description: region
+      ? t("placeMunicipalityMetaDescription", { ...span, region: placeLabel(region, locale) })
+      : t("placeMetaDescription", span),
   });
 }
 
@@ -79,7 +81,7 @@ export async function renderPopulationPlacePage(route: PopulationPlaceRoute, loc
     loadPopulationSources(locale),
     loadServedDemographyData(),
   ]);
-  const place = places.find((candidate) => candidate.id === placeIdFor(route));
+  const place = places.find((candidate) => candidate.id === placeIdForRoute(route));
   if (!place) notFound();
   // Only the two Population originals go to the browser; the loader returns the whole demography manifest.
   const populationSources = sources.filter((source) => source.sourceId === SOURCE_ID.populationUnits || source.sourceId === SOURCE_ID.density);
@@ -88,6 +90,10 @@ export async function renderPopulationPlacePage(route: PopulationPlaceRoute, loc
     source.sourceId === SOURCE_ID.births || source.sourceId === SOURCE_ID.deaths || source.sourceId === SOURCE_ID.naturalIncrease);
   // Only this place's births, deaths and natural increase go to the browser.
   const vitalFacts = vitalFactsForPlace(served.facts, place.id);
+  // Likewise its marriages, divorces and mid-year population, with the two counts' originals and the population they divide by.
+  const marriageFacts = marriageFactsForPlace(served.facts, place.id);
+  const marriageSources = sources.filter((source) =>
+    source.sourceId === SOURCE_ID.marriages || source.sourceId === SOURCE_ID.divorces || source.sourceId === SOURCE_ID.midYear);
   const { messages } = presentation;
   const t = (key: string, values?: TemplateValues) => message(messages, `demography.${key}`, values);
   const years = placeYears(clientFacts, place);
@@ -147,7 +153,7 @@ export async function renderPopulationPlacePage(route: PopulationPlaceRoute, loc
       : [];
 
   return (
-    <I18nProvider {...presentation}>
+    <I18nProvider {...clientPresentation(presentation)}>
       <BreadcrumbJsonLd
         items={[
           { name: crumbs[0].label, path: pageHref("/", locale) },
@@ -158,16 +164,16 @@ export async function renderPopulationPlacePage(route: PopulationPlaceRoute, loc
         ]}
       />
       <ExplorerPage testId="explorer-shell">
-        <PageHeader crumbs={crumbs} coverage={t("coverage", { first, last })} />
+        <PageHeader locale={locale} messages={presentation.messages} crumbs={crumbs} coverage={t("coverage", { first, last })} />
         <PopulationPlaceExplorer
           key={place.id}
           place={place}
           places={places}
-          facts={clientFacts}
+          facts={packFacts(clientFacts)}
           title={t("placeHeading")}
           metaLine={metaLine}
           navigation={navigation}
-          pickerCountry={{ id: MUNICIPAL_COUNTRY_ID, nameKa: "საქართველო", valueGel: index.country.valueGel, budgetCount: georgia.municipalityCount }}
+          pickerCountry={buildPickerCountry(index.country.valueGel, georgia.municipalityCount)}
           pickerGroups={pickerGroupsFromRows(index)}
           pickerOverrides={{
             hrefById: populationHrefById(places),
@@ -190,6 +196,14 @@ export async function renderPopulationPlacePage(route: PopulationPlaceRoute, loc
           siteOrigin={resolveSiteUrl()}
           workbookScope={workbookScopeFor(route)}
           nationalHref={BIRTHS_DEATHS_PATH}
+        />
+        <MarriageSection
+          place={place}
+          facts={marriageFacts}
+          sources={marriageSources}
+          siteOrigin={resolveSiteUrl()}
+          workbookScope={workbookScopeFor(route)}
+          nationalHref={MARRIAGES_DIVORCES_PATH}
         />
         <AgeSexSection
           place={place}

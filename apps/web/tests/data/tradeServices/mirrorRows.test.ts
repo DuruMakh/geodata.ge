@@ -15,13 +15,13 @@ async function fixture() {
 
 test("round-trips all accepted identities, values, nulls, native dash and source metadata", async () => {
   const { csv, entities, facts, db } = await fixture();
-  expect(entities).toHaveLength(13); expect(facts).toHaveLength(258);
+  expect(entities).toHaveLength(166); expect(facts).toHaveLength(2557);
   const mirror = await loadTradeServicesDataFromMirror(db);
   assertTradeServicesParity(csv, mirror);
   expect(mirror.entities).toEqual(csv.entities);
   for (const [index, fact] of mirror.facts.entries()) expect(fact).toEqual({ ...csv.facts[index], valueUsd: csv.facts[index].valueUsd === null ? null : new Decimal(csv.facts[index].valueUsd!).toFixed() });
-  expect(mirror.facts.filter(f => f.role === "derived")).toHaveLength(128);
-  expect(mirror.facts.find(f => f.valueStatus === "not_applicable")).toMatchObject({ entityId: "services.maintenance_repair", year: 2020, indicatorId: "trade.exports", valueUsd: null, sourceValue: "-" });
+  expect(mirror.facts.filter(f => f.role === "derived")).toHaveLength(1142);
+  expect(mirror.facts.find(f => f.entityId === "services.maintenance_repair" && f.valueStatus === "not_applicable")).toMatchObject({ entityId: "services.maintenance_repair", year: 2020, indicatorId: "trade.exports", valueUsd: null, sourceValue: "-" });
   expect(mirror.facts.some(f => new Decimal(f.valueUsd ?? 0).isNegative())).toBe(true);
   expect(entities.every(row => row.importRunId === "services-run")).toBe(true);
   for (const row of facts) {
@@ -147,7 +147,7 @@ test("CSV serving caches acceptance-checked data and leaves the database unloade
   const { loadServedTradeServicesData } = await import("../../../lib/data/tradeServices/importTradeServices");
   const first = loadServedTradeServicesData();
   expect(loadServedTradeServicesData()).toBe(first);
-  expect((await first).facts).toHaveLength(258);
+  expect((await first).facts).toHaveLength(2557);
   expect(dbLoad).not.toHaveBeenCalled();
 });
 test.each([false, true])("DB serving verifies complete accepted parity (mismatch=%s)", async mismatch => {

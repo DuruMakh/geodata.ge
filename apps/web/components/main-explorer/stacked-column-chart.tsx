@@ -7,6 +7,7 @@ import { CHART_AXIS_LABEL, CHART_LATTICE, INK } from "../../lib/explorer/colors"
 import { buildDotLattice, type DotLattice } from "../../lib/explorer/dotLattice";
 import { formatInUnit } from "../../lib/explorer/format";
 import { periodLabelIndices } from "../../lib/explorer/periodAxis";
+import { SwatchBar } from "../ui/editorial";
 import {
   ChartScrollFrame,
   ChartTooltip,
@@ -50,8 +51,14 @@ export type StackedColumnChartProps = {
   /** Tightens the float readout's rows so a dozen of them fit the plot's height. */
   compactReadout?: boolean;
   ariaLabel: string;
+  /** The scroll frame's landmark name, for a page whose other chart already has the default one. */
+  frameLabel?: string;
   /** Periods per calendar year on the x axis: 12 for months (default), 1 for years. */
   periodsPerYear?: number;
+  /** A colour key drawn as a swatch row above the plot, so colour is never the only cue (DESIGN.md §13); none when absent or empty. */
+  legend?: { id: string; label: string; color: string }[];
+  /** Counting changes drawn as a dashed rule before their period, as the line chart draws them; none when absent. */
+  breaks?: ReadonlyArray<{ period: number; label: string }>;
 };
 
 const W = 920;
@@ -100,7 +107,7 @@ export function buildStackReadout(
 ): { rows: TooltipRow[]; hidden: number } {
   const byId = new Map(segments.map((segment) => [segment.id, segment]));
   const ranked = buildTooltipRows(
-    segments.map((segment) => ({ id: segment.id, label: segment.label, color: segment.color, vals: segment.values, planned: [] })),
+    segments.map((segment) => ({ id: segment.id, label: segment.label, color: segment.color, vals: segment.values })),
     hover,
     order === "value" ? cap : Number.POSITIVE_INFINITY,
   );
@@ -142,7 +149,10 @@ export function StackedColumnChart({
   readoutRowCap = TOOLTIP_ROW_CAP,
   compactReadout = false,
   ariaLabel,
+  frameLabel,
   periodsPerYear = 12,
+  legend,
+  breaks,
 }: StackedColumnChartProps) {
   const captionId = useId();
   const { ref: layoutRef, mobileWidth } = useChartLayout<HTMLElement>();
@@ -395,6 +405,22 @@ export function StackedColumnChart({
           <line data-hover-guide x1={x(hover)} x2={x(hover)} y1={PAD_T - 6} y2={height - PAD_B} stroke={CHART_LATTICE} strokeWidth={1} />
         ) : null}
 
+        {(breaks ?? []).map((entry) => {
+          // A break needs the period before it on the axis; a range that starts at it has nothing to separate.
+          const index = periods.indexOf(entry.period);
+          if (index < 1) return null;
+          const bx = px(x(index) - band / 2);
+          const toTheLeft = bx > width / 2;
+          return (
+            <g key={`break-${entry.period}`} data-testid="chart-break">
+              <line x1={bx} x2={bx} y1={PAD_T} y2={height - PAD_B} stroke={CHART_AXIS_LABEL} strokeWidth={1} strokeDasharray="4 3" />
+              <text x={toTheLeft ? bx - 5 : bx + 5} y={PAD_T + 10} fontSize={FONT} fill={CHART_AXIS_LABEL} textAnchor={toTheLeft ? "end" : "start"} style={{ fontFamily: "var(--font-numeric)" }}>
+                {entry.label}
+              </text>
+            </g>
+          );
+        })}
+
         {overlayPath !== null && overlayPath !== "" && (
           <path data-overlay d={overlayPath} fill="none" stroke={INK} strokeWidth={1.5} />
         )}
@@ -427,8 +453,19 @@ export function StackedColumnChart({
     // role="img" belongs on the svg, not the figure: it is children-presentational,
     // so on the figure it would hide the sr-only figcaption that carries the numbers.
     <figure ref={layoutRef} className="m-0">
+      {legend?.length ? (
+        <ul data-testid="stack-chart-legend" className="mb-3 flex flex-wrap gap-x-4 gap-y-1.5 text-[0.6875rem] text-[var(--muted)]">
+          {legend.map((entry) => (
+            <li key={entry.id} data-legend-series-id={entry.id} className="flex min-w-0 items-center gap-2">
+              <SwatchBar color={entry.color} />
+              <span className="min-w-0 break-words">{entry.label}</span>
+            </li>
+          ))}
+        </ul>
+      ) : null}
       <ChartScrollFrame
         testId="stack-chart-frame"
+        label={frameLabel}
         scrollKey={scrollKey}
         fit={active.mobile}
         yAxis={active.mobile ? undefined : stickyAxis}

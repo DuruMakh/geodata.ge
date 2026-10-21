@@ -1,7 +1,7 @@
 import { prepareGeneralGovernmentBalance } from "../lib/data/generalGovernmentBalance/prepareGeneralGovernmentBalance";
+import { runAsCli } from "../lib/runAsCli";
 
-async function main() {
-  const args = process.argv.slice(2);
+export async function main(args: readonly string[]) {
   if (args.length !== 1 || !["--write", "--check"].includes(args[0])) {
     throw new Error("Usage: prepare-general-government-balance.ts --write|--check");
   }
@@ -13,7 +13,4 @@ async function main() {
   );
 }
 
-main().catch((error) => {
-  console.error(error);
-  process.exit(1);
-});
+runAsCli(import.meta.url, main);

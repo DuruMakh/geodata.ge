@@ -536,6 +536,714 @@
 2022,energy.supply.wind_solar_geothermal,27.8,27.8,ktoe,actual,published,geostat_energy_balance_2022_aggregated,KTOE,H12,"#,##0.0;[Red]#,##0.0",2026-10-11
 2023,energy.supply.wind_solar_geothermal,27.9,27.9,ktoe,actual,published,geostat_energy_balance_2023_aggregated,KTOE,H12,General,2026-10-11
 2024,energy.supply.wind_solar_geothermal,27.3,27.3,ktoe,actual,published,geostat_energy_balance_2024_aggregated,KTOE,H12,General,2026-10-11
+2006,farming.harvest.apples,32.799999999999997,32.8,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,B5,0.0,2026-10-20
+2007,farming.harvest.apples,101.3,101.3,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,C5,0.0,2026-10-20
+2008,farming.harvest.apples,41.5,41.5,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,D5,0.0,2026-10-20
+2009,farming.harvest.apples,80.7,80.7,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,E5,0.0,2026-10-20
+2010,farming.harvest.apples,21.1,21.1,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,F5,0.0,2026-10-20
+2011,farming.harvest.apples,64.3,64.3,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,G5,0.0,2026-10-20
+2012,farming.harvest.apples,45.012283800109998,45.0,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,H5,0.0,2026-10-20
+2013,farming.harvest.apples,68.599999999999994,68.6,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,I5,0.0,2026-10-20
+2014,farming.harvest.apples,82.3,82.3,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,J5,0.0,2026-10-20
+2015,farming.harvest.apples,25.7,25.7,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,K5,0.0,2026-10-20
+2016,farming.harvest.apples,65.2,65.2,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,L5,0.0,2026-10-20
+2017,farming.harvest.apples,19.7,19.7,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,M5,0.0,2026-10-20
+2018,farming.harvest.apples,82.7,82.7,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,N5,0.0,2026-10-20
+2019,farming.harvest.apples,44.3,44.3,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,O5,0.0,2026-10-20
+2020,farming.harvest.apples,89,89.0,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,P5,0.0,2026-10-20
+2021,farming.harvest.apples,73.7,73.7,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,Q5,0.0,2026-10-20
+2022,farming.harvest.apples,76.7,76.7,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,R5,0.0,2026-10-20
+2023,farming.harvest.apples,50.4,50.4,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,S5,0.0,2026-10-20
+2024,farming.harvest.apples,76.400000000000006,76.4,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,T5,0.0,2026-10-20
+2025,farming.harvest.apples,62.9,62.9,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,U5,0.0,2026-10-20
+2006,farming.harvest.barley,30.6,30.6,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,B7,"#,##0.0",2026-10-20
+2007,farming.harvest.barley,40.299999999999997,40.3,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,C7,"#,##0.0",2026-10-20
+2008,farming.harvest.barley,49.3,49.3,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,D7,"#,##0.0",2026-10-20
+2009,farming.harvest.barley,19.899999999999999,19.9,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,E7,"#,##0.0",2026-10-20
+2010,farming.harvest.barley,23.3,23.3,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,F7,"#,##0.0",2026-10-20
+2011,farming.harvest.barley,30.3,30.3,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,G7,"#,##0.0",2026-10-20
+2012,farming.harvest.barley,20.7,20.7,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,H7,"#,##0.0",2026-10-20
+2013,farming.harvest.barley,35,35.0,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,I7,"#,##0.0",2026-10-20
+2014,farming.harvest.barley,26.7,26.7,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,J7,"#,##0.0",2026-10-20
+2015,farming.harvest.barley,40.9,40.9,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,K7,"#,##0.0",2026-10-20
+2016,farming.harvest.barley,47.2,47.2,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,L7,"#,##0.0",2026-10-20
+2017,farming.harvest.barley,43.9,43.9,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,M7,"#,##0.0",2026-10-20
+2018,farming.harvest.barley,57.7,57.7,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,N7,"#,##0.0",2026-10-20
+2019,farming.harvest.barley,53.5,53.5,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,O7,"#,##0.0",2026-10-20
+2020,farming.harvest.barley,45.4,45.4,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,P7,"#,##0.0",2026-10-20
+2021,farming.harvest.barley,58.1,58.1,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,Q7,"#,##0.0",2026-10-20
+2022,farming.harvest.barley,58.8,58.8,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,R7,"#,##0.0",2026-10-20
+2023,farming.harvest.barley,52.9,52.9,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,S7,"#,##0.0",2026-10-20
+2024,farming.harvest.barley,48.4,48.4,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,T7,"#,##0.0",2026-10-20
+2025,farming.harvest.barley,63.4,63.4,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,U7,"#,##0.0",2026-10-20
+2006,farming.harvest.beans,7.6,7.6,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,B13,"#,##0.0",2026-10-20
+2007,farming.harvest.beans,10.5,10.5,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,C13,"#,##0.0",2026-10-20
+2008,farming.harvest.beans,11.6,11.6,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,D13,"#,##0.0",2026-10-20
+2009,farming.harvest.beans,10.199999999999999,10.2,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,E13,"#,##0.0",2026-10-20
+2010,farming.harvest.beans,5.8,5.8,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,F13,"#,##0.0",2026-10-20
+2011,farming.harvest.beans,8.9,8.9,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,G13,"#,##0.0",2026-10-20
+2012,farming.harvest.beans,9.6,9.6,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,H13,"#,##0.0",2026-10-20
+2013,farming.harvest.beans,10.5,10.5,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,I13,"#,##0.0",2026-10-20
+2014,farming.harvest.beans,7.6,7.6,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,J13,"#,##0.0",2026-10-20
+2015,farming.harvest.beans,5.5,5.5,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,K13,"#,##0.0",2026-10-20
+2016,farming.harvest.beans,5.8,5.8,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,L13,"#,##0.0",2026-10-20
+2017,farming.harvest.beans,5.7,5.7,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,M13,"#,##0.0",2026-10-20
+2018,farming.harvest.beans,5.8,5.8,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,N13,"#,##0.0",2026-10-20
+2019,farming.harvest.beans,5.9,5.9,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,O13,"#,##0.0",2026-10-20
+2020,farming.harvest.beans,5.2,5.2,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,P13,"#,##0.0",2026-10-20
+2021,farming.harvest.beans,4.2,4.2,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,Q13,"#,##0.0",2026-10-20
+2022,farming.harvest.beans,2.9,2.9,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,R13,"#,##0.0",2026-10-20
+2023,farming.harvest.beans,3.7,3.7,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,S13,"#,##0.0",2026-10-20
+2024,farming.harvest.beans,4.2,4.2,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,T13,"#,##0.0",2026-10-20
+2025,farming.harvest.beans,3.4,3.4,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,U13,"#,##0.0",2026-10-20
+2006,farming.harvest.grapes,162.5,162.5,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,B34,0.0,2026-10-20
+2007,farming.harvest.grapes,227.3,227.3,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,C34,0.0,2026-10-20
+2008,farming.harvest.grapes,175.8,175.8,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,D34,0.0,2026-10-20
+2009,farming.harvest.grapes,150.1,150.1,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,E34,0.0,2026-10-20
+2010,farming.harvest.grapes,120.7,120.7,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,F34,0.0,2026-10-20
+2011,farming.harvest.grapes,159.6,159.6,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,G34,0.0,2026-10-20
+2012,farming.harvest.grapes,143.95065792934801,144.0,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,H34,0.0,2026-10-20
+2013,farming.harvest.grapes,222.8,222.8,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,I34,0.0,2026-10-20
+2014,farming.harvest.grapes,172.6,172.6,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,J34,0.0,2026-10-20
+2015,farming.harvest.grapes,214.5,214.5,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,K34,0.0,2026-10-20
+2016,farming.harvest.grapes,159.19999999999999,159.2,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,L34,0.0,2026-10-20
+2017,farming.harvest.grapes,180.8,180.8,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,M34,0.0,2026-10-20
+2018,farming.harvest.grapes,259.89999999999998,259.9,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,N34,0.0,2026-10-20
+2019,farming.harvest.grapes,293.8,293.8,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,O34,0.0,2026-10-20
+2020,farming.harvest.grapes,316.89999999999998,316.9,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,P34,0.0,2026-10-20
+2021,farming.harvest.grapes,271.60000000000002,271.6,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,Q34,0.0,2026-10-20
+2022,farming.harvest.grapes,287.3,287.3,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,R34,0.0,2026-10-20
+2023,farming.harvest.grapes,220.7,220.7,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,S34,0.0,2026-10-20
+2024,farming.harvest.grapes,320.7,320.7,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,T34,0.0,2026-10-20
+2025,farming.harvest.grapes,348.9,348.9,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,U34,0.0,2026-10-20
+2006,farming.harvest.hazelnuts,23.5,23.5,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,B20,0.0,2026-10-20
+2007,farming.harvest.hazelnuts,21.2,21.2,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,C20,0.0,2026-10-20
+2008,farming.harvest.hazelnuts,18.7,18.7,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,D20,0.0,2026-10-20
+2009,farming.harvest.hazelnuts,21.8,21.8,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,E20,0.0,2026-10-20
+2010,farming.harvest.hazelnuts,28.8,28.8,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,F20,0.0,2026-10-20
+2011,farming.harvest.hazelnuts,31.1,31.1,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,G20,0.0,2026-10-20
+2012,farming.harvest.hazelnuts,24.707648041083001,24.7,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,H20,0.0,2026-10-20
+2013,farming.harvest.hazelnuts,39.700000000000003,39.7,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,I20,0.0,2026-10-20
+2014,farming.harvest.hazelnuts,33.799999999999997,33.8,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,J20,0.0,2026-10-20
+2015,farming.harvest.hazelnuts,35.299999999999997,35.3,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,K20,0.0,2026-10-20
+2016,farming.harvest.hazelnuts,29.5,29.5,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,L20,0.0,2026-10-20
+2017,farming.harvest.hazelnuts,21.4,21.4,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,M20,0.0,2026-10-20
+2018,farming.harvest.hazelnuts,17,17.0,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,N20,0.0,2026-10-20
+2019,farming.harvest.hazelnuts,24,24.0,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,O20,0.0,2026-10-20
+2020,farming.harvest.hazelnuts,32.700000000000003,32.7,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,P20,0.0,2026-10-20
+2021,farming.harvest.hazelnuts,46,46.0,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,Q20,0.0,2026-10-20
+2022,farming.harvest.hazelnuts,33.4,33.4,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,R20,0.0,2026-10-20
+2023,farming.harvest.hazelnuts,36.9,36.9,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,S20,0.0,2026-10-20
+2024,farming.harvest.hazelnuts,43.6,43.6,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,T20,0.0,2026-10-20
+2025,farming.harvest.hazelnuts,49.3,49.3,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,U20,0.0,2026-10-20
+2006,farming.harvest.maize,217.4,217.4,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,B12,"#,##0.0",2026-10-20
+2007,farming.harvest.maize,295.8,295.8,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,C12,"#,##0.0",2026-10-20
+2008,farming.harvest.maize,328.2,328.2,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,D12,"#,##0.0",2026-10-20
+2009,farming.harvest.maize,291,291.0,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,E12,"#,##0.0",2026-10-20
+2010,farming.harvest.maize,141.1,141.1,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,F12,"#,##0.0",2026-10-20
+2011,farming.harvest.maize,269.60000000000002,269.6,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,G12,"#,##0.0",2026-10-20
+2012,farming.harvest.maize,267,267.0,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,H12,"#,##0.0",2026-10-20
+2013,farming.harvest.maize,363.9,363.9,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,I12,"#,##0.0",2026-10-20
+2014,farming.harvest.maize,291.60000000000002,291.6,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,J12,"#,##0.0",2026-10-20
+2015,farming.harvest.maize,184.6,184.6,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,K12,"#,##0.0",2026-10-20
+2016,farming.harvest.maize,243.7,243.7,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,L12,"#,##0.0",2026-10-20
+2017,farming.harvest.maize,142.5,142.5,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,M12,"#,##0.0",2026-10-20
+2018,farming.harvest.maize,194.2,194.2,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,N12,"#,##0.0",2026-10-20
+2019,farming.harvest.maize,207.1,207.1,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,O12,"#,##0.0",2026-10-20
+2020,farming.harvest.maize,255,255.0,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,P12,"#,##0.0",2026-10-20
+2021,farming.harvest.maize,233,233.0,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,Q12,"#,##0.0",2026-10-20
+2022,farming.harvest.maize,152.9,152.9,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,R12,"#,##0.0",2026-10-20
+2023,farming.harvest.maize,190.9,190.9,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,S12,"#,##0.0",2026-10-20
+2024,farming.harvest.maize,211.5,211.5,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,T12,"#,##0.0",2026-10-20
+2025,farming.harvest.maize,208.6,208.6,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,U12,"#,##0.0",2026-10-20
+2006,farming.harvest.melons,37.799999999999997,37.8,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,B30,"#,##0.0",2026-10-20
+2007,farming.harvest.melons,73.5,73.5,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,C30,"#,##0.0",2026-10-20
+2008,farming.harvest.melons,52.8,52.8,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,D30,"#,##0.0",2026-10-20
+2009,farming.harvest.melons,43.7,43.7,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,E30,"#,##0.0",2026-10-20
+2010,farming.harvest.melons,40.9,40.9,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,F30,"#,##0.0",2026-10-20
+2011,farming.harvest.melons,42.8,42.8,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,G30,"#,##0.0",2026-10-20
+2012,farming.harvest.melons,36.700000000000003,36.7,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,H30,"#,##0.0",2026-10-20
+2013,farming.harvest.melons,66.400000000000006,66.4,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,I30,"#,##0.0",2026-10-20
+2014,farming.harvest.melons,86.1,86.1,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,J30,"#,##0.0",2026-10-20
+2015,farming.harvest.melons,72.5,72.5,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,K30,"#,##0.0",2026-10-20
+2016,farming.harvest.melons,72.8,72.8,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,L30,"#,##0.0",2026-10-20
+2017,farming.harvest.melons,80.099999999999994,80.1,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,M30,"#,##0.0",2026-10-20
+2018,farming.harvest.melons,70.2,70.2,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,N30,"#,##0.0",2026-10-20
+2019,farming.harvest.melons,79.900000000000006,79.9,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,O30,"#,##0.0",2026-10-20
+2020,farming.harvest.melons,83.6,83.6,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,P30,"#,##0.0",2026-10-20
+2021,farming.harvest.melons,77.900000000000006,77.9,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,Q30,"#,##0.0",2026-10-20
+2022,farming.harvest.melons,72.599999999999994,72.6,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,R30,"#,##0.0",2026-10-20
+2023,farming.harvest.melons,45.5,45.5,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,S30,"#,##0.0",2026-10-20
+2024,farming.harvest.melons,41.5,41.5,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,T30,"#,##0.0",2026-10-20
+2025,farming.harvest.melons,47,47.0,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,U30,"#,##0.0",2026-10-20
+2006,farming.harvest.peaches,5.3,5.3,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,B13,0.0,2026-10-20
+2007,farming.harvest.peaches,8.1999999999999993,8.2,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,C13,0.0,2026-10-20
+2008,farming.harvest.peaches,13.7,13.7,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,D13,0.0,2026-10-20
+2009,farming.harvest.peaches,17.600000000000001,17.6,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,E13,0.0,2026-10-20
+2010,farming.harvest.peaches,6.9,6.9,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,F13,0.0,2026-10-20
+2011,farming.harvest.peaches,19.100000000000001,19.1,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,G13,0.0,2026-10-20
+2012,farming.harvest.peaches,7.0589501665460004,7.1,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,H13,0.0,2026-10-20
+2013,farming.harvest.peaches,23.7,23.7,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,I13,0.0,2026-10-20
+2014,farming.harvest.peaches,24.9,24.9,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,J13,0.0,2026-10-20
+2015,farming.harvest.peaches,23.1,23.1,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,K13,0.0,2026-10-20
+2016,farming.harvest.peaches,33.299999999999997,33.3,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,L13,0.0,2026-10-20
+2017,farming.harvest.peaches,32.299999999999997,32.3,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,M13,0.0,2026-10-20
+2018,farming.harvest.peaches,27.5,27.5,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,N13,0.0,2026-10-20
+2019,farming.harvest.peaches,22.3,22.3,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,O13,0.0,2026-10-20
+2020,farming.harvest.peaches,28.2,28.2,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,P13,0.0,2026-10-20
+2021,farming.harvest.peaches,35.5,35.5,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,Q13,0.0,2026-10-20
+2022,farming.harvest.peaches,31.5,31.5,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,R13,0.0,2026-10-20
+2023,farming.harvest.peaches,29.4,29.4,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,S13,0.0,2026-10-20
+2024,farming.harvest.peaches,38.4,38.4,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,T13,0.0,2026-10-20
+2025,farming.harvest.peaches,29.7,29.7,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,U13,0.0,2026-10-20
+2006,farming.harvest.potatoes,168.7,168.7,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,B15,"#,##0.0",2026-10-20
+2007,farming.harvest.potatoes,229.2,229.2,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,C15,"#,##0.0",2026-10-20
+2008,farming.harvest.potatoes,193.4,193.4,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,D15,"#,##0.0",2026-10-20
+2009,farming.harvest.potatoes,216.8,216.8,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,E15,"#,##0.0",2026-10-20
+2010,farming.harvest.potatoes,228.8,228.8,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,F15,"#,##0.0",2026-10-20
+2011,farming.harvest.potatoes,273.89999999999998,273.9,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,G15,"#,##0.0",2026-10-20
+2012,farming.harvest.potatoes,252,252.0,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,H15,"#,##0.0",2026-10-20
+2013,farming.harvest.potatoes,296.60000000000002,296.6,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,I15,"#,##0.0",2026-10-20
+2014,farming.harvest.potatoes,215.3,215.3,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,J15,"#,##0.0",2026-10-20
+2015,farming.harvest.potatoes,186.5,186.5,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,K15,"#,##0.0",2026-10-20
+2016,farming.harvest.potatoes,249,249.0,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,L15,"#,##0.0",2026-10-20
+2017,farming.harvest.potatoes,180.1,180.1,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,M15,"#,##0.0",2026-10-20
+2018,farming.harvest.potatoes,237.5,237.5,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,N15,"#,##0.0",2026-10-20
+2019,farming.harvest.potatoes,194.7,194.7,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,O15,"#,##0.0",2026-10-20
+2020,farming.harvest.potatoes,208.6,208.6,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,P15,"#,##0.0",2026-10-20
+2021,farming.harvest.potatoes,234.7,234.7,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,Q15,"#,##0.0",2026-10-20
+2022,farming.harvest.potatoes,198.9,198.9,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,R15,"#,##0.0",2026-10-20
+2023,farming.harvest.potatoes,197.3,197.3,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,S15,"#,##0.0",2026-10-20
+2024,farming.harvest.potatoes,221.5,221.5,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,T15,"#,##0.0",2026-10-20
+2025,farming.harvest.potatoes,206.7,206.7,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,U15,"#,##0.0",2026-10-20
+2006,farming.harvest.tangerines,48.4,48.4,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,B40,0.0,2026-10-20
+2007,farming.harvest.tangerines,93.6,93.6,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,C40,0.0,2026-10-20
+2008,farming.harvest.tangerines,51.6,51.6,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,D40,0.0,2026-10-20
+2009,farming.harvest.tangerines,90.5,90.5,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,E40,0.0,2026-10-20
+2010,farming.harvest.tangerines,48.6,48.6,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,F40,0.0,2026-10-20
+2011,farming.harvest.tangerines,53.1,53.1,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,G40,0.0,2026-10-20
+2012,farming.harvest.tangerines,71.099999999999994,71.1,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,H40,0.0,2026-10-20
+2013,farming.harvest.tangerines,107.1,107.1,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,I40,0.0,2026-10-20
+2014,farming.harvest.tangerines,65.900000000000006,65.9,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,J40,0.0,2026-10-20
+2015,farming.harvest.tangerines,71,71.0,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,K40,0.0,2026-10-20
+2016,farming.harvest.tangerines,60,60.0,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,L40,0.0,2026-10-20
+2017,farming.harvest.tangerines,54.9,54.9,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,M40,0.0,2026-10-20
+2018,farming.harvest.tangerines,62.3,62.3,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,N40,0.0,2026-10-20
+2019,farming.harvest.tangerines,59.8,59.8,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,O40,0.0,2026-10-20
+2020,farming.harvest.tangerines,53.1,53.1,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,P40,0.0,2026-10-20
+2021,farming.harvest.tangerines,57.2,57.2,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,Q40,0.0,2026-10-20
+2022,farming.harvest.tangerines,49.1,49.1,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,R40,0.0,2026-10-20
+2023,farming.harvest.tangerines,66.099999999999994,66.1,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,S40,0.0,2026-10-20
+2024,farming.harvest.tangerines,49.8,49.8,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,T40,0.0,2026-10-20
+2025,farming.harvest.tangerines,48.9,48.9,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,U40,0.0,2026-10-20
+2006,farming.harvest.vegetables,179.7,179.7,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,B16,"#,##0.0",2026-10-20
+2007,farming.harvest.vegetables,190.3,190.3,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,C16,"#,##0.0",2026-10-20
+2008,farming.harvest.vegetables,165,165.0,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,D16,"#,##0.0",2026-10-20
+2009,farming.harvest.vegetables,170.3,170.3,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,E16,"#,##0.0",2026-10-20
+2010,farming.harvest.vegetables,175.7,175.7,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,F16,"#,##0.0",2026-10-20
+2011,farming.harvest.vegetables,185.8,185.8,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,G16,"#,##0.0",2026-10-20
+2012,farming.harvest.vegetables,198.5,198.5,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,H16,"#,##0.0",2026-10-20
+2013,farming.harvest.vegetables,204.8,204.8,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,I16,"#,##0.0",2026-10-20
+2014,farming.harvest.vegetables,153.6,153.6,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,J16,"#,##0.0",2026-10-20
+2015,farming.harvest.vegetables,152.30000000000001,152.3,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,K16,"#,##0.0",2026-10-20
+2016,farming.harvest.vegetables,141.69999999999999,141.7,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,L16,"#,##0.0",2026-10-20
+2017,farming.harvest.vegetables,125.9,125.9,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,M16,"#,##0.0",2026-10-20
+2018,farming.harvest.vegetables,142.19999999999999,142.2,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,N16,"#,##0.0",2026-10-20
+2019,farming.harvest.vegetables,161.1,161.1,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,O16,"#,##0.0",2026-10-20
+2020,farming.harvest.vegetables,176.1,176.1,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,P16,"#,##0.0",2026-10-20
+2021,farming.harvest.vegetables,149,149.0,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,Q16,"#,##0.0",2026-10-20
+2022,farming.harvest.vegetables,128.5,128.5,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,R16,"#,##0.0",2026-10-20
+2023,farming.harvest.vegetables,142,142.0,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,S16,"#,##0.0",2026-10-20
+2024,farming.harvest.vegetables,134.4,134.4,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,T16,"#,##0.0",2026-10-20
+2025,farming.harvest.vegetables,148.6,148.6,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,U16,"#,##0.0",2026-10-20
+2006,farming.harvest.walnuts,3.9,3.9,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,B19,0.0,2026-10-20
+2007,farming.harvest.walnuts,11.8,11.8,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,C19,0.0,2026-10-20
+2008,farming.harvest.walnuts,6.2,6.2,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,D19,0.0,2026-10-20
+2009,farming.harvest.walnuts,8.1999999999999993,8.2,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,E19,0.0,2026-10-20
+2010,farming.harvest.walnuts,6.1,6.1,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,F19,0.0,2026-10-20
+2011,farming.harvest.walnuts,5.7,5.7,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,G19,0.0,2026-10-20
+2012,farming.harvest.walnuts,4.8220379000489997,4.8,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,H19,0.0,2026-10-20
+2013,farming.harvest.walnuts,10.8,10.8,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,I19,0.0,2026-10-20
+2014,farming.harvest.walnuts,4.2,4.2,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,J19,0.0,2026-10-20
+2015,farming.harvest.walnuts,5.6,5.6,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,K19,0.0,2026-10-20
+2016,farming.harvest.walnuts,3.6,3.6,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,L19,0.0,2026-10-20
+2017,farming.harvest.walnuts,3.3,3.3,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,M19,0.0,2026-10-20
+2018,farming.harvest.walnuts,5.7,5.7,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,N19,0.0,2026-10-20
+2019,farming.harvest.walnuts,6.6,6.6,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,O19,0.0,2026-10-20
+2020,farming.harvest.walnuts,7.5,7.5,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,P19,0.0,2026-10-20
+2021,farming.harvest.walnuts,7.2,7.2,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,Q19,0.0,2026-10-20
+2022,farming.harvest.walnuts,8.8000000000000007,8.8,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,R19,0.0,2026-10-20
+2023,farming.harvest.walnuts,7.2,7.2,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,S19,0.0,2026-10-20
+2024,farming.harvest.walnuts,7.5,7.5,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,T19,0.0,2026-10-20
+2025,farming.harvest.walnuts,7.8,7.8,thousand_tonnes,actual,published,geostat_farming_permanent_crops,Permanent Crops production,U19,0.0,2026-10-20
+2006,farming.harvest.wheat,69.7,69.7,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,B3,"#,##0.0",2026-10-20
+2007,farming.harvest.wheat,74.900000000000006,74.9,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,C3,"#,##0.0",2026-10-20
+2008,farming.harvest.wheat,80.3,80.3,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,D3,"#,##0.0",2026-10-20
+2009,farming.harvest.wheat,53.9,53.9,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,E3,"#,##0.0",2026-10-20
+2010,farming.harvest.wheat,48.4,48.4,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,F3,"#,##0.0",2026-10-20
+2011,farming.harvest.wheat,96.8,96.8,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,G3,"#,##0.0",2026-10-20
+2012,farming.harvest.wheat,80.7,80.7,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,H3,"#,##0.0",2026-10-20
+2013,farming.harvest.wheat,81,81.0,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,I3,"#,##0.0",2026-10-20
+2014,farming.harvest.wheat,47.5,47.5,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,J3,"#,##0.0",2026-10-20
+2015,farming.harvest.wheat,125.6,125.6,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,K3,"#,##0.0",2026-10-20
+2016,farming.harvest.wheat,126.6,126.6,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,L3,"#,##0.0",2026-10-20
+2017,farming.harvest.wheat,97.9,97.9,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,M3,"#,##0.0",2026-10-20
+2018,farming.harvest.wheat,107.1,107.1,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,N3,"#,##0.0",2026-10-20
+2019,farming.harvest.wheat,100.6,100.6,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,O3,"#,##0.0",2026-10-20
+2020,farming.harvest.wheat,102.4,102.4,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,P3,"#,##0.0",2026-10-20
+2021,farming.harvest.wheat,135.9,135.9,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,Q3,"#,##0.0",2026-10-20
+2022,farming.harvest.wheat,156.80000000000001,156.8,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,R3,"#,##0.0",2026-10-20
+2023,farming.harvest.wheat,147,147.0,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,S3,"#,##0.0",2026-10-20
+2024,farming.harvest.wheat,149.1,149.1,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,T3,"#,##0.0",2026-10-20
+2025,farming.harvest.wheat,145.30000000000001,145.3,thousand_tonnes,actual,published,geostat_farming_annual_crops,Production,U3,"#,##0.0",2026-10-20
+2006,farming.livestock.cattle,1080.3,1080.3,thousand_head,actual,published,geostat_farming_livestock_numbers,Number of livestock,B3,#\ ##0.0,2026-10-20
+2007,farming.livestock.cattle,1048.5,1048.5,thousand_head,actual,published,geostat_farming_livestock_numbers,Number of livestock,C3,#\ ##0.0,2026-10-20
+2008,farming.livestock.cattle,1045.5,1045.5,thousand_head,actual,published,geostat_farming_livestock_numbers,Number of livestock,D3,#\ ##0.0,2026-10-20
+2009,farming.livestock.cattle,1014.7,1014.7,thousand_head,actual,published,geostat_farming_livestock_numbers,Number of livestock,E3,#\ ##0.0,2026-10-20
+2010,farming.livestock.cattle,1049.4000000000001,1049.4,thousand_head,actual,published,geostat_farming_livestock_numbers,Number of livestock,F3,#\ ##0.0,2026-10-20
+2011,farming.livestock.cattle,1087.5999999999999,1087.6,thousand_head,actual,published,geostat_farming_livestock_numbers,Number of livestock,G3,#\ ##0.0,2026-10-20
+2012,farming.livestock.cattle,1128.8,1128.8,thousand_head,actual,published,geostat_farming_livestock_numbers,Number of livestock,H3,#\ ##0.0,2026-10-20
+2013,farming.livestock.cattle,1229.7,1229.7,thousand_head,actual,published,geostat_farming_livestock_numbers,Number of livestock,I3,#\ ##0.0,2026-10-20
+2014,farming.livestock.cattle,970,970.0,thousand_head,actual,published,geostat_farming_livestock_numbers,Number of livestock,J3,#\ ##0.0,2026-10-20
+2015,farming.livestock.cattle,992.1,992.1,thousand_head,actual,published,geostat_farming_livestock_numbers,Number of livestock,K3,#\ ##0.0,2026-10-20
+2016,farming.livestock.cattle,962.7,962.7,thousand_head,actual,published,geostat_farming_livestock_numbers,Number of livestock,L3,#\ ##0.0,2026-10-20
+2017,farming.livestock.cattle,909.7,909.7,thousand_head,actual,published,geostat_farming_livestock_numbers,Number of livestock,M3,#\ ##0.0,2026-10-20
+2018,farming.livestock.cattle,878.9,878.9,thousand_head,actual,published,geostat_farming_livestock_numbers,Number of livestock,N3,#\ ##0.0,2026-10-20
+2019,farming.livestock.cattle,869.5,869.5,thousand_head,actual,published,geostat_farming_livestock_numbers,Number of livestock,O3,#\ ##0.0,2026-10-20
+2020,farming.livestock.cattle,925.8,925.8,thousand_head,actual,published,geostat_farming_livestock_numbers,Number of livestock,P3,#\ ##0.0,2026-10-20
+2021,farming.livestock.cattle,928.6,928.6,thousand_head,actual,published,geostat_farming_livestock_numbers,Number of livestock,Q3,#\ ##0.0,2026-10-20
+2022,farming.livestock.cattle,853.7,853.7,thousand_head,actual,published,geostat_farming_livestock_numbers,Number of livestock,R3,#\ ##0.0,2026-10-20
+2023,farming.livestock.cattle,837.7,837.7,thousand_head,actual,published,geostat_farming_livestock_numbers,Number of livestock,S3,#\ ##0.0,2026-10-20
+2024,farming.livestock.cattle,811.5,811.5,thousand_head,actual,published,geostat_farming_livestock_numbers,Number of livestock,T3,#\ ##0.0,2026-10-20
+2025,farming.livestock.cattle,761.6,761.6,thousand_head,actual,published,geostat_farming_livestock_numbers,Number of livestock,U3,#\ ##0.0,2026-10-20
+2006,farming.livestock.dairy_cows,591.20000000000005,591.2,thousand_head,actual,published,geostat_farming_livestock_numbers,Number of livestock,B6,#\ ##0.0,2026-10-20
+2007,farming.livestock.dairy_cows,541,541.0,thousand_head,actual,published,geostat_farming_livestock_numbers,Number of livestock,C6,#\ ##0.0,2026-10-20
+2008,farming.livestock.dairy_cows,560.5,560.5,thousand_head,actual,published,geostat_farming_livestock_numbers,Number of livestock,D6,#\ ##0.0,2026-10-20
+2009,farming.livestock.dairy_cows,537.6,537.6,thousand_head,actual,published,geostat_farming_livestock_numbers,Number of livestock,E6,#\ ##0.0,2026-10-20
+2010,farming.livestock.dairy_cows,561.70000000000005,561.7,thousand_head,actual,published,geostat_farming_livestock_numbers,Number of livestock,F6,#\ ##0.0,2026-10-20
+2011,farming.livestock.dairy_cows,587.70000000000005,587.7,thousand_head,actual,published,geostat_farming_livestock_numbers,Number of livestock,G6,#\ ##0.0,2026-10-20
+2012,farming.livestock.dairy_cows,602.4,602.4,thousand_head,actual,published,geostat_farming_livestock_numbers,Number of livestock,H6,#\ ##0.0,2026-10-20
+2013,farming.livestock.dairy_cows,641.1,641.1,thousand_head,actual,published,geostat_farming_livestock_numbers,Number of livestock,I6,#\ ##0.0,2026-10-20
+2014,farming.livestock.dairy_cows,563,563.0,thousand_head,actual,published,geostat_farming_livestock_numbers,Number of livestock,J6,#\ ##0.0,2026-10-20
+2015,farming.livestock.dairy_cows,545,545.0,thousand_head,actual,published,geostat_farming_livestock_numbers,Number of livestock,K6,#\ ##0.0,2026-10-20
+2016,farming.livestock.dairy_cows,509.3,509.3,thousand_head,actual,published,geostat_farming_livestock_numbers,Number of livestock,L6,#\ ##0.0,2026-10-20
+2017,farming.livestock.dairy_cows,477.4,477.4,thousand_head,actual,published,geostat_farming_livestock_numbers,Number of livestock,M6,#\ ##0.0,2026-10-20
+2018,farming.livestock.dairy_cows,458,458.0,thousand_head,actual,published,geostat_farming_livestock_numbers,Number of livestock,N6,#\ ##0.0,2026-10-20
+2019,farming.livestock.dairy_cows,441.8,441.8,thousand_head,actual,published,geostat_farming_livestock_numbers,Number of livestock,O6,#\ ##0.0,2026-10-20
+2020,farming.livestock.dairy_cows,450.8,450.8,thousand_head,actual,published,geostat_farming_livestock_numbers,Number of livestock,P6,#\ ##0.0,2026-10-20
+2021,farming.livestock.dairy_cows,451.7,451.7,thousand_head,actual,published,geostat_farming_livestock_numbers,Number of livestock,Q6,#\ ##0.0,2026-10-20
+2022,farming.livestock.dairy_cows,431.4,431.4,thousand_head,actual,published,geostat_farming_livestock_numbers,Number of livestock,R6,#\ ##0.0,2026-10-20
+2023,farming.livestock.dairy_cows,418.7,418.7,thousand_head,actual,published,geostat_farming_livestock_numbers,Number of livestock,S6,#\ ##0.0,2026-10-20
+2024,farming.livestock.dairy_cows,404.3,404.3,thousand_head,actual,published,geostat_farming_livestock_numbers,Number of livestock,T6,#\ ##0.0,2026-10-20
+2025,farming.livestock.dairy_cows,382.7,382.7,thousand_head,actual,published,geostat_farming_livestock_numbers,Number of livestock,U6,#\ ##0.0,2026-10-20
+2006,farming.livestock.pigs,343.5,343.5,thousand_head,actual,published,geostat_farming_livestock_numbers,Number of livestock,B7,#\ ##0.0,2026-10-20
+2007,farming.livestock.pigs,109.9,109.9,thousand_head,actual,published,geostat_farming_livestock_numbers,Number of livestock,C7,#\ ##0.0,2026-10-20
+2008,farming.livestock.pigs,86.3,86.3,thousand_head,actual,published,geostat_farming_livestock_numbers,Number of livestock,D7,#\ ##0.0,2026-10-20
+2009,farming.livestock.pigs,135.19999999999999,135.2,thousand_head,actual,published,geostat_farming_livestock_numbers,Number of livestock,E7,#\ ##0.0,2026-10-20
+2010,farming.livestock.pigs,110.1,110.1,thousand_head,actual,published,geostat_farming_livestock_numbers,Number of livestock,F7,#\ ##0.0,2026-10-20
+2011,farming.livestock.pigs,105.1,105.1,thousand_head,actual,published,geostat_farming_livestock_numbers,Number of livestock,G7,#\ ##0.0,2026-10-20
+2012,farming.livestock.pigs,204.3,204.3,thousand_head,actual,published,geostat_farming_livestock_numbers,Number of livestock,H7,#\ ##0.0,2026-10-20
+2013,farming.livestock.pigs,191.2,191.2,thousand_head,actual,published,geostat_farming_livestock_numbers,Number of livestock,I7,#\ ##0.0,2026-10-20
+2014,farming.livestock.pigs,169.7,169.7,thousand_head,actual,published,geostat_farming_livestock_numbers,Number of livestock,J7,#\ ##0.0,2026-10-20
+2015,farming.livestock.pigs,161.5,161.5,thousand_head,actual,published,geostat_farming_livestock_numbers,Number of livestock,K7,#\ ##0.0,2026-10-20
+2016,farming.livestock.pigs,136.19999999999999,136.2,thousand_head,actual,published,geostat_farming_livestock_numbers,Number of livestock,L7,#\ ##0.0,2026-10-20
+2017,farming.livestock.pigs,150.69999999999999,150.7,thousand_head,actual,published,geostat_farming_livestock_numbers,Number of livestock,M7,#\ ##0.0,2026-10-20
+2018,farming.livestock.pigs,163.19999999999999,163.2,thousand_head,actual,published,geostat_farming_livestock_numbers,Number of livestock,N7,#\ ##0.0,2026-10-20
+2019,farming.livestock.pigs,155.5,155.5,thousand_head,actual,published,geostat_farming_livestock_numbers,Number of livestock,O7,#\ ##0.0,2026-10-20
+2020,farming.livestock.pigs,165.7,165.7,thousand_head,actual,published,geostat_farming_livestock_numbers,Number of livestock,P7,#\ ##0.0,2026-10-20
+2021,farming.livestock.pigs,152.9,152.9,thousand_head,actual,published,geostat_farming_livestock_numbers,Number of livestock,Q7,#\ ##0.0,2026-10-20
+2022,farming.livestock.pigs,150.19999999999999,150.2,thousand_head,actual,published,geostat_farming_livestock_numbers,Number of livestock,R7,#\ ##0.0,2026-10-20
+2023,farming.livestock.pigs,141.6,141.6,thousand_head,actual,published,geostat_farming_livestock_numbers,Number of livestock,S7,#\ ##0.0,2026-10-20
+2024,farming.livestock.pigs,138.4,138.4,thousand_head,actual,published,geostat_farming_livestock_numbers,Number of livestock,T7,#\ ##0.0,2026-10-20
+2025,farming.livestock.pigs,131.1,131.1,thousand_head,actual,published,geostat_farming_livestock_numbers,Number of livestock,U7,#\ ##0.0,2026-10-20
+2006,farming.livestock.poultry,5400.7,5400.7,thousand_head,actual,published,geostat_farming_livestock_numbers,Number of livestock,B11,#\ ##0.0,2026-10-20
+2007,farming.livestock.poultry,6149.7,6149.7,thousand_head,actual,published,geostat_farming_livestock_numbers,Number of livestock,C11,#\ ##0.0,2026-10-20
+2008,farming.livestock.poultry,6682.3,6682.3,thousand_head,actual,published,geostat_farming_livestock_numbers,Number of livestock,D11,#\ ##0.0,2026-10-20
+2009,farming.livestock.poultry,6674.8,6674.8,thousand_head,actual,published,geostat_farming_livestock_numbers,Number of livestock,E11,#\ ##0.0,2026-10-20
+2010,farming.livestock.poultry,6521.5,6521.5,thousand_head,actual,published,geostat_farming_livestock_numbers,Number of livestock,F11,#\ ##0.0,2026-10-20
+2011,farming.livestock.poultry,6360.2,6360.2,thousand_head,actual,published,geostat_farming_livestock_numbers,Number of livestock,G11,#\ ##0.0,2026-10-20
+2012,farming.livestock.poultry,6159.1,6159.1,thousand_head,actual,published,geostat_farming_livestock_numbers,Number of livestock,H11,#\ ##0.0,2026-10-20
+2013,farming.livestock.poultry,6760.7,6760.7,thousand_head,actual,published,geostat_farming_livestock_numbers,Number of livestock,I11,#\ ##0.0,2026-10-20
+2014,farming.livestock.poultry,6657.8,6657.8,thousand_head,actual,published,geostat_farming_livestock_numbers,Number of livestock,J11,#\ ##0.0,2026-10-20
+2015,farming.livestock.poultry,8308.6,8308.6,thousand_head,actual,published,geostat_farming_livestock_numbers,Number of livestock,K11,#\ ##0.0,2026-10-20
+2016,farming.livestock.poultry,8237.7999999999993,8237.8,thousand_head,actual,published,geostat_farming_livestock_numbers,Number of livestock,L11,#\ ##0.0,2026-10-20
+2017,farming.livestock.poultry,8386,8386.0,thousand_head,actual,published,geostat_farming_livestock_numbers,Number of livestock,M11,#\ ##0.0,2026-10-20
+2018,farming.livestock.poultry,8110.9,8110.9,thousand_head,actual,published,geostat_farming_livestock_numbers,Number of livestock,N11,#\ ##0.0,2026-10-20
+2019,farming.livestock.poultry,9466.4,9466.4,thousand_head,actual,published,geostat_farming_livestock_numbers,Number of livestock,O11,#\ ##0.0,2026-10-20
+2020,farming.livestock.poultry,10146.5,10146.5,thousand_head,actual,published,geostat_farming_livestock_numbers,Number of livestock,P11,#\ ##0.0,2026-10-20
+2021,farming.livestock.poultry,9253.6,9253.6,thousand_head,actual,published,geostat_farming_livestock_numbers,Number of livestock,Q11,#\ ##0.0,2026-10-20
+2022,farming.livestock.poultry,8955.7999999999993,8955.8,thousand_head,actual,published,geostat_farming_livestock_numbers,Number of livestock,R11,#\ ##0.0,2026-10-20
+2023,farming.livestock.poultry,7629.3,7629.3,thousand_head,actual,published,geostat_farming_livestock_numbers,Number of livestock,S11,#\ ##0.0,2026-10-20
+2024,farming.livestock.poultry,8047.2,8047.2,thousand_head,actual,published,geostat_farming_livestock_numbers,Number of livestock,T11,#\ ##0.0,2026-10-20
+2025,farming.livestock.poultry,8608.1,8608.1,thousand_head,actual,published,geostat_farming_livestock_numbers,Number of livestock,U11,#\ ##0.0,2026-10-20
+2006,farming.livestock.sheep_goats,789.2,789.2,thousand_head,actual,published,geostat_farming_livestock_numbers,Number of livestock,B8,#\ ##0.0,2026-10-20
+2007,farming.livestock.sheep_goats,797.1,797.1,thousand_head,actual,published,geostat_farming_livestock_numbers,Number of livestock,C8,#\ ##0.0,2026-10-20
+2008,farming.livestock.sheep_goats,769.4,769.4,thousand_head,actual,published,geostat_farming_livestock_numbers,Number of livestock,D8,#\ ##0.0,2026-10-20
+2009,farming.livestock.sheep_goats,673.8,673.8,thousand_head,actual,published,geostat_farming_livestock_numbers,Number of livestock,E8,#\ ##0.0,2026-10-20
+2010,farming.livestock.sheep_goats,653.9,653.9,thousand_head,actual,published,geostat_farming_livestock_numbers,Number of livestock,F8,#\ ##0.0,2026-10-20
+2011,farming.livestock.sheep_goats,630.4,630.4,thousand_head,actual,published,geostat_farming_livestock_numbers,Number of livestock,G8,#\ ##0.0,2026-10-20
+2012,farming.livestock.sheep_goats,742.6,742.6,thousand_head,actual,published,geostat_farming_livestock_numbers,Number of livestock,H8,#\ ##0.0,2026-10-20
+2013,farming.livestock.sheep_goats,856.8,856.8,thousand_head,actual,published,geostat_farming_livestock_numbers,Number of livestock,I8,#\ ##0.0,2026-10-20
+2014,farming.livestock.sheep_goats,919.6,919.6,thousand_head,actual,published,geostat_farming_livestock_numbers,Number of livestock,J8,#\ ##0.0,2026-10-20
+2015,farming.livestock.sheep_goats,891.4,891.4,thousand_head,actual,published,geostat_farming_livestock_numbers,Number of livestock,K8,#\ ##0.0,2026-10-20
+2016,farming.livestock.sheep_goats,936.5,936.5,thousand_head,actual,published,geostat_farming_livestock_numbers,Number of livestock,L8,#\ ##0.0,2026-10-20
+2017,farming.livestock.sheep_goats,907,907.0,thousand_head,actual,published,geostat_farming_livestock_numbers,Number of livestock,M8,#\ ##0.0,2026-10-20
+2018,farming.livestock.sheep_goats,869.5,869.5,thousand_head,actual,published,geostat_farming_livestock_numbers,Number of livestock,N8,#\ ##0.0,2026-10-20
+2019,farming.livestock.sheep_goats,891.5,891.5,thousand_head,actual,published,geostat_farming_livestock_numbers,Number of livestock,O8,#\ ##0.0,2026-10-20
+2020,farming.livestock.sheep_goats,946.5,946.5,thousand_head,actual,published,geostat_farming_livestock_numbers,Number of livestock,P8,#\ ##0.0,2026-10-20
+2021,farming.livestock.sheep_goats,956.8,956.8,thousand_head,actual,published,geostat_farming_livestock_numbers,Number of livestock,Q8,#\ ##0.0,2026-10-20
+2022,farming.livestock.sheep_goats,914,914.0,thousand_head,actual,published,geostat_farming_livestock_numbers,Number of livestock,R8,#\ ##0.0,2026-10-20
+2023,farming.livestock.sheep_goats,761.7,761.7,thousand_head,actual,published,geostat_farming_livestock_numbers,Number of livestock,S8,#\ ##0.0,2026-10-20
+2024,farming.livestock.sheep_goats,740.4,740.4,thousand_head,actual,published,geostat_farming_livestock_numbers,Number of livestock,T8,#\ ##0.0,2026-10-20
+2025,farming.livestock.sheep_goats,718.8,718.8,thousand_head,actual,published,geostat_farming_livestock_numbers,Number of livestock,U8,#\ ##0.0,2026-10-20
+2010,farming.output.crops,1117.0980036999454,1117.1,million_gel,actual,published,geostat_farming_general,AG. output,B4,#\ ##0.0,2026-10-20
+2011,farming.output.crops,1692.6266751007167,1692.6,million_gel,actual,published,geostat_farming_general,AG. output,C4,#\ ##0.0,2026-10-20
+2012,farming.output.crops,1376.9832720407474,1377.0,million_gel,actual,published,geostat_farming_general,AG. output,D4,#\ ##0.0,2026-10-20
+2013,farming.output.crops,1800.9827710706186,1801.0,million_gel,actual,published,geostat_farming_general,AG. output,E4,#\ ##0.0,2026-10-20
+2014,farming.output.crops,1955.9031745577477,1955.9,million_gel,actual,published,geostat_farming_general,AG. output,F4,#\ ##0.0,2026-10-20
+2015,farming.output.crops,1902.9629252353261,1903.0,million_gel,actual,published,geostat_farming_general,AG. output,G4,#\ ##0.0,2026-10-20
+2016,farming.output.crops,1892.3291780567513,1892.3,million_gel,actual,published,geostat_farming_general,AG. output,H4,#\ ##0.0,2026-10-20
+2017,farming.output.crops,1688.1532048491279,1688.2,million_gel,actual,published,geostat_farming_general,AG. output,I4,#\ ##0.0,2026-10-20
+2018,farming.output.crops,2436.9660964185327,2437.0,million_gel,actual,published,geostat_farming_general,AG. output,J4,#\ ##0.0,2026-10-20
+2019,farming.output.crops,2556.0280582605278,2556.0,million_gel,actual,published,geostat_farming_general,AG. output,K4,#\ ##0.0,2026-10-20
+2020,farming.output.crops,3087.4280943608128,3087.4,million_gel,actual,published,geostat_farming_general,AG. output,L4,#\ ##0.0,2026-10-20
+2021,farming.output.crops,3115.3935435587264,3115.4,million_gel,actual,published,geostat_farming_general,AG. output,M4,#\ ##0.0,2026-10-20
+2022,farming.output.crops,3295.4894031966533,3295.5,million_gel,actual,published,geostat_farming_general,AG. output,N4,#\ ##0.0,2026-10-20
+2023,farming.output.crops,3312.4633174675414,3312.5,million_gel,actual,published,geostat_farming_general,AG. output,O4,#\ ##0.0,2026-10-20
+2024,farming.output.crops,3662.5378925011164,3662.5,million_gel,actual,published,geostat_farming_general,AG. output,P4,#\ ##0.0,2026-10-20
+2025,farming.output.crops,4123.2897291846466,4123.3,million_gel,actual,preliminary,geostat_farming_general,AG. output,Q4,#\ ##0.0,2026-10-20
+2010,farming.output.livestock,1568.1488137595377,1568.1,million_gel,actual,published,geostat_farming_general,AG. output,B5,#\ ##0.0,2026-10-20
+2011,farming.output.livestock,1671.5320585145871,1671.5,million_gel,actual,published,geostat_farming_general,AG. output,C5,#\ ##0.0,2026-10-20
+2012,farming.output.livestock,1745.9952166796654,1746.0,million_gel,actual,published,geostat_farming_general,AG. output,D5,#\ ##0.0,2026-10-20
+2013,farming.output.livestock,1756.5908761101125,1756.6,million_gel,actual,published,geostat_farming_general,AG. output,E5,#\ ##0.0,2026-10-20
+2014,farming.output.livestock,1881.3881501642302,1881.4,million_gel,actual,published,geostat_farming_general,AG. output,F5,#\ ##0.0,2026-10-20
+2015,farming.output.livestock,1986.7602202170415,1986.8,million_gel,actual,published,geostat_farming_general,AG. output,G5,#\ ##0.0,2026-10-20
+2016,farming.output.livestock,1988.135891276831,1988.1,million_gel,actual,published,geostat_farming_general,AG. output,H5,#\ ##0.0,2026-10-20
+2017,farming.output.livestock,2017.1637919917478,2017.2,million_gel,actual,published,geostat_farming_general,AG. output,I5,#\ ##0.0,2026-10-20
+2018,farming.output.livestock,2200.7860774232313,2200.8,million_gel,actual,published,geostat_farming_general,AG. output,J5,#\ ##0.0,2026-10-20
+2019,farming.output.livestock,2420.5329061477287,2420.5,million_gel,actual,published,geostat_farming_general,AG. output,K5,#\ ##0.0,2026-10-20
+2020,farming.output.livestock,2611.5382979301871,2611.5,million_gel,actual,published,geostat_farming_general,AG. output,L5,#\ ##0.0,2026-10-20
+2021,farming.output.livestock,2866.718881068,2866.7,million_gel,actual,published,geostat_farming_general,AG. output,M5,#\ ##0.0,2026-10-20
+2022,farming.output.livestock,3248.7248817592863,3248.7,million_gel,actual,published,geostat_farming_general,AG. output,N5,#\ ##0.0,2026-10-20
+2023,farming.output.livestock,3610.0328675619999,3610.0,million_gel,actual,published,geostat_farming_general,AG. output,O5,#\ ##0.0,2026-10-20
+2024,farming.output.livestock,3674.6074186046358,3674.6,million_gel,actual,published,geostat_farming_general,AG. output,P5,#\ ##0.0,2026-10-20
+2025,farming.output.livestock,3700.2977369567643,3700.3,million_gel,actual,preliminary,geostat_farming_general,AG. output,Q5,#\ ##0.0,2026-10-20
+2010,farming.output.services,92.117465012190166,92.1,million_gel,actual,published,geostat_farming_general,AG. output,B6,#\ ##0.0,2026-10-20
+2011,farming.output.services,133.02259811040568,133.0,million_gel,actual,published,geostat_farming_general,AG. output,C6,#\ ##0.0,2026-10-20
+2012,farming.output.services,148.61840025555765,148.6,million_gel,actual,published,geostat_farming_general,AG. output,D6,#\ ##0.0,2026-10-20
+2013,farming.output.services,189.83179251530854,189.8,million_gel,actual,published,geostat_farming_general,AG. output,E6,#\ ##0.0,2026-10-20
+2014,farming.output.services,221.64989896238015,221.6,million_gel,actual,published,geostat_farming_general,AG. output,F6,#\ ##0.0,2026-10-20
+2015,farming.output.services,269.74908076389517,269.7,million_gel,actual,published,geostat_farming_general,AG. output,G6,#\ ##0.0,2026-10-20
+2016,farming.output.services,300.38254224154355,300.4,million_gel,actual,published,geostat_farming_general,AG. output,H6,#\ ##0.0,2026-10-20
+2017,farming.output.services,261.18797464116636,261.2,million_gel,actual,published,geostat_farming_general,AG. output,I6,#\ ##0.0,2026-10-20
+2018,farming.output.services,302.8861810319658,302.9,million_gel,actual,published,geostat_farming_general,AG. output,J6,#\ ##0.0,2026-10-20
+2019,farming.output.services,265.77495394722956,265.8,million_gel,actual,published,geostat_farming_general,AG. output,K6,#\ ##0.0,2026-10-20
+2020,farming.output.services,345.01778432522701,345.0,million_gel,actual,published,geostat_farming_general,AG. output,L6,#\ ##0.0,2026-10-20
+2021,farming.output.services,398.94493880181568,398.9,million_gel,actual,published,geostat_farming_general,AG. output,M6,#\ ##0.0,2026-10-20
+2022,farming.output.services,441.21036373394259,441.2,million_gel,actual,published,geostat_farming_general,AG. output,N6,#\ ##0.0,2026-10-20
+2023,farming.output.services,398.68351093140228,398.7,million_gel,actual,published,geostat_farming_general,AG. output,O6,#\ ##0.0,2026-10-20
+2024,farming.output.services,498.22685709164227,498.2,million_gel,actual,published,geostat_farming_general,AG. output,P6,#\ ##0.0,2026-10-20
+2025,farming.output.services,561.31517027606617,561.3,million_gel,actual,preliminary,geostat_farming_general,AG. output,Q6,#\ ##0.0,2026-10-20
+2010,farming.output.total,2777.3642824716735,2777.4,million_gel,actual,published,geostat_farming_general,AG. output,B3,#\ ##0.0,2026-10-20
+2011,farming.output.total,3497.1813317257097,3497.2,million_gel,actual,published,geostat_farming_general,AG. output,C3,#\ ##0.0,2026-10-20
+2012,farming.output.total,3271.5968889759706,3271.6,million_gel,actual,published,geostat_farming_general,AG. output,D3,#\ ##0.0,2026-10-20
+2013,farming.output.total,3747.40543969604,3747.4,million_gel,actual,published,geostat_farming_general,AG. output,E3,#\ ##0.0,2026-10-20
+2014,farming.output.total,4058.9412236843577,4058.9,million_gel,actual,published,geostat_farming_general,AG. output,F3,#\ ##0.0,2026-10-20
+2015,farming.output.total,4159.4722262162632,4159.5,million_gel,actual,published,geostat_farming_general,AG. output,G3,#\ ##0.0,2026-10-20
+2016,farming.output.total,4180.8476115751264,4180.8,million_gel,actual,published,geostat_farming_general,AG. output,H3,#\ ##0.0,2026-10-20
+2017,farming.output.total,3966.504971482042,3966.5,million_gel,actual,published,geostat_farming_general,AG. output,I3,#\ ##0.0,2026-10-20
+2018,farming.output.total,4940.6383548737294,4940.6,million_gel,actual,published,geostat_farming_general,AG. output,J3,#\ ##0.0,2026-10-20
+2019,farming.output.total,5242.3359183554858,5242.3,million_gel,actual,published,geostat_farming_general,AG. output,K3,#\ ##0.0,2026-10-20
+2020,farming.output.total,6043.9841766162272,6044.0,million_gel,actual,published,geostat_farming_general,AG. output,L3,#\ ##0.0,2026-10-20
+2021,farming.output.total,6381.057363428542,6381.1,million_gel,actual,published,geostat_farming_general,AG. output,M3,#\ ##0.0,2026-10-20
+2022,farming.output.total,6985.4246486898819,6985.4,million_gel,actual,published,geostat_farming_general,AG. output,N3,#\ ##0.0,2026-10-20
+2023,farming.output.total,7321.1796959609437,7321.2,million_gel,actual,published,geostat_farming_general,AG. output,O3,#\ ##0.0,2026-10-20
+2024,farming.output.total,7835.3721693345642,7835.4,million_gel,actual,published,geostat_farming_general,AG. output,P3,#\ ##0.0,2026-10-20
+2025,farming.output.total,8384.9026364174788,8384.9,million_gel,actual,preliminary,geostat_farming_general,AG. output,Q3,#\ ##0.0,2026-10-20
+2014,farming.price.apples,0.5,0.50,gel_per_kg,actual,published,geostat_farming_prices,Prices,B16,0.00,2026-10-20
+2015,farming.price.apples,0.69,0.69,gel_per_kg,actual,published,geostat_farming_prices,Prices,C16,General,2026-10-20
+2016,farming.price.apples,0.57999999999999996,0.58,gel_per_kg,actual,published,geostat_farming_prices,Prices,D16,General,2026-10-20
+2017,farming.price.apples,0.72,0.72,gel_per_kg,actual,published,geostat_farming_prices,Prices,E16,0.00,2026-10-20
+2018,farming.price.apples,0.47,0.47,gel_per_kg,actual,published,geostat_farming_prices,Prices,F16,0.00,2026-10-20
+2019,farming.price.apples,0.84,0.84,gel_per_kg,actual,published,geostat_farming_prices,Prices,G16,0.00,2026-10-20
+2020,farming.price.apples,0.66,0.66,gel_per_kg,actual,published,geostat_farming_prices,Prices,H16,0.00,2026-10-20
+2021,farming.price.apples,0.87,0.87,gel_per_kg,actual,published,geostat_farming_prices,Prices,I16,0.00,2026-10-20
+2022,farming.price.apples,0.68,0.68,gel_per_kg,actual,published,geostat_farming_prices,Prices,J16,0.00,2026-10-20
+2023,farming.price.apples,0.87,0.87,gel_per_kg,actual,published,geostat_farming_prices,Prices,K16,0.00,2026-10-20
+2024,farming.price.apples,1.02,1.02,gel_per_kg,actual,published,geostat_farming_prices,Prices,L16,0.00,2026-10-20
+2025,farming.price.apples,1.02,1.02,gel_per_kg,actual,published,geostat_farming_prices,Prices,M16,0.00,2026-10-20
+2014,farming.price.beef,8.75,8.75,gel_per_kg,actual,published,geostat_farming_prices,Prices,B25,General,2026-10-20
+2015,farming.price.beef,9.6,9.60,gel_per_kg,actual,published,geostat_farming_prices,Prices,C25,0.00,2026-10-20
+2016,farming.price.beef,10.48,10.48,gel_per_kg,actual,published,geostat_farming_prices,Prices,D25,General,2026-10-20
+2017,farming.price.beef,11.3,11.30,gel_per_kg,actual,published,geostat_farming_prices,Prices,E25,0.00,2026-10-20
+2018,farming.price.beef,12.61,12.61,gel_per_kg,actual,published,geostat_farming_prices,Prices,F25,0.00,2026-10-20
+2019,farming.price.beef,14.37,14.37,gel_per_kg,actual,published,geostat_farming_prices,Prices,G25,0.00,2026-10-20
+2020,farming.price.beef,16.84,16.84,gel_per_kg,actual,published,geostat_farming_prices,Prices,H25,0.00,2026-10-20
+2021,farming.price.beef,16.16,16.16,gel_per_kg,actual,published,geostat_farming_prices,Prices,I25,0.00,2026-10-20
+2022,farming.price.beef,18.149999999999999,18.15,gel_per_kg,actual,published,geostat_farming_prices,Prices,J25,0.00,2026-10-20
+2023,farming.price.beef,18.09,18.09,gel_per_kg,actual,published,geostat_farming_prices,Prices,K25,0.00,2026-10-20
+2024,farming.price.beef,20.53,20.53,gel_per_kg,actual,published,geostat_farming_prices,Prices,L25,0.00,2026-10-20
+2025,farming.price.beef,21.38,21.38,gel_per_kg,actual,published,geostat_farming_prices,Prices,M25,0.00,2026-10-20
+2014,farming.price.eggs,0.21,0.21,gel_per_piece,actual,published,geostat_farming_prices,Prices,B30,General,2026-10-20
+2015,farming.price.eggs,0.23,0.23,gel_per_piece,actual,published,geostat_farming_prices,Prices,C30,General,2026-10-20
+2016,farming.price.eggs,0.21,0.21,gel_per_piece,actual,published,geostat_farming_prices,Prices,D30,General,2026-10-20
+2017,farming.price.eggs,0.24,0.24,gel_per_piece,actual,published,geostat_farming_prices,Prices,E30,0.00,2026-10-20
+2018,farming.price.eggs,0.23,0.23,gel_per_piece,actual,published,geostat_farming_prices,Prices,F30,0.00,2026-10-20
+2019,farming.price.eggs,0.24,0.24,gel_per_piece,actual,published,geostat_farming_prices,Prices,G30,0.00,2026-10-20
+2020,farming.price.eggs,0.24,0.24,gel_per_piece,actual,published,geostat_farming_prices,Prices,H30,0.00,2026-10-20
+2021,farming.price.eggs,0.32,0.32,gel_per_piece,actual,published,geostat_farming_prices,Prices,I30,0.00,2026-10-20
+2022,farming.price.eggs,0.36,0.36,gel_per_piece,actual,published,geostat_farming_prices,Prices,J30,0.00,2026-10-20
+2023,farming.price.eggs,0.39,0.39,gel_per_piece,actual,published,geostat_farming_prices,Prices,K30,0.00,2026-10-20
+2024,farming.price.eggs,0.38,0.38,gel_per_piece,actual,published,geostat_farming_prices,Prices,L30,0.00,2026-10-20
+2025,farming.price.eggs,0.42,0.42,gel_per_piece,actual,published,geostat_farming_prices,Prices,M30,0.00,2026-10-20
+2014,farming.price.grapes,1.25,1.25,gel_per_kg,actual,published,geostat_farming_prices,Prices,B23,General,2026-10-20
+2015,farming.price.grapes,0.78,0.78,gel_per_kg,actual,published,geostat_farming_prices,Prices,C23,General,2026-10-20
+2016,farming.price.grapes,0.92,0.92,gel_per_kg,actual,published,geostat_farming_prices,Prices,D23,General,2026-10-20
+2017,farming.price.grapes,1.0900000000000001,1.09,gel_per_kg,actual,published,geostat_farming_prices,Prices,E23,0.00,2026-10-20
+2018,farming.price.grapes,1.1200000000000001,1.12,gel_per_kg,actual,published,geostat_farming_prices,Prices,F23,0.00,2026-10-20
+2019,farming.price.grapes,1.07,1.07,gel_per_kg,actual,published,geostat_farming_prices,Prices,G23,0.00,2026-10-20
+2020,farming.price.grapes,1.04,1.04,gel_per_kg,actual,published,geostat_farming_prices,Prices,H23,0.00,2026-10-20
+2021,farming.price.grapes,1.18,1.18,gel_per_kg,actual,published,geostat_farming_prices,Prices,I23,0.00,2026-10-20
+2022,farming.price.grapes,1.17,1.17,gel_per_kg,actual,published,geostat_farming_prices,Prices,J23,0.00,2026-10-20
+2023,farming.price.grapes,1.28,1.28,gel_per_kg,actual,published,geostat_farming_prices,Prices,K23,0.00,2026-10-20
+2024,farming.price.grapes,1.25,1.25,gel_per_kg,actual,published,geostat_farming_prices,Prices,L23,0.00,2026-10-20
+2025,farming.price.grapes,1.32,1.32,gel_per_kg,actual,published,geostat_farming_prices,Prices,M23,0.00,2026-10-20
+2014,farming.price.hazelnuts,6.28,6.28,gel_per_kg,actual,published,geostat_farming_prices,Prices,B22,General,2026-10-20
+2015,farming.price.hazelnuts,5.93,5.93,gel_per_kg,actual,published,geostat_farming_prices,Prices,C22,General,2026-10-20
+2016,farming.price.hazelnuts,4.45,4.45,gel_per_kg,actual,published,geostat_farming_prices,Prices,D22,General,2026-10-20
+2017,farming.price.hazelnuts,2.94,2.94,gel_per_kg,actual,published,geostat_farming_prices,Prices,E22,0.00,2026-10-20
+2018,farming.price.hazelnuts,4.3099999999999996,4.31,gel_per_kg,actual,published,geostat_farming_prices,Prices,F22,0.00,2026-10-20
+2019,farming.price.hazelnuts,4.3600000000000003,4.36,gel_per_kg,actual,published,geostat_farming_prices,Prices,G22,0.00,2026-10-20
+2020,farming.price.hazelnuts,5.21,5.21,gel_per_kg,actual,published,geostat_farming_prices,Prices,H22,0.00,2026-10-20
+2021,farming.price.hazelnuts,4.67,4.67,gel_per_kg,actual,published,geostat_farming_prices,Prices,I22,0.00,2026-10-20
+2022,farming.price.hazelnuts,3.75,3.75,gel_per_kg,actual,published,geostat_farming_prices,Prices,J22,0.00,2026-10-20
+2023,farming.price.hazelnuts,3.78,3.78,gel_per_kg,actual,published,geostat_farming_prices,Prices,K22,0.00,2026-10-20
+2024,farming.price.hazelnuts,4.38,4.38,gel_per_kg,actual,published,geostat_farming_prices,Prices,L22,0.00,2026-10-20
+2025,farming.price.hazelnuts,5.85,5.85,gel_per_kg,actual,published,geostat_farming_prices,Prices,M22,0.00,2026-10-20
+2014,farming.price.maize,0.52,0.52,gel_per_kg,actual,published,geostat_farming_prices,Prices,B8,0.00,2026-10-20
+2015,farming.price.maize,0.54,0.54,gel_per_kg,actual,published,geostat_farming_prices,Prices,C8,0.00,2026-10-20
+2016,farming.price.maize,0.52,0.52,gel_per_kg,actual,published,geostat_farming_prices,Prices,D8,0.00,2026-10-20
+2017,farming.price.maize,0.54,0.54,gel_per_kg,actual,published,geostat_farming_prices,Prices,E8,0.00,2026-10-20
+2018,farming.price.maize,0.51,0.51,gel_per_kg,actual,published,geostat_farming_prices,Prices,F8,0.00,2026-10-20
+2019,farming.price.maize,0.61,0.61,gel_per_kg,actual,published,geostat_farming_prices,Prices,G8,0.00,2026-10-20
+2020,farming.price.maize,0.69,0.69,gel_per_kg,actual,published,geostat_farming_prices,Prices,H8,0.00,2026-10-20
+2021,farming.price.maize,0.81,0.81,gel_per_kg,actual,published,geostat_farming_prices,Prices,I8,0.00,2026-10-20
+2022,farming.price.maize,0.99,0.99,gel_per_kg,actual,published,geostat_farming_prices,Prices,J8,0.00,2026-10-20
+2023,farming.price.maize,0.77,0.77,gel_per_kg,actual,published,geostat_farming_prices,Prices,K8,0.00,2026-10-20
+2024,farming.price.maize,0.7,0.70,gel_per_kg,actual,published,geostat_farming_prices,Prices,L8,0.00,2026-10-20
+2025,farming.price.maize,0.8,0.80,gel_per_kg,actual,published,geostat_farming_prices,Prices,M8,0.00,2026-10-20
+2014,farming.price.milk,0.88,0.88,gel_per_litre,actual,published,geostat_farming_prices,Prices,B29,General,2026-10-20
+2015,farming.price.milk,0.81,0.81,gel_per_litre,actual,published,geostat_farming_prices,Prices,C29,General,2026-10-20
+2016,farming.price.milk,0.8,0.80,gel_per_litre,actual,published,geostat_farming_prices,Prices,D29,0.00,2026-10-20
+2017,farming.price.milk,0.9,0.90,gel_per_litre,actual,published,geostat_farming_prices,Prices,E29,0.00,2026-10-20
+2018,farming.price.milk,0.92,0.92,gel_per_litre,actual,published,geostat_farming_prices,Prices,F29,0.00,2026-10-20
+2019,farming.price.milk,0.93,0.93,gel_per_litre,actual,published,geostat_farming_prices,Prices,G29,0.00,2026-10-20
+2020,farming.price.milk,1.0900000000000001,1.09,gel_per_litre,actual,published,geostat_farming_prices,Prices,H29,0.00,2026-10-20
+2021,farming.price.milk,1.18,1.18,gel_per_litre,actual,published,geostat_farming_prices,Prices,I29,0.00,2026-10-20
+2022,farming.price.milk,1.53,1.53,gel_per_litre,actual,published,geostat_farming_prices,Prices,J29,0.00,2026-10-20
+2023,farming.price.milk,1.51,1.51,gel_per_litre,actual,published,geostat_farming_prices,Prices,K29,0.00,2026-10-20
+2024,farming.price.milk,1.49,1.49,gel_per_litre,actual,published,geostat_farming_prices,Prices,L29,0.00,2026-10-20
+2025,farming.price.milk,1.63,1.63,gel_per_litre,actual,published,geostat_farming_prices,Prices,M29,0.00,2026-10-20
+2014,farming.price.pork,7.84,7.84,gel_per_kg,actual,published,geostat_farming_prices,Prices,B26,General,2026-10-20
+2015,farming.price.pork,6.78,6.78,gel_per_kg,actual,published,geostat_farming_prices,Prices,C26,General,2026-10-20
+2016,farming.price.pork,6.14,6.14,gel_per_kg,actual,published,geostat_farming_prices,Prices,D26,General,2026-10-20
+2017,farming.price.pork,7.45,7.45,gel_per_kg,actual,published,geostat_farming_prices,Prices,E26,0.00,2026-10-20
+2018,farming.price.pork,9.92,9.92,gel_per_kg,actual,published,geostat_farming_prices,Prices,F26,0.00,2026-10-20
+2019,farming.price.pork,9.4,9.40,gel_per_kg,actual,published,geostat_farming_prices,Prices,G26,0.00,2026-10-20
+2020,farming.price.pork,9.3699999999999992,9.37,gel_per_kg,actual,published,geostat_farming_prices,Prices,H26,0.00,2026-10-20
+2021,farming.price.pork,10.039999999999999,10.04,gel_per_kg,actual,published,geostat_farming_prices,Prices,I26,0.00,2026-10-20
+2022,farming.price.pork,10.96,10.96,gel_per_kg,actual,published,geostat_farming_prices,Prices,J26,0.00,2026-10-20
+2023,farming.price.pork,8.27,8.27,gel_per_kg,actual,published,geostat_farming_prices,Prices,K26,0.00,2026-10-20
+2024,farming.price.pork,8.26,8.26,gel_per_kg,actual,published,geostat_farming_prices,Prices,L26,0.00,2026-10-20
+2025,farming.price.pork,8.99,8.99,gel_per_kg,actual,published,geostat_farming_prices,Prices,M26,0.00,2026-10-20
+2014,farming.price.potatoes,0.77,0.77,gel_per_kg,actual,published,geostat_farming_prices,Prices,B10,0.00,2026-10-20
+2015,farming.price.potatoes,0.66,0.66,gel_per_kg,actual,published,geostat_farming_prices,Prices,C10,0.00,2026-10-20
+2016,farming.price.potatoes,0.43,0.43,gel_per_kg,actual,published,geostat_farming_prices,Prices,D10,0.00,2026-10-20
+2017,farming.price.potatoes,0.61,0.61,gel_per_kg,actual,published,geostat_farming_prices,Prices,E10,0.00,2026-10-20
+2018,farming.price.potatoes,0.59,0.59,gel_per_kg,actual,published,geostat_farming_prices,Prices,F10,0.00,2026-10-20
+2019,farming.price.potatoes,0.67,0.67,gel_per_kg,actual,published,geostat_farming_prices,Prices,G10,0.00,2026-10-20
+2020,farming.price.potatoes,0.69,0.69,gel_per_kg,actual,published,geostat_farming_prices,Prices,H10,0.00,2026-10-20
+2021,farming.price.potatoes,0.75,0.75,gel_per_kg,actual,published,geostat_farming_prices,Prices,I10,0.00,2026-10-20
+2022,farming.price.potatoes,0.94,0.94,gel_per_kg,actual,published,geostat_farming_prices,Prices,J10,0.00,2026-10-20
+2023,farming.price.potatoes,0.74,0.74,gel_per_kg,actual,published,geostat_farming_prices,Prices,K10,0.00,2026-10-20
+2024,farming.price.potatoes,0.64,0.64,gel_per_kg,actual,published,geostat_farming_prices,Prices,L10,0.00,2026-10-20
+2025,farming.price.potatoes,0.88,0.88,gel_per_kg,actual,published,geostat_farming_prices,Prices,M10,0.00,2026-10-20
+2014,farming.price.poultry_meat,3.93,3.93,gel_per_kg,actual,published,geostat_farming_prices,Prices,B28,General,2026-10-20
+2015,farming.price.poultry_meat,4.24,4.24,gel_per_kg,actual,published,geostat_farming_prices,Prices,C28,General,2026-10-20
+2016,farming.price.poultry_meat,4.13,4.13,gel_per_kg,actual,published,geostat_farming_prices,Prices,D28,General,2026-10-20
+2017,farming.price.poultry_meat,4.3600000000000003,4.36,gel_per_kg,actual,published,geostat_farming_prices,Prices,E28,0.00,2026-10-20
+2018,farming.price.poultry_meat,4.47,4.47,gel_per_kg,actual,published,geostat_farming_prices,Prices,F28,0.00,2026-10-20
+2019,farming.price.poultry_meat,4.88,4.88,gel_per_kg,actual,published,geostat_farming_prices,Prices,G28,0.00,2026-10-20
+2020,farming.price.poultry_meat,5.97,5.97,gel_per_kg,actual,published,geostat_farming_prices,Prices,H28,0.00,2026-10-20
+2021,farming.price.poultry_meat,5.09,5.09,gel_per_kg,actual,published,geostat_farming_prices,Prices,I28,0.00,2026-10-20
+2022,farming.price.poultry_meat,7.43,7.43,gel_per_kg,actual,published,geostat_farming_prices,Prices,J28,0.00,2026-10-20
+2023,farming.price.poultry_meat,6.71,6.71,gel_per_kg,actual,published,geostat_farming_prices,Prices,K28,0.00,2026-10-20
+2024,farming.price.poultry_meat,6.92,6.92,gel_per_kg,actual,published,geostat_farming_prices,Prices,L28,0.00,2026-10-20
+2025,farming.price.poultry_meat,7.42,7.42,gel_per_kg,actual,published,geostat_farming_prices,Prices,M28,0.00,2026-10-20
+2014,farming.price.tomatoes,0.71,0.71,gel_per_kg,actual,published,geostat_farming_prices,Prices,B12,General,2026-10-20
+2015,farming.price.tomatoes,0.83,0.83,gel_per_kg,actual,published,geostat_farming_prices,Prices,C12,General,2026-10-20
+2016,farming.price.tomatoes,0.62,0.62,gel_per_kg,actual,published,geostat_farming_prices,Prices,D12,General,2026-10-20
+2017,farming.price.tomatoes,0.92,0.92,gel_per_kg,actual,published,geostat_farming_prices,Prices,E12,0.00,2026-10-20
+2018,farming.price.tomatoes,1.03,1.03,gel_per_kg,actual,published,geostat_farming_prices,Prices,F12,0.00,2026-10-20
+2019,farming.price.tomatoes,0.96,0.96,gel_per_kg,actual,published,geostat_farming_prices,Prices,G12,0.00,2026-10-20
+2020,farming.price.tomatoes,0.8,0.80,gel_per_kg,actual,published,geostat_farming_prices,Prices,H12,0.00,2026-10-20
+2021,farming.price.tomatoes,1.1599999999999999,1.16,gel_per_kg,actual,published,geostat_farming_prices,Prices,I12,0.00,2026-10-20
+2022,farming.price.tomatoes,1.34,1.34,gel_per_kg,actual,published,geostat_farming_prices,Prices,J12,0.00,2026-10-20
+2023,farming.price.tomatoes,1.17,1.17,gel_per_kg,actual,published,geostat_farming_prices,Prices,K12,0.00,2026-10-20
+2024,farming.price.tomatoes,1.5,1.50,gel_per_kg,actual,published,geostat_farming_prices,Prices,L12,0.00,2026-10-20
+2025,farming.price.tomatoes,1.41,1.41,gel_per_kg,actual,published,geostat_farming_prices,Prices,M12,0.00,2026-10-20
+2014,farming.price.wheat,0.52,0.52,gel_per_kg,actual,published,geostat_farming_prices,Prices,B6,0.00,2026-10-20
+2015,farming.price.wheat,0.44,0.44,gel_per_kg,actual,published,geostat_farming_prices,Prices,C6,0.00,2026-10-20
+2016,farming.price.wheat,0.41,0.41,gel_per_kg,actual,published,geostat_farming_prices,Prices,D6,0.00,2026-10-20
+2017,farming.price.wheat,0.44,0.44,gel_per_kg,actual,published,geostat_farming_prices,Prices,E6,0.00,2026-10-20
+2018,farming.price.wheat,0.46,0.46,gel_per_kg,actual,published,geostat_farming_prices,Prices,F6,0.00,2026-10-20
+2019,farming.price.wheat,0.52,0.52,gel_per_kg,actual,published,geostat_farming_prices,Prices,G6,0.00,2026-10-20
+2020,farming.price.wheat,0.67,0.67,gel_per_kg,actual,published,geostat_farming_prices,Prices,H6,0.00,2026-10-20
+2021,farming.price.wheat,0.77,0.77,gel_per_kg,actual,published,geostat_farming_prices,Prices,I6,0.00,2026-10-20
+2022,farming.price.wheat,0.93,0.93,gel_per_kg,actual,published,geostat_farming_prices,Prices,J6,0.00,2026-10-20
+2023,farming.price.wheat,0.53,0.53,gel_per_kg,actual,published,geostat_farming_prices,Prices,K6,0.00,2026-10-20
+2024,farming.price.wheat,0.61,0.61,gel_per_kg,actual,published,geostat_farming_prices,Prices,L6,0.00,2026-10-20
+2025,farming.price.wheat,0.56999999999999995,0.57,gel_per_kg,actual,published,geostat_farming_prices,Prices,M6,0.00,2026-10-20
+2006,farming.products.beef,33,33.0,thousand_tonnes,actual,published,geostat_farming_livestock_products,Livestock products,B5,0.0,2026-10-20
+2007,farming.products.beef,31.3,31.3,thousand_tonnes,actual,published,geostat_farming_livestock_products,Livestock products,C5,0.0,2026-10-20
+2008,farming.products.beef,25.1,25.1,thousand_tonnes,actual,published,geostat_farming_livestock_products,Livestock products,D5,0.0,2026-10-20
+2009,farming.products.beef,29.2,29.2,thousand_tonnes,actual,published,geostat_farming_livestock_products,Livestock products,E5,0.0,2026-10-20
+2010,farming.products.beef,26.7,26.7,thousand_tonnes,actual,published,geostat_farming_livestock_products,Livestock products,F5,0.0,2026-10-20
+2011,farming.products.beef,21.3,21.3,thousand_tonnes,actual,published,geostat_farming_livestock_products,Livestock products,G5,0.0,2026-10-20
+2012,farming.products.beef,16.2,16.2,thousand_tonnes,actual,published,geostat_farming_livestock_products,Livestock products,H5,0.0,2026-10-20
+2013,farming.products.beef,20.2,20.2,thousand_tonnes,actual,published,geostat_farming_livestock_products,Livestock products,I5,0.0,2026-10-20
+2014,farming.products.beef,22.8,22.8,thousand_tonnes,actual,published,geostat_farming_livestock_products,Livestock products,J5,0.0,2026-10-20
+2015,farming.products.beef,24.4,24.4,thousand_tonnes,actual,published,geostat_farming_livestock_products,Livestock products,K5,0.0,2026-10-20
+2016,farming.products.beef,21.5,21.5,thousand_tonnes,actual,published,geostat_farming_livestock_products,Livestock products,L5,0.0,2026-10-20
+2017,farming.products.beef,21.4,21.4,thousand_tonnes,actual,published,geostat_farming_livestock_products,Livestock products,M5,0.0,2026-10-20
+2018,farming.products.beef,22.9,22.9,thousand_tonnes,actual,published,geostat_farming_livestock_products,Livestock products,N5,0.0,2026-10-20
+2019,farming.products.beef,22.1,22.1,thousand_tonnes,actual,published,geostat_farming_livestock_products,Livestock products,O5,0.0,2026-10-20
+2020,farming.products.beef,20.100000000000001,20.1,thousand_tonnes,actual,published,geostat_farming_livestock_products,Livestock products,P5,0.0,2026-10-20
+2021,farming.products.beef,20.5,20.5,thousand_tonnes,actual,published,geostat_farming_livestock_products,Livestock products,Q5,0.0,2026-10-20
+2022,farming.products.beef,23.8,23.8,thousand_tonnes,actual,published,geostat_farming_livestock_products,Livestock products,R5,0.0,2026-10-20
+2023,farming.products.beef,22.7,22.7,thousand_tonnes,actual,published,geostat_farming_livestock_products,Livestock products,S5,0.0,2026-10-20
+2024,farming.products.beef,26.7,26.7,thousand_tonnes,actual,published,geostat_farming_livestock_products,Livestock products,T5,0.0,2026-10-20
+2025,farming.products.beef,24.2,24.2,thousand_tonnes,actual,published,geostat_farming_livestock_products,Livestock products,U5,0.0,2026-10-20
+2006,farming.products.eggs,249.2,249.2,million_pieces,actual,published,geostat_farming_livestock_products,Livestock products,B18,0.0,2026-10-20
+2007,farming.products.eggs,438.1,438.1,million_pieces,actual,published,geostat_farming_livestock_products,Livestock products,C18,0.0,2026-10-20
+2008,farming.products.eggs,437.5,437.5,million_pieces,actual,published,geostat_farming_livestock_products,Livestock products,D18,0.0,2026-10-20
+2009,farming.products.eggs,430.6,430.6,million_pieces,actual,published,geostat_farming_livestock_products,Livestock products,E18,0.0,2026-10-20
+2010,farming.products.eggs,444.5,444.5,million_pieces,actual,published,geostat_farming_livestock_products,Livestock products,F18,0.0,2026-10-20
+2011,farming.products.eggs,483.1,483.1,million_pieces,actual,published,geostat_farming_livestock_products,Livestock products,G18,0.0,2026-10-20
+2012,farming.products.eggs,474,474.0,million_pieces,actual,published,geostat_farming_livestock_products,Livestock products,H18,0.0,2026-10-20
+2013,farming.products.eggs,495.3,495.3,million_pieces,actual,published,geostat_farming_livestock_products,Livestock products,I18,0.0,2026-10-20
+2014,farming.products.eggs,551.9,551.9,million_pieces,actual,published,geostat_farming_livestock_products,Livestock products,J18,0.0,2026-10-20
+2015,farming.products.eggs,602.5,602.5,million_pieces,actual,published,geostat_farming_livestock_products,Livestock products,K18,0.0,2026-10-20
+2016,farming.products.eggs,590.4,590.4,million_pieces,actual,published,geostat_farming_livestock_products,Livestock products,L18,0.0,2026-10-20
+2017,farming.products.eggs,600.1,600.1,million_pieces,actual,published,geostat_farming_livestock_products,Livestock products,M18,0.0,2026-10-20
+2018,farming.products.eggs,634.79999999999995,634.8,million_pieces,actual,published,geostat_farming_livestock_products,Livestock products,N18,0.0,2026-10-20
+2019,farming.products.eggs,661.2,661.2,million_pieces,actual,published,geostat_farming_livestock_products,Livestock products,O18,0.0,2026-10-20
+2020,farming.products.eggs,674.5,674.5,million_pieces,actual,published,geostat_farming_livestock_products,Livestock products,P18,0.0,2026-10-20
+2021,farming.products.eggs,654.79999999999995,654.8,million_pieces,actual,published,geostat_farming_livestock_products,Livestock products,Q18,0.0,2026-10-20
+2022,farming.products.eggs,654.70000000000005,654.7,million_pieces,actual,published,geostat_farming_livestock_products,Livestock products,R18,0.0,2026-10-20
+2023,farming.products.eggs,653.20000000000005,653.2,million_pieces,actual,published,geostat_farming_livestock_products,Livestock products,S18,0.0,2026-10-20
+2024,farming.products.eggs,673.1,673.1,million_pieces,actual,published,geostat_farming_livestock_products,Livestock products,T18,0.0,2026-10-20
+2025,farming.products.eggs,692.9,692.9,million_pieces,actual,published,geostat_farming_livestock_products,Livestock products,U18,0.0,2026-10-20
+2006,farming.products.meat,83.3,83.3,thousand_tonnes,actual,published,geostat_farming_livestock_products,Livestock products,B3,0.0,2026-10-20
+2007,farming.products.meat,73,73.0,thousand_tonnes,actual,published,geostat_farming_livestock_products,Livestock products,C3,0.0,2026-10-20
+2008,farming.products.meat,57.3,57.3,thousand_tonnes,actual,published,geostat_farming_livestock_products,Livestock products,D3,0.0,2026-10-20
+2009,farming.products.meat,54.3,54.3,thousand_tonnes,actual,published,geostat_farming_livestock_products,Livestock products,E3,0.0,2026-10-20
+2010,farming.products.meat,56.4,56.4,thousand_tonnes,actual,published,geostat_farming_livestock_products,Livestock products,F3,0.0,2026-10-20
+2011,farming.products.meat,49.3,49.3,thousand_tonnes,actual,published,geostat_farming_livestock_products,Livestock products,G3,0.0,2026-10-20
+2012,farming.products.meat,42.6,42.6,thousand_tonnes,actual,published,geostat_farming_livestock_products,Livestock products,H3,0.0,2026-10-20
+2013,farming.products.meat,48.4,48.4,thousand_tonnes,actual,published,geostat_farming_livestock_products,Livestock products,I3,0.0,2026-10-20
+2014,farming.products.meat,59.3,59.3,thousand_tonnes,actual,published,geostat_farming_livestock_products,Livestock products,J3,0.0,2026-10-20
+2015,farming.products.meat,66.7,66.7,thousand_tonnes,actual,published,geostat_farming_livestock_products,Livestock products,K3,0.0,2026-10-20
+2016,farming.products.meat,66.099999999999994,66.1,thousand_tonnes,actual,published,geostat_farming_livestock_products,Livestock products,L3,0.0,2026-10-20
+2017,farming.products.meat,66.2,66.2,thousand_tonnes,actual,published,geostat_farming_livestock_products,Livestock products,M3,0.0,2026-10-20
+2018,farming.products.meat,72.599999999999994,72.6,thousand_tonnes,actual,published,geostat_farming_livestock_products,Livestock products,N3,0.0,2026-10-20
+2019,farming.products.meat,69.5,69.5,thousand_tonnes,actual,published,geostat_farming_livestock_products,Livestock products,O3,0.0,2026-10-20
+2020,farming.products.meat,69.400000000000006,69.4,thousand_tonnes,actual,published,geostat_farming_livestock_products,Livestock products,P3,0.0,2026-10-20
+2021,farming.products.meat,72.599999999999994,72.6,thousand_tonnes,actual,published,geostat_farming_livestock_products,Livestock products,Q3,0.0,2026-10-20
+2022,farming.products.meat,74.599999999999994,74.6,thousand_tonnes,actual,published,geostat_farming_livestock_products,Livestock products,R3,0.0,2026-10-20
+2023,farming.products.meat,78.7,78.7,thousand_tonnes,actual,published,geostat_farming_livestock_products,Livestock products,S3,0.0,2026-10-20
+2024,farming.products.meat,88.7,88.7,thousand_tonnes,actual,published,geostat_farming_livestock_products,Livestock products,T3,0.0,2026-10-20
+2025,farming.products.meat,88.5,88.5,thousand_tonnes,actual,published,geostat_farming_livestock_products,Livestock products,U3,0.0,2026-10-20
+2006,farming.products.milk,606.1,606.1,million_litres,actual,published,geostat_farming_livestock_products,Livestock products,B14,0.0,2026-10-20
+2007,farming.products.milk,624.79999999999995,624.8,million_litres,actual,published,geostat_farming_livestock_products,Livestock products,C14,0.0,2026-10-20
+2008,farming.products.milk,645.79999999999995,645.8,million_litres,actual,published,geostat_farming_livestock_products,Livestock products,D14,0.0,2026-10-20
+2009,farming.products.milk,551.4,551.4,million_litres,actual,published,geostat_farming_livestock_products,Livestock products,E14,0.0,2026-10-20
+2010,farming.products.milk,587.70000000000005,587.7,million_litres,actual,published,geostat_farming_livestock_products,Livestock products,F14,0.0,2026-10-20
+2011,farming.products.milk,582.1,582.1,million_litres,actual,published,geostat_farming_livestock_products,Livestock products,G14,0.0,2026-10-20
+2012,farming.products.milk,589.5,589.5,million_litres,actual,published,geostat_farming_livestock_products,Livestock products,H14,0.0,2026-10-20
+2013,farming.products.milk,604.70000000000005,604.7,million_litres,actual,published,geostat_farming_livestock_products,Livestock products,I14,0.0,2026-10-20
+2014,farming.products.milk,588.79999999999995,588.8,million_litres,actual,published,geostat_farming_livestock_products,Livestock products,J14,0.0,2026-10-20
+2015,farming.products.milk,566.29999999999995,566.3,million_litres,actual,published,geostat_farming_livestock_products,Livestock products,K14,0.0,2026-10-20
+2016,farming.products.milk,540.1,540.1,million_litres,actual,published,geostat_farming_livestock_products,Livestock products,L14,0.0,2026-10-20
+2017,farming.products.milk,528.4,528.4,million_litres,actual,published,geostat_farming_livestock_products,Livestock products,M14,0.0,2026-10-20
+2018,farming.products.milk,555.29999999999995,555.3,million_litres,actual,published,geostat_farming_livestock_products,Livestock products,N14,0.0,2026-10-20
+2019,farming.products.milk,561.79999999999995,561.8,million_litres,actual,published,geostat_farming_livestock_products,Livestock products,O14,0.0,2026-10-20
+2020,farming.products.milk,569,569.0,million_litres,actual,published,geostat_farming_livestock_products,Livestock products,P14,0.0,2026-10-20
+2021,farming.products.milk,587.9,587.9,million_litres,actual,published,geostat_farming_livestock_products,Livestock products,Q14,0.0,2026-10-20
+2022,farming.products.milk,564.79999999999995,564.8,million_litres,actual,published,geostat_farming_livestock_products,Livestock products,R14,0.0,2026-10-20
+2023,farming.products.milk,584.29999999999995,584.3,million_litres,actual,published,geostat_farming_livestock_products,Livestock products,S14,0.0,2026-10-20
+2024,farming.products.milk,574.4,574.4,million_litres,actual,published,geostat_farming_livestock_products,Livestock products,T14,0.0,2026-10-20
+2025,farming.products.milk,556.20000000000005,556.2,million_litres,actual,published,geostat_farming_livestock_products,Livestock products,U14,0.0,2026-10-20
+2006,farming.products.pork,31.1,31.1,thousand_tonnes,actual,published,geostat_farming_livestock_products,Livestock products,B6,0.0,2026-10-20
+2007,farming.products.pork,21.4,21.4,thousand_tonnes,actual,published,geostat_farming_livestock_products,Livestock products,C6,0.0,2026-10-20
+2008,farming.products.pork,11.4,11.4,thousand_tonnes,actual,published,geostat_farming_livestock_products,Livestock products,D6,0.0,2026-10-20
+2009,farming.products.pork,8.1999999999999993,8.2,thousand_tonnes,actual,published,geostat_farming_livestock_products,Livestock products,E6,0.0,2026-10-20
+2010,farming.products.pork,12.8,12.8,thousand_tonnes,actual,published,geostat_farming_livestock_products,Livestock products,F6,0.0,2026-10-20
+2011,farming.products.pork,11.6,11.6,thousand_tonnes,actual,published,geostat_farming_livestock_products,Livestock products,G6,0.0,2026-10-20
+2012,farming.products.pork,11.8,11.8,thousand_tonnes,actual,published,geostat_farming_livestock_products,Livestock products,H6,0.0,2026-10-20
+2013,farming.products.pork,14.9,14.9,thousand_tonnes,actual,published,geostat_farming_livestock_products,Livestock products,I6,0.0,2026-10-20
+2014,farming.products.pork,17.3,17.3,thousand_tonnes,actual,published,geostat_farming_livestock_products,Livestock products,J6,0.0,2026-10-20
+2015,farming.products.pork,18.7,18.7,thousand_tonnes,actual,published,geostat_farming_livestock_products,Livestock products,K6,0.0,2026-10-20
+2016,farming.products.pork,16.100000000000001,16.1,thousand_tonnes,actual,published,geostat_farming_livestock_products,Livestock products,L6,0.0,2026-10-20
+2017,farming.products.pork,15.5,15.5,thousand_tonnes,actual,published,geostat_farming_livestock_products,Livestock products,M6,0.0,2026-10-20
+2018,farming.products.pork,17.600000000000001,17.6,thousand_tonnes,actual,published,geostat_farming_livestock_products,Livestock products,N6,0.0,2026-10-20
+2019,farming.products.pork,18.3,18.3,thousand_tonnes,actual,published,geostat_farming_livestock_products,Livestock products,O6,0.0,2026-10-20
+2020,farming.products.pork,19.8,19.8,thousand_tonnes,actual,published,geostat_farming_livestock_products,Livestock products,P6,0.0,2026-10-20
+2021,farming.products.pork,21.8,21.8,thousand_tonnes,actual,published,geostat_farming_livestock_products,Livestock products,Q6,0.0,2026-10-20
+2022,farming.products.pork,20.7,20.7,thousand_tonnes,actual,published,geostat_farming_livestock_products,Livestock products,R6,0.0,2026-10-20
+2023,farming.products.pork,25.8,25.8,thousand_tonnes,actual,published,geostat_farming_livestock_products,Livestock products,S6,0.0,2026-10-20
+2024,farming.products.pork,30.5,30.5,thousand_tonnes,actual,published,geostat_farming_livestock_products,Livestock products,T6,0.0,2026-10-20
+2025,farming.products.pork,32.799999999999997,32.8,thousand_tonnes,actual,published,geostat_farming_livestock_products,Livestock products,U6,0.0,2026-10-20
+2006,farming.products.poultry_meat,11.2,11.2,thousand_tonnes,actual,published,geostat_farming_livestock_products,Livestock products,B8,0.0,2026-10-20
+2007,farming.products.poultry_meat,12.4,12.4,thousand_tonnes,actual,published,geostat_farming_livestock_products,Livestock products,C8,0.0,2026-10-20
+2008,farming.products.poultry_meat,12.9,12.9,thousand_tonnes,actual,published,geostat_farming_livestock_products,Livestock products,D8,0.0,2026-10-20
+2009,farming.products.poultry_meat,12.4,12.4,thousand_tonnes,actual,published,geostat_farming_livestock_products,Livestock products,E8,0.0,2026-10-20
+2010,farming.products.poultry_meat,11.6,11.6,thousand_tonnes,actual,published,geostat_farming_livestock_products,Livestock products,F8,0.0,2026-10-20
+2011,farming.products.poultry_meat,12,12.0,thousand_tonnes,actual,published,geostat_farming_livestock_products,Livestock products,G8,0.0,2026-10-20
+2012,farming.products.poultry_meat,11.7,11.7,thousand_tonnes,actual,published,geostat_farming_livestock_products,Livestock products,H8,0.0,2026-10-20
+2013,farming.products.poultry_meat,10.1,10.1,thousand_tonnes,actual,published,geostat_farming_livestock_products,Livestock products,I8,0.0,2026-10-20
+2014,farming.products.poultry_meat,14.6,14.6,thousand_tonnes,actual,published,geostat_farming_livestock_products,Livestock products,J8,0.0,2026-10-20
+2015,farming.products.poultry_meat,18.399999999999999,18.4,thousand_tonnes,actual,published,geostat_farming_livestock_products,Livestock products,K8,0.0,2026-10-20
+2016,farming.products.poultry_meat,23.5,23.5,thousand_tonnes,actual,published,geostat_farming_livestock_products,Livestock products,L8,0.0,2026-10-20
+2017,farming.products.poultry_meat,22.3,22.3,thousand_tonnes,actual,published,geostat_farming_livestock_products,Livestock products,M8,0.0,2026-10-20
+2018,farming.products.poultry_meat,22.6,22.6,thousand_tonnes,actual,published,geostat_farming_livestock_products,Livestock products,N8,0.0,2026-10-20
+2019,farming.products.poultry_meat,22.8,22.8,thousand_tonnes,actual,published,geostat_farming_livestock_products,Livestock products,O8,0.0,2026-10-20
+2020,farming.products.poultry_meat,24.2,24.2,thousand_tonnes,actual,published,geostat_farming_livestock_products,Livestock products,P8,0.0,2026-10-20
+2021,farming.products.poultry_meat,25.5,25.5,thousand_tonnes,actual,published,geostat_farming_livestock_products,Livestock products,Q8,0.0,2026-10-20
+2022,farming.products.poultry_meat,24.5,24.5,thousand_tonnes,actual,published,geostat_farming_livestock_products,Livestock products,R8,0.0,2026-10-20
+2023,farming.products.poultry_meat,24.8,24.8,thousand_tonnes,actual,published,geostat_farming_livestock_products,Livestock products,S8,0.0,2026-10-20
+2024,farming.products.poultry_meat,26.7,26.7,thousand_tonnes,actual,published,geostat_farming_livestock_products,Livestock products,T8,0.0,2026-10-20
+2025,farming.products.poultry_meat,25.6,25.6,thousand_tonnes,actual,published,geostat_farming_livestock_products,Livestock products,U8,0.0,2026-10-20
+2006,farming.products.sheep_goat_meat,7.6,7.6,thousand_tonnes,actual,published,geostat_farming_livestock_products,Livestock products,B7,0.0,2026-10-20
+2007,farming.products.sheep_goat_meat,7.5,7.5,thousand_tonnes,actual,published,geostat_farming_livestock_products,Livestock products,C7,0.0,2026-10-20
+2008,farming.products.sheep_goat_meat,7.5,7.5,thousand_tonnes,actual,published,geostat_farming_livestock_products,Livestock products,D7,0.0,2026-10-20
+2009,farming.products.sheep_goat_meat,4.0999999999999996,4.1,thousand_tonnes,actual,published,geostat_farming_livestock_products,Livestock products,E7,0.0,2026-10-20
+2010,farming.products.sheep_goat_meat,4.9000000000000004,4.9,thousand_tonnes,actual,published,geostat_farming_livestock_products,Livestock products,F7,0.0,2026-10-20
+2011,farming.products.sheep_goat_meat,4,4.0,thousand_tonnes,actual,published,geostat_farming_livestock_products,Livestock products,G7,0.0,2026-10-20
+2012,farming.products.sheep_goat_meat,2.5,2.5,thousand_tonnes,actual,published,geostat_farming_livestock_products,Livestock products,H7,0.0,2026-10-20
+2013,farming.products.sheep_goat_meat,2.8,2.8,thousand_tonnes,actual,published,geostat_farming_livestock_products,Livestock products,I7,0.0,2026-10-20
+2014,farming.products.sheep_goat_meat,4.0999999999999996,4.1,thousand_tonnes,actual,published,geostat_farming_livestock_products,Livestock products,J7,0.0,2026-10-20
+2015,farming.products.sheep_goat_meat,4.8,4.8,thousand_tonnes,actual,published,geostat_farming_livestock_products,Livestock products,K7,0.0,2026-10-20
+2016,farming.products.sheep_goat_meat,4.5999999999999996,4.6,thousand_tonnes,actual,published,geostat_farming_livestock_products,Livestock products,L7,0.0,2026-10-20
+2017,farming.products.sheep_goat_meat,6.7,6.7,thousand_tonnes,actual,published,geostat_farming_livestock_products,Livestock products,M7,0.0,2026-10-20
+2018,farming.products.sheep_goat_meat,9.1,9.1,thousand_tonnes,actual,published,geostat_farming_livestock_products,Livestock products,N7,0.0,2026-10-20
+2019,farming.products.sheep_goat_meat,5.9,5.9,thousand_tonnes,actual,published,geostat_farming_livestock_products,Livestock products,O7,0.0,2026-10-20
+2020,farming.products.sheep_goat_meat,4.9000000000000004,4.9,thousand_tonnes,actual,published,geostat_farming_livestock_products,Livestock products,P7,0.0,2026-10-20
+2021,farming.products.sheep_goat_meat,4.4000000000000004,4.4,thousand_tonnes,actual,published,geostat_farming_livestock_products,Livestock products,Q7,0.0,2026-10-20
+2022,farming.products.sheep_goat_meat,5.2,5.2,thousand_tonnes,actual,published,geostat_farming_livestock_products,Livestock products,R7,0.0,2026-10-20
+2023,farming.products.sheep_goat_meat,5,5.0,thousand_tonnes,actual,published,geostat_farming_livestock_products,Livestock products,S7,0.0,2026-10-20
+2024,farming.products.sheep_goat_meat,4.4000000000000004,4.4,thousand_tonnes,actual,published,geostat_farming_livestock_products,Livestock products,T7,0.0,2026-10-20
+2025,farming.products.sheep_goat_meat,5.5,5.5,thousand_tonnes,actual,published,geostat_farming_livestock_products,Livestock products,U7,0.0,2026-10-20
 2014,food.self_sufficiency.beef,73,73,percent,actual,published,geostat_food_balance_sheets,Beef,B18,General,2026-10-11
 2015,food.self_sufficiency.beef,79,79,percent,actual,published,geostat_food_balance_sheets,Beef,C18,General,2026-10-11
 2016,food.self_sufficiency.beef,81,81,percent,actual,published,geostat_food_balance_sheets,Beef,D18,General,2026-10-11

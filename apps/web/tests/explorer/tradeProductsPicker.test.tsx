@@ -21,9 +21,10 @@ test("keeps global selection count while displaying eight category tiles", async
   expect(html).not.toContain('data-testid="trade-product-result"');
   const sections = [...html.matchAll(/data-selector-section="([^"]+)"/g)].map(match => match[1]);
   expect(sections).toEqual(["controls", "search", "actions", "list"]);
-  expect(html.indexOf('data-testid="trade-product-reference"')).toBeLessThan(html.indexOf('data-testid="trade-product-category"'));
-  expect(html).not.toContain("max-h-[430px]");
   expect(html).toContain("All products, including Georgia total");
+  // U22-17: a tile's number says what it counts, and no tab divider can dangle at a wrapped line's end on a phone.
+  expect(html).toMatch(/data-testid="trade-product-category-count"[^>]*>\d+ products</);
+  expect(html.match(/<span class="hidden min-\[480px\]:inline"><span aria-hidden="true"/g)).toHaveLength(2);
 });
 
 test.each(["en", "ka"] as const)("%s selected view has readable identities and checkboxes without a long catalogue", async locale => {

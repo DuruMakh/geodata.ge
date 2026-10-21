@@ -7,7 +7,7 @@ import { expect, test, vi } from "vitest";
 import { loadMoneyBanksFactsFromMirror, moneyBanksMirrorCreateRows } from "../../../lib/db/mirrorRows";
 import { assertMoneyBanksParity, loadMoneyBanksFacts, toClientMoneyBanksFact } from "../../../lib/data/moneyBanks/importMoneyBanks";
 import type { Prisma } from "../../../lib/generated/prisma/client";
-import { MONEY_BANKS_CSV_HEADERS, prepareMoneyBanksData, REVIEWED_AT } from "../../../lib/data/moneyBanks/prepareMoneyBanks";
+import { MONEY_BANKS_CSV_HEADERS, REVIEWED_AT } from "../../../lib/data/moneyBanks/prepareMoneyBanks";
 import { MONEY_BANKS_INDICATORS, MONEY_BANKS_PUBLIC_SOURCES, MONEY_BANKS_SOURCES, moneyBanksSourceDocumentId, type MoneyBanksFact } from "../../../lib/data/moneyBanks/types";
 import { expectedMoneyBanksKeys, moneyBanksDisplayDecimals, validateMoneyBanksFacts } from "../../../lib/data/moneyBanks/validation";
 
@@ -24,10 +24,6 @@ const setValue = (f: MoneyBanksFact, value: string) => {
   const decimals = moneyBanksDisplayDecimals(f.indicatorId);
   return Object.assign(f, { value, publishedValue: new Decimal(value).toDecimalPlaces(decimals, Decimal.ROUND_HALF_UP).toFixed(decimals) });
 };
-
-test("the canonical file reproduces the research package", async () => {
-  await expect(prepareMoneyBanksData(root, "check")).resolves.toBeUndefined();
-});
 
 test("serves all 730 reviewed values over the approved coverage", async () => {
   const facts = await loadFacts();

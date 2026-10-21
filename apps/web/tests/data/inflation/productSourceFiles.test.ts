@@ -5,12 +5,12 @@ import path from "node:path";
 import { describe, expect, it } from "vitest";
 import { INFLATION_PRODUCTS_RAW_ROOT, latestProductVintage, readVerifiedProductFiles } from "../../../lib/data/inflation/productSourceFiles";
 
-const vintageDir = path.join(INFLATION_PRODUCTS_RAW_ROOT, "2026-08");
+const vintageDir = path.join(INFLATION_PRODUCTS_RAW_ROOT, "2026-09");
 const expected = {
-  "en/mom": [583143, "26d9b429229cbad2ad6ee2bbefd5e86f52d4482d49abdcc14e270d4a956dcf20"],
-  "ka/mom": [580426, "7154963abfe05c0f8e5edd953ef0fb91274fde4911ce0a45eac7f3efc02bbd9c"],
-  "en/yoy": [599891, "ec9cd520693db0479f7fd576f0d2f4cfa65c9c9ba607c46ec7679e13b900faf9"],
-  "ka/yoy": [599155, "c4f87ab0b44d94538d7a0783371c28d639359977d8d00d12dcf588fa4b9390df"],
+  "en/mom": [585750, "ec596f4daa4dfb3256387298268ba9824d808752fbb96e4e0a4e62bf3900900a"],
+  "ka/mom": [582973, "835a70e49c5f46f6d632a9d350610d4053aff77b455f8db2472fa9b3def5672f"],
+  "en/yoy": [602679, "1a9876bac321b40b1213f1e21978398c1c919d6a1c32bf6e481a77c7274fb0ff"],
+  "ka/yoy": [601921, "5239bffbeb6549a9c455e1416ec5c627dbedd231f8426266d534ac33621f069c"],
 } as const;
 
 async function withCopy(run: (dir: string) => Promise<void>) {
@@ -25,7 +25,7 @@ async function withCopy(run: (dir: string) => Promise<void>) {
 
 describe("Geostat product source package", () => {
   it("verifies the four original files against the approved inventory", async () => {
-    expect(await latestProductVintage()).toBe("2026-08");
+    expect(await latestProductVintage()).toBe("2026-09");
     const files = await readVerifiedProductFiles(vintageDir);
     expect(files).toHaveLength(4);
     expect(files.map((file) => `${file.language}/${file.file_role}`).sort()).toEqual(Object.keys(expected).sort());

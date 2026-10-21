@@ -10,6 +10,7 @@ import {
   loadReviewedSourceManifest,
   type ValidatedSourceManifestRow,
 } from "./sourceManifest";
+import { projectPublicSources, sourcedWorkbookSources, type PublicSourceManifestRow } from "./publicSources";
 import type { MethodologyDatasetId } from "./types";
 
 export type WorkbookSourceRole =
@@ -237,6 +238,25 @@ export async function loadDebtWorkbookSources(locale: Locale = "ka"): Promise<So
     const row = rows.find((candidate) => candidate.downloadHref === source.downloadHref);
     return row ? [{ ...source, sourceId: registryDebtSourceId(row.source_id) }] : [];
   });
+}
+
+const sourcedCache = new Map<`${Locale}:${MethodologyDatasetId}`, Promise<{ manifest: ValidatedSourceManifestRow[]; publicSources: PublicSourceManifestRow[] }>>();
+
+/**
+ * A dataset's archived files for the Excel Sources sheet, named in the page's language and keyed by source id:
+ * by default its spreadsheets, or the rows `keep` names. The reviewed manifest is read once per dataset and language.
+ */
+export async function loadSourcedWorkbookSources(datasetId: MethodologyDatasetId, locale: Locale, keep: (row: ValidatedSourceManifestRow) => boolean = row => row.media_type.includes("spreadsheet")): Promise<SourcedWorkbookPublicSource[]> {
+  const cacheKey = `${locale}:${datasetId}` as const;
+  let pending = sourcedCache.get(cacheKey);
+  if (!pending) {
+    const repositoryRoot = path.resolve(process.cwd(), "../..");
+    pending = Promise.all([loadReviewedSourceManifest(repositoryRoot, datasetId), loadEnglishCatalogue(repositoryRoot)])
+      .then(([manifest, catalogue]) => ({ manifest, publicSources: projectPublicSources(manifest, locale, catalogue.documents) }));
+    sourcedCache.set(cacheKey, pending);
+  }
+  const { manifest, publicSources } = await pending;
+  return sourcedWorkbookSources(manifest, publicSources, keep);
 }
 
 export function loadGdpWorkbookSources(locale: Locale = "ka"): Promise<WorkbookPublicSource[]> {

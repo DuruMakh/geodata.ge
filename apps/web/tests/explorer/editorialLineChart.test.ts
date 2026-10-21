@@ -4,6 +4,7 @@ import { describe, expect, it } from "vitest";
 import {
   buildTooltipRows,
   EditorialLineChart,
+  periodReadoutText,
   TOOLTIP_ROW_CAP,
   type ChartSeries,
 } from "../../components/main-explorer/editorial-line-chart";
@@ -212,6 +213,16 @@ describe("EditorialLineChart monthly periods", () => {
     expect(markup).not.toContain("chart-series-cpi-dashed");
   });
 
+  it("dots a dotted series without an end dot, and draws nothing dotted unless asked", () => {
+    expect(markup).not.toContain("-dotted");
+    const dotted = renderGeorgianMarkup(createElement(EditorialLineChart, {
+      years: [2024, 2025], share: false, unit: UNIT_BN, shareLabel: "%",
+      series: [{ id: "loss", label: "Loss", color: "#B3402A", vals: [1e9, 2e9], dotted: true }],
+    }));
+    expect(dotted).toMatch(/data-testid="chart-series-loss-dotted"[^>]*stroke-dasharray="0.1 4.5"/);
+    expect(dotted).not.toMatch(/<circle[^>]*r="3.5"[^>]*fill="#B3402A"/);
+  });
+
   it("spaces lattice columns by half-years", () => {
     const width = Number(/<pattern[^>]*\swidth="([\d.]+)"/.exec(chartGeometry(markup, "desktop"))?.[1]);
     expect(width).toBeCloseTo((816 / 271) * 6, 3);
@@ -227,6 +238,55 @@ describe("EditorialLineChart monthly periods", () => {
     const regular = labels.slice(1, -1).map(Number);
     const gaps = new Set(regular.slice(1).map((year, index) => year - regular[index]!));
     expect(gaps.size).toBeLessThanOrEqual(1);
+  });
+});
+
+describe("EditorialLineChart dot lattice", () => {
+  const drawing = (years: number[]) =>
+    chartGeometry(
+      renderGeorgianMarkup(
+        createElement(EditorialLineChart, {
+          years,
+          series: [{ id: "total", label: "სერია", color: "#B3402A", vals: years.map((_, index) => (10 + index) * 1e9), planned: years.map(() => false) }],
+          share: false,
+          unit: UNIT_BN,
+          shareLabel: "% წილი",
+        }),
+      ),
+      "desktop",
+    );
+  const strokes = (markup: string) => [...markup.matchAll(/<line\b[^>]*\sstroke="([^"]+)"/g)].map((match) => match[1]);
+
+  it("draws a dot lattice instead of horizontal gridlines, keeping only the zero rule", () => {
+    const markup = drawing([2020, 2021, 2022, 2023, 2024]);
+    expect(markup).toContain('data-testid="chart-dot-lattice"');
+    expect(strokes(markup)).not.toContain("#E7DECF");
+    expect(strokes(markup)).toContain("#1E1B16");
+  });
+
+  it("offsets the pattern tile by half a pitch so the dots land on the chart's own grid", () => {
+    // editorial-line-chart.tsx: `x={PAD_L - lattice.colPitch / 2}`, `cx={lattice.colPitch / 2}`, so the
+    // dots sit at (PAD_L, PAD_T) rather than merely tiling the plot rect.
+    const markup = drawing([2020, 2021, 2022, 2023, 2024]);
+    const pattern = /<pattern id="chart-dot-lattice"[^>]*\sx="([\d.]+)" y="([\d.]+)" width="([\d.]+)" height="([\d.]+)"><circle cx="([\d.]+)" cy="([\d.]+)"/.exec(markup);
+    expect(pattern).not.toBeNull();
+    const [patternX, patternY, patternWidth, patternHeight, circleCx, circleCy] = pattern!.slice(1).map(Number) as [number, number, number, number, number, number];
+    // The left padding grows to fit the widest y label, so read the plot's left edge from the y-axis hairline.
+    const PAD_L = Number(/<line x1="([\d.]+)"[^>]*stroke="#D9CFBE"/.exec(markup)?.[1]);
+    expect(PAD_L).toBeGreaterThanOrEqual(74);
+    const PAD_T = 16;
+    expect(patternX + circleCx).toBeCloseTo(PAD_L, 5);
+    expect(patternY + circleCy).toBeCloseTo(PAD_T, 5);
+    expect(circleCx).toBeCloseTo(patternWidth / 2, 5);
+    expect(circleCy).toBeCloseTo(patternHeight / 2, 5);
+  });
+
+  it("drops the lattice for a single year and brings the hairline rules back", () => {
+    // A single-year range gives the lattice no interval to divide; without the hairlines
+    // the axis labels would sit against blank paper with nothing to read a value against.
+    const markup = drawing([2024]);
+    expect(markup).not.toContain("chart-dot-lattice");
+    expect(strokes(markup)).toContain("#E7DECF");
   });
 });
 
@@ -287,11 +347,83 @@ describe("EditorialLineChart accessible name", () => {
     );
   const imageLabels = (markup: string) => [...markup.matchAll(/<svg\b[^>]*role="img"[^>]*aria-label="([^"]*)"/g)].map((match) => match[1]);
 
-  it("keeps the generic trend label when no name is given", () => {
-    expect(imageLabels(render({}))).toEqual(["მრავალწლიანი დინამიკა", "მრავალწლიანი დინამიკა"]);
+  it("names the chart from its series and years when no label is passed", () => {
+    expect(imageLabels(render({}))).toEqual(["სერია, 1 სერია, 2024–2025", "სერია, 1 სერია, 2024–2025"]);
   });
 
   it("names every drawing with the given ariaLabel", () => {
     expect(imageLabels(render({ ariaLabel: "X" }))).toEqual(["X", "X"]);
+  });
+});
+
+describe("EditorialLineChart text for assistive technology", () => {
+  const series: ChartSeries[] = [
+    { id: "total", label: "სულ", color: "#B3402A", vals: [10_000_000_000, 12_000_000_000, 13_500_000_000], planned: [false, false, false] },
+    // Ends a year early: its latest value is 2024's, said with its year.
+    { id: "early", label: "ადრეული", color: "#4A707A", vals: [2_000_000_000, 3_000_000_000, null], planned: [false, false, false] },
+    { id: "empty", label: "ცარიელი", color: "#8A6D3B", vals: [null, null, null], planned: [false, false, false] },
+  ];
+  const markup = renderGeorgianMarkup(
+    createElement(EditorialLineChart, { years: [2023, 2024, 2025], series, share: false, unit: UNIT_BN, shareLabel: "% წილი" }),
+  );
+
+  it("the figcaption lists each line's latest value", () => {
+    const caption = /<figcaption id="([^"]+)"[^>]*>([\s\S]*?)<\/figcaption>/.exec(markup);
+    expect(caption).not.toBeNull();
+    const [, id, text] = caption!;
+    expect(text).toContain("სულ, 2025: 13.5 მლრდ");
+    expect(text).toContain("ადრეული, 2024: 3.0 მლრდ");
+    expect(text).toContain("ცარიელი: არ არის ხელმისაწვდომი");
+    // Both drawings point at it.
+    expect(markup.match(new RegExp(`<svg[^>]*aria-describedby="${id}"`, "g"))).toHaveLength(2);
+  });
+
+  it("is a keyboard stop of its own", () => {
+    expect(chartGeometry(markup, "desktop")).toMatch(/^<svg[^>]*tabindex="0"/);
+  });
+
+  it("a missing year is read as not available, never as zero", () => {
+    const formatValue = (value: number) => (value / 1e9).toFixed(1);
+    const labels = { notAvailable: "არ არის ხელმისაწვდომი", other: "სხვა", planned: "გეგმა" };
+    const gap: ChartSeries[] = [
+      { id: "a", label: "ა", color: "#B3402A", vals: [5_000_000_000, null, 7_000_000_000], planned: [false, false, false] },
+      { id: "b", label: "ბ", color: "#4A707A", vals: [1_000_000_000, null, null], planned: [false, false, false] },
+    ];
+    expect(periodReadoutText(gap, 1, "2024", formatValue, labels)).toBe("2024: არ არის ხელმისაწვდომი");
+    // A line missing in a year with data is left out, as in the visible readout — not read as 0.
+    expect(periodReadoutText(gap, 2, "2025", formatValue, labels)).toBe("2025: ა 7.0");
+    expect(periodReadoutText(gap, 0, "2023", formatValue, labels)).toBe("2023: ა 5.0, ბ 1.0");
+  });
+
+  it("says a preliminary or planned value is one, as the drawing marks it", () => {
+    const marked: ChartSeries[] = [
+      { id: "gdp", label: "მშპ", color: "#B3402A", vals: [80_000_000_000, 90_000_000_000], planned: [false, false], preliminary: [false, true] },
+      { id: "plan", label: "გეგმა", color: "#4A707A", vals: [null, 30_000_000_000], planned: [false, true] },
+    ];
+    const formatValue = (value: number) => (value / 1e9).toFixed(1);
+    const labels = { notAvailable: "არ არის ხელმისაწვდომი", other: "სხვა", planned: "გეგმა", preliminary: "წინასწ." };
+    expect(periodReadoutText(marked, 1, "2025", formatValue, labels)).toBe("2025: მშპ 90.0 (წინასწ.), გეგმა 30.0 (გეგმა)");
+    expect(periodReadoutText(marked, 0, "2024", formatValue, labels)).toBe("2024: მშპ 80.0");
+
+    const caption = /<figcaption[^>]*>([\s\S]*?)<\/figcaption>/.exec(
+      renderGeorgianMarkup(
+        createElement(EditorialLineChart, { years: [2024, 2025], series: marked, share: false, unit: UNIT_BN, shareLabel: "% წილი", preliminaryLabel: "წინასწ." }),
+      ),
+    )![1];
+    expect(caption).toContain("მშპ, 2025: 90.0 მლრდ (წინასწ.)");
+    expect(caption).toContain("გეგმა, 2025: 30.0 მლრდ (გეგმა)");
+  });
+
+  // X1-17: a series with no planned values leaves `planned` out instead of passing an all-false array.
+  it("treats a series without planned flags as having no planned value", () => {
+    const formatValue = (value: number) => (value / 1e9).toFixed(1);
+    const labels = { notAvailable: "არ არის ხელმისაწვდომი", other: "სხვა", planned: "გეგმა" };
+    const plain: ChartSeries[] = [{ id: "a", label: "ა", color: "#B3402A", vals: [5_000_000_000, 7_000_000_000] }];
+    expect(periodReadoutText(plain, 1, "2025", formatValue, labels)).toBe("2025: ა 7.0");
+    const hollow = (series: ChartSeries[]) =>
+      renderGeorgianMarkup(createElement(EditorialLineChart, { years: [2024, 2025], series, share: false, unit: UNIT_BN, shareLabel: "% წილი" })).match(/fill="#F7F2E9"/g)?.length ?? 0;
+    expect(hollow(plain)).toBe(0);
+    // The same line with its last value planned draws the hollow point, so the check above can fail.
+    expect(hollow([{ ...plain[0]!, planned: [false, true] }])).toBeGreaterThan(0);
   });
 });

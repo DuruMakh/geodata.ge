@@ -11,33 +11,6 @@ async function ready(page: Page) {
 test.describe("phone", () => {
   test.use({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
 
-  test("analysis years sit on one scrolling row, opened at the active year", async ({ page }) => {
-    await page.goto("/explorer/analysis");
-    await ready(page);
-    const row = page.getByTestId("analysis-year-selector");
-    const geometry = await row.evaluate((element) => {
-      const box = element.getBoundingClientRect();
-      const buttons = [...element.querySelectorAll("button")].map((button) => button.getBoundingClientRect());
-      const active = element.querySelector("button[aria-pressed='true']")!.getBoundingClientRect();
-      return {
-        overflows: element.scrollWidth > element.clientWidth,
-        rows: new Set(buttons.map((button) => Math.round(button.top))).size,
-        minHeight: Math.min(...buttons.map((button) => button.height)),
-        minWidth: Math.min(...buttons.map((button) => button.width)),
-        activeInside: active.left >= box.left - 1 && active.right <= box.right + 1,
-        pageOverflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
-      };
-    });
-    expect(geometry).toMatchObject({ overflows: true, rows: 1, activeInside: true, pageOverflow: 0 });
-    expect(geometry.minHeight).toBeGreaterThanOrEqual(36);
-    expect(geometry.minWidth).toBeGreaterThanOrEqual(36);
-
-    // Picking an early year keeps it in view and still drives the page.
-    await row.evaluate((element) => { element.scrollLeft = 0; });
-    await row.getByRole("button", { name: "2010", exact: true }).click();
-    await expect(row.getByRole("button", { name: "2010", exact: true })).toHaveAttribute("aria-pressed", "true");
-  });
-
   test("range handles rest at least 12px from the screen edges", async ({ page }) => {
     for (const path of ["/explorer/expenditure", "/explorer/inflation/overview"]) {
       await page.goto(path);
@@ -172,15 +145,163 @@ test.describe("phone", () => {
     await expect(page.getByTestId("chart-frame")).toHaveAttribute("aria-label", "Multi-year chart");
   });
 
-  test("radar note points to the ranking and the index uses one per-resident term", async ({ page }) => {
-    await page.goto("/explorer/analysis");
+  // Touch targets at the site's own sizes (DESIGN.md §12: text controls 44px on
+  // phones; WCAG 2.5.8: nothing tappable under 24px). Native selects take 16px
+  // text on phones so iOS Safari does not zoom the page on focus (Q5).
+  test("native selects are 16px and 44px tall on phones", async ({ page }) => {
+    for (const [path, testId] of [["/explorer/unemployment/age", "unemployment-indicator"], ["/explorer/wages/industries", "wages-group"]] as const) {
+      await page.goto(path);
+      await ready(page);
+      const select = page.getByTestId(testId);
+      expect(await select.evaluate((element) => getComputedStyle(element).fontSize)).toBe("16px");
+      expect((await select.boundingBox())!.height).toBeGreaterThanOrEqual(44);
+    }
+    await page.goto("/explorer/inflation/overview");
     await ready(page);
-    await expect(page.getByTestId("budget-radar")).toContainText("ზუსტი მნიშვნელობები — რეიტინგში ქვემოთ");
-    await expect(page.getByTestId("budget-radar")).not.toContainText("ვიზუალური");
-    await page.goto("/explorer/municipalities");
+    expect(await page.getByTestId("range-start-picker").locator("select").evaluateAll((selects) => selects.map((select) => getComputedStyle(select).fontSize))).toEqual(["16px", "16px"]);
+  });
+
+  test("range chips, text tabs and the show-all button are 44px targets on phones", async ({ page }) => {
+    // The count comes first, so a renamed test id fails instead of checking nothing.
+    const heights = async (locator: ReturnType<Page["locator"]>, count: number) => {
+      await expect(locator).toHaveCount(count);
+      return locator.evaluateAll((elements) => elements.map((element) => element.getBoundingClientRect().height));
+    };
+    for (const path of ["/explorer/debt", "/explorer/municipalities/batumi"]) {
+      await page.goto(path);
+      await ready(page);
+      const chips = page.getByTestId("year-range-strip").locator("button[aria-pressed]");
+      for (const height of await heights(chips, 3)) expect(height).toBeGreaterThanOrEqual(44);
+      // The taller chip row must not reach the handles' tap areas on the rail below it.
+      const chipBoxes = await chips.evaluateAll((elements) => elements.map((element) => element.getBoundingClientRect().toJSON()));
+      for (const handle of ["range-start-handle", "range-end-handle"]) {
+        const h = (await page.getByTestId(handle).boundingBox())!;
+        for (const c of chipBoxes) expect(c.right <= h.x || h.x + h.width <= c.left || c.bottom <= h.y || h.y + h.height <= c.top).toBe(true);
+      }
+    }
+    await page.goto("/explorer/inflation/overview");
     await ready(page);
-    await expect(page.getByTestId("municipal-row-per-resident").first()).toContainText("ერთ მოსახლეზე");
-    await expect(page.locator("body")).not.toContainText("ერთ სულზე");
+    for (const height of await heights(page.locator("[data-testid^='inflation-tab-']"), 3)) expect(height).toBeGreaterThanOrEqual(44);
+    await page.goto("/explorer/trade/products");
+    await ready(page);
+    for (const height of await heights(page.locator("[data-testid^='trade-products-measure-']"), 2)) expect(height).toBeGreaterThanOrEqual(44);
+    await page.goto("/explorer/trade/partners");
+    await ready(page);
+    expect((await page.getByTestId("trade-partners-show-all").boundingBox())!.height).toBeGreaterThanOrEqual(44);
+    // The narrowest text tab on the site: "All" over the census pyramid.
+    await page.goto("/en/explorer/demography/population/georgia");
+    await ready(page);
+    const settlements = page.locator("[data-testid^='age-sex-settlement-']");
+    await expect(settlements).toHaveCount(3);
+    for (const box of await settlements.evaluateAll((tabs) => tabs.map((tab) => tab.getBoundingClientRect().toJSON()))) {
+      expect(box.width).toBeGreaterThanOrEqual(24);
+      expect(box.height).toBeGreaterThanOrEqual(44);
+    }
+  });
+
+  test("links in fine print are at least 24px targets that do not overlap on phones", async ({ page }) => {
+    const atLeast24 = async (links: ReturnType<Page["locator"]>) => {
+      // One box per line a link occupies: a link that wraps is two targets side by side.
+      const boxes = await links.evaluateAll((elements) => elements.flatMap((element) => [...element.getClientRects()].map((rect) => rect.toJSON())));
+      expect(boxes.length).toBeGreaterThan(0);
+      for (const box of boxes) {
+        expect(box.width).toBeGreaterThanOrEqual(24);
+        expect(box.height).toBeGreaterThanOrEqual(24);
+      }
+      for (const [index, a] of boxes.entries()) {
+        for (const b of boxes.slice(index + 1)) expect(a.right <= b.left || b.right <= a.left || a.bottom <= b.top || b.bottom <= a.top).toBe(true);
+      }
+    };
+    for (const path of ["/explorer/external/money-from-abroad", "/explorer/external/foreign-investment", "/explorer/external/current-account"]) {
+      await page.goto(path);
+      await ready(page);
+      await atLeast24(page.getByTestId("source-label").locator("a"));
+    }
+    await page.goto("/en/explorer/demography/population/georgia");
+    await ready(page);
+    await atLeast24(page.getByTestId("population-source-note").locator("a"));
+    await page.goto("/methodology/expenditure");
+    await atLeast24(page.getByTestId("processed-dataset-json").locator("a"));
+    await page.goto("/connect");
+    await page.getByTestId("connect-developer-details").locator("summary").click();
+    for (const block of ["connect-sector-discovery", "connect-regional-discovery", "connect-inflation-discovery", "connect-product-discovery"]) await atLeast24(page.getByTestId(block).locator("a"));
+  });
+
+  test("picker rows are 44px on phones, touch hides the arrow-key hint and the municipal picker fits the screen", async ({ page }) => {
+    await page.goto("/explorer/economy/regions/imereti");
+    await ready(page);
+    await page.getByTestId("region-picker-trigger").click();
+    const options = page.getByRole("listbox").getByRole("option");
+    expect(await options.count()).toBeGreaterThan(0);
+    for (const height of await options.evaluateAll((rows) => rows.map((row) => row.getBoundingClientRect().height))) expect(height).toBeGreaterThanOrEqual(44);
+    await expect(page.getByText("გადაადგილდით ისრებით", { exact: false })).toBeHidden();
+
+    await page.setViewportSize({ width: 390, height: 700 });
+    await page.goto("/en/explorer/municipalities/region/racha_lechkhumi_kvemo_svaneti");
+    await ready(page);
+    await page.getByTestId("entity-picker-trigger").click();
+    const picker = page.getByTestId("entity-picker");
+    expect(await picker.getByRole("option").count()).toBeGreaterThan(0);
+    for (const height of await picker.getByRole("option").evaluateAll((rows) => rows.slice(0, 5).map((row) => row.getBoundingClientRect().height))) expect(height).toBeGreaterThanOrEqual(44);
+    const fit = await picker.evaluate((dialog) => {
+      const input = dialog.querySelector("input")!;
+      const style = getComputedStyle(input);
+      const context = document.createElement("canvas").getContext("2d")!;
+      context.font = `${style.fontSize} ${style.fontFamily}`;
+      return {
+        list: dialog.querySelector("[role='listbox']")!.getBoundingClientRect().height,
+        bottom: dialog.getBoundingClientRect().bottom,
+        placeholder: context.measureText(input.placeholder).width <= input.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight),
+      };
+    });
+    expect(fit.list).toBeLessThanOrEqual(700 * 0.4 + 1);
+    expect(fit.bottom).toBeLessThanOrEqual(700);
+    expect(fit.placeholder).toBe(true);
+  });
+
+  test("ranking headers are 11px and the trade share header breaks only between words", async ({ page }) => {
+    for (const [path, testId] of [["/explorer/trade/partners", "trade-partners-ranking"], ["/en/explorer/trade/products", "trade-partners-ranking"], ["/explorer/external/money-from-abroad", "money-from-abroad-ranking"]] as const) {
+      await page.goto(path);
+      await ready(page);
+      const header = await page.getByTestId(testId).locator("thead").evaluate((head) => {
+        const broken: string[] = [];
+        for (const cell of head.querySelectorAll("th")) {
+          const walker = document.createTreeWalker(cell, NodeFilter.SHOW_TEXT);
+          for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+            let index = 0;
+            for (const word of node.textContent!.split(/(\s+)/)) {
+              if (word.trim()) {
+                const range = document.createRange();
+                range.setStart(node, index);
+                range.setEnd(node, index + word.length);
+                if (new Set([...range.getClientRects()].map((rect) => Math.round(rect.top))).size > 1) broken.push(word);
+              }
+              index += word.length;
+            }
+          }
+        }
+        return { broken, cells: head.querySelectorAll("th").length > 0, sizes: [...new Set([...head.querySelectorAll("th")].map((cell) => getComputedStyle(cell).fontSize))] };
+      });
+      expect(header).toEqual({ broken: [], cells: true, sizes: ["11px"] });
+    }
+  });
+
+  test("neighbour region names wrap instead of being cut on phones", async ({ page }) => {
+    for (const path of ["/explorer/unemployment/regions/mtskheta_mtianeti", "/en/explorer/unemployment/regions/samegrelo_zemo_svaneti"]) {
+      await page.goto(path);
+      await ready(page);
+      const links = page.getByTestId("unemployment-region-navigation").locator("a");
+      await expect(links).toHaveCount(2);
+      await expect(links.locator("span")).toHaveCount(2);
+      expect(await links.locator("span").evaluateAll((spans) => spans.filter((span) => span.scrollWidth > span.clientWidth).map((span) => span.textContent))).toEqual([]);
+      for (const height of await links.evaluateAll((anchors) => anchors.map((anchor) => anchor.getBoundingClientRect().height))) expect(height).toBeGreaterThanOrEqual(44);
+    }
+  });
+
+  test("the pinned bar's brand link is a 44px row", async ({ page }) => {
+    await page.goto("/explorer/unemployment/overview");
+    await ready(page);
+    expect((await page.getByTestId("data-sidebar").locator("a").first().boundingBox())!.height).toBeGreaterThanOrEqual(44);
   });
 
   test("inflation overview eyebrow starts where the chart and range strip start", async ({ page }) => {
@@ -203,15 +324,40 @@ test.describe("phone", () => {
 test.describe("desktop", () => {
   test.use({ viewport: { width: 1440, height: 900 } });
 
-  test("analysis years still wrap and range handles keep the full-width rail", async ({ page }) => {
-    await page.goto("/explorer/analysis");
-    await ready(page);
-    const row = page.getByTestId("analysis-year-selector");
-    expect(await row.evaluate((element) => element.scrollWidth <= element.clientWidth)).toBe(true);
+  test("range handles keep the full-width rail", async ({ page }) => {
     await page.goto("/explorer/expenditure");
     await ready(page);
     const rail = await page.getByRole("group", { name: "წლების დიაპაზონი" }).evaluate((element) => getComputedStyle(element).marginLeft);
     expect(rail).toBe("0px");
+  });
+
+  test("phone-only target sizes leave the desktop controls as they were", async ({ page }) => {
+    // These exact sizes are today's inherited ones: globals.css:95-100 gives buttons and
+    // selects `font: inherit; min-width: 0` outside a layer, which overrides their text-*
+    // utilities. They are expected to move if that rule is ever fixed.
+    await page.goto("/explorer/debt");
+    await ready(page);
+    const chips = page.getByTestId("year-range-strip").locator("button[aria-pressed]");
+    await expect(chips).toHaveCount(3);
+    for (const height of await chips.evaluateAll((elements) => elements.map((chip) => chip.getBoundingClientRect().height))) expect(height).toBe(38);
+    await page.goto("/explorer/unemployment/age");
+    await ready(page);
+    const select = page.getByTestId("unemployment-indicator");
+    expect(await select.evaluate((element) => getComputedStyle(element).fontSize)).toBe("10px");
+    expect((await select.boundingBox())!.height).toBeLessThan(36);
+    await page.goto("/explorer/inflation/overview");
+    await ready(page);
+    expect((await page.getByTestId("inflation-tab-index").boundingBox())!.height).toBe(36);
+    await page.goto("/explorer/trade/partners");
+    await ready(page);
+    expect((await page.getByTestId("trade-partners-show-all").boundingBox())!.height).toBe(24);
+    await expect(page.getByTestId("trade-partners-ranking").locator("thead th").nth(3)).toHaveText("წილი საქართველოს ჯამში", { useInnerText: true });
+    // The 40svh list cap is for phones only: a short desktop window keeps the 340px list.
+    await page.setViewportSize({ width: 1366, height: 700 });
+    await page.goto("/en/explorer/municipalities/region/racha_lechkhumi_kvemo_svaneti");
+    await ready(page);
+    await page.getByTestId("entity-picker-trigger").click();
+    expect(await page.getByTestId("entity-picker").getByRole("listbox").evaluate((list) => list.getBoundingClientRect().height)).toBe(340);
   });
 
   test("GDP and unemployment y labels fit without the old fixed padding", async ({ page }) => {
@@ -243,8 +389,11 @@ test.describe("desktop", () => {
     const frame = page.getByTestId("chart-frame");
     if (await frame.evaluate((element) => element.scrollWidth > element.clientWidth + 1)) {
       await expect(frame).toHaveAttribute("aria-label", "Multi-year chart — scroll horizontally");
+      // A sideways scroll to operate makes the frame a keyboard stop of its own.
+      await expect(frame).toHaveAttribute("tabindex", "0");
     } else {
       await expect(frame).toHaveAttribute("aria-label", "Multi-year chart");
+      await expect(frame).not.toHaveAttribute("tabindex");
     }
   });
 });

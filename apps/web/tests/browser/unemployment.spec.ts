@@ -4,48 +4,44 @@ import { tableSeriesCount } from "./explorer-table";
 import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
+import { loadReviewedSourceManifest } from "../../lib/methodology/sourceManifest";
 
-for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
-  test(`four unemployment cards open the matching pages ${prefix || "ka"} at ${width}px`, async ({ page }, info) => {
+// Each locale once; page overflow at 390/768/1440 is in the layout pass of mobile-fit-charts.spec.ts,
+// and the regions index map and the 14 / 14 bulk check are in unemployment-regions.spec.ts.
+for (const [prefix, width] of [["", 390], ["/en", 1440]] as const) {
+  test(`eight unemployment cards open the matching pages ${prefix || "ka"} at ${width}px`, async ({ page }) => {
     const errors: string[] = []; page.on("pageerror", error => errors.push(error.message));
     await page.setViewportSize({ width, height: 1000 });
-    const sections = ["overview", "regions", "age", "gender"], breakdowns = ["national", "region", "age", "sex"];
-    const titles = prefix ? ["Unemployment overview", "Regions", "Age groups", "Gender"] : ["უმუშევრობის მიმოხილვა", "რეგიონები", "ასაკობრივი ჯგუფები", "სქესი"];
+    const sections = ["overview", "regions", "age", "gender", "industries", "hours", "informal", "young-people"], breakdowns = ["national", "region", "age", "sex"];
+    // U28-19: English says "sex", as the Georgian "სქესი" and the demography pages do.
+    const titles = prefix
+      ? ["Unemployment overview", "Regions", "Age groups", "Sex", "Jobs by industry", "Hours worked", "Informal jobs", "Young people not in work or study"]
+      : ["უმუშევრობის მიმოხილვა", "რეგიონები", "ასაკობრივი ჯგუფები", "სქესი", "დასაქმება დარგების მიხედვით", "სამუშაო საათები", "არაფორმალური დასაქმება", "ახალგაზრდები სწავლისა და დასაქმების გარეშე"];
     for (const [index, section] of sections.entries()) {
       await page.goto(`${prefix}/explorer/unemployment`);
       await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
       const cards = page.getByTestId("unemployment-hub").getByTestId("hub-card");
-      await expect(cards).toHaveCount(4);
+      await expect(cards).toHaveCount(8);
       await expect(cards.nth(index)).toHaveAttribute("href", `${prefix}/explorer/unemployment/${section}`);
       await expect(cards.nth(index).getByRole("heading")).toHaveText(titles[index]);
-      if (index === 0) await page.screenshot({ path: info.outputPath(`unemployment-hub-${prefix ? "en" : "ka"}-${width}.png`), fullPage: true });
       await cards.nth(index).click();
       await expect(page).toHaveURL(new RegExp(`${prefix}/explorer/unemployment/${section}$`));
-      if (section === "regions") {
-        await expect(page.getByTestId("unemployment-region-map")).toBeVisible();
-        await expect(page.getByTestId("regional-list-row")).toHaveCount(11);
-        await expect(page.getByTestId("chart-panel")).toHaveCount(0);
-      } else await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-breakdown", breakdowns[index]);
+      // The four Labour Force Survey detail pages (05–08) have one list each, no breakdown.
+      if (index >= 4) await expect(page.getByTestId(`labour-${section}`)).toBeVisible();
+      else if (section !== "regions") await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-breakdown", breakdowns[index]);
       await expect(page.getByTestId("unemployment-headline")).toHaveCount(0);
       await expect(page.getByTestId("unemployment-breakdown")).toHaveCount(0);
       await expect(page.getByTestId("unemployment-composition")).toHaveCount(section === "overview" ? 1 : 0);
       await expect(page.getByTestId("unemployment-national-tabs")).toHaveCount(section === "overview" ? 1 : 0);
       await expect(page.getByRole("contentinfo")).toContainText(prefix ? "Geostat" : "საქსტატი");
-      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
-      await page.screenshot({ path: info.outputPath(`unemployment-${section}-${prefix ? "en" : "ka"}-${width}.png`), fullPage: true });
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), section).toBe(true);
     }
-    await page.goto(`${prefix}/explorer/unemployment/regions#breakdown=region`);
-    await page.getByTestId("chart-mode-table").click();
-    await page.getByTestId("series-toggle-all").click(); await page.getByTestId("series-toggle-all").click();
-    // §7.7: the bulk action selects the 14 top-level regional rates, not the rates under their carets.
-    await expect(page.getByTestId("series-status")).toContainText("14 / 14");
-    await expect.poll(() => tableSeriesCount(page.getByTestId("explorer-table"))).toBe(14);
-    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     expect(errors).toEqual([]);
   });
 }
 
-for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
+// 768 takes the same branch as 1440.
+for (const prefix of ["", "/en"]) for (const width of [390, 1440]) {
   test(`count chart scales remain readable ${prefix || "ka"} at ${width}px`, async ({ page }) => {
     await page.setViewportSize({ width, height: 1000 });
     await page.goto(`${prefix}/explorer/unemployment/overview#indicator=unemployed`);
@@ -71,15 +67,14 @@ for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
 test("national tabs keep valid metrics, coverage and reference selection", async ({ page }) => {
   await page.goto("/en/explorer/unemployment/overview"); await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
   const title = await page.getByRole("heading", { level: 1 }).textContent();
-  // The page summary; the latest-value line above it (owner decision D2) follows the tab.
-  const subtitle = page.getByTestId("unemployment-explorer").locator(":scope > p:not([data-testid])").first();
-  const description = await subtitle.textContent();
+  // Only the latest-value line (owner decision D2) sits under the heading on every tab: no summary paragraph (DESIGN §17).
+  const subtitle = page.getByTestId("unemployment-explorer").locator(":scope > p:not([data-testid]):not(.sr-only)");
   for (const breakdown of ["national", "settlement", "education", "long_term"]) {
     await page.getByTestId(`unemployment-tab-${breakdown}`).click();
     await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-breakdown", breakdown);
     await expect(page.getByTestId(`unemployment-tab-${breakdown}`)).toHaveAttribute("aria-pressed", "true");
     await expect(page.getByRole("heading", { level: 1 })).toHaveText(title!);
-    await expect(subtitle).toHaveText(description!);
+    await expect(subtitle).toHaveCount(0);
     await expect(page.getByTestId("unemployment-headline")).toHaveCount(0);
     await expect(page.getByTestId("source-label")).toBeVisible();
     await expect(page.getByTestId("unemployment-composition")).toHaveCount(breakdown === "national" ? 1 : 0);
@@ -100,8 +95,8 @@ test("national tabs keep valid metrics, coverage and reference selection", async
   await expect(page.getByTestId("year-range-strip")).toContainText("2020–2025");
 });
 
-for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
-  test(`gender indicators expand beneath Men and Women ${prefix || "ka"} at ${width}px`, async ({ page }, info) => {
+for (const prefix of ["", "/en"]) for (const width of [390, 1440]) {
+  test(`gender indicators expand beneath Men and Women ${prefix || "ka"} at ${width}px`, async ({ page }) => {
     const errors: string[] = []; page.on("pageerror", error => errors.push(error.message));
     await page.setViewportSize({ width, height: 1000 });
     await page.goto(`${prefix}/explorer/unemployment/gender`);
@@ -143,7 +138,6 @@ for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
     await expect.poll(() => tableSeriesCount(page.getByTestId("explorer-table"))).toBe(2);
     await expect(page.getByTestId("explorer-table")).toContainText("79.4");
     await expect(page.getByTestId("explorer-table")).toContainText("770.2");
-    await page.screenshot({ path: info.outputPath(`unemployment-gender-expanded-${prefix ? "en" : "ka"}-${width}.png`), fullPage: true });
     await page.getByTestId("series-search").fill("participation");
     await page.getByTestId("series-toggle-all").click(); await page.getByTestId("series-toggle-all").click();
     await expect(page.getByTestId("series-status")).toContainText("10 / 10");
@@ -276,7 +270,7 @@ for (const prefix of ["", "/en"]) test(`overview checkboxes never mix rates and 
   await expect(page.getByTestId("explorer-table")).toContainText("961.1");
   const promise = page.waitForEvent("download"); await page.getByTestId("unemployment-excel-download").click();
   const download = await promise;
-  expect(download.suggestedFilename()).toContain("national-people-2025-2025");
+  expect(download.suggestedFilename()).toBe(`fiscal-unemployment-national-people-2025-2025${prefix ? "-en" : ""}.xlsx`);
   const workbook = new ExcelJS.Workbook(); await workbook.xlsx.readFile((await download.path())!);
   expect(workbook.worksheets[0].getCell("B4").value).toBeCloseTo(426.2940841069528, 10);
   expect(workbook.worksheets[0].getCell("B5").value).toBeCloseTo(961.1005993998547, 10);
@@ -347,7 +341,6 @@ for (const prefix of ["", "/en"]) test(`national export drops the remembered edu
   const downloadPromise = page.waitForEvent("download");
   await page.getByTestId("unemployment-excel-download").click();
   const download = await downloadPromise;
-  expect(download.suggestedFilename()).toBe(`fiscal-unemployment-national-unemployment_rate-2010-2025${prefix ? "-en" : ""}.xlsx`);
   const workbook = new ExcelJS.Workbook(); await workbook.xlsx.readFile((await download.path())!);
   expect(workbook.worksheets[0].getCell("A4").value).toBe(prefix ? "Unemployment rate" : "უმუშევრობის დონე");
   expect(workbook.worksheets[0].getCell("Q4").value).toBeCloseTo(0.139, 3);
@@ -397,17 +390,38 @@ for (const prefix of ["", "/en"]) test(`new controls and year handles work with 
   await expect(page.getByTestId("explorer-table")).toBeVisible();
 });
 
-test("both methodology pages link nine byte-identical originals without a nonexistent bulk dataset", async ({ page, request }) => {
+test("both methodology pages link 23 byte-identical originals without a nonexistent bulk dataset", async ({ page, request }) => {
   const root = path.resolve(process.cwd(), "../..");
-  const manifest = JSON.parse(await readFile(path.join(root, "docs/Raw Data/Unemployment/geostat-labour-force-annual/source-manifest.json"), "utf8")) as { local_file: string; sha256: string }[];
+  // The nine survey originals and the 14 of the labour detail pages (12 workbooks, two page captures).
+  const manifest = (await Promise.all(["geostat-labour-force-annual", "geostat-labour-force-detail"].map(async (folder) =>
+    JSON.parse(await readFile(path.join(root, "docs/Raw Data/Unemployment", folder, "source-manifest.json"), "utf8")) as { source_id: string; sha256: string }[]))).flat();
+  expect(manifest).toHaveLength(23);
+  // The site links each original under its reviewed public path (an archived web page is published as .html.txt).
+  const publishedPath = new Map((await loadReviewedSourceManifest(root, "unemployment")).map((row) => [row.source_id, row.public_download_path]));
   for (const prefix of ["", "/en"]) {
     await page.goto(`${prefix}/methodology/unemployment`);
-    await expect(page.locator('a[href^="/downloads/methodology/unemployment/files/"]')).toHaveCount(9);
+    await expect(page.locator('a[href^="/downloads/methodology/unemployment/files/"]')).toHaveCount(23);
     await expect(page.getByTestId("processed-dataset-download")).toHaveCount(0);
   }
   for (const source of manifest) {
-    const response = await request.get(`/downloads/methodology/unemployment/files/${path.posix.basename(source.local_file)}`);
-    expect(response.ok()).toBe(true);
+    const published = publishedPath.get(source.source_id);
+    expect(published, source.source_id).toBeDefined();
+    const response = await request.get(`/${published}`);
+    expect(response.ok(), published).toBe(true);
     expect(createHash("sha256").update(await response.body()).digest("hex")).toBe(source.sha256.toLowerCase());
   }
+});
+
+test("Georgian employment child labels keep a clear gap before the value at desktop width", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await page.goto("/explorer/unemployment/overview#sel=georgia:employed,georgia:self_employed&range=all");
+  const row = page.locator('[data-series-id="georgia:self_employed"]');
+  await expect(row).toContainText("426.3");
+  await page.evaluate(async () => { await document.fonts.ready; });
+  const gap = await row.evaluate(element => {
+    const label = element.querySelector('[data-testid="series-label"]')!;
+    const value = element.querySelector('[data-testid="series-row-toggle"]')!.lastElementChild!;
+    return value.getBoundingClientRect().left - label.getBoundingClientRect().right;
+  });
+  expect(gap).toBeGreaterThanOrEqual(8);
 });

@@ -1,5 +1,6 @@
 import type {
   SectorDefinition,
+  SectorMeasure,
 } from "../data/economicSectors/types";
 import type { Presentation } from "../i18n/types";
 import { message } from "../i18n/messages";
@@ -7,8 +8,10 @@ import { workbookMessage } from "../i18n/workbook";
 import { unitFor, unitsFor } from "./format";
 import {
   buildEconomicSectorsModel,
-  rankSectorDefinitions,
+  orderSectorDefinitions,
   SECTOR_GDP,
+  SECTORS_PAGE_CONFIG,
+  type SectorPageConfig,
   type SectorState,
 } from "./economicSectors";
 import {
@@ -21,6 +24,9 @@ import {
 } from "./workbookModel";
 import type { ClientSectorObservation } from "../servedRows";
 
+// File names share one English stem in both languages, in words rather than ids.
+const MEASURE_FILE_WORDS: Record<SectorMeasure, string> = { nominal: "nominal", share_of_gdp: "share-of-gdp", real_growth: "real-growth" };
+
 export function buildEconomicSectorsWorkbookExportModel(
   facts: ClientSectorObservation[],
   registry: SectorDefinition[],
@@ -29,17 +35,18 @@ export function buildEconomicSectorsWorkbookExportModel(
   sources: (WorkbookPublicSource & { sourceId: string })[],
   siteOrigin: string,
   sourceIdByMeasure: Record<string, string>,
+  config: SectorPageConfig = SECTORS_PAGE_CONFIG,
 ): WorkbookExportModel {
-  const model = buildEconomicSectorsModel(facts, registry, state, sourceIdByMeasure);
+  const model = buildEconomicSectorsModel(facts, registry, state, sourceIdByMeasure, config);
   const { locale, messages } = presentation;
-  const t = (key: string) => message(messages, `sectors.${key}`);
+  const t = (key: string) => message(messages, `${config.scope}.${key}`);
   const w = (key: Parameters<typeof workbookMessage>[1]) =>
     workbookMessage(locale, key);
   const percent = state.measure !== "nominal";
   const share = state.measure === "share_of_gdp";
   const label = t(share ? "shareOfGdp" : percent ? "realGrowth" : "nominal");
   const unitLabel = percent ? label : message(messages, "format.bnGel");
-  const definitions = rankSectorDefinitions(registry, model.endValues)
+  const definitions = orderSectorDefinitions(registry, model.endValues, config)
     .filter((r) => state.selectedIds.includes(r.id));
   const name = (r: SectorDefinition) =>
     locale === "en" ? r.labelEn : r.labelKa;
@@ -77,10 +84,10 @@ export function buildEconomicSectorsWorkbookExportModel(
   ].sort((a, b) => a - b);
   return {
     locale,
-    filename: workbookFilename(`economic-sectors-${state.measure}-${model.range.start}-${model.range.end}`, locale),
+    filename: workbookFilename(`${config.fileStem}-${MEASURE_FILE_WORDS[state.measure]}-${model.range.start}-${model.range.end}`, locale),
     sheetNames: SHEET_NAMES[locale],
     readable: {
-      title: message(messages, "sectors.workbookTitle", { measure: label }),
+      title: message(messages, `${config.scope}.workbookTitle`, { measure: label }),
       subtitle: `${model.range.start}–${model.range.end} · ${unitLabel}${preliminaryYears.length ? ` · ${t("preliminary")}: ${preliminaryYears.join(", ")}` : ""}`,
       unitLabel,
       amountDecimals: unitFor(facts.filter(f => f.measure === "nominal").map(f => f.value), unitsFor(locale).bn).decimals,

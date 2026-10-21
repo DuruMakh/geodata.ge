@@ -14,13 +14,14 @@ const SNAPSHOT_PATH = path.join(process.cwd(), "lib", "factQuery", "generated", 
 let cached: FactQuerySnapshot | undefined;
 
 /**
- * Measured cost on the 3.26 MB artifact: 6.8 ms to read, 4.8 ms to parse, once
- * per instance. Warm queries against the parsed object then run in well under
- * 2 ms, so section 11.4's latency targets are dominated by function boot rather
- * than by this.
+ * Measured on 2026-10-13 against the 32.1 MB minified artifact: about 200 ms to
+ * read and 290 ms to parse, about 185 MB resident, once per instance - most of
+ * a cold request, and the reason the file is written minified (the indented
+ * file was 46.3 MB and took about 320 ms to read). The inflation and product
+ * tables are most of it. Warm requests then reuse the parsed object.
  *
  * Deliberately synchronous: it runs on the first request, and an async loader
- * would let two concurrent requests race to parse the same 3 MB.
+ * would let two concurrent requests race to parse the same file.
  *
  * An unreadable or incompatible bundle throws. Section 4.4: the endpoint
  * returns a service error with no figures; it never falls back to another data

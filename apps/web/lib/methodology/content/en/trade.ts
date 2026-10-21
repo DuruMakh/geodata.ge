@@ -5,7 +5,7 @@ export const TRADE_METHODOLOGY_CONTENT: MethodologyContent = {
   "slug": "trade",
   "title": "External trade in goods and services",
   "summary": "Georgia’s annual goods trade and separately reviewed services trade in nominal USD.",
-  "reviewedAt": "2026-10-11",
+  "reviewedAt": "2026-10-14",
   "archiveManifestId": "trade",
   "coverageSource": {
     "kind": "archive"
@@ -41,7 +41,7 @@ export const TRADE_METHODOLOGY_CONTENT: MethodologyContent = {
       "kind": "scope",
       "title": "Which trade is covered?",
       "paragraphs": [
-        "Annual national totals, individual partner countries, five published country groups and four-digit products are covered. Total exports include re-exports. Domestic exports and supported national/country re-export comparisons are included; regional comparisons are excluded. A separate Services trade page covers national totals and twelve types for 2020–2024; services countries are deferred. The incomplete 2026 column is not served."
+        "Annual national totals, individual partner countries, five published country groups and four-digit products are covered. Total exports include re-exports. Domestic exports and supported national/country re-export comparisons are included; regional comparisons are excluded. A separate Services trade page covers national totals, twelve types and published country totals for exports and imports for 2020–2024. The incomplete 2026 column is not served."
       ]
     },
     {
@@ -103,7 +103,7 @@ export const TRADE_METHODOLOGY_CONTENT: MethodologyContent = {
       "title": "Domestic exports and re-exports",
       "paragraphs": [
         "The Domestic exports page compares total exports, domestic exports and calculated re-exports nationally for 2014–2025. Country comparisons show domestic exports and supported re-exports for the same years. All are goods exports in nominal USD on an FOB basis. Domestic exports include goods originating in Georgia and imported goods substantially processed here; they do not measure domestic value added.",
-        "Re-exports equal total exports minus domestic exports only where identities and years have a reviewed match. The historical Macedonia (FYR) entry has no reviewed total-export counterpart, so its re-export figures remain unavailable. Missing figures stay gaps, dashes and blank workbook cells; source decimal differences are preserved.",
+        "Re-exports equal total exports minus domestic exports only where identities and years have a reviewed match. The historical Macedonia (FYR) entry has no reviewed total-export counterpart, so its re-export figures remain unavailable. Missing figures stay gaps, dashes and blank workbook cells. The page and Excel show whole US dollars, so an amount under half a dollar shows as 0.",
         "The product view covers 2020–2025 and retains 99 source-published products plus Other commodities. Omitted products are not zero, the remainder is not allocated, and no product re-exports are inferred. Shares use the matching national domestic-export total. Excel includes the entire selected comparison and its applicable originals."
       ]
     },
@@ -120,14 +120,25 @@ export const TRADE_METHODOLOGY_CONTENT: MethodologyContent = {
     {
       "id": "services",
       "kind": "classification",
-      "title": "Services trade: national totals and types",
+      "title": "Services trade: national totals, types and countries",
       "sourceLinks": [{ "href": "https://www.geostat.ge/en/modules/categories/766/international-trade-in-services", "label": "Geostat services trade source page" }],
       "paragraphs": [
         "Services trade covers annual transactions between Georgian residents and non-residents for 2020–2024. Exports are supplied by residents to non-residents; imports are received by residents from non-residents. Goods FOB/CIF valuation, domestic exports and re-exports do not apply to these series. Amounts are nominal USD: exact source decimals in thousand USD are converted to USD without inflation adjustment or currency conversion.",
         "Overview shows total services trade, exports, imports and balance; Service types retains all twelve published categories and the national services total. Travel keeps its complete published meaning; Telecommunications, computer, and information services is not an IT-only estimate. n.i.e. means “not included elsewhere”. Type shares use the matching same-year national services total; Balance has no share.",
-        "Total services trade = exports + imports; services balance = exports − imports. Each calculation requires two numerical source counterparts for the same type and year. A positive balance means exports exceed imports. The published dash for maintenance and repair exports in 2020 remains unavailable, as do its turnover and balance. Neither the alternative joint table’s zero nor NBG’s rounded 0.0 replaces it. Other published zero and negative values are preserved. Missing workbook amounts remain blank; observed basis is actual and publication status unspecified.",
-        "The separately accepted subset contains 13 identities, 130 original observations (129 numerical and one dash) and 128 numerical derivations: 258 facts. Checks verify both originals’ byte sizes and SHA-256, every selected cell, year header, identity, unit, role, format, exact decimal and source reference. The twelve types’ numerical sums reconcile against national exports and imports within USD 1.",
-        "Services country comparisons are deferred: the two UK country-to-type-country import discrepancies for 2022 and 2024 remain unresolved. Accepting national and type figures does not accept the wider research package. Current account uses its separate NBG source and release vintage; its longer history is not used to backfill this page."
+        "Total services trade = exports + imports; services balance = exports − imports. Each calculation requires two numerical source counterparts for the same type or country and year. A positive balance means exports exceed imports. The published dash for maintenance and repair exports in 2020 remains unavailable, as do its turnover and balance. Neither the alternative joint table’s zero nor NBG’s rounded 0.0 replaces it. Other published zero and negative values are preserved. Missing workbook amounts remain blank; observed basis is actual and publication status unspecified.",
+        "The accepted subset contains 166 identities: the national total, twelve types, 149 named countries and four other/unknown entries. It preserves 1,415 original observations (1,400 numerical and 15 dashes) and 1,142 supported derivations: 2,557 facts. Another 40 country-file totals are validation controls. Four originals, exact source cells and complete inventories are checked; type sums and country detail plus residuals reconcile to their own totals, and country-file totals to the national type-file totals, within USD 1.",
+        "Country exports and imports use Geostat’s published country totals, as approved on 14 October 2026. The two UK country-versus-type-country import differences in 2022 and 2024 remain recorded; the joint table is not used to replace the country amounts. Other countries and International Organization are retained across both flows; undefined export country and unknown import country remain separate. Rankings list named countries only. Missing counterparts stay unavailable, so a balance or total trade is calculated only where both values exist. Type-country detail and the wider package remain unaccepted. Current account retains its separate NBG source and vintage, with no backfill here."
+      ]
+    },
+    {
+      "id": "composition",
+      "kind": "classification",
+      "title": "Trade composition: SITC and BEC",
+      "paragraphs": [
+        "Trade composition covers goods exports and imports for 2000–2025: ten SITC (Standard International Trade Classification) sections and seven published BEC (Broad Economic Categories) categories. In source labels, n.e.s. means ‘not elsewhere specified’. BEC is not a pure three-way capital/intermediate/consumer split. Capital goods includes its stated parts and accessories; transport equipment is separate.",
+        "Amounts are nominal USD. Exports include re-exports and use FOB valuation; imports use CIF. End-year category shares use the matching same-year national exports or imports. A missing or zero denominator yields no share. Missing amounts stay gaps, dashes and blank workbook cells; published zero and negative values retain their meaning.",
+        "The accepted subset has 17 identities and 884 original category observations (520 SITC and 364 BEC). Its 104 classification totals are validation controls, not selectable series. Four originals, exact source cells, years, codes, units and decimals are verified; category sums reconcile to classification totals and totals to national amounts within USD 1. Exact thousand-USD conversion uses Decimal precision 50. The private mirror preserves provenance and exact values through the parity-checked import.",
+        "The first release offers Exports and Imports in USD only. Excel includes all committed series and selected years with applicable native originals, and omits percentage, publication-status and internal metadata columns. The two UK services discrepancies and wider research package remain unresolved; no country-by-product join or additional measure is accepted."
       ]
     },
     {
@@ -135,7 +146,7 @@ export const TRADE_METHODOLOGY_CONTENT: MethodologyContent = {
       "kind": "archive",
       "title": "Original sources",
       "paragraphs": [
-        "Eighteen frozen Geostat originals are available: the national workbook, four partner-country/group workbooks, six product workbooks, two domestic-export workbooks, two services type workbooks, services metadata PDF, brief merchandise-trade methodology and external-trade metadata page, retrieved on 7 October 2026. HTML captures download as plain-text attachments. Excel includes the chosen measure, every selected year and all committed series, beyond the visible table page. Products downloads are limited to 2020 onward and follow the selected date range. Product codes, actual basis, unspecified publication status and applicable original-source links are retained. Missing amounts stay blank. Public workbooks do not expose internal cell metadata."
+        "Twenty-four frozen Geostat originals are available: the national workbook, four partner-country/group workbooks, six product workbooks, two domestic-export workbooks, two services type and two services country workbooks, four SITC/BEC workbooks, services metadata PDF, brief merchandise-trade methodology and external-trade metadata page, retrieved on 7 October 2026. HTML captures download as plain-text attachments. Excel includes the chosen measure, every selected year and all committed series, beyond the visible table page. Products downloads are limited to 2020 onward and follow the selected date range. Product codes, actual basis, unspecified publication status and applicable original-source links are retained. Missing amounts stay blank. Public workbooks do not expose internal cell metadata."
       ]
     }
   ],
@@ -145,7 +156,7 @@ export const TRADE_METHODOLOGY_CONTENT: MethodologyContent = {
       "group": "trade",
       "title": "Which trade is covered?",
       "statusLabel": "Fiscal.ge decision",
-      "summary": "Annual national totals, individual partner countries, five published country groups and four-digit products are covered. Total exports include re-exports. Domestic exports and supported national/country re-export comparisons are included; regional comparisons are excluded. A separate Services trade page covers national totals and twelve types for 2020–2024; services countries are deferred. The incomplete 2026 column is not served.",
+      "summary": "Annual national totals, individual partner countries, five published country groups and four-digit products are covered. Total exports include re-exports. Domestic exports and supported national/country re-export comparisons are included; regional comparisons are excluded. A separate Services trade page covers national totals, twelve types and published country totals for exports and imports for 2020–2024. The incomplete 2026 column is not served.",
       "detail": [],
       "canonicalDecisionIds": [
         "trade.scope"

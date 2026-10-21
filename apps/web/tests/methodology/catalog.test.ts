@@ -67,7 +67,7 @@ const registerRow = (overrides: Partial<DecisionRegisterRow> = {}): DecisionRegi
 
 describe("methodology catalog", () => {
   it("exposes the approved live datasets", () => {
-    expect(LIVE_METHODOLOGY_IDS).toEqual(["expenditure", "revenue", "municipalities", "debt", "gdp", "economic-sectors", "regional-economies", "inflation", "money", "unemployment", "wages", "poverty", "household-income", "trade", "external-flows", "energy-food", "demography"]);
+    expect(LIVE_METHODOLOGY_IDS).toEqual(["expenditure", "revenue", "municipalities", "debt", "gdp", "economic-sectors", "gdp-expenditure", "regional-economies", "business", "housing", "inflation", "money", "unemployment", "wages", "poverty", "household-income", "health", "social-protection", "education", "science-culture", "crime", "internet", "trade", "external-flows", "energy-food", "environment", "transport", "demography"]);
     expect(Object.keys(METHODOLOGY_CONTENT)).toEqual(LIVE_METHODOLOGY_IDS);
   });
 
@@ -138,15 +138,13 @@ describe("methodology catalog", () => {
     expect(publicText).toContain("69 მუნიციპალურ სერიას");
   });
 
-  it("discloses the nominal-GDP denominator without opening a GDP methodology route", () => {
+  it("discloses the nominal-GDP denominator on expenditure and revenue, and GDP and inflation keep their own slugs", () => {
     for (const dataset of ["expenditure", "revenue"] as const) {
       expect(METHODOLOGY_CONTENT[dataset].disclosure).toContain("მშპ");
       expect(METHODOLOGY_CONTENT[dataset].disclosure).toContain("მიმდინარე ფასებში");
       expect(METHODOLOGY_CONTENT[dataset].disclosure).toContain("2010 წლიდან — SNA 2008");
       expect(METHODOLOGY_CONTENT[dataset].disclosure).toContain("2025 წლის მშპ წინასწარია");
     }
-    expect(METHODOLOGY_CONTENT.expenditure.reviewedAt).toBe("2026-08-20");
-    expect(METHODOLOGY_CONTENT.revenue.reviewedAt).toBe("2026-08-20");
 
     expect(METHODOLOGY_CONTENT.gdp.slug).toBe("gdp");
     expect(METHODOLOGY_CONTENT.inflation.slug).toBe("inflation");
@@ -341,6 +339,7 @@ describe("methodology catalog", () => {
   it("builds live hub rows from facts, content metadata, and validated archives", () => {
     const archives: Record<(typeof LIVE_METHODOLOGY_IDS)[number], MethodologyArchiveSummary> = {
       "economic-sectors": {fileCount:3,totalBytes:100,latestRetrievedAt:"2026-09-11",validated:true,minYear:2010,maxYear:2025},
+      "gdp-expenditure": {fileCount:3,totalBytes:100,latestRetrievedAt:"2026-10-20",validated:true,minYear:2010,maxYear:2025},
       "regional-economies": {fileCount:2,totalBytes:100,latestRetrievedAt:"2026-09-13",validated:true,minYear:2010,maxYear:2024},
       expenditure: { fileCount: 42, totalBytes: 100, latestRetrievedAt: "2026-08-10", validated: true },
       revenue: { fileCount: 21, totalBytes: 200, latestRetrievedAt: "2026-08-09", validated: true },
@@ -350,12 +349,22 @@ describe("methodology catalog", () => {
       unemployment: { fileCount: 9, totalBytes: 100, latestRetrievedAt: "2026-10-03", validated: true, minYear: 2010, maxYear: 2025 },
       trade: { fileCount: 3, totalBytes: 520677, latestRetrievedAt: "2026-10-07", validated: true, minYear: 1995, maxYear: 2025 },
       "external-flows": { fileCount: 3, totalBytes: 100, latestRetrievedAt: "2026-10-10", validated: true, minYear: 2000, maxYear: 2025 },
-      "energy-food": { fileCount: 42, totalBytes: 100, latestRetrievedAt: "2026-10-11", validated: true, minYear: 2013, maxYear: 2025 },
+      "energy-food": { fileCount: 55, totalBytes: 100, latestRetrievedAt: "2026-10-20", validated: true, minYear: 2006, maxYear: 2025 },
+      transport: { fileCount: 25, totalBytes: 100, latestRetrievedAt: "2026-10-20", validated: true, minYear: 2000, maxYear: 2025 },
       demography: { fileCount: 2, totalBytes: 100, latestRetrievedAt: "2026-10-03", validated: true, minYear: 2004, maxYear: 2026 },
       wages: { fileCount: 12, totalBytes: 100, latestRetrievedAt: "2026-10-09", validated: true, minYear: 1995, maxYear: 2025 },
       poverty: { fileCount: 7, totalBytes: 100, latestRetrievedAt: "2026-10-10", validated: true, minYear: 2004, maxYear: 2025 },
       "household-income": { fileCount: 21, totalBytes: 100, latestRetrievedAt: "2026-10-11", validated: true, minYear: 2002, maxYear: 2025 },
+      health: { fileCount: 36, totalBytes: 100, latestRetrievedAt: "2026-10-15", validated: true, minYear: 2002, maxYear: 2025 },
+      crime: { fileCount: 22, totalBytes: 100, latestRetrievedAt: "2026-10-16", validated: true, minYear: 2001, maxYear: 2025 },
+      environment: { fileCount: 46, totalBytes: 100, latestRetrievedAt: "2026-10-20", validated: true, minYear: 1990, maxYear: 2025 },
+      internet: { fileCount: 36, totalBytes: 100, latestRetrievedAt: "2026-10-20", validated: true, minYear: 2016, maxYear: 2026 },
+      education: { fileCount: 45, totalBytes: 100, latestRetrievedAt: "2026-10-16", validated: true, minYear: 2000, maxYear: 2025 },
+      "social-protection": { fileCount: 17, totalBytes: 100, latestRetrievedAt: "2026-10-18", validated: true, minYear: 2013, maxYear: 2025 },
+      "science-culture": { fileCount: 33, totalBytes: 100, latestRetrievedAt: "2026-10-20", validated: true, minYear: 2005, maxYear: 2025 },
       money: { fileCount: 20, totalBytes: 100, latestRetrievedAt: "2026-10-11", validated: true, minYear: 1995, maxYear: 2025 },
+      business: { fileCount: 26, totalBytes: 100, latestRetrievedAt: "2026-10-15", validated: true, minYear: 1999, maxYear: 2025 },
+      housing: { fileCount: 21, totalBytes: 100, latestRetrievedAt: "2026-10-16", validated: true, minYear: 2006, maxYear: 2025 },
       debt: { fileCount: 10, totalBytes: 400, latestRetrievedAt: "2026-09-01", validated: true },
     };
 
@@ -398,7 +407,10 @@ describe("methodology catalog", () => {
       },
       {id:"gdp",title:METHODOLOGY_CONTENT.gdp.title,summary:METHODOLOGY_CONTENT.gdp.summary,href:"/methodology/gdp",coverage:{firstYear:1960,lastYear:2025},originalFileCount:5,reviewedAt:METHODOLOGY_CONTENT.gdp.reviewedAt},
       {id:"economic-sectors",title:METHODOLOGY_CONTENT["economic-sectors"].title,summary:METHODOLOGY_CONTENT["economic-sectors"].summary,href:"/methodology/economic-sectors",coverage:{firstYear:2010,lastYear:2025},originalFileCount:3,reviewedAt:METHODOLOGY_CONTENT["economic-sectors"].reviewedAt},
+      {id:"gdp-expenditure",title:METHODOLOGY_CONTENT["gdp-expenditure"].title,summary:METHODOLOGY_CONTENT["gdp-expenditure"].summary,href:"/methodology/gdp-expenditure",coverage:{firstYear:2010,lastYear:2025},originalFileCount:3,reviewedAt:METHODOLOGY_CONTENT["gdp-expenditure"].reviewedAt},
       {id:"regional-economies",title:METHODOLOGY_CONTENT["regional-economies"].title,summary:METHODOLOGY_CONTENT["regional-economies"].summary,href:"/methodology/regional-economies",coverage:{firstYear:2010,lastYear:2024},originalFileCount:2,reviewedAt:METHODOLOGY_CONTENT["regional-economies"].reviewedAt},
+      { id: "business", title: METHODOLOGY_CONTENT.business.title, summary: METHODOLOGY_CONTENT.business.summary, href: "/methodology/business", coverage: { firstYear: 1999, lastYear: 2025 }, originalFileCount: 26, reviewedAt: METHODOLOGY_CONTENT.business.reviewedAt },
+      { id: "housing", title: METHODOLOGY_CONTENT.housing.title, summary: METHODOLOGY_CONTENT.housing.summary, href: "/methodology/housing", coverage: { firstYear: 2006, lastYear: 2025 }, originalFileCount: 21, reviewedAt: METHODOLOGY_CONTENT.housing.reviewedAt },
       {
         id: "inflation",
         title: METHODOLOGY_CONTENT.inflation.title,
@@ -413,9 +425,17 @@ describe("methodology catalog", () => {
       { id: "wages", title: METHODOLOGY_CONTENT.wages.title, summary: METHODOLOGY_CONTENT.wages.summary, href: "/methodology/wages", coverage: { firstYear: 1995, lastYear: 2025 }, originalFileCount: 12, reviewedAt: METHODOLOGY_CONTENT.wages.reviewedAt },
       { id: "poverty", title: METHODOLOGY_CONTENT.poverty.title, summary: METHODOLOGY_CONTENT.poverty.summary, href: "/methodology/poverty", coverage: { firstYear: 2004, lastYear: 2025 }, originalFileCount: 7, reviewedAt: METHODOLOGY_CONTENT.poverty.reviewedAt },
       { id: "household-income", title: METHODOLOGY_CONTENT["household-income"].title, summary: METHODOLOGY_CONTENT["household-income"].summary, href: "/methodology/household-income", coverage: { firstYear: 2002, lastYear: 2025 }, originalFileCount: 21, reviewedAt: METHODOLOGY_CONTENT["household-income"].reviewedAt },
+      { id: "health", title: METHODOLOGY_CONTENT.health.title, summary: METHODOLOGY_CONTENT.health.summary, href: "/methodology/health", coverage: { firstYear: 2002, lastYear: 2025 }, originalFileCount: 36, reviewedAt: METHODOLOGY_CONTENT.health.reviewedAt },
+      { id: "social-protection", title: METHODOLOGY_CONTENT["social-protection"].title, summary: METHODOLOGY_CONTENT["social-protection"].summary, href: "/methodology/social-protection", coverage: { firstYear: 2013, lastYear: 2025 }, originalFileCount: 17, reviewedAt: METHODOLOGY_CONTENT["social-protection"].reviewedAt },
+      { id: "education", title: METHODOLOGY_CONTENT.education.title, summary: METHODOLOGY_CONTENT.education.summary, href: "/methodology/education", coverage: { firstYear: 2000, lastYear: 2025 }, originalFileCount: 45, reviewedAt: METHODOLOGY_CONTENT.education.reviewedAt },
+      { id: "science-culture", title: METHODOLOGY_CONTENT["science-culture"].title, summary: METHODOLOGY_CONTENT["science-culture"].summary, href: "/methodology/science-culture", coverage: { firstYear: 2005, lastYear: 2025 }, originalFileCount: 33, reviewedAt: METHODOLOGY_CONTENT["science-culture"].reviewedAt },
+      { id: "crime", title: METHODOLOGY_CONTENT.crime.title, summary: METHODOLOGY_CONTENT.crime.summary, href: "/methodology/crime", coverage: { firstYear: 2001, lastYear: 2025 }, originalFileCount: 22, reviewedAt: METHODOLOGY_CONTENT.crime.reviewedAt },
+      { id: "internet", title: METHODOLOGY_CONTENT.internet.title, summary: METHODOLOGY_CONTENT.internet.summary, href: "/methodology/internet", coverage: { firstYear: 2016, lastYear: 2026 }, originalFileCount: 36, reviewedAt: METHODOLOGY_CONTENT.internet.reviewedAt },
       { id: "trade", title: METHODOLOGY_CONTENT.trade.title, summary: METHODOLOGY_CONTENT.trade.summary, href: "/methodology/trade", coverage: { firstYear: 1995, lastYear: 2025 }, originalFileCount: 3, reviewedAt: METHODOLOGY_CONTENT.trade.reviewedAt },
       { id: "external-flows", title: METHODOLOGY_CONTENT["external-flows"].title, summary: METHODOLOGY_CONTENT["external-flows"].summary, href: "/methodology/external-flows", coverage: { firstYear: 2000, lastYear: 2025 }, originalFileCount: 3, reviewedAt: METHODOLOGY_CONTENT["external-flows"].reviewedAt },
-      { id: "energy-food", title: METHODOLOGY_CONTENT["energy-food"].title, summary: METHODOLOGY_CONTENT["energy-food"].summary, href: "/methodology/energy-food", coverage: { firstYear: 2013, lastYear: 2025 }, originalFileCount: 42, reviewedAt: METHODOLOGY_CONTENT["energy-food"].reviewedAt },
+      { id: "energy-food", title: METHODOLOGY_CONTENT["energy-food"].title, summary: METHODOLOGY_CONTENT["energy-food"].summary, href: "/methodology/energy-food", coverage: { firstYear: 2006, lastYear: 2025 }, originalFileCount: 55, reviewedAt: METHODOLOGY_CONTENT["energy-food"].reviewedAt },
+      { id: "environment", title: METHODOLOGY_CONTENT.environment.title, summary: METHODOLOGY_CONTENT.environment.summary, href: "/methodology/environment", coverage: { firstYear: 1990, lastYear: 2025 }, originalFileCount: 46, reviewedAt: METHODOLOGY_CONTENT.environment.reviewedAt },
+      { id: "transport", title: METHODOLOGY_CONTENT.transport.title, summary: METHODOLOGY_CONTENT.transport.summary, href: "/methodology/transport", coverage: { firstYear: 2000, lastYear: 2025 }, originalFileCount: 25, reviewedAt: METHODOLOGY_CONTENT.transport.reviewedAt },
       { id: "demography", title: METHODOLOGY_CONTENT.demography.title, summary: METHODOLOGY_CONTENT.demography.summary, href: "/methodology/demography", coverage: { firstYear: 2004, lastYear: 2026 }, originalFileCount: 2, reviewedAt: METHODOLOGY_CONTENT.demography.reviewedAt },
     ]);
   });
@@ -423,6 +443,7 @@ describe("methodology catalog", () => {
   it("rejects a hub row without a validated archive", () => {
     const archives = {
       "economic-sectors": {fileCount:3,totalBytes:100,latestRetrievedAt:"2026-09-11",validated:true,minYear:2010,maxYear:2025},
+      "gdp-expenditure": {fileCount:3,totalBytes:100,latestRetrievedAt:"2026-10-20",validated:true,minYear:2010,maxYear:2025},
       "regional-economies": {fileCount:2,totalBytes:100,latestRetrievedAt:"2026-09-13",validated:true,minYear:2010,maxYear:2024},
       expenditure: { fileCount: 1, totalBytes: 1, latestRetrievedAt: "2026-08-10", validated: true },
       revenue: { fileCount: 1, totalBytes: 1, latestRetrievedAt: "2026-08-10", validated: false },
@@ -433,14 +454,46 @@ describe("methodology catalog", () => {
       trade: { fileCount: 3, totalBytes: 520677, latestRetrievedAt: "2026-10-07", validated: true, minYear: 1995, maxYear: 2025 },
       "external-flows": { fileCount: 3, totalBytes: 100, latestRetrievedAt: "2026-10-10", validated: true, minYear: 2000, maxYear: 2025 },
       "energy-food": { fileCount: 42, totalBytes: 100, latestRetrievedAt: "2026-10-11", validated: true, minYear: 2013, maxYear: 2025 },
+      transport: { fileCount: 25, totalBytes: 100, latestRetrievedAt: "2026-10-20", validated: true, minYear: 2000, maxYear: 2025 },
       demography: { fileCount: 2, totalBytes: 100, latestRetrievedAt: "2026-10-03", validated: true, minYear: 2004, maxYear: 2026 },
       wages: { fileCount: 12, totalBytes: 100, latestRetrievedAt: "2026-10-09", validated: true, minYear: 1995, maxYear: 2025 },
       poverty: { fileCount: 7, totalBytes: 100, latestRetrievedAt: "2026-10-10", validated: true, minYear: 2004, maxYear: 2025 },
       "household-income": { fileCount: 21, totalBytes: 100, latestRetrievedAt: "2026-10-11", validated: true, minYear: 2002, maxYear: 2025 },
+      health: { fileCount: 36, totalBytes: 100, latestRetrievedAt: "2026-10-15", validated: true, minYear: 2002, maxYear: 2025 },
+      crime: { fileCount: 22, totalBytes: 100, latestRetrievedAt: "2026-10-16", validated: true, minYear: 2001, maxYear: 2025 },
+      environment: { fileCount: 46, totalBytes: 100, latestRetrievedAt: "2026-10-20", validated: true, minYear: 1990, maxYear: 2025 },
+      internet: { fileCount: 36, totalBytes: 100, latestRetrievedAt: "2026-10-20", validated: true, minYear: 2016, maxYear: 2026 },
+      education: { fileCount: 45, totalBytes: 100, latestRetrievedAt: "2026-10-16", validated: true, minYear: 2000, maxYear: 2025 },
+      "social-protection": { fileCount: 17, totalBytes: 100, latestRetrievedAt: "2026-10-18", validated: true, minYear: 2013, maxYear: 2025 },
+      "science-culture": { fileCount: 33, totalBytes: 100, latestRetrievedAt: "2026-10-20", validated: true, minYear: 2005, maxYear: 2025 },
       money: { fileCount: 20, totalBytes: 100, latestRetrievedAt: "2026-10-11", validated: true, minYear: 1995, maxYear: 2025 },
+      business: { fileCount: 26, totalBytes: 100, latestRetrievedAt: "2026-10-15", validated: true, minYear: 1999, maxYear: 2025 },
+      housing: { fileCount: 21, totalBytes: 100, latestRetrievedAt: "2026-10-16", validated: true, minYear: 2006, maxYear: 2025 },
       debt: { fileCount: 1, totalBytes: 1, latestRetrievedAt: "2026-09-01", validated: true },
     } satisfies Record<(typeof LIVE_METHODOLOGY_IDS)[number], MethodologyArchiveSummary>;
 
     expect(() => buildMethodologyHubEntries({ budgetFacts, municipalFacts, debtFacts, archives })).toThrow(/validated archive/i);
   });
+});
+
+// U29-10: the disclosure says what is official and what is Fiscal.ge's method (DESIGN.md §21); it never repeats the lead.
+it.each(["ka", "en"] as const)("every %s methodology disclosure says something its summary does not", async (locale) => {
+  const { getMethodologyContent } = await import("../../lib/methodology/catalog");
+  for (const id of LIVE_METHODOLOGY_IDS) {
+    const content = getMethodologyContent(id, locale);
+    expect(content.disclosure, id).not.toBe(content.summary);
+  }
+});
+
+// Task 48 fix round: nominal GDP joins Geostat's SNA 1993 and SNA 2008 series (docs/data-methodology/gdp-overview.md);
+// the disclosure says so rather than claiming no series is spliced.
+it.each([
+  ["ka", /SNA 1993/, /SNA 2008/, /არცერთი სერია არ არის გადაბმული/],
+  ["en", /SNA 1993/, /SNA 2008/, /does not splice, rebase or convert any series/],
+] as const)("the %s GDP disclosure names the nominal SNA join", async (locale, older, newer, wrong) => {
+  const { getMethodologyContent } = await import("../../lib/methodology/catalog");
+  const { disclosure } = getMethodologyContent("gdp", locale);
+  expect(disclosure).toMatch(older);
+  expect(disclosure).toMatch(newer);
+  expect(disclosure).not.toMatch(wrong);
 });

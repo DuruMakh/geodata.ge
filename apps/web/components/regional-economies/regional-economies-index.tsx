@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useMemo, useState, type ReactNode } from "react";
 import type { RegionalEconomyMapModel, RegionMapModel } from "../../lib/explorer/regionalEconomyMap";
 import { regionalEconomyHref } from "../../lib/explorer/regionalEconomyRoutes";
-import { formatAmount } from "../../lib/explorer/format";
+import { MISSING, formatAmount } from "../../lib/explorer/format";
 import { matchesLabelQuery } from "../../lib/i18n/search";
 import { publicLabel } from "../../lib/i18n/labels";
 import { message } from "../../lib/i18n/messages";
@@ -33,12 +33,15 @@ export function RegionalEconomiesIndex({ model, sourceNote }: { model: RegionalE
 /**
  * An empty summary leaves out the overview block.
  * leadRow is an unranked row above the ranked list, linked through hrefForRegion (a plain row without it).
+ * headingLevel 3 nests the overview and list titles under a section title of the page's own.
  */
-export function RegionIndex({ model, sourceNote, metric, summary, leadRow, mapControls }: {
-  model: RegionMapModel; sourceNote: string; metric: RegionMapMetric; summary: Array<{ label: string; value: string; detail: string }>;
+export function RegionIndex({ model, sourceNote, metric, summary = [], leadRow, mapControls, headingLevel = 2 }: {
+  model: RegionMapModel; sourceNote: string; metric: RegionMapMetric; summary?: Array<{ label: string; value: string; detail: string }>;
   leadRow?: { id: string; label: string; value: number };
   mapControls?: ReactNode;
+  headingLevel?: 2 | 3;
 }) {
+  const Heading = headingLevel === 3 ? "h3" : "h2";
   const { locale, messages, englishLabels } = useI18n();
   const [query, setQuery] = useState("");
   const [mapActive, setMapActive] = useState<string | null>(null);
@@ -54,6 +57,7 @@ export function RegionIndex({ model, sourceNote, metric, summary, leadRow, mapCo
     ]));
   }, [englishLabels, model.regions, query]);
   const lead = leadRow && matchesLabelQuery(query, [leadRow.label]) ? leadRow : null;
+  const unvalued = (model.withoutValue ?? []).filter(region => matchesLabelQuery(query.trim(), [region.nameKa, publicLabel("en", region.regionId, region.nameKa, englishLabels)]));
   const linkFor = metric.hrefForRegion;
   // Linked rows end in an arrow column; plain rows (no hrefForRegion) have none.
   const rowClass = (id: string) => `grid ${linkFor === undefined ? "grid-cols-[22px_minmax(0,1fr)_112px]" : "grid-cols-[22px_minmax(0,1fr)_112px_12px]"} items-center gap-[9px] border-b border-[var(--row-border)] py-[9px] pr-1 transition-colors hover:bg-[var(--tint)] ${id === activeRegionId ? "bg-[var(--tint)]" : "bg-transparent"}`;
@@ -65,9 +69,9 @@ export function RegionIndex({ model, sourceNote, metric, summary, leadRow, mapCo
           {mapControls ? <div className="mb-4 flex justify-end">{mapControls}</div> : null}
           <RegionMap model={model} metric={metric} activeRegionId={activeRegionId} onActiveRegionChange={setMapActive} />
           {summary.length ? <div className="mt-8 border-t-2 border-[var(--ink)] pt-5">
-            <h2 className="mb-[18px] font-[family-name:var(--font-display)] text-[22px] font-semibold">
+            <Heading className="mb-[18px] font-[family-name:var(--font-display)] text-[22px] font-semibold">
               {message(messages, "regionalEconomies.summaryTitle")}
-            </h2>
+            </Heading>
             <div className="grid grid-cols-1 gap-8 sm:grid-cols-3">
               {summary.map((item) => (
                 <div key={item.label} className="flex flex-col gap-[5px]">
@@ -82,7 +86,7 @@ export function RegionIndex({ model, sourceNote, metric, summary, leadRow, mapCo
 
         <div className="min-w-0 border-t-2 border-[var(--ink)] pt-[22px] @min-[1100px]:border-t-0 @min-[1100px]:border-l @min-[1100px]:border-[var(--hairline)] @min-[1100px]:pt-0 @min-[1100px]:pl-[26px]">
           <div className="flex items-baseline justify-between gap-2.5 border-b-2 border-[var(--ink)] pb-2">
-            <span className="font-[family-name:var(--font-display)] text-[19px] font-semibold">{message(messages, "regionalEconomies.regions")}</span>
+            <Heading className="font-[family-name:var(--font-display)] text-[19px] font-semibold">{message(messages, "regionalEconomies.regions")}</Heading>
             <span className="font-[family-name:var(--font-numeric)] text-[11px] min-[768px]:text-[10.5px] text-[var(--faint)]">{model.year}</span>
           </div>
           <div className="flex items-center gap-2 pt-3 pb-1">
@@ -96,7 +100,7 @@ export function RegionIndex({ model, sourceNote, metric, summary, leadRow, mapCo
             />
             <span className="font-[family-name:var(--font-numeric)] text-[11px] min-[768px]:text-[10.5px] text-[var(--faint)]">{rows.length === model.regions.length ? rows.length : `${rows.length} / ${model.regions.length}`}</span>
           </div>
-          {rows.length === 0 && !lead ? (
+          {rows.length === 0 && !lead && !unvalued.length ? (
             <div className="px-1 py-[26px] text-center text-[13px] text-[var(--body)]">
               {message(messages, "regionalEconomies.empty")}
               <button type="button" onClick={() => setQuery("")} className="mt-3 block w-full text-[12px] text-[var(--accent)]">{message(messages, "regionalEconomies.clearSearch")}</button>
@@ -104,7 +108,7 @@ export function RegionIndex({ model, sourceNote, metric, summary, leadRow, mapCo
           ) : (
             <div className="mt-1.5 max-h-[620px] overflow-y-auto">
               {lead ? (linkFor ? (
-                <Link href={pageHref(linkFor(lead.id), locale)} data-testid="regional-list-row" data-region-id={lead.id} className={rowClass(lead.id)}>
+                <Link href={pageHref(linkFor(lead.id), locale)} prefetch={false} data-testid="regional-list-row" data-region-id={lead.id} className={rowClass(lead.id)}>
                   <span aria-hidden />
                   <span className="min-w-0 text-[12.5px] font-medium">{lead.label}</span>
                   <span className="text-right font-[family-name:var(--font-numeric)] text-[11.5px]">{metric.formatValue(lead.value)}</span>
@@ -139,11 +143,29 @@ export function RegionIndex({ model, sourceNote, metric, summary, leadRow, mapCo
                   <Link
                     key={region.regionId}
                     href={pageHref(linkFor(region.regionId), locale)}
+                    prefetch={false}
                     {...rowProps}
                     onFocus={() => setFocusActive(region.regionId)}
                     onBlur={() => setFocusActive(null)}
                     className={rowClass(region.regionId)}
                   >
+                    {cells}
+                    <span aria-hidden className="text-[var(--faint)]">→</span>
+                  </Link>
+                );
+              })}
+              {/* Regions without a value come last, unranked, with a dash. */}
+              {unvalued.map((region) => {
+                const cells = (
+                  <>
+                    <span aria-hidden />
+                    <span className="min-w-0 text-[12.5px] font-medium">{publicLabel(locale, region.regionId, region.nameKa, englishLabels)}</span>
+                    <span className="text-right font-[family-name:var(--font-numeric)] text-[11.5px] text-[var(--faint)]">{MISSING}</span>
+                  </>
+                );
+                const rowProps = { "data-testid": "regional-list-row", "data-region-id": region.regionId, "data-no-value": "", onMouseEnter: () => setPointerActive(region.regionId), onMouseLeave: () => setPointerActive(null) };
+                return linkFor === undefined ? <div key={region.regionId} {...rowProps} className={rowClass(region.regionId)}>{cells}</div> : (
+                  <Link key={region.regionId} href={pageHref(linkFor(region.regionId), locale)} prefetch={false} {...rowProps} className={rowClass(region.regionId)}>
                     {cells}
                     <span aria-hidden className="text-[var(--faint)]">→</span>
                   </Link>

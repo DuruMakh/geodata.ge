@@ -1,5 +1,6 @@
 import path from "node:path";
-import { mkdtemp, mkdir, rm, symlink, writeFile } from "node:fs/promises";
+import { mkdtemp, mkdir, readFile, rm, symlink, writeFile } from "node:fs/promises";
+import { parse } from "csv-parse/sync";
 import { tmpdir } from "node:os";
 import { afterEach, describe, expect, it } from "vitest";
 import { expectedOriginalSourcePaths } from "../../lib/methodology/sourceInventory";
@@ -18,6 +19,17 @@ afterEach(async () => {
 });
 
 describe("original-source inventory", () => {
+  it("already contains every 2015–2025 transfer original and all 69 municipal history books", async () => {
+    const inventory = await expectedOriginalSourcePaths(REPOSITORY_ROOT);
+    expect(inventory.revenue.filter(row => /\/(201[5-9]|202[0-5])-jan-dec-consolidated-revenue\.pdf$/.test(row.path)).map(row => row.path)).toEqual(
+      Array.from({ length: 11 }, (_, index) => `docs/Raw Data/Revenue/${2015 + index}-jan-dec-consolidated-revenue.pdf`),
+    );
+    const history = inventory.municipalities.filter(row => row.path.includes("/mof-municipality-budget-history-2016-2025/"));
+    const reviewed = (await loadReviewedSourceManifest(REPOSITORY_ROOT, "municipalities")).filter(row => /budget_history_\d{2}$/.test(row.source_id));
+    expect(history).toHaveLength(69);
+    expect(history.map(row => [row.path, row.byteSize])).toEqual(reviewed.map(row => [row.repository_source_path, row.byte_size]).sort((a, b) => String(a[0]).localeCompare(String(b[0]))));
+  });
+
   it("includes every approved original and no prepared derivative", async () => {
     const inventory = await expectedOriginalSourcePaths(REPOSITORY_ROOT);
     expect(inventory.expenditure).toHaveLength(79);
@@ -39,6 +51,124 @@ describe("original-source inventory", () => {
     expect(rows).toHaveLength(21);
     expect(rows.every((row) => row.path.startsWith("docs/Raw Data/Households/geostat-household-income-spending-annual/official/"))).toBe(true);
     expect(rows.some((row) => row.path.includes("/official/ka/"))).toBe(false);
+  });
+
+  it("inventories the 36 health and causes-of-death originals, the served and the archived-only alike", async () => {
+    const rows = await expectedOriginalSourcePaths(REPOSITORY_ROOT, "health");
+    expect(rows).toHaveLength(36);
+    expect(rows.every((row) => row.path.startsWith("docs/Raw Data/Health/geostat-health-annual/official/"))).toBe(true);
+    expect(rows.filter((row) => row.path.includes("/official/deaths/"))).toHaveLength(13);
+    expect(rows.map((row) => row.path)).toEqual(expect.arrayContaining([
+      "docs/Raw Data/Health/geostat-health-annual/official/health-page.html",
+      "docs/Raw Data/Health/geostat-health-annual/official/deaths-page.html",
+    ]));
+  });
+
+  it("inventories the 25 transport originals: 20 workbooks and 5 page captures", async () => {
+    const rows = await expectedOriginalSourcePaths(REPOSITORY_ROOT, "transport");
+    expect(rows).toHaveLength(25);
+    expect(rows.every((row) => row.path.startsWith("docs/Raw Data/Transport/geostat-transport-annual/official/"))).toBe(true);
+    expect(rows.map((row) => row.path)).toEqual(expect.arrayContaining([
+      "docs/Raw Data/Transport/geostat-transport-annual/official/H-1-Passenger-transport-demand_ENG.XLSX",
+      "docs/Raw Data/Transport/geostat-transport-annual/official/Length-of-road-Eng-2024.xls",
+      "docs/Raw Data/Transport/geostat-transport-annual/official/geostat-category-565-2026-10-20.html",
+    ]));
+  });
+
+  it("inventories the 21 housing originals, the zips with their members and the page captures alike", async () => {
+    const rows = await expectedOriginalSourcePaths(REPOSITORY_ROOT, "housing");
+    expect(rows).toHaveLength(21);
+    expect(rows.every((row) => row.path.startsWith("docs/Raw Data/Housing/geostat-housing-annual/official/"))).toBe(true);
+    expect(rows.map((row) => row.path)).toEqual(expect.arrayContaining([
+      "docs/Raw Data/Housing/geostat-housing-annual/official/Permissions_ENG.zip",
+      "docs/Raw Data/Housing/geostat-housing-annual/official/Permissions_ENG/0503EN020102c_Permissions by type_ 2006-2025 ENG.xls",
+      "docs/Raw Data/Housing/geostat-housing-annual/official/geostat-category-698-2026-10-16.html",
+    ]));
+  });
+
+  it("inventories the 45 education originals: 41 workbooks and the four category page captures", async () => {
+    const rows = await expectedOriginalSourcePaths(REPOSITORY_ROOT, "education");
+    expect(rows).toHaveLength(45);
+    expect(rows.every((row) => row.path.startsWith("docs/Raw Data/Education/geostat-education-annual/official/"))).toBe(true);
+    expect(rows.filter((row) => row.path.endsWith(".html")).map((row) => path.posix.basename(row.path))).toEqual([58, 59, 60, 61].map((category) => `geostat-category-${category}-2026-10-16.html`));
+  });
+
+  it("inventories the 17 social protection originals: SSA's page captures and link lists and Geostat's four divisors, never the SSA workbooks", async () => {
+    const rows = await expectedOriginalSourcePaths(REPOSITORY_ROOT, "social-protection");
+    expect(rows).toHaveLength(17);
+    const ssa = rows.filter((row) => row.path.startsWith("docs/Raw Data/Social/"));
+    expect(ssa).toHaveLength(13);
+    expect(ssa.every((row) => row.path.startsWith("docs/Raw Data/Social/ssa-statistics/official/pages/"))).toBe(true);
+    expect(ssa.some((row) => row.path.includes("pre2012"))).toBe(false);
+    expect(rows.filter((row) => !row.path.startsWith("docs/Raw Data/Social/")).map((row) => row.path)).toEqual([
+      "docs/Raw Data/Economy/gdp-overview/sources/geostat_nominal_current.xlsx",
+      "docs/Raw Data/Inflation/geostat-cpi/2026-09/en/cpi-index-2010.xlsx",
+      "docs/Raw Data/Inflation/geostat-cpi/2026-09/ka/cpi-index-2010.xlsx",
+      "docs/Raw Data/Municipalities/geostat-population-regional-gdp/official/01-population-by-self-governed-unit.xlsx",
+    ]);
+    // The PR #170 rule: the 206 MB of SSA workbooks stay out of the published archive and the methodology bundle.
+    expect(rows.reduce(sumBytes, 0)).toBeLessThan(1_000_000);
+    // Every SSA table the served facts cite is registered on one of these captures.
+    const registry = parse(await readFile(path.join(REPOSITORY_ROOT, "data/sources/source-documents.csv"), "utf8"), { bom: true, columns: true }) as { source_id: string; source_url_or_file: string }[];
+    const ssaRegistry = registry.filter((row) => row.source_id.startsWith("source.ssa_"));
+    expect(ssaRegistry).toHaveLength(25);
+    expect(ssaRegistry.filter((row) => !ssa.some((capture) => capture.path === row.source_url_or_file))).toEqual([]);
+  });
+
+  it("inventories the 26 business originals", async () => {
+    const rows = await expectedOriginalSourcePaths(REPOSITORY_ROOT, "business");
+    expect(rows).toHaveLength(26);
+    expect(rows.every((row) => row.path.startsWith("docs/Raw Data/Business/geostat-business-annual/official/"))).toBe(true);
+  });
+
+  it("inventories the 36 internet originals: the English and Georgian tables and both page captures", async () => {
+    const rows = await expectedOriginalSourcePaths(REPOSITORY_ROOT, "internet");
+    expect(rows).toHaveLength(36);
+    expect(rows.every((row) => row.path.startsWith("docs/Raw Data/Internet/geostat-ict-households-annual/official/"))).toBe(true);
+    expect(rows.map((row) => row.path)).toEqual(expect.arrayContaining([
+      "docs/Raw Data/Internet/geostat-ict-households-annual/official/01_Share_of_households_with_internet_access.xlsx",
+      "docs/Raw Data/Internet/geostat-ict-households-annual/official/ka/01_internetit_uzrunvelyopili_shinameurneobebi.xlsx",
+      "docs/Raw Data/Internet/geostat-ict-households-annual/official/geostat-category-106-2026-10-20.html",
+      "docs/Raw Data/Internet/geostat-ict-households-annual/official/ka/geostat-category-106-ka-2026-10-20.html",
+    ]));
+  });
+
+  it("inventories the 22 crime and justice originals: the English and Georgian workbooks and both page captures", async () => {
+    const rows = await expectedOriginalSourcePaths(REPOSITORY_ROOT, "crime");
+    expect(rows).toHaveLength(22);
+    expect(rows.every((row) => row.path.startsWith("docs/Raw Data/Crime/geostat-crime-annual/official/"))).toBe(true);
+    expect(rows.map((row) => row.path)).toEqual(expect.arrayContaining([
+      "docs/Raw Data/Crime/geostat-crime-annual/official/Number-of-Recorded-Crimes.xlsx",
+      "docs/Raw Data/Crime/geostat-crime-annual/official/registrirebuli-danaSaulis-raodenoba.xlsx",
+      "docs/Raw Data/Crime/geostat-crime-annual/official/crime-page.html",
+      "docs/Raw Data/Crime/geostat-crime-annual/official/crime-page-ka.html",
+    ]));
+  });
+
+  it("inventories the 46 environment originals: the English and Georgian workbooks, the archived-only workbooks and the six page captures", async () => {
+    const rows = await expectedOriginalSourcePaths(REPOSITORY_ROOT, "environment");
+    expect(rows).toHaveLength(46);
+    expect(rows.every((row) => row.path.startsWith("docs/Raw Data/Environment/geostat-environment-annual/official/"))).toBe(true);
+    expect(rows.filter((row) => row.path.endsWith(".html")).map((row) => path.posix.basename(row.path))).toEqual(["page-565-en.html", "page-565-ka.html", "page-73-en.html", "page-73-ka.html", "page-822-en.html", "page-822-ka.html"]);
+    expect(rows.map((row) => row.path)).toEqual(expect.arrayContaining([
+      "docs/Raw Data/Environment/geostat-environment-annual/official/B-3.-Greenhouse-gas-emissions-ENG.XLSX",
+      "docs/Raw Data/Environment/geostat-environment-annual/official/B-3.-Greenhouse-gas-emissions-GEO.xlsx",
+      "docs/Raw Data/Environment/geostat-environment-annual/official/Volume-of-felled-timber.xls",
+      "docs/Raw Data/Environment/geostat-environment-annual/official/G-1.-Final-energy-consumption_ENG.xlsx",
+    ]));
+  });
+
+  it("inventories the 33 science and culture originals: the English workbooks, their Georgian versions and both page captures", async () => {
+    const rows = await expectedOriginalSourcePaths(REPOSITORY_ROOT, "science-culture");
+    expect(rows).toHaveLength(33);
+    expect(rows.every((row) => row.path.startsWith("docs/Raw Data/ScienceCulture/geostat-science-culture-annual/official/"))).toBe(true);
+    expect(rows.filter((row) => row.path.includes("/official/ka/"))).toHaveLength(13);
+    expect(rows.map((row) => row.path)).toEqual(expect.arrayContaining([
+      "docs/Raw Data/ScienceCulture/geostat-science-culture-annual/official/R&D-Personal.xlsx",
+      "docs/Raw Data/ScienceCulture/geostat-science-culture-annual/official/ka/mkvlevarebi.xlsx",
+      "docs/Raw Data/ScienceCulture/geostat-science-culture-annual/official/geostat-category-194-2026-10-20.html",
+      "docs/Raw Data/ScienceCulture/geostat-science-culture-annual/official/geostat-category-615-2026-10-20.html",
+    ]));
   });
 
   it("returns forward-slash paths in lexical order", async () => {
@@ -77,7 +207,7 @@ describe("original-source inventory", () => {
     expect(productRows.map((row) => row.source_id).sort()).toEqual([
       "source.geostat_product_mom", "source.geostat_product_mom_ka", "source.geostat_product_yoy", "source.geostat_product_yoy_ka",
     ]);
-    expect(productRows.every((row) => row.repository_source_path.includes("geostat-products/2026-08/") &&
+    expect(productRows.every((row) => row.repository_source_path.includes("geostat-products/2026-09/") &&
       row.downloadHref.startsWith("/downloads/methodology/inflation/files/"))).toBe(true);
   });
 

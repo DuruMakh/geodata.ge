@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, it } from "vitest";
-import { buildFactQuerySnapshot } from "../../lib/factQuery/buildSnapshot";
+import { testSnapshot } from "../helpers/factQuerySnapshot";
 import { describeCoverage, type CoverageData } from "../../lib/factQuery/describeCoverage";
 import { queryNational } from "../../lib/factQuery/queryNational";
 import { queryMinistries } from "../../lib/factQuery/queryMinistries";
@@ -12,7 +12,7 @@ import type { Observation } from "../../lib/factQuery/observations";
 import type { Coverage, FactQueryResponse, FactQuerySnapshot } from "../../lib/factQuery/types";
 
 let snapshot: FactQuerySnapshot;
-beforeAll(async () => { snapshot = await buildFactQuerySnapshot({ releaseCommit: "test", generatedAt: "2026-09-06T00:00:00Z" }); });
+beforeAll(async () => { snapshot = testSnapshot({ releaseCommit: "test", generatedAt: "2026-09-06T00:00:00Z" }); });
 const rows = (response: FactQueryResponse) => {
   if (response.kind !== "observations") throw new Error(`Expected observations, received ${response.kind}`);
   return response.data as { observations: Observation[]; coverage: Coverage };

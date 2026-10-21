@@ -1,15 +1,15 @@
 import { beforeAll, describe, expect, it } from "vitest";
-import { buildFactQuerySnapshot } from "../../lib/factQuery/buildSnapshot";
+import { testSnapshot } from "../helpers/factQuerySnapshot";
 import { queryInflationProducts, productQueryCellCount } from "../../lib/factQuery/queryInflationProducts";
 import { productQueryCoverage } from "../../lib/factQuery/inflationProductData";
-import { observationSchema, queryInflationProductsInput, queryInflationInput } from "../../lib/factQuery/schemas";
+import { observationSchema, queryInflationProductsInput, queryInflationInput, type QueryInflationProductsInput } from "../../lib/factQuery/schemas";
 import type { Observation } from "../../lib/factQuery/observations";
 import type { FactQueryResponse, FactQuerySnapshot } from "../../lib/factQuery/types";
 import type { ProductSnapshotFact } from "../../lib/factQuery/inflationProductSeries";
 
 const id = "cpi.product.p0001";
 let real: FactQuerySnapshot;
-beforeAll(async () => { real = await buildFactQuerySnapshot({ releaseCommit: "test", generatedAt: "2026-10-01T00:00:00Z" }); });
+beforeAll(async () => { real = testSnapshot({ releaseCommit: "test", generatedAt: "2026-10-01T00:00:00Z" }); });
 const fact = (period: string, index100: string | null, measure: ProductSnapshotFact["measure"] = "mom_index_100", productId = id): ProductSnapshotFact =>
   ({ productId, period, index100, measure, availability: index100 === null ? "not_published" : "published", sourceId: measure === "mom_index_100" ? "source.geostat_product_mom" : "source.geostat_product_yoy" });
 function synthetic(facts = [fact("2026-01", "101"), fact("2026-02", "102"), fact("2026-01", "150", "yoy_index_100"), fact("2026-02", "160", "yoy_index_100")], firstPeriod = "2026-01"): FactQuerySnapshot {
@@ -22,7 +22,75 @@ function rows(response: FactQueryResponse): Observation[] {
 const input = (measure = "yoy_pct", fromPeriod = "2026-02", toPeriod = fromPeriod, startYear?: number) => ({ seriesIds: [id], measure, fromPeriod, toPeriod, ...(startYear === undefined ? {} : { startYear }) });
 const errorCode = (response: FactQueryResponse) => response.kind === "error" ? response.error.code : response.status;
 
+// Facts-only oracle: enumerate complete January-to-endpoint inputs directly.
+// No index, prefix arithmetic or production coverage helpers participate.
+function independentCoverage(snapshot: FactQuerySnapshot, request: QueryInflationProductsInput) {
+  const available = new Set<string>();
+  for (const productId of request.seriesIds) {
+    const product = snapshot.inflationProducts.catalogue.find(product => product.productId === productId)!;
+    const facts = snapshot.inflationProducts.facts.filter(row => row.productId === productId && row.measure === (request.measure === "yoy_pct" ? "yoy_index_100" : "mom_index_100"));
+    const cells = new Map(facts.map(row => [row.period, row.index100]));
+    for (const row of facts) {
+      if (row.index100 === null) continue;
+      if (request.measure === "cumulative_pct") {
+        const january = `${request.startYear}-01`;
+        if (product.firstPeriod > january || row.period < january) continue;
+        let complete = true;
+        for (let year = request.startYear!; year <= Number(row.period.slice(0, 4)); year++) {
+          const lastMonth = year === Number(row.period.slice(0, 4)) ? Number(row.period.slice(5)) : 12;
+          for (let month = 1; month <= lastMonth; month++) if (cells.get(`${year}-${String(month).padStart(2, "0")}`) == null) complete = false;
+        }
+        if (!complete) continue;
+      }
+      available.add(row.period);
+    }
+  }
+  const periods = [...available].sort();
+  return { availablePeriods: periods.length ? [periods[0], periods.at(-1)] : null, availableYears: [...new Set(periods.map(period => Number(period.slice(0, 4))))].sort((a, b) => a - b) };
+}
+
 describe("queryInflationProducts", () => {
+  it("cached availability preserves snapshot and cumulative-base boundaries", () => {
+    const lateId = "cpi.product.p0002";
+    const emptyId = "cpi.product.p0003";
+    const facts = [
+      ...Array.from({ length: 12 }, (_, month) => fact(`2024-${String(month + 1).padStart(2, "0")}`, "101")),
+      fact("2025-01", "100"), fact("2025-02", null), fact("2025-03", "102"),
+      fact("2026-01", "100"), fact("2026-02", "101"), fact("2026-03", "102"),
+      fact("2024-01", "110", "yoy_index_100"), fact("2025-01", null, "yoy_index_100"), fact("2026-03", "120", "yoy_index_100"),
+      fact("2026-02", "100", "mom_index_100", lateId), fact("2025-06", "105", "yoy_index_100", lateId),
+      fact("2026-01", null, "mom_index_100", emptyId), fact("2026-03", null, "yoy_index_100", emptyId),
+    ];
+    const first = synthetic(facts, "2024-01");
+    first.inflationProducts.catalogue.push(
+      { ...first.inflationProducts.catalogue[0]!, productId: lateId, firstPeriod: "2026-02" },
+      { ...first.inflationProducts.catalogue[0]!, productId: emptyId, firstPeriod: "2026-01" },
+    );
+    const second = { ...first, inflationProducts: { ...first.inflationProducts, facts: facts.filter(row => !(row.productId === id && ["2024-02", "2026-02"].includes(row.period) && row.measure === "mom_index_100")) } };
+    const request = (startYear?: number, seriesIds = [id]): QueryInflationProductsInput => ({ seriesIds, measure: startYear === undefined ? "yoy_pct" : "cumulative_pct", fromPeriod: "2026-03", toPeriod: "2026-03", ...(startYear === undefined ? {} : { startYear }) });
+    const cases = [
+      { snapshot: first, input: request(2024), expected: { availablePeriods: ["2024-01", "2025-01"], availableYears: [2024, 2025] } },
+      { snapshot: first, input: request(2026), expected: { availablePeriods: ["2026-01", "2026-03"], availableYears: [2026] } },
+      { snapshot: second, input: request(2024), expected: { availablePeriods: ["2024-01", "2024-01"], availableYears: [2024] } },
+      { snapshot: second, input: request(2026), expected: { availablePeriods: ["2026-01", "2026-01"], availableYears: [2026] } },
+      { snapshot: first, input: request(), expected: { availablePeriods: ["2024-01", "2026-03"], availableYears: [2024, 2026] } },
+      { snapshot: first, input: request(undefined, [id, lateId]), expected: { availablePeriods: ["2024-01", "2026-03"], availableYears: [2024, 2025, 2026] } },
+      ...[lateId, emptyId].map(productId => ({ snapshot: first, input: request(2026, [productId]), expected: { availablePeriods: null, availableYears: [] } })),
+      { snapshot: first, input: request(undefined, [emptyId]), expected: { availablePeriods: null, availableYears: [] } },
+      { snapshot: first, input: request(2026, [id, lateId, emptyId]), expected: { availablePeriods: ["2026-01", "2026-03"], availableYears: [2026] } },
+    ];
+    for (const { snapshot, input, expected } of cases) {
+      const independentlyComputedCoverage = independentCoverage(snapshot, input);
+      expect(independentlyComputedCoverage).toEqual(expected);
+      productQueryCoverage(snapshot, input);
+      const warmCoverage = productQueryCoverage(snapshot, input);
+      expect(warmCoverage).toEqual(independentlyComputedCoverage);
+      expect(productQueryCoverage(snapshot, { ...input, fromPeriod: `${input.startYear ?? 2024}-01` })).toEqual(expected);
+      warmCoverage.availableYears.push(9999);
+      if (warmCoverage.availablePeriods) warmCoverage.availablePeriods[0] = "9999-01";
+      expect(productQueryCoverage(snapshot, input)).toEqual(expected);
+    }
+  });
   it("names the first required January when compounding starts after the monthly run", () => {
     const snapshot = synthetic([
       fact("2025-01", "101"), fact("2025-02", "102"), fact("2026-01", "110", "yoy_index_100"),

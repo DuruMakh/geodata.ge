@@ -1,7 +1,10 @@
 // apps/web/tests/factQuery/sources.test.ts
+import { readFileSync } from "node:fs";
+import path from "node:path";
+import { parse } from "csv-parse/sync";
 import { beforeAll, describe, expect, it } from "vitest";
-import { buildFactQuerySnapshot } from "../../lib/factQuery/buildSnapshot";
-import { findSourceProvenanceFailures, resolvePublicSources, selectSources } from "../../lib/factQuery/sources";
+import { testSnapshot } from "../helpers/factQuerySnapshot";
+import { findSourceProvenanceFailures, resolvePublicSources, selectSources, type ManifestDocument } from "../../lib/factQuery/sources";
 import { packageManifestRowSchema } from "../../lib/factQuery/buildSnapshot";
 import type { FactQuerySnapshot } from "../../lib/factQuery/types";
 
@@ -11,7 +14,7 @@ const OPTIONS = { releaseCommit: "test-commit", generatedAt: "2026-08-28T00:00:0
 let snapshot: FactQuerySnapshot;
 
 beforeAll(async () => {
-  snapshot = await buildFactQuerySnapshot(OPTIONS);
+  snapshot = testSnapshot(OPTIONS);
 });
 
 describe("public source resolution", () => {
@@ -71,6 +74,15 @@ describe("public source resolution", () => {
       expect(document?.datasetId).toBeNull();
       expect(document?.retrievedAt).toBe("2026-08-13");
     }
+  });
+
+  it("retains the 2015 workbook identity and reviewed 2014-2015 coverage", () => {
+    const source = snapshot.sources.find(source => source.sourceId === "source.mof_2014_programmatic_fact_actual")!;
+    expect(source.documents).toMatchObject([{
+      documentId: "source.mof.expenditure.2015.mof_excel_fact", years: [2014, 2015],
+      archiveUrl: "https://fiscal.ge/downloads/methodology/expenditure/files/2015/mof-excel-fact.xlsx",
+      byteSize: 85702, sha256: "47f9c22fffcae56faecb79bc0cfe84bcddb42db265ff4da7089ba84abdb0906e",
+    }]);
   });
 
   it("never emits a sentinel source id", async () => {
@@ -180,9 +192,9 @@ describe("public source resolution", () => {
 
       expect(unresolved).toEqual([]);
       expect(snapshot.sources.some(source => source.sourceId.startsWith("source.geostat_services_"))).toBe(false);
-      // The thirteen demography canonical inputs (twelve annual tables and the census snapshot) extend the existing inventory;
+      // The nineteen demography canonical inputs (eighteen annual tables and the census snapshot) extend the existing inventory;
       // the package's validation inputs and definitions are evidence, not sources.
-      expect(snapshot.sources.length).toBe(145);
+      expect(snapshot.sources.length).toBe(151);
     });
 
     it("resolves an extracted file to the archived original it came from", async () => {
@@ -215,7 +227,7 @@ describe("public source resolution", () => {
       const births = demography.find((source) => source.sourceId === "source.geostat_demography_births");
       const documentIds = snapshot.sources.flatMap((source) => source.documents.map((document) => document.documentId));
 
-      expect(demography).toHaveLength(12);
+      expect(demography).toHaveLength(18);
       expect(births?.documents).toHaveLength(1);
       expect(births?.documents[0]).toMatchObject({
         officialUrl: "https://geostat.ge/media/77847/09-number-of-live-births-by-self-governed-units.xlsx",
@@ -242,7 +254,11 @@ describe("public source resolution", () => {
       // The validation inputs and definition PDFs stay evidence, and table 01 stays the municipal package's one document.
       expect(documentIds).not.toContain("source.geostat_demography_median_age");
       expect(documentIds).not.toContain("source.geostat_demography_metadata_population");
-      expect(documentIds.filter((id) => id.startsWith("source.geostat_demography_"))).toHaveLength(12);
+      expect(documentIds).not.toContain("source.geostat_demography_crude_marriage_rate");
+      expect(documentIds).not.toContain("source.geostat_demography_marriages_previous_status");
+      expect(documentIds.filter((id) => id.startsWith("source.geostat_demography_"))).toHaveLength(18);
+      const midYear = demography.find((source) => source.sourceId === "source.geostat_demography_population_mid_year");
+      expect(midYear?.documents[0]?.years).toEqual(Array.from({ length: 32 }, (_, index) => 1994 + index));
       expect(snapshot.sources.find((source) => source.sourceId === "source.geostat_municipal_population")?.documents).toHaveLength(1);
     });
 
@@ -252,10 +268,18 @@ describe("public source resolution", () => {
       expect(source?.derivation).toBe(source?.name);
       expect((source?.derivation ?? "").length).toBeGreaterThan(0);
       // Upstream originals, not a document of the derived figures - there is none.
-      expect(source?.documents.map((d) => d.documentId)).toEqual([
-        "source.adjara.republic.2015.actual_payments",
-        "source.adjara.republic.2016_2025.actual_payments",
-      ]);
+      const municipal = parse(readFileSync(path.resolve(process.cwd(), "../../data/methodology/source-archives/municipalities.csv"), "utf8"), { columns: true, bom: true }) as { source_id: string; year: string }[];
+      const expectedIds = [...municipal.map(row => row.source_id).filter(id => !id.endsWith("portal_functional_basic_types")),
+        ...Array.from({ length: 11 }, (_, index) => `source.mof.revenue.${2015 + index}.form_1`),
+      ].sort();
+      expect(expectedIds).toHaveLength(89);
+      expect(source?.documents.map((d) => d.documentId).sort()).toEqual(expectedIds);
+      for (const document of source!.documents) {
+        const coverage = municipal.find(row => row.source_id === document.documentId)?.year ?? document.documentId.split(".")[3]!;
+        const [first, last = first] = coverage.split("-").map(Number);
+        expect(document.years).toEqual(Array.from({ length: last! - first! + 1 }, (_, index) => first! + index));
+        expect(document.role).toBe("derivation_upstream");
+      }
     });
 
     it("leaves every ordinary source's derivation null", async () => {
@@ -295,7 +319,7 @@ describe("public source resolution", () => {
   });
 
   describe("a derived source cannot lose its upstream originals silently", () => {
-    it("throws when a declared upstream matches no manifest document", () => {
+    it("throws when a configured logical upstream is absent", () => {
       // DERIVED_SOURCE_UPSTREAMS is hand-authored, so an id matching nothing is
       // always an authoring error - a typo, or an upstream renamed in a reviewed
       // manifest. It used to be skipped silently, which would ship the
@@ -313,8 +337,21 @@ describe("public source resolution", () => {
           ],
           manifestDocuments: [],
         }),
-      ).toThrow(/upstream/i);
+      ).toThrow(/logical upstream "source.municipal_portal_archive"/);
     });
+  });
+
+  it("retains the explicit document-id derivation and fails for an unknown original", () => {
+    expect(() => resolvePublicSources({ sourceDocuments: [{ sourceId: "source.fiscal_regional_economy_share", sourceName: "derived regional share", sourceUrlOrFile: "", lastReviewedAt: "2026-10-17" }], manifestDocuments: [] })).toThrow(/no manifest document has that id/);
+  });
+
+  it("composes logical upstreams once and deduplicates originals without changing ordinary roles", () => {
+    const document: ManifestDocument = { documentId: "source.shared", repositoryPath: "shared.pdf", title: "Shared original", publisher: "Official", years: [2025], datasetId: "municipalities", officialUrl: null, archiveUrl: "https://fiscal.ge/shared.pdf", sha256: "a".repeat(64), byteSize: 10, mediaType: "application/pdf", retrievedAt: "2026-10-17", licenceId: null, attribution: null };
+    const upstreamIds = ["source.municipal_portal_archive", "source.municipal_mof_annual_and_history_workbooks", "source.adjara_republic_budget_actual", "source.treasury_consolidated_revenue_actual"];
+    const rows = ["source.adjara_consolidated_budget", ...upstreamIds].map(sourceId => ({ sourceId, sourceName: sourceId, sourceUrlOrFile: "shared.pdf", lastReviewedAt: "2026-10-17" }));
+    const resolved = resolvePublicSources({ sourceDocuments: rows, manifestDocuments: [document] });
+    expect(resolved[0]?.documents.map(row => [row.documentId, row.role])).toEqual([["source.shared", "derivation_upstream"]]);
+    for (const source of resolved.slice(1)) expect(source.documents.map(row => [row.documentId, row.role])).toEqual([["source.shared", "primary"]]);
   });
 
   describe("package manifest coverage years", () => {
@@ -417,10 +454,9 @@ describe("public source resolution", () => {
     it("marks the derived source documents as derivation upstreams", async () => {
       const derived = snapshot.sources.find((s) => s.sourceId === "source.adjara_consolidated_budget");
 
-      // These two PDFs publish the republican payments, not the consolidated
-      // total. Only the sibling derivation field distinguished them before, so a
-      // consumer rendering documents would present one as the publication.
-      expect(derived?.documents.map((d) => d.role)).toEqual(["derivation_upstream", "derivation_upstream"]);
+      // These originals publish the calculation inputs, not the consolidated
+      // total; keep that distinction on every document as well as the source.
+      expect(derived?.documents.map((d) => d.role)).toEqual(Array(89).fill("derivation_upstream"));
     });
 
     it("marks every ordinary document primary", async () => {

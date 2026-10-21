@@ -56,6 +56,8 @@ export type SideKpi = {
   unit: string;
   color: string;
   detail: string;
+  /** Read with the detail but never clipped with it (the year after a long name, say): its own non-shrinking span. */
+  detailSuffix?: string;
   wrapDetail?: boolean;
   spark: { values: (number | null)[]; color: string } | null;
   /** Replaces the row's `side-kpi` test id. */
@@ -82,9 +84,16 @@ export function SideKpiList({ kpis, testId, rowTestId }: { kpis: SideKpi[]; test
                   </span>
                 ) : null}
               </p>
-              <p title={kpi.detail} className={`min-w-0 text-right text-xs text-[var(--muted)] ${kpi.wrapDetail ? "break-words" : KPI_DETAIL_CLIP_CLASS}`}>
-                {kpi.detail}
-              </p>
+              {kpi.detailSuffix && !kpi.wrapDetail ? (
+                <p title={kpi.detail + kpi.detailSuffix} className="flex min-w-0 justify-end text-right text-xs text-[var(--muted)] @max-[768px]:block">
+                  <span className={`min-w-0 ${KPI_DETAIL_CLIP_CLASS}`}>{kpi.detail}</span>
+                  <span className="shrink-0">{kpi.detailSuffix}</span>
+                </p>
+              ) : (
+                <p title={kpi.detail + (kpi.detailSuffix ?? "")} className={`min-w-0 text-right text-xs text-[var(--muted)] ${kpi.wrapDetail ? "break-words" : KPI_DETAIL_CLIP_CLASS}`}>
+                  {kpi.detail}{kpi.detailSuffix}
+                </p>
+              )}
             </div>
             {kpi.spark ? <Sparkline values={kpi.spark.values} color={kpi.spark.color} /> : null}
           </>
@@ -137,7 +146,7 @@ const COMPARISON_CLASSES = {
       "border-b-2 border-[var(--ink)] pl-3 pt-1.5 pb-2 text-right font-[family-name:var(--font-numeric)] text-[0.6875rem] font-semibold text-[var(--muted)] @max-[768px]:pl-1",
     ],
     nameCell: "py-2.5 pr-3",
-    name: "min-w-0 text-[0.78125rem] leading-[1.4] text-[var(--ink)] [overflow-wrap:anywhere] @max-[768px]:text-[0.75rem]",
+    name: "line-clamp-2 min-w-0 text-[0.78125rem] leading-[1.4] text-[var(--ink)] [overflow-wrap:anywhere] @max-[768px]:text-[0.75rem]",
     start: "px-3 py-2.5 text-right font-[family-name:var(--font-numeric)] text-[0.78125rem] whitespace-nowrap text-[var(--muted)] @max-[768px]:px-1",
     change: "px-3 py-2.5 text-right font-[family-name:var(--font-numeric)] text-[0.78125rem] whitespace-nowrap @max-[768px]:px-1",
     end: "py-2.5 pl-3 text-right font-[family-name:var(--font-numeric)] text-[0.78125rem] whitespace-nowrap text-[var(--ink)] @max-[768px]:pl-1",
@@ -169,7 +178,7 @@ export function PeriodComparisonTable({ heading, caption, firstColumnLabel, chan
       </colgroup>
       <thead>
         <tr>
-          {[firstColumnLabel, String(startYear), changeLabel, String(endYear)].map((label, index) => <th key={index} className={c.th[index]}>{label}</th>)}
+          {[firstColumnLabel, String(startYear), changeLabel, String(endYear)].map((label, index) => <th key={index} scope="col" className={c.th[index]}>{label}</th>)}
         </tr>
       </thead>
       <tbody>
@@ -177,12 +186,13 @@ export function PeriodComparisonTable({ heading, caption, firstColumnLabel, chan
           const weight = row.emphasis ? 600 : 500;
           return (
             <tr key={row.key} className={municipal ? `border-b border-[var(--hairline-soft)] transition-colors duration-100 hover:bg-[var(--tint)] ${row.emphasis ? "bg-[var(--tint)]" : ""}` : "border-b border-[var(--hairline-soft)] transition-colors duration-100 hover:bg-[var(--tint)]"}>
-              <td className={c.nameCell} title={row.title}>
+              {/* The row's name is its header, so a screen reader reads it with each value (as in ExplorerTable). */}
+              <th scope="row" className={`${c.nameCell} text-left font-normal`} title={row.title}>
                 <span className="inline-flex min-w-0 items-start gap-[9px] @max-[768px]:gap-1.5">
                   <SwatchBar color={row.color} className="mt-[7px]" />
                   <span className={c.name} style={{ fontWeight: weight }}>{row.label}</span>
                 </span>
-              </td>
+              </th>
               <td className={c.start} style={{ fontWeight: weight }}>{row.start}</td>
               <td data-testid={municipal ? "comparison-change-cell" : undefined} className={c.change} style={{ color: row.changeColor }}>{row.change}</td>
               <td className={c.end} style={{ fontWeight: weight }}>{row.end}</td>

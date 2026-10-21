@@ -8,10 +8,11 @@ import {
   REGIONAL_ECONOMY_REGIONS,
   REGIONAL_ECONOMY_SECTORS,
 } from "../data/regionalEconomies/importRegionalEconomies";
+import { REGIONAL_GDP_TOTAL, type ServedRegionalEconomyObservation } from "../data/regionalEconomies/types";
 import { buildRegionalEconomyMapModel } from "../explorer/regionalEconomyMap";
 import { message } from "../i18n/messages";
 import { publicLabel } from "../i18n/labels";
-import { getPresentation } from "../i18n/presentation.server";
+import { clientPresentation, getPresentation } from "../i18n/presentation.server";
 import { I18nProvider } from "../i18n/provider";
 import { pageHref } from "../i18n/routes";
 import type { Locale } from "../i18n/types";
@@ -20,15 +21,35 @@ import { explorerDatasetJsonLd } from "../seo/structuredData";
 import { resolveSiteUrl } from "../siteUrl";
 import { ExplorerHeading } from "../../components/explorer-shell/explorer-heading";
 import { ExplorerPage } from "../../components/explorer-shell/explorer-page";
-import { coverageLabel } from "../explorer/coverageLabel";
+import { coverageLabel, updatedDate } from "../explorer/coverageLabel";
+
+/** The years, counts and review date the regional copy quotes, read from the loaded facts (AGENTS.md UI Contract). */
+export function regionalCoverage(facts: readonly ServedRegionalEconomyObservation[], locale: Locale) {
+  const years = facts.map((fact) => fact.year);
+  const reviewedAt = facts.map((fact) => fact.lastReviewedAt).sort().at(-1)!;
+  return {
+    reviewedAt,
+    params: {
+      firstYear: Math.min(...years),
+      lastYear: Math.max(...years),
+      regionCount: new Set(facts.map((fact) => fact.regionId)).size,
+      sectorCount: new Set(facts.filter((fact) => fact.seriesId !== REGIONAL_GDP_TOTAL).map((fact) => fact.seriesId)).size,
+      reviewedDate: updatedDate(reviewedAt, locale),
+    },
+  };
+}
 
 export async function regionalEconomiesPageMetadata(locale: Locale) {
-  const presentation = await getPresentation(locale, ["regionalEconomies"], []);
+  const [{ facts }, presentation] = await Promise.all([
+    loadServedRegionalEconomyData(),
+    getPresentation(locale, ["regionalEconomies"], []),
+  ]);
+  const { params } = regionalCoverage(facts, locale);
   return fiscalMetadata({
     locale,
     path: "/explorer/economy/regions",
-    title: message(presentation.messages, "regionalEconomies.indexMetaTitle"),
-    description: message(presentation.messages, "regionalEconomies.description"),
+    title: message(presentation.messages, "regionalEconomies.indexMetaTitle", params),
+    description: message(presentation.messages, "regionalEconomies.description", params),
   });
 }
 
@@ -38,8 +59,9 @@ export async function renderRegionalEconomiesPage(locale: Locale) {
     loadServedMunicipalData(),
     getPresentation(
       locale,
-      ["regionalEconomies", "common", "format"],
+      ["regionalEconomies", "format"],
       [...REGIONAL_ECONOMY_REGIONS.map((region) => region.id), ...REGIONAL_ECONOMY_SECTORS.map((sector) => sector.id)],
+      REGIONAL_ECONOMY_REGIONS.map((region) => region.id),
     ),
   ]);
   const model = buildRegionalEconomyMapModel({
@@ -47,8 +69,8 @@ export async function renderRegionalEconomiesPage(locale: Locale) {
     regions: municipal.regions,
   });
   const title = message(presentation.messages, "regionalEconomies.heading");
-  const description = message(presentation.messages, "regionalEconomies.description");
-  const reviewedAt = facts.map((fact) => fact.lastReviewedAt).sort().at(-1)!;
+  const { reviewedAt, params } = regionalCoverage(facts, locale);
+  const description = message(presentation.messages, "regionalEconomies.description", params);
   const crumbs = [
     { label: message(presentation.messages, "common.home"), href: pageHref("/", locale) },
     { label: message(presentation.messages, "common.data") },
@@ -56,7 +78,7 @@ export async function renderRegionalEconomiesPage(locale: Locale) {
     { label: title },
   ];
   return (
-    <I18nProvider {...presentation}>
+    <I18nProvider {...clientPresentation(presentation)}>
       <BreadcrumbJsonLd items={[
         { name: crumbs[0].label, path: pageHref("/", locale) },
         { name: crumbs[2].label, path: pageHref("/explorer/economy", locale) },
@@ -72,7 +94,7 @@ export async function renderRegionalEconomiesPage(locale: Locale) {
         firstYear: model.firstYear,
         lastYear: model.year,
         dateModified: reviewedAt,
-        spatialCoverageName: locale === "ka" ? "საქართველოს რეგიონები" : "Regions of Georgia",
+        spatialCoverageName: message(presentation.messages, "regionalEconomies.spatialCoverage"),
         downloadPath: "/downloads/data/regional-economies.csv",
         sameAsPath: "/methodology/regional-economies",
         hasParts: REGIONAL_ECONOMY_REGIONS.map((region) => {
@@ -81,15 +103,18 @@ export async function renderRegionalEconomiesPage(locale: Locale) {
           return {
             path: `/explorer/economy/regions/${slug}` as const,
             name,
-            description: message(presentation.messages, "regionalEconomies.detailMetaDescription", { region: name }),
+            description: message(presentation.messages, "regionalEconomies.detailMetaDescription", {
+              ...regionalCoverage(facts.filter((fact) => fact.regionId === region.id), locale).params,
+              region: name,
+            }),
           };
         }),
       })} />
       <ExplorerPage testId="explorer-shell">
-        <PageHeader crumbs={crumbs} coverage={coverageLabel(presentation.messages, locale, model.firstYear, model.year, reviewedAt)} />
+        <PageHeader locale={locale} messages={presentation.messages} crumbs={crumbs} coverage={coverageLabel(presentation.messages, locale, model.firstYear, model.year, reviewedAt)} />
         <ExplorerHeading>{title}</ExplorerHeading>
-        <p className="mb-[30px] max-w-[720px] text-[13px] leading-relaxed text-[var(--body)]">{description}</p>
-        <RegionalEconomiesIndex model={model} sourceNote={message(presentation.messages, "regionalEconomies.sourceNote")} />
+        <p className="mb-[30px] max-w-[720px] text-[13px] leading-relaxed text-[var(--body)]">{message(presentation.messages, "regionalEconomies.lead")}</p>
+        <RegionalEconomiesIndex model={model} sourceNote={message(presentation.messages, "regionalEconomies.sourceNote", params)} />
       </ExplorerPage>
     </I18nProvider>
   );

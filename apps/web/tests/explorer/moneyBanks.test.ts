@@ -1,6 +1,5 @@
 import ExcelJS from "exceljs";
-import { beforeAll, expect, test } from "vitest";
-import { readCsvRecords } from "../../lib/data/csv";
+import { beforeAll, expect, test, vi } from "vitest";
 import { loadMoneyBanksFacts, toClientMoneyBanksFact } from "../../lib/data/moneyBanks/importMoneyBanks";
 import { MONEY_BANKS_SOURCES, type ClientMoneyBanksFact } from "../../lib/data/moneyBanks/types";
 import { loadNationalGdpFacts } from "../../lib/data/nationalGdp/importNationalGdp";
@@ -10,9 +9,12 @@ import { INK } from "../../lib/explorer/colors";
 import { buildMoneyBanksHubCards } from "../../lib/explorer/moneyBanksHubCards";
 import { buildMoneyBanksWorkbookExportModel } from "../../lib/explorer/moneyBanksWorkbook";
 import { createWorkbookBuffer } from "../../lib/explorer/workbookWriter.client";
+import { message } from "../../lib/i18n/messages";
 import { getMessages } from "../../lib/i18n/messages.server";
 import type { Presentation } from "../../lib/i18n/types";
-import { loadMoneyBanksWorkbookSources } from "../../lib/pages/moneyBanks";
+import { loadMoneyBanksWorkbookSources, moneyBanksPageMetadata, renderMoneyBanksPage } from "../../lib/pages/moneyBanks";
+import { renderPageMarkup } from "../helpers/render-localized";
+import { loadMoneyBanksCsv, yearSpan } from "../helpers/money-banks-csv";
 import {
   MONEY_BANKS_SECTIONS, buildMoneyBanksModel, changeMoneyBanksView, defaultMoneyBanksState, moneyBanksCoverage, moneyBanksDefaultSelection, moneyBanksViewSeries, moneyBanksViews,
   parseMoneyBanksHash, serializeMoneyBanksHash,
@@ -20,10 +22,16 @@ import {
 
 let facts: ClientMoneyBanksFact[];
 let gdpFacts: ClientNationalGdpFact[];
+// Expected latest values and years are read from the reviewed CSVs, so an NBG or Geostat refresh does not fail these tests.
+let csv: Awaited<ReturnType<typeof loadMoneyBanksCsv>>;
 beforeAll(async () => {
   facts = (await loadMoneyBanksFacts()).map(toClientMoneyBanksFact);
   gdpFacts = (await loadNationalGdpFacts(SERVED_DATA_FILES.gdpFacts)).map(projectGdpFact);
+  csv = await loadMoneyBanksCsv();
 });
+/** The ids a page lists in one of its views. */
+const seriesOf = (section: Parameters<typeof moneyBanksViewSeries>[0], view: Parameters<typeof moneyBanksViewSeries>[1]) => moneyBanksViewSeries(section, view).map(s => s.id);
+const span = (years: number[]) => ({ min: years[0], max: years.at(-1) });
 
 test("the four sections and their views", () => {
   expect(MONEY_BANKS_SECTIONS.map(s => [s.id, s.href, s.labelKey])).toEqual([
@@ -45,12 +53,11 @@ test("each page starts with its first series selected, loans and deposits with b
   expect(defaultMoneyBanksState("bank-health")).toEqual({ mode: "line", range: { kind: "all" }, view: "main", selectedIds: ["banks.npl_ratio"] });
   expect(moneyBanksDefaultSelection("supply", "gdp")).toEqual(["money.m3"]);
   expect(moneyBanksDefaultSelection("loans-deposits", "fx_share")).toEqual(["loans.fx_share"]);
-  expect(moneyBanksCoverage("supply", "amount", facts)).toMatchObject({ min: 1995, max: 2025 });
-  expect(moneyBanksCoverage("supply", "gdp", facts, gdpFacts)).toMatchObject({ min: 1996, max: 2025 });
-  expect(moneyBanksCoverage("loans-deposits", "amount", facts)).toMatchObject({ min: 1996, max: 2025 });
-  expect(moneyBanksCoverage("interest-rates", "main", facts)).toMatchObject({ min: 1996, max: 2025 });
-  expect(moneyBanksCoverage("bank-health", "main", facts)).toMatchObject({ min: 2001, max: 2025 });
-  expect(moneyBanksCoverage("loans-deposits", "fx_share", facts)).toMatchObject({ min: 1996, max: 2025 });
+  for (const [section, view] of [["supply", "amount"], ["loans-deposits", "amount"], ["loans-deposits", "fx_share"], ["interest-rates", "main"], ["bank-health", "main"]] as const) {
+    expect(moneyBanksCoverage(section, view, facts)).toMatchObject(span(csv.yearsOf(seriesOf(section, view))));
+  }
+  // % of GDP covers only the years with a GDP.
+  expect(moneyBanksCoverage("supply", "gdp", facts, gdpFacts)).toMatchObject(span(csv.gdpYearsOf(seriesOf("supply", "gdp"))));
 });
 
 test("totals nest their lari and foreign-currency rows", () => {
@@ -97,16 +104,11 @@ test("% of GDP shows all four aggregates, each December amount divided by Fiscal
   expect(model.unit).toBe("percent");
   expect(model.series.map(s => s.id)).toEqual(["money.m3", "money.m2", "money.m1", "money.m0"]);
   expect(model.selected.map(s => s.id)).toEqual(["money.m3", "money.m2", "money.m1", "money.m0"]);
-  expect(model.years[0]).toBe(1996);
+  const years = csv.gdpYearsOf(seriesOf("supply", "gdp")), latest = years.at(-1)!;
+  expect(model.years[0]).toBe(years[0]);
   for (const series of model.series) { expect(series.decimals).toBe(1); for (const year of model.years) expect(series.valuesByYear[year]).not.toBeNull(); }
-  // M1 / GDP × 100, both read from the canonical CSVs.
-  const money = await readCsvRecords("../../data/imports/money-banks-annual.csv");
-  const gdp = await readCsvRecords(SERVED_DATA_FILES.gdpFacts);
-  const m1 = Number(money.find(row => row.indicator_id === "money.m1" && row.year === "2025")!.published_value);
-  const gdp2025 = Number(gdp.find(row => row.year === "2025")!.gdp_current_prices_million_gel);
-  expect(model.series.find(s => s.id === "money.m1")!.valuesByYear[2025]).toBeCloseTo(m1 / gdp2025 * 100, 10);
-  // 2025 on Fiscal.ge's GDP: NBG's own coefficients (56.0 and 33.9) use an earlier GDP estimate.
-  expect(model.series.map(s => Number(s.valuesByYear[2025]!.toFixed(1)))).toEqual([55.1, 33.4, 19.8, 5.8]);
+  // Each aggregate / GDP × 100, both read from the canonical CSVs; for the latest year NBG's own coefficients use an earlier GDP estimate.
+  for (const series of model.series) expect(series.valuesByYear[latest]).toBeCloseTo(csv.shareOfGdp(series.id, latest), 10);
   // Before 2010 NBG's M3 coefficient used the same GDP, so the two agree.
   const nbgM3 = facts.find(f => f.indicatorId === "money.m3_to_gdp" && f.year === 2009)!.value;
   expect(Number(model.series[0].valuesByYear[2009]!.toFixed(1))).toBe(nbgM3);
@@ -161,8 +163,9 @@ test("the hash round-trips, drops another tab's series and keeps an explicit emp
 test("the model carries lari amounts, gaps, signed values and per-series precision", () => {
   const supply = buildMoneyBanksModel("supply", facts, defaultMoneyBanksState("supply"));
   expect(supply.unit).toBe("gel");
-  expect(supply.selected[0].endValue).toBe(57680200000);
-  expect(supply.years).toEqual(Array.from({ length: 31 }, (_, i) => 1995 + i));
+  const supplyYears = csv.yearsOf(seriesOf("supply", "amount"));
+  expect(supply.selected[0].endValue).toBe(csv.published("money.m3", csv.latestYear("money.m3")) * 1_000_000);
+  expect(supply.years).toEqual(Array.from({ length: supplyYears.at(-1)! - supplyYears[0] + 1 }, (_, i) => supplyYears[0] + i));
   expect(supply.series[0].color).toBe(INK);
   expect(supply.series[1].color).not.toBe(INK);
 
@@ -215,7 +218,7 @@ test("the deposits workbook exports million GEL, leaves 2010-2014 company deposi
   expect(model.readable.rows.map(row => row.kind)).not.toContain("total");
   expect(model.readable.unitLabel).toBe("million GEL");
   expect(model.readable.numberFormat).toBe("#,##0.0");
-  expect(model.readable.rows[0].valuesByYear[2025]).toBe(68496.9);
+  expect(model.readable.rows[0].valuesByYear[2025]).toBe(csv.published("deposits.total", 2025));
   const legal = model.readable.rows[4];
   for (let year = 2010; year <= 2014; year++) { expect(legal.valuesByYear[year]).toBeNull(); expect(legal.basisByYear[year]).toBeNull(); }
   expect(legal.valuesByYear[2015]).not.toBeNull();
@@ -276,7 +279,7 @@ test("the % of GDP workbook exports the calculated shares and cites the GDP sour
   expect(model.filename).toBe("fiscal-money-supply-gdp-2020-2025-en.xlsx");
   expect(model.readable.unitLabel).toBe("% of GDP");
   expect(model.analysis.headers[2]).toBe("Share of GDP (%)");
-  expect(model.readable.rows.map(row => Number(row.valuesByYear[2025]!.toFixed(1)))).toEqual([19.8, 5.8]);
+  expect(model.readable.rows.map(row => Number(row.valuesByYear[2025]!.toFixed(1)))).toEqual(["money.m1", "money.m0"].map(id => Number(csv.shareOfGdp(id, 2025).toFixed(1))));
   expect(new Set(model.analysis.rows.map(row => row[3]))).toEqual(new Set(["Calculated by Fiscal.ge"]));
   expect(model.analysis.rows).toHaveLength(12);
   expect(model.sources.map(source => source.title)).toEqual(["nbg_money_aggregates", "Geostat GDP"]);
@@ -294,8 +297,9 @@ test.each(["ka", "en"] as const)("the %s pages hand Excel the ten archived NBG w
   expect(sources.map(source => source.sourceId).sort()).toEqual([...MONEY_BANKS_SOURCES].sort());
   for (const source of sources) expect(source.downloadHref).toMatch(/^\/downloads\/methodology\/money\/files\/[a-z0-9._-]+\.xlsx$/);
   const range = (first: number, last: number) => Array.from({ length: last - first + 1 }, (_, i) => first + i);
+  // The 2022 break between the archived and the current FSI file is fixed; the current file's last year follows the data.
   expect(sources.find(source => source.sourceId === "nbg_fsi_archive")!.years).toEqual(range(2001, 2021));
-  expect(sources.find(source => source.sourceId === "nbg_fsi")!.years).toEqual(range(2022, 2025));
+  expect(sources.find(source => source.sourceId === "nbg_fsi")!.years).toEqual(range(2022, csv.sourceYears("nbg_fsi").at(-1)!));
   expect(sources.find(source => source.sourceId === "nbg_fsi")!.title).toBe(locale === "en" ? "Financial soundness indicators (FSI)" : "ფინანსური მდგრადობის მაჩვენებლები (FSI)");
   expect(new Set(sources.map(source => source.organization))).toEqual(new Set([locale === "en" ? "National Bank of Georgia (NBG)" : "საქართველოს ეროვნული ბანკი"]));
   const model = buildMoneyBanksWorkbookExportModel({
@@ -308,6 +312,45 @@ test.each(["ka", "en"] as const)("the %s pages hand Excel the ten archived NBG w
 test("the hub has four cards with the first series of each page and their latest values", async () => {
   const cards = buildMoneyBanksHubCards(facts, await presentation());
   expect(cards.map(card => card.href)).toEqual(MONEY_BANKS_SECTIONS.map(section => section.href));
-  expect(cards.map(card => card.footer)).toEqual(["2025 · 57.7 bn GEL · 1995–2025", "2025 · 72.5 bn GEL · 2002–2025", "2025 · 8.00% · 2008–2025", "2025 · 2.5% · 2003–2025"]);
-  expect(cards.map(card => card.series?.length)).toEqual([31, 24, 18, 23]);
+  // Each card follows its page's headline series: the latest year, its value and the series' own span.
+  const footer = (id: string, value: (year: number) => string) => {
+    const years = csv.yearsOf([id]), latest = years.at(-1)!;
+    return `${latest} · ${value(latest)} · ${yearSpan(years)}`;
+  };
+  expect(cards.map(card => card.footer)).toEqual([
+    footer("money.m3", year => `${csv.billions("money.m3", year)} bn GEL`),
+    footer("loans.total", year => `${csv.billions("loans.total", year)} bn GEL`),
+    footer("rates.policy", year => `${csv.percent("rates.policy", year)}%`),
+    footer("banks.npl_ratio", year => `${csv.percent("banks.npl_ratio", year)}%`),
+  ]);
+});
+
+// U24-10: the page's own metadata and Dataset record, in both languages, with its years read from the data.
+test.each(["ka", "en"] as const)("each %s page names itself in its metadata and Dataset record and covers the data's years", async locale => {
+  vi.stubEnv("NEXT_PUBLIC_SITE_URL", "https://fiscal.ge");
+  try {
+    const messages = await getMessages(locale, ["moneyBanks"]);
+    for (const section of MONEY_BANKS_SECTIONS) {
+      const metadata = await moneyBanksPageMetadata(locale, section.id);
+      expect(metadata.title).toContain(message(messages, `moneyBanks.page.${section.id}.metaTitle`));
+      expect(metadata.description).toBe(message(messages, `moneyBanks.page.${section.id}.summary`));
+      expect(metadata.alternates?.canonical).toBe(`https://fiscal.ge${locale === "en" ? "/en" : ""}${section.href}`);
+      const html = renderPageMarkup(locale, await renderMoneyBanksPage(locale, section.id));
+      const dataset = JSON.parse(html.match(/<script[^>]*data-testid="explorer-dataset-json-ld"[^>]*>([\s\S]*?)<\/script>/)![1]);
+      expect(dataset.name).toBe(message(messages, `moneyBanks.page.${section.id}.title`));
+      const ids = [...new Set(moneyBanksViews(section.id).flatMap(view => seriesOf(section.id, view)))];
+      expect(dataset.temporalCoverage).toBe(yearSpan(csv.yearsOf(ids)).replace("–", "/"));
+      expect(dataset.url).toBe(`https://fiscal.ge${locale === "en" ? "/en" : ""}${section.href}`);
+    }
+  } finally {
+    vi.unstubAllEnvs();
+  }
+});
+
+// U24-09: the deposits row says "individuals" as its id and the Georgian do, and the line under the heading names the
+// loans series as its series row does.
+test.each(["ka", "en"] as const)("the %s loans and deposits labels match their rows", async (locale) => {
+  const messages = await getMessages(locale, ["moneyBanks"]);
+  expect(messages["moneyBanks.latest.loans-deposits"]).toBe(messages["moneyBanks.series.loans.total"]);
+  if (locale === "en") expect(messages["moneyBanks.series.deposits.individuals"]).toBe("Deposits of individuals");
 });

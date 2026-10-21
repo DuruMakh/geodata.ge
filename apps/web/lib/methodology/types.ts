@@ -1,7 +1,7 @@
 import type { MunicipalTotalFact } from "../data/municipal/types";
 import type { ServedBudgetFact, ServedGovernmentDebtFact } from "../servedRows";
 
-export const LIVE_METHODOLOGY_IDS = ["expenditure", "revenue", "municipalities", "debt", "gdp", "economic-sectors", "regional-economies", "inflation", "money", "unemployment", "wages", "poverty", "household-income", "trade", "external-flows", "energy-food", "demography"] as const;
+export const LIVE_METHODOLOGY_IDS = ["expenditure", "revenue", "municipalities", "debt", "gdp", "economic-sectors", "gdp-expenditure", "regional-economies", "business", "housing", "inflation", "money", "unemployment", "wages", "poverty", "household-income", "health", "social-protection", "education", "science-culture", "crime", "internet", "trade", "external-flows", "energy-food", "environment", "transport", "demography"] as const;
 
 export type MethodologyDatasetId = (typeof LIVE_METHODOLOGY_IDS)[number];
 
@@ -30,6 +30,8 @@ export type MethodologyContent = {
   slug: MethodologyDatasetId;
   title: string;
   summary: string;
+  /** The search snippet when `summary` is longer than a meta description's 160 characters. */
+  metaDescription?: string;
   reviewedAt: string;
   archiveManifestId: MethodologyDatasetId;
   // Where this dataset's coverage years come from. Declared rather than inferred:

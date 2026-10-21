@@ -19,6 +19,7 @@ import { message } from "../../lib/i18n/messages";
 import { useI18n } from "../../lib/i18n/provider";
 import { pageHref } from "../../lib/i18n/routes";
 import { ExcelDownloadButton } from "../explorer/excel-download-button";
+import { ModeTabs } from "../explorer-shell/mode-tabs";
 import { PlaceHeading } from "../explorer-shell/place-heading";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
@@ -32,6 +33,7 @@ import { RegionPicker } from "./region-picker";
 import { RegionalEconomySeriesPanel } from "./regional-economy-series-panel";
 import { useRegionalEconomyState } from "./use-regional-economy-state";
 import type { ClientRegionalEconomyObservation } from "../../lib/servedRows";
+import { unpackFacts, type FactsInput } from "../../lib/data/packedFacts";
 import { rangeFromPatch } from "../../lib/explorer/periodRange";
 
 export type RegionalEconomyIdentity = {
@@ -42,20 +44,21 @@ export type RegionalEconomyIdentity = {
 };
 
 export function RegionalEconomyExplorer({
-  facts,
+  facts: shippedFacts,
   registry,
   region,
   regions,
   sources,
   siteOrigin,
 }: {
-  facts: ClientRegionalEconomyObservation[];
+  facts: FactsInput<ClientRegionalEconomyObservation>;
   registry: SectorDefinition[];
   region: RegionalEconomyIdentity;
   regions: MunicipalRegion[];
   sources: (WorkbookPublicSource & { sourceId: string })[];
   siteOrigin: string;
 }) {
+  const facts = unpackFacts(shippedFacts);
   const presentation = useI18n();
   const { locale, messages, englishLabels } = presentation;
   const t = (key: string) => message(messages, `regionalEconomies.${key}`);
@@ -79,7 +82,7 @@ export function RegionalEconomyExplorer({
         lead={t("detailHeadingLead")}
         placeLabel={regionLabel}
         triggerTestId="region-picker-trigger"
-        picker={(open, close) => <RegionPicker open={open} onClose={close} regions={regions} activeRegionId={region.id} />}
+        picker={(open, close, id) => <RegionPicker id={id} open={open} onClose={close} regions={regions} activeRegionId={region.id} />}
         neighbours={{
           testId: "regional-entity-navigation",
           previous: { href: pageHref(regionalEconomyHref(previousRegion.id), locale), label: publicLabel(locale, previousRegion.id, previousRegion.kaLabel, englishLabels) },
@@ -87,19 +90,12 @@ export function RegionalEconomyExplorer({
         }}
       />
       <LatestValueLine testId="regional-headline" measure={t("total")} period={model.headline?.year ?? "—"} value={share ? formatShare(model.headline ? model.headline.value / 100 : null) : formatAmount(model.headline?.value, locale)} />
-      <div className="mb-[30px] grid text-[13px] text-[var(--muted)]">
-        <p aria-hidden={share} className={`[grid-area:1/1] ${share ? "invisible" : ""}`}>{t("contextNominal")}</p>
-        <p aria-hidden={!share} className={`[grid-area:1/1] ${share ? "" : "invisible"}`}>{t("contextShare")}</p>
-      </div>
       <p role="status" className="sr-only">{message(messages, "regionalEconomies.rangeChanged", { start: model.range.start, end: model.range.end })}</p>
       <ExplorerWorkspace>
         <div className="flex min-w-0 flex-col">
           <section data-testid="regional-chart-panel" data-mode={state.mode} data-measure={state.measure} className="border-t border-[var(--ink)] pt-4">
             <div className="flex flex-wrap items-center justify-between gap-3">
-              <SegmentedTabs ariaLabel={message(messages, "controls.viewMode")} value={state.mode} onChange={(mode) => update((previous) => ({ ...previous, mode }), "push")} options={[
-                { value: "line", label: message(messages, "controls.chart"), testId: "regional-mode-line" },
-                { value: "table", label: message(messages, "controls.table"), testId: "regional-mode-table" },
-              ]} />
+              <ModeTabs value={state.mode} onChange={(mode) => update((previous) => ({ ...previous, mode }), "push")} testId="regional" />
               <SegmentedTabs ariaLabel={t("measure")} value={state.measure} onChange={(measure) => update((previous) => changeRegionalEconomyMeasure(previous, measure, facts), "push")} options={[
                 { value: "nominal", label: t("nominal"), ariaLabel: t("nominal"), testId: "regional-measure-nominal", icon: <span aria-hidden className="text-base">₾</span> },
                 { value: "share_of_region_gdp", label: t("shareOfRegionGdp"), ariaLabel: t("shareOfRegionGdp"), testId: "regional-measure-share", icon: <ChartPie aria-hidden size={18} strokeWidth={1.5} /> },
@@ -112,7 +108,11 @@ export function RegionalEconomyExplorer({
             <ChartSelectionAids series={series} chartShown={state.mode === "line"} share={share} unit={unit} formatValue={share ? undefined : (value) => formatAmount(value, locale)} />
             <RangeStrip years={model.availableYears} range={model.range} onChange={(patch) => update((previous) => ({ ...previous, range: rangeFromPatch(model.range, patch) }))} />
           </section>
-          <div className="mt-[18px]"><SourceNote testId="regional-source-label">{t("source")} {model.range.start}–{model.range.end}</SourceNote></div>
+          <div className="mt-[18px]"><SourceNote testId="regional-source-label">
+            {/* The price basis sits with the source, not as a second line under the heading (DESIGN §17). */}
+            <span data-testid="regional-context">{t(share ? "contextShare" : "contextNominal")}</span>{" "}
+            {t("source")} {model.range.start}–{model.range.end}
+          </SourceNote></div>
           <div className="mt-3 border-l-2 border-[var(--accent)] bg-[var(--tint)] px-3.5 py-3"><SourceNote>{t("accountingNote")}</SourceNote></div>
         </div>
         <RegionalEconomySeriesPanel registry={registry} selectedIds={state.selectedIds} endYear={model.range.end} endValues={model.endValues} measure={state.measure} onSelectionChange={(selectedIds) => update((previous) => ({ ...previous, selectedIds }))} downloadAction={

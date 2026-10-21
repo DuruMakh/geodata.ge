@@ -9,11 +9,11 @@
 // with the website. Investigate the core. Do not relax an assertion.
 import { beforeAll, describe, expect, it } from "vitest";
 import {
-  buildFactQuerySnapshot,
   queryMinistries,
   queryMunicipal,
   queryNational,
 } from "../../lib/factQuery";
+import { testSnapshot } from "../helpers/factQuerySnapshot";
 import { buildExplorerModel } from "../../lib/explorer/explorerData";
 import { buildCountryTotalByYear } from "../../lib/explorer/municipalData";
 import { projectAdminFact } from "../../lib/explorer/clientData";
@@ -24,7 +24,7 @@ import type { GlossaryEntry } from "../../lib/data/glossary";
 let snapshot: FactQuerySnapshot;
 
 beforeAll(async () => {
-  snapshot = await buildFactQuerySnapshot({ releaseCommit: "test", generatedAt: "2026-08-28T00:00:00.000Z" });
+  snapshot = testSnapshot({ releaseCommit: "test", generatedAt: "2026-08-28T00:00:00.000Z" });
 });
 
 /** Fails loudly on an error envelope rather than silently yielding no rows to compare. */

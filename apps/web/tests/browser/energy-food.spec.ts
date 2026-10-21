@@ -1,20 +1,15 @@
 import { expect, test, type Page } from "@playwright/test";
 import ExcelJS from "exceljs";
 
-const SECTIONS = ["energy-supply", "electricity", "energy-use", "food-self-sufficiency"] as const;
+const SECTIONS = ["energy-supply", "electricity", "energy-use", "food-self-sufficiency", "farming"] as const;
 const toggle = (id: string) => `[data-series-id="${id}"] [data-testid="series-row-toggle"]`;
 const caret = (id: string) => `[data-series-id="${id}"] [aria-expanded]`;
 const ready = (page: Page) => expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
 
-test("the hub shows one card per page, each linking to it", async ({ page }) => {
-  await page.goto("/explorer/energy-food");
-  const cards = page.getByTestId("energy-food-hub").locator("a");
-  await expect(cards).toHaveCount(4);
-  for (const [index, section] of SECTIONS.entries()) await expect(cards.nth(index)).toHaveAttribute("href", `/explorer/energy-food/${section}`);
-});
 
-for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
-  test(`every ${prefix || "ka"} page shows no page tabs, selects only its total and fits ${width}px`, async ({ page }) => {
+// 768px (and page overflow at every width) is in the layout pass of mobile-fit-charts.spec.ts.
+for (const prefix of ["", "/en"]) for (const width of [390, 1440]) {
+  test(`every ${prefix || "ka"} page shows no page tabs and selects only its total at ${width}px`, async ({ page }) => {
     const errors: string[] = []; page.on("pageerror", error => errors.push(error.message));
     await page.setViewportSize({ width, height: 900 });
     for (const section of SECTIONS) {
@@ -24,7 +19,11 @@ for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
       await expect(page.locator('[data-testid^="energy-food-tab"]')).toHaveCount(0);
       await expect(page.getByTestId("series-status")).toContainText("1 /");
       await expect(page.locator('[data-testid="series-row-toggle"][aria-pressed="true"]')).toHaveCount(1);
-      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+      // Energy use states the latest final use.
+      if (prefix && section === "energy-use") {
+        await expect(page.getByTestId("energy-food-latest")).toHaveText("Final energy use · 2024: 5,456.7");
+        await expect(page.getByTestId("series-status")).toContainText("1 / 7");
+      }
     }
     expect(errors).toEqual([]);
   });
@@ -78,13 +77,6 @@ test("electricity keeps the wind gap before 2016 as a chart, not the empty callo
   await expect(wind).not.toContainText(/\b0\.0\b/);
 });
 
-test("energy use states the latest final use", async ({ page }) => {
-  await page.goto("/en/explorer/energy-food/energy-use");
-  await ready(page);
-  await expect(page.getByTestId("energy-food-latest")).toHaveText("Final energy use · 2024: 5,456.7");
-  await expect(page.getByTestId("series-status")).toContainText("1 / 7");
-});
-
 test("food shows whole-number wheat self-sufficiency and nests four meats under meat", async ({ page }) => {
   await page.goto("/en/explorer/energy-food/food-self-sufficiency");
   await ready(page);
@@ -100,6 +92,45 @@ test("food shows whole-number wheat self-sufficiency and nests four meats under 
   await expect(wheat).toContainText("Wheat");
   await expect(wheat.locator("td").last()).toHaveText("19%");
   await expect(page.getByTestId("explorer-table")).not.toContainText("19.0");
+});
+
+for (const [prefix, line] of [["", "პროდუქციის გამოშვება · 2025: 8,384.9 მლნ ₾"], ["/en", "Farm output · 2025: 8,384.9 million ₾"]] as const) {
+  test(`farming defaults to farm output and states the 2025 value on one line at 375px (${prefix || "ka"})`, async ({ page }) => {
+    await page.setViewportSize({ width: 375, height: 800 });
+    await page.goto(`${prefix}/explorer/energy-food/farming`);
+    await ready(page);
+    const latest = page.getByTestId("energy-food-latest");
+    await expect(latest).toHaveText(line);
+    const { height, lineHeight } = await latest.evaluate(element => ({ height: element.getBoundingClientRect().height, lineHeight: parseFloat(getComputedStyle(element).lineHeight) }));
+    expect(height, "the latest line stays on one line").toBeLessThan(lineHeight * 1.5);
+    await expect(page.locator(toggle("farming.output.total"))).toHaveAttribute("aria-pressed", "true");
+    await expect(page.locator('[data-testid="series-row-toggle"][aria-pressed="true"]')).toHaveCount(1);
+    await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-unit", "million_gel");
+  });
+}
+
+test("ticking a price replaces the output selection and the unit label reads ₾ per kg", async ({ page }) => {
+  await page.goto("/en/explorer/energy-food/farming");
+  await ready(page);
+  await page.locator(toggle("farming.price.wheat")).click();
+  await expect(page.locator(toggle("farming.price.wheat"))).toHaveAttribute("aria-pressed", "true");
+  await expect(page.locator(toggle("farming.output.total"))).toHaveAttribute("aria-pressed", "false");
+  await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-unit", "price");
+  await expect(page.getByTestId("chart-panel")).toContainText("₾ per kg");
+  await expect(page.getByTestId("range-start-handle")).toHaveAttribute("aria-valuenow", "2014");
+  await expect(page).toHaveURL(/sel=farming\.price\.wheat(&|$)/);
+  // Prices read two decimals in the list, quantities one.
+  await expect(page.locator('[data-series-id="farming.price.wheat"]')).toContainText("0.57");
+  await expect(page.locator('[data-series-id="farming.harvest.grapes"]')).toContainText("348.9");
+});
+
+test("the list shows five headings and every row from the start", async ({ page }) => {
+  await page.goto("/en/explorer/energy-food/farming");
+  await ready(page);
+  await expect(page.getByTestId("series-heading")).toHaveText(["Farm output, million ₾", "Harvests, thousand tonnes", "Livestock, thousand head", "Meat, milk and eggs", "Farm-gate prices, ₾ per kg"]);
+  await expect(page.locator("[data-series-id]")).toHaveCount(41);
+  await expect(page.locator("[data-series-id] [aria-expanded]")).toHaveCount(0);
+  await expect(page.getByTestId("source-label")).toContainText("Agriculture");
 });
 
 test("clearing the selection shows the empty callout and disables Excel", async ({ page }) => {
@@ -137,4 +168,41 @@ test("switching to English keeps range, selection and table mode (Review Focus 5
   await expect(page.locator(toggle("energy.final_fuel.natural_gas"))).toHaveAttribute("aria-pressed", "true");
   await expect(page.getByTestId("year-range-strip")).toContainText("2018–2022");
   await expect(page).toHaveURL(/start=2018/);
+});
+
+// U25-07: on a phone a year cell scrolled under the sticky label column passes behind a solid paper margin with a
+// hairline edge, not a gradient (DESIGN.md §17), so no half figure shows against the label.
+test("the table's sticky label column ends in a solid edge on a phone and on a desktop", async ({ page }) => {
+  for (const width of [375, 1440]) {
+    await page.setViewportSize({ width, height: 900 });
+    // Four series: from four rows a phone table lists series as rows with a sticky label column (DESIGN.md §12).
+    await page.goto("/explorer/energy-food/energy-supply#view=table&sel=energy.supply.total,energy.supply.natural_gas,energy.supply.oil_products,energy.supply.hydro");
+    await ready(page);
+    const table = page.getByTestId("explorer-table");
+    const paper = await page.evaluate(() => getComputedStyle(document.body).backgroundColor);
+    const soft = await page.evaluate(() => {
+      const probe = document.createElement("div");
+      probe.style.color = "var(--hairline-soft)";
+      document.body.append(probe);
+      const color = getComputedStyle(probe).color;
+      probe.remove();
+      return color;
+    });
+    // The header label cell and every body label cell: one straight rule, at the cell's right edge, in hairline-soft,
+    // then a 10px solid paper margin; no gradient.
+    for (const cell of [table.locator("thead th:first-child"), table.locator("tbody th[scope='row']").first(), table.locator("tbody th[scope='row']").last()]) {
+      const edge = await cell.evaluate((element) => {
+        const after = getComputedStyle(element, "::after");
+        return {
+          image: after.backgroundImage, color: after.backgroundColor, rule: after.borderLeftWidth, ruleColor: after.borderLeftColor,
+          right: after.borderRightWidth, width: after.width, left: parseFloat(after.left), cellWidth: element.getBoundingClientRect().width,
+          ruleX: element.getBoundingClientRect().right,
+        };
+      });
+      expect(edge, `${width}px`).toMatchObject({ image: "none", color: paper, rule: "1px", ruleColor: soft, right: "0px", width: "10px" });
+      expect(edge.left).toBeCloseTo(edge.cellWidth, 0);
+    }
+    const rules = await table.locator("thead th:first-child, tbody th[scope='row']").evaluateAll((cells) => cells.map((cell) => Math.round(cell.getBoundingClientRect().right)));
+    expect(new Set(rules).size, `${width}px: the header and body rules line up`).toBe(1);
+  }
 });

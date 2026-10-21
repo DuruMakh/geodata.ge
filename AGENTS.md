@@ -41,7 +41,7 @@ Reuse what the repository already has; do not build parallel versions. Before ad
 
 ## Project Snapshot
 
-Fiscal.ge (repository and Vercel project name: GeoData.ge) is an implemented Georgian-first explorer of reviewed Georgian public-finance and economy data, not a broad public-data catalog. Georgian keeps the established URLs; English mirrors them under `/en`. Route families under `/explorer` are budget (expenditure, revenue, municipalities, single-year analysis, debt, deficit), economy (GDP, sectors, regions), inflation (overview, categories, cities, products), unemployment, wages, poverty, trade, external flows and demography; alongside them sit `/methodology`, `/connect`, `/about` and the read-only `/mcp`. `Project_Definition.md` section 2 owns the authoritative list.
+Fiscal.ge (repository and Vercel project name: GeoData.ge) is an implemented Georgian-first explorer of reviewed Georgian public-finance and economy data, not a broad public-data catalog. Georgian keeps the established URLs; English mirrors them under `/en`. Route families under `/explorer` are the dataset hubs, listed in sidebar order in `DESIGN.md` §6.7 from the one navigation config `apps/web/lib/navigation/navTree.ts`; alongside them sit `/methodology`, `/connect`, `/about` and the read-only `/mcp`. `Project_Definition.md` section 2 owns the authoritative list.
 
 The stack is Next.js 16, strict TypeScript, Tailwind v4, and the custom editorial component layer; do not introduce shadcn. Reviewed CSVs under `data/imports/` are the canonical human-reviewed source of truth. Supabase Postgres via Prisma 7 is the serving mirror, populated only by the transactional, parity-checked `npm run data:import`; never edit the database directly. Builds remain fully static, with CSV mode as the documented fallback. See `docs/data-methodology/database-import.md`.
 
@@ -53,7 +53,7 @@ A branch implementation, merged commit, green deploy-trigger workflow, or accept
 
 ## V1 and Data Non-Negotiables
 
-- Do not expand v1 beyond `Project_Definition.md` section 2 without explicit user approval. Excluded features include a broad catalog, clickable drilldown/detail pages, admin UI, a public API beyond the approved read-only MCP and static publications, uploads, sub-annual data other than the approved monthly inflation dataset, and automated production document extraction.
+- Do not expand v1 beyond `Project_Definition.md` section 2 without explicit user approval. Excluded features include a broad catalog, clickable drilldown/detail pages, admin UI, a public API beyond the approved read-only MCP and static publications, uploads, sub-annual data other than the approved monthly inflation dataset and the one dated latest-amount point on Foreign debt and Reserves, and automated production document extraction.
 - Multi-year institutions and major programs are selectable series, not clickable drilldown.
 - Use stable lowercase ASCII category IDs; Georgian and English labels are display data, not identifiers.
 - Public expenditure fields come from reviewed mappings over official rows. Preserve every official row. Assign uncertain rows explicitly to `spending.other_unclassified` and retain mapping confidence and notes.
@@ -70,7 +70,7 @@ A branch implementation, merged commit, green deploy-trigger workflow, or accept
 - Derive year ranges and defaults from loaded facts; do not hardcode coverage.
 - Under a page heading add only the one-line latest-value (or lead) line; no summary paragraphs or notes there (`DESIGN.md` §17).
 - Preserve readable Georgian text, accessible chart labels, distinguishable stable category colors, and data comprehension.
-- Only the applicable total is selected by default; it remains first, selectable, and removable.
+- Only the applicable total is selected by default, unless the page's approved scope in `Project_Definition.md` section 2 names another default; the total remains first, selectable, and removable.
 - Series selection is unlimited. Optional grouping tabs precede search; the next row places `გასუფთავება` / `ყველას მონიშვნა` on the left. Ordinary scopes show `სერიები {selected} / {all}` on the right; ministries show `ძირითადი {selected} / {all} · პროგრამები {selectedPrograms}` so a selected program is never hidden by the top-level bulk count. Search never scopes the bulk action or denominator.
 
 ## Workflow and Delivery

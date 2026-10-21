@@ -10,7 +10,7 @@ import { pageHref } from "../../lib/i18n/routes";
 import { useRouter } from "next/navigation";
 import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { MUNICIPAL_COUNTRY_ID } from "../../lib/data/municipal/types";
-import { formatAmount, formatInUnit, UNIT_PERSONS } from "../../lib/explorer/format";
+import { formatAmount, formatInUnit, formatShare, UNIT_PERSONS } from "../../lib/explorer/format";
 import { municipalEntityHref } from "../../lib/seo/internalLinks";
 
 // Entity picker for the 64 municipality and 11 region pages. A plain popover
@@ -44,8 +44,8 @@ export type EntityPickerCountry = {
 export type EntityPickerOverrides = {
   /** Where each option opens, by id (country id, region id, municipality code). Ids not listed open the Budget page. */
   hrefById?: Readonly<Record<string, string>>;
-  /** How a figure prints: the budget amount (default) or a whole number of persons. */
-  valueFormat?: "amount" | "persons";
+  /** How a figure prints: the budget amount (default), a whole number of persons, or a per-100 share as a percent to one decimal. */
+  valueFormat?: "amount" | "persons" | "percent";
   /** The country row's right-hand text; the budget amount and count by default. */
   countryDetail?: string;
 };
@@ -57,6 +57,8 @@ type EntityPickerProps = {
   groups: EntityPickerGroup[];
   activeId: string;
   overrides?: EntityPickerOverrides;
+  /** Carry the page's view hash to the place picked (see EntityHeading). */
+  carryHash?: boolean;
 };
 
 type PickerOption =
@@ -85,7 +87,7 @@ function focusTrigger() {
   document.querySelector<HTMLButtonElement>("[data-testid='entity-picker-trigger']")?.focus();
 }
 
-export function EntityPicker({ open, onClose, country, groups, activeId, overrides }: EntityPickerProps) {
+export function EntityPicker({ open, onClose, country, groups, activeId, overrides, carryHash = false }: EntityPickerProps) {
   const { locale, messages, englishLabels } = useI18n();
   const router = useRouter();
   const [query, setQuery] = useState("");
@@ -165,7 +167,8 @@ export function EntityPicker({ open, onClose, country, groups, activeId, overrid
     return list;
   }, [filteredCountry, filteredGroups, baseId]);
 
-  // The listbox is a capped, scrollable region (see max-h-[340px] below); with
+  // The listbox is a capped, scrollable region (see max-h below: 340px, and
+  // below 768px also at most 40% of the small viewport height); with
   // up to 75 options, arrowing past the visible edge must carry the highlight
   // into view or the active option becomes invisible.
   useEffect(() => {
@@ -174,13 +177,15 @@ export function EntityPicker({ open, onClose, country, groups, activeId, overrid
   }, [activeOptionId]);
 
   const hrefFor = (kind: "country" | "region" | "municipality", id: string) => overrides?.hrefById?.[id] ?? municipalEntityHref(kind, id);
-  const formatValue = (value: number) => (overrides?.valueFormat === "persons" ? formatInUnit(value, UNIT_PERSONS) : formatAmount(value, locale));
+  // The popover only renders once opened, in the browser, so the hash is read at that point (U09-17).
+  const placeHref = (kind: "country" | "region" | "municipality", id: string) => `${pageHref(hrefFor(kind, id), locale)}${carryHash ? window.location.hash : ""}`;
+  const formatValue = (value: number) => (overrides?.valueFormat === "persons" ? formatInUnit(value, UNIT_PERSONS) : overrides?.valueFormat === "percent" ? formatShare(value / 100) : formatAmount(value, locale));
 
   function selectOption(option: PickerOption) {
     onClose();
-    if (option.kind === "country") router.push(pageHref(hrefFor("country", country.id), locale));
-    else if (option.kind === "region") router.push(pageHref(hrefFor("region", option.regionId), locale));
-    else router.push(pageHref(hrefFor("municipality", option.code), locale));
+    if (option.kind === "country") router.push(placeHref("country", country.id));
+    else if (option.kind === "region") router.push(placeHref("region", option.regionId));
+    else router.push(placeHref("municipality", option.code));
   }
 
   function moveActive(delta: 1 | -1) {
@@ -246,10 +251,11 @@ export function EntityPicker({ open, onClose, country, groups, activeId, overrid
             className="h-[34px] w-full rounded-[3px] border border-[var(--control)] bg-[var(--paper)] px-2.5 text-[13px] text-[var(--ink)] outline-none"
           />
         </div>
-        <div id={listboxId} role="listbox" aria-label={message(messages, "municipal.pickerResults")} className="max-h-[340px] overflow-y-auto">
+        <div id={listboxId} role="listbox" aria-label={message(messages, "municipal.pickerResults")} className="max-h-[340px] overflow-y-auto max-[768px]:max-h-[min(340px,40svh)]">
           {filteredCountry ? (
             <Link
-              href={pageHref(hrefFor("country", country.id), locale)}
+              href={placeHref("country", country.id)}
+              prefetch={false}
               id={countryOptionId(baseId)}
               role="option"
               aria-selected={countryOptionId(baseId) === activeOptionId}
@@ -257,7 +263,7 @@ export function EntityPicker({ open, onClose, country, groups, activeId, overrid
               tabIndex={-1}
               data-testid="picker-country"
               onClick={onClose}
-              className={`grid w-full cursor-pointer grid-cols-[minmax(0,1fr)_auto] items-baseline gap-2.5 border-b border-b-[var(--hairline-soft)] border-l-2 bg-[var(--tint)] px-3 py-2 text-left transition-colors duration-100 hover:border-l-[var(--accent)] hover:text-[var(--accent)] ${
+              className={`grid w-full cursor-pointer grid-cols-[minmax(0,1fr)_auto] items-baseline gap-2.5 border-b border-b-[var(--hairline-soft)] border-l-2 bg-[var(--tint)] px-3 py-2 text-left max-[768px]:min-h-11 max-[768px]:content-center transition-colors duration-100 hover:border-l-[var(--accent)] hover:text-[var(--accent)] ${
                 countryOptionId(baseId) === activeOptionId ? "border-l-[var(--ink)]" : "border-l-transparent"
               } ${country.id === activeId ? "text-[var(--accent)]" : "text-[var(--ink)]"}`}
             >
@@ -274,7 +280,8 @@ export function EntityPicker({ open, onClose, country, groups, activeId, overrid
             return (
               <div key={group.regionId}>
                 <Link
-                  href={pageHref(hrefFor("region", group.regionId), locale)}
+                  href={placeHref("region", group.regionId)}
+                  prefetch={false}
                   id={regionId}
                   role="option"
                   aria-selected={regionActive}
@@ -282,7 +289,7 @@ export function EntityPicker({ open, onClose, country, groups, activeId, overrid
                   tabIndex={-1}
                   data-testid="picker-region"
                   onClick={onClose}
-                  className={`grid w-full cursor-pointer grid-cols-[minmax(0,1fr)_auto] items-baseline gap-2.5 border-b border-b-[var(--hairline-soft)] border-l-2 bg-[var(--tint)] px-3 py-2 text-left transition-colors duration-100 hover:border-l-[var(--accent)] hover:text-[var(--accent)] ${
+                  className={`grid w-full cursor-pointer grid-cols-[minmax(0,1fr)_auto] items-baseline gap-2.5 border-b border-b-[var(--hairline-soft)] border-l-2 bg-[var(--tint)] px-3 py-2 text-left max-[768px]:min-h-11 max-[768px]:content-center transition-colors duration-100 hover:border-l-[var(--accent)] hover:text-[var(--accent)] ${
                     regionActive ? "border-l-[var(--ink)]" : "border-l-transparent"
                   } ${group.regionId === activeId ? "text-[var(--accent)]" : "text-[var(--ink)]"}`}
                 >
@@ -298,7 +305,8 @@ export function EntityPicker({ open, onClose, country, groups, activeId, overrid
                   return (
                     <Link
                       key={member.code}
-                      href={pageHref(hrefFor("municipality", member.code), locale)}
+                      href={placeHref("municipality", member.code)}
+                      prefetch={false}
                       id={memberId}
                       role="option"
                       aria-selected={memberActive}
@@ -306,7 +314,7 @@ export function EntityPicker({ open, onClose, country, groups, activeId, overrid
                       tabIndex={-1}
                       data-testid="picker-municipality"
                       onClick={onClose}
-                      className={`grid w-full cursor-pointer grid-cols-[minmax(0,1fr)_auto] items-baseline gap-2.5 border-b border-b-[var(--row-border)] border-l-2 py-[7px] pr-3 pl-[26px] text-left transition-colors duration-100 hover:border-l-[var(--accent)] hover:bg-[var(--tint)] hover:text-[var(--accent)] ${
+                      className={`grid w-full cursor-pointer grid-cols-[minmax(0,1fr)_auto] items-baseline gap-2.5 border-b border-b-[var(--row-border)] border-l-2 py-[7px] pr-3 pl-[26px] text-left max-[768px]:min-h-11 max-[768px]:content-center transition-colors duration-100 hover:border-l-[var(--accent)] hover:bg-[var(--tint)] hover:text-[var(--accent)] ${
                         memberActive ? "border-l-[var(--ink)] bg-[var(--tint)]" : "border-l-transparent"
                       } ${member.code === activeId ? "font-semibold text-[var(--accent)]" : "text-[var(--body)]"}`}
                     >

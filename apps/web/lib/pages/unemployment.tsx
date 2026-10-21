@@ -1,6 +1,5 @@
 import path from "node:path";
 import { UnemploymentExplorer } from "../../components/unemployment/unemployment-explorer";
-import { UnemploymentLegacyLink } from "../../components/unemployment/unemployment-legacy-link";
 import { UnemploymentRegionsIndex } from "../../components/unemployment/unemployment-regions-index";
 import { buildUnemploymentRegionMapModel, UNEMPLOYMENT_REGIONS } from "../explorer/unemploymentRegionMap";
 import { unemploymentRegionHref } from "../explorer/unemploymentRegionRoutes";
@@ -10,7 +9,7 @@ import { JsonLd } from "../../components/seo/json-ld";
 import { BreadcrumbJsonLd } from "../../components/seo/breadcrumb-json-ld";
 import { loadServedUnemploymentData, UNEMPLOYMENT_GROUPS } from "../data/unemployment/importUnemployment";
 import { I18nProvider } from "../i18n/provider";
-import { getPresentation } from "../i18n/presentation.server";
+import { clientPresentation, getPresentation } from "../i18n/presentation.server";
 import { getMessages } from "../i18n/messages.server";
 import { message } from "../i18n/messages";
 import { pageHref } from "../i18n/routes";
@@ -19,35 +18,27 @@ import { loadEnglishCatalogue } from "../i18n/catalogue.server";
 import { loadReviewedSourceManifest } from "../methodology/sourceManifest";
 import { projectPublicSources } from "../methodology/publicSources";
 import { fiscalMetadata } from "../seo/metadata";
+import { explorerDatasetJsonLd } from "../seo/structuredData";
 import { coverageLabel } from "../explorer/coverageLabel";
 import { resolveSiteUrl } from "../siteUrl";
-import { buildUnemploymentHubCards } from "../explorer/unemploymentHubCards";
 import { unemploymentIndicators } from "../data/unemployment/types";
 import { unemploymentOverviewIndicators } from "../explorer/unemploymentOverview";
 import { UNEMPLOYMENT_SECTIONS, unemploymentBreakdownsForSection, type UnemploymentSectionId } from "../explorer/unemploymentSections";
 import { UNEMPLOYMENT_AGE_FIRST_YEAR } from "../explorer/unemploymentAge";
-import { TopicHub } from "./hub";
-
-export async function unemploymentHubMetadata(locale: Locale) {
-  const messages = await getMessages(locale, ["unemployment"]);
-  return fiscalMetadata({ locale, path: "/explorer/unemployment", title: message(messages, "unemployment.metaTitle"), description: message(messages, "unemployment.metaDescription") });
-}
-
-export async function renderUnemploymentHub(locale: Locale) {
-  const [{ facts }, presentation] = await Promise.all([loadServedUnemploymentData(), getPresentation(locale, ["unemployment", "common"], [])]);
-  const title = message(presentation.messages, "unemployment.title");
-  return <TopicHub locale={locale} presentation={presentation} title={title} summary={message(presentation.messages, "unemployment.hubSummary")} path={"/explorer/unemployment"} coverage={coverageLabel(presentation.messages, locale, Math.min(...facts.map(f => f.year)), Math.max(...facts.map(f => f.year)), facts.map(f => f.lastReviewedAt).sort().at(-1))} cards={buildUnemploymentHubCards(facts, presentation)} testId="unemployment-hub" after={<UnemploymentLegacyLink locale={locale} />} />;
-}
 
 export async function unemploymentPageMetadata(locale: Locale, section: UnemploymentSectionId) {
   const messages = await getMessages(locale, ["unemployment"]);
   return fiscalMetadata({ locale, path: UNEMPLOYMENT_SECTIONS.find(item => item.id === section)!.href, title: message(messages, `unemployment.page.${section}.title`), description: message(messages, `unemployment.page.${section}.summary`) });
 }
 
+// The reviewed registry spells English age bands with a hyphen ("15-19"); the page prints a number range with an en
+// dash, as the Georgian labels and every year range do (U16-16). The taxonomy stays as reviewed.
+const UNEMPLOYMENT_REGISTRY = UNEMPLOYMENT_GROUPS.map((group) => ({ ...group, labelEn: group.labelEn.replace(/(\d)-(\d)/g, "$1–$2") }));
+
 export async function renderUnemploymentPage(locale: Locale, section: UnemploymentSectionId, regionId?: string) {
   const root = path.resolve(/* turbopackIgnore: true */ process.cwd(), "../..");
   const [data, presentation, manifest, catalogue] = await Promise.all([
-    loadServedUnemploymentData(), getPresentation(locale, ["unemployment", "regionalEconomies", "common", "controls", "format", "main", "workbook"], UNEMPLOYMENT_GROUPS.map(group => group.id)),
+    loadServedUnemploymentData(), getPresentation(locale, ["unemployment", "regionalEconomies", "format", "main", "workbook"], UNEMPLOYMENT_GROUPS.map(group => group.id), UNEMPLOYMENT_REGIONS.map(region => region.id)),
     loadReviewedSourceManifest(root, "unemployment"), loadEnglishCatalogue(root),
   ]);
   const dimensions = new Set([...unemploymentBreakdownsForSection(section), "national", ...(section === "overview" ? ["sex"] : [])]);
@@ -66,20 +57,21 @@ export async function renderUnemploymentPage(locale: Locale, section: Unemployme
   const lastReviewedAt = facts.map(f => f.lastReviewedAt).sort().at(-1)!, origin = resolveSiteUrl();
   const crumbs = [{ label: message(presentation.messages, "common.home"), href: pageHref("/", locale) }, { label: message(presentation.messages, "common.data") }, { label: message(presentation.messages, "unemployment.title"), href: pageHref("/explorer/unemployment", locale) }, { label: region ? regionName : title }];
   if (region) crumbs.splice(3, 0, { label: message(presentation.messages, "unemployment.page.regions.title"), href: pageHref("/explorer/unemployment/regions", locale) });
-  const explorer = { section, regionId, regions: regionId ? UNEMPLOYMENT_REGIONS : undefined, facts: facts.map(({ dimension, groupId, sex, indicatorId, year, value, publishedValue, sourceId }) => ({ dimension, groupId, sex, indicatorId, year, value, publishedValue, sourceId })), registry: UNEMPLOYMENT_GROUPS, sources, lastReviewedAt, siteOrigin: origin };
-  return <I18nProvider {...presentation}>
-    <JsonLd testId="explorer-dataset-json-ld" data={{
-      "@context": "https://schema.org", "@type": "Dataset", "@id": `${origin}${sectionPath}#dataset`, name: title,
-      description, url: `${origin}${pageHref(sectionPath, locale)}`,
-      temporalCoverage: `${firstYear}/${lastYear}`, dateModified: lastReviewedAt, inLanguage: ["ka", "en"],
-      spatialCoverage: { "@type": "Place", name: region ? regionName : locale === "ka" ? "საქართველო" : "Georgia" },
-      measurementTechnique: "Labour Force Survey", creator: { "@type": "Organization", name: "Geostat", url: "https://www.geostat.ge" },
-      publisher: { "@id": `${origin}/#organization` },
+  // A region first published later than the regional series starts was split out of a combined group: its page
+  // carries the split-region note (U17-11). Read from the facts, not listed.
+  const regionFirstYear = (id?: string) => Math.min(...data.facts.filter(f => f.dimension === "region" && (!id || f.groupId === id)).map(f => f.year));
+  const regionSplit = regionId ? regionFirstYear(regionId) > regionFirstYear() : undefined;
+  const explorer = { section, regionId, regionSplit, regions: regionId ? UNEMPLOYMENT_REGIONS : undefined, facts: facts.map(({ dimension, groupId, sex, indicatorId, year, value, sourceId }) => ({ dimension, groupId, sex, indicatorId, year, value, sourceId })), registry: UNEMPLOYMENT_REGISTRY, sources, lastReviewedAt, siteOrigin: origin };
+  return <I18nProvider {...clientPresentation(presentation)}>
+    <JsonLd testId="explorer-dataset-json-ld" data={explorerDatasetJsonLd({
+      locale, origin, path: sectionPath, datasetId: "unemployment", name: title, description, firstYear, lastYear, dateModified: lastReviewedAt,
+      // A region page is a slice of the Regions page's dataset.
+      ...(region ? { spatialCoverageName: regionName, withinGeorgia: true, partOf: { path: "/explorer/unemployment/regions", name: message(presentation.messages, "unemployment.page.regions.title"), description: message(presentation.messages, "unemployment.page.regions.summary") } } : {}),
       variableMeasured: [...new Set(facts.map(f => f.indicatorId))].map(indicator => message(presentation.messages, `unemployment.indicator.${indicator}`)),
-    }} />
+    })} />
     <BreadcrumbJsonLd items={[{ name: crumbs[0].label, path: pageHref("/", locale) }, { name: crumbs[2].label, path: pageHref("/explorer/unemployment", locale) }, ...(region ? [{ name: message(presentation.messages, "unemployment.page.regions.title"), path: pageHref("/explorer/unemployment/regions", locale) }] : []), { name: title, path: pageHref(sectionPath, locale) }]} />
     <ExplorerPage containerQueries={false}>
-      <PageHeader crumbs={crumbs} coverage={coverageLabel(presentation.messages, locale, firstYear, lastYear, lastReviewedAt)} />
+      <PageHeader locale={locale} messages={presentation.messages} crumbs={crumbs} coverage={coverageLabel(presentation.messages, locale, firstYear, lastYear, lastReviewedAt)} />
       {section === "regions" && !regionId ? <UnemploymentRegionsIndex model={buildUnemploymentRegionMapModel(facts)} explorer={explorer} /> : <UnemploymentExplorer key={regionId ?? section} {...explorer} />}
     </ExplorerPage>
   </I18nProvider>;
