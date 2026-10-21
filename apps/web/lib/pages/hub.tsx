@@ -13,6 +13,7 @@ import { PageHeader } from "../../components/shell/page-header";
 import { buildHubCards, type HubCardModel } from "../explorer/hubCards";
 import { coverageLabel } from "../explorer/coverageLabel";
 import { loadServedGeneralGovernmentBalanceData, loadServedGovernmentDebtData, loadServedLandingData, loadServedMunicipalData } from "../data/servedData";
+import { loadServedTaxBreaksRefundsData, toClientTaxBreaksRefundsFact } from "../data/taxBreaksRefunds/importTaxBreaksRefunds";
 import { fiscalMetadata } from "../seo/metadata";
 
 export async function hubPageMetadata(locale: Locale) {
@@ -28,11 +29,12 @@ export async function hubPageMetadata(locale: Locale) {
 export async function renderHubPage(locale: Locale) {
   const presentation = await getPresentation(locale, ["main", "hub"], []);
   const { messages } = presentation;
-  const [{ facts, sourceDocuments }, { countryTotalFacts }, { facts: debtFacts }, { facts: balanceFacts }] = await Promise.all([
+  const [{ facts, sourceDocuments }, { countryTotalFacts }, { facts: debtFacts }, { facts: balanceFacts }, { facts: taxBreaksRefundsFacts }] = await Promise.all([
     loadServedLandingData(),
     loadServedMunicipalData(),
     loadServedGovernmentDebtData(),
     loadServedGeneralGovernmentBalanceData(),
+    loadServedTaxBreaksRefundsData(),
   ]);
   const municipalTotals = new Map<number, number>();
   for (const row of countryTotalFacts) {
@@ -43,7 +45,8 @@ export async function renderHubPage(locale: Locale) {
     ...debtFacts.map((fact) => fact.lastReviewedAt),
     ...balanceFacts.map((fact) => fact.lastReviewedAt),
   ].sort().at(-1) ?? "";
-  const cards = buildHubCards(facts, municipalTotals, debtFacts, balanceFacts, presentation);
+  const refundTotals = new Map(taxBreaksRefundsFacts.filter((fact) => fact.indicatorId === "tax_refunds.total").map(toClientTaxBreaksRefundsFact).map((fact) => [fact.year, fact.value]));
+  const cards = buildHubCards(facts, municipalTotals, debtFacts, balanceFacts, refundTotals, presentation);
   const years = Array.from(new Set(facts.map((fact) => fact.year))).sort((a, b) => a - b);
   const coverage = coverageLabel(messages, locale, years[0], years.at(-1), lastUpdatedAt || undefined);
 

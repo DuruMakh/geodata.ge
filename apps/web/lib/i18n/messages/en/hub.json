@@ -1,6 +1,8 @@
 {
   "hub.expenditureDescription": "Expenditure by function and institution — where the budget is spent.",
   "hub.revenueDescription": "Taxes, grants and other receipts across years.",
+  "hub.taxBreaksRefundsDescription": "Tax the state gives up through tax breaks, and overpaid tax it pays back.",
+  "hub.taxBreaksRefundsFooter": "{year} · Refunds {amount}",
   "hub.analysisDescription": "One year at a glance — composition, rankings and every GEL 100.",
   "hub.debtDescription": "Government debt stock, repayments and interest rates.",
   "hub.deficitDescription": "General government deficit or surplus — share of GDP and nominal GEL.",

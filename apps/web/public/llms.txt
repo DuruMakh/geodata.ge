@@ -12,6 +12,7 @@ Budget and GDP data are annual, so it does not provide sub-annual or live budget
 - [Budget explorer](https://fiscal.ge/explorer) — choose a dataset and compare the published series.
 - [National expenditure](https://fiscal.ge/explorer/expenditure) — annual state-budget expenditure.
 - [National revenue](https://fiscal.ge/explorer/revenue) — annual consolidated-budget receipts.
+- [Tax breaks and refunds](https://fiscal.ge/explorer/tax-breaks-refunds) — the Ministry of Finance's estimates of tax given up through tax breaks, in total, for VAT in eight areas and for income and profit tax in four parts, 2018–2024, and the State Treasury's refunds of overpaid tax, 2008–2025, in million GEL or as a share of GDP calculated by Fiscal.ge. The two are different measures and are never added together. Browse-only: there is no MCP tool and no bulk file for this page.
 - [Annual analysis](https://fiscal.ge/explorer/analysis) — one-year budget analysis.
 - [Municipal budgets](https://fiscal.ge/explorer/municipalities) — annual municipal expenditure.
 - [Government debt explorer](https://fiscal.ge/explorer/debt) — annual government debt stock, debt service and weighted-average interest rates.
@@ -135,6 +136,7 @@ Budget and GDP data are annual, so it does not provide sub-annual or live budget
 - [Methodology hub](https://fiscal.ge/methodology) — how the reviewed public data is prepared and presented.
 - [Expenditure methodology](https://fiscal.ge/methodology/expenditure) — national-expenditure sources and processing.
 - [Revenue methodology](https://fiscal.ge/methodology/revenue) — national-revenue sources and processing.
+- [Tax breaks and refunds methodology](https://fiscal.ge/methodology/tax-breaks-refunds) — what a tax break and a refund are, the Ministry's one-at-a-time VAT estimates, the latest report edition only, the GDP shares and the original files.
 - [Municipal methodology](https://fiscal.ge/methodology/municipalities) — municipal-expenditure sources and processing.
 - [Government debt methodology](https://fiscal.ge/methodology/debt) — debt stock, principal and interest payments, the portfolio's average interest rates and original sources.
 

@@ -44,6 +44,8 @@ import { loadServedEnergyFoodData } from "../data/energyFood/importEnergyFood";
 import { ENERGY_FOOD_HUB_PATH, ENERGY_FOOD_SECTIONS, energyFoodLastReviewedAt } from "../explorer/energyFood";
 import { loadServedMoneyBanksData } from "../data/moneyBanks/importMoneyBanks";
 import { MONEY_BANKS_SECTIONS } from "../explorer/moneyBanks";
+import { loadServedTaxBreaksRefundsData } from "../data/taxBreaksRefunds/importTaxBreaksRefunds";
+import { TAX_BREAKS_REFUNDS_PATH } from "../explorer/taxBreaksRefunds";
 import { loadServedBusinessData } from "../data/business/importBusiness";
 import { BUSINESS_HUB_PATH, BUSINESS_SECTIONS } from "../explorer/business";
 import { BUSINESS_AREAS, businessAreaHref } from "../explorer/businessAreas";
@@ -92,7 +94,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     countryFunctionFacts,
     countryTotalFacts,
     adjaraBudgetAdjustments,
-  }, { facts: debtFacts }, { facts: balanceFacts }, { facts: inflationFacts }, { facts: productFacts }, { facts: regionalEconomyFacts }, { facts: gdpOverviewFacts }, { facts: sectorFacts }, { facts: unemploymentFacts }, { facts: tradeFacts }, { facts: tradePartnerFacts }, { facts: moneyTransferFacts }, { facts: demographyFacts }, { facts: tradeProductFacts }, { facts: tradeDomesticFacts }, { facts: foreignInvestmentFacts }, { facts: wagesFacts }, currentAccountFacts, { facts: povertyFacts }, { facts: householdFacts }, { facts: energyFoodFacts }, { facts: moneyBanksFacts }, { facts: tradeServicesFacts }, { facts: tradeCompositionFacts }, { facts: externalPositionFacts }, { facts: businessFacts }, { facts: healthFacts }, { facts: crimeFacts }, { facts: housingFacts }, { facts: educationFacts }, { facts: socialFacts }, environmentFacts, { facts: scienceCultureFacts }, { facts: labourFacts }, { facts: gdpExpenditureFacts }, { facts: transportFacts }, { facts: internetFacts }] = await Promise.all([
+  }, { facts: debtFacts }, { facts: balanceFacts }, { facts: inflationFacts }, { facts: productFacts }, { facts: regionalEconomyFacts }, { facts: gdpOverviewFacts }, { facts: sectorFacts }, { facts: unemploymentFacts }, { facts: tradeFacts }, { facts: tradePartnerFacts }, { facts: moneyTransferFacts }, { facts: demographyFacts }, { facts: tradeProductFacts }, { facts: tradeDomesticFacts }, { facts: foreignInvestmentFacts }, { facts: wagesFacts }, currentAccountFacts, { facts: povertyFacts }, { facts: householdFacts }, { facts: energyFoodFacts }, { facts: moneyBanksFacts }, { facts: tradeServicesFacts }, { facts: tradeCompositionFacts }, { facts: externalPositionFacts }, { facts: businessFacts }, { facts: healthFacts }, { facts: crimeFacts }, { facts: housingFacts }, { facts: educationFacts }, { facts: socialFacts }, environmentFacts, { facts: scienceCultureFacts }, { facts: labourFacts }, { facts: gdpExpenditureFacts }, { facts: transportFacts }, { facts: internetFacts }, { facts: taxBreaksRefundsFacts }] = await Promise.all([
     loadServedLandingData(),
     loadServedMunicipalData(),
     loadServedGovernmentDebtData(),
@@ -131,6 +133,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     loadServedGdpExpenditureData(),
     loadServedTransportData(),
     loadServedInternetData(),
+    loadServedTaxBreaksRefundsData(),
   ]);
   const inflationModified = new Date(inflationFacts.map((fact) => fact.lastReviewedAt).sort().at(-1)!);
   const productModified = new Date(productFacts.map((fact) => fact.lastReviewedAt).sort().at(-1)!);
@@ -292,6 +295,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...populationPlacePaths(regions.map((region) => region.id)).map((path) => ({ url: `${siteUrl}${path}`, lastModified: demographyModified })),
     { url: `${siteUrl}/explorer/expenditure`, lastModified },
     { url: `${siteUrl}/explorer/revenue`, lastModified },
+    { url: `${siteUrl}${TAX_BREAKS_REFUNDS_PATH}`, lastModified: new Date(taxBreaksRefundsFacts.map(fact => fact.lastReviewedAt).sort().at(-1)!) },
     { url: `${siteUrl}/explorer/analysis`, lastModified },
     {
       url: `${siteUrl}${DEBT_EXPLORER_PATH}`,

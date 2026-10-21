@@ -41,7 +41,7 @@ export type TopicDatasetId =
   | "inflation-products";
 
 /** An official statistics producer whose published figures a dataset is read from. */
-export type SourceAgencyId = "geostat" | "nbg" | "ssa";
+export type SourceAgencyId = "geostat" | "nbg" | "ssa" | "mof" | "treasury";
 
 const SOURCE_AGENCIES: Record<SourceAgencyId, { name: Localized; url: string }> = {
   geostat: {
@@ -55,6 +55,14 @@ const SOURCE_AGENCIES: Record<SourceAgencyId, { name: Localized; url: string }> 
   ssa: {
     name: { ka: "სოციალური მომსახურების სააგენტო", en: "Social Service Agency" },
     url: "https://ssa.moh.gov.ge",
+  },
+  mof: {
+    name: { ka: "საქართველოს ფინანსთა სამინისტრო", en: "Ministry of Finance of Georgia" },
+    url: "https://www.mof.ge",
+  },
+  treasury: {
+    name: { ka: "სახაზინო სამსახური", en: "State Treasury of Georgia" },
+    url: "https://www.treasury.ge",
   },
 };
 
@@ -332,8 +340,7 @@ const TOPIC_DATASETS: Record<TopicDatasetId, { keywords: Record<Locale, readonly
       ka: "გადამოწმებული ამოღება ფინანსთა სამინისტროს საგადასახადო დანახარჯების ანგარიშიდან და სახაზინო სამსახურის გამოქვეყნებული მონაცემებიდან.",
       en: "Reviewed extraction from the Ministry of Finance's Tax Expenditure Report and the State Treasury's published figures.",
     },
-    // The Ministry of Finance and the Treasury are not statistics agencies; the budget datasets credit none either.
-    sources: [],
+    sources: ["mof", "treasury"],
   },
   housing: {
     keywords: {

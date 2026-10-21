@@ -253,6 +253,7 @@ const PAGE_SOURCE_NOTES: Readonly<Record<string, string>> = {
   "/explorer": "common.budgetHubSourceNote",
   "/explorer/expenditure": "common.budgetStatisticsSourceNote",
   "/explorer/revenue": "common.budgetStatisticsSourceNote",
+  "/explorer/tax-breaks-refunds": "common.taxBreaksRefundsSourceNote",
   "/explorer/debt": "common.budgetStatisticsSourceNote",
   "/explorer/municipalities": "common.budgetStatisticsSourceNote",
   "/explorer/deficit": "common.deficitSourceNote",
