@@ -262,8 +262,8 @@ const PAGE_SOURCE_NOTES: Readonly<Record<string, string>> = {
   "/explorer/inflation/products": "common.geostatSourceNote",
   "/explorer/external": "common.externalHubSourceNote",
   "/explorer/external/foreign-investment": "common.geostatSourceNote",
-  // The hub lists Geostat's health pages and the Social Service Agency's pages.
-  [HEALTH_HUB_PATH]: "common.socialSourceNote",
+  // The hub lists Geostat's health pages, the Social Service Agency's pages and the Pension Fund's page.
+  [HEALTH_HUB_PATH]: "common.socialHubSourceNote",
   // The funded pension page reads the Pension Fund's statements, with Geostat's GDP for its % of GDP view.
   [`${HEALTH_HUB_PATH}/funded-pension`]: "common.fundedPensionSourceNote",
 };

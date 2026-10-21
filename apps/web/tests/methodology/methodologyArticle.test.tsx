@@ -132,7 +132,7 @@ describe("methodology footer attribution", () => {
     ["environment", "Geostat"],
     ["internet", "Geostat"],
     ["education", "Geostat"],
-    ["social-protection", "Social Service Agency and Geostat"],
+    ["social-protection", "Social Service Agency, Pension Fund of Georgia and Geostat"],
     ["science-culture", "Geostat"],
   ])("uses %s sources and leaves the review date with the article", async (dataset, source) => {
     const { renderMethodologyArticle } = await import("../../lib/pages/methodology-article");

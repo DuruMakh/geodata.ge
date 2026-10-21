@@ -150,7 +150,7 @@ describe("the explorer footer source note", () => {
     expect(sourceNoteKey("/explorer/demography/population/region/imereti")).toBe("common.geostatSourceNote");
     expect(sourceNoteKey("/explorer/education")).toBe("common.geostatSourceNote");
     expect(sourceNoteKey("/explorer/education/schools/batumi")).toBe("common.geostatSourceNote");
-    expect(sourceNoteKey("/explorer/health")).toBe("common.socialSourceNote");
+    expect(sourceNoteKey("/explorer/health")).toBe("common.socialHubSourceNote");
     expect(sourceNoteKey("/explorer/health/illnesses")).toBe("common.geostatSourceNote");
     expect(sourceNoteKey("/explorer/health/social-payments")).toBe("common.socialSourceNote");
     expect(sourceNoteKey("/explorer/health/pensions/region/guria")).toBe("common.socialSourceNote");
