@@ -68,23 +68,28 @@ async function loadSocialPlaceBasics(locale: Locale) {
 
 /**
  * The Excel Sources sheet's files, in the page's language: each SSA table the facts cite, as its archived topic page
- * (data/methodology/source-archives/social-protection.csv) under the table's own id, and Geostat's population table (shares of
- * residents) and price index (2025 prices) from the Population and Inflation archives.
+ * (data/methodology/source-archives/social-protection.csv) under the table's own id, the Pension Fund's six documents (the funded
+ * pension page's), and Geostat's population table (shares of residents) and price index (2025 prices) from the Population and
+ * Inflation archives.
  */
-export async function loadSocialWorkbookSources(locale: Locale): Promise<{ ssa: SourcedWorkbookPublicSource[]; population: WorkbookPublicSource[]; cpi: WorkbookPublicSource[] }> {
+export async function loadSocialWorkbookSources(locale: Locale): Promise<{ ssa: SourcedWorkbookPublicSource[]; pensionFund: SourcedWorkbookPublicSource[]; population: WorkbookPublicSource[]; cpi: WorkbookPublicSource[] }> {
   const cpiId = locale === "ka" ? "source.geostat_cpi_index_2010_ka" : "source.geostat_cpi_index_2010";
   const [pages, population, cpi] = await Promise.all([
-    loadSourcedWorkbookSources("social-protection", locale, row => row.source_id.startsWith("ssa_")),
+    loadSourcedWorkbookSources("social-protection", locale, row => row.source_id.startsWith("ssa_") || row.source_id.startsWith("pension_fund_")),
     loadSourcedWorkbookSources("demography", locale, row => row.source_id === SOURCE_ID.populationUnits),
     loadSourcedWorkbookSources("inflation", locale, row => row.source_id === cpiId),
   ]);
-  // The Pension Fund's documents have no archived SSA page; Task 5 lists them with the funded pension page.
-  const ssa = SOCIAL_PUBLIC_SOURCES.filter(sourceId => !FUNDED_PENSION_SOURCES.includes(sourceId)).map(sourceId => {
+  // Each SSA table is cited by its topic's archived page; a Pension Fund document is archived under its own id. The two lists stay apart so
+  // an SSA workbook is never offered the Pension Fund's PDFs, and a funded pension workbook none of SSA's pages.
+  const sourced = (sourceIds: readonly string[], what: string) => sourceIds.map(sourceId => {
     const page = pages.find(row => row.sourceId === socialArchiveSourceId(sourceId));
-    if (!page) throw new Error(`No archived SSA page for ${sourceId}`);
+    if (!page) throw new Error(`No archived ${what} for ${sourceId}`);
     return { ...page, sourceId };
   });
-  return { ssa, population, cpi };
+  return {
+    ssa: sourced(SOCIAL_PUBLIC_SOURCES.filter(sourceId => !FUNDED_PENSION_SOURCES.includes(sourceId)), "SSA page"),
+    pensionFund: sourced(FUNDED_PENSION_SOURCES, "Pension Fund document"), population, cpi,
+  };
 }
 
 /** The headings a set's pages list, named in the page's language: the measures the Dataset markup says the page shows. */

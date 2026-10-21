@@ -701,7 +701,7 @@ describe("Dataset nodes across the sitemap", () => {
         if (creditsSource(page)) {
           const producers = [dataset.provider ?? []].flat();
           expect(producers.length, `${pathname} credits its source`).toBeGreaterThan(0);
-          for (const producer of producers) expect(producer, pathname).toEqual({ "@type": "Organization", name: expect.any(String), url: expect.stringMatching(/^https:\/\/(www\.geostat\.ge|nbg\.gov\.ge|ssa\.moh\.gov\.ge)$/) });
+          for (const producer of producers) expect(producer, pathname).toEqual({ "@type": "Organization", name: expect.any(String), url: expect.stringMatching(/^https:\/\/(www\.geostat\.ge|nbg\.gov\.ge|ssa\.moh\.gov\.ge|pensions\.ge)$/) });
         }
         expect(String(dataset.description).length, pathname).toBeGreaterThanOrEqual(50);
         // Every node it points at is the same language's: its parent, its subsets and the catalog.

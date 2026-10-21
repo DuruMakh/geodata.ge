@@ -311,21 +311,25 @@ const sourceFor = (sourceId: string, years: number[]) => ({
 });
 const YEARS = Array.from({ length: 13 }, (_, i) => 2013 + i);
 const SSA_SOURCES = ["ssa_pension_01", "ssa_pension_02", "ssa_pension_04", "ssa_tsa_allowance_01", "ssa_tsa_allowance_02", "ssa_tsa_allowance_03", "ssa_socpackage_01", "ssa_socpackage_02", "ssa_statistics", "ssa_other_04", "ssa_workinjury_03"].map(id => sourceFor(id, YEARS));
+const PENSION_FUND_SOURCES = [
+  ["pension_fund_ifrs_2020", [2019, 2020]], ["pension_fund_ifrs_2022", [2021]], ["pension_fund_ifrs_2023", [2022]], ["pension_fund_ifrs_2024", [2023]],
+  ["pension_fund_ifrs_2025", [2024, 2025]], ["pension_fund_report_2025", [2019, 2020, 2021, 2022, 2023, 2024, 2025]],
+].map(([id, years]) => sourceFor(id as string, years as number[]));
 const GEOSTAT = {
   populationSources: [sourceFor("source.geostat_municipal_population", YEARS)],
   cpiSources: [sourceFor("source.geostat_cpi_index_2010", YEARS)],
   gdpSources: [sourceFor("source.geostat_national_gdp_sna_2008", YEARS)],
 };
 const labelsFor = (ids: readonly string[]) => Object.fromEntries(ids.map(id => [id, id]));
-const HEADINGS = { money: "Money paid", pensioners: "Pensioners", share: "Share of residents", average: "Average a month", families: "Families", people: "People", recipients: "Recipients", ages: "Age groups" };
+const HEADINGS = { flows: "Money in and out", savings: "Savings, end of year", money: "Money paid", pensioners: "Pensioners", share: "Share of residents", average: "Average a month", families: "Families", people: "People", recipients: "Recipients", ages: "Age groups" };
 const placeWorkbook = async (set: "pensions" | "subsistence-allowance", placeId: string, scope: string, selectedIds: string[], start: number, end: number, locale: "en" | "ka" = "en") =>
   buildSocialWorkbookExportModel({
     set, placeId, scope, facts, extras: extras(), sources: SSA_SOURCES, ...GEOSTAT, siteOrigin: "https://fiscal.ge", labels: labelsFor(selectedIds), headingLabels: HEADINGS, title: "Title",
     state: { mode: "table", range: { kind: "manual", start, end }, selectedIds },
   }, await presentation(locale));
-const topicWorkbook = async (section: "social-payments" | "social-package", view: "amount" | "gdp", selectedIds: string[], start: number, end: number) =>
+const topicWorkbook = async (section: "social-payments" | "social-package" | "funded-pension", view: "amount" | "gdp", selectedIds: string[], start: number, end: number) =>
   buildSocialWorkbookExportModel({
-    section, gdpFacts, sources: SSA_SOURCES, ...GEOSTAT, facts, siteOrigin: "https://fiscal.ge", labels: labelsFor(selectedIds), headingLabels: HEADINGS, title: "Title",
+    section, gdpFacts, sources: section === "funded-pension" ? PENSION_FUND_SOURCES : SSA_SOURCES, ...GEOSTAT, facts, siteOrigin: "https://fiscal.ge", labels: labelsFor(selectedIds), headingLabels: HEADINGS, title: "Title",
     state: { mode: "table", range: { kind: "manual", start, end }, selectedIds, view },
   }, await presentation());
 const loadWorkbook = async (model: Parameters<typeof createWorkbookBuffer>[0]) => { const excel = new ExcelJS.Workbook(); await excel.xlsx.load(await createWorkbookBuffer(model)); return excel; };
@@ -456,6 +460,51 @@ test("Social payments workbooks: million GEL, or % of GDP calculated with the GD
   expect([packageRecipients.readable.unitLabel, packageRecipients.readable.numberFormat]).toEqual(["persons", "#,##0"]);
   expect(packageRecipients.filename).toBe("fiscal-social-package-2013-2025-en.xlsx");
   expect(packageRecipients.sources.map(source => source.title)).toEqual(["ssa_socpackage_01"]);
+});
+
+test("a funded pension flows workbook: gaps stay empty, securities losses stay negative, only the cited Pension Fund documents are listed", async () => {
+  const ids = ["social.funded_pension.securities_gains.amount"];
+  const model = await topicWorkbook("funded-pension", "amount", ids, 2019, 2025);
+  expect(model.filename).toBe("fiscal-social-funded-pension-2019-2025-en.xlsx");
+  expect([model.readable.unitLabel, model.readable.numberFormat]).toEqual(["million GEL", "#,##0.0"]);
+  expect(model.readable.rows[0].valuesByYear[2019]).toBeNull();
+  expect(model.readable.rows[0].valuesByYear[2022]).toBe(-31.187);
+  expect(model.analysis.rows.find(r => r[0] === 2022)![2]).toBe(-31.187);
+  expect(model.analysis.rows.find(r => r[0] === 2019)![2]).toBeNull();
+  expect(model.analysis.rows.find(r => r[0] === 2019)![3]).toBe("Not available");
+  expect(model.analysis.rows.find(r => r[0] === 2022)![3]).toBe("Official");
+  // The statements that print a year's securities result: 2022 in the 2023 statement, 2023 in the 2024 one, 2024 and 2025 in the 2025 one.
+  expect(model.sources.map(source => source.title)).toEqual(["pension_fund_ifrs_2023", "pension_fund_ifrs_2024", "pension_fund_ifrs_2025"]);
+  expect(model.sources.find(source => source.title === "pension_fund_ifrs_2025")!.years).toEqual([2024, 2025]);
+  expect(model.readable.subtitle).toBe("2019–2025 · million GEL");
+  const counts = await topicWorkbook("funded-pension", "amount", ["social.funded_pension.members", "social.funded_pension.return"], 2019, 2025);
+  expect(counts.sources.map(source => source.title)).toEqual(["pension_fund_report_2025"]);
+  const employers = await topicWorkbook("funded-pension", "amount", ["social.funded_pension.employers"], 2019, 2025);
+  expect(employers.readable.unitLabel).toBe("employers");
+  const rate = await topicWorkbook("funded-pension", "amount", ["social.funded_pension.return"], 2019, 2025);
+  expect([rate.readable.unitLabel, rate.readable.numberFormat]).toEqual(["%", "#,##0.0"]);
+  expect(rate.readable.rows[0].valuesByYear[2025]).toBe(11.8);
+});
+
+test("a funded pension workbook in % of GDP is calculated, keeps the loss negative and cites the GDP files and the statements", async () => {
+  const model = await topicWorkbook("funded-pension", "gdp", ["social.funded_pension.securities_gains.amount"], 2019, 2025);
+  expect([model.readable.unitLabel, model.readable.numberFormat]).toEqual(["% of GDP", "#,##0.00"]);
+  expect(model.readable.rows[0].valuesByYear[2022]!).toBeLessThan(0);
+  expect(model.readable.rows[0].valuesByYear[2019]).toBeNull();
+  expect(model.analysis.rows.find(r => r[0] === 2022)![3]).toBe("Calculated by Fiscal.ge");
+  expect(model.readable.subtitle).toBe("2019–2025 · % of GDP · “Calculated by Fiscal.ge” marks values calculated from Pension Fund of Georgia and Geostat data.");
+  expect(model.sources.map(source => source.title)).toEqual(["pension_fund_ifrs_2023", "pension_fund_ifrs_2024", "pension_fund_ifrs_2025", "source.geostat_national_gdp_sna_2008"]);
+});
+
+test("an SSA workbook's Sources sheet never lists the Pension Fund documents, even when they are offered", async () => {
+  const offered = [...SSA_SOURCES, ...PENSION_FUND_SOURCES];
+  const model = await buildSocialWorkbookExportModel({
+    section: "social-payments", gdpFacts, sources: offered, ...GEOSTAT, facts, siteOrigin: "https://fiscal.ge", labels: labelsFor(["social.payments.total.amount"]), headingLabels: HEADINGS, title: "Title",
+    state: { mode: "table", range: { kind: "manual", start: 2013, end: 2025 }, selectedIds: ["social.payments.total.amount"], view: "amount" },
+  }, await presentation());
+  const reference = await topicWorkbook("social-payments", "amount", ["social.payments.total.amount"], 2013, 2025);
+  expect(model.sources.map(source => source.title)).toEqual(reference.sources.map(source => source.title));
+  expect(model.sources.some(source => source.title.startsWith("pension_fund_"))).toBe(false);
 });
 
 test("a programme that ran part of a year is marked with its months on the Data sheet", async () => {
@@ -599,4 +648,8 @@ test("funded pension as % of GDP divides the money rows by GDP and leaves the co
   // A gap stays a gap in the gdp view too.
   expect(shown.some(f => f.indicatorId === `${FUNDED}dividends.amount` && f.year < 2022)).toBe(false);
   expect(changeSocialView(fundedState([`${FUNDED}savings.amount`]), "funded-pension", "gdp", facts, gdpFacts)).toMatchObject({ view: "gdp" });
+  // A loss stays a loss: securities gains 2022 is negative as a share of GDP.
+  const gains = shown.find(f => f.indicatorId === `${FUNDED}securities_gains.amount` && f.year === 2022)!;
+  expect(gains.value).toBeLessThan(0);
+  expect(gains.value).toBeCloseTo(shareOfGdp(-31187000, 2022, gdpByYear)! * 100, 10);
 });

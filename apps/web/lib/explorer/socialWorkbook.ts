@@ -97,7 +97,7 @@ export function buildSocialWorkbookExportModel(input: SocialWorkbookInput, prese
   return {
     locale, filename: workbookFilename(stem, locale), sheetNames: SHEET_NAMES[locale],
     readable: {
-      title: input.title, subtitle: [`${model.range.start}–${model.range.end} · ${unitLabel}`, ...(anyCalculated ? [t("workbook.calculatedNote")] : [])].join(" · "),
+      title: input.title, subtitle: [`${model.range.start}–${model.range.end} · ${unitLabel}`, ...(anyCalculated ? [t(!place && input.section === "funded-pension" ? "workbook.calculatedNoteFundedPension" : "workbook.calculatedNote")] : [])].join(" · "),
       unitLabel, amountDecimals: lead.decimals, years: model.years, showChangeColumn: false, numberFormat, ...(anyCalculated ? { fitSubtitle: true } : {}),
       rows: model.selected.map(series => {
         const values = Object.fromEntries(model.years.map(year => [year, valueOf(series, series.valuesByYear[year])]));

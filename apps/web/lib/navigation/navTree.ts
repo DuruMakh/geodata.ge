@@ -264,6 +264,8 @@ const PAGE_SOURCE_NOTES: Readonly<Record<string, string>> = {
   "/explorer/external/foreign-investment": "common.geostatSourceNote",
   // The hub lists Geostat's health pages and the Social Service Agency's pages.
   [HEALTH_HUB_PATH]: "common.socialSourceNote",
+  // The funded pension page reads the Pension Fund's statements, with Geostat's GDP for its % of GDP view.
+  [`${HEALTH_HUB_PATH}/funded-pension`]: "common.fundedPensionSourceNote",
 };
 
 /** Footer source notes for an address and every page below it; the longest address wins. */
