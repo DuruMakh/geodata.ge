@@ -9,6 +9,10 @@ export const TAX_BREAKS_REFUNDS_INDICATORS = [
 export type TaxBreaksRefundsIndicator = (typeof TAX_BREAKS_REFUNDS_INDICATORS)[number];
 /** The Ministry's Georgian workbook and the Treasury chart data: the two files the observations are read from. */
 export const TAX_BREAKS_REFUNDS_SOURCES = ["mof_tax_expenditure_report_2024_xlsx_ka", "treasury_tax_refunds_chart"] as const;
+/** Every archived source: the served two plus the Ministry's English workbook and both PDF reports. */
+export const TAX_BREAKS_REFUNDS_PUBLIC_SOURCES = [
+  ...TAX_BREAKS_REFUNDS_SOURCES, "mof_tax_expenditure_report_2024_xlsx_en", "mof_tax_expenditure_report_2024_pdf_ka", "mof_tax_expenditure_report_2024_pdf_en",
+] as const;
 export const TAX_BREAKS_REFUNDS_PACKAGE = "docs/Raw Data/Revenue/tax-breaks-refunds";
 export const TAX_BREAKS_REFUNDS_CSV_PATH = "data/imports/tax-breaks-refunds-annual.csv";
 export const TAX_BREAKS_REFUNDS_REPORT_PATH = "data/reports/tax-breaks-refunds-validation.json";
@@ -40,4 +44,7 @@ export type TaxBreaksRefundsAcceptance = {
 };
 export function taxBreaksRefundsFactKey(fact: Pick<TaxBreaksRefundsFact, "indicatorId" | "year">): string {
   return `${fact.indicatorId}:${fact.year}`;
+}
+export function taxBreaksRefundsSourceDocumentId(sourceId: string): string {
+  return `source.${sourceId}`;
 }

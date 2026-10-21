@@ -43,6 +43,7 @@ import { crimeSourceDocumentId, type CrimeFact } from "../data/crime/types";
 import { labourSourceDocumentId, type LabourFact } from "../data/labour/types";
 import { moneyBanksSourceDocumentId, type MoneyBanksFact } from "../data/moneyBanks/types";
 import { moneyBanksDisplayDecimals } from "../data/moneyBanks/validation";
+import { taxBreaksRefundsSourceDocumentId, type TaxBreaksRefundsFact } from "../data/taxBreaksRefunds/types";
 import { externalPositionSourceDocumentId, type ExternalPositionFact } from "../data/externalPosition/types";
 import { businessSourceDocumentId, type BusinessFact } from "../data/business/types";
 import { housingSourceDocumentId, type HousingFact } from "../data/housing/types";
@@ -773,6 +774,24 @@ export async function loadMoneyBanksFactsFromMirror(db: Pick<MirrorClient, "mone
     return {
       year: row.year, indicatorId: row.indicatorId as MoneyBanksFact["indicatorId"],
       value: row.value.toFixed(), publishedValue: row.publishedValue.toFixed(moneyBanksDisplayDecimals(row.indicatorId)), unit: row.unit as MoneyBanksFact["unit"], basis: row.basis as "actual", valueStatus: row.valueStatus as MoneyBanksFact["valueStatus"],
+      sourceId: row.sourceId, sourceSheet: row.sourceSheet, sourceCell: row.sourceCell, lastReviewedAt: isoDate(row.lastReviewedAt),
+    };
+  });
+}
+
+export function taxBreaksRefundsMirrorCreateRows(facts: readonly TaxBreaksRefundsFact[], importRunId: string): Prisma.TaxBreaksRefundsFactCreateManyInput[] {
+  return facts.map(({ lastReviewedAt, ...fact }) => ({
+    ...fact, sourceDocumentId: taxBreaksRefundsSourceDocumentId(fact.sourceId), lastReviewedAt: new Date(`${lastReviewedAt}T00:00:00.000Z`), importRunId,
+  }));
+}
+
+export async function loadTaxBreaksRefundsFactsFromMirror(db: Pick<MirrorClient, "taxBreaksRefundsFact">): Promise<TaxBreaksRefundsFact[]> {
+  const rows = await db.taxBreaksRefundsFact.findMany({ orderBy: [{ indicatorId: "asc" }, { year: "asc" }] });
+  return rows.map(row => {
+    if (row.sourceDocumentId !== taxBreaksRefundsSourceDocumentId(row.sourceId)) throw new Error("Tax breaks and refunds source relation mismatch");
+    return {
+      year: row.year, indicatorId: row.indicatorId as TaxBreaksRefundsFact["indicatorId"],
+      value: row.value.toFixed(), publishedValue: row.publishedValue.toFixed(2), unit: row.unit as "gel_million", basis: row.basis as "actual", valueStatus: row.valueStatus as "official",
       sourceId: row.sourceId, sourceSheet: row.sourceSheet, sourceCell: row.sourceCell, lastReviewedAt: isoDate(row.lastReviewedAt),
     };
   });
