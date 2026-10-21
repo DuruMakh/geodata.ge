@@ -76,10 +76,10 @@ export const SOCIAL_PUBLIC_SOURCES = [...SOCIAL_SOURCES, "ssa_statistics"];
 /**
  * The archived SSA topic page (data/methodology/source-archives/social-protection.csv) that lists a served table: SSA renames
  * its workbooks on every upload, so a table is cited by its topic's page (`ssa_pension_04` → `ssa_pension`), and the statistics
- * list cites itself.
+ * list cites itself. A Pension Fund document is archived under its own id (`pension_fund_ifrs_2020`).
  */
 export function socialArchiveSourceId(sourceId: string): string {
-  return sourceId.replace(/_\d+$/, "");
+  return sourceId.startsWith("ssa_") ? sourceId.replace(/_\d+$/, "") : sourceId;
 }
 export function socialSourceId(tableId: string): string {
   return `ssa_${tableId.replace(/-/g, "_")}`;

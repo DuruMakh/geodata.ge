@@ -164,8 +164,7 @@ type Mismatch = { check: string; year: number; difference: string };
 export function validateSocialFacts(allFacts: readonly SocialFact[], averageInputs?: SocialAverageInputs): void {
   // The funded pension rows have their own rules; every check below sees the SSA rows only.
   const funded = allFacts.filter(f => isFundedPension(f.indicatorId));
-  // Task 3 serves the 99 funded rows and removes this gate; until then the file has none and the completeness check would fail it.
-  if (funded.length) validateFundedPensionFacts(funded);
+  validateFundedPensionFacts(funded);
   const facts = allFacts.filter(f => !isFundedPension(f.indicatorId));
   const expected = expectedSocialKeys();
   const byKey = new Map<string, SocialFact>();

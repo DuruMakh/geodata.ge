@@ -68,9 +68,11 @@ const inventoryRules = {
   // The healthcare and deaths workbooks (official/deaths/) and both page captures; served and archived-only alike.
   health: [{ root: "docs/Raw Data/Health/geostat-health-annual/official", include: () => true }],
   // SSA's topic page captures and link lists (never its 1,027 workbooks, 206 MB; nor the pre-2012 list, which no served
-  // value uses), and the Geostat population, price index and GDP workbooks the calculated rows divide by.
+  // value uses), the six Pension Fund statements and report the funded pension values are read from (never the seven kept only
+  // for cross-checks), and the Geostat population, price index and GDP workbooks the calculated rows divide by.
   "social-protection": [
     { root: "docs/Raw Data/Social/ssa-statistics/official/pages", include: (candidatePath: string) => !candidatePath.endsWith("/ssa-links-pre2012.json") },
+    { root: "docs/Raw Data/Social/pension-fund/official", include: (candidatePath: string) => ["2020-IFRS.pdf", "2022-IFRS-GE.pdf", "2023-IFRS-GE.pdf", "2024-IFRS-GE.pdf", "2025-IFRS.pdf", "Annual_Rep_2025_geo.pdf"].includes(path.posix.basename(candidatePath)) },
     { root: "docs/Raw Data/Municipalities/geostat-population-regional-gdp/official", include: (candidatePath: string) => path.posix.basename(candidatePath) === "01-population-by-self-governed-unit.xlsx" },
     { root: "docs/Raw Data/Inflation", include: (candidatePath: string) => /^Inflation\/geostat-cpi\/2026-09\/(en|ka)\/cpi-index-2010\.xlsx$/.test(candidatePath) },
     { root: "docs/Raw Data/Economy/gdp-overview/sources", include: (candidatePath: string) => path.posix.basename(candidatePath) === "geostat_nominal_current.xlsx" },

@@ -334,8 +334,10 @@ describe("social protection methodology", () => {
     expect(markup).toContain('"@type":"Dataset"');
     const jsonLd = markup.match(/<script[^>]*data-testid="dataset-json-ld"[^>]*>([\s\S]*?)<\/script>/)?.[1] ?? "";
     expect(jsonLd).toContain(agency);
-    expect(markup.match(/data-testid="source-archive-row"/g)).toHaveLength(17);
+    expect(markup.match(/data-testid="source-archive-row"/g)).toHaveLength(23);
     expect(markup).toContain("/downloads/methodology/social-protection/files/ssa-page-pension.html.txt");
+    expect(markup).toContain("/downloads/methodology/social-protection/files/2020-ifrs.pdf");
+    expect(markup).toContain("/downloads/methodology/social-protection/files/annual_rep_2025_geo.pdf");
     expect(markup).toContain("/downloads/methodology/social-protection/files/ssa-links-other.json");
     expect(markup).toContain("/downloads/methodology/social-protection/files/01-population-by-self-governed-unit.xlsx");
     // The SSA workbooks are never published: only the topic pages that list them (the PR #170 rule).

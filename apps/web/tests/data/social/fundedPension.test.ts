@@ -1,3 +1,6 @@
+import fs from "node:fs/promises";
+import path from "node:path";
+import { parse } from "csv-parse/sync";
 import { describe, expect, test } from "vitest";
 import {
   fundedPensionFirstYear, fundedPensionMonths, fundedPensionUnit, isFundedPension, validateFundedPensionFacts,
@@ -88,6 +91,17 @@ describe("funded pension validation", () => {
     expect(() => validateSocialFacts(without(fixture(), "savings", 2021))).toThrow(/Incomplete funded pension coverage/);
   });
 
+  test("validateSocialFacts accepts the SSA rows and the funded rows together, each checked by its own rules", async () => {
+    const csv = parse(await fs.readFile(path.resolve(process.cwd(), "../../data/imports/social-protection-annual.csv")), { bom: true, columns: true, skip_empty_lines: true }) as Record<string, string>[];
+    const ssa: SocialFact[] = csv.filter(row => !row.indicator_id.startsWith("social.funded_pension.")).map(row => ({
+      year: Number(row.year), indicatorId: row.indicator_id as SocialIndicator, geographyId: row.geography_id, value: row.value, unit: row.unit as SocialFact["unit"],
+      months: Number(row.months), basis: "actual", valueStatus: row.value_status as SocialFact["valueStatus"], sourceId: row.source_id,
+      sourceWorkbook: row.source_workbook, sourceSheet: row.source_sheet, sourceCell: row.source_cell, lastReviewedAt: row.last_reviewed_at,
+    }));
+    expect(ssa.length).toBeGreaterThan(21_000);
+    expect(() => validateSocialFacts([...ssa, ...fixture()])).not.toThrow();
+  });
+
   test("negative and decimal values", () => {
     expect(socialValueText("social.funded_pension.securities_gains.amount", "-31187000.000000000000")).toBe("-31187000");
     expect(socialValueText("social.funded_pension.return", "11.800000000000")).toBe("11.8");
@@ -99,13 +113,19 @@ describe("funded pension validation", () => {
     ["a missing year", facts => without(facts, "savings", 2021), /Incomplete funded pension coverage/],
     ["a 2018 row", facts => [...facts, { ...get(facts, "savings", 2019), year: 2018 }], /outside the approved coverage/],
     ["a dividends row for 2021, which prints no line", facts => [...facts, { ...get(facts, "dividends", 2022), year: 2021, value: "1000" }], /outside the approved coverage/],
-    ["a zero where none is printed", facts => [...facts, { ...get(facts, "securities_gains", 2022), year: 2020, value: "0" }], /outside the approved coverage/],
+    ["a gains on securities row for 2020, which prints no line", facts => [...facts, { ...get(facts, "securities_gains", 2022), year: 2020, value: "0" }], /outside the approved coverage/],
     ["a duplicate", facts => [...facts, { ...get(facts, "savings", 2021) }], /Duplicate funded pension observation/],
     ["months 12 on savings", facts => facts.map(f => (f === get(facts, "savings", 2021) ? { ...f, months: 12 } : f)), /source contract/],
     ["months 1 on payouts", facts => facts.map(f => (f === get(facts, "payouts", 2021) ? { ...f, months: 1 } : f)), /source contract/],
     ["a return with two decimals", facts => facts.map(f => (f === get(facts, "return", 2021) ? { ...f, value: "9.50" } : f)), /Invalid funded pension value/],
     ["a negative count", facts => facts.map(f => (f === get(facts, "left", 2021) ? { ...f, value: "-1605" } : f)), /Invalid funded pension value/],
-    ["a negative savings value", facts => facts.map(f => (f === get(facts, "payouts", 2021) ? { ...f, value: "-1988000" } : f)), /Invalid funded pension value/],
+    ["a negative payouts value", facts => facts.map(f => (f === get(facts, "payouts", 2021) ? { ...f, value: "-1988000" } : f)), /Invalid funded pension value/],
+    ["a leading zero", facts => facts.map(f => (f === get(facts, "members", 2021) ? { ...f, value: "01234732" } : f)), /Invalid funded pension value/],
+    ["a leading zero in a money value", facts => facts.map(f => (f === get(facts, "payouts", 2021) ? { ...f, value: "007" } : f)), /Invalid funded pension value/],
+    ["a negative zero in gains on securities", facts => facts.map(f => (f === get(facts, "securities_gains", 2023) ? { ...f, value: "-0" } : f)), /Invalid funded pension value/],
+    ["a return with a leading zero", facts => facts.map(f => (f === get(facts, "return", 2021) ? { ...f, value: "09.5" } : f)), /Invalid funded pension value/],
+    ["a workbook that is not its source's document", facts => facts.map(f => (f === get(facts, "savings", 2021) ? { ...f, sourceWorkbook: "2025-IFRS.pdf" } : f)), /source contract/],
+    ["a count read from another report", facts => facts.map(f => (f === get(facts, "members", 2021) ? { ...f, sourceWorkbook: "2022-IFRS-GE.pdf" } : f)), /source contract/],
     ["a changed anchor", facts => facts.map(f => (f === get(facts, "savings", 2025) ? { ...f, value: "8237531000" } : f)), /anchor value changed/],
     ["a changed return anchor", facts => facts.map(f => (f === get(facts, "return", 2025) ? { ...f, value: "11.9" } : f)), /anchor value changed/],
     ["a changed gains anchor", facts => facts.map(f => (f === get(facts, "securities_gains", 2022) ? { ...f, value: "31187000" } : f)), /anchor value changed/],

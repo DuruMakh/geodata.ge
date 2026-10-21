@@ -3066,6 +3066,48 @@
     },
     "derivation": null
   },
+  "source.pension_fund_ifrs_2020": {
+    "name": {
+      "text": "Funded pension scheme financial statements for 2020 (IFRS)",
+      "reviewedAt": "2026-10-21"
+    },
+    "derivation": null
+  },
+  "source.pension_fund_ifrs_2022": {
+    "name": {
+      "text": "Funded pension scheme financial statements for 2022 (IFRS)",
+      "reviewedAt": "2026-10-21"
+    },
+    "derivation": null
+  },
+  "source.pension_fund_ifrs_2023": {
+    "name": {
+      "text": "Funded pension scheme financial statements for 2023 (IFRS)",
+      "reviewedAt": "2026-10-21"
+    },
+    "derivation": null
+  },
+  "source.pension_fund_ifrs_2024": {
+    "name": {
+      "text": "Funded pension scheme financial statements for 2024 (IFRS)",
+      "reviewedAt": "2026-10-21"
+    },
+    "derivation": null
+  },
+  "source.pension_fund_ifrs_2025": {
+    "name": {
+      "text": "Funded pension scheme financial statements for 2025 (IFRS)",
+      "reviewedAt": "2026-10-21"
+    },
+    "derivation": null
+  },
+  "source.pension_fund_report_2025": {
+    "name": {
+      "text": "Pension Fund of Georgia annual report 2025",
+      "reviewedAt": "2026-10-21"
+    },
+    "derivation": null
+  },
   "source.geostat_science_researchers": {
     "name": {
       "text": "Number of researchers by level of education, age groups and fields of science",

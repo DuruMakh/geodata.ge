@@ -17,6 +17,11 @@ const MONEY_SOURCES: Readonly<Record<number, string>> = {
   2023: "pension_fund_ifrs_2024", 2024: "pension_fund_ifrs_2025", 2025: "pension_fund_ifrs_2025",
 };
 const COUNT_SOURCE = "pension_fund_report_2025";
+/** The file each source is: a fact's workbook is its source's document, never another. */
+const DOCUMENTS: Readonly<Record<string, string>> = {
+  pension_fund_ifrs_2020: "2020-IFRS.pdf", pension_fund_ifrs_2022: "2022-IFRS-GE.pdf", pension_fund_ifrs_2023: "2023-IFRS-GE.pdf",
+  pension_fund_ifrs_2024: "2024-IFRS-GE.pdf", pension_fund_ifrs_2025: "2025-IFRS.pdf", pension_fund_report_2025: "Annual_Rep_2025_geo.pdf",
+};
 /** Spec §4's anchors, as printed (money in GEL, the return in percent). */
 const ANCHORS: readonly (readonly [indicatorId: SocialIndicator, year: number, value: string])[] = [
   [`${PREFIX}savings.amount`, 2025, "8237530000"], [`${PREFIX}savings.amount`, 2019, "508031000"], [`${PREFIX}net_assets.amount`, 2025, "8365433000"],
@@ -44,10 +49,10 @@ export function fundedPensionFirstYear(id: string): 2019 | 2022 {
 function fundedPensionSource(id: string, year: number): string {
   return id.endsWith(".amount") ? MONEY_SOURCES[year] : COUNT_SOURCE;
 }
-/** The stored form of a value: whole GEL (negative only for gains on securities), whole counts, the return to one decimal. */
+/** The stored form of a value: whole GEL (negative only for gains on securities), whole counts, the return to one decimal; no leading zeros, no "-0". */
 function validValue(id: string, value: string): boolean {
-  if (id === `${PREFIX}return`) return /^\d+\.\d$/.test(value);
-  return (id === `${PREFIX}securities_gains.amount` ? /^-?\d+$/ : /^\d+$/).test(value);
+  if (id === `${PREFIX}return`) return /^(0|[1-9]\d*)\.\d$/.test(value);
+  return (id === `${PREFIX}securities_gains.amount` ? /^(0|-?[1-9]\d*)$/ : /^(0|[1-9]\d*)$/).test(value);
 }
 
 /**
@@ -67,7 +72,7 @@ export function validateFundedPensionFacts(facts: readonly SocialFact[]): void {
     if (byKey.has(key)) throw new Error(`Duplicate funded pension observation: ${key}`);
     byKey.set(key, fact);
     if (fact.unit !== fundedPensionUnit(fact.indicatorId) || fact.months !== fundedPensionMonths(fact.indicatorId) || fact.basis !== "actual" || fact.valueStatus !== "official"
-      || fact.sourceId !== fundedPensionSource(fact.indicatorId, fact.year) || !fact.sourceWorkbook || !fact.sourceSheet || !fact.sourceCell
+      || fact.sourceId !== fundedPensionSource(fact.indicatorId, fact.year) || fact.sourceWorkbook !== DOCUMENTS[fact.sourceId] || !fact.sourceSheet || !fact.sourceCell
       || !/^\d{4}-\d{2}-\d{2}$/.test(fact.lastReviewedAt)) throw new Error(`Invalid funded pension source contract: ${key}`);
     if (!validValue(fact.indicatorId, fact.value)) throw new Error(`Invalid funded pension value: ${key}`);
   }
