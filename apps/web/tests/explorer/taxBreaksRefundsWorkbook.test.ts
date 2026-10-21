@@ -58,4 +58,11 @@ test("the % of GDP workbook exports shares to two decimals and adds the GDP sour
   expect(model.readable.rows[0].valuesByYear[2024]).toBeCloseTo(6.88, 2);
   expect(new Set(model.analysis.rows.map(row => row[3]))).toEqual(new Set(["Calculated by Fiscal.ge"]));
   expect(model.sources.map(source => source.title)).toEqual(["mof_tax_expenditure_report_2024_xlsx_ka", "Geostat GDP"]);
+  expect(model.readable.subtitle).not.toContain("2025");
+});
+
+test("a % of GDP workbook reaching 2025 names the preliminary GDP year", async () => {
+  const gdp = await workbook("gdp", ["tax_refunds.total"], 2020, 2025);
+  expect(gdp.readable.subtitle).toMatch(/· Preliminary: 2025$/);
+  expect((await workbook("amount", ["tax_refunds.total"], 2020, 2025)).readable.subtitle).not.toContain("Preliminary");
 });

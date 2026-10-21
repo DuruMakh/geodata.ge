@@ -24,6 +24,8 @@ export function buildTaxBreaksRefundsWorkbookExportModel(input: {
   const isGdp = state.view === "gdp";
   const unitLabel = isGdp ? workbookMessage(locale, "workbook.percentGdp") : t("unitMlnGel");
   const numberFormat = isGdp ? "0.00" : "#,##0.0";
+  // Shares over preliminary GDP will move when Geostat revises it, so the subtitle names those years (as on Economic sectors).
+  const preliminaryYears = isGdp ? model.years.filter(year => input.gdpFacts.some(f => f.year === year && f.status === "preliminary")) : [];
   const toExport = (value: number | null) => value === null ? null : isGdp ? value : value / MILLION;
   // Every published amount is official; a share of GDP is Fiscal.ge's calculation.
   const status = (id: string, year: number) => byCell.has(`${id}:${year}`) ? t(isGdp ? "status.calculated" : "status.official") : workbookMessage(locale, "workbook.unavailable");
@@ -31,7 +33,7 @@ export function buildTaxBreaksRefundsWorkbookExportModel(input: {
   return {
     locale, filename: workbookFilename(`tax-breaks-refunds${isGdp ? "-gdp" : ""}-${model.range.start}-${model.range.end}`, locale), sheetNames: SHEET_NAMES[locale],
     readable: {
-      title: `${input.title ?? t("title")} · ${t(`tab.${state.view}`)}`, subtitle: `${model.range.start}–${model.range.end} · ${unitLabel}`,
+      title: `${input.title ?? t("title")} · ${t(`tab.${state.view}`)}`, subtitle: `${model.range.start}–${model.range.end} · ${unitLabel}${preliminaryYears.length ? ` · ${workbookMessage(locale, "workbook.preliminary")}: ${preliminaryYears.join(", ")}` : ""}`,
       unitLabel, amountDecimals: 1, years: model.years, showChangeColumn: false, numberFormat,
       rows: model.selected.map(series => {
         const values = Object.fromEntries(model.years.map(year => [year, toExport(series.valuesByYear[year])]));
