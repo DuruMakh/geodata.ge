@@ -11,7 +11,7 @@
   "expenditureTypes.preliminary": "წინასწარი",
   "expenditureTypes.nominalContext": "ზოგადი მთავრობა: სახელმწიფო ბიუჯეტი, ავტონომიური რესპუბლიკები და მუნიციპალიტეტები.",
   "expenditureTypes.shareContext": "წილი იმავე წლის მშპ-ში.",
-  "expenditureTypes.source": "წყარო: საქართველოს ფინანსთა სამინისტრო · ზოგადი მთავრობის ოპერაციები.",
+  "expenditureTypes.source": "წყარო: საქართველოს ფინანსთა სამინისტრო.",
   "expenditureTypes.rowYear": "მნიშვნელობები: {year} წელი",
   "expenditureTypes.rangeChanged": "პერიოდი: {start}–{end}",
   "expenditureTypes.sector": "ხარჯის სახე",

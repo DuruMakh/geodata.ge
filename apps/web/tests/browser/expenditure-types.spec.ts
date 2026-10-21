@@ -32,7 +32,7 @@ test("offers amounts and share of GDP only; the share view keeps the total and h
   await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-measure", "share_of_gdp");
   await expect(page.locator(row("spending_type.total"))).toHaveAttribute("aria-pressed", "true");
   const headline = page.getByTestId("sectors-headline");
-  await expect(headline).toHaveText("Total spending · 2025: 28.4% · Preliminary");
+  await expect(headline).toHaveText("Spending · 2025: 28.4% · Preliminary");
   expect(await headline.evaluate((line) => line.getBoundingClientRect().height / parseFloat(getComputedStyle(line).lineHeight))).toBeLessThanOrEqual(1.1);
 });
 
@@ -66,6 +66,6 @@ test("the Budget hub card, the sidebar and the methodology page reach the new pa
   await page.getByTestId("section-link-expenditure-types").click();
   await expect(page).toHaveURL(/\/en\/explorer\/expenditure-types$/);
   await page.goto("/en/methodology/expenditure-types");
-  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Government spending by type");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Spending by type");
   await expect(page.locator('a[href*="/downloads/methodology/expenditure-types/files/"]')).toHaveCount(1);
 });

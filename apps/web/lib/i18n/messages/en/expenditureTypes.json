@@ -11,7 +11,7 @@
   "expenditureTypes.preliminary": "Preliminary",
   "expenditureTypes.nominalContext": "General government: the state budget, the autonomous republics and the municipalities.",
   "expenditureTypes.shareContext": "Share of the same year’s GDP.",
-  "expenditureTypes.source": "Source: Ministry of Finance of Georgia · General government operations.",
+  "expenditureTypes.source": "Source: Ministry of Finance of Georgia.",
   "expenditureTypes.rowYear": "Values for {year}",
   "expenditureTypes.rangeChanged": "Period: {start}–{end}",
   "expenditureTypes.sector": "Type of spending",
