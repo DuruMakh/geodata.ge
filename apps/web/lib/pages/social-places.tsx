@@ -14,7 +14,7 @@ import { SOURCE_ID } from "../data/demography/series";
 import { loadServedInflationData } from "../data/inflation/importInflation";
 import { loadServedMunicipalData } from "../data/servedData";
 import { loadServedSocialData, toClientSocialFact } from "../data/social/importSocial";
-import { SOCIAL_GEORGIA, SOCIAL_PUBLIC_SOURCES, socialArchiveSourceId, type ClientSocialFact } from "../data/social/types";
+import { FUNDED_PENSION_SOURCES, SOCIAL_GEORGIA, SOCIAL_PUBLIC_SOURCES, socialArchiveSourceId, type ClientSocialFact } from "../data/social/types";
 import { coverageLabel } from "../explorer/coverageLabel";
 import { GEORGIA_PLACE_ID, TBILISI_PLACE_ID, buildDemographyPlaces, placeLabel, type DemographyPlace } from "../explorer/demographyAreas";
 import { placeHrefById, placeIdForRoute, placeNeighbours, placePageHref, type PlaceRoute } from "../explorer/demographyPlaceRoutes";
@@ -78,7 +78,8 @@ export async function loadSocialWorkbookSources(locale: Locale): Promise<{ ssa: 
     loadSourcedWorkbookSources("demography", locale, row => row.source_id === SOURCE_ID.populationUnits),
     loadSourcedWorkbookSources("inflation", locale, row => row.source_id === cpiId),
   ]);
-  const ssa = SOCIAL_PUBLIC_SOURCES.map(sourceId => {
+  // The Pension Fund's documents have no archived SSA page; Task 5 lists them with the funded pension page.
+  const ssa = SOCIAL_PUBLIC_SOURCES.filter(sourceId => !FUNDED_PENSION_SOURCES.includes(sourceId)).map(sourceId => {
     const page = pages.find(row => row.sourceId === socialArchiveSourceId(sourceId));
     if (!page) throw new Error(`No archived SSA page for ${sourceId}`);
     return { ...page, sourceId };

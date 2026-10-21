@@ -31,6 +31,13 @@ export const SOCIAL_PAYMENT_PROGRAMMES = [
 ] as const;
 export type SocialPaymentProgramme = (typeof SOCIAL_PAYMENT_PROGRAMMES)[number];
 
+/** The funded pension scheme's money rows (stored as `social.funded_pension.{measure}.amount`, in GEL), in the order the Pension Fund's statements print them. */
+export const FUNDED_PENSION_MONEY = [
+  "savings", "net_assets", "contributions", "contributions_private", "contributions_public", "contributions_state", "interest", "securities_gains", "dividends", "payouts",
+] as const;
+/** The funded pension scheme's counts (stored as `social.funded_pension.{measure}`); the annual return is `social.funded_pension.return`. */
+export const FUNDED_PENSION_COUNTS = ["members", "left", "paid_persons", "employers"] as const;
+
 /** Every served indicator: the Pensions and Subsistence allowance place series, the Social package series and the Social payments rows. */
 export const SOCIAL_INDICATORS = [
   "social.pension.recipients", "social.pension.amount", "social.pension.avg_monthly",
@@ -46,15 +53,23 @@ export const SOCIAL_INDICATORS = [
   ...SOCIAL_PACKAGE_GROUPS.filter(group => group !== "total").map(group => `social.social_package.${group}.avg_monthly` as const),
   "social.payments.total.amount",
   ...SOCIAL_PAYMENT_PROGRAMMES.map(programme => `social.payments.${programme}.amount` as const),
+  ...FUNDED_PENSION_MONEY.map(measure => `social.funded_pension.${measure}.amount` as const),
+  ...FUNDED_PENSION_COUNTS.map(measure => `social.funded_pension.${measure}` as const),
+  "social.funded_pension.return",
 ] as const;
 export type SocialIndicator = (typeof SOCIAL_INDICATORS)[number];
 
-/** The SSA tables the served values are read from, as `ssa_` and the research package's table id. */
+/** The Pension Fund's audited IFRS statements (one per document that serves a year) and its 2025 annual report, which serves the counts and the return. */
+export const FUNDED_PENSION_SOURCES = [
+  "pension_fund_ifrs_2020", "pension_fund_ifrs_2022", "pension_fund_ifrs_2023", "pension_fund_ifrs_2024", "pension_fund_ifrs_2025", "pension_fund_report_2025",
+];
+/** The SSA tables the served values are read from, as `ssa_` and the research package's table id, then the Pension Fund's documents. */
 export const SOCIAL_SOURCES = [
   "ssa_pension_01", "ssa_pension_02", "ssa_pension_04", "ssa_tsa_allowance_01", "ssa_tsa_allowance_02", "ssa_tsa_allowance_03", "ssa_tsa_db_01",
   "ssa_socpackage_01", "ssa_socpackage_02", "ssa_socpackage_10", "ssa_idp_refugee_02", "ssa_compensation_04", "ssa_maternity_01",
   "ssa_maternity_03", "ssa_demography_02", "ssa_demography_04", "ssa_utilitysubsidy_02", "ssa_other_01", "ssa_other_02",
   "ssa_other_03", "ssa_other_04", "ssa_highmountain_01", "ssa_highmountain_03", "ssa_workinjury_03",
+  ...FUNDED_PENSION_SOURCES,
 ];
 /** The served tables and SSA's statistics page, which the Social payments total (a sum of the tables' rows) cites. */
 export const SOCIAL_PUBLIC_SOURCES = [...SOCIAL_SOURCES, "ssa_statistics"];
@@ -75,10 +90,10 @@ export type SocialFact = {
   indicatorId: SocialIndicator;
   /** `country.georgia`, a `region.*` id, a two-digit municipality code or a `unit.*` id. */
   geographyId: string;
-  /** Exact decimal: whole persons, families or GEL; an average in GEL to two decimals. */
+  /** Exact decimal: whole persons, families or GEL (negative only for the funded pension's securities gains); an average in GEL to two decimals; the funded pension's return to one decimal. */
   value: string;
-  /** Money is GEL as summed; `gel_million` is the client's display unit, never stored. */
-  unit: "persons" | "families" | "gel" | "gel_million";
+  /** Money is GEL as summed; `gel_million` is the client's display unit, never stored. `employers` and `percent` are the funded pension's. */
+  unit: "persons" | "families" | "gel" | "gel_million" | "employers" | "percent";
   /** How many monthly sheets the value covers: 1 for a December count. */
   months: number;
   basis: "actual";

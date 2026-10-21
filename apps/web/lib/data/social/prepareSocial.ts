@@ -8,7 +8,7 @@ import { readVerifiedPackageFile } from "../sourcePackage";
 import { assertGeneratedArtifactMatches } from "../generatedArtifacts";
 import type { CsvRecord } from "../csv";
 import {
-  SOCIAL_AGE_BANDS, SOCIAL_GEORGIA, SOCIAL_INDICATORS, SOCIAL_MUNICIPALITIES, SOCIAL_PACKAGE_GROUPS, SOCIAL_PAYMENT_PROGRAMMES, SOCIAL_REGIONS, SOCIAL_SOURCES, SOCIAL_UNITS,
+  FUNDED_PENSION_SOURCES, SOCIAL_AGE_BANDS, SOCIAL_GEORGIA, SOCIAL_INDICATORS, SOCIAL_MUNICIPALITIES, SOCIAL_PACKAGE_GROUPS, SOCIAL_PAYMENT_PROGRAMMES, SOCIAL_REGIONS, SOCIAL_SOURCES, SOCIAL_UNITS,
   socialFactKey, socialSourceId, type SocialAcceptance, type SocialFact, type SocialIndicator, type SocialSeriesBreak,
 } from "./types";
 import { SOCIAL_AVERAGES, SOCIAL_AVERAGE_GAPS, SOCIAL_KNOWN_DIFFERENCES, socialAverage, socialUnit, validateSocialFacts, type SocialAverageInputs } from "./validation";
@@ -84,7 +84,8 @@ export async function loadSocialAverageInputs(repositoryRoot: string): Promise<S
 async function checkPackage(directory: string, rows: readonly CsvRecord[]): Promise<string> {
   const manifest: Source[] = JSON.parse(await fs.readFile(path.join(directory, "source-manifest.json"), "utf8"));
   const tables = new Set(rows.map(row => row.source_table));
-  if (tables.size !== SOCIAL_SOURCES.length || [...tables].some(table => !SOCIAL_SOURCES.includes(socialSourceId(table)))) throw new Error("Social source inventory mismatch");
+  const ssaSources = SOCIAL_SOURCES.filter(id => !FUNDED_PENSION_SOURCES.includes(id));
+  if (tables.size !== ssaSources.length || [...tables].some(table => !ssaSources.includes(socialSourceId(table)))) throw new Error("Social source inventory mismatch");
   const workbooks = new Map(rows.map(row => [row.source_workbook, row.source_table]));
   for (const [workbook, table] of workbooks) {
     const entries = manifest.filter(source => source.kind === "workbook" && source.local_file === `official/workbooks/${workbook}`);

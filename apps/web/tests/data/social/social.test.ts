@@ -9,7 +9,7 @@ import { loadSocialFactsFromMirror, socialMirrorCreateRows } from "../../../lib/
 import type { Prisma } from "../../../lib/generated/prisma/client";
 import { REVIEWED_AT, SOCIAL_CSV_HEADERS, checkKnownDifferences, loadSocialAverageInputs, prepareSocialData } from "../../../lib/data/social/prepareSocial";
 import {
-  SOCIAL_AGE_BANDS, SOCIAL_GEORGIA, SOCIAL_INDICATORS, SOCIAL_PAYMENT_PROGRAMMES, SOCIAL_PUBLIC_SOURCES, SOCIAL_SOURCES, socialFactKey, socialSourceDocumentId, type SocialFact, type SocialIndicator,
+  FUNDED_PENSION_SOURCES, SOCIAL_AGE_BANDS, SOCIAL_GEORGIA, SOCIAL_INDICATORS, SOCIAL_PAYMENT_PROGRAMMES, SOCIAL_PUBLIC_SOURCES, SOCIAL_SOURCES, socialFactKey, socialSourceDocumentId, type SocialFact, type SocialIndicator,
 } from "../../../lib/data/social/types";
 import { SOCIAL_AVERAGE_GAPS, SOCIAL_KNOWN_DIFFERENCES, expectedSocialKeys, socialAverage, validateSocialFacts, type SocialAverageInputs } from "../../../lib/data/social/validation";
 
@@ -57,12 +57,16 @@ test("serves the package's place, social package and programme values, with the 
   const years = new Set(rows.map(row => row.year)).size;
   expect(facts).toHaveLength(served.length + averaged.length + payments.length + years);
   expect(facts).toHaveLength(21988);
-  expect(SOCIAL_INDICATORS).toHaveLength(73);
+  // The 15 funded pension indicators and 6 Pension Fund sources are served from Task 3 on; until then the file holds the SSA ones.
+  const ssaIndicators = SOCIAL_INDICATORS.filter(id => !id.startsWith("social.funded_pension."));
+  const ssaSources = SOCIAL_PUBLIC_SOURCES.filter(id => !FUNDED_PENSION_SOURCES.includes(id));
+  expect(SOCIAL_INDICATORS).toHaveLength(88);
+  expect(ssaIndicators).toHaveLength(73);
   expect(SOCIAL_PAYMENT_PROGRAMMES).toHaveLength(18);
-  expect(SOCIAL_SOURCES).toHaveLength(24);
+  expect(SOCIAL_SOURCES).toHaveLength(30);
   expect(SOCIAL_PUBLIC_SOURCES).toEqual([...SOCIAL_SOURCES, "ssa_statistics"]);
-  expect(new Set(facts.map(f => f.indicatorId))).toEqual(new Set(SOCIAL_INDICATORS));
-  expect(new Set(facts.map(f => f.sourceId))).toEqual(new Set(SOCIAL_PUBLIC_SOURCES));
+  expect(new Set(facts.map(f => f.indicatorId))).toEqual(new Set(ssaIndicators));
+  expect(new Set(facts.map(f => f.sourceId))).toEqual(new Set(ssaSources));
   expect(facts.every(f => f.basis === "actual" && f.lastReviewedAt === REVIEWED_AT)).toBe(true);
   expect(Math.min(...facts.map(f => f.year))).toBe(2013);
   expect(Math.max(...facts.map(f => f.year))).toBe(2025);
@@ -336,5 +340,6 @@ test("the database mirror round-trips exact decimals, months and source relation
 test("every cited source has a source-document row", async () => {
   const csv = await fs.readFile(path.join(root, "data/sources/source-documents.csv"));
   const ids = new Set((parse(csv, { columns: true, bom: true }) as Record<string, string>[]).map(r => r.source_id));
-  expect(SOCIAL_PUBLIC_SOURCES.filter(id => !ids.has(socialSourceDocumentId(id)))).toEqual([]);
+  // The Pension Fund's source documents are added with the funded pension rows in Task 3.
+  expect(SOCIAL_PUBLIC_SOURCES.filter(id => !FUNDED_PENSION_SOURCES.includes(id) && !ids.has(socialSourceDocumentId(id)))).toEqual([]);
 });
