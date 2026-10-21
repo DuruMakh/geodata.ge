@@ -38,7 +38,8 @@ export type FiscalDatasetId = Exclude<DatasetId, "ministries" | "inflation" | "i
  */
 export type TopicDatasetId =
   | Exclude<MethodologyDatasetId, "expenditure" | "revenue" | "municipalities" | "debt" | "gdp" | "economic-sectors" | "regional-economies" | "demography">
-  | "inflation-products";
+  | "inflation-products"
+  | "funded-pension";
 
 /** An official statistics producer whose published figures a dataset is read from. */
 export type SourceAgencyId = "geostat" | "nbg" | "ssa" | "pension_fund";
@@ -439,14 +440,25 @@ const TOPIC_DATASETS: Record<TopicDatasetId, { keywords: Record<Locale, readonly
   },
   "social-protection": {
     keywords: {
-      ka: ["სოციალური დაცვა", "პენსიები", "საარსებო შემწეობა", "სოციალური პაკეტი", "სოციალური გასაცემლები", "დაგროვებითი პენსია", "საქართველო"],
-      en: ["Georgia", "social protection", "pensions", "subsistence allowance", "social package", "social payments", "funded pension"],
+      ka: ["სოციალური დაცვა", "პენსიები", "საარსებო შემწეობა", "სოციალური პაკეტი", "სოციალური გასაცემლები", "საქართველო"],
+      en: ["Georgia", "social protection", "pensions", "subsistence allowance", "social package", "social payments"],
     },
     measurementTechnique: {
-      ka: "გადამოწმებული ამოღება სოციალური მომსახურების სააგენტოს ყოველთვიური სტატისტიკიდან: დეკემბრის რაოდენობები და 12 თვის თანხების ჯამი, და საქართველოს საპენსიო ფონდის აუდირებული ფინანსური ანგარიშგებიდან და წლიური ანგარიშიდან: დაგროვებითი პენსიის წლიური თანხები და რაოდენობები, ისე, როგორც ისინი იბეჭდება; საშუალოებს, წილებს მოსახლეობაში, 2025 წლის ფასებსა და მშპ-სთან შეფარდებას Fiscal.ge ითვლის საქსტატის მონაცემებით.",
-      en: "Reviewed extraction from the Social Service Agency's monthly statistics: December counts and the sum of 12 monthly amounts; and from the Pension Fund of Georgia's audited financial statements and annual report: the funded pension's yearly amounts and counts, as they are printed; averages, shares of residents, 2025 prices and shares of GDP are calculated by Fiscal.ge with Geostat data.",
+      ka: "გადამოწმებული ამოღება სოციალური მომსახურების სააგენტოს ყოველთვიური სტატისტიკიდან: დეკემბრის რაოდენობები და 12 თვის თანხების ჯამი; საშუალოებს, წილებს მოსახლეობაში, 2025 წლის ფასებსა და მშპ-სთან შეფარდებას Fiscal.ge ითვლის საქსტატის მონაცემებით.",
+      en: "Reviewed extraction from the Social Service Agency's monthly statistics: December counts and the sum of 12 monthly amounts; averages, shares of residents, 2025 prices and shares of GDP are calculated by Fiscal.ge with Geostat data.",
     },
     sources: ["ssa", "geostat"],
+  },
+  "funded-pension": {
+    keywords: {
+      ka: ["დაგროვებითი პენსია", "საპენსიო დანაზოგი", "საპენსიო ფონდი", "საქართველო"],
+      en: ["Georgia", "funded pension", "pension savings", "pension fund", "pension contributions"],
+    },
+    measurementTechnique: {
+      ka: "გადამოწმებული ამოღება საქართველოს საპენსიო ფონდის აუდირებული ფინანსური ანგარიშგებიდან (IFRS) და წლიური ანგარიშიდან, ისე, როგორც ისინი იბეჭდება; მშპ-სთან შეფარდებას Fiscal.ge ითვლის საქსტატის მონაცემებით.",
+      en: "Reviewed extraction from the Pension Fund of Georgia's audited IFRS financial statements and annual report, as they print the figures; shares of GDP are calculated by Fiscal.ge with Geostat data.",
+    },
+    sources: ["pension_fund", "geostat"],
   },
   environment: {
     keywords: {

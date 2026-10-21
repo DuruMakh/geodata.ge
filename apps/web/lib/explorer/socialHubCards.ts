@@ -7,14 +7,14 @@ import { HEALTH_SECTIONS } from "./health";
 import type { HubCardModel } from "./hubCards";
 import { SOCIAL_SECTIONS, type SocialSectionId } from "./social";
 
-/** Each card's sparkline and footer follow one Georgia series: the payments total, pensioners, receiving families and social package recipients. */
+/** Each card's sparkline and footer follow one Georgia series: the payments total, pensioners, receiving families, social package recipients and the funded pension's savings. */
 const HEADLINE: Record<SocialSectionId, string> = {
   "social-payments": "social.payments.total.amount", pensions: "social.pension.recipients",
   "subsistence-allowance": "social.subsistence.families", "social-package": "social.social_package.total.recipients",
   "funded-pension": "social.funded_pension.savings.amount",
 };
 
-/** The four cards follow the Health hub's three, so their numbers continue from 04. */
+/** The five cards follow the Health hub's three, so their numbers continue from 04. */
 export function buildSocialHubCards(facts: readonly ClientSocialFact[], presentation: Presentation): HubCardModel[] {
   const t = (key: string) => message(presentation.messages, `social.${key}`);
   return SOCIAL_SECTIONS.map((section, index) => {

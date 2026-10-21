@@ -67,10 +67,10 @@ export async function renderSocialTopicPage(locale: Locale, section: SocialTopic
   ];
   return <I18nProvider {...clientPresentation(presentation)}>
     <JsonLd testId="explorer-dataset-json-ld" data={explorerDatasetJsonLd({
-      locale, origin, path: href, datasetId: "social-protection", name: title, description, firstYear: min, lastYear: max, dateModified: lastReviewedAt,
+      locale, origin, path: href, datasetId: section === "funded-pension" ? "funded-pension" : "social-protection", name: title, description, firstYear: min, lastYear: max, dateModified: lastReviewedAt,
       variableMeasured: [...new Set(Object.values(headingLabels))],
-      // SSA's statistics, or the Pension Fund's statements; a % of GDP view divides by Geostat's GDP.
-      ...(section === "funded-pension" ? { sources: ["pension_fund", "geostat"] as const } : gdp ? {} : { sources: ["ssa"] as const }),
+      // SSA's statistics; only Social payments' % of GDP view divides by Geostat's GDP. The funded pension has its own dataset vocabulary.
+      ...(gdp ? {} : { sources: ["ssa"] as const }),
     })} />
     <BreadcrumbJsonLd items={[{ name: crumbs[0].label, path: pageHref("/", locale) }, { name: hubLabel, path: pageHref(HEALTH_HUB_PATH, locale) }, { name: title, path: pageHref(href, locale) }]} />
     <ExplorerPage containerQueries={false}>

@@ -7,12 +7,19 @@ vi.mock("next/navigation", async (importOriginal) => ({
   usePathname: () => "/",
 }));
 
+// The page's state comes from the address hash, which a server render does not have: this stands in for it.
+const address = vi.hoisted(() => ({ hash: "" }));
+vi.mock("../../components/explorer-shell/use-hash-state", () => ({
+  useHashState: <D, S>(data: D, parse: (hash: string, data: D) => S) => ({ state: parse(address.hash, data), update: (change: (previous: S) => S) => change(parse(address.hash, data)) }),
+}));
+
+import { defaultSocialState, serializeSocialHash } from "../../lib/explorer/social";
 import { renderSocialTopicPage, socialTopicMetadata } from "../../lib/pages/social";
 import { loadSocialWorkbookSources } from "../../lib/pages/social-places";
 import { renderPageMarkup } from "../helpers/render-localized";
 
 const original = process.env.NEXT_PUBLIC_SITE_URL;
-beforeEach(() => { process.env.NEXT_PUBLIC_SITE_URL = "https://fiscal.ge"; });
+beforeEach(() => { process.env.NEXT_PUBLIC_SITE_URL = "https://fiscal.ge"; address.hash = ""; });
 afterEach(() => { process.env.NEXT_PUBLIC_SITE_URL = original; });
 const text = (html: string) => html.replace(/<[^>]+>/g, "").replace(/\s+/g, " ");
 const latest = (html: string) => text(html.match(/<p data-testid="social-latest"[^>]*>(.*?)<\/p>/)?.[1] ?? "");
@@ -33,6 +40,26 @@ describe("the funded pension page", () => {
     expect(text(html)).not.toContain("Employers · employers");
   });
 
+  it("lists the return with its own unit in the % of GDP view, and the money rows with theirs", async () => {
+    const FUNDED = "social.funded_pension.";
+    address.hash = serializeSocialHash({ ...defaultSocialState("funded-pension"), view: "gdp", selectedIds: [`${FUNDED}savings.amount`] }, "funded-pension");
+    const html = await page("en");
+    expect(html).toContain('data-view="gdp"');
+    const headings = [...html.matchAll(/data-testid="series-heading"[^>]*>([^<]*)</g)].map(match => match[1]);
+    expect(headings).toEqual(["Savings, end of year · % of GDP", "Money in and out · % of GDP", "Members", "Employers", "Return · %"]);
+  });
+
+  it("offers the % of GDP switch on the money headings only", async () => {
+    const FUNDED = "social.funded_pension.";
+    const switchOn = async (selectedIds: string[]) => {
+      address.hash = serializeSocialHash({ ...defaultSocialState("funded-pension"), selectedIds }, "funded-pension");
+      return (await page("en")).includes('data-testid="social-measure-gdp"');
+    };
+    expect(await switchOn([`${FUNDED}savings.amount`])).toBe(true);
+    expect(await switchOn([`${FUNDED}interest.amount`])).toBe(true);
+    for (const id of ["members", "left", "paid_persons", "employers", "return"]) expect(await switchOn([`${FUNDED}${id}`]), id).toBe(false);
+  });
+
   it("says the same in Georgian", async () => {
     const html = await page("ka");
     expect(latest(html)).toBe("2025: 8.24 მლრდ ლარი საპენსიო დანაზოგში");
@@ -43,6 +70,12 @@ describe("the funded pension page", () => {
     const data = jsonLd(await page("en"));
     expect(data.provider.map((agency: { name: string }) => agency.name)).toEqual(["Pension Fund of Georgia", "National Statistics Office of Georgia (Geostat)"]);
     expect(data.temporalCoverage).toContain("2019");
+    // Its own technique and keywords; the SSA pages' stay SSA-only.
+    expect(data.measurementTechnique).toContain("Pension Fund of Georgia");
+    expect(data.keywords).toContain("funded pension");
+    const payments = jsonLd(renderPageMarkup("en", await renderSocialTopicPage("en", "social-payments")));
+    expect(payments.measurementTechnique).not.toContain("Pension Fund");
+    expect(JSON.stringify(payments.keywords)).not.toContain("funded pension");
   });
 
   it("has a title and a description of its own in both languages", async () => {

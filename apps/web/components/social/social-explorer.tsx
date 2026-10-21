@@ -130,8 +130,8 @@ export function SocialExplorer({ section, facts, gdpFacts, gdpSources, breaks, l
       <FlatSeriesPanel asideLabel={message(messages, "controls.series")} caption={list.end} downloadAction={downloadAction}
         rows={model.series.map(series => {
           const { latest, headingYear } = list.rows[series.id]!;
-          // Counts need no unit beside their heading; money, averages and the return name theirs.
-          const heading = series.unit === "persons" || series.unit === "families" || series.unit === "employers" ? headingLabels[series.heading] : `${headingLabels[series.heading]} · ${gdpView ? t("unitPercentGdp") : unitLabelOf(series.unit)}`;
+          // Counts need no unit beside their heading; money, averages and the return name theirs (the return keeps its own in the % of GDP view).
+          const heading = series.unit === "persons" || series.unit === "families" || series.unit === "employers" ? headingLabels[series.heading] : `${headingLabels[series.heading]} · ${gdpView && series.unit === "percent" ? t("unitPercentGdp") : unitLabelOf(series.unit)}`;
           return { id: series.id, label: labels[series.id], color: series.color, value: formatInUnit(latest?.value, { divisor: 1, label: "", decimals: series.decimals }),
             heading: headingYear ? `${heading} · ${headingYear}` : heading };
         })}
