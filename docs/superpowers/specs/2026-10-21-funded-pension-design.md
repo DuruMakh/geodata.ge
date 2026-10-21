@@ -90,7 +90,7 @@ The Pension Fund publishes everything on pensions.ge. Its document list is the J
 | IFRS statements 2019 and 2021 and annual reports 2019–2024 | Cross-checks only, not served | — |
 | Geostat nominal GDP (already served) | % of GDP | 2019–2025 |
 
-**Which statement serves a year.** Every statement prints the year and the year before. A year is served from the latest statement that prints it as text:
+**Which statement serves a year.** Every statement prints the year and the year before. The statements up to 2024 are in Georgian; the 2025 statement is in English. A year is served from the latest statement that prints it as text:
 
 - 2019 from the 2020 statement;
 - 2020 from the 2020 statement, because the 2021 statement is a scanned image;
@@ -137,10 +137,10 @@ The page reuses the social protection data path. It adds no new table and no new
   - Every value has `valueStatus = official`, because each is one printed figure.
   - `sourceWorkbook` is the PDF's file name, `sourceSheet` the page number, and `sourceCell` the printed line label with its column year.
 - **New units.** `SocialFact.unit` gains `employers` and `percent`. The column is free text in the mirror, so no migration is needed.
-- **Stable IDs** follow `social.funded_pension.{measure}`:
-  - `savings_amount`, `net_assets_amount`;
-  - `contributions_amount`, `contributions_private_amount`, `contributions_public_amount`, `contributions_state_amount`;
-  - `interest_amount`, `securities_gains_amount`, `dividends_amount`, `payouts_amount`;
+- **Stable IDs** follow `social.funded_pension.{measure}`, and money ends in `.amount` like every other social money id, so the existing million-GEL and % of GDP helpers apply:
+  - `savings.amount`, `net_assets.amount`;
+  - `contributions.amount`, `contributions_private.amount`, `contributions_public.amount`, `contributions_state.amount`;
+  - `interest.amount`, `securities_gains.amount`, `dividends.amount`, `payouts.amount`;
   - `members`, `left`, `paid_persons`, `employers`, `return`.
 - **Source IDs.** The new source IDs are `pension_fund_ifrs_{year}` and `pension_fund_report_2025`.
 - **Rejected by validation:**
