@@ -2,7 +2,7 @@
 
 Collected on **21 October 2026** from <https://pensions.ge>. The Fund (საქართველოს საპენსიო ფონდი, formerly სსიპ საპენსიო სააგენტო) publishes its documents through `https://site-api.pensions.ge/api/v1/embedded-doc/get?slug=<slug>`, which returns the file's path under `https://site-api.pensions.ge/`. The thirteen files in `official/` are saved byte for byte under the names pensions.ge serves them with. Nothing here is edited by hand.
 
-The package feeds the funded pension page. It reads the originals once, offline. CI does not run `extract.py`; it checks the committed outputs against `source-manifest.json`.
+The package feeds the funded pension page. It reads the originals once, offline. CI does not run `extract.py`; `npm run data:check-social` checks the six served PDFs against `source-manifest.json` and the CSV against the SHA-256 that `validation-report.json` records for it, so a value edited by hand in the CSV fails.
 
 ## Files
 
@@ -13,7 +13,7 @@ The package feeds the funded pension page. It reads the originals once, offline.
 | `extract.py` | Reads the PDFs with poppler's `pdftotext` (layout text, plus word positions for the two charts), runs the checks and writes the two outputs below. Standard library only. |
 | `test_extract.py` | Regression tests: the fixture of all 99 values, the recorded differences, the failure cases and the committed outputs. |
 | `pension-fund-annual.csv` | The 99 served values, UTF-8 with BOM: `measure,year,value,unit,months,source_id,document,page,line`. Money is whole GEL (the printed thousands × 1,000, negative for a loss), counts are whole numbers, the return is as printed to one decimal. `page` is the PDF page and `line` the printed line label (the chart title for the 2025 report). |
-| `validation-report.json` | `passed`, `failures`, `rows` and the recorded `restatements` and `revisions`. |
+| `validation-report.json` | `passed`, `failures`, `rows`, the recorded `restatements` and `revisions`, and `csv_sha256`, the SHA-256 of the CSV written beside it. |
 
 ## What is served from where
 
@@ -46,8 +46,7 @@ The 2025 annual report's table of payout amounts appears to print 2023 in a diff
 - in every statement column, the increases less the decreases equal the printed net change, and the figures behind each total add up to it;
 - each year's opening net assets plus the net change equal its closing net assets, and a year's closing net assets are the next year's opening net assets in every statement that prints both;
 - the members' balance rolls forward in the note (opening plus every line down to closing);
-- the served value equals the same year's value in that year's own statement, except recorded restatements (own statements as text exist for 2019, 2020, 2022, 2023, 2024 and 2025; 2020 and 2025 are the served ones);
-- the 2025 report's counts equal the earlier reports', except recorded revisions;
+- the served value is compared with the same year's value in that year's own statement (own statements as text exist for 2019, 2020, 2022, 2023, 2024 and 2025; 2020 and 2025 are the served ones), and the 2025 report's counts with the earlier reports'. A difference is not a failure: `extract.py` records it as a restatement or a revision in the report, and `test_extract.py` pins the recorded lists (`RECORDED_RESTATEMENTS`, `RECORDED_REVISIONS`), so a new one fails the tests until it is read by hand;
 - the 2025 return equals the report text, 11.8%; the rows of the people-paid table add up to its total row;
 - the ten anchor values of the design (savings, net assets, contributions, State contribution, 2022 securities loss, members, employers and the 2025 return), the 99 rows, and `source-manifest.json` against the files.
 

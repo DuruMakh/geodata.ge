@@ -496,6 +496,21 @@ test("a funded pension workbook in % of GDP is calculated, keeps the loss negati
   expect(model.sources.map(source => source.title)).toEqual(["pension_fund_ifrs_2023", "pension_fund_ifrs_2024", "pension_fund_ifrs_2025", "source.geostat_national_gdp_sna_2008"]);
 });
 
+test("a funded pension workbook writes every row as an item, the first of a heading included; Social payments keeps its total", async () => {
+  const savings = await topicWorkbook("funded-pension", "amount", ["social.funded_pension.savings.amount", "social.funded_pension.net_assets.amount"], 2019, 2025);
+  expect(savings.readable.rows.map(row => [row.kind, row.parentLabel, row.label])).toEqual([["item", "Savings, end of year", "social.funded_pension.savings.amount"], ["item", "Savings, end of year", "social.funded_pension.net_assets.amount"]]);
+  for (const ids of [["social.funded_pension.contributions.amount", "social.funded_pension.interest.amount"], ["social.funded_pension.members"], ["social.funded_pension.employers"], ["social.funded_pension.return"]]) {
+    expect((await topicWorkbook("funded-pension", "amount", ids, 2019, 2025)).readable.rows.map(row => row.kind), ids.join()).toEqual(ids.map(() => "item"));
+  }
+  const excel = await loadWorkbook(savings);
+  const sheet = excel.worksheets[0];
+  const rows = [3, 4, 5, 6, 7].map(index => sheet.getRow(index)).filter(row => String(row.getCell(1).value ?? "").includes("social.funded_pension"));
+  expect(rows).toHaveLength(2);
+  for (const row of rows) expect(row.border?.bottom?.style).not.toBe("medium");
+  const payments = await topicWorkbook("social-payments", "amount", ["social.payments.total.amount", "social.payments.pension.amount"], 2013, 2025);
+  expect(payments.readable.rows.map(row => row.kind)).toEqual(["total", "item"]);
+});
+
 test("an SSA workbook's Sources sheet never lists the Pension Fund documents, even when they are offered", async () => {
   const offered = [...SSA_SOURCES, ...PENSION_FUND_SOURCES];
   const model = await buildSocialWorkbookExportModel({

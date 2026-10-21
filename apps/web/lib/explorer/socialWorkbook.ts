@@ -3,7 +3,7 @@ import type { Presentation } from "../i18n/types";
 import { message } from "../i18n/messages";
 import { workbookMessage } from "../i18n/workbook";
 import { educationFullLabel } from "./education";
-import { buildSocialModel, socialTopicFacts, type SocialModel, type SocialPlaceSet, type SocialState, type SocialTopicId, type SocialUnit } from "./social";
+import { buildSocialModel, isSocialTotal, socialTopicFacts, type SocialModel, type SocialPlaceSet, type SocialState, type SocialTopicId, type SocialUnit } from "./social";
 import { buildSocialPlaceModel, socialPlaceFacts, type SocialPlaceExtras } from "./socialPlaces";
 import type { ClientNationalGdpFact } from "./clientData";
 import type { TopicState } from "./topicSeries";
@@ -102,7 +102,7 @@ export function buildSocialWorkbookExportModel(input: SocialWorkbookInput, prese
       rows: model.selected.map(series => {
         const values = Object.fromEntries(model.years.map(year => [year, valueOf(series, series.valuesByYear[year])]));
         return {
-          kind: series.reference ? "total" : "item", parentLabel: headingOf(series), label: labels[series.id], change: null, valuesByYear: values,
+          kind: isSocialTotal(series) ? "total" : "item", parentLabel: headingOf(series), label: labels[series.id], change: null, valuesByYear: values,
           basisByYear: Object.fromEntries(model.years.map(year => [year, values[year] === null ? null : "actual"])),
         };
       }),

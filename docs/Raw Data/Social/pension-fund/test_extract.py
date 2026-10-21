@@ -196,10 +196,14 @@ class CommittedOutputs(unittest.TestCase):
 
     def test_report_says_passed(self):
         report = json.loads((ROOT / 'validation-report.json').read_text(encoding='utf-8'))
-        self.assertEqual(list(report), ['passed', 'failures', 'rows', 'restatements', 'revisions'])
+        self.assertEqual(list(report), ['passed', 'failures', 'rows', 'restatements', 'revisions', 'csv_sha256'])
         self.assertIs(report['passed'], True)
         self.assertEqual(report['failures'], [])
         self.assertEqual(report['rows'], 99)
+
+    def test_report_names_the_csv_it_was_written_with(self):
+        report = json.loads((ROOT / 'validation-report.json').read_text(encoding='utf-8'))
+        self.assertEqual(report['csv_sha256'], extract.sha256_of(ROOT / 'pension-fund-annual.csv'))
 
     def test_manifest_matches_the_files(self):
         manifest = json.loads((ROOT / 'source-manifest.json').read_text(encoding='utf-8'))

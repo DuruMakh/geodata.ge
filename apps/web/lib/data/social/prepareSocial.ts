@@ -130,8 +130,10 @@ async function readFundedPension(repositoryRoot: string): Promise<SocialFact[]> 
     if (!served.some(source => source.source_id === row.source_id && source.document === row.document)) throw new Error(`Pension fund document not in the source manifest: ${row.document}`);
   }
   for (const source of served) await readVerifiedPackageFile(directory, source.local_file, source, `Social source capture mismatch: ${source.document}`);
-  const report = JSON.parse(await fs.readFile(path.join(directory, "validation-report.json"), "utf8")) as { passed: boolean; failures: unknown[]; rows: number };
+  const report = JSON.parse(await fs.readFile(path.join(directory, "validation-report.json"), "utf8")) as { passed: boolean; failures: unknown[]; rows: number; csv_sha256: string };
   if (report.passed !== true || report.failures.length !== 0 || report.rows !== FUNDED_ROWS) throw new Error("Pension fund research package validation has not passed");
+  // The report names the CSV `extract.py` wrote beside it, so a value edited by hand in the CSV is caught here.
+  if (createHash("sha256").update(await fs.readFile(file)).digest("hex") !== report.csv_sha256) throw new Error("Social source capture mismatch: pension-fund-annual.csv");
   return rows.map(row => {
     const indicatorId = (FUNDED_PENSION_MONEY as readonly string[]).includes(row.measure) ? `social.funded_pension.${row.measure}.amount`
       : [...FUNDED_PENSION_COUNTS, "return"].includes(row.measure) ? `social.funded_pension.${row.measure}` : null;

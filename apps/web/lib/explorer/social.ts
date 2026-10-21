@@ -29,7 +29,9 @@ export type SocialHeading = "money" | "pensioners" | "share" | "average" | "fami
  * A listed row. A calculated row's id is its base indicator plus `#share` (per 100 residents) or `#real` (at 2025 prices),
  * so a hash naming it stays stable.
  */
-export type SocialSeriesDefinition = { id: string; reference: boolean; heading: SocialHeading; calculated?: "share" | "real" };
+export type SocialSeriesDefinition = { id: string; reference: boolean; total?: boolean; heading: SocialHeading; calculated?: "share" | "real" };
+/** Whether a row is styled as its table's total: its heading's reference, unless the page says the reference sums nothing (`total: false`, the funded pension's). */
+export const isSocialTotal = (series: { reference: boolean; total?: boolean }): boolean => series.total ?? series.reference;
 /** How a page shows a value: money in million GEL (or % of GDP), averages in GEL a month, shares in %, counts as they are, a fund's return in %. */
 export type SocialUnit = "persons" | "families" | "employers" | "gel_million" | "gel" | "percent" | "return";
 /** A value as a page shows it: a served fact, or one calculated from it (whose id carries the `#` suffix). */
@@ -42,19 +44,21 @@ export const socialRows = (heading: SocialHeading, ids: readonly string[], refer
 const FUNDED = "social.funded_pension.";
 const fundedMoneyIds = (measures: readonly string[]) => measures.map(measure => `${FUNDED}${measure}.amount`);
 const FUNDED_FLOWS = FUNDED_PENSION_MONEY.slice(2);
+/** A funded pension heading's first row keeps its ink, but none of its rows is a total: "Total fund assets" does not sum "In members' accounts". */
+const fundedRows = (heading: SocialHeading, ids: readonly string[]): SocialSeriesDefinition[] => socialRows(heading, ids, true).map(row => ({ ...row, total: false }));
 
 /**
  * The series a topic page lists: Social payments' total and its 18 programmes in spec order; Social package's 10 groups under each
- * of its three headings; the funded pension's savings, flows, members, employers and return (the first row of each heading the reference).
+ * of its three headings; the funded pension's savings, flows, members, employers and return (the first row of each heading the ink reference, none of them a total).
  */
 export function socialTopicSeries(section: SocialTopicId): SocialSeriesDefinition[] {
   if (section === "funded-pension") {
     return [
-      ...socialRows("savings", fundedMoneyIds(FUNDED_PENSION_MONEY.slice(0, 2)), true),
-      ...socialRows("flows", fundedMoneyIds(FUNDED_FLOWS), true),
-      ...socialRows("members", FUNDED_PENSION_COUNTS.slice(0, 3).map(measure => `${FUNDED}${measure}`), true),
-      ...socialRows("employers", [`${FUNDED}employers`], true),
-      ...socialRows("return", [`${FUNDED}return`], true),
+      ...fundedRows("savings", fundedMoneyIds(FUNDED_PENSION_MONEY.slice(0, 2))),
+      ...fundedRows("flows", fundedMoneyIds(FUNDED_FLOWS)),
+      ...fundedRows("members", FUNDED_PENSION_COUNTS.slice(0, 3).map(measure => `${FUNDED}${measure}`)),
+      ...fundedRows("employers", [`${FUNDED}employers`]),
+      ...fundedRows("return", [`${FUNDED}return`]),
     ];
   }
   if (section === "social-payments") return socialRows("money", ["social.payments.total.amount", ...SOCIAL_PAYMENT_PROGRAMMES.map(programme => `social.payments.${programme}.amount`)], true);

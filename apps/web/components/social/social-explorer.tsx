@@ -9,7 +9,7 @@ import { educationFullLabel } from "../../lib/explorer/education";
 import { formatInUnit, type ValueUnit } from "../../lib/explorer/format";
 import { rangeFromPatch } from "../../lib/explorer/periodRange";
 import {
-  buildSocialModel, changeSocialSelection, changeSocialView, parseSocialHash, serializeSocialHash, socialCoverage, socialTopicList, socialViews,
+  buildSocialModel, changeSocialSelection, changeSocialView, isSocialTotal, parseSocialHash, serializeSocialHash, socialCoverage, socialTopicList, socialViews,
   type SocialPayView, type SocialState, type SocialTopicId,
 } from "../../lib/explorer/social";
 import { buildSocialWorkbookExportModel, SOCIAL_UNIT_KEYS } from "../../lib/explorer/socialWorkbook";
@@ -80,7 +80,7 @@ export function SocialExplorer({ section, facts, gdpFacts, gdpSources, breaks, l
   const partialMark = (months: Record<number, number>) => Object.fromEntries(Object.entries(months).map(([year, n]) => [year, t("months.partial", { n })]));
   const rows = model.selected.map(series => ({ itemId: series.id, kaLabel: fullLabel(series), color: series.color, valuesByYear: series.valuesByYear, markByYear: partialMark(series.partialMonths) }));
   const lineSeries = model.selected.map(series => ({ id: series.id, label: fullLabel(series), color: series.color, vals: model.years.map(year => series.valuesByYear[year]) }));
-  const reference = model.series.find(series => series.reference);
+  const reference = model.series.find(isSocialTotal);
   const total = rows.find(row => row.itemId === reference?.id) ?? null;
   const title = t(`page.${section}.title`);
   const chartLabel = `${title} · ${headingLabels[model.heading]}`;

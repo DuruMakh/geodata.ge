@@ -49,6 +49,19 @@ describe("the funded pension page", () => {
     expect(headings).toEqual(["Savings, end of year · % of GDP", "Money in and out · % of GDP", "Members", "Employers", "Return · %"]);
   });
 
+  it("styles no row of the table as a total, while the payments table keeps its total row", async () => {
+    const FUNDED = "social.funded_pension.";
+    const totalRows = async (section: "funded-pension" | "social-payments", selectedIds: string[]) => {
+      address.hash = serializeSocialHash({ ...defaultSocialState(section), mode: "table", selectedIds }, section);
+      const html = renderPageMarkup("en", await renderSocialTopicPage("en", section));
+      return { table: html.includes('data-testid="explorer-table"'), totals: html.match(/<tr class="border-t-2 border-\[var\(--ink\)\]"/g)?.length ?? 0 };
+    };
+    // Total fund assets sums nothing the page lists, so it is a row like the others even with the heading's first row selected.
+    expect(await totalRows("funded-pension", [`${FUNDED}savings.amount`, `${FUNDED}net_assets.amount`])).toEqual({ table: true, totals: 0 });
+    expect(await totalRows("funded-pension", [`${FUNDED}contributions.amount`, `${FUNDED}interest.amount`])).toEqual({ table: true, totals: 0 });
+    expect(await totalRows("social-payments", ["social.payments.total.amount", "social.payments.pension.amount"])).toEqual({ table: true, totals: 1 });
+  });
+
   it("offers the % of GDP switch on the money headings only", async () => {
     const FUNDED = "social.funded_pension.";
     const switchOn = async (selectedIds: string[]) => {

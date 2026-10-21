@@ -75,6 +75,7 @@ Notes on the rows:
 - The Fund's annual reports split contributions into private and public sector only, with the state's 2% inside each. The page uses the audited statements, which show the state's 2% separately. The methodology page explains the difference.
 - "Gains or losses on securities" and "Dividends" start in 2022, the first year the statements print them. Before 2022 the fund held deposits only.
 - The table and Excel mark the members, employers and return rows as figures from the Fund's 2025 annual report, and the money rows as figures from the audited statements.
+  *Implementation note (2026-10-21): the Excel Sources sheet carries this, listing the documents the selected heading's figures come from; the table marks no row.*
 - The two savings rows are stocks at 31 December. "Money in and out" adds up flows during the year. The page never adds rows across headings.
 
 ## 4. Data foundation

@@ -408,6 +408,13 @@ test.each([
     const file = path.join(directory, "pension-fund-annual.csv");
     await fs.writeFile(file, (await fs.readFile(file, "utf8")).replace("pension_fund_ifrs_2020,2020-IFRS.pdf", "pension_fund_ifrs_2020,2022-IFRS-GE.pdf"));
   }, /Pension fund document not in the source manifest/],
+  // A value that no anchor, row count or document name guards: only the hash the package's report holds for the CSV catches it.
+  ["a package whose CSV has a hand-edited value", async (directory: string) => {
+    const file = path.join(directory, "pension-fund-annual.csv");
+    const text = await fs.readFile(file, "utf8");
+    expect(text).toContain("interest,2021,163741000,");
+    await fs.writeFile(file, text.replace("interest,2021,163741000,", "interest,2021,163741001,"));
+  }, /Social source capture mismatch: pension-fund-annual\.csv/],
 ])("prepare rejects %s", async (_name, change, message) => {
   await withFundedPackage(change, async repositoryRoot => {
     await expect(prepareSocialData(repositoryRoot, "check")).rejects.toThrow(message);

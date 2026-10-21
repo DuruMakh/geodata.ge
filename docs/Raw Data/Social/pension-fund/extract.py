@@ -579,7 +579,8 @@ def main(argv):
         return 1
     write_csv(analysis['rows'])
     write_json('validation-report.json', {'passed': True, 'failures': [], 'rows': len(analysis['rows']),
-                                          'restatements': analysis['restatements'], 'revisions': analysis['revisions']})
+                                          'restatements': analysis['restatements'], 'revisions': analysis['revisions'],
+                                          'csv_sha256': sha256_of(ROOT / 'pension-fund-annual.csv')})
     print(f'{len(analysis["rows"])} rows, {len(analysis["restatements"])} restatements, {len(analysis["revisions"])} revisions')
     return 0
 
