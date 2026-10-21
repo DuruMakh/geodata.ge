@@ -119,7 +119,7 @@ class MoneyBanksPackageTests(unittest.TestCase):
 
     def test_anchor_values(self):
         anchors = {('money.m3', 2025): '57680.2', ('loans.total', 2025): '72453.0', ('rates.policy', 2025): '8.00',
-                   ('banks.npl_ratio', 2025): '2.5', ('deposits.fx_share', 2025): '48.6', ('loans.fx_share', 2025): '41.9'}
+                   ('rates.loans_total', 2010): '18.56', ('banks.npl_ratio', 2025): '2.5', ('deposits.fx_share', 2025): '48.6', ('loans.fx_share', 2025): '41.9'}
         for (indicator, year), published in anchors.items():
             self.assertEqual(find(self.rows, indicator, year)['published_value'], published, indicator)
         with self.assertRaisesRegex(ValueError, 'anchor'):
@@ -130,9 +130,10 @@ class MoneyBanksPackageTests(unittest.TestCase):
         self.assertEqual(prepare.published('8.4499999999999993', 1), '8.5')
         self.assertEqual(prepare.published('8.4499999999999', 1), '8.4')
         self.assertEqual(find(self.rows, 'rates.deposits_gel', 2013)['value'], '8.4499999999999993')
-        self.assertEqual(find(self.rows, 'rates.deposits_gel', 2013)['published_value'], '8.5')
+        # Interest rates publish to two decimals, as NBG prints them.
+        self.assertEqual(find(self.rows, 'rates.deposits_gel', 2013)['published_value'], '8.45')
         self.assertEqual(find(self.rows, 'rates.deposits_fx', 2003)['value'], '8.9499999999999993')
-        self.assertEqual(find(self.rows, 'rates.deposits_fx', 2003)['published_value'], '9.0')
+        self.assertEqual(find(self.rows, 'rates.deposits_fx', 2003)['published_value'], '8.95')
 
     def test_exact_tokens(self):
         self.assertEqual(find(self.rows, 'money.m3', 2025)['value'], '57680.224000000002')

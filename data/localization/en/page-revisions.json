@@ -577,6 +577,8 @@
   "/methodology/environment": "2026-10-20",
   "/explorer/economy/expenditure": "2026-10-20",
   "/methodology/gdp-expenditure": "2026-10-20",
+  "/explorer/expenditure-types": "2026-10-21",
+  "/methodology/expenditure-types": "2026-10-21",
   "/explorer/transport": "2026-10-20",
   "/explorer/transport/vehicles": "2026-10-20",
   "/explorer/transport/vehicle-age": "2026-10-20",

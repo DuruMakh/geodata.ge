@@ -130,10 +130,10 @@ test.describe("Government Debt explorer", () => {
       [2018, "—"],
       [2019, "—"],
       [2020, "—"],
-      [2021, "0.9%"],
-      [2022, "2.2%"],
-      [2023, "3.4%"],
-      [2024, "3.1%"],
+      [2021, "0.95%"],
+      [2022, "2.23%"],
+      [2023, "3.40%"],
+      [2024, "3.12%"],
       [2025, "—"],
     ] as const;
     await expect(table.getByRole("columnheader")).toHaveText(["სერია", ...expectedByYear.map(([year]) => String(year))]);

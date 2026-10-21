@@ -559,9 +559,10 @@ export const REFERENCE_INTENTS: readonly ReferenceIntent[] = [
       orderedIds: ["71", "36", "68", "70", "69"],
       // public_total_gel / population_persons, straight from
       // municipal-total-facts-2015-2025.csv and municipal-population-2025.csv:
-      // 24,927,687.47/5,700 · 43,390,007.09/10,000 · 17,030,309.67/4,900 ·
-      // 16,867,830.42/5,100 · 30,336,411.59/10,600.
-      topValues: [4373.278503508772, 4339.000709, 3475.5734020408167, 3307.417729411765, 2861.925621698113],
+      // 24,927,687.47/5,671 · 43,390,007.09/9,972 · 17,030,309.67/4,927 ·
+      // 16,867,830.42/5,145 · 30,336,411.59/10,563 (Geostat's stored populations
+      // since 2026-10-13; before, the one-decimal display: 5,700 · 10,000 · 4,900 · 5,100 · 10,600).
+      topValues: [4395.642297654735, 4351.184024267951, 3456.5272315810844, 3278.489877551021, 2871.95035406608],
       unit: "GEL_per_resident",
       // All 64 served municipalities are eligible; the aggregate-only codes,
       // the regions and the country aggregate never enter the population.

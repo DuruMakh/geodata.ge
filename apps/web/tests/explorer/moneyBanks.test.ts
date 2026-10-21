@@ -183,7 +183,7 @@ test("the model carries lari amounts, gaps, signed values and per-series precisi
 
   const rates = buildMoneyBanksModel("interest-rates", facts, defaultMoneyBanksState("interest-rates"));
   expect(rates.series.find(s => s.id === "rates.policy")!.decimals).toBe(2);
-  expect(rates.series.find(s => s.id === "rates.loans_total")!.decimals).toBe(1);
+  expect(rates.series.find(s => s.id === "rates.loans_total")!.decimals).toBe(2);
 });
 
 // The money messages arrive with the page text, so these tests carry the few labels the workbook and hub cards read.
@@ -242,7 +242,7 @@ test("only the Money supply workbook styles its first series as a total", async 
   expect((await workbookFor("bank-health", "main", ["banks.npl_ratio", "banks.roa"], 2020, 2025)).readable.rows.map(row => row.kind)).toEqual(["item", "item"]);
 });
 
-test("the interest-rates workbook shows the National Bank rate to two decimals and the rest to one", async () => {
+test("the interest-rates workbook shows every interest rate to two decimals, as NBG prints them", async () => {
   const ids = ["rates.policy", "rates.loans_total"];
   const model = await workbookFor("interest-rates", "main", ids, 2020, 2025);
   expect(model.filename).toBe("fiscal-money-interest-rates-2020-2025-en.xlsx");
@@ -253,11 +253,11 @@ test("the interest-rates workbook shows the National Bank rate to two decimals a
     return [...new Set(model.readable.years.map((_, i) => row.getCell(i + 2).numFmt))];
   };
   expect(formats(excel.worksheets[0], "rates.policy")).toEqual(["0.00"]);
-  expect(formats(excel.worksheets[0], "rates.loans_total")).toEqual(["0.0"]);
+  expect(formats(excel.worksheets[0], "rates.loans_total")).toEqual(["0.00"]);
   const data = excel.worksheets[1];
   expect(data.getCell(2, 3).numFmt).toBe("0.00");
   expect(data.getCell(2, 2).value).toBe("rates.policy");
-  expect(data.getCell(3, 3).numFmt).toBe("0.0");
+  expect(data.getCell(3, 3).numFmt).toBe("0.00");
   expect(data.getCell(3, 2).value).toBe("rates.loans_total");
 });
 

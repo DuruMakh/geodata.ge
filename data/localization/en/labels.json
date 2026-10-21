@@ -1171,6 +1171,46 @@
     "text": "Total GDP",
     "reviewedAt": "2026-09-11"
   },
+  "spending_type.total": {
+    "text": "Total spending",
+    "reviewedAt": "2026-10-21"
+  },
+  "spending_type.expense": {
+    "text": "Total running costs",
+    "reviewedAt": "2026-10-21"
+  },
+  "spending_type.compensation": {
+    "text": "Wages and salaries",
+    "reviewedAt": "2026-10-21"
+  },
+  "spending_type.goods_services": {
+    "text": "Goods and services",
+    "reviewedAt": "2026-10-21"
+  },
+  "spending_type.interest": {
+    "text": "Interest",
+    "reviewedAt": "2026-10-21"
+  },
+  "spending_type.subsidies": {
+    "text": "Subsidies",
+    "reviewedAt": "2026-10-21"
+  },
+  "spending_type.grants": {
+    "text": "Grants",
+    "reviewedAt": "2026-10-21"
+  },
+  "spending_type.social_benefits": {
+    "text": "Social benefits",
+    "reviewedAt": "2026-10-21"
+  },
+  "spending_type.other": {
+    "text": "Other costs",
+    "reviewedAt": "2026-10-21"
+  },
+  "spending_type.investment": {
+    "text": "Buildings, roads and other assets",
+    "reviewedAt": "2026-10-21"
+  },
   "gdp_use.consumption": {
     "text": "Total consumption",
     "reviewedAt": "2026-10-20"

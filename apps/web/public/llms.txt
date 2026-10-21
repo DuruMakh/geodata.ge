@@ -11,6 +11,7 @@ Budget and GDP data are annual, so it does not provide sub-annual or live budget
 - [Fiscal.ge home](https://fiscal.ge/) — start with the site's scope and latest reviewed coverage.
 - [Budget explorer](https://fiscal.ge/explorer) — choose a dataset and compare the published series.
 - [National expenditure](https://fiscal.ge/explorer/expenditure) — annual state-budget expenditure.
+- [Spending by type](https://fiscal.ge/explorer/expenditure-types) — annual general-government spending by economic type: wages, goods and services, interest, subsidies, social benefits and investment, in GEL and as a share of GDP.
 - [National revenue](https://fiscal.ge/explorer/revenue) — annual consolidated-budget receipts.
 - [Annual analysis](https://fiscal.ge/explorer/analysis) — one-year budget analysis.
 - [Municipal budgets](https://fiscal.ge/explorer/municipalities) — annual municipal expenditure.
@@ -135,6 +136,7 @@ Budget and GDP data are annual, so it does not provide sub-annual or live budget
 
 - [Methodology hub](https://fiscal.ge/methodology) — how the reviewed public data is prepared and presented.
 - [Expenditure methodology](https://fiscal.ge/methodology/expenditure) — national-expenditure sources and processing.
+- [Spending by type methodology](https://fiscal.ge/methodology/expenditure-types) — the general-government perimeter, why the Ministry of Finance's GFSM 2001 file is used, GDP shares and the original file.
 - [Revenue methodology](https://fiscal.ge/methodology/revenue) — national-revenue sources and processing.
 - [Municipal methodology](https://fiscal.ge/methodology/municipalities) — municipal-expenditure sources and processing.
 - [Government debt methodology](https://fiscal.ge/methodology/debt) — debt stock, principal and interest payments, the portfolio's average interest rates and original sources.

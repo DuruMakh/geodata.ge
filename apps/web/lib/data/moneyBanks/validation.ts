@@ -49,9 +49,9 @@ export function expectedMoneyBanksKeys(): Set<string> {
   return keys;
 }
 
-/** The National Bank rate is shown with two decimals, every other value with one. */
+/** Interest rates are shown with two decimals, as NBG prints them; every other value with one. */
 export function moneyBanksDisplayDecimals(indicatorId: string): 1 | 2 {
-  return indicatorId === "rates.policy" ? 2 : 1;
+  return indicatorId.startsWith("rates.") ? 2 : 1;
 }
 
 export function validateMoneyBanksFacts(facts: readonly MoneyBanksFact[]): void {

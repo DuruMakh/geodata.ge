@@ -2984,6 +2984,21 @@
     },
     "documentLanguage": "en"
   },
+  "source.mof_gfs_general_government_2002_2025": {
+    "title": {
+      "text": "Ministry of Finance of Georgia general government operations (GFSM 2001), 2002–2025",
+      "reviewedAt": "2026-10-21"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-10-21"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-10-21"
+    },
+    "documentLanguage": "en"
+  },
   "source.geostat_gdp_use_current": {
     "title": {
       "text": "Geostat GDP by categories of use at current prices",

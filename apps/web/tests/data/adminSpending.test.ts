@@ -624,6 +624,24 @@ describe("admin spending facts", () => {
     }
   }, 30_000);
 
+  it("books the High Council of Justice and the other independent bodies in other costs, not in a ministry", () => {
+    const categoryByYear = (year: number) => {
+      const facts = allFacts().filter((fact) => fact.level === "admin_category" && fact.year === year);
+      return Object.fromEntries(facts.map((fact) => [fact.itemId, fact.amountGel]));
+    };
+    // Ministry of Justice alone (2024: 431,366,249 shown before = MoJ + Council 6,327,421).
+    expect(categoryByYear(2024)["admin_spending.justice"]).toBe(425_038_828);
+    expect(categoryByYear(2025)["admin_spending.justice"]).toBe(406_958_300);
+    // Education without the International Education Center (5,144,800 in 2015).
+    expect(categoryByYear(2015)["admin_spending.education_science_youth"]).toBe(824_657_500);
+    for (const row of officialRows()) {
+      const label = row.institutionLabelKa ?? "";
+      if (/იუსტიციის უმაღლესი საბჭო|განათლების საერთაშორისო ცენტრი|მეურნეობის მეცნიერებათა აკადემია|ლუგარის/.test(label)) {
+        expect(classifyAdminSpendingCategory(row), `${row.year} ${row.code} ${label}`).toBe("admin_spending.other_costs");
+      }
+    }
+  }, 30_000);
+
   it("does not merge unrelated programs that reused the same official code", () => {
     const rows = [
       officialRow(2018, "27 02", "probation system", 160_000, {

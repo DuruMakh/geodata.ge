@@ -1,7 +1,12 @@
 import { describe, expect, it } from "vitest";
+import { readCsvRecords } from "../../lib/data/csv";
+import { GOVERNMENT_DEBT_REVIEWED_RATE_SOURCE_IDS } from "../../lib/data/governmentDebt/types";
 import {
   buildDebtDeck,
   buildDebtExplorerModel,
+  DEBT_RATE_SOURCE_DECIMALS,
+  debtRateDecimals,
+  formatDebtRate,
   getDefaultDebtSelection,
   selectDebtSeries,
 } from "../../lib/explorer/debtExplorer";
@@ -116,6 +121,42 @@ describe("Government Debt explorer model", () => {
 
     expect(model.points[0]).toEqual(expect.objectContaining({ value: null, status: "not_available" }));
     expect(model.tableRows[0]?.valuesByYear[2025]).toBeNull();
+  });
+});
+
+describe("interest-rate precision", () => {
+  it("takes each rate's decimals from what its source prints", () => {
+    // Chart labels in the monthly report and the 2019-2021 strategy print one decimal; the later strategy tables two.
+    expect(debtRateDecimals("source.mof_monthly_debt_report_2026_07")).toBe(1);
+    expect(debtRateDecimals("mof_debt_strategy_2019_2021")).toBe(1);
+    expect(debtRateDecimals("source.mof_debt_strategy_2022_2025")).toBe(2);
+    expect(debtRateDecimals("source.mof_debt_strategy_2023_2026")).toBe(2);
+    expect(debtRateDecimals("mof_debt_strategy_2025_2029")).toBe(2);
+    // Every reviewed rate source states its precision; none falls back to the one-decimal default.
+    expect(Object.keys(DEBT_RATE_SOURCE_DECIMALS).sort()).toEqual([...GOVERNMENT_DEBT_REVIEWED_RATE_SOURCE_IDS].sort());
+  });
+
+  it("formats a rate as printed: 3.1% stays 3.1%, 9.20% keeps its zero, 0.95% is not rounded away", () => {
+    const facts = [
+      { year: 2015, family: "rate", seriesId: "debt.rate.total", value: 3.1, valueKind: "percent", status: "actual", sourceId: "source.mof_monthly_debt_report_2026_07" },
+      { year: 2018, family: "rate", seriesId: "debt.rate.domestic", value: 8.3, valueKind: "percent", status: "actual", sourceId: "source.mof_debt_strategy_2019_2021" },
+      { year: 2022, family: "rate", seriesId: "debt.rate.domestic", value: 9.2, valueKind: "percent", status: "actual", sourceId: "source.mof_debt_strategy_2023_2026" },
+      { year: 2021, family: "rate", seriesId: "debt.rate.external", value: 0.95, valueKind: "percent", status: "actual", sourceId: "source.mof_debt_strategy_2023_2026" },
+    ] as const;
+    const format = formatDebtRate(facts);
+    expect(format(3.1, "debt.rate.total", 2015)).toBe("3.1%");
+    expect(format(8.3, "debt.rate.domestic", 2018)).toBe("8.3%");
+    expect(format(9.2, "debt.rate.domestic", 2022)).toBe("9.20%");
+    expect(format(0.95, "debt.rate.external", 2021)).toBe("0.95%");
+  });
+
+  it("never truncates a served rate: each value has no more decimals than its source prints", async () => {
+    const rows = await readCsvRecords("../../data/imports/government-debt-facts-2013-2030.csv");
+    const rates = rows.filter((row) => row.family === "rate" && row.value !== "");
+    expect(rates.length).toBe(22);
+    for (const row of rates) {
+      expect((row.value.split(".")[1] ?? "").length, `${row.series_id} ${row.year}`).toBeLessThanOrEqual(debtRateDecimals(row.source_id));
+    }
   });
 });
 

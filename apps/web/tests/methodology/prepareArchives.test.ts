@@ -118,6 +118,7 @@ async function createFixtureRepository() {
     ],
     "economic-sectors": [await writeReviewedSource(repositoryRoot,"economic-sectors","2011-2025","docs/Raw Data/Economy/economic-sectors/sources/growth.xlsx","downloads/methodology/economic-sectors/files/growth.xlsx","sector-growth")],
     "gdp-expenditure": [await writeReviewedSource(repositoryRoot,"gdp-expenditure","2010-2025","docs/Raw Data/Economy/gdp-expenditure/sources/08_GDP-by-use-categories.xlsx","downloads/methodology/gdp-expenditure/files/08_gdp-by-use-categories.xlsx","gdp-use-current")],
+    "expenditure-types": [await writeReviewedSource(repositoryRoot,"expenditure-types","2002-2025","docs/Raw Data/Budget/expenditure-types/sources/general20022025.xlsx","downloads/methodology/expenditure-types/files/general20022025.xlsx","mof-general-government")],
     "regional-economies": [
       await writeReviewedSource(repositoryRoot, "regional-economies", "2010-2024", "docs/Raw Data/Economy/regional-economies/sources/regional-GDP-by-activities-ENG.xlsx", "downloads/methodology/regional-economies/files/regional-gdp-by-activities-eng.xlsx", "regional-activities"),
       await writeReviewedSource(repositoryRoot, "regional-economies", "2010-2024", "docs/Raw Data/Municipalities/geostat-population-regional-gdp/official/regional-GDP-ENG.xlsx", "downloads/methodology/regional-economies/files/regional-gdp-eng.xlsx", "regional-totals"),

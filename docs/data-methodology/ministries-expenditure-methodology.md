@@ -127,7 +127,8 @@ display-only.
 
 `classifyAdminSpendingCategory(row)` routes a leaf by matching keyword fragments against the row's
 **institution label** (`institutionLabelKa`), in a fixed cascade. Two structural rules run first
-(debt-service and state-wide payments), then backfill-era rules, then a program-level Sport/Culture
+(debt-service and state-wide payments), then an explicit list of independent bodies whose names
+carry a ministry keyword (§6.10), then backfill-era rules, then a program-level Sport/Culture
 split for the combined-ministry years, then the modern ministry cascade. **The final,
 unconditional fallback is `other_costs`** — no row is ever dropped or left unclassified (a v1
 requirement). Because the classifier keys on institution *labels*, and labels change spelling
@@ -346,6 +347,25 @@ are constitutionally independent — Prosecutor's Office (independent since 2018
 courts, State Security Service, Public Broadcaster — and the state-wide transfers/reserves buckets
 also sit in `other_costs`, consistent with the 2017–2025 baseline. This is why `other_costs` is
 visibly larger before 2017. No genuine functional ministry is hidden there (validated §8).
+
+Four independent bodies have official names that contain a ministry keyword, so the keyword
+cascade would book them to that ministry. An explicit exclusion list
+(`INDEPENDENT_BODIES_WITH_MINISTRY_KEYWORDS` in `categories.ts`) runs before the keyword rules and
+sends them to `other_costs` with the courts, the Prosecutor's Office and the Academy of Sciences:
+
+| Body (official code) | Keyword it carries | Years with spending | Actual moved to Other costs |
+|---|---|---|---|
+| High Council of Justice — საქართველოს იუსტიციის უმაღლესი საბჭო (10 00) | Justice | 2004–2025 | GEL 0.60 mln (2005) to 6.85 mln (2025); 59.94 mln in all |
+| International Education Center — სსიპ განათლების საერთაშორისო ცენტრი (61 00, 58 00) | Education | 2015, 2016 (2014 row is zero) | 5.14 mln, 5.95 mln |
+| Academy of Agricultural Sciences — საქართველოს სოფლის მეურნეობის მეცნიერებათა აკადემია (38 00) | Agriculture | 2004 | 2.89 mln |
+| Lugar Public Health Research Center — რიჩარდ გ. ლუგარის საზოგადოებრივი ჯანმრთელობის კვლევითი ცენტრი (48 00, 63 00) | Health | 2012, 2013 (2014 row is zero) | 0.95 mln, 0.55 mln |
+
+Until 2026-10-13 these four were booked to Justice, Education, Environment & agriculture and
+Health; for example Justice 2024 showed 431.37 mln instead of the Ministry's 425.04 mln. Moving
+them changes no year's total. The 2004 review file
+(`admin-spending-institution-review-2004.csv`, codes 10 00 and 38 00) records the same mapping.
+The two state departments of 2004–2009 (Sport, Youth Affairs) are government departments, not
+independent bodies, and stay in Sport and Education (§6.3, §6.5).
 
 ### 6.11 2004 — complete state-budget administrative inclusion
 The canonical `2004-annual-execution-annex.pdf` organizational table is pages 2–231 (SHA-256

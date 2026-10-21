@@ -4,13 +4,13 @@ year,item_id,parent_item_id,level,amount_gel,basis,source_id,official_code,offic
 2004,admin_spending.defence,,admin_category,172009000,actual,source.mof_2004_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
 2004,admin_spending.economy_sustainable_development,,admin_category,248501200,actual,source.mof_2004_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
 2004,admin_spending.education_science_youth,,admin_category,67676700,actual,source.mof_2004_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
-2004,admin_spending.environment_agriculture,,admin_category,76706200,actual,source.mof_2004_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
+2004,admin_spending.environment_agriculture,,admin_category,73818800,actual,source.mof_2004_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
 2004,admin_spending.finance,,admin_category,79007600,actual,source.mof_2004_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
 2004,admin_spending.foreign_affairs,,admin_category,36959400,actual,source.mof_2004_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
 2004,admin_spending.health_social_affairs,,admin_category,478506500,actual,source.mof_2004_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
 2004,admin_spending.internal_affairs,,admin_category,150182500,actual,source.mof_2004_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
-2004,admin_spending.justice,,admin_category,22559100,actual,source.mof_2004_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
-2004,admin_spending.other_costs,,admin_category,277845400,actual,source.mof_2004_programmatic_fact_actual,,,,,medium,Aggregated from official tavi 6 leaf rows by administrative owner.
+2004,admin_spending.justice,,admin_category,21935600,actual,source.mof_2004_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
+2004,admin_spending.other_costs,,admin_category,281356300,actual,source.mof_2004_programmatic_fact_actual,,,,,medium,Aggregated from official tavi 6 leaf rows by administrative owner.
 2004,admin_spending.sport,,admin_category,6866000,actual,source.mof_2004_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
 2005,admin_spending.culture,,admin_category,24630200,actual,source.mof_2005_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
 2005,admin_spending.debt_service,,admin_category,282040400,actual,source.mof_2005_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
@@ -22,8 +22,8 @@ year,item_id,parent_item_id,level,amount_gel,basis,source_id,official_code,offic
 2005,admin_spending.foreign_affairs,,admin_category,33115300,actual,source.mof_2005_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
 2005,admin_spending.health_social_affairs,,admin_category,693674400,actual,source.mof_2005_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
 2005,admin_spending.internal_affairs,,admin_category,182161700,actual,source.mof_2005_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
-2005,admin_spending.justice,,admin_category,50482800,actual,source.mof_2005_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
-2005,admin_spending.other_costs,,admin_category,309372700,actual,source.mof_2005_programmatic_fact_actual,,,,,medium,Aggregated from official tavi 6 leaf rows by administrative owner.
+2005,admin_spending.justice,,admin_category,49883700,actual,source.mof_2005_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
+2005,admin_spending.other_costs,,admin_category,309971800,actual,source.mof_2005_programmatic_fact_actual,,,,,medium,Aggregated from official tavi 6 leaf rows by administrative owner.
 2005,admin_spending.sport,,admin_category,6915100,actual,source.mof_2005_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
 2006,admin_spending.culture,,admin_category,48982000,actual,source.mof_2006_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
 2006,admin_spending.debt_service,,admin_category,334908600,actual,source.mof_2006_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
@@ -35,8 +35,8 @@ year,item_id,parent_item_id,level,amount_gel,basis,source_id,official_code,offic
 2006,admin_spending.foreign_affairs,,admin_category,43858900,actual,source.mof_2006_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
 2006,admin_spending.health_social_affairs,,admin_category,825657500,actual,source.mof_2006_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
 2006,admin_spending.internal_affairs,,admin_category,277702100,actual,source.mof_2006_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
-2006,admin_spending.justice,,admin_category,78623500,actual,source.mof_2006_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
-2006,admin_spending.other_costs,,admin_category,511195200,actual,source.mof_2006_programmatic_fact_actual,,,,,medium,Aggregated from official tavi 6 leaf rows by administrative owner.
+2006,admin_spending.justice,,admin_category,77640200,actual,source.mof_2006_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
+2006,admin_spending.other_costs,,admin_category,512178500,actual,source.mof_2006_programmatic_fact_actual,,,,,medium,Aggregated from official tavi 6 leaf rows by administrative owner.
 2006,admin_spending.sport,,admin_category,4705300,actual,source.mof_2006_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
 2006,admin_program.09_01.f5bec61a,admin_spending.other_costs,major_program,26315500,actual,source.mof_2006_programmatic_fact_actual,09 02,საერთო სასამართლოები,09 00,საერთო სასამართლოები,medium,"Pre-2012 organizational line(s) joined to this modern program series (owner-approved 2026-07-07). 2006: 09 02 'common courts' (26,315.5k)."
 2006,admin_program.25_02.4cffd876,admin_spending.regional_development_infrastructure,major_program,181243000,actual,source.mof_2006_programmatic_fact_actual,26 14,საქართველოს საავტომობილო გზების დეპარტამენტი,26 00,საქართველოს ეკონომიკური განვითარების სამინისტრო,medium,"Pre-2012 organizational line(s) joined to this modern program series (owner-approved 2026-07-07). 2006: 26 14 Roads Department (181,243.0k) under the Economic Development ministry; the report narrative confirms transport spending of 181.2M."
@@ -56,8 +56,8 @@ year,item_id,parent_item_id,level,amount_gel,basis,source_id,official_code,offic
 2007,admin_spending.foreign_affairs,,admin_category,58104900,actual,source.mof_2007_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
 2007,admin_spending.health_social_affairs,,admin_category,1028783100,actual,source.mof_2007_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
 2007,admin_spending.internal_affairs,,admin_category,470414600,actual,source.mof_2007_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
-2007,admin_spending.justice,,admin_category,140818300,actual,source.mof_2007_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
-2007,admin_spending.other_costs,,admin_category,493554400,actual,source.mof_2007_programmatic_fact_actual,,,,,medium,Aggregated from official tavi 6 leaf rows by administrative owner.
+2007,admin_spending.justice,,admin_category,139857100,actual,source.mof_2007_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
+2007,admin_spending.other_costs,,admin_category,494515600,actual,source.mof_2007_programmatic_fact_actual,,,,,medium,Aggregated from official tavi 6 leaf rows by administrative owner.
 2007,admin_spending.sport,,admin_category,8682600,actual,source.mof_2007_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
 2007,admin_program.09_01.f5bec61a,admin_spending.other_costs,major_program,28530500,actual,source.mof_2007_programmatic_fact_actual,09 02,საერთო სასამართლოები,09 00,საერთო სასამართლოები,medium,"Pre-2012 organizational line(s) joined to this modern program series (owner-approved 2026-07-07). 2007: 09 02 (28,530.5k)."
 2007,admin_program.25_02.4cffd876,admin_spending.regional_development_infrastructure,major_program,277086600,actual,source.mof_2007_programmatic_fact_actual,26 14,საგზაო ინფრასტრუქტურის გაუმჯობესების ღონისძიებები,26 00,საქართველოს ეკონომიკური განვითარების სამინისტრო,medium,"Pre-2012 organizational line(s) joined to this modern program series (owner-approved 2026-07-07). 2007: 26 14 (277,086.6k) under the Economic Development ministry, identical label to the modern series."
@@ -77,8 +77,8 @@ year,item_id,parent_item_id,level,amount_gel,basis,source_id,official_code,offic
 2008,admin_spending.foreign_affairs,,admin_category,57177500,actual,source.mof_2008_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
 2008,admin_spending.health_social_affairs,,admin_category,1415151200,actual,source.mof_2008_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
 2008,admin_spending.internal_affairs,,admin_category,739264800,actual,source.mof_2008_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
-2008,admin_spending.justice,,admin_category,155186000,actual,source.mof_2008_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
-2008,admin_spending.other_costs,,admin_category,1383229000,actual,source.mof_2008_programmatic_fact_actual,,,,,medium,Aggregated from official tavi 6 leaf rows by administrative owner.
+2008,admin_spending.justice,,admin_category,154127400,actual,source.mof_2008_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
+2008,admin_spending.other_costs,,admin_category,1384287600,actual,source.mof_2008_programmatic_fact_actual,,,,,medium,Aggregated from official tavi 6 leaf rows by administrative owner.
 2008,admin_spending.sport,,admin_category,15125800,actual,source.mof_2008_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
 2008,admin_program.09_01.f5bec61a,admin_spending.other_costs,major_program,32689900,actual,source.mof_2008_programmatic_fact_actual,09 02,საერთო სასამართლოები,09 00,საერთო სასამართლოები,medium,"Pre-2012 organizational line(s) joined to this modern program series (owner-approved 2026-07-07). 2008: 09 02 'common courts' (32,689.9k); the modern series' code is 09 01."
 2008,admin_program.25_02.4cffd876,admin_spending.regional_development_infrastructure,major_program,272337100,actual,source.mof_2008_programmatic_fact_actual,26 11,საგზაო ინფრასტრუქტურის გაუმჯობესების ღონისძიებები,26 00,საქართველოს ეკონომიკური განვითარების სამინისტრო,medium,"Pre-2012 organizational line(s) joined to this modern program series (owner-approved 2026-07-07). 2008: 26 11 (272,337.1k) under the Economic Development ministry, which ran roads before the Regional Development ministry existed."
@@ -98,8 +98,8 @@ year,item_id,parent_item_id,level,amount_gel,basis,source_id,official_code,offic
 2009,admin_spending.foreign_affairs,,admin_category,66104700,actual,source.mof_2009_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
 2009,admin_spending.health_social_affairs,,admin_category,1570043200,actual,source.mof_2009_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
 2009,admin_spending.internal_affairs,,admin_category,573373200,actual,source.mof_2009_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
-2009,admin_spending.justice,,admin_category,191248700,actual,source.mof_2009_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
-2009,admin_spending.other_costs,,admin_category,1690041100,actual,source.mof_2009_programmatic_fact_actual,,,,,medium,Aggregated from official tavi 6 leaf rows by administrative owner.
+2009,admin_spending.justice,,admin_category,190165900,actual,source.mof_2009_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
+2009,admin_spending.other_costs,,admin_category,1691123900,actual,source.mof_2009_programmatic_fact_actual,,,,,medium,Aggregated from official tavi 6 leaf rows by administrative owner.
 2009,admin_spending.regional_development_infrastructure,,admin_category,519445400,actual,source.mof_2009_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
 2009,admin_spending.sport,,admin_category,11784000,actual,source.mof_2009_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
 2009,admin_program.09_01.f5bec61a,admin_spending.other_costs,major_program,35195800,actual,source.mof_2009_programmatic_fact_actual,09 02,საერთო სასამართლოები,09 00,საერთო სასამართლოები,medium,"Pre-2012 organizational line(s) joined to this modern program series (owner-approved 2026-07-07). 2009: 09 02 (35,195.8k)."
@@ -120,8 +120,8 @@ year,item_id,parent_item_id,level,amount_gel,basis,source_id,official_code,offic
 2010,admin_spending.foreign_affairs,,admin_category,67979500,actual,source.mof_2010_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
 2010,admin_spending.health_social_affairs,,admin_category,1646712000,actual,source.mof_2010_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
 2010,admin_spending.internal_affairs,,admin_category,549235700,actual,source.mof_2010_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
-2010,admin_spending.justice,,admin_category,183183800,actual,source.mof_2010_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
-2010,admin_spending.other_costs,,admin_category,1447530800,actual,source.mof_2010_programmatic_fact_actual,,,,,medium,Aggregated from official tavi 6 leaf rows by administrative owner.
+2010,admin_spending.justice,,admin_category,182196700,actual,source.mof_2010_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
+2010,admin_spending.other_costs,,admin_category,1448517900,actual,source.mof_2010_programmatic_fact_actual,,,,,medium,Aggregated from official tavi 6 leaf rows by administrative owner.
 2010,admin_spending.regional_development_infrastructure,,admin_category,716704500,actual,source.mof_2010_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
 2010,admin_spending.sport,,admin_category,42042200,actual,source.mof_2010_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
 2010,admin_program.09_01.f5bec61a,admin_spending.other_costs,major_program,30609400,actual,source.mof_2010_programmatic_fact_actual,09 02,საერთო სასამართლოები,09 00,საერთო სასამართლოები,medium,"Pre-2012 organizational line(s) joined to this modern program series (owner-approved 2026-07-07). 2010: 09 02 (30,609.4k)."
@@ -143,8 +143,8 @@ year,item_id,parent_item_id,level,amount_gel,basis,source_id,official_code,offic
 2011,admin_spending.foreign_affairs,,admin_category,74628900,actual,source.mof_2011_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
 2011,admin_spending.health_social_affairs,,admin_category,1710427200,actual,source.mof_2011_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
 2011,admin_spending.internal_affairs,,admin_category,567423900,actual,source.mof_2011_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
-2011,admin_spending.justice,,admin_category,243374600,actual,source.mof_2011_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
-2011,admin_spending.other_costs,,admin_category,1490928100,actual,source.mof_2011_programmatic_fact_actual,,,,,medium,Aggregated from official tavi 6 leaf rows by administrative owner.
+2011,admin_spending.justice,,admin_category,242321900,actual,source.mof_2011_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
+2011,admin_spending.other_costs,,admin_category,1491980800,actual,source.mof_2011_programmatic_fact_actual,,,,,medium,Aggregated from official tavi 6 leaf rows by administrative owner.
 2011,admin_spending.regional_development_infrastructure,,admin_category,834568500,actual,source.mof_2011_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
 2011,admin_spending.sport,,admin_category,50288100,actual,source.mof_2011_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
 2011,admin_program.09_01.f5bec61a,admin_spending.other_costs,major_program,29885500,actual,source.mof_2011_programmatic_fact_actual,09 02,საერთო სასამართლოები,09 00,საერთო სასამართლოები,medium,"Pre-2012 organizational line(s) joined to this modern program series (owner-approved 2026-07-07). 2011: 09 02 (29,885.5k)."
@@ -164,10 +164,10 @@ year,item_id,parent_item_id,level,amount_gel,basis,source_id,official_code,offic
 2012,admin_spending.environment_agriculture,,admin_category,245191600,actual,source.mof_2012_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
 2012,admin_spending.finance,,admin_category,105215700,actual,source.mof_2012_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
 2012,admin_spending.foreign_affairs,,admin_category,83302500,actual,source.mof_2012_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
-2012,admin_spending.health_social_affairs,,admin_category,1832230100,actual,source.mof_2012_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
+2012,admin_spending.health_social_affairs,,admin_category,1831279300,actual,source.mof_2012_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
 2012,admin_spending.internal_affairs,,admin_category,584887900,actual,source.mof_2012_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
-2012,admin_spending.justice,,admin_category,194390400,actual,source.mof_2012_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
-2012,admin_spending.other_costs,,admin_category,1723553900,actual,source.mof_2012_programmatic_fact_actual,,,,,medium,Aggregated from official tavi 6 leaf rows by administrative owner.
+2012,admin_spending.justice,,admin_category,193331300,actual,source.mof_2012_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
+2012,admin_spending.other_costs,,admin_category,1725563800,actual,source.mof_2012_programmatic_fact_actual,,,,,medium,Aggregated from official tavi 6 leaf rows by administrative owner.
 2012,admin_spending.regional_development_infrastructure,,admin_category,655075100,actual,source.mof_2012_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
 2012,admin_spending.sport,,admin_category,72426500,actual,source.mof_2012_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
 2012,admin_program.09_01.f5bec61a,admin_spending.other_costs,major_program,35059300,actual,source.mof_2012_programmatic_fact_actual,09 01,საერთო სასამართლოების სისტემის განვითარება და ხელშეწყობა,09 00,საერთო სასამართლოები,medium,Official depth-2 program. Included because this source-code series reaches at least 100000000 GEL in one or more years.
@@ -200,10 +200,10 @@ year,item_id,parent_item_id,level,amount_gel,basis,source_id,official_code,offic
 2013,admin_spending.environment_agriculture,,admin_category,248030900,actual,source.mof_2013_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
 2013,admin_spending.finance,,admin_category,95922500,actual,source.mof_2013_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
 2013,admin_spending.foreign_affairs,,admin_category,76425000,actual,source.mof_2013_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
-2013,admin_spending.health_social_affairs,,admin_category,2174269400,actual,source.mof_2013_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
+2013,admin_spending.health_social_affairs,,admin_category,2173718700,actual,source.mof_2013_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
 2013,admin_spending.internal_affairs,,admin_category,585525900,actual,source.mof_2013_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
-2013,admin_spending.justice,,admin_category,237017100,actual,source.mof_2013_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
-2013,admin_spending.other_costs,,admin_category,1455146400,actual,source.mof_2013_programmatic_fact_actual,,,,,medium,Aggregated from official tavi 6 leaf rows by administrative owner.
+2013,admin_spending.justice,,admin_category,235544100,actual,source.mof_2013_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
+2013,admin_spending.other_costs,,admin_category,1457170100,actual,source.mof_2013_programmatic_fact_actual,,,,,medium,Aggregated from official tavi 6 leaf rows by administrative owner.
 2013,admin_spending.regional_development_infrastructure,,admin_category,798595100,actual,source.mof_2013_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
 2013,admin_spending.sport,,admin_category,66092900,actual,source.mof_2013_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
 2013,admin_program.09_01.f5bec61a,admin_spending.other_costs,major_program,36533800,actual,source.mof_2013_programmatic_fact_actual,09 01,საერთო სასამართლოების სისტემის განვითარება და ხელშეწყობა,09 00,საერთო სასამართლოები,medium,Official depth-2 program. Included because this source-code series reaches at least 100000000 GEL in one or more years.
@@ -238,8 +238,8 @@ year,item_id,parent_item_id,level,amount_gel,basis,source_id,official_code,offic
 2014,admin_spending.foreign_affairs,,admin_category,89372000,actual,source.mof_2014_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
 2014,admin_spending.health_social_affairs,,admin_category,2692148600,actual,source.mof_2014_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
 2014,admin_spending.internal_affairs,,admin_category,607111300,actual,source.mof_2014_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
-2014,admin_spending.justice,,admin_category,220771900,actual,source.mof_2014_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
-2014,admin_spending.other_costs,,admin_category,1473321200,actual,source.mof_2014_programmatic_fact_actual,,,,,medium,Aggregated from official tavi 6 leaf rows by administrative owner.
+2014,admin_spending.justice,,admin_category,218452100,actual,source.mof_2014_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
+2014,admin_spending.other_costs,,admin_category,1475641000,actual,source.mof_2014_programmatic_fact_actual,,,,,medium,Aggregated from official tavi 6 leaf rows by administrative owner.
 2014,admin_spending.regional_development_infrastructure,,admin_category,904963000,actual,source.mof_2014_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
 2014,admin_spending.sport,,admin_category,90682400,actual,source.mof_2014_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
 2014,admin_program.09_01.f5bec61a,admin_spending.other_costs,major_program,45818800,actual,source.mof_2014_programmatic_fact_actual,09 01,საერთო სასამართლოების სისტემის განვითარება და ხელშეწყობა,09 00,საერთო სასამართლოები,medium,Official depth-2 program. Included because this source-code series reaches at least 100000000 GEL in one or more years.
@@ -270,14 +270,14 @@ year,item_id,parent_item_id,level,amount_gel,basis,source_id,official_code,offic
 2015,admin_spending.debt_service,,admin_category,731023700,actual,source.mof_2015_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
 2015,admin_spending.defence,,admin_category,679707000,actual,source.mof_2015_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
 2015,admin_spending.economy_sustainable_development,,admin_category,273529300,actual,source.mof_2015_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
-2015,admin_spending.education_science_youth,,admin_category,829802300,actual,source.mof_2015_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
+2015,admin_spending.education_science_youth,,admin_category,824657500,actual,source.mof_2015_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
 2015,admin_spending.environment_agriculture,,admin_category,351940000,actual,source.mof_2015_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
 2015,admin_spending.finance,,admin_category,112710900,actual,source.mof_2015_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
 2015,admin_spending.foreign_affairs,,admin_category,89498500,actual,source.mof_2015_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
 2015,admin_spending.health_social_affairs,,admin_category,2979755100,actual,source.mof_2015_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
 2015,admin_spending.internal_affairs,,admin_category,593666200,actual,source.mof_2015_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
-2015,admin_spending.justice,,admin_category,244930000,actual,source.mof_2015_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
-2015,admin_spending.other_costs,,admin_category,1707521400,actual,source.mof_2015_programmatic_fact_actual,,,,,medium,Aggregated from official tavi 6 leaf rows by administrative owner.
+2015,admin_spending.justice,,admin_category,242351900,actual,source.mof_2015_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
+2015,admin_spending.other_costs,,admin_category,1715244300,actual,source.mof_2015_programmatic_fact_actual,,,,,medium,Aggregated from official tavi 6 leaf rows by administrative owner.
 2015,admin_spending.regional_development_infrastructure,,admin_category,898398000,actual,source.mof_2015_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
 2015,admin_spending.sport,,admin_category,102150300,actual,source.mof_2015_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
 2015,admin_program.09_01.f5bec61a,admin_spending.other_costs,major_program,48698700,actual,source.mof_2015_programmatic_fact_actual,09 01,საერთო სასამართლოების სისტემის განვითარება და ხელშეწყობა,09 00,საერთო სასამართლოები,medium,Official depth-2 program. Included because this source-code series reaches at least 100000000 GEL in one or more years.
@@ -309,14 +309,14 @@ year,item_id,parent_item_id,level,amount_gel,basis,source_id,official_code,offic
 2016,admin_spending.debt_service,,admin_category,740185700,actual,source.mof_2016_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
 2016,admin_spending.defence,,admin_category,745977100,actual,source.mof_2016_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
 2016,admin_spending.economy_sustainable_development,,admin_category,331471600,actual,source.mof_2016_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
-2016,admin_spending.education_science_youth,,admin_category,954294400,actual,source.mof_2016_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
+2016,admin_spending.education_science_youth,,admin_category,948342800,actual,source.mof_2016_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
 2016,admin_spending.environment_agriculture,,admin_category,371911200,actual,source.mof_2016_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
 2016,admin_spending.finance,,admin_category,78862500,actual,source.mof_2016_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
 2016,admin_spending.foreign_affairs,,admin_category,107108100,actual,source.mof_2016_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
 2016,admin_spending.health_social_affairs,,admin_category,3350477900,actual,source.mof_2016_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
 2016,admin_spending.internal_affairs,,admin_category,589530800,actual,source.mof_2016_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
-2016,admin_spending.justice,,admin_category,248236400,actual,source.mof_2016_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
-2016,admin_spending.other_costs,,admin_category,1544656200,actual,source.mof_2016_programmatic_fact_actual,,,,,medium,Aggregated from official tavi 6 leaf rows by administrative owner.
+2016,admin_spending.justice,,admin_category,245638000,actual,source.mof_2016_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
+2016,admin_spending.other_costs,,admin_category,1553206200,actual,source.mof_2016_programmatic_fact_actual,,,,,medium,Aggregated from official tavi 6 leaf rows by administrative owner.
 2016,admin_spending.regional_development_infrastructure,,admin_category,971817600,actual,source.mof_2016_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
 2016,admin_spending.sport,,admin_category,128856300,actual,source.mof_2016_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
 2016,admin_program.09_01.f5bec61a,admin_spending.other_costs,major_program,51386100,actual,source.mof_2016_programmatic_fact_actual,09 01,საერთო სასამართლოების სისტემის განვითარება და ხელშეწყობა,09 00,საერთო სასამართლოები,medium,Official depth-2 program. Included because this source-code series reaches at least 100000000 GEL in one or more years.
@@ -354,8 +354,8 @@ year,item_id,parent_item_id,level,amount_gel,basis,source_id,official_code,offic
 2017,admin_spending.foreign_affairs,,admin_category,116140100,actual,source.mof_2017_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
 2017,admin_spending.health_social_affairs,,admin_category,3548805100,actual,source.mof_2017_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
 2017,admin_spending.internal_affairs,,admin_category,607741000,actual,source.mof_2017_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
-2017,admin_spending.justice,,admin_category,247755500,actual,source.mof_2017_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
-2017,admin_spending.other_costs,,admin_category,1643584900,actual,source.mof_2017_programmatic_fact_actual,,,,,medium,Aggregated from official tavi 6 leaf rows by administrative owner.
+2017,admin_spending.justice,,admin_category,245197500,actual,source.mof_2017_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
+2017,admin_spending.other_costs,,admin_category,1646142900,actual,source.mof_2017_programmatic_fact_actual,,,,,medium,Aggregated from official tavi 6 leaf rows by administrative owner.
 2017,admin_spending.regional_development_infrastructure,,admin_category,1355150300,actual,source.mof_2017_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
 2017,admin_spending.sport,,admin_category,182455500,actual,source.mof_2017_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
 2017,admin_program.09_01.f5bec61a,admin_spending.other_costs,major_program,57426100,actual,source.mof_2017_programmatic_fact_actual,09 01,საერთო სასამართლოების სისტემის განვითარება და ხელშეწყობა,09 00,საერთო სასამართლოები,medium,Official depth-2 program. Included because this source-code series reaches at least 100000000 GEL in one or more years.
@@ -401,8 +401,8 @@ year,item_id,parent_item_id,level,amount_gel,basis,source_id,official_code,offic
 2018,admin_spending.foreign_affairs,,admin_category,143707086,actual,source.mof_2018_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
 2018,admin_spending.health_social_affairs,,admin_category,3695606017,actual,source.mof_2018_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
 2018,admin_spending.internal_affairs,,admin_category,603761846,actual,source.mof_2018_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
-2018,admin_spending.justice,,admin_category,240353968,actual,source.mof_2018_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
-2018,admin_spending.other_costs,,admin_category,2088761917,actual,source.mof_2018_programmatic_fact_actual,,,,,medium,Aggregated from official tavi 6 leaf rows by administrative owner.
+2018,admin_spending.justice,,admin_category,236897419,actual,source.mof_2018_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
+2018,admin_spending.other_costs,,admin_category,2092218466,actual,source.mof_2018_programmatic_fact_actual,,,,,medium,Aggregated from official tavi 6 leaf rows by administrative owner.
 2018,admin_spending.regional_development_infrastructure,,admin_category,1661664449,actual,source.mof_2018_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
 2018,admin_spending.sport,,admin_category,151877171,actual,source.mof_2018_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
 2018,admin_program.09_01.f5bec61a,admin_spending.other_costs,major_program,65375941,actual,source.mof_2018_programmatic_fact_actual,09 01,საერთო სასამართლოების სისტემის განვითარება და ხელშეწყობა,09 00,საერთო სასამართლოები,medium,Official depth-2 program. Included because this source-code series reaches at least 100000000 GEL in one or more years.
@@ -452,8 +452,8 @@ year,item_id,parent_item_id,level,amount_gel,basis,source_id,official_code,offic
 2019,admin_spending.foreign_affairs,,admin_category,148256700,actual,source.mof_2019_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
 2019,admin_spending.health_social_affairs,,admin_category,4055432300,actual,source.mof_2019_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
 2019,admin_spending.internal_affairs,,admin_category,774400300,actual,source.mof_2019_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
-2019,admin_spending.justice,,admin_category,221110800,actual,source.mof_2019_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
-2019,admin_spending.other_costs,,admin_category,1410332900,actual,source.mof_2019_programmatic_fact_actual,,,,,medium,Aggregated from official tavi 6 leaf rows by administrative owner.
+2019,admin_spending.justice,,admin_category,216833000,actual,source.mof_2019_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
+2019,admin_spending.other_costs,,admin_category,1414610700,actual,source.mof_2019_programmatic_fact_actual,,,,,medium,Aggregated from official tavi 6 leaf rows by administrative owner.
 2019,admin_spending.regional_development_infrastructure,,admin_category,2121193300,actual,source.mof_2019_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
 2019,admin_spending.sport,,admin_category,131451700,actual,source.mof_2019_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
 2019,admin_program.06_04.674b2aee,admin_spending.other_costs,major_program,4672500,actual,source.mof_2019_programmatic_fact_actual,06 04,არჩევნების ჩატარების ღონისძიებები,06 00,საქართველოს ცენტრალური საარჩევნო კომისია,medium,Official depth-2 program. Included because this source-code series reaches at least 100000000 GEL in one or more years.
@@ -509,8 +509,8 @@ year,item_id,parent_item_id,level,amount_gel,basis,source_id,official_code,offic
 2020,admin_spending.foreign_affairs,,admin_category,156573400,actual,source.mof_2020_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
 2020,admin_spending.health_social_affairs,,admin_category,5631137500,actual,source.mof_2020_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
 2020,admin_spending.internal_affairs,,admin_category,765835600,actual,source.mof_2020_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
-2020,admin_spending.justice,,admin_category,243344900,actual,source.mof_2020_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
-2020,admin_spending.other_costs,,admin_category,1742828000,actual,source.mof_2020_programmatic_fact_actual,,,,,medium,Aggregated from official tavi 6 leaf rows by administrative owner.
+2020,admin_spending.justice,,admin_category,238813300,actual,source.mof_2020_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
+2020,admin_spending.other_costs,,admin_category,1747359600,actual,source.mof_2020_programmatic_fact_actual,,,,,medium,Aggregated from official tavi 6 leaf rows by administrative owner.
 2020,admin_spending.regional_development_infrastructure,,admin_category,2202373400,actual,source.mof_2020_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
 2020,admin_spending.sport,,admin_category,113923500,actual,source.mof_2020_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
 2020,admin_program.06_04.674b2aee,admin_spending.other_costs,major_program,50536300,actual,source.mof_2020_programmatic_fact_actual,06 04,არჩევნების ჩატარების ღონისძიებები,06 00,საქართველოს ცენტრალური საარჩევნო კომისია,medium,Official depth-2 program. Included because this source-code series reaches at least 100000000 GEL in one or more years.
@@ -566,8 +566,8 @@ year,item_id,parent_item_id,level,amount_gel,basis,source_id,official_code,offic
 2021,admin_spending.foreign_affairs,,admin_category,169213500,actual,source.mof_2021_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
 2021,admin_spending.health_social_affairs,,admin_category,6466099300,actual,source.mof_2021_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
 2021,admin_spending.internal_affairs,,admin_category,788905800,actual,source.mof_2021_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
-2021,admin_spending.justice,,admin_category,328963000,actual,source.mof_2021_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
-2021,admin_spending.other_costs,,admin_category,1815645800,actual,source.mof_2021_programmatic_fact_actual,,,,,medium,Aggregated from official tavi 6 leaf rows by administrative owner.
+2021,admin_spending.justice,,admin_category,324772900,actual,source.mof_2021_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
+2021,admin_spending.other_costs,,admin_category,1819835900,actual,source.mof_2021_programmatic_fact_actual,,,,,medium,Aggregated from official tavi 6 leaf rows by administrative owner.
 2021,admin_spending.regional_development_infrastructure,,admin_category,2513545200,actual,source.mof_2021_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
 2021,admin_spending.sport,,admin_category,184730700,actual,source.mof_2021_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
 2021,admin_program.06_04.674b2aee,admin_spending.other_costs,major_program,54243000,actual,source.mof_2021_programmatic_fact_actual,06 04,არჩევნების ჩატარების ღონისძიებები,06 00,საქართველოს ცენტრალური საარჩევნო კომისია,medium,Official depth-2 program. Included because this source-code series reaches at least 100000000 GEL in one or more years.
@@ -625,8 +625,8 @@ year,item_id,parent_item_id,level,amount_gel,basis,source_id,official_code,offic
 2022,admin_spending.foreign_affairs,,admin_category,177974086,actual,source.mof_2022_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
 2022,admin_spending.health_social_affairs,,admin_category,6361827251,actual,source.mof_2022_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
 2022,admin_spending.internal_affairs,,admin_category,967163899,actual,source.mof_2022_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
-2022,admin_spending.justice,,admin_category,345319212,actual,source.mof_2022_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
-2022,admin_spending.other_costs,,admin_category,2077027448,actual,source.mof_2022_programmatic_fact_actual,,,,,medium,Aggregated from official tavi 6 leaf rows by administrative owner.
+2022,admin_spending.justice,,admin_category,340721906,actual,source.mof_2022_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
+2022,admin_spending.other_costs,,admin_category,2081624754,actual,source.mof_2022_programmatic_fact_actual,,,,,medium,Aggregated from official tavi 6 leaf rows by administrative owner.
 2022,admin_spending.regional_development_infrastructure,,admin_category,3080396407,actual,source.mof_2022_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
 2022,admin_spending.sport,,admin_category,151026496,actual,source.mof_2022_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
 2022,admin_program.06_04.674b2aee,admin_spending.other_costs,major_program,2713654,actual,source.mof_2022_programmatic_fact_actual,06 04,არჩევნების ჩატარების ღონისძიებები,06 00,საქართველოს ცენტრალური საარჩევნო კომისია,medium,Official depth-2 program. Included because this source-code series reaches at least 100000000 GEL in one or more years.
@@ -684,8 +684,8 @@ year,item_id,parent_item_id,level,amount_gel,basis,source_id,official_code,offic
 2023,admin_spending.foreign_affairs,,admin_category,188706608,actual,source.mof_2023_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
 2023,admin_spending.health_social_affairs,,admin_category,7117759833,actual,source.mof_2023_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
 2023,admin_spending.internal_affairs,,admin_category,1149607808,actual,source.mof_2023_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
-2023,admin_spending.justice,,admin_category,398515264,actual,source.mof_2023_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
-2023,admin_spending.other_costs,,admin_category,2546075021,actual,source.mof_2023_programmatic_fact_actual,,,,,medium,Aggregated from official tavi 6 leaf rows by administrative owner.
+2023,admin_spending.justice,,admin_category,392739437,actual,source.mof_2023_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
+2023,admin_spending.other_costs,,admin_category,2551850848,actual,source.mof_2023_programmatic_fact_actual,,,,,medium,Aggregated from official tavi 6 leaf rows by administrative owner.
 2023,admin_spending.regional_development_infrastructure,,admin_category,3438030968,actual,source.mof_2023_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
 2023,admin_spending.sport,,admin_category,182251821,actual,source.mof_2023_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
 2023,admin_program.06_04.674b2aee,admin_spending.other_costs,major_program,56232303,actual,source.mof_2023_programmatic_fact_actual,06 04,არჩევნების ჩატარების ღონისძიებები,06 00,საქართველოს ცენტრალური საარჩევნო კომისია,medium,Official depth-2 program. Included because this source-code series reaches at least 100000000 GEL in one or more years.
@@ -743,8 +743,8 @@ year,item_id,parent_item_id,level,amount_gel,basis,source_id,official_code,offic
 2024,admin_spending.foreign_affairs,,admin_category,191871929,actual,source.mof_2024_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
 2024,admin_spending.health_social_affairs,,admin_category,8081854782,actual,source.mof_2024_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
 2024,admin_spending.internal_affairs,,admin_category,1284034111,actual,source.mof_2024_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
-2024,admin_spending.justice,,admin_category,431366249,actual,source.mof_2024_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
-2024,admin_spending.other_costs,,admin_category,3002323225,actual,source.mof_2024_programmatic_fact_actual,,,,,medium,Aggregated from official tavi 6 leaf rows by administrative owner.
+2024,admin_spending.justice,,admin_category,425038828,actual,source.mof_2024_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
+2024,admin_spending.other_costs,,admin_category,3008650646,actual,source.mof_2024_programmatic_fact_actual,,,,,medium,Aggregated from official tavi 6 leaf rows by administrative owner.
 2024,admin_spending.regional_development_infrastructure,,admin_category,3901639757,actual,source.mof_2024_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
 2024,admin_spending.sport,,admin_category,218004843,actual,source.mof_2024_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
 2024,admin_program.06_04.674b2aee,admin_spending.other_costs,major_program,140661081,actual,source.mof_2024_programmatic_fact_actual,06 04,არჩევნების ჩატარების ღონისძიებები,06 00,საქართველოს ცენტრალური საარჩევნო კომისია,medium,Official depth-2 program. Included because this source-code series reaches at least 100000000 GEL in one or more years.
@@ -802,8 +802,8 @@ year,item_id,parent_item_id,level,amount_gel,basis,source_id,official_code,offic
 2025,admin_spending.foreign_affairs,,admin_category,203643400,actual,source.mof_2025_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
 2025,admin_spending.health_social_affairs,,admin_category,8976498000,actual,source.mof_2025_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
 2025,admin_spending.internal_affairs,,admin_category,1399254500,actual,source.mof_2025_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
-2025,admin_spending.justice,,admin_category,413803700,actual,source.mof_2025_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
-2025,admin_spending.other_costs,,admin_category,3422666100,actual,source.mof_2025_programmatic_fact_actual,,,,,medium,Aggregated from official tavi 6 leaf rows by administrative owner.
+2025,admin_spending.justice,,admin_category,406958300,actual,source.mof_2025_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
+2025,admin_spending.other_costs,,admin_category,3429511500,actual,source.mof_2025_programmatic_fact_actual,,,,,medium,Aggregated from official tavi 6 leaf rows by administrative owner.
 2025,admin_spending.regional_development_infrastructure,,admin_category,2959278300,actual,source.mof_2025_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
 2025,admin_spending.sport,,admin_category,340229100,actual,source.mof_2025_programmatic_fact_actual,,,,,high,Aggregated from official tavi 6 leaf rows by administrative owner.
 2025,admin_program.06_04.674b2aee,admin_spending.other_costs,major_program,72648400,actual,source.mof_2025_programmatic_fact_actual,06 04,არჩევნების ჩატარების ღონისძიებები,06 00,საქართველოს ცენტრალური საარჩევნო კომისია,medium,Official depth-2 program. Included because this source-code series reaches at least 100000000 GEL in one or more years.

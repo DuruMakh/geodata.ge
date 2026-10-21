@@ -1,0 +1,186 @@
+{
+  "status": "PASS",
+  "reviewedAt": "2026-10-21",
+  "capturedOn": "2026-10-21",
+  "sourcePage": "https://mof.ge/en/fl/sakhelmtsifo_finansebis_statistika__naerti_biujeti",
+  "counts": {
+    "nominal": 240,
+    "share_of_gdp": 240
+  },
+  "identityToleranceMillionGel": "0.05",
+  "preliminaryShareYears": [
+    2025
+  ],
+  "notServed": "Revenue, net operating balance, net lending/borrowing (the IMF balance stays on the Deficit page), financing, consumption of fixed capital (zero in every year).",
+  "sourceHashes": {
+    "docs/Raw Data/Budget/expenditure-types/sources/general20022025.xlsx": "45b7cb1d5a9babccf0594f892f2fcca861aae2c575383542393a3d96a07ed42c"
+  },
+  "source": {
+    "sourceId": "source.mof_gfs_general_government_2002_2025",
+    "file": "docs/Raw Data/Budget/expenditure-types/sources/general20022025.xlsx",
+    "originalFilename": "general20022025.xlsx",
+    "url": "https://mof.ge/files/download/general20022025.xlsx/2135a1f1-5823-4aa6-a3d0-3ae7e8c610dd",
+    "sha256": "45b7cb1d5a9babccf0594f892f2fcca861aae2c575383542393a3d96a07ed42c",
+    "bytes": 24422,
+    "sheet": "Sheet4",
+    "unit": "million_gel",
+    "decimals": 1,
+    "headerRow": 6,
+    "annualYears": [
+      2002,
+      2003,
+      2004,
+      2005,
+      2006,
+      2007,
+      2008,
+      2009,
+      2010,
+      2011,
+      2012,
+      2013,
+      2014,
+      2015,
+      2016,
+      2017,
+      2018,
+      2019,
+      2020,
+      2021,
+      2022,
+      2023,
+      2024,
+      2025
+    ],
+    "firstAnnualColumn": "C",
+    "lastAnnualColumn": "Z",
+    "titles": [
+      "General Government",
+      "Fiscal year ending; December 31",
+      "Millions Lari (GEL)",
+      "TABLE 2A: Statement of Government Operations"
+    ]
+  },
+  "identities": [
+    {
+      "year": 2002,
+      "expenseDifferenceMillionGel": "0",
+      "totalDifferenceMillionGel": "0"
+    },
+    {
+      "year": 2003,
+      "expenseDifferenceMillionGel": "0",
+      "totalDifferenceMillionGel": "0"
+    },
+    {
+      "year": 2004,
+      "expenseDifferenceMillionGel": "0",
+      "totalDifferenceMillionGel": "0"
+    },
+    {
+      "year": 2005,
+      "expenseDifferenceMillionGel": "0",
+      "totalDifferenceMillionGel": "0"
+    },
+    {
+      "year": 2006,
+      "expenseDifferenceMillionGel": "0",
+      "totalDifferenceMillionGel": "0"
+    },
+    {
+      "year": 2007,
+      "expenseDifferenceMillionGel": "0",
+      "totalDifferenceMillionGel": "0"
+    },
+    {
+      "year": 2008,
+      "expenseDifferenceMillionGel": "0",
+      "totalDifferenceMillionGel": "0"
+    },
+    {
+      "year": 2009,
+      "expenseDifferenceMillionGel": "0",
+      "totalDifferenceMillionGel": "0"
+    },
+    {
+      "year": 2010,
+      "expenseDifferenceMillionGel": "0",
+      "totalDifferenceMillionGel": "0"
+    },
+    {
+      "year": 2011,
+      "expenseDifferenceMillionGel": "0",
+      "totalDifferenceMillionGel": "0"
+    },
+    {
+      "year": 2012,
+      "expenseDifferenceMillionGel": "0",
+      "totalDifferenceMillionGel": "0"
+    },
+    {
+      "year": 2013,
+      "expenseDifferenceMillionGel": "0",
+      "totalDifferenceMillionGel": "0"
+    },
+    {
+      "year": 2014,
+      "expenseDifferenceMillionGel": "0",
+      "totalDifferenceMillionGel": "0"
+    },
+    {
+      "year": 2015,
+      "expenseDifferenceMillionGel": "0",
+      "totalDifferenceMillionGel": "0"
+    },
+    {
+      "year": 2016,
+      "expenseDifferenceMillionGel": "0",
+      "totalDifferenceMillionGel": "0"
+    },
+    {
+      "year": 2017,
+      "expenseDifferenceMillionGel": "0",
+      "totalDifferenceMillionGel": "0"
+    },
+    {
+      "year": 2018,
+      "expenseDifferenceMillionGel": "0",
+      "totalDifferenceMillionGel": "0"
+    },
+    {
+      "year": 2019,
+      "expenseDifferenceMillionGel": "0",
+      "totalDifferenceMillionGel": "0"
+    },
+    {
+      "year": 2020,
+      "expenseDifferenceMillionGel": "0",
+      "totalDifferenceMillionGel": "0"
+    },
+    {
+      "year": 2021,
+      "expenseDifferenceMillionGel": "0",
+      "totalDifferenceMillionGel": "0"
+    },
+    {
+      "year": 2022,
+      "expenseDifferenceMillionGel": "0",
+      "totalDifferenceMillionGel": "0"
+    },
+    {
+      "year": 2023,
+      "expenseDifferenceMillionGel": "0",
+      "totalDifferenceMillionGel": "0"
+    },
+    {
+      "year": 2024,
+      "expenseDifferenceMillionGel": "0",
+      "totalDifferenceMillionGel": "0"
+    },
+    {
+      "year": 2025,
+      "expenseDifferenceMillionGel": "0",
+      "totalDifferenceMillionGel": "0"
+    }
+  ]
+}

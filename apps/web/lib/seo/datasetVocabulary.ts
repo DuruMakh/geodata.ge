@@ -42,7 +42,7 @@ export type TopicDatasetId =
   | "funded-pension";
 
 /** An official statistics producer whose published figures a dataset is read from. */
-export type SourceAgencyId = "geostat" | "nbg" | "ssa" | "pension_fund";
+export type SourceAgencyId = "geostat" | "nbg" | "ssa" | "mof" | "pension_fund";
 
 const SOURCE_AGENCIES: Record<SourceAgencyId, { name: Localized; url: string }> = {
   geostat: {
@@ -56,6 +56,10 @@ const SOURCE_AGENCIES: Record<SourceAgencyId, { name: Localized; url: string }> 
   ssa: {
     name: { ka: "სოციალური მომსახურების სააგენტო", en: "Social Service Agency" },
     url: "https://ssa.moh.gov.ge",
+  },
+  mof: {
+    name: { ka: "საქართველოს ფინანსთა სამინისტრო", en: "Ministry of Finance of Georgia" },
+    url: "https://mof.ge",
   },
   pension_fund: {
     name: { ka: "საქართველოს საპენსიო ფონდი", en: "Pension Fund of Georgia" },
@@ -316,6 +320,17 @@ const TOPIC_DATASETS: Record<TopicDatasetId, { keywords: Record<Locale, readonly
       en: "Reviewed extraction from Geostat's official published business statistics files.",
     },
     sources: ["geostat"],
+  },
+  "expenditure-types": {
+    keywords: {
+      ka: ["ხარჯები ეკონომიკური კლასიფიკაციით", "შრომის ანაზღაურება", "სუბსიდიები", "სოციალური უზრუნველყოფა", "ინვესტიცია", "საქართველო"],
+      en: ["Georgia", "government spending by type", "public wage bill", "interest", "subsidies", "social benefits", "public investment"],
+    },
+    measurementTechnique: {
+      ka: "ფინანსთა სამინისტროს ზოგადი მთავრობის ოპერაციები (GFSM 2001); ხარჯები ეკონომიკური კლასიფიკაციით და მშპ-ის წილები.",
+      en: "Reviewed Ministry of Finance general government operations (GFSM 2001): spending by economic type and shares of GDP.",
+    },
+    sources: ["mof", "geostat"],
   },
   "gdp-expenditure": {
     keywords: {
