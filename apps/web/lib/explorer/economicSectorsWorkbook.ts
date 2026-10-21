@@ -9,7 +9,7 @@ import { unitFor, unitsFor } from "./format";
 import {
   buildEconomicSectorsModel,
   orderSectorDefinitions,
-  SECTOR_GDP,
+  sectorTotalId,
   SECTORS_PAGE_CONFIG,
   type SectorPageConfig,
   type SectorState,
@@ -94,7 +94,7 @@ export function buildEconomicSectorsWorkbookExportModel(
       years: model.years,
       showChangeColumn: false,
       rows: definitions.map((r) => ({
-        kind: r.id === SECTOR_GDP ? "total" : "item",
+        kind: r.id === sectorTotalId(config) ? "total" : "item",
         parentLabel: null,
         label: name(r),
         change: null,

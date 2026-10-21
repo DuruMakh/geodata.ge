@@ -4,7 +4,7 @@ import type {
   SectorDefinition,
   SectorMeasure,
 } from "../../lib/data/economicSectors/types";
-import { SECTOR_GDP, SECTORS_PAGE_CONFIG, orderSectorDefinitions, sectorColor, type SectorPageConfig } from "../../lib/explorer/economicSectors";
+import { SECTORS_PAGE_CONFIG, orderSectorDefinitions, sectorColor, sectorTotalId, type SectorPageConfig } from "../../lib/explorer/economicSectors";
 import { formatAmount, formatShare } from "../../lib/explorer/format";
 import { useI18n } from "../../lib/i18n/provider";
 import { message } from "../../lib/i18n/messages";
@@ -34,7 +34,7 @@ export function SectorSeriesPanel({
 }) {
   const { locale, messages } = useI18n();
   const ordered = orderSectorDefinitions(registry, endValues, config).filter((r) => !visibleIds || visibleIds.includes(r.id));
-  // Total GDP stays pinned whatever the query, like every panel's total row.
+  // The total (Total GDP on Sectors) stays pinned whatever the query, like every panel's total row.
   return (
     <FlatSeriesPanel
       rows={ordered.map((r) => {
@@ -50,7 +50,7 @@ export function SectorSeriesPanel({
       })}
       selectedIds={selectedIds}
       onSelectionChange={onSelectionChange}
-      totalId={SECTOR_GDP}
+      totalId={sectorTotalId(config)}
       pinTotal
       wrapLabel={false}
       asideLabel={message(messages, "controls.series")}
