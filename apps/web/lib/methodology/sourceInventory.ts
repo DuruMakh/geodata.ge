@@ -41,6 +41,7 @@ const inventoryRules = {
     { root: "docs/Raw Data/Economy/gdp-overview/sources", include: (candidatePath: string) => path.posix.basename(candidatePath) === "geostat_nominal_current.xlsx" },
   ],
   "gdp-expenditure": [{ root: "docs/Raw Data/Economy/gdp-expenditure/sources", include: extension(".xlsx") }],
+  "expenditure-types": [{ root: "docs/Raw Data/Budget/expenditure-types/sources", include: extension(".xlsx") }],
   "tax-breaks-refunds": [{ root: "docs/Raw Data/Revenue/tax-breaks-refunds/sources", include: () => true }],
   "regional-economies": [
     { root: "docs/Raw Data/Economy/regional-economies/sources", include: (candidatePath: string) => path.posix.basename(candidatePath) === "regional-GDP-by-activities-ENG.xlsx" },

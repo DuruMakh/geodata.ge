@@ -49,7 +49,7 @@ export function MoneyBanksExplorer({ section, facts, labels, sources, gdpFacts, 
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
   const model = buildMoneyBanksModel(section, facts, state, gdpFacts);
   // Each view has one unit. Amounts share the site's billion-GEL scale, its decimals read from every value the view can show;
-  // percents keep each series' own precision (two decimals for the National Bank rate, one elsewhere).
+  // percents keep each series' own precision (two decimals for interest rates, one elsewhere).
   const percent = model.unit === "percent";
   const viewIds = new Set<string>(model.series.map(series => series.id));
   const unit: ValueUnit = percent ? { divisor: 1, label: t("unitPercent"), decimals: 1 } : unitFor(facts.filter(f => viewIds.has(f.indicatorId)).map(f => f.value), unitsFor(locale).bn);

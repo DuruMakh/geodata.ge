@@ -856,6 +856,13 @@
     },
     "derivation": null
   },
+  "source.mof_gfs_general_government_2002_2025": {
+    "name": {
+      "text": "Ministry of Finance of Georgia general government operations (GFSM 2001) 2002-2025",
+      "reviewedAt": "2026-10-21"
+    },
+    "derivation": null
+  },
   "source.geostat_cpi_index_2010": {
     "name": {
       "text": "Geostat consumer price index, 2010 average = 100",

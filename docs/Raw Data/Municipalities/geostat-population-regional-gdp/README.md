@@ -39,7 +39,7 @@ The GDP workbook says `Last update: 23.12.2025` and gives its metadata link as h
 
 The population source title is *Population as of 1 January by regions and self-governed units* and its stated unit is `(thousands)`. It is an annual 1 January stock, not a mid-year population measure. The preserved workbook spans 1994-2026; this package normalizes 2015-2025 only.
 
-The normalized output has 704 rows: 64 canonical municipalities for every year 2015-2025, inclusive. `population_thousand` retains Geostat's published precision; `population_persons` is the exact mechanical conversion `population_thousand * 1000`, not an additional estimate. Every normalized source cell is numeric, so the panel has zero official gaps.
+The normalized output has 704 rows: 64 canonical municipalities for every year 2015-2025, inclusive. `population_thousand` is Geostat's stored cell value (to the person; the workbook displays one decimal, e.g. Lentekhi 2025 `5.1` for a stored `5.145`); `population_persons` is the exact mechanical conversion `population_thousand * 1000`, not an additional estimate. Every normalized source cell is numeric, so the panel has zero official gaps.
 
 Population sheet `1` also marks `- Occupied territories`; the dash marker denotes occupied territories. Along with the workbook's `*`, `**`, and 2025 census-recalculation notes, it is preserved source context and does not create a normalized 2015-2025 gap for the 64 canonical rows.
 
@@ -87,23 +87,9 @@ The preparation module checks every approved manifest field (schema, IDs, titles
 
 The focused test independently checks all manifest fields and semantic constraints, mutates every manifest field to prove fail-closed behavior, checks invalid component rules, source-driven values and contributing cells for all 21 composites, both national reconciliations, BOMs, Georgian text, exact CSV schemas, and zero estimates. It compares every CSV field to the XLSX value and underlying type, including text municipality codes and displayed ISO dates, while preserving exactly four workbook sheets. The separate artifact-tool workflow performs workbook key-range inspection, formula-error scanning, rendering, and visual review.
 
-For population, the reported difference is `published Georgia total minus sum of the 64 canonical municipalities`, in thousands. Values are never adjusted to force equality; the small differences are published component rounding:
+For population, the reported difference is `published Georgia total minus sum of the 64 canonical municipalities`, in thousands. Values are never adjusted to force equality. Read from the stored cells (since 2026-10-13) the difference is 0 in every year 2015-2025, for example 2025: 3,930.428 thousand on both sides. The `-0.3` to `+0.5` differences recorded before came from summing the workbook's one-decimal display.
 
-| Year | Published | Municipality sum | Difference, thousand |
-| --- | ---: | ---: | ---: |
-| 2015 | 3,721.9 | 3,722.0 | -0.1 |
-| 2016 | 3,728.6 | 3,728.6 | 0.0 |
-| 2017 | 3,726.4 | 3,726.7 | -0.3 |
-| 2018 | 3,729.6 | 3,729.1 | +0.5 |
-| 2019 | 3,723.5 | 3,723.2 | +0.3 |
-| 2020 | 3,716.9 | 3,717.0 | -0.1 |
-| 2021 | 3,728.6 | 3,728.4 | +0.2 |
-| 2022 | 3,688.6 | 3,688.3 | +0.3 |
-| 2023 | 3,736.4 | 3,736.3 | +0.1 |
-| 2024 | 3,694.6 | 3,694.6 | 0.0 |
-| 2025 | 3,930.4 | 3,930.6 | -0.2 |
-
-For regional GDP, the reported difference is `published national total minus sum of the 11 published regional components`, in million GEL. Values are never changed to force a match. The only non-zero differences are normal published component rounding:
+For regional GDP, the reported difference is `published national total minus sum of the 11 published regional components`, in million GEL. Values are never changed to force a match. On the stored cells every year reconciles to 0 apart from a floating-point remainder of 1e-10 million GEL in 2020. Read from the one-decimal display, as before 2026-10-13, the non-zero differences were:
 
 | Year | Difference, million GEL |
 | --- | ---: |
@@ -117,7 +103,7 @@ For regional GDP, the reported difference is `published national total minus sum
 | 2022 | -0.2 |
 | 2023 | +0.2 |
 
-All other observed GDP years reconcile to 0.0 million GEL at the published precision. Every current GDP reconciliation is complete. If any regional component is blank, its reconciliation is marked incomplete with `regional_sum_million_gel` and `difference_million_gel` set to `null`; a missing component is never treated as zero.
+All other observed GDP years reconciled to 0.0 million GEL at the displayed precision. Every current GDP reconciliation is complete. If any regional component is blank, its reconciliation is marked incomplete with `regional_sum_million_gel` and `difference_million_gel` set to `null`; a missing component is never treated as zero.
 
 ### Reproduce the package and checks
 
@@ -133,11 +119,11 @@ npm run build
 
 The preparation command regenerates only the two normalized CSVs and `validation-report.json` from the two preserved official workbooks plus the reviewed one-to-one geography and temporal component maps; it first validates the complete manifest and source bytes. Do not overwrite an official capture with a different file.
 
-The XLSX review workbook is authored separately after normalization by the git-ignored SDD support builder `.superpowers/sdd/2026-08-03-municipal-population-regional-gdp-collection/build-review-workbook.mjs`, using the bundled workspace `@oai/artifact-tool` runtime. It reads the generated CSVs and geography map and writes the four review sheets; it is not a committed project dependency or a package-generation command. After authoring, inspect the used workbook ranges, scan for formula errors, render all four sheets, and visually check for clipped headers, unreadable values, excessive widths, blank sheets, or broken data before accepting the workbook. Do not commit the builder, its runtime junction, or render previews. Recheck the generated counts, years, hashes, gaps, and reconciliation against `source-manifest.csv` and `validation-report.json` before publishing any future update.
+The XLSX review workbook is authored separately after normalization by the git-ignored SDD support builder `.superpowers/sdd/2026-08-03-municipal-population-regional-gdp-collection/build-review-workbook.mjs`, using the bundled workspace `@oai/artifact-tool` runtime. It reads the generated CSVs and geography map and writes the four review sheets; it is not a committed project dependency or a package-generation command. After authoring, inspect the used workbook ranges, scan for formula errors, render all four sheets, and visually check for clipped headers, unreadable values, excessive widths, blank sheets, or broken data before accepting the workbook. Do not commit the builder, its runtime junction, or render previews. Recheck the generated counts, years, hashes, gaps, and reconciliation against `source-manifest.csv` and `validation-report.json` before publishing any future update. On 2026-10-13, when the package switched to Geostat's stored cell values, the builder was not available, so the committed workbook was patched in place instead: the population and regional GDP value cells were rewritten from the regenerated CSVs and their number format changed from `#,##0.0` to `#,##0.000`, leaving every other cell and style untouched. The focused test checks every workbook value against the CSVs and that format.
 
 ## Gaps and source limitations
 
-There are no official missing, blank, suppressed, or non-numeric cells in either normalized period: 0 population gaps for 2015-2025 and 0 regional GDP gaps for 2010-2024. GDP years 2005-2009 and 2025 are outside the preserved workbook's observed coverage, not filled gaps. The regional GDP national-total differences above are published rounding differences only, not missing values.
+There are no official missing, blank, suppressed, or non-numeric cells in either normalized period: 0 population gaps for 2015-2025 and 0 regional GDP gaps for 2010-2024. GDP years 2005-2009 and 2025 are outside the preserved workbook's observed coverage, not filled gaps. The display-precision regional GDP differences above were rounding only, not missing values.
 
 This package preserves the population census-recalculation note and the GDP workbook's 2025-12-23 last-update date and metadata link. A future source revision or changed media URL must be treated as a new capture: record its actual retrieval URL, date, size, hash, source coverage, and any changed footnotes before regenerating normalized outputs.
 

@@ -82,6 +82,7 @@ model SourceDocument {
   gdpOverviewFacts GdpOverviewFact[]
   economicSectorFacts EconomicSectorFact[]
   gdpExpenditureFacts GdpExpenditureFact[]
+  expenditureTypeFacts ExpenditureTypeFact[]
   unemploymentFacts UnemploymentFact[]
   tradeOverviewFacts TradeOverviewFact[]
   tradePartnerFacts TradePartnerFact[]
@@ -143,6 +144,7 @@ model ImportRun {
   gdpOverviewFacts GdpOverviewFact[]
   economicSectorFacts EconomicSectorFact[]
   gdpExpenditureFacts GdpExpenditureFact[]
+  expenditureTypeFacts ExpenditureTypeFact[]
   unemploymentFacts UnemploymentFact[]
   tradeOverviewFacts TradeOverviewFact[]
   tradePartnerEntities TradePartnerEntity[]
@@ -351,7 +353,7 @@ model MunicipalPopulationFact {
   year               Int
   municipalityCode   String
   municipality       Municipality   @relation(fields: [municipalityCode], references: [code])
-  populationThousand Decimal        @db.Decimal(10, 1)
+  populationThousand Decimal        @db.Decimal(10, 3)
   populationPersons  Int
   referenceDate      DateTime       @db.Date
   sourceDocumentId   String
@@ -545,6 +547,27 @@ model EconomicSectorFact {
 // Mirror of data/imports/gdp-expenditure-annual.csv: Geostat's GDP by categories of use, the
 // economic-sector columns, exact stored decimals.
 model GdpExpenditureFact {
+  seriesId String
+  measure String
+  year Int
+  value Decimal @db.Decimal(40,20)
+  unit String
+  valuation String
+  priceBasis String
+  calculation String
+  status String
+  sourceLocator String
+  sourceDocumentId String
+  sourceDocument SourceDocument @relation(fields: [sourceDocumentId], references: [id])
+  lastReviewedAt DateTime @db.Date
+  importRunId String?
+  importRun ImportRun? @relation(fields: [importRunId], references: [id])
+  @@id([seriesId, measure, year])
+}
+
+// Mirror of data/imports/expenditure-types-annual.csv: the Ministry of Finance's general-government
+// spending by economic type, the economic-sector columns, exact stored decimals.
+model ExpenditureTypeFact {
   seriesId String
   measure String
   year Int

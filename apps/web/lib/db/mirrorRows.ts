@@ -1061,6 +1061,23 @@ export async function loadGdpExpenditureFactsFromMirror(db: Pick<MirrorClient, "
   }));
 }
 
+export function expenditureTypesMirrorCreateRows(facts: readonly SectorObservation[], importRunId: string): Prisma.ExpenditureTypeFactCreateManyInput[] {
+  return facts.map(({ sourceId, lastReviewedAt, ...fact }) => ({
+    ...fact, sourceDocumentId: sourceId, lastReviewedAt: new Date(`${lastReviewedAt}T00:00:00.000Z`), importRunId,
+  }));
+}
+
+export async function loadExpenditureTypeFactsFromMirror(db: Pick<MirrorClient, "expenditureTypeFact">): Promise<SectorObservation[]> {
+  const rows = await db.expenditureTypeFact.findMany({ orderBy: [{ seriesId: "asc" }, { measure: "asc" }, { year: "asc" }] });
+  return rows.map(row => ({
+    seriesId: row.seriesId, measure: row.measure as SectorObservation["measure"], year: row.year,
+    value: row.value.toFixed(), unit: row.unit as SectorObservation["unit"],
+    valuation: row.valuation as SectorObservation["valuation"], priceBasis: row.priceBasis as SectorObservation["priceBasis"],
+    calculation: row.calculation as SectorObservation["calculation"], status: row.status as SectorObservation["status"],
+    sourceId: row.sourceDocumentId, sourceLocator: row.sourceLocator, lastReviewedAt: isoDate(row.lastReviewedAt),
+  }));
+}
+
 export async function loadRegionalEconomyFactsFromMirror(
   db: MirrorClient,
 ): Promise<RegionalEconomyObservation[]> {

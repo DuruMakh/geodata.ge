@@ -19,7 +19,7 @@ export const DEFAULT_SECTOR_STATE: SectorState = {
 /** What a page built on this explorer changes. Plain data, so a server page can hand it to the client explorer. */
 export type SectorPageConfig = {
   /** Message prefix: `sectors.*` or `gdpExpenditure.*`. */
-  scope: "sectors" | "gdpExpenditure";
+  scope: "sectors" | "gdpExpenditure" | "expenditureTypes";
   /** Workbook file name stem. */
   fileStem: string;
   defaultSelectedIds: readonly string[];
@@ -32,10 +32,20 @@ export type SectorPageConfig = {
   /** List every registry row in every measure (Sectors), or only the rows a measure has data for. */
   listEveryRow: boolean;
   highlights: boolean;
+  /** The measures the toolbar offers; every one when omitted. */
+  measures?: readonly SectorMeasure[];
+  /** The pinned total row; Total GDP when omitted. */
+  totalId?: string;
 };
 export const SECTORS_PAGE_CONFIG: SectorPageConfig = {
   scope: "sectors", fileStem: "economic-sectors", defaultSelectedIds: [SECTOR_GDP], measureStandIns: {}, shareHeadlineId: null, ranked: true, listEveryRow: true, highlights: true,
 };
+/** The page's pinned total row. */
+export function sectorTotalId(config: SectorPageConfig): string {
+  return config.totalId ?? SECTOR_GDP;
+}
+export const ALL_SECTOR_MEASURES: readonly SectorMeasure[] = ["nominal", "share_of_gdp", "real_growth"];
+
 export function defaultSectorState(config: SectorPageConfig): SectorState {
   return { ...DEFAULT_SECTOR_STATE, selectedIds: [...config.defaultSelectedIds] };
 }
@@ -69,9 +79,9 @@ export function sectorColor(id: string): string {
 
 export function parseSectorHash(hash: string, validIds: readonly string[], config: SectorPageConfig = SECTORS_PAGE_CONFIG): SectorState {
   const p = new URLSearchParams(hash.replace(/^#/, ""));
-  const measure = p.get("measure");
+  const measure = (config.measures ?? ALL_SECTOR_MEASURES).find(m => m !== "nominal" && m === p.get("measure")) ?? "nominal";
   return {
-    measure: measure === "share_of_gdp" || measure === "real_growth" ? measure : "nominal",
+    measure,
     mode: p.get("view") === "table" ? "table" : "line",
     selectedIds: p.has("sel") ? [...new Set(p.get("sel")!.split(","))].filter(id => validIds.includes(id)) : [...config.defaultSelectedIds],
     range: parseYearRangeKeys(p),
@@ -146,8 +156,8 @@ export function buildEconomicSectorsModel(facts: readonly ClientSectorObservatio
     // Total GDP's own share is always 100%: the share view's headline is the largest sector's share in the latest
     // year (U11-01). The ranked list and the chart name it; the line itself stays one line at 375px.
     headline: (state.measure === "share_of_gdp"
-      ? active.filter(f => config.shareHeadlineId ? f.seriesId === config.shareHeadlineId : f.seriesId !== SECTOR_GDP).toSorted((a,b)=>a.year-b.year || a.value-b.value)
-      : active.filter(f => f.seriesId === SECTOR_GDP).toSorted((a,b)=>a.year-b.year)).at(-1) ?? null,
+      ? active.filter(f => config.shareHeadlineId ? f.seriesId === config.shareHeadlineId : f.seriesId !== sectorTotalId(config)).toSorted((a,b)=>a.year-b.year || a.value-b.value)
+      : active.filter(f => f.seriesId === sectorTotalId(config)).toSorted((a,b)=>a.year-b.year)).at(-1) ?? null,
     sourceIds: hasData && sourceIdByMeasure[state.measure] ? [sourceIdByMeasure[state.measure]!] : [],
     hasData,
   };

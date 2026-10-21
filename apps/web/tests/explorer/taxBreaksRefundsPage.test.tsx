@@ -27,17 +27,17 @@ test.each(["ka", "en"] as const)("the %s page shows its heading, the latest refu
   expect(metadata.alternates?.canonical).toContain(`${locale === "en" ? "/en" : ""}/explorer/tax-breaks-refunds`);
 });
 
-test("Budget card 03 is tax breaks and refunds, drawn from refunds", async () => {
+test("Budget card 04 is tax breaks and refunds, drawn from refunds", async () => {
   const { facts } = await loadServedTaxBreaksRefundsData();
   const refunds = new Map(facts.filter(f => f.indicatorId === "tax_refunds.total").map(f => [f.year, Number(f.value) * 1e6]));
-  const cards = buildHubCards([], new Map(), [], [], refunds);
-  expect(cards.map(card => card.index)).toEqual(["01", "02", "03", "04", "05", "06", "07"]);
-  expect(cards[2]).toMatchObject({ href: "/explorer/tax-breaks-refunds", comingSoon: false, seriesColor: INK, title: "შეღავათები და დაბრუნება" });
-  expect(cards[2].series).toHaveLength(18);
-  expect(cards[2].footer).toBe("2025 · დაბრუნება 2.7 მლრდ ₾");
+  const cards = buildHubCards([], new Map(), [], [], undefined, undefined, refunds);
+  expect(cards.map(card => card.index)).toEqual(["01", "02", "03", "04", "05", "06", "07", "08"]);
+  expect(cards[3]).toMatchObject({ href: "/explorer/tax-breaks-refunds", comingSoon: false, seriesColor: INK, title: "შეღავათები და დაბრუნება" });
+  expect(cards[3].series).toHaveLength(18);
+  expect(cards[3].footer).toBe("2025 · დაბრუნება 2.7 მლრდ ₾");
 });
 
 test("the sidebar lists the page between Revenue and Municipalities", () => {
   const budget = NAV_TREE[0].sections.map(section => section.href);
-  expect(budget.slice(0, 4)).toEqual(["/explorer/expenditure", "/explorer/revenue", "/explorer/tax-breaks-refunds", "/explorer/municipalities"]);
+  expect(budget.slice(0, 5)).toEqual(["/explorer/expenditure", "/explorer/expenditure-types", "/explorer/revenue", "/explorer/tax-breaks-refunds", "/explorer/municipalities"]);
 });

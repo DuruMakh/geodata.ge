@@ -68,7 +68,7 @@ for (const prefix of ["", "/en"]) test(`the heading line stays on one line at 37
 test("the Budget hub card and the sidebar link open the page", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/explorer");
-  const card = page.getByTestId("hub-card").nth(2);
+  const card = page.getByTestId("hub-card").nth(3);
   await expect(card).toContainText("შეღავათები და დაბრუნება");
   await expect(card).toContainText("2025 · დაბრუნება 2.7");
   await card.click();

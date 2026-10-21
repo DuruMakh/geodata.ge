@@ -58,7 +58,7 @@ const SOURCE_AGENCIES: Record<SourceAgencyId, { name: Localized; url: string }> 
   },
   mof: {
     name: { ka: "საქართველოს ფინანსთა სამინისტრო", en: "Ministry of Finance of Georgia" },
-    url: "https://www.mof.ge",
+    url: "https://mof.ge",
   },
   treasury: {
     name: { ka: "სახაზინო სამსახური", en: "State Treasury of Georgia" },
@@ -319,6 +319,17 @@ const TOPIC_DATASETS: Record<TopicDatasetId, { keywords: Record<Locale, readonly
       en: "Reviewed extraction from Geostat's official published business statistics files.",
     },
     sources: ["geostat"],
+  },
+  "expenditure-types": {
+    keywords: {
+      ka: ["ხარჯები ეკონომიკური კლასიფიკაციით", "შრომის ანაზღაურება", "სუბსიდიები", "სოციალური უზრუნველყოფა", "ინვესტიცია", "საქართველო"],
+      en: ["Georgia", "government spending by type", "public wage bill", "interest", "subsidies", "social benefits", "public investment"],
+    },
+    measurementTechnique: {
+      ka: "ფინანსთა სამინისტროს ზოგადი მთავრობის ოპერაციები (GFSM 2001); ხარჯები ეკონომიკური კლასიფიკაციით და მშპ-ის წილები.",
+      en: "Reviewed Ministry of Finance general government operations (GFSM 2001): spending by economic type and shares of GDP.",
+    },
+    sources: ["mof", "geostat"],
   },
   "gdp-expenditure": {
     keywords: {

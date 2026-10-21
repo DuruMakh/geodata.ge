@@ -11,6 +11,7 @@ Budget and GDP data are annual, so it does not provide sub-annual or live budget
 - [Fiscal.ge home](https://fiscal.ge/) — start with the site's scope and latest reviewed coverage.
 - [Budget explorer](https://fiscal.ge/explorer) — choose a dataset and compare the published series.
 - [National expenditure](https://fiscal.ge/explorer/expenditure) — annual state-budget expenditure.
+- [Spending by type](https://fiscal.ge/explorer/expenditure-types) — annual general-government spending by economic type: wages, goods and services, interest, subsidies, social benefits and investment, in GEL and as a share of GDP.
 - [National revenue](https://fiscal.ge/explorer/revenue) — annual consolidated-budget receipts.
 - [Tax breaks and refunds](https://fiscal.ge/explorer/tax-breaks-refunds) — the Ministry of Finance's estimates of tax given up through tax breaks, in total, for VAT in eight areas and for income and profit tax in four parts, 2018–2024, and the State Treasury's refunds of overpaid tax, 2008–2025, in million GEL or as a share of GDP calculated by Fiscal.ge. The two are different measures and are never added together. Browse-only: there is no MCP tool and no bulk file for this page.
 - [Annual analysis](https://fiscal.ge/explorer/analysis) — one-year budget analysis.
@@ -135,6 +136,7 @@ Budget and GDP data are annual, so it does not provide sub-annual or live budget
 
 - [Methodology hub](https://fiscal.ge/methodology) — how the reviewed public data is prepared and presented.
 - [Expenditure methodology](https://fiscal.ge/methodology/expenditure) — national-expenditure sources and processing.
+- [Spending by type methodology](https://fiscal.ge/methodology/expenditure-types) — the general-government perimeter, why the Ministry of Finance's GFSM 2001 file is used, GDP shares and the original file.
 - [Revenue methodology](https://fiscal.ge/methodology/revenue) — national-revenue sources and processing.
 - [Tax breaks and refunds methodology](https://fiscal.ge/methodology/tax-breaks-refunds) — what a tax break and a refund are, the Ministry's one-at-a-time VAT estimates, the latest report edition only, the GDP shares and the original files.
 - [Municipal methodology](https://fiscal.ge/methodology/municipalities) — municipal-expenditure sources and processing.

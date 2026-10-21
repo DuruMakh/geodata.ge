@@ -1,5 +1,6 @@
 {
   "hub.expenditureDescription": "Expenditure by function and institution — where the budget is spent.",
+  "hub.expenditureTypesDescription": "Wages, interest, subsidies, social benefits and investment — what kinds of things government spends on.",
   "hub.revenueDescription": "Taxes, grants and other receipts across years.",
   "hub.taxBreaksRefundsDescription": "Tax the state gives up through tax breaks, and overpaid tax it pays back.",
   "hub.taxBreaksRefundsFooter": "{year} · Refunds {amount}",

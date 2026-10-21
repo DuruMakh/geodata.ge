@@ -1,5 +1,6 @@
 {
   "hub.expenditureDescription": "ფუნქციონალური და უწყებრივი ჭრილი — რაში იხარჯება ბიუჯეტი.",
+  "hub.expenditureTypesDescription": "ხელფასები, პროცენტი, სუბსიდიები, სოციალური უზრუნველყოფა და ინვესტიცია — რა სახის ხარჯებია.",
   "hub.revenueDescription": "გადასახადები, გრანტები და სხვა შემოსულობები წლების მიხედვით.",
   "hub.taxBreaksRefundsDescription": "რამდენ გადასახადს თმობს სახელმწიფო შეღავათებით და რამდენს უბრუნებს გადამხდელებს.",
   "hub.taxBreaksRefundsFooter": "{year} · დაბრუნება {amount}",

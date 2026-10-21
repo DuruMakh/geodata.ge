@@ -10,6 +10,7 @@ import { EXTERNAL_POSITION_SECTIONS } from "../explorer/externalPosition";
 import { loadServedGdpOverviewData } from "../data/gdpOverview/importGdpOverview";
 import { loadServedEconomicSectorsData } from "../data/economicSectors/importEconomicSectors";
 import { loadServedGdpExpenditureData } from "../data/gdpExpenditure/importGdpExpenditure";
+import { loadServedExpenditureTypesData } from "../data/expenditureTypes/importExpenditureTypes";
 import { loadServedUnemploymentData } from "../data/unemployment/importUnemployment";
 import { loadServedTradeOverviewData } from "../data/tradeOverview/importTradeOverview";
 import { loadServedWagesData } from "../data/wages/importWages";
@@ -94,7 +95,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     countryFunctionFacts,
     countryTotalFacts,
     adjaraBudgetAdjustments,
-  }, { facts: debtFacts }, { facts: balanceFacts }, { facts: inflationFacts }, { facts: productFacts }, { facts: regionalEconomyFacts }, { facts: gdpOverviewFacts }, { facts: sectorFacts }, { facts: unemploymentFacts }, { facts: tradeFacts }, { facts: tradePartnerFacts }, { facts: moneyTransferFacts }, { facts: demographyFacts }, { facts: tradeProductFacts }, { facts: tradeDomesticFacts }, { facts: foreignInvestmentFacts }, { facts: wagesFacts }, currentAccountFacts, { facts: povertyFacts }, { facts: householdFacts }, { facts: energyFoodFacts }, { facts: moneyBanksFacts }, { facts: tradeServicesFacts }, { facts: tradeCompositionFacts }, { facts: externalPositionFacts }, { facts: businessFacts }, { facts: healthFacts }, { facts: crimeFacts }, { facts: housingFacts }, { facts: educationFacts }, { facts: socialFacts }, environmentFacts, { facts: scienceCultureFacts }, { facts: labourFacts }, { facts: gdpExpenditureFacts }, { facts: transportFacts }, { facts: internetFacts }, { facts: taxBreaksRefundsFacts }] = await Promise.all([
+  }, { facts: debtFacts }, { facts: balanceFacts }, { facts: inflationFacts }, { facts: productFacts }, { facts: regionalEconomyFacts }, { facts: gdpOverviewFacts }, { facts: sectorFacts }, { facts: unemploymentFacts }, { facts: tradeFacts }, { facts: tradePartnerFacts }, { facts: moneyTransferFacts }, { facts: demographyFacts }, { facts: tradeProductFacts }, { facts: tradeDomesticFacts }, { facts: foreignInvestmentFacts }, { facts: wagesFacts }, currentAccountFacts, { facts: povertyFacts }, { facts: householdFacts }, { facts: energyFoodFacts }, { facts: moneyBanksFacts }, { facts: tradeServicesFacts }, { facts: tradeCompositionFacts }, { facts: externalPositionFacts }, { facts: businessFacts }, { facts: healthFacts }, { facts: crimeFacts }, { facts: housingFacts }, { facts: educationFacts }, { facts: socialFacts }, environmentFacts, { facts: scienceCultureFacts }, { facts: labourFacts }, { facts: gdpExpenditureFacts }, { facts: transportFacts }, { facts: internetFacts }, { facts: expenditureTypeFacts }, { facts: taxBreaksRefundsFacts }] = await Promise.all([
     loadServedLandingData(),
     loadServedMunicipalData(),
     loadServedGovernmentDebtData(),
@@ -133,6 +134,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     loadServedGdpExpenditureData(),
     loadServedTransportData(),
     loadServedInternetData(),
+    loadServedExpenditureTypesData(),
     loadServedTaxBreaksRefundsData(),
   ]);
   const inflationModified = new Date(inflationFacts.map((fact) => fact.lastReviewedAt).sort().at(-1)!);
@@ -143,6 +145,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const gdpModified = new Date(gdpOverviewFacts.map((fact) => fact.lastReviewedAt).sort().at(-1)!);
   const sectorsModified = new Date(sectorFacts.map((fact) => fact.lastReviewedAt).sort().at(-1)!);
   const gdpExpenditureModified = new Date(gdpExpenditureFacts.map((fact) => fact.lastReviewedAt).sort().at(-1)!);
+  const expenditureTypesModified = new Date(expenditureTypeFacts.map((fact) => fact.lastReviewedAt).sort().at(-1)!);
   const unemploymentModified = new Date(unemploymentFacts.map(fact => fact.lastReviewedAt).sort().at(-1)!);
   const tradeModified = new Date(tradeFacts.map(fact => fact.lastReviewedAt).sort().at(-1)!);
   const wagesModified = new Date(wagesFacts.map(fact => fact.lastReviewedAt).sort().at(-1)!);
@@ -294,6 +297,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...LIVE_DEMOGRAPHY_PAGES.map((page) => ({ url: `${siteUrl}${page.path}`, lastModified: demographyModified })),
     ...populationPlacePaths(regions.map((region) => region.id)).map((path) => ({ url: `${siteUrl}${path}`, lastModified: demographyModified })),
     { url: `${siteUrl}/explorer/expenditure`, lastModified },
+    { url: `${siteUrl}/explorer/expenditure-types`, lastModified: expenditureTypesModified },
     { url: `${siteUrl}/explorer/revenue`, lastModified },
     { url: `${siteUrl}${TAX_BREAKS_REFUNDS_PATH}`, lastModified: new Date(taxBreaksRefundsFacts.map(fact => fact.lastReviewedAt).sort().at(-1)!) },
     { url: `${siteUrl}/explorer/analysis`, lastModified },

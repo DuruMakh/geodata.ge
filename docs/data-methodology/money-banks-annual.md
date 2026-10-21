@@ -55,7 +55,7 @@ Both bank-health breaks are recorded in `data/imports/money-banks-series-breaks.
 
 `npm run data:prepare-money` writes `data/imports/money-banks-annual.csv` (UTF-8 with BOM) and `data/reports/money-banks-validation.json`; `npm run data:check-money` (part of `data:validate`) rebuilds both in memory and fails on any difference. The Prisma mirror table `MoneyBanksFact` is filled only by the transactional, parity-checked `npm run data:import`; CSV and database modes serve identical rows.
 
-The pages show the published value: one decimal for percents, two for the National Bank rate, and amounts in billion GEL with the site's GEL formatting; Excel keeps amounts in million GEL. Missing years are gaps, dashes and blank Excel cells, never zero. The pages describe the figures and state no causes.
+The pages show the published value: one decimal for percents, two for every interest rate, and amounts in billion GEL with the site's GEL formatting; Excel keeps amounts in million GEL. NBG prints all interest rates to two decimals (every loan and deposit rate cell in the LWIR and DWIR workbooks is formatted `0.00`, as is the policy rate). Until 2026-10-13 only the National Bank rate was published with two; the 180 loan and deposit rate values now are too (2010 loans, all currencies: 18.6% → 18.56%). Missing years are gaps, dashes and blank Excel cells, never zero. The pages describe the figures and state no causes.
 
 Routes are `/explorer/money` with `/supply`, `/loans-deposits`, `/interest-rates` and `/bank-health`, plus `/methodology/money`, each mirrored under `/en`. The sidebar entry sits after Inflation.
 

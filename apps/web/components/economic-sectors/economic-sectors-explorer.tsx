@@ -5,9 +5,10 @@ import type { SectorDefinition } from "../../lib/data/economicSectors/types";
 import type { ClientSectorObservation } from "../../lib/servedRows";
 import { unpackFacts, type FactsInput } from "../../lib/data/packedFacts";
 import {
+  ALL_SECTOR_MEASURES,
   buildEconomicSectorsModel,
   changeSectorMeasure,
-  SECTOR_GDP,
+  sectorTotalId,
   SECTORS_PAGE_CONFIG,
   type SectorPageConfig,
 } from "../../lib/explorer/economicSectors";
@@ -85,7 +86,8 @@ export function EconomicSectorsExplorer({
     registry.map((r) => [r.id, locale === "en" ? r.labelEn : r.labelKa]),
   );
   const series = model.series.map((s) => ({ ...s, label: labels.get(s.id)! }));
-  const total = model.rows.find((r) => r.itemId === SECTOR_GDP) ?? null;
+  const totalId = sectorTotalId(config);
+  const total = model.rows.find((r) => r.itemId === totalId) ?? null;
   const activeSources = sources.filter((s) =>
     model.sourceIds.includes(s.sourceId),
   );
@@ -104,7 +106,7 @@ export function EconomicSectorsExplorer({
   ].sort((a, b) => a - b);
   // The longest of the three measures' lines, the national nominal one with its note, kept as the line's height so
   // switching measure never moves the chart (DESIGN.md, sectors): the one-line share headline would otherwise lift it.
-  const latestNominal = facts.filter((f) => f.measure === "nominal" && f.seriesId === SECTOR_GDP).toSorted((a, b) => a.year - b.year).at(-1);
+  const latestNominal = facts.filter((f) => f.measure === "nominal" && f.seriesId === totalId).toSorted((a, b) => a.year - b.year).at(-1);
   const nationalLine = latestNominal
     ? { measure: t("reference"), period: latestNominal.year, value: formatAmount(latestNominal.value, locale), note: t("preliminary") }
     : undefined;
@@ -151,10 +153,10 @@ export function EconomicSectorsExplorer({
                   }));
                 }}
                 options={[
-                  { value: "nominal", label: t("nominal"), icon: <span aria-hidden="true" className="text-base">₾</span> },
-                  { value: "share_of_gdp", label: t("shareOfGdp"), icon: <ChartPie aria-hidden="true" size={18} strokeWidth={1.5} /> },
-                  { value: "real_growth", label: t("realGrowth"), icon: <ChartNoAxesCombined aria-hidden="true" size={18} strokeWidth={1.5} /> },
-                ]}
+                  { value: "nominal" as const, label: t("nominal"), icon: <span aria-hidden="true" className="text-base">₾</span> },
+                  { value: "share_of_gdp" as const, label: t("shareOfGdp"), icon: <ChartPie aria-hidden="true" size={18} strokeWidth={1.5} /> },
+                  { value: "real_growth" as const, label: t("realGrowth"), icon: <ChartNoAxesCombined aria-hidden="true" size={18} strokeWidth={1.5} /> },
+                ].filter((option) => (config.measures ?? ALL_SECTOR_MEASURES).includes(option.value))}
               />
             </div>
             {!state.selectedIds.length ? (
@@ -184,7 +186,7 @@ export function EconomicSectorsExplorer({
             ) : (
               <ExplorerTable
                 caption={`${t("heading")} · ${percent ? measureLabel : message(messages, "format.bnGel")} · ${model.range.start}–${model.range.end}`}
-                rows={model.rows.filter((r) => r.itemId !== SECTOR_GDP)}
+                rows={model.rows.filter((r) => r.itemId !== totalId)}
                 totalRow={total}
                 showTotal={Boolean(total)}
                 totalFirst

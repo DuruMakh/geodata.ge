@@ -97,6 +97,39 @@ describe("classifier — older-year mappings", () => {
     );
   });
 
+  it("keeps independent bodies whose names carry a ministry keyword in other costs", () => {
+    // Methodology §6.10: courts and independent bodies sit in Other costs. These four official
+    // institution labels contain a ministry keyword (იუსტიციის, განათლების, სოფლის მეურნეობის,
+    // ჯანმრთელობის) but are not part of that ministry.
+    const independentBodies: Array<[number, string]> = [
+      [2024, "საქართველოს იუსტიციის უმაღლესი საბჭო"],
+      [2004, "საქართველოს იუსტიციის უმაღლესი საბჭო"],
+      [2015, "სსიპ -განათლების საერთაშორისო ცენტრი"],
+      [2014, "სსიპ – განათლების საერთაშორისო ცენტრი"],
+      [2004, "საქართველოს სოფლის მეურნეობის მეცნიერებათა აკადემია"],
+      [2012, "ა(ა)იპ – რიჩარდ გ. ლუგარის საზოგადოებრივი ჯანმრთელობის კვლევითი ცენტრი"],
+    ];
+    for (const [year, label] of independentBodies) {
+      expect(classifyAdminSpendingCategory(institutionRow(year, label)), `${year} ${label}`).toBe(
+        "admin_spending.other_costs",
+      );
+    }
+
+    // The ministries the keywords exist for keep their categories.
+    expect(classifyAdminSpendingCategory(institutionRow(2024, "საქართველოს იუსტიციის სამინისტრო"))).toBe(
+      "admin_spending.justice",
+    );
+    expect(classifyAdminSpendingCategory(institutionRow(2015, "საქართველოს განათლებისა და მეცნიერების სამინისტრო"))).toBe(
+      "admin_spending.education_science_youth",
+    );
+    expect(classifyAdminSpendingCategory(institutionRow(2004, "საქართველოს სოფლის მეურნეობის სამინისტრო"))).toBe(
+      "admin_spending.environment_agriculture",
+    );
+    expect(
+      classifyAdminSpendingCategory(institutionRow(2012, "საქართველოს შრომის, ჯანმრთელობისა და სოციალური დაცვის სამინისტრო")),
+    ).toBe("admin_spending.health_social_affairs");
+  });
+
   it("books the 2005 Culture ministry's Youth Affairs Department to education/science/youth", () => {
     expect(classifyAdminSpendingCategory(institutionRow(2005, "ახალგაზრდობის საქმეთა დეპარტამენტი"))).toBe(
       "admin_spending.education_science_youth",
