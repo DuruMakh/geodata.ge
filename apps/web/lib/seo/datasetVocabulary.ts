@@ -323,6 +323,18 @@ const TOPIC_DATASETS: Record<TopicDatasetId, { keywords: Record<Locale, readonly
     },
     sources: ["geostat"],
   },
+  "tax-breaks-refunds": {
+    keywords: {
+      ka: ["საგადასახადო შეღავათები", "საგადასახადო დანახარჯები", "დღგ", "გადასახადის დაბრუნება", "საქართველო"],
+      en: ["Georgia", "tax breaks", "tax expenditures", "VAT", "tax refunds"],
+    },
+    measurementTechnique: {
+      ka: "გადამოწმებული ამოღება ფინანსთა სამინისტროს საგადასახადო დანახარჯების ანგარიშიდან და სახაზინო სამსახურის გამოქვეყნებული მონაცემებიდან.",
+      en: "Reviewed extraction from the Ministry of Finance's Tax Expenditure Report and the State Treasury's published figures.",
+    },
+    // The Ministry of Finance and the Treasury are not statistics agencies; the budget datasets credit none either.
+    sources: [],
+  },
   housing: {
     keywords: {
       ka: ["მშენებლობის ნებართვები", "ექსპლუატაციაში მიღებული ობიექტები", "საცხოვრებლის ფასები", "მშენებლობა", "საქართველო"],

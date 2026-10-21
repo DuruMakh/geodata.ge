@@ -2,6 +2,8 @@ import { GDP_METHODOLOGY_CONTENT } from "./content/gdp";
 import { ECONOMIC_SECTORS_METHODOLOGY } from "./content/economic-sectors";
 import { ECONOMIC_SECTORS_METHODOLOGY as EN_SECTORS } from "./content/en/economic-sectors";
 import { GDP_EXPENDITURE_METHODOLOGY } from "./content/gdp-expenditure";
+import { TAX_BREAKS_REFUNDS_METHODOLOGY } from "./content/tax-breaks-refunds";
+import { TAX_BREAKS_REFUNDS_METHODOLOGY as EN_TAX_BREAKS_REFUNDS } from "./content/en/tax-breaks-refunds";
 import { GDP_EXPENDITURE_METHODOLOGY as EN_GDP_EXPENDITURE } from "./content/en/gdp-expenditure";
 import { GDP_METHODOLOGY_CONTENT as EN_GDP } from "./content/en/gdp";
 import { INFLATION_METHODOLOGY_CONTENT } from "./content/inflation";
@@ -71,6 +73,7 @@ export type { MethodologyDatasetId } from "./types";
 export const METHODOLOGY_CONTENT: Readonly<Record<MethodologyDatasetId, MethodologyContent>> = {
   expenditure: EXPENDITURE_METHODOLOGY_CONTENT,
   revenue: REVENUE_METHODOLOGY_CONTENT,
+  "tax-breaks-refunds": TAX_BREAKS_REFUNDS_METHODOLOGY,
   municipalities: MUNICIPALITIES_METHODOLOGY_CONTENT,
   debt: DEBT_METHODOLOGY_CONTENT,
   gdp: GDP_METHODOLOGY_CONTENT,
@@ -102,6 +105,7 @@ export const METHODOLOGY_CONTENT: Readonly<Record<MethodologyDatasetId, Methodol
 const ENGLISH_METHODOLOGY_CONTENT: Readonly<Record<MethodologyDatasetId, MethodologyContent>> = {
   "economic-sectors": EN_SECTORS,
   "gdp-expenditure": EN_GDP_EXPENDITURE,
+  "tax-breaks-refunds": EN_TAX_BREAKS_REFUNDS,
   "regional-economies": EN_REGIONAL_ECONOMIES,
   unemployment: EN_UNEMPLOYMENT,
   trade: EN_TRADE,
