@@ -4,7 +4,7 @@ import { evaluateAudit } from "../../scripts/audit-dependencies";
 const advisory = { name: "braces", url: "https://github.com/advisories/GHSA-vfj7-8cjw-p6xm", severity: "high" };
 function fixture() {
   const names = ["braces", "micromatch", "fast-glob", "@next/eslint-plugin-next", "eslint-config-next"];
-  const versions = ["3.0.3", "4.0.8", "3.3.1", "16.3.8", "16.3.8"];
+  const versions = ["3.0.3", "4.0.8", "3.3.1", "16.4.2", "16.4.2"];
   const vulnerabilities: Record<string, { name: string; severity: string; nodes: string[]; via: (string | typeof advisory)[] }> = {};
   const packages: Record<string, { version: string; dev: boolean }> = {};
   for (const [i, name] of names.entries()) {
@@ -43,9 +43,21 @@ describe("temporary braces audit exception", () => {
     expect(evaluateAudit(report, lock, now).blocked).toContain("braces");
   });
 
-  it.each(["2026-11-02T00:00:00Z", "2026-12-01T00:00:00Z"])("expires at %s", date => {
+  it.each(["2026-12-01T00:00:00Z", "2027-01-01T00:00:00Z"])("expires at %s", date => {
     const { report, lock } = fixture();
     expect(evaluateAudit(report, lock, new Date(date)).blocked).toHaveLength(5);
+  });
+
+  it.each(["2026-11-02T00:00:00Z", "2026-11-30T23:59:59Z"])("is still accepted at %s, after the first approval's expiry (renewed 2026-10-21)", date => {
+    const { report, lock } = fixture();
+    expect(evaluateAudit(report, lock, new Date(date)).blocked).toEqual([]);
+  });
+
+  it.each(["16.3.8", "16.4.3"])("blocks the unreviewed lint-chain version %s", version => {
+    const { report, lock } = fixture();
+    lock.packages["node_modules/eslint-config-next"]!.version = version;
+    lock.packages["node_modules/@next/eslint-plugin-next"]!.version = version;
+    expect(evaluateAudit(report, lock, now).blocked).toContain("eslint-config-next");
   });
 
   it.each(["braces", "micromatch", "fast-glob", "@next/eslint-plugin-next", "eslint-config-next"])("rejects production use of %s", name => {

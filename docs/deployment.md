@@ -130,9 +130,17 @@ request-time route is `/mcp` (see "The `/mcp` runtime" below).
   `.next/cache` or source maps. The `e2e` job waits for `build` only: it
   downloads the artifact, starts `next start` on port 3100, waits until it
   answers, runs the browser suite against it and prints the server log if
-  anything fails. `.next/cache` (keyed on the lockfile and the tracked source)
-  and the Playwright browsers are cached. Job limits: 30 minutes (`checks`), 20
-  (`build`) and 45 (`e2e`). Every job fails if it wrote into the repository.
+  anything fails. The `mirror` job (since 2026-10-22) runs in parallel too: on a
+  disposable PostgreSQL 17 service it creates Supabase's `anon` and
+  `authenticated` roles, applies every migration (`npm run prisma:deploy`), runs
+  the parity-checked import (`npm run data:import`) and then the database
+  integration tests with `GEODATA_TEST_DATABASE_URL`. A schema that cannot hold
+  the reviewed CSVs therefore fails the pull request instead of the production
+  deploy, as #211's three-decimal municipal population did on 2026-10-21. Its
+  first runs took about 2.5 minutes (import about 100 s). `.next/cache` (keyed
+  on the lockfile and the tracked source) and the Playwright browsers are
+  cached. Job limits: 30 minutes (`checks`), 20 (`build`), 20 (`mirror`) and 45
+  (`e2e`). Every job fails if it wrote into the repository.
   Playwright retries a failed test once in CI and reports it as flaky. Still to
   measure on the first CI runs: each job's step times and the critical path
   (`build` then `e2e`) against the former layout; the browser suite at two
@@ -176,6 +184,16 @@ The advisory has no published patched version; [upstream PR #72](https://github.
 is a proposed fix, not a released remedy. This is accepted risk, not a claim
 that the dependency is fixed.
 
+On **2026-10-21** the owner renewed it until **2026-12-01 00:00 UTC**, for the
+same advisory and chain at `@next/eslint-plugin-next@16.4.2` and
+`eslint-config-next@16.4.2`, which the Next 16.4.2 update (Dependabot #209)
+brings (the owner's answer to the week review's question: "Renew to 1 Dec
+2026"). Fresh evidence that day: `braces@3.0.3` is still the latest release
+(its registry entry last changed 2024-09-18) and PR #72 is unreleased;
+`eslint.config.mjs` sets no `next.rootDir`; all five chain entries are
+`dev: true` in the lockfile; and the 124 files traced into the built `/mcp`
+route (`.next/server/app/mcp/route.js.nft.json`) include none of them.
+
 The inspected Next ESLint helper receives its root-directory pattern from
 repository-owned ESLint settings; this repository does not set `next.rootDir`,
 so the helper uses the trusted working directory. Lockfile entries are all
@@ -188,30 +206,42 @@ including development tools**, prints the unfiltered report, and fails for
 other high/critical findings. It accepts only this exact advisory, its current
 named development-only ancestors and the reviewed package/version paths.
 The reviewed ancestor versions are `micromatch@4.0.8`, `fast-glob@3.3.1`,
-`@next/eslint-plugin-next@16.3.8` and `eslint-config-next@16.3.8`; a version
-change is blocking until reassessed.
+`@next/eslint-plugin-next@16.4.2` and `eslint-config-next@16.4.2` (16.3.8 until
+the 2026-10-21 renewal); a version change is blocking until reassessed.
 Production-use findings, changed paths, additional advisories, malformed
 reports, registry failures and expiry remain blocking. CI retains the existing
 three attempts for registry failures and its original high-severity threshold.
 
-The exception **expires at 2026-11-02 00:00 UTC**. Check the upstream advisory
+The exception **expires at 2026-12-01 00:00 UTC** (first approved until
+2026-11-02). Check the upstream advisory
 and release during dependency maintenance; once an official fix is available,
 update the compatible dependency chain, verify lint/audit and remove this
 exception and its tests. Extending acceptance beyond expiry requires explicit
 owner approval and fresh exposure evidence. No automatic renewal is permitted.
 
-## Current dependency-security review (2026-10-17)
+## Current dependency-security review (2026-10-21)
 
 The reviewed maintenance updates standalone `fast-uri` **3.1.7 → 3.1.8**
 ([advisory](https://github.com/advisories/GHSA-hrr3-gc8f-f4qj)) and the existing
-development-only Hono resolution **4.13.5 → 4.13.7**
+development-only Hono resolution **4.13.5 → 4.13.7** (now 4.13.13)
 ([advisory](https://github.com/advisories/GHSA-hxh3-vqpv-xpqv)). Hono stays
-within legacy SDK 1.31.0's declared `^4.11.4` range; no direct dependency or
+within the legacy SDK's declared `^4.11.4` range; no direct dependency or
 additional override is introduced. Its affected JSX rendering operation was
 not found in Fiscal's application path; the legacy SDK imports Hono only in
 its example server.
 
-The full npm audit, including development tools, now reports **7 package
+On 2026-10-20 new advisories made the audit block every branch, so two feature
+pull requests updated the MCP packages: the server **2.2.0 → 2.3.1** and vite
+**8.3.0–8.3.2 → 8.3.4** in the Internet hub (#205; GHSA-jm63-cq47-j5jp,
+GHSA-46jr-4wx8-v453 and GHSA-rvq5-wwqv-78pq for the server below 2.3.0;
+GHSA-698v-4r3x-3vcv, GHSA-r825-w8mm-5pxw and GHSA-587h-7wmj-h5pm for vite), and
+the client **2.2.0 → 2.3.1** with the legacy test SDK **1.31.0 → 1.32.1** in
+the Transport hub (#202; GHSA-22jm-h49p-29qw for the SDK below 1.32.0). A
+dependency update forced by the audit gate inside a feature pull request updates
+this section in the same pull request. Next and `eslint-config-next` moved to
+16.4.2 on 2026-10-21 with the exception's renewal.
+
+The full npm audit, including development tools, still reports **7 package
 findings: 2 moderate, 5 high, 0 critical**. The two moderate findings are
 `uuid@8.3.2` and its parent `exceljs@4.4.0`, from the
 [same advisory](https://github.com/advisories/GHSA-w5hq-g745-h8pq); they are
@@ -224,12 +254,11 @@ Do not apply npm's suggested ExcelJS downgrade or a cross-major uuid override
 without separate compatibility review of workbook and browser exports.
 
 The npm report does **not** enumerate the SDK's embedded parser. Server and
-client remain **2.2.0**, with the legacy test SDK **1.31.0**. Official 2.3.1
-server/client tarballs were inspected and integrity-checked: the candidate
-server's AJV provider is byte-for-byte identical to installed 2.2.0 and both
-candidates retain executable `fast-uri@3.1.0` code. Actual resolver probes
-still return host `A.com` for `//%41.com`, whereas standalone 3.1.8 returns
-`a.com`. The advisory's separate `equal() === false` example did not reproduce;
+client are **2.3.1**, with the legacy test SDK **1.32.1**. The 2.3.1 server's
+AJV provider still bundles `fast-uri@3.1.0` (as the 2026-10-17 inspection of the
+2.3.1 tarballs found); re-run on 2026-10-21 against the installed server, its
+resolver still returns host `A.com` for `//%41.com`, whereas standalone 3.1.8
+returns `a.com`. The advisory's separate `equal() === false` example did not reproduce;
 the observed parser discrepancy remains unresolved. The server uses this
 provider for schema validation. Fiscal owns the schemas, uses native `URL`
 and exact allowlists for Host/Origin checks, and fetches no caller URL; these
@@ -237,8 +266,8 @@ limit the demonstrated exposure but do not establish a universal guarantee.
 Keep this embedded residual open until an upstream artifact actually fixes it.
 
 The five high findings are the exact temporary lint-chain exception above.
-The policy and its expiry remain unchanged: **2026-11-02 00:00 UTC / 04:00
-Tbilisi**. Before then, recheck an official braces patch or supported lint-chain
+The policy is unchanged; its expiry is now **2026-12-01 00:00 UTC / 04:00
+Tbilisi** (renewed 2026-10-21). Before then, recheck an official braces patch or supported lint-chain
 replacement; if none exists, raise the unresolved release blocker for an
 explicit owner decision. Passing the policy command does not mean all findings
 are fixed. The focused policy, MCP failure/privacy, legacy/modern protocol,
@@ -882,7 +911,7 @@ The regional-economies addition (`docs/superpowers/specs/2026-09-13-regional-eco
 
 ### Demography release checks
 
-For the demography release, require the Actions-owned pipeline to apply `20261008100000_demography`, replace the 1,068 `DemographyFact` rows (923 population, 145 density) with parity checked inside the import transaction, and pass the database-mode build before triggering Vercel; the workflow log must show `[OK ] DemographyFact: csv=1068 db=1068`. CI has no Postgres and the database-backed demography tests skip without `GEODATA_TEST_DATABASE_URL`, so this deploy is the first real run of the migration, the table and the import step: none of them has been exercised against a database before this release. An optional rehearsal beforehand: point `GEODATA_TEST_DATABASE_URL` at a disposable local PostgreSQL database (never production; the test refuses any other host; on a plain PostgreSQL, create two empty roles named `anon` and `authenticated` first, because the migrations from `20260911000000_gdp_overview` on, the demography one included, revoke table access from those two Supabase roles (all but `20260917000000_government_debt_source_document`, which adds a foreign key and revokes nothing) and nothing in the repository creates them), apply the migrations and run the import against it as in the manual fallback of `docs/data-methodology/database-import.md` (`npm run prisma:deploy`, then `npm run data:import`, with `DATABASE_URL` and `DIRECT_URL` set to that database for the two commands), run `npx vitest run tests/data/demography/importIntegration.test.ts`, then do one `GEODATA_DATA_SOURCE=db npm run build` against the same database. After Vercel is READY at the merge commit, open the demography hub (`/explorer/demography`), the Population index (`/explorer/demography/population`), one place page (for example `/explorer/demography/population/batumi`) and the methodology page (`/methodology/demography`) in Georgian and under `/en`, follow one original-source link, and download a native Excel workbook from the place page in each language (the index has no download), checking that the Summary sheet's 2025 header shows both the year and the re-base label. The place pages are a closed set of 75 (Georgia, the 11 regions and the 63 municipalities other than Tbilisi), so also open Tbilisi from the index map and expect `/explorer/demography/population/region/tbilisi`, and expect `/explorer/demography/population/tbilisi` and any other address outside the set to return 404. Demography has no `/mcp` tool, catalogue dataset or central JSON/CSV file, so the MCP and central-manifest checks above do not apply; the methodology archive smoke test does.
+For the demography release, require the Actions-owned pipeline to apply `20261008100000_demography`, replace the 1,068 `DemographyFact` rows (923 population, 145 density) with parity checked inside the import transaction, and pass the database-mode build before triggering Vercel; the workflow log must show `[OK ] DemographyFact: csv=1068 db=1068`. (As of the demography release, 2026-10-08; since 2026-10-22 the CI `mirror` job runs this rehearsal on every pull request.) CI has no Postgres and the database-backed demography tests skip without `GEODATA_TEST_DATABASE_URL`, so this deploy is the first real run of the migration, the table and the import step: none of them has been exercised against a database before this release. An optional rehearsal beforehand: point `GEODATA_TEST_DATABASE_URL` at a disposable local PostgreSQL database (never production; the test refuses any other host; on a plain PostgreSQL, create two empty roles named `anon` and `authenticated` first, because the migrations from `20260911000000_gdp_overview` on, the demography one included, revoke table access from those two Supabase roles (all but `20260917000000_government_debt_source_document`, which adds a foreign key and revokes nothing) and nothing in the repository creates them), apply the migrations and run the import against it as in the manual fallback of `docs/data-methodology/database-import.md` (`npm run prisma:deploy`, then `npm run data:import`, with `DATABASE_URL` and `DIRECT_URL` set to that database for the two commands), run `npx vitest run tests/data/demography/importIntegration.test.ts`, then do one `GEODATA_DATA_SOURCE=db npm run build` against the same database. After Vercel is READY at the merge commit, open the demography hub (`/explorer/demography`), the Population index (`/explorer/demography/population`), one place page (for example `/explorer/demography/population/batumi`) and the methodology page (`/methodology/demography`) in Georgian and under `/en`, follow one original-source link, and download a native Excel workbook from the place page in each language (the index has no download), checking that the Summary sheet's 2025 header shows both the year and the re-base label. The place pages are a closed set of 75 (Georgia, the 11 regions and the 63 municipalities other than Tbilisi), so also open Tbilisi from the index map and expect `/explorer/demography/population/region/tbilisi`, and expect `/explorer/demography/population/tbilisi` and any other address outside the set to return 404. Demography has no `/mcp` tool, catalogue dataset or central JSON/CSV file, so the MCP and central-manifest checks above do not apply; the methodology archive smoke test does.
 
 For the Migration release there is no new demography migration: the Population release (a7b24bd8) applied `20261008100000_demography`, and Trade partners (50ffb869, with `20261008233336_trade_partners`) was live on 2026-10-09, so this deploy normally applies none (if a later release is not yet live when it ships, its migrations run first, as usual), and the import replaces `DemographyFact` with 2,846 rows (923 population, 145 density, 1,778 migration) and the workflow log must show `[OK ] DemographyFact: csv=2846 db=2846`. After Vercel is READY, open `/explorer/demography/migration` and `/en/explorer/demography/migration`, check that the hub links two pages, download the workbook in each language, and open the two new originals (tables 31 and 33) on `/methodology/demography`.
 
