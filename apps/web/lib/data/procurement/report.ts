@@ -27,21 +27,25 @@ function assertNoPersonalNumbers(dataDir: string) {
 
 type Control = { year: string; tenders_announced: string; simplified_total_gel: string; report_file: string; page: string };
 
+/** A month below this many direct purchases is a likely hole: a normal month in 2016–2021 has 5,000–40,000, so 3,000 also catches months that are only partly missing. */
+const THIN_MONTH = 3_000;
 const signed = (value: Decimal) => (value.isZero() ? "0" : value.isNegative() ? `−${value.abs().toString()}` : `+${value.toString()}`);
 const fileYear = (file: string) => /_(\d{4})\.xlsx$/.exec(file)![1];
 
 async function purchaseTotals(dataDir: string) {
-  const totals = new Map<string, { gel: Decimal; other: Record<string, number> }>();
+  const totals = new Map<string, { gel: Decimal; other: Record<string, number>; months: Record<string, number> }>();
   let lastDate = "";
   for (const name of fs.readdirSync(path.join(dataDir, "clean")).filter(n => /^purchases_\d{4}\.csv\.gz$/.test(n)).sort()) {
     const year = name.slice(10, 14);
-    const total = { gel: new Decimal(0), other: {} as Record<string, number> };
+    const total = { gel: new Decimal(0), other: {} as Record<string, number>, months: {} as Record<string, number> };
     totals.set(year, total);
     const rows = fs.createReadStream(path.join(dataDir, "clean", name)).pipe(createGunzip()).pipe(parse({ bom: true, columns: true }));
     for await (const row of rows as AsyncIterable<Record<string, string>>) {
       if (row.currency === "GEL" && row.contract_value) total.gel = total.gel.plus(row.contract_value);
       else if (row.currency) total.other[row.currency] = (total.other[row.currency] ?? 0) + 1;
       if (row.contract_date > lastDate) lastDate = row.contract_date;
+      const month = row.contract_date.slice(5, 7);
+      total.months[month] = (total.months[month] ?? 0) + 1;
     }
   }
   return { totals, lastDate: lastDate.slice(0, 10) };
@@ -70,10 +74,14 @@ export async function buildReport(dataDir: string): Promise<string> {
   });
   const purchaseLines = stats.filter(s => s.file.includes("/simpified_")).map(s => {
     const year = fileYear(s.file);
-    const total = totals.get(year) ?? { gel: new Decimal(0), other: {} };
+    const total = totals.get(year) ?? { gel: new Decimal(0), other: {}, months: {} };
     const agency = controls.get(year)?.simplified_total_gel;
     const other = Object.entries(total.other).map(([currency, n]) => `${currency} ${n}`).join(", ") || "—";
     return `| ${year} | ${s.rows} | ${total.gel.toString()} | ${agency || "—"} | ${agency ? signed(total.gel.minus(agency)) : "—"} | ${other} |`;
+  });
+  const thinMonths = [...totals].map(([year, total]) => {
+    const months = Array.from({ length: 12 }, (_, i) => String(i + 1).padStart(2, "0")).filter(m => (total.months[m] ?? 0) < THIN_MONTH);
+    return `| ${year} | ${months.join(", ") || "none"} |`;
   });
   const quality = stats.map(s => `| ${s.file} | ${s.duplicateIds} | ${s.wonWithoutSupplier} | ${Object.entries(s.currencies).map(([c, n]) => `${c} ${n}`).join(", ")} |`);
 
@@ -95,6 +103,12 @@ export async function buildReport(dataDir: string): Promise<string> {
     ...purchaseLines,
     "",
     `The last direct purchase in the files is dated ${lastDate || "—"}. Later direct purchases are not in Tender Monitor's yearly files.`,
+    "",
+    `Months with fewer than ${THIN_MONTH.toLocaleString("en-US")} direct purchases (a normal month has several thousand, so these point to holes in the files):`,
+    "",
+    "| Year | Months |",
+    "|---|---|",
+    ...thinMonths,
     "",
     "## File checks",
     "",

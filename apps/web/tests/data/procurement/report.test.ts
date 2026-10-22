@@ -65,3 +65,8 @@ test("a personal number in a saved registry answer stops the report too", async 
   fs.writeFileSync(path.join(dataDir, "registry", "raw", "111111111.json"), JSON.stringify({ id: "01019067930" }));
   await expect(buildReport(dataDir)).rejects.toThrow("111111111.json");
 });
+
+test("months with almost no direct purchases are listed, since they point to holes in the files", async () => {
+  const report = await buildReport(fixture());
+  expect(report).toContain("| 2016 | 01, 02, 03, 04, 05, 06, 07, 08, 09, 10, 11, 12 |");
+});
