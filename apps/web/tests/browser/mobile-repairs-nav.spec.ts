@@ -1,4 +1,5 @@
 import { expect, test, type Locator, type Page } from "@playwright/test";
+import { NAV_TREE } from "../../lib/navigation/navTree";
 
 // Mobile repairs (2026-10-07 review, owner decisions D2/D3/D10): navigation,
 // headers and editorial pages on a 390px phone.
@@ -141,8 +142,9 @@ for (const { path, labels } of [
     // The data line no longer repeats its own heading.
     await expect(footer.getByText(path === "/en" ? "Data" : "მონაცემები", { exact: true })).toHaveCount(0);
     const height = (await footer.boundingBox())?.height ?? 0;
-    // ~748px since the footer lists all twenty hubs (Q3, 2026-10-12; Business, Health, Housing, Crime and justice and Education added 2026-10-15/16, Science and culture, Environment and climate, Transport and Internet and technology 2026-10-20): twenty-three links make twelve 44px rows in two columns.
-    expect(height).toBeLessThanOrEqual(760);
+    // The footer lists every hub plus three links, in two columns of 44px rows; 232px is the rest of the footer
+    // (760px for twenty hubs' twelve rows, measured 2026-10-20).
+    expect(height).toBeLessThanOrEqual(Math.ceil((NAV_TREE.length + 3) / 2) * 44 + 232);
     const marginTop = await footer.evaluate((element) => parseFloat(getComputedStyle(element).marginTop));
     expect(marginTop).toBeLessThanOrEqual(48);
   });

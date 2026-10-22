@@ -132,7 +132,7 @@ jobs:
       # because their content changes on every run. A source change restores the
       # newest cache for the same lockfile and recompiles only what changed.
       - name: Restore the Next.js build cache
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: apps/web/.next/cache
           key: nextjs-${{ runner.os }}-${{ hashFiles('apps/web/package-lock.json') }}-${{ hashFiles('apps/web/app/**', 'apps/web/components/**', 'apps/web/lib/**', '!apps/web/lib/factQuery/generated/**', '!apps/web/lib/generated/**', 'apps/web/next.config.ts') }}
@@ -200,7 +200,7 @@ jobs:
       # packages they need are not, so a cache hit still installs those.
       - name: Restore the Playwright browsers
         id: playwright-cache
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ~/.cache/ms-playwright
           key: playwright-${{ runner.os }}-${{ steps.playwright.outputs.version }}-chromium
@@ -211,7 +211,7 @@ jobs:
         if: steps.playwright-cache.outputs.cache-hit == 'true'
         run: npx playwright install-deps chromium
       - name: Download the build
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: next-build
           path: apps/web
