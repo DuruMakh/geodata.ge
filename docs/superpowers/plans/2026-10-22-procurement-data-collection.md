@@ -68,7 +68,7 @@
   - `partyKey(code: string, secret: string): string` — personal number → `p_` + 16 hex of HMAC-SHA-256; any other code returned trimmed and unchanged.
   - `stripPersonalNumbers<T>(value: T): T` — deep copy with every string of exactly 11 digits (after trim), and every number with 11 digits, replaced by `null`; object keys kept.
 
-- [ ] **Step 1: Write failing tests** — `isPersonalNumber("01019067930")` true, `("202283242")` false, `("0101906793a")` false; `partyKey` is stable for the same input/secret, differs between secrets, starts with `p_`, length 18, and never contains the input; `partyKey("202283242", s) === "202283242"`; `stripPersonalNumbers({a:{b:["01019067930", "x"]}, n: 12345678901, c: "202283242"})` equals `{a:{b:[null,"x"]}, n:null, c:"202283242"}`; `loadOrCreateSecret` twice in a temp dir returns the same 64-hex string.
+- [ ] **Step 1: Write failing tests** — `isPersonalNumber("99999999990")` true, `("202283242")` false, `("9999999999a")` false; `partyKey` is stable for the same input/secret, differs between secrets, starts with `p_`, length 18, and never contains the input; `partyKey("202283242", s) === "202283242"`; `stripPersonalNumbers({a:{b:["99999999990", "x"]}, n: 12345678901, c: "202283242"})` equals `{a:{b:[null,"x"]}, n:null, c:"202283242"}`; `loadOrCreateSecret` twice in a temp dir returns the same 64-hex string.
 - [ ] **Step 2: Run** `npx vitest run tests/data/procurement/privacy.test.ts` — expect FAIL.
 - [ ] **Step 3: Implement** `privacy.ts`.
 - [ ] **Step 4: Run** — expect PASS.

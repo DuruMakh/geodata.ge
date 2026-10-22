@@ -55,14 +55,14 @@ test("the report is written to data-report.md", async () => {
 
 test("a personal number anywhere in the cleaned data stops the report and names the file", async () => {
   const dataDir = fixture();
-  fs.writeFileSync(path.join(dataDir, "clean", "suppliers.csv.gz"), gzipSync("supplier_code\n01019067930\n"));
+  fs.writeFileSync(path.join(dataDir, "clean", "suppliers.csv.gz"), gzipSync("supplier_code\n99999999990\n"));
   await expect(buildReport(dataDir)).rejects.toThrow("suppliers.csv.gz");
 });
 
 test("a personal number in a saved registry answer stops the report too", async () => {
   const dataDir = fixture();
   fs.mkdirSync(path.join(dataDir, "registry", "raw"));
-  fs.writeFileSync(path.join(dataDir, "registry", "raw", "111111111.json"), JSON.stringify({ id: "01019067930" }));
+  fs.writeFileSync(path.join(dataDir, "registry", "raw", "111111111.json"), JSON.stringify({ id: "99999999990" }));
   await expect(buildReport(dataDir)).rejects.toThrow("111111111.json");
 });
 

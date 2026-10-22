@@ -29,11 +29,11 @@ function cellText(value: ExcelJS.CellValue | undefined): string | null {
 }
 
 /**
- * Streams the first worksheet's rows as text cells, padded to the header's length. Throws, naming the file, when the
+ * Streams the first worksheet's rows (styles are read so that date cells come back as dates, not serial numbers) as text cells, padded to the header's length. Throws, naming the file, when the
  * trimmed header differs from the expected columns.
  */
 export async function* readSheetRows(xlsxPath: string, expected: readonly { source: string }[]): AsyncGenerator<(string | null)[]> {
-  const reader = new ExcelJS.stream.xlsx.WorkbookReader(xlsxPath, { sharedStrings: "cache", hyperlinks: "ignore", styles: "ignore", worksheets: "emit" });
+  const reader = new ExcelJS.stream.xlsx.WorkbookReader(xlsxPath, { sharedStrings: "cache", hyperlinks: "ignore", styles: "cache", worksheets: "emit" });
   for await (const worksheet of reader) {
     let headerChecked = false;
     for await (const row of worksheet) {

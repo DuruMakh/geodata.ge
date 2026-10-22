@@ -26,12 +26,13 @@ export function maskPersonalNumbers(text: string): string {
 }
 
 /**
- * A personal number, or a code with one inside it, becomes `p_` + 16 hex of its HMAC-SHA-256, the same for the same
- * code; any other code is kept.
+ * A personal number, a code with one inside it, or a 10-digit code starting with 0 (a personal number missing a digit;
+ * company codes have 9 digits) becomes `p_` + 16 hex of its HMAC-SHA-256, the same for the same code; any other code
+ * is kept.
  */
 export function partyKey(code: string, secret: string): string {
   const trimmed = code.trim();
-  if (!PERSONAL_NUMBER_RUN.test(trimmed)) return trimmed;
+  if (!PERSONAL_NUMBER_RUN.test(trimmed) && !/^0\d{9}$/.test(trimmed)) return trimmed;
   return `p_${createHmac("sha256", secret).update(trimmed).digest("hex").slice(0, 16)}`;
 }
 

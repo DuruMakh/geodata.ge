@@ -50,18 +50,33 @@ function appendStatus(dataDir: string, code: string, status: string, retrievedAt
   fs.appendFileSync(file, `${code},${status},${retrievedAt}\n`);
 }
 
+/** Codes whose latest lookup answered "not found", so a re-run does not ask for them again. */
+function previouslyNotFound(dataDir: string): Set<string> {
+  const file = path.join(dataDir, "registry", "status.csv");
+  const latest = new Map<string, string>();
+  if (fs.existsSync(file)) {
+    for (const line of fs.readFileSync(file, "utf8").replace(/^\uFEFF/, "").split("\n").slice(1)) {
+      const [code, status] = line.split(",");
+      if (code) latest.set(code, status);
+    }
+  }
+  return new Set([...latest].filter(([, status]) => status === "not_found").map(([code]) => code));
+}
+
 /**
- * Looks up each company code not yet saved: its internal id, then its record, saved to registry/raw/{code}.json with
- * every personal number removed. Stops after ten failed codes in a row, so a broken service is not hammered.
+ * Looks up each company code not yet saved or found missing: its internal id, then its record, saved to registry/raw/{code}.json with
+ * every personal number removed. An answer that is neither an id nor empty is a failure, not "not found". Stops after
+ * ten failed codes in a row, so a broken service is not hammered.
  */
 export async function collectRegistry(dataDir: string, codes: string[], client: RegistryClient, log: (line: string) => void): Promise<RegistryStats> {
   const rawDir = path.join(dataDir, "registry", "raw");
   fs.mkdirSync(rawDir, { recursive: true });
   const stats: RegistryStats = { looked_up: 0, found: 0, not_found: 0, failed: 0, skipped: 0, stopped: false };
+  const notFound = previouslyNotFound(dataDir);
   let failuresInRow = 0;
   for (const code of codes) {
     const target = path.join(rawDir, `${code}.json`);
-    if (fs.existsSync(target)) {
+    if (fs.existsSync(target) || notFound.has(code)) {
       stats.skipped += 1;
       continue;
     }
@@ -69,7 +84,8 @@ export async function collectRegistry(dataDir: string, codes: string[], client: 
     const retrievedAt = new Date().toISOString();
     try {
       const internalId = await client.getJson(`getcorporation/${code}`);
-      const record = typeof internalId === "number" ? await client.getJson(`corporations/${internalId}`) : null;
+      if (internalId !== null && typeof internalId !== "number") throw new Error(`unexpected answer to getcorporation/${code}: ${typeof internalId}`);
+      const record = internalId === null ? null : await client.getJson(`corporations/${internalId}`);
       if (record === null || record === undefined) {
         stats.not_found += 1;
         appendStatus(dataDir, code, "not_found", retrievedAt);

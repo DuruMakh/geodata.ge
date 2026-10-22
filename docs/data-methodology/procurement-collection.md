@@ -46,11 +46,15 @@ value, else its start value.
 ## Privacy rules
 
 - No collected data is committed to the repository, which is public. Code, tests (made-up rows only) and this note are.
-- An 11-digit personal number never appears in `clean/` or `registry/`. In the cleaned tables it is replaced by
-  `p_` plus the first 16 hex characters of an HMAC-SHA-256 of the number, keyed by `secret.key` in the data folder,
-  so the same person keeps the same key across years. The original workbooks keep the numbers (they are public on
+- An 11-digit personal number never appears on its own in `clean/` or `registry/`. A supplier or buyer code that is
+  one, contains one, or is a 10-digit code starting with 0 (a personal number missing a digit) is replaced by `p_`
+  plus the first 16 hex characters of an HMAC-SHA-256 of the code, keyed by `secret.key` in the data folder, so the
+  same code keeps the same key across years. (A person whose code is written two ways, such as with and without a
+  prefix, gets two keys.) In every other field, such as supplier names and document numbers, a standalone 11-digit
+  run is replaced by `[removed]`. A run glued to letters (`ID12345678901`) is not treated as one. The original workbooks keep the numbers (they are public on
   Tender Monitor) and stay in the private folder.
-- Every 11-digit value in a registry answer is removed before the answer is saved. People are recorded by name and
+- Every 11-digit value in a registry answer is removed, and every 11-digit run inside its texts masked, before the
+  answer is saved. People are recorded by name and
   by companyinfo.ge's own person number.
 - Individuals and sole traders are not looked up on companyinfo.ge; its `robots.txt` excludes their pages.
 - The report step scans `clean/` and `registry/` and refuses to report if it finds an 11-digit number.
@@ -60,7 +64,8 @@ value, else its start value.
 - Tender Monitor: each yearly file is downloaded once; a re-run skips files already present.
 - companyinfo.ge: one request at a time, at least two seconds apart, user-agent
   `fiscal.ge-procurement-collection/1.0 (+https://fiscal.ge)`. A server error, rate limit or network error is retried
-  after 10 s and then 30 s; ten failed companies in a row stop the run. Saved companies are never asked for again.
+  after 10 s and then 30 s; ten failed companies in a row stop the run. Companies already saved or answered "not found" are never asked for again; an answer
+  that is neither an id nor empty counts as a failure.
   Companies are looked up in order of total GEL won, largest first.
 
 ## Checks
@@ -68,7 +73,8 @@ value, else its start value.
 The `report` step writes `data-report.md` with: tender rows per year against the agency's count of tenders
 announced; direct-purchase GEL totals per year against the agency's simplified-purchase total; duplicate tender and
 contract numbers; tenders marked "contract signed" with no supplier; rows per currency; the date of the last direct
-purchase; and owner/director coverage (found, not found, failed). A year that differs from the agency is listed with
+purchase; the months with fewer than 3,000 direct purchases (a normal month has several thousand, so these point to
+holes in Tender Monitor's files); and owner/director coverage (found, not found, failed). A year that differs from the agency is listed with
 both numbers. The clean step stops, naming the file and both header lists, if a yearly file's columns differ from the
 expected ones.
 

@@ -7,18 +7,18 @@ import { isPersonalNumber, loadOrCreateSecret, maskPersonalNumbers, partyKey, st
 const SECRET = "a".repeat(64);
 
 test("an 11-digit code is a personal number; a 9-digit company code is not", () => {
-  expect(isPersonalNumber("01019067930")).toBe(true);
-  expect(isPersonalNumber(" 01019067930 ")).toBe(true);
+  expect(isPersonalNumber("99999999990")).toBe(true);
+  expect(isPersonalNumber(" 99999999990 ")).toBe(true);
   expect(isPersonalNumber("202283242")).toBe(false);
-  expect(isPersonalNumber("0101906793a")).toBe(false);
+  expect(isPersonalNumber("9999999999a")).toBe(false);
 });
 
 test("a personal number becomes a stable key that does not contain it", () => {
-  const key = partyKey("01019067930", SECRET);
-  expect(key).toBe(partyKey("01019067930", SECRET));
-  expect(key).not.toBe(partyKey("01019067930", "b".repeat(64)));
+  const key = partyKey("99999999990", SECRET);
+  expect(key).toBe(partyKey("99999999990", SECRET));
+  expect(key).not.toBe(partyKey("99999999990", "b".repeat(64)));
   expect(key).toMatch(/^p_[0-9a-f]{16}$/);
-  expect(key).not.toContain("01019067930");
+  expect(key).not.toContain("99999999990");
 });
 
 test("a company code is kept as published", () => {
@@ -26,7 +26,7 @@ test("a company code is kept as published", () => {
 });
 
 test("personal numbers are removed at any depth, other values kept", () => {
-  expect(stripPersonalNumbers({ a: { b: ["01019067930", "x"] }, n: 12345678901, c: "202283242" })).toEqual({
+  expect(stripPersonalNumbers({ a: { b: ["99999999990", "x"] }, n: 12345678901, c: "202283242" })).toEqual({
     a: { b: [null, "x"] },
     n: null,
     c: "202283242",
@@ -41,17 +41,22 @@ test("the secret is created once and then reused", async () => {
 });
 
 test("a code with a personal number inside it is replaced as a whole", () => {
-  const key = partyKey("09 / 01019067930-5", SECRET);
+  const key = partyKey("09 / 99999999990-5", SECRET);
   expect(key).toMatch(/^p_[0-9a-f]{16}$/);
-  expect(key).toBe(partyKey(" 09 / 01019067930-5 ", SECRET));
-  expect(key).not.toBe(partyKey("01019067930", SECRET));
+  expect(key).toBe(partyKey(" 09 / 99999999990-5 ", SECRET));
+  expect(key).not.toBe(partyKey("99999999990", SECRET));
 });
 
 test("a personal number inside free text is masked, other numbers kept", () => {
-  expect(maskPersonalNumbers("ფ/პ ნინი (პ/ნ 01019067930), # 01019067931")).toBe("ფ/პ ნინი (პ/ნ [removed]), # [removed]");
-  expect(maskPersonalNumbers("SPA160009161 1595.00 202283242 010190679301")).toBe("SPA160009161 1595.00 202283242 010190679301");
+  expect(maskPersonalNumbers("ფ/პ ნინი (პ/ნ 99999999990), # 99999999991")).toBe("ფ/პ ნინი (პ/ნ [removed]), # [removed]");
+  expect(maskPersonalNumbers("SPA160009161 1595.00 202283242 999999999901")).toBe("SPA160009161 1595.00 202283242 999999999901");
 });
 
 test("a personal number inside a registry text is masked too", () => {
-  expect(stripPersonalNumbers({ note: "პ/ნ 01019067930" })).toEqual({ note: "პ/ნ [removed]" });
+  expect(stripPersonalNumbers({ note: "პ/ნ 99999999990" })).toEqual({ note: "პ/ნ [removed]" });
+});
+
+test("a 10-digit code starting with 0 is a personal number missing a digit and is replaced too", () => {
+  expect(partyKey("0999999999", SECRET)).toMatch(/^p_[0-9a-f]{16}$/);
+  expect(partyKey("2999999999", SECRET)).toBe("2999999999");
 });

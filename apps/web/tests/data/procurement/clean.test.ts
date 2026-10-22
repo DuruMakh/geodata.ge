@@ -106,3 +106,15 @@ test("a direct-purchase file keeps all 25 fields and replaces personal numbers",
   expect(rows[1].supplier_code).toMatch(/^p_[0-9a-f]{16}$/);
   expect(text).not.toContain(PERSON);
 });
+
+test("a date cell is written as a date, not as a spreadsheet serial number", async () => {
+  const { dataDir, file, xlsx } = setup("purchases");
+  const row = PURCHASE_COLUMNS.map(column => (column.source === "კონტრაქტის დრო" ? new Date(Date.UTC(2016, 0, 4)) : column.source === "რეგისტრაციის ნომერი" ? "CMR9" : null));
+  const workbook = new ExcelJS.Workbook();
+  const sheet = workbook.addWorksheet("Sheet1");
+  sheet.addRow(PURCHASE_COLUMNS.map(column => column.source));
+  sheet.addRow(row);
+  await workbook.xlsx.writeFile(xlsx);
+  await cleanFile(file, dataDir, SECRET);
+  expect(readClean(dataDir, "purchases_2016.csv.gz").rows[0].contract_date).toBe("2016-01-04");
+});

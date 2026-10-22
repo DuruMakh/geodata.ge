@@ -32,12 +32,12 @@ test("a company already saved is not asked for again", async () => {
 
 test("a found company is saved without any personal number in its record", async () => {
   const dataDir = tempDir();
-  const record = { name: "Alpha", persons: [{ person: { name: "A. Person", personalNumber: "01019067930" } }] };
+  const record = { name: "Alpha", persons: [{ person: { name: "A. Person", personalNumber: "99999999990" } }] };
   const { client, calls } = fakeClient({ "111111111": 647006 }, { "647006": record });
   expect(await collectRegistry(dataDir, ["111111111"], client, quiet)).toMatchObject({ looked_up: 1, found: 1 });
   expect(calls).toEqual(["getcorporation/111111111", "corporations/647006"]);
   const saved = fs.readFileSync(path.join(dataDir, "registry", "raw", "111111111.json"), "utf8");
-  expect(saved).not.toContain("01019067930");
+  expect(saved).not.toContain("99999999990");
   expect(JSON.parse(saved)).toMatchObject({ code: "111111111", internal_id: 647006, record: { name: "Alpha", persons: [{ person: { name: "A. Person", personalNumber: null } }] } });
   expect(fs.readFileSync(path.join(dataDir, "registry", "status.csv"), "utf8")).toMatch(/^﻿code,status,retrieved_at\n111111111,found,/);
 });
@@ -86,4 +86,18 @@ test("the polite client gives up after three failed attempts", async () => {
   const client = politeClient(fetchImpl, async ms => { clock += ms; }, () => clock);
   await expect(client.getJson("metadata")).rejects.toThrow("503");
   expect(attempts).toBe(3);
+});
+
+test("a company found missing before is not asked for again", async () => {
+  const dataDir = tempDir();
+  await collectRegistry(dataDir, ["999999999"], fakeClient({}).client, quiet);
+  const { client, calls } = fakeClient({});
+  expect(await collectRegistry(dataDir, ["999999999"], client, quiet)).toMatchObject({ skipped: 1, looked_up: 0 });
+  expect(calls).toEqual([]);
+});
+
+test("an answer that is neither an id nor empty counts as a failure, not as not found", async () => {
+  const dataDir = tempDir();
+  const { client } = fakeClient({ "111111111": { id: 5 } });
+  expect(await collectRegistry(dataDir, ["111111111"], client, quiet)).toMatchObject({ failed: 1, not_found: 0 });
 });
