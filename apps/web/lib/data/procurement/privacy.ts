@@ -17,19 +17,31 @@ export async function loadOrCreateSecret(dataDir: string): Promise<string> {
   return fs.readFileSync(file, "utf8").trim();
 }
 
-/** A personal number becomes `p_` + 16 hex of its HMAC-SHA-256, the same for the same person; any other code is kept. */
+/** An 11-digit run that is not part of a longer word or number (a `p_` key's hex is not caught). */
+export const PERSONAL_NUMBER_RUN = /(?<![0-9A-Za-z_])\d{11}(?![0-9A-Za-z])/;
+
+/** Free text with every standalone 11-digit run replaced by `[removed]`. */
+export function maskPersonalNumbers(text: string): string {
+  return text.replace(new RegExp(PERSONAL_NUMBER_RUN.source, "g"), "[removed]");
+}
+
+/**
+ * A personal number, or a code with one inside it, becomes `p_` + 16 hex of its HMAC-SHA-256, the same for the same
+ * code; any other code is kept.
+ */
 export function partyKey(code: string, secret: string): string {
   const trimmed = code.trim();
-  if (!isPersonalNumber(trimmed)) return trimmed;
+  if (!PERSONAL_NUMBER_RUN.test(trimmed)) return trimmed;
   return `p_${createHmac("sha256", secret).update(trimmed).digest("hex").slice(0, 16)}`;
 }
 
 const isPersonalValue = (value: unknown) =>
   (typeof value === "string" && isPersonalNumber(value)) || (typeof value === "number" && Number.isInteger(value) && isPersonalNumber(String(value)));
 
-/** A copy with every 11-digit value, at any depth, replaced by null. */
+/** A copy with every 11-digit value, at any depth, replaced by null, and every 11-digit run inside a text masked. */
 export function stripPersonalNumbers<T>(value: T): T {
   if (isPersonalValue(value)) return null as T;
+  if (typeof value === "string") return maskPersonalNumbers(value) as T;
   if (Array.isArray(value)) return value.map(item => stripPersonalNumbers(item)) as T;
   if (value !== null && typeof value === "object") {
     return Object.fromEntries(Object.entries(value).map(([key, item]) => [key, stripPersonalNumbers(item)])) as T;

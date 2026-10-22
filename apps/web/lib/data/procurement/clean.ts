@@ -5,7 +5,7 @@ import { createGzip } from "node:zlib";
 import ExcelJS from "exceljs";
 import { csvEscape } from "../csvEscape";
 import { PURCHASE_COLUMNS, TENDER_COLUMNS, type SourceColumn } from "./columns";
-import { partyKey } from "./privacy";
+import { maskPersonalNumbers, partyKey } from "./privacy";
 import type { SourceFile } from "./paths";
 
 export type CleanStats = { file: string; rows: number; duplicateIds: number; wonWithoutSupplier: number; currencies: Record<string, number> };
@@ -84,7 +84,7 @@ export async function cleanFile(file: SourceFile, dataDir: string, secret: strin
       if (currency) stats.currencies[currency] = (stats.currencies[currency] ?? 0) + 1;
       const fields = kept.map(({ field, index }) => {
         const text = cells[index]?.trim() ?? "";
-        return PARTY_FIELDS.has(field) && text ? partyKey(text, secret) : text;
+        return PARTY_FIELDS.has(field) && text ? partyKey(text, secret) : maskPersonalNumbers(text);
       });
       await write(`${fields.map(csvEscape).join(",")}\n`);
     }

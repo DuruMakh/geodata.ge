@@ -5,9 +5,8 @@ import { parse } from "csv-parse";
 import { parse as parseSync } from "csv-parse/sync";
 import Decimal from "decimal.js";
 import type { CleanStats } from "./clean";
+import { PERSONAL_NUMBER_RUN } from "./privacy";
 
-/** An 11-digit run that is not part of a longer word or number (a `p_` key's hex is not caught). */
-const PERSONAL_NUMBER = /(?<![0-9A-Za-z_])\d{11}(?![0-9A-Za-z])/;
 
 function filesUnder(dir: string): string[] {
   if (!fs.existsSync(dir)) return [];
@@ -22,7 +21,7 @@ function assertNoPersonalNumbers(dataDir: string) {
   for (const file of [...filesUnder(path.join(dataDir, "clean")), ...filesUnder(path.join(dataDir, "registry"))]) {
     const bytes = fs.readFileSync(file);
     const text = (file.endsWith(".gz") ? gunzipSync(bytes) : bytes).toString("utf8");
-    if (PERSONAL_NUMBER.test(text)) throw new Error(`${file} contains an 11-digit number that may be a personal ID; nothing was reported`);
+    if (PERSONAL_NUMBER_RUN.test(text)) throw new Error(`${file} contains an 11-digit number that may be a personal ID; nothing was reported`);
   }
 }
 
