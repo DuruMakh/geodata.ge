@@ -8,7 +8,7 @@ import { downloadSources } from "../lib/data/procurement/download";
 import { buildParties, companyLookupQueue } from "../lib/data/procurement/parties";
 import { procurementDataDir, sourceFiles } from "../lib/data/procurement/paths";
 import { loadOrCreateSecret } from "../lib/data/procurement/privacy";
-import { collectRegistry, politeClient } from "../lib/data/procurement/registry";
+import { collectRegistry, flattenRegistry, politeClient } from "../lib/data/procurement/registry";
 import { buildReport } from "../lib/data/procurement/report";
 import { runAsCli } from "../lib/runAsCli";
 
@@ -47,7 +47,8 @@ export async function main(args: readonly string[]) {
     const queue = await companyLookupQueue(dataDir);
     const client = politeClient(fetch, ms => sleep(ms), () => Date.now());
     const stats = await collectRegistry(dataDir, limit ? queue.slice(0, limit) : queue, client, line => console.error(line));
-    console.log(JSON.stringify({ status: stats.stopped ? "stopped" : "passed", step, queued: queue.length, ...stats }));
+    const flattened = await flattenRegistry(dataDir);
+    console.log(JSON.stringify({ status: stats.stopped ? "stopped" : "passed", step, queued: queue.length, ...stats, ...flattened }));
   } else {
     await buildReport(dataDir);
     console.log(JSON.stringify({ status: "passed", step, report: path.join(dataDir, "data-report.md") }));

@@ -34,7 +34,12 @@ stopped in 2019. Direct purchases after mid-August 2025 are a known gap.
   by hand, with the report and page of each.
 - `clean/`: `tenders_{YEAR}.csv.gz`, `purchases_{YEAR}.csv.gz`, `suppliers.csv.gz`, `buyers.csv.gz` (UTF-8 with BOM,
   gzip) and `stats.json`.
-- `registry/`: `raw/{code}.json` (one answer per company) and `status.csv` (each lookup's outcome and time).
+- `registry/`: `raw/{code}.json` (one answer per company), `status.csv` (each lookup's outcome and time), and two
+  tables rebuilt from the saved answers at the end of every registry run: `companies.csv.gz` (code, companyinfo.ge's
+  internal id, name, legal form, registration date, status, address) and `links.csv.gz` (one row per person or company
+  linked to a company, current or former: role, companyinfo.ge's person number, name, the 9-digit code when the
+  linked party is a Georgian company, share, the date the service shows for the link, whether the link is former, and
+  nationality). The service gives one date per link and does not say whether it is a start or an end date.
 - `data-report.md`: counts, totals and checks, in plain words.
 
 The cleaned tables keep every source column except six long free-text tender fields (submission terms, additional
@@ -55,7 +60,8 @@ value, else its start value.
   Tender Monitor) and stay in the private folder.
 - Every 11-digit value in a registry answer is removed, and every 11-digit run inside its texts masked, before the
   answer is saved. People are recorded by name and
-  by companyinfo.ge's own person number.
+  by companyinfo.ge's own person number. The flattened `links.csv.gz` carries no ID number of a person (foreign
+  passport and registration numbers stay only in the saved answers).
 - Individuals and sole traders are not looked up on companyinfo.ge; its `robots.txt` excludes their pages.
 - The report step scans `clean/` and `registry/` and refuses to report if it finds an 11-digit number.
 
@@ -65,7 +71,7 @@ value, else its start value.
 - companyinfo.ge: one request at a time, at least two seconds apart, user-agent
   `fiscal.ge-procurement-collection/1.0 (+https://fiscal.ge)`. A server error, rate limit or network error is retried
   after 10 s and then 30 s; ten failed companies in a row stop the run. Companies already saved or answered "not found" are never asked for again; an answer
-  that is neither an id nor empty counts as a failure.
+  that is neither an id nor empty (the service answers an empty text for a code it does not have) counts as a failure.
   Companies are looked up in order of total GEL won, largest first.
 
 ## Checks

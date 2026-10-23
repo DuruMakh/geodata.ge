@@ -2,7 +2,8 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { expect, test } from "vitest";
-import { collectRegistry, politeClient, type RegistryClient } from "../../../lib/data/procurement/registry";
+import { gunzipSync } from "node:zlib";
+import { collectRegistry, flattenRegistry, politeClient, type RegistryClient } from "../../../lib/data/procurement/registry";
 
 const tempDir = () => fs.mkdtempSync(path.join(os.tmpdir(), "procurement-registry-"));
 const quiet = () => undefined;
@@ -100,4 +101,42 @@ test("an answer that is neither an id nor empty counts as a failure, not as not 
   const dataDir = tempDir();
   const { client } = fakeClient({ "111111111": { id: 5 } });
   expect(await collectRegistry(dataDir, ["111111111"], client, quiet)).toMatchObject({ failed: 1, not_found: 0 });
+});
+
+test("an empty text answer (the service's way of saying it has no such company) is not found", async () => {
+  const dataDir = tempDir();
+  const { client, calls } = fakeClient({ "111111111": "" });
+  expect(await collectRegistry(dataDir, ["111111111"], client, quiet)).toMatchObject({ not_found: 1, failed: 0 });
+  expect(calls).toEqual(["getcorporation/111111111"]);
+});
+
+test("saved records flatten into one company row and one row per linked person or company", async () => {
+  const dataDir = tempDir();
+  const rawDir = path.join(dataDir, "registry", "raw");
+  fs.mkdirSync(rawDir, { recursive: true });
+  const record = {
+    corporation: { name: "შპს ალფა", idCode: "111111111", registrationDate: { date: "2004-05-06 00:00:00.000000" }, address: "თბილისი, ქუჩა 1" },
+    legalFormKa: "შეზღუდული პასუხისმგებლობის საზოგადოება",
+    status: "რეგისტრირებულია",
+    corporationAffiliations: [
+      { personId: 11, personName: "ა. პირი", personCompanyId: null, personIdNumber: null, personNationality: "საქართველო", exPerson: false, role: "დირექტორი", share: 0, date: "April 5, 2019" },
+      { personId: 22, personName: "შპს ბეტა", personCompanyId: 5005, personIdNumber: "222222222", personNationality: "საქართველო", exPerson: true, role: "პარტნიორი", share: 50.5, date: "December 31, 2010" },
+      { personId: 33, personName: "B. Person", personCompanyId: null, personIdNumber: "N12345678", personNationality: "თურქეთი", exPerson: false, role: "პარტნიორი", share: 49.5, date: "January 1, 2020" },
+    ],
+  };
+  fs.writeFileSync(path.join(rawDir, "111111111.json"), JSON.stringify({ code: "111111111", retrieved_at: "2026-10-23T05:00:00.000Z", internal_id: 647006, record }));
+  expect(await flattenRegistry(dataDir)).toEqual({ companies: 1, links: 3 });
+  const read = (name: string) => gunzipSync(fs.readFileSync(path.join(dataDir, "registry", name))).toString("utf8").replace(/^\uFEFF/, "").trim().split(/\r?\n/);
+  expect(read("companies.csv.gz")).toEqual([
+    "company_code,internal_id,name,legal_form,registered,status,address,retrieved_at",
+    "111111111,647006,შპს ალფა,შეზღუდული პასუხისმგებლობის საზოგადოება,2004-05-06,რეგისტრირებულია,\"თბილისი, ქუჩა 1\",2026-10-23T05:00:00.000Z",
+  ]);
+  const links = read("links.csv.gz");
+  expect(links[0]).toBe("company_code,role,person_id,person_name,linked_company_code,share,date,former,nationality,retrieved_at");
+  expect(links.slice(1)).toEqual([
+    "111111111,დირექტორი,11,ა. პირი,,0,2019-04-05,false,საქართველო,2026-10-23T05:00:00.000Z",
+    "111111111,პარტნიორი,22,შპს ბეტა,222222222,50.5,2010-12-31,true,საქართველო,2026-10-23T05:00:00.000Z",
+    "111111111,პარტნიორი,33,B. Person,,49.5,2020-01-01,false,თურქეთი,2026-10-23T05:00:00.000Z",
+  ]);
+  expect(links.join("\n")).not.toContain("N12345678");
 });

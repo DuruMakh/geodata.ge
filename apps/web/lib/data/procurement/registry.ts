@@ -1,5 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
+import { gzipSync } from "node:zlib";
+import { serializeBomCsvRows } from "../csvEscape";
 import { stripPersonalNumbers } from "./privacy";
 
 export type RegistryClient = { getJson(path: string): Promise<unknown> };
@@ -65,7 +67,7 @@ function previouslyNotFound(dataDir: string): Set<string> {
 
 /**
  * Looks up each company code not yet saved or found missing: its internal id, then its record, saved to registry/raw/{code}.json with
- * every personal number removed. An answer that is neither an id nor empty is a failure, not "not found". Stops after
+ * every personal number removed. An answer that is neither an id nor empty (null or empty text) is a failure, not "not found". Stops after
  * ten failed codes in a row, so a broken service is not hammered.
  */
 export async function collectRegistry(dataDir: string, codes: string[], client: RegistryClient, log: (line: string) => void): Promise<RegistryStats> {
@@ -83,7 +85,9 @@ export async function collectRegistry(dataDir: string, codes: string[], client: 
     stats.looked_up += 1;
     const retrievedAt = new Date().toISOString();
     try {
-      const internalId = await client.getJson(`getcorporation/${code}`);
+      const answer = await client.getJson(`getcorporation/${code}`);
+      // The service answers an empty text, not 404, for a code it does not have.
+      const internalId = answer === "" ? null : answer;
       if (internalId !== null && typeof internalId !== "number") throw new Error(`unexpected answer to getcorporation/${code}: ${typeof internalId}`);
       const record = internalId === null ? null : await client.getJson(`corporations/${internalId}`);
       if (record === null || record === undefined) {
@@ -109,4 +113,59 @@ export async function collectRegistry(dataDir: string, codes: string[], client: 
     if (stats.looked_up % 100 === 0) log(`${stats.looked_up} looked up: ${JSON.stringify(stats)}`);
   }
   return stats;
+}
+
+type SavedRecord = {
+  code: string;
+  retrieved_at: string;
+  internal_id: number;
+  record: {
+    corporation: { name: string | null; registrationDate: { date: string } | null; address: string | null };
+    legalFormKa: string | null;
+    status: string | null;
+    corporationAffiliations: {
+      personId: number;
+      personName: string | null;
+      personIdNumber: string | null;
+      personNationality: string | null;
+      exPerson: boolean;
+      role: string | null;
+      share: number | null;
+      date: string | null;
+    }[];
+  };
+};
+
+const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+/** "April 5, 2019" (the service's date format) as 2019-04-05; anything else is kept as it came. */
+function isoDate(text: string | null): string | null {
+  const match = text?.match(/^([A-Za-z]+) (\d{1,2}), (\d{4})$/);
+  const month = match ? MONTHS.indexOf(match[1]) + 1 : 0;
+  if (!match || month === 0) return text;
+  return `${match[3]}-${String(month).padStart(2, "0")}-${match[2].padStart(2, "0")}`;
+}
+
+/**
+ * Writes registry/companies.csv.gz (one row per saved company) and registry/links.csv.gz (one row per person or
+ * company linked to it, current or former). A linked Georgian company keeps its 9-digit code; no other ID number of
+ * a linked person or company is written.
+ */
+export async function flattenRegistry(dataDir: string): Promise<{ companies: number; links: number }> {
+  const registryDir = path.join(dataDir, "registry");
+  const rawDir = path.join(registryDir, "raw");
+  const companies: (string | number | boolean | null)[][] = [];
+  const links: (string | number | boolean | null)[][] = [];
+  for (const name of fs.readdirSync(rawDir).filter(file => file.endsWith(".json")).sort()) {
+    const saved = JSON.parse(fs.readFileSync(path.join(rawDir, name), "utf8")) as SavedRecord;
+    const { corporation } = saved.record;
+    companies.push([saved.code, saved.internal_id, corporation.name, saved.record.legalFormKa, corporation.registrationDate?.date.slice(0, 10) ?? null, saved.record.status, corporation.address, saved.retrieved_at]);
+    for (const link of saved.record.corporationAffiliations ?? []) {
+      const companyCode = /^\d{9}$/.test(link.personIdNumber ?? "") ? link.personIdNumber : null;
+      links.push([saved.code, link.role, link.personId, link.personName, companyCode, link.share, isoDate(link.date), link.exPerson, link.personNationality, saved.retrieved_at]);
+    }
+  }
+  fs.writeFileSync(path.join(registryDir, "companies.csv.gz"), gzipSync(serializeBomCsvRows([["company_code", "internal_id", "name", "legal_form", "registered", "status", "address", "retrieved_at"], ...companies])));
+  fs.writeFileSync(path.join(registryDir, "links.csv.gz"), gzipSync(serializeBomCsvRows([["company_code", "role", "person_id", "person_name", "linked_company_code", "share", "date", "former", "nationality", "retrieved_at"], ...links])));
+  return { companies: companies.length, links: links.length };
 }
