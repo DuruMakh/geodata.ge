@@ -44,7 +44,7 @@ test("its group page shows four cards, each opening its page, and the sidebar li
   }
   await expect(page.locator("#t-science-culture").getByRole("heading", { level: 2 })).toHaveText("Science and culture");
   const cards = topicCards(page, "science-culture");
-  for (const [index, figure] of [["14,046", "2024", "2019–2024"], ["79", "2025", "2016–2025"], ["1,998.9", "2025", "2005–2025"], ["620.3", "2025", "2006–2025"]].entries()) await expect(cards.nth(index)).toContainText(cardFigure(figure[0], figure[1], figure[2]));
+  for (const [index, figure] of [["14,046", "2024", "2019–2024"], ["79", "2025", "2016–2025"], ["1,998.9", "2025", "2005–2025"], ["620.3", "2025", "2006–2025"]].entries()) await expect(cards.nth(index)).toHaveAccessibleDescription(cardFigure(figure[0], figure[1], figure[2]));
 });
 
 test("research selects all researchers, and ticking spending replaces them (one unit at a time)", async ({ page }) => {

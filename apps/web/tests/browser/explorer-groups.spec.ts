@@ -12,6 +12,8 @@ const width = async (locator: Locator) => Math.round((await locator.boundingBox(
 /** Whether focus is inside the element. */
 const holdsFocus = (locator: Locator) => locator.evaluate((element) => element.contains(document.activeElement));
 const PREFIXES = ["", "/en"] as const;
+/** The page's address without its origin, compared exactly: a Georgian case that ended in English would not match. */
+const address = (page: Page) => { const url = new URL(page.url()); return url.pathname + url.search + url.hash; };
 const FORWARDED = new Set(LEGACY_TOPIC_FORWARDS.map(({ from }) => from));
 
 test.describe("the sidebar at 1440px", () => {
@@ -73,6 +75,8 @@ test.describe("the sidebar at 1440px", () => {
     await page.keyboard.press("Enter");
     await expect(sidebar(page)).toHaveAttribute("data-collapsed", "false");
     await expect(page.getByTestId("group-panel-prices")).toHaveCount(0);
+    // Away from the rail, so no hover can open or keep a pop-out when it returns.
+    await page.mouse.move(1000, 450);
     await page.keyboard.press("Enter");
     await expect(sidebar(page)).toHaveAttribute("data-collapsed", "true");
     await expect(page.getByTestId("group-panel-prices")).toHaveCount(0);
@@ -83,6 +87,13 @@ test.describe("the sidebar at 1440px", () => {
     await expect(sidebar(page)).toHaveAttribute("data-collapsed", "true");
     await expect.poll(() => width(sidebar(page))).toBe(72);
     await expect(page.getByTestId("sidebar-toggle")).toHaveAttribute("aria-expanded", "false");
+
+    // A rail icon is its group page's link.
+    await page.getByTestId("group-link-economy").click();
+    await expect.poll(() => address(page)).toBe("/explorer/economy");
+    await ready(page);
+    await expect(page.getByTestId("group-link-economy")).toHaveAttribute("aria-current", "page");
+    await expect(sidebar(page)).toHaveAttribute("data-collapsed", "true");
   });
 
   test("/ opens All data with its search box focused", async ({ page }) => {
@@ -129,24 +140,25 @@ test.describe("the phone menu at 375px", () => {
     const box = (await nav.boundingBox())!;
     expect([box.x, box.y, Math.round(box.width), Math.round(box.height)]).toEqual([0, 0, 375, 812]);
     await expect(page.locator("#content")).not.toBeVisible();
-    // Shift+Tab walks back through the menu and never reaches the page behind it. Past the menu's first link focus leaves
-    // the document for the browser's own controls (the body here) and comes back in at the menu's last link.
-    let inside = 0;
-    for (let step = 0; step < 40; step += 1) {
+    // The page and the bar behind the menu are inert, and Shift+Tab wraps from the menu's first control to its last, so
+    // focus never leaves the menu: not for the page, and not for the browser's own controls (the body here).
+    await expect(page.locator("[data-shell-page]")).toHaveAttribute("inert", "");
+    await expect(page.getByTestId("sidebar-topbar")).toHaveAttribute("inert", "");
+    const stops = await nav.locator("a[href], button").evaluateAll((elements) => elements.filter((element) => element.checkVisibility()).length);
+    for (let step = 0; step < stops + 5; step += 1) {
       await page.keyboard.press("Shift+Tab");
       const outside = await page.evaluate((id) => {
         const active = document.activeElement;
-        return active && active !== document.body && !document.getElementById(id)!.contains(active) ? active.outerHTML.slice(0, 160) : null;
+        return active && document.getElementById(id)!.contains(active) ? null : active?.outerHTML.slice(0, 160) ?? "nothing";
       }, "data-sidebar-navigation");
       expect(outside, `Shift+Tab ${step + 1}`).toBeNull();
-      if (await holdsFocus(nav)) inside += 1;
     }
-    expect(inside).toBeGreaterThan(30);
 
     await page.keyboard.press("Escape");
     await expect(page.getByTestId("sidebar-menu-button")).toHaveAttribute("aria-expanded", "false");
     await expect(page.getByTestId("sidebar-menu-button")).toBeFocused();
     await expect(page.locator("#content")).toBeVisible();
+    await expect(page.locator("[data-shell-page]")).not.toHaveAttribute("inert");
     expect(await page.evaluate(() => window.scrollY)).toBe(700);
 
     await page.getByTestId("sidebar-menu-button").click();
@@ -169,6 +181,20 @@ test.describe("the phone menu at 375px", () => {
     await page.setViewportSize({ width: 375, height: 812 });
     await expect(page.getByTestId("sidebar-menu-button")).toHaveAttribute("aria-expanded", "false");
     await expect(page.locator("#content")).toBeVisible();
+  });
+
+  test("the bar's search button opens All data with its box focused", async ({ page }) => {
+    for (const prefix of PREFIXES) {
+      await page.goto(`${prefix}/explorer/labour`);
+      await ready(page);
+      await page.getByTestId("topbar-search").click();
+      await expect.poll(() => address(page)).toBe(`${prefix}/explorer#q=`);
+      await expect(page.locator("#explorer-q")).toBeFocused();
+      // Already on All data, the button focuses the box in place.
+      await page.locator("#explorer-q").blur();
+      await page.getByTestId("topbar-search").click();
+      await expect(page.locator("#explorer-q")).toBeFocused();
+    }
   });
 
   test("a link to another page closes the menu and lands at that page's top", async ({ page }) => {
@@ -220,7 +246,7 @@ test("a Budget chart page's Budget crumb goes to the Budget group page", async (
     const crumb = page.getByTestId("explorer-header").getByRole("link", { name: prefix ? "Budget" : "ბიუჯეტი", exact: true });
     await expect(crumb).toHaveAttribute("href", `${prefix}/explorer/budget`);
     await crumb.click();
-    await expect(page).toHaveURL(new RegExp(`${prefix}/explorer/budget$`));
+    await expect.poll(() => address(page)).toBe(`${prefix}/explorer/budget`);
     await ready(page);
   }
 });
@@ -277,11 +303,15 @@ test.describe("All data", () => {
     await page.setViewportSize({ width: 1024, height: 800 });
     for (const prefix of PREFIXES) {
       await page.goto(`${prefix}/explorer`);
+      await page.evaluate(() => document.fonts.ready);
+      // The letters sit in the content column, beside the 272px sidebar.
+      const column = (await page.locator("#content").boundingBox())!;
+      expect(Math.round(column.x)).toBe(272);
       const boxes = await page.getByTestId("az-index").getByRole("navigation").locator("a, span").evaluateAll((elements) =>
         elements.map((element) => element.getBoundingClientRect().toJSON() as DOMRect));
       expect(boxes.length).toBeGreaterThanOrEqual(26);
       for (const box of boxes) {
-        expect(box.x).toBeGreaterThanOrEqual(0);
+        expect(box.x).toBeGreaterThanOrEqual(column.x);
         expect(box.x + box.width).toBeLessThanOrEqual(1024);
       }
       expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(1024);
@@ -343,9 +373,12 @@ test.describe("All data", () => {
 
   test("with the places file blocked, page search still finds Wages and shows no error (Review Focus 4)", async ({ page }) => {
     await page.route("**/explorer-places.*.json", (route) => route.abort());
+    const failed = page.waitForEvent("requestfailed", (request) => request.url().includes("explorer-places"));
     await page.goto("/explorer");
     await ready(page);
     await search(page).fill("ხელფასები");
+    // The checks below mean something only once the file has failed.
+    await failed;
     await expect(page.getByTestId("search-result").and(page.locator('[href="/explorer/wages/overview"]'))).toHaveCount(1);
     await expect(page.getByTestId("search-none")).toHaveCount(0);
     await expect(page.getByTestId("place-card")).toHaveCount(0);
@@ -366,6 +399,10 @@ test.describe("All data", () => {
     await search(page).fill("ხელფასები");
     await expect(page.getByTestId("search-result").and(page.locator('[href="/explorer/wages/overview"]'))).toHaveCount(1);
     await search(page).fill("ბათუმი");
+    // Batumi's rows all come from the places file. Page search has answered this query (its count went from Wages' to
+    // none) and the file has not, so there is no place card yet.
+    await expect(page.getByRole("search").getByText("0 გვერდი", { exact: true })).toBeVisible();
+    await expect(page.getByTestId("search-result")).toHaveCount(0);
     await expect(page.getByTestId("place-card")).toHaveCount(0);
     // The file may still name a place, so nothing says "not found" while it is on its way.
     await expect(page.getByTestId("search-none")).toHaveCount(0);
@@ -383,7 +420,7 @@ test.describe("the old topic hubs forward (Review Focus 3)", () => {
     test(`${path} lands on the Wages section of Labour market`, async ({ page }) => {
       await page.goto(path);
       const prefix = path.startsWith("/en/") ? "/en" : "";
-      await expect(page).toHaveURL(new RegExp(`^[^?#]+${prefix}/explorer/labour#t-wages$`));
+      await expect.poll(() => address(page)).toBe(`${prefix}/explorer/labour#t-wages`);
       await ready(page);
       await expect(page.locator("#t-wages")).toBeInViewport();
       await expect(page.locator("#t-wages")).toBeFocused();
@@ -392,21 +429,21 @@ test.describe("the old topic hubs forward (Review Focus 3)", () => {
 
   test("an old Unemployment hub view goes on to the page that serves it", async ({ page }) => {
     await page.goto("/explorer/unemployment#breakdown=region");
-    await expect(page).toHaveURL(/\/explorer\/unemployment\/regions#breakdown=region$/);
+    await expect.poll(() => address(page)).toBe("/explorer/unemployment/regions#breakdown=region");
     await ready(page);
     await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-breakdown", "region");
   });
 
   test("a Wages view hash on Labour market is not handed to Unemployment", async ({ page }) => {
     await page.goto("/explorer/labour?topic=wages#view=table");
-    await expect(page).toHaveURL(/\/explorer\/labour#t-wages$/);
+    await expect.poll(() => address(page)).toBe("/explorer/labour#t-wages");
     await ready(page);
     await expect(page.locator("#t-wages")).toBeInViewport();
   });
 
   test("/explorer#nav=analysis lands on Analysis", async ({ page }) => {
     await page.goto("/explorer#nav=analysis");
-    await expect(page).toHaveURL(/\/explorer\/analysis$/);
+    await expect.poll(() => address(page)).toBe("/explorer/analysis");
     await ready(page);
     await expect(page.getByTestId("single-year-snapshot")).toBeVisible();
   });

@@ -103,7 +103,7 @@ test("the health section shows one card per page, each linking to it, and the si
     for (const id of sections) await expect(page.getByTestId(`health-${id}-link`)).toBeVisible();
   }
   await expect(page.locator("#t-health").getByRole("heading", { level: 2 })).toHaveText("Health and social protection");
-  await expect(topicCards(page, "health").first()).toContainText(cardFigure("22,491", "2025", "2002–2025"));
+  await expect(topicCards(page, "health").first()).toHaveAccessibleDescription(cardFigure("22,491", "2025", "2002–2025"));
 });
 
 test("the crime section shows one card per page, each linking to it, and the sidebar lists Crime and justice after Science and culture", async ({ page }) => {
@@ -120,7 +120,7 @@ test("the crime section shows one card per page, each linking to it, and the sid
     for (const id of sections) await expect(page.getByTestId(`crime-${id}-link`)).toBeVisible();
   }
   await expect(page.locator("#t-crime").getByRole("heading", { level: 2 })).toHaveText("Crime and justice");
-  await expect(topicCards(page, "crime").first()).toContainText(cardFigure("54,134", "2025", "2015–2025"));
+  await expect(topicCards(page, "crime").first()).toHaveAccessibleDescription(cardFigure("54,134", "2025", "2015–2025"));
 });
 
 test("the internet section shows one card per page, each linking to it, and the sidebar lists Internet and technology after Crime and justice", async ({ page }) => {
@@ -136,7 +136,7 @@ test("the internet section shows one card per page, each linking to it, and the 
     for (const id of sections) await expect(page.getByTestId(`internet-${id}-link`)).toBeVisible();
   }
   await expect(page.locator("#t-internet").getByRole("heading", { level: 2 })).toHaveText("Internet and technology");
-  await expect(topicCards(page, "internet").first()).toContainText(cardFigure("93.5%", "2026", "2016–2026"));
+  await expect(topicCards(page, "internet").first()).toHaveAccessibleDescription(cardFigure("93.5%", "2026", "2016–2026"));
 });
 
 test("the housing section shows one card per page, each linking to it, and the sidebar lists Housing after Business", async ({ page }) => {
@@ -154,8 +154,8 @@ test("the housing section shows one card per page, each linking to it, and the s
   }
   await expect(page.locator("#t-housing").getByRole("heading", { level: 2 })).toHaveText("Housing and construction");
   const cards = topicCards(page, "housing");
-  await expect(cards.first()).toContainText(cardFigure("11,578", "2025", "2006–2025"));
-  await expect(cards.nth(2)).toContainText(cardFigure("159.4", "2025", "2020–2025"));
+  await expect(cards.first()).toHaveAccessibleDescription(cardFigure("11,578", "2025", "2006–2025"));
+  await expect(cards.nth(2)).toHaveAccessibleDescription(cardFigure("159.4", "2025", "2020–2025"));
   await expect(cards.nth(3)).toContainText("2006–2025");
 });
 
@@ -174,8 +174,8 @@ test("the transport section shows one card per page, each linking to it, and the
   }
   await expect(page.locator("#t-transport").getByRole("heading", { level: 2 })).toHaveText("Transport");
   const cards = topicCards(page, "transport");
-  await expect(cards.first()).toContainText(cardFigure("1,650.0", "2025", "2000–2025"));
-  await expect(cards.nth(1)).toContainText(cardFigure("1,318.9", "2025", "2017–2025"));
+  await expect(cards.first()).toHaveAccessibleDescription(cardFigure("1,650.0", "2025", "2000–2025"));
+  await expect(cards.nth(1)).toHaveAccessibleDescription(cardFigure("1,318.9", "2025", "2017–2025"));
   await expect(cards.nth(4)).toContainText("2017–2025");
 });
 

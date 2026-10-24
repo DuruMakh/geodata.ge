@@ -46,8 +46,8 @@ test("its group page shows four cards, Schools in school years, and the sidebar 
     await expect(cards).toHaveCount(4);
     expect(await cards.evaluateAll(links => links.map(link => link.getAttribute("href")))).toEqual(SECTIONS.map(section => `${prefix}/explorer/education/${section}`));
     for (let index = 0; index < 4; index += 1) await expect(cards.nth(index).getByTestId("explorer-card-graphic").locator("svg")).toHaveCount(1);
-    await expect(cards.first()).toContainText(cardFigure("644.2", "2025/26", "2000/01–2025/26"));
-    await expect(cards.last()).toContainText(cardFigure("19,690", "2025", "2013–2025"));
+    await expect(cards.first()).toHaveAccessibleDescription(cardFigure(prefix ? "644.2 thousand" : "644.2 ათასი", "2025/26", "2000/01–2025/26"));
+    await expect(cards.last()).toHaveAccessibleDescription(cardFigure("19,690", "2025", "2013–2025"));
     await expect(page.getByTestId("group-link-society")).toHaveAttribute("aria-current", "page");
     const rows = page.getByTestId("group-panel-society").locator('[data-testid$="-link"]');
     await expect(rows.first()).toHaveAttribute("data-testid", "education-schools-link");
