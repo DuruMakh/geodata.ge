@@ -37,7 +37,7 @@ export function SiteFooterView({ updatedAt, locale = "ka", sourceNote, messages,
   if (variant === "site") {
     const otherLocale: Locale = locale === "ka" ? "en" : "ka";
     return (
-      <footer data-testid="site-footer" className="mt-16 border-t-2 border-[var(--ink)] pb-8 pt-7 min-[768px]:mt-28 min-[768px]:pb-10">
+      <footer data-testid="site-footer" data-variant="site" className="mt-16 border-t-2 border-[var(--ink)] pb-8 pt-7 min-[768px]:mt-28 min-[768px]:pb-10">
         <div data-testid="landing-footer" className="grid grid-cols-1 gap-9 min-[1000px]:grid-cols-[minmax(0,4fr)_minmax(0,5fr)_minmax(0,2fr)] min-[1000px]:gap-12">
           <div>
             <Link href={pageHref("/", locale)} prefetch={false} aria-label={message(messages, "common.brandHome")} className="block w-[220px]">
@@ -99,7 +99,7 @@ export function SiteFooterView({ updatedAt, locale = "ka", sourceNote, messages,
     );
   }
   return (
-    <footer data-testid="site-footer" className="mt-10 border-t-2 border-[var(--ink)] pb-5 pt-5 min-[768px]:mt-[72px] min-[768px]:pb-10 min-[768px]:pt-[26px]">
+    <footer data-testid="site-footer" data-variant="compact" className="mt-10 border-t-2 border-[var(--ink)] pb-5 pt-5 min-[768px]:mt-[72px] min-[768px]:pb-10 min-[768px]:pt-[26px]">
       <div data-testid="landing-footer">
         <div className="flex flex-col gap-4 min-[768px]:grid min-[768px]:grid-cols-[repeat(auto-fit,minmax(220px,1fr))] min-[768px]:gap-9">
           {/* Phones: lockup and address share one row. */}
