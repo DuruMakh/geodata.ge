@@ -4,6 +4,8 @@ import { createWorkbookBuffer } from "../../lib/explorer/workbookWriter.client";
 import {
   absoluteWorkbookSourceUrl,
   buildWorkbookExportModel,
+  pictureFilename,
+  pictureStem,
   type WorkbookExportInput,
 } from "../../lib/explorer/workbookModel";
 
@@ -191,5 +193,18 @@ describe("buildWorkbookExportModel", () => {
 
     expect(withBasis("published").readable.subtitle).toBe("2020–2021 · გამოქვეყნებული · მილიონი ₾");
     expect(withBasis("preliminary").readable.subtitle).toBe("2020–2021 · წინასწარი · მილიონი ₾");
+  });
+});
+
+describe("pictureFilename", () => {
+  it("names pictures like workbooks", () => {
+    expect(pictureFilename("wages-overview-1995-2025", "ka")).toBe("fiscal-wages-overview-1995-2025.png");
+    expect(pictureFilename("wages-overview-1995-2025", "en")).toBe("fiscal-wages-overview-1995-2025-en.png");
+  });
+
+  it("stems a picture from the page address below /explorer and the years shown", () => {
+    expect(pictureStem("/explorer/wages/overview", "1995-2025")).toBe("wages-overview-1995-2025");
+    expect(pictureStem("/en/explorer/wages/regions/tbilisi/", "2010-2025")).toBe("wages-regions-tbilisi-2010-2025");
+    expect(pictureStem("/explorer", "2024")).toBe("explorer-2024");
   });
 });

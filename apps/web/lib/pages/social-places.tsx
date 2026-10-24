@@ -160,6 +160,7 @@ export async function renderSocialIndexPage(locale: Locale, set: SocialPlaceSet)
         <LatestValueLine testId="social-latest" sentence={<Message messages={messages} id={`social.latest.${set}`} values={{ period: headline.year, value: <LatestFigure value={countLabel(headline)} /> }} />} />
         <section data-testid={`social-index-${set}`} className="mt-4">
           <MunicipalitiesIndex
+            share={{ title, caption: t(`mapLegend.${set}`, { year: index.year }), source: t(`sourceNote.${set}`), period: String(index.year) }}
             viewBox={index.map.viewBox}
             shapes={index.map.shapes}
             markers={index.map.markers}

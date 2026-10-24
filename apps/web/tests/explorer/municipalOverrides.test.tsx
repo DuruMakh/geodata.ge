@@ -64,6 +64,7 @@ beforeAll(async () => {
   presentation = await getPresentation("en", ["municipal", "common", "controls", "format", "main"], ids);
 });
 
+const SHARE = { title: "Title", caption: "Caption", source: "Source", period: "2024" };
 const wrap = (node: ReactNode) => renderToStaticMarkup(<I18nProvider {...presentation}>{node}</I18nProvider>);
 const index = (overrides?: Parameters<typeof MunicipalitiesIndex>[0]["overrides"]) =>
   wrap(
@@ -79,7 +80,7 @@ const index = (overrides?: Parameters<typeof MunicipalitiesIndex>[0]["overrides"
       regions={regionRows}
       country={country}
       kpis={[]}
-      sourceNote="Source"
+      sourceNote="Source" share={SHARE}
       overrides={overrides}
     />,
   );
@@ -97,7 +98,7 @@ const budgetIndex = () =>
       regions={budgetRegionRows}
       country={country}
       kpis={budgetKpis}
-      sourceNote="Source"
+      sourceNote="Source" share={SHARE}
     />,
   );
 
@@ -182,7 +183,7 @@ describe("Georgia on the municipalities tab", () => {
   test("with a share, no bar passes 100% on either tab", () => {
     const shares = wrap(<MunicipalitiesIndex viewBox={EMPTY_MAP_VIEW_BOX} shapes={[]} markers={[]} occupiedAreas={[]} touchTargets={[]} legendMin="1.0%" legendMax="9.0%"
       municipalities={[{ ...rows[0], valueGel: 38 }, { ...rows[1], valueGel: 19 }]} regions={[{ ...regionRows[0], valueGel: 30 }]} country={{ ...country, valueGel: 22.5 }}
-      kpis={[]} sourceNote="Source" overrides={{ valueFormat: "percent" }} />);
+      kpis={[]} sourceNote="Source" share={SHARE} overrides={{ valueFormat: "percent" }} />);
     expect(barWidths(panel(shares, "muni"))).toEqual([59.2, 100, 50]);
     expect(barWidths(panel(shares, "region"))).toEqual([75, 100]);
   });
@@ -192,7 +193,7 @@ describe("the percent value format", () => {
   const perHundred = { ...country, valueGel: 22.46 };
   test("prints a per-100 share as a percent to one decimal, in the index and in the picker", () => {
     const html = wrap(<MunicipalitiesIndex viewBox={EMPTY_MAP_VIEW_BOX} shapes={[]} markers={[]} occupiedAreas={[]} touchTargets={[]} legendMin="1.0%" legendMax="9.0%"
-      municipalities={rows.map(row => ({ ...row, valueGel: 12.34 }))} regions={regionRows} country={perHundred} kpis={[]} sourceNote="Source" overrides={{ valueFormat: "percent" }} />);
+      municipalities={rows.map(row => ({ ...row, valueGel: 12.34 }))} regions={regionRows} country={perHundred} kpis={[]} sourceNote="Source" share={SHARE} overrides={{ valueFormat: "percent" }} />);
     expect(listRow(html, "06")).toContain("12.3%");
     expect(listRow(html, "06")).not.toContain("GEL");
     const picker = wrap(<EntityPicker open onClose={() => {}} country={{ id: MUNICIPAL_COUNTRY_ID, nameKa: "საქართველო", valueGel: 22.46, budgetCount: 64 }}

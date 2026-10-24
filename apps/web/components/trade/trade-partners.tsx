@@ -20,6 +20,7 @@ import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { SeriesAside } from "../explorer-shell/series-aside";
 import { EditorialLineChart } from "../main-explorer/editorial-line-chart";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
+import { ChartShareButton } from "../explorer-shell/chart-share-button";
 import { ExplorerTable } from "../main-explorer/explorer-table";
 import { RangeStrip } from "../main-explorer/range-strip";
 import { ExcelDownloadButton } from "../explorer/excel-download-button";
@@ -54,6 +55,9 @@ export function TradePartners({ data, sources, lastReviewedAt, siteOrigin, navig
   }} />;
   const valueLabel = (value: number) => `${formatInUnit(value, model.unit)} ${model.unit.label}`;
   const lineSeries = model.selectedIds.map(id => ({ id, label: label(id), color: tradePartnerColor(id), vals: model.years.map(year => model.valuesByEntity[id][year]) }));
+  const chart = <EditorialLineChart years={model.years} series={lineSeries} share={false} unit={model.unit} shareLabel={measureLabel} showAxisUnit={false} formatTooltipValue={valueLabel} />;
+  const shareAction = model.selectedCount ? <ChartShareButton title={domestic ? message(messages, "trade.domestic.countriesTitle") : t("title")} caption={`${measureLabel} · ${model.unit.label} · ${model.range.start}–${model.range.end}`}
+    legend={lineSeries.map(({ label, color }) => ({ label, color }))} source={message(messages, composition ? "trade.composition.sourceNote" : services ? "trade.services.sourceNote" : "trade.sourceNote")} chart={chart} period={`${model.range.start}-${model.range.end}`} /> : undefined;
   return <div data-testid="trade-partners" className="@container">
     {!embedded ? <ExplorerHeading>{t("title")}</ExplorerHeading> : null}
     {navigation ? navigation(state.measure, measure => update(s => ({ ...s, measure }), true)) : !embedded ? measureControls : null}
@@ -63,13 +67,13 @@ export function TradePartners({ data, sources, lastReviewedAt, siteOrigin, navig
         <section data-testid="chart-panel" data-mode={state.mode} data-measure={state.measure} data-unit="usd" className="border-t border-[var(--ink)] pt-4">
           <div className="flex flex-wrap items-end justify-between gap-3"><ModeTabs value={state.mode} onChange={mode => update(s => ({ ...s, mode }), true)} /><span className="text-[11px] text-[var(--muted)]">{measureLabel} · {model.unit.label}</span></div>
           {!model.selectedCount ? <div className="mt-5"><Callout testId="no-selection-callout">{t("emptySelection")}</Callout></div>
-            : state.mode === "line" ? <div className="mt-5"><EditorialLineChart years={model.years} series={lineSeries} share={false} unit={model.unit} shareLabel={measureLabel} showAxisUnit={false} formatTooltipValue={valueLabel} /></div>
+            : state.mode === "line" ? <div className="mt-5">{chart}</div>
             : <><ExplorerTable caption={`${t("title")} · ${measureLabel} · ${model.unit.label} · ${model.range.start}–${model.range.end}`} rows={rows.filter(row => row.itemId !== totalId)} totalRow={total} showTotal={Boolean(total)} totalFirst wrapRowLabels rowLabelsLocalized years={model.years} firstColumnLabel={t("series")} unit={model.unit} share={false} showChangeColumn={false} shareValueForYear={() => null} />
               {pageCount > 1 ? <TablePager label={message(messages, "trade.partners.tablePages")} summary={`${message(messages, "trade.products.selected")} · ${model.selectedIds.length}`} page={page} pageCount={pageCount} onPage={setPage} previous={message(messages, "trade.products.previous")} next={message(messages, "trade.products.next")} testIdPrefix="trade-partners-table" /> : null}</>}
           <ChartSelectionAids series={lineSeries} chartShown={state.mode === "line"} share={false} unit={model.unit} formatValue={valueLabel} />
           <RangeStrip years={tradePartnersCoverage(data).years} range={model.range} onChange={patch => update(s => ({ ...s, range: rangeFromPatch(buildTradePartnersModel(data, s, presentation).range, patch) }))} />
         </section>
-        <div className="mt-[18px]"><SourceNote testId="source-label">{message(messages, composition ? "trade.composition.sourceNote" : services ? "trade.services.sourceNote" : "trade.sourceNote")} · {model.range.start}–{model.range.end} · <span className="whitespace-nowrap">{updatedDate(lastReviewedAt, locale)}</span><Link href={pageHref("/methodology/trade", locale)} prefetch={false} className="ml-2 text-[var(--accent)] underline underline-offset-4">{message(messages, "trade.methodology")}</Link></SourceNote><p className="mt-2 max-w-[850px] text-[11px] leading-relaxed text-[var(--muted)]">{composition ? t("definitions") : services ? message(messages, countries ? "trade.services.countryDefinitions" : "trade.services.definitions") : domestic ? message(messages, "trade.domestic.countryDefinitions") : t("definitions")}</p></div>
+        <div className="mt-[18px]"><SourceNote testId="source-label" action={shareAction}>{message(messages, composition ? "trade.composition.sourceNote" : services ? "trade.services.sourceNote" : "trade.sourceNote")} · {model.range.start}–{model.range.end} · <span className="whitespace-nowrap">{updatedDate(lastReviewedAt, locale)}</span><Link href={pageHref("/methodology/trade", locale)} prefetch={false} className="ml-2 text-[var(--accent)] underline underline-offset-4">{message(messages, "trade.methodology")}</Link></SourceNote><p className="mt-2 max-w-[850px] text-[11px] leading-relaxed text-[var(--muted)]">{composition ? t("definitions") : services ? message(messages, countries ? "trade.services.countryDefinitions" : "trade.services.definitions") : domestic ? message(messages, "trade.domestic.countryDefinitions") : t("definitions")}</p></div>
       </div>
       <SeriesAside label={message(messages, "controls.series")}><TradePartnersSeriesPanel key={state.tab} data={data} state={state} model={model} onTabChange={tab => update(s => setTradePartnersTab(s, tab), true)} onSelectionChange={selectedIds => update(s => ({ ...s, selectedIds }), true)} measureControls={seriesControls ?? (navigation ? undefined : measureControls)} downloadAction={downloadAction} /></SeriesAside>
     </ExplorerWorkspace>

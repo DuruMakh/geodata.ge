@@ -35,6 +35,7 @@ import { ExplorerHeading } from "../explorer-shell/explorer-heading";
 import { LatestValueLine } from "../explorer-shell/latest-value-line";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
+import { ChartShareButton } from "../explorer-shell/chart-share-button";
 import { rangeFromPatch } from "../../lib/explorer/periodRange";
 
 export type EconomicSectorsExplorerProps = {
@@ -110,6 +111,27 @@ export function EconomicSectorsExplorer({
   const nationalLine = latestNominal
     ? { measure: t("reference"), period: latestNominal.year, value: formatAmount(latestNominal.value, locale), note: t("preliminary") }
     : undefined;
+  const chart = (
+    <EditorialLineChart
+      years={model.years}
+      series={series}
+      share={percent}
+      unit={unit}
+      shareLabel={measureLabel}
+      preliminaryLabel={t("preliminary")}
+      formatTooltipValue={percent ? undefined : value => formatAmount(value, locale)}
+    />
+  );
+  const shareAction = state.selectedIds.length && model.hasData ? (
+    <ChartShareButton
+      title={t("heading")}
+      caption={`${percent ? measureLabel : message(messages, "format.bnGel")} · ${model.range.start}–${model.range.end}`}
+      legend={series.map(({ label, color }) => ({ label, color }))}
+      source={`${t("source")} ${model.range.start}–${model.range.end}${activeSources.length ? ` · ${[...new Set(activeSources.map((s) => s.title))].join("; ")}` : ""}`}
+      chart={chart}
+      period={`${model.range.start}-${model.range.end}`}
+    />
+  ) : undefined;
   return (
     <div data-testid="economic-sectors-explorer" className="@container">
       <ExplorerHeading>{t("heading")}</ExplorerHeading>
@@ -173,15 +195,7 @@ export function EconomicSectorsExplorer({
               </div>
             ) : state.mode === "line" ? (
               <div className="mt-5">
-                <EditorialLineChart
-                  years={model.years}
-                  series={series}
-                  share={percent}
-                  unit={unit}
-                  shareLabel={measureLabel}
-                  preliminaryLabel={t("preliminary")}
-                  formatTooltipValue={percent ? undefined : value => formatAmount(value, locale)}
-                />
+                {chart}
               </div>
             ) : (
               <ExplorerTable
@@ -212,7 +226,7 @@ export function EconomicSectorsExplorer({
             />
           </section>
           <div className="mt-[18px]">
-            <SourceNote testId="source-label">
+            <SourceNote testId="source-label" action={shareAction}>
               {/* The measure's price basis sits with the source, not as a second line under the heading (DESIGN §17). */}
               <span data-testid="sectors-context">{t(state.measure === "nominal" ? "nominalContext" : state.measure === "share_of_gdp" ? "shareContext" : "growthContext")}</span>
               {" "}

@@ -44,5 +44,13 @@
   "controls.backToTable": "Table",
   "controls.backUp": "scroll up",
   "controls.planned": "Planned",
-  "controls.other": "Others"
+  "controls.other": "Others",
+  "controls.share.button": "Share",
+  "controls.share.menu": "Share picture",
+  "controls.share.download": "Download picture",
+  "controls.share.copy": "Copy picture",
+  "controls.share.native": "Share…",
+  "controls.share.working": "Making the picture…",
+  "controls.share.copied": "Picture copied",
+  "controls.share.error": "The picture could not be made — try again."
 }
