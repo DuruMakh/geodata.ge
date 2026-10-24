@@ -11,7 +11,6 @@ const labels: DeficitLabels = {
   surplus: "პროფიციტი",
   forecast: "პროგნოზი",
   imf: "IMF-ის პროგნოზი",
-  surplusRun: "პროფიციტი",
   vsGdp: "მშპ-სთან",
   inGel: "ლარში",
   deepest: "ყველაზე ღრმა",

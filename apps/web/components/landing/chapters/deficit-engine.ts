@@ -108,7 +108,7 @@ export function createDeficit({ wrap, canvas, data, labels, onHover, onLeave }: 
         ctx.lineTo(b, yb);
         ctx.lineTo(b, yb + 5);
         ctx.stroke();
-        haloTxt(ctx, `${lab.surplusRun} · ${yearRange(run.first, run.last)}`, (a + b) / 2, yb - 7, `600 11.5px ${ui}`, positive, paper, "center");
+        haloTxt(ctx, `${lab.surplus} · ${yearRange(run.first, run.last)}`, (a + b) / 2, yb - 7, `600 11.5px ${ui}`, positive, paper, "center");
       }
     }
   };

@@ -56,7 +56,7 @@ export function LandingPage({ chapters, gdpFigure, presentation, updatedAt, mcpE
     })),
     { label: message(messages, "landing.economy"), unit: message(messages, "landing.bnGel"), unitTestId: "gdp-unit", ...gdpFigure },
   ];
-  const chapterLink = (n: number, path: string) => ({ title: t(`landing.ch${n}.title`), href: pageHref(path, locale), hint: t(`landing.ch${n}.hint`) });
+  const chapterLink = (n: number, path: string) => ({ href: pageHref(path, locale), hint: t(`landing.ch${n}.hint`) });
   const units = { bnGel: t("landing.bnGel"), mlnGel: t("landing.mlnGel") };
   const unavailable = t("landing.heroUnavailable");
 
@@ -123,7 +123,6 @@ export function LandingPage({ chapters, gdpFigure, presentation, updatedAt, mcpE
     surplus: t("landing.deficit.surplus"),
     forecast: t("landing.deficit.forecast"),
     imf: t("landing.deficit.imf"),
-    surplusRun: t("landing.deficit.surplus"),
     vsGdp: t("landing.deficit.vsGdp"),
     inGel: t("landing.deficit.inGel"),
     deepest: t("landing.deficit.deepest"),

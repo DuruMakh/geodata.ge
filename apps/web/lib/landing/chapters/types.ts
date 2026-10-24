@@ -1,7 +1,7 @@
 // Shared model for the homepage chapters. Each chapter builder in this folder
 // returns one of these; the chart components only draw what they are handed.
 
-export type ChapterLink = { title: string; href: string; hint: string };
+export type ChapterLink = { href: string; hint: string };
 
 export type SpendingSeries = {
   years: number[]; // ascending, first..latest active expenditure year

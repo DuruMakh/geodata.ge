@@ -18,10 +18,9 @@ export type DeficitLabels = {
   bnGel: string; // "მლრდ ₾"
   mlnGel: string; // "მლნ ₾"
   deficit: string; // legend and tooltip foot: "დეფიციტი"
-  surplus: string; // legend and tooltip foot: "პროფიციტი"
+  surplus: string; // legend, tooltip foot and surplus-run bracket (the "2004–2007" range is appended): "პროფიციტი"
   forecast: string; // legend entry for the projection band: "პროგნოზი"
   imf: string; // band label and tooltip title suffix: "IMF-ის პროგნოზი"
-  surplusRun: string; // bracket text before the years: "პროფიციტი" (the "2004–2007" range is appended)
   vsGdp: string; // tooltip row and aria-label, follows a percentage: "მშპ-სთან"
   inGel: string; // tooltip row for the amount: "ლარში"
   deepest: string; // aria-label: "ყველაზე ღრმა"
