@@ -1,7 +1,7 @@
 # Explorer redesign: 8 groups, group pages and the All data search page
 
 Date: 2026-10-24
-Status: Draft for Duru's review. Design parts 1–3 were agreed in the thread "Redesign and regroup the explorer" on 2026-10-24 (18:17–18:35 Tbilisi).
+Status: Approved by Duru on 2026-10-24 (decision card "Approve the spec so I can write the build plan?", answer "Approve, write the plan", 18:44 Tbilisi). Design parts 1–3 were agreed in the thread "Redesign and regroup the explorer" on 2026-10-24 (18:17–18:35 Tbilisi).
 Source design: Duru's canvas https://claude.ai/artifact/NTvuHd3oasbXxkNcZto2Wz, page "მონაცემები — ჰაბები და ძებნა" (board `DX-App.dc.html` and the boards that import it).
 
 ## 0. In plain words
