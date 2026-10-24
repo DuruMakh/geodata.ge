@@ -2,15 +2,20 @@
 
 import { useEffect, useRef, useState, type ReactNode, type RefObject } from "react";
 
-// Fade-in on first view. `.home-rv` (globals.css) holds the hidden state and the reduced-motion
-// override; this only adds `data-in` once, straight on the element so React never rerenders it.
+// Fade-in on first view. `.home-rv` (globals.css) holds the hidden state, the reduced-motion
+// override and a fail-safe that shows the block after 3s if this never runs; this marks the block
+// `data-js` (which stops the fail-safe) and adds `data-in` once, straight on the element so React
+// never rerenders it.
 export function Reveal({ children, className }: { children: ReactNode; className?: string }) {
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
-    if (typeof IntersectionObserver === "undefined") {
+    // Started after the fail-safe already showed the block (a slow start): keep it shown.
+    const shown = getComputedStyle(el).opacity === "1";
+    el.setAttribute("data-js", "");
+    if (shown || typeof IntersectionObserver === "undefined") {
       el.setAttribute("data-in", "");
       return;
     }

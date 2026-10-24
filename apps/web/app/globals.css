@@ -255,13 +255,20 @@ summary:focus-visible {
   }
 }
 
-/* Scroll reveal: content rises 16px and fades in once, when Reveal sets data-in. */
+/* Scroll reveal: content rises 16px and fades in once, when Reveal sets data-in. Fail-safe: when the
+   script never runs although scripting is on (its bundle failed), the block shows by itself after 3s;
+   Reveal sets data-js as it starts, which hands the block back to the scroll reveal. */
 .home-rv {
   opacity: 0;
   transform: translateY(16px);
   transition:
     opacity 0.9s cubic-bezier(0.22, 0.7, 0.18, 1),
     transform 0.9s cubic-bezier(0.22, 0.7, 0.18, 1);
+  animation: home-rv-show 0.9s cubic-bezier(0.22, 0.7, 0.18, 1) 3s forwards;
+}
+
+.home-rv[data-js] {
+  animation: none;
 }
 
 .home-rv[data-in] {
@@ -269,11 +276,19 @@ summary:focus-visible {
   transform: none;
 }
 
+@keyframes home-rv-show {
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 @media (prefers-reduced-motion: reduce), (scripting: none) {
   .home-rv {
     opacity: 1;
     transform: none;
     transition: none;
+    animation: none;
   }
 }
 
@@ -339,15 +354,18 @@ summary:focus-visible {
   border: 1.5px solid var(--ink);
 }
 
+/* A dot runs down the rail by transform only: each .home-flow box is as tall as the run (rail top
+   28px to 34px above the bottom) and paints its dot at its own top, so translateY(100%) is the run. */
 .home-flow {
   position: absolute;
   z-index: 1;
   left: 3px;
   top: 28px;
   width: 5px;
-  height: 5px;
-  background: var(--accent);
+  height: calc(100% - 62px);
+  background: linear-gradient(var(--accent), var(--accent)) 0 0 / 5px 5px no-repeat;
   opacity: 0;
+  pointer-events: none;
   animation: home-flow 3.6s cubic-bezier(0.45, 0, 0.55, 1) infinite;
 }
 
@@ -361,7 +379,7 @@ summary:focus-visible {
 
 @keyframes home-flow {
   0% {
-    top: 28px;
+    transform: translateY(0);
     opacity: 0;
   }
   8%,
@@ -369,7 +387,7 @@ summary:focus-visible {
     opacity: 1;
   }
   100% {
-    top: calc(100% - 34px);
+    transform: translateY(100%);
     opacity: 0;
   }
 }
@@ -473,22 +491,25 @@ summary:focus-visible {
   background: var(--ai-line);
 }
 
+/* Moved by transform only, like .home-flow: the box is as tall as the run (dot top 16px to 30px above
+   the bottom) and paints the 8px dot with its 4px halo at its own top. */
 .home-ai-path::after {
   content: "";
   position: absolute;
-  left: 7px;
-  top: 16px;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--ai-accent);
-  box-shadow: 0 0 0 4px rgba(229, 138, 111, 0.2);
+  left: 3px;
+  top: 12px;
+  width: 16px;
+  height: calc(100% - 46px);
+  background-image: radial-gradient(circle at 8px 8px, var(--ai-accent) 3.5px, rgba(229, 138, 111, 0.2) 4.5px 7.5px, transparent 8.5px);
+  background-size: 16px 16px;
+  background-repeat: no-repeat;
+  pointer-events: none;
   animation: home-run 3.6s cubic-bezier(0.6, 0, 0.4, 1) infinite;
 }
 
 @keyframes home-run {
   0% {
-    top: 16px;
+    transform: translateY(0);
     opacity: 0;
   }
   10%,
@@ -496,7 +517,7 @@ summary:focus-visible {
     opacity: 1;
   }
   100% {
-    top: calc(100% - 30px);
+    transform: translateY(100%);
     opacity: 0;
   }
 }
