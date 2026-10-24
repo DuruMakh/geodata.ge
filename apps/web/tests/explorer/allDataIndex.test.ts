@@ -17,9 +17,9 @@ describe.each(["ka", "en"] as const)("the All data pages (%s)", async (locale) =
   const pages = buildSearchPages(await loadTopicHubs(locale, TOPICS), messagesKa, messagesEn);
 
   it("lists every navigation page once, with its group, topic and names in both languages", () => {
-    expect(pages).toHaveLength(100);
+    expect(pages).toHaveLength(102);
     expect(pages).toHaveLength(PAGE_COUNT);
-    expect(new Set(pages.map((page) => page.href)).size).toBe(100);
+    expect(new Set(pages.map((page) => page.href)).size).toBe(PAGE_COUNT);
     for (const page of pages) {
       expect(page.group, page.href).toBeTruthy();
       expect(page.topic, page.href).toBeTruthy();
@@ -54,7 +54,7 @@ describe.each(["ka", "en"] as const)("the All data pages (%s)", async (locale) =
     const positions = groups.map((group) => alphabet.indexOf(group.letter));
     expect(positions.every((position) => position >= 0), groups.map((group) => group.letter).join("")).toBe(true);
     expect(positions).toEqual([...positions].sort((a, b) => a - b));
-    expect(groups.flatMap((group) => group.rows)).toHaveLength(100);
+    expect(groups.flatMap((group) => group.rows)).toHaveLength(PAGE_COUNT);
     for (const group of groups) {
       const labels = group.rows.map((page) => rowLabel(page, locale));
       for (const label of labels) expect(locale === "ka" ? label[0] : label[0].toUpperCase()).toBe(group.letter);

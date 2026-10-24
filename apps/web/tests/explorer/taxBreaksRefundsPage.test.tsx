@@ -35,6 +35,10 @@ test("Budget card 04 is tax breaks and refunds, drawn from refunds", async () =>
   expect(cards[3]).toMatchObject({ href: "/explorer/tax-breaks-refunds", comingSoon: false, seriesColor: INK, title: "შეღავათები და დაბრუნება" });
   expect(cards[3].series).toHaveLength(18);
   expect(cards[3].footer).toBe("2025 · დაბრუნება 2.7 მლრდ ₾");
+  // On the Budget group page the card states the same refunds figure, named, and the years refunds cover.
+  const groupCard = buildHubCards([], new Map(), [], [], undefined, undefined, refunds, true)[3];
+  expect(groupCard.latest).toEqual({ value: "2.7 მლრდ ₾", period: "2025", caption: "დაბრუნება" });
+  expect(groupCard.years).toBe("2008–2025");
 });
 
 test("the sidebar lists the page between Revenue and Municipalities", () => {

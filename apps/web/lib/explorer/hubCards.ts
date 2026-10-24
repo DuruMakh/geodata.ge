@@ -174,6 +174,9 @@ export function buildHubCards(
       footer: refunds.latest === null
         ? null
         : translated("hub.taxBreaksRefundsFooter", `${refunds.latest} · დაბრუნება ${formatAmount(refundTotals.get(refunds.latest) ?? 0, locale)}`, { year: refunds.latest, amount: formatAmount(refundTotals.get(refunds.latest) ?? 0, locale) }),
+      // The figure is refunds, as the footer says; the caption names them.
+      latest: refunds.figure && { ...refunds.figure, caption: translated("hub.taxBreaksRefundsCaption", "დაბრუნება") },
+      years: refunds.years,
     },
     {
       index: "05",

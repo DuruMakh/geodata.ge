@@ -88,7 +88,7 @@ const marked = (segments: Segment[]) => segments.filter((segment) => segment.mar
 
 describe("the fixture", () => {
   it("carries every page with its names and topic", () => {
-    expect(PAGES).toHaveLength(100);
+    expect(PAGES).toHaveLength(102);
     for (const page of PAGES) for (const value of [page.name.ka, page.name.en, page.topicName.ka, page.topicName.en, page.groupName.ka, page.groupName.en]) expect(value, page.href).toBeTruthy();
   });
 });

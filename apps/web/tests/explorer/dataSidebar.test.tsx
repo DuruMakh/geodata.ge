@@ -61,8 +61,8 @@ describe("the explorer sidebar", () => {
     const groups = [...markup.matchAll(/data-testid="group-link-([a-z]+)"/g)].map((match) => match[1]);
     expect(groups).toEqual(["budget", "economy", "prices", "labour", "living", "external", "demography", "society"]);
     const counts = groups.map((id) => />(\d+)<\/span><\/a>$/.exec(element(markup, `group-link-${id}`, "a"))?.[1]);
-    expect(counts).toEqual(["7", "13", "8", "11", "11", "11", "5", "34"]);
-    expect(element(markup, "all-data-link", "a")).toMatch(/>100<\/span><\/a>$/);
+    expect(counts).toEqual(["8", "13", "8", "11", "12", "11", "5", "34"]);
+    expect(element(markup, "all-data-link", "a")).toMatch(/>102<\/span><\/a>$/);
     expect(tag(markup, "group-link-labour")).toContain('aria-label="შრომის ბაზარი, 11 გვერდი"');
   });
 

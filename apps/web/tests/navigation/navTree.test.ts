@@ -196,8 +196,8 @@ describe("the eight groups over the twenty topics", () => {
   });
 
   it("counts the pages per group from the config", () => {
-    expect(NAV_GROUPS.map((group) => groupPages(group).length)).toEqual([7, 13, 8, 11, 11, 11, 5, 34]);
-    expect(PAGE_COUNT).toBe(100);
+    expect(NAV_GROUPS.map((group) => groupPages(group).length)).toEqual([8, 13, 8, 11, 12, 11, 5, 34]);
+    expect(PAGE_COUNT).toBe(102);
     expect(NAV_GROUPS.flatMap(groupPages).map((section) => section.href).toSorted()).toEqual(NAV_TREE.flatMap((hub) => hub.sections.map((section) => section.href)).toSorted());
   });
 

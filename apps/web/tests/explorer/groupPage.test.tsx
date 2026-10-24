@@ -70,12 +70,12 @@ describe("the Labour market group page (ka)", async () => {
 describe("the Budget group page (en)", async () => {
   const html = renderToStaticMarkup(await renderGroupPage("budget", "en"));
 
-  it("has no topic links, one section and seven cards", () => {
+  it("has no topic links, one section and eight cards", () => {
     expect(hrefs(html, "group-topic-link")).toEqual([]);
     expect(sections(html).map(({ topic }) => topic)).toEqual(["budget"]);
-    expect(cardTags(html)).toHaveLength(7);
+    expect(cardTags(html)).toHaveLength(8);
     expect(hrefs(html, "group-headline")).toEqual(GROUP_HEADLINES.budget.map(({ page }) => `/en${page}`));
-    expect(html).toMatch(/7 pages · Updated \d{1,2} [A-Z][a-z]+ \d{4}/);
+    expect(html).toMatch(/8 pages · Updated \d{1,2} [A-Z][a-z]+ \d{4}/);
   });
 });
 
