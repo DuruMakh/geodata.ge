@@ -8,6 +8,8 @@
 
 **Tech Stack:** Python 3 standard library (research package), Node `xlsx` (independent check), Next.js 16 / React / strict TypeScript, Vitest, Playwright.
 
+**Rebased 2026-10-24 onto main `f4b7a209`.** Since the plan was written, main gained a shared regions-page frame, `apps/web/lib/pages/region-area-frame.tsx`, used by Housing, Transport and Internet (#214). The Internet hub is now the pattern for Loans by region, not Business; Tasks 5 and 6 follow it. Main also derives the browser hub and page counts from their registries (`1328dc62`), and shows every `rates.*` value to two decimals. New loan series stay at one decimal.
+
 **Spec:** `docs/superpowers/specs/2026-10-21-loans-detail-design.md` (approved by Duru 2026-10-21 23:26 Tbilisi). Read it together with `docs/superpowers/specs/2026-10-11-money-banks-design.md` and `DESIGN.md` §34–§35.
 
 ## Global Constraints
@@ -212,7 +214,7 @@
 
 **Interfaces:**
 - Consumes `MONEY_BANKS_LOAN_AREAS` and `loansRegionIndicator` (Task 2), `areaRoutes` and `buildLatestValueRegionMapModel` / `latestCompleteRegionYear` (unchanged).
-- Produces, mirroring the `businessAreas.ts` names:
+- Produces, mirroring the `internetAreas.ts` names (and `internetRegionMap.ts` for the map):
   - `type MoneyBanksArea`, `MONEY_BANKS_REGIONS_HREF = "/explorer/money/regions"`;
   - `{ areaSlug: moneyBanksAreaSlug, areaHref: moneyBanksAreaHref, mapId: moneyBanksMapId, areaOfMapId: moneyBanksAreaOfMapId, regionHref: moneyBanksRegionHref }`;
   - `moneyBanksAreaSeries(area): MoneyBanksSeriesDefinition[]`: `[total (reference), gel, fx]`, with no headings and no nesting;
@@ -228,7 +230,7 @@
   - `test("a selection moves to another area")`: `moneyBanksAreaSelectionHash(["loans_region.region_imereti.fx"], "region_guria") === "#sel=loans_region.region_guria.fx"`, and the default selection moves to `""`.
   - `test("an unknown id in the hash is ignored")`: `parseMoneyBanksAreaHash("#sel=loans_region.region_abkhazeti.total", "georgia", facts).selectedIds` is `[]`.
 - [ ] **Step 2: Confirm they fail.** Run: `npx vitest run tests/explorer/moneyBanksAreas.test.ts`. Expected: FAIL (the module is missing).
-- [ ] **Step 3: Implement both modules,** following `businessAreas.ts` and `businessRegionMap.ts` line by line. Use the money-banks topic helpers (`parseTopicHash`, `buildTopicModel`), not the unit-list helpers, because one unit means no unit switching.
+- [ ] **Step 3: Implement both modules,** following `internetAreas.ts` and `internetRegionMap.ts` (`businessAreas.ts` is the older copy of the same shape). Use the money-banks topic helpers (`parseTopicHash`, `buildTopicModel`), not the unit-list helpers, because one unit means no unit switching.
 - [ ] **Step 4: Confirm they pass.** Run: `npx vitest run tests/explorer/moneyBanksAreas.test.ts && npm run typecheck`. Expected: PASS.
 - [ ] **Step 5: Commit.** Run: `git commit -m "feat: loans by region area model and map"`.
 
@@ -236,16 +238,16 @@
 
 **Files:**
 - Create:
-  - `apps/web/components/money-banks/money-banks-index.tsx` (as `business-index.tsx`, without the measure switch);
-  - `apps/web/components/money-banks/money-banks-area-explorer.tsx` (as `business-area-explorer.tsx`, one unit: million GEL);
-  - `apps/web/lib/pages/moneyBanksRegions.tsx` (as `lib/pages/business-regions.tsx`);
+  - `apps/web/components/money-banks/money-banks-index.tsx` (as `components/internet/internet-index.tsx`);
+  - `apps/web/components/money-banks/money-banks-area-explorer.tsx` (as `components/internet/internet-area-explorer.tsx`, one unit: million GEL);
+  - `apps/web/lib/pages/money-banks-regions-shared.tsx`, `money-banks-regions.tsx` and `money-banks-area.tsx` (as `internet-shared.tsx`, `internet-homes.tsx` and `internet-area.tsx`). The shared module calls `regionAreaFrame` with `hub: "moneyBanks"`, `indexKey: "regions"`, `sourceIds: ["nbg_loans_regions_lreg"]`;
   - the routes `apps/web/app/(ka)/explorer/money/regions/page.tsx`, `.../regions/[id]/page.tsx` and their `(en)/en/...` copies (with `dynamicParams = false` and `generateStaticParams = moneyBanksAreaStaticParams`).
-- Modify: `lib/i18n/messages/{ka,en}/moneyBanks.json`, `lib/explorer/moneyBanksWorkbook.ts` (area file name), `lib/seo/sitemap.ts`.
+- Modify: `lib/pages/region-area-frame.tsx` (the only change: add `"moneyBanks"` to the `hub` union, so the frame reads `moneyBanks.title`, `moneyBanks.heading.<id>`, `moneyBanks.mapLabel` and `moneyBanks.area.georgia`), `lib/i18n/messages/{ka,en}/moneyBanks.json`, `lib/explorer/moneyBanksWorkbook.ts` (area file name), `lib/seo/sitemap.ts`.
 - Test: `apps/web/tests/explorer/moneyBanksAreas.test.ts` (render tests).
 
 **Interfaces:**
 - Consumes Task 5.
-- Produces the page functions `moneyBanksRegionsPageMetadata(locale)`, `renderMoneyBanksRegionsPage(locale)`, `moneyBanksAreaStaticParams()`, `moneyBanksAreaPageMetadata(slug, locale)` and `renderMoneyBanksAreaPage(locale, slug)`.
+- Produces the page functions `moneyBanksRegionsPageMetadata(locale)`, `renderMoneyBanksRegionsPage(locale)`, `moneyBanksAreaStaticParams()`, `moneyBanksAreaPageMetadata(slug, locale)` and `renderMoneyBanksAreaPage(locale, slug)`, with the same export layout as `internet-shared.tsx`. Each area page has one heading id, `area`, with the message `moneyBanks.heading.area` ("Loans" / "სესხები"), for the frame's Dataset measures.
 - The workbook takes an optional `area?: { slug: string }`. With it, the filename stem is `money-loans-region-${slug}-${start}-${end}`.
 - Message keys:
   - `moneyBanks.page.regions.{title,metaTitle,summary}` and `moneyBanks.page.area.{regionTitle,regionSummary}`;
