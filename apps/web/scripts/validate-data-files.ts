@@ -58,6 +58,7 @@ function assertYears(label: string, actual: number[], expected: number[]) {
     throw new Error(`${label} years mismatch. Expected ${expectedText}, got ${actualText}`);
   }
 }
+
 function assertPlannedRows(label: string, rows: Array<{ year: number; basis: string }>) {
   for (const row of rows) {
     if (row.basis !== "planned") {
@@ -66,6 +67,18 @@ function assertPlannedRows(label: string, rows: Array<{ year: number; basis: str
     if (!PLANNED_BUDGET_YEARS.includes(row.year)) {
       throw new Error(`${label} row has year ${row.year}, expected one of ${PLANNED_BUDGET_YEARS.join(",")}`);
     }
+  }
+}
+
+// Admin facts are unique per (year, itemId) in the database mirror.
+function assertUniqueAdminFacts(rows: Array<{ year: number; itemId: string }>) {
+  const seen = new Set<string>();
+  for (const row of rows) {
+    const key = `${row.year}:${row.itemId}`;
+    if (seen.has(key)) {
+      throw new Error(`Duplicate admin spending fact for (year, itemId): ${key}`);
+    }
+    seen.add(key);
   }
 }
 
@@ -160,19 +173,20 @@ export async function main() {
   // rows, the planned years must appear alongside the actuals.
   assertPlannedRows("Planned budget", plannedBudgetRows);
   assertPlannedRows("Planned admin spending", plannedAdminSpendingFacts);
+  assertUniqueAdminFacts(adminSpendingFacts);
   if (plannedBudgetRows.some((row) => row.side !== "expenditure")) {
     throw new Error("Planned budget rows must all be expenditure rows");
   }
   assertYears(
     "Expenditure",
     sortedYears(facts.filter((row) => row.side === "expenditure").map((row) => row.year)),
-    [...EXPENDITURE_YEARS, ...(plannedBudgetRows.length > 0 ? PLANNED_BUDGET_YEARS : [])],
+    sortedYears([...EXPENDITURE_YEARS, ...(plannedBudgetRows.length > 0 ? PLANNED_BUDGET_YEARS : [])]),
   );
   assertYears("Revenue", sortedYears(revenueRows.map((row) => row.year)), REVENUE_YEARS);
   assertYears(
     "Admin spending",
     sortedYears(adminSpendingFacts.map((row) => row.year)),
-    [...ADMIN_SPENDING_YEARS, ...(plannedAdminSpendingFacts.length > 0 ? PLANNED_BUDGET_YEARS : [])],
+    sortedYears([...ADMIN_SPENDING_YEARS, ...(plannedAdminSpendingFacts.length > 0 ? PLANNED_BUDGET_YEARS : [])]),
   );
   assertYears("Municipal", sortedYears(municipalFunctionFacts.map((row) => row.year)), MUNICIPAL_YEARS);
   assertYears(

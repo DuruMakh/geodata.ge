@@ -1,9 +1,11 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { PLANNED_BUDGET_YEARS } from "../../lib/data/coverage";
 import { loadAdminSpendingFacts } from "../../lib/data/adminSpending/importAdminSpendingFacts";
+import type { AdminSpendingFact } from "../../lib/data/adminSpending/types";
 import { loadBudgetFactRows } from "../../lib/data/importBudgetFacts";
 import {
   loadReviewedAdminSpendingFacts,
+  resolvePlannedAdminSpendingFacts,
   loadReviewedBudgetFactRows,
   loadServedExplorerData,
   loadServedLandingData,
@@ -85,6 +87,31 @@ describe("csv served data", () => {
       loadReviewedAdminSpendingFacts(),
     ]);
     expect(reviewedAdmin).toEqual([...baseAdmin, ...plannedAdmin]);
+  });
+
+  it("keeps planned admin rows only for years without admin actuals", () => {
+    const fact = (year: number, itemId: string, basis: "actual" | "planned"): AdminSpendingFact => ({
+      year,
+      itemId,
+      parentItemId: null,
+      level: "admin_category",
+      amountGel: 1,
+      basis,
+      sourceId: "source.test",
+      officialCode: null,
+      officialLabelKa: null,
+      officialInstitutionCode: null,
+      officialInstitutionLabelKa: null,
+      mappingConfidence: "high",
+      mappingNotes: "",
+    });
+    const base = [fact(2025, "admin_spending.health", "actual")];
+    const planned2026 = [fact(2026, "admin_spending.health", "planned"), fact(2026, "admin_spending.culture", "planned")];
+
+    expect(resolvePlannedAdminSpendingFacts(base, planned2026)).toEqual(planned2026);
+
+    const withActual2026 = [...base, fact(2026, "admin_spending.health", "actual")];
+    expect(resolvePlannedAdminSpendingFacts(withActual2026, planned2026)).toEqual([]);
   });
 
   it("loads the full landing dataset from the reviewed CSVs", async () => {

@@ -133,7 +133,19 @@ export async function loadReviewedAdminSpendingFacts(): Promise<AdminSpendingFac
     loadAdminSpendingFacts(SERVED_DATA_FILES.adminSpendingPlannedFacts),
   ]);
 
-  return [...base, ...planned];
+  return [...base, ...resolvePlannedAdminSpendingFacts(base, planned)];
+}
+
+// Admin facts are unique per (year, itemId) - no basis in the key - so actual
+// over planned resolves for a whole year: once the base file holds any actual
+// row for a year, that year's planned rows are dropped.
+export function resolvePlannedAdminSpendingFacts(
+  base: AdminSpendingFact[],
+  planned: AdminSpendingFact[],
+): AdminSpendingFact[] {
+  const actualYears = new Set(base.filter((fact) => fact.basis === "actual").map((fact) => fact.year));
+
+  return planned.filter((fact) => !actualYears.has(fact.year));
 }
 
 export { loadServedGovernmentDebtData } from "./governmentDebt/importGovernmentDebtFacts";
