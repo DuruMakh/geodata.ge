@@ -10,6 +10,10 @@ export const EXPENDITURE_SOURCE_YEARS = inclusiveYears(APP_START_YEAR, APP_END_Y
 export const EXPENDITURE_DETAILED_YEARS = inclusiveYears(APP_START_YEAR, APP_END_YEAR);
 export const EXPENDITURE_YEARS = [...EXPENDITURE_DETAILED_YEARS];
 
+// Years served only as a plan (basis "planned"), read from the separate
+// *-2026-planned.csv files beside the 2004-2025 actuals.
+export const PLANNED_BUDGET_YEARS = [2026];
+
 export const REVENUE_SOURCE_YEARS = inclusiveYears(REVENUE_START_YEAR, APP_END_YEAR);
 // The 2004 annual report provides ten comparable consolidated revenue-and-grants
 // categories but not the Form #1 increase-in-liabilities row.

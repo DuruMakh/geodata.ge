@@ -94,6 +94,8 @@ export const SERVED_DATA_FILES = {
   inflationCityFacts: "../../data/imports/cpi-cities-monthly.csv",
   budgetFacts: "../../data/imports/budget-facts-2004-2025.csv",
   adminSpendingFacts: "../../data/imports/admin-spending-facts-2004-2025.csv",
+  budgetPlannedFacts: "../../data/imports/expenditure-facts-2026-planned.csv",
+  adminSpendingPlannedFacts: "../../data/imports/admin-spending-facts-2026-planned.csv",
   glossary: "../../data/glossary/category-glossary.csv",
   sourceDocuments: "../../data/sources/source-documents.csv",
   adminSpendingCategories: "../../data/taxonomy/admin-spending-categories.json",
@@ -113,6 +115,26 @@ export const SERVED_DATA_FILES = {
   generalGovernmentBalanceFacts:
     "../../data/imports/general-government-balance-annual-1995-2031.csv",
 } as const;
+
+// The reviewed national and ministry facts are the 2004-2025 actuals plus the
+// separate planned-year files. Every reader of these facts goes through here.
+export async function loadReviewedBudgetFactRows(): Promise<BudgetFactImportRow[]> {
+  const [base, planned] = await Promise.all([
+    loadBudgetFactRows(SERVED_DATA_FILES.budgetFacts),
+    loadBudgetFactRows(SERVED_DATA_FILES.budgetPlannedFacts),
+  ]);
+
+  return [...base, ...planned];
+}
+
+export async function loadReviewedAdminSpendingFacts(): Promise<AdminSpendingFact[]> {
+  const [base, planned] = await Promise.all([
+    loadAdminSpendingFacts(SERVED_DATA_FILES.adminSpendingFacts),
+    loadAdminSpendingFacts(SERVED_DATA_FILES.adminSpendingPlannedFacts),
+  ]);
+
+  return [...base, ...planned];
+}
 
 export { loadServedGovernmentDebtData } from "./governmentDebt/importGovernmentDebtFacts";
 export { loadServedGeneralGovernmentBalanceData } from "./generalGovernmentBalance/importGeneralGovernmentBalance";
@@ -252,7 +274,7 @@ function toServedNationalGdpFact(fact: NationalGdpFact): ServedNationalGdpFact {
 
 async function loadLandingDataFromCsv(): Promise<LoadedLandingData> {
   const [facts, glossary, sourceDocuments] = await Promise.all([
-    loadBudgetFactRows(SERVED_DATA_FILES.budgetFacts),
+    loadReviewedBudgetFactRows(),
     loadGlossary(SERVED_DATA_FILES.glossary),
     loadSourceDocuments(SERVED_DATA_FILES.sourceDocuments),
   ]);
@@ -263,7 +285,7 @@ async function loadLandingDataFromCsv(): Promise<LoadedLandingData> {
 async function loadExplorerDataFromCsv(): Promise<LoadedExplorerData> {
   const [landing, adminFacts, adminCategories, gdpFacts] = await Promise.all([
     loadLandingDataFromCsv(),
-    loadAdminSpendingFacts(SERVED_DATA_FILES.adminSpendingFacts),
+    loadReviewedAdminSpendingFacts(),
     loadAdminSpendingCategoriesFile(SERVED_DATA_FILES.adminSpendingCategories),
     loadNationalGdpFacts(SERVED_DATA_FILES.gdpFacts),
   ]);

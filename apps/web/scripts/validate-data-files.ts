@@ -1,7 +1,13 @@
 import { writeFile } from "node:fs/promises";
 import path from "node:path";
 import { loadAdminSpendingFacts } from "../lib/data/adminSpending/importAdminSpendingFacts";
-import { ADMIN_SPENDING_YEARS, EXPENDITURE_YEARS, MUNICIPAL_YEARS, REVENUE_YEARS } from "../lib/data/coverage";
+import {
+  ADMIN_SPENDING_YEARS,
+  EXPENDITURE_YEARS,
+  MUNICIPAL_YEARS,
+  PLANNED_BUDGET_YEARS,
+  REVENUE_YEARS,
+} from "../lib/data/coverage";
 import { validateFoundationReferences } from "../lib/data/foundationValidation";
 import { loadGlossary } from "../lib/data/glossary";
 import { loadBudgetFactRows } from "../lib/data/importBudgetFacts";
@@ -31,7 +37,11 @@ import {
   assertMunicipalAggregateSourceIds,
   assertMunicipalCountryPanel,
 } from "../lib/data/municipal/sourceValidation";
-import { SERVED_DATA_FILES } from "../lib/data/servedData";
+import {
+  loadReviewedAdminSpendingFacts,
+  loadReviewedBudgetFactRows,
+  SERVED_DATA_FILES,
+} from "../lib/data/servedData";
 import { loadSourceDocuments, referencedSourceIds } from "../lib/data/sources";
 import { loadTaxonomyFiles } from "../lib/data/taxonomy";
 import { budgetRowsToCsvRows } from "./compose-budget-facts";
@@ -48,6 +58,17 @@ function assertYears(label: string, actual: number[], expected: number[]) {
     throw new Error(`${label} years mismatch. Expected ${expectedText}, got ${actualText}`);
   }
 }
+function assertPlannedRows(label: string, rows: Array<{ year: number; basis: string }>) {
+  for (const row of rows) {
+    if (row.basis !== "planned") {
+      throw new Error(`${label} row for ${row.year} must have basis planned, got ${row.basis}`);
+    }
+    if (!PLANNED_BUDGET_YEARS.includes(row.year)) {
+      throw new Error(`${label} row has year ${row.year}, expected one of ${PLANNED_BUDGET_YEARS.join(",")}`);
+    }
+  }
+}
+
 function composedFactsMatchSideFiles(
   expenditureRows: Awaited<ReturnType<typeof loadBudgetFactRows>>,
   revenueRows: Awaited<ReturnType<typeof loadBudgetFactRows>>,
@@ -66,8 +87,12 @@ export async function main() {
   const sources = await loadSourceDocuments(SERVED_DATA_FILES.sourceDocuments);
   const expenditureRows = await loadBudgetFactRows("../../data/imports/expenditure-facts-2004-2025.csv");
   const revenueRows = await loadBudgetFactRows("../../data/imports/revenue-facts-2004-2025.csv");
-  const facts = await loadBudgetFactRows(SERVED_DATA_FILES.budgetFacts);
-  const adminSpendingFacts = await loadAdminSpendingFacts(SERVED_DATA_FILES.adminSpendingFacts);
+  // The planned-year rows live in their own files; the combined loaders are what
+  // the site, the snapshot and the database import read.
+  const plannedBudgetRows = await loadBudgetFactRows(SERVED_DATA_FILES.budgetPlannedFacts);
+  const plannedAdminSpendingFacts = await loadAdminSpendingFacts(SERVED_DATA_FILES.adminSpendingPlannedFacts);
+  const facts = await loadReviewedBudgetFactRows();
+  const adminSpendingFacts = await loadReviewedAdminSpendingFacts();
   const nationalGdpFacts = await loadNationalGdpFacts(SERVED_DATA_FILES.gdpFacts);
   const regionalEconomyFacts = await loadRegionalEconomyFacts(SERVED_DATA_FILES.regionalEconomyFacts);
   const generalGovernmentBalanceFacts = await loadGeneralGovernmentBalanceFacts(
@@ -121,11 +146,34 @@ export async function main() {
   ).sort();
   const gdpYears = new Set(nationalGdpFacts.map((fact) => fact.year));
   const nationalBudgetYears = sortedYears(facts.map((fact) => fact.year));
-  const missingGdpYears = nationalBudgetYears.filter((year) => !gdpYears.has(year));
+  // A year with only planned rows has no GDP outturn yet, so it has no denominator to check.
+  const plannedOnlyYears = new Set(
+    nationalBudgetYears.filter((year) =>
+      facts.filter((fact) => fact.year === year).every((fact) => fact.basis === "planned"),
+    ),
+  );
+  const missingGdpYears = nationalBudgetYears.filter(
+    (year) => !plannedOnlyYears.has(year) && !gdpYears.has(year),
+  );
 
-  assertYears("Expenditure", sortedYears(expenditureRows.map((row) => row.year)), EXPENDITURE_YEARS);
+  // The planned files may be header-only until the plan is loaded; once they hold
+  // rows, the planned years must appear alongside the actuals.
+  assertPlannedRows("Planned budget", plannedBudgetRows);
+  assertPlannedRows("Planned admin spending", plannedAdminSpendingFacts);
+  if (plannedBudgetRows.some((row) => row.side !== "expenditure")) {
+    throw new Error("Planned budget rows must all be expenditure rows");
+  }
+  assertYears(
+    "Expenditure",
+    sortedYears(facts.filter((row) => row.side === "expenditure").map((row) => row.year)),
+    [...EXPENDITURE_YEARS, ...(plannedBudgetRows.length > 0 ? PLANNED_BUDGET_YEARS : [])],
+  );
   assertYears("Revenue", sortedYears(revenueRows.map((row) => row.year)), REVENUE_YEARS);
-  assertYears("Admin spending", sortedYears(adminSpendingFacts.map((row) => row.year)), ADMIN_SPENDING_YEARS);
+  assertYears(
+    "Admin spending",
+    sortedYears(adminSpendingFacts.map((row) => row.year)),
+    [...ADMIN_SPENDING_YEARS, ...(plannedAdminSpendingFacts.length > 0 ? PLANNED_BUDGET_YEARS : [])],
+  );
   assertYears("Municipal", sortedYears(municipalFunctionFacts.map((row) => row.year)), MUNICIPAL_YEARS);
   assertYears(
     "Adjara budget adjustments",
@@ -273,7 +321,7 @@ export async function main() {
     throw new Error(`National budget years missing a GDP denominator: ${missingGdpYears.join(", ")}`);
   }
 
-  if (!composedFactsMatchSideFiles(expenditureRows, revenueRows, facts)) {
+  if (!composedFactsMatchSideFiles(expenditureRows, revenueRows, facts.slice(0, facts.length - plannedBudgetRows.length))) {
     throw new Error("Combined budget facts are stale. Run npm run data:compose-budget-facts.");
   }
 
