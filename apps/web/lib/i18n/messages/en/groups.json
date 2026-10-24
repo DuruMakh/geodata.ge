@@ -46,6 +46,7 @@
   "groups.meta": "{topics} topics · {pages} pages · updated {date}",
   "groups.annual": "annual data",
   "groups.mapAndList": "Map and list · {n} regions",
+  "groups.regionsN": "{n} regions",
   "groups.metaTitle.budget": "Georgia’s budget, debt and deficit",
   "groups.metaDescription.budget": "Georgia’s budget spending and revenue, government debt and deficit by year, from the Ministry of Finance, Geostat and the IMF World Economic Outlook.",
   "groups.metaTitle.economy": "Georgia’s economy, business and housing",

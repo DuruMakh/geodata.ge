@@ -46,6 +46,7 @@
   "groups.meta": "{topics} ქვეთემა · {pages} გვერდი · განახლდა {date}",
   "groups.annual": "წლიური მონაცემები",
   "groups.mapAndList": "რუკა და სია · {n} რეგიონი",
+  "groups.regionsN": "{n} რეგიონი",
   "groups.metaTitle.budget": "საქართველოს ბიუჯეტი, ვალი და დეფიციტი",
   "groups.metaDescription.budget": "ბიუჯეტის ხარჯები და შემოსავლები, სახელმწიფო ვალი და დეფიციტი საქართველოში წლების მიხედვით (ფინანსთა სამინისტრო, საქსტატი და IMF WEO).",
   "groups.metaTitle.economy": "საქართველოს ეკონომიკა, ბიზნესი და საცხოვრებელი",
