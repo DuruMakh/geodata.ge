@@ -73,7 +73,7 @@
     - **L3.10.1 `Total`:** locate the columns by their printed headings. Row 3 holds `Total` and `Households`. Row 4 holds `total` (businesses), the 11 industry labels in spec order, `Individuals` and `Individual entrepreneur`.
       - Industry labels map to ids: `Agriculture, Forestry, Fishing`→agriculture, `Industry`→industry, `Construction`→construction, `Trade`→trade, `Hotels and Restaurants`→hotels_restaurants, `Transport and Communications`→transport_communications, `Financial Intermediation`→financial, `Transactions in Real Estates, Researches`→real_estate (startswith match), `Education`→education, `Health Care and Social Services`→health_social, `Other Services`→other_services. `Individuals`→people.
       - Use the existing `december_rows` for the rows.
-    - **LOP `HH`:** take each purpose's lari cell (under `In National Currency`) plus its foreign-currency cell (under `In Foreign Currency`), using `add_pair`.
+    - **LPR `HH`:** take each purpose's lari cell (under `In National Currency`) plus its foreign-currency cell (under `In Foreign Currency`), using `add_pair`.
       - Labels map to ids: `Consumer Loans`→consumer, `Mortgage loans for real estate purchase and repair`→home, `Business loans for SME`→sme, `Business loans for large enterprises`→large_business, `Auto loans`→car, `Lombard Loans`→pawn, `Other Loans`→other.
     - **LREG `NC`/`FC`:** read `Total`→georgia and the 11 region rows by label (`Adjara, Autonomous Republic of` in `NC` but `Adjara` in `FC`, so match by prefix). Skip the Abkhazeti row. Each area's `gel` and `fx` are official; its `total` comes from `add_pair`.
   - Extend `COVERAGE`, `CALCULATED`, `ANCHORS` and `BREAKS`, using the exact reasons and source notes quoted from each workbook's footer.

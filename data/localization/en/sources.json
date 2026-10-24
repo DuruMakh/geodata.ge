@@ -1651,7 +1651,7 @@
     "derivation": null
   },
   "source.nbg_loans_purpose_lop": {
-    "name": { "text": "Household loans by purpose (LOP)", "reviewedAt": "2026-10-24" },
+    "name": { "text": "Household loans by purpose (LPR)", "reviewedAt": "2026-10-24" },
     "derivation": null
   },
   "source.nbg_loans_regions_lreg": {

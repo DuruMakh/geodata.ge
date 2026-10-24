@@ -93,7 +93,7 @@ INDUSTRY_LABELS = {
     'hotels_restaurants': 'Hotels and Restaurants', 'transport_communications': 'Transport and Communications',
     'financial': 'Financial Intermediation', 'real_estate': 'Transactions in Real Estate', 'education': 'Education',
     'health_social': 'Health Care and Social Services', 'other_services': 'Other Services'}
-# Printed labels in column A of LOP sheet HH, repeated under "In National Currency" and under "In Foreign Currency".
+# Printed labels in column A of LPR sheet HH, repeated under "In National Currency" and under "In Foreign Currency".
 PURPOSE_LABELS = {
     'consumer': 'Consumer Loans', 'home': 'Mortgage loans for real estate purchase and repair', 'sme': 'Business loans for SME',
     'large_business': 'Business loans for large enterprises', 'car': 'Auto loans', 'pawn': 'Lombard Loans', 'other': 'Other Loans'}
@@ -507,7 +507,7 @@ def extract_borrowers():
 
 
 def extract_purposes():
-    """LOP `HH`: each household purpose as the lari cell plus the foreign-currency cell, in the same December column."""
+    """LPR `HH`: each household purpose as the lari cell plus the foreign-currency cell, in the same December column."""
     source_id, name = 'nbg_loans_purpose_lop', 'HH'
     sheet_rows = sheet(source_id, name)
     check_million_gel(sheet_rows)

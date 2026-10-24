@@ -4419,7 +4419,7 @@
     "documentLanguage": "en"
   },
   "nbg_loans_purpose_lop": {
-    "title": { "text": "Household loans by purpose (LOP)", "reviewedAt": "2026-10-24" },
+    "title": { "text": "Household loans by purpose (LPR)", "reviewedAt": "2026-10-24" },
     "publisher": { "text": "National Bank of Georgia (NBG)", "reviewedAt": "2026-10-24" },
     "attribution": { "text": "National Bank of Georgia", "reviewedAt": "2026-10-24" },
     "documentLanguage": "en"

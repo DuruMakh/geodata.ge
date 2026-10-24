@@ -109,7 +109,7 @@ All files come from NBG's statistics page, category 17 (loans), listed by `GET h
 | NBG code | File | Used for | Served values |
 | --- | --- | --- | --- |
 | L3.10.1 | `loans-structure-l3-10-1eng.xlsx`, sheet `Total` | All loans, Businesses, 11 industries, People (Dec 2003–2025); Households, Individual entrepreneurs (Dec 2015–2025) | 13 × 23 + 2 × 11 + 23 = 344 |
-| LOP | `loans-by-lopeng.xlsx`, sheet `HH` | Seven household purposes, lari block + foreign-currency block (Dec 2015–2025) | 7 × 11 = 77 (calculated) |
+| LPR | `loans-by-lopeng.xlsx`, sheet `HH` | Seven household purposes, lari block + foreign-currency block (Dec 2015–2025) | 7 × 11 = 77 (calculated) |
 | LREG | `loans-by-regions-lregeng.xlsx`, sheets `NC` and `FC` | Georgia and 11 regions: in lari, in foreign currency, all (Dec 2015–2025) | 12 × 3 × 11 = 396 (the 132 "all" values calculated) |
 
 That is about 817 new served values, which join the existing 730. The research package also keeps the API listing and the three files' Notes sheets. The "of which" consumer and real-estate columns of L3.10.1 and the `LE`, `GEL` and `FRC` sheets are not served.

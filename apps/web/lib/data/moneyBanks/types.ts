@@ -5,7 +5,7 @@ import type { BreakRow } from "../demography/breaks";
 export const MONEY_BANKS_LOAN_INDUSTRIES = [
   "agriculture", "industry", "construction", "trade", "hotels_restaurants", "transport_communications", "financial", "real_estate", "education", "health_social", "other_services",
 ] as const;
-/** The seven purposes of household loans (LOP, sheet HH), in the file's order. */
+/** The seven purposes of household loans (LPR, sheet HH), in the file's order. */
 export const MONEY_BANKS_LOAN_PURPOSES = ["consumer", "home", "sme", "large_business", "car", "pawn", "other"] as const;
 /** Loans by region (LREG): Georgia, then the site's 11 regions. */
 export const MONEY_BANKS_LOAN_AREAS = ["georgia", ...BUSINESS_REGIONS] as const;

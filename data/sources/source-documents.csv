@@ -275,7 +275,7 @@ source.nbg_deposit_rates_dwir,დეპოზიტებზე წლიურ�
 source.nbg_fsi_archive,ფინანსური მდგრადობის მაჩვენებლები (FSI) - არქივი,docs/Raw Data/Money/nbg-money-banks-annual/official/fsieng-archive.xlsx,2026-10-11
 source.nbg_fsi,ფინანსური მდგრადობის მაჩვენებლები (FSI),docs/Raw Data/Money/nbg-money-banks-annual/official/fsieng.xlsx,2026-10-11
 source.nbg_loans_structure_l3_10_1,სესხები ეროვნულ ეკონომიკაზე მსესხებლისა და საქმიანობის სახეობის მიხედვით (L3.10.1),docs/Raw Data/Money/nbg-money-banks-annual/official/loans-structure-l3-10-1eng.xlsx,2026-10-24
-source.nbg_loans_purpose_lop,ფიზიკური პირების სესხები დანიშნულების მიხედვით (LOP),docs/Raw Data/Money/nbg-money-banks-annual/official/loans-by-lopeng.xlsx,2026-10-24
+source.nbg_loans_purpose_lop,შინამეურნეობების სესხები დანიშნულების მიხედვით (LPR),docs/Raw Data/Money/nbg-money-banks-annual/official/loans-by-lopeng.xlsx,2026-10-24
 source.nbg_loans_regions_lreg,სესხები რეგიონების მიხედვით (LREG),docs/Raw Data/Money/nbg-money-banks-annual/official/loans-by-regions-lregeng.xlsx,2026-10-24
 source.nbg_meth_monetary_statistics,მონეტარული სტატისტიკის მეთოდოლოგია,docs/Raw Data/Money/nbg-money-banks-annual/official/monetary-statistics-meth-eng.pdf,2026-10-11
 source.nbg_meth_loans,სესხების სტატისტიკის მეთოდოლოგია,docs/Raw Data/Money/nbg-money-banks-annual/official/loans-meth-noteseng.pdf,2026-10-11
