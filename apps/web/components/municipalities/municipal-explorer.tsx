@@ -43,6 +43,7 @@ import { useMunicipalState } from "./use-municipal-state";
 import { ModeTabs } from "../explorer-shell/mode-tabs";
 import { useAppReady } from "../explorer-shell/use-app-ready";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
+import { ChartShareButton } from "../explorer-shell/chart-share-button";
 
 export type MunicipalMetricContext =
   | {
@@ -254,6 +255,18 @@ function MunicipalExplorerContent(props: MunicipalExplorerProps) {
 
   useAppReady();
 
+  const chart = <EditorialLineChart years={years} series={series} share={state.share} unit={unit} shareLabel={message(messages, "municipal.shareOfBudget")} />;
+  const shareAction = noSelection ? undefined : (
+    <ChartShareButton
+      title={`${props.title} ${props.triggerLabel}`}
+      caption={`${message(messages, state.share ? "municipal.shareMeasure" : "municipal.amountMeasure")} · ${state.range.start}–${state.range.end}`}
+      legend={series.map(({ label, color }) => ({ label, color }))}
+      source={props.sourceNote}
+      chart={chart}
+      period={`${state.range.start}-${state.range.end}`}
+    />
+  );
+
   return (
     <>
       <EntityHeading
@@ -307,7 +320,7 @@ function MunicipalExplorerContent(props: MunicipalExplorerProps) {
                 <Callout testId="no-selection-callout">{message(messages, "municipal.noSelection")}</Callout>
               </div>
             ) : state.chartMode === "line" ? (
-              <EditorialLineChart years={years} series={series} share={state.share} unit={unit} shareLabel={message(messages, "municipal.shareOfBudget")} />
+              chart
             ) : (
               <ExplorerTable
                 caption={message(messages, state.share ? "municipal.tableCaptionShare" : "municipal.tableCaptionAmount", { name: props.triggerLabel, start: state.range.start, end: state.range.end })}
@@ -336,7 +349,7 @@ function MunicipalExplorerContent(props: MunicipalExplorerProps) {
             <RangeStrip years={allYears} range={state.range} onChange={state.setRange} />
 
             <div className="mt-5 max-w-[640px]">
-              <SourceNote testId="municipal-source-note">{props.sourceNote}</SourceNote>
+              <SourceNote testId="municipal-source-note" action={shareAction}>{props.sourceNote}</SourceNote>
             </div>
 
             {props.summary ? (

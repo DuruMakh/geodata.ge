@@ -798,7 +798,8 @@ test("Excel button shows working and retryable error states", async ({ page }) =
   });
 
   const button = page.getByTestId("series-excel");
-  const announcement = page.getByRole("status");
+  // The Excel button's own status: the chart's share button has one too (DESIGN.md §7.17).
+  const announcement = button.locator("..").getByRole("status");
   await expect(button).toHaveText("ჩამოტვირთვა");
   await page.evaluate(() => {
     const target = document.querySelector<HTMLButtonElement>("[data-testid='series-excel']");

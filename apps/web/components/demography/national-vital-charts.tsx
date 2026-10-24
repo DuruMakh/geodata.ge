@@ -13,6 +13,7 @@ import { useI18n } from "../../lib/i18n/provider";
 import type { TemplateValues } from "../../lib/i18n/types";
 import type { ClientNationalFact } from "../../lib/servedRows";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
+import { ChartShareButton } from "../explorer-shell/chart-share-button";
 import { ModeTabs } from "../explorer-shell/mode-tabs";
 import { useAppReady } from "../explorer-shell/use-app-ready";
 import { EditorialLineChart } from "../main-explorer/editorial-line-chart";
@@ -54,6 +55,54 @@ export function NationalVitalCharts({
   const lifeColor = (colorKey: string | null) => (colorKey === null ? INK : SERIES_COLORS[colorKey]!);
   const rate1 = (value: number) => formatInUnit(value, UNIT_DENSITY);
   const lifeSeries = LIFE_SERIES.map((line) => ({ id: line.seriesId, label: t(line.key), color: lifeColor(line.colorKey), vals: flat(seriesByYear(facts, line.seriesId)) }));
+  const nationalSource = t("nationalSource", { first, last });
+  const tfrTitle = `${t("tfrLabel")} (${t("tfrUnit")})`;
+  const tfrChart = (
+    <EditorialLineChart
+      years={years}
+      series={[{ id: SERIES.totalFertilityRate, label: t("tfrLabel"), color: INK, vals: flat(tfr) }]}
+      share={false}
+      unit={UNIT_RATE_2}
+      shareLabel=""
+      formatTooltipValue={(value) => formatInUnit(value, UNIT_RATE_2)}
+      breaks={breaks}
+      ariaLabel={t("tfrChartAria", { first, last })}
+    />
+  );
+  const asfrLegend = [
+    { label: String(curves.years[0]), color: FIRST_YEAR_COLOR },
+    { label: String(curves.years.at(-1)), color: ACCENT },
+    { label: t("otherYears"), color: OTHER_COLOR },
+  ];
+  const asfrChart = (
+    <EditorialLineChart
+      years={positions}
+      series={ageOrder.map((year) => ({
+        id: String(year),
+        label: String(year),
+        color: ageColor(year),
+        vals: AGE_GROUPS.map((group) => curves.byYear[year]![group]),
+      }))}
+      share={false}
+      unit={UNIT_DENSITY}
+      shareLabel=""
+      formatTooltipValue={rate1}
+      formatPeriod={(position) => ageLabel(position)}
+      ariaLabel={t("asfrChartName", { first: curves.years[0]!, last: curves.years.at(-1)! })}
+    />
+  );
+  const lifeChart = (
+    <EditorialLineChart
+      years={years}
+      series={lifeSeries}
+      share={false}
+      unit={UNIT_DENSITY}
+      shareLabel=""
+      formatTooltipValue={rate1}
+      breaks={breaks}
+      ariaLabel={t("lifeChartAria", { first, last })}
+    />
+  );
 
   return (
     <>
@@ -63,16 +112,7 @@ export function NationalVitalCharts({
         <ModeTabs value={tfrMode} onChange={setTfrMode} testId="tfr" />
         <div className="mt-5">
           {tfrMode === "line" ? (
-            <EditorialLineChart
-              years={years}
-              series={[{ id: SERIES.totalFertilityRate, label: t("tfrLabel"), color: INK, vals: flat(tfr) }]}
-              share={false}
-              unit={UNIT_RATE_2}
-              shareLabel=""
-              formatTooltipValue={(value) => formatInUnit(value, UNIT_RATE_2)}
-              breaks={breaks}
-              ariaLabel={t("tfrChartAria", { first, last })}
-            />
+            tfrChart
           ) : (
             <ExplorerTable
               caption={t("tfrChartAria", { first, last })}
@@ -92,38 +132,24 @@ export function NationalVitalCharts({
             />
           )}
         </div>
+        {/* The rate has no source line of its own (it shares the life section's), so its button sits under the chart, at the right. */}
+        <div className="mt-3 flex justify-end">
+          <ChartShareButton title={tfrTitle} caption={`${first}–${last}`} source={nationalSource} chart={tfrChart} period={`${first}-${last}`} testId="tfr-share" />
+        </div>
         <h3 className="mt-10 mb-3 text-[15px] text-[var(--ink)]">{t("asfrLabel")}</h3>
         <ModeTabs value={ageMode} onChange={setAgeMode} testId="asfr" />
         <div className="mt-5" data-testid="asfr-panel">
           {ageMode === "line" ? (
             <>
               <ul className="mb-3 flex flex-wrap gap-x-5 gap-y-1 text-[12px] text-[var(--body)]" data-testid="asfr-legend">
-                {[
-                  { label: String(curves.years[0]), color: FIRST_YEAR_COLOR },
-                  { label: String(curves.years.at(-1)), color: ACCENT },
-                  { label: t("otherYears"), color: OTHER_COLOR },
-                ].map((item) => (
+                {asfrLegend.map((item) => (
                   <li key={item.label} className="inline-flex items-center gap-2">
                     <span aria-hidden className="inline-block h-[3px] w-4" style={{ background: item.color }} />
                     {item.label}
                   </li>
                 ))}
               </ul>
-              <EditorialLineChart
-                years={positions}
-                series={ageOrder.map((year) => ({
-                  id: String(year),
-                  label: String(year),
-                  color: ageColor(year),
-                  vals: AGE_GROUPS.map((group) => curves.byYear[year]![group]),
-                }))}
-                share={false}
-                unit={UNIT_DENSITY}
-                shareLabel=""
-                formatTooltipValue={rate1}
-                formatPeriod={(position) => ageLabel(position)}
-                ariaLabel={t("asfrChartName", { first: curves.years[0]!, last: curves.years.at(-1)! })}
-              />
+              {asfrChart}
             </>
           ) : (
             <ExplorerTable
@@ -149,7 +175,9 @@ export function NationalVitalCharts({
             />
           )}
         </div>
-        <div className="mt-[18px] max-w-[740px]"><SourceNote testId="asfr-note">{t("asfrNote")}</SourceNote></div>
+        <div className="mt-[18px] max-w-[740px]"><SourceNote testId="asfr-note" action={
+          <ChartShareButton title={t("asfrLabel")} caption={`${curves.years[0]!}–${curves.years.at(-1)!}`} legend={asfrLegend} source={nationalSource} chart={asfrChart} period={`${curves.years[0]!}-${curves.years.at(-1)!}`} testId="asfr-share" />
+        }>{t("asfrNote")}</SourceNote></div>
         <Download testId="fertility-excel-download" build={() => buildFertilityWorkbookExportModel({ facts, sources, siteOrigin }, presentation)} />
       </section>
       <section data-testid="life-section" className={SECTION_CLASS}>
@@ -157,16 +185,7 @@ export function NationalVitalCharts({
         <div className="mt-5"><ModeTabs value={lifeMode} onChange={setLifeMode} testId="life" /></div>
         <div className="mt-5">
           {lifeMode === "line" ? (
-            <EditorialLineChart
-              years={years}
-              series={lifeSeries}
-              share={false}
-              unit={UNIT_DENSITY}
-              shareLabel=""
-              formatTooltipValue={rate1}
-              breaks={breaks}
-              ariaLabel={t("lifeChartAria", { first, last })}
-            />
+            lifeChart
           ) : (
             <ExplorerTable
               caption={t("lifeChartAria", { first, last })}
@@ -187,7 +206,9 @@ export function NationalVitalCharts({
           )}
         </div>
         <ChartSelectionAids series={lifeSeries} chartShown={lifeMode === "line"} share={false} unit={UNIT_DENSITY} formatValue={rate1} />
-        <div className="mt-[18px] max-w-[740px]"><SourceNote testId="national-source-note">{t("nationalSource", { first, last })}</SourceNote></div>
+        <div className="mt-[18px] max-w-[740px]"><SourceNote testId="national-source-note" action={
+          <ChartShareButton title={t("lifeTitle")} caption={`${first}–${last}`} legend={lifeSeries.map(({ label, color }) => ({ label, color }))} source={nationalSource} chart={lifeChart} period={`${first}-${last}`} testId="life-share" />
+        }>{nationalSource}</SourceNote></div>
         <Download testId="life-excel-download" build={() => buildLifeWorkbookExportModel({ facts, sources, siteOrigin }, presentation)} />
       </section>
     </>

@@ -31,7 +31,7 @@ export function HealthDeathsIndex({ georgiaRates, regionMap }: {
     <ExplorerHeading>{t("page.causes-of-death.title")}</ExplorerHeading>
     <LatestValueLine testId="health-latest" measure={t("latest.causes-of-death")} period={latest.year} value={rate(latest.value)} />
     <section data-testid="health-regions" className="mt-4">
-      <RegionIndex model={regionMap} summary={[]} sourceNote={`${t("sourceNoteDeaths")} · ${unitLabel} · ${regionMap.year}.`}
+      <RegionIndex title={t("page.causes-of-death.title")} model={regionMap} summary={[]} sourceNote={`${t("sourceNoteDeaths")} · ${unitLabel} · ${regionMap.year}.`}
         leadRow={georgiaValue === undefined ? undefined : { id: "georgia", label: t("area.georgia"), value: georgiaValue }} metric={{
           hrefForRegion: id => healthDeathsAreaHref(id as HealthArea), formatValue: rate, legend: `${rateLabel} · ${unitLabel}`, testId: "health-region-map",
           mapAria: t("regionMapAria", { unit: unitLabel, year: regionMap.year }), entityAria: (name, value, year) => t("regionMapEntityAria", { name, amount: rate(value), year }),

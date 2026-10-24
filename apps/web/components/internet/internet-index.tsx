@@ -33,7 +33,7 @@ export function InternetIndex({ facts, regionMap }: {
     <ExplorerHeading>{t("page.homes.title")}</ExplorerHeading>
     <LatestValueLine testId="internet-latest" sentence={<Message messages={messages} id="internet.latest.homes" values={{ year: latest.year, value: <LatestFigure value={internetPercent(latest.value)} /> }} />} />
     <section data-testid="internet-region-index" className="mt-4">
-      <RegionIndex model={regionMap} summary={[]} sourceNote={`${t("sourceNoteHomes")} · ${unitLabel} · ${regionMap.year}.`}
+      <RegionIndex title={t("page.homes.title")} model={regionMap} summary={[]} sourceNote={`${t("sourceNoteHomes")} · ${unitLabel} · ${regionMap.year}.`}
         leadRow={georgiaValue === undefined ? undefined : { id: "georgia", label: t("area.georgia"), value: georgiaValue }} metric={{
           hrefForRegion: internetRegionHref, formatValue: value => formatInUnit(value, INTERNET_PERCENT), legend: `${mapLabel} · ${unitLabel}`, testId: "internet-region-map",
           mapAria: t("regionMapAria", { total: mapLabel, unit: unitLabel, year: regionMap.year }), entityAria: (name, value, year) => t("regionMapEntityAria", { name, amount: internetPercent(value), year }),

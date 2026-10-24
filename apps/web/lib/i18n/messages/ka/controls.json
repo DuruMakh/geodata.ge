@@ -44,5 +44,13 @@
   "controls.backToTable": "ცხრილი",
   "controls.backUp": "ზემოთ ასვლა",
   "controls.planned": "გეგმა",
-  "controls.other": "სხვა"
+  "controls.other": "სხვა",
+  "controls.share.button": "გაზიარება",
+  "controls.share.menu": "სურათის გაზიარება",
+  "controls.share.download": "სურათის ჩამოტვირთვა",
+  "controls.share.copy": "სურათის კოპირება",
+  "controls.share.native": "გაზიარება…",
+  "controls.share.working": "სურათი მზადდება…",
+  "controls.share.copied": "სურათი დაკოპირდა",
+  "controls.share.error": "სურათი ვერ მომზადდა — სცადეთ თავიდან."
 }

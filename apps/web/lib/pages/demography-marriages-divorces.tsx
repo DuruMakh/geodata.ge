@@ -97,6 +97,7 @@ export async function renderDemographyMarriagesDivorcesPage(locale: Locale) {
         />
         <div className="mt-16">
           <MunicipalitiesIndex
+            share={{ title, caption: t("marriageLegend", { year: index.year }), source: t("marriageIndexSource", { first: Math.min(...placeYears), last: Math.max(...placeYears) }), period: String(index.year), testId: "map-share" }}
             viewBox={index.map.viewBox}
             shapes={index.map.shapes}
             markers={index.map.markers}

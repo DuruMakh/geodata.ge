@@ -31,6 +31,7 @@ import { ExplorerPage } from "../explorer-shell/explorer-page";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { MeasurePill } from "../explorer-shell/measure-pill";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
+import { ChartShareButton } from "../explorer-shell/chart-share-button";
 import { useHashState } from "../explorer-shell/use-hash-state";
 import { DECK_LINE_CLASS } from "../explorer-shell/latest-value-line";
 
@@ -110,6 +111,26 @@ export function DeficitExplorer({ facts, workbookSources, edition, siteOrigin, l
     : "—";
   const coverage = coverageLabel(messages, locale, years.length > 0 ? min : undefined, years.length > 0 ? max : undefined, lastUpdatedAt || undefined);
 
+  const chart = (
+    <EditorialLineChart
+      years={model.years}
+      series={chartSeries}
+      share={percentage}
+      unit={unit}
+      shareLabel={message(messages, "main.shareGdp")}
+      preliminaryLabel={message(messages, "deficit.forecast")}
+    />
+  );
+  const shareAction = selected ? (
+    <ChartShareButton
+      title={message(messages, "deficit.heading")}
+      caption={`${message(messages, percentage ? "main.shareGdp" : "format.bnGel")} · ${range.start}–${range.end}`}
+      legend={chartSeries.map(({ label, color }) => ({ label, color }))}
+      source={message(messages, "deficit.source", { edition })}
+      chart={chart}
+      period={`${range.start}-${range.end}`}
+    />
+  ) : undefined;
   return (
     <ExplorerPage testId="deficit-explorer" repeatDesktopBottomPadding>
       <PageHeader
@@ -173,14 +194,7 @@ export function DeficitExplorer({ facts, workbookSources, edition, siteOrigin, l
               />
             ) : (
               <div className="mt-5">
-                <EditorialLineChart
-                  years={model.years}
-                  series={chartSeries}
-                  share={percentage}
-                  unit={unit}
-                  shareLabel={message(messages, "main.shareGdp")}
-                  preliminaryLabel={message(messages, "deficit.forecast")}
-                />
+                {chart}
               </div>
             )}
             <ChartSelectionAids series={chartSeries} chartShown={chartMode === "line"} share={percentage} unit={unit} />
@@ -207,7 +221,7 @@ export function DeficitExplorer({ facts, workbookSources, edition, siteOrigin, l
           </section>
 
           <div className="mt-[18px]">
-            <SourceNote testId="source-label">
+            <SourceNote testId="source-label" action={shareAction}>
               {message(messages, "deficit.source", { edition })}
               {" "}{message(messages, "deficit.definition")}
               {lastUpdatedAt ? (

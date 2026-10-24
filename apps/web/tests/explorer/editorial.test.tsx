@@ -1,6 +1,6 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import { TextTab, TextTabGroup } from "../../components/ui/editorial";
+import { SourceNote, TextTab, TextTabGroup } from "../../components/ui/editorial";
 import { SeriesPanel } from "../../components/main-explorer/series-panel";
 import { AnalysisView } from "../../components/analysis/analysis-view";
 import type { SingleYearSnapshotModel } from "../../lib/explorer/types";
@@ -66,5 +66,19 @@ describe("TextTabGroup", () => {
     );
     expect(groupOf(view, "analysis-side-expenditure")).toContain('aria-label="ბიუჯეტის მხარე"');
     expect(groupOf(view, "analysis-grouping-fields")).toContain('aria-label="დაჯგუფება"');
+  });
+});
+
+describe("SourceNote", () => {
+  it("without an action renders exactly as before", () => {
+    expect(renderToStaticMarkup(<SourceNote testId="s">x</SourceNote>))
+      .toBe('<p data-testid="s" class="text-xs leading-relaxed text-[var(--muted)] max-[768px]:[&amp;_a]:py-1">x</p>');
+  });
+
+  it("with an action puts it at the right of the text", () => {
+    const html = renderToStaticMarkup(<SourceNote testId="s" action={<button>b</button>}>x</SourceNote>);
+    expect(html).toMatch(/^<div data-testid="source-row"[^>]*justify-between/);
+    expect(html).toContain('<p data-testid="s"');
+    expect(html.indexOf("<button>b</button>")).toBeGreaterThan(html.indexOf(">x</p>"));
   });
 });
