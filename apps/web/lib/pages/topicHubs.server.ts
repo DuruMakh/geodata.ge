@@ -81,9 +81,18 @@ export const PRODUCT_SOURCE_BLOCK = "2020-2025";
 
 type Loaded = Omit<TopicHubData, "topic">;
 
-/** The range and latest review date of facts counted in calendar years. */
+/**
+ * The range and latest review date of facts counted in calendar years. A loop, not `Math.min(...years)`: Trade passes one
+ * year per fact (about 100,000), past the arguments a call can spread.
+ */
 function yearly(cards: HubCardModel[], years: readonly number[], reviewed: readonly string[]): Loaded {
-  return { cards, firstPeriod: String(Math.min(...years)), lastPeriod: String(Math.max(...years)), lastReviewedAt: [...reviewed].sort().at(-1) ?? "" };
+  let first = Infinity, last = -Infinity, lastReviewedAt = "";
+  for (const year of years) {
+    if (year < first) first = year;
+    if (year > last) last = year;
+  }
+  for (const date of reviewed) if (date > lastReviewedAt) lastReviewedAt = date;
+  return { cards, firstPeriod: String(first), lastPeriod: String(last), lastReviewedAt };
 }
 
 const LOADERS: Record<TopicId, (locale: Locale) => Promise<Loaded>> = {
