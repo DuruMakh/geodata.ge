@@ -1,7 +1,7 @@
 # Chart share button: download, copy or share the chart as a picture
 
 Date: 2026-10-24
-Status: Draft for Duru's review. Decisions so far, all made by Duru in the thread "Add share button to charts" on 2026-10-24 (Tbilisi time):
+Status: Approved by Duru on 2026-10-24 ("ok", 18:44 Tbilisi). Decisions, all made by Duru in the thread "Add share button to charts" on 2026-10-24 (Tbilisi time):
 
 - 18:04: sharing sends the **picture** of the chart, never a link to fiscal.ge. No Facebook or X "post a link" buttons.
 - 18:08: agreed the menu of three actions (download, copy, share) and the picture layout shown in the mockups.
@@ -29,7 +29,7 @@ Success means:
 
 | Item | Georgian / English | Shown when | What it does |
 | --- | --- | --- | --- |
-| Download | `სურათის ჩამოტვირთვა` / `Download picture` | always | Saves a PNG file, e.g. `fiscal-ge-loans-deposits-1996-2025.png` |
+| Download | `სურათის ჩამოტვირთვა` / `Download picture` | always | Saves a PNG file, e.g. `fiscal-money-loans-deposits-1996-2025.png` |
 | Copy | `სურათის კოპირება` / `Copy picture` | the browser can put pictures on the clipboard | Copies the picture; the reader pastes it into a Facebook, X, LinkedIn or Telegram post (Ctrl+V) |
 | Share | `გაზიარება…` / `Share…` | the device can share files (phones; Windows; Safari on Mac) | Opens the device's own share sheet with the picture attached: Facebook, Messenger, Instagram, WhatsApp, Telegram, Mail… |
 
@@ -61,8 +61,8 @@ All of it runs in the reader's browser when they click. No server, no new page, 
 2. **Desktop drawing on phones.** `useChartLayout` (`components/main-explorer/chart-frame.tsx`) and the pyramid's own media query gain one optional context, `ChartGeometryContext`, defaulting to "follow the screen". Inside the share card it says "desktop", so the line, column and pyramid charts draw their 920-wide desktop geometry. Default behaviour, and every existing test, is unchanged.
 3. **Actions.** Download: an object URL on a temporary link with the file name. Copy: `navigator.clipboard.write([new ClipboardItem({"image/png": blobPromise})])`, passing the promise so Safari keeps the click's permission. Share: `navigator.share({ files: [file], title })` after `navigator.canShare({ files: [file] })`; an `AbortError` (reader cancelled) is silent. Feature checks decide which items are shown, once the menu opens.
 4. **Menu behaviour.** A disclosure button (`aria-expanded`, `aria-controls`) with a list of buttons. Escape and a click outside close it and return focus to the button; arrow keys move between items. Targets are at least 44 px tall below 768 px (DESIGN.md §12). Status and errors are announced through a polite live region, as on the Excel button.
-5. **Wiring per page.** `SourceNote` (`components/ui/editorial.tsx`) gains an optional `action` slot rendered at the right of the source text; without it, output is byte-for-byte unchanged. Each chart page passes `<ChartShareButton>` with the page title, the unit and years line, the legend items (from the series it already gives the chart), the chart element, the plain source text and a file-name slug. Pages already hold all of these.
-6. **File name.** `fiscal-ge-<page-slug>-<start>-<end>.png`, ASCII only, from the route slug, not the Georgian title.
+5. **Wiring per page.** `SourceNote` (`components/ui/editorial.tsx`) gains an optional `action` slot rendered at the right of the source text; without it, output is byte-for-byte unchanged. Each chart page passes `<ChartShareButton>` with the page title, the unit and years line, the legend items (from the series it already gives the chart), the chart element, the plain source text (the page's source message, without date or link) and a file stem. Pages already hold all of these.
+6. **File name.** Same naming as the Excel workbooks (`workbookFilename` in `lib/explorer/workbookModel.ts`): `fiscal-<stem>.png`, with `-en` on the English edition, where the stem is ASCII (hub, page, range), e.g. `fiscal-wages-overview-1995-2025.png`.
 
 ## 5. Reuse
 
