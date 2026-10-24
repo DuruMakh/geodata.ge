@@ -33,7 +33,8 @@ export function buildMoneyBanksWorkbookExportModel(input: {
   const isBreak = (id: string, year: number) => section === "borrowers" && MONEY_BANKS_LOAN_BREAKS.some(entry => entry.year === year && entry.appliesTo.includes(id));
   const status = (id: string, year: number) => {
     const fact = byCell.get(`${id}:${year}`);
-    const text = fact ? t(`status.${fact.valueStatus}`) : workbookMessage(locale, "workbook.unavailable");
+    if (!fact) return workbookMessage(locale, "workbook.unavailable");
+    const text = t(`status.${fact.valueStatus}`);
     return isBreak(id, year) ? `${text} · ${t("status.break")}` : text;
   };
   const cells = model.years.flatMap(year => model.selected.map(series => ({ year, series })));

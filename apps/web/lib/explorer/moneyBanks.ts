@@ -77,11 +77,11 @@ const INDUSTRY_SECTOR_KEYS: Readonly<Record<typeof MONEY_BANKS_LOAN_INDUSTRIES[n
 };
 /**
  * The borrower and purpose rows wear fixed palette hexes that no sector colour uses (as Business's size rows do), all 23 rows
- * of the page differing. Other loans is the shared "other" colour.
+ * of the page differing. Other loans is the shared "other" colour, so no other row takes a grey beside it.
  */
 const BORROWER_COLORS: Readonly<Record<string, string>> = {
   "borrowers.businesses": "#B3402A", "borrowers.households": "#4A707A", "borrowers.people": "#A5822B", "borrowers.individual_entrepreneurs": "#8C5A32",
-  "households.purpose.consumer": "#667722", "households.purpose.home": "#7777AA", "households.purpose.sme": "#4E5D74", "households.purpose.large_business": "#8A7B65",
+  "households.purpose.consumer": "#667722", "households.purpose.home": "#7777AA", "households.purpose.sme": "#4E5D74", "households.purpose.large_business": "#1A8C8A",
   "households.purpose.car": "#5B5347", "households.purpose.pawn": "#A3477A", "households.purpose.other": OTHER_COLOR,
 };
 

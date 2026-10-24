@@ -15,6 +15,7 @@ import { getMessages } from "../../lib/i18n/messages.server";
 import type { Presentation } from "../../lib/i18n/types";
 import { loadMoneyBanksWorkbookSources, moneyBanksPageMetadata, renderMoneyBanksPage } from "../../lib/pages/moneyBanks";
 import { renderPageMarkup } from "../helpers/render-localized";
+import { ciede2000 } from "../helpers/ciede2000";
 import { loadMoneyBanksCsv, yearSpan } from "../helpers/money-banks-csv";
 import {
   MONEY_BANKS_LOAN_BREAKS, MONEY_BANKS_SECTIONS, buildMoneyBanksModel, changeMoneyBanksView, defaultMoneyBanksState, moneyBanksCoverage, moneyBanksDefaultSelection, moneyBanksViewSeries, moneyBanksViews,
@@ -218,6 +219,11 @@ test("who borrows colours are all different", () => {
   // The four borrower rows and seven purposes wear no economic-sector colour.
   const sectorColors = new Set(Object.entries(SERIES_COLORS).filter(([key]) => key.startsWith("sector.")).map(([, color]) => color));
   for (const [id, color] of colors) if (!id.startsWith("borrowers.industry.") && id !== "borrowers.total") expect(sectorColors.has(color), id).toBe(false);
+  // The rows this page colours itself (the total, the four borrowers and seven purposes) read as different colours, not only different hexes:
+  // "Other loans" is #94856D, so Large business may not be the near-identical #8A7B65. Industries keep their sector colours, some of which sit closer.
+  const fixed = [...colors].filter(([id]) => !id.startsWith("borrowers.industry."));
+  expect(fixed).toHaveLength(12);
+  for (const [i, [leftId, left]] of fixed.entries()) for (const [rightId, right] of fixed.slice(i + 1)) expect(ciede2000(left, right), `${leftId} vs ${rightId}`).toBeGreaterThanOrEqual(10);
 });
 
 test("households before 2015 are gaps, not zeros", () => {
