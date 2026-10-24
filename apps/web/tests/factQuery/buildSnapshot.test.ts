@@ -30,7 +30,8 @@ describe("buildFactQuerySnapshot", () => {
     // The nineteen demography canonical inputs (eighteen annual tables, six of them for marriages and divorces, and the census snapshot) supply new fact sources; the
     // package's validation inputs and definitions remain evidence.
     // The seven Wages workbooks, the seven Poverty documents, the 21 Household income and spending documents, the 55 Energy and food sources, the twenty Money and banks documents, the 26 Business documents, the 21 Housing archived sources, the 36 Health archived sources, the 22 Crime and justice archived sources, the 14 Labour detail archived sources, the 46 Education documents, the 46 Environment and climate archived sources, the 33 Science and culture archived sources, the 25 Social Service Agency sources, the 25 Transport archived sources, the 36 Internet and technology archived sources, the four Services trade workbooks, the four Trade composition originals and the three Foreign debt and Reserves originals are registered sources of human explorers only.
-    expect(sources).toHaveLength(634);
+    // The 2026 State Budget law (source.mof_2026_budget_law_planned) is the one planned-basis source behind the 2026 Spending plan.
+    expect(sources).toHaveLength(635);
     expect(sources.filter(source => source.sourceId.startsWith("source.geostat_services_")).map(source => source.sourceId).sort()).toEqual([
       "source.geostat_services_georgian_exports_of_services_by_countries",
       "source.geostat_services_georgian_exports_of_services_by_types",

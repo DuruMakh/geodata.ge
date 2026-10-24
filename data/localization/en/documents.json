@@ -1424,6 +1424,36 @@
     },
     "documentLanguage": null
   },
+  "source.mof.expenditure.2026.budget_law_tavi_iii": {
+    "title": {
+      "text": "Law of Georgia on the 2026 State Budget, Chapter III: functional classification of expenses",
+      "reviewedAt": "2026-10-24"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-10-24"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-10-24"
+    },
+    "documentLanguage": "ka"
+  },
+  "source.mof.expenditure.2026.budget_law_tavi_vi": {
+    "title": {
+      "text": "Law of Georgia on the 2026 State Budget, Chapter VI: appropriations by institution and programme",
+      "reviewedAt": "2026-10-24"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-10-24"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-10-24"
+    },
+    "documentLanguage": "ka"
+  },
   "source.mof.municipalities.2015_2019.portal_functional_basic_types": {
     "title": {
       "text": "Municipalities Analytical Portal: functional classification details",
