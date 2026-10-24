@@ -1,0 +1,1130 @@
+<!doctype html>
+<html lang="ka">
+<head>
+<meta charset="utf-8">
+<title>მონაცემები — ყველა მონაცემი და ჰაბები</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400..600&amp;family=Noto+Sans+Georgian:wght@400..700&amp;family=Noto+Serif+Georgian:wght@400..700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#f7f2e9}
+.dx{--paper:#f7f2e9;--tint:#f1eadc;--tile:#fdfaf3;--ink:#1e1b16;--ink2:#2a251e;--body:#55503f;--muted:#6a6050;--faint:#776e5c;--hairline:#d9cfbe;--hairline-soft:#e7decf;--row-border:#ede4d3;--control:#95846a;--accent:#b3402a;--on-ink:#f7f2e9;--on-ink-muted:#a69c8c;--on-ink-faint:#8f8676;--ink-line:#3a342b;--font-display:"Noto Serif Georgian",Georgia,serif;--font-ui:"Noto Sans Georgian","Helvetica Neue",Arial,sans-serif;--font-numeric:"Geist Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;min-height:100vh;background:var(--paper);color:var(--ink);font-family:var(--font-ui);font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+.dx *,.dx *::before,.dx *::after{box-sizing:border-box}
+.dx :where(h1,h2,h3,p,ul,ol,figure){margin:0;padding:0}
+.dx :where(ul,ol){list-style:none}
+.dx :where(a){color:inherit;text-decoration:none}
+.dx :where(button){font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
+.dx :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.dx-side :focus-visible,.dx-bar :focus-visible{outline-color:var(--on-ink)}
+.dx-sprite{position:absolute;width:0;height:0;overflow:hidden}
+.dx-sr{position:absolute;width:1px;height:1px;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+.dx-skip{position:absolute;left:12px;top:-60px;z-index:99;padding:10px 14px;background:var(--accent);color:#fff;font-size:13px;font-weight:600}
+.dx-skip:focus{top:12px}
+.dx.is-menu .dx-skip{display:none}
+.dx-ic{width:18px;height:18px;flex:none;fill:none;stroke:currentColor;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round}
+.dx-ic-sm{width:14px;height:14px}
+.dx-shell{display:grid;grid-template-columns:272px minmax(0,1fr);min-height:100vh}
+.dx-bar{display:none}
+/* —— sidebar —— */
+.dx-side{position:sticky;top:0;z-index:30;height:100vh;overflow-y:auto;display:flex;flex-direction:column;padding:18px 12px 14px;background:var(--ink);color:var(--on-ink);scrollbar-width:thin;scrollbar-color:#4a4237 transparent}
+.dx-brand{display:flex;align-items:center;gap:8px;min-height:40px;padding:0 2px 0 6px}
+.dx-brand-a{display:flex;align-items:center;gap:10px;min-width:0;margin-right:auto}
+.dx-logo{width:24px;height:30px;flex:none}
+.dx-brand-txt>b{display:block;font-family:var(--font-display);font-size:17px;font-weight:600;line-height:1.1;color:var(--on-ink)}
+.dx-brand-txt>span{display:block;margin-top:3px;font-family:var(--font-numeric);font-size:10.5px;color:var(--on-ink-muted)}
+.dx-icbtn{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;flex:none;border:1px solid var(--ink-line);color:var(--on-ink-muted);transition:color .15s,border-color .15s}
+.dx-icbtn:hover{color:var(--on-ink);border-color:#5d5447}
+.dx-close-btn{display:none}
+.dx-side-search{margin-top:18px;display:flex;align-items:center;gap:10px;width:100%;min-height:40px;padding:0 8px 0 10px;border:1px solid var(--ink-line);color:var(--on-ink-muted);font-size:13px;text-align:left;transition:border-color .15s,color .15s}
+.dx-side-search:hover{border-color:#5d5447;color:var(--on-ink)}
+.dx-side-search kbd{margin-left:auto;padding:0 6px;border:1px solid var(--ink-line);font-family:var(--font-numeric);font-size:11px;line-height:20px}
+.dx-side-all{margin-top:10px;display:flex;align-items:center;gap:10px;min-height:42px;padding:0 10px;font-size:13.5px;font-weight:600;color:var(--on-ink)}
+.dx-side-all:hover{background:var(--ink2)}
+.dx-side-all.is-cur{background:var(--ink2);box-shadow:inset 2px 0 0 var(--accent)}
+.dx-n{margin-left:auto;padding-left:8px;font-family:var(--font-numeric);font-size:11px;font-weight:400;color:var(--on-ink-muted)}
+.dx-side-label{margin:20px 10px 6px;font-family:var(--font-numeric);font-size:10.5px;letter-spacing:.06em;color:var(--on-ink-faint)}
+.dx-hub{border-top:1px solid #2c2720}
+.dx-hub-row{display:flex;align-items:stretch}
+.dx-hub-link{flex:1;min-width:0;display:flex;align-items:flex-start;gap:10px;padding:10px 4px 10px 10px;color:var(--on-ink-muted)}
+.dx-hub-link .dx-ic{margin-top:1px}
+.dx-hub-name{font-size:13.5px;font-weight:600;line-height:1.38;color:var(--on-ink)}
+.dx-hub-link .dx-n{padding-top:2px}
+.dx-hub-link:hover .dx-hub-name{text-decoration:underline;text-decoration-color:var(--accent);text-decoration-thickness:1.5px;text-underline-offset:3px}
+.dx-hub.is-cur>.dx-hub-row .dx-hub-link{color:var(--on-ink);box-shadow:inset 2px 0 0 var(--accent)}
+.dx-hub-tog{flex:none;width:36px;display:flex;align-items:flex-start;justify-content:center;padding-top:11px;color:var(--on-ink-faint)}
+.dx-hub-tog:hover{color:var(--on-ink)}
+.dx-hub-tog .dx-ic{width:16px;height:16px;transition:transform .2s}
+.dx-hub.is-open .dx-hub-tog .dx-ic{transform:rotate(90deg)}
+.dx-hub-body{padding:0 6px 12px 38px}
+.dx-fly-h{display:none}
+.dx-tl{margin:10px 0 4px;font-size:11px;font-weight:600;line-height:1.35;color:var(--on-ink-faint)}
+.dx-pl{border-left:1px solid var(--ink-line)}
+.dx-pl a{display:block;margin-left:-1px;padding:6px 8px 6px 12px;border-left:2px solid transparent;font-size:12.5px;line-height:1.4;color:var(--on-ink-muted)}
+.dx-pl a:hover{color:var(--on-ink)}
+.dx-pl a.is-cur{color:var(--on-ink);border-left-color:var(--accent);background:var(--ink2)}
+.dx-side-foot{margin-top:auto;padding:18px 6px 0;display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;font-size:12px;color:var(--on-ink-muted)}
+.dx-side-foot a{display:inline-flex;align-items:center;min-height:24px}
+.dx-side-foot a:hover{color:var(--on-ink)}
+.dx-lang{display:inline-flex;border:1px solid var(--ink-line)}
+.dx-lang button{min-width:40px;min-height:30px;padding:0 9px;font-family:var(--font-numeric);font-size:11px;color:var(--on-ink-muted)}
+.dx-lang button[aria-pressed="true"]{background:var(--on-ink);color:var(--ink)}
+/* collapsed rail, desktop only */
+@media(min-width:768px){
+.dx.is-rail .dx-shell{grid-template-columns:72px minmax(0,1fr)}
+.dx.is-rail .dx-side{overflow:visible;padding:16px 10px}
+.dx.is-rail .dx-brand{flex-direction:column;gap:14px;padding:0}
+.dx.is-rail .dx-brand-a{margin:0}
+.dx.is-rail .dx-brand-txt,.dx.is-rail .dx-side-search span,.dx.is-rail .dx-side-search kbd,.dx.is-rail .dx-side-all span,.dx.is-rail .dx-side-label,.dx.is-rail .dx-hub-name,.dx.is-rail .dx-hub-link .dx-n,.dx.is-rail .dx-hub-tog,.dx.is-rail .dx-foot-links{display:none}
+.dx.is-rail .dx-side-search,.dx.is-rail .dx-side-all{justify-content:center;padding:0}
+.dx.is-rail .dx-side-label+.dx-hubs{margin-top:16px}
+.dx.is-rail .dx-hub-link{justify-content:center;padding:13px 0}
+.dx.is-rail .dx-hub.is-open>.dx-hub-row .dx-hub-link{background:var(--ink2);color:var(--on-ink)}
+.dx.is-rail .dx-hub-body{position:absolute;left:100%;top:0;bottom:0;z-index:40;width:320px;overflow-y:auto;padding:22px 22px 24px;background:var(--ink);border-left:1px solid var(--ink-line);box-shadow:14px 0 36px rgba(30,27,22,.16);scrollbar-width:thin;scrollbar-color:#4a4237 transparent}
+.dx.is-rail .dx-hub-body .dx-tl{margin-top:16px}
+.dx.is-rail .dx-fly-h{display:block;margin-bottom:8px;padding-bottom:12px;border-bottom:1px solid var(--ink-line);font-family:var(--font-display);font-size:20px;font-weight:600;line-height:1.3;color:var(--on-ink)}
+.dx.is-rail .dx-fly-h a:hover{text-decoration:underline;text-decoration-color:var(--accent);text-underline-offset:4px}
+.dx.is-rail .dx-fly-h>span{display:block;margin-top:4px;font-family:var(--font-numeric);font-size:11px;font-weight:400;color:var(--on-ink-faint)}
+.dx.is-rail .dx-side-foot{justify-content:center;padding:14px 0 0}
+.dx.is-rail .dx-lang{flex-direction:column}
+}
+/* —— main —— */
+.dx-main{min-width:0;padding:28px 56px 72px;outline:none}
+.dx-in{max-width:1120px;margin:0 auto}
+.dx-top{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 20px;padding-bottom:12px;border-bottom:1.5px solid var(--ink);font-family:var(--font-numeric);font-size:11.5px;color:var(--muted)}
+.dx-crumbs{display:flex;flex-wrap:wrap;gap:6px}
+.dx-crumbs{align-items:center}
+.dx-crumbs a{display:inline-flex;align-items:center;min-height:24px}
+.dx-crumbs a:hover{color:var(--ink);text-decoration:underline;text-underline-offset:3px}
+.dx-crumbs [aria-current]{color:var(--ink);font-weight:600}
+.dx-h1{margin-top:34px;font-family:var(--font-display);font-size:44px;font-weight:600;line-height:1.12;letter-spacing:-.015em;text-wrap:balance}
+.dx-line{margin-top:10px;max-width:760px;font-size:15px;line-height:1.55;color:var(--body)}
+/* search */
+.dx-search{margin-top:28px}
+.dx-q{display:flex;align-items:center;gap:14px;height:66px;padding:0 10px 0 22px;background:var(--tile);border:1.5px solid var(--ink)}
+.dx-q:focus-within{outline:2px solid var(--accent);outline-offset:3px}
+.dx-q>.dx-ic{width:22px;height:22px}
+.dx-q input{flex:1;min-width:0;height:100%;padding:0;border:0;outline:0;background:transparent;font-family:var(--font-ui);font-size:19px;color:var(--ink)}
+.dx-q input::placeholder{color:var(--faint)}
+.dx-q input:focus-visible{outline:none}
+.dx-q-n{font-family:var(--font-numeric);font-size:12px;color:var(--muted);white-space:nowrap}
+.dx-q-x{width:44px;height:44px;display:flex;align-items:center;justify-content:center;color:var(--muted)}
+.dx-q-x:hover{color:var(--ink)}
+.dx-kbd{margin-right:12px;padding:0 8px;border:1px solid var(--hairline);background:var(--paper);font-family:var(--font-numeric);font-size:12px;line-height:24px;color:var(--muted)}
+.dx-try{margin-top:12px;display:flex;flex-wrap:wrap;align-items:center;gap:8px;font-size:12.5px;color:var(--muted)}
+.dx-chip{display:inline-flex;align-items:center;min-height:34px;padding:0 13px;border:1px solid var(--hairline);background:var(--paper);font-size:12.5px;color:var(--ink);transition:border-color .15s,background .15s}
+.dx-chip:hover{border-color:var(--ink);background:var(--tile)}
+/* results */
+.dx-alt{margin-top:26px;display:flex;align-items:center;gap:10px;padding:12px 16px;background:var(--tint);font-size:13.5px}
+.dx-alt b{font-weight:600}
+.dx-place{margin-top:26px;border:1.5px solid var(--ink);background:var(--tile)}
+.dx-place-h{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:6px 16px;padding:16px 22px 14px;border-bottom:1px solid var(--hairline)}
+.dx-place-n{display:flex;align-items:center;gap:10px;font-family:var(--font-display);font-size:30px;font-weight:600;line-height:1.15}
+.dx-place-n .dx-ic{width:24px;height:24px;color:var(--accent)}
+.dx-place-t{font-family:var(--font-numeric);font-size:12px;color:var(--muted)}
+.dx-facts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr))}
+.dx-fact{padding:14px 22px 16px;border-right:1px solid var(--hairline-soft)}
+.dx-fact:last-child{border-right:0}
+.dx-fact>b{display:block;font-family:var(--font-numeric);font-size:23px;font-weight:600;letter-spacing:-.015em;line-height:1.2}
+.dx-fact>span{display:block;margin-top:4px;font-size:12.5px;line-height:1.35;color:var(--body)}
+.dx-fact>em{display:block;margin-top:2px;font-style:normal;font-family:var(--font-numeric);font-size:10.5px;color:var(--faint)}
+.dx-res{margin-top:8px}
+.dx-short{margin-top:20px;display:grid;grid-template-columns:22px minmax(0,1fr) auto 18px;align-items:center;gap:14px;min-height:64px;padding:12px 18px;border:1px solid var(--ink);background:var(--tile)}
+.dx-short .dx-ic{color:var(--accent)}
+.dx-short-t>b{display:block;font-family:var(--font-display);font-size:19px;font-weight:600;line-height:1.25}
+.dx-short-t>span{display:block;font-size:12px;color:var(--muted)}
+.dx-short-n{font-family:var(--font-numeric);font-size:12px;color:var(--muted)}
+.dx-short .dx-short-go{color:var(--ink)}
+.dx-short:hover,.dx-short.is-act{background:var(--tint)}
+.dx-short.is-act{box-shadow:inset 3px 0 0 var(--accent)}
+.dx-grp{margin-top:26px}
+.dx-grp.is-flat{margin-top:20px;border-top:1px solid var(--ink)}
+.dx-grp-h{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 12px;padding-bottom:8px;border-bottom:1px solid var(--ink)}
+.dx-grp-h h3{font-size:14.5px;font-weight:700;line-height:1.3}
+.dx-grp-tag{font-family:var(--font-numeric);font-size:11px;color:var(--muted)}
+.dx-grp-n{margin-left:auto;font-family:var(--font-numeric);font-size:11px;color:var(--muted)}
+.dx-row{display:grid;grid-template-columns:20px minmax(0,1fr) 88px minmax(110px,auto) 18px;align-items:center;gap:16px;min-height:60px;padding:9px 12px;border-bottom:1px solid var(--row-border)}
+.dx-row:hover,.dx-row.is-act{background:var(--tint)}
+.dx-row.is-act{box-shadow:inset 3px 0 0 var(--accent)}
+.dx-row:hover .dx-row-s,.dx-row.is-act .dx-row-s,.dx-row:hover .dx-row-v em,.dx-row.is-act .dx-row-v em{color:var(--muted)}
+.dx-row-i{color:var(--muted)}
+.dx-row-m{min-width:0}
+.dx-row-t{display:block;font-size:14.5px;font-weight:600;line-height:1.35}
+.dx-row-t mark{background:none;color:var(--accent);text-decoration:underline;text-decoration-thickness:1.5px;text-underline-offset:3px}
+.dx-row-s{display:block;margin-top:3px;font-family:var(--font-numeric);font-size:11px;line-height:1.4;color:var(--faint)}
+.dx-row-s mark{background:none;color:var(--accent);font-weight:600}
+.dx-row-sp svg{display:block;width:88px;height:22px;overflow:visible}
+.dx-row-sp path{fill:none;stroke:var(--ink);stroke-width:1.25;vector-effect:non-scaling-stroke}
+.dx-row-v{text-align:right;font-family:var(--font-numeric);font-size:13px;font-weight:600;white-space:nowrap}
+.dx-row-v em{display:block;font-style:normal;font-weight:400;font-size:10.5px;color:var(--faint)}
+.dx-row-go{width:16px;height:16px;color:var(--faint);opacity:0}
+.dx-row.is-act .dx-row-go{opacity:1;color:var(--accent)}
+.dx-keys{margin-top:14px;font-family:var(--font-numeric);font-size:11px;color:var(--faint)}
+.dx-none{margin-top:26px;padding:26px 24px;border:1px dashed var(--hairline)}
+.dx-none-t{font-family:var(--font-display);font-size:22px;font-weight:600}
+.dx-none-s{margin-top:6px;font-size:13.5px;color:var(--body)}
+.dx-none-b{margin-top:16px}
+/* every page in one A–Z list, with a letter bar that stays on screen */
+.dx-idx{margin-top:44px}
+.dx-az{position:sticky;top:0;z-index:6;padding:8px 0;background:var(--paper);border-top:1.5px solid var(--ink);border-bottom:1px solid var(--hairline)}
+.dx-az-ls{display:flex;justify-content:space-between;gap:2px}
+.dx-az-l{display:inline-flex;align-items:center;justify-content:center;min-width:26px;height:32px;padding:0 3px;font-size:14px;font-weight:600;line-height:1;color:var(--ink)}
+a.dx-az-l:hover{background:var(--tint);color:var(--accent)}
+.dx-az-l.is-off{font-weight:400;color:var(--hairline)}
+.dx-ix{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(420px,100%),1fr));column-gap:48px;align-items:start}
+.dx-lg{padding-top:24px;scroll-margin-top:56px}
+.dx-lg:focus{outline:none}
+.dx-lg-h{display:flex;align-items:baseline;gap:12px;padding-bottom:6px;border-bottom:1px solid var(--ink)}
+.dx-lg-c{font-family:var(--font-display);font-size:30px;font-weight:600;line-height:1.05}
+.dx-lg-n{font-family:var(--font-numeric);font-size:11px;font-weight:400;color:var(--muted)}
+.dx-ix-r{display:grid;grid-template-columns:minmax(0,1fr) 44px minmax(84px,auto);align-items:center;gap:14px;min-height:54px;padding:8px 0;border-bottom:1px solid var(--row-border)}
+.dx-ix-r:hover .dx-ix-n{color:var(--accent);text-decoration:underline;text-underline-offset:3px}
+.dx-ix-m{min-width:0}
+.dx-ix-n{display:block;font-size:14px;font-weight:600;line-height:1.35}
+.dx-ix-t{display:flex;align-items:center;gap:6px;margin-top:3px;font-family:var(--font-numeric);font-size:10.5px;line-height:1.3;color:var(--faint)}
+.dx-ix-t .dx-ic{width:12px;height:12px}
+.dx-ix-g{display:flex;justify-content:center;color:var(--faint)}
+.dx-ix-g svg:not(.dx-ic){display:block;width:44px;height:14px;overflow:visible}
+.dx-ix-g path{fill:none;stroke:var(--control);stroke-width:1.2;vector-effect:non-scaling-stroke}
+.dx-ix-v{max-width:124px;text-align:right;font-family:var(--font-numeric);font-size:12px;font-weight:600;line-height:1.3}
+.dx-ix-v em{display:block;font-style:normal;font-weight:400;font-size:10.5px;color:var(--faint)}
+/* hub page */
+.dx-hub-h1{display:flex;align-items:center;gap:14px}
+.dx-hub-h1 .dx-ic{width:36px;height:36px;color:var(--accent);stroke-width:1.5}
+.dx-stats{margin-top:30px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-top:1px solid var(--hairline);border-bottom:1px solid var(--hairline)}
+.dx-stat{display:block;min-width:0;padding:16px 22px 14px 0;margin-right:22px;border-right:1px solid var(--hairline-soft)}
+.dx-stat:hover .dx-stat-l{color:var(--ink);text-decoration:underline;text-decoration-color:var(--accent);text-underline-offset:3px}
+.dx-stat:last-child{margin-right:0;border-right:0}
+.dx-stat-l{display:block;font-size:12.5px;line-height:1.35;color:var(--body)}
+.dx-stat-v{display:block;margin-top:6px;font-family:var(--font-numeric);font-size:27px;font-weight:600;letter-spacing:-.02em;line-height:1.1;white-space:nowrap}
+.dx-stat-v small{margin-left:6px;font-size:11.5px;font-weight:400;letter-spacing:0;color:var(--faint)}
+.dx-stat svg{display:block;width:100%;height:24px;margin-top:10px;overflow:visible}
+.dx-stat path{fill:none;stroke:var(--control);stroke-width:1.4;vector-effect:non-scaling-stroke}
+.dx-tabs{position:sticky;top:0;z-index:6;margin-top:26px;display:flex;gap:8px;overflow-x:auto;padding:10px 0;background:var(--paper);border-bottom:1px solid var(--hairline);scrollbar-width:none}
+.dx-tab{display:inline-flex;align-items:center;gap:10px;flex:none;min-height:42px;padding:0 14px;border:1px solid var(--hairline);font-size:13px;font-weight:600;white-space:nowrap;transition:border-color .15s,background .15s}
+.dx-tab:hover{border-color:var(--ink);background:var(--tile)}
+.dx-tab b{font-family:var(--font-numeric);font-size:11px;font-weight:400;color:var(--muted)}
+.dx-tab-cells{display:flex;gap:2px}
+.dx-tab-cells i{display:block;width:4px;height:14px;background:var(--ink)}
+.dx-topic{margin-top:44px;scroll-margin-top:76px}
+.dx-topic:focus{outline:none}
+.dx-topic-h{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:6px 18px;padding-top:12px;border-top:1.5px solid var(--ink)}
+.dx-topic-h h2{font-family:var(--font-display);font-size:28px;font-weight:600;line-height:1.2}
+.dx-topic-m{font-family:var(--font-numeric);font-size:11.5px;color:var(--muted)}
+.dx-topic-l{margin-top:6px;font-size:14px;color:var(--body)}
+.dx-grid{margin-top:20px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.dx-topic.is-solo .dx-grid{margin-top:30px}
+.dx-card{position:relative;display:flex;flex-direction:column;gap:8px;min-width:0;min-height:216px;padding:16px 18px 13px;background:var(--tile);border:1px solid var(--hairline);transition:background .15s,border-color .15s}
+.dx-card:hover{border-color:var(--ink)}
+.dx-card.is-focus{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+.dx-card-top{display:flex;justify-content:space-between;align-items:center;font-family:var(--font-numeric);font-size:11px}
+.dx-card-top b{font-weight:500;color:var(--accent)}
+.dx-card-top .dx-ic{color:var(--faint);transition:transform .2s,color .2s}
+.dx-card:hover .dx-card-top .dx-ic{color:var(--accent);transform:translate(2px,-2px)}
+.dx-card-t{display:block;font-family:var(--font-display);font-size:17px;font-weight:600;line-height:1.32}
+.dx-card-d{display:block;font-size:12.5px;line-height:1.5;color:var(--muted);max-width:560px}
+.dx-card-vis{position:relative;display:block;height:58px;margin-top:auto}
+.dx-card-v{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 10px}
+.dx-card-v>b{font-family:var(--font-numeric);font-size:20px;font-weight:600;letter-spacing:-.015em;line-height:1.25}
+.dx-card-v>span{font-size:11.5px;line-height:1.35;color:var(--muted)}
+.dx-natkey::before{content:"";display:inline-block;height:10px;margin-right:6px;border-left:1.5px dashed var(--accent);vertical-align:-1px}
+.dx-card-f{display:block;padding-top:9px;border-top:1px solid var(--row-border);font-family:var(--font-numeric);font-size:10.5px;color:var(--faint)}
+.dx-card-tag{position:absolute;right:16px;top:-11px;padding:2px 8px;background:var(--accent);color:#fff;font-family:var(--font-numeric);font-size:10.5px}
+/* micro-visuals */
+.dx-mv-sp{display:block;width:100%;height:100%;overflow:visible}
+.dx-mv-l{fill:none;stroke:var(--ink);stroke-width:1.5;stroke-linejoin:round;vector-effect:non-scaling-stroke}
+.dx-mv-a{fill:var(--tint);stroke:none}
+.dx-card:hover .dx-mv-a{fill:#e9dfcd}
+.dx-mv-end{position:absolute;right:-3px;width:7px;height:7px;margin-top:-3.5px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 2px var(--tile)}
+.dx-mv-dots{position:absolute;left:0;right:0;top:26px;height:2px}
+.dx-mv-axis{position:absolute;left:0;right:0;top:0;height:1px;background:var(--hairline)}
+.dx-mv-nat{position:absolute;top:-13px;height:13px;border-left:1.5px dashed var(--accent)}
+.dx-mv-dot{position:absolute;top:-5px;width:10px;height:10px;margin-left:-5px;border-radius:50%;background:var(--control);box-shadow:0 0 0 1.5px var(--tile);opacity:.85}
+.dx-mv-dot.is-key{background:var(--ink);opacity:1}
+.dx-mv-lab{position:absolute;font-family:var(--font-numeric);font-size:10.5px;line-height:1.2;color:var(--body);white-space:nowrap}
+.dx-mv-lab.lo{top:13px;transform:translateX(-12px)}
+.dx-mv-lab.hi{bottom:12px;right:0;text-align:right}
+.dx-mv-bars{position:absolute;left:0;right:0;top:0;bottom:16px;display:flex;align-items:flex-end;gap:3px}
+.dx-mv-bars i{flex:1;background:var(--control)}
+.dx-mv-bars i.is-acc{background:var(--accent)}
+.dx-mv-bl{position:absolute;left:0;right:0;bottom:0;display:flex;justify-content:space-between;font-family:var(--font-numeric);font-size:10.5px;color:var(--faint)}
+.dx-card-vis.is-flow{height:auto;min-height:58px;display:flex;flex-direction:column;justify-content:flex-end}
+.dx-mv-pair{display:flex;flex-direction:column;gap:9px}
+.dx-mv-pl{display:block;font-size:11.5px;line-height:1.3;color:var(--body)}
+.dx-mv-pb{display:grid;grid-template-columns:minmax(0,1fr) 64px;align-items:center;gap:10px;margin-top:4px}
+.dx-mv-pt{display:block;height:8px}
+.dx-mv-pt i{display:block;height:100%;background:var(--control)}
+.dx-mv-pt i.is-acc{background:var(--accent)}
+.dx-mv-pb b{font-family:var(--font-numeric);font-size:11.5px;font-weight:600;text-align:right;color:var(--ink)}
+.dx-mv-map{position:absolute;inset:0;display:flex;align-items:center;gap:10px;font-size:12px;color:var(--muted)}
+.dx-mv-map .dx-ic{width:26px;height:26px;color:var(--control);stroke-width:1.4}
+/* lead cards */
+.dx-card.lead2{grid-column:span 2}
+.dx-card.lead2x2{grid-column:span 2;grid-row:span 2}
+.dx-card.lead3{grid-column:1/-1}
+.dx-lead .dx-card-t{font-size:21px}
+.dx-lead .dx-card-v>b{font-size:32px}
+.dx-lead .dx-card-vis{height:150px}
+.dx-card.lead2x2 .dx-card-vis{height:220px}
+.dx-lead .dx-card-vis{margin-bottom:24px}
+.dx-lead-y{position:absolute;bottom:-18px;font-family:var(--font-numeric);font-size:10.5px;color:var(--faint)}
+.dx-lead-y.a{left:0}
+.dx-lead-y.b{right:0}
+.dx-lead-lab{position:absolute;font-family:var(--font-numeric);font-size:11px;font-weight:600;line-height:1;white-space:nowrap;transform:translateY(-50%)}
+.dx-lead-lab.s{left:6px;margin-top:-12px;color:var(--body);font-weight:500}
+.dx-lead-lab.e{right:0;color:var(--accent)}
+.dx-lv{position:absolute;left:0;top:0;height:100%}
+.dx-lead .dx-card-f{margin-top:16px}
+@media(min-width:1101px){
+.dx-card.lead3,.dx-card.lead2{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);grid-template-rows:auto auto 1fr auto auto;column-gap:32px;row-gap:8px}
+.dx-card.lead3>*,.dx-card.lead2>*{grid-column:1}
+.dx-card.lead3 .dx-card-vis,.dx-card.lead2 .dx-card-vis{grid-column:2;grid-row:1/span 5;align-self:stretch;height:auto;min-height:160px;margin:4px 0 22px}
+.dx-card.lead2{grid-template-columns:minmax(0,4fr) minmax(0,6fr)}
+}
+.dx-foot{margin-top:72px;padding-top:14px;border-top:1px solid var(--hairline);font-family:var(--font-numeric);font-size:11px;color:var(--faint)}
+/* —— tablet —— */
+@media(max-width:1100px){
+.dx-main{padding:24px 32px 64px}
+.dx-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+.dx-card.lead3,.dx-card.lead2,.dx-card.lead2x2{grid-column:1/-1;grid-row:auto}
+.dx-stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+.dx-stat:nth-child(2){margin-right:0;border-right:0}
+.dx-stat:nth-child(n+3){border-top:1px solid var(--hairline-soft)}
+.dx-facts{grid-template-columns:repeat(2,minmax(0,1fr))}
+.dx-fact:nth-child(2){border-right:0}
+.dx-fact:nth-child(n+3){border-top:1px solid var(--hairline-soft)}
+.dx-row{grid-template-columns:20px minmax(0,1fr) minmax(96px,auto) 18px}
+.dx-row-sp{display:none}
+}
+/* —— phone —— */
+@media(max-width:767px){
+.dx-shell{display:block;min-height:calc(100vh - 56px)}
+.dx-bar{display:flex;position:sticky;top:0;z-index:40;align-items:center;gap:4px;height:56px;padding:0 6px 0 16px;background:var(--ink);color:var(--on-ink)}
+.dx-bar-brand{display:flex;align-items:center;gap:10px;margin-right:auto;font-family:var(--font-display);font-size:17px;font-weight:600}
+.dx-bar-btn{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;color:var(--on-ink)}
+.dx-bar-btn .dx-ic{width:22px;height:22px}
+.dx-side{display:none}
+.dx.is-menu .dx-side{display:flex;position:fixed;inset:0;z-index:60;height:auto;padding:10px 14px 22px}
+.dx.is-menu .dx-main,.dx.is-menu .dx-bar{display:none}
+.dx.is-menu .dx-rail-btn{display:none}
+.dx.is-menu .dx-close-btn{display:inline-flex;width:44px;height:44px}
+.dx-side-search{min-height:48px;font-size:14px}
+.dx-side-all{min-height:48px}
+.dx-hub-link{padding:13px 4px 13px 10px}
+.dx-hub-tog{width:48px;padding-top:13px}
+.dx-pl a{padding:10px 8px 10px 12px;font-size:13.5px}
+.dx-main{padding:16px 20px 56px}
+.dx-top{font-size:11px}
+.dx-h1{margin-top:24px;font-size:32px}
+.dx-line{font-size:14.5px}
+.dx-search{margin-top:20px}
+.dx-q{height:56px;gap:10px;padding:0 4px 0 14px}
+.dx-q input{font-size:16.5px}
+.dx-kbd{display:none}
+.dx-chip{min-height:40px;flex:none}
+.dx-try{flex-wrap:nowrap;overflow-x:auto;margin-left:-20px;margin-right:-20px;padding:0 20px 2px;scrollbar-width:none}
+.dx-try>span{flex:none}
+.dx-place-n{font-size:25px}
+.dx-place-h,.dx-fact{padding-left:16px;padding-right:16px}
+.dx-fact>b{font-size:19px}
+.dx-row{grid-template-columns:18px minmax(0,1fr) auto;gap:12px;padding:10px 8px}
+.dx-row-go{display:none}
+.dx-row-v{font-size:12.5px;white-space:normal;max-width:110px}
+.dx-short{grid-template-columns:22px minmax(0,1fr) 18px}
+.dx-short-n{display:none}
+.dx-idx{margin-top:32px}
+.dx-az{top:56px;margin-left:-20px;margin-right:-20px;padding:6px 14px;overflow-x:auto;scrollbar-width:none}
+.dx-az-ls{justify-content:flex-start}
+.dx-az-l{flex:none;min-width:36px;height:40px}
+.dx-lg{padding-top:18px;scroll-margin-top:116px}
+.dx-lg-c{font-size:24px}
+.dx-ix-r{grid-template-columns:minmax(0,1fr) auto;gap:12px;min-height:52px;padding:7px 0}
+.dx-ix-g{display:none}
+.dx-hub-h1 .dx-ic{width:28px;height:28px}
+.dx-stats{margin-top:22px}
+.dx-stat{padding-right:12px;margin-right:12px}
+.dx-stat-v{font-size:22px}
+.dx-stat-l{min-height:2.7em}
+.dx-tabs{top:56px;margin-left:-20px;margin-right:-20px;padding:10px 20px}
+.dx-topic{margin-top:36px;scroll-margin-top:124px}
+.dx-topic-h h2{font-size:23px}
+.dx-grid{grid-template-columns:minmax(0,1fr);gap:12px}
+.dx-card{min-height:0}
+.dx-lead .dx-card-vis{height:130px}
+.dx-card.lead2x2 .dx-card-vis{height:150px}
+.dx-lead .dx-card-v>b{font-size:26px}
+}
+@media(prefers-reduced-motion:reduce){.dx *{transition:none!important}}
+</style>
+</helmet>
+<div class="dx {{mods}}" lang="{{lang}}" ref="{{r.root}}" onKeyDown="{{onRootKey}}">
+<svg class="dx-sprite" aria-hidden="true" focusable="false">
+<symbol id="i-landmark" viewBox="0 0 24 24"><line x1="3" x2="21" y1="22" y2="22"></line><line x1="6" x2="6" y1="18" y2="11"></line><line x1="10" x2="10" y1="18" y2="11"></line><line x1="14" x2="14" y1="18" y2="11"></line><line x1="18" x2="18" y1="18" y2="11"></line><polygon points="12 2 20 7 4 7"></polygon></symbol>
+<symbol id="i-factory" viewBox="0 0 24 24"><path d="M2 20a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8l-7 5V8l-7 5V4a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"></path><path d="M17 18h1"></path><path d="M12 18h1"></path><path d="M7 18h1"></path></symbol>
+<symbol id="i-coins" viewBox="0 0 24 24"><circle cx="8" cy="8" r="6"></circle><path d="M18.09 10.37A6 6 0 1 1 10.34 18"></path><path d="M7 6h1v4"></path><path d="m16.71 13.88.7.71-2.82 2.82"></path></symbol>
+<symbol id="i-briefcase" viewBox="0 0 24 24"><path d="M12 12h.01"></path><path d="M16 6V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"></path><path d="M22 13a18.15 18.15 0 0 1-20 0"></path><rect width="20" height="14" x="2" y="6" rx="2"></rect></symbol>
+<symbol id="i-heart" viewBox="0 0 24 24"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path><path d="M3.22 12H9.5l.5-1 2 4.5 2-7 1.5 3.5h5.27"></path></symbol>
+<symbol id="i-ship" viewBox="0 0 24 24"><path d="M12 10.189V14"></path><path d="M12 2v3"></path><path d="M19 13V7a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v6"></path><path d="M19.38 20A11.6 11.6 0 0 0 21 14l-8.188-3.639a2 2 0 0 0-1.624 0L3 14a11.6 11.6 0 0 0 2.81 7.76"></path><path d="M2 21c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1s1.2 1 2.5 1c2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"></path></symbol>
+<symbol id="i-users" viewBox="0 0 24 24"><path d="M18 21a8 8 0 0 0-16 0"></path><circle cx="10" cy="8" r="5"></circle><path d="M22 20c0-3.37-2-6.5-4-8a5 5 0 0 0-.45-8.3"></path></symbol>
+<symbol id="i-trees" viewBox="0 0 24 24"><path d="M10 10v.2A3 3 0 0 1 8.9 16H5a3 3 0 0 1-1-5.8V10a3 3 0 0 1 6 0Z"></path><path d="M7 16v6"></path><path d="M13 19v3"></path><path d="M12 19h8.3a1 1 0 0 0 .7-1.7L18 14h.3a1 1 0 0 0 .7-1.7L16 9h.2a1 1 0 0 0 .8-1.7L13 3l-1.4 1.5"></path></symbol>
+<symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></symbol>
+<symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></symbol>
+<symbol id="i-chev-r" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"></path></symbol>
+<symbol id="i-chev-d" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"></path></symbol>
+<symbol id="i-panel-close" viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="3" rx="2"></rect><path d="M9 3v18"></path><path d="m16 15-3-3 3-3"></path></symbol>
+<symbol id="i-panel-open" viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="3" rx="2"></rect><path d="M9 3v18"></path><path d="m14 9 3 3-3 3"></path></symbol>
+<symbol id="i-menu" viewBox="0 0 24 24"><line x1="4" x2="20" y1="12" y2="12"></line><line x1="4" x2="20" y1="6" y2="6"></line><line x1="4" x2="20" y1="18" y2="18"></line></symbol>
+<symbol id="i-arrow-r" viewBox="0 0 24 24"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></symbol>
+<symbol id="i-arrow-ur" viewBox="0 0 24 24"><path d="M7 7h10v10"></path><path d="M7 17 17 7"></path></symbol>
+<symbol id="i-enter" viewBox="0 0 24 24"><polyline points="9 10 4 15 9 20"></polyline><path d="M20 4v7a4 4 0 0 1-4 4H4"></path></symbol>
+<symbol id="i-pin" viewBox="0 0 24 24"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"></path><circle cx="12" cy="10" r="3"></circle></symbol>
+<symbol id="i-grid" viewBox="0 0 24 24"><rect width="7" height="7" x="3" y="3" rx="1"></rect><rect width="7" height="7" x="14" y="3" rx="1"></rect><rect width="7" height="7" x="14" y="14" rx="1"></rect><rect width="7" height="7" x="3" y="14" rx="1"></rect></symbol>
+<symbol id="i-map" viewBox="0 0 24 24"><path d="M14.106 5.553a2 2 0 0 0 1.788 0l3.659-1.83A1 1 0 0 1 21 4.619v12.764a1 1 0 0 1-.553.894l-4.553 2.277a2 2 0 0 1-1.788 0l-4.212-2.106a2 2 0 0 0-1.788 0l-3.659 1.83A1 1 0 0 1 3 19.381V6.618a1 1 0 0 1 .553-.894l4.553-2.277a2 2 0 0 1 1.788 0z"></path><path d="M15 5.764v15"></path><path d="M9 3.236v15"></path></symbol>
+<symbol id="i-lang" viewBox="0 0 24 24"><path d="m5 8 6 6"></path><path d="m4 14 6-6 2-3"></path><path d="M2 5h12"></path><path d="M7 2h1"></path><path d="m22 22-5-10-5 10"></path><path d="M14 18h6"></path></symbol>
+</svg>
+<a class="dx-skip" href="#dx-main">{{t.skip}}</a>
+<header class="dx-bar">
+<a class="dx-bar-brand" href="https://fiscal.ge/"><svg class="dx-logo" viewBox="0 0 520 650" aria-hidden="true"><path fill="currentColor" d="m 157.3,10 c 113.6,0.2 227.3,0.3 340.9,0.5 10,4.8 3,17.2 4.4,25.9 -5.2,17.4 -10.4,34.8 -21.7,49.4 -10.1,17.4 -25.5,32 -42.8,42.3 -15.1,8.4 -30.5,16.3 -47.9,18.7 -21.7,5.3 -44.4,1.3 -66.6,2.5 -49.6,0.5 -99.3,-1 -148.8,0.8 -33.7,3.8 -64.1,23 -85.5,48.9 C 72.2,219.9 60.1,245 53.6,271.2 c 6.8,4.3 13.4,-12.2 20.1,-16.1 19.4,-17.3 45,-27.6 70.9,-29.3 57.2,0 114.4,0 171.6,0 7,8.9 -1.9,21.3 -3.5,31.2 -6.6,18.3 -16.5,35.6 -30.2,49.6 -15.4,16.8 -35.9,28.8 -57.7,35.1 -23.8,5.2 -48.7,2.4 -72.9,4.2 -10.8,-0.1 -21,6.5 -29.7,12.3 -17.2,13.4 -22.7,36 -20.7,56.9 0,65.2 0,130.4 0,195.6 -4.5,14.9 -17.3,28.9 -33.7,28.9 -15.9,0.1 -34.7,2.4 -45.9,-11.5 C 13,618.4 10.3,604.5 11.5,591.7 11.7,441.3 11.2,290.8 11.8,140.5 15.6,112.4 26.9,85.6 45.4,64 67.9,37.1 100.1,18.6 134.6,12.1 142.1,11.4 149.7,10.7 157.3,10 Z"></path><path fill="#906845" d="m 151.4,493.3 c 18.9,0.3 38.1,-1.2 56.7,0.2 12.5,3.3 19.3,16 16.7,28.3 -0.1,32.7 1.4,65.7 0.2,98.2 -2.7,13.1 -15.3,22.3 -28.7,19.5 -15.7,-0.9 -32.3,1.9 -47.4,-1.4 -11,-3.8 -16.3,-15.5 -14.4,-26.6 0.1,-34.3 -1.5,-69 -0.2,-103.1 2.3,-7.9 9.4,-12.9 17,-15.2 z"></path><path fill="#1f6e56" d="m 277.6,410.1 c 19.2,0.3 38.7,-1.2 57.7,0.1 15.6,4.6 19.4,22.2 17.6,36.4 0,57.6 0,115.2 0,172.8 -3.2,12.8 -15.2,22.6 -28.7,20.1 -16.5,-1.1 -33.7,2.2 -49.7,-1.7 -15.8,-5.5 -16.6,-24.4 -15.6,-38.6 0,-56.5 0,-113 0,-169.6 3.1,-9.2 8.7,-17.1 18.6,-19.6 z"></path><path fill="#b3402a" d="m 431.2,257.5 c 10.2,-2.9 18.4,2.8 23.9,10.8 16.7,18.7 35.4,36 50.9,55.6 7.7,10.9 -4.2,25.8 -16.8,22.1 -12.7,-2.1 -11.7,12.8 -11.1,21.4 0,84 0,168 0,252 -3,14.9 -18.8,22.5 -32.9,20.1 -17.2,-1.7 -38.4,5.6 -51.2,-9.3 -7.7,-12.9 -2.4,-28.8 -4,-43.1 C 389.7,508.2 389.4,429.3 389.1,350.4 c -6.1,-8.1 -19.9,-1.1 -23.7,-12.6 -5.6,-14.8 11.1,-23.4 18.7,-33.6 14.9,-15 28.2,-32.3 44.2,-45.8 l 1.5,-0.5 z"></path></svg><span>Fiscal.ge</span></a>
+<button class="dx-bar-btn" type="button" aria-label="{{t.search}}" onClick="{{goSearch}}"><svg class="dx-ic" aria-hidden="true"><use href="#i-search"></use></svg></button>
+<button class="dx-bar-btn" type="button" aria-label="{{t.menu}}" aria-expanded="{{menu}}" aria-controls="dx-side" onClick="{{openMenu}}" ref="{{r.menuBtn}}"><svg class="dx-ic" aria-hidden="true"><use href="#i-menu"></use></svg></button>
+</header>
+<div class="dx-shell">
+<nav id="dx-side" class="dx-side" aria-label="{{t.nav}}">
+<div class="dx-brand">
+<a class="dx-brand-a" href="https://fiscal.ge/" aria-label="Fiscal.ge"><svg class="dx-logo" viewBox="0 0 520 650" aria-hidden="true"><path fill="currentColor" d="m 157.3,10 c 113.6,0.2 227.3,0.3 340.9,0.5 10,4.8 3,17.2 4.4,25.9 -5.2,17.4 -10.4,34.8 -21.7,49.4 -10.1,17.4 -25.5,32 -42.8,42.3 -15.1,8.4 -30.5,16.3 -47.9,18.7 -21.7,5.3 -44.4,1.3 -66.6,2.5 -49.6,0.5 -99.3,-1 -148.8,0.8 -33.7,3.8 -64.1,23 -85.5,48.9 C 72.2,219.9 60.1,245 53.6,271.2 c 6.8,4.3 13.4,-12.2 20.1,-16.1 19.4,-17.3 45,-27.6 70.9,-29.3 57.2,0 114.4,0 171.6,0 7,8.9 -1.9,21.3 -3.5,31.2 -6.6,18.3 -16.5,35.6 -30.2,49.6 -15.4,16.8 -35.9,28.8 -57.7,35.1 -23.8,5.2 -48.7,2.4 -72.9,4.2 -10.8,-0.1 -21,6.5 -29.7,12.3 -17.2,13.4 -22.7,36 -20.7,56.9 0,65.2 0,130.4 0,195.6 -4.5,14.9 -17.3,28.9 -33.7,28.9 -15.9,0.1 -34.7,2.4 -45.9,-11.5 C 13,618.4 10.3,604.5 11.5,591.7 11.7,441.3 11.2,290.8 11.8,140.5 15.6,112.4 26.9,85.6 45.4,64 67.9,37.1 100.1,18.6 134.6,12.1 142.1,11.4 149.7,10.7 157.3,10 Z"></path><path fill="#906845" d="m 151.4,493.3 c 18.9,0.3 38.1,-1.2 56.7,0.2 12.5,3.3 19.3,16 16.7,28.3 -0.1,32.7 1.4,65.7 0.2,98.2 -2.7,13.1 -15.3,22.3 -28.7,19.5 -15.7,-0.9 -32.3,1.9 -47.4,-1.4 -11,-3.8 -16.3,-15.5 -14.4,-26.6 0.1,-34.3 -1.5,-69 -0.2,-103.1 2.3,-7.9 9.4,-12.9 17,-15.2 z"></path><path fill="#1f6e56" d="m 277.6,410.1 c 19.2,0.3 38.7,-1.2 57.7,0.1 15.6,4.6 19.4,22.2 17.6,36.4 0,57.6 0,115.2 0,172.8 -3.2,12.8 -15.2,22.6 -28.7,20.1 -16.5,-1.1 -33.7,2.2 -49.7,-1.7 -15.8,-5.5 -16.6,-24.4 -15.6,-38.6 0,-56.5 0,-113 0,-169.6 3.1,-9.2 8.7,-17.1 18.6,-19.6 z"></path><path fill="#b3402a" d="m 431.2,257.5 c 10.2,-2.9 18.4,2.8 23.9,10.8 16.7,18.7 35.4,36 50.9,55.6 7.7,10.9 -4.2,25.8 -16.8,22.1 -12.7,-2.1 -11.7,12.8 -11.1,21.4 0,84 0,168 0,252 -3,14.9 -18.8,22.5 -32.9,20.1 -17.2,-1.7 -38.4,5.6 -51.2,-9.3 -7.7,-12.9 -2.4,-28.8 -4,-43.1 C 389.7,508.2 389.4,429.3 389.1,350.4 c -6.1,-8.1 -19.9,-1.1 -23.7,-12.6 -5.6,-14.8 11.1,-23.4 18.7,-33.6 14.9,-15 28.2,-32.3 44.2,-45.8 l 1.5,-0.5 z"></path></svg><span class="dx-brand-txt"><b>Fiscal.ge</b><span>{{t.brandSub}}</span></span></a>
+<button class="dx-icbtn dx-rail-btn" type="button" aria-label="{{side.railLabel}}" aria-pressed="{{rail}}" onClick="{{toggleRail}}"><svg class="dx-ic" aria-hidden="true"><use href="#i-{{side.railIcon}}"></use></svg></button>
+<button class="dx-icbtn dx-close-btn" type="button" aria-label="{{t.close}}" onClick="{{closeMenu}}" ref="{{r.close}}"><svg class="dx-ic" aria-hidden="true"><use href="#i-x"></use></svg></button>
+</div>
+<button class="dx-side-search" type="button" title="{{t.searchAll}}" aria-label="{{t.searchAll}}" onClick="{{goSearch}}"><svg class="dx-ic" aria-hidden="true"><use href="#i-search"></use></svg><span>{{t.searchAll}}</span><kbd>/</kbd></button>
+<a class="dx-side-all {{side.allCls}}" href="{{side.allHref}}" aria-current="{{side.allCur}}" title="{{t.allData}}" aria-label="{{t.allData}}" onClick="{{goAll}}"><svg class="dx-ic" aria-hidden="true"><use href="#i-grid"></use></svg><span>{{t.allData}}</span><span class="dx-n">100</span></a>
+<p class="dx-side-label">{{t.hubs}}</p>
+<ul class="dx-hubs">
+<sc-for list="{{side.hubs}}" as="h" hint-placeholder-count="8">
+<li class="dx-hub {{h.cls}}" onMouseEnter="{{h.enter}}" onMouseLeave="{{h.leave}}" onFocus="{{h.focus}}" onBlur="{{h.blur}}">
+<div class="dx-hub-row">
+<a class="dx-hub-link" href="{{h.href}}" aria-current="{{h.cur}}" aria-label="{{h.aria}}" onClick="{{h.go}}"><svg class="dx-ic" aria-hidden="true"><use href="#i-{{h.icon}}"></use></svg><span class="dx-hub-name">{{h.name}}</span><span class="dx-n">{{h.count}}</span></a>
+<button class="dx-hub-tog" type="button" aria-expanded="{{h.open}}" aria-controls="{{h.bodyId}}" aria-label="{{h.togLabel}}" onClick="{{h.toggle}}"><svg class="dx-ic" aria-hidden="true"><use href="#i-chev-r"></use></svg></button>
+</div>
+<sc-if value="{{h.open}}" hint-placeholder-val="{{false}}">
+<div class="dx-hub-body" id="{{h.bodyId}}">
+<p class="dx-fly-h"><a href="{{h.href}}" onClick="{{h.go}}">{{h.name}}</a><span>{{h.flyMeta}}</span></p>
+<sc-for list="{{h.topics}}" as="tp" hint-placeholder-count="2">
+<sc-if value="{{tp.label}}" hint-placeholder-val="{{false}}"><p class="dx-tl">{{tp.label}}</p></sc-if>
+<ul class="dx-pl">
+<sc-for list="{{tp.pages}}" as="pg" hint-placeholder-count="4">
+<li><a class="{{pg.cls}}" href="{{pg.href}}" aria-current="{{pg.cur}}" onClick="{{pg.go}}">{{pg.name}}</a></li>
+</sc-for>
+</ul>
+</sc-for>
+</div>
+</sc-if>
+</li>
+</sc-for>
+</ul>
+<div class="dx-side-foot">
+<div class="dx-lang" role="group" aria-label="{{t.langLabel}}"><button type="button" aria-pressed="{{isKa}}" lang="ka" onClick="{{setKa}}">ქარ</button><button type="button" aria-pressed="{{isEn}}" lang="en" onClick="{{setEn}}">EN</button></div>
+<span class="dx-foot-links"><a href="https://fiscal.ge/methodology">{{t.method}}</a> · <a href="https://fiscal.ge/connect">{{t.ai}}</a></span>
+</div>
+</nav>
+<main id="dx-main" class="dx-main" tabindex="-1">
+<div class="dx-in">
+<sc-if value="{{isAll}}" hint-placeholder-val="{{true}}">
+<div class="dx-top"><nav class="dx-crumbs" aria-label="{{t.crumbs}}"><a href="https://fiscal.ge/">{{t.home}}</a><span aria-hidden="true">/</span><span aria-current="page">{{t.data}}</span></nav><p>{{t.allMeta}}</p></div>
+<h1 class="dx-h1">{{t.allTitle}}</h1>
+<p class="dx-line">{{t.allLine}}</p>
+<div class="dx-search" role="search">
+<label class="dx-sr" for="dx-q">{{t.qLabel}}</label>
+<div class="dx-q">
+<svg class="dx-ic" aria-hidden="true"><use href="#i-search"></use></svg>
+<input id="dx-q" type="text" role="combobox" aria-autocomplete="list" aria-controls="dx-results" aria-expanded="{{all.expanded}}" aria-activedescendant="{{all.activeId}}" autocomplete="off" spellcheck="false" placeholder="{{t.ph}}" value="{{all.q}}" onChange="{{all.onInput}}" onKeyDown="{{all.onKey}}" ref="{{r.q}}">
+<sc-if value="{{all.hasQ}}" hint-placeholder-val="{{false}}"><span class="dx-q-n">{{all.count}}</span><button class="dx-q-x" type="button" aria-label="{{t.clear}}" onClick="{{all.clear}}"><svg class="dx-ic" aria-hidden="true"><use href="#i-x"></use></svg></button></sc-if>
+<sc-if value="{{all.noQ}}" hint-placeholder-val="{{true}}"><kbd class="dx-kbd" aria-hidden="true">/</kbd></sc-if>
+</div>
+<div class="dx-try"><span>{{t.try}}</span><sc-for list="{{all.chips}}" as="c" hint-placeholder-count="5"><button class="dx-chip" type="button" onClick="{{c.pick}}">{{c.label}}</button></sc-for></div>
+</div>
+<p class="dx-sr" role="status" aria-live="polite">{{all.announce}}</p>
+<sc-if value="{{all.hasQ}}" hint-placeholder-val="{{false}}">
+<sc-if value="{{all.res.alt}}" hint-placeholder-val="{{false}}"><p class="dx-alt"><svg class="dx-ic" aria-hidden="true"><use href="#i-lang"></use></svg><span>{{all.res.altPre}} <b>{{all.res.alt}}</b></span></p></sc-if>
+<sc-if value="{{all.res.place}}" hint-placeholder-val="{{false}}">
+<div class="dx-place">
+<div class="dx-place-h"><p class="dx-place-n"><svg class="dx-ic" aria-hidden="true"><use href="#i-pin"></use></svg><span>{{all.res.place.name}}</span></p><p class="dx-place-t">{{all.res.place.type}}</p></div>
+<div class="dx-facts"><sc-for list="{{all.res.place.facts}}" as="f" hint-placeholder-count="4"><div class="dx-fact"><b>{{f.v}}</b><span>{{f.l}}</span><em>{{f.per}}</em></div></sc-for></div>
+</div>
+</sc-if>
+<div id="dx-results" class="dx-res" role="{{all.lbRole}}" aria-label="{{all.lbLabel}}">
+<sc-for list="{{all.res.shortcuts}}" as="sc" hint-placeholder-count="1">
+<a class="dx-short {{sc.cls}}" id="{{sc.id}}" role="option" aria-selected="{{sc.sel}}" aria-label="{{sc.aria}}" tabindex="-1" href="{{sc.href}}" onClick="{{sc.go}}" onMouseEnter="{{sc.hover}}"><svg class="dx-ic" aria-hidden="true"><use href="#i-{{sc.icon}}"></use></svg><span class="dx-short-t"><b>{{sc.name}}</b><span>{{sc.kind}}</span></span><span class="dx-short-n">{{sc.count}}</span><svg class="dx-ic dx-short-go" aria-hidden="true"><use href="#i-arrow-r"></use></svg></a>
+</sc-for>
+<sc-for list="{{all.res.groups}}" as="g" hint-placeholder-count="2">
+<div class="dx-grp {{g.cls}}" role="{{g.role}}" aria-labelledby="{{g.lby}}">
+<sc-if value="{{g.label}}" hint-placeholder-val="{{true}}"><div class="dx-grp-h" aria-hidden="true"><h3 id="{{g.hid}}">{{g.label}}</h3><span class="dx-grp-tag">{{g.tag}}</span><span class="dx-grp-n">{{g.count}}</span></div></sc-if>
+<sc-for list="{{g.items}}" as="it" hint-placeholder-count="4">
+<a class="dx-row {{it.cls}}" id="{{it.id}}" role="option" aria-selected="{{it.sel}}" aria-label="{{it.aria}}" tabindex="-1" href="{{it.href}}" onClick="{{it.go}}" onMouseEnter="{{it.hover}}">
+<svg class="dx-ic dx-row-i" aria-hidden="true"><use href="#i-{{it.icon}}"></use></svg>
+<span class="dx-row-m"><span class="dx-row-t"><sc-for list="{{it.segs}}" as="s" hint-placeholder-count="2"><sc-if value="{{s.m}}" hint-placeholder-val="{{false}}"><mark>{{s.t}}</mark></sc-if><sc-if value="{{s.u}}" hint-placeholder-val="{{true}}"><span>{{s.t}}</span></sc-if></sc-for></span><span class="dx-row-s">{{it.sub}}<sc-if value="{{it.mirror}}" hint-placeholder-val="{{false}}"> · <span lang="{{it.mLang}}"><sc-for list="{{it.mirror}}" as="s" hint-placeholder-count="1"><sc-if value="{{s.m}}" hint-placeholder-val="{{false}}"><mark>{{s.t}}</mark></sc-if><sc-if value="{{s.u}}" hint-placeholder-val="{{true}}"><span>{{s.t}}</span></sc-if></sc-for></span></sc-if></span></span>
+<span class="dx-row-sp" aria-hidden="true"><sc-if value="{{it.spark}}" hint-placeholder-val="{{false}}"><svg viewBox="0 0 88 22" preserveAspectRatio="none"><path d="{{it.spark}}"></path></svg></sc-if></span>
+<span class="dx-row-v">{{it.value}}<em>{{it.per}}</em></span>
+<svg class="dx-ic dx-row-go" aria-hidden="true"><use href="#i-enter"></use></svg>
+</a>
+</sc-for>
+</div>
+</sc-for>
+</div>
+<sc-if value="{{all.res.none}}" hint-placeholder-val="{{false}}"><div class="dx-none"><p class="dx-none-t">{{all.res.noneMsg}}</p><p class="dx-none-s">{{t.noneHint}}</p><button class="dx-chip dx-none-b" type="button" onClick="{{all.clear}}">{{t.showAll}}</button></div></sc-if>
+<sc-if value="{{all.expanded}}" hint-placeholder-val="{{false}}"><p class="dx-keys" aria-hidden="true">{{t.keys}}</p></sc-if>
+</sc-if>
+<sc-if value="{{all.noQ}}" hint-placeholder-val="{{true}}">
+<section class="dx-idx" aria-labelledby="dx-idx-h">
+<h2 class="dx-sr" id="dx-idx-h">{{t.idxTitle}}</h2>
+<nav class="dx-az" aria-label="{{t.azLabel}}"><div class="dx-az-ls">
+<sc-for list="{{all.az}}" as="lt" hint-placeholder-count="33"><sc-if value="{{lt.on}}" hint-placeholder-val="{{true}}"><a class="dx-az-l" href="#{{lt.id}}" aria-label="{{lt.aria}}" onClick="{{lt.go}}">{{lt.ch}}</a></sc-if><sc-if value="{{lt.off}}" hint-placeholder-val="{{false}}"><span class="dx-az-l is-off" aria-hidden="true">{{lt.ch}}</span></sc-if></sc-for>
+</div></nav>
+<div class="dx-ix">
+<sc-for list="{{all.cols}}" as="col" hint-placeholder-count="2">
+<div class="dx-ix-col">
+<sc-for list="{{col.groups}}" as="lg" hint-placeholder-count="6">
+<section class="dx-lg" id="{{lg.id}}" aria-labelledby="{{lg.hid}}" tabindex="-1">
+<h3 class="dx-lg-h" id="{{lg.hid}}"><span class="dx-lg-c">{{lg.ch}}</span><span class="dx-lg-n">{{lg.count}}</span></h3>
+<ul>
+<sc-for list="{{lg.rows}}" as="pg" hint-placeholder-count="4">
+<li><a class="dx-ix-r" href="{{pg.href}}" onClick="{{pg.go}}"><span class="dx-ix-m"><span class="dx-ix-n">{{pg.name}}</span><span class="dx-ix-t"><svg class="dx-ic" aria-hidden="true"><use href="#i-{{pg.icon}}"></use></svg><span>{{pg.tag}}</span></span></span><span class="dx-ix-g" aria-hidden="true"><sc-if value="{{pg.spark}}" hint-placeholder-val="{{false}}"><svg viewBox="0 0 44 14" preserveAspectRatio="none"><path d="{{pg.spark}}"></path></svg></sc-if><sc-if value="{{pg.map}}" hint-placeholder-val="{{false}}"><svg class="dx-ic dx-ic-sm"><use href="#i-map"></use></svg></sc-if></span><span class="dx-ix-v">{{pg.value}}<em>{{pg.per}}</em></span></a></li>
+</sc-for>
+</ul>
+</section>
+</sc-for>
+</div>
+</sc-for>
+</div>
+</section>
+</sc-if>
+</sc-if>
+<sc-if value="{{isHub}}" hint-placeholder-val="{{false}}">
+<div class="dx-top"><nav class="dx-crumbs" aria-label="{{t.crumbs}}"><a href="https://fiscal.ge/">{{t.home}}</a><span aria-hidden="true">/</span><a href="{{side.allHref}}" onClick="{{goAll}}">{{t.data}}</a><span aria-hidden="true">/</span><span aria-current="page">{{hub.name}}</span></nav><p>{{hub.meta}}</p></div>
+<h1 class="dx-h1 dx-hub-h1"><svg class="dx-ic" aria-hidden="true"><use href="#i-{{hub.icon}}"></use></svg><span>{{hub.name}}</span></h1>
+<p class="dx-line">{{hub.line}}</p>
+<div class="dx-stats">
+<sc-for list="{{hub.stats}}" as="st" hint-placeholder-count="4">
+<a class="dx-stat" href="{{st.href}}"><span class="dx-stat-l">{{st.label}}</span><span class="dx-stat-v">{{st.value}}<small>{{st.per}}</small></span><sc-if value="{{st.spark}}" hint-placeholder-val="{{false}}"><svg viewBox="0 0 200 24" preserveAspectRatio="none" aria-hidden="true"><path d="{{st.spark}}"></path></svg></sc-if></a>
+</sc-for>
+</div>
+<sc-if value="{{hub.multi}}" hint-placeholder-val="{{false}}">
+<nav class="dx-tabs" aria-label="{{t.topicsNav}}">
+<sc-for list="{{hub.topics}}" as="tp" hint-placeholder-count="2">
+<a class="dx-tab" href="{{tp.anchor}}" onClick="{{tp.jump}}"><span>{{tp.label}}</span><span class="dx-tab-cells" aria-hidden="true"><sc-for list="{{tp.cells}}" as="cl" hint-placeholder-count="4"><i></i></sc-for></span><b>{{tp.count}}</b></a>
+</sc-for>
+</nav>
+</sc-if>
+<sc-for list="{{hub.topics}}" as="tp" hint-placeholder-count="2">
+<section class="dx-topic {{tp.cls}}" id="{{tp.id}}" aria-labelledby="{{tp.hid}}" tabindex="-1">
+<sc-if value="{{tp.showHead}}" hint-placeholder-val="{{true}}"><div class="dx-topic-h"><h2 id="{{tp.hid}}">{{tp.label}}</h2><p class="dx-topic-m">{{tp.meta}}</p></div><p class="dx-topic-l">{{tp.line}}</p></sc-if>
+<sc-if value="{{tp.noHead}}" hint-placeholder-val="{{false}}"><h2 class="dx-sr" id="{{tp.hid}}">{{tp.label}}</h2></sc-if>
+<div class="dx-grid">
+<sc-for list="{{tp.cards}}" as="c" hint-placeholder-count="4">
+<a class="dx-card {{c.cls}}" href="{{c.href}}" data-focus="{{c.focus}}">
+<span class="dx-card-top"><b>{{c.n}}</b><svg class="dx-ic dx-ic-sm" aria-hidden="true"><use href="#i-arrow-ur"></use></svg></span>
+<span class="dx-card-t">{{c.title}}</span>
+<sc-if value="{{c.desc}}" hint-placeholder-val="{{false}}"><span class="dx-card-d">{{c.desc}}</span></sc-if>
+<span class="dx-card-vis {{c.visCls}}" aria-hidden="true">
+<sc-if value="{{c.isSpark}}" hint-placeholder-val="{{false}}"><svg class="dx-mv-sp" viewBox="0 0 200 58" preserveAspectRatio="none"><path class="dx-mv-a" d="{{c.area}}"></path><path class="dx-mv-l" d="{{c.line}}"></path></svg><i class="dx-mv-end" style="top: {{c.endY}}%"></i></sc-if>
+<sc-if value="{{c.isLead}}" hint-placeholder-val="{{false}}"><svg class="dx-mv-sp dx-lv" viewBox="0 0 600 160" preserveAspectRatio="none" style="width: calc(100% - {{c.gut}}px)"><path class="dx-mv-a" d="{{c.area}}"></path><path class="dx-mv-l" d="{{c.line}}"></path></svg><i class="dx-mv-end" style="top: {{c.endY}}%; right: {{c.gutDot}}px"></i><span class="dx-lead-lab s" style="top: {{c.sY}}%">{{c.sV}}</span><span class="dx-lead-lab e" style="top: {{c.endY}}%; width: {{c.labW}}px">{{c.eV}}</span><span class="dx-lead-y a">{{c.y0}}</span><span class="dx-lead-y b" style="right: {{c.gut}}px">{{c.y1}}</span></sc-if>
+<sc-if value="{{c.isDots}}" hint-placeholder-val="{{false}}"><span class="dx-mv-dots"><i class="dx-mv-axis"></i><i class="dx-mv-nat" style="left: {{c.nat}}%"></i><sc-for list="{{c.dots}}" as="d" hint-placeholder-count="11"><i class="dx-mv-dot {{d.cls}}" style="left: {{d.x}}%"></i></sc-for><span class="dx-mv-lab lo" style="left: {{c.loX}}%">{{c.lo}}</span><span class="dx-mv-lab hi">{{c.hi}}</span></span></sc-if>
+<sc-if value="{{c.isBars}}" hint-placeholder-val="{{false}}"><span class="dx-mv-bars"><sc-for list="{{c.bars}}" as="b" hint-placeholder-count="11"><i class="{{b.cls}}" style="height: {{b.h}}%"></i></sc-for></span><span class="dx-mv-bl"><span>{{c.b0}}</span><span>{{c.b1}}</span></span></sc-if>
+<sc-if value="{{c.isPair}}" hint-placeholder-val="{{false}}"><span class="dx-mv-pair"><sc-for list="{{c.pair}}" as="pr" hint-placeholder-count="2"><span class="dx-mv-pr"><span class="dx-mv-pl">{{pr.l}}</span><span class="dx-mv-pb"><span class="dx-mv-pt"><i class="{{pr.cls}}" style="width: {{pr.w}}%"></i></span><b>{{pr.v}}</b></span></span></sc-for></span></sc-if>
+<sc-if value="{{c.isMap}}" hint-placeholder-val="{{false}}"><span class="dx-mv-map"><svg class="dx-ic"><use href="#i-map"></use></svg><span>{{c.mapText}}</span></span></sc-if>
+</span>
+<sc-if value="{{c.value}}" hint-placeholder-val="{{false}}"><span class="dx-card-v"><b>{{c.value}}</b><span>{{c.cap}}</span><sc-if value="{{c.natKey}}" hint-placeholder-val="{{false}}"><span class="dx-natkey">{{c.natKey}}</span></sc-if></span></sc-if>
+<span class="dx-card-f">{{c.foot}}</span>
+<sc-if value="{{c.focus}}" hint-placeholder-val="{{false}}"><span class="dx-card-tag">{{t.fromSearch}}</span></sc-if>
+</a>
+</sc-for>
+</div>
+</section>
+</sc-for>
+</sc-if>
+<footer class="dx-foot">© 2026 Fiscal.ge · CC BY 4.0 · info@fiscal.ge</footer>
+</div>
+</main>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"view":{"editor":null},"hub":{"editor":null},"q":{"editor":null},"rail":{"editor":null},"menu":{"editor":null},"fly":{"editor":null},"lang":{"editor":null},"focus":{"editor":null},"$preview":{"width":1440,"height":4130}}'>
+/* ===== content index, read from the live fiscal.ge pages on 2026-10-24 ===== */
+const HUBS = [
+  ['budget', 'ბიუჯეტი', 'Budget', 'landmark', ['budget']],
+  ['economy', 'ეკონომიკა და ბიზნესი', 'Economy and business', 'factory', ['economy', 'business', 'housing']],
+  ['prices', 'ფასები და ფული', 'Prices and money', 'coins', ['inflation', 'money']],
+  ['labour', 'შრომის ბაზარი', 'Labour market', 'briefcase', ['unemployment', 'wages']],
+  ['living', 'ცხოვრების დონე და ჯანდაცვა', 'Living standards and health', 'heart', ['living-standards', 'health']],
+  ['external', 'საგარეო სექტორი', 'External sector', 'ship', ['trade', 'external']],
+  ['demography', 'დემოგრაფია', 'Demography', 'users', ['demography']],
+  ['society', 'საზოგადოება და გარემო', 'Society and environment', 'trees', ['education', 'science-culture', 'crime', 'internet', 'energy-food', 'environment', 'transport']]
+];
+const HUB_LINE = {
+  budget: ['ბიუჯეტის, ვალისა და დეფიციტის მონაცემები', 'Budget, debt and deficit data for Georgia'],
+  economy: ['ეკონომიკა, ბიზნესი, საცხოვრებელი და მშენებლობა', 'The economy, business, housing and construction'],
+  prices: ['ინფლაცია, ფული და ბანკები', 'Inflation, money and banks'],
+  labour: ['უმუშევრობა, დასაქმება და ხელფასები', 'Unemployment, jobs and wages'],
+  living: ['შემოსავლები, სიღარიბე, ჯანდაცვა და სოციალური დაცვა', 'Income, poverty, health and social protection'],
+  external: ['საგარეო ვაჭრობა და საქართველოში შემოსული და გასული ფული', 'Trade, and money flowing into and out of Georgia'],
+  demography: ['მოსახლეობა, შობადობა, მოკვდაობა, მიგრაცია', 'Population, births, deaths and migration'],
+  society: ['განათლება, კულტურა, დანაშაული, ტექნოლოგიები, ენერგია, გარემო და ტრანსპორტი', 'Education, culture, crime, technology, energy, environment and transport']
+};
+/* topic: ka, en, years, updated, line ka, line en */
+const TOPICS = {
+  'budget': ['ბიუჯეტი', 'Budget', '2004–2025', '2026-10-21', '', ''],
+  'economy': ['ეკონომიკა', 'Economy', '1960–2025', '2026-10-20', 'საქართველოს ეკონომიკის მაჩვენებლები', 'Georgia’s economic output'],
+  'business': ['ბიზნესი', 'Business', '1999–2025', '2026-10-15', 'ბრუნვა, დასაქმებულები, ინვესტიციები, ფირმები', 'Sales, jobs, investment and firms'],
+  'housing': ['საცხოვრებელი და მშენებლობა', 'Housing and construction', '2006–2025', '2026-10-16', 'ნებართვები, ექსპლუატაციაში მიღება, ფასები', 'Permits, completions and home prices'],
+  'inflation': ['ინფლაცია', 'Inflation', '2000–2026', '2026-10-17', 'სამომხმარებლო ფასების ცვლილება', 'Consumer price changes in Georgia'],
+  'money': ['ფული და ბანკები', 'Money and banks', '1995–2025', '2026-10-11', 'ფული, სესხები, დეპოზიტები და განაკვეთები', 'Money, bank loans, deposits and interest rates'],
+  'unemployment': ['უმუშევრობა და დასაქმება', 'Unemployment and jobs', '2010–2025', '2026-10-20', 'უმუშევრობა, დასაქმება და ახალგაზრდები', 'Unemployment, jobs, hours, informal work, youth'],
+  'wages': ['ხელფასები', 'Wages', '1995–2025', '2026-10-10', 'საშუალო და მედიანური თვიური ხელფასი', 'Georgia’s average and median monthly wages'],
+  'living-standards': ['ცხოვრების დონე', 'Living standards', '2002–2025', '2026-10-11', 'შემოსავლები, ხარჯები და სიღარიბე', 'Household income, spending and poverty'],
+  'health': ['ჯანდაცვა და სოციალური დაცვა', 'Health and social protection', '2002–2025', '2026-10-20', 'ჯანდაცვა, პენსიები და სოციალური დახმარება', 'Health care, pensions and social help'],
+  'trade': ['საგარეო ვაჭრობა', 'Trade', '1995–2025', '2026-10-14', 'საქონლითა და მომსახურებით წლიური ვაჭრობა', 'Georgia’s annual trade in goods and services'],
+  'external': ['საგარეო ნაკადები', 'External flows', '1995–2026', '2026-10-15', 'საქართველოში შემოსული და გასული ფული', 'Money flowing into and out of Georgia'],
+  'demography': ['დემოგრაფია', 'Demography', '1994–2026', '2026-10-20', '', ''],
+  'education': ['განათლება', 'Education', '2000–2026', '2026-10-16', 'სკოლები, ბაღები, უნივერსიტეტები, კოლეჯები', 'Schools, kindergartens, universities, colleges'],
+  'science-culture': ['მეცნიერება და კულტურა', 'Science and culture', '2005–2025', '2026-10-20', 'კვლევები, პატენტები, მუზეუმები, თეატრები', 'Research, patents, museums and theatres'],
+  'crime': ['დანაშაული და მართლმსაჯულება', 'Crime and justice', '2001–2025', '2026-10-16', 'დანაშაული, მსჯავრი, პატიმრები, ავარიები', 'Crimes, convictions, prisons, victims, roads'],
+  'internet': ['ინტერნეტი და ტექნოლოგიები', 'Internet and technology', '2016–2026', '2026-10-20', 'ინტერნეტი სახლში, ონლაინ, ტელეფონები', 'Internet at home, users, online life, phones'],
+  'energy-food': ['ენერგეტიკა და სურსათი', 'Energy and food', '2006–2025', '2026-10-20', 'ენერგეტიკა, სურსათი და სოფლის მეურნეობა', 'Energy, food self-sufficiency and farming'],
+  'environment': ['გარემო და კლიმატი', 'Environment and climate', '1990–2025', '2026-10-20', 'ჰაერი, კლიმატი, წყალი, ნარჩენები და ტყეები', 'Emissions, air, climate, water, waste, forests'],
+  'transport': ['ტრანსპორტი', 'Transport', '2000–2025', '2026-10-20', 'ავტოპარკი, მგზავრები, ტვირთი', 'Vehicles, passengers and freight']
+};
+/* page: topic, slug, ka, en, latest period, value ka, value en, qualifier ka, qualifier en, years, sparkline (svg y in a 34-high box, 1 = highest), search words */
+const PG = [
+  ['budget', 'expenditure', 'ხარჯები', 'Expenditure', '2025', '27.7 მლრდ ₾', '27.7 bn GEL', '', '', '2004–2025', '33,32,31,29,27,27,27,26,26,25,24,23,23,21,20,19,15,11,10,8,3,1', 'ბიუჯეტის ხარჯები spending'],
+  ['budget', 'expenditure-types', 'ხარჯების სახეები', 'Spending by type', '2025', '29.7 მლრდ ₾', '29.7 bn GEL', '', '', '2004–2025', '33,33,32,32,31,29,27,27,27,27,26,26,25,24,23,22,21,18,15,13,11,7,3,1', 'ეკონომიკური კლასიფიკაცია economic classification'],
+  ['budget', 'revenue', 'შემოსავლები', 'Revenue', '2025', '32.4 მლრდ ₾', '32.4 bn GEL', '', '', '2004–2025', '33,32,31,29,28,29,28,27,27,27,25,24,23,22,21,19,14,13,10,8,4,1', 'გადასახადები შემოსულობები taxes receipts'],
+  ['budget', 'municipalities', 'მუნიციპალიტეტები', 'Municipalities', '2025', '6.1 მლრდ ₾', '6.1 bn GEL', '', '', '2015–2025', '32,33,32,30,27,27,25,19,12,6,1', 'ადგილობრივი ბიუჯეტი local budgets'],
+  ['budget', 'analysis', 'ანალიზი', 'Analysis', '2025', '13 კატეგორია', '13 categories', '', '', '2025', '', 'ბიუჯეტის ველი რადარი'],
+  ['budget', 'debt', 'ვალი', 'Debt', '2025', '35.9 მლრდ ₾', '35.9 bn GEL', '', '', '2013–2025', '33,32,28,26,24,23,20,8,8,10,6,4,1', 'სახელმწიფო ვალი government debt'],
+  ['budget', 'deficit', 'დეფიციტი', 'Deficit', '2025', '−1.5%', '−1.5%', 'მშპ-ის', 'of GDP', '1995–2025', '22,25,27,20,22,15,12,11,11,1,5,2,8,15,26,21,12,12,13,15,13,14,11,12,15,33,25,16,16,16,14', 'ბალანსი balance'],
+  ['economy', 'economy/gdp', 'ეკონომიკის მიმოხილვა', 'Economy overview', '2025', '104.6 მლრდ ₾', '104.6 bn GEL', 'ნომინალური მშპ', 'nominal GDP', '1960–2025', '32,31,31,29,28,27,25,24,21,19,16,15,13,10,11,9,15,29,32,33,31,31,30,29,27,26,23,23,20,19,17,15,13,12,7,1', 'მშპ gdp ეკონომიკური ზრდა growth'],
+  ['economy', 'economy/sectors', 'სექტორები', 'Sectors', '2025', '29.1%', '29.1%', 'ტოპ 3-ის წილი მშპ-ში', 'top 3 sectors’ share of GDP', '2010–2025', '1,3,12,15,17,20,27,26,26,24,19,21,23,22,28,33', 'დარგები industries'],
+  ['economy', 'economy/expenditure', 'მშპ დანახარჯების მიხედვით', 'GDP by expenditure', '2025', '69.1%', '69.1%', 'შინამეურნეობების მოხმარება', 'household consumption', '2010–2025', '8,7,8,14,13,16,27,25,31,33,6,1,22,25,29,28', 'მოხმარება consumption'],
+  ['economy', 'economy/regions', 'რეგიონების ეკონომიკა', 'Regional economies', '2024', '49.4 მლრდ ₾', '49.4 bn GEL', 'თბილისი, უდიდესი', 'Tbilisi, the largest', '2010–2024', '33,31,31,30,29,28,27,25,23,22,22,17,12,7,1', 'რეგიონული მშპ regional gdp'],
+  ['business', 'business/sales', 'ბრუნვა', 'Sales', '2025', '253.7 მლრდ ₾', '253.7 bn GEL', '', '', '1999–2025', '33,33,33,33,33,33,32,32,31,31,31,30,29,28,28,27,26,25,24,22,20,19,14,10,7,4,1', 'turnover'],
+  ['business', 'business/jobs', 'დასაქმებულები', 'Jobs', '2025', '899.0 ათასი', '899.0 thousand', '', '', '1999–2025', '29,29,32,33,33,32,28,30,30,30,28,28,22,20,20,17,16,13,11,10,9,11,9,7,5,3,1', 'დასაქმება employment'],
+  ['business', 'business/investment-profit', 'ინვესტიციები და მოგება', 'Investment and profit', '2025', '8.0 მლრდ ₾', '8.0 bn GEL', '', '', '2006–2025', '33,30,32,32,27,30,27,23,25,21,19,14,17,18,21,15,13,6,9,1', ''],
+  ['business', 'business/firms', 'გახსნილი და დახურული საწარმოები', 'Firms opened and closed', '2024', '56,259', '56,259', 'ახალი საწარმო', 'new firms', '2014–2024', '33,8,28,30,31,22,31,23,3,1,4', 'ფირმები firms'],
+  ['business', 'business/regions', 'რეგიონები', 'Regions', '', '', '', '', '', '2006–2025', '', 'რეგიონები regions'],
+  ['housing', 'housing/permits', 'მშენებლობის ნებართვები', 'Building permits', '2025', '11,578', '11,578', '', '', '2006–2025', '33,31,29,30,20,9,14,11,10,8,5,6,7,6,10,8,5,4,1,3', ''],
+  ['housing', 'housing/completed', 'ექსპლუატაციაში მიღებული ობიექტები', 'Completed buildings', '2025', '3,393', '3,393', '', '', '2006–2025', '33,28,25,27,27,22,19,6,14,13,9,8,13,13,17,15,11,6,1,3', ''],
+  ['housing', 'housing/prices', 'საცხოვრებლის ფასები', 'Home prices', '2025', '159.4', '159.4', '', '', '2020–2025', '33,32,23,13,4,1', 'ბინის ფასები apartment'],
+  ['housing', 'housing/regions', 'რეგიონები', 'Regions', '', '', '', '', '', '2006–2025', '', 'რეგიონები regions'],
+  ['inflation', 'inflation/overview', 'ინფლაციის მიმოხილვა', 'Inflation overview', '2026-09', '5.6%', '5.6%', '', '', '2000–2026', '18,16,11,16,3,13,7,10,24,22,14,2,23,27,31,27,23,25,18,23,24,17,23,24,18,16,20,6,6,8,26,27,27,21,18,17', 'ფასები cpi prices'],
+  ['inflation', 'inflation/categories', 'კატეგორიები', 'Categories', '2026-09', '+2.1 პპ', '+2.1 pp', 'ტრანსპორტი', 'transport', '2000–2026', '22,26,25,23,19,23,24,23,23,29,20,6,8,19,16,18,20,18,19,29,26,16,1,8,5,12,29,29,17,11,22,21,25,22,13,7', 'ფასები prices'],
+  ['inflation', 'inflation/products', 'პროდუქტები', 'Products', '2026-09', '63.3%', '63.3%', 'გაზეთი', 'newspaper', '2000–2026', '28,20,20,14,24,24,29,33,30,28,23,24,27,28,28,28,27,28,28,26,23,22,19,17,18,24,26,26,26,28,24,23,23,21,10,1', 'ფასები prices'],
+  ['inflation', 'inflation/cities', 'ქალაქები', 'Cities', '2026-09', '6.5%', '6.5%', 'ბათუმი', 'Batumi', '2000–2026', '5,6,13,27,24,33,15,13,23,21,5,27,16,22,22,25,25,22,16,20,14,26,12,14,19,24,25,30,18,18,20,21,9,1,5,12', 'ფასები prices'],
+  ['money', 'money/supply', 'ფულის მასა', 'Money supply', '2025', '57.7 მლრდ ₾', '57.7 bn GEL', '', '', '1995–2025', '33,33,33,33,33,33,33,33,33,32,32,32,31,31,30,30,29,29,28,27,26,24,23,22,20,16,14,12,9,6,1', 'm3'],
+  ['money', 'money/loans-deposits', 'სესხები და დეპოზიტები', 'Loans and deposits', '2025', '72.5 მლრდ ₾', '72.5 bn GEL', '', '', '2002–2025', '33,33,33,33,32,31,31,31,31,30,29,29,28,26,25,23,21,19,16,14,13,10,5,1', 'კრედიტები credit'],
+  ['money', 'money/interest-rates', 'საპროცენტო განაკვეთები', 'Interest rates', '2025', '8.00%', '8.00%', '', '', '2008–2025', '14,28,16,20,26,33,32,14,21,18,19,10,14,3,1,8,14,14', 'რეფინანსირების განაკვეთი policy rate'],
+  ['money', 'money/bank-health', 'ბანკების მდგრადობა', 'Bank health', '2025', '2.5%', '2.5%', '', '', '2003–2025', '24,26,31,33,33,14,1,3,12,16,20,20,22,18,21,22,27,24,27,29,23,23,23', 'npl'],
+  ['unemployment', 'unemployment/overview', 'უმუშევრობის მიმოხილვა', 'Unemployment overview', '2025', '13.9%', '13.9%', '', '', '2010–2025', '1,1,2,3,11,14,14,15,20,24,22,17,25,27,33,33', 'უმუშევრობის დონე unemployment rate'],
+  ['unemployment', 'unemployment/regions', 'რეგიონები', 'Regions', '', '', '', '', '', '2010–2025', '', 'რეგიონები regions'],
+  ['unemployment', 'unemployment/age', 'ასაკობრივი ჯგუფები', 'Age groups', '', '', '', '', '', '2020–2025', '', 'ასაკი age'],
+  ['unemployment', 'unemployment/gender', 'სქესი', 'Sex', '', '', '', '', '', '2010–2025', '', 'ქალები კაცები women men gender'],
+  ['unemployment', 'unemployment/industries', 'დასაქმება დარგების მიხედვით', 'Jobs by industry', '2025', '1,389.7 ათასი', '1,389.7 thousand', '', '', '2017–2025', '21,19,19,29,33,22,13,1,3', 'დასაქმებული employment'],
+  ['unemployment', 'unemployment/hours', 'სამუშაო საათები', 'Hours worked', '2025', '41.0 საათი', '41.0 hours', '', '', '2020–2025', '1,21,10,19,30,33', ''],
+  ['unemployment', 'unemployment/informal', 'არაფორმალური დასაქმება', 'Informal jobs', '2025', '28.3%', '28.3%', '', '', '2020–2025', '1,24,27,33,21,28', 'informal'],
+  ['unemployment', 'unemployment/young-people', 'ახალგაზრდები სწავლისა და დასაქმების გარეშე', 'Young people not in work or study', '2025', '17.6%', '17.6%', '', '', '2020–2025', '1,6,16,23,33,33', 'neet ახალგაზრდები youth'],
+  ['wages', 'wages/overview', 'ხელფასების მიმოხილვა', 'Wages overview', '2025', '2,165.2 ₾', '2,165.2 GEL', '', '', '1995–2025', '33,33,33,32,32,32,32,32,31,31,30,29,28,25,25,24,24,23,22,21,20,19,18,17,16,16,14,10,7,4,1', 'ხელფასი salary pay ქალები კაცები women men'],
+  ['wages', 'wages/industries', 'საქმიანობები', 'Industries', '', '', '', '', '', '2014–2025', '', 'ხელფასი დარგები salary'],
+  ['wages', 'wages/regions', 'რეგიონები', 'Regions', '', '', '', '', '', '2010–2025', '', 'ხელფასი რეგიონები regions'],
+  ['living-standards', 'living-standards/income', 'შემოსავლები', 'Income', '2025', '2,025.8 ₾', '2,025.8 GEL', '', '', '2002–2025', '33,33,32,32,31,30,29,28,27,26,25,23,22,21,20,20,19,18,19,17,13,9,5,1', 'შინამეურნეობის შემოსავალი household income'],
+  ['living-standards', 'living-standards/spending', 'ხარჯები', 'Spending', '2025', '1,438.7 ₾', '1,438.7 GEL', '', '', '2002–2025', '33,33,32,32,31,30,28,27,26,25,24,22,21,20,20,19,19,17,19,16,11,6,5,1', 'მოხმარება consumption'],
+  ['living-standards', 'living-standards/poverty', 'სიღარიბე', 'Poverty', '2025', '7.1%', '7.1%', '', '', '2004–2025', '6,4,3,1,5,5,3,6,10,14,16,18,18,18,20,21,19,23,24,28,31,33', ''],
+  ['living-standards', 'living-standards/inequality', 'უთანასწორობა', 'Inequality', '2025', '0.34', '0.34', '', '', '2006–2025', '4,1,4,4,1,4,7,14,14,14,14,11,17,17,23,23,27,27,30,33', 'ჯინი gini'],
+  ['health', 'health/doctors-hospitals', 'ექიმები და საავადმყოფოები', 'Doctors and hospitals', '2025', '22,491', '22,491', '', '', '2002–2025', '31,29,28,31,30,32,31,30,28,27,33,25,24,20,15,12,3,1,28,25,21,20,21,25', 'ჯანდაცვა health'],
+  ['health', 'health/illnesses', 'დაავადებები', 'Illnesses', '2025', '500.4 ათასი', '500.4 thousand', '', '', '2002–2025', '33,30,30,30,26,27,27,18,19,17,14,12,9,3,1,7,7,10,25,26,20,17,14,15', 'diseases'],
+  ['health', 'health/causes-of-death', 'სიკვდილის მიზეზები', 'Causes of death', '2025', '44,319', '44,319', '', '', '2014–2025', '21,21,18,24,26,26,19,1,21,33,31,30', 'გარდაცვალება deaths mortality'],
+  ['health', 'health/social-payments', 'სოციალური გასაცემლები', 'Social payments', '2025', '6,166.1 მლნ ₾', '6,166.1 mln GEL', '', '', '2013–2025', '33,31,30,29,28,28,25,22,19,16,10,5,1', 'სოციალური დახმარება benefits'],
+  ['health', 'health/pensions', 'პენსიები', 'Pensions', '2025', '888,518', '888,518', '', '', '2013–2025', '33,31,30,28,26,24,21,18,16,14,9,5,1', 'პენსიონერები pensioners'],
+  ['health', 'health/subsistence-allowance', 'საარსებო შემწეობა', 'Subsistence allowance', '2025', '129,506', '129,506', '', '', '2013–2025', '15,20,30,19,26,28,33,17,1,15,31,28,27', 'სოციალური დახმარება benefits'],
+  ['health', 'health/social-package', 'სოციალური პაკეტი', 'Social package', '2025', '187,764', '187,764', '', '', '2013–2025', '26,28,30,30,32,33,24,20,15,14,9,4,1', ''],
+  ['education', 'education/schools', 'სკოლები', 'Schools', '2025/26', '644.2 ათასი', '644.2 thousand', '', '', '2000/01–2025/26', '1,4,7,10,14,17,17,21,15,19,25,30,32,33,33,33,31,29,27,25,22,19,17,17,16,15', 'მოსწავლეები pupils'],
+  ['education', 'education/kindergartens', 'საბავშვო ბაღები', 'Kindergartens', '2025/26', '130,337', '130,337', '', '', '2017/18–2025/26', '3,4,1,7,10,16,23,27,33', 'ბაღი'],
+  ['education', 'education/universities', 'უნივერსიტეტები', 'Universities', '2025/26', '195,426', '195,426', '', '', '2011/12–2025/26', '33,28,26,24,21,19,18,16,16,13,12,12,7,3,1', 'სტუდენტები students'],
+  ['education', 'education/vocational', 'პროფესიული კოლეჯები', 'Vocational colleges', '2025', '19,690', '19,690', '', '', '2013–2025', '1,14,13,16,16,26,27,33,28,20,16,12,5', 'პროფესიული განათლება'],
+  ['science-culture', 'science-culture/research', 'კვლევები', 'Research', '2024', '14,046', '14,046', '', '', '2019–2024', '33,19,18,10,9,1', 'მეცნიერება science'],
+  ['science-culture', 'science-culture/patents', 'პატენტები', 'Patents', '2025', '79', '79', '', '', '2016–2025', '6,33,1,18,25,14,19,6,9,28', ''],
+  ['science-culture', 'science-culture/museums', 'მუზეუმები', 'Museums', '2025', '1,998.9', '1,998.9', '', '', '2005–2025', '31,30,31,31,28,26,27,22,20,21,16,11,7,3,1,33,25,10,4,7,5', 'კულტურა culture'],
+  ['science-culture', 'science-culture/theatres', 'თეატრები', 'Theatres', '2025', '620.3', '620.3', '', '', '2006–2025', '22,18,20,16,21,19,22,18,15,12,9,11,10,9,33,30,12,1,8,9', 'კულტურა culture'],
+  ['crime', 'crime/recorded', 'რეგისტრირებული დანაშაული', 'Recorded crimes', '2025', '54,134', '54,134', '', '', '2015–2025', '33,32,30,7,1,9,10,12,12,17,12', 'დანაშაული crime'],
+  ['crime', 'crime/convictions', 'მსჯავრდებულები', 'Convictions', '2025', '22,767', '22,767', '', '', '2001–2025', '31,32,33,31,31,14,5,5,11,7,11,27,18,14,18,17,19,16,14,22,17,10,10,14,1', 'სასამართლო courts'],
+  ['crime', 'crime/prisons', 'პატიმრები', 'Prisons', '2025', '11,153', '11,153', '', '', '2001–2025', '30,32,33,30,27,16,11,11,6,2,1,10,28,25,27,27,27,27,27,28,28,27,26,28,24', 'ციხე prisoners'],
+  ['crime', 'crime/victims', 'დაზარალებულები', 'Victims', '2025', '17,209', '17,209', '', '', '2007–2025', '26,33,32,32,28', ''],
+  ['crime', 'crime/road-accidents', 'საგზაო-სატრანსპორტო შემთხვევები', 'Road accidents', '2025', '5,969', '5,969', '', '', '2001–2025', '33,33,32,27,21,15,14,7,10,13,17,11,10,7,4,1,7,4,8,13,8,10,10,8,7', 'ავარიები accidents'],
+  ['internet', 'internet/homes', 'ინტერნეტი სახლში', 'Internet at home', '2026', '93.5%', '93.5%', '', '', '2016–2026', '33,32,25,20,14,11,8,7,4,3,1', ''],
+  ['internet', 'internet/users', 'ინტერნეტის მომხმარებლები', 'Internet users', '2026', '89.6%', '89.6%', '', '', '2016–2026', '33,32,27,21,17,14,11,8,6,3,1', ''],
+  ['internet', 'internet/online', 'ონლაინ შესყიდვები და მომსახურება', 'Shopping and services online', '2026', '38.6%', '38.6%', '', '', '2016–2026', '30,33,27,27,26,26,23,14,12,3,1', 'ონლაინ online'],
+  ['internet', 'internet/devices', 'ტელეფონები და კომპიუტერები', 'Phones and computers', '2026', '93.3%', '93.3%', '', '', '2016–2026', '33,29,24,19,16,16,12,9,6,2,1', 'მობილური mobile'],
+  ['trade', 'trade/overview', 'საგარეო ვაჭრობის მიმოხილვა', 'Trade overview', '2025', '25.9 მლრდ $', '$25.9 bn', 'ბრუნვა', 'turnover', '1995–2025', '33,33,32,33,33,33,33,32,32,31,30,28,26,24,27,25,22,21,20,19,22,22,20,18,17,19,16,10,6,4,1', 'ექსპორტი იმპორტი exports imports'],
+  ['trade', 'trade/partners', 'სავაჭრო პარტნიორები', 'Trading partners', '2025', '3.1 მლრდ $', '$3.1 bn', 'თურქეთი, უმსხვილესი', 'Turkey, the largest', '1995–2025', '33,33,32,33,33,33,33,32,32,31,30,28,26,24,27,25,22,21,20,19,22,22,20,18,17,19,16,10,6,4,1', 'ქვეყნები countries'],
+  ['trade', 'trade/products', 'პროდუქტები', 'Products', '2025', '38.6%', '38.6%', 'ავტომობილები ექსპორტში', 'cars in exports', '2020–2025', '33,27,16,10,6,1', 'საქონელი goods'],
+  ['trade', 'trade/domestic-exports', 'ადგილობრივი ექსპორტი', 'Domestic exports', '', '', '', '', '', '2014–2025', '30,33,33,27,24,22,20,10,1,14,12,7', 'ექსპორტი exports'],
+  ['trade', 'trade/services', 'მომსახურებით ვაჭრობა', 'Services trade', '', '', '', '', '', '2020–2024', '33,28,12,4,1', 'ტურიზმი tourism'],
+  ['trade', 'trade/composition', 'საქონლით ვაჭრობის სტრუქტურა', 'Trade composition', '', '', '', '', '', '2000–2025', '33,33,33,32,32,31,30,29,28,29,27,24,24,21,21,24,25,22,19,17,19,15,9,7,4,1', ''],
+  ['external', 'external/money-from-abroad', 'ფული საზღვარგარეთიდან', 'Money from abroad', '2025', '3.65 მლრდ $', '$3.65 bn', 'ფულადი გზავნილები', 'remittances', '2000–2025', '33,33,33,32,32,31,29,27,26,27,26,24,24,23,23,25,25,23,22,21,20,16,1,3,9,6', 'გზავნილები remittances'],
+  ['external', 'external/foreign-investment', 'უცხოური ინვესტიციები', 'Foreign investment', '2025', '1.90 მლრდ $', '$1.90 bn', '', '', '1996–2025', '33,30,29,32,31,32,31,28,26,27,16,8,11,24,21,17,18,18,7,9,10,5,14,14,25,15,1,4,10,6', 'fdi პუი'],
+  ['external', 'external/current-account', 'მიმდინარე ანგარიში', 'Current account', '', '', '', '', '', '2000–2025', '1,1,2,4,3,7,13,23,33,13,13,21,22,11,21,20,22,15,13,12,23,23,12,20,20,13', 'გადასახდელთა ბალანსი balance of payments'],
+  ['external', 'external/foreign-debt', 'საგარეო ვალი', 'Foreign debt', '', '', '', '', '', '2006–2026', '33,29,27,25,24,22,20,20,19,17,17,15,14,13,10,9,6,6,5,2,1', 'external debt'],
+  ['external', 'external/reserves', 'საერთაშორისო რეზერვები', 'Reserves', '', '', '', '', '', '1995–2026', '33,33,33,33,33,33,33,33,33,32,32,30,28,28,25,25,22,22,22,23,23,23,21,20,20,18,17,14,14,16,9,1', 'ეროვნული ბანკი nbg'],
+  ['energy-food', 'energy-food/energy-supply', 'ენერგიის მიწოდება', 'Energy supply', '2024', '5,914.5 ათ. ტ.ნ.ე.', '5,914.5 ktoe', '', '', '2013–2024', '33,28,23,21,21,21,16,19,13,4,5,1', 'ენერგია energy'],
+  ['energy-food', 'energy-food/electricity', 'ელექტროენერგია', 'Electricity', '2024', '14,234.1 გვტ.სთ', '14,234.1 GWh', '', '', '2013–2024', '33,31,27,22,22,18,20,25,14,2,1,2', 'დენი power'],
+  ['energy-food', 'energy-food/energy-use', 'ენერგიის მოხმარება', 'Energy use', '2024', '5,456.7 ათ. ტ.ნ.ე.', '5,456.7 ktoe', '', '', '2013–2024', '33,28,25,21,20,20,17,19,11,6,7,1', 'ენერგია energy'],
+  ['energy-food', 'energy-food/food-self-sufficiency', 'სურსათით თვითუზრუნველყოფა', 'Food self-sufficiency', '2025', '19%', '19%', '', '', '2014–2025', '33,12,7,16,18,16,16,1,1,1,1,7', 'საკვები food'],
+  ['energy-food', 'energy-food/farming', 'სოფლის მეურნეობა', 'Farming', '2025', '8,384.9 მლნ ₾', '8,384.9 mln GEL', '', '', '2010–2025', '33,29,30,28,26,25,25,26,21,19,14,12,9,7,4,1', 'აგრო agriculture'],
+  ['environment', 'environment/greenhouse-gases', 'სათბურის გაზები', 'Greenhouse gases', '2022', '20.1', '20.1', '', '', '2000–2022', '27,33,28,25,24,27,21,20,24,25,21,13,11,13,10,6,5,8,8,7,6,5,1', 'ემისიები co2 emissions'],
+  ['environment', 'environment/air-pollution', 'ჰაერის დაბინძურება', 'Air pollution', '2024', '86.4', '86.4', '', '', '2013–2024', '8,1,9,5,10,25,28,33,28,29,29,28', 'ჰაერი air'],
+  ['environment', 'environment/air-quality', 'ჰაერის ხარისხი ქალაქებში', 'City air quality', '2025', '51', '51', '', '', '2019–2025', '1,8,1,13,33,30,19', 'pm10 ჰაერი air'],
+  ['environment', 'environment/climate', 'ტემპერატურა და ნალექი', 'Temperature and rain', '2024', '10.3', '10.3', '', '', '1990–2024', '24,16,28,32,24,22,24,22,27,22,1,33,19,19,15,16,22,18,6,12,13,10,12,4,6', 'კლიმატი climate'],
+  ['environment', 'environment/water', 'წყალი', 'Water', '2025', '869.1', '869.1', '', '', '2015–2025', '4,9,9,26,22,33,1,9,12,13,13', ''],
+  ['environment', 'environment/waste', 'ნარჩენები', 'Waste', '2024', '1,184.0', '1,184.0', '', '', '2015–2024', '33,26,22,17,16,18,15,12,6,1', 'ნაგავი'],
+  ['environment', 'environment/forests', 'ტყეები', 'Forests', '2024', '376,215', '376,215', '', '', '2010–2024', '1,14,24,11,13,12,17,17,20,24,26,28,23,27,33', 'ტყე'],
+  ['transport', 'transport/vehicles', 'ავტოპარკი', 'Vehicles', '2025', '1,650.0', '1,650.0', '', '', '2000–2025', '33,33,33,33,29,28,27,26,25,24,23,22,20,18,16,15,14,13,12,10,8,6,4,1', 'მანქანები cars'],
+  ['transport', 'transport/vehicle-age', 'ავტომობილების ასაკი', 'Vehicle age', '2025', '1,318.9', '1,318.9', '', '', '2017–2025', '33,30,28,26,22,18,12,7,1', 'მანქანები cars'],
+  ['transport', 'transport/passengers', 'მგზავრთა გადაყვანა', 'Passengers', '2025', '11,262.1', '11,262.1', '', '', '2000–2025', '33,32,31,29,27,25,25,25,25,26,24,23,22,21,20,18,17,14,9,6,28,32,14,7,2,1', 'მგზავრები'],
+  ['transport', 'transport/freight', 'ტვირთის გადაზიდვა', 'Freight', '2025', '5,121.4', '5,121.4', '', '', '2000–2025', '23,22,17,14,19,10,1,4,8,16,10,11,11,15,18,23,29,31,33,30,29,24,15,23,21,22', 'ტვირთი cargo'],
+  ['transport', 'transport/regions', 'რეგიონები', 'Regions', '', '', '', '', '', '2017–2025', '', 'რეგიონები regions'],
+  ['demography', 'demography/population', 'მოსახლეობა', 'Population', '2026', '3,941,103', '3,941,103', '', '', '2004–2026', '1,4,8,10,13,15,19,22,27,29,29,29,28,28,28,29,29,28,33,27,32', 'მოსახლე population'],
+  ['demography', 'demography/age-sex', 'ასაკი და სქესი', 'Age and sex', '2026', '18.1%', '18.1%', '65+ წლის', 'aged 65+', '2004–2026', '33,30,27,26,26,29,31,33,33,32,32,31,30,30,28,27,24,23,22,21,16', 'პირამიდა pyramid'],
+  ['demography', 'demography/migration', 'მიგრაცია', 'Migration', '2025', '+17,127', '+17,127', 'წმინდა მიგრაცია', 'net migration', '2012–2025', '27,21,22,21,22,20,23,22,14,29,1,33,15,14', 'ემიგრაცია emigration'],
+  ['demography', 'demography/births-deaths', 'შობადობა და სიკვდილიანობა', 'Births and deaths', '2025', '37,867', '37,867', 'დაბადება', 'births', '2014–2025', '1,3,7,11,14,18,21,22,27,30,31,33', 'ნაყოფიერება fertility'],
+  ['demography', 'demography/marriages-divorces', 'ქორწინება და განქორწინება', 'Marriages and divorces', '2025', '22,285', '22,285', 'ქორწინება', 'marriages', '1994–2025', '20,20,23,26,29,31,33,32,33,33,30,25,20,15,6,5,1,7,7,1,6,9,15,17,18,18,28,18,14,19,20,19', '']
+];
+/* places — region: key, ka, en, budget 2025, per resident, population 2026, births per 100 deaths 2025 */
+const REG = [
+  ['tbilisi', 'თბილისი', 'Tbilisi', '2.1 მლრდ ₾|2.1 bn GEL', '1,579', '1,369,356', '112'],
+  ['adjara', 'აჭარა', 'Adjara', '1.2 მლრდ ₾|1.2 bn GEL', '3,001', '413,214', '128'],
+  ['imereti', 'იმერეთი', 'Imereti', '606 მლნ ₾|606 mln GEL', '1,191', '492,505', '59'],
+  ['kvemo_kartli', 'ქვემო ქართლი', 'Kvemo Kartli', '487 მლნ ₾|487 mln GEL', '1,104', '440,058', '101'],
+  ['samegrelo_zemo_svaneti', 'სამეგრელო-ზემო სვანეთი', 'Samegrelo-Zemo Svaneti', '408 მლნ ₾|408 mln GEL', '1,338', '297,820', '50'],
+  ['kakheti', 'კახეთი', 'Kakheti', '368 მლნ ₾|368 mln GEL', '1,213', '300,049', '65'],
+  ['shida_kartli', 'შიდა ქართლი', 'Shida Kartli', '245 მლნ ₾|245 mln GEL', '974', '248,396', '74'],
+  ['samtskhe_javakheti', 'სამცხე-ჯავახეთი', 'Samtskhe-Javakheti', '227 მლნ ₾|227 mln GEL', '1,461', '155,480', '91'],
+  ['guria', 'გურია', 'Guria', '186 მლნ ₾|186 mln GEL', '1,820', '101,557', '51'],
+  ['mtskheta_mtianeti', 'მცხეთა-მთიანეთი', 'Mtskheta-Mtianeti', '152 მლნ ₾|152 mln GEL', '1,618', '93,187', '61'],
+  ['racha_lechkhumi_kvemo_svaneti', 'რაჭა-ლეჩხუმი და ქვემო სვანეთი', 'Racha-Lechkhumi and Kvemo Svaneti', '95.9 მლნ ₾|95.9 mln GEL', '3,214', '29,481', '33']
+];
+/* municipality: key, ka, en, region index, budget 2025 (mln ₾), per resident, population 2026, births per 100 deaths 2025 */
+const MUN = [
+  ['tbilisi', 'თბილისი', 'Tbilisi', 0, '2,108', '1,579', '1,369,356', '112'],
+  ['batumi', 'ბათუმი', 'Batumi', 1, '486', '2,053', '246,267', '148'], ['rustavi', 'რუსთავი', 'Rustavi', 3, '173', '1,311', '130,174', '91'],
+  ['kutaisi', 'ქუთაისი', 'Kutaisi', 2, '159', '993', '153,799', '83'], ['gori', 'გორი', 'Gori', 6, '114', '935', '120,149', '82'],
+  ['zugdidi', 'ზუგდიდი', 'Zugdidi', 4, '105', '1,036', '98,339', '53'], ['ozurgeti', 'ოზურგეთი', 'Ozurgeti', 8, '89.0', '1,524', '57,904', '55'],
+  ['kobuleti', 'ქობულეთი', 'Kobuleti', 1, '88.5', '1,196', '73,897', '95'], ['marneuli', 'მარნეული', 'Marneuli', 3, '81.6', '705', '116,717', '143'],
+  ['poti', 'ფოთი', 'Poti', 4, '71.4', '1,842', '38,492', '49'], ['gardabani', 'გარდაბანი', 'Gardabani', 3, '71.3', '855', '82,506', '93'],
+  ['khelvachauri', 'ხელვაჩაური', 'Khelvachauri', 1, '68.1', '1,333', '51,286', '121'], ['mtskheta', 'მცხეთა', 'Mtskheta', 9, '67.9', '1,248', '53,823', '72'],
+  ['bolnisi', 'ბოლნისი', 'Bolnisi', 3, '61.7', '1,162', '53,568', '89'], ['telavi', 'თელავი', 'Telavi', 5, '59.0', '1,032', '55,815', '69'],
+  ['gurjaani', 'გურჯაანი', 'Gurjaani', 5, '57.9', '1,158', '49,218', '51'], ['lanchkhuti', 'ლანჩხუთი', 'Lanchkhuti', 8, '57.8', '2,150', '26,745', '45'],
+  ['tskaltubo', 'წყალტუბო', 'Tskaltubo', 2, '57.7', '1,202', '45,286', '47'], ['borjomi', 'ბორჯომი', 'Borjomi', 7, '57.4', '2,319', '24,613', '80'],
+  ['zestafoni', 'ზესტაფონი', 'Zestafoni', 2, '55.6', '1,011', '54,286', '59'], ['chiatura', 'ჭიათურა', 'Chiatura', 2, '53.4', '1,446', '36,534', '55'],
+  ['sagarejo', 'საგარეჯო', 'Sagarejo', 5, '53.2', '1,041', '50,900', '100'], ['sachkhere', 'საჩხერე', 'Sachkhere', 2, '51.6', '1,491', '34,023', '74'],
+  ['akhaltsikhe', 'ახალციხე', 'Akhaltsikhe', 7, '49.1', '1,279', '38,419', '77'], ['lagodekhi', 'ლაგოდეხი', 'Lagodekhi', 5, '47.9', '1,194', '40,222', '75'],
+  ['sighnaghi', 'სიღნაღი', 'Sighnaghi', 5, '45.5', '1,581', '28,819', '46'], ['khashuri', 'ხაშური', 'Khashuri', 6, '45.3', '916', '48,854', '60'],
+  ['kaspi', 'კასპი', 'Kaspi', 6, '45.3', '1,084', '41,254', '61'], ['dusheti', 'დუშეთი', 'Dusheti', 9, '44.7', '1,727', '25,492', '48'],
+  ['samtredia', 'სამტრედია', 'Samtredia', 2, '44.2', '988', '43,818', '46'], ['mestia', 'მესტია', 'Mestia', 4, '43.4', '4,351', '9,967', '106'],
+  ['akhmeta', 'ახმეტა', 'Akhmeta', 5, '43.0', '1,496', '27,650', '56'], ['akhalkalaki', 'ახალქალაქი', 'Akhalkalaki', 7, '42.2', '940', '45,238', '103'],
+  ['senaki', 'სენაკი', 'Senaki', 4, '40.7', '1,131', '34,835', '39'], ['tetritskaro', 'თეთრიწყარო', 'Tetritskaro', 3, '40.5', '2,044', '19,715', '66'],
+  ['kareli', 'ქარელი', 'Kareli', 6, '40.3', '1,049', '38,139', '88'], ['chokhatauri', 'ჩოხატაური', 'Chokhatauri', 8, '39.3', '2,313', '16,908', '50'],
+  ['terjola', 'თერჯოლა', 'Terjola', 2, '39.1', '1,226', '30,676', '58'], ['khulo', 'ხულო', 'Khulo', 1, '38.2', '2,340', '16,098', '124'],
+  ['kvareli', 'ყვარელი', 'Kvareli', 5, '36.4', '1,274', '28,574', '64'], ['martvili', 'მარტვილი', 'Martvili', 4, '36.3', '1,231', '29,047', '48'],
+  ['kharagauli', 'ხარაგაული', 'Kharagauli', 2, '35.6', '2,120', '16,773', '48'], ['dmanisi', 'დმანისი', 'Dmanisi', 3, '33.0', '1,686', '19,571', '94'],
+  ['khobi', 'ხობი', 'Khobi', 4, '31.8', '1,192', '26,265', '57'], ['baghdati', 'ბაღდათი', 'Baghdati', 2, '31.5', '1,570', '18,975', '48'],
+  ['adigeni', 'ადიგენი', 'Adigeni', 7, '31.1', '2,174', '14,292', '86'], ['keda', 'ქედა', 'Keda', 1, '31.0', '2,112', '14,636', '104'],
+  ['shuakhevi', 'შუახევი', 'Shuakhevi', 1, '30.4', '2,735', '11,030', '129'], ['ambrolauri', 'ამბროლაური', 'Ambrolauri', 10, '30.3', '2,872', '10,564', '34'],
+  ['chkhorotsku', 'ჩხოროწყუ', 'Chkhorotsku', 4, '30.1', '1,457', '20,459', '39'], ['ninotsminda', 'ნინოწმინდა', 'Ninotsminda', 7, '27.9', '1,189', '23,568', '113'],
+  ['tkibuli', 'ტყიბული', 'Tkibuli', 2, '27.5', '1,562', '16,879', '36'], ['vani', 'ვანი', 'Vani', 2, '27.3', '1,295', '20,189', '37'],
+  ['tsalka', 'წალკა', 'Tsalka', 3, '26.2', '1,464', '17,807', '89'], ['dedoplistskaro', 'დედოფლისწყარო', 'Dedoplistskaro', 5, '25.3', '1,336', '18,851', '50'],
+  ['tsalenjikha', 'წალენჯიხა', 'Tsalenjikha', 4, '25.2', '1,120', '21,587', '49'], ['oni', 'ონი', 'Oni', 10, '24.9', '4,396', '5,646', '28'],
+  ['tsageri', 'ცაგერი', 'Tsageri', 10, '23.8', '2,812', '8,215', '31'], ['abasha', 'აბაშა', 'Abasha', 4, '23.7', '1,225', '18,829', '37'],
+  ['khoni', 'ხონი', 'Khoni', 2, '23.1', '1,063', '21,267', '54'], ['tianeti', 'თიანეთი', 'Tianeti', 9, '22.3', '2,575', '8,576', '43'],
+  ['aspindza', 'ასპინძა', 'Aspindza', 7, '19.0', '2,018', '9,350', '85'], ['kazbegi', 'ყაზბეგი', 'Kazbegi', 9, '17.0', '3,457', '5,296', '82'],
+  ['lentekhi', 'ლენტეხი', 'Lentekhi', 10, '16.9', '3,278', '5,056', '41']
+];
+/* which pages show which level of place data (visible text on the live pages) */
+const MUN_PAGES = ['demography/population', 'demography/births-deaths', 'demography/marriages-divorces', 'education/schools', 'education/kindergartens', 'health/pensions', 'health/subsistence-allowance'];
+const CITY_PAGES = { 'inflation/cities': ['tbilisi', 'kutaisi', 'batumi', 'gori', 'telavi', 'zugdidi'], 'environment/air-quality': ['tbilisi', 'batumi', 'rustavi', 'kutaisi', 'zugdidi', 'telavi', 'zestafoni', 'akhaltsikhe', 'mestia'] };
+const REG_PAGES = ['unemployment/regions', 'wages/regions', 'living-standards/income', 'living-standards/spending', 'economy/regions', 'business/regions', 'housing/regions', 'transport/regions', 'internet/homes', 'demography/age-sex', 'health/causes-of-death', 'science-culture/museums', 'environment/forests', 'environment/waste'];
+/* place values read from the live pages: [ka, en, period] */
+const UN_R = ['17.5%', '9.4%', '16.1%', '13.8%', '9.6%', '8.7%', '14.9%', '7.0%', '14.1%', '14.6%', '8.5%'];
+const WG_R = ['2,565.0', '1,789.1', '1,340.0', '1,800.3', '1,439.4', '1,384.2', '1,318.4', '1,343.9', '1,276.4', '1,974.8', '1,138.5'];
+const PV = {
+  batumi: { 'demography/marriages-divorces': ['1,184 ქორწინება', '1,184 marriages', '2025'], 'education/schools': ['45,610 მოსწავლე', '45,610 pupils', '2025/26'], 'education/kindergartens': ['9,575 ბავშვი', '9,575 children', '2025/26'], 'health/pensions': ['12.1%', '12.1%', '2025'], 'health/subsistence-allowance': ['6.6%', '6.6%', '2025'], 'environment/air-quality': ['PM10 · 29', 'PM10 · 29', '2025'] },
+  adjara: { 'living-standards/income': ['2,204.1 ₾', '2,204.1 GEL', '2025'], 'living-standards/spending': ['1,484.3 ₾', '1,484.3 GEL', '2025'], 'economy/regions': ['8.6 მლრდ ₾', '8.6 bn GEL', '2024'], 'business/regions': ['14.2 მლრდ ₾', '14.2 bn GEL', '2025'], 'internet/homes': ['96.3%', '96.3%', '2026'], 'demography/age-sex': ['13.1% · 65+', '13.1% · 65+', '2024'], 'health/causes-of-death': ['8.7 / 1,000', '8.7 / 1,000', '2025'] },
+  tbilisi: { 'living-standards/income': ['2,317.5 ₾', '2,317.5 GEL', '2025'], 'living-standards/spending': ['1,645.2 ₾', '1,645.2 GEL', '2025'], 'economy/regions': ['49.4 მლრდ ₾', '49.4 bn GEL', '2024'], 'business/regions': ['200.8 მლრდ ₾', '200.8 bn GEL', '2025'], 'internet/homes': ['98.2%', '98.2%', '2026'], 'demography/age-sex': ['14.4% · 65+', '14.4% · 65+', '2024'], 'health/causes-of-death': ['9.4 / 1,000', '9.4 / 1,000', '2025'] }
+};
+const CITY_INF = { tbilisi: '5.6%', kutaisi: '5.6%', batumi: '6.5%', gori: '5.5%', telavi: '4.2%', zugdidi: '5.4%' };
+
+/* ===== search: Georgian or English, places, inflected Georgian, Latin typed on a Georgian keyboard ===== */
+const KB = { q: 'ქ', w: 'წ', e: 'ე', r: 'რ', t: 'ტ', y: 'ყ', u: 'უ', i: 'ი', o: 'ო', p: 'პ', a: 'ა', s: 'ს', d: 'დ', f: 'ფ', g: 'გ', h: 'ჰ', j: 'ჯ', k: 'კ', l: 'ლ', z: 'ზ', x: 'ხ', c: 'ც', v: 'ვ', b: 'ბ', n: 'ნ', m: 'მ', W: 'ჭ', R: 'ღ', T: 'თ', S: 'შ', J: 'ჟ', Z: 'ძ', C: 'ჩ' };
+const MON = { ka: ['იან', 'თებ', 'მარ', 'აპრ', 'მაი', 'ივნ', 'ივლ', 'აგვ', 'სექ', 'ოქტ', 'ნოე', 'დეკ'], en: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'] };
+const norm = (s) => String(s || '').toLowerCase().replace(/[„“”"'’.,:;()/\\+]/g, ' ').replace(/\s+/g, ' ').trim();
+const isLatin = (s) => /[a-z]/i.test(s) && !/[ა-ჰ]/.test(s);
+const toKb = (s) => [...s].map((ch) => KB[ch] || KB[ch.toLowerCase()] || ch).join('');
+const stem = (w) => w.length < 5 ? w : w.replace(/(ისთვის|იდან|ამდე|ებში|ებით|ების|ებს|ში|ზე|ით|ად|ის|მა|ს)$/, '').replace(/[იაეოუ]$/, '');
+const wordsOf = (s) => norm(s).split(' ').filter(Boolean);
+let PAGES = null, PLACES = null;
+function index() {
+  if (PAGES) return;
+  PAGES = PG.map((r, i) => {
+    const hub = HUBS.findIndex((h) => h[4].includes(r[0])), tp = TOPICS[r[0]];
+    return { i, topic: r[0], slug: r[1], ka: r[2], en: r[3], per: r[4], v: [r[5], r[6]], c: [r[7], r[8]], yrs: r[9], ys: r[10], hub,
+      hay: [norm(r[2]), norm(r[3]), norm(tp[0] + ' ' + tp[1]), norm(HUBS[hub][1] + ' ' + HUBS[hub][2]), norm(r[11] + ' ' + r[7] + ' ' + r[8])] };
+  });
+  PLACES = REG.map((r, i) => ({ type: 'r', k: r[0], ka: r[1], en: r[2], ri: i, bud: r[3].split('|'), pc: r[4], pop: r[5], bpd: r[6] }))
+    .concat(MUN.map((r) => ({ type: 'm', k: r[0], ka: r[1], en: r[2], ri: r[3], bud: r[4] === '2,108' ? ['2.1 მლრდ ₾', '2.1 bn GEL'] : [r[4] + ' მლნ ₾', r[4] + ' mln GEL'], pc: r[5], pop: r[6], bpd: r[7] })));
+}
+function wscore(w, field) {
+  if (!w) return 0;
+  const ws = field.split(' ');
+  for (const f of ws) if (f.startsWith(w)) return 1;
+  if (w.length >= 3 && field.includes(w)) return 0.7;
+  const s = stem(w);
+  if (s.length >= 4 && s !== w) for (const f of ws) if (f.startsWith(s)) return 0.55;
+  return 0;
+}
+const WT = [10, 10, 4, 3, 6];
+function pageScore(p, words) {
+  let tot = 0;
+  for (const w of words) {
+    let best = 0;
+    p.hay.forEach((f, j) => { const s = wscore(w, f) * WT[j]; if (s > best) best = s; });
+    if (!best) return 0;
+    tot += best;
+  }
+  if (norm(p.ka) === words.join(' ') || norm(p.en) === words.join(' ')) tot += 8;
+  return tot;
+}
+function placeFor(w) {
+  if (!w || w.length < 2) return null;
+  let best = null, bs = 0;
+  for (const pl of PLACES) {
+    for (const nm of [norm(pl.ka), norm(pl.en)]) {
+      let s = 0;
+      if (nm === w) s = 3; else if (nm.split(' ')[0] === w || nm.replace(/[\s-]/g, '') === w.replace(/[\s-]/g, '')) s = 2.6;
+      else if (w.length >= 3 && nm.startsWith(w)) s = 2;
+      else if (w.length >= 4 && stem(w).length >= 3 && nm.startsWith(stem(w))) s = 1.8;
+      if (pl.type === 'r' && pl.k === 'tbilisi') s -= 0.1;
+      if (s > bs) { bs = s; best = pl; }
+    }
+  }
+  return best ? { pl: best, s: bs } : null;
+}
+function segs(label, words) {
+  const low = label.toLowerCase(), mark = new Array(label.length).fill(false);
+  for (const w of words) {
+    for (const cand of [w, stem(w)]) {
+      if (cand.length < 2) continue;
+      let i = low.indexOf(cand);
+      while (i >= 0) { if (i === 0 || !/[ა-ჰa-z]/.test(low[i - 1])) for (let j = i; j < i + cand.length; j++) mark[j] = true; i = low.indexOf(cand, i + 1); }
+      if (mark.some(Boolean)) break;
+    }
+  }
+  const out = []; let cur = null;
+  for (let i = 0; i < label.length; i++) { if (!cur || cur.m !== mark[i]) { cur = { t: '', m: mark[i], u: !mark[i] }; out.push(cur); } cur.t += label[i]; }
+  return out.length ? out : [{ t: label, m: false, u: true }];
+}
+function search(q, L) {
+  index();
+  let words = wordsOf(q), alt = null;
+  if (!words.length) return null;
+  const run = (ws) => {
+    let place = null, rest = ws;
+    for (const w of ws) { const m = placeFor(w); if (m && m.s >= 1.8 && (!place || m.s > place.s)) place = Object.assign({ w }, m); }
+    if (!place && ws.length > 1) { const m = placeFor(ws.join(' ')); if (m && m.s >= 2) place = Object.assign({ w: ws.join(' ') }, m); }
+    if (place) { const nk = norm(place.pl.ka), ne = norm(place.pl.en); rest = ws.filter((w) => w !== place.w && !nk.includes(w) && !ne.includes(w)); }
+    const scored = PAGES.map((p) => ({ p, s: rest.length ? pageScore(p, rest) : 0 })).filter((x) => x.s > 0).sort((a, b) => b.s - a.s);
+    return { place, rest, scored };
+  };
+  let r = run(words);
+  if (!r.place && !r.scored.length && isLatin(q)) { const g = wordsOf(toKb(q.trim())); const r2 = run(g); if (r2.place || r2.scored.length) { alt = g.join(' '); words = g; r = r2; } }
+  const out = { alt, place: null, groups: [], shortcuts: [], total: 0, words };
+  if (r.place) {
+    const pl = r.place.pl, reg = REG[pl.ri];
+    const own = [], regional = [];
+    const keep = (p) => !r.rest.length || pageScore(p, r.rest) > 0;
+    const keepBudget = !r.rest.length || r.rest.every((w) => wscore(w, 'ბიუჯეტი ბიუჯეტის budget municipal მუნიციპალიტეტი') > 0);
+    const per100 = L ? ' per 100 deaths' : ' / 100 გარდაცვ.';
+    const val = (slug) => {
+      const pv = PV[pl.k] && PV[pl.k][slug];
+      if (pv) return { v: pv[L], per: pv[2] };
+      if (slug === 'demography/population') return { v: pl.pop, per: '2026' };
+      if (slug === 'demography/births-deaths') return { v: pl.bpd + per100, per: '2025' };
+      if (slug === 'inflation/cities' && CITY_INF[pl.k]) return { v: CITY_INF[pl.k], per: '2026-09' };
+      return null;
+    };
+    const rval = (slug) => {
+      const ri = pl.ri;
+      if (slug === 'unemployment/regions') return { v: UN_R[ri], per: '2025' };
+      if (slug === 'wages/regions') return { v: WG_R[ri] + (L ? ' GEL' : ' ₾'), per: '2025' };
+      const pv = PV[REG[ri][0]] && PV[REG[ri][0]][slug];
+      return pv ? { v: pv[L], per: pv[2] } : null;
+    };
+    if (keepBudget) own.push({ special: true, href: '/explorer/municipalities' + (pl.type === 'r' ? '' : '/' + pl.k), ka: pl.ka + (pl.type === 'r' ? ' — მუნიციპალიტეტების ბიუჯეტები' : ' — მუნიციპალიტეტის ბიუჯეტი'), en: pl.en + (pl.type === 'r' ? ' — municipal budgets' : ' — municipal budget'), value: { v: pl.bud[L], per: '2025' } });
+    for (const s of MUN_PAGES) { const p = PAGES.find((x) => x.slug === s); if (keep(p)) own.push({ p, value: val(s) }); }
+    if (pl.type === 'm') for (const s in CITY_PAGES) if (CITY_PAGES[s].includes(pl.k)) { const p = PAGES.find((x) => x.slug === s); if (keep(p)) own.push({ p, value: val(s) }); }
+    for (const s of REG_PAGES) { const p = PAGES.find((x) => x.slug === s); if (keep(p)) regional.push({ p, value: rval(s) }); }
+    const nMun = MUN.filter((m) => m[3] === pl.ri).length;
+    const isTb = pl.k === 'tbilisi';
+    out.place = { k: pl.k, type: pl.type, name: L ? pl.en : pl.ka,
+      typeLabel: pl.type === 'r' ? (L ? 'Region · ' + nMun + ' municipalities' : 'რეგიონი · ' + nMun + ' მუნიციპალიტეტი') : isTb ? (L ? 'Capital city' : 'დედაქალაქი') : (L ? 'Municipality · ' + reg[2] : 'მუნიციპალიტეტი · ' + reg[1]),
+      facts: [[L ? 'Population' : 'მოსახლეობა', pl.pop, '2026'], [L ? 'Budget' : 'ბიუჯეტი', pl.bud[L], '2025'], [L ? 'Budget per resident' : 'ბიუჯეტი ერთ მოსახლეზე', pl.pc + (L ? ' GEL' : ' ₾'), '2025'], [L ? 'Births per 100 deaths' : 'დაბადება 100 გარდაცვალებაზე', pl.bpd, '2025']] };
+    if (own.length) out.groups.push({ kind: 'own', label: L ? pl.en : pl.ka, tag: pl.type === 'r' ? (L ? 'Region and its municipalities' : 'რეგიონი და მისი მუნიციპალიტეტები') : isTb ? (L ? 'City data' : 'ქალაქის მონაცემები') : (L ? 'Municipality data' : 'მუნიციპალიტეტის მონაცემები'), items: own });
+    if (regional.length) out.groups.push({ kind: 'reg', label: L ? reg[2] : reg[1], tag: L ? 'Region data' : 'რეგიონის მონაცემები', items: regional });
+  } else {
+    /* one list, best match first — no grouping by hub */
+    if (r.scored.length) out.groups.push({ kind: 'flat', label: '', tag: '', items: r.scored.map((x) => ({ p: x.p, value: null })) });
+    const all = (name) => words.every((w) => wscore(w, norm(name)) >= 0.55);
+    HUBS.forEach((h, hi) => { if (all(h[1]) || all(h[2])) out.shortcuts.push({ hub: hi, topic: '' }); });
+    Object.keys(TOPICS).forEach((tk) => { const hi = HUBS.findIndex((h) => h[4].includes(tk)); if (HUBS[hi][4].length > 1 && (all(TOPICS[tk][0]) || all(TOPICS[tk][1]))) out.shortcuts.push({ hub: hi, topic: tk }); });
+  }
+  out.total = out.groups.reduce((n, g) => n + g.items.length, 0);
+  return out;
+}
+/* names that only make sense next to their topic get the topic in front, e.g. "ხელფასები — რეგიონები" */
+const GENERIC = ['რეგიონები', 'ხარჯები', 'შემოსავლები', 'პროდუქტები', 'კატეგორიები', 'ქალაქები', 'საქმიანობები', 'სექტორები', 'ანალიზი', 'ბრუნვა', 'დასაქმებულები', 'სქესი', 'ასაკობრივი ჯგუფები', 'ვალი', 'მუნიციპალიტეტები'];
+const rowLabel = (p, L) => GENERIC.includes(p.ka) ? (L ? TOPICS[p.topic][1] + ' — ' + p.en.toLowerCase() : TOPICS[p.topic][0] + ' — ' + p.ka) : (L ? p.en : p.ka);
+const fmtPer = (per, L) => { const m = /^(\d{4})-(\d\d)$/.exec(per || ''); return m ? MON[L ? 'en' : 'ka'][+m[2] - 1] + ' ' + m[1] : (per || ''); };
+const fmtDate = (d, L) => { const a = d.split('-'); return L ? +a[2] + ' ' + MON.en[+a[1] - 1] + ' ' + a[0] : a[2] + '.' + a[1] + '.' + a[0]; };
+const pad2 = (n) => (n < 10 ? '0' : '') + n;
+
+/* ===== drawing helpers ===== */
+const ysOf = (ys) => ys ? ys.split(',').map(Number) : null;
+function sparkD(ys, w, h, pad) {
+  const a = ysOf(ys); if (!a || a.length < 2) return '';
+  const p = pad == null ? 2 : pad;
+  return a.map((y, i) => (i ? 'L' : 'M') + (i * w / (a.length - 1)).toFixed(1) + ' ' + (p + (y - 1) / 32 * (h - 2 * p)).toFixed(1)).join(' ');
+}
+function valD(vals, w, h, top, bot) {
+  const mn = Math.min.apply(null, vals), mx = Math.max.apply(null, vals);
+  return vals.map((v, i) => (i ? 'L' : 'M') + (i * w / (vals.length - 1)).toFixed(1) + ' ' + (top + (1 - (v - mn) / (mx - mn)) * (h - top - bot)).toFixed(1)).join(' ');
+}
+const lastPct = (d, h) => { const m = /([\d.]+) ([\d.]+)$/.exec(d); return m ? (+m[2] / h * 100).toFixed(1) : 50; };
+const firstPct = (d, h) => { const m = /^M[\d.]+ ([\d.]+)/.exec(d); return m ? (+m[1] / h * 100).toFixed(1) : 50; };
+
+/* ===== labour-market detail read from the live pages ===== */
+const UN_SERIES = [27.2, 27.2, 26.7, 26.4, 23.0, 21.9, 21.7, 21.6, 19.2, 17.6, 18.5, 20.6, 17.3, 16.4, 13.9, 13.9];
+const WAGE_AVG = [13.5, 29.0, 42.5, 55.4, 67.5, 72.3, 94.6, 113.5, 125.9, 156.6, 204.2, 277.9, 368.1, 534.9, 556.8, 597.6, 636.0, 712.5, 773.1, 818.0, 900.4, 940.0, 999.1, 1068.3, 1129.5, 1191.0, 1304.5, 1543.0, 1766.8, 1970.8, 2165.2];
+const UN_REGV = [[0, 17.5], [2, 16.1], [6, 14.9], [9, 14.6], [8, 14.1], [3, 13.8], [4, 9.6], [1, 9.4], [5, 8.7], [10, 8.5], [7, 7.0]];
+const WG_REGV = [[0, 2565.0], [9, 1974.8], [3, 1800.3], [1, 1789.1], [4, 1439.4], [5, 1384.2], [7, 1343.9], [2, 1340.0], [6, 1318.4], [8, 1276.4], [10, 1138.5]];
+const AGE = [['15–19', 39.0], ['20–24', 30.2], ['25–29', 19.2], ['30–34', 16.9], ['35–39', 15.4], ['40–44', 13.3], ['45–49', 12.9], ['50–54', 12.6], ['55–59', 10.8], ['60–64', 8.1], ['65+', 3.5]];
+const WG_TOP = [['ფინანსები და დაზღვევა', 'Finance and insurance', 4123.6], ['ინფორმაცია და კომუნიკაცია', 'Information and communication', 4042.6], ['მშენებლობა', 'Construction', 3026.1]];
+const DESC = {
+  'unemployment/overview': ['უმუშევრობისა და შრომის ძალის ეროვნული ტენდენციები, დამატებითი ხედებით ქალაქისა და სოფლის, განათლებისა და უმუშევრობის ხანგრძლივობის მიხედვით.', 'National unemployment and labour-force trends, with supporting views by urban/rural settlement, education and unemployment duration.'],
+  'wages/overview': ['საქართველოში საშუალო თვიური ხელფასი 1995 წლიდან და მედიანური თვიური ხელფასი 2018 წლიდან, საჯარო და არასაჯარო სექტორების და ქალებისა და კაცების შედარებით.', 'Georgia’s average monthly wage since 1995 and median wage since 2018, comparing public and non-public employers, and women and men.']
+};
+const STAT_PICK = {
+  budget: ['revenue', 'expenditure', 'debt', 'deficit'], economy: ['economy/gdp', 'business/sales', 'business/jobs', 'housing/permits'],
+  prices: ['inflation/overview', 'money/interest-rates', 'money/supply', 'money/loans-deposits'], living: ['living-standards/income', 'living-standards/poverty', 'living-standards/inequality', 'health/pensions'],
+  external: ['trade/overview', 'external/money-from-abroad', 'external/foreign-investment', 'trade/partners'], demography: ['demography/population', 'demography/age-sex', 'demography/births-deaths', 'demography/migration'],
+  society: ['education/schools', 'education/universities', 'internet/users', 'crime/recorded']
+};
+const STAT_LABEL = {
+  'deficit': ['დეფიციტი, მშპ-ის %', 'Deficit, % of GDP'], 'economy/gdp': ['ნომინალური მშპ', 'Nominal GDP'], 'business/sales': ['ბიზნესის ბრუნვა', 'Business sales'], 'business/jobs': ['ბიზნესში დასაქმებულები', 'Jobs in business'],
+  'trade/overview': ['საგარეო ვაჭრობის ბრუნვა', 'Trade turnover'], 'trade/partners': ['უმსხვილესი პარტნიორი — თურქეთი', 'Largest partner — Turkey'], 'external/money-from-abroad': ['ფულადი გზავნილები', 'Remittances'],
+  'demography/age-sex': ['65+ წლის მოსახლეობა', 'Population aged 65+'], 'demography/births-deaths': ['დაბადება', 'Births'], 'demography/migration': ['წმინდა მიგრაცია', 'Net migration'], 'education/schools': ['სკოლის მოსწავლეები', 'School pupils'], 'education/universities': ['სტუდენტები', 'University students']
+};
+const STATS = {
+  labour: [[['უმუშევრობის დონე', 'Unemployment rate'], ['13.9%', '13.9%'], '2025', 'unemployment/overview'], [['საშუალო ხელფასი', 'Average monthly wage'], ['2,165 ₾', '2,165 GEL'], '2025', 'wages/overview'], [['დასაქმებული', 'People in work'], ['1.39 მლნ', '1.39 million'], '2025', 'unemployment/industries'], [['არაფორმალური დასაქმება', 'Informal jobs'], ['28.3%', '28.3%'], '2025', 'unemployment/informal']]
+};
+const T = {
+  ka: { skip: 'მთავარ შინაარსზე გადასვლა', brandSub: 'ღია მონაცემები', nav: 'მონაცემების ნავიგაცია', search: 'ძებნა', searchAll: 'ძებნა ყველა მონაცემში', allData: 'ყველა მონაცემი', hubs: 'თემები', collapse: 'გვერდითი პანელის ჩაკეცვა', expand: 'გვერდითი პანელის გაშლა', menu: 'მენიუ', close: 'მენიუს დახურვა', method: 'მეთოდოლოგია', ai: 'AI-კავშირი', langLabel: 'ენა', crumbs: 'სად ხართ', home: 'მთავარი', data: 'მონაცემები',
+    allTitle: 'ყველა მონაცემი', allLine: 'მოძებნეთ ან დაათვალიერეთ.', allMeta: '100 გვერდი · განახლდა 21.10.2026', qLabel: 'მოძებნეთ მონაცემები', ph: 'ინფლაცია, ბათუმი, ხელფასები…', try: 'სცადეთ:', clear: 'ძებნის გასუფთავება', results: 'შედეგები', keys: '↑ ↓ არჩევა · Enter გახსნა · Esc გასუფთავება', noneHint: 'სცადეთ სხვა სიტყვა, ქალაქი ან რეგიონი, ან ინგლისური სახელი.',
+    idxTitle: 'ყველა გვერდი ანბანის მიხედვით', azLabel: 'ანბანი — გადადით ასოზე', showAll: 'ყველა გვერდის ნახვა', updated: 'განახლდა', pages: 'გვერდი', topicsLit: 'ქვეთემა', annual: 'წლიური მონაცემები', regionsN: '11 რეგიონი', topicsNav: 'ქვეთემები ამ გვერდზე', fromSearch: 'ძებნიდან', expandHub: 'გაშლა', collapseHub: 'ჩაკეცვა', topicOf: 'ქვეთემა · ', hubKind: 'თემა', alt: 'ქართული განლაგებით:' },
+  en: { skip: 'Skip to content', brandSub: 'Open data', nav: 'Data navigation', search: 'Search', searchAll: 'Search all data', allData: 'All data', hubs: 'Hubs', collapse: 'Collapse sidebar', expand: 'Expand sidebar', menu: 'Menu', close: 'Close menu', method: 'Methodology', ai: 'AI connection', langLabel: 'Language', crumbs: 'You are here', home: 'Home', data: 'Data',
+    allTitle: 'All data', allLine: 'Search or browse every page.', allMeta: '100 pages · updated 21 Oct 2026', qLabel: 'Search the data', ph: 'Inflation, Batumi, wages…', try: 'Try:', clear: 'Clear search', results: 'Results', keys: '↑ ↓ to move · Enter to open · Esc to clear', noneHint: 'Try another word, a town or region, or the Georgian name.',
+    idxTitle: 'All pages, A to Z', azLabel: 'Alphabet — jump to a letter', showAll: 'Show all pages', updated: 'Updated', pages: 'pages', topicsLit: 'topics', annual: 'annual data', regionsN: '11 regions', topicsNav: 'Topics on this page', fromSearch: 'From search', expandHub: 'Expand', collapseHub: 'Collapse', topicOf: 'Topic in ', hubKind: 'Hub', alt: 'Read with the Georgian keyboard:' }
+};
+const CHIPS = { ka: ['ბათუმი', 'ინფლაცია', 'ხელფასები', 'მშპ', 'NEET'], en: ['Batumi', 'inflation', 'wages', 'GDP', 'xelfasebi'] };
+
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    const P = props || {}, on = (v) => v === true || v === '1' || v === 'true';
+    this.state = { view: P.view || 'all', hub: P.hub || 'labour', q: P.q || '', act: -1, rail: on(P.rail), menu: on(P.menu), fly: P.fly || '', lang: P.lang === 'en' ? 'en' : 'ka', focus: P.focus || '', open: {} };
+    this.els = {}; const keep = (k) => (el) => { if (el) this.els[k] = el; };
+    this.r = { root: keep('root'), q: keep('q'), close: keep('close'), menuBtn: keep('menuBtn') };
+    this.flat = [];
+    this.pending = null;
+    this.onInput = (e) => this.setState({ q: e.target.value, act: -1 });
+    this.onKey = (e) => {
+      const n = this.flat.length, a = this.state.act;
+      if (e.key === 'ArrowDown') { e.preventDefault(); if (n) this.setState({ act: (a + 1) % n }); }
+      else if (e.key === 'ArrowUp') { e.preventDefault(); if (n) this.setState({ act: a <= 0 ? n - 1 : a - 1 }); }
+      else if (e.key === 'Enter') { if (a >= 0 && this.flat[a]) { e.preventDefault(); this.flat[a](); } }
+      else if (e.key === 'Escape') { if (this.state.q) { e.preventDefault(); this.setState({ q: '', act: -1 }); } }
+    };
+    this.clear = () => { this.setState({ q: '', act: -1 }); this.pending = 'q'; };
+    this.goAll = (e) => { if (e) e.preventDefault(); this.setState({ view: 'all', focus: '', menu: false, fly: '' }); this.pending = 'top'; };
+    this.goSearch = () => { this.setState({ view: 'all', menu: false, fly: '' }); this.pending = 'q'; };
+    this.toggleRail = () => this.setState({ rail: !this.state.rail, fly: '' });
+    this.openMenu = () => { this.setState({ menu: true }); this.pending = 'close'; };
+    this.closeMenu = () => { this.setState({ menu: false }); this.pending = 'menuBtn'; };
+    this.onRootKey = (e) => {
+      if (e.key === 'Escape' && this.state.menu) { this.closeMenu(); }
+      else if (e.key === 'Escape' && this.state.fly) { const a = this.els.root && this.els.root.querySelector('.dx-hub.is-open .dx-hub-link'); if (a) a.focus(); this.setState({ fly: '' }); }
+    };
+    /* "/" jumps to search from anywhere on the page, unless someone is typing */
+    this.onDocKey = (e) => {
+      if (e.key !== '/' || e.defaultPrevented || e.ctrlKey || e.metaKey || e.altKey) return;
+      const tg = e.target;
+      if (tg && (tg.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(tg.tagName))) return;
+      e.preventDefault(); this.goSearch();
+    };
+    this.setKa = () => this.setState({ lang: 'ka' });
+    this.setEn = () => this.setState({ lang: 'en' });
+  }
+  goHub(id, e, topic) { if (e) e.preventDefault(); this.setState({ view: 'hub', hub: id, focus: '', menu: false, fly: '', open: Object.assign({}, this.state.open, { [id]: true }) }); this.pending = topic ? '#t-' + topic : 'top'; }
+  goPage(p, e) { if (e) e.preventDefault(); const id = HUBS[p.hub][0]; this.setState({ view: 'hub', hub: id, focus: p.slug, menu: false, fly: '', open: Object.assign({}, this.state.open, { [id]: true }) }); this.pending = 'focus'; }
+  componentDidMount() { document.addEventListener('keydown', this.onDocKey); }
+  componentWillUnmount() { document.removeEventListener('keydown', this.onDocKey); }
+  componentDidUpdate() {
+    const pd = this.pending; if (!pd) return; this.pending = null;
+    const root = this.els.root; if (!root) return;
+    try {
+      if (pd === 'q' || pd === 'close' || pd === 'menuBtn') { const el = this.els[pd]; if (el && el.offsetParent !== null) el.focus(); }
+      else if (pd === 'top') { window.scrollTo(0, 0); const m = root.querySelector('#dx-main'); if (m) m.focus({ preventScroll: true }); }
+      else if (pd === 'focus') { const el = root.querySelector('[data-focus="true"]'); if (el) { const r = el.getBoundingClientRect(); window.scrollTo(0, Math.max(0, r.top + window.scrollY - (window.innerHeight - r.height) / 2)); el.focus({ preventScroll: true }); } }
+      else { const el = root.querySelector(pd); if (el) { window.scrollTo(0, Math.max(0, el.getBoundingClientRect().top + window.scrollY - (parseFloat(getComputedStyle(el).scrollMarginTop) || 0))); el.focus({ preventScroll: true }); } }
+    } catch (err) {}
+  }
+  renderVals() {
+    index();
+    const S = this.state, L = S.lang === 'en' ? 1 : 0, t = T[L ? 'en' : 'ka'], lp = L ? '/en' : '';
+    const nP = (n) => n + ' ' + (L && n === 1 ? 'page' : t.pages);
+    const pageHref = (p) => 'https://fiscal.ge' + lp + '/explorer/' + p.slug;
+    const hubHref = (hi) => 'https://fiscal.ge' + lp + '/explorer/' + HUBS[hi][0];
+    const icon = (hi) => HUBS[hi][3];
+    const name = (p) => L ? p.en : p.ka;
+    const curHi = S.view === 'hub' ? Math.max(0, HUBS.findIndex((h) => h[0] === S.hub)) : -1;
+
+    /* sidebar */
+    const sideHubs = HUBS.map((h, hi) => {
+      const id = h[0], open = S.rail ? S.fly === id : (S.open[id] !== undefined ? S.open[id] : hi === curHi);
+      const cnt = PAGES.filter((p) => p.hub === hi).length;
+      return { id, name: h[1 + L], icon: icon(hi), count: cnt, aria: h[1 + L] + ', ' + nP(cnt), flyMeta: (h[4].length > 1 ? h[4].length + ' ' + t.topicsLit + ' · ' : '') + nP(cnt), href: hubHref(hi), cur: hi === curHi && !S.focus ? 'page' : undefined,
+        cls: (hi === curHi ? 'is-cur ' : '') + (open ? 'is-open' : ''), open, bodyId: 'dx-hb-' + id, togLabel: (open ? t.collapseHub : t.expandHub) + ': ' + h[1 + L],
+        toggle: () => this.setState({ open: Object.assign({}, this.state.open, { [id]: !open }) }), go: (e) => this.goHub(id, e),
+        enter: () => { if (this.state.rail && this.state.fly !== id) this.setState({ fly: id }); }, leave: () => { if (this.state.rail && this.state.fly === id) this.setState({ fly: '' }); },
+        focus: () => { if (this.state.rail && this.state.fly !== id) this.setState({ fly: id }); }, blur: (e) => { if (this.state.rail && this.state.fly === id && !(e.relatedTarget && e.currentTarget.contains(e.relatedTarget))) this.setState({ fly: '' }); },
+        topics: h[4].map((tk) => ({ label: h[4].length > 1 ? TOPICS[tk][L] : '', pages: PAGES.filter((p) => p.topic === tk).map((p) => ({ name: name(p), href: pageHref(p), cls: S.focus === p.slug ? 'is-cur' : '', cur: S.focus === p.slug ? 'page' : undefined, go: (e) => this.goPage(p, e) })) })) };
+    });
+    const side = { hubs: sideHubs, allCls: S.view === 'all' ? 'is-cur' : '', allCur: S.view === 'all' ? 'page' : undefined, allHref: 'https://fiscal.ge' + lp + '/explorer', railLabel: S.rail ? t.expand : t.collapse, railIcon: S.rail ? 'panel-open' : 'panel-close' };
+
+    /* all data */
+    const res = S.view === 'all' && S.q.trim() ? search(S.q, L) : null;
+    const flat = []; let k = 0;
+    const opt = (open) => { const idx = k++; flat.push(open); const sel = idx === S.act; return { id: 'dx-o' + idx, sel, cls: sel ? 'is-act' : '', hover: () => { if (this.state.act !== idx) this.setState({ act: idx }); } }; };
+    let R = null;
+    if (res) {
+      const words = res.words;
+      const shortcuts = res.shortcuts.map((sc) => {
+        const n = PAGES.filter((p) => p.hub === sc.hub && (!sc.topic || p.topic === sc.topic)).length;
+        const go = (e) => this.goHub(HUBS[sc.hub][0], e, sc.topic);
+        const scName = sc.topic ? TOPICS[sc.topic][L] : HUBS[sc.hub][1 + L], scKind = sc.topic ? t.topicOf + HUBS[sc.hub][1 + L] : t.hubKind;
+        return Object.assign(opt(() => go()), { name: scName, kind: scKind, aria: scName + ' — ' + scKind + ', ' + nP(n), count: nP(n), icon: icon(sc.hub), href: hubHref(sc.hub) + (sc.topic ? '#t-' + sc.topic : ''), go });
+      });
+      const groups = res.groups.map((g, gi) => ({ hid: 'dx-g' + gi, lby: g.label ? 'dx-g' + gi : undefined, role: g.label ? 'group' : 'presentation', cls: g.label ? '' : 'is-flat', label: g.label, tag: g.tag, count: nP(g.items.length), items: g.items.map((it) => {
+        if (it.special) {
+          const href = 'https://fiscal.ge' + lp + it.href;
+          return Object.assign(opt(() => { try { window.open(href, '_blank', 'noopener'); } catch (err) {} }), { aria: (L ? it.en : it.ka) + ', ' + it.value.v + ' (' + it.value.per + ')', icon: 'landmark', segs: segs(L ? it.en : it.ka, words), sub: HUBS[0][1 + L] + ' › ' + (L ? 'Municipalities' : 'მუნიციპალიტეტები'), mirror: segs(L ? it.ka : it.en, words), mLang: L ? 'ka' : 'en', spark: '', value: it.value.v, per: it.value.per, href, go: undefined });
+        }
+        const p = it.p;
+        const go = (e) => this.goPage(p, e);
+        const crumb = HUBS[p.hub][1 + L] + (HUBS[p.hub][4].length > 1 ? ' › ' + TOPICS[p.topic][L] : '');
+        const placeMode = g.kind === 'own' || g.kind === 'reg', v = placeMode ? it.value : { v: p.v[L], per: p.per };
+        const vv = v && v.v ? v.v + ' (' + fmtPer(v.per, L) + ')' : '';
+        return Object.assign(opt(() => go()), { aria: rowLabel(p, L) + (vv ? ', ' + vv : '') + ' — ' + crumb, icon: icon(p.hub), segs: segs(rowLabel(p, L), words), sub: crumb, mirror: segs(L ? p.ka : p.en, words), mLang: L ? 'ka' : 'en', spark: placeMode ? '' : sparkD(p.ys, 88, 22), value: v && v.v ? v.v : '', per: v && v.v ? fmtPer(v.per, L) : '', href: pageHref(p), go });
+      }) }));
+      const pl = res.place;
+      const total = res.total + shortcuts.length;
+      R = { alt: res.alt || '', altPre: t.alt, place: pl ? { name: pl.name, type: pl.typeLabel, facts: pl.facts.map((f) => ({ l: f[0], v: f[1], per: f[2] })) } : null, shortcuts, groups,
+        none: total === 0, noneMsg: L ? 'Nothing matches “' + S.q.trim() + '”' : '„' + S.q.trim() + '“ ვერ მოიძებნა' };
+    }
+    this.flat = flat;
+    /* every page, A–Z (Georgian order ა–ჰ, or A–Z in English), split into two balanced columns */
+    const ABC = L ? 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' : 'აბგდევზთიკლმნოპჟრსტუფქღყშჩცძწჭხჯჰ';
+    const sorted = PAGES.map((p) => ({ p, label: rowLabel(p, L) })).sort((a, b) => L ? a.label.localeCompare(b.label, 'en', { sensitivity: 'base' }) : (a.label < b.label ? -1 : a.label > b.label ? 1 : 0));
+    const byLetter = {};
+    sorted.forEach((r) => { const c = L ? r.label[0].toUpperCase() : r.label[0]; (byLetter[c] = byLetter[c] || []).push(r); });
+    const lid = (c) => 'dx-l-' + c.codePointAt(0);
+    const letterGroups = Object.keys(byLetter).sort((a, b) => ABC.indexOf(a) - ABC.indexOf(b)).map((c) => ({ id: lid(c), hid: lid(c) + '-h', ch: c, count: byLetter[c].length,
+      rows: byLetter[c].map((r) => { const p = r.p; return { name: r.label, tag: HUBS[p.hub][1 + L], icon: icon(p.hub), href: pageHref(p), go: (e) => this.goPage(p, e), spark: sparkD(p.ys, 44, 14, 1), map: !p.ys && /regions$/.test(p.slug), value: p.v[L], per: p.v[L] ? fmtPer(p.per, L) : '' }; }) }));
+    const weight = (g) => g.count + 1.4, half = letterGroups.reduce((n, g) => n + weight(g), 0) / 2;
+    let acc = 0, cut = letterGroups.length;
+    for (let i = 0; i < letterGroups.length; i++) { if (acc + weight(letterGroups[i]) / 2 > half) { cut = i; break; } acc += weight(letterGroups[i]); }
+    const cols = [{ groups: letterGroups.slice(0, cut) }, { groups: letterGroups.slice(cut) }];
+    const az = ABC.split('').map((c) => byLetter[c]
+      ? { ch: c, on: true, off: false, id: lid(c), aria: c + ' — ' + nP(byLetter[c].length), go: (e) => { e.preventDefault(); this.pending = '#' + lid(c); this.forceUpdate(); } }
+      : { ch: c, on: false, off: true });
+    const total = res ? res.total + R.shortcuts.length : 0;
+    const all = { q: S.q, hasQ: !!res, noQ: !res, onInput: this.onInput, onKey: this.onKey, clear: this.clear,
+      expanded: !!res && total > 0, lbRole: res && total > 0 ? 'listbox' : undefined, lbLabel: res && total > 0 ? t.results : undefined, activeId: S.act >= 0 && S.act < flat.length ? 'dx-o' + S.act : undefined,
+      count: res ? nP(total) : '', announce: res ? (total ? (L ? total + (total === 1 ? ' result' : ' results') : 'ნაპოვნია ' + total + ' შედეგი') : R.noneMsg) : '',
+      chips: CHIPS[L ? 'en' : 'ka'].map((c) => ({ label: c, pick: () => { this.setState({ q: c, act: -1 }); this.pending = 'q'; } })),
+      res: R, az, cols };
+
+    /* hub page */
+    let hub = null;
+    if (S.view === 'hub') {
+      const hi = curHi, h = HUBS[hi], ps = PAGES.filter((p) => p.hub === hi), multi = h[4].length > 1;
+      const latest = h[4].map((tk) => TOPICS[tk][3]).sort().pop();
+      let stats;
+      if (STATS[h[0]]) stats = STATS[h[0]].map((s) => { const p = PAGES.find((x) => x.slug === s[3]); return { label: s[0][L], value: s[1][L], per: s[2], spark: sparkD(p.ys, 200, 24, 2), href: pageHref(p) }; });
+      else stats = STAT_PICK[h[0]].map((sl) => { const p = PAGES.find((x) => x.slug === sl); return { label: STAT_LABEL[sl] ? STAT_LABEL[sl][L] : name(p), value: p.v[L], per: fmtPer(p.per, L), spark: sparkD(p.ys, 200, 24, 2), href: pageHref(p) }; });
+      const gutter = (txt) => { const g = Math.round(String(txt).length * 7.4 + 16); return { gut: g, gutDot: g - 3, labW: g - 9 }; };
+      const card = (p, j, lead) => {
+        const focus = S.focus === p.slug;
+        const c = { n: pad2(j + 1), title: name(p), href: pageHref(p), focus, cls: (lead ? 'dx-lead ' + lead : '') + (focus ? ' is-focus' : ''), desc: lead && DESC[p.slug] ? DESC[p.slug][L] : '',
+          value: p.v[L], cap: [p.c[L], fmtPer(p.per, L)].filter(Boolean).join(' · '), foot: p.yrs + (p.per ? '' : ' · ' + t.annual) };
+        const s = p.slug;
+        if (lead && (s === 'unemployment/overview' || s === 'wages/overview')) {
+          const v = s === 'unemployment/overview' ? UN_SERIES : WAGE_AVG, d = valD(v, 600, 160, 30, 10);
+          Object.assign(c, { isLead: true, line: d, area: d + ' L600 160 L0 160 Z', endY: lastPct(d, 160), sY: firstPct(d, 160), sV: s === 'unemployment/overview' ? '27.2%' : (L ? '13.5 GEL' : '13.5 ₾'), eV: p.v[L], y0: s === 'unemployment/overview' ? '2010' : '1995', y1: '2025' }, gutter(p.v[L]));
+        } else if (lead && p.ys) {
+          const d = sparkD(p.ys, 600, 160, 14), yr = p.yrs.split('–');
+          Object.assign(c, { isLead: true, line: d, area: d + ' L600 160 L0 160 Z', endY: lastPct(d, 160), sY: firstPct(d, 160), sV: '', eV: p.v[L], y0: yr[0], y1: yr[1] || '' }, gutter(p.v[L]));
+        } else if (s === 'unemployment/regions') {
+          Object.assign(c, { isDots: true, dots: UN_REGV.map((r) => ({ x: (r[1] / 20 * 100).toFixed(1), cls: r[1] === 17.5 || r[1] === 7.0 ? 'is-key' : '' })), nat: 69.5, lo: REG[7][1 + L] + ' 7.0%', loX: 35, hi: REG[0][1 + L] + ' 17.5%', value: '7.0–17.5%', cap: t.regionsN + ' · 2025', natKey: (L ? 'Georgia ' : 'საქართველო ') + '13.9%' });
+        } else if (s === 'wages/regions') {
+          const x = (v) => ((v - 1000) / 1700 * 100).toFixed(1);
+          Object.assign(c, { isDots: true, dots: WG_REGV.map((r) => ({ x: x(r[1]), cls: r[1] === 2565.0 || r[1] === 1138.5 ? 'is-key' : '' })), nat: x(2165.2), lo: REG[10][1 + L].split(' ')[0] + ' 1,138.5', loX: x(1138.5), hi: REG[0][1 + L] + ' 2,565.0', value: L ? '1,138.5–2,565.0 GEL' : '1,138.5–2,565.0 ₾', cap: t.regionsN + ' · 2025', natKey: (L ? 'Georgia ' : 'საქართველო ') + '2,165.2' });
+        } else if (s === 'unemployment/age') {
+          Object.assign(c, { isBars: true, bars: AGE.map((a, i) => ({ h: (a[1] / 39 * 100).toFixed(1), cls: i < 3 ? 'is-acc' : '' })), b0: '15–19', b1: '65+', value: '39.0%', cap: (L ? 'ages 15–19' : '15–19 წლის') + ' · 2025' });
+        } else if (s === 'unemployment/gender') {
+          Object.assign(c, { isPair: true, pair: [{ l: L ? 'Men' : 'კაცები', w: (15.8 / 20 * 100).toFixed(1), v: '15.8%', cls: '' }, { l: L ? 'Women' : 'ქალები', w: (11.4 / 20 * 100).toFixed(1), v: '11.4%', cls: '' }], value: '', cap: '', visCls: 'is-flow' });
+          c.foot = p.yrs + ' · 2025';
+        } else if (s === 'wages/industries') {
+          Object.assign(c, { isPair: true, pair: WG_TOP.map((w, i) => ({ l: w[L], w: (w[2] / 4300 * 100).toFixed(1), v: w[2].toLocaleString('en-US', { minimumFractionDigits: 1 }), cls: i === 0 ? 'is-acc' : '' })), value: '', cap: '', visCls: 'is-flow' });
+          c.foot = (L ? '19 activities · ' : '19 საქმიანობა · ') + p.yrs;
+        } else if (p.ys) {
+          const d = sparkD(p.ys, 200, 58, 6);
+          Object.assign(c, { isSpark: true, line: d, area: d + ' L200 58 L0 58 Z', endY: lastPct(d, 58) });
+        } else if (/regions$/.test(s)) {
+          Object.assign(c, { isMap: true, mapText: (L ? 'Map and list · ' : 'რუკა და სია · ') + t.regionsN });
+        }
+        return c;
+      };
+      hub = { name: h[1 + L], icon: icon(hi), line: HUB_LINE[h[0]][L], multi, stats,
+        meta: (multi ? h[4].length + ' ' + t.topicsLit + ' · ' : '') + ps.length + ' ' + t.pages + ' · ' + t.updated + ' ' + fmtDate(latest, L),
+        topics: h[4].map((tk) => {
+          const tps = ps.filter((p) => p.topic === tk), kk = tps.length - 1;
+          const lead = kk % 3 === 1 ? 'lead2' : kk % 3 === 2 ? 'lead2x2' : 'lead3';
+          return { id: 't-' + tk, hid: 'th-' + tk, anchor: '#t-' + tk, jump: (e) => { e.preventDefault(); this.pending = '#t-' + tk; this.forceUpdate(); }, label: TOPICS[tk][L], count: tps.length, cells: tps.map(() => 0),
+            meta: TOPICS[tk][2] + ' · ' + t.updated + ' ' + fmtDate(TOPICS[tk][3], L) + ' · ' + tps.length + ' ' + t.pages, line: TOPICS[tk][4 + L], showHead: multi, noHead: !multi, cls: multi ? '' : 'is-solo',
+            cards: tps.map((p, j) => card(p, j, j === 0 ? lead : '')) };
+        }) };
+    }
+    return { r: this.r, t, lang: L ? 'en' : 'ka', isKa: !L, isEn: !!L, mods: (S.rail ? 'is-rail ' : '') + (S.menu ? 'is-menu' : ''), rail: S.rail, menu: S.menu,
+      isAll: S.view === 'all', isHub: S.view === 'hub', side, all, hub: hub || {}, onRootKey: this.onRootKey, goAll: this.goAll, goSearch: this.goSearch, toggleRail: this.toggleRail, openMenu: this.openMenu, closeMenu: this.closeMenu, setKa: this.setKa, setEn: this.setEn };
+  }
+}
+</script>
+</body>
+</html>
