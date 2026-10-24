@@ -70,7 +70,7 @@ Every route also exists under `/en`. `/explorer/economy`, `/explorer/external` a
 
 Only the exact topic addresses forward. Addresses below them, such as `/explorer/wages/overview` and `/explorer/wages/regions/adjara`, stay as they are. `/explorer` itself becomes All data and cannot forward to Budget. People who bookmarked it land on All data, which links Budget first.
 
-The `#t-…` part is written into the forward. If a check of the built site shows the hash is dropped, the group page reads the old topic from the referrer path instead. The plan's verification step settles which one applies.
+How the section is reached: the server forward carries the topic as `?topic={topic}` (for example `/explorer/labour?topic=wages`) and no `#` part, so the browser keeps any `#…` the old link had. On the group page a small script then rewrites the address to `#t-{topic}` and scrolls there. Before that, it hands an old link's view state to the page that now serves it: the Unemployment hub's legacy `#breakdown=…` links (today `UnemploymentLegacyLink`) move to the Labour market page, and the Budget hub's legacy `#nav=…` links (`LegacyHashRedirect`) stay on `/explorer`. A forward cannot write `#t-…` itself, because a `#` in the forward's target would replace the old link's `#…` state.
 
 ## 4. Sidebar (`components/shell/data-sidebar.tsx`)
 
