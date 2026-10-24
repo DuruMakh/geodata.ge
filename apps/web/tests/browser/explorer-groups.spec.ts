@@ -253,8 +253,9 @@ test("a Budget chart page's Budget crumb goes to the Budget group page", async (
 
 test("at 1440px a lead card that spans the row puts its chart beside its text", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
-  // Budget's seven pages give a lead that spans the whole row (leadSpan: lead3).
-  await page.goto("/explorer/budget");
+  // Economy's four pages give a lead that spans the whole row (leadSpan: lead3); Budget's eight give a two-column lead now.
+  expect(topicHub("economy").sections.length % 3).toBe(1);
+  await page.goto("/explorer/economy");
   await ready(page);
   const cards = page.getByTestId("explorer-card");
   const lead = cards.first();
