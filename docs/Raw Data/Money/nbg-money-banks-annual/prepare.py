@@ -1,4 +1,4 @@
-"""Reproduce and check the annual money, loans, deposits, interest-rate and bank-health research package.
+"""Reproduce and check the annual money, loans (in total, by borrower, purpose and region), deposits, interest-rate and bank-health research package.
 
 Uses Python's standard library only. Never downloads sources or serves product data.
 The worksheet reader and CSV writer are reused from the unemployment package, as the poverty package does.
@@ -51,6 +51,9 @@ SOURCES = [
     ('nbg_meth_loans', 'Methodology: loans', FILES + 'loans/eng/loans-meth-noteseng.pdf', 'official/loans-meth-noteseng.pdf', 'application/pdf', '2026-10-11T05:39:03Z'),
     ('nbg_meth_deposits', 'Methodology: deposits', FILES + 'deposits/eng/deposits-meth-noteseng.pdf', 'official/deposits-meth-noteseng.pdf', 'application/pdf', '2026-10-11T05:39:04Z'),
     ('nbg_meth_interest_rates', 'Methodology: interest rates', FILES + 'financial_markets/eng/interest-rates-methodology-eng.pdf', 'official/interest-rates-methodology-eng.pdf', 'application/pdf', '2026-10-11T05:39:06Z'),
+    ('nbg_loans_structure_l3_10_1', 'L3.10.1 Loans to the National Economy (stocks), by borrower and type of activity', FILES + 'loans/eng/loans-structure-l3-10-1eng.xlsx', 'official/loans-structure-l3-10-1eng.xlsx', XLSX, '2026-10-24T15:37:01Z'),
+    ('nbg_loans_purpose_lop', 'LPR Loans by Purpose (stocks), households sheet', FILES + 'loans/eng/loans-by-lopeng.xlsx', 'official/loans-by-lopeng.xlsx', XLSX, '2026-10-24T15:37:03Z'),
+    ('nbg_loans_regions_lreg', 'LREG Loans by Regions (stocks), lari and foreign-currency sheets', FILES + 'loans/eng/loans-by-regions-lregeng.xlsx', 'official/loans-by-regions-lregeng.xlsx', XLSX, '2026-10-24T15:37:04Z'),
     ('nbg_api_category_15', 'NBG file list, category 15 (monetary statistics)', API.format(15), 'official/api-category-15.json', 'application/json', '2026-10-11T05:39:07Z'),
     ('nbg_api_category_16', 'NBG file list, category 16 (deposits)', API.format(16), 'official/api-category-16.json', 'application/json', '2026-10-11T05:39:07Z'),
     ('nbg_api_category_17', 'NBG file list, category 17 (loans)', API.format(17), 'official/api-category-17.json', 'application/json', '2026-10-11T05:39:09Z'),
@@ -84,6 +87,28 @@ CURRENT_ROWS = {
     'banks.npl_ratio': 'Nonperforming loans to total gross loans', 'banks.roa': 'Return on assets', 'banks.roe': 'Return on equity',
     'banks.capital_ratio': 'Regulatory capital to risk-weighted assets', 'banks.tier1_ratio': 'Tier 1 capital to risk-weighted assets'}
 CURRENT_YEARS = (2022, 2025)
+# Printed headings of L3.10.1 row 4 (a heading is matched by its start, since NBG prints "Transactions in Real Estates, Researches").
+INDUSTRY_LABELS = {
+    'agriculture': 'Agriculture, Forestry, Fishing', 'industry': 'Industry', 'construction': 'Construction', 'trade': 'Trade',
+    'hotels_restaurants': 'Hotels and Restaurants', 'transport_communications': 'Transport and Communications',
+    'financial': 'Financial Intermediation', 'real_estate': 'Transactions in Real Estate', 'education': 'Education',
+    'health_social': 'Health Care and Social Services', 'other_services': 'Other Services'}
+# Printed labels in column A of LOP sheet HH, repeated under "In National Currency" and under "In Foreign Currency".
+PURPOSE_LABELS = {
+    'consumer': 'Consumer Loans', 'home': 'Mortgage loans for real estate purchase and repair', 'sme': 'Business loans for SME',
+    'large_business': 'Business loans for large enterprises', 'car': 'Auto loans', 'pawn': 'Lombard Loans', 'other': 'Other Loans'}
+# Printed region labels of LREG (text before the first comma, because NC prints "Adjara, Autonomous Republic of" and FC "Adjara").
+REGION_LABELS = {
+    'Tbilisi': 'region_tbilisi', 'Adjara': 'region_adjara', 'Guria': 'region_guria', 'Imereti': 'region_imereti',
+    'Kakheti': 'region_kakheti', 'Mtskheta-Mtianeti': 'region_mtskheta_mtianeti',
+    'Racha-Lechkhumi and Kvemo Svaneti': 'region_racha_lechkhumi_kvemo_svaneti',
+    'Samegrelo-Zemo Svaneti': 'region_samegrelo_zemo_svaneti', 'Samtskhe-Javakheti': 'region_samtskhe_javakheti',
+    'Kvemo Kartli': 'region_kvemo_kartli', 'Shida Kartli': 'region_shida_kartli'}
+AREAS = ['georgia'] + list(REGION_LABELS.values())
+BORROWERS = ['borrowers.total', 'borrowers.businesses', 'borrowers.households', 'borrowers.people', 'borrowers.individual_entrepreneurs']
+INDUSTRIES = [f'borrowers.industry.{industry}' for industry in INDUSTRY_LABELS]
+PURPOSES = [f'households.purpose.{purpose}' for purpose in PURPOSE_LABELS]
+REGIONAL = [f'loans_region.{area}.{part}' for area in AREAS for part in ('total', 'gel', 'fx')]
 COVERAGE = {
     **{indicator: (1995, 2025) for indicator in MONEY}, **{indicator: (1996, 2025) for indicator in MONETIZATION},
     'loans.total': (2002, 2025), 'loans.gel': (2002, 2025), 'loans.fx': (2002, 2025), 'loans.fx_share': (2002, 2025),
@@ -93,13 +118,21 @@ COVERAGE = {
     **{f'rates.loans_{part}': (1996, 2025) for part in RATE_GROUPS.values()},
     **{f'rates.deposits_{part}': (1996, 2025) for part in RATE_GROUPS.values()},
     'banks.npl_ratio': (2003, 2025), 'banks.roa': (2001, 2025), 'banks.roe': (2001, 2025),
-    'banks.capital_ratio': (2014, 2025), 'banks.tier1_ratio': (2014, 2025)}
-CALCULATED = ('deposits.total', 'deposits.individuals', 'deposits.legal_entities', 'loans.fx_share', 'deposits.fx_share')
+    'banks.capital_ratio': (2014, 2025), 'banks.tier1_ratio': (2014, 2025),
+    # Households and individual entrepreneurs are published only from December 2015; the purpose and region tables start then too.
+    **{indicator: (2003, 2025) for indicator in ('borrowers.total', 'borrowers.businesses', 'borrowers.people', *INDUSTRIES)},
+    **{indicator: (2015, 2025) for indicator in ('borrowers.households', 'borrowers.individual_entrepreneurs', *PURPOSES, *REGIONAL)}}
+CALCULATED = ('deposits.total', 'deposits.individuals', 'deposits.legal_entities', 'loans.fx_share', 'deposits.fx_share',
+              *PURPOSES, *(f'loans_region.{area}.total' for area in AREAS))
 UNITS_PERCENT_UNBOUNDED = ('banks.roa', 'banks.roe')  # May be negative, as they were in 2008.
 # Values NBG shows on its statistics page and in its FSI notes, as published (one decimal; two for interest rates).
 ANCHORS = {('money.m3', 2025): '57680.2', ('loans.total', 2025): '72453.0', ('rates.policy', 2025): '8.00',
-           ('banks.npl_ratio', 2025): '2.5', ('deposits.fx_share', 2025): '48.6', ('loans.fx_share', 2025): '41.9'}
+           ('banks.npl_ratio', 2025): '2.5', ('deposits.fx_share', 2025): '48.6', ('loans.fx_share', 2025): '41.9',
+           ('borrowers.total', 2025): '69035.7', ('borrowers.households', 2025): '37355.4',
+           ('loans_region.georgia.total', 2025): '71780.2', ('loans_region.georgia.gel', 2025): '41698.7',
+           ('loans_region.georgia.fx', 2025): '30081.5', ('loans_region.region_tbilisi.total', 2025): '52420.1'}
 TOLERANCE = Decimal('0.01')
+ROUNDING = Decimal('0.5')  # The loan tables print whole thousands of lari in million GEL, so parts add up to a total within 0.5.
 CALC = Context(prec=28)
 BREAKS = [
     {'break_id': 'fsi_method_2022', 'applies_to': 'banks.npl_ratio;banks.roe', 'reference_date': '2022-01-01',
@@ -116,7 +149,42 @@ BREAKS = [
                'bad loans move from 1.51% in December 2022 to 3.10% in January 2023 (2.52% in December 2023). No change may be '
                'computed across this point.',
      'source_note': 'Current FSI file, sheet FSD, cell B121: "Due to the implementation of the IFRS, data has been reviewed starting '
-                    'from 2023-01." Nonperforming loans to total gross loans, row 20: O20 (2022-12) 1.51%, P20 (2023-01) 3.10%.'}]
+                    'from 2023-01." Nonperforming loans to total gross loans, row 20: O20 (2022-12) 1.51%, P20 (2023-01) 3.10%.'},
+    {'break_id': 'loans_activity_2014', 'applies_to': ';'.join(INDUSTRIES), 'reference_date': '2014-06-01',
+     'reason': "NBG says the changes in loans by type of economic activity since June 2014, compared with the months before, result from banks "
+               "updating their clients' information about the client's economic activity. Part of an industry's change from May to June 2014 "
+               "is therefore a move of existing loans between industries, not new lending. No change may be computed across this point for "
+               "the industries.",
+     'source_note': 'L3.10.1 Total!B283: "Note: The structural changes of loans by type of economic activities since June 2014 compared '
+                    'with previous months are result of updating banks\' clients\' personal information regarding their economic activity."'},
+    {'break_id': 'loans_overdue_2015', 'applies_to': ';'.join([*BORROWERS, *INDUSTRIES, *PURPOSES]), 'reference_date': '2015-12-01',
+     'reason': "NBG includes overdue loan amounts in these figures from 1 December 2015. From the same month the L3.10.1 file gives "
+               "Households and, inside them, Individuals and Individual entrepreneurs (its Households and Individual entrepreneur cells hold "
+               "'...' and '-' before then); before it gives only Individuals (people). The household and purpose series start on the new "
+               "basis. No change may be computed across this point for the series that run before it.",
+     'source_note': 'L3.10.1 Total!B284: "Including overdue loan amounts since December 1, 2015." '
+                    'LPR HH!A27: "Including overdue loan amounts since December 1, 2015."'},
+    {'break_id': 'loans_sector_2022', 'applies_to': ';'.join(['borrowers.businesses', 'borrowers.households', 'borrowers.people',
+                                                              'borrowers.individual_entrepreneurs', *INDUSTRIES,
+                                                              'households.purpose.sme', 'households.purpose.large_business']),
+     'reference_date': '2022-09-01',
+     'reason': "From September 2022 NBG sorts borrowers into sectors using the new unified register of legal entities, classifies economic "
+               "activity by NACE Rev.2, and sizes businesses by the Eurostat method, which changed how business loans and loans to small and "
+               "medium businesses are determined. NBG says the update did not change the total credit portfolio of legal entities. No "
+               "change may be computed across this point for the series listed.",
+     'source_note': 'L3.10.1 Total!B285: "*** The unified database of legal entities registered in Georgia has been developed. Consequently, '
+                    'the categorization of institutional sectors has been updated from September 2022 . Also, the reports produced by National '
+                    'Bank of Georgia are presented with the updated classification of economic activity NACE.Rev2 from September 2022. In '
+                    'addition, the methodology developed by Eurostat for determining the size of the enterprise was introduced, which affected '
+                    'the targeting of business loans. Accordingly, from September 2022, the volumes of business loans and loans granted to '
+                    'small and medium businesses were determined by a new methodology. Mentioned classification update did not affect the '
+                    'volume of the total credit portfolio of legal entities." LPR HH!A28 carries the same note.'},
+    {'break_id': 'loans_microbanks_2025', 'applies_to': ';'.join([*BORROWERS, *INDUSTRIES, *PURPOSES, *REGIONAL]),
+     'reference_date': '2025-01-01',
+     'reason': 'NBG includes microbanks in all three loan tables from January 2025, so the 2025 values cover more lenders than the years '
+               'before. This is a coverage change inside the series and is not adjusted. No change may be computed across this point.',
+     'source_note': 'L3.10.1 Total!B286: "The data have been updated to include microbanks from January 2025." '
+                    'LPR HH!A29 and LREG NC!A21 and FC!A21 carry the same sentence.'}]
 
 
 DISPLAY = Context(prec=15, rounding=ROUND_HALF_UP)  # Excel shows a stored double to 15 significant digits.
@@ -174,6 +242,34 @@ def december_rows(sheet_rows):
                 raise ValueError(f'Unexpected December row {number}: {day}')
             rows[day.year] = number
     return rows
+
+
+def december_columns(sheet_rows, row):
+    """Column letter of each year's December in a header row of month dates (the transposed sheets).
+
+    A heading is the 31 December date, or the first of December when the cell prints only the month and year (format `mm-yyyy`):
+    NBG's HH sheet stores its January 2021 to August 2022 headings as first-of-month dates, so December 2021 is 1 December.
+    Any other December date, and a second December column in one year, is an error.
+    """
+    columns = {}
+    for column, cell in sheet_rows.get(row, {}).items():
+        day = to_date(cell)
+        if day is None or day.month != 12:
+            continue
+        prints_day = 'd' in re.sub(r'\\.', '', str(cell.get('format', ''))).lower()
+        if (day.day != 31 and not (day.day == 1 and not prints_day)) or day.year in columns:
+            raise ValueError(f'Unexpected December column {column}{row}: {day}')
+        columns[day.year] = column
+    return columns
+
+
+def row_by_label(sheet_rows, label, after=None, before=None):
+    """The one row whose column-A text is `label`, optionally only below row `after` and above row `before`."""
+    found = [number for number, cells in sheet_rows.items()
+             if text(cells.get('A')) == label and (after is None or number > after) and (before is None or number < before)]
+    if len(found) != 1:
+        raise ValueError(f'Expected one {label!r} row, found {len(found)}')
+    return found[0]
 
 
 def number_at(sheet_rows, row, column, what):
@@ -377,10 +473,99 @@ def fsi_overlap():
     return overlap
 
 
+def check_million_gel(sheet_rows):
+    if 'Million GEL' not in text(sheet_rows.get(1, {}).get('A')):
+        raise ValueError('Loans are not in million GEL')
+
+
+def extract_borrowers():
+    """L3.10.1 `Total`: loans to the economy by borrower and, for businesses, by industry, from the December rows."""
+    source_id, name = 'nbg_loans_structure_l3_10_1', 'Total'
+    sheet_rows = sheet(source_id, name)
+    check_million_gel(sheet_rows)
+    businesses = locate(sheet_rows, 4, 'total')
+    if text(sheet_rows[3].get(businesses)) != 'of which by branches:':
+        raise ValueError('The "total" heading is not under "of which by branches:"')
+    households = locate(sheet_rows, 3, 'Households')
+    columns = {'borrowers.total': locate(sheet_rows, 3, 'Total'), 'borrowers.businesses': businesses, 'borrowers.households': households,
+               'borrowers.people': locate(sheet_rows, 4, 'Individuals'),
+               'borrowers.individual_entrepreneurs': locate(sheet_rows, 4, 'Individual entrepreneur')}
+    for industry, label in INDUSTRY_LABELS.items():
+        headings = [text(cell) for cell in sheet_rows[4].values() if text(cell).startswith(label)]
+        if len(headings) != 1:
+            raise ValueError(f'Expected one industry heading starting {label!r}, found {len(headings)}')
+        columns[f'borrowers.industry.{industry}'] = locate(sheet_rows, 4, headings[0])
+    for indicator_id in ('borrowers.people', 'borrowers.individual_entrepreneurs'):
+        if column_number(columns[indicator_id]) <= column_number(households):
+            raise ValueError(f'{indicator_id} is not under the Households heading')
+    december, rows = december_rows(sheet_rows), []
+    for indicator_id, column in columns.items():
+        first, last = COVERAGE[indicator_id]
+        rows += [observation(indicator_id, year, number_at(sheet_rows, december[year], column, f'{indicator_id}:{year}'),
+                             source_id, name, 'gel_million') for year in range(first, last + 1)]
+    return rows
+
+
+def extract_purposes():
+    """LOP `HH`: each household purpose as the lari cell plus the foreign-currency cell, in the same December column."""
+    source_id, name = 'nbg_loans_purpose_lop', 'HH'
+    sheet_rows = sheet(source_id, name)
+    check_million_gel(sheet_rows)
+    columns = december_columns(sheet_rows, 3)
+    lari_heading = row_by_label(sheet_rows, 'In National Currency')
+    foreign_heading = row_by_label(sheet_rows, 'In Foreign Currency')
+    if lari_heading >= foreign_heading:
+        raise ValueError('The lari block does not come before the foreign-currency block')
+    rows = []
+    for purpose, label in PURPOSE_LABELS.items():
+        indicator_id = f'households.purpose.{purpose}'
+        first, last = COVERAGE[indicator_id]
+        parts = [[observation(indicator_id, year, number_at(sheet_rows, row, columns[year], f'{indicator_id}:{year}'),
+                              source_id, name, 'gel_million') for year in range(first, last + 1)]
+                 for row in (row_by_label(sheet_rows, label, after=lari_heading, before=foreign_heading),
+                             row_by_label(sheet_rows, label, after=foreign_heading))]
+        rows += add_pair(indicator_id, source_id, *parts)
+    return rows
+
+
+def extract_regions():
+    """LREG `NC` and `FC`: Georgia and the 11 regions in lari and in foreign currency, and their sum as the area's total."""
+    source_id = 'nbg_loans_regions_lreg'
+    by_area = {}
+    for part, name in (('gel', 'NC'), ('fx', 'FC')):
+        sheet_rows = sheet(source_id, name)
+        check_million_gel(sheet_rows)
+        columns = december_columns(sheet_rows, 3)
+        found = defaultdict(list)
+        for number, cells in sheet_rows.items():
+            if number > 3 and 'A' in cells:
+                found[text(cells['A']).split(',')[0]].append(number)
+        wanted = {'Total': 'georgia', **REGION_LABELS}
+        for label, area in wanted.items():
+            if len(found[label]) != 1:
+                raise ValueError(f'Expected one {label!r} row in {name}, found {len(found[label])}')
+            indicator_id = f'loans_region.{area}.{part}'
+            first, last = COVERAGE[indicator_id]
+            by_area.setdefault(area, {})[part] = [
+                observation(indicator_id, year, number_at(sheet_rows, found[label][0], columns[year], f'{indicator_id}:{year}'),
+                            source_id, name, 'gel_million') for year in range(first, last + 1)]
+        # Abkhazeti has a row but no values; it is not served.
+        if len(found['Abkhazeti']) != 1 or any(sheet_rows[found['Abkhazeti'][0]].get(c, {}).get('kind') == 'n' for c in columns.values()):
+            raise ValueError(f'Expected one empty Abkhazeti row in {name}')
+    rows = []
+    for area, parts in by_area.items():
+        rows += parts['gel'] + parts['fx'] + add_pair(f'loans_region.{area}.total', source_id, parts['gel'], parts['fx'])
+    return rows
+
+
+def extract_loans_detail():
+    return extract_borrowers() + extract_purposes() + extract_regions()
+
+
 def extract():
     """Every served observation: transcribed from its original cell, or calculated from transcribed cells."""
     return (extract_money() + extract_loans() + extract_deposits() + extract_policy_rate() + extract_interest_rates()
-            + extract_banks())
+            + extract_banks() + extract_loans_detail())
 
 
 def validate(rows):
@@ -417,6 +602,21 @@ def validate(rows):
     for year in range(1995, 2026):
         if not v('money.m0', year) <= v('money.m1', year) <= v('money.m2', year) <= v('money.m3', year):
             raise ValueError(f'Money aggregates out of order (M0 <= M1 <= M2 <= M3): {year}')
+    for year in range(2003, 2026):
+        first_part = 'borrowers.people' if year <= 2014 else 'borrowers.households'
+        if abs(v('borrowers.businesses', year) + v(first_part, year) - v('borrowers.total', year)) > ROUNDING:
+            raise ValueError(f'Businesses plus {first_part.split(".")[1]} differ from all loans: {year}')
+        if abs(sum((v(i, year) for i in INDUSTRIES), Decimal(0)) - v('borrowers.businesses', year)) > ROUNDING:
+            raise ValueError(f'The industries do not add up to businesses: {year}')
+    for year in range(2015, 2026):
+        if abs(v('borrowers.people', year) + v('borrowers.individual_entrepreneurs', year) - v('borrowers.households', year)) > ROUNDING:
+            raise ValueError(f'Households differ from people plus individual entrepreneurs: {year}')
+        for area in AREAS:
+            if abs(v(f'loans_region.{area}.gel', year) + v(f'loans_region.{area}.fx', year) - v(f'loans_region.{area}.total', year)) > ROUNDING:
+                raise ValueError(f'Lari plus foreign currency differs from the total of {area}: {year}')
+        for part in ('gel', 'fx'):
+            if abs(sum((v(f'loans_region.{area}.{part}', year) for area in AREAS[1:]), Decimal(0)) - v(f'loans_region.georgia.{part}', year)) > ROUNDING:
+                raise ValueError(f'The regions do not add up to Georgia ({part}): {year}')
     overlap = {i: published(o['value'], 1) for i, o in fsi_overlap().items()}
     for indicator_id, old in overlap.items():
         new = published(v(indicator_id, 2022), 1)
@@ -452,8 +652,10 @@ def build(check=False):
                      for i, y in sorted(coverage.items())]
     report = {
         'status': 'passed', 'retrieved_at': RETRIEVED_DATE,
-        'scope': 'Annual research only: money aggregates, bank loans and deposits, interest rates and bank-health measures; '
-                 'no exchange rates, monthly or quarterly values, serving or published figures beyond the reviewed cells',
+        'scope': 'Annual research only: money aggregates, bank loans (also by borrower, industry, household purpose and region) and deposits, '
+                 'interest rates and bank-health measures; no exchange rates, monthly or quarterly values, serving or published figures '
+                 'beyond the reviewed cells',
+        'loan_detail_workbooks_retrieved_at': '2026-10-24',
         'primary_observation_count': len(rows), 'observations_by_source': dict(sorted(counts.items())),
         'imputed_values': 0, 'calculated_values': sum(r['value_status'] == 'calculated' for r in rows),
         'reconciliation_failed_count': 0,
@@ -461,6 +663,9 @@ def build(check=False):
             'coverage_matches_year_ranges': True, 'published_values_are_rounded_stored_values': True,
             'lari_plus_foreign_equals_total': True, 'people_plus_companies_equals_all_deposits_2015_2025': True,
             'money_aggregates_in_order': True, 'percentages_within_0_100_except_roa_roe': True,
+            'businesses_plus_people_or_households_equals_all_loans': True, 'people_plus_entrepreneurs_equals_households_2015_2025': True,
+            'industries_add_up_to_businesses': True, 'region_lari_plus_foreign_equals_total': True,
+            'regions_add_up_to_georgia_in_lari_and_foreign_currency': True,
             'fsi_2022_overlap': {i: {'archive_2022q4': published(o['value'], 1), 'archive_cell': o['cell']} for i, o in fsi_overlap().items()},
             'anchor_values': {f'{i}:{y}': p for (i, y), p in ANCHORS.items()}},
         'source_checks': [{'source_id': s['source_id'], 'sha256': s['sha256'], 'bytes': s['bytes'], 'passed': True} for s in sources],
