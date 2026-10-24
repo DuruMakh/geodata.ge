@@ -3,7 +3,7 @@ import type { Presentation } from "../i18n/types";
 import { message } from "../i18n/messages";
 import { workbookMessage } from "../i18n/workbook";
 import type { ClientNationalGdpFact } from "./clientData";
-import { buildMoneyBanksModel, moneyBanksHasTotalRow, moneyBanksViewFacts, type MoneyBanksSectionId, type MoneyBanksState } from "./moneyBanks";
+import { MONEY_BANKS_LOAN_BREAKS, buildMoneyBanksModel, moneyBanksHasTotalRow, moneyBanksViewFacts, type MoneyBanksSectionId, type MoneyBanksState } from "./moneyBanks";
 import { SHEET_NAMES, neededSourceYears, sourcesForNeededYears, withAbsoluteUrls, workbookFilename, type WorkbookExportModel, type WorkbookPublicSource } from "./workbookModel";
 
 const MILLION = 1_000_000;
@@ -29,9 +29,12 @@ export function buildMoneyBanksWorkbookExportModel(input: {
   // Interest rates are the series shown to two decimals.
   const rowFormat = (decimals: number) => !isAmount && decimals === 2 ? "0.00" : undefined;
   const toExport = (value: number | null) => value === null ? null : isAmount ? value / MILLION : value;
+  // On Who borrows a year that opens a new basis (the register's loan breaks) says so after its status.
+  const isBreak = (id: string, year: number) => section === "borrowers" && MONEY_BANKS_LOAN_BREAKS.some(entry => entry.year === year && entry.appliesTo.includes(id));
   const status = (id: string, year: number) => {
     const fact = byCell.get(`${id}:${year}`);
-    return fact ? t(`status.${fact.valueStatus}`) : workbookMessage(locale, "workbook.unavailable");
+    const text = fact ? t(`status.${fact.valueStatus}`) : workbookMessage(locale, "workbook.unavailable");
+    return isBreak(id, year) ? `${text} · ${t("status.break")}` : text;
   };
   const cells = model.years.flatMap(year => model.selected.map(series => ({ year, series })));
   const view = state.view === "main" ? "" : ` · ${t(`tab.${state.view}`)}`;

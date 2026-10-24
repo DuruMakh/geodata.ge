@@ -6,9 +6,9 @@ import { formatAmount, formatInUnit } from "./format";
 import type { HubCardModel } from "./hubCards";
 import { MONEY_BANKS_SECTIONS } from "./moneyBanks";
 
-/** Each card's sparkline and footer years follow one series: the broad money supply, total loans, the National Bank rate and the bad-loans ratio. */
+/** Each card's sparkline and footer years follow one series: the broad money supply, total loans, all loans by borrower, the National Bank rate and the bad-loans ratio. */
 const HEADLINE: Record<typeof MONEY_BANKS_SECTIONS[number]["id"], MoneyBanksIndicator> = {
-  "supply": "money.m3", "loans-deposits": "loans.total", "interest-rates": "rates.policy", "bank-health": "banks.npl_ratio",
+  "supply": "money.m3", "loans-deposits": "loans.total", "borrowers": "borrowers.total", "interest-rates": "rates.policy", "bank-health": "banks.npl_ratio",
 };
 
 export function buildMoneyBanksHubCards(facts: readonly ClientMoneyBanksFact[], presentation: Presentation): HubCardModel[] {

@@ -263,6 +263,7 @@
   "/explorer/money": "2026-10-11",
   "/explorer/money/supply": "2026-10-11",
   "/explorer/money/loans-deposits": "2026-10-11",
+  "/explorer/money/borrowers": "2026-10-24",
   "/explorer/money/interest-rates": "2026-10-11",
   "/explorer/money/bank-health": "2026-10-11",
   "/methodology/money": "2026-10-11",

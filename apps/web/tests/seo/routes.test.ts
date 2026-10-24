@@ -120,7 +120,8 @@ describe("indexable Fiscal.ge routes", () => {
     // Transport adds its hub, five pages, a page for Georgia and each of the 11 regions and its methodology page: 19 bilingual pairs.
     // Internet and technology adds its hub, four pages, a page for Georgia and each of the 11 regions and its methodology page: 18 bilingual pairs.
     // Spending by type adds its Budget page and its methodology page: 2 bilingual pairs.
-    expect(urls).toHaveLength(1544);
+    // Who borrows adds one page to Money and banks: 1 bilingual pair.
+    expect(urls).toHaveLength(1546);
     expect(new Set(urls).size).toBe(urls.length);
     expect(urls.every((url) => url.startsWith("https://fiscal.ge/"))).toBe(true);
     expect(urls).toContain("https://fiscal.ge/about");

@@ -60,6 +60,7 @@
   "moneyBanks.amountHeader.percent": "Value (%)",
   "moneyBanks.status.official": "Official",
   "moneyBanks.status.calculated": "Calculated by Fiscal.ge",
+  "moneyBanks.status.break": "series break",
   "moneyBanks.emptySelection": "Select one or more series to compare.",
   "moneyBanks.nestedSelected": "Subcategories",
   "moneyBanks.subcategoriesFor": "Subcategories of {label}"
