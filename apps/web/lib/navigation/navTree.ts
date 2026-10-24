@@ -285,6 +285,7 @@ const PAGE_SOURCE_NOTES: Readonly<Record<string, string>> = {
   "/explorer/expenditure": "common.budgetStatisticsSourceNote",
   "/explorer/expenditure-types": "common.budgetStatisticsSourceNote",
   "/explorer/revenue": "common.budgetStatisticsSourceNote",
+  "/explorer/tax-breaks-refunds": "common.taxBreaksRefundsSourceNote",
   "/explorer/debt": "common.budgetStatisticsSourceNote",
   "/explorer/municipalities": "common.budgetStatisticsSourceNote",
   "/explorer/deficit": "common.deficitSourceNote",
@@ -293,6 +294,8 @@ const PAGE_SOURCE_NOTES: Readonly<Record<string, string>> = {
   "/explorer/inflation/categories": "common.geostatSourceNote",
   "/explorer/inflation/products": "common.geostatSourceNote",
   "/explorer/external/foreign-investment": "common.geostatSourceNote",
+  // The funded pension page reads the Pension Fund's statements, with Geostat's GDP for its % of GDP view.
+  [`${HEALTH_HUB_PATH}/funded-pension`]: "common.fundedPensionSourceNote",
 };
 
 /** Footer source notes for an address and every page below it; the longest address wins. */

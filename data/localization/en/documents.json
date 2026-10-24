@@ -7196,6 +7196,96 @@
     },
     "documentLanguage": null
   },
+  "pension_fund_ifrs_2020": {
+    "title": {
+      "text": "Funded pension scheme financial statements for 2020 (IFRS)",
+      "reviewedAt": "2026-10-21"
+    },
+    "publisher": {
+      "text": "Pension Fund of Georgia",
+      "reviewedAt": "2026-10-21"
+    },
+    "attribution": {
+      "text": "Pension Fund of Georgia",
+      "reviewedAt": "2026-10-21"
+    },
+    "documentLanguage": "ka"
+  },
+  "pension_fund_ifrs_2022": {
+    "title": {
+      "text": "Funded pension scheme financial statements for 2022 (IFRS)",
+      "reviewedAt": "2026-10-21"
+    },
+    "publisher": {
+      "text": "Pension Fund of Georgia",
+      "reviewedAt": "2026-10-21"
+    },
+    "attribution": {
+      "text": "Pension Fund of Georgia",
+      "reviewedAt": "2026-10-21"
+    },
+    "documentLanguage": "ka"
+  },
+  "pension_fund_ifrs_2023": {
+    "title": {
+      "text": "Funded pension scheme financial statements for 2023 (IFRS)",
+      "reviewedAt": "2026-10-21"
+    },
+    "publisher": {
+      "text": "Pension Fund of Georgia",
+      "reviewedAt": "2026-10-21"
+    },
+    "attribution": {
+      "text": "Pension Fund of Georgia",
+      "reviewedAt": "2026-10-21"
+    },
+    "documentLanguage": "ka"
+  },
+  "pension_fund_ifrs_2024": {
+    "title": {
+      "text": "Funded pension scheme financial statements for 2024 (IFRS)",
+      "reviewedAt": "2026-10-21"
+    },
+    "publisher": {
+      "text": "Pension Fund of Georgia",
+      "reviewedAt": "2026-10-21"
+    },
+    "attribution": {
+      "text": "Pension Fund of Georgia",
+      "reviewedAt": "2026-10-21"
+    },
+    "documentLanguage": "ka"
+  },
+  "pension_fund_ifrs_2025": {
+    "title": {
+      "text": "Funded pension scheme financial statements for 2025 (IFRS)",
+      "reviewedAt": "2026-10-21"
+    },
+    "publisher": {
+      "text": "Pension Fund of Georgia",
+      "reviewedAt": "2026-10-21"
+    },
+    "attribution": {
+      "text": "Pension Fund of Georgia",
+      "reviewedAt": "2026-10-21"
+    },
+    "documentLanguage": "en"
+  },
+  "pension_fund_report_2025": {
+    "title": {
+      "text": "Pension Fund of Georgia annual report 2025",
+      "reviewedAt": "2026-10-21"
+    },
+    "publisher": {
+      "text": "Pension Fund of Georgia",
+      "reviewedAt": "2026-10-21"
+    },
+    "attribution": {
+      "text": "Pension Fund of Georgia",
+      "reviewedAt": "2026-10-21"
+    },
+    "documentLanguage": "ka"
+  },
   "geostat_science_researchers": {
     "title": {
       "text": "Number of researchers by level of education, age groups and fields of science",
@@ -9539,6 +9629,81 @@
     "attribution": {
       "text": "Geostat",
       "reviewedAt": "2026-10-20"
+    },
+    "documentLanguage": "ka"
+  },
+  "mof_tax_expenditure_report_2024_xlsx_ka": {
+    "title": {
+      "text": "Tax Expenditure Report 2024, figures and tables (Georgian)",
+      "reviewedAt": "2026-10-21"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-10-21"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-10-21"
+    },
+    "documentLanguage": "ka"
+  },
+  "mof_tax_expenditure_report_2024_xlsx_en": {
+    "title": {
+      "text": "Tax Expenditure Report 2024, figures and tables (English)",
+      "reviewedAt": "2026-10-21"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-10-21"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-10-21"
+    },
+    "documentLanguage": "en"
+  },
+  "mof_tax_expenditure_report_2024_pdf_ka": {
+    "title": {
+      "text": "Tax Expenditure Report 2024 (Georgian)",
+      "reviewedAt": "2026-10-21"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-10-21"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-10-21"
+    },
+    "documentLanguage": "ka"
+  },
+  "mof_tax_expenditure_report_2024_pdf_en": {
+    "title": {
+      "text": "Tax Expenditure Report 2024 (English)",
+      "reviewedAt": "2026-10-21"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-10-21"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-10-21"
+    },
+    "documentLanguage": "en"
+  },
+  "treasury_tax_refunds_chart": {
+    "title": {
+      "text": "Tax overpayment refunds, State Treasury chart data",
+      "reviewedAt": "2026-10-21"
+    },
+    "publisher": {
+      "text": "State Treasury of Georgia",
+      "reviewedAt": "2026-10-21"
+    },
+    "attribution": {
+      "text": "State Treasury of Georgia",
+      "reviewedAt": "2026-10-21"
     },
     "documentLanguage": "ka"
   }

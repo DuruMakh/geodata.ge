@@ -122,6 +122,8 @@ const statedCoverage: { url: string; file: string; rows?: (row: CsvRow) => boole
   { url: "/explorer/health/social-package", file: "social-protection-annual.csv", rows: (row) => row.indicator_id.startsWith("social.social_package.") },
   { url: "/explorer/health/social-package", file: "social-protection-annual.csv", rows: (row) => /^social\.social_package\.disability_.+\.recipients$/.test(row.indicator_id), text: (first) => `four disability rows from ${first}` },
   { url: "/explorer/health/social-package", file: "social-protection-annual.csv", rows: (row) => row.indicator_id === "social.social_package.war_participants.recipients", text: (first) => `war participants from ${first}` },
+  { url: "/explorer/health/funded-pension", file: "social-protection-annual.csv", rows: (row) => row.indicator_id.startsWith("social.funded_pension.") },
+  { url: "/explorer/health/funded-pension", file: "social-protection-annual.csv", rows: (row) => row.indicator_id.startsWith("social.funded_pension.securities_gains."), text: (first) => `securities gains and dividends from ${first}` },
   { url: "/explorer/society#t-crime", file: "crime-annual.csv" },
   { url: "/explorer/crime/recorded", file: "crime-annual.csv", rows: (row) => row.indicator_id.startsWith("crime.recorded.") },
   { url: "/explorer/crime/convictions", file: "crime-annual.csv", rows: (row) => row.indicator_id.startsWith("crime.convicted.") },

@@ -5,7 +5,7 @@ const ready = (page: Page) => expect(page.locator("body")).toHaveAttribute("data
 const toggle = (id: string) => `[data-series-id="${id}"] [data-testid="series-row-toggle"]`;
 const pressedRows = (page: Page) => page.locator('[data-testid="series-row-toggle"][aria-pressed="true"]');
 const HEALTH = ["doctors-hospitals", "illnesses", "causes-of-death"];
-const SOCIAL = ["social-payments", "pensions", "subsistence-allowance", "social-package"];
+const SOCIAL = ["social-payments", "pensions", "subsistence-allowance", "social-package", "funded-pension"];
 
 /** The table cell of the series labelled `label` in `year`, in either layout: year columns, or (a narrow table of up to three series) year rows. */
 async function cell(page: Page, label: string, year: string) {
@@ -32,16 +32,18 @@ const lines = (page: Page, testId: string) => page.getByTestId(testId).evaluate(
 test.beforeEach(async ({ page }) => { await page.setViewportSize({ width: 1440, height: 900 }); });
 
 // The old Health hub is the section #t-health of the Living standards and health page now.
-test("the Health section shows seven cards, the four social protection cards after Causes of death", async ({ page }) => {
+test("the Health section shows eight cards, the five social protection cards after Causes of death", async ({ page }) => {
   for (const prefix of ["", "/en"]) {
     await page.goto(`${prefix}/explorer/living`);
     const cards = topicCards(page, "health");
-    await expect(cards).toHaveCount(7);
+    await expect(cards).toHaveCount(8);
     expect(await cards.evaluateAll(links => links.map(link => link.getAttribute("href")))).toEqual([...HEALTH, ...SOCIAL].map(section => `${prefix}/explorer/health/${section}`));
-    for (let index = 0; index < 7; index += 1) await expect(cards.nth(index).getByTestId("explorer-card-graphic").locator("svg")).toHaveCount(1);
+    for (let index = 0; index < 8; index += 1) await expect(cards.nth(index).getByTestId("explorer-card-graphic").locator("svg")).toHaveCount(1);
+    await expect(cards.nth(7)).toContainText("08");
+    await expect(cards.nth(7)).toContainText("2019–2025");
     await expect(cards.nth(3)).toContainText("04");
     await expect(cards.nth(3)).toContainText("2013–2025");
-    // The sidebar lists the four pages under Health, after Causes of death.
+    // The sidebar lists the five pages under Health, after Causes of death.
     for (const section of SOCIAL) await expect(page.getByTestId(`health-${section}-link`)).toBeVisible();
     expect(await page.getByTestId("health-causes-of-death-link").evaluate((causes, payments) => Boolean(causes.compareDocumentPosition(payments!) & Node.DOCUMENT_POSITION_FOLLOWING), await page.getByTestId("health-social-payments-link").elementHandle())).toBe(true);
   }
@@ -197,6 +199,35 @@ test("Social package: the 2025 group redesign is drawn when Other groups is tick
   await expect(page.getByTestId("chart-panel").getByTestId("chart-break")).toContainText("ახალი აღრიცხვა");
 });
 
+test("Funded pension: the 8.24 billion line, savings first, the % of GDP switch only on money headings, the 2022 loss", async ({ page }) => {
+  await page.goto("/en/explorer/health/funded-pension");
+  await ready(page);
+  await expect(page.getByTestId("social-latest")).toHaveText("2025: 8.24 billion GEL in pension savings");
+  await expect(pressedRows(page)).toHaveCount(1);
+  await expect(page.locator(toggle("social.funded_pension.savings.amount"))).toHaveAttribute("aria-pressed", "true");
+  await expect(page.locator('[role="tablist"]')).toHaveCount(0);
+  const headings = page.getByTestId("series-heading");
+  await expect(headings).toHaveCount(5);
+  for (const [index, name] of ["Savings, end of year", "Money in and out", "Members", "Employers", "Return"].entries()) await expect(headings.nth(index)).toContainText(name);
+  // The switch shows on the money headings; ticking Members leaves the view at amount and drops it from the address.
+  await expect(page.getByTestId("social-measure-gdp")).toBeVisible();
+  await page.getByTestId("social-measure-gdp").click();
+  await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-view", "gdp");
+  await expect(page).toHaveURL(/#tab=gdp&/);
+  await page.locator(toggle("social.funded_pension.members")).click();
+  await expect(pressedRows(page)).toHaveCount(1);
+  await expect(page.locator(toggle("social.funded_pension.members"))).toHaveAttribute("aria-pressed", "true");
+  await expect(page.getByTestId("social-measure-gdp")).toHaveCount(0);
+  await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-view", "amount");
+  await expect(page).not.toHaveURL(/tab=gdp/);
+  // Securities lost money in 2022 and the statements print nothing for 2019: the table shows the loss and the empty-cell marker.
+  await page.goto("/en/explorer/health/funded-pension#view=table&sel=social.funded_pension.securities_gains.amount&range=all");
+  await ready(page);
+  await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-mode", "table");
+  await expect(await cell(page, "Gains or losses on securities", "2022")).toHaveText("−31.2");
+  await expect(await cell(page, "Gains or losses on securities", "2019")).toHaveText("—");
+});
+
 test("the language switch keeps the hash on Guria's Pensions page and on Social payments", async ({ page }) => {
   const placeHash = "#view=table&sel=social.pension.amount&start=2016&end=2024";
   await page.goto(`/explorer/health/pensions/region/guria${placeHash}`);
@@ -234,7 +265,7 @@ for (const prefix of ["", "/en"]) test(`social protection pages fit a 390px scre
   await page.setViewportSize({ width: 390, height: 900 });
   // The place pages include the longest region names and a long municipality name, on both sets.
   const places = ["/region/racha_lechkhumi_kvemo_svaneti", "/region/samegrelo_zemo_svaneti", "/dedoplistskaro", "/georgia"];
-  const paths = ["", "/social-payments", "/pensions", "/subsistence-allowance", "/pensions/region/guria", "/social-package", ...["/pensions", "/subsistence-allowance"].flatMap(set => places.map(place => `${set}${place}`))];
+  const paths = ["", "/social-payments", "/pensions", "/subsistence-allowance", "/pensions/region/guria", "/social-package", "/funded-pension", ...["/pensions", "/subsistence-allowance"].flatMap(set => places.map(place => `${set}${place}`))];
   for (const path of paths.map(path => `/explorer/health${path}`)) {
     await page.goto(`${prefix}${path}`);
     if (path === "/explorer/health") {

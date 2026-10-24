@@ -29,6 +29,7 @@ import type { TemplateValues } from "../../lib/i18n/types";
 import type { ClientAgeFact } from "../../lib/servedRows";
 import { unpackFacts, type FactsInput } from "../../lib/data/packedFacts";
 import { useAppReady } from "../explorer-shell/use-app-ready";
+import { ChartShareButton } from "../explorer-shell/chart-share-button";
 import { useReplaceHash } from "../explorer-shell/use-replace-hash";
 import { HeatmapTable } from "../main-explorer/heatmap-table";
 import { Callout, SectionTitle, SegmentedTabs, SourceNote } from "../ui/editorial";
@@ -88,6 +89,17 @@ export function AgeSexExplorer({
   const place = t("georgia");
   const date = String(state.year);
   const chooseYear = (year: number) => update({ year, compare: state.compare === year ? null : state.compare });
+
+  // The pyramid draws its own key (women and men, and the comparison year's outline), so the picture adds none.
+  const shareAction = (
+    <ChartShareButton
+      title={t("pyramidTitle")}
+      caption={`${compare ? `${state.year} · ${compare.year}` : date} · ${measure === "share" ? "%" : t("measurePersons")}`}
+      source={t("annualSource", { first, last })}
+      chart={<div className="mx-auto max-w-[640px]"><PopulationPyramid pyramid={pyramid} year={state.year} compare={compare} measure={measure} ariaLabel={t("pyramidAria", { place, date })} testId="share-card-pyramid" /></div>}
+      period={compare ? `${state.year}-${compare.year}` : date}
+    />
+  );
 
   // Heat map
   const heat = useMemo(() => heatmapRows(facts, years), [facts, years]);
@@ -158,7 +170,7 @@ export function AgeSexExplorer({
             ratio: formatInUnit(womenPer100Men(pyramid), UNIT_DENSITY),
           })}
         </p>
-        <div className="mt-[18px] max-w-[740px]"><SourceNote testId="age-sex-pyramid-source">{source}</SourceNote></div>
+        <div className="mt-[18px] max-w-[740px]"><SourceNote testId="age-sex-pyramid-source" action={shareAction}>{source}</SourceNote></div>
         <Download
           testId="age-sex-pyramid-excel-download"
           build={() => buildPyramidWorkbookExportModel({ facts, sources, siteOrigin, year: state.year, compare: state.compare }, presentation)}

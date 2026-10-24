@@ -798,7 +798,8 @@ test("Excel button shows working and retryable error states", async ({ page }) =
   });
 
   const button = page.getByTestId("series-excel");
-  const announcement = page.getByRole("status");
+  // The Excel button's own status: the chart's share button has one too (DESIGN.md §7.17).
+  const announcement = button.locator("..").getByRole("status");
   await expect(button).toHaveText("ჩამოტვირთვა");
   await page.evaluate(() => {
     const target = document.querySelector<HTMLButtonElement>("[data-testid='series-excel']");
@@ -1501,15 +1502,15 @@ test("sidebar is a full-width top bar with a menu below 900px", async ({ page })
   expect(consoleProblems).toEqual([]);
 });
 
-// Budget's seven cards moved from /explorer (now All data) to the Budget group page; a card shows its figure, then its period.
-test("the Budget group page lists seven cards, all seven live", async ({ page }) => {
+// Budget's eight cards moved from /explorer (now All data) to the Budget group page; a card shows its figure, then its period.
+test("the Budget group page lists eight cards, all eight live", async ({ page }) => {
   const consoleProblems = collectConsoleProblems(page);
 
   await page.goto(`${TEST_BASE_URL}/explorer/budget`);
   await expectAppReady(page);
 
   const cards = page.locator("#t-budget").getByTestId("explorer-card");
-  await expect(cards).toHaveCount(7);
+  await expect(cards).toHaveCount(8);
   for (const card of await cards.all()) {
     await expect(card.locator("h3")).toHaveCount(1);
   }
@@ -1520,8 +1521,8 @@ test("the Budget group page lists seven cards, all seven live", async ({ page })
     "/explorer/expenditure",
   );
 
-  // Card 04: routed like the other three, not a "მალე" marker any more.
-  const municipalities = cards.nth(3);
+  // Card 05: routed like the others, not a "მალე" marker any more.
+  const municipalities = cards.nth(4);
   await expect(municipalities).toContainText("მუნიციპალიტეტები");
   await expect(municipalities).not.toContainText("მალე");
   await expect(municipalities).not.toHaveAttribute("aria-disabled");
@@ -1539,17 +1540,17 @@ test("the Budget group page lists seven cards, all seven live", async ({ page })
   await expect(types).toContainText("ხარჯების სახეები");
   await expect(types).toHaveAttribute("href", "/explorer/expenditure-types");
   await expect(types).toContainText(/[\d,]+\.\d მლრდ ₾\d{4}/);
-  // Card 04 carries the same contract.
+  // Card 05 carries the same contract.
   await expect(municipalities).toContainText(/[\d,]+\.\d მლრდ ₾\d{4}/);
 
-  await expect(cards.nth(4).getByRole("heading")).toHaveText("ანალიზი");
+  await expect(cards.nth(5).getByRole("heading")).toHaveText("ანალიზი");
 
-  const debt = cards.nth(5);
+  const debt = cards.nth(6);
   await expect(debt).toContainText("ვალი");
   await expect(debt).toHaveAttribute("href", "/explorer/debt");
   await expect(debt).toContainText(/[\d,]+\.\d მლრდ ₾2025/);
 
-  const deficit = cards.nth(6);
+  const deficit = cards.nth(7);
   await expect(deficit).toContainText("დეფიციტი");
   await expect(deficit).toHaveAttribute("href", "/explorer/deficit");
   await expect(deficit).toContainText(/[+−]?\d+\.\d%\d{4}/);

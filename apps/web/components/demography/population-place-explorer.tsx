@@ -18,6 +18,7 @@ import { unpackFacts, type FactsInput } from "../../lib/data/packedFacts";
 import { ExcelDownloadButton } from "../explorer/excel-download-button";
 import { ModeTabs } from "../explorer-shell/mode-tabs";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
+import { ChartShareButton } from "../explorer-shell/chart-share-button";
 import { useAppReady } from "../explorer-shell/use-app-ready";
 import { EditorialLineChart } from "../main-explorer/editorial-line-chart";
 import { ExplorerTable } from "../main-explorer/explorer-table";
@@ -105,6 +106,29 @@ export function PopulationPlaceExplorer({
   const breakLabel = t("breakLabel");
   const rebase = formatInUnit(Math.round(CENSUS_STEP.residual / 1000) * 1000, UNIT_PERSONS);
   const placeRow = model.rows.find((row) => row.itemId === place.id) ?? null;
+  const chart = (
+    <EditorialLineChart
+      years={model.years}
+      series={model.series}
+      share={false}
+      unit={thousandsUnit(locale)}
+      shareLabel=""
+      formatTooltipValue={(value) => formatInUnit(value, UNIT_PERSONS)}
+      formatPeriod={(period, kind) =>
+        kind === "axis" ? String(period) : `${period} · ${message(messages, populationBasisKey(period))}`}
+      breaks={[{ year: CENSUS_STEP.toYear, label: breakLabel }]}
+    />
+  );
+  const shareAction = hasSelection && model.hasData ? (
+    <ChartShareButton
+      title={`${title} ${placeLabel(place, locale)}`}
+      caption={`${t("unitLine")} · ${model.range.start}–${model.range.end}`}
+      legend={model.series.map(({ label, color }) => ({ label, color }))}
+      source={message(messages, "demography.source", { start: model.range.start, end: model.range.end })}
+      chart={chart}
+      period={`${model.range.start}-${model.range.end}`}
+    />
+  ) : undefined;
 
   return (
     <>
@@ -134,17 +158,7 @@ export function PopulationPlaceExplorer({
               ) : !model.hasData ? (
                 <div className="mt-5"><Callout testId="no-range-data-callout">{message(messages, "main.noRangeData")}</Callout></div>
               ) : state.chartMode === "line" ? (
-                <EditorialLineChart
-                  years={model.years}
-                  series={model.series}
-                  share={false}
-                  unit={thousandsUnit(locale)}
-                  shareLabel=""
-                  formatTooltipValue={(value) => formatInUnit(value, UNIT_PERSONS)}
-                  formatPeriod={(period, kind) =>
-                    kind === "axis" ? String(period) : `${period} · ${message(messages, populationBasisKey(period))}`}
-                  breaks={[{ year: CENSUS_STEP.toYear, label: breakLabel }]}
-                />
+                chart
               ) : (
                 <ExplorerTable
                   // The census re-base sentence is the note right under the chart panel, not repeated here (U26-12).
@@ -176,7 +190,7 @@ export function PopulationPlaceExplorer({
               <RangeStrip years={allYears} range={state.range} marker={{ year: CENSUS_STEP.toYear, label: breakLabel }} onChange={state.setRange} />
             </section>
             <div className="mt-5 max-w-[640px]">
-              <SourceNote testId="population-source-note">{sourceNote}</SourceNote>
+              <SourceNote testId="population-source-note" action={shareAction}>{sourceNote}</SourceNote>
             </div>
             <p
               data-testid="population-census-note"

@@ -17,6 +17,7 @@ import { message } from "../../lib/i18n/messages";
 import { pageHref } from "../../lib/i18n/routes";
 import { ModeTabs } from "../explorer-shell/mode-tabs";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
+import { ChartShareButton } from "../explorer-shell/chart-share-button";
 import { ExplorerHeading } from "../explorer-shell/explorer-heading";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { LatestValueLine } from "../explorer-shell/latest-value-line";
@@ -79,6 +80,9 @@ export function BusinessAreaExplorer({ area, facts, labels, areaLabels, sources,
   const index = areas.findIndex(item => item.id === businessMapId(area));
   const neighbours = { previous: areas[(index - 1 + areas.length) % areas.length]!, next: areas[(index + 1) % areas.length]! };
   const nameOf = (id: string) => areaLabels[businessAreaOfMapId(id)];
+  const chart = <EditorialLineChart years={model.years} series={lineSeries} share={false} unit={unit} shareLabel={chartLabel} formatTooltipValue={valueLabel} />;
+  const shareAction = model.selected.length ? <ChartShareButton title={title} caption={`${unitLabel} · ${model.range.start}–${model.range.end}`}
+    legend={lineSeries.map(({ label, color }) => ({ label, color }))} source={t(area === "georgia" ? "sourceNote" : "sourceNoteRegions")} chart={chart} period={`${model.range.start}-${model.range.end}`} /> : undefined;
   return <div data-testid={`business-area-${area}`} className="@container">
     <div className="flex flex-col min-[768px]:flex-row min-[768px]:items-end min-[768px]:justify-between min-[768px]:gap-3">
       <div className="relative min-w-0 min-[768px]:flex-1">
@@ -102,13 +106,13 @@ export function BusinessAreaExplorer({ area, facts, labels, areaLabels, sources,
             <span data-testid="business-unit-label" className="text-[11px] text-[var(--muted)]">{unitLabel}</span>
           </div>
           {!model.selected.length ? <div className="mt-5"><Callout testId="no-selection-callout">{t("emptySelection")}</Callout></div>
-            : state.mode === "line" ? <div className="mt-5"><EditorialLineChart years={model.years} series={lineSeries} share={false} unit={unit} shareLabel={chartLabel} formatTooltipValue={valueLabel} /></div>
+            : state.mode === "line" ? <div className="mt-5">{chart}</div>
             : <ExplorerTable caption={`${chartLabel} · ${unitLabel} · ${model.range.start}–${model.range.end}`} rows={rows.filter(row => row !== total)} totalRow={total} showTotal={Boolean(total)} totalFirst wrapRowLabels rowLabelsLocalized years={model.years} firstColumnLabel={t("series")} unit={unit} share={false} showChangeColumn={false} shareValueForYear={() => null} />}
           <ChartSelectionAids series={lineSeries} chartShown={state.mode === "line"} share={false} unit={unit} formatValue={valueLabel} />
           <RangeStrip years={businessAreaCoverage(area, facts, state.selectedIds).years} range={model.range} onChange={patch => update(s => ({ ...s, range: rangeFromPatch(buildBusinessAreaModel(area, facts, s).range, patch) }))} />
         </section>
         {/* A region's line names the head-office caveat; Georgia's totals need none. */}
-        <div className="mt-[18px]"><SourceNote testId="source-label">{t(area === "georgia" ? "sourceNote" : "sourceNoteRegions")} · {unitLabel} · {model.range.start}–{model.range.end} · <span className="whitespace-nowrap">{updatedDate(lastReviewedAt, locale)}</span>
+        <div className="mt-[18px]"><SourceNote testId="source-label" action={shareAction}>{t(area === "georgia" ? "sourceNote" : "sourceNoteRegions")} · {unitLabel} · {model.range.start}–{model.range.end} · <span className="whitespace-nowrap">{updatedDate(lastReviewedAt, locale)}</span>
           <Link href={pageHref("/methodology/business", locale)} prefetch={false} className="ml-2 text-[var(--accent)] underline underline-offset-4">{t("methodology")}</Link>
         </SourceNote></div>
       </div>

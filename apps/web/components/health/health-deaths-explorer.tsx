@@ -15,6 +15,7 @@ import { message } from "../../lib/i18n/messages";
 import { pageHref } from "../../lib/i18n/routes";
 import { ModeTabs } from "../explorer-shell/mode-tabs";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
+import { ChartShareButton } from "../explorer-shell/chart-share-button";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { LatestValueLine } from "../explorer-shell/latest-value-line";
 import { FlatSeriesPanel } from "../explorer-shell/flat-series-panel";
@@ -65,6 +66,9 @@ export function HealthDeathsExplorer({ area, areas, facts, labels, areaLabels, s
   const index = areas.findIndex(item => item.id === area);
   const neighbours = { previous: areas[(index - 1 + areas.length) % areas.length]!, next: areas[(index + 1) % areas.length]! };
   const coverage = healthSeriesCoverage(facts, area, healthDeathsSeries(), `No causes-of-death years for ${area}`);
+  const chart = <EditorialLineChart years={model.years} series={lineSeries} share={false} unit={UNIT} shareLabel={chartLabel} formatTooltipValue={valueLabel} />;
+  const shareAction = model.selected.length ? <ChartShareButton title={title} caption={`${unitLabel} · ${model.range.start}–${model.range.end}`}
+    legend={lineSeries.map(({ label, color }) => ({ label, color }))} source={t("sourceNoteDeaths")} chart={chart} period={`${model.range.start}-${model.range.end}`} /> : undefined;
   return <div data-testid="health-causes-of-death-area" className="@container">
     <PlaceHeading lead={t("page.area.regionHeadingLead")} placeLabel={areaName} triggerTestId="region-picker-trigger"
       picker={(open, close, id) => <RegionPicker id={id} open={open} onClose={close} regions={areas} activeRegionId={area} hrefForRegion={id => healthDeathsAreaHref(id as HealthArea)} indexHref={INDEX_HREF} />}
@@ -82,12 +86,12 @@ export function HealthDeathsExplorer({ area, areas, facts, labels, areaLabels, s
             <span className="text-[11px] text-[var(--muted)]">{unitLabel}</span>
           </div>
           {!model.selected.length ? <div className="mt-5"><Callout testId="no-selection-callout">{t("emptySelection")}</Callout></div>
-            : state.mode === "line" ? <div className="mt-5"><EditorialLineChart years={model.years} series={lineSeries} share={false} unit={UNIT} shareLabel={chartLabel} formatTooltipValue={valueLabel} /></div>
+            : state.mode === "line" ? <div className="mt-5">{chart}</div>
             : <ExplorerTable caption={`${chartLabel} · ${unitLabel} · ${model.range.start}–${model.range.end}`} rows={rows.filter(row => row !== total)} totalRow={total} showTotal={Boolean(total)} totalFirst wrapRowLabels rowLabelsLocalized years={model.years} firstColumnLabel={t("series")} unit={UNIT} share={false} showChangeColumn={false} shareValueForYear={() => null} />}
           <ChartSelectionAids series={lineSeries} chartShown={state.mode === "line"} share={false} unit={UNIT} formatValue={valueLabel} />
           <RangeStrip years={coverage.years} range={model.range} onChange={patch => update(s => ({ ...s, range: rangeFromPatch(buildHealthDeathsModel(area, facts, s).range, patch) }))} />
         </section>
-        <div className="mt-[18px]"><SourceNote testId="source-label">{t("sourceNoteDeaths")} · {unitLabel} · {model.range.start}–{model.range.end} · <span className="whitespace-nowrap">{updatedDate(lastReviewedAt, locale)}</span> · <Link href={pageHref("/methodology/health", locale)} prefetch={false} className="text-[var(--accent)] underline underline-offset-4">{t("methodology")}</Link>
+        <div className="mt-[18px]"><SourceNote testId="source-label" action={shareAction}>{t("sourceNoteDeaths")} · {unitLabel} · {model.range.start}–{model.range.end} · <span className="whitespace-nowrap">{updatedDate(lastReviewedAt, locale)}</span> · <Link href={pageHref("/methodology/health", locale)} prefetch={false} className="text-[var(--accent)] underline underline-offset-4">{t("methodology")}</Link>
         </SourceNote></div>
       </div>
       <FlatSeriesPanel asideLabel={message(messages, "controls.series")} caption={<>{model.range.end} · {unitLabel}</>}

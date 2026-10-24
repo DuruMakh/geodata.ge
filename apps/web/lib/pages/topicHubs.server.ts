@@ -28,6 +28,7 @@ import { loadServedRegionalEconomyData, REGIONAL_ECONOMY_REGIONS } from "../data
 import { loadServedScienceCultureData, toClientScienceCultureFact } from "../data/scienceCulture/importScienceCulture";
 import { loadServedGeneralGovernmentBalanceData, loadServedGovernmentDebtData, loadServedLandingData, loadServedMunicipalData } from "../data/servedData";
 import { loadServedSocialData, toClientSocialFact } from "../data/social/importSocial";
+import { loadServedTaxBreaksRefundsData, toClientTaxBreaksRefundsFact } from "../data/taxBreaksRefunds/importTaxBreaksRefunds";
 import { loadServedTradeCompositionData, toClientTradeCompositionData } from "../data/tradeComposition/importTradeComposition";
 import { loadServedTradeDomesticData, toClientTradeDomesticData } from "../data/tradeDomestic/importTradeDomestic";
 import { loadServedTradeOverviewData, toClientTradeOverviewFact } from "../data/tradeOverview/importTradeOverview";
@@ -97,13 +98,15 @@ function yearly(cards: HubCardModel[], years: readonly number[], reviewed: reado
 
 const LOADERS: Record<TopicId, (locale: Locale) => Promise<Loaded>> = {
   budget: async (locale) => {
-    const [presentation, { facts, sourceDocuments }, { countryTotalFacts }, { facts: debtFacts }, { facts: balanceFacts }, { facts: expenditureTypeFacts }] = await Promise.all([
+    const [presentation, { facts, sourceDocuments }, { countryTotalFacts }, { facts: debtFacts }, { facts: balanceFacts }, { facts: expenditureTypeFacts }, { facts: taxBreaksRefundsFacts }] = await Promise.all([
       getPresentation(locale, ["main", "hub"], []), loadServedLandingData(), loadServedMunicipalData(), loadServedGovernmentDebtData(), loadServedGeneralGovernmentBalanceData(), loadServedExpenditureTypesData(),
+      loadServedTaxBreaksRefundsData(),
     ]);
     const municipalTotals = new Map<number, number>();
     for (const row of countryTotalFacts) municipalTotals.set(row.year, row.publicTotalGel);
     const expenditureTypeTotals = new Map(expenditureTypeFacts.filter((fact) => fact.seriesId === EXPENDITURE_TYPES_TOTAL && fact.measure === "nominal").map((fact) => [fact.year, fact.value]));
-    const cards = buildHubCards(facts, municipalTotals, debtFacts, balanceFacts, presentation, expenditureTypeTotals, true);
+    const refundTotals = new Map(taxBreaksRefundsFacts.filter((fact) => fact.indicatorId === "tax_refunds.total").map(toClientTaxBreaksRefundsFact).map((fact) => [fact.year, fact.value]));
+    const cards = buildHubCards(facts, municipalTotals, debtFacts, balanceFacts, presentation, expenditureTypeTotals, refundTotals, true);
     return yearly(cards, facts.map((fact) => fact.year), [...sourceDocuments.map((source) => source.lastReviewedAt), ...debtFacts.map((fact) => fact.lastReviewedAt), ...balanceFacts.map((fact) => fact.lastReviewedAt)]);
   },
   economy: async (locale) => {

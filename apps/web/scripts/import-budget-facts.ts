@@ -14,6 +14,8 @@ import { loadEnergyFoodFacts, assertEnergyFoodParity } from "../lib/data/energyF
 import { energyFoodSourceDocumentId } from "../lib/data/energyFood/types";
 import { loadMoneyBanksFacts, assertMoneyBanksParity } from "../lib/data/moneyBanks/importMoneyBanks";
 import { moneyBanksSourceDocumentId } from "../lib/data/moneyBanks/types";
+import { loadTaxBreaksRefundsFacts, assertTaxBreaksRefundsParity } from "../lib/data/taxBreaksRefunds/importTaxBreaksRefunds";
+import { taxBreaksRefundsSourceDocumentId } from "../lib/data/taxBreaksRefunds/types";
 import { loadExternalPositionFacts, assertExternalPositionParity } from "../lib/data/externalPosition/importExternalPosition";
 import { externalPositionSourceDocumentId } from "../lib/data/externalPosition/types";
 import { loadBusinessFacts, assertBusinessParity } from "../lib/data/business/importBusiness";
@@ -88,6 +90,8 @@ import {
   energyFoodMirrorCreateRows,
   loadMoneyBanksFactsFromMirror,
   moneyBanksMirrorCreateRows,
+  loadTaxBreaksRefundsFactsFromMirror,
+  taxBreaksRefundsMirrorCreateRows,
   loadExternalPositionFactsFromMirror,
   externalPositionMirrorCreateRows,
   loadBusinessFactsFromMirror,
@@ -389,6 +393,8 @@ async function main() {
   assertSubset("Energy and food source IDs", energyFoodFacts.map(f => energyFoodSourceDocumentId(f.sourceId)), sourceIds);
   const moneyBanksFacts = await loadMoneyBanksFacts();
   assertSubset("Money and banks source IDs", moneyBanksFacts.map(f => moneyBanksSourceDocumentId(f.sourceId)), sourceIds);
+  const taxBreaksRefundsFacts = await loadTaxBreaksRefundsFacts();
+  assertSubset("Tax breaks and refunds source IDs", taxBreaksRefundsFacts.map(f => taxBreaksRefundsSourceDocumentId(f.sourceId)), sourceIds);
   const businessFacts = await loadBusinessFacts();
   assertSubset("Business source IDs", businessFacts.map(f => businessSourceDocumentId(f.sourceId)), sourceIds);
   const educationFacts = await loadEducationFacts();
@@ -620,6 +626,7 @@ async function main() {
         await tx.povertyFact.deleteMany();
         await tx.energyFoodFact.deleteMany();
         await tx.moneyBanksFact.deleteMany();
+        await tx.taxBreaksRefundsFact.deleteMany();
         await tx.externalPositionFact.deleteMany();
         await tx.businessFact.deleteMany();
         await tx.educationFact.deleteMany();
@@ -939,6 +946,9 @@ async function main() {
         await tx.moneyBanksFact.createMany({ data: moneyBanksMirrorCreateRows(moneyBanksFacts, run.id) });
         const mirrorMoneyBanksFacts = await loadMoneyBanksFactsFromMirror(tx);
         assertMoneyBanksParity(moneyBanksFacts, mirrorMoneyBanksFacts);
+        await tx.taxBreaksRefundsFact.createMany({ data: taxBreaksRefundsMirrorCreateRows(taxBreaksRefundsFacts, run.id) });
+        const mirrorTaxBreaksRefundsFacts = await loadTaxBreaksRefundsFactsFromMirror(tx);
+        assertTaxBreaksRefundsParity(taxBreaksRefundsFacts, mirrorTaxBreaksRefundsFacts);
         await tx.externalPositionFact.createMany({ data: externalPositionMirrorCreateRows(externalPositionFacts, run.id) });
         const mirrorExternalPositionFacts = await loadExternalPositionFactsFromMirror(tx);
         assertExternalPositionParity(externalPositionFacts, mirrorExternalPositionFacts);
@@ -1317,6 +1327,7 @@ async function main() {
             { table: "PovertyFact", csvRows: povertyFacts.length, dbRows: mirrorPovertyFacts.length },
             { table: "EnergyFoodFact", csvRows: energyFoodFacts.length, dbRows: mirrorEnergyFoodFacts.length },
             { table: "MoneyBanksFact", csvRows: moneyBanksFacts.length, dbRows: mirrorMoneyBanksFacts.length },
+            { table: "TaxBreaksRefundsFact", csvRows: taxBreaksRefundsFacts.length, dbRows: mirrorTaxBreaksRefundsFacts.length },
             { table: "ExternalPositionFact", csvRows: externalPositionFacts.length, dbRows: mirrorExternalPositionFacts.length },
             { table: "BusinessFact", csvRows: businessFacts.length, dbRows: mirrorBusinessFacts.length },
             { table: "EducationFact", csvRows: educationFacts.length, dbRows: mirrorEducationFacts.length },

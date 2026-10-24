@@ -22,7 +22,8 @@ import {
   type CityView,
   type PackedCitySeries,
 } from "../../lib/explorer/inflationCities";
-import { cityLineLabel, cityViewLineColor, cityViewLineLabel } from "../../lib/explorer/inflationCityLabels";
+import { cityLineLabel, cityPlaceLabel, cityViewLineColor, cityViewLineLabel } from "../../lib/explorer/inflationCityLabels";
+import { periodKey } from "../../lib/data/inflation/periods";
 import { CITIES_PATH } from "../../lib/explorer/inflationCityRoutes";
 import { buildInflationCityWorkbookExportModel } from "../../lib/explorer/inflationCityWorkbook";
 import { formatInflationValue, periodLabel, monthlyChartPeriod, PCT_UNIT } from "../../lib/explorer/inflationLabels";
@@ -36,6 +37,7 @@ import { ExcelDownloadButton } from "../explorer/excel-download-button";
 import { ExplorerPage } from "../explorer-shell/explorer-page";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
+import { ChartShareButton } from "../explorer-shell/chart-share-button";
 import { useHashState } from "../explorer-shell/use-hash-state";
 import { EditorialLineChart, type ChartSeries } from "../main-explorer/editorial-line-chart";
 import { RangeStrip } from "../main-explorer/range-strip";
@@ -88,6 +90,27 @@ export function InflationCities({ view, facts, lastReviewedAt, sources, siteOrig
     color: cityViewLineColor(view, line.key),
     vals: line.values,
   }));
+  const chart = (
+    <EditorialLineChart
+      years={lines.periods}
+      series={chartSeries}
+      share
+      unit={PCT_UNIT}
+      shareLabel={t("categoryTab.yoy")}
+      periodsPerYear={12}
+      formatPeriod={(period, kind) => monthlyChartPeriod(messages, period, kind)}
+    />
+  );
+  const shareAction = hasSeries ? (
+    <ChartShareButton
+      title={`${t("cityHeadingLead")} ${cityPlaceLabel(messages, view)}`}
+      caption={`${t("categoryUnit.yoy")} · ${periodLabel(messages, range.start, "short")}–${periodLabel(messages, range.end, "short")}`}
+      legend={chartSeries.map(({ label, color }) => ({ label, color }))}
+      source={t("citySource")}
+      chart={chart}
+      period={`${periodKey(range.start)}-${periodKey(range.end)}`}
+    />
+  ) : undefined;
   const citiesCrumb = { label: t("citiesHeading"), ...(view.kind === "city" ? { href: pageHref(CITIES_PATH, locale) } : {}) };
 
   return (
@@ -128,17 +151,7 @@ export function InflationCities({ view, facts, lastReviewedAt, sources, siteOrig
             ) : state.mode === "table" ? (
               <InflationCityTable index={index} view={view} state={state} range={range} onTableSeriesChange={(lineId) => update((current) => ({ ...current, tableSeries: lineId }))} />
             ) : (
-              <div className="mt-5">
-                <EditorialLineChart
-                  years={lines.periods}
-                  series={chartSeries}
-                  share
-                  unit={PCT_UNIT}
-                  shareLabel={t("categoryTab.yoy")}
-                  periodsPerYear={12}
-                  formatPeriod={(period, kind) => monthlyChartPeriod(messages, period, kind)}
-                />
-              </div>
+              <div className="mt-5">{chart}</div>
             )}
             <ChartSelectionAids series={chartSeries} chartShown={state.mode === "chart"} share unit={PCT_UNIT} />
             <RangeStrip
@@ -151,7 +164,7 @@ export function InflationCities({ view, facts, lastReviewedAt, sources, siteOrig
             />
           </section>
           <div className="mt-[18px] space-y-2">
-            <SourceNote testId="source-label">
+            <SourceNote testId="source-label" action={shareAction}>
               {/* The unit sits with the source, not as a second line under the heading (DESIGN §17). */}
               <span data-testid="inflation-city-unit">{t("categoryUnit.yoy")}</span>
               {" · "}

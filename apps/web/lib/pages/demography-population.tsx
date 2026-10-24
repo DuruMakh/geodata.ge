@@ -141,6 +141,7 @@ export async function renderDemographyPopulationPage(locale: Locale) {
         <ExplorerHeading>{title}</ExplorerHeading>
         <p className="mb-[30px] text-[13px] text-[var(--body)]">{t("unitLine")}</p>
         <MunicipalitiesIndex
+          share={{ title, caption: t("mapLegendPopulation", { year: index.year }), source: message(messages, "demography.source", { start, end }), period: String(index.year) }}
           viewBox={index.map.viewBox}
           shapes={index.map.shapes}
           markers={index.map.markers}

@@ -67,7 +67,7 @@ const registerRow = (overrides: Partial<DecisionRegisterRow> = {}): DecisionRegi
 
 describe("methodology catalog", () => {
   it("exposes the approved live datasets", () => {
-    expect(LIVE_METHODOLOGY_IDS).toEqual(["expenditure", "expenditure-types", "revenue", "municipalities", "debt", "gdp", "economic-sectors", "gdp-expenditure", "regional-economies", "business", "housing", "inflation", "money", "unemployment", "wages", "poverty", "household-income", "health", "social-protection", "education", "science-culture", "crime", "internet", "trade", "external-flows", "energy-food", "environment", "transport", "demography"]);
+    expect(LIVE_METHODOLOGY_IDS).toEqual(["expenditure", "expenditure-types", "revenue", "tax-breaks-refunds", "municipalities", "debt", "gdp", "economic-sectors", "gdp-expenditure", "regional-economies", "business", "housing", "inflation", "money", "unemployment", "wages", "poverty", "household-income", "health", "social-protection", "education", "science-culture", "crime", "internet", "trade", "external-flows", "energy-food", "environment", "transport", "demography"]);
     expect(Object.keys(METHODOLOGY_CONTENT)).toEqual(LIVE_METHODOLOGY_IDS);
   });
 
@@ -341,6 +341,7 @@ describe("methodology catalog", () => {
       "economic-sectors": {fileCount:3,totalBytes:100,latestRetrievedAt:"2026-09-11",validated:true,minYear:2010,maxYear:2025},
       "gdp-expenditure": {fileCount:3,totalBytes:100,latestRetrievedAt:"2026-10-20",validated:true,minYear:2010,maxYear:2025},
       "expenditure-types": {fileCount:1,totalBytes:100,latestRetrievedAt:"2026-10-21",validated:true,minYear:2002,maxYear:2025},
+      "tax-breaks-refunds": {fileCount:5,totalBytes:100,latestRetrievedAt:"2026-10-21",validated:true,minYear:2008,maxYear:2025},
       "regional-economies": {fileCount:2,totalBytes:100,latestRetrievedAt:"2026-09-13",validated:true,minYear:2010,maxYear:2024},
       expenditure: { fileCount: 42, totalBytes: 100, latestRetrievedAt: "2026-08-10", validated: true },
       revenue: { fileCount: 21, totalBytes: 200, latestRetrievedAt: "2026-08-09", validated: true },
@@ -389,6 +390,7 @@ describe("methodology catalog", () => {
         originalFileCount: 21,
         reviewedAt: METHODOLOGY_CONTENT.revenue.reviewedAt,
       },
+      {id:"tax-breaks-refunds",title:METHODOLOGY_CONTENT["tax-breaks-refunds"].title,summary:METHODOLOGY_CONTENT["tax-breaks-refunds"].summary,href:"/methodology/tax-breaks-refunds",coverage:{firstYear:2008,lastYear:2025},originalFileCount:5,reviewedAt:METHODOLOGY_CONTENT["tax-breaks-refunds"].reviewedAt},
       {
         id: "municipalities",
         title: METHODOLOGY_CONTENT.municipalities.title,
@@ -447,6 +449,7 @@ describe("methodology catalog", () => {
       "economic-sectors": {fileCount:3,totalBytes:100,latestRetrievedAt:"2026-09-11",validated:true,minYear:2010,maxYear:2025},
       "gdp-expenditure": {fileCount:3,totalBytes:100,latestRetrievedAt:"2026-10-20",validated:true,minYear:2010,maxYear:2025},
       "expenditure-types": {fileCount:1,totalBytes:100,latestRetrievedAt:"2026-10-21",validated:true,minYear:2002,maxYear:2025},
+      "tax-breaks-refunds": {fileCount:5,totalBytes:100,latestRetrievedAt:"2026-10-21",validated:true,minYear:2008,maxYear:2025},
       "regional-economies": {fileCount:2,totalBytes:100,latestRetrievedAt:"2026-09-13",validated:true,minYear:2010,maxYear:2024},
       expenditure: { fileCount: 1, totalBytes: 1, latestRetrievedAt: "2026-08-10", validated: true },
       revenue: { fileCount: 1, totalBytes: 1, latestRetrievedAt: "2026-08-10", validated: false },

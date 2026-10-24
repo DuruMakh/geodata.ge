@@ -33,7 +33,7 @@ export function EnvironmentRegionIndex({ topic, regionMap, georgiaValue, unit, d
     <ExplorerHeading>{t(`page.${topic}.title`)}</ExplorerHeading>
     <LatestValueLine testId="environment-latest" measure={latest.measure} period={latest.year} value={latest.value} />
     <section data-testid="environment-region-index" className="mt-4">
-      <RegionIndex model={regionMap} summary={[]} sourceNote={`${t(`sourceNote.${topic}`)} · ${unitLabel} · ${regionMap.year}.`}
+      <RegionIndex title={t(`page.${topic}.title`)} model={regionMap} summary={[]} sourceNote={`${t(`sourceNote.${topic}`)} · ${unitLabel} · ${regionMap.year}.`}
         leadRow={georgiaValue === undefined ? undefined : { id: "georgia", label: t("area.georgia"), value: georgiaValue }} metric={{
           hrefForRegion: environmentAreaRoutes(topic).regionHref, formatValue: value => formatInUnit(value, environmentValueUnit(decimals)), legend: `${mapLabel} · ${unitLabel}`,
           testId: "environment-region-map", mapAria: t("regionMapAria", { total: mapLabel, unit: unitLabel, year: regionMap.year }),

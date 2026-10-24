@@ -180,6 +180,27 @@ export const SERIES_COLORS: Record<string, string> = {
   "sex.female": "#C26E4C",
   // Births page: the first year of the mother's-age fertility curve (the last is ACCENT).
   "fertility.first_year": "#3D5A98",
+
+  // Tax breaks and refunds (spec 2026-10-21). Both totals are on at arrival, so neither is ink. The VAT total wears
+  // Revenue's VAT colour; education, health, cars and farm products wear their concept colours; VAT's remainder wears "other";
+  // the rest are new hexes, so no sector or concept colour is reused. tests/explorer/taxBreaksRefundsModel.test.ts holds all 16 at CIEDE2000 >= 10 apart
+  // and >= 3:1 on paper and tint.
+  "tax_breaks.total": "#5A3E85",
+  "tax_breaks.vat.total": "#B3402A",
+  "tax_breaks.vat.education": "#3D5A98",
+  "tax_breaks.vat.health": "#1F6E56",
+  "tax_breaks.vat.child_care": "#B0607E",
+  "tax_breaks.vat.gambling": "#7E3B58",
+  "tax_breaks.vat.vehicles": "#C26E4C",
+  "tax_breaks.vat.agriculture": "#2F4B3A",
+  "tax_breaks.vat.medicines": "#2A8C82",
+  "tax_breaks.vat.other": OTHER_COLOR,
+  "tax_breaks.income.total": "#9A7420",
+  "tax_breaks.income.personal": "#7A4A22",
+  "tax_breaks.income.profit": "#6A7A2E",
+  "tax_breaks.income.old_profit": "#8E6F8C",
+  "tax_breaks.income.other": "#55524A",
+  "tax_refunds.total": "#0B6E99",
 };
 
 // Open-ended top-level sets cycle through the editorial palette by position so

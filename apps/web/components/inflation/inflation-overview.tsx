@@ -6,6 +6,7 @@ import { useMemo, useState } from "react";
 import type { ClientInflationTargetRow } from "../../lib/servedRows";
 import { updatedDate } from "../../lib/explorer/coverageLabel";
 import { formatInflationValue, periodLabel, seriesLabel, monthlyChartPeriod } from "../../lib/explorer/inflationLabels";
+import { periodKey } from "../../lib/data/inflation/periods";
 import { latestEntry } from "../../lib/explorer/latestValue";
 import { ModeTabs } from "../explorer-shell/mode-tabs";
 import { LatestValueLine } from "../explorer-shell/latest-value-line";
@@ -32,6 +33,7 @@ import { ExplorerHeading } from "../explorer-shell/explorer-heading";
 import { ExplorerPage } from "../explorer-shell/explorer-page";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
+import { ChartShareButton } from "../explorer-shell/chart-share-button";
 import { useHashState } from "../explorer-shell/use-hash-state";
 import { topicSection } from "../../lib/navigation/navTree";
 
@@ -93,6 +95,27 @@ export function InflationOverview({ facts, sourceIdBySeriesMeasure, lastReviewed
     setAnnouncement(t("rangeChanged", { start: periodLabel(messages, nextRange.start, "short"), end: periodLabel(messages, nextRange.end, "short") }));
   }
 
+  const chart = (
+    <EditorialLineChart
+      years={periods}
+      series={chartSeries}
+      share={state.tab !== "index"}
+      unit={INDEX_UNIT}
+      shareLabel={t(`tab.${state.tab}`)}
+      periodsPerYear={12}
+      formatPeriod={(period, kind) => monthlyChartPeriod(messages, period, kind)}
+    />
+  );
+  const shareAction = hasSeries ? (
+    <ChartShareButton
+      title={t("heading")}
+      caption={`${t(`unit.${state.tab}`)} · ${periodLabel(messages, range.start, "short")}–${periodLabel(messages, range.end, "short")}`}
+      legend={chartSeries.map(({ label, color }) => ({ label, color }))}
+      source={t("source")}
+      chart={chart}
+      period={`${periodKey(range.start)}-${periodKey(range.end)}`}
+    />
+  ) : undefined;
   return (
     <ExplorerPage testId="inflation-overview">
       <PageHeader
@@ -137,15 +160,7 @@ export function InflationOverview({ facts, sourceIdBySeriesMeasure, lastReviewed
               <InflationTable index={index} state={state} range={range} onTableSeriesChange={(key) => update((current) => ({ ...current, tableSeries: key }))} />
             ) : (
               <div className="mt-5">
-                <EditorialLineChart
-                  years={periods}
-                  series={chartSeries}
-                  share={state.tab !== "index"}
-                  unit={INDEX_UNIT}
-                  shareLabel={t(`tab.${state.tab}`)}
-                  periodsPerYear={12}
-                  formatPeriod={(period, kind) => monthlyChartPeriod(messages, period, kind)}
-                />
+                {chart}
               </div>
             )}
             <ChartSelectionAids series={chartSeries} chartShown={state.mode === "line"} share={state.tab !== "index"} unit={INDEX_UNIT} />
@@ -159,7 +174,7 @@ export function InflationOverview({ facts, sourceIdBySeriesMeasure, lastReviewed
             />
           </section>
           <div className="mt-[18px] space-y-2">
-            <SourceNote testId="source-label">
+            <SourceNote testId="source-label" action={shareAction}>
               {/* The unit sits with the source, not as a second line under the heading (DESIGN §17). */}
               <span data-testid="inflation-unit">{t(`unit.${state.tab}`)}</span>
               {" · "}

@@ -1,0 +1,132 @@
+[
+ {
+  "source_id": "pension_fund_ifrs_2020",
+  "document": "2020-IFRS.pdf",
+  "url": "https://site-api.pensions.ge/uploads/docs/reports/financial-statements/2020-IFRS.pdf",
+  "local_file": "official/2020-IFRS.pdf",
+  "bytes": 687243,
+  "sha256": "e0e580f3e74cda23ebaa61d98f9dc55f90ab0644c902aba7996a462a46e15e98",
+  "retrieved_on": "2026-10-21",
+  "used_for": "served"
+ },
+ {
+  "source_id": "pension_fund_ifrs_2022",
+  "document": "2022-IFRS-GE.pdf",
+  "url": "https://site-api.pensions.ge/uploads/docs/reports/financial-statements/2022-IFRS-GE.pdf",
+  "local_file": "official/2022-IFRS-GE.pdf",
+  "bytes": 1302950,
+  "sha256": "975e9ee8896a6f34b6389e14e48d8fda25a088d7a6abd12ca5869c8e8a76e2d5",
+  "retrieved_on": "2026-10-21",
+  "used_for": "served"
+ },
+ {
+  "source_id": "pension_fund_ifrs_2023",
+  "document": "2023-IFRS-GE.pdf",
+  "url": "https://site-api.pensions.ge/uploads/docs/reports/financial-statements/2023-IFRS-GE.pdf",
+  "local_file": "official/2023-IFRS-GE.pdf",
+  "bytes": 6967262,
+  "sha256": "41869afa09f30755dcf3ea13364364a86ea29509ede23542220cc8fb271552b9",
+  "retrieved_on": "2026-10-21",
+  "used_for": "served"
+ },
+ {
+  "source_id": "pension_fund_ifrs_2024",
+  "document": "2024-IFRS-GE.pdf",
+  "url": "https://site-api.pensions.ge/uploads/docs/reports/financial-statements/2024-IFRS-GE.pdf",
+  "local_file": "official/2024-IFRS-GE.pdf",
+  "bytes": 1148152,
+  "sha256": "6fb6429de510e9b46557d7a39354341aeb41f0d403e59e0df97c983a4418befd",
+  "retrieved_on": "2026-10-21",
+  "used_for": "served"
+ },
+ {
+  "source_id": "pension_fund_ifrs_2025",
+  "document": "2025-IFRS.pdf",
+  "url": "https://site-api.pensions.ge/uploads/docs/reports/financial-statements/2025-IFRS.pdf",
+  "local_file": "official/2025-IFRS.pdf",
+  "bytes": 1315265,
+  "sha256": "cf4b93ba6e0b66df4568a959a436ccd6dd5b7c8a68e97d9f4f931d08819119ea",
+  "retrieved_on": "2026-10-21",
+  "used_for": "served"
+ },
+ {
+  "source_id": "pension_fund_report_2025",
+  "document": "Annual_Rep_2025_geo.pdf",
+  "url": "https://site-api.pensions.ge/uploads/docs/reports/activity-reports/Annual_Rep_2025_geo.pdf",
+  "local_file": "official/Annual_Rep_2025_geo.pdf",
+  "bytes": 1276899,
+  "sha256": "36f3a2ba48bc86d4f3dc21f069a33c20f9429b28cd686ebf26e24b2f2b6dc5ae",
+  "retrieved_on": "2026-10-21",
+  "used_for": "served"
+ },
+ {
+  "source_id": "pension_fund_ifrs_2019",
+  "document": "2019-IFRS.pdf",
+  "url": "https://site-api.pensions.ge/uploads/docs/reports/financial-statements/2019-IFRS.pdf",
+  "local_file": "official/2019-IFRS.pdf",
+  "bytes": 2668084,
+  "sha256": "f3c78fd91851da8e9e64174b3137bad192e12b7d2023c74b6560dfad2c82e7b3",
+  "retrieved_on": "2026-10-21",
+  "used_for": "check"
+ },
+ {
+  "source_id": "pension_fund_report_2019",
+  "document": "2019-annual-report.pdf",
+  "url": "https://site-api.pensions.ge/uploads/docs/reports/activity-reports/2019-annual-report.pdf",
+  "local_file": "official/2019-annual-report.pdf",
+  "bytes": 94450,
+  "sha256": "82b74f9dc10e572585c5eafe039e7f4bc0a00710e96f6f9a803114def7e1fd3f",
+  "retrieved_on": "2026-10-21",
+  "used_for": "check"
+ },
+ {
+  "source_id": "pension_fund_report_2020",
+  "document": "2020-annual-report.pdf",
+  "url": "https://site-api.pensions.ge/uploads/docs/reports/activity-reports/2020-annual-report.pdf",
+  "local_file": "official/2020-annual-report.pdf",
+  "bytes": 251374,
+  "sha256": "51f2a4742a569cf1734432b5bd82844aba0ae6a5f66112cbb6f39e6388a6be3d",
+  "retrieved_on": "2026-10-21",
+  "used_for": "check"
+ },
+ {
+  "source_id": "pension_fund_report_2021",
+  "document": "2021-annual-report.pdf",
+  "url": "https://site-api.pensions.ge/uploads/docs/reports/activity-reports/2021-annual-report.pdf",
+  "local_file": "official/2021-annual-report.pdf",
+  "bytes": 666478,
+  "sha256": "2ac18d4d25531bd15500f0888a4b74b4d4fce3ed784fc35dda921667111a1022",
+  "retrieved_on": "2026-10-21",
+  "used_for": "check"
+ },
+ {
+  "source_id": "pension_fund_report_2022",
+  "document": "2022-annual-report.pdf",
+  "url": "https://site-api.pensions.ge/uploads/docs/reports/activity-reports/2022-annual-report.pdf",
+  "local_file": "official/2022-annual-report.pdf",
+  "bytes": 1003398,
+  "sha256": "63712181879205b6c782b7cf453dbb642fbf846f667a8d314630fa8ecd93969f",
+  "retrieved_on": "2026-10-21",
+  "used_for": "check"
+ },
+ {
+  "source_id": "pension_fund_report_2023",
+  "document": "2023-annual-report.pdf",
+  "url": "https://site-api.pensions.ge/uploads/docs/reports/activity-reports/2023-annual-report.pdf",
+  "local_file": "official/2023-annual-report.pdf",
+  "bytes": 676247,
+  "sha256": "ab9126406a19e5be97bc612744d21fd0e91579387e8b3b37e1d3a66547a603d8",
+  "retrieved_on": "2026-10-21",
+  "used_for": "check"
+ },
+ {
+  "source_id": "pension_fund_report_2024",
+  "document": "2024-annual-report.pdf",
+  "url": "https://site-api.pensions.ge/uploads/docs/reports/activity-reports/2024-annual-report.pdf",
+  "local_file": "official/2024-annual-report.pdf",
+  "bytes": 758391,
+  "sha256": "70bdcdfa000a3b514057231de7edadc5053d0f5a5f9a50c171d9ff31cc3d33f7",
+  "retrieved_on": "2026-10-21",
+  "used_for": "check"
+ }
+]

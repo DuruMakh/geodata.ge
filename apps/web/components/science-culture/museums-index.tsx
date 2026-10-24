@@ -34,7 +34,7 @@ export function MuseumsIndex({ facts, regionMap }: {
     <LatestValueLine testId="science-culture-latest" sentence={<Message messages={messages} id="scienceCulture.latest.museumsIndex"
       values={{ period: latest.year, value: <LatestFigure value={formatInUnit(latest.value, { divisor: 1_000, label: "", decimals: 1 })} /> }} />} />
     <section data-testid="science-culture-region-index" className="mt-4">
-      <RegionIndex model={regionMap} summary={[]} sourceNote={`${t("sourceNoteMuseums")} · ${unitLabel} · ${regionMap.year}.`}
+      <RegionIndex title={t("page.museums.title")} model={regionMap} summary={[]} sourceNote={`${t("sourceNoteMuseums")} · ${unitLabel} · ${regionMap.year}.`}
         leadRow={georgiaValue === undefined ? undefined : { id: "georgia", label: t("area.georgia"), value: georgiaValue }} metric={{
           hrefForRegion: museumRegionHref, formatValue: value => formatInUnit(value, scienceCultureValueUnit("thousand")), legend: `${mapLabel} · ${unitLabel}`, testId: "science-culture-region-map",
           mapAria: t("regionMapAria", { total: mapLabel, unit: unitLabel, year: regionMap.year }),

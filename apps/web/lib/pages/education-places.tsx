@@ -129,6 +129,7 @@ export async function renderEducationIndexPage(locale: Locale, set: EducationPla
         }} />} />
         <section data-testid={`education-index-${set}`} className="mt-4">
           <MunicipalitiesIndex
+            share={{ title, caption: t(`mapLegend.${set}`, { year: period(index.year) }), source: t(`sourceNote.${set}`), period: String(index.year) }}
             viewBox={index.map.viewBox}
             shapes={index.map.shapes}
             markers={index.map.markers}

@@ -1,4 +1,5 @@
 import { beforeAll, describe, expect, it } from "vitest";
+import { loadServedTaxBreaksRefundsData, toClientTaxBreaksRefundsFact } from "../../lib/data/taxBreaksRefunds/importTaxBreaksRefunds";
 import { buildHubCards } from "../../lib/explorer/hubCards";
 import { ACCENT, INK } from "../../lib/explorer/colors";
 import { loadServedGeneralGovernmentBalanceData, loadServedGovernmentDebtData, loadServedLandingData, loadServedMunicipalData } from "../../lib/data/servedData";
@@ -74,11 +75,11 @@ const BALANCE_FACTS: ServedGeneralGovernmentBalanceFact[] = [
 // and falls back to a literal cannot pass unnoticed.
 
 describe("buildHubCards", () => {
-  it("orders expenditure, spending by type, revenue, municipalities, analysis, debt, deficit", () => {
+  it("orders expenditure, spending by type, revenue, tax breaks and refunds, municipalities, analysis, debt, deficit", () => {
     const cards = buildHubCards(FACTS, MUNICIPAL_TOTALS, DEBT_FACTS);
 
-    expect(cards.map((card) => card.title)).toEqual(["ხარჯები", "ხარჯების სახეები", "შემოსავლები", "მუნიციპალიტეტები", "ანალიზი", "ვალი", "დეფიციტი"]);
-    expect(cards.map((card) => card.index)).toEqual(["01", "02", "03", "04", "05", "06", "07"]);
+    expect(cards.map((card) => card.title)).toEqual(["ხარჯები", "ხარჯების სახეები", "შემოსავლები", "შეღავათები და დაბრუნება", "მუნიციპალიტეტები", "ანალიზი", "ვალი", "დეფიციტი"]);
+    expect(cards.map((card) => card.index)).toEqual(["01", "02", "03", "04", "05", "06", "07", "08"]);
   });
 
   it("derives each live card's footer from the latest year", () => {
@@ -118,7 +119,7 @@ describe("buildHubCards", () => {
     // category sum; 11.00 would be the sum with the total double-counted in.
     expect(cards[0].footer).toBe("2025 · 9.0 მლრდ ₾");
     // The total row is still not a category.
-    expect(cards[4].footer).toContain("1 კატეგორია");
+    expect(cards[5].footer).toContain("1 კატეგორია");
   });
 
   it("lets an actual value beat a planned value for the same year and item", () => {
@@ -129,8 +130,8 @@ describe("buildHubCards", () => {
     expect(cards[2].series?.at(-1)).toBe(4_000_000_000);
   });
 
-  it("makes card 04 a live destination once municipal data is routed", () => {
-    const card = buildHubCards(FACTS, MUNICIPAL_TOTALS, DEBT_FACTS)[3]!;
+  it("makes card 05 a live destination once municipal data is routed", () => {
+    const card = buildHubCards(FACTS, MUNICIPAL_TOTALS, DEBT_FACTS)[4]!;
 
     expect(card.href).toBe("/explorer/municipalities");
     expect(card.comingSoon).toBe(false);
@@ -155,14 +156,14 @@ describe("buildHubCards", () => {
     // payments. Describing it as "64 მუნიციპალიტეტი და 11 რეგიონი" overstated
     // the local-budget total those entities sum to by 8.6%. The destination
     // page states 69 საბიუჯეტო ერთეული; the card now matches it.
-    const card = buildHubCards(FACTS, MUNICIPAL_TOTALS, DEBT_FACTS)[3]!;
+    const card = buildHubCards(FACTS, MUNICIPAL_TOTALS, DEBT_FACTS)[4]!;
 
     expect(card.description).toBe("69 მუნიციპალური საბიუჯეტო ერთეული — რაში იხარჯება ადგილობრივი ბიუჯეტები.");
     expect(card.description).not.toContain("მუნიციპალიტეტი და");
   });
 
   it("points the analysis card at the route it actually opens", () => {
-    const card = buildHubCards(FACTS, MUNICIPAL_TOTALS, DEBT_FACTS)[4];
+    const card = buildHubCards(FACTS, MUNICIPAL_TOTALS, DEBT_FACTS)[5];
 
     expect(card.href).toBe("/explorer/analysis");
     expect(card.comingSoon).toBe(false);
@@ -170,8 +171,8 @@ describe("buildHubCards", () => {
     expect(card.footer).toContain("კატეგორია");
   });
 
-  it("builds card 06 only from the served total-debt facts", () => {
-    const card = buildHubCards(FACTS, MUNICIPAL_TOTALS, DEBT_FACTS)[5]!;
+  it("builds card 07 only from the served total-debt facts", () => {
+    const card = buildHubCards(FACTS, MUNICIPAL_TOTALS, DEBT_FACTS)[6]!;
 
     expect(card.href).toBe("/explorer/debt");
     expect(card.comingSoon).toBe(false);
@@ -190,8 +191,8 @@ describe("buildHubCards", () => {
     expect(card.seriesColor).toBe(INK);
   });
 
-  it("builds card 07 from actual IMF deficit percentages, excluding projections", () => {
-    const card = buildHubCards(FACTS, MUNICIPAL_TOTALS, DEBT_FACTS, BALANCE_FACTS)[6]!;
+  it("builds card 08 from actual IMF deficit percentages, excluding projections", () => {
+    const card = buildHubCards(FACTS, MUNICIPAL_TOTALS, DEBT_FACTS, BALANCE_FACTS)[7]!;
 
     expect(card.href).toBe("/explorer/deficit");
     expect(card.comingSoon).toBe(false);
@@ -202,22 +203,23 @@ describe("buildHubCards", () => {
 });
 
 describe("buildHubCards over the served data", () => {
-  let input: { facts: Parameters<typeof buildHubCards>[0]; municipalCountryTotalFacts: { year: number; publicTotalGel: number }[]; debtFacts: ServedGovernmentDebtFact[]; balanceFacts: ServedGeneralGovernmentBalanceFact[] };
+  let input: { facts: Parameters<typeof buildHubCards>[0]; municipalCountryTotalFacts: { year: number; publicTotalGel: number }[]; debtFacts: ServedGovernmentDebtFact[]; balanceFacts: ServedGeneralGovernmentBalanceFact[]; refundTotals: Map<number, number> };
   let ka: Presentation, en: Presentation;
   beforeAll(async () => {
-    const [landing, municipal, debt, balance] = await Promise.all([loadServedLandingData(), loadServedMunicipalData(), loadServedGovernmentDebtData(), loadServedGeneralGovernmentBalanceData()]);
-    input = { facts: landing.facts, municipalCountryTotalFacts: municipal.countryTotalFacts, debtFacts: debt.facts, balanceFacts: balance.facts };
+    const [landing, municipal, debt, balance, taxBreaksRefunds] = await Promise.all([loadServedLandingData(), loadServedMunicipalData(), loadServedGovernmentDebtData(), loadServedGeneralGovernmentBalanceData(), loadServedTaxBreaksRefundsData()]);
+    const refundTotals = new Map(taxBreaksRefunds.facts.filter(fact => fact.indicatorId === "tax_refunds.total").map(toClientTaxBreaksRefundsFact).map(fact => [fact.year, fact.value]));
+    input = { facts: landing.facts, municipalCountryTotalFacts: municipal.countryTotalFacts, debtFacts: debt.facts, balanceFacts: balance.facts, refundTotals };
     const ids = [...landing.glossary.keys(), ...municipal.municipalities.map(entity => entity.code), "debt.stock.domestic", "debt.stock.external"];
     [ka, en] = await Promise.all([getPresentation("ka", ["common", "landing", "hub"], ids), getPresentation("en", ["common", "landing", "hub"], ids)]);
   });
 
   it("keeps hub destinations, sparkline values, coverage and ordering unchanged", () => {
     const totals = new Map(input.municipalCountryTotalFacts.map(fact => [fact.year, fact.publicTotalGel]));
-    const original = buildHubCards(input.facts, totals, input.debtFacts, input.balanceFacts, ka);
-    const english = buildHubCards(input.facts, totals, input.debtFacts, input.balanceFacts, en);
+    const original = buildHubCards(input.facts, totals, input.debtFacts, input.balanceFacts, ka, undefined, input.refundTotals);
+    const english = buildHubCards(input.facts, totals, input.debtFacts, input.balanceFacts, en, undefined, input.refundTotals);
     const data = (cards: typeof original) => cards.map(card => ({ ...card, title: undefined, description: undefined, footer: card.footer?.match(/[−+]?\d[\d,.]*%?/g) }));
     expect(data(english)).toEqual(data(original));
-    expect(original).toEqual(buildHubCards(input.facts, totals, input.debtFacts, input.balanceFacts));
+    expect(original).toEqual(buildHubCards(input.facts, totals, input.debtFacts, input.balanceFacts, undefined, undefined, input.refundTotals));
     expect(english.flatMap(card => [card.title, card.description, card.footer ?? ""]).join(" ")).not.toMatch(/\p{Script=Georgian}/u);
     expect(english.find(card => card.href === "/explorer/municipalities")?.description).toContain("69");
   });

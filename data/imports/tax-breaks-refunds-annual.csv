@@ -1,0 +1,124 @@
+﻿year,indicator_id,value,published_value,unit,basis,value_status,source_id,source_sheet,source_cell,last_reviewed_at
+2018,tax_breaks.total,2623.5984415840685,2623.60,gel_million,actual,official,mof_tax_expenditure_report_2024_xlsx_ka,Figure 1,C7,2026-10-21
+2019,tax_breaks.total,3463.7689759158193,3463.77,gel_million,actual,official,mof_tax_expenditure_report_2024_xlsx_ka,Figure 1,D7,2026-10-21
+2020,tax_breaks.total,3389.7114778143605,3389.71,gel_million,actual,official,mof_tax_expenditure_report_2024_xlsx_ka,Figure 1,E7,2026-10-21
+2021,tax_breaks.total,4848.3750852403055,4848.38,gel_million,actual,official,mof_tax_expenditure_report_2024_xlsx_ka,Figure 1,F7,2026-10-21
+2022,tax_breaks.total,5626.4804085255564,5626.48,gel_million,actual,official,mof_tax_expenditure_report_2024_xlsx_ka,Figure 1,G7,2026-10-21
+2023,tax_breaks.total,5921.7181305016275,5921.72,gel_million,actual,official,mof_tax_expenditure_report_2024_xlsx_ka,Figure 1,H7,2026-10-21
+2024,tax_breaks.total,6403.1762556943795,6403.18,gel_million,actual,official,mof_tax_expenditure_report_2024_xlsx_ka,Figure 1,I7,2026-10-21
+2018,tax_breaks.vat.total,2229.7668197857165,2229.77,gel_million,actual,official,mof_tax_expenditure_report_2024_xlsx_ka,Figure 1,C6,2026-10-21
+2019,tax_breaks.vat.total,3179.8304356484023,3179.83,gel_million,actual,official,mof_tax_expenditure_report_2024_xlsx_ka,Figure 1,D6,2026-10-21
+2020,tax_breaks.vat.total,3084.4191776679527,3084.42,gel_million,actual,official,mof_tax_expenditure_report_2024_xlsx_ka,Figure 1,E6,2026-10-21
+2021,tax_breaks.vat.total,4513.3723618007416,4513.37,gel_million,actual,official,mof_tax_expenditure_report_2024_xlsx_ka,Figure 1,F6,2026-10-21
+2022,tax_breaks.vat.total,5232.0540123749488,5232.05,gel_million,actual,official,mof_tax_expenditure_report_2024_xlsx_ka,Figure 1,G6,2026-10-21
+2023,tax_breaks.vat.total,5489.6132220776635,5489.61,gel_million,actual,official,mof_tax_expenditure_report_2024_xlsx_ka,Figure 1,H6,2026-10-21
+2024,tax_breaks.vat.total,5998.0315533002158,5998.03,gel_million,actual,official,mof_tax_expenditure_report_2024_xlsx_ka,Figure 1,I6,2026-10-21
+2018,tax_breaks.vat.education,337.84442181814848,337.84,gel_million,actual,official,mof_tax_expenditure_report_2024_xlsx_ka,Table 4,J12,2026-10-21
+2019,tax_breaks.vat.education,478.32024339910276,478.32,gel_million,actual,official,mof_tax_expenditure_report_2024_xlsx_ka,Table 4,K12,2026-10-21
+2020,tax_breaks.vat.education,400.83125430563177,400.83,gel_million,actual,official,mof_tax_expenditure_report_2024_xlsx_ka,Table 4,L12,2026-10-21
+2021,tax_breaks.vat.education,503.99478989323234,503.99,gel_million,actual,official,mof_tax_expenditure_report_2024_xlsx_ka,Table 4,M12,2026-10-21
+2022,tax_breaks.vat.education,637.54658475765427,637.55,gel_million,actual,official,mof_tax_expenditure_report_2024_xlsx_ka,Table 4,N12,2026-10-21
+2023,tax_breaks.vat.education,802.67646216552021,802.68,gel_million,actual,official,mof_tax_expenditure_report_2024_xlsx_ka,Table 4,O12,2026-10-21
+2024,tax_breaks.vat.education,808.23594176865663,808.24,gel_million,actual,official,mof_tax_expenditure_report_2024_xlsx_ka,Table 4,P12,2026-10-21
+2018,tax_breaks.vat.health,365.41824584280857,365.42,gel_million,actual,official,mof_tax_expenditure_report_2024_xlsx_ka,Table 4,J14,2026-10-21
+2019,tax_breaks.vat.health,488.63119404629106,488.63,gel_million,actual,official,mof_tax_expenditure_report_2024_xlsx_ka,Table 4,K14,2026-10-21
+2020,tax_breaks.vat.health,427.02167027298492,427.02,gel_million,actual,official,mof_tax_expenditure_report_2024_xlsx_ka,Table 4,L14,2026-10-21
+2021,tax_breaks.vat.health,634.99989733586244,635.00,gel_million,actual,official,mof_tax_expenditure_report_2024_xlsx_ka,Table 4,M14,2026-10-21
+2022,tax_breaks.vat.health,644.05868100017869,644.06,gel_million,actual,official,mof_tax_expenditure_report_2024_xlsx_ka,Table 4,N14,2026-10-21
+2023,tax_breaks.vat.health,689.9270471907239,689.93,gel_million,actual,official,mof_tax_expenditure_report_2024_xlsx_ka,Table 4,O14,2026-10-21
+2024,tax_breaks.vat.health,845.31590051970306,845.32,gel_million,actual,official,mof_tax_expenditure_report_2024_xlsx_ka,Table 4,P14,2026-10-21
+2018,tax_breaks.vat.child_care,33.362752732781701,33.36,gel_million,actual,official,mof_tax_expenditure_report_2024_xlsx_ka,Table 4,J11,2026-10-21
+2019,tax_breaks.vat.child_care,34.85488912722667,34.85,gel_million,actual,official,mof_tax_expenditure_report_2024_xlsx_ka,Table 4,K11,2026-10-21
+2020,tax_breaks.vat.child_care,45.856398466394239,45.86,gel_million,actual,official,mof_tax_expenditure_report_2024_xlsx_ka,Table 4,L11,2026-10-21
+2021,tax_breaks.vat.child_care,39.815162622214302,39.82,gel_million,actual,official,mof_tax_expenditure_report_2024_xlsx_ka,Table 4,M11,2026-10-21
+2022,tax_breaks.vat.child_care,48.849208103100864,48.85,gel_million,actual,official,mof_tax_expenditure_report_2024_xlsx_ka,Table 4,N11,2026-10-21
+2023,tax_breaks.vat.child_care,32.073646264809213,32.07,gel_million,actual,official,mof_tax_expenditure_report_2024_xlsx_ka,Table 4,O11,2026-10-21
+2024,tax_breaks.vat.child_care,48.365052817378455,48.37,gel_million,actual,official,mof_tax_expenditure_report_2024_xlsx_ka,Table 4,P11,2026-10-21
+2018,tax_breaks.vat.gambling,2.6741428529421682,2.67,gel_million,actual,official,mof_tax_expenditure_report_2024_xlsx_ka,Table 4,J13,2026-10-21
+2019,tax_breaks.vat.gambling,80.381081873046242,80.38,gel_million,actual,official,mof_tax_expenditure_report_2024_xlsx_ka,Table 4,K13,2026-10-21
+2020,tax_breaks.vat.gambling,89.240166745547867,89.24,gel_million,actual,official,mof_tax_expenditure_report_2024_xlsx_ka,Table 4,L13,2026-10-21
+2021,tax_breaks.vat.gambling,183.34739498306772,183.35,gel_million,actual,official,mof_tax_expenditure_report_2024_xlsx_ka,Table 4,M13,2026-10-21
+2022,tax_breaks.vat.gambling,192.59931208410853,192.60,gel_million,actual,official,mof_tax_expenditure_report_2024_xlsx_ka,Table 4,N13,2026-10-21
+2023,tax_breaks.vat.gambling,277.17738592922433,277.18,gel_million,actual,official,mof_tax_expenditure_report_2024_xlsx_ka,Table 4,O13,2026-10-21
+2024,tax_breaks.vat.gambling,191.00305080856924,191.00,gel_million,actual,official,mof_tax_expenditure_report_2024_xlsx_ka,Table 4,P13,2026-10-21
+2018,tax_breaks.vat.vehicles,51.876410752200172,51.88,gel_million,actual,official,mof_tax_expenditure_report_2024_xlsx_ka,Table 4,J15,2026-10-21
+2019,tax_breaks.vat.vehicles,62.571386810878721,62.57,gel_million,actual,official,mof_tax_expenditure_report_2024_xlsx_ka,Table 4,K15,2026-10-21
+2020,tax_breaks.vat.vehicles,79.119016532573369,79.12,gel_million,actual,official,mof_tax_expenditure_report_2024_xlsx_ka,Table 4,L15,2026-10-21
+2021,tax_breaks.vat.vehicles,135.52458274111177,135.52,gel_million,actual,official,mof_tax_expenditure_report_2024_xlsx_ka,Table 4,M15,2026-10-21
+2022,tax_breaks.vat.vehicles,190.1143007077535,190.11,gel_million,actual,official,mof_tax_expenditure_report_2024_xlsx_ka,Table 4,N15,2026-10-21
+2023,tax_breaks.vat.vehicles,184.92646423526821,184.93,gel_million,actual,official,mof_tax_expenditure_report_2024_xlsx_ka,Table 4,O15,2026-10-21
+2024,tax_breaks.vat.vehicles,172.15053929995156,172.15,gel_million,actual,official,mof_tax_expenditure_report_2024_xlsx_ka,Table 4,P15,2026-10-21
+2018,tax_breaks.vat.agriculture,288.72419802690911,288.72,gel_million,actual,official,mof_tax_expenditure_report_2024_xlsx_ka,Table 4,J19,2026-10-21
+2019,tax_breaks.vat.agriculture,396.64998096798809,396.65,gel_million,actual,official,mof_tax_expenditure_report_2024_xlsx_ka,Table 4,K19,2026-10-21
+2020,tax_breaks.vat.agriculture,347.79143649594334,347.79,gel_million,actual,official,mof_tax_expenditure_report_2024_xlsx_ka,Table 4,L19,2026-10-21
+2021,tax_breaks.vat.agriculture,436.31993088286436,436.32,gel_million,actual,official,mof_tax_expenditure_report_2024_xlsx_ka,Table 4,M19,2026-10-21
+2022,tax_breaks.vat.agriculture,471.42255136283984,471.42,gel_million,actual,official,mof_tax_expenditure_report_2024_xlsx_ka,Table 4,N19,2026-10-21
+2023,tax_breaks.vat.agriculture,448.24794488678708,448.25,gel_million,actual,official,mof_tax_expenditure_report_2024_xlsx_ka,Table 4,O19,2026-10-21
+2024,tax_breaks.vat.agriculture,613.85402905302726,613.85,gel_million,actual,official,mof_tax_expenditure_report_2024_xlsx_ka,Table 4,P19,2026-10-21
+2018,tax_breaks.vat.medicines,214.07753123472048,214.08,gel_million,actual,official,mof_tax_expenditure_report_2024_xlsx_ka,Table 4,J20,2026-10-21
+2019,tax_breaks.vat.medicines,287.05530076879586,287.06,gel_million,actual,official,mof_tax_expenditure_report_2024_xlsx_ka,Table 4,K20,2026-10-21
+2020,tax_breaks.vat.medicines,344.54856102825397,344.55,gel_million,actual,official,mof_tax_expenditure_report_2024_xlsx_ka,Table 4,L20,2026-10-21
+2021,tax_breaks.vat.medicines,477.38082326163203,477.38,gel_million,actual,official,mof_tax_expenditure_report_2024_xlsx_ka,Table 4,M20,2026-10-21
+2022,tax_breaks.vat.medicines,537.66906595724595,537.67,gel_million,actual,official,mof_tax_expenditure_report_2024_xlsx_ka,Table 4,N20,2026-10-21
+2023,tax_breaks.vat.medicines,450.42363821279832,450.42,gel_million,actual,official,mof_tax_expenditure_report_2024_xlsx_ka,Table 4,O20,2026-10-21
+2024,tax_breaks.vat.medicines,592.99261281943473,592.99,gel_million,actual,official,mof_tax_expenditure_report_2024_xlsx_ka,Table 4,P20,2026-10-21
+2018,tax_breaks.vat.other,935.78911652520583,935.79,gel_million,actual,official,mof_tax_expenditure_report_2024_xlsx_ka,Table 4,J24,2026-10-21
+2019,tax_breaks.vat.other,1351.3663586550729,1351.37,gel_million,actual,official,mof_tax_expenditure_report_2024_xlsx_ka,Table 4,K24,2026-10-21
+2020,tax_breaks.vat.other,1350.0106738206232,1350.01,gel_million,actual,official,mof_tax_expenditure_report_2024_xlsx_ka,Table 4,L24,2026-10-21
+2021,tax_breaks.vat.other,2101.9897800807566,2101.99,gel_million,actual,official,mof_tax_expenditure_report_2024_xlsx_ka,Table 4,M24,2026-10-21
+2022,tax_breaks.vat.other,2509.7943084020671,2509.79,gel_million,actual,official,mof_tax_expenditure_report_2024_xlsx_ka,Table 4,N24,2026-10-21
+2023,tax_breaks.vat.other,2604.1606331925323,2604.16,gel_million,actual,official,mof_tax_expenditure_report_2024_xlsx_ka,Table 4,O24,2026-10-21
+2024,tax_breaks.vat.other,2726.1144262134949,2726.11,gel_million,actual,official,mof_tax_expenditure_report_2024_xlsx_ka,Table 4,P24,2026-10-21
+2018,tax_breaks.income.total,393.83162179835176,393.83,gel_million,actual,official,mof_tax_expenditure_report_2024_xlsx_ka,Figure 1,C5,2026-10-21
+2019,tax_breaks.income.total,283.93854026741707,283.94,gel_million,actual,official,mof_tax_expenditure_report_2024_xlsx_ka,Figure 1,D5,2026-10-21
+2020,tax_breaks.income.total,305.29230014640757,305.29,gel_million,actual,official,mof_tax_expenditure_report_2024_xlsx_ka,Figure 1,E5,2026-10-21
+2021,tax_breaks.income.total,335.00272343956419,335.00,gel_million,actual,official,mof_tax_expenditure_report_2024_xlsx_ka,Figure 1,F5,2026-10-21
+2022,tax_breaks.income.total,394.4263961506075,394.43,gel_million,actual,official,mof_tax_expenditure_report_2024_xlsx_ka,Figure 1,G5,2026-10-21
+2023,tax_breaks.income.total,432.10490842396388,432.10,gel_million,actual,official,mof_tax_expenditure_report_2024_xlsx_ka,Figure 1,H5,2026-10-21
+2024,tax_breaks.income.total,405.14470239416346,405.14,gel_million,actual,official,mof_tax_expenditure_report_2024_xlsx_ka,Figure 1,I5,2026-10-21
+2018,tax_breaks.income.personal,188.49430805532666,188.49,gel_million,actual,official,mof_tax_expenditure_report_2024_xlsx_ka,Table 3 ,I22,2026-10-21
+2019,tax_breaks.income.personal,155.06570897073715,155.07,gel_million,actual,official,mof_tax_expenditure_report_2024_xlsx_ka,Table 3 ,J22,2026-10-21
+2020,tax_breaks.income.personal,146.41857008838724,146.42,gel_million,actual,official,mof_tax_expenditure_report_2024_xlsx_ka,Table 3 ,K22,2026-10-21
+2021,tax_breaks.income.personal,224.45391203652542,224.45,gel_million,actual,official,mof_tax_expenditure_report_2024_xlsx_ka,Table 3 ,L22,2026-10-21
+2022,tax_breaks.income.personal,230.70833996220711,230.71,gel_million,actual,official,mof_tax_expenditure_report_2024_xlsx_ka,Table 3 ,M22,2026-10-21
+2023,tax_breaks.income.personal,228.72436592882579,228.72,gel_million,actual,official,mof_tax_expenditure_report_2024_xlsx_ka,Table 3 ,N22,2026-10-21
+2024,tax_breaks.income.personal,216.13445398582465,216.13,gel_million,actual,official,mof_tax_expenditure_report_2024_xlsx_ka,Table 3 ,O22,2026-10-21
+2018,tax_breaks.income.profit,31.590000152587891,31.59,gel_million,actual,official,mof_tax_expenditure_report_2024_xlsx_ka,Table 3 ,I26,2026-10-21
+2019,tax_breaks.income.profit,26.610000610351563,26.61,gel_million,actual,official,mof_tax_expenditure_report_2024_xlsx_ka,Table 3 ,J26,2026-10-21
+2020,tax_breaks.income.profit,34.970001220703125,34.97,gel_million,actual,official,mof_tax_expenditure_report_2024_xlsx_ka,Table 3 ,K26,2026-10-21
+2021,tax_breaks.income.profit,47.049999237060547,47.05,gel_million,actual,official,mof_tax_expenditure_report_2024_xlsx_ka,Table 3 ,L26,2026-10-21
+2022,tax_breaks.income.profit,67.94000244140625,67.94,gel_million,actual,official,mof_tax_expenditure_report_2024_xlsx_ka,Table 3 ,M26,2026-10-21
+2023,tax_breaks.income.profit,86.099998474121094,86.10,gel_million,actual,official,mof_tax_expenditure_report_2024_xlsx_ka,Table 3 ,N26,2026-10-21
+2024,tax_breaks.income.profit,116.18000030517578,116.18,gel_million,actual,official,mof_tax_expenditure_report_2024_xlsx_ka,Table 3 ,O26,2026-10-21
+2018,tax_breaks.income.old_profit,162.47999572753906,162.48,gel_million,actual,official,mof_tax_expenditure_report_2024_xlsx_ka,Table 3 ,I43,2026-10-21
+2019,tax_breaks.income.old_profit,89.099998474121094,89.10,gel_million,actual,official,mof_tax_expenditure_report_2024_xlsx_ka,Table 3 ,J43,2026-10-21
+2020,tax_breaks.income.old_profit,112.31999969482422,112.32,gel_million,actual,official,mof_tax_expenditure_report_2024_xlsx_ka,Table 3 ,K43,2026-10-21
+2021,tax_breaks.income.old_profit,48.279998779296875,48.28,gel_million,actual,official,mof_tax_expenditure_report_2024_xlsx_ka,Table 3 ,L43,2026-10-21
+2022,tax_breaks.income.old_profit,73.019996643066406,73.02,gel_million,actual,official,mof_tax_expenditure_report_2024_xlsx_ka,Table 3 ,M43,2026-10-21
+2023,tax_breaks.income.old_profit,85.019996643066406,85.02,gel_million,actual,official,mof_tax_expenditure_report_2024_xlsx_ka,Table 3 ,N43,2026-10-21
+2024,tax_breaks.income.old_profit,36.540000915527344,36.54,gel_million,actual,official,mof_tax_expenditure_report_2024_xlsx_ka,Table 3 ,O43,2026-10-21
+2018,tax_breaks.income.other,11.267317862898178,11.27,gel_million,actual,official,mof_tax_expenditure_report_2024_xlsx_ka,Table 3 ,I65,2026-10-21
+2019,tax_breaks.income.other,13.162832212207274,13.16,gel_million,actual,official,mof_tax_expenditure_report_2024_xlsx_ka,Table 3 ,J65,2026-10-21
+2020,tax_breaks.income.other,11.583729142492977,11.58,gel_million,actual,official,mof_tax_expenditure_report_2024_xlsx_ka,Table 3 ,K65,2026-10-21
+2021,tax_breaks.income.other,15.218813386681328,15.22,gel_million,actual,official,mof_tax_expenditure_report_2024_xlsx_ka,Table 3 ,L65,2026-10-21
+2022,tax_breaks.income.other,22.758057103927712,22.76,gel_million,actual,official,mof_tax_expenditure_report_2024_xlsx_ka,Table 3 ,M65,2026-10-21
+2023,tax_breaks.income.other,32.260547377950573,32.26,gel_million,actual,official,mof_tax_expenditure_report_2024_xlsx_ka,Table 3 ,N65,2026-10-21
+2024,tax_breaks.income.other,36.290247187635728,36.29,gel_million,actual,official,mof_tax_expenditure_report_2024_xlsx_ka,Table 3 ,O65,2026-10-21
+2008,tax_refunds.total,124,124.00,gel_million,actual,official,treasury_tax_refunds_chart,newChart.xml,series[0]/row[2],2026-10-21
+2009,tax_refunds.total,174,174.00,gel_million,actual,official,treasury_tax_refunds_chart,newChart.xml,series[0]/row[3],2026-10-21
+2010,tax_refunds.total,129,129.00,gel_million,actual,official,treasury_tax_refunds_chart,newChart.xml,series[0]/row[4],2026-10-21
+2011,tax_refunds.total,72,72.00,gel_million,actual,official,treasury_tax_refunds_chart,newChart.xml,series[0]/row[5],2026-10-21
+2012,tax_refunds.total,146,146.00,gel_million,actual,official,treasury_tax_refunds_chart,newChart.xml,series[0]/row[6],2026-10-21
+2013,tax_refunds.total,88,88.00,gel_million,actual,official,treasury_tax_refunds_chart,newChart.xml,series[0]/row[7],2026-10-21
+2014,tax_refunds.total,113,113.00,gel_million,actual,official,treasury_tax_refunds_chart,newChart.xml,series[0]/row[8],2026-10-21
+2015,tax_refunds.total,129,129.00,gel_million,actual,official,treasury_tax_refunds_chart,newChart.xml,series[0]/row[9],2026-10-21
+2016,tax_refunds.total,174,174.00,gel_million,actual,official,treasury_tax_refunds_chart,newChart.xml,series[0]/row[10],2026-10-21
+2017,tax_refunds.total,225,225.00,gel_million,actual,official,treasury_tax_refunds_chart,newChart.xml,series[0]/row[11],2026-10-21
+2018,tax_refunds.total,521,521.00,gel_million,actual,official,treasury_tax_refunds_chart,newChart.xml,series[0]/row[12],2026-10-21
+2019,tax_refunds.total,615,615.00,gel_million,actual,official,treasury_tax_refunds_chart,newChart.xml,series[0]/row[13],2026-10-21
+2020,tax_refunds.total,1040,1040.00,gel_million,actual,official,treasury_tax_refunds_chart,newChart.xml,series[0]/row[14],2026-10-21
+2021,tax_refunds.total,1930,1930.00,gel_million,actual,official,treasury_tax_refunds_chart,newChart.xml,series[0]/row[15],2026-10-21
+2022,tax_refunds.total,2265.95,2265.95,gel_million,actual,official,treasury_tax_refunds_chart,newChart.xml,series[0]/row[16],2026-10-21
+2023,tax_refunds.total,2331.56,2331.56,gel_million,actual,official,treasury_tax_refunds_chart,newChart.xml,series[0]/row[17],2026-10-21
+2024,tax_refunds.total,2546.91,2546.91,gel_million,actual,official,treasury_tax_refunds_chart,newChart.xml,series[0]/row[18],2026-10-21
+2025,tax_refunds.total,2721.10,2721.10,gel_million,actual,official,treasury_tax_refunds_chart,newChart.xml,series[0]/row[19],2026-10-21

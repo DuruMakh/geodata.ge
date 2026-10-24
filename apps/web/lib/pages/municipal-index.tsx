@@ -128,6 +128,7 @@ export async function renderMunicipalIndex(locale: Locale) {
       </h1>
       <I18nProvider {...clientPresentation(presentation)}>
       <MunicipalitiesIndex
+        share={{ title: message(messages, "municipal.indexTitle"), caption: `₾ ${message(messages, "municipal.perResident")} · ${comparisonYear}`, source: message(messages, "municipal.indexSource", { year: comparisonYear, municipalities: municipalities.length, budgets: MUNICIPAL_COUNTRY_BUDGET_COUNT }), period: String(comparisonYear) }}
         viewBox={map.viewBox}
         shapes={map.shapes}
         markers={map.markers}

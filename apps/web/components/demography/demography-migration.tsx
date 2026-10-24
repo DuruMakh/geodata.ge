@@ -30,6 +30,7 @@ import { matchesLabelQuery } from "../../lib/i18n/search";
 import type { TemplateValues } from "../../lib/i18n/types";
 import type { ClientMigrationFact } from "../../lib/servedRows";
 import { ExcelDownloadButton } from "../explorer/excel-download-button";
+import { ChartShareButton } from "../explorer-shell/chart-share-button";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { ModeTabs } from "../explorer-shell/mode-tabs";
 import { SeriesAside } from "../explorer-shell/series-aside";
@@ -128,6 +129,36 @@ export function MigrationExplorer({
   const startDetail = (value: string) => (singleYear ? "" : `${start}: ${value}`);
   const heroSentence = net === null ? null : t(net > 0 ? "heroMoreArrived" : net < 0 ? "heroMoreLeft" : "heroBalanced");
 
+  const chart = (
+    <StackedColumnChart
+      periods={model.years}
+      periodsPerYear={1}
+      segments={segments}
+      overlay={{ label: netLabel, values: scaled(model.totals.net, 1) }}
+      legend={[
+        ...model.selectedIds.map((group) => ({ id: group, label: groupLabel(group), color: MIGRATION_COLORS[group] })),
+        { id: "net", label: netLabel, color: INK },
+      ]}
+      formatPeriod={String}
+      formatValue={(value) => persons(Math.abs(Math.round(value * CHART_SCALE)))}
+      formatOverlayValue={(value) => signedPersons(Math.round(value * CHART_SCALE))}
+      readoutOrder="sign-then-magnitude"
+      readoutRowCap={MIGRATION_GROUPS.length * 2}
+      compactReadout
+      ariaLabel={t("chartAria", { start: model.range.start, end })}
+    />
+  );
+  // The chart draws its own colour key, so the picture adds none.
+  const shareAction = model.selectedIds.length ? (
+    <ChartShareButton
+      title={t("migrationTitle")}
+      caption={`${t("chartUnit")} · ${start}–${end}`}
+      source={t("migrationSource", { start, end })}
+      chart={chart}
+      period={`${start}-${end}`}
+    />
+  ) : undefined;
+
   return (
     <div data-testid="migration-explorer" className="@container">
       <ExplorerWorkspace>
@@ -147,23 +178,7 @@ export function MigrationExplorer({
             ) : state.mode === "line" ? (
               <div className="mt-5">
                 <p className="mb-2 text-[11px] text-[var(--muted)]">{t("chartUnit")}</p>
-                <StackedColumnChart
-                  periods={model.years}
-                  periodsPerYear={1}
-                  segments={segments}
-                  overlay={{ label: netLabel, values: scaled(model.totals.net, 1) }}
-                  legend={[
-                    ...model.selectedIds.map((group) => ({ id: group, label: groupLabel(group), color: MIGRATION_COLORS[group] })),
-                    { id: "net", label: netLabel, color: INK },
-                  ]}
-                  formatPeriod={String}
-                  formatValue={(value) => persons(Math.abs(Math.round(value * CHART_SCALE)))}
-                  formatOverlayValue={(value) => signedPersons(Math.round(value * CHART_SCALE))}
-                  readoutOrder="sign-then-magnitude"
-                  readoutRowCap={MIGRATION_GROUPS.length * 2}
-                  compactReadout
-                  ariaLabel={t("chartAria", { start: model.range.start, end })}
-                />
+                {chart}
               </div>
             ) : (
               <div className="mt-5">
@@ -197,7 +212,7 @@ export function MigrationExplorer({
               onChange={(patch) => update((s) => ({ ...s, range: rangeFromPatch(buildMigrationModel(facts, s).range, patch) }))}
             />
           </section>
-          <div className="mt-[18px]"><SourceNote testId="source-label">{sourceNote}</SourceNote></div>
+          <div className="mt-[18px]"><SourceNote testId="source-label" action={shareAction}>{sourceNote}</SourceNote></div>
         </div>
         <SeriesAside label={message(messages, "controls.series")}>
           <p className="mb-3 text-[11px] text-[var(--muted)]">{t("asideCaption", { year: end })}</p>

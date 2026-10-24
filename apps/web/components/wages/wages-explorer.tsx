@@ -29,6 +29,7 @@ import { ExcelDownloadButton } from "../explorer/excel-download-button";
 import { RegionPicker } from "../regional-economies/region-picker";
 import { PlaceHeading } from "../explorer-shell/place-heading";
 import { Callout, SELECT_CLASS, SourceNote } from "../ui/editorial";
+import { ChartShareButton } from "../explorer-shell/chart-share-button";
 
 
 type WagesHashData = { section: WagesSectionId; facts: ClientWagesFact[] };
@@ -71,6 +72,10 @@ export function WagesExplorer({ section, facts: shippedFacts, labels, sources, l
   }} />;
   const heatmap = section === "industries" ? buildWagesHeatmap(model) : null;
   const lineSeries = model.selected.map(series => ({ id: series.id, label: labels[series.id], color: series.color, vals: model.years.map(year => series.valuesByYear[year]) }));
+  const chart = <EditorialLineChart years={model.years} series={lineSeries} share={false} unit={unit} shareLabel={title} formatTooltipValue={(value, id) => valueLabel(value, id)} />;
+  const sourceText = t(state.view === "median" || section === "overview" ? "sourceNoteMedian" : "sourceNote");
+  const shareAction = model.selected.length ? <ChartShareButton title={title} caption={`${t("unitMonthly")} · ${model.range.start}–${model.range.end}`}
+    legend={lineSeries.map(({ label, color }) => ({ label, color }))} source={sourceText} chart={chart} period={`${model.range.start}-${model.range.end}`} /> : undefined;
   return <div data-testid={`wages-${section}`} className="@container">
     {regionId ? <PlaceHeading
       lead={t("regionHeadingLead")}
@@ -96,12 +101,12 @@ export function WagesExplorer({ section, facts: shippedFacts, labels, sources, l
             </label> : <span className="text-[11px] text-[var(--muted)]">{t("unitMonthly")}</span>}
           </div>
           {!model.selected.length ? <div className="mt-5"><Callout testId="no-selection-callout">{t("emptySelection")}</Callout></div>
-            : state.mode === "line" ? <div className="mt-5"><EditorialLineChart years={model.years} series={lineSeries} share={false} unit={unit} shareLabel={title} formatTooltipValue={(value, id) => valueLabel(value, id)} /></div>
+            : state.mode === "line" ? <div className="mt-5">{chart}</div>
             : <ExplorerTable caption={`${title} · ${t("unitMonthly")} · ${model.range.start}–${model.range.end}`} rows={rows.filter(row => row.itemId !== reference.id)} totalRow={total} showTotal={Boolean(total)} totalFirst wrapRowLabels rowLabelsLocalized years={model.years} firstColumnLabel={t("series")} unit={unit} share={false} showChangeColumn={false} shareValueForYear={() => null} decimalsForRow={row => decimalsOf(row.itemId)} />}
           <ChartSelectionAids series={lineSeries} chartShown={state.mode === "line"} share={false} unit={unit} formatValue={(value, id) => valueLabel(value, id)} />
           <RangeStrip years={wagesCoverage(section, state.view, facts).years} range={model.range} onChange={patch => update(s => ({ ...s, range: rangeFromPatch(buildWagesModel(section, facts, s).range, patch) }))} />
         </section>
-        <div className="mt-[18px]"><SourceNote testId="source-label">{t(state.view === "median" || section === "overview" ? "sourceNoteMedian" : "sourceNote")} · {model.range.start}–{model.range.end} · <span className="whitespace-nowrap">{updatedDate(lastReviewedAt, locale)}</span>
+        <div className="mt-[18px]"><SourceNote testId="source-label" action={shareAction}>{sourceText} · {model.range.start}–{model.range.end} · <span className="whitespace-nowrap">{updatedDate(lastReviewedAt, locale)}</span>
           <Link href={pageHref("/methodology/wages", locale)} prefetch={false} className="ml-2 text-[var(--accent)] underline underline-offset-4">{t("methodology")}</Link>
         </SourceNote></div>
         {regionId ? <p className="mt-3 max-w-[800px] text-[11px] leading-relaxed text-[var(--muted)]">{t("regionNote")}</p> : null}

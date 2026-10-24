@@ -31,6 +31,7 @@ import { PlaceHeading } from "../explorer-shell/place-heading";
 import { LatestValueLine } from "../explorer-shell/latest-value-line";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
+import { ChartShareButton } from "../explorer-shell/chart-share-button";
 import { Callout, SELECT_CLASS, SegmentedTabs, SourceNote, SwatchBar, SectionTitle, TextTab } from "../ui/editorial";
 import { UnemploymentSeriesPanel } from "./unemployment-series-panel";
 import { UnemploymentOverviewSeriesPanel } from "./unemployment-overview-series-panel";
@@ -79,6 +80,11 @@ export function UnemploymentExplorer({ section, regionId, regionSplit, regions, 
     const { downloadWorkbook } = await import("../../lib/explorer/workbookWriter.client");
     await downloadWorkbook(buildUnemploymentWorkbookExportModel(facts, registry, state, presentation, sources, siteOrigin));
   }} />;
+  const lineSeries = model.series.map(series => ({ ...series, label: labels.get(series.id)! }));
+  const chart = <EditorialLineChart years={model.years} series={lineSeries} share={model.percent} unit={unit} shareLabel={indicatorLabel} formatTooltipValue={valueLabel} />;
+  const shareAction = state.selectedIds.length && model.hasData ? <ChartShareButton title={region ? `${t("regionHeadingLead")} ${regionName}` : t(`page.${section}.title`)}
+    caption={`${indicatorLabel} · ${model.percent ? "%" : unit.label} · ${model.range.start}–${model.range.end}`} legend={lineSeries.map(({ label, color }) => ({ label, color }))}
+    source={t("sourceNote")} chart={chart} period={`${model.range.start}-${model.range.end}`} /> : undefined;
   return <div data-testid="unemployment-explorer" className="@container">
     {region ? <PlaceHeading
       lead={t("regionHeadingLead")}
@@ -113,13 +119,13 @@ export function UnemploymentExplorer({ section, regionId, regionSplit, regions, 
           </div>
           {!state.selectedIds.length ? <div className="mt-5"><Callout testId="no-selection-callout">{t("emptySelection")}</Callout></div>
             : !model.hasData ? <div className="mt-5"><Callout testId="no-range-data-callout">{t("emptyRange")}</Callout></div>
-            : state.mode === "line" ? <div className="mt-5"><EditorialLineChart years={model.years} series={model.series.map(series => ({ ...series, label: labels.get(series.id)! }))} share={model.percent} unit={unit} shareLabel={indicatorLabel} formatTooltipValue={valueLabel} /></div>
+            : state.mode === "line" ? <div className="mt-5">{chart}</div>
             : <ExplorerTable caption={`${indicatorLabel} · ${model.percent ? "%" : unit.label} · ${model.range.start}–${model.range.end}`} rows={rows.filter(row => row.itemId !== model.referenceId)} totalRow={total} showTotal={Boolean(total)} totalFirst wrapRowLabels rowLabelsLocalized
               years={model.years} firstColumnLabel={t(unemploymentUsesIndicatorSeries(state) ? "series" : "group")} unit={unit} share={model.percent} showChangeColumn={false} shareValueForYear={(row, year) => row.valuesByYear[year] ?? null} />}
           <ChartSelectionAids series={model.series.map(series => ({ ...series, label: labels.get(series.id)! }))} chartShown={state.mode === "line"} share={model.percent} unit={unit} formatValue={valueLabel} />
           <RangeStrip years={model.availableYears} range={model.range} onChange={patch => update(s => ({ ...s, range: rangeFromPatch(buildUnemploymentModel(facts, registry, s).range, patch) }))} />
         </section>
-        <div className="mt-[18px]"><SourceNote testId="source-label">{t("sourceNote")} {model.range.start}–{model.range.end} · {updatedDate(lastReviewedAt, locale)}
+        <div className="mt-[18px]"><SourceNote testId="source-label" action={shareAction}>{t("sourceNote")} {model.range.start}–{model.range.end} · {updatedDate(lastReviewedAt, locale)}
           <Link href={pageHref("/methodology/unemployment", locale)} prefetch={false} className="ml-2 text-[var(--accent)] underline underline-offset-4">{t("methodology")}</Link>
         </SourceNote></div>
         {(section === "overview" || section === "regions") && noteKey ? <p className="mt-2 text-[11px] leading-relaxed text-[var(--muted)]">{t(noteKey)}</p> : null}

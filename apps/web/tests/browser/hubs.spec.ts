@@ -90,20 +90,21 @@ test("the energy and food section shows one card per page, each linking to it", 
 
 test("the health section shows one card per page, each linking to it, and the sidebar lists Health after Living standards", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
-  // Health's three pages, then the four social protection pages (tests/browser/social.spec.ts).
-  const sections = ["doctors-hospitals", "illnesses", "causes-of-death", "social-payments", "pensions", "subsistence-allowance", "social-package"];
+  // Health's three pages, then the five social protection pages (tests/browser/social.spec.ts).
+  const sections = ["doctors-hospitals", "illnesses", "causes-of-death", "social-payments", "pensions", "subsistence-allowance", "social-package", "funded-pension"];
   for (const prefix of ["", "/en"]) {
     await page.goto(`${prefix}/explorer/living`);
     const cards = topicCards(page, "health");
-    await expect(cards).toHaveCount(7);
+    await expect(cards).toHaveCount(8);
     expect(await hrefs(cards)).toEqual(sections.map(section => `${prefix}/explorer/health/${section}`));
-    for (let index = 0; index < 7; index += 1) await expect(chart(cards.nth(index))).toHaveCount(1);
+    for (let index = 0; index < 8; index += 1) await expect(chart(cards.nth(index))).toHaveCount(1);
     await expect(page.getByTestId("group-link-living")).toHaveAttribute("aria-current", "page");
     expect(await follows(page.getByTestId("living-standards-inequality-link"), page.getByTestId("health-doctors-hospitals-link"))).toBe(true);
     for (const id of sections) await expect(page.getByTestId(`health-${id}-link`)).toBeVisible();
   }
   await expect(page.locator("#t-health").getByRole("heading", { level: 2 })).toHaveText("Health and social protection");
   await expect(topicCards(page, "health").first()).toHaveAccessibleDescription(cardFigure("22,491", "2025", "2002–2025"));
+  await expect(topicCards(page, "health").last()).toHaveAccessibleDescription(cardFigure("8,237.5 million GEL", "2025", "2019–2025"));
 });
 
 test("the crime section shows one card per page, each linking to it, and the sidebar lists Crime and justice after Science and culture", async ({ page }) => {

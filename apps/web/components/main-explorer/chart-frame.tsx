@@ -1,6 +1,8 @@
 "use client";
 
 import {
+  createContext,
+  useContext,
   useEffect,
   useLayoutEffect,
   useRef,
@@ -47,12 +49,20 @@ export function mobileChartHeight(width: number, ratio: number, min: number, max
  * `null` means desktop and a number is the phone drawing's width in CSS pixels
  * (one viewBox unit per pixel, so 11-unit axis text renders at 11px).
  */
+/**
+ * Which geometry the charts below draw: "screen" follows the screen as above; "desktop" always
+ * draws the desktop geometry, whatever the screen (the share picture, DESIGN.md §7.17).
+ */
+export const ChartGeometryContext = createContext<"screen" | "desktop">("screen");
+
 export function useChartLayout<T extends HTMLElement = HTMLDivElement>() {
   const ref = useRef<T>(null);
-  const [mobileWidth, setMobileWidth] = useState<number | null | undefined>(undefined);
+  const desktop = useContext(ChartGeometryContext) === "desktop";
+  const [mobileWidth, setMobileWidth] = useState<number | null | undefined>(desktop ? null : undefined);
 
   useLayoutEffect(() => {
     const element = ref.current;
+    if (desktop) return;
     if (!element || typeof window.matchMedia !== "function") {
       setMobileWidth(null);
       return;
@@ -67,7 +77,7 @@ export function useChartLayout<T extends HTMLElement = HTMLDivElement>() {
       observer.disconnect();
       query.removeEventListener("change", measure);
     };
-  }, []);
+  }, [desktop]);
 
   return {
     ref,
