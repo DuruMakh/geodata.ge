@@ -23,7 +23,8 @@ test("the English reader journey keeps human pages English and reaches the share
   await page.goto("/en");
   await page.getByTestId("landing-header").getByRole("link", { name: "Data", exact: true }).click();
   await expect(page).toHaveURL(/\/en\/explorer$/);
-  await page.getByTestId("budget-hub").locator('a[href="/en/explorer/expenditure"]').click();
+  // Data opens All data, whose A to Z list links every page.
+  await page.getByTestId("az-index").locator('a[href="/en/explorer/expenditure"]').click();
   await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
   await page.getByTestId("site-footer").getByRole("link", { name: "Methodology", exact: true }).click();
   await expect(page).toHaveURL(/\/en\/methodology$/);
@@ -46,11 +47,12 @@ test("homepage and hub figures stay identical when switching languages", async (
   await expect(page.locator("html")).toHaveAttribute("lang", "ka");
   expect(new URL(page.url()).hash).toBe("#data");
   expect(await figures()).toEqual(before);
-  await page.goto("/en/explorer");
-  const sparklines = () => page.getByTestId("budget-hub").locator("svg polyline, svg path").evaluateAll(elements => elements.map(element => element.getAttribute("points") ?? element.getAttribute("d")));
+  // The Budget cards moved from /explorer to the Budget group page.
+  await page.goto("/en/explorer/budget");
+  const sparklines = () => page.getByTestId("explorer-card-graphic").locator("svg polyline, svg path").evaluateAll(elements => elements.map(element => element.getAttribute("points") ?? element.getAttribute("d")));
   const englishSparklines = await sparklines();
   expect(englishSparklines.length).toBeGreaterThan(0);
-  await page.goto("/explorer");
+  await page.goto("/explorer/budget");
   expect(await sparklines()).toEqual(englishSparklines);
 });
 

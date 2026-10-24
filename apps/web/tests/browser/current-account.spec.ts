@@ -57,11 +57,11 @@ for (const prefix of ["", "/en"]) for (const width of [390, 1440]) {
     expect(await tableSeriesCount(table)).toBe(5);
     await expect(table.locator("tbody tr").first()).toContainText(prefix ? "Current account" : "მიმდინარე ანგარიში");
     const before = page.url();
-    if (width < 900) await page.getByTestId("sidebar-toggle").click();
+    if (width < 900) await page.getByTestId("sidebar-menu-button").click();
     await page.getByTestId("current-account-link").click(); await expect(page).toHaveURL(before);
     await page.reload();
     expect(await tableSeriesCount(table)).toBe(5);
-    if (width < 900) await page.getByTestId("sidebar-toggle").click();
+    if (width < 900) await page.getByTestId("sidebar-menu-button").click();
     await page.getByTestId("data-sidebar").getByRole("link", { name: prefix ? "ქართული" : "English", exact: true }).click();
     await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-mode", "table");
     await expect(page).toHaveURL(/start=2015/);

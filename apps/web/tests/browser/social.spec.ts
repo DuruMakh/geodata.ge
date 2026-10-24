@@ -1,4 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
+import { topicCards } from "./group-cards";
 
 const ready = (page: Page) => expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
 const toggle = (id: string) => `[data-series-id="${id}"] [data-testid="series-row-toggle"]`;
@@ -30,13 +31,14 @@ const lines = (page: Page, testId: string) => page.getByTestId(testId).evaluate(
 
 test.beforeEach(async ({ page }) => { await page.setViewportSize({ width: 1440, height: 900 }); });
 
-test("the Health hub shows seven cards, the four social protection cards after Causes of death", async ({ page }) => {
+// The old Health hub is the section #t-health of the Living standards and health page now.
+test("the Health section shows seven cards, the four social protection cards after Causes of death", async ({ page }) => {
   for (const prefix of ["", "/en"]) {
-    await page.goto(`${prefix}/explorer/health`);
-    const cards = page.getByTestId("health-hub").getByTestId("hub-card");
+    await page.goto(`${prefix}/explorer/living`);
+    const cards = topicCards(page, "health");
     await expect(cards).toHaveCount(7);
     expect(await cards.evaluateAll(links => links.map(link => link.getAttribute("href")))).toEqual([...HEALTH, ...SOCIAL].map(section => `${prefix}/explorer/health/${section}`));
-    for (let index = 0; index < 7; index += 1) await expect(cards.nth(index).locator("svg")).toHaveCount(1);
+    for (let index = 0; index < 7; index += 1) await expect(cards.nth(index).getByTestId("explorer-card-graphic").locator("svg")).toHaveCount(1);
     await expect(cards.nth(3)).toContainText("04");
     await expect(cards.nth(3)).toContainText("2013–2025");
     // The sidebar lists the four pages under Health, after Causes of death.

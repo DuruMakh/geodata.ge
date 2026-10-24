@@ -22,7 +22,7 @@ const section = (page: Page, value: Classification) => page.getByTestId(`trade-c
 const toggle = (page: Page, id: string) => page.locator(`[data-testid="series-row"][data-series-id="${id}"]`).getByTestId("series-row-toggle");
 const selected = (page: Page, count: number, total: number) => expect(page.getByTestId("series-status")).toContainText(`${count} / ${total}`);
 async function language(page: Page, name: string) {
-  if (page.viewportSize()!.width < 900) await page.getByTestId("sidebar-toggle").click();
+  if (page.viewportSize()!.width < 900) await page.getByTestId("sidebar-menu-button").click();
   await page.getByTestId("data-sidebar").getByRole("link", { name, exact: true }).click();
 }
 async function ranking(page: Page, classification: Classification, flow: string, year = 2025) {

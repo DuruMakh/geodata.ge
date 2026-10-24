@@ -1,5 +1,5 @@
 import { expect, test, type APIRequestContext, type Locator, type Page } from "@playwright/test";
-import { NAV_TREE } from "../../lib/navigation/navTree";
+import { DATASET_HUBS } from "../../lib/navigation/datasetHubs";
 import { computedCssColorAlpha } from "./focus-outline";
 
 // Landing page (GeoData Site v2 design): structure, live data blocks, and the
@@ -372,7 +372,8 @@ test("landing data and methodology links use real destinations", async ({ page }
   await expect(page.getByTestId("landing-header").getByRole("link", { name: "ექსპლორერი", exact: true })).toHaveCount(0);
   await page.getByTestId("hero-cta").click();
   await expect(page).toHaveURL(/\/explorer$/);
-  await expect(page.getByTestId("explorer-shell")).toBeVisible();
+  // /explorer is All data, the index of every page, rather than a chart page.
+  await expect(page.getByTestId("all-data-page")).toBeVisible();
 
   await page.goto(baseUrl);
   await page.getByTestId("landing-dataset-revenue").getByRole("link").click();
@@ -915,8 +916,8 @@ test("footer links keep non-overlapping 24px mobile targets and keyboard focus",
 
     const links = page.getByTestId("site-footer").getByRole("link");
     // The production connection is discoverable from every site footer.
-    // Logo, every dataset hub, methodology, AI-კავშირი, მიზანი and the address.
-    await expect(links).toHaveCount(NAV_TREE.length + 5);
+    // Logo, every group page, methodology, AI-კავშირი, მიზანი and the address.
+    await expect(links).toHaveCount(DATASET_HUBS.length + 5);
     await expect(page.getByTestId("site-footer").getByRole("link", { name: "AI-კავშირი", exact: true })).toHaveAttribute("href", "/connect");
     for (const link of await links.all()) {
       await expectMinimumTarget(link);

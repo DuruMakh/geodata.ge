@@ -1,6 +1,7 @@
 import { expect, test } from "@playwright/test";
 import ExcelJS from "exceljs";
 import { tableSeriesCount } from "./explorer-table";
+import { topicCards } from "./group-cards";
 import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
@@ -18,9 +19,10 @@ for (const [prefix, width] of [["", 390], ["/en", 1440]] as const) {
       ? ["Unemployment overview", "Regions", "Age groups", "Sex", "Jobs by industry", "Hours worked", "Informal jobs", "Young people not in work or study"]
       : ["უმუშევრობის მიმოხილვა", "რეგიონები", "ასაკობრივი ჯგუფები", "სქესი", "დასაქმება დარგების მიხედვით", "სამუშაო საათები", "არაფორმალური დასაქმება", "ახალგაზრდები სწავლისა და დასაქმების გარეშე"];
     for (const [index, section] of sections.entries()) {
-      await page.goto(`${prefix}/explorer/unemployment`);
+      // The old hub is the section #t-unemployment of the Labour market page now.
+      await page.goto(`${prefix}/explorer/labour`);
       await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
-      const cards = page.getByTestId("unemployment-hub").getByTestId("hub-card");
+      const cards = topicCards(page, "unemployment");
       await expect(cards).toHaveCount(8);
       await expect(cards.nth(index)).toHaveAttribute("href", `${prefix}/explorer/unemployment/${section}`);
       await expect(cards.nth(index).getByRole("heading")).toHaveText(titles[index]);
@@ -356,9 +358,10 @@ for (const prefix of ["", "/en"]) test(`old shared links open the correct new pa
     await expect(page.getByTestId("no-selection-callout")).toBeVisible();
     await expect(page.getByTestId("year-range-strip")).toContainText("2021–2024");
   }
+  // A hash that names no view lands on the old hub's section of the Labour market page.
   await page.goto(`${prefix}/explorer/unemployment#sources`);
-  await expect(page.getByTestId("unemployment-hub")).toBeVisible();
-  await expect(page).toHaveURL(new RegExp(`${prefix}/explorer/unemployment#sources$`));
+  await expect(page).toHaveURL(new RegExp(`${prefix}/explorer/labour#t-unemployment$`));
+  await expect(page.locator("#t-unemployment")).toBeInViewport();
 });
 
 for (const prefix of ["", "/en"]) for (const [section, group, display, value, source] of [

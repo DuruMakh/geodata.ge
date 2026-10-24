@@ -180,9 +180,10 @@ test("an explicitly empty sel= survives Back and Forward", async ({ page }) => {
   await expect(page.getByTestId("series-status")).toContainText("2 / 7");
 });
 
-test("the hub links the Georgia page and the sidebar stays on the section across city pages", async ({ page }) => {
-  await page.goto("/en/explorer/inflation");
-  await page.getByTestId("inflation-hub").locator('a[href="/en/explorer/inflation/cities"]').click();
+test("the Inflation section links the Georgia page and the sidebar stays on the section across city pages", async ({ page }) => {
+  // The old hub is the section #t-inflation of the Prices and money page now.
+  await page.goto("/en/explorer/prices");
+  await page.locator('#t-inflation a[href="/en/explorer/inflation/cities"]').click();
   await ready(page);
   await expect(page.getByTestId("inflation-cities-link")).toHaveAttribute("aria-current", "page");
   await page.goto(`/en${CITIES}/gori`);

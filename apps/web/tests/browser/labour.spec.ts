@@ -2,6 +2,7 @@ import { expect, test, type Page } from "@playwright/test";
 import ExcelJS from "exceljs";
 import { expectEnglish } from "./expect-english";
 import { tableSeriesValues } from "./explorer-table";
+import { cardFigure, topicCards } from "./group-cards";
 
 // The four Labour Force Survey detail pages under Unemployment (spec 2026-10-20-labour-detail §§3–8).
 // Page overflow at 390/768/1440 and the §17 line check are also in the layout pass of mobile-fit-charts.spec.ts;
@@ -48,18 +49,19 @@ for (const locale of ["ka", "en"] as const) for (const width of [375, 768, 1440]
   });
 }
 
-test("the hub cards 05–08 show each page total's latest figure and coverage, and the sidebar lists the eight pages", async ({ page }) => {
+// The old Unemployment hub is the section #t-unemployment of the Labour market page now.
+test("the Unemployment section's cards 05–08 show each page total's latest figure and coverage, and the sidebar lists the eight pages", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
-  for (const [prefix, footers] of [
-    ["", ["2025 · 1,389.7 ათასი · 2017–2025", "2025 · 41.0 საათი · 2020–2025", "2025 · 28.3% · 2020–2025", "2025 · 17.6% · 2020–2025"]],
-    ["/en", ["2025 · 1,389.7 thousand · 2017–2025", "2025 · 41.0 hours · 2020–2025", "2025 · 28.3% · 2020–2025", "2025 · 17.6% · 2020–2025"]],
+  for (const [prefix, figures] of [
+    ["", [["1,389.7 ათასი", "2017–2025"], ["41.0 საათი", "2020–2025"], ["28.3%", "2020–2025"], ["17.6%", "2020–2025"]]],
+    ["/en", [["1,389.7 thousand", "2017–2025"], ["41.0 hours", "2020–2025"], ["28.3%", "2020–2025"], ["17.6%", "2020–2025"]]],
   ] as const) {
-    await page.goto(`${prefix}/explorer/unemployment`);
-    const cards = page.getByTestId("unemployment-hub").getByTestId("hub-card");
+    await page.goto(`${prefix}/explorer/labour`);
+    const cards = topicCards(page, "unemployment");
     await expect(cards).toHaveCount(8);
-    for (const [offset, footer] of footers.entries()) {
-      await expect(cards.nth(4 + offset)).toContainText(footer);
-      await expect(cards.nth(4 + offset).locator("svg")).toHaveCount(1);
+    for (const [offset, [value, years]] of figures.entries()) {
+      await expect(cards.nth(4 + offset)).toContainText(cardFigure(value, "2025", years));
+      await expect(cards.nth(4 + offset).getByTestId("explorer-card-graphic").locator("svg")).toHaveCount(1);
     }
     const sidebar = ["overview", "regions", "age", "gender", "industries", "hours", "informal", "young-people"];
     const links = sidebar.map(section => page.getByTestId(`unemployment-${section}-link`).first());

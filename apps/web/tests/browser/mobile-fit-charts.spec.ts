@@ -293,6 +293,13 @@ const wrappingLines: Record<string, readonly ("ka" | "en")[]> = {
   "/explorer/living-standards/income/regions/[id]": ["ka", "en"],
   "/explorer/living-standards/spending": ["ka", "en"],
   "/explorer/living-standards/spending/regions/[id]": ["ka", "en"],
+  // The group pages' lines (spec 2026-10-24-explorer-regroup §5, copy from its Task 1): owner wording pending.
+  "/explorer/budget": ["ka"],
+  "/explorer/economy": ["ka", "en"],
+  "/explorer/living": ["ka"],
+  "/explorer/external": ["ka", "en"],
+  "/explorer/demography": ["ka"],
+  "/explorer/society": ["ka", "en"],
 };
 
 /** The first block under the page heading, and the one after it when that is a text line. */
@@ -339,15 +346,15 @@ const layoutWidths = [390, 768, 1440] as const;
 
 /**
  * After a resize, wait until the page has re-rendered for the new width: the
- * sidebar keeps its desktop state (900px) in React and the charts swap to their
- * phone drawing below 768px, both on a media-query change; ResizeObserver widths
- * (the phone chart, the table layout) land in the frames after.
+ * sidebar swaps its phone bar for the desktop column at 900px and the charts swap
+ * to their phone drawing below 768px, both on a media-query change; ResizeObserver
+ * widths (the phone chart, the table layout) land in the frames after.
  */
 async function settleAt(page: Page, width: number) {
   await expect.poll(() => page.evaluate((width) => {
-    const toggles = [...document.querySelectorAll('[data-testid="sidebar-toggle"]')];
+    const bars = [...document.querySelectorAll('[data-testid="sidebar-topbar"]')];
     const drawings = [...document.querySelectorAll("svg[data-geometry]")].filter((drawing) => drawing.checkVisibility());
-    return toggles.every((toggle) => toggle.getAttribute("aria-expanded") === String(width >= 900))
+    return bars.every((bar) => bar.checkVisibility() === width < 900)
       && drawings.every((drawing) => drawing.getAttribute("data-geometry") === (width < 768 ? "mobile" : "desktop"));
   }, width), { message: `rendered for ${width}px` }).toBe(true);
   await page.evaluate(() => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => setTimeout(resolve)))));

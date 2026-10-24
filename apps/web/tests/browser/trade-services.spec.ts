@@ -5,6 +5,7 @@ import { readFile } from "node:fs/promises";
 import { parse } from "csv-parse/sync";
 import { tableSeriesCount, tableSeriesValues } from "./explorer-table";
 import { workbookMessage } from "../../lib/i18n/workbook";
+import { topicCards } from "./group-cards";
 
 const toggle = (page: Page, id: string) => page.locator(`[data-series-id="${id}"]`).getByTestId("series-row-toggle");
 const section = (page: Page, id: string) => page.getByTestId(`trade-services-section-${id}`);
@@ -54,7 +55,7 @@ for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
     await expect(page.getByTestId("trade-services")).toHaveAttribute("data-section", "countries");
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     if (width !== 390) return;
-    await page.getByTestId("sidebar-toggle").click();
+    await page.getByTestId("sidebar-menu-button").click();
     await page.getByTestId("data-sidebar").getByRole("link", { name: prefix ? "ქართული" : "English", exact: true }).click();
     await expect(page.getByTestId("trade-services")).toHaveAttribute("data-section", "countries");
     await expect(section(page, "trade.imports")).toHaveAttribute("aria-pressed", "true");
@@ -102,8 +103,9 @@ for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
   test(`Services defaults, independent ranking and complete selection ${prefix || "ka"} ${width}px`, async ({ page }) => {
     const errors: string[] = []; page.on("pageerror", error => errors.push(error.message));
     await page.setViewportSize({ width, height: 1000 });
-    await page.goto(`${prefix}/explorer/trade`);
-    const cards = page.getByTestId("trade-hub").getByTestId("hub-card");
+    // The old Trade hub is the section #t-trade of the External sector page now.
+    await page.goto(`${prefix}/explorer/external`);
+    const cards = topicCards(page, "trade");
     await expect(cards).toHaveCount(6); await cards.nth(4).click();
     await expect(page).toHaveURL(new RegExp(`${prefix}/explorer/trade/services$`));
     await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
@@ -191,7 +193,7 @@ for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
   });
 }
 
-// 390 takes the sidebar-toggle path, 1440 the desktop sidebar.
+// 390 takes the phone menu (sidebar-menu-button) path, 1440 the desktop sidebar.
 for (const prefix of ["", "/en"]) for (const width of [390, 1440]) {
   test(`Services missingness, keyboard, view memory and navigation ${prefix || "ka"} ${width}px`, async ({ page }) => {
     await page.setViewportSize({ width, height: 1000 });
@@ -228,10 +230,10 @@ for (const prefix of ["", "/en"]) for (const width of [390, 1440]) {
     await expect(page.getByTestId("trade-services")).toHaveAttribute("data-section", "overview");
     await expect(page.getByTestId("series-status")).toContainText("0 / 4");
     await page.goForward(); await expect(page).toHaveURL(savedTypes);
-    if (width < 900) await page.getByTestId("sidebar-toggle").click();
+    if (width < 900) await page.getByTestId("sidebar-menu-button").click();
     await page.getByTestId("trade-services-link").click(); await expect(page).toHaveURL(savedTypes);
-    if (width < 900) await expect(page.getByTestId("sidebar-toggle")).toHaveAttribute("aria-expanded", "false");
-    if (width < 900) await page.getByTestId("sidebar-toggle").click();
+    if (width < 900) await expect(page.getByTestId("sidebar-menu-button")).toHaveAttribute("aria-expanded", "false");
+    if (width < 900) await page.getByTestId("sidebar-menu-button").click();
     await page.getByTestId("data-sidebar").getByRole("link", { name: prefix ? "ქართული" : "English", exact: true }).click();
     await expect(page.getByTestId("trade-services")).toHaveAttribute("data-section", "types");
     await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-measure", "trade.balance");

@@ -1,5 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 import ExcelJS from "exceljs";
+import { topicCards } from "./group-cards";
 
 const pressed = (id: string) => `[data-series-id="${id}"] [data-testid="series-row-toggle"]`;
 const ready = (page: Page) => expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
@@ -21,12 +22,13 @@ async function cell(page: Page, label: string, year: number) {
   return table.locator("tbody tr", { hasText: label }).locator("td").nth(column - 1);
 }
 
-test("the hub shows five cards, each opening its page", async ({ page }) => {
-  await page.goto("/explorer/business");
-  const hub = page.getByTestId("business-hub");
-  await expect(hub.getByTestId("hub-card")).toHaveCount(5);
-  expect(await hub.locator("a").evaluateAll(links => links.map(link => link.getAttribute("href")))).toEqual([...TOPICS, "regions"].map(section => `/explorer/business/${section}`));
-  await expect(page.getByTestId("business-link")).toHaveAttribute("aria-current", "page");
+// The old hub is the section #t-business of its group page now.
+test("its group page shows five cards, each opening its page", async ({ page }) => {
+  await page.goto("/explorer/economy");
+  const cards = topicCards(page, "business");
+  await expect(cards).toHaveCount(5);
+  expect(await cards.evaluateAll(links => links.map(link => link.getAttribute("href")))).toEqual([...TOPICS, "regions"].map(section => `/explorer/business/${section}`));
+  await expect(page.getByTestId("group-link-economy")).toHaveAttribute("aria-current", "page");
 });
 
 test("sales selects all firms alone and lists sizes and industries under two headings", async ({ page }) => {

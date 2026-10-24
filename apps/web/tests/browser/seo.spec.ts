@@ -1,5 +1,6 @@
 import { expect, test, type Locator, type Page } from "@playwright/test";
 import { MUNICIPALITY_ROUTES } from "../../lib/explorer/municipalityRoutes";
+import { DATASET_HUBS } from "../../lib/navigation/datasetHubs";
 import { computedCssColorAlpha } from "./focus-outline";
 import { TEST_BASE_URL } from "./test-base-url";
 
@@ -211,7 +212,8 @@ test("404 recovery keeps a real not-found response with useful, accessible desti
 
   expect(response.status()).toBe(404);
   expect(response.headers()["content-type"]?.toLowerCase()).toContain("text/html");
-  for (const href of ["/", "/explorer", "/explorer/economy", "/explorer/inflation", "/explorer/unemployment", "/methodology"]) {
+  // Home, the group pages and methodology.
+  for (const href of ["/", ...DATASET_HUBS.map(({ href }) => href), "/methodology"]) {
     expect(html).toContain(`href=\"${href}\"`);
   }
 
@@ -238,8 +240,9 @@ test("404 recovery keeps a real not-found response with useful, accessible desti
     const recovery = page.getByTestId("not-found-recovery");
     await expect(recovery).toContainText("მისამართი არ არსებობს ან გვერდი გადატანილია.");
     const links = recovery.getByRole("link");
-    await expect(links).toHaveCount(22);
-    for (const href of ["/", "/explorer", "/explorer/economy", "/explorer/business", "/explorer/housing", "/explorer/inflation", "/explorer/money", "/explorer/unemployment", "/explorer/wages", "/explorer/living-standards", "/explorer/health", "/explorer/education", "/explorer/science-culture", "/explorer/crime", "/explorer/internet", "/explorer/trade", "/explorer/external", "/explorer/energy-food", "/explorer/environment", "/explorer/transport", "/explorer/demography", "/methodology"]) {
+    // Home, the eight group pages and methodology.
+    await expect(links).toHaveCount(10);
+    for (const href of ["/", ...DATASET_HUBS.map(({ href }) => href), "/methodology"]) {
       await expect(recovery.locator(`[href=\"${href}\"]`)).toHaveCount(1);
     }
     await expectNoPageOverflow(page);
@@ -427,7 +430,8 @@ test("sitemap keeps its XML contract and offers a readable browser view", async 
   const xml = await response.text();
   expect(xml).toContain('<?xml-stylesheet type="text/xsl" href="/sitemap.xsl"?>');
   // The sitemap builder's URLs, the trade pages among them, are asserted in tests/seo/routes.test.ts.
-  expect([...xml.matchAll(/<loc>https:\/\/[^<]+<\/loc>/g)]).toHaveLength(1544);
+  // 1544 less the 19 old topic hubs and their 19 English mirrors, plus the 8 group pages in both languages.
+  expect([...xml.matchAll(/<loc>https:\/\/[^<]+<\/loc>/g)]).toHaveLength(1522);
 
   const consoleIssues: string[] = [];
   page.on("console", (message) => {
@@ -444,7 +448,7 @@ test("sitemap keeps its XML contract and offers a readable browser view", async 
     expect(navigation?.status()).toBe(200);
     await expect(page).toHaveTitle("Fiscal.ge / XML sitemap");
     await expect(page.getByRole("heading", { name: "Public pages" })).toHaveCount(1);
-    await expect(page.locator(".sitemap-row")).toHaveCount(1544);
+    await expect(page.locator(".sitemap-row")).toHaveCount(1522);
     await expectNoPageOverflow(page);
 
     if (viewport.width < 720) {
@@ -556,10 +560,11 @@ test("Tbilisi municipality breadcrumbs distinguish the region from the city", as
   );
 });
 
-test("explorer hub states its data scope in one lead line", async ({ page }) => {
-  await page.goto(`${BASE_URL}/explorer`);
+// The Budget hub moved from /explorer to the Budget group page, which keeps its one lead line.
+test("the Budget group page states its data scope in one lead line", async ({ page }) => {
+  await page.goto(`${BASE_URL}/explorer/budget`);
 
-  const introduction = page.getByTestId("explorer-hub-introduction");
+  const introduction = page.locator("h1 + p");
   await expect(introduction).toHaveText("ბიუჯეტის, ვალისა და დეფიციტის მონაცემები");
 });
 

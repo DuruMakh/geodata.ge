@@ -174,7 +174,7 @@ for (const path of ["/explorer/expenditure", "/explorer/unemployment/overview", 
   test(`explorer menu rows are at least 36px tall below 900px: ${path}`, async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto(path);
-    await page.getByTestId("data-sidebar").locator("button[aria-controls]").click();
+    await page.getByTestId("sidebar-menu-button").click();
     const panel = page.locator("#data-sidebar-navigation");
     await expect(panel).toBeVisible();
     const short = await panel.locator("a, li").evaluateAll((rows) =>
@@ -185,11 +185,12 @@ for (const path of ["/explorer/expenditure", "/explorer/unemployment/overview", 
   });
 }
 
-test("the unemployment dataset row keeps the menu rhythm below 900px", async ({ page }) => {
+// The topics' rows are group rows now (spec 2026-10-24-explorer-regroup §4); Labour market holds Unemployment.
+test("the unemployment group row keeps the menu rhythm below 900px", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/explorer/unemployment/overview");
-  await page.getByTestId("data-sidebar").locator("button[aria-controls]").click();
-  // The dataset's list item carries the desktop gap since the hubs became a list (U02-09).
-  const marginTop = await page.locator("#data-sidebar-navigation nav li:has(> a[href$=\"/explorer/unemployment\"])").evaluate((row) => getComputedStyle(row).marginTop);
-  expect(marginTop).toBe("0px");
+  await page.getByTestId("sidebar-menu-button").click();
+  // No group row carries the desktop gap since the hubs became a list (U02-09).
+  const margins = await page.locator("#data-sidebar-navigation li:has(> div > a[data-testid^=\"group-link-\"])").evaluateAll((rows) => rows.map((row) => getComputedStyle(row).marginTop));
+  expect(margins).toEqual(Array(8).fill("0px"));
 });

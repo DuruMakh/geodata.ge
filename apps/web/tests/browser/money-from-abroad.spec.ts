@@ -58,12 +58,12 @@ for (const prefix of ["", "/en"]) for (const width of [390, 1440]) {
     await expect(table).toContainText(prefix ? "partial" : "არასრ.");
     await expect(page.getByTestId("money-from-abroad-partial-note")).toContainText("2019");
     const before = page.url();
-    if (width < 900) await page.getByTestId("sidebar-toggle").click();
+    if (width < 900) await page.getByTestId("sidebar-menu-button").click();
     await page.getByTestId("money-from-abroad-link").click(); await expect(page).toHaveURL(before);
-    if (width < 900) await expect(page.getByTestId("sidebar-toggle")).toHaveAttribute("aria-expanded", "false");
+    if (width < 900) await expect(page.getByTestId("sidebar-menu-button")).toHaveAttribute("aria-expanded", "false");
     await page.reload();
     await expect(page.getByTestId("series-status")).toContainText("3 / 12");
-    if (width < 900) await page.getByTestId("sidebar-toggle").click();
+    if (width < 900) await page.getByTestId("sidebar-menu-button").click();
     await page.getByTestId("data-sidebar").getByRole("link", { name: prefix ? "ქართული" : "English", exact: true }).click();
     await expect(page.getByTestId("series-status")).toContainText("3 / 12");
     await expect(page.getByTestId("money-from-abroad-ranking")).toHaveAttribute("data-end-year", "2019");

@@ -1,5 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 import ExcelJS from "exceljs";
+import { cardFigure, topicCards } from "./group-cards";
 
 const ready = (page: Page) => expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
 const toggle = (id: string) => `[data-series-id="${id}"] [data-testid="series-row-toggle"]`;
@@ -37,22 +38,22 @@ async function download(page: Page) {
 
 test.beforeEach(async ({ page }) => { await page.setViewportSize({ width: 1440, height: 900 }); });
 
-test("the hub shows four cards, Schools in school years, and the sidebar lists Education after Health", async ({ page }) => {
+// The old hub is the section #t-education of the Society and environment page now, its first topic.
+test("its group page shows four cards, Schools in school years, and the sidebar lists Education first under Society and environment", async ({ page }) => {
   for (const prefix of ["", "/en"]) {
-    await page.goto(`${prefix}/explorer/education`);
-    const cards = page.getByTestId("education-hub").getByTestId("hub-card");
+    await page.goto(`${prefix}/explorer/society`);
+    const cards = topicCards(page, "education");
     await expect(cards).toHaveCount(4);
     expect(await cards.evaluateAll(links => links.map(link => link.getAttribute("href")))).toEqual(SECTIONS.map(section => `${prefix}/explorer/education/${section}`));
-    for (let index = 0; index < 4; index += 1) await expect(cards.nth(index).locator("svg")).toHaveCount(1);
-    await expect(cards.first()).toContainText("2025/26 · 644.2");
-    await expect(cards.first()).toContainText("2000/01–2025/26");
-    await expect(cards.last()).toContainText("2025 · 19,690 · 2013–2025");
-    const entry = page.getByTestId("education-link");
-    await expect(entry).toHaveAttribute("aria-current", "page");
-    expect(await page.getByTestId("health-link").evaluate((health, education) => Boolean(health.compareDocumentPosition(education!) & Node.DOCUMENT_POSITION_FOLLOWING), await entry.elementHandle())).toBe(true);
+    for (let index = 0; index < 4; index += 1) await expect(cards.nth(index).getByTestId("explorer-card-graphic").locator("svg")).toHaveCount(1);
+    await expect(cards.first()).toContainText(cardFigure("644.2", "2025/26", "2000/01–2025/26"));
+    await expect(cards.last()).toContainText(cardFigure("19,690", "2025", "2013–2025"));
+    await expect(page.getByTestId("group-link-society")).toHaveAttribute("aria-current", "page");
+    const rows = page.getByTestId("group-panel-society").locator('[data-testid$="-link"]');
+    await expect(rows.first()).toHaveAttribute("data-testid", "education-schools-link");
     for (const section of SECTIONS) await expect(page.getByTestId(`education-${section}-link`)).toBeVisible();
   }
-  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Education");
+  await expect(page.locator("#t-education").getByRole("heading", { level: 2 })).toHaveText("Education");
 });
 
 test("the Schools index draws the municipality map, lists Georgia first and opens Tbilisi's region page", async ({ page }) => {

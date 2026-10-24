@@ -108,6 +108,7 @@ for (const path of [
   "/methodology",
   "/methodology/expenditure",
   "/explorer",
+  "/explorer/labour",
   "/explorer/expenditure",
   "/explorer/municipalities",
   "/explorer/municipalities/batumi",
@@ -150,10 +151,11 @@ test.describe("touch targets (D8)", () => {
   });
 });
 
+// The Budget hub's cards moved to the Budget group page, whose card footer is 10.5px (spec 2026-10-24-explorer-regroup §5).
 test("desktop keeps its compact type (D8 is phone-only)", async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 900 });
-  await page.goto("/explorer");
-  await expect(page.getByTestId("budget-hub").locator("p").last()).toHaveCSS("font-size", "10px");
+  await page.goto("/explorer/budget");
+  await expect(page.getByTestId("explorer-card").first().locator("> span").last()).toHaveCSS("font-size", "10.5px");
 });
 
 test.describe("a larger text setting (root font 125%) at 360px", () => {

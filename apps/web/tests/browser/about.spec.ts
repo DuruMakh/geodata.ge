@@ -23,7 +23,8 @@ async function expectHeader(page: Page, width: number) {
   const header = page.getByTestId("about-header");
   if (width < 900) await header.getByRole("button", { name: "მენიუ" }).click();
   await expect(header.getByRole("link", { name: "მთავარი", exact: true })).toHaveAttribute("href", "/");
-  await expect(header.getByRole("link", { name: width < 900 ? "ბიუჯეტი" : "მონაცემები", exact: true })).toHaveAttribute("href", "/explorer");
+  // The ☰ panel's Budget link goes to the Budget group page; the desktop მონაცემები link to All data.
+  await expect(header.getByRole("link", { name: width < 900 ? "ბიუჯეტი" : "მონაცემები", exact: true })).toHaveAttribute("href", width < 900 ? "/explorer/budget" : "/explorer");
   await expect(header.getByRole("link", { name: "მიზანი", exact: true })).toHaveAttribute("href", "/about");
   await expect(header.getByRole("link", { name: "მიზანი", exact: true })).toHaveAttribute("aria-current", "page");
   if (width < 900) await header.getByRole("button", { name: "მენიუ" }).click();

@@ -1378,9 +1378,11 @@ test("Explorer branding uses the reversed mark without changing shell behavior",
   ]) {
     await page.setViewportSize(viewport);
     await page.goto(`${TEST_BASE_URL}/explorer/expenditure`);
-    const sidebar = page.getByTestId("data-sidebar");
-    const home = sidebar.getByRole("link", { name: "Fiscal.ge — მთავარი", exact: true });
-    const mark = sidebar.getByTestId("sidebar-brand-mark");
+    // Below 900px the brand sits in the phone bar, which is its own element (sidebar-topbar) beside the closed menu.
+    const phone = viewport.width < 900;
+    const shell = page.getByTestId(phone ? "sidebar-topbar" : "data-sidebar");
+    const home = shell.getByRole("link", { name: "Fiscal.ge — მთავარი", exact: true });
+    const mark = phone ? home.locator("img") : shell.getByTestId("sidebar-brand-mark");
     await expect(home).toHaveCount(1);
     await expect(mark).toHaveAttribute("src", "/brand/fiscal-logo-mark-reversed.svg");
     await expect(mark).toHaveAttribute("alt", "");
@@ -1390,7 +1392,7 @@ test("Explorer branding uses the reversed mark without changing shell behavior",
     await expect.poll(() => mark.evaluate((image: HTMLImageElement) => image.naturalWidth)).toBeGreaterThan(0);
     expect((await mark.boundingBox())?.width ?? 0).toBeGreaterThanOrEqual(24);
     await expect(home).toContainText("Fiscal.ge");
-    await expect(home).toContainText("ღია მონაცემები");
+    if (!phone) await expect(home).toContainText("ღია მონაცემები");
   }
 });
 
@@ -1403,28 +1405,27 @@ test("sidebar collapses to a rail and remembers the choice", async ({ page }) =>
   const sidebar = page.getByTestId("data-sidebar");
   const toggle = page.getByTestId("sidebar-toggle");
 
+  // 272px expanded and a 72px icon rail (spec 2026-10-24-explorer-regroup §4).
   await expect(toggle).toHaveAttribute("aria-expanded", "true");
-  await expectSidebarWidth(page, 232);
+  await expectSidebarWidth(page, 272);
   await expect(page.getByTestId("section-link-revenue")).toBeVisible();
 
   await toggle.click();
   await expect(toggle).toHaveAttribute("aria-expanded", "false");
-  await expectSidebarWidth(page, 52);
+  await expectSidebarWidth(page, 72);
   await expect(sidebar).toHaveAttribute("data-collapsed", "true");
   await expect(page.getByTestId("section-link-revenue")).toHaveCount(0);
-  await expect(page.getByTestId("sidebar-brand-mark")).toHaveCount(0);
-  const home = sidebar.getByRole("link", { name: "მთავარი", exact: true });
+  // The rail keeps the brand mark as its way home, and keeps orientation by marking the current group's icon.
+  const home = sidebar.getByRole("link", { name: "Fiscal.ge — მთავარი", exact: true });
   await expect(home).toBeVisible();
-  // The home icon stays visible and readable on the dark rail.
-  await expect(home.locator("svg")).toBeVisible();
-  await expectReadableText(home, sidebar);
-  // The rail keeps orientation instead of the section list (spec §4.2).
-  await expect(sidebar).toContainText("მონაცემები · ბიუჯეტი");
+  await expect(home.getByTestId("sidebar-brand-mark")).toBeVisible();
+  await expect(page.getByTestId("group-link-budget")).toHaveCSS("box-shadow", /inset/);
+  await expect(page.getByTestId("group-link-economy")).toHaveCSS("box-shadow", "none");
 
   // The toggle is not one-way: expanding must bring the sections back.
   await toggle.click();
   await expect(toggle).toHaveAttribute("aria-expanded", "true");
-  await expectSidebarWidth(page, 232);
+  await expectSidebarWidth(page, 272);
   await expect(page.getByTestId("section-link-revenue")).toBeVisible();
 
   await toggle.click();
@@ -1433,23 +1434,24 @@ test("sidebar collapses to a rail and remembers the choice", async ({ page }) =>
   await expectAppReady(page);
 
   await expect(page.getByTestId("sidebar-toggle")).toHaveAttribute("aria-expanded", "false");
-  await expectSidebarWidth(page, 52);
+  await expectSidebarWidth(page, 72);
 
   expect(consoleProblems).toEqual([]);
 });
 
-test("sidebar is a full-width top bar with a sheet below 900px", async ({ page }) => {
+// Below 900px the bar (sidebar-topbar) holds the menu button, and the menu opens the sidebar itself full screen.
+test("sidebar is a full-width top bar with a menu below 900px", async ({ page }) => {
   const consoleProblems = collectConsoleProblems(page);
   await page.setViewportSize({ width: 390, height: 844 });
 
   // Arrive carrying a collapse preference set on a desktop. It must be ignored
-  // here rather than applied as an unexplained 52px rail on a phone.
+  // here rather than applied as an unexplained 72px rail on a phone.
   await page.addInitScript(() => window.localStorage.setItem("geodata:sidebar-collapsed", "1"));
 
   await page.goto(`${TEST_BASE_URL}/explorer/expenditure`);
   await expectAppReady(page);
 
-  const toggle = page.getByTestId("sidebar-toggle");
+  const toggle = page.getByTestId("sidebar-menu-button");
   const revenueLink = page.getByTestId("section-link-revenue");
   const toggleBox = await toggle.boundingBox();
   expect(toggleBox?.width ?? 0).toBeGreaterThanOrEqual(36);
@@ -1461,7 +1463,7 @@ test("sidebar is a full-width top bar with a sheet below 900px", async ({ page }
   // above the content. That state overflows nothing, so the mobile-overflow test
   // above passes in both worlds — assert the bar's shape directly.
   const clientWidth = await page.evaluate(() => document.documentElement.clientWidth);
-  const bar = await page.getByTestId("data-sidebar").boundingBox();
+  const bar = await page.getByTestId("sidebar-topbar").boundingBox();
   expect(bar?.width ?? 0).toBeGreaterThan(clientWidth - 2);
   expect(bar?.width ?? 0).toBeLessThan(clientWidth + 2);
   expect(bar?.height ?? 0).toBeLessThan(120);
@@ -1476,7 +1478,7 @@ test("sidebar is a full-width top bar with a sheet below 900px", async ({ page }
   await expect(revenueLink).toBeVisible();
   await expectNoPageOverflow(page);
 
-  // Escape closes the sheet from inside it and hands focus back to the trigger
+  // Escape closes the menu from inside it and hands focus back to the trigger
   // rather than dropping it on a display:none link.
   await revenueLink.focus();
   await page.keyboard.press("Escape");
@@ -1499,56 +1501,58 @@ test("sidebar is a full-width top bar with a sheet below 900px", async ({ page }
   expect(consoleProblems).toEqual([]);
 });
 
-test("hub lists seven cards, all seven live", async ({ page }) => {
+// Budget's seven cards moved from /explorer (now All data) to the Budget group page; a card shows its figure, then its period.
+test("the Budget group page lists seven cards, all seven live", async ({ page }) => {
   const consoleProblems = collectConsoleProblems(page);
 
-  await page.goto(`${TEST_BASE_URL}/explorer`);
+  await page.goto(`${TEST_BASE_URL}/explorer/budget`);
   await expectAppReady(page);
 
-  await expect(page.getByTestId("hub-card")).toHaveCount(7);
-  for (const card of await page.getByTestId("hub-card").all()) {
-    await expect(card.locator("h2")).toHaveCount(1);
+  const cards = page.locator("#t-budget").getByTestId("explorer-card");
+  await expect(cards).toHaveCount(7);
+  for (const card of await cards.all()) {
+    await expect(card.locator("h3")).toHaveCount(1);
   }
-  // Scoped to the hub: the sidebar carries a ხარჯები link too, and an unscoped
+  // Scoped to the section: the sidebar carries a ხარჯები link too, and an unscoped
   // role query would trip Playwright's strict mode.
-  await expect(page.getByTestId("budget-hub").getByRole("link", { name: "ხარჯები", exact: true })).toHaveAttribute(
+  await expect(page.locator("#t-budget").getByRole("link", { name: "ხარჯები", exact: true })).toHaveAttribute(
     "href",
     "/explorer/expenditure",
   );
 
   // Card 04: routed like the other three, not a "მალე" marker any more.
-  const municipalities = page.getByTestId("hub-card").nth(3);
+  const municipalities = cards.nth(3);
   await expect(municipalities).toContainText("მუნიციპალიტეტები");
   await expect(municipalities).not.toContainText("მალე");
   await expect(municipalities).not.toHaveAttribute("aria-disabled");
   expect(await municipalities.evaluate((node) => node.tagName)).toBe("A");
   await expect(municipalities).toHaveAttribute("href", "/explorer/municipalities");
 
-  // No invented article count or unit total anywhere on the hub.
-  await expect(page.getByTestId("budget-hub")).not.toContainText("სტატია");
+  // No invented article count or unit total anywhere on the page's cards.
+  await expect(page.locator("#t-budget")).not.toContainText("სტატია");
 
-  // Absence alone would pass on a hub whose footers all came back null, so also
+  // Absence alone would pass on a page whose figures all came back null, so also
   // assert a real figure is there. The shape, not the figure: the number moves
-  // with every dataset update, the "<year> · <n.n> მლრდ ₾" contract does not.
-  await expect(page.getByTestId("hub-card").first()).toContainText(/\d{4} · [\d,]+\.\d მლრდ ₾/);
-  const types = page.getByTestId("hub-card").nth(1);
+  // with every dataset update, the "<n.n> მლრდ ₾" then "<year>" contract does not.
+  await expect(cards.first()).toContainText(/[\d,]+\.\d მლრდ ₾\d{4}/);
+  const types = cards.nth(1);
   await expect(types).toContainText("ხარჯების სახეები");
   await expect(types).toHaveAttribute("href", "/explorer/expenditure-types");
-  await expect(types).toContainText(/\d{4} · [\d,]+\.\d მლრდ ₾/);
-  // Card 04 now carries the same contract — this is the figure this task adds.
-  await expect(municipalities).toContainText(/\d{4} · [\d,]+\.\d მლრდ ₾/);
+  await expect(types).toContainText(/[\d,]+\.\d მლრდ ₾\d{4}/);
+  // Card 04 carries the same contract.
+  await expect(municipalities).toContainText(/[\d,]+\.\d მლრდ ₾\d{4}/);
 
-  await expect(page.getByTestId("hub-card").nth(4).getByRole("heading")).toHaveText("ანალიზი");
+  await expect(cards.nth(4).getByRole("heading")).toHaveText("ანალიზი");
 
-  const debt = page.getByTestId("hub-card").nth(5);
+  const debt = cards.nth(5);
   await expect(debt).toContainText("ვალი");
   await expect(debt).toHaveAttribute("href", "/explorer/debt");
-  await expect(debt).toContainText(/2025 · [\d,]+\.\d მლრდ ₾/);
+  await expect(debt).toContainText(/[\d,]+\.\d მლრდ ₾2025/);
 
-  const deficit = page.getByTestId("hub-card").nth(6);
+  const deficit = cards.nth(6);
   await expect(deficit).toContainText("დეფიციტი");
   await expect(deficit).toHaveAttribute("href", "/explorer/deficit");
-  await expect(deficit).toContainText(/\d{4} · [+−]?\d+\.\d% მშპ-ის/);
+  await expect(deficit).toContainText(/[+−]?\d+\.\d%\d{4}/);
 
   // The card is not just styled as a link — clicking it actually lands on the
   // municipalities index.

@@ -1,5 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 import ExcelJS from "exceljs";
+import { topicCards } from "./group-cards";
 
 const pressed = (id: string) => `[data-series-id="${id}"] [data-testid="series-row-toggle"]`;
 const ticked = (page: Page) => page.locator('[data-testid="series-row-toggle"][aria-pressed="true"]');
@@ -17,14 +18,15 @@ async function cell(page: Page, label: string, year: number) {
   return table.locator("tbody tr", { hasText: label }).locator("td").nth(column - 1);
 }
 
-test("the hub shows seven cards, each opening its page, and sits after Energy and food in the menu", async ({ page }) => {
-  await page.goto("/explorer/environment");
-  const hub = page.getByTestId("environment-hub");
-  await expect(hub.getByTestId("hub-card")).toHaveCount(7);
-  expect(await hub.locator("a").evaluateAll(links => links.map(link => link.getAttribute("href")))).toEqual(SECTIONS.map(section => `/explorer/environment/${section}`));
-  await expect(page.getByTestId("environment-link")).toHaveAttribute("aria-current", "page");
-  const hubs = await page.locator('[data-testid$="-link"][href^="/explorer/"]').evaluateAll(links => links.map(link => link.getAttribute("href")));
-  expect(hubs[hubs.indexOf("/explorer/energy-food") + 1]).toBe("/explorer/environment");
+// The old hub is the section #t-environment of its group page now.
+test("its group page shows seven cards, each opening its page, and the topic sits after Energy and food in the menu", async ({ page }) => {
+  await page.goto("/explorer/society");
+  const cards = topicCards(page, "environment");
+  await expect(cards).toHaveCount(7);
+  expect(await cards.evaluateAll(links => links.map(link => link.getAttribute("href")))).toEqual(SECTIONS.map(section => `/explorer/environment/${section}`));
+  await expect(page.getByTestId("group-link-society")).toHaveAttribute("aria-current", "page");
+  const rows = await page.getByTestId("group-panel-society").locator('[data-testid$="-link"]').evaluateAll(links => links.map(link => link.getAttribute("href")));
+  expect(rows[rows.indexOf("/explorer/energy-food/farming") + 1]).toBe("/explorer/environment/greenhouse-gases");
 });
 
 test("greenhouse gases select the total and list six headings, with no measure switch", async ({ page }) => {

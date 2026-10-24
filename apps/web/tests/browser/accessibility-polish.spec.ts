@@ -1,6 +1,6 @@
-import path from "node:path";
 import { expect, test, type Locator, type Page } from "@playwright/test";
-import { NAV_TREE } from "../../lib/navigation/navTree";
+import { ALL_DATA_PATH, NAV_GROUPS, NAV_TREE } from "../../lib/navigation/navTree";
+import { axeViolations } from "./axe";
 import { expectReadableText } from "./color-contrast";
 
 // Screen-reader and keyboard semantics from the 2026-10 platform review (Task 47), one page per
@@ -227,13 +227,14 @@ test("the deficit deck reads its value alone", async ({ page }) => {
   await expect(page.getByTestId("source-label")).toContainText("A negative value indicates a deficit");
 });
 
-test("hub cards are named by their title, described by the rest, and the hovered footer stays readable", async ({ page }) => {
-  await page.goto("/en/explorer");
-  const card = page.getByTestId("hub-card").first();
+// The Budget cards moved from /explorer to the Budget group page; a card is described by its figure, period and years.
+test("group page cards are named by their title, described by the rest, and the hovered footer stays readable", async ({ page }) => {
+  await page.goto("/en/explorer/budget");
+  const card = page.getByTestId("explorer-card").first();
   await expect(card).toHaveAccessibleName("Expenditure");
-  await expect(card).toHaveAccessibleDescription(/^Expenditure by function and institution.+ · .+GEL$/);
+  await expect(card).toHaveAccessibleDescription(/^\d+\.\d bn GEL \d{4} \d{4}–\d{4}$/);
   await card.hover();
-  const footer = card.locator("p").last();
+  const footer = card.locator("> span").last();
   await expect(async () => expectReadableText(footer, card)).toPass();
 });
 
@@ -292,44 +293,40 @@ test.describe("on a phone", () => {
   test.describe("before scripts run", () => {
     test.use({ javaScriptEnabled: false });
 
-    test("the sidebar toggle claims no open panel and no collapse action", async ({ page }) => {
+    // The phone bar's menu button is its own control now; the desktop collapse toggle is not shown on a phone.
+    test("the menu button is the closed menu and no collapse action is offered", async ({ page }) => {
       await page.goto("/explorer");
-      const toggle = page.getByTestId("sidebar-toggle");
-      await expect(toggle).not.toHaveAttribute("aria-expanded");
-      await expect(toggle).toHaveAccessibleName("მენიუ");
+      const menu = page.getByTestId("sidebar-menu-button");
+      await expect(menu).toHaveAttribute("aria-expanded", "false");
+      await expect(menu).toHaveAccessibleName("მენიუ");
+      await expect(page.getByTestId("sidebar-toggle")).toBeHidden();
     });
   });
 
-  test("after hydration the sidebar toggle is the closed menu", async ({ page }) => {
+  test("after hydration the menu button is the closed menu", async ({ page }) => {
     await page.goto("/explorer");
-    const toggle = page.getByTestId("sidebar-toggle");
-    await expect(toggle).toHaveAttribute("aria-expanded", "false");
-    await expect(toggle).toHaveAccessibleName("მენიუ");
-    await expect(toggle).toHaveAttribute("aria-controls", "data-sidebar-navigation");
+    await ready(page);
+    const menu = page.getByTestId("sidebar-menu-button");
+    await expect(menu).toHaveAttribute("aria-expanded", "false");
+    await expect(menu).toHaveAccessibleName("მენიუ");
+    await expect(menu).toHaveAttribute("aria-controls", "data-sidebar-navigation");
+    await expect(page.getByTestId("sidebar-toggle")).toBeHidden();
   });
 });
 
-// axe-core, pinned in package.json, run in the page; the rules are WCAG 2.0 and 2.1, levels A and AA.
-const AXE = path.join(process.cwd(), "node_modules/axe-core/axe.min.js");
-const WCAG_AA = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"];
 // About's mission band numbers itself "01" in accent on ink (3.01:1). It is decorative and aria-hidden, so WCAG 1.4.3's
 // incidental-text exception applies; its colour is DESIGN.md's to change, not this test's.
 const DECORATIVE = ['[data-testid="mission-cover"] [aria-hidden="true"] strong'];
 
-test("every hub, its first page and the site pages pass axe's WCAG 2.1 A and AA rules on a phone", async ({ page }) => {
+// The old topic hubs forward to their group pages, so All data and the eight group pages stand in for them.
+test("All data, every group page, each topic's first page and the site pages pass axe's WCAG 2.1 A and AA rules on a phone", async ({ page }) => {
   test.setTimeout(300_000);
   await page.setViewportSize({ width: 375, height: 812 });
-  const paths = [...NAV_TREE.flatMap(hub => [hub.href, ...(hub.sections[0] ? [hub.sections[0].href] : [])]), "/", "/methodology", "/connect", "/about"];
+  const paths = [ALL_DATA_PATH, ...NAV_GROUPS.map(group => group.href), ...NAV_TREE.flatMap(hub => (hub.sections[0] ? [hub.sections[0].href] : [])), "/", "/methodology", "/connect", "/about"];
   const failures: string[] = [];
   for (const href of paths) {
     await page.goto(href);
-    await page.addScriptTag({ path: AXE });
-    const violations = await page.evaluate(async ({ tags, exclude }) => {
-      const { axe } = window as unknown as { axe: { run: (context: unknown, options: unknown) => Promise<{ violations: { id: string; nodes: { target: string[] }[] }[] }> } };
-      const result = await axe.run({ exclude: [exclude] }, { runOnly: { type: "tag", values: tags } });
-      return result.violations.map(violation => `${violation.id}: ${violation.nodes.map(node => node.target.join(" ")).join(", ")}`);
-    }, { tags: WCAG_AA, exclude: DECORATIVE });
-    failures.push(...violations.map(violation => `${href} ${violation}`));
+    failures.push(...(await axeViolations(page, DECORATIVE)).map(violation => `${href} ${violation}`));
   }
   expect(failures).toEqual([]);
 });

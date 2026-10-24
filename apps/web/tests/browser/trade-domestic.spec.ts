@@ -2,6 +2,7 @@ import { expect, test, type Page } from "@playwright/test";
 import ExcelJS from "exceljs";
 import { createHash } from "node:crypto";
 import { tableSeriesCount } from "./explorer-table";
+import { topicCards } from "./group-cards";
 
 const section = (page: Page, name: string) => page.getByTestId(`trade-domestic-section-${name}`);
 
@@ -9,8 +10,9 @@ for (const prefix of ["", "/en"]) for (const width of [390, 1440]) {
   test(`Domestic views retain comparisons, range and language ${prefix || "ka"} ${width}px`, async ({ page }) => {
     const errors: string[] = []; page.on("pageerror", error => errors.push(error.message));
     await page.setViewportSize({ width, height: 1000 });
-    await page.goto(`${prefix}/explorer/trade`);
-    await page.getByTestId("trade-hub").getByTestId("hub-card").nth(3).click();
+    // The old Trade hub is the section #t-trade of the External sector page now.
+    await page.goto(`${prefix}/explorer/external`);
+    await topicCards(page, "trade").nth(3).click();
     await expect(page).toHaveURL(new RegExp(`${prefix}/explorer/trade/domestic-exports$`));
     await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
     await expect(page.getByTestId("series-status")).toContainText("1 / 3");
@@ -52,7 +54,7 @@ for (const prefix of ["", "/en"]) for (const width of [390, 1440]) {
     await expect(page.getByTestId("series-status")).toContainText("101 / 101");
     await page.getByTestId("trade-products-compare").click();
     await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-selected-count", "101");
-    if (width < 900) await page.getByTestId("sidebar-toggle").click();
+    if (width < 900) await page.getByTestId("sidebar-menu-button").click();
     await page.getByTestId("data-sidebar").getByRole("link", { name: prefix ? "ქართული" : "English", exact: true }).click();
     await expect(page.getByTestId("trade-domestic")).toHaveAttribute("data-section", "products");
     await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-selected-count", "101");
