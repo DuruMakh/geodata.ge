@@ -4,9 +4,14 @@ import { moneyBanksViewSeries, type MoneyBanksTopicId } from "../../lib/explorer
 import { loadMoneyBanksCsv, yearSpan } from "../helpers/money-banks-csv";
 
 const pressed = (id: string) => `[data-series-id="${id}"] [data-testid="series-row-toggle"]`;
-const SECTIONS = ["supply", "loans-deposits", "interest-rates", "bank-health"];
+/** The hub's cards in order; Loans by region is a map and list of area pages, so it has no series list. */
+const SECTIONS = ["supply", "loans-deposits", "borrowers", "regions", "interest-rates", "bank-health"];
 /** The initial count of each page: its first series, or both totals on Loans and deposits. */
-const INITIAL_COUNT: Record<string, string> = { "supply": "1 / 4", "loans-deposits": "2 / 4", "interest-rates": "1 / 3", "bank-health": "1 / 5" };
+const INITIAL_COUNT: Record<string, string> = { "supply": "1 / 4", "loans-deposits": "2 / 4", "borrowers": "1 / 23", "interest-rates": "1 / 3", "bank-health": "1 / 5" };
+const AREAS = ["georgia", "tbilisi", "imereti", "kvemo_kartli", "kakheti", "adjara", "samegrelo_zemo_svaneti", "shida_kartli", "samtskhe_javakheti", "mtskheta_mtianeti", "guria", "racha_lechkhumi_kvemo_svaneti"];
+
+/** How many line boxes an element's text takes: its height over its line height. */
+const lines = (page: Page, testId: string) => page.getByTestId(testId).evaluate(element => element.getBoundingClientRect().height / parseFloat(getComputedStyle(element).lineHeight));
 
 // Latest values and year spans come from the reviewed CSV, so an NBG refresh does not fail these tests.
 let csv: Awaited<ReturnType<typeof loadMoneyBanksCsv>>;
@@ -29,11 +34,16 @@ for (const prefix of ["", "/en"]) {
     const errors: string[] = []; page.on("pageerror", error => errors.push(error.message));
     await page.goto(`${prefix}/explorer/money`);
     const hub = page.getByTestId("money-hub");
-    await expect(hub.locator("a")).toHaveCount(4);
+    await expect(hub.locator("a")).toHaveCount(SECTIONS.length);
     expect(await hub.locator("a").evaluateAll(links => links.map(link => link.getAttribute("href")))).toEqual(SECTIONS.map(section => `${prefix}/explorer/money/${section}`));
     for (const section of SECTIONS) {
       await page.goto(`${prefix}/explorer/money/${section}`);
       await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
+      if (section === "regions") {
+        await expect(page.getByTestId("money-region-index")).toBeVisible();
+        await expect(page.getByTestId("series-status")).toHaveCount(0);
+        continue;
+      }
       await expect(page.getByTestId("series-status")).toContainText(INITIAL_COUNT[section]);
       // No money page has a tab row: two of them switch measures with icons on the chart toolbar.
       await expect(page.getByTestId("money-tabs")).toHaveCount(0);
@@ -184,6 +194,72 @@ test("bank health has one list, a dash for capital before 2014 and the 2008 loss
   await expect(await cell(page, "Capital to risk-weighted assets", 2014)).not.toHaveText("—");
   await expect(await cell(page, "Return on assets", 2008)).toHaveText(`${csv.percent("banks.roa", 2008)}%`);
   await expect(await cell(page, "Return on equity", 2008)).toHaveText(`${csv.percent("banks.roe", 2008)}%`);
+});
+
+test("who borrows shows all loans alone, three headings and search", async ({ page }) => {
+  await page.goto("/en/explorer/money/borrowers");
+  await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
+  await expect(page.getByTestId("money-latest")).toHaveText(/^2025: all loans 69\.0 bn GEL$/);
+  await expect(page.getByTestId("series-heading")).toHaveCount(3);
+  await expect(page.getByTestId("series-heading")).toHaveText(["Who borrows", "Businesses by industry", "What households borrow for"]);
+  await expect(page.getByTestId("series-status")).toContainText("Series 1 / 23");
+  await expect(page.locator(pressed("borrowers.total"))).toHaveAttribute("aria-pressed", "true");
+  await expect(page.locator(`[data-testid="series-row-toggle"][aria-pressed="true"]`)).toHaveCount(1);
+  // Search narrows the list to the pinned total and Trade, never the count.
+  await page.getByTestId("series-search").fill("trade");
+  await expect(page.getByTestId("series-row-toggle")).toHaveCount(2);
+  await expect(page.locator(pressed("borrowers.industry.trade"))).toHaveAttribute("aria-pressed", "false");
+  await expect(page.getByTestId("series-status")).toContainText("Series 1 / 23");
+});
+
+test("households before 2015 are dashes in the table", async ({ page }) => {
+  await page.goto("/en/explorer/money/borrowers#view=table&sel=borrowers.households&start=2013&end=2016");
+  await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
+  await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-mode", "table");
+  await expect(await cell(page, "Households", 2013)).toHaveText("—");
+  await expect(await cell(page, "Households", 2014)).toHaveText("—");
+  await expect(await cell(page, "Households", 2015)).not.toHaveText("—");
+});
+
+test("the regions index names the largest region and each area page names its own all loans", async ({ page }) => {
+  await page.goto("/en/explorer/money/regions");
+  await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
+  await expect(page.getByTestId("money-latest")).toHaveText(/^2025: Tbilisi 52\.4 bn GEL$/);
+  await expect(page.getByTestId("money-region-map").getByTestId("regional-map-path")).toHaveCount(11);
+  await page.goto("/en/explorer/money/regions/imereti");
+  await expect(page.getByTestId("money-latest")).toHaveText(/^2025: all loans 4\.0 bn GEL$/);
+  await page.goto("/en/explorer/money/regions/racha_lechkhumi_kvemo_svaneti");
+  await expect(page.getByTestId("money-latest")).toHaveText(/^2025: all loans 60\.5 mln GEL$/);
+  await page.goto("/explorer/money/regions/imereti");
+  await expect(page.getByTestId("money-latest")).toHaveText(/^2025: ყველა სესხი 4\.0 მლრდ ₾$/);
+});
+
+test("the regions map opens Imereti and the language switch keeps the selection", async ({ page }) => {
+  // The open section list puts the sidebar's language link below a 720px fold.
+  await page.setViewportSize({ width: 1280, height: 1000 });
+  await page.goto("/en/explorer/money/regions");
+  await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
+  await page.getByTestId("money-region-index").locator('[data-testid="regional-list-row"][data-region-id="region.imereti"]').click();
+  await expect(page).toHaveURL(/\/en\/explorer\/money\/regions\/imereti$/);
+  await expect(page.getByTestId("money-area-region_imereti")).toBeVisible();
+  await page.locator(pressed("loans_region.region_imereti.fx")).click();
+  await expect(page).toHaveURL(/sel=loans_region\.region_imereti\.total(%2C|,)loans_region\.region_imereti\.fx(&|$)/);
+  await page.getByTestId("language-switch").getByRole("link", { name: "ქართული", exact: true }).click();
+  await expect(page).toHaveURL(/\/explorer\/money\/regions\/imereti#.*sel=/);
+  expect(page.url()).toContain("loans_region.region_imereti");
+  await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
+  await expect(page.locator(pressed("loans_region.region_imereti.fx"))).toHaveAttribute("aria-pressed", "true");
+  await expect(page.locator(pressed("loans_region.region_imereti.total"))).toHaveAttribute("aria-pressed", "true");
+});
+
+for (const prefix of ["", "/en"]) test(`latest lines fit one line at 375px ${prefix || "ka"}`, async ({ page }) => {
+  await page.setViewportSize({ width: 375, height: 800 });
+  for (const path of ["borrowers", "regions", ...AREAS.map(area => `regions/${area}`)]) {
+    await page.goto(`${prefix}/explorer/money/${path}`);
+    await expect(page.getByTestId("money-latest")).toBeVisible();
+    await page.evaluate(() => document.fonts.ready);
+    expect(await lines(page, "money-latest"), path).toBeLessThanOrEqual(1.1);
+  }
 });
 
 test("clearing the selection shows the empty callout and disables Excel", async ({ page }) => {
