@@ -38,10 +38,11 @@ export type FiscalDatasetId = Exclude<DatasetId, "ministries" | "inflation" | "i
  */
 export type TopicDatasetId =
   | Exclude<MethodologyDatasetId, "expenditure" | "revenue" | "municipalities" | "debt" | "gdp" | "economic-sectors" | "regional-economies" | "demography">
-  | "inflation-products";
+  | "inflation-products"
+  | "funded-pension";
 
 /** An official statistics producer whose published figures a dataset is read from. */
-export type SourceAgencyId = "geostat" | "nbg" | "ssa" | "mof";
+export type SourceAgencyId = "geostat" | "nbg" | "ssa" | "mof" | "treasury" | "pension_fund";
 
 const SOURCE_AGENCIES: Record<SourceAgencyId, { name: Localized; url: string }> = {
   geostat: {
@@ -59,6 +60,14 @@ const SOURCE_AGENCIES: Record<SourceAgencyId, { name: Localized; url: string }> 
   mof: {
     name: { ka: "საქართველოს ფინანსთა სამინისტრო", en: "Ministry of Finance of Georgia" },
     url: "https://mof.ge",
+  },
+  treasury: {
+    name: { ka: "სახაზინო სამსახური", en: "State Treasury of Georgia" },
+    url: "https://www.treasury.ge",
+  },
+  pension_fund: {
+    name: { ka: "საქართველოს საპენსიო ფონდი", en: "Pension Fund of Georgia" },
+    url: "https://pensions.ge",
   },
 };
 
@@ -338,6 +347,17 @@ const TOPIC_DATASETS: Record<TopicDatasetId, { keywords: Record<Locale, readonly
     },
     sources: ["geostat"],
   },
+  "tax-breaks-refunds": {
+    keywords: {
+      ka: ["საგადასახადო შეღავათები", "საგადასახადო დანახარჯები", "დღგ", "გადასახადის დაბრუნება", "საქართველო"],
+      en: ["Georgia", "tax breaks", "tax expenditures", "VAT", "tax refunds"],
+    },
+    measurementTechnique: {
+      ka: "გადამოწმებული ამოღება ფინანსთა სამინისტროს საგადასახადო დანახარჯების ანგარიშიდან და სახაზინო სამსახურის გამოქვეყნებული მონაცემებიდან.",
+      en: "Reviewed extraction from the Ministry of Finance's Tax Expenditure Report and the State Treasury's published figures.",
+    },
+    sources: ["mof", "treasury"],
+  },
   housing: {
     keywords: {
       ka: ["მშენებლობის ნებართვები", "ექსპლუატაციაში მიღებული ობიექტები", "საცხოვრებლის ფასები", "მშენებლობა", "საქართველო"],
@@ -458,6 +478,17 @@ const TOPIC_DATASETS: Record<TopicDatasetId, { keywords: Record<Locale, readonly
       en: "Reviewed extraction from the Social Service Agency's monthly statistics: December counts and the sum of 12 monthly amounts; averages, shares of residents, 2025 prices and shares of GDP are calculated by Fiscal.ge with Geostat data.",
     },
     sources: ["ssa", "geostat"],
+  },
+  "funded-pension": {
+    keywords: {
+      ka: ["დაგროვებითი პენსია", "საპენსიო დანაზოგი", "საპენსიო ფონდი", "საქართველო"],
+      en: ["Georgia", "funded pension", "pension savings", "pension fund", "pension contributions"],
+    },
+    measurementTechnique: {
+      ka: "გადამოწმებული ამოღება საქართველოს საპენსიო ფონდის აუდირებული ფინანსური ანგარიშგებიდან (IFRS) და წლიური ანგარიშიდან, ისე, როგორც ისინი იბეჭდება; მშპ-სთან შეფარდებას Fiscal.ge ითვლის საქსტატის მონაცემებით.",
+      en: "Reviewed extraction from the Pension Fund of Georgia's audited IFRS financial statements and annual report, as they print the figures; shares of GDP are calculated by Fiscal.ge with Geostat data.",
+    },
+    sources: ["pension_fund", "geostat"],
   },
   environment: {
     keywords: {

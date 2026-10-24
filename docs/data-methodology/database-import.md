@@ -74,9 +74,10 @@ Unemployment uses the existing single import transaction. Source IDs retain thei
 | `HousingFact` | `data/imports/housing-annual.csv` (see `housing-annual.md`) |
 | `GdpExpenditureFact` | `data/imports/gdp-expenditure-annual.csv` (see `gdp-expenditure.md`) |
 | `ExpenditureTypeFact` | `data/imports/expenditure-types-annual.csv` (see `expenditure-types.md`) |
+| `TaxBreaksRefundsFact` | `data/imports/tax-breaks-refunds-annual.csv` (see `tax-breaks-refunds.md`; migration `20261021200000_tax_breaks_refunds`) |
 | `InternetFact` | `data/imports/internet-annual.csv` (see `internet-annual.md`) |
 | `EducationFact` | `data/imports/education-annual.csv` (see `education-annual.md`) |
-| `SocialFact` | `data/imports/social-protection-annual.csv` (21,988 SSA annual observations; exact values, GEL as summed, with the months each covers; the counting-change register `social-protection-series-breaks.csv` is read from the CSV and not mirrored) |
+| `SocialFact` | `data/imports/social-protection-annual.csv` (22,087 annual observations: 21,988 from SSA and 99 funded pension values from the Pension Fund of Georgia, in the same columns and with no new table; exact values, GEL as summed, with the months each covers; the counting-change register `social-protection-series-breaks.csv` is read from the CSV and not mirrored) |
 | `EnvironmentFact` | `data/imports/environment-annual.csv` (see `environment-annual.md`; migration `20261020160000_environment`; a value's shown decimals are read from its published value, so none is stored) |
 | `ScienceCultureFact` | `data/imports/science-culture-annual.csv` (see `science-culture-annual.md`; the counting-change register `science-culture-series-breaks.csv` is read from the CSV and not mirrored) |
 | `TransportFact` | `data/imports/transport-annual.csv` (see `transport-annual.md`) |

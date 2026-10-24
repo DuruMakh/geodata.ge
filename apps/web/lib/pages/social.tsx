@@ -27,9 +27,9 @@ import { loadSocialWorkbookSources } from "./social-places";
 
 const topicHref = (section: SocialTopicId) => SOCIAL_SECTIONS.find(item => item.id === section)!.href;
 
-/** The latest line's figure: Social payments' total in billion GEL to two decimals ("6.17"), Social package's recipients whole. */
+/** The latest line's figure: the money headlines (Social payments' total, the funded pension's savings) in billion GEL to two decimals ("6.17"), Social package's recipients whole. */
 function latestFigure(section: SocialTopicId, value: number): string {
-  return section === "social-payments" ? formatInUnit(value / 1000, { divisor: 1, label: "", decimals: 2 }) : formatInUnit(value, UNIT_PERSONS);
+  return section === "social-payments" || section === "funded-pension" ? formatInUnit(value / 1000, { divisor: 1, label: "", decimals: 2 }) : formatInUnit(value, UNIT_PERSONS);
 }
 
 export async function socialTopicMetadata(locale: Locale, section: SocialTopicId) {
@@ -37,9 +37,9 @@ export async function socialTopicMetadata(locale: Locale, section: SocialTopicId
   return fiscalMetadata({ locale, path: topicHref(section), title: message(messages, `social.page.${section}.metaTitle`), description: message(messages, `social.page.${section}.summary`) });
 }
 
-/** Social payments or Social package: the latest line, then the chart workspace over Georgia's series. */
+/** Social payments, Social package or the funded pension: the latest line, then the chart workspace over Georgia's series. */
 export async function renderSocialTopicPage(locale: Locale, section: SocialTopicId) {
-  // Social payments' % of GDP view divides by the national GDP the debt page uses, and its Excel cites the same Geostat files.
+  // The % of GDP view of the money pages divides by the national GDP the debt page uses, and their Excel cites the same Geostat files.
   const gdp = socialViews(section).includes("gdp");
   const [{ facts: served, breaks }, presentation, sources, gdpFacts, gdpSources] = await Promise.all([
     loadServedSocialData(), getPresentation(locale, ["social", "format", "main", "workbook"], []), loadSocialWorkbookSources(locale),
@@ -67,9 +67,9 @@ export async function renderSocialTopicPage(locale: Locale, section: SocialTopic
   ];
   return <I18nProvider {...clientPresentation(presentation)}>
     <JsonLd testId="explorer-dataset-json-ld" data={explorerDatasetJsonLd({
-      locale, origin, path: href, datasetId: "social-protection", name: title, description, firstYear: min, lastYear: max, dateModified: lastReviewedAt,
+      locale, origin, path: href, datasetId: section === "funded-pension" ? "funded-pension" : "social-protection", name: title, description, firstYear: min, lastYear: max, dateModified: lastReviewedAt,
       variableMeasured: [...new Set(Object.values(headingLabels))],
-      // SSA's statistics; only Social payments' % of GDP view divides by Geostat's GDP.
+      // SSA's statistics; only Social payments' % of GDP view divides by Geostat's GDP. The funded pension has its own dataset vocabulary.
       ...(gdp ? {} : { sources: ["ssa"] as const }),
     })} />
     <BreadcrumbJsonLd items={[{ name: crumbs[0].label, path: pageHref("/", locale) }, { name: hubLabel, path: pageHref(HEALTH_HUB_PATH, locale) }, { name: title, path: pageHref(href, locale) }]} />
@@ -78,7 +78,7 @@ export async function renderSocialTopicPage(locale: Locale, section: SocialTopic
       <SocialExplorer key={section} section={section} facts={facts} gdpFacts={gdpFacts} gdpSources={gdpSources} breaks={breaks}
         labels={Object.fromEntries(series.map(({ id }) => [id, t(`series.${id}`)]))} headingLabels={headingLabels}
         latestLine={<Message messages={messages} id={`social.latest.${section}`} values={{ period: latest.year, value: <LatestFigure value={latestFigure(section, latest.value)} /> }} />}
-        sources={sources.ssa} lastReviewedAt={lastReviewedAt} siteOrigin={origin} />
+        sources={section === "funded-pension" ? sources.pensionFund : sources.ssa} lastReviewedAt={lastReviewedAt} siteOrigin={origin} />
     </ExplorerPage>
   </I18nProvider>;
 }

@@ -492,6 +492,12 @@ source.ssa_highmountain_01,მაღალმთიან დასახლე�
 source.ssa_highmountain_03,"მაღალმთიან დასახლებაში მუდმივად მცხოვრები, ელექტროენერგიის შეღავათით მოსარგებლე ბენეფიციართა რაოდენობა და მათზე გადარიცხული თანხა",docs/Raw Data/Social/ssa-statistics/official/pages/ssa-links-highmountain.json,2026-10-20
 source.ssa_workinjury_03,შრომითი მოვალეობის შესრულებისას მიყენებული ზიანის ანაზღაურება: გადარიცხული თანხა,docs/Raw Data/Social/ssa-statistics/official/pages/ssa-page-workinjury.html,2026-10-20
 source.ssa_statistics,SSA-ს სტატისტიკის სია (წყაროს გვერდი),docs/Raw Data/Social/ssa-statistics/official/pages/ssa-page-statistiklist.html,2026-10-20
+source.pension_fund_ifrs_2020,დაგროვებითი პენსიის სქემის ფინანსური ანგარიშგება 2020 წლისთვის (IFRS),docs/Raw Data/Social/pension-fund/official/2020-IFRS.pdf,2026-10-21
+source.pension_fund_ifrs_2022,დაგროვებითი საპენსიო სქემის ფინანსური ანგარიშგება 2022 წლისთვის (IFRS),docs/Raw Data/Social/pension-fund/official/2022-IFRS-GE.pdf,2026-10-21
+source.pension_fund_ifrs_2023,დაგროვებითი საპენსიო სქემის ფინანსური ანგარიშგება 2023 წლისთვის (IFRS),docs/Raw Data/Social/pension-fund/official/2023-IFRS-GE.pdf,2026-10-21
+source.pension_fund_ifrs_2024,დაგროვებითი საპენსიო სქემის ფინანსური ანგარიშგება 2024 წლისთვის (IFRS),docs/Raw Data/Social/pension-fund/official/2024-IFRS-GE.pdf,2026-10-21
+source.pension_fund_ifrs_2025,"დაგროვებითი საპენსიო სქემის ფინანსური ანგარიშგება 2025 წლისთვის (IFRS, ინგლისური)",docs/Raw Data/Social/pension-fund/official/2025-IFRS.pdf,2026-10-21
+source.pension_fund_report_2025,საქართველოს საპენსიო ფონდის 2025 წლის საქმიანობის ანგარიში,docs/Raw Data/Social/pension-fund/official/Annual_Rep_2025_geo.pdf,2026-10-21
 source.geostat_env_ghg,B-3. სათბურის გაზების ემისიები,docs/Raw Data/Environment/geostat-environment-annual/official/B-3.-Greenhouse-gas-emissions-ENG.XLSX,2026-10-20
 source.geostat_env_air_emissions,A-1. ატმოსფერულ ჰაერში გაფრქვეული მავნე ნივთიერებები,docs/Raw Data/Environment/geostat-environment-annual/official/A-1.-Emissions-of-pollutants-into-the-atmospheric-air_ENG.XLSX,2026-10-20
 source.geostat_env_air_quality,A-2. ატმოსფერული ჰაერის ხარისხი ურბანულ ტერიტორიებზე,docs/Raw Data/Environment/geostat-environment-annual/official/A-2_Ambient_air_quality_in_urban_areas_ENG.XLSX,2026-10-20
@@ -634,3 +640,8 @@ source.geostat_ict_page,საინფორმაციო და საკო
 source.geostat_ict_page_ka,"საინფორმაციო და საკომუნიკაციო ტექნოლოგიების გამოყენება შინამეურნეობებში (წყაროს გვერდი, ქართული ვერსია)",docs/Raw Data/Internet/geostat-ict-households-annual/official/ka/geostat-category-106-ka-2026-10-20.html,2026-10-20
 source.mof_gfs_general_government_2002_2025,Ministry of Finance of Georgia general government operations (GFSM 2001) 2002-2025,docs/Raw Data/Budget/expenditure-types/sources/general20022025.xlsx,2026-10-21
 source.mof_2026_budget_law_planned,"Law of Georgia on the 2026 State Budget, Tavi III and Tavi VI (planned expenditure, Ministry of Finance)",docs/Raw Data/Expenditure/mof.ge/budget-law-2026/2026-tavi-III.doc + docs/Raw Data/Expenditure/mof.ge/budget-law-2026/2026-tavi-VI.docx,2026-10-24
+source.mof_tax_expenditure_report_2024_xlsx_ka,საგადასახადო დანახარჯების შეფასების ანგარიში 2024: გრაფიკები და ცხრილები (ქართული),docs/Raw Data/Revenue/tax-breaks-refunds/sources/TER graphs GEO 2024.xlsx,2026-10-21
+source.mof_tax_expenditure_report_2024_xlsx_en,საგადასახადო დანახარჯების შეფასების ანგარიში 2024: გრაფიკები და ცხრილები (ინგლისური ვერსია),docs/Raw Data/Revenue/tax-breaks-refunds/sources/TER graphs ENG 2024.xlsx,2026-10-21
+source.mof_tax_expenditure_report_2024_pdf_ka,საგადასახადო დანახარჯების შეფასების ანგარიში 2024 (PDF),docs/Raw Data/Revenue/tax-breaks-refunds/sources/TER 2024 GEO.pdf,2026-10-21
+source.mof_tax_expenditure_report_2024_pdf_en,"საგადასახადო დანახარჯების შეფასების ანგარიში 2024 (PDF, ინგლისური ვერსია)",docs/Raw Data/Revenue/tax-breaks-refunds/sources/TER 2024 ENG.pdf,2026-10-21
+source.treasury_tax_refunds_chart,საგადასახადო ზედმეტობების დაბრუნება წლების მიხედვით (სახაზინო სამსახური),docs/Raw Data/Revenue/tax-breaks-refunds/sources/treasury-newChart-2026-10-21.xml,2026-10-21

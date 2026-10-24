@@ -45,6 +45,8 @@ import { loadServedEnergyFoodData } from "../data/energyFood/importEnergyFood";
 import { ENERGY_FOOD_HUB_PATH, ENERGY_FOOD_SECTIONS, energyFoodLastReviewedAt } from "../explorer/energyFood";
 import { loadServedMoneyBanksData } from "../data/moneyBanks/importMoneyBanks";
 import { MONEY_BANKS_SECTIONS } from "../explorer/moneyBanks";
+import { loadServedTaxBreaksRefundsData } from "../data/taxBreaksRefunds/importTaxBreaksRefunds";
+import { TAX_BREAKS_REFUNDS_PATH } from "../explorer/taxBreaksRefunds";
 import { loadServedBusinessData } from "../data/business/importBusiness";
 import { BUSINESS_HUB_PATH, BUSINESS_SECTIONS } from "../explorer/business";
 import { BUSINESS_AREAS, businessAreaHref } from "../explorer/businessAreas";
@@ -127,6 +129,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     transport: loadServedTransportData(),
     internet: loadServedInternetData(),
     expenditureTypes: loadServedExpenditureTypesData(),
+    taxBreaksRefunds: loadServedTaxBreaksRefundsData(),
   });
   const { sourceDocuments } = data.landing;
   const { regions, municipalities, functionFacts, totalFacts, countryFunctionFacts, countryTotalFacts, adjaraBudgetAdjustments } = data.municipal;
@@ -167,6 +170,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const transportFacts = data.transport.facts;
   const internetFacts = data.internet.facts;
   const expenditureTypeFacts = data.expenditureTypes.facts;
+  const taxBreaksRefundsFacts = data.taxBreaksRefunds.facts;
   const inflationModified = new Date(inflationFacts.map((fact) => fact.lastReviewedAt).sort().at(-1)!);
   const productModified = new Date(productFacts.map((fact) => fact.lastReviewedAt).sort().at(-1)!);
   const regionalModified = new Date(regionalEconomyFacts.map((fact) => fact.lastReviewedAt).sort().at(-1)!);
@@ -329,6 +333,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${siteUrl}/explorer/expenditure`, lastModified },
     { url: `${siteUrl}/explorer/expenditure-types`, lastModified: expenditureTypesModified },
     { url: `${siteUrl}/explorer/revenue`, lastModified },
+    { url: `${siteUrl}${TAX_BREAKS_REFUNDS_PATH}`, lastModified: new Date(taxBreaksRefundsFacts.map(fact => fact.lastReviewedAt).sort().at(-1)!) },
     { url: `${siteUrl}/explorer/analysis`, lastModified },
     {
       url: `${siteUrl}${DEBT_EXPLORER_PATH}`,

@@ -3,7 +3,7 @@ import type { Presentation } from "../i18n/types";
 import { message } from "../i18n/messages";
 import { workbookMessage } from "../i18n/workbook";
 import { educationFullLabel } from "./education";
-import { buildSocialModel, socialTopicFacts, type SocialModel, type SocialPlaceSet, type SocialState, type SocialTopicId, type SocialUnit } from "./social";
+import { buildSocialModel, isSocialTotal, socialTopicFacts, type SocialModel, type SocialPlaceSet, type SocialState, type SocialTopicId, type SocialUnit } from "./social";
 import { buildSocialPlaceModel, socialPlaceFacts, type SocialPlaceExtras } from "./socialPlaces";
 import type { ClientNationalGdpFact } from "./clientData";
 import type { TopicState } from "./topicSeries";
@@ -31,7 +31,7 @@ type SocialWorkbookInput = {
 );
 
 /** The `social.` message key of each display unit. */
-export const SOCIAL_UNIT_KEYS: Record<SocialUnit, string> = { persons: "unitPersons", families: "unitFamilies", gel_million: "unitMlnGel", gel: "unitGel", percent: "unitPercent" };
+export const SOCIAL_UNIT_KEYS: Record<SocialUnit, string> = { persons: "unitPersons", families: "unitFamilies", employers: "unitEmployers", gel_million: "unitMlnGel", gel: "unitGel", percent: "unitPercent", return: "unitReturn" };
 const numberFormatOf = (decimals: number) => decimals ? `#,##0.${"0".repeat(decimals)}` : "#,##0";
 
 /**
@@ -98,12 +98,12 @@ export function buildSocialWorkbookExportModel(input: SocialWorkbookInput, prese
   return {
     locale, filename: workbookFilename(stem, locale), sheetNames: SHEET_NAMES[locale],
     readable: {
-      title: input.title, subtitle: [`${model.range.start}–${model.range.end} · ${unitLabel}`, ...(anyCalculated ? [t("workbook.calculatedNote")] : [])].join(" · "),
+      title: input.title, subtitle: [`${model.range.start}–${model.range.end} · ${unitLabel}`, ...(anyCalculated ? [t(!place && input.section === "funded-pension" ? "workbook.calculatedNoteFundedPension" : "workbook.calculatedNote")] : [])].join(" · "),
       unitLabel, amountDecimals: lead.decimals, years: model.years, showChangeColumn: false, numberFormat, ...(anyCalculated ? { fitSubtitle: true } : {}),
       rows: model.selected.map(series => {
         const values = Object.fromEntries(model.years.map(year => [year, valueOf(series, series.valuesByYear[year])]));
         return {
-          kind: series.reference ? "total" : "item", parentLabel: headingOf(series), label: labels[series.id], change: null, valuesByYear: values,
+          kind: isSocialTotal(series) ? "total" : "item", parentLabel: headingOf(series), label: labels[series.id], change: null, valuesByYear: values,
           basisByYear: Object.fromEntries(model.years.map(year => [year, values[year] === null ? null : "actual"])),
         };
       }),

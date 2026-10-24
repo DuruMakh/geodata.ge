@@ -1,0 +1,100 @@
+﻿measure,year,value,unit,months,source_id,document,page,line
+savings,2019,508031000,gel,1,pension_fund_ifrs_2020,2020-IFRS.pdf,16,ნაშთი 31 დეკემბერს
+savings,2020,1164657000,gel,1,pension_fund_ifrs_2020,2020-IFRS.pdf,16,ნაშთი 31 დეკემბერს
+savings,2021,1980291000,gel,1,pension_fund_ifrs_2022,2022-IFRS-GE.pdf,18,ნაშთი 31 დეკემბერს
+savings,2022,2947151000,gel,1,pension_fund_ifrs_2023,2023-IFRS-GE.pdf,20,ნაშთი 31 დეკემბერს
+savings,2023,4357160000,gel,1,pension_fund_ifrs_2024,2024-IFRS-GE.pdf,21,ნაშთი 31 დეკემბერს
+savings,2024,6060268000,gel,1,pension_fund_ifrs_2025,2025-IFRS.pdf,20,Balance at 31 December
+savings,2025,8237530000,gel,1,pension_fund_ifrs_2025,2025-IFRS.pdf,20,Balance at 31 December
+net_assets,2019,547844000,gel,1,pension_fund_ifrs_2020,2020-IFRS.pdf,7,"წმინდა აქტივები, 31 დეკემბერს"
+net_assets,2020,1213129000,gel,1,pension_fund_ifrs_2020,2020-IFRS.pdf,7,"წმინდა აქტივები, 31 დეკემბერს"
+net_assets,2021,2048024000,gel,1,pension_fund_ifrs_2022,2022-IFRS-GE.pdf,7,"საპენსიო სარგებლისთვის განკუთვნილი წმინდა აქტივები, 31 დეკემბერს"
+net_assets,2022,3027208000,gel,1,pension_fund_ifrs_2023,2023-IFRS-GE.pdf,8,საპენსიო სარგებლისთვის განკუთვნილი წმინდა აქტივები 31 დეკემბერს
+net_assets,2023,4484620000,gel,1,pension_fund_ifrs_2024,2024-IFRS-GE.pdf,8,საპენსიო სარგებლისთვის განკუთვნილი წმინდა აქტივები 31 დეკემბერს
+net_assets,2024,6191340000,gel,1,pension_fund_ifrs_2025,2025-IFRS.pdf,8,Net assets available for benefits as at 31 December
+net_assets,2025,8365433000,gel,1,pension_fund_ifrs_2025,2025-IFRS.pdf,8,Net assets available for benefits as at 31 December
+contributions,2019,548315000,gel,12,pension_fund_ifrs_2020,2020-IFRS.pdf,7,სულ სქემის მონაწილეთა შენატანი
+contributions,2020,571148000,gel,12,pension_fund_ifrs_2020,2020-IFRS.pdf,7,სულ სქემის მონაწილეთა შენატანი
+contributions,2021,658014000,gel,12,pension_fund_ifrs_2022,2022-IFRS-GE.pdf,7,სულ სქემის მონაწილეთა შენატანი
+contributions,2022,802753000,gel,12,pension_fund_ifrs_2023,2023-IFRS-GE.pdf,8,სულ სქემის მონაწილეთა შენატანი
+contributions,2023,996862000,gel,12,pension_fund_ifrs_2024,2024-IFRS-GE.pdf,8,სულ სქემის მონაწილეთა შენატანი
+contributions,2024,1179226000,gel,12,pension_fund_ifrs_2025,2025-IFRS.pdf,8,Total scheme member contributions
+contributions,2025,1431780000,gel,12,pension_fund_ifrs_2025,2025-IFRS.pdf,8,Total scheme member contributions
+contributions_private,2019,294314000,gel,12,pension_fund_ifrs_2020,2020-IFRS.pdf,7,(კერძო დამქირავებელნი და დაქირავებული პირნი)
+contributions_private,2020,319679000,gel,12,pension_fund_ifrs_2020,2020-IFRS.pdf,7,(კერძო დამქირავებელნი და დაქირავებული პირნი)
+contributions_private,2021,375117000,gel,12,pension_fund_ifrs_2022,2022-IFRS-GE.pdf,7,კერძო დამსაქმებლები და მათი დასაქმებულები
+contributions_private,2022,469120000,gel,12,pension_fund_ifrs_2023,2023-IFRS-GE.pdf,8,კერძო დამსაქმებლები და მათი დასაქმებულები
+contributions_private,2023,587066000,gel,12,pension_fund_ifrs_2024,2024-IFRS-GE.pdf,8,კერძო დამსაქმებლები და მათი დასაქმებულები
+contributions_private,2024,692043000,gel,12,pension_fund_ifrs_2025,2025-IFRS.pdf,8,Private employers and employees
+contributions_private,2025,843224000,gel,12,pension_fund_ifrs_2025,2025-IFRS.pdf,8,Private employers and employees
+contributions_public,2019,88663000,gel,12,pension_fund_ifrs_2020,2020-IFRS.pdf,7,(საჯარო დამქირავებელნი და დაქირავებული პირნი)
+contributions_public,2020,85307000,gel,12,pension_fund_ifrs_2020,2020-IFRS.pdf,7,(საჯარო დამქირავებელნი და დაქირავებული პირნი)
+contributions_public,2021,94283000,gel,12,pension_fund_ifrs_2022,2022-IFRS-GE.pdf,7,საჯარო დამსაქმებლები და მათი დასაქმებულები
+contributions_public,2022,108859000,gel,12,pension_fund_ifrs_2023,2023-IFRS-GE.pdf,8,საჯარო დამსაქმებლები და მათი დასაქმებულები
+contributions_public,2023,137625000,gel,12,pension_fund_ifrs_2024,2024-IFRS-GE.pdf,8,საჯარო დამსაქმებლები და მათი დასაქმებულები
+contributions_public,2024,175799000,gel,12,pension_fund_ifrs_2025,2025-IFRS.pdf,8,State employers and employees
+contributions_public,2025,217567000,gel,12,pension_fund_ifrs_2025,2025-IFRS.pdf,8,State employers and employees
+contributions_state,2019,165338000,gel,12,pension_fund_ifrs_2020,2020-IFRS.pdf,7,საქართველოს სახელმწიფოს სუბსიდია
+contributions_state,2020,166162000,gel,12,pension_fund_ifrs_2020,2020-IFRS.pdf,7,საქართველოს სახელმწიფოს სუბსიდია
+contributions_state,2021,188614000,gel,12,pension_fund_ifrs_2022,2022-IFRS-GE.pdf,7,საქართველოს სახელმწიფოს საპენსიო შენატანი
+contributions_state,2022,224774000,gel,12,pension_fund_ifrs_2023,2023-IFRS-GE.pdf,8,საქართველოს სახელმწიფოს საპენსიო შენატანი
+contributions_state,2023,272171000,gel,12,pension_fund_ifrs_2024,2024-IFRS-GE.pdf,8,საქართველოს სახელმწიფოს საპენსიო შენატანი
+contributions_state,2024,311384000,gel,12,pension_fund_ifrs_2025,2025-IFRS.pdf,8,Subsidy from the State of Georgia
+contributions_state,2025,370989000,gel,12,pension_fund_ifrs_2025,2025-IFRS.pdf,8,Subsidy from the State of Georgia
+interest,2019,17038000,gel,12,pension_fund_ifrs_2020,2020-IFRS.pdf,7,საპროცენტო შემოსავალი
+interest,2020,87026000,gel,12,pension_fund_ifrs_2020,2020-IFRS.pdf,7,საპროცენტო შემოსავალი
+interest,2021,163741000,gel,12,pension_fund_ifrs_2022,2022-IFRS-GE.pdf,7,საპროცენტო შემოსავალი
+interest,2022,218227000,gel,12,pension_fund_ifrs_2023,2023-IFRS-GE.pdf,8,საპროცენტო შემოსავალი
+interest,2023,254614000,gel,12,pension_fund_ifrs_2024,2024-IFRS-GE.pdf,8,საპროცენტო შემოსავალი
+interest,2024,356201000,gel,12,pension_fund_ifrs_2025,2025-IFRS.pdf,8,Interest income
+interest,2025,461555000,gel,12,pension_fund_ifrs_2025,2025-IFRS.pdf,8,Interest income
+securities_gains,2022,-31187000,gel,12,pension_fund_ifrs_2023,2023-IFRS-GE.pdf,8,სავაჭრო ფასიანი ქაღალდების ფლობით მიღებული წმინდა ზარალი
+securities_gains,2023,168430000,gel,12,pension_fund_ifrs_2024,2024-IFRS-GE.pdf,8,სავაჭრო ფასიანი ქაღალდების ფლობით მიღებული წმინდა მოგება
+securities_gains,2024,197986000,gel,12,pension_fund_ifrs_2025,2025-IFRS.pdf,8,Net gains on investments in marketable securities
+securities_gains,2025,319147000,gel,12,pension_fund_ifrs_2025,2025-IFRS.pdf,8,Net gains on investments in marketable securities
+dividends,2022,3543000,gel,12,pension_fund_ifrs_2023,2023-IFRS-GE.pdf,8,დივიდენდის შემოსავალი
+dividends,2023,18598000,gel,12,pension_fund_ifrs_2024,2024-IFRS-GE.pdf,8,დივიდენდის შემოსავალი
+dividends,2024,25485000,gel,12,pension_fund_ifrs_2025,2025-IFRS.pdf,8,Dividend income
+dividends,2025,33223000,gel,12,pension_fund_ifrs_2025,2025-IFRS.pdf,8,Dividend income
+payouts,2019,57322000,gel,12,pension_fund_ifrs_2020,2020-IFRS.pdf,7,ანაზღაურება/სქემის დატოვების ანაზღაურება
+payouts,2020,1548000,gel,12,pension_fund_ifrs_2020,2020-IFRS.pdf,7,ანაზღაურება/სქემის დატოვების ანაზღაურება
+payouts,2021,1988000,gel,12,pension_fund_ifrs_2022,2022-IFRS-GE.pdf,7,საპენსიო სქემის მონაწილეზე ჯამურად გაცემული პენსია
+payouts,2022,5787000,gel,12,pension_fund_ifrs_2023,2023-IFRS-GE.pdf,8,საპენსიო სქემის მონაწილეზე ჯამურად გაცემული პენსია
+payouts,2023,15014000,gel,12,pension_fund_ifrs_2024,2024-IFRS-GE.pdf,8,საპენსიო სქემის მონაწილეზე ჯამურად გაცემული პენსია
+payouts,2024,40110000,gel,12,pension_fund_ifrs_2025,2025-IFRS.pdf,8,Total scheme member opt-outs
+payouts,2025,63609000,gel,12,pension_fund_ifrs_2025,2025-IFRS.pdf,8,Total scheme member opt-outs
+members,2019,958226,persons,1,pension_fund_report_2025,Annual_Rep_2025_geo.pdf,16,რეგისტრირებული მონაწილეთა რაოდენობა
+members,2020,1105041,persons,1,pension_fund_report_2025,Annual_Rep_2025_geo.pdf,16,რეგისტრირებული მონაწილეთა რაოდენობა
+members,2021,1234732,persons,1,pension_fund_report_2025,Annual_Rep_2025_geo.pdf,16,რეგისტრირებული მონაწილეთა რაოდენობა
+members,2022,1359035,persons,1,pension_fund_report_2025,Annual_Rep_2025_geo.pdf,16,რეგისტრირებული მონაწილეთა რაოდენობა
+members,2023,1478720,persons,1,pension_fund_report_2025,Annual_Rep_2025_geo.pdf,16,რეგისტრირებული მონაწილეთა რაოდენობა
+members,2024,1581832,persons,1,pension_fund_report_2025,Annual_Rep_2025_geo.pdf,16,რეგისტრირებული მონაწილეთა რაოდენობა
+members,2025,1705365,persons,1,pension_fund_report_2025,Annual_Rep_2025_geo.pdf,16,რეგისტრირებული მონაწილეთა რაოდენობა
+left,2019,164198,persons,12,pension_fund_report_2025,Annual_Rep_2025_geo.pdf,19,საპენსიო სქემიდან გასული დასაქმებულების რაოდენობა
+left,2020,3098,persons,12,pension_fund_report_2025,Annual_Rep_2025_geo.pdf,19,საპენსიო სქემიდან გასული დასაქმებულების რაოდენობა
+left,2021,1605,persons,12,pension_fund_report_2025,Annual_Rep_2025_geo.pdf,19,საპენსიო სქემიდან გასული დასაქმებულების რაოდენობა
+left,2022,1218,persons,12,pension_fund_report_2025,Annual_Rep_2025_geo.pdf,19,საპენსიო სქემიდან გასული დასაქმებულების რაოდენობა
+left,2023,1165,persons,12,pension_fund_report_2025,Annual_Rep_2025_geo.pdf,19,საპენსიო სქემიდან გასული დასაქმებულების რაოდენობა
+left,2024,727,persons,12,pension_fund_report_2025,Annual_Rep_2025_geo.pdf,19,საპენსიო სქემიდან გასული დასაქმებულების რაოდენობა
+left,2025,540,persons,12,pension_fund_report_2025,Annual_Rep_2025_geo.pdf,19,საპენსიო სქემიდან გასული დასაქმებულების რაოდენობა
+paid_persons,2019,185,persons,12,pension_fund_report_2025,Annual_Rep_2025_geo.pdf,20,დანიშნული პენსიების რაოდენობა წლების მიხედვით / სულ
+paid_persons,2020,466,persons,12,pension_fund_report_2025,Annual_Rep_2025_geo.pdf,20,დანიშნული პენსიების რაოდენობა წლების მიხედვით / სულ
+paid_persons,2021,839,persons,12,pension_fund_report_2025,Annual_Rep_2025_geo.pdf,20,დანიშნული პენსიების რაოდენობა წლების მიხედვით / სულ
+paid_persons,2022,1853,persons,12,pension_fund_report_2025,Annual_Rep_2025_geo.pdf,20,დანიშნული პენსიების რაოდენობა წლების მიხედვით / სულ
+paid_persons,2023,3747,persons,12,pension_fund_report_2025,Annual_Rep_2025_geo.pdf,20,დანიშნული პენსიების რაოდენობა წლების მიხედვით / სულ
+paid_persons,2024,8363,persons,12,pension_fund_report_2025,Annual_Rep_2025_geo.pdf,20,დანიშნული პენსიების რაოდენობა წლების მიხედვით / სულ
+paid_persons,2025,11367,persons,12,pension_fund_report_2025,Annual_Rep_2025_geo.pdf,20,დანიშნული პენსიების რაოდენობა წლების მიხედვით / სულ
+employers,2019,61173,employers,1,pension_fund_report_2025,Annual_Rep_2025_geo.pdf,15,დამსაქმებელთა რაოდენობა
+employers,2020,71600,employers,1,pension_fund_report_2025,Annual_Rep_2025_geo.pdf,15,დამსაქმებელთა რაოდენობა
+employers,2021,82801,employers,1,pension_fund_report_2025,Annual_Rep_2025_geo.pdf,15,დამსაქმებელთა რაოდენობა
+employers,2022,94994,employers,1,pension_fund_report_2025,Annual_Rep_2025_geo.pdf,15,დამსაქმებელთა რაოდენობა
+employers,2023,108047,employers,1,pension_fund_report_2025,Annual_Rep_2025_geo.pdf,15,დამსაქმებელთა რაოდენობა
+employers,2024,119966,employers,1,pension_fund_report_2025,Annual_Rep_2025_geo.pdf,15,დამსაქმებელთა რაოდენობა
+employers,2025,145780,employers,1,pension_fund_report_2025,Annual_Rep_2025_geo.pdf,15,დამსაქმებელთა რაოდენობა
+return,2019,6.1,percent,12,pension_fund_report_2025,Annual_Rep_2025_geo.pdf,7,საინვესტიციო ამონაგები და ინფლაცია / ამონაგები
+return,2020,12.9,percent,12,pension_fund_report_2025,Annual_Rep_2025_geo.pdf,7,საინვესტიციო ამონაგები და ინფლაცია / ამონაგები
+return,2021,9.5,percent,12,pension_fund_report_2025,Annual_Rep_2025_geo.pdf,7,საინვესტიციო ამონაგები და ინფლაცია / ამონაგები
+return,2022,7.3,percent,12,pension_fund_report_2025,Annual_Rep_2025_geo.pdf,7,საინვესტიციო ამონაგები და ინფლაცია / ამონაგები
+return,2023,12.3,percent,12,pension_fund_report_2025,Annual_Rep_2025_geo.pdf,7,საინვესტიციო ამონაგები და ინფლაცია / ამონაგები
+return,2024,11.5,percent,12,pension_fund_report_2025,Annual_Rep_2025_geo.pdf,7,საინვესტიციო ამონაგები და ინფლაცია / ამონაგები
+return,2025,11.8,percent,12,pension_fund_report_2025,Annual_Rep_2025_geo.pdf,7,საინვესტიციო ამონაგები და ინფლაცია / ამონაგები

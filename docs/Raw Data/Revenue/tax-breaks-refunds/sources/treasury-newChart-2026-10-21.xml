@@ -1,0 +1,63 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<chart>
+	<general>
+		<chartName en="Return of tax surpluses by years (GEL in millions)" ge="საგადასახადო ზედმეტობების დაბრუნება
+წლების მიხედვით (მლნ. ლარი)" />
+		<seriesType>column</seriesType>
+		<stacking column="true" />
+	</general>
+	<tooltip>
+		<xAxis>
+			<categories>
+				<row en="2007" ge="2007"></row>
+				<row en="2008" ge="2008"></row>
+				<row en="2009" ge="2009"></row>
+				<row en="2010" ge="2010"></row>
+				<row en="2011" ge="2011"></row>
+				<row en="2012" ge="2012"></row>
+				<row en="2013" ge="2013"></row>
+				<row en="2014" ge="2014"></row>
+				<row en="2015" ge="2015"></row>
+				<row en="2016" ge="2016"></row>
+				<row en="2017" ge="2017"></row>
+				<row en="2018" ge="2018"></row>
+				<row en="2019" ge="2019"></row>
+				<row en="2020" ge="2020"></row>
+				<row en="2021" ge="2021"></row>
+				<row en="2022" ge="2022"></row>
+				<row en="2023" ge="2023"></row>
+				<row en="2024" ge="2024"></row>
+				<row en="2025" ge="2025"></row>
+				<row en="09.2026" ge="09.2026"></row>
+			</categories>
+			<title en="Date" ge="თარიღი" />
+		</xAxis>
+		<yAxis>
+			<title en="Amount (GEL in millions)" ge="თანხა (მლნ. ლარი)" />
+		</yAxis>
+	</tooltip>
+	<series>
+		<item ge="საგადასახადო ზედმეტობების დაბრუნება" en="Return of tax surpluses">
+			<row>1</row>
+			<row>124</row>
+			<row>174</row>
+			<row>129</row>
+			<row>72</row>
+			<row>146</row>
+			<row>88</row>
+			<row>113</row>
+			<row>129</row>
+			<row>174</row>
+			<row>225</row>
+			<row>521</row>
+			<row>615</row>
+			<row>1040</row>
+			<row>1930</row>
+			<row>2265.95</row>
+			<row>2331.56</row>
+			<row>2546.91</row>
+			<row>2721.10</row>
+			<row>2103.10</row>
+		</item>
+	</series>
+</chart>
