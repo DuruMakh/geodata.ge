@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("next/navigation", async (importOriginal) => ({ ...(await importOriginal<typeof import("next/navigation")>()), useRouter: () => ({ replace() {} }) }));
 
+import { splitValue } from "../../components/explorer-groups/group-page";
 import { topicScrollTarget } from "../../components/explorer-groups/group-topic-scroll";
 import { GROUP_HEADLINES, groupHeadlines } from "../../lib/explorer/groupHeadlines";
 import type { HubCardModel } from "../../lib/explorer/hubCards";
@@ -34,6 +35,27 @@ describe("the Labour market group page (ka)", async () => {
     expect(count(below, /<p[\s>]/g)).toBe(1);
     expect(below).toContain("უმუშევრობა, დასაქმება და ხელფასები");
     expect(hrefs(html, "group-headline")).toEqual(GROUP_HEADLINES.labour.map(({ page }) => page));
+  });
+
+  it("keeps each headline figure and its unit whole, the unit set smaller", () => {
+    const figures = [...html.matchAll(/<span[^>]*data-testid="group-headline-figure"[^>]*>([^<]*)<\/span>/g)];
+    expect(figures).toHaveLength(4);
+    for (const [tag] of figures) expect(tag).toContain("whitespace-nowrap");
+    const units = [...html.matchAll(/<span[^>]*data-testid="group-headline-unit"[^>]*>([^<]*)<\/span>/g)];
+    expect(units.map((match) => match[1])).toContain("ათასი");
+    // The unit and the space before it are set at 13px, so the gap stays a small one.
+    expect(count(html, /<span class="text-\[13px\][^"]*"> <span[^>]*data-testid="group-headline-unit"/g)).toBe(units.length);
+    for (const [tag] of units) expect(tag).toContain("whitespace-nowrap");
+    // The period, not the unit, is what moves to the next line when the row is tight.
+    expect(count(html, /<wbr\/><small/g)).toBe(4);
+  });
+
+  it("wraps the topic links from 900px and keeps sideways scrolling below", () => {
+    const tag = /<nav[^>]*data-testid="group-topic-links"[^>]*>/.exec(html)![0];
+    expect(tag).toContain("overflow-x-auto");
+    expect(tag).toContain("min-[900px]:flex-wrap");
+    expect(tag).toContain("min-[900px]:overflow-x-visible");
+    expect(tag).toContain("sticky");
   });
 
   it("links the two topics' sections", () => {
@@ -76,6 +98,15 @@ describe("the Budget group page (en)", async () => {
     expect(cardTags(html)).toHaveLength(8);
     expect(hrefs(html, "group-headline")).toEqual(GROUP_HEADLINES.budget.map(({ page }) => `/en${page}`));
     expect(html).toMatch(/8 pages · Updated \d{1,2} [A-Z][a-z]+ \d{4}/);
+  });
+});
+
+describe("splitValue", () => {
+  it("splits a headline value into its figure and its unit at the first space", () => {
+    expect(splitValue("32.4 მლრდ ₾")).toEqual({ figure: "32.4", unit: "მლრდ ₾" });
+    expect(splitValue("25.9 მლრდ აშშ დოლარი")).toEqual({ figure: "25.9", unit: "მლრდ აშშ დოლარი" });
+    expect(splitValue("13.9%")).toEqual({ figure: "13.9%", unit: null });
+    expect(splitValue("+17,127")).toEqual({ figure: "+17,127", unit: null });
   });
 });
 

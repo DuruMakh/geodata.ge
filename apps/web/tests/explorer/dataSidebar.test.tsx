@@ -114,6 +114,11 @@ describe("the explorer sidebar", () => {
     expect(["expenditure", "expenditure-types", "revenue", "municipalities", "analysis", "debt", "deficit"].map((id) => tag(budget, `section-link-${id}`) !== "")).not.toContain(false);
   });
 
+  it("shows the search row's / key hint on desktop only, not in the phone menu", async () => {
+    const hint = /<kbd[^>]*>\/<\/kbd>/.exec(element(await render("/explorer/labour"), "sidebar-search", "a"))?.[0] ?? "";
+    expect(hint).toContain("max-[900px]:hidden");
+  });
+
   it("links search to All data with the box focused, in both languages", async () => {
     expect(tag(await render("/explorer/labour"), "sidebar-search")).toContain('href="/explorer#q="');
     expect(tag(await render("/en/explorer/labour", "en"), "sidebar-search")).toContain('href="/en/explorer#q="');

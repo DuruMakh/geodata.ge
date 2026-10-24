@@ -1,4 +1,5 @@
 import { Map as MapIcon } from "lucide-react";
+import { Fragment } from "react";
 import { buildSparklinePath } from "../../lib/explorer/sparkline";
 import type { RegionSpread } from "../../lib/explorer/regionSpread";
 import type { CardGraphic } from "../../lib/explorer/topicHub";
@@ -96,20 +97,21 @@ export function BarsGraphic({ graphic }: { graphic: Extract<CardGraphic, { kind:
   );
 }
 
-/** Two or three labelled bars side by side, scaled to the page's maximum. Flows in the band instead of filling it. */
+/**
+ * Two or three labelled bars side by side, scaled to the page's maximum. Flows in the band instead of filling it. One grid holds
+ * every row, so the value column is as wide as the widest value and the bars stay comparable; a value never wraps from its unit.
+ */
 export function PairGraphic({ graphic }: { graphic: Extract<CardGraphic, { kind: "pair" }> }) {
   return (
-    <span className="flex flex-col gap-[9px]">
-      {graphic.rows.map((row) => (
-        <span key={row.label} className="block">
-          <span className="block text-[11.5px] leading-[1.3] text-[var(--body)]">{row.label}</span>
-          <span className="mt-1 grid grid-cols-[minmax(0,1fr)_64px] items-center gap-2.5">
-            <span className="block h-2">
-              <i className={`block h-full ${row.accent ? "bg-[var(--accent)]" : "bg-[var(--control)]"}`} style={{ width: percent(graphic.max > 0 ? (row.value / graphic.max) * 100 : 0) }} />
-            </span>
-            <b className={`text-right ${NUMERIC} text-[11.5px] font-semibold text-[var(--ink)]`}>{row.text}</b>
+    <span className="grid grid-cols-[minmax(0,1fr)_max-content] items-center gap-x-2.5">
+      {graphic.rows.map((row, index) => (
+        <Fragment key={row.label}>
+          <span className={`col-span-2 block text-[11.5px] leading-[1.3] text-[var(--body)] ${index > 0 ? "mt-[9px]" : ""}`}>{row.label}</span>
+          <span className="mt-1 block h-2">
+            <i className={`block h-full ${row.accent ? "bg-[var(--accent)]" : "bg-[var(--control)]"}`} style={{ width: percent(graphic.max > 0 ? (row.value / graphic.max) * 100 : 0) }} />
           </span>
-        </span>
+          <b data-testid="card-pair-value" className={`mt-1 text-right ${NUMERIC} text-[11.5px] font-semibold whitespace-nowrap text-[var(--ink)]`}>{row.text}</b>
+        </Fragment>
       ))}
     </span>
   );

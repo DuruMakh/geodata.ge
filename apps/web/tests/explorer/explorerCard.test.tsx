@@ -154,6 +154,10 @@ describe("ExplorerCard", () => {
     expect(text(markup)).toContain("|15.8%|");
     expect(markup).toContain("width:79%");
     expect(markup).toContain("width:57%");
+    // One grid for all rows: the value column fits the widest value, and a value never wraps from its unit.
+    expect(markup).toContain("grid-cols-[minmax(0,1fr)_max-content]");
+    for (const [tag] of markup.matchAll(/<b[^>]*data-testid="card-pair-value"[^>]*>/g)) expect(tag).toContain("whitespace-nowrap");
+    expect(count(markup, /data-testid="card-pair-value"/g)).toBe(2);
   });
 
   it("makes a card without a link a plain, disabled block with a coming-soon badge", () => {

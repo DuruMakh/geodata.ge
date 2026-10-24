@@ -260,7 +260,7 @@ export function DataSidebar() {
           {railed ? null : (
             <>
               <span>{searchLabel}</span>
-              <kbd className="ml-auto border border-[var(--ink-line)] px-1.5 font-[family-name:var(--font-numeric)] text-[11px] leading-5">/</kbd>
+              <kbd className="ml-auto border border-[var(--ink-line)] px-1.5 max-[900px]:hidden font-[family-name:var(--font-numeric)] text-[11px] leading-5">/</kbd>
             </>
           )}
         </Link>

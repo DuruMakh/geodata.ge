@@ -13,7 +13,7 @@ import { pageHref } from "../../lib/i18n/routes";
 import type { Locale, Messages } from "../../lib/i18n/types";
 import type { GroupId, TopicId } from "../../lib/navigation/navTree";
 import { CARD_GRID_CLASS, ExplorerCard, leadSpan } from "./explorer-card";
-import { GroupTopicScroll } from "./group-topic-scroll";
+import { GroupTopicScroll, TOPIC_LINKS_ID } from "./group-topic-scroll";
 
 // A group page (spec 2026-10-24-explorer-regroup §5, prototype `dx-hub-h1`, `dx-stats`, `dx-tabs`, `dx-topic`, `dx-grid`): the breadcrumb
 // row with the group's meta line, the icon and H1, one line, the four headline numbers, the topic links of a group with more
@@ -46,14 +46,31 @@ const HEADLINE_CLASS = [
   "min-[1101px]:mr-[22px] min-[1101px]:border-r min-[1101px]:pr-[22px] min-[1101px]:last:mr-0 min-[1101px]:last:border-r-0",
 ].join(" ");
 
+/** A headline value's figure and its unit ("32.4" and "მლრდ ₾"): the text after the first space is the unit. */
+export function splitValue(value: string): { figure: string; unit: string | null } {
+  const space = value.indexOf(" ");
+  return space < 0 ? { figure: value, unit: null } : { figure: value.slice(0, space), unit: value.slice(space + 1) };
+}
+
 function Headline({ headline, locale }: { headline: GroupHeadline; locale: Locale }) {
+  const { figure, unit } = splitValue(headline.value);
   return (
     <Link href={pageHref(headline.href, locale)} prefetch={false} data-testid="group-headline" className={HEADLINE_CLASS}>
       <span className="block text-[12.5px] leading-[1.35] text-[var(--body)] group-hover:text-[var(--ink)] group-hover:underline group-hover:decoration-[var(--accent)] group-hover:underline-offset-[3px] max-[1100px]:min-h-[2.7em]">
         {headline.label}
       </span>
       <span className={`mt-1.5 block ${NUMERIC} text-[27px] leading-[1.1] font-semibold tracking-[-0.02em] max-[1100px]:text-[22px]`}>
-        {headline.value}
+        {/* The figure and the unit each stay whole; the unit is set smaller (DESIGN.md §5.2), so the pair fits one line at 1440 and
+            1024px. Only where a long unit cannot fit beside its figure does it move, whole, under it. */}
+        <span data-testid="group-headline-figure" className="whitespace-nowrap">{figure}</span>
+        {unit ? (
+          <span className="text-[13px] font-normal tracking-normal text-[var(--body)]">
+            {" "}
+            <span data-testid="group-headline-unit" className="whitespace-nowrap">{unit}</span>
+          </span>
+        ) : null}
+        {/* The period may go to the next line instead of the unit. */}
+        <wbr />
         <small className="ml-1.5 text-[11.5px] font-normal tracking-normal text-[var(--faint)]">{headline.period}</small>
       </span>
       {headline.caption ? <span className="mt-1 block text-[11.5px] leading-snug text-[var(--muted)]">{headline.caption}</span> : null}
@@ -89,7 +106,9 @@ export function GroupPage({ locale, messages, group, href, name, line, meta, hea
       {multi ? (
         <nav
           aria-label={message(messages, "groups.topicsNav")}
-          className="sticky top-14 z-[6] mt-[26px] flex gap-2 overflow-x-auto border-b border-[var(--hairline)] bg-[var(--paper)] py-2.5 [scrollbar-width:none] min-[900px]:top-0 max-[767px]:-mx-5 max-[767px]:px-5"
+          id={TOPIC_LINKS_ID}
+          data-testid="group-topic-links"
+          className="sticky top-14 z-[6] mt-[26px] flex gap-2 overflow-x-auto border-b border-[var(--hairline)] bg-[var(--paper)] py-2.5 [scrollbar-width:none] min-[900px]:top-0 min-[900px]:flex-wrap min-[900px]:overflow-x-visible max-[767px]:-mx-5 max-[767px]:px-5"
         >
           {topics.map((section) => (
             <a
@@ -116,7 +135,7 @@ export function GroupPage({ locale, messages, group, href, name, line, meta, hea
             id={`t-${section.topic}`}
             aria-labelledby={headingId}
             tabIndex={-1}
-            className="mt-9 scroll-mt-[124px] focus:outline-none min-[768px]:mt-11 min-[900px]:scroll-mt-[76px]"
+            className="mt-9 scroll-mt-[124px] focus:outline-none min-[768px]:mt-11 min-[900px]:scroll-mt-[calc(var(--topic-links-h,63px)+13px)]"
           >
             {multi ? (
               <>

@@ -132,6 +132,13 @@ test.describe("the phone menu at 375px", () => {
     await expect(page.getByTestId("sidebar-close")).toBeFocused();
   }
 
+  test("hides the search row's / key hint in the menu, which the desktop sidebar shows", async ({ page }) => {
+    await openMenuAt(page, 0);
+    await expect(page.getByTestId("sidebar-search").locator("kbd")).toBeHidden();
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await expect(page.getByTestId("sidebar-search").locator("kbd")).toBeVisible();
+  });
+
   test("opens full screen as a dialog, keeps focus inside, and Escape and X give back focus and place", async ({ page }) => {
     await openMenuAt(page, 700);
     const nav = sidebar(page);
@@ -234,6 +241,59 @@ for (const prefix of PREFIXES) {
       await expect(section).toBeInViewport();
       const bar = (await topicLinks.first().locator("xpath=..").boundingBox())!;
       await expect.poll(async () => Math.round((await section.boundingBox())!.y)).toBeGreaterThanOrEqual(Math.floor(bar.y + bar.height) - 1);
+    }
+  });
+}
+
+for (const viewport of [{ width: 1440, height: 900 }, { width: 1024, height: 768 }]) {
+  test(`at ${viewport.width}px no topic link is cut off, and no value parts from its unit`, async ({ page }) => {
+    await page.setViewportSize(viewport);
+    for (const prefix of PREFIXES) {
+      for (const group of NAV_GROUPS) {
+        await page.goto(`${prefix}${group.href}`);
+        await ready(page);
+        await page.evaluate(() => document.fonts.ready);
+        // Headline figures and units: each part on one line, the unit on the figure's line.
+        for (const headline of await page.getByTestId("group-headline").all()) {
+          const parts = await headline.evaluate((link) => {
+            const one = (testId: string) => {
+              const element = link.querySelector(`[data-testid="${testId}"]`);
+              return element ? { lines: element.getClientRects().length, bottom: element.getBoundingClientRect().bottom } : null;
+            };
+            return { figure: one("group-headline-figure"), unit: one("group-headline-unit"), text: link.textContent };
+          });
+          expect(parts.figure?.lines, parts.text!).toBe(1);
+          if (!parts.unit) continue;
+          expect(parts.unit.lines, parts.text!).toBe(1);
+          expect(Math.abs(parts.unit.bottom - parts.figure!.bottom), parts.text!).toBeLessThan(6);
+        }
+        // Bar values on the cards stay whole.
+        for (const value of await page.getByTestId("card-pair-value").all()) {
+          expect(await value.evaluate((element) => element.getClientRects().length), (await value.textContent()) ?? "").toBe(1);
+          expect((await value.boundingBox())!.height).toBeLessThan(20);
+        }
+        if (group.topics.length < 2) continue;
+        // The topic links wrap instead of running off the edge, and stay sticky.
+        const row = page.getByTestId("group-topic-links");
+        const fit = await row.evaluate((element) => ({ scroll: element.scrollWidth, client: element.clientWidth, position: getComputedStyle(element).position }));
+        expect(fit.scroll, group.id).toBeLessThanOrEqual(fit.client);
+        expect(fit.position).toBe("sticky");
+        const rowBox = (await row.boundingBox())!;
+        for (const link of await page.getByTestId("group-topic-link").all()) {
+          const box = (await link.boundingBox())!;
+          expect(box.x).toBeGreaterThanOrEqual(rowBox.x - 0.5);
+          expect(box.x + box.width).toBeLessThanOrEqual(rowBox.x + rowBox.width + 0.5);
+        }
+        // With the links on several rows, a topic link still lands its section below them.
+        const last = group.topics.at(-1)!;
+        await page.getByTestId("group-topic-link").last().click();
+        const section = page.locator(`#t-${last}`);
+        await expect(section).toBeInViewport();
+        await expect.poll(async () => {
+          const bar = (await row.boundingBox())!;
+          return Math.round((await section.boundingBox())!.y) - Math.floor(bar.y + bar.height);
+        }).toBeGreaterThanOrEqual(-1);
+      }
     }
   });
 }
