@@ -87,7 +87,61 @@ describe("buildSpendingSeries", () => {
   });
 });
 
+describe("buildSpendingSeries planned and locale handling", () => {
+  it("flags a year that mixes actual and planned items as planned", () => {
+    const series = buildSpendingSeries(
+      [spend(2025, "spending.health", 40), spend(2025, "spending.defence", 20, "planned")],
+      glossary,
+      presentation,
+    );
+
+    expect(series.planned).toEqual([true]);
+  });
+
+  it("uses the English label path for the en locale", () => {
+    const english: Presentation = {
+      ...presentation,
+      locale: "en",
+      englishLabels: { "spending.health": "Health" },
+      messages: { ...presentation.messages, "landing.revBand.vat": "VAT" },
+    };
+
+    const series = buildSpendingSeries([spend(2025, "spending.health", 40)], glossary, english);
+    expect(series.fields[0].label).toBe("Health");
+    expect(() => buildSpendingSeries([spend(2025, "spending.defence", 1)], glossary, english)).toThrow("spending.defence");
+
+    expect(buildRevenueSeries([rev(2025, "revenue.vat", 1)], glossary, english).bands[0].label).toBe("VAT");
+  });
+});
+
 describe("buildRevenueSeries", () => {
+  it("uses actual over planned and flags planned-only and mixed years as planned", () => {
+    const series = buildRevenueSeries(
+      [
+        rev(2023, "revenue.vat", 70),
+        rev(2023, "revenue.vat", 700, "planned"),
+        rev(2024, "revenue.vat", 50, "planned"),
+        rev(2025, "revenue.vat", 60),
+        rev(2025, "revenue.grants", 5, "planned"),
+      ],
+      glossary,
+      presentation,
+    );
+    const vat = series.bands.find((entry) => entry.id === "vat")!;
+
+    expect(series.planned).toEqual([false, true, true]);
+    expect(vat.values).toEqual([70, 50, 60]);
+    expect(series.totals).toEqual([70, 50, 65]);
+  });
+
+  it("gives taxShare 0 for a year with total 0", () => {
+    const series = buildRevenueSeries([rev(2020, "revenue.vat", 10), rev(2022, "revenue.vat", 10)], glossary, presentation);
+
+    expect(series.years).toEqual([2020, 2021, 2022]);
+    expect(series.totals[1]).toBe(0);
+    expect(series.taxShare).toEqual([1, 0, 1]);
+  });
+
   it("groups items into seven bands", () => {
     const series = buildRevenueSeries(
       [

@@ -14,6 +14,7 @@ export type RevenueBandId = "vat" | "income" | "profit" | "excise" | "otherTaxes
 
 export type RevenueSeries = {
   years: number[];
+  planned: boolean[]; // per year: any active fact of that year is planned
   totals: number[];
   taxShare: number[]; // fraction 0..1
   bands: { id: RevenueBandId; label: string; values: (number | null)[] }[];

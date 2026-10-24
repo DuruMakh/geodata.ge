@@ -90,12 +90,14 @@ export function buildRevenueSeries(
   const yearIndex = new Map(years.map((year, index) => [year, index]));
   const bandIds = Object.keys(REVENUE_BANDS) as RevenueBandId[];
   const values = new Map<RevenueBandId, (number | null)[]>(bandIds.map((id) => [id, years.map(() => null)]));
+  const planned = years.map(() => false);
 
   for (const fact of active) {
     const bandId = bandOfItem.get(fact.itemId);
     if (!bandId) throw new Error(`Revenue item ${fact.itemId} is not assigned to a homepage band`);
     const series = values.get(bandId)!;
     const index = yearIndex.get(fact.year)!;
+    if (fact.basis === "planned") planned[index] = true;
     series[index] = (series[index] ?? 0) + fact.amountGel;
   }
 
@@ -106,14 +108,15 @@ export function buildRevenueSeries(
   );
 
   let peakBorrowing: RevenueSeries["peakBorrowing"] = null;
-  years.forEach((year, index) => {
-    if (values.get("liabilities")![index] === null || totals[index] === 0) return;
+  for (const [index, year] of years.entries()) {
+    if (values.get("liabilities")![index] === null || totals[index] === 0) continue;
     const share = amount("liabilities", index) / totals[index];
     if (!peakBorrowing || share > peakBorrowing.share) peakBorrowing = { year, share };
-  });
+  }
 
   return {
     years,
+    planned,
     totals,
     taxShare,
     bands: bandIds.map((id) => ({
