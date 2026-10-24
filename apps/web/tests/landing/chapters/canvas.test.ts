@@ -53,6 +53,16 @@ describe("stackLabels", () => {
     }
   });
 
+  it("re-stacks upward when a crowded group would fall below lo", () => {
+    const y = stackLabels([30, 28, 26, 24], 14, 12, 220);
+    expect(y[y.length - 1]).toBe(12);
+    for (let i = 1; i < y.length; i++) expect(y[i - 1] - y[i]).toBeGreaterThanOrEqual(14 - 1e-9);
+    for (const v of y) {
+      expect(v).toBeGreaterThanOrEqual(12);
+      expect(v).toBeLessThanOrEqual(220);
+    }
+  });
+
   it("returns an empty list for no labels", () => {
     expect(stackLabels([], 14, 0, 100)).toEqual([]);
   });

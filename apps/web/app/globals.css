@@ -187,7 +187,8 @@ summary:focus-visible {
   transition: text-decoration-color 0.2s;
 }
 
-.home-tl:hover {
+.home-tl:hover,
+.home-tl:focus-visible {
   text-decoration-color: var(--accent);
 }
 
@@ -201,7 +202,8 @@ summary:focus-visible {
   transition: transform 0.22s cubic-bezier(0.22, 0.7, 0.18, 1);
 }
 
-.home-tl:hover .home-tl-i {
+.home-tl:hover .home-tl-i,
+.home-tl:focus-visible .home-tl-i {
   transform: translateX(5px);
 }
 
@@ -232,7 +234,8 @@ summary:focus-visible {
   }
 }
 
-.home-tl:hover .home-tl-hint {
+.home-tl:hover .home-tl-hint,
+.home-tl:focus-visible .home-tl-hint {
   opacity: 1;
   transform: none;
 }
