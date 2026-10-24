@@ -96,6 +96,14 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* Chart labels are placed from estimated glyph widths (lib/explorer/chartScale.ts).
+   Hinted text snaps each glyph to the drawing's rendered pixel size, so a chart
+   scaled below its viewBox prints labels up to ~10% wider than the estimate and
+   clips them; geometric precision keeps the widths the same at every scale. */
+svg text {
+  text-rendering: geometricPrecision;
+}
+
 button,
 select,
 input {
