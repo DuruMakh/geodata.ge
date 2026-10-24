@@ -32,6 +32,7 @@ import { DebtSeriesPanel } from "./debt-series-panel";
 import { useDebtExplorerState } from "./use-debt-explorer-state";
 import { ModeTabs } from "../explorer-shell/mode-tabs";
 import { ExplorerHeading } from "../explorer-shell/explorer-heading";
+import { ChartShareButton } from "../explorer-shell/chart-share-button";
 import { ExplorerPage } from "../explorer-shell/explorer-page";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { MeasurePill } from "../explorer-shell/measure-pill";
@@ -129,6 +130,27 @@ export function DebtExplorerSurface(props: DebtExplorerSurfaceProps) {
     .map((fact) => fact.year)
     .sort((left, right) => left - right)[0] ?? null;
 
+  const chart = (
+    <EditorialLineChart
+      years={model.years}
+      series={chartSeries}
+      share={isPercent}
+      unit={unit}
+      shareLabel={message(messages, props.family === "rate" ? "debt.rate" : "main.shareGdp")}
+      preliminaryLabel={message(messages, "debt.forecast")}
+      {...(formatRate ? { formatTooltipValue: formatRate } : {})}
+    />
+  );
+  const shareAction = noSelection || noRangeData ? undefined : (
+    <ChartShareButton
+      title={message(messages, "debt.heading")}
+      caption={`${message(messages, FAMILY_LABEL[props.family])} · ${props.family === "rate" ? "%" : isPercent ? message(messages, "main.shareGdp") : message(messages, "format.bnGel")} · ${props.range.start}–${props.range.end}`}
+      legend={chartSeries.map(({ label, color }) => ({ label, color }))}
+      source={message(messages, "debt.source")}
+      chart={chart}
+      period={`${props.range.start}-${props.range.end}`}
+    />
+  );
   return (
     <ExplorerPage testId="debt-explorer" repeatDesktopBottomPadding>
       <PageHeader
@@ -219,15 +241,7 @@ export function DebtExplorerSurface(props: DebtExplorerSurfaceProps) {
               />
             ) : (
               <div className="mt-5">
-                <EditorialLineChart
-                  years={model.years}
-                  series={chartSeries}
-                  share={isPercent}
-                  unit={unit}
-                  shareLabel={message(messages, props.family === "rate" ? "debt.rate" : "main.shareGdp")}
-                  preliminaryLabel={message(messages, "debt.forecast")}
-                  {...(formatRate ? { formatTooltipValue: formatRate } : {})}
-                />
+                {chart}
               </div>
             )}
             <ChartSelectionAids
@@ -255,7 +269,7 @@ export function DebtExplorerSurface(props: DebtExplorerSurfaceProps) {
           </section>
 
           <div className="mt-[18px]">
-            <SourceNote testId="source-label">
+            <SourceNote testId="source-label" action={shareAction}>
               {message(messages, "debt.source")}
               {" "}{message(messages, "debt.comparability")}
               {props.family === "stock" ? " " + message(messages, "main.gdpSource") : null}

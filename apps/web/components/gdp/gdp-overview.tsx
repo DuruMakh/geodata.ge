@@ -31,6 +31,7 @@ import { ExcelDownloadButton } from "../explorer/excel-download-button";
 import { GdpSummary } from "./gdp-summary";
 import { ModeTabs } from "../explorer-shell/mode-tabs";
 import { ExplorerHeading } from "../explorer-shell/explorer-heading";
+import { ChartShareButton } from "../explorer-shell/chart-share-button";
 import { LatestValueLine } from "../explorer-shell/latest-value-line";
 import { formatGdpLatestValue } from "../../lib/explorer/latestValue";
 import { ExplorerPage } from "../explorer-shell/explorer-page";
@@ -120,6 +121,27 @@ export function GdpOverview({
   function select(indicator: GdpIndicator) {
     show(changeGdpIndicator(state, indicator, facts));
   }
+  const chart = (
+    <EditorialLineChart
+      years={m.years}
+      series={chartSeries}
+      share={d.growth}
+      unit={state.indicator === "per_capita"
+        ? { ...d.unit, label: state.currency === "gel" ? "₾" : "$" }
+        : d.unit}
+      shareLabel={d.fullUnitLabel}
+    />
+  );
+  const shareAction = (
+    <ChartShareButton
+      title={t("heading")}
+      caption={`${d.label} · ${d.fullUnitLabel} · ${m.range.start}–${m.range.end}`}
+      legend={chartSeries.map(({ label, color }) => ({ label, color }))}
+      source={state.indicator === "real" || state.indicator === "growth" ? t("wbNote") : t("geostatNote")}
+      chart={chart}
+      period={`${m.range.start}-${m.range.end}`}
+    />
+  );
   return (
     <ExplorerPage testId="gdp-overview" containerQueries={false}>
       <PageHeader
@@ -193,15 +215,7 @@ export function GdpOverview({
         </div>
         <div className="mt-5">
           {state.mode === "line" ? (
-            <EditorialLineChart
-              years={m.years}
-              series={chartSeries}
-              share={d.growth}
-              unit={state.indicator === "per_capita"
-                ? { ...d.unit, label: state.currency === "gel" ? "₾" : "$" }
-                : d.unit}
-              shareLabel={d.fullUnitLabel}
-            />
+            chart
           ) : (
             <ExplorerTable
               caption={`${d.label} · ${d.fullUnitLabel}`}
@@ -245,7 +259,7 @@ export function GdpOverview({
         }
       />
       <div className="mt-5 space-y-2">
-        <SourceNote>
+        <SourceNote action={shareAction}>
           {/* The price basis sits with the source, not as a second line under the heading (DESIGN §17). */}
           <span data-testid="gdp-unit">{state.indicator === "real" ? t("constant") : d.growth ? t("percent") : t("current")}</span>
           {" · "}

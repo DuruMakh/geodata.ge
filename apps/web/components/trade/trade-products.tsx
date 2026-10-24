@@ -21,6 +21,7 @@ import { ExplorerHeading } from "../explorer-shell/explorer-heading";
 import { ExcelDownloadButton } from "../explorer/excel-download-button";
 import { EditorialLineChart } from "../main-explorer/editorial-line-chart";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
+import { ChartShareButton } from "../explorer-shell/chart-share-button";
 import { ExplorerTable } from "../main-explorer/explorer-table";
 import { RangeStrip } from "../main-explorer/range-strip";
 import { Callout, SourceNote, SwatchBar, TextTab } from "../ui/editorial";
@@ -51,6 +52,8 @@ export function TradeProducts({ data, sources, lastReviewedAt, siteOrigin }: { d
   const lineSeries = useMemo(() => model.selectedIds.map(id => ({ id, label: labels.get(id)!, color: tradeProductColor(id), vals: model.years.map(year => model.valuesByEntity[id][year]) })), [model, labels]);
   const valueLabel = useCallback((value: number) => `${formatInUnit(value, model.unit)} ${model.unit.label}`, [model.unit]);
   const chart = useMemo(() => <EditorialLineChart years={model.years} series={lineSeries} share={false} unit={model.unit} shareLabel={measureLabel} showAxisUnit={false} formatTooltipValue={valueLabel} />, [model, lineSeries, measureLabel, valueLabel]);
+  const shareAction = model.selectedCount ? <ChartShareButton title={t("title")} caption={`${measureLabel} · ${model.unit.label} · ${model.range.start}–${model.range.end}`}
+    legend={lineSeries.map(({ label, color }) => ({ label, color }))} source={message(messages, "trade.sourceNote")} chart={chart} period={`${model.range.start}-${model.range.end}`} /> : undefined;
   return <div data-testid="trade-products" className="@container">
     {!domestic ? <ExplorerHeading>{t("title")}</ExplorerHeading> : null}
     <div className={`mb-4 flex flex-wrap items-center ${domestic ? "justify-end" : "justify-between"} gap-3`}>
@@ -84,7 +87,7 @@ export function TradeProducts({ data, sources, lastReviewedAt, siteOrigin }: { d
       </div>
       <RangeStrip years={data.years.filter(year => year >= model.range.min && year <= model.range.max)} range={model.range} onChange={patch => update(previous => ({ ...previous, range: rangeFromPatch(model.range, patch) }))} />
     </section>
-    <div className="mt-[18px]"><SourceNote testId="source-label">{message(messages, "trade.sourceNote")} · {model.range.start}–{model.range.end} · <span className="whitespace-nowrap">{updatedDate(lastReviewedAt, locale)}</span><Link href={pageHref("/methodology/trade", locale)} prefetch={false} className="ml-2 text-[var(--accent)] underline underline-offset-4">{message(messages, "trade.methodology")}</Link></SourceNote><p className="mt-2 max-w-[850px] text-[11px] leading-relaxed text-[var(--muted)]">{domestic ? message(messages, "trade.domestic.productDefinitions") : `${data.sourceBlock ? "" : `${t("historicalNote")} `}${t("definitions")}`}</p></div>
+    <div className="mt-[18px]"><SourceNote testId="source-label" action={shareAction}>{message(messages, "trade.sourceNote")} · {model.range.start}–{model.range.end} · <span className="whitespace-nowrap">{updatedDate(lastReviewedAt, locale)}</span><Link href={pageHref("/methodology/trade", locale)} prefetch={false} className="ml-2 text-[var(--accent)] underline underline-offset-4">{message(messages, "trade.methodology")}</Link></SourceNote><p className="mt-2 max-w-[850px] text-[11px] leading-relaxed text-[var(--muted)]">{domestic ? message(messages, "trade.domestic.productDefinitions") : `${data.sourceBlock ? "" : `${t("historicalNote")} `}${t("definitions")}`}</p></div>
     <TradePartnersRanking key={`${state.measure}:${model.range.end}`} model={model} tab="products" measure={state.measure} pageSize={25} />
     {picker ? <TradeProductsPicker data={data} model={model} selectedIds={state.selectedIds} initialView={picker.view} returnFocusTo={picker.opener} onApply={selectedIds => update(previous => ({ ...previous, selectedIds }), true)} onClose={() => setPicker(null)} /> : null}
   </div>;

@@ -100,3 +100,19 @@ test("the button sits on the source line, not in the chart's control row", async
   await expect(page.getByTestId("chart-panel").getByTestId("chart-share")).toHaveCount(0);
   await expect(page.getByTestId("source-row").getByTestId("chart-share")).toHaveCount(1);
 });
+
+test("a picture with every Budget series ticked grows taller and keeps every name", async ({ page }) => {
+  await open(page, "/explorer/expenditure");
+  const few = await downloadPicture(page);
+  const toggleAll = page.getByTestId("series-toggle-all");
+  while ((await toggleAll.getAttribute("data-state")) !== "true") await toggleAll.click();
+  const all = await downloadPicture(page);
+  expect(all.width).toBe(2400);
+  expect(all.height).toBeGreaterThan(few.height);
+});
+
+test("a stacked column chart makes a picture too", async ({ page }) => {
+  await open(page, "/explorer/external/current-account");
+  await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-tab", "balance");
+  expect((await downloadPicture(page)).width).toBe(2400);
+});

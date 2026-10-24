@@ -15,6 +15,7 @@ import { message } from "../../lib/i18n/messages";
 import { pageHref } from "../../lib/i18n/routes";
 import { ModeTabs } from "../explorer-shell/mode-tabs";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
+import { ChartShareButton } from "../explorer-shell/chart-share-button";
 import { ExplorerHeading } from "../explorer-shell/explorer-heading";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { LatestValueLine } from "../explorer-shell/latest-value-line";
@@ -78,6 +79,9 @@ export function MoneyBanksExplorer({ section, facts, labels, sources, gdpFacts, 
     const { downloadWorkbook } = await import("../../lib/explorer/workbookWriter.client");
     await downloadWorkbook(buildMoneyBanksWorkbookExportModel({ section, facts, state, labels, sources, siteOrigin, title, gdpFacts, gdpSources }, presentation));
   }} />;
+  const chart = <EditorialLineChart years={model.years} series={lineSeries} share={percent} unit={unit} shareLabel={tabLabel} formatTooltipValue={valueLabel} />;
+  const shareAction = model.selected.length ? <ChartShareButton title={title} caption={`${unitLabel} · ${model.range.start}–${model.range.end}`}
+    legend={lineSeries.map(({ label, color }) => ({ label, color }))} source={t("sourceNote")} chart={chart} period={`${model.range.start}-${model.range.end}`} /> : undefined;
   return <div data-testid={`money-${section}`} className="@container">
     <ExplorerHeading>{title}</ExplorerHeading>
     <LatestValueLine testId="money-latest" measure={measureLabel} period={latest.year} value={latestValue} />
@@ -95,13 +99,13 @@ export function MoneyBanksExplorer({ section, facts, labels, sources, gdpFacts, 
             </div>
           </div>
           {!model.selected.length ? <div className="mt-5"><Callout testId="no-selection-callout">{t("emptySelection")}</Callout></div>
-            : state.mode === "line" ? <div className="mt-5"><EditorialLineChart years={model.years} series={lineSeries} share={percent} unit={unit} shareLabel={tabLabel} formatTooltipValue={valueLabel} /></div>
+            : state.mode === "line" ? <div className="mt-5">{chart}</div>
             : <ExplorerTable caption={`${tabLabel} · ${unitLabel} · ${model.range.start}–${model.range.end}`} rows={rows.filter(row => row !== total)} totalRow={total} showTotal={Boolean(total)} totalFirst wrapRowLabels rowLabelsLocalized years={model.years} firstColumnLabel={t("series")} unit={unit} share={percent} showChangeColumn={false}
               shareValueForYear={(row, year) => { const value = row.valuesByYear[year]; return value == null ? null : value / 100; }} shareDecimalsForRow={row => decimalsOf(row.itemId)} />}
           <ChartSelectionAids series={lineSeries} chartShown={state.mode === "line"} share={percent} unit={unit} formatValue={valueLabel} />
           <RangeStrip years={moneyBanksCoverage(section, state.view, facts, gdpFacts).years} range={model.range} onChange={patch => update(s => ({ ...s, range: rangeFromPatch(buildMoneyBanksModel(section, facts, s, gdpFacts).range, patch) }))} />
         </section>
-        <div className="mt-[18px]"><SourceNote testId="source-label">{t("sourceNote")}
+        <div className="mt-[18px]"><SourceNote testId="source-label" action={shareAction}>{t("sourceNote")}
           {state.view === "gdp" ? <> · {message(messages, "main.gdpSource")}{preliminaryGdpYears.length ? ` ${message(messages, "main.preliminaryGdp", { years: preliminaryGdpYears.join(", ") })}` : null}</> : null}
           {" · "}{unitLabel} · {model.range.start}–{model.range.end} · <span className="whitespace-nowrap">{updatedDate(lastReviewedAt, locale)}</span>
           <Link href={pageHref("/methodology/money", locale)} prefetch={false} className="ml-2 text-[var(--accent)] underline underline-offset-4">{t("methodology")}</Link>

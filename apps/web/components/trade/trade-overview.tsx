@@ -20,6 +20,7 @@ import { SeriesAside } from "../explorer-shell/series-aside";
 import { useHashState, type HashStateOptions } from "../explorer-shell/use-hash-state";
 import { EditorialLineChart } from "../main-explorer/editorial-line-chart";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
+import { ChartShareButton } from "../explorer-shell/chart-share-button";
 import { ExplorerTable } from "../main-explorer/explorer-table";
 import { RangeStrip } from "../main-explorer/range-strip";
 import { SEARCHABLE_MIN_ROWS, SeriesSelector, SeriesSelectorRow } from "../main-explorer/series-selector";
@@ -54,6 +55,9 @@ export function TradeOverview({ facts, sources, lastReviewedAt, siteOrigin, data
     await downloadWorkbook(buildTradeOverviewWorkbookExportModel({ facts, state, sources, siteOrigin, dataset }, presentation));
   }} />;
   const lineSeries = model.selectedIds.map(id => ({ id, label: label(id), color: TRADE_OVERVIEW_COLORS[id], vals: model.years.map(year => model.valuesByIndicator[id][year]) }));
+  const chart = <EditorialLineChart years={model.years} series={lineSeries} share={false} unit={model.unit} shareLabel={t("title")} showAxisUnit={false} formatTooltipValue={valueLabel} />;
+  const shareAction = model.selectedIds.length ? <ChartShareButton title={title} caption={`${model.unit.label} · ${model.range.start}–${model.range.end}`}
+    legend={lineSeries.map(({ label, color }) => ({ label, color }))} source={t(services ? "services.sourceNote" : "sourceNote")} chart={chart} period={`${model.range.start}-${model.range.end}`} /> : undefined;
   return <div data-testid="trade-overview" className="@container">
     {!domestic && !services ? <ExplorerHeading>{title}</ExplorerHeading> : null}
     <ExplorerWorkspace>
@@ -64,12 +68,12 @@ export function TradeOverview({ facts, sources, lastReviewedAt, siteOrigin, data
             <span className="text-[11px] text-[var(--muted)]">{model.unit.label}</span>
           </div>
           {!model.selectedIds.length ? <div className="mt-5"><Callout testId="no-selection-callout">{t(domestic ? "domestic.emptySelection" : "emptySelection")}</Callout></div>
-            : state.mode === "line" ? <div className="mt-5"><EditorialLineChart years={model.years} series={lineSeries} share={false} unit={model.unit} shareLabel={t("title")} showAxisUnit={false} formatTooltipValue={valueLabel} /></div>
+            : state.mode === "line" ? <div className="mt-5">{chart}</div>
             : <ExplorerTable caption={`${title} · ${model.unit.label} · ${model.range.start}–${model.range.end}`} rows={rows.filter(row => row.itemId !== totalId)} totalRow={total} showTotal={Boolean(total)} totalFirst wrapRowLabels rowLabelsLocalized years={model.years} firstColumnLabel={t("series")} unit={model.unit} share={false} showChangeColumn={false} shareValueForYear={() => null} />}
           <ChartSelectionAids series={lineSeries} chartShown={state.mode === "line"} share={false} unit={model.unit} formatValue={valueLabel} />
           <RangeStrip years={tradeOverviewCoverage(facts).years} range={model.range} onChange={patch => update(s => ({ ...s, range: rangeFromPatch(buildTradeOverviewModel(facts, s, presentation).range, patch) }))} />
         </section>
-        <div className="mt-[18px]"><SourceNote testId="source-label">{t(services ? "services.sourceNote" : "sourceNote")} · {model.range.start}–{model.range.end} · <span className="whitespace-nowrap">{updatedDate(lastReviewedAt, locale)}</span>
+        <div className="mt-[18px]"><SourceNote testId="source-label" action={shareAction}>{t(services ? "services.sourceNote" : "sourceNote")} · {model.range.start}–{model.range.end} · <span className="whitespace-nowrap">{updatedDate(lastReviewedAt, locale)}</span>
           <Link href={pageHref("/methodology/trade", locale)} prefetch={false} className="ml-2 text-[var(--accent)] underline underline-offset-4">{t("methodology")}</Link>
         </SourceNote>{domestic ? <p className="mt-2 text-[11px] leading-relaxed text-[var(--muted)]">{t("domestic.definitions")}</p> : null}</div>
       </div>
