@@ -37,9 +37,9 @@ export function partyKey(code: string, secret: string): string {
 }
 
 const isPersonalValue = (value: unknown) =>
-  (typeof value === "string" && isPersonalNumber(value)) || (typeof value === "number" && Number.isInteger(value) && isPersonalNumber(String(value)));
+  (typeof value === "string" && isPersonalNumber(value)) || (typeof value === "number" && Number.isFinite(value) && isPersonalNumber(String(Math.trunc(value))));
 
-/** A copy with every 11-digit value, at any depth, replaced by null, and every 11-digit run inside a text masked. */
+/** A copy with every 11-digit value (or number with an 11-digit whole part), at any depth, replaced by null, and every 11-digit run inside a text masked. */
 export function stripPersonalNumbers<T>(value: T): T {
   if (isPersonalValue(value)) return null as T;
   if (typeof value === "string") return maskPersonalNumbers(value) as T;

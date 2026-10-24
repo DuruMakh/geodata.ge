@@ -39,7 +39,9 @@ stopped in 2019. Direct purchases after mid-August 2025 are a known gap.
   internal id, name, legal form, registration date, status, address) and `links.csv.gz` (one row per person or company
   linked to a company, current or former: role, companyinfo.ge's person number, name, the 9-digit code when the
   linked party is a Georgian company, share, the date the service shows for the link, whether the link is former, and
-  nationality). The service gives one date per link and does not say whether it is a start or an end date.
+  nationality). The service gives one date per link and does not say whether it is a start or an end date. A share is
+  normally a percentage; about 250 partner rows carry a number above 100 (apparently a count of shares or an amount),
+  kept as the service gives it.
 - `data-report.md`: counts, totals and checks, in plain words.
 
 The cleaned tables keep every source column except six long free-text tender fields (submission terms, additional
@@ -58,7 +60,8 @@ value, else its start value.
   prefix, gets two keys.) In every other field, such as supplier names and document numbers, a standalone 11-digit
   run is replaced by `[removed]`. A run glued to letters (`ID12345678901`) is not treated as one. The original workbooks keep the numbers (they are public on
   Tender Monitor) and stay in the private folder.
-- Every 11-digit value in a registry answer is removed, and every 11-digit run inside its texts masked, before the
+- Every 11-digit value in a registry answer (including a number whose whole part has 11 digits, such as a few
+  partner `share` values) is removed, and every 11-digit run inside its texts masked, before the
   answer is saved. People are recorded by name and
   by companyinfo.ge's own person number. The flattened `links.csv.gz` carries no ID number of a person (foreign
   passport and registration numbers stay only in the saved answers).
@@ -72,7 +75,9 @@ value, else its start value.
   `fiscal.ge-procurement-collection/1.0 (+https://fiscal.ge)`. A server error, rate limit or network error is retried
   after 10 s and then 30 s; ten failed companies in a row stop the run. Companies already saved or answered "not found" are never asked for again; an answer
   that is neither an id nor empty (the service answers an empty text for a code it does not have) counts as a failure.
-  Companies are looked up in order of total GEL won, largest first.
+  Companies are looked up in order of total GEL won, largest first. The first collection (2026-10-23/24) covered
+  the 10,000 largest winners, about 99% of the GEL won by companies; the remaining ~28,600 can be added later
+  with `registry` (no `--limit`).
 
 ## Checks
 

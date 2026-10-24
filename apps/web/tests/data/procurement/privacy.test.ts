@@ -60,3 +60,7 @@ test("a 10-digit code starting with 0 is a personal number missing a digit and i
   expect(partyKey("0999999999", SECRET)).toMatch(/^p_[0-9a-f]{16}$/);
   expect(partyKey("2999999999", SECRET)).toBe("2999999999");
 });
+
+test("a number with an 11-digit whole part is removed too, since the report's scan would read it as a personal number", () => {
+  expect(stripPersonalNumbers({ share: 12345678901.9, small: 33.333333333333, big: 1234567890.5 })).toEqual({ share: null, small: 33.333333333333, big: 1234567890.5 });
+});
