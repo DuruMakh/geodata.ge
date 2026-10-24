@@ -1,11 +1,15 @@
+import path from "node:path";
 import { LandingPage } from "../../components/landing/landing-page";
 import { loadServedGeneralGovernmentBalanceData, loadServedGovernmentDebtData, loadServedLandingData, loadServedMunicipalData } from "../data/servedData";
-import { buildLandingModel } from "../landing/landingData";
-import { buildLandingDatasetLinks, landingGdpFigure } from "../landing/landingDatasets";
+import { MUNICIPAL_COUNTRY_ID } from "../data/municipal/types";
+import { loadServedForeignInvestmentData } from "../data/externalFlows/importForeignInvestment";
+import { loadServedMoneyTransfersData } from "../data/externalFlows/importMoneyTransfers";
+import { buildMunicipalListRows, MUNICIPAL_PER_RESIDENT_YEAR } from "../explorer/municipalData";
+import { buildHomeChapters } from "../landing/chapters";
+import { buildLandingContext, landingGdpFigure } from "../landing/landingData";
 import { loadServedGdpOverviewData } from "../data/gdpOverview/importGdpOverview";
-import { loadServedInflationData } from "../data/inflation/importInflation";
-import { loadServedUnemploymentData } from "../data/unemployment/importUnemployment";
-import { loadServedTradeOverviewData, toClientTradeOverviewFact } from "../data/tradeOverview/importTradeOverview";
+import { buildMethodologyHubEntries } from "../methodology/catalog";
+import { loadGeneratedArchiveSummaries } from "../methodology/prepareArchives";
 import { fiscalMetadata } from "../seo/metadata";
 import { resolveSiteUrl } from "../siteUrl";
 import type { Locale } from "../i18n/types";
@@ -22,29 +26,37 @@ export async function homePageMetadata(locale: Locale) {
 }
 
 export async function renderHomePage(locale: Locale) {
-  const [landingData, municipalData, debtData, balanceData, gdpData, inflationData, unemploymentData, tradeData] = await Promise.all([
+  const repositoryRoot = path.resolve(/* turbopackIgnore: true */ process.cwd(), "../..");
+  const [landingData, municipalData, debtData, balanceData, gdpData, fdiData, transferData, archives] = await Promise.all([
     loadServedLandingData(), loadServedMunicipalData(), loadServedGovernmentDebtData(), loadServedGeneralGovernmentBalanceData(),
-    loadServedGdpOverviewData(), loadServedInflationData(), loadServedUnemploymentData(), loadServedTradeOverviewData(),
+    loadServedGdpOverviewData(), loadServedForeignInvestmentData(), loadServedMoneyTransfersData(), loadGeneratedArchiveSummaries(repositoryRoot),
   ]);
-  // "inflation" supplies the short month names of the inflation figure's period.
-  const presentation = await getPresentation(locale, ["landing", "inflation", "trade"], [...landingData.glossary.keys(), ...municipalData.municipalities.map(entity => entity.code)]);
-  const model = buildLandingModel({
-    ...landingData,
+  const presentation = await getPresentation(locale, ["landing"], [...landingData.glossary.keys(), ...municipalData.municipalities.map(entity => entity.code)]);
+  const { updatedAt } = buildLandingContext(landingData);
+  const municipalList = buildMunicipalListRows({
     municipalities: municipalData.municipalities,
-    municipalTotalFacts: municipalData.totalFacts,
-    municipalCountryTotalFacts: municipalData.countryTotalFacts,
+    regionLabels: new Map(municipalData.regions.map((region) => [region.id, region.kaLabel])),
+    totalFacts: municipalData.totalFacts,
+    populationFacts: municipalData.populationFacts,
+    adjaraBudgetAdjustments: municipalData.adjaraBudgetAdjustments,
+    year: MUNICIPAL_PER_RESIDENT_YEAR,
+  });
+  const chapters = buildHomeChapters({
+    gdp: gdpData.facts,
     debtFacts: debtData.facts,
     balanceFacts: balanceData.facts,
-  }, presentation);
-  const datasets = buildLandingDatasetLinks({
-    expenditure: model.expenditure,
-    gdpFacts: gdpData.facts,
-    cpiFacts: inflationData.facts,
-    unemploymentFacts: unemploymentData.facts,
-    tradeFacts: tradeData.facts.map(toClientTradeOverviewFact),
+    municipalTotals: new Map(municipalData.countryTotalFacts.filter((fact) => fact.municipalityCode === MUNICIPAL_COUNTRY_ID).map((fact) => [fact.year, fact.publicTotalGel])),
+    fdiFacts: fdiData.facts,
+    transferFacts: transferData.facts,
+    budgetFacts: landingData.facts,
+    glossary: landingData.glossary,
+    municipalRows: municipalList.municipalities,
+    municipalYear: MUNICIPAL_PER_RESIDENT_YEAR,
+    methodologyEntries: buildMethodologyHubEntries({ budgetFacts: landingData.facts, municipalFacts: municipalData.totalFacts, debtFacts: debtData.facts, archives }, locale),
+    updatedAt,
   }, presentation);
   const rootUrl = new URL(pageHref("/", locale), `${resolveSiteUrl()}/`).href;
   const ka = `${resolveSiteUrl()}/`;
   const en = `${resolveSiteUrl()}/en`;
-  return <><link rel="canonical" href={rootUrl} /><link rel="alternate" hrefLang="ka" href={ka} /><link rel="alternate" hrefLang="en" href={en} /><link rel="alternate" hrefLang="x-default" href={ka} /><meta property="og:url" content={rootUrl} /><LandingPage model={model} datasets={datasets} gdpFigure={landingGdpFigure(gdpData.facts, presentation.messages)} presentation={presentation} /></>;
+  return <><link rel="canonical" href={rootUrl} /><link rel="alternate" hrefLang="ka" href={ka} /><link rel="alternate" hrefLang="en" href={en} /><link rel="alternate" hrefLang="x-default" href={ka} /><meta property="og:url" content={rootUrl} /><LandingPage chapters={chapters} gdpFigure={landingGdpFigure(gdpData.facts, presentation.messages)} presentation={presentation} updatedAt={updatedAt} /></>;
 }
