@@ -4,7 +4,7 @@ import { Pause, Play } from "lucide-react";
 import { useEffect, useId, useRef, useState } from "react";
 import { formatInUnit, formatShare, UNIT_BN } from "../../../lib/explorer/format";
 import type { SpendingSeries } from "../../../lib/landing/chapters/types";
-import { blockTone, sparkPoints } from "./canvas";
+import { blockTone, prefersReducedMotion, sparkPoints } from "./canvas";
 import { money } from "./chart-format";
 import { ChartTip, hideTip, showTip } from "./chart-tip";
 import { plannedYearText } from "./chart-tips";
@@ -39,6 +39,7 @@ export type SpendingLabels = {
 const loadEngine = () => import("./spending-engine");
 
 const STEP_MS = 900; // one year per step while playing
+const AUTOPLAY_VISIBLE = 0.4; // share of the chart on screen before it starts playing on its own
 
 const LABEL_CLASS = "text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]";
 // The range input is a transparent hit area over the sparkline; the accent marker shows the year.
@@ -152,6 +153,29 @@ export function SpendingChapter({ data, labels }: { data: SpendingSeries; labels
       if (next >= last) stop();
     }, STEP_MS);
   };
+
+  // The first time the chart comes into view it plays through the years on its own, from the first year;
+  // pause stops it. Not under reduced motion, and not once the reader has picked a year.
+  const autoplayRef = useRef(toggle);
+  useEffect(() => {
+    autoplayRef.current = () => {
+      if (!timerRef.current && cursorRef.current === last) toggle();
+    };
+  });
+  useEffect(() => {
+    const wrap = wrapRef.current;
+    if (!wrap || typeof IntersectionObserver === "undefined" || prefersReducedMotion()) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (!entries.some((entry) => entry.isIntersecting)) return;
+        observer.disconnect();
+        autoplayRef.current();
+      },
+      { threshold: AUTOPLAY_VISIBLE },
+    );
+    observer.observe(wrap);
+    return () => observer.disconnect();
+  }, []);
 
   const rows = data.fields.filter((f) => f.values[index] > 0).sort((a, b) => b.values[index] - a.values[index]);
   const top = rows[0];

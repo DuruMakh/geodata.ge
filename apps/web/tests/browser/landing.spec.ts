@@ -345,6 +345,44 @@ test("the year slider and play button change the spending year", async ({ page }
   expect(await yearOf()).toBe(paused);
 });
 
+test("the spending chart plays on its own from the first year when it comes into view, and pause stops it", async ({ page }) => {
+  await page.goto(`${baseUrl}/`);
+  const chapter = page.locator("#ch-02");
+  const range = chapter.locator('input[type="range"]');
+  const yearOf = async () => Number(await range.inputValue());
+  const min = Number(await range.getAttribute("min"));
+  const max = Number(await range.getAttribute("max"));
+  // Off screen it waits on the latest year.
+  await expect(range).toHaveValue(String(max));
+
+  await chapter.locator("figure").first().scrollIntoViewIfNeeded();
+  const pause = chapter.locator("button:has(svg.lucide-pause)");
+  await expect(pause).toHaveCount(1);
+  // It starts from the first year and moves forward.
+  await expect.poll(yearOf, { timeout: 3_000 }).toBeLessThan(max);
+  const early = await yearOf();
+  expect(early).toBeLessThanOrEqual(min + 3);
+  await expect.poll(yearOf, { timeout: 2_000 }).toBeGreaterThan(early);
+
+  await pause.click();
+  await expect(chapter.locator("button:has(svg.lucide-play)")).toHaveCount(1);
+  const paused = await yearOf();
+  await page.waitForTimeout(1_200);
+  expect(await yearOf()).toBe(paused);
+});
+
+test("under reduced motion the spending chart does not play on its own", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto(`${baseUrl}/`);
+  const chapter = page.locator("#ch-02");
+  const range = chapter.locator('input[type="range"]');
+  const max = await range.getAttribute("max");
+  await chapter.locator("figure").first().scrollIntoViewIfNeeded();
+  await page.waitForTimeout(1_500);
+  await expect(range).toHaveValue(max!);
+  await expect(chapter.locator("button:has(svg.lucide-pause)")).toHaveCount(0);
+});
+
 test("reduced motion shows final states", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto(`${baseUrl}/`);
