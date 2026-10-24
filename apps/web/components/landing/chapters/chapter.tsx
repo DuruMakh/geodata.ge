@@ -32,6 +32,7 @@ export function Chapter({
   link,
   title,
   lede,
+  meta,
   first = false,
   children,
 }: {
@@ -39,6 +40,8 @@ export function Chapter({
   link: ChapterLink | null;
   title: string;
   lede: string;
+  /** Optional small line under the lede (collection count, review date, a link). */
+  meta?: ReactNode;
   first?: boolean;
   children: ReactNode;
 }) {
@@ -49,6 +52,7 @@ export function Chapter({
           <ChapterTitle title={title} link={link} />
         </h2>
         <p className="mt-2 max-w-[860px] text-[15px] leading-[1.6] text-[var(--body)] [text-wrap:pretty]">{lede}</p>
+        {meta}
       </Reveal>
       {children}
     </section>

@@ -276,3 +276,205 @@ summary:focus-visible {
     transition: none;
   }
 }
+
+/* Homepage sources chapter: the four steps hang on a rail with a dot running down it, and each
+   coverage bar grows in from its left edge once the list has been revealed. */
+.home-steps {
+  position: relative;
+  border-top: 1.5px solid var(--ink);
+}
+
+.home-steps::before {
+  content: "";
+  position: absolute;
+  left: 5px;
+  top: 28px;
+  bottom: 28px;
+  width: 1px;
+  background: var(--hairline);
+}
+
+.home-step {
+  position: relative;
+  padding: 18px 0 18px 32px;
+  border-bottom: 1px solid var(--hairline-soft);
+}
+
+.home-step::before {
+  content: "";
+  position: absolute;
+  left: 1px;
+  top: 24px;
+  width: 9px;
+  height: 9px;
+  background: var(--paper);
+  border: 1.5px solid var(--ink);
+}
+
+.home-flow {
+  position: absolute;
+  z-index: 1;
+  left: 3px;
+  top: 28px;
+  width: 5px;
+  height: 5px;
+  background: var(--accent);
+  opacity: 0;
+  animation: home-flow 3.6s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+}
+
+.home-flow:nth-of-type(2) {
+  animation-delay: 1.2s;
+}
+
+.home-flow:nth-of-type(3) {
+  animation-delay: 2.4s;
+}
+
+@keyframes home-flow {
+  0% {
+    top: 28px;
+    opacity: 0;
+  }
+  8%,
+  92% {
+    opacity: 1;
+  }
+  100% {
+    top: calc(100% - 34px);
+    opacity: 0;
+  }
+}
+
+.home-cov-bar {
+  transform-origin: 0 50%;
+  transform: scaleX(0);
+  transition: transform 0.9s cubic-bezier(0.22, 0.7, 0.18, 1);
+}
+
+.home-src-list[data-in] .home-cov-bar {
+  transform: scaleX(1);
+}
+
+.home-cov-row:hover .home-cov-bar {
+  background: var(--accent);
+}
+
+@media (prefers-reduced-motion: reduce), (scripting: none) {
+  .home-flow {
+    animation: none;
+  }
+
+  .home-cov-bar {
+    transform: none;
+    transition: none;
+  }
+}
+
+/* Homepage Ask AI band: full-bleed dark paper with a faint dot grain that fades downwards. The
+   dark palette lives on the band as custom properties; nothing else uses it. */
+.home-ai {
+  --ai-bg: var(--ink);
+  --ai-ink: var(--paper);
+  --ai-body: #d8cfbf;
+  --ai-muted: var(--ink-fg-muted);
+  --ai-accent: #e58a6f;
+  --ai-link: #f3b4a2;
+  --ai-card: #27231d;
+  --ai-line: rgba(247, 242, 233, 0.22);
+  position: relative;
+  margin-left: calc(50% - 50vw);
+  width: 100vw;
+  margin-top: 104px;
+  padding: 80px 0 88px;
+  overflow: hidden;
+  background: var(--ai-bg);
+  color: var(--ai-ink);
+}
+
+.home-ai-grain {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(rgba(247, 242, 233, 0.07) 1px, transparent 1.2px);
+  background-size: 9px 9px;
+  pointer-events: none;
+  -webkit-mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0.15));
+  mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0.15));
+}
+
+.home-ai-inner {
+  position: relative;
+  max-width: 1296px;
+  margin: 0 auto;
+  padding: 0 28px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 44px;
+}
+
+@media (min-width: 1000px) {
+  .home-ai-inner {
+    grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
+    gap: 72px;
+    align-items: start;
+  }
+}
+
+@media (max-width: 600px) {
+  .home-ai {
+    padding: 64px 0 72px;
+  }
+
+  .home-ai-inner {
+    padding: 0 20px;
+  }
+}
+
+/* How it works: a rail through the five nodes, a dot runs down it. */
+.home-ai-path {
+  position: relative;
+}
+
+.home-ai-path::before {
+  content: "";
+  position: absolute;
+  left: 10px;
+  top: 20px;
+  bottom: 24px;
+  width: 1.5px;
+  background: var(--ai-line);
+}
+
+.home-ai-path::after {
+  content: "";
+  position: absolute;
+  left: 7px;
+  top: 16px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--ai-accent);
+  box-shadow: 0 0 0 4px rgba(229, 138, 111, 0.2);
+  animation: home-run 3.6s cubic-bezier(0.6, 0, 0.4, 1) infinite;
+}
+
+@keyframes home-run {
+  0% {
+    top: 16px;
+    opacity: 0;
+  }
+  10%,
+  88% {
+    opacity: 1;
+  }
+  100% {
+    top: calc(100% - 30px);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-ai-path::after {
+    display: none;
+  }
+}
