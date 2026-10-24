@@ -86,9 +86,14 @@ test("the regions index shows Tbilisi's 2025 line, Georgia first and the branch 
   expect(list.indexOf(">Georgia<")).toBeGreaterThan(-1);
   expect(list.indexOf(">Georgia<")).toBeLessThan(list.indexOf(">Tbilisi<"));
   const regionLinks = new Set([...html.matchAll(/href="\/en\/explorer\/money\/regions\/([a-z_]+)"/g)].map(match => match[1]));
+  // Georgia's lead row opens its own page; the eleven regions' map shapes and rows open theirs.
+  expect(regionLinks.has("georgia")).toBe(true);
   regionLinks.delete("georgia");
   expect([...regionLinks].sort()).toEqual(MONEY_BANKS_LOAN_AREAS.filter(area => area !== "georgia").map(moneyBanksAreaSlug).sort());
-  expect(text(html)).toContain("bank branch");
+  // The source note (not the Dataset summary, which also mentions the branch) carries the caveat, in both languages.
+  const sourceNote = (markup: string) => text(markup.match(/<p[^>]*data-testid="regional-source-note"[^>]*>([\s\S]*?)<\/p>/)![1]);
+  expect(sourceNote(html)).toContain("loans are counted where the lending bank branch is, not where the borrower lives");
+  expect(sourceNote(renderPageMarkup("ka", await renderMoneyBanksRegionsPage("ka")))).toContain("და არა იქ, სადაც მსესხებელი ცხოვრობს");
   // The frame's Dataset is Money and banks' own, credited to the National Bank.
   const dataset = JSON.parse(html.match(/<script[^>]*data-testid="explorer-dataset-json-ld"[^>]*>([\s\S]*?)<\/script>/)![1]);
   expect(dataset.provider).toMatchObject({ name: "National Bank of Georgia" });
@@ -99,8 +104,9 @@ test("an area page reads million GEL, small values included", async () => {
   const html = renderPageMarkup("en", await renderMoneyBanksAreaPage("en", "racha_lechkhumi_kvemo_svaneti"));
   const id = "loans_region.region_racha_lechkhumi_kvemo_svaneti";
   const year = csv.latestYear(`${id}.total`);
-  expect(latestLine(html)).toBe(`${year}: all loans ${formatAmount(csv.published(`${id}.total`, year) * 1e6, "en")} · Racha-Lechkhumi and Kvemo Svaneti`);
-  expect(latestLine(html)).toBe("2025: all loans 60.5 mln GEL · Racha-Lechkhumi and Kvemo Svaneti");
+  // The heading names the area, so the line does not (it fits on one line at 375px).
+  expect(latestLine(html)).toBe(`${year}: all loans ${formatAmount(csv.published(`${id}.total`, year) * 1e6, "en")}`);
+  expect(latestLine(html)).toBe("2025: all loans 60.5 mln GEL");
   // 0.311 million lari in foreign currency reads as a number, never 0 or a dash.
   const row = (part: string) => text(html.match(new RegExp(`<div[^>]*data-series-id="${id}.${part}"[^>]*>([\\s\\S]*?)</button>`))![1]);
   expect(row("fx")).toBe("In foreign currency0.3");

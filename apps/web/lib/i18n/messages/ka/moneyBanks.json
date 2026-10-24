@@ -93,7 +93,7 @@
   "moneyBanks.latest.loans-deposits": "ყველა სესხი",
   "moneyBanks.latest.borrowers": "{year}: ყველა სესხი {value}",
   "moneyBanks.latest.regions": "{year}: {region} {value}",
-  "moneyBanks.latest.area": "{year}: ყველა სესხი {value} · {region}",
+  "moneyBanks.latest.area": "{year}: ყველა სესხი {value}",
   "moneyBanks.latest.interest-rates": "ეროვნული ბანკის განაკვეთი",
   "moneyBanks.latest.bank-health": "უმოქმედო სესხების წილი ყველა სესხში",
   "moneyBanks.latest.gdp": "ფართო ფული (M3), მშპ-ის %",

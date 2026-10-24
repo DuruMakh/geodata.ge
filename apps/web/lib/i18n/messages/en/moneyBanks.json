@@ -93,7 +93,7 @@
   "moneyBanks.latest.loans-deposits": "All loans",
   "moneyBanks.latest.borrowers": "{year}: all loans {value}",
   "moneyBanks.latest.regions": "{year}: {region} {value}",
-  "moneyBanks.latest.area": "{year}: all loans {value} · {region}",
+  "moneyBanks.latest.area": "{year}: all loans {value}",
   "moneyBanks.latest.interest-rates": "National Bank rate",
   "moneyBanks.latest.bank-health": "Bad loans, share of all loans",
   "moneyBanks.latest.gdp": "Broad money (M3), % of GDP",

@@ -85,7 +85,7 @@ export function MoneyBanksAreaExplorer({ area, facts, labels, areaLabels, source
         previous={{ href: pageHref(areaHref(neighbours.previous.id), locale), label: nameOf(neighbours.previous.id) }}
         next={{ href: pageHref(areaHref(neighbours.next.id), locale), label: nameOf(neighbours.next.id) }} />
     </div>
-    <LatestValueLine testId="money-latest" sentence={<Message messages={messages} id="moneyBanks.latest.area" values={{ year: latest.year, region: areaName, value: <LatestFigure value={formatAmount(latest.value, locale)} /> }} />} />
+    <LatestValueLine testId="money-latest" sentence={<Message messages={messages} id="moneyBanks.latest.area" values={{ year: latest.year, value: <LatestFigure value={formatAmount(latest.value, locale)} /> }} />} />
     <ExplorerWorkspace>
       <div className="flex min-w-0 flex-col">
         <section aria-label={chartLabel} data-testid="chart-panel" data-mode={state.mode} data-area={area} className="border-t border-[var(--ink)] pt-4">

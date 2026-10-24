@@ -5,10 +5,11 @@ import { INK } from "./colors";
 import { formatAmount, formatInUnit } from "./format";
 import type { HubCardModel } from "./hubCards";
 import { MONEY_BANKS_SECTIONS, type MoneyBanksTopicId } from "./moneyBanks";
+import { buildMoneyBanksRegionMapModel } from "./moneyBanksRegionMap";
 
 /**
  * Each card's sparkline and footer years follow one series: the broad money supply, total loans, all loans by borrower, the
- * National Bank rate and the bad-loans ratio. Loans by region has none, only the years of Georgia's loans by region.
+ * National Bank rate and the bad-loans ratio. Loans by region has none, only its map's years.
  */
 const HEADLINE: Record<MoneyBanksTopicId, MoneyBanksIndicator> = {
   "supply": "money.m3", "loans-deposits": "loans.total", "borrowers": "borrowers.total", "interest-rates": "rates.policy", "bank-health": "banks.npl_ratio",
@@ -22,8 +23,8 @@ export function buildMoneyBanksHubCards(facts: readonly ClientMoneyBanksFact[], 
       href: section.href, comingSoon: false,
     };
     if (section.id === "regions") {
-      const years = facts.filter(f => f.indicatorId === "loans_region.georgia.total").map(f => f.year);
-      return { ...card, series: null, seriesColor: null, footer: `${Math.min(...years)}–${Math.max(...years)}` };
+      const map = buildMoneyBanksRegionMapModel(facts);
+      return { ...card, series: null, seriesColor: null, footer: `${map.firstYear}–${map.year}` };
     }
     const headline = facts.filter(f => f.indicatorId === HEADLINE[section.id]).sort((a, b) => a.year - b.year);
     const last = headline.at(-1)!;
