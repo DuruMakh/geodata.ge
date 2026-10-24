@@ -17,6 +17,14 @@ import { SCIENCE_CULTURE_HUB_PATH, SCIENCE_CULTURE_SECTIONS } from "../explorer/
 import { INTERNET_HUB_PATH, INTERNET_SECTIONS } from "../explorer/internet";
 import { DEMOGRAPHY_HUB_PATH, LIVE_DEMOGRAPHY_PAGES } from "../explorer/demographyRoutes";
 
+/** The twenty topics: the hubs of `NAV_TREE`. A topic keeps its id and pages when a group page replaces its own hub page. */
+export type TopicId =
+  | "budget" | "economy" | "business" | "housing" | "inflation" | "money" | "unemployment" | "wages" | "living-standards" | "health"
+  | "education" | "science-culture" | "crime" | "internet" | "trade" | "external" | "energy-food" | "environment" | "transport" | "demography";
+
+/** The eight groups the topics are sorted into. */
+export type GroupId = "budget" | "economy" | "prices" | "labour" | "living" | "external" | "demography" | "society";
+
 /** A page under a hub: its sidebar row. `labelKey` is a `common` message. */
 export type NavSection = { href: `/${string}`; labelKey: string; testId?: string };
 
@@ -25,6 +33,7 @@ export type NavSection = { href: `/${string}`; labelKey: string; testId?: string
  * `spaced` keeps the 8px desktop gap above the rows that have always had it.
  */
 export type NavHub = {
+  id: TopicId;
   href: `/${string}`;
   labelKey: string;
   railLabelKey: string;
@@ -48,6 +57,7 @@ function sectionRows(sections: readonly { id: string; href: `/${string}`; labelK
  */
 export const NAV_TREE: readonly NavHub[] = [
   {
+    id: "budget",
     href: BUDGET_HUB_PATH,
     labelKey: "common.budget",
     railLabelKey: "common.dataBudget",
@@ -57,6 +67,7 @@ export const NAV_TREE: readonly NavHub[] = [
     }),
   },
   {
+    id: "economy",
     href: "/explorer/economy",
     labelKey: "common.economy",
     railLabelKey: "common.dataEconomy",
@@ -69,6 +80,7 @@ export const NAV_TREE: readonly NavHub[] = [
     ], "economy"),
   },
   {
+    id: "business",
     href: BUSINESS_HUB_PATH,
     labelKey: "common.business",
     railLabelKey: "common.dataBusiness",
@@ -76,6 +88,7 @@ export const NAV_TREE: readonly NavHub[] = [
     sections: sectionRows(BUSINESS_SECTIONS, "business"),
   },
   {
+    id: "housing",
     href: HOUSING_HUB_PATH,
     labelKey: "common.housing",
     railLabelKey: "common.dataHousing",
@@ -83,6 +96,7 @@ export const NAV_TREE: readonly NavHub[] = [
     sections: sectionRows(HOUSING_SECTIONS, "housing"),
   },
   {
+    id: "inflation",
     href: "/explorer/inflation",
     labelKey: "common.inflation",
     railLabelKey: "common.dataInflation",
@@ -95,6 +109,7 @@ export const NAV_TREE: readonly NavHub[] = [
     ], "inflation"),
   },
   {
+    id: "money",
     href: "/explorer/money",
     labelKey: "common.moneyBanks",
     railLabelKey: "common.dataMoneyBanks",
@@ -103,6 +118,7 @@ export const NAV_TREE: readonly NavHub[] = [
     sections: sectionRows(MONEY_BANKS_SECTIONS, "money"),
   },
   {
+    id: "unemployment",
     href: "/explorer/unemployment",
     labelKey: "common.unemployment",
     railLabelKey: "common.dataUnemployment",
@@ -111,6 +127,7 @@ export const NAV_TREE: readonly NavHub[] = [
     sections: sectionRows([...UNEMPLOYMENT_SECTIONS, ...LABOUR_SECTIONS], "unemployment"),
   },
   {
+    id: "wages",
     href: "/explorer/wages",
     labelKey: "common.wages",
     railLabelKey: "common.dataWages",
@@ -119,6 +136,7 @@ export const NAV_TREE: readonly NavHub[] = [
     sections: sectionRows(WAGES_SECTIONS, "wages"),
   },
   {
+    id: "living-standards",
     href: LIVING_STANDARDS_HUB_PATH,
     labelKey: "common.livingStandards",
     railLabelKey: "common.dataLivingStandards",
@@ -127,6 +145,7 @@ export const NAV_TREE: readonly NavHub[] = [
     sections: sectionRows(LIVING_STANDARDS_SECTIONS, "living-standards"),
   },
   {
+    id: "health",
     href: HEALTH_HUB_PATH,
     labelKey: "common.health",
     railLabelKey: "common.dataHealth",
@@ -135,6 +154,7 @@ export const NAV_TREE: readonly NavHub[] = [
     sections: sectionRows([...HEALTH_SECTIONS, ...SOCIAL_SECTIONS], "health"),
   },
   {
+    id: "education",
     href: EDUCATION_HUB_PATH,
     labelKey: "common.education",
     railLabelKey: "common.dataEducation",
@@ -143,6 +163,7 @@ export const NAV_TREE: readonly NavHub[] = [
     sections: sectionRows(EDUCATION_SECTIONS, "education"),
   },
   {
+    id: "science-culture",
     href: SCIENCE_CULTURE_HUB_PATH,
     labelKey: "common.scienceCulture",
     railLabelKey: "common.dataScienceCulture",
@@ -151,6 +172,7 @@ export const NAV_TREE: readonly NavHub[] = [
     sections: sectionRows(SCIENCE_CULTURE_SECTIONS, "science-culture"),
   },
   {
+    id: "crime",
     href: CRIME_HUB_PATH,
     labelKey: "common.crime",
     railLabelKey: "common.dataCrime",
@@ -159,6 +181,7 @@ export const NAV_TREE: readonly NavHub[] = [
     sections: sectionRows(CRIME_SECTIONS, "crime"),
   },
   {
+    id: "internet",
     href: INTERNET_HUB_PATH,
     labelKey: "common.internet",
     railLabelKey: "common.dataInternet",
@@ -167,6 +190,7 @@ export const NAV_TREE: readonly NavHub[] = [
     sections: sectionRows(INTERNET_SECTIONS, "internet"),
   },
   {
+    id: "trade",
     href: "/explorer/trade",
     labelKey: "common.trade",
     railLabelKey: "common.dataTrade",
@@ -182,6 +206,7 @@ export const NAV_TREE: readonly NavHub[] = [
     ], "trade"),
   },
   {
+    id: "external",
     href: "/explorer/external",
     labelKey: "common.external",
     railLabelKey: "common.dataExternal",
@@ -196,6 +221,7 @@ export const NAV_TREE: readonly NavHub[] = [
     ],
   },
   {
+    id: "energy-food",
     href: ENERGY_FOOD_HUB_PATH,
     labelKey: "common.energyFood",
     railLabelKey: "common.dataEnergyFood",
@@ -204,6 +230,7 @@ export const NAV_TREE: readonly NavHub[] = [
     sections: sectionRows(ENERGY_FOOD_SECTIONS, "energy-food"),
   },
   {
+    id: "environment",
     href: ENVIRONMENT_HUB_PATH,
     labelKey: "common.environment",
     railLabelKey: "common.dataEnvironment",
@@ -212,6 +239,7 @@ export const NAV_TREE: readonly NavHub[] = [
     sections: sectionRows(ENVIRONMENT_SECTIONS, "environment"),
   },
   {
+    id: "transport",
     href: TRANSPORT_HUB_PATH,
     labelKey: "common.transport",
     railLabelKey: "common.dataTransport",
@@ -219,6 +247,7 @@ export const NAV_TREE: readonly NavHub[] = [
     sections: sectionRows(TRANSPORT_SECTIONS, "transport"),
   },
   {
+    id: "demography",
     href: DEMOGRAPHY_HUB_PATH,
     labelKey: "common.demography",
     railLabelKey: "common.dataDemography",
@@ -228,6 +257,41 @@ export const NAV_TREE: readonly NavHub[] = [
   },
 ];
 
+/** A group: its own page, its sidebar name (`labelKey` is a `common` message) and the topics it holds, in order. */
+export type NavGroup = { id: GroupId; href: `/explorer/${string}`; labelKey: string; topics: readonly TopicId[] };
+
+/** The All data page, which lists every page and searches them; the explorer's root. */
+export const ALL_DATA_PATH = "/explorer";
+
+/** The eight groups in sidebar order, over the twenty topics. Each topic is in exactly one group. */
+export const NAV_GROUPS: readonly NavGroup[] = [
+  { id: "budget", href: "/explorer/budget", labelKey: "common.group.budget", topics: ["budget"] },
+  { id: "economy", href: "/explorer/economy", labelKey: "common.group.economy", topics: ["economy", "business", "housing"] },
+  { id: "prices", href: "/explorer/prices", labelKey: "common.group.prices", topics: ["inflation", "money"] },
+  { id: "labour", href: "/explorer/labour", labelKey: "common.group.labour", topics: ["unemployment", "wages"] },
+  { id: "living", href: "/explorer/living", labelKey: "common.group.living", topics: ["living-standards", "health"] },
+  { id: "external", href: "/explorer/external", labelKey: "common.group.external", topics: ["trade", "external"] },
+  { id: "demography", href: "/explorer/demography", labelKey: "common.group.demography", topics: ["demography"] },
+  { id: "society", href: "/explorer/society", labelKey: "common.group.society", topics: ["education", "science-culture", "crime", "internet", "energy-food", "environment", "transport"] },
+];
+
+/** The topic's hub: its base address, sections and labels. */
+export function topicHub(id: TopicId): NavHub {
+  return NAV_TREE.find((hub) => hub.id === id)!;
+}
+
+export function groupOfTopic(id: TopicId): NavGroup {
+  return NAV_GROUPS.find((group) => group.topics.includes(id))!;
+}
+
+/** The pages of a group: its topics' sections, in order. */
+export function groupPages(group: NavGroup): NavSection[] {
+  return group.topics.flatMap((id) => topicHub(id).sections);
+}
+
+/** Every page in the navigation tree. */
+export const PAGE_COUNT = NAV_TREE.reduce((total, hub) => total + hub.sections.length, 0);
+
 /** The one active rule: a row is active on its own page and on every page below it (a region or place page). */
 export function isActivePath(pathname: string, href: string): boolean {
   return pathname === href || pathname.startsWith(`${href}/`);
@@ -236,6 +300,12 @@ export function isActivePath(pathname: string, href: string): boolean {
 /** The hub whose rows are open: the longest hub address the page sits under; Budget (`/explorer`) holds the rest. */
 export function openHub(pathname: string): NavHub {
   return NAV_TREE.reduce((open, hub) => (isActivePath(pathname, hub.href) && hub.href.length > open.href.length ? hub : open));
+}
+
+/** The group a page belongs to: a group's own page, else the group of the open hub; none on All data. */
+export function currentGroup(pathname: string): NavGroup | null {
+  if (pathname === ALL_DATA_PATH) return null;
+  return NAV_GROUPS.find((group) => group.href === pathname) ?? groupOfTopic(openHub(pathname).id);
 }
 
 /**
@@ -248,9 +318,16 @@ export function currentEntry(pathname: string): string | undefined {
   return hub.sections.find((section) => isActivePath(pathname, section.href))?.href;
 }
 
+/** Old topic addresses and where they forward: the group page, carrying the topic as `?topic=` (spec §3.1). */
+export const LEGACY_TOPIC_FORWARDS: readonly { topic: TopicId; from: string; to: string }[] = NAV_TREE.flatMap(({ id, href }) => {
+  const group = groupOfTopic(id);
+  return id === "budget" || href === group.href ? [] : [{ topic: id, from: href, to: `${group.href}?topic=${id}` }];
+});
+
 /** Footer source notes that belong to one page only. */
 const PAGE_SOURCE_NOTES: Readonly<Record<string, string>> = {
-  "/explorer": "common.budgetHubSourceNote",
+  [ALL_DATA_PATH]: "common.sourceNote.allData",
+  ...Object.fromEntries(NAV_GROUPS.map((group) => [group.href, `common.sourceNote.group.${group.id}`])),
   "/explorer/expenditure": "common.budgetStatisticsSourceNote",
   "/explorer/expenditure-types": "common.budgetStatisticsSourceNote",
   "/explorer/revenue": "common.budgetStatisticsSourceNote",
@@ -261,7 +338,6 @@ const PAGE_SOURCE_NOTES: Readonly<Record<string, string>> = {
   "/explorer/economy/expenditure": "common.geostatSourceNote",
   "/explorer/inflation/categories": "common.geostatSourceNote",
   "/explorer/inflation/products": "common.geostatSourceNote",
-  "/explorer/external": "common.externalHubSourceNote",
   "/explorer/external/foreign-investment": "common.geostatSourceNote",
   // The hub lists Geostat's health pages and the Social Service Agency's pages.
   [HEALTH_HUB_PATH]: "common.socialSourceNote",
