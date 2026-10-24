@@ -92,7 +92,7 @@ describe("columnHeights", () => {
     expect(columnHeights([place("04", 2e9, 1), place("06", 5e8, 2), place("20", 0, 3)])).toEqual([RELIEF_MAX_HEIGHT, RELIEF_MAX_HEIGHT / 4, 0]);
   });
 
-  it("caps at places[0], whatever its total", () => {
+  it("scales to the first place's total, and gives zeros when it is zero", () => {
     expect(columnHeights([place("04", 4e9, 1), place("06", 1e9, 2)])[1]).toBe(RELIEF_MAX_HEIGHT / 4);
     expect(columnHeights([place("04", 0, 1), place("06", 0, 2)])).toEqual([0, 0]);
   });

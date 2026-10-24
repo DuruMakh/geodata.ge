@@ -69,8 +69,8 @@ export function camUpdate(c: Camera): void {
   c.axes = { x: [xx, 0, xz], y: [zy * xz, zz * xx - zx * xz, -zy * xx], z: [zx, zy, zz] };
 
   const top = c.near * Math.tan((c.fov * Math.PI) / 360);
-  c.sx = 1 / (c.aspect * top);
-  c.sy = 1 / top;
+  c.sx = c.near / (c.aspect * top);
+  c.sy = c.near / top;
   const C = -(c.far + c.near) / (c.far - c.near);
   const D = (-2 * c.far * c.near) / (c.far - c.near);
   const p = c.pos;
@@ -141,7 +141,7 @@ export const worldZ = (r: number, rows: number) => (r - (rows - 1) / 2) * RELIEF
 
 /** Column height per place: its total over the first (largest) place's, times RELIEF_MAX_HEIGHT. */
 export function columnHeights(places: ReliefPlace[]): number[] {
-  const cap = places[0]?.totalGel ?? 0;
+  const cap = places[0]?.totalGel ?? 0; // the model sorts places by total, descending, so places[0] is the largest
   return places.map((place) => (cap > 0 ? (place.totalGel / cap) * RELIEF_MAX_HEIGHT : 0));
 }
 

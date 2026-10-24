@@ -213,9 +213,9 @@ function softRenderer(canvas: HTMLCanvasElement, b: Buffers): Renderer {
   };
 }
 
-type Engine = { destroy(): void };
+export type Engine = { destroy(): void };
 
-type EngineOptions = {
+export type EngineOptions = {
   stage: HTMLElement;
   canvas: HTMLCanvasElement;
   /** Label of places[i], for the first LABELLED places. */
@@ -229,7 +229,7 @@ type EngineOptions = {
   onLost(): void;
 };
 
-function createRelief(o: EngineOptions): Engine | null {
+export function createRelief(o: EngineOptions): Engine | null {
   const { stage, canvas, labelEls, data } = o;
   const gl = o.webgl ? canvas.getContext("webgl", { antialias: true, alpha: true, premultipliedAlpha: true }) : null;
   if (!gl && !canvas.getContext("2d")) return null;
@@ -511,10 +511,14 @@ export function MunicipalRelief({ data, labels }: { data: MunicipalChapter; labe
           showTip(tip, reliefTip(d, lab, hit), x, y, stage.clientWidth, stage.clientHeight);
         },
         onLeave: () => hideTip(tip),
-        onLost: () => setWebgl(false),
+        onLost: () => {
+          console.warn("[fiscal] municipal relief: WebGL context lost, drawing in 2D");
+          setWebgl(false);
+        },
       });
     } catch (error) {
       if (!webgl) throw error;
+      console.warn("[fiscal] municipal relief: WebGL unavailable, drawing in 2D", error);
       // WebGL started but its shaders would not build: retry in 2D on a fresh canvas.
       retry = window.setTimeout(() => setWebgl(false), 0);
     }

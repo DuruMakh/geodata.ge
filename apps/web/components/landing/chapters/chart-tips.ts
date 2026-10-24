@@ -1,4 +1,4 @@
-import { formatInUnit, formatPoints, formatShare, MISSING } from "../../../lib/explorer/format";
+import { formatInUnit, formatPoints, formatShare, MISSING, UNIT_PERSONS } from "../../../lib/explorer/format";
 import type { DeficitChapter, MunicipalChapter, RevenueSeries } from "../../../lib/landing/chapters/types";
 import { money } from "./chart-format";
 import type { TipData } from "./chart-tip";
@@ -61,7 +61,7 @@ export function reliefTip(
     title: place.name,
     rows: [
       { key: "var(--ink)", val: money(place.totalGel, labels), name: `${labels.budget}, ${data.year}` },
-      { val: `${formatInUnit(place.perResidentGel, { divisor: 1, label: "", decimals: 0 })}\u00a0${labels.gel}`, name: labels.perResident },
+      { val: `${formatInUnit(place.perResidentGel, UNIT_PERSONS)}\u00a0${labels.gel}`, name: labels.perResident },
     ],
     foot: `${labels.rank}: ${place.rank} / ${data.places.length}`,
   };
