@@ -5,6 +5,7 @@ import {
   ADMIN_SPENDING_RECONCILIATION_TOLERANCE_GEL,
   buildAdminSpendingReport,
   generateAdminSpendingFacts,
+  unexecutedPlanRows,
 } from "../../../lib/data/adminSpending/generateAdminSpendingFacts";
 import { loadAdminSpendingFacts } from "../../../lib/data/adminSpending/importAdminSpendingFacts";
 import type { AdminSpendingFact } from "../../../lib/data/adminSpending/types";
@@ -136,5 +137,32 @@ describe("2026 planned spending by ministry from the budget law", () => {
       expect(Math.round((programme?.actualThousandGel ?? 0) * 1000), row.code_2026).toBe(Number(row.amount_2026_gel));
       expect(row.note.length, row.code_2026).toBeGreaterThan(0);
     }
+  }, 60_000);
+});
+
+describe("when the 2026 execution report arrives", () => {
+  it("keeps the plan rows today, while 2026 has no execution rows", () => {
+    const { rows2026, allRows } = generated();
+    const executionRows = allRows.slice(0, allRows.length - rows2026.length);
+
+    expect(unexecutedPlanRows(executionRows, rows2026, PLANNED_BUDGET_YEARS)).toEqual({ plannedYears: PLANNED_BUDGET_YEARS, planRows: rows2026 });
+  }, 60_000);
+
+  it("generates 2026 as actual from its execution rows, leaves the plan rows out and still reconciles", () => {
+    const { rows2026, allRows } = generated();
+    // Stand-in execution rows for 2026: the law's own rows under an execution source id.
+    const executionRows = [
+      ...allRows.slice(0, allRows.length - rows2026.length),
+      ...rows2026.map((row) => ({ ...row, sourceId: "source.mof_2026_programmatic_fact_actual" })),
+    ];
+    const { plannedYears, planRows } = unexecutedPlanRows(executionRows, rows2026, PLANNED_BUDGET_YEARS);
+    const facts = generateAdminSpendingFacts([...executionRows, ...planRows], { plannedYears });
+    const report = buildAdminSpendingReport(executionRows, facts);
+
+    expect(plannedYears).toEqual([]);
+    expect(planRows).toEqual([]);
+    expect(facts.filter((fact) => fact.year === 2026).every((fact) => fact.basis === "actual")).toBe(true);
+    expect(report.reconciliationStatusByYear[2026]).toBe("passed");
+    expect(Object.values(report.reconciliationStatusByYear).every((status) => status === "passed")).toBe(true);
   }, 60_000);
 });

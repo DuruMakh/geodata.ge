@@ -5,6 +5,7 @@ import { extractAdminSpendingOfficialRows } from "../lib/data/adminSpending/extr
 import {
   buildAdminSpendingReport,
   generateAdminSpendingFacts,
+  unexecutedPlanRows,
   MAJOR_PROGRAM_THRESHOLD_GEL,
 } from "../lib/data/adminSpending/generateAdminSpendingFacts";
 import type { AdminSpendingFact } from "../lib/data/adminSpending/types";
@@ -185,10 +186,11 @@ function programReviewCsv(facts: AdminSpendingFact[]): string {
 async function main() {
   const parserWarnings: string[] = [];
   const officialRows = extractAdminSpendingOfficialRows(parserWarnings);
-  // The 2026 law's Tavi VI plan rows; their facts carry basis planned and ship in their own file.
-  const plannedRows = lawTavi6OfficialRows();
-  const allFacts = generateAdminSpendingFacts([...officialRows, ...plannedRows], { plannedYears: PLANNED_BUDGET_YEARS });
-  const isPlannedYear = (year: number) => PLANNED_BUDGET_YEARS.includes(year);
+  // The 2026 law's Tavi VI plan rows; their facts carry basis planned and ship in their own file. Once a plan
+  // year's execution rows are extracted, that year is generated as actual and its plan rows are left out.
+  const { plannedYears, planRows: plannedRows } = unexecutedPlanRows(officialRows, lawTavi6OfficialRows(), PLANNED_BUDGET_YEARS);
+  const allFacts = generateAdminSpendingFacts([...officialRows, ...plannedRows], { plannedYears });
+  const isPlannedYear = (year: number) => plannedYears.includes(year);
   const facts = allFacts.filter((fact) => !isPlannedYear(fact.year));
   const plannedFacts = allFacts.filter((fact) => isPlannedYear(fact.year));
   const report = buildAdminSpendingReport(officialRows, facts);

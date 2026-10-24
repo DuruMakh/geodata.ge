@@ -580,6 +580,21 @@ export type GenerateAdminSpendingFactsOptions = {
   plannedYears?: readonly number[];
 };
 
+/**
+ * The plan years still waiting for their execution report, and the plan rows that stand in for them. A plan year
+ * whose execution rows exist is generated as actual from those rows alone, so importing a year's actuals needs no
+ * change here: its plan rows simply stop being used.
+ */
+export function unexecutedPlanRows(
+  executionRows: readonly OfficialExpenditureRow[],
+  planRows: readonly OfficialExpenditureRow[],
+  plannedYears: readonly number[],
+): { plannedYears: number[]; planRows: OfficialExpenditureRow[] } {
+  const executedYears = new Set(executionRows.map((row) => row.year));
+  const waiting = plannedYears.filter((year) => !executedYears.has(year));
+  return { plannedYears: waiting, planRows: planRows.filter((row) => waiting.includes(row.year)) };
+}
+
 export function generateAdminSpendingFacts(
   rows: OfficialExpenditureRow[],
   options: GenerateAdminSpendingFactsOptions = {},

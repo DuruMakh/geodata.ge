@@ -10,8 +10,10 @@ export const EXPENDITURE_SOURCE_YEARS = inclusiveYears(APP_START_YEAR, APP_END_Y
 export const EXPENDITURE_DETAILED_YEARS = inclusiveYears(APP_START_YEAR, APP_END_YEAR);
 export const EXPENDITURE_YEARS = [...EXPENDITURE_DETAILED_YEARS];
 
-// Years served only as a plan (basis "planned"), read from the separate
-// *-2026-planned.csv files beside the 2004-2025 actuals.
+// Years with an approved budget-law plan (basis "planned"), read from the separate
+// *-2026-planned.csv files beside the actuals. A year stays listed after its actuals
+// arrive: actual wins in every reader, and the admin generator stops using its plan
+// rows once its execution rows exist (2026-budget-plan-methodology.md section 9).
 export const PLANNED_BUDGET_YEARS = [2026];
 
 export const REVENUE_SOURCE_YEARS = inclusiveYears(REVENUE_START_YEAR, APP_END_YEAR);
