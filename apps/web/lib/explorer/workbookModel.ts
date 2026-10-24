@@ -125,6 +125,13 @@ export function workbookFilename(stem: string, locale: Locale): string {
   return `fiscal-${stem}${locale === "en" ? "-en" : ""}.xlsx`;
 }
 
+/** A share picture's stem: the page address below /explorer, then the years shown (`wages-overview-1995-2025`). */
+export function pictureStem(pathname: string, period: string): string {
+  const segments = pathname.split("/").filter(Boolean);
+  const below = segments.slice(segments.indexOf("explorer") + 1);
+  return [...(below.length ? below : ["explorer"]), period].join("-");
+}
+
 /** `fiscal-<stem>.png`, named like the workbook of the same view (DESIGN.md §7.17). */
 export function pictureFilename(stem: string, locale: Locale): string {
   return `fiscal-${stem}${locale === "en" ? "-en" : ""}.png`;

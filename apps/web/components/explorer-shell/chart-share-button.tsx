@@ -4,14 +4,14 @@ import { Copy, Download, Share, Share2 } from "lucide-react";
 import { useEffect, useId, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { canCopyPicture, canSharePicture, copyPicture, downloadPicture, renderPicture, sharePicture } from "../../lib/explorer/chartPicture.client";
-import { pictureFilename } from "../../lib/explorer/workbookModel";
+import { pictureFilename, pictureStem } from "../../lib/explorer/workbookModel";
 import { message } from "../../lib/i18n/messages";
 import { useI18n } from "../../lib/i18n/provider";
 import { ShareCard, type ShareCardProps } from "./share-card";
 
 type ChartShareButtonProps = ShareCardProps & {
-  /** The file name's stem, as the page's workbook names it: `wages-overview-1995-2025`. */
-  fileStem: string;
+  /** The years shown, for the file name: `1995-2025`, or `2024` for a single year. */
+  period: string;
   testId?: string;
 };
 
@@ -31,7 +31,7 @@ const settle = () => new Promise<void>((resolve) => requestAnimationFrame(() => 
 // Its menu downloads, copies or device-shares a picture of the chart as selected. Opening the menu
 // starts the picture, from a ShareCard mounted off-screen until it is drawn, so that by the time an
 // item is chosen it is usually ready: Safari copies and shares only close to the reader's tap.
-export function ChartShareButton({ fileStem, testId = "chart-share", ...card }: ChartShareButtonProps) {
+export function ChartShareButton({ period, testId = "chart-share", ...card }: ChartShareButtonProps) {
   const { locale, messages } = useI18n();
   const t = (key: string) => message(messages, `controls.share.${key}`);
   const menuId = useId();
@@ -77,7 +77,7 @@ export function ChartShareButton({ fileStem, testId = "chart-share", ...card }: 
     busy.current = true;
     close();
     setStatus("working");
-    const filename = pictureFilename(fileStem, locale);
+    const filename = pictureFilename(pictureStem(window.location.pathname, period), locale);
     try {
       if (action === "copy") {
         await copyPicture(blob);

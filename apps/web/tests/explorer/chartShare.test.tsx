@@ -24,7 +24,7 @@ describe("share card", () => {
 
 describe("share button", () => {
   it("a closed share button is a labelled disclosure with no menu", () => {
-    const html = renderGeorgianMarkup(<ChartShareButton title="t" caption="c" source="s" chart={<svg />} fileStem="x" />);
+    const html = renderGeorgianMarkup(<ChartShareButton title="t" caption="c" source="s" chart={<svg />} period="2025" />);
     expect(html).toContain('data-testid="chart-share"');
     expect(html).toContain('aria-expanded="false"');
     expect(html).toContain("გაზიარება");
@@ -32,6 +32,6 @@ describe("share button", () => {
   });
 
   it("reads Share on the English page", () => {
-    expect(renderPageMarkup("en", <ChartShareButton title="t" caption="c" source="s" chart={<svg />} fileStem="x" />)).toContain(">Share<");
+    expect(renderPageMarkup("en", <ChartShareButton title="t" caption="c" source="s" chart={<svg />} period="2025" />)).toContain(">Share<");
   });
 });
