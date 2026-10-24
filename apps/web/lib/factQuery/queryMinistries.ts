@@ -135,14 +135,14 @@ export function queryMinistries(
   // isDerivedTotalItemId then strips any row that is itself the derived
   // admin total (none exist in the reviewed CSV today - verified: no
   // "admin_spending.total" item_id row in
-  // data/imports/admin-spending-facts-2004-2025.csv - but the total below
+  // data/imports/admin-spending-facts-2004-2025.csv or the 2026 planned file - but the total below
   // must never double-count one if a future row ever adds it).
   const categoryFacts = facts.filter((f) => f.level === "admin_category" && !isDerivedTotalItemId(f.itemId));
   const programFacts = facts.filter((f) => f.level === "major_program");
   const levelFacts = input.level === "admin_category" ? categoryFacts : programFacts;
 
   // The dataset's overall coverage, not the requested level's: a program
-  // year inside 2004-2025 but outside that program's own coverage is a
+  // year inside the dataset's years but outside that program's own coverage is a
   // missing cell, never an out-of-range error (brief, "Coverage is ragged").
   const datasetYears = Array.from(new Set(facts.map((f) => f.year))).sort((a, b) => a - b);
   const minYear = datasetYears[0];

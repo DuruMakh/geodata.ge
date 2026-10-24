@@ -189,7 +189,8 @@ model ImportRun {
   populationFacts       MunicipalPopulationFact[]
 }
 
-// Mirror of data/imports/budget-facts-2004-2025.csv.
+// Mirror of data/imports/budget-facts-2004-2025.csv plus the planned-year
+// data/imports/expenditure-facts-2026-planned.csv (basis planned).
 // id is deterministic: `${year}:${side}:${itemId}:${basis}`.
 // itemId is deliberately NOT a foreign key: the CSV contract also allows
 // explicit `revenue.total` / `expenditure.total` rows that have no taxonomy
@@ -218,8 +219,10 @@ model BudgetFact {
   @@index([itemId])
 }
 
-// Mirror of data/imports/admin-spending-facts-2004-2025.csv (ministries dataset,
-// admin_category rows plus major_program drill-down rows).
+// Mirror of data/imports/admin-spending-facts-2004-2025.csv plus the planned-year
+// data/imports/admin-spending-facts-2026-planned.csv (ministries dataset,
+// admin_category rows plus major_program drill-down rows; a year's planned rows
+// are dropped once it has actual rows, so (year, itemId) stays unique).
 // id is deterministic: `${year}:${itemId}`.
 // sourceId is deliberately NOT a foreign key: the CSV contract allows
 // `;`-joined multi-source values (see scripts/validate-data-files.ts); the

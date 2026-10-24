@@ -86,7 +86,7 @@ describe("csv served data", () => {
       loadAdminSpendingFacts(SERVED_DATA_FILES.adminSpendingPlannedFacts),
       loadReviewedAdminSpendingFacts(),
     ]);
-    expect(reviewedAdmin).toEqual([...baseAdmin, ...plannedAdmin]);
+    expect(reviewedAdmin).toEqual([...baseAdmin, ...resolvePlannedAdminSpendingFacts(baseAdmin, plannedAdmin)]);
   });
 
   it("keeps planned admin rows only for years without admin actuals", () => {
