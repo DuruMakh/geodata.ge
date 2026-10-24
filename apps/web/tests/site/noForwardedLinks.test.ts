@@ -7,14 +7,12 @@ import { ALL_DATA_PATH, LEGACY_TOPIC_FORWARDS, groupOfTopic, navGroup, topicSect
 // Ruling R8 (spec 2026-10-24-explorer-regroup §3.1): the old topic hub addresses only forward. No breadcrumb, structured
 // data or link the pages and the landing build may point at one; they point at the topic's section on its group page.
 const root = path.resolve(__dirname, "../..");
-// The sidebar is replaced by the group navigation in a later task.
-const SKIPPED = new Set(["components/shell/data-sidebar.tsx"]);
 
 function sources(dir: string): string[] {
   return readdirSync(path.join(root, dir), { withFileTypes: true }).flatMap((entry) => {
     const file = `${dir}/${entry.name}`;
     if (entry.isDirectory()) return sources(file);
-    return /\.tsx?$/.test(entry.name) && !SKIPPED.has(file) ? [file] : [];
+    return /\.tsx?$/.test(entry.name) ? [file] : [];
   });
 }
 

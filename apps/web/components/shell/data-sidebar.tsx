@@ -1,115 +1,123 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { ChevronsLeft, ChevronsRight, House, Menu, X } from "lucide-react";
+import { useCallback, useEffect, useReducer, useRef, useState, type MouseEvent } from "react";
+import { flushSync } from "react-dom";
+import { ChevronRight, LayoutGrid, Menu, PanelLeftClose, PanelLeftOpen, Search, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { SectionNav, SidebarSectionLink } from "./section-nav";
+import { GROUP_ICONS } from "./group-icons";
+import { SidebarSectionLink } from "./section-nav";
+import { initialSidebarState, isRailed, sidebarReducer } from "./sidebar-state";
+import { SEARCH_PATH, useSlashSearch } from "./use-slash-search";
 import { LanguageSwitch } from "../site/language-switch";
+import { focusExplorerSearch } from "../explorer-groups/explorer-search-focus";
 import { useI18n } from "../../lib/i18n/provider";
 import { message } from "../../lib/i18n/messages";
 import { pageHref, splitLanguagePath } from "../../lib/i18n/routes";
-import { BUDGET_HUB_PATH, NAV_TREE, currentEntry, openHub } from "../../lib/navigation/navTree";
+import { pagesLabel } from "../../lib/explorer/pagesLabel";
+import { ALL_DATA_PATH, NAV_GROUPS, PAGE_COUNT, currentEntry, currentGroup, groupPages, topicHub, type GroupId } from "../../lib/navigation/navTree";
 
-// Platform sidebar (DESIGN.md §6.7). Two desktop states — 232px expanded and a
-// 52px reading rail — plus a top bar with a sheet below 900px. Fiscal.ge is a data
-// platform whose first dataset is the budget.
+// The explorer sidebar (spec 2026-10-24-explorer-regroup §4, DESIGN.md §6.7): from 900px a 272px column or a 72px icon
+// rail whose groups open a 320px pop-out; below 900px a 56px bar whose menu opens this same column full screen.
 
 const STORAGE_KEY = "geodata:sidebar-collapsed";
 const DESKTOP_MIN_WIDTH = 900;
-const MOBILE_NAV_ID = "data-sidebar-navigation";
+const NAV_ID = "data-sidebar-navigation";
+const ACTIVE_BG = "bg-[rgba(247,242,233,0.07)]";
+const COUNT = "ml-auto pl-2 font-[family-name:var(--font-numeric)] text-[11px] font-normal text-[var(--ink-fg-muted)]";
+const ICON = { "aria-hidden": true, size: 18, strokeWidth: 1.5, className: "flex-none" } as const;
+
+const panelId = (id: GroupId) => `sidebar-group-${id}`;
+const groupLinkId = (id: GroupId) => `sidebar-group-link-${id}`;
+
+function BrandMark({ testId }: { testId?: string }) {
+  // Local SVG brand asset; native img avoids adding a raster optimization path.
+  // eslint-disable-next-line @next/next/no-img-element
+  return <img data-testid={testId} src="/brand/fiscal-logo-mark-reversed.svg" width="520" height="650" alt="" className="h-auto w-6 flex-none" />;
+}
 
 export function DataSidebar() {
   const { locale, messages } = useI18n();
-  const [collapsed, setCollapsed] = useState(false);
-  const [sheetOpen, setSheetOpen] = useState(false);
-  // Unknown until mounted: the server cannot see the width, and the toggle's state and
-  // label differ by it (the rail on desktop, the closed sheet on a phone).
-  const [isDesktop, setIsDesktop] = useState<boolean | null>(null);
-  const [animateWidth, setAnimateWidth] = useState(false);
-  const toggleRef = useRef<HTMLButtonElement>(null);
-  const asideRef = useRef<HTMLElement>(null);
   const pathname = usePathname();
-  // The navigation tree's addresses carry no language prefix.
+  // The navigation config's addresses carry no language prefix.
   const page = splitLanguagePath(pathname).pathname;
-  const activeHub = openHub(page);
+  const [state, dispatch] = useReducer(sidebarReducer, page, initialSidebarState);
+  // The explorer layout persists across its pages, so arriving at one is a render with a new page, not a new sidebar.
+  if (state.page !== page) dispatch({ type: "navigate", page });
+  const [animateWidth, setAnimateWidth] = useState(false);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
+  const closeRef = useRef<HTMLButtonElement>(null);
+  const focusAfterMenu = useRef<"close" | "menu" | null>(null);
+  const railed = isRailed(state);
   const current = currentEntry(page);
+  const currentGroupId = currentGroup(page)?.id;
 
-  // Read after mount: the server render cannot see localStorage, and guessing
-  // would flash the wrong width on every load.
+  // Read after mount: the server render cannot see localStorage, and guessing would flash the wrong width on every load.
   useEffect(() => {
     try {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setCollapsed(window.localStorage.getItem(STORAGE_KEY) === "1");
+      dispatch({ type: "collapse", collapsed: window.localStorage.getItem(STORAGE_KEY) === "1" });
     } catch {
-      // Storage access denials (blocked cookies, sandboxed iframes) must not
-      // break the render — default to expanded.
+      // Storage access denials (blocked cookies, sandboxed iframes) must not break the render — default to expanded.
     }
   }, []);
 
   useEffect(() => {
     const query = window.matchMedia(`(min-width: ${DESKTOP_MIN_WIDTH}px)`);
-    const sync = () => {
-      setIsDesktop(query.matches);
-      // A sheet opened below 900px must not survive into the desktop rail —
-      // otherwise a stray Escape keypress anywhere on the page steals focus.
-      if (query.matches) setSheetOpen(false);
-    };
+    const sync = () => dispatch({ type: "width", desktop: query.matches });
     sync();
     query.addEventListener("change", sync);
     return () => query.removeEventListener("change", sync);
   }, []);
 
-  // The explorer layout persists across section routes, so navigating never
-  // unmounts the sheet. Close it on arrival or the user lands on the nav list
-  // they just used — and a phone has no Escape key to undo that.
+  // The menu works as a modal: opening it hands focus to its close button, closing it hands focus back to the button
+  // that opened it, once the bar is shown again.
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setSheetOpen(false);
-  }, [pathname]);
+    const target = focusAfterMenu.current;
+    focusAfterMenu.current = null;
+    if (target === "close") closeRef.current?.focus();
+    if (target === "menu") menuButtonRef.current?.focus();
+  }, [state.menu]);
+
+  const closeMenu = useCallback(() => {
+    focusAfterMenu.current = "menu";
+    dispatch({ type: "menu", open: false });
+  }, []);
 
   useEffect(() => {
-    if (!sheetOpen) return;
+    if (!state.menu && !state.fly) return;
+    const fly = state.fly;
     const onKey = (event: KeyboardEvent) => {
       if (event.key !== "Escape") return;
-      setSheetOpen(false);
-      // Escape usually arrives with focus on a link inside the sheet, which is
-      // about to become display:none — hand focus back rather than drop it.
-      toggleRef.current?.focus();
-    };
-    // The open panel now covers the page, so a tap on the page below it closes it.
-    const onPointerDown = (event: PointerEvent) => {
-      if (event.target instanceof Node && !asideRef.current?.contains(event.target)) setSheetOpen(false);
+      if (state.menu) {
+        closeMenu();
+        return;
+      }
+      // Focus goes back to the rail icon the pop-out hangs from before it closes, or it would be lost with the list.
+      if (fly) document.getElementById(groupLinkId(fly))?.focus();
+      dispatch({ type: "fly", id: null });
     };
     window.addEventListener("keydown", onKey);
-    document.addEventListener("pointerdown", onPointerDown);
-    return () => {
-      window.removeEventListener("keydown", onKey);
-      document.removeEventListener("pointerdown", onPointerDown);
-    };
-  }, [sheetOpen]);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [state.menu, state.fly, closeMenu]);
 
-  // Collapse is a desktop posture. A preference set on a laptop must not follow
-  // the user to a phone, where it would render as a mystery-narrow rail.
-  const railed = collapsed && isDesktop === true;
-  // One control, two jobs, so "expanded" means different things by width: the
-  // rail on desktop, the sheet on mobile. The label, the glyph and aria-expanded
-  // must all describe whichever one the next click will change. Before the width
-  // is known the toggle states nothing: a neutral "Menu" and no aria-expanded.
-  const navVisible = isDesktop === null ? undefined : isDesktop ? !railed : sheetOpen;
+  // On All data the search box is already on the page, under the menu while it is open: the menu closes first.
+  const focusSearchHere = useCallback(() => {
+    flushSync(() => dispatch({ type: "menu", open: false }));
+    return focusExplorerSearch();
+  }, []);
+  useSlashSearch(focusSearchHere);
 
-  function handleToggle() {
-    if (!isDesktop) {
-      setSheetOpen((open) => !open);
-      return;
-    }
-    // Arm the width transition on the first click, not on mount: a browser
-    // starts a transition whenever the transition property and the width land in
-    // the same style change, so a mount-time class would animate the restored
-    // rail on every cold load (DESIGN.md §14: nothing animates on load).
+  function onSearchClick(event: MouseEvent<HTMLAnchorElement>) {
+    // A link to /explorer#q= from /explorer itself fires no hashchange, so the page would not see it.
+    if (focusSearchHere()) event.preventDefault();
+  }
+
+  function toggleCollapsed() {
+    // Arm the width transition on the first click, not on mount: a mount-time class would animate the restored rail on
+    // every cold load (DESIGN.md §14: nothing animates on load).
     setAnimateWidth(true);
-    const next = !collapsed;
-    setCollapsed(next);
+    const next = !state.collapsed;
+    dispatch({ type: "collapse", collapsed: next });
     try {
       window.localStorage.setItem(STORAGE_KEY, next ? "1" : "0");
     } catch {
@@ -117,142 +125,223 @@ export function DataSidebar() {
     }
   }
 
-  return (
-    <aside
-      aria-label={message(messages, "common.dataPanel")}
-      data-testid="data-sidebar"
-      data-collapsed={railed ? "true" : "false"}
-      ref={asideRef}
-      className={`sticky top-0 z-30 flex w-full flex-none flex-col bg-[var(--ink)] px-4 pt-[max(6px,env(safe-area-inset-top))] pb-1.5 min-[900px]:h-screen min-[900px]:pt-[18px] min-[900px]:pb-4 ${
-        animateWidth ? "transition-[width] duration-150 ease-in-out" : ""
-      } ${railed ? "min-[900px]:w-[52px] min-[900px]:px-3" : "min-[900px]:w-[232px]"}`}
-    >
-      <div className="flex items-center justify-between gap-2.5">
-        {railed ? null : (
-          // Reload across the Explorer/public layout boundary so stale route metadata cannot remain in <head>.
-          <a
-            href={pageHref("/", locale)}
-            aria-label={message(messages, "common.brandHome")}
-            className="flex min-w-0 items-center gap-2.5 no-underline max-[900px]:min-h-11"
-          >
-            {/* Local SVG brand asset; native img avoids adding a raster optimization path. */}
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              data-testid="sidebar-brand-mark"
-              src="/brand/fiscal-logo-mark-reversed.svg"
-              width="520"
-              height="650"
-              alt=""
-              className="h-auto w-[30px] flex-none"
-            />
-            <span className="flex min-w-0 flex-col gap-0.5">
-              <span className="font-[family-name:var(--font-display)] text-base font-bold text-[var(--paper)]">
-                Fiscal.ge
-              </span>
-              <span className="font-[family-name:var(--font-numeric)] text-[11px] min-[768px]:text-[8.5px] tracking-[0.1em] text-[var(--ink-fg-faint)]">
-                {message(messages, "common.openData")}
-              </span>
-            </span>
-          </a>
-        )}
-        <button
-          ref={toggleRef}
-          type="button"
-          data-testid="sidebar-toggle"
-          aria-expanded={navVisible}
-          aria-controls={isDesktop === false ? MOBILE_NAV_ID : undefined}
-          aria-label={message(messages, isDesktop ? (navVisible ? "common.collapsePanel" : "common.expandPanel") : "common.menu")}
-          onClick={handleToggle}
-          className="-mr-2 flex size-11 flex-none cursor-pointer items-center justify-center rounded-[3px] font-[family-name:var(--font-numeric)] text-[11px] text-[var(--ink-fg-muted)] hover:text-[var(--paper)] min-[900px]:mr-0 min-[900px]:size-[26px] min-[900px]:border min-[900px]:border-[rgba(247,242,233,0.18)]"
-        >
-          {/* Below 900px this is the site-wide ☰ menu (the landing header uses the
-              same Menu/X pair); the chevrons belong to the desktop collapse only.
-              CSS picks the glyph so the first paint is right before hydration. */}
-          {sheetOpen ? <X aria-hidden="true" size={22} strokeWidth={1.5} className="min-[900px]:hidden" /> : <Menu aria-hidden="true" size={22} strokeWidth={1.5} className="min-[900px]:hidden" />}
-          {railed ? <ChevronsRight aria-hidden="true" size={18} strokeWidth={1.5} className="hidden min-[900px]:block" /> : <ChevronsLeft aria-hidden="true" size={18} strokeWidth={1.5} className="hidden min-[900px]:block" />}
-        </button>
-      </div>
+  const searchLabel = message(messages, "common.searchAll");
+  const searchHref = pageHref(SEARCH_PATH, locale);
+  const onAllData = page === ALL_DATA_PATH;
 
-      {railed ? (
-        <>
-          <p
-            className="mt-6 flex-1 font-[family-name:var(--font-numeric)] text-[11px] min-[768px]:text-[9.5px] tracking-[0.1em] text-[var(--ink-fg-faint)]"
-            style={{ writingMode: "vertical-rl", transform: "rotate(180deg)" }}
-          >
-            {message(messages, activeHub.railLabelKey)}
-          </p>
-          <div className="self-center text-[var(--ink-fg-muted)]"><LanguageSwitch compact /></div>
-          <Link
-            href={pageHref("/", locale)}
-            prefetch={false}
-            aria-label={message(messages, "common.home")}
-            title={message(messages, "common.home")}
-            className="mt-auto flex size-[26px] items-center justify-center self-center text-[var(--ink-fg-muted)] no-underline hover:text-[var(--paper)]"
-          >
-            <House aria-hidden="true" size={18} strokeWidth={1.5} />
-          </Link>
-        </>
-      ) : (
-        // Below 900px the bar is pinned, so the open panel hangs from it over the
-        // page and scrolls on its own: an in-flow panel inside a pinned bar would
-        // grow the document above the reader's position and jump the page. From
-        // 900px the expanded panel scrolls inside the full-height bar when its links overflow; its 4px inner
-        // padding keeps the 2px focus ring (offset 2px) from being clipped by the scroll box.
-        <div
-          id={MOBILE_NAV_ID}
-          className={`${sheetOpen ? "flex" : "hidden min-[900px]:flex"} flex-1 flex-col max-[900px]:absolute max-[900px]:inset-x-0 max-[900px]:top-full max-[900px]:max-h-[calc(100dvh-56px-env(safe-area-inset-top))] max-[900px]:overflow-y-auto max-[900px]:overscroll-contain max-[900px]:border-b max-[900px]:border-[rgba(247,242,233,0.12)] max-[900px]:bg-[var(--ink)] max-[900px]:px-4 max-[900px]:pb-4 min-[900px]:flex-col min-[900px]:min-h-0 min-[900px]:overflow-y-auto min-[900px]:-mx-1 min-[900px]:px-1 min-[900px]:pb-1`}
+  return (
+    <>
+      <header
+        data-testid="sidebar-topbar"
+        className={`${state.menu ? "hidden" : "flex"} sticky top-0 z-40 h-[calc(56px+env(safe-area-inset-top))] flex-none items-center gap-1 bg-[var(--ink)] pt-[env(safe-area-inset-top)] pr-1.5 pl-4 text-[var(--paper)] min-[900px]:hidden`}
+      >
+        {/* Reload across the Explorer/public layout boundary so stale route metadata cannot remain in <head>. */}
+        <a href={pageHref("/", locale)} aria-label={message(messages, "common.brandHome")} className="mr-auto flex min-h-11 items-center gap-2.5 font-[family-name:var(--font-display)] text-[17px] font-semibold text-[var(--paper)] no-underline">
+          <BrandMark />
+          <span>Fiscal.ge</span>
+        </a>
+        <Link href={searchHref} prefetch={false} data-testid="topbar-search" aria-label={searchLabel} onClick={onSearchClick} className="flex size-11 items-center justify-center text-[var(--paper)]">
+          <Search aria-hidden="true" size={22} strokeWidth={1.5} />
+        </Link>
+        <button
+          ref={menuButtonRef}
+          type="button"
+          data-testid="sidebar-menu-button"
+          aria-label={message(messages, "common.menu")}
+          aria-expanded={state.menu}
+          aria-controls={NAV_ID}
+          onClick={() => {
+            focusAfterMenu.current = "close";
+            dispatch({ type: "menu", open: true });
+          }}
+          className="flex size-11 cursor-pointer items-center justify-center text-[var(--paper)]"
         >
-          <div aria-hidden className="mt-4 mb-3.5 h-px bg-[rgba(247,242,233,0.12)] max-[900px]:mt-0" />
-          <p className="mb-3 font-[family-name:var(--font-numeric)] text-[11px] min-[768px]:text-[9.5px] tracking-[0.12em] text-[var(--ink-fg-faint)]">
-            {message(messages, "common.dataSection")}
-          </p>
-          {/* Every link closes the sheet here, the current page's included: the pathname effect above never fires for it. */}
-          <nav aria-label={message(messages, "common.datasets")} className="flex flex-col gap-0.5" onClick={(event) => { if ((event.target as Element).closest("a")) setSheetOpen(false); }}>
-            {/* Each hub is a list item and its pages a nested list (U02-09); the list boxes carry the gaps the rows had as siblings. */}
-            <ul className="flex list-none flex-col gap-0.5">
-              {NAV_TREE.map((hub) => {
-                const open = hub === activeHub;
-                return (
-                  <li key={hub.href} className={`${hub.spaced ? "mt-2 max-[900px]:mt-0 " : ""}flex flex-col gap-0.5`}>
-                    <Link
-                      href={pageHref(hub.href, locale)}
-                      prefetch={false}
-                      data-testid={hub.testId}
-                      aria-current={current === hub.href ? "page" : undefined}
-                      className={`flex items-baseline gap-2 border-l-2 max-[900px]:min-h-11 max-[900px]:items-center px-2.5 py-2 text-[12.5px] font-semibold no-underline ${open ? "border-[var(--accent)] bg-[rgba(247,242,233,0.07)] text-[var(--paper)]" : "border-transparent text-[var(--ink-fg-muted)]"}`}
-                    >
-                      {message(messages, hub.labelKey)}
-                    </Link>
-                    {/* Budget's sections render as SectionNav's list, with its coming-soon rows. */}
-                    {open && hub.href === BUDGET_HUB_PATH ? <SectionNav /> : null}
-                    {open && hub.href !== BUDGET_HUB_PATH ? (
-                      <ul className="flex list-none flex-col gap-0.5 pl-[18px]">
-                        {hub.sections.map((section) => (
-                          <li key={section.href}>
-                            <SidebarSectionLink
-                              href={pageHref(section.href, locale)}
-                              testId={section.testId}
-                              label={message(messages, section.labelKey)}
-                              active={current === section.href}
-                              current={page === section.href}
-                            />
-                          </li>
-                        ))}
-                      </ul>
-                    ) : null}
-                  </li>
-                );
-              })}
-            </ul>
-          </nav>
-          <div className="mt-auto border-t border-[rgba(247,242,233,0.12)] pt-3">
-            <div className="mb-2 text-[var(--ink-fg-muted)] max-[900px]:mb-0 max-[900px]:[&_a]:min-h-11"><LanguageSwitch /></div>
-            <Link href={pageHref("/", locale)} prefetch={false} data-testid="sidebar-back-home" className="text-[11.5px] font-medium text-[var(--ink-fg-muted)] no-underline hover:text-[var(--paper)] max-[900px]:flex max-[900px]:min-h-11 max-[900px]:w-full max-[900px]:items-center max-[900px]:px-2.5 max-[900px]:text-[12.5px]">
-              {message(messages, "common.backHome")}
-            </Link>
-          </div>
+          <Menu aria-hidden="true" size={22} strokeWidth={1.5} />
+        </button>
+      </header>
+
+      <nav
+        id={NAV_ID}
+        aria-label={message(messages, "common.dataPanel")}
+        data-testid="data-sidebar"
+        data-collapsed={railed ? "true" : "false"}
+        data-menu-open={state.menu ? "true" : undefined}
+        // Every link closes the menu, the current page's included: arriving at a new page closes it, but that one is no arrival.
+        onClick={(event) => {
+          if ((event.target as Element).closest("a")) dispatch({ type: "menu", open: false });
+        }}
+        className={`${state.menu ? "flex max-[900px]:fixed max-[900px]:inset-0 max-[900px]:z-[60] max-[900px]:overflow-y-auto max-[900px]:overscroll-contain max-[900px]:px-3.5 max-[900px]:pt-[max(10px,env(safe-area-inset-top))] max-[900px]:pb-[22px]" : "hidden"} flex-col bg-[var(--ink)] text-[var(--paper)] [scrollbar-color:var(--ink-line)_transparent] [scrollbar-width:thin] min-[900px]:sticky min-[900px]:top-0 min-[900px]:z-30 min-[900px]:flex min-[900px]:h-screen min-[900px]:flex-none ${
+          railed ? "min-[900px]:w-[72px] min-[900px]:px-2.5 min-[900px]:py-4" : "min-[900px]:w-[272px] min-[900px]:overflow-y-auto min-[900px]:px-3 min-[900px]:pt-[18px] min-[900px]:pb-3.5"
+        } ${animateWidth ? "transition-[width] duration-150 ease-in-out" : ""}`}
+      >
+        <div className={`flex items-center ${railed ? "flex-col gap-3.5" : "min-h-10 gap-2 pr-0.5 pl-1.5"}`}>
+          <a href={pageHref("/", locale)} aria-label={message(messages, "common.brandHome")} className={`flex min-w-0 items-center gap-2.5 no-underline max-[900px]:min-h-11 ${railed ? "" : "mr-auto"}`}>
+            <BrandMark testId="sidebar-brand-mark" />
+            {railed ? null : (
+              <span className="flex min-w-0 flex-col">
+                <span className="font-[family-name:var(--font-display)] text-[17px] leading-[1.1] font-semibold text-[var(--paper)]">Fiscal.ge</span>
+                <span className="mt-[3px] font-[family-name:var(--font-numeric)] text-[10.5px] text-[var(--ink-fg-muted)]">{message(messages, "common.openData")}</span>
+              </span>
+            )}
+          </a>
+          <button
+            type="button"
+            data-testid="sidebar-toggle"
+            aria-expanded={!railed}
+            aria-label={message(messages, railed ? "common.expandPanel" : "common.collapsePanel")}
+            onClick={toggleCollapsed}
+            className="flex size-9 flex-none cursor-pointer items-center justify-center border border-[var(--ink-line)] text-[var(--ink-fg-muted)] transition-colors duration-150 hover:border-[rgba(247,242,233,0.18)] hover:text-[var(--paper)] max-[900px]:hidden"
+          >
+            {railed ? <PanelLeftOpen {...ICON} /> : <PanelLeftClose {...ICON} />}
+          </button>
+          {state.menu ? (
+            <button ref={closeRef} type="button" data-testid="sidebar-close" aria-label={message(messages, "common.closeMenu")} onClick={closeMenu} className="flex size-11 flex-none cursor-pointer items-center justify-center border border-[var(--ink-line)] text-[var(--ink-fg-muted)] hover:text-[var(--paper)] min-[900px]:hidden">
+              <X aria-hidden="true" size={22} strokeWidth={1.5} />
+            </button>
+          ) : null}
         </div>
-      )}
-    </aside>
+
+        <Link
+          href={searchHref}
+          prefetch={false}
+          data-testid="sidebar-search"
+          aria-label={searchLabel}
+          title={railed ? searchLabel : undefined}
+          onClick={onSearchClick}
+          className={`mt-[18px] flex min-h-10 w-full items-center gap-2.5 border border-[var(--ink-line)] text-[13px] text-[var(--ink-fg-muted)] no-underline transition-colors duration-150 hover:border-[rgba(247,242,233,0.18)] hover:text-[var(--paper)] max-[900px]:min-h-12 max-[900px]:text-sm ${railed ? "justify-center" : "pr-2 pl-2.5"}`}
+        >
+          <Search {...ICON} />
+          {railed ? null : (
+            <>
+              <span>{searchLabel}</span>
+              <kbd className="ml-auto border border-[var(--ink-line)] px-1.5 font-[family-name:var(--font-numeric)] text-[11px] leading-5">/</kbd>
+            </>
+          )}
+        </Link>
+
+        <Link
+          href={pageHref(ALL_DATA_PATH, locale)}
+          prefetch={false}
+          data-testid="all-data-link"
+          aria-current={onAllData ? "page" : undefined}
+          aria-label={message(messages, "common.allData")}
+          title={railed ? message(messages, "common.allData") : undefined}
+          className={`mt-2.5 flex min-h-[42px] items-center gap-2.5 text-[13.5px] font-semibold text-[var(--paper)] no-underline hover:bg-[rgba(247,242,233,0.07)] max-[900px]:min-h-12 ${railed ? "justify-center" : "px-2.5"} ${onAllData ? `${ACTIVE_BG} shadow-[inset_2px_0_0_var(--accent)]` : ""}`}
+        >
+          <LayoutGrid {...ICON} />
+          {railed ? null : (
+            <>
+              <span>{message(messages, "common.allData")}</span>
+              <span className={COUNT}>{PAGE_COUNT}</span>
+            </>
+          )}
+        </Link>
+
+        {railed ? null : <p className="mx-2.5 mt-5 mb-1.5 font-[family-name:var(--font-numeric)] text-[10.5px] tracking-[0.06em] text-[var(--ink-fg-faint)]">{message(messages, "common.hubsOverline")}</p>}
+        <ul className={`list-none ${railed ? "mt-4" : ""}`}>
+          {NAV_GROUPS.map((group) => {
+            const { id, href, topics } = group;
+            const Icon = GROUP_ICONS[id];
+            const name = message(messages, group.labelKey);
+            const pages = groupPages(group).length;
+            const open = railed ? state.fly === id : state.open.has(id);
+            const isCurrent = currentGroupId === id;
+            return (
+              <li
+                key={id}
+                className="border-t border-[var(--ink-divider)]"
+                onMouseEnter={railed ? () => dispatch({ type: "fly", id }) : undefined}
+                onMouseLeave={railed ? () => dispatch({ type: "fly", id: null }) : undefined}
+                onFocus={railed ? () => dispatch({ type: "fly", id }) : undefined}
+                onBlur={railed ? (event) => {
+                  if (!event.currentTarget.contains(event.relatedTarget)) dispatch({ type: "fly", id: null });
+                } : undefined}
+              >
+                <div className="flex items-stretch">
+                  <Link
+                    id={groupLinkId(id)}
+                    href={pageHref(href, locale)}
+                    prefetch={false}
+                    data-testid={`group-link-${id}`}
+                    aria-current={page === href ? "page" : undefined}
+                    aria-label={`${name}, ${pagesLabel(messages, pages)}`}
+                    className={`group/link flex min-w-0 flex-1 items-start gap-2.5 no-underline max-[900px]:min-h-11 ${railed ? "justify-center py-[13px]" : "py-2.5 pr-1 pl-2.5 max-[900px]:py-[13px]"} ${isCurrent ? "text-[var(--paper)] shadow-[inset_2px_0_0_var(--accent)]" : "text-[var(--ink-fg-muted)]"} ${railed && open ? `${ACTIVE_BG} text-[var(--paper)]` : ""}`}
+                  >
+                    <Icon {...ICON} className="mt-px flex-none" />
+                    {railed ? null : (
+                      <>
+                        <span className="text-[13.5px] leading-[1.38] font-semibold text-[var(--paper)] decoration-[var(--accent)] decoration-[1.5px] underline-offset-[3px] group-hover/link:underline">{name}</span>
+                        <span className={`${COUNT} pt-0.5`}>{pages}</span>
+                      </>
+                    )}
+                  </Link>
+                  {railed ? null : (
+                    <button
+                      type="button"
+                      data-testid={`group-toggle-${id}`}
+                      aria-expanded={open}
+                      aria-controls={panelId(id)}
+                      aria-label={message(messages, open ? "common.groupToggleClose" : "common.groupToggleOpen", { name })}
+                      onClick={() => dispatch({ type: "toggleGroup", id })}
+                      className="flex w-9 flex-none cursor-pointer items-start justify-center pt-[11px] text-[var(--ink-fg-faint)] hover:text-[var(--paper)] max-[900px]:w-12 max-[900px]:pt-[13px]"
+                    >
+                      <ChevronRight aria-hidden="true" size={16} strokeWidth={1.5} className={`transition-transform duration-200 ${open ? "rotate-90" : ""}`} />
+                    </button>
+                  )}
+                </div>
+                {open ? (
+                  <div
+                    id={panelId(id)}
+                    data-testid={`group-panel-${id}`}
+                    className={railed
+                      ? "absolute top-0 bottom-0 left-full z-40 w-[320px] overflow-y-auto border-l border-[var(--ink-line)] bg-[var(--ink)] px-[22px] pt-[22px] pb-6 shadow-[14px_0_36px_rgba(30,27,22,0.16)]"
+                      : "pr-1.5 pb-3 pl-[38px]"}
+                  >
+                    {railed ? (
+                      <p className="mb-2 border-b border-[var(--ink-line)] pb-3 font-[family-name:var(--font-display)] text-xl leading-[1.3] font-semibold text-[var(--paper)]">
+                        <Link href={pageHref(href, locale)} prefetch={false} className="no-underline decoration-[var(--accent)] underline-offset-4 hover:underline">{name}</Link>
+                        <span className="mt-1 block font-[family-name:var(--font-numeric)] text-[11px] font-normal text-[var(--ink-fg-faint)]">
+                          {topics.length > 1 ? `${message(messages, "common.topicsCount", { n: topics.length })} · ` : ""}{pagesLabel(messages, pages)}
+                        </span>
+                      </p>
+                    ) : null}
+                    {topics.map((topic) => (
+                      <div key={topic}>
+                        {topics.length > 1 ? <p className={`${railed ? "mt-4" : "mt-2.5"} mb-1 text-[11px] leading-[1.35] font-semibold text-[var(--ink-fg-faint)]`}>{message(messages, `common.topic.${topic}`)}</p> : null}
+                        <ul className="list-none border-l border-[var(--ink-line)]">
+                          {topicHub(topic).sections.map((section) => (
+                            <li key={section.href}>
+                              <SidebarSectionLink
+                                href={pageHref(section.href, locale)}
+                                testId={section.testId}
+                                label={message(messages, section.labelKey)}
+                                active={current === section.href}
+                                current={page === section.href}
+                              />
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    ))}
+                  </div>
+                ) : null}
+              </li>
+            );
+          })}
+        </ul>
+
+        <div className={`mt-auto flex flex-wrap items-center gap-x-3.5 gap-y-2.5 text-xs text-[var(--ink-fg-muted)] ${railed ? "justify-center pt-3.5" : "px-1.5 pt-[18px]"}`}>
+          <div className="max-[900px]:[&_a]:min-h-11"><LanguageSwitch compact={railed} /></div>
+          {railed ? null : (
+            <span className="flex items-center gap-1.5">
+              {/* Reload across the Explorer/public layout boundary, as the brand link does. */}
+              <a href={pageHref("/methodology", locale)} className="inline-flex min-h-6 items-center no-underline hover:text-[var(--paper)] max-[900px]:min-h-11">{message(messages, "common.methodology")}</a>
+              <span aria-hidden="true">·</span>
+              <a href={pageHref("/connect", locale)} className="inline-flex min-h-6 items-center no-underline hover:text-[var(--paper)] max-[900px]:min-h-11">{message(messages, "common.aiConnection")}</a>
+            </span>
+          )}
+        </div>
+      </nav>
+    </>
   );
 }

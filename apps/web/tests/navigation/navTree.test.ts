@@ -43,7 +43,7 @@ describe("the navigation tree", () => {
     const hubs = NAV_TREE.map((hub) => hub.href);
     expect(hubs.indexOf("/explorer/science-culture")).toBe(hubs.indexOf("/explorer/education") + 1);
     const hub = NAV_TREE.find((entry) => entry.href === "/explorer/science-culture")!;
-    expect(hub).toMatchObject({ labelKey: "common.scienceCulture", railLabelKey: "common.dataScienceCulture", testId: "science-culture-link" });
+    expect(hub).toMatchObject({ labelKey: "common.scienceCulture" });
     expect(hub.sections.map((section) => [section.href, section.testId])).toEqual(["research", "patents", "museums", "theatres"].map((id) => [`/explorer/science-culture/${id}`, `science-culture-${id}-link`]));
   });
 
@@ -51,7 +51,7 @@ describe("the navigation tree", () => {
     const hubs = NAV_TREE.map((hub) => hub.href);
     expect(hubs.indexOf("/explorer/education")).toBe(hubs.indexOf("/explorer/health") + 1);
     const hub = NAV_TREE.find((entry) => entry.href === "/explorer/education")!;
-    expect(hub).toMatchObject({ labelKey: "common.education", railLabelKey: "common.dataEducation", testId: "education-link" });
+    expect(hub).toMatchObject({ labelKey: "common.education" });
     expect(hub.sections.map((section) => [section.href, section.testId])).toEqual([
       ["/explorer/education/schools", "education-schools-link"],
       ["/explorer/education/kindergartens", "education-kindergartens-link"],
@@ -97,7 +97,7 @@ describe("the navigation tree", () => {
     const hubs = NAV_TREE.map((hub) => hub.href);
     expect(hubs.indexOf("/explorer/housing")).toBe(hubs.indexOf("/explorer/business") + 1);
     const hub = NAV_TREE.find((entry) => entry.href === "/explorer/housing")!;
-    expect(hub).toMatchObject({ labelKey: "common.housing", railLabelKey: "common.dataHousing", testId: "housing-link" });
+    expect(hub).toMatchObject({ labelKey: "common.housing" });
     expect(hub.sections.map((section) => [section.href, section.testId])).toEqual(["permits", "completed", "prices", "regions"].map((id) => [`/explorer/housing/${id}`, `housing-${id}-link`]));
   });
 
@@ -105,7 +105,7 @@ describe("the navigation tree", () => {
     const hubs = NAV_TREE.map((hub) => hub.href);
     expect(hubs.indexOf("/explorer/transport")).toBe(hubs.indexOf("/explorer/environment") + 1);
     const hub = NAV_TREE.find((entry) => entry.href === "/explorer/transport")!;
-    expect(hub).toMatchObject({ labelKey: "common.transport", railLabelKey: "common.dataTransport", testId: "transport-link" });
+    expect(hub).toMatchObject({ labelKey: "common.transport" });
     expect(hub.sections.map((section) => [section.href, section.testId])).toEqual(["vehicles", "vehicle-age", "passengers", "freight", "regions"].map((id) => [`/explorer/transport/${id}`, `transport-${id}-link`]));
   });
 
@@ -116,12 +116,12 @@ describe("the navigation tree", () => {
   });
 
   it("names every label in Georgian and English and gives each row its own test id", () => {
-    const keys = NAV_TREE.flatMap((hub) => [hub.labelKey, hub.railLabelKey, ...hub.sections.map((section) => section.labelKey)]);
+    const keys = NAV_TREE.flatMap((hub) => [hub.labelKey, ...hub.sections.map((section) => section.labelKey)]);
     for (const key of keys) {
       expect((kaCommon as Record<string, string>)[key], key).toBeTruthy();
       expect((enCommon as Record<string, string>)[key], key).toBeTruthy();
     }
-    const testIds = NAV_TREE.flatMap((hub) => [hub.testId, ...hub.sections.map((section) => section.testId)]).filter(Boolean);
+    const testIds = NAV_TREE.flatMap((hub) => hub.sections.map((section) => section.testId)).filter(Boolean);
     expect(new Set(testIds).size).toBe(testIds.length);
   });
 });

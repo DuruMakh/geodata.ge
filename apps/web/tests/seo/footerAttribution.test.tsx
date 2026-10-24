@@ -5,7 +5,7 @@ import { SiteFooter } from "../../components/site/site-footer";
 import { renderPageMarkup } from "../helpers/render-localized";
 
 const route = vi.hoisted(() => ({ pathname: "/en/explorer/deficit" }));
-vi.mock("next/navigation", () => ({ usePathname: () => route.pathname }));
+vi.mock("next/navigation", () => ({ usePathname: () => route.pathname, useRouter: () => ({ push: () => {} }) }));
 
 function footerText(markup: string) {
   const footer = markup.match(/<footer[\s\S]*?<\/footer>/)?.[0];

@@ -10,6 +10,8 @@
   --faint: #776E5C;
   --ink-fg-muted: #A69C8C;
   --ink-fg-faint: #8F8676;
+  --ink-divider: #2C2720;
+  --ink-line: #3A342B;
   --hairline: #D9CFBE;
   --hairline-soft: #E7DECF;
   --row-border: #EDE4D3;
@@ -150,6 +152,17 @@ summary:focus-visible {
   [data-testid="data-sidebar"] {
     transition: none;
   }
+}
+
+/* The explorer sidebar and its phone bar draw the focus ring in paper: the accent ring is only about 3:1 on ink. */
+[data-testid="data-sidebar"] :focus-visible,
+[data-testid="sidebar-topbar"] :focus-visible {
+  outline-color: var(--paper);
+}
+
+/* While the phone menu covers the page, the page is hidden and the skip link has nothing to skip to. */
+body:has([data-menu-open]) a[href="#content"] {
+  display: none;
 }
 
 /* Reserve the relief's cropped band before its scene loads. These bounds follow

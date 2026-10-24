@@ -12,7 +12,7 @@ import { loadServedUnemploymentData, UNEMPLOYMENT_GROUPS } from "../../lib/data/
 import type { ClientUnemploymentObservation } from "../../lib/data/unemployment/types";
 
 const navigation = vi.hoisted(() => ({ pathname: "/en/explorer/unemployment" }));
-vi.mock("next/navigation", async importOriginal => ({ ...await importOriginal<typeof import("next/navigation")>(), usePathname: () => navigation.pathname, useRouter: () => ({ replace: () => {} }) }));
+vi.mock("next/navigation", async importOriginal => ({ ...await importOriginal<typeof import("next/navigation")>(), usePathname: () => navigation.pathname, useRouter: () => ({ push: () => {}, replace: () => {} }) }));
 
 // The landing page is the Unemployment section of the Labour market page now (spec 2026-10-24-explorer-regroup §5).
 test.each(["ka", "en"] as const)("the %s Unemployment section offers eight cards in the approved order", async locale => {
@@ -45,19 +45,21 @@ for (const [section, breakdown] of [["overview", "national"], ["age", "age"], ["
   expect(metadata.alternates?.canonical).toEqual(expect.stringContaining(`${locale === "en" ? "/en" : ""}/explorer/unemployment/${section}`));
   expect(metadata.alternates?.languages).toMatchObject({ ka: expect.stringContaining(`/explorer/unemployment/${section}`), en: expect.stringContaining(`/en/explorer/unemployment/${section}`) });
 });
-test("navigation activates unemployment and leaves demography closed", async () => {
-  const markup = renderToStaticMarkup(<I18nProvider locale="en" messages={await getMessages("en", ["common", "controls"])}><DataSidebar /></I18nProvider>);
-  expect(markup).toMatch(/<a[^>]+data-testid="unemployment-link"[^>]+aria-current="page"/);
-  expect(markup).toContain('href="/en/explorer/unemployment"');
-  expect(markup).not.toContain('data-testid="demography-population-link"');
-  expect(markup).not.toContain('href="/en/explorer/expenditure"');
-  const budgetLink = /<a[^>]+href="\/en\/explorer"[^>]*>/.exec(markup)![0];
-  expect(budgetLink).not.toContain("border-[var(--accent)]");
-  const sectionLinks = [...markup.matchAll(/<a\b[^>]*data-testid="unemployment-(?:overview|regions|age|gender)-link"[^>]*>/g)].map(match => /href="([^"]+)"/.exec(match[0])![1]);
-  expect(sectionLinks).toEqual(["overview", "regions", "age", "gender"].map(section => `/en/explorer/unemployment/${section}`));
+test("navigation opens the Labour market group and leaves Demography closed", async () => {
+  navigation.pathname = "/en/explorer/unemployment/overview";
+  try {
+    const markup = renderToStaticMarkup(<I18nProvider locale="en" messages={await getMessages("en", ["common", "controls"])}><DataSidebar /></I18nProvider>);
+    expect(markup).toContain('data-testid="group-panel-labour"');
+    expect(markup).not.toContain('data-testid="demography-population-link"');
+    expect(markup).not.toContain('href="/en/explorer/expenditure"');
+    // The old hub address forwards, so nothing links it (spec 2026-10-24-explorer-regroup §3.1).
+    expect(markup).not.toContain('href="/en/explorer/unemployment"');
+    const sectionLinks = [...markup.matchAll(/<a\b[^>]*data-testid="unemployment-(?:overview|regions|age|gender)-link"[^>]*>/g)].map(match => /href="([^"]+)"/.exec(match[0])![1]);
+    expect(sectionLinks).toEqual(["overview", "regions", "age", "gender"].map(section => `/en/explorer/unemployment/${section}`));
+  } finally { navigation.pathname = "/en/explorer/unemployment"; }
 });
 
-test.each(["/explorer/unemployment/regions", "/en/explorer/unemployment/regions", "/explorer/unemployment/regions/tbilisi", "/en/explorer/unemployment/regions/tbilisi"])("%s keeps the unemployment menu active and marks Regions", async pathname => {
+test.each(["/explorer/unemployment/regions", "/en/explorer/unemployment/regions", "/explorer/unemployment/regions/tbilisi", "/en/explorer/unemployment/regions/tbilisi"])("%s keeps the Labour market group open and marks Regions", async pathname => {
   const locale = pathname.startsWith("/en/") ? "en" : "ka";
   navigation.pathname = pathname;
   try {
@@ -66,7 +68,7 @@ test.each(["/explorer/unemployment/regions", "/en/explorer/unemployment/regions"
     expect(currentLink).toContain(`href="${locale === "en" ? "/en" : ""}/explorer/unemployment/regions"`);
     expect(currentLink).toContain('aria-current="page"');
     expect(markup).not.toContain('href="/en/explorer/expenditure"');
-    expect(markup).not.toMatch(/data-testid="unemployment-link"[^>]+aria-current="page"/);
+    expect(markup).not.toMatch(/data-testid="group-link-labour"[^>]+aria-current="page"/);
   } finally { navigation.pathname = "/en/explorer/unemployment"; }
 });
 

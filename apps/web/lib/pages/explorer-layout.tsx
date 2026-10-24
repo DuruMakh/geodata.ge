@@ -10,9 +10,10 @@ export async function renderExplorerLayout(locale: Locale, children: ReactNode) 
   const messages = await getMessages(locale, ["controls"]);
   return (
     <I18nProvider locale={locale} messages={messages}>
-      <div className="flex min-h-screen flex-col bg-[var(--paper)] min-[900px]:flex-row">
+      {/* Below 900px the sidebar's open menu covers the screen, and the page behind it is hidden, so focus stays in the menu. */}
+      <div className="group/shell flex min-h-screen flex-col bg-[var(--paper)] min-[900px]:flex-row">
         <DataSidebar />
-        <div className="flex min-w-0 flex-1 flex-col">
+        <div className="flex min-w-0 flex-1 flex-col max-[900px]:group-has-[[data-menu-open]]/shell:hidden">
           <div id="content" tabIndex={-1} className="flex-1 outline-none">{children}</div>
           <div className="px-5 min-[768px]:px-[34px]">
             <div className="mx-auto max-w-[1180px]"><ExplorerFooter locale={locale} year={new Date().getFullYear()} /></div>
