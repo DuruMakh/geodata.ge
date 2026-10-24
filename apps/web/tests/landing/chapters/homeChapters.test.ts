@@ -132,6 +132,21 @@ describe("buildChapterSentences", () => {
     expect(other).not.toContain("პანდემიის");
   });
 
+  it("uses the last actual year and its pct when the series ends in projection years", () => {
+    const projected: DeficitChapter = {
+      years: [2020, 2024, 2025, 2026, 2027],
+      pctGdp: [-9.158, -2.1, -1.5, -2.4, -2.3],
+      gel: [-1, -1, -1, -1, -1],
+      projectionFrom: 2026,
+      deepest: { year: 2020, pct: -9.158 },
+      earlier: null,
+      surplusRun: null,
+    };
+    expect(sentences({ deficit: projected }).deficit).toBe(
+      "ზოგადი მთავრობის დეფიციტი 2025 წელს მშპ-ის 1.5% იყო; ყველაზე ღრმა — 9.2% — 2020 წელს, პანდემიის დროს.",
+    );
+  });
+
   it("the Tbilisi share phrase picks by share", () => {
     const phrase = (share: number, presentation: typeof ka | typeof en) =>
       sentences({ municipal: municipal(1_000, share * 1_000), presentation }).municipal;

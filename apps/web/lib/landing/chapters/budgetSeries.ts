@@ -10,7 +10,7 @@ import type { RevenueBandId, RevenueSeries, SpendingSeries } from "./types";
 // Chapters 02 and 03: per-year series from the same active facts (actual wins
 // over planned) that the explorer charts. Totals are sums of the plotted parts.
 
-const OTHER_UNCLASSIFIED_ID = "spending.other_unclassified";
+export const OTHER_UNCLASSIFIED_ID = "spending.other_unclassified";
 
 export const REVENUE_BANDS: Record<RevenueBandId, readonly string[]> = {
   vat: ["revenue.vat"],

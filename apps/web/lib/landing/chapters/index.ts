@@ -5,7 +5,7 @@ import { message } from "../../i18n/messages";
 import type { Presentation } from "../../i18n/types";
 import type { MethodologyHubEntry } from "../../methodology/types";
 import type { ServedBudgetFact } from "../../servedRows";
-import { buildRevenueSeries, buildSpendingSeries } from "./budgetSeries";
+import { OTHER_UNCLASSIFIED_ID, buildRevenueSeries, buildSpendingSeries } from "./budgetSeries";
 import { buildDeficitChapter } from "./deficit";
 import { buildMunicipalChapter } from "./municipalRelief";
 import { buildScaleChapter, type ScaleInput } from "./scale";
@@ -16,7 +16,6 @@ import type { DeficitChapter, HomeChapters, MunicipalChapter, RevenueSeries, Spe
 // the served inputs; the one-line ledes are sentences over those same models.
 
 const PANDEMIC_YEAR = 2020;
-const OTHER_UNCLASSIFIED_ID = "spending.other_unclassified";
 
 export type HomeChaptersInput = Omit<ScaleInput, "spending" | "revenue"> & {
   budgetFacts: ServedBudgetFact[];
@@ -47,10 +46,8 @@ export function buildChapterSentences({ spending, revenue, municipal, deficit }:
   const { messages } = presentation;
 
   const spendingIndex = spending.years.length - 1;
-  // "Most on X" names a real field, never the unclassified remainder.
-  const largest = spending.fields
-    .filter((field) => field.id !== OTHER_UNCLASSIFIED_ID)
-    .reduce((top, field) => (field.values[spendingIndex]! > top.values[spendingIndex]! ? field : top));
+  // Fields sort biggest first with the unclassified remainder last, so "most on X" never names it.
+  const largest = spending.fields.find((field) => field.id !== OTHER_UNCLASSIFIED_ID)!;
 
   const revenueIndex = revenue.years.length - 1;
   const liabilities = revenue.bands.find((band) => band.id === "liabilities")?.values[revenueIndex] ?? 0;
