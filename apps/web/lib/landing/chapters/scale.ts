@@ -8,12 +8,10 @@ import type { ServedGdpObservation } from "../../data/gdpOverview/types";
 import { message } from "../../i18n/messages";
 import type { Messages } from "../../i18n/types";
 import type { ServedGeneralGovernmentBalanceFact, ServedGovernmentDebtFact } from "../../servedRows";
-import type { RevenueSeries, ScaleChapter, ScaleMeasureId, SpendingSeries } from "./types";
+import { GEL_PER_SQUARE, type RevenueSeries, type ScaleChapter, type ScaleMeasureId, type SpendingSeries } from "./types";
 
 // Chapter 01: each measure beside nominal GDP of the same year. One square is
-// GEL 10 million, so GDP itself is the full grid.
-
-export const GEL_PER_SQUARE = 10_000_000;
+// GEL 10 million (GEL_PER_SQUARE), so GDP itself is the full grid.
 
 export type ScaleInput = {
   gdp: ServedGdpObservation[];
@@ -33,6 +31,10 @@ function gdpValue(gdp: ServedGdpObservation[], seriesId: ServedGdpObservation["s
 function seriesTotal(series: SpendingSeries | RevenueSeries, year: number): number | null {
   const index = series.years.indexOf(year);
   return index === -1 ? null : series.totals[index];
+}
+
+function seriesPlanned(series: SpendingSeries | RevenueSeries, year: number): boolean {
+  return series.planned[series.years.indexOf(year)] ?? false;
 }
 
 function usdToGel(valueUsd: string | null | undefined, gelPerUsd: number | null): number | null {
@@ -57,16 +59,16 @@ export function buildScaleChapter(input: ScaleInput, messages: Messages): ScaleC
       fact.status === "actual" &&
       fact.valueKind === "amount_gel",
   );
-  const balance = input.balanceFacts.find((fact) => fact.year === year);
+  const balance = input.balanceFacts.find((fact) => fact.year === year && fact.status === "actual");
   const fdi = input.fdiFacts.find((fact) => fact.entityId === FOREIGN_INVESTMENT_TOTAL_ID && fact.year === year);
   const transfer = input.transferFacts.find(
     (fact) => fact.entityId === MONEY_TRANSFER_TOTAL_ID && fact.measure === "received" && fact.year === year,
   );
 
-  const candidates: { id: ScaleMeasureId; label: string; valueGel: number | null }[] = [
+  const candidates: { id: ScaleMeasureId; label: string; valueGel: number | null; planned?: boolean }[] = [
     { id: "gdp", label: message(messages, "landing.scale.gdp"), valueGel: gdpGel },
-    { id: "revenue", label: message(messages, "landing.scale.revenue"), valueGel: seriesTotal(input.revenue, year) },
-    { id: "spending", label: message(messages, "landing.scale.spending"), valueGel: seriesTotal(input.spending, year) },
+    { id: "revenue", label: message(messages, "landing.scale.revenue"), valueGel: seriesTotal(input.revenue, year), planned: seriesPlanned(input.revenue, year) },
+    { id: "spending", label: message(messages, "landing.scale.spending"), valueGel: seriesTotal(input.spending, year), planned: seriesPlanned(input.spending, year) },
     { id: "debt", label: message(messages, "landing.scale.debt"), valueGel: debt?.value ?? null },
     {
       id: "balance",
@@ -79,9 +81,9 @@ export function buildScaleChapter(input: ScaleInput, messages: Messages): ScaleC
   ];
 
   const measures: ScaleChapter["measures"] = [];
-  for (const { id, label, valueGel } of candidates) {
+  for (const { id, label, valueGel, planned = false } of candidates) {
     if (valueGel === null) continue;
-    measures.push({ id, label, valueGel, squares: Math.round(valueGel / GEL_PER_SQUARE), share: valueGel / gdpGel });
+    measures.push({ id, label, valueGel, squares: Math.round(valueGel / GEL_PER_SQUARE), share: valueGel / gdpGel, planned });
   }
 
   return { year, gdpGel, squares: Math.round(gdpGel / GEL_PER_SQUARE), defaultId: "spending", measures };

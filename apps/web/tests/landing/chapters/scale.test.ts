@@ -184,6 +184,26 @@ describe("buildScaleChapter", () => {
     expect(chapter.measures.some((measure) => measure.id === "debt")).toBe(false);
   });
 
+  it("uses only an actual balance fact, never a projection", () => {
+    const projected = buildScaleChapter(input({ balanceFacts: [{ ...balance(2025, -9_000_000_000), status: "projection" }] }), messages);
+    expect(projected.measures.some((measure) => measure.id === "balance")).toBe(false);
+    const both = buildScaleChapter(
+      input({ balanceFacts: [{ ...balance(2025, -9_000_000_000), status: "projection" }, balance(2025, -2_000_000_000)] }),
+      messages,
+    );
+    expect(both.measures.find((measure) => measure.id === "balance")?.valueGel).toBe(2_000_000_000);
+  });
+
+  it("marks spending and revenue planned when their value for the year is planned; the rest are actual", () => {
+    const actual = buildScaleChapter(input(), messages);
+    expect(actual.measures.every((measure) => !measure.planned)).toBe(true);
+    const chapter = buildScaleChapter(
+      input({ spending: { ...spending, planned: [false, true] }, revenue: { ...revenue, planned: [true, false] } }),
+      messages,
+    );
+    expect(chapter.measures.filter((measure) => measure.planned).map((measure) => measure.id)).toEqual(["spending"]);
+  });
+
   it("share = valueGel / gdpGel; squares = round(valueGel / 10_000_000)", () => {
     const chapter = buildScaleChapter(input(), messages);
     const spendingMeasure = chapter.measures.find((measure) => measure.id === "spending")!;

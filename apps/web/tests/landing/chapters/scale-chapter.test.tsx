@@ -10,6 +10,7 @@ const labels: ScaleLabels = {
   included: "შედის: ",
   notIncluded: "მიღმაა: ",
   bnGel: "მლრდ ₾",
+  planned: "გეგმა",
   square: "კვადრატი",
   squareNoteSpoken: "თითოეული 10 მილიონი ლარი",
   measureGroup: "მაჩვენებლის არჩევა",
@@ -17,12 +18,13 @@ const labels: ScaleLabels = {
 };
 
 const gdpGel = 104_598_139_883;
-const measure = (id: ScaleData["measures"][number]["id"], label: string, valueGel: number): ScaleData["measures"][number] => ({
+const measure = (id: ScaleData["measures"][number]["id"], label: string, valueGel: number, planned = false): ScaleData["measures"][number] => ({
   id,
   label,
   valueGel,
   squares: Math.round(valueGel / 10_000_000),
   share: valueGel / gdpGel,
+  planned,
 });
 
 const data: ScaleData = {
@@ -66,6 +68,16 @@ describe("ScaleChapter (server render = default state)", () => {
 
   it("names the button group", () => {
     expect(html).toContain('role="group" aria-label="მაჩვენებლის არჩევა"');
+  });
+
+  it("marks a planned measure on its button, in the readout and in the canvas name", () => {
+    const planned: ScaleData = { ...data, measures: data.measures.map((m) => (m.id === "spending" ? { ...m, planned: true } : m)) };
+    const markup = renderToStaticMarkup(<ScaleChapter data={planned} labels={labels} />);
+    const pressed = markup.match(/<button[^>]*aria-pressed="true"[^>]*>(.*?)<\/button>/)?.[1] ?? "";
+    expect(pressed).toContain("გეგმა");
+    expect(markup.match(/<button[^>]*aria-pressed="false"[^>]*>(.*?)<\/button>/g)?.join("")).not.toContain("გეგმა");
+    expect(markup).toContain('<span class="sr-only">სახელმწიფო ბიუჯეტის ხარჯები (გეგმა)</span>');
+    expect(markup).toContain('aria-label="10,460 კვადრატი, თითოეული 10 მილიონი ლარი; სახელმწიფო ბიუჯეტის ხარჯები (გეგმა): 33.4 მლრდ ₾');
   });
 
   it("keeps the tooltip out of the accessibility tree and the marker label on the default measure", () => {

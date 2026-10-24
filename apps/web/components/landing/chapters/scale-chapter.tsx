@@ -2,8 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { formatInUnit, formatShare, UNIT_BN, UNIT_PERSONS } from "../../../lib/explorer/format";
-import { GEL_PER_SQUARE } from "../../../lib/landing/chapters/scale";
-import type { ScaleChapter as ScaleData } from "../../../lib/landing/chapters/types";
+import { GEL_PER_SQUARE, type ScaleChapter as ScaleData } from "../../../lib/landing/chapters/types";
 import { OFF_SQUARE, placeTip, TOKEN_FALLBACKS } from "./canvas";
 import { ChartUnavailable, Reveal, useEngine } from "./reveal";
 import type { Engine } from "./scale-engine";
@@ -19,6 +18,7 @@ export type ScaleLabels = {
   included: string; // tooltip foot prefix: the square is inside the measure
   notIncluded: string; // tooltip foot prefix: the square is beyond the measure
   bnGel: string; // "მლრდ ₾"
+  planned: string; // after a planned value: "გეგმა"
   square: string; // the unit word: "კვადრატი" / "squares"
   squareNoteSpoken: string; // squareNote without the glyph, for the canvas aria-label: "თითოეული 10 მილიონი ლარი"
   measureGroup: string; // aria-label of the measure button group
@@ -31,6 +31,8 @@ const BN_2 = { ...UNIT_BN, decimals: 2 };
 
 const count = (n: number) => formatInUnit(n, UNIT_PERSONS);
 const share = (fraction: number) => formatShare(fraction, false, fraction > 0.999 ? 0 : 1);
+/** The measure's name, with the planned mark when its value is planned: "სახელმწიფო ბიუჯეტის ხარჯები (გეგმა)". */
+const measureName = (measure: ScaleData["measures"][number], planned: string) => (measure.planned ? `${measure.label} (${planned})` : measure.label);
 
 export function ScaleChapter({ data, labels }: { data: ScaleData; labels: ScaleLabels }) {
   const [selectedId, setSelectedId] = useState<string>(data.defaultId);
@@ -84,7 +86,7 @@ export function ScaleChapter({ data, labels }: { data: ScaleData; labels: ScaleL
         text(tipNameRef.current, l.cumulative);
         text(tipShareRef.current, share(cumulativeGel / d.gdpGel));
         text(tipShareNameRef.current, l.ofGdp);
-        text(tipFootRef.current, `${filled ? l.included : l.notIncluded}${measure.label}`);
+        text(tipFootRef.current, `${filled ? l.included : l.notIncluded}${measureName(measure, l.planned)}`);
         placeTip(tip, x, y, wrap.clientWidth, wrap.clientHeight);
       },
       onLeave() {
@@ -105,7 +107,7 @@ export function ScaleChapter({ data, labels }: { data: ScaleData; labels: ScaleL
   const markerText = `${share(selected.share)} ${labels.ofGdp}`;
   const ariaLabel =
     `${count(data.squares)} ${labels.square}, ${labels.squareNoteSpoken}; ` +
-    `${selected.label}: ${formatInUnit(selected.valueGel, UNIT_BN)} ${labels.bnGel}, ${markerText} (${count(selected.squares)} ${labels.square})`;
+    `${measureName(selected, labels.planned)}: ${formatInUnit(selected.valueGel, UNIT_BN)} ${labels.bnGel}, ${markerText} (${count(selected.squares)} ${labels.square})`;
 
   return (
     <Reveal className="mt-8 grid grid-cols-1 gap-8 min-[1000px]:grid-cols-[300px_minmax(0,1fr)] min-[1000px]:gap-12">
@@ -126,15 +128,21 @@ export function ScaleChapter({ data, labels }: { data: ScaleData; labels: ScaleL
               <span className="text-[13.5px] font-medium leading-[1.3] group-aria-pressed:font-semibold">{measure.label}</span>
               <span className="whitespace-nowrap font-[family-name:var(--font-numeric)] text-xs text-[var(--muted)]">
                 {formatInUnit(measure.valueGel, UNIT_BN)}&nbsp;{labels.bnGel}
+                {measure.planned && <span className="ml-1.5">{labels.planned}</span>}
               </span>
             </button>
           ))}
         </div>
         <div aria-live="polite" className="mt-[26px]">
-          <span className="sr-only">{selected.label}</span>
+          <span className="sr-only">{measureName(selected, labels.planned)}</span>
           <div className="font-[family-name:var(--font-display)] text-[clamp(40px,4.4vw,58px)] font-semibold leading-none tracking-[-0.02em]">
             {formatInUnit(selected.valueGel, UNIT_BN)}
             <small className="ml-[0.2em] text-[0.4em] font-semibold tracking-normal">{labels.bnGel}</small>
+            {selected.planned && (
+              <small aria-hidden="true" className="ml-[0.4em] text-[0.3em] font-semibold tracking-normal text-[var(--muted)]">
+                {labels.planned}
+              </small>
+            )}
           </div>
           <div className="mt-3 font-[family-name:var(--font-numeric)] text-[13px] text-[var(--body)]">
             <b className="font-semibold text-[var(--ink)]">{markerText}</b> · {count(selected.squares)} {labels.square}

@@ -67,6 +67,7 @@ export function LandingPage({ chapters, gdpFigure, presentation, updatedAt }: { 
     included: t("landing.scale.included"),
     notIncluded: t("landing.scale.notIncluded"),
     bnGel: units.bnGel,
+    planned: t("landing.planned"),
     square: t("landing.scale.square"),
     squareNoteSpoken: t("landing.scale.squareNoteSpoken"),
     measureGroup: t("landing.scale.measureGroup"),

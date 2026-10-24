@@ -23,12 +23,16 @@ export type RevenueSeries = {
 
 export type ScaleMeasureId = "gdp" | "revenue" | "spending" | "debt" | "balance" | "municipal" | "fdi" | "remittances";
 
+/** One square of chapter 01 is GEL 10 million, so GDP itself is the full grid. */
+export const GEL_PER_SQUARE = 10_000_000;
+
 export type ScaleChapter = {
   year: number;
   gdpGel: number;
   squares: number;
   defaultId: "spending";
-  measures: { id: ScaleMeasureId; label: string; valueGel: number; squares: number; share: number }[];
+  // planned: the measure's value for the year is planned (spending and revenue can be; the rest are actual)
+  measures: { id: ScaleMeasureId; label: string; valueGel: number; squares: number; share: number; planned: boolean }[];
 };
 
 export type DeficitChapter = {
