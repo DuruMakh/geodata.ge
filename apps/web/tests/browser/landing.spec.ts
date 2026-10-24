@@ -1,5 +1,7 @@
 import { expect, test, type APIRequestContext, type Locator, type Page } from "@playwright/test";
 import { NAV_TREE } from "../../lib/navigation/navTree";
+import enLanding from "../../lib/i18n/messages/en/landing.json";
+import kaLanding from "../../lib/i18n/messages/ka/landing.json";
 import { computedCssColorAlpha } from "./focus-outline";
 
 // Landing page (GeoData Site v2 design): structure, live data blocks, and the
@@ -139,47 +141,8 @@ async function expectKeyboardFocusOrder(page: Page, locator: Locator) {
   }
 }
 
-async function expectDatasetTableFits(page: Page, testId: string) {
-  const section = page.getByTestId(testId);
-  await expect(section.locator("tbody tr")).toHaveCount(4);
-  const geometry = await section.locator("table").evaluate((table) => {
-    const tableBox = table.getBoundingClientRect();
-    const parentBox = table.parentElement!.getBoundingClientRect();
-    const cells = Array.from(table.querySelectorAll("th, td"))
-      .filter((cell) => {
-        const style = getComputedStyle(cell);
-        const box = cell.getBoundingClientRect();
-        return style.display !== "none" && style.visibility !== "hidden" && box.width > 0 && box.height > 0;
-      })
-      .map((cell) => {
-        const box = cell.getBoundingClientRect();
-        return {
-          clientWidth: cell.clientWidth,
-          left: box.left,
-          right: box.right,
-          scrollWidth: cell.scrollWidth,
-          text: cell.textContent?.trim() ?? "",
-        };
-      });
-    return {
-      cells,
-      tableLeft: tableBox.left,
-      tableRight: tableBox.right,
-      parentLeft: parentBox.left,
-      parentRight: parentBox.right,
-    };
-  });
-  expect(geometry.tableLeft).toBeGreaterThanOrEqual(geometry.parentLeft);
-  expect(geometry.tableRight).toBeLessThanOrEqual(geometry.parentRight + 0.5);
-  for (const cell of geometry.cells) {
-    expect(cell.left, `${testId}: left edge of "${cell.text}"`).toBeGreaterThanOrEqual(geometry.tableLeft - 0.5);
-    expect(cell.right, `${testId}: right edge of "${cell.text}"`).toBeLessThanOrEqual(geometry.tableRight + 0.5);
-    expect(cell.scrollWidth, `${testId}: clipped content in "${cell.text}"`).toBeLessThanOrEqual(cell.clientWidth);
-  }
-}
-
 // The copy each language must render. Figures are not listed: they come from the
-// served data, so the test checks their shape and that they agree with each other.
+// served data, so the tests check their shape and that they agree with each other.
 const LANDING_COPY = {
   ka: {
     prefix: "",
@@ -193,25 +156,10 @@ const LANDING_COPY = {
     population: "3.9",
     populationCaption: "2026 წლის 1 იანვარი · საქსტატი",
     area: "69.7",
-    sections: [
-      "როგორ იხარჯება საქართველოს ბიუჯეტი",
-      "როგორ ფინანსდება საქართველოს ბიუჯეტი",
-      "როგორ ხარჯავენ ბიუჯეტს საქართველოს მუნიციპალიტეტები",
-      "რამდენია საქართველოს მთავრობის ვალი",
-      "რამდენია საქართველოს ბიუჯეტის დეფიციტი",
-      "მეთოდოლოგია და პირველწყაროები",
-    ],
-    caption: (heading: string, year: string) => `${heading} — ${year} წლის მონაცემები`,
-    amount: /^\d+\.\d მლრდ ₾$/,
-    domesticDebt: "საშინაო ვალი",
-    externalDebt: "საგარეო ვალი",
-    debtLink: "ვალის მონაცემები →",
-    deficitShare: "დეფიციტი მშპ-სთან მიმართებით",
-    actualData: "ფაქტობრივი მონაცემი",
-    deficitLink: "დეფიციტის მონაცემები →",
-    municipalColumn: "უდიდესი მუნიციპალური ბიუჯეტები",
+    messages: kaLanding,
     methodologyLink: "მეთოდოლოგიის ნახვა →",
     methodology: "მეთოდოლოგია",
+    otherLanguage: "English",
   },
   en: {
     prefix: "/en",
@@ -225,32 +173,29 @@ const LANDING_COPY = {
     population: "3.9",
     populationCaption: "1 January 2026 · Geostat",
     area: "69.7",
-    sections: [
-      "How Georgia’s budget is spent",
-      "How Georgia’s budget is financed",
-      "How Georgia’s municipalities spend their budgets",
-      "How much Georgia’s government owes",
-      "How large is Georgia’s budget deficit?",
-      "Methodology and original sources",
-    ],
-    caption: (heading: string, year: string) => `${heading} — data for ${year}`,
-    amount: /^\d+\.\d bn GEL$/,
-    domesticDebt: "Domestic debt",
-    externalDebt: "External debt",
-    debtLink: "Debt data →",
-    deficitShare: "Deficit as a share of GDP",
-    actualData: "Actual data",
-    deficitLink: "Deficit data →",
-    municipalColumn: "Largest municipal budgets",
+    messages: enLanding,
     methodologyLink: "View methodology →",
     methodology: "Methodology",
+    otherLanguage: "ქართული",
   },
 } as const;
 
-const SIGNED_PERCENT = /^[−+]?\d+\.\d%$/;
+// The five chapters in page order, with the explorer page each heading leads to.
+const CHAPTERS = [
+  { id: "ch-01", path: "/explorer/analysis", titleKey: "landing.ch1.title" },
+  { id: "ch-02", path: "/explorer/expenditure", titleKey: "landing.ch2.title" },
+  { id: "ch-03", path: "/explorer/revenue", titleKey: "landing.ch3.title" },
+  { id: "ch-04", path: "/explorer/municipalities", titleKey: "landing.ch4.title" },
+  { id: "ch-05", path: "/explorer/deficit", titleKey: "landing.ch5.title" },
+] as const;
+
+// Software-GL drivers in a container log these on every WebGL canvas, the hero included; they are not app output.
+const SOFTWARE_GL_NOISE = /GPU stall|ReadPixels|GL Driver Message|software WebGL|SwiftShader/i;
+
+const text = (value: string | null | undefined) => (value ?? "").replace(/\s+/g, " ").trim();
 
 for (const [locale, copy] of Object.entries(LANDING_COPY)) {
-  test(`landing renders the approved latest-year data composition: ${locale}`, async ({ page }) => {
+  test(`landing renders the redesigned composition: ${locale}`, async ({ page }) => {
     const href = (path: string) => `${copy.prefix}${path}`;
     await page.setViewportSize({ width: 1366, height: 768 });
     await page.goto(`${baseUrl}${copy.prefix}/`);
@@ -261,109 +206,238 @@ for (const [locale, copy] of Object.entries(LANDING_COPY)) {
     await expect(page.getByText(copy.portal, { exact: true })).toBeVisible();
     await expect(page.getByTestId("hero-cta")).toHaveText(copy.cta);
     await expect(page.getByTestId("hero-cta")).toHaveAttribute("href", href("/explorer"));
-    await expect(page.locator("figure canvas").or(page.getByText(copy.heroFallback))).toBeVisible({ timeout: 15_000 });
+    await expect(page.locator(".landing-hero-frame canvas").or(page.getByText(copy.heroFallback))).toBeVisible({ timeout: 15_000 });
 
-    // Population and area are maintained by hand; the economic size is the latest
-    // nominal GDP, the same figure and year as the Economy link in the dataset row.
+    // Population and area are maintained by hand; the economic size is the latest nominal GDP, the same
+    // figure and year as the GDP measure of chapter 01.
     const figures = page.getByTestId("key-numbers");
     await expect(figures).toContainText(copy.population);
     await expect(figures).toContainText(copy.populationCaption);
     await expect(figures).toContainText(copy.area);
-    const economyLink = (await page.getByTestId("landing-datasets").locator(`a[href="${href("/explorer/economy")}"]`).textContent()) ?? "";
-    const [, gdpYear, gdpValue] = economyLink.match(/· (\d{4}): ([\d.,]+)/) ?? [];
-    expect(gdpYear, economyLink).toBeDefined();
     const gdpFigure = figures.locator("[data-country-stat]").nth(2);
-    expect((await gdpFigure.locator(":scope > div").nth(1).textContent())?.trim().split(/\s/)[0]).toBe(gdpValue);
-    await expect(gdpFigure).toContainText(gdpYear!);
+    const gdpValue = text(await gdpFigure.locator(":scope > div").nth(1).textContent()).split(" ")[0];
+    expect(gdpValue).toMatch(/^[\d.,]+$/);
+    const gdpMeasure = page.locator("#ch-01 [role=group] button").first();
+    await expect(gdpMeasure).toContainText(copy.messages["landing.scale.gdp"]);
+    expect(text(await gdpMeasure.textContent())).toContain(gdpValue);
+    const gdpYear = text(await gdpFigure.textContent()).match(/\b(\d{4})\b/)?.[1];
+    expect(gdpYear).toBeDefined();
+    await expect(page.locator("#ch-01 figure")).toContainText(`, ${gdpYear}`);
     await expectNoPageOverflow(page);
 
-    expect(await page.locator("#data h2").allTextContents()).toEqual(copy.sections);
-    const landingData = page.getByTestId("landing-data");
-    const expenditureSection = page.getByTestId("landing-dataset-expenditure");
-    if (locale === "ka") {
-      await expect(page.getByText("საჯარო ფინანსების წლიური", { exact: true })).toHaveCount(0);
-      await expect(page.getByText(/^ბოლო ხელმისაწვდომი წელი · \d{4}$/)).toHaveCount(0);
+    // Five chapters, each with its heading link, a lede, and a chart canvas.
+    for (const chapter of CHAPTERS) {
+      const section = page.locator(`#${chapter.id}`);
+      await expect(section.getByRole("heading", { level: 2 })).toContainText(copy.messages[chapter.titleKey]);
+      expect(text(await section.locator("h2 + p").textContent()).length, `${chapter.id} lede`).toBeGreaterThan(20);
+      await expect(section.locator("canvas")).toHaveCount(1);
     }
-    await expect(landingData.locator(':scope > [data-testid="landing-dataset-expenditure"]')).toHaveCount(1);
-    expect(
-      await landingData.locator(":scope > *").evaluateAll((elements) => elements.map((element) => element.getAttribute("data-testid"))),
-    ).toEqual([
-      "landing-dataset-expenditure",
-      "landing-dataset-revenue",
-      "landing-dataset-municipalities",
-      "landing-debt",
-      "landing-deficit",
-      "landing-methodology",
-    ]);
-    await expect(landingData).toHaveCSS("border-top-width", "0px");
-    await expect(expenditureSection).toHaveCSS("border-top-width", "0px");
+    expect(await page.locator("main canvas").evaluateAll((canvases) => canvases.length)).toBe(6);
 
-    for (const [index, [testId, path]] of [
-      ["landing-dataset-expenditure", "/explorer/expenditure"],
-      ["landing-dataset-revenue", "/explorer/revenue"],
-      ["landing-dataset-municipalities", "/explorer/municipalities"],
-    ].entries()) {
-      const section = page.getByTestId(testId);
-      await expect(section.getByTestId("landing-dataset-total")).toBeVisible();
-      await expectDatasetTableFits(page, testId);
-      await expect(section.locator("tbody tr").first().getByRole("rowheader")).not.toBeEmpty();
-      await expect(section.locator("tbody tr").first().getByRole("cell")).toHaveCount(2);
-      // The table's year column, its caption and the total all name the section's latest year.
-      const latestYear = (await section.getByTestId("landing-dataset-total").locator("strong").textContent())!;
-      expect(latestYear).toMatch(/^\d{4}$/);
-      await expect(section.locator("thead th").nth(1)).toHaveText(latestYear);
-      const caption = copy.caption(copy.sections[index]!, latestYear);
-      await expect(section.locator("table caption")).toHaveText(caption);
-      await expect(section.getByRole("table", { name: caption })).toHaveCount(1);
-      await expect(section.getByRole("link")).toHaveAttribute("href", href(path));
-    }
-
-    // Debt: the total and both parts are amounts in billion lari for one latest actual year.
-    const debtSection = page.getByTestId("landing-debt");
-    await expect(debtSection.getByText(copy.amount)).toHaveCount(3);
-    await expect(debtSection.locator("strong")).toHaveText(/^\d{4}$/);
-    await expect(debtSection).toContainText(copy.domesticDebt);
-    await expect(debtSection).toContainText(copy.externalDebt);
-    await expect(debtSection).toContainText(copy.actualData);
-    await expect(debtSection.getByRole("link", { name: copy.debtLink })).toHaveAttribute("href", href("/explorer/debt"));
-
-    // Deficit: three consecutive actual years, the last of them the headline year and value.
-    const deficitSection = page.getByTestId("landing-deficit");
-    await expect(deficitSection).toContainText(copy.deficitShare);
-    await expect(deficitSection).toContainText(copy.actualData);
-    const headline = deficitSection.getByText(SIGNED_PERCENT).first();
-    const headlineYear = deficitSection.locator("strong").first();
-    await expect(headlineYear).toHaveText(/^\d{4}$/);
-    const history = deficitSection.getByTestId("landing-deficit-history").locator("li");
-    await expect(history).toHaveCount(3);
-    const latest = Number(await headlineYear.textContent());
-    for (let index = 0; index < 3; index += 1) {
-      await expect(history.nth(index).locator("span")).toHaveText(String(latest - 2 + index));
-      await expect(history.nth(index).locator("strong")).toHaveText(SIGNED_PERCENT);
-    }
-    await expect(history.nth(2).locator("strong")).toHaveText((await headline.textContent())!);
-    if (locale === "ka") {
-      await expect(deficitSection.getByText("როგორ წავიკითხოთ", { exact: true })).toHaveCount(0);
-      await expect(deficitSection.getByText("ნომინალური ბალანსი", { exact: true })).toHaveCount(0);
-    }
-    await expect(deficitSection.getByRole("link", { name: copy.deficitLink })).toHaveAttribute("href", href("/explorer/deficit"));
-    await expect(page.getByText(copy.municipalColumn, { exact: true })).toBeVisible();
-    await expect(page.getByTestId("landing-methodology").getByRole("link", { name: copy.methodologyLink })).toHaveAttribute("href", href("/methodology"));
-
-    await expect(page.getByTestId("landing-data").locator("svg, canvas")).toHaveCount(0);
-
-    const footer = page.getByTestId("landing-footer");
-    await expect(footer.getByRole("link", { name: "info@fiscal.ge" })).toHaveAttribute("href", "mailto:info@fiscal.ge");
-    await expect(footer).toContainText("CC BY 4.0");
+    // Sources: the methodology link, and the dark AI band with the address to copy.
+    await expect(page.locator("#sources").getByRole("link", { name: copy.methodologyLink })).toHaveAttribute("href", href("/methodology"));
+    await expect(page.locator("#ai").getByTestId("landing-ai-copy")).toBeVisible();
+    await expect(page.locator("#ai code")).toHaveText("https://fiscal.ge/mcp");
+    await expect(page.locator("#ai").getByRole("link", { name: copy.messages["landing.ai.cta"] })).toHaveAttribute("href", href("/connect"));
 
     // Methodology stays out of the landing header and in the footer.
     await expect(page.getByTestId("landing-header").getByRole("link", { name: copy.methodology })).toHaveCount(0);
-    await expect(page.getByTestId("site-footer").getByRole("link", { name: copy.methodology })).toHaveAttribute(
-      "href",
-      href("/methodology"),
-    );
+    const footer = page.getByTestId("site-footer");
+    await expect(footer.getByRole("link", { name: "info@fiscal.ge" })).toHaveAttribute("href", "mailto:info@fiscal.ge");
+    await expect(footer).toContainText("CC BY 4.0");
+    await expect(footer.getByRole("link", { name: copy.methodology, exact: true })).toHaveAttribute("href", href("/methodology"));
+    await expect(footer.getByTestId("footer-language-link")).toHaveAttribute("href", locale === "ka" ? "/en" : "/");
   });
 }
+
+test("homepage sections appear in the approved order", async ({ page }) => {
+  for (const prefix of ["", "/en"]) {
+    await page.goto(`${baseUrl}${prefix}/`);
+    const order = await page.evaluate(() => {
+      const top = (selector: string) => document.querySelector(selector)?.getBoundingClientRect().top;
+      return ["#ch-01", "#ch-02", "#ch-03", "#ch-04", "#ch-05", "#sources", "#ai", "footer[data-variant=site]"].map((selector) => ({
+        selector,
+        top: top(selector) ?? null,
+        // The chapters are direct children of main, the footer follows main.
+        inMain: document.querySelector("main")?.contains(document.querySelector(selector)) ?? false,
+      }));
+    });
+    for (const entry of order) expect(entry.top, `${prefix || "/"} ${entry.selector} exists`).not.toBeNull();
+    const tops = order.map((entry) => entry.top!);
+    expect(tops, `${prefix || "/"} section order`).toEqual([...tops].sort((a, b) => a - b));
+    expect(order.map((entry) => entry.inMain)).toEqual([true, true, true, true, true, true, true, false]);
+    // The key-number row sits above the first chapter.
+    const keyNumbers = (await page.getByTestId("key-numbers").boundingBox())!;
+    expect(keyNumbers.y).toBeLessThan(tops[0]!);
+  }
+});
+
+test("chapter headings link to their explorer pages", async ({ page }) => {
+  for (const [locale, copy] of Object.entries(LANDING_COPY)) {
+    await page.goto(`${baseUrl}${copy.prefix}/`);
+    for (const chapter of CHAPTERS) {
+      const link = page.locator(`#${chapter.id} h2 a`);
+      await expect(link, `${locale} ${chapter.id}`).toHaveAttribute("href", `${copy.prefix}${chapter.path}`);
+      await expect(link).toContainText(copy.messages[chapter.titleKey]);
+    }
+  }
+  // The sources heading is not a link; it is a section about the page's own method.
+  await page.goto(`${baseUrl}/`);
+  await expect(page.locator("#sources h2 a")).toHaveCount(0);
+});
+
+test("choosing a measure updates the readout", async ({ page }) => {
+  for (const [locale, copy] of Object.entries(LANDING_COPY)) {
+    await page.goto(`${baseUrl}${copy.prefix}/`);
+    const debt = page.locator("#ch-01 [role=group] button", { hasText: copy.messages["landing.scale.debt"] });
+    await expect(debt, `${locale} debt measure`).toHaveCount(1);
+    const readout = page.locator("#ch-01 [aria-live=polite]");
+    // Spending is the default, and the readout names it.
+    await expect(page.locator("#ch-01 [role=group] button[aria-pressed=true]")).toContainText(copy.messages["landing.scale.spending"]);
+    await expect(readout).toContainText(copy.messages["landing.scale.spending"]);
+
+    // The button carries "{label} {billions} {unit}"; the readout must show the same billions and a share of GDP.
+    const billions = text(await debt.textContent()).match(/\d[\d.,]*/)![0];
+    await debt.click();
+    await expect(debt).toHaveAttribute("aria-pressed", "true");
+    await expect(page.locator("#ch-01 [role=group] button[aria-pressed=true]")).toHaveCount(1);
+    await expect(readout).toContainText(copy.messages["landing.scale.debt"]);
+    await expect(readout).toContainText(billions);
+    await expect(readout).toContainText(new RegExp(`\\d+(\\.\\d)?%\\s*${copy.messages["landing.scale.ofGdp"]}`));
+    await expect(readout).toContainText(copy.messages["landing.scale.square"]);
+  }
+});
+
+test("the year slider and play button change the spending year", async ({ page }) => {
+  await page.goto(`${baseUrl}/`);
+  const chapter = page.locator("#ch-02");
+  const range = chapter.locator('input[type="range"]');
+  // The big year is the block right under the "Year" label.
+  const bigYear = chapter.getByText(LANDING_COPY.ka.messages["landing.spending.year"], { exact: true }).locator("xpath=following-sibling::div[1]");
+  const yearOf = async () => Number(await range.inputValue());
+
+  const min = Number(await range.getAttribute("min"));
+  const max = Number(await range.getAttribute("max"));
+  expect(max).toBeGreaterThan(min);
+  // The page opens on the latest year.
+  await expect(range).toHaveValue(String(max));
+  await expect(bigYear).toContainText(String(max));
+
+  // Moving the slider to the first year shows that year in the big figure and above the side list.
+  await range.fill(String(min));
+  await expect(bigYear).toContainText(String(min));
+  await expect(chapter.getByText(new RegExp(`${LANDING_COPY.ka.messages["landing.spending.listCaption"]} · ${min}`))).toBeVisible();
+
+  // Play from the first year: the year advances within two seconds (one step is 900 ms).
+  const play = chapter.locator("button:has(svg.lucide-play)");
+  const pause = chapter.locator("button:has(svg.lucide-pause)");
+  await expect(play).toHaveCount(1);
+  await play.click();
+  await expect(pause).toHaveCount(1);
+  await expect.poll(yearOf, { timeout: 2_000 }).toBeGreaterThan(min);
+  await expect(bigYear).toContainText(String(await yearOf()));
+
+  // Pausing stops the advance: the year stays put for longer than one step.
+  await pause.click();
+  await expect(play).toHaveCount(1);
+  const paused = await yearOf();
+  await page.waitForTimeout(1_200);
+  expect(await yearOf()).toBe(paused);
+});
+
+test("reduced motion shows final states", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto(`${baseUrl}/`);
+  // No scroll-reveal wait: every revealed block is already fully visible and in place.
+  const hidden = await page.evaluate(() =>
+    [...document.querySelectorAll<HTMLElement>(".home-rv")]
+      .map((element) => ({ opacity: getComputedStyle(element).opacity, transform: getComputedStyle(element).transform, entered: element.hasAttribute("data-in") }))
+      .filter((state) => state.opacity !== "1" || (state.transform !== "none" && state.transform !== "matrix(1, 0, 0, 1, 0, 0)")),
+  );
+  expect(hidden).toEqual([]);
+  expect(await page.locator(".home-rv").count()).toBeGreaterThan(5);
+  // The squares chart opens on its default measure with the marker label already in place.
+  const selected = page.locator("#ch-01 [role=group] button[aria-pressed=true]");
+  await expect(selected).toHaveCount(1);
+  await expect(selected).toContainText(LANDING_COPY.ka.messages["landing.scale.spending"]);
+  await expect(page.locator("#ch-01 [aria-live=polite]")).toContainText(LANDING_COPY.ka.messages["landing.scale.ofGdp"]);
+  // The marker is already in place, and has no transition to wait for.
+  const marker = page.locator("#ch-01 figure .pointer-events-none").first();
+  await expect(marker).toHaveCSS("opacity", "1");
+  expect(await marker.evaluate((element) => parseFloat(getComputedStyle(element).transitionDuration))).toBeLessThan(0.001);
+});
+
+for (const width of [375, 390]) {
+  test(`homepage has no horizontal overflow at ${width}px`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 800 });
+    for (const prefix of ["", "/en"]) {
+      await page.goto(`${baseUrl}${prefix}/`);
+      await page.locator("footer[data-variant=site]").scrollIntoViewIfNeeded();
+      const widths = await page.evaluate(() => ({ scroll: document.documentElement.scrollWidth, inner: window.innerWidth }));
+      expect(widths.scroll, `${prefix || "/"} at ${width}px`).toBeLessThanOrEqual(widths.inner);
+      // Nothing inside a chapter pokes out of the viewport on the right either.
+      const wide = await page.evaluate(
+        (limit) =>
+          [...document.querySelectorAll<HTMLElement>("main section *")]
+            .filter((element) => element.getBoundingClientRect().right > limit + 1 && getComputedStyle(element).position !== "fixed")
+            .filter((element) => !element.closest("[aria-hidden=true], canvas, svg"))
+            .slice(0, 5)
+            .map((element) => `${element.tagName.toLowerCase()}.${element.className} ${Math.round(element.getBoundingClientRect().right)}`),
+        widths.inner,
+      );
+      expect(wide, `${prefix || "/"} elements wider than ${width}px`).toEqual([]);
+    }
+  });
+}
+
+test("site footer on the homepage and the site pages, compact footer on explorer pages", async ({ page }) => {
+  for (const path of ["/", "/methodology", "/connect", "/about", "/en", "/en/methodology", "/en/connect", "/en/about"]) {
+    await page.goto(`${baseUrl}${path}`);
+    const footer = page.getByTestId("site-footer");
+    await expect(footer, path).toHaveAttribute("data-variant", "site");
+    await expect(footer.getByTestId("footer-language-link"), path).toHaveCount(1);
+  }
+  for (const path of ["/explorer/expenditure", "/en/explorer/expenditure"]) {
+    await page.goto(`${baseUrl}${path}`);
+    const footer = page.getByTestId("site-footer");
+    await expect(footer, path).toHaveAttribute("data-variant", "compact");
+    await expect(footer.getByTestId("footer-language-link"), path).toHaveCount(0);
+  }
+});
+
+test("no console errors or warnings while scrolling the whole page", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  const errors: string[] = [];
+  const warnings: string[] = [];
+  const pageErrors: string[] = [];
+  page.on("console", (message) => {
+    if (message.type() === "error") errors.push(message.text());
+    else if (message.type() === "warning" && !SOFTWARE_GL_NOISE.test(message.text())) warnings.push(message.text());
+  });
+  page.on("pageerror", (error) => pageErrors.push(error.message));
+
+  for (const prefix of ["", "/en"]) {
+    await page.goto(`${baseUrl}${prefix}/`);
+    for (const id of ["ch-01", "ch-02", "ch-03", "ch-04", "ch-05", "sources", "ai"]) {
+      await page.locator(`#${id}`).scrollIntoViewIfNeeded();
+      await page.evaluate((target) => document.getElementById(target)?.scrollIntoView(), id);
+    }
+    await page.locator("footer[data-variant=site]").scrollIntoViewIfNeeded();
+    // Each chart's engine has loaded and sized its canvas, so start-up and first-frame output is already logged.
+    await expect
+      .poll(() =>
+        page.evaluate(() =>
+          ["ch-01", "ch-02", "ch-03", "ch-04", "ch-05"].map((id) => document.querySelector<HTMLCanvasElement>(`#${id} canvas`)?.style.width !== ""),
+        ),
+      )
+      .toEqual([true, true, true, true, true]);
+    await expect(page.getByText(LANDING_COPY[prefix === "" ? "ka" : "en"].messages["landing.heroUnavailable"])).toHaveCount(0);
+  }
+
+  expect(errors).toEqual([]);
+  expect(pageErrors).toEqual([]);
+  expect(warnings).toEqual([]);
+});
 
 test("landing data and methodology links use real destinations", async ({ page }) => {
   await page.goto(baseUrl);
@@ -375,7 +449,7 @@ test("landing data and methodology links use real destinations", async ({ page }
   await expect(page.getByTestId("explorer-shell")).toBeVisible();
 
   await page.goto(baseUrl);
-  await page.getByTestId("landing-dataset-revenue").getByRole("link").click();
+  await page.locator("#ch-03 h2 a").click();
   await expect(page).toHaveURL(/\/explorer\/revenue/);
   await expect(page.getByTestId("explorer-shell")).toBeVisible();
 
@@ -531,7 +605,7 @@ test("landing waits for the post-load idle timeout before requesting the WebGL h
       ),
     )
     .toBe(1_500);
-  await expect(page.locator("figure canvas")).toHaveCount(0);
+  await expect(page.locator(".landing-hero-frame canvas")).toHaveCount(0);
 
   const scriptsBeforeIdle = new Set(scriptRequests);
   expect(await heroRuntimeScripts(request, scriptsBeforeIdle)).toEqual([]);
@@ -539,7 +613,7 @@ test("landing waits for the post-load idle timeout before requesting the WebGL h
   await page.evaluate(() =>
     (window as typeof window & { __flushHeroIdle: (didTimeout?: boolean) => void }).__flushHeroIdle(true),
   );
-  await expect(page.locator("figure canvas").or(page.getByText("ვიზუალი ვერ ჩაიტვირთა"))).toBeVisible({ timeout: 5_000 });
+  await expect(page.locator(".landing-hero-frame canvas").or(page.getByText("ვიზუალი ვერ ჩაიტვირთა"))).toBeVisible({ timeout: 5_000 });
 
   const scriptsAfterTimeout = scriptRequests.filter((url) => !scriptsBeforeIdle.has(url));
   expect(await heroRuntimeScripts(request, scriptsAfterTimeout)).toHaveLength(1);
@@ -576,7 +650,7 @@ test("landing keeps timeout-driven hero readiness within five seconds of load", 
   });
 
   await page.goto(baseUrl, { waitUntil: "load" });
-  await expect(page.locator("figure canvas")).toHaveCount(0);
+  await expect(page.locator(".landing-hero-frame canvas")).toHaveCount(0);
   await expect
     .poll(() =>
       page.evaluate(() => {
@@ -602,7 +676,7 @@ test("landing keeps timeout-driven hero readiness within five seconds of load", 
     );
   });
   expect(readiness).toBeGreaterThanOrEqual(1_500);
-  await expect(page.locator("figure canvas").or(page.getByText("ვიზუალი ვერ ჩაიტვირთა"))).toBeVisible();
+  await expect(page.locator(".landing-hero-frame canvas").or(page.getByText("ვიზუალი ვერ ჩაიტვირთა"))).toBeVisible();
 });
 
 test("landing activates the hero after load when requestIdleCallback is unavailable", async ({ page, request }) => {
@@ -620,7 +694,7 @@ test("landing activates the hero after load when requestIdleCallback is unavaila
   });
 
   await page.goto(baseUrl, { waitUntil: "load" });
-  await expect(page.locator("figure canvas").or(page.getByText("ვიზუალი ვერ ჩაიტვირთა"))).toBeVisible({ timeout: 5_000 });
+  await expect(page.locator(".landing-hero-frame canvas").or(page.getByText("ვიზუალი ვერ ჩაიტვირთა"))).toBeVisible({ timeout: 5_000 });
 
   const matchingScripts = await heroRuntimeScripts(
     request,
@@ -652,11 +726,11 @@ test("landing serves a static mobile hero without loading WebGL and retains desk
     );
     expect(await mobileStaticImage.evaluate((image) => (image as HTMLImageElement).naturalWidth)).toBe(780);
     await pastHeroDecision(mobilePage);
-    await expect(mobilePage.locator("figure canvas")).toHaveCount(0);
+    await expect(mobilePage.locator(".landing-hero-frame canvas")).toHaveCount(0);
     expect(await heroRuntimeScripts(request, mobileScripts)).toEqual([]);
 
     // Crossing the breakpoint live mounts exactly one desktop canvas and hides the static hero; crossing back unmounts it.
-    const canvas = mobilePage.locator("figure canvas");
+    const canvas = mobilePage.locator(".landing-hero-frame canvas");
     await mobilePage.setViewportSize({ width: 768, height: 900 });
     await expect(mobileStatic).toBeHidden();
     await expect(canvas).toHaveCount(1, { timeout: 5_000 });
@@ -687,7 +761,7 @@ test("landing serves a static mobile hero without loading WebGL and retains desk
     await desktopPage.goto(baseUrl);
     await expect(desktopPage.getByTestId("mobile-hero-static")).toBeHidden();
     expect(desktopImages).toEqual([]);
-    const canvas = desktopPage.locator("figure canvas");
+    const canvas = desktopPage.locator(".landing-hero-frame canvas");
     await expect(canvas.or(desktopPage.getByText("ვიზუალი ვერ ჩაიტვირთა"))).toBeVisible({ timeout: 15_000 });
     await expect
       .poll(() =>
@@ -717,7 +791,7 @@ test("landing hero has no browser runtime warnings or errors", async ({ page }) 
 
   await page.addInitScript(installHeroDrawInstrumentation);
   await page.goto(baseUrl);
-  const canvas = page.locator("figure canvas");
+  const canvas = page.locator(".landing-hero-frame canvas");
   await expect(canvas.or(page.getByText("ვიზუალი ვერ ჩაიტვირთა"))).toBeVisible({ timeout: 15_000 });
   // The scene has drawn its terrain, so start-up and first-frame warnings are already logged.
   if (await canvas.isVisible()) {
@@ -735,7 +809,7 @@ test("landing hero remains usable with reduced motion", async ({ page }) => {
   await page.goto(baseUrl);
 
   await expect(page.getByRole("img", { name: /საქართველოს ზუსტი რუკა ცოცხალ რელიეფად/ })).toBeVisible();
-  await expect(page.locator("figure canvas").or(page.getByText("ვიზუალი ვერ ჩაიტვირთა"))).toBeVisible({ timeout: 15_000 });
+  await expect(page.locator(".landing-hero-frame canvas").or(page.getByText("ვიზუალი ვერ ჩაიტვირთა"))).toBeVisible({ timeout: 15_000 });
   await expect(page.getByRole("heading", { level: 1, name: "საქართველო ციფრებში" })).toBeVisible();
   const cta = page.getByTestId("hero-cta");
   await expect(cta).toBeVisible();
@@ -746,22 +820,14 @@ test("landing calls to action have visible keyboard focus", async ({ page }) => 
   await page.goto(baseUrl);
 
   await expectVisibleFocusOutline(page.getByTestId("hero-cta"));
-  for (const testId of [
-    "landing-dataset-expenditure",
-    "landing-dataset-revenue",
-    "landing-dataset-municipalities",
-    "landing-debt",
-    "landing-deficit",
-  ]) {
-    await expectVisibleFocusOutline(page.getByTestId(testId).getByRole("link"));
-  }
-  await expectVisibleFocusOutline(
-    page.getByTestId("landing-methodology").getByRole("link", { name: "მეთოდოლოგიის ნახვა →" }),
-  );
+  for (const chapter of CHAPTERS) await expectVisibleFocusOutline(page.locator(`#${chapter.id} h2 a`));
+  await expectVisibleFocusOutline(page.locator("#sources").getByRole("link", { name: "მეთოდოლოგიის ნახვა →" }));
+  await expectVisibleFocusOutline(page.getByTestId("landing-ai-copy"));
+  await expectVisibleFocusOutline(page.locator("#ai").getByRole("link", { name: kaLanding["landing.ai.cta"] }));
 });
 
-test("landing keeps stats and dataset tables inside narrow viewports", async ({ page }) => {
-  // 768 and 820: tablet portrait, where the five dataset columns are narrowest (U01-23).
+test("landing keeps stats and chapters inside narrow viewports", async ({ page }) => {
+  // 768 and 820: tablet portrait, where the two-column chapter layouts are narrowest (U01-23).
   for (const width of [390, 320, 768, 820]) {
     await page.setViewportSize({ width, height: 844 });
     await page.goto(baseUrl);
@@ -769,139 +835,17 @@ test("landing keeps stats and dataset tables inside narrow viewports", async ({ 
     await expect(page.getByTestId("key-numbers").locator("[data-country-stat]")).toHaveCount(3);
     await expectNoPageOverflow(page);
     expect((await page.getByTestId("hero-cta").boundingBox())?.height ?? 0, `hero CTA at ${width}px`).toBeGreaterThanOrEqual(44);
-    // Nothing in a dataset link (a long value such as "25.9 მლრდ აშშ დოლარი") runs past the link's own box.
-    const overruns = await page.getByTestId("landing-datasets").getByRole("link").evaluateAll((links) =>
-      links.flatMap((link) => {
-        const box = link.getBoundingClientRect();
-        return [...link.querySelectorAll("*")]
-          .map((element) => element.getBoundingClientRect())
-          .filter((inner) => inner.right > box.right + 0.5 || inner.left < box.left - 0.5)
-          .map((inner) => `${link.textContent?.trim()}: ${Math.round(inner.right - box.right)}px`);
-      }),
-    );
-    expect(overruns, `dataset links at ${width}px`).toEqual([]);
 
-    for (const testId of [
-      "landing-dataset-expenditure",
-      "landing-dataset-revenue",
-      "landing-dataset-municipalities",
-    ]) {
-      await expectDatasetTableFits(page, testId);
-      const section = page.getByTestId(testId);
-      const positions = await section.locator(
-        '[data-testid="landing-dataset-index"], [data-testid="landing-dataset-copy"], [data-testid="landing-dataset-data"]',
-      ).evaluateAll((elements) => elements.map((element) => element.getBoundingClientRect().top));
-      expect(positions[1]).toBeGreaterThanOrEqual(positions[0]!);
-      expect(positions[2]).toBeGreaterThanOrEqual(positions[1]!);
+    for (const chapter of CHAPTERS) {
+      const heading = page.locator(`#${chapter.id} h2`);
+      await expect(heading).toBeVisible();
+      const box = (await heading.boundingBox())!;
+      expect(box.x, `${chapter.id} heading at ${width}px`).toBeGreaterThanOrEqual(0);
+      expect(box.x + box.width, `${chapter.id} heading at ${width}px`).toBeLessThanOrEqual(width);
     }
 
-    for (const testId of ["landing-debt", "landing-deficit"]) {
-      const section = page.getByTestId(testId);
-      await expect(section).toBeVisible();
-      await expect(section.getByRole("link")).toBeVisible();
-    }
-
-    if (width === 320) {
-      await expect(page.getByTestId("population-unit")).toHaveCSS("display", "block");
-      // The debt total and its two parts, whatever the latest figures are.
-      const amounts = page.getByTestId("landing-debt").getByText(LANDING_COPY.ka.amount);
-      await expect(amounts).toHaveCount(3);
-      for (const value of await amounts.all()) {
-        await expect(value).toBeVisible();
-        expect(
-          await value.evaluate((element) => element.getBoundingClientRect().height / Number.parseFloat(getComputedStyle(element).lineHeight)),
-          `${await value.textContent()} should stay on one line`,
-        ).toBeLessThan(1.2);
-      }
-    }
+    if (width === 320) await expect(page.getByTestId("population-unit")).toHaveCSS("display", "block");
   }
-});
-
-test("landing methodology keeps reading order and stays inside a 390px phone", async ({ page }) => {
-  await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto(`${baseUrl}/`);
-  const methodology = page.getByTestId("landing-methodology");
-  const methodologyTitle = methodology.getByRole("heading", { level: 2 });
-  const methodologyList = methodology.locator("ol");
-  const footer = page.getByTestId("site-footer");
-  await expect(methodology).toBeVisible();
-  await expect(methodologyTitle).toBeVisible();
-  await expect(methodologyList).toBeVisible();
-  await expect(footer).toBeVisible();
-  await page.evaluate(async () => {
-    await document.fonts.ready;
-    await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
-  });
-  const geometry = await page.evaluate(() => {
-    const section = document.querySelector<HTMLElement>('[data-testid="landing-methodology"]');
-    const title = section?.querySelector<HTMLElement>("h2");
-    const list = section?.querySelector<HTMLOListElement>("ol");
-    const footerElement = document.querySelector<HTMLElement>('[data-testid="site-footer"]');
-    if (!section || !title || !list || !footerElement) return null;
-
-    const box = (element: Element) => {
-      const rect = element.getBoundingClientRect();
-      return { x: rect.x, y: rect.y, width: rect.width, height: rect.height };
-    };
-
-    return {
-      methodology: box(section),
-      title: box(title),
-      list: box(list),
-      footer: box(footerElement),
-      overflow: {
-        body: document.body.scrollWidth,
-        viewport: document.documentElement.clientWidth,
-      },
-    };
-  });
-  expect(geometry).not.toBeNull();
-  if (!geometry) throw new Error("Landing methodology geometry was not found");
-  expect(geometry.methodology.x).toBeGreaterThanOrEqual(0);
-  expect(geometry.methodology.x + geometry.methodology.width).toBeLessThanOrEqual(390);
-  expect(geometry.title.x).toBeGreaterThanOrEqual(0);
-  expect(geometry.title.x + geometry.title.width).toBeLessThanOrEqual(390);
-  expect(geometry.list.x).toBeGreaterThanOrEqual(0);
-  expect(geometry.list.x + geometry.list.width).toBeLessThanOrEqual(390);
-  expect(geometry.list.y).toBeGreaterThanOrEqual(geometry.title.y + geometry.title.height);
-  expect(geometry.footer.y).toBeGreaterThanOrEqual(geometry.methodology.y + geometry.methodology.height);
-  expect(geometry.overflow).toEqual({ body: 390, viewport: 390 });
-});
-
-test("landing methodology keeps its introduction and link with the left heading on desktop", async ({ page }) => {
-  await page.setViewportSize({ width: 1366, height: 768 });
-  await page.goto(`${baseUrl}/`);
-
-  const methodology = page.getByTestId("landing-methodology");
-  const copy = methodology.getByTestId("landing-methodology-copy");
-  const intro = methodology.getByTestId("landing-methodology-intro");
-  const link = methodology.getByTestId("landing-methodology-link");
-  const list = methodology.locator("ol");
-  await expect(copy).toBeVisible();
-  await expect(intro).toBeVisible();
-  await expect(link).toBeVisible();
-  await expect(list).toBeVisible();
-
-  const positions = await page.evaluate(() => {
-    const section = document.querySelector<HTMLElement>('[data-testid="landing-methodology"]')!;
-    const box = (selector: string) => {
-      const rect = section.querySelector<HTMLElement>(selector)!.getBoundingClientRect();
-      return { left: rect.left, right: rect.right, top: rect.top };
-    };
-    return {
-      copy: box('[data-testid="landing-methodology-copy"]'),
-      intro: box('[data-testid="landing-methodology-intro"]'),
-      link: box('[data-testid="landing-methodology-link"]'),
-      list: box("ol"),
-    };
-  });
-
-  expect(positions.intro.left).toBeGreaterThanOrEqual(positions.copy.left);
-  expect(positions.intro.right).toBeLessThanOrEqual(positions.copy.right);
-  expect(positions.link.left).toBeGreaterThanOrEqual(positions.copy.left);
-  expect(positions.link.right).toBeLessThanOrEqual(positions.copy.right);
-  expect(positions.list.left).toBeGreaterThan(positions.copy.right);
-  expect(positions.list.top).toBeLessThanOrEqual(positions.intro.top);
 });
 
 test("footer links keep non-overlapping 24px mobile targets and keyboard focus", async ({ page }) => {
@@ -915,8 +859,8 @@ test("footer links keep non-overlapping 24px mobile targets and keyboard focus",
 
     const links = page.getByTestId("site-footer").getByRole("link");
     // The production connection is discoverable from every site footer.
-    // Logo, every dataset hub, methodology, AI-კავშირი, მიზანი and the address.
-    await expect(links).toHaveCount(NAV_TREE.length + 5);
+    // Logo, the address, every dataset hub, methodology, AI-კავშირი, მიზანი and the language link.
+    await expect(links).toHaveCount(NAV_TREE.length + 6);
     await expect(page.getByTestId("site-footer").getByRole("link", { name: "AI-კავშირი", exact: true })).toHaveAttribute("href", "/connect");
     for (const link of await links.all()) {
       await expectMinimumTarget(link);
@@ -943,14 +887,12 @@ test("active public-header underline sits directly beneath its label across the 
     const decoration = await activeLink.evaluate((link) => {
       const style = getComputedStyle(link);
       const header = link.closest("header")!;
-      const dataSection = document.querySelector('[data-testid="landing-data"]')!;
       return {
         line: style.textDecorationLine,
         color: style.textDecorationColor,
         thickness: style.textDecorationThickness,
         offset: style.textUnderlineOffset,
         headerBorder: getComputedStyle(header).borderBottomWidth,
-        dataBorder: getComputedStyle(dataSection).borderTopWidth,
       };
     });
     expect(decoration.line, `${viewport.width}px active label decoration`).toContain("underline");
@@ -958,12 +900,11 @@ test("active public-header underline sits directly beneath its label across the 
     expect(decoration.thickness).toBe("2px");
     expect(decoration.offset).toBe("5px");
     expect(decoration.headerBorder).toBe("0px");
-    expect(decoration.dataBorder).toBe("0px");
   }
 });
 
 async function expectRoomForEnlargedText(page: Page, width: number) {
-  const initialCanvasHeight = (await page.locator("figure canvas").boundingBox())!.height;
+  const initialCanvasHeight = (await page.locator(".landing-hero-frame canvas").boundingBox())!.height;
 
   // Text-only enlargement keeps the viewport and map scale unchanged.
   await page.locator("[data-hero-copy] p, [data-hero-copy] h1, [data-hero-copy] a").evaluateAll((elements) => {
@@ -973,13 +914,13 @@ async function expectRoomForEnlargedText(page: Page, width: number) {
   });
   await page.setViewportSize({ width: width + 1, height: 900 });
   await page.setViewportSize({ width, height: 900 });
-  await expect.poll(async () => (await page.locator("figure canvas").boundingBox())!.height).toBeGreaterThan(initialCanvasHeight);
+  await expect.poll(async () => (await page.locator(".landing-hero-frame canvas").boundingBox())!.height).toBeGreaterThan(initialCanvasHeight);
   const copy = await page.locator("[data-hero-copy]").boundingBox();
   const stats = await page.getByTestId("key-numbers").boundingBox();
   expect(copy).not.toBeNull();
   expect(stats).not.toBeNull();
-  const figure = await page.locator("figure").boundingBox();
-  const canvas = await page.locator("figure canvas").boundingBox();
+  const figure = await page.locator(".landing-hero-frame").boundingBox();
+  const canvas = await page.locator(".landing-hero-frame canvas").boundingBox();
   expect(canvas!.height).toBeLessThanOrEqual(figure!.height + 1);
   expect(stats!.y).toBeGreaterThanOrEqual(copy!.y + copy!.height + 24);
 
@@ -987,8 +928,8 @@ async function expectRoomForEnlargedText(page: Page, width: number) {
     for (const element of elements) (element as HTMLElement).style.removeProperty("font-size");
   });
   await expect.poll(async () => {
-    const frame = await page.locator("figure").boundingBox();
-    const canvas = await page.locator("figure canvas").boundingBox();
+    const frame = await page.locator(".landing-hero-frame").boundingBox();
+    const canvas = await page.locator(".landing-hero-frame canvas").boundingBox();
     return canvas!.height - frame!.height;
   }).toBeLessThanOrEqual(1);
 }
@@ -1011,7 +952,7 @@ for (const viewport of [
       const initialPage = await initialContext.newPage();
       await initialPage.goto(baseUrl);
       await initialPage.evaluate(() => document.fonts.ready.then(() => undefined));
-      const initialFigure = await initialPage.locator("figure").boundingBox();
+      const initialFigure = await initialPage.locator(".landing-hero-frame").boundingBox();
       const initialStats = await initialPage.getByTestId("key-numbers").boundingBox();
       expect(initialFigure).not.toBeNull();
       expect(initialStats).not.toBeNull();
@@ -1020,10 +961,10 @@ for (const viewport of [
       await page.goto(baseUrl);
       await page.evaluate(() => document.fonts.ready.then(() => undefined));
       const renderedHero =
-        viewport.width < 768 ? page.getByTestId("mobile-hero-static") : page.locator("figure canvas");
+        viewport.width < 768 ? page.getByTestId("mobile-hero-static") : page.locator(".landing-hero-frame canvas");
       await expect(renderedHero).toBeVisible({ timeout: 15_000 });
       await expect.poll(async () => {
-        const figure = await page.locator("figure").boundingBox();
+        const figure = await page.locator(".landing-hero-frame").boundingBox();
         const stats = await page.getByTestId("key-numbers").boundingBox();
         if (!figure || !stats) return Number.POSITIVE_INFINITY;
         return Math.max(
@@ -1031,7 +972,7 @@ for (const viewport of [
           Math.abs(stats.y - initialStats!.y),
         );
       }).toBeLessThanOrEqual(1);
-      const figure = await page.locator("figure").boundingBox();
+      const figure = await page.locator(".landing-hero-frame").boundingBox();
       const renderedHeroBox = await renderedHero.boundingBox();
       expect(figure).not.toBeNull();
       expect(renderedHeroBox).not.toBeNull();

@@ -81,7 +81,7 @@ export function AiSection({ tools, labels, locale }: { tools: string[]; labels: 
             <Link
               href={pageHref("/connect", locale)}
               prefetch={false}
-              className="-mb-3 mt-[22px] inline-flex items-center py-3 text-[12.5px] font-semibold text-[var(--ai-link)] underline decoration-[1.5px] underline-offset-4 hover:text-white"
+              className="-mb-3 mt-[22px] inline-flex min-h-11 items-center text-[12.5px] font-semibold text-[var(--ai-link)] underline decoration-[1.5px] underline-offset-4 hover:text-white"
             >
               {labels.cta}
             </Link>

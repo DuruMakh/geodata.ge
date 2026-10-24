@@ -58,7 +58,7 @@ export function SourcesSection({
           <Link
             href={pageHref("/methodology", locale)}
             prefetch={false}
-            className="-my-3 inline-flex items-center py-3 text-[12.5px] font-semibold text-[var(--accent)] underline decoration-[1.5px] underline-offset-4"
+            className="-my-3 inline-flex min-h-11 items-center text-[12.5px] font-semibold text-[var(--accent)] underline decoration-[1.5px] underline-offset-4"
           >
             {labels.methodologyLink}
           </Link>

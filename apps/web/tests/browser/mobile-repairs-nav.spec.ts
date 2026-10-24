@@ -91,43 +91,21 @@ for (const { path, menu, datasets, other } of [
   });
 }
 
-for (const { path, titles, measures } of [
-  { path: "/", titles: ["ბიუჯეტი", "ეკონომიკა", "ინფლაცია", "უმუშევრობა", "საგარეო ვაჭრობა"], measures: ["ხარჯები", "ნომინალური მშპ", "წლიური ინფლაცია", "უმუშევრობის დონე", "საგარეო სავაჭრო ბრუნვა"] },
-  { path: "/en", titles: ["Budget", "Economy", "Inflation", "Unemployment", "Trade"], measures: ["Spending", "Nominal GDP", "Annual inflation", "Unemployment rate", "Total trade"] },
-]) {
-  test(`${path} lists every dataset with a latest figure right after the country figures`, async ({ page }) => {
-    await page.goto(path);
-    const row = page.getByTestId("landing-datasets");
-    const links = row.getByRole("link");
-    await expect(links).toHaveCount(titles.length);
-    for (const [index, link] of (await links.all()).entries()) {
-      await expect(link).toContainText(titles[index]);
-      // "{measure} · {period}: {value}", the value a number with its unit.
-      await expect(link).toContainText(new RegExp(`${measures[index]} · [^:]+: [−\\d.]+( |%)`));
-      expect((await link.boundingBox())?.height ?? 0).toBeGreaterThanOrEqual(44);
-    }
-    const figures = await page.getByTestId("key-numbers").boundingBox();
-    const rowBox = await row.boundingBox();
-    expect(rowBox!.y).toBeGreaterThan(figures!.y + figures!.height - 1);
-    expect(rowBox!.y).toBeLessThan((await page.getByTestId("landing-data").boundingBox())!.y);
-    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(390);
-  });
-}
-
 // The hero CTA kept its 44px target only below 768px (U01-03); touch tablets sit above it.
 for (const width of [390, 768, 1280]) test(`landing calls to action are 44px tap targets at ${width}px`, async ({ page }) => {
   await page.setViewportSize({ width, height: 900 });
   await page.goto("/");
   const targets = [
     page.getByTestId("hero-cta"),
-    ...["landing-dataset-expenditure", "landing-dataset-revenue", "landing-dataset-municipalities", "landing-debt", "landing-deficit", "landing-methodology"].map((id) => page.getByTestId(id).getByRole("link").first()),
+    page.locator("#sources").getByRole("link", { name: "მეთოდოლოგიის ნახვა →" }),
+    page.locator("#ai").getByRole("link", { name: "AI-კავშირის ინსტრუქცია →" }),
   ];
   for (const target of targets) expect((await target.boundingBox())?.height ?? 0).toBeGreaterThanOrEqual(44);
 });
 
 for (const { path, labels } of [
   { path: "/explorer/unemployment", labels: ["ბიუჯეტი", "ეკონომიკა", "ბიზნესი", "საცხოვრებელი და მშენებლობა", "ინფლაცია", "ფული და ბანკები", "უმუშევრობა", "ხელფასები", "ცხოვრების დონე", "ჯანდაცვა და სოციალური დაცვა", "განათლება", "მეცნიერება და კულტურა", "დანაშაული და მართლმსაჯულება", "ინტერნეტი და ტექნოლოგიები", "საგარეო ვაჭრობა", "საგარეო ნაკადები", "ენერგეტიკა და სურსათი", "გარემო და კლიმატი", "ტრანსპორტი", "დემოგრაფია", "მეთოდოლოგია", "AI-კავშირი", "მიზანი"] },
-  { path: "/en", labels: ["Budget", "Economy", "Business", "Housing and construction", "Inflation", "Money and banks", "Unemployment", "Wages", "Living standards", "Health and social protection", "Education", "Science and culture", "Crime and justice", "Internet and technology", "Trade", "External flows", "Energy and food", "Environment and climate", "Transport", "Demography", "Methodology", "AI connection", "About"] },
+  { path: "/en/explorer/unemployment", labels: ["Budget", "Economy", "Business", "Housing and construction", "Inflation", "Money and banks", "Unemployment", "Wages", "Living standards", "Health and social protection", "Education", "Science and culture", "Crime and justice", "Internet and technology", "Trade", "External flows", "Energy and food", "Environment and climate", "Transport", "Demography", "Methodology", "AI connection", "About"] },
 ]) {
   test(`${path} footer names every dataset in a compact two-column grid`, async ({ page }) => {
     await page.goto(path);
