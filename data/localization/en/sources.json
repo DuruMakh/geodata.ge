@@ -3073,6 +3073,48 @@
     },
     "derivation": null
   },
+  "source.pension_fund_ifrs_2020": {
+    "name": {
+      "text": "Funded pension scheme financial statements for 2020 (IFRS)",
+      "reviewedAt": "2026-10-21"
+    },
+    "derivation": null
+  },
+  "source.pension_fund_ifrs_2022": {
+    "name": {
+      "text": "Funded pension scheme financial statements for 2022 (IFRS)",
+      "reviewedAt": "2026-10-21"
+    },
+    "derivation": null
+  },
+  "source.pension_fund_ifrs_2023": {
+    "name": {
+      "text": "Funded pension scheme financial statements for 2023 (IFRS)",
+      "reviewedAt": "2026-10-21"
+    },
+    "derivation": null
+  },
+  "source.pension_fund_ifrs_2024": {
+    "name": {
+      "text": "Funded pension scheme financial statements for 2024 (IFRS)",
+      "reviewedAt": "2026-10-21"
+    },
+    "derivation": null
+  },
+  "source.pension_fund_ifrs_2025": {
+    "name": {
+      "text": "Funded pension scheme financial statements for 2025 (IFRS)",
+      "reviewedAt": "2026-10-21"
+    },
+    "derivation": null
+  },
+  "source.pension_fund_report_2025": {
+    "name": {
+      "text": "Pension Fund of Georgia annual report 2025",
+      "reviewedAt": "2026-10-21"
+    },
+    "derivation": null
+  },
   "source.geostat_science_researchers": {
     "name": {
       "text": "Number of researchers by level of education, age groups and fields of science",
@@ -3766,6 +3808,26 @@
   },
   "source.geostat_transport_sea_page": {
     "name": { "text": "Maritime transport (source page capture)", "reviewedAt": "2026-10-20" },
+    "derivation": null
+  },
+  "source.mof_tax_expenditure_report_2024_xlsx_ka": {
+    "name": { "text": "Ministry of Finance, Tax Expenditure Report 2024: graphs and tables (Georgian)", "reviewedAt": "2026-10-21" },
+    "derivation": null
+  },
+  "source.mof_tax_expenditure_report_2024_xlsx_en": {
+    "name": { "text": "Ministry of Finance, Tax Expenditure Report 2024: graphs and tables (English)", "reviewedAt": "2026-10-21" },
+    "derivation": null
+  },
+  "source.mof_tax_expenditure_report_2024_pdf_ka": {
+    "name": { "text": "Ministry of Finance, Tax Expenditure Report 2024 (Georgian PDF)", "reviewedAt": "2026-10-21" },
+    "derivation": null
+  },
+  "source.mof_tax_expenditure_report_2024_pdf_en": {
+    "name": { "text": "Ministry of Finance, Tax Expenditure Report 2024 (English PDF)", "reviewedAt": "2026-10-21" },
+    "derivation": null
+  },
+  "source.treasury_tax_refunds_chart": {
+    "name": { "text": "State Treasury, return of tax overpayments by year", "reviewedAt": "2026-10-21" },
     "derivation": null
   }
 }

@@ -7,19 +7,26 @@ import { serializeBomCsvRows } from "../csvEscape";
 import { readVerifiedPackageFile } from "../sourcePackage";
 import { assertGeneratedArtifactMatches } from "../generatedArtifacts";
 import type { CsvRecord } from "../csv";
+import { fundedPensionMonths, fundedPensionUnit } from "./fundedPension";
 import {
-  SOCIAL_AGE_BANDS, SOCIAL_GEORGIA, SOCIAL_INDICATORS, SOCIAL_MUNICIPALITIES, SOCIAL_PACKAGE_GROUPS, SOCIAL_PAYMENT_PROGRAMMES, SOCIAL_REGIONS, SOCIAL_SOURCES, SOCIAL_UNITS,
+  FUNDED_PENSION_COUNTS, FUNDED_PENSION_MONEY, FUNDED_PENSION_SOURCES, SOCIAL_AGE_BANDS, SOCIAL_GEORGIA, SOCIAL_INDICATORS, SOCIAL_MUNICIPALITIES, SOCIAL_PACKAGE_GROUPS, SOCIAL_PAYMENT_PROGRAMMES, SOCIAL_REGIONS, SOCIAL_SOURCES, SOCIAL_UNITS,
   socialFactKey, socialSourceId, type SocialAcceptance, type SocialFact, type SocialIndicator, type SocialSeriesBreak,
 } from "./types";
 import { SOCIAL_AVERAGES, SOCIAL_AVERAGE_GAPS, SOCIAL_KNOWN_DIFFERENCES, socialAverage, socialUnit, validateSocialFacts, type SocialAverageInputs } from "./validation";
 
 const RESEARCH = "docs/Raw Data/Social/ssa-statistics";
+const FUNDED_RESEARCH = "docs/Raw Data/Social/pension-fund";
 export const REVIEWED_AT = "2026-10-20";
+/** The Pension Fund package was retrieved and read on this date. */
+export const FUNDED_REVIEWED_AT = "2026-10-21";
 export const SOCIAL_CSV_HEADERS = ["year", "indicator_id", "geography_id", "value", "unit", "months", "basis", "value_status", "source_id", "source_workbook", "source_sheet", "source_cell", "last_reviewed_at"];
 const PACKAGE_HEADERS = ["programme", "measure", "geography_id", "year", "value", "months", "value_status", "source_table", "source_workbook", "source_sheet", "source_cell"];
+const FUNDED_HEADERS = ["measure", "year", "value", "unit", "months", "source_id", "document", "page", "line"];
 const BREAK_HEADERS = ["break_id", "applies_to", "reference_date", "reason", "source_note"];
 const SERVED_ROWS = 24451;
+const FUNDED_ROWS = 99;
 type Source = { source_id: string; kind: string; table_id: string; local_file: string; sha256: string; bytes: number };
+type FundedSource = { source_id: string; document: string; local_file: string; sha256: string; bytes: number; used_for: string };
 
 /** The package's own measures served as an indicator of their own (social package groups are mapped by name below). */
 const OWN: Readonly<Record<string, SocialIndicator>> = {
@@ -80,11 +87,15 @@ export async function loadSocialAverageInputs(repositoryRoot: string): Promise<S
   return averageInputs(await readServedPackage(repositoryRoot));
 }
 
-/** Every workbook a served value is read from, and SSA's statistics page, against the package manifest; and the package's own checks. */
+/**
+ * Every SSA workbook a served value is read from, and SSA's statistics page, against the package manifest; and the package's own checks.
+ * The Pension Fund's documents are not SSA tables: `readFundedPension` verifies them, and together the two cover every source in SOCIAL_SOURCES.
+ */
 async function checkPackage(directory: string, rows: readonly CsvRecord[]): Promise<string> {
   const manifest: Source[] = JSON.parse(await fs.readFile(path.join(directory, "source-manifest.json"), "utf8"));
   const tables = new Set(rows.map(row => row.source_table));
-  if (tables.size !== SOCIAL_SOURCES.length || [...tables].some(table => !SOCIAL_SOURCES.includes(socialSourceId(table)))) throw new Error("Social source inventory mismatch");
+  const ssaSources = SOCIAL_SOURCES.filter(id => !FUNDED_PENSION_SOURCES.includes(id));
+  if (tables.size !== ssaSources.length || [...tables].some(table => !ssaSources.includes(socialSourceId(table)))) throw new Error("Social source inventory mismatch");
   const workbooks = new Map(rows.map(row => [row.source_workbook, row.source_table]));
   for (const [workbook, table] of workbooks) {
     const entries = manifest.filter(source => source.kind === "workbook" && source.local_file === `official/workbooks/${workbook}`);
@@ -99,6 +110,42 @@ async function checkPackage(directory: string, rows: readonly CsvRecord[]): Prom
   if (report.passed !== true || report.failures.length !== 0 || report.counts.served_rows !== SERVED_ROWS
     || independent.passed !== true || independent.problems !== 0 || independent.served_rows_checked !== SERVED_ROWS) throw new Error("Social research package validation has not passed");
   return "passed";
+}
+
+/**
+ * The Pension Fund package's 99 printed figures as facts. Each cited statement is read against `source-manifest.json` (size and
+ * SHA-256) and the package's own validation must have passed; `page` and `line` become the sheet and cell of the fact.
+ */
+async function readFundedPension(repositoryRoot: string): Promise<SocialFact[]> {
+  const directory = path.join(repositoryRoot, FUNDED_RESEARCH);
+  const file = path.join(directory, "pension-fund-annual.csv");
+  const header = (parse(await fs.readFile(file), { bom: true, to_line: 1 }) as string[][])[0];
+  if (header.join(",") !== FUNDED_HEADERS.join(",")) throw new Error("Pension fund file header changed");
+  const rows = await readCsv(file);
+  if (rows.length !== FUNDED_ROWS) throw new Error(`Pension fund file has ${rows.length} rows, expected ${FUNDED_ROWS}`);
+  const manifest: FundedSource[] = JSON.parse(await fs.readFile(path.join(directory, "source-manifest.json"), "utf8"));
+  const served = manifest.filter(source => source.used_for === "served");
+  if (served.length !== FUNDED_PENSION_SOURCES.length || served.some(source => !FUNDED_PENSION_SOURCES.includes(source.source_id))) throw new Error("Pension fund source inventory mismatch");
+  for (const row of rows) {
+    if (!served.some(source => source.source_id === row.source_id && source.document === row.document)) throw new Error(`Pension fund document not in the source manifest: ${row.document}`);
+  }
+  for (const source of served) await readVerifiedPackageFile(directory, source.local_file, source, `Social source capture mismatch: ${source.document}`);
+  const report = JSON.parse(await fs.readFile(path.join(directory, "validation-report.json"), "utf8")) as { passed: boolean; failures: unknown[]; rows: number; csv_sha256: string };
+  if (report.passed !== true || report.failures.length !== 0 || report.rows !== FUNDED_ROWS) throw new Error("Pension fund research package validation has not passed");
+  // The report names the CSV `extract.py` wrote beside it, so a value edited by hand in the CSV is caught here.
+  if (createHash("sha256").update(await fs.readFile(file)).digest("hex") !== report.csv_sha256) throw new Error("Social source capture mismatch: pension-fund-annual.csv");
+  return rows.map(row => {
+    const indicatorId = (FUNDED_PENSION_MONEY as readonly string[]).includes(row.measure) ? `social.funded_pension.${row.measure}.amount`
+      : [...FUNDED_PENSION_COUNTS, "return"].includes(row.measure) ? `social.funded_pension.${row.measure}` : null;
+    if (!indicatorId || !(SOCIAL_INDICATORS as readonly string[]).includes(indicatorId)) throw new Error(`Pension fund row has no indicator: ${row.measure}`);
+    const unit = fundedPensionUnit(indicatorId);
+    const months = fundedPensionMonths(indicatorId);
+    if (row.unit !== unit || Number(row.months) !== months) throw new Error(`Pension fund row disagrees with its indicator: ${row.measure} ${row.year}`);
+    return {
+      year: Number(row.year), indicatorId: indicatorId as SocialIndicator, geographyId: SOCIAL_GEORGIA, value: row.value, unit, months,
+      basis: "actual", valueStatus: "official", sourceId: row.source_id, sourceWorkbook: row.document, sourceSheet: row.page, sourceCell: row.line, lastReviewedAt: FUNDED_REVIEWED_AT,
+    };
+  });
 }
 
 /** Served places are the site's own: Georgia, the regions and municipalities of municipalities.csv (never Tbilisi's code 04) and the two SSA units. */
@@ -164,10 +211,11 @@ const fact = (indicatorId: SocialIndicator, row: CsvRecord): SocialFact => ({
 /**
  * Promotes the research package's served file into the canonical serving CSV: its place, social package and programme
  * values as published, money series starting in their first 12-month year, the averages (money ÷ month-count sum) and
- * the Social payments rows with their total.
+ * the Social payments rows with their total; and the Pension Fund package's funded pension values after them.
  */
 export async function prepareSocialData(repositoryRoot: string, mode: "write" | "check"): Promise<void> {
   const directory = path.join(repositoryRoot, RESEARCH);
+  const funded = await readFundedPension(repositoryRoot);
   const rows = await readServedPackage(repositoryRoot);
   const researchStatus = await checkPackage(directory, rows);
   await checkPlaces(repositoryRoot, rows);
@@ -224,7 +272,7 @@ export async function prepareSocialData(repositoryRoot: string, mode: "write" | 
     };
   });
 
-  const facts = [...served, ...averages, ...payments, ...totals];
+  const facts = [...served, ...averages, ...payments, ...totals, ...funded];
   validateSocialFacts(facts, inputs);
   facts.sort((a, b) => order.get(a.indicatorId)! - order.get(b.indicatorId)! || (a.geographyId < b.geographyId ? -1 : a.geographyId > b.geographyId ? 1 : 0) || a.year - b.year);
   const csv = serializeBomCsvRows([SOCIAL_CSV_HEADERS, ...facts.map(f => [f.year, f.indicatorId, f.geographyId, f.value, f.unit, f.months, f.basis, f.valueStatus, f.sourceId, f.sourceWorkbook, f.sourceSheet, f.sourceCell, f.lastReviewedAt])]);

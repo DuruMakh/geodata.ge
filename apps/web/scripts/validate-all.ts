@@ -46,6 +46,7 @@ export const DATA_VALIDATE_CHECKS = [
   "data:check-housing",
   "data:check-gdp-expenditure",
   "data:check-expenditure-types",
+  "data:check-tax-breaks-refunds",
   "data:check-internet",
   "data:check-education",
   "data:check-social",
