@@ -4,6 +4,7 @@ import { createWorkbookBuffer } from "../../lib/explorer/workbookWriter.client";
 import {
   absoluteWorkbookSourceUrl,
   buildWorkbookExportModel,
+  pictureFilename,
   type WorkbookExportInput,
 } from "../../lib/explorer/workbookModel";
 
@@ -191,5 +192,12 @@ describe("buildWorkbookExportModel", () => {
 
     expect(withBasis("published").readable.subtitle).toBe("2020–2021 · გამოქვეყნებული · მილიონი ₾");
     expect(withBasis("preliminary").readable.subtitle).toBe("2020–2021 · წინასწარი · მილიონი ₾");
+  });
+});
+
+describe("pictureFilename", () => {
+  it("names pictures like workbooks", () => {
+    expect(pictureFilename("wages-overview-1995-2025", "ka")).toBe("fiscal-wages-overview-1995-2025.png");
+    expect(pictureFilename("wages-overview-1995-2025", "en")).toBe("fiscal-wages-overview-1995-2025-en.png");
   });
 });

@@ -125,6 +125,11 @@ export function workbookFilename(stem: string, locale: Locale): string {
   return `fiscal-${stem}${locale === "en" ? "-en" : ""}.xlsx`;
 }
 
+/** `fiscal-<stem>.png`, named like the workbook of the same view (DESIGN.md §7.17). */
+export function pictureFilename(stem: string, locale: Locale): string {
+  return `fiscal-${stem}${locale === "en" ? "-en" : ""}.png`;
+}
+
 /** An English label as file-name words: lower case, each run of spaces and punctuation one hyphen. */
 export function filenameWords(label: string): string {
   return label.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
