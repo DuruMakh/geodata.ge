@@ -25,16 +25,17 @@ export function mixHex(a: string, b: string, t: number): string {
 
 /**
  * Grid of `total` equal squares for a chart `width` px wide: rows 16..220, the tallest grid that stays within
- * 1.04 x clamp(0.56 x width, 280, 520); a 40-row grid when none fits. Squares fill column by column.
+ * 1.04 x clamp(0.56 x width, 280, 520), or within `maxHeight` when the chart's height is already set; a 40-row grid
+ * when none fits. Squares fill column by column.
  */
-export function gridFor(width: number, total: number): { rows: number; cols: number; cell: number; gap: number; height: number } {
-  const target = clamp(Math.round(width * 0.56), 280, 520);
+export function gridFor(width: number, total: number, maxHeight?: number): { rows: number; cols: number; cell: number; gap: number; height: number } {
+  const limit = maxHeight ?? clamp(Math.round(width * 0.56), 280, 520) * 1.04;
   let best: { rows: number; cols: number; cell: number; height: number } | null = null;
   for (let rows = 16; rows <= 220; rows++) {
     const cols = Math.ceil(total / rows);
     const cell = width / cols;
     const height = rows * cell;
-    if (height <= target * 1.04 && (!best || height > best.height)) best = { rows, cols, cell, height };
+    if (height <= limit && (!best || height > best.height)) best = { rows, cols, cell, height };
   }
   if (!best) {
     const cols = Math.ceil(total / 40);

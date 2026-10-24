@@ -42,17 +42,18 @@ export function createSquares({ wrap, canvas, marker, markerLabel, total, initia
   let introT0 = 0;
   let hover = -1;
 
+  // The wrapper's height is set in CSS, so drawing never moves the page; the grid fills it from the bottom.
   const layout = () => {
     const w = Math.round(wrap.clientWidth);
-    if (!w || w === W) return false;
+    const h = Math.round(wrap.clientHeight);
+    if (!w || !h || (w === W && h === H)) return false;
     W = w;
-    const grid = gridFor(W, total);
+    H = h;
+    const grid = gridFor(W, total, H);
     rows = grid.rows;
     cols = grid.cols;
     cell = grid.cell;
     gap = grid.gap;
-    H = grid.height;
-    wrap.style.height = `${H}px`;
     return true;
   };
 

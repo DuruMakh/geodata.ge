@@ -156,7 +156,8 @@ export function ScaleChapter({ data, labels }: { data: ScaleData; labels: ScaleL
             {count(data.squares)} {labels.square} = {gdp?.label ?? ""}, {data.year}
           </span>
         </div>
-        <div ref={wrapRef} className="relative h-[280px] w-full cursor-crosshair min-[1000px]:h-[420px]">
+        {/* The engine's grid target, clamp(0.56 x width, 280, 520), reserved before it loads. */}
+        <div ref={wrapRef} className="relative aspect-[100/56] max-h-[520px] min-h-[280px] w-full cursor-crosshair">
           {failed ? (
             <ChartUnavailable text={labels.unavailable} summary={ariaLabel} />
           ) : (

@@ -105,6 +105,15 @@ describe("gridFor", () => {
     expect(gridFor(280, 10460).gap).toBe(1);
   });
 
+  it("stays within a given height instead of the target", () => {
+    for (const [width, height] of [[892, 500], [335, 280], [1000, 520]]) {
+      const grid = gridFor(width, 10460, height);
+      expect(grid.rows * grid.cell).toBeLessThanOrEqual(height);
+      expect(grid.rows * grid.cell).toBeGreaterThan(height * 0.95);
+      expect(grid.cols * grid.rows).toBeGreaterThanOrEqual(10460);
+    }
+  });
+
   it("uses the 40-row fallback when no row count fits", () => {
     const grid = gridFor(300, 5);
     expect(grid.rows).toBe(40);

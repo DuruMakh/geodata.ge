@@ -80,6 +80,10 @@ describe("ScaleChapter (server render = default state)", () => {
     expect(markup).toContain('aria-label="10,460 კვადრატი, თითოეული 10 მილიონი ლარი; სახელმწიფო ბიუჯეტის ხარჯები (გეგმა): 33.4 მლრდ ₾');
   });
 
+  it("reserves the grid's height in CSS, so the engine never resizes the chart", () => {
+    expect(html).toMatch(/<div class="relative aspect-\[100\/56\] max-h-\[520px\] min-h-\[280px\] w-full/);
+  });
+
   it("keeps the tooltip out of the accessibility tree and the marker label on the default measure", () => {
     expect(html).toMatch(/<div[^>]*aria-hidden="true"[^>]*opacity-0/);
     expect(html).toContain(">31.9% მშპ-ის</span>");
