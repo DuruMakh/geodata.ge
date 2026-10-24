@@ -1,0 +1,84 @@
+import type { MatrixCell } from "../realExpenditure/parseTavi6Rows";
+import { buildRowId, parentFunctionalCode, type ExpenditurePdfOfficialRow } from "../realExpenditurePdf/phase1Pilot";
+import { parseThousandGel } from "./readDocxTables";
+import { BUDGET_LAW_2026 } from "./sources";
+
+/** Both law tables print code, label, 2024 fact, 2025 plan, 2026 plan (then the 2026 funding split). */
+const LAW_AMOUNT_COLUMNS = { fact2024: 2, plan2026: 4 } as const;
+const LAW_COLUMN_YEARS = { fact2024: 2024, plan2026: 2026 } as const;
+
+export type LawAmountColumn = keyof typeof LAW_AMOUNT_COLUMNS;
+
+const FUNCTIONAL_CODE = /^7(\.\d+)*$/;
+
+/**
+ * Turns the Article 9 functional table (Tavi III) into the official-row shape the Treasury E11
+ * parser produces, so the unchanged COFOG mapping rules read one column of the law as "actual".
+ */
+export function lawFunctionalRows(table: string[][], column: LawAmountColumn): ExpenditurePdfOfficialRow[] {
+  const year = LAW_COLUMN_YEARS[column];
+  const formId = "budget-law-article-9";
+  const functionalPaths = new Map<string, string>();
+
+  return table
+    .filter((row) => FUNCTIONAL_CODE.test(row[0] ?? ""))
+    .map((row, index): ExpenditurePdfOfficialRow => {
+      const [code, labelKa] = row;
+      const isGrandTotal = code === "7";
+      const functionalCode = isGrandTotal ? null : code;
+      let hierarchyPath = labelKa;
+      if (functionalCode) {
+        const parentCode = parentFunctionalCode(functionalCode);
+        hierarchyPath = parentCode ? [functionalPaths.get(parentCode), labelKa].filter(Boolean).join(" > ") : labelKa;
+        functionalPaths.set(functionalCode, hierarchyPath);
+      }
+      const actualRaw = row[LAW_AMOUNT_COLUMNS[column]] ?? "";
+      const actualThousandGel = parseThousandGel(actualRaw);
+
+      return {
+        sourceId: BUDGET_LAW_2026.sourceId,
+        sourceFile: "docs/Raw Data/Expenditure/mof.ge/budget-law-2026/2026-tavi-III.doc",
+        year,
+        formId,
+        tableTitle: `2026 state budget law Article 9, functional classification (${column})`,
+        pageNumber: 0,
+        tableIndex: 1,
+        rowIndex: index + 1,
+        rowId: buildRowId({ year, formId, functionalCode, economicCode: "00", hierarchyPath }),
+        rowType: isGrandTotal ? "grand_total" : "functional_total",
+        includeInPublicMapping: !isGrandTotal,
+        identityConfidence: "official_code",
+        functionalCode,
+        economicCode: "00",
+        hierarchyPath,
+        labelKa,
+        approvedPlanRaw: null,
+        approvedPlanThousandGel: null,
+        approvedPlanGel: null,
+        revisedPlanRaw: null,
+        revisedPlanThousandGel: null,
+        revisedPlanGel: null,
+        actualRaw,
+        actualThousandGel,
+        actualGel: Math.round(actualThousandGel * 1000),
+        annualObligationRaw: null,
+        annualObligationThousandGel: null,
+        annualObligationGel: null,
+        yearResourceRaw: null,
+        yearResourceThousandGel: null,
+        yearResourceGel: null,
+        sourceUnit: "gel",
+        rawRowText: row.join(" | "),
+      };
+    });
+}
+
+/**
+ * Turns the Article 16 table (Tavi VI) into a header-less matrix of `[code, label, null, null, 2026 plan]`
+ * rows: parseTavi6Rows then finds the "00 00" row and reads the amount three cells after the label.
+ */
+export function lawTavi6Matrix(table: string[][]): MatrixCell[][] {
+  return table
+    .filter((row) => row[1] && row[1] !== "დასახელება")
+    .map((row) => [row[0] || null, row[1], null, null, parseThousandGel(row[LAW_AMOUNT_COLUMNS.plan2026] ?? "")]);
+}
