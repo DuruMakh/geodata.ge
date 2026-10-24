@@ -58,13 +58,14 @@ export function buildChapterSentences({ spending, revenue, municipal, deficit }:
   const deficitIndex = deficit.projectionFrom === null ? deficit.years.length - 1 : deficit.years.indexOf(deficit.projectionFrom) - 1;
   const deficitKey = deficit.deepest.year === PANDEMIC_YEAR ? "landing.sentence.deficitPandemic" : "landing.sentence.deficit";
 
+  // A latest year whose active facts are planned is told as the budget's plan, not as money already spent or received.
   return {
-    spending: message(messages, "landing.sentence.spending", {
+    spending: message(messages, spending.planned[spendingIndex] ? "landing.sentence.spendingPlanned" : "landing.sentence.spending", {
       year: spending.years[spendingIndex]!,
       total: billions(spending.totals[spendingIndex]!),
       field: message(messages, `landing.spendingField.${largest.id.replace(/^spending\./, "")}`),
     }),
-    revenue: message(messages, "landing.sentence.revenue", {
+    revenue: message(messages, revenue.planned[revenueIndex] ? "landing.sentence.revenuePlanned" : "landing.sentence.revenue", {
       year: revenue.years[revenueIndex]!,
       total: billions(revenue.totals[revenueIndex]!),
       tax: formatShare(revenue.taxShare[revenueIndex]!, false, 0),

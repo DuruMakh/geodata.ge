@@ -162,6 +162,34 @@ describe("buildChapterSentences", () => {
     }
   });
 
+  it("tells a planned latest year as the budget's plan, in both languages", () => {
+    const plannedSpending: SpendingSeries = { ...spending, planned: [false, true] };
+    const plannedRevenue: RevenueSeries = { ...revenueWith(3_110_400_000), planned: [false, true] };
+    const planned = (presentation: typeof ka | typeof en) =>
+      buildChapterSentences(
+        { spending: plannedSpending, revenue: plannedRevenue, municipal: municipal(6_100_000_000, 2_100_000_000), deficit: deficit(2020) },
+        presentation,
+      );
+    expect(planned(ka).spending).toBe("2025 წლის სახელმწიფო ბიუჯეტით 27.7 მილიარდი ლარის ხარჯია დაგეგმილი — ყველაზე მეტი სოციალურ დაცვაზე.");
+    expect(planned(en).spending).toBe("Georgia’s 2025 state budget plans 27.7 billion lari of spending — most of it on social protection.");
+    expect(planned(ka).revenue).toBe(
+      "2025 წლის ნაერთი ბიუჯეტით 32.4 მილიარდი ლარის შემოსულობაა დაგეგმილი: 79% გადასახადებიდან, 9.6% — ვალდებულებების ზრდიდან.",
+    );
+    expect(planned(en).revenue).toBe("Georgia’s 2025 consolidated budget plans 32.4 billion lari of revenue: 79% from taxes and 9.6% from new liabilities.");
+    // An actual latest year keeps the past-tense sentence, even when earlier years were planned.
+    const actual = buildChapterSentences(
+      {
+        spending: { ...spending, planned: [true, false] },
+        revenue: { ...revenueWith(3_110_400_000), planned: [true, false] },
+        municipal: municipal(6_100_000_000, 2_100_000_000),
+        deficit: deficit(2020),
+      },
+      en,
+    );
+    expect(actual.spending).toBe("In 2025 the state budget spent GEL 27.7 billion — most of it on social protection.");
+    expect(actual.revenue).toBe("In 2025 consolidated budget revenue came to GEL 32.4 billion: 79% came from taxes and 9.6% from new liabilities.");
+  });
+
   it("treats a missing liabilities value as zero", () => {
     const result = buildChapterSentences(
       { spending, revenue: revenueWith(null), municipal: municipal(6_100_000_000, 2_100_000_000), deficit: deficit(2020) },
