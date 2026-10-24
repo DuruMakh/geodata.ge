@@ -10,7 +10,7 @@ import { GEORGIA_PLACE_ID } from "../explorer/demographyAreas";
 import { MARRIAGE_SERIES, marriageFactsForPlace, marriageSourceId } from "../explorer/demographyMarriage";
 import { buildMarriageIndexModel } from "../explorer/demographyMarriageIndex";
 import { populationHrefById } from "../explorer/demographyPlaceRoutes";
-import { DEMOGRAPHY_HUB_PATH, MARRIAGES_DIVORCES_PATH } from "../explorer/demographyRoutes";
+import { DEMOGRAPHY_HUB_PATH, MARRIAGES_DIVORCES_ANCHOR, MARRIAGES_DIVORCES_PATH } from "../explorer/demographyRoutes";
 import { formatInUnit, UNIT_DENSITY, UNIT_PERSONS } from "../explorer/format";
 import { message } from "../i18n/messages";
 import { clientPresentation, getPresentation } from "../i18n/presentation.server";
@@ -37,9 +37,6 @@ export async function demographyMarriagesDivorcesPageMetadata(locale: Locale) {
   });
 }
 
-/** The place pages' section the map's rows open. */
-const ANCHOR = "#marriages-divorces";
-
 export async function renderDemographyMarriagesDivorcesPage(locale: Locale) {
   // The population basics bring the place list, the municipal registry and a presentation that already loads `municipal` (the map's words).
   const [{ facts: served }, { municipal, presentation, places }, sources] = await Promise.all([
@@ -62,7 +59,7 @@ export async function renderDemographyMarriagesDivorcesPage(locale: Locale) {
     .at(-1)!;
   const { first, last } = marriageYears(served);
   const placeYears = served.filter((fact) => fact.seriesId === SERIES.marriages && fact.geographyId !== GEORGIA_PLACE_ID).map((fact) => fact.year);
-  const hrefById = Object.fromEntries(Object.entries(populationHrefById(places)).map(([id, href]) => [id, `${href}${ANCHOR}`]));
+  const hrefById = Object.fromEntries(Object.entries(populationHrefById(places)).map(([id, href]) => [id, `${href}${MARRIAGES_DIVORCES_ANCHOR}`]));
   const title = t("marriagesTitle");
   const crumbs = [
     { label: message(messages, "common.home"), href: pageHref("/", locale) },

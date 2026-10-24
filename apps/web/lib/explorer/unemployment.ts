@@ -14,6 +14,11 @@ export function unemploymentPlaceLatest(facts: readonly ClientUnemploymentObserv
   return facts.filter(f => f.dimension === (regionId ? "region" : "national") && (!regionId || f.groupId === regionId) && f.indicatorId === indicator && f.value != null).sort((a, b) => a.year - b.year).at(-1);
 }
 
+/** The Regions index's national rate: Georgia's unemployment rate in the map's year, the latest regional one. */
+export function unemploymentRegionsNationalRate<T extends Pick<ClientUnemploymentObservation, "dimension" | "indicatorId" | "year">>(facts: readonly T[], year: number): T | undefined {
+  return facts.find(fact => fact.dimension === "national" && fact.indicatorId === "unemployment_rate" && fact.year === year);
+}
+
 export function unemploymentReferenceId(state: Pick<UnemploymentState, "breakdown" | "educationSex" | "overview" | "regional" | "regionId">): string {
   if (state.breakdown === "age") return "";
   if (state.regional) return `${state.regionId ?? "georgia"}:unemployment_rate`;

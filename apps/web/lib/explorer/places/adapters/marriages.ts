@@ -2,7 +2,7 @@ import { loadServedDemographyData } from "../../../data/demography/importDemogra
 import { loadServedMunicipalData } from "../../../data/servedData";
 import { buildMarriageIndexModel } from "../../demographyMarriageIndex";
 import { populationPlaceHref } from "../../demographyPlaceRoutes";
-import { MARRIAGES_DIVORCES_PATH } from "../../demographyRoutes";
+import { MARRIAGES_DIVORCES_ANCHOR, MARRIAGES_DIVORCES_PATH } from "../../demographyRoutes";
 import { formatInUnit, UNIT_PERSONS } from "../../format";
 import { placePageIds } from "../places.server";
 import type { PlaceAdapter } from "../types";
@@ -13,6 +13,6 @@ export const marriageEntries: PlaceAdapter = async () => {
   const index = buildMarriageIndexModel({ facts, regions, municipalities });
   return ids.map((id) => {
     const number = index.countsById[id]!.marriages;
-    return { placeId: id, page: MARRIAGES_DIVORCES_PATH, href: `${populationPlaceHref(id)}#marriages-divorces`, value: formatInUnit(number, UNIT_PERSONS), number, period: String(index.year) };
+    return { placeId: id, page: MARRIAGES_DIVORCES_PATH, href: `${populationPlaceHref(id)}${MARRIAGES_DIVORCES_ANCHOR}`, value: formatInUnit(number, UNIT_PERSONS), number, period: String(index.year) };
   });
 };

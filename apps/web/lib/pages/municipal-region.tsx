@@ -15,13 +15,11 @@ import { PageHeader } from "../../components/shell/page-header";
 import { loadServedLandingData, loadServedMunicipalData } from "../data/servedData";
 import { ADJARA_REGION_ID } from "../data/municipal/types";
 import {
-  applyAdjaraBudgetAdjustment,
-  aggregateFactsForEntity,
   buildCountryTotalByYear,
   buildMunicipalListRows,
   buildPickerGroups,
   latestReviewedAtForMunicipalFacts,
-  regionFactsFor,
+  regionOwnFacts,
   buildPickerCountry,
 } from "../explorer/municipalData";
 import { projectMunicipalFunctionFact, projectMunicipalTotalFact } from "../explorer/clientData";
@@ -80,15 +78,7 @@ function buildRegionPageFacts(
     ranks[year] = yearList.regions.find((row) => row.id === regionId)?.rank ?? 0;
     return ranks;
   }, {});
-  const members = regionFactsFor(regionId, municipalities, functionFacts, totalFacts);
-  const rolled = aggregateFactsForEntity(regionId, members.functionFacts, members.totalFacts);
-  const own =
-    regionId === ADJARA_REGION_ID
-      ? {
-          ...rolled,
-          totalFacts: applyAdjaraBudgetAdjustment(rolled.totalFacts, adjaraBudgetAdjustments),
-        }
-      : rolled;
+  const { members, own } = regionOwnFacts(regionId, municipalities, functionFacts, totalFacts, adjaraBudgetAdjustments);
   const latestTotal = own.totalFacts.find((row) => row.year === latestYear)!;
   const largestFunctionFact = own.functionFacts
     .filter((row) => row.year === latestYear)

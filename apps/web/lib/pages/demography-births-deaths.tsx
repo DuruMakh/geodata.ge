@@ -9,7 +9,7 @@ import { loadServedDemographyData } from "../data/demography/importDemography";
 import { SERIES, SOURCE_ID } from "../data/demography/series";
 import { projectNationalObservation } from "../explorer/clientData";
 import { populationHrefById } from "../explorer/demographyPlaceRoutes";
-import { BIRTHS_DEATHS_PATH, DEMOGRAPHY_HUB_PATH } from "../explorer/demographyRoutes";
+import { BIRTHS_DEATHS_ANCHOR, BIRTHS_DEATHS_PATH, DEMOGRAPHY_HUB_PATH } from "../explorer/demographyRoutes";
 import { NATIONAL_SERIES, nationalYears } from "../explorer/demographyNational";
 import { buildVitalIndexModel } from "../explorer/demographyVitalIndex";
 import { formatInUnit, UNIT_PERSONS } from "../explorer/format";
@@ -34,8 +34,6 @@ export async function demographyBirthsDeathsPageMetadata(locale: Locale) {
   });
 }
 
-const ANCHOR = "#births-deaths";
-
 export async function renderDemographyBirthsDeathsPage(locale: Locale) {
   // The population basics bring the place list, the municipal registry and a presentation that already loads `municipal` (the map's words).
   const [{ facts: served }, { municipal, presentation, places }, sources] = await Promise.all([
@@ -55,7 +53,7 @@ export async function renderDemographyBirthsDeathsPage(locale: Locale) {
   // The header's coverage is the births span; the national series must cover the same years or the header would mislead.
   if (national[0] !== first || national.at(-1) !== last) throw new Error(`National series cover ${national[0]}–${national.at(-1)}, births ${first}–${last}`);
   const georgia = index.countsById["country.georgia"]!;
-  const hrefById = Object.fromEntries(Object.entries(populationHrefById(places)).map(([id, href]) => [id, `${href}${ANCHOR}`]));
+  const hrefById = Object.fromEntries(Object.entries(populationHrefById(places)).map(([id, href]) => [id, `${href}${BIRTHS_DEATHS_ANCHOR}`]));
   const title = message(messages, "demography.birthsDeathsTitle");
   const crumbs = [
     { label: message(messages, "common.home"), href: pageHref("/", locale) },

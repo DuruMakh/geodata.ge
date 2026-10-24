@@ -14,14 +14,20 @@ import { buildVitalPlaceModel, vitalFactsForPlace } from "../../lib/explorer/dem
 import { SERIES } from "../../lib/data/demography/series";
 import { formatAmount, formatInUnit, MISSING, UNIT_PERSONS } from "../../lib/explorer/format";
 import { aggregateFactsForEntity, applyAdjaraBudgetAdjustment, regionFactsFor } from "../../lib/explorer/municipalData";
-import { municipalityCodeForSlug } from "../../lib/explorer/municipalityRoutes";
+import { MUNICIPALITY_ROUTES, municipalityCodeForSlug } from "../../lib/explorer/municipalityRoutes";
+import type { MunicipalTotalFact } from "../../lib/data/municipal/types";
+import { message } from "../../lib/i18n/messages";
+import { getMessages } from "../../lib/i18n/messages.server";
+import { coverageFromYears } from "../../lib/seo/metadata";
+import { latestOwnTotal } from "../../lib/explorer/places/adapters/municipalBudget";
 import { buildPlaceIndex, entriesForPage } from "../../lib/explorer/places/buildPlaceIndex.server";
 import type { PlaceIndex } from "../../lib/explorer/places/types";
 import { loadServedMunicipalData } from "../../lib/data/servedData";
 import { NAV_TREE } from "../../lib/navigation/navTree";
 import { renderEducationPlacePage } from "../../lib/pages/education-places";
 import { renderHouseholdRegionPage } from "../../lib/pages/household";
-import { renderUnemploymentRegionPage } from "../../lib/pages/unemployment-regions";
+import { renderUnemploymentRegionPage, renderUnemploymentRegionsPage } from "../../lib/pages/unemployment-regions";
+import { renderWagesRegionsIndexPage } from "../../lib/pages/wages-regions-index";
 import { renderWagesRegionPage } from "../../lib/pages/wages";
 import { renderPageMarkup } from "../helpers/render-localized";
 
@@ -56,6 +62,18 @@ function latestLine(html: string, testId: string): string {
   if (!match) throw new Error(`No ${testId} line`);
   return match[1]!.replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim();
 }
+
+describe("a Budget page's latest total", () => {
+  const total = (year: number, publicTotalGel: number) => ({ year, publicTotalGel }) as MunicipalTotalFact;
+
+  it("is the place's own latest year, even where it lags the others", () => {
+    expect(latestOwnTotal([total(2023, 5), total(2024, 7), total(2022, 3)], "99")).toEqual(total(2024, 7));
+  });
+
+  it("is an error for a place with no total, never 0 ₾", () => {
+    expect(() => latestOwnTotal([], "99")).toThrow("No budget total for 99");
+  });
+});
 
 describe.each(["ka", "en"] as const)("place index (%s)", (locale) => {
   let index: PlaceIndex;
@@ -202,12 +220,40 @@ describe.each(["ka", "en"] as const)("place index (%s)", (locale) => {
     }
   });
 
+  it("states Georgia's and each municipality's budget as its own Budget page does", async () => {
+    const { totalFacts, countryTotalFacts } = await loadServedMunicipalData();
+    // The pages' own logic (lib/pages/municipality.tsx, municipal-country.tsx): the latest year's own total.
+    const latestYear = coverageFromYears(totalFacts).lastYear;
+    for (const { slug } of MUNICIPALITY_ROUTES) {
+      const code = municipalityCodeForSlug(slug)!;
+      const latestTotal = totalFacts.find((fact) => fact.municipalityCode === code && fact.year === latestYear)!;
+      const budget = entry(code === "04" ? "region.tbilisi" : code, "/explorer/municipalities");
+      expect([budget.value, budget.period, budget.href], slug).toEqual([formatAmount(latestTotal.publicTotalGel, locale), String(latestYear), `/explorer/municipalities/${slug}`]);
+    }
+    const countryYear = coverageFromYears(countryTotalFacts).lastYear;
+    const georgia = entry("country.georgia", "/explorer/municipalities");
+    expect([georgia.value, georgia.period, georgia.href]).toEqual([
+      formatAmount(countryTotalFacts.find((fact) => fact.year === countryYear)!.publicTotalGel, locale), String(countryYear), "/explorer/municipalities/georgia",
+    ]);
+  });
+
+  it("states Georgia's unemployment rate as the Regions index's national tile does", async () => {
+    const messages = await getMessages(locale, ["unemployment"]);
+    const label = message(messages, "unemployment.nationalRate").replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const html = renderPageMarkup(locale, await renderUnemploymentRegionsPage(locale));
+    const tile = new RegExp(`>${label}</span><span[^>]*>([^<]*)</span><span[^>]*>([^<]*)</span>`).exec(html);
+    expect(tile, "national tile").not.toBeNull();
+    const georgia = entry("country.georgia", "/explorer/unemployment/regions");
+    expect([georgia.value, georgia.period]).toEqual([tile![1], tile![2]]);
+  }, 120_000);
+
   it("states the figure each sampled place page's latest line renders", async () => {
     const pages = [
       { placeId: "region.adjara", page: "/explorer/wages/regions", testId: "wages-latest", render: () => renderWagesRegionPage("adjara", locale) },
       { placeId: BATUMI, page: "/explorer/education/schools", testId: "education-latest", render: () => renderEducationPlacePage({ kind: "municipality", slug: "batumi" }, locale, "schools") },
       { placeId: "region.adjara", page: "/explorer/living-standards/income", testId: "household-latest", render: () => renderHouseholdRegionPage("income", "adjara", locale) },
       { placeId: "region.adjara", page: "/explorer/unemployment/regions", testId: "unemployment-latest", render: () => renderUnemploymentRegionPage("adjara", locale) },
+      { placeId: "country.georgia", page: "/explorer/wages/regions", testId: "wages-latest", render: () => renderWagesRegionsIndexPage(locale) },
     ];
     for (const sample of pages) {
       const line = latestLine(renderPageMarkup(locale, await sample.render()), sample.testId);

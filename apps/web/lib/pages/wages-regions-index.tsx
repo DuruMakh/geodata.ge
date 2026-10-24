@@ -4,6 +4,7 @@ import { PageHeader } from "../../components/shell/page-header";
 import { BreadcrumbJsonLd } from "../../components/seo/breadcrumb-json-ld";
 import { JsonLd } from "../../components/seo/json-ld";
 import { buildWagesRegionMapModel } from "../explorer/wagesRegionMap";
+import { wagesPlaceLatest } from "../explorer/wages";
 import { coverageLabel } from "../explorer/coverageLabel";
 import { I18nProvider } from "../i18n/provider";
 import { message } from "../i18n/messages";
@@ -20,7 +21,7 @@ export async function renderWagesRegionsIndexPage(locale: Locale) {
   const lastReviewedAt = data.facts.map(f => f.lastReviewedAt).sort().at(-1)!;
   const t = (key: string) => message(presentation.messages, `wages.${key}`), title = t("page.regions.title");
   const regionMap = buildWagesRegionMapModel(facts);
-  const national = facts.filter(f => f.dimension === "national" && f.value !== null).sort((a, b) => a.year - b.year).at(-1)!;
+  const national = wagesPlaceLatest(facts);
   const crumbs = [{ label: message(presentation.messages, "common.home"), href: pageHref("/", locale) }, { label: message(presentation.messages, "common.data") }, { label: t("title"), href: pageHref("/explorer/wages", locale) }, { label: title }];
   const parent = wagesRegionsDataset(presentation.messages);
   return <I18nProvider {...clientPresentation(presentation)}>

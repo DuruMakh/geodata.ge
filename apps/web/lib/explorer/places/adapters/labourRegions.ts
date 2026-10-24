@@ -7,7 +7,8 @@ import { getMessages } from "../../../i18n/messages.server";
 import type { Locale, Messages } from "../../../i18n/types";
 import { GEORGIA_PLACE_ID } from "../../demographyAreas";
 import { formatInUnit } from "../../format";
-import { formatUnemploymentValue, unemploymentPlaceLatest } from "../../unemployment";
+import { formatUnemploymentValue, unemploymentPlaceLatest, unemploymentRegionsNationalRate } from "../../unemployment";
+import { buildUnemploymentRegionMapModel } from "../../unemploymentRegionMap";
 import { unemploymentRegionHref } from "../../unemploymentRegionRoutes";
 import { UNEMPLOYMENT_SECTIONS } from "../../unemploymentSections";
 import { WAGES_SECTIONS, wagesPlaceLatest, wagesRegionHref } from "../../wages";
@@ -16,11 +17,15 @@ import type { PlaceAdapter, PlaceEntry } from "../types";
 const UNEMPLOYMENT_REGIONS_PAGE = UNEMPLOYMENT_SECTIONS.find((section) => section.id === "regions")!.href;
 const WAGES_REGIONS_PAGE = WAGES_SECTIONS.find((section) => section.id === "regions")!.href;
 
-/** The unemployment rate of each region, and Georgia's on the Regions page itself, in its latest year. */
+/**
+ * The unemployment rate of each region in its latest year, and Georgia's as the Regions page itself states it: the national
+ * rate in the map's year, the latest regional one.
+ */
 async function unemployment(messages: Messages): Promise<PlaceEntry[]> {
   const { facts } = await loadServedUnemploymentData();
+  const mapYear = buildUnemploymentRegionMapModel(facts).year;
   return [undefined, ...REGIONAL_ECONOMY_REGIONS.map((region) => region.id)].flatMap((regionId) => {
-    const latest = unemploymentPlaceLatest(facts, regionId, "unemployment_rate");
+    const latest = regionId ? unemploymentPlaceLatest(facts, regionId, "unemployment_rate") : unemploymentRegionsNationalRate(facts, mapYear);
     if (!latest) return [];
     return [{
       placeId: regionId ?? GEORGIA_PLACE_ID, page: UNEMPLOYMENT_REGIONS_PAGE, href: regionId ? unemploymentRegionHref(regionId) : UNEMPLOYMENT_REGIONS_PAGE,
@@ -29,7 +34,7 @@ async function unemployment(messages: Messages): Promise<PlaceEntry[]> {
   });
 }
 
-/** The average monthly wage, all sectors, of each region, and Georgia's on the Regions page itself, in its latest year (₾ to one decimal). */
+/** The average monthly wage, all sectors, of each region, and Georgia's (the Regions page's line), in its latest year (₾ to one decimal). */
 async function wages(messages: Messages): Promise<PlaceEntry[]> {
   const facts = (await loadServedWagesData()).facts.map(toClientWagesFact);
   const gel = message(messages, "wages.unit");
