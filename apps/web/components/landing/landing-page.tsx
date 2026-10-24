@@ -58,7 +58,7 @@ export function LandingPage({ chapters, gdpFigure, presentation, updatedAt }: { 
   ];
   const chapterLink = (n: number, path: string) => ({ title: t(`landing.ch${n}.title`), href: pageHref(path, locale), hint: t(`landing.ch${n}.hint`) });
   const units = { bnGel: t("landing.bnGel"), mlnGel: t("landing.mlnGel") };
-  const unavailable = t("landing.chartUnavailable");
+  const unavailable = t("landing.heroUnavailable");
 
   const scaleLabels: ScaleLabels = {
     squareNote: t("landing.scale.squareNote"),
@@ -110,7 +110,7 @@ export function LandingPage({ chapters, gdpFigure, presentation, updatedAt }: { 
     rank: t("landing.municipal.rank"),
     occupied: t("landing.municipal.occupied"),
     occupiedNote: t("landing.municipal.occupiedNote"),
-    total: t("landing.municipal.total"),
+    total: t("landing.revenue.total"),
     share: t("landing.share"),
     chartSummary: t("landing.municipal.chartSummary"),
     unavailable,
@@ -122,7 +122,7 @@ export function LandingPage({ chapters, gdpFigure, presentation, updatedAt }: { 
     surplus: t("landing.deficit.surplus"),
     forecast: t("landing.deficit.forecast"),
     imf: t("landing.deficit.imf"),
-    surplusRun: t("landing.deficit.surplusRun"),
+    surplusRun: t("landing.deficit.surplus"),
     vsGdp: t("landing.deficit.vsGdp"),
     inGel: t("landing.deficit.inGel"),
     deepest: t("landing.deficit.deepest"),

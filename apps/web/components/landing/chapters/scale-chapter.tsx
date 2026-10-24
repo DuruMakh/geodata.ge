@@ -150,7 +150,7 @@ export function ScaleChapter({ data, labels }: { data: ScaleData; labels: ScaleL
         </div>
         <div ref={wrapRef} className="relative h-[280px] w-full cursor-crosshair min-[1000px]:h-[420px]">
           {failed ? (
-            <ChartUnavailable text={labels.unavailable} />
+            <ChartUnavailable text={labels.unavailable} summary={ariaLabel} />
           ) : (
             <canvas ref={canvasRef} role="img" aria-label={ariaLabel} className="absolute left-0 top-0" />
           )}

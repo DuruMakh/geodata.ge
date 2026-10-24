@@ -230,7 +230,7 @@ export function SpendingChapter({ data, labels }: { data: SpendingSeries; labels
         <figure>
           <div ref={wrapRef} className="relative h-[360px] w-full min-[601px]:h-[440px] min-[1000px]:h-[520px]">
             {failed ? (
-              <ChartUnavailable text={labels.unavailable} />
+              <ChartUnavailable text={labels.unavailable} summary={ariaLabel} />
             ) : (
               <canvas ref={canvasRef} role="img" aria-label={ariaLabel} className="absolute left-0 top-0" />
             )}

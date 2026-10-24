@@ -109,7 +109,8 @@ export function createTreemap({ wrap, canvas, data, initial, frameText, amount, 
       const sub = dark ? "rgba(247,242,233,.8)" : "rgba(30,27,22,.82)";
       ctx.font = `600 12.5px ${ui}`;
       txt(ctx, fitText(ctx, field.label, w - 20), x + 10, y + 21, `600 12.5px ${ui}`, dark ? paper : ink);
-      txt(ctx, amount(v), x + 10, y + 39, `500 11.5px ${num}`, sub);
+      ctx.font = `500 11.5px ${num}`;
+      txt(ctx, fitText(ctx, amount(v), w - 20), x + 10, y + 39, `500 11.5px ${num}`, sub);
       if (tier === "nameAmountShare") txt(ctx, formatShare(fraction), x + 10, y + 56, `500 11.5px ${num}`, sub);
     });
     ctx.restore();

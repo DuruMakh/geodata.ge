@@ -107,7 +107,6 @@
   "landing.ai.node5Title": "პასუხი",
   "landing.ai.node5Text": "ციფრი წყაროს მითითებით; თუ მონაცემი არ არსებობს, ასისტენტი ამას გეტყვით.",
   "landing.mlnGel": "მლნ ₾",
-  "landing.chartUnavailable": "ვიზუალი ვერ ჩაიტვირთა — მონაცემები ხელმისაწვდომია ექსპლორერში",
   "landing.ch1.title": "რამხელაა ბიუჯეტი ეკონომიკასთან შედარებით",
   "landing.ch1.hint": "ბიუჯეტის ანალიზი",
   "landing.ch1.lede": "ყოველი კვადრატი 10 მილიონი ლარია.",
@@ -149,7 +148,6 @@
   "landing.deficit.surplus": "პროფიციტი",
   "landing.deficit.forecast": "პროგნოზი",
   "landing.deficit.imf": "IMF-ის პროგნოზი",
-  "landing.deficit.surplusRun": "პროფიციტი",
   "landing.deficit.vsGdp": "მშპ-სთან",
   "landing.deficit.inGel": "ლარში",
   "landing.deficit.deepest": "ყველაზე ღრმა",
@@ -160,6 +158,5 @@
   "landing.municipal.rank": "რანგი ბიუჯეტით",
   "landing.municipal.occupied": "ოკუპირებული ტერიტორია",
   "landing.municipal.occupiedNote": "მუნიციპალური ბიუჯეტის მონაცემები არ არსებობს",
-  "landing.municipal.total": "სულ",
   "landing.municipal.chartSummary": "საქართველოს მუნიციპალიტეტების ბიუჯეტის სამგანზომილებიანი რელიეფი"
 }

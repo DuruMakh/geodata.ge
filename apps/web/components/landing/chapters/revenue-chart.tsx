@@ -92,7 +92,7 @@ export function RevenueChart({ data, labels }: { data: RevenueSeries; labels: Re
           </ul>
         </figcaption>
         <div ref={wrapRef} className="relative h-[360px] w-full min-[768px]:h-[420px]">
-          {failed ? <ChartUnavailable text={labels.unavailable} /> : <canvas ref={canvasRef} role="img" aria-label={ariaLabel} className="absolute left-0 top-0" />}
+          {failed ? <ChartUnavailable text={labels.unavailable} summary={ariaLabel} /> : <canvas ref={canvasRef} role="img" aria-label={ariaLabel} className="absolute left-0 top-0" />}
           <ChartTip tipRef={tipRef} rows={data.bands.length} />
         </div>
       </figure>

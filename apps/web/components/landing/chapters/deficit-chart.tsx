@@ -99,7 +99,7 @@ export function DeficitChart({ data, labels }: { data: DeficitChapter; labels: D
           </ul>
         </figcaption>
         <div ref={wrapRef} className="relative h-[340px] w-full min-[768px]:h-[420px]">
-          {failed ? <ChartUnavailable text={labels.unavailable} /> : <canvas ref={canvasRef} role="img" aria-label={ariaLabel} className="absolute left-0 top-0" />}
+          {failed ? <ChartUnavailable text={labels.unavailable} summary={ariaLabel} /> : <canvas ref={canvasRef} role="img" aria-label={ariaLabel} className="absolute left-0 top-0" />}
           <ChartTip tipRef={tipRef} rows={2} />
         </div>
       </figure>

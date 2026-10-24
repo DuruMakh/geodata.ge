@@ -107,7 +107,6 @@
   "landing.ai.node5Title": "Answer",
   "landing.ai.node5Text": "A figure with its source; if the data does not exist, the assistant will say so.",
   "landing.mlnGel": "mln GEL",
-  "landing.chartUnavailable": "The visual could not load — data is available in the explorer",
   "landing.ch1.title": "How big is the budget next to the economy",
   "landing.ch1.hint": "Budget analysis",
   "landing.ch1.lede": "Each square is GEL 10 million.",
@@ -149,7 +148,6 @@
   "landing.deficit.surplus": "Surplus",
   "landing.deficit.forecast": "Projection",
   "landing.deficit.imf": "IMF projection",
-  "landing.deficit.surplusRun": "Surplus",
   "landing.deficit.vsGdp": "of GDP",
   "landing.deficit.inGel": "in GEL",
   "landing.deficit.deepest": "deepest",
@@ -160,6 +158,5 @@
   "landing.municipal.rank": "Rank by budget",
   "landing.municipal.occupied": "Occupied territory",
   "landing.municipal.occupiedNote": "No municipal budget data exist",
-  "landing.municipal.total": "total",
   "landing.municipal.chartSummary": "Three-dimensional relief of Georgia’s municipal budgets"
 }

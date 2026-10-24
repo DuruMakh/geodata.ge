@@ -89,11 +89,15 @@ export function useEngine<M>(ref: RefObject<Element | null>, load: () => Promise
   return state;
 }
 
-/** Stands in for a chart's canvas when its engine could not load; the chart keeps its reserved height. */
-export function ChartUnavailable({ text }: { text: string }) {
+/**
+ * Stands in for a chart's canvas when its engine could not load; the chart keeps its reserved height, and the
+ * canvas's accessible summary (`summary`) stays readable to assistive technology.
+ */
+export function ChartUnavailable({ text, summary }: { text: string; summary: string }) {
   return (
     <div className="absolute inset-0 flex items-center justify-center">
       <p className="px-4 text-center font-[family-name:var(--font-numeric)] text-[11px] text-[var(--faint)]">{text}</p>
+      <p className="sr-only">{summary}</p>
     </div>
   );
 }

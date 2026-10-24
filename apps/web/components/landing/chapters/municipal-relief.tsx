@@ -95,7 +95,7 @@ export function MunicipalRelief({ data, labels }: { data: MunicipalChapter; labe
       <figure>
         <div ref={stageRef} className="home-muni-stage">
           {failed ? (
-            <ChartUnavailable text={labels.unavailable} />
+            <ChartUnavailable text={labels.unavailable} summary={ariaLabel} />
           ) : (
             <canvas key={webgl ? "webgl" : "2d"} ref={canvasRef} role="img" aria-label={ariaLabel} className="absolute left-0 top-0" />
           )}

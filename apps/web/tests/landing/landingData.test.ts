@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 import type { SourceDocumentRow } from "../../lib/data/sources";
 import { getMessages } from "../../lib/i18n/messages.server";
 import { buildLandingContext, landingGdpFigure } from "../../lib/landing/landingData";
+import type { HomeChapters } from "../../lib/landing/chapters/types";
 import type { ServedBudgetFact } from "../../lib/servedRows";
 
 const sourceDocuments: SourceDocumentRow[] = [
@@ -68,6 +69,19 @@ vi.mock("next/navigation", async (original) => ({ ...(await original<typeof impo
 // The sources chapter reads the archive report that only `prebuild` writes; see the helper.
 vi.mock("../../lib/methodology/prepareArchives", async (importOriginal) =>
   (await import("../helpers/archive-summaries")).withValidatedArchiveSummaries(importOriginal));
+// Keeps the chapters model the page builds, so the tests can check it against the served facts.
+const built = vi.hoisted(() => ({ chapters: [] as HomeChapters[] }));
+vi.mock("../../lib/landing/chapters", async (importOriginal) => {
+  const original = await importOriginal<typeof import("../../lib/landing/chapters")>();
+  return {
+    ...original,
+    buildHomeChapters: (...args: Parameters<typeof original.buildHomeChapters>) => {
+      const chapters = original.buildHomeChapters(...args);
+      built.chapters.push(chapters);
+      return chapters;
+    },
+  };
+});
 describe("landing page layout", () => {
   it("keeps a key number's unit on one line and renders the chapters in order, chart text included", async () => {
     const { renderPageMarkup } = await import("../helpers/render-localized");
@@ -88,5 +102,30 @@ describe("landing page layout", () => {
     expect(chapter("ch-03").match(/<li data-band="[a-zA-Z]+"/g)?.length).toBeGreaterThanOrEqual(6);
     // The site footer, with the mission sentence.
     expect(markup).toContain("ჩვენი მიზანია");
+  });
+  it("links the chapter headings to the English explorer pages on /en", async () => {
+    const { renderPageMarkup } = await import("../helpers/render-localized");
+    const { renderHomePage } = await import("../../lib/pages/home");
+    const markup = renderPageMarkup("en", await renderHomePage("en"));
+    const headingLinks = [...markup.matchAll(/<h2[^>]*>[\s\S]*?<\/h2>/g)].flatMap((match) => [...match[0].matchAll(/href="([^"]+)"/g)].map((link) => link[1]));
+    expect(headingLinks).toEqual(["/en/explorer/analysis", "/en/explorer/expenditure", "/en/explorer/revenue", "/en/explorer/municipalities", "/en/explorer/deficit"]);
+  });
+
+  // Two municipal totals by design: chapter 01 compares the official all-local-budgets country aggregate with GDP;
+  // chapter 04 adds up the 64 mapped places it draws (its sentence says "64 მუნიციპალიტეტის").
+  it("pins the two municipal totals: ch-01 is the country aggregate fact, ch-04 the sum of its places", async () => {
+    const { renderHomePage } = await import("../../lib/pages/home");
+    const { loadServedMunicipalData } = await import("../../lib/data/servedData");
+    const { MUNICIPAL_COUNTRY_ID } = await import("../../lib/data/municipal/types");
+    built.chapters.length = 0;
+    await renderHomePage("ka");
+    const { scale, municipal } = built.chapters[0];
+    const aggregate = (await loadServedMunicipalData()).countryTotalFacts.find(
+      (fact) => fact.municipalityCode === MUNICIPAL_COUNTRY_ID && fact.year === scale.year,
+    );
+    expect(aggregate).toBeDefined();
+    expect(scale.measures.find((measure) => measure.id === "municipal")?.valueGel).toBe(aggregate?.publicTotalGel);
+    expect(municipal.places).toHaveLength(64);
+    expect(municipal.totalGel).toBe(municipal.places.reduce((sum, place) => sum + place.totalGel, 0));
   });
 });
