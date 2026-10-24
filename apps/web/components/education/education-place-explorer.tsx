@@ -17,6 +17,7 @@ import { useI18n } from "../../lib/i18n/provider";
 import { pageHref } from "../../lib/i18n/routes";
 import { ExcelDownloadButton } from "../explorer/excel-download-button";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
+import { ChartShareButton } from "../explorer-shell/chart-share-button";
 import { FlatSeriesPanel } from "../explorer-shell/flat-series-panel";
 import { LatestValueLine } from "../explorer-shell/latest-value-line";
 import { ModeTabs } from "../explorer-shell/mode-tabs";
@@ -97,6 +98,9 @@ export function EducationPlaceExplorer({
     prev: { label: navigation.prev.label, href: withState(navigation.prev.href, navigation.prev.id) },
     next: { label: navigation.next.label, href: withState(navigation.next.href, navigation.next.id) },
   };
+  const chart = <EditorialLineChart years={model.years} series={lineSeries} share={false} unit={unit} shareLabel={chartLabel} formatTooltipValue={valueLabel} formatPeriod={period} />;
+  const shareAction = model.selected.length ? <ChartShareButton title={`${title} ${placeName}`} caption={`${unitLabel} · ${period(model.range.start)}–${period(model.range.end)}`}
+    legend={lineSeries.map(({ label, color }) => ({ label, color }))} source={t(`sourceNote.${set}`)} chart={chart} period={`${model.range.start}-${model.range.end}`} /> : undefined;
   return <div data-testid={`education-place-${set}`}>
     <EntityHeading title={title} triggerLabel={placeName} metaLine={<LatestValueLine testId="education-latest" sentence={metaLine} />} entityId={place.id}
       navigation={neighbours} pickerCountry={pickerCountry} pickerGroups={pickerGroups} pickerOverrides={overrides} />
@@ -108,13 +112,13 @@ export function EducationPlaceExplorer({
             <span data-testid="education-unit-label" className="text-[11px] text-[var(--muted)]">{unitLabel}</span>
           </div>
           {!model.selected.length ? <div className="mt-5"><Callout testId="no-selection-callout">{t("emptySelection")}</Callout></div>
-            : state.mode === "line" ? <div className="mt-5"><EditorialLineChart years={model.years} series={lineSeries} share={false} unit={unit} shareLabel={chartLabel} formatTooltipValue={valueLabel} formatPeriod={period} /></div>
+            : state.mode === "line" ? <div className="mt-5">{chart}</div>
             : <ExplorerTable caption={`${chartLabel} · ${unitLabel} · ${period(model.range.start)}–${period(model.range.end)}`} rows={rows.filter(row => row !== total)} totalRow={total} showTotal={Boolean(total)} totalFirst wrapRowLabels rowLabelsLocalized years={model.years} yearLabel={period} firstColumnLabel={t("series")} unit={unit} share={false} showChangeColumn={false} shareValueForYear={() => null} />}
           <ChartSelectionAids series={lineSeries} chartShown={state.mode === "line"} share={false} unit={unit} formatValue={valueLabel} />
           <RangeStrip years={educationPlaceCoverage(set, place.id, facts, state.selectedIds).years} range={model.range} formatPeriod={period}
             onChange={patch => update(s => ({ ...s, range: rangeFromPatch(buildEducationPlaceModel(set, place.id, facts, s).range, patch) }))} />
         </section>
-        <div className="mt-[18px]"><SourceNote testId="source-label">{t(`sourceNote.${set}`)} · {unitLabel} · {period(model.range.start)}–{period(model.range.end)} · <span className="whitespace-nowrap">{updatedDate(lastReviewedAt, locale)}</span>
+        <div className="mt-[18px]"><SourceNote testId="source-label" action={shareAction}>{t(`sourceNote.${set}`)} · {unitLabel} · {period(model.range.start)}–{period(model.range.end)} · <span className="whitespace-nowrap">{updatedDate(lastReviewedAt, locale)}</span>
           <Link href={pageHref("/methodology/education", locale)} prefetch={false} className="ml-2 text-[var(--accent)] underline underline-offset-4">{t("methodology")}</Link>
         </SourceNote></div>
         {children}

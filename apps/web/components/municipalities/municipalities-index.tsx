@@ -18,6 +18,7 @@ import { SourceNote, TabDivider, TextTab, TextTabGroup } from "../ui/editorial";
 import { SEARCH_FIELD_PROPS } from "../main-explorer/series-selector";
 import { MunicipalityMap } from "./municipality-map";
 import { useAppReady } from "../explorer-shell/use-app-ready";
+import { ChartShareButton } from "../explorer-shell/chart-share-button";
 
 /** Plain data, so a server page can hand it over. Every field is omitted by the Budget index. */
 export type MunicipalitiesIndexOverrides = {
@@ -50,6 +51,8 @@ type MunicipalitiesIndexProps = Omit<MunicipalityMapModel, "legendMinPerResident
   kpis: MunicipalKpi[];
   /** Inline content only: it renders inside the source note's paragraph. */
   sourceNote: ReactNode;
+  /** The map's share picture (DESIGN.md §7.17): its title, unit line and source as plain text, and the year for the file name. */
+  share: { title: string; caption: string; source: string; period: string; testId?: string };
   overrides?: MunicipalitiesIndexOverrides;
 };
 
@@ -214,6 +217,18 @@ export function MunicipalitiesIndex(props: MunicipalitiesIndexProps) {
     );
   }
 
+  const mapProps = {
+    viewBox: props.viewBox,
+    shapes: props.shapes,
+    markers: props.markers,
+    occupiedAreas: props.occupiedAreas,
+    touchTargets: props.touchTargets,
+    legendMin: props.legendMin,
+    legendMax: props.legendMax,
+    wording: overrides?.mapWording,
+    hrefForCode: (code: string) => hrefFor("municipality", code),
+  };
+
   return (
     <>
       <div data-testid="municipal-index-workspace" className="grid items-start gap-10 @min-[1100px]:grid-cols-[minmax(0,1fr)_336px]">
@@ -221,18 +236,10 @@ export function MunicipalitiesIndex(props: MunicipalitiesIndexProps) {
           {overrides?.headings ? <h2 className="sr-only">{overrides.headings.map}</h2> : null}
           <div>
             <MunicipalityMap
-              viewBox={props.viewBox}
-              shapes={props.shapes}
-              markers={props.markers}
-              occupiedAreas={props.occupiedAreas}
-              touchTargets={props.touchTargets}
-              legendMin={props.legendMin}
-              legendMax={props.legendMax}
+              {...mapProps}
               activeCode={activeMunicipalityCode}
               onActiveCodeChange={setMapActiveCode}
               onOpenMunicipality={openMunicipality}
-              wording={overrides?.mapWording}
-              hrefForCode={(code) => hrefFor("municipality", code)}
             />
           </div>
           {overrides?.mapNote}
@@ -319,7 +326,10 @@ export function MunicipalitiesIndex(props: MunicipalitiesIndexProps) {
         </div>
       </div>
       <div className="mt-9 border-t border-[var(--hairline)] pt-4">
-        <SourceNote testId="municipal-source-note">
+        <SourceNote testId="municipal-source-note" action={
+          <ChartShareButton {...props.share} source={`${props.share.source} ${message(messages, "municipal.boundaries")} © OpenStreetMap contributors (ODbL).`}
+            chart={<MunicipalityMap {...mapProps} activeCode={null} onActiveCodeChange={() => {}} onOpenMunicipality={() => {}} />} />
+        }>
           {props.sourceNote}{" "}
           {/* The choropleth is a vendored OSM derivative, so ODbL §4.3 attribution
               belongs wherever it is publicly used. Fixed text, so it lives here

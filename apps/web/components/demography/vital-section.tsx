@@ -15,6 +15,7 @@ import { pageHref } from "../../lib/i18n/routes";
 import type { TemplateValues } from "../../lib/i18n/types";
 import type { ClientDemographyObservation } from "../../lib/servedRows";
 import { ModeTabs } from "../explorer-shell/mode-tabs";
+import { ChartShareButton } from "../explorer-shell/chart-share-button";
 import { ExplorerTable } from "../main-explorer/explorer-table";
 import { HeroKpi, KPI_GRID_CLASS, SideKpiList } from "../main-explorer/kpi-blocks";
 import { StackedColumnChart } from "../main-explorer/stacked-column-chart";
@@ -58,6 +59,28 @@ export function VitalSection({
         : t(streak.since === latest.year ? "vitalDeathsAhead" : "vitalDeathsSince", { year: streak.since })
       : t(streak.kind === "even" ? "vitalEven" : "vitalBirthsAhead", { year: streak.year });
 
+  const chart = (
+    <StackedColumnChart
+      periods={model.years}
+      periodsPerYear={1}
+      segments={[
+        { id: "births", label: t("vitalBirths"), color: BIRTHS, marker: "up", values: values(model.births, 1) },
+        { id: "deaths", label: t("vitalDeaths"), color: DEATHS, marker: "down", values: values(model.deaths, -1) },
+      ]}
+      overlay={{ label: t("vitalNatural"), values: values(model.natural, 1) }}
+      legend={[
+        { id: "births", label: t("vitalBirths"), color: BIRTHS },
+        { id: "deaths", label: t("vitalDeaths"), color: DEATHS },
+        { id: "natural", label: t("vitalNatural"), color: INK },
+      ]}
+      formatPeriod={String}
+      formatValue={(value) => persons(Math.abs(value))}
+      formatOverlayValue={(value) => signedPersons(value)}
+      readoutOrder="sign-then-magnitude"
+      ariaLabel={t("vitalChartAria", { place: name, first, last })}
+    />
+  );
+
   return (
     <section id="births-deaths" aria-labelledby="births-deaths-title" data-testid="vital-section" className={`@container ${SECTION_CLASS}`}>
       <SectionTitle id="births-deaths-title">{t("vitalTitle")}</SectionTitle>
@@ -66,25 +89,7 @@ export function VitalSection({
         <ModeTabs value={mode} onChange={setMode} testId="vital" lineLabel={t("columns")} />
         <div className="mt-5">
           {mode === "line" ? (
-            <StackedColumnChart
-              periods={model.years}
-              periodsPerYear={1}
-              segments={[
-                { id: "births", label: t("vitalBirths"), color: BIRTHS, marker: "up", values: values(model.births, 1) },
-                { id: "deaths", label: t("vitalDeaths"), color: DEATHS, marker: "down", values: values(model.deaths, -1) },
-              ]}
-              overlay={{ label: t("vitalNatural"), values: values(model.natural, 1) }}
-              legend={[
-                { id: "births", label: t("vitalBirths"), color: BIRTHS },
-                { id: "deaths", label: t("vitalDeaths"), color: DEATHS },
-                { id: "natural", label: t("vitalNatural"), color: INK },
-              ]}
-              formatPeriod={String}
-              formatValue={(value) => persons(Math.abs(value))}
-              formatOverlayValue={(value) => signedPersons(value)}
-              readoutOrder="sign-then-magnitude"
-              ariaLabel={t("vitalChartAria", { place: name, first, last })}
-            />
+            chart
           ) : (
             <ExplorerTable
               caption={t("vitalTableCaption", { place: name, first, last })}
@@ -107,7 +112,10 @@ export function VitalSection({
         </div>
       </div>
       <div className="mt-[18px] flex flex-wrap items-start justify-between gap-4">
-        <div className="max-w-[640px]"><SourceNote testId="vital-source-note">{t("vitalSource", { first, last })}</SourceNote></div>
+        <div className="max-w-[640px]"><SourceNote testId="vital-source-note" action={
+          // The chart draws its own colour key, so the picture adds none.
+          <ChartShareButton title={`${t("vitalTitle")} · ${name}`} caption={`${first}–${last}`} source={t("vitalSource", { first, last })} chart={chart} period={`${first}-${last}`} testId="vital-share" />
+        }>{t("vitalSource", { first, last })}</SourceNote></div>
         <Download
           testId="vital-excel-download"
           className="w-full max-w-[260px]"

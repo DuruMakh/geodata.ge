@@ -111,6 +111,37 @@ test("a picture with every Budget series ticked grows taller and keeps every nam
   expect(all.height).toBeGreaterThan(few.height);
 });
 
+for (const [name, path, testId] of [
+  ["the region map", "/explorer/wages/regions", "chart-share"],
+  ["the municipality map", "/explorer/municipalities", "chart-share"],
+  ["the population pyramid", "/explorer/demography/age-sex", "chart-share"],
+  ["the age-sex region map", "/explorer/demography/age-sex", "region-map-share"],
+  ["a municipality page", "/explorer/municipalities/batumi", "chart-share"],
+  ["a region page", "/explorer/economy/regions/adjara", "chart-share"],
+] as const) {
+  test(`${name} makes a wide picture on a computer and a phone`, async ({ page }) => {
+    await open(page, path);
+    expect((await downloadPicture(page, testId)).width).toBe(2400);
+    await page.setViewportSize({ width: 390, height: 844 });
+    await open(page, path);
+    expect((await downloadPicture(page, testId)).width).toBe(2400);
+  });
+}
+
+// A page with several charts gives each its own button, so no two share a test id or a menu.
+for (const [path, testIds] of [
+  ["/explorer/demography/population/georgia", ["chart-share", "vital-share", "marriage-share", "age-sex-share"]],
+  ["/explorer/demography/births-deaths", ["chart-share", "tfr-share", "asfr-share", "life-share"]],
+  ["/explorer/demography/marriages-divorces", ["chart-share", "map-share"]],
+  ["/explorer/demography/age-sex", ["chart-share", "region-map-share"]],
+] as const) {
+  test(`every chart on ${path} has one button of its own`, async ({ page }) => {
+    await open(page, path);
+    for (const testId of testIds) await expect(page.getByTestId(testId), testId).toHaveCount(1);
+    expect((await downloadPicture(page, testIds.at(-1))).width).toBe(2400);
+  });
+}
+
 test("a stacked column chart makes a picture too", async ({ page }) => {
   await open(page, "/explorer/external/current-account");
   await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-tab", "balance");

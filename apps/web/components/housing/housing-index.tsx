@@ -35,7 +35,7 @@ export function HousingIndex({ facts, regionMap }: {
     <ExplorerHeading>{t("page.regions.title")}</ExplorerHeading>
     <LatestValueLine testId="housing-latest" measure={t("latest.regions", { region: largestName })} period={regionMap.year} value={housingFloorArea(largest.value, t)} />
     <section data-testid="housing-region-index" className="mt-4">
-      <RegionIndex model={regionMap} summary={[]} sourceNote={`${t("sourceNoteRegions")} · ${unitLabel} · ${regionMap.year}.`}
+      <RegionIndex title={t("page.regions.title")} model={regionMap} summary={[]} sourceNote={`${t("sourceNoteRegions")} · ${unitLabel} · ${regionMap.year}.`}
         leadRow={georgiaValue === undefined ? undefined : { id: "georgia", label: t("area.georgia"), value: georgiaValue }} metric={{
           hrefForRegion: housingRegionHref, formatValue: value => formatInUnit(value, housingValueUnit("area")), legend: `${mapLabel} · ${unitLabel}`, testId: "housing-region-map",
           mapAria: t("regionMapAria", { total: mapLabel, unit: unitLabel, year: regionMap.year }), entityAria: (name, value, year) => t("regionMapEntityAria", { name, amount: valueLabel(value), year }),

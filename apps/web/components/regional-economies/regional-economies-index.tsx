@@ -14,12 +14,13 @@ import { SourceNote } from "../ui/editorial";
 import { SEARCH_FIELD_PROPS } from "../main-explorer/series-selector";
 import { RegionMap, regionalEconomyMapData, type RegionMapMetric } from "./regional-economy-map";
 import { useAppReady } from "../explorer-shell/use-app-ready";
+import { ChartShareButton } from "../explorer-shell/chart-share-button";
 
 export function RegionalEconomiesIndex({ model, sourceNote }: { model: RegionalEconomyMapModel; sourceNote: string }) {
   const { locale, messages, englishLabels } = useI18n();
   const largest = model.regions[0];
   useAppReady();
-  return <RegionIndex model={regionalEconomyMapData(model)} sourceNote={sourceNote} metric={{
+  return <RegionIndex title={message(messages, "regionalEconomies.heading")} model={regionalEconomyMapData(model)} sourceNote={sourceNote} metric={{
     hrefForRegion: regionalEconomyHref, formatValue: value => formatAmount(value, locale), mapAria: message(messages, "regionalEconomies.mapAria", { year: model.year }),
     entityAria: (name, value, year) => message(messages, "regionalEconomies.mapEntityAria", { name, amount: formatAmount(value, locale), year }),
     legend: message(messages, "regionalEconomies.legend"), testId: "regional-economy-map",
@@ -34,12 +35,14 @@ export function RegionalEconomiesIndex({ model, sourceNote }: { model: RegionalE
  * An empty summary leaves out the overview block.
  * leadRow is an unranked row above the ranked list, linked through hrefForRegion (a plain row without it).
  * headingLevel 3 nests the overview and list titles under a section title of the page's own.
+ * title names the map's share picture; shareTestId tells its button apart on a page with another chart.
  */
-export function RegionIndex({ model, sourceNote, metric, summary = [], leadRow, mapControls, headingLevel = 2 }: {
-  model: RegionMapModel; sourceNote: string; metric: RegionMapMetric; summary?: Array<{ label: string; value: string; detail: string }>;
+export function RegionIndex({ title, model, sourceNote, metric, summary = [], leadRow, mapControls, headingLevel = 2, shareTestId }: {
+  title: string; model: RegionMapModel; sourceNote: string; metric: RegionMapMetric; summary?: Array<{ label: string; value: string; detail: string }>;
   leadRow?: { id: string; label: string; value: number };
   mapControls?: ReactNode;
   headingLevel?: 2 | 3;
+  shareTestId?: string;
 }) {
   const Heading = headingLevel === 3 ? "h3" : "h2";
   const { locale, messages, englishLabels } = useI18n();
@@ -176,7 +179,11 @@ export function RegionIndex({ model, sourceNote, metric, summary = [], leadRow, 
         </div>
       </div>
       <div className="mt-9 border-t border-[var(--hairline)] pt-4">
-        <SourceNote testId="regional-source-note">
+        <SourceNote testId="regional-source-note" action={
+          <ChartShareButton title={title} caption={`${metric.legend} · ${model.year}`} testId={shareTestId}
+            source={`${sourceNote} ${message(messages, "regionalEconomies.boundaries")} geoBoundaries (CC BY 3.0).`}
+            chart={<RegionMap model={model} metric={metric} activeRegionId={null} onActiveRegionChange={() => {}} />} period={String(model.year)} />
+        }>
           {sourceNote} {message(messages, "regionalEconomies.boundaries")} {" "}
           <a href="https://www.geoboundaries.org/" target="_blank" rel="noreferrer" className="underline underline-offset-2">geoBoundaries</a> (CC BY 3.0).
         </SourceNote>

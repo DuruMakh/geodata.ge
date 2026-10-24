@@ -15,6 +15,7 @@ import { useI18n } from "../../lib/i18n/provider";
 import { pageHref } from "../../lib/i18n/routes";
 import type { TemplateValues } from "../../lib/i18n/types";
 import { ModeTabs } from "../explorer-shell/mode-tabs";
+import { ChartShareButton } from "../explorer-shell/chart-share-button";
 import { ExplorerTable } from "../main-explorer/explorer-table";
 import { StackedColumnChart } from "../main-explorer/stacked-column-chart";
 import { SectionTitle, SegmentedTabs, SourceNote } from "../ui/editorial";
@@ -60,6 +61,27 @@ export function MarriageSection({
   const breaks = model.breaks.map((item) => ({ period: item.year, label: t("breakLabel") }));
   const labels = { marriages: t("marriageSeries.marriages"), divorces: t("marriageSeries.divorces") };
 
+  const chart = (
+    <StackedColumnChart
+      periods={model.years}
+      periodsPerYear={1}
+      segments={[
+        { id: "marriages", label: labels.marriages, color: MARRIAGES, marker: "up", values: values(marriages, 1) },
+        { id: "divorces", label: labels.divorces, color: DIVORCES, marker: "down", values: values(divorces, -1) },
+      ]}
+      overlay={null}
+      legend={[
+        { id: "marriages", label: labels.marriages, color: MARRIAGES },
+        { id: "divorces", label: labels.divorces, color: DIVORCES },
+      ]}
+      breaks={breaks}
+      formatPeriod={String}
+      formatValue={(value) => format(Math.abs(value))}
+      readoutOrder="sign-then-magnitude"
+      ariaLabel={t("marriageChartAria", { place: name, first, last })}
+    />
+  );
+
   return (
     <section id="marriages-divorces" aria-labelledby="marriages-divorces-title" data-testid="marriage-section" className={`@container ${SECTION_CLASS}`}>
       <SectionTitle id="marriages-divorces-title">{t("marriageSectionTitle")}</SectionTitle>
@@ -75,24 +97,7 @@ export function MarriageSection({
         </div>
         <div className="mt-5">
           {mode === "line" ? (
-            <StackedColumnChart
-              periods={model.years}
-              periodsPerYear={1}
-              segments={[
-                { id: "marriages", label: labels.marriages, color: MARRIAGES, marker: "up", values: values(marriages, 1) },
-                { id: "divorces", label: labels.divorces, color: DIVORCES, marker: "down", values: values(divorces, -1) },
-              ]}
-              overlay={null}
-              legend={[
-                { id: "marriages", label: labels.marriages, color: MARRIAGES },
-                { id: "divorces", label: labels.divorces, color: DIVORCES },
-              ]}
-              breaks={breaks}
-              formatPeriod={String}
-              formatValue={(value) => format(Math.abs(value))}
-              readoutOrder="sign-then-magnitude"
-              ariaLabel={t("marriageChartAria", { place: name, first, last })}
-            />
+            chart
           ) : (
             <ExplorerTable
               caption={t("marriageTableCaption", { place: name, first, last, unit: unitLabel })}
@@ -117,7 +122,10 @@ export function MarriageSection({
         </div>
       </div>
       <div className="mt-[18px] flex flex-wrap items-start justify-between gap-4">
-        <div className="max-w-[640px]"><SourceNote testId="marriage-source-note">{t("marriageSectionSource", { first, last })}</SourceNote></div>
+        <div className="max-w-[640px]"><SourceNote testId="marriage-source-note" action={
+          // The chart draws its own colour key, so the picture adds none.
+          <ChartShareButton title={`${t("marriageSectionTitle")} · ${name}`} caption={`${unitLabel} · ${first}–${last}`} source={t("marriageSectionSource", { first, last })} chart={chart} period={`${first}-${last}`} testId="marriage-share" />
+        }>{t("marriageSectionSource", { first, last })}</SourceNote></div>
         <Download
           testId="marriage-section-excel-download"
           className="w-full max-w-[260px]"
