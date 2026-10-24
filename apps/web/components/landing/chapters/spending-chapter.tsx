@@ -77,7 +77,7 @@ type EngineOptions = {
   canvas: HTMLCanvasElement;
   data: SpendingSeries;
   initial: number;
-  frameText: string;
+  frameText(): string;
   amount(gel: number): string;
   onHover(field: number, x: number, y: number): void;
   onLeave(): void;
@@ -143,7 +143,7 @@ function createTreemap({ wrap, canvas, data, initial, frameText, amount, onHover
       ctx.lineWidth = 1;
       ctx.strokeRect(0.5, 0.5, W - 1, H - 1);
       ctx.restore();
-      label(ctx, frameText, W - 12, 22, `500 11.5px ${ui}`, muted, "right");
+      label(ctx, frameText(), W - 12, 22, `500 11.5px ${ui}`, muted, "right");
     }
     ctx.save();
     ctx.beginPath();
@@ -286,6 +286,10 @@ function createTreemap({ wrap, canvas, data, initial, frameText, amount, onHover
     setYear(index, ms = TWEEN_MS) {
       if (index === idx && cur) return;
       idx = index;
+      // The tooltip and an outside highlight describe the old year: drop both.
+      hover = -1;
+      ext = null;
+      onLeave();
       if (W) tween(ms);
     },
     highlight(id) {
@@ -352,14 +356,14 @@ export function SpendingChapter({ data, labels }: { data: SpendingSeries; labels
     const text = (el: HTMLElement | null, value: string) => {
       if (el) el.textContent = value;
     };
-    const { labels: l, index: initial } = live.current;
+    const { index: initial } = live.current;
     const engine = createTreemap({
       wrap,
       canvas,
       data,
       initial,
-      frameText: l.maxFrame,
-      amount: (gel) => money(gel, l),
+      frameText: () => live.current.labels.maxFrame,
+      amount: (gel) => money(gel, live.current.labels),
       onHover(field, x, y) {
         const { index: i, labels: lab, data: d } = live.current;
         const f = d.fields[field];
@@ -368,7 +372,7 @@ export function SpendingChapter({ data, labels }: { data: SpendingSeries; labels
         text(tipTitleRef.current, f.label);
         if (tipKeyRef.current) tipKeyRef.current.style.background = blockTone(field, d.fields.length);
         text(tipValueRef.current, money(v, lab));
-        text(tipNameRef.current, String(d.years[i]));
+        text(tipNameRef.current, d.planned[i] ? `${d.years[i]} (${lab.planned})` : String(d.years[i]));
         text(tipShareRef.current, percent(d.totals[i] > 0 ? v / d.totals[i] : 0));
         text(tipShareNameRef.current, lab.share);
         text(tipFootRef.current, before > 0 ? `${lab.vsPrevious}${formatShare(v / before - 1, true, 1)}` : "");
@@ -518,7 +522,7 @@ export function SpendingChapter({ data, labels }: { data: SpendingSeries; labels
         </figure>
         <div>
           <div className={LABEL_CLASS}>
-            {labels.listCaption} · {year}
+            {labels.listCaption} · {yearText}
           </div>
           <div className="mt-2.5 flex flex-col border-t border-[var(--hairline-soft)]">
             {rows.map((f) => (

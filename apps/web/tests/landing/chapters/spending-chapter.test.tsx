@@ -79,6 +79,11 @@ describe("SpendingChapter (server render = latest year)", () => {
     expect(canvas).toContain("ყველაზე დიდი: სოციალური დაცვა");
   });
 
+  it("marks a planned year in the side-list heading", () => {
+    expect(html).toContain("სფეროები · 2025 (გეგმა)");
+    expect(unplanned).toContain("სფეროები · 2025</div>");
+  });
+
   it("keeps the tooltip out of the accessibility tree", () => {
     expect(html).toMatch(/<div[^>]*aria-hidden="true"[^>]*opacity-0/);
   });
