@@ -1,3 +1,5 @@
+import type { RevenueBandId } from "../../../lib/landing/chapters/types";
+
 // Canvas helpers ported from the design board's chart script. Pure functions (squarify,
 // niceTicks, stackLabels, fitText) touch no DOM; the rest read `window` only when called.
 
@@ -62,6 +64,18 @@ export function blockLabelTier(w: number, h: number): "nameAmountShare" | "nameA
 export function blockTone(rank: number, count: number): string {
   return mixHex("#26211b", "#d6cab5", Math.pow(rank / Math.max(1, count - 2), 0.9));
 }
+
+// Revenue band colours, fixed by the homepage plan; liabilities take the accent colour the caller passes.
+const REVENUE_BAND_COLORS: Record<Exclude<RevenueBandId, "liabilities">, string> = {
+  vat: "#28568e",
+  income: "#50aed5",
+  profit: "#007f69",
+  excise: "#83c084",
+  otherTaxes: "#7668ad",
+  otherIncome: "#d2ab5f",
+};
+
+export const revenueBandColor = (id: RevenueBandId, accent: string) => (id === "liabilities" ? accent : REVENUE_BAND_COLORS[id]);
 
 /** The rectangle `t` of the way from `a` to `b`. */
 export function lerpRect(a: Rect, b: Rect, t: number): Rect {

@@ -16,6 +16,7 @@ const labels: DeficitLabels = {
   inGel: "ლარში",
   deepest: "ყველაზე ღრმა",
   chartSummary: "ზოგადი მთავრობის ბალანსი მშპ-სთან",
+  unavailable: "ვიზუალი ვერ ჩაიტვირთა — მონაცემები ხელმისაწვდომია ექსპლორერში",
 };
 
 const data = (overrides: Partial<DeficitChapter> = {}): DeficitChapter => ({

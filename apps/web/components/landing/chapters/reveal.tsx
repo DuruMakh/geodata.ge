@@ -59,3 +59,41 @@ export function useNearViewport(ref: RefObject<Element | null>, rootMargin = "10
 
   return near;
 }
+
+/**
+ * A chart's canvas engine module, imported once the element comes near the viewport; the chart's text is already
+ * server HTML, so only the drawing code waits. `failed` once the import rejects. `load` must be stable (a
+ * module-level function).
+ */
+export function useEngine<M>(ref: RefObject<Element | null>, load: () => Promise<M>): { lib: M | null; failed: boolean } {
+  const near = useNearViewport(ref);
+  const [state, setState] = useState<{ lib: M | null; failed: boolean }>({ lib: null, failed: false });
+
+  useEffect(() => {
+    if (!near) return;
+    let live = true;
+    load().then(
+      (lib) => {
+        if (live) setState({ lib, failed: false });
+      },
+      (error: unknown) => {
+        console.warn("[fiscal] chart engine unavailable", error);
+        if (live) setState({ lib: null, failed: true });
+      },
+    );
+    return () => {
+      live = false;
+    };
+  }, [near, load]);
+
+  return state;
+}
+
+/** Stands in for a chart's canvas when its engine could not load; the chart keeps its reserved height. */
+export function ChartUnavailable({ text }: { text: string }) {
+  return (
+    <div className="absolute inset-0 flex items-center justify-center">
+      <p className="px-4 text-center font-[family-name:var(--font-numeric)] text-[11px] text-[var(--faint)]">{text}</p>
+    </div>
+  );
+}

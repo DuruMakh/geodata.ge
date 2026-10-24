@@ -13,6 +13,7 @@ const labels: ScaleLabels = {
   square: "კვადრატი",
   squareNoteSpoken: "თითოეული 10 მილიონი ლარი",
   measureGroup: "მაჩვენებლის არჩევა",
+  unavailable: "ვიზუალი ვერ ჩაიტვირთა — მონაცემები ხელმისაწვდომია ექსპლორერში",
 };
 
 const gdpGel = 104_598_139_883;

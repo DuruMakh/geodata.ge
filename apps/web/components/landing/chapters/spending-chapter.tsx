@@ -4,29 +4,15 @@ import { Pause, Play } from "lucide-react";
 import { useEffect, useId, useRef, useState } from "react";
 import { formatInUnit, formatShare, UNIT_BN } from "../../../lib/explorer/format";
 import type { SpendingSeries } from "../../../lib/landing/chapters/types";
-import {
-  anchoredRect,
-  blockLabelTier,
-  blockTone,
-  clamp,
-  fitText,
-  lerpRect,
-  placeTip,
-  prefersReducedMotion,
-  readTokens,
-  sizeCanvas,
-  sparkPoints,
-  squarify,
-  type Rect,
-} from "./canvas";
-import { easeOut, txt } from "./chart-draw";
+import { blockTone, placeTip, sparkPoints } from "./canvas";
 import { money } from "./chart-format";
-import { Reveal, useNearViewport } from "./reveal";
+import { ChartUnavailable, Reveal, useEngine } from "./reveal";
+import type { Engine } from "./spending-engine";
 
 // Chapter 02: a squarified treemap of the 13 spending fields. The block area of a year follows
 // sqrt(total / largest total) anchored bottom-left, so a small year is a small copy of the same
-// picture; a year slider, a play button and a side list drive it. Ported from the design board's
-// createTree.
+// picture; a year slider, a play button and a side list drive it. The controls and list are server
+// HTML; the drawing engine (spending-engine.ts) loads near view.
 
 export type SpendingLabels = {
   year: string; // "წელი"
@@ -45,232 +31,12 @@ export type SpendingLabels = {
   vsPrevious: string; // tooltip foot prefix, the change follows: "წინა წელთან: "
   chartSummary: string; // canvas aria-label lead: "სახელმწიფო ბიუჯეტის ხარჯები სფეროების მიხედვით; ფართობი ხარჯის პროპორციულია"
   largest: string; // canvas aria-label: "ყველაზე დიდი"
+  unavailable: string; // in place of the chart when its engine fails to load
 };
 
-const DARK_BLOCKS = 6; // the six largest fields take light text
+const loadEngine = () => import("./spending-engine");
+
 const STEP_MS = 900; // one year per step while playing
-const TWEEN_MS = 520;
-
-const easeInOut = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
-
-type Engine = { setYear(index: number, ms?: number): void; highlight(id: string | null): void; destroy(): void };
-
-type EngineOptions = {
-  wrap: HTMLElement;
-  canvas: HTMLCanvasElement;
-  data: SpendingSeries;
-  initial: number;
-  frameText(): string;
-  amount(gel: number): string;
-  onHover(field: number, x: number, y: number): void;
-  onLeave(): void;
-};
-
-function createTreemap({ wrap, canvas, data, initial, frameText, amount, onHover, onLeave }: EngineOptions): Engine {
-  const { paper, ink, accent, control, muted, ui, num } = readTokens(wrap);
-  const reduced = prefersReducedMotion();
-
-  const { fields, totals } = data;
-  const maxTotal = Math.max(...totals);
-  const tones = fields.map((_, i) => blockTone(i, fields.length));
-
-  let W = 0;
-  let H = 0;
-  let idx = initial;
-  let cur: Rect[] | null = null;
-  let from: Rect[] = [];
-  let to: Rect[] = [];
-  let t0 = 0;
-  let dur = TWEEN_MS;
-  let tweenRaf = 0;
-  let introRaf = 0;
-  let alive = true;
-  let seen = false;
-  let intro = reduced ? 1 : 0;
-  let hover = -1;
-  let ext: string | null = null;
-
-  const target = (i: number): Rect[] => {
-    const [x, y, w, h] = anchoredRect(totals[i], maxTotal, W, H);
-    return squarify(fields.map((f) => f.values[i]), x, y, w, h);
-  };
-
-  const draw = () => {
-    if (!W || !alive || !cur) return;
-    const ctx = sizeCanvas(canvas, W, H);
-    const k = easeOut(intro);
-    if (intro > 0 && totals[idx] < maxTotal) {
-      ctx.save();
-      ctx.setLineDash([3, 4]);
-      ctx.strokeStyle = control;
-      ctx.lineWidth = 1;
-      ctx.strokeRect(0.5, 0.5, W - 1, H - 1);
-      ctx.restore();
-      txt(ctx, frameText(), W - 12, 22, `500 11.5px ${ui}`, muted, "right");
-    }
-    ctx.save();
-    ctx.beginPath();
-    ctx.rect(0, H - H * k, W * k, H * k);
-    ctx.clip();
-    fields.forEach((field, i) => {
-      const rect = cur?.[i];
-      if (!rect) return;
-      const x = rect[0] + 1;
-      const y = rect[1] + 1;
-      const w = rect[2] - 2;
-      const h = rect[3] - 2;
-      if (w < 0.5 || h < 0.5) return;
-      const lit = hover === i || ext === field.id;
-      const dark = lit || i < DARK_BLOCKS;
-      ctx.fillStyle = lit ? accent : tones[i];
-      ctx.fillRect(x, y, w, h);
-      ctx.fillStyle = dark ? "rgba(247,242,233,.085)" : "rgba(30,27,22,.07)";
-      for (let yy = y + 4; yy < y + h - 2; yy += 7) for (let xx = x + 4; xx < x + w - 2; xx += 7) ctx.fillRect(xx, yy, 1.3, 1.3);
-      const tier = blockLabelTier(w, h);
-      if (tier === "none") return;
-      const v = field.values[idx];
-      const fraction = totals[idx] > 0 ? v / totals[idx] : 0;
-      if (tier === "share") {
-        ctx.font = `500 10.5px ${num}`;
-        txt(ctx, fitText(ctx, formatShare(fraction, false, 0), w - 12), x + 6, y + 16, `500 10.5px ${num}`, dark ? paper : ink);
-        return;
-      }
-      const sub = dark ? "rgba(247,242,233,.8)" : "rgba(30,27,22,.82)";
-      ctx.font = `600 12.5px ${ui}`;
-      txt(ctx, fitText(ctx, field.label, w - 20), x + 10, y + 21, `600 12.5px ${ui}`, dark ? paper : ink);
-      txt(ctx, amount(v), x + 10, y + 39, `500 11.5px ${num}`, sub);
-      if (tier === "nameAmountShare") txt(ctx, formatShare(fraction), x + 10, y + 56, `500 11.5px ${num}`, sub);
-    });
-    ctx.restore();
-  };
-
-  const tween = (ms: number) => {
-    to = target(idx);
-    from = cur ? cur.map((r) => [...r] as Rect) : to;
-    t0 = performance.now();
-    dur = ms;
-    cancelAnimationFrame(tweenRaf);
-    if (reduced || ms <= 0) {
-      cur = to;
-      draw();
-      return;
-    }
-    const frame = (t: number) => {
-      if (!alive) return;
-      const k = clamp((t - t0) / dur, 0, 1);
-      const e = easeInOut(k);
-      cur = to.map((r, i) => lerpRect(from[i] ?? r, r, e));
-      draw();
-      if (k < 1) tweenRaf = requestAnimationFrame(frame);
-    };
-    tweenRaf = requestAnimationFrame(frame);
-  };
-
-  const size = () => {
-    const w = Math.round(wrap.clientWidth);
-    const h = Math.round(wrap.clientHeight);
-    if (!w || !h || (w === W && h === H)) return;
-    W = w;
-    H = h;
-    cancelAnimationFrame(tweenRaf);
-    cur = to = target(idx);
-    draw();
-  };
-
-  const hit = (px: number, py: number) => {
-    if (!cur) return -1;
-    return cur.findIndex((r) => r[2] > 1 && r[3] > 1 && px >= r[0] && px <= r[0] + r[2] && py >= r[1] && py <= r[1] + r[3]);
-  };
-  const move = (event: PointerEvent) => {
-    const box = canvas.getBoundingClientRect();
-    const px = event.clientX - box.left;
-    const py = event.clientY - box.top;
-    const i = hit(px, py);
-    if (i !== hover) {
-      hover = i;
-      draw();
-    }
-    if (i < 0) onLeave();
-    else onHover(i, px, py);
-  };
-  const leave = () => {
-    if (hover !== -1) {
-      hover = -1;
-      draw();
-    }
-    onLeave();
-  };
-  canvas.addEventListener("pointermove", move);
-  canvas.addEventListener("pointerdown", move);
-  canvas.addEventListener("pointerleave", leave);
-
-  const startIntro = () => {
-    if (seen) return;
-    seen = true;
-    if (intro >= 1) {
-      draw();
-      return;
-    }
-    const s0 = performance.now();
-    const frame = (t: number) => {
-      if (!alive) return;
-      intro = clamp((t - s0) / 900, 0, 1);
-      draw();
-      if (intro < 1) introRaf = requestAnimationFrame(frame);
-    };
-    introRaf = requestAnimationFrame(frame);
-  };
-
-  let resizeObserver: ResizeObserver | null = null;
-  let introObserver: IntersectionObserver | null = null;
-  if (typeof ResizeObserver !== "undefined") {
-    resizeObserver = new ResizeObserver(size);
-    resizeObserver.observe(wrap);
-  }
-  size();
-  if (typeof IntersectionObserver !== "undefined") {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (!entries.some((entry) => entry.isIntersecting)) return;
-        observer.disconnect();
-        startIntro();
-      },
-      { threshold: 0.3 },
-    );
-    introObserver = observer;
-    observer.observe(wrap);
-  } else {
-    intro = 1;
-    seen = true;
-    draw();
-  }
-
-  return {
-    setYear(index, ms = TWEEN_MS) {
-      if (index === idx && cur) return;
-      idx = index;
-      // The tooltip and an outside highlight describe the old year: drop both.
-      hover = -1;
-      ext = null;
-      onLeave();
-      if (W) tween(ms);
-    },
-    highlight(id) {
-      ext = id;
-      draw();
-    },
-    destroy() {
-      alive = false;
-      cancelAnimationFrame(tweenRaf);
-      cancelAnimationFrame(introRaf);
-      resizeObserver?.disconnect();
-      introObserver?.disconnect();
-      canvas.removeEventListener("pointermove", move);
-      canvas.removeEventListener("pointerdown", move);
-      canvas.removeEventListener("pointerleave", leave);
-    },
-  };
-}
 
 const LABEL_CLASS = "text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]";
 // The range input is a transparent hit area over the sparkline; the accent marker shows the year.
@@ -309,18 +75,18 @@ export function SpendingChapter({ data, labels }: { data: SpendingSeries; labels
     live.current = { index, labels, data };
   });
 
-  const near = useNearViewport(wrapRef);
+  const { lib, failed } = useEngine(wrapRef, loadEngine);
 
   useEffect(() => {
     const wrap = wrapRef.current;
     const canvas = canvasRef.current;
     const tip = tipRef.current;
-    if (!near || !wrap || !canvas || !tip) return;
+    if (!lib || !wrap || !canvas || !tip) return;
     const text = (el: HTMLElement | null, value: string) => {
       if (el) el.textContent = value;
     };
     const { index: initial } = live.current;
-    const engine = createTreemap({
+    const engine = lib.createTreemap({
       wrap,
       canvas,
       data,
@@ -350,7 +116,7 @@ export function SpendingChapter({ data, labels }: { data: SpendingSeries; labels
       engine.destroy();
       engineRef.current = null;
     };
-  }, [near, data]);
+  }, [lib, data]);
 
   useEffect(() => {
     engineRef.current?.setYear(index);
@@ -463,7 +229,11 @@ export function SpendingChapter({ data, labels }: { data: SpendingSeries; labels
       <div className="grid grid-cols-1 gap-[30px] min-[1000px]:grid-cols-[minmax(0,1fr)_330px] min-[1000px]:gap-10">
         <figure>
           <div ref={wrapRef} className="relative h-[360px] w-full min-[601px]:h-[440px] min-[1000px]:h-[520px]">
-            <canvas ref={canvasRef} role="img" aria-label={ariaLabel} className="absolute left-0 top-0" />
+            {failed ? (
+              <ChartUnavailable text={labels.unavailable} />
+            ) : (
+              <canvas ref={canvasRef} role="img" aria-label={ariaLabel} className="absolute left-0 top-0" />
+            )}
             <div
               ref={tipRef}
               aria-hidden="true"

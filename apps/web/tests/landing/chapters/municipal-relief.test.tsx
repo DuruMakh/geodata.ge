@@ -15,6 +15,7 @@ const labels: MunicipalLabels = {
   total: "სულ",
   share: "წილი",
   chartSummary: "საქართველოს მუნიციპალიტეტების ბიუჯეტის სამგანზომილებიანი რელიეფი",
+  unavailable: "ვიზუალი ვერ ჩაიტვირთა — მონაცემები ხელმისაწვდომია ექსპლორერში",
 };
 
 const place = (code: string, name: string, totalGel: number, rank: number, city = false): ReliefPlace => ({

@@ -8,13 +8,12 @@ import { SiteFooter } from "../site/site-footer";
 import { SiteHeader } from "../site/site-header";
 import { AiSection, type AiLabels } from "./chapters/ai-section";
 import { Chapter } from "./chapters/chapter";
-import type { DeficitLabels } from "./chapters/deficit-chart";
-import { LazyChart } from "./chapters/lazy-chart";
-import type { MunicipalLabels } from "./chapters/municipal-relief";
-import type { RevenueLabels } from "./chapters/revenue-chart";
-import type { ScaleLabels } from "./chapters/scale-chapter";
+import { DeficitChart, type DeficitLabels } from "./chapters/deficit-chart";
+import { MunicipalRelief, type MunicipalLabels } from "./chapters/municipal-relief";
+import { RevenueChart, type RevenueLabels } from "./chapters/revenue-chart";
+import { ScaleChapter, type ScaleLabels } from "./chapters/scale-chapter";
 import { SourcesSection, type SourcesLabels } from "./chapters/sources-section";
-import type { SpendingLabels } from "./chapters/spending-chapter";
+import { SpendingChapter, type SpendingLabels } from "./chapters/spending-chapter";
 import { HeroReliefLazy } from "./hero-relief-lazy";
 
 // Population and area are maintained by hand; the GDP figure and every budget
@@ -71,6 +70,7 @@ export function LandingPage({ chapters, gdpFigure, presentation, updatedAt }: { 
     square: t("landing.scale.square"),
     squareNoteSpoken: t("landing.scale.squareNoteSpoken"),
     measureGroup: t("landing.scale.measureGroup"),
+    unavailable,
   };
   const { spending } = chapters;
   const largestYear = spending.years[spending.totals.indexOf(Math.max(...spending.totals))];
@@ -90,6 +90,7 @@ export function LandingPage({ chapters, gdpFigure, presentation, updatedAt }: { 
     vsPrevious: t("landing.spending.vsPrevious"),
     chartSummary: t("landing.spending.chartSummary"),
     largest: t("landing.spending.largest"),
+    unavailable,
   };
   const revenueLabels: RevenueLabels = {
     ...units,
@@ -99,6 +100,7 @@ export function LandingPage({ chapters, gdpFigure, presentation, updatedAt }: { 
     taxes: t("landing.revenue.taxes"),
     peakFrom: t("landing.revenue.peakFrom"),
     chartSummary: t("landing.revenue.chartSummary"),
+    unavailable,
   };
   const municipalLabels: MunicipalLabels = {
     ...units,
@@ -111,6 +113,7 @@ export function LandingPage({ chapters, gdpFigure, presentation, updatedAt }: { 
     total: t("landing.municipal.total"),
     share: t("landing.share"),
     chartSummary: t("landing.municipal.chartSummary"),
+    unavailable,
   };
   const deficitLabels: DeficitLabels = {
     ...units,
@@ -124,6 +127,7 @@ export function LandingPage({ chapters, gdpFigure, presentation, updatedAt }: { 
     inGel: t("landing.deficit.inGel"),
     deepest: t("landing.deficit.deepest"),
     chartSummary: t("landing.deficit.chartSummary"),
+    unavailable,
   };
   const collections = chapters.sources.rows.length;
   const sourcesLabels: SourcesLabels = {
@@ -225,19 +229,19 @@ export function LandingPage({ chapters, gdpFigure, presentation, updatedAt }: { 
           </section>
 
           <Chapter id="ch-01" first link={chapterLink(1, "/explorer/analysis")} title={t("landing.ch1.title")} lede={t("landing.ch1.lede")}>
-            <LazyChart chart="scale" data={chapters.scale} labels={scaleLabels} unavailable={unavailable} />
+            <ScaleChapter data={chapters.scale} labels={scaleLabels} />
           </Chapter>
           <Chapter id="ch-02" link={chapterLink(2, "/explorer/expenditure")} title={t("landing.ch2.title")} lede={chapters.sentences.spending}>
-            <LazyChart chart="spending" data={chapters.spending} labels={spendingLabels} unavailable={unavailable} />
+            <SpendingChapter data={chapters.spending} labels={spendingLabels} />
           </Chapter>
           <Chapter id="ch-03" link={chapterLink(3, "/explorer/revenue")} title={t("landing.ch3.title")} lede={chapters.sentences.revenue}>
-            <LazyChart chart="revenue" data={chapters.revenue} labels={revenueLabels} unavailable={unavailable} />
+            <RevenueChart data={chapters.revenue} labels={revenueLabels} />
           </Chapter>
           <Chapter id="ch-04" link={chapterLink(4, "/explorer/municipalities")} title={t("landing.ch4.title")} lede={chapters.sentences.municipal}>
-            <LazyChart chart="municipal" data={chapters.municipal} labels={municipalLabels} unavailable={unavailable} />
+            <MunicipalRelief data={chapters.municipal} labels={municipalLabels} />
           </Chapter>
           <Chapter id="ch-05" link={chapterLink(5, "/explorer/deficit")} title={t("landing.ch5.title")} lede={chapters.sentences.deficit}>
-            <LazyChart chart="deficit" data={chapters.deficit} labels={deficitLabels} unavailable={unavailable} />
+            <DeficitChart data={chapters.deficit} labels={deficitLabels} />
           </Chapter>
           <SourcesSection sources={chapters.sources} labels={sourcesLabels} locale={locale} />
           <AiSection tools={chapters.tools} labels={aiLabels} locale={locale} />

@@ -12,6 +12,7 @@ const labels: RevenueLabels = {
   taxes: "გადასახადები",
   peakFrom: "ვალდებულებების ზრდიდან",
   chartSummary: "ნაერთი ბიუჯეტის შემოსულობები",
+  unavailable: "ვიზუალი ვერ ჩაიტვირთა — მონაცემები ხელმისაწვდომია ექსპლორერში",
 };
 
 const bandLabels: Record<RevenueBandId, string> = {

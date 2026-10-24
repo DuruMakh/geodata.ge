@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { createRelief } from "../../../components/landing/chapters/municipal-relief";
+import { createRelief } from "../../../components/landing/chapters/relief-engine";
 import type { MunicipalChapter } from "../../../lib/landing/chapters/types";
 
 // The relief engine against fake browser objects: a WebGL context that counts what it creates and

@@ -69,7 +69,7 @@ vi.mock("next/navigation", async (original) => ({ ...(await original<typeof impo
 vi.mock("../../lib/methodology/prepareArchives", async (importOriginal) =>
   (await import("../helpers/archive-summaries")).withValidatedArchiveSummaries(importOriginal));
 describe("landing page layout", () => {
-  it("keeps a key number's unit on one line and renders the chapters in order", async () => {
+  it("keeps a key number's unit on one line and renders the chapters in order, chart text included", async () => {
     const { renderPageMarkup } = await import("../helpers/render-localized");
     const { renderHomePage } = await import("../../lib/pages/home");
     const markup = renderPageMarkup("ka", await renderHomePage("ka"));
@@ -77,6 +77,15 @@ describe("landing page layout", () => {
     expect(markup).toMatch(/<span data-testid="[^"]+" class="[^"]*whitespace-nowrap[^"]*">[^<]*₾<\/span>/);
     const anchors = [...markup.matchAll(/<section id="([^"]+)"/g)].map((match) => match[1]);
     expect(anchors).toEqual(["ch-01", "ch-02", "ch-03", "ch-04", "ch-05", "sources", "ai"]);
+    // The charts render on the server; only their canvas engines load in the browser.
+    const chapter = (id: string) => {
+      const start = markup.indexOf(`<section id="${id}"`);
+      return markup.slice(start, markup.indexOf("</section>", start));
+    };
+    expect(chapter("ch-01").match(/<button type="button" aria-pressed="(true|false)"/g)?.length).toBeGreaterThanOrEqual(3);
+    expect(chapter("ch-01")).toContain('aria-pressed="true"');
+    expect(chapter("ch-02").match(/<button[^>]* data-field="[^"]+"/g)?.length).toBeGreaterThanOrEqual(10);
+    expect(chapter("ch-03").match(/<li data-band="[a-zA-Z]+"/g)?.length).toBeGreaterThanOrEqual(6);
     // The site footer, with the mission sentence.
     expect(markup).toContain("ჩვენი მიზანია");
   });
