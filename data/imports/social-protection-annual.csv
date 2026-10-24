@@ -21987,3 +21987,102 @@
 2025,social.payments.workplace_injury.amount,country.georgia,739720,gel,12,actual,calculated,ssa_workinjury_03,ssa-workinjury-03-2025.xlsx,*,G85,2026-10-20
 2020,social.payments.covid_vulnerable_compensation.amount,country.georgia,90823935,gel,6,actual,calculated,ssa_other_04,ssa-other-04-2020.xlsx,*,D92+G92+I92+K92,2026-10-20
 2021,social.payments.covid_vulnerable_compensation.amount,country.georgia,102190930,gel,6,actual,calculated,ssa_other_04,ssa-other-04-2021.xlsx,*,D92+G92+I92+K92,2026-10-20
+2019,social.funded_pension.savings.amount,country.georgia,508031000,gel,1,actual,official,pension_fund_ifrs_2020,2020-IFRS.pdf,16,ნაშთი 31 დეკემბერს,2026-10-21
+2020,social.funded_pension.savings.amount,country.georgia,1164657000,gel,1,actual,official,pension_fund_ifrs_2020,2020-IFRS.pdf,16,ნაშთი 31 დეკემბერს,2026-10-21
+2021,social.funded_pension.savings.amount,country.georgia,1980291000,gel,1,actual,official,pension_fund_ifrs_2022,2022-IFRS-GE.pdf,18,ნაშთი 31 დეკემბერს,2026-10-21
+2022,social.funded_pension.savings.amount,country.georgia,2947151000,gel,1,actual,official,pension_fund_ifrs_2023,2023-IFRS-GE.pdf,20,ნაშთი 31 დეკემბერს,2026-10-21
+2023,social.funded_pension.savings.amount,country.georgia,4357160000,gel,1,actual,official,pension_fund_ifrs_2024,2024-IFRS-GE.pdf,21,ნაშთი 31 დეკემბერს,2026-10-21
+2024,social.funded_pension.savings.amount,country.georgia,6060268000,gel,1,actual,official,pension_fund_ifrs_2025,2025-IFRS.pdf,20,Balance at 31 December,2026-10-21
+2025,social.funded_pension.savings.amount,country.georgia,8237530000,gel,1,actual,official,pension_fund_ifrs_2025,2025-IFRS.pdf,20,Balance at 31 December,2026-10-21
+2019,social.funded_pension.net_assets.amount,country.georgia,547844000,gel,1,actual,official,pension_fund_ifrs_2020,2020-IFRS.pdf,7,"წმინდა აქტივები, 31 დეკემბერს",2026-10-21
+2020,social.funded_pension.net_assets.amount,country.georgia,1213129000,gel,1,actual,official,pension_fund_ifrs_2020,2020-IFRS.pdf,7,"წმინდა აქტივები, 31 დეკემბერს",2026-10-21
+2021,social.funded_pension.net_assets.amount,country.georgia,2048024000,gel,1,actual,official,pension_fund_ifrs_2022,2022-IFRS-GE.pdf,7,"საპენსიო სარგებლისთვის განკუთვნილი წმინდა აქტივები, 31 დეკემბერს",2026-10-21
+2022,social.funded_pension.net_assets.amount,country.georgia,3027208000,gel,1,actual,official,pension_fund_ifrs_2023,2023-IFRS-GE.pdf,8,საპენსიო სარგებლისთვის განკუთვნილი წმინდა აქტივები 31 დეკემბერს,2026-10-21
+2023,social.funded_pension.net_assets.amount,country.georgia,4484620000,gel,1,actual,official,pension_fund_ifrs_2024,2024-IFRS-GE.pdf,8,საპენსიო სარგებლისთვის განკუთვნილი წმინდა აქტივები 31 დეკემბერს,2026-10-21
+2024,social.funded_pension.net_assets.amount,country.georgia,6191340000,gel,1,actual,official,pension_fund_ifrs_2025,2025-IFRS.pdf,8,Net assets available for benefits as at 31 December,2026-10-21
+2025,social.funded_pension.net_assets.amount,country.georgia,8365433000,gel,1,actual,official,pension_fund_ifrs_2025,2025-IFRS.pdf,8,Net assets available for benefits as at 31 December,2026-10-21
+2019,social.funded_pension.contributions.amount,country.georgia,548315000,gel,12,actual,official,pension_fund_ifrs_2020,2020-IFRS.pdf,7,სულ სქემის მონაწილეთა შენატანი,2026-10-21
+2020,social.funded_pension.contributions.amount,country.georgia,571148000,gel,12,actual,official,pension_fund_ifrs_2020,2020-IFRS.pdf,7,სულ სქემის მონაწილეთა შენატანი,2026-10-21
+2021,social.funded_pension.contributions.amount,country.georgia,658014000,gel,12,actual,official,pension_fund_ifrs_2022,2022-IFRS-GE.pdf,7,სულ სქემის მონაწილეთა შენატანი,2026-10-21
+2022,social.funded_pension.contributions.amount,country.georgia,802753000,gel,12,actual,official,pension_fund_ifrs_2023,2023-IFRS-GE.pdf,8,სულ სქემის მონაწილეთა შენატანი,2026-10-21
+2023,social.funded_pension.contributions.amount,country.georgia,996862000,gel,12,actual,official,pension_fund_ifrs_2024,2024-IFRS-GE.pdf,8,სულ სქემის მონაწილეთა შენატანი,2026-10-21
+2024,social.funded_pension.contributions.amount,country.georgia,1179226000,gel,12,actual,official,pension_fund_ifrs_2025,2025-IFRS.pdf,8,Total scheme member contributions,2026-10-21
+2025,social.funded_pension.contributions.amount,country.georgia,1431780000,gel,12,actual,official,pension_fund_ifrs_2025,2025-IFRS.pdf,8,Total scheme member contributions,2026-10-21
+2019,social.funded_pension.contributions_private.amount,country.georgia,294314000,gel,12,actual,official,pension_fund_ifrs_2020,2020-IFRS.pdf,7,(კერძო დამქირავებელნი და დაქირავებული პირნი),2026-10-21
+2020,social.funded_pension.contributions_private.amount,country.georgia,319679000,gel,12,actual,official,pension_fund_ifrs_2020,2020-IFRS.pdf,7,(კერძო დამქირავებელნი და დაქირავებული პირნი),2026-10-21
+2021,social.funded_pension.contributions_private.amount,country.georgia,375117000,gel,12,actual,official,pension_fund_ifrs_2022,2022-IFRS-GE.pdf,7,კერძო დამსაქმებლები და მათი დასაქმებულები,2026-10-21
+2022,social.funded_pension.contributions_private.amount,country.georgia,469120000,gel,12,actual,official,pension_fund_ifrs_2023,2023-IFRS-GE.pdf,8,კერძო დამსაქმებლები და მათი დასაქმებულები,2026-10-21
+2023,social.funded_pension.contributions_private.amount,country.georgia,587066000,gel,12,actual,official,pension_fund_ifrs_2024,2024-IFRS-GE.pdf,8,კერძო დამსაქმებლები და მათი დასაქმებულები,2026-10-21
+2024,social.funded_pension.contributions_private.amount,country.georgia,692043000,gel,12,actual,official,pension_fund_ifrs_2025,2025-IFRS.pdf,8,Private employers and employees,2026-10-21
+2025,social.funded_pension.contributions_private.amount,country.georgia,843224000,gel,12,actual,official,pension_fund_ifrs_2025,2025-IFRS.pdf,8,Private employers and employees,2026-10-21
+2019,social.funded_pension.contributions_public.amount,country.georgia,88663000,gel,12,actual,official,pension_fund_ifrs_2020,2020-IFRS.pdf,7,(საჯარო დამქირავებელნი და დაქირავებული პირნი),2026-10-21
+2020,social.funded_pension.contributions_public.amount,country.georgia,85307000,gel,12,actual,official,pension_fund_ifrs_2020,2020-IFRS.pdf,7,(საჯარო დამქირავებელნი და დაქირავებული პირნი),2026-10-21
+2021,social.funded_pension.contributions_public.amount,country.georgia,94283000,gel,12,actual,official,pension_fund_ifrs_2022,2022-IFRS-GE.pdf,7,საჯარო დამსაქმებლები და მათი დასაქმებულები,2026-10-21
+2022,social.funded_pension.contributions_public.amount,country.georgia,108859000,gel,12,actual,official,pension_fund_ifrs_2023,2023-IFRS-GE.pdf,8,საჯარო დამსაქმებლები და მათი დასაქმებულები,2026-10-21
+2023,social.funded_pension.contributions_public.amount,country.georgia,137625000,gel,12,actual,official,pension_fund_ifrs_2024,2024-IFRS-GE.pdf,8,საჯარო დამსაქმებლები და მათი დასაქმებულები,2026-10-21
+2024,social.funded_pension.contributions_public.amount,country.georgia,175799000,gel,12,actual,official,pension_fund_ifrs_2025,2025-IFRS.pdf,8,State employers and employees,2026-10-21
+2025,social.funded_pension.contributions_public.amount,country.georgia,217567000,gel,12,actual,official,pension_fund_ifrs_2025,2025-IFRS.pdf,8,State employers and employees,2026-10-21
+2019,social.funded_pension.contributions_state.amount,country.georgia,165338000,gel,12,actual,official,pension_fund_ifrs_2020,2020-IFRS.pdf,7,საქართველოს სახელმწიფოს სუბსიდია,2026-10-21
+2020,social.funded_pension.contributions_state.amount,country.georgia,166162000,gel,12,actual,official,pension_fund_ifrs_2020,2020-IFRS.pdf,7,საქართველოს სახელმწიფოს სუბსიდია,2026-10-21
+2021,social.funded_pension.contributions_state.amount,country.georgia,188614000,gel,12,actual,official,pension_fund_ifrs_2022,2022-IFRS-GE.pdf,7,საქართველოს სახელმწიფოს საპენსიო შენატანი,2026-10-21
+2022,social.funded_pension.contributions_state.amount,country.georgia,224774000,gel,12,actual,official,pension_fund_ifrs_2023,2023-IFRS-GE.pdf,8,საქართველოს სახელმწიფოს საპენსიო შენატანი,2026-10-21
+2023,social.funded_pension.contributions_state.amount,country.georgia,272171000,gel,12,actual,official,pension_fund_ifrs_2024,2024-IFRS-GE.pdf,8,საქართველოს სახელმწიფოს საპენსიო შენატანი,2026-10-21
+2024,social.funded_pension.contributions_state.amount,country.georgia,311384000,gel,12,actual,official,pension_fund_ifrs_2025,2025-IFRS.pdf,8,Subsidy from the State of Georgia,2026-10-21
+2025,social.funded_pension.contributions_state.amount,country.georgia,370989000,gel,12,actual,official,pension_fund_ifrs_2025,2025-IFRS.pdf,8,Subsidy from the State of Georgia,2026-10-21
+2019,social.funded_pension.interest.amount,country.georgia,17038000,gel,12,actual,official,pension_fund_ifrs_2020,2020-IFRS.pdf,7,საპროცენტო შემოსავალი,2026-10-21
+2020,social.funded_pension.interest.amount,country.georgia,87026000,gel,12,actual,official,pension_fund_ifrs_2020,2020-IFRS.pdf,7,საპროცენტო შემოსავალი,2026-10-21
+2021,social.funded_pension.interest.amount,country.georgia,163741000,gel,12,actual,official,pension_fund_ifrs_2022,2022-IFRS-GE.pdf,7,საპროცენტო შემოსავალი,2026-10-21
+2022,social.funded_pension.interest.amount,country.georgia,218227000,gel,12,actual,official,pension_fund_ifrs_2023,2023-IFRS-GE.pdf,8,საპროცენტო შემოსავალი,2026-10-21
+2023,social.funded_pension.interest.amount,country.georgia,254614000,gel,12,actual,official,pension_fund_ifrs_2024,2024-IFRS-GE.pdf,8,საპროცენტო შემოსავალი,2026-10-21
+2024,social.funded_pension.interest.amount,country.georgia,356201000,gel,12,actual,official,pension_fund_ifrs_2025,2025-IFRS.pdf,8,Interest income,2026-10-21
+2025,social.funded_pension.interest.amount,country.georgia,461555000,gel,12,actual,official,pension_fund_ifrs_2025,2025-IFRS.pdf,8,Interest income,2026-10-21
+2022,social.funded_pension.securities_gains.amount,country.georgia,-31187000,gel,12,actual,official,pension_fund_ifrs_2023,2023-IFRS-GE.pdf,8,სავაჭრო ფასიანი ქაღალდების ფლობით მიღებული წმინდა ზარალი,2026-10-21
+2023,social.funded_pension.securities_gains.amount,country.georgia,168430000,gel,12,actual,official,pension_fund_ifrs_2024,2024-IFRS-GE.pdf,8,სავაჭრო ფასიანი ქაღალდების ფლობით მიღებული წმინდა მოგება,2026-10-21
+2024,social.funded_pension.securities_gains.amount,country.georgia,197986000,gel,12,actual,official,pension_fund_ifrs_2025,2025-IFRS.pdf,8,Net gains on investments in marketable securities,2026-10-21
+2025,social.funded_pension.securities_gains.amount,country.georgia,319147000,gel,12,actual,official,pension_fund_ifrs_2025,2025-IFRS.pdf,8,Net gains on investments in marketable securities,2026-10-21
+2022,social.funded_pension.dividends.amount,country.georgia,3543000,gel,12,actual,official,pension_fund_ifrs_2023,2023-IFRS-GE.pdf,8,დივიდენდის შემოსავალი,2026-10-21
+2023,social.funded_pension.dividends.amount,country.georgia,18598000,gel,12,actual,official,pension_fund_ifrs_2024,2024-IFRS-GE.pdf,8,დივიდენდის შემოსავალი,2026-10-21
+2024,social.funded_pension.dividends.amount,country.georgia,25485000,gel,12,actual,official,pension_fund_ifrs_2025,2025-IFRS.pdf,8,Dividend income,2026-10-21
+2025,social.funded_pension.dividends.amount,country.georgia,33223000,gel,12,actual,official,pension_fund_ifrs_2025,2025-IFRS.pdf,8,Dividend income,2026-10-21
+2019,social.funded_pension.payouts.amount,country.georgia,57322000,gel,12,actual,official,pension_fund_ifrs_2020,2020-IFRS.pdf,7,ანაზღაურება/სქემის დატოვების ანაზღაურება,2026-10-21
+2020,social.funded_pension.payouts.amount,country.georgia,1548000,gel,12,actual,official,pension_fund_ifrs_2020,2020-IFRS.pdf,7,ანაზღაურება/სქემის დატოვების ანაზღაურება,2026-10-21
+2021,social.funded_pension.payouts.amount,country.georgia,1988000,gel,12,actual,official,pension_fund_ifrs_2022,2022-IFRS-GE.pdf,7,საპენსიო სქემის მონაწილეზე ჯამურად გაცემული პენსია,2026-10-21
+2022,social.funded_pension.payouts.amount,country.georgia,5787000,gel,12,actual,official,pension_fund_ifrs_2023,2023-IFRS-GE.pdf,8,საპენსიო სქემის მონაწილეზე ჯამურად გაცემული პენსია,2026-10-21
+2023,social.funded_pension.payouts.amount,country.georgia,15014000,gel,12,actual,official,pension_fund_ifrs_2024,2024-IFRS-GE.pdf,8,საპენსიო სქემის მონაწილეზე ჯამურად გაცემული პენსია,2026-10-21
+2024,social.funded_pension.payouts.amount,country.georgia,40110000,gel,12,actual,official,pension_fund_ifrs_2025,2025-IFRS.pdf,8,Total scheme member opt-outs,2026-10-21
+2025,social.funded_pension.payouts.amount,country.georgia,63609000,gel,12,actual,official,pension_fund_ifrs_2025,2025-IFRS.pdf,8,Total scheme member opt-outs,2026-10-21
+2019,social.funded_pension.members,country.georgia,958226,persons,1,actual,official,pension_fund_report_2025,Annual_Rep_2025_geo.pdf,16,რეგისტრირებული მონაწილეთა რაოდენობა,2026-10-21
+2020,social.funded_pension.members,country.georgia,1105041,persons,1,actual,official,pension_fund_report_2025,Annual_Rep_2025_geo.pdf,16,რეგისტრირებული მონაწილეთა რაოდენობა,2026-10-21
+2021,social.funded_pension.members,country.georgia,1234732,persons,1,actual,official,pension_fund_report_2025,Annual_Rep_2025_geo.pdf,16,რეგისტრირებული მონაწილეთა რაოდენობა,2026-10-21
+2022,social.funded_pension.members,country.georgia,1359035,persons,1,actual,official,pension_fund_report_2025,Annual_Rep_2025_geo.pdf,16,რეგისტრირებული მონაწილეთა რაოდენობა,2026-10-21
+2023,social.funded_pension.members,country.georgia,1478720,persons,1,actual,official,pension_fund_report_2025,Annual_Rep_2025_geo.pdf,16,რეგისტრირებული მონაწილეთა რაოდენობა,2026-10-21
+2024,social.funded_pension.members,country.georgia,1581832,persons,1,actual,official,pension_fund_report_2025,Annual_Rep_2025_geo.pdf,16,რეგისტრირებული მონაწილეთა რაოდენობა,2026-10-21
+2025,social.funded_pension.members,country.georgia,1705365,persons,1,actual,official,pension_fund_report_2025,Annual_Rep_2025_geo.pdf,16,რეგისტრირებული მონაწილეთა რაოდენობა,2026-10-21
+2019,social.funded_pension.left,country.georgia,164198,persons,12,actual,official,pension_fund_report_2025,Annual_Rep_2025_geo.pdf,19,საპენსიო სქემიდან გასული დასაქმებულების რაოდენობა,2026-10-21
+2020,social.funded_pension.left,country.georgia,3098,persons,12,actual,official,pension_fund_report_2025,Annual_Rep_2025_geo.pdf,19,საპენსიო სქემიდან გასული დასაქმებულების რაოდენობა,2026-10-21
+2021,social.funded_pension.left,country.georgia,1605,persons,12,actual,official,pension_fund_report_2025,Annual_Rep_2025_geo.pdf,19,საპენსიო სქემიდან გასული დასაქმებულების რაოდენობა,2026-10-21
+2022,social.funded_pension.left,country.georgia,1218,persons,12,actual,official,pension_fund_report_2025,Annual_Rep_2025_geo.pdf,19,საპენსიო სქემიდან გასული დასაქმებულების რაოდენობა,2026-10-21
+2023,social.funded_pension.left,country.georgia,1165,persons,12,actual,official,pension_fund_report_2025,Annual_Rep_2025_geo.pdf,19,საპენსიო სქემიდან გასული დასაქმებულების რაოდენობა,2026-10-21
+2024,social.funded_pension.left,country.georgia,727,persons,12,actual,official,pension_fund_report_2025,Annual_Rep_2025_geo.pdf,19,საპენსიო სქემიდან გასული დასაქმებულების რაოდენობა,2026-10-21
+2025,social.funded_pension.left,country.georgia,540,persons,12,actual,official,pension_fund_report_2025,Annual_Rep_2025_geo.pdf,19,საპენსიო სქემიდან გასული დასაქმებულების რაოდენობა,2026-10-21
+2019,social.funded_pension.paid_persons,country.georgia,185,persons,12,actual,official,pension_fund_report_2025,Annual_Rep_2025_geo.pdf,20,დანიშნული პენსიების რაოდენობა წლების მიხედვით / სულ,2026-10-21
+2020,social.funded_pension.paid_persons,country.georgia,466,persons,12,actual,official,pension_fund_report_2025,Annual_Rep_2025_geo.pdf,20,დანიშნული პენსიების რაოდენობა წლების მიხედვით / სულ,2026-10-21
+2021,social.funded_pension.paid_persons,country.georgia,839,persons,12,actual,official,pension_fund_report_2025,Annual_Rep_2025_geo.pdf,20,დანიშნული პენსიების რაოდენობა წლების მიხედვით / სულ,2026-10-21
+2022,social.funded_pension.paid_persons,country.georgia,1853,persons,12,actual,official,pension_fund_report_2025,Annual_Rep_2025_geo.pdf,20,დანიშნული პენსიების რაოდენობა წლების მიხედვით / სულ,2026-10-21
+2023,social.funded_pension.paid_persons,country.georgia,3747,persons,12,actual,official,pension_fund_report_2025,Annual_Rep_2025_geo.pdf,20,დანიშნული პენსიების რაოდენობა წლების მიხედვით / სულ,2026-10-21
+2024,social.funded_pension.paid_persons,country.georgia,8363,persons,12,actual,official,pension_fund_report_2025,Annual_Rep_2025_geo.pdf,20,დანიშნული პენსიების რაოდენობა წლების მიხედვით / სულ,2026-10-21
+2025,social.funded_pension.paid_persons,country.georgia,11367,persons,12,actual,official,pension_fund_report_2025,Annual_Rep_2025_geo.pdf,20,დანიშნული პენსიების რაოდენობა წლების მიხედვით / სულ,2026-10-21
+2019,social.funded_pension.employers,country.georgia,61173,employers,1,actual,official,pension_fund_report_2025,Annual_Rep_2025_geo.pdf,15,დამსაქმებელთა რაოდენობა,2026-10-21
+2020,social.funded_pension.employers,country.georgia,71600,employers,1,actual,official,pension_fund_report_2025,Annual_Rep_2025_geo.pdf,15,დამსაქმებელთა რაოდენობა,2026-10-21
+2021,social.funded_pension.employers,country.georgia,82801,employers,1,actual,official,pension_fund_report_2025,Annual_Rep_2025_geo.pdf,15,დამსაქმებელთა რაოდენობა,2026-10-21
+2022,social.funded_pension.employers,country.georgia,94994,employers,1,actual,official,pension_fund_report_2025,Annual_Rep_2025_geo.pdf,15,დამსაქმებელთა რაოდენობა,2026-10-21
+2023,social.funded_pension.employers,country.georgia,108047,employers,1,actual,official,pension_fund_report_2025,Annual_Rep_2025_geo.pdf,15,დამსაქმებელთა რაოდენობა,2026-10-21
+2024,social.funded_pension.employers,country.georgia,119966,employers,1,actual,official,pension_fund_report_2025,Annual_Rep_2025_geo.pdf,15,დამსაქმებელთა რაოდენობა,2026-10-21
+2025,social.funded_pension.employers,country.georgia,145780,employers,1,actual,official,pension_fund_report_2025,Annual_Rep_2025_geo.pdf,15,დამსაქმებელთა რაოდენობა,2026-10-21
+2019,social.funded_pension.return,country.georgia,6.1,percent,12,actual,official,pension_fund_report_2025,Annual_Rep_2025_geo.pdf,7,საინვესტიციო ამონაგები და ინფლაცია / ამონაგები,2026-10-21
+2020,social.funded_pension.return,country.georgia,12.9,percent,12,actual,official,pension_fund_report_2025,Annual_Rep_2025_geo.pdf,7,საინვესტიციო ამონაგები და ინფლაცია / ამონაგები,2026-10-21
+2021,social.funded_pension.return,country.georgia,9.5,percent,12,actual,official,pension_fund_report_2025,Annual_Rep_2025_geo.pdf,7,საინვესტიციო ამონაგები და ინფლაცია / ამონაგები,2026-10-21
+2022,social.funded_pension.return,country.georgia,7.3,percent,12,actual,official,pension_fund_report_2025,Annual_Rep_2025_geo.pdf,7,საინვესტიციო ამონაგები და ინფლაცია / ამონაგები,2026-10-21
+2023,social.funded_pension.return,country.georgia,12.3,percent,12,actual,official,pension_fund_report_2025,Annual_Rep_2025_geo.pdf,7,საინვესტიციო ამონაგები და ინფლაცია / ამონაგები,2026-10-21
+2024,social.funded_pension.return,country.georgia,11.5,percent,12,actual,official,pension_fund_report_2025,Annual_Rep_2025_geo.pdf,7,საინვესტიციო ამონაგები და ინფლაცია / ამონაგები,2026-10-21
+2025,social.funded_pension.return,country.georgia,11.8,percent,12,actual,official,pension_fund_report_2025,Annual_Rep_2025_geo.pdf,7,საინვესტიციო ამონაგები და ინფლაცია / ამონაგები,2026-10-21

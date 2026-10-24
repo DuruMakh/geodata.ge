@@ -96,9 +96,10 @@ async function createFixtureRepository() {
     crime: [await writeReviewedSource(repositoryRoot, "crime", "2015-2025", "docs/Raw Data/Crime/geostat-crime-annual/official/Number-of-Recorded-Crimes.xlsx", "downloads/methodology/crime/files/number-of-recorded-crimes.xlsx", "crime-recorded")],
     internet: [await writeReviewedSource(repositoryRoot, "internet", "2016-2026", "docs/Raw Data/Internet/geostat-ict-households-annual/official/01_Share_of_households_with_internet_access.xlsx", "downloads/methodology/internet/files/01_share_of_households_with_internet_access.xlsx", "internet-homes")],
     education: [await writeReviewedSource(repositoryRoot, "education", "2010-2025", "docs/Raw Data/Education/geostat-education-annual/official/01Number-of-Students-Admission-Graduates-by-Programmes-and-Sex.xlsx", "downloads/methodology/education/files/01number-of-students-admission-graduates-by-programmes-and-sex.xlsx", "education-higher")],
-    // SSA's topic page capture, and the population table Demography archives too (the same bytes, so the same contents here).
+    // SSA's topic page capture, a Pension Fund statement, and the population table Demography archives too (the same bytes, so the same contents here).
     "social-protection": [
       await writeReviewedSource(repositoryRoot, "social-protection", "2013-2025", "docs/Raw Data/Social/ssa-statistics/official/pages/ssa-page-pension.html", "downloads/methodology/social-protection/files/ssa-page-pension.html.txt", "ssa-pension-page"),
+      await writeReviewedSource(repositoryRoot, "social-protection", "2019-2020", "docs/Raw Data/Social/pension-fund/official/2020-IFRS.pdf", "downloads/methodology/social-protection/files/2020-ifrs.pdf", "pension-fund-ifrs-2020"),
       await writeReviewedSource(repositoryRoot, "social-protection", "2014-2025", "docs/Raw Data/Municipalities/geostat-population-regional-gdp/official/01-population-by-self-governed-unit.xlsx", "downloads/methodology/social-protection/files/01-population-by-self-governed-unit.xlsx", "demography-population"),
     ],
     "science-culture": [await writeReviewedSource(repositoryRoot, "science-culture", "2019-2024", "docs/Raw Data/ScienceCulture/geostat-science-culture-annual/official/Researchers.xlsx", "downloads/methodology/science-culture/files/researchers.xlsx", "science-culture-researchers")],

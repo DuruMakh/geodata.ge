@@ -1,6 +1,7 @@
 import Decimal from "decimal.js";
+import { fundedPensionUnit, isFundedPension, validateFundedPensionFacts } from "./fundedPension";
 import {
-  SOCIAL_AGE_BANDS, SOCIAL_GEORGIA, SOCIAL_INDICATORS, SOCIAL_MUNICIPALITIES, SOCIAL_PACKAGE_GROUPS, SOCIAL_PAYMENT_PROGRAMMES, SOCIAL_PUBLIC_SOURCES, SOCIAL_REGIONS, SOCIAL_UNITS,
+  FUNDED_PENSION_SOURCES, SOCIAL_AGE_BANDS, SOCIAL_GEORGIA, SOCIAL_INDICATORS, SOCIAL_MUNICIPALITIES, SOCIAL_PACKAGE_GROUPS, SOCIAL_PAYMENT_PROGRAMMES, SOCIAL_PUBLIC_SOURCES, SOCIAL_REGIONS, SOCIAL_UNITS,
   socialFactKey, type SocialFact, type SocialIndicator, type SocialPaymentProgramme,
 } from "./types";
 
@@ -97,16 +98,17 @@ export const isMoney = (indicatorId: string) => /\.(amount|employment_amount)$/.
 const isPayment = (indicatorId: string) => indicatorId.startsWith("social.payments.");
 
 export function socialUnit(indicatorId: SocialIndicator): SocialFact["unit"] {
+  if (isFundedPension(indicatorId)) return fundedPensionUnit(indicatorId);
   if (isMoney(indicatorId) || isAverage(indicatorId)) return "gel";
   return /\.(families|employment_families|registered_families)$/.test(indicatorId) ? "families" : "persons";
 }
 
 /**
- * A stored value as the file writes it: whole units, or two decimals for an average. The database drops trailing zeros (`150.5`) and
+ * A stored value as the file writes it: whole units (a negative sign is kept), two decimals for an average, one for the funded pension's return. The database drops trailing zeros (`150.5`) and
  * the mirror pads them back; a value with more decimals than its indicator allows is left as it is, so validation rejects it.
  */
 export function socialValueText(indicatorId: string, value: string): string {
-  const places = isAverage(indicatorId) ? 2 : 0;
+  const places = isAverage(indicatorId) ? 2 : indicatorId === "social.funded_pension.return" ? 1 : 0;
   const decimal = new D(value);
   return decimal.decimalPlaces() <= places ? decimal.toFixed(places) : decimal.toFixed();
 }
@@ -159,7 +161,11 @@ type Mismatch = { check: string; year: number; difference: string };
  * `averageInputs` holds the package's month-count sums, which are not served. With them every average is recalculated;
  * without them (a caller that only holds facts) that one check is skipped and everything else is checked.
  */
-export function validateSocialFacts(facts: readonly SocialFact[], averageInputs?: SocialAverageInputs): void {
+export function validateSocialFacts(allFacts: readonly SocialFact[], averageInputs?: SocialAverageInputs): void {
+  // The funded pension rows have their own rules; every check below sees the SSA rows only.
+  const funded = allFacts.filter(f => isFundedPension(f.indicatorId));
+  validateFundedPensionFacts(funded);
+  const facts = allFacts.filter(f => !isFundedPension(f.indicatorId));
   const expected = expectedSocialKeys();
   const byKey = new Map<string, SocialFact>();
   for (const fact of facts) {
@@ -288,5 +294,5 @@ export function validateSocialFacts(facts: readonly SocialFact[], averageInputs?
   for (const [indicatorId, year, value] of ANCHORS) {
     if (byKey.get(socialFactKey({ indicatorId, geographyId: SOCIAL_GEORGIA, year }))?.value !== value) throw new Error(`Social anchor value changed: ${indicatorId}:${SOCIAL_GEORGIA}:${year}`);
   }
-  if (!SOCIAL_PUBLIC_SOURCES.every(id => facts.some(f => f.sourceId === id))) throw new Error("Social source missing from the serving file");
+  if (!SOCIAL_PUBLIC_SOURCES.filter(id => !FUNDED_PENSION_SOURCES.includes(id)).every(id => facts.some(f => f.sourceId === id))) throw new Error("Social source missing from the serving file");
 }
