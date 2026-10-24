@@ -128,4 +128,28 @@ describe("landing page layout", () => {
     expect(municipal.places).toHaveLength(64);
     expect(municipal.totalGel).toBe(municipal.places.reduce((sum, place) => sum + place.totalGel, 0));
   });
+
+  // Georgian and English read the same facts: only labels and sentences may differ between the two models.
+  it("builds the same chapter models in Georgian and English, apart from their words", async () => {
+    const { renderHomePage } = await import("../../lib/pages/home");
+    built.chapters.length = 0;
+    await renderHomePage("ka");
+    await renderHomePage("en");
+    const [ka, en] = built.chapters;
+    const numbersOnly = (value: unknown): unknown =>
+      typeof value === "string"
+        ? ""
+        : Array.isArray(value)
+          ? value.map(numbersOnly)
+          : value !== null && typeof value === "object"
+            ? Object.fromEntries(Object.entries(value).map(([key, entry]) => [key, numbersOnly(entry)]))
+            : value;
+    expect(numbersOnly(en)).toEqual(numbersOnly(ka));
+    // Ids are identifiers, not words: they match exactly.
+    expect(en.spending.fields.map((field) => field.id)).toEqual(ka.spending.fields.map((field) => field.id));
+    expect(en.revenue.bands.map((band) => band.id)).toEqual(ka.revenue.bands.map((band) => band.id));
+    expect(en.scale.measures.map((measure) => measure.id)).toEqual(ka.scale.measures.map((measure) => measure.id));
+    expect(en.municipal.places.map((place) => place.code)).toEqual(ka.municipal.places.map((place) => place.code));
+    expect(en.sentences.spending).not.toBe(ka.sentences.spending);
+  });
 });

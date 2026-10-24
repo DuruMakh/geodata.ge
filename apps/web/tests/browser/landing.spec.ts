@@ -4,9 +4,9 @@ import enLanding from "../../lib/i18n/messages/en/landing.json";
 import kaLanding from "../../lib/i18n/messages/ka/landing.json";
 import { computedCssColorAlpha } from "./focus-outline";
 
-// Landing page (GeoData Site v2 design): structure, live data blocks, and the
-// paths into the explorer. The hero is a static image below 768px and WebGL at
-// wider sizes; tests assert the matching visual mounts rather than pixel content.
+// Homepage (DESIGN.md §19): the hero, the country figures, the five data chapters with their charts,
+// sources, Ask AI and the site footer, and the paths into the explorer. The hero is a static image
+// below 768px and WebGL at wider sizes; tests assert the matching visual mounts rather than pixel content.
 
 const baseUrl = process.env.PLAYWRIGHT_BASE_URL ?? "http://localhost:3100";
 const heroRuntimeMarkers = ["WebGLRenderer", "hero scene init failed"] as const;
