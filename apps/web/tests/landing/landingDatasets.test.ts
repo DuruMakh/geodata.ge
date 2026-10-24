@@ -35,9 +35,9 @@ describe("buildLandingDatasetLinks", () => {
     expect(links.map(({ href, title }) => [href, title])).toEqual([
       ["/explorer", "ბიუჯეტი"],
       ["/explorer/economy", "ეკონომიკა"],
-      ["/explorer/inflation", "ინფლაცია"],
-      ["/explorer/unemployment", "უმუშევრობა"],
-      ["/explorer/trade", "საგარეო ვაჭრობა"],
+      ["/explorer/prices#t-inflation", "ინფლაცია"],
+      ["/explorer/labour#t-unemployment", "უმუშევრობა"],
+      ["/explorer/external#t-trade", "საგარეო ვაჭრობა"],
     ]);
     expect(links.map(({ measure, period, value }) => `${measure} · ${period}: ${value}`)).toEqual([
       "ხარჯები · 2025: 27.7 მლრდ ₾",

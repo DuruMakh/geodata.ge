@@ -1,6 +1,5 @@
 {
   "unemployment.title": "Unemployment",
-  "unemployment.hubSummary": "Unemployment, jobs, hours, informal work, youth",
   "unemployment.annual": "Annual data",
   "unemployment.nationalViews": "National views",
   "unemployment.overviewTab": "Overview",
@@ -79,7 +78,5 @@
   "unemployment.educationNote": "Education rates begin in 2020. Each rate uses its matching education/sex denominator. The reference is separately published; education counts and No education rates are unavailable.",
   "unemployment.longTermNote": "Long-term means 12 months or more. The rate is a percentage of the labour force; the share is a percentage of all unemployed people.",
   "unemployment.sourceNote": "Source: Geostat Labour Force Survey. Survey estimates, not census counts; displayed differences do not establish statistical significance.",
-  "unemployment.methodology": "Definitions and original sources",
-  "unemployment.metaTitle": "Unemployment in Georgia",
-  "unemployment.metaDescription": "Georgia’s annual unemployment, employment and participation rates and counts by sex, age, settlement, region and education, from Geostat."
+  "unemployment.methodology": "Definitions and original sources"
 }

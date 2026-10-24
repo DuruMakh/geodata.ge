@@ -284,6 +284,19 @@ export function groupOfTopic(id: TopicId): NavGroup {
   return NAV_GROUPS.find((group) => group.topics.includes(id))!;
 }
 
+export function navGroup(id: GroupId): NavGroup {
+  return NAV_GROUPS.find((group) => group.id === id)!;
+}
+
+/**
+ * Where a link to a topic goes now that its own hub page forwards: `href`, its section on its group page, for a link or
+ * a visible breadcrumb; `path`, the group page itself, for breadcrumb structured data.
+ */
+export function topicSection(id: TopicId): { href: `/${string}`; path: `/${string}` } {
+  const { href } = groupOfTopic(id);
+  return { href: `${href}#t-${id}`, path: href };
+}
+
 /** The pages of a group: its topics' sections, in order. */
 export function groupPages(group: NavGroup): NavSection[] {
   return group.topics.flatMap((id) => topicHub(id).sections);
@@ -339,8 +352,6 @@ const PAGE_SOURCE_NOTES: Readonly<Record<string, string>> = {
   "/explorer/inflation/categories": "common.geostatSourceNote",
   "/explorer/inflation/products": "common.geostatSourceNote",
   "/explorer/external/foreign-investment": "common.geostatSourceNote",
-  // The hub lists Geostat's health pages and the Social Service Agency's pages.
-  [HEALTH_HUB_PATH]: "common.socialSourceNote",
 };
 
 /** Footer source notes for an address and every page below it; the longest address wins. */

@@ -75,7 +75,7 @@ describe("the Budget group page (en)", async () => {
     expect(sections(html).map(({ topic }) => topic)).toEqual(["budget"]);
     expect(cardTags(html)).toHaveLength(7);
     expect(hrefs(html, "group-headline")).toEqual(GROUP_HEADLINES.budget.map(({ page }) => `/en${page}`));
-    expect(html).toMatch(/7 pages · updated \d{1,2} [A-Z][a-z]+ \d{4}/);
+    expect(html).toMatch(/7 pages · Updated \d{1,2} [A-Z][a-z]+ \d{4}/);
   });
 });
 
@@ -104,6 +104,22 @@ describe("groupHeadlines", () => {
     expect(() => groupHeadlines("budget", [...cards.slice(0, 3), card("/explorer/deficit", null)], messages)).toThrow(/\/explorer\/deficit/);
   });
 
+  it("names the Pensions and Inflation picks as spec §5.3 does", async () => {
+    const [ka, en] = await Promise.all([import("../../lib/i18n/messages/ka/groups.json"), import("../../lib/i18n/messages/en/groups.json")]);
+    const label = (messages: Record<string, string>, group: GroupId, page: string) => messages[`groups.headline.${GROUP_HEADLINES[group].find((pick) => pick.page === page)!.labelKey}`];
+    expect([label(ka.default, "living", "/explorer/health/pensions"), label(en.default, "living", "/explorer/health/pensions")]).toEqual(["პენსიონერები", "Pensioners"]);
+    expect([label(ka.default, "prices", "/explorer/inflation/overview"), label(en.default, "prices", "/explorer/inflation/overview")]).toEqual(["ინფლაცია", "Inflation"]);
+  });
+
+  it("has a ka and an en label for every key a pick names", async () => {
+    const [ka, en] = await Promise.all([import("../../lib/i18n/messages/ka/groups.json"), import("../../lib/i18n/messages/en/groups.json")]);
+    for (const { labelKey } of Object.values(GROUP_HEADLINES).flat()) {
+      if (!labelKey) continue;
+      expect(ka.default, labelKey).toHaveProperty([`groups.headline.${labelKey}`]);
+      expect(en.default, labelKey).toHaveProperty([`groups.headline.${labelKey}`]);
+    }
+  });
+
   it("keeps a caption the label does not already say", () => {
     const withCaption = cards.map((item, index) => ({ ...item, latest: { value: "1", period: "2025", caption: index === 3 ? "Deficit, % of GDP" : "Türkiye, largest" } }));
     expect(groupHeadlines("budget", withCaption, messages).map(({ caption }) => caption)).toEqual(["Türkiye, largest", "Türkiye, largest", "Türkiye, largest", null]);
@@ -125,6 +141,9 @@ describe("topicScrollTarget", () => {
   it("hands an old Unemployment hub view to the page that now serves it", () => {
     expect(topicScrollTarget("labour", "ka", "/explorer/labour", "?topic=unemployment", "#breakdown=region")).toEqual({ navigate: "/explorer/unemployment/regions#breakdown=region" });
     expect(topicScrollTarget("labour", "en", "/en/explorer/labour", "?topic=unemployment&x=1", "#breakdown=age&sel=a")).toEqual({ navigate: "/en/explorer/unemployment/age?x=1#breakdown=age&sel=a" });
+    expect(topicScrollTarget("labour", "ka", "/explorer/labour", "", "#breakdown=region")).toEqual({ navigate: "/explorer/unemployment/regions#breakdown=region" });
+    // Only an old Unemployment hub link: the Wages section keeps its own hash.
+    expect(topicScrollTarget("labour", "ka", "/explorer/labour", "?topic=wages", "#breakdown=region")).toEqual({ topic: "wages", url: "/explorer/labour#t-wages" });
     // Only the Labour page serves the old Unemployment hub.
     expect(topicScrollTarget("society", "ka", "/explorer/society", "?topic=crime", "#breakdown=region")).toEqual({ topic: "crime", url: "/explorer/society#t-crime" });
   });

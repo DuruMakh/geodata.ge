@@ -13,12 +13,12 @@ export const GROUP_HEADLINES: Record<GroupId, readonly { page: string; labelKey?
     { page: "/explorer/economy/gdp", labelKey: "economy.gdp" }, { page: "/explorer/business/sales", labelKey: "business.sales" },
     { page: "/explorer/business/jobs", labelKey: "business.jobs" }, { page: "/explorer/housing/permits" },
   ],
-  prices: [{ page: "/explorer/inflation/overview" }, { page: "/explorer/money/interest-rates" }, { page: "/explorer/money/supply" }, { page: "/explorer/money/loans-deposits" }],
+  prices: [{ page: "/explorer/inflation/overview", labelKey: "inflation.overview" }, { page: "/explorer/money/interest-rates" }, { page: "/explorer/money/supply" }, { page: "/explorer/money/loans-deposits" }],
   labour: [
     { page: "/explorer/unemployment/overview", labelKey: "unemployment.overview" }, { page: "/explorer/wages/overview", labelKey: "wages.overview" },
     { page: "/explorer/unemployment/industries", labelKey: "unemployment.industries" }, { page: "/explorer/unemployment/informal", labelKey: "unemployment.informal" },
   ],
-  living: [{ page: "/explorer/living-standards/income" }, { page: "/explorer/living-standards/poverty" }, { page: "/explorer/living-standards/inequality" }, { page: "/explorer/health/pensions" }],
+  living: [{ page: "/explorer/living-standards/income" }, { page: "/explorer/living-standards/poverty" }, { page: "/explorer/living-standards/inequality" }, { page: "/explorer/health/pensions", labelKey: "health.pensions" }],
   external: [
     { page: "/explorer/trade/overview", labelKey: "trade.overview" }, { page: "/explorer/external/money-from-abroad", labelKey: "external.money-from-abroad" },
     { page: "/explorer/external/foreign-investment" }, { page: "/explorer/trade/partners", labelKey: "trade.partners" },

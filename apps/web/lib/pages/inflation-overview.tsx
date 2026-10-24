@@ -16,7 +16,8 @@ import { loadReviewedSourceManifest } from "../methodology/sourceManifest";
 import { fiscalMetadata } from "../seo/metadata";
 import { explorerDatasetJsonLd } from "../seo/structuredData";
 import { resolveSiteUrl } from "../siteUrl";
-import { INFLATION_HUB_PATH, inflationRepositoryRoot, inflationWorkbookSources } from "./inflation-shared";
+import { inflationRepositoryRoot, inflationWorkbookSources } from "./inflation-shared";
+import { topicSection } from "../navigation/navTree";
 
 const OVERVIEW_PATH = "/explorer/inflation/overview";
 
@@ -54,7 +55,7 @@ export async function renderInflationOverview(locale: Locale) {
       <BreadcrumbJsonLd
         items={[
           { name: t("common.home"), path: pageHref("/", locale) },
-          { name: t("common.inflation"), path: pageHref(INFLATION_HUB_PATH, locale) },
+          { name: t("common.inflation"), path: pageHref(topicSection("inflation").path, locale) },
           { name: t("inflation.heading"), path: pageHref(OVERVIEW_PATH, locale) },
         ]}
       />

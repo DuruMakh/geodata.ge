@@ -41,6 +41,8 @@
   "groups.headline.wages.overview": "საშუალო ხელფასი",
   "groups.headline.unemployment.industries": "დასაქმებული",
   "groups.headline.unemployment.informal": "არაფორმალური დასაქმება",
+  "groups.headline.health.pensions": "პენსიონერები",
+  "groups.headline.inflation.overview": "ინფლაცია",
   "groups.caption.largest": "{name}, უმსხვილესი",
   "groups.topicsNav": "ქვეთემები ამ გვერდზე",
   "groups.meta": "{topics} ქვეთემა · {pages} გვერდი · განახლდა {date}",

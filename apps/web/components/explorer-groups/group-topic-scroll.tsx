@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import type { Locale } from "../../lib/i18n/types";
-import { NAV_GROUPS, type GroupId } from "../../lib/navigation/navTree";
+import { navGroup, type GroupId } from "../../lib/navigation/navTree";
 import { useAppReady } from "../explorer-shell/use-app-ready";
 import { unemploymentLegacyHref } from "../unemployment/unemployment-legacy-link";
 
@@ -19,11 +19,12 @@ export function topicScrollTarget(group: GroupId, locale: Locale, pathname: stri
   const topic = params.get("topic");
   params.delete("topic");
   const rest = params.toString() ? `?${params}` : "";
-  if (group === "labour") {
+  // Only an old Unemployment hub link, forwarded or typed without its topic, can carry one of its views.
+  if (group === "labour" && (topic === "unemployment" || topic === null)) {
     const legacy = unemploymentLegacyHref(locale, rest, hash);
     if (legacy) return { navigate: legacy };
   }
-  const topics: readonly string[] = NAV_GROUPS.find(({ id }) => id === group)!.topics;
+  const topics: readonly string[] = navGroup(group).topics;
   return topic !== null && topics.includes(topic) ? { topic, url: `${pathname}${rest}#t-${topic}` } : null;
 }
 

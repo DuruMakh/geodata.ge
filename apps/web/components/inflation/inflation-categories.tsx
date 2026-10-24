@@ -57,6 +57,7 @@ import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { PageDataStatus } from "../explorer-shell/page-data-status";
 import { useHashState } from "../explorer-shell/use-hash-state";
 import { usePageData } from "../explorer-shell/use-page-data";
+import { topicSection } from "../../lib/navigation/navTree";
 
 // Inflation categories (spec §6): the overview's layout, with a stacked column
 // chart on the contribution tab where the parts visibly re-add to the published
@@ -153,7 +154,7 @@ export function InflationCategories({ facts, monthlyUrl, weights, headline, head
         crumbs={[
           { label: message(messages, "common.home"), href: pageHref("/", locale) },
           { label: message(messages, "common.data") },
-          { label: message(messages, "common.inflation"), href: pageHref("/explorer/inflation", locale) },
+          { label: message(messages, "common.inflation"), href: pageHref(topicSection("inflation").href, locale) },
           { label: t("categoriesHeading") },
         ]}
         coverage={coverageLabel(messages, locale, periodLabel(messages, coverage.min, "short"), periodLabel(messages, coverage.max, "short"), lastReviewedAt)}

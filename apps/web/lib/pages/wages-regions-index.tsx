@@ -14,6 +14,7 @@ import { loadWagesPage, wagesRegionsDataset } from "./wages-shared";
 import { clientPresentation } from "../i18n/presentation.server";
 import { explorerDatasetJsonLd } from "../seo/structuredData";
 import { resolveSiteUrl } from "../siteUrl";
+import { topicSection } from "../navigation/navTree";
 
 /** The Regions index: the map and ranked list; each region opens its own page (wages.tsx). */
 export async function renderWagesRegionsIndexPage(locale: Locale) {
@@ -22,14 +23,14 @@ export async function renderWagesRegionsIndexPage(locale: Locale) {
   const t = (key: string) => message(presentation.messages, `wages.${key}`), title = t("page.regions.title");
   const regionMap = buildWagesRegionMapModel(facts);
   const national = wagesPlaceLatest(facts);
-  const crumbs = [{ label: message(presentation.messages, "common.home"), href: pageHref("/", locale) }, { label: message(presentation.messages, "common.data") }, { label: t("title"), href: pageHref("/explorer/wages", locale) }, { label: title }];
+  const crumbs = [{ label: message(presentation.messages, "common.home"), href: pageHref("/", locale) }, { label: message(presentation.messages, "common.data") }, { label: t("title"), href: pageHref(topicSection("wages").href, locale) }, { label: title }];
   const parent = wagesRegionsDataset(presentation.messages);
   return <I18nProvider {...clientPresentation(presentation)}>
     <JsonLd testId="explorer-dataset-json-ld" data={explorerDatasetJsonLd({
       locale, origin: resolveSiteUrl(), path: parent.path, datasetId: "wages", name: parent.name, description: parent.description,
       firstYear: regionMap.firstYear, lastYear: regionMap.year, dateModified: lastReviewedAt, variableMeasured: [t("series.average")],
     })} />
-    <BreadcrumbJsonLd items={[{ name: crumbs[0].label, path: pageHref("/", locale) }, { name: t("title"), path: pageHref("/explorer/wages", locale) }, { name: title, path: pageHref("/explorer/wages/regions", locale) }]} />
+    <BreadcrumbJsonLd items={[{ name: crumbs[0].label, path: pageHref("/", locale) }, { name: t("title"), path: pageHref(topicSection("wages").path, locale) }, { name: title, path: pageHref("/explorer/wages/regions", locale) }]} />
     <ExplorerPage containerQueries={false}>
       <PageHeader locale={locale} messages={presentation.messages} crumbs={crumbs} coverage={coverageLabel(presentation.messages, locale, regionMap.firstYear, regionMap.year, lastReviewedAt)} />
       <WagesRegionsIndex regionMap={regionMap} national={{ year: national.year, value: national.value! }} />

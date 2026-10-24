@@ -1,6 +1,5 @@
 import { loadServedTransportData } from "../data/transport/importTransport";
 import { TRANSPORT_SOURCES, type TransportFact } from "../data/transport/types";
-import { TRANSPORT_HUB_PATH } from "../explorer/transport";
 import { TRANSPORT_AREAS, TRANSPORT_REGIONS_HREF, transportAreaHref, transportAreaSeries, transportAreaSlug, transportMapId, type TransportArea } from "../explorer/transportAreas";
 import { regionAreaFrame, type RegionAreaBody } from "./region-area-frame";
 
@@ -12,7 +11,7 @@ export const {
   areaPages: AREA_PAGES, areaStaticParams: transportAreaStaticParams, areaForSlug, indexPageMetadata: transportRegionsPageMetadata,
   areaPageMetadata: transportAreaPageMetadata, loadWorkbookSources: loadTransportWorkbookSources, renderFrame: renderTransportRegionsFrame,
 } = regionAreaFrame<TransportArea, TransportFact>({
-  hub: "transport", hubPath: TRANSPORT_HUB_PATH, indexHref: TRANSPORT_REGIONS_HREF, indexKey: "regions",
+  hub: "transport", indexHref: TRANSPORT_REGIONS_HREF, indexKey: "regions",
   areas: TRANSPORT_AREAS, areaSlug: transportAreaSlug, areaHref: transportAreaHref, mapId: transportMapId,
   areaHeadingIds: area => transportAreaSeries(area).map(series => series.heading),
   load: loadServedTransportData, sourceIds: TRANSPORT_SOURCES,

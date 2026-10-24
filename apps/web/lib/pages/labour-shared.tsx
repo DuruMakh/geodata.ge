@@ -15,10 +15,9 @@ import type { Locale, Presentation } from "../i18n/types";
 import { fiscalMetadata } from "../seo/metadata";
 import { explorerDatasetJsonLd } from "../seo/structuredData";
 import { resolveSiteUrl } from "../siteUrl";
+import { topicSection } from "../navigation/navTree";
 
 // Shared by the labour page module and the routes' metadata: keep explorer components out of this file.
-
-const UNEMPLOYMENT_HUB_PATH = "/explorer/unemployment";
 
 export const labourSectionHref = (section: LabourSectionId) => LABOUR_SECTIONS.find(item => item.id === section)!.href;
 
@@ -37,14 +36,14 @@ export function renderLabourFrame({ locale, presentation, path: href, title, des
   const hubTitle = message(messages, "common.unemployment"), home = message(messages, "common.home");
   const years = facts.map(f => f.year), firstYear = Math.min(...years), lastYear = Math.max(...years);
   const lastReviewedAt = facts.map(f => f.lastReviewedAt).sort().at(-1)!, origin = resolveSiteUrl();
-  const crumbs = [{ label: home, href: pageHref("/", locale) }, { label: message(messages, "common.data") }, { label: hubTitle, href: pageHref(UNEMPLOYMENT_HUB_PATH, locale) }, { label: title }];
+  const crumbs = [{ label: home, href: pageHref("/", locale) }, { label: message(messages, "common.data") }, { label: hubTitle, href: pageHref(topicSection("unemployment").href, locale) }, { label: title }];
   return <I18nProvider {...clientPresentation(presentation)}>
     <JsonLd testId="explorer-dataset-json-ld" data={explorerDatasetJsonLd({
       locale, origin, path: href, datasetId: "unemployment", name: title, description, firstYear, lastYear, dateModified: lastReviewedAt,
       // Every row the page lists, not only the headline one.
       variableMeasured,
     })} />
-    <BreadcrumbJsonLd items={[{ name: home, path: pageHref("/", locale) }, { name: hubTitle, path: pageHref(UNEMPLOYMENT_HUB_PATH, locale) }, { name: title, path: pageHref(href, locale) }]} />
+    <BreadcrumbJsonLd items={[{ name: home, path: pageHref("/", locale) }, { name: hubTitle, path: pageHref(topicSection("unemployment").path, locale) }, { name: title, path: pageHref(href, locale) }]} />
     <ExplorerPage containerQueries={false}>
       <PageHeader locale={locale} messages={messages} crumbs={crumbs} coverage={coverageLabel(messages, locale, firstYear, lastYear, lastReviewedAt)} />
       {children}

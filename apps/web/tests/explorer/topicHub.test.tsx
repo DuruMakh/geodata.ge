@@ -13,7 +13,7 @@ describe.each(["external", "economy"] as const)("the %s group page", (group) => 
     const sections = [...html.matchAll(/<section[^>]*id="t-[^"]+"[^>]*>([\s\S]*?)<\/section>/g)].map((match) => match[1]);
     expect(sections.length).toBeGreaterThan(1);
     for (const section of sections) expect(section).toMatch(/<p[^>]*>\d{4}–\d{4} · Updated \d{1,2} [A-Z][a-z]+ \d{4} · \d+ pages<\/p>/);
-    expect(html).toMatch(/\d+ topics · \d+ pages · updated \d{1,2} [A-Z][a-z]+ \d{4}/);
+    expect(html).toMatch(/\d+ topics · \d+ pages · Updated \d{1,2} [A-Z][a-z]+ \d{4}/);
   });
 });
 
@@ -22,7 +22,7 @@ it.each(["ka", "en"] as const)("the %s hub cards say \"annual data\" one way", a
   const { getMessages } = await import("../../lib/i18n/messages.server");
   const messages = await getMessages(locale, ["trade", "external", "wages", "unemployment", "inflation", "demography"]);
   for (const key of ["trade.annual", "external.annual", "unemployment.annual"]) expect(messages[key], key).toBe(messages["wages.annual"]);
-  if (locale === "en") for (const key of ["trade.services.summary", "external.account.summary", "inflation.cardCitiesDescription", "demography.hubDescription"]) expect(messages[key], key).not.toContain("'");
+  if (locale === "en") for (const key of ["trade.services.summary", "external.account.summary", "inflation.cardCitiesDescription"]) expect(messages[key], key).not.toContain("'");
 });
 
 // U28-19: the English trade heading names what the Georgian one does, and English says "sex" as demography does.
@@ -30,5 +30,5 @@ it("English names trade and sex as the Georgian does", async () => {
   const { getMessages } = await import("../../lib/i18n/messages.server");
   const messages = await getMessages("en", ["trade", "unemployment", "wages", "common"]);
   expect(messages["trade.hubTitle"]).toBe("External trade");
-  for (const key of ["common.unemploymentGender", "unemployment.hubSummary", "unemployment.page.gender.title", "wages.metaDescription"]) expect(messages[key], key).not.toMatch(/gender/i);
+  for (const key of ["common.unemploymentGender", "unemployment.page.gender.title"]) expect(messages[key], key).not.toMatch(/gender/i);
 });

@@ -7,6 +7,7 @@ import { formatAmount, formatInUnit, formatShare, UNIT_BN } from "../explorer/fo
 import { periodLabel } from "../explorer/inflationLabels";
 import { message } from "../i18n/messages";
 import type { Messages, Presentation } from "../i18n/types";
+import { topicSection } from "../navigation/navTree";
 
 // The landing's dataset row (owner decision D3, 2026-10-07): one link per
 // dataset hub, each with one latest figure computed from the served facts —
@@ -46,9 +47,9 @@ export function buildLandingDatasetLinks(
   return [
     { href: "/explorer", title: t("common.budget"), measure: t("landing.datasetBudgetMeasure"), period: String(input.expenditure.latestYear), value: formatAmount(input.expenditure.totalGel, locale) },
     { href: "/explorer/economy", title: t("common.economy"), measure: t("landing.datasetEconomyMeasure"), period: String(gdp.year), value: formatAmount(gdp.value, locale) },
-    { href: "/explorer/inflation", title: t("common.inflation"), measure: t("landing.datasetInflationMeasure"), period: periodLabel(messages, periodFromKey(cpi.period), "short"), value: formatShare(cpi.value / 100) },
-    { href: "/explorer/unemployment", title: t("common.unemployment"), measure: t("landing.datasetUnemploymentMeasure"), period: String(unemployment.year), value: formatShare(unemployment.value / 100) },
-    { href: "/explorer/trade", title: t("common.trade"), measure: t("landing.datasetTradeMeasure"), period: String(trade.year), value: `${formatInUnit(trade.valueUsd, tradeUnit)} ${tradeUnit.label}` },
+    { href: topicSection("inflation").href, title: t("common.inflation"), measure: t("landing.datasetInflationMeasure"), period: periodLabel(messages, periodFromKey(cpi.period), "short"), value: formatShare(cpi.value / 100) },
+    { href: topicSection("unemployment").href, title: t("common.unemployment"), measure: t("landing.datasetUnemploymentMeasure"), period: String(unemployment.year), value: formatShare(unemployment.value / 100) },
+    { href: topicSection("trade").href, title: t("common.trade"), measure: t("landing.datasetTradeMeasure"), period: String(trade.year), value: `${formatInUnit(trade.valueUsd, tradeUnit)} ${tradeUnit.label}` },
   ];
 }
 

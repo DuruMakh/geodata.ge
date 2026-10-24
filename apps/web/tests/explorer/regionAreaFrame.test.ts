@@ -1,6 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
 import { areaRoutes } from "../../lib/explorer/areaRoutes";
-import { HOUSING_HUB_PATH } from "../../lib/explorer/housing";
 import { HOUSING_AREAS } from "../../lib/explorer/housingAreas";
 import { regionAreaFrame } from "../../lib/pages/region-area-frame";
 
@@ -12,7 +11,7 @@ const AREAS: readonly Area[] = [HOUSING_AREAS[0], HOUSING_AREAS[1]];
 const INDEX = "/explorer/test/regions";
 const routes = areaRoutes<Area>(INDEX);
 const frame = regionAreaFrame<Area, { year: number; lastReviewedAt: string }>({
-  hub: "housing", hubPath: HOUSING_HUB_PATH, indexHref: INDEX, indexKey: "regions",
+  hub: "housing", indexHref: INDEX, indexKey: "regions",
   areas: AREAS, areaSlug: routes.areaSlug, areaHref: routes.areaHref, mapId: routes.mapId,
   areaHeadingIds: () => [], load: async () => ({ facts: [] }), sourceIds: [],
 });

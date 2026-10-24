@@ -18,7 +18,8 @@ import { loadReviewedSourceManifest } from "../methodology/sourceManifest";
 import { fiscalMetadata } from "../seo/metadata";
 import { explorerDatasetJsonLd } from "../seo/structuredData";
 import { resolveSiteUrl } from "../siteUrl";
-import { INFLATION_HUB_PATH, inflationRepositoryRoot, inflationWorkbookSources } from "./inflation-shared";
+import { inflationRepositoryRoot, inflationWorkbookSources } from "./inflation-shared";
+import { topicSection } from "../navigation/navTree";
 
 /** Pages carry the annual rate in full; the 12-month average only feeds the table and workbook summary column, which reads December alone. */
 const isPageFact = (fact: { measure: string; period: string }) => fact.measure === "yoy_pct" || (fact.measure === "avg12_pct" && fact.period.endsWith("-12"));
@@ -75,7 +76,7 @@ async function renderCitiesView(locale: Locale, view: CityView, facts: CityFactI
   const parent = { path: CITIES_PATH, name: `${t("common.inflation")}: ${t("inflation.citiesHeading")}`, description: t("inflation.citiesDescription") };
   const crumbs = [
     { name: t("common.home"), path: pageHref("/", locale) },
-    { name: t("common.inflation"), path: pageHref(INFLATION_HUB_PATH, locale) },
+    { name: t("common.inflation"), path: pageHref(topicSection("inflation").path, locale) },
     { name: t("inflation.citiesHeading"), path: pageHref(CITIES_PATH, locale) },
     ...(view.kind === "city" ? [{ name: t(`inflation.city.${view.cityId}`), path: pageHref(cityPageHref(view.cityId), locale) }] : []),
   ];

@@ -19,7 +19,6 @@ import { coverageLabel } from "../explorer/coverageLabel";
 import { GEORGIA_PLACE_ID, TBILISI_PLACE_ID, buildDemographyPlaces, placeLabel, type DemographyPlace } from "../explorer/demographyAreas";
 import { placeHrefById, placeIdForRoute, placeNeighbours, placePageHref, type PlaceRoute } from "../explorer/demographyPlaceRoutes";
 import { formatInUnit, formatShare, UNIT_PERSONS } from "../explorer/format";
-import { HEALTH_HUB_PATH } from "../explorer/health";
 import { buildPickerCountry, pickerGroupsFromRows } from "../explorer/municipalData";
 import { socialAnnualCpi, socialPopulation, type SocialPlaceSet } from "../explorer/social";
 import { buildSocialIndexModel } from "../explorer/socialIndex";
@@ -37,6 +36,7 @@ import { fiscalMetadata } from "../seo/metadata";
 import { explorerDatasetJsonLd } from "../seo/structuredData";
 import { resolveSiteUrl } from "../siteUrl";
 import { workbookScopeFor } from "./demography-population-place";
+import { topicSection } from "../navigation/navTree";
 
 /** The same three kinds of place page as Population and Education, with the same 11 region ids and 63 municipality slugs. */
 export type SocialPlaceRoute = PlaceRoute;
@@ -106,7 +106,7 @@ function hubCrumbs(messages: Messages, locale: Locale) {
   return [
     { label: message(messages, "common.home"), href: pageHref("/", locale) },
     { label: message(messages, "common.data") },
-    { label: message(messages, "common.health"), href: pageHref(HEALTH_HUB_PATH, locale) },
+    { label: message(messages, "common.health"), href: pageHref(topicSection("health").href, locale) },
   ];
 }
 
@@ -138,7 +138,7 @@ export async function renderSocialIndexPage(locale: Locale, set: SocialPlaceSet)
       })} />
       <BreadcrumbJsonLd items={[
         { name: crumbs[0].label, path: pageHref("/", locale) },
-        { name: crumbs[2].label, path: pageHref(HEALTH_HUB_PATH, locale) },
+        { name: crumbs[2].label, path: pageHref(topicSection("health").path, locale) },
         { name: title, path: pageHref(base, locale) },
       ]} />
       <ExplorerPage testId="explorer-shell">
@@ -236,7 +236,7 @@ export async function renderSocialPlacePage(route: SocialPlaceRoute, locale: Loc
       })} />
       <BreadcrumbJsonLd items={[
         { name: crumbs[0].label, path: pageHref("/", locale) },
-        { name: crumbs[2].label, path: pageHref(HEALTH_HUB_PATH, locale) },
+        { name: crumbs[2].label, path: pageHref(topicSection("health").path, locale) },
         { name: sectionTitle, path: pageHref(base, locale) },
         ...(region ? [{ name: placeLabel(region, locale), path: href(region) }] : []),
         { name, path: href(place) },

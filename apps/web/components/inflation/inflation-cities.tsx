@@ -46,6 +46,7 @@ import { InflationCityHeading } from "./inflation-city-heading";
 import { InflationCityIndicators } from "./inflation-city-indicators";
 import { InflationCityPanel } from "./inflation-city-panel";
 import { InflationCityTable } from "./inflation-city-table";
+import { topicSection } from "../../lib/navigation/navTree";
 
 // Inflation cities (spec 2026-09-30): the Georgia page compares seven places on the
 // total; a city page shows that city's total and divisions. Annual inflation only.
@@ -97,7 +98,7 @@ export function InflationCities({ view, facts, lastReviewedAt, sources, siteOrig
         crumbs={[
           { label: message(messages, "common.home"), href: pageHref("/", locale) },
           { label: message(messages, "common.data") },
-          { label: message(messages, "common.inflation"), href: pageHref("/explorer/inflation", locale) },
+          { label: message(messages, "common.inflation"), href: pageHref(topicSection("inflation").href, locale) },
           citiesCrumb,
           ...(view.kind === "city" ? [{ label: cityLineLabel(messages, view.cityId) }] : []),
         ]}

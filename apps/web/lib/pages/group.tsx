@@ -7,12 +7,10 @@ import { getCommonMessages } from "../i18n/common.server";
 import { getGroupsMessages } from "../i18n/groups.server";
 import { message } from "../i18n/messages";
 import type { Locale, Messages } from "../i18n/types";
-import { groupPages, NAV_GROUPS, type GroupId, type NavGroup } from "../navigation/navTree";
+import { groupPages, navGroup, type GroupId } from "../navigation/navTree";
 import { fiscalMetadata } from "../seo/metadata";
 import { loadPopulationBasics } from "./demography-population";
 import { loadTopicHubs, topicHubCoverage } from "./topicHubs.server";
-
-const navGroup = (group: GroupId): NavGroup => NAV_GROUPS.find(({ id }) => id === group)!;
 
 const pagesLabel = (messages: Messages, n: number) => message(messages, n === 1 ? "common.pagesCountOne" : "common.pagesCount", { n });
 
