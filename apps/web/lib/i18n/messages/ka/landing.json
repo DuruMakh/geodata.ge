@@ -82,5 +82,14 @@
   "landing.revBand.excise": "აქციზი",
   "landing.revBand.otherTaxes": "სხვა გადასახადები",
   "landing.revBand.otherIncome": "სხვა შემოსავლები",
-  "landing.revBand.liabilities": "ვალდებულებების ზრდა"
+  "landing.revBand.liabilities": "ვალდებულებების ზრდა",
+  "landing.scale.gdp": "ნომინალური მშპ",
+  "landing.scale.revenue": "ნაერთი ბიუჯეტის შემოსულობები",
+  "landing.scale.spending": "სახელმწიფო ბიუჯეტის ხარჯები",
+  "landing.scale.debt": "მთავრობის ვალი",
+  "landing.scale.deficit": "ბიუჯეტის დეფიციტი",
+  "landing.scale.surplus": "ბიუჯეტის პროფიციტი",
+  "landing.scale.municipal": "მუნიციპალიტეტების ბიუჯეტები",
+  "landing.scale.fdi": "უცხოური ინვესტიციები",
+  "landing.scale.remittances": "ფულადი გზავნილები"
 }

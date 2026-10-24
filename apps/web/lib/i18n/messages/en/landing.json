@@ -82,5 +82,14 @@
   "landing.revBand.excise": "Excise",
   "landing.revBand.otherTaxes": "Other taxes",
   "landing.revBand.otherIncome": "Other income",
-  "landing.revBand.liabilities": "Increase in liabilities"
+  "landing.revBand.liabilities": "Increase in liabilities",
+  "landing.scale.gdp": "Nominal GDP",
+  "landing.scale.revenue": "Consolidated budget receipts",
+  "landing.scale.spending": "State budget spending",
+  "landing.scale.debt": "Government debt",
+  "landing.scale.deficit": "Budget deficit",
+  "landing.scale.surplus": "Budget surplus",
+  "landing.scale.municipal": "Municipal budgets",
+  "landing.scale.fdi": "Foreign direct investment",
+  "landing.scale.remittances": "Money transfers from abroad"
 }
