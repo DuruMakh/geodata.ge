@@ -12,10 +12,10 @@ export async function renderExplorerLayout(locale: Locale, children: ReactNode) 
     <I18nProvider locale={locale} messages={messages}>
       {/* Below 900px the sidebar's open menu covers the screen, and the page behind it is hidden, so focus stays in the menu.
           Invisible rather than removed: the page keeps its layout, so its charts are not re-measured and the reader's
-          place on it survives the menu. */}
+          place on it survives the menu. The sidebar also makes this column inert while the menu is open. */}
       <div className="group/shell flex min-h-screen flex-col bg-[var(--paper)] min-[900px]:flex-row">
         <DataSidebar />
-        <div className="flex min-w-0 flex-1 flex-col max-[900px]:group-has-[[data-menu-open]]/shell:invisible">
+        <div data-shell-page className="flex min-w-0 flex-1 flex-col max-[900px]:group-has-[[data-menu-open]]/shell:invisible">
           <div id="content" tabIndex={-1} className="flex-1 outline-none">{children}</div>
           <div className="px-5 min-[768px]:px-[34px]">
             <div className="mx-auto max-w-[1180px]"><ExplorerFooter locale={locale} year={new Date().getFullYear()} /></div>

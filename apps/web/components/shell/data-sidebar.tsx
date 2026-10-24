@@ -92,6 +92,12 @@ export function DataSidebar() {
     else if (state.desktop && (document.activeElement === null || document.activeElement === document.body)) toggleRef.current?.focus({ preventScroll: true });
   }, [state.menu, state.page, state.desktop]);
 
+  // The open menu is modal: the page column behind it is inert as well as hidden, so neither Tab nor a screen reader
+  // reaches it. The column is the layout's (lib/pages/explorer-layout.tsx); the bar below is inert by the same flag.
+  useLayoutEffect(() => {
+    document.querySelector("[data-shell-page]")?.toggleAttribute("inert", state.menu);
+  }, [state.menu]);
+
   const closeMenu = useCallback(() => {
     focusAfterMenu.current = "menu";
     dispatch({ type: "menu", open: false });
@@ -101,6 +107,19 @@ export function DataSidebar() {
     if (!state.menu && !state.fly) return;
     const fly = state.fly;
     const onKey = (event: KeyboardEvent) => {
+      // A modal menu wraps Tab at its ends, so focus never leaves it for the inert page or the browser's own controls.
+      if (event.key === "Tab" && state.menu) {
+        const nav = document.getElementById(NAV_ID);
+        const stops = nav ? [...nav.querySelectorAll<HTMLElement>("a[href], button:not([disabled]), input:not([disabled])")].filter((element) => element.checkVisibility()) : [];
+        const [first, last] = [stops[0], stops.at(-1)];
+        if (!first || !last) return;
+        const active = document.activeElement;
+        if (event.shiftKey ? active === first || !nav!.contains(active) : active === last) {
+          event.preventDefault();
+          (event.shiftKey ? last : first).focus();
+        }
+        return;
+      }
       if (event.key !== "Escape") return;
       if (state.menu) {
         closeMenu();
@@ -148,6 +167,7 @@ export function DataSidebar() {
     <>
       <header
         data-testid="sidebar-topbar"
+        inert={state.menu}
         className={`flex ${state.menu ? "invisible" : ""} sticky top-0 z-40 h-[calc(56px+env(safe-area-inset-top))] flex-none items-center gap-1 bg-[var(--ink)] pt-[env(safe-area-inset-top)] pr-1.5 pl-4 text-[var(--paper)] min-[900px]:hidden`}
       >
         {/* Reload across the Explorer/public layout boundary so stale route metadata cannot remain in <head>. */}
