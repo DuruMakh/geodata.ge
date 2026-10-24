@@ -38,7 +38,7 @@ export function MoneyBanksIndex({ facts, regionMap }: {
     <ExplorerHeading>{t("page.regions.title")}</ExplorerHeading>
     <LatestValueLine testId="money-latest" sentence={<Message messages={messages} id="moneyBanks.latest.regions" values={{ year: regionMap.year, region: largestName, value: <LatestFigure value={valueLabel(largest.value)} /> }} />} />
     <section data-testid="money-region-index" className="mt-4">
-      <RegionIndex model={regionMap} summary={[]} sourceNote={`${t("sourceNoteRegions")} · ${unitLabel} · ${regionMap.year}.`}
+      <RegionIndex title={t("page.regions.title")} model={regionMap} summary={[]} sourceNote={`${t("sourceNoteRegions")} · ${unitLabel} · ${regionMap.year}.`}
         leadRow={georgiaValue === undefined ? undefined : { id: "georgia", label: t("area.georgia"), value: georgiaValue }} metric={{
           hrefForRegion: moneyBanksRegionHref, formatValue: valueLabel, legend: `${mapLabel} · ${unitLabel}`, testId: "money-region-map",
           mapAria: t("regionMapAria", { total: mapLabel, unit: unitLabel, year: regionMap.year }), entityAria: (name, value, year) => t("regionMapEntityAria", { name, amount: valueLabel(value), year }),

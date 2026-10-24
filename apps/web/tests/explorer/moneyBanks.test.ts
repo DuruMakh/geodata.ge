@@ -426,7 +426,8 @@ test("who borrows renders headed rows, search and the 2025 line", async () => {
   expect(text(line)).toBe(`${year}: all loans ${csv.billions("borrowers.total", year)} bn GEL`);
   expect([...html.matchAll(/<p[^>]*data-testid="series-heading"[^>]*>([\s\S]*?)<\/p>/g)].map(match => text(match[1]))).toEqual(["Who borrows", "Businesses by industry", "What households borrow for"]);
   expect(html).toMatch(/<input[^>]*type="search"/);
-  expect(html).not.toContain("aria-expanded");
+  // No collapsible parents in the series list: the only expandable control is the chart's share button.
+  expect(html.match(/<[^>]*aria-expanded[^>]*>/g)?.filter(tag => !tag.includes('data-testid="chart-share"')) ?? []).toEqual([]);
   const ka = await getMessages("ka", ["moneyBanks"]);
   expect((await moneyBanksPageMetadata("ka", "borrowers")).title).toContain(message(ka, "moneyBanks.page.borrowers.metaTitle"));
 });
