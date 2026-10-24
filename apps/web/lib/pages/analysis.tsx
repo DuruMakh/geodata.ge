@@ -11,6 +11,7 @@ import { loadServedExplorerData } from "../data/servedData";
 import { referencedSourceIds } from "../data/sources";
 import { projectAdminFact, projectBudgetFact } from "../explorer/clientData";
 import { coverageFromYears, fiscalMetadata } from "../seo/metadata";
+import { navGroup } from "../navigation/navTree";
 
 export async function analysisPageMetadata(locale: Locale): Promise<Metadata> {
   const [{ facts }, messages] = await Promise.all([loadServedExplorerData(), getMessages(locale, ["analysis"])]);
@@ -50,7 +51,7 @@ export async function renderAnalysisPage(locale: Locale) {
   const { messages } = presentation;
   return (
     <>
-      <BreadcrumbJsonLd items={[{ name: message(messages, "common.home"), path: pageHref("/", locale) }, { name: message(messages, "common.budget"), path: pageHref("/explorer", locale) }, { name: message(messages, "common.analysis"), path: pageHref("/explorer/analysis", locale) }]} />
+      <BreadcrumbJsonLd items={[{ name: message(messages, "common.home"), path: pageHref("/", locale) }, { name: message(messages, "common.budget"), path: pageHref(navGroup("budget").href, locale) }, { name: message(messages, "common.analysis"), path: pageHref("/explorer/analysis", locale) }]} />
       <AnalysisExplorer
         presentation={clientPresentation(presentation)}
         facts={facts.map(projectBudgetFact)}

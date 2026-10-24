@@ -3,7 +3,7 @@ import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 vi.mock("next/navigation", async (importOriginal) => ({ ...(await importOriginal<typeof import("next/navigation")>()), useRouter: () => ({ push() {}, replace() {} }) }));
 
 import kaAllData from "../../lib/i18n/messages/ka/allData.json";
-import { ExplorerSearch, loadPlaces } from "../../components/explorer-groups/explorer-search";
+import { ExplorerSearch, PLACES_TIMEOUT_MS, loadPlaces } from "../../components/explorer-groups/explorer-search";
 import { searchMessages } from "../../lib/explorer/allDataIndex";
 import { allDataPageMetadata, renderAllDataPage } from "../../lib/pages/all-data";
 import type { SearchPage } from "../../lib/explorer/search/searchExplorer";
@@ -52,10 +52,31 @@ describe("the search box, rendered on the server", () => {
 describe("the places file (Review Focus 4)", () => {
   const ok = (body: unknown) => vi.fn(async () => new Response(JSON.stringify(body), { status: 200 }));
 
+  // First: the file is kept once it has loaded, and each test below reads the same cache.
+  it("gives up on a file that has not come in time, and cancels it", async () => {
+    vi.useFakeTimers();
+    try {
+      let signal: AbortSignal | undefined;
+      // A request that only ends when it is cancelled, as fetch does.
+      const hanging = vi.fn((_url: string, init: { signal: AbortSignal }) => {
+        signal = init.signal;
+        return new Promise<Response>((_resolve, reject) => init.signal.addEventListener("abort", () => reject(new DOMException("aborted", "AbortError"))));
+      });
+      const loading = loadPlaces(hanging, "ka");
+      await vi.advanceTimersByTimeAsync(PLACES_TIMEOUT_MS - 1);
+      expect(signal?.aborted).toBe(false);
+      await vi.advanceTimersByTimeAsync(1);
+      await expect(loading).resolves.toBeNull();
+      expect(signal?.aborted).toBe(true);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it("resolves null when the fetch is rejected", async () => {
     const fetchImpl = vi.fn(async () => { throw new TypeError("network"); });
     await expect(loadPlaces(fetchImpl, "ka")).resolves.toBeNull();
-    expect(fetchImpl).toHaveBeenCalledWith("/explorer-places.ka.json");
+    expect(fetchImpl).toHaveBeenCalledWith("/explorer-places.ka.json", { signal: expect.any(AbortSignal) });
   });
 
   it("resolves null on a response that is not OK, or not JSON", async () => {
@@ -75,7 +96,7 @@ describe("the places file (Review Focus 4)", () => {
   it("keeps each language's file apart", async () => {
     const english = ok(PLACES);
     await loadPlaces(english, "en");
-    expect(english).toHaveBeenCalledWith("/explorer-places.en.json");
+    expect(english).toHaveBeenCalledWith("/explorer-places.en.json", { signal: expect.any(AbortSignal) });
   });
 });
 

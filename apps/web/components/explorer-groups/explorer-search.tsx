@@ -4,11 +4,13 @@ import { ChevronRight, Languages, MapPin, Search, X } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
-import { useHashState } from "../explorer-shell/use-hash-state";
+import { useHashState, writeHash } from "../explorer-shell/use-hash-state";
 import { GROUP_ICONS } from "../shell/group-icons";
 import { Sparkline } from "../ui/sparkline";
+import { EXPLORER_SEARCH_INPUT_ID } from "./explorer-search-focus";
 import type { PlaceFact, PlaceIndex } from "../../lib/explorer/places/types";
 import { searchExplorer, type ResultRow, type SearchPage, type SearchResult, type SearchShortcut, type Segment } from "../../lib/explorer/search/searchExplorer";
+import { pagesLabel } from "../../lib/explorer/pagesLabel";
 import { message } from "../../lib/i18n/messages";
 import { useI18n } from "../../lib/i18n/provider";
 import { pageHref } from "../../lib/i18n/routes";
@@ -18,20 +20,26 @@ import { navGroup } from "../../lib/navigation/navTree";
 // The All data page's search (spec 2026-10-24-explorer-regroup §7, prototype `dx-search`, `dx-q`, `dx-try`, `dx-place`, `dx-res`,
 // `dx-row`, `dx-grp`): a combobox over a listbox of results, with the server's A to Z list below it while the box is empty. The query
 // lives in the address as `#q=`. Pages are searched at once; the places file is fetched on the first query and joins the search when
-// it lands. If it never does, page search goes on and the place card is simply absent.
+// it lands. If it fails, page search goes on, the place card is simply absent, and the next query asks for the file again.
 
-type FetchLike = (url: string) => Promise<Response>;
+type FetchLike = (url: string, init: { signal: AbortSignal }) => Promise<Response>;
+
+/** How long a query waits for the places file before page search alone answers, "nothing found" included. */
+export const PLACES_TIMEOUT_MS = 4000;
 
 const placesFiles = new Map<Locale, Promise<PlaceIndex | null>>();
 
 /**
- * The language's places file, fetched once: `null` when the request fails, is not OK or is not the index, and then asked for
- * again the next time. The first good file is kept for the page's life.
+ * The language's places file: `null` when the request fails, is not OK, is not the index or takes longer than
+ * `PLACES_TIMEOUT_MS` (then it is cancelled). A failure is forgotten, so the next call asks again; the first good file is
+ * kept for the page's life.
  */
 export function loadPlaces(fetchImpl: FetchLike, locale: Locale): Promise<PlaceIndex | null> {
   const cached = placesFiles.get(locale);
   if (cached) return cached;
-  const request = fetchImpl(`/explorer-places.${locale}.json`)
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), PLACES_TIMEOUT_MS);
+  const request = fetchImpl(`/explorer-places.${locale}.json`, { signal: controller.signal })
     .then(async (response) => {
       if (!response.ok) return null;
       const data = await response.json() as Partial<PlaceIndex> | null;
@@ -39,6 +47,7 @@ export function loadPlaces(fetchImpl: FetchLike, locale: Locale): Promise<PlaceI
     })
     .catch(() => null)
     .then((data) => {
+      clearTimeout(timer);
       if (!data) placesFiles.delete(locale);
       return data;
     });
@@ -47,8 +56,14 @@ export function loadPlaces(fetchImpl: FetchLike, locale: Locale): Promise<PlaceI
 }
 
 const parseQuery = (hash: string) => new URLSearchParams(hash.replace(/^#/, "")).get("q") ?? "";
-const serializeQuery = (query: string) => `q=${encodeURIComponent(query)}`;
+/** An empty box leaves no `q` behind, so a cleared page reloads or is shared without the focus an empty `#q=` asks for. */
+const serializeQuery = (query: string) => (query ? `q=${encodeURIComponent(query)}` : "");
 const NO_DATA = null;
+/** The hash state writes `#` for an empty box; drop the bare `#` from the address. */
+function dropEmptyHash() {
+  if (window.location.href.endsWith("#")) writeHash(`${window.location.pathname}${window.location.search}`, "replace");
+}
+const HASH_OPTIONS = { afterWrite: dropEmptyHash };
 /** `#q=` with nothing after it: the sidebar's search link, which opens the page with the box focused. */
 const EMPTY_QUERY_HASH = /(?:^#|&)q=(?:&|$)/;
 
@@ -67,8 +82,6 @@ const PLACE_FACT_KEYS: Record<PlaceFact["label"], string> = {
 function Marked({ segments, markClass }: { segments: Segment[]; markClass: string }) {
   return segments.map((segment, index) => (segment.mark ? <mark key={index} className={markClass}>{segment.text}</mark> : <span key={index}>{segment.text}</span>));
 }
-
-const pagesLabel = (messages: Messages, n: number) => message(messages, n === 1 ? "common.pagesCountOne" : "common.pagesCount", { n });
 
 /** A page's place in the navigation: its group, and its topic when the group has several. */
 function crumb(page: SearchPage, locale: Locale) {
@@ -199,7 +212,7 @@ export function ExplorerSearch({ locale, pages, shortcuts, children }: ExplorerS
   const { messages } = useI18n();
   const router = useRouter();
   const input = useRef<HTMLInputElement>(null);
-  const { state: query, update } = useHashState(NO_DATA, parseQuery, serializeQuery);
+  const { state: query, update } = useHashState(NO_DATA, parseQuery, serializeQuery, HASH_OPTIONS);
   const [places, setPlaces] = useState<PlaceIndex | null>(null);
   /** While the places file is on its way, a query that finds no page may still name a place: no "nothing found" yet. */
   const [placesPending, setPlacesPending] = useState(false);
@@ -215,7 +228,11 @@ export function ExplorerSearch({ locale, pages, shortcuts, children }: ExplorerS
     placesAsked.current = true;
     setPlacesPending(true);
     void loadPlaces(fetch, locale).then((data) => {
-      if (data) setPlaces(data);
+      // The rows change under the arrow keys when the places join, so nothing stays selected.
+      if (data) {
+        setPlaces(data);
+        setActive(-1);
+      } else placesAsked.current = false;
       setPlacesPending(false);
     });
   }, [query, locale]);
@@ -269,13 +286,13 @@ export function ExplorerSearch({ locale, pages, shortcuts, children }: ExplorerS
   return (
     <>
       <div role="search" data-testid="all-data-search" className="mt-7 max-[767px]:mt-5">
-        <label htmlFor="explorer-q" className="sr-only">{message(messages, "allData.label")}</label>
+        <label htmlFor={EXPLORER_SEARCH_INPUT_ID} className="sr-only">{message(messages, "allData.label")}</label>
         {/* The box draws the focus ring, so the input drops the site's own (an unlayered rule, hence the `!`). */}
         <div className="flex h-[66px] items-center gap-3.5 border-[1.5px] border-[var(--ink)] bg-[var(--tile)] pr-2.5 pl-[22px] focus-within:outline-2 focus-within:outline-offset-[3px] focus-within:outline-[var(--accent)] max-[767px]:h-14 max-[767px]:gap-2.5 max-[767px]:pr-1 max-[767px]:pl-3.5">
           <Search aria-hidden strokeWidth={1.75} className="size-[22px] flex-none" />
           <input
             ref={input}
-            id="explorer-q"
+            id={EXPLORER_SEARCH_INPUT_ID}
             type="text"
             role="combobox"
             aria-autocomplete="list"
@@ -290,9 +307,9 @@ export function ExplorerSearch({ locale, pages, shortcuts, children }: ExplorerS
             onKeyDown={onKeyDown}
             className="h-full min-w-0 flex-1 border-0 bg-transparent p-0 font-[family-name:var(--font-ui)] text-[19px] text-[var(--ink)] outline-none placeholder:text-[var(--faint)] focus-visible:outline-none! max-[767px]:text-[16.5px]"
           />
-          {result ? (
+          {query ? (
             <>
-              <span className={`${NUMERIC} text-[12px] whitespace-nowrap text-[var(--muted)]`}>{pagesLabel(messages, total)}</span>
+              {result ? <span className={`${NUMERIC} text-[12px] whitespace-nowrap text-[var(--muted)]`}>{pagesLabel(messages, total)}</span> : null}
               <button
                 type="button"
                 aria-label={message(messages, "allData.clear")}

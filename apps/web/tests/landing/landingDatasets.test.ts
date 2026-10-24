@@ -33,7 +33,7 @@ describe("buildLandingDatasetLinks", () => {
     const messages = await getMessages("ka", ["common", "landing", "inflation", "trade"]);
     const links = buildLandingDatasetLinks(input as Parameters<typeof buildLandingDatasetLinks>[0], { locale: "ka", messages });
     expect(links.map(({ href, title }) => [href, title])).toEqual([
-      ["/explorer", "ბიუჯეტი"],
+      ["/explorer/budget", "ბიუჯეტი"],
       ["/explorer/economy", "ეკონომიკა"],
       ["/explorer/prices#t-inflation", "ინფლაცია"],
       ["/explorer/labour#t-unemployment", "უმუშევრობა"],

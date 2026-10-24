@@ -14,6 +14,7 @@ import { ExplorerPage } from "../explorer-shell/explorer-page";
 import { PageHeader } from "../shell/page-header";
 import { DECK_LINE_CLASS } from "../explorer-shell/latest-value-line";
 import { withLari } from "../ui/lari";
+import { navGroup } from "../../lib/navigation/navTree";
 
 // The budget explorer (expenditure, revenue) and the single-year analysis are
 // separate client entries, so neither route ships the other's view; this is
@@ -76,7 +77,7 @@ export function BudgetExplorerFrame({ locale, messages, sectionLabel, coverage, 
         crumbs={[
           { label: message(messages, "common.home"), href: "/" },
           { label: message(messages, "common.data") },
-          { label: message(messages, "common.budget"), href: "/explorer" },
+          { label: message(messages, "common.budget"), href: navGroup("budget").href },
           { label: sectionLabel },
         ]}
         coverage={coverage}

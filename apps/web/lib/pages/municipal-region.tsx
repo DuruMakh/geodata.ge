@@ -37,6 +37,7 @@ import {
 import { explorerDatasetJsonLd } from "../seo/structuredData";
 import { resolveSiteUrl } from "../siteUrl";
 import { clientPresentation } from "../i18n/presentation.server";
+import { navGroup } from "../navigation/navTree";
 
 // The 11 region ids are the complete, closed set.
 
@@ -239,14 +240,14 @@ export async function renderMunicipalRegion(id: string, locale: Locale) {
         })}
         testId="explorer-dataset-json-ld"
       />
-      <BreadcrumbJsonLd items={[{ name: message(messages, "common.home"), path: pageHref("/", locale) }, { name: message(messages, "common.budget"), path: pageHref("/explorer", locale) }, { name: message(messages, "common.municipalities"), path: pageHref("/explorer/municipalities", locale) }, { name, path: pageHref(`/explorer/municipalities/region/${id}`, locale) }]} />
+      <BreadcrumbJsonLd items={[{ name: message(messages, "common.home"), path: pageHref("/", locale) }, { name: message(messages, "common.budget"), path: pageHref(navGroup("budget").href, locale) }, { name: message(messages, "common.municipalities"), path: pageHref("/explorer/municipalities", locale) }, { name, path: pageHref(`/explorer/municipalities/region/${id}`, locale) }]} />
       <PageHeader
         locale={locale}
         messages={presentation.messages}
         crumbs={[
           { label: message(messages, "common.home"), href: pageHref("/", locale) },
           { label: message(messages, "common.data") },
-          { label: message(messages, "common.budget"), href: pageHref("/explorer", locale) },
+          { label: message(messages, "common.budget"), href: pageHref(navGroup("budget").href, locale) },
           { label: message(messages, "common.municipalities"), href: pageHref("/explorer/municipalities", locale) },
           { label: name },
         ]}

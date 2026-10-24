@@ -14,6 +14,7 @@ import { pageHref } from "../i18n/routes";
 import { explorerDatasetJsonLd } from "../seo/structuredData";
 import { resolveSiteUrl } from "../siteUrl";
 import { projectBudgetFact, projectGdpFact } from "../explorer/clientData";
+import { navGroup } from "../navigation/navTree";
 
 export async function revenuePageMetadata(locale: Locale): Promise<Metadata> {
   const [{ facts }, messages] = await Promise.all([loadServedLandingData(), getMessages(locale, ["main"])]);
@@ -65,7 +66,7 @@ export async function renderRevenuePage(locale: Locale) {
         })}
         testId="explorer-dataset-json-ld"
       />
-      <BreadcrumbJsonLd items={[{ name: message(messages, "common.home"), path: pageHref("/", locale) }, { name: message(messages, "common.budget"), path: pageHref("/explorer", locale) }, { name: message(messages, "common.revenue"), path: pageHref("/explorer/revenue", locale) }]} />
+      <BreadcrumbJsonLd items={[{ name: message(messages, "common.home"), path: pageHref("/", locale) }, { name: message(messages, "common.budget"), path: pageHref(navGroup("budget").href, locale) }, { name: message(messages, "common.revenue"), path: pageHref("/explorer/revenue", locale) }]} />
       <MainExplorer
         presentation={clientPresentation(presentation)}
         nav="revenue"

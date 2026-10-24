@@ -2,7 +2,7 @@ import { readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
 import { pageHref } from "../../lib/i18n/routes";
-import { LEGACY_TOPIC_FORWARDS, groupOfTopic, topicSection } from "../../lib/navigation/navTree";
+import { ALL_DATA_PATH, LEGACY_TOPIC_FORWARDS, groupOfTopic, navGroup, topicSection } from "../../lib/navigation/navTree";
 
 // Ruling R8 (spec 2026-10-24-explorer-regroup §3.1): the old topic hub addresses only forward. No breadcrumb, structured
 // data or link the pages and the landing build may point at one; they point at the topic's section on its group page.
@@ -39,6 +39,24 @@ describe("no internal link through an old topic hub forward", () => {
       const used = new RegExp(`(pageHref\\(|href: |path: |hubPath: )${name}\\b`);
       expect(files.filter(({ text }) => used.test(text)).map(({ file }) => file), name).toEqual([]);
     }
+  });
+});
+
+// Ruling R12: /explorer is All data now, so a link named Budget (`common.budget`) goes to the Budget group page.
+describe("no Budget link to All data", () => {
+  // One object literal, `{ label: message(messages, "common.budget"), href: … }` or the landing's `{ href: …, title: t("common.budget") }`.
+  const budgetLinks = files.flatMap(({ file, text }) => [...text.matchAll(/\{[^{}]*common\.budget[^{}]*\}/g)].map((match) => ({ file, link: match[0] })));
+
+  it("finds the Budget links of the budget pages, their explorers and the landing", () => {
+    expect(budgetLinks.map(({ file }) => file)).toEqual(expect.arrayContaining([
+      "lib/pages/expenditure.tsx", "lib/pages/municipal-region.tsx", "lib/landing/landingDatasets.ts", "components/debt/debt-explorer.tsx", "components/main-explorer/budget-explorer-frame.tsx",
+    ]));
+    expect(navGroup("budget").href).not.toBe(ALL_DATA_PATH);
+  });
+
+  it("points none of them at /explorer or BUDGET_HUB_PATH", () => {
+    const toAllData = /["'`]\/explorer["'`]|\bBUDGET_HUB_PATH\b|\bALL_DATA_PATH\b/;
+    expect(budgetLinks.filter(({ link }) => toAllData.test(link)).map(({ file }) => file)).toEqual([]);
   });
 });
 

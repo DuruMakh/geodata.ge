@@ -21,6 +21,7 @@ import { coverageLabel } from "../explorer/coverageLabel";
 import { EXPENDITURE_TYPES_PAGE_CONFIG } from "../explorer/expenditureTypes";
 import { resolveSiteUrl } from "../siteUrl";
 import { ExplorerPage } from "../../components/explorer-shell/explorer-page";
+import { navGroup } from "../navigation/navTree";
 
 const PATH = "/explorer/expenditure-types";
 
@@ -40,10 +41,10 @@ export async function renderExpenditureTypesPage(locale: Locale) {
     return {sourceId:source.source_id,years:source.years,title:translated.title,organization:translated.publisher,downloadHref:source.downloadHref,retrievedAt:source.retrieved_at};
   });
   const title=message(presentation.messages,"expenditureTypes.heading"),firstYear=Math.min(...facts.map(f=>f.year)),lastYear=Math.max(...facts.map(f=>f.year)),dateModified=facts.map(f=>f.lastReviewedAt).sort().at(-1)!;
-  const crumbs=[{label:message(presentation.messages,"common.home"),href:pageHref("/",locale)},{label:message(presentation.messages,"common.data")},{label:message(presentation.messages,"common.budget"),href:pageHref("/explorer",locale)},{label:title}];
+  const crumbs=[{label:message(presentation.messages,"common.home"),href:pageHref("/",locale)},{label:message(presentation.messages,"common.data")},{label:message(presentation.messages,"common.budget"),href:pageHref(navGroup("budget").href, locale)},{label:title}];
   return <I18nProvider {...clientPresentation(presentation)}>
     <JsonLd testId="explorer-dataset-json-ld" data={explorerDatasetJsonLd({locale,datasetId:"expenditure-types",origin:resolveSiteUrl(),path:PATH,name:message(presentation.messages,"expenditureTypes.metaTitle"),description:message(presentation.messages,"expenditureTypes.metaDescription"),firstYear,lastYear,dateModified,spatialCoverageName:locale==="ka"?"საქართველო":"Georgia"})}/>
-    <BreadcrumbJsonLd items={[{name:crumbs[0].label,path:pageHref("/",locale)},{name:crumbs[2].label,path:pageHref("/explorer",locale)},{name:title,path:pageHref(PATH,locale)}]}/>
+    <BreadcrumbJsonLd items={[{name:crumbs[0].label,path:pageHref("/",locale)},{name:crumbs[2].label,path:pageHref(navGroup("budget").href,locale)},{name:title,path:pageHref(PATH,locale)}]}/>
     <ExplorerPage containerQueries={false}>
       <PageHeader locale={locale} messages={presentation.messages} crumbs={crumbs} coverage={coverageLabel(presentation.messages, locale, firstYear, lastYear, dateModified)}/>
       <EconomicSectorsExplorer facts={packFacts(facts.map(projectSectorObservation))} sourceIdByMeasure={sourceIdByMeasure(facts)} registry={EXPENDITURE_TYPES} sources={sources} siteOrigin={resolveSiteUrl()} config={EXPENDITURE_TYPES_PAGE_CONFIG}/>

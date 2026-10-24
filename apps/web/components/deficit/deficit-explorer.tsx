@@ -33,6 +33,7 @@ import { MeasurePill } from "../explorer-shell/measure-pill";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { useHashState } from "../explorer-shell/use-hash-state";
 import { DECK_LINE_CLASS } from "../explorer-shell/latest-value-line";
+import { navGroup } from "../../lib/navigation/navTree";
 
 type DeficitExplorerProps = {
   facts: ClientGeneralGovernmentBalanceFact[];
@@ -118,7 +119,7 @@ export function DeficitExplorer({ facts, workbookSources, edition, siteOrigin, l
         crumbs={[
           { label: message(messages, "common.home"), href: pageHref("/", locale) },
           { label: message(messages, "common.data") },
-          { label: message(messages, "common.budget"), href: pageHref("/explorer", locale) },
+          { label: message(messages, "common.budget"), href: pageHref(navGroup("budget").href, locale) },
           { label: message(messages, "common.deficit") },
         ]}
         coverage={coverage}

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { GROUP_ICONS } from "../shell/group-icons";
 import { Sparkline } from "../ui/sparkline";
 import { azAlphabet, azColumns, azGroups } from "../../lib/explorer/allDataIndex";
+import { pagesLabel } from "../../lib/explorer/pagesLabel";
 import { rowLabel, type SearchPage } from "../../lib/explorer/search/searchExplorer";
 import { message } from "../../lib/i18n/messages";
 import { pageHref } from "../../lib/i18n/routes";
@@ -11,10 +12,12 @@ import type { Locale, Messages } from "../../lib/i18n/types";
 // Every page A to Z on the All data page (spec 2026-10-24-explorer-regroup §6.4, prototype `dx-idx`, `dx-az`, `dx-ix`): a letter
 // bar that stays on screen, then the letters in two balanced columns, one on phones. Rendered on the server, so the whole list is
 // in the page's HTML.
+//
+// The Georgian bar needs about 920px for its 33 letters. Where the column is narrower (beside the sidebar up to about 1260px, or
+// without it from 768px) the letters wrap onto a second row of the same grid, so every letter stays in reach of the mouse; one row
+// spans the column as in the prototype. Phones scroll the one row sideways, as the prototype does.
 
 const NUMERIC = "font-[family-name:var(--font-numeric)]";
-
-const pagesLabel = (messages: Messages, n: number) => message(messages, n === 1 ? "common.pagesCountOne" : "common.pagesCount", { n });
 
 function IndexRow({ page, locale }: { page: SearchPage; locale: Locale }) {
   const Icon = GROUP_ICONS[page.group];
@@ -58,7 +61,7 @@ export function AllDataIndex({ locale, messages, pages }: { locale: Locale; mess
         aria-label={message(messages, "allData.alphabetLabel")}
         className="sticky top-14 z-[6] border-t-[1.5px] border-b border-t-[var(--ink)] border-b-[var(--hairline)] bg-[var(--paper)] py-2 [scrollbar-width:none] min-[900px]:top-0 max-[767px]:-mx-5 max-[767px]:overflow-x-auto max-[767px]:px-3.5 max-[767px]:py-1.5"
       >
-        <div className="flex justify-between gap-0.5 max-[767px]:justify-start">
+        <div className="grid grid-cols-[repeat(auto-fit,minmax(26px,1fr))] gap-0.5 max-[767px]:flex max-[767px]:justify-start">
           {[...azAlphabet(locale)].map((letter) => {
             const group = present.get(letter);
             const letterClass = "inline-flex h-8 min-w-[26px] items-center justify-center px-[3px] text-[14px] leading-none max-[767px]:h-11 max-[767px]:min-w-11 max-[767px]:flex-none";
@@ -87,7 +90,7 @@ export function AllDataIndex({ locale, messages, pages }: { locale: Locale; mess
                 id={group.id}
                 aria-labelledby={`${group.id}-h`}
                 tabIndex={-1}
-                className="scroll-mt-[116px] pt-6 focus:outline-none min-[900px]:scroll-mt-14 max-[767px]:pt-[18px]"
+                className="scroll-mt-[146px] pt-6 focus:outline-none max-[767px]:scroll-mt-[116px] max-[767px]:pt-[18px] min-[900px]:scroll-mt-[96px]"
               >
                 <h3 id={`${group.id}-h`} className="flex items-baseline gap-3 border-b border-[var(--ink)] pb-1.5">
                   <span className="font-[family-name:var(--font-display)] text-[30px] leading-[1.05] font-semibold max-[767px]:text-[24px]">{group.letter}</span>

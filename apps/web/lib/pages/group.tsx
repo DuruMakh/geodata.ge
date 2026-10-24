@@ -1,18 +1,17 @@
 import { GroupPage, type GroupTopicSection } from "../../components/explorer-groups/group-page";
 import { updatedDate } from "../explorer/coverageLabel";
 import { groupHeadlines } from "../explorer/groupHeadlines";
+import { pagesLabel } from "../explorer/pagesLabel";
 import { buildPlaceIndex, entriesForPage } from "../explorer/places/buildPlaceIndex.server";
 import { regionSpread } from "../explorer/regionSpread";
 import { getCommonMessages } from "../i18n/common.server";
 import { getGroupsMessages } from "../i18n/groups.server";
 import { message } from "../i18n/messages";
-import type { Locale, Messages } from "../i18n/types";
+import type { Locale } from "../i18n/types";
 import { groupPages, navGroup, type GroupId } from "../navigation/navTree";
 import { fiscalMetadata } from "../seo/metadata";
 import { loadPopulationBasics } from "./demography-population";
 import { loadTopicHubs, topicHubCoverage } from "./topicHubs.server";
-
-const pagesLabel = (messages: Messages, n: number) => message(messages, n === 1 ? "common.pagesCountOne" : "common.pagesCount", { n });
 
 /** A Regions page's card shows its regions' spread. */
 const isRegionsPage = (href: string | null) => href?.endsWith("/regions") ?? false;
