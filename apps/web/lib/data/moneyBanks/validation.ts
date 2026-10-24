@@ -110,7 +110,7 @@ export function validateMoneyBanksFacts(facts: readonly MoneyBanksFact[]): void 
     // Up to 2014 NBG splits loans into businesses and people; from 2015 into businesses and households, which are people plus individual entrepreneurs.
     const sectors = year < 2015 ? v("borrowers.businesses", year).plus(v("borrowers.people", year)) : v("borrowers.businesses", year).plus(v("borrowers.households", year));
     if (!near(sectors, v("borrowers.total", year))) throw new Error(`Money and banks borrowers do not add up to all loans: ${year}`);
-    if (year >= 2015 && !near(v("borrowers.people", year).plus(v("borrowers.individual_entrepreneurs", year)), v("borrowers.households", year))) throw new Error(`Money and banks borrowers do not add up to all loans: ${year}`);
+    if (year >= 2015 && !near(v("borrowers.people", year).plus(v("borrowers.individual_entrepreneurs", year)), v("borrowers.households", year))) throw new Error(`Money and banks people and individual entrepreneurs do not add up to households: ${year}`);
     if (!near(MONEY_BANKS_LOAN_INDUSTRIES.reduce((sum, industry) => sum.plus(v(`borrowers.industry.${industry}`, year)), new D(0)), v("borrowers.businesses", year))) throw new Error(`Money and banks industries do not add up to businesses: ${year}`);
   }
   for (const year of range(...YEARS["loans_region.georgia.total"])) {

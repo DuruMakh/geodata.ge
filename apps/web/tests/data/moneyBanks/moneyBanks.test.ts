@@ -7,7 +7,7 @@ import { expect, test, vi } from "vitest";
 import { loadMoneyBanksFactsFromMirror, moneyBanksMirrorCreateRows } from "../../../lib/db/mirrorRows";
 import { assertMoneyBanksParity, loadMoneyBanksFacts, toClientMoneyBanksFact } from "../../../lib/data/moneyBanks/importMoneyBanks";
 import type { Prisma } from "../../../lib/generated/prisma/client";
-import { MONEY_BANKS_CSV_HEADERS, REVIEWED_AT } from "../../../lib/data/moneyBanks/prepareMoneyBanks";
+import { MONEY_BANKS_CSV_HEADERS, reviewedAtFor } from "../../../lib/data/moneyBanks/prepareMoneyBanks";
 import {
   MONEY_BANKS_INDICATORS, MONEY_BANKS_LOAN_AREAS, MONEY_BANKS_LOAN_INDUSTRIES, MONEY_BANKS_LOAN_PURPOSES, MONEY_BANKS_PUBLIC_SOURCES, MONEY_BANKS_SOURCES, loansRegionIndicator, moneyBanksSourceDocumentId, type MoneyBanksFact,
 } from "../../../lib/data/moneyBanks/types";
@@ -34,7 +34,10 @@ test("serves all 1547 reviewed values over the approved coverage", async () => {
   expect(new Set(facts.map(f => f.indicatorId))).toEqual(new Set(MONEY_BANKS_INDICATORS));
   expect(new Set(facts.map(f => f.sourceId))).toEqual(new Set(MONEY_BANKS_SOURCES));
   expect(facts.filter(f => f.valueStatus === "calculated")).toHaveLength(328);
-  expect(facts.every(f => f.basis === "actual" && f.lastReviewedAt === REVIEWED_AT)).toBe(true);
+  expect(facts.every(f => f.basis === "actual" && f.lastReviewedAt === reviewedAtFor(f.indicatorId))).toBe(true);
+  // The loan-detail rows were retrieved on 24 October; every earlier row keeps its 11 October review.
+  expect(new Set(facts.filter(f => /^(borrowers|households|loans_region)\./.test(f.indicatorId)).map(f => f.lastReviewedAt))).toEqual(new Set(["2026-10-24"]));
+  expect(new Set(facts.filter(f => !/^(borrowers|households|loans_region)\./.test(f.indicatorId)).map(f => f.lastReviewedAt))).toEqual(new Set(["2026-10-11"]));
   expect(find(facts, "money.m3", 2025).publishedValue).toBe("57680.2");
   expect(find(facts, "rates.policy", 2025).publishedValue).toBe("8.00");
   // Every NBG interest rate is printed to two decimals (cell format 0.00); FSI ratios and aggregates to one.
@@ -125,6 +128,7 @@ test.each([
   ["a bank-health row from the wrong file", (facts: MoneyBanksFact[]) => { find(facts, "banks.roa", 2021).sourceId = "nbg_fsi"; }, /source contract/],
   ["a share that does not follow its amounts", (facts: MoneyBanksFact[]) => { setValue(find(facts, "loans.fx_share", 2020), "10"); }, /calculated/],
   ["borrowers that do not add up to all loans", (facts: MoneyBanksFact[]) => { const f = find(facts, "borrowers.businesses", 2020); setValue(f, new Decimal(f.value).plus(1).toFixed()); }, /borrowers do not add up to all loans/],
+  ["people and individual entrepreneurs that do not add up to households", (facts: MoneyBanksFact[]) => { const f = find(facts, "borrowers.individual_entrepreneurs", 2020); setValue(f, new Decimal(f.value).plus(1).toFixed()); }, /people and individual entrepreneurs do not add up to households/],
   ["industries that do not add up to businesses", (facts: MoneyBanksFact[]) => { const f = find(facts, "borrowers.industry.trade", 2020); setValue(f, new Decimal(f.value).plus(1).toFixed()); }, /industries do not add up to businesses/],
   ["an area whose lari plus foreign currency differs from its total", (facts: MoneyBanksFact[]) => { const f = find(facts, "loans_region.region_imereti.total", 2020); setValue(f, new Decimal(f.value).plus(1).toFixed()); }, /area lari plus foreign currency differs from its total/],
   ["a changed 2025 anchor", (facts: MoneyBanksFact[]) => { setValue(find(facts, "money.m3", 2025), "57680.3"); }, /anchor/],

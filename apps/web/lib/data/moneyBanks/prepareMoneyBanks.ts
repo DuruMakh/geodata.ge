@@ -14,6 +14,9 @@ import { validateMoneyBanksFacts } from "./validation";
 
 const RESEARCH = "docs/Raw Data/Money/nbg-money-banks-annual";
 export const REVIEWED_AT = "2026-10-11";
+/** The loan-detail workbooks (L3.10.1, LPR, LREG) were retrieved on 24 October 2026. */
+export const LOANS_DETAIL_REVIEWED_AT = "2026-10-24";
+export const reviewedAtFor = (indicatorId: string) => /^(borrowers|households|loans_region)\./.test(indicatorId) ? LOANS_DETAIL_REVIEWED_AT : REVIEWED_AT;
 export const MONEY_BANKS_CSV_HEADERS = ["year", "indicator_id", "value", "published_value", "unit", "basis", "value_status", "source_id", "source_sheet", "source_cell", "last_reviewed_at"];
 const BREAK_HEADERS = ["break_id", "applies_to", "reference_date", "reason", "source_note"];
 const BREAK_IDS = ["fsi_method_2022", "fsi_ifrs_2023", "loans_activity_2014", "loans_overdue_2015", "loans_sector_2022", "loans_microbanks_2025"];
@@ -79,7 +82,7 @@ export async function prepareMoneyBanksData(repositoryRoot: string, mode: "write
     return {
       year: Number(row.year), indicatorId: row.indicator_id as MoneyBanksFact["indicatorId"], value: row.value, publishedValue: row.published_value,
       unit: row.unit as MoneyBanksFact["unit"], basis: row.basis as "actual", valueStatus: row.value_status as MoneyBanksFact["valueStatus"],
-      sourceId: row.source_id, sourceSheet: row.source_sheet, sourceCell: row.source_cell, lastReviewedAt: REVIEWED_AT,
+      sourceId: row.source_id, sourceSheet: row.source_sheet, sourceCell: row.source_cell, lastReviewedAt: reviewedAtFor(row.indicator_id),
     };
   });
   validateMoneyBanksFacts(facts);
@@ -94,7 +97,7 @@ export async function prepareMoneyBanksData(repositoryRoot: string, mode: "write
   const years = facts.map(f => f.year);
   const acceptance: MoneyBanksAcceptance = {
     status: "passed", years: { min: Math.min(...years), max: Math.max(...years) }, observations: facts.length,
-    researchStatus: report.status, canonicalSha256: createHash("sha256").update(csv).digest("hex"), reviewedAt: REVIEWED_AT,
+    researchStatus: report.status, canonicalSha256: createHash("sha256").update(csv).digest("hex"), reviewedAt: facts.map(f => f.lastReviewedAt).sort().at(-1)!,
   };
   for (const [relative, content] of [["data/imports/money-banks-annual.csv", csv], ["data/imports/money-banks-series-breaks.csv", breaks], ["data/reports/money-banks-validation.json", `${JSON.stringify(acceptance, null, 2)}\n`]]) {
     const target = path.join(repositoryRoot, relative);
