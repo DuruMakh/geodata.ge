@@ -1,6 +1,6 @@
 "use client";
 
-import { useLayoutEffect, useRef, useState, type KeyboardEvent } from "react";
+import { useContext, useLayoutEffect, useRef, useState, type KeyboardEvent } from "react";
 import { axisLabelWidth, decimalsFor } from "../../lib/explorer/chartScale";
 import { INK, SERIES_COLORS } from "../../lib/explorer/colors";
 import { ageGroupLabel, bandShares, shareOf, type AgeMeasure, type Pyramid } from "../../lib/explorer/demographyAgeSex";
@@ -9,7 +9,7 @@ import { PYRAMID, pyramidLayout } from "../../lib/explorer/pyramidLayout";
 import { message } from "../../lib/i18n/messages";
 import { useI18n } from "../../lib/i18n/provider";
 import type { TemplateValues } from "../../lib/i18n/types";
-import { ChartTooltip, MOBILE_CHART_QUERY } from "../main-explorer/chart-frame";
+import { ChartGeometryContext, ChartTooltip, MOBILE_CHART_QUERY } from "../main-explorer/chart-frame";
 import type { TooltipRow } from "../main-explorer/editorial-line-chart";
 import { SwatchBar } from "../ui/editorial";
 import { persons } from "./demography-helpers";
@@ -51,6 +51,7 @@ export function PopulationPyramid({ pyramid, year, compare, measure, ariaLabel, 
   const { locale, messages } = useI18n();
   const t = (key: string, values?: TemplateValues) => message(messages, `demography.${key}`, values);
   const frame = useRef<HTMLDivElement>(null);
+  const desktop = useContext(ChartGeometryContext) === "desktop";
   const [frameWidth, setFrameWidth] = useState<number | null>(null);
   const [phone, setPhone] = useState(false);
   const [roving, setRoving] = useState(pyramid.rows.length - 1);
@@ -60,7 +61,7 @@ export function PopulationPyramid({ pyramid, year, compare, measure, ariaLabel, 
   useLayoutEffect(() => {
     const element = frame.current;
     if (!element) return;
-    const query = typeof window.matchMedia === "function" ? window.matchMedia(MOBILE_CHART_QUERY) : null;
+    const query = !desktop && typeof window.matchMedia === "function" ? window.matchMedia(MOBILE_CHART_QUERY) : null;
     const measure = () => {
       setFrameWidth(Math.round(element.clientWidth));
       setPhone(query?.matches ?? false);
@@ -73,7 +74,7 @@ export function PopulationPyramid({ pyramid, year, compare, measure, ariaLabel, 
       observer.disconnect();
       query?.removeEventListener("change", measure);
     };
-  }, []);
+  }, [desktop]);
 
   const values = measured(pyramid, measure);
   const compared = compare === null ? null : measured(compare.pyramid, measure);
