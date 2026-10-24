@@ -28,7 +28,7 @@ import { renderHealthDeathsAreaPage } from "../../lib/pages/health-deaths";
 import { renderHealthDeathsIndex } from "../../lib/pages/health-deaths-index";
 import { renderHouseholdRegionPage } from "../../lib/pages/household";
 import { renderGroupPage } from "../../lib/pages/group";
-import { renderHubPage } from "../../lib/pages/hub";
+import { renderAllDataPage } from "../../lib/pages/all-data";
 import { renderEnvironmentPage } from "../../lib/pages/environment";
 import { renderEnvironmentAirQualityIndex, renderEnvironmentCityPage } from "../../lib/pages/environment-air-quality";
 import { renderEnvironmentAreaPage, renderEnvironmentRegionIndex } from "../../lib/pages/environment-areas";
@@ -84,7 +84,7 @@ const pages: PageRender[] = [
   ["analysis", renderAnalysisPage, 1],
   ["debt", renderDebtPage, 1],
   ["deficit", renderDeficitPage, 1],
-  ["budget hub", renderHubPage, 0],
+  ["all data", renderAllDataPage, 1],
   ["budget group", (locale) => renderGroupPage("budget", locale), 0],
   ["gdp", renderGdpPage, 1],
   ["economy group", (locale) => renderGroupPage("economy", locale), 0],

@@ -276,7 +276,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${siteUrl}/connect`, lastModified },
     // /mcp itself is never listed: a POST-only protocol endpoint answers a
     // crawler's GET with 405, so it is not a page to index.
-    { url: `${siteUrl}/explorer`, lastModified: topicModified.budget },
+    // All data lists every page, so it changes when any topic does.
+    { url: `${siteUrl}/explorer`, lastModified: groupModified(Object.keys(topicModified) as TopicId[]) },
     // The group pages replace the topic hubs, whose addresses forward to them (next.config.ts).
     ...NAV_GROUPS.map((group) => ({ url: `${siteUrl}${group.href}`, lastModified: groupModified(group.topics) })),
     { url: `${siteUrl}/explorer/economy/gdp`, lastModified: gdpModified },

@@ -9,7 +9,7 @@ Budget and GDP data are annual, so it does not provide sub-annual or live budget
 ## Core data
 
 - [Fiscal.ge home](https://fiscal.ge/) — start with the site's scope and latest reviewed coverage.
-- [Budget explorer](https://fiscal.ge/explorer) — choose a dataset and compare the published series.
+- [All data](https://fiscal.ge/explorer) — search or browse every page A to Z, by topic, town or region.
 - [Budget](https://fiscal.ge/explorer/budget) — a group page: four headline numbers and a card for each page of the budget, debt and deficit.
 - [National expenditure](https://fiscal.ge/explorer/expenditure) — annual state-budget expenditure.
 - [Spending by type](https://fiscal.ge/explorer/expenditure-types) — annual general-government spending by economic type: wages, goods and services, interest, subsidies, social benefits and investment, in GEL and as a share of GDP.
