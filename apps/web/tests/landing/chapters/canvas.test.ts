@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { fitText, niceTicks, squarify, stackLabels } from "../../../components/landing/chapters/canvas";
+import { fitText, gridFor, mixHex, niceTicks, OFF_SQUARE, squarify, stackLabels } from "../../../components/landing/chapters/canvas";
 
 describe("squarify", () => {
   it("areas are proportional to values and fill the rectangle (sum of areas = w*h within 1e-6)", () => {
@@ -75,5 +75,51 @@ describe("fitText", () => {
     expect(fitText(ctx, "abc", 30)).toBe("abc");
     expect(fitText(ctx, "abcdefgh", 50)).toBe("abcd…");
     expect(fitText(ctx, "abcdefgh", 5)).toBe("");
+  });
+});
+
+describe("gridFor", () => {
+  const clampTo = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v));
+
+  it("keeps rows in 16-220 and the height within 1.04 x the target, or falls back to 40 rows, for widths 280-1440", () => {
+    for (let width = 280; width <= 1440; width += 20) {
+      const grid = gridFor(width, 10460);
+      const target = clampTo(Math.round(width * 0.56), 280, 520);
+      if (grid.rows === 40) {
+        expect(grid.cols).toBe(Math.ceil(10460 / 40));
+      } else {
+        expect(grid.rows).toBeGreaterThanOrEqual(16);
+        expect(grid.rows).toBeLessThanOrEqual(220);
+        expect(grid.rows * grid.cell).toBeLessThanOrEqual(target * 1.04 + 1e-6);
+      }
+      expect(grid.cols * grid.rows).toBeGreaterThanOrEqual(10460);
+      expect(grid.cell).toBeCloseTo(width / grid.cols, 9);
+      expect(grid.height).toBe(Math.round(grid.rows * grid.cell));
+    }
+  });
+
+  it("picks the tallest grid that fits and thins the gap on small cells", () => {
+    const wide = gridFor(1000, 10460);
+    expect(wide.rows * wide.cell).toBeGreaterThan(520 * 0.9);
+    expect(wide.gap).toBe(1.5);
+    expect(gridFor(280, 10460).gap).toBe(1);
+  });
+
+  it("uses the 40-row fallback when no row count fits", () => {
+    const grid = gridFor(300, 5);
+    expect(grid.rows).toBe(40);
+    expect(grid.cols).toBe(1);
+  });
+});
+
+describe("mixHex", () => {
+  it("interpolates between two hex colours", () => {
+    expect(mixHex("#000000", "#ffffff", 0)).toBe("rgb(0,0,0)");
+    expect(mixHex("#000000", "#ffffff", 1)).toBe("rgb(255,255,255)");
+    expect(mixHex("#000000", "#c8640a", 0.5)).toBe("rgb(100,50,5)");
+  });
+
+  it("exports the off-square colour", () => {
+    expect(OFF_SQUARE).toBe("#e2d7c4");
   });
 });

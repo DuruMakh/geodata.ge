@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { formatInUnit, formatShare, UNIT_BN, UNIT_PERSONS } from "../../../lib/explorer/format";
 import { GEL_PER_SQUARE } from "../../../lib/landing/chapters/scale";
 import type { ScaleChapter as ScaleData } from "../../../lib/landing/chapters/types";
-import { placeTip, prefersReducedMotion, sizeCanvas } from "./canvas";
+import { clamp, gridFor, mixHex, OFF_SQUARE, placeTip, prefersReducedMotion, sizeCanvas } from "./canvas";
 import { Reveal, useNearViewport } from "./reveal";
 
 // Chapter 01: one square per GEL 10 million, GDP is the whole grid. Squares fill column by column
@@ -18,26 +18,17 @@ export type ScaleLabels = {
   included: string; // tooltip foot prefix: the square is inside the measure
   notIncluded: string; // tooltip foot prefix: the square is beyond the measure
   bnGel: string; // "მლრდ ₾"
+  square: string; // the unit word: "კვადრატი" / "squares"
+  squareNoteSpoken: string; // squareNote without the glyph, for the canvas aria-label: "თითოეული 10 მილიონი ლარი"
+  measureGroup: string; // aria-label of the measure button group
 };
 
-const FALLBACK = { ink: "#1e1b16", accent: "#b3402a", off: "#e2d7c4" };
+const FALLBACK = { ink: "#1e1b16", accent: "#b3402a" };
 const BN_2 = { ...UNIT_BN, decimals: 2 };
 
-const clamp = (v: number, lo: number, hi: number) => (v < lo ? lo : v > hi ? hi : v);
 const easeInOut = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
 const count = (n: number) => formatInUnit(n, UNIT_PERSONS);
 const share = (fraction: number) => formatShare(fraction, false, fraction > 0.999 ? 0 : 1);
-
-function rgb(hex: string): [number, number, number] {
-  const h = /^#[0-9a-f]{6}$/i.test(hex) ? hex : "#000000";
-  return [parseInt(h.slice(1, 3), 16), parseInt(h.slice(3, 5), 16), parseInt(h.slice(5, 7), 16)];
-}
-
-function mixHex(a: string, b: string, t: number): string {
-  const [ar, ag, ab] = rgb(a);
-  const [br, bg, bb] = rgb(b);
-  return `rgb(${Math.round(ar + (br - ar) * t)},${Math.round(ag + (bg - ag) * t)},${Math.round(ab + (bb - ab) * t)})`;
-}
 
 type Engine = { set(squares: number): void; destroy(): void };
 
@@ -60,7 +51,7 @@ function createSquares({ wrap, canvas, marker, markerLabel, total, initial, onHo
   };
   const ink = token("--ink", FALLBACK.ink);
   const accent = token("--accent", FALLBACK.accent);
-  const off = FALLBACK.off;
+  const off = OFF_SQUARE;
   const reduced = prefersReducedMotion();
 
   let W = 0;
@@ -81,28 +72,16 @@ function createSquares({ wrap, canvas, marker, markerLabel, total, initial, onHo
   let introT0 = 0;
   let hover = -1;
 
-  // Rows 16..220: the tallest grid that stays within 1.04 x the target height for this width.
   const layout = () => {
     const w = Math.round(wrap.clientWidth);
     if (!w || w === W) return false;
     W = w;
-    const target = clamp(Math.round(W * 0.56), 280, 520);
-    let best: { r: number; k: number; c: number; h: number } | null = null;
-    for (let r = 16; r <= 220; r++) {
-      const k = Math.ceil(total / r);
-      const c = W / k;
-      const h = r * c;
-      if (h <= target * 1.04 && (!best || h > best.h)) best = { r, k, c, h };
-    }
-    if (!best) {
-      const k = Math.ceil(total / 40);
-      best = { r: 40, k, c: W / k, h: 40 * (W / k) };
-    }
-    rows = best.r;
-    cols = best.k;
-    cell = best.c;
-    gap = cell >= 7 ? 1.5 : 1;
-    H = Math.round(rows * cell);
+    const grid = gridFor(W, total);
+    rows = grid.rows;
+    cols = grid.cols;
+    cell = grid.cell;
+    gap = grid.gap;
+    H = grid.height;
     wrap.style.height = `${H}px`;
     return true;
   };
@@ -352,13 +331,13 @@ export function ScaleChapter({ data, labels }: { data: ScaleData; labels: ScaleL
       onHover(index, x, y, filled) {
         const { selected: measure, labels: l, data: d } = live.current;
         const cumulativeGel = (index + 1) * GEL_PER_SQUARE;
-        text(tipTitleRef.current, `■ ${count(index + 1)} / ${count(d.squares)}`);
-        if (tipKeyRef.current) tipKeyRef.current.style.background = filled ? FALLBACK.ink : FALLBACK.off;
+        text(tipTitleRef.current, `${count(index + 1)} / ${count(d.squares)} ${l.square}`);
+        if (tipKeyRef.current) tipKeyRef.current.style.background = filled ? FALLBACK.ink : OFF_SQUARE;
         text(tipValueRef.current, `${formatInUnit(cumulativeGel, BN_2)} ${l.bnGel}`);
         text(tipNameRef.current, l.cumulative);
         text(tipShareRef.current, share(cumulativeGel / d.gdpGel));
         text(tipShareNameRef.current, l.ofGdp);
-        text(tipFootRef.current, `${filled ? l.included : l.notIncluded}${measure.label.toLocaleLowerCase()}`);
+        text(tipFootRef.current, `${filled ? l.included : l.notIncluded}${measure.label}`);
         placeTip(tip, x, y, wrap.clientWidth, wrap.clientHeight);
       },
       onLeave() {
@@ -377,11 +356,14 @@ export function ScaleChapter({ data, labels }: { data: ScaleData; labels: ScaleL
   }, [selected.squares]);
 
   const markerText = `${share(selected.share)} ${labels.ofGdp}`;
+  const ariaLabel =
+    `${count(data.squares)} ${labels.square}, ${labels.squareNoteSpoken}; ` +
+    `${selected.label}: ${formatInUnit(selected.valueGel, UNIT_BN)} ${labels.bnGel}, ${markerText} (${count(selected.squares)} ${labels.square})`;
 
   return (
     <Reveal className="mt-8 grid grid-cols-1 gap-8 min-[1000px]:grid-cols-[300px_minmax(0,1fr)] min-[1000px]:gap-12">
       <div>
-        <div className="flex flex-col border-t border-[var(--hairline-soft)]">
+        <div role="group" aria-label={labels.measureGroup} className="flex flex-col border-t border-[var(--hairline-soft)]">
           {data.measures.map((measure) => (
             <button
               key={measure.id}
@@ -402,27 +384,28 @@ export function ScaleChapter({ data, labels }: { data: ScaleData; labels: ScaleL
           ))}
         </div>
         <div aria-live="polite" className="mt-[26px]">
+          <span className="sr-only">{selected.label}</span>
           <div className="font-[family-name:var(--font-display)] text-[clamp(40px,4.4vw,58px)] font-semibold leading-none tracking-[-0.02em]">
             {formatInUnit(selected.valueGel, UNIT_BN)}
             <small className="ml-[0.2em] text-[0.4em] font-semibold tracking-normal">{labels.bnGel}</small>
           </div>
           <div className="mt-3 font-[family-name:var(--font-numeric)] text-[13px] text-[var(--body)]">
-            <b className="font-semibold text-[var(--ink)]">{markerText}</b> · {count(selected.squares)} ■
+            <b className="font-semibold text-[var(--ink)]">{markerText}</b> · {count(selected.squares)} {labels.square}
           </div>
         </div>
       </div>
       <figure>
         <div className="mb-3 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1.5">
-          <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]">{labels.squareNote}</span>
+          <span aria-hidden className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]">{labels.squareNote}</span>
           <span className="font-[family-name:var(--font-numeric)] text-[11.5px] text-[var(--muted)]">
-            {count(data.squares)} ■ = {gdp?.label ?? ""}, {data.year}
+            {count(data.squares)} {labels.square} = {gdp?.label ?? ""}, {data.year}
           </span>
         </div>
         <div ref={wrapRef} className="relative h-[280px] w-full cursor-crosshair min-[1000px]:h-[420px]">
           <canvas
             ref={canvasRef}
             role="img"
-            aria-label={`${count(data.squares)} ■, ${labels.squareNote}; ${selected.label}: ${count(selected.squares)} ■`}
+            aria-label={ariaLabel}
             className="absolute left-0 top-0"
           />
           <div

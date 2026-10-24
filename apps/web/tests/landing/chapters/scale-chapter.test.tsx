@@ -10,6 +10,9 @@ const labels: ScaleLabels = {
   included: "შედის: ",
   notIncluded: "მიღმაა: ",
   bnGel: "მლრდ ₾",
+  square: "კვადრატი",
+  squareNoteSpoken: "თითოეული 10 მილიონი ლარი",
+  measureGroup: "მაჩვენებლის არჩევა",
 };
 
 const gdpGel = 104_598_139_883;
@@ -48,20 +51,25 @@ describe("ScaleChapter (server render = default state)", () => {
 
   it("announces the selected measure in a polite live region", () => {
     const live = html.match(/<div aria-live="polite"[^>]*>(.*?)<\/div><\/div>/)?.[1] ?? "";
+    expect(live).toContain("სახელმწიფო ბიუჯეტის ხარჯები");
     expect(live).toContain("33.4");
     expect(live).toContain("31.9% მშპ-ის");
-    expect(live).toContain("3,340 ■");
+    expect(live).toContain("3,340 კვადრატი");
   });
 
   it("describes the canvas as an image naming the squares and the measure", () => {
     const canvas = html.match(/<canvas[^>]*>/)?.[0] ?? "";
     expect(canvas).toContain('role="img"');
-    expect(canvas).toContain('aria-label="10,460 ■, ■ = 10 მლნ ₾; სახელმწიფო ბიუჯეტის ხარჯები: 3,340 ■"');
+    expect(canvas).toContain('aria-label="10,460 კვადრატი, თითოეული 10 მილიონი ლარი; სახელმწიფო ბიუჯეტის ხარჯები: 33.4 მლრდ ₾, 31.9% მშპ-ის (3,340 კვადრატი)"');
+  });
+
+  it("names the button group", () => {
+    expect(html).toContain('role="group" aria-label="მაჩვენებლის არჩევა"');
   });
 
   it("keeps the tooltip out of the accessibility tree and the marker label on the default measure", () => {
     expect(html).toMatch(/<div[^>]*aria-hidden="true"[^>]*opacity-0/);
     expect(html).toContain(">31.9% მშპ-ის</span>");
-    expect(html).toContain("10,460 ■ = ნომინალური მშპ, 2025");
+    expect(html).toContain("10,460 კვადრატი = ნომინალური მშპ, 2025");
   });
 });

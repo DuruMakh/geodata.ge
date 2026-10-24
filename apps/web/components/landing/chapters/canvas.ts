@@ -3,7 +3,42 @@
 
 export type Rect = [x: number, y: number, w: number, h: number];
 
-const clamp = (v: number, lo: number, hi: number) => (v < lo ? lo : v > hi ? hi : v);
+export const clamp = (v: number, lo: number, hi: number) => (v < lo ? lo : v > hi ? hi : v);
+
+/** Colour of a square outside the selected measure (no token in globals.css). */
+export const OFF_SQUARE = "#e2d7c4";
+
+function rgb(hex: string): [number, number, number] {
+  const h = /^#[0-9a-f]{6}$/i.test(hex) ? hex : "#000000";
+  return [parseInt(h.slice(1, 3), 16), parseInt(h.slice(3, 5), 16), parseInt(h.slice(5, 7), 16)];
+}
+
+/** `rgb(r,g,b)` the fraction `t` of the way from hex colour `a` to hex colour `b`. */
+export function mixHex(a: string, b: string, t: number): string {
+  const [ar, ag, ab] = rgb(a);
+  const [br, bg, bb] = rgb(b);
+  return `rgb(${Math.round(ar + (br - ar) * t)},${Math.round(ag + (bg - ag) * t)},${Math.round(ab + (bb - ab) * t)})`;
+}
+
+/**
+ * Grid of `total` equal squares for a chart `width` px wide: rows 16..220, the tallest grid that stays within
+ * 1.04 x clamp(0.56 x width, 280, 520); a 40-row grid when none fits. Squares fill column by column.
+ */
+export function gridFor(width: number, total: number): { rows: number; cols: number; cell: number; gap: number; height: number } {
+  const target = clamp(Math.round(width * 0.56), 280, 520);
+  let best: { rows: number; cols: number; cell: number; height: number } | null = null;
+  for (let rows = 16; rows <= 220; rows++) {
+    const cols = Math.ceil(total / rows);
+    const cell = width / cols;
+    const height = rows * cell;
+    if (height <= target * 1.04 && (!best || height > best.height)) best = { rows, cols, cell, height };
+  }
+  if (!best) {
+    const cols = Math.ceil(total / 40);
+    best = { rows: 40, cols, cell: width / cols, height: 40 * (width / cols) };
+  }
+  return { rows: best.rows, cols: best.cols, cell: best.cell, gap: best.cell >= 7 ? 1.5 : 1, height: Math.round(best.rows * best.cell) };
+}
 
 export function prefersReducedMotion(): boolean {
   return typeof window !== "undefined" && !!window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
