@@ -40,6 +40,44 @@ export function gridFor(width: number, total: number): { rows: number; cols: num
   return { rows: best.rows, cols: best.cols, cell: best.cell, gap: best.cell >= 7 ? 1.5 : 1, height: Math.round(best.rows * best.cell) };
 }
 
+/**
+ * Rectangle of a year inside a w x h chart: both sides scaled by sqrt(value / max), so the area follows the value,
+ * anchored to the bottom-left corner. Nothing to draw (zero width and height on the floor) without a value or a maximum.
+ */
+export function anchoredRect(value: number, max: number, w: number, h: number): Rect {
+  if (!(value > 0) || !(max > 0)) return [0, h, 0, 0];
+  const s = Math.sqrt(Math.min(1, value / max));
+  return [0, h - h * s, w * s, h * s];
+}
+
+/** What a treemap block of w x h px has room to say: name + amount (+ share when 64 px tall), the share alone, or nothing. */
+export function blockLabelTier(w: number, h: number): "nameAmountShare" | "nameAmount" | "share" | "none" {
+  if (w >= 82 && h >= 46) return h >= 64 ? "nameAmountShare" : "nameAmount";
+  if (w >= 44 && h >= 24) return "share";
+  return "none";
+}
+
+/** Fill of the block at `rank` (0 = largest) of `count`: from near-black to sand, the last block a touch lighter. */
+export function blockTone(rank: number, count: number): string {
+  return mixHex("#26211b", "#d6cab5", Math.pow(rank / Math.max(1, count - 2), 0.9));
+}
+
+/** The rectangle `t` of the way from `a` to `b`. */
+export function lerpRect(a: Rect, b: Rect, t: number): Rect {
+  return [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t, a[3] + (b[3] - a[3]) * t];
+}
+
+/**
+ * Points of a sparkline across `width`: the smallest value sits at `bottom`, the largest at `top`.
+ * A constant or single-value series runs flat through the middle.
+ */
+export function sparkPoints(values: number[], width: number, top: number, bottom: number): [x: number, y: number][] {
+  const lo = Math.min(...values);
+  const hi = Math.max(...values);
+  const n = values.length;
+  return values.map((v, i) => [n > 1 ? (i / (n - 1)) * width : 0, hi > lo ? bottom - ((v - lo) / (hi - lo)) * (bottom - top) : (top + bottom) / 2]);
+}
+
 export function prefersReducedMotion(): boolean {
   return typeof window !== "undefined" && !!window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
 }
