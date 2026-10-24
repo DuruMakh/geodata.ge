@@ -3,13 +3,11 @@ import { loadBasketWeights, loadCpiCategoryFacts, loadCpiCityFacts, loadCpiFacts
 import { loadEconomicSectorFacts } from "../../lib/data/economicSectors/importEconomicSectors";
 import { loadRegionalEconomyFacts } from "../../lib/data/regionalEconomies/importRegionalEconomies";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { loadBudgetFactRows } from "../../lib/data/importBudgetFacts";
 import { loadGlossary } from "../../lib/data/glossary";
 import { loadSourceDocuments } from "../../lib/data/sources";
-import { loadAdminSpendingFacts } from "../../lib/data/adminSpending/importAdminSpendingFacts";
 import { loadAdminSpendingCategoriesFile } from "../../lib/data/adminSpending/categoriesFile";
 import { loadNationalGdpFacts } from "../../lib/data/nationalGdp/importNationalGdp";
-import { loadServedExplorerData, loadServedMunicipalData, loadServedGovernmentDebtData, loadServedGeneralGovernmentBalanceData, resetServedDataCacheForTests, SERVED_DATA_FILES } from "../../lib/data/servedData";
+import { loadReviewedAdminSpendingFacts, loadReviewedBudgetFactRows, loadServedExplorerData, loadServedMunicipalData, loadServedGovernmentDebtData, loadServedGeneralGovernmentBalanceData, resetServedDataCacheForTests, SERVED_DATA_FILES } from "../../lib/data/servedData";
 import { buildFactQuerySnapshot } from "../../lib/factQuery/buildSnapshot";
 import { getPresentation } from "../../lib/i18n/presentation.server";
 import { buildExplorerModel } from "../../lib/explorer/explorerData";
@@ -24,8 +22,9 @@ describe("bilingual presentation on both serving paths", () => {
     vi.stubEnv("GEODATA_DATA_SOURCE", "csv");
     resetServedDataCacheForTests();
     const [facts, glossary, sourceDocuments, adminFacts, adminCategories, gdpFacts, municipal, debt, balance, csv] = await Promise.all([
-      loadBudgetFactRows(SERVED_DATA_FILES.budgetFacts), loadGlossary(SERVED_DATA_FILES.glossary), loadSourceDocuments(SERVED_DATA_FILES.sourceDocuments),
-      loadAdminSpendingFacts(SERVED_DATA_FILES.adminSpendingFacts), loadAdminSpendingCategoriesFile(SERVED_DATA_FILES.adminSpendingCategories), loadNationalGdpFacts(SERVED_DATA_FILES.gdpFacts),
+      // The reviewed loaders (2004-2025 plus the planned-year files) are what data:import mirrors.
+      loadReviewedBudgetFactRows(), loadGlossary(SERVED_DATA_FILES.glossary), loadSourceDocuments(SERVED_DATA_FILES.sourceDocuments),
+      loadReviewedAdminSpendingFacts(), loadAdminSpendingCategoriesFile(SERVED_DATA_FILES.adminSpendingCategories), loadNationalGdpFacts(SERVED_DATA_FILES.gdpFacts),
       loadServedMunicipalData(), loadServedGovernmentDebtData(), loadServedGeneralGovernmentBalanceData(), loadServedExplorerData(),
     ]);
     const raw = { facts, glossary, sourceDocuments, adminFacts: [...adminFacts].reverse(), adminCategories, gdpFacts };

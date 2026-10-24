@@ -78,7 +78,8 @@ describe("buildFactQuerySnapshot", () => {
   });
 
   it("carries the national, ministries, municipal and gdp facts", async () => {
-    expect(snapshot.national.facts.length).toBe(527);
+    // 527 + 13: the planned 2026 spending-field rows from the budget law.
+    expect(snapshot.national.facts.length).toBe(540);
     expect(snapshot.ministries.facts.length).toBe(852);
     expect(snapshot.municipal.functionFacts.length).toBe(7040);
     expect(snapshot.municipal.totalFacts.length).toBe(704);

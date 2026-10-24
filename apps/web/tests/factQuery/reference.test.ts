@@ -331,10 +331,12 @@ describe("boundary cases beyond the section 14.3 table", () => {
   });
 
   it("refuses a year beyond this baseline rather than extrapolating", () => {
+    // 2026 is now covered by the planned budget (the 2026 budget law), so the first year past
+    // the baseline is 2027.
     const response = queryNational(snapshot, {
       side: "expenditure",
       seriesIds: ["spending.health"],
-      years: [2026],
+      years: [2027],
       measure: "amount_gel",
     });
 
