@@ -8,7 +8,7 @@ const labels: MunicipalLabels = {
   mlnGel: "მლნ ₾",
   gel: "₾",
   budget: "ბიუჯეტი",
-  perResident: "ერთ მცხოვრებზე",
+  perResident: "ერთ მოსახლეზე",
   rank: "რანგი ბიუჯეტით",
   occupied: "ოკუპირებული ტერიტორია",
   occupiedNote: "მუნიციპალური ბიუჯეტის მონაცემები არ არსებობს",

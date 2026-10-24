@@ -83,7 +83,7 @@ const reliefLabels = {
   mlnGel: "მლნ ₾",
   gel: "₾",
   budget: "ბიუჯეტი",
-  perResident: "ერთ მცხოვრებზე",
+  perResident: "ერთ მოსახლეზე",
   rank: "რანგი ბიუჯეტით",
   occupied: "ოკუპირებული ტერიტორია",
   occupiedNote: "მუნიციპალური ბიუჯეტის მონაცემები არ არსებობს",
@@ -104,7 +104,7 @@ describe("reliefTip", () => {
       title: "ბათუმი",
       rows: [
         { key: "var(--ink)", val: "486\u00a0მლნ ₾", name: "ბიუჯეტი, 2025" },
-        { val: "2,862\u00a0₾", name: "ერთ მცხოვრებზე" },
+        { val: "2,862\u00a0₾", name: "ერთ მოსახლეზე" },
       ],
       foot: "რანგი ბიუჯეტით: 2 / 2",
     });

@@ -19,7 +19,7 @@ export type MunicipalLabels = {
   mlnGel: string; // "მლნ ₾"
   gel: string; // after the budget per resident: "₾"
   budget: string; // tooltip row, ", 2025" follows: "ბიუჯეტი"
-  perResident: string; // tooltip row: "ერთ მცხოვრებზე"
+  perResident: string; // tooltip row: "ერთ მოსახლეზე"
   rank: string; // tooltip foot, ": 2 / 64" follows: "რანგი ბიუჯეტით"
   occupied: string; // tooltip title over an occupied area: "ოკუპირებული ტერიტორია"
   occupiedNote: string; // its foot: "მუნიციპალური ბიუჯეტის მონაცემები არ არსებობს"
