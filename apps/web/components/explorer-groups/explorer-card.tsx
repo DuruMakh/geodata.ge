@@ -111,7 +111,7 @@ export function ExplorerCard(props: CardProps) {
       <span className={`flex items-center justify-between ${NUMERIC} text-[11px]${row("top")}`}>
         <b aria-hidden className="font-medium text-[var(--accent)]">{card.index}</b>
         {card.comingSoon ? (
-          <span className={`rounded-[2px] border border-[var(--control)] px-1.5 py-px ${NUMERIC} text-[10.5px] text-[var(--muted)]`}>
+          <span className={`rounded-[2px] border border-[var(--control)] px-1.5 py-px ${NUMERIC} text-[10.5px] text-[var(--muted)] max-[767px]:text-[11px]`}>
             {message(getCommonMessages(locale), "common.comingSoon")}
           </span>
         ) : (
@@ -144,7 +144,7 @@ export function ExplorerCard(props: CardProps) {
         </span>
       ) : null}
       {footer ? (
-        <span id={ids.footer} className={`block border-t border-[var(--row-border)] pt-[9px] ${NUMERIC} text-[10.5px] text-[var(--faint)]${lead ? " mt-4" : ""}${row("footer")}`}>{footer}</span>
+        <span id={ids.footer} className={`block border-t border-[var(--row-border)] pt-[9px] ${NUMERIC} text-[10.5px] text-[var(--faint)] max-[767px]:text-[11px]${lead ? " mt-4" : ""}${row("footer")}`}>{footer}</span>
       ) : null}
     </>
   );

@@ -31,7 +31,7 @@ function IndexRow({ page, locale }: { page: SearchPage; locale: Locale }) {
       >
         <span className="min-w-0">
           <span className="block text-[14px] leading-[1.35] font-semibold group-hover:text-[var(--accent)] group-hover:underline group-hover:underline-offset-[3px]">{rowLabel(page, locale)}</span>
-          <span className={`mt-[3px] flex items-center gap-1.5 ${NUMERIC} text-[10.5px] leading-[1.3] text-[var(--faint)]`}>
+          <span className={`mt-[3px] flex items-center gap-1.5 ${NUMERIC} text-[10.5px] leading-[1.3] text-[var(--faint)] max-[767px]:text-[11px]`}>
             <Icon aria-hidden strokeWidth={1.75} className="size-3 flex-none" />
             <span>{page.groupName[locale]}</span>
           </span>
@@ -43,7 +43,7 @@ function IndexRow({ page, locale }: { page: SearchPage; locale: Locale }) {
         </span>
         <span className={`max-w-[124px] justify-self-end text-right ${NUMERIC} text-[12px] leading-[1.3] font-semibold`}>
           {page.value}
-          {page.value ? <em className="block text-[10.5px] font-normal text-[var(--faint)] not-italic">{page.period}</em> : null}
+          {page.value ? <em className="block text-[10.5px] font-normal text-[var(--faint)] not-italic max-[767px]:text-[11px]">{page.period}</em> : null}
         </span>
       </Link>
     </li>
