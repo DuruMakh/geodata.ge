@@ -118,6 +118,8 @@
   "common.moneyBanks": "ფული და ბანკები",
   "common.moneySupply": "ფულის მასა",
   "common.moneyLoansDeposits": "სესხები და დეპოზიტები",
+  "common.moneyBorrowers": "ვინ იღებს სესხს",
+  "common.moneyRegions": "სესხები რეგიონებში",
   "common.moneyInterestRates": "საპროცენტო განაკვეთები",
   "common.moneyBankHealth": "ბანკების მდგრადობა",
   "common.business": "ბიზნესი",

@@ -33,6 +33,8 @@ import { CRIME_HUB_PATH, CRIME_SECTIONS } from "../explorer/crime";
 import { HEALTH_HUB_PATH, HEALTH_SECTIONS } from "../explorer/health";
 import { HEALTH_DEATH_AREAS, healthDeathsAreaHref } from "../explorer/healthDeaths";
 import { MONEY_BANKS_SECTIONS } from "../explorer/moneyBanks";
+import { MONEY_BANKS_LOAN_AREAS } from "../data/moneyBanks/types";
+import { moneyBanksAreaHref } from "../explorer/moneyBanksAreas";
 import { EXTERNAL_POSITION_SECTIONS } from "../explorer/externalPosition";
 import { BUSINESS_HUB_PATH, BUSINESS_SECTIONS } from "../explorer/business";
 import { BUSINESS_AREAS, businessAreaHref } from "../explorer/businessAreas";
@@ -70,7 +72,7 @@ export async function listPublicPagePaths(): Promise<string[]> {
     CRIME_HUB_PATH, ...CRIME_SECTIONS.map(section => section.href),
     ENERGY_FOOD_HUB_PATH, ...ENERGY_FOOD_SECTIONS.map(section => section.href),
     TRANSPORT_HUB_PATH, ...TRANSPORT_SECTIONS.map(section => section.href), ...TRANSPORT_AREAS.map(transportAreaHref),
-    "/explorer/money", ...MONEY_BANKS_SECTIONS.map(section => section.href),
+    "/explorer/money", ...MONEY_BANKS_SECTIONS.map(section => section.href), ...MONEY_BANKS_LOAN_AREAS.map(moneyBanksAreaHref),
     BUSINESS_HUB_PATH, ...BUSINESS_SECTIONS.map(section => section.href), ...BUSINESS_AREAS.map(businessAreaHref),
     HOUSING_HUB_PATH, ...HOUSING_SECTIONS.map(section => section.href), ...HOUSING_AREAS.map(housingAreaHref),
     ENVIRONMENT_HUB_PATH, ...ENVIRONMENT_SECTIONS.map(section => section.href), ...ENVIRONMENT_CITIES.map(environmentCityHref),

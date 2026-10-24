@@ -1,8 +1,9 @@
 {
   "status": "passed",
   "retrieved_at": "2026-10-11",
-  "scope": "Annual research only: money aggregates, bank loans and deposits, interest rates and bank-health measures; no exchange rates, monthly or quarterly values, serving or published figures beyond the reviewed cells",
-  "primary_observation_count": 730,
+  "scope": "Annual research only: money aggregates, bank loans (also by borrower, industry, household purpose and region) and deposits, interest rates and bank-health measures; no exchange rates, monthly or quarterly values, serving or published figures beyond the reviewed cells",
+  "loan_detail_workbooks_retrieved_at": "2026-10-24",
+  "primary_observation_count": 1547,
   "observations_by_source": {
     "nbg_deposit_rates_dwir": 90,
     "nbg_deposits_d3_17": 120,
@@ -12,11 +13,14 @@
     "nbg_fsi_archive": 77,
     "nbg_loan_rates_lwir": 90,
     "nbg_loans_l3_5": 96,
+    "nbg_loans_purpose_lop": 77,
+    "nbg_loans_regions_lreg": 396,
+    "nbg_loans_structure_l3_10_1": 344,
     "nbg_money_aggregates": 184,
     "nbg_policy_rate": 18
   },
   "imputed_values": 0,
-  "calculated_values": 119,
+  "calculated_values": 328,
   "reconciliation_failed_count": 0,
   "checks": {
     "coverage_matches_year_ranges": true,
@@ -25,6 +29,11 @@
     "people_plus_companies_equals_all_deposits_2015_2025": true,
     "money_aggregates_in_order": true,
     "percentages_within_0_100_except_roa_roe": true,
+    "businesses_plus_people_or_households_equals_all_loans": true,
+    "people_plus_entrepreneurs_equals_households_2015_2025": true,
+    "industries_add_up_to_businesses": true,
+    "region_lari_plus_foreign_equals_total": true,
+    "regions_add_up_to_georgia_in_lari_and_foreign_currency": true,
     "fsi_2022_overlap": {
       "banks.npl_ratio": {
         "archive_2022q4": "1.7",
@@ -53,7 +62,13 @@
       "rates.policy:2025": "8.00",
       "banks.npl_ratio:2025": "2.5",
       "deposits.fx_share:2025": "48.6",
-      "loans.fx_share:2025": "41.9"
+      "loans.fx_share:2025": "41.9",
+      "borrowers.total:2025": "69035.7",
+      "borrowers.households:2025": "37355.4",
+      "loans_region.georgia.total:2025": "71780.2",
+      "loans_region.georgia.gel:2025": "41698.7",
+      "loans_region.georgia.fx:2025": "30081.5",
+      "loans_region.region_tbilisi.total:2025": "52420.1"
     }
   },
   "source_checks": [
@@ -139,6 +154,24 @@
       "source_id": "nbg_meth_interest_rates",
       "sha256": "5998CDBEAF4D0DAB7C37C99CD000BD770B3457EDF645862C73167DA3422FE9D0",
       "bytes": 178955,
+      "passed": true
+    },
+    {
+      "source_id": "nbg_loans_structure_l3_10_1",
+      "sha256": "44BB0B7D01361292BA0EF88EE673CB3C983CF8FB562139AE4896B7FC4D335C94",
+      "bytes": 179515,
+      "passed": true
+    },
+    {
+      "source_id": "nbg_loans_purpose_lop",
+      "sha256": "F5D14841075FE6C5E8296D6003F48FCC2FCD2559A3AC9CEB1CE98867A0861FFF",
+      "bytes": 62821,
+      "passed": true
+    },
+    {
+      "source_id": "nbg_loans_regions_lreg",
+      "sha256": "3AA008AA8A5428F20B973B68A279085BBBEF12A7016ACBB642F9EA0C53514CB3",
+      "bytes": 58665,
       "passed": true
     },
     {

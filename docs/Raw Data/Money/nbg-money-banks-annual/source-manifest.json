@@ -182,6 +182,45 @@
     "content_type": "application/pdf"
   },
   {
+    "source_id": "nbg_loans_structure_l3_10_1",
+    "dataset_title": "L3.10.1 Loans to the National Economy (stocks), by borrower and type of activity",
+    "publisher": "National Bank of Georgia (NBG)",
+    "source_page_url": "https://nbg.gov.ge/en/statistics/statistics-data",
+    "retrieved_file_url": "https://nbg.gov.ge/fm/%E1%83%A1%E1%83%A2%E1%83%90%E1%83%A2%E1%83%98%E1%83%A1%E1%83%A2%E1%83%98%E1%83%99%E1%83%90/loans/eng/loans-structure-l3-10-1eng.xlsx",
+    "resolved_file_url": "https://nbg.gov.ge/fm/%E1%83%A1%E1%83%A2%E1%83%90%E1%83%A2%E1%83%98%E1%83%A1%E1%83%A2%E1%83%98%E1%83%99%E1%83%90/loans/eng/loans-structure-l3-10-1eng.xlsx",
+    "retrieved_at": "2026-10-24T15:37:01Z",
+    "local_file": "official/loans-structure-l3-10-1eng.xlsx",
+    "sha256": "44BB0B7D01361292BA0EF88EE673CB3C983CF8FB562139AE4896B7FC4D335C94",
+    "bytes": 179515,
+    "content_type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+  },
+  {
+    "source_id": "nbg_loans_purpose_lop",
+    "dataset_title": "LPR Loans by Purpose (stocks), households sheet",
+    "publisher": "National Bank of Georgia (NBG)",
+    "source_page_url": "https://nbg.gov.ge/en/statistics/statistics-data",
+    "retrieved_file_url": "https://nbg.gov.ge/fm/%E1%83%A1%E1%83%A2%E1%83%90%E1%83%A2%E1%83%98%E1%83%A1%E1%83%A2%E1%83%98%E1%83%99%E1%83%90/loans/eng/loans-by-lopeng.xlsx",
+    "resolved_file_url": "https://nbg.gov.ge/fm/%E1%83%A1%E1%83%A2%E1%83%90%E1%83%A2%E1%83%98%E1%83%A1%E1%83%A2%E1%83%98%E1%83%99%E1%83%90/loans/eng/loans-by-lopeng.xlsx",
+    "retrieved_at": "2026-10-24T15:37:03Z",
+    "local_file": "official/loans-by-lopeng.xlsx",
+    "sha256": "F5D14841075FE6C5E8296D6003F48FCC2FCD2559A3AC9CEB1CE98867A0861FFF",
+    "bytes": 62821,
+    "content_type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+  },
+  {
+    "source_id": "nbg_loans_regions_lreg",
+    "dataset_title": "LREG Loans by Regions (stocks), lari and foreign-currency sheets",
+    "publisher": "National Bank of Georgia (NBG)",
+    "source_page_url": "https://nbg.gov.ge/en/statistics/statistics-data",
+    "retrieved_file_url": "https://nbg.gov.ge/fm/%E1%83%A1%E1%83%A2%E1%83%90%E1%83%A2%E1%83%98%E1%83%A1%E1%83%A2%E1%83%98%E1%83%99%E1%83%90/loans/eng/loans-by-regions-lregeng.xlsx",
+    "resolved_file_url": "https://nbg.gov.ge/fm/%E1%83%A1%E1%83%A2%E1%83%90%E1%83%A2%E1%83%98%E1%83%A1%E1%83%A2%E1%83%98%E1%83%99%E1%83%90/loans/eng/loans-by-regions-lregeng.xlsx",
+    "retrieved_at": "2026-10-24T15:37:04Z",
+    "local_file": "official/loans-by-regions-lregeng.xlsx",
+    "sha256": "3AA008AA8A5428F20B973B68A279085BBBEF12A7016ACBB642F9EA0C53514CB3",
+    "bytes": 58665,
+    "content_type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+  },
+  {
     "source_id": "nbg_api_category_15",
     "dataset_title": "NBG file list, category 15 (monetary statistics)",
     "publisher": "National Bank of Georgia (NBG)",
