@@ -11,7 +11,7 @@ async function expectEnglish(page: Page) {
       if (!parent || parent.closest("script,style")) continue;
       const text = node.textContent?.trim() ?? "";
       if (!/\p{Script=Georgian}/u.test(text)) continue;
-      if (text === "ქართული" && parent.closest('[data-testid="language-switch"]')) continue;
+      if (text === "ქართული" && parent.closest('[data-testid="language-switch"],[data-testid="footer-language-link"]')) continue;
       if (parent.closest('[data-original-language="filename"][lang="ka"][data-source-id]')) continue;
       failures.push(text);
     }

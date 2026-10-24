@@ -1,5 +1,8 @@
 import type { Locale } from "./types";
 
+// Each language's own name, as the language switch and the site footer show it.
+export const LANGUAGE_NAMES: Record<Locale, string> = { ka: "ქართული", en: "English" };
+
 export function splitLanguagePath(pathname: string): { locale: Locale; pathname: string } {
   if (pathname === "/en") return { locale: "en", pathname: "/" };
   if (pathname.startsWith("/en/")) return { locale: "en", pathname: pathname.slice(3) };

@@ -1,10 +1,15 @@
 import { renderToStaticMarkup } from "react-dom/server";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
+import { ExplorerFooter } from "../../components/shell/explorer-footer";
 import { SiteFooterView } from "../../components/site/site-footer-view";
+import { I18nProvider } from "../../lib/i18n/provider";
+import { sourceNoteKey } from "../../lib/navigation/navTree";
 import { message } from "../../lib/i18n/messages";
 import { getMessages } from "../../lib/i18n/messages.server";
 import { DATASET_HUBS } from "../../lib/navigation/datasetHubs";
-import { pageHref } from "../../lib/i18n/routes";
+import { LANGUAGE_NAMES, pageHref } from "../../lib/i18n/routes";
+
+vi.mock("next/navigation", () => ({ usePathname: () => "/explorer/deficit" }));
 
 describe("site footer variants", () => {
   it("default variant renders today's markup", async () => {
@@ -45,11 +50,33 @@ describe("site footer variants", () => {
       expect(platform).toContain(`lang="${other}"`);
     });
 
+    it("links the language to the same nested page in the other language, marked up as that language", async () => {
+      const messages = await getMessages(locale, ["common"]);
+      const html = renderToStaticMarkup(<SiteFooterView variant="site" path="/methodology/x" locale={locale} messages={messages} year={2026} />);
+      const link = html.match(/<a [^>]*data-testid="footer-language-link"[^>]*>[^<]*<\/a>/)?.[0] ?? "";
+      expect(link).toContain(`href="${pageHref("/methodology/x", other)}"`);
+      expect(link).toContain(`lang="${other}"`);
+      expect(link).toContain(`hrefLang="${other}"`);
+      expect(link).toContain(`>${LANGUAGE_NAMES[other]}</a>`);
+    });
+
     it("keeps the source note, licence and copyright", async () => {
       const { html } = await render();
       expect(html).toContain("2026-10-20");
       expect(html).toContain("© 2026 Fiscal.ge");
       expect(html).toContain('data-testid="site-footer"');
     });
+  });
+
+  it("the explorer footer stays compact: no site variant, no language link", async () => {
+    const messages = await getMessages("ka", ["common"]);
+    const html = renderToStaticMarkup(
+      <I18nProvider locale="ka" messages={messages}>
+        <ExplorerFooter locale="ka" year={2026} />
+      </I18nProvider>,
+    );
+    const compact = renderToStaticMarkup(<SiteFooterView locale="ka" messages={messages} sourceNote={message(messages, sourceNoteKey("/explorer/deficit"))} year={2026} />);
+    expect(html).toBe(compact);
+    expect(html).not.toContain("footer-language-link");
   });
 });

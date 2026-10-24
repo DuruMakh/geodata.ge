@@ -46,7 +46,7 @@ for (const route of paths) test(`paired discovery and English content: ${route}`
           while (walker.nextNode()) {
             const node = walker.currentNode, parent = node.parentElement, text = node.textContent?.trim() ?? "";
             if (!parent || parent.closest("script,style") || !/\p{Script=Georgian}/u.test(text)) continue;
-            if (text === "ქართული" && parent.closest('[data-testid="language-switch"]')) continue;
+            if (text === "ქართული" && parent.closest('[data-testid="language-switch"],[data-testid="footer-language-link"]')) continue;
             const original = parent.closest('[data-original-language="filename"][lang="ka"][data-source-id]');
             if (original && originals[original.getAttribute("data-source-id")!] === text) continue;
             const product = parent.closest('[data-original-language="product"][lang="ka"][data-product-id]');
@@ -55,7 +55,7 @@ for (const route of paths) test(`paired discovery and English content: ${route}`
           }
           for (const element of root.querySelectorAll("[aria-label],[title],[placeholder],img[alt]")) for (const attribute of ["aria-label", "title", "placeholder", "alt"]) {
             const text = element.getAttribute(attribute) ?? "";
-            if (/\p{Script=Georgian}/u.test(text) && !(text === "ქართული" && element.closest('[data-testid="language-switch"]'))) failures.push(`${attribute}: ${text}`);
+            if (/\p{Script=Georgian}/u.test(text) && !(text === "ქართული" && element.closest('[data-testid="language-switch"],[data-testid="footer-language-link"]'))) failures.push(`${attribute}: ${text}`);
           }
         };
         if (locale === "en") checkText(root.body);
@@ -103,7 +103,7 @@ for (const route of paths) test(`paired discovery and English content: ${route}`
     }
     if (locale === "en") {
       await expect(page.locator("h1")).toHaveCount(1);
-      const links = await page.locator('a[href^="/"]').evaluateAll(elements => elements.filter(element => !element.closest('[data-testid="language-switch"]')).map(element => element.getAttribute("href")!));
+      const links = await page.locator('a[href^="/"]').evaluateAll(elements => elements.filter(element => !element.closest('[data-testid="language-switch"],[data-testid="footer-language-link"]')).map(element => element.getAttribute("href")!));
       expect(links.filter(href => /^\/(?:explorer|methodology|about|connect)(?:[/?#]|$)/.test(href))).toEqual([]);
       expect(links.filter(href => /^\/en\/(?:mcp|downloads|robots\.txt|sitemap\.xml|llms\.txt)(?:[/?#]|$)/.test(href))).toEqual([]);
     }

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { message } from "../../lib/i18n/messages";
-import { pageHref } from "../../lib/i18n/routes";
+import { LANGUAGE_NAMES, pageHref } from "../../lib/i18n/routes";
 import type { Locale, Messages } from "../../lib/i18n/types";
 import { DATASET_HUBS } from "../../lib/navigation/datasetHubs";
 
@@ -14,8 +14,6 @@ const FOOTER_LINKS = [
 
 // The larger footer of the homepage and the site's own pages: the mission, the data list and the platform list.
 const PLATFORM_LINKS = FOOTER_LINKS.slice(DATASET_HUBS.length);
-// Each language's own name, as the header's language switch shows it.
-const LANGUAGE_NAMES = { ka: "ქართული", en: "English" } as const;
 const SITE_LINK_CLASS = "flex min-h-11 items-center text-[0.8125rem] text-[var(--body)] hover:text-[var(--accent)] min-[768px]:inline-flex min-[768px]:min-h-[30px]";
 
 // The markup, with the common catalogue handed in. It is split from the
@@ -24,9 +22,11 @@ const SITE_LINK_CLASS = "flex min-h-11 items-center text-[0.8125rem] text-[var(-
 // route's client bundle.
 // `year` is the build's: the explorer footer is a client component, so its server layout passes it in rather than each
 // browser reading its own clock and disagreeing with the prerendered HTML.
-// `variant="site"` is the larger footer; the default `"compact"` is the explorer's and is unchanged. `path` is the page
-// the footer sits on, so its language link leads to the same page in the other language.
-export function SiteFooterView({ updatedAt, locale = "ka", sourceNote, messages, year, variant = "compact", path = "/" }: { updatedAt?: string; locale?: Locale; sourceNote?: string; messages: Messages; year: number; variant?: "compact" | "site"; path?: `/${string}` }) {
+// `variant="site"` is the larger footer; leaving it out gives the explorer's, which is unchanged. The site footer needs
+// `path`, the page it sits on, so its language link leads to the same page in the other language.
+export type FooterVariantProps = { variant?: "compact"; path?: never } | { variant: "site"; path: `/${string}` };
+
+export function SiteFooterView({ updatedAt, locale = "ka", sourceNote, messages, year, variant, path }: { updatedAt?: string; locale?: Locale; sourceNote?: string; messages: Messages; year: number } & FooterVariantProps) {
   const [sourcePrefix, sourceSuffix] = (sourceNote ?? messages["common.sourceNote"]).split("{updatedAt}");
   const sourceText = (
     <>
@@ -84,7 +84,7 @@ export function SiteFooterView({ updatedAt, locale = "ka", sourceNote, messages,
                 </li>
               ))}
               <li>
-                <a href={pageHref(path, otherLocale)} lang={otherLocale} hrefLang={otherLocale} className={SITE_LINK_CLASS}>
+                <a data-testid="footer-language-link" href={pageHref(path, otherLocale)} lang={otherLocale} hrefLang={otherLocale} className={SITE_LINK_CLASS}>
                   {LANGUAGE_NAMES[otherLocale]}
                 </a>
               </li>
