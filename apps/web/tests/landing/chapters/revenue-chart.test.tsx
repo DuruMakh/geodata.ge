@@ -80,4 +80,11 @@ describe("RevenueChart (server render)", () => {
     const tip = html.match(/<div[^>]*aria-hidden="true"[^>]*opacity-0[^>]*>(.*?)<\/div><\/div><\/figure>/)?.[1] ?? "";
     expect((tip.match(/<b /g) ?? []).length).toBe(7);
   });
+
+  it("puts the title in a figcaption and draws the planned legend swatch as paper lines over a fill", () => {
+    expect(html).toMatch(/<figcaption[^>]*>\s*<b[^>]*>ნაერთი ბიუჯეტის შემოსულობები, მლრდ ₾<\/b>/);
+    const swatch = html.match(/data-band="planned"[^>]*><i[^>]*class="([^"]*)"/)?.[1] ?? "";
+    expect(swatch).toContain("var(--paper)");
+    expect(swatch).toContain(",var(--control)");
+  });
 });

@@ -224,3 +224,42 @@ export function placeTip(el: HTMLElement, x: number, y: number, w: number, h: nu
   el.style.transform = `translate3d(${Math.round(left)}px,${Math.round(top)}px,0)`;
   el.style.opacity = "1";
 }
+
+/** Fallbacks of the design tokens the charts read, used when a token is missing or not a 6-digit hex colour. */
+export const TOKEN_FALLBACKS = {
+  paper: "#f7f2e9",
+  ink: "#1e1b16",
+  accent: "#b3402a",
+  body: "#55503f",
+  muted: "#6a6050",
+  control: "#95846a",
+  hairline: "#d9cfbe",
+  hairlineSoft: "#e7decf",
+  positive: "#1f6e56",
+  ui: '"Noto Sans Georgian","Helvetica Neue",Arial,sans-serif',
+  num: '"Geist Mono",ui-monospace,Menlo,monospace',
+};
+
+/** The colour and font tokens the charts draw with, resolved on `el` (canvas cannot use `var()`). */
+export function readTokens(el: Element): typeof TOKEN_FALLBACKS {
+  const style = getComputedStyle(el);
+  const color = (name: string, fallback: string) => {
+    const value = style.getPropertyValue(name).trim();
+    return /^#[0-9a-f]{6}$/i.test(value) ? value : fallback;
+  };
+  const font = (name: string, fallback: string) => style.getPropertyValue(name).trim() || fallback;
+  const f = TOKEN_FALLBACKS;
+  return {
+    paper: color("--paper", f.paper),
+    ink: color("--ink", f.ink),
+    accent: color("--accent", f.accent),
+    body: color("--body", f.body),
+    muted: color("--muted", f.muted),
+    control: color("--control", f.control),
+    hairline: color("--hairline", f.hairline),
+    hairlineSoft: color("--hairline-soft", f.hairlineSoft),
+    positive: color("--positive", f.positive),
+    ui: font("--font-ui", f.ui),
+    num: font("--font-numeric", f.num),
+  };
+}

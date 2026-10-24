@@ -2,7 +2,7 @@
 
 import { Pause, Play } from "lucide-react";
 import { useEffect, useId, useRef, useState } from "react";
-import { formatInUnit, formatShare, UNIT_BN, UNIT_MLN } from "../../../lib/explorer/format";
+import { formatInUnit, formatShare, UNIT_BN } from "../../../lib/explorer/format";
 import type { SpendingSeries } from "../../../lib/landing/chapters/types";
 import {
   anchoredRect,
@@ -13,11 +13,14 @@ import {
   lerpRect,
   placeTip,
   prefersReducedMotion,
+  readTokens,
   sizeCanvas,
   sparkPoints,
   squarify,
   type Rect,
 } from "./canvas";
+import { easeOut, txt } from "./chart-draw";
+import { money } from "./chart-format";
 import { Reveal, useNearViewport } from "./reveal";
 
 // Chapter 02: a squarified treemap of the 13 spending fields. The block area of a year follows
@@ -44,31 +47,11 @@ export type SpendingLabels = {
   largest: string; // canvas aria-label: "ყველაზე დიდი"
 };
 
-const FALLBACK = {
-  paper: "#f7f2e9",
-  ink: "#1e1b16",
-  accent: "#b3402a",
-  control: "#95846a",
-  muted: "#6a6050",
-  ui: '"Noto Sans Georgian","Helvetica Neue",Arial,sans-serif',
-  num: '"Geist Mono",ui-monospace,Menlo,monospace',
-};
-const NB = " ";
 const DARK_BLOCKS = 6; // the six largest fields take light text
 const STEP_MS = 900; // one year per step while playing
 const TWEEN_MS = 520;
 
 const easeInOut = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
-const easeOut = (t: number) => 1 - Math.pow(1 - t, 3);
-
-type Amounts = Pick<SpendingLabels, "bnGel" | "mlnGel">;
-/** Billions with two decimals (one from 9.95), below one billion millions with 0 or 1 decimals. */
-export function money(gel: number, l: Amounts): string {
-  const a = Math.abs(gel);
-  if (a >= 1e9) return `${formatInUnit(gel, { ...UNIT_BN, decimals: a >= 9.95e9 ? 1 : 2 })}${NB}${l.bnGel}`;
-  return `${formatInUnit(gel, { ...UNIT_MLN, decimals: a >= 1e8 ? 0 : 1 })}${NB}${l.mlnGel}`;
-}
-export const percent = (fraction: number, decimals = 1) => formatShare(fraction, false, decimals);
 
 type Engine = { setYear(index: number, ms?: number): void; highlight(id: string | null): void; destroy(): void };
 
@@ -84,19 +67,7 @@ type EngineOptions = {
 };
 
 function createTreemap({ wrap, canvas, data, initial, frameText, amount, onHover, onLeave }: EngineOptions): Engine {
-  const style = getComputedStyle(wrap);
-  const token = (name: string, fallback: string) => {
-    const value = style.getPropertyValue(name).trim();
-    return /^#[0-9a-f]{6}$/i.test(value) ? value : fallback;
-  };
-  const font = (name: string, fallback: string) => style.getPropertyValue(name).trim() || fallback;
-  const paper = token("--paper", FALLBACK.paper);
-  const ink = token("--ink", FALLBACK.ink);
-  const accent = token("--accent", FALLBACK.accent);
-  const control = token("--control", FALLBACK.control);
-  const muted = token("--muted", FALLBACK.muted);
-  const ui = font("--font-ui", FALLBACK.ui);
-  const num = font("--font-numeric", FALLBACK.num);
+  const { paper, ink, accent, control, muted, ui, num } = readTokens(wrap);
   const reduced = prefersReducedMotion();
 
   const { fields, totals } = data;
@@ -124,14 +95,6 @@ function createTreemap({ wrap, canvas, data, initial, frameText, amount, onHover
     return squarify(fields.map((f) => f.values[i]), x, y, w, h);
   };
 
-  const label = (ctx: CanvasRenderingContext2D, s: string, x: number, y: number, f: string, color: string, align: CanvasTextAlign = "left") => {
-    ctx.font = f;
-    ctx.fillStyle = color;
-    ctx.textAlign = align;
-    ctx.textBaseline = "alphabetic";
-    ctx.fillText(s, x, y);
-  };
-
   const draw = () => {
     if (!W || !alive || !cur) return;
     const ctx = sizeCanvas(canvas, W, H);
@@ -143,7 +106,7 @@ function createTreemap({ wrap, canvas, data, initial, frameText, amount, onHover
       ctx.lineWidth = 1;
       ctx.strokeRect(0.5, 0.5, W - 1, H - 1);
       ctx.restore();
-      label(ctx, frameText(), W - 12, 22, `500 11.5px ${ui}`, muted, "right");
+      txt(ctx, frameText(), W - 12, 22, `500 11.5px ${ui}`, muted, "right");
     }
     ctx.save();
     ctx.beginPath();
@@ -169,14 +132,14 @@ function createTreemap({ wrap, canvas, data, initial, frameText, amount, onHover
       const fraction = totals[idx] > 0 ? v / totals[idx] : 0;
       if (tier === "share") {
         ctx.font = `500 10.5px ${num}`;
-        label(ctx, fitText(ctx, percent(fraction, 0), w - 12), x + 6, y + 16, `500 10.5px ${num}`, dark ? paper : ink);
+        txt(ctx, fitText(ctx, formatShare(fraction, false, 0), w - 12), x + 6, y + 16, `500 10.5px ${num}`, dark ? paper : ink);
         return;
       }
       const sub = dark ? "rgba(247,242,233,.8)" : "rgba(30,27,22,.82)";
       ctx.font = `600 12.5px ${ui}`;
-      label(ctx, fitText(ctx, field.label, w - 20), x + 10, y + 21, `600 12.5px ${ui}`, dark ? paper : ink);
-      label(ctx, amount(v), x + 10, y + 39, `500 11.5px ${num}`, sub);
-      if (tier === "nameAmountShare") label(ctx, percent(fraction), x + 10, y + 56, `500 11.5px ${num}`, sub);
+      txt(ctx, fitText(ctx, field.label, w - 20), x + 10, y + 21, `600 12.5px ${ui}`, dark ? paper : ink);
+      txt(ctx, amount(v), x + 10, y + 39, `500 11.5px ${num}`, sub);
+      if (tier === "nameAmountShare") txt(ctx, formatShare(fraction), x + 10, y + 56, `500 11.5px ${num}`, sub);
     });
     ctx.restore();
   };
@@ -373,7 +336,7 @@ export function SpendingChapter({ data, labels }: { data: SpendingSeries; labels
         if (tipKeyRef.current) tipKeyRef.current.style.background = blockTone(field, d.fields.length);
         text(tipValueRef.current, money(v, lab));
         text(tipNameRef.current, d.planned[i] ? `${d.years[i]} (${lab.planned})` : String(d.years[i]));
-        text(tipShareRef.current, percent(d.totals[i] > 0 ? v / d.totals[i] : 0));
+        text(tipShareRef.current, formatShare(d.totals[i] > 0 ? v / d.totals[i] : 0));
         text(tipShareNameRef.current, lab.share);
         text(tipFootRef.current, before > 0 ? `${lab.vsPrevious}${formatShare(v / before - 1, true, 1)}` : "");
         placeTip(tip, x, y, wrap.clientWidth, wrap.clientHeight);
@@ -429,7 +392,7 @@ export function SpendingChapter({ data, labels }: { data: SpendingSeries; labels
   const yearText = planned ? `${year} (${labels.planned})` : String(year);
   const ariaLabel =
     `${labels.chartSummary}; ${yearText}: ${formatInUnit(total, UNIT_BN)} ${labels.bnGel}` +
-    (top ? `; ${labels.largest}: ${top.label}, ${money(top.values[index], labels)}, ${percent(top.values[index] / total)}` : "");
+    (top ? `; ${labels.largest}: ${top.label}, ${money(top.values[index], labels)}, ${formatShare(top.values[index] / total)}` : "");
   const playLabel = playing ? labels.pause : index >= last ? labels.replay : labels.play;
 
   const spark = sparkPoints(data.totals, 1000, 6, 39.5);
@@ -539,7 +502,7 @@ export function SpendingChapter({ data, labels }: { data: SpendingSeries; labels
                 <span className="text-[13px] font-medium leading-[1.3]">{f.label}</span>
                 <span className="whitespace-nowrap font-[family-name:var(--font-numeric)] text-xs">
                   {money(f.values[index], labels)}
-                  <em className="ml-1.5 not-italic text-[var(--muted)]">{percent(f.values[index] / total)}</em>
+                  <em className="ml-1.5 not-italic text-[var(--muted)]">{formatShare(f.values[index] / total)}</em>
                 </span>
                 <span aria-hidden="true" className="relative col-span-full h-[3px] overflow-hidden rounded-sm bg-[var(--hairline-soft)]">
                   <i

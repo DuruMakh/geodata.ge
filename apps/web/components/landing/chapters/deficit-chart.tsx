@@ -3,13 +3,13 @@
 import { useEffect, useRef } from "react";
 import { formatPoints } from "../../../lib/explorer/format";
 import type { DeficitChapter } from "../../../lib/landing/chapters/types";
-import { clamp } from "./canvas";
+import { clamp, readTokens } from "./canvas";
 import { createChartCore, type ChartState } from "./chart-core";
 import { bar, easeOut, haloTxt, hline, txt, vline } from "./chart-draw";
-import { barSlots, DEFICIT_RULE_PCT, deficitScale, fiveYearIndices, slotIndexAt, valueY } from "./chart-layout";
+import { barSlots, DEFICIT_RULE_PCT, deficitScale, fiveYearIndices, slotIndexAt, valueY, yearRange } from "./chart-layout";
 import { ChartTip, hideTip, showTip } from "./chart-tip";
+import { deficitTip } from "./chart-tips";
 import { Reveal, useNearViewport } from "./reveal";
-import { money } from "./spending-chapter";
 
 // Chapter 05: the general-government balance as % of GDP, one bar per year. Deficits are ink, surpluses
 // green; projection years sit in a lightly shaded band at 40% opacity. A dashed accent line marks
@@ -31,19 +31,6 @@ export type DeficitLabels = {
   chartSummary: string; // canvas aria-label lead: "ზოგადი მთავრობის ბალანსი მშპ-სთან"
 };
 
-const FALLBACK = {
-  paper: "#f7f2e9",
-  ink: "#1e1b16",
-  accent: "#b3402a",
-  positive: "#1f6e56",
-  body: "#55503f",
-  muted: "#6a6050",
-  hairline: "#d9cfbe",
-  hairlineSoft: "#e7decf",
-  ui: '"Noto Sans Georgian","Helvetica Neue",Arial,sans-serif',
-  num: '"Geist Mono",ui-monospace,Menlo,monospace',
-};
-
 const points = (value: number, decimals = 1) => `${formatPoints(value, false, decimals)}%`;
 const RULE_TEXT = points(DEFICIT_RULE_PCT, 0);
 
@@ -52,27 +39,12 @@ type EngineOptions = {
   canvas: HTMLCanvasElement;
   data: DeficitChapter;
   labels(): DeficitLabels;
-  onHover(index: number, x: number, y: number, color: string): void;
+  onHover(index: number, x: number, y: number): void;
   onLeave(): void;
 };
 
 function createDeficit({ wrap, canvas, data, labels, onHover, onLeave }: EngineOptions) {
-  const style = getComputedStyle(wrap);
-  const token = (name: string, fallback: string) => {
-    const value = style.getPropertyValue(name).trim();
-    return /^#[0-9a-f]{6}$/i.test(value) ? value : fallback;
-  };
-  const font = (name: string, fallback: string) => style.getPropertyValue(name).trim() || fallback;
-  const paper = token("--paper", FALLBACK.paper);
-  const ink = token("--ink", FALLBACK.ink);
-  const accent = token("--accent", FALLBACK.accent);
-  const positive = token("--positive", FALLBACK.positive);
-  const body = token("--body", FALLBACK.body);
-  const muted = token("--muted", FALLBACK.muted);
-  const hairline = token("--hairline", FALLBACK.hairline);
-  const hairlineSoft = token("--hairline-soft", FALLBACK.hairlineSoft);
-  const ui = font("--font-ui", FALLBACK.ui);
-  const num = font("--font-numeric", FALLBACK.num);
+  const { paper, ink, accent, positive, body, muted, hairline, hairlineSoft, ui, num } = readTokens(wrap);
 
   const { years, pctGdp } = data;
   const n = years.length;
@@ -157,7 +129,7 @@ function createDeficit({ wrap, canvas, data, labels, onHover, onLeave }: EngineO
         ctx.lineTo(b, yb);
         ctx.lineTo(b, yb + 5);
         ctx.stroke();
-        haloTxt(ctx, `${lab.surplusRun} · ${run.first}–${run.last}`, (a + b) / 2, yb - 7, `600 11.5px ${ui}`, positive, paper, "center");
+        haloTxt(ctx, `${lab.surplusRun} · ${yearRange(run.first, run.last)}`, (a + b) / 2, yb - 7, `600 11.5px ${ui}`, positive, paper, "center");
       }
     }
   };
@@ -167,7 +139,7 @@ function createDeficit({ wrap, canvas, data, labels, onHover, onLeave }: EngineO
     draw,
     hit: (x) => (geo ? slotIndexAt(x, geo.left, geo.slot, n) : -1),
     onHover: (i) => {
-      if (geo) onHover(i, geo.center(i), geo.top + geo.height * 0.25, colorOf(i));
+      if (geo) onHover(i, geo.center(i), geo.top + geo.height * 0.25);
     },
     onLeave,
   });
@@ -195,26 +167,9 @@ export function DeficitChart({ data, labels }: { data: DeficitChapter; labels: D
       canvas,
       data,
       labels: () => live.current.labels,
-      onHover(index, x, y, color) {
+      onHover(index, x, y) {
         const { data: d, labels: lab } = live.current;
-        const year = d.years[index];
-        const v = d.pctGdp[index];
-        const projected = d.projectionFrom !== null && year >= d.projectionFrom;
-        showTip(
-          tip,
-          {
-            title: projected ? `${year} · ${lab.imf}` : String(year),
-            rows: [
-              { key: color, val: points(v, 2), name: lab.vsGdp },
-              { val: money(d.gel[index], lab), name: lab.inGel },
-            ],
-            foot: v >= 0 ? lab.surplus : lab.deficit,
-          },
-          x,
-          y,
-          wrap.clientWidth,
-          wrap.clientHeight,
-        );
+        showTip(tip, deficitTip(d, lab, index), x, y, wrap.clientWidth, wrap.clientHeight);
       },
       onLeave: () => hideTip(tip),
     });
@@ -226,14 +181,14 @@ export function DeficitChart({ data, labels }: { data: DeficitChapter; labels: D
   const projection = data.projectionFrom === null ? -1 : data.years.indexOf(data.projectionFrom);
   const latest = projection > 0 ? projection - 1 : n - 1;
   const ariaLabel =
-    `${labels.chartSummary} ${data.years[0]}–${data.years[n - 1]}; ` +
+    `${labels.chartSummary} ${yearRange(data.years[0], data.years[n - 1])}; ` +
     `${data.years[latest]}: ${points(data.pctGdp[latest])} ${labels.vsGdp}; ` +
     `${labels.deepest}: ${points(data.deepest.pct)}, ${data.deepest.year}`;
 
   return (
     <Reveal className="mt-8">
       <figure>
-        <div className="mb-3 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1.5">
+        <figcaption className="mb-3 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1.5">
           <b className="text-[13.5px] font-semibold">{labels.title}</b>
           <ul className="flex flex-wrap gap-x-4 gap-y-1.5 text-xs text-[var(--body)]">
             <li data-key="deficit" className="inline-flex items-center gap-[7px]">
@@ -255,7 +210,7 @@ export function DeficitChart({ data, labels }: { data: DeficitChapter; labels: D
               {RULE_TEXT}
             </li>
           </ul>
-        </div>
+        </figcaption>
         <div ref={wrapRef} className="relative h-[340px] w-full min-[768px]:h-[420px]">
           <canvas ref={canvasRef} role="img" aria-label={ariaLabel} className="absolute left-0 top-0" />
           <ChartTip tipRef={tipRef} rows={2} />

@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { formatInUnit, formatShare, UNIT_BN, UNIT_PERSONS } from "../../../lib/explorer/format";
 import { GEL_PER_SQUARE } from "../../../lib/landing/chapters/scale";
 import type { ScaleChapter as ScaleData } from "../../../lib/landing/chapters/types";
-import { clamp, gridFor, mixHex, OFF_SQUARE, placeTip, prefersReducedMotion, sizeCanvas } from "./canvas";
+import { clamp, gridFor, mixHex, OFF_SQUARE, placeTip, prefersReducedMotion, readTokens, sizeCanvas, TOKEN_FALLBACKS } from "./canvas";
 import { Reveal, useNearViewport } from "./reveal";
 
 // Chapter 01: one square per GEL 10 million, GDP is the whole grid. Squares fill column by column
@@ -23,7 +23,6 @@ export type ScaleLabels = {
   measureGroup: string; // aria-label of the measure button group
 };
 
-const FALLBACK = { ink: "#1e1b16", accent: "#b3402a" };
 const BN_2 = { ...UNIT_BN, decimals: 2 };
 
 const easeInOut = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
@@ -44,13 +43,7 @@ type EngineOptions = {
 };
 
 function createSquares({ wrap, canvas, marker, markerLabel, total, initial, onHover, onLeave }: EngineOptions): Engine {
-  const style = getComputedStyle(wrap);
-  const token = (name: string, fallback: string) => {
-    const value = style.getPropertyValue(name).trim();
-    return /^#[0-9a-f]{6}$/i.test(value) ? value : fallback;
-  };
-  const ink = token("--ink", FALLBACK.ink);
-  const accent = token("--accent", FALLBACK.accent);
+  const { ink, accent } = readTokens(wrap);
   const off = OFF_SQUARE;
   const reduced = prefersReducedMotion();
 
@@ -332,7 +325,7 @@ export function ScaleChapter({ data, labels }: { data: ScaleData; labels: ScaleL
         const { selected: measure, labels: l, data: d } = live.current;
         const cumulativeGel = (index + 1) * GEL_PER_SQUARE;
         text(tipTitleRef.current, `${count(index + 1)} / ${count(d.squares)} ${l.square}`);
-        if (tipKeyRef.current) tipKeyRef.current.style.background = filled ? FALLBACK.ink : OFF_SQUARE;
+        if (tipKeyRef.current) tipKeyRef.current.style.background = filled ? TOKEN_FALLBACKS.ink : OFF_SQUARE;
         text(tipValueRef.current, `${formatInUnit(cumulativeGel, BN_2)} ${l.bnGel}`);
         text(tipNameRef.current, l.cumulative);
         text(tipShareRef.current, share(cumulativeGel / d.gdpGel));

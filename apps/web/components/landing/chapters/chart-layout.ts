@@ -91,3 +91,8 @@ export function valueY(value: number, lo: number, hi: number, top: number, heigh
 
 /** The fiscal rule line of the deficit chart, percent of GDP. */
 export const DEFICIT_RULE_PCT = -3;
+
+/** "2004" for a single year, "2004–2007" for a range. */
+export function yearRange(first: number, last: number): string {
+  return first === last ? String(first) : `${first}–${last}`;
+}

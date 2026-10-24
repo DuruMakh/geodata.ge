@@ -61,4 +61,8 @@ describe("DeficitChart (server render)", () => {
     const tip = html.match(/<div[^>]*aria-hidden="true"[^>]*opacity-0[^>]*>(.*?)<\/div><\/div><\/figure>/)?.[1] ?? "";
     expect((tip.match(/<b /g) ?? []).length).toBe(2);
   });
+
+  it("puts the title in a figcaption", () => {
+    expect(html).toMatch(/<figcaption[^>]*>\s*<b[^>]*>ზოგადი მთავრობის ბალანსი, % მშპ-სთან<\/b>/);
+  });
 });

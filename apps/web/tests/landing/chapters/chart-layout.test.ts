@@ -11,6 +11,7 @@ import {
   slotIndexAt,
   valueY,
   yearLabelIndices,
+  yearRange,
 } from "../../../components/landing/chapters/chart-layout";
 
 describe("yearLabelIndices", () => {
@@ -117,5 +118,12 @@ describe("valueY", () => {
     const rule = valueY(DEFICIT_RULE_PCT, -10, 4, 34, 280);
     expect(rule).toBeCloseTo(34 + (7 / 14) * 280, 9);
     expect(rule).toBeGreaterThan(valueY(0, -10, 4, 34, 280));
+  });
+});
+
+describe("yearRange", () => {
+  it("writes a single year once and a range with an en dash", () => {
+    expect(yearRange(2004, 2004)).toBe("2004");
+    expect(yearRange(2004, 2007)).toBe("2004–2007");
   });
 });

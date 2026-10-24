@@ -1,15 +1,16 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { formatInUnit, MISSING, UNIT_BN } from "../../../lib/explorer/format";
+import { formatInUnit, formatShare, UNIT_BN } from "../../../lib/explorer/format";
 import type { RevenueBandId, RevenueSeries } from "../../../lib/landing/chapters/types";
-import { fitText, mixHex, niceTicks, stackLabels } from "./canvas";
+import { fitText, mixHex, niceTicks, readTokens, stackLabels } from "./canvas";
 import { createChartCore, type ChartState } from "./chart-core";
 import { dot, easeOut, haloTxt, hline, txt, vline } from "./chart-draw";
-import { pointIndexAt, plannedRuns, plannedSpan, revenuePads, yearLabelIndices } from "./chart-layout";
+import { money } from "./chart-format";
+import { plannedRuns, plannedSpan, pointIndexAt, revenuePads, yearLabelIndices, yearRange } from "./chart-layout";
 import { ChartTip, hideTip, showTip } from "./chart-tip";
+import { plannedYearText, revenueTip } from "./chart-tips";
 import { Reveal, useNearViewport } from "./reveal";
-import { money, percent } from "./spending-chapter";
 
 // Chapter 03: consolidated-budget receipts as a stacked area, one band per revenue group. Planned
 // years are hatched; the year of peak borrowing gets a callout and the latest year labels each band on
@@ -35,21 +36,9 @@ const BAND_COLORS: Record<Exclude<RevenueBandId, "liabilities">, string> = {
   otherTaxes: "#7668ad",
   otherIncome: "#d2ab5f",
 };
-const FALLBACK = {
-  paper: "#f7f2e9",
-  ink: "#1e1b16",
-  accent: "#b3402a",
-  body: "#55503f",
-  muted: "#6a6050",
-  hairline: "#d9cfbe",
-  hairlineSoft: "#e7decf",
-  ui: '"Noto Sans Georgian","Helvetica Neue",Arial,sans-serif',
-  num: '"Geist Mono",ui-monospace,Menlo,monospace',
-};
 const HATCH_GAP = 7;
 
 const bandColor = (id: RevenueBandId, accent: string) => (id === "liabilities" ? accent : BAND_COLORS[id]);
-const yearText = (data: RevenueSeries, i: number, planned: string) => (data.planned[i] ? `${data.years[i]} (${planned})` : String(data.years[i]));
 
 type Engine = { colors: string[]; destroy(): void };
 
@@ -63,21 +52,7 @@ type EngineOptions = {
 };
 
 function createRevenue({ wrap, canvas, data, labels, onHover, onLeave }: EngineOptions): Engine {
-  const style = getComputedStyle(wrap);
-  const token = (name: string, fallback: string) => {
-    const value = style.getPropertyValue(name).trim();
-    return /^#[0-9a-f]{6}$/i.test(value) ? value : fallback;
-  };
-  const font = (name: string, fallback: string) => style.getPropertyValue(name).trim() || fallback;
-  const paper = token("--paper", FALLBACK.paper);
-  const ink = token("--ink", FALLBACK.ink);
-  const accent = token("--accent", FALLBACK.accent);
-  const body = token("--body", FALLBACK.body);
-  const muted = token("--muted", FALLBACK.muted);
-  const hairline = token("--hairline", FALLBACK.hairline);
-  const hairlineSoft = token("--hairline-soft", FALLBACK.hairlineSoft);
-  const ui = font("--font-ui", FALLBACK.ui);
-  const num = font("--font-numeric", FALLBACK.num);
+  const { paper, ink, accent, body, muted, hairline, hairlineSoft, ui, num } = readTokens(wrap);
 
   const { years, bands, totals, planned } = data;
   const n = years.length;
@@ -137,20 +112,6 @@ function createRevenue({ wrap, canvas, data, labels, onHover, onLeave }: EngineO
       ctx.fill();
       ctx.globalAlpha = 1;
     });
-    const trace = (values: number[]) => {
-      ctx.beginPath();
-      values.forEach((v, i) => (i ? ctx.lineTo(X(i), Y(v)) : ctx.moveTo(X(i), Y(v))));
-    };
-    for (let bi = 0; bi < lastBand; bi++) {
-      trace(tops[bi]);
-      ctx.strokeStyle = paper;
-      ctx.lineWidth = 1.5;
-      ctx.stroke();
-    }
-    trace(tops[lastBand]);
-    ctx.strokeStyle = topLine;
-    ctx.lineWidth = 1.5;
-    ctx.stroke();
     // Planned years: paper-coloured diagonal hatching over the stack, from the actual year before.
     for (const run of plannedRuns(planned)) {
       const [from, to] = plannedSpan(run);
@@ -172,6 +133,20 @@ function createRevenue({ wrap, canvas, data, labels, onHover, onLeave }: EngineO
       ctx.stroke();
       ctx.restore();
     }
+    const trace = (values: number[]) => {
+      ctx.beginPath();
+      values.forEach((v, i) => (i ? ctx.lineTo(X(i), Y(v)) : ctx.moveTo(X(i), Y(v))));
+    };
+    for (let bi = 0; bi < lastBand; bi++) {
+      trace(tops[bi]);
+      ctx.strokeStyle = paper;
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+    }
+    trace(tops[lastBand]);
+    ctx.strokeStyle = topLine;
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
     ctx.restore();
     hline(ctx, L, R, B, ink, 1);
 
@@ -184,7 +159,7 @@ function createRevenue({ wrap, canvas, data, labels, onHover, onLeave }: EngineO
         const align = wide ? "center" : "right";
         const ax = wide ? xx : xx + 10;
         vline(ctx, xx, yTop - 30 + shift, yTop - 4, ink, 1);
-        haloTxt(ctx, `${years[peak]} · ${percent(data.peakBorrowing.share, 0)}`, ax, yTop - 52 + shift, `600 12.5px ${ui}`, ink, paper, align);
+        haloTxt(ctx, `${years[peak]} · ${formatShare(data.peakBorrowing.share, false, 0)}`, ax, yTop - 52 + shift, `600 12.5px ${ui}`, ink, paper, align);
         haloTxt(ctx, lab.peakFrom, ax, yTop - 36 + shift, `500 11.5px ${ui}`, body, paper, align);
       }
       const mids = bands.map((_, bi) => Y(((bi ? tops[bi - 1][n - 1] : 0) + tops[bi][n - 1]) / 2));
@@ -208,10 +183,10 @@ function createRevenue({ wrap, canvas, data, labels, onHover, onLeave }: EngineO
           ctx.font = `600 12px ${ui}`;
           txt(ctx, fitText(ctx, band.label, room), lx + 15, yy - 5, `600 12px ${ui}`, ink);
           ctx.font = `500 11px ${num}`;
-          txt(ctx, fitText(ctx, `${money(v, lab)} · ${percent(sh)}`, room), lx + 15, yy + 11, `500 11px ${num}`, muted);
+          txt(ctx, fitText(ctx, `${money(v, lab)} · ${formatShare(sh)}`, room), lx + 15, yy + 11, `500 11px ${num}`, muted);
         } else {
           ctx.fillRect(lx, yy - 3.5, 7, 7);
-          txt(ctx, percent(sh, 0), lx + 10, yy, `600 10.5px ${num}`, ink, "left", "middle");
+          txt(ctx, formatShare(sh, false, 0), lx + 10, yy, `600 10.5px ${num}`, ink, "left", "middle");
         }
       });
     }
@@ -263,25 +238,7 @@ export function RevenueChart({ data, labels }: { data: RevenueSeries; labels: Re
       labels: () => live.current.labels,
       onHover(index, x, y) {
         const { data: d, labels: lab } = live.current;
-        const rows = d.bands
-          .map((band, bi) => ({
-            key: engine.colors[bi],
-            val: band.values[index] === null ? MISSING : money(band.values[index] as number, lab),
-            name: band.label,
-          }))
-          .reverse();
-        showTip(
-          tip,
-          {
-            title: yearText(d, index, lab.planned),
-            rows,
-            foot: `${lab.total} ${money(d.totals[index], lab)} · ${lab.taxes} ${percent(d.taxShare[index], 0)}`,
-          },
-          x,
-          y,
-          wrap.clientWidth,
-          wrap.clientHeight,
-        );
+        showTip(tip, revenueTip(d, lab, engine.colors, index), x, y, wrap.clientWidth, wrap.clientHeight);
       },
       onLeave: () => hideTip(tip),
     });
@@ -291,13 +248,13 @@ export function RevenueChart({ data, labels }: { data: RevenueSeries; labels: Re
   const last = data.years.length - 1;
   const hasPlanned = data.planned.some(Boolean);
   const ariaLabel =
-    `${labels.chartSummary} ${data.years[0]}–${data.years[last]}: ${data.bands.map((band) => band.label).join(", ")}; ` +
-    `${yearText(data, last, labels.planned)}: ${money(data.totals[last], labels)}, ${labels.taxes} ${percent(data.taxShare[last], 0)}`;
+    `${labels.chartSummary} ${yearRange(data.years[0], data.years[last])}: ${data.bands.map((band) => band.label).join(", ")}; ` +
+    `${plannedYearText(data, last, labels.planned)}: ${money(data.totals[last], labels)}, ${labels.taxes} ${formatShare(data.taxShare[last], false, 0)}`;
 
   return (
     <Reveal className="mt-8">
       <figure>
-        <div className="mb-3 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1.5">
+        <figcaption className="mb-3 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1.5">
           <b className="text-[13.5px] font-semibold">{labels.title}</b>
           <ul className="flex flex-wrap gap-x-4 gap-y-1.5 text-xs text-[var(--body)]">
             {data.bands.map((band) => (
@@ -314,13 +271,13 @@ export function RevenueChart({ data, labels }: { data: RevenueSeries; labels: Re
               <li data-band="planned" className="inline-flex items-center gap-[7px]">
                 <i
                   aria-hidden="true"
-                  className="inline-block h-2.5 w-2.5 flex-none rounded-[2px] border border-[var(--control)] [background:repeating-linear-gradient(135deg,var(--control)_0_1px,transparent_1px_3px)]"
+                  className="inline-block h-2.5 w-2.5 flex-none rounded-[2px] [background:repeating-linear-gradient(135deg,var(--paper)_0_1.5px,transparent_1.5px_4px),var(--control)]"
                 />
                 {labels.planned}
               </li>
             )}
           </ul>
-        </div>
+        </figcaption>
         <div ref={wrapRef} className="relative h-[360px] w-full min-[768px]:h-[420px]">
           <canvas ref={canvasRef} role="img" aria-label={ariaLabel} className="absolute left-0 top-0" />
           <ChartTip tipRef={tipRef} rows={data.bands.length} />
