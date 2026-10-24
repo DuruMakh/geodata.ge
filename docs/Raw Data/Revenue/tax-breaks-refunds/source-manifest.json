@@ -1,0 +1,110 @@
+{
+  "capturedOn": "2026-10-21",
+  "reviewedAt": "2026-10-21",
+  "identityToleranceMillionGel": "0.01",
+  "files": [
+    {
+      "sourceId": "mof_tax_expenditure_report_2024_xlsx_ka",
+      "role": "canonical_input",
+      "file": "sources/TER graphs GEO 2024.xlsx",
+      "originalFilename": "TER graphs  GEO 2024.xlsx",
+      "url": "https://mof.ge/files/download/TER%20graphs%20%20GEO%202024.xlsx/f3d2fe55-2cec-434f-92ad-ab88348eb7c5",
+      "sha256": "38a9bcb4717461a6905ca307da93ccd88576011cbffee4d2b50f0d76e67b4331",
+      "bytes": 315703
+    },
+    {
+      "sourceId": "mof_tax_expenditure_report_2024_xlsx_en",
+      "role": "archived_not_served",
+      "file": "sources/TER graphs ENG 2024.xlsx",
+      "originalFilename": "TER graphs  ENG 2024.xlsx",
+      "url": "https://mof.ge/files/download/TER%20graphs%20%20ENG%202024.xlsx/4d1e65e0-d625-4792-9842-c33fae9d97be",
+      "sha256": "6f19e8f4a9daf6c6e9487746fa328b5856d754642c1899b12cddc1625744c616",
+      "bytes": 295928
+    },
+    {
+      "sourceId": "mof_tax_expenditure_report_2024_pdf_ka",
+      "role": "archived_not_served",
+      "file": "sources/TER 2024 GEO.pdf",
+      "originalFilename": "TER 2024  GEO.pdf",
+      "url": "https://mof.ge/files/download/TER%202024%20%20GEO.pdf/e4b4ed16-2101-4e22-82fb-850864b30349",
+      "sha256": "a06d5515c301b07045bc255b95196a31e894184f7e5d0ddd91a082234da0cd58",
+      "bytes": 2335811
+    },
+    {
+      "sourceId": "mof_tax_expenditure_report_2024_pdf_en",
+      "role": "archived_not_served",
+      "file": "sources/TER 2024 ENG.pdf",
+      "originalFilename": "TER 2024  ENG.pdf",
+      "url": "https://mof.ge/files/download/TER%202024%20%20ENG.pdf/d1f7bc78-51d0-4ba2-9d86-0f27087dbeee",
+      "sha256": "434243ca1fbefd84ca8391877f52ccb2bf1b45c7f11aefd617fd9c1408a24125",
+      "bytes": 1295561
+    },
+    {
+      "sourceId": "treasury_tax_refunds_chart",
+      "role": "canonical_input",
+      "file": "sources/treasury-newChart-2026-10-21.xml",
+      "originalFilename": "newChart.xml",
+      "url": "https://www.treasury.ge/Content/charts/newChart.xml",
+      "sha256": "d5d5a1ce16cfd08b17a36f9f6f90a111d8e8adafaa1529920f45e6a13fba76aa",
+      "bytes": 1970
+    }
+  ],
+  "ministry": {
+    "sourceId": "mof_tax_expenditure_report_2024_xlsx_ka",
+    "years": [2018, 2019, 2020, 2021, 2022, 2023, 2024],
+    "sheets": [
+      {
+        "sheet": "Figure 1",
+        "labelColumn": "B",
+        "yearRow": 4,
+        "firstYearColumn": "C",
+        "rows": {
+          "tax_breaks.income.total": [5, "საშემოსავლო და მოგების გადასახადი"],
+          "tax_breaks.vat.total": [6, "დღგ"],
+          "tax_breaks.total": [7, "სულ საგადასახადო დანახარჯები"]
+        },
+        "controlRows": {}
+      },
+      {
+        "sheet": "Table 4",
+        "labelColumn": "H",
+        "yearRow": 7,
+        "firstYearColumn": "J",
+        "rows": {
+          "tax_breaks.vat.child_care": [11, "ბავშვთა მოვლა"],
+          "tax_breaks.vat.education": [12, "განათლება"],
+          "tax_breaks.vat.gambling": [13, "აზარტული თამაშები"],
+          "tax_breaks.vat.health": [14, "ჯანდაცვა"],
+          "tax_breaks.vat.vehicles": [15, "მსუბუქი ავტომობილები"],
+          "tax_breaks.vat.agriculture": [19, "სოფლის მეურნეობა"],
+          "tax_breaks.vat.medicines": [20, "ფარმაცევტული"],
+          "tax_breaks.vat.other": [24, "C. სხვა სექტორები"]
+        },
+        "controlRows": {
+          "vatGrandTotal": [26, "D. მთლიანი ჯამი (A + B + C)"]
+        }
+      },
+      {
+        "sheet": "Table 3 ",
+        "labelColumn": "G",
+        "yearRow": 8,
+        "firstYearColumn": "I",
+        "rows": {
+          "tax_breaks.income.personal": [22, "ჯამი,  საშემოსავლო (მემორანდუმის გარდა)"],
+          "tax_breaks.income.profit": [26, "II.ა. განაწილებული მოგების გადასახადი (DPT), სადაც:"],
+          "tax_breaks.income.old_profit": [43, "II.ბ. ძველი მოგების გადასახადის (CIT) რეჟიმი, სადაც:"],
+          "tax_breaks.income.other": [65, "ჯამი, სხვა"]
+        },
+        "controlRows": {
+          "incomeGrandTotal": [67, "მთლიანი ჯამი (I + II + III)"]
+        }
+      }
+    ]
+  },
+  "treasury": {
+    "sourceId": "treasury_tax_refunds_chart",
+    "seriesLabelKa": "საგადასახადო ზედმეტობების დაბრუნება",
+    "fullYears": [2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025],
+    "servedFromYear": 2008
+  }
+}

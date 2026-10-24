@@ -68,6 +68,8 @@ export function buildHubCards(
   presentation?: Presentation,
   /** General-government total spending by year, from the spending-by-type page. */
   expenditureTypeTotals: Map<number, number> = new Map(),
+  /** Tax refunds by year, from the tax breaks and refunds page. */
+  refundTotals: Map<number, number> = new Map(),
 ): HubCardModel[] {
   const locale = presentation?.locale ?? "ka";
   const translated = (key: string, originalKa: string, values?: TemplateValues) => presentation ? message(presentation.messages, key, values) : originalKa;
@@ -98,6 +100,7 @@ export function buildHubCards(
   const spendByType = build(expenditureTypeTotals);
   const revenues = build(revenue);
   const municipal = build(municipalTotals);
+  const refunds = build(refundTotals);
   const debtTotals = new Map<number, number>();
   for (const fact of debtFacts) {
     if (fact.seriesId === "debt.stock.total" && fact.status === "actual" && fact.value !== null) {
@@ -143,6 +146,19 @@ export function buildHubCards(
     },
     {
       index: "04",
+      title: translated("common.taxBreaksRefunds", BUDGET_SECTIONS.taxBreaksRefunds.label),
+      description: translated("hub.taxBreaksRefundsDescription", "რამდენ გადასახადს თმობს სახელმწიფო შეღავათებით და რამდენს უბრუნებს გადამხდელებს."),
+      href: BUDGET_SECTIONS.taxBreaksRefunds.href,
+      comingSoon: BUDGET_SECTIONS.taxBreaksRefunds.href === null,
+      // The sparkline traces refunds, the page's longer total (tax breaks start in 2018).
+      series: refunds.series,
+      seriesColor: refunds.series === null ? null : INK,
+      footer: refunds.latest === null
+        ? null
+        : translated("hub.taxBreaksRefundsFooter", `${refunds.latest} · დაბრუნება ${formatAmount(refundTotals.get(refunds.latest) ?? 0, locale)}`, { year: refunds.latest, amount: formatAmount(refundTotals.get(refunds.latest) ?? 0, locale) }),
+    },
+    {
+      index: "05",
       title: translated("common.municipalities", BUDGET_SECTIONS.municipalities.label),
       // The figure beside this is countryTotalFacts — the national roll-up,
       // which carries five excluded budget units and the Adjara A.R. republican
@@ -159,7 +175,7 @@ export function buildHubCards(
       footer: municipal.footer,
     },
     {
-      index: "05",
+      index: "06",
       title: translated("common.analysis", BUDGET_SECTIONS.analysis.label),
       description: translated("hub.analysisDescription", "ერთი წლის სურათი — სტრუქტურა, რეიტინგი და ყოველი 100 ₾."),
       href: BUDGET_SECTIONS.analysis.href,
@@ -172,7 +188,7 @@ export function buildHubCards(
           : translated("hub.analysisFooter", `${analysisYear} · ${categoryCount(facts, "expenditure", analysisYear)} კატეგორია`, { year: analysisYear, count: categoryCount(facts, "expenditure", analysisYear) }),
     },
     {
-      index: "06",
+      index: "07",
       title: translated("common.debt", BUDGET_SECTIONS.debt.label),
       description: translated("hub.debtDescription", "მთავრობის ვალის მოცულობა, გადახდა და საპროცენტო განაკვეთები."),
       href: BUDGET_SECTIONS.debt.href,
@@ -182,7 +198,7 @@ export function buildHubCards(
       footer: debt.footer,
     },
     {
-      index: "07",
+      index: "08",
       title: translated("common.deficit", BUDGET_SECTIONS.deficit.label),
       description: translated("hub.deficitDescription", "ზოგადი მთავრობის დეფიციტი ან პროფიციტი — მშპ-ის წილი და თანხა ლარში."),
       href: BUDGET_SECTIONS.deficit.href,

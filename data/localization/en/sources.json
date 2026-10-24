@@ -3809,5 +3809,25 @@
   "source.geostat_transport_sea_page": {
     "name": { "text": "Maritime transport (source page capture)", "reviewedAt": "2026-10-20" },
     "derivation": null
+  },
+  "source.mof_tax_expenditure_report_2024_xlsx_ka": {
+    "name": { "text": "Ministry of Finance, Tax Expenditure Report 2024: graphs and tables (Georgian)", "reviewedAt": "2026-10-21" },
+    "derivation": null
+  },
+  "source.mof_tax_expenditure_report_2024_xlsx_en": {
+    "name": { "text": "Ministry of Finance, Tax Expenditure Report 2024: graphs and tables (English)", "reviewedAt": "2026-10-21" },
+    "derivation": null
+  },
+  "source.mof_tax_expenditure_report_2024_pdf_ka": {
+    "name": { "text": "Ministry of Finance, Tax Expenditure Report 2024 (Georgian PDF)", "reviewedAt": "2026-10-21" },
+    "derivation": null
+  },
+  "source.mof_tax_expenditure_report_2024_pdf_en": {
+    "name": { "text": "Ministry of Finance, Tax Expenditure Report 2024 (English PDF)", "reviewedAt": "2026-10-21" },
+    "derivation": null
+  },
+  "source.treasury_tax_refunds_chart": {
+    "name": { "text": "State Treasury, return of tax overpayments by year", "reviewedAt": "2026-10-21" },
+    "derivation": null
   }
 }

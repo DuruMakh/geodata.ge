@@ -42,7 +42,7 @@ export type TopicDatasetId =
   | "funded-pension";
 
 /** An official statistics producer whose published figures a dataset is read from. */
-export type SourceAgencyId = "geostat" | "nbg" | "ssa" | "mof" | "pension_fund";
+export type SourceAgencyId = "geostat" | "nbg" | "ssa" | "mof" | "treasury" | "pension_fund";
 
 const SOURCE_AGENCIES: Record<SourceAgencyId, { name: Localized; url: string }> = {
   geostat: {
@@ -60,6 +60,10 @@ const SOURCE_AGENCIES: Record<SourceAgencyId, { name: Localized; url: string }> 
   mof: {
     name: { ka: "საქართველოს ფინანსთა სამინისტრო", en: "Ministry of Finance of Georgia" },
     url: "https://mof.ge",
+  },
+  treasury: {
+    name: { ka: "სახაზინო სამსახური", en: "State Treasury of Georgia" },
+    url: "https://www.treasury.ge",
   },
   pension_fund: {
     name: { ka: "საქართველოს საპენსიო ფონდი", en: "Pension Fund of Georgia" },
@@ -342,6 +346,17 @@ const TOPIC_DATASETS: Record<TopicDatasetId, { keywords: Record<Locale, readonly
       en: "Reviewed Geostat annual national accounts: GDP by categories of use at current prices, GDP shares and real volume growth.",
     },
     sources: ["geostat"],
+  },
+  "tax-breaks-refunds": {
+    keywords: {
+      ka: ["საგადასახადო შეღავათები", "საგადასახადო დანახარჯები", "დღგ", "გადასახადის დაბრუნება", "საქართველო"],
+      en: ["Georgia", "tax breaks", "tax expenditures", "VAT", "tax refunds"],
+    },
+    measurementTechnique: {
+      ka: "გადამოწმებული ამოღება ფინანსთა სამინისტროს საგადასახადო დანახარჯების ანგარიშიდან და სახაზინო სამსახურის გამოქვეყნებული მონაცემებიდან.",
+      en: "Reviewed extraction from the Ministry of Finance's Tax Expenditure Report and the State Treasury's published figures.",
+    },
+    sources: ["mof", "treasury"],
   },
   housing: {
     keywords: {

@@ -9631,5 +9631,80 @@
       "reviewedAt": "2026-10-20"
     },
     "documentLanguage": "ka"
+  },
+  "mof_tax_expenditure_report_2024_xlsx_ka": {
+    "title": {
+      "text": "Tax Expenditure Report 2024, figures and tables (Georgian)",
+      "reviewedAt": "2026-10-21"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-10-21"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-10-21"
+    },
+    "documentLanguage": "ka"
+  },
+  "mof_tax_expenditure_report_2024_xlsx_en": {
+    "title": {
+      "text": "Tax Expenditure Report 2024, figures and tables (English)",
+      "reviewedAt": "2026-10-21"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-10-21"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-10-21"
+    },
+    "documentLanguage": "en"
+  },
+  "mof_tax_expenditure_report_2024_pdf_ka": {
+    "title": {
+      "text": "Tax Expenditure Report 2024 (Georgian)",
+      "reviewedAt": "2026-10-21"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-10-21"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-10-21"
+    },
+    "documentLanguage": "ka"
+  },
+  "mof_tax_expenditure_report_2024_pdf_en": {
+    "title": {
+      "text": "Tax Expenditure Report 2024 (English)",
+      "reviewedAt": "2026-10-21"
+    },
+    "publisher": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-10-21"
+    },
+    "attribution": {
+      "text": "Ministry of Finance of Georgia",
+      "reviewedAt": "2026-10-21"
+    },
+    "documentLanguage": "en"
+  },
+  "treasury_tax_refunds_chart": {
+    "title": {
+      "text": "Tax overpayment refunds, State Treasury chart data",
+      "reviewedAt": "2026-10-21"
+    },
+    "publisher": {
+      "text": "State Treasury of Georgia",
+      "reviewedAt": "2026-10-21"
+    },
+    "attribution": {
+      "text": "State Treasury of Georgia",
+      "reviewedAt": "2026-10-21"
+    },
+    "documentLanguage": "ka"
   }
 }

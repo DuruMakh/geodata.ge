@@ -121,7 +121,8 @@ describe("indexable Fiscal.ge routes", () => {
     // Internet and technology adds its hub, four pages, a page for Georgia and each of the 11 regions and its methodology page: 18 bilingual pairs.
     // Spending by type adds its Budget page and its methodology page: 2 bilingual pairs.
     // The funded pension adds one Health and social protection page: 1 bilingual pair.
-    expect(urls).toHaveLength(1546);
+    // Tax breaks and refunds adds its Budget page and its methodology page: 2 bilingual pairs.
+    expect(urls).toHaveLength(1550);
     expect(new Set(urls).size).toBe(urls.length);
     expect(urls.every((url) => url.startsWith("https://fiscal.ge/"))).toBe(true);
     expect(urls).toContain("https://fiscal.ge/about");
@@ -252,6 +253,7 @@ describe("indexable Fiscal.ge routes", () => {
       "/methodology/expenditure",
       "/methodology/expenditure-types",
       "/methodology/revenue",
+      "/methodology/tax-breaks-refunds",
       "/methodology/municipalities",
       "/methodology/debt",
       "/methodology/gdp",
