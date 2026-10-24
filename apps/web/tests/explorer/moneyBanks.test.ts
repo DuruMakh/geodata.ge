@@ -15,7 +15,7 @@ import { getMessages } from "../../lib/i18n/messages.server";
 import type { Presentation } from "../../lib/i18n/types";
 import { loadMoneyBanksWorkbookSources, moneyBanksPageMetadata, renderMoneyBanksPage } from "../../lib/pages/moneyBanks";
 import { renderPageMarkup } from "../helpers/render-localized";
-import { ciede2000 } from "../helpers/ciede2000";
+import { ciede2000 } from "../helpers/contrast";
 import { loadMoneyBanksCsv, yearSpan } from "../helpers/money-banks-csv";
 import {
   MONEY_BANKS_LOAN_BREAKS, MONEY_BANKS_SECTIONS, buildMoneyBanksModel, changeMoneyBanksView, defaultMoneyBanksState, moneyBanksCoverage, moneyBanksDefaultSelection, moneyBanksViewSeries, moneyBanksViews,

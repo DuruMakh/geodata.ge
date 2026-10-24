@@ -54,7 +54,7 @@ describe("the navigation tree", () => {
     ]);
   });
 
-  it("lists the four social protection pages under Health, after Causes of death", () => {
+  it("lists the five social protection pages under Health, after Causes of death", () => {
     const hub = NAV_TREE.find((entry) => entry.href === "/explorer/health")!;
     expect(hub.sections.map((section) => [section.href, section.testId])).toEqual([
       ["/explorer/health/doctors-hospitals", "health-doctors-hospitals-link"],
@@ -64,6 +64,7 @@ describe("the navigation tree", () => {
       ["/explorer/health/pensions", "health-pensions-link"],
       ["/explorer/health/subsistence-allowance", "health-subsistence-allowance-link"],
       ["/explorer/health/social-package", "health-social-package-link"],
+      ["/explorer/health/funded-pension", "health-funded-pension-link"],
     ]);
     expect(openHub("/explorer/health/pensions/region/guria")).toBe(hub);
     expect(currentEntry("/explorer/health/pensions/region/guria")).toBe("/explorer/health/pensions");
@@ -149,10 +150,12 @@ describe("the explorer footer source note", () => {
     expect(sourceNoteKey("/explorer/demography/population/region/imereti")).toBe("common.geostatSourceNote");
     expect(sourceNoteKey("/explorer/education")).toBe("common.geostatSourceNote");
     expect(sourceNoteKey("/explorer/education/schools/batumi")).toBe("common.geostatSourceNote");
-    expect(sourceNoteKey("/explorer/health")).toBe("common.socialSourceNote");
+    expect(sourceNoteKey("/explorer/health")).toBe("common.socialHubSourceNote");
     expect(sourceNoteKey("/explorer/health/illnesses")).toBe("common.geostatSourceNote");
     expect(sourceNoteKey("/explorer/health/social-payments")).toBe("common.socialSourceNote");
     expect(sourceNoteKey("/explorer/health/pensions/region/guria")).toBe("common.socialSourceNote");
+    // The funded pension page is read from the Pension Fund's statements, not the Social Service Agency's tables.
+    expect(sourceNoteKey("/explorer/health/funded-pension")).toBe("common.fundedPensionSourceNote");
     expect(sourceNoteKey("/explorer/science-culture")).toBe("common.geostatSourceNote");
     expect(sourceNoteKey("/explorer/science-culture/museums/guria")).toBe("common.geostatSourceNote");
   });

@@ -4,8 +4,7 @@ import { DEFAULT_SECTOR_STATE, parseSectorHash, serializeSectorHash, changeSecto
 import type { ServedSectorObservation } from "../../lib/data/economicSectors/types";
 import { sourceIdByMeasure } from "../../lib/explorer/clientData";
 import { ACCENT, INK, OTHER_COLOR, SERIES_COLORS } from "../../lib/explorer/colors";
-import { ciede2000 } from "../helpers/ciede2000";
-import { contrastRatio } from "../helpers/contrast";
+import { ciede2000, contrastRatio } from "../helpers/contrast";
 const ids = registry.map(r => r.id);
 const make = (seriesId: string, year: number, measure: ServedSectorObservation["measure"], value: number): ServedSectorObservation => ({
   seriesId, year, measure, value, unit: measure === "nominal" ? "gel" : "percent", valuation: seriesId === "economy.gdp_total" ? "market_prices" : "basic_prices",

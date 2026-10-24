@@ -204,3 +204,7 @@ canonical_decision_id,dataset_id,canonical_document,canonical_heading,public_dec
 "internet.excluded","internet","docs/data-methodology/internet-annual.md","Tables left out","internet.excluded","limitation","2026-10-20"
 "internet.activities","internet","docs/data-methodology/internet-annual.md","Activities and public services","internet.activities","official_fact","2026-10-20"
 "internet.values","internet","docs/data-methodology/internet-annual.md","Values as Geostat publishes them","internet.values","geodata_decision","2026-10-20"
+"tax-breaks-refunds.two_totals","tax-breaks-refunds","docs/data-methodology/tax-breaks-refunds.md","Serving","tax-breaks-refunds.two_totals","geodata_decision","2026-10-21"
+"tax-breaks-refunds.georgian_workbook","tax-breaks-refunds","docs/data-methodology/tax-breaks-refunds.md","Scope and sources","tax-breaks-refunds.georgian_workbook","geodata_decision","2026-10-21"
+"tax-breaks-refunds.refunds_from_2008","tax-breaks-refunds","docs/data-methodology/tax-breaks-refunds.md","Scope and sources","tax-breaks-refunds.refunds_from_2008","geodata_decision","2026-10-21"
+"tax-breaks-refunds.gdp_share","tax-breaks-refunds","docs/data-methodology/tax-breaks-refunds.md","Share of GDP","tax-breaks-refunds.gdp_share","geodata_decision","2026-10-21"

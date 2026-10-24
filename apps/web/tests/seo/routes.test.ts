@@ -120,9 +120,11 @@ describe("indexable Fiscal.ge routes", () => {
     // Transport adds its hub, five pages, a page for Georgia and each of the 11 regions and its methodology page: 19 bilingual pairs.
     // Internet and technology adds its hub, four pages, a page for Georgia and each of the 11 regions and its methodology page: 18 bilingual pairs.
     // Spending by type adds its Budget page and its methodology page: 2 bilingual pairs.
+    // The funded pension adds one Health and social protection page: 1 bilingual pair.
+    // Tax breaks and refunds adds its Budget page and its methodology page: 2 bilingual pairs.
     // Who borrows adds one page to Money and banks: 1 bilingual pair.
     // Loans by region adds its index and a page for Georgia and each of the 11 regions to Money and banks: 13 bilingual pairs.
-    expect(urls).toHaveLength(1572);
+    expect(urls).toHaveLength(1578);
     expect(new Set(urls).size).toBe(urls.length);
     expect(urls.every((url) => url.startsWith("https://fiscal.ge/"))).toBe(true);
     expect(urls).toContain("https://fiscal.ge/about");
@@ -213,8 +215,8 @@ describe("indexable Fiscal.ge routes", () => {
       expect(urls).not.toContain(`https://fiscal.ge/explorer/education/${set}/tbilisi`);
     }
     expect(urls.some(url => /\/explorer\/education\/.*\/\d{2}$/.test(url))).toBe(false);
-    // Social protection sits on the Health hub: two topic pages, and two map indexes with 75 place pages each.
-    for (const page of ["/social-payments", "/social-package", ...["pensions", "subsistence-allowance"].flatMap(set => [`/${set}`, `/${set}/georgia`, ...educationRegions.map(region => `/${set}/region/${region}`), `/${set}/batumi`, `/${set}/ozurgeti`])]) {
+    // Social protection sits on the Health hub: three topic pages, and two map indexes with 75 place pages each.
+    for (const page of ["/social-payments", "/social-package", "/funded-pension", ...["pensions", "subsistence-allowance"].flatMap(set => [`/${set}`, `/${set}/georgia`, ...educationRegions.map(region => `/${set}/region/${region}`), `/${set}/batumi`, `/${set}/ozurgeti`])]) {
       expect(urls).toContain(`https://fiscal.ge/explorer/health${page}`);
       expect(urls).toContain(`https://fiscal.ge/en/explorer/health${page}`);
     }
@@ -253,6 +255,7 @@ describe("indexable Fiscal.ge routes", () => {
       "/methodology/expenditure",
       "/methodology/expenditure-types",
       "/methodology/revenue",
+      "/methodology/tax-breaks-refunds",
       "/methodology/municipalities",
       "/methodology/debt",
       "/methodology/gdp",
