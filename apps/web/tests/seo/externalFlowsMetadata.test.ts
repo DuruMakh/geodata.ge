@@ -13,7 +13,7 @@ import {
   currentAccountMetadata, externalPositionMetadata, foreignInvestmentMetadata, moneyFromAbroadMetadata,
   renderCurrentAccountPage, renderExternalPositionPage, renderForeignInvestmentPage, renderMoneyFromAbroadPage,
 } from "../../lib/pages/external";
-import { externalHubMetadata } from "../../lib/pages/hubs/external";
+import { groupPageMetadata } from "../../lib/pages/group";
 import { renderPageMarkup } from "../helpers/render-localized";
 
 beforeAll(() => vi.stubEnv("NEXT_PUBLIC_SITE_URL", "https://fiscal.ge"));
@@ -61,10 +61,11 @@ describe.each(["ka", "en"] as const)("External flows pages name themselves and t
   });
 });
 
-// U23-10: the hub's search description names all three of its pages, the current account included.
-it.each(["ka", "en"] as const)("the External flows hub description names its three pages: %s", async (locale) => {
-  const { description } = await externalHubMetadata(locale);
-  for (const term of locale === "en" ? ["money transfers", "foreign direct investment", "current account"] : ["ფულადი გზავნილები", "პირდაპირი უცხოური ინვესტიციები", "მიმდინარე ანგარიშ"]) {
+// U23-10: the hub's search description named its pages. The hub is the External sector group page now (spec
+// 2026-10-24-explorer-regroup §5), and its description names trade beside the external flows.
+it.each(["ka", "en"] as const)("the External sector page's description names trade and the external flows: %s", (locale) => {
+  const { description } = groupPageMetadata("external", locale);
+  for (const term of locale === "en" ? ["trade", "remittances", "foreign investment", "foreign debt", "reserves"] : ["საგარეო ვაჭრობა", "ფულადი გზავნილები", "უცხოური ინვესტიციები", "საგარეო ვალი", "რეზერვები"]) {
     expect(description).toContain(term);
   }
 });

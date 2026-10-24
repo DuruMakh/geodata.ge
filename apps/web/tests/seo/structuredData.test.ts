@@ -5,7 +5,7 @@ import { JsonLd } from "../../components/seo/json-ld";
 import { appRoutes, routeFor } from "../helpers/appRoutes";
 import { DEMOGRAPHY_HUB_PATH } from "../../lib/explorer/demographyRoutes";
 import { pageHref, splitLanguagePath } from "../../lib/i18n/routes";
-import { NAV_TREE, openHub } from "../../lib/navigation/navTree";
+import { NAV_GROUPS, NAV_TREE, openHub } from "../../lib/navigation/navTree";
 import { isTopicDatasetId } from "../../lib/seo/datasetVocabulary";
 import sitemap from "../../lib/seo/sitemap";
 import {
@@ -653,9 +653,9 @@ describe("Dataset nodes across the sitemap", () => {
   beforeAll(() => vi.stubEnv("NEXT_PUBLIC_SITE_URL", "https://fiscal.ge"));
   afterAll(() => vi.unstubAllEnvs());
 
-  // The pages with no Dataset of their own: the hubs (the navigation tree's hub rows), demography (spec section 10:
-  // no Dataset markup yet), the single-year analysis view, the methodology catalog page and the site pages.
-  const hubs = new Set<string>(NAV_TREE.map((hub) => hub.href));
+  // The pages with no Dataset of their own: the hubs (the navigation tree's hub rows) and the group pages, demography (spec
+  // section 10: no Dataset markup yet), the single-year analysis view, the methodology catalog page and the site pages.
+  const hubs = new Set<string>([...NAV_TREE.map((hub) => hub.href), ...NAV_GROUPS.map((group) => group.href)]);
   const carriesDataset = (page: string) =>
     (page.startsWith("/explorer/") || page.startsWith("/methodology/")) && !hubs.has(page) &&
     !page.startsWith(`${DEMOGRAPHY_HUB_PATH}/`) && page !== "/methodology/demography" && page !== "/explorer/analysis";

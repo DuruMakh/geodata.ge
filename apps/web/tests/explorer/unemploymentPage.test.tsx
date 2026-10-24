@@ -4,8 +4,8 @@ import { renderUnemploymentPage, unemploymentPageMetadata } from "../../lib/page
 import { DataSidebar } from "../../components/shell/data-sidebar";
 import { I18nProvider } from "../../lib/i18n/provider";
 import { getMessages } from "../../lib/i18n/messages.server";
-import GeorgianUnemploymentHub from "../../app/(ka)/explorer/unemployment/page";
-import EnglishUnemploymentHub from "../../app/(en)/en/explorer/unemployment/page";
+import GeorgianLabourPage from "../../app/(ka)/explorer/labour/page";
+import EnglishLabourPage from "../../app/(en)/en/explorer/labour/page";
 import { renderPageMarkup } from "../helpers/render-localized";
 import { UnemploymentExplorer } from "../../components/unemployment/unemployment-explorer";
 import { loadServedUnemploymentData, UNEMPLOYMENT_GROUPS } from "../../lib/data/unemployment/importUnemployment";
@@ -14,17 +14,18 @@ import type { ClientUnemploymentObservation } from "../../lib/data/unemployment/
 const navigation = vi.hoisted(() => ({ pathname: "/en/explorer/unemployment" }));
 vi.mock("next/navigation", async importOriginal => ({ ...await importOriginal<typeof import("next/navigation")>(), usePathname: () => navigation.pathname, useRouter: () => ({ replace: () => {} }) }));
 
-test.each(["ka", "en"] as const)("the %s landing page offers eight cards in the approved order", async locale => {
-  const markup = renderToStaticMarkup(await (locale === "ka" ? GeorgianUnemploymentHub() : EnglishUnemploymentHub()));
-  expect(markup).toContain('data-testid="unemployment-hub"');
-  const hrefs = [...markup.matchAll(/<a\b[^>]*data-testid="hub-card"[^>]*>/g)].map(match => /href="([^"]+)"/.exec(match[0])![1]);
+// The landing page is the Unemployment section of the Labour market page now (spec 2026-10-24-explorer-regroup §5).
+test.each(["ka", "en"] as const)("the %s Unemployment section offers eight cards in the approved order", async locale => {
+  const page = renderToStaticMarkup(await (locale === "ka" ? GeorgianLabourPage() : EnglishLabourPage()));
+  const markup = /<section[^>]*id="t-unemployment"[^>]*>([\s\S]*?)<\/section>/.exec(page)![1];
+  const hrefs = [...markup.matchAll(/<a\b[^>]*data-testid="explorer-card"[^>]*>/g)].map(match => /href="([^"]+)"/.exec(match[0])![1]);
   expect(hrefs).toEqual(["overview", "regions", "age", "gender", "industries", "hours", "informal", "young-people"].map(section => `${locale === "en" ? "/en" : ""}/explorer/unemployment/${section}`));
   const common = await getMessages(locale, ["common"]);
-  const titles = [...markup.matchAll(/data-testid="hub-card"[\s\S]*?<\/a>/g)].map(match => match[0]);
+  const titles = [...markup.matchAll(/data-testid="explorer-card"[\s\S]*?<\/a>/g)].map(match => match[0]);
   expect(titles).toHaveLength(8);
   ["unemploymentIndustries", "unemploymentHours", "unemploymentInformal", "unemploymentYoungPeople"].forEach((key, offset) => expect(titles[4 + offset]).toContain(common[`common.${key}`]));
   expect(markup.match(/>0[1-8]</g)).toEqual(["01", "02", "03", "04", "05", "06", "07", "08"].map(n => `>${n}<`));
-  expect(markup).not.toContain('data-testid="unemployment-explorer"');
+  expect(page).not.toContain('data-testid="unemployment-explorer"');
 });
 
 for (const [section, breakdown] of [["overview", "national"], ["age", "age"], ["gender", "sex"]] as const) test.each(["ka", "en"] as const)(`renders a static %s ${section} explorer with its own scope and metadata`, async locale => {

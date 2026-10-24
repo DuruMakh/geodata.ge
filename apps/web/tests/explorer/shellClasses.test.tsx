@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 import type { Locale } from "../../lib/i18n/types";
 import { renderPageMarkup } from "../helpers/render-localized";
 
-// The budget hub's legacy-hash redirect reads the router; no other page here does.
+// The budget hub's legacy-hash redirect and the group pages' topic scroll read the router.
 vi.mock("next/navigation", async (original) => ({ ...(await original<typeof import("next/navigation")>()), useRouter: () => ({ replace() {} }) }));
 
 // The class lists the explorer shell renders on each page, pinned before the
@@ -14,8 +14,8 @@ const PAGES: ReadonlyArray<{ name: string; render: (locale: Locale) => Promise<u
   { name: "deficit", render: async (l) => (await import("../../lib/pages/deficit")).renderDeficitPage(l) },
   { name: "gdp", render: async (l) => (await import("../../lib/pages/gdp")).renderGdpPage(l) },
   { name: "sectors", render: async (l) => (await import("../../lib/pages/economic-sectors")).renderEconomicSectorsPage(l) },
-  { name: "economy", render: async (l) => (await import("../../lib/pages/economy")).renderEconomyPage(l) },
-  { name: "inflation", render: async (l) => (await import("../../lib/pages/hubs/inflation")).renderInflationHub(l) },
+  { name: "economy", render: async (l) => (await import("../../lib/pages/group")).renderGroupPage("economy", l) },
+  { name: "prices", render: async (l) => (await import("../../lib/pages/group")).renderGroupPage("prices", l) },
   { name: "inflation-overview", render: async (l) => (await import("../../lib/pages/inflation-overview")).renderInflationOverview(l) },
   { name: "inflation-categories", render: async (l) => (await import("../../lib/pages/inflation-categories")).renderInflationCategories(l) },
   { name: "regions", render: async (l) => (await import("../../lib/pages/regional-economies")).renderRegionalEconomiesPage(l) },

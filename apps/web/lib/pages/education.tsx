@@ -22,24 +22,9 @@ import { loadSourcedWorkbookSources } from "../methodology/workbookSources";
 import { fiscalMetadata } from "../seo/metadata";
 import { explorerDatasetJsonLd } from "../seo/structuredData";
 import { resolveSiteUrl } from "../siteUrl";
-import { TopicHub } from "./hub";
-import { TOPIC_HUB_LOADERS, topicHubCoverage } from "./topicHubs.server";
 
 /** The figure each topic page's latest line names, by the template's placeholder. */
 const LATEST_FIGURE: Record<EducationTopicId, string> = { universities: "students", vocational: "admitted" };
-
-export async function educationHubMetadata(locale: Locale) {
-  const messages = await getMessages(locale, ["education"]);
-  return fiscalMetadata({ locale, path: EDUCATION_HUB_PATH, title: message(messages, "education.metaTitle"), description: message(messages, "education.metaDescription") });
-}
-
-/** The hub: one card per page, Schools, Kindergartens, Universities and Vocational colleges, each from served facts. */
-export async function renderEducationHub(locale: Locale) {
-  const [hub, presentation] = await Promise.all([TOPIC_HUB_LOADERS.education(locale), getPresentation(locale, ["education"], [])]);
-  const { messages } = presentation;
-  return <TopicHub locale={locale} presentation={presentation} title={message(messages, "education.title")} summary={message(messages, "education.hubSummary")} path={EDUCATION_HUB_PATH}
-    coverage={topicHubCoverage(messages, locale, hub)} cards={hub.cards} testId="education-hub" />;
-}
 
 const topicHref = (section: EducationTopicId) => EDUCATION_SECTIONS.find(item => item.id === section)!.href;
 

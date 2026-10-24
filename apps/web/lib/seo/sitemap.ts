@@ -20,42 +20,41 @@ import { loadServedPovertyData } from "../data/poverty/importPoverty";
 import { POVERTY_SECTIONS } from "../explorer/poverty";
 import { loadServedHouseholdData } from "../data/household/importHousehold";
 import { HOUSEHOLD_PAGE_AREAS, HOUSEHOLD_SECTIONS, householdRegionHref } from "../explorer/household";
-import { LIVING_STANDARDS_HUB_PATH } from "../explorer/livingStandards";
 import { loadServedHealthData } from "../data/health/importHealth";
 import { HEALTH_DEATH_AREAS, healthDeathsAreaHref } from "../explorer/healthDeaths";
-import { HEALTH_HUB_PATH, HEALTH_SECTIONS } from "../explorer/health";
+import { HEALTH_SECTIONS } from "../explorer/health";
 import { loadServedCrimeData } from "../data/crime/importCrime";
-import { CRIME_HUB_PATH, CRIME_SECTIONS } from "../explorer/crime";
+import { CRIME_SECTIONS } from "../explorer/crime";
 import { loadServedEducationData } from "../data/education/importEducation";
 import { loadServedEnvironmentData } from "../data/environment/importEnvironment";
 import { ENVIRONMENT_CITIES } from "../data/environment/types";
-import { ENVIRONMENT_HUB_PATH, ENVIRONMENT_SECTIONS } from "../explorer/environment";
+import { ENVIRONMENT_SECTIONS } from "../explorer/environment";
 import { environmentCityHref } from "../explorer/environmentCities";
 import { ENVIRONMENT_AREAS, environmentAreaRoutes } from "../explorer/environmentAreas";
 import { loadServedLabourData } from "../data/labour/importLabour";
-import { EDUCATION_HUB_PATH, EDUCATION_SECTIONS } from "../explorer/education";
+import { EDUCATION_SECTIONS } from "../explorer/education";
 import { educationPlaceBase } from "../explorer/educationPlaces";
 import { loadServedSocialData } from "../data/social/importSocial";
 import { SOCIAL_SECTIONS } from "../explorer/social";
 import { socialPlaceBase } from "../explorer/socialPlaces";
 import { loadServedScienceCultureData } from "../data/scienceCulture/importScienceCulture";
-import { SCIENCE_CULTURE_HUB_PATH, SCIENCE_CULTURE_SECTIONS } from "../explorer/scienceCulture";
+import { SCIENCE_CULTURE_SECTIONS } from "../explorer/scienceCulture";
 import { MUSEUM_AREAS, museumAreaHref } from "../explorer/scienceCultureMuseums";
 import { loadServedEnergyFoodData } from "../data/energyFood/importEnergyFood";
-import { ENERGY_FOOD_HUB_PATH, ENERGY_FOOD_SECTIONS, energyFoodLastReviewedAt } from "../explorer/energyFood";
+import { ENERGY_FOOD_SECTIONS, energyFoodLastReviewedAt } from "../explorer/energyFood";
 import { loadServedMoneyBanksData } from "../data/moneyBanks/importMoneyBanks";
 import { MONEY_BANKS_SECTIONS } from "../explorer/moneyBanks";
 import { loadServedBusinessData } from "../data/business/importBusiness";
-import { BUSINESS_HUB_PATH, BUSINESS_SECTIONS } from "../explorer/business";
+import { BUSINESS_SECTIONS } from "../explorer/business";
 import { BUSINESS_AREAS, businessAreaHref } from "../explorer/businessAreas";
 import { loadServedHousingData } from "../data/housing/importHousing";
-import { HOUSING_HUB_PATH, HOUSING_SECTIONS } from "../explorer/housing";
+import { HOUSING_SECTIONS } from "../explorer/housing";
 import { HOUSING_AREAS, housingAreaHref } from "../explorer/housingAreas";
 import { loadServedInternetData } from "../data/internet/importInternet";
-import { INTERNET_HUB_PATH, INTERNET_SECTIONS } from "../explorer/internet";
+import { INTERNET_SECTIONS } from "../explorer/internet";
 import { INTERNET_AREAS, internetAreaHref } from "../explorer/internetAreas";
 import { loadServedTransportData } from "../data/transport/importTransport";
-import { TRANSPORT_HUB_PATH, TRANSPORT_SECTIONS } from "../explorer/transport";
+import { TRANSPORT_SECTIONS } from "../explorer/transport";
 import { TRANSPORT_AREAS, transportAreaHref } from "../explorer/transportAreas";
 import { loadServedTradePartnersData } from "../data/tradePartners/importTradePartners";
 import { loadServedMoneyTransfersData } from "../data/externalFlows/importMoneyTransfers";
@@ -74,12 +73,13 @@ import {
 } from "../explorer/municipalData";
 import { CITY_PAGE_PATHS } from "../explorer/inflationCityRoutes";
 import { placePagePaths, populationPlacePaths } from "../explorer/demographyPlaceRoutes";
-import { DEMOGRAPHY_HUB_PATH, LIVE_DEMOGRAPHY_PAGES } from "../explorer/demographyRoutes";
+import { LIVE_DEMOGRAPHY_PAGES } from "../explorer/demographyRoutes";
 import { MUNICIPALITY_ROUTES } from "../explorer/municipalityRoutes";
 import { resolveSiteUrl } from "../siteUrl";
 import { awaitNamed } from "../awaitNamed";
 import { DEBT_EXPLORER_PATH, DEFICIT_EXPLORER_PATH } from "./internalLinks";
 import { pageHref } from "../i18n/routes";
+import { NAV_GROUPS, type TopicId } from "../navigation/navTree";
 import { UNEMPLOYMENT_SECTIONS } from "../explorer/unemploymentSections";
 import { LABOUR_SECTIONS } from "../explorer/labour";
 import { unemploymentRegionHref } from "../explorer/unemploymentRegionRoutes";
@@ -244,61 +244,73 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     return reviewed ? new Date(reviewed) : undefined;
   };
 
+  // Each topic hub's date: the newest dataset its cards read. A group page carries the newest of its topics', as its header does.
+  const topicModified: Record<TopicId, Date | undefined> = {
+    budget: budgetHubReviewedAt ? new Date(budgetHubReviewedAt) : undefined,
+    economy: economyModified,
+    business: businessModified,
+    housing: housingModified,
+    inflation: inflationHubModified,
+    money: moneyBanksModified,
+    unemployment: labourModified > unemploymentModified ? labourModified : unemploymentModified,
+    wages: wagesModified,
+    "living-standards": livingStandardsModified,
+    health: healthHubModified,
+    education: educationModified,
+    "science-culture": scienceCultureModified,
+    crime: crimeModified,
+    internet: internetModified,
+    trade: tradeHubModified,
+    external: externalModified,
+    "energy-food": energyFoodModified,
+    environment: environmentModified,
+    transport: transportModified,
+    demography: demographyModified,
+  };
+  const groupModified = (topics: readonly TopicId[]): Date | undefined =>
+    topics.map((topic) => topicModified[topic]).reduce<Date | undefined>((latest, date) => (date && (!latest || date > latest) ? date : latest), undefined);
+
   const georgian: MetadataRoute.Sitemap = [
     { url: `${siteUrl}/`, lastModified },
     { url: `${siteUrl}/about`, lastModified },
     { url: `${siteUrl}/connect`, lastModified },
     // /mcp itself is never listed: a POST-only protocol endpoint answers a
     // crawler's GET with 405, so it is not a page to index.
-    { url: `${siteUrl}/explorer`, lastModified: budgetHubReviewedAt ? new Date(budgetHubReviewedAt) : undefined },
-    { url: `${siteUrl}/explorer/economy`, lastModified: economyModified },
+    { url: `${siteUrl}/explorer`, lastModified: topicModified.budget },
+    // The group pages replace the topic hubs, whose addresses forward to them (next.config.ts).
+    ...NAV_GROUPS.map((group) => ({ url: `${siteUrl}${group.href}`, lastModified: groupModified(group.topics) })),
     { url: `${siteUrl}/explorer/economy/gdp`, lastModified: gdpModified },
     { url: `${siteUrl}/explorer/economy/sectors`, lastModified: sectorsModified },
     { url: `${siteUrl}/explorer/economy/expenditure`, lastModified: gdpExpenditureModified },
-    { url: `${siteUrl}${BUSINESS_HUB_PATH}`, lastModified: businessModified },
     ...BUSINESS_SECTIONS.map(section => ({ url: `${siteUrl}${section.href}`, lastModified: businessModified })),
     ...BUSINESS_AREAS.map(area => ({ url: `${siteUrl}${businessAreaHref(area)}`, lastModified: businessModified })),
-    { url: `${siteUrl}${HOUSING_HUB_PATH}`, lastModified: housingModified },
     ...HOUSING_SECTIONS.map(section => ({ url: `${siteUrl}${section.href}`, lastModified: housingModified })),
     ...HOUSING_AREAS.map(area => ({ url: `${siteUrl}${housingAreaHref(area)}`, lastModified: housingModified })),
-    { url: `${siteUrl}/explorer/unemployment`, lastModified: labourModified > unemploymentModified ? labourModified : unemploymentModified },
-    { url: `${siteUrl}/explorer/wages`, lastModified: wagesModified },
     ...WAGES_SECTIONS.map(section => ({ url: `${siteUrl}${section.href}`, lastModified: wagesModified })),
     ...WAGES_REGIONS.map(id => ({ url: `${siteUrl}${wagesRegionHref(id)}`, lastModified: wagesModified })),
-    { url: `${siteUrl}${LIVING_STANDARDS_HUB_PATH}`, lastModified: livingStandardsModified },
     ...HOUSEHOLD_SECTIONS.map(section => ({ url: `${siteUrl}${section.href}`, lastModified: householdModified })),
     ...HOUSEHOLD_SECTIONS.flatMap(section => HOUSEHOLD_PAGE_AREAS.map(id => ({ url: `${siteUrl}${householdRegionHref(section.id, id)}`, lastModified: householdModified }))),
     ...POVERTY_SECTIONS.map(section => ({ url: `${siteUrl}${section.href}`, lastModified: povertyModified })),
-    { url: `${siteUrl}${HEALTH_HUB_PATH}`, lastModified: healthHubModified },
     ...HEALTH_SECTIONS.map(section => ({ url: `${siteUrl}${section.href}`, lastModified: healthModified })),
     ...HEALTH_DEATH_AREAS.map(area => ({ url: `${siteUrl}${healthDeathsAreaHref(area)}`, lastModified: healthModified })),
     ...SOCIAL_SECTIONS.map(section => ({ url: `${siteUrl}${section.href}`, lastModified: socialModified })),
     ...(["pensions", "subsistence-allowance"] as const).flatMap(set => placePagePaths(socialPlaceBase(set), regions.map((region) => region.id)).map((path) => ({ url: `${siteUrl}${path}`, lastModified: socialModified }))),
-    { url: `${siteUrl}${CRIME_HUB_PATH}`, lastModified: crimeModified },
     ...CRIME_SECTIONS.map(section => ({ url: `${siteUrl}${section.href}`, lastModified: crimeModified })),
-    { url: `${siteUrl}${INTERNET_HUB_PATH}`, lastModified: internetModified },
     ...INTERNET_SECTIONS.map(section => ({ url: `${siteUrl}${section.href}`, lastModified: internetModified })),
     ...INTERNET_AREAS.map(area => ({ url: `${siteUrl}${internetAreaHref(area)}`, lastModified: internetModified })),
-    { url: `${siteUrl}${EDUCATION_HUB_PATH}`, lastModified: educationModified },
     ...EDUCATION_SECTIONS.map(section => ({ url: `${siteUrl}${section.href}`, lastModified: educationModified })),
     ...(["schools", "kindergartens"] as const).flatMap(set => placePagePaths(educationPlaceBase(set), regions.map((region) => region.id)).map((path) => ({ url: `${siteUrl}${path}`, lastModified: educationModified }))),
-    { url: `${siteUrl}${SCIENCE_CULTURE_HUB_PATH}`, lastModified: scienceCultureModified },
     ...SCIENCE_CULTURE_SECTIONS.map(section => ({ url: `${siteUrl}${section.href}`, lastModified: scienceCultureModified })),
     ...MUSEUM_AREAS.map(area => ({ url: `${siteUrl}${museumAreaHref(area)}`, lastModified: scienceCultureModified })),
-    { url: `${siteUrl}${ENERGY_FOOD_HUB_PATH}`, lastModified: energyFoodModified },
-    // Each page carries its own facts' review date, as its header and Dataset JSON-LD do; the hub the newest.
+    // Each page carries its own facts' review date, as its header and Dataset JSON-LD do.
     ...ENERGY_FOOD_SECTIONS.map(section => ({ url: `${siteUrl}${section.href}`, lastModified: new Date(energyFoodLastReviewedAt(section.id, energyFoodFacts)) })),
-    { url: `${siteUrl}${ENVIRONMENT_HUB_PATH}`, lastModified: environmentModified },
     ...ENVIRONMENT_SECTIONS.map(section => ({ url: `${siteUrl}${section.href}`, lastModified: environmentModified })),
     ...ENVIRONMENT_CITIES.map(city => ({ url: `${siteUrl}${environmentCityHref(city)}`, lastModified: environmentModified })),
     ...(["waste", "forests"] as const).flatMap(topic => ENVIRONMENT_AREAS.map(area => ({ url: `${siteUrl}${environmentAreaRoutes(topic).areaHref(area)}`, lastModified: environmentModified }))),
-    { url: `${siteUrl}${TRANSPORT_HUB_PATH}`, lastModified: transportModified },
     ...TRANSPORT_SECTIONS.map(section => ({ url: `${siteUrl}${section.href}`, lastModified: transportModified })),
     ...TRANSPORT_AREAS.map(area => ({ url: `${siteUrl}${transportAreaHref(area)}`, lastModified: transportModified })),
-    { url: `${siteUrl}/explorer/trade`, lastModified: tradeHubModified },
     { url: `${siteUrl}/explorer/trade/overview`, lastModified: tradeModified },
     { url: `${siteUrl}/explorer/trade/partners`, lastModified: tradePartnersModified },
-    { url: `${siteUrl}/explorer/external`, lastModified: externalModified },
     { url: `${siteUrl}/explorer/external/money-from-abroad`, lastModified: moneyTransfersModified },
     { url: `${siteUrl}/explorer/external/foreign-investment`, lastModified: foreignInvestmentModified },
     { url: `${siteUrl}/explorer/external/current-account`, lastModified: currentAccountModified },
@@ -315,15 +327,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       url: `${siteUrl}/explorer/economy/regions/${region.id.replace("region.", "")}`,
       lastModified: regionalModified,
     })),
-    { url: `${siteUrl}/explorer/inflation`, lastModified: inflationHubModified },
     { url: `${siteUrl}/explorer/inflation/overview`, lastModified: inflationModified },
     { url: `${siteUrl}/explorer/inflation/categories`, lastModified: inflationModified },
     { url: `${siteUrl}/explorer/inflation/products`, lastModified: productModified },
     { url: `${siteUrl}/explorer/inflation/cities`, lastModified: inflationModified },
     ...CITY_PAGE_PATHS.map((path) => ({ url: `${siteUrl}${path}`, lastModified: inflationModified })),
-    { url: `${siteUrl}/explorer/money`, lastModified: moneyBanksModified },
     ...MONEY_BANKS_SECTIONS.map(section => ({ url: `${siteUrl}${section.href}`, lastModified: moneyBanksModified })),
-    { url: `${siteUrl}${DEMOGRAPHY_HUB_PATH}`, lastModified: demographyModified },
     ...LIVE_DEMOGRAPHY_PAGES.map((page) => ({ url: `${siteUrl}${page.path}`, lastModified: demographyModified })),
     ...populationPlacePaths(regions.map((region) => region.id)).map((path) => ({ url: `${siteUrl}${path}`, lastModified: demographyModified })),
     { url: `${siteUrl}/explorer/expenditure`, lastModified },

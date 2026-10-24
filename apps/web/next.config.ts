@@ -1,5 +1,6 @@
 import type { NextConfig } from "next";
 import { MUNICIPALITY_ROUTES } from "./lib/explorer/municipalityRoutes";
+import { LEGACY_TOPIC_FORWARDS } from "./lib/navigation/navTree";
 
 // Report-only for now (docs/deployment.md, "SEO and headers"): browsers log what the
 // policy would block without blocking it. Pages are prerendered, so Next.js's inline
@@ -48,9 +49,13 @@ const nextConfig: NextConfig = {
         destination: `${prefix}/explorer/municipalities/${slug}`,
         permanent: true,
       }))),
-      // The Poverty and inequality hub became Living standards; the part after # carries over in the browser.
-      ...[["/explorer/poverty", "/explorer/living-standards"], ["/explorer/poverty/rates", "/explorer/living-standards/poverty"], ["/explorer/poverty/inequality", "/explorer/living-standards/inequality"]]
+      // The Poverty and inequality hub became Living standards, whose section is on the Living standards and health page now;
+      // the part after # carries over in the browser.
+      ...[["/explorer/poverty", LEGACY_TOPIC_FORWARDS.find(({ topic }) => topic === "living-standards")!.to], ["/explorer/poverty/rates", "/explorer/living-standards/poverty"], ["/explorer/poverty/inequality", "/explorer/living-standards/inequality"]]
         .flatMap(([source, destination]) => ["", "/en"].map((prefix) => ({ source: `${prefix}${source}`, destination: `${prefix}${destination}`, permanent: true }))),
+      // The topic hubs a group page replaced: the group page, with the topic in the query and no #, so the browser keeps the
+      // old link's # (spec 2026-10-24-explorer-regroup §3.1); the page's GroupTopicScroll turns it into the section's anchor.
+      ...LEGACY_TOPIC_FORWARDS.flatMap(({ from, to }) => ["", "/en"].map((prefix) => ({ source: `${prefix}${from}`, destination: `${prefix}${to}`, permanent: true }))),
     ];
   },
   async headers() {

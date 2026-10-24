@@ -1,53 +1,20 @@
-import { renderToStaticMarkup } from "react-dom/server";
-import { describe, expect, it } from "vitest";
-import { TopicHub } from "../../lib/pages/hub";
-import type { HubCardModel } from "../../lib/explorer/hubCards";
+import { describe, expect, it, vi } from "vitest";
 
-const presentation = { locale: "en" as const, messages: { "common.home": "Home", "common.data": "Data", "common.breadcrumb": "Breadcrumb" }, englishLabels: {} };
-const card = (index: string): HubCardModel => ({ index, title: `Card ${index}`, description: "About it", href: `/explorer/example/${index}`, comingSoon: false, series: null, seriesColor: null, footer: null });
+// The group pages' topic scroll reads the router.
+vi.mock("next/navigation", async (original) => ({ ...(await original<typeof import("next/navigation")>()), useRouter: () => ({ replace() {} }) }));
 
-function render(props: Partial<Parameters<typeof TopicHub>[0]> = {}) {
-  return renderToStaticMarkup(
-    <TopicHub locale="en" presentation={presentation} title="Example topic" summary="What this hub covers." path="/explorer/example" coverage="" cards={[card("01"), card("02")]} testId="example-hub" {...props} />,
-  );
-}
-
-describe("TopicHub", () => {
-  it("renders the hub cards under the heading and summary", () => {
-    const html = render();
-    expect(html.match(/data-testid="hub-card"/g) ?? []).toHaveLength(2);
-    expect(html).toContain('data-testid="example-hub"');
-    expect(html).toContain("What this hub covers.");
-    expect(html).toMatch(/<h1[^>]*>Example topic<\/h1>/);
+// U28-06: every hub's header named its coverage and update date. The topic hubs are sections of the group pages now
+// (spec 2026-10-24-explorer-regroup §5): each section's heading row states its topic's coverage, and the page header the
+// group's latest update.
+describe.each(["external", "economy"] as const)("the %s group page", (group) => {
+  it("states each topic's coverage in its section, and the group's update date in the header", async () => {
+    const [{ renderGroupPage }, { renderPageMarkup }] = await Promise.all([import("../../lib/pages/group"), import("../helpers/render-localized")]);
+    const html = renderPageMarkup("en", (await renderGroupPage(group, "en")) as never);
+    const sections = [...html.matchAll(/<section[^>]*id="t-[^"]+"[^>]*>([\s\S]*?)<\/section>/g)].map((match) => match[1]);
+    expect(sections.length).toBeGreaterThan(1);
+    for (const section of sections) expect(section).toMatch(/<p[^>]*>\d{4}–\d{4} · Updated \d{1,2} [A-Z][a-z]+ \d{4} · \d+ pages<\/p>/);
+    expect(html).toMatch(/\d+ topics · \d+ pages · updated \d{1,2} [A-Z][a-z]+ \d{4}/);
   });
-
-  it("emits one breadcrumb JSON-LD block ending at the hub", () => {
-    const html = render();
-    const scripts = html.match(/<script[^>]*application\/ld\+json[^>]*>[\s\S]*?<\/script>/g) ?? [];
-    expect(scripts).toHaveLength(1);
-    expect(scripts[0]).toContain("Example topic");
-  });
-
-  it("omits the breadcrumb JSON-LD when asked", () => {
-    expect(render({ breadcrumb: false })).not.toContain("application/ld+json");
-  });
-
-  it("labels the breadcrumb with crumbLabel while the heading keeps the title", () => {
-    const html = render({ crumbLabel: "Example" });
-    expect(html).toMatch(/<h1[^>]*>Example topic<\/h1>/);
-    expect(html.match(/<script[^>]*application\/ld\+json[^>]*>[\s\S]*?<\/script>/)![0]).toContain('"Example"');
-  });
-});
-
-// U28-06: every hub's header names its coverage and update date; trade, external and demography printed nothing there.
-it.each([
-  ["trade", async () => (await import("../../lib/pages/hubs/trade")).renderTradeHub("en")],
-  ["external", async () => (await import("../../lib/pages/hubs/external")).renderExternalHub("en")],
-  ["demography", async () => (await import("../../lib/pages/demography")).renderDemographyPage("en")],
-] as const)("the %s hub's header states its coverage", async (_name, render) => {
-  const { renderPageMarkup } = await import("../helpers/render-localized");
-  const html = renderPageMarkup("en", (await render()) as never);
-  expect(html).toMatch(/\d{4}–\d{4} · Updated \d{1,2} [A-Z][a-z]+ \d{4}/);
 });
 
 // U28-10: one wording for the hub cards' "annual" suffix, and the typographic apostrophe in the hub texts.

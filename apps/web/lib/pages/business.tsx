@@ -19,8 +19,6 @@ import type { Locale, Presentation } from "../i18n/types";
 import { fiscalMetadata } from "../seo/metadata";
 import { explorerDatasetJsonLd } from "../seo/structuredData";
 import { resolveSiteUrl } from "../siteUrl";
-import { TopicHub } from "./hub";
-import { TOPIC_HUB_LOADERS, topicHubCoverage } from "./topicHubs.server";
 
 /** The shared economic-sector labels the industry rows wear (`sector_x` is `sector.x`); the survey's B–E group and the unknown activity have their own. */
 const BUSINESS_SECTOR_LABEL_IDS = BUSINESS_DEMOGRAPHY_SECTORS.map(group => `sector.${group.slice("sector_".length)}`);
@@ -29,17 +27,6 @@ const BUSINESS_SECTOR_LABEL_IDS = BUSINESS_DEMOGRAPHY_SECTORS.map(group => `sect
 function businessGroupLabel(presentation: Presentation, group: BusinessGroup): string {
   const sector = ECONOMIC_SECTORS.find(item => item.id === `sector.${group.slice("sector_".length)}`);
   return group.startsWith("sector_") && sector ? publicLabel(presentation.locale, sector.id, sector.labelKa, presentation.englishLabels) : message(presentation.messages, `business.group.${group}`);
-}
-
-export async function businessHubMetadata(locale: Locale) {
-  const messages = await getMessages(locale, ["business"]);
-  return fiscalMetadata({ locale, path: BUSINESS_HUB_PATH, title: message(messages, "business.metaTitle"), description: message(messages, "business.metaDescription") });
-}
-
-export async function renderBusinessHub(locale: Locale) {
-  const [hub, presentation] = await Promise.all([TOPIC_HUB_LOADERS.business(locale), getPresentation(locale, ["business"], [])]);
-  const title = message(presentation.messages, "business.title");
-  return <TopicHub locale={locale} presentation={presentation} title={title} summary={message(presentation.messages, "business.hubSummary")} path={BUSINESS_HUB_PATH} coverage={topicHubCoverage(presentation.messages, locale, hub)} cards={hub.cards} testId="business-hub" />;
 }
 
 export async function businessPageMetadata(locale: Locale, section: BusinessTopicId) {

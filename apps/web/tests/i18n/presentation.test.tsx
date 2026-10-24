@@ -2,6 +2,7 @@ import { isValidElement, type ReactNode } from "react";
 import { describe, expect, test, vi } from "vitest";
 import { AnalysisExplorer } from "../../components/analysis/analysis-explorer";
 import { MainExplorer } from "../../components/main-explorer/main-explorer";
+import { GroupPage } from "../../components/explorer-groups/group-page";
 import { MethodologyArticle } from "../../components/methodology/methodology-article";
 import { MunicipalExplorer } from "../../components/municipalities/municipal-explorer";
 import { getMessages } from "../../lib/i18n/messages.server";
@@ -11,14 +12,12 @@ import type { Locale, Messages, Presentation } from "../../lib/i18n/types";
 import { renderAnalysisPage } from "../../lib/pages/analysis";
 import { renderDebtPage } from "../../lib/pages/debt";
 import { renderDeficitPage } from "../../lib/pages/deficit";
-import { renderDemographyPage } from "../../lib/pages/demography";
 import { renderDemographyAgeSexPage } from "../../lib/pages/demography-age-sex";
 import { renderDemographyBirthsDeathsPage } from "../../lib/pages/demography-births-deaths";
 import { renderDemographyMigrationPage } from "../../lib/pages/demography-migration";
 import { renderDemographyPopulationPage } from "../../lib/pages/demography-population";
 import { renderPopulationPlacePage } from "../../lib/pages/demography-population-place";
 import { renderEconomicSectorsPage } from "../../lib/pages/economic-sectors";
-import { renderEconomyPage } from "../../lib/pages/economy";
 import { renderEnergyFoodPage } from "../../lib/pages/energy-food";
 import { renderExpenditurePage } from "../../lib/pages/expenditure";
 import { renderCurrentAccountPage, renderForeignInvestmentPage, renderMoneyFromAbroadPage } from "../../lib/pages/external";
@@ -28,29 +27,18 @@ import { renderCrimePage } from "../../lib/pages/crime";
 import { renderHealthDeathsAreaPage } from "../../lib/pages/health-deaths";
 import { renderHealthDeathsIndex } from "../../lib/pages/health-deaths-index";
 import { renderHouseholdRegionPage } from "../../lib/pages/household";
-import { renderHubPage, TopicHub } from "../../lib/pages/hub";
-import { renderEnergyFoodHub } from "../../lib/pages/hubs/energy-food";
-import { renderEnvironmentHub } from "../../lib/pages/hubs/environment";
+import { renderGroupPage } from "../../lib/pages/group";
+import { renderHubPage } from "../../lib/pages/hub";
 import { renderEnvironmentPage } from "../../lib/pages/environment";
 import { renderEnvironmentAirQualityIndex, renderEnvironmentCityPage } from "../../lib/pages/environment-air-quality";
 import { renderEnvironmentAreaPage, renderEnvironmentRegionIndex } from "../../lib/pages/environment-areas";
-import { renderExternalHub } from "../../lib/pages/hubs/external";
-import { renderHealthHub } from "../../lib/pages/hubs/health";
-import { renderCrimeHub } from "../../lib/pages/hubs/crime";
-import { renderTransportHub } from "../../lib/pages/hubs/transport";
 import { renderTransportPage } from "../../lib/pages/transport";
 import { renderTransportAreaPage } from "../../lib/pages/transport-area";
-import { renderInflationHub } from "../../lib/pages/hubs/inflation";
-import { renderMoneyBanksHub } from "../../lib/pages/hubs/moneyBanks";
-import { renderTradeHub } from "../../lib/pages/hubs/trade";
-import { renderUnemploymentHub } from "../../lib/pages/hubs/unemployment";
-import { renderWagesHub } from "../../lib/pages/hubs/wages";
 import { renderInflationCategories } from "../../lib/pages/inflation-categories";
 import { renderInflationCities } from "../../lib/pages/inflation-cities";
 import { renderInflationOverview } from "../../lib/pages/inflation-overview";
 import { renderInflationProducts } from "../../lib/pages/inflation-products";
 import { renderLabourPage } from "../../lib/pages/labour";
-import { renderLivingStandardsHub } from "../../lib/pages/living-standards";
 import { renderMethodologyArticle } from "../../lib/pages/methodology-article";
 import { renderMoneyBanksPage } from "../../lib/pages/moneyBanks";
 import { renderMunicipalCountry } from "../../lib/pages/municipal-country";
@@ -76,7 +64,7 @@ vi.mock("../../lib/methodology/prepareArchives", async (importOriginal) =>
 const layoutKey = (key: string) => LAYOUT_SCOPES.some((scope) => key.startsWith(`${scope}.`));
 
 // Server components that render a page's provider inside them are called, so their providers are read too.
-const SERVER_COMPONENTS = new Set<unknown>([TopicHub, MethodologyArticle]);
+const SERVER_COMPONENTS = new Set<unknown>([GroupPage, MethodologyArticle]);
 const EXPLORERS = new Set<unknown>([MainExplorer, AnalysisExplorer, MunicipalExplorer]);
 
 /** The messages every I18nProvider and client explorer in a page's tree receives. */
@@ -97,55 +85,49 @@ const pages: PageRender[] = [
   ["debt", renderDebtPage, 1],
   ["deficit", renderDeficitPage, 1],
   ["budget hub", renderHubPage, 0],
+  ["budget group", (locale) => renderGroupPage("budget", locale), 0],
   ["gdp", renderGdpPage, 1],
-  ["economy hub", renderEconomyPage, 0],
+  ["economy group", (locale) => renderGroupPage("economy", locale), 0],
   ["economic sectors", renderEconomicSectorsPage, 1],
   ["regional economies", renderRegionalEconomiesPage, 1],
   ["regional economy", (locale) => renderRegionalEconomyPage("imereti", locale), 1],
-  ["inflation hub", renderInflationHub, 0],
+  ["prices group", (locale) => renderGroupPage("prices", locale), 0],
   ["inflation overview", renderInflationOverview, 1],
   ["inflation categories", renderInflationCategories, 1],
   ["inflation cities", renderInflationCities, 1],
   ["inflation products", renderInflationProducts, 1],
-  ["unemployment hub", renderUnemploymentHub, 0],
+  ["labour group", (locale) => renderGroupPage("labour", locale), 0],
   ["unemployment", (locale) => renderUnemploymentPage(locale, "overview"), 1],
   ["unemployment industries", (locale) => renderLabourPage(locale, "industries"), 1],
-  ["wages hub", renderWagesHub, 0],
   ["wages", (locale) => renderWagesPage(locale, "industries"), 1],
   ["wages regions index", renderWagesRegionsIndexPage, 1],
-  ["living standards hub", renderLivingStandardsHub, 0],
+  ["living group", (locale) => renderGroupPage("living", locale), 0],
   ["poverty", (locale) => renderPovertyPage(locale, "inequality"), 1],
   ["household", (locale) => renderHouseholdRegionPage("income", "georgia", locale), 1],
-  ["health hub", renderHealthHub, 0],
   ["health", (locale) => renderHealthPage(locale, "doctors-hospitals"), 1],
   ["causes of death", renderHealthDeathsIndex, 1],
   ["causes of death area", (locale) => renderHealthDeathsAreaPage(locale, "guria"), 1],
-  ["crime hub", renderCrimeHub, 0],
-  ["transport hub", renderTransportHub, 0],
+  ["society group", (locale) => renderGroupPage("society", locale), 0],
   ["transport", (locale) => renderTransportPage(locale, "freight"), 1],
   ["transport area", (locale) => renderTransportAreaPage(locale, "guria"), 1],
   ["crime", (locale) => renderCrimePage(locale, "road-accidents"), 1],
-  ["trade hub", renderTradeHub, 0],
+  ["external group", (locale) => renderGroupPage("external", locale), 0],
   ["trade overview", renderTradeOverviewPage, 1],
   ["trade partners", renderTradePartnersPage, 1],
   ["trade products", renderTradeProductsPage, 1],
   ["trade domestic exports", renderTradeDomesticPage, 1],
   ["trade services", renderTradeServicesPage, 1],
-  ["external hub", renderExternalHub, 0],
   ["money from abroad", renderMoneyFromAbroadPage, 1],
   ["foreign investment", renderForeignInvestmentPage, 1],
   ["current account", renderCurrentAccountPage, 1],
-  ["money and banks hub", renderMoneyBanksHub, 0],
   ["money and banks", (locale) => renderMoneyBanksPage(locale, "loans-deposits"), 1],
-  ["energy and food hub", renderEnergyFoodHub, 0],
   ["energy and food", (locale) => renderEnergyFoodPage(locale, "electricity"), 1],
-  ["environment hub", renderEnvironmentHub, 0],
   ["environment", (locale) => renderEnvironmentPage(locale, "climate"), 1],
   ["city air quality", renderEnvironmentAirQualityIndex, 1],
   ["city air quality city", (locale) => renderEnvironmentCityPage(locale, "rustavi"), 1],
   ["waste", (locale) => renderEnvironmentRegionIndex(locale, "waste"), 1],
   ["forests area", (locale) => renderEnvironmentAreaPage(locale, "forests", "tbilisi"), 1],
-  ["demography hub", renderDemographyPage, 0],
+  ["demography group", (locale) => renderGroupPage("demography", locale), 0],
   ["population", renderDemographyPopulationPage, 1],
   ["population place", (locale) => renderPopulationPlacePage({ kind: "region", id: "imereti" }, locale), 1],
   ["births and deaths", renderDemographyBirthsDeathsPage, 1],

@@ -23,7 +23,8 @@ test("Trade registers its six explorers and twenty-four translated original docu
   expect(manifest).toHaveLength(24);
   expect(manifest.map(row => path.basename(row.repository_source_path)).sort()).toEqual(["Export-Country_1995-2026.xlsx", "Export-_Country_Group-1995-2026.xlsx", "FTrade_1995-2026.xlsx", "Import-Country-1995-2026.xlsx", "Import_Country_Group-1995-2026.xlsx", "external_trade_methodology.html", "metadata-en.html", "Export-Product-by-4-digit-1995-1999.xlsx", "Export-Product-by-4-digit-2000-2014.xlsx", "Export-Product-by-4-digit-2015-2026.xlsx", "Import-products--1995-1999_eng.xlsx", "Import-Product-by-4-digit-2000-2014.xlsx", "Import-Product-by-4-digit-2015-2026.xlsx", "Domestic-Export-Country_2014-2026.xlsx", "Domestic-Exports_by-4-digit-2014-2026.xlsx", "Georgian-Exports-of-services-by-types.xlsx", "Georgian-Imports-of-services-by-types.xlsx", "Georgian-Exports-of-services-by-countries.xlsx", "Georgian-Imports-of-services-by-countries.xlsx", "1004_180325_EN.PDF", "Export-SITC_2000-2026.xlsx", "Import-SITC_2000-2026.xlsx", "Export-BEC_2000-2026.xlsx", "Import-BEC-2000-2026.xlsx"].sort());
   for (const source of manifest) expect(catalogue.documents[source.source_id].title.text).toBeTruthy();
-  expect(paths).toContain("/explorer/trade"); expect(paths).toContain("/explorer/trade/overview"); expect(paths).toContain("/methodology/trade");
+  // The Trade hub is the Trade section of the External sector page (/explorer/external) now.
+  expect(paths).toContain("/explorer/external"); expect(paths).not.toContain("/explorer/trade"); expect(paths).toContain("/explorer/trade/overview"); expect(paths).toContain("/methodology/trade");
   expect(paths).toContain("/explorer/trade/partners");
   expect(paths).toContain("/explorer/trade/products");
   expect(paths).toContain("/explorer/trade/domestic-exports");

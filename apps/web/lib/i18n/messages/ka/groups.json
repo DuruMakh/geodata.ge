@@ -44,6 +44,7 @@
   "groups.caption.largest": "{name}, უმსხვილესი",
   "groups.topicsNav": "ქვეთემები ამ გვერდზე",
   "groups.meta": "{topics} ქვეთემა · {pages} გვერდი · განახლდა {date}",
+  "groups.metaSolo": "{pages} გვერდი · განახლდა {date}",
   "groups.annual": "წლიური მონაცემები",
   "groups.mapAndList": "რუკა და სია · {n} რეგიონი",
   "groups.regionsN": "{n} რეგიონი",

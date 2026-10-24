@@ -44,6 +44,7 @@
   "groups.caption.largest": "{name}, largest",
   "groups.topicsNav": "Topics on this page",
   "groups.meta": "{topics} topics · {pages} pages · updated {date}",
+  "groups.metaSolo": "{pages} pages · updated {date}",
   "groups.annual": "annual data",
   "groups.mapAndList": "Map and list · {n} regions",
   "groups.regionsN": "{n} regions",
