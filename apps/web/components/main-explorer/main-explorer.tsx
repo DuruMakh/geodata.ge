@@ -130,7 +130,7 @@ function MainExplorerContent({ nav, facts: shippedFacts, adminFacts: shippedAdmi
     const previousTotal = previousYear === undefined ? null : totals.get(previousYear) ?? null;
     const yoy = latestTotal !== null && previousTotal ? (latestTotal - previousTotal) / previousTotal : null;
 
-    // A latest year that is only a plan says so ("2026 plan: Total 30.9 bn GEL +11.4% year on year"); the change then
+    // A latest year that is only a plan says so ("2026 plan: Total 30.9 bn GEL +11.4%"); the change then
     // compares the plan with the year before, which the total above already resolves to actual where both exist.
     const latestFacts = scope === "ministries"
       ? adminFacts.filter((fact) => fact.level === "admin_category" && fact.year === latestYear)

@@ -6,7 +6,7 @@ export const EXPENDITURE_METHODOLOGY_CONTENT: MethodologyContent = {
   "slug": "expenditure",
   "title": "Expenditure methodology",
   "summary": "How actual state-budget payments are brought together into clear functions, institutions and major programmes.",
-  "reviewedAt": "2026-08-20",
+  "reviewedAt": "2026-10-24",
   "archiveManifestId": "expenditure",
   "coverageSource": {
     "kind": "budgetSide",
@@ -15,7 +15,8 @@ export const EXPENDITURE_METHODOLOGY_CONTENT: MethodologyContent = {
   "canonicalDocuments": [
     "docs/data-methodology/treasury-functional-expenditure-methodology-2004-2025.md",
     "docs/data-methodology/ministries-expenditure-methodology.md",
-    "docs/data-methodology/ministries-drilldown-programs-methodology.md"
+    "docs/data-methodology/ministries-drilldown-programs-methodology.md",
+    "docs/data-methodology/2026-budget-plan-methodology.md"
   ],
   "disclosure": "Annual amounts and total payments come from official sources. The public functions, consolidation of historical institutions and continuity of programmes follow Fiscal.ge’s reviewed classification. Shares in the multi-year chart use Geostat’s nominal GDP for the same year, at current prices. SNA 1993 is used for 1996–2009, and SNA 2008 from 2010 onward. GDP for 2025 is preliminary.",
   "keyFacts": [
@@ -45,7 +46,8 @@ export const EXPENDITURE_METHODOLOGY_CONTENT: MethodologyContent = {
       "kind": "scope",
       "title": "What it measures",
       "paragraphs": [
-        "The series measures all state-budget payments actually executed during the year. Functional and institutional expenditure cover 2004–2025; the separate receipts series also covers 2004–2025, but the increase in liabilities for 2004 is unavailable in the source and is excluded from that year’s total."
+        "The series measures all state-budget payments actually executed during the year. Actual functional and institutional expenditure cover 2004–2025; the separate receipts series also covers 2004–2025, but the increase in liabilities for 2004 is unavailable in the source and is excluded from that year’s total.",
+        "The 2026 figures are not executed results. They are the plan approved in the Law of Georgia on the 2026 State Budget (chapters III and VI, published by the Ministry of Finance), and they are marked as a plan wherever they appear. The plan total matches the law’s total payments of 30,881,358,000 GEL. When 2026 actual execution is published, the actual figures replace the plan."
       ]
     },
     {

@@ -1530,8 +1530,8 @@ test("hub lists seven cards, all seven live", async ({ page }) => {
 
   // Absence alone would pass on a hub whose footers all came back null, so also
   // assert a real figure is there. The shape, not the figure: the number moves
-  // with every dataset update, the "<year>[ გეგმა] · <n.n> მლრდ ₾" contract does not.
-  await expect(page.getByTestId("hub-card").first()).toContainText(/\d{4}( გეგმა)? · [\d,]+\.\d მლრდ ₾/);
+  // with every dataset update, the "<year> გეგმა · <n.n> მლრდ ₾" contract does not (the first card is the shipped 2026 plan).
+  await expect(page.getByTestId("hub-card").first()).toContainText(/\d{4} გეგმა · [\d,]+\.\d მლრდ ₾/);
   const types = page.getByTestId("hub-card").nth(1);
   await expect(types).toContainText("ხარჯების სახეები");
   await expect(types).toHaveAttribute("href", "/explorer/expenditure-types");
