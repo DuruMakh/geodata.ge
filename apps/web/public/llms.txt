@@ -216,7 +216,7 @@ The endpoint is `https://fiscal.ge/mcp`, stateless unauthenticated MCP over Stre
 ## Site navigation
 
 - [English home](https://fiscal.ge/en) — scope and latest reviewed coverage.
-- [English budget explorer](https://fiscal.ge/en/explorer) — the English budget hub: expenditure, revenue, municipalities, analysis, debt and deficit.
+- [English All data](https://fiscal.ge/en/explorer) — every page in English: search or browse A to Z, by topic, town or region.
 - [English methodology](https://fiscal.ge/en/methodology/expenditure) — reviewed definitions and original source documents.
 
 - [Mission — Fiscal.ge](https://fiscal.ge/about) — the site's purpose and public-data boundaries.

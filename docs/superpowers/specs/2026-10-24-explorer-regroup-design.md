@@ -2,6 +2,7 @@
 
 Date: 2026-10-24
 Status: Approved by Duru on 2026-10-24 (decision card "Approve the spec so I can write the build plan?", answer "Approve, write the plan", 18:44 Tbilisi). Design parts 1–3 were agreed in the thread "Redesign and regroup the explorer" on 2026-10-24 (18:17–18:35 Tbilisi).
+Note (2026-10-24, after approval): main later added Tax breaks and refunds (Budget) and Funded pension (Health and social protection), so the counts below are now 102 pages (Budget 8, Living standards and health 12); the text keeps the approved figures.
 Source design: Duru's canvas https://claude.ai/artifact/NTvuHd3oasbXxkNcZto2Wz, page "მონაცემები — ჰაბები და ძებნა" (board `DX-App.dc.html` and the boards that import it).
 
 ## 0. In plain words

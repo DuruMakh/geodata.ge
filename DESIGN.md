@@ -3,7 +3,7 @@
 Version: 4.1
 Last updated: 2026-10-24
 Status: Production visual system for Fiscal.ge
-Scope: Explorer product UI (the twenty dataset hubs of §6.7), charts, tables, controls, export surfaces, responsive behavior, and future pages that reuse the Budget Explorer shell.
+Scope: Explorer product UI (All data, the eight group pages and the chart pages of their twenty topics, §6.7–§6.8), charts, tables, controls, export surfaces, responsive behavior, and future pages that reuse the Budget Explorer shell.
 
 ---
 
@@ -17,7 +17,7 @@ Confirmed product references:
 
 - `Project_Definition.md`
 
-This file owns production visuals. Current product specs may record deliberate feature-level carve-outs, which must be reflected here when they become durable; the platform shell and route IA are specified in §6.2/§6.7 and `docs/superpowers/specs/2026-07-28-explorer-shell-and-workspace-design.md`.
+This file owns production visuals. Current product specs may record deliberate feature-level carve-outs, which must be reflected here when they become durable; the platform shell and route IA are specified in §6.2/§6.7/§6.8 and `docs/superpowers/specs/2026-07-28-explorer-shell-and-workspace-design.md`.
 
 Superseded and must not appear in production:
 
@@ -26,13 +26,13 @@ Superseded and must not appear in production:
 
 ## 2. Product Scope Boundary
 
-Fiscal.ge is a Georgian-first explorer of reviewed annual public-finance and economy data in twenty dataset hubs (§6.7), plus monthly national inflation. It is not a broad public-data catalog. `Project_Definition.md` §2 owns scope; this section only frames the visual system.
+Fiscal.ge is a Georgian-first explorer of reviewed annual public-finance and economy data in twenty topics, gathered into eight groups (§6.7, §6.8), plus monthly national inflation. It is not a broad public-data catalog. `Project_Definition.md` §2 owns scope; this section only frames the visual system.
 
-Included: the budget hub, multi-year explorer (line + table) with fields/ministries grouping, the spending-by-type page, single-year analysis view, the one-chart Government Debt explorer, the one-series general-government deficit explorer, the Economy hub (GDP overview, national sectors, GDP by expenditure, regional economies), the Business hub (§35), the Housing hub (§37), the Inflation hub (overview, categories, products, cities), the Money and banks hub (§34), the Unemployment hub (§27), the Wages hub (§31), the Living standards hub (§32), the Health hub (§36), the Education hub (§39), the Science and culture hub (§40), the Crime and justice hub (§38), the Internet and technology hub (§42), the Trade hub (overview, trading partners, products, domestic exports, services trade; §28), the External flows hub (§30), the Energy and food hub (§33), the Environment and climate hub (§41), the Transport hub (§42), the Demography hub (population, age and sex, migration, births and deaths; §29), methodology pages, the `/about` mission page (§23), the `/connect` page, Excel workbook export, Georgian-first UI with an English mirror (§2.2), minimal public source label, internal provenance metadata.
+Included: the All data page and the eight group pages (§6.8), multi-year explorer (line + table) with fields/ministries grouping, the spending-by-type page, single-year analysis view, the one-chart Government Debt explorer, the one-series general-government deficit explorer, the Economy hub (GDP overview, national sectors, GDP by expenditure, regional economies), the Business hub (§35), the Housing hub (§37), the Inflation hub (overview, categories, products, cities), the Money and banks hub (§34), the Unemployment hub (§27), the Wages hub (§31), the Living standards hub (§32), the Health hub (§36), the Education hub (§39), the Science and culture hub (§40), the Crime and justice hub (§38), the Internet and technology hub (§42), the Trade hub (overview, trading partners, products, domestic exports, services trade; §28), the External flows hub (§30), the Energy and food hub (§33), the Environment and climate hub (§41), the Transport hub (§42), the Demography hub (population, age and sex, migration, births and deaths; §29), methodology pages, the `/about` mission page (§23), the `/connect` page, Excel workbook export, Georgian-first UI with an English mirror (§2.2), minimal public source label, internal provenance metadata.
 
 Excluded: data catalog, capital explorer, admin UI, a public API beyond the read-only MCP and static publications, uploads, sub-annual data other than inflation (§25) and the one latest 2026 amount on Foreign debt and Reserves (§30.3, §30.4), automated document extraction, clickable drilldown pages (series selection in the explorer is not drilldown). The Government Debt explorer does not alter the existing `spending.debt_service` expenditure series.
 
-Municipal budgets are a budget **section** at `/explorer/municipalities` (§2.1, §6.2, §20): an index with a municipality-grain map and ranked list, 64 municipality pages, 11 region roll-up pages, and one explicit Georgia aggregate page, reachable from the sidebar and hub card 05 (§6.7). The annual unemployment explorer is active at `/explorer/unemployment` and its English mirror. No teaser dataset remains in the sidebar; a future teaser is a marker only, with no data at all, and nothing about a marker may be styled as if it were live.
+Municipal budgets are a budget **section** at `/explorer/municipalities` (§2.1, §6.2, §20): an index with a municipality-grain map and ranked list, 64 municipality pages, 11 region roll-up pages, and one explicit Georgia aggregate page, reachable from the sidebar and the Budget group page's card 05 (§6.7, §6.8). The annual unemployment explorer is active under `/explorer/unemployment/` and its English mirror. No teaser dataset remains in the sidebar; a future teaser is a marker only, with no data at all, and nothing about a marker may be styled as if it were live.
 
 Regional economies are an Economy route family at `/explorer/economy/regions` (§2.1, §6.2, §26): one All Regions index and 11 detail pages.
 
@@ -121,7 +121,7 @@ Rules:
 - **Exception: the explorer sidebar** (`ink` background, §6.7) — a persistent navigation shell beside the content column, not a panel within it. This does not generalize: `paper` remains the only background for every panel, block, or surface inside the content column.
 - Selection/hover emphasis is always `tint`, never shadow or border color change.
 - Series-row values use `muted` so their small text stays above 4.5:1 on both `paper` and selected/hovered `tint` backgrounds; `faint` is not a text color for tinted rows.
-- `tile` is reserved for tooltips, treemap tiles, and budget hub cards (§6.6).
+- `tile` is reserved for tooltips, treemap tiles, the explorer cards, the All data search box and place card (§6.6, §6.8), and the City air quality cards.
 - The two `ink-fg-*` tokens exist only on the `ink` shell surface (§6.7); never use them on paper. **These lines are the single definition of both hex values** — §16 mirrors the paper tokens only, so a value change is one edit here plus one in `apps/web/app/globals.css`.
 - `ComingSoonBadge` keeps `ink-fg-faint` for its default dark-shell use. On the methodology hub's paper background, use its explicit `paper` surface with `muted` text; its label, size, and border stay unchanged.
 - Both ink tokens clear WCAG AA on `ink`: `ink-fg-faint` measures **4.77:1** for the 8.5–9.5px text it carries from 768px (11px below it, §5.2) (brand sub-line, `მონაცემები /` overline, rail label, `მალე` badge) and `ink-fg-muted` measures **6.34:1** for its 12–12.5px labels. They are a deliberate two-step hierarchy — an ~8.5 CIE L\* gap, so faint still reads dimmer than muted. Any future move has to keep **both** above 4.5:1 **and** that gap; raising one alone collapses the pair. (The pair was raised from `#7A7060` / `#8F8676`, where faint sat at 3.53:1.)
@@ -320,14 +320,24 @@ page:
 
 No screen card, no outer container. Content sits directly on paper.
 
-**Exception: the explorer shell** (§6.7) — every dataset hub under `/explorer` and its pages use a sidebar + content-column layout instead, with different max-width and padding. This page shell applies to the landing page (§19) only.
+**Exception: the explorer shell** (§6.7) — every page under `/explorer` (All data, the group pages and the chart pages) uses a sidebar + content-column layout instead, with different max-width and padding. This page shell applies to the landing page (§19) only.
 
 ### 6.2 Information Architecture
 
-The landing lives at `/` (მთავარი — see §19). Everything else is the data platform: the Budget, Economy, Business, Housing and construction, Inflation, Money and banks, Unemployment, Wages, Living standards, Health and social protection, Education, Science and culture, Crime and justice, Internet and technology, Trade, External flows, Energy and food, Environment and climate, Transport and Demography hubs and their sections, all mounted under `/explorer` inside the shell of §6.7. Every route below also exists under `/en` (§2.2).
+The landing lives at `/` (მთავარი — see §19). Everything else is the data platform, all mounted under `/explorer` inside the shell of §6.7: **All data** at `/explorer`, the **eight group pages** (§6.8), and the chart pages of the twenty topics — Budget, Economy, Business, Housing and construction, Inflation, Money and banks, Unemployment, Wages, Living standards, Health and social protection, Education, Science and culture, Crime and justice, Internet and technology, Trade, External flows, Energy and food, Environment and climate, Transport and Demography — 102 chart pages in all, a count derived from `lib/navigation/navTree.ts`. Since 2026-10-24 a topic has no page of its own: its cards form its section on its group page, and its old address forwards there (§6.8). Every route below also exists under `/en` (§2.2).
 
 ```text
-/explorer                              budget hub — the seven sections as cards
+/explorer                              ყველა მონაცემი    All data: search and the A to Z list of every chart page (§6.8)
+/explorer/budget                       ბიუჯეტი           Budget group page (§6.8)
+/explorer/economy                      ეკონომიკა და ბიზნესი  Economy and business group page: Economy, Business, Housing and construction
+/explorer/prices                       ფასები და ფული    Prices and money group page: Inflation, Money and banks
+/explorer/labour                       შრომის ბაზარი     Labour market group page: Unemployment and jobs, Wages
+/explorer/living                       ცხოვრების დონე და ჯანდაცვა  Living standards and health group page: Living standards, Health and social protection
+/explorer/external                     საგარეო სექტორი   External sector group page: Trade, External flows
+/explorer/demography                   დემოგრაფია        Demography group page
+/explorer/society                      საზოგადოება და გარემო  Society and environment group page: Education, Science and culture, Crime and justice,
+                                                          Internet and technology, Energy and food, Environment and climate, Transport
+/explorer/{topic}                      forwards (308) to its group section, e.g. /explorer/wages → /explorer/labour#t-wages (§6.8)
 /explorer/expenditure                  ხარჯები           multi-year expenditure explorer (fields/ministries grouping)
 /explorer/expenditure-types            ხარჯების სახეები  general-government spending by economic type
 /explorer/revenue                      შემოსავლები       multi-year revenue explorer
@@ -340,37 +350,37 @@ The landing lives at `/` (მთავარი — see §19). Everything else i
                                                           for expenditure, and year selector)
 /explorer/debt                         ვალი              Government Debt stock, service, and rate explorer (§8.5)
 /explorer/deficit                      დეფიციტი          General-government balance explorer (§8.6)
-/explorer/economy                     ეკონომიკა         Economy hub
+                                                        Economy pages; /explorer/economy is the Economy and business group page
 /explorer/economy/gdp                                   Annual GDP overview
 /explorer/economy/sectors                               National economic sectors
 /explorer/economy/expenditure                           GDP by expenditure
 /explorer/economy/regions                               All Regions map and ranked list (§26)
 /explorer/economy/regions/[id]                          11 regional-economy detail pages (§26)
-/explorer/business                    ბიზნესი           Business hub (§35)
+/explorer/business                    → /explorer/economy#t-business (§35)
 /explorer/business/sales                                Firms' sales by firm size and industry (§35)
 /explorer/business/jobs                                 People employed in firms by firm size and industry (§35)
 /explorer/business/investment-profit                    Investment, profit and loss, with sizes and industries nested (§35)
 /explorer/business/firms                                Firms opened and closed, numbers and rates (§35)
 /explorer/business/regions                              Region map and ranked list (§35)
 /explorer/business/regions/[id]                         Georgia and 11 region business pages (§35)
-/explorer/housing                     საცხოვრებელი და მშენებლობა  Housing and construction hub (§37)
+/explorer/housing                     → /explorer/economy#t-housing (§37)
 /explorer/housing/permits                               Building permits by building type, numbers and floor area (§37)
 /explorer/housing/completed                             Completed buildings by building type, numbers and floor area (§37)
 /explorer/housing/prices                                Home price index and Tbilisi district prices (§37)
 /explorer/housing/regions                               Region map and ranked list (§37)
 /explorer/housing/regions/[id]                          Georgia and 11 region housing pages (§37)
-/explorer/inflation                   ინფლაცია          Inflation hub (§25)
+/explorer/inflation                   → /explorer/prices#t-inflation (§25)
 /explorer/inflation/overview                            Monthly national CPI overview (§25)
 /explorer/inflation/categories                          COICOP categories and contributions (§25.1)
 /explorer/inflation/products                            Individual products (§25.2)
 /explorer/inflation/cities                              Inflation by city: Georgia page (§25.3)
 /explorer/inflation/cities/[city]                       Inflation in one city (§25.3)
-/explorer/money                       ფული და ბანკები   Money and banks hub (§34)
+/explorer/money                       → /explorer/prices#t-money (§34)
 /explorer/money/supply                                  Money supply with a % of GDP icon switch (§34)
 /explorer/money/loans-deposits                          Loans, deposits and a foreign-currency share icon switch (§34)
 /explorer/money/interest-rates                          National Bank rate and bank interest rates (§34)
 /explorer/money/bank-health                             Bad loans, profits and capital (§34)
-/explorer/unemployment                უმუშევრობა        Unemployment hub (§27)
+/explorer/unemployment                → /explorer/labour#t-unemployment (§27)
 /explorer/unemployment/overview                         National overview and supporting tabs (§27)
 /explorer/unemployment/regions                          Region-only map and linked list (§27)
 /explorer/unemployment/regions/[id]                     Region indicators and trends (§27)
@@ -380,19 +390,19 @@ The landing lives at `/` (მთავარი — see §19). Everything else i
 /explorer/unemployment/hours                            Usual weekly hours by industry, sex and settlement (§27)
 /explorer/unemployment/informal                         Informal share of non-farm jobs: Georgia, women, men, towns and villages (§27)
 /explorer/unemployment/young-people                     Young people not in work or study (§27)
-/explorer/wages                       ხელფასები         Wages hub (§31)
+/explorer/wages                       → /explorer/labour#t-wages (§31)
 /explorer/wages/overview                                Average wage with women/men and public/non-public subcategories, and the median (§31)
 /explorer/wages/industries                              Wages by economic activity for a chosen group (§31)
 /explorer/wages/regions                                 Region map and ranked list (§31)
 /explorer/wages/regions/[id]                            11 region wage pages (§31)
-/explorer/living-standards            ცხოვრების დონე    Living standards hub (§32)
+/explorer/living-standards            → /explorer/living#t-living-standards (§32)
 /explorer/living-standards/income                       Household income by source and area (§32)
 /explorer/living-standards/spending                     Household spending by category and area (§32)
 /explorer/living-standards/income/regions/[id]          Georgia and 11 region income pages (§32)
 /explorer/living-standards/spending/regions/[id]        Georgia and 11 region spending pages (§32)
 /explorer/living-standards/poverty                      Poverty rates on three tabs: poverty line, relative, international (§32)
 /explorer/living-standards/inequality                   Gini coefficients (§32)
-/explorer/health                      ჯანდაცვა და სოციალური დაცვა  Health and social protection hub (§36)
+/explorer/health                      → /explorer/living#t-health (§36)
 /explorer/health/doctors-hospitals                      Doctors and hospitals (§36)
 /explorer/health/illnesses                              Illnesses (§36)
 /explorer/health/causes-of-death                        Causes of death: death rate by region, map and ranked list (§36)
@@ -408,7 +418,7 @@ The landing lives at `/` (მთავარი — see §19). Everything else i
 /explorer/health/subsistence-allowance/[slug]           63 municipality subsistence allowance pages (§36)
 /explorer/health/social-package                         Social package: recipients, money and groups, Georgia (§36)
 /explorer/health/funded-pension                         Funded pension: savings, contributions, return, members and employers, Georgia (§36)
-/explorer/education                   განათლება         Education hub (§39)
+/explorer/education                   → /explorer/society#t-education (§39)
 /explorer/education/schools                             Schools: municipality map and ranked list by pupils (§39)
 /explorer/education/schools/georgia                     Georgia schools page (§39)
 /explorer/education/schools/region/[id]                 11 region schools pages; Tbilisi is region/tbilisi (§39)
@@ -419,43 +429,43 @@ The landing lives at `/` (მთავარი — see §19). Everything else i
 /explorer/education/kindergartens/[slug]                63 municipality kindergartens pages (§39)
 /explorer/education/universities                        Universities: students, newly admitted and graduates (§39)
 /explorer/education/vocational                          Vocational colleges: admitted and graduates (§39)
-/explorer/science-culture              მეცნიერება და კულტურა  Science and culture hub (§40)
+/explorer/science-culture              → /explorer/society#t-science-culture (§40)
 /explorer/science-culture/research                      Research: researchers, R&D staff, institutions and spending (§40)
 /explorer/science-culture/patents                       Patents: invention and utility model applications and patents (§40)
 /explorer/science-culture/museums                       Museums: region map and ranked list by visitors (§40)
 /explorer/science-culture/museums/[id]                  Georgia and 11 region museum pages (§40)
 /explorer/science-culture/theatres                      Theatres: audience, shows, events, theatres, seats and staff (§40)
-/explorer/crime                        დანაშაული და მართლმსაჯულება  Crime and justice hub (§38)
+/explorer/crime                        → /explorer/society#t-crime (§38)
 /explorer/crime/recorded                                Recorded crimes (§38)
 /explorer/crime/convictions                             Convictions (§38)
 /explorer/crime/prisons                                 Prisons (§38)
 /explorer/crime/victims                                 Victims (§38)
 /explorer/crime/road-accidents                          Road accidents (§38)
-/explorer/internet                     ინტერნეტი და ტექნოლოგიები  Internet and technology hub (§43)
+/explorer/internet                     → /explorer/society#t-internet (§43)
 /explorer/internet/homes                                Internet at home: region map and ranked list (§43)
 /explorer/internet/homes/[id]                           Georgia and 11 region pages (§43)
 /explorer/internet/users                                Internet users (§43)
 /explorer/internet/online                               Shopping and services online (§43)
 /explorer/internet/devices                              Phones and computers (§43)
-/explorer/trade                       საგარეო ვაჭრობა   Trade hub (§28)
+/explorer/trade                       → /explorer/external#t-trade (§28)
 /explorer/trade/overview                                National goods overview (§28)
 /explorer/trade/partners                                Trading partners (§28.1)
 /explorer/trade/products                                Goods by product (§28.2)
 /explorer/trade/domestic-exports                        Domestic exports and re-exports (§28.3)
 /explorer/trade/services                                Services trade (§28.4)
-/explorer/external                    საგარეო ნაკადები   External flows hub (§30)
+                                                        External flows pages (§30); /explorer/external is the External sector group page
 /explorer/external/money-from-abroad                    Money from abroad (§30)
 /explorer/external/foreign-investment                   Foreign investment (§30.1)
 /explorer/external/current-account                      Current account (§30.2)
 /explorer/external/foreign-debt                         Foreign debt (§30.3)
 /explorer/external/reserves                             Reserves (§30.4)
-/explorer/energy-food                ენერგეტიკა და სურსათი  Energy and food hub (§33)
+/explorer/energy-food                → /explorer/society#t-energy-food (§33)
 /explorer/energy-food/energy-supply                     Energy supply (§33)
 /explorer/energy-food/electricity                       Electricity (§33)
 /explorer/energy-food/energy-use                        Energy use (§33)
 /explorer/energy-food/food-self-sufficiency             Food self-sufficiency (§33)
 /explorer/energy-food/farming                           Farming (§33)
-/explorer/environment                 გარემო და კლიმატი  Environment and climate hub (§41)
+/explorer/environment                 → /explorer/society#t-environment (§41)
 /explorer/environment/greenhouse-gases                  Greenhouse gases (§41)
 /explorer/environment/air-pollution                     Air pollution: eight pollutants (§41)
 /explorer/environment/air-quality                       City air quality: nine city cards (§41)
@@ -466,14 +476,14 @@ The landing lives at `/` (მთავარი — see §19). Everything else i
 /explorer/environment/waste/[id]                        Georgia and 11 region waste pages (§41)
 /explorer/environment/forests                           Forests: region map and ranked list (§41)
 /explorer/environment/forests/[id]                      Georgia and 11 region forests pages (§41)
-/explorer/transport                  ტრანსპორტი         Transport hub (§42)
+/explorer/transport                  → /explorer/society#t-transport (§42)
 /explorer/transport/vehicles                            Vehicle fleet by type and fuel (§42)
 /explorer/transport/vehicle-age                         Vehicle fleet by cumulative age (§42)
 /explorer/transport/passengers                          Passenger-km and passengers carried (§42)
 /explorer/transport/freight                             Tonne-km and goods carried (§42)
 /explorer/transport/regions                             Region map and ranked list (§42)
 /explorer/transport/regions/[id]                        Georgia and 11 region transport pages (§42)
-/explorer/demography                  დემოგრაფია        Demography hub (§29)
+                                                        Demography pages (§29); /explorer/demography is its group page
 /explorer/demography/population                         Population on 1 January: index — municipality map, key figures, ranked list (§29)
 /explorer/demography/population/georgia                 Georgia page (§29)
 /explorer/demography/population/region/[id]             11 region pages (§29)
@@ -487,11 +497,11 @@ Outside `/explorer` sit the two editorial pages, `/about` (§23) and `/connect`,
 
 Public municipality routes use the explicit lowercase-ASCII `[slug]` registry. Numeric municipality codes remain internal data, geometry, and join identifiers; they are not the public route identity.
 
-The section **is the route** — not React state, not a hash key. Sections are reached from the sidebar's nested list under `ბიუჯეტი` (§6.7) or from the hub cards; there are no in-page nav tabs. Section order is fixed and identical in both places: `ხარჯები`, `შემოსავლები`, `შეღავათები და დაბრუნება`, `მუნიციპალიტეტები`, `ანალიზი`, `ვალი`, `დეფიციტი`.
+The section **is the route** — not React state, not a hash key. Sections are reached from the sidebar's page rows under `ბიუჯეტი` (§6.7), from the Budget group page's cards (§6.8) or from All data; there are no in-page nav tabs. Section order is fixed and identical in the sidebar and on the group page: `ხარჯები`, `ხარჯების სახეები`, `შემოსავლები`, `შეღავათები და დაბრუნება`, `მუნიციპალიტეტები`, `ანალიზი`, `ვალი`, `დეფიციტი`.
 
-Every surface under `/explorer` opens with the **breadcrumb row** (§6.7): `მთავარი / მონაცემები / ბიუჯეტი` on the hub, `მთავარი / მონაცემები / ბიუჯეტი / <section>` on a section. Municipality entity pages extend that hierarchy through their real region before the municipality name (`… / მუნიციპალიტეტები / იმერეთი / ჭიათურა`); the visible trail and `BreadcrumbList` JSON-LD use the same region route. Its right slot is a mono **coverage** label — `{range} · განახლდა {YYYY-MM-DD}` (English `Updated {d Month yyyy}`) for the route's active scope, not the user's selection (the range strip owns that, and the two facts live at different altitudes). One formatter (`lib/explorer/coverageLabel.ts`) writes it on every route, every hub included, except the Demography pages, which print `{first}–{last} · 1 იანვრის მდგომარეობით` (§29); the range uses the unspaced en dash for month ranges as well as years.
+Every surface under `/explorer` opens with the **breadcrumb row** (§6.7): `მთავარი / მონაცემები` on All data, `მთავარი / მონაცემები / ბიუჯეტი` on the Budget group page, `მთავარი / მონაცემები / ბიუჯეტი / <section>` on a section. `მონაცემები` links to All data. On a chart page the topic crumb (`ბიუჯეტი`, `ხელფასები`, …) links to its group: Budget to `/explorer/budget`, any other topic to its section on its group page (`/explorer/labour#t-wages`), so no internal link passes through a forward; the `BreadcrumbList` item is the group page without the `#t-…` part. Municipality entity pages extend that hierarchy through their real region before the municipality name (`… / მუნიციპალიტეტები / იმერეთი / ჭიათურა`); the visible trail and `BreadcrumbList` JSON-LD use the same region route. Its right slot is a mono **coverage** label — `{range} · განახლდა {YYYY-MM-DD}` (English `Updated {d Month yyyy}`) for the route's active scope, not the user's selection (the range strip owns that, and the two facts live at different altitudes). One formatter (`lib/explorer/coverageLabel.ts`) writes it on every chart route, except the Demography pages, which print `{first}–{last} · 1 იანვრის მდგომარეობით` (§29); the range uses the unspaced en dash for month ranges as well as years.
 
-On the section routes, under the page title, sits the **deck line**: `year: Total` (`სულ`) in the body face and the latest-year total `X` in mono (the explorer) plus a colored YoY delta and the phrase `წინა წელთან` (`year on year`); the line fits one line at 375px in both languages (§17). The analysis deck is the YoY delta alone: its year, category count and total are the first headline card right below it. The hub has no deck line — it opens with the serif H1 `საქართველოს ბიუჯეტი` and a plain lead paragraph.
+On the section routes, under the page title, sits the **deck line**: `year: Total` (`სულ`) in the body face and the latest-year total `X` in mono (the explorer) plus a colored YoY delta and the phrase `წინა წელთან` (`year on year`); the line fits one line at 375px in both languages (§17). The analysis deck is the YoY delta alone: its year, category count and total are the first headline card right below it. All data and the group pages have no deck line; their header slot and line are specified in §6.8.
 
 ### 6.3 URL State (deep linking)
 
@@ -522,9 +532,9 @@ Write rules: loading a page never adds state to its URL, so a pristine URL stays
 
 Restore on load with validation (unknown values fall back to defaults; ranges clamp to loaded years; repeated selection IDs collapse to their first occurrence).
 
-Links shared before the route split still work: `/explorer#nav=expenditure|revenue|analysis` is honored once by a client component mounted on the hub, which reads the hash on mount and `router.replace`s to the matching route with `nav` stripped and the rest of the hash preserved.
+Links shared before the route split still work: `/explorer#nav=expenditure|revenue|analysis` is honored once by a client component mounted on All data (`/explorer`), which reads the hash on mount and `router.replace`s to the matching route with `nav` stripped and the rest of the hash preserved.
 
-The landing links into the dataset hubs (hero CTA → `/explorer`, the dataset row, the footer, which lists all twenty) and into the budget sections from its ledger (§19).
+The landing links into the explorer (hero CTA → `/explorer`, All data; the dataset row, whose Budget link opens `/explorer/budget` and whose Inflation, Unemployment and Trade links open their group sections; the footer, which lists the eight groups) and into the budget sections from its ledger (§19).
 
 ### 6.4 Rule Hierarchy (replaces cards)
 
@@ -552,43 +562,33 @@ spacing:
 ### 6.6 Shape and Elevation Policy
 
 - Border radius: **0–3px everywhere** (buttons 2px, tooltip 3px). Exception: the national `% მშპ-ში` measure pill, the municipal `% წილი` measure pill, the return-to-chart pill (§7.14), and slider handles/ticks use `999px`.
-- Shadows: only the chart tooltip (`0 4px 16px rgba(30,27,22,0.10)`), slider handles (`0 1px 3px rgba(30,27,22,0.15)`), the floating return-to-chart pill (§7.14), which floats over content and shares the tooltip's shadow, and the chart share menu (§7.17), which also shares it. Nothing else casts a shadow.
+- Shadows: only the chart tooltip (`0 4px 16px rgba(30,27,22,0.10)`), slider handles (`0 1px 3px rgba(30,27,22,0.15)`), the floating return-to-chart pill (§7.14), which floats over content and shares the tooltip's shadow, the chart share menu (§7.17), which also shares it, and the collapsed rail's pop-out (§6.7, `14px 0 36px rgba(30,27,22,0.16)`), which floats over the content. Accent left markers drawn as inset box-shadows (current sidebar row, active search result) are borders, not elevation. Nothing else casts a shadow.
 - Swatches are **14×3px bars**, never dots or rounded squares.
-- **Exception: hub cards** (`tile` bg, 1px `hairline` border, radius 0, hover `tint`, no shadow): the budget hub's seven cards, which every other dataset hub reuses for its own pages. The one other place they appear is the City air quality index (`/explorer/environment/air-quality`, §41), whose nine city cards use the same hub card component (`BudgetHub` with `HubCardModel`). A hub's peer destinations with no natural reading order are the one place containment beats rules — a rule stack implies a sequence that is not there. Cards remain forbidden everywhere else; this exception does not generalize to panels, KPI blocks, or any other surface.
+- **Exception: explorer cards** (`tile` bg, 1px `hairline` border, radius 0, hover `tint`, no shadow): the group pages' cards, one per chart page (`ExplorerCard`, §6.8), and, on All data, the place card and the topic shortcut rows, which use a 1.5px or 1px `ink` border on `tile` (§6.8). The one other place cards appear is the City air quality index (`/explorer/environment/air-quality`, §41), whose nine city cards keep the earlier hub card component (`BudgetHub` with `HubCardModel`). A group's peer destinations with no natural reading order are the one place containment beats rules — a rule stack implies a sequence that is not there. Cards remain forbidden everywhere else; this exception does not generalize to panels, KPI blocks, or any other surface.
 
 ### 6.7 Shell and Sidebar
 
 Everything under `/explorer` renders inside a persistent shell: a dark sidebar on the left, the content column beside it (max-width 1180px, **centred** in the space left over, page padding `20px` / `34px` at ≥768px). Centring matters past ~1500px: left-aligned, the column strands the whole surplus as one blank margin on the right. Implementation: `apps/web/components/shell/`.
 
-**Sidebar (expanded, ≥900px).** 232px, `ink` background, radius 0, sticky at `top: 0` with full viewport height so it holds while the long explorer page scrolls. When its links exceed the viewport height, the expanded sidebar's panel below the brand row scrolls on its own. Dividers on ink are `rgba(247,242,233,0.12)`; the active row background is `rgba(247,242,233,0.07)`.
+**Sidebar (expanded, ≥900px).** 272px, `ink` background, radius 0, sticky at `top: 0` with full viewport height so it holds while the long explorer page scrolls; when its rows exceed the viewport height it scrolls on its own. At 1440×900 the eight closed groups fit without scrolling. Dividers on ink are `rgba(247,242,233,0.12)` and `--ink-divider` / `--ink-line` (`#2C2720`, `#3A342B`); the active row background is `--ink-active` (`rgba(247,242,233,0.07)`). Implementation: `components/shell/data-sidebar.tsx`, with its state in the pure reducer `sidebar-state.ts`. From the top (redesign approved 2026-10-24, `docs/superpowers/specs/2026-10-24-explorer-regroup-design.md` §4):
 
-- Brand block → `/`: the reversed mark at approximately 30px, followed by live serif text `Fiscal.ge` in `paper` and live mono text `ღია მონაცემები` (8.5px, 0.1em) beneath in `ink-fg-faint`. This identity is shared by the expanded desktop sidebar and the mobile top bar.
-- `მონაცემები /` overline: mono 9.5px, 0.12em, `ink-fg-faint`.
-- Twenty dataset links, in order (one navigation config, `lib/navigation/navTree.ts`, which also feeds the header menu, footer and 404 hub lists): `ბიუჯეტი` → `/explorer`, `ეკონომიკა` → `/explorer/economy`, `ბიზნესი` → `/explorer/business`, `საცხოვრებელი და მშენებლობა` → `/explorer/housing`, `ინფლაცია` → `/explorer/inflation`, `ფული და ბანკები` → `/explorer/money`, `უმუშევრობა` → `/explorer/unemployment`, `ხელფასები` → `/explorer/wages`, `ცხოვრების დონე` → `/explorer/living-standards`, `ჯანდაცვა და სოციალური დაცვა` → `/explorer/health`, `განათლება` → `/explorer/education`, `მეცნიერება და კულტურა` → `/explorer/science-culture`, `დანაშაული და მართლმსაჯულება` → `/explorer/crime`, `ინტერნეტი და ტექნოლოგიები` → `/explorer/internet`, `საგარეო ვაჭრობა` → `/explorer/trade`, `საგარეო ნაკადები` → `/explorer/external`, `ენერგეტიკა და სურსათი` → `/explorer/energy-food`, `გარემო და კლიმატი` → `/explorer/environment`, `ტრანსპორტი` → `/explorer/transport`, `დემოგრაფია` → `/explorer/demography`. The active dataset wears a `2px accent` left border, active-row background and sans 12.5/600 in `paper`; inactive ones are `ink-fg-muted`.
-- Only the active dataset's sections nest beneath it: the seven budget sections (below), Economy's GDP / sectors / expenditure / regions, Business's Sales / Jobs / Investment and profit / Firms opened and closed / Regions, Housing's Permits / Completed buildings / Home prices / Regions, Inflation's overview / categories / products / cities, Money and banks' Money supply / Loans and deposits / Interest rates / Bank health, Unemployment's national overview / regions / age groups / gender / Jobs by industry / Hours worked / Informal jobs / Young people not in work or study, Wages' overview / industries / regions, Living standards' Income / Spending / Poverty / Inequality, Health's Doctors and hospitals / Illnesses / Causes of death / Social payments / Pensions / Subsistence allowance / Social package, Education's Schools / Kindergartens / Universities / Vocational colleges, Science and culture's Research / Patents / Museums / Theatres, Crime and justice's Recorded crimes / Convictions / Prisons / Victims / Road accidents, Internet and technology's Internet at home / Internet users / Shopping and services online / Phones and computers, Trade's Overview / Trading partners / Products / Domestic exports / Services trade, External flows' Money from abroad / Foreign investment / Current account / Foreign debt / Reserves, Energy and food's Energy supply / Electricity / Energy use / Food self-sufficiency / Farming, Environment and climate's Greenhouse gases / Air pollution / City air quality / Temperature and rain / Water / Waste / Forests, Transport's Vehicles / Vehicle age / Passengers / Freight / Regions, or Demography's Population / Age and sex / Migration / Births and deaths (Population, and Health's Pensions and Subsistence allowance, stay current on their place pages too), all in the section-row style below.
-- Teaser datasets (none today) — an `ink-fg-muted` label with a `მალე` badge (1px `#6C6860` border — **3.09:1** on `ink`, above the WCAG 1.4.11 3:1 floor for a component boundary — 2px radius, mono 9px, `ink-fg-faint`), rendered at reduced emphasis (opacity 0.6) so it never reads as a live row. Markers only: not links, not focusable, no route, no data. With none, the sidebar renders no teaser list at all.
-- Foot, above a 1px divider: `← მთავარი`. No version string.
-- Top-right: the collapse toggle — a 26px box, 1px `rgba(247,242,233,0.18)` border, Lucide `ChevronsLeft` (expanded) / `ChevronsRight` (collapsed) (§7.2a). `ChevronsLeft`/`ChevronsRight` are desktop-only; below 900px the toggle is the Lucide `Menu` / `X` pair (accessible name `მენიუ` / `Menu`, 44×44, no border).
+- Brand block → `/`: the reversed mark at approximately 30px, live serif `Fiscal.ge` in `paper` and live mono `ღია მონაცემები` (8.5px, 0.1em) beneath in `ink-fg-faint`. The collapse toggle sits at its right: a 36px box, Lucide `PanelLeftClose` (expanded) / `PanelLeftOpen` (rail), labels `პანელის ჩაკეცვა` / `პანელის გაშლა`, `aria-expanded`.
+- **Search all data** (`ძებნა ყველა მონაცემში`): a 40px full-width link with the search icon and a `/` key hint, to `/explorer#q=` with the box focused; on All data itself it focuses the box in place. The `/` key does the same from any explorer page, except while typing in a field or composing.
+- **All data** (`ყველა მონაცემი`): a 42px row with Lucide `LayoutGrid` and the page count (102, from the config), current on `/explorer`.
+- The overline `თემები` / `Hubs`, then the eight groups in the order of §6.8, each a row with its Lucide icon, the name (sans 13.5/600) and the mono 11px page count. The row links to the group page (`aria-current="page"` there); a separate 36px chevron button (`ChevronRight`, `aria-expanded`, `aria-controls`, named `გაშლა: {group}` / `ჩაკეცვა: {group}`) opens or closes the row's list. The current group — the group page itself or the group of the chart page shown — wears the `accent` inset left border and is open on load; other groups open with their chevron and stay open until closed.
+- An open group lists its topics as 11px subheadings (only when it has more than one topic), each with its pages as 12.5px rows drawn by `SidebarSectionLink` (`section-nav.tsx`): a 2px left border, `accent` and `paper` text at 600 on the current page, `aria-current="page"`. A row is current on its own page and on the pages below it (a municipality, region or place page). Budget's rows come from the same config as every other topic's; there is no separate section list and no `მალე` row.
+- Foot: the language switch (`LanguageSwitch`), then `მეთოდოლოგია · AI-კავშირი` (`/methodology`, `/connect`). There is no `← მთავარი` row; the brand links home. No version string.
+- Teaser datasets (none today) — a future marker is never a link and carries no data; `ComingSoonBadge` keeps its `მალე` styling (1px `#6C6860` border, **3.09:1** on `ink`).
 
-**Section list** (`section-nav.tsx`, nested under `ბიუჯეტი`). Each entry is a route link, drawn by `SidebarSectionLink`, the one section row every hub's pages use. Active: accent `▸` marker, `paper` text at weight 600, active-row background, `aria-current="page"`. Inactive: `ink-fg-muted`, marker held in transparent so labels do not shift. All eight sections — `ხარჯები`, `ხარჯების სახეები`, `შემოსავლები`, `შეღავათები და დაბრუნება`, `მუნიციპალიტეტები`, `ანალიზი`, `ვალი`, `დეფიციტი` — render this way; none is a `მალე` marker. The sidebar's hubs and their pages come from `lib/navigation/navTree.ts`: every hub is a list item and its pages a nested list (Budget's from `lib/explorer/sections.ts` through `SectionNav`, which adds any `მალე` rows). A row is current on its own page and on the pages below it (a municipality, region or place page). Removing the section rows means removing a hub's `sections` from that config, not deleting `section-nav.tsx`, which also holds the shared row.
+The sidebar's groups, topics and pages come from the one navigation config, `lib/navigation/navTree.ts` (`NAV_GROUPS` over `NAV_TREE`), which also feeds the header menu, footer and 404 lists (now the eight groups), All data and the group pages. Counts are derived from it, never typed.
 
-**Collapsed rail (≥900px).** 52px, same `ink` surface, radius 0:
+**Collapsed rail (≥900px).** 72px, same `ink` surface: the brand mark, the toggle, the search icon, the All data icon and the eight group icons, each with an accessible name; the current group keeps its accent marker. Hovering or focusing a group icon opens a 320px **pop-out** beside the rail (fixed to the viewport at `left: 72px`, full height, its own scroll, a 1px `--ink-line` left border and the one sidebar shadow of §6.6): the group name as a 20px serif link, `{n} ქვეთემა · {n} გვერდი`, its topics and all its pages. Moving away, focus leaving the group, or Escape (focus returns to the icon when it was inside) closes it; expanding the rail closes it; clicking the icon opens the group page. The compact language switch (`EN` / `ქარ`) sits at the foot. This replaces the earlier rule that sections are not reachable while collapsed. Width transitions at `base` (§14) and snaps under `prefers-reduced-motion: reduce`. The choice persists in `localStorage` under `geodata:sidebar-collapsed`, read after mount; a storage denial falls back to expanded.
 
-- The toggle stays in place at the top, icon flipped to `ChevronsRight`.
-- Below it, the context line runs vertically down the rail, naming the active dataset (`მონაცემები · ბიუჯეტი`, or the Economy / Business / Housing and construction / Inflation / Money and banks / Unemployment / Wages / Living standards / Health and social protection / Education / Science and culture / Crime and justice / Internet and technology / Trade / Energy and food / Environment and climate / Transport / Demography equivalent), mono 9.5px, `ink-fg-faint`, 0.1em, via `writing-mode: vertical-rl` plus `rotate(180deg)` so it reads **bottom-to-top**. It carries the same two facts the expanded overline and active row carry, which is why the section list can disappear without losing orientation.
-- Beneath it, the compact language switch; at the foot, a Lucide `House` icon is the collapsed `← მთავარი` link, with a 26×26 hit area, `aria-label="მთავარი"`, and a `title` tooltip. The collapsed rail remains logo-free.
-- **Sections are not reachable while collapsed** — the list is unmounted, not hidden. A 52px rail cannot carry Georgian section names, and reducing them to invented initials would trade one extra click for three ambiguous glyphs. Collapse is a reading posture: it hands the width back to the data and keeps only orientation and escape.
+**Below 900px** (owner decision D3, 2026-10-07; the redesign's 768px switch is not used, because chart pages lose too much width to a 272px sidebar between 768 and 900px). A 56px top bar, safe-area aware and pinned while the page scrolls, holds the brand (mark and `Fiscal.ge`, no `ღია მონაცემები` sub-line), a search button (to All data with the box focused) and the `Menu` button (`მენიუ` / `Menu`, 44×44, `aria-expanded`, `aria-controls`). The menu opens the same sidebar **full screen** as a modal: the nav takes `role="dialog"`, `aria-modal="true"` and the name `მენიუ`; the page column and the bar are `inert` and hidden (`visibility: hidden`, so the page keeps its layout and scroll position); focus moves to the close button (`X`, `მენიუს დახურვა`), which replaces the collapse toggle; Tab and Shift+Tab wrap inside the menu. Escape and the close button close it, restore the scroll position and return focus to the menu button; following a link closes it and the new page opens at its top; widening past 900px closes it and shows the desktop sidebar. Every row is at least 44px tall. Expanded/collapsed is a **desktop-only** state: a stored collapse is ignored below 900px.
 
-Width transitions at `base` (§14) and snaps under `prefers-reduced-motion: reduce`. The choice persists in `localStorage` under `geodata:sidebar-collapsed`, read after mount; a storage denial falls back to expanded rather than breaking the render.
+**Accessibility.** The sidebar is a `nav` landmark (`მონაცემთა პანელი` / `Data panel`) and a modal dialog only while the phone menu is open. Group chevrons expose `aria-expanded` and `aria-controls`; the current page and group carry `aria-current="page"`. Icons beside text are `aria-hidden`; icon-only controls have names. Inside the sidebar and the phone bar the focus ring is drawn in `paper`. The skip link is hidden while the menu is open.
 
-**Below 900px** (owner decision D3, 2026-10-07). The sidebar becomes a full-width top bar (brand + `☰` toggle, ~56px, safe-area aware) that stays pinned to the top of the viewport while the page scrolls, so the menu is always one tap away. The toggle opens the same nav as a panel hanging directly below the bar, capped at the viewport height minus the bar and scrolling on its own; there is no backdrop. `Escape` closes it and hands focus back to the toggle; a tap outside the bar or on a link closes it. Every panel row — datasets, sections, the language switch and `← მთავარი`, which is a full row — is at least 44px tall. Expanded/collapsed is a **desktop-only** state: a persisted collapse preference is ignored below 900px rather than applied as an unexplained narrow rail, and the mobile toggle only opens and closes the panel.
-
-**Accessibility, and the deviations on record.**
-
-- The toggle exposes `aria-expanded`. On desktop its label flips between `პანელის ჩაკეცვა` and `პანელის გაშლა`; below 900px it is `მენიუ` / `Menu` and points with `aria-controls` to the mounted `data-sidebar-navigation` panel. The collapsed desktop rail omits `aria-controls` because that panel is unmounted.
-- There is **no focus trap** on the mobile panel, by decision. A trap is the contract for a modal; this panel is non-modal — no backdrop, the page behind it stays reachable, and a tap outside dismisses it — so trapping would strand keyboard users in a region they can simply tab past. `Escape` to close plus focus return to the trigger is the whole contract.
-
-**Breadcrumb page header** (`page-header.tsx`). One row with a `2px ink` bottom rule, rendered per route (the final crumb differs per route, and a server layout cannot read the child route). Crumbs: sans 10.5px uppercase 600 in `muted`, current crumb in `ink`, separators `/` in accent. `მთავარი` links to `/`; `მონაცემები` is plain text with no route; `ბიუჯეტი` links to the hub on section routes and is plain text on the hub. Right slot: the mono 10.5px `faint` coverage label of §6.2 — the loaded range of the route's active scope, so it tracks the grouping, and the union of both sides on the hub. Unemployment region pages end the trail with the region name.
+**Breadcrumb page header** (`page-header.tsx`). One row with a `2px ink` bottom rule, rendered per route (the final crumb differs per route, and a server layout cannot read the child route). Crumbs: sans 10.5px uppercase 600 in `muted`, current crumb in `ink`, separators `/` in accent. `მთავარი` links to `/`; `მონაცემები` links to All data and is plain text there; the topic crumb links to its group page or section (§6.2) and is plain text on a group page. Right slot: the mono 10.5px `faint` coverage label of §6.2 — the loaded range of the route's active scope, so it tracks the grouping — or, on All data and the group pages, their meta line (§6.8). Unemployment region pages end the trail with the region name.
 
 Below 768px (owner decision D10, 2026-10-07) the trail is replaced by a single back-link to the nearest linked parent (`← ბიუჯეტი`), sans 11px uppercase with a 44px target. From 768px the full trail shows; the `BreadcrumbList` JSON-LD is the same at every width.
 
@@ -596,24 +596,51 @@ The crumbs carry `BreadcrumbTrail`'s semantics, not its markup: a localized brea
 
 **Footer.** Every `/explorer` route renders `SiteFooter` (§19) at the foot of the content column — inside it, not beside the sidebar — with the pages' own horizontal padding so its rule lines up with the content above. The footer uses the compact lockup at approximately 150px and retains its trust, navigation, contact, and CC BY 4.0 licence content (anatomy in §19). Explorer and methodology-article footers name the relevant dataset's source institutions; review dates remain in the page's existing source note or article header. They do not repeat the site-wide latest review date as if it applied to that dataset. Generic footers explicitly label the landing model's `updatedAt` as the latest source review across Fiscal.ge. These routes are the site's main SEO landing targets, and the footer is where the licence, contact address and methodology link live (§21).
 
-**Budget hub (`/explorer`).** Breadcrumb, serif H1 `საქართველოს ბიუჯეტი`, a concise lead covering budgets, debt and deficit, then eight cards in a two-column grid (one column below 768px, max-width 860px). It has no source note of its own: the footer note and the header's coverage label carry the source and update date. Card anatomy, in order: mono index in accent with `→` right-aligned, serif 18px title, 11.5px `muted` description, graphic, mono 10px `faint` footer (`muted` while the card is hovered: `faint` on the `tint` hover fill is 4.21:1). A card link is named by its title and described by its description and footer; the index is `aria-hidden`. The sparkline draws at 200×34 from 768px and at the full card width below it; a card without a graphic keeps the empty 34px band so footers align.
-
-| # | Card | Graphic | Footer | Links to |
-|---|------|---------|--------|----------|
-| 01 | `ხარჯები` | total expenditure series, `Sparkline` at 200×34 in `ink` | `{latestYear} · {total}` | `/explorer/expenditure` |
-| 02 | `ხარჯების სახეები` | general-government total spending series, `Sparkline` at 200×34 in `ink` | `{latestYear} · {total}` | `/explorer/expenditure-types` |
-| 03 | `შემოსავლები` | total revenue series, same at 200×34 in `ink` | `{latestYear} · {total}` | `/explorer/revenue` |
-| 04 | `შეღავათები და დაბრუნება` | tax refunds series 2008–2025, `Sparkline` at 200×34 in `ink` | `{latestYear} · დაბრუნება {total}` | `/explorer/tax-breaks-refunds` |
-| 05 | `მუნიციპალიტეტები` | total municipal series, `Sparkline` at 200×34 in `ink` | `{latestYear} · {total}` | `/explorer/municipalities` |
-| 06 | `ანალიზი` | none | `{latestYear} · {n} კატეგორია` | `/explorer/analysis` |
-| 07 | `ვალი` | total Government Debt stock series, `Sparkline` at 200×34 in `ink` | `{latestYear} · {total}` | `/explorer/debt` |
-| 08 | `დეფიციტი` | actual general-government balance as `% მშპ-ში`, `Sparkline` at 200×34 in `ink` | `{latestActualYear} · {balance}% მშპ-ის` | `/explorer/deficit` |
-
-All seven sparklines are `ink` because each traces a **total or balance** (a side total for cards 01/03, general-government total spending for card 02, tax refunds for card 04, the municipal total for card 05, Government Debt stock for card 07, and the general-government balance for card 08). `accent` is not free chrome here: `#B3402A` is the token of `spending.social_protection` and `revenue.vat`, so an accent aggregate would draw one quantity in another category's color.
-
-Every figure on the hub — series, footers and card 05's description counts alike — is computed at build time from the same served facts the section pages use, so the hub cannot drift from the pages behind it. Nothing on it is hardcoded.
+**Budget group page (`/explorer/budget`).** The Budget group page (§6.8) has one topic, so it shows no topic heading or topic links: after the headline numbers come eight cards in the section order of §6.2, the first a two-column lead card. Card 04 (Tax breaks and refunds) shows the latest refunds total with the caption `დაბრუნება` / `Refunds`; Analysis has no single figure and shows its years only. Every card's line is `ink`, because each traces a **total or balance** (a side total, general-government total spending, tax refunds, the municipal total, Government Debt stock, the general-government balance); `accent` is not free chrome here: `#B3402A` is the token of `spending.social_protection` and `revenue.vat`, so an accent aggregate would draw one quantity in another category's color. Every figure is computed at build time from the same served facts the section pages use. Nothing on it is hardcoded.
 
 **Spending by type (`/explorer/expenditure-types`).** General-government spending by economic type from the Ministry of Finance's GFS file, 2002–2025, on the Sectors workspace that GDP by expenditure also uses, with two measures only, amounts in ₾ and `% of GDP` (no real growth). The series list keeps the Ministry's order under two small headings, Running costs (expense and its seven parts) and Investment; total spending is pinned first. The page opens on total spending, social benefits, investment, wages, subsidies, goods and services and interest, an approved departure from "only the total" (owner, 2026-10-21). Every row has its own stable colour; the total is `ink`. The page shows no balance: the Deficit page keeps the one IMF figure per year. Bounded decisions: `docs/superpowers/specs/2026-10-21-spending-by-type-design.md`.
+
+### 6.8 Group pages and All data
+
+Approved by Duru on 2026-10-24 (`docs/superpowers/specs/2026-10-24-explorer-regroup-design.md`). The twenty topics are gathered into eight groups, each with its own page, and `/explorer` is **All data**, a search page with an A to Z list of every chart page. Chart pages, their addresses, charts, tables and Excel are unchanged. Implementation: `components/explorer-groups/`, `lib/pages/{group,all-data}.tsx`, `lib/explorer/{groupHeadlines,allDataIndex}.ts`, `lib/explorer/search/` and `lib/explorer/places/`.
+
+| Group (ka / en) | Address | Icon | Topics, in order | Pages (2026-10-24) |
+| --- | --- | --- | --- | --- |
+| ბიუჯეტი / Budget | `/explorer/budget` | `Landmark` | Budget | 8 |
+| ეკონომიკა და ბიზნესი / Economy and business | `/explorer/economy` | `Factory` | Economy, Business, Housing and construction | 13 |
+| ფასები და ფული / Prices and money | `/explorer/prices` | `Coins` | Inflation, Money and banks | 8 |
+| შრომის ბაზარი / Labour market | `/explorer/labour` | `BriefcaseBusiness` | Unemployment and jobs, Wages | 11 |
+| ცხოვრების დონე და ჯანდაცვა / Living standards and health | `/explorer/living` | `HeartPulse` | Living standards, Health and social protection | 12 |
+| საგარეო სექტორი / External sector | `/explorer/external` | `Ship` | Trade, External flows | 11 |
+| დემოგრაფია / Demography | `/explorer/demography` | `UsersRound` | Demography | 5 |
+| საზოგადოება და გარემო / Society and environment | `/explorer/society` | `Trees` | Education, Science and culture, Crime and justice, Internet and technology, Energy and food, Environment and climate, Transport | 34 |
+
+Membership, order and counts come from `NAV_GROUPS` in `lib/navigation/navTree.ts`; a page added to a topic joins its group, its sidebar list, All data and search with no other change. Where §2 and §19–§44 describe a topic's "hub" and its numbered cards, those cards are now that topic's section on its group page, in the same order, and the topic's old address forwards there.
+
+**Group page.** In order:
+
+1. The breadcrumb row (`მთავარი / მონაცემები / {group}`) with the meta line in the right slot: `{n} ქვეთემა · {pages} გვერდი · განახლდა {date}` / `{n} topics · {pages} pages · Updated {date}`, or `{pages} გვერდი · განახლდა {date}` for a one-topic group. The date is the latest review date of the group's topics.
+2. The H1 with the group icon in `accent` (28px, 36px from 1101px), then **one short line** (§17), which fits one line at 375px.
+3. **Four headline numbers** (`lib/explorer/groupHeadlines.ts`), each a link to its page with a label, the latest value in mono with its period, a caption only where the label does not already say it (the largest trading partner's name), and a 24px trend line in `control`. Four columns from 1101px and **two below** — a deviation from the spec's "two from 768px down", because long values (`25.9 მლრდ აშშ დოლარი`) overflow four columns beside the 272px sidebar. The columns are ruled off by `hairline-soft`, the row by `hairline` above and below.
+4. **Topic links**, only in a group with more than one topic: one bordered link per topic with its name, one small bar per page and the page count, to `#t-{topic}`. The row sticks to the top (under the 56px bar below 900px) and scrolls sideways when it does not fit.
+5. **One section per topic**, `id="t-{topic}"`: a 1.5px `ink` top rule, the topic name as a serif H2 (23px, 28px from 768px), the mono meta `{years} · განახლდა {date} · {n} გვერდი` on the right, and the topic's one line. A one-topic group shows no topic heading (it stays for screen readers).
+6. **Cards**, then the explorer footer, whose source note names the group's institutions.
+
+**Cards** (`ExplorerCard`, §6.6 exception). Three columns from 1101px, two from 768px, one below. Each card is one link: the mono index in `accent` and Lucide `ArrowUpRight`, the page title (h3), a graphic band, the latest value with its caption and period, and a mono footer with the years covered. A topic's first card is its **lead**: it shows the page's description and a larger area chart labelled with its last value and its first and last years. Its span leaves the grid of three full: with `n` pages, `(n − 1) mod 3` of 0 spans the whole row, 1 two columns, 2 two columns by two rows (`leadSpan`); below 1101px a lead spans the whole row. A whole-row or two-column lead splits into text left and chart right from 1101px. Graphics: a line with an end dot for a page with a national series; the **region spread** for a Regions page (one dot per region on a scale, Georgia as a dashed line, the lowest and highest named); bars for Unemployment by age; two bars for Unemployment by sex; the top three industries for Wages by industry; otherwise `Map` with `რუკა და სია · {n} რეგიონი`, or an empty band so footers align. The band is `aria-hidden`; what it says that the text does not (the pair, the first and last bar, the spread's ends) is repeated in visually hidden text the link's description points at. Below 768px small card text keeps the 11px floor (§5.2).
+
+**Numbers.** Every value, period, trend and year range is computed at build time from the same served facts as the chart page it links to, through that topic's card builder (`lib/explorer/*HubCards.ts`, `HubCardModel.latest`); a headline pick without a figure fails the build. Nothing is typed by hand.
+
+**Forwards.** Each of the 16 old topic addresses (`/explorer/business`, `/explorer/wages`, …, and their `/en` mirrors) forwards permanently, in `next.config.ts`, to `{group}?topic={topic}`, so the browser keeps any `#…` the old link had; on the group page a small client script rewrites the address to `#t-{topic}`, scrolls the section into view and focuses it. Before that it hands an old Unemployment link's `#breakdown=…` to the page that now serves it. Only the exact topic address forwards (a trailing slash included); pages below it do not. `/explorer/poverty` goes straight to `/explorer/living?topic=living-standards`. `/explorer/economy`, `/explorer/external` and `/explorer/demography` keep their addresses and now serve group pages; `/explorer` keeps honouring `#nav=` links (§6.3). Internal links never use a forwarded address.
+
+**All data (`/explorer`).** In order: the breadcrumb row `მთავარი / მონაცემები` with the meta `{pages} გვერდი · განახლდა {date}`; the H1 `ყველა მონაცემი` / `All data` and the one line `მოძებნეთ ან დაათვალიერეთ.` / `Search or browse every page.`; the **search box**; a `სცადეთ:` row of five example words; then either the A to Z list or the results.
+
+- **Search box.** 66px tall (56px on phones), a 1.5px `ink` border on `tile`, the search icon, the placeholder `ინფლაცია, ბათუმი, ხელფასები…`, a `/` hint while empty and, once it has text, the result count and a clear button. It is a labelled ARIA combobox over a listbox: ↑ and ↓ move (and wrap), Enter opens, Esc clears, and a polite live region announces the count. The query lives in the address as `#q=…` (`use-hash-state`, written with replace), so a search can be shared and Back works; clearing removes it.
+- **A to Z** (rendered on the server, in the page's HTML): a sticky letter bar (`ა–ჰ` / `A–Z`; letters with no page dimmed and unlinked), which wraps onto a second row from 768px when it does not fit and scrolls sideways on phones; then the pages grouped by first letter in two balanced columns (one on phones). A row has the page name, its group's icon and name, a 44px trend line (`Map` for a Regions page without one) and the latest value with its period. Vague names take their topic in front: `ხელფასები — რეგიონები` / `Wages — regions`.
+- **Matching** (`lib/explorer/search/`). Case, punctuation and quotation marks are ignored. A word matches the start of a word in a page's Georgian or English name, its topic and group names, or its extra search words (`allData.words.*`), anywhere inside from three letters, or as a stem with common Georgian endings removed; every word must match. A Latin query that finds nothing is read through the Georgian keyboard layout, with a notice: `ქართული განლაგებით: ხელფასები` (Lucide `Languages`). Matched letters are highlighted in `accent`. A query that names a whole group or topic adds a shortcut row to it above the results.
+- **Places.** The 11 regions (Tbilisi as the capital) and 63 municipalities. A query that names one shows the **place card** first (Lucide `MapPin`, the name, its type — `რეგიონი · {n} მუნიციპალიტეტი`, `მუნიციპალიტეტი · {region}` or `დედაქალაქი` — and four facts with their years: population, budget, budget per resident, births per 100 deaths), then the place's own pages (each linking to the place's page with its value, its municipal budget first), then its region's pages. Other words narrow the lists (`ბათუმი სკოლა`). The place index is a prerendered `force-static` file per language, `/explorer-places.{ka,en}.json`, fetched once on the first query and abandoned after 4 seconds; if it fails, page search still works and the card is simply absent, with no error text.
+- **Nothing found:** `„{q}“ ვერ მოიძებნა`, a hint and a `ყველა გვერდის ნახვა` button that clears the box.
+
+**Accessibility.** One H1 per page; topic sections are labelled regions that take focus when reached through a forward; card links are named by their titles; the letter bar is a named `nav`; axe scans run on All data and a group page at 375 and 1440px.
 
 ## 7. Core Components
 
@@ -625,7 +652,7 @@ The public-site header appears on the landing page (§19), `/about` (§23), the 
 
 The brand link uses the reviewed full v2.0 horizontal lockup at 280px from 900px upward and the standalone symbol below 900px. The full horizontal lockup must not render below 280px; the standalone mark must not render below 24px. The supplied token JSON's 180px lockup value is not authoritative for production.
 
-Vertically centered logo row: lockup left, navigation centered independently of the side content, language switch right; no coverage-year label or bottom rule. From 900px, equal outer grid columns keep navigation at the header's true midpoint. Below 900px, a single compact row contains the standalone logo symbol on the left, a centered bold Fiscal.ge wordmark without a tagline, and an icon-only Menu button on the right. The button retains a localized accessible name. The button expands navigation links and the KA / EN language switch beneath it; the language switch stays inside this panel, with each language target at least 44×44px. A link that shows `KA` / `EN` (here and in the collapsed rail) carries the full language name after it as visually hidden text, so its accessible name starts with what it shows. In the panel, `მონაცემები` is a label over the twenty dataset hub links, in the sidebar's order (§6.7) and from its one navigation config (`lib/navigation/navTree.ts`); from 900px the single `მონაცემები` → `/explorer` link stays (owner decision D3, 2026-10-07; all hubs per Q3, 2026-10-12, recommended default pending the owner's answer). Escape closes the panel and returns focus to the button; following a link or crossing the desktop breakpoint closes it. Nav tab: sans 13px; active = ink, weight 600, `2px accent` text underline with a `5px` offset; inactive = muted, weight 500. The landing page marks `მთავარი` active. `/about` marks `მიზანი` active. Methodology routes mark neither `მთავარი` nor `მონაცემები` nor `მიზანი` active and render no `aria-current`, because methodology remains inactive as a separate destination; no methodology tab is added.
+Vertically centered logo row: lockup left, navigation centered independently of the side content, language switch right; no coverage-year label or bottom rule. From 900px, equal outer grid columns keep navigation at the header's true midpoint. Below 900px, a single compact row contains the standalone logo symbol on the left, a centered bold Fiscal.ge wordmark without a tagline, and an icon-only Menu button on the right. The button retains a localized accessible name. The button expands navigation links and the KA / EN language switch beneath it; the language switch stays inside this panel, with each language target at least 44×44px. A link that shows `KA` / `EN` (here and in the collapsed rail) carries the full language name after it as visually hidden text, so its accessible name starts with what it shows. In the panel, `მონაცემები` is a label over the eight group links, in the sidebar's order (§6.7) and from its one navigation config (`lib/navigation/navTree.ts`); from 900px the single `მონაცემები` → `/explorer` link stays (owner decision D3, 2026-10-07; all hubs per Q3, 2026-10-12, recommended default pending the owner's answer). Escape closes the panel and returns focus to the button; following a link or crossing the desktop breakpoint closes it. Nav tab: sans 13px; active = ink, weight 600, `2px accent` text underline with a `5px` offset; inactive = muted, weight 500. The landing page marks `მთავარი` active. `/about` marks `მიზანი` active. Methodology routes mark neither `მთავარი` nor `მონაცემები` nor `მიზანი` active and render no `aria-current`, because methodology remains inactive as a separate destination; no methodology tab is added.
 
 The English hero heading uses two explicit lines: `Georgia` followed by `in numbers`. English hero statistics and city population labels abbreviate thousand as `k` (for example, `69.7 k km²`).
 
@@ -639,7 +666,7 @@ Lucide (`lucide-react`) is the project's chosen functional icon family. Use name
 
 Icon-only controls must keep a localized accessible name on the button/link; the SVG itself is decorative (`aria-hidden`). Measure controls show the full label on hover and keyboard-visible focus, with Escape dismissal and hoverable tooltip content. Mouse/touch clicks must not latch the tooltip open after the pointer leaves. Touch users can read the selected measure's explanation beneath the heading, except on the household Income and Spending pages and their area pages (Georgia and the regions), whose latest-value line is fixed to the page's area per household, so the measure is read from the series panel caption, the source line and, on the section pages, the map legend. Crime and justice is the other exception: its latest-value line always shows the count headline (§38), so the per 100,000 view is read from the chart panel's unit caption beside the measure switch. Reuse `SegmentedTabs` and `ControlTooltip` for this pattern.
 
-National-sector mapping: literal `₾` for nominal GEL, Lucide `ChartPie` for share of GDP, `ChartNoAxesCombined` for real growth; the money and banks pages reuse `₾` and `ChartPie`, and add `CircleDollarSign` for share in foreign currency (money and banks). The chart icon denotes a measure, not a promise of positive growth. The household measure switch uses Lucide `User` for per person. Dated exception (owner approval, 2026-10-12): per household uses one solid non-Lucide glyph, Material Symbols `family_restroom` (outlined, weight 400, Apache-2.0, © Google), because Lucide has no family icon. It is filled with `currentColor` at the same 18px as `User`, used for this one button only, kept in `components/ui/household-icon.tsx`, and is not a second icon family. Existing functional menu/close, sidebar collapse/expand and compact home controls use Lucide `Menu`, `X`, `ChevronsLeft`, `ChevronsRight`, and `House`. The chart share button (§7.17) uses `Share2`, and its menu items `Download`, `Copy` and `Share`, all 16px. Logos, brand assets, maps and actual data visualizations are not UI icons and remain unchanged. Conventional checkbox marks, textual carets and arrows embedded in prose remain typographic; do not add decorative icons or indiscriminately replace text with symbols.
+National-sector mapping: literal `₾` for nominal GEL, Lucide `ChartPie` for share of GDP, `ChartNoAxesCombined` for real growth; the money and banks pages reuse `₾` and `ChartPie`, and add `CircleDollarSign` for share in foreign currency (money and banks). The chart icon denotes a measure, not a promise of positive growth. The household measure switch uses Lucide `User` for per person. Dated exception (owner approval, 2026-10-12): per household uses one solid non-Lucide glyph, Material Symbols `family_restroom` (outlined, weight 400, Apache-2.0, © Google), because Lucide has no family icon. It is filled with `currentColor` at the same 18px as `User`, used for this one button only, kept in `components/ui/household-icon.tsx`, and is not a second icon family. Functional menu/close and sidebar collapse/expand controls use Lucide `Menu`, `X`, `PanelLeftClose` and `PanelLeftOpen`; the sidebar's group chevron is `ChevronRight`. The explorer's group icons are `Landmark` (Budget), `Factory` (Economy and business), `Coins` (Prices and money), `BriefcaseBusiness` (Labour market), `HeartPulse` (Living standards and health), `Ship` (External sector), `UsersRound` (Demography) and `Trees` (Society and environment), kept in `components/shell/group-icons.tsx`; All data is `LayoutGrid`, search `Search`, the place card `MapPin`, a Regions card or row without a line `Map`, a card's corner arrow `ArrowUpRight`, and the keyboard reading notice `Languages`. The chart share button (§7.17) uses `Share2`, and its menu items `Download`, `Copy` and `Share`, all 16px. Logos, brand assets, maps and actual data visualizations are not UI icons and remain unchanged. Conventional checkbox marks, textual carets and arrows embedded in prose remain typographic; do not add decorative icons or indiscriminately replace text with symbols.
 
 A boxed either/or switch is the honest affordance for choosing which view of the same data you are looking at. A filter is not that — do not box the tab groups of §7.2b.
 
@@ -688,6 +715,8 @@ clears everything, programs included.
 **Long lists scroll inside their panel** (exception to D4, 2026-10-12). D4's rule that a stacked list flows with the page was written for short lists. A list of more than 30 rows (`LONG_LIST_ROWS`; trade partners 218, domestic-export countries 187, inflation products 305) uses `listLayout="scroll"`: the list scrolls inside a box of at most `min(430px, 60svh)` at every width, so the content after it stays within a couple of screens of the chart. Before the list sits a `სიის გამოტოვება` / `Skip the list` button, hidden until it has keyboard focus, that moves focus to the end of the list (a button, not an in-page link, because these pages keep their state in the URL hash). Trade partners and domestic-export countries also put their Excel button above the list, under the end-year · unit line (§7.8). The inflation products list keeps its phone top ten and `მეტი პროდუქტი` button; after that button the remaining rows scroll inside the same box.
 
 Underline-only input: h34, no box, 1px `control` bottom border, transparent bg, sans 13px, radius 0. Search inputs are `type="search"` with `enterkeyhint="search"`; on stacked layouts focusing the field scrolls it to the top of the viewport so results stay above the on-screen keyboard. The placeholder is `ძებნა` / `Search` in every series panel, the products list and the municipal and regional indexes (all underline fields, h34); heading pickers keep their descriptive placeholder. A query with no matches shows `კატეგორია ვერ მოიძებნა — შეცვალე საძიებო ტექსტი.` The total row stays pinned regardless of the query, so this message names the categories that missed rather than claiming zero results — it would otherwise render directly above a visible `მთლიანი ხარჯი`. While searching in ministries grouping, ministries with matching programs auto-expand to show only matching programs (their caret is locked open); a ministry matched by name still honors its caret and expands to all of its programs. Search ignores accents (`turkiye` finds `Türkiye`); trade partners match their Georgian and English names in either language, Geostat's partner code and a few common names their labels lack (`Turkey`, `USA`, `UK`). The query is panel-local state and resets on ANY scope switch — nav (ხარჯები↔შემოსავლები) and grouping alike; typing must not re-render the chart.
+
+**Site search is separate** (2026-10-24). Everything above is the search inside one series panel. Finding a page, topic or place across the site is All data's search box (§6.8): a 66px box (56px on phones) with a 1.5px `ink` border on `tile`, not the underline field; its matching lives in `lib/explorer/search/`, and the series-panel matching is unchanged.
 
 ### 7.8 Excel Button
 
@@ -939,11 +968,11 @@ Mobile (<768px): page padding `24px 20px 64px`; page title 30px; hero value 44px
 
 Breakpoint behavior keys off the page container width (ResizeObserver or CSS container/media queries), matching the reference prototype.
 
-The shell adds one breakpoint of its own at **900px** (§6.7). It governs the sidebar only — above it the sidebar is a column, below it a pinned top bar with a drop-down nav panel — and does not change the content column's own breakpoints above. The hub card grid drops to one column below 768px.
+The shell adds one breakpoint of its own at **900px** (§6.7). It governs the sidebar only — above it the sidebar is a column, below it a pinned top bar whose menu opens full screen — and does not change the content column's own breakpoints above. The group pages add their own (§6.8): cards in three columns from 1101px, two from 768px and one below; headline numbers in four columns from 1101px and two below.
 
-The workspace's own breakpoints measure the **content column**, not the viewport (`@container` on the centred column in `main-explorer.tsx`). With a 232px sidebar in front of it the two differ by more than the 292px aside costs, so a viewport query keeps the two-column layout past the width the chart can fit and the chart clips inside its own frame.
+The workspace's own breakpoints measure the **content column**, not the viewport (`@container` on the centred column in `main-explorer.tsx`). With a 272px sidebar in front of it the two differ by more than the 292px aside costs, so a viewport query keeps the two-column layout past the width the chart can fit and the chart clips inside its own frame.
 
-**Chart width between 900 and 1019px — an accepted deviation from the §8.3 label size.** In that band the sidebar leaves the column 600–719px, under the chart frame's 720px minimum. The chart shrinks to fit there rather than scrolling, so the rendered axis label falls to **7.2px at 900px** (from 8.6px). This is a deliberate trade of label size for a whole chart, approved for this band only. Two things it does not change: below 900px the sidebar becomes a top bar, the column is wide again, and phones (<768px) draw the phone geometry of §8.3 instead; and the 11px in §8.3 is a viewBox unit, so the rendered size has always tracked the frame — it is 8.6px at 1020px and 9.7px at 1440px, reaching 11px only where the chart is widest.
+**Chart width between 900 and 1059px — an accepted deviation from the §8.3 label size.** In that band the 272px sidebar (232px before 2026-10-24) leaves the column 560–719px, under the chart frame's 720px minimum. The chart shrinks to fit there rather than scrolling, so the rendered axis label falls to about **6.7px at 900px** (from 8.6px). This is a deliberate trade of label size for a whole chart, approved for this band only. Two things it does not change: below 900px the sidebar becomes a top bar, the column is wide again, and phones (<768px) draw the phone geometry of §8.3 instead; and the 11px in §8.3 is a viewBox unit, so the rendered size has always tracked the frame — it is 8.6px at 1060px and about 9.2px at 1440px, reaching 11px only where the chart is widest. Chart SVG text renders with `text-rendering: geometricPrecision` (2026-10-24), so a label's width scales exactly with the chart and stays inside the padding computed for it; without hinting, small chart text can look slightly softer.
 
 ## 13. Accessibility
 
@@ -1016,11 +1045,12 @@ Do:
 - Keep the Excel button visible and bound to the active range and selection.
 - Show source/update context on every analytical view.
 - Derive every year range from loaded data.
-- Under a page's H1 show only one small one-line text (the latest-value line, or the hub's lead line). No summary paragraph, nominal/inflation note or other explanatory text goes between the heading and the workspace; disclosures belong in the source note, below-chart notes, methodology and Excel (owner rule, 2026-10-10, first applied to Wages; it applies to every explorer and hub page). The line fits one line at 375px; unit and price-basis wording ("Current prices", "Percent · …") opens the chart's source note instead of a second line under the heading. `tests/browser/mobile-fit-charts.spec.ts` checks every explorer route; the lines that still wrap there await the owner's wording.
+- Under a page's H1 show only one small one-line text (the latest-value line, or the lead line of All data or a group page). No summary paragraph, nominal/inflation note or other explanatory text goes between the heading and the workspace; disclosures belong in the source note, below-chart notes, methodology and Excel (owner rule, 2026-10-10, first applied to Wages; it applies to every explorer and hub page). The line fits one line at 375px; unit and price-basis wording ("Current prices", "Percent · …") opens the chart's source note instead of a second line under the heading. `tests/browser/mobile-fit-charts.spec.ts` checks every explorer route; the lines that still wrap there await the owner's wording.
+- **Dated exception, group pages (Duru, 2026-10-24 18:07 Tbilisi):** a group page (§6.8) shows its four headline numbers directly under its one line. This replaces the 2026-10-10 rule "no at-a-glance block on hub pages" for the group pages only; the line itself stays one line at 375px, and no other text goes between the heading and the numbers. Chart pages and All data are unchanged.
 
 Do not:
 
-- No cards, panels with backgrounds, container shadows, or radii above 3px (pill exceptions only). The single card exception is the hub cards (§6.6): the budget hub's seven cards and the other dataset hubs and the City air quality index, which reuse them; it does not generalize to any other surface.
+- No cards, panels with backgrounds, container shadows, or radii above 3px (pill exceptions only). The single card exception is the explorer cards (§6.6): the group pages' cards, All data's place card and shortcut rows, and the City air quality index's city cards; it does not generalize to any other surface.
 - No white surfaces; no gradients anywhere.
 - No blue `#0071e3` or any v3.x Apple token; no night theme or theme toggle.
 - No dots/rounded-square swatches — bars only.
@@ -1032,8 +1062,8 @@ Do not:
 
 ## 18. Design QA Checklist
 
-1. Page is paper-backed with no cards or shadows (tooltip, slider-handle, return-to-chart pill and chart share menu exceptions only; the hub cards — the budget hub's and the other dataset hubs' and the City air quality index's, which reuse them — are the one card exception, §6.6).
-2. Every `/explorer` surface opens with the breadcrumb row's 2px ink rule; major sections open with 2px rules; sections are routes reached from the sidebar (§6.7), not in-page nav tabs.
+1. Page is paper-backed with no cards or shadows (tooltip, slider-handle, return-to-chart pill, chart share menu and rail pop-out exceptions only; the explorer cards — the group pages', All data's place card and shortcuts, and the City air quality index's — are the one card exception, §6.6).
+2. Every `/explorer` surface opens with the breadcrumb row's 2px ink rule; major sections open with 2px rules; sections are routes reached from the sidebar (§6.7), group pages and All data (§6.8), not in-page nav tabs.
 3. All numerals are mono; all display values serif; overlines uppercase sans 11/600.
 4. Explorer default: line mode, nominal GEL, full range, the default selection of §8.1 (with each section's documented departures, such as the sectors' five largest on share of GDP), and unrestricted line rendering.
 5. Only `ხაზი` and `ცხრილი` modes exist; the national `% მშპ-ში` measure is the only pill control on national multi-year routes.
@@ -1501,7 +1531,7 @@ Only yearly data is shown; Geostat's 2026 quarterly rows are not served. The met
 
 ## 36. Health surfaces
 
-The Health and social protection hub at `/explorer/health` reuses the budget hub cards: Doctors and hospitals, Illnesses and Causes of death, then Social payments, Pensions, Subsistence allowance, Social package and Funded pension, in that order (eight cards), each with a sparkline of Georgia's headline series (doctors, respiratory diseases, all deaths, All programmes, state pensioners, receiving families, all social package recipients, savings in members' accounts), its latest figure and its coverage from served facts; the Funded pension card's footer reads like the others, for example `2025 · 8,237.5 million GEL · 2019–2025`. The sidebar lists the eight pages under `ჯანდაცვა და სოციალური დაცვა`, after Living standards. The hub shows no `მალე` card for pensions or social help; the five social pages are specified at the end of this section.
+The Health and social protection section of the Living standards and health group page (`/explorer/living#t-health`; the old `/explorer/health` forwards there, §6.8) has these cards: Doctors and hospitals, Illnesses and Causes of death, then Social payments, Pensions, Subsistence allowance, Social package and Funded pension, in that order (eight cards), each with a sparkline of Georgia's headline series (doctors, respiratory diseases, all deaths, All programmes, state pensioners, receiving families, all social package recipients, savings in members' accounts), its latest figure and its coverage from served facts; the Funded pension card reads like the others: value `8,237.5 million GEL`, period `2025`, years `2019–2025`. The sidebar lists the eight pages under the topic heading `ჯანდაცვა და სოციალური დაცვა` in the Living standards and health group, after Living standards. The section shows no `მალე` card for pensions or social help; the five social pages are specified at the end of this section.
 
 Doctors and hospitals and Illnesses reuse the Money and banks workspace; the Causes of death area pages reuse the Living standards area pages. All of them use the latest-value line, the editorial line chart, table, RangeStrip, right-hand series panel and three-sheet Excel action. Under the H1 is only the latest-value line (§17), worded in the site's measure pattern, and the only line under the chart is the source note. Missing years are gaps and dashes, never zero, except in the causes-of-death table, where a published `0` is a count. No page has a tab row.
 
@@ -1687,7 +1717,7 @@ Only yearly data is shown (one survey a year, in June or July), and the pages st
 
 ## 44. Tax breaks and refunds surfaces
 
-The Budget page at `/explorer/tax-breaks-refunds` (`საგადასახადო შეღავათები და დაბრუნება` / Tax breaks and refunds) follows Revenue in the sidebar (`შეღავათები და დაბრუნება`) and on the Budget hub (card 04). It reuses the Money supply workspace (§34): the latest-value line, the editorial line chart, table, RangeStrip, right-hand series panel and three-sheet Excel action, with the icon-only measure switch of §7.2a after the unit caption: `₾` for the amounts in million GEL and Lucide `ChartPie` for the share of GDP.
+The Budget page at `/explorer/tax-breaks-refunds` (`საგადასახადო შეღავათები და დაბრუნება` / Tax breaks and refunds) follows Revenue in the sidebar (`შეღავათები და დაბრუნება`) and on the Budget group page (card 04, captioned `დაბრუნება` / `Refunds`, §6.7). It reuses the Money supply workspace (§34): the latest-value line, the editorial line chart, table, RangeStrip, right-hand series panel and three-sheet Excel action, with the icon-only measure switch of §7.2a after the unit caption: `₾` for the amounts in million GEL and Lucide `ChartPie` for the share of GDP.
 
 - **Heading line.** One line under the H1 (§17), naming the latest refunds: `დაბრუნება 2025: 2.7 მლრდ ₾` (English `Refunds 2025: 2.7 bn GEL`); in the % of GDP view it shows the share. Both totals (434px in Georgian) do not fit one 375px line, so by the approved spec's fallback the line names refunds only and tax breaks are read in the series list. It fits one line at 375px in both languages.
 - **Series list.** Sixteen fixed rows, all visible, under four small headings in this order: Tax breaks (the total), VAT (the total and eight areas), Income and profit tax (the total and four parts), Refunds. No carets, no search, no name prefixes. Each row's value is its latest year in range; a heading whose rows end before the range's last year names that year (`საგადასახადო შეღავათები · 2024`), as on Environment (§41).
