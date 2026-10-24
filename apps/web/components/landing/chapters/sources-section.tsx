@@ -113,10 +113,17 @@ export function SourcesSection({
                   key={row.name}
                   className="home-cov-row grid grid-cols-[minmax(0,1fr)_44px] items-center gap-x-[14px] gap-y-1 border-b border-[var(--row-border)] px-1 py-[7px] transition-colors hover:bg-[var(--tint)] min-[700px]:grid-cols-[minmax(0,230px)_minmax(0,1fr)_44px]"
                 >
-                  <span className="min-w-0 text-[12.5px] leading-[1.3]">{row.name}</span>
+                  <span className="min-w-0 text-[12.5px] leading-[1.3]">
+                    {row.name}
+                    {row.firstYear < AXIS_FROM ? (
+                      <span aria-hidden="true" className="ml-2 whitespace-nowrap font-[family-name:var(--font-numeric)] text-[10px] text-[var(--faint)] min-[700px]:hidden">
+                        {labels.since(row.firstYear)}
+                      </span>
+                    ) : null}
+                  </span>
                   <div className="relative col-start-1 h-2.5 min-[700px]:col-start-2">
                     {row.firstYear < AXIS_FROM ? (
-                      <span className="absolute left-0 top-1/2 -translate-x-full -translate-y-1/2 whitespace-nowrap pr-1.5 font-[family-name:var(--font-numeric)] text-[10px] text-[var(--faint)]">
+                      <span aria-hidden="true" className="absolute left-0 top-1/2 hidden -translate-x-full -translate-y-1/2 whitespace-nowrap pr-1.5 min-[700px]:block font-[family-name:var(--font-numeric)] text-[10px] text-[var(--faint)]">
                         {labels.since(row.firstYear)}
                       </span>
                     ) : null}

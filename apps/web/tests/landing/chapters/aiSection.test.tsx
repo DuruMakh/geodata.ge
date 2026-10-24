@@ -45,8 +45,9 @@ describe("AiSection", () => {
   });
 
   it("renders one chip per tool and one line per fact", () => {
-    for (const tool of tools) expect(html).toContain(`>${tool}</li>`);
-    expect(html.match(/border-\[var\(--ai-line\)\]/g)).toHaveLength(tools.length);
+    const list = html.slice(html.indexOf(labels.tools)).match(/<ul[^>]*>.*?<\/ul>/)?.[0] ?? "";
+    expect(list.match(/<li\b/g)).toHaveLength(tools.length);
+    for (const tool of tools) expect(list).toMatch(new RegExp(`<li[^>]*>${tool}</li>`));
     for (const fact of labels.facts) expect(html).toContain(fact);
   });
 

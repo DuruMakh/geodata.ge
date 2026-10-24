@@ -46,7 +46,7 @@ export function AiSection({ tools, labels, locale }: { tools: string[]; labels: 
           </Reveal>
           <Reveal>
             <div className="mt-[30px] flex max-w-[520px] items-center gap-3 rounded-md border border-[rgba(247,242,233,0.26)] py-1.5 pl-4 pr-1.5">
-              <code className="min-w-0 flex-1 select-all overflow-hidden text-ellipsis whitespace-nowrap font-[family-name:var(--font-numeric)] text-[14.5px] text-white">
+              <code className="min-w-0 flex-1 select-all break-all font-[family-name:var(--font-numeric)] text-[13px] text-white min-[400px]:text-[14.5px]">
                 {MCP_ENDPOINT}
               </code>
               <CopyEndpoint

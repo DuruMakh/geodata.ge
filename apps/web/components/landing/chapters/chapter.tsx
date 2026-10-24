@@ -13,7 +13,7 @@ function ChapterTitle({ title, link }: { title: string; link: ChapterLink | null
   const head = cut < 0 ? "" : `${title.slice(0, cut)} `;
   const last = cut < 0 ? title : title.slice(cut + 1);
   return (
-    <Link href={link.href} className="home-tl">
+    <Link href={link.href} prefetch={false} className="home-tl">
       {head}
       <span className="relative whitespace-nowrap">
         {last}

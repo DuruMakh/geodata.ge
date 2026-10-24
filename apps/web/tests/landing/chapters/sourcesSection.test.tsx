@@ -71,7 +71,7 @@ describe("SourcesSection", () => {
     const html = render();
     expect(html.match(/home-cov-row/g)).toHaveLength(3);
     expect(html).toMatch(/სახელმწიფო ბიუჯეტი<\/span>.*?2004–2025.*?>120<\/span>/);
-    expect(html).toMatch(/მშპ<\/span>.*?1960–2024.*?>35<\/span>/);
+    expect(html).toMatch(/მშპ.*?1960–2024.*?>35<\/span>/);
     expect(html).toMatch(/ინფლაცია<\/span>.*?1990–2030.*?>7<\/span>/);
   });
 
@@ -86,11 +86,17 @@ describe("SourcesSection", () => {
     expect(render("en")).toMatch(/href="\/en\/methodology"/);
   });
 
-  it("tags only the sources that start before 1990", () => {
+  it("tags only the sources that start before 1990, hidden from assistive technology", () => {
     const html = render();
-    expect(html.match(/1960-დან/g)).toHaveLength(1);
+    const rows = html.split('class="home-cov-row').slice(1);
+    expect(rows.filter((row) => row.includes("1960-დან"))).toHaveLength(1);
     expect(html).not.toContain("1990-დან");
     expect(html).not.toContain("2004-დან");
+    // One copy inline after the name (phones), one left of the bar (700px and up).
+    const tags = html.match(/<span aria-hidden="true" class="[^"]*">1960-დან<\/span>/g) ?? [];
+    expect(tags).toHaveLength(2);
+    expect(tags.filter((tag) => tag.includes("min-[700px]:hidden"))).toHaveLength(1);
+    expect(tags.filter((tag) => tag.includes("min-[700px]:block"))).toHaveLength(1);
   });
 
   it("sets each bar's left and width from the 1990-2030 axis, staggered by row", () => {
