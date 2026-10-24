@@ -147,3 +147,64 @@ test("a stacked column chart makes a picture too", async ({ page }) => {
   await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-tab", "balance");
   expect((await downloadPicture(page)).width).toBe(2400);
 });
+
+/** Slows the page's animation frames, so a picture started now is still being made for a few seconds. */
+async function slowFrames(page: Page, delay = 1500) {
+  await page.evaluate((delay) => {
+    const frame = window.requestAnimationFrame.bind(window);
+    window.requestAnimationFrame = (callback) => window.setTimeout(() => frame(callback), delay);
+  }, delay);
+}
+
+test("reopening the menu while a picture is being made still gives a picture", async ({ page }) => {
+  await open(page, "/explorer/wages/overview");
+  // The picture library arrives late, so the first picture is still being made when the menu reopens,
+  // and finishes while the second is still starting: the card must stay for the second.
+  await page.route("**/_next/static/chunks/**", async (route) => { await new Promise((done) => setTimeout(done, 1500)); await route.continue(); });
+  const button = page.getByTestId("chart-share");
+  await button.click();
+  await page.keyboard.press("Escape");
+  await slowFrames(page, 4000);
+  await button.click();
+  const [download] = await Promise.all([page.waitForEvent("download"), page.getByTestId("chart-share-download").click()]);
+  expect((await readFile(await download.path())).readUInt32BE(16)).toBe(2400);
+  await expect(page.getByTestId("chart-share-status")).not.toHaveText(/ვერ/);
+});
+
+test("Share… chosen before the picture is ready waits for it, and the next tap shares", async ({ page }) => {
+  await page.addInitScript(() => {
+    Object.defineProperty(navigator, "canShare", { value: () => true, configurable: true });
+    Object.defineProperty(navigator, "share", { value: async (data: ShareData) => { (window as unknown as { shared: string }).shared = data.files![0]!.name; }, configurable: true });
+  });
+  await open(page, "/explorer/wages/overview");
+  await slowFrames(page);
+  await page.getByTestId("chart-share").click();
+  const item = page.getByTestId("chart-share-native");
+  await item.click();
+  await expect(page.getByTestId("chart-share-menu")).toBeVisible();
+  await expect(item).toHaveText("სურათი მზადდება…");
+  await expect(item).toHaveText("გაზიარება…", { timeout: 15000 });
+  await item.click();
+  await expect.poll(() => page.evaluate(() => (window as unknown as { shared?: string }).shared)).toBe(`fiscal-wages-overview-${await shownYears(page)}.png`);
+  await expect(page.getByTestId("chart-share-menu")).toHaveCount(0);
+});
+
+test("the domestic exports pictures carry the page's own titles", async ({ page }) => {
+  await open(page, "/explorer/trade/domestic-exports");
+  for (const [section, title] of [["countries", "ადგილობრივი ექსპორტი ქვეყნების მიხედვით"], ["products", "ადგილობრივი ექსპორტი პროდუქტების მიხედვით"]] as const) {
+    await page.getByTestId(`trade-domestic-section-${section}`).click();
+    await slowFrames(page);
+    await page.getByTestId("chart-share").click();
+    await expect(page.getByTestId("share-card").locator("p").first()).toHaveText(title);
+    await page.keyboard.press("Escape");
+    await open(page, "/explorer/trade/domestic-exports");
+  }
+});
+
+test("Download chosen before the picture is ready keeps the keyboard on the button", async ({ page }) => {
+  await open(page, "/explorer/wages/overview");
+  await slowFrames(page);
+  await page.getByTestId("chart-share").click();
+  await Promise.all([page.waitForEvent("download"), page.getByTestId("chart-share-download").click()]);
+  await expect(page.getByTestId("chart-share")).toBeFocused();
+});

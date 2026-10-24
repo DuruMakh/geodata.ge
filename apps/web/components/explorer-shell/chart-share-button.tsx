@@ -40,7 +40,11 @@ export function ChartShareButton({ period, testId = "chart-share", ...card }: Ch
   const cardRef = useRef<HTMLDivElement>(null);
   const busy = useRef(false);
   const picture = useRef<Promise<Blob> | null>(null);
+  const renders = useRef(0);
   const [open, setOpen] = useState(false);
+  // Whether the latest picture is finished, and whether Share… was chosen before it was.
+  const [ready, setReady] = useState(false);
+  const [shareWaiting, setShareWaiting] = useState(false);
   const [actions, setActions] = useState<Action[]>(["download"]);
   const [cardShown, setCardShown] = useState(false);
   const [status, setStatus] = useState<Status>("idle");
@@ -59,11 +63,19 @@ export function ChartShareButton({ period, testId = "chart-share", ...card }: Ch
     setActions(["download", ...(canCopyPicture() ? ["copy" as const] : []), ...(canSharePicture() ? ["native" as const] : [])]);
     setOpen(true);
     setCardShown(true);
+    setReady(false);
+    setShareWaiting(false);
+    const render = ++renders.current;
     const made = (async () => {
       await settle();
       return renderPicture(cardRef.current!.firstElementChild as HTMLElement);
     })();
-    made.catch(() => {}).finally(() => setCardShown(false));
+    // A menu reopened before the last picture finished starts a newer one, which still needs the card.
+    made.catch(() => {}).finally(() => {
+      if (renders.current !== render) return;
+      setCardShown(false);
+      setReady(true);
+    });
     picture.current = made;
   };
   const close = () => {
@@ -72,6 +84,12 @@ export function ChartShareButton({ period, testId = "chart-share", ...card }: Ch
   };
 
   const run = async (action: Action) => {
+    // Safari opens the share sheet only close to the tap, so Share… waits in the menu for the picture
+    // and the next tap shares it.
+    if (action === "native" && !ready) {
+      setShareWaiting(true);
+      return;
+    }
     const blob = picture.current;
     if (!blob || busy.current) return;
     busy.current = true;
@@ -120,10 +138,11 @@ export function ChartShareButton({ period, testId = "chart-share", ...card }: Ch
         data-testid={testId}
         aria-expanded={open}
         aria-controls={open ? menuId : undefined}
-        disabled={status === "working"}
+        // Not `disabled`: a disabled button drops the keyboard focus the menu has just returned to it.
+        aria-disabled={status === "working"}
         aria-busy={status === "working"}
-        onClick={() => (open ? close() : show())}
-        className="inline-flex h-9 cursor-pointer items-center gap-2 rounded-[2px] border border-[var(--control)] px-3 text-[12.5px] font-semibold text-[var(--ink)] transition-colors duration-150 hover:bg-[var(--tint)] disabled:cursor-wait disabled:opacity-55 max-[768px]:h-11"
+        onClick={() => (status === "working" ? undefined : open ? close() : show())}
+        className="inline-flex h-9 cursor-pointer items-center gap-2 rounded-[2px] border border-[var(--control)] px-3 text-[12.5px] font-semibold text-[var(--ink)] transition-colors duration-150 hover:bg-[var(--tint)] aria-disabled:cursor-wait aria-disabled:opacity-55 max-[768px]:h-11"
       >
         <Share2 aria-hidden size={16} strokeWidth={1.5} />
         {t("button")}
@@ -150,7 +169,7 @@ export function ChartShareButton({ period, testId = "chart-share", ...card }: Ch
                 className="flex min-h-10 w-full cursor-pointer items-center gap-2.5 px-3.5 text-left text-[13px] text-[var(--ink)] hover:bg-[var(--tint)] focus-visible:bg-[var(--tint)] max-[768px]:min-h-11"
               >
                 {ICONS[action]}
-                {t(action)}
+                {action === "native" && shareWaiting && !ready ? t("working") : t(action)}
               </button>
             ))}
           </div>

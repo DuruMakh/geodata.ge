@@ -56,7 +56,7 @@ export function TradePartners({ data, sources, lastReviewedAt, siteOrigin, navig
   const valueLabel = (value: number) => `${formatInUnit(value, model.unit)} ${model.unit.label}`;
   const lineSeries = model.selectedIds.map(id => ({ id, label: label(id), color: tradePartnerColor(id), vals: model.years.map(year => model.valuesByEntity[id][year]) }));
   const chart = <EditorialLineChart years={model.years} series={lineSeries} share={false} unit={model.unit} shareLabel={measureLabel} showAxisUnit={false} formatTooltipValue={valueLabel} />;
-  const shareAction = model.selectedCount ? <ChartShareButton title={t("title")} caption={`${measureLabel} · ${model.unit.label} · ${model.range.start}–${model.range.end}`}
+  const shareAction = model.selectedCount ? <ChartShareButton title={domestic ? message(messages, "trade.domestic.countriesTitle") : t("title")} caption={`${measureLabel} · ${model.unit.label} · ${model.range.start}–${model.range.end}`}
     legend={lineSeries.map(({ label, color }) => ({ label, color }))} source={message(messages, composition ? "trade.composition.sourceNote" : services ? "trade.services.sourceNote" : "trade.sourceNote")} chart={chart} period={`${model.range.start}-${model.range.end}`} /> : undefined;
   return <div data-testid="trade-partners" className="@container">
     {!embedded ? <ExplorerHeading>{t("title")}</ExplorerHeading> : null}

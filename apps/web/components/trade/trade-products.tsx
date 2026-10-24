@@ -52,7 +52,7 @@ export function TradeProducts({ data, sources, lastReviewedAt, siteOrigin }: { d
   const lineSeries = useMemo(() => model.selectedIds.map(id => ({ id, label: labels.get(id)!, color: tradeProductColor(id), vals: model.years.map(year => model.valuesByEntity[id][year]) })), [model, labels]);
   const valueLabel = useCallback((value: number) => `${formatInUnit(value, model.unit)} ${model.unit.label}`, [model.unit]);
   const chart = useMemo(() => <EditorialLineChart years={model.years} series={lineSeries} share={false} unit={model.unit} shareLabel={measureLabel} showAxisUnit={false} formatTooltipValue={valueLabel} />, [model, lineSeries, measureLabel, valueLabel]);
-  const shareAction = model.selectedCount ? <ChartShareButton title={t("title")} caption={`${measureLabel} · ${model.unit.label} · ${model.range.start}–${model.range.end}`}
+  const shareAction = model.selectedCount ? <ChartShareButton title={domestic ? message(messages, "trade.domestic.productsTitle") : t("title")} caption={`${measureLabel} · ${model.unit.label} · ${model.range.start}–${model.range.end}`}
     legend={lineSeries.map(({ label, color }) => ({ label, color }))} source={message(messages, "trade.sourceNote")} chart={chart} period={`${model.range.start}-${model.range.end}`} /> : undefined;
   return <div data-testid="trade-products" className="@container">
     {!domestic ? <ExplorerHeading>{t("title")}</ExplorerHeading> : null}
