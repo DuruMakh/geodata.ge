@@ -1,7 +1,7 @@
 # Fiscal.ge Design System — Editorial
 
 Version: 4.1
-Last updated: 2026-10-20
+Last updated: 2026-10-24
 Status: Production visual system for Fiscal.ge
 Scope: Explorer product UI (the twenty dataset hubs of §6.7), charts, tables, controls, export surfaces, responsive behavior, and future pages that reuse the Budget Explorer shell.
 
@@ -550,7 +550,7 @@ spacing:
 ### 6.6 Shape and Elevation Policy
 
 - Border radius: **0–3px everywhere** (buttons 2px, tooltip 3px). Exception: the national `% მშპ-ში` measure pill, the municipal `% წილი` measure pill, the return-to-chart pill (§7.14), and slider handles/ticks use `999px`.
-- Shadows: only the chart tooltip (`0 4px 16px rgba(30,27,22,0.10)`), slider handles (`0 1px 3px rgba(30,27,22,0.15)`), and the floating return-to-chart pill (§7.14), which floats over content and shares the tooltip's shadow. Nothing else casts a shadow.
+- Shadows: only the chart tooltip (`0 4px 16px rgba(30,27,22,0.10)`), slider handles (`0 1px 3px rgba(30,27,22,0.15)`), the floating return-to-chart pill (§7.14), which floats over content and shares the tooltip's shadow, and the chart share menu (§7.17), which also shares it. Nothing else casts a shadow.
 - Swatches are **14×3px bars**, never dots or rounded squares.
 - **Exception: hub cards** (`tile` bg, 1px `hairline` border, radius 0, hover `tint`, no shadow): the budget hub's seven cards, which every other dataset hub reuses for its own pages. The one other place they appear is the City air quality index (`/explorer/environment/air-quality`, §41), whose nine city cards use the same hub card component (`BudgetHub` with `HubCardModel`). A hub's peer destinations with no natural reading order are the one place containment beats rules — a rule stack implies a sequence that is not there. Cards remain forbidden everywhere else; this exception does not generalize to panels, KPI blocks, or any other surface.
 
@@ -636,7 +636,7 @@ Lucide (`lucide-react`) is the project's chosen functional icon family. Use name
 
 Icon-only controls must keep a localized accessible name on the button/link; the SVG itself is decorative (`aria-hidden`). Measure controls show the full label on hover and keyboard-visible focus, with Escape dismissal and hoverable tooltip content. Mouse/touch clicks must not latch the tooltip open after the pointer leaves. Touch users can read the selected measure's explanation beneath the heading, except on the household Income and Spending pages and their area pages (Georgia and the regions), whose latest-value line is fixed to the page's area per household, so the measure is read from the series panel caption, the source line and, on the section pages, the map legend. Crime and justice is the other exception: its latest-value line always shows the count headline (§38), so the per 100,000 view is read from the chart panel's unit caption beside the measure switch. Reuse `SegmentedTabs` and `ControlTooltip` for this pattern.
 
-National-sector mapping: literal `₾` for nominal GEL, Lucide `ChartPie` for share of GDP, `ChartNoAxesCombined` for real growth; the money and banks pages reuse `₾` and `ChartPie`, and add `CircleDollarSign` for share in foreign currency (money and banks). The chart icon denotes a measure, not a promise of positive growth. The household measure switch uses Lucide `User` for per person. Dated exception (owner approval, 2026-10-12): per household uses one solid non-Lucide glyph, Material Symbols `family_restroom` (outlined, weight 400, Apache-2.0, © Google), because Lucide has no family icon. It is filled with `currentColor` at the same 18px as `User`, used for this one button only, kept in `components/ui/household-icon.tsx`, and is not a second icon family. Existing functional menu/close, sidebar collapse/expand and compact home controls use Lucide `Menu`, `X`, `ChevronsLeft`, `ChevronsRight`, and `House`. Logos, brand assets, maps and actual data visualizations are not UI icons and remain unchanged. Conventional checkbox marks, textual carets and arrows embedded in prose remain typographic; do not add decorative icons or indiscriminately replace text with symbols.
+National-sector mapping: literal `₾` for nominal GEL, Lucide `ChartPie` for share of GDP, `ChartNoAxesCombined` for real growth; the money and banks pages reuse `₾` and `ChartPie`, and add `CircleDollarSign` for share in foreign currency (money and banks). The chart icon denotes a measure, not a promise of positive growth. The household measure switch uses Lucide `User` for per person. Dated exception (owner approval, 2026-10-12): per household uses one solid non-Lucide glyph, Material Symbols `family_restroom` (outlined, weight 400, Apache-2.0, © Google), because Lucide has no family icon. It is filled with `currentColor` at the same 18px as `User`, used for this one button only, kept in `components/ui/household-icon.tsx`, and is not a second icon family. Existing functional menu/close, sidebar collapse/expand and compact home controls use Lucide `Menu`, `X`, `ChevronsLeft`, `ChevronsRight`, and `House`. The chart share button (§7.17) uses `Share2`, and its menu items `Download`, `Copy` and `Share`, all 16px. Logos, brand assets, maps and actual data visualizations are not UI icons and remain unchanged. Conventional checkbox marks, textual carets and arrows embedded in prose remain typographic; do not add decorative icons or indiscriminately replace text with symbols.
 
 A boxed either/or switch is the honest affordance for choosing which view of the same data you are looking at. A filter is not that — do not box the tab groups of §7.2b.
 
@@ -698,7 +698,7 @@ Tint bg, `2px accent` left border, sans 11.5–12.5px, `body` color, max-width 5
 
 ### 7.10 Source Note
 
-Sans 12px, muted, plain paragraph under the primary panel and at the end of the analysis view. Below 768px its links answer taps 4px above and below their text, a 24px target (WCAG 2.5.8), without moving a line. Pattern:
+Sans 12px, muted, plain paragraph under the primary panel and at the end of the analysis view. Under a chart it may carry one action at its right end, the chart share button (§7.17); the note then sits in a row with the button, the text wrapping beside it. Below 768px its links answer taps 4px above and below their text, a 24px target (WCAG 2.5.8), without moving a line. Pattern:
 
 ```text
 მონაცემები: გადამოწმებული ოფიციალური საბიუჯეტო დოკუმენტები (საქართველოს ფინანსთა სამინისტრო). <coverage note> · 12-თვიანი ფაქტობრივი შესრულება. <classification note> ბოლო განახლება: YYYY-MM-DD.
@@ -754,6 +754,18 @@ Stacked layouts (<1100px) only (owner decision D4, 2026-10-07). It appears when 
 ### 7.16 Native Select
 
 A native dropdown (`SELECT_CLASS` in `components/ui/editorial.tsx`: Unemployment's indicator and Wages' group menu; the monthly range strip's hidden month and year selects, §7.5; `TableSeriesPicker`, §25) is 16px and at least 44px tall below 768px, so iOS Safari does not zoom the page when it takes focus (Q5, 2026-10-12). From 768px each keeps its compact look.
+
+### 7.17 Share Picture
+
+Approved by Duru, 2026-10-24 (spec `docs/superpowers/specs/2026-10-24-chart-share-picture-design.md`). A reader takes the chart as they set it up (series, years, measure) away as a picture; the site never offers to share a link to itself, and there are no network-specific "post" buttons.
+
+**Button.** `ChartShareButton` (`components/explorer-shell/chart-share-button.tsx`) sits at the right end of the chart's source note (§7.10), never in the chart's control row, where the measure icons would be mistaken for it. Outlined: h36 (44 below 768px), 1px `control` border, radius 2px, sans 12.5/600 ink, Lucide `Share2` and the word `გაზიარება` / `Share`; hover `tint`. A page with several charts has one button under each. A chart with no source line of its own (the total fertility rate, §29.2) has its button right-aligned under the chart. With nothing selected there is no chart and no button.
+
+**Menu.** A disclosure (`aria-expanded`, `aria-controls`) opening a group of buttons under the button, right-aligned: `tile`, 1px `hairline` border, radius 2px, the tooltip shadow (§6.6), at least 236px wide, items 40px tall (44 below 768px), sans 13px with a 16px Lucide icon, hover and keyboard focus `tint`. Items, each only where the browser can do it: `სურათის ჩამოტვირთვა` / `Download picture` (always, `Download`), `სურათის კოპირება` / `Copy picture` (clipboard pictures, `Copy`), `გაზიარება…` / `Share…` (the device's share sheet with the picture attached, `Share`). Opening focuses the first item; ↑/↓ move, Escape, Tab and an outside press close it, and focus returns to the button. While the picture is made the button is disabled and a polite status under it reads `სურათი მზადდება…` / `Making the picture…`; a copy confirms `სურათი დაკოპირდა` / `Picture copied` for 3 seconds; a failure reads `სურათი ვერ მომზადდა — სცადეთ თავიდან.` / `The picture could not be made — try again.` in `negative`. Closing the phone share sheet is not an error.
+
+**Picture.** `ShareCard` (`components/explorer-shell/share-card.tsx`), drawn off-screen and turned into a PNG in the reader's browser by `modern-screenshot`, which loads only on demand: a fixed 1200px card on `paper` at double sharpness (2400px wide; height follows the content). Top to bottom: page title (display serif 38px), one mono 14px muted line of unit and years, the legend (14×3 swatch bars and full series names, 15px, wrapping; left out where the chart has its own key, as maps and the pyramid do), the chart in its desktop drawing whatever the screen (`ChartGeometryContext`), then a 1px `ink` rule with the source (13px muted, no methodology link or date) on the left and the Fiscal.ge logo with `fiscal.ge` on the right. Map pictures carry their boundary credit in the source (geoBoundaries CC BY 3.0; © OpenStreetMap contributors, ODbL). The pyramid keeps its page width of 640px, centred. The picture follows the page language; in table view it is still the chart.
+
+**File name.** `fiscal-<page path below /explorer>-<years>.png`, `-en` added on the English edition, as the Excel workbooks do: `fiscal-wages-overview-1995-2025.png`; monthly pages name months (`fiscal-inflation-overview-2004-01-2026-09.png`), a single year or date one year (`fiscal-municipalities-2025.png`).
 
 ## 8. Multi-Year Explorer
 
@@ -1017,7 +1029,7 @@ Do not:
 
 ## 18. Design QA Checklist
 
-1. Page is paper-backed with no cards or shadows (tooltip, slider-handle and return-to-chart pill exceptions only; the hub cards — the budget hub's and the other dataset hubs' and the City air quality index's, which reuse them — are the one card exception, §6.6).
+1. Page is paper-backed with no cards or shadows (tooltip, slider-handle, return-to-chart pill and chart share menu exceptions only; the hub cards — the budget hub's and the other dataset hubs' and the City air quality index's, which reuse them — are the one card exception, §6.6).
 2. Every `/explorer` surface opens with the breadcrumb row's 2px ink rule; major sections open with 2px rules; sections are routes reached from the sidebar (§6.7), not in-page nav tabs.
 3. All numerals are mono; all display values serif; overlines uppercase sans 11/600.
 4. Explorer default: line mode, nominal GEL, full range, the default selection of §8.1 (with each section's documented departures, such as the sectors' five largest on share of GDP), and unrestricted line rendering.
