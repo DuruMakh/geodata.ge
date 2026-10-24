@@ -157,7 +157,7 @@ export function LandingPage({ model, datasets, gdpFigure, presentation }: { mode
               index="01"
               overline={message(messages, "landing.expenditureOverline")}
               heading={message(messages, "landing.expenditureHeading")}
-              description={message(messages, "landing.expenditureDescription", { year: model.expenditure.latestYear })}
+              description={message(messages, model.expenditure.basis === "planned" ? "landing.expenditureDescriptionPlanned" : "landing.expenditureDescription", { year: model.expenditure.latestYear })}
               href="/explorer/expenditure"
               linkLabel={message(messages, "landing.expenditureLink")}
               totalLabel={message(messages, "landing.expenditureTotal")}

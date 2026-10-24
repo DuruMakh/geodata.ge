@@ -43,6 +43,28 @@ describe("2026 planned spending by area from the budget law", () => {
     expect(Math.abs(totalGel - 30_881_358_000)).toBeLessThanOrEqual(1000);
   });
 
+  it("pins the 13 field amounts to the independent re-derivation from the law (Article 9 plus the Tavi VI supplement)", async () => {
+    // Figures re-derived by the independent data audit (2026-10-24) from the law itself, not from the generated CSV.
+    const lawFieldAmountsGel: Record<string, number> = {
+      "spending.social_protection": 7_859_787_000,
+      "spending.health": 2_400_710_000,
+      "spending.education": 3_540_028_300,
+      "spending.defence": 1_986_330_000,
+      "spending.public_order_safety": 2_706_636_000,
+      "spending.infrastructure_regional_development": 3_873_850_000,
+      "spending.economic_affairs": 1_359_165_000,
+      "spending.agriculture_environment": 837_511_000,
+      "spending.culture": 427_167_700,
+      "spending.sport": 304_978_000,
+      "spending.general_public_services": 827_495_000,
+      "spending.debt_service": 4_757_700_000,
+      "spending.other_unclassified": 0,
+    };
+    const rows = await loadBudgetFactRows("../../data/imports/expenditure-facts-2026-planned.csv");
+    expect(Object.fromEntries(rows.map((row) => [row.itemId, row.amountGel]))).toEqual(lawFieldAmountsGel);
+    expect(Object.values(lawFieldAmountsGel).reduce((sum, amount) => sum + amount, 0)).toBe(30_881_358_000);
+  });
+
   it("maps every Article 9 functional row of the 2026 plan with the unchanged COFOG rules", () => {
     const rows = lawFunctionalRows(article9Table, "plan2026");
     expect(rows.find((row) => row.rowType === "grand_total")?.actualGel).toBe(27_311_597_000);

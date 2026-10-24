@@ -50,6 +50,30 @@ describe("2026 planned spending by ministry from the budget law", () => {
     );
   }, 60_000);
 
+  it("pins the 14 category amounts to the independent re-derivation from the law's Tavi VI", () => {
+    // Figures re-derived by the independent data audit (2026-10-24) from the law itself, not from the generated CSV.
+    const lawCategoryAmountsGel: Record<string, number> = {
+      "admin_spending.health_social_affairs": 9_668_640_000,
+      "admin_spending.debt_service": 4_733_000_000,
+      "admin_spending.other_costs": 3_868_879_000,
+      "admin_spending.regional_development_infrastructure": 3_246_550_000,
+      "admin_spending.education_science_youth": 2_702_198_000,
+      "admin_spending.defence": 1_890_000_000,
+      "admin_spending.internal_affairs": 1_547_000_000,
+      "admin_spending.economy_sustainable_development": 928_550_000,
+      "admin_spending.environment_agriculture": 808_161_000,
+      "admin_spending.justice": 443_235_000,
+      "admin_spending.culture": 364_835_000,
+      "admin_spending.sport": 325_310_000,
+      "admin_spending.foreign_affairs": 225_000_000,
+      "admin_spending.finance": 130_000_000,
+    };
+    const categories = facts2026().filter((fact) => fact.level === "admin_category");
+
+    expect(Object.fromEntries(categories.map((fact) => [fact.itemId, fact.amountGel]))).toEqual(lawCategoryAmountsGel);
+    expect(Object.values(lawCategoryAmountsGel).reduce((sum, amount) => sum + amount, 0)).toBe(NATIONAL_2026_TOTAL_GEL);
+  }, 60_000);
+
   it("ignores the uncoded Tavi VI headcount and economic-breakdown rows", () => {
     const { rows2026 } = generated();
     const headcountRows = rows2026.filter((row) => row.labelKa === "მომუშავეთა რიცხოვნობა");
