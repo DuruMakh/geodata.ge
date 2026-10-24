@@ -91,6 +91,10 @@ describe("2026 planned spending by ministry from the budget law", () => {
   }, 60_000);
 
   it("gives no 2026 fact from institution 57 00 an item id of a 2004-2025 fact", () => {
+    // The 2026 law prints 57 00 (Civil Service Bureau) at 0.0 with no programmes; a change in the
+    // law's structure that gives a 57 xx row an amount must be reviewed, not pass silently.
+    const { rows2026 } = generated();
+    expect(rows2026.filter((row) => row.code?.startsWith("57 ") && row.actualThousandGel > 0)).toEqual([]);
     const historicalIds = new Set(historicalFacts().map((fact) => fact.itemId));
     const shared = facts2026().filter((fact) => fact.officialInstitutionCode === "57 00" && historicalIds.has(fact.itemId));
     expect(shared).toEqual([]);

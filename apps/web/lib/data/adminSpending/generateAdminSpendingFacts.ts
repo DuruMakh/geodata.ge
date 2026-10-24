@@ -367,15 +367,6 @@ const PROGRAM_SEMANTIC_ERAS = [
     key: "maritime_vocational_education",
   },
   {
-    // Code reuse: 2025's 25 05 (solid waste) moved to 31 16. The 2026 25 05 widens 2025's 25 06
-    // school construction to higher education: a perimeter change, so a new series.
-    code: "25 05",
-    parentItemId: "admin_spending.regional_development_infrastructure",
-    startYear: 2026,
-    endYear: 2026,
-    key: "educational_institutions_construction",
-  },
-  {
     // Code reuse: 2025's 25 07 (tourism) is 25 06 in 2026. The 2026 25 07 is 2025's 25 08 sport
     // infrastructure, which never reached 100M GEL, so it starts a new series under its own key.
     code: "25 07",

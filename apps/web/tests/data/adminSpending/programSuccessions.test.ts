@@ -95,8 +95,7 @@ describe("PROGRAM_SUCCESSIONS structure", () => {
 
 describe("succession-joined series continuity (real data)", () => {
   // canonical code (+ era key) -> expected continuous year range of the merged series; a series the
-  // 2026 budget law continues runs to 2026 (school construction does not: its 2026 successor is a
-  // perimeter change and a new series).
+  // 2026 budget law continues runs to 2026.
   const EXPECTED_SERIES: Array<{
     targetCode: string;
     parentItemId: string;
@@ -113,7 +112,7 @@ describe("succession-joined series continuity (real data)", () => {
     { targetCode: "31 06", parentItemId: "admin_spending.environment_agriculture", targetEraKey: "irrigation_modernization", years: [2017, 2026], label: "irrigation" },
     { targetCode: "29 07", parentItemId: "admin_spending.defence", targetEraKey: "defence_capabilities", years: [2017, 2026], label: "defence capabilities" },
     { targetCode: "29 08", parentItemId: "admin_spending.defence", targetEraKey: "logistics", years: [2018, 2026], label: "logistics" },
-    { targetCode: "25 06", parentItemId: "admin_spending.regional_development_infrastructure", targetEraKey: "school_infrastructure", years: [2019, 2025], label: "school construction" },
+    { targetCode: "25 06", parentItemId: "admin_spending.regional_development_infrastructure", targetEraKey: "school_infrastructure", years: [2019, 2026], label: "school construction" },
     { targetCode: "25 07", parentItemId: "admin_spending.regional_development_infrastructure", targetEraKey: "tourism_infrastructure", years: [2023, 2026], label: "tourism infrastructure" },
     { targetCode: "34 02", parentItemId: "admin_spending.sport", years: [2010, 2026], label: "sport development" },
     { targetCode: "33 02", parentItemId: "admin_spending.culture", targetEraKey: "culture_development", years: [2019, 2026], label: "culture development" },

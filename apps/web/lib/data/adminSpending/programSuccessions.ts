@@ -12,7 +12,8 @@
  *
  * An entry maps the rows of `code` under `parentItemId` for `startYear..endYear` onto the
  * canonical identity `targetCode|parentItemId|targetEraKey` — the identity of the series'
- * LATEST code segment. Evidence standard (methodology §7.4 label-diff procedure): the
+ * LATEST code segment, except planned-year entries, which point at the existing canonical code
+ * (see the 2026 budget-law block). Evidence standard (methodology §7.4 label-diff procedure): the
  * source-year label must be identical to the target program's label, or a documented
  * slight rename of it. Perimeter CHANGES are not successions and stay separate series —
  * e.g. 30 01 "public order + border" (2012-2018) is deliberately NOT joined to the
@@ -36,7 +37,10 @@ export type ProgramSuccession = {
   parentItemId: string;
   startYear: number;
   endYear: number;
-  /** Canonical (latest) code of the series. */
+  /**
+   * Canonical (latest) code of the series. Planned-year entries use the existing canonical code
+   * instead (see the 2026 block).
+   */
   targetCode: string;
   /** Era key of the canonical identity when the target code carries semantic eras. */
   targetEraKey?: string;
@@ -207,6 +211,8 @@ export const PROGRAM_SUCCESSIONS: ProgramSuccession[] = [
     note: lawNote("Donor-financed payments: 54 14 (2026 plan), identical label.") },
   { code: "24 16", parentItemId: ECONOMY, startYear: 2026, endYear: 2026, targetCode: "24 17", targetEraKey: "anaklia_port",
     note: lawNote("Anaklia deep-sea port: 24 16 (2026 plan) -> 24 17 (2021-2025), identical label.") },
+  { code: "25 05", parentItemId: REGIONAL, startYear: 2026, endYear: 2026, targetCode: "25 06", targetEraKey: "school_infrastructure",
+    note: lawNote("Educational institutions construction-rehabilitation: 25 05 (2026 plan) -> 25 06 school construction (2019-2025), slight rename; the law prints this row's 2024 fact as 303,100.0 thousand GEL, the 25 06 series' 2024 actual.") },
   { code: "25 06", parentItemId: REGIONAL, startYear: 2026, endYear: 2026, targetCode: "25 07", targetEraKey: "tourism_infrastructure",
     note: lawNote("Tourism infrastructure improvement: 25 06 (2026 plan) -> 25 07 (2025), identical label.") },
 ];

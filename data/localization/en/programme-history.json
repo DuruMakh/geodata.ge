@@ -780,13 +780,6 @@
       "originalKa": "წყალმომარაგების ინფრასტრუქტურის აღდგენა-რეაბილიტაცია"
     }
   },
-  "admin_program.25_05.a7e898c6": {
-    "2026": {
-      "text": "Construction and rehabilitation of educational institutions",
-      "reviewedAt": "2026-10-24",
-      "originalKa": "საგანმანათლებლო დაწესებულებების მშენებლობა-რეაბილიტაცია"
-    }
-  },
   "admin_program.25_05.fa6f4fd1": {
     "2017": {
       "text": "Solid waste management programme",
@@ -869,6 +862,11 @@
       "text": "Construction and rehabilitation of general education and preschool institutions",
       "reviewedAt": "2026-09-05",
       "originalKa": "ზოგადსაგანმანათლებლო და სკოლამდელი აღზრდის დაწესებულებების მშენებლობა-რეაბილიტაცია"
+    },
+    "2026": {
+      "text": "Construction and rehabilitation of educational institutions",
+      "reviewedAt": "2026-10-24",
+      "originalKa": "საგანმანათლებლო დაწესებულებების მშენებლობა-რეაბილიტაცია"
     }
   },
   "admin_program.25_07.9b10dc83": {

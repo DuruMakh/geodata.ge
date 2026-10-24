@@ -51,7 +51,7 @@ async function writeText(relativePath: string, content: string): Promise<void> {
 
 async function main() {
   await assertSha256(tavi3OriginalPath, BUDGET_LAW_2026.tavi3Sha256);
-  await assertSha256(tavi6Path, BUDGET_LAW_2026.tavi6Sha256);
+  // lawTavi6OfficialRows() checks the Tavi VI hash itself.
   const provenance = JSON.parse(await readFile(`${BUDGET_LAW_2026.tavi3DocxPath}.provenance.json`, "utf8")) as {
     convertedSha256: string;
   };

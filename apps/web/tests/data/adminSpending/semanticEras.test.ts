@@ -68,6 +68,12 @@ const SEMANTIC_ERA_SPECS: CodeSpec[] = [
     ],
   },
   {
+    code: "24 15",
+    institutionLabelKa: ECONOMY_LABEL_KA,
+    parentItemId: "admin_spending.economy_sustainable_development",
+    eras: [{ startYear: 2026, endYear: 2026, key: "maritime_vocational_education" }],
+  },
+  {
     code: "24 17",
     institutionLabelKa: ECONOMY_LABEL_KA,
     parentItemId: "admin_spending.economy_sustainable_development",
@@ -367,6 +373,18 @@ describe("PROGRAM_SEMANTIC_ERAS business rules", () => {
       }
     },
   );
+
+  // 25 05 is not in the table above: its 2012-2016 legacy era is drop-only (a pre-2017 identity never
+  // qualifies), so the all-years harness cannot emit those years. Its 2026 boundary is checked here.
+  it("joins code 25 05's 2026 row to the 25 06 school-construction series and nothing else", () => {
+    const years = [2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026, 2027];
+    const identityByYear = itemIdByYear("25 05", REGIONAL_LABEL_KA, years);
+    const schoolSeries = itemIdByYear("25 06", REGIONAL_LABEL_KA, [2025]).get(2025);
+
+    expect(partitionYears(identityByYear)).toEqual([[2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025, 2027], [2026]]);
+    expect(identityByYear.get(2026)).toBe(schoolSeries);
+    expect(identityByYear.get(2025)?.startsWith("admin_program.25_05.")).toBe(true);
+  });
 
   it("splits code 06 04 into political/nonprofit funding through 2018 and elections from 2019", () => {
     const identityByYear = itemIdByYear("06 04", ELECTION_COMMISSION_LABEL_KA, TEST_YEARS);

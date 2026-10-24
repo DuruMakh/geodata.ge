@@ -663,9 +663,9 @@ export const REFERENCE_INTENTS: readonly ReferenceIntent[] = [
       // A percentage change is reported in percent, NOT in the measure's
       // currency. Published as "GEL" until the fixture caught it.
       unit: "percent",
-      // +7 programme series that exist only in the 2026 plan (≥100 m GEL in the law, never in
+      // +6 programme series that exist only in the 2026 plan (≥100 m GEL in the law, never in
       // 2017–2025 actuals); they are candidates but not eligible for 2017→2024.
-      candidateCount: 55,
+      candidateCount: 54,
       eligibleCount: 31,
     },
     allowedRounding: RATIO_TOLERANCE,
