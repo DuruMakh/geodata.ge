@@ -1,7 +1,10 @@
 // Small canvas drawing primitives shared by the revenue and deficit charts, ported from the design
-// board (txt, halo, hline, vline, dot, bar). They draw in CSS pixels on a context from `sizeCanvas`.
+// board (txt, halo, hline, vline, dot, bar), and the easings of every chapter chart. They draw in CSS
+// pixels on a context from `sizeCanvas`.
 
 export const easeOut = (t: number) => 1 - Math.pow(1 - t, 3);
+
+export const easeInOut = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
 
 export function txt(
   ctx: CanvasRenderingContext2D,

@@ -367,6 +367,40 @@ test("reduced motion shows final states", async ({ page }) => {
   expect(await marker.evaluate((element) => parseFloat(getComputedStyle(element).transitionDuration))).toBeLessThan(0.001);
 });
 
+test.describe("chart tooltips on a touch screen", () => {
+  test.use({ hasTouch: true, viewport: { width: 390, height: 844 } });
+
+  // pointerleave fires as soon as the finger lifts; a tapped tooltip must outlive it, as in the explorer charts.
+  // The relief (ch-04) shares the same pointer handling (bindChartPointer) but picks places in 3D, so it is left out.
+  test("a tapped chart keeps its tooltip until a tap outside or a scroll", async ({ page }) => {
+    // Reduced motion puts every chart in its final state at once, so the tap is read straight away.
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.goto(`${baseUrl}/`);
+    const opacity = (tip: Locator) => tip.evaluate((element) => getComputedStyle(element).opacity);
+    for (const id of ["ch-01", "ch-02", "ch-03", "ch-05"]) {
+      const chapter = page.locator(`#${id}`);
+      const canvas = chapter.locator("canvas");
+      const tip = chapter.locator("[data-chart-tip]");
+      await canvas.scrollIntoViewIfNeeded();
+      await expect.poll(() => canvas.evaluate((element) => (element as HTMLCanvasElement).style.width !== ""), { message: `${id} drawn` }).toBe(true);
+      const box = (await canvas.boundingBox())!;
+      await canvas.tap({ position: { x: box.width * 0.5, y: box.height * 0.6 } });
+      await expect(tip, `${id} tooltip after the tap`).toHaveCSS("opacity", "1");
+      await page.waitForTimeout(400);
+      expect(await opacity(tip), `${id} tooltip after the finger lifted`).toBe("1");
+      await chapter.locator("h2 + p").tap();
+      await expect(tip, `${id} tooltip after a tap outside the chart`).toHaveCSS("opacity", "0");
+    }
+
+    const revenue = page.locator("#ch-03");
+    const box = (await revenue.locator("canvas").boundingBox())!;
+    await revenue.locator("canvas").tap({ position: { x: box.width * 0.5, y: box.height * 0.6 } });
+    await expect(revenue.locator("[data-chart-tip]")).toHaveCSS("opacity", "1");
+    await page.evaluate(() => window.scrollBy(0, 120));
+    await expect(revenue.locator("[data-chart-tip]"), "tooltip after a scroll").toHaveCSS("opacity", "0");
+  });
+});
+
 for (const width of [375, 390]) {
   test(`homepage has no horizontal overflow at ${width}px`, async ({ page }) => {
     await page.setViewportSize({ width, height: 800 });

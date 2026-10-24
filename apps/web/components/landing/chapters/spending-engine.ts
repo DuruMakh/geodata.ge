@@ -2,6 +2,7 @@ import type { SpendingSeries } from "../../../lib/landing/chapters/types";
 import { formatShare } from "../../../lib/explorer/format";
 import {
   anchoredRect,
+  bindChartPointer,
   blockLabelTier,
   blockTone,
   clamp,
@@ -13,7 +14,7 @@ import {
   squarify,
   type Rect,
 } from "./canvas";
-import { easeOut, txt } from "./chart-draw";
+import { easeInOut, easeOut, txt } from "./chart-draw";
 
 // The canvas engine of chapter 02's treemap, loaded only once the chapter nears the viewport (spending-chapter.tsx).
 // The block area of a year follows sqrt(total / largest total) anchored bottom-left. Ported from the design board's
@@ -21,8 +22,6 @@ import { easeOut, txt } from "./chart-draw";
 
 const DARK_BLOCKS = 6; // the six largest fields take light text
 const TWEEN_MS = 520;
-
-const easeInOut = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
 
 export type Engine = { setYear(index: number, ms?: number): void; highlight(id: string | null): void; destroy(): void };
 
@@ -173,9 +172,7 @@ export function createTreemap({ wrap, canvas, data, initial, frameText, amount, 
     }
     onLeave();
   };
-  canvas.addEventListener("pointermove", move);
-  canvas.addEventListener("pointerdown", move);
-  canvas.addEventListener("pointerleave", leave);
+  const unbind = bindChartPointer(canvas, move, leave);
 
   const startIntro = () => {
     if (seen) return;
@@ -238,9 +235,7 @@ export function createTreemap({ wrap, canvas, data, initial, frameText, amount, 
       cancelAnimationFrame(introRaf);
       resizeObserver?.disconnect();
       introObserver?.disconnect();
-      canvas.removeEventListener("pointermove", move);
-      canvas.removeEventListener("pointerdown", move);
-      canvas.removeEventListener("pointerleave", leave);
+      unbind();
     },
   };
 }

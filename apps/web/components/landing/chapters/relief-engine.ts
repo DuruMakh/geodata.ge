@@ -1,5 +1,5 @@
 import type { MunicipalChapter } from "../../../lib/landing/chapters/types";
-import { clamp, fitCanvas, prefersReducedMotion, readTokens, rgb, sizeCanvas } from "./canvas";
+import { bindChartPointer, clamp, fitCanvas, prefersReducedMotion, readTokens, rgb, sizeCanvas } from "./canvas";
 import { easeOut } from "./chart-draw";
 import { camFit, camProject, camUpdate, labelX, labelY, makeCam, pickPlace, reliefScene, toScreen, worldX, worldZ, type Vec3 } from "./relief-math";
 
@@ -409,9 +409,7 @@ export function createRelief(o: EngineOptions): Engine | null {
     stop();
     o.onLost();
   };
-  canvas.addEventListener("pointermove", move);
-  canvas.addEventListener("pointerdown", move);
-  canvas.addEventListener("pointerleave", leave);
+  const unbind = bindChartPointer(canvas, move, leave);
   canvas.addEventListener("webglcontextlost", lost);
   document.addEventListener("visibilitychange", onVisibility);
 
@@ -448,9 +446,7 @@ export function createRelief(o: EngineOptions): Engine | null {
       stop();
       resizeObserver?.disconnect();
       viewObserver?.disconnect();
-      canvas.removeEventListener("pointermove", move);
-      canvas.removeEventListener("pointerdown", move);
-      canvas.removeEventListener("pointerleave", leave);
+      unbind();
       canvas.removeEventListener("webglcontextlost", lost);
       document.removeEventListener("visibilitychange", onVisibility);
       renderer.free();

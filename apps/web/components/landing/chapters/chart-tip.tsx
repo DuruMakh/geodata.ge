@@ -1,7 +1,7 @@
 import type { Ref } from "react";
 import { placeTip } from "./canvas";
 
-// Tooltip of the revenue and deficit charts: a title, `rows` rows of key swatch + value + name, and a
+// Tooltip of every chapter chart: a title, `rows` rows of key swatch + value + name, and a
 // foot. The markup is fixed and `showTip` fills it in place, so hovering never rerenders React.
 // Ported from the design board's tipCtl; hidden from assistive technology like every chart tooltip.
 
@@ -16,6 +16,7 @@ export function ChartTip({ tipRef, rows }: { tipRef: Ref<HTMLDivElement>; rows: 
     <div
       ref={tipRef}
       aria-hidden="true"
+      data-chart-tip=""
       className="pointer-events-none absolute left-0 top-0 z-[6] min-w-[156px] max-w-[270px] rounded-[4px] border border-[var(--hairline)] bg-[var(--tile)] px-3 pb-[9px] pt-2.5 text-xs leading-[1.35] text-[var(--ink)] opacity-0 shadow-[0_10px_28px_rgba(30,27,22,.13)] transition-opacity duration-[120ms]"
     >
       <div className="mb-[5px] text-xs font-semibold" />

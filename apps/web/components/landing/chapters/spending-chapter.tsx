@@ -4,8 +4,10 @@ import { Pause, Play } from "lucide-react";
 import { useEffect, useId, useRef, useState } from "react";
 import { formatInUnit, formatShare, UNIT_BN } from "../../../lib/explorer/format";
 import type { SpendingSeries } from "../../../lib/landing/chapters/types";
-import { blockTone, placeTip, sparkPoints } from "./canvas";
+import { blockTone, sparkPoints } from "./canvas";
 import { money } from "./chart-format";
+import { ChartTip, hideTip, showTip } from "./chart-tip";
+import { plannedYearText } from "./chart-tips";
 import { ChartUnavailable, Reveal, useEngine } from "./reveal";
 import type { Engine } from "./spending-engine";
 
@@ -58,14 +60,10 @@ export function SpendingChapter({ data, labels }: { data: SpendingSeries; labels
   const wrapRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const tipRef = useRef<HTMLDivElement>(null);
-  const tipTitleRef = useRef<HTMLDivElement>(null);
-  const tipKeyRef = useRef<HTMLElement>(null);
-  const tipValueRef = useRef<HTMLElement>(null);
-  const tipNameRef = useRef<HTMLSpanElement>(null);
-  const tipShareRef = useRef<HTMLElement>(null);
-  const tipShareNameRef = useRef<HTMLSpanElement>(null);
-  const tipFootRef = useRef<HTMLDivElement>(null);
   const engineRef = useRef<Engine | null>(null);
+  const litRef = useRef<string | null>(null); // the field the side list highlights
+  // How the coming click on a list row was made, and what the list highlighted before it (a tap may focus the row first).
+  const pressRef = useRef<{ type: string; lit: string | null }>({ type: "", lit: null });
   const timerRef = useRef(0);
   const cursorRef = useRef(last); // the year index the controls last chose; the interval steps from it
   const rangeId = useId();
@@ -82,9 +80,6 @@ export function SpendingChapter({ data, labels }: { data: SpendingSeries; labels
     const canvas = canvasRef.current;
     const tip = tipRef.current;
     if (!lib || !wrap || !canvas || !tip) return;
-    const text = (el: HTMLElement | null, value: string) => {
-      if (el) el.textContent = value;
-    };
     const { index: initial } = live.current;
     const engine = lib.createTreemap({
       wrap,
@@ -98,18 +93,17 @@ export function SpendingChapter({ data, labels }: { data: SpendingSeries; labels
         const f = d.fields[field];
         const v = f.values[i];
         const before = i > 0 ? f.values[i - 1] : 0;
-        text(tipTitleRef.current, f.label);
-        if (tipKeyRef.current) tipKeyRef.current.style.background = blockTone(field, d.fields.length);
-        text(tipValueRef.current, money(v, lab));
-        text(tipNameRef.current, d.planned[i] ? `${d.years[i]} (${lab.planned})` : String(d.years[i]));
-        text(tipShareRef.current, formatShare(d.totals[i] > 0 ? v / d.totals[i] : 0));
-        text(tipShareNameRef.current, lab.share);
-        text(tipFootRef.current, before > 0 ? `${lab.vsPrevious}${formatShare(v / before - 1, true, 1)}` : "");
-        placeTip(tip, x, y, wrap.clientWidth, wrap.clientHeight);
+        const tipData = {
+          title: f.label,
+          rows: [
+            { key: blockTone(field, d.fields.length), val: money(v, lab), name: plannedYearText(d, i, lab.planned) },
+            { val: formatShare(d.totals[i] > 0 ? v / d.totals[i] : 0), name: lab.share },
+          ],
+          foot: before > 0 ? `${lab.vsPrevious}${formatShare(v / before - 1, true, 1)}` : undefined,
+        };
+        showTip(tip, tipData, x, y, wrap.clientWidth, wrap.clientHeight);
       },
-      onLeave() {
-        tip.style.opacity = "0";
-      },
+      onLeave: () => hideTip(tip),
     });
     engineRef.current = engine;
     return () => {
@@ -119,6 +113,8 @@ export function SpendingChapter({ data, labels }: { data: SpendingSeries; labels
   }, [lib, data]);
 
   useEffect(() => {
+    // A new year drops the outside highlight in the engine as well.
+    litRef.current = null;
     engineRef.current?.setYear(index);
   }, [index]);
 
@@ -129,6 +125,10 @@ export function SpendingChapter({ data, labels }: { data: SpendingSeries; labels
     [],
   );
 
+  const highlight = (id: string | null) => {
+    litRef.current = id;
+    engineRef.current?.highlight(id);
+  };
   const select = (i: number) => {
     cursorRef.current = i;
     setIndex(i);
@@ -234,23 +234,7 @@ export function SpendingChapter({ data, labels }: { data: SpendingSeries; labels
             ) : (
               <canvas ref={canvasRef} role="img" aria-label={ariaLabel} className="absolute left-0 top-0" />
             )}
-            <div
-              ref={tipRef}
-              aria-hidden="true"
-              className="pointer-events-none absolute left-0 top-0 z-[6] min-w-[156px] max-w-[270px] rounded-[4px] border border-[var(--hairline)] bg-[var(--tile)] px-3 pb-[9px] pt-2.5 text-xs leading-[1.35] text-[var(--ink)] opacity-0 shadow-[0_10px_28px_rgba(30,27,22,.13)] transition-opacity duration-[120ms]"
-            >
-              <div ref={tipTitleRef} className="mb-[5px] text-xs font-semibold" />
-              <div className="mt-1 flex items-center gap-2">
-                <i ref={tipKeyRef} className="h-0.5 w-3 flex-none rounded-[1px]" />
-                <b ref={tipValueRef} className="whitespace-nowrap font-[family-name:var(--font-numeric)] text-xs font-semibold" />
-                <span ref={tipNameRef} className="text-[11.5px] text-[var(--muted)]" />
-              </div>
-              <div className="mt-1 flex items-center gap-2">
-                <b ref={tipShareRef} className="whitespace-nowrap font-[family-name:var(--font-numeric)] text-xs font-semibold" />
-                <span ref={tipShareNameRef} className="text-[11.5px] text-[var(--muted)]" />
-              </div>
-              <div ref={tipFootRef} className="mt-1.5 border-t border-[var(--row-border)] pt-1.5 text-[11px] text-[var(--muted)] empty:hidden" />
-            </div>
+            <ChartTip tipRef={tipRef} rows={2} />
           </div>
         </figure>
         <div>
@@ -263,10 +247,23 @@ export function SpendingChapter({ data, labels }: { data: SpendingSeries; labels
                 key={f.id}
                 type="button"
                 data-field={f.id}
-                onMouseEnter={() => engineRef.current?.highlight(f.id)}
-                onMouseLeave={() => engineRef.current?.highlight(null)}
-                onFocus={() => engineRef.current?.highlight(f.id)}
-                onBlur={() => engineRef.current?.highlight(null)}
+                onPointerEnter={(event) => {
+                  if (event.pointerType !== "touch") highlight(f.id);
+                }}
+                onPointerLeave={(event) => {
+                  if (event.pointerType !== "touch") highlight(null);
+                }}
+                onPointerDown={(event) => {
+                  pressRef.current = { type: event.pointerType, lit: litRef.current };
+                }}
+                // A tap (no hover on a phone) toggles the row's block.
+                onClick={() => {
+                  const { type, lit } = pressRef.current;
+                  if (type === "touch") highlight(lit === f.id ? null : f.id);
+                  pressRef.current = { type: "", lit: null };
+                }}
+                onFocus={() => highlight(f.id)}
+                onBlur={() => highlight(null)}
                 className="group grid w-full grid-cols-[minmax(0,1fr)_auto] items-baseline gap-x-3 gap-y-[5px] border-b border-[var(--row-border)] px-1 pb-2.5 pt-[9px] text-left transition-colors hover:bg-[var(--tint)] focus-visible:bg-[var(--tint)]"
               >
                 <span className="text-[13px] font-medium leading-[1.3]">{f.label}</span>

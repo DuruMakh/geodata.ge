@@ -235,6 +235,42 @@ export function stackLabels(want: number[], gap: number, lo: number, hi: number)
   return y;
 }
 
+/**
+ * The pointer listeners of a chart canvas: `move` on pointer move and press, `leave` when a mouse or pen leaves.
+ * A touch tooltip stays after the tap (pointerleave follows the finger lifting, as in the explorer charts) and goes
+ * on a press outside the canvas or on scroll. Returns the function that removes the listeners.
+ */
+export function bindChartPointer(canvas: HTMLElement, move: (event: PointerEvent) => void, leave: () => void): () => void {
+  let touchShown = false;
+  const press = (event: PointerEvent) => {
+    touchShown = event.pointerType === "touch";
+    move(event);
+  };
+  const out = (event: PointerEvent) => {
+    if (event.pointerType !== "touch") leave();
+  };
+  const release = () => {
+    if (!touchShown) return;
+    touchShown = false;
+    leave();
+  };
+  const outside = (event: PointerEvent) => {
+    if (!canvas.contains(event.target as Node | null)) release();
+  };
+  canvas.addEventListener("pointermove", move);
+  canvas.addEventListener("pointerdown", press);
+  canvas.addEventListener("pointerleave", out);
+  document.addEventListener("pointerdown", outside);
+  window.addEventListener("scroll", release, { passive: true });
+  return () => {
+    canvas.removeEventListener("pointermove", move);
+    canvas.removeEventListener("pointerdown", press);
+    canvas.removeEventListener("pointerleave", out);
+    document.removeEventListener("pointerdown", outside);
+    window.removeEventListener("scroll", release);
+  };
+}
+
 /** Move a tooltip element next to (x, y) inside a w x h chart: right of the pointer, flipped left at the edge, kept in view. */
 export function placeTip(el: HTMLElement, x: number, y: number, w: number, h: number): void {
   const tw = el.offsetWidth;

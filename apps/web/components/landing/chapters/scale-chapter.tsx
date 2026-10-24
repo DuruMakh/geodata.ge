@@ -3,7 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 import { formatInUnit, formatShare, UNIT_BN, UNIT_PERSONS } from "../../../lib/explorer/format";
 import { GEL_PER_SQUARE, type ScaleChapter as ScaleData } from "../../../lib/landing/chapters/types";
-import { OFF_SQUARE, placeTip, TOKEN_FALLBACKS } from "./canvas";
+import { OFF_SQUARE } from "./canvas";
+import { ChartTip, hideTip, showTip } from "./chart-tip";
 import { ChartUnavailable, Reveal, useEngine } from "./reveal";
 import type { Engine } from "./scale-engine";
 
@@ -44,13 +45,6 @@ export function ScaleChapter({ data, labels }: { data: ScaleData; labels: ScaleL
   const markerRef = useRef<HTMLDivElement>(null);
   const markerLabelRef = useRef<HTMLSpanElement>(null);
   const tipRef = useRef<HTMLDivElement>(null);
-  const tipTitleRef = useRef<HTMLDivElement>(null);
-  const tipKeyRef = useRef<HTMLElement>(null);
-  const tipValueRef = useRef<HTMLElement>(null);
-  const tipNameRef = useRef<HTMLSpanElement>(null);
-  const tipShareRef = useRef<HTMLElement>(null);
-  const tipShareNameRef = useRef<HTMLSpanElement>(null);
-  const tipFootRef = useRef<HTMLDivElement>(null);
   const engineRef = useRef<Engine | null>(null);
   // Read by the long-lived engine callbacks, so a measure change never rebuilds the engine.
   const live = useRef({ selected, labels, data });
@@ -67,9 +61,6 @@ export function ScaleChapter({ data, labels }: { data: ScaleData; labels: ScaleL
     const markerLabel = markerLabelRef.current;
     const tip = tipRef.current;
     if (!lib || !wrap || !canvas || !marker || !markerLabel || !tip) return;
-    const text = (el: HTMLElement | null, value: string) => {
-      if (el) el.textContent = value;
-    };
     const engine = lib.createSquares({
       wrap,
       canvas,
@@ -80,18 +71,17 @@ export function ScaleChapter({ data, labels }: { data: ScaleData; labels: ScaleL
       onHover(index, x, y, filled) {
         const { selected: measure, labels: l, data: d } = live.current;
         const cumulativeGel = (index + 1) * GEL_PER_SQUARE;
-        text(tipTitleRef.current, `${count(index + 1)} / ${count(d.squares)} ${l.square}`);
-        if (tipKeyRef.current) tipKeyRef.current.style.background = filled ? TOKEN_FALLBACKS.ink : OFF_SQUARE;
-        text(tipValueRef.current, `${formatInUnit(cumulativeGel, BN_2)} ${l.bnGel}`);
-        text(tipNameRef.current, l.cumulative);
-        text(tipShareRef.current, share(cumulativeGel / d.gdpGel));
-        text(tipShareNameRef.current, l.ofGdp);
-        text(tipFootRef.current, `${filled ? l.included : l.notIncluded}${measureName(measure, l.planned)}`);
-        placeTip(tip, x, y, wrap.clientWidth, wrap.clientHeight);
+        const tipData = {
+          title: `${count(index + 1)} / ${count(d.squares)} ${l.square}`,
+          rows: [
+            { key: filled ? "var(--ink)" : OFF_SQUARE, val: `${formatInUnit(cumulativeGel, BN_2)} ${l.bnGel}`, name: l.cumulative },
+            { val: share(cumulativeGel / d.gdpGel), name: l.ofGdp },
+          ],
+          foot: `${filled ? l.included : l.notIncluded}${measureName(measure, l.planned)}`,
+        };
+        showTip(tip, tipData, x, y, wrap.clientWidth, wrap.clientHeight);
       },
-      onLeave() {
-        tip.style.opacity = "0";
-      },
+      onLeave: () => hideTip(tip),
     });
     engineRef.current = engine;
     return () => {
@@ -174,23 +164,7 @@ export function ScaleChapter({ data, labels }: { data: ScaleData; labels: ScaleL
               {markerText}
             </span>
           </div>
-          <div
-            ref={tipRef}
-            aria-hidden="true"
-            className="pointer-events-none absolute left-0 top-0 z-[6] min-w-[156px] max-w-[270px] rounded-[4px] border border-[var(--hairline)] bg-[var(--tile)] px-3 pb-[9px] pt-2.5 text-xs leading-[1.35] text-[var(--ink)] opacity-0 shadow-[0_10px_28px_rgba(30,27,22,.13)] transition-opacity duration-[120ms]"
-          >
-            <div ref={tipTitleRef} className="mb-[5px] text-xs font-semibold" />
-            <div className="mt-1 flex items-center gap-2">
-              <i ref={tipKeyRef} className="h-0.5 w-3 flex-none rounded-[1px]" />
-              <b ref={tipValueRef} className="whitespace-nowrap font-[family-name:var(--font-numeric)] text-xs font-semibold" />
-              <span ref={tipNameRef} className="text-[11.5px] text-[var(--muted)]" />
-            </div>
-            <div className="mt-1 flex items-center gap-2">
-              <b ref={tipShareRef} className="whitespace-nowrap font-[family-name:var(--font-numeric)] text-xs font-semibold" />
-              <span ref={tipShareNameRef} className="text-[11.5px] text-[var(--muted)]" />
-            </div>
-            <div ref={tipFootRef} className="mt-1.5 border-t border-[var(--row-border)] pt-1.5 text-[11px] text-[var(--muted)]" />
-          </div>
+          <ChartTip tipRef={tipRef} rows={2} />
         </div>
       </figure>
     </Reveal>

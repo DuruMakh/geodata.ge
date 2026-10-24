@@ -33,9 +33,12 @@ function setup({ webgl, reduced }: { webgl: boolean; reduced: boolean }) {
   const frames = new Map<number, (t: number) => void>();
   let nextFrame = 0;
   const doc = { hidden: false, ...listeners() };
+  const win = listeners();
   const observers = { intersection: [] as { cb: (entries: { isIntersecting: boolean }[]) => void; live: boolean }[], resize: [] as { live: boolean }[] };
 
   vi.stubGlobal("window", globalThis);
+  vi.stubGlobal("addEventListener", win.add);
+  vi.stubGlobal("removeEventListener", win.remove);
   vi.stubGlobal("devicePixelRatio", 2);
   vi.stubGlobal("matchMedia", () => ({ matches: reduced }));
   vi.stubGlobal("getComputedStyle", () => ({ getPropertyValue: () => "" }));
@@ -138,7 +141,7 @@ function setup({ webgl, reduced }: { webgl: boolean; reduced: boolean }) {
     return due.length;
   };
   const view = (isIntersecting: boolean) => observers.intersection[0].cb([{ isIntersecting }]);
-  return { engine, frames, tick, view, doc, observers, gl, draws, canvasEvents, onLost };
+  return { engine, frames, tick, view, doc, win, observers, gl, draws, canvasEvents, onLost };
 }
 
 afterEach(() => {
@@ -184,13 +187,16 @@ describe("createRelief", () => {
     expect(s.gl.created).toEqual({ Program: 2, Shader: 4, Buffer: 5 });
     expect(s.frames.size).toBe(1);
     expect(s.canvasEvents.count()).toBe(4);
-    expect(s.doc.count()).toBe(1);
+    // visibilitychange, and the press outside and the scroll that hide a tapped tooltip.
+    expect(s.doc.count()).toBe(2);
+    expect(s.win.count()).toBe(1);
 
     s.engine.destroy();
     expect(s.gl.deleted).toEqual(s.gl.created);
     expect(s.frames.size).toBe(0);
     expect(s.canvasEvents.count()).toBe(0);
     expect(s.doc.count()).toBe(0);
+    expect(s.win.count()).toBe(0);
     expect([...s.observers.intersection, ...s.observers.resize].every((o) => !o.live)).toBe(true);
   });
 

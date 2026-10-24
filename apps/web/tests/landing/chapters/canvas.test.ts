@@ -1,5 +1,5 @@
-import { describe, expect, it } from "vitest";
-import { anchoredRect, blockLabelTier, blockTone, fitText, gridFor, lerpRect, mixHex, niceTicks, OFF_SQUARE, sparkPoints, squarify, stackLabels } from "../../../components/landing/chapters/canvas";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { anchoredRect, bindChartPointer, blockLabelTier, blockTone, fitText, gridFor, lerpRect, mixHex, niceTicks, OFF_SQUARE, sparkPoints, squarify, stackLabels } from "../../../components/landing/chapters/canvas";
 
 describe("squarify", () => {
   it("areas are proportional to values and fill the rectangle (sum of areas = w*h within 1e-6)", () => {
@@ -206,5 +206,75 @@ describe("sparkPoints", () => {
     expect(sparkPoints([5, 5, 5], 100, 0, 40).map(([, y]) => y)).toEqual([20, 20, 20]);
     expect(sparkPoints([5], 100, 0, 40)).toEqual([[0, 20]]);
     expect(sparkPoints([], 100, 0, 40)).toEqual([]);
+  });
+});
+
+describe("bindChartPointer", () => {
+  type Handler = (event?: unknown) => void;
+  const target = () => {
+    const map: Record<string, Handler[]> = {};
+    return {
+      map,
+      addEventListener: (type: string, fn: Handler) => void (map[type] ??= []).push(fn),
+      removeEventListener: (type: string, fn: Handler) => void (map[type] = (map[type] ?? []).filter((f) => f !== fn)),
+      fire: (type: string, event?: unknown) => (map[type] ?? []).forEach((fn) => fn(event)),
+      count: () => Object.values(map).reduce((n, list) => n + list.length, 0),
+    };
+  };
+
+  function setup() {
+    const doc = target();
+    const win = target();
+    vi.stubGlobal("document", doc);
+    vi.stubGlobal("window", win);
+    const inside = {};
+    const canvas = { ...target(), contains: (node: unknown) => node === inside };
+    const calls: string[] = [];
+    const unbind = bindChartPointer(canvas as unknown as HTMLElement, (event) => calls.push(`move:${event.pointerType}`), () => calls.push("leave"));
+    return { doc, win, canvas, inside, calls, unbind };
+  }
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it("a mouse leaving hides the tooltip; a touch tap keeps it through pointerleave", () => {
+    const s = setup();
+    s.canvas.fire("pointermove", { pointerType: "mouse" });
+    s.canvas.fire("pointerleave", { pointerType: "mouse" });
+    expect(s.calls).toEqual(["move:mouse", "leave"]);
+
+    s.calls.length = 0;
+    s.canvas.fire("pointerdown", { pointerType: "touch", target: s.inside });
+    s.doc.fire("pointerdown", { pointerType: "touch", target: s.inside });
+    s.canvas.fire("pointerleave", { pointerType: "touch" });
+    expect(s.calls).toEqual(["move:touch"]);
+  });
+
+  it("hides a tapped tooltip on a press outside the canvas or on scroll, once", () => {
+    const s = setup();
+    s.canvas.fire("pointerdown", { pointerType: "touch", target: s.inside });
+    s.doc.fire("pointerdown", { pointerType: "touch", target: {} });
+    s.doc.fire("pointerdown", { pointerType: "touch", target: {} });
+    expect(s.calls).toEqual(["move:touch", "leave"]);
+
+    s.calls.length = 0;
+    s.canvas.fire("pointerdown", { pointerType: "touch", target: s.inside });
+    s.win.fire("scroll");
+    s.win.fire("scroll");
+    expect(s.calls).toEqual(["move:touch", "leave"]);
+
+    // A mouse user scrolling over the chart is left alone; pointerleave covers the mouse.
+    s.calls.length = 0;
+    s.canvas.fire("pointerdown", { pointerType: "mouse", target: s.inside });
+    s.win.fire("scroll");
+    expect(s.calls).toEqual(["move:mouse"]);
+  });
+
+  it("removes every listener it added", () => {
+    const s = setup();
+    expect([s.canvas.count(), s.doc.count(), s.win.count()]).toEqual([3, 1, 1]);
+    s.unbind();
+    expect([s.canvas.count(), s.doc.count(), s.win.count()]).toEqual([0, 0, 0]);
   });
 });

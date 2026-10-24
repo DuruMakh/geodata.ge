@@ -1,4 +1,4 @@
-import { clamp, prefersReducedMotion, sizeCanvas } from "./canvas";
+import { bindChartPointer, clamp, prefersReducedMotion, sizeCanvas } from "./canvas";
 
 // Shared engine of the line/area/bar charts of chapters 03 and 05: sizes the canvas to its wrapper,
 // plays the draw-in once the wrapper is first on screen (reduced motion: final state at once),
@@ -78,9 +78,7 @@ export function createChartCore(wrap: HTMLElement, canvas: HTMLCanvasElement, sp
     }
     spec.onLeave();
   };
-  canvas.addEventListener("pointermove", move);
-  canvas.addEventListener("pointerdown", move);
-  canvas.addEventListener("pointerleave", leave);
+  const unbind = bindChartPointer(canvas, move, leave);
 
   let resizeObserver: ResizeObserver | null = null;
   let introObserver: IntersectionObserver | null = null;
@@ -112,9 +110,7 @@ export function createChartCore(wrap: HTMLElement, canvas: HTMLCanvasElement, sp
       cancelAnimationFrame(raf);
       resizeObserver?.disconnect();
       introObserver?.disconnect();
-      canvas.removeEventListener("pointermove", move);
-      canvas.removeEventListener("pointerdown", move);
-      canvas.removeEventListener("pointerleave", leave);
+      unbind();
     },
   };
 }

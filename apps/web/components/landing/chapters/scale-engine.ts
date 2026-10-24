@@ -1,10 +1,9 @@
-import { clamp, gridFor, mixHex, OFF_SQUARE, prefersReducedMotion, readTokens, sizeCanvas } from "./canvas";
+import { bindChartPointer, clamp, gridFor, mixHex, OFF_SQUARE, prefersReducedMotion, readTokens, sizeCanvas } from "./canvas";
+import { easeInOut } from "./chart-draw";
 
 // The canvas engine of chapter 01's squares, loaded only once the chapter nears the viewport (scale-chapter.tsx).
 // Squares fill column by column from the bottom left; a new measure tweens the fill and moves the marker. Ported from
 // the design board's createScale.
-
-const easeInOut = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
 
 export type Engine = { set(squares: number): void; destroy(): void };
 
@@ -199,9 +198,7 @@ export function createSquares({ wrap, canvas, marker, markerLabel, total, initia
     }
     onLeave();
   };
-  canvas.addEventListener("pointermove", move);
-  canvas.addEventListener("pointerdown", move);
-  canvas.addEventListener("pointerleave", leave);
+  const unbind = bindChartPointer(canvas, move, leave);
 
   const onSize = () => {
     if (layout()) {
@@ -249,9 +246,7 @@ export function createSquares({ wrap, canvas, marker, markerLabel, total, initia
       cancelAnimationFrame(raf);
       resizeObserver?.disconnect();
       introObserver?.disconnect();
-      canvas.removeEventListener("pointermove", move);
-      canvas.removeEventListener("pointerdown", move);
-      canvas.removeEventListener("pointerleave", leave);
+      unbind();
     },
   };
 }
