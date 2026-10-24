@@ -23,7 +23,7 @@ import { HEALTH_HUB_PATH } from "../explorer/health";
 import { buildPickerCountry, pickerGroupsFromRows } from "../explorer/municipalData";
 import { socialAnnualCpi, socialPopulation, type SocialPlaceSet } from "../explorer/social";
 import { buildSocialIndexModel } from "../explorer/socialIndex";
-import { socialPlaceBase, socialPlaceCoverage, socialPlaceDefaultSelection, socialPlaceFacts, socialPlaceSeries } from "../explorer/socialPlaces";
+import { socialLatestOf, socialPlaceBase, socialPlaceCoverage, socialPlaceDefaultSelection, socialPlaceFacts, socialPlaceSeries } from "../explorer/socialPlaces";
 import type { WorkbookPublicSource } from "../explorer/workbookModel";
 import { Message } from "../i18n/message";
 import { message } from "../i18n/messages";
@@ -91,13 +91,6 @@ function headingNames(messages: Messages, set: SocialPlaceSet): string[] {
   return [...new Set(socialPlaceSeries(set).map(({ heading }) => message(messages, `social.heading.${heading}`)))];
 }
 
-/** The latest served fact of a place's series. */
-function latestOf(facts: readonly ClientSocialFact[], indicatorId: string, placeId: string): ClientSocialFact {
-  const latest = facts.filter(f => f.indicatorId === indicatorId && f.geographyId === placeId).sort((a, b) => a.year - b.year).at(-1);
-  if (!latest) throw new Error(`No ${indicatorId} facts for ${placeId}`);
-  return latest;
-}
-
 /** A count as the latest lines print it: whole persons or families. */
 const countLabel = (fact: ClientSocialFact) => formatInUnit(fact.value, UNIT_PERSONS);
 /** A share of residents as the map, the list and the picker print it: per 100, as a percent to one decimal. */
@@ -130,7 +123,7 @@ export async function renderSocialIndexPage(locale: Locale, set: SocialPlaceSet)
   const index = buildSocialIndexModel(set, facts, population, municipal.regions, municipal.municipalities);
   const base = socialPlaceBase(set);
   const georgia = places.find(candidate => candidate.id === GEORGIA_PLACE_ID)!;
-  const headline = latestOf(facts, socialPlaceDefaultSelection(set)[0], SOCIAL_GEORGIA);
+  const headline = socialLatestOf(facts, socialPlaceDefaultSelection(set)[0], SOCIAL_GEORGIA);
   const { min, max } = socialPlaceCoverage(set, SOCIAL_GEORGIA, socialPlaceFacts(set, SOCIAL_GEORGIA, facts, { population, cpi }));
   const title = t(`page.${set}.title`);
   // The map's measure is the set's first share of residents.
@@ -206,7 +199,7 @@ export async function renderSocialPlacePage(route: SocialPlaceRoute, locale: Loc
   const series = socialPlaceSeries(set);
   const placeFacts = facts.filter(f => f.geographyId === place.id && series.some(({ id }) => id === f.indicatorId));
   const placePopulation = population.filter(row => row.geographyId === place.id);
-  const headline = latestOf(placeFacts, socialPlaceDefaultSelection(set)[0], place.id);
+  const headline = socialLatestOf(placeFacts, socialPlaceDefaultSelection(set)[0], place.id);
   const name = placeLabel(place, locale);
   const { min, max } = socialPlaceCoverage(set, place.id, socialPlaceFacts(set, place.id, placeFacts, { population: placePopulation, cpi }));
   const sectionTitle = t(`page.${set}.title`);

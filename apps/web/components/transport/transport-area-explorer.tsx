@@ -5,7 +5,7 @@ import { useCallback, useId, useRef, useState } from "react";
 import type { ClientTransportFact } from "../../lib/data/transport/types";
 import type { MunicipalRegion } from "../../lib/data/municipal/types";
 import { transportLatestValue, transportSeriesLabel, transportUnitLabel, transportValueLabel, transportValueUnit, serializeTransportHash, type TransportSeriesModel, type TransportTranslate } from "../../lib/explorer/transport";
-import { TRANSPORT_REGIONS_HREF, buildTransportAreaModel, changeTransportAreaSelection, transportAreaCoverage, transportAreaOfMapId, transportAreaSelectionHash, transportAreaSeries, transportMapId, transportRegionHref, parseTransportAreaHash, type TransportArea } from "../../lib/explorer/transportAreas";
+import { TRANSPORT_REGIONS_HREF, buildTransportAreaModel, changeTransportAreaSelection, transportAreaCoverage, transportAreaLatest, transportAreaOfMapId, transportAreaSelectionHash, transportMapId, transportRegionHref, parseTransportAreaHash, type TransportArea } from "../../lib/explorer/transportAreas";
 import { buildTransportWorkbookExportModel } from "../../lib/explorer/transportWorkbook";
 import { updatedDate } from "../../lib/explorer/coverageLabel";
 import { formatInUnit } from "../../lib/explorer/format";
@@ -61,8 +61,7 @@ export function TransportAreaExplorer({ area, facts, labels, areaLabels, sources
   const reference = model.series.find(series => series.reference && series.unit === model.unit);
   const total = rows.find(row => row.itemId === reference?.id) ?? null;
   // The latest-value line is the page's headline: its own area's registered vehicles, whatever is chosen below.
-  const registeredId = transportAreaSeries(area)[0].id;
-  const latest = facts.filter(f => f.indicatorId === registeredId).sort((a, b) => a.year - b.year).at(-1)!;
+  const latest = transportAreaLatest(area, facts);
   const areaName = areaLabels[area];
   const title = t("page.area.regionTitle", { region: areaName });
   // The chart is named after the heading of the selection's unit (its text before the unit).

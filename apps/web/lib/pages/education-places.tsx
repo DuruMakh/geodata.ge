@@ -17,7 +17,7 @@ import { GEORGIA_PLACE_ID, TBILISI_PLACE_ID, buildDemographyPlaces, placeLabel, 
 import { placeHrefById, placeIdForRoute, placeNeighbours, placePageHref, type PlaceRoute } from "../explorer/demographyPlaceRoutes";
 import { EDUCATION_HUB_PATH, educationCountLabel, educationPeriodLabel, educationSeriesLabel, educationTemporalCoverage } from "../explorer/education";
 import { buildEducationIndexModel } from "../explorer/educationIndex";
-import { educationPlaceBase, educationPlaceCoverage, educationPlaceDefaultSelection, educationPlaceSeries, type EducationPlaceSet } from "../explorer/educationPlaces";
+import { educationLatestOf, educationPlaceBase, educationPlaceCoverage, educationPlaceDefaultSelection, educationPlaceSeries, type EducationPlaceSet } from "../explorer/educationPlaces";
 import { formatInUnit, UNIT_PERSONS } from "../explorer/format";
 import { buildPickerCountry, pickerGroupsFromRows } from "../explorer/municipalData";
 import { Message } from "../i18n/message";
@@ -49,13 +49,6 @@ async function loadEducationPlaceBasics(locale: Locale) {
   });
   const lastReviewedAt = shown.map(f => f.lastReviewedAt).sort().at(-1)!;
   return { facts: shown.map(toClientEducationFact), municipal, presentation, places, lastReviewedAt };
-}
-
-/** The latest fact of a place's series. */
-function latestOf(facts: readonly ClientEducationFact[], indicatorId: string, placeId: string): ClientEducationFact {
-  const latest = facts.filter(f => f.indicatorId === indicatorId && f.geographyId === placeId).sort((a, b) => a.year - b.year).at(-1);
-  if (!latest) throw new Error(`No ${indicatorId} facts for ${placeId}`);
-  return latest;
 }
 
 /** Georgia's value of a series in one year (the index's map year), or a descriptive error. */
@@ -100,7 +93,7 @@ export async function renderEducationIndexPage(locale: Locale, set: EducationPla
   const base = educationPlaceBase(set);
   const georgia = places.find(candidate => candidate.id === GEORGIA_PLACE_ID)!;
   // Georgia's headline (national pupils, or kindergarten children) and the institutions counted in the same year.
-  const headline = latestOf(facts, educationPlaceDefaultSelection(set, EDUCATION_GEORGIA)[0], EDUCATION_GEORGIA);
+  const headline = educationLatestOf(facts, educationPlaceDefaultSelection(set, EDUCATION_GEORGIA)[0], EDUCATION_GEORGIA);
   const institutions = georgiaFactAt(facts, educationIndicator(set === "schools" ? "schools" : "kindergartens", "total"), headline.year);
   const figures = set === "schools" ? { pupils: headline, schools: institutions } : { children: headline, kindergartens: institutions };
   const country = georgiaFactAt(facts, headline.indicatorId, index.year);
@@ -188,7 +181,7 @@ export async function renderEducationPlacePage(route: EducationPlaceRoute, local
   const href = (target: DemographyPlace) => pageHref(placePageHref(base, target.id), locale);
   const index = buildEducationIndexModel(set, facts, municipal.regions, municipal.municipalities);
   const series = educationPlaceSeries(set, place.id);
-  const headline = latestOf(facts, series[0].id, place.id);
+  const headline = educationLatestOf(facts, series[0].id, place.id);
   const name = placeLabel(place, locale);
   const { first, last } = placeCoverage(set, place.id, facts);
   const sectionTitle = t(`page.${set}.title`);

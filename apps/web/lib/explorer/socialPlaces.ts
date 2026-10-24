@@ -34,6 +34,13 @@ export function socialPlaceSeries(set: SocialPlaceSet): SocialSeriesDefinition[]
   ];
 }
 
+/** The latest served fact of a place's series: a latest line's figure. */
+export function socialLatestOf(facts: readonly ClientSocialFact[], indicatorId: string, placeId: string): ClientSocialFact {
+  const latest = facts.filter(f => f.indicatorId === indicatorId && f.geographyId === placeId).sort((a, b) => a.year - b.year).at(-1);
+  if (!latest) throw new Error(`No ${indicatorId} facts for ${placeId}`);
+  return latest;
+}
+
 export function socialPlaceDefaultSelection(set: SocialPlaceSet): string[] {
   return [socialPlaceSeries(set)[0].id];
 }

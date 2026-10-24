@@ -5,7 +5,7 @@ import { useCallback, useId, useRef, useState } from "react";
 import type { ClientHouseholdFact, HouseholdArea } from "../../lib/data/household/types";
 import { unpackFacts, type FactsInput } from "../../lib/data/packedFacts";
 import type { MunicipalRegion } from "../../lib/data/municipal/types";
-import { buildHouseholdModel, changeHouseholdMeasure, HOUSEHOLD_SECTIONS, householdCoverage, householdMeasureHash, householdRegionHref, parseHouseholdHash, sectionTotal, serializeHouseholdHash, type HouseholdSectionId } from "../../lib/explorer/household";
+import { buildHouseholdModel, changeHouseholdMeasure, HOUSEHOLD_SECTIONS, householdAreaLatest, householdCoverage, householdMeasureHash, householdRegionHref, parseHouseholdHash, serializeHouseholdHash, type HouseholdSectionId } from "../../lib/explorer/household";
 import { buildHouseholdWorkbookExportModel } from "../../lib/explorer/householdWorkbook";
 import { formatInUnit, type ValueUnit } from "../../lib/explorer/format";
 import { rangeFromPatch } from "../../lib/explorer/periodRange";
@@ -63,7 +63,7 @@ export function HouseholdExplorer({ section, facts: shippedFacts, labels: lineLa
   const lineSeries = model.selected.map(series => ({ id: series.id, label: labels[series.id], color: series.color, vals: model.years.map(year => series.valuesByYear[year]) }));
   const total = rows.find(row => row.itemId === reference.id) ?? null;
   // The latest-value line is the page's headline: its own area per household, whatever is chosen below.
-  const latest = facts.filter(f => f.indicatorId === sectionTotal(section) && f.areaId === area && f.measure === "per_household").sort((a, b) => a.year - b.year).at(-1)!;
+  const latest = householdAreaLatest(section, area, facts);
   const areaName = areaLabels[area];
   const title = t(`page.${section}.title`);
   const chartLabel = `${t(`tab.parts.${section}`)} · ${areaLabels[area]}`;

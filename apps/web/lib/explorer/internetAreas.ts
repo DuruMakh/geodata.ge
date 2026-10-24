@@ -55,5 +55,11 @@ export function internetAreaSelectionHash(selectedIds: readonly string[], area: 
   return moved.join(",") === internetAreaDefaultSelection(area).join(",") ? "" : `#${new URLSearchParams({ sel: moved.join(",") })}`;
 }
 
+/** The latest-value line's figure: the area's own homes with internet in their latest year, whatever is chosen below. */
+export function internetAreaLatest(area: InternetArea, facts: readonly ClientInternetFact[]): ClientInternetFact {
+  const homesId = internetAreaSeries(area)[0].id;
+  return facts.filter(f => f.indicatorId === homesId).sort((a, b) => a.year - b.year).at(-1)!;
+}
+
 export const buildInternetAreaModel = (area: InternetArea, facts: readonly ClientInternetFact[], state: InternetAreaState): InternetModel =>
   buildInternetSeriesModel(internetAreaSeries(area), facts, state);

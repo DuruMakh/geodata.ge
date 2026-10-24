@@ -3,7 +3,7 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import type { ClientUnemploymentObservation, UnemploymentBreakdown, UnemploymentGroupDefinition, UnemploymentIndicator, UnemploymentSex } from "../../lib/data/unemployment/types";
 import { unemploymentIndicators, unemploymentIsRate } from "../../lib/data/unemployment/types";
-import { buildUnemploymentModel, buildUnemploymentComposition, formatUnemploymentValue, unemploymentCountUnit } from "../../lib/explorer/unemployment";
+import { buildUnemploymentModel, buildUnemploymentComposition, formatUnemploymentValue, unemploymentCountUnit, unemploymentPlaceLatest } from "../../lib/explorer/unemployment";
 import { buildUnemploymentAgeHeatmap } from "../../lib/explorer/unemploymentAge";
 import { changeUnemploymentBreakdown, changeUnemploymentEducationSex, changeUnemploymentIndicator, changeUnemploymentOverviewSelection, type UnemploymentState } from "../../lib/explorer/unemploymentState";
 import { unemploymentSeriesLabel, unemploymentUsesIndicatorSeries } from "../../lib/explorer/unemploymentOverview";
@@ -61,9 +61,9 @@ export function UnemploymentExplorer({ section, regionId, regionSplit, regions, 
   const valueLabel = (value: number | null | undefined) => model.percent ? formatUnemploymentValue(value, true, messages) : `${formatUnemploymentValue(value, false, messages)} ${unit.label}`;
   // Latest value of the active indicator for the page's own place (Georgia, or the region).
   // The age page carries no national rows, so it states its first selected group instead.
-  const placeFacts = facts.filter(f => f.dimension === (regionId ? "region" : "national") && (!regionId || f.groupId === regionId) && f.indicatorId === state.indicator && f.value != null);
-  const latestGroup = placeFacts.length ? null : model.definitions.find(group => state.selectedIds.includes(group.id)) ?? null;
-  const latest = (latestGroup ? facts.filter(f => f.groupId === latestGroup.groupId && f.indicatorId === latestGroup.indicatorId && f.value != null) : placeFacts).sort((a, b) => a.year - b.year).at(-1);
+  const placeLatest = unemploymentPlaceLatest(facts, regionId, state.indicator);
+  const latestGroup = placeLatest ? null : model.definitions.find(group => state.selectedIds.includes(group.id)) ?? null;
+  const latest = latestGroup ? facts.filter(f => f.groupId === latestGroup.groupId && f.indicatorId === latestGroup.indicatorId && f.value != null).sort((a, b) => a.year - b.year).at(-1) : placeLatest;
   const latestGroupLabel = latestGroup ? registry.find(group => group.id === latestGroup.groupId) : undefined;
   const latestMeasure = t(`indicator.${latestGroup?.indicatorId ?? state.indicator}`) + (latestGroupLabel ? ` · ${locale === "en" ? latestGroupLabel.labelEn : latestGroupLabel.labelKa}` : "");
   const rows = model.rows.map(row => ({ ...row, kaLabel: labels.get(row.itemId)! }));

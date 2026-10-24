@@ -15,9 +15,8 @@ import {
   toggleAllCityLines,
   toggleCityLine,
   unpackCityFacts,
-  cityValues,
+  cityLatestHeadline,
   GEORGIA_LINE_ID,
-  HEADLINE_ID,
   type CityIndex,
   type CityState,
   type CityView,
@@ -27,7 +26,6 @@ import { cityLineLabel, cityViewLineColor, cityViewLineLabel } from "../../lib/e
 import { CITIES_PATH } from "../../lib/explorer/inflationCityRoutes";
 import { buildInflationCityWorkbookExportModel } from "../../lib/explorer/inflationCityWorkbook";
 import { formatInflationValue, periodLabel, monthlyChartPeriod, PCT_UNIT } from "../../lib/explorer/inflationLabels";
-import { latestEntry } from "../../lib/explorer/latestValue";
 import { LatestValueLine } from "../explorer-shell/latest-value-line";
 import type { InflationWorkbookSource } from "../../lib/explorer/inflationWorkbook";
 import { downloadWorkbook } from "../../lib/explorer/workbookWriter.client";
@@ -77,7 +75,7 @@ export function InflationCities({ view, facts, lastReviewedAt, sources, siteOrig
   const range = resolveCityRange(state, index, view);
   const coverage = cityCoverage(index, view);
   // The place's own total: Georgia on the Georgia page, the city on a city page.
-  const latest = latestEntry(cityValues(index, view.kind === "city" ? view.cityId : GEORGIA_LINE_ID, HEADLINE_ID, "yoy_pct"));
+  const latest = cityLatestHeadline(index, view.kind === "city" ? view.cityId : GEORGIA_LINE_ID);
   const periods = Array.from({ length: range.max - range.min + 1 }, (_, offset) => range.min + offset);
   const displayDate = updatedDate(lastReviewedAt, locale);
   const lines = buildCityLines(index, view, state, range);

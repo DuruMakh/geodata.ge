@@ -9,7 +9,7 @@ import { formatInUnit } from "../../lib/explorer/format";
 import { rangeFromPatch } from "../../lib/explorer/periodRange";
 import { scienceCultureSeriesLabel, scienceCultureValueLabel, scienceCultureValueUnit, serializeScienceCultureHash, type ScienceCultureSeriesModel } from "../../lib/explorer/scienceCulture";
 import {
-  MUSEUMS_HREF, buildMuseumAreaModel, changeMuseumAreaSelection, museumAreaCoverage, museumAreaOfMapId, museumAreaSelectionHash, museumMapId, museumRegionHref, parseMuseumAreaHash, type MuseumArea,
+  MUSEUMS_HREF, buildMuseumAreaModel, changeMuseumAreaSelection, museumAreaCoverage, museumAreaLatest, museumAreaOfMapId, museumAreaSelectionHash, museumMapId, museumRegionHref, parseMuseumAreaHash, type MuseumArea,
 } from "../../lib/explorer/scienceCultureMuseums";
 import { buildScienceCultureWorkbookExportModel } from "../../lib/explorer/scienceCultureWorkbook";
 import type { WorkbookPublicSource } from "../../lib/explorer/workbookModel";
@@ -68,7 +68,7 @@ export function MuseumAreaExplorer({ area, facts, labels, areaLabels, sources, l
   const total = rows.find(row => row.itemId === reference?.id) ?? null;
   // The latest-value line is the page's headline: its own area's visitors, whatever is chosen below.
   const headline = model.series.find(series => series.reference)!;
-  const latest = facts.filter(f => f.indicatorId === headline.id).sort((a, b) => a.year - b.year).at(-1)!;
+  const latest = museumAreaLatest(area, facts);
   const areaName = areaLabels[area];
   const title = t("page.area.regionTitle", { region: areaName });
   // The chart is named after the heading of the selection's first row (its text before the unit) and the area.

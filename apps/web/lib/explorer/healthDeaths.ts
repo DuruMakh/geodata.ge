@@ -21,6 +21,11 @@ const TOTAL = "health.deaths.total";
 
 export type HealthDeathsState = TopicState;
 
+/** The latest-value line's figure: the area's deaths from all causes in their latest year, whatever is chosen below. */
+export function healthDeathsAreaLatest(area: HealthArea, facts: readonly ClientHealthFact[]): ClientHealthFact {
+  return facts.filter(f => f.indicatorId === TOTAL && f.areaId === area).sort((a, b) => a.year - b.year).at(-1)!;
+}
+
 export function defaultHealthDeathsState(): HealthDeathsState {
   return { mode: "line", range: { kind: "all" }, selectedIds: [TOTAL] };
 }

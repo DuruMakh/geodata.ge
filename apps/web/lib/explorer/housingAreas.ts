@@ -63,5 +63,11 @@ export function housingAreaSelectionHash(selectedIds: readonly string[], area: H
   return moved.join(",") === housingAreaDefaultSelection(area).join(",") ? "" : `#${new URLSearchParams({ sel: moved.join(",") })}`;
 }
 
+/** The latest-value line's figure: the area's own permits in their latest year, whatever is chosen below. */
+export function housingAreaLatest(area: HousingArea, facts: readonly ClientHousingFact[]): ClientHousingFact {
+  const permitsId = housingAreaSeries(area).find(series => series.reference && series.heading === "permitsCount")!.id;
+  return facts.filter(f => f.indicatorId === permitsId).sort((a, b) => a.year - b.year).at(-1)!;
+}
+
 export const buildHousingAreaModel = (area: HousingArea, facts: readonly ClientHousingFact[], state: HousingAreaState): HousingModel =>
   buildHousingSeriesModel(housingAreaSeries(area), facts, state, housingAreaColor);

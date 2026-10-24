@@ -27,6 +27,13 @@ export function educationPlaceSeries(set: EducationPlaceSet, placeId: string): E
   })));
 }
 
+/** The latest fact of a place's series: a latest line's figure. */
+export function educationLatestOf(facts: readonly ClientEducationFact[], indicatorId: string, placeId: string): ClientEducationFact {
+  const latest = facts.filter(f => f.indicatorId === indicatorId && f.geographyId === placeId).sort((a, b) => a.year - b.year).at(-1);
+  if (!latest) throw new Error(`No ${indicatorId} facts for ${placeId}`);
+  return latest;
+}
+
 export function educationPlaceDefaultSelection(set: EducationPlaceSet, placeId: string): string[] {
   return [educationPlaceSeries(set, placeId)[0].id];
 }
