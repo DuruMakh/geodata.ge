@@ -5,7 +5,7 @@ import { ChartPie, CircleDollarSign } from "lucide-react";
 import { updatedDate } from "../../lib/explorer/coverageLabel";
 import type { ClientMoneyBanksFact } from "../../lib/data/moneyBanks/types";
 import type { ClientNationalGdpFact } from "../../lib/explorer/clientData";
-import { buildMoneyBanksModel, changeMoneyBanksView, moneyBanksCoverage, moneyBanksHasTotalRow, moneyBanksViewFacts, moneyBanksViews, moneyBanksViewSeries, parseMoneyBanksHash, serializeMoneyBanksHash, type MoneyBanksSectionId, type MoneyBanksState, type MoneyBanksView } from "../../lib/explorer/moneyBanks";
+import { buildMoneyBanksModel, changeMoneyBanksView, moneyBanksCoverage, moneyBanksHasTotalRow, moneyBanksViewFacts, moneyBanksViews, moneyBanksViewSeries, parseMoneyBanksHash, serializeMoneyBanksHash, type MoneyBanksTopicId, type MoneyBanksState, type MoneyBanksView } from "../../lib/explorer/moneyBanks";
 import { buildMoneyBanksWorkbookExportModel } from "../../lib/explorer/moneyBanksWorkbook";
 import { formatAmount, formatInUnit, unitFor, unitsFor, type ValueUnit } from "../../lib/explorer/format";
 import { rangeFromPatch } from "../../lib/explorer/periodRange";
@@ -28,17 +28,17 @@ import { SEARCHABLE_MIN_ROWS } from "../main-explorer/series-selector";
 import { ExcelDownloadButton } from "../explorer/excel-download-button";
 import { Callout, SegmentedTabs, SourceNote } from "../ui/editorial";
 
-type MoneyBanksHashData = { section: MoneyBanksSectionId; facts: ClientMoneyBanksFact[]; gdpFacts: ClientNationalGdpFact[] };
+type MoneyBanksHashData = { section: MoneyBanksTopicId; facts: ClientMoneyBanksFact[]; gdpFacts: ClientNationalGdpFact[] };
 const parseMoneyBanksState = (hash: string, data: MoneyBanksHashData) => parseMoneyBanksHash(hash, data.section, data.facts, data.gdpFacts);
 const serializeMoneyBanksState = (state: MoneyBanksState, data: MoneyBanksHashData) => serializeMoneyBanksHash(state, data.section);
 
-function useMoneyBanksState(section: MoneyBanksSectionId, facts: ClientMoneyBanksFact[], gdpFacts: ClientNationalGdpFact[]) {
+function useMoneyBanksState(section: MoneyBanksTopicId, facts: ClientMoneyBanksFact[], gdpFacts: ClientNationalGdpFact[]) {
   const data = useMemo(() => ({ section, facts, gdpFacts }), [section, facts, gdpFacts]);
   return useHashState(data, parseMoneyBanksState, serializeMoneyBanksState);
 }
 
 export type MoneyBanksExplorerProps = {
-  section: MoneyBanksSectionId; facts: ClientMoneyBanksFact[]; labels: Record<string, string>; sources: (WorkbookPublicSource & { sourceId: string })[];
+  section: MoneyBanksTopicId; facts: ClientMoneyBanksFact[]; labels: Record<string, string>; sources: (WorkbookPublicSource & { sourceId: string })[];
   /** National GDP and its Geostat files, for the % of GDP view (Money supply only; empty elsewhere). */
   gdpFacts: ClientNationalGdpFact[]; gdpSources: WorkbookPublicSource[];
   lastReviewedAt: string; siteOrigin: string;

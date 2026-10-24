@@ -35,11 +35,12 @@ beforeAll(async () => {
 const seriesOf = (section: Parameters<typeof moneyBanksViewSeries>[0], view: Parameters<typeof moneyBanksViewSeries>[1]) => moneyBanksViewSeries(section, view).map(s => s.id);
 const span = (years: number[]) => ({ min: years[0], max: years.at(-1) });
 
-test("the five sections and their views", () => {
+test("the six sections and their views", () => {
   expect(MONEY_BANKS_SECTIONS.map(s => [s.id, s.href, s.labelKey])).toEqual([
     ["supply", "/explorer/money/supply", "common.moneySupply"],
     ["loans-deposits", "/explorer/money/loans-deposits", "common.moneyLoansDeposits"],
     ["borrowers", "/explorer/money/borrowers", "common.moneyBorrowers"],
+    ["regions", "/explorer/money/regions", "common.moneyRegions"],
     ["interest-rates", "/explorer/money/interest-rates", "common.moneyInterestRates"],
     ["bank-health", "/explorer/money/bank-health", "common.moneyBankHealth"],
   ]);
@@ -252,11 +253,11 @@ test("who borrows Excel marks a break year in the status column", async () => {
 
 // The money messages arrive with the page text, so these tests carry the few labels the workbook and hub cards read.
 const TEST_MESSAGES = {
-  "common.moneySupply": "Money supply", "common.moneyLoansDeposits": "Loans and deposits", "common.moneyBorrowers": "Who borrows", "common.moneyInterestRates": "Interest rates", "common.moneyBankHealth": "Bank health",
+  "common.moneySupply": "Money supply", "common.moneyLoansDeposits": "Loans and deposits", "common.moneyBorrowers": "Who borrows", "common.moneyRegions": "Loans by region", "common.moneyInterestRates": "Interest rates", "common.moneyBankHealth": "Bank health",
   "moneyBanks.unitMlnGel": "million GEL", "moneyBanks.unitPercent": "%", "moneyBanks.status.official": "Official", "moneyBanks.status.calculated": "Calculated by Fiscal.ge", "moneyBanks.status.break": "series break",
   "moneyBanks.series": "Series", "moneyBanks.amountHeader.gel": "Amount (million GEL)", "moneyBanks.amountHeader.percent": "Value (%)",
   "moneyBanks.page.supply.title": "Money supply", "moneyBanks.page.loans-deposits.title": "Loans and deposits", "moneyBanks.page.borrowers.title": "Who borrows", "moneyBanks.page.interest-rates.title": "Interest rates", "moneyBanks.page.bank-health.title": "Bank health",
-  "moneyBanks.page.supply.summary": "supply", "moneyBanks.page.loans-deposits.summary": "loans", "moneyBanks.page.borrowers.summary": "borrowers", "moneyBanks.page.interest-rates.summary": "rates", "moneyBanks.page.bank-health.summary": "health",
+  "moneyBanks.page.supply.summary": "supply", "moneyBanks.page.loans-deposits.summary": "loans", "moneyBanks.page.borrowers.summary": "borrowers", "moneyBanks.page.regions.summary": "regions", "moneyBanks.page.interest-rates.summary": "rates", "moneyBanks.page.bank-health.summary": "health",
   "moneyBanks.tab.amount": "Amount", "moneyBanks.tab.gdp": "Compared with GDP",
 };
 const presentation = async (): Promise<Presentation> => ({ locale: "en", englishLabels: {}, messages: { ...await getMessages("en", ["workbook", "format", "common"]), ...TEST_MESSAGES } });
@@ -373,7 +374,7 @@ test.each(["ka", "en"] as const)("the %s pages hand Excel the ten archived NBG w
   expect(model.sources.map(source => source.absoluteUrl).sort()).toEqual(["https://fiscal.ge/downloads/methodology/money/files/fsieng-archive.xlsx", "https://fiscal.ge/downloads/methodology/money/files/fsieng.xlsx"]);
 });
 
-test("the hub has five cards with the first series of each page and their latest values", async () => {
+test("the hub has six cards with the first series of each page and their latest values, Loans by region only its years", async () => {
   const cards = buildMoneyBanksHubCards(facts, await presentation());
   expect(cards.map(card => card.href)).toEqual(MONEY_BANKS_SECTIONS.map(section => section.href));
   // Each card follows its page's headline series: the latest year, its value and the series' own span.
@@ -385,9 +386,12 @@ test("the hub has five cards with the first series of each page and their latest
     footer("money.m3", year => `${csv.billions("money.m3", year)} bn GEL`),
     footer("loans.total", year => `${csv.billions("loans.total", year)} bn GEL`),
     footer("borrowers.total", year => `${csv.billions("borrowers.total", year)} bn GEL`),
+    yearSpan(csv.yearsOf(["loans_region.georgia.total"])),
     footer("rates.policy", year => `${csv.percent("rates.policy", year)}%`),
     footer("banks.npl_ratio", year => `${csv.percent("banks.npl_ratio", year)}%`),
   ]);
+  expect(cards[3].footer).toBe("2015–2025");
+  expect([cards[3].series, cards[3].seriesColor]).toEqual([null, null]);
 });
 
 // U24-10: the page's own metadata and Dataset record, in both languages, with its years read from the data.
@@ -395,7 +399,8 @@ test.each(["ka", "en"] as const)("each %s page names itself in its metadata and 
   vi.stubEnv("NEXT_PUBLIC_SITE_URL", "https://fiscal.ge");
   try {
     const messages = await getMessages(locale, ["moneyBanks"]);
-    for (const section of MONEY_BANKS_SECTIONS) {
+    // Loans by region is the index of the area pages, with its own page module (moneyBanksAreas.test.ts).
+    for (const section of MONEY_BANKS_SECTIONS.filter((item): item is Exclude<typeof item, { id: "regions" }> => item.id !== "regions")) {
       const metadata = await moneyBanksPageMetadata(locale, section.id);
       expect(metadata.title).toContain(message(messages, `moneyBanks.page.${section.id}.metaTitle`));
       expect(metadata.description).toBe(message(messages, `moneyBanks.page.${section.id}.summary`));

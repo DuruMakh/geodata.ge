@@ -2,6 +2,14 @@ import { beforeAll, expect, test } from "vitest";
 import { loadMoneyBanksFacts, toClientMoneyBanksFact } from "../../lib/data/moneyBanks/importMoneyBanks";
 import { MONEY_BANKS_LOAN_AREAS, type ClientMoneyBanksFact } from "../../lib/data/moneyBanks/types";
 import { businessAreaSlug } from "../../lib/explorer/businessAreas";
+import { formatAmount } from "../../lib/explorer/format";
+import { buildMoneyBanksWorkbookExportModel } from "../../lib/explorer/moneyBanksWorkbook";
+import { getMessages } from "../../lib/i18n/messages.server";
+import { moneyBanksAreaStaticParams } from "../../lib/pages/money-banks-regions-shared";
+import { renderMoneyBanksRegionsPage } from "../../lib/pages/money-banks-regions";
+import { renderMoneyBanksAreaPage } from "../../lib/pages/money-banks-area";
+import { loadMoneyBanksCsv } from "../helpers/money-banks-csv";
+import { renderPageMarkup } from "../helpers/render-localized";
 import {
   MONEY_BANKS_REGIONS_HREF, buildMoneyBanksAreaModel, moneyBanksAreaDefaultSelection, moneyBanksAreaHref, moneyBanksAreaOfMapId, moneyBanksAreaSelectionHash,
   moneyBanksAreaSeries, moneyBanksAreaSlug, moneyBanksMapId, moneyBanksRegionHref, parseMoneyBanksAreaHash,
@@ -9,7 +17,11 @@ import {
 import { buildMoneyBanksRegionMapModel } from "../../lib/explorer/moneyBanksRegionMap";
 
 let facts: ClientMoneyBanksFact[];
-beforeAll(async () => { facts = (await loadMoneyBanksFacts()).map(toClientMoneyBanksFact); });
+// Expected figures are read from the reviewed CSV, so an NBG refresh does not fail these tests.
+let csv: Awaited<ReturnType<typeof loadMoneyBanksCsv>>;
+beforeAll(async () => { facts = (await loadMoneyBanksFacts()).map(toClientMoneyBanksFact); csv = await loadMoneyBanksCsv(); });
+const text = (fragment: string) => fragment.replace(/<[^>]*>/g, "").replace(/&nbsp;|\u00a0/g, " ").replace(/&amp;/g, "&");
+const latestLine = (html: string) => text(html.match(/<p[^>]*data-testid="money-latest"[^>]*>([\s\S]*?)<\/p>/)![1]);
 
 test("twelve areas with slugs and map ids", () => {
   expect(MONEY_BANKS_LOAN_AREAS.map(moneyBanksAreaSlug)).toEqual([
@@ -61,4 +73,64 @@ test("a selection moves to another area", () => {
 
 test("an unknown id in the hash is ignored", () => {
   expect(parseMoneyBanksAreaHash("#sel=loans_region.region_abkhazeti.total", "georgia", facts).selectedIds).toEqual([]);
+});
+
+test("the regions index shows Tbilisi's 2025 line, Georgia first and the branch caveat", async () => {
+  const html = renderPageMarkup("en", await renderMoneyBanksRegionsPage("en"));
+  const year = csv.latestYear("loans_region.region_tbilisi.total");
+  expect(year).toBe(2025);
+  expect(latestLine(html)).toBe(`${year}: Tbilisi ${csv.billions("loans_region.region_tbilisi.total", year)} bn GEL`);
+  expect(latestLine(html)).toBe("2025: Tbilisi 52.4 bn GEL");
+  // Georgia is the list's first, unranked row; Tbilisi, the largest region, follows.
+  const list = html.slice(html.indexOf('data-testid="regional-index-workspace"'));
+  expect(list.indexOf(">Georgia<")).toBeGreaterThan(-1);
+  expect(list.indexOf(">Georgia<")).toBeLessThan(list.indexOf(">Tbilisi<"));
+  const regionLinks = new Set([...html.matchAll(/href="\/en\/explorer\/money\/regions\/([a-z_]+)"/g)].map(match => match[1]));
+  regionLinks.delete("georgia");
+  expect([...regionLinks].sort()).toEqual(MONEY_BANKS_LOAN_AREAS.filter(area => area !== "georgia").map(moneyBanksAreaSlug).sort());
+  expect(text(html)).toContain("bank branch");
+  // The frame's Dataset is Money and banks' own, credited to the National Bank.
+  const dataset = JSON.parse(html.match(/<script[^>]*data-testid="explorer-dataset-json-ld"[^>]*>([\s\S]*?)<\/script>/)![1]);
+  expect(dataset.provider).toMatchObject({ name: "National Bank of Georgia" });
+  expect(dataset.temporalCoverage).toBe("2015/2025");
+});
+
+test("an area page reads million GEL, small values included", async () => {
+  const html = renderPageMarkup("en", await renderMoneyBanksAreaPage("en", "racha_lechkhumi_kvemo_svaneti"));
+  const id = "loans_region.region_racha_lechkhumi_kvemo_svaneti";
+  const year = csv.latestYear(`${id}.total`);
+  expect(latestLine(html)).toBe(`${year}: all loans ${formatAmount(csv.published(`${id}.total`, year) * 1e6, "en")} · Racha-Lechkhumi and Kvemo Svaneti`);
+  expect(latestLine(html)).toBe("2025: all loans 60.5 mln GEL · Racha-Lechkhumi and Kvemo Svaneti");
+  // 0.311 million lari in foreign currency reads as a number, never 0 or a dash.
+  const row = (part: string) => text(html.match(new RegExp(`<div[^>]*data-series-id="${id}.${part}"[^>]*>([\\s\\S]*?)</button>`))![1]);
+  expect(row("fx")).toBe("In foreign currency0.3");
+  expect(row("total")).toMatch(/^✓All loans60\.5$/);
+  expect(row("gel")).toMatch(/^In lari\d/);
+  const dataset = JSON.parse(html.match(/<script[^>]*data-testid="explorer-dataset-json-ld"[^>]*>([\s\S]*?)<\/script>/)![1]);
+  expect(dataset.variableMeasured).toEqual(["Loans"]);
+  expect(dataset.temporalCoverage).toBe("2015/2025");
+});
+
+test("an unknown area is a 404", async () => {
+  await expect(renderMoneyBanksAreaPage("en", "abkhazeti")).rejects.toThrow(/NEXT_HTTP_ERROR_FALLBACK;404/);
+  expect(moneyBanksAreaStaticParams().map(params => params.id)).toEqual(MONEY_BANKS_LOAN_AREAS.map(moneyBanksAreaSlug));
+  expect(moneyBanksAreaStaticParams()).toHaveLength(12);
+});
+
+test("the area workbook names the area", async () => {
+  const presentation = { locale: "en" as const, englishLabels: {}, messages: await getMessages("en", ["workbook", "format", "common", "moneyBanks"]) };
+  const ids = ["loans_region.region_imereti.total", "loans_region.region_imereti.fx"];
+  const sources = [{ sourceId: "nbg_loans_regions_lreg", years: Array.from({ length: 11 }, (_, i) => 2015 + i), title: "Loans by region (LREG)", organization: "National Bank of Georgia", retrievedAt: "2026-10-21", downloadHref: "/downloads/methodology/money/files/loans-by-regions-lregeng.xlsx" as const }];
+  const model = buildMoneyBanksWorkbookExportModel({
+    area: "region_imereti", facts, sources, siteOrigin: "https://fiscal.ge", title: "Loans — Imereti", labels: { [ids[0]]: "All loans", [ids[1]]: "In foreign currency" },
+    state: { mode: "table", range: { kind: "manual", start: 2015, end: 2025 }, selectedIds: ids },
+  }, presentation);
+  expect(model.filename).toBe("fiscal-money-loans-region-imereti-2015-2025-en.xlsx");
+  expect(model.readable.title).toBe("Loans — Imereti");
+  expect(model.readable.rows.map(row => [row.kind, row.label])).toEqual([["total", "All loans"], ["item", "In foreign currency"]]);
+  // Million GEL; all loans is lari plus foreign currency, added up by Fiscal.ge.
+  const cell = model.analysis.rows.find(row => row[0] === 2025 && row[1] === "All loans")!;
+  expect(cell[2]).toBeCloseTo(csv.published("loans_region.region_imereti.total", 2025), 1);
+  expect(cell[3]).toBe("Calculated by Fiscal.ge · series break");
+  expect(model.sources.map(source => source.absoluteUrl)).toEqual(["https://fiscal.ge/downloads/methodology/money/files/loans-by-regions-lregeng.xlsx"]);
 });

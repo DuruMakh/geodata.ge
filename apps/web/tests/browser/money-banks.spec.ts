@@ -1,6 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 import ExcelJS from "exceljs";
-import { moneyBanksViewSeries, type MoneyBanksSectionId } from "../../lib/explorer/moneyBanks";
+import { moneyBanksViewSeries, type MoneyBanksTopicId } from "../../lib/explorer/moneyBanks";
 import { loadMoneyBanksCsv, yearSpan } from "../helpers/money-banks-csv";
 
 const pressed = (id: string) => `[data-series-id="${id}"] [data-testid="series-row-toggle"]`;
@@ -12,7 +12,7 @@ const INITIAL_COUNT: Record<string, string> = { "supply": "1 / 4", "loans-deposi
 let csv: Awaited<ReturnType<typeof loadMoneyBanksCsv>>;
 test.beforeAll(async () => { csv = await loadMoneyBanksCsv(); });
 /** The ids a page lists in one of its views. */
-const seriesOf = (section: MoneyBanksSectionId, view: Parameters<typeof moneyBanksViewSeries>[1]) => moneyBanksViewSeries(section, view).map(series => series.id);
+const seriesOf = (section: MoneyBanksTopicId, view: Parameters<typeof moneyBanksViewSeries>[1]) => moneyBanksViewSeries(section, view).map(series => series.id);
 
 /** The table cell of the row labelled `label` in the `year` column (the wide, year-columns layout). */
 async function cell(page: Page, label: string, year: number) {
