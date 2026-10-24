@@ -11,6 +11,7 @@ export const METHODOLOGY_TRANSLATION_REVIEWED_AT: Readonly<Record<MethodologyDat
   "economic-sectors": "2026-09-11",
   "gdp-expenditure": "2026-10-20",
   "expenditure-types": "2026-10-21",
+  "tax-breaks-refunds": "2026-10-21",
   "regional-economies": "2026-09-13",
   inflation: "2026-09-11",
   unemployment: "2026-10-20",

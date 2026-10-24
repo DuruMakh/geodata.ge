@@ -1,0 +1,135 @@
+{
+ "passed": true,
+ "failures": [],
+ "rows": 99,
+ "restatements": [],
+ "revisions": [
+  {
+   "measure": "members",
+   "year": 2019,
+   "document": "2019-annual-report.pdf",
+   "page": 9,
+   "earlier": "960394",
+   "served": "958226",
+   "where": "year-end statistics block"
+  },
+  {
+   "measure": "left",
+   "year": 2019,
+   "document": "2019-annual-report.pdf",
+   "page": 9,
+   "earlier": "164096",
+   "served": "164198",
+   "where": "year-end statistics block"
+  },
+  {
+   "measure": "members",
+   "year": 2020,
+   "document": "2020-annual-report.pdf",
+   "page": 1,
+   "earlier": "1106683",
+   "served": "1105041",
+   "where": "report text"
+  },
+  {
+   "measure": "left",
+   "year": 2020,
+   "document": "2020-annual-report.pdf",
+   "page": 3,
+   "earlier": "3377",
+   "served": "3098",
+   "where": "report text"
+  },
+  {
+   "measure": "paid_persons",
+   "year": 2020,
+   "document": "2020-annual-report.pdf",
+   "page": 13,
+   "earlier": "430",
+   "served": "466",
+   "where": "year-end statistics block"
+  },
+  {
+   "measure": "members",
+   "year": 2021,
+   "document": "2021-annual-report.pdf",
+   "page": 17,
+   "earlier": "1235938",
+   "served": "1234732",
+   "where": "year-end statistics block"
+  },
+  {
+   "measure": "left",
+   "year": 2021,
+   "document": "2021-annual-report.pdf",
+   "page": 5,
+   "earlier": "1880",
+   "served": "1605",
+   "where": "report text"
+  },
+  {
+   "measure": "paid_persons",
+   "year": 2021,
+   "document": "2021-annual-report.pdf",
+   "page": 18,
+   "earlier": "741",
+   "served": "839",
+   "where": "year-end statistics block"
+  },
+  {
+   "measure": "employers",
+   "year": 2021,
+   "document": "2021-annual-report.pdf",
+   "page": 2,
+   "earlier": "82795",
+   "served": "82801",
+   "where": "report text"
+  },
+  {
+   "measure": "members",
+   "year": 2022,
+   "document": "2022-annual-report.pdf",
+   "page": 20,
+   "earlier": "1359887",
+   "served": "1359035",
+   "where": "year-end statistics block"
+  },
+  {
+   "measure": "left",
+   "year": 2022,
+   "document": "2022-annual-report.pdf",
+   "page": 10,
+   "earlier": "1564",
+   "served": "1218",
+   "where": "report text"
+  },
+  {
+   "measure": "paid_persons",
+   "year": 2022,
+   "document": "2022-annual-report.pdf",
+   "page": 20,
+   "earlier": "1615",
+   "served": "1853",
+   "where": "year-end statistics block"
+  },
+  {
+   "measure": "return",
+   "year": 2023,
+   "document": "2023-annual-report.pdf",
+   "page": 9,
+   "earlier": "11.9",
+   "served": "12.3",
+   "where": "return chart"
+  },
+  {
+   "measure": "return",
+   "year": 2024,
+   "document": "2024-annual-report.pdf",
+   "page": 6,
+   "earlier": "11.6",
+   "served": "11.5",
+   "where": "report text"
+  }
+ ],
+ "csv_sha256": "3d73282b51050aea687e1d72deee36fe7a118faf9250644dc158327e0b6d21e2"
+}

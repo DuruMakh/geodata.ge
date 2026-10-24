@@ -9,7 +9,7 @@ import { educationFullLabel } from "../../lib/explorer/education";
 import { formatInUnit, type ValueUnit } from "../../lib/explorer/format";
 import { rangeFromPatch } from "../../lib/explorer/periodRange";
 import {
-  buildSocialModel, changeSocialSelection, changeSocialView, parseSocialHash, serializeSocialHash, socialCoverage, socialTopicList, socialViews,
+  buildSocialModel, changeSocialSelection, changeSocialView, isSocialTotal, parseSocialHash, serializeSocialHash, socialCoverage, socialTopicList, socialViews,
   type SocialPayView, type SocialState, type SocialTopicId,
 } from "../../lib/explorer/social";
 import { buildSocialWorkbookExportModel, SOCIAL_UNIT_KEYS } from "../../lib/explorer/socialWorkbook";
@@ -81,15 +81,15 @@ export function SocialExplorer({ section, facts, gdpFacts, gdpSources, breaks, l
   const partialMark = (months: Record<number, number>) => Object.fromEntries(Object.entries(months).map(([year, n]) => [year, t("months.partial", { n })]));
   const rows = model.selected.map(series => ({ itemId: series.id, kaLabel: fullLabel(series), color: series.color, valuesByYear: series.valuesByYear, markByYear: partialMark(series.partialMonths) }));
   const lineSeries = model.selected.map(series => ({ id: series.id, label: fullLabel(series), color: series.color, vals: model.years.map(year => series.valuesByYear[year]) }));
-  const reference = model.series.find(series => series.reference);
+  const reference = model.series.find(isSocialTotal);
   const total = rows.find(row => row.itemId === reference?.id) ?? null;
   const title = t(`page.${section}.title`);
   const chartLabel = `${title} · ${headingLabels[model.heading]}`;
   const newCounting = t("break.newCounting");
-  const views = socialViews(section);
+  const views = socialViews(section, model.heading);
   // % of GDP divides by the debt page's GDP: the source line names it and its preliminary years, as on Money and banks.
   const preliminaryGdpYears = gdpView ? model.years.filter(year => gdpFacts.some(f => f.year === year && f.status === "preliminary")) : [];
-  const changeView = (view: SocialPayView) => { if (view !== state.view) update(s => changeSocialView(s, view, facts, gdpFacts), true); };
+  const changeView = (view: SocialPayView) => { if (view !== state.view) update(s => changeSocialView(s, section, view, facts, gdpFacts), true); };
   const downloadAction = <ExcelDownloadButton testId="social-excel-download" disabled={!model.selected.length} onDownload={async () => {
     const { downloadWorkbook } = await import("../../lib/explorer/workbookWriter.client");
     await downloadWorkbook(buildSocialWorkbookExportModel({
@@ -134,8 +134,8 @@ export function SocialExplorer({ section, facts, gdpFacts, gdpSources, breaks, l
       <FlatSeriesPanel asideLabel={message(messages, "controls.series")} caption={list.end} downloadAction={downloadAction}
         rows={model.series.map(series => {
           const { latest, headingYear } = list.rows[series.id]!;
-          // Counts need no unit beside their heading; money and averages name theirs.
-          const heading = series.unit === "persons" || series.unit === "families" ? headingLabels[series.heading] : `${headingLabels[series.heading]} · ${gdpView ? t("unitPercentGdp") : unitLabelOf(series.unit)}`;
+          // Counts need no unit beside their heading; money, averages and the return name theirs (the return keeps its own in the % of GDP view).
+          const heading = series.unit === "persons" || series.unit === "families" || series.unit === "employers" ? headingLabels[series.heading] : `${headingLabels[series.heading]} · ${gdpView && series.unit === "percent" ? t("unitPercentGdp") : unitLabelOf(series.unit)}`;
           return { id: series.id, label: labels[series.id], color: series.color, value: formatInUnit(latest?.value, { divisor: 1, label: "", decimals: series.decimals }),
             heading: headingYear ? `${heading} · ${headingYear}` : heading };
         })}
