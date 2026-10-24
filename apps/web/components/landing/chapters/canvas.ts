@@ -8,7 +8,8 @@ export const clamp = (v: number, lo: number, hi: number) => (v < lo ? lo : v > h
 /** Colour of a square outside the selected measure (no token in globals.css). */
 export const OFF_SQUARE = "#e2d7c4";
 
-function rgb(hex: string): [number, number, number] {
+/** Red, green and blue 0..255 of a 6-digit hex colour (black when it is not one). */
+export function rgb(hex: string): [number, number, number] {
   const h = /^#[0-9a-f]{6}$/i.test(hex) ? hex : "#000000";
   return [parseInt(h.slice(1, 3), 16), parseInt(h.slice(3, 5), 16), parseInt(h.slice(5, 7), 16)];
 }
@@ -82,8 +83,8 @@ export function prefersReducedMotion(): boolean {
   return typeof window !== "undefined" && !!window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
 }
 
-/** Size a canvas to w x h CSS pixels at device-pixel ratio (capped at 2), cleared and ready to draw in CSS pixels. */
-export function sizeCanvas(cv: HTMLCanvasElement, w: number, h: number): CanvasRenderingContext2D {
+/** Size a canvas's buffer to w x h CSS pixels at device-pixel ratio (capped at 2) and return that ratio. */
+export function fitCanvas(cv: HTMLCanvasElement, w: number, h: number): number {
   const dpr = Math.min(window.devicePixelRatio || 1, 2);
   const pw = Math.max(1, Math.round(w * dpr));
   const ph = Math.max(1, Math.round(h * dpr));
@@ -93,6 +94,12 @@ export function sizeCanvas(cv: HTMLCanvasElement, w: number, h: number): CanvasR
   const sh = `${h}px`;
   if (cv.style.width !== sw) cv.style.width = sw;
   if (cv.style.height !== sh) cv.style.height = sh;
+  return dpr;
+}
+
+/** Size a canvas to w x h CSS pixels at device-pixel ratio (capped at 2), cleared and ready to draw in CSS pixels. */
+export function sizeCanvas(cv: HTMLCanvasElement, w: number, h: number): CanvasRenderingContext2D {
+  const dpr = fitCanvas(cv, w, h);
   const ctx = cv.getContext("2d");
   if (!ctx) throw new Error("2D canvas context unavailable");
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);

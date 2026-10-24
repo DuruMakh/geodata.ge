@@ -1,9 +1,9 @@
-import { formatPoints, formatShare, MISSING } from "../../../lib/explorer/format";
-import type { DeficitChapter, RevenueSeries } from "../../../lib/landing/chapters/types";
+import { formatInUnit, formatPoints, formatShare, MISSING } from "../../../lib/explorer/format";
+import type { DeficitChapter, MunicipalChapter, RevenueSeries } from "../../../lib/landing/chapters/types";
 import { money } from "./chart-format";
 import type { TipData } from "./chart-tip";
 
-// Tooltip content of the revenue and deficit charts, kept apart from the engines so it can be tested.
+// Tooltip content of the revenue, deficit and municipal relief charts, kept apart from the engines so it can be tested.
 
 /** Year with a planned suffix when the year's value is planned: "2025 (გეგმა)". */
 export function plannedYearText(data: Pick<RevenueSeries, "years" | "planned">, i: number, planned: string): string {
@@ -46,5 +46,23 @@ export function deficitTip(
       { val: money(data.gel[i], labels), name: labels.inGel },
     ],
     foot: v >= 0 ? labels.surplus : labels.deficit,
+  };
+}
+
+/** Relief tooltip for place index `i` (budget for the year, budget per resident, rank), or -2 for an occupied area. */
+export function reliefTip(
+  data: MunicipalChapter,
+  labels: { bnGel: string; mlnGel: string; gel: string; budget: string; perResident: string; rank: string; occupied: string; occupiedNote: string },
+  i: number,
+): TipData {
+  if (i === -2) return { title: labels.occupied, rows: [], foot: labels.occupiedNote };
+  const place = data.places[i];
+  return {
+    title: place.name,
+    rows: [
+      { key: "var(--ink)", val: money(place.totalGel, labels), name: `${labels.budget}, ${data.year}` },
+      { val: `${formatInUnit(place.perResidentGel, { divisor: 1, label: "", decimals: 0 })}\u00a0${labels.gel}`, name: labels.perResident },
+    ],
+    foot: `${labels.rank}: ${place.rank} / ${data.places.length}`,
   };
 }

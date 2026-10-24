@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { deficitTip, plannedYearText, revenueTip } from "../../../components/landing/chapters/chart-tips";
-import type { DeficitChapter, RevenueSeries } from "../../../lib/landing/chapters/types";
+import { deficitTip, plannedYearText, reliefTip, revenueTip } from "../../../components/landing/chapters/chart-tips";
+import type { DeficitChapter, MunicipalChapter, RevenueSeries } from "../../../lib/landing/chapters/types";
 
 const labels = {
   bnGel: "მლრდ ₾",
@@ -75,5 +75,43 @@ describe("deficitTip", () => {
     expect(positive.foot).toBe("პროფიციტი");
     expect(positive.rows[0].key).toBe("var(--positive)");
     expect(positive.rows[0].val).toBe("1.23%");
+  });
+});
+
+const reliefLabels = {
+  bnGel: "მლრდ ₾",
+  mlnGel: "მლნ ₾",
+  gel: "₾",
+  budget: "ბიუჯეტი",
+  perResident: "ერთ მცხოვრებზე",
+  rank: "რანგი ბიუჯეტით",
+  occupied: "ოკუპირებული ტერიტორია",
+  occupiedNote: "მუნიციპალური ბიუჯეტის მონაცემები არ არსებობს",
+};
+const relief: MunicipalChapter = {
+  year: 2025,
+  totalGel: 2.6e9,
+  places: [
+    { code: "04", name: "თბილისი", totalGel: 2.1084e9, perResidentGel: 1702.4, rank: 1, city: false },
+    { code: "06", name: "ბათუმი", totalGel: 486.2e6, perResidentGel: 2861.6, rank: 2, city: true },
+  ],
+  grid: { cols: 1, rows: 1, cells: [0] },
+};
+
+describe("reliefTip", () => {
+  it("shows a place's name, budget for the year, budget per resident and rank among all places", () => {
+    expect(reliefTip(relief, reliefLabels, 1)).toEqual({
+      title: "ბათუმი",
+      rows: [
+        { key: "var(--ink)", val: "486\u00a0მლნ ₾", name: "ბიუჯეტი, 2025" },
+        { val: "2,862\u00a0₾", name: "ერთ მცხოვრებზე" },
+      ],
+      foot: "რანგი ბიუჯეტით: 2 / 2",
+    });
+    expect(reliefTip(relief, reliefLabels, 0).rows[0].val).toBe("2.11\u00a0მლრდ ₾");
+  });
+
+  it("says an occupied area has no municipal budget data", () => {
+    expect(reliefTip(relief, reliefLabels, -2)).toEqual({ title: "ოკუპირებული ტერიტორია", rows: [], foot: "მუნიციპალური ბიუჯეტის მონაცემები არ არსებობს" });
   });
 });

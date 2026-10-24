@@ -277,6 +277,34 @@ summary:focus-visible {
   }
 }
 
+/* Homepage municipal relief (chapter 04): a full-bleed stage like the Ask AI band. Its height is fixed
+   per breakpoint, so the canvas mounting later never shifts the page. */
+.home-muni {
+  position: relative;
+  margin-left: calc(50% - 50vw);
+  width: 100vw;
+  margin-top: 36px;
+}
+
+.home-muni-stage {
+  position: relative;
+  height: 640px;
+  overflow: hidden;
+  cursor: crosshair;
+}
+
+@media (width < 900px) {
+  .home-muni-stage {
+    height: 500px;
+  }
+}
+
+@media (width < 600px) {
+  .home-muni-stage {
+    height: 330px;
+  }
+}
+
 /* Homepage sources chapter: the four steps hang on a rail with a dot running down it, and each
    coverage bar grows in from its left edge once the list has been revealed. */
 .home-steps {
