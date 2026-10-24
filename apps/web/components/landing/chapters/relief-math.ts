@@ -228,3 +228,20 @@ export function pickPlace(cam: Camera, scene: ReliefScene, W: number, H: number,
 export function labelX(sx: number, width: number, W: number): { x: number; flipped: boolean } {
   return sx + 6 + width > W - 8 ? { x: sx - 6 - width, flipped: true } : { x: sx + 6, flipped: false };
 }
+
+type LabelBox = { x: number; y: number; w: number; h: number };
+
+/**
+ * Top of a label so it covers none of the labels placed before it (a larger place keeps its spot): lifted above
+ * each one it would overlap, or dropped below it when lifting would leave the stage. On a phone the stage is short
+ * and the columns of two labelled places can stand close.
+ */
+export function labelY(box: LabelBox, placed: readonly LabelBox[], gap = 2): number {
+  let y = box.y;
+  for (let pass = 0; pass <= placed.length; pass++) {
+    const hit = placed.find((p) => box.x < p.x + p.w && p.x < box.x + box.w && y < p.y + p.h && p.y < y + box.h);
+    if (!hit) return y;
+    y = hit.y - box.h - gap >= 0 ? hit.y - box.h - gap : hit.y + hit.h + gap;
+  }
+  return y;
+}

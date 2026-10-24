@@ -8,7 +8,7 @@ import { easeOut } from "./chart-draw";
 import { money } from "./chart-format";
 import { ChartTip, hideTip, showTip } from "./chart-tip";
 import { reliefTip } from "./chart-tips";
-import { camFit, camProject, camUpdate, labelX, makeCam, pickPlace, reliefScene, toScreen, worldX, worldZ, type Vec3 } from "./relief-math";
+import { camFit, camProject, camUpdate, labelX, labelY, makeCam, pickPlace, reliefScene, toScreen, worldX, worldZ, type Vec3 } from "./relief-math";
 import { Reveal, useNearViewport } from "./reveal";
 
 // Chapter 04: every municipal budget as a column rising from a dot map of Georgia, drawn with raw WebGL,
@@ -327,13 +327,18 @@ export function createRelief(o: EngineOptions): Engine | null {
   };
 
   const placeLabels = (alpha: number) => {
+    const placed: { x: number; y: number; w: number; h: number }[] = [];
     labelEls.forEach((el, i) => {
       if (!el || !centers[i]) return;
       const [sx, sy] = toScreen(camProject(cam, [worldX(centers[i].c, C), heights[i] + 2, worldZ(centers[i].r, R)], pj), W, H);
-      const { x, flipped } = labelX(sx, el.offsetWidth || 120, W);
+      const w = el.offsetWidth || 120;
+      const h = el.offsetHeight || 20;
+      const { x, flipped } = labelX(sx, w, W);
+      const y = labelY({ x, y: sy - 26, w, h }, placed);
+      placed.push({ x, y, w, h });
       el.style.borderLeftWidth = flipped ? "0" : "";
       el.style.borderRightWidth = flipped ? "1.5px" : "";
-      el.style.transform = `translate3d(${x.toFixed(1)}px,${(sy - 26).toFixed(1)}px,0)`;
+      el.style.transform = `translate3d(${x.toFixed(1)}px,${y.toFixed(1)}px,0)`;
       el.style.opacity = String(alpha);
     });
   };

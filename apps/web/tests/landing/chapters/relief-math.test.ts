@@ -5,6 +5,7 @@ import {
   camUpdate,
   columnHeights,
   labelX,
+  labelY,
   makeCam,
   pickPlace,
   RELIEF_MAX_HEIGHT,
@@ -152,5 +153,20 @@ describe("toScreen and labelX", () => {
   it("puts a label right of its column, or left of it when it would cross the edge", () => {
     expect(labelX(100, 120, 800)).toEqual({ x: 106, flipped: false });
     expect(labelX(700, 120, 800)).toEqual({ x: 574, flipped: true });
+  });
+});
+
+describe("labelY", () => {
+  it("keeps a label where it is when it overlaps nothing placed before it", () => {
+    expect(labelY({ x: 0, y: 100, w: 120, h: 20 }, [{ x: 200, y: 100, w: 120, h: 20 }])).toBe(100);
+  });
+
+  it("lifts a label above an earlier one it would cover, and past a chain of them", () => {
+    expect(labelY({ x: 50, y: 105, w: 120, h: 20 }, [{ x: 100, y: 100, w: 120, h: 20 }])).toBe(78);
+    expect(labelY({ x: 50, y: 105, w: 120, h: 20 }, [{ x: 100, y: 100, w: 120, h: 20 }, { x: 0, y: 80, w: 120, h: 20 }])).toBe(58);
+  });
+
+  it("drops it below the earlier label when lifting would leave the stage", () => {
+    expect(labelY({ x: 50, y: 10, w: 120, h: 20 }, [{ x: 100, y: 12, w: 120, h: 20 }])).toBe(34);
   });
 });
