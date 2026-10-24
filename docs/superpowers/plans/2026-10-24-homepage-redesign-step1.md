@@ -63,7 +63,7 @@ export type SpendingSeries = {
 };
 export type RevenueBandId = "vat" | "income" | "profit" | "excise" | "otherTaxes" | "otherIncome" | "liabilities";
 export type RevenueSeries = {
-  years: number[]; totals: number[]; taxShare: number[];          // taxShare as fraction 0..1
+  years: number[]; planned: boolean[]; totals: number[]; taxShare: number[]; // planned as in SpendingSeries; taxShare 0..1
   bands: { id: RevenueBandId; label: string; values: (number | null)[] }[];
   peakBorrowing: { year: number; share: number } | null;
 };
@@ -229,7 +229,7 @@ export type HomeChapters = { scale: ScaleChapter; spending: SpendingSeries; reve
 
 **Interfaces:** Consume `RevenueSeries` / `DeficitChapter`, canvas helpers. Produce `<RevenueChart data labels />`, `<DeficitChart data labels />`.
 
-- [ ] **Step 1:** Revenue: port `createRev` (stacked areas with paper separators, y ticks via `niceTicks`, x labels at first year, every 4th and last; right-hand labels with `stackLabels` when ≥620px wide, share-only otherwise; callout at `peakBorrowing`; hover guide with dots; tooltip rows top band first, `—` for null). Legend above the chart in HTML.
+- [ ] **Step 1:** Revenue: port `createRev` (stacked areas with paper separators, y ticks via `niceTicks`, x labels at first year, every 4th and last; right-hand labels with `stackLabels` when ≥620px wide, share-only otherwise; callout at `peakBorrowing`; hover guide with dots; tooltip rows top band first, `—` for null; a planned year's tooltip title carries `landing.planned`). Legend above the chart in HTML.
 - [ ] **Step 2:** Deficit: port `createDef` (bars from 1995 to last year, ink deficits, `--positive` surpluses, projection band from `projectionFrom` at 40% opacity with `landing.deficit.imf` label, dashed accent −3% line and label, labels on `deepest` and `earlier`, bracket over `surplusRun` with `landing.deficit.surplusRun` text). Legend in HTML.
 - [ ] **Step 3:** Verify locally at 1440px and 375px; tooltips show correct years; no console errors.
 - [ ] **Step 4: Commit** `feat(home): revenue and deficit charts`.
