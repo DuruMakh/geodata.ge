@@ -412,6 +412,20 @@ test.each(["ka", "en"] as const)("each %s page names itself in its metadata and 
   }
 });
 
+// Who borrows: one list under three small headings, searchable, with the latest total in the line under the title.
+test("who borrows renders headed rows, search and the 2025 line", async () => {
+  const html = renderPageMarkup("en", await renderMoneyBanksPage("en", "borrowers"));
+  const text = (fragment: string) => fragment.replace(/<[^>]*>/g, "").replace(/&nbsp;|\u00a0/g, " ");
+  const year = csv.latestYear("borrowers.total");
+  const line = html.match(/<p[^>]*data-testid="money-latest"[^>]*>([\s\S]*?)<\/p>/)![1];
+  expect(text(line)).toBe(`${year}: all loans ${csv.billions("borrowers.total", year)} bn GEL`);
+  expect([...html.matchAll(/<p[^>]*data-testid="series-heading"[^>]*>([\s\S]*?)<\/p>/g)].map(match => text(match[1]))).toEqual(["Who borrows", "Businesses by industry", "What households borrow for"]);
+  expect(html).toMatch(/<input[^>]*type="search"/);
+  expect(html).not.toContain("aria-expanded");
+  const ka = await getMessages("ka", ["moneyBanks"]);
+  expect((await moneyBanksPageMetadata("ka", "borrowers")).title).toContain(message(ka, "moneyBanks.page.borrowers.metaTitle"));
+});
+
 // U24-09: the deposits row says "individuals" as its id and the Georgian do, and the line under the heading names the
 // loans series as its series row does.
 test.each(["ka", "en"] as const)("the %s loans and deposits labels match their rows", async (locale) => {

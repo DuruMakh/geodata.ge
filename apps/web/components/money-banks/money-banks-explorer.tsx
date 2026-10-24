@@ -12,17 +12,19 @@ import { rangeFromPatch } from "../../lib/explorer/periodRange";
 import type { WorkbookPublicSource } from "../../lib/explorer/workbookModel";
 import { useI18n } from "../../lib/i18n/provider";
 import { message } from "../../lib/i18n/messages";
+import { Message } from "../../lib/i18n/message";
 import { pageHref } from "../../lib/i18n/routes";
 import { ModeTabs } from "../explorer-shell/mode-tabs";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { ExplorerHeading } from "../explorer-shell/explorer-heading";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
-import { LatestValueLine } from "../explorer-shell/latest-value-line";
+import { LatestFigure, LatestValueLine } from "../explorer-shell/latest-value-line";
 import { FlatSeriesPanel } from "../explorer-shell/flat-series-panel";
 import { useHashState } from "../explorer-shell/use-hash-state";
 import { EditorialLineChart } from "../main-explorer/editorial-line-chart";
 import { ExplorerTable } from "../main-explorer/explorer-table";
 import { RangeStrip } from "../main-explorer/range-strip";
+import { SEARCHABLE_MIN_ROWS } from "../main-explorer/series-selector";
 import { ExcelDownloadButton } from "../explorer/excel-download-button";
 import { Callout, SegmentedTabs, SourceNote } from "../ui/editorial";
 
@@ -47,6 +49,7 @@ export function MoneyBanksExplorer({ section, facts, labels, sources, gdpFacts, 
   const t = (key: string, values?: Record<string, string | number>) => message(messages, `moneyBanks.${key}`, values);
   const { state, update } = useMoneyBanksState(section, facts, gdpFacts);
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
+  const [query, setQuery] = useState("");
   const model = buildMoneyBanksModel(section, facts, state, gdpFacts);
   // Each view has one unit. Amounts share the site's billion-GEL scale, its decimals read from every value the view can show;
   // percents keep each series' own precision (two decimals for interest rates, one elsewhere).
@@ -66,7 +69,7 @@ export function MoneyBanksExplorer({ section, facts, labels, sources, gdpFacts, 
   const views = moneyBanksViews(section);
   const headline = moneyBanksViewSeries(section, state.view)[0].id;
   const latest = moneyBanksViewFacts(state.view, facts, gdpFacts).filter(f => f.indicatorId === headline).sort((a, b) => a.year - b.year).at(-1)!;
-  const measureLabel = state.view === views[0] ? t(`latest.${section}`) : state.view === "gdp" ? t("latest.gdp") : labels[headline];
+  const measureLabel = () => state.view === views[0] ? t(`latest.${section}`) : state.view === "gdp" ? t("latest.gdp") : labels[headline];
   // % of GDP divides by the debt page's GDP: the source line names it and its preliminary years, as on the debt page.
   const preliminaryGdpYears = state.view === "gdp" ? model.years.filter(year => gdpFacts.some(f => f.year === year && f.status === "preliminary")) : [];
   const latestValue = latest.unit === "gel" ? formatAmount(latest.value, locale) : `${formatInUnit(latest.value, { divisor: 1, label: "", decimals: latest.decimals })}${t("unitPercent")}`;
@@ -80,7 +83,9 @@ export function MoneyBanksExplorer({ section, facts, labels, sources, gdpFacts, 
   }} />;
   return <div data-testid={`money-${section}`} className="@container">
     <ExplorerHeading>{title}</ExplorerHeading>
-    <LatestValueLine testId="money-latest" measure={measureLabel} period={latest.year} value={latestValue} />
+    {/* Who borrows names its measure in one sentence ("2025: all loans 69.0 billion GEL"); the other pages read "{measure} · {year}: {value}". */}
+    {section === "borrowers" ? <LatestValueLine testId="money-latest" sentence={<Message messages={messages} id="moneyBanks.latest.borrowers" values={{ year: latest.year, value: <LatestFigure value={latestValue} /> }} />} />
+      : <LatestValueLine testId="money-latest" measure={measureLabel()} period={latest.year} value={latestValue} />}
     <ExplorerWorkspace>
       <div className="flex min-w-0 flex-col">
         <section data-testid="chart-panel" data-mode={state.mode} data-view={state.view} data-unit={model.unit} className="border-t border-[var(--ink)] pt-4">
@@ -107,10 +112,11 @@ export function MoneyBanksExplorer({ section, facts, labels, sources, gdpFacts, 
           <Link href={pageHref("/methodology/money", locale)} prefetch={false} className="ml-2 text-[var(--accent)] underline underline-offset-4">{t("methodology")}</Link>
         </SourceNote></div>
       </div>
-      {/* Parts nest under their total (as on Poverty). Every money list has ten rows or fewer, so none has a search field (DESIGN §7.7). */}
+      {/* Parts nest under their total (as on Poverty); Who borrows lists its rows under headings instead. Only its 23 rows are long enough for a search field (DESIGN §7.7). */}
       <FlatSeriesPanel asideLabel={message(messages, "controls.series")} caption={<>{model.range.end} · {unitLabel}</>} downloadAction={downloadAction}
-        rows={model.series.map(series => ({ id: series.id, label: labels[series.id], color: series.color, value: format(series.endValue, series.id), parentId: series.parentId }))}
-        totalId={model.series.find(series => series.reference)?.id} pinTotal selectedIds={state.selectedIds} onSelectionChange={selectedIds => update(s => ({ ...s, selectedIds }), true)} searchable={false}
+        rows={model.series.map(series => ({ id: series.id, label: labels[series.id], color: series.color, value: format(series.endValue, series.id), parentId: series.parentId, heading: series.heading && t(`heading.${series.heading}`) }))}
+        totalId={model.series.find(series => series.reference)?.id} pinTotal selectedIds={state.selectedIds} onSelectionChange={selectedIds => update(s => ({ ...s, selectedIds }), true)}
+        searchable={model.series.length > SEARCHABLE_MIN_ROWS} query={query} onQueryChange={setQuery} searchPlaceholder={t("search")}
         nesting={{ selectedLabel: t("nestedSelected"), expansionLabel: label => t("subcategoriesFor", { label }), expanded, onExpandedChange: setExpanded }} />
     </ExplorerWorkspace>
   </div>;
