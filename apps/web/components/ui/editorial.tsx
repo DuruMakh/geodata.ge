@@ -112,15 +112,24 @@ export function SectionTitle({ children, id }: SectionTitleProps) {
 type SourceNoteProps = {
   children: ReactNode;
   testId?: string;
+  /** Drawn at the right of the note: the chart's share button (DESIGN.md §7.17). */
+  action?: ReactNode;
 };
 
 // Below 768px each link in the note answers taps 4px above and below its text
 // (24px, WCAG 2.5.8) without moving a line.
-export function SourceNote({ children, testId }: SourceNoteProps) {
-  return (
+export function SourceNote({ children, testId, action }: SourceNoteProps) {
+  const note = (
     <p data-testid={testId} className="text-xs leading-relaxed text-[var(--muted)] max-[768px]:[&_a]:py-1">
       {children}
     </p>
+  );
+  if (action === undefined) return note;
+  return (
+    <div data-testid="source-row" className="flex items-start justify-between gap-4">
+      {note}
+      <div className="flex-none">{action}</div>
+    </div>
   );
 }
 
