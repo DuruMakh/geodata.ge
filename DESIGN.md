@@ -701,7 +701,7 @@ Tint bg, `2px accent` left border, sans 11.5–12.5px, `body` color, max-width 5
 
 ### 7.10 Source Note
 
-Sans 12px, muted, plain paragraph under the primary panel and at the end of the analysis view. Under a chart it may carry one action at its right end, the chart share button (§7.17); the note then sits in a row with the button, the text wrapping beside it. Below 768px its links answer taps 4px above and below their text, a 24px target (WCAG 2.5.8), without moving a line. Pattern:
+Sans 12px, muted, plain paragraph under the primary panel and at the end of the analysis view. Under a chart it may carry one action at its right end, the chart share button (§7.17); the note then sits in a row with the button, the text wrapping beside it; below 768px the button drops under the note, right-aligned, so the note keeps the full width. Below 768px its links answer taps 4px above and below their text, a 24px target (WCAG 2.5.8), without moving a line. Pattern:
 
 ```text
 მონაცემები: გადამოწმებული ოფიციალური საბიუჯეტო დოკუმენტები (საქართველოს ფინანსთა სამინისტრო). <coverage note> · 12-თვიანი ფაქტობრივი შესრულება. <classification note> ბოლო განახლება: YYYY-MM-DD.

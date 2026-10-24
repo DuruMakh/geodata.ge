@@ -126,9 +126,10 @@ export function SourceNote({ children, testId, action }: SourceNoteProps) {
   );
   if (action === undefined) return note;
   return (
-    <div data-testid="source-row" className="flex items-start justify-between gap-4">
+    // Below 768px the action drops under the note, so the note keeps the full width.
+    <div data-testid="source-row" className="flex items-start justify-between gap-4 max-[768px]:flex-col max-[768px]:gap-2">
       {note}
-      <div className="flex-none">{action}</div>
+      <div className="flex-none max-[768px]:self-end">{action}</div>
     </div>
   );
 }
