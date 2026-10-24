@@ -14,6 +14,12 @@ describe("sidebar Demography group", () => {
   it("opens with the live pages nested and the current page marked", async () => {
     const markup = await render("/en/explorer/demography/population");
     expect(markup).toContain('data-testid="group-panel-demography"');
+    expect(markup).toMatch(/data-testid="group-toggle-demography"[^>]*aria-expanded="true"/);
+    // The current group carries the accent border; its link is current only on the group page itself.
+    const groupLink = /<a\b[^>]*data-testid="group-link-demography"[^>]*>/.exec(markup)![0];
+    expect(groupLink).toContain('href="/en/explorer/demography"');
+    expect(groupLink).toContain("shadow-[inset_2px_0_0_var(--accent)]");
+    expect(groupLink).not.toContain("aria-current");
     expect(markup).toContain('data-testid="demography-population-link" aria-current="page"');
     expect(markup).toContain('data-testid="demography-age-sex-link"');
     expect(markup).toContain("Labour market");

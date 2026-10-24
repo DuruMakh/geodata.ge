@@ -19,7 +19,7 @@ export function SidebarSectionLink({ href, testId, label, active, current }: { h
       }}
       className={`-ml-px flex items-center border-l-2 py-1.5 pr-2 pl-3 text-[12.5px] leading-[1.4] no-underline transition-colors duration-150 max-[900px]:min-h-11 max-[900px]:py-2.5 max-[900px]:text-[13.5px] ${
         active
-          ? "border-[var(--accent)] bg-[rgba(247,242,233,0.07)] text-[var(--paper)]"
+          ? "border-[var(--accent)] bg-[var(--ink-active)] text-[var(--paper)]"
           : "border-transparent text-[var(--ink-fg-muted)] hover:text-[var(--paper)]"
       }`}
     >

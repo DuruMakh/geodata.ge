@@ -37,6 +37,7 @@ describe("editorial design system tokens", () => {
       "--ink-fg-faint",
       "--ink-divider",
       "--ink-line",
+      "--ink-active",
       "--hairline",
       "--hairline-soft",
       "--row-border",

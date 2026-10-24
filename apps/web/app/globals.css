@@ -12,6 +12,8 @@
   --ink-fg-faint: #8F8676;
   --ink-divider: #2C2720;
   --ink-line: #3A342B;
+  /* The current or hovered row on ink (DESIGN.md §6.7). */
+  --ink-active: rgba(247, 242, 233, 0.07);
   --hairline: #D9CFBE;
   --hairline-soft: #E7DECF;
   --row-border: #EDE4D3;

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useReducer, useRef, useState, type MouseEvent } from "react";
+import { useCallback, useEffect, useLayoutEffect, useReducer, useRef, useState, type MouseEvent } from "react";
 import { flushSync } from "react-dom";
 import { ChevronRight, LayoutGrid, Menu, PanelLeftClose, PanelLeftOpen, Search, X } from "lucide-react";
 import Link from "next/link";
@@ -23,7 +23,7 @@ import { ALL_DATA_PATH, NAV_GROUPS, PAGE_COUNT, currentEntry, currentGroup, grou
 const STORAGE_KEY = "geodata:sidebar-collapsed";
 const DESKTOP_MIN_WIDTH = 900;
 const NAV_ID = "data-sidebar-navigation";
-const ACTIVE_BG = "bg-[rgba(247,242,233,0.07)]";
+const ACTIVE_BG = "bg-[var(--ink-active)]";
 const COUNT = "ml-auto pl-2 font-[family-name:var(--font-numeric)] text-[11px] font-normal text-[var(--ink-fg-muted)]";
 const ICON = { "aria-hidden": true, size: 18, strokeWidth: 1.5, className: "flex-none" } as const;
 
@@ -47,7 +47,10 @@ export function DataSidebar() {
   const [animateWidth, setAnimateWidth] = useState(false);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
+  const toggleRef = useRef<HTMLButtonElement>(null);
   const focusAfterMenu = useRef<"close" | "menu" | null>(null);
+  /** Where the reader was when the menu opened: the page behind it is hidden, which takes the scroll position with it. */
+  const menuOpenedAt = useRef<{ page: string; scrollY: number } | null>(null);
   const railed = isRailed(state);
   const current = currentEntry(page);
   const currentGroupId = currentGroup(page)?.id;
@@ -70,13 +73,24 @@ export function DataSidebar() {
   }, []);
 
   // The menu works as a modal: opening it hands focus to its close button, closing it hands focus back to the button
-  // that opened it, once the bar is shown again.
-  useEffect(() => {
+  // that opened it, once the bar is shown again. Closing it without leaving the page (Escape, the close button, a
+  // widening past 900px, the search box on All data) puts the reader back where they were, should the hidden page have
+  // scrolled under the menu. A layout effect, so the page is in place before it paints and before the search box takes focus.
+  useLayoutEffect(() => {
     const target = focusAfterMenu.current;
     focusAfterMenu.current = null;
-    if (target === "close") closeRef.current?.focus();
-    if (target === "menu") menuButtonRef.current?.focus();
-  }, [state.menu]);
+    if (state.menu) {
+      if (target === "close") closeRef.current?.focus();
+      return;
+    }
+    const opened = menuOpenedAt.current;
+    menuOpenedAt.current = null;
+    if (!opened) return;
+    if (opened.page === state.page) window.scrollTo(0, opened.scrollY);
+    if (target === "menu") menuButtonRef.current?.focus({ preventScroll: true });
+    // Widened past 900px: the close button that held focus is gone; the collapse toggle sits where it was.
+    else if (state.desktop && (document.activeElement === null || document.activeElement === document.body)) toggleRef.current?.focus({ preventScroll: true });
+  }, [state.menu, state.page, state.desktop]);
 
   const closeMenu = useCallback(() => {
     focusAfterMenu.current = "menu";
@@ -92,8 +106,9 @@ export function DataSidebar() {
         closeMenu();
         return;
       }
-      // Focus goes back to the rail icon the pop-out hangs from before it closes, or it would be lost with the list.
-      if (fly) document.getElementById(groupLinkId(fly))?.focus();
+      // Focus inside the pop-out goes back to the rail icon it hangs from before it closes, or it would be lost with the list.
+      const link = fly ? document.getElementById(groupLinkId(fly)) : null;
+      if (link?.closest("li")?.contains(document.activeElement)) link.focus();
       dispatch({ type: "fly", id: null });
     };
     window.addEventListener("keydown", onKey);
@@ -133,7 +148,7 @@ export function DataSidebar() {
     <>
       <header
         data-testid="sidebar-topbar"
-        className={`${state.menu ? "hidden" : "flex"} sticky top-0 z-40 h-[calc(56px+env(safe-area-inset-top))] flex-none items-center gap-1 bg-[var(--ink)] pt-[env(safe-area-inset-top)] pr-1.5 pl-4 text-[var(--paper)] min-[900px]:hidden`}
+        className={`flex ${state.menu ? "invisible" : ""} sticky top-0 z-40 h-[calc(56px+env(safe-area-inset-top))] flex-none items-center gap-1 bg-[var(--ink)] pt-[env(safe-area-inset-top)] pr-1.5 pl-4 text-[var(--paper)] min-[900px]:hidden`}
       >
         {/* Reload across the Explorer/public layout boundary so stale route metadata cannot remain in <head>. */}
         <a href={pageHref("/", locale)} aria-label={message(messages, "common.brandHome")} className="mr-auto flex min-h-11 items-center gap-2.5 font-[family-name:var(--font-display)] text-[17px] font-semibold text-[var(--paper)] no-underline">
@@ -152,6 +167,7 @@ export function DataSidebar() {
           aria-controls={NAV_ID}
           onClick={() => {
             focusAfterMenu.current = "close";
+            menuOpenedAt.current = { page, scrollY: window.scrollY };
             dispatch({ type: "menu", open: true });
           }}
           className="flex size-11 cursor-pointer items-center justify-center text-[var(--paper)]"
@@ -162,16 +178,25 @@ export function DataSidebar() {
 
       <nav
         id={NAV_ID}
-        aria-label={message(messages, "common.dataPanel")}
+        // Open below 900px, the menu covers the page as a modal dialog.
+        role={state.menu ? "dialog" : undefined}
+        aria-modal={state.menu ? true : undefined}
+        aria-label={message(messages, state.menu ? "common.menu" : "common.dataPanel")}
         data-testid="data-sidebar"
         data-collapsed={railed ? "true" : "false"}
         data-menu-open={state.menu ? "true" : undefined}
-        // Every link closes the menu, the current page's included: arriving at a new page closes it, but that one is no arrival.
+        // Every link closes the menu, the current page's included: arriving at a new page closes it, but that one is no
+        // arrival. A modified click opens a new tab or window, and the menu stays.
         onClick={(event) => {
-          if ((event.target as Element).closest("a")) dispatch({ type: "menu", open: false });
+          if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+          const link = (event.target as Element).closest("a");
+          if (!link) return;
+          // A link to another page lands at its top; only the page the menu covered gets its place back.
+          if (link.pathname !== window.location.pathname) menuOpenedAt.current = null;
+          dispatch({ type: "menu", open: false });
         }}
-        className={`${state.menu ? "flex max-[900px]:fixed max-[900px]:inset-0 max-[900px]:z-[60] max-[900px]:overflow-y-auto max-[900px]:overscroll-contain max-[900px]:px-3.5 max-[900px]:pt-[max(10px,env(safe-area-inset-top))] max-[900px]:pb-[22px]" : "hidden"} flex-col bg-[var(--ink)] text-[var(--paper)] [scrollbar-color:var(--ink-line)_transparent] [scrollbar-width:thin] min-[900px]:sticky min-[900px]:top-0 min-[900px]:z-30 min-[900px]:flex min-[900px]:h-screen min-[900px]:flex-none ${
-          railed ? "min-[900px]:w-[72px] min-[900px]:px-2.5 min-[900px]:py-4" : "min-[900px]:w-[272px] min-[900px]:overflow-y-auto min-[900px]:px-3 min-[900px]:pt-[18px] min-[900px]:pb-3.5"
+        className={`${state.menu ? "flex max-[900px]:fixed max-[900px]:inset-0 max-[900px]:z-[60] max-[900px]:overflow-y-auto max-[900px]:overscroll-contain max-[900px]:px-3.5 max-[900px]:pt-[max(10px,env(safe-area-inset-top))] max-[900px]:pb-[22px]" : "hidden"} flex-col bg-[var(--ink)] text-[var(--paper)] [scrollbar-color:var(--ink-line)_transparent] [scrollbar-width:thin] min-[900px]:sticky min-[900px]:top-0 min-[900px]:z-30 min-[900px]:flex min-[900px]:h-screen min-[900px]:flex-none min-[900px]:overflow-y-auto ${
+          railed ? "min-[900px]:w-[72px] min-[900px]:px-2.5 min-[900px]:py-4" : "min-[900px]:w-[272px] min-[900px]:px-3 min-[900px]:pt-[18px] min-[900px]:pb-3.5"
         } ${animateWidth ? "transition-[width] duration-150 ease-in-out" : ""}`}
       >
         <div className={`flex items-center ${railed ? "flex-col gap-3.5" : "min-h-10 gap-2 pr-0.5 pl-1.5"}`}>
@@ -185,6 +210,7 @@ export function DataSidebar() {
             )}
           </a>
           <button
+            ref={toggleRef}
             type="button"
             data-testid="sidebar-toggle"
             aria-expanded={!railed}
@@ -226,7 +252,7 @@ export function DataSidebar() {
           aria-current={onAllData ? "page" : undefined}
           aria-label={message(messages, "common.allData")}
           title={railed ? message(messages, "common.allData") : undefined}
-          className={`mt-2.5 flex min-h-[42px] items-center gap-2.5 text-[13.5px] font-semibold text-[var(--paper)] no-underline hover:bg-[rgba(247,242,233,0.07)] max-[900px]:min-h-12 ${railed ? "justify-center" : "px-2.5"} ${onAllData ? `${ACTIVE_BG} shadow-[inset_2px_0_0_var(--accent)]` : ""}`}
+          className={`mt-2.5 flex min-h-[42px] items-center gap-2.5 text-[13.5px] font-semibold text-[var(--paper)] no-underline hover:bg-[var(--ink-active)] max-[900px]:min-h-12 ${railed ? "justify-center" : "px-2.5"} ${onAllData ? `${ACTIVE_BG} shadow-[inset_2px_0_0_var(--accent)]` : ""}`}
         >
           <LayoutGrid {...ICON} />
           {railed ? null : (
@@ -294,7 +320,8 @@ export function DataSidebar() {
                     id={panelId(id)}
                     data-testid={`group-panel-${id}`}
                     className={railed
-                      ? "absolute top-0 bottom-0 left-full z-40 w-[320px] overflow-y-auto border-l border-[var(--ink-line)] bg-[var(--ink)] px-[22px] pt-[22px] pb-6 shadow-[14px_0_36px_rgba(30,27,22,0.16)]"
+                      // Fixed to the viewport beside the rail, so the rail can scroll on a short screen without clipping it.
+                      ? "fixed top-0 bottom-0 left-[72px] z-40 w-[320px] overflow-y-auto border-l border-[var(--ink-line)] bg-[var(--ink)] px-[22px] pt-[22px] pb-6 shadow-[14px_0_36px_rgba(30,27,22,0.16)]"
                       : "pr-1.5 pb-3 pl-[38px]"}
                   >
                     {railed ? (
