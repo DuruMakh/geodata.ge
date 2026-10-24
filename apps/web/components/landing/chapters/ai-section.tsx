@@ -25,13 +25,13 @@ export type AiLabels = {
   nodes: { title: string; text: string }[]; // five, the third is the endpoint
 };
 
-export const MCP_ENDPOINT = "https://fiscal.ge/mcp";
-
-const COPY_BUTTON =
-  "min-h-[42px] shrink-0 whitespace-nowrap rounded-[4px] bg-[var(--ai-ink)] px-4 text-[12.5px] font-semibold text-[var(--ai-bg)] transition-colors hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ai-link)]";
+// The focus ring of the band's controls, in its link colour so it shows on the dark ground.
+const FOCUS_RING = "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ai-link)]";
+const COPY_BUTTON = `min-h-[42px] shrink-0 whitespace-nowrap rounded-[4px] bg-[var(--ai-ink)] px-4 text-[12.5px] font-semibold text-[var(--ai-bg)] transition-colors hover:bg-white ${FOCUS_RING}`;
 const LABEL = "text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--ai-muted)]";
 
-export function AiSection({ tools, labels, locale }: { tools: string[]; labels: AiLabels; locale: Locale }) {
+/** `endpoint` is the site's own MCP address, `${resolveSiteUrl()}/mcp`, resolved on the server as on the Connect page. */
+export function AiSection({ endpoint, tools, labels, locale }: { endpoint: string; tools: string[]; labels: AiLabels; locale: Locale }) {
   return (
     <section id="ai" className="home-ai scroll-mt-4">
       <div aria-hidden="true" className="home-ai-grain" />
@@ -47,10 +47,10 @@ export function AiSection({ tools, labels, locale }: { tools: string[]; labels: 
           <Reveal>
             <div className="mt-[30px] flex max-w-[520px] items-center gap-3 rounded-md border border-[rgba(247,242,233,0.26)] py-1.5 pl-4 pr-1.5">
               <code className="min-w-0 flex-1 select-all break-all font-[family-name:var(--font-numeric)] text-[13px] text-white min-[400px]:text-[14.5px]">
-                {MCP_ENDPOINT}
+                {endpoint}
               </code>
               <CopyEndpoint
-                value={MCP_ENDPOINT}
+                value={endpoint}
                 testId="landing-ai-copy"
                 copyLabel={labels.copyLabel}
                 copiedLabel={labels.copiedLabel}
@@ -81,7 +81,7 @@ export function AiSection({ tools, labels, locale }: { tools: string[]; labels: 
             <Link
               href={pageHref("/connect", locale)}
               prefetch={false}
-              className="-mb-3 mt-[22px] inline-flex min-h-11 items-center text-[12.5px] font-semibold text-[var(--ai-link)] underline decoration-[1.5px] underline-offset-4 hover:text-white"
+              className={`-mb-3 mt-[22px] inline-flex min-h-11 items-center text-[12.5px] font-semibold text-[var(--ai-link)] underline decoration-[1.5px] underline-offset-4 hover:text-white ${FOCUS_RING}`}
             >
               {labels.cta}
             </Link>

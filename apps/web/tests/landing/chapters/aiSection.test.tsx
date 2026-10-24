@@ -1,6 +1,6 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import { AiSection, MCP_ENDPOINT, type AiLabels } from "../../../components/landing/chapters/ai-section";
+import { AiSection, type AiLabels } from "../../../components/landing/chapters/ai-section";
 import { CopyEndpoint } from "../../../components/connect/copy-endpoint";
 
 const labels: AiLabels = {
@@ -26,7 +26,8 @@ const labels: AiLabels = {
 };
 const tools = ["query_economic_sectors", "query_inflation", "query_inflation_products"];
 
-const render = (locale: "ka" | "en" = "ka") => renderToStaticMarkup(<AiSection tools={tools} labels={labels} locale={locale} />);
+const render = (locale: "ka" | "en" = "ka", endpoint = "https://fiscal.ge/mcp") =>
+  renderToStaticMarkup(<AiSection endpoint={endpoint} tools={tools} labels={labels} locale={locale} />);
 
 describe("AiSection", () => {
   const html = render();
@@ -36,8 +37,8 @@ describe("AiSection", () => {
     expect(html).toContain("ჰკითხე AI-ს — პასუხი წყაროსთან ერთად");
   });
 
-  it("shows the address as visible, selectable text next to the copy button", () => {
-    expect(MCP_ENDPOINT).toBe("https://fiscal.ge/mcp");
+  it("shows the address it is given as visible, selectable text next to the copy button", () => {
+    expect(render("ka", "https://preview.example/mcp")).toMatch(/<code class="[^"]*">https:\/\/preview\.example\/mcp<\/code>/);
     expect(html).toMatch(/<code class="[^"]*select-all[^"]*">https:\/\/fiscal\.ge\/mcp<\/code>/);
     expect(html).toContain('data-testid="landing-ai-copy"');
     expect(html).toContain('aria-label="მისამართის კოპირება"');
@@ -51,8 +52,9 @@ describe("AiSection", () => {
     for (const fact of labels.facts) expect(html).toContain(fact);
   });
 
-  it("links to the connect page, with the /en prefix in English", () => {
+  it("links to the connect page, with the /en prefix in English, and rings it on focus like the copy button", () => {
     expect(html).toMatch(/href="\/connect"[^>]*>AI-კავშირის ინსტრუქცია →/);
+    expect(html).toMatch(/<a class="[^"]*focus-visible:outline-\[var\(--ai-link\)\][^"]*" href="\/connect"/);
     expect(render("en")).toMatch(/href="\/en\/connect"/);
   });
 

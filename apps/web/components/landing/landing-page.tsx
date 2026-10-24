@@ -43,7 +43,7 @@ const HERO_ARIA_LABEL =
 const STEPS = [1, 2, 3, 4] as const;
 const NODES = [1, 2, 3, 4, 5] as const;
 
-export function LandingPage({ chapters, gdpFigure, presentation, updatedAt }: { chapters: HomeChapters; gdpFigure: LandingGdpFigure; presentation: Presentation; updatedAt: string }) {
+export function LandingPage({ chapters, gdpFigure, presentation, updatedAt, mcpEndpoint }: { chapters: HomeChapters; gdpFigure: LandingGdpFigure; presentation: Presentation; updatedAt: string; mcpEndpoint: string }) {
   const { locale, messages } = presentation;
   const t = (key: string, values?: Record<string, string | number>) => message(messages, key, values);
   const keyNumbers = [
@@ -245,7 +245,7 @@ export function LandingPage({ chapters, gdpFigure, presentation, updatedAt }: { 
             <DeficitChart data={chapters.deficit} labels={deficitLabels} />
           </Chapter>
           <SourcesSection sources={chapters.sources} labels={sourcesLabels} locale={locale} />
-          <AiSection tools={chapters.tools} labels={aiLabels} locale={locale} />
+          <AiSection endpoint={mcpEndpoint} tools={chapters.tools} labels={aiLabels} locale={locale} />
         </main>
 
         <SiteFooter variant="site" path="/" locale={locale} updatedAt={updatedAt} />

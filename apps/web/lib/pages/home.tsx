@@ -58,5 +58,5 @@ export async function renderHomePage(locale: Locale) {
   const rootUrl = new URL(pageHref("/", locale), `${resolveSiteUrl()}/`).href;
   const ka = `${resolveSiteUrl()}/`;
   const en = `${resolveSiteUrl()}/en`;
-  return <><link rel="canonical" href={rootUrl} /><link rel="alternate" hrefLang="ka" href={ka} /><link rel="alternate" hrefLang="en" href={en} /><link rel="alternate" hrefLang="x-default" href={ka} /><meta property="og:url" content={rootUrl} /><LandingPage chapters={chapters} gdpFigure={landingGdpFigure(gdpData.facts, presentation.messages)} presentation={presentation} updatedAt={updatedAt} /></>;
+  return <><link rel="canonical" href={rootUrl} /><link rel="alternate" hrefLang="ka" href={ka} /><link rel="alternate" hrefLang="en" href={en} /><link rel="alternate" hrefLang="x-default" href={ka} /><meta property="og:url" content={rootUrl} /><LandingPage chapters={chapters} gdpFigure={landingGdpFigure(gdpData.facts, presentation.messages)} presentation={presentation} updatedAt={updatedAt} mcpEndpoint={`${resolveSiteUrl()}/mcp`} /></>;
 }
