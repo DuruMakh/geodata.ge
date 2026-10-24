@@ -209,7 +209,7 @@ describe("buildHubCards with a planned latest spending year", () => {
     const cards = buildHubCards(WITH_PLAN, MUNICIPAL_TOTALS, DEBT_FACTS);
 
     expect(cards[0].footer).toBe("2026 გეგმა · 11.0 მლრდ ₾");
-    expect(cards[4].footer).toBe("2026 გეგმა · 1 კატეგორია");
+    expect(cards[5].footer).toBe("2026 გეგმა · 1 კატეგორია");
     expect(cards[2].footer).toBe("2025 · 4.0 მლრდ ₾");
     expect(cards[2].series).toEqual([3_000_000_000, 4_000_000_000]);
   });
