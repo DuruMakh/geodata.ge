@@ -295,7 +295,7 @@ export async function renderMethodologyArticle(locale: Locale, { params }: Metho
         ]}
       />
       <div className="mx-auto w-full max-w-[1240px] px-5 min-[768px]:px-7">
-        <SiteFooter locale={locale} sourceNote={message(messages, DATASET_SOURCE_NOTES[dataset])} />
+        <SiteFooter variant="site" path={`/methodology/${dataset}`} locale={locale} sourceNote={message(messages, DATASET_SOURCE_NOTES[dataset])} />
       </div>
     </>
   );

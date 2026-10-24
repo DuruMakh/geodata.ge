@@ -12,14 +12,92 @@ const FOOTER_LINKS = [
   { href: "/about", labelKey: "common.about" },
 ] as const;
 
+// The larger footer of the homepage and the site's own pages: the mission, the data list and the platform list.
+const PLATFORM_LINKS = FOOTER_LINKS.slice(DATASET_HUBS.length);
+// Each language's own name, as the header's language switch shows it.
+const LANGUAGE_NAMES = { ka: "ქართული", en: "English" } as const;
+const SITE_LINK_CLASS = "flex min-h-11 items-center text-[0.8125rem] text-[var(--body)] hover:text-[var(--accent)] min-[768px]:inline-flex min-[768px]:min-h-[30px]";
+
 // The markup, with the common catalogue handed in. It is split from the
 // lookup below because the explorer footer is a client component: importing
 // common.server.ts from here put BOTH locales' catalogue in every explorer
 // route's client bundle.
 // `year` is the build's: the explorer footer is a client component, so its server layout passes it in rather than each
 // browser reading its own clock and disagreeing with the prerendered HTML.
-export function SiteFooterView({ updatedAt, locale = "ka", sourceNote, messages, year }: { updatedAt?: string; locale?: Locale; sourceNote?: string; messages: Messages; year: number }) {
+// `variant="site"` is the larger footer; the default `"compact"` is the explorer's and is unchanged. `path` is the page
+// the footer sits on, so its language link leads to the same page in the other language.
+export function SiteFooterView({ updatedAt, locale = "ka", sourceNote, messages, year, variant = "compact", path = "/" }: { updatedAt?: string; locale?: Locale; sourceNote?: string; messages: Messages; year: number; variant?: "compact" | "site"; path?: `/${string}` }) {
   const [sourcePrefix, sourceSuffix] = (sourceNote ?? messages["common.sourceNote"]).split("{updatedAt}");
+  const sourceText = (
+    <>
+      {sourcePrefix}{sourceSuffix !== undefined && <span className="font-[family-name:var(--font-numeric)]">{updatedAt}</span>}{sourceSuffix}{" "}
+      {message(messages, "common.footerLicence")}
+    </>
+  );
+  if (variant === "site") {
+    const otherLocale: Locale = locale === "ka" ? "en" : "ka";
+    return (
+      <footer data-testid="site-footer" className="mt-16 border-t-2 border-[var(--ink)] pb-8 pt-7 min-[768px]:mt-28 min-[768px]:pb-10">
+        <div data-testid="landing-footer" className="grid grid-cols-1 gap-9 min-[1000px]:grid-cols-[minmax(0,4fr)_minmax(0,5fr)_minmax(0,2fr)] min-[1000px]:gap-12">
+          <div>
+            <Link href={pageHref("/", locale)} prefetch={false} aria-label={message(messages, "common.brandHome")} className="block w-[220px]">
+              {/* Local SVG brand asset, lazy like the compact footer's. */}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                data-testid="site-footer-logo"
+                src={locale === "en" ? "/brand/fiscal-logo-compact-en.svg" : "/brand/fiscal-logo-compact.svg"}
+                width="1080"
+                height="340"
+                loading="lazy"
+                alt=""
+                className="block h-auto w-full"
+              />
+            </Link>
+            <p className="mt-4 max-w-[42ch] font-[family-name:var(--font-display)] text-[1.0625rem] leading-normal text-[var(--ink)]">{message(messages, "common.footerMission")}</p>
+            <a
+              href="mailto:info@fiscal.ge"
+              className="mt-2 inline-flex min-h-11 items-center font-[family-name:var(--font-numeric)] text-[0.8125rem] text-[var(--ink)] underline decoration-[var(--accent)] underline-offset-4"
+            >
+              info@fiscal.ge
+            </a>
+          </div>
+          <nav aria-label={message(messages, "common.footerData")}>
+            <div className="text-[0.6875rem] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]">{message(messages, "common.footerData")}</div>
+            <ul className="mt-3 grid list-none grid-cols-2 gap-x-6">
+              {DATASET_HUBS.map(({ href, labelKey }) => (
+                <li key={href}>
+                  <Link href={pageHref(href, locale)} prefetch={false} className={SITE_LINK_CLASS}>
+                    {message(messages, labelKey)}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
+          <nav aria-label={message(messages, "common.footerPlatform")}>
+            <div className="text-[0.6875rem] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]">{message(messages, "common.footerPlatform")}</div>
+            <ul className="mt-3 grid list-none grid-cols-2 gap-x-6 min-[1000px]:grid-cols-1">
+              {PLATFORM_LINKS.map(({ href, labelKey }) => (
+                <li key={href}>
+                  <Link href={pageHref(href, locale)} prefetch={false} className={SITE_LINK_CLASS}>
+                    {message(messages, labelKey)}
+                  </Link>
+                </li>
+              ))}
+              <li>
+                <a href={pageHref(path, otherLocale)} lang={otherLocale} hrefLang={otherLocale} className={SITE_LINK_CLASS}>
+                  {LANGUAGE_NAMES[otherLocale]}
+                </a>
+              </li>
+            </ul>
+          </nav>
+          <div className="flex flex-wrap justify-between gap-x-8 gap-y-3 border-t border-[var(--hairline-soft)] pt-4 text-[0.75rem] leading-relaxed text-[var(--muted)] min-[1000px]:col-span-full">
+            <p className="max-w-[80ch] text-pretty">{sourceText}</p>
+            <p className="font-[family-name:var(--font-numeric)]">© {year} Fiscal.ge · CC BY 4.0</p>
+          </div>
+        </div>
+      </footer>
+    );
+  }
   return (
     <footer data-testid="site-footer" className="mt-10 border-t-2 border-[var(--ink)] pb-5 pt-5 min-[768px]:mt-[72px] min-[768px]:pb-10 min-[768px]:pt-[26px]">
       <div data-testid="landing-footer">
@@ -63,8 +141,7 @@ export function SiteFooterView({ updatedAt, locale = "ka", sourceNote, messages,
           {/* One fine-print paragraph. The source sentence already opens with
               "მონაცემები:", so the old "მონაცემები" heading above it said it twice. */}
           <p className="text-pretty text-[0.75rem] leading-relaxed text-[var(--muted)] min-[768px]:max-w-[340px]">
-            {sourcePrefix}{sourceSuffix !== undefined && <span className="font-[family-name:var(--font-numeric)]">{updatedAt}</span>}{sourceSuffix}{" "}
-            {message(messages, "common.footerLicence")}
+            {sourceText}
           </p>
         </div>
         <div className="mt-3 flex flex-wrap justify-between gap-4 border-t border-[var(--hairline-soft)] pt-2.5 min-[768px]:mt-[30px] min-[768px]:pt-3.5">
