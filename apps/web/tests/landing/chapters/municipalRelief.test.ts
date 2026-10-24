@@ -70,8 +70,8 @@ describe("rasterizeMunicipalities", () => {
   });
 
   it("breaks distance ties by row then column", () => {
-    // Marker on a cell corner: the four surrounding cells are equally near, plus
-    // enough owned cells for the tie to matter at the fourth pick.
+    // The marker is the centre of cell (1,1) in a 3x3 shape. Four cells are taken:
+    // (1,1) at distance 0, then three of the four edge-adjacent cells, which tie.
     const tied: Artifact = {
       ...artifact,
       municipalityPaths: [{ code: "04", relationId: 1, d: "M0 0L30 0L30 30L0 30Z" }],
@@ -79,10 +79,28 @@ describe("rasterizeMunicipalities", () => {
       occupiedAreas: artifact.occupiedAreas,
     };
     const { cells } = rasterizeMunicipalities(tied, ["04", "06"], CELL);
-    // The nearest cells to (15,15) are (1,1) at 7.07 ... then (1,0),(0,1),(2,1),(1,2) at 10.
-    // Four picks: (1,1), then the first three of the distance-10 group in row, column order.
+    // The edge-adjacent cells (1,0), (0,1), (2,1), (1,2) are all at distance 10, so the
+    // first three in row, column order are taken and (1,2) stays with the shape.
     expect([at(cells, 1, 1), at(cells, 1, 0), at(cells, 0, 1), at(cells, 2, 1)]).toEqual([1, 1, 1, 1]);
     expect(at(cells, 1, 2)).toBe(0);
+  });
+
+  it("a city never takes the last cell of a place", () => {
+    // 04 is two cells wide and 07 a single cell; the marker sits on both. Only one of
+    // 04's cells is spare, so the city ends up with one cell and each place keeps one.
+    const small: Artifact = {
+      ...artifact,
+      municipalityPaths: [
+        { code: "04", relationId: 1, d: "M0 0L20 0L20 10L0 10Z" },
+        { code: "07", relationId: 2, d: "M10 10L20 10L20 20L10 20Z" },
+      ],
+      cityMarkers: [{ code: "06", x: 10, y: 10 }],
+      occupiedAreas: artifact.occupiedAreas,
+    };
+    const { cells } = rasterizeMunicipalities(small, ["04", "07", "06"], CELL);
+    expect(cells.filter((value) => value === 0)).toHaveLength(1);
+    expect(cells.filter((value) => value === 1)).toHaveLength(1);
+    expect(cells.filter((value) => value === 2)).toHaveLength(1);
   });
 
   it("every place gets at least one cell: a path smaller than one cell gets the cell containing its first point", () => {

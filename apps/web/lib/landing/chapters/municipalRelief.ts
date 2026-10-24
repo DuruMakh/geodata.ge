@@ -1,4 +1,5 @@
 import type { MunicipalListRow } from "../../explorer/municipalData";
+import { pathBounds } from "../../explorer/mapTouchTargets";
 import { MUNICIPALITY_MAP_ARTIFACT } from "../../explorer/municipalityMapData";
 import { publicLabel } from "../../i18n/labels";
 import type { Presentation } from "../../i18n/types";
@@ -39,25 +40,10 @@ function insideRings(rings: number[][], x: number, y: number): boolean {
   return inside;
 }
 
-function ringsBounds(rings: number[][]) {
-  let minX = Infinity;
-  let minY = Infinity;
-  let maxX = -Infinity;
-  let maxY = -Infinity;
-  for (const ring of rings) {
-    for (let i = 0; i < ring.length; i += 2) {
-      minX = Math.min(minX, ring[i]!);
-      maxX = Math.max(maxX, ring[i]!);
-      minY = Math.min(minY, ring[i + 1]!);
-      maxY = Math.max(maxY, ring[i + 1]!);
-    }
-  }
-  return { minX, minY, maxX, maxY };
-}
-
 /** Cells in row-major order whose centre lies inside the path. */
-function cellsInside(rings: number[][], cols: number, rowCount: number, cell: number): number[] {
-  const { minX, minY, maxX, maxY } = ringsBounds(rings);
+function cellsInside(d: string, cols: number, rowCount: number, cell: number): number[] {
+  const rings = parseRings(d);
+  const { minX, minY, maxX, maxY } = pathBounds(d);
   const c0 = Math.max(0, Math.floor(minX / cell - 0.5));
   const c1 = Math.min(cols - 1, Math.ceil(maxX / cell - 0.5));
   const r0 = Math.max(0, Math.floor(minY / cell - 0.5));
@@ -93,7 +79,9 @@ function nearestCells(
 }
 
 // A city (Batumi, Kutaisi, Poti, Rustavi) has a marker and no shape of its own:
-// Tbilisi has both, so it is drawn as the area it is.
+// Tbilisi has both, so it is drawn as the area it is. On the validated artifact
+// this is the same as "a marker other than 04", because
+// validateMunicipalityMapArtifact requires 04 to be the only code with both.
 function isCity(artifact: MapArtifact, code: string): boolean {
   return (
     artifact.cityMarkers.some((marker) => marker.code === code) &&
@@ -122,12 +110,11 @@ export function rasterizeMunicipalities(
       if (!isCity(artifact, code)) throw new Error(`Municipality ${code} has no map shape or marker`);
       return;
     }
-    const rings = parseRings(shape.d);
-    const owned = cellsInside(rings, cols, rows, cell).filter((index) => cells[index] === EMPTY);
+    const owned = cellsInside(shape.d, cols, rows, cell).filter((index) => cells[index] === EMPTY);
     for (const index of owned) cells[index] = placeIndex;
     if (owned.length > 0) return;
     // Smaller than one cell: the cell holding its first point, or the nearest free one.
-    const [x, y] = rings[0]!;
+    const [x, y] = parseRings(shape.d)[0]!;
     const c = Math.min(cols - 1, Math.max(0, Math.floor(x! / cell)));
     const r = Math.min(rows - 1, Math.max(0, Math.floor(y! / cell)));
     const here = r * cols + c;
@@ -137,24 +124,35 @@ export function rasterizeMunicipalities(
   });
 
   for (const area of artifact.occupiedAreas) {
-    for (const index of cellsInside(parseRings(area.d), cols, rows, cell)) {
+    for (const index of cellsInside(area.d, cols, rows, cell)) {
       if (cells[index] === EMPTY) cells[index] = OCCUPIED;
     }
   }
 
   const cityPlace = codes.map((code) => isCity(artifact, code));
+  const remaining = codes.map(() => 0);
+  for (const owner of cells) if (owner >= 0) remaining[owner]! += 1;
   codes.forEach((code, placeIndex) => {
     if (!cityPlace[placeIndex]) return;
     const marker = artifact.cityMarkers.find((candidate) => candidate.code === code)!;
-    const taken = nearestCells(
+    // Nearest first, but never a place's last cell: every place keeps one.
+    const candidates = nearestCells(
       cols,
       cells.length,
       cell,
       marker.x,
       marker.y,
-      CITY_CELLS,
+      cells.length,
       (index) => cells[index]! >= 0 && !cityPlace[cells[index]!],
     );
+    const taken: number[] = [];
+    for (const index of candidates) {
+      if (taken.length === CITY_CELLS) break;
+      const owner = cells[index]!;
+      if (remaining[owner]! <= 1) continue;
+      remaining[owner]! -= 1;
+      taken.push(index);
+    }
     if (taken.length === 0) throw new Error(`City ${code} has no surrounding cells to take`);
     for (const index of taken) cells[index] = placeIndex;
   });
