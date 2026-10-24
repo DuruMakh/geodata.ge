@@ -565,7 +565,7 @@ test("the Budget group page states its data scope in one lead line", async ({ pa
   await page.goto(`${BASE_URL}/explorer/budget`);
 
   const introduction = page.locator("h1 + p");
-  await expect(introduction).toHaveText("ბიუჯეტის, ვალისა და დეფიციტის მონაცემები");
+  await expect(introduction).toHaveText("ბიუჯეტი, ვალი და დეფიციტი");
 });
 
 test("methodology exposes a stable processed-data download", async ({ page, request }) => {

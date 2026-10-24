@@ -293,13 +293,6 @@ const wrappingLines: Record<string, readonly ("ka" | "en")[]> = {
   "/explorer/living-standards/income/regions/[id]": ["ka", "en"],
   "/explorer/living-standards/spending": ["ka", "en"],
   "/explorer/living-standards/spending/regions/[id]": ["ka", "en"],
-  // The group pages' lines (spec 2026-10-24-explorer-regroup §5, copy from its Task 1): owner wording pending.
-  "/explorer/budget": ["ka"],
-  "/explorer/economy": ["ka", "en"],
-  "/explorer/living": ["ka"],
-  "/explorer/external": ["ka", "en"],
-  "/explorer/demography": ["ka"],
-  "/explorer/society": ["ka", "en"],
 };
 
 /** The first block under the page heading, and the one after it when that is a text line. */
