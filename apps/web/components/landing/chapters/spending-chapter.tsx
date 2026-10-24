@@ -63,12 +63,12 @@ const easeOut = (t: number) => 1 - Math.pow(1 - t, 3);
 
 type Amounts = Pick<SpendingLabels, "bnGel" | "mlnGel">;
 /** Billions with two decimals (one from 9.95), below one billion millions with 0 or 1 decimals. */
-function money(gel: number, l: Amounts): string {
+export function money(gel: number, l: Amounts): string {
   const a = Math.abs(gel);
   if (a >= 1e9) return `${formatInUnit(gel, { ...UNIT_BN, decimals: a >= 9.95e9 ? 1 : 2 })}${NB}${l.bnGel}`;
   return `${formatInUnit(gel, { ...UNIT_MLN, decimals: a >= 1e8 ? 0 : 1 })}${NB}${l.mlnGel}`;
 }
-const percent = (fraction: number, decimals = 1) => formatShare(fraction, false, decimals);
+export const percent = (fraction: number, decimals = 1) => formatShare(fraction, false, decimals);
 
 type Engine = { setYear(index: number, ms?: number): void; highlight(id: string | null): void; destroy(): void };
 
