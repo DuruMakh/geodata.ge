@@ -176,3 +176,100 @@ summary:focus-visible {
     );
   }
 }
+
+/* Homepage chapters: the title is the link to its data. An accent arrow marks it; on hover it
+   underlines in accent and, from 1200px, the destination name appears to its right. */
+.home-tl {
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.2em;
+  text-decoration-color: transparent;
+  transition: text-decoration-color 0.2s;
+}
+
+.home-tl:hover {
+  text-decoration-color: var(--accent);
+}
+
+.home-tl-i {
+  display: inline-block;
+  width: 0.78em;
+  height: 0.78em;
+  margin-left: 0.26em;
+  vertical-align: -0.05em;
+  color: var(--accent);
+  transition: transform 0.22s cubic-bezier(0.22, 0.7, 0.18, 1);
+}
+
+.home-tl:hover .home-tl-i {
+  transform: translateX(5px);
+}
+
+.home-tl-hint {
+  display: none;
+  position: absolute;
+  left: calc(100% + 16px);
+  top: 50%;
+  margin-top: -9px;
+  font-family: var(--font-ui);
+  font-size: 12.5px;
+  font-weight: 600;
+  line-height: 18px;
+  letter-spacing: 0;
+  color: var(--accent);
+  white-space: nowrap;
+  opacity: 0;
+  transform: translateX(-6px);
+  transition:
+    opacity 0.2s,
+    transform 0.22s;
+  pointer-events: none;
+}
+
+@media (min-width: 1200px) {
+  .home-tl-hint {
+    display: block;
+  }
+}
+
+.home-tl:hover .home-tl-hint {
+  opacity: 1;
+  transform: none;
+}
+
+/* On touch screens the whole heading is the tap target. */
+@media (hover: none) {
+  .home-tl {
+    display: block;
+  }
+
+  .home-tl:active {
+    opacity: 0.7;
+  }
+
+  .home-tl-hint {
+    display: none;
+  }
+}
+
+/* Scroll reveal: content rises 16px and fades in once, when Reveal sets data-in. */
+.home-rv {
+  opacity: 0;
+  transform: translateY(16px);
+  transition:
+    opacity 0.9s cubic-bezier(0.22, 0.7, 0.18, 1),
+    transform 0.9s cubic-bezier(0.22, 0.7, 0.18, 1);
+}
+
+.home-rv[data-in] {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce), (scripting: none) {
+  .home-rv {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
