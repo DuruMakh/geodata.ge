@@ -1,11 +1,12 @@
-import { describe, expect, it } from "vitest";
+import { beforeAll, describe, expect, it } from "vitest";
 import kaCommon from "../../lib/i18n/messages/ka/common.json";
 import enCommon from "../../lib/i18n/messages/en/common.json";
 import kaAllData from "../../lib/i18n/messages/ka/allData.json";
 import enAllData from "../../lib/i18n/messages/en/allData.json";
 import type { Locale } from "../../lib/i18n/types";
 import { NAV_GROUPS, NAV_TREE, groupOfTopic, groupPages } from "../../lib/navigation/navTree";
-import type { Place, PlaceEntry } from "../../lib/explorer/places/types";
+import type { Place, PlaceEntry, PlaceIndex } from "../../lib/explorer/places/types";
+import { buildPlaceIndex } from "../../lib/explorer/places/buildPlaceIndex.server";
 import { latinToGeorgian, stem } from "../../lib/explorer/search/georgian";
 import { rowLabel, searchExplorer, type SearchPage, type SearchResult, type SearchShortcut, type Segment } from "../../lib/explorer/search/searchExplorer";
 
@@ -187,6 +188,10 @@ describe("decorated and mixed queries (Review Focus 1)", () => {
     ["WAGES", "wages"],
     ["ხელფასები,", "ხელფასები"],
     ["(ინფლაცია).", "ინფლაცია"],
+    ["ხელფასები — რეგიონები", "ხელფასები რეგიონები"],
+    ["Wages — regions", "wages regions"],
+    ["Wages - regions", "wages regions"],
+    ["Wages – regions", "wages regions"],
   ])("%j gives the same results as %j", (decorated, plain) => {
     expect(run(decorated)).toEqual(run(plain));
     expect(run(decorated, "en")).toEqual(run(plain, "en"));
@@ -196,6 +201,26 @@ describe("decorated and mixed queries (Review Focus 1)", () => {
     expect(searchExplorer("", "ka", PAGES, SHORTCUTS, INDEX)).toBeNull();
     expect(searchExplorer("   ", "ka", PAGES, SHORTCUTS, INDEX)).toBeNull();
     expect(searchExplorer("„“,", "ka", PAGES, SHORTCUTS, INDEX)).toBeNull();
+  });
+});
+
+describe("a lone dash or capital Latin", () => {
+  it("finds the page a row's own label names", () => {
+    expect(firstRow(run("ხელფასები — რეგიონები")).href).toBe("/explorer/wages/regions");
+    expect(firstRow(run("Wages — regions", "en")).href).toBe("/explorer/wages/regions");
+  });
+
+  it("reads all-caps Latin through the keyboard in lower case once the Shift letters find nothing", () => {
+    const result = run("XELFASEBI", "en");
+    expect(result.reading).toBe("ხელფასები");
+    expect(firstRow(result).href).toBe("/explorer/wages/overview");
+    expect(run("Tbilisi", "en").reading).toBeNull();
+  });
+});
+
+describe("a place with a case ending", () => {
+  it.each([["ბათუმში", "06"], ["ბათუმის", "06"], ["თბილისში", "region.tbilisi"], ["აჭარაში", "region.adjara"], ["ქობულეთში", "21"]])("%s finds %s", (query, id) => {
+    expect(run(query).place?.place.id).toBe(id);
   });
 });
 
@@ -260,5 +285,39 @@ describe("rows", () => {
     const result = run("ხელფასები რეგიონები");
     expect(firstRow(result).href).toBe("/explorer/wages/regions");
     expect(marked(firstRow(result).label)).toBe("ხელფასები|რეგიონები");
+  });
+});
+
+describe("the real 74 places", () => {
+  const indexes = {} as Record<Locale, PlaceIndex>;
+  beforeAll(async () => {
+    process.env.NEXT_PUBLIC_SITE_URL ??= "https://fiscal.ge";
+    [indexes.ka, indexes.en] = await Promise.all([buildPlaceIndex("ka"), buildPlaceIndex("en")]);
+  }, 180_000);
+
+  it.each(["ka", "en"] as const)("never take a page's name or label for a place (%s)", (locale) => {
+    expect(indexes[locale].places).toHaveLength(74);
+    for (const page of PAGES) {
+      for (const query of [page.name[locale], rowLabel(page, locale)]) {
+        const result = searchExplorer(query, locale, PAGES, SHORTCUTS, indexes[locale])!;
+        expect(result.place, `${query} → ${result.place?.place.nameEn}`).toBeNull();
+        expect(firstRow(result).page.name[locale], query).toBe(page.name[locale]);
+      }
+      // A name two pages share (English "Expenditure": the budget's and GDP's) cannot pick one of them.
+      if (PAGES.filter((other) => other.name[locale] === page.name[locale]).length > 1) continue;
+      const label = searchExplorer(rowLabel(page, locale), locale, PAGES, SHORTCUTS, indexes[locale])!;
+      expect(firstRow(label).href, rowLabel(page, locale)).toBe(page.href);
+    }
+  });
+
+  it.each(["საბავშვო ბაღები", "ბაღები", "საგარეო ვალი", "საგარეო ვაჭრობა", "საგარეო ნაკადები", "საგარეო სექტორი", "წყალი"])("%s names no place", (query) => {
+    expect(searchExplorer(query, "ka", PAGES, SHORTCUTS, indexes.ka)!.place).toBeNull();
+  });
+
+  it.each([
+    ["ბათუმში", "ka", "Batumi"], ["თბილისში", "ka", "Tbilisi"], ["აჭარაში", "ka", "Adjara"], ["ქობულეთში", "ka", "Kobuleti"],
+    ["სამეგრელო-ზემო სვანეთი", "ka", "Samegrelo-Zemo Svaneti"], ["Samegrelo-Zemo Svaneti", "en", "Samegrelo-Zemo Svaneti"], ["Kvemo Kartli", "en", "Kvemo Kartli"],
+  ] as const)("%s finds %s", (query, locale, nameEn) => {
+    expect(searchExplorer(query, locale, PAGES, SHORTCUTS, indexes[locale])!.place?.place.nameEn).toBe(nameEn);
   });
 });

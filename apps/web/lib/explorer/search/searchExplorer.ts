@@ -1,6 +1,7 @@
 import type { Locale } from "../../i18n/types";
 import { fold } from "../../i18n/search";
 import type { GroupId, TopicId } from "../../navigation/navTree";
+import { BUDGET_SECTIONS } from "../sections";
 import type { Place, PlaceEntry } from "../places/types";
 import { isLatin, latinToGeorgian, stem } from "./georgian";
 
@@ -43,11 +44,12 @@ export type SearchResult = {
 
 type PlaceIndexData = { places: Place[]; entries: PlaceEntry[] };
 
-const MUNICIPAL_BUDGET_PAGE = "/explorer/municipalities";
+const MUNICIPAL_BUDGET_PAGE = BUDGET_SECTIONS.municipalities.href;
 
 /** Matching text: folded (case, accents, dashes), with quotes and punctuation as spaces. */
 const norm = (text: string) => fold(text).replace(/[„“”"'‘’«».,:;!?()/\\+]/g, " ").replace(/\s+/g, " ").trim();
-const wordsOf = (text: string) => norm(text).split(" ").filter(Boolean);
+/** A query's words; a lone dash (`Wages — regions`) is not a word, while `15-19` keeps its hyphen. */
+const wordsOf = (text: string) => norm(text).split(" ").filter((word) => /[\p{L}\p{N}]/u.test(word));
 
 /** How well one query word matches a field: a word start 1, inside the field from 3 letters 0.7, by stem 0.55. */
 function wordScore(word: string, field: string): number {
@@ -63,16 +65,23 @@ function wordScore(word: string, field: string): number {
 /** Weights of a page's fields: its name, its name in the other language, topic, group, extra words. */
 const WEIGHTS = [10, 10, 4, 3, 6];
 
-function pageFields(page: SearchPage, locale: Locale): string[] {
-  const other = locale === "ka" ? "en" : "ka";
-  return [
-    norm(page.name[locale]), norm(page.name[other]), norm(`${page.topicName.ka} ${page.topicName.en}`), norm(`${page.groupName.ka} ${page.groupName.en}`), norm(page.words),
-  ];
+/**
+ * A page's matching fields, normalised once per page object rather than on every keystroke. The two names weigh the
+ * same, so the Georgian name comes first in both languages.
+ */
+const PAGE_FIELDS = new WeakMap<SearchPage, string[]>();
+function pageFields(page: SearchPage): string[] {
+  let fields = PAGE_FIELDS.get(page);
+  if (!fields) {
+    fields = [norm(page.name.ka), norm(page.name.en), norm(`${page.topicName.ka} ${page.topicName.en}`), norm(`${page.groupName.ka} ${page.groupName.en}`), norm(page.words)];
+    PAGE_FIELDS.set(page, fields);
+  }
+  return fields;
 }
 
 /** A page's score for the words: each word's best weighted field, plus 8 for its exact name; 0 unless every word matches. */
-function pageScore(page: SearchPage, locale: Locale, words: string[]): number {
-  const fields = pageFields(page, locale);
+function pageScore(page: SearchPage, words: string[]): number {
+  const fields = pageFields(page);
   let total = 0;
   for (const word of words) {
     const best = Math.max(...fields.map((field, index) => wordScore(word, field) * WEIGHTS[index]));
@@ -80,23 +89,44 @@ function pageScore(page: SearchPage, locale: Locale, words: string[]): number {
     total += best;
   }
   const phrase = words.join(" ");
-  if (norm(page.name.ka) === phrase || norm(page.name.en) === phrase) total += 8;
+  if (fields[0] === phrase || fields[1] === phrase) total += 8;
   return total;
 }
 
-/** The place a word names best, and how well: the whole name 3, its first word or the name without spaces 2.6, its start 2, by stem 1.8. */
+type PlaceName = { name: string; firstWord: string; compact: string; firstStem: string };
+
+/** A place's two names, normalised once per place object. */
+const PLACE_NAMES = new WeakMap<Place, PlaceName[]>();
+function placeNames(place: Place): PlaceName[] {
+  let names = PLACE_NAMES.get(place);
+  if (!names) {
+    names = [place.nameKa, place.nameEn].map((raw) => {
+      const name = norm(raw);
+      return { name, firstWord: name.split(" ")[0], compact: name.replace(/[\s-]/g, ""), firstStem: stem(name.split(/[\s-]/)[0]) };
+    });
+    PLACE_NAMES.set(place, names);
+  }
+  return names;
+}
+
+/**
+ * The place a word names best, and how well: the whole name 3, its first word or the name without spaces 2.6, its
+ * start 2, the first word with another ending 1.8 (`ბათუმში`, `აჭარაში`). The stem must equal the name's own stem,
+ * not just start it, or `საგარეო` would find Sagarejo and `ბაღები` Baghdati.
+ */
 function placeFor(word: string, places: Place[]): { place: Place; score: number } | null {
   if (word.length < 2) return null;
   const compact = word.replace(/[\s-]/g, "");
+  const wordStem = stem(word);
   let best: Place | null = null;
   let bestScore = 0;
   for (const place of places) {
-    for (const name of [norm(place.nameKa), norm(place.nameEn)]) {
+    for (const { name, firstWord, compact: nameCompact, firstStem } of placeNames(place)) {
       let score = 0;
       if (name === word) score = 3;
-      else if (name.split(" ")[0] === word || name.replace(/[\s-]/g, "") === compact) score = 2.6;
+      else if (firstWord === word || nameCompact === compact) score = 2.6;
       else if (word.length >= 3 && name.startsWith(word)) score = 2;
-      else if (word.length >= 4 && stem(word).length >= 3 && name.startsWith(stem(word))) score = 1.8;
+      else if (word.length >= 4 && wordStem.length >= 3 && wordStem === firstStem) score = 1.8;
       if (score > bestScore) {
         bestScore = score;
         best = place;
@@ -154,7 +184,7 @@ export function rowLabel(page: SearchPage, locale: Locale): string {
 
 type Run = { place: { place: Place; word: string; score: number } | null; rest: string[]; scored: { page: SearchPage; score: number }[] };
 
-function runWords(words: string[], locale: Locale, pages: SearchPage[], places: Place[]): Run {
+function runWords(words: string[], pages: SearchPage[], places: Place[]): Run {
   let place: Run["place"] = null;
   for (const word of words) {
     const match = placeFor(word, places);
@@ -167,13 +197,12 @@ function runWords(words: string[], locale: Locale, pages: SearchPage[], places: 
   }
   let rest = words;
   if (place) {
-    const nameKa = norm(place.place.nameKa);
-    const nameEn = norm(place.place.nameEn);
+    const [{ name: nameKa }, { name: nameEn }] = placeNames(place.place);
     const placeWord = place.word;
     rest = words.filter((word) => word !== placeWord && !nameKa.includes(word) && !nameEn.includes(word));
   }
   const scored = rest.length
-    ? pages.map((page) => ({ page, score: pageScore(page, locale, rest) })).filter((candidate) => candidate.score > 0).sort((a, b) => b.score - a.score)
+    ? pages.map((page) => ({ page, score: pageScore(page, rest) })).filter((candidate) => candidate.score > 0).sort((a, b) => b.score - a.score)
     : [];
   return { place, rest, scored };
 }
@@ -182,7 +211,8 @@ function runWords(words: string[], locale: Locale, pages: SearchPage[], places: 
  * Searches the pages and, once the place index has arrived, the places. A query that names a place gives its card,
  * its own rows (its municipal budget first) and its region's other rows, each linking to the place's page; other
  * words narrow those rows. Otherwise the pages that match every word, best first, under the matching shortcuts.
- * A Latin query that finds nothing is read through the Georgian keyboard. `null` for an empty query.
+ * A Latin query that finds nothing is read through the Georgian keyboard, as typed (Shift letters such as `T` → `თ`)
+ * and then in lower case, so `XELFASEBI` still reads `ხელფასები`. `null` for an empty query.
  */
 export function searchExplorer(
   query: string, locale: Locale, pages: SearchPage[], shortcuts: SearchShortcut[], places: PlaceIndexData | null,
@@ -191,14 +221,17 @@ export function searchExplorer(
   if (!words.length) return null;
   const placeList = places?.places ?? [];
   let reading: string | null = null;
-  let found = runWords(words, locale, pages, placeList);
+  let found = runWords(words, pages, placeList);
   if (!found.place && !found.scored.length && isLatin(query)) {
-    const georgian = wordsOf(latinToGeorgian(query.trim()));
-    const retry = runWords(georgian, locale, pages, placeList);
-    if (retry.place || retry.scored.length) {
-      reading = georgian.join(" ");
-      words = georgian;
-      found = retry;
+    for (const typed of new Set([query.trim(), query.trim().toLowerCase()])) {
+      const georgian = wordsOf(latinToGeorgian(typed));
+      const retry = runWords(georgian, pages, placeList);
+      if (retry.place || retry.scored.length) {
+        reading = georgian.join(" ");
+        words = georgian;
+        found = retry;
+        break;
+      }
     }
   }
 
@@ -216,7 +249,7 @@ export function searchExplorer(
       .filter((entry) => entry.placeId === placeId && !skip.has(entry.page))
       .flatMap((entry) => {
         const page = pageOf.get(entry.page);
-        return page && (!rest.length || pageScore(page, locale, rest) > 0) ? [row(page, entry.href, entry.value, entry.period)] : [];
+        return page && (!rest.length || pageScore(page, rest) > 0) ? [row(page, entry.href, entry.value, entry.period)] : [];
       });
 
     const own = rowsFor(place.id, new Set())
