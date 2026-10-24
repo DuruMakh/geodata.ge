@@ -75,5 +75,12 @@
   "landing.datasetEconomyMeasure": "ნომინალური მშპ",
   "landing.datasetInflationMeasure": "წლიური ინფლაცია",
   "landing.datasetTradeMeasure": "საგარეო სავაჭრო ბრუნვა",
-  "landing.datasetUnemploymentMeasure": "უმუშევრობის დონე"
+  "landing.datasetUnemploymentMeasure": "უმუშევრობის დონე",
+  "landing.revBand.vat": "დღგ",
+  "landing.revBand.income": "საშემოსავლო",
+  "landing.revBand.profit": "მოგების",
+  "landing.revBand.excise": "აქციზი",
+  "landing.revBand.otherTaxes": "სხვა გადასახადები",
+  "landing.revBand.otherIncome": "სხვა შემოსავლები",
+  "landing.revBand.liabilities": "ვალდებულებების ზრდა"
 }

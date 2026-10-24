@@ -1,0 +1,63 @@
+// Shared model for the homepage chapters. Each chapter builder in this folder
+// returns one of these; the chart components only draw what they are handed.
+
+export type ChapterLink = { title: string; href: string; hint: string };
+
+export type SpendingSeries = {
+  years: number[]; // ascending, first..latest active expenditure year
+  planned: boolean[]; // per year: any active fact of that year is planned
+  totals: number[]; // GEL per year, sum of fields
+  fields: { id: string; label: string; values: number[] }[]; // GEL, sorted by latest-year value desc, other_unclassified last
+};
+
+export type RevenueBandId = "vat" | "income" | "profit" | "excise" | "otherTaxes" | "otherIncome" | "liabilities";
+
+export type RevenueSeries = {
+  years: number[];
+  totals: number[];
+  taxShare: number[]; // fraction 0..1
+  bands: { id: RevenueBandId; label: string; values: (number | null)[] }[];
+  peakBorrowing: { year: number; share: number } | null;
+};
+
+export type ScaleMeasureId = "gdp" | "revenue" | "spending" | "debt" | "balance" | "municipal" | "fdi" | "remittances";
+
+export type ScaleChapter = {
+  year: number;
+  gdpGel: number;
+  squares: number;
+  defaultId: "spending";
+  measures: { id: ScaleMeasureId; label: string; valueGel: number; squares: number; share: number }[];
+};
+
+export type DeficitChapter = {
+  years: number[];
+  pctGdp: number[];
+  gel: number[];
+  projectionFrom: number | null;
+  deepest: { year: number; pct: number };
+  earlier: { year: number; pct: number } | null;
+  surplusRun: { first: number; last: number } | null;
+};
+
+export type ReliefPlace = { code: string; name: string; totalGel: number; perResidentGel: number; rank: number; city: boolean };
+
+export type MunicipalChapter = {
+  year: number;
+  totalGel: number;
+  places: ReliefPlace[];
+  grid: { cols: number; rows: number; cells: number[] }; // cells[r*cols+c]: place index, -1 empty, -2 occupied area
+};
+
+export type SourceRow = { name: string; firstYear: number; lastYear: number; files: number };
+
+export type HomeChapters = {
+  scale: ScaleChapter;
+  spending: SpendingSeries;
+  revenue: RevenueSeries;
+  municipal: MunicipalChapter;
+  deficit: DeficitChapter;
+  sources: { rows: SourceRow[]; totalFiles: number; reviewedAt: string };
+  tools: string[];
+  sentences: Record<"spending" | "revenue" | "municipal" | "deficit", string>;
+};

@@ -75,5 +75,12 @@
   "landing.datasetEconomyMeasure": "Nominal GDP",
   "landing.datasetInflationMeasure": "Annual inflation",
   "landing.datasetTradeMeasure": "Total trade",
-  "landing.datasetUnemploymentMeasure": "Unemployment rate"
+  "landing.datasetUnemploymentMeasure": "Unemployment rate",
+  "landing.revBand.vat": "VAT",
+  "landing.revBand.income": "Income tax",
+  "landing.revBand.profit": "Profit tax",
+  "landing.revBand.excise": "Excise",
+  "landing.revBand.otherTaxes": "Other taxes",
+  "landing.revBand.otherIncome": "Other income",
+  "landing.revBand.liabilities": "Increase in liabilities"
 }
