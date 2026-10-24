@@ -216,6 +216,16 @@ describe("buildHubCards with a planned latest spending year", () => {
   it("keeps an actual latest year unmarked", () => {
     expect(buildHubCards(FACTS, MUNICIPAL_TOTALS, DEBT_FACTS)[0].footer).toBe("2025 · 9.0 მლრდ ₾");
   });
+
+  it("marks a latest year that mixes actual and planned rows, as the table total does", () => {
+    const mixed = [...WITH_PLAN, fact("expenditure", "spending.education", 2026, 1_000_000_000, "actual")];
+    expect(buildHubCards(mixed, MUNICIPAL_TOTALS, DEBT_FACTS)[0].footer).toBe("2026 გეგმა · 12.0 მლრდ ₾");
+  });
+
+  it("drops the mark once the year's actual replaces its plan", () => {
+    const replaced = [...WITH_PLAN, fact("expenditure", "spending.health", 2026, 10_000_000_000, "actual")];
+    expect(buildHubCards(replaced, MUNICIPAL_TOTALS, DEBT_FACTS)[0].footer).toBe("2026 · 10.0 მლრდ ₾");
+  });
 });
 
 describe("buildHubCards over the served data", () => {

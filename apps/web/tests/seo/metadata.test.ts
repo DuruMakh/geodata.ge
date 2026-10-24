@@ -179,3 +179,22 @@ describe("the single-year analysis title follows the basis of its year (U05-12)"
     expect(String((await analysisPageMetadata("en")).title)).toBe("Georgia budget analysis — 2026 actuals | Fiscal.ge");
   });
 });
+
+describe("the Spending description names a planned latest year as a plan", () => {
+  afterAll(() => {
+    vi.doUnmock("../../lib/data/servedData");
+    vi.resetModules();
+  });
+
+  it("splits the actual years from the plan year, and calls the range actual once the plan is replaced", async () => {
+    const row = (year: number, basis: "actual" | "planned", side = "expenditure") => ({ year, side, itemId: "spending.health", amountGel: 1, basis });
+    const served = { facts: [row(2004, "actual"), row(2025, "actual"), row(2026, "planned"), row(2025, "actual", "revenue")] };
+    vi.doMock("../../lib/data/servedData", async (original) => ({ ...(await original<object>()), loadServedLandingData: async () => served }));
+    vi.resetModules();
+    const { expenditurePageMetadata } = await import("../../lib/pages/expenditure");
+    expect(String((await expenditurePageMetadata("en")).description)).toBe("Georgia’s actual state-budget expenditure by function and institution, 2004–2025, and the approved 2026 plan.");
+    expect(String((await expenditurePageMetadata("ka")).description)).toBe("საქართველოს სახელმწიფო ბიუჯეტის ფაქტობრივი ხარჯები სფეროებისა და უწყებების მიხედვით, 2004–2025; 2026 წლის დამტკიცებული გეგმა.");
+    served.facts.push(row(2026, "actual"));
+    expect(String((await expenditurePageMetadata("en")).description)).toBe("Georgia’s actual state-budget expenditure by function and institution, 2004–2026.");
+  });
+});

@@ -17,18 +17,25 @@ const WITH_PLAN = [
 ];
 const ALL_ACTUAL = WITH_PLAN.filter((row) => row.year !== 2026);
 
-async function deckOf(locale: Locale, facts: ClientBudgetFact[]): Promise<string> {
+async function pageOf(locale: Locale, facts: ClientBudgetFact[]): Promise<string> {
   const messages = await getMessages(locale, ["format", "main"]);
-  const html = renderPageMarkup(locale, (
+  return renderPageMarkup(locale, (
     <MainExplorer
-      presentation={{ locale, englishLabels: { "expenditure.total": "Total expenditure", "spending.education": "Education" }, messages }}
+      presentation={{ locale, englishLabels: { "expenditure.total": "Total expenditure", "spending.education": "Education", "spending.health": "Health" }, messages }}
       nav="expenditure"
       facts={facts}
       glossaryEntries={[]}
       lastUpdatedAt=""
     />
   ));
-  return html.match(/<p data-testid="budget-deck"[^>]*>([\s\S]*?)<\/p>/)![1]!.replace(/<[^>]+>/g, "|");
+}
+
+async function deckOf(locale: Locale, facts: ClientBudgetFact[]): Promise<string> {
+  return (await pageOf(locale, facts)).match(/<p data-testid="budget-deck"[^>]*>([\s\S]*?)<\/p>/)![1]!.replace(/<[^>]+>/g, "|");
+}
+
+async function sourceNoteOf(locale: Locale, facts: ClientBudgetFact[]): Promise<string> {
+  return (await pageOf(locale, facts)).match(/<p[^>]*data-testid="source-label"[^>]*>([\s\S]*?)<\/p>/)![1]!.replace(/<[^>]+>/g, "");
 }
 
 describe("the Spending headline when its latest year is a plan", () => {
@@ -44,5 +51,22 @@ describe("the Spending headline when its latest year is a plan", () => {
     expect(await deckOf("en", ALL_ACTUAL)).toMatch(/^\|2025: Total\|/);
     expect(await deckOf("en", ALL_ACTUAL)).not.toContain("plan");
     expect(await deckOf("ka", ALL_ACTUAL)).toMatch(/^\|2025: სულ\|/);
+  });
+});
+
+describe("the Spending source note when its latest year is a plan", () => {
+  test("names the plan year apart from the actual execution", async () => {
+    expect(await sourceNoteOf("en", WITH_PLAN)).toContain("2024–2026 · Actual execution for the full 12 months; 2026: the approved budget plan.");
+    expect(await sourceNoteOf("ka", WITH_PLAN)).toContain("· 12-თვიანი ფაქტობრივი შესრულება; 2026 — დამტკიცებული ბიუჯეტის გეგმა.");
+    expect(await sourceNoteOf("en", ALL_ACTUAL)).toContain("2024–2025 · Actual execution for the full 12 months.");
+  });
+
+  test("marks a latest year that mixes actual and planned rows, and not one whose actual replaced the plan", async () => {
+    const mixed = [...WITH_PLAN, fact(2026, "spending.health", 1_000_000_000, "actual")];
+    expect(await deckOf("en", mixed)).toMatch(/^\|2026 plan: Total\|/);
+    expect(await sourceNoteOf("en", mixed)).toContain("2026: the approved budget plan.");
+    const replaced = [...WITH_PLAN, fact(2026, "spending.education", 30_000_000_000, "actual")];
+    expect(await deckOf("en", replaced)).toMatch(/^\|2026: Total\|/);
+    expect(await sourceNoteOf("en", replaced)).not.toContain("plan");
   });
 });

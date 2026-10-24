@@ -12,9 +12,8 @@ import type {
   ClientBudgetFact,
   ClientNationalGdpFact,
 } from "../../lib/explorer/clientData";
-import { chooseActivePublicFacts } from "../../lib/data/activeFacts";
 import { unpackFacts, type FactsInput } from "../../lib/data/packedFacts";
-import { buildExplorerModel, isDerivedTotalItemId } from "../../lib/explorer/explorerData";
+import { buildExplorerModel, isPlannedYear } from "../../lib/explorer/explorerData";
 import { buildBudgetWorkbookInput } from "../../lib/explorer/budgetWorkbook";
 import { formatAmount, unitFor, unitsFor } from "../../lib/explorer/format";
 import { useAppReady } from "../explorer-shell/use-app-ready";
@@ -130,12 +129,12 @@ function MainExplorerContent({ nav, facts: shippedFacts, adminFacts: shippedAdmi
     const previousTotal = previousYear === undefined ? null : totals.get(previousYear) ?? null;
     const yoy = latestTotal !== null && previousTotal ? (latestTotal - previousTotal) / previousTotal : null;
 
-    // A latest year that is only a plan says so ("2026 plan: Total 30.9 bn GEL +11.4%"); the change then
-    // compares the plan with the year before, which the total above already resolves to actual where both exist.
-    const latestFacts = scope === "ministries"
-      ? adminFacts.filter((fact) => fact.level === "admin_category" && fact.year === latestYear)
-      : chooseActivePublicFacts(facts).filter((fact) => fact.side === (scope === "revenue" ? "revenue" : "expenditure") && fact.year === latestYear && !isDerivedTotalItemId(fact.itemId));
-    const planned = latestFacts.length > 0 && latestFacts.every((fact) => fact.basis === "planned");
+    // A latest year with a planned value says so ("2026 plan: Total 30.9 bn GEL +11.4%"), as the table total and
+    // the hub card do; the change then compares it with the year before, which the total above already resolves
+    // to actual where both exist.
+    const planned = scope === "ministries"
+      ? adminFacts.some((fact) => fact.level === "admin_category" && fact.year === latestYear && fact.basis === "planned")
+      : isPlannedYear(facts, explorerSide, latestYear);
     const yearLabel = planned ? message(messages, "main.plannedYear", { year: latestYear }) : String(latestYear);
 
     // The line says what the figure is (U04-11): "2025: Total 32.4 bn GEL +8.8% year on year". The heading names the
@@ -143,7 +142,7 @@ function MainExplorerContent({ nav, facts: shippedFacts, adminFacts: shippedAdmi
     return latestTotal === null
       ? { lead: "", yoy }
       : { measure: `${yearLabel}: ${message(messages, "main.total")}`, lead: formatAmount(latestTotal, locale), yoy, plan: planned };
-  }, [totalsByScope, scope, scopeYears, facts, adminFacts, locale, messages]);
+  }, [totalsByScope, scope, scopeYears, facts, adminFacts, explorerSide, locale, messages]);
 
   const screenTitle = nav === "expenditure"
     ? message(messages, "main.expenditureHeading")
@@ -166,6 +165,7 @@ function MainExplorerContent({ nav, facts: shippedFacts, adminFacts: shippedAdmi
         selectedIds={selectedIds}
         expandedMinistries={expandedMinistries}
         lastUpdatedAt={lastUpdatedAt}
+        plannedYear={deck.plan ? scopeYears.at(-1) : undefined}
         onGroupingChange={setGrouping}
         onChartModeChange={setChartMode}
         onShareChange={setShare}

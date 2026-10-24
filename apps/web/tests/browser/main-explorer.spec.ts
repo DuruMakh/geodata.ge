@@ -141,6 +141,7 @@ test("explorer hydrates with the editorial shell and default expenditure view", 
   await expect(page.getByTestId("series-status")).toContainText(/სერიები\s*1 \/ \d+/);
   await expect(page.getByTestId("source-label")).toContainText("გადამოწმებული ოფიციალური საბიუჯეტო დოკუმენტები");
   await expect(page.getByTestId("source-label").getByText("ხარჯვითი მონაცემები: 2004–2026", { exact: true })).toBeVisible();
+  await expect(page.getByTestId("source-label")).toContainText("12-თვიანი ფაქტობრივი შესრულება; 2026 — დამტკიცებული ბიუჯეტის გეგმა.");
   await expect(page.getByTestId("source-label")).toContainText("მშპ: საქსტატი, მიმდინარე ფასებში");
   await expect(page.getByTestId("source-label")).toContainText("2025 წლის მშპ წინასწარია");
 

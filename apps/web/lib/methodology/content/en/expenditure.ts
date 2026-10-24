@@ -55,7 +55,7 @@ export const EXPENDITURE_METHODOLOGY_CONTENT: MethodologyContent = {
       "kind": "sources",
       "title": "Official sources",
       "paragraphs": [
-        "The functional breakdown for 2004 comes from the full 2004 state-budget execution annex; the narrower central-budget Treasury E11 is used only as a supporting check. For 2005–2025, sources are Treasury E11 forms and documented supplementary Ministry of Finance reports or workbooks."
+        "The functional breakdown for 2004 comes from the full 2004 state-budget execution annex; the narrower central-budget Treasury E11 is used only as a supporting check. For 2005–2025, sources are Treasury E11 forms and documented supplementary Ministry of Finance reports or workbooks. The approved 2026 plan comes from chapters III and VI of the Law of Georgia on the 2026 State Budget."
       ]
     },
     {

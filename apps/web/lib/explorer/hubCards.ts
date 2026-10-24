@@ -7,7 +7,7 @@ import type {
 } from "../servedRows";
 import { MUNICIPAL_COUNTRY_BUDGET_COUNT } from "./municipalData";
 import { chooseActivePublicFacts } from "../data/activeFacts";
-import { isDerivedTotalItemId } from "./explorerData";
+import { isDerivedTotalItemId, isPlannedYear } from "./explorerData";
 import { formatAmount, formatShare } from "./format";
 import { INK } from "./colors";
 import { BUDGET_SECTIONS } from "./sections";
@@ -58,13 +58,6 @@ function categoryCount(facts: ServedBudgetFact[], side: "expenditure" | "revenue
     ids.add(fact.itemId);
   }
   return ids.size;
-}
-
-// A year whose every active category row is a plan (actual wins where both exist), like the headline on the page.
-function isPlannedYear(facts: ServedBudgetFact[], side: "expenditure" | "revenue", year: number | null): boolean {
-  if (year === null) return false;
-  const rows = chooseActivePublicFacts(facts).filter((fact) => fact.side === side && fact.year === year && !isDerivedTotalItemId(fact.itemId));
-  return rows.length > 0 && rows.every((fact) => fact.basis === "planned");
 }
 
 export function buildHubCards(

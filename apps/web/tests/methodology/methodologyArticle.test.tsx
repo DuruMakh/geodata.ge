@@ -76,6 +76,25 @@ function renderArticle(dataset: "debt" | "expenditure") {
   }));
 }
 
+describe("the basis key fact of a budget side whose latest year is a plan", () => {
+  const basisOf = (markup: string, label: string) => markup.match(new RegExp(`<dt[^>]*>${label}</dt><dd[^>]*>([^<]*)</dd>`))?.[1];
+
+  it.each([
+    ["ka", "საფუძველი", "12-თვიანი ფაქტობრივი შესრულება, 2004–2025; 2026 — დამტკიცებული გეგმა"],
+    ["en", "Basis", "Actual execution for the full 12 months, 2004–2025; 2026: approved plan"],
+  ] as const)("names the plan year apart from the actual years: %s", async (locale, label, basis) => {
+    const { renderMethodologyArticle } = await import("../../lib/pages/methodology-article");
+    const markup = renderToStaticMarkup(await renderMethodologyArticle(locale, { params: Promise.resolve({ dataset: "expenditure" }) }));
+    expect(basisOf(markup, label)).toBe(basis);
+  });
+
+  it("leaves an all-actual side's basis as written", async () => {
+    const { renderMethodologyArticle } = await import("../../lib/pages/methodology-article");
+    const markup = renderToStaticMarkup(await renderMethodologyArticle("ka", { params: Promise.resolve({ dataset: "revenue" }) }));
+    expect(basisOf(markup, "საფუძველი")).toBe(METHODOLOGY_CONTENT.revenue.keyFacts.find((fact) => fact.valueKind === "basis")?.value);
+  });
+});
+
 describe("methodology processed-download caption", () => {
   // Debt describes its CSV with neutral status metadata rather than fact/plan metadata; every category keeps
   // its existing download link and the shared format/licence caption.
