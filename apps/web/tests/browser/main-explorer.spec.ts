@@ -3,6 +3,7 @@ import { expect, test, type APIRequestContext, type Page } from "@playwright/tes
 import ExcelJS from "exceljs";
 import { expectReadableText } from "./color-contrast";
 import { expectEnglish } from "./expect-english";
+import { tableSeriesValues } from "./explorer-table";
 import { TEST_BASE_URL } from "./test-base-url";
 
 // A line chart without its own label is named "{first series}, {count} სერია, {first}–{last}".
@@ -139,7 +140,7 @@ test("explorer hydrates with the editorial shell and default expenditure view", 
   await expect(page.getByTestId("series-selector")).toContainText("სერიები");
   await expect(page.getByTestId("series-status")).toContainText(/სერიები\s*1 \/ \d+/);
   await expect(page.getByTestId("source-label")).toContainText("გადამოწმებული ოფიციალური საბიუჯეტო დოკუმენტები");
-  await expect(page.getByTestId("source-label").getByText("ხარჯვითი მონაცემები: 2004–2025", { exact: true })).toBeVisible();
+  await expect(page.getByTestId("source-label").getByText("ხარჯვითი მონაცემები: 2004–2026", { exact: true })).toBeVisible();
   await expect(page.getByTestId("source-label")).toContainText("მშპ: საქსტატი, მიმდინარე ფასებში");
   await expect(page.getByTestId("source-label")).toContainText("2025 წლის მშპ წინასწარია");
 
@@ -281,7 +282,7 @@ test("explorer controls expose line, table, grouping, and the share pill", async
   await expect(page.getByTestId("explorer-table")).toContainText("მთლიანი ხარჯი");
   await expect(page.getByTestId("explorer-table")).not.toContainText("ცვლილება");
   await expect(page.getByTestId("explorer-table").locator("caption")).toHaveText(
-    "ხარჯვითი მონაცემები — ხარჯები ლარში, 2004–2025",
+    "ხარჯვითი მონაცემები — ხარჯები ლარში, 2004–2026",
   );
 
   await chartPanel.getByTestId("chart-mode-line").click();
@@ -300,7 +301,7 @@ test("explorer controls expose line, table, grouping, and the share pill", async
   await expect(page.getByTestId("explorer-table")).not.toContainText("წილი მშპ-ში 2025");
   await expect(page.getByTestId("explorer-table")).not.toContainText("100.0%");
   await expect(page.getByTestId("explorer-table").locator("caption")).toHaveText(
-    "უწყებრივი მონაცემები — წილი მშპ-ში, 2004–2025",
+    "უწყებრივი მონაცემები — წილი მშპ-ში, 2004–2026",
   );
 
   expect(consoleProblems).toEqual([]);
@@ -497,7 +498,7 @@ test("2004 expenditure is complete across functions, ministries, GDP share, and 
   await expectAppReady(page);
 
   const fields = page.getByTestId("series-selector");
-  await expect(page.getByTestId("year-range-strip")).toContainText("2004–2025");
+  await expect(page.getByTestId("year-range-strip")).toContainText("2004–2026");
   await expect(fields.locator('[data-level="public_field"]')).toHaveCount(13);
   await expect(fields.getByTitle("ჯანდაცვა")).toBeVisible();
   await expect(fields.getByTitle("სოციალური დაცვა")).toBeVisible();
@@ -526,7 +527,7 @@ test("2004 expenditure is complete across functions, ministries, GDP share, and 
   expect(JSON.stringify(functionalExport.workbook.getWorksheet("მარტივი ცხრილი")!.getSheetValues())).not.toContain("1500000000");
 
   await page.getByTestId("grouping-ministries").click();
-  await expect(page.getByTestId("year-range-strip")).toContainText("2004–2025");
+  await expect(page.getByTestId("year-range-strip")).toContainText("2004–2026");
   await fields.getByTestId("series-toggle-all").click();
   await fields.getByTestId("series-toggle-all").click();
   const ministryExport = await downloadWorkbook(page);
@@ -574,7 +575,7 @@ test("range strip supports chips and dragging handles", async ({ page }) => {
   await expectAppReady(page);
 
   const strip = page.getByTestId("year-range-strip");
-  await expect(strip).toContainText("2004–2025");
+  await expect(strip).toContainText("2004–2026");
   await expect(strip).toContainText("10წ");
   for (const testId of ["range-start-handle", "range-end-handle"]) {
     const box = await strip.getByTestId(testId).boundingBox();
@@ -596,10 +597,10 @@ test("range strip supports chips and dragging handles", async ({ page }) => {
   await page.mouse.move(railBox.x + railBox.width / 2, startBox.y + startBox.height / 2, { steps: 8 });
   await page.mouse.up();
 
-  await expect(strip).toContainText("2015–2025");
+  await expect(strip).toContainText("2015–2026");
 
   await strip.getByRole("button", { name: "ყველა" }).click();
-  await expect(strip).toContainText("2004–2025");
+  await expect(strip).toContainText("2004–2026");
 });
 
 test("URL hash round-trips explorer state", async ({ page }) => {
@@ -883,7 +884,7 @@ test("analysis view renders the fixed single-year section order", async ({ page 
   await expect(page.getByTestId("budget-field")).toBeVisible();
   await expect(page.getByTestId("single-year-ranking")).toBeVisible();
   await expect(page.getByTestId("single-year-ranking").locator("caption")).toHaveText(
-    "ხარჯები სფეროების მიხედვით — სრული რეიტინგი, 2025",
+    "ხარჯები სფეროების მიხედვით — სრული რეიტინგი, 2026",
   );
   await expect(page.getByTestId("single-year-ranking").locator("thead th")).toHaveCount(4);
   await expect(page.getByTestId("single-year-ranking").getByTestId("ranking-share-bar").first()).toBeVisible();
@@ -969,7 +970,7 @@ test("the analysis tabs and year row work from the keyboard", async ({ page }) =
 });
 
 test("budget field identifies a circle with its category and amount on hover and focus", async ({ page }) => {
-  await page.goto(`${TEST_BASE_URL}/explorer/analysis`);
+  await page.goto(`${TEST_BASE_URL}/explorer/analysis#as=expenditure&ay=2025`);
   await expectAppReady(page);
 
   const field = page.getByTestId("budget-field");
@@ -1529,8 +1530,8 @@ test("hub lists seven cards, all seven live", async ({ page }) => {
 
   // Absence alone would pass on a hub whose footers all came back null, so also
   // assert a real figure is there. The shape, not the figure: the number moves
-  // with every dataset update, the "<year> · <n.n> მლრდ ₾" contract does not.
-  await expect(page.getByTestId("hub-card").first()).toContainText(/\d{4} · [\d,]+\.\d მლრდ ₾/);
+  // with every dataset update, the "<year>[ გეგმა] · <n.n> მლრდ ₾" contract does not.
+  await expect(page.getByTestId("hub-card").first()).toContainText(/\d{4}( გეგმა)? · [\d,]+\.\d მლრდ ₾/);
   const types = page.getByTestId("hub-card").nth(1);
   await expect(types).toContainText("ხარჯების სახეები");
   await expect(types).toHaveAttribute("href", "/explorer/expenditure-types");
@@ -1576,5 +1577,93 @@ test("legacy nav hashes redirect to their route", async ({ page }) => {
   await expect(page.getByTestId("explorer-table")).toBeVisible();
 
   expect(consoleProblems).toEqual([]);
+});
+// The 2026 state budget is a plan. The Spending headline, chart, table and workbook mark it as one and compare it with
+// 2025 actual; the revenue side has no 2026 and stays as it was.
+for (const [path, text, lead] of [
+  ["/explorer/expenditure", /^2026 გეგმა: სულ\s*30\.9 მლრდ ₾\s*\+11\.4%$/, "ka"],
+  ["/en/explorer/expenditure", /^2026 plan: Total\s*30\.9 bn GEL\s*\+11\.4%$/, "en"],
+] as const) {
+  test(`the Spending headline names 2026 as a plan on one line at 375px: ${lead}`, async ({ page }) => {
+    await page.setViewportSize({ width: 375, height: 800 });
+    await page.goto(`${TEST_BASE_URL}${path}`);
+    await expectAppReady(page);
+
+    const headline = page.getByTestId("budget-deck");
+    await expect(headline).toContainText("2026");
+    await expect(headline).toHaveText(text);
+    const lines = await headline.evaluate((element) => {
+      const lineHeight = parseFloat(getComputedStyle(element).lineHeight);
+      return Math.round(element.getBoundingClientRect().height / lineHeight);
+    });
+    expect(lines).toBe(1);
+    await expectNoPageOverflow(page);
+  });
+}
+
+test("2026 is a hollow point and a marked table cell on the by-area and by-ministry views", async ({ page }) => {
+  await page.goto(`${TEST_BASE_URL}/explorer/expenditure#m=table&r=2024-2026`);
+  await expectAppReady(page);
+
+  const table = page.getByTestId("explorer-table");
+  const fields = await tableSeriesValues(table, "");
+  expect(fields[2]).toContain("გეგმა");
+  expect([fields[0], fields[1]].join(" ")).not.toContain("გეგმა");
+
+  await page.goto(`${TEST_BASE_URL}/explorer/expenditure#g=ministries&m=table&r=2024-2026`);
+  await page.reload();
+  await expectAppReady(page);
+  const ministries = await tableSeriesValues(page.getByTestId("explorer-table"), "");
+  expect(ministries[2]).toContain("გეგმა");
+  expect([ministries[0], ministries[1]].join(" ")).not.toContain("გეგმა");
+
+  await page.goto(`${TEST_BASE_URL}/explorer/expenditure#g=ministries&m=line&r=2024-2026`);
+  await page.reload();
+  await expectAppReady(page);
+  await expect(page.getByTestId("chart-frame").locator("circle[fill='#F7F2E9']")).not.toHaveCount(0);
+});
+
+test("the Excel workbook marks 2026 as planned", async ({ page }) => {
+  await page.goto(`${TEST_BASE_URL}/explorer/expenditure#m=table&r=2025-2026`);
+  await expectAppReady(page);
+
+  const { workbook } = await downloadWorkbook(page);
+  const rows = (workbook.getWorksheet("მონაცემები")!.getRows(2, 40) ?? []).map((row) => row.values);
+  expect(rows).toContainEqual(expect.arrayContaining([2026, "მთლიანი ხარჯი", 30_881_358_000, "გეგმა"]));
+  expect(rows).toContainEqual(expect.arrayContaining([2025, "მთლიანი ხარჯი", "ფაქტი"]));
+});
+
+test("a year with only a plan is selectable on the analysis page and labelled as planned budget data", async ({ page }) => {
+  await page.goto(`${TEST_BASE_URL}/explorer/analysis`);
+  await expectAppReady(page);
+
+  // 2026 is the default year of the spending side: the newest year there is.
+  await expect(page.getByTestId("single-year-snapshot")).toContainText("გეგმური ბიუჯეტის მონაცემები");
+  await expect(page.getByTestId("analysis-year-selector")).toContainText("2026");
+  await expect(page.getByTestId("analysis-year-selector")).toContainText("გეგმა");
+
+  await page.goto(`${TEST_BASE_URL}/explorer/analysis#as=expenditure&ag=ministries&ay=2026`);
+  await page.reload();
+  await expectAppReady(page);
+  await expect(page.getByTestId("single-year-snapshot")).toContainText("გეგმური ბიუჯეტის მონაცემები");
+  await expect(page.getByTestId("analysis-year-selector")).toContainText("გეგმა");
+
+  // The revenue side has no 2026: no such year, no plan label.
+  await page.goto(`${TEST_BASE_URL}/explorer/analysis#as=revenue&ay=2026`);
+  await page.reload();
+  await expectAppReady(page);
+  await expect(page.getByTestId("analysis-year-selector")).not.toContainText("2026");
+  await expect(page.getByTestId("single-year-snapshot")).not.toContainText("გეგმური ბიუჯეტის მონაცემები");
+});
+
+test("the revenue side shows no 2026 column, point or empty year", async ({ page }) => {
+  await page.goto(`${TEST_BASE_URL}/explorer/revenue#m=table`);
+  await expectAppReady(page);
+
+  await expect(page.getByTestId("year-range-strip")).toContainText("2004–2025");
+  await expect(page.getByTestId("year-range-strip")).not.toContainText("2026");
+  await expect(page.getByTestId("explorer-table")).not.toContainText("2026");
+  await expect(page.getByTestId("budget-deck")).toContainText("2025");
+  await expect(page.getByTestId("budget-deck")).not.toContainText("გეგმა");
 });
 });

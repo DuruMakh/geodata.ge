@@ -43,6 +43,7 @@
   "landing.municipalDescription": "Budgets for {municipalities} municipalities and {regions} regions in {year}.",
   "landing.actual": "Actual execution",
   "landing.planned": "Planned",
+  "landing.plannedYear": "{year} plan",
   "landing.mixed": "Actual and planned",
   "landing.latestYear": "Latest available year",
   "landing.share": "Share",

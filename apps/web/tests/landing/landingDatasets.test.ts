@@ -48,6 +48,15 @@ describe("buildLandingDatasetLinks", () => {
     ]);
   });
 
+  it("says so when the latest spending year is a plan", async () => {
+    for (const [locale, plan] of [["ka", "2026 გეგმა"], ["en", "2026 plan"]] as const) {
+      const messages = await getMessages(locale, ["common", "landing", "inflation", "trade"]);
+      const planned = { ...input, expenditure: { latestYear: 2026, totalGel: 30_881_358_000, basis: "planned" as const } };
+      const [budget] = buildLandingDatasetLinks(planned as Parameters<typeof buildLandingDatasetLinks>[0], { locale, messages });
+      expect(budget).toMatchObject({ period: plan, value: locale === "ka" ? "30.9 მლრდ ₾" : "30.9 bn GEL" });
+    }
+  });
+
   it("speaks English on /en", async () => {
     const messages = await getMessages("en", ["common", "landing", "inflation", "trade"]);
     const links = buildLandingDatasetLinks(input as Parameters<typeof buildLandingDatasetLinks>[0], { locale: "en", messages });

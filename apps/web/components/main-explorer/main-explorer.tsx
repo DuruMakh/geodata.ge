@@ -12,8 +12,9 @@ import type {
   ClientBudgetFact,
   ClientNationalGdpFact,
 } from "../../lib/explorer/clientData";
+import { chooseActivePublicFacts } from "../../lib/data/activeFacts";
 import { unpackFacts, type FactsInput } from "../../lib/data/packedFacts";
-import { buildExplorerModel } from "../../lib/explorer/explorerData";
+import { buildExplorerModel, isDerivedTotalItemId } from "../../lib/explorer/explorerData";
 import { buildBudgetWorkbookInput } from "../../lib/explorer/budgetWorkbook";
 import { formatAmount, unitFor, unitsFor } from "../../lib/explorer/format";
 import { useAppReady } from "../explorer-shell/use-app-ready";
@@ -129,12 +130,20 @@ function MainExplorerContent({ nav, facts: shippedFacts, adminFacts: shippedAdmi
     const previousTotal = previousYear === undefined ? null : totals.get(previousYear) ?? null;
     const yoy = latestTotal !== null && previousTotal ? (latestTotal - previousTotal) / previousTotal : null;
 
+    // A latest year that is only a plan says so ("2026 plan: Total 30.9 bn GEL +11.4% year on year"); the change then
+    // compares the plan with the year before, which the total above already resolves to actual where both exist.
+    const latestFacts = scope === "ministries"
+      ? adminFacts.filter((fact) => fact.level === "admin_category" && fact.year === latestYear)
+      : chooseActivePublicFacts(facts).filter((fact) => fact.side === (scope === "revenue" ? "revenue" : "expenditure") && fact.year === latestYear && !isDerivedTotalItemId(fact.itemId));
+    const planned = latestFacts.length > 0 && latestFacts.every((fact) => fact.basis === "planned");
+    const yearLabel = planned ? message(messages, "main.plannedYear", { year: latestYear }) : String(latestYear);
+
     // The line says what the figure is (U04-11): "2025: Total 32.4 bn GEL +8.8% year on year". The heading names the
     // side, so "Total" is enough, and the line stays one line at 375px in both languages (DESIGN.md §17).
     return latestTotal === null
       ? { lead: "", yoy }
-      : { measure: `${latestYear}: ${message(messages, "main.total")}`, lead: formatAmount(latestTotal, locale), yoy };
-  }, [totalsByScope, scope, scopeYears, locale, messages]);
+      : { measure: `${yearLabel}: ${message(messages, "main.total")}`, lead: formatAmount(latestTotal, locale), yoy, plan: planned };
+  }, [totalsByScope, scope, scopeYears, facts, adminFacts, locale, messages]);
 
   const screenTitle = nav === "expenditure"
     ? message(messages, "main.expenditureHeading")

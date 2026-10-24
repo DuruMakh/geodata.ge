@@ -201,6 +201,23 @@ describe("buildHubCards", () => {
   });
 });
 
+describe("buildHubCards with a planned latest spending year", () => {
+  const WITH_PLAN = [...FACTS, fact("expenditure", "spending.health", 2026, 11_000_000_000, "planned")];
+
+  it("marks the spending card and the analysis card's year as a plan, and leaves revenue alone", () => {
+    const cards = buildHubCards(WITH_PLAN, MUNICIPAL_TOTALS, DEBT_FACTS);
+
+    expect(cards[0].footer).toBe("2026 გეგმა · 11.0 მლრდ ₾");
+    expect(cards[4].footer).toBe("2026 გეგმა · 1 კატეგორია");
+    expect(cards[2].footer).toBe("2025 · 4.0 მლრდ ₾");
+    expect(cards[2].series).toEqual([3_000_000_000, 4_000_000_000]);
+  });
+
+  it("keeps an actual latest year unmarked", () => {
+    expect(buildHubCards(FACTS, MUNICIPAL_TOTALS, DEBT_FACTS)[0].footer).toBe("2025 · 9.0 მლრდ ₾");
+  });
+});
+
 describe("buildHubCards over the served data", () => {
   let input: { facts: Parameters<typeof buildHubCards>[0]; municipalCountryTotalFacts: { year: number; publicTotalGel: number }[]; debtFacts: ServedGovernmentDebtFact[]; balanceFacts: ServedGeneralGovernmentBalanceFact[] };
   let ka: Presentation, en: Presentation;
@@ -208,7 +225,7 @@ describe("buildHubCards over the served data", () => {
     const [landing, municipal, debt, balance] = await Promise.all([loadServedLandingData(), loadServedMunicipalData(), loadServedGovernmentDebtData(), loadServedGeneralGovernmentBalanceData()]);
     input = { facts: landing.facts, municipalCountryTotalFacts: municipal.countryTotalFacts, debtFacts: debt.facts, balanceFacts: balance.facts };
     const ids = [...landing.glossary.keys(), ...municipal.municipalities.map(entity => entity.code), "debt.stock.domestic", "debt.stock.external"];
-    [ka, en] = await Promise.all([getPresentation("ka", ["common", "landing", "hub"], ids), getPresentation("en", ["common", "landing", "hub"], ids)]);
+    [ka, en] = await Promise.all([getPresentation("ka", ["common", "landing", "main", "hub"], ids), getPresentation("en", ["common", "landing", "main", "hub"], ids)]);
   });
 
   it("keeps hub destinations, sparkline values, coverage and ordering unchanged", () => {

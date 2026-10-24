@@ -43,6 +43,7 @@
   "landing.municipalDescription": "{municipalities} მუნიციპალიტეტისა და {regions} რეგიონის {year} წლის ბიუჯეტები.",
   "landing.actual": "ფაქტობრივი შესრულება",
   "landing.planned": "გეგმა",
+  "landing.plannedYear": "{year} გეგმა",
   "landing.mixed": "ფაქტი და გეგმა",
   "landing.latestYear": "ბოლო ხელმისაწვდომი წელი",
   "landing.share": "წილი",
