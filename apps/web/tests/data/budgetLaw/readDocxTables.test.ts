@@ -62,4 +62,12 @@ describe("readDocxTables", () => {
     expect(sha256(BUDGET_LAW_2026.tavi6DocxPath)).toBe(BUDGET_LAW_2026.tavi6Sha256);
     expect(BUDGET_LAW_2026.sourceId).toBe("source.mof_2026_budget_law_planned");
   });
+
+  it("ties the converted Tavi III to the archived original through its provenance record", () => {
+    const provenance = JSON.parse(readFileSync(`${BUDGET_LAW_2026.tavi3DocxPath}.provenance.json`, "utf8")) as Record<string, string>;
+    expect(provenance.sourceSha256).toBe(BUDGET_LAW_2026.tavi3Sha256);
+    expect(path.join(repositoryRoot, provenance.sourceFile)).toBe(originalTavi3Path);
+    expect(path.join(repositoryRoot, provenance.convertedFile)).toBe(BUDGET_LAW_2026.tavi3DocxPath);
+    expect(provenance.convertedSha256).toBe(sha256(BUDGET_LAW_2026.tavi3DocxPath));
+  });
 });
