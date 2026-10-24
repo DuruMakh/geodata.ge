@@ -353,6 +353,86 @@ const PROGRAM_SEMANTIC_ERAS = [
     endYear: 2018,
     key: "international_obligations",
   },
+  // 2026 planned rows (budget law Tavi VI), reviewed in
+  // data/mappings/review/admin-spending-program-concordance-2026.csv. A same-code programme whose
+  // 2025 era continues gets a 2026 entry with the same key (identical label); a code the law
+  // reuses for a different programme gets its own key so it never joins the 2025 series.
+  {
+    // Code reuse: 2025's 24 15 (electricity and gas supply) moved to 24 21 with no 2026 amount;
+    // the 2026 24 15 is 2025's 24 16 maritime vocational education.
+    code: "24 15",
+    parentItemId: "admin_spending.economy_sustainable_development",
+    startYear: 2026,
+    endYear: 2026,
+    key: "maritime_vocational_education",
+  },
+  {
+    // Code reuse: 2025's 25 05 (solid waste) moved to 31 16. The 2026 25 05 widens 2025's 25 06
+    // school construction to higher education: a perimeter change, so a new series.
+    code: "25 05",
+    parentItemId: "admin_spending.regional_development_infrastructure",
+    startYear: 2026,
+    endYear: 2026,
+    key: "educational_institutions_construction",
+  },
+  {
+    // Code reuse: 2025's 25 07 (tourism) is 25 06 in 2026. The 2026 25 07 is 2025's 25 08 sport
+    // infrastructure, which never reached 100M GEL, so it starts a new series under its own key.
+    code: "25 07",
+    parentItemId: "admin_spending.regional_development_infrastructure",
+    startYear: 2026,
+    endYear: 2026,
+    key: "sport_infrastructure",
+  },
+  {
+    code: "26 02",
+    parentItemId: "admin_spending.justice",
+    startYear: 2026,
+    endYear: 2026,
+    key: "penitentiary_system",
+  },
+  {
+    code: "29 07",
+    parentItemId: "admin_spending.defence",
+    startYear: 2026,
+    endYear: 2026,
+    key: "defence_capabilities",
+  },
+  {
+    code: "29 08",
+    parentItemId: "admin_spending.defence",
+    startYear: 2026,
+    endYear: 2026,
+    key: "logistics",
+  },
+  {
+    code: "30 01",
+    parentItemId: "admin_spending.internal_affairs",
+    startYear: 2026,
+    endYear: 2026,
+    key: "public_order",
+  },
+  {
+    code: "30 02",
+    parentItemId: "admin_spending.internal_affairs",
+    startYear: 2026,
+    endYear: 2026,
+    key: "border_protection",
+  },
+  {
+    code: "31 06",
+    parentItemId: "admin_spending.environment_agriculture",
+    startYear: 2026,
+    endYear: 2026,
+    key: "irrigation_modernization",
+  },
+  {
+    code: "33 02",
+    parentItemId: "admin_spending.culture",
+    startYear: 2026,
+    endYear: 2026,
+    key: "culture_development",
+  },
   // Pre-2017 code reuses: these program codes were later recycled for a DIFFERENT 2017+ program.
   // Give the pre-2017 program its own identity so its amount does not merge into (and contaminate)
   // the modern program; the drill-down filter below then drops it, because a program that no longer
@@ -504,7 +584,17 @@ function programRows(rows: OfficialExpenditureRow[]): OfficialExpenditureRow[] {
   return rows.filter((row) => row.code && row.depth === 2 && row.actualThousandGel > 0);
 }
 
-export function generateAdminSpendingFacts(rows: OfficialExpenditureRow[]): AdminSpendingFact[] {
+export type GenerateAdminSpendingFactsOptions = {
+  /** Years whose rows are a budget plan (the law), not an execution report: their facts get basis planned. */
+  plannedYears?: readonly number[];
+};
+
+export function generateAdminSpendingFacts(
+  rows: OfficialExpenditureRow[],
+  options: GenerateAdminSpendingFactsOptions = {},
+): AdminSpendingFact[] {
+  const plannedYears = new Set(options.plannedYears ?? []);
+  const basisFor = (year: number): AdminSpendingFact["basis"] => (plannedYears.has(year) ? "planned" : "actual");
   const facts: AdminSpendingFact[] = [];
   const categoryAmounts = new Map<string, number>();
   const categorySources = new Map<string, Set<string>>();
@@ -527,7 +617,7 @@ export function generateAdminSpendingFacts(rows: OfficialExpenditureRow[]): Admi
       parentItemId: null,
       level: "admin_category",
       amountGel: amount,
-      basis: "actual",
+      basis: basisFor(Number(yearText)),
       sourceId: Array.from(categorySources.get(key) ?? []).sort().join(";"),
       officialCode: null,
       officialLabelKa: null,
@@ -546,15 +636,25 @@ export function generateAdminSpendingFacts(rows: OfficialExpenditureRow[]): Admi
   // identity into the major-program set. This also subsumes the old "present in 2017+" filter —
   // any qualifying identity necessarily has a modern row — so abolished pre-2017 programs
   // (their identity never reaches the threshold in a modern year) are dropped automatically.
-  const qualifyingIds = new Set(
-    programs
-      .filter((row) => row.year >= MAJOR_PROGRAM_MODERN_MIN_YEAR && amountGel(row) >= MAJOR_PROGRAM_THRESHOLD_GEL)
-      .map((row) => programItemId(row)),
-  );
+  // A planned year qualifies a series only for planned years: a plan figure never promotes the
+  // actual points of a series that stayed below the threshold in every executed year.
+  const qualifyingIdsFor = (planned: boolean) =>
+    new Set(
+      programs
+        .filter(
+          (row) =>
+            plannedYears.has(row.year) === planned &&
+            row.year >= MAJOR_PROGRAM_MODERN_MIN_YEAR &&
+            amountGel(row) >= MAJOR_PROGRAM_THRESHOLD_GEL,
+        )
+        .map((row) => programItemId(row)),
+    );
+  const qualifyingIds = qualifyingIdsFor(false);
+  const plannedQualifyingIds = qualifyingIdsFor(true);
 
   for (const row of programs) {
     const itemId = programItemId(row);
-    if (!qualifyingIds.has(itemId)) continue;
+    if (!qualifyingIds.has(itemId) && !(plannedYears.has(row.year) && plannedQualifyingIds.has(itemId))) continue;
 
     // Joined pre-2012 points belong to their modern series: they carry the series' parent
     // category and a provenance note; officialCode/officialLabel stay source-year truth. The
@@ -569,7 +669,7 @@ export function generateAdminSpendingFacts(rows: OfficialExpenditureRow[]): Admi
       parentItemId,
       level: "major_program",
       amountGel: amountGel(row),
-      basis: "actual",
+      basis: basisFor(row.year),
       sourceId: row.sourceId,
       officialCode: row.code,
       officialLabelKa: row.labelKa,

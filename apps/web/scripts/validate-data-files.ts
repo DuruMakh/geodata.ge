@@ -169,8 +169,7 @@ export async function main() {
     (year) => !plannedOnlyYears.has(year) && !gdpYears.has(year),
   );
 
-  // The planned expenditure file must hold the plan year; the planned admin file
-  // may stay header-only until the plan is loaded, then its years must appear too.
+  // The planned expenditure and admin files must both hold the plan year.
   assertPlannedRows("Planned budget", plannedBudgetRows);
   assertPlannedRows("Planned admin spending", plannedAdminSpendingFacts);
   assertUniqueAdminFacts(adminSpendingFacts);
@@ -186,7 +185,7 @@ export async function main() {
   assertYears(
     "Admin spending",
     sortedYears(adminSpendingFacts.map((row) => row.year)),
-    sortedYears([...ADMIN_SPENDING_YEARS, ...(plannedAdminSpendingFacts.length > 0 ? PLANNED_BUDGET_YEARS : [])]),
+    sortedYears([...ADMIN_SPENDING_YEARS, ...PLANNED_BUDGET_YEARS]),
   );
   assertYears("Municipal", sortedYears(municipalFunctionFacts.map((row) => row.year)), MUNICIPAL_YEARS);
   assertYears(

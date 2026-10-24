@@ -24,10 +24,12 @@ const ELECTION_COMMISSION_LABEL_KA = "საქართველოს ცე�
 // State-wide payments institution -> admin_spending.other_costs (program label is not debt service).
 const STATE_WIDE_PAYMENTS_LABEL_KA = "საერთო-სახელმწიფოებრივი მნიშვნელობის გადასახდელები";
 
-// Eras mirrored in this spec span 2012..2025 (30 01's public_order_and_border reaches back to
-// 2012 since the 2026-07-07 owner decision), so 2011..2026 covers startYear-1 and endYear+1 for
-// every era entry.
-const TEST_YEARS = [2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026];
+// Eras mirrored in this spec span 2012..2026 (30 01's public_order_and_border reaches back to
+// 2012 since the 2026-07-07 owner decision; the 2026 budget-law entries end in 2026), so
+// 2011..2027 covers startYear-1 and endYear+1 for every era entry.
+const TEST_YEARS = [
+  2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026, 2027,
+];
 
 type EraSpec = {
   startYear: number;
@@ -81,6 +83,7 @@ const SEMANTIC_ERA_SPECS: CodeSpec[] = [
     eras: [
       { startYear: 2017, endYear: 2024, key: "displaced_person_support" },
       { startYear: 2025, endYear: 2025, key: "school_infrastructure" },
+      { startYear: 2026, endYear: 2026, key: "tourism_infrastructure", targetCode: "25 07" },
     ],
   },
   {
@@ -90,6 +93,7 @@ const SEMANTIC_ERA_SPECS: CodeSpec[] = [
     eras: [
       { startYear: 2019, endYear: 2024, key: "school_infrastructure", targetCode: "25 06" },
       { startYear: 2025, endYear: 2025, key: "tourism_infrastructure" },
+      { startYear: 2026, endYear: 2026, key: "sport_infrastructure" },
     ],
   },
   {
@@ -108,6 +112,7 @@ const SEMANTIC_ERA_SPECS: CodeSpec[] = [
     eras: [
       { startYear: 2017, endYear: 2018, key: "prosecution" },
       { startYear: 2019, endYear: 2025, key: "penitentiary_system" },
+      { startYear: 2026, endYear: 2026, key: "penitentiary_system" },
     ],
   },
   {
@@ -117,6 +122,7 @@ const SEMANTIC_ERA_SPECS: CodeSpec[] = [
     eras: [
       { startYear: 2017, endYear: 2023, key: "military_industry" },
       { startYear: 2024, endYear: 2025, key: "defence_capabilities" },
+      { startYear: 2026, endYear: 2026, key: "defence_capabilities" },
     ],
   },
   {
@@ -126,6 +132,7 @@ const SEMANTIC_ERA_SPECS: CodeSpec[] = [
     eras: [
       { startYear: 2017, endYear: 2023, key: "defence_capabilities", targetCode: "29 07" },
       { startYear: 2024, endYear: 2025, key: "logistics" },
+      { startYear: 2026, endYear: 2026, key: "logistics" },
     ],
   },
   {
@@ -137,6 +144,7 @@ const SEMANTIC_ERA_SPECS: CodeSpec[] = [
     eras: [
       { startYear: 2012, endYear: 2018, key: "public_order_and_border" },
       { startYear: 2019, endYear: 2025, key: "public_order" },
+      { startYear: 2026, endYear: 2026, key: "public_order" },
     ],
   },
   {
@@ -146,6 +154,7 @@ const SEMANTIC_ERA_SPECS: CodeSpec[] = [
     eras: [
       { startYear: 2017, endYear: 2018, key: "protected_assets_and_persons" },
       { startYear: 2019, endYear: 2025, key: "border_protection" },
+      { startYear: 2026, endYear: 2026, key: "border_protection" },
     ],
   },
   {
@@ -155,6 +164,7 @@ const SEMANTIC_ERA_SPECS: CodeSpec[] = [
     eras: [
       { startYear: 2018, endYear: 2019, key: "agricultural_cooperatives" },
       { startYear: 2020, endYear: 2025, key: "irrigation_modernization" },
+      { startYear: 2026, endYear: 2026, key: "irrigation_modernization" },
     ],
   },
   {
@@ -214,6 +224,7 @@ const SEMANTIC_ERA_SPECS: CodeSpec[] = [
       { startYear: 2017, endYear: 2018, key: "arts_development" },
       { startYear: 2022, endYear: 2024, key: "higher_arts_and_sport_education" },
       { startYear: 2025, endYear: 2025, key: "culture_development" },
+      { startYear: 2026, endYear: 2026, key: "culture_development" },
     ],
   },
   {

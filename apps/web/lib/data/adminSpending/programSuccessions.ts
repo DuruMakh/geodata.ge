@@ -59,6 +59,9 @@ const DEBT = "admin_spending.debt_service";
 const note = (text: string) =>
   `Program code succession joined to the canonical series (owner-approved 2026-07-09). ${text}`;
 
+const lawNote = (text: string) =>
+  `Program code succession joined to the canonical series (2026 budget law concordance). ${text}`;
+
 export const PROGRAM_SUCCESSIONS: ProgramSuccession[] = [
   // ======================= 2019 IDPs/Labour/Health super-ministry merger ======================
   // Identical program labels across the merger; only the ministry (and so the code) changed.
@@ -187,6 +190,25 @@ export const PROGRAM_SUCCESSIONS: ProgramSuccession[] = [
 
   // ---- 2020-2022 pilot-regions integrated development program -> 55 14 (other_costs) ----
   { code: "56 14", parentItemId: OTHER, startYear: 2021, endYear: 2021, targetCode: "55 14", note: note("Pilot-regions program: 56 14 (2021) -> 55 14 (2022), identical label; the program ended with 2022.") },
+
+  // ======================= 2026 budget law (planned) renumbering ==============================
+  // Reviewed in data/mappings/review/admin-spending-program-concordance-2026.csv. Exception to the
+  // "point at the latest code" rule above: these entries point at the series' existing canonical
+  // code, not at the 2026 code, so no 2004-2025 item id changes.
+  { code: "54 01", parentItemId: DEBT, startYear: 2026, endYear: 2026, targetCode: "57 01",
+    note: lawNote("External debt service: 54 01 (2026 plan), identical label.") },
+  { code: "54 02", parentItemId: DEBT, startYear: 2026, endYear: 2026, targetCode: "57 02",
+    note: lawNote("Domestic debt service: 54 02 (2026 plan), identical label.") },
+  { code: "54 04", parentItemId: OTHER, startYear: 2026, endYear: 2026, targetCode: "57 04",
+    note: lawNote("Municipal transfers: 54 04 (2026 plan), identical label.") },
+  { code: "54 11", parentItemId: OTHER, startYear: 2026, endYear: 2026, targetCode: "57 11",
+    note: lawNote("Pension co-financing: 54 11 (2026 plan), identical label.") },
+  { code: "54 14", parentItemId: OTHER, startYear: 2026, endYear: 2026, targetCode: "57 14",
+    note: lawNote("Donor-financed payments: 54 14 (2026 plan), identical label.") },
+  { code: "24 16", parentItemId: ECONOMY, startYear: 2026, endYear: 2026, targetCode: "24 17", targetEraKey: "anaklia_port",
+    note: lawNote("Anaklia deep-sea port: 24 16 (2026 plan) -> 24 17 (2021-2025), identical label.") },
+  { code: "25 06", parentItemId: REGIONAL, startYear: 2026, endYear: 2026, targetCode: "25 07", targetEraKey: "tourism_infrastructure",
+    note: lawNote("Tourism infrastructure improvement: 25 06 (2026 plan) -> 25 07 (2025), identical label.") },
 ];
 
 export function findProgramSuccession(

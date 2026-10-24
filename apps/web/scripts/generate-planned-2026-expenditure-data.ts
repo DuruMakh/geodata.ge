@@ -1,7 +1,6 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
-import { parseAdminWorkbookRows } from "../lib/data/adminSpending/extractWorkbooks";
-import { lawFunctionalRows, lawTavi6Matrix } from "../lib/data/budgetLaw/lawRows";
+import { lawFunctionalRows, lawTavi6OfficialRows } from "../lib/data/budgetLaw/lawRows";
 import { readDocxTables } from "../lib/data/budgetLaw/readDocxTables";
 import { BUDGET_LAW_2026 } from "../lib/data/budgetLaw/sources";
 import { readCsvRecords } from "../lib/data/csv";
@@ -69,15 +68,7 @@ async function main() {
     );
   }
 
-  const [tavi6Table] = readDocxTables(BUDGET_LAW_2026.tavi6DocxPath);
-  if (!tavi6Table) throw new Error("Tavi VI has no table.");
-  const workbookRows = parseAdminWorkbookRows({
-    year,
-    sourceId: BUDGET_LAW_2026.sourceId,
-    workbookPath: tavi6Path,
-    sheetName: "Tavi VI",
-    matrix: lawTavi6Matrix(tavi6Table),
-  });
+  const workbookRows = lawTavi6OfficialRows();
   const totalRow = workbookRows.find((row) => row.isTotal && row.code === "00 00");
   if (!totalRow) throw new Error("Tavi VI has no 00 00 grand total row.");
 

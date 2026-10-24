@@ -78,9 +78,9 @@ describe("buildFactQuerySnapshot", () => {
   });
 
   it("carries the national, ministries, municipal and gdp facts", async () => {
-    // 527 + 13: the planned 2026 spending-field rows from the budget law.
+    // 527 + 13 and 852 + 62: the planned 2026 rows from the budget law (spending fields, ministries).
     expect(snapshot.national.facts.length).toBe(540);
-    expect(snapshot.ministries.facts.length).toBe(852);
+    expect(snapshot.ministries.facts.length).toBe(914);
     expect(snapshot.municipal.functionFacts.length).toBe(7040);
     expect(snapshot.municipal.totalFacts.length).toBe(704);
     expect(snapshot.gdpFacts.length).toBe(30);
@@ -135,10 +135,12 @@ describe("buildFactQuerySnapshot", () => {
   // LEGACY_PROGRAM_JOINS carries year, so the joined years are in the tables already —
   // 50 legacy-join cells across 9 series, 140 further succession cells across 20
   // series (four of the 20 are also reached by a legacy join), 190 cells and 25
-  // distinct series once deduplicated. Cross-checked against the reviewed CSV's own
+  // distinct series once deduplicated; the 2026 budget-law successions add 7 cells
+  // (2026 points of 57 01/02/04/11/14, 25 07 tourism and 24 17 Anaklia, the last a new
+  // series), so 197 cells and 26 series. Cross-checked against the reviewed CSV's own
   // mapping_notes and ministries-drilldown-programs-methodology.md §6. Asserting the
   // exact totals here is what keeps program_historical_join honest: a derivation that
-  // silently widened to whole series would blow past 190.
+  // silently widened to whole series would blow past 197.
   it("resolves historical joins to the exact served cells that came in through a join", async () => {
     const servedProgramCells = new Set(
       snapshot.ministries.facts.filter((f) => f.level === "major_program").map((f) => `${f.itemId}:${f.year}`),
@@ -146,8 +148,8 @@ describe("buildFactQuerySnapshot", () => {
     const cells = snapshot.ministries.historicalJoinSeriesYears;
     const seriesIds = new Set(cells.map((cell) => cell.slice(0, cell.lastIndexOf(":"))));
 
-    expect(cells.length).toBe(190);
-    expect(seriesIds.size).toBe(25);
+    expect(cells.length).toBe(197);
+    expect(seriesIds.size).toBe(26);
 
     // Every joined cell is a real served major_program row: the caveat can never pin
     // to a cell the query would return as missing.

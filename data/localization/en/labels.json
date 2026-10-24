@@ -555,6 +555,10 @@
     "text": "Entrepreneurship development",
     "reviewedAt": "2026-09-05"
   },
+  "admin_program.24_08.4514cb34": {
+    "text": "Development of innovation and technology in Georgia",
+    "reviewedAt": "2026-10-24"
+  },
   "admin_program.24_14.6c3a02c8": {
     "text": "Development of the systemically important electricity transmission network",
     "reviewedAt": "2026-09-05"
@@ -579,6 +583,10 @@
     "text": "Restoration and rehabilitation of water supply infrastructure",
     "reviewedAt": "2026-09-05"
   },
+  "admin_program.25_05.a7e898c6": {
+    "text": "Construction and rehabilitation of educational institutions",
+    "reviewedAt": "2026-10-24"
+  },
   "admin_program.25_05.fa6f4fd1": {
     "text": "Solid waste management programme",
     "reviewedAt": "2026-09-05"
@@ -586,6 +594,10 @@
   "admin_program.25_06.b29bf400": {
     "text": "Construction and rehabilitation of general education and preschool institutions",
     "reviewedAt": "2026-09-05"
+  },
+  "admin_program.25_07.9b10dc83": {
+    "text": "Sport infrastructure support activities",
+    "reviewedAt": "2026-10-24"
   },
   "admin_program.25_07.b8cdb293": {
     "text": "Tourism infrastructure improvement activities",
@@ -659,6 +671,10 @@
     "text": "Improvement of civil safety and establishment and management of state material reserves",
     "reviewedAt": "2026-09-05"
   },
+  "admin_program.31_02.4c716ffc": {
+    "text": "Food safety, plant protection and epizootic well-being",
+    "reviewedAt": "2026-10-24"
+  },
   "admin_program.31_03.c8e552ff": {
     "text": "Development of viticulture and winemaking",
     "reviewedAt": "2026-09-05"
@@ -683,6 +699,10 @@
     "text": "Higher education",
     "reviewedAt": "2026-09-05"
   },
+  "admin_program.32_06.75b0daad": {
+    "text": "Inclusive education",
+    "reviewedAt": "2026-10-24"
+  },
   "admin_program.32_07.1f0c1c68": {
     "text": "Infrastructure development",
     "reviewedAt": "2026-09-05"
@@ -698,6 +718,14 @@
   "admin_program.34_02.2dcd3ddf": {
     "text": "Development and promotion of grassroots and high-performance sport",
     "reviewedAt": "2026-09-05"
+  },
+  "admin_program.40_01.4da4c450": {
+    "text": "Security of protected persons and facilities",
+    "reviewedAt": "2026-10-24"
+  },
+  "admin_program.54_07.a43df73b": {
+    "text": "Fund for projects implemented in the regions of Georgia",
+    "reviewedAt": "2026-10-24"
   },
   "admin_program.55_14.7452e9e9": {
     "text": "Financing selected municipal projects under the 2020–2022 Pilot Integrated Regional Development Programme",

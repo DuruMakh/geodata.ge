@@ -1,6 +1,10 @@
+import { createHash } from "node:crypto";
+import { readFileSync } from "node:fs";
+import { parseAdminWorkbookRows } from "../adminSpending/extractWorkbooks";
 import type { MatrixCell } from "../realExpenditure/parseTavi6Rows";
+import type { OfficialExpenditureRow } from "../realExpenditure/types";
 import { buildRowId, parentFunctionalCode, type ExpenditurePdfOfficialRow } from "../realExpenditurePdf/phase1Pilot";
-import { parseThousandGel } from "./readDocxTables";
+import { parseThousandGel, readDocxTables } from "./readDocxTables";
 import { BUDGET_LAW_2026 } from "./sources";
 
 /** Both law tables print code, label, 2024 fact, 2025 plan, 2026 plan (then the 2026 funding split). */
@@ -81,4 +85,25 @@ export function lawTavi6Matrix(table: string[][]): MatrixCell[][] {
   return table
     .filter((row) => row[1] && row[1] !== "დასახელება")
     .map((row) => [row[0] || null, row[1], null, null, parseThousandGel(row[LAW_AMOUNT_COLUMNS.plan2026] ?? "")]);
+}
+
+/**
+ * The 2026 law's Tavi VI (Article 16) rows in the tavi-6 official-row shape, with the 2026 plan
+ * read as the amount. Checks the archived file's hash first. The uncoded headcount and economic
+ * breakdown rows come back with no code, so the admin generator never counts them.
+ */
+export function lawTavi6OfficialRows(): OfficialExpenditureRow[] {
+  const sha256 = createHash("sha256").update(readFileSync(BUDGET_LAW_2026.tavi6DocxPath)).digest("hex");
+  if (sha256 !== BUDGET_LAW_2026.tavi6Sha256) {
+    throw new Error(`Hash mismatch for ${BUDGET_LAW_2026.tavi6DocxPath}: expected ${BUDGET_LAW_2026.tavi6Sha256}, got ${sha256}`);
+  }
+  const [table] = readDocxTables(BUDGET_LAW_2026.tavi6DocxPath);
+  if (!table) throw new Error("Tavi VI has no table.");
+  return parseAdminWorkbookRows({
+    year: 2026,
+    sourceId: BUDGET_LAW_2026.sourceId,
+    workbookPath: "docs/Raw Data/Expenditure/mof.ge/budget-law-2026/2026-tavi-VI.docx",
+    sheetName: "Tavi VI",
+    matrix: lawTavi6Matrix(table),
+  });
 }

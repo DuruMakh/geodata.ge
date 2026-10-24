@@ -8,6 +8,8 @@ import {
   MAJOR_PROGRAM_THRESHOLD_GEL,
 } from "../lib/data/adminSpending/generateAdminSpendingFacts";
 import type { AdminSpendingFact } from "../lib/data/adminSpending/types";
+import { lawTavi6OfficialRows } from "../lib/data/budgetLaw/lawRows";
+import { PLANNED_BUDGET_YEARS } from "../lib/data/coverage";
 import type { OfficialExpenditureRow } from "../lib/data/realExpenditure/types";
 
 function csvEscape(value: string | number | boolean | null): string {
@@ -183,8 +185,14 @@ function programReviewCsv(facts: AdminSpendingFact[]): string {
 async function main() {
   const parserWarnings: string[] = [];
   const officialRows = extractAdminSpendingOfficialRows(parserWarnings);
-  const facts = generateAdminSpendingFacts(officialRows);
+  // The 2026 law's Tavi VI plan rows; their facts carry basis planned and ship in their own file.
+  const plannedRows = lawTavi6OfficialRows();
+  const allFacts = generateAdminSpendingFacts([...officialRows, ...plannedRows], { plannedYears: PLANNED_BUDGET_YEARS });
+  const isPlannedYear = (year: number) => PLANNED_BUDGET_YEARS.includes(year);
+  const facts = allFacts.filter((fact) => !isPlannedYear(fact.year));
+  const plannedFacts = allFacts.filter((fact) => isPlannedYear(fact.year));
   const report = buildAdminSpendingReport(officialRows, facts);
+  const plannedReport = buildAdminSpendingReport(plannedRows, plannedFacts);
 
   const stagingDir = path.resolve(process.cwd(), "../../data/staging");
   const importsDir = path.resolve(process.cwd(), "../../data/imports");
@@ -199,7 +207,13 @@ async function main() {
     officialRowsToCsv(officialRows),
     "utf8",
   );
+  await writeFile(
+    path.join(stagingDir, "admin-spending-official-rows-2026-planned.csv"),
+    officialRowsToCsv(plannedRows),
+    "utf8",
+  );
   await writeFile(path.join(importsDir, "admin-spending-facts-2004-2025.csv"), factsToCsv(facts), "utf8");
+  await writeFile(path.join(importsDir, "admin-spending-facts-2026-planned.csv"), factsToCsv(plannedFacts), "utf8");
   await writeFile(
     path.join(reviewDir, "admin-spending-major-program-review-2004-2025.csv"),
     programReviewCsv(facts),
@@ -215,6 +229,11 @@ async function main() {
     JSON.stringify(report, null, 2),
     "utf8",
   );
+  await writeFile(
+    path.join(reportsDir, "admin-spending-2026-planned-report.json"),
+    JSON.stringify(plannedReport, null, 2),
+    "utf8",
+  );
 
   console.error(`Parser warnings: ${parserWarnings.length}`);
   for (const warning of parserWarnings) console.error(`  - ${warning}`);
@@ -222,12 +241,17 @@ async function main() {
   if (Object.values(report.reconciliationStatusByYear).some((status) => status === "failed")) {
     throw new Error("Admin spending reconciliation failed. See data/reports/admin-spending-2004-2025-report.json");
   }
+  if (Object.values(plannedReport.reconciliationStatusByYear).some((status) => status === "failed")) {
+    throw new Error("Planned admin spending reconciliation failed. See data/reports/admin-spending-2026-planned-report.json");
+  }
 
   console.log(`Official rows: ${officialRows.length}`);
   console.log(`Fact rows: ${facts.length}`);
   console.log(`Major program fact rows: ${report.majorProgramFactRows}`);
   console.log(`Major program unique items: ${report.majorProgramUniqueItems}`);
-  console.log("Report written: data/reports/admin-spending-2004-2025-report.json");
+  console.log(`Planned official rows: ${plannedRows.length}`);
+  console.log(`Planned fact rows: ${plannedFacts.length} (major programs: ${plannedReport.majorProgramFactRows})`);
+  console.log("Reports written: data/reports/admin-spending-2004-2025-report.json, data/reports/admin-spending-2026-planned-report.json");
 }
 
 main().catch((error) => {
