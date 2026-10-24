@@ -42,6 +42,8 @@ test("credits geoBoundaries, overlays the two occupied areas and claims no share
         "regionalEconomies.currentPrices": "Current prices",
         "regionalEconomies.sourceNote": "Source note",
         "regionalEconomies.boundaries": "Boundaries",
+        "regionalEconomies.heading": "Regional economies",
+        "controls.share.button": "Share",
       }}
     >
       <RegionalEconomiesIndex model={model} sourceNote="Source note" />

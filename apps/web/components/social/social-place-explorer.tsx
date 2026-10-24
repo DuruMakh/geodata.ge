@@ -19,6 +19,7 @@ import { useI18n } from "../../lib/i18n/provider";
 import { pageHref } from "../../lib/i18n/routes";
 import { ExcelDownloadButton } from "../explorer/excel-download-button";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
+import { ChartShareButton } from "../explorer-shell/chart-share-button";
 import { FlatSeriesPanel } from "../explorer-shell/flat-series-panel";
 import { LatestValueLine } from "../explorer-shell/latest-value-line";
 import { ModeTabs } from "../explorer-shell/mode-tabs";
@@ -101,6 +102,9 @@ export function SocialPlaceExplorer({
   const newCounting = t("break.newCounting");
   const placeName = placeLabel(place, locale);
   const chartLabel = `${headingLabels[model.heading]} · ${placeName}`;
+  const chart = <EditorialLineChart years={model.years} series={lineSeries} share={false} unit={unit} shareLabel={chartLabel} formatTooltipValue={valueLabel} breaks={model.breaks.map(item => ({ year: item.year, label: newCounting }))} />;
+  const shareAction = model.selected.length ? <ChartShareButton title={`${title} ${placeName}`} caption={`${unitLabel} · ${model.range.start}–${model.range.end}`}
+    legend={lineSeries.map(({ label, color }) => ({ label, color }))} source={t(`sourceNote.${set}`)} chart={chart} period={`${model.range.start}-${model.range.end}`} /> : undefined;
   return <div data-testid={`social-place-${set}`}>
     <EntityHeading title={title} triggerLabel={placeName} metaLine={<LatestValueLine testId="social-latest" sentence={metaLine} />} entityId={place.id}
       navigation={navigation} pickerCountry={pickerCountry} pickerGroups={pickerGroups} pickerOverrides={pickerOverrides} carryHash />
@@ -112,14 +116,14 @@ export function SocialPlaceExplorer({
             <span data-testid="social-unit-label" className="text-[11px] text-[var(--muted)]">{unitLabel}</span>
           </div>
           {!model.selected.length ? <div className="mt-5"><Callout testId="no-selection-callout">{t("emptySelection")}</Callout></div>
-            : state.mode === "line" ? <div className="mt-5"><EditorialLineChart years={model.years} series={lineSeries} share={false} unit={unit} shareLabel={chartLabel} formatTooltipValue={valueLabel} breaks={model.breaks.map(item => ({ year: item.year, label: newCounting }))} /></div>
+            : state.mode === "line" ? <div className="mt-5">{chart}</div>
             : <ExplorerTable caption={`${chartLabel} · ${unitLabel} · ${model.range.start}–${model.range.end}`} rows={rows} totalRow={null} showTotal={false} wrapRowLabels rowLabelsLocalized years={model.years} firstColumnLabel={t("series")} unit={unit} share={false} showChangeColumn={false} shareValueForYear={() => null}
               breakYears={model.breaks.map(item => item.year)} breakLabel={newCounting} />}
           <ChartSelectionAids series={lineSeries} chartShown={state.mode === "line"} share={false} unit={unit} formatValue={valueLabel} />
           <RangeStrip years={socialPlaceCoverage(set, place.id, shown, state.selectedIds).years} range={model.range}
             onChange={patch => update(s => ({ ...s, range: rangeFromPatch(buildSocialPlaceModel(set, place.id, shown, s, breaks).range, patch) }))} />
         </section>
-        <div className="mt-[18px]"><SourceNote testId="source-label">{t(`sourceNote.${set}`)} · {unitLabel} · {model.range.start}–{model.range.end} · <span className="whitespace-nowrap">{updatedDate(lastReviewedAt, locale)}</span>
+        <div className="mt-[18px]"><SourceNote testId="source-label" action={shareAction}>{t(`sourceNote.${set}`)} · {unitLabel} · {model.range.start}–{model.range.end} · <span className="whitespace-nowrap">{updatedDate(lastReviewedAt, locale)}</span>
           <Link href={pageHref("/methodology/social-protection", locale)} prefetch={false} className="ml-2 text-[var(--accent)] underline underline-offset-4">{t("methodology")}</Link>
         </SourceNote></div>
         {children}

@@ -21,7 +21,7 @@ export function WagesRegionsIndex({ regionMap, national }: { regionMap: RegionMa
     <div data-testid="wages-regions-index">
       {/* The note ends its sentence before the map-boundaries credit (U18-10). No overview tiles: the Georgia average is
           the line under the heading, and DESIGN.md §31 keeps the page to the map and the list (U18-11). */}
-      <RegionIndex model={regionMap} sourceNote={`${t("sourceNote")}.`} metric={{
+      <RegionIndex title={t("page.regions.title")} model={regionMap} sourceNote={`${t("sourceNote")}.`} metric={{
         hrefForRegion: wagesRegionHref, formatValue: amount,
         mapAria: t("regionMapAria", { year: regionMap.year }), entityAria: (name, value, year) => t("regionMapEntityAria", { name, amount: amount(value), year }),
         legend: t("series.average"), testId: "wages-region-map",

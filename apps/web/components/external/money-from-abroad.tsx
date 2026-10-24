@@ -20,6 +20,7 @@ import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { SeriesAside } from "../explorer-shell/series-aside";
 import { EditorialLineChart } from "../main-explorer/editorial-line-chart";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
+import { ChartShareButton } from "../explorer-shell/chart-share-button";
 import { ExplorerTable } from "../main-explorer/explorer-table";
 import { RangeStrip } from "../main-explorer/range-strip";
 import { ExcelDownloadButton } from "../explorer/excel-download-button";
@@ -46,6 +47,9 @@ export function MoneyFromAbroad({ data: input, sources, lastReviewedAt, siteOrig
   }} />;
   const valueLabel = (value: number) => `${formatInUnit(value, model.unit)} ${model.unit.label}`;
   const lineSeries = model.selectedIds.map(id => ({ id, label: label(id), color: model.colorById[id], vals: model.years.map(year => model.valuesByEntity[id][year]), preliminary: model.years.map(year => Boolean(model.partialMonths[id]?.[year])), hollowPreliminary: true }));
+  const chart = <EditorialLineChart years={model.years} series={lineSeries} share={false} unit={model.unit} shareLabel={measureLabel} showAxisUnit={false} preliminaryLabel={t("partial")} formatTooltipValue={valueLabel} />;
+  const shareAction = model.selectedCount ? <ChartShareButton title={message(messages, "external.money.title")} caption={`${measureLabel} · ${model.unit.label} · ${model.range.start}–${model.range.end}`}
+    legend={lineSeries.map(({ label, color }) => ({ label, color }))} source={message(messages, "external.sourceNote")} chart={chart} period={`${model.range.start}-${model.range.end}`} /> : undefined;
   return <div data-testid="money-from-abroad" className="@container">
     <ExplorerHeading>{message(messages, "external.money.title")}</ExplorerHeading>
     <div role="group" aria-label={t("measure")} className="mb-6 flex flex-wrap justify-center gap-x-6 gap-y-3">{MONEY_TRANSFER_MEASURES.map(measure => <TextTab key={measure} label={message(messages, `external.measure.${measure}`)} active={state.measure === measure} onClick={() => update(s => ({ ...s, measure }), true)} testId={`money-from-abroad-measure-${measure}`} />)}</div>
@@ -54,12 +58,12 @@ export function MoneyFromAbroad({ data: input, sources, lastReviewedAt, siteOrig
         <section data-testid="chart-panel" data-mode={state.mode} data-measure={state.measure} data-unit="usd" className="border-t border-[var(--ink)] pt-4">
           <div className="flex flex-wrap items-end justify-between gap-3"><ModeTabs value={state.mode} onChange={mode => update(s => ({ ...s, mode }), true)} /><span className="text-[11px] text-[var(--muted)]">{measureLabel} · {model.unit.label}</span></div>
           {!model.selectedCount ? <div className="mt-5"><Callout testId="no-selection-callout">{t("emptySelection")}</Callout></div>
-            : state.mode === "line" ? <div className="mt-5"><EditorialLineChart years={model.years} series={lineSeries} share={false} unit={model.unit} shareLabel={measureLabel} showAxisUnit={false} preliminaryLabel={t("partial")} formatTooltipValue={valueLabel} /></div>
+            : state.mode === "line" ? <div className="mt-5">{chart}</div>
             : <ExplorerTable caption={`${message(messages, "external.money.title")} · ${measureLabel} · ${model.unit.label} · ${model.range.start}–${model.range.end}`} rows={rows.filter(row => row.itemId !== MONEY_TRANSFER_TOTAL_ID)} totalRow={total} showTotal={Boolean(total)} totalFirst wrapRowLabels rowLabelsLocalized years={model.years} firstColumnLabel={t("series")} unit={model.unit} share={false} showChangeColumn={false} shareValueForYear={() => null} preliminaryLabel={t("partial")} />}
           <ChartSelectionAids series={lineSeries} chartShown={state.mode === "line"} share={false} unit={model.unit} formatValue={valueLabel} />
           <RangeStrip years={moneyTransfersCoverage(data).years} range={model.range} onChange={patch => update(s => ({ ...s, range: rangeFromPatch(resolveRange(s.range, moneyTransfersCoverage(data)), patch) }))} />
         </section>
-        <div className="mt-[18px]"><SourceNote testId="source-label">{message(messages, "external.sourceNote")} {model.range.start}–{model.range.end} · {updatedDate(lastReviewedAt, locale)}
+        <div className="mt-[18px]"><SourceNote testId="source-label" action={shareAction}>{message(messages, "external.sourceNote")} {model.range.start}–{model.range.end} · {updatedDate(lastReviewedAt, locale)}
           <Link href={pageHref("/methodology/external-flows", locale)} prefetch={false} className="ml-2 text-[var(--accent)] underline underline-offset-4">{message(messages, "external.methodology")}</Link>
         </SourceNote></div>
         {partialShown ? <p data-testid="money-from-abroad-partial-note" className="mt-2 text-[11px] leading-relaxed text-[var(--muted)]">{t("partialNote", { years: model.partialYears.join(", ") })}</p> : null}

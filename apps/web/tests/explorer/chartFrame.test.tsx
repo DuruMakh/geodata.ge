@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { ChartScrollFrame, ChartTooltip } from "../../components/main-explorer/chart-frame";
+import { ChartGeometryContext, ChartScrollFrame, ChartTooltip } from "../../components/main-explorer/chart-frame";
+import { EditorialLineChart } from "../../components/main-explorer/editorial-line-chart";
 import { renderGeorgianMarkup } from "../helpers/render-localized";
 
 describe("shared chart frame", () => {
@@ -126,5 +127,22 @@ describe("shared chart frame", () => {
     expect(render()).toContain('class="flex items-center justify-between gap-2"');
     expect(render(true)).toContain("flex-col gap-0 overflow-hidden");
     expect(render(true)).toContain("leading-[14px]");
+  });
+});
+
+describe("chart geometry context", () => {
+  const chart = <EditorialLineChart years={[2024, 2025]} series={[{ id: "a", label: "A", color: "#1E1B16", vals: [1, 2] }]} share={false} unit={{ divisor: 1, label: "₾", decimals: 0 }} shareLabel="%" />;
+
+  it("a chart under the desktop geometry context draws only its desktop drawing, unhidden", () => {
+    const markup = renderGeorgianMarkup(<ChartGeometryContext.Provider value="desktop">{chart}</ChartGeometryContext.Provider>);
+    expect(markup).toContain('data-geometry="desktop"');
+    expect(markup).not.toContain('data-geometry="mobile"');
+    expect(markup).not.toContain("max-[768px]:hidden");
+  });
+
+  it("without the context a chart still renders both drawings before measuring", () => {
+    const markup = renderGeorgianMarkup(chart);
+    expect(markup).toContain('data-geometry="desktop"');
+    expect(markup).toContain('data-geometry="mobile"');
   });
 });

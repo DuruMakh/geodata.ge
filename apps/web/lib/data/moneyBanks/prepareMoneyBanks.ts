@@ -14,9 +14,13 @@ import { validateMoneyBanksFacts } from "./validation";
 
 const RESEARCH = "docs/Raw Data/Money/nbg-money-banks-annual";
 export const REVIEWED_AT = "2026-10-11";
+/** The loan-detail workbooks (L3.10.1, LPR, LREG) were retrieved on 24 October 2026. */
+export const LOANS_DETAIL_REVIEWED_AT = "2026-10-24";
+export const reviewedAtFor = (indicatorId: string) => /^(borrowers|households|loans_region)\./.test(indicatorId) ? LOANS_DETAIL_REVIEWED_AT : REVIEWED_AT;
 export const MONEY_BANKS_CSV_HEADERS = ["year", "indicator_id", "value", "published_value", "unit", "basis", "value_status", "source_id", "source_sheet", "source_cell", "last_reviewed_at"];
 const BREAK_HEADERS = ["break_id", "applies_to", "reference_date", "reason", "source_note"];
-const BREAK_IDS = ["fsi_method_2022", "fsi_ifrs_2023"];
+const BREAK_IDS = ["fsi_method_2022", "fsi_ifrs_2023", "loans_activity_2014", "loans_overdue_2015", "loans_sector_2022", "loans_microbanks_2025"];
+const BREAK_PREFIXES = ["banks.", "borrowers.", "households.", "loans_region."];
 /** The research package computes its derived rows with 28 significant digits, round-half-even. */
 const CALC = Decimal.clone({ precision: 28, rounding: Decimal.ROUND_HALF_EVEN });
 type Source = { source_id: string; local_file: string; sha256: string; bytes: number };
@@ -45,7 +49,7 @@ function recompute(row: CsvRecord, numeric: Map<string, string>): Decimal {
 }
 
 /**
- * Promotes the research package's 730 observations into the canonical serving CSV. Every official
+ * Promotes the research package's 1,547 observations into the canonical serving CSV. Every official
  * value is re-read from its archived workbook cell and every calculated value is recomputed from its inputs.
  */
 export async function prepareMoneyBanksData(repositoryRoot: string, mode: "write" | "check"): Promise<void> {
@@ -68,7 +72,7 @@ export async function prepareMoneyBanksData(repositoryRoot: string, mode: "write
   }
   const report = JSON.parse(await fs.readFile(path.join(directory, "validation-report.json"), "utf8")) as { status: string; primary_observation_count: number; reconciliation_failed_count: number; imputed_values: number };
   const independent = JSON.parse(await fs.readFile(path.join(directory, "independent-validation.json"), "utf8")) as { status: string };
-  if (report.status !== "passed" || report.primary_observation_count !== 730 || report.reconciliation_failed_count !== 0 || report.imputed_values !== 0 || independent.status !== "passed") throw new Error("Money and banks research package validation has not passed");
+  if (report.status !== "passed" || report.primary_observation_count !== 1547 || report.reconciliation_failed_count !== 0 || report.imputed_values !== 0 || independent.status !== "passed") throw new Error("Money and banks research package validation has not passed");
   const rows = parse(await fs.readFile(path.join(directory, "money-banks-annual.csv")), { columns: true, bom: true, skip_empty_lines: true }) as CsvRecord[];
   const facts: MoneyBanksFact[] = rows.map(row => {
     const key = `${row.indicator_id}:${row.year}`;
@@ -78,7 +82,7 @@ export async function prepareMoneyBanksData(repositoryRoot: string, mode: "write
     return {
       year: Number(row.year), indicatorId: row.indicator_id as MoneyBanksFact["indicatorId"], value: row.value, publishedValue: row.published_value,
       unit: row.unit as MoneyBanksFact["unit"], basis: row.basis as "actual", valueStatus: row.value_status as MoneyBanksFact["valueStatus"],
-      sourceId: row.source_id, sourceSheet: row.source_sheet, sourceCell: row.source_cell, lastReviewedAt: REVIEWED_AT,
+      sourceId: row.source_id, sourceSheet: row.source_sheet, sourceCell: row.source_cell, lastReviewedAt: reviewedAtFor(row.indicator_id),
     };
   });
   validateMoneyBanksFacts(facts);
@@ -88,12 +92,12 @@ export async function prepareMoneyBanksData(repositoryRoot: string, mode: "write
     breakId: row.break_id, appliesTo: row.applies_to.split(";"), referenceDate: row.reference_date, reason: row.reason, sourceNote: row.source_note,
   }));
   if (breakRows.map(row => row.breakId).join() !== BREAK_IDS.join() || breakRows.some(row => !/^\d{4}-\d{2}-\d{2}$/.test(row.referenceDate) || !row.reason || !row.sourceNote
-    || row.appliesTo.some(id => !id.startsWith("banks.") || !facts.some(f => f.indicatorId === id)))) throw new Error("Money and banks series break register is invalid");
+    || row.appliesTo.some(id => !BREAK_PREFIXES.some(prefix => id.startsWith(prefix)) || !facts.some(f => f.indicatorId === id)))) throw new Error("Money and banks series break register is invalid");
   const breaks = serializeBomCsvRows([BREAK_HEADERS, ...breakRows.map(row => [row.breakId, row.appliesTo.join(";"), row.referenceDate, row.reason, row.sourceNote])]);
   const years = facts.map(f => f.year);
   const acceptance: MoneyBanksAcceptance = {
     status: "passed", years: { min: Math.min(...years), max: Math.max(...years) }, observations: facts.length,
-    researchStatus: report.status, canonicalSha256: createHash("sha256").update(csv).digest("hex"), reviewedAt: REVIEWED_AT,
+    researchStatus: report.status, canonicalSha256: createHash("sha256").update(csv).digest("hex"), reviewedAt: facts.map(f => f.lastReviewedAt).sort().at(-1)!,
   };
   for (const [relative, content] of [["data/imports/money-banks-annual.csv", csv], ["data/imports/money-banks-series-breaks.csv", breaks], ["data/reports/money-banks-validation.json", `${JSON.stringify(acceptance, null, 2)}\n`]]) {
     const target = path.join(repositoryRoot, relative);

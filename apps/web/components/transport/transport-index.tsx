@@ -35,7 +35,7 @@ export function TransportIndex({ facts, regionMap }: {
     <ExplorerHeading>{t("page.regions.title")}</ExplorerHeading>
     <LatestValueLine testId="transport-latest" measure={t("latest.regions", { region: largestName })} period={regionMap.year} value={transportLatestValue(largest.value, "thousand", t)} />
     <section data-testid="transport-region-index" className="mt-4">
-      <RegionIndex model={regionMap} summary={[]} sourceNote={`${t("sourceNoteRegions")} · ${unitLabel} · ${regionMap.year}.`}
+      <RegionIndex title={t("page.regions.title")} model={regionMap} summary={[]} sourceNote={`${t("sourceNoteRegions")} · ${unitLabel} · ${regionMap.year}.`}
         leadRow={georgiaValue === undefined ? undefined : { id: "georgia", label: t("area.georgia"), value: georgiaValue }} metric={{
           hrefForRegion: transportRegionHref, formatValue: value => formatInUnit(value, transportValueUnit("vehicles")), legend: `${mapLabel} · ${unitLabel}`, testId: "transport-region-map",
           mapAria: t("regionMapAria", { total: mapLabel, unit: unitLabel, year: regionMap.year }), entityAria: (name, value, year) => t("regionMapEntityAria", { name, amount: valueLabel(value), year }),

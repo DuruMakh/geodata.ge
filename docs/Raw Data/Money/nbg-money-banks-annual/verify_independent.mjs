@@ -1,7 +1,7 @@
 // Independent Excel-cell comparison for the NBG money and banking research package.
 // Reads the preserved workbooks with SheetJS (the web app's own dependency), not the Python XML reader, and
-// recomputes every one of the 730 values from its cell: stored value, rounding, the month or year in the row,
-// the printed column heading, and, for calculated rows, the sum or ratio of the cells named in source_cell.
+// recomputes every one of the 1,547 values from its cell: stored value, rounding, the month or year in the row or column,
+// the printed row or column heading, and, for calculated rows, the sum or ratio of the cells named in source_cell.
 // The label tables below are written separately from prepare.py. Writes independent-validation.json on every run.
 import { createRequire } from 'node:module';
 import { readFileSync, writeFileSync } from 'node:fs';
@@ -23,11 +23,31 @@ const FILES = {
   nbg_deposit_rates_dwir: 'official/annual-weighted-deposit-interest-rates-dwireng.xlsx',
   nbg_fsi_archive: 'official/fsieng-archive.xlsx',
   nbg_fsi: 'official/fsieng.xlsx',
+  nbg_loans_structure_l3_10_1: 'official/loans-structure-l3-10-1eng.xlsx',
+  nbg_loans_purpose_lop: 'official/loans-by-lopeng.xlsx',
+  nbg_loans_regions_lreg: 'official/loans-by-regions-lregeng.xlsx',
 };
 const books = Object.fromEntries(Object.entries(FILES).map(([id, file]) =>
   [id, XLSX.read(readFileSync(join(root, file)), { type: 'buffer', cellNF: true })]));
 
 // Years served per indicator, written from the approved spec rather than from prepare.py.
+const INDUSTRY_HEADINGS = {
+  agriculture: 'Agriculture, Forestry, Fishing', industry: 'Industry', construction: 'Construction', trade: 'Trade',
+  hotels_restaurants: 'Hotels and Restaurants', transport_communications: 'Transport and Communications',
+  financial: 'Financial Intermediation', real_estate: 'Transactions in Real Estates, Researches', education: 'Education',
+  health_social: 'Health Care and Social Services', other_services: 'Other Services',
+};
+const PURPOSE_ROWS = {
+  consumer: 'Consumer Loans', home: 'Mortgage loans for real estate purchase and repair', sme: 'Business loans for SME',
+  large_business: 'Business loans for large enterprises', car: 'Auto loans', pawn: 'Lombard Loans', other: 'Other Loans',
+};
+// The row label printed in LREG column A, up to the comma ("Adjara, Autonomous Republic of" on NC, "Adjara" on FC).
+const AREA_ROWS = {
+  georgia: 'Total', region_tbilisi: 'Tbilisi', region_adjara: 'Adjara', region_guria: 'Guria', region_imereti: 'Imereti',
+  region_kakheti: 'Kakheti', region_mtskheta_mtianeti: 'Mtskheta-Mtianeti',
+  region_racha_lechkhumi_kvemo_svaneti: 'Racha-Lechkhumi and Kvemo Svaneti', region_samegrelo_zemo_svaneti: 'Samegrelo-Zemo Svaneti',
+  region_samtskhe_javakheti: 'Samtskhe-Javakheti', region_kvemo_kartli: 'Kvemo Kartli', region_shida_kartli: 'Shida Kartli',
+};
 const RANGES = {
   'money.m3': [1995, 2025], 'money.m2': [1995, 2025], 'money.m1': [1995, 2025], 'money.m0': [1995, 2025],
   'money.m3_to_gdp': [1996, 2025], 'money.m2_to_gdp': [1996, 2025],
@@ -39,8 +59,13 @@ const RANGES = {
   'rates.deposits_total': [1996, 2025], 'rates.deposits_gel': [1996, 2025], 'rates.deposits_fx': [1996, 2025],
   'banks.npl_ratio': [2003, 2025], 'banks.roa': [2001, 2025], 'banks.roe': [2001, 2025],
   'banks.capital_ratio': [2014, 2025], 'banks.tier1_ratio': [2014, 2025],
+  'borrowers.total': [2003, 2025], 'borrowers.businesses': [2003, 2025], 'borrowers.people': [2003, 2025],
+  'borrowers.households': [2015, 2025], 'borrowers.individual_entrepreneurs': [2015, 2025],
+  ...Object.fromEntries(Object.keys(INDUSTRY_HEADINGS).map(id => [`borrowers.industry.${id}`, [2003, 2025]])),
+  ...Object.fromEntries(Object.keys(PURPOSE_ROWS).map(id => [`households.purpose.${id}`, [2015, 2025]])),
+  ...Object.fromEntries(Object.keys(AREA_ROWS).flatMap(id => ['total', 'gel', 'fx'].map(part => [`loans_region.${id}.${part}`, [2015, 2025]]))),
 };
-const EXPECTED_TOTAL = 730;
+const EXPECTED_TOTAL = 1547;
 // NBG prints every interest rate to two decimals; every other value is rounded to one.
 const PLACES = Object.fromEntries(['rates.policy', 'rates.loans_total', 'rates.loans_gel', 'rates.loans_fx', 'rates.deposits_total', 'rates.deposits_gel', 'rates.deposits_fx'].map(id => [id, 2]));
 const ARCHIVE_LAST = 2021;
@@ -50,10 +75,13 @@ const month = (source, sheet, headRow, head, unit) => ({ source, sheet, row: 'mo
 const year = (source, sheet, group) => ({ source, sheet, row: 'year', group });
 const archive = (head, group) => ({ source: 'nbg_fsi_archive', sheet: 'FSI_Deposit_Takers_eng', row: 'archive', head, group });
 const current = head => ({ source: 'nbg_fsi', sheet: 'FSD', row: 'current', head });
+// A sheet with months across row 3 and labelled rows down column A: `block` is the column-A heading the row must sit under.
+const across = (source, sheet, label, block) => ({ source, sheet, row: 'across', label, block });
 const M = 'Monetary Ratios-eng', L = 'Eng';
 const D17 = ['NC Dep.volume&Int.rates-eng', 'FC Dep.volume&Int.rates-eng'];
 const D23 = ['NC Dep.of Individuals-eng', 'FC Dep.of Individuals-eng'];
 const total = 'Total Loans (including overdue Loans)';
+const L310 = 'nbg_loans_structure_l3_10_1';
 const LEAF = {
   'money.m3': month('nbg_money_aggregates', M, 3, 'Money Aggregates (M3)'),
   'money.m2': month('nbg_money_aggregates', M, 3, 'Money Aggregates (M2)'),
@@ -70,6 +98,19 @@ const LEAF = {
   'deposits.individuals.fx': month('nbg_deposits_individuals_d3_23', D23[1], 4, 'Deposits, total', 'Million GEL'),
   'deposits.legal_entities.gel': month('nbg_deposits_legal_d3_27', 'NC', 3, 'Total Deposits'),
   'deposits.legal_entities.fx': month('nbg_deposits_legal_d3_27', 'FC', 3, 'Total Deposits'),
+  'borrowers.total': month(L310, 'Total', 3, 'Total'),
+  'borrowers.businesses': month(L310, 'Total', 4, 'total', 'of which by branches:'),
+  'borrowers.households': month(L310, 'Total', 3, 'Households'),
+  'borrowers.people': month(L310, 'Total', 4, 'Individuals', 'of which:'),
+  'borrowers.individual_entrepreneurs': month(L310, 'Total', 4, 'Individual entrepreneur', 'of which:'),
+  ...Object.fromEntries(Object.entries(INDUSTRY_HEADINGS).map(([id, heading]) =>
+    [`borrowers.industry.${id}`, month(L310, 'Total', 4, heading, 'of which by branches:')])),
+  ...Object.fromEntries(Object.entries(PURPOSE_ROWS).flatMap(([id, label]) => [
+    [`households.purpose.${id}.gel`, across('nbg_loans_purpose_lop', 'HH', label, 'In National Currency')],
+    [`households.purpose.${id}.fx`, across('nbg_loans_purpose_lop', 'HH', label, 'In Foreign Currency')]])),
+  ...Object.fromEntries(Object.entries(AREA_ROWS).flatMap(([id, label]) => [
+    [`loans_region.${id}.gel`, across('nbg_loans_regions_lreg', 'NC', label)],
+    [`loans_region.${id}.fx`, across('nbg_loans_regions_lreg', 'FC', label)]])),
   'rates.policy': { source: 'nbg_policy_rate', sheet: 'MPIR-Eng', row: 'policy' },
   'rates.loans_total': year('nbg_loan_rates_lwir', 'loans % Annual', 'Total'),
   'rates.loans_gel': year('nbg_loan_rates_lwir', 'loans % Annual', 'National currency'),
@@ -90,6 +131,8 @@ const CALCULATED = {
   'deposits.legal_entities': ['deposits.legal_entities.gel', 'deposits.legal_entities.fx'],
   'loans.fx_share': ['loans.fx', 'loans.total'],
   'deposits.fx_share': ['deposits.fx', 'deposits.gel', 'deposits.fx'],
+  ...Object.fromEntries(Object.keys(PURPOSE_ROWS).map(id => [`households.purpose.${id}`, [`households.purpose.${id}.gel`, `households.purpose.${id}.fx`]])),
+  ...Object.fromEntries(Object.keys(AREA_ROWS).map(id => [`loans_region.${id}.total`, [`loans_region.${id}.gel`, `loans_region.${id}.fx`]])),
 };
 
 function parseCsv(text) {
@@ -163,6 +206,23 @@ function readLeaf(leaf, yearValue, address, sheetName, failures, where) {
     if (clean(sheet[`${column}${leaf.headRow}`]?.v).toLowerCase() !== leaf.head.toLowerCase()) failures.push(`${where}: heading ${clean(sheet[`${column}${leaf.headRow}`]?.v)} != ${leaf.head}`);
     if (leaf.unit && spanHeading(sheet, 3, column) !== leaf.unit) failures.push(`${where}: column ${column} is not under ${leaf.unit}`);
     if (leaf.source === 'nbg_loans_l3_5' && ![4, 5].some(n => clean(sheet[`${column}${n}`]?.v) === 'Total')) failures.push(`${where}: no Total sub-heading`);
+  } else if (leaf.row === 'across') {
+    // The column's own heading must be a December of the year: 31 December, or 1 December where only month and year are printed
+    // (HH prints 12-2021 from a 1 December date). The columns either side must be the neighbouring months.
+    const headerOf = letters => { const value = sheet[`${letters}3`]?.v; return typeof value === 'number' ? dateOf(value) : null; };
+    const day = headerOf(column);
+    const printsDay = /d/i.test(String(sheet[`${column}3`]?.z ?? '').replace(/\\./g, ''));
+    if (!day || day.getUTCFullYear() !== yearValue || day.getUTCMonth() !== 11 || !(day.getUTCDate() === 31 || (day.getUTCDate() === 1 && !printsDay))) failures.push(`${where}: column ${column} is not December ${yearValue}`);
+    const before = headerOf(XLSX.utils.encode_col(columnNumber(column) - 2)), after = headerOf(XLSX.utils.encode_col(columnNumber(column)));
+    if (!before || before.getUTCFullYear() !== yearValue || before.getUTCMonth() !== 10) failures.push(`${where}: the column before ${column} is not November ${yearValue}`);
+    if (!after || after.getUTCFullYear() !== yearValue + 1 || after.getUTCMonth() !== 0) failures.push(`${where}: the column after ${column} is not January ${yearValue + 1}`);
+    const printed = clean(sheet[`A${row}`]?.v);
+    if (!(leaf.label === 'Total' ? printed === 'Total' : printed === leaf.label || printed.startsWith(`${leaf.label},`))) failures.push(`${where}: row ${row} reads ${printed}, not ${leaf.label}`);
+    if (leaf.block) {
+      let above = row;
+      while (above > 3 && !['In National Currency', 'In Foreign Currency'].includes(clean(sheet[`A${above}`]?.v))) above -= 1;
+      if (clean(sheet[`A${above}`]?.v) !== leaf.block) failures.push(`${where}: row ${row} is not under ${leaf.block}`);
+    }
   } else if (leaf.row === 'year') {
     if (Number(clean(sheet[`A${row}`]?.v)) !== yearValue) failures.push(`${where}: row ${row} is not ${yearValue}`);
     if (spanHeading(sheet, 3, column) !== leaf.group || clean(sheet[`${column}4`]?.v).toLowerCase() !== 'total') failures.push(`${where}: column ${column} is not ${leaf.group} total`);
@@ -253,6 +313,8 @@ const detects = rows => verify(rows).failures.length > 0;
 const edit = (index, change) => observations.map((row, i) => (i === index ? { ...row, ...change } : row));
 const at = (indicator, yearValue) => observations.findIndex(row => row.indicator_id === indicator && row.year === String(yearValue));
 const m3 = at('money.m3', 2025), fxShare = at('loans.fx_share', 2025), total2 = at('deposits.total', 2020), npl = at('banks.npl_ratio', 2019);
+const trade = at('borrowers.industry.trade', 2020), people = at('borrowers.people', 2012), home = at('households.purpose.home', 2025);
+const home2021 = at('households.purpose.home', 2021), adjara = at('loans_region.region_adjara.total', 2025), georgiaFx = at('loans_region.georgia.fx', 2025);
 const negative = {
   altered_value_detected: detects(edit(m3, { value: '57680.3', published_value: '57680.3' })),
   altered_calculated_value_detected: detects(edit(fxShare, { value: '41.8', published_value: '41.8' })),
@@ -262,6 +324,14 @@ const negative = {
   swapped_sheets_detected: detects(edit(total2, { source_sheet: 'FC Dep.volume&Int.rates-eng+NC Dep.volume&Int.rates-eng' })),
   wrong_quarter_detected: detects(edit(npl, { source_cell: observations[npl].source_cell.replace(/^[A-Z]+/, 'CI') })),
   unrounded_published_value_detected: detects(edit(m3, { published_value: '57680.22' })),
+  neighbouring_industry_column_detected: detects(edit(trade, { source_cell: observations[trade].source_cell.replace(/^[A-Z]+/, 'H') })),
+  household_row_before_2015_detected: detects(edit(people, { indicator_id: 'borrowers.households' })),
+  lari_block_used_twice_detected: detects(edit(home, { source_cell: observations[home].source_cell.replace(/\+.*/, '+DS7') })),
+  wrong_purpose_row_detected: detects(edit(home, { source_cell: 'DS6+DS15' })),
+  november_column_detected: detects(edit(home2021, { source_cell: 'BV7+BV16' })),
+  neighbouring_region_row_detected: detects(edit(adjara, { source_cell: 'DS9+DS9' })),
+  swapped_region_sheets_detected: detects(edit(adjara, { source_sheet: 'FC+NC' })),
+  foreign_currency_in_lari_sheet_detected: detects(edit(georgiaFx, { source_sheet: 'NC' })),
 };
 
 const report = {
