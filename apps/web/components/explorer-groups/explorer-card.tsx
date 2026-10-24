@@ -22,8 +22,8 @@ export function leadSpan(pageCount: number): LeadSpan {
   return rest === 1 ? "lead2" : rest === 2 ? "lead2x2" : "lead3";
 }
 
-/** The grid a topic's cards sit in: three columns from 1101px, two from 900px, one on phones. */
-export const CARD_GRID_CLASS = "grid grid-cols-1 gap-3 min-[900px]:grid-cols-2 min-[900px]:gap-4 min-[1101px]:grid-cols-3";
+/** The grid a topic's cards sit in: three columns from 1101px, two from 768px, one on phones. */
+export const CARD_GRID_CLASS = "grid grid-cols-1 gap-3 min-[768px]:grid-cols-2 min-[768px]:gap-4 min-[1101px]:grid-cols-3";
 
 const NUMERIC = "font-[family-name:var(--font-numeric)]";
 
@@ -36,10 +36,19 @@ const SPAN_CLASS: Record<LeadSpan, string> = {
 };
 
 const LEAD_BAND: Record<LeadSpan, string> = {
-  lead3: "mb-6 h-[150px] max-[899px]:h-[130px] min-[1101px]:col-start-2 min-[1101px]:row-[1/span_5] min-[1101px]:mt-1 min-[1101px]:mb-[22px] min-[1101px]:h-auto min-[1101px]:min-h-[160px] min-[1101px]:self-stretch",
-  lead2: "mb-6 h-[150px] max-[899px]:h-[130px] min-[1101px]:col-start-2 min-[1101px]:row-[1/span_5] min-[1101px]:mt-1 min-[1101px]:mb-[22px] min-[1101px]:h-auto min-[1101px]:min-h-[160px] min-[1101px]:self-stretch",
-  lead2x2: "mb-6 h-[220px] max-[899px]:h-[150px]",
+  lead3: "mb-6 h-[150px] max-[767px]:h-[130px] min-[1101px]:col-start-2 min-[1101px]:row-[1/span_5] min-[1101px]:mt-1 min-[1101px]:mb-[22px] min-[1101px]:h-auto min-[1101px]:min-h-[160px] min-[1101px]:self-stretch",
+  lead2: "mb-6 h-[150px] max-[767px]:h-[130px] min-[1101px]:col-start-2 min-[1101px]:row-[1/span_5] min-[1101px]:mt-1 min-[1101px]:mb-[22px] min-[1101px]:h-auto min-[1101px]:min-h-[160px] min-[1101px]:self-stretch",
+  lead2x2: "mb-6 h-[220px] max-[767px]:h-[150px]",
 };
+
+// A split lead card's text column, one child per row, so a missing description or value leaves its row empty instead of shifting the rest up.
+const ROW = {
+  top: "min-[1101px]:row-start-1",
+  title: "min-[1101px]:row-start-2",
+  description: "min-[1101px]:row-start-3",
+  value: "min-[1101px]:row-start-4",
+  footer: "min-[1101px]:row-start-5",
+} as const;
 
 type CardProps = {
   card: HubCardModel;
@@ -82,17 +91,24 @@ export function ExplorerCard(props: CardProps) {
   const { card, locale, lead, spread } = props;
   const groups = getGroupsMessages(locale);
   const base = useId();
-  const ids = { title: `${base}-title`, value: `${base}-value`, footer: `${base}-footer` };
+  const ids = { title: `${base}-title`, value: `${base}-value`, detail: `${base}-detail`, footer: `${base}-footer` };
 
   // A spread states the Regions page's range, in place of the one latest figure.
   const caption = spread ? spread.caption : [card.latest?.caption, card.latest?.period].filter(Boolean).join(" · ");
   const value = spread ? spread.value : card.latest?.value;
   const footer = card.years ? (card.latest?.period ? card.years : `${card.years} · ${message(groups, "groups.annual")}`) : null;
-  const described = [value ? ids.value : null, footer ? ids.footer : null].filter(Boolean).join(" ");
+  // What only the decorative band shows, for assistive technology: the pair's rows, the bars' first and last band, the spread's extremes.
+  const detail = card.graphic?.kind === "pair" ? card.graphic.rows.map((row) => `${row.label} ${row.text}`).join(", ")
+    : card.graphic?.kind === "bars" ? [card.graphic.first, card.graphic.last].join(", ")
+    : !card.graphic && spread ? [spread.low, spread.high].join(", ")
+    : null;
+  const described = [value ? ids.value : null, detail ? ids.detail : null, footer ? ids.footer : null].filter(Boolean).join(" ");
+  const split = lead !== undefined && lead !== "lead2x2";
+  const row = (name: keyof typeof ROW) => (split ? ` ${ROW[name]}` : "");
 
   const body = (
     <>
-      <span className={`flex items-center justify-between ${NUMERIC} text-[11px]`}>
+      <span className={`flex items-center justify-between ${NUMERIC} text-[11px]${row("top")}`}>
         <b aria-hidden className="font-medium text-[var(--accent)]">{card.index}</b>
         {card.comingSoon ? (
           <span className={`rounded-[2px] border border-[var(--control)] px-1.5 py-px ${NUMERIC} text-[10.5px] text-[var(--muted)]`}>
@@ -109,15 +125,16 @@ export function ExplorerCard(props: CardProps) {
       </span>
       <h3
         id={ids.title}
-        className={`block font-[family-name:var(--font-display)] ${lead ? "text-[21px]" : "text-[17px]"} leading-[1.32] font-semibold ${card.comingSoon ? "text-[var(--muted)]" : "text-[var(--ink)]"}`}
+        className={`block font-[family-name:var(--font-display)] ${lead ? "text-[21px]" : "text-[17px]"} leading-[1.32] font-semibold ${card.comingSoon ? "text-[var(--muted)]" : "text-[var(--ink)]"}${row("title")}`}
       >
         {card.title}
       </h3>
-      {lead && card.description ? <span className="block max-w-[560px] text-[12.5px] leading-normal text-[var(--muted)]">{card.description}</span> : null}
+      {lead && card.description ? <span className={`block max-w-[560px] text-[12.5px] leading-normal text-[var(--muted)]${row("description")}`}>{card.description}</span> : null}
       <Band {...props} />
+      {detail ? <span id={ids.detail} className="sr-only">{detail}</span> : null}
       {value ? (
-        <span id={ids.value} className="flex flex-wrap items-baseline gap-x-2.5 gap-y-0.5">
-          <b className={`${NUMERIC} ${lead ? "text-[32px] max-[899px]:text-[26px]" : "text-[20px]"} leading-tight font-semibold tracking-[-0.015em] text-[var(--ink)]`}>{value}</b>
+        <span id={ids.value} className={`flex flex-wrap items-baseline gap-x-2.5 gap-y-0.5${row("value")}`}>
+          <b className={`${NUMERIC} ${lead ? "text-[32px] max-[767px]:text-[26px]" : "text-[20px]"} leading-tight font-semibold tracking-[-0.015em] text-[var(--ink)]`}>{value}</b>
           {caption ? <span className="text-[11.5px] leading-snug text-[var(--muted)]">{caption}</span> : null}
           {spread?.georgiaLabel ? (
             <span className="text-[11.5px] leading-snug text-[var(--muted)] before:mr-1.5 before:inline-block before:h-2.5 before:border-l-[1.5px] before:border-dashed before:border-[var(--accent)] before:align-[-1px] before:content-['']">
@@ -127,20 +144,20 @@ export function ExplorerCard(props: CardProps) {
         </span>
       ) : null}
       {footer ? (
-        <span id={ids.footer} className={`block border-t border-[var(--row-border)] pt-[9px] ${NUMERIC} text-[10.5px] text-[var(--faint)]${lead ? " mt-4" : ""}`}>{footer}</span>
+        <span id={ids.footer} className={`block border-t border-[var(--row-border)] pt-[9px] ${NUMERIC} text-[10.5px] text-[var(--faint)]${lead ? " mt-4" : ""}${row("footer")}`}>{footer}</span>
       ) : null}
     </>
   );
 
   // Every child but the chart band stays in the text column of a split lead card.
   const frame = [
-    "group relative flex min-h-[216px] min-w-0 flex-col gap-2 border border-[var(--hairline)] bg-[var(--tile)] px-[18px] pt-4 pb-[13px] no-underline transition-colors duration-150 max-[899px]:min-h-0 motion-reduce:transition-none",
+    "group relative flex min-h-[216px] min-w-0 flex-col gap-2 border border-[var(--hairline)] bg-[var(--tile)] px-[18px] pt-4 pb-[13px] no-underline transition-colors duration-150 max-[767px]:min-h-0 motion-reduce:transition-none",
     lead ? SPAN_CLASS[lead] : "",
     lead && lead !== "lead2x2" ? "min-[1101px]:[&>*:not([data-testid=explorer-card-graphic])]:col-start-1" : "",
   ].filter(Boolean).join(" ");
 
   return card.href === null ? (
-    <div data-testid="explorer-card" aria-disabled="true" className={frame}>{body}</div>
+    <div data-testid="explorer-card" className={frame}>{body}</div>
   ) : (
     <Link
       href={pageHref(card.href, locale)}

@@ -1,7 +1,7 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { Sparkline } from "../../components/ui/sparkline";
-import { ExplorerCard, leadSpan } from "../../components/explorer-groups/explorer-card";
+import { CARD_GRID_CLASS, ExplorerCard, leadSpan } from "../../components/explorer-groups/explorer-card";
 import type { RegionSpread } from "../../lib/explorer/regionSpread";
 import type { HubCardModel } from "../../lib/explorer/hubCards";
 
@@ -24,6 +24,15 @@ const SPREAD: RegionSpread = {
 describe("leadSpan", () => {
   it("follows the prototype rule: whole row, two columns, or two by two", () => {
     expect([1, 2, 3, 4, 5, 6, 7, 8].map(leadSpan)).toEqual(["lead3", "lead2", "lead2x2", "lead3", "lead2", "lead2x2", "lead3", "lead2"]);
+  });
+});
+
+describe("CARD_GRID_CLASS", () => {
+  it("is one column on phones, two from 768px and three from 1101px", () => {
+    expect(CARD_GRID_CLASS).toContain("grid-cols-1");
+    expect(CARD_GRID_CLASS).toContain("min-[768px]:grid-cols-2");
+    expect(CARD_GRID_CLASS).toContain("min-[1101px]:grid-cols-3");
+    expect(CARD_GRID_CLASS).not.toContain("899");
   });
 });
 
@@ -150,8 +159,52 @@ describe("ExplorerCard", () => {
   it("makes a card without a link a plain, disabled block with a coming-soon badge", () => {
     const markup = html({ card: card({ href: null, comingSoon: true }) });
     expect(markup).not.toContain("<a ");
-    expect(markup).toContain('aria-disabled="true"');
+    expect(markup).not.toContain("aria-disabled");
     expect(markup).toContain("Coming soon");
+  });
+});
+
+describe("ExplorerCard for assistive technology and edge cases", () => {
+  const describedText = (markup: string) => {
+    const ids = /aria-describedby="([^"]+)"/.exec(markup)![1].split(" ");
+    return ids.map((id) => text(new RegExp(`id="${id}"[^>]*>(.*?)</span>`).exec(markup)![1])).join(" / ");
+  };
+
+  it("describes a pair card by its rows, since the band is hidden", () => {
+    const markup = html({
+      card: card({
+        series: null, seriesColor: null, latest: null,
+        graphic: { kind: "pair", max: 20, rows: [{ label: "Men", value: 15.8, text: "15.8%", accent: true }, { label: "Women", value: 11.4, text: "11.4%", accent: false }] },
+      }),
+    });
+    expect(describedText(markup)).toContain("Men 15.8%, Women 11.4%");
+  });
+
+  it("describes a bars card by its first and last band, and a spread card by its extremes", () => {
+    const bars = html({ card: card({ series: null, seriesColor: null, graphic: { kind: "bars", first: "15–19", last: "65+", bars: [{ label: "a", value: 3, accent: true }] } }) });
+    expect(describedText(bars)).toContain("15–19, 65+");
+    const spread = html({ card: card({ series: null, seriesColor: null, latest: null }), spread: SPREAD });
+    expect(describedText(spread)).toContain("Shida Kartli 7.0%, Tbilisi 17.5%");
+  });
+
+  it("draws no NaN or infinite sizes for empty bars or a zero maximum", () => {
+    const empty = html({ card: card({ series: null, seriesColor: null, graphic: { kind: "bars", first: "", last: "", bars: [] } }) });
+    const zero = html({
+      card: card({ series: null, seriesColor: null, graphic: { kind: "pair", max: 0, rows: [{ label: "Men", value: 0, text: "0%", accent: false }] } }),
+    });
+    for (const markup of [empty, zero]) expect(markup).not.toMatch(/NaN|Infinity/);
+    expect(zero).toContain("width:0%");
+  });
+
+  it("places a split lead card's text in fixed rows, so a missing description or value keeps the rest in place", () => {
+    const full = html({ lead: "lead3" });
+    for (const row of [1, 2, 3, 4, 5]) expect(full).toContain(`min-[1101px]:row-start-${row}`);
+    const bare = html({ lead: "lead3", card: card({ description: "", latest: null }) });
+    expect(bare).toContain("min-[1101px]:row-start-2");
+    expect(bare).not.toContain("min-[1101px]:row-start-3");
+    expect(bare).not.toContain("min-[1101px]:row-start-4");
+    expect(bare).toContain("min-[1101px]:row-start-5");
+    expect(html({ lead: "lead2x2" })).not.toContain("row-start");
   });
 });
 

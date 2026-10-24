@@ -74,7 +74,7 @@ export function SpreadGraphic({ spread }: { spread: RegionSpread }) {
 
 /** A bar per band, tallest full height, the marked ones in accent, the first and last band named under them. */
 export function BarsGraphic({ graphic }: { graphic: Extract<CardGraphic, { kind: "bars" }> }) {
-  const max = Math.max(...graphic.bars.map((bar) => bar.value)) || 1;
+  const max = Math.max(0, ...graphic.bars.map((bar) => bar.value)) || 1;
   return (
     <>
       <span className="absolute inset-x-0 top-0 bottom-4 flex items-end gap-[3px]">
@@ -105,7 +105,7 @@ export function PairGraphic({ graphic }: { graphic: Extract<CardGraphic, { kind:
           <span className="block text-[11.5px] leading-[1.3] text-[var(--body)]">{row.label}</span>
           <span className="mt-1 grid grid-cols-[minmax(0,1fr)_64px] items-center gap-2.5">
             <span className="block h-2">
-              <i className={`block h-full ${row.accent ? "bg-[var(--accent)]" : "bg-[var(--control)]"}`} style={{ width: percent((row.value / graphic.max) * 100) }} />
+              <i className={`block h-full ${row.accent ? "bg-[var(--accent)]" : "bg-[var(--control)]"}`} style={{ width: percent(graphic.max > 0 ? (row.value / graphic.max) * 100 : 0) }} />
             </span>
             <b className={`text-right ${NUMERIC} text-[11.5px] font-semibold text-[var(--ink)]`}>{row.text}</b>
           </span>
