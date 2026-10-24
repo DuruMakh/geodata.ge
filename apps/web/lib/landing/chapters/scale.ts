@@ -13,7 +13,7 @@ import type { RevenueSeries, ScaleChapter, ScaleMeasureId, SpendingSeries } from
 // Chapter 01: each measure beside nominal GDP of the same year. One square is
 // GEL 10 million, so GDP itself is the full grid.
 
-const GEL_PER_SQUARE = 10_000_000;
+export const GEL_PER_SQUARE = 10_000_000;
 
 export type ScaleInput = {
   gdp: ServedGdpObservation[];

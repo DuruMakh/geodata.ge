@@ -1,0 +1,460 @@
+"use client";
+
+import { useEffect, useRef, useState } from "react";
+import { formatInUnit, formatShare, UNIT_BN, UNIT_PERSONS } from "../../../lib/explorer/format";
+import { GEL_PER_SQUARE } from "../../../lib/landing/chapters/scale";
+import type { ScaleChapter as ScaleData } from "../../../lib/landing/chapters/types";
+import { placeTip, prefersReducedMotion, sizeCanvas } from "./canvas";
+import { Reveal, useNearViewport } from "./reveal";
+
+// Chapter 01: one square per GEL 10 million, GDP is the whole grid. Squares fill column by column
+// from the bottom left; picking a measure tweens the fill and moves the marker. Ported from the
+// design board's createScale.
+
+export type ScaleLabels = {
+  squareNote: string; // "■ = 10 მლნ ₾"
+  ofGdp: string; // "of GDP" (follows a percentage)
+  cumulative: string; // tooltip: running total up to the hovered square
+  included: string; // tooltip foot prefix: the square is inside the measure
+  notIncluded: string; // tooltip foot prefix: the square is beyond the measure
+  bnGel: string; // "მლრდ ₾"
+};
+
+const FALLBACK = { ink: "#1e1b16", accent: "#b3402a", off: "#e2d7c4" };
+const BN_2 = { ...UNIT_BN, decimals: 2 };
+
+const clamp = (v: number, lo: number, hi: number) => (v < lo ? lo : v > hi ? hi : v);
+const easeInOut = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+const count = (n: number) => formatInUnit(n, UNIT_PERSONS);
+const share = (fraction: number) => formatShare(fraction, false, fraction > 0.999 ? 0 : 1);
+
+function rgb(hex: string): [number, number, number] {
+  const h = /^#[0-9a-f]{6}$/i.test(hex) ? hex : "#000000";
+  return [parseInt(h.slice(1, 3), 16), parseInt(h.slice(3, 5), 16), parseInt(h.slice(5, 7), 16)];
+}
+
+function mixHex(a: string, b: string, t: number): string {
+  const [ar, ag, ab] = rgb(a);
+  const [br, bg, bb] = rgb(b);
+  return `rgb(${Math.round(ar + (br - ar) * t)},${Math.round(ag + (bg - ag) * t)},${Math.round(ab + (bb - ab) * t)})`;
+}
+
+type Engine = { set(squares: number): void; destroy(): void };
+
+type EngineOptions = {
+  wrap: HTMLElement;
+  canvas: HTMLCanvasElement;
+  marker: HTMLElement;
+  markerLabel: HTMLElement;
+  total: number;
+  initial: number;
+  onHover(index: number, x: number, y: number, filled: boolean): void;
+  onLeave(): void;
+};
+
+function createSquares({ wrap, canvas, marker, markerLabel, total, initial, onHover, onLeave }: EngineOptions): Engine {
+  const style = getComputedStyle(wrap);
+  const token = (name: string, fallback: string) => {
+    const value = style.getPropertyValue(name).trim();
+    return /^#[0-9a-f]{6}$/i.test(value) ? value : fallback;
+  };
+  const ink = token("--ink", FALLBACK.ink);
+  const accent = token("--accent", FALLBACK.accent);
+  const off = FALLBACK.off;
+  const reduced = prefersReducedMotion();
+
+  let W = 0;
+  let H = 0;
+  let cell = 6;
+  let rows = 1;
+  let cols = 1;
+  let gap = 1;
+  let cur = 0; // squares currently filled (fractional while tweening)
+  let from = 0;
+  let to = initial;
+  let t0 = 0;
+  let dur = 1;
+  let raf = 0;
+  let alive = true;
+  let seen = false;
+  let intro = reduced ? 1 : 0;
+  let introT0 = 0;
+  let hover = -1;
+
+  // Rows 16..220: the tallest grid that stays within 1.04 x the target height for this width.
+  const layout = () => {
+    const w = Math.round(wrap.clientWidth);
+    if (!w || w === W) return false;
+    W = w;
+    const target = clamp(Math.round(W * 0.56), 280, 520);
+    let best: { r: number; k: number; c: number; h: number } | null = null;
+    for (let r = 16; r <= 220; r++) {
+      const k = Math.ceil(total / r);
+      const c = W / k;
+      const h = r * c;
+      if (h <= target * 1.04 && (!best || h > best.h)) best = { r, k, c, h };
+    }
+    if (!best) {
+      const k = Math.ceil(total / 40);
+      best = { r: 40, k, c: W / k, h: 40 * (W / k) };
+    }
+    rows = best.r;
+    cols = best.k;
+    cell = best.c;
+    gap = cell >= 7 ? 1.5 : 1;
+    H = Math.round(rows * cell);
+    wrap.style.height = `${H}px`;
+    return true;
+  };
+
+  const cx = (c: number) => Math.round(c * cell);
+  const cy = (r: number) => Math.round(H - (r + 1) * cell);
+
+  const placeMarker = () => {
+    const x = Math.min((to / rows) * cell, cols * cell);
+    marker.style.transform = `translateX(${x.toFixed(1)}px)`;
+    if (x > W - 150) {
+      markerLabel.style.left = "auto";
+      markerLabel.style.right = "8px";
+    } else {
+      markerLabel.style.left = "8px";
+      markerLabel.style.right = "auto";
+    }
+    marker.style.opacity = intro >= 1 ? "1" : "0";
+  };
+
+  const draw = () => {
+    if (!W || !alive) return;
+    const ctx = sizeCanvas(canvas, W, H);
+    const now = cur;
+    const edge = Math.abs(to - from) > 0 ? Math.sin(Math.PI * clamp((performance.now() - t0) / dur, 0, 1)) : 0;
+    const band = rows * 2.2;
+    const square = (i: number, path: boolean) => {
+      const c = Math.floor(i / rows);
+      const r = i % rows;
+      const x0 = cx(c);
+      const y0 = cy(r) + gap;
+      const w = cx(c + 1) - x0 - gap;
+      const h = cy(r - 1) - cy(r) - gap;
+      if (path) ctx.rect(x0, y0, w, h);
+      else ctx.fillRect(x0, y0, w, h);
+    };
+    if (intro < 1) {
+      ctx.fillStyle = off;
+      for (let i = 0; i < total; i++) {
+        const c = Math.floor(i / rows);
+        const r = i % rows;
+        const a = clamp((intro * 1.35 - (c / cols) * 0.9 - (r / rows) * 0.25) * 3, 0, 1);
+        if (a <= 0) continue;
+        ctx.globalAlpha = a;
+        square(i, false);
+      }
+      ctx.globalAlpha = 1;
+      return;
+    }
+    ctx.fillStyle = off;
+    ctx.beginPath();
+    for (let i = Math.max(0, Math.floor(now)); i < total; i++) square(i, true);
+    ctx.fill();
+    ctx.fillStyle = ink;
+    ctx.beginPath();
+    const full = Math.floor(now);
+    for (let i = 0; i < full; i++) square(i, true);
+    ctx.fill();
+    if (edge > 0.01) {
+      for (let i = Math.max(0, Math.floor(now - band)); i < full; i++) {
+        const k = 1 - (now - i) / band;
+        ctx.fillStyle = mixHex(ink, accent, clamp(k * edge * 1.2, 0, 1));
+        square(i, false);
+      }
+    }
+    if (hover >= 0 && hover < total) {
+      const c = Math.floor(hover / rows);
+      const r = hover % rows;
+      ctx.strokeStyle = accent;
+      ctx.lineWidth = 1.5;
+      ctx.strokeRect(cx(c) - 1, cy(r) + gap - 1, cx(c + 1) - cx(c) - gap + 2, cy(r - 1) - cy(r) - gap + 2);
+    }
+  };
+
+  const animate = (n: number, ms: number) => {
+    from = cur;
+    to = n;
+    t0 = performance.now();
+    dur = ms;
+    placeMarker();
+    cancelAnimationFrame(raf);
+    if (reduced) {
+      cur = from = to = n;
+      draw();
+      placeMarker();
+      return;
+    }
+    const frame = (t: number) => {
+      if (!alive) return;
+      const k = clamp((t - t0) / dur, 0, 1);
+      cur = from + (to - from) * easeInOut(k);
+      draw();
+      if (k < 1) raf = requestAnimationFrame(frame);
+      else {
+        from = to = cur = n;
+        draw();
+      }
+    };
+    raf = requestAnimationFrame(frame);
+  };
+
+  const startIntro = () => {
+    if (seen) return;
+    seen = true;
+    if (intro >= 1) {
+      animate(to, 10);
+      return;
+    }
+    introT0 = performance.now();
+    const frame = (t: number) => {
+      if (!alive) return;
+      intro = clamp((t - introT0) / 1300, 0, 1);
+      draw();
+      if (intro < 1) raf = requestAnimationFrame(frame);
+      else animate(to, 1400);
+    };
+    raf = requestAnimationFrame(frame);
+  };
+
+  const move = (event: PointerEvent) => {
+    if (intro < 1) return;
+    const box = canvas.getBoundingClientRect();
+    const px = event.clientX - box.left;
+    const py = event.clientY - box.top;
+    const c = Math.floor(px / cell);
+    const r = Math.floor((H - py) / cell);
+    const i = c * rows + r;
+    const ok = c >= 0 && r >= 0 && r < rows && i < total;
+    const n = ok ? i : -1;
+    if (n !== hover) {
+      hover = n;
+      draw();
+    }
+    if (!ok) {
+      onLeave();
+      return;
+    }
+    onHover(i, c * cell + cell / 2, H - (r + 0.5) * cell, i < Math.round(cur));
+  };
+  const leave = () => {
+    if (hover !== -1) {
+      hover = -1;
+      draw();
+    }
+    onLeave();
+  };
+  canvas.addEventListener("pointermove", move);
+  canvas.addEventListener("pointerdown", move);
+  canvas.addEventListener("pointerleave", leave);
+
+  const onSize = () => {
+    if (layout()) {
+      draw();
+      placeMarker();
+    }
+  };
+  let resizeObserver: ResizeObserver | null = null;
+  let introObserver: IntersectionObserver | null = null;
+  if (typeof ResizeObserver !== "undefined") {
+    resizeObserver = new ResizeObserver(onSize);
+    resizeObserver.observe(wrap);
+  }
+  onSize();
+  if (typeof IntersectionObserver !== "undefined") {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (!entries.some((entry) => entry.isIntersecting)) return;
+        observer.disconnect();
+        startIntro();
+      },
+      { threshold: 0.25 },
+    );
+    introObserver = observer;
+    observer.observe(wrap);
+  } else {
+    intro = 1;
+    seen = true;
+    cur = to;
+    draw();
+    placeMarker();
+  }
+
+  return {
+    set(squares) {
+      to = squares;
+      if (!seen || intro < 1) {
+        placeMarker();
+        return;
+      }
+      animate(squares, 1100);
+    },
+    destroy() {
+      alive = false;
+      cancelAnimationFrame(raf);
+      resizeObserver?.disconnect();
+      introObserver?.disconnect();
+      canvas.removeEventListener("pointermove", move);
+      canvas.removeEventListener("pointerdown", move);
+      canvas.removeEventListener("pointerleave", leave);
+    },
+  };
+}
+
+export function ScaleChapter({ data, labels }: { data: ScaleData; labels: ScaleLabels }) {
+  const [selectedId, setSelectedId] = useState<string>(data.defaultId);
+  const selected = data.measures.find((m) => m.id === selectedId) ?? data.measures[0];
+  const gdp = data.measures.find((m) => m.id === "gdp");
+
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const markerRef = useRef<HTMLDivElement>(null);
+  const markerLabelRef = useRef<HTMLSpanElement>(null);
+  const tipRef = useRef<HTMLDivElement>(null);
+  const tipTitleRef = useRef<HTMLDivElement>(null);
+  const tipKeyRef = useRef<HTMLElement>(null);
+  const tipValueRef = useRef<HTMLElement>(null);
+  const tipNameRef = useRef<HTMLSpanElement>(null);
+  const tipShareRef = useRef<HTMLElement>(null);
+  const tipShareNameRef = useRef<HTMLSpanElement>(null);
+  const tipFootRef = useRef<HTMLDivElement>(null);
+  const engineRef = useRef<Engine | null>(null);
+  // Read by the long-lived engine callbacks, so a measure change never rebuilds the engine.
+  const live = useRef({ selected, labels, data });
+  useEffect(() => {
+    live.current = { selected, labels, data };
+  });
+
+  const near = useNearViewport(wrapRef);
+
+  useEffect(() => {
+    const wrap = wrapRef.current;
+    const canvas = canvasRef.current;
+    const marker = markerRef.current;
+    const markerLabel = markerLabelRef.current;
+    const tip = tipRef.current;
+    if (!near || !wrap || !canvas || !marker || !markerLabel || !tip) return;
+    const text = (el: HTMLElement | null, value: string) => {
+      if (el) el.textContent = value;
+    };
+    const engine = createSquares({
+      wrap,
+      canvas,
+      marker,
+      markerLabel,
+      total: data.squares,
+      initial: live.current.selected.squares,
+      onHover(index, x, y, filled) {
+        const { selected: measure, labels: l, data: d } = live.current;
+        const cumulativeGel = (index + 1) * GEL_PER_SQUARE;
+        text(tipTitleRef.current, `■ ${count(index + 1)} / ${count(d.squares)}`);
+        if (tipKeyRef.current) tipKeyRef.current.style.background = filled ? FALLBACK.ink : FALLBACK.off;
+        text(tipValueRef.current, `${formatInUnit(cumulativeGel, BN_2)} ${l.bnGel}`);
+        text(tipNameRef.current, l.cumulative);
+        text(tipShareRef.current, share(cumulativeGel / d.gdpGel));
+        text(tipShareNameRef.current, l.ofGdp);
+        text(tipFootRef.current, `${filled ? l.included : l.notIncluded}${measure.label.toLocaleLowerCase()}`);
+        placeTip(tip, x, y, wrap.clientWidth, wrap.clientHeight);
+      },
+      onLeave() {
+        tip.style.opacity = "0";
+      },
+    });
+    engineRef.current = engine;
+    return () => {
+      engine.destroy();
+      engineRef.current = null;
+    };
+  }, [near, data.squares]);
+
+  useEffect(() => {
+    engineRef.current?.set(selected.squares);
+  }, [selected.squares]);
+
+  const markerText = `${share(selected.share)} ${labels.ofGdp}`;
+
+  return (
+    <Reveal className="mt-8 grid grid-cols-1 gap-8 min-[1000px]:grid-cols-[300px_minmax(0,1fr)] min-[1000px]:gap-12">
+      <div>
+        <div className="flex flex-col border-t border-[var(--hairline-soft)]">
+          {data.measures.map((measure) => (
+            <button
+              key={measure.id}
+              type="button"
+              aria-pressed={measure.id === selected.id}
+              onClick={() => setSelectedId(measure.id)}
+              className="group grid min-h-[50px] grid-cols-[12px_minmax(0,1fr)_auto] items-center gap-3 border-b border-[var(--hairline-soft)] px-1.5 py-[9px] text-left transition-colors hover:bg-[var(--tint)]"
+            >
+              <span
+                aria-hidden
+                className="h-2.5 w-2.5 rounded-[1px] border-[1.5px] border-[var(--control)] transition-colors group-aria-pressed:border-[var(--accent)] group-aria-pressed:bg-[var(--accent)]"
+              />
+              <span className="text-[13.5px] font-medium leading-[1.3] group-aria-pressed:font-semibold">{measure.label}</span>
+              <span className="whitespace-nowrap font-[family-name:var(--font-numeric)] text-xs text-[var(--muted)]">
+                {formatInUnit(measure.valueGel, UNIT_BN)}&nbsp;{labels.bnGel}
+              </span>
+            </button>
+          ))}
+        </div>
+        <div aria-live="polite" className="mt-[26px]">
+          <div className="font-[family-name:var(--font-display)] text-[clamp(40px,4.4vw,58px)] font-semibold leading-none tracking-[-0.02em]">
+            {formatInUnit(selected.valueGel, UNIT_BN)}
+            <small className="ml-[0.2em] text-[0.4em] font-semibold tracking-normal">{labels.bnGel}</small>
+          </div>
+          <div className="mt-3 font-[family-name:var(--font-numeric)] text-[13px] text-[var(--body)]">
+            <b className="font-semibold text-[var(--ink)]">{markerText}</b> · {count(selected.squares)} ■
+          </div>
+        </div>
+      </div>
+      <figure>
+        <div className="mb-3 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1.5">
+          <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]">{labels.squareNote}</span>
+          <span className="font-[family-name:var(--font-numeric)] text-[11.5px] text-[var(--muted)]">
+            {count(data.squares)} ■ = {gdp?.label ?? ""}, {data.year}
+          </span>
+        </div>
+        <div ref={wrapRef} className="relative h-[280px] w-full cursor-crosshair min-[1000px]:h-[420px]">
+          <canvas
+            ref={canvasRef}
+            role="img"
+            aria-label={`${count(data.squares)} ■, ${labels.squareNote}; ${selected.label}: ${count(selected.squares)} ■`}
+            className="absolute left-0 top-0"
+          />
+          <div
+            ref={markerRef}
+            className="pointer-events-none absolute -bottom-2.5 -top-2.5 left-0 w-0 border-l-[1.5px] border-[var(--accent)] opacity-0 [transition:transform_.9s_cubic-bezier(.22,.7,.18,1),opacity_.3s] motion-reduce:[transition:none]"
+          >
+            <span
+              ref={markerLabelRef}
+              className="absolute left-2 top-[14px] whitespace-nowrap border border-[var(--hairline)] bg-[var(--paper)] px-2 py-1 font-[family-name:var(--font-numeric)] text-xs font-semibold text-[var(--ink)] shadow-[0_4px_14px_rgba(30,27,22,.12)]"
+            >
+              {markerText}
+            </span>
+          </div>
+          <div
+            ref={tipRef}
+            aria-hidden="true"
+            className="pointer-events-none absolute left-0 top-0 z-[6] min-w-[156px] max-w-[270px] rounded-[4px] border border-[var(--hairline)] bg-[var(--tile)] px-3 pb-[9px] pt-2.5 text-xs leading-[1.35] text-[var(--ink)] opacity-0 shadow-[0_10px_28px_rgba(30,27,22,.13)] transition-opacity duration-[120ms]"
+          >
+            <div ref={tipTitleRef} className="mb-[5px] text-xs font-semibold" />
+            <div className="mt-1 flex items-center gap-2">
+              <i ref={tipKeyRef} className="h-0.5 w-3 flex-none rounded-[1px]" />
+              <b ref={tipValueRef} className="whitespace-nowrap font-[family-name:var(--font-numeric)] text-xs font-semibold" />
+              <span ref={tipNameRef} className="text-[11.5px] text-[var(--muted)]" />
+            </div>
+            <div className="mt-1 flex items-center gap-2">
+              <b ref={tipShareRef} className="whitespace-nowrap font-[family-name:var(--font-numeric)] text-xs font-semibold" />
+              <span ref={tipShareNameRef} className="text-[11.5px] text-[var(--muted)]" />
+            </div>
+            <div ref={tipFootRef} className="mt-1.5 border-t border-[var(--row-border)] pt-1.5 text-[11px] text-[var(--muted)]" />
+          </div>
+        </div>
+      </figure>
+    </Reveal>
+  );
+}
