@@ -38,10 +38,11 @@ export type FiscalDatasetId = Exclude<DatasetId, "ministries" | "inflation" | "i
  */
 export type TopicDatasetId =
   | Exclude<MethodologyDatasetId, "expenditure" | "revenue" | "municipalities" | "debt" | "gdp" | "economic-sectors" | "regional-economies" | "demography">
-  | "inflation-products";
+  | "inflation-products"
+  | "funded-pension";
 
 /** An official statistics producer whose published figures a dataset is read from. */
-export type SourceAgencyId = "geostat" | "nbg" | "ssa" | "mof" | "treasury";
+export type SourceAgencyId = "geostat" | "nbg" | "ssa" | "mof" | "treasury" | "pension_fund";
 
 const SOURCE_AGENCIES: Record<SourceAgencyId, { name: Localized; url: string }> = {
   geostat: {
@@ -63,6 +64,10 @@ const SOURCE_AGENCIES: Record<SourceAgencyId, { name: Localized; url: string }> 
   treasury: {
     name: { ka: "სახაზინო სამსახური", en: "State Treasury of Georgia" },
     url: "https://www.treasury.ge",
+  },
+  pension_fund: {
+    name: { ka: "საქართველოს საპენსიო ფონდი", en: "Pension Fund of Georgia" },
+    url: "https://pensions.ge",
   },
 };
 
@@ -473,6 +478,17 @@ const TOPIC_DATASETS: Record<TopicDatasetId, { keywords: Record<Locale, readonly
       en: "Reviewed extraction from the Social Service Agency's monthly statistics: December counts and the sum of 12 monthly amounts; averages, shares of residents, 2025 prices and shares of GDP are calculated by Fiscal.ge with Geostat data.",
     },
     sources: ["ssa", "geostat"],
+  },
+  "funded-pension": {
+    keywords: {
+      ka: ["დაგროვებითი პენსია", "საპენსიო დანაზოგი", "საპენსიო ფონდი", "საქართველო"],
+      en: ["Georgia", "funded pension", "pension savings", "pension fund", "pension contributions"],
+    },
+    measurementTechnique: {
+      ka: "გადამოწმებული ამოღება საქართველოს საპენსიო ფონდის აუდირებული ფინანსური ანგარიშგებიდან (IFRS) და წლიური ანგარიშიდან, ისე, როგორც ისინი იბეჭდება; მშპ-სთან შეფარდებას Fiscal.ge ითვლის საქსტატის მონაცემებით.",
+      en: "Reviewed extraction from the Pension Fund of Georgia's audited IFRS financial statements and annual report, as they print the figures; shares of GDP are calculated by Fiscal.ge with Geostat data.",
+    },
+    sources: ["pension_fund", "geostat"],
   },
   environment: {
     keywords: {

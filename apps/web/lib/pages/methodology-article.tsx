@@ -95,7 +95,7 @@ const DATASET_SOURCE_NOTES = {
   poverty: "common.geostatSourceNote",
   "household-income": "common.geostatSourceNote",
   health: "common.geostatSourceNote",
-  "social-protection": "common.socialSourceNote",
+  "social-protection": "common.socialHubSourceNote",
   education: "common.geostatSourceNote",
   "science-culture": "common.geostatSourceNote",
   crime: "common.geostatSourceNote",

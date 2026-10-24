@@ -7,9 +7,9 @@ import { expect, test } from "vitest";
 import { assertSocialParity, loadSocialBreaks, loadSocialFacts, toClientSocialFact } from "../../../lib/data/social/importSocial";
 import { loadSocialFactsFromMirror, socialMirrorCreateRows } from "../../../lib/db/mirrorRows";
 import type { Prisma } from "../../../lib/generated/prisma/client";
-import { REVIEWED_AT, SOCIAL_CSV_HEADERS, checkKnownDifferences, loadSocialAverageInputs, prepareSocialData } from "../../../lib/data/social/prepareSocial";
+import { FUNDED_REVIEWED_AT, REVIEWED_AT, SOCIAL_CSV_HEADERS, checkKnownDifferences, loadSocialAverageInputs, prepareSocialData } from "../../../lib/data/social/prepareSocial";
 import {
-  SOCIAL_AGE_BANDS, SOCIAL_GEORGIA, SOCIAL_INDICATORS, SOCIAL_PAYMENT_PROGRAMMES, SOCIAL_PUBLIC_SOURCES, SOCIAL_SOURCES, socialFactKey, socialSourceDocumentId, type SocialFact, type SocialIndicator,
+  FUNDED_PENSION_MONEY as FUNDED_MONEY, FUNDED_PENSION_SOURCES, SOCIAL_AGE_BANDS, SOCIAL_GEORGIA, SOCIAL_INDICATORS, SOCIAL_PAYMENT_PROGRAMMES, SOCIAL_PUBLIC_SOURCES, SOCIAL_SOURCES, socialFactKey, socialSourceDocumentId, type SocialFact, type SocialIndicator,
 } from "../../../lib/data/social/types";
 import { SOCIAL_AVERAGE_GAPS, SOCIAL_KNOWN_DIFFERENCES, expectedSocialKeys, socialAverage, validateSocialFacts, type SocialAverageInputs } from "../../../lib/data/social/validation";
 
@@ -22,6 +22,8 @@ const loadFacts = async (): Promise<SocialFact[]> =>
     months: Number(row.months), basis: row.basis as "actual", valueStatus: row.value_status as SocialFact["valueStatus"], sourceId: row.source_id,
     sourceWorkbook: row.source_workbook, sourceSheet: row.source_sheet, sourceCell: row.source_cell, lastReviewedAt: row.last_reviewed_at,
   }));
+/** The funded pension rows have their own rules (negative gains, 12-month counts); the SSA tests below look at the SSA rows. */
+const ssaOnly = (facts: readonly SocialFact[]) => facts.filter(f => !f.indicatorId.startsWith("social.funded_pension."));
 const find = (facts: readonly SocialFact[], indicatorId: string, geographyId: string, year: number) => facts.find(f => f.indicatorId === indicatorId && f.geographyId === geographyId && f.year === year)!;
 const has = (facts: readonly SocialFact[], indicatorId: string, geographyId: string, year: number) => facts.some(f => f.indicatorId === indicatorId && f.geographyId === geographyId && f.year === year);
 type SocialInput = SocialAverageInputs extends ReadonlyMap<string, infer V> ? V : never;
@@ -55,15 +57,18 @@ test("serves the package's place, social package and programme values, with the 
       && gap.indicatorId === (row.programme === "social_package_group" ? `social.social_package.${row.measure.split(".")[1]}` : `social.${row.programme === "subsistence_allowance" ? "subsistence" : row.programme}`) + ".avg_monthly"));
   const payments = rows.filter(row => national(row) && row.programme !== "pension_idp");
   const years = new Set(rows.map(row => row.year)).size;
-  expect(facts).toHaveLength(served.length + averaged.length + payments.length + years);
-  expect(facts).toHaveLength(21988);
-  expect(SOCIAL_INDICATORS).toHaveLength(73);
+  const funded = await readCsv(path.join(root, "docs/Raw Data/Social/pension-fund/pension-fund-annual.csv"));
+  expect(funded).toHaveLength(99);
+  expect(facts).toHaveLength(served.length + averaged.length + payments.length + years + funded.length);
+  expect(facts).toHaveLength(22087);
+  expect(facts.filter(f => f.indicatorId.startsWith("social.funded_pension."))).toHaveLength(99);
+  expect(SOCIAL_INDICATORS).toHaveLength(88);
   expect(SOCIAL_PAYMENT_PROGRAMMES).toHaveLength(18);
-  expect(SOCIAL_SOURCES).toHaveLength(24);
+  expect(SOCIAL_SOURCES).toHaveLength(30);
   expect(SOCIAL_PUBLIC_SOURCES).toEqual([...SOCIAL_SOURCES, "ssa_statistics"]);
   expect(new Set(facts.map(f => f.indicatorId))).toEqual(new Set(SOCIAL_INDICATORS));
   expect(new Set(facts.map(f => f.sourceId))).toEqual(new Set(SOCIAL_PUBLIC_SOURCES));
-  expect(facts.every(f => f.basis === "actual" && f.lastReviewedAt === REVIEWED_AT)).toBe(true);
+  expect(facts.every(f => f.basis === "actual" && f.lastReviewedAt === (f.indicatorId.startsWith("social.funded_pension.") ? FUNDED_REVIEWED_AT : REVIEWED_AT))).toBe(true);
   expect(Math.min(...facts.map(f => f.year))).toBe(2013);
   expect(Math.max(...facts.map(f => f.year))).toBe(2025);
   expect(facts.some(f => f.geographyId === "04")).toBe(false);
@@ -89,7 +94,7 @@ test("the spec's anchors and the calculated averages", async () => {
   expect(averages.every(f => /^\d+\.\d\d$/.test(f.value) && f.unit === "gel" && f.valueStatus === "calculated")).toBe(true);
   // Places that never had a high-mountain pensioner have no average: 0 / 0 is a gap, not zero.
   expect(has(facts, "social.pension_highmountain.avg_monthly", "region.tbilisi", 2023)).toBe(false);
-  expect(facts.filter(f => f.indicatorId.endsWith(".amount") || f.indicatorId.endsWith(".employment_amount")).every(f => f.unit === "gel" && /^\d+$/.test(f.value))).toBe(true);
+  expect(ssaOnly(facts).filter(f => f.indicatorId.endsWith(".amount") || f.indicatorId.endsWith(".employment_amount")).every(f => f.unit === "gel" && /^\d+$/.test(f.value))).toBe(true);
   expect(find(facts, "social.subsistence.families", "06", 2025).unit).toBe("families");
   expect(find(facts, "social.subsistence.persons", "06", 2025).unit).toBe("persons");
 });
@@ -163,7 +168,7 @@ test("partial years: payments keep their published months, place and social pack
   expect(has(facts, "social.subsistence.employment_amount", SOCIAL_GEORGIA, 2022)).toBe(false);
   // A later partial year stays, marked with its months.
   expect(find(facts, "social.pension.amount", "unit.upper_abkhazia", 2022).months).toBe(9);
-  expect(facts.filter(f => !/(amount|avg_monthly)$/.test(f.indicatorId)).every(f => f.months === 1)).toBe(true);
+  expect(ssaOnly(facts).filter(f => !/(amount|avg_monthly)$/.test(f.indicatorId)).every(f => f.months === 1)).toBe(true);
 });
 
 test("the canonical file is UTF-8 with a BOM and the agreed header", async () => {
@@ -281,7 +286,7 @@ test("prepare requires each recorded national average gap's blank cell in the so
 test("the loader reads the committed canonical file and its break register", async () => {
   const facts = await loadSocialFacts();
   expect(facts).toEqual(await loadFacts());
-  expect(facts).toHaveLength(21988);
+  expect(facts).toHaveLength(22087);
   const breaks = await loadSocialBreaks();
   expect(breaks.map(b => b.breakId)).toEqual(["subsistence_employment_2022", "social_package_groups_2025"]);
   expect(breaks[0].appliesTo).toEqual(["social.subsistence.families", "social.subsistence.persons", ...SOCIAL_AGE_BANDS.map(band => `social.subsistence.persons_age_${band}`)]);
@@ -336,5 +341,82 @@ test("the database mirror round-trips exact decimals, months and source relation
 test("every cited source has a source-document row", async () => {
   const csv = await fs.readFile(path.join(root, "data/sources/source-documents.csv"));
   const ids = new Set((parse(csv, { columns: true, bom: true }) as Record<string, string>[]).map(r => r.source_id));
+  expect(FUNDED_PENSION_SOURCES.every(id => SOCIAL_PUBLIC_SOURCES.includes(id))).toBe(true);
   expect(SOCIAL_PUBLIC_SOURCES.filter(id => !ids.has(socialSourceDocumentId(id)))).toEqual([]);
 });
+
+test("the funded pension values are the Pension Fund package's 99 printed figures, each citing its statement", async () => {
+  const facts = (await loadFacts()).filter(f => f.indicatorId.startsWith("social.funded_pension."));
+  const rows = await readCsv(path.join(root, "docs/Raw Data/Social/pension-fund/pension-fund-annual.csv"));
+  expect(facts).toHaveLength(rows.length);
+  for (const row of rows) {
+    const indicatorId = (FUNDED_MONEY as readonly string[]).includes(row.measure) ? `social.funded_pension.${row.measure}.amount` : `social.funded_pension.${row.measure}`;
+    expect(find(facts, indicatorId, SOCIAL_GEORGIA, Number(row.year)), `${row.measure} ${row.year}`).toMatchObject({
+      value: row.value, unit: row.unit, months: Number(row.months), basis: "actual", valueStatus: "official", sourceId: row.source_id,
+      sourceWorkbook: row.document, sourceSheet: row.page, sourceCell: row.line, lastReviewedAt: FUNDED_REVIEWED_AT,
+    });
+  }
+  expect(find(facts, "social.funded_pension.savings.amount", SOCIAL_GEORGIA, 2025).value).toBe("8237530000");
+  expect(find(facts, "social.funded_pension.securities_gains.amount", SOCIAL_GEORGIA, 2022).value).toBe("-31187000");
+  expect(has(facts, "social.funded_pension.dividends.amount", SOCIAL_GEORGIA, 2021)).toBe(false);
+  expect(new Set(facts.map(f => f.sourceId))).toEqual(new Set(FUNDED_PENSION_SOURCES));
+});
+
+/** A temporary repository root holding only a copy of the Pension Fund package (the six served statements), which prepare reads before the SSA package. */
+async function withFundedPackage(change: (directory: string) => Promise<void>, run: (repositoryRoot: string) => Promise<void>) {
+  const repositoryRoot = await fs.mkdtemp(path.join(os.tmpdir(), "social-funded-"));
+  try {
+    const source = path.join(root, "docs/Raw Data/Social/pension-fund");
+    const directory = path.join(repositoryRoot, "docs/Raw Data/Social/pension-fund");
+    await fs.mkdir(path.join(directory, "official"), { recursive: true });
+    for (const name of ["pension-fund-annual.csv", "source-manifest.json", "validation-report.json"]) await fs.copyFile(path.join(source, name), path.join(directory, name));
+    for (const name of ["2020-IFRS.pdf", "2022-IFRS-GE.pdf", "2023-IFRS-GE.pdf", "2024-IFRS-GE.pdf", "2025-IFRS.pdf", "Annual_Rep_2025_geo.pdf"]) {
+      await fs.copyFile(path.join(source, "official", name), path.join(directory, "official", name));
+    }
+    await change(directory);
+    await run(repositoryRoot);
+  } finally {
+    await fs.rm(repositoryRoot, { recursive: true, force: true });
+  }
+}
+
+test("prepare rejects a Pension Fund statement that no longer matches the package manifest", async () => {
+  await withFundedPackage(async directory => {
+    const file = path.join(directory, "official/2022-IFRS-GE.pdf");
+    const bytes = await fs.readFile(file);
+    bytes[bytes.length - 1] ^= 1;
+    await fs.writeFile(file, bytes);
+  }, async repositoryRoot => {
+    await expect(prepareSocialData(repositoryRoot, "check")).rejects.toThrow(/Social source capture mismatch: 2022-IFRS-GE\.pdf/);
+  });
+}, 60_000);
+
+test.each([
+  ["a package whose validation did not pass", async (directory: string) => {
+    const file = path.join(directory, "validation-report.json");
+    await fs.writeFile(file, (await fs.readFile(file, "utf8")).replace('"passed": true', '"passed": false'));
+  }, /Pension fund research package validation has not passed/],
+  ["a package with a changed row count", async (directory: string) => {
+    const file = path.join(directory, "pension-fund-annual.csv");
+    await fs.writeFile(file, (await fs.readFile(file, "utf8")).trimEnd().split("\n").slice(0, -1).join("\n") + "\n");
+  }, /Pension fund file has 98 rows, expected 99/],
+  ["a package with a changed header", async (directory: string) => {
+    const file = path.join(directory, "pension-fund-annual.csv");
+    await fs.writeFile(file, (await fs.readFile(file, "utf8")).replace("measure,year,value", "measure,year,amount"));
+  }, /Pension fund file header changed/],
+  ["a row that cites a document other than its source's", async (directory: string) => {
+    const file = path.join(directory, "pension-fund-annual.csv");
+    await fs.writeFile(file, (await fs.readFile(file, "utf8")).replace("pension_fund_ifrs_2020,2020-IFRS.pdf", "pension_fund_ifrs_2020,2022-IFRS-GE.pdf"));
+  }, /Pension fund document not in the source manifest/],
+  // A value that no anchor, row count or document name guards: only the hash the package's report holds for the CSV catches it.
+  ["a package whose CSV has a hand-edited value", async (directory: string) => {
+    const file = path.join(directory, "pension-fund-annual.csv");
+    const text = await fs.readFile(file, "utf8");
+    expect(text).toContain("interest,2021,163741000,");
+    await fs.writeFile(file, text.replace("interest,2021,163741000,", "interest,2021,163741001,"));
+  }, /Social source capture mismatch: pension-fund-annual\.csv/],
+])("prepare rejects %s", async (_name, change, message) => {
+  await withFundedPackage(change, async repositoryRoot => {
+    await expect(prepareSocialData(repositoryRoot, "check")).rejects.toThrow(message);
+  });
+}, 60_000);
