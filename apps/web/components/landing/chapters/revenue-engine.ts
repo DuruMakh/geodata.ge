@@ -159,7 +159,7 @@ export function createRevenue({ wrap, canvas, data, labels, onHover, onLeave }: 
           txt(ctx, fitText(ctx, `${money(v, lab)} · ${formatShare(sh)}`, room), lx + 15, yy + 11, `500 11px ${num}`, muted);
         } else {
           ctx.fillRect(lx, yy - 3.5, 7, 7);
-          txt(ctx, formatShare(sh, false, 0), lx + 10, yy, `600 10.5px ${num}`, ink, "left", "middle");
+          txt(ctx, formatShare(sh, false, 0), lx + 10, yy, `600 11px ${num}`, ink, "left", "middle");
         }
       });
     }
