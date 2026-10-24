@@ -18,6 +18,12 @@ limit; opening that transaction has a separate 30-second wait limit. Exceeding
 either limit fails the import. Validation and exact row parity remain inside the
 same all-or-nothing transaction, and a failure preserves the previous mirror.
 
+Every pull request rehearses the import: CI's `mirror` job applies every
+migration and runs `npm run data:import` against a disposable PostgreSQL, then
+the database integration tests (`docs/deployment.md`, "How deploys happen"). A
+schema that cannot hold the reviewed CSVs fails the pull request, not the
+production deploy.
+
 ## What the import loads
 
 Unemployment uses the existing single import transaction. Source IDs retain their original research identity in each observation; the source-register relation adds the required `source.` prefix. The importer validates all observations and registered references before opening the transaction, deletes unemployment children before source parents, creates rows with the active run ID and reloads them through the serving mapper. Exact field/value parity must pass before commit. Both numeric fields use Decimal(40,20), and displayed values preserve one-decimal precision. The private table has row-level security enabled and grants no access to `anon` or `authenticated`. Local verification covers schema generation, mapping and rejection of missing/mismatched rows; applying the migration and importing a live mirror requires delivery authorization.

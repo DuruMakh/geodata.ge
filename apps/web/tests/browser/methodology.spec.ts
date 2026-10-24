@@ -3,6 +3,7 @@ import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { LIVE_METHODOLOGY_IDS } from "../../lib/methodology/types";
+import { NAV_TREE } from "../../lib/navigation/navTree";
 import { TEST_BASE_URL } from "./test-base-url";
 
 async function expectVisibleFocusOutline(locator: Locator) {
@@ -93,7 +94,7 @@ for (const path of [
 test("methodology hub separates live datasets from future markers", async ({ page }) => {
   await page.goto(`${TEST_BASE_URL}/methodology`);
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("მეთოდოლოგია და პირველწყაროები");
-  await expect(page.getByTestId("methodology-live-row")).toHaveCount(29);
+  await expect(page.getByTestId("methodology-live-row")).toHaveCount(LIVE_METHODOLOGY_IDS.length);
   // Unemployment, trade and demography are all live, so no future row remains to name.
   await expect(page.getByTestId("methodology-future-row")).toHaveCount(0);
   await expect(page.getByTestId("methodology-live-row").first()).toContainText(/2004–2025/);
@@ -104,8 +105,8 @@ test("future routes stay on the static 404 surface", async ({ page }) => {
     const response = await page.goto(`${TEST_BASE_URL}/methodology/${slug}`);
     expect(response?.status(), slug).toBe(404);
     await expect(page.getByRole("heading", { level: 1, name: "გვერდი ვერ მოიძებნა" })).toHaveCount(1);
-    // Home, the twenty dataset hubs and methodology.
-    await expect(page.getByTestId("not-found-recovery").getByRole("link")).toHaveCount(22);
+    // Home, every dataset hub and methodology.
+    await expect(page.getByTestId("not-found-recovery").getByRole("link")).toHaveCount(NAV_TREE.length + 2);
     await expect(page.locator(`link[rel="canonical"][href*="/methodology/${slug}"]`)).toHaveCount(0);
     await expect(page.locator(`meta[property="og:url"][content*="/methodology/${slug}"]`)).toHaveCount(0);
     await expect(page.getByTestId("site-json-ld")).toHaveCount(1);

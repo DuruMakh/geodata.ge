@@ -105,6 +105,11 @@ export function roundForDisplay(value: number, decimals: number): number {
   return Number(decimalFixed(value, decimals).replaceAll(",", "")) + 0;
 }
 
+/** A calculated value for a workbook cell, rounded as the page shows it (`roundForDisplay`); a gap stays null. */
+export function roundShown(value: number | null, decimals: number): number | null {
+  return value === null ? null : roundForDisplay(value, decimals);
+}
+
 // Any negative value keeps its minus (−0.0%); the digits get the same en-US
 // grouping as every other figure, so a mover reads "+4,565.1%".
 function formatSignedFixed(value: number, signed: boolean, decimals: number): string {

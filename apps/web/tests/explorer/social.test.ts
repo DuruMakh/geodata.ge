@@ -11,11 +11,12 @@ import { shareOfGdp } from "../../lib/explorer/debtExplorer";
 import { projectGdpFact, type ClientNationalGdpFact } from "../../lib/explorer/clientData";
 import { EDITORIAL_PALETTE, INK } from "../../lib/explorer/colors";
 import { createWorkbookBuffer } from "../../lib/explorer/workbookWriter.client";
+import { message } from "../../lib/i18n/messages";
 import { getMessages } from "../../lib/i18n/messages.server";
 import type { Presentation } from "../../lib/i18n/types";
 import { placePageHref } from "../../lib/explorer/demographyPlaceRoutes";
 import {
-  SOCIAL_SECTIONS, atPrices, buildSocialModel, changeSocialSelection, changeSocialView, defaultSocialState, parseSocialHash, serializeSocialHash, sharePerHundred,
+  SOCIAL_PRICE_BASE_YEAR, SOCIAL_SECTIONS, atPrices, buildSocialModel, changeSocialSelection, changeSocialView, defaultSocialState, parseSocialHash, serializeSocialHash, sharePerHundred,
   socialAnnualCpi, socialCoverage, socialPaymentsViewFacts, socialPopulation, socialSeriesColor, socialTopicFacts, socialTopicSeries, socialViews, type SocialPopulation, type SocialPriceIndex,
 } from "../../lib/explorer/social";
 import { buildSocialHubCards } from "../../lib/explorer/socialHubCards";
@@ -667,4 +668,13 @@ test("funded pension as % of GDP divides the money rows by GDP and leaves the co
   const gains = shown.find(f => f.indicatorId === `${FUNDED}securities_gains.amount` && f.year === 2022)!;
   expect(gains.value).toBeLessThan(0);
   expect(gains.value).toBeCloseTo(shareOfGdp(-31187000, 2022, gdpByYear)! * 100, 10);
+});
+
+test("the price base year is named once: both languages' label names it and atPrices uses it", async () => {
+  for (const locale of ["en", "ka"] as const) {
+    expect(message((await presentation(locale)).messages, "social.series.social.pension.avg_monthly#real")).toContain(String(SOCIAL_PRICE_BASE_YEAR));
+  }
+  const fact = { year: SOCIAL_PRICE_BASE_YEAR - 1, indicatorId: "social.pension.avg_monthly", geographyId: "x", sourceId: "x", months: 12, valueStatus: "official", value: 10 } as const;
+  const [real] = atPrices([fact], [{ year: SOCIAL_PRICE_BASE_YEAR - 1, index: 100 }, { year: SOCIAL_PRICE_BASE_YEAR, index: 200 }]);
+  expect(real.value).toBe(20);
 });

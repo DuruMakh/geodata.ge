@@ -233,6 +233,15 @@ const LABELS: Record<string, string> = { "crime.convicted.total": "People convic
 const loadWorkbook = async (model: Parameters<typeof createWorkbookBuffer>[0]) => { const excel = new ExcelJS.Workbook(); await excel.xlsx.load(await createWorkbookBuffer(model)); return excel; };
 
 describe("Excel workbooks", () => {
+  test("a per-100,000 rate is written as the page rounds it: 19 convicts per 2,000,000 people is 1.0, not 0.9", async () => {
+    const model = buildCrimeWorkbookExportModel({
+      section: "convictions", facts: [{ year: 2004, indicatorId: "crime.convicted.total", sourceId: "geostat_crime_convicts_types", unit: "persons", value: 19 }],
+      population: [{ year: 2004, persons: 2_000_000 }], sources: SOURCES, siteOrigin: "https://fiscal.ge", labels: LABELS, title: "Convictions",
+      state: state("convictions", ["crime.convicted.total"], "per100k", { kind: "manual", start: 2004, end: 2004 }),
+    }, await presentationFor("en"));
+    expect(model.analysis.rows[0]![2]).toBe(1);
+  });
+
   test("a convictions per-100,000 workbook leaves the years without population blank", async () => {
     const model = buildCrimeWorkbookExportModel({
       section: "convictions", facts, population, sources: SOURCES, siteOrigin: "https://fiscal.ge", labels: LABELS, title: "Convictions",

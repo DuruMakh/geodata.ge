@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { NAV_TREE } from "../../lib/navigation/navTree";
 
 for (const locale of ["ka", "en"] as const) {
   for (const width of [320, 390, 768, 899]) {
@@ -16,8 +17,8 @@ for (const locale of ["ka", "en"] as const) {
       await page.keyboard.press("Enter");
       await expect(toggle).toHaveAttribute("aria-expanded", "true");
       const nav = header.getByRole("navigation", { includeHidden: false });
-      // მთავარი, the twenty dataset hubs (in place of the single budget-only data link), AI, მიზანი.
-      await expect(nav.getByRole("link")).toHaveCount(23);
+      // მთავარი, every dataset hub (in place of the single budget-only data link), AI, მიზანი.
+      await expect(nav.getByRole("link")).toHaveCount(NAV_TREE.length + 3);
       await expect(nav.getByRole("link").first()).toHaveAttribute("aria-current", "page");
       const languages = header.getByRole("group");
       await expect(languages).toBeVisible();

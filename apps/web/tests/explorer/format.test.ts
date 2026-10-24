@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { formatAmount, formatAmountParts, formatBn, formatInUnit, formatPerResidentGel, formatPoints, formatShare, formatSignedAmount, roundForDisplay, UNIT_BN, UNIT_MLN } from "../../lib/explorer/format";
+import { formatAmount, formatAmountParts, formatBn, formatInUnit, formatPerResidentGel, formatPoints, formatShare, formatSignedAmount, roundForDisplay, roundShown, UNIT_BN, UNIT_MLN } from "../../lib/explorer/format";
 
 describe("editorial formatters", () => {
   it("reuses number-format rules across subsequent chart and map values", () => {
@@ -86,6 +86,15 @@ describe("editorial formatters", () => {
     expect(formatPoints(1234567890123.4, false, 0)).toBe("1,234,567,890,123");
     expect(formatPoints(123456789012.35, false, 2)).toBe("123,456,789,012.35");
     expect(roundForDisplay(98765432109876.5, 0)).toBe(98765432109877);
+  });
+
+  it("rounds a calculated value for a workbook cell as the page shows it, and keeps a gap a gap", () => {
+    // toFixed rounds the binary value, so (0.95).toFixed(1) is "0.9" while the page shows 1.0.
+    expect(roundShown(0.95, 1)).toBe(1);
+    expect(roundShown(1.45, 1)).toBe(1.5);
+    expect(roundShown(-0.95, 1)).toBe(-1);
+    expect(roundShown(230.44, 1)).toBe(230.4);
+    expect(roundShown(null, 1)).toBeNull();
   });
 
   it("groups thousands in percentages and points like every other figure", () => {
