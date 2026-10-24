@@ -1631,6 +1631,10 @@ test("the Excel workbook marks 2026 as planned", async ({ page }) => {
   const rows = (workbook.getWorksheet("მონაცემები")!.getRows(2, 40) ?? []).map((row) => row.values);
   expect(rows).toContainEqual(expect.arrayContaining([2026, "მთლიანი ხარჯი", 30_881_358_000, "გეგმა"]));
   expect(rows).toContainEqual(expect.arrayContaining([2025, "მთლიანი ხარჯი", "ფაქტი"]));
+  // The plan year cites the archived budget law on the Sources sheet.
+  const sourceText = JSON.stringify(workbook.getWorksheet("წყაროები")!.getSheetValues());
+  expect(sourceText).toContain("/downloads/methodology/expenditure/files/2026/budget-law-tavi-iii.doc");
+  expect(sourceText).toContain("/downloads/methodology/expenditure/files/2026/budget-law-tavi-vi.docx");
 });
 
 test("a year with only a plan is selectable on the analysis page and labelled as planned budget data", async ({ page }) => {

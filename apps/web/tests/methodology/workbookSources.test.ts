@@ -10,6 +10,10 @@ import {
   scopeMunicipalWorkbookSources,
 } from "../../lib/methodology/workbookSources";
 import { loadReviewedSourceManifest } from "../../lib/methodology/sourceManifest";
+import { loadReviewedAdminSpendingFacts, loadReviewedBudgetFactRows } from "../../lib/data/servedData";
+import { buildWorkbookExportModel } from "../../lib/explorer/workbookModel";
+import { buildBudgetWorkbookInput } from "../../lib/explorer/budgetWorkbook";
+import type { ExplorerModel } from "../../lib/explorer/explorerData";
 
 const gdpRows = [
   {
@@ -180,10 +184,13 @@ describe("loadWorkbookSources", () => {
     resetWorkbookSourceCacheForTests();
     const fields = await loadWorkbookSources("expenditure", "expenditure-fields");
     const ministries = await loadWorkbookSources("expenditure", "expenditure-ministries");
-    for (let year = 2004; year <= 2025; year += 1) {
-      expect(fields.some((source) => source.years.includes(year))).toBe(true);
-      expect(ministries.some((source) => source.years.includes(year))).toBe(true);
-    }
+    const [budgetFacts, adminFacts] = await Promise.all([loadReviewedBudgetFactRows(), loadReviewedAdminSpendingFacts()]);
+    const fieldYears = new Set(budgetFacts.filter((fact) => fact.side === "expenditure").map((fact) => fact.year));
+    const ministryYears = new Set(adminFacts.map((fact) => fact.year));
+    expect(fieldYears.has(2004)).toBe(true);
+    expect(ministryYears.has(2004)).toBe(true);
+    for (const year of fieldYears) expect(fields.some((source) => source.years.includes(year)), `fields ${year}`).toBe(true);
+    for (const year of ministryYears) expect(ministries.some((source) => source.years.includes(year)), `ministries ${year}`).toBe(true);
     const rows = await loadReviewedSourceManifest(path.resolve(process.cwd(), "../.."), "expenditure");
     const duplicateHashRows = rows.filter((row) => row.sha256 === "b0039981526ea083f59704fe27bd670784b3b67512b07cc3307366d09f71c8f4");
     expect(duplicateHashRows.map((row) => row.source_id)).toEqual([
@@ -197,6 +204,35 @@ describe("loadWorkbookSources", () => {
       "/downloads/methodology/expenditure/files/2005/mof-annual-execution.pdf",
       "/downloads/methodology/expenditure/files/2005/mof-excel-fact.xlsx",
     ]);
+  });
+});
+
+describe("planned-year workbook sources", () => {
+  it("gives a planned year's Spending rows the archived budget-law source in both scopes", async () => {
+    resetWorkbookSourceCacheForTests();
+    const [budgetFacts, fields, ministries] = await Promise.all([
+      loadReviewedBudgetFactRows(),
+      loadWorkbookSources("expenditure", "expenditure-fields"),
+      loadWorkbookSources("expenditure", "expenditure-ministries"),
+    ]);
+    const plannedYear = Math.max(...budgetFacts.filter((fact) => fact.side === "expenditure" && fact.basis === "planned").map((fact) => fact.year));
+    const total = { id: "expenditure.total", side: "expenditure", parentItemId: null, level: "total", kaLabel: "ხარჯები სულ", enLabel: "Total", color: "#000", sortOrder: 0 };
+    const model = {
+      years: [plannedYear],
+      items: [total],
+      tableRows: [{ itemId: total.id, parentItemId: null, level: "total", kaLabel: total.kaLabel, enLabel: total.enLabel, color: total.color, basisByYear: { [plannedYear]: "planned" }, valuesByYear: { [plannedYear]: 1 }, change: null }],
+      totalRow: { itemId: total.id },
+    } as unknown as ExplorerModel;
+    const exportModel = (scope: "fields" | "ministries") => buildWorkbookExportModel(buildBudgetWorkbookInput({
+      model, presentation: { locale: "ka", englishLabels: {} }, scope, share: false, title: "ხარჯები",
+      sources: { budget: fields, admin: ministries, gdp: [] }, siteOrigin: "https://fiscal.ge",
+    }));
+    const lawHref = (file: string) => `https://fiscal.ge/downloads/methodology/expenditure/files/${plannedYear}/${file}`;
+
+    const byArea = exportModel("fields");
+    expect(byArea.analysis.rows).toEqual([[plannedYear, expect.any(String), "ხარჯები სულ", 1, "გეგმა"]]);
+    expect(byArea.sources.map((source) => source.absoluteUrl)).toEqual([lawHref("budget-law-tavi-iii.doc"), lawHref("budget-law-tavi-vi.docx")]);
+    expect(exportModel("ministries").sources.map((source) => source.absoluteUrl)).toEqual([lawHref("budget-law-tavi-vi.docx")]);
   });
 });
 
