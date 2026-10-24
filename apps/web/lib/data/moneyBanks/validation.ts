@@ -1,10 +1,10 @@
 import Decimal from "decimal.js";
-import { MONEY_BANKS_INDICATORS, MONEY_BANKS_SOURCES, moneyBanksFactKey, type MoneyBanksFact, type MoneyBanksIndicator } from "./types";
+import { MONEY_BANKS_INDICATORS, MONEY_BANKS_LOAN_AREAS, MONEY_BANKS_LOAN_INDUSTRIES, MONEY_BANKS_LOAN_PURPOSES, MONEY_BANKS_SOURCES, loansRegionIndicator, moneyBanksFactKey, type MoneyBanksFact, type MoneyBanksIndicator } from "./types";
 
 const D = Decimal.clone({ precision: 50, rounding: Decimal.ROUND_HALF_UP });
 const range = (start: number, end: number) => Array.from({ length: end - start + 1 }, (_, i) => start + i);
 /** The published first and last year of each indicator (research package coverage.csv). */
-const YEARS: Record<MoneyBanksIndicator, readonly [number, number]> = {
+const FIRST_MAP_YEARS: Record<string, readonly [number, number]> = {
   "money.m3": [1995, 2025], "money.m2": [1995, 2025], "money.m1": [1995, 2025], "money.m0": [1995, 2025],
   "money.m3_to_gdp": [1996, 2025], "money.m2_to_gdp": [1996, 2025],
   "loans.total": [2002, 2025], "loans.gel": [2002, 2025], "loans.fx": [2002, 2025],
@@ -17,20 +17,33 @@ const YEARS: Record<MoneyBanksIndicator, readonly [number, number]> = {
   "banks.npl_ratio": [2003, 2025], "banks.roa": [2001, 2025], "banks.roe": [2001, 2025],
   "banks.capital_ratio": [2014, 2025], "banks.tier1_ratio": [2014, 2025],
 };
-/** Lari plus foreign-currency deposits, loans lari plus foreign currency, and the two shares: the only derived values. */
-const CALCULATED: readonly string[] = ["deposits.total", "deposits.individuals", "deposits.legal_entities", "loans.fx_share", "deposits.fx_share"];
+/** Loans by borrower and industry run from December 2003, except households and individual entrepreneurs, which start with the purposes and regions in December 2015. */
+const LOAN_FROM_2003 = new Set(["borrowers.total", "borrowers.businesses", "borrowers.people", ...MONEY_BANKS_LOAN_INDUSTRIES.map(industry => `borrowers.industry.${industry}`)]);
+const YEARS = Object.fromEntries(MONEY_BANKS_INDICATORS.map(id => [id, FIRST_MAP_YEARS[id] ?? [LOAN_FROM_2003.has(id) ? 2003 : 2015, 2025]])) as Record<MoneyBanksIndicator, readonly [number, number]>;
+/** Lari plus foreign-currency deposits, the two shares, each household purpose (its lari and foreign-currency blocks added) and each area's total loans: the only derived values. */
+const CALCULATED: readonly string[] = [
+  "deposits.total", "deposits.individuals", "deposits.legal_entities", "loans.fx_share", "deposits.fx_share",
+  ...MONEY_BANKS_LOAN_PURPOSES.map(purpose => `households.purpose.${purpose}`),
+  ...MONEY_BANKS_LOAN_AREAS.map(area => loansRegionIndicator(area, "total")),
+];
 /** Bank-health values to 2021 come from the archive FSI file and values from 2022 from the current file. */
 const LAST_ARCHIVE_YEAR = 2021;
 /** Return on assets and equity may be negative (as in 2008); every other percent lies between 0 and 100. */
 const SIGNED: readonly string[] = ["banks.roa", "banks.roe"];
 const TOLERANCE = new D("0.01");
+/** NBG rounds each loan figure on its own, so the loan detail sums hold within half a million lari. */
+const LOAN_TOLERANCE = new D("0.5");
 /** What NBG shows for 2025, as published. */
 const ANCHORS: readonly (readonly [MoneyBanksIndicator, string])[] = [
   ["money.m3", "57680.2"], ["loans.total", "72453.0"], ["rates.policy", "8.00"], ["banks.npl_ratio", "2.5"], ["deposits.fx_share", "48.6"], ["loans.fx_share", "41.9"],
+  ["borrowers.total", "69035.7"], ["borrowers.households", "37355.4"], ["loans_region.georgia.total", "71780.2"], ["loans_region.region_tbilisi.total", "52420.1"],
 ];
 
 function sourceFor(indicatorId: MoneyBanksIndicator, year: number): string {
   if (indicatorId.startsWith("money.")) return "nbg_money_aggregates";
+  if (indicatorId.startsWith("borrowers.")) return "nbg_loans_structure_l3_10_1";
+  if (indicatorId.startsWith("households.purpose.")) return "nbg_loans_purpose_lop";
+  if (indicatorId.startsWith("loans_region.")) return "nbg_loans_regions_lreg";
   if (indicatorId.startsWith("loans.")) return "nbg_loans_l3_5";
   if (indicatorId === "deposits.individuals") return "nbg_deposits_individuals_d3_23";
   if (indicatorId === "deposits.legal_entities") return "nbg_deposits_legal_d3_27";
@@ -40,7 +53,7 @@ function sourceFor(indicatorId: MoneyBanksIndicator, year: number): string {
   if (indicatorId.startsWith("rates.deposits_")) return "nbg_deposit_rates_dwir";
   return year <= LAST_ARCHIVE_YEAR ? "nbg_fsi_archive" : "nbg_fsi";
 }
-const unitFor = (indicatorId: string) => (indicatorId.startsWith("money.") && !indicatorId.endsWith("_to_gdp")) || /^(loans|deposits)\.(total|gel|fx|individuals|legal_entities)$/.test(indicatorId) ? "gel_million" : "percent";
+const unitFor = (indicatorId: string) => (indicatorId.startsWith("money.") && !indicatorId.endsWith("_to_gdp")) || /^(loans|deposits)\.(total|gel|fx|individuals|legal_entities)$/.test(indicatorId) || /^(borrowers|households|loans_region)\./.test(indicatorId) ? "gel_million" : "percent";
 
 /** Every key the serving package must contain, exactly once. */
 export function expectedMoneyBanksKeys(): Set<string> {
@@ -91,6 +104,23 @@ export function validateMoneyBanksFacts(facts: readonly MoneyBanksFact[]): void 
   }
   for (const kind of ["loans", "deposits"]) for (const year of range(...YEARS[`${kind}.fx_share` as MoneyBanksIndicator])) {
     if (v(`${kind}.fx`, year).times(100).div(v(`${kind}.total`, year)).minus(v(`${kind}.fx_share`, year)).abs().gt("1e-9")) throw new Error(`Money and banks calculated share does not follow its amounts: ${kind}.fx_share:${year}`);
+  }
+  const near = (a: Decimal, b: Decimal) => a.minus(b).abs().lte(LOAN_TOLERANCE);
+  for (const year of range(...YEARS["borrowers.total"])) {
+    // Up to 2014 NBG splits loans into businesses and people; from 2015 into businesses and households, which are people plus individual entrepreneurs.
+    const sectors = year < 2015 ? v("borrowers.businesses", year).plus(v("borrowers.people", year)) : v("borrowers.businesses", year).plus(v("borrowers.households", year));
+    if (!near(sectors, v("borrowers.total", year))) throw new Error(`Money and banks borrowers do not add up to all loans: ${year}`);
+    if (year >= 2015 && !near(v("borrowers.people", year).plus(v("borrowers.individual_entrepreneurs", year)), v("borrowers.households", year))) throw new Error(`Money and banks borrowers do not add up to all loans: ${year}`);
+    if (!near(MONEY_BANKS_LOAN_INDUSTRIES.reduce((sum, industry) => sum.plus(v(`borrowers.industry.${industry}`, year)), new D(0)), v("borrowers.businesses", year))) throw new Error(`Money and banks industries do not add up to businesses: ${year}`);
+  }
+  for (const year of range(...YEARS["loans_region.georgia.total"])) {
+    for (const part of ["gel", "fx"] as const) {
+      const regions = MONEY_BANKS_LOAN_AREAS.slice(1).reduce((sum, area) => sum.plus(v(loansRegionIndicator(area, part), year)), new D(0));
+      if (!near(regions, v(loansRegionIndicator("georgia", part), year))) throw new Error(`Money and banks regions differ from Georgia: ${part}:${year}`);
+    }
+    for (const area of MONEY_BANKS_LOAN_AREAS) {
+      if (!near(v(loansRegionIndicator(area, "gel"), year).plus(v(loansRegionIndicator(area, "fx"), year)), v(loansRegionIndicator(area, "total"), year))) throw new Error(`Money and banks area lari plus foreign currency differs from its total: ${area}:${year}`);
+    }
   }
   for (const [indicatorId, published] of ANCHORS) if (facts.find(f => f.indicatorId === indicatorId && f.year === 2025)!.publishedValue !== published) throw new Error(`Money and banks anchor value changed: ${indicatorId}:2025`);
   if (!MONEY_BANKS_SOURCES.every(id => facts.some(f => f.sourceId === id))) throw new Error("Money and banks source missing from the serving package");

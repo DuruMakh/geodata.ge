@@ -4,8 +4,8 @@
     "min": 1995,
     "max": 2025
   },
-  "observations": 730,
+  "observations": 1547,
   "researchStatus": "passed",
-  "canonicalSha256": "4f4afb0f16a2b607e49f173515cb98a2d35b9523ca33a4ed553a87ced2760ba1",
+  "canonicalSha256": "1d01e1dadbc9d376f21d7847902820bdf5635971a1724bb28e262e25c9435e2c",
   "reviewedAt": "2026-10-11"
 }

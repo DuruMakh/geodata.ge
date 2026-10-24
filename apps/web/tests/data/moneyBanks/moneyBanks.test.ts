@@ -8,7 +8,9 @@ import { loadMoneyBanksFactsFromMirror, moneyBanksMirrorCreateRows } from "../..
 import { assertMoneyBanksParity, loadMoneyBanksFacts, toClientMoneyBanksFact } from "../../../lib/data/moneyBanks/importMoneyBanks";
 import type { Prisma } from "../../../lib/generated/prisma/client";
 import { MONEY_BANKS_CSV_HEADERS, REVIEWED_AT } from "../../../lib/data/moneyBanks/prepareMoneyBanks";
-import { MONEY_BANKS_INDICATORS, MONEY_BANKS_PUBLIC_SOURCES, MONEY_BANKS_SOURCES, moneyBanksSourceDocumentId, type MoneyBanksFact } from "../../../lib/data/moneyBanks/types";
+import {
+  MONEY_BANKS_INDICATORS, MONEY_BANKS_LOAN_AREAS, MONEY_BANKS_LOAN_INDUSTRIES, MONEY_BANKS_LOAN_PURPOSES, MONEY_BANKS_PUBLIC_SOURCES, MONEY_BANKS_SOURCES, loansRegionIndicator, moneyBanksSourceDocumentId, type MoneyBanksFact,
+} from "../../../lib/data/moneyBanks/types";
 import { expectedMoneyBanksKeys, moneyBanksDisplayDecimals, validateMoneyBanksFacts } from "../../../lib/data/moneyBanks/validation";
 
 const root = path.resolve(process.cwd(), "../..");
@@ -25,13 +27,13 @@ const setValue = (f: MoneyBanksFact, value: string) => {
   return Object.assign(f, { value, publishedValue: new Decimal(value).toDecimalPlaces(decimals, Decimal.ROUND_HALF_UP).toFixed(decimals) });
 };
 
-test("serves all 730 reviewed values over the approved coverage", async () => {
+test("serves all 1547 reviewed values over the approved coverage", async () => {
   const facts = await loadFacts();
-  expect(facts).toHaveLength(730);
-  expect(expectedMoneyBanksKeys().size).toBe(730);
+  expect(facts).toHaveLength(1547);
+  expect(expectedMoneyBanksKeys().size).toBe(1547);
   expect(new Set(facts.map(f => f.indicatorId))).toEqual(new Set(MONEY_BANKS_INDICATORS));
   expect(new Set(facts.map(f => f.sourceId))).toEqual(new Set(MONEY_BANKS_SOURCES));
-  expect(facts.filter(f => f.valueStatus === "calculated")).toHaveLength(119);
+  expect(facts.filter(f => f.valueStatus === "calculated")).toHaveLength(328);
   expect(facts.every(f => f.basis === "actual" && f.lastReviewedAt === REVIEWED_AT)).toBe(true);
   expect(find(facts, "money.m3", 2025).publishedValue).toBe("57680.2");
   expect(find(facts, "rates.policy", 2025).publishedValue).toBe("8.00");
@@ -42,6 +44,25 @@ test("serves all 730 reviewed values over the approved coverage", async () => {
   expect(find(facts, "deposits.fx_share", 2025).publishedValue).toBe("48.6");
   expect(Math.min(...facts.filter(f => f.indicatorId === "rates.policy").map(f => f.year))).toBe(2008);
   expect(Math.max(...facts.map(f => f.year))).toBe(2025);
+});
+
+test("the loan detail series and their years", async () => {
+  const facts = await loadFacts();
+  const span = (indicatorId: string) => { const years = facts.filter(f => f.indicatorId === indicatorId).map(f => f.year); return [Math.min(...years), Math.max(...years)]; };
+  expect(MONEY_BANKS_INDICATORS).toHaveLength(87);
+  expect(span("borrowers.total")).toEqual([2003, 2025]);
+  expect(span("borrowers.households")).toEqual([2015, 2025]);
+  expect(find(facts, "loans_region.region_racha_lechkhumi_kvemo_svaneti.fx", 2025).publishedValue).toBe("0.3");
+  expect(find(facts, "borrowers.total", 2025).publishedValue).toBe("69035.7");
+  expect(find(facts, "borrowers.households", 2025).publishedValue).toBe("37355.4");
+  expect(find(facts, "loans_region.georgia.total", 2025).publishedValue).toBe("71780.2");
+  expect(find(facts, "loans_region.region_tbilisi.total", 2025).publishedValue).toBe("52420.1");
+  expect(find(facts, "households.purpose.home", 2025).valueStatus).toBe("calculated");
+  expect(find(facts, "borrowers.businesses", 2025).valueStatus).toBe("official");
+  expect(loansRegionIndicator("region_imereti", "gel")).toBe("loans_region.region_imereti.gel");
+  expect(MONEY_BANKS_LOAN_AREAS).toHaveLength(12);
+  expect(MONEY_BANKS_LOAN_INDUSTRIES).toHaveLength(11);
+  expect(MONEY_BANKS_LOAN_PURPOSES).toHaveLength(7);
 });
 
 test("published values round from the value as Excel displays it, as NBG prints them", async () => {
@@ -64,15 +85,27 @@ test("the canonical file is UTF-8 with a BOM and the agreed header", async () =>
   expect(bytes.toString("utf8").slice(1).split("\n")[0]).toBe(MONEY_BANKS_CSV_HEADERS.join(","));
 });
 
-test("both bank-health series breaks are served with demography's columns", async () => {
+test("the series breaks are served with demography's columns, the bank-health ones first", async () => {
   const bytes = await fs.readFile(path.join(root, "data/imports/money-banks-series-breaks.csv"));
   expect([...bytes.subarray(0, 3)]).toEqual([0xef, 0xbb, 0xbf]);
   const rows = parse(bytes, { columns: true, bom: true }) as Record<string, string>[];
   expect(Object.keys(rows[0])).toEqual(["break_id", "applies_to", "reference_date", "reason", "source_note"]);
-  expect(rows.map(r => [r.break_id, r.applies_to, r.reference_date])).toEqual([
+  expect(rows.slice(0, 2).map(r => [r.break_id, r.applies_to, r.reference_date])).toEqual([
     ["fsi_method_2022", "banks.npl_ratio;banks.roe", "2022-01-01"],
     ["fsi_ifrs_2023", "banks.npl_ratio;banks.roa;banks.roe;banks.capital_ratio;banks.tier1_ratio", "2023-01-01"],
   ]);
+});
+
+test("validation rejects regions that do not add up to Georgia", async () => {
+  const facts = (await loadFacts()).map(f => ({ ...f }));
+  const f = find(facts, "loans_region.region_tbilisi.gel", 2020);
+  setValue(f, new Decimal(f.value).plus(10).toFixed());
+  expect(() => validateMoneyBanksFacts(facts)).toThrow(/regions differ from Georgia/);
+});
+
+test("the break register lists the four loan breaks", async () => {
+  const rows = parse(await fs.readFile(path.join(root, "data/imports/money-banks-series-breaks.csv")), { columns: true, bom: true }) as Record<string, string>[];
+  expect(rows.map(r => r.break_id)).toEqual(["fsi_method_2022", "fsi_ifrs_2023", "loans_activity_2014", "loans_overdue_2015", "loans_sector_2022", "loans_microbanks_2025"]);
 });
 
 test.each([
@@ -91,6 +124,9 @@ test.each([
   ["an official status on total deposits", (facts: MoneyBanksFact[]) => { find(facts, "deposits.total", 2020).valueStatus = "official"; }, /source contract/],
   ["a bank-health row from the wrong file", (facts: MoneyBanksFact[]) => { find(facts, "banks.roa", 2021).sourceId = "nbg_fsi"; }, /source contract/],
   ["a share that does not follow its amounts", (facts: MoneyBanksFact[]) => { setValue(find(facts, "loans.fx_share", 2020), "10"); }, /calculated/],
+  ["borrowers that do not add up to all loans", (facts: MoneyBanksFact[]) => { const f = find(facts, "borrowers.businesses", 2020); setValue(f, new Decimal(f.value).plus(1).toFixed()); }, /borrowers do not add up to all loans/],
+  ["industries that do not add up to businesses", (facts: MoneyBanksFact[]) => { const f = find(facts, "borrowers.industry.trade", 2020); setValue(f, new Decimal(f.value).plus(1).toFixed()); }, /industries do not add up to businesses/],
+  ["an area whose lari plus foreign currency differs from its total", (facts: MoneyBanksFact[]) => { const f = find(facts, "loans_region.region_imereti.total", 2020); setValue(f, new Decimal(f.value).plus(1).toFixed()); }, /area lari plus foreign currency differs from its total/],
   ["a changed 2025 anchor", (facts: MoneyBanksFact[]) => { setValue(find(facts, "money.m3", 2025), "57680.3"); }, /anchor/],
 ] as const)("validation rejects %s", async (_, mutate, error) => {
   const facts = (await loadFacts()).map(f => ({ ...f }));
@@ -104,7 +140,7 @@ test("negative return on assets and equity are allowed", async () => {
   expect(() => validateMoneyBanksFacts(facts)).not.toThrow();
 });
 
-test("loading serves the same 730 values as the canonical file", async () => {
+test("loading serves the same 1547 values as the canonical file", async () => {
   const facts = await loadMoneyBanksFacts();
   expect(facts).toEqual(await loadFacts());
 });

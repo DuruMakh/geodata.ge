@@ -1646,6 +1646,18 @@
     "name": { "text": "Financial soundness indicators (FSI)", "reviewedAt": "2026-10-11" },
     "derivation": null
   },
+  "source.nbg_loans_structure_l3_10_1": {
+    "name": { "text": "Loans to the economy by borrower and type of activity (L3.10.1)", "reviewedAt": "2026-10-24" },
+    "derivation": null
+  },
+  "source.nbg_loans_purpose_lop": {
+    "name": { "text": "Household loans by purpose (LOP)", "reviewedAt": "2026-10-24" },
+    "derivation": null
+  },
+  "source.nbg_loans_regions_lreg": {
+    "name": { "text": "Loans by region (LREG)", "reviewedAt": "2026-10-24" },
+    "derivation": null
+  },
   "source.nbg_meth_monetary_statistics": {
     "name": { "text": "Methodology of monetary statistics", "reviewedAt": "2026-10-11" },
     "derivation": null
