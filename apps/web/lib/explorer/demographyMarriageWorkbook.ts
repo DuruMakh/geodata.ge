@@ -4,6 +4,7 @@ import type { Presentation } from "../i18n/types";
 import { workbookMessage } from "../i18n/workbook";
 import { buildMarriageModel, marriageSourceId, type MarriagePlaceFacts, type MarriageSeriesId, type MarriageState } from "./demographyMarriage";
 import { SHEET_NAMES, neededSourceYears, sourcesForNeededYears, withAbsoluteUrls, workbookFilename, type WorkbookExportModel, type WorkbookPublicSource } from "./workbookModel";
+import { roundShown } from "./format";
 
 /** The Data sheet's columns in order; the numeric format is keyed by the 1-based position of the `value` column. */
 const ANALYSIS_COLUMNS = ["year", "series", "value", "unit", "status"] as const;
@@ -34,7 +35,7 @@ export function buildMarriageWorkbookExportModel(input: MarriageWorkbookInput, p
   const unitLabel = message(messages, model.unitKey);
   const numberFormat = model.decimals ? "#,##0.0" : "#,##0";
   // A rate is written to the one decimal the page shows it with, so the cell holds the figure the reader sees.
-  const valueOf = (value: number | null) => (value === null ? null : Number(value.toFixed(model.decimals)));
+  const valueOf = (value: number | null) => roundShown(value, model.decimals);
   const status = (series: { group: string }, value: number | null) =>
     value === null ? workbookMessage(locale, "workbook.unavailable") : isRate(series) ? t("marriageCalculated") : workbookMessage(locale, "workbook.published");
   const stem = `marriages-divorces-${input.scope}${rates ? "-per-1000" : ""}-${model.range.start}-${model.range.end}`;

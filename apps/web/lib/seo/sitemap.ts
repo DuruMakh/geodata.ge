@@ -79,6 +79,7 @@ import { placePagePaths, populationPlacePaths } from "../explorer/demographyPlac
 import { DEMOGRAPHY_HUB_PATH, LIVE_DEMOGRAPHY_PAGES } from "../explorer/demographyRoutes";
 import { MUNICIPALITY_ROUTES } from "../explorer/municipalityRoutes";
 import { resolveSiteUrl } from "../siteUrl";
+import { awaitNamed } from "../awaitNamed";
 import { DEBT_EXPLORER_PATH, DEFICIT_EXPLORER_PATH } from "./internalLinks";
 import { pageHref } from "../i18n/routes";
 import { UNEMPLOYMENT_SECTIONS } from "../explorer/unemploymentSections";
@@ -87,56 +88,89 @@ import { unemploymentRegionHref } from "../explorer/unemploymentRegionRoutes";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const siteUrl = resolveSiteUrl();
-  const [{ sourceDocuments }, {
-    regions,
-    municipalities,
-    functionFacts,
-    totalFacts,
-    countryFunctionFacts,
-    countryTotalFacts,
-    adjaraBudgetAdjustments,
-  }, { facts: debtFacts }, { facts: balanceFacts }, { facts: inflationFacts }, { facts: productFacts }, { facts: regionalEconomyFacts }, { facts: gdpOverviewFacts }, { facts: sectorFacts }, { facts: unemploymentFacts }, { facts: tradeFacts }, { facts: tradePartnerFacts }, { facts: moneyTransferFacts }, { facts: demographyFacts }, { facts: tradeProductFacts }, { facts: tradeDomesticFacts }, { facts: foreignInvestmentFacts }, { facts: wagesFacts }, currentAccountFacts, { facts: povertyFacts }, { facts: householdFacts }, { facts: energyFoodFacts }, { facts: moneyBanksFacts }, { facts: tradeServicesFacts }, { facts: tradeCompositionFacts }, { facts: externalPositionFacts }, { facts: businessFacts }, { facts: healthFacts }, { facts: crimeFacts }, { facts: housingFacts }, { facts: educationFacts }, { facts: socialFacts }, environmentFacts, { facts: scienceCultureFacts }, { facts: labourFacts }, { facts: gdpExpenditureFacts }, { facts: transportFacts }, { facts: internetFacts }, { facts: expenditureTypeFacts }, { facts: taxBreaksRefundsFacts }] = await Promise.all([
-    loadServedLandingData(),
-    loadServedMunicipalData(),
-    loadServedGovernmentDebtData(),
-    loadServedGeneralGovernmentBalanceData(),
-    loadServedInflationData(),
-    loadServedProductData(),
-    loadServedRegionalEconomyData(),
-    loadServedGdpOverviewData(),
-    loadServedEconomicSectorsData(),
-    loadServedUnemploymentData(),
-    loadServedTradeOverviewData(),
-    loadServedTradePartnersData(),
-    loadServedMoneyTransfersData(),
-    loadServedDemographyData(),
-    loadServedTradeProductsData(),
-    loadServedTradeDomesticData(),
-    loadServedForeignInvestmentData(),
-    loadServedWagesData(),
-    loadServedCurrentAccountFacts(),
-    loadServedPovertyData(),
-    loadServedHouseholdData(),
-    loadServedEnergyFoodData(),
-    loadServedMoneyBanksData(),
-    loadServedTradeServicesData(),
-    loadServedTradeCompositionData(),
-    loadServedExternalPositionData(),
-    loadServedBusinessData(),
-    loadServedHealthData(),
-    loadServedCrimeData(),
-    loadServedHousingData(),
-    loadServedEducationData(),
-    loadServedSocialData(),
-    loadServedEnvironmentData(),
-    loadServedScienceCultureData(),
-    loadServedLabourData(),
-    loadServedGdpExpenditureData(),
-    loadServedTransportData(),
-    loadServedInternetData(),
-    loadServedExpenditureTypesData(),
-    loadServedTaxBreaksRefundsData(),
-  ]);
+  // By name, not by position: every result has the same shape, so a swapped pair would still typecheck.
+  const data = await awaitNamed({
+    landing: loadServedLandingData(),
+    municipal: loadServedMunicipalData(),
+    governmentDebt: loadServedGovernmentDebtData(),
+    generalGovernmentBalance: loadServedGeneralGovernmentBalanceData(),
+    inflation: loadServedInflationData(),
+    product: loadServedProductData(),
+    regionalEconomy: loadServedRegionalEconomyData(),
+    gdpOverview: loadServedGdpOverviewData(),
+    economicSectors: loadServedEconomicSectorsData(),
+    unemployment: loadServedUnemploymentData(),
+    tradeOverview: loadServedTradeOverviewData(),
+    tradePartners: loadServedTradePartnersData(),
+    moneyTransfers: loadServedMoneyTransfersData(),
+    demography: loadServedDemographyData(),
+    tradeProducts: loadServedTradeProductsData(),
+    tradeDomestic: loadServedTradeDomesticData(),
+    foreignInvestment: loadServedForeignInvestmentData(),
+    wages: loadServedWagesData(),
+    currentAccount: loadServedCurrentAccountFacts(),
+    poverty: loadServedPovertyData(),
+    household: loadServedHouseholdData(),
+    energyFood: loadServedEnergyFoodData(),
+    moneyBanks: loadServedMoneyBanksData(),
+    tradeServices: loadServedTradeServicesData(),
+    tradeComposition: loadServedTradeCompositionData(),
+    externalPosition: loadServedExternalPositionData(),
+    business: loadServedBusinessData(),
+    health: loadServedHealthData(),
+    crime: loadServedCrimeData(),
+    housing: loadServedHousingData(),
+    education: loadServedEducationData(),
+    social: loadServedSocialData(),
+    environment: loadServedEnvironmentData(),
+    scienceCulture: loadServedScienceCultureData(),
+    labour: loadServedLabourData(),
+    gdpExpenditure: loadServedGdpExpenditureData(),
+    transport: loadServedTransportData(),
+    internet: loadServedInternetData(),
+    expenditureTypes: loadServedExpenditureTypesData(),
+    taxBreaksRefunds: loadServedTaxBreaksRefundsData(),
+  });
+  const { sourceDocuments } = data.landing;
+  const { regions, municipalities, functionFacts, totalFacts, countryFunctionFacts, countryTotalFacts, adjaraBudgetAdjustments } = data.municipal;
+  const debtFacts = data.governmentDebt.facts;
+  const balanceFacts = data.generalGovernmentBalance.facts;
+  const inflationFacts = data.inflation.facts;
+  const productFacts = data.product.facts;
+  const regionalEconomyFacts = data.regionalEconomy.facts;
+  const gdpOverviewFacts = data.gdpOverview.facts;
+  const sectorFacts = data.economicSectors.facts;
+  const unemploymentFacts = data.unemployment.facts;
+  const tradeFacts = data.tradeOverview.facts;
+  const tradePartnerFacts = data.tradePartners.facts;
+  const moneyTransferFacts = data.moneyTransfers.facts;
+  const demographyFacts = data.demography.facts;
+  const tradeProductFacts = data.tradeProducts.facts;
+  const tradeDomesticFacts = data.tradeDomestic.facts;
+  const foreignInvestmentFacts = data.foreignInvestment.facts;
+  const wagesFacts = data.wages.facts;
+  const currentAccountFacts = data.currentAccount;
+  const povertyFacts = data.poverty.facts;
+  const householdFacts = data.household.facts;
+  const energyFoodFacts = data.energyFood.facts;
+  const moneyBanksFacts = data.moneyBanks.facts;
+  const tradeServicesFacts = data.tradeServices.facts;
+  const tradeCompositionFacts = data.tradeComposition.facts;
+  const externalPositionFacts = data.externalPosition.facts;
+  const businessFacts = data.business.facts;
+  const healthFacts = data.health.facts;
+  const crimeFacts = data.crime.facts;
+  const housingFacts = data.housing.facts;
+  const educationFacts = data.education.facts;
+  const socialFacts = data.social.facts;
+  const environmentFacts = data.environment;
+  const scienceCultureFacts = data.scienceCulture.facts;
+  const labourFacts = data.labour.facts;
+  const gdpExpenditureFacts = data.gdpExpenditure.facts;
+  const transportFacts = data.transport.facts;
+  const internetFacts = data.internet.facts;
+  const expenditureTypeFacts = data.expenditureTypes.facts;
+  const taxBreaksRefundsFacts = data.taxBreaksRefunds.facts;
   const inflationModified = new Date(inflationFacts.map((fact) => fact.lastReviewedAt).sort().at(-1)!);
   const productModified = new Date(productFacts.map((fact) => fact.lastReviewedAt).sort().at(-1)!);
   const regionalModified = new Date(regionalEconomyFacts.map((fact) => fact.lastReviewedAt).sort().at(-1)!);

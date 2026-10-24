@@ -1,4 +1,6 @@
+import path from "node:path";
 import { expect, test, type Locator, type Page } from "@playwright/test";
+import { NAV_TREE } from "../../lib/navigation/navTree";
 import { expectReadableText } from "./color-contrast";
 
 // Screen-reader and keyboard semantics from the 2026-10 platform review (Task 47), one page per
@@ -305,4 +307,29 @@ test.describe("on a phone", () => {
     await expect(toggle).toHaveAccessibleName("მენიუ");
     await expect(toggle).toHaveAttribute("aria-controls", "data-sidebar-navigation");
   });
+});
+
+// axe-core, pinned in package.json, run in the page; the rules are WCAG 2.0 and 2.1, levels A and AA.
+const AXE = path.join(process.cwd(), "node_modules/axe-core/axe.min.js");
+const WCAG_AA = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"];
+// About's mission band numbers itself "01" in accent on ink (3.01:1). It is decorative and aria-hidden, so WCAG 1.4.3's
+// incidental-text exception applies; its colour is DESIGN.md's to change, not this test's.
+const DECORATIVE = ['[data-testid="mission-cover"] [aria-hidden="true"] strong'];
+
+test("every hub, its first page and the site pages pass axe's WCAG 2.1 A and AA rules on a phone", async ({ page }) => {
+  test.setTimeout(300_000);
+  await page.setViewportSize({ width: 375, height: 812 });
+  const paths = [...NAV_TREE.flatMap(hub => [hub.href, ...(hub.sections[0] ? [hub.sections[0].href] : [])]), "/", "/methodology", "/connect", "/about"];
+  const failures: string[] = [];
+  for (const href of paths) {
+    await page.goto(href);
+    await page.addScriptTag({ path: AXE });
+    const violations = await page.evaluate(async ({ tags, exclude }) => {
+      const { axe } = window as unknown as { axe: { run: (context: unknown, options: unknown) => Promise<{ violations: { id: string; nodes: { target: string[] }[] }[] }> } };
+      const result = await axe.run({ exclude: [exclude] }, { runOnly: { type: "tag", values: tags } });
+      return result.violations.map(violation => `${violation.id}: ${violation.nodes.map(node => node.target.join(" ")).join(", ")}`);
+    }, { tags: WCAG_AA, exclude: DECORATIVE });
+    failures.push(...violations.map(violation => `${href} ${violation}`));
+  }
+  expect(failures).toEqual([]);
 });
