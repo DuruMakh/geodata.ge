@@ -8,10 +8,9 @@ import { loadServedEducationData, shownEducationFacts, toClientEducationFact } f
 import { EDUCATION_GEORGIA, EDUCATION_SOURCES } from "../data/education/types";
 import { coverageLabel } from "../explorer/coverageLabel";
 import {
-  EDUCATION_HUB_PATH, EDUCATION_SECTIONS, educationCountLabel, educationCoverage, educationPeriodLabel, educationSeriesLabel, educationTemporalCoverage, educationTopicSeries, schoolYearLabel,
+  EDUCATION_HUB_PATH, EDUCATION_SECTIONS, educationCountLabel, educationCoverage, educationPeriodLabel, educationSeriesLabel, educationTemporalCoverage, educationTopicSeries,
   type EducationTopicId,
 } from "../explorer/education";
-import { buildEducationHubCards } from "../explorer/educationHubCards";
 import { Message } from "../i18n/message";
 import { message } from "../i18n/messages";
 import { getMessages } from "../i18n/messages.server";
@@ -24,6 +23,7 @@ import { fiscalMetadata } from "../seo/metadata";
 import { explorerDatasetJsonLd } from "../seo/structuredData";
 import { resolveSiteUrl } from "../siteUrl";
 import { TopicHub } from "./hub";
+import { TOPIC_HUB_LOADERS, topicHubCoverage } from "./topicHubs.server";
 
 /** The figure each topic page's latest line names, by the template's placeholder. */
 const LATEST_FIGURE: Record<EducationTopicId, string> = { universities: "students", vocational: "admitted" };
@@ -35,14 +35,10 @@ export async function educationHubMetadata(locale: Locale) {
 
 /** The hub: one card per page, Schools, Kindergartens, Universities and Vocational colleges, each from served facts. */
 export async function renderEducationHub(locale: Locale) {
-  const [{ facts: served }, presentation] = await Promise.all([loadServedEducationData(), getPresentation(locale, ["education"], [])]);
-  const facts = shownEducationFacts(served);
+  const [hub, presentation] = await Promise.all([TOPIC_HUB_LOADERS.education(locale), getPresentation(locale, ["education"], [])]);
   const { messages } = presentation;
-  // The header's years are school years; vocational colleges' calendar years fall inside them.
-  const schoolYears = facts.filter(f => !f.indicatorId.startsWith("education.vet_")).map(f => f.year);
-  const coverage = coverageLabel(messages, locale, schoolYearLabel(Math.min(...schoolYears)), schoolYearLabel(Math.max(...schoolYears)), facts.map(f => f.lastReviewedAt).sort().at(-1));
   return <TopicHub locale={locale} presentation={presentation} title={message(messages, "education.title")} summary={message(messages, "education.hubSummary")} path={EDUCATION_HUB_PATH}
-    coverage={coverage} cards={buildEducationHubCards(facts.map(toClientEducationFact), presentation)} testId="education-hub" />;
+    coverage={topicHubCoverage(messages, locale, hub)} cards={hub.cards} testId="education-hub" />;
 }
 
 const topicHref = (section: EducationTopicId) => EDUCATION_SECTIONS.find(item => item.id === section)!.href;

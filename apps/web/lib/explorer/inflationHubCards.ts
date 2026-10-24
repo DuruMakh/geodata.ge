@@ -1,10 +1,11 @@
-import { periodFromKey } from "../data/inflation/periods";
+import { periodFromKey, periodYear } from "../data/inflation/periods";
 import type { CategoryFactInput, CityFactInput, ServedBasketWeightRow, ServedCpiFact } from "../data/inflation/types";
 import type { ServedProductData } from "../data/inflation/importProducts";
 import { message } from "../i18n/messages";
 import type { Presentation } from "../i18n/types";
 import { INK } from "./colors";
 import { formatShare } from "./format";
+import { coverageRange } from "./coverageLabel";
 import type { HubCardModel } from "./hubCards";
 import { buildCategoryIndex, latestContributors } from "./inflationCategories";
 import { categoryColor, categoryLabel, formatContribution } from "./inflationCategoryLabels";
@@ -23,6 +24,8 @@ export type ProductHubSummary = {
   labelEn: string;
   labelKa: string;
   latestPeriod: string;
+  /** The first month of the leader's annual series. */
+  firstPeriod: string;
   annualChangePct: number;
   annualSeries: Array<number | null>;
 };
@@ -36,11 +39,11 @@ export function buildLatestProductHubSummary(data: ServedProductData): ProductHu
   if (!leader) return null;
   const product = data.catalogue.find((item) => item.productId === leader.productId);
   if (!product) throw new Error(`Latest product leader is absent from the catalogue: ${leader.productId}`);
+  const leaderAnnual = annual.filter((fact) => fact.productId === leader.productId).sort((a, b) => a.period.localeCompare(b.period));
   return {
-    productId: leader.productId, labelEn: product.labelEn, labelKa: product.labelKa, latestPeriod,
+    productId: leader.productId, labelEn: product.labelEn, labelKa: product.labelKa, latestPeriod, firstPeriod: leaderAnnual[0].period,
     annualChangePct: Number(leader.index100) - 100,
-    annualSeries: annual.filter((fact) => fact.productId === leader.productId).sort((a, b) => a.period.localeCompare(b.period))
-      .map((fact) => fact.index100 === null ? null : Number(fact.index100) - 100),
+    annualSeries: leaderAnnual.map((fact) => fact.index100 === null ? null : Number(fact.index100) - 100),
   };
 }
 
@@ -57,6 +60,9 @@ export function buildInflationHubCards(
     .filter((fact) => fact.seriesId === "cpi.headline" && fact.measure === "yoy_pct")
     .sort((a, b) => a.period.localeCompare(b.period));
   const last = yoy.at(-1);
+  const short = (period: number) => periodLabel(presentation.messages, period, "short");
+  /** A card's years: the calendar years of its monthly periods. */
+  const yearsOf = (periods: readonly number[]) => periods.length ? coverageRange(periodYear(Math.min(...periods)), periodYear(Math.max(...periods))) : undefined;
 
   // The card leads with the largest contributor, which is the question the
   // section answers; with no category data it stays a plain link.
@@ -81,6 +87,8 @@ export function buildInflationHubCards(
     footer: last
       ? `${periodLabel(presentation.messages, periodFromKey(last.period), "long")} · ${formatShare(last.value / 100)}`
       : null,
+    latest: last ? { value: formatShare(last.value / 100), period: short(periodFromKey(last.period)) } : null,
+    years: yearsOf(yoy.map((fact) => periodFromKey(fact.period))),
   };
 
   const categoriesCard: HubCardModel = {
@@ -95,6 +103,8 @@ export function buildInflationHubCards(
       top && leader
         ? `${periodLabel(presentation.messages, top.period, "long")} · ${categoryLabel(presentation.messages, leader.categoryId)} ${formatContribution(leader.value)} ${t("pp")}`
         : null,
+    latest: top && leader ? { value: `${formatContribution(leader.value)} ${t("pp")}`, period: short(top.period), caption: categoryLabel(presentation.messages, leader.categoryId) } : null,
+    years: index === null || leader === null ? undefined : yearsOf([...(index.contributions.get(leader.categoryId)?.keys() ?? [])]),
   };
 
   const productsCard: HubCardModel = {
@@ -106,6 +116,8 @@ export function buildInflationHubCards(
     series: productSummary?.annualSeries ?? null,
     seriesColor: productSummary ? productColor(productSummary.productId) : null,
     footer: productSummary ? `${periodLabel(presentation.messages, periodFromKey(productSummary.latestPeriod), "long")} · ${presentation.locale === "ka" ? productSummary.labelKa : productSummary.labelEn} ${formatShare(productSummary.annualChangePct / 100)}` : null,
+    latest: productSummary ? { value: formatShare(productSummary.annualChangePct / 100), period: short(periodFromKey(productSummary.latestPeriod)), caption: presentation.locale === "ka" ? productSummary.labelKa : productSummary.labelEn } : null,
+    years: productSummary ? yearsOf([periodFromKey(productSummary.firstPeriod), periodFromKey(productSummary.latestPeriod)]) : undefined,
   };
 
   // Cities lead with the highest city's annual rate; the sparkline is the gap
@@ -123,6 +135,8 @@ export function buildInflationHubCards(
     footer: cityLatest === null
       ? null
       : `${periodLabel(presentation.messages, cityLatest.period, "long")} · ${cityLatest.highest.cityIds.map((id) => cityLineLabel(presentation.messages, id)).join(", ")} ${formatShare(cityLatest.highest.value / 100)}`,
+    latest: cityLatest === null ? null : { value: formatShare(cityLatest.highest.value / 100), period: short(cityLatest.period), caption: cityLatest.highest.cityIds.map((id) => cityLineLabel(presentation.messages, id)).join(", ") },
+    years: yearsOf(cities.map((fact) => periodFromKey(fact.period))),
   };
 
   return [overviewCard, categoriesCard, productsCard, citiesCard];

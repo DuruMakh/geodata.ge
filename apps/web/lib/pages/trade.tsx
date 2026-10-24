@@ -37,7 +37,7 @@ import { projectWorkbookSources } from "../methodology/workbookSources";
 import { fiscalMetadata } from "../seo/metadata";
 import { explorerDatasetJsonLd } from "../seo/structuredData";
 import { resolveSiteUrl } from "../siteUrl";
-import { PRODUCT_SOURCE_BLOCK } from "./hubs/trade";
+import { PRODUCT_SOURCE_BLOCK } from "./topicHubs.server";
 
 export async function tradeOverviewMetadata(locale: Locale) {
   const messages = await getMessages(locale, ["trade"]);

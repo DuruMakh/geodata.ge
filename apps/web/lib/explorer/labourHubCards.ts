@@ -3,6 +3,7 @@ import type { Presentation } from "../i18n/types";
 import { message } from "../i18n/messages";
 import { INK } from "./colors";
 import { formatInUnit, formatShare } from "./format";
+import { coverageRange } from "./coverageLabel";
 import type { HubCardModel } from "./hubCards";
 import { LABOUR_SECTIONS, labourDefaultSelection, labourUnit, ONE_DECIMAL } from "./labour";
 
@@ -23,7 +24,7 @@ export function buildLabourHubCards(facts: readonly ClientLabourFact[], presenta
       index: String(startIndex + index).padStart(2, "0"), title: message(presentation.messages, section.labelKey), description: t(`page.${section.id}.summary`),
       href: section.href, comingSoon: false,
       series: Array.from({ length: last - first + 1 }, (_, offset) => valueByYear.get(first + offset) ?? null), seriesColor: INK,
-      footer: `${last} · ${shown} · ${first}–${last}`,
+      footer: `${last} · ${shown} · ${first}–${last}`, latest: { value: shown, period: String(last) }, years: coverageRange(first, last),
     };
   });
 }

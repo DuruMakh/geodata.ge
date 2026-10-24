@@ -7,7 +7,7 @@ import { ExplorerPage } from "../../components/explorer-shell/explorer-page";
 import { PageHeader } from "../../components/shell/page-header";
 import { JsonLd } from "../../components/seo/json-ld";
 import { BreadcrumbJsonLd } from "../../components/seo/breadcrumb-json-ld";
-import { loadServedUnemploymentData, UNEMPLOYMENT_GROUPS } from "../data/unemployment/importUnemployment";
+import { loadServedUnemploymentData, UNEMPLOYMENT_GROUPS, UNEMPLOYMENT_REGISTRY } from "../data/unemployment/importUnemployment";
 import { I18nProvider } from "../i18n/provider";
 import { clientPresentation, getPresentation } from "../i18n/presentation.server";
 import { getMessages } from "../i18n/messages.server";
@@ -30,10 +30,6 @@ export async function unemploymentPageMetadata(locale: Locale, section: Unemploy
   const messages = await getMessages(locale, ["unemployment"]);
   return fiscalMetadata({ locale, path: UNEMPLOYMENT_SECTIONS.find(item => item.id === section)!.href, title: message(messages, `unemployment.page.${section}.title`), description: message(messages, `unemployment.page.${section}.summary`) });
 }
-
-// The reviewed registry spells English age bands with a hyphen ("15-19"); the page prints a number range with an en
-// dash, as the Georgian labels and every year range do (U16-16). The taxonomy stays as reviewed.
-const UNEMPLOYMENT_REGISTRY = UNEMPLOYMENT_GROUPS.map((group) => ({ ...group, labelEn: group.labelEn.replace(/(\d)-(\d)/g, "$1–$2") }));
 
 export async function renderUnemploymentPage(locale: Locale, section: UnemploymentSectionId, regionId?: string) {
   const root = path.resolve(/* turbopackIgnore: true */ process.cwd(), "../..");

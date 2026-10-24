@@ -4,6 +4,7 @@ import { message } from "../i18n/messages";
 import { INK } from "./colors";
 import { formatInUnit, UNIT_PERSONS } from "./format";
 import { HEALTH_SECTIONS } from "./health";
+import { coverageRange } from "./coverageLabel";
 import type { HubCardModel } from "./hubCards";
 import { SOCIAL_SECTIONS, type SocialSectionId } from "./social";
 
@@ -25,6 +26,7 @@ export function buildSocialHubCards(facts: readonly ClientSocialFact[], presenta
       index: String(HEALTH_SECTIONS.length + index + 1).padStart(2, "0"), title: message(presentation.messages, section.labelKey), description: t(`page.${section.id}.summary`),
       href: section.href, comingSoon: false,
       series: headline.map(f => f.value), seriesColor: INK, footer: `${last.year} · ${value} · ${headline[0].year}–${last.year}`,
+      latest: { value, period: String(last.year) }, years: coverageRange(headline[0].year, last.year),
     };
   });
 }

@@ -41,6 +41,7 @@
   "groups.headline.wages.overview": "Average monthly wage",
   "groups.headline.unemployment.industries": "People in work",
   "groups.headline.unemployment.informal": "Informal jobs",
+  "groups.caption.largest": "{name}, largest",
   "groups.topicsNav": "Topics on this page",
   "groups.meta": "{topics} topics · {pages} pages · updated {date}",
   "groups.annual": "annual data",

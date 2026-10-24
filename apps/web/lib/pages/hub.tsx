@@ -10,12 +10,9 @@ import { ExplorerHeading } from "../../components/explorer-shell/explorer-headin
 import { BreadcrumbJsonLd } from "../../components/seo/breadcrumb-json-ld";
 import { LegacyHashRedirect } from "../../components/shell/legacy-hash-redirect";
 import { PageHeader } from "../../components/shell/page-header";
-import { buildHubCards, type HubCardModel } from "../explorer/hubCards";
-import { coverageLabel } from "../explorer/coverageLabel";
-import { loadServedGeneralGovernmentBalanceData, loadServedGovernmentDebtData, loadServedLandingData, loadServedMunicipalData } from "../data/servedData";
+import type { HubCardModel } from "../explorer/hubCards";
 import { fiscalMetadata } from "../seo/metadata";
-import { loadServedExpenditureTypesData } from "../data/expenditureTypes/importExpenditureTypes";
-import { EXPENDITURE_TYPES_TOTAL } from "../data/expenditureTypes/types";
+import { TOPIC_HUB_LOADERS, topicHubCoverage } from "./topicHubs.server";
 
 export async function hubPageMetadata(locale: Locale) {
   const messages = await getMessages(locale, ["hub"]);
@@ -28,28 +25,10 @@ export async function hubPageMetadata(locale: Locale) {
 }
 
 export async function renderHubPage(locale: Locale) {
-  const presentation = await getPresentation(locale, ["main", "hub"], []);
+  const [presentation, hub] = await Promise.all([getPresentation(locale, ["main", "hub"], []), TOPIC_HUB_LOADERS.budget(locale)]);
   const { messages } = presentation;
-  const [{ facts, sourceDocuments }, { countryTotalFacts }, { facts: debtFacts }, { facts: balanceFacts }, { facts: expenditureTypeFacts }] = await Promise.all([
-    loadServedLandingData(),
-    loadServedMunicipalData(),
-    loadServedGovernmentDebtData(),
-    loadServedGeneralGovernmentBalanceData(),
-    loadServedExpenditureTypesData(),
-  ]);
-  const municipalTotals = new Map<number, number>();
-  for (const row of countryTotalFacts) {
-    municipalTotals.set(row.year, row.publicTotalGel);
-  }
-  const lastUpdatedAt = [
-    ...sourceDocuments.map((source) => source.lastReviewedAt),
-    ...debtFacts.map((fact) => fact.lastReviewedAt),
-    ...balanceFacts.map((fact) => fact.lastReviewedAt),
-  ].sort().at(-1) ?? "";
-  const expenditureTypeTotals = new Map(expenditureTypeFacts.filter((fact) => fact.seriesId === EXPENDITURE_TYPES_TOTAL && fact.measure === "nominal").map((fact) => [fact.year, fact.value]));
-  const cards = buildHubCards(facts, municipalTotals, debtFacts, balanceFacts, presentation, expenditureTypeTotals);
-  const years = Array.from(new Set(facts.map((fact) => fact.year))).sort((a, b) => a - b);
-  const coverage = coverageLabel(messages, locale, years[0], years.at(-1), lastUpdatedAt || undefined);
+  const { cards } = hub;
+  const coverage = topicHubCoverage(messages, locale, hub);
 
   return (
     <ExplorerPage testId="explorer-shell" containerQueries={false}>

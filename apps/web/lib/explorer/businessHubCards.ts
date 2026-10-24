@@ -5,6 +5,7 @@ import { INK } from "./colors";
 import { BUSINESS_SECTIONS, type BusinessSectionId } from "./business";
 import { buildBusinessRegionMapModel } from "./businessRegionMap";
 import { formatAmount, formatInUnit } from "./format";
+import { coverageRange } from "./coverageLabel";
 import type { HubCardModel } from "./hubCards";
 
 /** Each card's sparkline and footer years follow one series: firms' sales, people employed, investment and new firms. Regions has none, only the map's years. */
@@ -21,13 +22,14 @@ export function buildBusinessHubCards(facts: readonly ClientBusinessFact[], pres
     };
     if (section.id === "regions") {
       const map = buildBusinessRegionMapModel("turnover", facts);
-      return { ...card, series: null, seriesColor: null, footer: `${map.firstYear}–${map.year}` };
+      return { ...card, series: null, seriesColor: null, footer: `${map.firstYear}–${map.year}`, years: coverageRange(map.firstYear, map.year) };
     }
     const headline = facts.filter(f => f.indicatorId === HEADLINE[section.id]).sort((a, b) => a.year - b.year);
     const last = headline.at(-1)!;
     const value = last.unit === "gel" ? formatAmount(last.value, presentation.locale)
       : last.unit === "persons" ? `${formatInUnit(last.value, { divisor: 1_000, label: "", decimals: 1 })} ${t("unitThousandPersons")}`
       : t("cardFirms", { value: formatInUnit(last.value, { divisor: 1, label: "", decimals: 0 }) });
-    return { ...card, series: headline.map(f => f.value), seriesColor: INK, footer: `${last.year} · ${value} · ${headline[0].year}–${last.year}` };
+    return { ...card, series: headline.map(f => f.value), seriesColor: INK, footer: `${last.year} · ${value} · ${headline[0].year}–${last.year}`,
+      latest: { value, period: String(last.year) }, years: coverageRange(headline[0].year, last.year) };
   });
 }

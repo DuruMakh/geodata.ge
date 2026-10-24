@@ -11,6 +11,7 @@ import type { HubCardModel } from "./hubCards";
 import { INK } from "./colors";
 import { formatAmount, formatShare } from "./format";
 import { buildSectorHighlights } from "./sectorHighlights";
+import { coverageRange } from "./coverageLabel";
 export function buildEconomyHubCards(
   facts: ServedGdpObservation[],
   p: Presentation,
@@ -46,6 +47,9 @@ export function buildEconomyHubCards(
       regionalTotals.find((f) => f.regionId === largestRegion.regionId && f.year === firstRegionalYear + index)?.value ?? null)
     : null;
   const region = largestRegion && REGIONAL_ECONOMY_REGIONS.find((r) => r.id === largestRegion.regionId);
+  const regionName = region ? publicLabel(p.locale, region.id, region.kaLabel, p.englishLabels) : null;
+  const latestNominal = nominal.at(-1)!;
+  const sectorShare = sectorHighlights && sectorHighlights.topThreeShare !== null ? formatShare(sectorHighlights.topThreeShare / 100) : null;
   return [
     {
       index: "01",
@@ -57,7 +61,9 @@ export function buildEconomyHubCards(
       seriesColor: INK,
       // One figure, the economy's size as the landing states it, instead of a
       // three-line run of constant-dollar values and coverage ranges.
-      footer: `${nominal.at(-1)!.year} · ${t("nominal")} ${formatAmount(nominal.at(-1)!.value, p.locale)}`,
+      footer: `${latestNominal.year} · ${t("nominal")} ${formatAmount(latestNominal.value, p.locale)}`,
+      latest: { value: formatAmount(latestNominal.value, p.locale), period: String(latestNominal.year), caption: t("nominal") },
+      years: coverageRange(Math.min(...[...real, ...nominal].map((f) => f.year)), Math.max(...[...real, ...nominal].map((f) => f.year))),
     },
     {
       index: "02",
@@ -67,9 +73,11 @@ export function buildEconomyHubCards(
       comingSoon: sectorHighlights === null,
       series: sectorHighlights?.trends.topThree ?? null,
       seriesColor: sectorHighlights ? INK : null,
-      footer: sectorHighlights && sectorHighlights.topThreeShare !== null
-        ? `${latestSectorYear} · ${message(p.messages, "sectors.topThree")} ${formatShare(sectorHighlights.topThreeShare / 100)} · ${Math.min(...sectorYears)}–${latestSectorYear}${sectorHighlights.preliminary ? ` · ${t("preliminary")}` : ""}`
+      footer: sectorHighlights && sectorShare !== null
+        ? `${latestSectorYear} · ${message(p.messages, "sectors.topThree")} ${sectorShare} · ${Math.min(...sectorYears)}–${latestSectorYear}${sectorHighlights.preliminary ? ` · ${t("preliminary")}` : ""}`
         : null,
+      latest: sectorShare === null ? null : { value: sectorShare, period: String(latestSectorYear), caption: message(p.messages, "sectors.topThree") },
+      years: latestSectorYear === null ? undefined : coverageRange(Math.min(...sectorYears), latestSectorYear),
     },
     {
       index: "03",
@@ -82,6 +90,8 @@ export function buildEconomyHubCards(
       footer: latestHouseholds
         ? `${latestHouseholds.year} · ${message(p.messages, "gdpExpenditure.householdsShare", { share: formatShare(latestHouseholds.value / 100) })} · ${households[0].year}–${latestHouseholds.year}${latestHouseholds.status === "preliminary" ? ` · ${t("preliminary")}` : ""}`
         : null,
+      latest: latestHouseholds ? { value: formatShare(latestHouseholds.value / 100), period: String(latestHouseholds.year), caption: message(p.messages, "gdpExpenditure.largest") } : null,
+      years: latestHouseholds ? coverageRange(households[0].year, latestHouseholds.year) : undefined,
     },
     {
       index: "04",
@@ -92,8 +102,11 @@ export function buildEconomyHubCards(
       series: regionTrend,
       seriesColor: largestRegion ? INK : null,
       footer: largestRegion && region
-        ? `${latestRegionalYear} · ${message(p.messages, "regionalEconomies.largestRegion")}: ${publicLabel(p.locale, region.id, region.kaLabel, p.englishLabels)} · ${message(p.messages, "regionalEconomies.total")} (${message(p.messages, "regionalEconomies.currentPrices")}): ${formatAmount(largestRegion.value, p.locale)} · ${firstRegionalYear}–${latestRegionalYear}`
+        ? `${latestRegionalYear} · ${message(p.messages, "regionalEconomies.largestRegion")}: ${regionName} · ${message(p.messages, "regionalEconomies.total")} (${message(p.messages, "regionalEconomies.currentPrices")}): ${formatAmount(largestRegion.value, p.locale)} · ${firstRegionalYear}–${latestRegionalYear}`
         : null,
+      // The caption names the region the figure belongs to, the largest, as the footer does.
+      latest: largestRegion && regionName ? { value: formatAmount(largestRegion.value, p.locale), period: String(latestRegionalYear), caption: regionName } : null,
+      years: firstRegionalYear === null || latestRegionalYear === null ? undefined : coverageRange(firstRegionalYear, latestRegionalYear),
     },
   ];
 }

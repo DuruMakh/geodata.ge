@@ -4,6 +4,7 @@ import { message } from "../i18n/messages";
 import { INK } from "./colors";
 import { formatInUnit } from "./format";
 import { HEALTH_SECTIONS, type HealthSectionId } from "./health";
+import { coverageRange } from "./coverageLabel";
 import type { HubCardModel } from "./hubCards";
 
 /** Each card's sparkline and footer are its page's headline series: Georgia's, in the stored unit and as published. */
@@ -23,6 +24,7 @@ export function buildHealthHubCards(facts: readonly ClientHealthFact[], presenta
       index: String(index + 1).padStart(2, "0"), title: message(presentation.messages, section.labelKey), description: t(`page.${section.id}.summary`),
       href: section.href, comingSoon: false, series: headline.map(f => f.value), seriesColor: INK,
       footer: `${last.year} · ${value} · ${headline[0].year}–${last.year}`,
+      latest: { value, period: String(last.year) }, years: coverageRange(headline[0].year, last.year),
     };
   });
 }

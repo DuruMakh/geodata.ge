@@ -11,6 +11,8 @@ import { isDerivedTotalItemId } from "./explorerData";
 import { formatAmount, formatShare } from "./format";
 import { INK } from "./colors";
 import { BUDGET_SECTIONS } from "./sections";
+import { coverageRange } from "./coverageLabel";
+import type { CardGraphic, CardLatest } from "./topicHub";
 
 // Budget hub cards (DESIGN.md §6.7). Every figure is derived from the served
 // facts at build time, so the hub can never drift from the pages behind it.
@@ -24,6 +26,11 @@ export type HubCardModel = {
   series: (number | null)[] | null;
   seriesColor: string | null;
   footer: string | null;
+  /** The figure the footer prints, for the group pages' cards; absent on a card whose footer names only years. */
+  latest?: CardLatest | null;
+  /** The years the page covers, `2010–2025`. */
+  years?: string;
+  graphic?: CardGraphic;
 };
 
 // Mirrors what the destination pages do: sum the category rows, but let an
@@ -68,6 +75,8 @@ export function buildHubCards(
   presentation?: Presentation,
   /** General-government total spending by year, from the spending-by-type page. */
   expenditureTypeTotals: Map<number, number> = new Map(),
+  /** Each card also carries the figure its footer prints (`latest`), for the group pages' cards. */
+  withLatest = false,
 ): HubCardModel[] {
   const locale = presentation?.locale ?? "ka";
   const translated = (key: string, originalKa: string, values?: TemplateValues) => presentation ? message(presentation.messages, key, values) : originalKa;
@@ -87,10 +96,13 @@ export function buildHubCards(
         ? []
         : Array.from({ length: latest - first + 1 }, (_, index) => first + index);
 
+    const amount = latest === null ? null : formatAmount(totals.get(latest) ?? 0, locale);
     return {
       series: span.length > 0 ? span.map((year) => totals.get(year) ?? null) : null,
-      footer: latest === null ? null : `${latest} · ${formatAmount(totals.get(latest) ?? 0, locale)}`,
+      footer: latest === null ? null : `${latest} · ${amount}`,
       latest,
+      figure: !withLatest || amount === null ? null : { value: amount, period: String(latest) },
+      years: first === undefined || latest === null ? undefined : coverageRange(first, latest),
     };
   };
 
@@ -120,6 +132,8 @@ export function buildHubCards(
       series: spend.series,
       seriesColor: INK,
       footer: spend.footer,
+      latest: spend.figure,
+      years: spend.years,
     },
     {
       index: "02",
@@ -130,6 +144,8 @@ export function buildHubCards(
       series: spendByType.series,
       seriesColor: spendByType.series === null ? null : INK,
       footer: spendByType.footer,
+      latest: spendByType.figure,
+      years: spendByType.years,
     },
     {
       index: "03",
@@ -140,6 +156,8 @@ export function buildHubCards(
       series: revenues.series,
       seriesColor: INK,
       footer: revenues.footer,
+      latest: revenues.figure,
+      years: revenues.years,
     },
     {
       index: "04",
@@ -157,6 +175,8 @@ export function buildHubCards(
       // gives every total series ink. #B3402A is a category token.
       seriesColor: municipal.series === null ? null : INK,
       footer: municipal.footer,
+      latest: municipal.figure,
+      years: municipal.years,
     },
     {
       index: "05",
@@ -170,6 +190,7 @@ export function buildHubCards(
         analysisYear === null
           ? null
           : translated("hub.analysisFooter", `${analysisYear} · ${categoryCount(facts, "expenditure", analysisYear)} კატეგორია`, { year: analysisYear, count: categoryCount(facts, "expenditure", analysisYear) }),
+      years: spend.years,
     },
     {
       index: "06",
@@ -180,6 +201,8 @@ export function buildHubCards(
       series: debt.series,
       seriesColor: debt.series === null ? null : INK,
       footer: debt.footer,
+      latest: debt.figure,
+      years: debt.years,
     },
     {
       index: "07",
@@ -194,6 +217,8 @@ export function buildHubCards(
       footer: latestBalance === null
         ? null
         : translated("hub.deficitFooter", `${latestBalance.year} · ${formatShare(latestBalance.generalGovernmentBalancePctGdp / 100)} მშპ-ის`, { year: latestBalance.year, share: formatShare(latestBalance.generalGovernmentBalancePctGdp / 100) }),
+      latest: !withLatest || latestBalance === null ? null : { value: formatShare(latestBalance.generalGovernmentBalancePctGdp / 100), period: String(latestBalance.year) },
+      years: balanceYears.length > 0 ? coverageRange(balanceYears[0], balanceYears.at(-1)!) : undefined,
     },
   ];
 }

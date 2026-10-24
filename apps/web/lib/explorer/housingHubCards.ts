@@ -3,6 +3,7 @@ import type { Presentation } from "../i18n/types";
 import { message } from "../i18n/messages";
 import { INK } from "./colors";
 import { formatInUnit } from "./format";
+import { coverageRange } from "./coverageLabel";
 import type { HubCardModel } from "./hubCards";
 import { HOUSING_SECTIONS, type HousingSectionId } from "./housing";
 import { buildHousingRegionMapModel } from "./housingRegionMap";
@@ -21,11 +22,14 @@ export function buildHousingHubCards(facts: readonly ClientHousingFact[], presen
     };
     if (section.id === "regions") {
       const map = buildHousingRegionMapModel(facts);
-      return { ...card, series: null, seriesColor: null, footer: `${map.firstYear}–${map.year}` };
+      return { ...card, series: null, seriesColor: null, footer: `${map.firstYear}–${map.year}`, years: coverageRange(map.firstYear, map.year) };
     }
     const headline = facts.filter(f => f.indicatorId === HEADLINE[section.id]).sort((a, b) => a.year - b.year);
     const last = headline.at(-1)!;
     const value = formatInUnit(last.value, { divisor: 1, label: "", decimals: last.decimals });
-    return { ...card, series: headline.map(f => f.value), seriesColor: INK, footer: `${last.year} · ${value} · ${headline[0].year}–${last.year}` };
+    return {
+      ...card, series: headline.map(f => f.value), seriesColor: INK, footer: `${last.year} · ${value} · ${headline[0].year}–${last.year}`,
+      latest: { value, period: String(last.year) }, years: coverageRange(headline[0].year, last.year),
+    };
   });
 }

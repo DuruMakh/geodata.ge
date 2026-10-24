@@ -5,6 +5,7 @@ import { INK } from "./colors";
 import { ENVIRONMENT_SECTIONS, environmentDefaultSelection, environmentValueUnit, type EnvironmentSectionId } from "./environment";
 import { environmentCityHeadline, environmentCityHref, environmentHighestPm10 } from "./environmentCities";
 import { formatInUnit } from "./format";
+import { coverageRange } from "./coverageLabel";
 import type { HubCardModel } from "./hubCards";
 
 /** The series a card follows: its page's default (on Air pollution carbon monoxide, its first), the most polluted station, or Georgia's row of a map page. */
@@ -18,15 +19,16 @@ function headline(section: EnvironmentSectionId, facts: readonly ClientEnvironme
 }
 
 /** A card's sparkline over every year from the first to the last (a year without a value is a gap, never a zero) and its footer, the latest value as published. */
-function card(seriesId: string, facts: readonly ClientEnvironmentFact[]): Pick<HubCardModel, "series" | "seriesColor" | "footer"> {
+function card(seriesId: string, facts: readonly ClientEnvironmentFact[]): Pick<HubCardModel, "series" | "seriesColor" | "footer" | "latest" | "years"> {
   const own = facts.filter(f => f.indicatorId === seriesId);
   const valueByYear = new Map(own.map(f => [f.year, f.value]));
   const years = [...valueByYear.keys()].sort((a, b) => a - b);
   const first = years[0], last = years.at(-1)!;
   const decimals = Math.max(...own.map(f => f.decimals));
+  const value = formatInUnit(valueByYear.get(last)!, environmentValueUnit(decimals));
   return {
     series: Array.from({ length: last - first + 1 }, (_, offset) => valueByYear.get(first + offset) ?? null), seriesColor: INK,
-    footer: `${last} · ${formatInUnit(valueByYear.get(last)!, environmentValueUnit(decimals))} · ${first}–${last}`,
+    footer: `${last} · ${value} · ${first}–${last}`, latest: { value, period: String(last) }, years: coverageRange(first, last),
   };
 }
 

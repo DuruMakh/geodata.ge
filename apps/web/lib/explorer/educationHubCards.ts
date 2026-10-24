@@ -3,6 +3,7 @@ import type { Presentation } from "../i18n/types";
 import { message } from "../i18n/messages";
 import { INK } from "./colors";
 import { EDUCATION_SECTIONS, educationCountLabel, educationPeriodLabel, type EducationSectionId } from "./education";
+import { coverageRange } from "./coverageLabel";
 import type { HubCardModel } from "./hubCards";
 
 /** Each card's sparkline and footer follow one Georgia series: pupils, kindergarten children, university students and vocational admissions. */
@@ -21,6 +22,7 @@ export function buildEducationHubCards(facts: readonly ClientEducationFact[], pr
       index: String(index + 1).padStart(2, "0"), title: message(presentation.messages, section.labelKey), description: t(`page.${section.id}.summary`),
       href: section.href, comingSoon: false,
       series: headline.map(f => f.value), seriesColor: INK, footer: `${period(last.year)} · ${value} · ${period(headline[0].year)}–${period(last.year)}`,
+      latest: { value, period: period(last.year) }, years: coverageRange(period(headline[0].year), period(last.year)),
     };
   });
 }

@@ -7,6 +7,7 @@ import { GEORGIA_PLACE_ID } from "./demographyAreas";
 import { sparkValues } from "./demographyPopulation";
 import { DEMOGRAPHY_PAGES } from "./demographyRoutes";
 import { formatInUnit, formatShare, UNIT_PERSONS } from "./format";
+import { coverageRange } from "./coverageLabel";
 import type { HubCardModel } from "./hubCards";
 
 // Every figure is read from the served facts at build time, so the hub can never drift from the pages
@@ -57,6 +58,7 @@ export function buildDemographyHubCards(
         series: net.map((fact) => fact.value),
         seriesColor: INK,
         footer: t("migrationCardFooter", { year: lastNet.year, net: signed(lastNet.value), first: firstNet.year, last: lastNet.year }),
+        latest: { value: signed(lastNet.value), period: String(lastNet.year) }, years: coverageRange(firstNet.year, lastNet.year),
       };
     }
     if (page.id === "age-sex" && page.live && oldShares.length) {
@@ -67,6 +69,7 @@ export function buildDemographyHubCards(
         series: sparkValues(oldShares.map((entry) => entry.year), (year) => shareByYear.get(year) ?? null),
         seriesColor: INK,
         footer: t("ageSexCardFooter", { year: lastShare.year, share: formatShare(lastShare.share / 100), first: firstShare.year, last: lastShare.year }),
+        latest: { value: formatShare(lastShare.share / 100), period: String(lastShare.year) }, years: coverageRange(firstShare.year, lastShare.year),
       };
     }
     if (page.id === "births-deaths" && page.live && births.length) {
@@ -76,6 +79,7 @@ export function buildDemographyHubCards(
         series: births.map((fact) => fact.value),
         seriesColor: INK,
         footer: t("birthsCardFooter", { year: lastBirths.year, births: formatInUnit(lastBirths.value, UNIT_PERSONS), first: firstBirths.year, last: lastBirths.year }),
+        latest: { value: formatInUnit(lastBirths.value, UNIT_PERSONS), period: String(lastBirths.year) }, years: coverageRange(firstBirths.year, lastBirths.year),
       };
     }
     if (page.id === "marriages-divorces" && page.live && marriages.length) {
@@ -85,6 +89,7 @@ export function buildDemographyHubCards(
         series: marriages.map((fact) => fact.value),
         seriesColor: INK,
         footer: t("marriagesCardFooter", { year: lastMarriages.year, marriages: formatInUnit(lastMarriages.value, UNIT_PERSONS), first: firstMarriages.year, last: lastMarriages.year }),
+        latest: { value: formatInUnit(lastMarriages.value, UNIT_PERSONS), period: String(lastMarriages.year) }, years: coverageRange(firstMarriages.year, lastMarriages.year),
       };
     }
     if (page.id !== "population" || !first || !last) return { ...card, series: null, seriesColor: null, footer: null };
@@ -93,6 +98,7 @@ export function buildDemographyHubCards(
       series: trend,
       seriesColor: INK,
       footer: t("cardFooter", { year: last.year, persons: formatInUnit(last.value, UNIT_PERSONS), first: first.year, last: last.year }),
+      latest: { value: formatInUnit(last.value, UNIT_PERSONS), period: String(last.year) }, years: coverageRange(first.year, last.year),
     };
   });
 }
