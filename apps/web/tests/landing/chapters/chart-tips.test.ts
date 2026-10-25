@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { birthsTip, deficitTip, migrationTip, plannedYearText, pyramidTip, regionTip, reliefTip, revenueTip, waffleTip } from "../../../components/landing/chapters/chart-tips";
-import type { AgeingChapter, DeficitChapter, LabourSplit, MunicipalChapter, RevenueSeries, YouthJobsChapter } from "../../../lib/landing/chapters/types";
+import { birthsTip, deficitTip, migrationTip, plannedYearText, pyramidTip, regionTip, reliefTip, revenueTip, waffleTip, wageTip } from "../../../components/landing/chapters/chart-tips";
+import type { AgeingChapter, DeficitChapter, LabourSplit, MunicipalChapter, RevenueSeries, WageGapChapter, YouthJobsChapter } from "../../../lib/landing/chapters/types";
 
 const labels = {
   locale: "ka" as const,
@@ -266,5 +266,29 @@ describe("regionTip", () => {
 
   it("says a region equals the Georgia rate when they differ by less than 0.05 points", () => {
     expect(regionTip(regions, 13.88, regionLabels, 1).foot).toBe("საქართველოს საშუალოს ტოლი");
+  });
+});
+
+describe("wageTip", () => {
+  const sectors: WageGapChapter["sectors"] = [
+    { id: "finance", label: "ფინანსები და დაზღვევა", average: 5900.46, women: 4300.04, men: 7600.5 },
+    { id: "education", label: "განათლება", average: 1200, women: 1250, men: 1100 },
+  ];
+  const wageLabels = { men: "კაცები", women: "ქალები", average: "საშუალო", foot: "ქალების ხელფასი კაცებისის {pct}%-ია" };
+
+  it("lists men, women and the average of the sector with the year in the title, and women's pay as a share of men's in the foot", () => {
+    expect(wageTip(sectors, 2025, wageLabels, 0)).toEqual({
+      title: "ფინანსები და დაზღვევა, 2025",
+      rows: [
+        { key: "#3D5A98", val: "7,600.5 ₾", name: "კაცები" },
+        { key: "#C26E4C", val: "4,300.0 ₾", name: "ქალები" },
+        { key: "var(--ink)", val: "5,900.5 ₾", name: "საშუალო" },
+      ],
+      foot: "ქალების ხელფასი კაცებისის 56.6%-ია",
+    });
+  });
+
+  it("states a sector where women earn more as a share above 100", () => {
+    expect(wageTip(sectors, 2025, wageLabels, 1).foot).toBe("ქალების ხელფასი კაცებისის 113.6%-ია");
   });
 });

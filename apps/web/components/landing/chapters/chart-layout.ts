@@ -105,6 +105,25 @@ export function regionsAxisTop(maxRate: number): number {
   return (Math.floor(maxRate / 5) + 1) * 5;
 }
 
+/** Below this width the wages chart puts each sector's name above its row instead of beside it. */
+export const DUMBBELL_NARROW_WIDTH = 640;
+
+/** Height of the wages chart: 27 px per sector (44 px when narrow, with the name above) plus 40 px for the axis. */
+export function dumbbellHeight(count: number, narrow: boolean): number {
+  return count * (narrow ? 44 : 27) + 40;
+}
+
+/** Top of the wages chart's axis, in GEL: the next multiple of 2,000 above the highest wage (5,900 gives 6,000, 6,000 gives 8,000). */
+export function wagesAxisTop(maxWage: number): number {
+  return (Math.floor(maxWage / 2000) + 1) * 2000;
+}
+
+/** The sector whose women's and men's average wages are furthest apart (in GEL, whichever earns more). */
+export function largestWageGap<T extends { women: number; men: number }>(sectors: readonly T[]): T {
+  if (!sectors.length) throw new Error("Wages chapter: no sectors");
+  return sectors.reduce((best, sector) => (Math.abs(sector.women - sector.men) > Math.abs(best.women - best.men) ? sector : best));
+}
+
 /** "2004" for a single year, "2004–2007" for a range. */
 export function yearRange(first: number, last: number): string {
   return first === last ? String(first) : `${first}–${last}`;

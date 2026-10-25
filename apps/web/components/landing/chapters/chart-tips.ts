@@ -1,11 +1,11 @@
 import { formatInUnit, formatPerResidentGel, formatPoints, formatShare, MISSING, UNIT_PERSONS } from "../../../lib/explorer/format";
 import type { Locale } from "../../../lib/i18n/types";
-import type { AgeingChapter, DeficitChapter, LabourSplit, MunicipalChapter, ReliefPlace, RevenueSeries, YouthJobsChapter } from "../../../lib/landing/chapters/types";
+import type { AgeingChapter, DeficitChapter, LabourSplit, MunicipalChapter, ReliefPlace, RevenueSeries, WageGapChapter, YouthJobsChapter } from "../../../lib/landing/chapters/types";
 import { birthsColor, birthsPer100, MIGRATION_COLORS, SEX_COLORS } from "./canvas";
 import { money, points, signedCount } from "./chart-format";
 import type { TipData } from "./chart-tip";
 
-// Tooltip content of the revenue, deficit, municipal relief, ageing and youth jobs charts, kept apart from the engines so it can be tested.
+// Tooltip content of the revenue, deficit, municipal relief, ageing, youth jobs and wages charts, kept apart from the engines so it can be tested.
 
 /** Year with a planned suffix when the year's value is planned: "2025 (გეგმა)". */
 export function plannedYearText(data: Pick<RevenueSeries, "years" | "planned">, i: number, planned: string): string {
@@ -192,5 +192,28 @@ export function regionTip(
     title: label,
     rows: [{ key: "var(--ink)", val: points(rate), name: labels.rate }],
     foot: template.replace("{diff}", formatPoints(Math.abs(diff), false, 1)),
+  };
+}
+
+/**
+ * Wages chart tooltip for sector index `i`: men, women and the average wage in GEL (the year is in the title), and
+ * women's wage as a share of men's in the foot (`{pct}` in the template).
+ */
+export function wageTip(
+  sectors: WageGapChapter["sectors"],
+  year: number,
+  labels: { men: string; women: string; average: string; foot: string },
+  i: number,
+): TipData {
+  const { label, average, women, men } = sectors[i];
+  const gel = (value: number) => `${formatInUnit(value, { ...UNIT_PERSONS, decimals: 1 })} ₾`;
+  return {
+    title: `${label}, ${year}`,
+    rows: [
+      { key: SEX_COLORS.men, val: gel(men), name: labels.men },
+      { key: SEX_COLORS.women, val: gel(women), name: labels.women },
+      { key: "var(--ink)", val: gel(average), name: labels.average },
+    ],
+    foot: labels.foot.replace("{pct}", formatInUnit((women / men) * 100, { ...UNIT_PERSONS, decimals: 1 })),
   };
 }

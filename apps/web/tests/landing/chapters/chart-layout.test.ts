@@ -3,7 +3,9 @@ import {
   barSlots,
   DEFICIT_RULE_PCT,
   deficitScale,
+  dumbbellHeight,
   fiveYearIndices,
+  largestWageGap,
   plannedRuns,
   plannedSpan,
   pointIndexAt,
@@ -12,6 +14,7 @@ import {
   revenuePads,
   slotIndexAt,
   valueY,
+  wagesAxisTop,
   yearLabelIndices,
   yearRange,
 } from "../../../components/landing/chapters/chart-layout";
@@ -142,5 +145,33 @@ describe("regionsAxisTop", () => {
     expect(regionsAxisTop(17.5)).toBe(20);
     expect(regionsAxisTop(7)).toBe(10);
     expect(regionsAxisTop(20)).toBe(25);
+  });
+});
+
+describe("dumbbellHeight", () => {
+  it("gives 27 px per sector and 44 px when narrow, plus 40 px", () => {
+    expect(dumbbellHeight(19, false)).toBe(553);
+    expect(dumbbellHeight(19, true)).toBe(876);
+  });
+});
+
+describe("wagesAxisTop", () => {
+  it("is the next multiple of 2,000 above the highest wage, also for an exact multiple", () => {
+    expect(wagesAxisTop(5900)).toBe(6000);
+    expect(wagesAxisTop(6100)).toBe(8000);
+    expect(wagesAxisTop(6000)).toBe(8000);
+  });
+});
+
+describe("largestWageGap", () => {
+  const sector = (id: string, women: number, men: number) => ({ id, label: id, average: (women + men) / 2, women, men });
+
+  it("is the sector whose women's and men's wages are furthest apart, in either direction", () => {
+    expect(largestWageGap([sector("a", 4000, 4500), sector("b", 3000, 3900), sector("c", 4700, 4000)]).id).toBe("b");
+    expect(largestWageGap([sector("a", 4000, 4500), sector("c", 5600, 4000)]).id).toBe("c");
+  });
+
+  it("fails without sectors", () => {
+    expect(() => largestWageGap([])).toThrow("Wages chapter: no sectors");
   });
 });

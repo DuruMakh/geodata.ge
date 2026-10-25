@@ -17,6 +17,7 @@ import { RevenueChart, type RevenueLabels } from "./chapters/revenue-chart";
 import { ScaleChapter, type ScaleLabels } from "./chapters/scale-chapter";
 import { SourcesSection, type SourcesLabels } from "./chapters/sources-section";
 import { SpendingChapter, type SpendingLabels } from "./chapters/spending-chapter";
+import { WagesChapter, wagesNotes, type WagesLabels } from "./chapters/wages-chapter";
 import { HeroReliefLazy } from "./hero-relief-lazy";
 
 // Population and area are maintained by hand; the GDP figure and every budget
@@ -214,6 +215,26 @@ export function LandingPage({ chapters, gdpFigure, presentation, updatedAt, mcpE
       unavailable,
     },
   };
+  const { wageGap } = chapters;
+  const wageText = wagesNotes(wageGap, t);
+  const wagesLabels: WagesLabels = {
+    chart: {
+      title: t("landing.wages.chart.title", { year: wageGap.year }),
+      women: t("landing.ageing.women"),
+      men: t("landing.ageing.men"),
+      average: t("landing.wages.legendAverage"),
+      ratioHint: t("landing.wages.ratioHint"),
+      // The tooltip fills in the share when a sector is hovered.
+      tipFoot: t("landing.wages.tipFoot", { pct: "{pct}" }),
+      chartSummary: t("landing.wages.chartSummary", { count: wageGap.sectors.length, year: wageGap.year }),
+      largestGap: t("landing.wages.largestGap"),
+      unavailable,
+    },
+    average: { label: t("landing.wages.average.label"), note: wageText.average },
+    median: { label: t("landing.wages.median.label"), note: wageText.median },
+    ratio: { label: t("landing.wages.ratio.label"), note: wageText.ratio },
+    publicSector: { label: t("landing.wages.public.label"), note: wageText.publicSector },
+  };
   const collections = chapters.sources.rows.length;
   const sourcesLabels: SourcesLabels = {
     title: t("landing.sources.title"),
@@ -333,6 +354,9 @@ export function LandingPage({ chapters, gdpFigure, presentation, updatedAt, mcpE
           </Chapter>
           <Chapter id="ch-07" link={chapterLink(7, "/explorer/unemployment")} title={chapters.sentences.headings.youthJobs} lede={chapters.sentences.youthJobs}>
             <JobsChapter data={youthJobs} labels={jobsLabels} />
+          </Chapter>
+          <Chapter id="ch-08" link={chapterLink(8, "/explorer/wages")} title={t("landing.ch8.title")} lede={chapters.sentences.wageGap}>
+            <WagesChapter data={wageGap} labels={wagesLabels} />
           </Chapter>
           <SourcesSection sources={chapters.sources} labels={sourcesLabels} locale={locale} />
           <AiSection endpoint={mcpEndpoint} tools={chapters.tools} labels={aiLabels} locale={locale} />
