@@ -407,9 +407,9 @@ Public labels should come from a Georgian-first terminology glossary, not from h
 
 ## 6. Trust Policy
 
-Analytical views should not be overloaded with provenance panels or repeated introductory copy. They retain a concise source label; the explorer sidebar, the footer outside the explorer, and dedicated `/methodology` surfaces provide access to the applicable public methodology and original-source archive. Budget and municipal pages retain their complete public decision records; the Debt page intentionally stays limited to its concise scope, sources, known limitations, and archive.
+Analytical views should not be overloaded with provenance panels or repeated introductory copy. They — the chart pages — retain a concise source label. The group pages and All data are navigation and carry no source line (owner decision 2026-10-25): each figure on them links to its chart page, whose source label names its institutions. The explorer sidebar's foot, the footer outside the explorer (explorer routes have no footer), and dedicated `/methodology` surfaces provide access to the applicable public methodology and original-source archive. Budget and municipal pages retain their complete public decision records; the Debt page intentionally stays limited to its concise scope, sources, known limitations, and archive.
 
-Public UI should include a small source label, such as:
+Each analytical view should include a small source label, such as:
 
 ```text
 Data: reviewed official budget documents. Last updated: YYYY-MM-DD.

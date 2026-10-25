@@ -84,7 +84,7 @@ How the section is reached: the server forward carries the topic as `?topic={top
 5. An open group shows its topics as small headings (only when it has more than one topic), each with its pages as rows. The current page has the accent left border.
 6. Foot: the language switch (`ქარ` / `EN`), then `მეთოდოლოგია` and `AI-კავშირი` (`/methodology`, `/connect`).
 
-**Collapsed rail (from 900px).** 72px wide, with the brand mark, the search icon, the All data icon and the 8 group icons. Hovering over a group icon or focusing it opens a 320px pop-out beside the rail. The pop-out has the group name (linked), its topics and page count, and all its pages. Escape or moving away closes it, and clicking the icon opens the group page. The language switch stacks vertically at the foot. The collapsed choice persists as today (`geodata:sidebar-collapsed`). This replaces the rule "sections are not reachable while collapsed".
+**Collapsed rail (from 900px).** 72px wide, with the brand mark, the search icon, the All data icon and the 8 group icons. Hovering over a group icon or focusing it opens a 320px pop-out beside the rail. The pop-out has the group name (linked), its topics and page count, and all its pages. Escape or moving away closes it, and clicking the icon opens the group page. The foot stacks the language switch and two icon links, Methodology (`BookOpen`) and AI connection (`Plug`), each with an accessible name and a tooltip like the rail's other items. The collapsed choice persists as today (`geodata:sidebar-collapsed`). This replaces the rule "sections are not reachable while collapsed".
 
 **Below 900px.** A 56px top bar with the brand, a search button and a menu button. The menu opens the sidebar full screen, with a close button in place of the collapse toggle. While it is open the page behind is hidden, so focus stays in the menu. Escape and the close button both close it and return focus to the menu button. A link closes it. Every row is at least 44px tall.
 
@@ -115,7 +115,7 @@ Order on the page:
 6. **Cards**, three columns on desktop, two at tablet width, one on phones. Each card is a link with an index (`01`) and arrow, the page title, a graphic, the latest value with its caption and period, and a footer with the years covered.
    - The **first card of a topic is the lead card**. It is wider, with a larger area chart labelled with its first and last values and years, and it shows the page's description. Its span follows the design: the whole row, two columns, or two columns by two rows, depending on how many pages the topic has.
    - **Graphics:** a line with an end dot for any page with a national series; the **region spread** (one dot per region on a scale, Georgia marked with a dashed line, the lowest and highest named) for every Regions page; **bars** for Unemployment by age; **two bars** for Unemployment by sex (men, women); **top three bars** for Wages by industry. A page without a series or region values shows "Map and list · 11 regions" with the map icon, or keeps the empty graphic band.
-7. The explorer footer, as on every explorer page. Its source note names the institutions behind that group's pages.
+7. No footer and no source line. Explorer routes have no footer (owner decision 2026-10-25), and a group page names no source: each chart page's own source note names the institutions behind its figures.
 
 A topic's latest value, caption, years and update date come from that topic's existing hub card builder (`lib/explorer/*HubCards.ts`) and its coverage label. The group page assembles those builders. It never computes a figure a chart page does not.
 
@@ -126,6 +126,8 @@ A topic's latest value, caption, years and update date come from that topic's ex
 3. **The search box** (66px tall, 1.5px ink border, the search icon, placeholder `ინფლაცია, ბათუმი, ხელფასები…`, a `/` hint, and a clear button while it has text). Below it a `სცადეთ:` row of five example words: Georgian `ბათუმი, ინფლაცია, ხელფასები, მშპ, NEET`; English `Batumi, inflation, wages, GDP, xelfasebi`.
 4. With an **empty box**, all pages A to Z. A letter bar sticks to the top: Georgian `ა–ჰ`, English `A–Z`, and letters with no page are dimmed and unlinked. Pages are grouped by first letter in two balanced columns, one on phones. Each row shows the page name, its group's icon and name, a 44px trend line (the map icon for a Regions page without one), and the latest value with its period. Vague names get their topic in front: Regions, Spending, Revenue, Products, Categories, Cities, Industries, Sectors, Analysis, Sales, Jobs, Sex, Age groups, Debt and Municipalities. For example `ხელფასები — რეგიონები` / `Wages — regions`.
 5. With **text in the box**, results replace the list (§7). The query lives in the page address hash (`#q=ბათუმი`) through the existing `use-hash-state`, so a search can be shared and the back button works.
+
+Like the group pages, All data has no footer and no source line (owner decision 2026-10-25).
 
 The A to Z list is rendered on the server and is in the page's HTML for search engines. Search runs in the browser.
 
@@ -185,6 +187,8 @@ One adapter per place page family. Each turns that family's served facts into `{
 
 A page with place figures but no place page (Births and deaths, Marriages and divorces, the regions' census share aged 65+ on Age and sex) links to the general page, or the place's Population section, with the place's value. Births and deaths states the place's births and Marriages and divorces its marriages, each captioned as the page's card is. The place card's four facts come from the Population, Municipal budget (total and per resident) and Births and deaths data. For a region, the budget is the sum of its municipalities, as the municipal region pages already show.
 
+Every row states the measure, unit and caption of its page's card (fix round 4, 2026-10-25), so a reader sees in search what the group page says: Causes of death the death rate per 1,000 people, Museums its visitors in the card's scale (`2.0 million`, a region below a million in thousands), Waste the card's million tonnes (a region in thousand tonnes), Housing regions the floor area permitted that its card spreads, and the rows of Schools, Kindergartens, Pensions, Subsistence allowance, Museums, Waste, Forests and City air quality the card's caption. Where a place page's own line leads with another measure (Causes of death and Housing regions lead with counts), the row follows the card. `tests/explorer/placeEntryCards.test.ts` compares each family's Georgia row with its card.
+
 The same index feeds the region-spread graphic of §5.
 
 ## 9. Where the build differs from the prototype
@@ -193,11 +197,11 @@ The same index feeds the region-spread graphic of §5.
 - Place results link to the place's own page rather than the general page (agreed in part 3).
 - The rail and pop-out icons are Lucide (the project's one icon family). The prototype's inline icons are the same Lucide shapes.
 - The prototype's numbers were copied from the live site on 2026-10-24. The build computes them, so they follow the data.
-- Footer: the explorer footer stays as it is today. The prototype's one-line footer is only a placeholder.
+- Footer: explorer routes have no footer (owner decision 2026-10-25), so neither the explorer footer nor the prototype's one-line footer is built. Methodology and AI connection stay reachable from the sidebar's foot, expanded and collapsed (§4).
 
 ## 10. Reuse
 
-**Reused as is:** the design tokens in `globals.css` (the prototype uses the same palette and fonts), `PageHeader`, `ExplorerPage`, `ExplorerHeading`, `BreadcrumbJsonLd`, `LanguageSwitch`, `ExplorerFooter`, `use-hash-state`, `coverageLabel`, every topic's `*HubCards.ts` builder and its loaders, place route helpers (`placePageHref`, `areaRoutes`, municipality routes), `MUNICIPALITY_ROUTES`, region labels, the `force-static` route pattern, and `fiscalMetadata`.
+**Reused as is:** the design tokens in `globals.css` (the prototype uses the same palette and fonts), `PageHeader`, `ExplorerPage`, `ExplorerHeading`, `BreadcrumbJsonLd`, `LanguageSwitch`, `use-hash-state`, `coverageLabel`, every topic's `*HubCards.ts` builder and its loaders, place route helpers (`placePageHref`, `areaRoutes`, municipality routes), `MUNICIPALITY_ROUTES`, region labels, the `force-static` route pattern, and `fiscalMetadata`.
 
 **Small additions:**
 
