@@ -8,6 +8,8 @@ export type CardLatest = {
   caption?: string;
   /** What a group headline shows in place of `caption`, whose label already says the rest: the largest partner's name alone. */
   headlineCaption?: string;
+  /** The figure is a plan, not an actual: its period then reads as the plan (`2026 გეგმა` / `2026 plan`), and a lead card draws its last point hollow. */
+  planned?: boolean;
 };
 
 /** A card's own graphic, in place of the sparkline: Unemployment's age bands, or two or three bars side by side. */

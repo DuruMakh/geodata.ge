@@ -34,7 +34,12 @@ export const GROUP_HEADLINES: Record<GroupId, readonly { page: string; labelKey?
 };
 
 /** One headline number: its label, the page card's latest figure with its period, and the card's series as the trend. */
-export type GroupHeadline = { href: string; label: string; value: string; period: string; caption: string | null; series: (number | null)[] | null };
+export type GroupHeadline = {
+  href: string; label: string; value: string;
+  /** As the card writes it: a planned figure's period is the plan (`2026 გეგმა`). */
+  period: string;
+  planned: boolean; caption: string | null; series: (number | null)[] | null;
+};
 
 /** A value's figure and its unit ("32.4" and "მლრდ ₾"): the text after the first space is the unit. */
 export function splitValue(value: string): { figure: string; unit: string | null } {
@@ -60,6 +65,6 @@ export function groupHeadlines(group: GroupId, cards: readonly HubCardModel[], m
     // A unit that starts with a digit is the rest of a number split at a space (`1 234 ₾`).
     if (!HEADLINE_FIGURE.test(figure) || /^\d/.test(unit ?? "")) throw new Error(`The ${group} headline ${page} starts with "${figure}", not a figure: "${value}"`);
     const caption = card.latest.headlineCaption ?? card.latest.caption;
-    return { href: page, label, value, period, caption: caption && caption !== label ? caption : null, series: card.series };
+    return { href: page, label, value, period, planned: card.latest.planned === true, caption: caption && caption !== label ? caption : null, series: card.series };
   });
 }

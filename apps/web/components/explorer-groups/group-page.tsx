@@ -52,7 +52,7 @@ const EDGE_FADE = "pointer-events-none absolute top-0 bottom-px w-10 from-[var(-
 function Headline({ headline, locale }: { headline: GroupHeadline; locale: Locale }) {
   const { figure, unit } = splitValue(headline.value);
   return (
-    <Link href={pageHref(headline.href, locale)} prefetch={false} data-testid="group-headline" className={HEADLINE_CLASS}>
+    <Link href={pageHref(headline.href, locale)} prefetch={false} data-testid="group-headline" data-planned={headline.planned || undefined} className={HEADLINE_CLASS}>
       <span className="block text-[12.5px] leading-[1.35] text-[var(--body)] group-hover:text-[var(--ink)] group-hover:underline group-hover:decoration-[var(--accent)] group-hover:underline-offset-[3px] max-[1101px]:min-h-[2.7em]">
         {headline.label}
       </span>
@@ -66,8 +66,9 @@ function Headline({ headline, locale }: { headline: GroupHeadline; locale: Local
             <span data-testid="group-headline-unit" className="whitespace-nowrap">{unit}</span>
           </span>
         ) : null}
-        {/* The period may go to the next line instead of the unit. Its gap is a leading space, not a margin, so the break takes it. */}
-        <small className="text-[11.5px] font-normal tracking-normal text-[var(--faint)]">{` ${headline.period}`}</small>
+        {/* The period may go to the next line instead of the unit. Its gap is a leading space, not a margin, so the break takes it.
+            A planned figure's period is the plan (`2026 გეგმა`), set a step stronger so it is not read past. */}
+        <small className={`text-[11.5px] tracking-normal ${headline.planned ? "font-medium text-[var(--muted)]" : "font-normal text-[var(--faint)]"}`}>{` ${headline.period}`}</small>
       </span>
       {headline.caption ? <span className="mt-1 block text-[11.5px] leading-snug text-[var(--muted)]">{headline.caption}</span> : null}
       {headline.series ? (

@@ -94,9 +94,9 @@ function Band({ card, locale, lead, spread, regionCount }: CardProps) {
       {!graphic && spread ? <SpreadGraphic spread={spread} /> : null}
       {!graphic && !spread && series && seriesColor ? (
         lead ? (
-          <LeadGraphic series={series} color={seriesColor} endLabel={card.latest?.value ?? null} years={card.years} />
+          <LeadGraphic series={series} color={seriesColor} endLabel={card.latest?.value ?? null} years={card.years} planned={card.latest?.planned} />
         ) : (
-          <LineGraphic series={series} color={seriesColor} />
+          <LineGraphic series={series} color={seriesColor} planned={card.latest?.planned} />
         )
       ) : null}
       {!graphic && !spread && !(series && seriesColor) && onRegionsPage ? (
@@ -115,7 +115,8 @@ export function ExplorerCard(props: CardProps) {
   // A spread states the Regions page's range, in place of the one latest figure.
   const caption = spread ? spread.caption : [card.latest?.caption, card.latest?.period].filter(Boolean).join(" · ");
   const value = spread ? spread.value : card.latest?.value;
-  const footer = card.years ? (card.latest?.period ? card.years : `${card.years} · ${message(groups, "groups.annual")}`) : null;
+  // A card with no figure names its years as annual data, or, where they end in a plan year (Analysis), that plan.
+  const footer = card.years ? (card.latest?.period ? card.years : `${card.years} · ${card.plan ?? message(groups, "groups.annual")}`) : null;
   // What only the decorative band shows, for assistive technology: the pair's rows, the bars' first and last band, the spread's extremes.
   const detail = card.graphic?.kind === "pair" ? card.graphic.rows.map((row) => `${row.label} ${row.text}`).join(", ")
     : card.graphic?.kind === "bars" ? [card.graphic.first, card.graphic.last].join(", ")

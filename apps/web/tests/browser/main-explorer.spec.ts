@@ -1532,8 +1532,9 @@ test("the Budget group page lists eight cards, all eight live", async ({ page })
 
   // Absence alone would pass on a page whose figures all came back null, so also
   // assert a real figure is there. The shape, not the figure: the number moves
-  // with every dataset update, the "<n.n> მლრდ ₾" then "<year>" contract does not.
-  await expect(cards.first()).toContainText(/[\d,]+\.\d მლრდ ₾\d{4}/);
+  // with every dataset update, the "<n.n> მლრდ ₾" then "<year>" contract does not. The first card is the shipped 2026 plan,
+  // whose period reads as the plan.
+  await expect(cards.first()).toContainText(/[\d,]+\.\d მლრდ ₾\d{4} გეგმა/);
   const types = cards.nth(1);
   await expect(types).toContainText("ხარჯების სახეები");
   await expect(types).toHaveAttribute("href", "/explorer/expenditure-types");

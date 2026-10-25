@@ -13,10 +13,10 @@ const NUMERIC = "font-[family-name:var(--font-numeric)]";
 const percent = (value: number) => `${Math.round(value * 10) / 10}%`;
 
 /** The small line chart: area, line and an end dot, stretched over the band. */
-export function LineGraphic({ series, color }: { series: (number | null)[]; color: string }) {
+export function LineGraphic({ series, color, planned = false }: { series: (number | null)[]; color: string; planned?: boolean }) {
   return (
     <span className="absolute inset-0 block [&>svg]:mt-0 [&>svg]:h-full [&>svg]:w-full">
-      <Sparkline values={series} color={color} width={200} height={58} fluidOnMobile area endDot />
+      <Sparkline values={series} color={color} width={200} height={58} fluidOnMobile area endDot hollowEnd={planned} />
     </span>
   );
 }
@@ -27,14 +27,17 @@ function endHeight(series: (number | null)[], height: number): number {
   return last ? (Number(last.slice(last.lastIndexOf(" ") + 1)) / height) * 100 : 50;
 }
 
-/** The lead card's large area chart. Its last value is written at the line's end, in a gutter sized to the text, and the first and last year under it. */
-export function LeadGraphic({ series, color, endLabel, years }: { series: (number | null)[]; color: string; endLabel: string | null; years: string | undefined }) {
+/**
+ * The lead card's large area chart. Its last value is written at the line's end, in a gutter sized to the text, and the first and last year
+ * under it. A planned last value (`planned`) is drawn as a hollow point.
+ */
+export function LeadGraphic({ series, color, endLabel, years, planned = false }: { series: (number | null)[]; color: string; endLabel: string | null; years: string | undefined; planned?: boolean }) {
   const [first, last = ""] = (years ?? "").split("–");
   const gutter = endLabel ? Math.round(endLabel.length * 7.4 + 16) : 0;
   return (
     <>
       <span className="absolute top-0 left-0 block h-full [&>svg]:mt-0 [&>svg]:h-full [&>svg]:w-full" style={{ width: `calc(100% - ${gutter}px)` }}>
-        <Sparkline values={series} color={color} width={600} height={160} fluidOnMobile area endDot />
+        <Sparkline values={series} color={color} width={600} height={160} fluidOnMobile area endDot hollowEnd={planned} />
       </span>
       {endLabel ? (
         <span

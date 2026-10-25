@@ -30,6 +30,8 @@ export type HubCardModel = {
   latest?: CardLatest | null;
   /** The years the page covers, `2010–2025`. */
   years?: string;
+  /** A card with no single figure whose years end in a plan year: that year as the plan (`2026 გეგმა`), which its footer names. */
+  plan?: string;
   graphic?: CardGraphic;
 };
 
@@ -104,7 +106,8 @@ export function buildHubCards(
       series: span.length > 0 ? span.map((year) => totals.get(year) ?? null) : null,
       footer: latest === null ? null : `${planned ? yearLabel(latest) : latest} · ${amount}`,
       latest,
-      figure: !withLatest || amount === null ? null : { value: amount, period: String(latest) },
+      // A planned latest year reads as the plan the Spending page's line names (`2026 გეგმა`), never as a bare year beside actuals.
+      figure: !withLatest || amount === null || latest === null ? null : { value: amount, period: planned ? yearLabel(latest) : String(latest), ...(planned ? { planned } : {}) },
       years: first === undefined || latest === null ? undefined : coverageRange(first, latest),
     };
   };
@@ -212,6 +215,7 @@ export function buildHubCards(
           ? null
           : translated("hub.analysisFooter", `${spendIsPlanned ? yearLabel(analysisYear) : analysisYear} · ${categoryCount(facts, "expenditure", analysisYear)} კატეგორია`, { year: spendIsPlanned ? yearLabel(analysisYear) : analysisYear, count: categoryCount(facts, "expenditure", analysisYear) }),
       years: spend.years,
+      ...(withLatest && spendIsPlanned && analysisYear !== null ? { plan: yearLabel(analysisYear) } : {}),
     },
     {
       index: "07",

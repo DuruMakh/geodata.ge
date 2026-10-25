@@ -14,12 +14,15 @@ type SparklineProps = {
   area?: boolean;
   /** Mark the last drawn point with an accent dot in a paper ring. */
   endDot?: boolean;
+  /** With `endDot`: the last point is a plan, so the dot is hollow, as the explorer chart draws a planned point. */
+  hollowEnd?: boolean;
 };
 
 // The dot is a zero-length stroke with round caps, not a circle: a stretched chart (preserveAspectRatio "none")
 // would squash a circle into an ellipse, while a non-scaling stroke stays round at any width.
 const END_DOT = 7;
 const END_RING = 11;
+const END_HOLE = 3;
 
 function endPoint(segment: string): { x: string; y: string } {
   const [x, y] = segment.slice(segment.lastIndexOf("L") + 1).trim().split(" ");
@@ -32,7 +35,7 @@ function areaPath(segment: string, height: number): string {
   return `${segment} L${last.x} ${height} L${first[0]} ${height} Z`;
 }
 
-export function Sparkline({ values, color, width = 64, height = 16, fluidOnMobile = false, area = false, endDot = false }: SparklineProps) {
+export function Sparkline({ values, color, width = 64, height = 16, fluidOnMobile = false, area = false, endDot = false, hollowEnd = false }: SparklineProps) {
   const segments = buildSparklinePath(values, width, height);
   if (segments.length === 0) return null;
   const end = endPoint(segments.at(-1)!);
@@ -68,8 +71,9 @@ export function Sparkline({ values, color, width = 64, height = 16, fluidOnMobil
         ? [
             { stroke: "var(--tile)", size: END_RING },
             { stroke: "var(--accent)", size: END_DOT },
+            ...(hollowEnd ? [{ stroke: "var(--tile)", size: END_HOLE }] : []),
           ].map(({ stroke, size }) => (
-            <path key={size} d={`M${end.x} ${end.y} L${end.x} ${end.y}`} fill="none" stroke={stroke} strokeWidth={size} strokeLinecap="round" vectorEffect="non-scaling-stroke" />
+            <path key={size} data-testid={size === END_HOLE ? "sparkline-hollow-end" : undefined} d={`M${end.x} ${end.y} L${end.x} ${end.y}`} fill="none" stroke={stroke} strokeWidth={size} strokeLinecap="round" vectorEffect="non-scaling-stroke" />
           ))
         : null}
     </svg>
