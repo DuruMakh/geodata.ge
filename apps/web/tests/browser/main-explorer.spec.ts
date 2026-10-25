@@ -1500,7 +1500,7 @@ test("sidebar is a full-width top bar with a menu below 900px", async ({ page })
   expect(consoleProblems).toEqual([]);
 });
 
-// Budget's eight cards moved from /explorer (now All data) to the Budget group page; a card shows its figure, then its period.
+// Budget's eight cards moved from /explorer (now All data) to the Budget group page; a card shows its figure, then its caption (if any) and period.
 test("the Budget group page lists eight cards, all eight live", async ({ page }) => {
   const consoleProblems = collectConsoleProblems(page);
 
@@ -1552,7 +1552,8 @@ test("the Budget group page lists eight cards, all eight live", async ({ page })
   const deficit = cards.nth(7);
   await expect(deficit).toContainText("დეფიციტი");
   await expect(deficit).toHaveAttribute("href", "/explorer/deficit");
-  await expect(deficit).toContainText(/[+−]?\d+\.\d%\d{4}/);
+  // The share names its base, as the Deficit page's own label does: "of GDP", then the period.
+  await expect(deficit).toContainText(/[+−]?\d+\.\d%მშპ-ის · \d{4}/);
 
   // The card is not just styled as a link — clicking it actually lands on the
   // municipalities index.

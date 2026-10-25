@@ -107,13 +107,17 @@ test("% of GDP names the GDP source in the source line", async ({ page }) => {
 });
 
 test.describe("the return pill on a phone", () => {
-  test.use({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
+  // A small phone (iPhone SE). With no footer under it the page is too short on a 390×844 screen to scroll the
+  // chart out of view (measured 2026-10-25: at the bottom, 151 of its 252px still show), so there the pill is never called for.
+  test.use({ viewport: { width: 375, height: 667 }, isMobile: true, hasTouch: true });
   test("names the chart, not the table, over the Balance stack", async ({ page }) => {
     await page.goto("/en/explorer/external/current-account#tab=in&unit=usd&sel=ca.balance");
     await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
-    // Scrolled past the chart, the view switches to Balance (as Back would); read the pill's label as soon as it appears.
+    // Scrolled past the chart (asserted, so a page too short to leave it fails here, not as a missing pill)...
+    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+    await expect(page.getByTestId("chart-frame")).not.toBeInViewport({ ratio: 0.5 });
+    // ...the view switches to Balance (as Back would); read the pill's label as soon as it appears.
     const label = await page.evaluate(() => new Promise<string | null>(resolve => {
-      window.scrollTo(0, document.body.scrollHeight);
       window.location.hash = "tab=balance&unit=usd";
       const started = performance.now();
       const look = () => {
