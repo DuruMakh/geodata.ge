@@ -28,7 +28,7 @@
 2. **A scale measure missing for the GDP year** (e.g. debt not yet published): the measure is dropped, not shown as 0; covered in Task 2.
 3. **No surplus years / deepest deficit is the first year**: deficit annotations must be `null`, not crash; covered in Task 3.
 4. **A municipality whose shape rasterises to zero cells** (tiny shapes): it must still get at least one cell; covered in Task 4.
-5. **Clipboard blocked** (insecure context, permission denied): the copy button selects the address text instead of throwing; covered in Task 9.
+5. **Clipboard blocked** (insecure context, permission denied): as built, the shared `CopyEndpoint` is reused and does nothing when the clipboard is refused; the address stays selectable text, so nothing is lost (Task 9).
 
 ---
 
@@ -47,7 +47,7 @@
 | `apps/web/components/landing/chapters/chapter.tsx` | Server chapter shell: rule, heading link, lede, anchor (Task 6) |
 | `apps/web/components/landing/chapters/reveal.tsx` | Client: fade-in on first view and lazy chart mount (Task 6) |
 | `apps/web/components/landing/chapters/scale-chart.tsx` etc. | One client file per chart (Tasks 7-8, 10-11) |
-| `apps/web/components/landing/chapters/sources-section.tsx`, `ai-section.tsx`, `copy-endpoint.tsx` | Task 9 |
+| `apps/web/components/landing/chapters/sources-section.tsx`, `ai-section.tsx` (reuses `components/connect/copy-endpoint.tsx`) | Task 9 |
 | `apps/web/components/site/site-footer-view.tsx` | `variant` prop (Task 12) |
 | `apps/web/components/landing/landing-page.tsx`, `apps/web/lib/pages/home.tsx` | Assembly (Task 13) |
 
@@ -215,12 +215,12 @@ export type HomeChapters = { scale: ScaleChapter; spending: SpendingSeries; reve
 
 ### Task 9: Sources and Ask AI sections
 
-**Files:** Create `components/landing/chapters/{sources-section.tsx,ai-section.tsx,copy-endpoint.tsx}`; Test `apps/web/tests/landing/chapters/copyEndpoint.test.ts`, `apps/web/tests/landing/chapters/sourcesSection.test.tsx`.
+**Files:** Create `components/landing/chapters/{sources-section.tsx,ai-section.tsx}`; Test `apps/web/tests/landing/chapters/aiSection.test.tsx`, `apps/web/tests/landing/chapters/sourcesSection.test.tsx`. As built, no `copy-endpoint.tsx`, `copyOrSelect` or `copyEndpoint.test.ts` was made: the AI band reuses the Connect page's `CopyEndpoint` (`components/connect/copy-endpoint.tsx`, with an additive `className` prop whose default is unchanged), and the address stays selectable text, so a refused clipboard costs nothing.
 
-**Interfaces:** Consumes `HomeChapters["sources"]`, `tools`. Produces `<SourcesSection>` (server, `id="sources"`), `<AiSection>` (server, `id="ai"`), `<CopyEndpoint url="https://fiscal.ge/mcp" copyLabel copiedLabel />` (client), and the pure `copyOrSelect(text: string, clipboard: Pick<Clipboard, "writeText"> | undefined, select: () => void): Promise<"copied" | "selected">` in `copy-endpoint.tsx`.
+**Interfaces:** Consumes `HomeChapters["sources"]`, `tools`. Produces `<SourcesSection>` (server, `id="sources"`), `<AiSection>` (server, `id="ai"`), which renders the shared `<CopyEndpoint>` (client) beside the address.
 
-- [ ] **Step 1: Failing tests** (the repo has no DOM test library; components are checked with `renderToStaticMarkup` as in `tests/explorer/chartFrame.test.tsx`): `copyOrSelect resolves "copied" after writeText`; `copyOrSelect calls select and resolves "selected" when writeText rejects or clipboard is undefined`; `SourcesSection renders one row per source with years and file count, the total and the methodology link`.
-- [ ] **Step 2:** Run → FAIL. **Step 3:** Implement `CopyEndpoint`. Sources: four steps as an `<ol>` (copy `landing.sourceStep{1-4}Title/Text` from the board), coverage rows on a 1990-2030 axis with bars `left = (max(1990, first) − 1990)/40`, `width = (last + 1 − max(1990, first))/40`, "from 1960"-style tag when first < 1990, file count right, total row. AI band: full-bleed `#1e1b16` with the board's grain and colours (`.fx-ai*` CSS), facts, tool chips from `tools`, CTA to `/connect`, the five-node "how it works" card. **Step 4:** Run → PASS.
+- [ ] **Step 1: Failing tests** (the repo has no DOM test library; components are checked with `renderToStaticMarkup` as in `tests/explorer/chartFrame.test.tsx`): `AiSection shows the address as text with the shared copy button`; `SourcesSection renders one row per source with years and file count, the total and the methodology link`.
+- [ ] **Step 2:** Run → FAIL. **Step 3:** Wire the shared `CopyEndpoint`. Sources: four steps as an `<ol>` (copy `landing.sourceStep{1-4}Title/Text` from the board), coverage rows on a 1990-2030 axis with bars `left = (max(1990, first) − 1990)/40`, `width = (last + 1 − max(1990, first))/40`, "from 1960"-style tag when first < 1990, file count right, total row. AI band: full-bleed `#1e1b16` with the board's grain and colours (`.fx-ai*` CSS), facts, tool chips from `tools`, CTA to `/connect`, the five-node "how it works" card. **Step 4:** Run → PASS.
 - [ ] **Step 5: Commit** `feat(home): sources and Ask AI sections`.
 
 ### Task 10: Chapters 03 and 05 charts

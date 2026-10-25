@@ -123,10 +123,20 @@ function setup({ webgl, reduced }: { webgl: boolean; reduced: boolean }) {
   };
   const stage = { clientWidth: 900, clientHeight: 500 };
   const onLost = vi.fn();
+  // Counts how often the engine reads the label's size.
+  const label = {
+    reads: 0,
+    style: {},
+    get offsetWidth() {
+      this.reads += 1;
+      return 120;
+    },
+    offsetHeight: 20,
+  };
   const engine = createRelief({
     stage: stage as unknown as HTMLElement,
     canvas: canvas as unknown as HTMLCanvasElement,
-    labelEls: [{ offsetWidth: 120, style: {} } as unknown as HTMLElement],
+    labelEls: [label as unknown as HTMLElement],
     data,
     webgl: true,
     onHover: () => {},
@@ -141,7 +151,7 @@ function setup({ webgl, reduced }: { webgl: boolean; reduced: boolean }) {
     return due.length;
   };
   const view = (isIntersecting: boolean) => observers.intersection[0].cb([{ isIntersecting }]);
-  return { engine, frames, tick, view, doc, win, observers, gl, draws, canvasEvents, onLost };
+  return { engine, frames, tick, view, doc, win, observers, gl, draws, canvasEvents, onLost, label };
 }
 
 afterEach(() => {
@@ -167,6 +177,14 @@ describe("createRelief", () => {
     s.doc.hidden = false;
     s.doc.fire("visibilitychange");
     expect(s.frames.size).toBe(1);
+    s.engine.destroy();
+  });
+
+  it("reads the labels' size once per layout, not on every frame", () => {
+    const s = setup({ webgl: true, reduced: false });
+    s.view(true);
+    for (let t = 0; t < 2400; t += 16) s.tick(t);
+    expect(s.label.reads).toBe(1);
     s.engine.destroy();
   });
 

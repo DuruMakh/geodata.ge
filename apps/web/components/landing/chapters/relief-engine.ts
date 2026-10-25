@@ -303,13 +303,18 @@ export function createRelief(o: EngineOptions): Engine | null {
     changed = true;
   };
 
+  // Label sizes, read in layout (once, and on resize) rather than every frame: reading them after the
+  // previous label's transform write would force a layout per label per frame.
+  let labelSizes: { w: number; h: number }[] = [];
+  const measureLabels = () => {
+    labelSizes = labelEls.map((el) => ({ w: el?.offsetWidth || 120, h: el?.offsetHeight || 20 }));
+  };
   const placeLabels = (alpha: number) => {
     const placed: { x: number; y: number; w: number; h: number }[] = [];
     labelEls.forEach((el, i) => {
       if (!el || !centers[i]) return;
       const [sx, sy] = toScreen(camProject(cam, [worldX(centers[i].c, C), heights[i] + 2, worldZ(centers[i].r, R)], pj), W, H);
-      const w = el.offsetWidth || 120;
-      const h = el.offsetHeight || 20;
+      const { w, h } = labelSizes[i] ?? { w: 120, h: 20 };
       const { x, flipped } = labelX(sx, w, W);
       const y = labelY({ x, y: sy - 26, w, h }, placed);
       placed.push({ x, y, w, h });
@@ -370,6 +375,7 @@ export function createRelief(o: EngineOptions): Engine | null {
     const left = camProject(cam, [worldX(0, C), 0, 0], [0, 0])[0];
     const right = camProject(cam, [worldX(C - 1, C), 0, 0], [0, 0])[0];
     dotSize = clamp((Math.abs(right - left) / 2) * (W / C) * 0.42, 1.8, 5.4) * pr;
+    measureLabels();
     dirty = true;
     request();
   };
@@ -439,6 +445,12 @@ export function createRelief(o: EngineOptions): Engine | null {
     intro = 1;
   }
   layout();
+  // A web font that arrives after the first layout changes the labels' widths.
+  document.fonts?.ready.then(() => {
+    if (!alive) return;
+    measureLabels();
+    request();
+  });
 
   return {
     destroy() {

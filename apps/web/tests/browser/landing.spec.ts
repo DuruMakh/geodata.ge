@@ -383,6 +383,46 @@ test("under reduced motion the spending chart does not play on its own", async (
   await expect(chapter.locator("button:has(svg.lucide-pause)")).toHaveCount(0);
 });
 
+test("Enter and Space on a spending side-list row toggle its block's highlight, as a tap does", async ({ page }) => {
+  // Reduced motion draws every change at once, so the canvas can be compared straight away.
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto(`${baseUrl}/`);
+  const chapter = page.locator("#ch-02");
+  const canvas = chapter.locator("canvas");
+  await canvas.scrollIntoViewIfNeeded();
+  await expect.poll(() => canvas.evaluate((element) => (element as HTMLCanvasElement).style.width !== ""), { message: "treemap drawn" }).toBe(true);
+  const picture = () => canvas.evaluate((element) => (element as HTMLCanvasElement).toDataURL());
+  const plain = await picture();
+  const row = chapter.locator("button[data-field]").first();
+  // Focus highlights the row's block; Enter turns it off and Space turns it on again.
+  await row.focus();
+  await expect.poll(picture, { message: "highlighted on focus" }).not.toBe(plain);
+  const lit = await picture();
+  await row.press("Enter");
+  await expect.poll(picture, { message: "Enter toggles it off" }).toBe(plain);
+  await row.press("Space");
+  await expect.poll(picture, { message: "Space toggles it on" }).toBe(lit);
+});
+
+test("under reduced motion the squares show their final fill before the chart is in view", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto(`${baseUrl}/`);
+  const canvas = page.locator("#ch-01 canvas");
+  // Only a sliver of the chart on screen: below the 25% that starts the intro animation.
+  await canvas.evaluate((element) => window.scrollTo(0, element.getBoundingClientRect().top + window.scrollY - window.innerHeight + 40));
+  await expect.poll(() => canvas.evaluate((element) => (element as HTMLCanvasElement).style.width !== ""), { message: "squares drawn" }).toBe(true);
+  const inkPixels = () =>
+    canvas.evaluate((element) => {
+      const c = element as HTMLCanvasElement;
+      const { data } = c.getContext("2d")!.getImageData(0, 0, c.width, c.height);
+      let dark = 0;
+      for (let i = 0; i < data.length; i += 4) if (data[i + 3]! > 200 && data[i]! < 90 && data[i + 1]! < 90 && data[i + 2]! < 90) dark += 1;
+      return dark;
+    });
+  await expect.poll(inkPixels, { message: "filled squares are drawn" }).toBeGreaterThan(1000);
+});
+
 test("reduced motion shows final states", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto(`${baseUrl}/`);
@@ -438,6 +478,33 @@ test.describe("chart tooltips on a touch screen", () => {
     await expect(revenue.locator("[data-chart-tip]"), "tooltip after a scroll").toHaveCSS("opacity", "0");
   });
 });
+
+// With neither WebGL nor a 2D context (null, or a 2D context that throws), the relief shows its note
+// and keeps its accessible summary instead of a blank stage or a crashed page.
+for (const mode of ["null", "throw"] as const) {
+  test(`the municipal relief shows its note when no canvas can draw (getContext ${mode})`, async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.addInitScript((failure) => {
+      const original = HTMLCanvasElement.prototype.getContext;
+      HTMLCanvasElement.prototype.getContext = function (this: HTMLCanvasElement, ...args: unknown[]) {
+        if (!this.closest(".home-muni-stage")) return (original as (...rest: unknown[]) => unknown).apply(this, args);
+        if (failure === "throw" && args[0] === "2d") throw new Error("2D context refused");
+        return null;
+      } as typeof original;
+    }, mode);
+    const errors: string[] = [];
+    page.on("pageerror", (error) => errors.push(error.message));
+    await page.goto(`${baseUrl}/`);
+    const stage = page.locator("#ch-04 .home-muni-stage");
+    await stage.scrollIntoViewIfNeeded();
+    await expect(stage.getByText(LANDING_COPY.ka.messages["landing.heroUnavailable"])).toBeVisible();
+    await expect(stage.locator("canvas")).toHaveCount(0);
+    await expect(stage.locator(".sr-only")).toContainText(LANDING_COPY.ka.messages["landing.municipal.chartSummary"]);
+    // The rest of the page is still there.
+    await expect(page.locator("#ch-05 canvas")).toHaveCount(1);
+    expect(errors).toEqual([]);
+  });
+}
 
 test.describe("tap targets on a phone", () => {
   test.use({ isMobile: true, hasTouch: true, viewport: { width: 375, height: 812 } });

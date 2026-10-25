@@ -1,7 +1,7 @@
 # Homepage redesign, step 1 (budget chapters)
 
 Date: 2026-10-24
-Status: Draft for Duru's review. Content of step 1 agreed in the thread "Redesign the homepage" on 2026-10-24 ("ok", 18:36 Tbilisi).
+Status: Approved (Duru, 2026-10-24). Content of step 1 agreed in the thread "Redesign the homepage" on 2026-10-24 ("ok", 18:36 Tbilisi).
 Design source: Duru's redesign canvas https://claude.ai/artifact/NTvuHd3oasbXxkNcZto2Wz, board `project/Main.dc.html` ("მთავარი · დესკტოპი").
 
 ## 1. Intended result
@@ -96,7 +96,7 @@ All years below are "latest" at the time of writing (2025); the build always use
 
 - Heading: `რამდენია საქართველოს ბიუჯეტის დეფიციტი` → `/explorer/deficit`.
 - Sentence: `ზოგადი მთავრობის დეფიციტი {year} წელს მშპ-ის {pct}% იყო; ყველაზე ღრმა — {deepestPct}% — {deepestYear} წელს.` The board's "during the pandemic" is kept only as a fixed fact for 2020 if 2020 is the deepest year.
-- Chart: one bar per year from 1995 to the last IMF projection year, as % of GDP. Deficits ink, surpluses green, projection years faded on a light band labelled `IMF-ის პროგნოზი`. A dashed accent line at −3% (Georgia's fiscal-rule ceiling) with its label. Value labels sit on the deepest actual deficit and on the deepest actual deficit at least five years before it (today 2020 and 2009); a bracket marks the longest run of actual surplus years (today 2004–2007).
+- Chart: one bar per year from 1995 to the last IMF projection year, as % of GDP. Deficits ink, surpluses green, projection years faded on a light band labelled `IMF-ის პროგნოზი`. A dashed accent line at −3% (Georgia's fiscal-rule ceiling) with its label. Value labels sit on the deepest actual deficit and on the deepest actual deficit at least five years before it (with the IMF's April 2026 data the rule gives 2020 and 1997); a bracket marks the longest run of actual surplus years (today 2004–2007).
 - Tooltip: % of GDP, GEL amount, and whether it is a deficit, surplus or projection.
 - Data: `general-government-balance-annual-1995-2031.csv` via the served balance facts; the shaded band starts at the first non-actual year.
 
@@ -110,7 +110,7 @@ All years below are "latest" at the time of writing (2025); the build always use
 ### 5.7 Ask AI
 
 - Dark full-width band from the board: heading `ჰკითხე AI-ს — პასუხი წყაროსთან ერთად`, sentence, the line `MCP · Streamable HTTP · ავტორიზაციის გარეშე`.
-- The endpoint `https://fiscal.ge/mcp` with a copy button (`კოპირება` → `დაკოპირდა` for about two seconds; falls back to selecting the text if the clipboard is blocked).
+- The endpoint `https://fiscal.ge/mcp` with the Connect page's shared `CopyEndpoint` button (`კოპირება` → `დაკოპირდა` for about two seconds). The address is always selectable text, so a blocked clipboard costs nothing; the button then simply does not change.
 - Three facts: read-only, no token, no session. A list of the server's tools taken from the MCP tool registry (all of them, not the board's four). Link `AI-კავშირის ინსტრუქცია →` to `/connect`.
 - A card "how it works" with the board's five steps from question to answer.
 
@@ -143,7 +143,7 @@ The explorer keeps today's footer: `SiteFooterView` gains a `variant` prop whose
 
 ### Genuinely new
 
-- `components/landing/chapters/`: one client component per chart (squares, spending blocks with year control, revenue areas, municipal relief, deficit bars) plus the sources and AI sections. The explorer's charts were considered and are not reused: they are line and bar charts with series lists and tables, a different visual language from the board's editorial charts.
+- `components/landing/chapters/`: one client component per chart (squares, spending blocks with year control, revenue areas, municipal relief, deficit bars) plus the sources and AI sections. The explorer's chart components were considered and are not reused: they are DOM and SVG charts with series lists and tables (the Analysis page's structure treemap among them), a different visual language from the board's canvas charts. What they share is reused: the squarified layout of the Analysis treemap (`lib/explorer/treemapLayout.ts`, used by both) and the explorer's amount formatting (`formatAmountParts`, with an optional three-significant-digit billions flag for the chart labels).
 - A small shared canvas helper for these charts (pixel-ratio sizing, text, tooltip placement, scroll-triggered start, reduced motion), ported from the board's script.
 - A build-time helper that turns the municipality geometry into the relief's dot grid.
 

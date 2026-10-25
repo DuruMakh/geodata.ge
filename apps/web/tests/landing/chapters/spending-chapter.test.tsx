@@ -80,6 +80,19 @@ describe("SpendingChapter (server render = latest year)", () => {
     expect(canvas).toContain("ყველაზე დიდი: სოციალური დაცვა");
   });
 
+  it("keeps a field with nothing that year as a row showing a dash, after the others", () => {
+    const withZero: SpendingSeries = {
+      ...data([false, false, false]),
+      fields: [...fields.slice(0, 4), field("spending.other_unclassified", "სხვა", [50_000_000, 60_000_000, 0])],
+      totals: years.map((_, i) => fields.slice(0, 4).reduce((sum, f) => sum + f.values[i], 0) + [50_000_000, 60_000_000, 0][i]!),
+    };
+    const rows = [...renderToStaticMarkup(<SpendingChapter data={withZero} labels={labels} />).matchAll(/<button[^>]*data-field="([^"]+)"[^>]*>(.*?)<\/button>/g)];
+    expect(rows).toHaveLength(5);
+    expect(rows[4][1]).toBe("spending.other_unclassified");
+    expect(rows[4][2]).toContain(">—</span>");
+    expect(rows[4][2]).toContain("width:0%");
+  });
+
   it("marks a planned year in the side-list heading", () => {
     expect(html).toContain("სფეროები · 2025 (გეგმა)");
     expect(unplanned).toContain("სფეროები · 2025</div>");

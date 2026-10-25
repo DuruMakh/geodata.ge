@@ -46,6 +46,8 @@ export function MunicipalRelief({ data, labels }: { data: MunicipalChapter; labe
   // Off once WebGL fails to start or loses its context: the canvas is remounted (its key changes),
   // because a canvas that has handed out a WebGL context cannot give a 2D one.
   const [webgl, setWebgl] = useState(true);
+  // On when neither WebGL nor a 2D canvas can draw: the note and the accessible summary stand in.
+  const [unavailable, setUnavailable] = useState(false);
 
   useEffect(() => {
     const stage = stageRef.current;
@@ -54,6 +56,10 @@ export function MunicipalRelief({ data, labels }: { data: MunicipalChapter; labe
     if (!lib || !stage || !canvas || !tip) return;
     let engine: Engine | null = null;
     let retry = 0;
+    const giveUp = (error?: unknown) => {
+      console.warn("[fiscal] municipal relief: no canvas to draw on", error ?? "");
+      retry = window.setTimeout(() => setUnavailable(true), 0);
+    };
     try {
       engine = lib.createRelief({
         stage,
@@ -71,11 +77,15 @@ export function MunicipalRelief({ data, labels }: { data: MunicipalChapter; labe
           setWebgl(false);
         },
       });
+      if (!engine) giveUp();
     } catch (error) {
-      if (!webgl) throw error;
-      console.warn("[fiscal] municipal relief: WebGL unavailable, drawing in 2D", error);
-      // WebGL started but its shaders would not build: retry in 2D on a fresh canvas.
-      retry = window.setTimeout(() => setWebgl(false), 0);
+      if (!webgl) {
+        giveUp(error);
+      } else {
+        console.warn("[fiscal] municipal relief: WebGL unavailable, drawing in 2D", error);
+        // WebGL started but its shaders would not build: retry in 2D on a fresh canvas.
+        retry = window.setTimeout(() => setWebgl(false), 0);
+      }
     }
     return () => {
       window.clearTimeout(retry);
@@ -93,7 +103,7 @@ export function MunicipalRelief({ data, labels }: { data: MunicipalChapter; labe
     <Reveal className="home-muni">
       <figure>
         <div ref={stageRef} className="home-muni-stage">
-          {failed ? (
+          {failed || unavailable ? (
             <ChartUnavailable text={labels.unavailable} summary={ariaLabel} />
           ) : (
             <canvas key={webgl ? "webgl" : "2d"} ref={canvasRef} role="img" aria-label={ariaLabel} className="absolute left-0 top-0" />

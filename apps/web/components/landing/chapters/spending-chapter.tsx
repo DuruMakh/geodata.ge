@@ -2,7 +2,7 @@
 
 import { Pause, Play } from "lucide-react";
 import { useEffect, useId, useRef, useState } from "react";
-import { formatInUnit, formatShare, UNIT_BN } from "../../../lib/explorer/format";
+import { formatInUnit, formatShare, MISSING, UNIT_BN } from "../../../lib/explorer/format";
 import type { Locale } from "../../../lib/i18n/types";
 import type { SpendingSeries } from "../../../lib/landing/chapters/types";
 import { blockTone, prefersReducedMotion, sparkPoints } from "./canvas";
@@ -150,6 +150,10 @@ export function SpendingChapter({ data, labels }: { data: SpendingSeries; labels
     setPlaying(true);
     timerRef.current = window.setInterval(() => {
       const next = cursorRef.current + 1;
+      if (next > last) {
+        stop();
+        return;
+      }
       select(next);
       if (next >= last) stop();
     }, STEP_MS);
@@ -178,8 +182,10 @@ export function SpendingChapter({ data, labels }: { data: SpendingSeries; labels
     return () => observer.disconnect();
   }, []);
 
-  const rows = data.fields.filter((f) => f.values[index] > 0).sort((a, b) => b.values[index] - a.values[index]);
-  const top = rows[0];
+  // Every field keeps its row, so the list never changes height under the reader; a field with
+  // nothing that year shows "—" (and has no block in the treemap).
+  const rows = [...data.fields].sort((a, b) => b.values[index] - a.values[index]);
+  const top = rows[0]?.values[index] > 0 ? rows[0] : undefined;
   const yearText = planned ? `${year} (${labels.planned})` : String(year);
   const ariaLabel =
     `${labels.chartSummary}; ${yearText}: ${formatInUnit(total, UNIT_BN)} ${labels.bnGel}` +
@@ -281,10 +287,11 @@ export function SpendingChapter({ data, labels }: { data: SpendingSeries; labels
                 onPointerDown={(event) => {
                   pressRef.current = { type: event.pointerType, lit: litRef.current };
                 }}
-                // A tap (no hover on a phone) toggles the row's block.
+                // A tap (no hover on a phone) toggles the row's block, and so do Enter and Space (a click with no pointer).
                 onClick={() => {
                   const { type, lit } = pressRef.current;
                   if (type === "touch") highlight(lit === f.id ? null : f.id);
+                  else if (type === "") highlight(litRef.current === f.id ? null : f.id);
                   pressRef.current = { type: "", lit: null };
                 }}
                 onFocus={() => highlight(f.id)}
@@ -293,12 +300,18 @@ export function SpendingChapter({ data, labels }: { data: SpendingSeries; labels
               >
                 <span className="text-[13px] font-medium leading-[1.3]">{f.label}</span>
                 <span className="whitespace-nowrap font-[family-name:var(--font-numeric)] text-xs">
-                  {money(f.values[index], labels)}
-                  <em className="ml-1.5 not-italic text-[var(--muted)]">{formatShare(f.values[index] / total)}</em>
+                  {f.values[index] > 0 ? (
+                    <>
+                      {money(f.values[index], labels)}
+                      <em className="ml-1.5 not-italic text-[var(--muted)]">{formatShare(f.values[index] / total)}</em>
+                    </>
+                  ) : (
+                    MISSING
+                  )}
                 </span>
                 <span aria-hidden="true" className="relative col-span-full h-[3px] overflow-hidden rounded-sm bg-[var(--hairline-soft)]">
                   <i
-                    style={{ width: `${((f.values[index] / top.values[index]) * 100).toFixed(1)}%` }}
+                    style={{ width: top && f.values[index] > 0 ? `${((f.values[index] / top.values[index]) * 100).toFixed(1)}%` : "0%" }}
                     className="absolute inset-y-0 left-0 rounded-sm bg-[var(--ink)] transition-[width] duration-500 ease-[cubic-bezier(.22,.7,.18,1)] group-hover:bg-[var(--accent)] group-focus-visible:bg-[var(--accent)] motion-reduce:transition-none"
                   />
                 </span>

@@ -29,14 +29,15 @@ export function createSquares({ wrap, canvas, marker, markerLabel, total, initia
   let rows = 1;
   let cols = 1;
   let gap = 1;
-  let cur = 0; // squares currently filled (fractional while tweening)
+  // Under reduced motion the final fill shows at once: no empty grid waiting for the chart to scroll into view.
+  let cur = reduced ? initial : 0; // squares currently filled (fractional while tweening)
   let from = 0;
   let to = initial;
   let t0 = 0;
   let dur = 1;
   let raf = 0;
   let alive = true;
-  let seen = false;
+  let seen = reduced;
   let intro = reduced ? 1 : 0;
   let introT0 = 0;
   let hover = -1;
