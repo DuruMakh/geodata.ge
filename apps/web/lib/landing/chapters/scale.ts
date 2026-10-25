@@ -37,9 +37,10 @@ function seriesPlanned(series: SpendingSeries | RevenueSeries, year: number): bo
   return series.planned[series.years.indexOf(year)] ?? false;
 }
 
-function usdToGel(valueUsd: string | null | undefined, gelPerUsd: number | null): number | null {
-  if (valueUsd == null || gelPerUsd === null) return null;
-  const value = Number(valueUsd);
+// A partial-year or blank value is not a full-year amount to set beside GDP: it counts as missing.
+function usdToGel(fact: ForeignInvestmentFact | MoneyTransferFact | undefined, gelPerUsd: number | null): number | null {
+  if (!fact || fact.valueStatus !== "numeric" || fact.valueUsd === null || gelPerUsd === null) return null;
+  const value = Number(fact.valueUsd);
   return Number.isFinite(value) ? value * gelPerUsd : null;
 }
 
@@ -72,12 +73,13 @@ export function buildScaleChapter(input: ScaleInput, messages: Messages): ScaleC
     { id: "debt", label: message(messages, "landing.scale.debt"), valueGel: debt?.value ?? null },
     {
       id: "balance",
-      label: message(messages, balance && balance.generalGovernmentBalanceGel > 0 ? "landing.scale.surplus" : "landing.scale.deficit"),
+      // Zero or more is a surplus, as in chapter 05.
+      label: message(messages, balance && balance.generalGovernmentBalanceGel >= 0 ? "landing.scale.surplus" : "landing.scale.deficit"),
       valueGel: balance ? Math.abs(balance.generalGovernmentBalanceGel) : null,
     },
     { id: "municipal", label: message(messages, "landing.scale.municipal"), valueGel: input.municipalTotals.get(year) ?? null },
-    { id: "fdi", label: message(messages, "landing.scale.fdi"), valueGel: usdToGel(fdi?.valueUsd, gelPerUsd) },
-    { id: "remittances", label: message(messages, "landing.scale.remittances"), valueGel: usdToGel(transfer?.valueUsd, gelPerUsd) },
+    { id: "fdi", label: message(messages, "landing.scale.fdi"), valueGel: usdToGel(fdi, gelPerUsd) },
+    { id: "remittances", label: message(messages, "landing.scale.remittances"), valueGel: usdToGel(transfer, gelPerUsd) },
   ];
 
   const measures: ScaleChapter["measures"] = [];

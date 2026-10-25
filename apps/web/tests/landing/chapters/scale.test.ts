@@ -11,8 +11,8 @@ const messages: Messages = {
   "landing.scale.revenue": "ნაერთი ბიუჯეტის შემოსულობები",
   "landing.scale.spending": "სახელმწიფო ბიუჯეტის ხარჯები",
   "landing.scale.debt": "მთავრობის ვალი",
-  "landing.scale.deficit": "ბიუჯეტის დეფიციტი",
-  "landing.scale.surplus": "ბიუჯეტის პროფიციტი",
+  "landing.scale.deficit": "ზოგადი მთავრობის დეფიციტი",
+  "landing.scale.surplus": "ზოგადი მთავრობის პროფიციტი",
   "landing.scale.municipal": "მუნიციპალიტეტების ბიუჯეტები",
   "landing.scale.fdi": "უცხოური ინვესტიციები",
   "landing.scale.remittances": "ფულადი გზავნილები",
@@ -151,13 +151,33 @@ describe("buildScaleChapter", () => {
   it("balance uses the absolute GEL value and its label says deficit or surplus by sign", () => {
     const deficit = buildScaleChapter(input(), messages).measures.find((measure) => measure.id === "balance")!;
     expect(deficit.valueGel).toBe(2_000_000_000);
-    expect(deficit.label).toBe("ბიუჯეტის დეფიციტი");
+    expect(deficit.label).toBe("ზოგადი მთავრობის დეფიციტი");
 
     const surplus = buildScaleChapter(input({ balanceFacts: [balance(2025, 1_500_000_000)] }), messages).measures.find(
       (measure) => measure.id === "balance",
     )!;
     expect(surplus.valueGel).toBe(1_500_000_000);
-    expect(surplus.label).toBe("ბიუჯეტის პროფიციტი");
+    expect(surplus.label).toBe("ზოგადი მთავრობის პროფიციტი");
+  });
+
+  it("a zero balance is a surplus, as in chapter 05", () => {
+    const zero = buildScaleChapter(input({ balanceFacts: [balance(2025, 0)] }), messages).measures.find((measure) => measure.id === "balance")!;
+    expect(zero.valueGel).toBe(0);
+    expect(zero.label).toBe("ზოგადი მთავრობის პროფიციტი");
+  });
+
+  it("drops FDI and money transfers whose value is not a full numeric year", () => {
+    const chapter = buildScaleChapter(
+      input({
+        fdiFacts: [{ ...fdi(2025, "1900386201"), valueStatus: "not_applicable" }],
+        transferFacts: [{ ...transfer(2025, "2000000000"), valueStatus: "partial_months", monthsReported: 6 }],
+      }),
+      messages,
+    );
+    expect(chapter.measures.map((measure) => measure.id)).not.toContain("fdi");
+    expect(chapter.measures.map((measure) => measure.id)).not.toContain("remittances");
+    const blank = buildScaleChapter(input({ transferFacts: [{ ...transfer(2025, "2000000000"), valueStatus: "blank" }] }), messages);
+    expect(blank.measures.map((measure) => measure.id)).not.toContain("remittances");
   });
 
   it("a measure with no value for the year is omitted", () => {

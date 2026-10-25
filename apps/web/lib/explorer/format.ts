@@ -105,6 +105,24 @@ export function roundForDisplay(value: number, decimals: number): number {
   return Number(decimalFixed(value, decimals).replaceAll(",", "")) + 0;
 }
 
+/**
+ * Whole percentages of `values` (each at least 0) that add up to exactly 100, by largest remainder: every share
+ * is rounded down, then the shares with the largest remainders get one more point each (an equal remainder goes to
+ * the earlier value). All zeros stay zeros.
+ */
+export function wholePercents(values: readonly number[]): number[] {
+  const total = values.reduce((sum, value) => sum + value, 0);
+  if (total <= 0) return values.map(() => 0);
+  const exact = values.map((value) => (value / total) * 100);
+  const whole = exact.map((share) => Math.floor(share));
+  const byRemainder = exact.map((_, index) => index).sort((a, b) => exact[b]! - whole[b]! - (exact[a]! - whole[a]!) || a - b);
+  let missing = 100 - whole.reduce((sum, share) => sum + share, 0);
+  for (let cursor = 0; missing > 0 && byRemainder.length > 0; cursor += 1, missing -= 1) {
+    whole[byRemainder[cursor % byRemainder.length]!]! += 1;
+  }
+  return whole;
+}
+
 /** A calculated value for a workbook cell, rounded as the page shows it (`roundForDisplay`); a gap stays null. */
 export function roundShown(value: number | null, decimals: number): number | null {
   return value === null ? null : roundForDisplay(value, decimals);

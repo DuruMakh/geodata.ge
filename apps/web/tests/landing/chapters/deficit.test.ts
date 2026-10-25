@@ -48,7 +48,19 @@ describe("buildDeficitChapter", () => {
     expect(chapter.earlier).toBeNull();
   });
 
-  it("surplusRun is the longest run of consecutive actual years with pct > 0 (ties: earliest); null when none", () => {
+  it("latestActual is the last actual year and its pct, also when the first year is already a projection", () => {
+    expect(buildDeficitChapter([fact(2024, -2.1), fact(2025, -1.5), fact(2026, -2.4, "projection")]).latestActual).toEqual({ year: 2025, pct: -1.5 });
+    expect(buildDeficitChapter([fact(2024, -2.1), fact(2025, 0.4)]).latestActual).toEqual({ year: 2025, pct: 0.4 });
+    const projectedFirst = buildDeficitChapter([fact(2023, -3, "projection"), fact(2024, -2.1), fact(2025, -1.5)]);
+    expect(projectedFirst.projectionFrom).toBe(2023);
+    expect(projectedFirst.latestActual).toEqual({ year: 2025, pct: -1.5 });
+  });
+
+  it("a zero balance counts as a surplus year", () => {
+    expect(buildDeficitChapter([fact(2004, 0), fact(2005, 0.5), fact(2006, -1)]).surplusRun).toEqual({ first: 2004, last: 2005 });
+  });
+
+  it("surplusRun is the longest run of consecutive actual years with pct >= 0 (ties: earliest); null when none", () => {
     const chapter = buildDeficitChapter([
       fact(2003, -0.5),
       fact(2004, 3.6),

@@ -16,6 +16,7 @@ import type { DeficitChapter, HomeChapters, MunicipalChapter, RevenueSeries, Spe
 // the served inputs; the one-line ledes are sentences over those same models.
 
 const PANDEMIC_YEAR = 2020;
+const TBILISI_CODE = "04";
 
 export type HomeChaptersInput = Omit<ScaleInput, "spending" | "revenue"> & {
   budgetFacts: ServedBudgetFact[];
@@ -52,11 +53,17 @@ export function buildChapterSentences({ spending, revenue, municipal, deficit }:
   const revenueIndex = revenue.years.length - 1;
   const liabilities = revenue.bands.find((band) => band.id === "liabilities")?.values[revenueIndex] ?? 0;
 
-  const largestPlace = municipal.places[0]!;
+  // The sentence names Tbilisi in its fixed text, so its amount is Tbilisi's, looked up by code.
+  const tbilisi = municipal.places.find((place) => place.code === TBILISI_CODE);
+  if (!tbilisi) throw new Error(`Municipal chapter has no Tbilisi (code ${TBILISI_CODE})`);
 
-  // The latest actual year: the one before the projections start, else the last.
-  const deficitIndex = deficit.projectionFrom === null ? deficit.years.length - 1 : deficit.years.indexOf(deficit.projectionFrom) - 1;
-  const deficitKey = deficit.deepest.year === PANDEMIC_YEAR ? "landing.sentence.deficitPandemic" : "landing.sentence.deficit";
+  // A latest actual balance of zero or more is a surplus, as in the chart and its tooltip.
+  const { latestActual } = deficit;
+  const surplus = latestActual.pct >= 0;
+  const deficitKey =
+    deficit.deepest.year === PANDEMIC_YEAR
+      ? surplus ? "landing.sentence.surplusPandemic" : "landing.sentence.deficitPandemic"
+      : surplus ? "landing.sentence.surplus" : "landing.sentence.deficit";
 
   // A latest year whose active facts are planned is told as the budget's plan, not as money already spent or received.
   return {
@@ -75,12 +82,12 @@ export function buildChapterSentences({ spending, revenue, municipal, deficit }:
       count: municipal.places.length,
       year: municipal.year,
       total: billions(municipal.totalGel),
-      share: message(messages, `landing.sentence.share.${tbilisiSharePhrase(largestPlace.totalGel / municipal.totalGel)}`),
-      top: billions(largestPlace.totalGel),
+      share: message(messages, `landing.sentence.share.${tbilisiSharePhrase(tbilisi.totalGel / municipal.totalGel)}`),
+      top: billions(tbilisi.totalGel),
     }),
     deficit: message(messages, deficitKey, {
-      year: deficit.years[deficitIndex]!,
-      pct: formatShare(Math.abs(deficit.pctGdp[deficitIndex]!) / 100),
+      year: latestActual.year,
+      pct: formatShare(Math.abs(latestActual.pct) / 100),
       deepest: formatShare(Math.abs(deficit.deepest.pct) / 100),
       deepestYear: deficit.deepest.year,
     }),

@@ -40,6 +40,7 @@ export type DeficitChapter = {
   pctGdp: number[];
   gel: number[];
   projectionFrom: number | null;
+  latestActual: { year: number; pct: number }; // the last year with status actual, whatever comes before it
   deepest: { year: number; pct: number };
   earlier: { year: number; pct: number } | null;
   surplusRun: { first: number; last: number } | null;

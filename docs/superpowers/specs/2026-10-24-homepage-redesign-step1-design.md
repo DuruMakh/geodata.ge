@@ -79,7 +79,7 @@ All years below are "latest" at the time of writing (2025); the build always use
 
 - Heading: `როგორ ფინანსდება საქართველოს ბიუჯეტი` → `/explorer/revenue`.
 - Sentence: `{year} წელს ნაერთი ბიუჯეტის შემოსულობებმა {total} მილიარდი ლარი შეადგინა: {taxShare}% გადასახადებიდან შემოვიდა, {borrowShare}% — ვალდებულებების ზრდიდან.`
-- Chart: stacked areas from the first to the latest year in billion GEL, seven layers: VAT; income tax; profit tax; excise; other taxes (import, property and other taxes); other income (grants, other revenue, asset decrease); increase in liabilities. On wide screens the latest year's layers are labelled on the right with amount and share; on phones with share only. One callout marks the year with the highest borrowing share.
+- Chart: stacked areas from the first to the latest year in billion GEL, seven layers: VAT; income tax; profit tax; excise; other taxes (import, property and other taxes); other receipts (grants, other revenue, asset decrease); increase in liabilities. On wide screens the latest year's layers are labelled on the right with amount and share; on phones with share only. One callout marks the year with the highest borrowing share.
 - Tooltip: every layer's amount for the hovered year, total and tax share. A missing value shows "—".
 - Data: active public revenue facts, item IDs grouped as above.
 

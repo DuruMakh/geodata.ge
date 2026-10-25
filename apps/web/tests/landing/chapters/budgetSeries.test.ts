@@ -23,7 +23,7 @@ const presentation: Presentation = {
     "landing.revBand.profit": "მოგების",
     "landing.revBand.excise": "აქციზი",
     "landing.revBand.otherTaxes": "სხვა გადასახადები",
-    "landing.revBand.otherIncome": "სხვა შემოსავლები",
+    "landing.revBand.otherIncome": "სხვა შემოსულობები",
     "landing.revBand.liabilities": "ვალდებულებების ზრდა",
   },
 };

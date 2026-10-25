@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { formatAmount, formatAmountParts, formatBn, formatInUnit, formatPerResidentGel, formatPoints, formatShare, formatSignedAmount, roundForDisplay, roundShown, UNIT_BN, UNIT_MLN } from "../../lib/explorer/format";
+import { formatAmount, formatAmountParts, formatBn, formatInUnit, formatPerResidentGel, formatPoints, formatShare, formatSignedAmount, roundForDisplay, roundShown, UNIT_BN, UNIT_MLN, wholePercents } from "../../lib/explorer/format";
 
 describe("editorial formatters", () => {
   it("reuses number-format rules across subsequent chart and map values", () => {
@@ -176,5 +176,23 @@ describe("formatInUnit", () => {
   it("labels the units in Georgian", () => {
     expect(UNIT_BN.label).toBe("მლრდ");
     expect(UNIT_MLN.label).toBe("მლნ");
+  });
+});
+
+describe("wholePercents", () => {
+  it("rounds shares to whole percentages that add up to 100 by largest remainder", () => {
+    // The 2025 receipts bands: rounded one by one they read 31 + 26 + 9 + 8 + 5 + 12 + 10 = 101.
+    const bands = [10_158_086_603, 8_261_217_582, 2_881_352_179, 2_728_646_345, 1_507_047_362, 3_730_637_205, 3_101_893_132];
+    const total = bands.reduce((sum, value) => sum + value, 0);
+    expect(bands.map((value) => Math.round((value / total) * 100)).reduce((sum, share) => sum + share, 0)).toBe(101);
+    const whole = wholePercents(bands);
+    expect(whole.reduce((sum, share) => sum + share, 0)).toBe(100);
+    expect(whole).toEqual([31, 25, 9, 8, 5, 12, 10]);
+  });
+
+  it("gives an equal remainder to the earlier value and keeps all zeros at zero", () => {
+    expect(wholePercents([1, 1, 1])).toEqual([34, 33, 33]);
+    expect(wholePercents([0, 0])).toEqual([0, 0]);
+    expect(wholePercents([5])).toEqual([100]);
   });
 });

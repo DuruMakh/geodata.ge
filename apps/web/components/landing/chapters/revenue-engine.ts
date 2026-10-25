@@ -1,4 +1,4 @@
-import { formatInUnit, formatShare, UNIT_BN } from "../../../lib/explorer/format";
+import { formatInUnit, formatShare, UNIT_BN, wholePercents } from "../../../lib/explorer/format";
 import type { RevenueSeries } from "../../../lib/landing/chapters/types";
 import { fitText, mixHex, niceTicks, readTokens, revenueBandColor, stackLabels } from "./canvas";
 import { createChartCore, type ChartState } from "./chart-core";
@@ -138,6 +138,9 @@ export function createRevenue({ wrap, canvas, data, labels, onHover, onLeave }: 
       const mids = bands.map((_, bi) => Y(((bi ? tops[bi - 1][n - 1] : 0) + tops[bi][n - 1]) / 2));
       const ys = stackLabels(mids, wide ? 30 : 15, T + (wide ? 12 : 6), B - 2);
       const lx = R + (wide ? 14 : 8);
+      // Phone labels show whole percentages; rounded together they add up to 100 over the labelled bands.
+      const labelled = bands.flatMap((band, bi) => (band.values[n - 1] === null ? [] : [bi]));
+      const whole = wholePercents(labelled.map((bi) => bands[bi].values[n - 1]!));
       bands.forEach((band, bi) => {
         const v = band.values[n - 1];
         if (v === null) return;
@@ -159,7 +162,7 @@ export function createRevenue({ wrap, canvas, data, labels, onHover, onLeave }: 
           txt(ctx, fitText(ctx, `${money(v, lab)} · ${formatShare(sh)}`, room), lx + 15, yy + 11, `500 11px ${num}`, muted);
         } else {
           ctx.fillRect(lx, yy - 3.5, 7, 7);
-          txt(ctx, formatShare(sh, false, 0), lx + 10, yy, `600 11px ${num}`, ink, "left", "middle");
+          txt(ctx, formatShare(whole[labelled.indexOf(bi)] / 100, false, 0), lx + 10, yy, `600 11px ${num}`, ink, "left", "middle");
         }
       });
     }

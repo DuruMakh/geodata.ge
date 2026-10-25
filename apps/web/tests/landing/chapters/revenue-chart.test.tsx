@@ -21,7 +21,7 @@ const bandLabels: Record<RevenueBandId, string> = {
   profit: "მოგების",
   excise: "აქციზი",
   otherTaxes: "სხვა გადასახადები",
-  otherIncome: "სხვა შემოსავლები",
+  otherIncome: "სხვა შემოსულობები",
   liabilities: "ვალდებულებების ზრდა",
 };
 const order = Object.keys(bandLabels) as RevenueBandId[];

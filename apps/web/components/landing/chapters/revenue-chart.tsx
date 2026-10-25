@@ -22,7 +22,7 @@ export type RevenueLabels = {
   planned: string; // suffix after a planned year, and the legend entry for the hatching: "გეგმა"
   total: string; // tooltip foot lead: "სულ"
   taxes: string; // tooltip foot and aria-label: "გადასახადები"
-  peakFrom: string; // callout second line under "2020 · 29%": "ვალდებულებების ზრდიდან"
+  peakFrom: string; // callout second line, under the peak year and its borrowing share: "ვალდებულებების ზრდიდან"
   chartSummary: string; // canvas aria-label lead: "ნაერთი ბიუჯეტის შემოსულობები"
   unavailable: string; // in place of the chart when its engine fails to load
 };

@@ -7,7 +7,7 @@ import type { AdminSpendingCategory } from "../data/adminSpending/types";
 import type { PublicGlossaryEntry } from "../data/glossary";
 import type { ClientAdminFact, ClientBudgetFact } from "./clientData";
 import { colorForItem, OTHER_COLOR } from "./colors";
-import { formatAmountParts, formatShare, MISSING } from "./format";
+import { formatAmountParts, formatShare, MISSING, wholePercents } from "./format";
 import type {
   Every100Item,
   ExpenditureGrouping,
@@ -73,37 +73,15 @@ function wholeGelFrom100(items: SnapshotItem[]): Every100Item[] {
     }));
   }
 
-  const allocated = items.map((item, index) => {
-    const exactShare = (item.amountGel / drawnTotal) * 100;
-    const floorShare = Math.floor(exactShare);
+  const gelFrom100 = wholePercents(items.map((item) => item.amountGel));
 
-    return {
-      item,
-      index,
-      exactShare,
-      floorShare,
-      remainder: exactShare - floorShare,
-    };
-  });
-  const sortedByRemainder = [...allocated].sort((a, b) => b.remainder - a.remainder || a.index - b.index);
-  const extrasByIndex = new Map<number, number>();
-  let remainderToAllocate = 100 - allocated.reduce((sum, item) => sum + item.floorShare, 0);
-  let cursor = 0;
-
-  while (remainderToAllocate > 0 && sortedByRemainder.length > 0) {
-    const index = sortedByRemainder[cursor % sortedByRemainder.length]?.index;
-    if (index !== undefined) extrasByIndex.set(index, (extrasByIndex.get(index) ?? 0) + 1);
-    remainderToAllocate -= 1;
-    cursor += 1;
-  }
-
-  return allocated.map(({ item, index, exactShare, floorShare }) => ({
+  return items.map((item, index) => ({
     itemId: item.itemId,
     kaLabel: item.kaLabel,
     enLabel: item.enLabel,
     color: item.color,
-    gelFrom100: floorShare + (extrasByIndex.get(index) ?? 0),
-    exactShare,
+    gelFrom100: gelFrom100[index]!,
+    exactShare: (item.amountGel / drawnTotal) * 100,
   }));
 }
 

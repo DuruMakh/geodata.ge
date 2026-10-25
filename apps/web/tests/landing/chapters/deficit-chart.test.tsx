@@ -23,6 +23,7 @@ const data = (overrides: Partial<DeficitChapter> = {}): DeficitChapter => ({
   pctGdp: [-1.8, -9.2, -6, -2.3, -1.5],
   gel: [-1e9, -4.6e9, -3.4e9, -1.7e9, -1.2e9],
   projectionFrom: 2023,
+  latestActual: { year: 2022, pct: -2.3 },
   deepest: { year: 2020, pct: -9.2 },
   earlier: null,
   surplusRun: null,
@@ -31,7 +32,9 @@ const data = (overrides: Partial<DeficitChapter> = {}): DeficitChapter => ({
 
 describe("DeficitChart (server render)", () => {
   const html = renderToStaticMarkup(<DeficitChart data={data()} labels={labels} />);
-  const noProjection = renderToStaticMarkup(<DeficitChart data={data({ projectionFrom: null })} labels={labels} />);
+  const noProjection = renderToStaticMarkup(
+    <DeficitChart data={data({ projectionFrom: null, latestActual: { year: 2023, pct: -1.5 } })} labels={labels} />,
+  );
 
   it("has an HTML legend: deficit, surplus, forecast and the -3% rule, with colour keys", () => {
     const items = [...html.matchAll(/<li[^>]*data-key="([^"]+)"[^>]*><i[^>]*class="([^"]*)"[^>]*><\/i>([^<]*)<\/li>/g)];
@@ -54,6 +57,11 @@ describe("DeficitChart (server render)", () => {
     expect(canvas).toContain("2022: −2.3% მშპ-სთან");
     expect(canvas).toContain("ყველაზე ღრმა: −9.2%, 2020");
     expect(noProjection.match(/<canvas[^>]*>/)?.[0]).toContain("2023: −1.5% მშპ-სთან");
+    // The first year already a projection: the label still names the latest actual year.
+    const projectedFirst = renderToStaticMarkup(
+      <DeficitChart data={data({ projectionFrom: 2019, latestActual: { year: 2023, pct: -1.5 } })} labels={labels} />,
+    );
+    expect(projectedFirst.match(/<canvas[^>]*>/)?.[0]).toContain("2023: −1.5% მშპ-სთან");
   });
 
   it("keeps the chart in a fixed-height wrapper with a two-row tooltip hidden from assistive technology", () => {

@@ -63,12 +63,10 @@ export function DeficitChart({ data, labels }: { data: DeficitChapter; labels: D
   }, [lib, data]);
 
   const n = data.years.length;
-  // The latest year that is not a projection.
   const projection = data.projectionFrom === null ? -1 : data.years.indexOf(data.projectionFrom);
-  const latest = projection > 0 ? projection - 1 : n - 1;
   const ariaLabel =
     `${labels.chartSummary} ${yearRange(data.years[0], data.years[n - 1])}; ` +
-    `${data.years[latest]}: ${points(data.pctGdp[latest])} ${labels.vsGdp}; ` +
+    `${data.latestActual.year}: ${points(data.latestActual.pct)} ${labels.vsGdp}; ` +
     `${labels.deepest}: ${points(data.deepest.pct)}, ${data.deepest.year}`;
 
   return (

@@ -46,7 +46,7 @@ function revenueWith(liabilities: number | null, taxShare = 0.79): RevenueSeries
 
 function municipal(totalGel: number, topGel: number): MunicipalChapter {
   const place = (rank: number, valueGel: number) => ({
-    code: String(rank),
+    code: rank === 1 ? "04" : String(rank),
     name: `p${rank}`,
     totalGel: valueGel,
     perResidentGel: 1,
@@ -67,6 +67,7 @@ function deficit(deepestYear: number): DeficitChapter {
     pctGdp: [-9.158, -1.5],
     gel: [-1, -1],
     projectionFrom: null,
+    latestActual: { year: 2025, pct: -1.5 },
     deepest: { year: deepestYear, pct: -9.158 },
     earlier: null,
     surplusRun: null,
@@ -138,6 +139,7 @@ describe("buildChapterSentences", () => {
       pctGdp: [-9.158, -2.1, -1.5, -2.4, -2.3],
       gel: [-1, -1, -1, -1, -1],
       projectionFrom: 2026,
+      latestActual: { year: 2025, pct: -1.5 },
       deepest: { year: 2020, pct: -9.158 },
       earlier: null,
       surplusRun: null,
@@ -145,6 +147,51 @@ describe("buildChapterSentences", () => {
     expect(sentences({ deficit: projected }).deficit).toBe(
       "ზოგადი მთავრობის დეფიციტი 2025 წელს მშპ-ის 1.5% იყო; ყველაზე ღრმა — 9.2% — 2020 წელს, პანდემიის დროს.",
     );
+  });
+
+  it("names the latest actual balance a surplus when it is zero or more, keeping the deepest-deficit clause", () => {
+    const withLatest = (pct: number, deepestYear = 2020): DeficitChapter => ({ ...deficit(deepestYear), pctGdp: [-9.158, pct], latestActual: { year: 2025, pct } });
+    expect(sentences({ deficit: withLatest(0.4) }).deficit).toBe(
+      "ზოგადი მთავრობის ბალანსი 2025 წელს პროფიციტით დასრულდა — მშპ-ის 0.4%; ყველაზე ღრმა დეფიციტი — 9.2% — 2020 წელს იყო, პანდემიის დროს.",
+    );
+    expect(sentences({ deficit: withLatest(0.4, 2009), presentation: en }).deficit).toBe(
+      "The general-government balance was a surplus of 0.4% of GDP in 2025; the deepest deficit, 9.2%, was in 2009.",
+    );
+    // Zero is a surplus, as in the chart and its tooltip.
+    expect(sentences({ deficit: withLatest(0), presentation: en }).deficit).toBe(
+      "The general-government balance was a surplus of 0.0% of GDP in 2025; the deepest deficit, 9.2%, was in 2020, during the pandemic.",
+    );
+    expect(sentences({ deficit: withLatest(-0.4), presentation: en }).deficit).toContain("The general-government deficit was 0.4% of GDP in 2025");
+  });
+
+  it("uses the latest actual year when the first year is already a projection", () => {
+    const projectedFirst: DeficitChapter = {
+      years: [2019, 2020, 2025],
+      pctGdp: [-2, -9.158, -1.5],
+      gel: [-1, -1, -1],
+      projectionFrom: 2019,
+      latestActual: { year: 2025, pct: -1.5 },
+      deepest: { year: 2020, pct: -9.158 },
+      earlier: null,
+      surplusRun: null,
+    };
+    expect(sentences({ deficit: projectedFirst }).deficit).toBe(
+      "ზოგადი მთავრობის დეფიციტი 2025 წელს მშპ-ის 1.5% იყო; ყველაზე ღრმა — 9.2% — 2020 წელს, პანდემიის დროს.",
+    );
+  });
+
+  it("takes Tbilisi's amount by its code, wherever it sits in the list", () => {
+    const base = municipal(6_000_000_000, 3_000_000_000);
+    const [largest, ...rest] = base.places;
+    const reordered: MunicipalChapter = {
+      ...base,
+      // A larger place first; Tbilisi (04) third with 2.1 billion.
+      places: [{ ...rest[0]!, totalGel: 3_000_000_000 }, rest[1]!, { ...largest!, totalGel: 2_100_000_000 }, ...rest.slice(2)],
+    };
+    expect(sentences({ municipal: reordered }).municipal).toBe(
+      "64 მუნიციპალიტეტის 2025 წლის ბიუჯეტი 6.0 მილიარდი ლარია — მესამედზე მეტი, 2.1 მილიარდი, თბილისზე მოდის.",
+    );
+    expect(() => sentences({ municipal: { ...base, places: rest } })).toThrow(/Tbilisi/);
   });
 
   it("the Tbilisi share phrase picks by share", () => {
@@ -175,7 +222,7 @@ describe("buildChapterSentences", () => {
     expect(planned(ka).revenue).toBe(
       "2025 წლის ნაერთი ბიუჯეტით 32.4 მილიარდი ლარის შემოსულობაა დაგეგმილი: 79% გადასახადებიდან, 9.6% — ვალდებულებების ზრდიდან.",
     );
-    expect(planned(en).revenue).toBe("Georgia’s 2025 consolidated budget plans 32.4 billion lari of revenue: 79% from taxes and 9.6% from new liabilities.");
+    expect(planned(en).revenue).toBe("Georgia’s 2025 consolidated budget plans 32.4 billion lari of receipts: 79% from taxes and 9.6% from new liabilities.");
     // An actual latest year keeps the past-tense sentence, even when earlier years were planned.
     const actual = buildChapterSentences(
       {
@@ -187,7 +234,7 @@ describe("buildChapterSentences", () => {
       en,
     );
     expect(actual.spending).toBe("In 2025 the state budget spent GEL 27.7 billion — most of it on social protection.");
-    expect(actual.revenue).toBe("In 2025 consolidated budget revenue came to GEL 32.4 billion: 79% came from taxes and 9.6% from new liabilities.");
+    expect(actual.revenue).toBe("In 2025 consolidated budget receipts came to GEL 32.4 billion: 79% came from taxes and 9.6% from new liabilities.");
   });
 
   it("treats a missing liabilities value as zero", () => {

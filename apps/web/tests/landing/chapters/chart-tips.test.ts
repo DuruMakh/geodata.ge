@@ -54,6 +54,7 @@ const deficit: DeficitChapter = {
   pctGdp: [1.234, -9.16, -2.5],
   gel: [0.3e9, -4.6e9, -2.9e9],
   projectionFrom: 2026,
+  latestActual: { year: 2020, pct: -9.16 },
   deepest: { year: 2020, pct: -9.16 },
   earlier: null,
   surplusRun: null,
