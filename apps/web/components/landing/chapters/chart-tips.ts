@@ -1,4 +1,5 @@
-import { formatInUnit, formatPoints, formatShare, MISSING, UNIT_PERSONS } from "../../../lib/explorer/format";
+import { formatPerResidentGel, formatPoints, formatShare, MISSING } from "../../../lib/explorer/format";
+import type { Locale } from "../../../lib/i18n/types";
 import type { DeficitChapter, MunicipalChapter, RevenueSeries } from "../../../lib/landing/chapters/types";
 import { money } from "./chart-format";
 import type { TipData } from "./chart-tip";
@@ -13,7 +14,7 @@ export function plannedYearText(data: Pick<RevenueSeries, "years" | "planned">, 
 /** Revenue tooltip for year index `i`: one row per band, top band first (`—` for a gap), total and tax share as the foot. */
 export function revenueTip(
   data: RevenueSeries,
-  labels: { bnGel: string; mlnGel: string; planned: string; total: string; taxes: string },
+  labels: { locale: Locale; planned: string; total: string; taxes: string },
   colors: readonly string[],
   i: number,
 ): TipData {
@@ -33,7 +34,7 @@ export function revenueTip(
 /** Deficit tooltip for year index `i`: balance in % of GDP and in GEL; the foot says deficit or surplus. */
 export function deficitTip(
   data: DeficitChapter,
-  labels: { bnGel: string; mlnGel: string; imf: string; vsGdp: string; inGel: string; deficit: string; surplus: string },
+  labels: { locale: Locale; imf: string; vsGdp: string; inGel: string; deficit: string; surplus: string },
   i: number,
 ): TipData {
   const year = data.years[i];
@@ -52,7 +53,7 @@ export function deficitTip(
 /** Relief tooltip for place index `i` (budget for the year, budget per resident, rank), or -2 for an occupied area. */
 export function reliefTip(
   data: MunicipalChapter,
-  labels: { bnGel: string; mlnGel: string; gel: string; budget: string; perResident: string; rank: string; occupied: string; occupiedNote: string },
+  labels: { locale: Locale; budget: string; perResident: string; rank: string; occupied: string; occupiedNote: string },
   i: number,
 ): TipData {
   if (i === -2) return { title: labels.occupied, rows: [], foot: labels.occupiedNote };
@@ -61,7 +62,7 @@ export function reliefTip(
     title: place.name,
     rows: [
       { key: "var(--ink)", val: money(place.totalGel, labels), name: `${labels.budget}, ${data.year}` },
-      { val: `${formatInUnit(place.perResidentGel, UNIT_PERSONS)}\u00a0${labels.gel}`, name: labels.perResident },
+      { val: formatPerResidentGel(place.perResidentGel, labels.locale), name: labels.perResident },
     ],
     foot: `${labels.rank}: ${place.rank} / ${data.places.length}`,
   };

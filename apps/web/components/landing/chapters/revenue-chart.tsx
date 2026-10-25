@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { formatShare } from "../../../lib/explorer/format";
+import type { Locale } from "../../../lib/i18n/types";
 import type { RevenueSeries } from "../../../lib/landing/chapters/types";
 import { revenueBandColor } from "./canvas";
 import { money } from "./chart-format";
@@ -17,8 +18,7 @@ const loadEngine = () => import("./revenue-engine");
 
 export type RevenueLabels = {
   title: string; // above the chart: "ნაერთი ბიუჯეტის შემოსულობები, მლრდ ₾"
-  bnGel: string; // "მლრდ ₾"
-  mlnGel: string; // "მლნ ₾"
+  locale: Locale; // amounts are formatted for it: "მლრდ ₾" / "bn GEL"
   planned: string; // suffix after a planned year, and the legend entry for the hatching: "გეგმა"
   total: string; // tooltip foot lead: "სულ"
   taxes: string; // tooltip foot and aria-label: "გადასახადები"

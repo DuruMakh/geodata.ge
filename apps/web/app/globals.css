@@ -240,10 +240,13 @@ summary:focus-visible {
   transform: none;
 }
 
-/* On touch screens the whole heading is the tap target. */
+/* On touch screens the whole heading is the tap target, at least 44px tall: the padding grows the target
+   and the equal negative margin keeps the heading where it was. */
 @media (hover: none) {
   .home-tl {
     display: block;
+    padding-block: 10px;
+    margin-block: -10px;
   }
 
   .home-tl:active {

@@ -3,8 +3,7 @@ import { deficitTip, plannedYearText, reliefTip, revenueTip } from "../../../com
 import type { DeficitChapter, MunicipalChapter, RevenueSeries } from "../../../lib/landing/chapters/types";
 
 const labels = {
-  bnGel: "მლრდ ₾",
-  mlnGel: "მლნ ₾",
+  locale: "ka" as const,
   planned: "გეგმა",
   total: "სულ",
   taxes: "გადასახადები",
@@ -80,9 +79,7 @@ describe("deficitTip", () => {
 });
 
 const reliefLabels = {
-  bnGel: "მლრდ ₾",
-  mlnGel: "მლნ ₾",
-  gel: "₾",
+  locale: "ka" as const,
   budget: "ბიუჯეტი",
   perResident: "ერთ მოსახლეზე",
   rank: "რანგი ბიუჯეტით",
@@ -105,7 +102,7 @@ describe("reliefTip", () => {
       title: "ბათუმი",
       rows: [
         { key: "var(--ink)", val: "486\u00a0მლნ ₾", name: "ბიუჯეტი, 2025" },
-        { val: "2,862\u00a0₾", name: "ერთ მოსახლეზე" },
+        { val: "2,862 ₾", name: "ერთ მოსახლეზე" },
       ],
       foot: "რანგი ბიუჯეტით: 2 / 2",
     });

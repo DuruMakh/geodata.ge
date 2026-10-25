@@ -196,3 +196,13 @@ describe("wholePercents", () => {
     expect(wholePercents([5])).toEqual([100]);
   });
 });
+
+describe("formatAmountParts with significantBillions", () => {
+  it("keeps three significant digits in billions and leaves the default one decimal unchanged", () => {
+    expect(formatAmountParts(2_108_420_516, false, "ka", true)).toEqual({ num: "2.11", unit: "მლრდ ₾" });
+    expect(formatAmountParts(27_723_319_039, false, "en", true)).toEqual({ num: "27.7", unit: "bn GEL" });
+    expect(formatAmountParts(-1_526_000_000, false, "ka", true).num).toBe("−1.53");
+    expect(formatAmountParts(486_198_057, false, "ka", true)).toEqual({ num: "486", unit: "მლნ ₾" });
+    expect(formatAmountParts(2_108_420_516)).toEqual({ num: "2.1", unit: "მლრდ ₾" });
+  });
+});

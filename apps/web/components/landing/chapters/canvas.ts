@@ -1,7 +1,8 @@
 import type { RevenueBandId } from "../../../lib/landing/chapters/types";
 
-// Canvas helpers ported from the design board's chart script. Pure functions (squarify,
-// niceTicks, stackLabels, fitText) touch no DOM; the rest read `window` only when called.
+// Canvas helpers ported from the design board's chart script. Pure functions (niceTicks,
+// stackLabels, fitText) touch no DOM; the rest read `window` only when called. The treemap
+// layout is shared with the Analysis page (lib/explorer/treemapLayout.ts).
 
 export type Rect = [x: number, y: number, w: number, h: number];
 
@@ -145,82 +146,6 @@ export function fitText(ctx: Pick<CanvasRenderingContext2D, "measureText">, s: s
   let t = s;
   while (t.length > 1 && ctx.measureText(`${t}…`).width > maxW) t = t.slice(0, -1);
   return t.length > 1 ? `${t}…` : "";
-}
-
-/** Squarified treemap: one rectangle per value, areas proportional to the values, filling x,y,w,h. Zero values get empty rectangles. */
-export function squarify(values: number[], x: number, y: number, w: number, h: number): Rect[] {
-  const out: Rect[] = new Array(values.length);
-  const total = values.reduce((a, b) => a + Math.max(0, b), 0);
-  if (total <= 0 || w <= 0 || h <= 0) {
-    values.forEach((_, i) => {
-      out[i] = [x, y, 0, 0];
-    });
-    return out;
-  }
-  const scale = (w * h) / total;
-  const items = values.map((v, i) => ({ i, a: Math.max(0, v) * scale }));
-  let rx = x;
-  let ry = y;
-  let rw = w;
-  let rh = h;
-  let row: typeof items = [];
-  let k = 0;
-  const worst = (r: typeof items, len: number) => {
-    let s = 0;
-    let mx = -Infinity;
-    let mn = Infinity;
-    for (const it of r) {
-      s += it.a;
-      if (it.a > mx) mx = it.a;
-      if (it.a < mn) mn = it.a;
-    }
-    if (!s) return Infinity;
-    const l2 = len * len;
-    const s2 = s * s;
-    return Math.max((l2 * mx) / s2, s2 / (l2 * mn));
-  };
-  const lay = (r: typeof items) => {
-    const s = r.reduce((a, b) => a + b.a, 0);
-    if (rw >= rh) {
-      const sw = s / rh;
-      let yy = ry;
-      for (const it of r) {
-        const hh = it.a / sw;
-        out[it.i] = [rx, yy, sw, hh];
-        yy += hh;
-      }
-      rx += sw;
-      rw -= sw;
-    } else {
-      const sh = s / rw;
-      let xx = rx;
-      for (const it of r) {
-        const ww = it.a / sh;
-        out[it.i] = [xx, ry, ww, sh];
-        xx += ww;
-      }
-      ry += sh;
-      rh -= sh;
-    }
-  };
-  while (k < items.length) {
-    const it = items[k];
-    if (it.a <= 0) {
-      out[it.i] = [rx, ry, 0, 0];
-      k++;
-      continue;
-    }
-    const len = Math.min(rw, rh);
-    if (!row.length || worst([...row, it], len) <= worst(row, len)) {
-      row.push(it);
-      k++;
-    } else {
-      lay(row);
-      row = [];
-    }
-  }
-  if (row.length) lay(row);
-  return out;
 }
 
 /** Push overlapping labels apart by at least `gap`, keeping them inside [lo, hi]. Index 0 sits lowest on screen (largest y). */

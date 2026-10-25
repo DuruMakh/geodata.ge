@@ -439,6 +439,26 @@ test.describe("chart tooltips on a touch screen", () => {
   });
 });
 
+test.describe("tap targets on a phone", () => {
+  test.use({ isMobile: true, hasTouch: true, viewport: { width: 375, height: 812 } });
+
+  // DESIGN.md §12 and §19: at least 44px tall below 768px, the chapter headings included even on one line.
+  test("chapter heading links and the AI copy button are at least 44px tall", async ({ page }) => {
+    for (const prefix of ["", "/en"]) {
+      await page.goto(`${baseUrl}${prefix}/`);
+      for (const chapter of CHAPTERS) {
+        const link = page.locator(`#${chapter.id} h2 a`);
+        const box = (await link.boundingBox())!;
+        expect(box.height, `${prefix || "/"} ${chapter.id} heading link`).toBeGreaterThanOrEqual(44);
+        expect(box.width, `${prefix || "/"} ${chapter.id} heading link width`).toBeGreaterThanOrEqual(300);
+      }
+      const copy = page.getByTestId("landing-ai-copy");
+      await copy.scrollIntoViewIfNeeded();
+      expect((await copy.boundingBox())!.height, `${prefix || "/"} copy button`).toBeGreaterThanOrEqual(44);
+    }
+  });
+});
+
 for (const width of [375, 390]) {
   test(`homepage has no horizontal overflow at ${width}px`, async ({ page }) => {
     await page.setViewportSize({ width, height: 800 });

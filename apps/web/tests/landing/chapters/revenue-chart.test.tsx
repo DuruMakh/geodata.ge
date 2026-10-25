@@ -5,8 +5,7 @@ import type { RevenueBandId, RevenueSeries } from "../../../lib/landing/chapters
 
 const labels: RevenueLabels = {
   title: "ნაერთი ბიუჯეტის შემოსულობები, მლრდ ₾",
-  bnGel: "მლრდ ₾",
-  mlnGel: "მლნ ₾",
+  locale: "ka",
   planned: "გეგმა",
   total: "სულ",
   taxes: "გადასახადები",

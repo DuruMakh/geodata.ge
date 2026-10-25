@@ -57,7 +57,7 @@ export function LandingPage({ chapters, gdpFigure, presentation, updatedAt, mcpE
     { label: message(messages, "landing.economy"), unit: message(messages, "landing.bnGel"), unitTestId: "gdp-unit", ...gdpFigure },
   ];
   const chapterLink = (n: number, path: string) => ({ href: pageHref(path, locale), hint: t(`landing.ch${n}.hint`) });
-  const units = { bnGel: t("landing.bnGel"), mlnGel: t("landing.mlnGel") };
+  const bnGel = t("landing.bnGel");
   const unavailable = t("landing.heroUnavailable");
 
   const scaleLabels: ScaleLabels = {
@@ -66,7 +66,7 @@ export function LandingPage({ chapters, gdpFigure, presentation, updatedAt, mcpE
     cumulative: t("landing.scale.cumulative"),
     included: t("landing.scale.included"),
     notIncluded: t("landing.scale.notIncluded"),
-    bnGel: units.bnGel,
+    bnGel,
     planned: t("landing.planned"),
     square: t("landing.scale.square"),
     squareNoteSpoken: t("landing.scale.squareNoteSpoken"),
@@ -76,7 +76,8 @@ export function LandingPage({ chapters, gdpFigure, presentation, updatedAt, mcpE
   const { spending } = chapters;
   const largestYear = spending.years[spending.totals.indexOf(Math.max(...spending.totals))];
   const spendingLabels: SpendingLabels = {
-    ...units,
+    bnGel,
+    locale,
     year: t("landing.spending.year"),
     total: t("landing.expenditureTotal"),
     planned: t("landing.planned"),
@@ -94,7 +95,7 @@ export function LandingPage({ chapters, gdpFigure, presentation, updatedAt, mcpE
     unavailable,
   };
   const revenueLabels: RevenueLabels = {
-    ...units,
+    locale,
     title: t("landing.revenue.title"),
     planned: t("landing.planned"),
     total: t("landing.revenue.total"),
@@ -104,8 +105,7 @@ export function LandingPage({ chapters, gdpFigure, presentation, updatedAt, mcpE
     unavailable,
   };
   const municipalLabels: MunicipalLabels = {
-    ...units,
-    gel: t("landing.municipal.gel"),
+    locale,
     budget: t("landing.municipal.budget"),
     perResident: t("landing.municipal.perResident"),
     rank: t("landing.municipal.rank"),
@@ -117,7 +117,7 @@ export function LandingPage({ chapters, gdpFigure, presentation, updatedAt, mcpE
     unavailable,
   };
   const deficitLabels: DeficitLabels = {
-    ...units,
+    locale,
     title: t("landing.deficit.title"),
     deficit: t("landing.deficit.deficit"),
     surplus: t("landing.deficit.surplus"),

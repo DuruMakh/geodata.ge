@@ -1,36 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { anchoredRect, bindChartPointer, blockLabelTier, blockTone, fitText, gridFor, lerpRect, mixHex, niceTicks, OFF_SQUARE, sparkPoints, squarify, stackLabels } from "../../../components/landing/chapters/canvas";
-
-describe("squarify", () => {
-  it("areas are proportional to values and fill the rectangle (sum of areas = w*h within 1e-6)", () => {
-    const values = [40, 25, 15, 10, 6, 4];
-    const rects = squarify(values, 10, 20, 300, 180);
-    const areas = rects.map(([, , w, h]) => w * h);
-    expect(areas.reduce((a, b) => a + b, 0)).toBeCloseTo(300 * 180, 6);
-    const total = values.reduce((a, b) => a + b, 0);
-    areas.forEach((area, i) => expect(area).toBeCloseTo((values[i] / total) * 300 * 180, 6));
-    for (const [x, y, w, h] of rects) {
-      expect(x).toBeGreaterThanOrEqual(10 - 1e-9);
-      expect(y).toBeGreaterThanOrEqual(20 - 1e-9);
-      expect(x + w).toBeLessThanOrEqual(310 + 1e-9);
-      expect(y + h).toBeLessThanOrEqual(200 + 1e-9);
-    }
-  });
-
-  it("zero values get zero rectangles", () => {
-    const rects = squarify([5, 0, 3, 0], 0, 0, 100, 50);
-    expect(rects[1][2] * rects[1][3]).toBe(0);
-    expect(rects[3][2] * rects[3][3]).toBe(0);
-    expect(rects[0][2] * rects[0][3] + rects[2][2] * rects[2][3]).toBeCloseTo(5000, 6);
-  });
-
-  it("returns empty rectangles when there is nothing to lay out", () => {
-    expect(squarify([0, 0], 1, 2, 100, 50)).toEqual([
-      [1, 2, 0, 0],
-      [1, 2, 0, 0],
-    ]);
-  });
-});
+import { anchoredRect, bindChartPointer, blockLabelTier, blockTone, fitText, gridFor, lerpRect, mixHex, niceTicks, OFF_SQUARE, sparkPoints, stackLabels } from "../../../components/landing/chapters/canvas";
 
 describe("niceTicks", () => {
   it("covers the maximum with at most n steps of a round size", () => {

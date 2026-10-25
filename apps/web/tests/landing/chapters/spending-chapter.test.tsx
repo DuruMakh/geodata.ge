@@ -7,7 +7,7 @@ const labels: SpendingLabels = {
   year: "წელი",
   total: "მთლიანი ხარჯი",
   bnGel: "მლრდ ₾",
-  mlnGel: "მლნ ₾",
+  locale: "ka",
   planned: "გეგმა",
   maxFrame: "2025 წლის ბიუჯეტის მასშტაბი",
   play: "გაგრძელება",

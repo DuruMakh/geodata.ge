@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import type { Locale } from "../../../lib/i18n/types";
 import type { DeficitChapter } from "../../../lib/landing/chapters/types";
 import { points } from "./chart-format";
 import { DEFICIT_RULE_PCT, yearRange } from "./chart-layout";
@@ -15,8 +16,7 @@ import { ChartUnavailable, Reveal, useEngine } from "./reveal";
 
 export type DeficitLabels = {
   title: string; // above the chart: "ზოგადი მთავრობის ბალანსი, % მშპ-სთან"
-  bnGel: string; // "მლრდ ₾"
-  mlnGel: string; // "მლნ ₾"
+  locale: Locale; // amounts are formatted for it: "მლრდ ₾" / "bn GEL"
   deficit: string; // legend and tooltip foot: "დეფიციტი"
   surplus: string; // legend, tooltip foot and surplus-run bracket (the "2004–2007" range is appended): "პროფიციტი"
   forecast: string; // legend entry for the projection band: "პროგნოზი"

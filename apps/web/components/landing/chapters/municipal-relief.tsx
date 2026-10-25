@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { formatShare } from "../../../lib/explorer/format";
+import type { Locale } from "../../../lib/i18n/types";
 import type { MunicipalChapter } from "../../../lib/landing/chapters/types";
 import { money } from "./chart-format";
 import { ChartTip, hideTip, showTip } from "./chart-tip";
@@ -15,9 +16,7 @@ import { ChartUnavailable, Reveal, useEngine } from "./reveal";
 // engine (relief-engine.ts) loads near view.
 
 export type MunicipalLabels = {
-  bnGel: string; // "მლრდ ₾"
-  mlnGel: string; // "მლნ ₾"
-  gel: string; // after the budget per resident: "₾"
+  locale: Locale; // amounts are formatted for it: "მლრდ ₾" / "bn GEL"
   budget: string; // tooltip row, ", 2025" follows: "ბიუჯეტი"
   perResident: string; // tooltip row: "ერთ მოსახლეზე"
   rank: string; // tooltip foot, ": 2 / 64" follows: "რანგი ბიუჯეტით"

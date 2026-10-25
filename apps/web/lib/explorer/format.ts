@@ -39,20 +39,30 @@ export function formatBn(value: number | null | undefined): string {
 
 export type AmountParts = { num: string; unit: string };
 
-/** Split amount into number and localized unit, choosing magnitude from the value. */
-export function formatAmountParts(value: number | null | undefined, signed = false, locale: Locale = "ka"): AmountParts {
+// Decimals that leave three significant digits for a value from 1 to 999.
+const threeSignificant = (value: number) => (value >= 100 ? 0 : value >= 10 ? 1 : 2);
+
+/**
+ * Split amount into number and localized unit, choosing magnitude from the value. Billions carry one
+ * decimal; with `significantBillions` they keep three significant digits like millions (2.11, 27.7),
+ * for the homepage charts' labels.
+ */
+export function formatAmountParts(value: number | null | undefined, signed = false, locale: Locale = "ka", significantBillions = false): AmountParts {
   if (value === null || value === undefined) return { num: MISSING, unit: "" };
   // An unfunded line is plain zero lari, unsigned — never "0.00 მლნ ₾".
   if (value === 0) return { num: "0", unit: formatMessages[locale]["format.gel"] };
   const sign = signed ? (value >= 0 ? "+" : "−") : value < 0 ? "−" : "";
   const abs = Math.abs(value);
-  if (abs >= 0.9995 * BILLION) return { num: sign + fixed(abs / BILLION, 1), unit: formatMessages[locale]["format.bnGel"] };
+  if (abs >= 0.9995 * BILLION) {
+    const billions = abs / BILLION;
+    return { num: sign + fixed(billions, significantBillions ? threeSignificant(billions) : 1), unit: formatMessages[locale]["format.bnGel"] };
+  }
 
   // Three significant digits. A standalone amount carries its own unit label,
   // so precision can follow the value here — unlike a column, which shares one
   // unit across every cell and gets its decimals from unitFor instead.
   const millions = abs / MILLION;
-  const decimals = millions >= 100 ? 0 : millions >= 10 ? 1 : 2;
+  const decimals = threeSignificant(millions);
   if (abs > 0 && Number(millions.toFixed(decimals)) === 0) {
     return { num: value < 0 ? ">−0.01" : signed ? "+<0.01" : "<0.01", unit: formatMessages[locale]["format.mlnGel"] };
   }

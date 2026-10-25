@@ -3,6 +3,7 @@
 import { Pause, Play } from "lucide-react";
 import { useEffect, useId, useRef, useState } from "react";
 import { formatInUnit, formatShare, UNIT_BN } from "../../../lib/explorer/format";
+import type { Locale } from "../../../lib/i18n/types";
 import type { SpendingSeries } from "../../../lib/landing/chapters/types";
 import { blockTone, prefersReducedMotion, sparkPoints } from "./canvas";
 import { money } from "./chart-format";
@@ -20,7 +21,7 @@ export type SpendingLabels = {
   year: string; // "წელი"
   total: string; // "მთლიანი ხარჯი"
   bnGel: string; // "მლრდ ₾"
-  mlnGel: string; // "მლნ ₾"
+  locale: Locale; // amounts are formatted for it: "მლრდ ₾" / "bn GEL"
   planned: string; // suffix after a planned year: "გეგმა"
   maxFrame: string; // dashed-frame caption, the largest year already in it: "2025 წლის ბიუჯეტის მასშტაბი"
   play: string; // button while paused part-way: "გაგრძელება"

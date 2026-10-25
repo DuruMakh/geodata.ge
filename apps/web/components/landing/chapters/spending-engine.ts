@@ -1,5 +1,6 @@
 import type { SpendingSeries } from "../../../lib/landing/chapters/types";
 import { formatShare } from "../../../lib/explorer/format";
+import { squarify } from "../../../lib/explorer/treemapLayout";
 import {
   anchoredRect,
   bindChartPointer,
@@ -11,7 +12,6 @@ import {
   prefersReducedMotion,
   readTokens,
   sizeCanvas,
-  squarify,
   type Rect,
 } from "./canvas";
 import { easeInOut, easeOut, txt } from "./chart-draw";

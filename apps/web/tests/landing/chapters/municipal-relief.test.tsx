@@ -4,9 +4,7 @@ import { MunicipalRelief, type MunicipalLabels } from "../../../components/landi
 import type { MunicipalChapter, ReliefPlace } from "../../../lib/landing/chapters/types";
 
 const labels: MunicipalLabels = {
-  bnGel: "მლრდ ₾",
-  mlnGel: "მლნ ₾",
-  gel: "₾",
+  locale: "ka",
   budget: "ბიუჯეტი",
   perResident: "ერთ მოსახლეზე",
   rank: "რანგი ბიუჯეტით",

@@ -27,7 +27,7 @@ export type AiLabels = {
 
 // The focus ring of the band's controls, in its link colour so it shows on the dark ground.
 const FOCUS_RING = "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ai-link)]";
-const COPY_BUTTON = `min-h-[42px] shrink-0 whitespace-nowrap rounded-[4px] bg-[var(--ai-ink)] px-4 text-[12.5px] font-semibold text-[var(--ai-bg)] transition-colors hover:bg-white ${FOCUS_RING}`;
+const COPY_BUTTON = `min-h-11 shrink-0 whitespace-nowrap rounded-[4px] bg-[var(--ai-ink)] px-4 text-[12.5px] font-semibold text-[var(--ai-bg)] transition-colors hover:bg-white ${FOCUS_RING}`;
 const LABEL = "text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--ai-muted)]";
 
 /** `endpoint` is the site's own MCP address, `${resolveSiteUrl()}/mcp`, resolved on the server as on the Connect page. */

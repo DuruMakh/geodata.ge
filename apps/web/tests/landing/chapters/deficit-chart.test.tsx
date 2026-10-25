@@ -5,8 +5,7 @@ import type { DeficitChapter } from "../../../lib/landing/chapters/types";
 
 const labels: DeficitLabels = {
   title: "ზოგადი მთავრობის ბალანსი, % მშპ-სთან",
-  bnGel: "მლრდ ₾",
-  mlnGel: "მლნ ₾",
+  locale: "ka",
   deficit: "დეფიციტი",
   surplus: "პროფიციტი",
   forecast: "პროგნოზი",
