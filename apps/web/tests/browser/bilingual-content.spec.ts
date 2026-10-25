@@ -37,14 +37,16 @@ test("the English reader journey keeps human pages English and reaches the share
 
 test("homepage and hub figures stay identical when switching languages", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto("/en#data");
-  const figures = () => page.locator('[data-testid="landing-data"] table td, [data-testid="landing-dataset-total"] p, [data-testid="landing-debt"] dd, [data-testid="landing-deficit-history"] strong').evaluateAll(elements => elements.map(element => element.textContent?.match(/[−+]?\d[\d,.]*%?/g) ?? []));
+  await page.goto("/en#ch-03");
+  // The squares chart's measure buttons and the spending side list carry the page's figures; language words are ignored.
+  const figures = () => page.locator("#ch-01 [role=group] button, #ch-02 [data-field]").evaluateAll(elements => elements.map(element => element.textContent?.match(/[−+]?\d[\d,.]*%?/g) ?? []));
   const before = await figures();
   await page.getByTestId("landing-header").getByRole("button", { name: "Menu", exact: true }).click();
   // On a phone the link shows "KA"; its name starts with that and adds the full language name.
   await page.getByTestId("landing-header").getByTestId("language-switch").getByRole("link", { name: "KA ქართული", exact: true }).click();
   await expect(page.locator("html")).toHaveAttribute("lang", "ka");
-  expect(new URL(page.url()).hash).toBe("#data");
+  expect(new URL(page.url()).hash).toBe("#ch-03");
+  expect(before.length).toBeGreaterThan(10);
   expect(await figures()).toEqual(before);
   await page.goto("/en/explorer");
   const sparklines = () => page.getByTestId("budget-hub").locator("svg polyline, svg path").evaluateAll(elements => elements.map(element => element.getAttribute("points") ?? element.getAttribute("d")));

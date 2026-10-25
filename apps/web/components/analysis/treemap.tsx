@@ -3,6 +3,7 @@ import { useI18n } from "../../lib/i18n/provider";
 import { publicLabel } from "../../lib/i18n/labels";
 import type { SnapshotItem } from "../../lib/explorer/types";
 import { formatAmount, formatShare } from "../../lib/explorer/format";
+import { squarify as squarifyLayout } from "../../lib/explorer/treemapLayout";
 import { SwatchBar } from "../ui/editorial";
 
 // Structure treemap per DESIGN.md §9.3: squarified layout over a 1000×430 unit area,
@@ -14,64 +15,16 @@ type TreemapRect = { item: SnapshotItem; x: number; y: number; w: number; h: num
 const AREA_W = 1000;
 const AREA_H = 430;
 
-function worstRatio(row: number[], sum: number, side: number): number {
-  const thickness = sum / side;
-  let worst = 0;
-  for (const value of row) {
-    const length = value / thickness;
-    const ratio = Math.max(thickness / length, length / thickness);
-    if (ratio > worst) worst = ratio;
-  }
-  return worst;
-}
-
 export function squarify(items: SnapshotItem[], totalValue: number): TreemapRect[] {
-  const rects: TreemapRect[] = [];
-  if (totalValue <= 0) return rects;
-  let remaining = items.map((item) => ({ item, v: (item.amountGel / totalValue) * AREA_W * AREA_H }));
-  let x = 0;
-  let y = 0;
-  let w = AREA_W;
-  let h = AREA_H;
-
-  while (remaining.length > 0) {
-    const horizontal = w >= h;
-    const side = horizontal ? h : w;
-    const row = [remaining[0]];
-    let sum = remaining[0].v;
-    let count = 1;
-    let worst = worstRatio(row.map((entry) => entry.v), sum, side);
-
-    while (count < remaining.length) {
-      const nextSum = sum + remaining[count].v;
-      const nextWorst = worstRatio([...row.map((entry) => entry.v), remaining[count].v], nextSum, side);
-      if (nextWorst > worst) break;
-      row.push(remaining[count]);
-      sum = nextSum;
-      worst = nextWorst;
-      count += 1;
-    }
-
-    const thickness = sum / side;
-    let offset = 0;
-    for (const entry of row) {
-      const length = entry.v / thickness;
-      if (horizontal) rects.push({ item: entry.item, x, y: y + offset, w: thickness, h: length });
-      else rects.push({ item: entry.item, x: x + offset, y, w: length, h: thickness });
-      offset += length;
-    }
-
-    if (horizontal) {
-      x += thickness;
-      w -= thickness;
-    } else {
-      y += thickness;
-      h -= thickness;
-    }
-    remaining = remaining.slice(row.length);
-  }
-
-  return rects;
+  if (totalValue <= 0) return [];
+  return squarifyLayout(
+    items.map((item) => item.amountGel),
+    0,
+    0,
+    AREA_W,
+    AREA_H,
+    totalValue,
+  ).map(([x, y, w, h], index) => ({ item: items[index], x, y, w, h }));
 }
 
 type StructureTreemapProps = {

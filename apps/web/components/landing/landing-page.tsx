@@ -2,14 +2,19 @@ import type { Presentation } from "../../lib/i18n/types";
 import { message } from "../../lib/i18n/messages";
 import { pageHref } from "../../lib/i18n/routes";
 import Link from "next/link";
-import type { LandingModel } from "../../lib/landing/landingData";
-import type { LandingDatasetLink, LandingGdpFigure } from "../../lib/landing/landingDatasets";
+import type { HomeChapters } from "../../lib/landing/chapters/types";
+import type { LandingGdpFigure } from "../../lib/landing/landingData";
 import { SiteFooter } from "../site/site-footer";
 import { SiteHeader } from "../site/site-header";
-import { withLari } from "../ui/lari";
+import { AiSection, type AiLabels } from "./chapters/ai-section";
+import { Chapter } from "./chapters/chapter";
+import { DeficitChart, type DeficitLabels } from "./chapters/deficit-chart";
+import { MunicipalRelief, type MunicipalLabels } from "./chapters/municipal-relief";
+import { RevenueChart, type RevenueLabels } from "./chapters/revenue-chart";
+import { ScaleChapter, type ScaleLabels } from "./chapters/scale-chapter";
+import { SourcesSection, type SourcesLabels } from "./chapters/sources-section";
+import { SpendingChapter, type SpendingLabels } from "./chapters/spending-chapter";
 import { HeroReliefLazy } from "./hero-relief-lazy";
-import { LandingDatasetSection } from "./landing-dataset-section";
-import { LandingFiscalSections } from "./landing-fiscal-sections";
 
 // Population and area are maintained by hand; the GDP figure and every budget
 // value below them are derived from the same served facts as the matching explorer.
@@ -35,15 +40,12 @@ const COUNTRY_NUMBERS = [
 const HERO_ARIA_LABEL =
   "landing.heroAria";
 
-const METHODOLOGY_STEPS = [
-  "landing.methodStep1",
-  "landing.methodStep2",
-  "landing.methodStep3",
-  "landing.methodStep4",
-] as const;
+const STEPS = [1, 2, 3, 4] as const;
+const NODES = [1, 2, 3, 4, 5] as const;
 
-export function LandingPage({ model, datasets, gdpFigure, presentation }: { model: LandingModel; datasets: readonly LandingDatasetLink[]; gdpFigure: LandingGdpFigure; presentation: Presentation }) {
+export function LandingPage({ chapters, gdpFigure, presentation, updatedAt, mcpEndpoint }: { chapters: HomeChapters; gdpFigure: LandingGdpFigure; presentation: Presentation; updatedAt: string; mcpEndpoint: string }) {
   const { locale, messages } = presentation;
+  const t = (key: string, values?: Record<string, string | number>) => message(messages, key, values);
   const keyNumbers = [
     ...COUNTRY_NUMBERS.map((entry) => ({
       ...entry,
@@ -54,6 +56,108 @@ export function LandingPage({ model, datasets, gdpFigure, presentation }: { mode
     })),
     { label: message(messages, "landing.economy"), unit: message(messages, "landing.bnGel"), unitTestId: "gdp-unit", ...gdpFigure },
   ];
+  const chapterLink = (n: number, path: string) => ({ href: pageHref(path, locale), hint: t(`landing.ch${n}.hint`) });
+  const bnGel = t("landing.bnGel");
+  const unavailable = t("landing.heroUnavailable");
+
+  const scaleLabels: ScaleLabels = {
+    squareNote: t("landing.scale.squareNote"),
+    ofGdp: t("landing.scale.ofGdp"),
+    cumulative: t("landing.scale.cumulative"),
+    included: t("landing.scale.included"),
+    notIncluded: t("landing.scale.notIncluded"),
+    bnGel,
+    planned: t("landing.planned"),
+    square: t("landing.scale.square"),
+    squareNoteSpoken: t("landing.scale.squareNoteSpoken"),
+    measureGroup: t("landing.scale.measureGroup"),
+    unavailable,
+  };
+  const { spending } = chapters;
+  const largestYear = spending.years[spending.totals.indexOf(Math.max(...spending.totals))];
+  const spendingLabels: SpendingLabels = {
+    bnGel,
+    locale,
+    year: t("landing.spending.year"),
+    total: t("landing.expenditureTotal"),
+    planned: t("landing.planned"),
+    maxFrame: t("landing.spending.maxFrame", { year: largestYear }),
+    play: t("landing.spending.play"),
+    pause: t("landing.spending.pause"),
+    replay: t("landing.spending.replay", { year: spending.years[0] }),
+    yearPicker: t("landing.spending.yearPicker"),
+    axisCaption: t("landing.spending.axisCaption"),
+    listCaption: t("landing.spending.listCaption"),
+    share: t("landing.spending.share"),
+    vsPrevious: t("landing.spending.vsPrevious"),
+    chartSummary: t("landing.spending.chartSummary"),
+    largest: t("landing.spending.largest"),
+    unavailable,
+  };
+  const revenueLabels: RevenueLabels = {
+    locale,
+    title: t("landing.revenue.title"),
+    planned: t("landing.planned"),
+    total: t("landing.revenue.total"),
+    taxes: t("landing.revenue.taxes"),
+    peakFrom: t("landing.revenue.peakFrom"),
+    chartSummary: t("landing.revenue.chartSummary"),
+    unavailable,
+  };
+  const municipalLabels: MunicipalLabels = {
+    locale,
+    budget: t("landing.municipal.budget"),
+    perResident: t("landing.municipal.perResident"),
+    rank: t("landing.municipal.rank"),
+    occupied: t("landing.municipal.occupied"),
+    occupiedNote: t("landing.municipal.occupiedNote"),
+    total: t("landing.revenue.total"),
+    share: t("landing.share"),
+    chartSummary: t("landing.municipal.chartSummary"),
+    unavailable,
+  };
+  const deficitLabels: DeficitLabels = {
+    locale,
+    title: t("landing.deficit.title"),
+    deficit: t("landing.deficit.deficit"),
+    surplus: t("landing.deficit.surplus"),
+    forecast: t("landing.deficit.forecast"),
+    imf: t("landing.deficit.imf"),
+    vsGdp: t("landing.deficit.vsGdp"),
+    inGel: t("landing.deficit.inGel"),
+    deepest: t("landing.deficit.deepest"),
+    chartSummary: t("landing.deficit.chartSummary"),
+    unavailable,
+  };
+  const collections = chapters.sources.rows.length;
+  const sourcesLabels: SourcesLabels = {
+    title: t("landing.sources.title"),
+    lede: t("landing.methodologyDescription"),
+    meta: t("landing.sources.meta", { count: collections, date: chapters.sources.reviewedAt }),
+    methodologyLink: t("landing.methodologyLink"),
+    flow: t("landing.sources.flow"),
+    steps: STEPS.map((n) => ({ title: t(`landing.sourceStep${n}Title`), text: t(`landing.sourceStep${n}Text`) })),
+    coverageTitle: t("landing.sources.coverageTitle"),
+    coverageHint: t("landing.sources.coverageHint"),
+    axisName: t("landing.sources.axisName"),
+    since: (year) => t("landing.sources.since", { year }),
+    total: t("landing.sources.total", { count: collections }),
+  };
+  const aiLabels: AiLabels = {
+    title: t("landing.ai.title"),
+    lede: t("landing.ai.lede"),
+    meta: t("landing.ai.meta"),
+    copy: t("landing.ai.copy"),
+    copied: t("landing.ai.copied"),
+    copyLabel: t("landing.ai.copyLabel"),
+    copiedLabel: t("landing.ai.copiedLabel"),
+    facts: [t("landing.ai.fact1"), t("landing.ai.fact2"), t("landing.ai.fact3")],
+    tools: t("landing.ai.tools"),
+    cta: t("landing.ai.cta"),
+    cardTitle: t("landing.ai.cardTitle"),
+    cardKicker: t("landing.ai.cardKicker"),
+    nodes: NODES.map((n) => ({ title: t(`landing.ai.node${n}Title`), text: t(`landing.ai.node${n}Text`) })),
+  };
   return (
     <div
       data-testid="landing-shell"
@@ -124,120 +228,26 @@ export function LandingPage({ model, datasets, gdpFigure, presentation }: { mode
             ))}
           </section>
 
-          {/* One row per dataset hub, each with its latest served figure: the
-              budget ledger below is one dataset of five (owner decision D3). */}
-          <nav
-            aria-label={message(messages, "landing.datasetsLabel")}
-            data-testid="landing-datasets"
-            className="mt-7 grid grid-cols-2 border-t border-[var(--hairline-soft)] min-[768px]:mt-10 min-[768px]:grid-cols-5 [&>*:last-child:nth-child(odd)]:col-span-2 min-[768px]:[&>*:last-child:nth-child(odd)]:col-span-1"
-          >
-            {datasets.map((dataset) => (
-              <Link
-                key={dataset.href}
-                href={pageHref(dataset.href, locale)}
-                prefetch={false}
-                className="group flex min-h-11 min-w-0 flex-col justify-start gap-1 border-b border-[var(--hairline-soft)] py-3 pr-3 text-[var(--ink)] no-underline"
-              >
-                <span className="text-[0.875rem] font-semibold group-hover:text-[var(--accent)]">
-                  {dataset.title} <span aria-hidden="true" className="text-[var(--accent)]">→</span>
-                </span>
-                <span className="text-[0.71875rem] leading-snug text-[var(--muted)]">
-                  {dataset.measure} · {dataset.period}:{" "}
-                  {/* Five columns from 768px leave a long value too little room until 900px; there it wraps. */}
-                  <span className="whitespace-nowrap font-[family-name:var(--font-numeric)] text-[var(--ink)] min-[768px]:max-[900px]:whitespace-normal">{withLari(dataset.value)}</span>
-                </span>
-              </Link>
-            ))}
-          </nav>
-
-          <div id="data" data-testid="landing-data" className="mt-14 scroll-mt-4">
-            <LandingDatasetSection
-              presentation={presentation}
-              kind="expenditure"
-              index="01"
-              overline={message(messages, "landing.expenditureOverline")}
-              heading={message(messages, "landing.expenditureHeading")}
-              description={message(messages, model.expenditure.basis === "planned" ? "landing.expenditureDescriptionPlanned" : "landing.expenditureDescription", { year: model.expenditure.latestYear })}
-              href="/explorer/expenditure"
-              linkLabel={message(messages, "landing.expenditureLink")}
-              totalLabel={message(messages, "landing.expenditureTotal")}
-              firstColumnLabel={message(messages, "landing.expenditureColumn")}
-              summary={model.expenditure}
-            />
-            <LandingDatasetSection
-              presentation={presentation}
-              kind="revenue"
-              index="02"
-              overline={message(messages, "landing.revenueOverline")}
-              heading={message(messages, "landing.revenueHeading")}
-              description={message(messages, "landing.revenueDescription", { year: model.revenue.latestYear })}
-              href="/explorer/revenue"
-              linkLabel={message(messages, "landing.revenueLink")}
-              totalLabel={message(messages, "landing.revenueTotal")}
-              firstColumnLabel={message(messages, "landing.revenueColumn")}
-              summary={model.revenue}
-            />
-            <LandingDatasetSection
-              presentation={presentation}
-              kind="municipalities"
-              index="03"
-              overline={message(messages, "landing.municipalOverline")}
-              heading={message(messages, "landing.municipalHeading")}
-              description={message(messages, "landing.municipalDescription", { year: model.municipalities.latestYear, ...model.municipalCoverage })}
-              href="/explorer/municipalities"
-              linkLabel={message(messages, "landing.municipalLink")}
-              totalLabel={message(messages, "landing.municipalTotal")}
-              firstColumnLabel={message(messages, "landing.municipalColumn")}
-              summary={model.municipalities}
-            />
-
-            <LandingFiscalSections presentation={presentation} debt={model.debt} deficit={model.deficit} />
-
-            <section
-              data-testid="landing-methodology"
-              aria-labelledby="landing-methodology-title"
-              className="grid gap-5 border-t border-[var(--hairline)] py-8 min-[850px]:grid-cols-[52px_minmax(230px,0.82fr)_minmax(0,1.35fr)] min-[850px]:gap-8 min-[850px]:py-11"
-            >
-              <div aria-hidden="true" className="font-[family-name:var(--font-numeric)] text-[0.75rem] text-[var(--accent)]">
-                06
-              </div>
-              <div data-testid="landing-methodology-copy" className="min-w-0">
-                <h2
-                  id="landing-methodology-title"
-                  className="font-[family-name:var(--font-display)] text-[26px] font-semibold leading-[1.16]"
-                >
-                  {message(messages, "landing.methodologyHeading")}
-                </h2>
-                <p data-testid="landing-methodology-intro" className="mt-4 text-[0.8125rem] leading-[1.75] text-[var(--body)]">
-                  {message(messages, "landing.methodologyDescription")}
-                </p>
-                <Link
-                  data-testid="landing-methodology-link"
-                  href={pageHref("/methodology", locale)}
-                  prefetch={false}
-                  className="mt-1 inline-flex min-h-11 items-center text-[0.78125rem] font-semibold text-[var(--accent)] underline decoration-[1.5px] underline-offset-4"
-                >
-                  {message(messages, "landing.methodologyLink")}
-                </Link>
-              </div>
-              <ol className="border-t border-[var(--hairline-soft)]">
-                {METHODOLOGY_STEPS.map((label, index) => (
-                  <li
-                    key={label}
-                    className="grid grid-cols-[28px_1fr] gap-3 border-b border-[var(--hairline-soft)] py-2.5 text-[0.71875rem] text-[var(--body)]"
-                  >
-                    <span aria-hidden="true" className="font-[family-name:var(--font-numeric)] text-[var(--faint)]">
-                      {String(index + 1).padStart(2, "0")}
-                    </span>
-                    <span>{message(messages, label)}</span>
-                  </li>
-                ))}
-              </ol>
-            </section>
-          </div>
+          <Chapter id="ch-01" first link={chapterLink(1, "/explorer/analysis")} title={t("landing.ch1.title")} lede={t("landing.ch1.lede")}>
+            <ScaleChapter data={chapters.scale} labels={scaleLabels} />
+          </Chapter>
+          <Chapter id="ch-02" link={chapterLink(2, "/explorer/expenditure")} title={t("landing.ch2.title")} lede={chapters.sentences.spending}>
+            <SpendingChapter data={chapters.spending} labels={spendingLabels} />
+          </Chapter>
+          <Chapter id="ch-03" link={chapterLink(3, "/explorer/revenue")} title={t("landing.ch3.title")} lede={chapters.sentences.revenue}>
+            <RevenueChart data={chapters.revenue} labels={revenueLabels} />
+          </Chapter>
+          <Chapter id="ch-04" link={chapterLink(4, "/explorer/municipalities")} title={t("landing.ch4.title")} lede={chapters.sentences.municipal}>
+            <MunicipalRelief data={chapters.municipal} labels={municipalLabels} />
+          </Chapter>
+          <Chapter id="ch-05" link={chapterLink(5, "/explorer/deficit")} title={t("landing.ch5.title")} lede={chapters.sentences.deficit}>
+            <DeficitChart data={chapters.deficit} labels={deficitLabels} />
+          </Chapter>
+          <SourcesSection sources={chapters.sources} labels={sourcesLabels} locale={locale} />
+          <AiSection endpoint={mcpEndpoint} tools={chapters.tools} labels={aiLabels} locale={locale} />
         </main>
 
-        <SiteFooter locale={locale} updatedAt={model.updatedAt} />
+        <SiteFooter variant="site" path="/" locale={locale} updatedAt={updatedAt} />
       </div>
     </div>
   );

@@ -70,7 +70,8 @@ test("loads both analytics projects on Fiscal.ge without a consent step or dupli
     await expect(page.locator(`script[src="${src}"]`)).toHaveJSProperty("async", true);
   }
 
-  await page.getByRole("link", { name: "ხარჯების მონაცემები →", exact: true }).click();
+  // Chapter 02's heading links to the spending explorer.
+  await page.locator('#ch-02 a[href="/explorer/expenditure"]').click();
   await expect(page).toHaveURL(`${productionOrigin}/explorer/expenditure`);
   await expect(page.getByRole("heading", { name: "როგორ იხარჯება საქართველოს ბიუჯეტი", exact: true })).toBeVisible();
 

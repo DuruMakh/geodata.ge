@@ -393,7 +393,7 @@ export async function renderConnectPage(locale: Locale) {
             <p className="mt-3 max-w-[900px] text-[0.75rem] leading-[1.9] text-[var(--muted)]" data-testid="connect-fair-use">{message(messages, "connect.fairUse")}</p>
           </section>
         </main>
-        <SiteFooter locale={locale} updatedAt={model.updatedAt} />
+        <SiteFooter variant="site" path="/connect" locale={locale} updatedAt={model.updatedAt} />
       </div>
     </div>
   );
