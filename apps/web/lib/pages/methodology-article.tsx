@@ -11,6 +11,7 @@ import { MethodologyArticle } from "../../components/methodology/methodology-art
 import { JsonLd } from "../../components/seo/json-ld";
 import { SiteFooter } from "../../components/site/site-footer";
 import { loadServedGovernmentDebtData, loadServedLandingData, loadServedMunicipalData } from "../data/servedData";
+import { isPlannedYear } from "../explorer/explorerData";
 import {
   deriveMethodologyCoverage,
   LIVE_METHODOLOGY_IDS,
@@ -261,6 +262,14 @@ export async function renderMethodologyArticle(locale: Locale, { params }: Metho
     loadEnglishCatalogue(repositoryRoot),
   ]);
   const coverage = deriveMethodologyCoverage(dataset, landingData.facts, municipalData.totalFacts, debtData.facts, archiveSummaries[dataset]);
+  // A budget side whose latest year holds a planned value names it apart from the actual years in its basis line.
+  const coverageSource = METHODOLOGY_CONTENT[dataset].coverageSource;
+  const plannedYear = coverageSource.kind === "budgetSide" && isPlannedYear(landingData.facts, coverageSource.side, coverage.lastYear)
+    ? {
+        year: coverage.lastYear,
+        lastActualYear: Math.max(...landingData.facts.filter((fact) => fact.side === coverageSource.side && fact.year < coverage.lastYear).map((fact) => fact.year)),
+      }
+    : undefined;
   const publicRows = projectPublicSources(rows, locale, catalogue.documents);
 
   return (
@@ -289,6 +298,7 @@ export async function renderMethodologyArticle(locale: Locale, { params }: Metho
         messages={messages}
         content={content}
         coverage={coverage}
+        plannedYear={plannedYear}
         rows={publicRows}
         archiveSummary={archiveSummaries[dataset]}
         processedDataHref={DATASET_DOWNLOADS[dataset]}

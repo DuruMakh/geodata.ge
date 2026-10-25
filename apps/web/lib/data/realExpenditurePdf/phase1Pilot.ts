@@ -207,7 +207,7 @@ function normalizeNonDottedCode(code: string): string {
   return code;
 }
 
-function parentFunctionalCode(code: string): string | null {
+export function parentFunctionalCode(code: string): string | null {
   const parts = code.split(".");
   if (parts.length <= 2) return null;
   return parts.slice(0, -1).join(".");
@@ -217,7 +217,7 @@ function isTopFunctionalCode(code: string | null): boolean {
   return Boolean(code && code.split(".").length === 2);
 }
 
-function buildRowId(input: {
+export function buildRowId(input: {
   year: number;
   formId: string;
   functionalCode: string | null;

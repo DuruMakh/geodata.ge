@@ -1,0 +1,10 @@
+{
+  "convertedFile": "data/staging/budget-law-2026/2026-tavi-III.docx",
+  "convertedSha256": "ef4484ce21102eb35d2a6bd1e6c49f058214512ce782fe127f6af94547adea7a",
+  "sourceFile": "docs/Raw Data/Expenditure/mof.ge/budget-law-2026/2026-tavi-III.doc",
+  "sourceSha256": "4244b3c5cc9565da0326e88397dd21af727391fc9d6c8347a2adad2e69fb8297",
+  "converterCommand": "soffice --headless --convert-to docx --outdir data/staging/budget-law-2026 \"docs/Raw Data/Expenditure/mof.ge/budget-law-2026/2026-tavi-III.doc\"",
+  "converterVersion": "LibreOffice 24.2.7.2 420(Build:2)",
+  "convertedOn": "2026-10-24",
+  "note": "Generated intermediate, never a raw source. The converted bytes are not reproducible across LibreOffice versions, so only its parsed table content is tested; the source hash above is the authority."
+}

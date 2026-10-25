@@ -95,7 +95,7 @@ export function LandingDatasetSection({
           <table
             className="mt-3 w-full table-fixed text-[0.6875rem]"
           >
-            <caption className="sr-only">{message(messages, "landing.tableCaption", { heading, year: summary.latestYear })}</caption>
+            <caption className="sr-only">{message(messages, summary.basis === "planned" ? "landing.tableCaptionPlanned" : "landing.tableCaption", { heading, year: summary.latestYear })}</caption>
             <colgroup>
               {/* The amount column holds "10.2 მლრდ ₾" at the 11px phone floor down to 360px. */}
               <col className="w-[48%]" />

@@ -347,7 +347,9 @@ function debtSeriesIds(snapshot: FactQuerySnapshot, kind: "amount" | "rate"): st
 }
 
 export function buildDatasetFiles(snapshot: FactQuerySnapshot): PublicationArtifact[] {
-  const nationalYears = yearsOf(snapshot.national.facts);
+  // Per side: a planned year (2026) covers expenditure only, so revenue must not be asked for it.
+  const nationalYears = (side: "revenue" | "expenditure") =>
+    yearsOf(snapshot.national.facts.filter((fact) => fact.side === side));
   const seriesFor = (side: "revenue" | "expenditure") => [
     ...new Set(snapshot.national.facts.filter((fact) => fact.side === side).map((fact) => fact.itemId)),
   ];
@@ -374,7 +376,7 @@ export function buildDatasetFiles(snapshot: FactQuerySnapshot): PublicationArtif
       queryNational(snapshot, {
         side: "revenue",
         seriesIds: [...seriesFor("revenue"), ...totalSeriesIds(snapshot, "national-revenue")],
-        years: nationalYears,
+        years: nationalYears("revenue"),
         measure: "amount_gel",
       }),
       gdp,
@@ -386,7 +388,7 @@ export function buildDatasetFiles(snapshot: FactQuerySnapshot): PublicationArtif
       queryNational(snapshot, {
         side: "expenditure",
         seriesIds: [...seriesFor("expenditure"), ...totalSeriesIds(snapshot, "national-expenditure")],
-        years: nationalYears,
+        years: nationalYears("expenditure"),
         measure: "amount_gel",
       }),
       gdp,

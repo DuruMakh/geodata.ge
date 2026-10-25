@@ -3,7 +3,6 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import { parse } from "csv-parse/sync";
 import * as XLSX from "xlsx";
-import { generateCandidateMappings } from "../lib/data/realExpenditure/candidateMapping";
 import { parseAdminWorkbookRows } from "../lib/data/adminSpending/extractWorkbooks";
 import type { MatrixCell } from "../lib/data/realExpenditure/parseTavi6Rows";
 import {
@@ -12,9 +11,12 @@ import {
   final2025ExpenditureFactsToCsv,
   final2025SupplementsToCsv,
   finalExpenditureOutputFiles,
-  type SupplementMapping,
-  type WorkbookStagingRow,
 } from "../lib/data/realExpenditurePdf/final2025Data";
+import {
+  supplementMappingsByCode,
+  workbookRowsToSupplementRows,
+  type ReviewMappingCsvRow,
+} from "../lib/data/realExpenditurePdf/supplementMappings";
 import {
   generateCompactPdfSpendingMappings,
   validateCompactPdfSpendingMappings,
@@ -33,16 +35,6 @@ import {
   requestedYear,
 } from "../lib/data/realExpenditurePdf/expenditureSourcesByYear";
 
-
-type ReviewMappingCsvRow = {
-  year: string;
-  code: string;
-  label_ka: string;
-  actual_gel: string;
-  mapping_confidence: "high" | "medium" | "low" | "unclassified";
-  reviewed_public_spending_field_id: string;
-  review_notes: string;
-};
 
 type SpendingField = {
   id: string;
@@ -120,79 +112,6 @@ async function readWorkbookRows(): Promise<ReturnType<typeof parseAdminWorkbookR
   });
 }
 
-function workbookRowsToSupplementRows(rows: ReturnType<typeof parseAdminWorkbookRows>): WorkbookStagingRow[] {
-  return rows.map((row) => ({
-    year: row.year,
-    sourceId: row.sourceId,
-    code: row.code,
-    isCodedRow: row.isCodedRow,
-    isLeafCode: row.isLeafCode,
-    labelKa: row.labelKa,
-    actualGel: Math.round(row.actualThousandGel * 1000),
-  }));
-}
-
-function mappingsByCode(rows: ReviewMappingCsvRow[]): Map<string, SupplementMapping> {
-  return new Map(
-    rows
-      .filter((row) => row.year === String(source.year) && row.reviewed_public_spending_field_id)
-      .map((row) => [
-        row.code,
-        {
-          publicSpendingFieldId: row.reviewed_public_spending_field_id,
-          mappingConfidence: row.mapping_confidence,
-          labelKa: row.label_ka,
-          mappingNotes: row.review_notes,
-        },
-      ]),
-  );
-}
-
-function reviewedMappingsByLabel(rows: ReviewMappingCsvRow[]): Map<string, SupplementMapping> {
-  const mappings = new Map<string, SupplementMapping>();
-
-  for (const row of rows.filter(
-    (candidate) =>
-      candidate.reviewed_public_spending_field_id &&
-      candidate.reviewed_public_spending_field_id !== "spending.other_unclassified",
-  )) {
-    if (mappings.has(row.label_ka)) continue;
-    mappings.set(row.label_ka, {
-      publicSpendingFieldId: row.reviewed_public_spending_field_id,
-      mappingConfidence: row.mapping_confidence,
-      labelKa: row.label_ka,
-      mappingNotes: `Propagated from reviewed 2023-2025 row by exact Georgian label match: ${row.review_notes}`,
-    });
-  }
-
-  return mappings;
-}
-
-function supplementMappingsByCode(input: {
-  reviewRows: ReviewMappingCsvRow[];
-  workbookRows: ReturnType<typeof parseAdminWorkbookRows>;
-}): Map<string, SupplementMapping> {
-  const mappings = mappingsByCode(input.reviewRows);
-  const mappingsByLabel = reviewedMappingsByLabel(input.reviewRows);
-
-  for (const row of generateCandidateMappings(input.workbookRows)) {
-    if (mappings.has(row.code)) continue;
-    const reviewedMapping = mappingsByLabel.get(row.labelKa);
-    if (reviewedMapping) {
-      mappings.set(row.code, reviewedMapping);
-      continue;
-    }
-    mappings.set(row.code, {
-      publicSpendingFieldId: row.suggestedPublicSpendingFieldId,
-      mappingConfidence: row.mappingConfidence,
-      labelKa: row.labelKa,
-      mappingNotes: `Generated older-year supplement mapping candidate: ${row.mappingReason}`,
-    });
-  }
-
-  return mappings;
-}
-
 async function loadSpendingFieldIds(): Promise<string[]> {
   const content = await readFile(repoPath("data/taxonomy/spending-fields.json"), "utf8");
   const fields = JSON.parse(content) as SpendingField[];
@@ -246,6 +165,7 @@ async function main() {
   );
   const workbookRows = await readWorkbookRows();
   const supplementMappings = supplementMappingsByCode({
+    year: source.year,
     reviewRows: reviewMappingRows,
     workbookRows,
   });

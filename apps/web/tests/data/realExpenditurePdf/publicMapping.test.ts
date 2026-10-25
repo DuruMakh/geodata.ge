@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { parseExpenditurePdfText } from "../../../lib/data/realExpenditurePdf/phase1Pilot";
 import {
+  budgetLawArticle9ExtraMappingRules,
   expenditurePdfCompactMappingOutputFileForYear,
   generateCompactPdfSpendingMappings,
   pdfSpendingMappingsToCsv,
@@ -134,6 +135,33 @@ describe("PDF public spending mapping", () => {
         publicSpendingFieldId: "spending.culture",
         mappingConfidence: "medium",
       }),
+    );
+  });
+
+  it("maps 7.1.2 only when the budget-law extra rules are passed", () => {
+    const rows = parseExpenditurePdfText({
+      ...source,
+      pages: [
+        {
+          pageNumber: 1,
+          text: `
+            00 total 30.00 30.00 30.00 30.00 0.00
+            7.1 general public services
+            00 total 30.00 30.00 30.00 30.00 0.00
+            7.1.1 administration
+            00 total 28.00 28.00 28.00 28.00 0.00
+            7.1.2 foreign economic aid
+            00 total 2.00 2.00 2.00 2.00 0.00
+          `,
+        },
+      ],
+    });
+
+    expect(generateCompactPdfSpendingMappings(rows).map((row) => row.functionalCode)).toEqual(["7.1.1"]);
+    const lawMappings = generateCompactPdfSpendingMappings(rows, budgetLawArticle9ExtraMappingRules);
+    expect(lawMappings.map((row) => row.functionalCode)).toEqual(["7.1.1", "7.1.2"]);
+    expect(lawMappings[1]).toEqual(
+      expect.objectContaining({ publicSpendingFieldId: "spending.general_public_services", mappingConfidence: "medium" }),
     );
   });
 

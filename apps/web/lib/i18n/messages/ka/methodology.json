@@ -16,6 +16,7 @@
   "methodology.openDocument": "ღია დოკუმენტი, რომელიც პირველწყაროდან შემოწმებულ მონაცემებამდე გზას აჩვენებს",
   "methodology.articleOverline": "მონაცემთა ტექნიკური საველე წიგნი",
   "methodology.methodologyReviewed": "ბოლო მეთოდოლოგიური განხილვა · {date}",
+  "methodology.basisWithPlannedYear": "{basis}, {firstYear}–{lastActualYear}; {year} — დამტკიცებული გეგმა",
   "methodology.translationReviewed": "ინგლისური თარგმანის განხილვა · {date}",
   "methodology.processedDownload": "სრული დამუშავებული მონაცემები — CSV",
   "methodology.processedNote": "UTF-8 / Excel თავსებადი · CC BY 4.0 · წყაროსა და სტატუსის მეტამონაცემებით",

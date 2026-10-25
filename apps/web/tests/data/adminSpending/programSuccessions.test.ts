@@ -4,6 +4,8 @@ import { generateAdminSpendingFacts } from "../../../lib/data/adminSpending/gene
 import { extractAdminSpendingOfficialRows } from "../../../lib/data/adminSpending/extractWorkbooks";
 import { PROGRAM_SUCCESSIONS, type ProgramSuccession } from "../../../lib/data/adminSpending/programSuccessions";
 import type { AdminSpendingFact } from "../../../lib/data/adminSpending/types";
+import { lawTavi6OfficialRows } from "../../../lib/data/budgetLaw/lawRows";
+import { PLANNED_BUDGET_YEARS } from "../../../lib/data/coverage";
 
 /**
  * Guards for PROGRAM_SUCCESSIONS (owner-approved 2026-07-09): every drill-down series must be
@@ -20,11 +22,12 @@ function canonicalItemId(succession: ProgramSuccession): string {
   return `admin_program.${succession.targetCode.replaceAll(" ", "_")}.${hash}`;
 }
 
+// 2004-2025 executed years plus the 2026 budget-law plan, as the generator script runs them.
 let cachedProgramFacts: AdminSpendingFact[] | null = null;
 function programFacts(): AdminSpendingFact[] {
-  cachedProgramFacts ??= generateAdminSpendingFacts(extractAdminSpendingOfficialRows()).filter(
-    (fact) => fact.level === "major_program",
-  );
+  cachedProgramFacts ??= generateAdminSpendingFacts([...extractAdminSpendingOfficialRows(), ...lawTavi6OfficialRows()], {
+    plannedYears: PLANNED_BUDGET_YEARS,
+  }).filter((fact) => fact.level === "major_program");
   return cachedProgramFacts;
 }
 
@@ -91,7 +94,8 @@ describe("PROGRAM_SUCCESSIONS structure", () => {
 });
 
 describe("succession-joined series continuity (real data)", () => {
-  // canonical code (+ era key) -> expected continuous year range of the merged series.
+  // canonical code (+ era key) -> expected continuous year range of the merged series; a series the
+  // 2026 budget law continues runs to 2026.
   const EXPECTED_SERIES: Array<{
     targetCode: string;
     parentItemId: string;
@@ -99,25 +103,25 @@ describe("succession-joined series continuity (real data)", () => {
     years: [number, number];
     label: string;
   }> = [
-    { targetCode: "27 02", parentItemId: "admin_spending.health_social_affairs", years: [2006, 2025], label: "social protection" },
-    { targetCode: "27 03", parentItemId: "admin_spending.health_social_affairs", years: [2006, 2025], label: "health care" },
-    { targetCode: "27 06", parentItemId: "admin_spending.health_social_affairs", years: [2006, 2025], label: "IDP support" },
-    { targetCode: "26 02", parentItemId: "admin_spending.justice", targetEraKey: "penitentiary_system", years: [2012, 2025], label: "penitentiary" },
-    { targetCode: "24 14", parentItemId: "admin_spending.economy_sustainable_development", years: [2014, 2025], label: "transmission grid" },
-    { targetCode: "31 05", parentItemId: "admin_spending.environment_agriculture", years: [2017, 2025], label: "agro-project" },
-    { targetCode: "31 06", parentItemId: "admin_spending.environment_agriculture", targetEraKey: "irrigation_modernization", years: [2017, 2025], label: "irrigation" },
-    { targetCode: "29 07", parentItemId: "admin_spending.defence", targetEraKey: "defence_capabilities", years: [2017, 2025], label: "defence capabilities" },
-    { targetCode: "29 08", parentItemId: "admin_spending.defence", targetEraKey: "logistics", years: [2018, 2025], label: "logistics" },
-    { targetCode: "25 06", parentItemId: "admin_spending.regional_development_infrastructure", targetEraKey: "school_infrastructure", years: [2019, 2025], label: "school construction" },
-    { targetCode: "25 07", parentItemId: "admin_spending.regional_development_infrastructure", targetEraKey: "tourism_infrastructure", years: [2023, 2025], label: "tourism infrastructure" },
-    { targetCode: "34 02", parentItemId: "admin_spending.sport", years: [2010, 2025], label: "sport development" },
-    { targetCode: "33 02", parentItemId: "admin_spending.culture", targetEraKey: "culture_development", years: [2019, 2025], label: "culture development" },
+    { targetCode: "27 02", parentItemId: "admin_spending.health_social_affairs", years: [2006, 2026], label: "social protection" },
+    { targetCode: "27 03", parentItemId: "admin_spending.health_social_affairs", years: [2006, 2026], label: "health care" },
+    { targetCode: "27 06", parentItemId: "admin_spending.health_social_affairs", years: [2006, 2026], label: "IDP support" },
+    { targetCode: "26 02", parentItemId: "admin_spending.justice", targetEraKey: "penitentiary_system", years: [2012, 2026], label: "penitentiary" },
+    { targetCode: "24 14", parentItemId: "admin_spending.economy_sustainable_development", years: [2014, 2026], label: "transmission grid" },
+    { targetCode: "31 05", parentItemId: "admin_spending.environment_agriculture", years: [2017, 2026], label: "agro-project" },
+    { targetCode: "31 06", parentItemId: "admin_spending.environment_agriculture", targetEraKey: "irrigation_modernization", years: [2017, 2026], label: "irrigation" },
+    { targetCode: "29 07", parentItemId: "admin_spending.defence", targetEraKey: "defence_capabilities", years: [2017, 2026], label: "defence capabilities" },
+    { targetCode: "29 08", parentItemId: "admin_spending.defence", targetEraKey: "logistics", years: [2018, 2026], label: "logistics" },
+    { targetCode: "25 06", parentItemId: "admin_spending.regional_development_infrastructure", targetEraKey: "school_infrastructure", years: [2019, 2026], label: "school construction" },
+    { targetCode: "25 07", parentItemId: "admin_spending.regional_development_infrastructure", targetEraKey: "tourism_infrastructure", years: [2023, 2026], label: "tourism infrastructure" },
+    { targetCode: "34 02", parentItemId: "admin_spending.sport", years: [2010, 2026], label: "sport development" },
+    { targetCode: "33 02", parentItemId: "admin_spending.culture", targetEraKey: "culture_development", years: [2019, 2026], label: "culture development" },
     { targetCode: "32 09", parentItemId: "admin_spending.education_science_youth", targetEraKey: "millennium_challenge_second_project", years: [2014, 2018], label: "Millennium Challenge" },
-    { targetCode: "57 01", parentItemId: "admin_spending.debt_service", years: [2012, 2025], label: "external debt service" },
-    { targetCode: "57 02", parentItemId: "admin_spending.debt_service", years: [2012, 2025], label: "domestic debt service" },
-    { targetCode: "57 04", parentItemId: "admin_spending.other_costs", years: [2012, 2025], label: "municipal transfers" },
-    { targetCode: "57 11", parentItemId: "admin_spending.other_costs", years: [2018, 2025], label: "pension co-financing" },
-    { targetCode: "57 14", parentItemId: "admin_spending.other_costs", years: [2012, 2025], label: "donor-financed payments" },
+    { targetCode: "57 01", parentItemId: "admin_spending.debt_service", years: [2012, 2026], label: "external debt service" },
+    { targetCode: "57 02", parentItemId: "admin_spending.debt_service", years: [2012, 2026], label: "domestic debt service" },
+    { targetCode: "57 04", parentItemId: "admin_spending.other_costs", years: [2012, 2026], label: "municipal transfers" },
+    { targetCode: "57 11", parentItemId: "admin_spending.other_costs", years: [2018, 2026], label: "pension co-financing" },
+    { targetCode: "57 14", parentItemId: "admin_spending.other_costs", years: [2012, 2026], label: "donor-financed payments" },
     { targetCode: "55 14", parentItemId: "admin_spending.other_costs", years: [2021, 2022], label: "pilot regions" },
   ];
 

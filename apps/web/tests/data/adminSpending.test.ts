@@ -700,6 +700,45 @@ describe("admin spending facts", () => {
     );
   });
 
+  it("marks the rows of planned years as basis planned and every other year as actual", () => {
+    const rows = [
+      programRow(2025, "32 02", "preschool and general education", 150_000),
+      officialRow(2025, "32 02 01", "general education", 150_000),
+      programRow(2026, "32 02", "preschool and general education", 160_000),
+      officialRow(2026, "32 02 01", "general education", 160_000),
+    ];
+
+    const facts = generateAdminSpendingFacts(rows, { plannedYears: [2026] });
+
+    expect(facts.filter((fact) => fact.year === 2025).map((fact) => fact.basis)).toEqual(["actual", "actual"]);
+    expect(facts.filter((fact) => fact.year === 2026).map((fact) => fact.basis)).toEqual(["planned", "planned"]);
+    expect(generateAdminSpendingFacts(rows).every((fact) => fact.basis === "actual")).toBe(true);
+  });
+
+  it("routes the 2026 Infrastructure and Regional Development ministries to regional development and infrastructure", () => {
+    for (const institutionLabelKa of ["საქართველოს ინფრასტრუქტურის სამინისტრო", "საქართველოს რეგიონული განვითარების სამინისტრო"]) {
+      expect(classifyAdminSpendingCategory(officialRow(2026, "25 02 02", "roads", 1, { institutionLabelKa }))).toBe(
+        "admin_spending.regional_development_infrastructure",
+      );
+    }
+  });
+
+  it("lets a planned year add a major-program series without promoting its actual years", () => {
+    const rows = [
+      programRow(2025, "24 08", "innovation and technology", 84_000),
+      programRow(2026, "24 08", "innovation and technology", 156_000),
+    ];
+
+    const planned = generateAdminSpendingFacts(rows, { plannedYears: [2026] }).filter(
+      (fact) => fact.level === "major_program",
+    );
+    const bothActual = generateAdminSpendingFacts(rows).filter((fact) => fact.level === "major_program");
+
+    expect(planned.map((fact) => [fact.year, fact.basis])).toEqual([[2026, "planned"]]);
+    expect(bothActual.map((fact) => fact.year)).toEqual([2025, 2026]);
+    expect(planned[0].itemId).toBe(bothActual[1].itemId);
+  });
+
   it("allows small GEL rounding drift when reconciling category totals to source totals", () => {
     const rows = [
       officialRow(2025, "00 00", "total", 1000, {

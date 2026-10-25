@@ -7,7 +7,7 @@ import type {
 } from "../servedRows";
 import { MUNICIPAL_COUNTRY_BUDGET_COUNT } from "./municipalData";
 import { chooseActivePublicFacts } from "../data/activeFacts";
-import { isDerivedTotalItemId } from "./explorerData";
+import { isDerivedTotalItemId, isPlannedYear } from "./explorerData";
 import { formatAmount, formatShare } from "./format";
 import { INK } from "./colors";
 import { BUDGET_SECTIONS } from "./sections";
@@ -76,7 +76,8 @@ export function buildHubCards(
   const expenditure = totalsByYear(facts, "expenditure");
   const revenue = totalsByYear(facts, "revenue");
 
-  const build = (totals: Map<number, number>) => {
+  const yearLabel = (year: number) => translated("main.plannedYear", `${year} გეგმა`, { year });
+  const build = (totals: Map<number, number>, planned = false) => {
     const years = Array.from(totals.keys()).sort((a, b) => a - b);
     const first = years.at(0);
     const latest = years.at(-1) ?? null;
@@ -91,12 +92,13 @@ export function buildHubCards(
 
     return {
       series: span.length > 0 ? span.map((year) => totals.get(year) ?? null) : null,
-      footer: latest === null ? null : `${latest} · ${formatAmount(totals.get(latest) ?? 0, locale)}`,
+      footer: latest === null ? null : `${planned ? yearLabel(latest) : latest} · ${formatAmount(totals.get(latest) ?? 0, locale)}`,
       latest,
     };
   };
 
-  const spend = build(expenditure);
+  const spendIsPlanned = isPlannedYear(facts, "expenditure", Array.from(expenditure.keys()).sort((a, b) => a - b).at(-1) ?? null);
+  const spend = build(expenditure, spendIsPlanned);
   const spendByType = build(expenditureTypeTotals);
   const revenues = build(revenue);
   const municipal = build(municipalTotals);
@@ -185,7 +187,7 @@ export function buildHubCards(
       footer:
         analysisYear === null
           ? null
-          : translated("hub.analysisFooter", `${analysisYear} · ${categoryCount(facts, "expenditure", analysisYear)} კატეგორია`, { year: analysisYear, count: categoryCount(facts, "expenditure", analysisYear) }),
+          : translated("hub.analysisFooter", `${spendIsPlanned ? yearLabel(analysisYear) : analysisYear} · ${categoryCount(facts, "expenditure", analysisYear)} კატეგორია`, { year: spendIsPlanned ? yearLabel(analysisYear) : analysisYear, count: categoryCount(facts, "expenditure", analysisYear) }),
     },
     {
       index: "07",

@@ -6,6 +6,7 @@ import type { ClientTradeOverviewFact } from "../data/tradeOverview/types";
 import { formatAmount, formatInUnit, formatShare, UNIT_BN } from "../explorer/format";
 import { periodLabel } from "../explorer/inflationLabels";
 import { message } from "../i18n/messages";
+import type { LandingBasisStatus } from "./landingData";
 import type { Messages, Presentation } from "../i18n/types";
 
 // The landing's dataset row (owner decision D3, 2026-10-07): one link per
@@ -23,7 +24,8 @@ export type LandingDatasetLink = {
 
 export function buildLandingDatasetLinks(
   input: {
-    expenditure: { latestYear: number; totalGel: number };
+    /** `basis` "planned" marks the year as a plan; left out, the year is an actual one. */
+    expenditure: { latestYear: number; totalGel: number; basis?: LandingBasisStatus };
     gdpFacts: readonly Pick<ServedGdpObservation, "seriesId" | "year" | "value">[];
     cpiFacts: readonly Pick<ServedCpiFact, "seriesId" | "measure" | "period" | "value">[];
     unemploymentFacts: readonly Pick<ClientUnemploymentObservation, "dimension" | "indicatorId" | "year" | "value">[];
@@ -44,7 +46,7 @@ export function buildLandingDatasetLinks(
   const tradeBillion = Math.abs(trade.valueUsd) >= 1_000_000_000;
   const tradeUnit = { divisor: tradeBillion ? 1_000_000_000 : 1_000_000, label: t(tradeBillion ? "trade.unit.billion" : "trade.unit.million"), decimals: 1 };
   return [
-    { href: "/explorer", title: t("common.budget"), measure: t("landing.datasetBudgetMeasure"), period: String(input.expenditure.latestYear), value: formatAmount(input.expenditure.totalGel, locale) },
+    { href: "/explorer", title: t("common.budget"), measure: t("landing.datasetBudgetMeasure"), period: input.expenditure.basis === "planned" ? message(messages, "landing.plannedYear", { year: input.expenditure.latestYear }) : String(input.expenditure.latestYear), value: formatAmount(input.expenditure.totalGel, locale) },
     { href: "/explorer/economy", title: t("common.economy"), measure: t("landing.datasetEconomyMeasure"), period: String(gdp.year), value: formatAmount(gdp.value, locale) },
     { href: "/explorer/inflation", title: t("common.inflation"), measure: t("landing.datasetInflationMeasure"), period: periodLabel(messages, periodFromKey(cpi.period), "short"), value: formatShare(cpi.value / 100) },
     { href: "/explorer/unemployment", title: t("common.unemployment"), measure: t("landing.datasetUnemploymentMeasure"), period: String(unemployment.year), value: formatShare(unemployment.value / 100) },

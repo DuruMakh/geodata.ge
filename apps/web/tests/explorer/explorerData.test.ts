@@ -352,6 +352,27 @@ describe("main explorer data model", () => {
     expect(shareModel.points[1]?.value).toBeCloseTo(0.075, 4);
   });
 
+  it("gives a planned year with no GDP yet no share point and does not throw", () => {
+    const withPlan: BudgetFactImportRow[] = [
+      ...facts,
+      { ...facts[1]!, year: 2026, amountGel: 180, basis: "planned" },
+    ];
+    const shareModel = buildExplorerModel({
+      facts: withPlan,
+      glossary,
+      side: "expenditure",
+      selectedItemIds: ["spending.health"],
+      startYear: 2024,
+      endYear: 2026,
+      measure: "share_of_gdp",
+      gdpFacts,
+    });
+
+    expect(shareModel.points.find((point) => point.year === 2026)?.value).toBeNull();
+    expect(shareModel.tableRows[0]?.shareByYear?.[2026]).toBeNull();
+    expect(shareModel.points.find((point) => point.year === 2025)?.value).toBeCloseTo(0.075, 4);
+  });
+
   it("uses same-year GDP for detail and total rows regardless of selection", () => {
     const localFacts: BudgetFactImportRow[] = [
       { ...facts[1], itemId: "spending.health", amountGel: 250 },

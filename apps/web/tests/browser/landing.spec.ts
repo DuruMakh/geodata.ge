@@ -202,6 +202,8 @@ const LANDING_COPY = {
       "მეთოდოლოგია და პირველწყაროები",
     ],
     caption: (heading: string, year: string) => `${heading} — ${year} წლის მონაცემები`,
+    planCaption: (heading: string, year: string) => `${heading} — ${year} წლის გეგმა`,
+    planned: "გეგმა",
     amount: /^\d+\.\d მლრდ ₾$/,
     domesticDebt: "საშინაო ვალი",
     externalDebt: "საგარეო ვალი",
@@ -234,6 +236,8 @@ const LANDING_COPY = {
       "Methodology and original sources",
     ],
     caption: (heading: string, year: string) => `${heading} — data for ${year}`,
+    planCaption: (heading: string, year: string) => `${heading} — plan for ${year}`,
+    planned: "Planned",
     amount: /^\d+\.\d bn GEL$/,
     domesticDebt: "Domestic debt",
     externalDebt: "External debt",
@@ -312,7 +316,9 @@ for (const [locale, copy] of Object.entries(LANDING_COPY)) {
       const latestYear = (await section.getByTestId("landing-dataset-total").locator("strong").textContent())!;
       expect(latestYear).toMatch(/^\d{4}$/);
       await expect(section.locator("thead th").nth(1)).toHaveText(latestYear);
-      const caption = copy.caption(copy.sections[index]!, latestYear);
+      // A planned latest year names the plan in its caption.
+      const isPlanned = (await section.getByTestId("landing-dataset-total").locator("span").last().textContent()) === copy.planned;
+      const caption = (isPlanned ? copy.planCaption : copy.caption)(copy.sections[index]!, latestYear);
       await expect(section.locator("table caption")).toHaveText(caption);
       await expect(section.getByRole("table", { name: caption })).toHaveCount(1);
       await expect(section.getByRole("link")).toHaveAttribute("href", href(path));

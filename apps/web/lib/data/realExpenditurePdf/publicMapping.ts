@@ -31,7 +31,7 @@ export type CompactPdfSpendingMappingValidation = {
   missingCodes: string[];
 };
 
-type MappingRule = {
+export type MappingRule = {
   functionalCode: string;
   publicSpendingFieldId: string;
   mappingConfidence: MappingConfidence;
@@ -211,14 +211,30 @@ const mappingRules: MappingRule[] = [
   },
 ];
 
-export function generateCompactPdfSpendingMappings(rows: ExpenditurePdfOfficialRow[]): CompactPdfSpendingMappingRow[] {
+/**
+ * Rules used only for the budget law's Article 9 table, whose 7.1 total includes 7.1.2. The 2025 Treasury
+ * E11 report leaves 7.1.2 out of its 7.1 and grand totals, so mapping it there would overshoot the total.
+ */
+export const budgetLawArticle9ExtraMappingRules: MappingRule[] = [
+  {
+    functionalCode: "7.1.2",
+    publicSpendingFieldId: "spending.general_public_services",
+    mappingConfidence: "medium",
+    mappingReason: "7.1 split: foreign economic aid stays under general public services (budget law Article 9 only)",
+  },
+];
+
+export function generateCompactPdfSpendingMappings(
+  rows: ExpenditurePdfOfficialRow[],
+  extraRules: MappingRule[] = [],
+): CompactPdfSpendingMappingRow[] {
   const rowsByFunctionalCode = new Map(
     rows
       .filter((row) => row.rowType === "functional_total" && row.functionalCode)
       .map((row) => [row.functionalCode as string, row]),
   );
 
-  return mappingRules.flatMap((rule) => {
+  return [...mappingRules, ...extraRules].flatMap((rule) => {
     const row = rowsByFunctionalCode.get(rule.functionalCode);
     if (!row) return [];
 

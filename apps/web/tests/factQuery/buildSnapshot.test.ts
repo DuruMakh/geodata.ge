@@ -31,7 +31,8 @@ describe("buildFactQuerySnapshot", () => {
     // The nineteen demography canonical inputs (eighteen annual tables, six of them for marriages and divorces, and the census snapshot) supply new fact sources; the
     // package's validation inputs and definitions remain evidence.
     // The seven Wages workbooks, the seven Poverty documents, the 21 Household income and spending documents, the 55 Energy and food sources, the twenty-three Money and banks documents, the 26 Business documents, the 21 Housing archived sources, the 36 Health archived sources, the 22 Crime and justice archived sources, the 14 Labour detail archived sources, the 46 Education documents, the 46 Environment and climate archived sources, the 33 Science and culture archived sources, the 25 Social Service Agency sources, the six Pension Fund sources, the 25 Transport archived sources, the 36 Internet and technology archived sources, the five Tax breaks and refunds originals, the four Services trade workbooks, the four Trade composition originals and the three Foreign debt and Reserves originals are registered sources of human explorers only.
-    expect(sources).toHaveLength(648);
+    // The 2026 State Budget law (source.mof_2026_budget_law_planned) is the one planned-basis source behind the 2026 Spending plan.
+    expect(sources).toHaveLength(649);
     expect(sources.filter(source => source.sourceId.startsWith("source.geostat_services_")).map(source => source.sourceId).sort()).toEqual([
       "source.geostat_services_georgian_exports_of_services_by_countries",
       "source.geostat_services_georgian_exports_of_services_by_types",
@@ -81,8 +82,9 @@ describe("buildFactQuerySnapshot", () => {
   });
 
   it("carries the national, ministries, municipal and gdp facts", async () => {
-    expect(snapshot.national.facts.length).toBe(527);
-    expect(snapshot.ministries.facts.length).toBe(852);
+    // 527 + 13 and 852 + 62: the planned 2026 rows from the budget law (spending fields, ministries).
+    expect(snapshot.national.facts.length).toBe(540);
+    expect(snapshot.ministries.facts.length).toBe(914);
     expect(snapshot.municipal.functionFacts.length).toBe(7040);
     expect(snapshot.municipal.totalFacts.length).toBe(704);
     expect(snapshot.gdpFacts.length).toBe(30);
@@ -137,10 +139,12 @@ describe("buildFactQuerySnapshot", () => {
   // LEGACY_PROGRAM_JOINS carries year, so the joined years are in the tables already —
   // 50 legacy-join cells across 9 series, 140 further succession cells across 20
   // series (four of the 20 are also reached by a legacy join), 190 cells and 25
-  // distinct series once deduplicated. Cross-checked against the reviewed CSV's own
+  // distinct series once deduplicated; the 2026 budget-law successions add 8 cells
+  // (2026 points of 57 01/02/04/11/14, 25 06 school construction, 25 07 tourism and
+  // 24 17 Anaklia, the last a new series), so 198 cells and 26 series. Cross-checked against the reviewed CSV's own
   // mapping_notes and ministries-drilldown-programs-methodology.md §6. Asserting the
   // exact totals here is what keeps program_historical_join honest: a derivation that
-  // silently widened to whole series would blow past 190.
+  // silently widened to whole series would blow past 198.
   it("resolves historical joins to the exact served cells that came in through a join", async () => {
     const servedProgramCells = new Set(
       snapshot.ministries.facts.filter((f) => f.level === "major_program").map((f) => `${f.itemId}:${f.year}`),
@@ -148,8 +152,8 @@ describe("buildFactQuerySnapshot", () => {
     const cells = snapshot.ministries.historicalJoinSeriesYears;
     const seriesIds = new Set(cells.map((cell) => cell.slice(0, cell.lastIndexOf(":"))));
 
-    expect(cells.length).toBe(190);
-    expect(seriesIds.size).toBe(25);
+    expect(cells.length).toBe(198);
+    expect(seriesIds.size).toBe(26);
 
     // Every joined cell is a real served major_program row: the caveat can never pin
     // to a cell the query would return as missing.
