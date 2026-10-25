@@ -13,6 +13,8 @@ export type Place = {
   kind: "region" | "municipality";
   nameKa: string;
   nameEn: string;
+  /** Other spellings search also knows the place by (`Zestaponi`, `Ajara`, `Stepantsminda`). */
+  aliases?: string[];
   /** A municipality's region; a region's own id. */
   regionId: string;
   /** Tbilisi: a region, the capital, whose one municipality is itself. */
@@ -35,6 +37,8 @@ export type PlaceEntry = {
   number: number;
   /** The figure's period as the page writes it (`2025`, `2025/26`, `სექ 2026`). */
   period: string;
+  /** What the figure counts, where the page's name does not say (`Births` on Births and deaths), as the page's card captions it. */
+  caption?: string;
 };
 
 export type PlaceIndex = { places: Place[]; entries: PlaceEntry[] };

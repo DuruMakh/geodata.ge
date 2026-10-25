@@ -1,4 +1,5 @@
 import type { Locale } from "../../i18n/types";
+import { ageSexEntries } from "./adapters/ageSex";
 import { airQualityEntries } from "./adapters/airQuality";
 import { areaFamilyEntries } from "./adapters/areaFamilies";
 import { educationEntries } from "./adapters/education";
@@ -17,7 +18,7 @@ import type { PlaceAdapter, PlaceEntry, PlaceIndex } from "./types";
 
 /** One adapter per place-page family. The municipal budget comes first: a place's own rows list it first. */
 const ADAPTERS: readonly PlaceAdapter[] = [
-  municipalBudgetEntries, populationEntries, vitalEntries, marriageEntries, educationEntries, socialEntries, inflationCityEntries,
+  municipalBudgetEntries, populationEntries, ageSexEntries, vitalEntries, marriageEntries, educationEntries, socialEntries, inflationCityEntries,
   airQualityEntries, regionalEconomyEntries, areaFamilyEntries, householdEntries, labourRegionEntries, healthDeathsEntries,
 ];
 

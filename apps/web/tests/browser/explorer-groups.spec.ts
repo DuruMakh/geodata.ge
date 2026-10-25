@@ -615,6 +615,89 @@ test.describe("All data", () => {
     await expect(page.getByTestId("place-fact")).toHaveCount(4);
     expect(requests).toBe(1);
   });
+
+  test("with the pointer resting over the results, the arrow keys still move one row at a time (search #4)", async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await page.goto("/explorer");
+    await ready(page);
+    // The pointer rests where the results will come, as a laptop's cursor does; the keys then scroll rows under it.
+    await page.mouse.move(640, 600);
+    await search(page).fill("ბათუმი");
+    await expect(page.getByTestId("place-card")).toBeVisible();
+    expect(await page.getByRole("option").count()).toBeGreaterThan(12);
+    for (let index = 0; index < 12; index++) {
+      await search(page).press("ArrowDown");
+      await expect(search(page)).toHaveAttribute("aria-activedescendant", `explorer-o${index}`);
+    }
+    // A real move of the pointer still picks the row under it.
+    const under = page.getByRole("option").nth(3);
+    await under.scrollIntoViewIfNeeded();
+    const target = (await under.boundingBox())!;
+    await page.mouse.move(target.x + 40, target.y + target.height / 2, { steps: 3 });
+    await expect(search(page)).toHaveAttribute("aria-activedescendant", "explorer-o3");
+  });
+
+  for (const width of [390, 1280]) {
+    test(`at ${width}px a long unbroken query wraps instead of scrolling the page sideways (search #6)`, async ({ page }) => {
+      await page.setViewportSize({ width, height: 800 });
+      for (const query of ["https://www.geostat.ge/ka/modules/categories/41/samomkhmareblo-fasebis-indeksi", "ა".repeat(80), "q".repeat(80)]) {
+        await page.goto(`/explorer#q=${encodeURIComponent(query)}`);
+        await ready(page);
+        await expect(page.getByTestId("search-none").or(page.getByTestId("search-reading")).first()).toBeVisible();
+        expect(await page.evaluate(() => document.documentElement.scrollWidth), query).toBe(width);
+      }
+    });
+  }
+
+  test("without JavaScript the inert box and example words are hidden, and the A to Z list works (search #15)", async ({ browser, baseURL }) => {
+    const context = await browser.newContext({ javaScriptEnabled: false, baseURL });
+    try {
+      const page = await context.newPage();
+      await page.goto("/explorer");
+      await expect(page.getByTestId("all-data-search")).toBeHidden();
+      await expect(page.getByTestId("search-chip").first()).toBeHidden();
+      await expect(page.getByTestId("az-row")).toHaveCount(104);
+      await expect(page.getByTestId("az-row").first()).toBeVisible();
+    } finally {
+      await context.close();
+    }
+  });
+
+  test("names the place in each place row and in the announcement (search #14)", async ({ page }) => {
+    await page.goto("/explorer");
+    await ready(page);
+    await search(page).fill("ბათუმი");
+    await expect(page.getByTestId("place-card")).toBeVisible();
+    await expect(page.getByRole("status")).toHaveText(/^ბათუმი: ნაპოვნია \d+ შედეგი$/);
+    const labels = await page.getByTestId("search-result").evaluateAll((rows) => rows.map((row) => row.getAttribute("aria-label") ?? ""));
+    expect(labels.length).toBeGreaterThan(5);
+    expect(labels.some((label) => label.startsWith("ბათუმი: "))).toBe(true);
+    expect(labels.some((label) => label.startsWith("აჭარა: "))).toBe(true);
+    expect(labels.every((label) => /^(ბათუმი|აჭარა): /.test(label))).toBe(true);
+  });
+
+  test("with a places file slower than the wait, says the places are still loading, then shows them (search #10)", async ({ page }) => {
+    let release!: () => void;
+    const held = new Promise<void>((resolve) => { release = resolve; });
+    let requests = 0;
+    await page.route("**/explorer-places.*.json", async (route) => {
+      requests += 1;
+      await held;
+      await route.continue();
+    });
+    await page.goto("/explorer");
+    await ready(page);
+    await search(page).fill("ბათუმი");
+    await expect(page.getByTestId("search-loading")).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByTestId("search-none")).toHaveCount(0);
+    // Another keystroke keeps waiting on the same request.
+    await search(page).fill("ბათუმის");
+    await expect(page.getByTestId("search-loading")).toBeVisible();
+    release();
+    await expect(page.getByTestId("place-card")).toBeVisible();
+    await expect(page.getByTestId("search-loading")).toHaveCount(0);
+    expect(requests).toBe(1);
+  });
 });
 
 test.describe("the old topic hubs forward (Review Focus 3)", () => {

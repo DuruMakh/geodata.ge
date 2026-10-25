@@ -3,7 +3,7 @@
 import { ChevronRight, Languages, MapPin, Search, X } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type KeyboardEvent, type MouseEvent, type ReactNode } from "react";
 import { useHashState, writeHash } from "../explorer-shell/use-hash-state";
 import { GROUP_ICONS } from "../shell/group-icons";
 import { Sparkline } from "../ui/sparkline";
@@ -20,26 +20,25 @@ import { navGroup } from "../../lib/navigation/navTree";
 // The All data page's search (spec 2026-10-24-explorer-regroup §7, prototype `dx-search`, `dx-q`, `dx-try`, `dx-place`, `dx-res`,
 // `dx-row`, `dx-grp`): a combobox over a listbox of results, with the server's A to Z list below it while the box is empty. The query
 // lives in the address as `#q=`. Pages are searched at once; the places file is fetched on the first query and joins the search when
-// it lands. If it fails, page search goes on, the place card is simply absent, and the next query asks for the file again.
+// it lands, however long it takes. If it fails, page search goes on, the place card is simply absent, and the next query asks for the
+// file again.
 
-type FetchLike = (url: string, init: { signal: AbortSignal }) => Promise<Response>;
+type FetchLike = (url: string) => Promise<Response>;
 
-/** How long a query waits for the places file before page search alone answers, "nothing found" included. */
+/** How long a query that finds nothing waits for the places file before it says the places are still loading. */
 export const PLACES_TIMEOUT_MS = 4000;
 
 const placesFiles = new Map<Locale, Promise<PlaceIndex | null>>();
 
 /**
- * The language's places file: `null` when the request fails, is not OK, is not the index or takes longer than
- * `PLACES_TIMEOUT_MS` (then it is cancelled). A failure is forgotten, so the next call asks again; the first good file is
- * kept for the page's life.
+ * The language's places file, or `null` when the request fails, is not OK or is not the index. A slow file is never cancelled:
+ * every query waits on the one request. A failure is forgotten, so the next call asks again; the first good file is kept for
+ * the page's life.
  */
 export function loadPlaces(fetchImpl: FetchLike, locale: Locale): Promise<PlaceIndex | null> {
   const cached = placesFiles.get(locale);
   if (cached) return cached;
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), PLACES_TIMEOUT_MS);
-  const request = fetchImpl(`/explorer-places.${locale}.json`, { signal: controller.signal })
+  const request = fetchImpl(`/explorer-places.${locale}.json`)
     .then(async (response) => {
       if (!response.ok) return null;
       const data = await response.json() as Partial<PlaceIndex> | null;
@@ -47,7 +46,6 @@ export function loadPlaces(fetchImpl: FetchLike, locale: Locale): Promise<PlaceI
     })
     .catch(() => null)
     .then((data) => {
-      clearTimeout(timer);
       if (!data) placesFiles.delete(locale);
       return data;
     });
@@ -123,7 +121,8 @@ function PlaceCard({ result, locale, messages }: { result: NonNullable<SearchRes
   );
 }
 
-type OptionProps = { option: Option; active: boolean; onHover: () => void; locale: Locale };
+/** `onHover` runs on a pointer move over the option, not on the pointer's arrival: rows that scroll under a resting pointer leave the keys' choice alone. */
+type OptionProps = { option: Option; active: boolean; onHover: (event: MouseEvent) => void; locale: Locale };
 
 function ShortcutOption({ shortcut, option, active, onHover, locale, messages }: OptionProps & { shortcut: SearchShortcut; messages: Messages }) {
   const Icon = GROUP_ICONS[shortcut.group];
@@ -142,7 +141,7 @@ function ShortcutOption({ shortcut, option, active, onHover, locale, messages }:
       aria-label={`${name} — ${kind}, ${count}`}
       tabIndex={-1}
       data-testid="search-shortcut"
-      onMouseEnter={onHover}
+      onMouseMove={onHover}
       className={`mt-5 grid min-h-16 grid-cols-[22px_minmax(0,1fr)_auto_18px] items-center gap-3.5 border border-[var(--ink)] px-[18px] py-3 text-[var(--ink)] no-underline hover:bg-[var(--tint)] max-[768px]:grid-cols-[22px_minmax(0,1fr)_18px] ${active ? "bg-[var(--tint)] shadow-[inset_3px_0_0_var(--accent)]" : "bg-[var(--tile)]"}`}
     >
       <Icon aria-hidden strokeWidth={1.75} className="size-[18px] text-[var(--accent)]" />
@@ -156,7 +155,8 @@ function ShortcutOption({ shortcut, option, active, onHover, locale, messages }:
   );
 }
 
-function RowOption({ row, place, option, active, onHover, locale }: OptionProps & { row: ResultRow; place: boolean }) {
+/** `placeName`: the place (or Georgia) whose figure a place row states, which its accessible name leads with. */
+function RowOption({ row, place, placeName, option, active, onHover, locale }: OptionProps & { row: ResultRow; place: boolean; placeName?: string }) {
   const { page } = row;
   const note = valueNote(row, message(useI18n().messages, "allData.preliminary"));
   const Icon = GROUP_ICONS[page.group];
@@ -170,10 +170,10 @@ function RowOption({ row, place, option, active, onHover, locale }: OptionProps 
       prefetch={false}
       role="option"
       aria-selected={active}
-      aria-label={`${label}${row.value ? `, ${row.value} (${note})` : ""} — ${sub}`}
+      aria-label={`${placeName ? `${placeName}: ` : ""}${label}${row.value ? `, ${row.value} (${note})` : ""} — ${sub}`}
       tabIndex={-1}
       data-testid="search-result"
-      onMouseEnter={onHover}
+      onMouseMove={onHover}
       className={`group grid min-h-[60px] grid-cols-[20px_minmax(0,1fr)_88px_minmax(110px,auto)_18px] items-center gap-4 border-b border-[var(--row-border)] px-3 py-[9px] text-[var(--ink)] no-underline hover:bg-[var(--tint)] max-[1101px]:grid-cols-[20px_minmax(0,1fr)_minmax(96px,auto)_18px] max-[768px]:grid-cols-[18px_minmax(0,1fr)_auto] max-[768px]:gap-3 max-[768px]:px-2 max-[768px]:py-2.5 ${active ? "bg-[var(--tint)] shadow-[inset_3px_0_0_var(--accent)]" : ""}`}
     >
       <Icon aria-hidden strokeWidth={1.75} className="size-[18px] text-[var(--muted)]" />
@@ -217,8 +217,12 @@ export function ExplorerSearch({ locale, pages, shortcuts, children }: ExplorerS
   const [places, setPlaces] = useState<PlaceIndex | null>(null);
   /** While the places file is on its way, a query that finds no page may still name a place: no "nothing found" yet. */
   const [placesPending, setPlacesPending] = useState(false);
+  /** The places file has taken longer than `PLACES_TIMEOUT_MS`: a query that finds nothing says so rather than nothing. */
+  const [placesSlow, setPlacesSlow] = useState(false);
   const [active, setActive] = useState(-1);
   const placesAsked = useRef(false);
+  /** Where the pointer last moved, so a move event that comes with no movement (as some browsers send after a scroll) is no hover. */
+  const pointer = useRef<{ x: number; y: number } | null>(null);
 
   useEffect(() => {
     if (EMPTY_QUERY_HASH.test(window.location.hash)) input.current?.focus();
@@ -228,12 +232,15 @@ export function ExplorerSearch({ locale, pages, shortcuts, children }: ExplorerS
     if (placesAsked.current || !query.trim()) return;
     placesAsked.current = true;
     setPlacesPending(true);
-    void loadPlaces(fetch, locale).then((data) => {
+    const slow = setTimeout(() => setPlacesSlow(true), PLACES_TIMEOUT_MS);
+    void loadPlaces((url) => fetch(url), locale).then((data) => {
       // The rows change under the arrow keys when the places join, so nothing stays selected.
       if (data) {
         setPlaces(data);
         setActive(-1);
       } else placesAsked.current = false;
+      clearTimeout(slow);
+      setPlacesSlow(false);
       setPlacesPending(false);
     });
   }, [query, locale]);
@@ -255,6 +262,12 @@ export function ExplorerSearch({ locale, pages, shortcuts, children }: ExplorerS
     if (current >= 0) document.getElementById(`explorer-o${current}`)?.scrollIntoView({ block: "nearest" });
   }, [current]);
 
+  const hover = (index: number) => (event: MouseEvent) => {
+    const last = pointer.current;
+    pointer.current = { x: event.clientX, y: event.clientY };
+    if (last?.x === event.clientX && last.y === event.clientY) return;
+    setActive(index);
+  };
   const setQuery = (next: string) => {
     setActive(-1);
     update(() => next, "replace");
@@ -280,13 +293,22 @@ export function ExplorerSearch({ locale, pages, shortcuts, children }: ExplorerS
   const trimmed = query.trim();
   const none = message(messages, "allData.none", { q: trimmed });
   const nothing = result !== null && !total && !placesPending;
-  const announce = !result ? "" : total ? message(messages, total === 1 ? "allData.foundOne" : "allData.found", { n: total }) : nothing ? none : "";
+  const loading = result !== null && !total && placesPending && placesSlow;
+  const loadingText = message(messages, "allData.placesLoading");
+  const country = message(messages, "allData.country");
+  const groupLabel = (group: SearchResult["groups"][number]) => (group.kind === "country" ? country : group.label);
+  /** The place the rows are about, which the announcement leads with: `ბათუმი: ნაპოვნია 23 შედეგი`. */
+  const about = result?.place ? (locale === "en" ? result.place.place.nameEn : result.place.place.nameKa) : result?.groups[0]?.kind === "country" ? country : "";
+  const found = total ? message(messages, total === 1 ? "allData.foundOne" : "allData.found", { n: total }) : "";
+  const announce = !result ? "" : total ? (about ? `${about}: ${found}` : found) : nothing ? none : loading ? loadingText : "";
   const placeTag = result?.place
     ? message(messages, result.place.typeLabelArgs.kind === "capital" ? "allData.tag.capital" : result.place.typeLabelArgs.kind === "region" ? "allData.tag.region" : "allData.tag.municipality")
     : "";
 
   return (
     <>
+      {/* Without JavaScript the box and its example words do nothing, so they stay out of the way of the A to Z list. */}
+      <noscript><style>{'[data-testid="all-data-search"]{display:none}'}</style></noscript>
       <div role="search" data-testid="all-data-search" className="mt-7 max-[768px]:mt-5">
         <label htmlFor={EXPLORER_SEARCH_INPUT_ID} className="sr-only">{message(messages, "allData.label")}</label>
         {/* The box draws the focus ring, so the input drops the site's own (an unlayered rule, hence the `!`). */}
@@ -339,13 +361,13 @@ export function ExplorerSearch({ locale, pages, shortcuts, children }: ExplorerS
           {result.reading ? (
             <p data-testid="search-reading" className="mt-[26px] flex items-center gap-2.5 bg-[var(--tint)] px-4 py-3 text-[13.5px]">
               <Languages aria-hidden strokeWidth={1.75} className="size-[18px] flex-none" />
-              <span>{message(messages, "allData.reading")} <b className="font-semibold">{result.reading}</b></span>
+              <span className="min-w-0 [overflow-wrap:anywhere]">{message(messages, "allData.reading")} <b className="font-semibold">{result.reading}</b></span>
             </p>
           ) : null}
           {result.place ? <PlaceCard result={result.place} locale={locale} messages={messages} /> : null}
           <div id="explorer-results" role={total ? "listbox" : undefined} aria-label={total ? message(messages, "allData.results") : undefined} className="mt-2">
             {shortcutOptions.map(({ shortcut, option: made }) => (
-              <ShortcutOption key={made.id} shortcut={shortcut} option={made} active={made.id === `explorer-o${current}`} onHover={() => setActive(options.indexOf(made))} locale={locale} messages={messages} />
+              <ShortcutOption key={made.id} shortcut={shortcut} option={made} active={made.id === `explorer-o${current}`} onHover={hover(options.indexOf(made))} locale={locale} messages={messages} />
             ))}
             {groups.map(({ group, rows }, index) => {
               const headingId = `explorer-g${index}`;
@@ -359,13 +381,24 @@ export function ExplorerSearch({ locale, pages, shortcuts, children }: ExplorerS
                 >
                   {flat ? null : (
                     <div aria-hidden className="flex flex-wrap items-baseline gap-x-3 gap-y-1 border-b border-[var(--ink)] pb-2">
-                      <h3 id={headingId} className="text-[14.5px] leading-[1.3] font-bold">{group.label}</h3>
-                      <span className={`${NUMERIC} text-[11px] text-[var(--muted)]`}>{group.kind === "own" ? placeTag : message(messages, "allData.tag.regionData")}</span>
+                      <h3 id={headingId} className="text-[14.5px] leading-[1.3] font-bold">{groupLabel(group)}</h3>
+                      <span className={`${NUMERIC} text-[11px] text-[var(--muted)]`}>
+                        {group.kind === "own" ? placeTag : message(messages, group.kind === "country" ? "allData.tag.countryData" : "allData.tag.regionData")}
+                      </span>
                       <span className={`ml-auto ${NUMERIC} text-[11px] text-[var(--muted)]`}>{pagesLabel(messages, rows.length)}</span>
                     </div>
                   )}
                   {rows.map(({ row, option: made }) => (
-                    <RowOption key={made.id} row={row} place={!flat} option={made} active={made.id === `explorer-o${current}`} onHover={() => setActive(options.indexOf(made))} locale={locale} />
+                    <RowOption
+                      key={made.id}
+                      row={row}
+                      place={!flat}
+                      placeName={flat ? undefined : groupLabel(group)}
+                      option={made}
+                      active={made.id === `explorer-o${current}`}
+                      onHover={hover(options.indexOf(made))}
+                      locale={locale}
+                    />
                   ))}
                 </div>
               );
@@ -376,10 +409,13 @@ export function ExplorerSearch({ locale, pages, shortcuts, children }: ExplorerS
           ) : null}
           {nothing ? (
             <div data-testid="search-none" className="mt-[26px] border border-dashed border-[var(--hairline)] px-6 py-[26px]">
-              <p className={`${DISPLAY} text-[22px] font-semibold`}>{none}</p>
+              <p className={`${DISPLAY} text-[22px] font-semibold [overflow-wrap:anywhere]`}>{none}</p>
               <p className="mt-1.5 text-[13.5px] text-[var(--body)]">{message(messages, "allData.noneHint")}</p>
               <button type="button" onClick={() => pick("")} className={`mt-4 ${CHIP_CLASS}`}>{message(messages, "allData.showAll")}</button>
             </div>
+          ) : null}
+          {loading ? (
+            <p data-testid="search-loading" className="mt-[26px] border border-dashed border-[var(--hairline)] px-6 py-[26px] text-[15px] text-[var(--body)]">{loadingText}</p>
           ) : null}
         </>
       ) : null}

@@ -135,12 +135,15 @@ The A to Z list is rendered on the server and is in the page's HTML for search e
 
 - **Pages**: each page's Georgian and English names, its topic and group names in both languages, and a short list of extra words per page (the design's search words, for example `m3`, `npl`, `fdi`, `gini`, `salary`). The extra words are kept with the page's navigation entry, in both languages.
 - **Groups and topics**: if every word matches a group's or topic's name, a shortcut row to it appears above the results.
-- **Places**: Georgia's 11 regions (Tbilisi counted as a region) and its 63 municipalities, by Georgian and English names.
+- **Places**: Georgia's 11 regions (Tbilisi counted as a region) and its 63 municipalities, by Georgian and English names and a few other spellings in common use (`Zestaponi`, `Ajara`, `Stepantsminda`, `Signagi`, `q` for `ყ`).
+- **Georgia**: `საქართველო` / `Georgia` alone lists Georgia's own figures on the pages that hold places (a "საქართველო" group, no place card). Beside other words it is dropped (`inflation in georgia`, `საქართველოს ბიუჯეტი`).
 
 ### 7.2 Matching
 
 - Case and punctuation are ignored. A word matches the start of a word in a field, anywhere inside a field from 3 letters, or as a stem with common Georgian endings removed (`ების`, `ებში`, `ით`, `ის`, `ში`, `ზე`…).
 - Weights: page name 10, the other language's name 10, topic 4, group 3, extra words 6. An exact full-name match adds 8. Every word must match for a page to be shown.
+- English joining words (`in`, `of`, `the`, `for`, `and`, `at`) are dropped while other words remain, so `schools in gori` reads as `schools gori`.
+- **Places** (fix round 3, 2026-10-25): a run of up to four words is tried as a place name, and the place named by more of the query wins (`მცხეთა მთიანეთი` is the region). A `-ია` name's genitive and instrumental match (`გურიის`, `მესტიის`). A region's first word that is also an ordinary word (`შიდა`, `ქვემო`, `ზემო`) names it only with the next word, so `მთლიანი შიდა პროდუქტი` finds GDP. A word that only starts a place name (`საგ`, `mar`) gives the place only when no page matches it. Words after a place drop out only when they are a whole word of its name (`tsageri age` keeps `age`). When the other words rule out all the place's rows but match pages, the pages are shown.
 - **Latin typed on a Georgian keyboard**: if a Latin query finds nothing, it is read through the standard Georgian keyboard layout (`xelfasebi` → `ხელფასები`). A notice shows the reading: `ქართული განლაგებით: ხელფასები`.
 - Matching letters are highlighted in each result name.
 
@@ -148,8 +151,10 @@ The A to Z list is rendered on the server and is in the page's HTML for search e
 
 - **No place in the query:** one list, best match first. Each row has the group icon, the page name with highlights, a mono line `{group} › {topic}` plus the name in the other language, an 88px trend line, and the latest value with its period.
 - **A place in the query** (with or without other words): first the **place card**, with the name, the type ("რეგიონი · 9 მუნიციპალიტეტი", "მუნიციპალიტეტი · აჭარა", "დედაქალაქი") and four facts with their years: population, budget, budget per resident, births per 100 deaths. Then the group **"{place}"**: the place's own pages, each linking to that place's page (for example `/explorer/education/schools/batumi`) with the place's latest value; the place's municipal budget comes first. Then the group **"{region}"**: the pages that have data for its region, each linking to the region's page with the region's value. Other words narrow the lists (`ბათუმი სკოლა` shows only the Schools rows).
-- **Nothing found:** `„{q}“ ვერ მოიძებნა`, a hint, and a "show all pages" button that clears the box.
-- **Keyboard:** the box is an ARIA combobox over a listbox. ↑ and ↓ move, Enter opens, and Esc clears. A polite live region announces the result count.
+- **Nothing found:** `„{q}“ ვერ მოიძებნა`, a hint, and a "show all pages" button that clears the box. A long unbroken query wraps.
+- **Places still loading:** while the places file is on its way, a query that finds no page shows no "nothing found"; after 4 seconds it says `ქალაქები და რეგიონები ჯერ იტვირთება…` / "Towns and regions are still loading…". The request is never cancelled, and the place card appears when it lands.
+- **Keyboard:** the box is an ARIA combobox over a listbox. ↑ and ↓ move, Enter opens, and Esc clears. Only a real pointer move highlights a row, so rows scrolling under a resting pointer leave the keys' choice alone. A polite live region announces the result count, after the place's name when a place is named (`ბათუმი: ნაპოვნია 25 შედეგი`), and each place row's accessible name starts with its place.
+- **Without JavaScript** the box and the example words are hidden; the A to Z list works.
 
 ### 7.4 Search data
 
@@ -178,7 +183,7 @@ One adapter per place page family. Each turns that family's served facts into `{
 | City | Inflation cities, City air quality |
 | Region | Regional economies, Business regions, Housing regions, Transport regions, Internet at home, Income, Spending, Unemployment regions, Wages regions, Causes of death regions, Museums, Forests, Waste, Population by region (age and sex) |
 
-A page with place figures but no place page (Births and deaths, Marriages and divorces) links to the general page with the place's value. The place card's four facts come from the Population, Municipal budget (total and per resident) and Births and deaths data. For a region, the budget is the sum of its municipalities, as the municipal region pages already show.
+A page with place figures but no place page (Births and deaths, Marriages and divorces, the regions' census share aged 65+ on Age and sex) links to the general page, or the place's Population section, with the place's value. Births and deaths states the place's births and Marriages and divorces its marriages, each captioned as the page's card is. The place card's four facts come from the Population, Municipal budget (total and per resident) and Births and deaths data. For a region, the budget is the sum of its municipalities, as the municipal region pages already show.
 
 The same index feeds the region-spread graphic of §5.
 

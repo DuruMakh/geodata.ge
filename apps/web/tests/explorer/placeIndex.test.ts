@@ -11,8 +11,9 @@ vi.mock("next/navigation", async (importOriginal) => ({
 
 import { loadServedDemographyData } from "../../lib/data/demography/importDemography";
 import { buildVitalPlaceModel, vitalFactsForPlace } from "../../lib/explorer/demographyVital";
-import { SERIES } from "../../lib/data/demography/series";
-import { formatAmount, formatInUnit, MISSING, UNIT_PERSONS } from "../../lib/explorer/format";
+import { CENSUS_YEAR, SERIES } from "../../lib/data/demography/series";
+import { buildAgeSexRegionModel } from "../../lib/explorer/demographyAgeSexRegions";
+import { formatAmount, formatInUnit, formatShare, MISSING, UNIT_PERSONS } from "../../lib/explorer/format";
 import { aggregateFactsForEntity, applyAdjaraBudgetAdjustment, regionFactsFor } from "../../lib/explorer/municipalData";
 import { MUNICIPALITY_ROUTES, municipalityCodeForSlug } from "../../lib/explorer/municipalityRoutes";
 import type { MunicipalTotalFact } from "../../lib/data/municipal/types";
@@ -121,10 +122,17 @@ describe.each(["ka", "en"] as const)("place index (%s)", (locale) => {
       }
     }
     const batumi = index.places.find((place) => place.id === BATUMI)!;
-    // The card's population, budget and births figures are the ones the Population, Budget and Births pages give Batumi.
+    // The card's population and budget figures are the ones the Population and Budget pages give Batumi.
     expect(batumi.facts[0]).toEqual({ label: "population", value: entry(BATUMI, "/explorer/demography/population").value, period: entry(BATUMI, "/explorer/demography/population").period });
     expect(batumi.facts[1]).toEqual({ label: "budget", value: entry(BATUMI, "/explorer/municipalities").value, period: entry(BATUMI, "/explorer/municipalities").period });
-    expect(batumi.facts[3]).toEqual({ label: "birthsPer100Deaths", value: entry(BATUMI, "/explorer/demography/births-deaths").value, period: entry(BATUMI, "/explorer/demography/births-deaths").period });
+  });
+
+  it("gives every place card the births per 100 deaths its Population page states", async () => {
+    const { facts } = await loadServedDemographyData();
+    for (const place of index.places) {
+      const latest = buildVitalPlaceModel(vitalFactsForPlace(facts, place.id), place.id)!.latest;
+      expect(place.facts[3], place.id).toEqual({ label: "birthsPer100Deaths", value: formatInUnit(Math.round(latest.ratio!), UNIT_PERSONS), period: String(latest.year) });
+    }
   });
 
   it("links Batumi to its own pages", () => {
@@ -190,14 +198,35 @@ describe.each(["ka", "en"] as const)("place index (%s)", (locale) => {
     expect(entriesForPage(index, "/explorer/environment/air-quality")).toHaveLength(9);
   });
 
-  it("states births per 100 deaths as each place's Population page does", async () => {
+  it("states births, captioned as the Births card, as each place's Population page and the Births card do", async () => {
     const { facts } = await loadServedDemographyData();
+    const caption = message(await getMessages(locale, ["groups"]), "groups.headline.demography.births-deaths");
     for (const id of ["country.georgia", ...index.places.map((place) => place.id)]) {
-      const latest = buildVitalPlaceModel(vitalFactsForPlace(facts, id), id)!.latest;
+      const latest = facts.filter((fact) => fact.seriesId === SERIES.liveBirths && fact.geographyId === id).sort((a, b) => a.year - b.year).at(-1)!;
       const vital = entry(id, "/explorer/demography/births-deaths");
-      expect([vital.value, vital.period], id).toEqual([formatInUnit(Math.round(latest.ratio!), UNIT_PERSONS), String(latest.year)]);
+      expect([vital.value, vital.period, vital.caption], id).toEqual([formatInUnit(latest.value, UNIT_PERSONS), String(latest.year), caption]);
       expect(vital.href).toBe(`${entry(id, "/explorer/demography/population").href}#births-deaths`);
     }
+  });
+
+  it("states each region's census share aged 65+ as the Age and sex page maps it, linking to that page", async () => {
+    const [{ facts }, { regions }] = await Promise.all([loadServedDemographyData(), loadServedMunicipalData()]);
+    const model = buildAgeSexRegionModel(facts, regions);
+    const entries = entriesForPage(index, "/explorer/demography/age-sex");
+    expect(entries.map((candidate) => candidate.placeId).sort()).toEqual(regions.map((region) => region.id).sort());
+    for (const region of model.regions) {
+      expect(entry(region.regionId, "/explorer/demography/age-sex"), region.regionId).toMatchObject({
+        href: "/explorer/demography/age-sex", value: formatShare(region.value / 100), period: String(CENSUS_YEAR), caption: locale === "ka" ? "65+ წლის მოსახლეობა" : "Population aged 65+",
+      });
+    }
+  });
+
+  it("knows the places' other spellings", () => {
+    const named = (nameEn: string) => index.places.find((place) => place.nameEn === nameEn)!;
+    expect(named("Zestafoni").aliases).toContain("Zestaponi");
+    expect(named("Adjara").aliases).toContain("Ajara");
+    expect(named("Kazbegi").aliases).toEqual(expect.arrayContaining(["Stepantsminda", "სტეფანწმინდა"]));
+    expect(named("Batumi").aliases).toBeUndefined();
   });
 
   it("states each place's population as the latest served figure its Population page shows", async () => {

@@ -242,10 +242,24 @@ describe("Tbilisi (Review Focus 2)", () => {
 });
 
 describe("rows", () => {
-  it("never lists Georgia's entries", () => {
-    for (const query of ["ბათუმი", "აჭარა", "თბილისი", "სკოლები", "საქართველო", "ხელფასები"]) {
+  it("never lists Georgia's entries for a place or a page", () => {
+    for (const query of ["ბათუმი", "აჭარა", "თბილისი", "სკოლები", "ხელფასები", "საქართველოს სკოლები", "schools in georgia"]) {
       for (const row of rows(run(query))) expect(row.value, `${query} ${row.href}`).not.toBe("Georgia's figure");
     }
+  });
+
+  it("list Georgia's own entries for Georgia alone, with no place card", () => {
+    for (const [query, locale] of [["საქართველო", "ka"], ["georgia", "en"], ["Georgia", "en"], ["of Georgia", "en"], ["საქართველოში", "ka"]] as const) {
+      const result = run(query, locale);
+      expect(result.place, query).toBeNull();
+      expect(result.groups.map((group) => group.kind), query).toEqual(["country"]);
+      expect(rows(result).map((row) => row.href), query).toEqual([
+        "/explorer/municipalities/georgia", "/explorer/education/schools/georgia", "/explorer/wages/regions",
+      ]);
+      expect(rows(result).every((row) => row.value === "Georgia's figure"), query).toBe(true);
+    }
+    // Without the place index there is nothing to list, and no error.
+    expect(searchExplorer("საქართველო", "ka", PAGES, SHORTCUTS, null)).toMatchObject({ place: null, groups: [], total: 0 });
   });
 
   it("show the page's own value without a place, and the place's value with one", () => {
@@ -278,6 +292,10 @@ describe("rows", () => {
     const wagesRegions = PAGES.find((page) => page.href === "/explorer/wages/regions")!;
     expect(rowLabel(wagesRegions, "ka")).toBe("ხელფასები — რეგიონები");
     expect(rowLabel(wagesRegions, "en")).toBe("Wages — regions");
+    const tradeOverview = PAGES.find((page) => page.href === "/explorer/trade/overview")!;
+    expect([rowLabel(tradeOverview, "ka"), rowLabel(tradeOverview, "en")]).toEqual(["საგარეო ვაჭრობა — მიმოხილვა", "Trade — overview"]);
+    const gdpExpenditure = PAGES.find((page) => page.href === "/explorer/economy/expenditure")!;
+    expect([rowLabel(gdpExpenditure, "ka"), rowLabel(gdpExpenditure, "en")]).toEqual(["ეკონომიკა — დანახარჯები", "Economy — expenditure"]);
     const overview = PAGES.find((page) => page.href === "/explorer/wages/overview")!;
     expect(rowLabel(overview, "en")).toBe(overview.name.en);
   });
@@ -324,6 +342,146 @@ describe("the real 74 places", () => {
   ] as const)("%s finds %s", (query, locale, nameEn) => {
     expect(searchExplorer(query, locale, PAGES, SHORTCUTS, indexes[locale])!.place?.place.nameEn).toBe(nameEn);
   });
+
+  // The deep review's queries (search.md, 2026-10-25), against the real index.
+  const real = (query: string, locale: Locale = "ka") => searchExplorer(query, locale, PAGES, SHORTCUTS, indexes[locale])!;
+  const placeOf = (query: string, locale: Locale = "ka") => real(query, locale).place?.place.nameEn ?? null;
+  const hrefsOf = (query: string, locale: Locale = "ka") => rows(real(query, locale)).map((row) => row.href);
+
+  it("never take a word of a page's names, topic, group or search words for a place", () => {
+    for (const locale of ["ka", "en"] as const) {
+      const words = new Set(PAGES.flatMap((page) => [page.name.ka, page.name.en, page.topicName.ka, page.topicName.en, page.groupName.ka, page.groupName.en, page.words]
+        .flatMap((field) => field.toLocaleLowerCase("en").split(/[\s,—–]+/)).filter((word) => /[\p{L}\p{N}]/u.test(word))));
+      for (const word of words) expect(placeOf(word, locale), `${word} (${locale})`).toBeNull();
+    }
+  });
+
+  it.each([["გურიის", "Guria"], ["გურიით", "Guria"], ["მესტიის", "Mestia"], ["სამტრედიის", "Samtredia"]])("%s, a -ია name's genitive or instrumental, finds %s", (query, nameEn) => {
+    expect(placeOf(query)).toBe(nameEn);
+    expect(real(query).total).toBeGreaterThan(0);
+  });
+
+  it("narrows a -ია name's genitive by the next word", () => {
+    expect(hrefsOf("გურიის ბიუჯეტი")).toEqual(["/explorer/municipalities/region/guria"]);
+    expect(hrefsOf("მესტიის მოსახლეობა")).toEqual(["/explorer/demography/population/mestia"]);
+  });
+
+  it.each([["მთლიანი შიდა პროდუქტი", "ka"], ["შიდა პროდუქტი", "ka"], ["gross domestic product", "en"]] as const)("%s is GDP, not Shida Kartli", (query, locale) => {
+    const result = real(query, locale);
+    expect(result.place).toBeNull();
+    expect(firstRow(result).href).toBe("/explorer/economy/gdp");
+    expect(firstRow(searchExplorer(query, locale, PAGES, SHORTCUTS, null)!).href).toBe("/explorer/economy/gdp");
+  });
+
+  it.each(["შიდა", "ქვემო", "ზემო", "შიდ", "ქვემ", "შიდა ვალი"])("a lone %s names no region", (query) => {
+    expect(placeOf(query)).toBeNull();
+  });
+
+  it.each(["Shida", "Kvemo", "Zemo"])("a lone %s names no region in English", (query) => {
+    expect(placeOf(query, "en")).toBeNull();
+  });
+
+  it.each([
+    ["შიდა ქართლი", "ka", "Shida Kartli"], ["Shida Kartli", "en", "Shida Kartli"], ["ქვემო ქართლი", "ka", "Kvemo Kartli"], ["kvemo kartli", "en", "Kvemo Kartli"],
+    ["ქვემო ქართლის", "ka", "Kvemo Kartli"], ["მცხეთა მთიანეთი", "ka", "Mtskheta-Mtianeti"], ["mtskheta mtianeti", "en", "Mtskheta-Mtianeti"],
+    ["მცხეთა", "ka", "Mtskheta"], ["რაჭა", "ka", "Racha-Lechkhumi and Kvemo Svaneti"], ["Samegrelo", "en", "Samegrelo-Zemo Svaneti"],
+  ] as const)("%s, with its second word or as a whole, finds %s", (query, locale, nameEn) => {
+    expect(placeOf(query, locale)).toBe(nameEn);
+    expect(real(query, locale).total).toBeGreaterThan(0);
+  });
+
+  it("reads a region's two words and a page word together", () => {
+    expect(hrefsOf("შიდა ქართლის ხელფასები")).toEqual(["/explorer/wages/regions/shida_kartli"]);
+  });
+
+  it.each([
+    ["schools in gori", "Gori", ["/explorer/education/schools/gori"]],
+    ["population of batumi", "Batumi", ["/explorer/demography/population/batumi"]],
+    ["budget of tbilisi", "Tbilisi", ["/explorer/municipalities/tbilisi"]],
+    ["wages in tbilisi", "Tbilisi", ["/explorer/wages/regions/tbilisi"]],
+    ["inflation in batumi", "Batumi", ["/explorer/inflation/cities/batumi"]],
+  ])("%s: English joining words are dropped", (query, nameEn, expected) => {
+    expect(placeOf(query, "en")).toBe(nameEn);
+    expect(hrefsOf(query, "en")).toEqual(expected);
+  });
+
+  it("unemployment in kutaisi: Kutaisi, with its region's unemployment", () => {
+    expect(placeOf("unemployment in kutaisi", "en")).toBe("Kutaisi");
+    expect(hrefsOf("unemployment in kutaisi", "en")).toContain("/explorer/unemployment/regions/imereti");
+  });
+
+  it.each([["georgia", "en"], ["Georgia", "en"], ["საქართველო", "ka"]] as const)("%s alone lists Georgia's national figures", (query, locale) => {
+    const result = real(query, locale);
+    expect(result.place).toBeNull();
+    expect(result.groups.map((group) => group.kind)).toEqual(["country"]);
+    expect(rows(result).length).toBe(indexes[locale].entries.filter((candidate) => candidate.placeId === "country.georgia").length);
+    expect(firstRow(result).href).toBe("/explorer/municipalities/georgia");
+  });
+
+  it("drops Georgia beside other words", () => {
+    expect(firstRow(real("inflation in georgia", "en")).href).toBe("/explorer/inflation/overview");
+    expect(real("inflation in georgia", "en").shortcuts[0]).toMatchObject({ name: { en: "Inflation" } });
+    for (const [query, locale] of [["Georgia budget", "en"], ["საქართველოს ბიუჯეტი", "ka"]] as const) {
+      const result = real(query, locale);
+      expect(result.place, query).toBeNull();
+      expect(firstRow(result).page.group, query).toBe("budget");
+      expect(result.shortcuts[0], query).toMatchObject({ kind: "group", group: "budget" });
+    }
+  });
+
+  it.each([
+    ["საგ", "ka"], ["საგა", "ka"], ["საგარ", "ka"], ["საგარე", "ka"], ["ახალ", "ka"], ["ხელ", "ka"], ["საბავშვო ბაღ", "ka"], ["ჰაერის ხარ", "ka"],
+    ["ახალგაზრდები გარ", "ka"], ["mar", "en"],
+  ] as const)("%s, a page word half typed, keeps its pages rather than a place's", (query, locale) => {
+    const result = real(query, locale);
+    expect(result.place).toBeNull();
+    expect(result.total).toBeGreaterThan(0);
+  });
+
+  it("a half-typed place with no page to find still names it", () => {
+    expect(placeOf("ბათ")).toBe("Batumi");
+    expect(placeOf("Zestaf", "en")).toBe("Zestafoni");
+  });
+
+  it("gives the pages when a place's rows are all ruled out", () => {
+    // Keda has no inflation city page, nor has Adjara.
+    const result = real("ქედა ინფლაცია");
+    expect(result.place).toBeNull();
+    expect(firstRow(result).href).toBe("/explorer/inflation/overview");
+  });
+
+  it.each([
+    ["Zestaponi", "Zestafoni"], ["Ajara", "Adjara"], ["Achara", "Adjara"], ["Stepantsminda", "Kazbegi"], ["Signagi", "Sighnaghi"], ["Tsqaltubo", "Tskaltubo"],
+  ])("%s, another spelling, finds %s", (query, nameEn) => {
+    expect(placeOf(query, "en")).toBe(nameEn);
+  });
+
+  it("knows Stepantsminda in Georgian too", () => {
+    expect(placeOf("სტეფანწმინდა")).toBe("Kazbegi");
+  });
+
+  it("drops only whole words of the place's name: tsageri age keeps age", () => {
+    const all = hrefsOf("tsageri", "en");
+    const aged = hrefsOf("tsageri age", "en");
+    expect(placeOf("tsageri age", "en")).toBe("Tsageri");
+    expect(aged).toContain("/explorer/demography/age-sex");
+    expect(aged.length).toBeLessThan(all.length);
+    expect(hrefsOf("ცაგერი ასაკი")).toEqual(["/explorer/demography/age-sex"]);
+    expect(hrefsOf("Kvemo Kartli", "en")).toEqual(hrefsOf("kvemo kartli kartli", "en"));
+  });
+
+  it("states births, captioned, on a place's Births and deaths row", () => {
+    const births = rows(real("ბათუმი")).find((row) => row.page.href === "/explorer/demography/births-deaths")!;
+    const entry = indexes.ka.entries.find((candidate) => candidate.placeId === "06" && candidate.page === "/explorer/demography/births-deaths")!;
+    expect(births).toMatchObject({ value: entry.value, caption: "დაბადება", href: "/explorer/demography/population/batumi#births-deaths" });
+  });
+
+  it("lists a region's share aged 65+ under its municipalities' region", () => {
+    const result = real("ბათუმი");
+    const region = result.groups.find((group) => group.kind === "region")!;
+    expect(region.rows.find((row) => row.page.href === "/explorer/demography/age-sex")).toMatchObject({ href: "/explorer/demography/age-sex", caption: "65+ წლის მოსახლეობა" });
+  });
+
 });
 
 describe("valueNote", () => {

@@ -1,9 +1,9 @@
-import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
+import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("next/navigation", async (importOriginal) => ({ ...(await importOriginal<typeof import("next/navigation")>()), useRouter: () => ({ push() {}, replace() {} }) }));
 
 import kaAllData from "../../lib/i18n/messages/ka/allData.json";
-import { ExplorerSearch, PLACES_TIMEOUT_MS, loadPlaces } from "../../components/explorer-groups/explorer-search";
+import { ExplorerSearch, PLACES_TIMEOUT_MS } from "../../components/explorer-groups/explorer-search";
 import { searchMessages } from "../../lib/explorer/allDataIndex";
 import { allDataPageMetadata, renderAllDataPage } from "../../lib/pages/all-data";
 import type { SearchPage } from "../../lib/explorer/search/searchExplorer";
@@ -42,6 +42,10 @@ describe("the search box, rendered on the server", () => {
     expect(chips).toEqual(["ბათუმი", "ინფლაცია", "ხელფასები", "მშპ", "ადგილობრივი ექსპორტი"]);
   });
 
+  it("hides the box and its example words without JavaScript, which they need", () => {
+    expect(html).toContain('<noscript><style>[data-testid="all-data-search"]{display:none}</style></noscript>');
+  });
+
   it("shows the A to Z list while the box is empty, and no results or error text", () => {
     expect(html).toContain('data-testid="az-children"');
     expect(html).not.toContain('role="listbox"');
@@ -50,33 +54,35 @@ describe("the search box, rendered on the server", () => {
 });
 
 describe("the places file (Review Focus 4)", () => {
-  const ok = (body: unknown) => vi.fn(async () => new Response(JSON.stringify(body), { status: 200 }));
+  const ok = (body: unknown) => vi.fn(async (_url: string) => new Response(JSON.stringify(body), { status: 200 }));
+  // The file is kept for the page's life, so each test loads the module afresh and reads an empty cache.
+  let loadPlaces: typeof import("../../components/explorer-groups/explorer-search").loadPlaces;
+  beforeEach(async () => {
+    vi.resetModules();
+    ({ loadPlaces } = await import("../../components/explorer-groups/explorer-search"));
+  });
 
-  // First: the file is kept once it has loaded, and each test below reads the same cache.
-  it("gives up on a file that has not come in time, and cancels it", async () => {
+  it("waits for a slow file rather than cancelling it, with every call on the one request", async () => {
     vi.useFakeTimers();
     try {
-      let signal: AbortSignal | undefined;
-      // A request that only ends when it is cancelled, as fetch does.
-      const hanging = vi.fn((_url: string, init: { signal: AbortSignal }) => {
-        signal = init.signal;
-        return new Promise<Response>((_resolve, reject) => init.signal.addEventListener("abort", () => reject(new DOMException("aborted", "AbortError"))));
-      });
-      const loading = loadPlaces(hanging, "ka");
-      await vi.advanceTimersByTimeAsync(PLACES_TIMEOUT_MS - 1);
-      expect(signal?.aborted).toBe(false);
-      await vi.advanceTimersByTimeAsync(1);
-      await expect(loading).resolves.toBeNull();
-      expect(signal?.aborted).toBe(true);
+      let arrive!: () => void;
+      const slow = vi.fn((_url: string) => new Promise<Response>((resolve) => { arrive = () => resolve(new Response(JSON.stringify(PLACES), { status: 200 })); }));
+      const first = loadPlaces(slow, "ka");
+      await vi.advanceTimersByTimeAsync(PLACES_TIMEOUT_MS * 3);
+      const second = loadPlaces(slow, "ka");
+      arrive();
+      await expect(first).resolves.toEqual(PLACES);
+      await expect(second).resolves.toEqual(PLACES);
+      expect(slow).toHaveBeenCalledTimes(1);
     } finally {
       vi.useRealTimers();
     }
   });
 
   it("resolves null when the fetch is rejected", async () => {
-    const fetchImpl = vi.fn(async () => { throw new TypeError("network"); });
+    const fetchImpl = vi.fn(async (_url: string): Promise<Response> => { throw new TypeError("network"); });
     await expect(loadPlaces(fetchImpl, "ka")).resolves.toBeNull();
-    expect(fetchImpl).toHaveBeenCalledWith("/explorer-places.ka.json", { signal: expect.any(AbortSignal) });
+    expect(fetchImpl).toHaveBeenCalledWith("/explorer-places.ka.json");
   });
 
   it("resolves null on a response that is not OK, or not JSON", async () => {
@@ -85,6 +91,7 @@ describe("the places file (Review Focus 4)", () => {
   });
 
   it("fetches again after a failure, then keeps the first success", async () => {
+    await expect(loadPlaces(vi.fn(async () => new Response("missing", { status: 404 })), "ka")).resolves.toBeNull();
     const first = ok(PLACES);
     await expect(loadPlaces(first, "ka")).resolves.toEqual(PLACES);
     const second = ok({ places: [{ id: "other" }], entries: [] });
@@ -94,9 +101,10 @@ describe("the places file (Review Focus 4)", () => {
   });
 
   it("keeps each language's file apart", async () => {
+    await loadPlaces(ok(PLACES), "ka");
     const english = ok(PLACES);
     await loadPlaces(english, "en");
-    expect(english).toHaveBeenCalledWith("/explorer-places.en.json", { signal: expect.any(AbortSignal) });
+    expect(english).toHaveBeenCalledWith("/explorer-places.en.json");
   });
 });
 
