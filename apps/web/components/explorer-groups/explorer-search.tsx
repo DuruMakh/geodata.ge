@@ -307,9 +307,10 @@ export function ExplorerSearch({ locale, pages, shortcuts, children }: ExplorerS
 
   return (
     <>
-      {/* Without JavaScript the box and its example words do nothing, so they stay out of the way of the A to Z list. */}
-      <noscript><style>{'[data-testid="all-data-search"]{display:none}'}</style></noscript>
       <div role="search" data-testid="all-data-search" className="mt-7 max-[768px]:mt-5">
+        {/* Without JavaScript the box and its example words do nothing, so they stay out of the way of the A to Z list. The rule sits
+            inside the box it hides, so nothing but the one line stands between the heading and the box (DESIGN §17). */}
+        <noscript><style>{'[data-testid="all-data-search"]{display:none}'}</style></noscript>
         <label htmlFor={EXPLORER_SEARCH_INPUT_ID} className="sr-only">{message(messages, "allData.label")}</label>
         {/* The box draws the focus ring, so the input drops the site's own (an unlayered rule, hence the `!`). */}
         <div className="flex h-[66px] items-center gap-3.5 border-[1.5px] border-[var(--ink)] bg-[var(--tile)] pr-2.5 pl-[22px] focus-within:outline-2 focus-within:outline-offset-[3px] focus-within:outline-[var(--accent)] max-[768px]:h-14 max-[768px]:gap-2.5 max-[768px]:pr-1 max-[768px]:pl-3.5">
