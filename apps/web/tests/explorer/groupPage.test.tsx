@@ -50,30 +50,13 @@ describe("the Labour market group page (ka)", async () => {
     expect(count(html, /<small class="(?![^"]*\bml-)[^"]*"> [^ <][^<]*<\/small>/g)).toBe(4);
   });
 
-  it("keeps the topic links on one sticky row that scrolls sideways, with a thin scrollbar and edge fades from 900px", () => {
-    const row = /<div[^>]*data-testid="group-topic-row"[^>]*>/.exec(html)![0];
-    expect(row).toContain("sticky");
-    const tag = /<nav[^>]*data-testid="group-topic-links"[^>]*>/.exec(html)![0];
-    expect(tag).toContain("overflow-x-auto");
-    expect(tag).not.toContain("flex-wrap");
-    expect(tag).toContain("min-[900px]:[scrollbar-width:thin]");
-    // No line under the row.
-    expect(tag).not.toContain("border-b");
-    for (const edge of ["start", "end"]) {
-      const fade = new RegExp(`<span[^>]*data-testid="group-topic-fade-${edge}"[^>]*>`).exec(html)![0];
-      expect(fade).toContain("max-[900px]:hidden");
-      expect(fade).toContain(`group-data-[more-${edge}]/topics:opacity-100`);
-    }
-    // The sections' scroll margin is the one row's height (62px) and a 14px gap, fixed.
-    expect(html).not.toContain("--topic-links-h");
-    expect(count(html, /min-\[900px\]:scroll-mt-\[76px\]/g)).toBe(2);
-  });
-
-  it("links the two topics' sections", () => {
-    expect(hrefs(html, "group-topic-link")).toEqual(["#t-unemployment", "#t-wages"]);
-    // Each link is its label alone: no page bars, no count.
-    expect([...html.matchAll(/<a[^>]*data-testid="group-topic-link"[^>]*>([\s\S]*?)<\/a>/g)].map((match) => match[1])).toEqual(["უმუშევრობა და დასაქმება", "ხელფასები"]);
+  it("links no topics in a row of its own: the sidebar lists them, and each section keeps its heading and anchor", () => {
+    expect(html).not.toContain("group-topic");
+    expect(count(html, /href="#t-/g)).toBe(0);
     expect(sections(html).map(({ topic }) => topic)).toEqual(["unemployment", "wages"]);
+    expect([...html.matchAll(/<h2 id="th-([^"]+)"[^>]*>([^<]*)<\/h2>/g)].map((match) => [match[1], match[2]])).toEqual([["unemployment", "უმუშევრობა და დასაქმება"], ["wages", "ხელფასები"]]);
+    // A #t- jump lands the section 14px below what stays pinned: the 56px phone top bar below 900px, nothing from 900px.
+    expect(count(html, /scroll-mt-\[calc\(70px\+env\(safe-area-inset-top\)\)\][^"]*min-\[900px\]:scroll-mt-3\.5/g)).toBe(2);
   });
 
   it("has one card per page of the group, in the navigation's order", () => {
@@ -105,8 +88,7 @@ describe("the Labour market group page (ka)", async () => {
 describe("the Budget group page (en)", async () => {
   const html = renderToStaticMarkup(await renderGroupPage("budget", "en"));
 
-  it("has no topic links, one section and eight cards", () => {
-    expect(hrefs(html, "group-topic-link")).toEqual([]);
+  it("has one section and eight cards", () => {
     expect(sections(html).map(({ topic }) => topic)).toEqual(["budget"]);
     expect(cardTags(html)).toHaveLength(8);
     expect(hrefs(html, "group-headline")).toEqual(GROUP_HEADLINES.budget.map(({ page }) => `/en${page}`));
@@ -122,6 +104,15 @@ describe.each([["ka", ", უმსხვილესი"], ["en", ", largest"]] 
     expect(caption.length).toBeGreaterThan(1);
     expect(caption).not.toContain(largest.slice(2));
     expect(inner("explorer-card")).toContain(`${caption}${largest}`);
+  }, 120_000);
+});
+
+describe.each(["ka", "en"] as const)("every group page (%s)", (locale) => {
+  it.each(NAV_GROUPS.map(({ id }) => id))("%s has no row of topic links", async (id) => {
+    const html = renderToStaticMarkup(await renderGroupPage(id, locale));
+    expect(html).not.toContain("group-topic");
+    expect(count(html, /href="#t-/g)).toBe(0);
+    expect(sections(html).map(({ topic }) => topic)).toEqual([...group(id).topics]);
   }, 120_000);
 });
 

@@ -13,11 +13,12 @@ import { pageHref } from "../../lib/i18n/routes";
 import type { Locale, Messages } from "../../lib/i18n/types";
 import type { GroupId, TopicId } from "../../lib/navigation/navTree";
 import { CARD_GRID_CLASS, ExplorerCard, leadSpan } from "./explorer-card";
-import { GroupTopicScroll, TOPIC_LINKS_ID } from "./group-topic-scroll";
+import { GroupTopicScroll } from "./group-topic-scroll";
 
-// A group page (spec 2026-10-24-explorer-regroup §5, prototype `dx-hub-h1`, `dx-stats`, `dx-tabs`, `dx-topic`, `dx-grid`): the breadcrumb
-// row with the group's meta line, the icon and H1, one line, the four headline numbers, the topic links of a group with more
-// than one topic, then one section of cards per topic. Rendered on the server; only the forwarded-topic scroll runs in the browser.
+// A group page (spec 2026-10-24-explorer-regroup §5, prototype `dx-hub-h1`, `dx-stats`, `dx-topic`, `dx-grid`): the breadcrumb
+// row with the group's meta line, the icon and H1, one line, the four headline numbers, then one section of cards per topic.
+// The sidebar lists the topics, so the page has no row of topic links (owner, 2026-10-25). Rendered on the server; only the
+// forwarded-topic scroll runs in the browser.
 
 /** One topic's section: its heading row and line (shown only in a group of several topics), and its cards with each Regions card's spread. */
 export type GroupTopicSection = { topic: TopicId; label: string; meta: string; line: string | null; cards: HubCardModel[]; spreads: (RegionSpread | null)[] };
@@ -45,9 +46,6 @@ const HEADLINE_CLASS = [
   "max-[1101px]:pr-3 max-[1101px]:odd:mr-3 max-[1101px]:odd:border-r max-[1101px]:nth-[n+3]:border-t",
   "min-[1101px]:mr-[22px] min-[1101px]:border-r min-[1101px]:pr-[22px] min-[1101px]:last:mr-0 min-[1101px]:last:border-r-0",
 ].join(" ");
-
-// The topic links' edge fade, from 900px: shown where more links lie beyond that edge. It stops above the row's bottom rule.
-const EDGE_FADE = "pointer-events-none absolute top-0 bottom-px w-10 from-[var(--paper)] to-transparent opacity-0 transition-opacity duration-150 motion-reduce:transition-none max-[900px]:hidden";
 
 function Headline({ headline, locale, messages }: { headline: GroupHeadline; locale: Locale; messages: Messages }) {
   const { figure, unit } = splitValue(headline.value);
@@ -105,41 +103,18 @@ export function GroupPage({ locale, messages, group, href, name, line, meta, hea
       <div data-testid="group-headlines" className="mt-[22px] grid grid-cols-2 border-y border-[var(--hairline)] min-[1101px]:mt-[30px] min-[1101px]:grid-cols-4">
         {headlines.map((headline) => <Headline key={headline.href} headline={headline} locale={locale} messages={messages} />)}
       </div>
-      {multi ? (
-        // One row at every width, sticky, that scrolls sideways (prototype `dx-tabs`). From 900px a thin scrollbar shows, and a
-        // fade marks each edge with more links beyond it (`data-more-start`, `data-more-end`, kept by `GroupTopicScroll`).
-        <div data-testid="group-topic-row" className="group/topics sticky top-14 z-[6] mt-[26px] min-[900px]:top-0 max-[768px]:-mx-5">
-          <nav
-            aria-label={message(messages, "groups.topicsNav")}
-            id={TOPIC_LINKS_ID}
-            data-testid="group-topic-links"
-            className="flex gap-2 overflow-x-auto bg-[var(--paper)] py-2.5 [scrollbar-width:none] min-[900px]:[scrollbar-color:var(--control)_transparent] min-[900px]:[scrollbar-width:thin] data-[scrollbar]:pb-1 max-[768px]:px-5"
-          >
-            {topics.map((section) => (
-              <a
-                key={section.topic}
-                href={`#t-${section.topic}`}
-                data-testid="group-topic-link"
-                className="inline-flex min-h-[42px] flex-none items-center border border-[var(--hairline)] px-3.5 text-[13px] font-semibold whitespace-nowrap text-[var(--ink)] no-underline transition-colors duration-150 hover:border-[var(--ink)] hover:bg-[var(--tile)] motion-reduce:transition-none"
-              >
-                {section.label}
-              </a>
-            ))}
-          </nav>
-          <span aria-hidden data-testid="group-topic-fade-start" className={`${EDGE_FADE} left-0 bg-linear-to-r group-data-[more-start]/topics:opacity-100`} />
-          <span aria-hidden data-testid="group-topic-fade-end" className={`${EDGE_FADE} right-0 bg-linear-to-l group-data-[more-end]/topics:opacity-100`} />
-        </div>
-      ) : null}
       {topics.map((section) => {
         const headingId = `th-${section.topic}`;
         const lead = leadSpan(section.cards.length);
         return (
+          // A `#t-{topic}` jump sets the section's top rule 14px below what stays pinned: the 56px top bar (and the safe area)
+          // below 900px, nothing from 900px.
           <section
             key={section.topic}
             id={`t-${section.topic}`}
             aria-labelledby={headingId}
             tabIndex={-1}
-            className="mt-9 scroll-mt-[124px] focus:outline-none min-[768px]:mt-11 min-[900px]:scroll-mt-[76px]"
+            className="mt-9 scroll-mt-[calc(70px+env(safe-area-inset-top))] focus:outline-none min-[768px]:mt-11 min-[900px]:scroll-mt-3.5"
           >
             {multi ? (
               <>

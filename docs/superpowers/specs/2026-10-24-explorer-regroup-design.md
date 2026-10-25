@@ -110,12 +110,11 @@ Order on the page:
 | Society and environment | School pupils, University students, Internet users, Recorded crimes |
 
    Four columns on desktop, two from 768px down.
-4. **Topic links**, only for groups with more than one topic. One link per topic, with its name, a small block per page and the page count. The row sticks to the top while scrolling and scrolls sideways on phones.
-5. **One section per topic.** The heading row has the topic name and, mono on the right, `{years} · განახლდა {date} · {n} გვერდი`. Below it is the topic's one short line. A group with one topic (Budget, Demography) shows no topic heading.
-6. **Cards**, three columns on desktop, two at tablet width, one on phones. Each card is a link with an index (`01`) and arrow, the page title, a graphic, the latest value with its caption and period, and a footer with the years covered.
+4. **One section per topic.** The heading row has the topic name and, mono on the right, `{years} · განახლდა {date} · {n} გვერდი`. Below it is the topic's one short line. A group with one topic (Budget, Demography) shows no topic heading. The page has no row of topic links (owner decision 2026-10-25): the sidebar lists the topics, and a section's address `#t-{topic}` still opens the page at that section.
+5. **Cards**, three columns on desktop, two at tablet width, one on phones. Each card is a link with an index (`01`) and arrow, the page title, a graphic, the latest value with its caption and period, and a footer with the years covered.
    - The **first card of a topic is the lead card**. It is wider, with a larger area chart labelled with its first and last values and years, and it shows the page's description. Its span follows the design: the whole row, two columns, or two columns by two rows, depending on how many pages the topic has.
    - **Graphics:** a line with an end dot for any page with a national series; the **region spread** (one dot per region on a scale, Georgia marked with a dashed line, the lowest and highest named) for every Regions page; **bars** for Unemployment by age; **two bars** for Unemployment by sex (men, women); **top three bars** for Wages by industry. A page without a series or region values shows "Map and list · 11 regions" with the map icon, or keeps the empty graphic band.
-7. No footer and no source line. Explorer routes have no footer (owner decision 2026-10-25), and a group page names no source: each chart page's own source note names the institutions behind its figures.
+6. No footer and no source line. Explorer routes have no footer (owner decision 2026-10-25), and a group page names no source: each chart page's own source note names the institutions behind its figures.
 
 A topic's latest value, caption, years and update date come from that topic's existing hub card builder (`lib/explorer/*HubCards.ts`) and its coverage label. The group page assembles those builders. It never computes a figure a chart page does not.
 
@@ -213,7 +212,7 @@ The same index feeds the region-spread graphic of §5.
 
 **Genuinely new:**
 
-- `GroupPage` (group page layout, headline numbers, topic links, topic sections) and `ExplorerCard` (the card with its graphics). The hub card in `budget-hub.tsx` cannot stretch to lead cards, values and five graphic types without becoming a different component. It is replaced, and it remains in use only for the City air quality index, as DESIGN.md §6.6 records.
+- `GroupPage` (group page layout, headline numbers, topic sections) and `ExplorerCard` (the card with its graphics). The hub card in `budget-hub.tsx` cannot stretch to lead cards, values and five graphic types without becoming a different component. It is replaced, and it remains in use only for the City air quality index, as DESIGN.md §6.6 records.
 - `AllDataPage`, the A to Z list and `ExplorerSearch` (the client search box and results).
 - `lib/explorer/search/` holds the matching, the keyboard map and the stems, unit tested.
 - `lib/explorer/places/` holds the place index and the adapters.
@@ -239,7 +238,7 @@ The same index feeds the region-spread graphic of §5.
 ## 13. Testing
 
 - **Unit (vitest):** search matching (§7.5 table, stems, keyboard map, highlighting), place index adapters (one fixture place per family and level), the group config (every `NAV_TREE` topic in exactly one group, counts), `HubCardModel.latest` per builder, forwards (every old address forwards to the right place in both languages), and the sitemap.
-- **Browser (Playwright):** a new `explorer-groups.spec.ts` for the sidebar (open and close groups, the rail pop-out, the phone menu, the `/` key), each group page (headline numbers link, topic links jump, card links), All data (A to Z, letter jump, search and keyboard, the place card) and the forwards. Existing specs that open a topic hub (`/explorer/wages` and the like) or the Budget hub at `/explorer` switch to the group pages. Axe scans at phone and desktop widths.
+- **Browser (Playwright):** a new `explorer-groups.spec.ts` for the sidebar (open and close groups, the rail pop-out, the phone menu, the `/` key), each group page (headline numbers link, a topic's address lands on its section, card links), All data (A to Z, letter jump, search and keyboard, the place card) and the forwards. Existing specs that open a topic hub (`/explorer/wages` and the like) or the Budget hub at `/explorer` switch to the group pages. Axe scans at phone and desktop widths.
 - Screenshots of every board's equivalent for Duru's review before any push.
 
 ## 14. Out of scope and dependencies

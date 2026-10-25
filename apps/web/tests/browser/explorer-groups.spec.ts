@@ -253,7 +253,7 @@ test.describe("the phone menu at 375px", () => {
 });
 
 for (const prefix of PREFIXES) {
-  test(`every group page links its headlines and topics, with one card per page ${prefix || "ka"}`, async ({ page, request }) => {
+  test(`every group page links its headlines, shows no row of topic links, and has one card per page ${prefix || "ka"}`, async ({ page, request }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
     for (const group of NAV_GROUPS) {
       await page.goto(`${prefix}${group.href}`);
@@ -267,17 +267,15 @@ for (const prefix of PREFIXES) {
         expect(await cards.evaluateAll((links) => links.map((link) => link.getAttribute("href"))), topic).toEqual(topicHub(topic).sections.map(({ href }) => `${prefix}${href}`));
       }
       expect(await page.getByTestId("explorer-card").count()).toBe(groupPages(group).length);
-      const topicLinks = page.getByTestId("group-topic-link");
-      await expect(topicLinks).toHaveCount(group.topics.length > 1 ? group.topics.length : 0);
+      // The sidebar lists the topics; the page itself has no row of links to its sections (owner, 2026-10-25).
+      await expect(page.locator("[data-testid^=group-topic]")).toHaveCount(0);
+      await expect(page.locator('#content a[href^="#t-"]')).toHaveCount(0);
       if (group.topics.length < 2) continue;
-      // The last topic's link scrolls its section into view below the sticky links.
+      // The last topic's address still opens on its section.
       const last = group.topics.at(-1)!;
-      await topicLinks.last().click();
-      await expect(page).toHaveURL(new RegExp(`${group.href}#t-${last}$`));
-      const section = page.locator(`#t-${last}`);
-      await expect(section).toBeInViewport();
-      const bar = (await topicLinks.first().locator("xpath=..").boundingBox())!;
-      await expect.poll(async () => Math.round((await section.boundingBox())!.y)).toBeGreaterThanOrEqual(Math.floor(bar.y + bar.height) - 1);
+      await page.goto(`${prefix}${group.href}#t-${last}`);
+      await ready(page);
+      await expect(page.locator(`#th-${last}`)).toBeInViewport();
     }
   });
 }
@@ -287,7 +285,7 @@ const broken = (root: Locator, testId: string) => root.getByTestId(testId).evalu
   elements.filter((element) => element.getClientRects().length > 1).map((element) => element.textContent));
 
 for (const viewport of [{ width: 1440, height: 900 }, { width: 1024, height: 768 }]) {
-  test(`at ${viewport.width}px the topic links are one pinned row that scrolls, and no value parts from its unit`, async ({ page }) => {
+  test(`at ${viewport.width}px no value parts from its unit`, async ({ page }) => {
     await page.setViewportSize(viewport);
     for (const prefix of PREFIXES) {
       for (const group of NAV_GROUPS) {
@@ -316,100 +314,45 @@ for (const viewport of [{ width: 1440, height: 900 }, { width: 1024, height: 768
           expect(await value.evaluate((element) => element.getClientRects().length), (await value.textContent()) ?? "").toBe(1);
           expect((await value.boundingBox())!.height).toBeLessThan(20);
         }
-        if (group.topics.length < 2) continue;
-        // One row, pinned, no taller than one line of links, that scrolls sideways to every link.
-        const row = page.getByTestId("group-topic-links");
-        expect(await page.getByTestId("group-topic-row").evaluate((element) => getComputedStyle(element).position)).toBe("sticky");
-        const rowBox = (await row.boundingBox())!;
-        expect(rowBox.height, group.id).toBeLessThanOrEqual(70);
-        const links = page.getByTestId("group-topic-link");
-        const tops = await links.evaluateAll((elements) => elements.map((element) => Math.round(element.getBoundingClientRect().top)));
-        expect(new Set(tops).size, group.id).toBe(1);
-        for (const link of await links.all()) {
-          await link.evaluate((element) => element.scrollIntoView({ block: "nearest", inline: "nearest" }));
-          const box = (await link.boundingBox())!;
-          expect(box.x, (await link.textContent()) ?? "").toBeGreaterThanOrEqual(rowBox.x - 0.5);
-          expect(box.x + box.width, (await link.textContent()) ?? "").toBeLessThanOrEqual(rowBox.x + rowBox.width + 0.5);
-        }
-        // A topic link lands its section below the row.
-        const last = group.topics.at(-1)!;
-        await links.last().click();
-        const section = page.locator(`#t-${last}`);
-        await expect(section).toBeInViewport();
-        await expect.poll(async () => {
-          const bar = (await row.boundingBox())!;
-          return Math.round((await section.boundingBox())!.y) - Math.floor(bar.y + bar.height);
-        }).toBeGreaterThanOrEqual(-1);
       }
     }
   });
+}
 
-  test(`at ${viewport.width}px a #t-transport address lands the Transport heading below the row and its link in the row`, async ({ page }) => {
+// With no row of topic links pinned, a section's address sets its top rule 14px below the phone's 56px top bar, and 14px
+// below the top from 900px; its heading follows the rule (measured: rule at 70 and 14, heading box 13px under it).
+for (const viewport of [{ width: 1440, height: 900 }, { width: 1024, height: 768 }, { width: 375, height: 812 }]) {
+  test(`at ${viewport.width}px a #t-transport address lands the Transport heading just below the ${viewport.width < 900 ? "top bar" : "top"}`, async ({ page }) => {
     await page.setViewportSize(viewport);
     const chartPage = topicHub("transport").sections[0].href;
+    const pinned = viewport.width < 900 ? 56 : 0;
     for (const prefix of PREFIXES) {
       const landed = async () => {
         await ready(page);
-        const bar = (await page.getByTestId("group-topic-links").boundingBox())!;
-        await expect.poll(async () => Math.round((await page.locator("#th-transport").boundingBox())!.y)).toBeGreaterThanOrEqual(Math.ceil(bar.y + bar.height));
+        // At 1440px the page ends before Transport, its last section, can reach the top, so it stops lower, in view.
+        const landing = () => page.locator("#t-transport").evaluate((section) => ({
+          y: Math.round(section.getBoundingClientRect().top),
+          end: Math.ceil(window.scrollY) >= document.documentElement.scrollHeight - window.innerHeight - 1,
+        }));
+        await expect.poll(async () => { const { y, end } = await landing(); return y === pinned + 14 || (end && y > pinned + 14); }).toBe(true);
+        const section = (await page.locator("#t-transport").boundingBox())!;
+        const heading = (await page.locator("#th-transport").boundingBox())!;
+        expect(heading.y - section.y).toBeGreaterThan(0);
+        expect(heading.y - section.y).toBeLessThan(26);
         await expect(page.locator("#th-transport")).toBeInViewport();
-        const link = (await page.getByTestId("group-topic-link").and(page.locator('[href="#t-transport"]')).boundingBox())!;
-        expect(link.x).toBeGreaterThanOrEqual(bar.x - 0.5);
-        expect(link.x + link.width).toBeLessThanOrEqual(bar.x + bar.width + 0.5);
       };
       // Typed or followed from outside the site.
       await page.goto(`${prefix}/explorer/society#t-transport`);
       await landed();
-      // A Transport chart page's crumb (R8).
+      // A Transport chart page's crumb (R8): the trail, or below 768px the back crumb.
       await page.goto(`${prefix}${chartPage}`);
       await ready(page);
-      await page.getByTestId("explorer-header").locator(`a[href="${prefix}/explorer/society#t-transport"]`).first().click();
+      await page.getByTestId("explorer-header").locator(`a[href="${prefix}/explorer/society#t-transport"]`).filter({ visible: true }).first().click();
       await expect.poll(() => address(page)).toBe(`${prefix}/explorer/society#t-transport`);
       await landed();
     }
   });
 }
-
-for (const viewport of [{ width: 1024, height: 768 }, { width: 1440, height: 900 }]) {
-  test(`at ${viewport.width}px Society's pinned topic row, with a scrollbar that takes room, is no taller than 70px`, async ({ playwright, browserName, channel, launchOptions, baseURL }) => {
-    // Headless Chromium hides scrollbars; Windows and Linux desktops draw the thin one under the links.
-    const browser = await playwright[browserName].launch({ ...launchOptions, channel, ignoreDefaultArgs: ["--hide-scrollbars"] });
-    try {
-      const page = await browser.newPage({ baseURL, viewport });
-      for (const prefix of PREFIXES) {
-        await page.goto(`${prefix}/explorer/society`);
-        await ready(page);
-        const row = page.getByTestId("group-topic-links");
-        // The Georgian row overflows at both widths; the English one, labels only, can fit at 1440px and then draws no scrollbar.
-        const overflows = await row.evaluate((element) => element.scrollWidth > element.clientWidth);
-        if (!prefix) expect(overflows, "the Georgian row overflows").toBe(true);
-        expect(await row.evaluate((element) => (element as HTMLElement).offsetHeight - element.clientHeight > 1), "the scrollbar is drawn when the row overflows").toBe(overflows);
-        await page.evaluate(() => window.scrollTo(0, 2000));
-        await expect.poll(async () => (await row.boundingBox())!.y).toBe(0);
-        expect((await row.boundingBox())!.height, prefix || "ka").toBeLessThanOrEqual(70);
-      }
-    } finally {
-      await browser.close();
-    }
-  });
-}
-
-test("at 1024px the Society row fades the edge with more links beyond it, and below 900px it shows no fade", async ({ page }) => {
-  await page.setViewportSize({ width: 1024, height: 768 });
-  await page.goto("/explorer/society");
-  await ready(page);
-  const opacity = (edge: "start" | "end") => page.getByTestId(`group-topic-fade-${edge}`).evaluate((element) => getComputedStyle(element).opacity);
-  const row = page.getByTestId("group-topic-links");
-  expect(await row.evaluate((element) => element.scrollWidth > element.clientWidth)).toBe(true);
-  await expect.poll(() => opacity("end")).toBe("1");
-  expect(await opacity("start")).toBe("0");
-  await row.evaluate((element) => { element.scrollLeft = element.scrollWidth; });
-  await expect.poll(() => opacity("start")).toBe("1");
-  await expect.poll(() => opacity("end")).toBe("0");
-  await page.setViewportSize({ width: 375, height: 812 });
-  await expect(page.getByTestId("group-topic-fade-start")).toBeHidden();
-  await expect(page.getByTestId("group-topic-fade-end")).toBeHidden();
-});
 
 // 320px is the narrowest phone: a headline's long unit (`მლრდ აშშ დოლარი`) and a lead card's value wrap there instead of
 // pushing the page sideways.
