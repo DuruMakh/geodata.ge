@@ -90,3 +90,10 @@ export type WageGapChapter = {
   history: { years: number[]; values: number[] }; // national average, first..latest
   sectors: { id: string; label: string; average: number; women: number; men: number }[]; // average desc
 };
+
+export type TradeChapter = {
+  year: number; exportsUsd: number; importsUsd: number; turnoverUsd: number; balanceUsd: number;
+  years: number[]; exports: number[]; imports: number[]; // USD, one per year, first..latest
+  partners: { id: string; label: string; exportsUsd: number; importsUsd: number; turnoverUsd: number }[]; // countries only, at most 10, turnover desc
+  topProduct: { label: string; usd: number; share: number }; secondProduct: { label: string; usd: number } | null; // share of national exports
+};
