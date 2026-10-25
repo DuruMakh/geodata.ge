@@ -384,12 +384,14 @@ describe("hub cards", () => {
       "New cases of illness diagnosed each year in Georgia, by disease group and for six single diseases.",
       "What people die of in Georgia and in each region, by main group of causes, with the death rate by region.",
     ]);
-    expect(cards.map(card => card.footer)).toEqual(["2025 · 22,491 · 2002–2025", "2025 · 500.4 thousand · 2002–2025", "2025 · 44,319 · 2014–2025"]);
+    // Causes of death follows its page's line, the death rate per 1,000 people, not the count of deaths.
+    expect(cards.map(card => card.footer)).toEqual(["2025 · 22,491 · 2002–2025", "2025 · 500.4 thousand · 2002–2025", "2025 · 11.3 · 2014–2025"]);
+    expect(cards.map(card => card.latest?.caption)).toEqual(["Doctors", "New respiratory cases", "Deaths per 1,000 people, Georgia"]);
     expect(cards.map(card => card.series?.length)).toEqual([24, 24, 12]);
-    expect(cards.map(card => card.series!.at(-1))).toEqual([22491, 500.359, 44319]);
+    expect(cards.map(card => card.series!.at(-1))).toEqual([22491, 500.359, 11.3]);
     expect(cards.every(card => card.comingSoon === false && card.seriesColor === INK)).toBe(true);
     const ka = buildHealthHubCards(facts, await presentationFor("ka"));
-    expect(ka.map(card => card.footer)).toEqual(["2025 · 22,491 · 2002–2025", "2025 · 500.4 ათასი · 2002–2025", "2025 · 44,319 · 2014–2025"]);
+    expect(ka.map(card => card.footer)).toEqual(["2025 · 22,491 · 2002–2025", "2025 · 500.4 ათასი · 2002–2025", "2025 · 11.3 · 2014–2025"]);
   });
 });
 

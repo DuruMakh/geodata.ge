@@ -69,5 +69,11 @@ export function museumAreaSelectionHash(selectedIds: readonly string[], area: Mu
   return !moved.length || moved.join(",") === museumAreaDefaultSelection(area).join(",") ? "" : `#${new URLSearchParams({ sel: moved.join(",") })}`;
 }
 
+/** The latest-value line's figure: the area's own visitors (the reference row) in their latest year, whatever is chosen below. */
+export function museumAreaLatest(area: MuseumArea, facts: readonly ClientScienceCultureFact[]): ClientScienceCultureFact {
+  const visitorsId = museumAreaSeries(area).find(series => series.reference)!.id;
+  return facts.filter(f => f.indicatorId === visitorsId).sort((a, b) => a.year - b.year).at(-1)!;
+}
+
 export const buildMuseumAreaModel = (area: MuseumArea, facts: readonly ClientScienceCultureFact[], state: TopicState): ScienceCultureListModel =>
   buildScienceCultureSeriesModel(museumAreaSeries(area), facts, state);

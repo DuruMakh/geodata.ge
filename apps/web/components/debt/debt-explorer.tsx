@@ -38,6 +38,7 @@ import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { MeasurePill } from "../explorer-shell/measure-pill";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { DECK_LINE_CLASS } from "../explorer-shell/latest-value-line";
+import { navGroup, ALL_DATA_PATH } from "../../lib/navigation/navTree";
 
 type DebtRange = { start: number; end: number; min: number; max: number };
 
@@ -158,8 +159,8 @@ export function DebtExplorerSurface(props: DebtExplorerSurfaceProps) {
         messages={messages}
         crumbs={[
           { label: message(messages, "common.home"), href: pageHref("/", locale) },
-          { label: message(messages, "common.data") },
-          { label: message(messages, "common.budget"), href: pageHref("/explorer", locale) },
+          { label: message(messages, "common.data"), href: pageHref(ALL_DATA_PATH, locale) },
+          { label: message(messages, "common.budget"), href: pageHref(navGroup("budget").href, locale) },
           { label: message(messages, "common.debt") },
         ]}
         coverage={coverage}

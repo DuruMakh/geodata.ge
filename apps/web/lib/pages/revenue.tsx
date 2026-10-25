@@ -7,6 +7,7 @@ import { MainExplorer } from "../../components/main-explorer/main-explorer";
 import { BreadcrumbJsonLd } from "../../components/seo/breadcrumb-json-ld";
 import { JsonLd } from "../../components/seo/json-ld";
 import { publicGlossaryEntry } from "../data/glossary";
+import { citedReviewedAt } from "../data/sources";
 import { loadServedExplorerData, loadServedLandingData } from "../data/servedData";
 import { loadGdpWorkbookSources, loadWorkbookSources } from "../methodology/workbookSources";
 import { coverageFromYears, fiscalMetadata } from "../seo/metadata";
@@ -14,6 +15,7 @@ import { pageHref } from "../i18n/routes";
 import { explorerDatasetJsonLd } from "../seo/structuredData";
 import { resolveSiteUrl } from "../siteUrl";
 import { projectBudgetFact, projectGdpFact } from "../explorer/clientData";
+import { ALL_DATA_PATH, navGroup } from "../navigation/navTree";
 
 export async function revenuePageMetadata(locale: Locale): Promise<Metadata> {
   const [{ facts }, messages] = await Promise.all([loadServedLandingData(), getMessages(locale, ["main"])]);
@@ -35,10 +37,9 @@ export async function renderRevenuePage(locale: Locale) {
   // never be rendered on this route — 53 KB of dead payload, the same reasoning
   // the adminFacts note below already applies to the admin corpus.
   const ownFacts = facts.filter((fact) => fact.side === "revenue");
-  // Computed from the full registry, before the narrowing below: this is the
-  // displayed "განახლდა" date and narrowing it here would change what the page
-  // shows, not just what it ships.
-  const lastUpdatedAt = sourceDocuments.map((source) => source.lastReviewedAt).sort().at(-1) ?? "";
+  // The displayed "განახლდა" date: the newest source the page's own rows cite, as the sitemap dates it (lib/seo/sitemap.ts).
+  // The Budget group cites these rows and more, so it is never older than this page.
+  const lastUpdatedAt = citedReviewedAt(sourceDocuments, ownFacts);
   const { firstYear, lastYear } = coverageFromYears(ownFacts);
   // The series search matches English names on the Georgian page too.
   const labelIds = ["revenue.total", ...ownFacts.map(fact => fact.itemId)];
@@ -65,7 +66,7 @@ export async function renderRevenuePage(locale: Locale) {
         })}
         testId="explorer-dataset-json-ld"
       />
-      <BreadcrumbJsonLd items={[{ name: message(messages, "common.home"), path: pageHref("/", locale) }, { name: message(messages, "common.budget"), path: pageHref("/explorer", locale) }, { name: message(messages, "common.revenue"), path: pageHref("/explorer/revenue", locale) }]} />
+      <BreadcrumbJsonLd items={[{ name: message(messages, "common.home"), path: pageHref("/", locale) }, { name: message(messages, "common.data"), path: pageHref(ALL_DATA_PATH, locale) }, { name: message(messages, "common.budget"), path: pageHref(navGroup("budget").href, locale) }, { name: message(messages, "common.revenue"), path: pageHref("/explorer/revenue", locale) }]} />
       <MainExplorer
         presentation={clientPresentation(presentation)}
         nav="revenue"

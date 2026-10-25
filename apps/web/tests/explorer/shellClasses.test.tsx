@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 import type { Locale } from "../../lib/i18n/types";
 import { renderPageMarkup } from "../helpers/render-localized";
 
-// The budget hub's legacy-hash redirect reads the router; no other page here does.
+// The group pages' topic scroll reads the router.
 vi.mock("next/navigation", async (original) => ({ ...(await original<typeof import("next/navigation")>()), useRouter: () => ({ replace() {} }) }));
 
 // The class lists the explorer shell renders on each page, pinned before the
@@ -14,8 +14,8 @@ const PAGES: ReadonlyArray<{ name: string; render: (locale: Locale) => Promise<u
   { name: "deficit", render: async (l) => (await import("../../lib/pages/deficit")).renderDeficitPage(l) },
   { name: "gdp", render: async (l) => (await import("../../lib/pages/gdp")).renderGdpPage(l) },
   { name: "sectors", render: async (l) => (await import("../../lib/pages/economic-sectors")).renderEconomicSectorsPage(l) },
-  { name: "economy", render: async (l) => (await import("../../lib/pages/economy")).renderEconomyPage(l) },
-  { name: "inflation", render: async (l) => (await import("../../lib/pages/hubs/inflation")).renderInflationHub(l) },
+  { name: "economy", render: async (l) => (await import("../../lib/pages/group")).renderGroupPage("economy", l) },
+  { name: "prices", render: async (l) => (await import("../../lib/pages/group")).renderGroupPage("prices", l) },
   { name: "inflation-overview", render: async (l) => (await import("../../lib/pages/inflation-overview")).renderInflationOverview(l) },
   { name: "inflation-categories", render: async (l) => (await import("../../lib/pages/inflation-categories")).renderInflationCategories(l) },
   { name: "regions", render: async (l) => (await import("../../lib/pages/regional-economies")).renderRegionalEconomiesPage(l) },
@@ -47,9 +47,9 @@ describe.each(PAGES)("'$name' shell", ({ render }) => {
 });
 
 // U02-04: the budget hub's source and update date live in the footer note and the header's coverage label; the page
-// repeated both in a source note of its own (and showed the date twice on one screen).
-it("the budget hub states its source and update date once", async () => {
-  const markup = renderPageMarkup("en", (await (await import("../../lib/pages/hub")).renderHubPage("en")) as never);
+// repeated both in a source note of its own (and showed the date twice on one screen). The Budget group page replaced it.
+it("the budget group page states its source and update date once", async () => {
+  const markup = renderPageMarkup("en", (await (await import("../../lib/pages/group")).renderGroupPage("budget", "en")) as never);
   expect(markup).not.toContain("Last updated");
   expect(markup).not.toContain("World Economic Outlook");
   expect(markup).toMatch(/Updated \d{1,2} [A-Z][a-z]+ \d{4}/);

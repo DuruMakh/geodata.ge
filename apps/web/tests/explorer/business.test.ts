@@ -431,12 +431,15 @@ test("area workbooks scale money to million GEL, keep persons whole, and cite th
 });
 
 test("the hub has five cards: four headline series with their latest values and years, then Regions with its years only", async () => {
-  const cards = buildBusinessHubCards(facts, await presentation());
+  const base = await presentation();
+  const cards = buildBusinessHubCards(facts, { ...base, messages: { ...await getMessages("en", ["business"]), ...base.messages } });
   expect(cards.map(card => card.href)).toEqual(BUSINESS_SECTIONS.map(section => section.href));
   expect(cards.map(card => card.title)).toEqual(["Sales", "Jobs", "Investment and profit", "New and closed firms", "Regions"]);
   expect(cards.map(card => card.footer)).toEqual(["2025 · 253.7 bn GEL · 1999–2025", "2025 · 899.0 thousand · 1999–2025", "2025 · 8.0 bn GEL · 2006–2025", "2024 · 56,259 new firms · 2014–2024", "2006–2025"]);
   expect(cards.map(card => card.series?.length ?? null)).toEqual([27, 27, 20, 11, null]);
   expect(cards[0].series!.at(-1)).toBe(253725500000);
+  // Investment and profit names the figure its page's line leads with; the other titles name theirs.
+  expect(cards.map(card => card.latest?.caption ?? null)).toEqual([null, null, "Investment", null, null]);
   expect(cards[4]).toMatchObject({ series: null, seriesColor: null, comingSoon: false });
   expect(cards.map(card => card.index)).toEqual(["01", "02", "03", "04", "05"]);
 });

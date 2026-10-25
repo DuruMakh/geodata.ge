@@ -10,6 +10,10 @@
   --faint: #776E5C;
   --ink-fg-muted: #A69C8C;
   --ink-fg-faint: #8F8676;
+  --ink-divider: #2C2720;
+  --ink-line: #3A342B;
+  /* The current or hovered row on ink (DESIGN.md §6.7). */
+  --ink-active: rgba(247, 242, 233, 0.07);
   --hairline: #D9CFBE;
   --hairline-soft: #E7DECF;
   --row-border: #EDE4D3;
@@ -92,6 +96,14 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* Chart labels are placed from estimated glyph widths (lib/explorer/chartScale.ts).
+   Hinted text snaps each glyph to the drawing's rendered pixel size, so a chart
+   scaled below its viewBox prints labels up to ~10% wider than the estimate and
+   clips them; geometric precision keeps the widths the same at every scale. */
+svg text {
+  text-rendering: geometricPrecision;
+}
+
 button,
 select,
 input {
@@ -150,6 +162,17 @@ summary:focus-visible {
   [data-testid="data-sidebar"] {
     transition: none;
   }
+}
+
+/* The explorer sidebar and its phone bar draw the focus ring in paper: the accent ring is only about 3:1 on ink. */
+[data-testid="data-sidebar"] :focus-visible,
+[data-testid="sidebar-topbar"] :focus-visible {
+  outline-color: var(--paper);
+}
+
+/* While the phone menu covers the page, the page is hidden and the skip link has nothing to skip to. */
+body:has([data-menu-open]) a[href="#content"] {
+  display: none;
 }
 
 /* Reserve the relief's cropped band before its scene loads. These bounds follow

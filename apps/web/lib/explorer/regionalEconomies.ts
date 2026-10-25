@@ -127,6 +127,14 @@ export function changeRegionalEconomyMeasure(
   };
 }
 
+/** The latest regional GDP among the facts: the line under a region page's heading (its range's, or the whole series'). */
+export function latestRegionalGdpTotal<Fact extends Pick<ClientRegionalEconomyObservation, "seriesId" | "year">>(facts: readonly Fact[]): Fact | null {
+  return facts
+    .filter((fact) => fact.seriesId === REGIONAL_GDP_TOTAL)
+    .sort((left, right) => left.year - right.year)
+    .at(-1) ?? null;
+}
+
 export function buildRegionalEconomyModel(
   facts: readonly ClientRegionalEconomyObservation[],
   registry: readonly SectorDefinition[],
@@ -170,10 +178,7 @@ export function buildRegionalEconomyModel(
       preliminary: years.map(() => false),
     })),
     endValues,
-    headline: active
-      .filter((fact) => fact.seriesId === REGIONAL_GDP_TOTAL)
-      .sort((left, right) => left.year - right.year)
-      .at(-1) ?? null,
+    headline: latestRegionalGdpTotal(active),
     hasData: active.some((fact) => state.selectedIds.includes(fact.seriesId)),
   };
 }

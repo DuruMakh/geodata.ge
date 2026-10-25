@@ -1,5 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 import ExcelJS from "exceljs";
+import { cardFigure, topicCards } from "./group-cards";
 
 const pressed = (id: string) => `[data-series-id="${id}"] [data-testid="series-row-toggle"]`;
 const ticked = (page: Page) => page.locator('[data-testid="series-row-toggle"][aria-pressed="true"]');
@@ -28,21 +29,25 @@ async function cell(page: Page, label: string, year: number) {
 
 test.use({ viewport: { width: 1440, height: 900 } });
 
-test("the hub shows four cards, each opening its page, and the sidebar lists Science and culture after Education", async ({ page }) => {
+// The old hub is the section #t-science-culture of the Society and environment page now.
+test("its group page shows four cards, each opening its page, and the sidebar lists Science and culture after Education", async ({ page }) => {
   for (const prefix of ["", "/en"]) {
-    await page.goto(`${prefix}/explorer/science-culture`);
-    const hub = page.getByTestId("science-culture-hub");
-    await expect(hub.getByTestId("hub-card")).toHaveCount(4);
-    expect(await hub.locator("a").evaluateAll(links => links.map(link => link.getAttribute("href")))).toEqual(SECTIONS.map(section => `${prefix}/explorer/science-culture/${section}`));
-    for (let index = 0; index < 4; index += 1) await expect(hub.locator("a").nth(index).locator("svg")).toHaveCount(1);
-    const entry = page.getByTestId("science-culture-link");
-    await expect(entry).toHaveAttribute("aria-current", "page");
-    expect(await page.getByTestId("education-link").evaluate((education, science) => Boolean(education.compareDocumentPosition(science!) & Node.DOCUMENT_POSITION_FOLLOWING), await entry.elementHandle())).toBe(true);
+    await page.goto(`${prefix}/explorer/society`);
+    const cards = topicCards(page, "science-culture");
+    await expect(cards).toHaveCount(4);
+    expect(await cards.evaluateAll(links => links.map(link => link.getAttribute("href")))).toEqual(SECTIONS.map(section => `${prefix}/explorer/science-culture/${section}`));
+    for (let index = 0; index < 4; index += 1) await expect(cards.nth(index).getByTestId("explorer-card-graphic").locator("svg")).toHaveCount(1);
+    await expect(page.getByTestId("group-link-society")).toHaveAttribute("aria-current", "page");
+    const entry = page.getByTestId("science-culture-research-link");
+    expect(await page.getByTestId("education-vocational-link").evaluate((education, science) => Boolean(education.compareDocumentPosition(science!) & Node.DOCUMENT_POSITION_FOLLOWING), await entry.elementHandle())).toBe(true);
     for (const id of SECTIONS) await expect(page.getByTestId(`science-culture-${id}-link`)).toBeVisible();
   }
-  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Science and culture");
-  const cards = page.getByTestId("science-culture-hub").locator("a");
-  for (const [index, footer] of ["2024 · 14,046 · 2019–2024", "2025 · 79 · 2016–2025", "2025 · 1,998.9 · 2005–2025", "2025 · 620.3 · 2006–2025"].entries()) await expect(cards.nth(index)).toContainText(footer);
+  await expect(page.locator("#t-science-culture").getByRole("heading", { level: 2 })).toHaveText("Science and culture");
+  const cards = topicCards(page, "science-culture");
+  for (const [index, figure] of [
+    ["14,046", "2024", "2019–2024", "Researchers"], ["79", "2025", "2016–2025", "Invention applications from Georgia"],
+    ["2.0 million", "2025", "2005–2025", "Museum visitors"], ["620.3 thousand", "2025", "2006–2025", "Theatre-goers"],
+  ].entries()) await expect(cards.nth(index)).toHaveAccessibleDescription(cardFigure(figure[0], figure[1], figure[2], figure[3]));
 });
 
 test("research selects all researchers, and ticking spending replaces them (one unit at a time)", async ({ page }) => {

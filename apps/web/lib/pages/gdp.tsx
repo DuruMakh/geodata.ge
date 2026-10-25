@@ -16,6 +16,7 @@ import { loadEnglishCatalogue } from "../i18n/catalogue.server";
 import { projectPublicSources, sourcedWorkbookSources } from "../methodology/publicSources";
 import { BreadcrumbJsonLd } from "../../components/seo/breadcrumb-json-ld";
 import { pageHref } from "../i18n/routes";
+import { ALL_DATA_PATH } from "../navigation/navTree";
 export async function gdpPageMetadata(locale: Locale) {
   const m = await getMessages(locale, ["gdp"]);
   return fiscalMetadata({
@@ -73,6 +74,10 @@ export async function renderGdpPage(locale: Locale) {
           {
             name: message(presentation.messages, "common.home"),
             path: pageHref("/", locale),
+          },
+          {
+            name: message(presentation.messages, "common.data"),
+            path: pageHref(ALL_DATA_PATH, locale),
           },
           {
             name: message(presentation.messages, "gdp.economy"),

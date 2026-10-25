@@ -19,7 +19,7 @@ import { loadServedTradeOverviewData, toClientTradeOverviewFact } from "../data/
 import { loadServedTradePartnersData, toClientTradePartnersData } from "../data/tradePartners/importTradePartners";
 import { TRADE_PARTNER_SOURCES } from "../data/tradePartners/types";
 import { loadServedTradeProductsData, loadTradeProductCatalogueFingerprint, projectTradeProductsForPage, toClientTradeProductsData } from "../data/tradeProducts/importTradeProducts";
-import { TRADE_PRODUCT_MEASURES, TRADE_PRODUCT_SOURCES } from "../data/tradeProducts/types";
+import { PRODUCT_SOURCE_BLOCK, TRADE_PRODUCT_MEASURES, TRADE_PRODUCT_SOURCES } from "../data/tradeProducts/types";
 import { tradeProductsCoverage } from "../explorer/tradeProductsState";
 import { tradePartnersCoverage } from "../explorer/tradePartnersState";
 import { TRADE_OVERVIEW_INDICATORS, TRADE_OVERVIEW_SOURCE } from "../data/tradeOverview/types";
@@ -37,7 +37,7 @@ import { projectWorkbookSources } from "../methodology/workbookSources";
 import { fiscalMetadata } from "../seo/metadata";
 import { explorerDatasetJsonLd } from "../seo/structuredData";
 import { resolveSiteUrl } from "../siteUrl";
-import { PRODUCT_SOURCE_BLOCK } from "./hubs/trade";
+import { topicSection, ALL_DATA_PATH } from "../navigation/navTree";
 
 export async function tradeOverviewMetadata(locale: Locale) {
   const messages = await getMessages(locale, ["trade"]);
@@ -68,14 +68,14 @@ export async function renderTradeDomesticPage(locale: Locale) {
   const t = (key: string) => message(presentation.messages, `trade.${key}`), title = t("domestic.title");
   const sources = projectWorkbookSources(manifest.filter(row => row.source_id in TRADE_DOMESTIC_DOCUMENT_IDS), locale, catalogue.documents);
   const lastReviewedAt = domestic.facts.map(f => f.lastReviewedAt).sort().at(-1)!, origin = resolveSiteUrl();
-  const crumbs = [{ label: message(presentation.messages, "common.home"), href: pageHref("/", locale) }, { label: message(presentation.messages, "common.data") }, { label: t("hubTitle"), href: pageHref("/explorer/trade", locale) }, { label: title }];
+  const crumbs = [{ label: message(presentation.messages, "common.home"), href: pageHref("/", locale) }, { label: message(presentation.messages, "common.data"), href: pageHref(ALL_DATA_PATH, locale) }, { label: t("hubTitle"), href: pageHref(topicSection("trade").href, locale) }, { label: title }];
   return <I18nProvider {...clientPresentation(presentation)} englishLabels={{ ...presentation.englishLabels, ...pageLabels }}>
     <JsonLd testId="explorer-dataset-json-ld" data={explorerDatasetJsonLd({
       locale, origin, path: "/explorer/trade/domestic-exports", datasetId: "trade", name: title, description: t("domestic.summary"), firstYear: min, lastYear: max, dateModified: lastReviewedAt,
       // The page compares domestic exports with total exports and re-exports.
       variableMeasured: [t("indicator.trade.domestic_exports"), t("indicator.trade.exports"), t("indicator.trade.reexports")],
     })} />
-    <BreadcrumbJsonLd items={[{ name: crumbs[0].label, path: pageHref("/", locale) }, { name: t("hubTitle"), path: pageHref("/explorer/trade", locale) }, { name: title, path: pageHref("/explorer/trade/domestic-exports", locale) }]} />
+    <BreadcrumbJsonLd items={[{ name: crumbs[0].label, path: pageHref("/", locale) }, { name: message(presentation.messages, "common.data"), path: pageHref(ALL_DATA_PATH, locale) }, { name: t("hubTitle"), path: pageHref(topicSection("trade").path, locale) }, { name: title, path: pageHref("/explorer/trade/domestic-exports", locale) }]} />
     <ExplorerPage containerQueries={false}>
       <PageHeader locale={locale} messages={presentation.messages} crumbs={crumbs} coverage={coverageLabel(presentation.messages, locale, min, max, lastReviewedAt)} />
       <TradeDomesticExports data={{ ...data, products: projectTradeProductsForPage(data.products, locale) }} sources={sources} lastReviewedAt={lastReviewedAt} siteOrigin={origin} />
@@ -95,13 +95,13 @@ export async function renderTradeProductsPage(locale: Locale) {
   const sources = projectWorkbookSources(manifest.filter(row => sourceIds.has(row.source_id)), locale, catalogue.documents);
   const lastReviewedAt = [...products.facts.filter(fact => fact.sourceBlock === PRODUCT_SOURCE_BLOCK), ...national.facts.filter(fact => data.years.includes(fact.year))].map(fact => fact.lastReviewedAt).sort().at(-1)!, origin = resolveSiteUrl();
   const t = (key: string) => message(presentation.messages, `trade.${key}`);
-  const crumbs = [{ label: message(presentation.messages, "common.home"), href: pageHref("/", locale) }, { label: message(presentation.messages, "common.data") }, { label: t("hubTitle"), href: pageHref("/explorer/trade", locale) }, { label: t("products.title") }];
+  const crumbs = [{ label: message(presentation.messages, "common.home"), href: pageHref("/", locale) }, { label: message(presentation.messages, "common.data"), href: pageHref(ALL_DATA_PATH, locale) }, { label: t("hubTitle"), href: pageHref(topicSection("trade").href, locale) }, { label: t("products.title") }];
   return <I18nProvider {...clientPresentation(presentation)}>
     <JsonLd testId="explorer-dataset-json-ld" data={explorerDatasetJsonLd({
       locale, origin, path: "/explorer/trade/products", datasetId: "trade", name: t("products.title"), description: t("products.summary"), firstYear: min, lastYear: max, dateModified: lastReviewedAt,
       variableMeasured: TRADE_PRODUCT_MEASURES.map(id => t(`indicator.${id}`)),
     })} />
-    <BreadcrumbJsonLd items={[{ name: crumbs[0].label, path: pageHref("/", locale) }, { name: t("hubTitle"), path: pageHref("/explorer/trade", locale) }, { name: t("products.title"), path: pageHref("/explorer/trade/products", locale) }]} />
+    <BreadcrumbJsonLd items={[{ name: crumbs[0].label, path: pageHref("/", locale) }, { name: message(presentation.messages, "common.data"), path: pageHref(ALL_DATA_PATH, locale) }, { name: t("hubTitle"), path: pageHref(topicSection("trade").path, locale) }, { name: t("products.title"), path: pageHref("/explorer/trade/products", locale) }]} />
     <ExplorerPage containerQueries={false}>
       <PageHeader locale={locale} messages={presentation.messages} crumbs={crumbs} coverage={coverageLabel(presentation.messages, locale, min, max, lastReviewedAt)} />
       <TradeProducts data={data} sources={sources} lastReviewedAt={lastReviewedAt} siteOrigin={origin} />
@@ -129,13 +129,13 @@ export async function renderTradePartnersPage(locale: Locale) {
   const sources = projectWorkbookSources(manifest.filter(row => sourceIds.has(row.source_id)), locale, catalogue.documents);
   const lastReviewedAt = [...partners.facts, ...national.facts].map(fact => fact.lastReviewedAt).sort().at(-1)!, origin = resolveSiteUrl();
   const t = (key: string) => message(presentation.messages, `trade.${key}`);
-  const crumbs = [{ label: message(presentation.messages, "common.home"), href: pageHref("/", locale) }, { label: message(presentation.messages, "common.data") }, { label: t("hubTitle"), href: pageHref("/explorer/trade", locale) }, { label: t("partners.title") }];
+  const crumbs = [{ label: message(presentation.messages, "common.home"), href: pageHref("/", locale) }, { label: message(presentation.messages, "common.data"), href: pageHref(ALL_DATA_PATH, locale) }, { label: t("hubTitle"), href: pageHref(topicSection("trade").href, locale) }, { label: t("partners.title") }];
   return <I18nProvider {...clientPresentation(presentation)}>
     <JsonLd testId="explorer-dataset-json-ld" data={explorerDatasetJsonLd({
       locale, origin, path: "/explorer/trade/partners", datasetId: "trade", name: t("partners.title"), description: t("partners.summary"), firstYear: min, lastYear: max, dateModified: lastReviewedAt,
       variableMeasured: TRADE_OVERVIEW_INDICATORS.map(id => t(`indicator.${id}`)),
     })} />
-    <BreadcrumbJsonLd items={[{ name: crumbs[0].label, path: pageHref("/", locale) }, { name: t("hubTitle"), path: pageHref("/explorer/trade", locale) }, { name: t("partners.title"), path: pageHref("/explorer/trade/partners", locale) }]} />
+    <BreadcrumbJsonLd items={[{ name: crumbs[0].label, path: pageHref("/", locale) }, { name: message(presentation.messages, "common.data"), path: pageHref(ALL_DATA_PATH, locale) }, { name: t("hubTitle"), path: pageHref(topicSection("trade").path, locale) }, { name: t("partners.title"), path: pageHref("/explorer/trade/partners", locale) }]} />
     <ExplorerPage containerQueries={false}>
       <PageHeader locale={locale} messages={presentation.messages} crumbs={crumbs} coverage={coverageLabel(presentation.messages, locale, min, max, lastReviewedAt)} />
       <TradePartners data={data} sources={sources} lastReviewedAt={lastReviewedAt} siteOrigin={origin} />
@@ -152,13 +152,13 @@ export async function renderTradeOverviewPage(locale: Locale) {
   const lastReviewedAt = data.facts.map(f => f.lastReviewedAt).sort().at(-1)!, origin = resolveSiteUrl();
   const sources = projectWorkbookSources(manifest.filter(row => row.source_id === TRADE_OVERVIEW_SOURCE), locale, catalogue.documents);
   const t = (key: string) => message(presentation.messages, `trade.${key}`);
-  const crumbs = [{ label: message(presentation.messages, "common.home"), href: pageHref("/", locale) }, { label: message(presentation.messages, "common.data") }, { label: t("hubTitle"), href: pageHref("/explorer/trade", locale) }, { label: t("title") }];
+  const crumbs = [{ label: message(presentation.messages, "common.home"), href: pageHref("/", locale) }, { label: message(presentation.messages, "common.data"), href: pageHref(ALL_DATA_PATH, locale) }, { label: t("hubTitle"), href: pageHref(topicSection("trade").href, locale) }, { label: t("title") }];
   return <I18nProvider {...clientPresentation(presentation)}>
     <JsonLd testId="explorer-dataset-json-ld" data={explorerDatasetJsonLd({
       locale, origin, path: "/explorer/trade/overview", datasetId: "trade", name: t("title"), description: t("summary"), firstYear: min, lastYear: max, dateModified: lastReviewedAt,
       variableMeasured: TRADE_OVERVIEW_INDICATORS.map(id => t(`indicator.${id}`)),
     })} />
-    <BreadcrumbJsonLd items={[{ name: crumbs[0].label, path: pageHref("/", locale) }, { name: t("hubTitle"), path: pageHref("/explorer/trade", locale) }, { name: t("title"), path: pageHref("/explorer/trade/overview", locale) }]} />
+    <BreadcrumbJsonLd items={[{ name: crumbs[0].label, path: pageHref("/", locale) }, { name: message(presentation.messages, "common.data"), path: pageHref(ALL_DATA_PATH, locale) }, { name: t("hubTitle"), path: pageHref(topicSection("trade").path, locale) }, { name: t("title"), path: pageHref("/explorer/trade/overview", locale) }]} />
     <ExplorerPage containerQueries={false}>
       <PageHeader locale={locale} messages={presentation.messages} crumbs={crumbs} coverage={coverageLabel(presentation.messages, locale, min, max, lastReviewedAt)} />
       <TradeOverview facts={facts} sources={sources} lastReviewedAt={lastReviewedAt} siteOrigin={origin} />
@@ -184,14 +184,14 @@ export async function renderTradeServicesPage(locale: Locale) {
   const sources = projectWorkbookSources(manifest.filter(row => sourceIds.has(row.source_id)), locale, catalogue.documents);
   const lastReviewedAt = services.facts.map(fact => fact.lastReviewedAt).sort().at(-1)!, origin = resolveSiteUrl();
   const t = (key: string) => message(presentation.messages, `trade.${key}`), title = t("services.title");
-  const crumbs = [{ label: message(presentation.messages, "common.home"), href: pageHref("/", locale) }, { label: message(presentation.messages, "common.data") }, { label: t("hubTitle"), href: pageHref("/explorer/trade", locale) }, { label: title }];
+  const crumbs = [{ label: message(presentation.messages, "common.home"), href: pageHref("/", locale) }, { label: message(presentation.messages, "common.data"), href: pageHref(ALL_DATA_PATH, locale) }, { label: t("hubTitle"), href: pageHref(topicSection("trade").href, locale) }, { label: title }];
   // The service-type search matches English names on the Georgian page too.
   return <I18nProvider {...clientPresentation(presentation)} englishLabels={{ ...presentation.englishLabels, ...englishLabels }}>
     <JsonLd testId="explorer-dataset-json-ld" data={explorerDatasetJsonLd({
       locale, origin, path: "/explorer/trade/services", datasetId: "trade", name: title, description: t("services.summary"), firstYear: min, lastYear: max, dateModified: lastReviewedAt,
       variableMeasured: TRADE_OVERVIEW_INDICATORS.map(id => t(`services.indicator.${id}`)),
     })} />
-    <BreadcrumbJsonLd items={[{ name: crumbs[0].label, path: pageHref("/", locale) }, { name: t("hubTitle"), path: pageHref("/explorer/trade", locale) }, { name: title, path: pageHref("/explorer/trade/services", locale) }]} />
+    <BreadcrumbJsonLd items={[{ name: crumbs[0].label, path: pageHref("/", locale) }, { name: message(presentation.messages, "common.data"), path: pageHref(ALL_DATA_PATH, locale) }, { name: t("hubTitle"), path: pageHref(topicSection("trade").path, locale) }, { name: title, path: pageHref("/explorer/trade/services", locale) }]} />
     <ExplorerPage containerQueries={false}>
       <PageHeader locale={locale} messages={presentation.messages} crumbs={crumbs} coverage={coverageLabel(presentation.messages, locale, min, max, lastReviewedAt)} />
       <TradeServices data={data} sources={sources} lastReviewedAt={lastReviewedAt} siteOrigin={origin} />
@@ -217,13 +217,13 @@ export async function renderTradeCompositionPage(locale: Locale) {
   const sources = projectWorkbookSources(manifest.filter(row => sourceIds.has(row.source_id)), locale, catalogue.documents);
   const lastReviewedAt = [...composition.facts, ...national.facts.filter(fact => fact.year >= min && fact.year <= max && (fact.indicatorId === "trade.exports" || fact.indicatorId === "trade.imports"))].map(fact => fact.lastReviewedAt).sort().at(-1)!, origin = resolveSiteUrl();
   const t = (key: string) => message(presentation.messages, `trade.${key}`), title = t("composition.title");
-  const crumbs = [{ label: message(presentation.messages, "common.home"), href: pageHref("/", locale) }, { label: message(presentation.messages, "common.data") }, { label: t("hubTitle"), href: pageHref("/explorer/trade", locale) }, { label: title }];
+  const crumbs = [{ label: message(presentation.messages, "common.home"), href: pageHref("/", locale) }, { label: message(presentation.messages, "common.data"), href: pageHref(ALL_DATA_PATH, locale) }, { label: t("hubTitle"), href: pageHref(topicSection("trade").href, locale) }, { label: title }];
   return <I18nProvider {...clientPresentation(presentation)} englishLabels={{ ...presentation.englishLabels, ...englishLabels }}>
     <JsonLd testId="explorer-dataset-json-ld" data={explorerDatasetJsonLd({
       locale, origin, path: "/explorer/trade/composition", datasetId: "trade", name: title, description: t("composition.summary"), firstYear: min, lastYear: max, dateModified: lastReviewedAt,
       variableMeasured: [t("composition.indicator.trade.exports"), t("composition.indicator.trade.imports")],
     })} />
-    <BreadcrumbJsonLd items={[{ name: crumbs[0].label, path: pageHref("/", locale) }, { name: t("hubTitle"), path: pageHref("/explorer/trade", locale) }, { name: title, path: pageHref("/explorer/trade/composition", locale) }]} />
+    <BreadcrumbJsonLd items={[{ name: crumbs[0].label, path: pageHref("/", locale) }, { name: message(presentation.messages, "common.data"), path: pageHref(ALL_DATA_PATH, locale) }, { name: t("hubTitle"), path: pageHref(topicSection("trade").path, locale) }, { name: title, path: pageHref("/explorer/trade/composition", locale) }]} />
     <ExplorerPage containerQueries={false}>
       <PageHeader locale={locale} messages={presentation.messages} crumbs={crumbs} coverage={coverageLabel(presentation.messages, locale, min, max, lastReviewedAt)} />
       <TradeComposition data={data} sources={sources} lastReviewedAt={lastReviewedAt} siteOrigin={origin} />

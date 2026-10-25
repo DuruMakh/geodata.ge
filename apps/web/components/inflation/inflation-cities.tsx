@@ -15,9 +15,8 @@ import {
   toggleAllCityLines,
   toggleCityLine,
   unpackCityFacts,
-  cityValues,
+  cityLatestHeadline,
   GEORGIA_LINE_ID,
-  HEADLINE_ID,
   type CityIndex,
   type CityState,
   type CityView,
@@ -28,7 +27,6 @@ import { periodKey } from "../../lib/data/inflation/periods";
 import { CITIES_PATH } from "../../lib/explorer/inflationCityRoutes";
 import { buildInflationCityWorkbookExportModel } from "../../lib/explorer/inflationCityWorkbook";
 import { formatInflationValue, periodLabel, monthlyChartPeriod, PCT_UNIT } from "../../lib/explorer/inflationLabels";
-import { latestEntry } from "../../lib/explorer/latestValue";
 import { LatestValueLine } from "../explorer-shell/latest-value-line";
 import type { InflationWorkbookSource } from "../../lib/explorer/inflationWorkbook";
 import { downloadWorkbook } from "../../lib/explorer/workbookWriter.client";
@@ -50,6 +48,7 @@ import { InflationCityHeading } from "./inflation-city-heading";
 import { InflationCityIndicators } from "./inflation-city-indicators";
 import { InflationCityPanel } from "./inflation-city-panel";
 import { InflationCityTable } from "./inflation-city-table";
+import { topicSection, ALL_DATA_PATH } from "../../lib/navigation/navTree";
 
 // Inflation cities (spec 2026-09-30): the Georgia page compares seven places on the
 // total; a city page shows that city's total and divisions. Annual inflation only.
@@ -79,7 +78,7 @@ export function InflationCities({ view, facts, lastReviewedAt, sources, siteOrig
   const range = resolveCityRange(state, index, view);
   const coverage = cityCoverage(index, view);
   // The place's own total: Georgia on the Georgia page, the city on a city page.
-  const latest = latestEntry(cityValues(index, view.kind === "city" ? view.cityId : GEORGIA_LINE_ID, HEADLINE_ID, "yoy_pct"));
+  const latest = cityLatestHeadline(index, view.kind === "city" ? view.cityId : GEORGIA_LINE_ID);
   const periods = Array.from({ length: range.max - range.min + 1 }, (_, offset) => range.min + offset);
   const displayDate = updatedDate(lastReviewedAt, locale);
   const lines = buildCityLines(index, view, state, range);
@@ -121,8 +120,8 @@ export function InflationCities({ view, facts, lastReviewedAt, sources, siteOrig
         messages={messages}
         crumbs={[
           { label: message(messages, "common.home"), href: pageHref("/", locale) },
-          { label: message(messages, "common.data") },
-          { label: message(messages, "common.inflation"), href: pageHref("/explorer/inflation", locale) },
+          { label: message(messages, "common.data"), href: pageHref(ALL_DATA_PATH, locale) },
+          { label: message(messages, "common.inflation"), href: pageHref(topicSection("inflation").href, locale) },
           citiesCrumb,
           ...(view.kind === "city" ? [{ label: cityLineLabel(messages, view.cityId) }] : []),
         ]}

@@ -11,8 +11,10 @@ test("appends composition without changing the five existing cards", async () =>
   const cards = buildTradeHubCards(facts, presentation, coverage, coverage, facts, facts, composition);
   expect(cards.slice(0, 5)).toEqual(existing);
   expect(cards).toHaveLength(6);
-  expect(cards.at(-1)).toMatchObject({ index: "06", href: "/explorer/trade/composition", title: "Trade composition", series: [10, 50] });
+  expect(cards.at(-1)).toMatchObject({ index: "06", href: "/explorer/trade/composition", title: "Trade composition", series: [10, ...Array(24).fill(null), 50] });
   expect(cards.at(-1)?.footer).toContain("2000–2025");
+  // A year without a value is a gap in the sparkline, never a join across it.
+  expect(cards.at(-1)?.series).toHaveLength(26);
 });
 test("the hub has working Overview and Partners entries with their loaded coverage", () => {
   const cards = buildTradeHubCards(tradeFixtureFacts().map(f => ({ ...f, valueUsd: Number(f.valueUsd) })), { locale: "en", englishLabels: {}, messages: { "trade.title": "Trade Overview", "trade.summary": "Annual goods trade", "trade.annual": "Annual", "trade.partners.title": "Trading partners", "trade.partners.summary": "Countries and groups" } }, { min: 1995, max: 2025, years: [1995, 2025] });
@@ -39,7 +41,7 @@ test("Services is the fifth live card, with independent services turnover and co
     const cards = buildTradeHubCards(facts, presentation, { min: 1995, max: 2025, years: [1995, 2025] }, { min: 2020, max: 2025, years: [2020, 2025] }, facts.map(f => ({ ...f, indicatorId: "trade.domestic_exports" as const })), services);
     expect(cards).toHaveLength(5);
     expect(cards[3].href).toBe("/explorer/trade/domestic-exports");
-    expect(cards[4]).toMatchObject({ index: "05", title, href: "/explorer/trade/services", comingSoon: false, series: [345, 678] });
+    expect(cards[4]).toMatchObject({ index: "05", title, href: "/explorer/trade/services", comingSoon: false, series: [345, null, null, null, 678] });
     expect(cards[4].footer).toContain("2020–2024");
     expect(buildTradeHubCards(facts, presentation, { min: 1995, max: 2025, years: [1995, 2025] }, { min: 2020, max: 2025, years: [2020, 2025] }, facts)).toHaveLength(4);
   }

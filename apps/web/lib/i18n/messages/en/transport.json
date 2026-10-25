@@ -1,8 +1,5 @@
 {
   "transport.title": "Transport",
-  "transport.hubSummary": "Vehicles, passengers and freight",
-  "transport.metaTitle": "Transport in Georgia",
-  "transport.metaDescription": "Georgia’s road vehicles by type, fuel and age, passenger and freight transport by mode, and registered vehicles and roads by region, from Geostat data.",
   "transport.page.vehicles.title": "Vehicles",
   "transport.page.vehicles.summary": "Georgia’s road vehicle fleet each year: passenger cars, buses, trucks and special vehicles, and the fuel they run on.",
   "transport.page.vehicles.metaTitle": "Road vehicles in Georgia",

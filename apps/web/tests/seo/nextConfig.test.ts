@@ -40,6 +40,14 @@ it("lets browsers keep content-hashed page data for a year, out of search result
   });
 });
 
+// deep-review known #10: the place index that All data's search fetches stays out of search results, in both languages.
+it("noindexes the place index files", async () => {
+  const headers = await nextConfig.headers?.();
+  const rule = headers?.find(entry => entry.source.startsWith("/explorer-places"));
+  expect(rule).toEqual({ source: "/explorer-places.:locale(ka|en).json", headers: [{ key: "X-Robots-Tag", value: "noindex" }] });
+  // tests/browser/seo.spec.ts checks the served files carry it, and All data does not.
+});
+
 it("retains the general security headers on every route", async () => {
   const headers = await nextConfig.headers?.();
 

@@ -1,4 +1,6 @@
 import { ENVIRONMENT_POLLUTANTS, environmentFactKey, type ClientEnvironmentFact, type EnvironmentUnit } from "../data/environment/types";
+import { message } from "../i18n/messages";
+import type { Presentation } from "../i18n/types";
 import { MISSING, formatInUnit, type ValueUnit } from "./format";
 import type { ResolvedPeriodRange } from "./periodRange";
 import { buildTopicModel, serializeTopicHash, topicSeriesColor, type TopicSeriesModel, type TopicState } from "./topicSeries";
@@ -17,6 +19,12 @@ export const ENVIRONMENT_SECTIONS = [
 export type EnvironmentSectionId = typeof ENVIRONMENT_SECTIONS[number]["id"];
 /** The four pages with one national list; City air quality, Waste and Forests open city or area pages (environmentCities.ts, environmentAreas.ts). */
 export type EnvironmentTopicId = "greenhouse-gases" | "air-pollution" | "climate" | "water";
+
+/** The series whose latest figure is the line under each national page's heading, and its group page card's figure. */
+export const ENVIRONMENT_LATEST_ID: Record<EnvironmentTopicId, string> = {
+  "greenhouse-gases": "environment.ghg.total", "air-pollution": "environment.air.co.total",
+  climate: "environment.climate.temperature.georgia", water: "environment.water.lost_share",
+};
 
 /**
  * A list row. `heading` is the key of the group it is listed under (`environment.heading.{heading}`); rows under one heading
@@ -165,6 +173,20 @@ export function environmentValueLabel(value: number | null | undefined, unit: En
   if (value == null) return MISSING;
   const number = formatInUnit(value, environmentValueUnit(decimals));
   return unit === "percent" || unit === "celsius" ? `${number}${t(environmentUnitLabelKey(unit))}` : `${number}\u00a0${t(environmentUnitLabelKey(unit))}`;
+}
+
+/** Reads a page's `environment.*` messages. */
+export const environmentTranslate = (presentation: Presentation): EnvironmentTranslate => (key, values) => message(presentation.messages, `environment.${key}`, values);
+
+/** Waste collected (published in thousand tonnes) as the Waste card and its place rows write it: million tonnes to two decimals from a million, as published below. */
+export function wasteCollectedLabel(fact: Pick<ClientEnvironmentFact, "value" | "unit" | "decimals">, t: EnvironmentTranslate): string {
+  return fact.value >= 1_000 ? `${formatInUnit(fact.value / 1000, environmentValueUnit(2))} ${t("unit.millionTonnes")}` : environmentValueLabel(fact.value, fact.unit, fact.decimals, t);
+}
+
+/** The latest year of a series and its value as published, with its unit, for the line under a heading. */
+export function environmentLatest(facts: readonly ClientEnvironmentFact[], id: string, t: EnvironmentTranslate): { year: number; value: string; fact: ClientEnvironmentFact } {
+  const fact = facts.filter(f => f.indicatorId === id).sort((a, b) => a.year - b.year).at(-1)!;
+  return { year: fact.year, value: environmentValueLabel(fact.value, fact.unit, fact.decimals, t), fact };
 }
 
 /**

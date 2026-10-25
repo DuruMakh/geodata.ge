@@ -44,7 +44,6 @@ describe("demography messages", () => {
   test("the sidebar labels exist in both languages", async () => {
     for (const locale of ["ka", "en"] as const) {
       const common = await getMessages(locale, ["common"]);
-      expect(common["common.dataDemography"]?.trim()).toBeTruthy();
       expect(common["common.demographyPopulation"]?.trim()).toBeTruthy();
     }
   });

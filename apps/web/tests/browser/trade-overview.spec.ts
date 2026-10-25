@@ -2,13 +2,15 @@ import { expect, test } from "@playwright/test";
 import ExcelJS from "exceljs";
 import { createHash } from "node:crypto";
 import { tableSeriesCount } from "./explorer-table";
+import { topicCards } from "./group-cards";
 
 for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
   test(`Trade hub and Overview compare four indicators ${prefix || "ka"} at ${width}px`, async ({ page }) => {
     const errors: string[] = []; page.on("pageerror", error => errors.push(error.message));
     await page.setViewportSize({ width, height: 1000 });
-    await page.goto(`${prefix}/explorer/trade`);
-    const card = page.getByTestId("trade-hub").getByTestId("hub-card");
+    // The old Trade hub is the section #t-trade of the External sector page now.
+    await page.goto(`${prefix}/explorer/external`);
+    const card = topicCards(page, "trade");
     await expect(card).toHaveCount(6); await card.first().click();
     await expect(page).toHaveURL(new RegExp(`${prefix}/explorer/trade/overview$`));
     await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
@@ -97,7 +99,8 @@ for (const prefix of ["", "/en"]) {
   test(`Trade Overview navigation reaches its methodology ${prefix || "ka"}`, async ({ page }) => {
     await page.goto(`${prefix}/explorer/trade/overview`);
     await expect(page.getByTestId("trade-overview-link")).toHaveAttribute("aria-current", "page");
-    await expect(page.getByRole("contentinfo")).toContainText(prefix ? "Geostat" : "საქსტატი");
+    await expect(page.getByRole("contentinfo")).toHaveCount(0);
+    await expect(page.getByTestId("source-label")).toContainText(prefix ? "Geostat" : "საქსტატი");
     await page.getByTestId("source-label").getByRole("link").click();
     await expect(page).toHaveURL(new RegExp(`${prefix}/methodology/trade$`));
   });
@@ -119,13 +122,13 @@ for (const { prefix, width, selection } of [
     };
     await expectView();
     const before = page.url();
-    if (width < 900) await page.getByTestId("sidebar-toggle").click();
+    if (width < 900) await page.getByTestId("sidebar-menu-button").click();
     await page.getByTestId("trade-overview-link").click();
     await expect(page).toHaveURL(before);
-    if (width < 900) await expect(page.getByTestId("sidebar-toggle")).toHaveAttribute("aria-expanded", "false");
+    if (width < 900) await expect(page.getByTestId("sidebar-menu-button")).toHaveAttribute("aria-expanded", "false");
     await page.reload();
     await expectView();
-    if (width < 900) await page.getByTestId("sidebar-toggle").click();
+    if (width < 900) await page.getByTestId("sidebar-menu-button").click();
     await page.getByTestId("data-sidebar").getByRole("link", { name: prefix ? "ქართული" : "English", exact: true }).click();
     await expect(page).toHaveURL(new RegExp((prefix ? "" : "/en") + "/explorer/trade/overview#"));
     await expectView();

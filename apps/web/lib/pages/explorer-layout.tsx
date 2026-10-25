@@ -2,7 +2,7 @@ import { getMessages } from "../i18n/messages.server";
 import { I18nProvider } from "../i18n/provider";
 import type { ReactNode } from "react";
 import { DataSidebar } from "../../components/shell/data-sidebar";
-import { ExplorerFooter } from "../../components/shell/explorer-footer";
+import { PRE_PAINT_RAIL_SCRIPT } from "../../components/shell/sidebar-state";
 import type { Locale } from "../i18n/types";
 
 export async function renderExplorerLayout(locale: Locale, children: ReactNode) {
@@ -10,13 +10,15 @@ export async function renderExplorerLayout(locale: Locale, children: ReactNode) 
   const messages = await getMessages(locale, ["controls"]);
   return (
     <I18nProvider locale={locale} messages={messages}>
-      <div className="flex min-h-screen flex-col bg-[var(--paper)] min-[900px]:flex-row">
+      {/* Before the sidebar is parsed: a stored collapse is drawn from the first paint (DESIGN.md §6.7). */}
+      <script dangerouslySetInnerHTML={{ __html: PRE_PAINT_RAIL_SCRIPT }} />
+      {/* Below 900px the sidebar's open menu covers the screen, and the page behind it is hidden, so focus stays in the menu.
+          Invisible rather than removed: the page keeps its layout, so its charts are not re-measured and the reader's
+          place on it survives the menu. The sidebar also makes this column inert while the menu is open. */}
+      <div className="group/shell flex min-h-screen flex-col bg-[var(--paper)] min-[900px]:flex-row">
         <DataSidebar />
-        <div className="flex min-w-0 flex-1 flex-col">
+        <div data-shell-page className="flex min-w-0 flex-1 flex-col max-[900px]:group-has-[[data-menu-open]]/shell:invisible">
           <div id="content" tabIndex={-1} className="flex-1 outline-none">{children}</div>
-          <div className="px-5 min-[768px]:px-[34px]">
-            <div className="mx-auto max-w-[1180px]"><ExplorerFooter locale={locale} year={new Date().getFullYear()} /></div>
-          </div>
         </div>
       </div>
     </I18nProvider>

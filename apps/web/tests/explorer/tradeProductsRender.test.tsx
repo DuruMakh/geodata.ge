@@ -1,5 +1,8 @@
 import { renderToStaticMarkup } from "react-dom/server";
-import { expect, test } from "vitest";
+import { expect, test, vi } from "vitest";
+
+// The group pages' topic scroll reads the router.
+vi.mock("next/navigation", async (original) => ({ ...(await original<typeof import("next/navigation")>()), useRouter: () => ({ replace() {} }) }));
 import { buildTradeProductsModel } from "../../lib/explorer/tradeProducts";
 import { DEFAULT_TRADE_PRODUCTS_STATE } from "../../lib/explorer/tradeProductsState";
 import { getMessages } from "../../lib/i18n/messages.server";
@@ -45,9 +48,11 @@ test("Products metadata and page publish the reviewed bilingual dataset coverage
   expect(html).not.toContain("Historical product versions are separate");
 });
 
-test("the Trade hub shows Products coverage from 2020 while retaining full partner coverage", async () => {
-  const { renderTradeHub } = await import("../../lib/pages/hubs/trade");
-  const html = renderPageMarkup("en", await renderTradeHub("en"));
-  expect(html).toContain("2020–2025");
-  expect(html).toContain("1995–2025");
+// The Trade hub is the Trade section of the External sector page now.
+test("the Trade section shows Products coverage from 2020 while retaining full partner coverage", async () => {
+  const { renderGroupPage } = await import("../../lib/pages/group");
+  const html = renderPageMarkup("en", await renderGroupPage("external", "en"));
+  const card = (href: string) => new RegExp(`<a[^>]*data-testid="explorer-card"[^>]*href="${href}"[^>]*>([\\s\\S]*?)</a>`).exec(html)![1];
+  expect(card("/en/explorer/trade/products")).toContain("2020–2025");
+  expect(card("/en/explorer/trade/partners")).toContain("1995–2025");
 });

@@ -4,13 +4,15 @@ import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import { parse } from "csv-parse/sync";
 import { tableSeriesCount, tableSeriesValues } from "./explorer-table";
+import { topicCards } from "./group-cards";
 const toggle = (page: import("@playwright/test").Page, id: string) => page.locator(`[data-series-id="${id}"]`).getByTestId("series-row-toggle");
 
 for (const prefix of ["", "/en"]) for (const width of [390, 768, 1440]) {
   test(`Partners defaults, full ranking and search-safe bulk selection ${prefix || "ka"} ${width}px`, async ({ page }) => {
     const errors: string[] = []; page.on("pageerror", error => errors.push(error.message));
-    await page.setViewportSize({ width, height: 1000 }); await page.goto(`${prefix}/explorer/trade`);
-    const cards = page.getByTestId("trade-hub").getByTestId("hub-card"); await expect(cards).toHaveCount(6); await cards.nth(1).click();
+    await page.setViewportSize({ width, height: 1000 }); await page.goto(`${prefix}/explorer/external`);
+    // The old Trade hub is the section #t-trade of the External sector page now.
+    const cards = topicCards(page, "trade"); await expect(cards).toHaveCount(6); await cards.nth(1).click();
     await expect(page).toHaveURL(new RegExp(`${prefix}/explorer/trade/partners$`));
     await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
     await expect(page.getByTestId("series-status")).toContainText("1 / 218");
@@ -80,13 +82,13 @@ for (const prefix of ["", "/en"]) for (const width of [390, 1440]) {
     await expect(page.getByTestId("trade-partners-ranking")).toHaveAttribute("data-has-share", "false");
     await expect(page.getByTestId("trade-partners-zero-axis").first()).toBeVisible();
     const before = page.url();
-    if (width < 900) await page.getByTestId("sidebar-toggle").click();
+    if (width < 900) await page.getByTestId("sidebar-menu-button").click();
     await page.getByTestId("trade-partners-link").click(); await expect(page).toHaveURL(before);
-    if (width < 900) await expect(page.getByTestId("sidebar-toggle")).toHaveAttribute("aria-expanded", "false");
+    if (width < 900) await expect(page.getByTestId("sidebar-menu-button")).toHaveAttribute("aria-expanded", "false");
     await page.reload();
     await expect(page.getByTestId("series-status")).toContainText("2 / 218");
     await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-measure", "trade.balance");
-    if (width < 900) await page.getByTestId("sidebar-toggle").click();
+    if (width < 900) await page.getByTestId("sidebar-menu-button").click();
     await page.getByTestId("data-sidebar").getByRole("link", { name: prefix ? "ქართული" : "English", exact: true }).click();
     await expect(page.getByTestId("series-status")).toContainText("2 / 218");
     await expect(page.getByTestId("trade-partners-tab-groups")).toHaveAttribute("aria-pressed", "true");

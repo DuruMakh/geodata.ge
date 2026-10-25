@@ -25,14 +25,14 @@ describe("the Labour pages", () => {
     expect(latest(html)).toContain("1,389.7");
     expect(html).toContain('data-testid="labour-industries"');
     expect(html.match(/data-testid="series-row"/g)).toHaveLength(60);
-    expect(html).toContain('href="/explorer/unemployment"');
+    expect(html).toContain('href="/explorer/labour#t-unemployment"');
     expect(html).toContain('"temporalCoverage":"2017/2025"');
   });
 
   it("Young people: the 15–24 share in English", async () => {
     const html = await page("en", "young-people");
     expect(latest(html)).toContain("17.6%");
-    expect(html).toContain('href="/en/explorer/unemployment"');
+    expect(html).toContain('href="/en/explorer/labour#t-unemployment"');
   });
 
   it("a selection without any published value shows a short message, not an empty chart", async () => {

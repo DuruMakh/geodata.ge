@@ -16,6 +16,7 @@ import { explorerDatasetJsonLd } from "../seo/structuredData";
 import { loadImfWeoManifest, type ImfWeoManifest } from "../methodology/workbookSources";
 import { resolveSiteUrl } from "../siteUrl";
 import { projectBalanceFact } from "../explorer/clientData";
+import { ALL_DATA_PATH, navGroup } from "../navigation/navTree";
 
 function editionLabel(messages: Parameters<typeof message>[0], publicationDate: string): string {
   const [year, month] = publicationDate.split("-");
@@ -81,7 +82,8 @@ export async function renderDeficitPage(locale: Locale) {
       />
       <BreadcrumbJsonLd items={[
         { name: message(messages, "common.home"), path: pageHref("/", locale) },
-        { name: message(messages, "common.budget"), path: pageHref("/explorer", locale) },
+        { name: message(messages, "common.data"), path: pageHref(ALL_DATA_PATH, locale) },
+        { name: message(messages, "common.budget"), path: pageHref(navGroup("budget").href, locale) },
         { name: message(messages, "common.deficit"), path: pageHref(DEFICIT_EXPLORER_PATH, locale) },
       ]} />
       <I18nProvider {...clientPresentation(presentation)}>

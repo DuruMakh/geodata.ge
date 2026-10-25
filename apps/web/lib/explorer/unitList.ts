@@ -20,6 +20,13 @@ export function listLatest(facts: readonly ValueFact[], id: string, endYear: num
   return latest && { value: latest.value, year: latest.year };
 }
 
+/** The latest fact of one place's series, the figure its place page's latest line states; a place with none fails the build. */
+export function latestOf<F extends { indicatorId: string; geographyId: string; year: number }>(facts: readonly F[], indicatorId: string, placeId: string): F {
+  const latest = facts.filter(f => f.indicatorId === indicatorId && f.geographyId === placeId).sort((a, b) => a.year - b.year).at(-1);
+  if (!latest) throw new Error(`No ${indicatorId} facts for ${placeId}`);
+  return latest;
+}
+
 /**
  * Every listed row's latest value up to `endYear` (`listLatest`), and the year its heading names: the newest of the heading's
  * rows' latest years where that is older than `endYear` (none where a row reaches `endYear` or the heading has no value).

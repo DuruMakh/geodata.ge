@@ -5,10 +5,13 @@ import { PageHeader } from "../../components/shell/page-header";
 import { JsonLd } from "../../components/seo/json-ld";
 import { BreadcrumbJsonLd } from "../../components/seo/breadcrumb-json-ld";
 import { loadServedEnvironmentData, toClientEnvironmentFact } from "../data/environment/importEnvironment";
-import { ENVIRONMENT_CITIES, ENVIRONMENT_SOURCES, type ClientEnvironmentFact, type EnvironmentCity } from "../data/environment/types";
+import { ENVIRONMENT_CITIES, ENVIRONMENT_SOURCES, type EnvironmentCity } from "../data/environment/types";
 import type { MunicipalRegion } from "../data/municipal/types";
 import { REGIONAL_ECONOMY_REGIONS } from "../data/regionalEconomies/importRegionalEconomies";
-import { ENVIRONMENT_HUB_PATH, environmentLabelKey, environmentValueLabel, type EnvironmentTranslate } from "../explorer/environment";
+import { environmentLabelKey } from "../explorer/environment";
+
+// The Environment pages take these from here, beside the page frame.
+export { environmentLatest, environmentTranslate } from "../explorer/environment";
 import { ENVIRONMENT_AREAS, environmentAreaIndexHref, environmentAreaRoutes, type EnvironmentArea, type EnvironmentAreaTopic } from "../explorer/environmentAreas";
 import { coverageLabel } from "../explorer/coverageLabel";
 import { I18nProvider } from "../i18n/provider";
@@ -20,6 +23,7 @@ import type { Locale, MessageScope, Presentation } from "../i18n/types";
 import { loadSourcedWorkbookSources, type SourcedWorkbookPublicSource } from "../methodology/workbookSources";
 import { explorerDatasetJsonLd } from "../seo/structuredData";
 import { resolveSiteUrl } from "../siteUrl";
+import { topicSection, ALL_DATA_PATH } from "../navigation/navTree";
 
 // Shared by the environment page modules. The topic pages, the city pages and the area pages are separate modules, so each
 // ships only its own explorer: keep explorer components out of this file.
@@ -58,14 +62,6 @@ export function environmentAreaName(presentation: Presentation, area: Environmen
 export const environmentLabels = (presentation: Presentation, ids: readonly string[]): Record<string, string> =>
   Object.fromEntries(ids.map(id => [id, message(presentation.messages, `environment.${environmentLabelKey(id)}`)]));
 
-export const environmentTranslate = (presentation: Presentation): EnvironmentTranslate => (key, values) => message(presentation.messages, `environment.${key}`, values);
-
-/** The latest year of a series and its value as published, with its unit, for the line under a heading. */
-export function environmentLatest(facts: readonly ClientEnvironmentFact[], id: string, t: EnvironmentTranslate): { year: number; value: string; fact: ClientEnvironmentFact } {
-  const fact = facts.filter(f => f.indicatorId === id).sort((a, b) => a.year - b.year).at(-1)!;
-  return { year: fact.year, value: environmentValueLabel(fact.value, fact.unit, fact.decimals, t), fact };
-}
-
 /** The served facts as the client gets them, the page's presentation, its last review date and the site's origin. */
 export async function loadEnvironmentPage(locale: Locale, scopes: readonly MessageScope[] = [], labelIds: readonly string[] = []) {
   const [served, presentation] = await Promise.all([loadServedEnvironmentData(), getPresentation(locale, ["environment", ...scopes], labelIds, labelIds)]);
@@ -87,8 +83,8 @@ export function renderEnvironmentFrame({ locale, presentation, lastReviewedAt, o
   const hubTitle = message(presentation.messages, "environment.title");
   const parent = parents.at(-1);
   const crumbs = [
-    { label: message(presentation.messages, "common.home"), href: pageHref("/", locale) }, { label: message(presentation.messages, "common.data") },
-    { label: hubTitle, href: pageHref(ENVIRONMENT_HUB_PATH, locale) }, ...parents.map(item => ({ label: item.label, href: pageHref(item.href, locale) })), { label: area?.name ?? title },
+    { label: message(presentation.messages, "common.home"), href: pageHref("/", locale) }, { label: message(presentation.messages, "common.data"), href: pageHref(ALL_DATA_PATH, locale) },
+    { label: hubTitle, href: pageHref(topicSection("environment").href, locale) }, ...parents.map(item => ({ label: item.label, href: pageHref(item.href, locale) })), { label: area?.name ?? title },
   ];
   return <I18nProvider {...clientPresentation(presentation)}>
     <JsonLd testId="explorer-dataset-json-ld" data={explorerDatasetJsonLd({
@@ -97,7 +93,7 @@ export function renderEnvironmentFrame({ locale, presentation, lastReviewedAt, o
       ...(parent ? { partOf: { path: parent.href, name: parent.label, description: parent.description } } : {}),
       ...(area ? { spatialCoverageName: area.name, withinGeorgia: area.withinGeorgia } : {}),
     })} />
-    <BreadcrumbJsonLd items={[{ name: crumbs[0].label, path: pageHref("/", locale) }, { name: hubTitle, path: pageHref(ENVIRONMENT_HUB_PATH, locale) }, ...parents.map(item => ({ name: item.label, path: pageHref(item.href, locale) })), { name: title, path: pageHref(href, locale) }]} />
+    <BreadcrumbJsonLd items={[{ name: crumbs[0].label, path: pageHref("/", locale) }, { name: message(presentation.messages, "common.data"), path: pageHref(ALL_DATA_PATH, locale) }, { name: hubTitle, path: pageHref(topicSection("environment").path, locale) }, ...parents.map(item => ({ name: item.label, path: pageHref(item.href, locale) })), { name: title, path: pageHref(href, locale) }]} />
     <ExplorerPage containerQueries={false}>
       <PageHeader locale={locale} messages={presentation.messages} crumbs={crumbs} coverage={coverageLabel(presentation.messages, locale, firstYear, lastYear, lastReviewedAt)} />
       {children}

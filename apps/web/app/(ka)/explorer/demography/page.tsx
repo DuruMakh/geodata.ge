@@ -1,8 +1,3 @@
-import { demographyPageMetadata, renderDemographyPage } from "../../../../lib/pages/demography";
-
-export function generateMetadata() {
-  return demographyPageMetadata("ka");
-}
-export default function Page() {
-  return renderDemographyPage("ka");
-}
+import { groupPageMetadata, renderGroupPage } from "../../../../lib/pages/group";
+export const generateMetadata = () => groupPageMetadata("demography", "ka");
+export default function Page() { return renderGroupPage("demography", "ka"); }

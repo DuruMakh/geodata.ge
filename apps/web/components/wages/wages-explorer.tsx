@@ -5,7 +5,7 @@ import { updatedDate } from "../../lib/explorer/coverageLabel";
 import type { MunicipalRegion } from "../../lib/data/municipal/types";
 import { unpackFacts, type FactsInput } from "../../lib/data/packedFacts";
 import type { ClientWagesFact } from "../../lib/data/wages/types";
-import { buildWagesHeatmap, buildWagesModel, changeWagesView, parseWagesHash, serializeWagesHash, wagesCoverage, wagesRegionHref, wagesViews, type WagesSectionId, type WagesState, type WagesView } from "../../lib/explorer/wages";
+import { buildWagesHeatmap, buildWagesModel, changeWagesView, parseWagesHash, serializeWagesHash, wagesCoverage, wagesPlaceLatest, wagesRegionHref, wagesViews, type WagesSectionId, type WagesState, type WagesView } from "../../lib/explorer/wages";
 import { buildWagesWorkbookExportModel } from "../../lib/explorer/wagesWorkbook";
 import { formatInUnit, type ValueUnit } from "../../lib/explorer/format";
 import { rangeFromPatch } from "../../lib/explorer/periodRange";
@@ -63,7 +63,7 @@ export function WagesExplorer({ section, facts: shippedFacts, labels, sources, l
   const rows = model.selected.map(series => ({ itemId: series.id, kaLabel: labels[series.id], color: series.color, valuesByYear: series.valuesByYear }));
   const total = rows.find(row => row.itemId === reference.id) ?? null;
   // The latest-value line states the page's own place: Georgia, or the region.
-  const latest = facts.filter(f => f.indicatorId === "average_monthly_nominal_earnings" && f.dimension === (regionId ? "region" : "national") && f.sectorId === "total" && f.value !== null).sort((a, b) => a.year - b.year).at(-1)!;
+  const latest = wagesPlaceLatest(facts, regionId);
   const title = regionId ? t("regionTitle", { region: regionName }) : t(`page.${section}.title`);
   const changeView = (view: WagesView) => { if (view === state.view) return; setQuery(""); update(s => changeWagesView(s, section, view, facts), true); };
   const downloadAction = <ExcelDownloadButton testId="wages-excel-download" disabled={!model.selected.length} onDownload={async () => {

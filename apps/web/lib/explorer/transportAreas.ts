@@ -66,5 +66,11 @@ export function transportAreaSelectionHash(selectedIds: readonly string[], area:
   return moved.join(",") === transportAreaDefaultSelection(area).join(",") ? "" : `#${new URLSearchParams({ sel: moved.join(",") })}`;
 }
 
+/** The latest-value line's figure: the area's own registered vehicles in their latest year, whatever is chosen below. */
+export function transportAreaLatest(area: TransportArea, facts: readonly ClientTransportFact[]): ClientTransportFact {
+  const registeredId = transportAreaSeries(area)[0].id;
+  return facts.filter(f => f.indicatorId === registeredId).sort((a, b) => a.year - b.year).at(-1)!;
+}
+
 export const buildTransportAreaModel = (area: TransportArea, facts: readonly ClientTransportFact[], state: TransportAreaState): TransportModel =>
   buildTransportSeriesModel(transportAreaSeries(area), facts, state);

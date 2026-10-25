@@ -7,6 +7,9 @@ import { validateUnemploymentFacts, assertCompleteUnemploymentCoverage } from ".
 import { unemploymentObservationKey, type UnemploymentObservation, type UnemploymentGroupDefinition, type ServedUnemploymentObservation } from "./types";
 
 export const UNEMPLOYMENT_GROUPS: UnemploymentGroupDefinition[] = JSON.parse(readFileSync(path.resolve(/* turbopackIgnore: true */ process.cwd(), "../../data/taxonomy/unemployment-groups.json"), "utf8"));
+// The reviewed registry spells English age bands with a hyphen ("15-19"); the pages print a number range with an en
+// dash, as the Georgian labels and every year range do (U16-16). The taxonomy stays as reviewed.
+export const UNEMPLOYMENT_REGISTRY: UnemploymentGroupDefinition[] = UNEMPLOYMENT_GROUPS.map((group) => ({ ...group, labelEn: group.labelEn.replace(/(\d)-(\d)/g, "$1–$2") }));
 export function unemploymentObservationFromCsv(row: CsvRecord, lastReviewedAt: string): UnemploymentObservation {
   return {
     year: Number(row.year), frequency: row.frequency as UnemploymentObservation["frequency"], dimension: row.dimension as UnemploymentObservation["dimension"], groupId: row.group_id, groupLabelEn: row.group_label_en,

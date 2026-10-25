@@ -39,6 +39,11 @@ const GROUPS: Record<HouseholdSectionId, ReadonlyArray<{ parent: HouseholdIndica
 /** The section's headline indicator: its first group's reference total. The map, the towns and villages lines, the hub cards and the latest-value line show it. */
 export const sectionTotal = (section: HouseholdSectionId): HouseholdIndicator => GROUPS[section][0].parent;
 
+/** The latest-value line's figure: the area's own section total per household in its latest year, whatever is chosen below. */
+export function householdAreaLatest(section: HouseholdSectionId, area: HouseholdArea, facts: readonly ClientHouseholdFact[]): ClientHouseholdFact {
+  return facts.filter(f => f.indicatorId === sectionTotal(section) && f.areaId === area && f.measure === "per_household").sort((a, b) => a.year - b.year).at(-1)!;
+}
+
 /** The series an area offers, reference first: the section's total and its parts; Georgia then adds its towns and villages totals. */
 export function householdViewSeries(section: HouseholdSectionId, area: HouseholdArea): HouseholdSeriesDefinition[] {
   const parts = GROUPS[section].flatMap(({ parent, reference, children }) => [

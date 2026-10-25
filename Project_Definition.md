@@ -18,7 +18,7 @@ The first version focuses on annual national budget data: expenditure by public 
 
 This v1 scope is deliberate. A narrow, high-quality budget explorer is more valuable than a broad but shallow data catalog.
 
-Now (2026-10-20): the site serves twenty dataset hubs, in sidebar order Budget, Economy, Business, Housing and construction, Inflation, Money and banks, Unemployment, Wages, Living standards, Health and social protection, Education, Science and culture, Crime and justice, Internet and technology, Trade, External flows, Energy and food, Environment and climate, Transport and Demography, each approved in section 2 or one of its extensions (2C to 2T). `DESIGN.md` §6.7 specifies the sidebar.
+Now (2026-10-24): the site serves twenty data topics — Budget, Economy, Business, Housing and construction, Inflation, Money and banks, Unemployment, Wages, Living standards, Health and social protection, Education, Science and culture, Crime and justice, Internet and technology, Trade, External flows, Energy and food, Environment and climate, Transport and Demography — each approved in section 2 or one of its extensions (2C to 2U), with 104 chart pages. Since the regrouping in 2V the topics sit in eight groups, each with its own page (Budget; Economy and business; Prices and money; Labour market; Living standards and health; External sector; Demography; Society and environment), and `/explorer` is All data, a search and A to Z list of every page. `DESIGN.md` §6.7 specifies the sidebar and §6.8 the group pages and All data.
 
 ## 2. V1 Scope
 
@@ -331,6 +331,14 @@ The page serves the Ministry of Finance's tax breaks ("tax expenditures") from t
 
 Out of scope: earlier report editions, tax breaks by legal provision, taxpayer size or industry, refunds by tax type, 2026 year-to-date refunds, any change to the Revenue page, MCP tools and the central JSON/CSV publications. Design: `docs/superpowers/specs/2026-10-21-tax-breaks-refunds-design.md`; data: `docs/data-methodology/tax-breaks-refunds.md`.
 
+## 2V. Approved explorer groups, group pages and All data
+
+Approved by Duru on 2026-10-24: keep the headline numbers on the group pages (18:07 Tbilisi), forward the topic pages to their group page (18:08), ship everything in one release (18:11), the three design parts (18:17–18:35), and the spec (18:44). Spec: `docs/superpowers/specs/2026-10-24-explorer-regroup-design.md`; design: `DESIGN.md` §6.7 and §6.8.
+
+The twenty topics are gathered into eight groups, each with a page mirrored under `/en`: Budget (`/explorer/budget`), Economy and business (`/explorer/economy`: Economy, Business, Housing and construction), Prices and money (`/explorer/prices`: Inflation, Money and banks), Labour market (`/explorer/labour`: Unemployment and jobs, Wages), Living standards and health (`/explorer/living`: Living standards, Health and social protection), External sector (`/explorer/external`: Trade, External flows), Demography (`/explorer/demography`) and Society and environment (`/explorer/society`: Education, Science and culture, Crime and justice, Internet and technology, Energy and food, Environment and climate, Transport). A group page shows four headline numbers, links to its topics and one card per chart page; every figure is computed at build time from the same served facts as the chart pages. `/explorer` becomes All data: a search over every page's Georgian and English names (also Georgian typed on an English keyboard) and over Georgia's 11 regions and 63 municipalities, whose place card links to that place's own pages, plus an A to Z list. The sixteen old topic addresses (for example `/explorer/wages`) forward permanently to their group section; where sections 2C–2U describe a topic hub and its cards, those cards are now that topic's section on its group page, in the same order.
+
+No data, chart page, chart page address, methodology page, MCP tool or JSON publication changes. Navigation, search and place results are browse aids, not drilldown: a place result opens a page that already exists.
+
 ## 3. Target Users
 
 Primary users:
@@ -399,9 +407,9 @@ Public labels should come from a Georgian-first terminology glossary, not from h
 
 ## 6. Trust Policy
 
-Analytical views should not be overloaded with provenance panels or repeated introductory copy. They retain a concise source label; the footer and dedicated `/methodology` surfaces provide access to the applicable public methodology and original-source archive. Budget and municipal pages retain their complete public decision records; the Debt page intentionally stays limited to its concise scope, sources, known limitations, and archive.
+Analytical views should not be overloaded with provenance panels or repeated introductory copy. They — the chart pages — retain a concise source label. The group pages and All data are navigation and carry no source line (owner decision 2026-10-25): each figure on them links to its chart page, whose source label names its institutions. The explorer sidebar's foot, the footer outside the explorer (explorer routes have no footer), and dedicated `/methodology` surfaces provide access to the applicable public methodology and original-source archive. Budget and municipal pages retain their complete public decision records; the Debt page intentionally stays limited to its concise scope, sources, known limitations, and archive.
 
-Public UI should include a small source label, such as:
+Each analytical view should include a small source label, such as:
 
 ```text
 Data: reviewed official budget documents. Last updated: YYYY-MM-DD.

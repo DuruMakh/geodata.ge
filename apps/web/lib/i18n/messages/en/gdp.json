@@ -35,8 +35,6 @@
   "gdp.expenditure": "GDP by expenditure",
   "gdp.expenditureDescription": "Consumption, investment, exports and imports.",
   "gdp.regionsDescription": "Regional GDP and sector composition.",
-  "gdp.hubDescription": "Explore Georgia’s economic output.",
-  "gdp.hubMetaDescription": "Georgia’s GDP and economic growth, GDP by economic sector and regional economies — official annual data with sources and Excel downloads.",
   "gdp.geostat": "Geostat",
   "gdp.worldBank": "World Bank",
   "gdp.summary.heading": "What the data shows",

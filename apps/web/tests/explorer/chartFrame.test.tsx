@@ -122,11 +122,11 @@ describe("shared chart frame", () => {
     const rows = [{ id: "a", label: "Food", color: "#B3402A", value: 1.2 }];
     const render = (compact?: boolean) =>
       renderGeorgianMarkup(<ChartTooltip leftPercent={10} header="2026-08" rows={rows} hidden={0} formatValue={(value) => value.toFixed(1)} compact={compact} />);
-    expect(render()).toContain("flex-col gap-1 overflow-hidden");
-    expect(render()).not.toContain("leading-[14px]");
+    expect(render()).toContain("flex-col gap-1 py-2 overflow-hidden");
+    expect(render()).not.toContain("leading-[13px]");
     expect(render()).toContain('class="flex items-center justify-between gap-2"');
-    expect(render(true)).toContain("flex-col gap-0 overflow-hidden");
-    expect(render(true)).toContain("leading-[14px]");
+    expect(render(true)).toContain("flex-col gap-0 py-1.5 overflow-hidden");
+    expect(render(true)).toContain("leading-[13px]");
   });
 });
 

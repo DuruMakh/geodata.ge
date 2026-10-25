@@ -51,6 +51,11 @@ export function businessAreaSelectionHash(selectedIds: readonly string[], area: 
   return moved.join(",") === businessAreaDefaultSelection(area).join(",") ? "" : `#${new URLSearchParams({ sel: moved.join(",") })}`;
 }
 
+/** The latest-value line's figure: the area's own sales in its latest year, whatever is chosen below. */
+export function businessAreaLatest(area: BusinessArea, facts: readonly ClientBusinessFact[]): ClientBusinessFact {
+  return facts.filter(f => f.indicatorId === businessIndicator("turnover", areaGroup(area))).sort((a, b) => a.year - b.year).at(-1)!;
+}
+
 export function buildBusinessAreaModel(area: BusinessArea, facts: readonly ClientBusinessFact[], state: BusinessAreaState): BusinessModel {
   return buildBusinessSeriesModel(businessAreaSeries(area), facts, state);
 }

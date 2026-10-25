@@ -15,13 +15,11 @@ import { PageHeader } from "../../components/shell/page-header";
 import { loadServedLandingData, loadServedMunicipalData } from "../data/servedData";
 import { ADJARA_REGION_ID } from "../data/municipal/types";
 import {
-  applyAdjaraBudgetAdjustment,
-  aggregateFactsForEntity,
   buildCountryTotalByYear,
   buildMunicipalListRows,
   buildPickerGroups,
   latestReviewedAtForMunicipalFacts,
-  regionFactsFor,
+  regionOwnFacts,
   buildPickerCountry,
 } from "../explorer/municipalData";
 import { projectMunicipalFunctionFact, projectMunicipalTotalFact } from "../explorer/clientData";
@@ -39,6 +37,7 @@ import {
 import { explorerDatasetJsonLd } from "../seo/structuredData";
 import { resolveSiteUrl } from "../siteUrl";
 import { clientPresentation } from "../i18n/presentation.server";
+import { navGroup, ALL_DATA_PATH } from "../navigation/navTree";
 
 // The 11 region ids are the complete, closed set.
 
@@ -80,15 +79,7 @@ function buildRegionPageFacts(
     ranks[year] = yearList.regions.find((row) => row.id === regionId)?.rank ?? 0;
     return ranks;
   }, {});
-  const members = regionFactsFor(regionId, municipalities, functionFacts, totalFacts);
-  const rolled = aggregateFactsForEntity(regionId, members.functionFacts, members.totalFacts);
-  const own =
-    regionId === ADJARA_REGION_ID
-      ? {
-          ...rolled,
-          totalFacts: applyAdjaraBudgetAdjustment(rolled.totalFacts, adjaraBudgetAdjustments),
-        }
-      : rolled;
+  const { members, own } = regionOwnFacts(regionId, municipalities, functionFacts, totalFacts, adjaraBudgetAdjustments);
   const latestTotal = own.totalFacts.find((row) => row.year === latestYear)!;
   const largestFunctionFact = own.functionFacts
     .filter((row) => row.year === latestYear)
@@ -249,14 +240,14 @@ export async function renderMunicipalRegion(id: string, locale: Locale) {
         })}
         testId="explorer-dataset-json-ld"
       />
-      <BreadcrumbJsonLd items={[{ name: message(messages, "common.home"), path: pageHref("/", locale) }, { name: message(messages, "common.budget"), path: pageHref("/explorer", locale) }, { name: message(messages, "common.municipalities"), path: pageHref("/explorer/municipalities", locale) }, { name, path: pageHref(`/explorer/municipalities/region/${id}`, locale) }]} />
+      <BreadcrumbJsonLd items={[{ name: message(messages, "common.home"), path: pageHref("/", locale) }, { name: message(messages, "common.data"), path: pageHref(ALL_DATA_PATH, locale) }, { name: message(messages, "common.budget"), path: pageHref(navGroup("budget").href, locale) }, { name: message(messages, "common.municipalities"), path: pageHref("/explorer/municipalities", locale) }, { name, path: pageHref(`/explorer/municipalities/region/${id}`, locale) }]} />
       <PageHeader
         locale={locale}
         messages={presentation.messages}
         crumbs={[
           { label: message(messages, "common.home"), href: pageHref("/", locale) },
-          { label: message(messages, "common.data") },
-          { label: message(messages, "common.budget"), href: pageHref("/explorer", locale) },
+          { label: message(messages, "common.data"), href: pageHref(ALL_DATA_PATH, locale) },
+          { label: message(messages, "common.budget"), href: pageHref(navGroup("budget").href, locale) },
           { label: message(messages, "common.municipalities"), href: pageHref("/explorer/municipalities", locale) },
           { label: name },
         ]}

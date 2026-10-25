@@ -1,4 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
+import { topicCards } from "./group-cards";
 
 const PATH = "/explorer/tax-breaks-refunds";
 const pressed = (id: string) => `[data-series-id="${id}"] [data-testid="series-row-toggle"]`;
@@ -65,12 +66,13 @@ for (const prefix of ["", "/en"]) test(`the heading line stays on one line at 37
   expect(lines).toBeLessThanOrEqual(1.6);
 });
 
-test("the Budget hub card and the sidebar link open the page", async ({ page }) => {
+// The Budget hub's cards are the Budget group page's now (spec 2026-10-24-explorer-regroup §5): the figure, then its caption and year.
+test("the Budget group page card and the sidebar link open the page", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
-  await page.goto("/explorer");
-  const card = page.getByTestId("hub-card").nth(3);
+  await page.goto("/explorer/budget");
+  const card = topicCards(page, "budget").nth(3);
   await expect(card).toContainText("შეღავათები და დაბრუნება");
-  await expect(card).toContainText("2025 · დაბრუნება 2.7");
+  await expect(card).toHaveAccessibleDescription(/^2\.7 მლრდ ₾ დაბრუნება · 2025 2008–2025$/);
   await card.click();
   await expect(page).toHaveURL(new RegExp(`${PATH}$`));
   await ready(page);

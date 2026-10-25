@@ -60,11 +60,11 @@ for (const prefix of ["", "/en"]) for (const width of [390, 1440]) {
     expect(await tableSeriesCount(table)).toBe(3);
     await expect(table).toContainText("—");
     const before = page.url();
-    if (width < 900) await page.getByTestId("sidebar-toggle").click();
+    if (width < 900) await page.getByTestId("sidebar-menu-button").click();
     await page.getByTestId("foreign-investment-link").click(); await expect(page).toHaveURL(before);
     await page.reload();
     await expect(page.getByTestId("series-status")).toContainText("3 / 12");
-    if (width < 900) await page.getByTestId("sidebar-toggle").click();
+    if (width < 900) await page.getByTestId("sidebar-menu-button").click();
     await page.getByTestId("data-sidebar").getByRole("link", { name: prefix ? "ქართული" : "English", exact: true }).click();
     await expect(page.getByTestId("series-status")).toContainText("3 / 12");
     await expect(page.getByTestId("foreign-investment-ranking")).toHaveAttribute("data-end-year", "2018");

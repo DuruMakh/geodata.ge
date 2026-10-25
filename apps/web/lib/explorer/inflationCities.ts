@@ -2,6 +2,7 @@ import { periodFromKey, periodKey } from "../data/inflation/periods";
 import { CPI_CITY_IDS, type CityFactInput, type CpiCityMeasure } from "../data/inflation/types";
 import { decemberAverages } from "./inflationGrid";
 import type { CityView } from "./inflationCityRoutes";
+import { latestEntry } from "./latestValue";
 import { periodBounds, rangeFromPatch, refitRange, resolveRange, type PeriodRange, type ResolvedPeriodRange } from "./periodRange";
 import { parseMonthRangeKey, writeMonthRangeKey } from "./urlState";
 
@@ -81,6 +82,11 @@ export function buildCityIndex(facts: CityFactInput[]): CityIndex {
 
 export function cityValues(index: CityIndex, lineId: string, seriesId: string, measure: CpiCityMeasure): Map<number, number> | undefined {
   return index.values.get(factKey(lineId, seriesId, measure));
+}
+
+/** A place's latest annual rate on the total: the line under a cities page's heading (Georgia's, or the city's). */
+export function cityLatestHeadline(index: CityIndex, lineId: string): { period: number; value: number } | null {
+  return latestEntry(cityValues(index, lineId, HEADLINE_ID, "yoy_pct"));
 }
 
 function lineValues(index: CityIndex, view: CityView, lineId: string): Map<number, number> | undefined {

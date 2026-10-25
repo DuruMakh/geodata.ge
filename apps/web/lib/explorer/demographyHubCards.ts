@@ -7,7 +7,9 @@ import { GEORGIA_PLACE_ID } from "./demographyAreas";
 import { sparkValues } from "./demographyPopulation";
 import { DEMOGRAPHY_PAGES } from "./demographyRoutes";
 import { formatInUnit, formatShare, UNIT_PERSONS } from "./format";
+import { coverageRange } from "./coverageLabel";
 import type { HubCardModel } from "./hubCards";
+import { annualSeries } from "./sparkline";
 
 // Every figure is read from the served facts at build time, so the hub can never drift from the pages
 // behind it (DESIGN.md section 6.7).
@@ -42,6 +44,8 @@ export function buildDemographyHubCards(
   const shareByYear = new Map([...bandsByYear].map(([year, bands]) => [year, (bands.old / bands.all) * 100]));
   const oldShares = [...bandsByYear].sort(([left], [right]) => left - right).map(([year, bands]) => ({ year, share: (bands.old / bands.all) * 100 }));
   const signed = (value: number) => `${value > 0 ? "+" : ""}${formatInUnit(value, UNIT_PERSONS)}`;
+  // What a count or share counts, the noun its footer used to carry (the headline's own label for the same figure).
+  const caption = (key: string) => message(presentation.messages, key);
   return DEMOGRAPHY_PAGES.map((page, index) => {
     const card = {
       index: String(index + 1).padStart(2, "0"),
@@ -54,9 +58,10 @@ export function buildDemographyHubCards(
       const [firstNet, lastNet] = [net[0]!, net.at(-1)!];
       return {
         ...card,
-        series: net.map((fact) => fact.value),
+        series: annualSeries(net),
         seriesColor: INK,
         footer: t("migrationCardFooter", { year: lastNet.year, net: signed(lastNet.value), first: firstNet.year, last: lastNet.year }),
+        latest: { value: signed(lastNet.value), period: String(lastNet.year), caption: caption("groups.headline.demography.migration") }, years: coverageRange(firstNet.year, lastNet.year),
       };
     }
     if (page.id === "age-sex" && page.live && oldShares.length) {
@@ -67,24 +72,27 @@ export function buildDemographyHubCards(
         series: sparkValues(oldShares.map((entry) => entry.year), (year) => shareByYear.get(year) ?? null),
         seriesColor: INK,
         footer: t("ageSexCardFooter", { year: lastShare.year, share: formatShare(lastShare.share / 100), first: firstShare.year, last: lastShare.year }),
+        latest: { value: formatShare(lastShare.share / 100), period: String(lastShare.year), caption: caption("groups.headline.demography.age-sex") }, years: coverageRange(firstShare.year, lastShare.year),
       };
     }
     if (page.id === "births-deaths" && page.live && births.length) {
       const [firstBirths, lastBirths] = [births[0]!, births.at(-1)!];
       return {
         ...card,
-        series: births.map((fact) => fact.value),
+        series: annualSeries(births),
         seriesColor: INK,
         footer: t("birthsCardFooter", { year: lastBirths.year, births: formatInUnit(lastBirths.value, UNIT_PERSONS), first: firstBirths.year, last: lastBirths.year }),
+        latest: { value: formatInUnit(lastBirths.value, UNIT_PERSONS), period: String(lastBirths.year), caption: caption("groups.headline.demography.births-deaths") }, years: coverageRange(firstBirths.year, lastBirths.year),
       };
     }
     if (page.id === "marriages-divorces" && page.live && marriages.length) {
       const [firstMarriages, lastMarriages] = [marriages[0]!, marriages.at(-1)!];
       return {
         ...card,
-        series: marriages.map((fact) => fact.value),
+        series: annualSeries(marriages),
         seriesColor: INK,
         footer: t("marriagesCardFooter", { year: lastMarriages.year, marriages: formatInUnit(lastMarriages.value, UNIT_PERSONS), first: firstMarriages.year, last: lastMarriages.year }),
+        latest: { value: formatInUnit(lastMarriages.value, UNIT_PERSONS), period: String(lastMarriages.year), caption: caption("groups.caption.marriages") }, years: coverageRange(firstMarriages.year, lastMarriages.year),
       };
     }
     if (page.id !== "population" || !first || !last) return { ...card, series: null, seriesColor: null, footer: null };
@@ -93,6 +101,7 @@ export function buildDemographyHubCards(
       series: trend,
       seriesColor: INK,
       footer: t("cardFooter", { year: last.year, persons: formatInUnit(last.value, UNIT_PERSONS), first: first.year, last: last.year }),
+      latest: { value: formatInUnit(last.value, UNIT_PERSONS), period: String(last.year) }, years: coverageRange(first.year, last.year),
     };
   });
 }

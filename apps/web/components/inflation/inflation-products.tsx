@@ -32,6 +32,7 @@ import { Callout, SourceNote } from "../ui/editorial";
 import { InflationProductPanel } from "./inflation-product-panel";
 import { InflationProductIndicators } from "./inflation-product-indicators";
 import { InflationProductTable } from "./inflation-product-table";
+import { topicSection, ALL_DATA_PATH } from "../../lib/navigation/navTree";
 
 
 export type InflationProductsProps = {
@@ -57,8 +58,8 @@ export function InflationProducts({ products, dataUrl, coverage, lastReviewedAt,
       messages={messages}
       crumbs={[
         { label: message(messages, "common.home"), href: pageHref("/", locale) },
-        { label: message(messages, "common.data") },
-        { label: message(messages, "common.inflation"), href: pageHref("/explorer/inflation", locale) },
+        { label: message(messages, "common.data"), href: pageHref(ALL_DATA_PATH, locale) },
+        { label: message(messages, "common.inflation"), href: pageHref(topicSection("inflation").href, locale) },
         { label: t("productsHeading") },
       ]}
       coverage={coverageLabel(messages, locale, coverage.earliestYear, periodLabel(messages, coverage.latestPeriod, "short"), lastReviewedAt)}

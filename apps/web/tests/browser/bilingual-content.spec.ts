@@ -23,9 +23,12 @@ test("the English reader journey keeps human pages English and reaches the share
   await page.goto("/en");
   await page.getByTestId("landing-header").getByRole("link", { name: "Data", exact: true }).click();
   await expect(page).toHaveURL(/\/en\/explorer$/);
-  await page.getByTestId("budget-hub").locator('a[href="/en/explorer/expenditure"]').click();
+  // Data opens All data, whose A to Z list links every page.
+  await page.getByTestId("az-index").locator('a[href="/en/explorer/expenditure"]').click();
   await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
-  await page.getByTestId("site-footer").getByRole("link", { name: "Methodology", exact: true }).click();
+  // Explorer pages have no footer; the sidebar's foot links Methodology.
+  await expect(page.getByRole("contentinfo")).toHaveCount(0);
+  await page.getByTestId("data-sidebar").getByRole("link", { name: "Methodology", exact: true }).click();
   await expect(page).toHaveURL(/\/en\/methodology$/);
   await page.locator('main a[href="/en/methodology/expenditure"]').click();
   await expect(page).toHaveURL(/\/en\/methodology\/expenditure$/);
@@ -48,11 +51,12 @@ test("homepage and hub figures stay identical when switching languages", async (
   expect(new URL(page.url()).hash).toBe("#ch-03");
   expect(before.length).toBeGreaterThan(10);
   expect(await figures()).toEqual(before);
-  await page.goto("/en/explorer");
-  const sparklines = () => page.getByTestId("budget-hub").locator("svg polyline, svg path").evaluateAll(elements => elements.map(element => element.getAttribute("points") ?? element.getAttribute("d")));
+  // The Budget cards moved from /explorer to the Budget group page.
+  await page.goto("/en/explorer/budget");
+  const sparklines = () => page.getByTestId("explorer-card-graphic").locator("svg polyline, svg path").evaluateAll(elements => elements.map(element => element.getAttribute("points") ?? element.getAttribute("d")));
   const englishSparklines = await sparklines();
   expect(englishSparklines.length).toBeGreaterThan(0);
-  await page.goto("/explorer");
+  await page.goto("/explorer/budget");
   expect(await sparklines()).toEqual(englishSparklines);
 });
 

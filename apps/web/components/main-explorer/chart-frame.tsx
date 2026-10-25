@@ -325,7 +325,7 @@ export function ChartTooltip({
   testId?: string;
   /** "panel": the phone readout, in flow under the chart so it never covers the plot. */
   variant?: "float" | "panel";
-  /** Float readout only: no row gap and a 14px line, for a readout of a dozen rows that must fit the plot's height. */
+  /** Float readout only: no row gap, a 13px line and 6px vertical padding, for a readout of a dozen rows that must fit the plot's height. */
   compact?: boolean;
 }) {
   const { messages } = useI18n();
@@ -362,7 +362,7 @@ export function ChartTooltip({
     <div
       data-testid={testId}
       data-pinned={pinned ?? undefined}
-      className={`pointer-events-none absolute top-0 z-[2] flex max-h-full min-w-[200px] flex-col ${compact ? "gap-0" : "gap-1"} overflow-hidden rounded-[3px] border border-[var(--hairline)] bg-[var(--tile)] px-2.5 py-2 shadow-[0_4px_16px_rgba(30,27,22,0.10)]`}
+      className={`pointer-events-none absolute top-0 z-[2] flex max-h-full min-w-[200px] flex-col ${compact ? "gap-0 py-1.5" : "gap-1 py-2"} overflow-hidden rounded-[3px] border border-[var(--hairline)] bg-[var(--tile)] px-2.5 shadow-[0_4px_16px_rgba(30,27,22,0.10)]`}
       style={
         pinned === null
           ? {
@@ -377,7 +377,7 @@ export function ChartTooltip({
         {headerRight ? <span>{headerRight}</span> : null}
       </div>
       {rows.map((row) => (
-        <div key={row.id} className={`flex items-center justify-between gap-2${compact ? " leading-[14px]" : ""}`}>
+        <div key={row.id} className={`flex items-center justify-between gap-2${compact ? " leading-[13px]" : ""}`}>
           <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-[var(--body)]">
             <RowMark row={row} swatchClassName="!w-3" />
             <RowLabel row={row} className="max-w-[190px] overflow-hidden text-ellipsis whitespace-nowrap" />

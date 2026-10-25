@@ -161,9 +161,12 @@ const presentation = async (): Promise<Presentation> => ({
 });
 
 test("the hub has five cards: four headline series ending in 2025, then Regions with its years only", async () => {
-  const cards = buildTransportHubCards(facts, await presentation());
+  const base = await presentation();
+  const cards = buildTransportHubCards(facts, { ...base, messages: { ...await getMessages("en", ["transport"]), ...base.messages } });
   expect(cards.map(card => card.href)).toEqual(TRANSPORT_SECTIONS.map(section => section.href));
-  expect(cards.map(card => card.footer)).toEqual(["2025 · 1,650.0 · 2000–2025", "2025 · 1,318.9 · 2017–2025", "2025 · 11,262.1 · 2000–2025", expect.stringMatching(/^2025 · .* · 2000–2025$/), "2017–2025"]);
+  // In the pages' own scale words: vehicles in millions, passenger- and tonne-km in billions.
+  expect(cards.map(card => card.footer)).toEqual(["2025 · 1.65 million · 2000–2025", "2025 · 1.32 million · 2017–2025", "2025 · 11.3 billion · 2000–2025", expect.stringMatching(/^2025 · .* billion · 2000–2025$/), "2017–2025"]);
+  expect(cards.map(card => card.latest?.caption ?? null)).toEqual(["Passenger cars", "Cars over 10 years old", "Passenger-km", "Tonne-km", null]);
   expect(cards[4]).toMatchObject({ series: null, seriesColor: null, comingSoon: false });
 });
 

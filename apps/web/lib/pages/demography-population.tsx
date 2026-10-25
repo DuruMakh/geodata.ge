@@ -6,11 +6,8 @@ import { ExplorerPage } from "../../components/explorer-shell/explorer-page";
 import { BreadcrumbJsonLd } from "../../components/seo/breadcrumb-json-ld";
 import { PageHeader } from "../../components/shell/page-header";
 import { loadDensityRows } from "../data/demography/densityRows";
-import { loadServedDemographyData } from "../data/demography/importDemography";
 import { SERIES } from "../data/demography/series";
-import { loadServedMunicipalData } from "../data/servedData";
-import { projectDemographyObservation } from "../explorer/clientData";
-import { GEORGIA_PLACE_ID, TBILISI_PLACE_ID, buildDemographyPlaces } from "../explorer/demographyAreas";
+import { GEORGIA_PLACE_ID, TBILISI_PLACE_ID } from "../explorer/demographyAreas";
 import { POPULATION_PATH, populationHrefById } from "../explorer/demographyPlaceRoutes";
 import { buildPopulationHighlights, buildPopulationModel } from "../explorer/demographyPopulation";
 import { buildPopulationIndexModel } from "../explorer/demographyPopulationIndex";
@@ -20,7 +17,6 @@ import { formatInUnit, UNIT_DENSITY, UNIT_PERSONS } from "../explorer/format";
 import type { WorkbookPublicSource } from "../explorer/workbookModel";
 import { loadEnglishCatalogue } from "../i18n/catalogue.server";
 import { message } from "../i18n/messages";
-import { getMessages } from "../i18n/messages.server";
 import { clientPresentation, getPresentation } from "../i18n/presentation.server";
 import { I18nProvider } from "../i18n/provider";
 import { pageHref } from "../i18n/routes";
@@ -28,6 +24,11 @@ import type { Locale, Presentation, TemplateValues } from "../i18n/types";
 import { projectPublicSources } from "../methodology/publicSources";
 import { loadReviewedSourceManifest } from "../methodology/sourceManifest";
 import { fiscalMetadata } from "../seo/metadata";
+import { loadPopulationBasics } from "../explorer/populationBasics.server";
+
+// The other Demography pages take the shared loader from here, beside the source loader.
+export { loadPopulationBasics };
+import { ALL_DATA_PATH } from "../navigation/navTree";
 
 export async function demographyPopulationPageMetadata(locale: Locale) {
   const p = await getPresentation(locale, ["demography"], []);
@@ -37,27 +38,6 @@ export async function demographyPopulationPageMetadata(locale: Locale) {
     title: message(p.messages, "demography.populationMetaTitle"),
     description: message(p.messages, "demography.populationDescription"),
   });
-}
-
-/** Everything the index and the place pages share: the served facts, the registries, the language and the place list. */
-export async function loadPopulationBasics(locale: Locale) {
-  const [{ facts: served }, municipal, georgian] = await Promise.all([
-    loadServedDemographyData(),
-    loadServedMunicipalData(),
-    getMessages("ka", ["demography"]),
-  ]);
-  // The served rows include other demography pages' series; the Population pages carry only their own two.
-  const facts = served.filter((fact) => fact.seriesId === SERIES.populationTotal || fact.seriesId === SERIES.populationDensity);
-  const ids = [GEORGIA_PLACE_ID, ...municipal.regions.map((region) => region.id), ...municipal.municipalities.map((m) => m.code)];
-  // `municipal` is loaded for the map's legend text and the list's labels (tabs, search, boundaries).
-  const presentation = await getPresentation(locale, ["demography", "format", "main", "workbook", "municipal"], ids, ids);
-  const places = buildDemographyPlaces({
-    regions: municipal.regions,
-    municipalities: municipal.municipalities,
-    englishLabels: presentation.englishLabels,
-    georgiaNameKa: message(georgian, "demography.georgia"),
-  });
-  return { facts, clientFacts: facts.map(projectDemographyObservation), municipal, presentation, places };
 }
 
 /**
@@ -123,7 +103,7 @@ export async function renderDemographyPopulationPage(locale: Locale) {
   const title = t("populationTitle");
   const crumbs = [
     { label: message(messages, "common.home"), href: pageHref("/", locale) },
-    { label: message(messages, "common.data") },
+    { label: message(messages, "common.data"), href: pageHref(ALL_DATA_PATH, locale) },
     { label: t("title"), href: pageHref(DEMOGRAPHY_HUB_PATH, locale) },
     { label: title },
   ];
@@ -132,6 +112,7 @@ export async function renderDemographyPopulationPage(locale: Locale) {
       <BreadcrumbJsonLd
         items={[
           { name: crumbs[0].label, path: pageHref("/", locale) },
+          { name: message(messages, "common.data"), path: pageHref(ALL_DATA_PATH, locale) },
           { name: crumbs[2].label, path: pageHref(DEMOGRAPHY_HUB_PATH, locale) },
           { name: title, path: pageHref(POPULATION_PATH, locale) },
         ]}

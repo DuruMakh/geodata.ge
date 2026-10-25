@@ -39,6 +39,7 @@ import { useAppReady } from "../explorer-shell/use-app-ready";
 import { rangeFromPatch } from "../../lib/explorer/periodRange";
 import { useReplaceHash } from "../explorer-shell/use-replace-hash";
 import { INK } from "../../lib/explorer/colors";
+import { ALL_DATA_PATH } from "../../lib/navigation/navTree";
 
 export type GdpWorkbookSource = WorkbookPublicSource & { sourceId: string };
 export function GdpOverview({
@@ -152,7 +153,7 @@ export function GdpOverview({
             label: message(messages, "common.home"),
             href: pageHref("/", locale),
           },
-          { label: message(messages, "common.data") },
+          { label: message(messages, "common.data"), href: pageHref(ALL_DATA_PATH, locale) },
           {
             label: t("economy"),
             href: pageHref("/explorer/economy", locale),
@@ -259,7 +260,7 @@ export function GdpOverview({
         }
       />
       <div className="mt-5 space-y-2">
-        <SourceNote action={shareAction}>
+        <SourceNote testId="source-label" action={shareAction}>
           {/* The price basis sits with the source, not as a second line under the heading (DESIGN §17). */}
           <span data-testid="gdp-unit">{state.indicator === "real" ? t("constant") : d.growth ? t("percent") : t("current")}</span>
           {" · "}

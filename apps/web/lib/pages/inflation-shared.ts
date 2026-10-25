@@ -8,7 +8,6 @@ import type { loadReviewedSourceManifest } from "../methodology/sourceManifest";
 // Shared by the inflation hub and page modules. Each route has its own module, so
 // a page ships only its own explorer: keep client components out of this file.
 
-export const INFLATION_HUB_PATH = "/explorer/inflation";
 export const inflationRepositoryRoot = () => path.resolve(/* turbopackIgnore: true */ process.cwd(), "../..");
 
 // Archive rows ending in "_ka" are the Georgian twins of the English source files.

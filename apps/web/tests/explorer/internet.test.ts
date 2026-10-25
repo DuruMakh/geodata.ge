@@ -208,9 +208,12 @@ test("a users workbook names each group with its heading and cites only the tabl
 });
 
 test("the hub cards follow each page's default series", async () => {
-  const cards = buildInternetHubCards(facts, await presentation());
+  const base = await presentation();
+  const cards = buildInternetHubCards(facts, { ...base, messages: { ...base.messages, ...await getMessages("en", ["groups"]) } });
   expect(cards.map(card => card.href)).toEqual(INTERNET_SECTIONS.map(section => section.href));
   expect(cards.map(card => card.title)).toEqual(["Internet at home", "Internet users", "Shopping and services online", "Phones and computers"]);
   expect(cards.map(card => card.footer)).toEqual(["2026 · 93.5% · 2016–2026", "2026 · 89.6% · 2016–2026", "2026 · 38.6% · 2016–2026", "2026 · 93.3% · 2016–2026"]);
   expect(cards.every(card => card.series?.length === 11 && card.seriesColor === INK)).toBe(true);
+  // Phones and computers names the device its share counts; the other titles name theirs.
+  expect(cards.map(card => card.latest?.caption ?? null)).toEqual([null, null, null, "Own a mobile phone"]);
 });

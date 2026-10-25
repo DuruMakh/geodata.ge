@@ -5,7 +5,7 @@ import { useCallback, useId, useRef, useState } from "react";
 import type { ClientBusinessFact } from "../../lib/data/business/types";
 import type { MunicipalRegion } from "../../lib/data/municipal/types";
 import { businessHeadingLabel, changeBusinessSelection, serializeBusinessHash, type BusinessUnit } from "../../lib/explorer/business";
-import { BUSINESS_REGIONS_HREF, buildBusinessAreaModel, businessAreaCoverage, businessAreaOfMapId, businessAreaSelectionHash, businessAreaSeries, businessMapId, businessRegionHref, parseBusinessAreaHash, type BusinessArea } from "../../lib/explorer/businessAreas";
+import { BUSINESS_REGIONS_HREF, buildBusinessAreaModel, businessAreaCoverage, businessAreaLatest, businessAreaOfMapId, businessAreaSelectionHash, businessAreaSeries, businessMapId, businessRegionHref, parseBusinessAreaHash, type BusinessArea } from "../../lib/explorer/businessAreas";
 import { buildBusinessWorkbookExportModel } from "../../lib/explorer/businessWorkbook";
 import { updatedDate } from "../../lib/explorer/coverageLabel";
 import { formatAmount, formatInUnit, thousandsUnit, unitsFor, type ValueUnit } from "../../lib/explorer/format";
@@ -70,7 +70,7 @@ export function BusinessAreaExplorer({ area, facts, labels, areaLabels, sources,
   const listRows = listLatestByHeading(facts, model.series, listEnd);
   const total = rows.find(row => row.itemId === reference?.id) ?? null;
   // The latest-value line is the page's headline: its own area's sales, whatever is chosen below.
-  const latest = facts.filter(f => f.indicatorId === `business.turnover.${area === "georgia" ? "total" : area}`).sort((a, b) => a.year - b.year).at(-1)!;
+  const latest = businessAreaLatest(area, facts);
   const areaName = areaLabels[area];
   const title = t("page.area.regionTitle", { region: areaName });
   // The chart is named after the heading of the selection's unit group.

@@ -8,6 +8,7 @@ import {
   type MunicipalPopulationFact,
   type MunicipalTotalFact,
 } from "../data/municipal/types";
+import { aggregateFactsForEntity, applyAdjaraBudgetAdjustment } from "../data/municipal/aggregateMunicipalFacts";
 import type { SourceDocumentRow } from "../data/sources";
 import type { ClientMunicipalFunctionFact, ClientMunicipalTotalFact } from "./clientData";
 import { message } from "../i18n/messages";
@@ -355,6 +356,23 @@ export function regionFactsFor(
     functionFacts: functionFacts.filter((row) => members.has(row.municipalityCode)),
     totalFacts: totalFacts.filter((row) => members.has(row.municipalityCode)),
   };
+}
+
+/** A region page's own facts: its members' rolled up into one entity, Adjara's totals with the republican adjustment. */
+export function regionOwnFacts(
+  regionId: string,
+  municipalities: Municipality[],
+  functionFacts: MunicipalFunctionFact[],
+  totalFacts: MunicipalTotalFact[],
+  adjaraBudgetAdjustments: AdjaraBudgetAdjustment[],
+) {
+  const members = regionFactsFor(regionId, municipalities, functionFacts, totalFacts);
+  const rolled = aggregateFactsForEntity(regionId, members.functionFacts, members.totalFacts);
+  const own =
+    regionId === ADJARA_REGION_ID
+      ? { ...rolled, totalFacts: applyAdjaraBudgetAdjustment(rolled.totalFacts, adjaraBudgetAdjustments) }
+      : rolled;
+  return { members, own };
 }
 
 export type MunicipalKpi = { label: string; value: string; unit?: string; detail: string };

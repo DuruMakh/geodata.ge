@@ -6,10 +6,7 @@ vi.mock("next/navigation", () => ({ useRouter: () => ({ push() {} }), usePathnam
 import { SERIES } from "../../lib/data/demography/series";
 import { populationHrefById } from "../../lib/explorer/demographyPlaceRoutes";
 import { buildPopulationIndexModel } from "../../lib/explorer/demographyPopulationIndex";
-import {
-  demographyPageMetadata,
-  renderDemographyPage,
-} from "../../lib/pages/demography";
+import { groupPageMetadata, renderGroupPage } from "../../lib/pages/group";
 import { demographyMigrationPageMetadata, renderDemographyMigrationPage } from "../../lib/pages/demography-migration";
 import { demographyBirthsDeathsPageMetadata, renderDemographyBirthsDeathsPage } from "../../lib/pages/demography-births-deaths";
 import { demographyAgeSexPageMetadata, renderDemographyAgeSexPage } from "../../lib/pages/demography-age-sex";
@@ -23,6 +20,7 @@ import {
 import { renderPageMarkup } from "../helpers/render-localized";
 
 const GEORGIAN = /\p{Script=Georgian}/u;
+const count = (html: string, token: RegExp) => (html.match(token) ?? []).length;
 // The methodology link closes the source sentence with a full stop, so the Boundaries credit the index appends starts a new one.
 // Written without either language's words, so it holds for both.
 const SENTENCE_CLOSED_BEFORE_BOUNDARIES = /\/methodology\/demography"[^>]*>[^<]+<\/a>\. [^<]+<a href="https:\/\/www\.openstreetmap\.org\/copyright"/;
@@ -30,12 +28,12 @@ const original = process.env.NEXT_PUBLIC_SITE_URL;
 beforeEach(() => { process.env.NEXT_PUBLIC_SITE_URL = "https://fiscal.ge"; });
 afterEach(() => { process.env.NEXT_PUBLIC_SITE_URL = original; });
 
-describe("demography hub page", () => {
+// The Demography hub is the Demography group page now (spec 2026-10-24-explorer-regroup §5): one topic, no topic links.
+describe("demography group page", () => {
   it("renders the five cards with a breadcrumb and no Georgian text in English", async () => {
-    const html = renderPageMarkup("en", await renderDemographyPage("en"));
-    expect(html).toContain('data-testid="demography-hub"');
-    expect((html.match(/data-testid="hub-card"/g) ?? []).length).toBe(5);
-    expect((html.match(/aria-disabled="true"/g) ?? []).length).toBe(0);
+    const html = renderPageMarkup("en", await renderGroupPage("demography", "en"));
+    expect(html).toContain('id="t-demography"');
+    expect(count(html, /data-testid="explorer-card"/g)).toBe(5);
     expect(html).toContain('href="/en/explorer/demography/population"');
     expect(html).toContain('href="/en/explorer/demography/age-sex"');
     expect(html).toContain('href="/en/explorer/demography/migration"');
@@ -48,22 +46,20 @@ describe("demography hub page", () => {
   });
 
   it("links the five pages in order in Georgian, without the /en prefix", async () => {
-    const html = renderPageMarkup("ka", await renderDemographyPage("ka"));
-    const hub = html.slice(html.indexOf('data-testid="demography-hub"'));
-    expect((hub.match(/data-testid="hub-card"/g) ?? []).length).toBe(5);
-    expect([...hub.matchAll(/href="([^"]+)"/g)].map((match) => match[1]).slice(0, 5)).toEqual(
+    const html = renderPageMarkup("ka", await renderGroupPage("demography", "ka"));
+    const section = html.slice(html.indexOf('id="t-demography"'));
+    expect([...section.matchAll(/<a[^>]*data-testid="explorer-card"[^>]*>/g)].map((match) => /href="([^"]+)"/.exec(match[0])![1])).toEqual(
       ["population", "age-sex", "migration", "births-deaths", "marriages-divorces"].map((page) => `/explorer/demography/${page}`),
     );
   });
 
   it("has metadata that is canonical to its own language and reciprocal", async () => {
-    const metadata = await demographyPageMetadata("en");
+    const metadata = await groupPageMetadata("demography", "en");
     expect(metadata.alternates?.canonical).toBe("https://fiscal.ge/en/explorer/demography");
     expect(metadata.alternates?.languages).toMatchObject({ ka: "https://fiscal.ge/explorer/demography", en: "https://fiscal.ge/en/explorer/demography" });
   });
 });
 
-const count = (html: string, token: RegExp) => (html.match(token) ?? []).length;
 
 describe("population index page", () => {
   it("hands the Population pages only population and density rows", async () => {

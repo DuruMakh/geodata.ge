@@ -4,7 +4,7 @@ import { PageHeader } from "../../components/shell/page-header";
 import { JsonLd } from "../../components/seo/json-ld";
 import { BreadcrumbJsonLd } from "../../components/seo/breadcrumb-json-ld";
 import { loadServedEnergyFoodData, toClientEnergyFoodFact } from "../data/energyFood/importEnergyFood";
-import { ENERGY_FOOD_HUB_PATH, ENERGY_FOOD_SECTIONS, energyFoodCoverage, energyFoodLastReviewedAt, energyFoodSeries, type EnergyFoodSectionId } from "../explorer/energyFood";
+import { ENERGY_FOOD_SECTIONS, energyFoodCoverage, energyFoodLastReviewedAt, energyFoodSeries, type EnergyFoodSectionId } from "../explorer/energyFood";
 import { coverageLabel } from "../explorer/coverageLabel";
 import { I18nProvider } from "../i18n/provider";
 import { clientPresentation, getPresentation } from "../i18n/presentation.server";
@@ -16,6 +16,7 @@ import { loadSourcedWorkbookSources, type SourcedWorkbookPublicSource } from "..
 import { fiscalMetadata } from "../seo/metadata";
 import { explorerDatasetJsonLd } from "../seo/structuredData";
 import { resolveSiteUrl } from "../siteUrl";
+import { topicSection, ALL_DATA_PATH } from "../navigation/navTree";
 
 export async function energyFoodPageMetadata(locale: Locale, section: EnergyFoodSectionId) {
   const messages = await getMessages(locale, ["energyFood"]);
@@ -55,14 +56,14 @@ export async function renderEnergyFoodPage(locale: Locale, section: EnergyFoodSe
   const t = (key: string) => message(presentation.messages, `energyFood.${key}`);
   const title = t(`page.${section}.title`), description = t(`page.${section}.summary`);
   const lastReviewedAt = energyFoodLastReviewedAt(section, data.facts), origin = resolveSiteUrl();
-  const crumbs = [{ label: message(presentation.messages, "common.home"), href: pageHref("/", locale) }, { label: message(presentation.messages, "common.data") }, { label: t("title"), href: pageHref(ENERGY_FOOD_HUB_PATH, locale) }, { label: title }];
+  const crumbs = [{ label: message(presentation.messages, "common.home"), href: pageHref("/", locale) }, { label: message(presentation.messages, "common.data"), href: pageHref(ALL_DATA_PATH, locale) }, { label: t("title"), href: pageHref(topicSection("energy-food").href, locale) }, { label: title }];
   return <I18nProvider {...clientPresentation(presentation)}>
     <JsonLd testId="explorer-dataset-json-ld" data={explorerDatasetJsonLd({
       locale, origin, path: href, datasetId: "energy-food", name: title, description, firstYear, lastYear, dateModified: lastReviewedAt,
       // Every series the page offers, not only the headline one.
       variableMeasured: Object.values(labels),
     })} />
-    <BreadcrumbJsonLd items={[{ name: crumbs[0].label, path: pageHref("/", locale) }, { name: t("title"), path: pageHref(ENERGY_FOOD_HUB_PATH, locale) }, { name: title, path: pageHref(href, locale) }]} />
+    <BreadcrumbJsonLd items={[{ name: crumbs[0].label, path: pageHref("/", locale) }, { name: message(presentation.messages, "common.data"), path: pageHref(ALL_DATA_PATH, locale) }, { name: t("title"), path: pageHref(topicSection("energy-food").path, locale) }, { name: title, path: pageHref(href, locale) }]} />
     <ExplorerPage containerQueries={false}>
       <PageHeader locale={locale} messages={presentation.messages} crumbs={crumbs} coverage={coverageLabel(presentation.messages, locale, firstYear, lastYear, lastReviewedAt)} />
       <EnergyFoodExplorer key={section} section={section} facts={facts} labels={labels} sources={sources} lastReviewedAt={lastReviewedAt} siteOrigin={origin} />

@@ -1,3 +1,3 @@
-import { externalHubMetadata, renderExternalHub } from "../../../../lib/pages/hubs/external";
-export const generateMetadata = () => externalHubMetadata("ka");
-export default function Page() { return renderExternalHub("ka"); }
+import { groupPageMetadata, renderGroupPage } from "../../../../lib/pages/group";
+export const generateMetadata = () => groupPageMetadata("external", "ka");
+export default function Page() { return renderGroupPage("external", "ka"); }

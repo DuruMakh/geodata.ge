@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { NAV_TREE } from "../../lib/navigation/navTree";
+import { DATASET_HUBS } from "../../lib/navigation/datasetHubs";
 
 for (const locale of ["ka", "en"] as const) {
   for (const width of [320, 390, 768, 899]) {
@@ -18,8 +18,8 @@ for (const locale of ["ka", "en"] as const) {
       await page.keyboard.press("Enter");
       await expect(toggle).toHaveAttribute("aria-expanded", "true");
       const nav = header.getByRole("navigation", { includeHidden: false });
-      // მთავარი, every dataset hub (in place of the single budget-only data link), AI, მიზანი.
-      await expect(nav.getByRole("link")).toHaveCount(NAV_TREE.length + 3);
+      // მთავარი, every group page (in place of the single budget-only data link), AI, მიზანი.
+      await expect(nav.getByRole("link")).toHaveCount(DATASET_HUBS.length + 3);
       await expect(nav.getByRole("link").first()).toHaveAttribute("aria-current", "page");
       const languages = header.getByRole("group");
       await expect(languages).toBeVisible();
@@ -92,30 +92,34 @@ test.describe("explorer data sidebar", () => {
   test.use({ viewport: { width: 390, height: 844 } });
 
   test("tapping the current page closes the menu", async ({ page }) => {
-    // Budget's hub, a dataset hub and a section page: the link to the page you are on must still close the sheet.
+    // All data, a group page and a section page: the link to the page you are on must still close the menu.
     for (const path of ["/explorer", "/en/explorer/economy", "/explorer/economy/gdp"]) {
       await page.goto(path);
-      const toggle = page.getByTestId("sidebar-toggle");
-      // Hubs do not mark data-app-ready; the toggle names the sheet it controls once hydrated below 900px.
+      await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
+      const toggle = page.getByTestId("sidebar-menu-button");
       await expect(toggle).toHaveAttribute("aria-controls", "data-sidebar-navigation");
       await toggle.click();
       await expect(toggle).toHaveAttribute("aria-expanded", "true");
-      await page.locator(`#data-sidebar-navigation nav a[href="${path}"]`).click();
+      await page.locator(`#data-sidebar-navigation a[href="${path}"]`).click();
       await expect(toggle, path).toHaveAttribute("aria-expanded", "false");
       await expect(page.locator("#data-sidebar-navigation")).toBeHidden();
       expect(new URL(page.url()).pathname).toBe(path);
     }
   });
 
-  test("Budget is current on /explorer", async ({ page }) => {
+  // /explorer is All data now; Budget has its own group page.
+  test("All data is current on /explorer", async ({ page }) => {
     for (const prefix of ["", "/en"]) {
       await page.goto(`${prefix}/explorer`);
-      const budget = page.locator(`#data-sidebar-navigation nav a[href="${prefix}/explorer"]`);
-      await expect(budget).toHaveAttribute("aria-current", "page");
-      await expect(page.locator('#data-sidebar-navigation nav a[aria-current="page"]')).toHaveCount(1);
-      // A section page is current in its own right; Budget then only stays highlighted.
+      const allData = page.locator(`#data-sidebar-navigation a[href="${prefix}/explorer"]`);
+      await expect(allData).toHaveAttribute("data-testid", "all-data-link");
+      await expect(allData).toHaveAttribute("aria-current", "page");
+      await expect(page.locator('#data-sidebar-navigation a[aria-current="page"]')).toHaveCount(1);
+      // A section page is current in its own right; neither All data nor its group's own page is.
       await page.goto(`${prefix}/explorer/expenditure`);
-      await expect(page.locator(`#data-sidebar-navigation nav a[href="${prefix}/explorer"]`)).not.toHaveAttribute("aria-current", "page");
+      await expect(page.locator(`#data-sidebar-navigation a[href="${prefix}/explorer"]`)).not.toHaveAttribute("aria-current", "page");
+      await expect(page.locator(`#data-sidebar-navigation a[href="${prefix}/explorer/budget"]`)).not.toHaveAttribute("aria-current", "page");
+      await expect(page.getByTestId("section-link-expenditure")).toHaveAttribute("aria-current", "page");
     }
   });
 });

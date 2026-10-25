@@ -79,7 +79,7 @@ read `data/` via the `../../` relative paths in `apps/web/lib/data/servedData.ts
 Before Next.js builds, `prebuild` deterministically prepares the ignored public
 methodology downloads from the reviewed manifests and immutable originals; see
 `docs/data-methodology/public-methodology-and-source-archives.md`. Every
-human page—`/`, every explorer hub, section and place page, the methodology
+human page—`/`, All data, every group, chart and place page, the methodology
 hub and its category pages, `/about` and `/connect`—and `/robots.txt`,
 `/sitemap.xml` and the 404 page are prerendered at build time. The only
 request-time route is `/mcp` (see "The `/mcp` runtime" below).

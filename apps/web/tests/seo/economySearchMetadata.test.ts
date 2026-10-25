@@ -1,7 +1,7 @@
 import { afterAll, beforeAll, expect, test, vi } from "vitest";
 import { gdpPageMetadata, renderGdpPage } from "../../lib/pages/gdp";
 import { economicSectorsPageMetadata, renderEconomicSectorsPage } from "../../lib/pages/economic-sectors";
-import { economyPageMetadata } from "../../lib/pages/economy";
+import { groupPageMetadata } from "../../lib/pages/group";
 import { getMethodologyContent } from "../../lib/methodology/catalog";
 import { message } from "../../lib/i18n/messages";
 import { getMessages } from "../../lib/i18n/messages.server";
@@ -44,10 +44,11 @@ test.each(["ka", "en"] as const)("GDP and sector Datasets carry the page's searc
   }
 });
 
-// U28-12: the Economy hub's snippet names its three sections, not only the one-line lead under its heading.
-test.each(["ka", "en"] as const)("the Economy hub's search description names GDP, sectors and regions: %s", async (locale) => {
-  const metadata = await economyPageMetadata(locale);
-  const lead = message(await getMessages(locale, ["gdp"]), "gdp.hubDescription");
+// U28-12: the Economy page's snippet names its sections, not only the one-line lead under its heading. It is the Economy and
+// business group page now (spec 2026-10-24-explorer-regroup §5), so it names the economy, business and housing.
+test.each(["ka", "en"] as const)("the Economy and business page's search description names GDP, business and housing: %s", async (locale) => {
+  const metadata = groupPageMetadata("economy", locale);
+  const lead = message(await getMessages(locale, ["groups"]), "groups.line.economy");
   expect(metadata.description).not.toBe(lead);
-  for (const term of locale === "en" ? ["GDP", "sector", "regional"] : ["მშპ", "სექტორ", "რეგიონ"]) expect(metadata.description).toContain(term);
+  for (const term of locale === "en" ? ["GDP", "business", "home prices"] : ["მშპ", "ბიზნეს", "ბინების ფასები"]) expect(metadata.description).toContain(term);
 });

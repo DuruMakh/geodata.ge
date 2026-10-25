@@ -83,23 +83,28 @@ test("unemployment denominators count the top-level rows only (§7.7)", async ({
 // relief's positioned map labels, screen-reader-only and decorative text are out
 // of scope; the year-range strip and the municipal map legend are owned by
 // their own repair specs.
-async function textBelowFloor(page: Page): Promise<string[]> {
-  return page.evaluate(() => {
+// `root` narrows the walk to one region; `decorative` also reads aria-hidden text there, for a
+// band (the explorer cards' graphics) whose labels a sighted reader still reads.
+async function textBelowFloor(page: Page, { root = "body", decorative = false }: { root?: string; decorative?: boolean } = {}): Promise<string[]> {
+  return page.evaluate(({ root, decorative }) => {
     const found: string[] = [];
-    const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
-    while (walker.nextNode()) {
-      const text = walker.currentNode.textContent?.trim();
-      const element = walker.currentNode.parentElement;
-      if (!text || !element) continue;
-      if (element.closest("svg, figure, .sr-only, [aria-hidden='true'], [data-testid='year-range-strip'], [data-testid='municipality-map']")) continue;
-      const box = element.getBoundingClientRect();
-      const style = getComputedStyle(element);
-      if (box.width === 0 || box.height === 0 || style.visibility === "hidden" || style.opacity === "0") continue;
-      const size = parseFloat(style.fontSize);
-      if (size < 11) found.push(`${size}px "${text.slice(0, 30)}"`);
+    const skip = `svg, figure, .sr-only, ${decorative ? "" : "[aria-hidden='true'], "}[data-testid='year-range-strip'], [data-testid='municipality-map']`;
+    for (const scope of document.querySelectorAll(root)) {
+      const walker = document.createTreeWalker(scope, NodeFilter.SHOW_TEXT);
+      while (walker.nextNode()) {
+        const text = walker.currentNode.textContent?.trim();
+        const element = walker.currentNode.parentElement;
+        if (!text || !element) continue;
+        if (element.closest(skip)) continue;
+        const box = element.getBoundingClientRect();
+        const style = getComputedStyle(element);
+        if (box.width === 0 || box.height === 0 || style.visibility === "hidden" || style.opacity === "0") continue;
+        const size = parseFloat(style.fontSize);
+        if (size < 11) found.push(`${size}px "${text.slice(0, 30)}"`);
+      }
     }
     return [...new Set(found)];
-  });
+  }, { root, decorative });
 }
 
 for (const path of [
@@ -108,6 +113,7 @@ for (const path of [
   "/methodology",
   "/methodology/expenditure",
   "/explorer",
+  "/explorer/labour",
   "/explorer/expenditure",
   "/explorer/municipalities",
   "/explorer/municipalities/batumi",
@@ -122,6 +128,35 @@ for (const path of [
     expect(await textBelowFloor(page)).toEqual([]);
   });
 }
+
+test.describe("the explorer's own text keeps the phone floor (DESIGN §5.2)", () => {
+  for (const path of ["/explorer", "/en/explorer/prices", "/explorer/inflation/overview"]) {
+    test(`${path}: the open menu has no text below 11px`, async ({ page }) => {
+      await page.goto(path);
+      await ready(page);
+      await page.getByTestId("sidebar-menu-button").click();
+      await expect(page.getByTestId("sidebar-menu-dialog")).toHaveAttribute("role", "dialog");
+      expect(await textBelowFloor(page, { root: "[data-testid='sidebar-menu-dialog']" })).toEqual([]);
+    });
+  }
+
+  test("search's place card and rows have no text below 11px", async ({ page }) => {
+    await page.goto("/explorer");
+    await ready(page);
+    await page.locator("#explorer-q").fill("ბათუმი");
+    await expect(page.getByTestId("place-card")).toBeVisible();
+    expect(await textBelowFloor(page, { root: "[data-testid='place-card'], [data-testid='search-result']" })).toEqual([]);
+  });
+
+  for (const path of ["/explorer/economy", "/explorer/prices", "/en/explorer/living"]) {
+    test(`${path}: the cards' graphics label their figures at 11px or more`, async ({ page }) => {
+      await page.goto(path);
+      await ready(page);
+      expect(await page.getByTestId("explorer-card-graphic").count()).toBeGreaterThan(0);
+      expect(await textBelowFloor(page, { root: "[data-testid='explorer-card-graphic']", decorative: true })).toEqual([]);
+    });
+  }
+});
 
 test.describe("touch targets (D8)", () => {
   test("the % მშპ-ში pill and the bulk toggle are comfortable to tap", async ({ page }) => {
@@ -150,10 +185,11 @@ test.describe("touch targets (D8)", () => {
   });
 });
 
+// The Budget hub's cards moved to the Budget group page, whose card footer is 10.5px (spec 2026-10-24-explorer-regroup §5).
 test("desktop keeps its compact type (D8 is phone-only)", async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 900 });
-  await page.goto("/explorer");
-  await expect(page.getByTestId("budget-hub").locator("p").last()).toHaveCSS("font-size", "10px");
+  await page.goto("/explorer/budget");
+  await expect(page.getByTestId("explorer-card").first().locator("> span").last()).toHaveCSS("font-size", "10.5px");
 });
 
 test.describe("a larger text setting (root font 125%) at 360px", () => {
@@ -171,8 +207,10 @@ test.describe("a larger text setting (root font 125%) at 360px", () => {
       await page.waitForLoadState("networkidle");
       await page.addStyleTag({ content: "html { font-size: 125% !important; }" });
       expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(360);
-      // Body copy follows the setting: the footer fine print is rem-sized.
-      expect(await page.locator("footer p").last().evaluate((element) => parseFloat(getComputedStyle(element).fontSize))).toBeGreaterThan(12);
+      // Body copy follows the setting: the fine print is rem-sized — the footer's, or on explorer pages, which have no
+      // footer, the page's own `text-xs` notes.
+      const finePrint = path.startsWith("/explorer") ? "#content p.text-xs" : "footer p";
+      expect(await page.locator(finePrint).last().evaluate((element) => parseFloat(getComputedStyle(element).fontSize))).toBeGreaterThan(12);
     });
   }
 });
