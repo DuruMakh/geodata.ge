@@ -1,5 +1,5 @@
-// Small canvas drawing primitives shared by the revenue and deficit charts, ported from the design
-// board (txt, halo, hline, vline, dot, bar), and the easings of every chapter chart. They draw in CSS
+// Small canvas drawing primitives shared by the chapter charts, ported from the design board
+// (txt, halo, hline, vline, dot, bar, hbar), and the easings of every chapter chart. They draw in CSS
 // pixels on a context from `sizeCanvas`.
 
 export const easeOut = (t: number) => 1 - Math.pow(1 - t, 3);
@@ -107,6 +107,32 @@ export function bar(ctx: CanvasRenderingContext2D, x: number, y: number, w: numb
     ctx.arcTo(x + w, y + h, x + w - rad, y + h, rad);
     ctx.lineTo(x + rad, y + h);
     ctx.arcTo(x, y + h, x, y + h - rad, rad);
+    ctx.closePath();
+  }
+  ctx.fill();
+}
+
+/** Horizontal bar whose `end` ("left" or "right") has corners rounded to radius `r`; the other end is square. */
+export function hbar(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number, end: "left" | "right"): void {
+  if (w <= 0 || h <= 0) return;
+  const rad = Math.max(0, Math.min(r, h / 2, w));
+  ctx.beginPath();
+  if (!rad) ctx.rect(x, y, w, h);
+  else if (end === "right") {
+    ctx.moveTo(x, y);
+    ctx.lineTo(x + w - rad, y);
+    ctx.arcTo(x + w, y, x + w, y + rad, rad);
+    ctx.lineTo(x + w, y + h - rad);
+    ctx.arcTo(x + w, y + h, x + w - rad, y + h, rad);
+    ctx.lineTo(x, y + h);
+    ctx.closePath();
+  } else {
+    ctx.moveTo(x + w, y);
+    ctx.lineTo(x + rad, y);
+    ctx.arcTo(x, y, x, y + rad, rad);
+    ctx.lineTo(x, y + h - rad);
+    ctx.arcTo(x, y + h, x + rad, y + h, rad);
+    ctx.lineTo(x + w, y + h);
     ctx.closePath();
   }
   ctx.fill();

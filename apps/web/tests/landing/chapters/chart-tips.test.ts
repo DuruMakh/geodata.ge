@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { deficitTip, plannedYearText, reliefTip, revenueTip } from "../../../components/landing/chapters/chart-tips";
-import type { DeficitChapter, MunicipalChapter, RevenueSeries } from "../../../lib/landing/chapters/types";
+import { birthsTip, deficitTip, migrationTip, plannedYearText, pyramidTip, reliefTip, revenueTip } from "../../../components/landing/chapters/chart-tips";
+import type { AgeingChapter, DeficitChapter, MunicipalChapter, RevenueSeries } from "../../../lib/landing/chapters/types";
 
 const labels = {
   locale: "ka" as const,
@@ -111,5 +111,97 @@ describe("reliefTip", () => {
 
   it("says an occupied area has no municipal budget data", () => {
     expect(reliefTip(relief, reliefLabels, -2)).toEqual({ title: "ოკუპირებული ტერიტორია", rows: [], foot: "მუნიციპალური ბიუჯეტის მონაცემები არ არსებობს" });
+  });
+});
+
+const pyramid: AgeingChapter["pyramid"] = {
+  year: 2026,
+  baseYear: 2004,
+  ages: ["0–4", "85+"],
+  men: [106170, 19083],
+  women: [97930, 49131],
+  baseMen: [116228, 7809],
+  baseWomen: [102534, 21710],
+};
+
+describe("pyramidTip", () => {
+  it("shows the age group's men and women as shares of everyone, with counts, and both sexes in the first year", () => {
+    // 2026 total 272,314; 2004 total 248,281.
+    expect(pyramidTip(pyramid, { men: "კაცები", women: "ქალები", years: "წელი", bothSexes: "ორივე სქესი" }, 1)).toEqual({
+      title: "85+ წელი",
+      rows: [
+        { key: "#3D5A98", val: "7.01%", name: "კაცები · 19,083" },
+        { key: "#C26E4C", val: "18.04%", name: "ქალები · 49,131" },
+        { key: "var(--ink)", val: "11.89%", name: "ორივე სქესი, 2004" },
+      ],
+      foot: "ორივე სქესი, 2026: 25.05%",
+    });
+  });
+});
+
+const migration: AgeingChapter["migration"] = { years: [2022, 2023], net: [54509, -39207] };
+const migrationLabels = { net: "მიგრაციის სალდო", moreArrived: "ჩამოვიდა მეტი, ვიდრე წავიდა", moreLeft: "წავიდა მეტი, ვიდრე ჩამოვიდა" };
+
+describe("migrationTip", () => {
+  it("shows the signed balance of the year and says which way people moved", () => {
+    expect(migrationTip(migration, migrationLabels, 0)).toEqual({
+      title: "2022",
+      rows: [{ key: "#1e7f86", val: "+54,509", name: "მიგრაციის სალდო" }],
+      foot: "ჩამოვიდა მეტი, ვიდრე წავიდა",
+    });
+    expect(migrationTip(migration, migrationLabels, 1)).toEqual({
+      title: "2023",
+      rows: [{ key: "var(--accent)", val: "−39,207", name: "მიგრაციის სალდო" }],
+      foot: "წავიდა მეტი, ვიდრე ჩამოვიდა",
+    });
+  });
+});
+
+const births: AgeingChapter["births"] = {
+  year: 2025,
+  births: 37867,
+  deaths: 44319,
+  places: [{ births: 2630, deaths: 1779 }, { births: 31, deaths: 109 }, { births: 50, deaths: 50 }, null],
+};
+const birthPlaces = [
+  { code: "06", name: "ბათუმი", totalGel: 1, perResidentGel: 1, rank: 1, city: true },
+  { code: "71", name: "ონი", totalGel: 1, perResidentGel: 1, rank: 2, city: false },
+  { code: "01", name: "თანაბარი", totalGel: 1, perResidentGel: 1, rank: 3, city: false },
+  { code: "02", name: "უცნობი", totalGel: 1, perResidentGel: 1, rank: 4, city: false },
+];
+const birthsLabels = {
+  perHundred: "დაბადება 100 გარდაცვალებაზე",
+  births: "დაბადება",
+  deaths: "გარდაცვალება",
+  increase: "ბუნებრივი მატება",
+  decrease: "ბუნებრივი კლება",
+  balanced: "დაბადება და გარდაცვალება თანაბარია",
+  noData: "მონაცემები არ არის",
+  occupied: "ოკუპირებული ტერიტორია",
+};
+
+describe("birthsTip", () => {
+  it("shows births per 100 deaths in the place's class colour, the two counts and the natural increase", () => {
+    expect(birthsTip(births, birthPlaces, birthsLabels, 0)).toEqual({
+      title: "ბათუმი",
+      rows: [
+        { key: "#1e7f86", val: "148", name: "დაბადება 100 გარდაცვალებაზე" },
+        { val: "2,630", name: "დაბადება" },
+        { val: "1,779", name: "გარდაცვალება" },
+      ],
+      foot: "ბუნებრივი მატება: +851",
+    });
+  });
+
+  it("states a natural decrease without a sign, and an even balance in words", () => {
+    const oni = birthsTip(births, birthPlaces, birthsLabels, 1);
+    expect(oni.rows[0]).toEqual({ key: "#7d2a1b", val: "28", name: "დაბადება 100 გარდაცვალებაზე" });
+    expect(oni.foot).toBe("ბუნებრივი კლება: 78");
+    expect(birthsTip(births, birthPlaces, birthsLabels, 2).foot).toBe("დაბადება და გარდაცვალება თანაბარია");
+  });
+
+  it("says there is no data for a place without figures and for an occupied area (-2)", () => {
+    expect(birthsTip(births, birthPlaces, birthsLabels, 3)).toEqual({ title: "უცნობი", rows: [{ val: "მონაცემები არ არის" }] });
+    expect(birthsTip(births, birthPlaces, birthsLabels, -2)).toEqual({ title: "ოკუპირებული ტერიტორია", rows: [{ val: "მონაცემები არ არის" }] });
   });
 });

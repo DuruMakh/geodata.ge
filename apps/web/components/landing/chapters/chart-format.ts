@@ -11,3 +11,6 @@ export function money(gel: number, l: { locale: Locale }): string {
 
 /** A value in percentage points with its sign and a % mark: "−9.2%". */
 export const points = (value: number, decimals = 1) => `${formatPoints(value, false, decimals)}%`;
+
+/** A count with its sign and en-US grouping: "+17,127", "−39,207". */
+export const signedCount = (value: number) => formatPoints(value, true, 0);

@@ -79,6 +79,23 @@ const REVENUE_BAND_COLORS: Record<Exclude<RevenueBandId, "liabilities">, string>
 
 export const revenueBandColor = (id: RevenueBandId, accent: string) => (id === "liabilities" ? accent : REVENUE_BAND_COLORS[id]);
 
+// Chapter 06 colours, fixed by the homepage plan: men and women, and births per 100 deaths in five classes, each
+// below `below`, red where deaths outnumber births and teal where births do. Net migration reuses the two arms.
+export const SEX_COLORS = { men: "#3D5A98", women: "#C26E4C" };
+
+export const BIRTH_CLASSES = [
+  { below: 50, color: "#7d2a1b" },
+  { below: 75, color: "#b3402a" },
+  { below: 100, color: "#d5998a" },
+  { below: 125, color: "#8bb9b8" },
+  { below: Infinity, color: "#1e7f86" },
+] as const;
+
+export const birthsColor = (ratio: number) => (BIRTH_CLASSES.find((c) => ratio < c.below) ?? BIRTH_CLASSES[BIRTH_CLASSES.length - 1]).color;
+
+/** Net migration bars: teal above zero (more arrived), the accent below; canvas engines swap in the accent token. */
+export const MIGRATION_COLORS = { arrivals: BIRTH_CLASSES[BIRTH_CLASSES.length - 1].color, departures: "var(--accent)" };
+
 /** The rectangle `t` of the way from `a` to `b`. */
 export function lerpRect(a: Rect, b: Rect, t: number): Rect {
   return [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t, a[3] + (b[3] - a[3]) * t];

@@ -6,7 +6,9 @@ import type { HomeChapters } from "../../lib/landing/chapters/types";
 import type { LandingGdpFigure } from "../../lib/landing/landingData";
 import { SiteFooter } from "../site/site-footer";
 import { SiteHeader } from "../site/site-header";
+import { AgeingChapter, ageingNotes, type AgeingLabels } from "./chapters/ageing-chapter";
 import { AiSection, type AiLabels } from "./chapters/ai-section";
+import { BIRTH_CLASSES } from "./chapters/canvas";
 import { Chapter } from "./chapters/chapter";
 import { DeficitChart, type DeficitLabels } from "./chapters/deficit-chart";
 import { MunicipalRelief, type MunicipalLabels } from "./chapters/municipal-relief";
@@ -129,6 +131,50 @@ export function LandingPage({ chapters, gdpFigure, presentation, updatedAt, mcpE
     chartSummary: t("landing.deficit.chartSummary"),
     unavailable,
   };
+  const { ageing } = chapters;
+  const ageingText = ageingNotes(ageing, t);
+  const ageingLabels: AgeingLabels = {
+    pyramid: {
+      title: t("landing.ageing.pyramid.title", { year: ageing.pyramid.year }),
+      men: t("landing.ageing.men"),
+      women: t("landing.ageing.women"),
+      base: t("landing.ageing.pyramid.base", { year: ageing.pyramid.baseYear }),
+      years: t("landing.ageing.years"),
+      bothSexes: t("landing.ageing.pyramid.bothSexes"),
+      then: t("landing.ageing.pyramid.then", { year: ageing.oldShareBase.year }),
+      oldShare: t("landing.ageing.pyramid.oldShare"),
+      chartSummary: t("landing.ageing.pyramid.chartSummary", { year: ageing.pyramid.year, baseYear: ageing.pyramid.baseYear }),
+      unavailable,
+    },
+    migration: {
+      net: t("landing.ageing.migration.label"),
+      moreArrived: t("landing.ageing.migration.moreArrived"),
+      moreLeft: t("landing.ageing.migration.moreLeft"),
+      highest: t("landing.ageing.highest"),
+      lowest: t("landing.ageing.lowest"),
+      unavailable,
+    },
+    map: {
+      title: t("landing.ageing.map.title", { year: ageing.births.year }),
+      perHundred: t("landing.ageing.map.perHundred"),
+      births: t("landing.ageing.map.births"),
+      deaths: t("landing.ageing.map.deaths"),
+      increase: t("landing.ageing.map.increase"),
+      decrease: t("landing.ageing.map.decrease"),
+      balanced: t("landing.ageing.map.balanced"),
+      noData: t("landing.ageing.map.noData"),
+      occupied: t("landing.municipal.occupied"),
+      below: t("landing.ageing.map.below", { value: BIRTH_CLASSES[0].below }),
+      highest: t("landing.ageing.highest"),
+      lowest: t("landing.ageing.lowest"),
+      chartSummary: t("landing.ageing.map.chartSummary", { year: ageing.births.year }),
+      unavailable,
+    },
+    women: { label: t("landing.ageing.women.label"), note: ageingText.women },
+    life: { label: t("landing.ageing.life.label"), unit: t("landing.ageing.years"), note: ageingText.life },
+    fertility: { label: t("landing.ageing.fertility.label"), note: ageingText.fertility },
+    migrationCard: { label: t("landing.ageing.migration.label"), note: ageingText.migration },
+  };
   const collections = chapters.sources.rows.length;
   const sourcesLabels: SourcesLabels = {
     title: t("landing.sources.title"),
@@ -242,6 +288,9 @@ export function LandingPage({ chapters, gdpFigure, presentation, updatedAt, mcpE
           </Chapter>
           <Chapter id="ch-05" link={chapterLink(5, "/explorer/deficit")} title={t("landing.ch5.title")} lede={chapters.sentences.deficit}>
             <DeficitChart data={chapters.deficit} labels={deficitLabels} />
+          </Chapter>
+          <Chapter id="ch-06" link={chapterLink(6, "/explorer/demography")} title={chapters.sentences.headings.ageing} lede={chapters.sentences.ageing}>
+            <AgeingChapter data={ageing} municipal={chapters.municipal} labels={ageingLabels} />
           </Chapter>
           <SourcesSection sources={chapters.sources} labels={sourcesLabels} locale={locale} />
           <AiSection endpoint={mcpEndpoint} tools={chapters.tools} labels={aiLabels} locale={locale} />
