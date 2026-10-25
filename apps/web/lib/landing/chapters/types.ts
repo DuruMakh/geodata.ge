@@ -82,3 +82,11 @@ export type AgeingChapter = {
 export type LabourSplit = { employed: number; unemployed: number; outside: number; rate: number; per100: [number, number, number] }; // thousand persons; rate percent
 export type ComparisonId = "notHigher" | "littleHigher" | "oneAndHalf" | "almostTwice" | "twice" | "moreThanTwice";
 export type YouthJobsChapter = { year: number; all: LabourSplit; youth: LabourSplit; ratio: number; comparison: ComparisonId; regions: { id: string; label: string; rate: number }[] }; // regions rate desc
+
+export type WageGapChapter = {
+  year: number; average: number; women: number; men: number; ratio: number; // ratio = women / men
+  median: { year: number; value: number };
+  publicSector: number; nonPublic: number;
+  history: { years: number[]; values: number[] }; // national average, first..latest
+  sectors: { id: string; label: string; average: number; women: number; men: number }[]; // average desc
+};
