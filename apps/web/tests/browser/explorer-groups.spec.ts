@@ -943,6 +943,34 @@ test.describe("the sidebar's current row and focus", () => {
     }
   });
 
+  test("the phone menu opens with its current row in view, at once, and the page does not move (shell M4)", async ({ page }) => {
+    await page.setViewportSize({ width: 375, height: 740 });
+    const inView = () => sidebar(page).locator('[aria-current="page"]').evaluate((element) => {
+      const [box, view] = [element.getBoundingClientRect(), element.closest("nav")!.getBoundingClientRect()];
+      return box.top >= view.top && box.bottom <= view.bottom;
+    });
+    for (const path of ["/explorer/transport/regions", "/explorer/environment/air-quality"]) {
+      await page.goto(path);
+      await ready(page);
+      await page.evaluate(() => window.scrollTo(0, 120));
+      await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(120);
+      await page.getByTestId("sidebar-menu-button").click();
+      await expect(page.getByTestId("sidebar-close")).toBeFocused();
+      // No smooth scrolling: the row is in view as soon as the menu is.
+      expect(await inView(), path).toBe(true);
+      expect(await sidebar(page).evaluate((nav) => [nav.scrollTop > 0, getComputedStyle(nav).scrollBehavior]), path).toEqual([true, "auto"]);
+      await page.keyboard.press("Escape");
+      await expect.poll(() => page.evaluate(() => window.scrollY), path).toBe(120);
+    }
+    // A current row already in view leaves the menu at its top, by the close button.
+    await page.goto("/explorer/inflation/overview");
+    await ready(page);
+    await page.getByTestId("sidebar-menu-button").click();
+    await expect(page.getByTestId("sidebar-close")).toBeFocused();
+    expect(await inView()).toBe(true);
+    expect(await sidebar(page).evaluate((nav) => nav.scrollTop)).toBe(0);
+  });
+
   test("in forced colours the current page and the current group are marked, and other rows are not", async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.emulateMedia({ forcedColors: "active" });

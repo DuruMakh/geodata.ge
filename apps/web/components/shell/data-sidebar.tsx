@@ -88,9 +88,9 @@ export function DataSidebar() {
     if (state.desktop !== null) document.getElementById(PRE_PAINT_RAIL_STYLE_ID)?.remove();
   }, [state.desktop]);
 
-  // The current row is the reader's "you are here": on arrival, and when the rail opens or closes, the sidebar's own scroll
-  // brings it into view (nearest edge, no smooth scrolling, DESIGN.md §14). Only the sidebar scrolls; the page stays where it
-  // is. The phone menu still opens at its top, where focus lands on its close button.
+  // The current row is the reader's "you are here": on arrival, when the rail opens or closes, and when the phone menu opens,
+  // the sidebar's own scroll brings it into view (nearest edge, no smooth scrolling, DESIGN.md §14). Only the sidebar scrolls;
+  // the page stays where it is. A row already in view leaves the menu at its top, by its close button, which takes focus.
   useEffect(() => {
     const nav = document.getElementById(NAV_ID);
     const row = nav?.querySelector("[aria-current]");
@@ -100,7 +100,7 @@ export function DataSidebar() {
     // Whole pixels, rounded away from the row: scrollTop drops a fraction, which left the row's last half pixel outside.
     if (box.top < view.top) nav.scrollTop -= Math.ceil(view.top - box.top);
     else if (box.bottom > view.bottom) nav.scrollTop += Math.ceil(Math.min(box.bottom - view.bottom, box.top - view.top));
-  }, [state.page, railed]);
+  }, [state.page, railed, state.menu]);
 
   // The menu works as a modal: opening it hands focus to its close button, closing it hands focus back to the button
   // that opened it, once the bar is shown again. Closing it without leaving the page (Escape, the close button, a
