@@ -3,16 +3,14 @@ import { WAGES_SECTORS, type WagesFact } from "../../data/wages/types";
 import { publicLabel } from "../../i18n/labels";
 import type { Presentation } from "../../i18n/types";
 import type { WageGapChapter } from "./types";
+import { chapterNeed } from "./need";
 
 // Chapter 08: what a month's work pays, and the gap between women and men.
 // Pure reading of the served annual earnings facts. The year is the latest with
 // a national average; the median is the one figure that may sit in an earlier
 // year of its own.
 
-function need<T>(value: T | undefined, what: string): T {
-  if (value === undefined) throw new Error(`Wage gap chapter: no data for ${what}`);
-  return value;
-}
+const need = chapterNeed("Wage gap chapter");
 
 export function buildWageGapChapter(facts: WagesFact[], presentation: Presentation): WageGapChapter {
   const numbers = new Map<string, number>();

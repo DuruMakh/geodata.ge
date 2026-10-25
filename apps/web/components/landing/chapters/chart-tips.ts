@@ -1,4 +1,4 @@
-import { formatInUnit, formatPerResidentGel, formatPoints, formatShare, MISSING, UNIT_PERSONS } from "../../../lib/explorer/format";
+import { formatPerResidentGel, formatPoints, formatShare, MISSING } from "../../../lib/explorer/format";
 import type { Locale } from "../../../lib/i18n/types";
 import type { AgeingChapter, DeathsChapter, DeficitChapter, LabourSplit, MunicipalChapter, ReliefPlace, RevenueSeries, TradeChapter, WageGapChapter, YouthJobsChapter } from "../../../lib/landing/chapters/types";
 import { birthsColor, birthsPer100, deathSquareToken, MIGRATION_COLORS, SEX_COLORS, TRADE_COLORS } from "./canvas";
@@ -70,7 +70,6 @@ export function reliefTip(
   };
 }
 
-const persons = (n: number) => formatInUnit(n, UNIT_PERSONS);
 const sum = (values: readonly number[]) => values.reduce((total, v) => total + v, 0);
 
 /** Pyramid tooltip for age index `i` (youngest first): men's and women's share of everyone with counts, both sexes in the first year. */
@@ -85,8 +84,8 @@ export function pyramidTip(
   return {
     title: `${data.ages[i]} ${labels.years}`,
     rows: [
-      { key: SEX_COLORS.men, val: share(data.men[i], total), name: `${labels.men} · ${persons(data.men[i])}` },
-      { key: SEX_COLORS.women, val: share(data.women[i], total), name: `${labels.women} · ${persons(data.women[i])}` },
+      { key: SEX_COLORS.men, val: share(data.men[i], total), name: `${labels.men} · ${decimals(data.men[i], 0)}` },
+      { key: SEX_COLORS.women, val: share(data.women[i], total), name: `${labels.women} · ${decimals(data.women[i], 0)}` },
       { key: "var(--ink)", val: share(data.baseMen[i] + data.baseWomen[i], baseTotal), name: `${labels.bothSexes}, ${data.baseYear}` },
     ],
     foot: `${labels.bothSexes}, ${data.year}: ${share(data.men[i] + data.women[i], total)}`,
@@ -124,11 +123,11 @@ export function birthsTip(
   return {
     title: places[i].name,
     rows: [
-      { key: birthsColor(ratio), val: persons(ratio), name: labels.perHundred },
-      { val: persons(entry.births), name: labels.births },
-      { val: persons(entry.deaths), name: labels.deaths },
+      { key: birthsColor(ratio), val: decimals(ratio, 0), name: labels.perHundred },
+      { val: decimals(entry.births, 0), name: labels.births },
+      { val: decimals(entry.deaths, 0), name: labels.deaths },
     ],
-    foot: change > 0 ? `${labels.increase}: +${persons(change)}` : change < 0 ? `${labels.decrease}: ${persons(-change)}` : labels.balanced,
+    foot: change > 0 ? `${labels.increase}: +${decimals(change, 0)}` : change < 0 ? `${labels.decrease}: ${decimals(-change, 0)}` : labels.balanced,
   };
 }
 
@@ -160,7 +159,7 @@ export function waffleTip(
   ];
   const { name, key, value } = groups[i];
   const whole = split.employed + split.unemployed + split.outside;
-  const thousands = (n: number) => `${formatInUnit(n, { divisor: 1, label: "", decimals: 1 })} ${labels.thousand}`;
+  const thousands = (n: number) => `${decimals(n, 1)} ${labels.thousand}`;
   const foot = [
     `${labels.labourForce} — ${thousands(split.employed + split.unemployed)}`,
     `${labels.unemploymentRate} — ${points(split.rate)} ${labels.ofLabourForce}`,
@@ -207,7 +206,7 @@ export function wageTip(
   i: number,
 ): TipData {
   const { label, average, women, men } = sectors[i];
-  const gel = (value: number) => `${formatInUnit(value, { ...UNIT_PERSONS, decimals: 1 })} ₾`;
+  const gel = (value: number) => `${decimals(value, 1)} ₾`;
   return {
     title: `${label}, ${year}`,
     rows: [
@@ -215,7 +214,7 @@ export function wageTip(
       { key: SEX_COLORS.women, val: gel(women), name: labels.women },
       { key: "var(--ink)", val: gel(average), name: labels.average },
     ],
-    foot: labels.foot.replace("{pct}", formatInUnit((women / men) * 100, { ...UNIT_PERSONS, decimals: 1 })),
+    foot: labels.foot.replace("{pct}", decimals((women / men) * 100, 1)),
   };
 }
 

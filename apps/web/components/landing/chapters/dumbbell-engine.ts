@@ -1,8 +1,9 @@
-import { formatInUnit, formatShare, UNIT_PERSONS } from "../../../lib/explorer/format";
+import { formatShare } from "../../../lib/explorer/format";
 import type { WageGapChapter } from "../../../lib/landing/chapters/types";
 import { clamp, fitText, readTokens, SEX_COLORS } from "./canvas";
 import { createChartCore, type ChartState } from "./chart-core";
 import { dot, easeOut, txt, vline } from "./chart-draw";
+import { decimals } from "./chart-format";
 import { DUMBBELL_NARROW_WIDTH, dumbbellHeight, wagesAxisTop } from "./chart-layout";
 
 // The canvas engine of chapter 08's wages chart, loaded only once the chart nears the viewport (dumbbell-chart.tsx).
@@ -25,7 +26,6 @@ export function createDumbbell({ wrap, canvas, sectors, onHover, onLeave }: Engi
   const top = wagesAxisTop(Math.max(...sectors.flatMap((sector) => [sector.women, sector.men])));
   const ticks: number[] = [];
   for (let v = 0; v <= top; v += 2000) ticks.push(v);
-  const grouped = (v: number) => formatInUnit(v, UNIT_PERSONS);
 
   let geo: { top: number; rowHeight: number; X(v: number): number } | null = null;
 
@@ -48,7 +48,7 @@ export function createDumbbell({ wrap, canvas, sectors, onHover, onLeave }: Engi
 
     for (const v of ticks) {
       vline(ctx, X(v), T, B, v ? hairlineSoft : ink, 1);
-      txt(ctx, grouped(v) + (v === top ? " ₾" : ""), X(v), B + 16, `500 11px ${num}`, muted, v ? "center" : "left");
+      txt(ctx, decimals(v, 0) + (v === top ? " ₾" : ""), X(v), B + 16, `500 11px ${num}`, muted, v ? "center" : "left");
     }
 
     sectors.forEach((sector, i) => {

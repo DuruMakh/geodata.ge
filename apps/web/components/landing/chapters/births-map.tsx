@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { formatInUnit, UNIT_PERSONS } from "../../../lib/explorer/format";
 import type { AgeingChapter, MunicipalChapter } from "../../../lib/landing/chapters/types";
 import { BIRTH_CLASSES, placeRatios } from "./canvas";
+import { decimals } from "./chart-format";
 import { ChartTip, hideTip, showTip } from "./chart-tip";
 import { birthsTip } from "./chart-tips";
 import { ChartUnavailable, Reveal, useEngine } from "./reveal";
@@ -30,7 +30,6 @@ export type BirthsMapLabels = {
 };
 
 const loadEngine = () => import("./births-map-engine");
-const whole = (v: number) => formatInUnit(v, UNIT_PERSONS);
 
 export function BirthsMap({ births, municipal, labels }: { births: AgeingChapter["births"]; municipal: MunicipalChapter; labels: BirthsMapLabels }) {
   const wrapRef = useRef<HTMLDivElement>(null);
@@ -64,7 +63,7 @@ export function BirthsMap({ births, municipal, labels }: { births: AgeingChapter
   }, [lib, births, municipal]);
 
   const ratios = placeRatios(births).sort((a, b) => b.ratio - a.ratio);
-  const named = (r: { index: number; ratio: number } | undefined) => (r ? `${municipal.places[r.index].name} ${whole(r.ratio)}` : "");
+  const named = (r: { index: number; ratio: number } | undefined) => (r ? `${municipal.places[r.index].name} ${decimals(r.ratio, 0)}` : "");
   const ariaLabel = `${labels.chartSummary}; ${labels.highest}: ${named(ratios[0])}; ${labels.lowest}: ${named(ratios[ratios.length - 1])}`;
   const classLabel = (i: number) =>
     i === 0 ? labels.below : i === BIRTH_CLASSES.length - 1 ? `${BIRTH_CLASSES[i - 1].below}+` : `${BIRTH_CLASSES[i - 1].below}–${BIRTH_CLASSES[i].below}`;

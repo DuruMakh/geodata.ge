@@ -4,6 +4,7 @@ import type { TradeProductsData } from "../../data/tradeProducts/types";
 import { publicLabel } from "../../i18n/labels";
 import type { Presentation } from "../../i18n/types";
 import type { TradeChapter } from "./types";
+import { chapterNeed } from "./need";
 
 // Chapter 09: what Georgia sells and buys abroad. Pure reading of the served
 // goods-trade facts. The year is the latest with national exports; partners and
@@ -11,10 +12,7 @@ import type { TradeChapter } from "./types";
 
 const PARTNER_LIMIT = 10;
 
-function need<T>(value: T | undefined, what: string): T {
-  if (value === undefined) throw new Error(`Trade chapter: no data for ${what}`);
-  return value;
-}
+const need = chapterNeed("Trade chapter");
 
 /** The chapter's year: the latest with national exports. */
 export function tradeYear(overview: TradeOverviewFact[]): number {

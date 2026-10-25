@@ -1,6 +1,6 @@
-import { formatInUnit, UNIT_PERSONS } from "../../../lib/explorer/format";
 import type { WageGapChapter } from "../../../lib/landing/chapters/types";
 import { sparkPoints } from "./canvas";
+import { decimals } from "./chart-format";
 import { DumbbellChart, type DumbbellLabels } from "./dumbbell-chart";
 import { StatCard } from "./stat-card";
 
@@ -17,8 +17,6 @@ export type WagesLabels = {
   ratio: StatText;
   publicSector: StatText;
 };
-
-const decimals = (value: number, places: number) => formatInUnit(value, { ...UNIT_PERSONS, decimals: places });
 
 /** The cards' notes, each with the year of its own measure (the median may be older than the rest). */
 export function wagesNotes(data: WageGapChapter, t: (key: string, values?: Record<string, string | number>) => string) {

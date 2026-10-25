@@ -3,6 +3,7 @@ import type { ServedUnemploymentObservation } from "../../data/unemployment/type
 import { publicLabel } from "../../i18n/labels";
 import type { Presentation } from "../../i18n/types";
 import type { ComparisonId, LabourSplit, YouthJobsChapter } from "./types";
+import { chapterNeed } from "./need";
 
 // Chapter 07: how many of the young are without a job, against everyone 15+.
 // Pure reading of the served annual labour-force facts: the national row, the
@@ -11,10 +12,7 @@ import type { ComparisonId, LabourSplit, YouthJobsChapter } from "./types";
 const NATIONAL = "georgia";
 const YOUTH_GROUPS = ["age.15_19", "age.20_24", "age.25_29"];
 
-function need<T>(value: T | undefined, what: string): T {
-  if (value === undefined) throw new Error(`Youth jobs chapter: no data for ${what}`);
-  return value;
-}
+const need = chapterNeed("Youth jobs chapter");
 
 /** Whole numbers that sum to exactly 100, shares rounded by the largest remainder. */
 export function per100(values: number[]): number[] {

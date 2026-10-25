@@ -1,7 +1,6 @@
-import { formatInUnit, UNIT_PERSONS } from "../../../lib/explorer/format";
 import type { AgeingChapter as AgeingData, MunicipalChapter } from "../../../lib/landing/chapters/types";
 import { BirthsMap, type BirthsMapLabels } from "./births-map";
-import { signedCount } from "./chart-format";
+import { decimals, signedCount } from "./chart-format";
 import { MigrationChart, type MigrationLabels } from "./migration-chart";
 import { PyramidChart, type PyramidLabels } from "./pyramid-chart";
 import { StatCard } from "./stat-card";
@@ -20,8 +19,6 @@ export type AgeingLabels = {
   fertility: StatText;
   migrationCard: StatText;
 };
-
-const decimals = (value: number, places: number) => formatInUnit(value, { ...UNIT_PERSONS, decimals: places });
 
 /**
  * The cards' notes, each with the numbers and year of its own measure. The migration note follows the data: which
