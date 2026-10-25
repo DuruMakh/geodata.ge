@@ -1,4 +1,4 @@
-import { formatAmountParts, formatPoints } from "../../../lib/explorer/format";
+import { formatAmountParts, formatInUnit, formatPoints, UNIT_BN, UNIT_PERSONS } from "../../../lib/explorer/format";
 import type { Locale } from "../../../lib/i18n/types";
 
 // Amount formatting shared by the homepage chart chapters.
@@ -11,3 +11,21 @@ export function money(gel: number, l: { locale: Locale }): string {
 
 /** A value in percentage points with its sign and a % mark: "−9.2%". */
 export const points = (value: number, decimals = 1) => `${formatPoints(value, false, decimals)}%`;
+
+/** A count with its sign and en-US grouping: "+17,127", "−39,207". */
+export const signedCount = (value: number) => formatPoints(value, true, 0);
+
+/** A count given in thousand persons, the way the labour grids print it: "1.39 mln" from a thousand up, else whole thousands ("224 thousand"). */
+export function labourCount(thousands: number, l: { thousand: string; million: string }): string {
+  if (thousands >= 999.5) return `${formatInUnit(thousands, { divisor: 1000, label: "", decimals: 2 })} ${l.million}`;
+  return `${formatInUnit(thousands, UNIT_PERSONS)} ${l.thousand}`;
+}
+
+/** A number with en-US grouping and exactly `places` decimals: "2,165", "13.5". */
+export const decimals = (value: number, places: number) => formatInUnit(value, { ...UNIT_PERSONS, decimals: places });
+
+/** US dollars in billions with `places` decimals, no unit: "25.9", "−11.4", "0.38". */
+export const billions = (usd: number, places: number) => formatInUnit(usd, { ...UNIT_BN, label: "", decimals: places });
+
+/** US dollars in billions with its sign: "+1.49", "−2.45". */
+export const signedBillions = (usd: number, places: number) => formatPoints(usd / UNIT_BN.divisor, true, places);

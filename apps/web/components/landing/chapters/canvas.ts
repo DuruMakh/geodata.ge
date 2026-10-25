@@ -1,4 +1,4 @@
-import type { RevenueBandId } from "../../../lib/landing/chapters/types";
+import type { AgeingChapter, DeathGroupKind, RevenueBandId } from "../../../lib/landing/chapters/types";
 
 // Canvas helpers ported from the design board's chart script. Pure functions (niceTicks,
 // stackLabels, fitText) touch no DOM; the rest read `window` only when called. The treemap
@@ -79,6 +79,44 @@ const REVENUE_BAND_COLORS: Record<Exclude<RevenueBandId, "liabilities">, string>
 
 export const revenueBandColor = (id: RevenueBandId, accent: string) => (id === "liabilities" ? accent : REVENUE_BAND_COLORS[id]);
 
+// Chapter 06 colours, fixed by the homepage plan: men and women, and births per 100 deaths in five classes, each
+// below `below`, red where deaths outnumber births and teal where births do. Net migration reuses the two arms.
+export const SEX_COLORS = { men: "#3D5A98", women: "#C26E4C" };
+
+export const BIRTH_CLASSES = [
+  { below: 50, color: "#7d2a1b" },
+  { below: 75, color: "#b3402a" },
+  { below: 100, color: "#d5998a" },
+  { below: 125, color: "#8bb9b8" },
+  { below: Infinity, color: "#1e7f86" },
+] as const;
+
+// Chapter 09 colours, fixed by the homepage plan: what Georgia sells and what it buys.
+export const TRADE_COLORS = { exports: "#1f6e56", imports: "#3a332a" };
+
+/**
+ * The design token a causes-of-death group's squares are drawn with: the largest established cause in the accent,
+ * other established causes in ink, the remainder and the unestablished causes (drawn hollow) in the control colour.
+ */
+export const deathSquareToken = (kind: DeathGroupKind): "accent" | "ink" | "control" => (kind === "top" ? "accent" : kind === "established" ? "ink" : "control");
+
+/** Births per 100 deaths of one place's figures. */
+export const birthsPer100 = (entry: { births: number; deaths: number }) => (entry.births / entry.deaths) * 100;
+
+/** Births per 100 deaths of every municipality with figures, by place index. */
+export function placeRatios(births: AgeingChapter["births"]): { index: number; ratio: number }[] {
+  const out: { index: number; ratio: number }[] = [];
+  births.places.forEach((entry, index) => {
+    if (entry) out.push({ index, ratio: birthsPer100(entry) });
+  });
+  return out;
+}
+
+export const birthsColor = (ratio: number) => (BIRTH_CLASSES.find((c) => ratio < c.below) ?? BIRTH_CLASSES[BIRTH_CLASSES.length - 1]).color;
+
+/** Net migration bars: teal above zero (more arrived), the accent below; canvas engines swap in the accent token. */
+export const MIGRATION_COLORS = { arrivals: BIRTH_CLASSES[BIRTH_CLASSES.length - 1].color, departures: "var(--accent)" };
+
 /** The rectangle `t` of the way from `a` to `b`. */
 export function lerpRect(a: Rect, b: Rect, t: number): Rect {
   return [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t, a[3] + (b[3] - a[3]) * t];
@@ -146,6 +184,33 @@ export function fitText(ctx: Pick<CanvasRenderingContext2D, "measureText">, s: s
   let t = s;
   while (t.length > 1 && ctx.measureText(`${t}…`).width > maxW) t = t.slice(0, -1);
   return t.length > 1 ? `${t}…` : "";
+}
+
+/**
+ * `s` on one line when it fits `maxW`, else broken at the first space after which the next word no longer fits:
+ * the first line as is and the rest shortened with an ellipsis (a single word is only shortened). Set the font first.
+ */
+export function wrapLines(ctx: Pick<CanvasRenderingContext2D, "measureText">, s: string, maxW: number): string[] {
+  if (ctx.measureText(s).width <= maxW) return [s];
+  const words = s.split(" ");
+  let first = "";
+  for (let i = 0; i < words.length; i++) {
+    const next = first ? `${first} ${words[i]}` : words[i];
+    if (first && ctx.measureText(next).width > maxW) return [first, fitText(ctx, words.slice(i).join(" "), maxW)];
+    first = next;
+  }
+  return [fitText(ctx, s, maxW)];
+}
+
+/** The width `s` needs when it may break at one space: the smallest, over the breaks, of the wider of the two lines (the whole width without a space). Set the font first. */
+export function twoLineWidth(ctx: Pick<CanvasRenderingContext2D, "measureText">, s: string): number {
+  const words = s.split(" ");
+  let best = ctx.measureText(s).width;
+  for (let i = 1; i < words.length; i++) {
+    const wider = Math.max(ctx.measureText(words.slice(0, i).join(" ")).width, ctx.measureText(words.slice(i).join(" ")).width);
+    if (wider < best) best = wider;
+  }
+  return best;
 }
 
 /** Push overlapping labels apart by at least `gap`, keeping them inside [lo, hi]. Index 0 sits lowest on screen (largest y). */

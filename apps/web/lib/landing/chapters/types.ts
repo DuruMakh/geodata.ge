@@ -57,13 +57,61 @@ export type MunicipalChapter = {
 
 export type SourceRow = { name: string; firstYear: number; lastYear: number; files: number };
 
+export type AgeingChapter = {
+  pyramid: { year: number; baseYear: number; ages: string[]; men: number[]; women: number[]; baseMen: number[]; baseWomen: number[] }; // ages youngest first: "0–4" … "85+"; persons
+  oldShare: { year: number; share: number }; oldShareBase: { year: number; share: number }; // 65+ share, fraction
+  ageing: boolean; // oldShare.share > oldShareBase.share
+  womenPer100Men: number; oldestWomenPerMan: number; // latest pyramid year; 85+ women / men
+  lifeExpectancy: { year: number; total: number; women: number; men: number };
+  fertility: { year: number; rate: number };
+  migration: { years: number[]; net: number[] }; // consecutive years with a net value, ascending
+  births: { year: number; births: number; deaths: number; places: ({ births: number; deaths: number } | null)[] }; // places aligned with MunicipalChapter.places
+};
+
+export type LabourSplit = { employed: number; unemployed: number; outside: number; rate: number; per100: [number, number, number] }; // thousand persons; rate percent
+export type ComparisonId = "notHigher" | "littleHigher" | "oneAndHalf" | "almostTwice" | "twice" | "moreThanTwice";
+export type YouthJobsChapter = { year: number; all: LabourSplit; youth: LabourSplit; ratio: number; comparison: ComparisonId; regions: { id: string; label: string; rate: number }[] }; // regions rate desc
+
+export type WageGapChapter = {
+  year: number; average: number; women: number; men: number; ratio: number; // ratio = women / men
+  median: { year: number; value: number };
+  publicSector: number; nonPublic: number;
+  history: { years: number[]; values: number[] }; // national average, first..latest
+  sectors: { id: string; label: string; average: number; women: number; men: number }[]; // average desc
+};
+
+export type TradeChapter = {
+  year: number; exportsUsd: number; importsUsd: number; turnoverUsd: number; balanceUsd: number;
+  years: number[]; exports: number[]; imports: number[]; // USD, one per year, first..latest
+  partners: { id: string; label: string; exportsUsd: number; importsUsd: number; turnoverUsd: number }[]; // countries only, at most 10, turnover desc
+  topProduct: { label: string; usd: number; share: number }; secondProduct: { label: string; usd: number } | null; // share of national exports
+};
+
+export type DeathGroupKind = "top" | "unknown" | "established" | "other";
+export type DeathsChapter = {
+  year: number; total: number;
+  groups: { id: string; label: string; count: number; kind: DeathGroupKind }[]; // five largest causes by count, then "other" (the remainder); ids without the health.deaths. prefix
+  top: { id: string; label: string; share: number }; // largest established cause (anything but ill_defined), share of total
+  unknownShare: number; // ill_defined / total, 0 if absent
+};
+
+export type BudgetSentenceKey = "spending" | "revenue" | "municipal" | "deficit";
+export type SocietySentenceKey = "ageing" | "youthJobs" | "wageGap" | "trade" | "deaths";
+// headings: the chapter titles whose wording follows the data (06: is the old-age share growing; 07: how much higher is youth unemployment)
+export type SocietySentences = Record<SocietySentenceKey, string> & { headings: { ageing: string; youthJobs: string } };
+
 export type HomeChapters = {
   scale: ScaleChapter;
   spending: SpendingSeries;
   revenue: RevenueSeries;
   municipal: MunicipalChapter;
   deficit: DeficitChapter;
+  ageing: AgeingChapter;
+  youthJobs: YouthJobsChapter;
+  wageGap: WageGapChapter;
+  trade: TradeChapter;
+  deaths: DeathsChapter;
   sources: { rows: SourceRow[]; totalFiles: number; reviewedAt: string };
   tools: string[];
-  sentences: Record<"spending" | "revenue" | "municipal" | "deficit", string>;
+  sentences: Record<BudgetSentenceKey, string> & SocietySentences;
 };

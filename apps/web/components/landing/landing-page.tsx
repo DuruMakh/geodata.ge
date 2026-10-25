@@ -1,19 +1,28 @@
 import type { Presentation } from "../../lib/i18n/types";
 import { message } from "../../lib/i18n/messages";
 import { pageHref } from "../../lib/i18n/routes";
+import { topicSection } from "../../lib/navigation/navTree";
 import Link from "next/link";
 import type { HomeChapters } from "../../lib/landing/chapters/types";
 import type { LandingGdpFigure } from "../../lib/landing/landingData";
 import { SiteFooter } from "../site/site-footer";
 import { SiteHeader } from "../site/site-header";
+import { AgeingChapter, ageingNotes, type AgeingLabels } from "./chapters/ageing-chapter";
 import { AiSection, type AiLabels } from "./chapters/ai-section";
+import { BIRTH_CLASSES } from "./chapters/canvas";
 import { Chapter } from "./chapters/chapter";
+import { billions, decimals } from "./chapters/chart-format";
+import { DEATH_UNIT, yearRange } from "./chapters/chart-layout";
+import { DeathsChapter, type DeathsLabels } from "./chapters/deaths-chapter";
 import { DeficitChart, type DeficitLabels } from "./chapters/deficit-chart";
+import { JobsChapter, type JobsLabels } from "./chapters/jobs-chapter";
 import { MunicipalRelief, type MunicipalLabels } from "./chapters/municipal-relief";
 import { RevenueChart, type RevenueLabels } from "./chapters/revenue-chart";
 import { ScaleChapter, type ScaleLabels } from "./chapters/scale-chapter";
 import { SourcesSection, type SourcesLabels } from "./chapters/sources-section";
 import { SpendingChapter, type SpendingLabels } from "./chapters/spending-chapter";
+import { TradeChapter, tradeNotes, type TradeLabels } from "./chapters/trade-chapter";
+import { WagesChapter, wagesNotes, type WagesLabels } from "./chapters/wages-chapter";
 import { HeroReliefLazy } from "./hero-relief-lazy";
 
 // Population and area are maintained by hand; the GDP figure and every budget
@@ -129,6 +138,149 @@ export function LandingPage({ chapters, gdpFigure, presentation, updatedAt, mcpE
     chartSummary: t("landing.deficit.chartSummary"),
     unavailable,
   };
+  const { ageing } = chapters;
+  const ageingText = ageingNotes(ageing, t);
+  const ageingLabels: AgeingLabels = {
+    pyramid: {
+      title: t("landing.ageing.pyramid.title", { year: ageing.pyramid.year }),
+      men: t("landing.ageing.men"),
+      women: t("landing.ageing.women"),
+      base: t("landing.ageing.pyramid.base", { year: ageing.pyramid.baseYear }),
+      years: t("landing.ageing.years"),
+      bothSexes: t("landing.ageing.pyramid.bothSexes"),
+      then: t("landing.ageing.pyramid.then", { year: ageing.oldShareBase.year }),
+      oldShare: t("landing.ageing.pyramid.oldShare"),
+      chartSummary: t("landing.ageing.pyramid.chartSummary", { year: ageing.pyramid.year, baseYear: ageing.pyramid.baseYear }),
+      unavailable,
+    },
+    migration: {
+      net: t("landing.ageing.migration.label"),
+      moreArrived: t("landing.ageing.migration.moreArrived"),
+      moreLeft: t("landing.ageing.migration.moreLeft"),
+      highest: t("landing.ageing.highest"),
+      lowest: t("landing.ageing.lowest"),
+      unavailable,
+    },
+    map: {
+      title: t("landing.ageing.map.title", { year: ageing.births.year }),
+      perHundred: t("landing.ageing.map.perHundred"),
+      births: t("landing.ageing.map.births"),
+      deaths: t("landing.ageing.map.deaths"),
+      increase: t("landing.ageing.map.increase"),
+      decrease: t("landing.ageing.map.decrease"),
+      balanced: t("landing.ageing.map.balanced"),
+      noData: t("landing.ageing.map.noData"),
+      occupied: t("landing.municipal.occupied"),
+      below: t("landing.ageing.map.below", { value: BIRTH_CLASSES[0].below }),
+      highest: t("landing.ageing.highest"),
+      lowest: t("landing.ageing.lowest"),
+      chartSummary: t("landing.ageing.map.chartSummary", { year: ageing.births.year }),
+      unavailable,
+    },
+    women: { label: t("landing.ageing.women.label"), note: ageingText.women },
+    life: { label: t("landing.ageing.life.label"), unit: t("landing.ageing.years"), note: ageingText.life },
+    fertility: { label: t("landing.ageing.fertility.label"), note: ageingText.fertility },
+    migrationCard: { label: t("landing.ageing.migration.label"), note: ageingText.migration },
+  };
+  const { youthJobs } = chapters;
+  const jobsYear = youthJobs.year;
+  const waffleLabels = (kind: "all" | "youth") => {
+    const [employed, unemployed, outside] = youthJobs[kind].per100;
+    return {
+      title: t(`landing.jobs.waffle.${kind}Title`, { year: jobsYear }),
+      who: t(`landing.jobs.waffle.${kind}Who`),
+      summary: t(`landing.jobs.waffle.${kind}Summary`, { year: jobsYear, employed, unemployed, outside }),
+      employed: t("landing.jobs.employed"),
+      unemployed: t("landing.jobs.unemployed"),
+      outside: t("landing.jobs.outside"),
+      people: t("landing.jobs.people"),
+      thousand: t("landing.jobs.thousand"),
+      million: t("landing.million"),
+      unemploymentRate: t("landing.jobs.unemploymentRate"),
+      ofLabourForce: t("landing.jobs.ofLabourForce"),
+      labourForce: t("landing.jobs.labourForce"),
+      neither: t("landing.jobs.neither"),
+      unavailable,
+    };
+  };
+  const jobsLabels: JobsLabels = {
+    all: waffleLabels("all"),
+    youth: waffleLabels("youth"),
+    regions: {
+      title: t("landing.jobs.regions.title", { year: jobsYear }),
+      national: t("landing.jobs.regions.national"),
+      rate: t("landing.jobs.regions.rate", { year: jobsYear }),
+      equal: t("landing.jobs.regions.equal"),
+      // The tooltip fills in the difference when a region is hovered.
+      higher: t("landing.jobs.regions.higher", { diff: "{diff}" }),
+      lower: t("landing.jobs.regions.lower", { diff: "{diff}" }),
+      chartSummary: t("landing.jobs.regions.chartSummary", { year: jobsYear }),
+      unavailable,
+    },
+  };
+  const { wageGap } = chapters;
+  const wageText = wagesNotes(wageGap, t);
+  const wagesLabels: WagesLabels = {
+    chart: {
+      title: t("landing.wages.chart.title", { year: wageGap.year }),
+      women: t("landing.ageing.women"),
+      men: t("landing.ageing.men"),
+      average: t("landing.wages.legendAverage"),
+      ratioHint: t("landing.wages.ratioHint"),
+      // The tooltip fills in the share when a sector is hovered.
+      tipFoot: t("landing.wages.tipFoot", { pct: "{pct}" }),
+      chartSummary: t("landing.wages.chartSummary", { count: wageGap.sectors.length, year: wageGap.year }),
+      largestGap: t("landing.wages.largestGap"),
+      unavailable,
+    },
+    average: { label: t("landing.wages.average.label"), note: wageText.average },
+    median: { label: t("landing.wages.median.label"), note: wageText.median },
+    ratio: { label: t("landing.wages.ratio.label"), note: wageText.ratio },
+    publicSector: { label: t("landing.wages.public.label"), note: wageText.publicSector },
+  };
+  const { trade } = chapters;
+  const tradeText = tradeNotes(trade, t);
+  const tradeUnit = t("landing.trade.unit");
+  const tradeRange = yearRange(trade.years[0], trade.years[trade.years.length - 1]);
+  const tradeLabels: TradeLabels = {
+    butterfly: {
+      title: t("landing.trade.partners.title", { count: trade.partners.length, year: trade.year }),
+      exports: t("landing.trade.exports"),
+      imports: t("landing.trade.imports"),
+      balance: t("landing.trade.balanceName"),
+      turnover: t("landing.trade.turnoverName"),
+      unit: tradeUnit,
+      exportsHead: t("landing.trade.partners.exportsHead"),
+      importsHead: t("landing.trade.partners.importsHead"),
+      chartSummary: t("landing.trade.partners.chartSummary", { count: trade.partners.length, year: trade.year }),
+      unavailable,
+    },
+    lines: {
+      title: t("landing.trade.lines.title", { range: tradeRange }),
+      exports: t("landing.trade.exports"),
+      imports: t("landing.trade.imports"),
+      balance: t("landing.trade.balanceName"),
+      deficit: t("landing.trade.deficit"),
+      unit: tradeUnit,
+      chartSummary: t("landing.trade.lines.chartSummary", { range: tradeRange, year: trade.year, exports: billions(trade.exportsUsd, 1), imports: billions(trade.importsUsd, 1) }),
+      unavailable,
+    },
+    turnover: { label: t("landing.trade.turnover.label"), note: tradeText.turnover },
+    balance: { label: t("landing.trade.balance.label"), note: tradeText.balance },
+    product: { label: t("landing.trade.product.label"), note: tradeText.product },
+  };
+  const { deaths } = chapters;
+  const deathsLabels: DeathsLabels = {
+    title: t("landing.deaths.chart.title", { year: deaths.year }),
+    unit: t("landing.deaths.chart.unit", { count: DEATH_UNIT }),
+    unknown: t("landing.deaths.chart.unknown"),
+    summary: t("landing.deaths.chart.summary", { total: decimals(deaths.total, 0), year: deaths.year, count: DEATH_UNIT }),
+    people: t("landing.deaths.tip.people"),
+    ofAll: t("landing.deaths.tip.ofAll"),
+    // The tooltip fills in the squares of the hovered group.
+    squares: t("landing.deaths.tip.squares", { count: "{count}" }),
+    unavailable,
+  };
   const collections = chapters.sources.rows.length;
   const sourcesLabels: SourcesLabels = {
     title: t("landing.sources.title"),
@@ -242,6 +394,21 @@ export function LandingPage({ chapters, gdpFigure, presentation, updatedAt, mcpE
           </Chapter>
           <Chapter id="ch-05" link={chapterLink(5, "/explorer/deficit")} title={t("landing.ch5.title")} lede={chapters.sentences.deficit}>
             <DeficitChart data={chapters.deficit} labels={deficitLabels} />
+          </Chapter>
+          <Chapter id="ch-06" link={chapterLink(6, "/explorer/demography")} title={chapters.sentences.headings.ageing} lede={chapters.sentences.ageing}>
+            <AgeingChapter data={ageing} municipal={chapters.municipal} labels={ageingLabels} />
+          </Chapter>
+          <Chapter id="ch-07" link={chapterLink(7, topicSection("unemployment").href)} title={chapters.sentences.headings.youthJobs} lede={chapters.sentences.youthJobs}>
+            <JobsChapter data={youthJobs} labels={jobsLabels} />
+          </Chapter>
+          <Chapter id="ch-08" link={chapterLink(8, topicSection("wages").href)} title={t("landing.ch8.title")} lede={chapters.sentences.wageGap}>
+            <WagesChapter data={wageGap} labels={wagesLabels} />
+          </Chapter>
+          <Chapter id="ch-09" link={chapterLink(9, topicSection("trade").href)} title={t("landing.ch9.title")} lede={chapters.sentences.trade}>
+            <TradeChapter data={trade} labels={tradeLabels} />
+          </Chapter>
+          <Chapter id="ch-10" link={chapterLink(10, "/explorer/health/causes-of-death")} title={t("landing.ch10.title")} lede={chapters.sentences.deaths}>
+            <DeathsChapter data={deaths} labels={deathsLabels} />
           </Chapter>
           <SourcesSection sources={chapters.sources} labels={sourcesLabels} locale={locale} />
           <AiSection endpoint={mcpEndpoint} tools={chapters.tools} labels={aiLabels} locale={locale} />

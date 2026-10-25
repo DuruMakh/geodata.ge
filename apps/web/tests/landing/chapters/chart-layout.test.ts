@@ -2,14 +2,25 @@ import { describe, expect, it } from "vitest";
 import {
   barSlots,
   DEFICIT_RULE_PCT,
+  deficitFloor,
   deficitScale,
+  dumbbellHeight,
   fiveYearIndices,
+  heightVars,
+  largestWageGap,
+  partnerNameColumn,
+  partnersAxisTop,
   plannedRuns,
   plannedSpan,
   pointIndexAt,
+  regionsAxisTop,
+  regionsHeight,
   revenuePads,
   slotIndexAt,
+  tradeYearTicks,
   valueY,
+  wagesAxisTop,
+  widestDeficitIndex,
   yearLabelIndices,
   yearRange,
 } from "../../../components/landing/chapters/chart-layout";
@@ -125,5 +136,106 @@ describe("yearRange", () => {
   it("writes a single year once and a range with an en dash", () => {
     expect(yearRange(2004, 2004)).toBe("2004");
     expect(yearRange(2004, 2007)).toBe("2004–2007");
+  });
+});
+
+describe("regionsHeight", () => {
+  it("gives 28 px per region and 40 px when narrow, plus 56 px", () => {
+    expect(regionsHeight(11, false)).toBe(364);
+    expect(regionsHeight(11, true)).toBe(496);
+  });
+});
+
+describe("regionsAxisTop", () => {
+  it("is the next multiple of 5 above the highest rate, also for an exact multiple", () => {
+    expect(regionsAxisTop(17.5)).toBe(20);
+    expect(regionsAxisTop(7)).toBe(10);
+    expect(regionsAxisTop(20)).toBe(25);
+  });
+});
+
+describe("dumbbellHeight", () => {
+  it("gives 27 px per sector and 44 px when narrow, plus 40 px", () => {
+    expect(dumbbellHeight(19, false)).toBe(553);
+    expect(dumbbellHeight(19, true)).toBe(876);
+  });
+});
+
+describe("wagesAxisTop", () => {
+  it("is the next multiple of 2,000 above the highest wage, also for an exact multiple", () => {
+    expect(wagesAxisTop(5900)).toBe(6000);
+    expect(wagesAxisTop(6100)).toBe(8000);
+    expect(wagesAxisTop(6000)).toBe(8000);
+  });
+});
+
+describe("largestWageGap", () => {
+  const sector = (id: string, women: number, men: number) => ({ id, label: id, average: (women + men) / 2, women, men });
+
+  it("is the sector whose women's and men's wages are furthest apart, in either direction", () => {
+    expect(largestWageGap([sector("a", 4000, 4500), sector("b", 3000, 3900), sector("c", 4700, 4000)]).id).toBe("b");
+    expect(largestWageGap([sector("a", 4000, 4500), sector("c", 5600, 4000)]).id).toBe("c");
+  });
+
+  it("fails without sectors", () => {
+    expect(() => largestWageGap([])).toThrow("Wages chapter: no sectors");
+  });
+});
+
+describe("partnersAxisTop", () => {
+  it("is the next whole billion above the largest one-way flow, also for an exact billion", () => {
+    expect(partnersAxisTop(2.79)).toBe(3);
+    expect(partnersAxisTop(0.4)).toBe(1);
+    expect(partnersAxisTop(3)).toBe(4);
+  });
+});
+
+describe("tradeYearTicks", () => {
+  it("labels the first year and every tenth year after it", () => {
+    const years = Array.from({ length: 31 }, (_, i) => 1995 + i);
+    expect(tradeYearTicks(years).map((i) => years[i])).toEqual([1995, 2005, 2015, 2025]);
+  });
+
+  it("follows the years that exist, not their count", () => {
+    expect(tradeYearTicks([2000, 2005, 2010, 2012])).toEqual([0, 2]);
+    expect(tradeYearTicks([])).toEqual([]);
+  });
+});
+
+describe("widestDeficitIndex", () => {
+  it("is the year in which imports exceed exports by the most", () => {
+    expect(widestDeficitIndex([1, 2, 7], [3, 9, 18])).toBe(2);
+    expect(widestDeficitIndex([1, 2, 7], [3, 15, 9])).toBe(1);
+  });
+
+  it("is -1 when imports never exceed exports", () => {
+    expect(widestDeficitIndex([4, 5], [4, 3])).toBe(-1);
+  });
+});
+
+describe("heightVars", () => {
+  it("sets the phone and desktop heights as the custom properties the wrapper's height classes read", () => {
+    expect(heightVars(216, 168)).toEqual({ "--h-narrow": "216px", "--h-wide": "168px" });
+  });
+});
+
+describe("deficitFloor", () => {
+  it("is the lower of the two lines in each year, so the shading is the gap only where imports are above exports", () => {
+    expect(deficitFloor([1, 5, 3], [3, 4, 3])).toEqual([1, 4, 3]);
+  });
+});
+
+describe("partnerNameColumn", () => {
+  it("fits the widest name plus 20 (12 when narrow) within 112 px (84) and a third of the plot (44%)", () => {
+    expect(partnerNameColumn(60, 700, false)).toBe(112);
+    expect(partnerNameColumn(150, 700, false)).toBe(170);
+    expect(partnerNameColumn(40, 331, true)).toBe(84);
+    expect(partnerNameColumn(90, 331, true)).toBe(102);
+  });
+
+  it("never takes more than 34% of the plot width (44% when narrow), but at least its minimum", () => {
+    expect(partnerNameColumn(400, 700, false)).toBeCloseTo(238, 5);
+    expect(partnerNameColumn(400, 300, false)).toBe(112);
+    expect(partnerNameColumn(200, 331, true)).toBeCloseTo(145.64, 5);
   });
 });

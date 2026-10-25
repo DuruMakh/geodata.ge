@@ -1,16 +1,33 @@
 import type { GlossaryEntry } from "../../data/glossary";
+import type { ServedDemographyObservation } from "../../data/demography/types";
+import type { HealthFact } from "../../data/health/types";
+import type { TradeOverviewFact } from "../../data/tradeOverview/types";
+import type { TradePartnersData } from "../../data/tradePartners/types";
+import type { TradeProductsData } from "../../data/tradeProducts/types";
+import type { ServedUnemploymentObservation } from "../../data/unemployment/types";
+import type { WagesFact } from "../../data/wages/types";
 import type { MunicipalListRow } from "../../explorer/municipalData";
-import { UNIT_BN, formatInUnit, formatShare } from "../../explorer/format";
+import { REGIONAL_ECONOMY_REGIONS } from "../../data/regionalEconomies/importRegionalEconomies";
+import { WAGES_SECTORS } from "../../data/wages/types";
+import { UNIT_BN, UNIT_PERSONS, formatInUnit, formatShare } from "../../explorer/format";
 import { message } from "../../i18n/messages";
 import type { Presentation } from "../../i18n/types";
 import type { MethodologyHubEntry } from "../../methodology/types";
 import type { ServedBudgetFact } from "../../servedRows";
 import { OTHER_UNCLASSIFIED_ID, buildRevenueSeries, buildSpendingSeries } from "./budgetSeries";
+import { buildAgeingChapter } from "./ageing";
+import { buildDeathsChapter, oneInN } from "./deaths";
 import { buildDeficitChapter } from "./deficit";
 import { buildMunicipalChapter } from "./municipalRelief";
 import { buildScaleChapter, type ScaleInput } from "./scale";
 import { buildSourceRows, toolNames } from "./sourcesAi";
-import type { DeficitChapter, HomeChapters, MunicipalChapter, RevenueSeries, SpendingSeries } from "./types";
+import { buildTradeChapter, tradeYear } from "./trade";
+import type {
+  AgeingChapter, BudgetSentenceKey, DeathsChapter, DeficitChapter, HomeChapters, MunicipalChapter, RevenueSeries, SocietySentences, SpendingSeries,
+  TradeChapter, WageGapChapter, YouthJobsChapter,
+} from "./types";
+import { buildWageGapChapter } from "./wageGap";
+import { buildYouthJobsChapter } from "./youthJobs";
 
 // Assembles the five chapter models for the homepage. Every number comes from
 // the served inputs; the one-line ledes are sentences over those same models.
@@ -23,6 +40,11 @@ export type HomeChaptersInput = Omit<ScaleInput, "spending" | "revenue"> & {
   glossary: Map<string, GlossaryEntry>;
   municipalRows: MunicipalListRow[];
   municipalYear: number;
+  demographyFacts: ServedDemographyObservation[];
+  unemploymentFacts: ServedUnemploymentObservation[];
+  wagesFacts: WagesFact[];
+  trade: { overview: TradeOverviewFact[]; partners: TradePartnersData; products: TradeProductsData };
+  healthFacts: HealthFact[];
   methodologyEntries: MethodologyHubEntry[];
   updatedAt: string;
 };
@@ -34,6 +56,8 @@ type SentenceModels = {
   deficit: DeficitChapter;
 };
 
+type SocietyModels = { ageing: AgeingChapter; youthJobs: YouthJobsChapter; wageGap: WageGapChapter; trade: TradeChapter; deaths: DeathsChapter };
+
 const billions = (valueGel: number) => formatInUnit(valueGel, UNIT_BN);
 
 function tbilisiSharePhrase(share: number): string {
@@ -43,7 +67,7 @@ function tbilisiSharePhrase(share: number): string {
   return "halfMore";
 }
 
-export function buildChapterSentences({ spending, revenue, municipal, deficit }: SentenceModels, presentation: Presentation): HomeChapters["sentences"] {
+export function buildChapterSentences({ spending, revenue, municipal, deficit }: SentenceModels, presentation: Presentation): Record<BudgetSentenceKey, string> {
   const { messages } = presentation;
 
   const spendingIndex = spending.years.length - 1;
@@ -94,11 +118,71 @@ export function buildChapterSentences({ spending, revenue, municipal, deficit }:
   };
 }
 
+export function buildSocietySentences({ ageing, youthJobs, wageGap, trade, deaths }: SocietyModels, presentation: Presentation): SocietySentences {
+  const { messages } = presentation;
+  const text = (key: string, values?: Record<string, string | number>) => message(messages, key, values);
+
+  const unknownIn = oneInN(deaths.unknownShare);
+  return {
+    ageing: text("landing.sentence.ageing", {
+      year: ageing.oldShare.year,
+      share: formatShare(ageing.oldShare.share),
+      firstYear: ageing.oldShareBase.year,
+      firstShare: formatShare(ageing.oldShareBase.share),
+      vitalYear: ageing.births.year,
+      births: Math.round((ageing.births.births / ageing.births.deaths) * 100),
+    }),
+    youthJobs: text("landing.sentence.youthJobs", {
+      year: youthJobs.year,
+      all: formatShare(youthJobs.all.rate / 100),
+      youth: formatShare(youthJobs.youth.rate / 100),
+    }),
+    wageGap: text("landing.sentence.wageGap", {
+      year: wageGap.year,
+      average: formatInUnit(wageGap.average, UNIT_PERSONS),
+      ratio: formatShare(wageGap.ratio, false, 0),
+    }),
+    trade: text("landing.sentence.trade", {
+      year: trade.year,
+      turnover: formatInUnit(trade.turnoverUsd, UNIT_BN),
+      exports: formatInUnit(trade.exportsUsd, UNIT_BN),
+      imports: formatInUnit(trade.importsUsd, UNIT_BN),
+    }),
+    deaths: text("landing.sentence.deaths", {
+      year: deaths.year,
+      total: formatInUnit(deaths.total, UNIT_PERSONS),
+      pct: formatShare(deaths.top.share, false, 0),
+      cause: text(`landing.deaths.cause.${deaths.top.id}`),
+      unknown: unknownIn === null ? text("landing.deaths.share", { pct: formatShare(deaths.unknownShare, false, 0) }) : text(`landing.deaths.oneIn.${unknownIn}`),
+    }),
+    headings: {
+      ageing: text(ageing.ageing ? "landing.ageing.heading.ageing" : "landing.ageing.heading.changing"),
+      youthJobs: text(`landing.jobs.heading.${youthJobs.comparison}`),
+    },
+  };
+}
+
+/** English names the society chapters read: sectors, regions, country partners and the products of the trade year. */
+export function societyEnglishLabelIds({ overview, partners, products }: HomeChaptersInput["trade"]): string[] {
+  const year = tradeYear(overview);
+  return [
+    ...WAGES_SECTORS,
+    ...REGIONAL_ECONOMY_REGIONS.map((region) => region.id),
+    ...partners.entities.filter((entity) => entity.kind === "country").map((entity) => entity.id),
+    ...new Set(products.facts.filter((fact) => fact.year === year).map((fact) => fact.entityId)),
+  ];
+}
+
 export function buildHomeChapters(input: HomeChaptersInput, presentation: Presentation): HomeChapters {
   const spending = buildSpendingSeries(input.budgetFacts, input.glossary, presentation);
   const revenue = buildRevenueSeries(input.budgetFacts, input.glossary, presentation);
   const municipal = buildMunicipalChapter(input.municipalRows, input.municipalYear, presentation);
   const deficit = buildDeficitChapter(input.balanceFacts);
+  const ageing = buildAgeingChapter(input.demographyFacts, municipal.places);
+  const youthJobs = buildYouthJobsChapter(input.unemploymentFacts, presentation);
+  const wageGap = buildWageGapChapter(input.wagesFacts, presentation);
+  const trade = buildTradeChapter(input.trade, presentation);
+  const deaths = buildDeathsChapter(input.healthFacts, presentation.messages);
 
   return {
     scale: buildScaleChapter({ ...input, spending, revenue }, presentation.messages),
@@ -106,8 +190,16 @@ export function buildHomeChapters(input: HomeChaptersInput, presentation: Presen
     revenue,
     municipal,
     deficit,
+    ageing,
+    youthJobs,
+    wageGap,
+    trade,
+    deaths,
     sources: buildSourceRows(input.methodologyEntries, input.updatedAt),
     tools: toolNames(),
-    sentences: buildChapterSentences({ spending, revenue, municipal, deficit }, presentation),
+    sentences: {
+      ...buildChapterSentences({ spending, revenue, municipal, deficit }, presentation),
+      ...buildSocietySentences({ ageing, youthJobs, wageGap, trade, deaths }, presentation),
+    },
   };
 }

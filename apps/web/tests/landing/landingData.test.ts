@@ -90,7 +90,7 @@ describe("landing page layout", () => {
     // U01-05: "მლრდ ₾" never splits into a stranded currency sign.
     expect(markup).toMatch(/<span data-testid="[^"]+" class="[^"]*whitespace-nowrap[^"]*">[^<]*₾<\/span>/);
     const anchors = [...markup.matchAll(/<section id="([^"]+)"/g)].map((match) => match[1]);
-    expect(anchors).toEqual(["ch-01", "ch-02", "ch-03", "ch-04", "ch-05", "sources", "ai"]);
+    expect(anchors).toEqual(["ch-01", "ch-02", "ch-03", "ch-04", "ch-05", "ch-06", "ch-07", "ch-08", "ch-09", "ch-10", "sources", "ai"]);
     // The charts render on the server; only their canvas engines load in the browser.
     const chapter = (id: string) => {
       const start = markup.indexOf(`<section id="${id}"`);
@@ -100,6 +100,21 @@ describe("landing page layout", () => {
     expect(chapter("ch-01")).toContain('aria-pressed="true"');
     expect(chapter("ch-02").match(/<button[^>]* data-field="[^"]+"/g)?.length).toBeGreaterThanOrEqual(10);
     expect(chapter("ch-03").match(/<li data-band="[a-zA-Z]+"/g)?.length).toBeGreaterThanOrEqual(6);
+    expect(chapter("ch-06").match(/<div data-stat=""/g)?.length).toBe(4);
+    // Chapter 07: two labour grids with three key rows each, and the regions chart.
+    expect(chapter("ch-07").match(/<li[^>]*data-key="(employed|unemployed|outside)"/g)?.length).toBe(6);
+    expect(chapter("ch-07").match(/<canvas/g)?.length).toBe(3);
+    // Chapter 08: the wages-by-sector chart beside four number cards, the first with its sparkline.
+    expect(chapter("ch-08").match(/<canvas/g)?.length).toBe(1);
+    expect(chapter("ch-08").match(/<div data-stat=""/g)?.length).toBe(4);
+    expect(chapter("ch-08").match(/<polyline/g)?.length).toBe(1);
+    // Chapter 09: the partners chart and the exports and imports lines, then three number cards.
+    expect(chapter("ch-09").match(/<canvas/g)?.length).toBe(2);
+    expect(chapter("ch-09").match(/<div data-stat=""/g)?.length).toBe(3);
+    // Chapter 10: the causes-of-death chart of squares, with its two-part key.
+    expect(chapter("ch-10").match(/<canvas/g)?.length).toBe(1);
+    expect(chapter("ch-10")).toContain("გარდაცვალების მიზეზები, 2025");
+    expect(chapter("ch-10")).toContain("= 100 გარდაცვლილი");
     // The site footer, with the mission sentence.
     expect(markup).toContain("ჩვენი მიზანია");
   });
@@ -108,7 +123,7 @@ describe("landing page layout", () => {
     const { renderHomePage } = await import("../../lib/pages/home");
     const markup = renderPageMarkup("en", await renderHomePage("en"));
     const headingLinks = [...markup.matchAll(/<h2[^>]*>[\s\S]*?<\/h2>/g)].flatMap((match) => [...match[0].matchAll(/href="([^"]+)"/g)].map((link) => link[1]));
-    expect(headingLinks).toEqual(["/en/explorer/analysis", "/en/explorer/expenditure", "/en/explorer/revenue", "/en/explorer/municipalities", "/en/explorer/deficit"]);
+    expect(headingLinks).toEqual(["/en/explorer/analysis", "/en/explorer/expenditure", "/en/explorer/revenue", "/en/explorer/municipalities", "/en/explorer/deficit", "/en/explorer/demography", "/en/explorer/labour#t-unemployment", "/en/explorer/labour#t-wages", "/en/explorer/external#t-trade", "/en/explorer/health/causes-of-death"]);
   });
 
   // Two municipal totals by design: chapter 01 compares the official all-local-budgets country aggregate with GDP;
