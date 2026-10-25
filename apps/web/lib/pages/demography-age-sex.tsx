@@ -19,6 +19,7 @@ import type { Locale, TemplateValues } from "../i18n/types";
 import { fiscalMetadata } from "../seo/metadata";
 import { resolveSiteUrl } from "../siteUrl";
 import { loadPopulationBasics, loadPopulationSources } from "./demography-population";
+import { ALL_DATA_PATH } from "../navigation/navTree";
 
 export async function demographyAgeSexPageMetadata(locale: Locale) {
   const [{ facts: served }, p] = await Promise.all([loadServedDemographyData(), getPresentation(locale, ["demography"], [])]);
@@ -53,7 +54,7 @@ export async function renderDemographyAgeSexPage(locale: Locale) {
   const title = t("ageSexTitle");
   const crumbs = [
     { label: message(messages, "common.home"), href: pageHref("/", locale) },
-    { label: message(messages, "common.data") },
+    { label: message(messages, "common.data"), href: pageHref(ALL_DATA_PATH, locale) },
     { label: t("title"), href: pageHref(DEMOGRAPHY_HUB_PATH, locale) },
     { label: title },
   ];
@@ -62,6 +63,7 @@ export async function renderDemographyAgeSexPage(locale: Locale) {
       <BreadcrumbJsonLd
         items={[
           { name: crumbs[0].label, path: pageHref("/", locale) },
+          { name: message(messages, "common.data"), path: pageHref(ALL_DATA_PATH, locale) },
           { name: crumbs[2].label, path: pageHref(DEMOGRAPHY_HUB_PATH, locale) },
           { name: title, path: pageHref(AGE_SEX_PATH, locale) },
         ]}

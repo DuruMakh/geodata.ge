@@ -15,7 +15,7 @@ import { pageHref } from "../i18n/routes";
 import { explorerDatasetJsonLd } from "../seo/structuredData";
 import { resolveSiteUrl } from "../siteUrl";
 import { projectAdminFact, projectBudgetFact, projectGdpFact } from "../explorer/clientData";
-import { navGroup } from "../navigation/navTree";
+import { ALL_DATA_PATH, navGroup } from "../navigation/navTree";
 import { isPlannedYear } from "../explorer/explorerData";
 import type { ServedBudgetFact } from "../servedRows";
 
@@ -78,7 +78,7 @@ export async function renderExpenditurePage(locale: Locale) {
         })}
         testId="explorer-dataset-json-ld"
       />
-      <BreadcrumbJsonLd items={[{ name: message(messages, "common.home"), path: pageHref("/", locale) }, { name: message(messages, "common.budget"), path: pageHref(navGroup("budget").href, locale) }, { name: message(messages, "common.expenditure"), path: pageHref("/explorer/expenditure", locale) }]} />
+      <BreadcrumbJsonLd items={[{ name: message(messages, "common.home"), path: pageHref("/", locale) }, { name: message(messages, "common.data"), path: pageHref(ALL_DATA_PATH, locale) }, { name: message(messages, "common.budget"), path: pageHref(navGroup("budget").href, locale) }, { name: message(messages, "common.expenditure"), path: pageHref("/explorer/expenditure", locale) }]} />
       <MainExplorer
         presentation={clientPresentation(presentation)}
         nav="expenditure"

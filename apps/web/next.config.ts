@@ -77,6 +77,11 @@ const nextConfig: NextConfig = {
           { key: "X-Robots-Tag", value: "noindex" },
         ],
       },
+      // The place index All data's search fetches (app/explorer-places.{ka,en}.json): data for the page, not a page to list.
+      {
+        source: "/explorer-places.:locale(ka|en).json",
+        headers: [{ key: "X-Robots-Tag", value: "noindex" }],
+      },
       {
         source: "/(.*)",
         headers: [

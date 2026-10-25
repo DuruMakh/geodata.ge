@@ -20,6 +20,7 @@ import { explorerDatasetJsonLd } from "../seo/structuredData";
 import { coverageLabel } from "../explorer/coverageLabel";
 import { resolveSiteUrl } from "../siteUrl";
 import { ExplorerPage } from "../../components/explorer-shell/explorer-page";
+import { ALL_DATA_PATH } from "../navigation/navTree";
 
 export async function economicSectorsPageMetadata(locale: Locale) {
   const messages = await getMessages(locale,["sectors"]);
@@ -37,10 +38,10 @@ export async function renderEconomicSectorsPage(locale: Locale) {
     return {sourceId:source.source_id,years:source.years,title:translated.title,organization:translated.publisher,downloadHref:source.downloadHref,retrievedAt:source.retrieved_at};
   });
   const title=message(presentation.messages,"sectors.heading"),firstYear=Math.min(...facts.map(f=>f.year)),lastYear=Math.max(...facts.map(f=>f.year)),dateModified=facts.map(f=>f.lastReviewedAt).sort().at(-1)!;
-  const crumbs=[{label:message(presentation.messages,"common.home"),href:pageHref("/",locale)},{label:message(presentation.messages,"common.data")},{label:message(presentation.messages,"common.economy"),href:pageHref("/explorer/economy",locale)},{label:title}];
+  const crumbs=[{label:message(presentation.messages,"common.home"),href:pageHref("/",locale)},{label:message(presentation.messages,"common.data"),href:pageHref(ALL_DATA_PATH,locale)},{label:message(presentation.messages,"common.economy"),href:pageHref("/explorer/economy",locale)},{label:title}];
   return <I18nProvider {...clientPresentation(presentation)}>
     <JsonLd testId="explorer-dataset-json-ld" data={explorerDatasetJsonLd({locale,datasetId:"economic-sectors",origin:resolveSiteUrl(),path:"/explorer/economy/sectors",name:message(presentation.messages,"sectors.metaTitle"),description:message(presentation.messages,"sectors.metaDescription"),firstYear,lastYear,dateModified,spatialCoverageName:locale==="ka"?"საქართველო":"Georgia",downloadPath:"/downloads/data/economic-sectors.csv"})}/>
-    <BreadcrumbJsonLd items={[{name:crumbs[0].label,path:pageHref("/",locale)},{name:crumbs[2].label,path:pageHref("/explorer/economy",locale)},{name:title,path:pageHref("/explorer/economy/sectors",locale)}]}/>
+    <BreadcrumbJsonLd items={[{name:crumbs[0].label,path:pageHref("/",locale)},{name:message(presentation.messages,"common.data"),path:pageHref(ALL_DATA_PATH,locale)},{name:crumbs[2].label,path:pageHref("/explorer/economy",locale)},{name:title,path:pageHref("/explorer/economy/sectors",locale)}]}/>
     <ExplorerPage containerQueries={false}>
       <PageHeader locale={locale} messages={presentation.messages} crumbs={crumbs} coverage={coverageLabel(presentation.messages, locale, firstYear, lastYear, dateModified)}/>
       <EconomicSectorsExplorer facts={packFacts(facts.map(projectSectorObservation))} sourceIdByMeasure={sourceIdByMeasure(facts)} registry={ECONOMIC_SECTORS} sources={sources} siteOrigin={resolveSiteUrl()}/>

@@ -22,7 +22,8 @@ import { formatInUnit, formatShare, UNIT_PERSONS } from "../explorer/format";
 import { buildPickerCountry, pickerGroupsFromRows } from "../explorer/municipalData";
 import { socialAnnualCpi, socialPopulation, type SocialPlaceSet } from "../explorer/social";
 import { buildSocialIndexModel } from "../explorer/socialIndex";
-import { socialLatestOf, socialPlaceBase, socialPlaceCoverage, socialPlaceDefaultSelection, socialPlaceFacts, socialPlaceSeries } from "../explorer/socialPlaces";
+import { socialPlaceBase, socialPlaceCoverage, socialPlaceDefaultSelection, socialPlaceFacts, socialPlaceSeries } from "../explorer/socialPlaces";
+import { latestOf } from "../explorer/unitList";
 import type { WorkbookPublicSource } from "../explorer/workbookModel";
 import { Message } from "../i18n/message";
 import { message } from "../i18n/messages";
@@ -36,7 +37,7 @@ import { fiscalMetadata } from "../seo/metadata";
 import { explorerDatasetJsonLd } from "../seo/structuredData";
 import { resolveSiteUrl } from "../siteUrl";
 import { workbookScopeFor } from "./demography-population-place";
-import { topicSection } from "../navigation/navTree";
+import { topicSection, ALL_DATA_PATH } from "../navigation/navTree";
 
 /** The same three kinds of place page as Population and Education, with the same 11 region ids and 63 municipality slugs. */
 export type SocialPlaceRoute = PlaceRoute;
@@ -111,7 +112,7 @@ function methodologyLink(messages: Messages, locale: Locale) {
 function hubCrumbs(messages: Messages, locale: Locale) {
   return [
     { label: message(messages, "common.home"), href: pageHref("/", locale) },
-    { label: message(messages, "common.data") },
+    { label: message(messages, "common.data"), href: pageHref(ALL_DATA_PATH, locale) },
     { label: message(messages, "common.health"), href: pageHref(topicSection("health").href, locale) },
   ];
 }
@@ -129,7 +130,7 @@ export async function renderSocialIndexPage(locale: Locale, set: SocialPlaceSet)
   const index = buildSocialIndexModel(set, facts, population, municipal.regions, municipal.municipalities);
   const base = socialPlaceBase(set);
   const georgia = places.find(candidate => candidate.id === GEORGIA_PLACE_ID)!;
-  const headline = socialLatestOf(facts, socialPlaceDefaultSelection(set)[0], SOCIAL_GEORGIA);
+  const headline = latestOf(facts, socialPlaceDefaultSelection(set)[0], SOCIAL_GEORGIA);
   const { min, max } = socialPlaceCoverage(set, SOCIAL_GEORGIA, socialPlaceFacts(set, SOCIAL_GEORGIA, facts, { population, cpi }));
   const title = t(`page.${set}.title`);
   // The map's measure is the set's first share of residents.
@@ -144,6 +145,7 @@ export async function renderSocialIndexPage(locale: Locale, set: SocialPlaceSet)
       })} />
       <BreadcrumbJsonLd items={[
         { name: crumbs[0].label, path: pageHref("/", locale) },
+        { name: message(messages, "common.data"), path: pageHref(ALL_DATA_PATH, locale) },
         { name: crumbs[2].label, path: pageHref(topicSection("health").path, locale) },
         { name: title, path: pageHref(base, locale) },
       ]} />
@@ -206,7 +208,7 @@ export async function renderSocialPlacePage(route: SocialPlaceRoute, locale: Loc
   const series = socialPlaceSeries(set);
   const placeFacts = facts.filter(f => f.geographyId === place.id && series.some(({ id }) => id === f.indicatorId));
   const placePopulation = population.filter(row => row.geographyId === place.id);
-  const headline = socialLatestOf(placeFacts, socialPlaceDefaultSelection(set)[0], place.id);
+  const headline = latestOf(placeFacts, socialPlaceDefaultSelection(set)[0], place.id);
   const name = placeLabel(place, locale);
   const { min, max } = socialPlaceCoverage(set, place.id, socialPlaceFacts(set, place.id, placeFacts, { population: placePopulation, cpi }));
   const sectionTitle = t(`page.${set}.title`);
@@ -243,6 +245,7 @@ export async function renderSocialPlacePage(route: SocialPlaceRoute, locale: Loc
       })} />
       <BreadcrumbJsonLd items={[
         { name: crumbs[0].label, path: pageHref("/", locale) },
+        { name: message(messages, "common.data"), path: pageHref(ALL_DATA_PATH, locale) },
         { name: crumbs[2].label, path: pageHref(topicSection("health").path, locale) },
         { name: sectionTitle, path: pageHref(base, locale) },
         ...(region ? [{ name: placeLabel(region, locale), path: href(region) }] : []),

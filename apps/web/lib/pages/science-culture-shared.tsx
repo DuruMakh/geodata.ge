@@ -22,7 +22,7 @@ import { loadSourcedWorkbookSources, type SourcedWorkbookPublicSource } from "..
 import { fiscalMetadata } from "../seo/metadata";
 import { explorerDatasetJsonLd } from "../seo/structuredData";
 import { resolveSiteUrl } from "../siteUrl";
-import { topicSection } from "../navigation/navTree";
+import { topicSection, ALL_DATA_PATH } from "../navigation/navTree";
 
 // Shared by the science and culture page modules. The topic pages, the Museums index and the area pages are separate
 // modules, so each ships only its own explorer: keep explorer components out of this file.
@@ -87,7 +87,7 @@ export async function renderMuseumsFrame(locale: Locale, area: MuseumArea | unde
   const covered = years(data.facts), firstYear = Math.min(...covered), lastYear = Math.max(...covered);
   const lastReviewedAt = data.facts.map(f => f.lastReviewedAt).sort().at(-1)!, origin = resolveSiteUrl();
   const hubTitle = t("title");
-  const crumbs = [{ label: message(presentation.messages, "common.home"), href: pageHref("/", locale) }, { label: message(presentation.messages, "common.data") }, { label: hubTitle, href: pageHref(topicSection("science-culture").href, locale) }, ...(area ? [{ label: indexTitle, href: pageHref(MUSEUMS_HREF, locale) }] : []), { label: area ? areaName : title }];
+  const crumbs = [{ label: message(presentation.messages, "common.home"), href: pageHref("/", locale) }, { label: message(presentation.messages, "common.data"), href: pageHref(ALL_DATA_PATH, locale) }, { label: hubTitle, href: pageHref(topicSection("science-culture").href, locale) }, ...(area ? [{ label: indexTitle, href: pageHref(MUSEUMS_HREF, locale) }] : []), { label: area ? areaName : title }];
   // The measures the page shows, by name: an area's headings, or the index map's visitors.
   const measures = area ? [...new Set(museumAreaSeries(area).map(series => t(`heading.${series.heading}`)))] : [t("mapLabel")];
   return <I18nProvider {...clientPresentation(presentation)}>
@@ -97,7 +97,7 @@ export async function renderMuseumsFrame(locale: Locale, area: MuseumArea | unde
       ...(area ? { spatialCoverageName: areaName, withinGeorgia: area !== "georgia", partOf: { path: MUSEUMS_HREF, name: indexTitle, description: t("page.museums.summary") } } : {}),
       variableMeasured: measures,
     })} />
-    <BreadcrumbJsonLd items={[{ name: crumbs[0].label, path: pageHref("/", locale) }, { name: hubTitle, path: pageHref(topicSection("science-culture").path, locale) }, ...(area ? [{ name: indexTitle, path: pageHref(MUSEUMS_HREF, locale) }] : []), { name: title, path: pageHref(href, locale) }]} />
+    <BreadcrumbJsonLd items={[{ name: crumbs[0].label, path: pageHref("/", locale) }, { name: message(presentation.messages, "common.data"), path: pageHref(ALL_DATA_PATH, locale) }, { name: hubTitle, path: pageHref(topicSection("science-culture").path, locale) }, ...(area ? [{ name: indexTitle, path: pageHref(MUSEUMS_HREF, locale) }] : []), { name: title, path: pageHref(href, locale) }]} />
     <ExplorerPage containerQueries={false}>
       <PageHeader locale={locale} messages={presentation.messages} crumbs={crumbs} coverage={coverageLabel(presentation.messages, locale, firstYear, lastYear, lastReviewedAt)} />
       {body({ facts: data.facts, presentation, areaLabels, origin, lastReviewedAt })}

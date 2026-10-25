@@ -32,6 +32,7 @@ import { fiscalMetadata } from "../seo/metadata";
 import { explorerDatasetJsonLd } from "../seo/structuredData";
 import { publicLabel } from "../i18n/labels";
 import { resolveSiteUrl } from "../siteUrl";
+import { ALL_DATA_PATH, topicSection } from "../navigation/navTree";
 
 /** The nominal GDP in US dollars, as the % of GDP views divide by it. */
 const nominalGdpUsd = (gdpFacts: readonly { seriesId: string; year: number; value: number; status: string }[]) =>
@@ -69,13 +70,13 @@ export async function renderMoneyFromAbroadPage(locale: Locale) {
   const sources = projectWorkbookSources(manifest.filter(row => sourceIds.has(row.source_id)), locale, catalogue.documents);
   const lastReviewedAt = data.facts.map(fact => fact.lastReviewedAt).sort().at(-1)!, origin = resolveSiteUrl();
   const t = (key: string) => message(presentation.messages, `external.${key}`);
-  const crumbs = [{ label: message(presentation.messages, "common.home"), href: pageHref("/", locale) }, { label: message(presentation.messages, "common.data") }, { label: t("hubTitle"), href: pageHref("/explorer/external", locale) }, { label: t("money.title") }];
+  const crumbs = [{ label: message(presentation.messages, "common.home"), href: pageHref("/", locale) }, { label: message(presentation.messages, "common.data"), href: pageHref(ALL_DATA_PATH, locale) }, { label: t("hubTitle"), href: pageHref(topicSection("external").href, locale) }, { label: t("money.title") }];
   return <I18nProvider {...clientPresentation(presentation)}>
     <JsonLd testId="explorer-dataset-json-ld" data={explorerDatasetJsonLd({
       locale, origin, path: "/explorer/external/money-from-abroad", datasetId: "external-flows", name: t("money.title"), description: t("money.summary"), firstYear: min, lastYear: max, dateModified: lastReviewedAt,
       variableMeasured: [t("measure.received"), t("measure.sent")], sources: ["nbg"],
     })} />
-    <BreadcrumbJsonLd items={[{ name: crumbs[0].label, path: pageHref("/", locale) }, { name: t("hubTitle"), path: pageHref("/explorer/external", locale) }, { name: t("money.title"), path: pageHref("/explorer/external/money-from-abroad", locale) }]} />
+    <BreadcrumbJsonLd items={[{ name: crumbs[0].label, path: pageHref("/", locale) }, { name: message(presentation.messages, "common.data"), path: pageHref(ALL_DATA_PATH, locale) }, { name: t("hubTitle"), path: pageHref(topicSection("external").path, locale) }, { name: t("money.title"), path: pageHref("/explorer/external/money-from-abroad", locale) }]} />
     <ExplorerPage containerQueries={false}>
       <PageHeader locale={locale} messages={presentation.messages} crumbs={crumbs} coverage={coverageLabel(presentation.messages, locale, min, max, lastReviewedAt)} />
       <MoneyFromAbroad data={{ ...client, facts: packFacts(client.facts) }} sources={sources} lastReviewedAt={lastReviewedAt} siteOrigin={origin} />
@@ -101,14 +102,14 @@ export async function renderForeignInvestmentPage(locale: Locale) {
   const sources = projectWorkbookSources(manifest.filter(row => sourceIds.has(row.source_id)), locale, catalogue.documents);
   const lastReviewedAt = data.facts.map(fact => fact.lastReviewedAt).sort().at(-1)!, origin = resolveSiteUrl();
   const t = (key: string) => message(presentation.messages, `external.${key}`);
-  const crumbs = [{ label: message(presentation.messages, "common.home"), href: pageHref("/", locale) }, { label: message(presentation.messages, "common.data") }, { label: t("hubTitle"), href: pageHref("/explorer/external", locale) }, { label: t("investment.title") }];
+  const crumbs = [{ label: message(presentation.messages, "common.home"), href: pageHref("/", locale) }, { label: message(presentation.messages, "common.data"), href: pageHref(ALL_DATA_PATH, locale) }, { label: t("hubTitle"), href: pageHref(topicSection("external").href, locale) }, { label: t("investment.title") }];
   return <I18nProvider {...clientPresentation(presentation)}>
     <JsonLd testId="explorer-dataset-json-ld" data={explorerDatasetJsonLd({
       locale, origin, path: "/explorer/external/foreign-investment", datasetId: "external-flows", name: t("investment.title"), description: t("investment.summary"), firstYear: min, lastYear: max, dateModified: lastReviewedAt,
       // The page's measures are the investment itself and each item's share of the year's total; country, sector and region are its breakdowns.
       variableMeasured: [publicLabel(locale, total.id, total.labelKa, presentation.englishLabels), t("investment.share")], sources: ["geostat"],
     })} />
-    <BreadcrumbJsonLd items={[{ name: crumbs[0].label, path: pageHref("/", locale) }, { name: t("hubTitle"), path: pageHref("/explorer/external", locale) }, { name: t("investment.title"), path: pageHref("/explorer/external/foreign-investment", locale) }]} />
+    <BreadcrumbJsonLd items={[{ name: crumbs[0].label, path: pageHref("/", locale) }, { name: message(presentation.messages, "common.data"), path: pageHref(ALL_DATA_PATH, locale) }, { name: t("hubTitle"), path: pageHref(topicSection("external").path, locale) }, { name: t("investment.title"), path: pageHref("/explorer/external/foreign-investment", locale) }]} />
     <ExplorerPage containerQueries={false}>
       <PageHeader locale={locale} messages={presentation.messages} crumbs={crumbs} coverage={coverageLabel(presentation.messages, locale, min, max, lastReviewedAt)} />
       <ForeignInvestment data={client} sources={sources} lastReviewedAt={lastReviewedAt} siteOrigin={origin} />
@@ -135,7 +136,7 @@ export async function renderCurrentAccountPage(locale: Locale) {
   const gdp = nominalGdpUsd(gdpFacts);
   const lastReviewedAt = facts.map(fact => fact.lastReviewedAt).sort().at(-1)!, origin = resolveSiteUrl();
   const t = (key: string) => message(presentation.messages, `external.${key}`);
-  const crumbs = [{ label: message(presentation.messages, "common.home"), href: pageHref("/", locale) }, { label: message(presentation.messages, "common.data") }, { label: t("hubTitle"), href: pageHref("/explorer/external", locale) }, { label: t("account.title") }];
+  const crumbs = [{ label: message(presentation.messages, "common.home"), href: pageHref("/", locale) }, { label: message(presentation.messages, "common.data"), href: pageHref(ALL_DATA_PATH, locale) }, { label: t("hubTitle"), href: pageHref(topicSection("external").href, locale) }, { label: t("account.title") }];
   return <I18nProvider {...clientPresentation(presentation)}>
     <JsonLd testId="explorer-dataset-json-ld" data={explorerDatasetJsonLd({
       locale, origin, path: "/explorer/external/current-account", datasetId: "external-flows", name: t("account.title"), description: t("account.summary"), firstYear: min, lastYear: max, dateModified: lastReviewedAt,
@@ -143,7 +144,7 @@ export async function renderCurrentAccountPage(locale: Locale) {
       // The NBG's balance of payments; the % of GDP view divides by Geostat's GDP.
       sources: ["nbg", "geostat"],
     })} />
-    <BreadcrumbJsonLd items={[{ name: crumbs[0].label, path: pageHref("/", locale) }, { name: t("hubTitle"), path: pageHref("/explorer/external", locale) }, { name: t("account.title"), path: pageHref("/explorer/external/current-account", locale) }]} />
+    <BreadcrumbJsonLd items={[{ name: crumbs[0].label, path: pageHref("/", locale) }, { name: message(presentation.messages, "common.data"), path: pageHref(ALL_DATA_PATH, locale) }, { name: t("hubTitle"), path: pageHref(topicSection("external").path, locale) }, { name: t("account.title"), path: pageHref("/explorer/external/current-account", locale) }]} />
     <ExplorerPage containerQueries={false}>
       <PageHeader locale={locale} messages={presentation.messages} crumbs={crumbs} coverage={coverageLabel(presentation.messages, locale, min, max, lastReviewedAt)} />
       <CurrentAccount facts={client} gdp={gdp} sources={sources} gdpSources={gdpSources} lastReviewedAt={lastReviewedAt} siteOrigin={origin} />
@@ -183,7 +184,7 @@ export async function renderExternalPositionPage(locale: Locale, section: Extern
   const labels = Object.fromEntries(externalPositionSeries(section).map(series => [series.id, message(presentation.messages, `external.${key}.series.${series.id}`)]));
   const lastReviewedAt = facts.map(fact => fact.lastReviewedAt).sort().at(-1)!, origin = resolveSiteUrl();
   const t = (suffix: string) => message(presentation.messages, `external.${suffix}`);
-  const crumbs = [{ label: message(presentation.messages, "common.home"), href: pageHref("/", locale) }, { label: message(presentation.messages, "common.data") }, { label: t("hubTitle"), href: pageHref("/explorer/external", locale) }, { label: t(`${key}.title`) }];
+  const crumbs = [{ label: message(presentation.messages, "common.home"), href: pageHref("/", locale) }, { label: message(presentation.messages, "common.data"), href: pageHref(ALL_DATA_PATH, locale) }, { label: t("hubTitle"), href: pageHref(topicSection("external").href, locale) }, { label: t(`${key}.title`) }];
   return <I18nProvider {...clientPresentation(presentation)}>
     <JsonLd testId="explorer-dataset-json-ld" data={explorerDatasetJsonLd({
       locale, origin, path: href, datasetId: "external-flows", name: t(`${key}.title`), description: t(`${key}.summary`), firstYear: min, lastYear: max, dateModified: lastReviewedAt,
@@ -191,7 +192,7 @@ export async function renderExternalPositionPage(locale: Locale, section: Extern
       // The NBG's statistics; the % of GDP view divides by Geostat's GDP.
       sources: ["nbg", "geostat"],
     })} />
-    <BreadcrumbJsonLd items={[{ name: crumbs[0].label, path: pageHref("/", locale) }, { name: t("hubTitle"), path: pageHref("/explorer/external", locale) }, { name: t(`${key}.title`), path: pageHref(href, locale) }]} />
+    <BreadcrumbJsonLd items={[{ name: crumbs[0].label, path: pageHref("/", locale) }, { name: message(presentation.messages, "common.data"), path: pageHref(ALL_DATA_PATH, locale) }, { name: t("hubTitle"), path: pageHref(topicSection("external").path, locale) }, { name: t(`${key}.title`), path: pageHref(href, locale) }]} />
     <ExplorerPage containerQueries={false}>
       <PageHeader locale={locale} messages={presentation.messages} crumbs={crumbs} coverage={coverageLabel(presentation.messages, locale, min, max, lastReviewedAt)} />
       <ExternalPositionExplorer key={section} section={section} facts={client} labels={labels} sources={sources.filter(source => sourceIds.has(source.sourceId))} gdp={gdp} gdpSources={gdpSources} lastReviewedAt={lastReviewedAt} siteOrigin={origin} />

@@ -16,7 +16,7 @@ import { fiscalMetadata } from "../seo/metadata";
 import { explorerDatasetJsonLd } from "../seo/structuredData";
 import { resolveSiteUrl } from "../siteUrl";
 import { loadScienceCultureWorkbookSources, scienceCultureLabels } from "./science-culture-shared";
-import { topicSection } from "../navigation/navTree";
+import { topicSection, ALL_DATA_PATH } from "../navigation/navTree";
 
 const topicHref = (section: ScienceCultureTopicId) => SCIENCE_CULTURE_SECTIONS.find(item => item.id === section)!.href;
 
@@ -40,12 +40,12 @@ export async function renderScienceCulturePage(locale: Locale, section: ScienceC
   const t = (key: string) => message(presentation.messages, `scienceCulture.${key}`);
   const title = t(`page.${section}.title`), description = t(`page.${section}.summary`);
   const lastReviewedAt = data.facts.map(f => f.lastReviewedAt).sort().at(-1)!, origin = resolveSiteUrl();
-  const crumbs = [{ label: message(presentation.messages, "common.home"), href: pageHref("/", locale) }, { label: message(presentation.messages, "common.data") }, { label: t("title"), href: pageHref(topicSection("science-culture").href, locale) }, { label: title }];
+  const crumbs = [{ label: message(presentation.messages, "common.home"), href: pageHref("/", locale) }, { label: message(presentation.messages, "common.data"), href: pageHref(ALL_DATA_PATH, locale) }, { label: t("title"), href: pageHref(topicSection("science-culture").href, locale) }, { label: title }];
   // The measures the page shows, by their headings.
   const measures = [...new Set(series.map(({ heading }) => t(`heading.${heading}`)))];
   return <I18nProvider {...clientPresentation(presentation)}>
     <JsonLd testId="explorer-dataset-json-ld" data={explorerDatasetJsonLd({ locale, origin, path: href, datasetId: "science-culture", name: title, description, firstYear, lastYear, dateModified: lastReviewedAt, variableMeasured: measures })} />
-    <BreadcrumbJsonLd items={[{ name: crumbs[0].label, path: pageHref("/", locale) }, { name: t("title"), path: pageHref(topicSection("science-culture").path, locale) }, { name: title, path: pageHref(href, locale) }]} />
+    <BreadcrumbJsonLd items={[{ name: crumbs[0].label, path: pageHref("/", locale) }, { name: message(presentation.messages, "common.data"), path: pageHref(ALL_DATA_PATH, locale) }, { name: t("title"), path: pageHref(topicSection("science-culture").path, locale) }, { name: title, path: pageHref(href, locale) }]} />
     <ExplorerPage containerQueries={false}>
       <PageHeader locale={locale} messages={presentation.messages} crumbs={crumbs} coverage={coverageLabel(presentation.messages, locale, firstYear, lastYear, lastReviewedAt)} />
       <ScienceCultureExplorer key={section} section={section} facts={facts} breaks={breaks} labels={scienceCultureLabels(presentation.messages, series)} sources={sources} lastReviewedAt={lastReviewedAt} siteOrigin={origin} />

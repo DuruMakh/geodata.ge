@@ -20,6 +20,7 @@ import type { Locale, TemplateValues } from "../i18n/types";
 import { fiscalMetadata } from "../seo/metadata";
 import { resolveSiteUrl } from "../siteUrl";
 import { loadPopulationBasics, loadPopulationSources } from "./demography-population";
+import { ALL_DATA_PATH } from "../navigation/navTree";
 
 /** Georgia's marriage years: the page header's and the description's span. */
 const marriageYears = (facts: readonly { seriesId: string; geographyId: string; year: number }[]) => {
@@ -63,7 +64,7 @@ export async function renderDemographyMarriagesDivorcesPage(locale: Locale) {
   const title = t("marriagesTitle");
   const crumbs = [
     { label: message(messages, "common.home"), href: pageHref("/", locale) },
-    { label: message(messages, "common.data") },
+    { label: message(messages, "common.data"), href: pageHref(ALL_DATA_PATH, locale) },
     { label: t("title"), href: pageHref(DEMOGRAPHY_HUB_PATH, locale) },
     { label: title },
   ];
@@ -78,6 +79,7 @@ export async function renderDemographyMarriagesDivorcesPage(locale: Locale) {
       <BreadcrumbJsonLd
         items={[
           { name: crumbs[0].label, path: pageHref("/", locale) },
+          { name: message(messages, "common.data"), path: pageHref(ALL_DATA_PATH, locale) },
           { name: crumbs[2].label, path: pageHref(DEMOGRAPHY_HUB_PATH, locale) },
           { name: title, path: pageHref(MARRIAGES_DIVORCES_PATH, locale) },
         ]}

@@ -4,7 +4,7 @@ import enCommon from "../../lib/i18n/messages/en/common.json";
 import kaAllData from "../../lib/i18n/messages/ka/allData.json";
 import enAllData from "../../lib/i18n/messages/en/allData.json";
 import type { Locale } from "../../lib/i18n/types";
-import { NAV_GROUPS, NAV_TREE, groupOfTopic, groupPages } from "../../lib/navigation/navTree";
+import { NAV_GROUPS, NAV_TREE, PAGE_COUNT, groupOfTopic, groupPages } from "../../lib/navigation/navTree";
 import type { Place, PlaceEntry, PlaceIndex } from "../../lib/explorer/places/types";
 import { buildPlaceIndex } from "../../lib/explorer/places/buildPlaceIndex.server";
 import { latinToGeorgian, stem } from "../../lib/explorer/search/georgian";
@@ -89,7 +89,7 @@ const marked = (segments: Segment[]) => segments.filter((segment) => segment.mar
 
 describe("the fixture", () => {
   it("carries every page with its names and topic", () => {
-    expect(PAGES).toHaveLength(104);
+    expect(PAGES).toHaveLength(PAGE_COUNT);
     for (const page of PAGES) for (const value of [page.name.ka, page.name.en, page.topicName.ka, page.topicName.en, page.groupName.ka, page.groupName.en]) expect(value, page.href).toBeTruthy();
   });
 });

@@ -24,7 +24,7 @@ export type Place = {
   facts: PlaceFact[];
 };
 
-/** A place's page under one of the navigation's pages, with the latest figure its line states whatever range a reader picks. */
+/** A place's page under one of the navigation's pages, with its latest figure in the measure, unit and caption of that page's card. */
 export type PlaceEntry = {
   /** A place id, or `country.georgia`. */
   placeId: string;

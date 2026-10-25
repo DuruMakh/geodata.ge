@@ -108,6 +108,7 @@
   "health.latest.doctors-hospitals": "Doctors",
   "health.latest.illnesses": "New respiratory cases",
   "health.latest.causes-of-death": "Deaths per 1,000 people, Georgia",
+  "health.latest.deathRate": "Deaths per 1,000 people",
   "health.latest.area": "Deaths",
   "health.break.newCounting": "new counting",
   "health.area.georgia": "Georgia",

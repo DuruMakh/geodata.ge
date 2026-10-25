@@ -11,7 +11,7 @@ import { message } from "../i18n/messages";
 import type { Locale } from "../i18n/types";
 import { groupPages, navGroup, type GroupId } from "../navigation/navTree";
 import { fiscalMetadata } from "../seo/metadata";
-import { loadPopulationBasics } from "./demography-population";
+import { loadPopulationBasics } from "../explorer/populationBasics.server";
 import { loadTopicHubs, topicHubCoverage } from "./topicHubs.server";
 
 /** A Regions page's card shows its regions' spread. */

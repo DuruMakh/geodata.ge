@@ -38,6 +38,7 @@ import type { Locale, TemplateValues } from "../i18n/types";
 import { fiscalMetadata } from "../seo/metadata";
 import { resolveSiteUrl } from "../siteUrl";
 import { loadPopulationBasics, loadPopulationSources, loadTbilisiAreaLabel, populationSourceNote } from "./demography-population";
+import { ALL_DATA_PATH } from "../navigation/navTree";
 
 export type PopulationPlaceRoute = PlaceRoute;
 
@@ -120,7 +121,7 @@ export async function renderPopulationPlacePage(route: PopulationPlaceRoute, loc
   const region = highlights.kind === "municipality" ? highlights.region : null;
   const crumbs = [
     { label: message(messages, "common.home"), href: pageHref("/", locale) },
-    { label: message(messages, "common.data") },
+    { label: message(messages, "common.data"), href: pageHref(ALL_DATA_PATH, locale) },
     { label: t("title"), href: pageHref(DEMOGRAPHY_HUB_PATH, locale) },
     { label: populationTitle, href: pageHref(POPULATION_PATH, locale) },
     ...(region ? [{ label: placeLabel(region, locale), href: pageHref(populationPlaceHref(region.id), locale) }] : []),
@@ -157,6 +158,7 @@ export async function renderPopulationPlacePage(route: PopulationPlaceRoute, loc
       <BreadcrumbJsonLd
         items={[
           { name: crumbs[0].label, path: pageHref("/", locale) },
+          { name: message(messages, "common.data"), path: pageHref(ALL_DATA_PATH, locale) },
           { name: crumbs[2].label, path: pageHref(DEMOGRAPHY_HUB_PATH, locale) },
           { name: populationTitle, path: pageHref(POPULATION_PATH, locale) },
           ...(region ? [{ name: placeLabel(region, locale), path: pageHref(populationPlaceHref(region.id), locale) }] : []),

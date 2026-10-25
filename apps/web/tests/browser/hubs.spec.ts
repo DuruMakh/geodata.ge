@@ -45,6 +45,9 @@ test("the inflation section links all four live pages and the sidebar reaches Ov
   await topicCards(page, "inflation").first().click();
   await ready(page);
   await expect(page.getByTestId("inflation-overview-link")).toHaveAttribute("aria-current", "page");
+  // The page's own source note names both publishers (deep-review quality Q4: the footer that did is gone).
+  await expect(page.getByTestId("source-label")).toContainText("საქსტატი");
+  await expect(page.getByTestId("source-label")).toContainText("ეროვნული ბანკი");
   await expect(page.getByTestId("data-sidebar").getByText("მალე", { exact: true })).toHaveCount(0);
 
   // The Categories card reaches its page, and the sidebar leads back to Overview.
@@ -56,6 +59,14 @@ test("the inflation section links all four live pages and the sidebar reaches Ov
   await page.getByTestId("inflation-overview-link").click();
   await ready(page);
   await expect(page).toHaveURL(/\/explorer\/inflation\/overview/);
+});
+
+// Products draws its source note once its data has loaded; it credits Geostat's price survey alone.
+test("the Inflation products page credits Geostat in its source note", async ({ page }) => {
+  await page.goto("/en/explorer/inflation/products");
+  await ready(page);
+  await expect(page.getByTestId("source-label")).toContainText("Geostat");
+  await expect(page.getByTestId("source-label")).not.toContainText("National Bank");
 });
 
 test("the living standards section lists Income, Spending, Poverty and Inequality in that order", async ({ page }) => {

@@ -100,6 +100,7 @@ for (const prefix of ["", "/en"]) {
     await page.goto(`${prefix}/explorer/trade/overview`);
     await expect(page.getByTestId("trade-overview-link")).toHaveAttribute("aria-current", "page");
     await expect(page.getByRole("contentinfo")).toHaveCount(0);
+    await expect(page.getByTestId("source-label")).toContainText(prefix ? "Geostat" : "საქსტატი");
     await page.getByTestId("source-label").getByRole("link").click();
     await expect(page).toHaveURL(new RegExp(`${prefix}/methodology/trade$`));
   });

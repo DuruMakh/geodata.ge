@@ -2,6 +2,8 @@ export const TRADE_PRODUCT_MEASURES = ["trade.exports", "trade.imports"] as cons
 export type TradeProductMeasure = (typeof TRADE_PRODUCT_MEASURES)[number];
 export const TRADE_PRODUCT_BLOCKS = ["1995-1999", "2000-2014", "2015-2019", "2020-2025"] as const;
 export type TradeProductSourceBlock = (typeof TRADE_PRODUCT_BLOCKS)[number];
+/** The source block the Products pages show; the Products card reports the same coverage. */
+export const PRODUCT_SOURCE_BLOCK = "2020-2025" satisfies TradeProductSourceBlock;
 export const TRADE_PRODUCT_CATEGORIES = ["food_agriculture", "minerals_fuels", "chemicals_materials", "clothing_wood_paper", "metals_stone_glass", "machinery_electronics", "vehicles_transport", "other_products"] as const;
 export type TradeProductCategoryId = (typeof TRADE_PRODUCT_CATEGORIES)[number];
 export type TradeProductEntity = { id: string; sourceBlock: TradeProductSourceBlock; code: string; labelKa: string; sourceLabelEn: string; categoryId: TradeProductCategoryId; aliasesKa: string[]; aliasesEn: string[] };

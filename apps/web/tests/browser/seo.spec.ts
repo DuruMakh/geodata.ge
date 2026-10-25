@@ -1,6 +1,7 @@
 import { expect, test, type Locator, type Page } from "@playwright/test";
 import { MUNICIPALITY_ROUTES } from "../../lib/explorer/municipalityRoutes";
 import { DATASET_HUBS } from "../../lib/navigation/datasetHubs";
+import { NAV_GROUPS, groupPages } from "../../lib/navigation/navTree";
 import { computedCssColorAlpha } from "./focus-outline";
 import { TEST_BASE_URL } from "./test-base-url";
 
@@ -184,6 +185,33 @@ test("only third-party methodology source originals send a noindex header", asyn
   expect(methodologyPage.headers()["x-robots-tag"]).toBeUndefined();
 });
 
+// deep-review known #10: the place index All data's search fetches is data, not a page to list.
+test("the place index files send a noindex header, and All data does not", async ({ request }) => {
+  for (const locale of ["ka", "en"]) {
+    const response = await request.get(`${BASE_URL}/explorer-places.${locale}.json`);
+    expect(response.ok(), locale).toBe(true);
+    expect(response.headers()["x-robots-tag"], locale).toBe("noindex");
+  }
+  expect((await request.get(`${BASE_URL}/explorer`)).headers()["x-robots-tag"]).toBeUndefined();
+});
+
+// deep-review routing M3: a chart page's "მონაცემები" / "Data" crumb links to All data, and its structured trail has the
+// same Data level as a group page's (Home > Data > group or topic > page).
+test("a chart page of every group links its Data crumb to All data and lists it in its structured trail", async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 900 });
+  for (const prefix of ["", "/en"]) {
+    for (const group of NAV_GROUPS) {
+      const path = `${prefix}${groupPages(group)[0].href}`;
+      await page.goto(`${BASE_URL}${path}`);
+      const data = prefix ? "Data" : "მონაცემები";
+      await expect(page.locator('[data-testid="explorer-header"] nav:visible a', { hasText: data }), path).toHaveAttribute("href", `${prefix}/explorer`);
+      const structured = JSON.parse((await page.locator('[data-testid="breadcrumb-json-ld"]').textContent()) ?? "{}");
+      const items = structured.itemListElement.map((item: { name: string; item?: string }) => [item.name, item.item]);
+      expect(items[1], path).toEqual([data, `https://fiscal.ge${prefix}/explorer`]);
+    }
+  }
+});
+
 test("agent instructions publish a plain-text guide with working public links", async ({ request }) => {
   const response = await request.get(`${BASE_URL}/llms.txt`);
 
@@ -240,8 +268,8 @@ test("404 recovery keeps a real not-found response with useful, accessible desti
     const recovery = page.getByTestId("not-found-recovery");
     await expect(recovery).toContainText("მისამართი არ არსებობს ან გვერდი გადატანილია.");
     const links = recovery.getByRole("link");
-    // Home, the eight group pages and methodology.
-    await expect(links).toHaveCount(10);
+    // Home, the group pages and methodology.
+    await expect(links).toHaveCount(DATASET_HUBS.length + 2);
     for (const href of ["/", ...DATASET_HUBS.map(({ href }) => href), "/methodology"]) {
       await expect(recovery.locator(`[href=\"${href}\"]`)).toHaveCount(1);
     }
@@ -516,6 +544,7 @@ test("municipality breadcrumbs include the region in visible and structured hier
 
   expect(visibleLabels).toEqual([
     "მთავარი",
+    "მონაცემები",
     "ბიუჯეტი",
     "მუნიციპალიტეტები",
     "იმერეთი",
@@ -523,6 +552,7 @@ test("municipality breadcrumbs include the region in visible and structured hier
   ]);
   expect(structuredLabels).toEqual([
     "მთავარი",
+    "მონაცემები",
     "ბიუჯეტი",
     "მუნიციპალიტეტები",
     "იმერეთი",
@@ -539,6 +569,7 @@ test("Tbilisi municipality breadcrumbs distinguish the region from the city", as
 
   const expectedLabels = [
     "მთავარი",
+    "მონაცემები",
     "ბიუჯეტი",
     "მუნიციპალიტეტები",
     "თბილისის რეგიონი",

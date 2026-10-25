@@ -22,7 +22,7 @@ import { loadSourcedWorkbookSources } from "../methodology/workbookSources";
 import { fiscalMetadata } from "../seo/metadata";
 import { explorerDatasetJsonLd } from "../seo/structuredData";
 import { resolveSiteUrl } from "../siteUrl";
-import { topicSection } from "../navigation/navTree";
+import { topicSection, ALL_DATA_PATH } from "../navigation/navTree";
 
 /** The figure each topic page's latest line names, by the template's placeholder. */
 const LATEST_FIGURE: Record<EducationTopicId, string> = { universities: "students", vocational: "admitted" };
@@ -56,7 +56,7 @@ export async function renderEducationTopicPage(locale: Locale, section: Educatio
   const latest = facts.filter(f => f.indicatorId === series[0].id).sort((a, b) => a.year - b.year).at(-1)!;
   const crumbs = [
     { label: message(messages, "common.home"), href: pageHref("/", locale) },
-    { label: message(messages, "common.data") },
+    { label: message(messages, "common.data"), href: pageHref(ALL_DATA_PATH, locale) },
     { label: t("title"), href: pageHref(topicSection("education").href, locale) },
     { label: title },
   ];
@@ -65,7 +65,7 @@ export async function renderEducationTopicPage(locale: Locale, section: Educatio
       locale, origin, path: href, datasetId: "education", name: title, description, ...educationTemporalCoverage(section, min, max), dateModified: lastReviewedAt,
       variableMeasured: [...new Set(Object.values(headingLabels))],
     })} />
-    <BreadcrumbJsonLd items={[{ name: crumbs[0].label, path: pageHref("/", locale) }, { name: t("title"), path: pageHref(topicSection("education").path, locale) }, { name: title, path: pageHref(href, locale) }]} />
+    <BreadcrumbJsonLd items={[{ name: crumbs[0].label, path: pageHref("/", locale) }, { name: message(messages, "common.data"), path: pageHref(ALL_DATA_PATH, locale) }, { name: t("title"), path: pageHref(topicSection("education").path, locale) }, { name: title, path: pageHref(href, locale) }]} />
     <ExplorerPage containerQueries={false}>
       <PageHeader locale={locale} messages={messages} crumbs={crumbs} coverage={coverageLabel(messages, locale, period(min), period(max), lastReviewedAt)} />
       <EducationExplorer key={section} section={section} facts={facts}

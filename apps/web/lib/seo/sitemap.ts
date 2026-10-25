@@ -1,7 +1,7 @@
 import { loadServedTradeCompositionData } from "../data/tradeComposition/importTradeComposition";
 import type { MetadataRoute } from "next";
-import { loadServedGeneralGovernmentBalanceData, loadServedGovernmentDebtData, loadServedLandingData, loadServedMunicipalData } from "../data/servedData";
-import { ADJARA_REGION_ID } from "../data/municipal/types";
+import { loadServedExplorerData, loadServedGeneralGovernmentBalanceData, loadServedGovernmentDebtData, loadServedMunicipalData } from "../data/servedData";
+import { citedReviewedAt } from "../data/sources";
 import { loadServedInflationData } from "../data/inflation/importInflation";
 import { loadServedProductData } from "../data/inflation/importProducts";
 import { loadServedRegionalEconomyData } from "../data/regionalEconomies/importRegionalEconomies";
@@ -70,10 +70,8 @@ import { loadServedTradeDomesticData } from "../data/tradeDomestic/importTradeDo
 import { loadServedDemographyData } from "../data/demography/importDemography";
 import { LIVE_METHODOLOGY_IDS, METHODOLOGY_CONTENT } from "../methodology/catalog";
 import {
-  aggregateFactsForEntity,
-  applyAdjaraBudgetAdjustment,
   latestReviewedAtForMunicipalFacts,
-  regionFactsFor,
+  regionOwnFacts,
 } from "../explorer/municipalData";
 import { CITY_PAGE_PATHS } from "../explorer/inflationCityRoutes";
 import { placePagePaths, populationPlacePaths } from "../explorer/demographyPlaceRoutes";
@@ -92,7 +90,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const siteUrl = resolveSiteUrl();
   // By name, not by position: every result has the same shape, so a swapped pair would still typecheck.
   const data = await awaitNamed({
-    landing: loadServedLandingData(),
+    explorer: loadServedExplorerData(),
     municipal: loadServedMunicipalData(),
     governmentDebt: loadServedGovernmentDebtData(),
     generalGovernmentBalance: loadServedGeneralGovernmentBalanceData(),
@@ -133,7 +131,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     expenditureTypes: loadServedExpenditureTypesData(),
     taxBreaksRefunds: loadServedTaxBreaksRefundsData(),
   });
-  const { sourceDocuments } = data.landing;
+  const { sourceDocuments, facts: budgetFacts, adminFacts } = data.explorer;
   const { regions, municipalities, functionFacts, totalFacts, countryFunctionFacts, countryTotalFacts, adjaraBudgetAdjustments } = data.municipal;
   const debtFacts = data.governmentDebt.facts;
   const balanceFacts = data.generalGovernmentBalance.facts;
@@ -223,11 +221,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     .sort()
     .at(-1);
   const lastModified = lastReviewedAt ? new Date(lastReviewedAt) : undefined;
-  // The budget hub shows the debt and deficit cards beside the budget ones, and dates itself by all three.
-  const budgetHubReviewedAt = [lastReviewedAt, ...debtFacts.map((fact) => fact.lastReviewedAt), ...balanceFacts.map((fact) => fact.lastReviewedAt)]
-    .filter(Boolean)
-    .sort()
-    .at(-1);
+  // The Budget group page is dated as its header dates it (lib/pages/topicHubs.server.ts): the sources its budget, ministry and
+  // municipal rows cite, and every other dataset its eight cards read, Spending by type and Tax breaks and refunds included.
+  const budgetHubReviewedAt = citedReviewedAt(
+    sourceDocuments,
+    [...budgetFacts, ...adminFacts, ...functionFacts, ...totalFacts, ...countryFunctionFacts, ...countryTotalFacts],
+    [debtFacts, balanceFacts, expenditureTypeFacts, taxBreaksRefundsFacts],
+  );
   const methodologyLastModified = LIVE_METHODOLOGY_IDS.map(
     (id) => METHODOLOGY_CONTENT[id].reviewedAt,
   )
@@ -386,21 +386,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         totalFacts.filter((row) => row.municipalityCode === code),
       ),
     })),
+    // Each region roll-up is dated by its page's own facts: the members' function facts and the rolled-up totals, which for
+    // Adjara fold in the republic budget, reviewed later than any member municipality.
     ...regions.map((region) => {
-      const members = regionFactsFor(region.id, municipalities, functionFacts, totalFacts);
-      const rolled = aggregateFactsForEntity(region.id, members.functionFacts, members.totalFacts);
-      // Adjara's roll-up folds in the republic budget, which is reviewed later than
-      // any member municipality, so the raw member facts alone would date it too early.
-      const ownTotalFacts =
-        region.id === ADJARA_REGION_ID
-          ? applyAdjaraBudgetAdjustment(rolled.totalFacts, adjaraBudgetAdjustments)
-          : rolled.totalFacts;
+      const { members, own } = regionOwnFacts(region.id, municipalities, functionFacts, totalFacts, adjaraBudgetAdjustments);
       return {
         // Region ids carry a "region." prefix (e.g. "region.tbilisi"); the route
         // strips it, the same way .../region/[id]/page.tsx's own
         // generateStaticParams and prev/next hrefs already do.
         url: `${siteUrl}/explorer/municipalities/region/${region.id.replace("region.", "")}`,
-        lastModified: reviewedAt(members.functionFacts, ownTotalFacts),
+        lastModified: reviewedAt(members.functionFacts, own.totalFacts),
       };
     }),
   ];

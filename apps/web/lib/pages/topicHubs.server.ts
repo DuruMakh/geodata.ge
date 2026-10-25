@@ -26,7 +26,8 @@ import { loadServedMoneyBanksData, toClientMoneyBanksFact } from "../data/moneyB
 import { loadServedPovertyData, toClientPovertyFact } from "../data/poverty/importPoverty";
 import { loadServedRegionalEconomyData, REGIONAL_ECONOMY_REGIONS } from "../data/regionalEconomies/importRegionalEconomies";
 import { loadServedScienceCultureData, toClientScienceCultureFact } from "../data/scienceCulture/importScienceCulture";
-import { loadServedGeneralGovernmentBalanceData, loadServedGovernmentDebtData, loadServedLandingData, loadServedMunicipalData } from "../data/servedData";
+import { loadServedExplorerData, loadServedGeneralGovernmentBalanceData, loadServedGovernmentDebtData, loadServedMunicipalData } from "../data/servedData";
+import { citedReviewedAt } from "../data/sources";
 import { loadServedSocialData, toClientSocialFact } from "../data/social/importSocial";
 import { loadServedTaxBreaksRefundsData, toClientTaxBreaksRefundsFact } from "../data/taxBreaksRefunds/importTaxBreaksRefunds";
 import { loadServedTradeCompositionData, toClientTradeCompositionData } from "../data/tradeComposition/importTradeComposition";
@@ -34,6 +35,7 @@ import { loadServedTradeDomesticData, toClientTradeDomesticData } from "../data/
 import { loadServedTradeOverviewData, toClientTradeOverviewFact } from "../data/tradeOverview/importTradeOverview";
 import { loadServedTradePartnersData, toClientTradePartnersData } from "../data/tradePartners/importTradePartners";
 import { loadServedTradeProductsData, toClientTradeProductsData } from "../data/tradeProducts/importTradeProducts";
+import { PRODUCT_SOURCE_BLOCK } from "../data/tradeProducts/types";
 import { loadServedTradeServicesData, toClientTradeServicesData } from "../data/tradeServices/importTradeServices";
 import { loadServedTransportData, toClientTransportFact } from "../data/transport/importTransport";
 import { loadServedUnemploymentData, UNEMPLOYMENT_REGISTRY } from "../data/unemployment/importUnemployment";
@@ -77,9 +79,6 @@ import { wagesLabels } from "./wages-shared";
 // pages, All data and search all read a topic from here, so no figure is built twice. Each loader's presentation adds
 // `groups` for the card captions a group page shows.
 
-/** The source block the Products pages show; the hub reports the same coverage. */
-export const PRODUCT_SOURCE_BLOCK = "2020-2025";
-
 type Loaded = Omit<TopicHubData, "topic">;
 
 /**
@@ -98,16 +97,20 @@ function yearly(cards: HubCardModel[], years: readonly number[], reviewed: reado
 
 const LOADERS: Record<TopicId, (locale: Locale) => Promise<Loaded>> = {
   budget: async (locale) => {
-    const [presentation, { facts, sourceDocuments }, { countryTotalFacts }, { facts: debtFacts }, { facts: balanceFacts }, { facts: expenditureTypeFacts }, { facts: taxBreaksRefundsFacts }] = await Promise.all([
-      getPresentation(locale, ["main", "hub"], []), loadServedLandingData(), loadServedMunicipalData(), loadServedGovernmentDebtData(), loadServedGeneralGovernmentBalanceData(), loadServedExpenditureTypesData(),
+    const [presentation, { facts, adminFacts, sourceDocuments }, municipal, { facts: debtFacts }, { facts: balanceFacts }, { facts: expenditureTypeFacts }, { facts: taxBreaksRefundsFacts }] = await Promise.all([
+      getPresentation(locale, ["main", "hub"], []), loadServedExplorerData(), loadServedMunicipalData(), loadServedGovernmentDebtData(), loadServedGeneralGovernmentBalanceData(), loadServedExpenditureTypesData(),
       loadServedTaxBreaksRefundsData(),
     ]);
+    const { functionFacts, totalFacts, countryFunctionFacts, countryTotalFacts } = municipal;
     const municipalTotals = new Map<number, number>();
     for (const row of countryTotalFacts) municipalTotals.set(row.year, row.publicTotalGel);
     const expenditureTypeTotals = new Map(expenditureTypeFacts.filter((fact) => fact.seriesId === EXPENDITURE_TYPES_TOTAL && fact.measure === "nominal").map((fact) => [fact.year, fact.value]));
     const refundTotals = new Map(taxBreaksRefundsFacts.filter((fact) => fact.indicatorId === "tax_refunds.total").map(toClientTaxBreaksRefundsFact).map((fact) => [fact.year, fact.value]));
     const cards = buildHubCards(facts, municipalTotals, debtFacts, balanceFacts, presentation, expenditureTypeTotals, refundTotals, true);
-    return yearly(cards, facts.map((fact) => fact.year), [...sourceDocuments.map((source) => source.lastReviewedAt), ...debtFacts.map((fact) => fact.lastReviewedAt), ...balanceFacts.map((fact) => fact.lastReviewedAt)]);
+    // Dated by the sources its budget, ministry and municipal rows cite and by every other dataset its eight cards read, as the
+    // sitemap dates /explorer/budget (lib/seo/sitemap.ts).
+    const reviewed = citedReviewedAt(sourceDocuments, [...facts, ...adminFacts, ...functionFacts, ...totalFacts, ...countryFunctionFacts, ...countryTotalFacts], [debtFacts, balanceFacts, expenditureTypeFacts, taxBreaksRefundsFacts]);
+    return yearly(cards, facts.map((fact) => fact.year), [reviewed]);
   },
   economy: async (locale) => {
     const [{ facts }, presentation, sectors, regional, expenditure] = await Promise.all([

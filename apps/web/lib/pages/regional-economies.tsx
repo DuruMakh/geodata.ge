@@ -22,6 +22,7 @@ import { resolveSiteUrl } from "../siteUrl";
 import { ExplorerHeading } from "../../components/explorer-shell/explorer-heading";
 import { ExplorerPage } from "../../components/explorer-shell/explorer-page";
 import { coverageLabel, updatedDate } from "../explorer/coverageLabel";
+import { ALL_DATA_PATH } from "../navigation/navTree";
 
 /** The years, counts and review date the regional copy quotes, read from the loaded facts (AGENTS.md UI Contract). */
 export function regionalCoverage(facts: readonly ServedRegionalEconomyObservation[], locale: Locale) {
@@ -73,7 +74,7 @@ export async function renderRegionalEconomiesPage(locale: Locale) {
   const description = message(presentation.messages, "regionalEconomies.description", params);
   const crumbs = [
     { label: message(presentation.messages, "common.home"), href: pageHref("/", locale) },
-    { label: message(presentation.messages, "common.data") },
+    { label: message(presentation.messages, "common.data"), href: pageHref(ALL_DATA_PATH, locale) },
     { label: message(presentation.messages, "common.economy"), href: pageHref("/explorer/economy", locale) },
     { label: title },
   ];
@@ -81,6 +82,7 @@ export async function renderRegionalEconomiesPage(locale: Locale) {
     <I18nProvider {...clientPresentation(presentation)}>
       <BreadcrumbJsonLd items={[
         { name: crumbs[0].label, path: pageHref("/", locale) },
+        { name: message(presentation.messages, "common.data"), path: pageHref(ALL_DATA_PATH, locale) },
         { name: crumbs[2].label, path: pageHref("/explorer/economy", locale) },
         { name: title, path: pageHref("/explorer/economy/regions", locale) },
       ]} />

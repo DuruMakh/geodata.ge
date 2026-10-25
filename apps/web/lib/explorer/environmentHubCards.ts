@@ -2,7 +2,7 @@ import { ENVIRONMENT_CITIES, type ClientEnvironmentFact } from "../data/environm
 import type { Presentation } from "../i18n/types";
 import { message } from "../i18n/messages";
 import { INK } from "./colors";
-import { ENVIRONMENT_LATEST_ID, ENVIRONMENT_SECTIONS, environmentCoverage, environmentValueLabel, environmentValueUnit, type EnvironmentSectionId, type EnvironmentTopicId } from "./environment";
+import { ENVIRONMENT_LATEST_ID, ENVIRONMENT_SECTIONS, environmentCoverage, environmentValueLabel, environmentValueUnit, wasteCollectedLabel, type EnvironmentSectionId, type EnvironmentTopicId } from "./environment";
 import { environmentCityHeadline, environmentCityHref, environmentHighestPm10 } from "./environmentCities";
 import { formatInUnit } from "./format";
 import { coverageRange } from "./coverageLabel";
@@ -56,7 +56,7 @@ export function buildEnvironmentHubCards(facts: readonly ClientEnvironmentFact[]
       }
       case "waste": {
         const { fact } = valueOf("environment.waste.collected.georgia");
-        return { seriesId: fact.indicatorId, line: { value: `${formatInUnit(fact.value / 1000, environmentValueUnit(2))} ${t("unit.millionTonnes")}`, caption: t("latest.waste") }, years: yearsOf(facts, "environment.waste.collected.") };
+        return { seriesId: fact.indicatorId, line: { value: wasteCollectedLabel(fact, t), caption: t("latest.waste") }, years: yearsOf(facts, "environment.waste.collected.") };
       }
       case "forests":
         return { seriesId: "environment.forest.timber_cut.georgia", line: { value: valueOf("environment.forest.timber_cut.georgia").value, caption: t("latest.forests") }, years: yearsOf(facts, "environment.forest.timber_cut.") };

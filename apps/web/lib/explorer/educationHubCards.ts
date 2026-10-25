@@ -13,8 +13,8 @@ const HEADLINE: Record<EducationSectionId, string> = {
   schools: "education.pupils_national.total", kindergartens: "education.kg_children.total", universities: "education.he_students.total", vocational: "education.vet_admitted.total",
 };
 
-/** What each page's line counts, the card's caption. */
-const CAPTION: Record<EducationSectionId, string> = {
+/** What each page's line counts, the card's caption; the Schools and Kindergartens place rows share it. */
+export const EDUCATION_CAPTION: Record<EducationSectionId, string> = {
   schools: "groups.headline.education.schools", kindergartens: "groups.caption.kindergartenChildren", universities: "groups.headline.education.universities", vocational: "groups.caption.vocationalAdmitted",
 };
 
@@ -31,7 +31,7 @@ export function buildEducationHubCards(facts: readonly ClientEducationFact[], pr
       index: String(index + 1).padStart(2, "0"), title: message(presentation.messages, section.labelKey), description: t(`page.${section.id}.summary`),
       href: section.href, comingSoon: false,
       series: annualSeries(headline, min, max), seriesColor: INK, footer: `${period(last.year)} · ${value} · ${period(min)}–${period(max)}`,
-      latest: { value, period: period(last.year), caption: message(presentation.messages, CAPTION[section.id]) }, years: coverageRange(period(min), period(max)),
+      latest: { value, period: period(last.year), caption: message(presentation.messages, EDUCATION_CAPTION[section.id]) }, years: coverageRange(period(min), period(max)),
     };
   });
 }

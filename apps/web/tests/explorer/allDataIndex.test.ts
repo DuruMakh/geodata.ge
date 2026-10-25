@@ -18,7 +18,7 @@ describe.each(["ka", "en"] as const)("the All data pages (%s)", async (locale) =
   const pages = buildSearchPages(await loadTopicHubs(locale, TOPICS), messagesKa, messagesEn);
 
   it("lists every navigation page once, with its group, topic and names in both languages", () => {
-    expect(pages).toHaveLength(104);
+    expect(pages).toHaveLength(PAGE_COUNT);
     expect(pages).toHaveLength(PAGE_COUNT);
     expect(new Set(pages.map((page) => page.href)).size).toBe(PAGE_COUNT);
     for (const page of pages) {

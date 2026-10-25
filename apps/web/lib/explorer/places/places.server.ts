@@ -1,7 +1,7 @@
 import { loadServedDemographyData } from "../../data/demography/importDemography";
 import { loadServedMunicipalData } from "../../data/servedData";
 import type { Locale } from "../../i18n/types";
-import { loadPopulationBasics } from "../../pages/demography-population";
+import { loadPopulationBasics } from "../populationBasics.server";
 import { GEORGIA_PLACE_ID, TBILISI_PLACE_ID } from "../demographyAreas";
 import { populationMunicipalityCodeForSlug, populationMunicipalitySlugs } from "../demographyPlaceRoutes";
 import { POPULATION_PATH } from "../demographyRoutes";

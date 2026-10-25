@@ -36,6 +36,8 @@ for (const [prefix, width] of [["", 390], ["/en", 1440]] as const) {
       await expect(page.getByTestId("unemployment-composition")).toHaveCount(section === "overview" ? 1 : 0);
       await expect(page.getByTestId("unemployment-national-tabs")).toHaveCount(section === "overview" ? 1 : 0);
       await expect(page.getByRole("contentinfo")).toHaveCount(0);
+      // The page's own source note credits the survey to Geostat (Regions, a map, has the region index's note).
+      await expect(page.getByTestId(section === "regions" ? "regional-source-note" : "source-label")).toContainText(prefix ? "Geostat" : "საქსტატი");
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), section).toBe(true);
     }
     expect(errors).toEqual([]);

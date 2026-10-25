@@ -16,8 +16,8 @@ const HEADLINE: Record<SocialSectionId, string> = {
   "funded-pension": "social.funded_pension.savings.amount",
 };
 
-/** Who a count counts, the card's caption: the page's line names them. The money cards' titles already say what their figure is. */
-const CAPTION: Partial<Record<SocialSectionId, string>> = {
+/** Who a count counts, the card's caption: the page's line names them; the Pensions and Subsistence allowance place rows share it. The money cards' titles already say what their figure is. */
+export const SOCIAL_CAPTION: Partial<Record<SocialSectionId, string>> = {
   pensions: "groups.headline.health.pensions", "subsistence-allowance": "groups.caption.allowanceFamilies", "social-package": "groups.caption.socialPackage",
 };
 
@@ -33,7 +33,7 @@ export function buildSocialHubCards(facts: readonly ClientSocialFact[], presenta
     // Money is served in million GEL.
     const value = section.id === "social-payments" || section.id === "funded-pension"
       ? `${formatInUnit(last.value / 1000, { divisor: 1, label: "", decimals: 2 })} ${message(presentation.messages, "groups.unit.billionGel")}` : formatInUnit(last.value, UNIT_PERSONS);
-    const caption = CAPTION[section.id];
+    const caption = SOCIAL_CAPTION[section.id];
     return {
       index: String(HEALTH_SECTIONS.length + index + 1).padStart(2, "0"), title: message(presentation.messages, section.labelKey), description: t(`page.${section.id}.summary`),
       href: section.href, comingSoon: false,

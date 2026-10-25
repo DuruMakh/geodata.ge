@@ -35,7 +35,7 @@ import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { ChartShareButton } from "../explorer-shell/chart-share-button";
 import { useHashState } from "../explorer-shell/use-hash-state";
-import { topicSection } from "../../lib/navigation/navTree";
+import { topicSection, ALL_DATA_PATH } from "../../lib/navigation/navTree";
 
 // Inflation overview (spec §6): the GDP overview's centred tabs over the Budget
 // explorers' workspace — chart or monthly table, range strip and series panel.
@@ -123,7 +123,7 @@ export function InflationOverview({ facts, sourceIdBySeriesMeasure, lastReviewed
         messages={messages}
         crumbs={[
           { label: message(messages, "common.home"), href: pageHref("/", locale) },
-          { label: message(messages, "common.data") },
+          { label: message(messages, "common.data"), href: pageHref(ALL_DATA_PATH, locale) },
           { label: message(messages, "common.inflation"), href: pageHref(topicSection("inflation").href, locale) },
           { label: t("heading") },
         ]}

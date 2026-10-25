@@ -34,6 +34,18 @@ export function referencedSourceIds(rows: readonly { sourceId: string }[]): Set<
   return referenced;
 }
 
+/**
+ * The newest review date among the source documents the `citing` rows cite (`referencedSourceIds`) and the `datasets` rows'
+ * own review dates; "" when there is none. A topic dated this way moves only when a source behind its own figures does.
+ */
+export function citedReviewedAt(sourceDocuments: readonly SourceDocumentRow[], citing: readonly { sourceId: string }[], datasets: readonly (readonly { lastReviewedAt: string }[])[] = []): string {
+  const cited = referencedSourceIds(citing);
+  let latest = "";
+  for (const source of sourceDocuments) if (cited.has(source.sourceId) && source.lastReviewedAt > latest) latest = source.lastReviewedAt;
+  for (const rows of datasets) for (const row of rows) if (row.lastReviewedAt > latest) latest = row.lastReviewedAt;
+  return latest;
+}
+
 export async function loadSourceDocuments(relativePath: string): Promise<SourceDocumentRow[]> {
   const records = await readCsvRecords(relativePath);
   const sourceIds = new Set<string>();
