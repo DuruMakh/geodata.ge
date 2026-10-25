@@ -59,11 +59,6 @@ type SentenceModels = {
 type SocietyModels = { ageing: AgeingChapter; youthJobs: YouthJobsChapter; wageGap: WageGapChapter; trade: TradeChapter; deaths: DeathsChapter };
 
 const billions = (valueGel: number) => formatInUnit(valueGel, UNIT_BN);
-// Whole numbers the way the board writes them: Georgian groups thousands with a space ("2 165"), English with a comma.
-const grouped = (value: number, locale: Presentation["locale"]) => {
-  const text = formatInUnit(value, UNIT_PERSONS);
-  return locale === "ka" ? text.replaceAll(",", " ") : text;
-};
 
 function tbilisiSharePhrase(share: number): string {
   if (share < 0.25) return "quarterLess";
@@ -124,7 +119,7 @@ export function buildChapterSentences({ spending, revenue, municipal, deficit }:
 }
 
 export function buildSocietySentences({ ageing, youthJobs, wageGap, trade, deaths }: SocietyModels, presentation: Presentation): SocietySentences {
-  const { messages, locale } = presentation;
+  const { messages } = presentation;
   const text = (key: string, values?: Record<string, string | number>) => message(messages, key, values);
 
   const unknownIn = oneInN(deaths.unknownShare);
@@ -143,7 +138,7 @@ export function buildSocietySentences({ ageing, youthJobs, wageGap, trade, death
     }),
     wageGap: text("landing.sentence.wageGap", {
       year: wageGap.year,
-      average: grouped(wageGap.average, locale),
+      average: formatInUnit(wageGap.average, UNIT_PERSONS),
       ratio: formatShare(wageGap.ratio, false, 0),
     }),
     trade: text("landing.sentence.trade", {
@@ -154,7 +149,7 @@ export function buildSocietySentences({ ageing, youthJobs, wageGap, trade, death
     }),
     deaths: text("landing.sentence.deaths", {
       year: deaths.year,
-      total: grouped(deaths.total, locale),
+      total: formatInUnit(deaths.total, UNIT_PERSONS),
       pct: formatShare(deaths.top.share, false, 0),
       cause: text(`landing.deaths.cause.${deaths.top.id}`),
       unknown: unknownIn === null ? text("landing.deaths.share", { pct: formatShare(deaths.unknownShare, false, 0) }) : text(`landing.deaths.oneIn.${unknownIn}`),
