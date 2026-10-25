@@ -18,8 +18,9 @@ import { loadReviewedSourceManifest } from "../methodology/sourceManifest";
 import { fiscalMetadata } from "../seo/metadata";
 import { explorerDatasetJsonLd } from "../seo/structuredData";
 import { resolveSiteUrl } from "../siteUrl";
-import { INFLATION_HUB_PATH, inflationRepositoryRoot, inflationWorkbookSources } from "./inflation-shared";
+import { inflationRepositoryRoot, inflationWorkbookSources } from "./inflation-shared";
 import { loadInflationPageData } from "./inflationPageData";
+import { ALL_DATA_PATH, topicSection } from "../navigation/navTree";
 
 const CATEGORIES_PATH = "/explorer/inflation/categories";
 
@@ -64,7 +65,8 @@ export async function renderInflationCategories(locale: Locale) {
       <BreadcrumbJsonLd
         items={[
           { name: t("common.home"), path: pageHref("/", locale) },
-          { name: t("common.inflation"), path: pageHref(INFLATION_HUB_PATH, locale) },
+          { name: t("common.data"), path: pageHref(ALL_DATA_PATH, locale) },
+          { name: t("common.inflation"), path: pageHref(topicSection("inflation").path, locale) },
           { name: t("inflation.categoriesHeading"), path: pageHref(CATEGORIES_PATH, locale) },
         ]}
       />

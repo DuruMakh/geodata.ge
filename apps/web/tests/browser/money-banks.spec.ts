@@ -2,6 +2,7 @@ import { expect, test, type Page } from "@playwright/test";
 import ExcelJS from "exceljs";
 import { moneyBanksViewSeries, type MoneyBanksTopicId } from "../../lib/explorer/moneyBanks";
 import { loadMoneyBanksCsv, yearSpan } from "../helpers/money-banks-csv";
+import { topicCards } from "./group-cards";
 
 const pressed = (id: string) => `[data-series-id="${id}"] [data-testid="series-row-toggle"]`;
 /** The hub's cards in order; Loans by region is a map and list of area pages, so it has no series list. */
@@ -30,12 +31,13 @@ async function cell(page: Page, label: string, year: number) {
 
 // Structure once per locale; page overflow at 390, 768 and 1440px is in the layout pass of mobile-fit-charts.spec.ts.
 for (const prefix of ["", "/en"]) {
-  test(`money and banks hub and pages render ${prefix || "ka"}`, async ({ page }) => {
+  test(`money and banks section and pages render ${prefix || "ka"}`, async ({ page }) => {
     const errors: string[] = []; page.on("pageerror", error => errors.push(error.message));
-    await page.goto(`${prefix}/explorer/money`);
-    const hub = page.getByTestId("money-hub");
-    await expect(hub.locator("a")).toHaveCount(SECTIONS.length);
-    expect(await hub.locator("a").evaluateAll(links => links.map(link => link.getAttribute("href")))).toEqual(SECTIONS.map(section => `${prefix}/explorer/money/${section}`));
+    // The old hub is the section #t-money of the Prices and money page now.
+    await page.goto(`${prefix}/explorer/prices`);
+    const hub = topicCards(page, "money");
+    await expect(hub).toHaveCount(SECTIONS.length);
+    expect(await hub.evaluateAll(links => links.map(link => link.getAttribute("href")))).toEqual(SECTIONS.map(section => `${prefix}/explorer/money/${section}`));
     for (const section of SECTIONS) {
       await page.goto(`${prefix}/explorer/money/${section}`);
       await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");

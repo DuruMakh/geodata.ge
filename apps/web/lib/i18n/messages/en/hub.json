@@ -4,14 +4,12 @@
   "hub.revenueDescription": "Taxes, grants and other receipts across years.",
   "hub.taxBreaksRefundsDescription": "Tax the state gives up through tax breaks, and overpaid tax it pays back.",
   "hub.taxBreaksRefundsFooter": "{year} · Refunds {amount}",
+  "hub.taxBreaksRefundsCaption": "Refunds",
   "hub.analysisDescription": "One year at a glance — composition, rankings and every GEL 100.",
   "hub.debtDescription": "Government debt stock, repayments and interest rates.",
   "hub.deficitDescription": "General government deficit or surplus — share of GDP and nominal GEL.",
   "hub.municipalDescription": "{count} municipal budget units — where local budgets are spent.",
   "hub.analysisFooter": "{year} · {count} categories",
   "hub.deficitFooter": "{year} · {share} of GDP",
-  "hub.metaTitle": "Georgia budget data | Fiscal.ge",
-  "hub.metaDescription": "Verified data on Georgia’s budget: receipts, expenditure, municipalities, debt, deficit and single-year analysis.",
-  "hub.heading": "Georgia’s budget",
-  "hub.introduction": "Budget, debt and deficit data for Georgia"
+  "hub.deficitCaption": "of GDP"
 }

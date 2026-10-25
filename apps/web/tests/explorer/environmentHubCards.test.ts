@@ -22,11 +22,16 @@ const SOURCES = ENVIRONMENT_SOURCES.map(sourceId => ({
 test("the hub has seven cards in page order, each following its page's headline series", async () => {
   const cards = buildEnvironmentHubCards(facts, await presentation());
   expect(cards.map(c => c.title)).toEqual(["Greenhouse gases", "Air pollution", "City air quality", "Temperature and rain", "Water", "Waste", "Forests"]);
-  expect(cards[0].footer).toBe("2022 · 20.1 · 2000–2022");
-  expect(cards[1].footer).toBe("2024 · 86.4 · 2013–2024");
-  expect(cards[2].footer).toBe("2025 · 51 · 2019–2025");
-  expect(cards[4].footer).toBe("2025 · 869.1 · 2015–2025");
-  expect(cards[6].footer).toBe("2024 · 376,215 · 2010–2024");
+  // Each card states its page's line: the figure in the page's unit (joined by a no-break space where its page prints one), the
+  // line's measure and the years the page covers.
+  expect(cards.map(c => c.footer)).toEqual([
+    "2022 · 20.1\u00a0million t CO₂ eq. · 2000–2022", "2024 · 86.4\u00a0thousand tonnes · 2013–2024", "2025 · 51\u00a0µg/m³ · 2005–2025", "2024 · 10.3°C · 1990–2024",
+    "2025 · 64.4% · 2015–2025", "2024 · 1.18 million tonnes · 2015–2024", "2024 · 376,215\u00a0m³ · 2010–2024",
+  ]);
+  expect(cards.map(c => c.latest?.caption ?? null)).toEqual([null, "Carbon monoxide", "Rustavi, fine dust (PM10)", "Georgia", "Water lost in pipes", "Waste collected", "Timber cut"]);
+  // City air quality follows the station with the highest PM10 average; Water the share lost in pipes, as their pages' lines do.
+  expect(cards[2].series!.at(-1)).toBe(51);
+  expect(cards[4].series!.at(-1)).toBe(64.4);
   // Temperature and rain print 1990 and 1995, then 2000 on: the years between are gaps in the sparkline.
   expect(cards[3].series!.slice(0, 11).map(v => v === null)).toEqual([false, true, true, true, true, false, true, true, true, true, false]);
   expect(cards.every(c => c.href?.startsWith("/explorer/environment/") && !c.comingSoon)).toBe(true);

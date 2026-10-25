@@ -3,20 +3,26 @@ import { renderExplorerLayout } from "../../lib/pages/explorer-layout";
 import { renderPageMarkup } from "../helpers/render-localized";
 
 const route = vi.hoisted(() => ({ pathname: "/en/explorer/demography/population" }));
-vi.mock("next/navigation", () => ({ usePathname: () => route.pathname }));
+vi.mock("next/navigation", () => ({ usePathname: () => route.pathname, useRouter: () => ({ push: () => {} }) }));
 
 const render = async (pathname: string, locale: "ka" | "en" = "en") => {
   route.pathname = pathname;
   return renderPageMarkup(locale, await renderExplorerLayout(locale, null));
 };
 
-describe("sidebar demography group", () => {
+describe("sidebar Demography group", () => {
   it("opens with the live pages nested and the current page marked", async () => {
     const markup = await render("/en/explorer/demography/population");
-    expect(markup).toContain('data-testid="demography-link"');
+    expect(markup).toContain('data-testid="group-panel-demography"');
+    expect(markup).toMatch(/data-testid="group-toggle-demography"[^>]*aria-expanded="true"/);
+    // The current group carries the accent border; its link is current only on the group page itself.
+    const groupLink = /<a\b[^>]*data-testid="group-link-demography"[^>]*>/.exec(markup)![0];
+    expect(groupLink).toContain('href="/en/explorer/demography"');
+    expect(groupLink).toContain("shadow-[inset_2px_0_0_var(--accent)]");
+    expect(groupLink).not.toContain("aria-current");
     expect(markup).toContain('data-testid="demography-population-link" aria-current="page"');
     expect(markup).toContain('data-testid="demography-age-sex-link"');
-    expect(markup).toContain("Unemployment");
+    expect(markup).toContain("Labour market");
     expect((markup.match(/Coming soon/g) ?? []).length).toBe(0);
   });
 
@@ -54,13 +60,13 @@ describe("sidebar demography group", () => {
     ] as const) {
       const markup = await render(pathname, locale);
       expect(markup, pathname).toContain('data-testid="demography-population-link" aria-current="page"');
-      expect(markup, pathname).not.toContain('data-testid="demography-link" aria-current="page"');
+      expect(markup, pathname).not.toMatch(/data-testid="group-link-demography"[^>]*aria-current="page"/);
     }
   });
 
-  it("marks the hub link current on the hub and nests the live pages", async () => {
+  it("marks the group link current on the group page and nests the live pages", async () => {
     const markup = await render("/en/explorer/demography");
-    expect(markup).toContain('data-testid="demography-link" aria-current="page"');
+    expect(markup).toMatch(/data-testid="group-link-demography"[^>]*aria-current="page"/);
     expect(markup).toContain('data-testid="demography-population-link"');
     // The match runs one way: a place page's path contains the Population path, the hub's address does not.
     expect(markup).not.toContain('data-testid="demography-population-link" aria-current="page"');
@@ -68,7 +74,7 @@ describe("sidebar demography group", () => {
 
   it("stays closed on other sections and keeps the budget group out of demography", async () => {
     const markup = await render("/en/explorer/economy");
-    expect(markup).toContain('data-testid="demography-link"');
+    expect(markup).toContain('data-testid="group-link-demography"');
     expect(markup).not.toContain('data-testid="demography-population-link"');
     const onDemography = await render("/en/explorer/demography/population");
     expect(onDemography).not.toContain('data-testid="section-link-expenditure"');

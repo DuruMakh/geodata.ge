@@ -5,7 +5,7 @@ import { useCallback, useId, useRef, useState } from "react";
 import type { ClientInternetFact } from "../../lib/data/internet/types";
 import type { MunicipalRegion } from "../../lib/data/municipal/types";
 import { INTERNET_PERCENT, internetPercent, internetSeriesLabel, serializeInternetHash, type InternetSeriesModel, type InternetTranslate } from "../../lib/explorer/internet";
-import { INTERNET_HOMES_HREF, buildInternetAreaModel, changeInternetAreaSelection, internetAreaCoverage, internetAreaOfMapId, internetAreaSelectionHash, internetMapId, internetRegionHref, parseInternetAreaHash, type InternetArea } from "../../lib/explorer/internetAreas";
+import { INTERNET_HOMES_HREF, buildInternetAreaModel, changeInternetAreaSelection, internetAreaCoverage, internetAreaLatest, internetAreaOfMapId, internetAreaSelectionHash, internetMapId, internetRegionHref, parseInternetAreaHash, type InternetArea } from "../../lib/explorer/internetAreas";
 import { buildInternetWorkbookExportModel } from "../../lib/explorer/internetWorkbook";
 import { updatedDate } from "../../lib/explorer/coverageLabel";
 import { MISSING, formatInUnit } from "../../lib/explorer/format";
@@ -63,7 +63,7 @@ export function InternetAreaExplorer({ area, facts, labels, areaLabels, sources,
   // The table's total is the area's own homes with internet.
   const total = rows.find(row => row.itemId === model.series[0].id) ?? null;
   // The latest-value line is the page's headline: its own area's homes with internet, whatever is chosen below.
-  const latest = facts.filter(f => f.indicatorId === model.series[0].id).sort((a, b) => a.year - b.year).at(-1)!;
+  const latest = internetAreaLatest(area, facts);
   const areaName = areaLabels[area];
   const title = t("page.area.regionTitle", { region: areaName });
   const chartLabel = `${t("heading.homes").split(" · ")[0]} · ${areaName}`;

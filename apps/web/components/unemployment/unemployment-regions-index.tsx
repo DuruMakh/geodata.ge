@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import type { RegionMapModel } from "../../lib/explorer/regionalEconomyMap";
+import { unemploymentRegionsNationalRate } from "../../lib/explorer/unemployment";
 import { unemploymentRegionHref } from "../../lib/explorer/unemploymentRegionRoutes";
 import { formatShare } from "../../lib/explorer/format";
 import { message } from "../../lib/i18n/messages";
@@ -28,7 +29,7 @@ export function UnemploymentRegionsIndex({ model, explorer }: { model: RegionMap
   const t = (key: string) => message(messages, `unemployment.${key}`);
   // An in-app move to the same path drops the hash without a hashchange event, so the click leaves comparison itself.
   if (comparison) return <><Link href={pageHref("/explorer/unemployment/regions", locale)} prefetch={false} onClick={() => setComparison(false)} className="mb-4 inline-block text-[12px] text-[var(--accent)] underline underline-offset-4">{message(messages, "regionalEconomies.allRegions")}</Link><UnemploymentExplorer {...explorer} /></>;
-  const national = explorer.facts.find(fact => fact.dimension === "national" && fact.indicatorId === "unemployment_rate" && fact.year === model.year);
+  const national = unemploymentRegionsNationalRate(explorer.facts, model.year);
   const percent = (value: number) => formatShare(value / 100);
   return <div data-testid="unemployment-regions-index" className="@container">
     <ExplorerHeading>{t("page.regions.title")}</ExplorerHeading>

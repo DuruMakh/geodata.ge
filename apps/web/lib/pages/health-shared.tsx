@@ -6,7 +6,7 @@ import { BreadcrumbJsonLd } from "../../components/seo/breadcrumb-json-ld";
 import type { HealthArea, HealthFact } from "../data/health/types";
 import type { MunicipalRegion } from "../data/municipal/types";
 import { REGIONAL_ECONOMY_REGIONS } from "../data/regionalEconomies/importRegionalEconomies";
-import { HEALTH_HUB_PATH, HEALTH_SECTIONS, type HealthSectionId } from "../explorer/health";
+import { HEALTH_SECTIONS, type HealthSectionId } from "../explorer/health";
 import { HEALTH_DEATH_AREAS } from "../explorer/healthDeaths";
 import { coverageLabel } from "../explorer/coverageLabel";
 import { getMessages } from "../i18n/messages.server";
@@ -20,6 +20,7 @@ import { loadSourcedWorkbookSources, type SourcedWorkbookPublicSource } from "..
 import { fiscalMetadata } from "../seo/metadata";
 import { explorerDatasetJsonLd } from "../seo/structuredData";
 import { resolveSiteUrl } from "../siteUrl";
+import { topicSection, ALL_DATA_PATH } from "../navigation/navTree";
 
 // Shared by the health page modules. The national pages, the causes-of-death index and the area pages are separate
 // modules, so each ships only its own explorer: keep explorer components out of this file.
@@ -66,8 +67,8 @@ export function renderHealthFrame({ locale, presentation, path: href, title, des
   const hubTitle = message(messages, "health.title"), home = message(messages, "common.home");
   const years = facts.map(f => f.year), firstYear = Math.min(...years), lastYear = Math.max(...years);
   const lastReviewedAt = facts.map(f => f.lastReviewedAt).sort().at(-1)!, origin = resolveSiteUrl();
-  const parents: { label: string; path: `/${string}` }[] = [{ label: hubTitle, path: HEALTH_HUB_PATH }, ...(section ? [section] : [])];
-  const crumbs = [{ label: home, href: pageHref("/", locale) }, { label: message(messages, "common.data") }, ...parents.map(parent => ({ label: parent.label, href: pageHref(parent.path, locale) })), { label: crumb }];
+  const parents: { label: string; href: `/${string}`; path: `/${string}` }[] = [{ label: hubTitle, ...topicSection("health") }, ...(section ? [{ ...section, href: section.path }] : [])];
+  const crumbs = [{ label: home, href: pageHref("/", locale) }, { label: message(messages, "common.data"), href: pageHref(ALL_DATA_PATH, locale) }, ...parents.map(parent => ({ label: parent.label, href: pageHref(parent.href, locale) })), { label: crumb }];
   return <I18nProvider {...clientPresentation(presentation)}>
     <JsonLd testId="explorer-dataset-json-ld" data={explorerDatasetJsonLd({
       locale, origin, path: href, datasetId: "health", name: title, description, firstYear, lastYear, dateModified: lastReviewedAt,
@@ -75,7 +76,7 @@ export function renderHealthFrame({ locale, presentation, path: href, title, des
       // Every series the page offers, not only the headline one.
       variableMeasured,
     })} />
-    <BreadcrumbJsonLd items={[{ name: home, path: pageHref("/", locale) }, ...parents.map(parent => ({ name: parent.label, path: pageHref(parent.path, locale) })), { name: title, path: pageHref(href, locale) }]} />
+    <BreadcrumbJsonLd items={[{ name: home, path: pageHref("/", locale) }, { name: message(messages, "common.data"), path: pageHref(ALL_DATA_PATH, locale) }, ...parents.map(parent => ({ name: parent.label, path: pageHref(parent.path, locale) })), { name: title, path: pageHref(href, locale) }]} />
     <ExplorerPage containerQueries={false}>
       <PageHeader locale={locale} messages={messages} crumbs={crumbs} coverage={coverageLabel(messages, locale, firstYear, lastYear, lastReviewedAt)} />
       {children}

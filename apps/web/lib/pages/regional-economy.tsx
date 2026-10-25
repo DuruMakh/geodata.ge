@@ -34,6 +34,7 @@ export {
 } from "./regional-economies";
 import { ExplorerPage } from "../../components/explorer-shell/explorer-page";
 import { coverageLabel } from "../explorer/coverageLabel";
+import { ALL_DATA_PATH } from "../navigation/navTree";
 
 export function regionalEconomyStaticParams() {
   return REGIONAL_ECONOMY_REGIONS.map((region) => ({ id: region.id.replace(/^region\./, "") }));
@@ -103,7 +104,7 @@ export async function renderRegionalEconomyPage(slug: string, locale: Locale) {
   });
   const crumbs = [
     { label: message(presentation.messages, "common.home"), href: pageHref("/", locale) },
-    { label: message(presentation.messages, "common.data") },
+    { label: message(presentation.messages, "common.data"), href: pageHref(ALL_DATA_PATH, locale) },
     { label: message(presentation.messages, "common.economy"), href: pageHref("/explorer/economy", locale) },
     { label: title, href: pageHref("/explorer/economy/regions", locale) },
     { label: regionName },
@@ -112,6 +113,7 @@ export async function renderRegionalEconomyPage(slug: string, locale: Locale) {
     <I18nProvider {...clientPresentation(presentation)}>
       <BreadcrumbJsonLd items={[
         { name: crumbs[0].label, path: pageHref("/", locale) },
+        { name: message(presentation.messages, "common.data"), path: pageHref(ALL_DATA_PATH, locale) },
         { name: crumbs[2].label, path: pageHref("/explorer/economy", locale) },
         { name: title, path: pageHref("/explorer/economy/regions", locale) },
         { name: regionName, path: pageHref(`/explorer/economy/regions/${slug}`, locale) },

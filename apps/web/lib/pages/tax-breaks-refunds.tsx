@@ -16,6 +16,7 @@ import { message } from "../i18n/messages";
 import { pageHref } from "../i18n/routes";
 import type { Locale } from "../i18n/types";
 import { loadGdpWorkbookSources, loadSourcedWorkbookSources } from "../methodology/workbookSources";
+import { navGroup, ALL_DATA_PATH } from "../navigation/navTree";
 import { fiscalMetadata } from "../seo/metadata";
 import { explorerDatasetJsonLd } from "../seo/structuredData";
 import { resolveSiteUrl } from "../siteUrl";
@@ -48,13 +49,13 @@ export async function renderTaxBreaksRefundsPage(locale: Locale) {
   const title = t("title"), description = t("metaDescription");
   const lastReviewedAt = data.facts.map(f => f.lastReviewedAt).sort().at(-1)!, origin = resolveSiteUrl();
   const budget = message(presentation.messages, "common.budget");
-  const crumbs = [{ label: message(presentation.messages, "common.home"), href: pageHref("/", locale) }, { label: message(presentation.messages, "common.data") }, { label: budget, href: pageHref("/explorer", locale) }, { label: title }];
+  const crumbs = [{ label: message(presentation.messages, "common.home"), href: pageHref("/", locale) }, { label: message(presentation.messages, "common.data"), href: pageHref(ALL_DATA_PATH, locale) }, { label: budget, href: pageHref(navGroup("budget").href, locale) }, { label: title }];
   return <I18nProvider {...clientPresentation(presentation)}>
     <JsonLd testId="explorer-dataset-json-ld" data={explorerDatasetJsonLd({
       locale, origin, path: TAX_BREAKS_REFUNDS_PATH, datasetId: "tax-breaks-refunds", name: title, description, firstYear, lastYear, dateModified: lastReviewedAt,
       variableMeasured: TAX_BREAKS_REFUNDS_INDICATORS.map(id => labels[id]),
     })} />
-    <BreadcrumbJsonLd items={[{ name: crumbs[0].label, path: pageHref("/", locale) }, { name: budget, path: pageHref("/explorer", locale) }, { name: title, path: pageHref(TAX_BREAKS_REFUNDS_PATH, locale) }]} />
+    <BreadcrumbJsonLd items={[{ name: crumbs[0].label, path: pageHref("/", locale) }, { name: message(presentation.messages, "common.data"), path: pageHref(ALL_DATA_PATH, locale) }, { name: budget, path: pageHref(navGroup("budget").href, locale) }, { name: title, path: pageHref(TAX_BREAKS_REFUNDS_PATH, locale) }]} />
     <ExplorerPage containerQueries={false}>
       <PageHeader locale={locale} messages={presentation.messages} crumbs={crumbs} coverage={coverageLabel(presentation.messages, locale, firstYear, lastYear, lastReviewedAt)} />
       <TaxBreaksRefundsExplorer facts={facts} labels={labels} headings={headings} sources={sources.filter(source => sourceIds.has(source.sourceId))} gdpFacts={gdpFacts} gdpSources={gdpSources} lastReviewedAt={lastReviewedAt} siteOrigin={origin} />

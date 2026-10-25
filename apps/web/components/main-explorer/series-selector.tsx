@@ -293,7 +293,8 @@ export function SeriesSelectorRow({
           // a following row's own caret paints over it, so it never steals that row's taps,
           // and it only lands in the empty caret gutter of a row without children.
           className={`relative z-[1] flex w-6 flex-none items-center justify-center text-base leading-none before:absolute before:top-0 before:-bottom-3 before:inset-x-0 before:content-[""] ${expansionLocked ? "cursor-default" : "cursor-pointer"}`}
-          style={{ visibility: hasChildren ? "visible" : "hidden" }}
+          // Hidden only without children; otherwise inherited, so a hidden page (behind the phone menu) hides it too.
+          style={{ visibility: hasChildren ? undefined : "hidden" }}
           tabIndex={hasChildren && !expansionLocked ? 0 : -1}
         >
           <span style={{ color: expanded ? "var(--accent)" : "var(--ink)" }}>{expanded ? "▾" : "▸"}</span>

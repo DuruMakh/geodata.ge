@@ -8,10 +8,9 @@ import { loadServedEducationData, shownEducationFacts, toClientEducationFact } f
 import { EDUCATION_GEORGIA, EDUCATION_SOURCES } from "../data/education/types";
 import { coverageLabel } from "../explorer/coverageLabel";
 import {
-  EDUCATION_HUB_PATH, EDUCATION_SECTIONS, educationCountLabel, educationCoverage, educationPeriodLabel, educationSeriesLabel, educationTemporalCoverage, educationTopicSeries, schoolYearLabel,
+  EDUCATION_SECTIONS, educationCountLabel, educationCoverage, educationPeriodLabel, educationSeriesLabel, educationTemporalCoverage, educationTopicSeries,
   type EducationTopicId,
 } from "../explorer/education";
-import { buildEducationHubCards } from "../explorer/educationHubCards";
 import { Message } from "../i18n/message";
 import { message } from "../i18n/messages";
 import { getMessages } from "../i18n/messages.server";
@@ -23,27 +22,10 @@ import { loadSourcedWorkbookSources } from "../methodology/workbookSources";
 import { fiscalMetadata } from "../seo/metadata";
 import { explorerDatasetJsonLd } from "../seo/structuredData";
 import { resolveSiteUrl } from "../siteUrl";
-import { TopicHub } from "./hub";
+import { topicSection, ALL_DATA_PATH } from "../navigation/navTree";
 
 /** The figure each topic page's latest line names, by the template's placeholder. */
 const LATEST_FIGURE: Record<EducationTopicId, string> = { universities: "students", vocational: "admitted" };
-
-export async function educationHubMetadata(locale: Locale) {
-  const messages = await getMessages(locale, ["education"]);
-  return fiscalMetadata({ locale, path: EDUCATION_HUB_PATH, title: message(messages, "education.metaTitle"), description: message(messages, "education.metaDescription") });
-}
-
-/** The hub: one card per page, Schools, Kindergartens, Universities and Vocational colleges, each from served facts. */
-export async function renderEducationHub(locale: Locale) {
-  const [{ facts: served }, presentation] = await Promise.all([loadServedEducationData(), getPresentation(locale, ["education"], [])]);
-  const facts = shownEducationFacts(served);
-  const { messages } = presentation;
-  // The header's years are school years; vocational colleges' calendar years fall inside them.
-  const schoolYears = facts.filter(f => !f.indicatorId.startsWith("education.vet_")).map(f => f.year);
-  const coverage = coverageLabel(messages, locale, schoolYearLabel(Math.min(...schoolYears)), schoolYearLabel(Math.max(...schoolYears)), facts.map(f => f.lastReviewedAt).sort().at(-1));
-  return <TopicHub locale={locale} presentation={presentation} title={message(messages, "education.title")} summary={message(messages, "education.hubSummary")} path={EDUCATION_HUB_PATH}
-    coverage={coverage} cards={buildEducationHubCards(facts.map(toClientEducationFact), presentation)} testId="education-hub" />;
-}
 
 const topicHref = (section: EducationTopicId) => EDUCATION_SECTIONS.find(item => item.id === section)!.href;
 
@@ -74,8 +56,8 @@ export async function renderEducationTopicPage(locale: Locale, section: Educatio
   const latest = facts.filter(f => f.indicatorId === series[0].id).sort((a, b) => a.year - b.year).at(-1)!;
   const crumbs = [
     { label: message(messages, "common.home"), href: pageHref("/", locale) },
-    { label: message(messages, "common.data") },
-    { label: t("title"), href: pageHref(EDUCATION_HUB_PATH, locale) },
+    { label: message(messages, "common.data"), href: pageHref(ALL_DATA_PATH, locale) },
+    { label: t("title"), href: pageHref(topicSection("education").href, locale) },
     { label: title },
   ];
   return <I18nProvider {...clientPresentation(presentation)}>
@@ -83,7 +65,7 @@ export async function renderEducationTopicPage(locale: Locale, section: Educatio
       locale, origin, path: href, datasetId: "education", name: title, description, ...educationTemporalCoverage(section, min, max), dateModified: lastReviewedAt,
       variableMeasured: [...new Set(Object.values(headingLabels))],
     })} />
-    <BreadcrumbJsonLd items={[{ name: crumbs[0].label, path: pageHref("/", locale) }, { name: t("title"), path: pageHref(EDUCATION_HUB_PATH, locale) }, { name: title, path: pageHref(href, locale) }]} />
+    <BreadcrumbJsonLd items={[{ name: crumbs[0].label, path: pageHref("/", locale) }, { name: message(messages, "common.data"), path: pageHref(ALL_DATA_PATH, locale) }, { name: t("title"), path: pageHref(topicSection("education").path, locale) }, { name: title, path: pageHref(href, locale) }]} />
     <ExplorerPage containerQueries={false}>
       <PageHeader locale={locale} messages={messages} crumbs={crumbs} coverage={coverageLabel(messages, locale, period(min), period(max), lastReviewedAt)} />
       <EducationExplorer key={section} section={section} facts={facts}

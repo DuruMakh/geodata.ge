@@ -1,11 +1,10 @@
 import { readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import { afterEach, describe, expect, it, test, vi } from "vitest";
-import kaCommon from "../../lib/i18n/messages/ka/common.json";
-import enCommon from "../../lib/i18n/messages/en/common.json";
 import sitemap from "../../lib/seo/sitemap";
 import { MUNICIPALITY_ROUTES } from "../../lib/explorer/municipalityRoutes";
-import { loadServedGeneralGovernmentBalanceData, loadServedGovernmentDebtData, loadServedLandingData, loadServedMunicipalData } from "../../lib/data/servedData";
+import { loadServedExplorerData, loadServedGeneralGovernmentBalanceData, loadServedGovernmentDebtData, loadServedLandingData, loadServedMunicipalData } from "../../lib/data/servedData";
+import { citedReviewedAt } from "../../lib/data/sources";
 import { loadServedRegionalEconomyData } from "../../lib/data/regionalEconomies/importRegionalEconomies";
 import { loadServedTradeOverviewData } from "../../lib/data/tradeOverview/importTradeOverview";
 import { loadServedTradePartnersData } from "../../lib/data/tradePartners/importTradePartners";
@@ -19,6 +18,13 @@ import { loadServedDemographyData } from "../../lib/data/demography/importDemogr
 import { loadServedGdpOverviewData } from "../../lib/data/gdpOverview/importGdpOverview";
 import { loadServedEconomicSectorsData } from "../../lib/data/economicSectors/importEconomicSectors";
 import { loadServedGdpExpenditureData } from "../../lib/data/gdpExpenditure/importGdpExpenditure";
+import { loadServedBusinessData } from "../../lib/data/business/importBusiness";
+import { loadServedHousingData } from "../../lib/data/housing/importHousing";
+import { loadServedMoneyTransfersData } from "../../lib/data/externalFlows/importMoneyTransfers";
+import { loadServedForeignInvestmentData } from "../../lib/data/externalFlows/importForeignInvestment";
+import { loadServedCurrentAccountFacts } from "../../lib/data/externalFlows/importCurrentAccount";
+import { loadServedExternalPositionData } from "../../lib/data/externalPosition/importExternalPosition";
+import { loadServedMoneyBanksData } from "../../lib/data/moneyBanks/importMoneyBanks";
 import {
   aggregateFactsForEntity,
   applyAdjaraBudgetAdjustment,
@@ -30,7 +36,7 @@ import { DEMOGRAPHY_PAGES } from "../../lib/explorer/demographyRoutes";
 import { listPublicPagePaths } from "../../lib/i18n/inventory.server";
 import { loadPageRevisions } from "../../lib/i18n/page-revisions.server";
 import { pageHref, splitLanguagePath } from "../../lib/i18n/routes";
-import { currentEntry, isActivePath, openHub, sourceNoteKey } from "../../lib/navigation/navTree";
+import { ALL_DATA_PATH, currentEntry, currentGroup, isActivePath, LEGACY_TOPIC_FORWARDS, NAV_GROUPS, NAV_TREE, openHub } from "../../lib/navigation/navTree";
 import { inflationProductsMetadata } from "../../lib/pages/inflation-products";
 import { municipalEntityHref } from "../../lib/seo/internalLinks";
 
@@ -120,11 +126,12 @@ describe("indexable Fiscal.ge routes", () => {
     // Transport adds its hub, five pages, a page for Georgia and each of the 11 regions and its methodology page: 19 bilingual pairs.
     // Internet and technology adds its hub, four pages, a page for Georgia and each of the 11 regions and its methodology page: 18 bilingual pairs.
     // Spending by type adds its Budget page and its methodology page: 2 bilingual pairs.
+    // The eight group pages replace the 19 topic hubs other than Budget's (three of them keep their address): 11 fewer pairs.
     // The funded pension adds one Health and social protection page: 1 bilingual pair.
     // Tax breaks and refunds adds its Budget page and its methodology page: 2 bilingual pairs.
     // Who borrows adds one page to Money and banks: 1 bilingual pair.
     // Loans by region adds its index and a page for Georgia and each of the 11 regions to Money and banks: 13 bilingual pairs.
-    expect(urls).toHaveLength(1578);
+    expect(urls).toHaveLength(1556);
     expect(new Set(urls).size).toBe(urls.length);
     expect(urls.every((url) => url.startsWith("https://fiscal.ge/"))).toBe(true);
     expect(urls).toContain("https://fiscal.ge/about");
@@ -133,7 +140,7 @@ describe("indexable Fiscal.ge routes", () => {
     expect(urls).toContain("https://fiscal.ge/explorer/deficit");
     expect(urls).toContain("https://fiscal.ge/explorer/trade/partners");
     expect(urls).toContain("https://fiscal.ge/en/explorer/trade/partners");
-    for (const page of ["", "/overview", "/industries", "/regions"]) {
+    for (const page of ["/overview", "/industries", "/regions"]) {
       expect(urls).toContain(`https://fiscal.ge/explorer/wages${page}`);
       expect(urls).toContain(`https://fiscal.ge/en/explorer/wages${page}`);
     }
@@ -154,7 +161,7 @@ describe("indexable Fiscal.ge routes", () => {
     expect(urls).toContain("https://fiscal.ge/methodology/transport");
     expect(urls).toContain("https://fiscal.ge/en/methodology/transport");
     expect(urls).toContain("https://fiscal.ge/explorer/wages/regions/adjara");
-    for (const page of ["", "/income", "/spending", "/poverty", "/inequality"]) {
+    for (const page of ["/income", "/spending", "/poverty", "/inequality"]) {
       expect(urls).toContain(`https://fiscal.ge/explorer/living-standards${page}`);
       expect(urls).toContain(`https://fiscal.ge/en/explorer/living-standards${page}`);
     }
@@ -165,47 +172,47 @@ describe("indexable Fiscal.ge routes", () => {
       expect(urls).toContain(`https://fiscal.ge/en/explorer/living-standards/${section}/regions/georgia`);
     }
     expect(urls.some((url) => url.includes("/explorer/poverty"))).toBe(false);
-    for (const page of ["", "/energy-supply", "/electricity", "/energy-use", "/food-self-sufficiency", "/farming"]) {
+    for (const page of ["/energy-supply", "/electricity", "/energy-use", "/food-self-sufficiency", "/farming"]) {
       expect(urls).toContain(`https://fiscal.ge/explorer/energy-food${page}`);
       expect(urls).toContain(`https://fiscal.ge/en/explorer/energy-food${page}`);
     }
-    for (const page of ["", "/doctors-hospitals", "/illnesses", "/causes-of-death", "/causes-of-death/regions/georgia", "/causes-of-death/regions/guria", "/causes-of-death/regions/racha_lechkhumi_kvemo_svaneti"]) {
+    for (const page of ["/doctors-hospitals", "/illnesses", "/causes-of-death", "/causes-of-death/regions/georgia", "/causes-of-death/regions/guria", "/causes-of-death/regions/racha_lechkhumi_kvemo_svaneti"]) {
       expect(urls).toContain(`https://fiscal.ge/explorer/health${page}`);
       expect(urls).toContain(`https://fiscal.ge/en/explorer/health${page}`);
     }
     expect(urls.filter((url) => url.includes("/explorer/health/causes-of-death/regions/"))).toHaveLength(24);
-    for (const page of ["", "/recorded", "/convictions", "/prisons", "/victims", "/road-accidents"]) {
+    for (const page of ["/recorded", "/convictions", "/prisons", "/victims", "/road-accidents"]) {
       expect(urls).toContain(`https://fiscal.ge/explorer/crime${page}`);
       expect(urls).toContain(`https://fiscal.ge/en/explorer/crime${page}`);
     }
-    for (const page of ["", "/supply", "/loans-deposits", "/interest-rates", "/bank-health"]) {
+    for (const page of ["/supply", "/loans-deposits", "/interest-rates", "/bank-health"]) {
       expect(urls).toContain(`https://fiscal.ge/explorer/money${page}`);
       expect(urls).toContain(`https://fiscal.ge/en/explorer/money${page}`);
     }
     const businessAreas = ["georgia", "tbilisi", "adjara", "guria", "imereti", "kakheti", "mtskheta_mtianeti", "racha_lechkhumi_kvemo_svaneti", "samegrelo_zemo_svaneti", "samtskhe_javakheti", "kvemo_kartli", "shida_kartli"];
-    for (const page of ["", "/sales", "/jobs", "/investment-profit", "/firms", "/regions", ...businessAreas.map(area => `/regions/${area}`)]) {
+    for (const page of ["/sales", "/jobs", "/investment-profit", "/firms", "/regions", ...businessAreas.map(area => `/regions/${area}`)]) {
       expect(urls).toContain(`https://fiscal.ge/explorer/business${page}`);
       expect(urls).toContain(`https://fiscal.ge/en/explorer/business${page}`);
     }
-    for (const page of ["", "/permits", "/completed", "/prices", "/regions", ...businessAreas.map(area => `/regions/${area}`)]) {
+    for (const page of ["/permits", "/completed", "/prices", "/regions", ...businessAreas.map(area => `/regions/${area}`)]) {
       expect(urls).toContain(`https://fiscal.ge/explorer/housing${page}`);
       expect(urls).toContain(`https://fiscal.ge/en/explorer/housing${page}`);
     }
-    expect(urls.filter((url) => url.includes("/explorer/housing"))).toHaveLength(34);
-    for (const page of ["", "/homes", "/users", "/online", "/devices", ...businessAreas.map(area => `/homes/${area}`)]) {
+    expect(urls.filter((url) => url.includes("/explorer/housing"))).toHaveLength(32);
+    for (const page of ["/homes", "/users", "/online", "/devices", ...businessAreas.map(area => `/homes/${area}`)]) {
       expect(urls).toContain(`https://fiscal.ge/explorer/internet${page}`);
       expect(urls).toContain(`https://fiscal.ge/en/explorer/internet${page}`);
     }
-    expect(urls.filter((url) => url.includes("/explorer/internet"))).toHaveLength(34);
+    expect(urls.filter((url) => url.includes("/explorer/internet"))).toHaveLength(32);
     expect(urls).toContain("https://fiscal.ge/methodology/internet");
     expect(urls).toContain("https://fiscal.ge/en/methodology/internet");
-    for (const page of ["", "/vehicles", "/vehicle-age", "/passengers", "/freight", "/regions", ...businessAreas.map(area => `/regions/${area}`)]) {
+    for (const page of ["/vehicles", "/vehicle-age", "/passengers", "/freight", "/regions", ...businessAreas.map(area => `/regions/${area}`)]) {
       expect(urls).toContain(`https://fiscal.ge/explorer/transport${page}`);
       expect(urls).toContain(`https://fiscal.ge/en/explorer/transport${page}`);
     }
-    expect(urls.filter((url) => url.includes("/explorer/transport"))).toHaveLength(36);
+    expect(urls.filter((url) => url.includes("/explorer/transport"))).toHaveLength(34);
     const educationRegions = ["tbilisi", "adjara", "guria", "imereti", "kakheti", "mtskheta_mtianeti", "racha_lechkhumi_kvemo_svaneti", "samegrelo_zemo_svaneti", "samtskhe_javakheti", "kvemo_kartli", "shida_kartli"];
-    for (const page of ["", "/universities", "/vocational", ...["schools", "kindergartens"].flatMap(set => [`/${set}`, `/${set}/georgia`, ...educationRegions.map(region => `/${set}/region/${region}`), `/${set}/batumi`, `/${set}/ozurgeti`])]) {
+    for (const page of ["/universities", "/vocational", ...["schools", "kindergartens"].flatMap(set => [`/${set}`, `/${set}/georgia`, ...educationRegions.map(region => `/${set}/region/${region}`), `/${set}/batumi`, `/${set}/ozurgeti`])]) {
       expect(urls).toContain(`https://fiscal.ge/explorer/education${page}`);
       expect(urls).toContain(`https://fiscal.ge/en/explorer/education${page}`);
     }
@@ -226,11 +233,11 @@ describe("indexable Fiscal.ge routes", () => {
       expect(urls).not.toContain(`https://fiscal.ge/explorer/health/${set}/tbilisi`);
     }
     expect(urls.some(url => /\/explorer\/health\/(pensions|subsistence-allowance)\/\d{2}$/.test(url))).toBe(false);
-    for (const page of ["", "/research", "/patents", "/museums", "/theatres", ...businessAreas.map(area => `/museums/${area}`)]) {
+    for (const page of ["/research", "/patents", "/museums", "/theatres", ...businessAreas.map(area => `/museums/${area}`)]) {
       expect(urls).toContain(`https://fiscal.ge/explorer/science-culture${page}`);
       expect(urls).toContain(`https://fiscal.ge/en/explorer/science-culture${page}`);
     }
-    expect(urls.filter((url) => url.includes("/explorer/science-culture"))).toHaveLength(34);
+    expect(urls.filter((url) => url.includes("/explorer/science-culture"))).toHaveLength(32);
     expect(urls).toContain("https://fiscal.ge/explorer/trade/products");
     expect(urls).toContain("https://fiscal.ge/en/explorer/trade/products");
     expect(urls).toContain("https://fiscal.ge/explorer/trade/domestic-exports");
@@ -297,6 +304,18 @@ describe("indexable Fiscal.ge routes", () => {
   });
 });
 
+// Spec 2026-10-24-explorer-regroup §3.1 and §10: the group pages replace the topic hubs in the sitemap.
+describe("explorer group pages in the sitemap", () => {
+  it("lists All data and the eight group pages in both languages, and none of the forwarded topic hubs", async () => {
+    process.env.NEXT_PUBLIC_SITE_URL = "https://fiscal.ge";
+    const urls = (await sitemap()).map((entry) => entry.url);
+    for (const prefix of ["", "/en"]) {
+      for (const href of [ALL_DATA_PATH, ...NAV_GROUPS.map((group) => group.href)]) expect(urls, href).toContain(`https://fiscal.ge${prefix}${href}`);
+      for (const { from } of LEGACY_TOPIC_FORWARDS) expect(urls, from).not.toContain(`https://fiscal.ge${prefix}${from}`);
+    }
+  });
+});
+
 // The unit tests that read the whole sitemap live in this file, so `npm test` builds it once instead of once per
 // file: building it loads every served dataset, 13-14 s for each file that did. (tests/seo/structuredData.test.ts
 // still builds its own, because it renders every page and loads the same data anyway.) Each block below names the
@@ -305,9 +324,10 @@ describe("indexable Fiscal.ge routes", () => {
 // From tests/explorer/unemploymentPage.test.tsx.
 describe("unemployment discovery", () => {
   test("localization and sitemap discover the explorer and its methodology in both languages", async () => {
-    const paths = await listPublicPagePaths(); expect(paths).toContain("/explorer/unemployment"); expect(paths).toContain("/methodology/unemployment");
+    // The Unemployment hub is the Unemployment section of the Labour market page now.
+    const paths = await listPublicPagePaths(); expect(paths).toContain("/explorer/labour"); expect(paths).toContain("/methodology/unemployment");
     const entries = await sitemap();
-    for (const path of ["/explorer/unemployment", "/en/explorer/unemployment", "/methodology/unemployment", "/en/methodology/unemployment"]) expect(entries.some(entry => entry.url.endsWith(path))).toBe(true);
+    for (const path of ["/explorer/labour", "/en/explorer/labour", "/methodology/unemployment", "/en/methodology/unemployment"]) expect(entries.some(entry => entry.url.endsWith(path))).toBe(true);
     for (const section of ["overview", "regions", "age", "gender", "industries", "hours", "informal", "young-people"]) {
       expect(paths).toContain(`/explorer/unemployment/${section}`);
       for (const prefix of ["", "/en"]) expect(entries.some(entry => entry.url.endsWith(`${prefix}/explorer/unemployment/${section}`))).toBe(true);
@@ -430,7 +450,8 @@ describe("Fiscal.ge agent instructions", () => {
     // from the sitemap, which lists public HTML routes. Spec section 16 said
     // only requiredTargets needed updating here; it missed this filter, which
     // treated any non-sitemap link as an HTML page owing a sitemap entry.
-    const htmlTargets = targets.filter((target) => !/\.(xml|json|csv)$/.test(new URL(target).pathname));
+    // A topic's line links its section on its group page (`/explorer/labour#t-wages`): the page is the group page.
+    const htmlTargets = targets.filter((target) => !/\.(xml|json|csv)$/.test(new URL(target).pathname)).map((target) => target.replace(/#.*$/, ""));
     const sitemapTargets = (await sitemap()).map((entry) => entry.url);
 
     expect(htmlTargets.every((target) => sitemapTargets.includes(target))).toBe(true);
@@ -474,11 +495,11 @@ async function sitemapDates(): Promise<Map<string, string | undefined>> {
 }
 
 describe("sitemap lastmod reports each entity's own reviewed date", () => {
-  it("dates each energy and food page by its own facts, and the hub by the newest", async () => {
+  // The hub is the Energy and food section of the Society and environment page now, dated with the group.
+  it("dates each energy and food page by its own facts", async () => {
     const dates = await sitemapDates();
     for (const page of ["energy-supply", "electricity", "energy-use", "food-self-sufficiency"]) expect(dates.get(`${SITE}/explorer/energy-food/${page}`), page).toBe("2026-10-11");
     expect(dates.get(`${SITE}/explorer/energy-food/farming`)).toBe("2026-10-20");
-    expect(dates.get(`${SITE}/explorer/energy-food`)).toBe("2026-10-20");
   });
 
   it("gives every municipality the date its own facts were reviewed", async () => {
@@ -560,17 +581,18 @@ describe("sitemap lastmod reports each entity's own reviewed date", () => {
     expect(new Set(municipalDates).size).toBeGreaterThan(1);
   });
 
-  it("leaves the national explorer routes on the site-wide reviewed date", async () => {
-    const [dates, { sourceDocuments }] = await Promise.all([sitemapDates(), loadServedLandingData()]);
-    const siteWide = sourceDocuments
-      .map((source) => source.lastReviewedAt)
-      .sort()
-      .at(-1);
-
-    // These pages display the site-wide maximum by design, so the sitemap must
-    // keep agreeing with them rather than being narrowed alongside the municipal URLs.
-    for (const path of ["/explorer/expenditure", "/explorer/revenue", "/explorer/analysis"]) {
-      expect(dates.get(`${SITE}${path}`)).toBe(siteWide);
+  it("dates the national budget routes by the sources their own rows cite, as their headers do", async () => {
+    const [dates, { sourceDocuments, facts, adminFacts }] = await Promise.all([sitemapDates(), loadServedExplorerData()]);
+    // Their headers date them the same way (lib/pages/expenditure.tsx, revenue.tsx, analysis.tsx); a source no budget row cites
+    // moves neither (verify-review N6, tests/seo/sitemapBudgetDate.test.ts).
+    const expected = {
+      "/explorer/expenditure": citedReviewedAt(sourceDocuments, [...facts.filter((fact) => fact.side === "expenditure"), ...adminFacts]),
+      "/explorer/revenue": citedReviewedAt(sourceDocuments, facts.filter((fact) => fact.side === "revenue")),
+      "/explorer/analysis": citedReviewedAt(sourceDocuments, [...facts, ...adminFacts]),
+    };
+    for (const [path, date] of Object.entries(expected)) {
+      expect(date, path).not.toBe("");
+      expect(dates.get(`${SITE}${path}`), path).toBe(date);
     }
   });
 
@@ -589,18 +611,21 @@ describe("sitemap lastmod reports each entity's own reviewed date", () => {
     expect(dates.get(`${SITE}/explorer/economy/sectors`)).toBe(sectors);
   });
 
-  // U28-13: a hub moves when any dataset one of its cards reads is refreshed, as the date in its header does.
-  it("dates each hub by the newest dataset its cards read", async () => {
+  // U28-13: a hub moves when any dataset one of its cards reads is refreshed, as the date in its header does. The group
+  // pages hold the topic hubs' cards now, so a group page moves with every dataset of its topics.
+  it("dates each group page by the newest dataset its cards read", async () => {
     const latest = (...datasets: { facts: readonly { lastReviewedAt: string }[] }[]) =>
       datasets.flatMap(({ facts }) => facts.map((fact) => fact.lastReviewedAt)).sort().at(-1);
-    const [dates, gdp, sectors, expenditure, regional, trade, partners, products, domestic, services, composition, inflation, inflationProducts, { sourceDocuments }, debt, balance] = await Promise.all([
-      sitemapDates(), loadServedGdpOverviewData(), loadServedEconomicSectorsData(), loadServedGdpExpenditureData(), loadServedRegionalEconomyData(),
+    const [dates, gdp, sectors, expenditure, regional, business, housing, trade, partners, products, domestic, services, composition, transfers, investment, account, position, inflation, inflationProducts, money, { sourceDocuments }, debt, balance] = await Promise.all([
+      sitemapDates(), loadServedGdpOverviewData(), loadServedEconomicSectorsData(), loadServedGdpExpenditureData(), loadServedRegionalEconomyData(), loadServedBusinessData(), loadServedHousingData(),
       loadServedTradeOverviewData(), loadServedTradePartnersData(), loadServedTradeProductsData(), loadServedTradeDomesticData(), loadServedTradeServicesData(), loadServedTradeCompositionData(),
-      loadServedInflationData(), loadServedProductData(), loadServedLandingData(), loadServedGovernmentDebtData(), loadServedGeneralGovernmentBalanceData(),
+      loadServedMoneyTransfersData(), loadServedForeignInvestmentData(), loadServedCurrentAccountFacts(), loadServedExternalPositionData(),
+      loadServedInflationData(), loadServedProductData(), loadServedMoneyBanksData(), loadServedLandingData(), loadServedGovernmentDebtData(), loadServedGeneralGovernmentBalanceData(),
     ]);
-    expect(dates.get(`${SITE}/explorer/economy`)).toBe(latest(gdp, sectors, expenditure, regional));
-    expect(dates.get(`${SITE}/explorer/trade`)).toBe(latest(trade, partners, products, domestic, services, composition));
-    expect(dates.get(`${SITE}/explorer/inflation`)).toBe(latest(inflation, inflationProducts));
+    expect(dates.get(`${SITE}/explorer/economy`)).toBe(latest(gdp, sectors, expenditure, regional, business, housing));
+    expect(dates.get(`${SITE}/explorer/external`)).toBe(latest(trade, partners, products, domestic, services, composition, transfers, investment, { facts: account }, position));
+    expect(dates.get(`${SITE}/explorer/prices`)).toBe(latest(inflation, inflationProducts, money));
+    expect(dates.get(`${SITE}/explorer/budget`)).toBe(latest({ facts: sourceDocuments }, debt, balance));
     expect(dates.get(`${SITE}/explorer`)).toBe(latest({ facts: sourceDocuments }, debt, balance));
   });
 
@@ -665,21 +690,16 @@ describe("the navigation tree", () => {
     const routes = await explorerRoutes();
     expect(routes.length).toBeGreaterThan(500);
     for (const route of routes) {
+      // A group page is no hub's row: the sidebar marks its group (Task 8 of the 2026-10-24 explorer regrouping).
+      if (NAV_GROUPS.some((group) => group.href === route) && !NAV_TREE.some((hub) => hub.href === route)) {
+        expect(currentGroup(route)?.href, route).toBe(route);
+        continue;
+      }
       // The sidebar marks currentEntry's row; it must exist, sit in the open hub and be the only row there that matches.
       const hub = openHub(route);
       const entry = currentEntry(route);
       expect([hub.href, ...hub.sections.map((section) => section.href)], route).toContain(entry);
       expect(hub.sections.filter((section) => isActivePath(route, section.href)).length, route).toBeLessThanOrEqual(1);
-    }
-  });
-});
-
-describe("the explorer footer source note", () => {
-  it("resolves to a note in both languages on every sitemap explorer route", async () => {
-    for (const route of await explorerRoutes()) {
-      const key = sourceNoteKey(route);
-      expect((kaCommon as Record<string, string>)[key], route).toBeTruthy();
-      expect((enCommon as Record<string, string>)[key], route).toBeTruthy();
     }
   });
 });

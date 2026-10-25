@@ -1,5 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 import ExcelJS from "exceljs";
+import { topicCards } from "./group-cards";
 
 const PAGES = ["foreign-debt", "reserves"] as const;
 const pressed = (id: string) => `[data-series-id="${id}"] [data-testid="series-row-toggle"]`;
@@ -14,9 +15,10 @@ async function cell(page: Page, label: string, year: number) {
   return table.locator("tbody tr", { hasText: label }).locator("td").nth(column - 1);
 }
 
-test("the external hub shows five cards, each linking to its page", async ({ page }) => {
+// The old hub is the section #t-external of the External sector page.
+test("the external flows section shows five cards, each linking to its page", async ({ page }) => {
   await page.goto("/en/explorer/external");
-  const cards = page.getByTestId("external-hub").getByTestId("hub-card");
+  const cards = topicCards(page, "external");
   await expect(cards).toHaveCount(5);
   await expect(cards.nth(3)).toHaveAttribute("href", /\/en\/explorer\/external\/foreign-debt$/);
   await expect(cards.nth(4)).toHaveAttribute("href", /\/en\/explorer\/external\/reserves$/);

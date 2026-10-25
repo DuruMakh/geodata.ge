@@ -25,6 +25,7 @@ import { georgiaDescription } from "../seo/municipalMetadata";
 import { explorerDatasetJsonLd } from "../seo/structuredData";
 import { resolveSiteUrl } from "../siteUrl";
 import { clientPresentation } from "../i18n/presentation.server";
+import { navGroup, ALL_DATA_PATH } from "../navigation/navTree";
 
 const ROUTE = "/explorer/municipalities/georgia";
 
@@ -118,14 +119,14 @@ export async function renderMunicipalCountry(locale: Locale) {
         })}
         testId="explorer-dataset-json-ld"
       />
-      <BreadcrumbJsonLd items={[{ name: message(messages, "common.home"), path: pageHref("/", locale) }, { name: message(messages, "common.budget"), path: pageHref("/explorer", locale) }, { name: message(messages, "common.municipalities"), path: pageHref("/explorer/municipalities", locale) }, { name: message(messages, "municipal.georgia"), path: pageHref(ROUTE, locale) }]} />
+      <BreadcrumbJsonLd items={[{ name: message(messages, "common.home"), path: pageHref("/", locale) }, { name: message(messages, "common.data"), path: pageHref(ALL_DATA_PATH, locale) }, { name: message(messages, "common.budget"), path: pageHref(navGroup("budget").href, locale) }, { name: message(messages, "common.municipalities"), path: pageHref("/explorer/municipalities", locale) }, { name: message(messages, "municipal.georgia"), path: pageHref(ROUTE, locale) }]} />
       <PageHeader
         locale={locale}
         messages={presentation.messages}
         crumbs={[
           { label: message(messages, "common.home"), href: pageHref("/", locale) },
-          { label: message(messages, "common.data") },
-          { label: message(messages, "common.budget"), href: pageHref("/explorer", locale) },
+          { label: message(messages, "common.data"), href: pageHref(ALL_DATA_PATH, locale) },
+          { label: message(messages, "common.budget"), href: pageHref(navGroup("budget").href, locale) },
           { label: message(messages, "common.municipalities"), href: pageHref("/explorer/municipalities", locale) },
           { label: message(messages, "municipal.georgia") },
         ]}

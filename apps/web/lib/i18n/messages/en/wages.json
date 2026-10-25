@@ -1,8 +1,5 @@
 {
   "wages.title": "Wages",
-  "wages.hubSummary": "Georgia’s average and median monthly wages",
-  "wages.metaTitle": "Wages in Georgia",
-  "wages.metaDescription": "Explore Georgia’s annual average and median monthly wages by employer type, industry, region and sex.",
   "wages.annual": "Annual data",
   "wages.page.overview.title": "Wages overview",
   "wages.page.overview.summary": "Georgia’s average monthly wage since {averageFrom} and median wage since {medianFrom}, comparing public and non-public employers, and women and men.",

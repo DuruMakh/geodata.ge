@@ -14,6 +14,7 @@ import { DEBT_EXPLORER_PATH } from "../seo/internalLinks";
 import { explorerDatasetJsonLd } from "../seo/structuredData";
 import { resolveSiteUrl } from "../siteUrl";
 import { loadDebtWorkbookSources, loadGdpWorkbookSources } from "../methodology/workbookSources";
+import { ALL_DATA_PATH, navGroup } from "../navigation/navTree";
 
 export async function debtPageMetadata(locale: Locale): Promise<Metadata> {
   const { facts } = await loadServedGovernmentDebtData();
@@ -58,7 +59,8 @@ export async function renderDebtPage(locale: Locale) {
       />
       <BreadcrumbJsonLd items={[
         { name: message(messages, "common.home"), path: pageHref("/", locale) },
-        { name: message(messages, "common.budget"), path: pageHref("/explorer", locale) },
+        { name: message(messages, "common.data"), path: pageHref(ALL_DATA_PATH, locale) },
+        { name: message(messages, "common.budget"), path: pageHref(navGroup("budget").href, locale) },
         { name: message(messages, "common.debt"), path: pageHref(DEBT_EXPLORER_PATH, locale) },
       ]} />
       <I18nProvider {...clientPresentation(presentation)}>

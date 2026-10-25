@@ -8,10 +8,11 @@ for (const [locale, width] of [['ka', 390], ['en', 1440]] as const) {
     await expect(page.getByTestId('gdp-indicators').getByRole('button')).toHaveCount(4);
   });
 }
-test('Economy footer identifies its actual sources',async({page})=>{
+test('the GDP page renders no footer, and its source note credits the World Bank',async({page})=>{
   await page.goto('/en/explorer/economy/gdp');
-  await expect(page.getByTestId('site-footer')).toContainText('World Bank');
-  await expect(page.getByTestId('site-footer')).not.toContainText('Ministry of Finance');
+  await expect(page.getByRole('contentinfo')).toHaveCount(0);
+  await expect(page.getByTestId('source-label')).toContainText('World Bank');
+  await expect(page.getByTestId('source-label')).not.toContainText('Ministry of Finance');
 });
 test("GDP reuses chart/table/range and preserves indicator state", async ({
   page,

@@ -23,8 +23,8 @@ type MonthGridTableProps = {
   picker?: ReactNode;
 };
 
-const headCell = "border-b-2 border-[var(--ink)] px-2 pt-1.5 pb-[9px] text-right align-bottom text-[11px] font-semibold text-[var(--muted)]";
-const numericCell = "px-2 py-[9px] text-right font-[family-name:var(--font-numeric)] text-[12.5px] whitespace-nowrap";
+const headCell = "border-b-2 border-[var(--ink)] px-1.5 pt-1.5 pb-[9px] text-right align-bottom text-[11px] font-semibold text-[var(--muted)]";
+const numericCell = "px-1.5 py-[9px] text-right font-[family-name:var(--font-numeric)] text-[12.5px] whitespace-nowrap";
 
 export function MonthGridTable({ caption, yearLabel, monthLabels, monthNames, summaryLabel, rows, formatValue, legend, legendLabel, picker }: MonthGridTableProps) {
   const { messages } = useI18n();
@@ -59,8 +59,8 @@ export function MonthGridTable({ caption, yearLabel, monthLabels, monthNames, su
         aria-label={message(messages, "controls.tableScrollable")}
         className="overflow-x-auto focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
       >
-        {/* Sized to fit the 1440px workspace (~808px) with the summary column; narrower screens scroll. */}
-        <table className="w-full border-collapse" style={{ minWidth: 64 + 12 * 54 + (hasSummary ? 76 : 0) }}>
+        {/* Sized to fit the 1440px workspace (~768px beside the 272px sidebar) with the summary column; narrower screens scroll. */}
+        <table className="w-full border-collapse" style={{ minWidth: 64 + 12 * 50 + (hasSummary ? 72 : 0) }}>
           <caption className="sr-only">{caption}</caption>
           <thead>
             <tr>

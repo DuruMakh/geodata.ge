@@ -5,8 +5,8 @@ import { loadServedTradeCompositionData } from "../../lib/data/tradeComposition/
 import { coverageLabel } from "../../lib/explorer/coverageLabel";
 import { getPresentation } from "../../lib/i18n/presentation.server";
 import type { Presentation } from "../../lib/i18n/types";
-import { renderTradeHub } from "../../lib/pages/hubs/trade";
 import { renderTradeCompositionPage, tradeCompositionMetadata } from "../../lib/pages/trade";
+import { TOPIC_HUB_LOADERS, topicHubCoverage } from "../../lib/pages/topicHubs.server";
 import { resolveSiteUrl } from "../../lib/siteUrl";
 import { renderPageMarkup } from "../helpers/render-localized";
 
@@ -48,10 +48,11 @@ test.each(["ka", "en"] as const)("%s composition page uses shared coverage, sour
   expect(sources.every(source => source.downloadHref.startsWith("/downloads/methodology/trade/files/"))).toBe(true);
 });
 
-test.each(["ka", "en"] as const)("%s Trade hub includes composition in cards and its last review date", async locale => {
-  const [hub, composition, presentation] = await Promise.all([renderTradeHub(locale), loadServedTradeCompositionData(), getPresentation(locale, ["trade"], [])]);
+// The Trade hub's cards and coverage are the Trade section of the External sector page now.
+test.each(["ka", "en"] as const)("%s Trade section includes composition in cards and its last review date", async locale => {
+  const [hub, composition, presentation] = await Promise.all([TOPIC_HUB_LOADERS.trade(locale), loadServedTradeCompositionData(), getPresentation(locale, ["trade"], [])]);
   const latestCompositionReview = composition.facts.map(fact => fact.lastReviewedAt).sort().at(-1)!;
-  expect(hub.props.cards).toHaveLength(6);
-  expect(hub.props.cards.at(-1)).toMatchObject({ index: "06", href: "/explorer/trade/composition" });
-  expect(hub.props.coverage).toBe(coverageLabel(presentation.messages, locale, 1995, 2025, latestCompositionReview));
+  expect(hub.cards).toHaveLength(6);
+  expect(hub.cards.at(-1)).toMatchObject({ index: "06", href: "/explorer/trade/composition" });
+  expect(topicHubCoverage(presentation.messages, locale, hub)).toBe(coverageLabel(presentation.messages, locale, 1995, 2025, latestCompositionReview));
 });

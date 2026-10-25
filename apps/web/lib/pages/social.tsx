@@ -10,7 +10,6 @@ import { SOCIAL_GEORGIA } from "../data/social/types";
 import { projectGdpFact } from "../explorer/clientData";
 import { coverageLabel } from "../explorer/coverageLabel";
 import { formatInUnit, UNIT_PERSONS } from "../explorer/format";
-import { HEALTH_HUB_PATH } from "../explorer/health";
 import { SOCIAL_SECTIONS, socialCoverage, socialTopicSeries, socialViews, type SocialTopicId } from "../explorer/social";
 import { Message } from "../i18n/message";
 import { message } from "../i18n/messages";
@@ -24,6 +23,7 @@ import { fiscalMetadata } from "../seo/metadata";
 import { explorerDatasetJsonLd } from "../seo/structuredData";
 import { resolveSiteUrl } from "../siteUrl";
 import { loadSocialWorkbookSources } from "./social-places";
+import { topicSection, ALL_DATA_PATH } from "../navigation/navTree";
 
 const topicHref = (section: SocialTopicId) => SOCIAL_SECTIONS.find(item => item.id === section)!.href;
 
@@ -61,8 +61,8 @@ export async function renderSocialTopicPage(locale: Locale, section: SocialTopic
   const hubLabel = message(messages, "common.health");
   const crumbs = [
     { label: message(messages, "common.home"), href: pageHref("/", locale) },
-    { label: message(messages, "common.data") },
-    { label: hubLabel, href: pageHref(HEALTH_HUB_PATH, locale) },
+    { label: message(messages, "common.data"), href: pageHref(ALL_DATA_PATH, locale) },
+    { label: hubLabel, href: pageHref(topicSection("health").href, locale) },
     { label: title },
   ];
   return <I18nProvider {...clientPresentation(presentation)}>
@@ -72,7 +72,7 @@ export async function renderSocialTopicPage(locale: Locale, section: SocialTopic
       // SSA's statistics; only Social payments' % of GDP view divides by Geostat's GDP. The funded pension has its own dataset vocabulary.
       ...(gdp ? {} : { sources: ["ssa"] as const }),
     })} />
-    <BreadcrumbJsonLd items={[{ name: crumbs[0].label, path: pageHref("/", locale) }, { name: hubLabel, path: pageHref(HEALTH_HUB_PATH, locale) }, { name: title, path: pageHref(href, locale) }]} />
+    <BreadcrumbJsonLd items={[{ name: crumbs[0].label, path: pageHref("/", locale) }, { name: message(messages, "common.data"), path: pageHref(ALL_DATA_PATH, locale) }, { name: hubLabel, path: pageHref(topicSection("health").path, locale) }, { name: title, path: pageHref(href, locale) }]} />
     <ExplorerPage containerQueries={false}>
       <PageHeader locale={locale} messages={messages} crumbs={crumbs} coverage={coverageLabel(messages, locale, min, max, lastReviewedAt)} />
       <SocialExplorer key={section} section={section} facts={facts} gdpFacts={gdpFacts} gdpSources={gdpSources} breaks={breaks}

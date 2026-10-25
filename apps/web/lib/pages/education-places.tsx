@@ -15,11 +15,12 @@ import { loadServedMunicipalData } from "../data/servedData";
 import { coverageLabel } from "../explorer/coverageLabel";
 import { GEORGIA_PLACE_ID, TBILISI_PLACE_ID, buildDemographyPlaces, placeLabel, type DemographyPlace } from "../explorer/demographyAreas";
 import { placeHrefById, placeIdForRoute, placeNeighbours, placePageHref, type PlaceRoute } from "../explorer/demographyPlaceRoutes";
-import { EDUCATION_HUB_PATH, educationCountLabel, educationPeriodLabel, educationSeriesLabel, educationTemporalCoverage } from "../explorer/education";
+import { educationCountLabel, educationPeriodLabel, educationSeriesLabel, educationTemporalCoverage } from "../explorer/education";
 import { buildEducationIndexModel } from "../explorer/educationIndex";
 import { educationPlaceBase, educationPlaceCoverage, educationPlaceDefaultSelection, educationPlaceSeries, type EducationPlaceSet } from "../explorer/educationPlaces";
 import { formatInUnit, UNIT_PERSONS } from "../explorer/format";
 import { buildPickerCountry, pickerGroupsFromRows } from "../explorer/municipalData";
+import { latestOf } from "../explorer/unitList";
 import { Message } from "../i18n/message";
 import { message } from "../i18n/messages";
 import { getMessages } from "../i18n/messages.server";
@@ -32,6 +33,7 @@ import { fiscalMetadata } from "../seo/metadata";
 import { explorerDatasetJsonLd } from "../seo/structuredData";
 import { resolveSiteUrl } from "../siteUrl";
 import { workbookScopeFor } from "./demography-population-place";
+import { topicSection, ALL_DATA_PATH } from "../navigation/navTree";
 
 /** The same three kinds of place page as Population, with the same 11 region ids and 63 municipality slugs. */
 export type EducationPlaceRoute = PlaceRoute;
@@ -49,13 +51,6 @@ async function loadEducationPlaceBasics(locale: Locale) {
   });
   const lastReviewedAt = shown.map(f => f.lastReviewedAt).sort().at(-1)!;
   return { facts: shown.map(toClientEducationFact), municipal, presentation, places, lastReviewedAt };
-}
-
-/** The latest fact of a place's series. */
-function latestOf(facts: readonly ClientEducationFact[], indicatorId: string, placeId: string): ClientEducationFact {
-  const latest = facts.filter(f => f.indicatorId === indicatorId && f.geographyId === placeId).sort((a, b) => a.year - b.year).at(-1);
-  if (!latest) throw new Error(`No ${indicatorId} facts for ${placeId}`);
-  return latest;
 }
 
 /** Georgia's value of a series in one year (the index's map year), or a descriptive error. */
@@ -109,8 +104,8 @@ export async function renderEducationIndexPage(locale: Locale, set: EducationPla
   const measure = t(`heading.${educationPlaceSeries(set, EDUCATION_GEORGIA)[0].heading}`);
   const crumbs = [
     { label: message(messages, "common.home"), href: pageHref("/", locale) },
-    { label: message(messages, "common.data") },
-    { label: t("title"), href: pageHref(EDUCATION_HUB_PATH, locale) },
+    { label: message(messages, "common.data"), href: pageHref(ALL_DATA_PATH, locale) },
+    { label: t("title"), href: pageHref(topicSection("education").href, locale) },
     { label: title },
   ];
   const years = educationPlaceCoverage(set, EDUCATION_GEORGIA, facts);
@@ -123,7 +118,8 @@ export async function renderEducationIndexPage(locale: Locale, set: EducationPla
       })} />
       <BreadcrumbJsonLd items={[
         { name: crumbs[0].label, path: pageHref("/", locale) },
-        { name: crumbs[2].label, path: pageHref(EDUCATION_HUB_PATH, locale) },
+        { name: message(messages, "common.data"), path: pageHref(ALL_DATA_PATH, locale) },
+        { name: crumbs[2].label, path: pageHref(topicSection("education").path, locale) },
         { name: title, path: pageHref(base, locale) },
       ]} />
       <ExplorerPage testId="explorer-shell">
@@ -196,8 +192,8 @@ export async function renderEducationPlacePage(route: EducationPlaceRoute, local
   const region = place.regionId === null ? null : places.find(candidate => candidate.id === place.regionId)!;
   const crumbs = [
     { label: message(messages, "common.home"), href: pageHref("/", locale) },
-    { label: message(messages, "common.data") },
-    { label: t("title"), href: pageHref(EDUCATION_HUB_PATH, locale) },
+    { label: message(messages, "common.data"), href: pageHref(ALL_DATA_PATH, locale) },
+    { label: t("title"), href: pageHref(topicSection("education").href, locale) },
     { label: sectionTitle, href: pageHref(base, locale) },
     ...(region ? [{ label: placeLabel(region, locale), href: href(region) }] : []),
     { label: name },
@@ -230,7 +226,8 @@ export async function renderEducationPlacePage(route: EducationPlaceRoute, local
       })} />
       <BreadcrumbJsonLd items={[
         { name: crumbs[0].label, path: pageHref("/", locale) },
-        { name: crumbs[2].label, path: pageHref(EDUCATION_HUB_PATH, locale) },
+        { name: message(messages, "common.data"), path: pageHref(ALL_DATA_PATH, locale) },
+        { name: crumbs[2].label, path: pageHref(topicSection("education").path, locale) },
         { name: sectionTitle, path: pageHref(base, locale) },
         ...(region ? [{ name: placeLabel(region, locale), path: href(region) }] : []),
         { name, path: href(place) },

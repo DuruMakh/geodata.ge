@@ -28,9 +28,11 @@ it("links all four delivered Economy datasets and derives their coverage", async
     "/explorer/economy/expenditure",
     "/explorer/economy/regions",
   ]);
-  // One figure: the latest nominal GDP, as the landing states the economy's size.
-  const nominal = facts.filter((fact) => fact.seriesId === "nominal_gel").sort((a, b) => a.year - b.year).at(-1)!;
-  expect(cards[0].footer).toBe(`${nominal.year} · Nominal GDP ${formatAmount(nominal.value, "en")}`);
+  // One series: the Economy overview page's line, real GDP in US dollars, is the card's figure, its caption and its sparkline.
+  const real = facts.filter((fact) => fact.seriesId === "real_usd_2015").sort((a, b) => a.year - b.year);
+  expect(cards[0].latest).toEqual({ value: "27.1 bn USD", period: String(real.at(-1)!.year), caption: "Real GDP" });
+  expect(cards[0].footer).toBe(`${real.at(-1)!.year} · Real GDP 27.1 bn USD`);
+  expect(cards[0].series).toEqual(real.map((fact) => fact.value));
   expect(cards[0].footer).not.toContain("Constant");
   const sectorYear = Math.max(...sectorFacts.map((fact) => fact.year));
   const sectorHighlights = buildSectorHighlights(sectorFacts, ECONOMIC_SECTORS, sectorYear);
@@ -45,6 +47,8 @@ it("links all four delivered Economy datasets and derives their coverage", async
   expect(cards[2]).toMatchObject({ index: "03", title: "GDP by expenditure", series: households.map((fact) => fact.value) });
   expect(cards[2].footer).toBe(`2025 · Households ${formatShare(households.at(-1)!.value / 100)} of GDP · 2010–2025 · Preliminary`);
   expect(cards[2].footer).toContain("69.1%");
+  // The sector shares and household share are published as preliminary for their latest year; the card marks them so.
+  expect([cards[1].latest?.status, cards[2].latest?.status]).toEqual(["preliminary", "preliminary"]);
   expect(cards[3].series).toEqual(regionalTotals.filter((fact) => fact.regionId === largest.regionId).sort((a, b) => a.year - b.year).map((fact) => fact.value));
   expect(cards[3].footer).toContain(`${regionalYear} · Largest regional economy: ${presentation.englishLabels[largest.regionId]} · Total regional GDP (Current prices): ${formatAmount(largest.value, "en")}`);
   expect(cards[3].footer).toContain(`${Math.min(...regionalTotals.map((fact) => fact.year))}–${regionalYear}`);

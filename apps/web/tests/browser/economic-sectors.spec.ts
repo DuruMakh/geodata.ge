@@ -198,8 +198,10 @@ for(const [locale,measure] of [["en","nominal"],["en","share_of_gdp"],["en","rea
 }
 test("sector source notes and metadata name the correct dataset",async({page})=>{
   await page.goto("/en/explorer/economy/sectors");
-  await expect(page.getByTestId("site-footer")).toContainText("Geostat");
-  await expect(page.getByTestId("site-footer")).not.toContainText("World Bank");
+  // No footer on explorer pages: the page's own source note names the dataset.
+  await expect(page.getByRole("contentinfo")).toHaveCount(0);
+  await expect(page.getByTestId("source-label")).toContainText("Geostat");
+  await expect(page.getByTestId("source-label")).not.toContainText("World Bank");
   await page.getByTestId("chart-mode-table").click();
   await expect(page.locator("caption")).toContainText("bn GEL");
   await expect(page.getByTestId("explorer-table")).toContainText("Preliminary");

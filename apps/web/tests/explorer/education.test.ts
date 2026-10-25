@@ -387,13 +387,14 @@ test("a Guria Schools teachers workbook names the total alone and the parts unde
 });
 
 test("the hub has four cards: Georgia's headline series with their latest school-year values and years", async () => {
-  const cards = buildEducationHubCards(facts, await presentation());
+  const base = await presentation();
+  const cards = buildEducationHubCards(facts, { ...base, messages: { ...base.messages, ...await getMessages("en", ["groups"]) } });
   expect(cards.map(card => card.href)).toEqual(EDUCATION_SECTIONS.map(section => section.href));
   expect(cards.map(card => card.title)).toEqual(["Schools", "Kindergartens", "Universities", "Vocational colleges"]);
   expect(cards.map(card => card.footer)).toEqual([
-    "2025/26 · 644.2 thousand · 2000/01–2025/26", "2025/26 · 130,337 · 2017/18–2025/26", "2025/26 · 195,426 · 2011/12–2025/26", "2025 · 19,690 · 2013–2025",
+    "2025/26 · 644.2 thousand · 2000/01–2025/26", "2025/26 · 130,337 · 2017/18–2025/26", "2025/26 · 195,426 · 2010/11–2025/26", "2025 · 19,690 · 2013–2025",
   ]);
-  expect(cards.map(card => card.series?.length)).toEqual([26, 9, 15, 13]);
+  expect(cards.map(card => card.series?.length)).toEqual([26, 9, 16, 13]);
   expect(cards[0].series!.at(-1)).toBe(644200);
   expect(cards.map(card => card.index)).toEqual(["01", "02", "03", "04"]);
   expect(cards.every(card => card.seriesColor === INK && !card.comingSoon)).toBe(true);

@@ -1,5 +1,5 @@
 import { expect, test, type APIRequestContext, type Locator, type Page } from "@playwright/test";
-import { NAV_TREE } from "../../lib/navigation/navTree";
+import { DATASET_HUBS } from "../../lib/navigation/datasetHubs";
 import enLanding from "../../lib/i18n/messages/en/landing.json";
 import kaLanding from "../../lib/i18n/messages/ka/landing.json";
 import { computedCssColorAlpha } from "./focus-outline";
@@ -191,12 +191,12 @@ const CHAPTERS = [
   { id: "ch-06", path: "/explorer/demography", titleKeys: ["landing.ageing.heading.ageing", "landing.ageing.heading.changing"], canvases: 3 },
   {
     id: "ch-07",
-    path: "/explorer/unemployment",
+    path: "/explorer/labour#t-unemployment",
     titleKeys: ["notHigher", "littleHigher", "oneAndHalf", "almostTwice", "twice", "moreThanTwice"].map((word) => `landing.jobs.heading.${word}`),
     canvases: 3,
   },
-  { id: "ch-08", path: "/explorer/wages", titleKeys: ["landing.ch8.title"], canvases: 1 },
-  { id: "ch-09", path: "/explorer/trade", titleKeys: ["landing.ch9.title"], canvases: 2 },
+  { id: "ch-08", path: "/explorer/labour#t-wages", titleKeys: ["landing.ch8.title"], canvases: 1 },
+  { id: "ch-09", path: "/explorer/external#t-trade", titleKeys: ["landing.ch9.title"], canvases: 2 },
   { id: "ch-10", path: "/explorer/health/causes-of-death", titleKeys: ["landing.ch10.title"], canvases: 1 },
 ] as const;
 const CHAPTER_IDS = CHAPTERS.map((chapter) => chapter.id);
@@ -642,18 +642,19 @@ for (const width of [375, 390]) {
   });
 }
 
-test("site footer on the homepage and the site pages, compact footer on explorer pages", async ({ page }) => {
+test("site footer on the homepage and the site pages, no footer on explorer pages", async ({ page }) => {
   for (const path of ["/", "/methodology", "/connect", "/about", "/en", "/en/methodology", "/en/connect", "/en/about"]) {
     await page.goto(`${baseUrl}${path}`);
     const footer = page.getByTestId("site-footer");
     await expect(footer, path).toHaveAttribute("data-variant", "site");
     await expect(footer.getByTestId("footer-language-link"), path).toHaveCount(1);
   }
+  // Explorer routes render no footer (owner, 2026-10-25); the sidebar's foot links methodology and AI connection.
   for (const path of ["/explorer/expenditure", "/en/explorer/expenditure"]) {
     await page.goto(`${baseUrl}${path}`);
-    const footer = page.getByTestId("site-footer");
-    await expect(footer, path).toHaveAttribute("data-variant", "compact");
-    await expect(footer.getByTestId("footer-language-link"), path).toHaveCount(0);
+    await expect(page.locator("body"), path).toHaveAttribute("data-app-ready", "true");
+    await expect(page.getByTestId("site-footer"), path).toHaveCount(0);
+    await expect(page.getByRole("contentinfo"), path).toHaveCount(0);
   }
 });
 
@@ -699,7 +700,8 @@ test("landing data and methodology links use real destinations", async ({ page }
   await expect(page.getByTestId("landing-header").getByRole("link", { name: "ექსპლორერი", exact: true })).toHaveCount(0);
   await page.getByTestId("hero-cta").click();
   await expect(page).toHaveURL(/\/explorer$/);
-  await expect(page.getByTestId("explorer-shell")).toBeVisible();
+  // /explorer is All data, the index of every page, rather than a chart page.
+  await expect(page.getByTestId("all-data-page")).toBeVisible();
 
   await page.goto(baseUrl);
   await page.locator("#ch-03 h2 a").click();
@@ -1112,8 +1114,8 @@ test("footer links keep non-overlapping 24px mobile targets and keyboard focus",
 
     const links = page.getByTestId("site-footer").getByRole("link");
     // The production connection is discoverable from every site footer.
-    // Logo, the address, every dataset hub, methodology, AI-კავშირი, მიზანი and the language link.
-    await expect(links).toHaveCount(NAV_TREE.length + 6);
+    // Logo, the address, every group page, methodology, AI-კავშირი, მიზანი and the language link.
+    await expect(links).toHaveCount(DATASET_HUBS.length + 6);
     await expect(page.getByTestId("site-footer").getByRole("link", { name: "AI-კავშირი", exact: true })).toHaveAttribute("href", "/connect");
     for (const link of await links.all()) {
       await expectMinimumTarget(link);

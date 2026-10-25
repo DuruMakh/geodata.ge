@@ -8,7 +8,6 @@ import { HOUSEHOLD_AREAS, type ClientHouseholdFact, type HouseholdArea } from ".
 import { REGIONAL_ECONOMY_REGIONS } from "../data/regionalEconomies/importRegionalEconomies";
 import { HOUSEHOLD_PAGE_AREAS, HOUSEHOLD_SECTIONS, householdCoverage, householdRegionHref, householdViewSeries, type HouseholdSectionId } from "../explorer/household";
 import { isHouseholdWorkbookSource } from "../explorer/householdWorkbook";
-import { LIVING_STANDARDS_HUB_PATH } from "../explorer/livingStandards";
 import { coverageLabel } from "../explorer/coverageLabel";
 import { I18nProvider } from "../i18n/provider";
 import { clientPresentation, getPresentation } from "../i18n/presentation.server";
@@ -21,6 +20,7 @@ import { loadSourcedWorkbookSources, type SourcedWorkbookPublicSource } from "..
 import { fiscalMetadata } from "../seo/metadata";
 import { explorerDatasetJsonLd } from "../seo/structuredData";
 import { resolveSiteUrl } from "../siteUrl";
+import { topicSection, ALL_DATA_PATH } from "../navigation/navTree";
 
 // Shared by the household page modules. The index and the area pages are separate
 // modules, so the index ships no explorer: keep explorer components out of this file.
@@ -67,7 +67,7 @@ export async function renderHouseholdPage(locale: Locale, section: HouseholdSect
   const title = regionId ? t(`page.${section}.regionTitle`, { region: regionName }) : sectionTitle;
   const description = regionId ? t(`page.${section}.regionSummary`, { region: regionName }) : t(`page.${section}.summary`), hubTitle = message(presentation.messages, "common.livingStandards");
   const lastReviewedAt = data.facts.filter(f => f.indicatorId.startsWith(`${section}.`) && (!regionId || areaIds.has(f.areaId))).map(f => f.lastReviewedAt).sort().at(-1)!, origin = resolveSiteUrl();
-  const crumbs = [{ label: message(presentation.messages, "common.home"), href: pageHref("/", locale) }, { label: message(presentation.messages, "common.data") }, { label: hubTitle, href: pageHref(LIVING_STANDARDS_HUB_PATH, locale) }, ...(regionId ? [{ label: sectionTitle, href: pageHref(sectionHref, locale) }] : []), { label: regionId ? regionName : title }];
+  const crumbs = [{ label: message(presentation.messages, "common.home"), href: pageHref("/", locale) }, { label: message(presentation.messages, "common.data"), href: pageHref(ALL_DATA_PATH, locale) }, { label: hubTitle, href: pageHref(topicSection("living-standards").href, locale) }, ...(regionId ? [{ label: sectionTitle, href: pageHref(sectionHref, locale) }] : []), { label: regionId ? regionName : title }];
   return <I18nProvider {...clientPresentation(presentation)}>
     <JsonLd testId="explorer-dataset-json-ld" data={explorerDatasetJsonLd({
       locale, origin, path: href, datasetId: "household-income", name: title, description, firstYear, lastYear, dateModified: lastReviewedAt,
@@ -75,7 +75,7 @@ export async function renderHouseholdPage(locale: Locale, section: HouseholdSect
       ...(regionId ? { spatialCoverageName: regionName, withinGeorgia: regionId !== "georgia", partOf: { path: sectionHref, name: sectionTitle, description: t(`page.${section}.summary`) } } : {}),
       variableMeasured: Object.values(labels),
     })} />
-    <BreadcrumbJsonLd items={[{ name: crumbs[0].label, path: pageHref("/", locale) }, { name: hubTitle, path: pageHref(LIVING_STANDARDS_HUB_PATH, locale) }, ...(regionId ? [{ name: sectionTitle, path: pageHref(sectionHref, locale) }] : []), { name: title, path: pageHref(href, locale) }]} />
+    <BreadcrumbJsonLd items={[{ name: crumbs[0].label, path: pageHref("/", locale) }, { name: message(presentation.messages, "common.data"), path: pageHref(ALL_DATA_PATH, locale) }, { name: hubTitle, path: pageHref(topicSection("living-standards").path, locale) }, ...(regionId ? [{ name: sectionTitle, path: pageHref(sectionHref, locale) }] : []), { name: title, path: pageHref(href, locale) }]} />
     <ExplorerPage containerQueries={false}>
       <PageHeader locale={locale} messages={presentation.messages} crumbs={crumbs} coverage={coverageLabel(presentation.messages, locale, firstYear, lastYear, lastReviewedAt)} />
       {body({ facts, labels, areaLabels, sources, origin })}

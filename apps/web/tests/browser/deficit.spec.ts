@@ -19,12 +19,12 @@ test.describe("General-government deficit explorer", () => {
     await expect(page.getByTestId("chart-series-deficit.general_government.balance-actual")).toBeVisible();
     await expect(page.getByTestId("chart-series-deficit.general_government.balance-forecast")).toHaveAttribute("stroke-dasharray", "6 5");
     await expect(page.getByTestId("range-marker")).toContainText("პროგნოზი");
-    // The projection, actual-period and sign notes; the explorer renders no footer of its own.
+    // The projection, actual-period and sign notes; explorer pages render no footer.
     const explorer = page.getByTestId("deficit-explorer");
     await expect(explorer).toContainText("2026–2031 წლები IMF-ის პროგნოზია");
     await expect(explorer).toContainText("1995–2025 წლები ამ WEO გამოცემაში ფაქტობრივ პერიოდადაა მონიშნული");
     await expect(explorer).toContainText("უარყოფითი მნიშვნელობა დეფიციტია");
-    await expect(explorer.getByTestId("site-footer")).toHaveCount(0);
+    await expect(page.getByRole("contentinfo")).toHaveCount(0);
     const overflow = await page.evaluate(() => ({
       body: document.body.scrollWidth,
       viewport: document.documentElement.clientWidth,

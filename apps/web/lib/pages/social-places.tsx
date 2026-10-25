@@ -19,11 +19,11 @@ import { coverageLabel } from "../explorer/coverageLabel";
 import { GEORGIA_PLACE_ID, TBILISI_PLACE_ID, buildDemographyPlaces, placeLabel, type DemographyPlace } from "../explorer/demographyAreas";
 import { placeHrefById, placeIdForRoute, placeNeighbours, placePageHref, type PlaceRoute } from "../explorer/demographyPlaceRoutes";
 import { formatInUnit, formatShare, UNIT_PERSONS } from "../explorer/format";
-import { HEALTH_HUB_PATH } from "../explorer/health";
 import { buildPickerCountry, pickerGroupsFromRows } from "../explorer/municipalData";
 import { socialAnnualCpi, socialPopulation, type SocialPlaceSet } from "../explorer/social";
 import { buildSocialIndexModel } from "../explorer/socialIndex";
 import { socialPlaceBase, socialPlaceCoverage, socialPlaceDefaultSelection, socialPlaceFacts, socialPlaceSeries } from "../explorer/socialPlaces";
+import { latestOf } from "../explorer/unitList";
 import type { WorkbookPublicSource } from "../explorer/workbookModel";
 import { Message } from "../i18n/message";
 import { message } from "../i18n/messages";
@@ -37,6 +37,7 @@ import { fiscalMetadata } from "../seo/metadata";
 import { explorerDatasetJsonLd } from "../seo/structuredData";
 import { resolveSiteUrl } from "../siteUrl";
 import { workbookScopeFor } from "./demography-population-place";
+import { topicSection, ALL_DATA_PATH } from "../navigation/navTree";
 
 /** The same three kinds of place page as Population and Education, with the same 11 region ids and 63 municipality slugs. */
 export type SocialPlaceRoute = PlaceRoute;
@@ -97,13 +98,6 @@ function headingNames(messages: Messages, set: SocialPlaceSet): string[] {
   return [...new Set(socialPlaceSeries(set).map(({ heading }) => message(messages, `social.heading.${heading}`)))];
 }
 
-/** The latest served fact of a place's series. */
-function latestOf(facts: readonly ClientSocialFact[], indicatorId: string, placeId: string): ClientSocialFact {
-  const latest = facts.filter(f => f.indicatorId === indicatorId && f.geographyId === placeId).sort((a, b) => a.year - b.year).at(-1);
-  if (!latest) throw new Error(`No ${indicatorId} facts for ${placeId}`);
-  return latest;
-}
-
 /** A count as the latest lines print it: whole persons or families. */
 const countLabel = (fact: ClientSocialFact) => formatInUnit(fact.value, UNIT_PERSONS);
 /** A share of residents as the map, the list and the picker print it: per 100, as a percent to one decimal. */
@@ -118,8 +112,8 @@ function methodologyLink(messages: Messages, locale: Locale) {
 function hubCrumbs(messages: Messages, locale: Locale) {
   return [
     { label: message(messages, "common.home"), href: pageHref("/", locale) },
-    { label: message(messages, "common.data") },
-    { label: message(messages, "common.health"), href: pageHref(HEALTH_HUB_PATH, locale) },
+    { label: message(messages, "common.data"), href: pageHref(ALL_DATA_PATH, locale) },
+    { label: message(messages, "common.health"), href: pageHref(topicSection("health").href, locale) },
   ];
 }
 
@@ -151,7 +145,8 @@ export async function renderSocialIndexPage(locale: Locale, set: SocialPlaceSet)
       })} />
       <BreadcrumbJsonLd items={[
         { name: crumbs[0].label, path: pageHref("/", locale) },
-        { name: crumbs[2].label, path: pageHref(HEALTH_HUB_PATH, locale) },
+        { name: message(messages, "common.data"), path: pageHref(ALL_DATA_PATH, locale) },
+        { name: crumbs[2].label, path: pageHref(topicSection("health").path, locale) },
         { name: title, path: pageHref(base, locale) },
       ]} />
       <ExplorerPage testId="explorer-shell">
@@ -250,7 +245,8 @@ export async function renderSocialPlacePage(route: SocialPlaceRoute, locale: Loc
       })} />
       <BreadcrumbJsonLd items={[
         { name: crumbs[0].label, path: pageHref("/", locale) },
-        { name: crumbs[2].label, path: pageHref(HEALTH_HUB_PATH, locale) },
+        { name: message(messages, "common.data"), path: pageHref(ALL_DATA_PATH, locale) },
+        { name: crumbs[2].label, path: pageHref(topicSection("health").path, locale) },
         { name: sectionTitle, path: pageHref(base, locale) },
         ...(region ? [{ name: placeLabel(region, locale), path: href(region) }] : []),
         { name, path: href(place) },

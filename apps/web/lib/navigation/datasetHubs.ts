@@ -1,7 +1,7 @@
-import { NAV_TREE } from "./navTree";
+import { NAV_GROUPS } from "./navTree";
 
 /**
- * The dataset hubs the site header menu, the footer and the 404 page link to: every hub of the sidebar's navigation
- * tree, in its order (owner question Q3, 2026-10-12, recommended default). A new hub is one edit to `NAV_TREE`.
+ * The groups the site header menu, the footer and the 404 page link to: every group of the sidebar's navigation
+ * config, in its order. A new group is one edit to `NAV_GROUPS`.
  */
-export const DATASET_HUBS = NAV_TREE.map(({ href, labelKey }) => ({ href, labelKey }));
+export const DATASET_HUBS = NAV_GROUPS.map(({ href, labelKey }) => ({ href, labelKey }));

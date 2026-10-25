@@ -9,6 +9,10 @@ export const WAGES_SECTIONS = [
 ] as const;
 export type WagesSectionId = typeof WAGES_SECTIONS[number]["id"];
 export const wagesRegionHref = (regionId: string): `/${string}` => `/explorer/wages/regions/${regionId.replace(/^region\./, "")}`;
+/** The latest-value line's figure: the average monthly wage, all sectors, of Georgia or of a region, in its latest year. */
+export function wagesPlaceLatest(facts: readonly ClientWagesFact[], regionId?: string): ClientWagesFact {
+  return facts.filter(f => f.indicatorId === "average_monthly_nominal_earnings" && f.dimension === (regionId ? "region" : "national") && (!regionId || f.groupId === regionId) && f.sectorId === "total" && f.value !== null).sort((a, b) => a.year - b.year).at(-1)!;
+}
 /** Whose wages the Industries page shows; "median" is Georgia's median, the rest are averages. */
 export const WAGES_INDUSTRY_GROUPS = ["georgia", "women", "men", "public", "non_public", "business", "non_business", "median"] as const;
 export type WagesIndustryGroup = typeof WAGES_INDUSTRY_GROUPS[number];

@@ -301,7 +301,7 @@ test.describe("phone", () => {
   test("the pinned bar's brand link is a 44px row", async ({ page }) => {
     await page.goto("/explorer/unemployment/overview");
     await ready(page);
-    expect((await page.getByTestId("data-sidebar").locator("a").first().boundingBox())!.height).toBeGreaterThanOrEqual(44);
+    expect((await page.getByTestId("sidebar-topbar").locator("a").first().boundingBox())!.height).toBeGreaterThanOrEqual(44);
   });
 
   test("inflation overview eyebrow starts where the chart and range strip start", async ({ page }) => {

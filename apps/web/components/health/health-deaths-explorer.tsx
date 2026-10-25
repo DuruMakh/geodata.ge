@@ -5,7 +5,7 @@ import { updatedDate } from "../../lib/explorer/coverageLabel";
 import type { ClientHealthFact, HealthArea } from "../../lib/data/health/types";
 import type { MunicipalRegion } from "../../lib/data/municipal/types";
 import { HEALTH_SECTIONS, healthSeriesCoverage } from "../../lib/explorer/health";
-import { buildHealthDeathsModel, healthDeathsAreaHref, healthDeathsSeries, parseHealthDeathsHash, serializeHealthDeathsHash } from "../../lib/explorer/healthDeaths";
+import { buildHealthDeathsModel, healthDeathsAreaHref, healthDeathsAreaLatest, healthDeathsSeries, parseHealthDeathsHash, serializeHealthDeathsHash } from "../../lib/explorer/healthDeaths";
 import { buildHealthWorkbookExportModel } from "../../lib/explorer/healthWorkbook";
 import { formatInUnit, type ValueUnit } from "../../lib/explorer/format";
 import { rangeFromPatch } from "../../lib/explorer/periodRange";
@@ -59,7 +59,7 @@ export function HealthDeathsExplorer({ area, areas, facts, labels, areaLabels, s
   const rows = model.selected.map(series => ({ itemId: series.id, kaLabel: labels[series.id], color: series.color, valuesByYear: series.valuesByYear }));
   const lineSeries = model.selected.map(series => ({ id: series.id, label: labels[series.id], color: series.color, vals: model.years.map(year => series.valuesByYear[year]) }));
   const total = rows.find(row => row.itemId === TOTAL) ?? null;
-  const latest = facts.filter(f => f.indicatorId === TOTAL).sort((a, b) => a.year - b.year).at(-1)!;
+  const latest = healthDeathsAreaLatest(area, facts);
   const areaName = areaLabels[area];
   const title = t("page.area.regionTitle", { region: areaName });
   const chartLabel = `${t("page.causes-of-death.title")} · ${areaName}`;

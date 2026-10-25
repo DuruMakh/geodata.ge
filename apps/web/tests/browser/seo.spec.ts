@@ -1,5 +1,7 @@
 import { expect, test, type Locator, type Page } from "@playwright/test";
 import { MUNICIPALITY_ROUTES } from "../../lib/explorer/municipalityRoutes";
+import { DATASET_HUBS } from "../../lib/navigation/datasetHubs";
+import { NAV_GROUPS, groupPages } from "../../lib/navigation/navTree";
 import { computedCssColorAlpha } from "./focus-outline";
 import { TEST_BASE_URL } from "./test-base-url";
 
@@ -183,6 +185,33 @@ test("only third-party methodology source originals send a noindex header", asyn
   expect(methodologyPage.headers()["x-robots-tag"]).toBeUndefined();
 });
 
+// deep-review known #10: the place index All data's search fetches is data, not a page to list.
+test("the place index files send a noindex header, and All data does not", async ({ request }) => {
+  for (const locale of ["ka", "en"]) {
+    const response = await request.get(`${BASE_URL}/explorer-places.${locale}.json`);
+    expect(response.ok(), locale).toBe(true);
+    expect(response.headers()["x-robots-tag"], locale).toBe("noindex");
+  }
+  expect((await request.get(`${BASE_URL}/explorer`)).headers()["x-robots-tag"]).toBeUndefined();
+});
+
+// deep-review routing M3: a chart page's "მონაცემები" / "Data" crumb links to All data, and its structured trail has the
+// same Data level as a group page's (Home > Data > group or topic > page).
+test("a chart page of every group links its Data crumb to All data and lists it in its structured trail", async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 900 });
+  for (const prefix of ["", "/en"]) {
+    for (const group of NAV_GROUPS) {
+      const path = `${prefix}${groupPages(group)[0].href}`;
+      await page.goto(`${BASE_URL}${path}`);
+      const data = prefix ? "Data" : "მონაცემები";
+      await expect(page.locator('[data-testid="explorer-header"] nav:visible a', { hasText: data }), path).toHaveAttribute("href", `${prefix}/explorer`);
+      const structured = JSON.parse((await page.locator('[data-testid="breadcrumb-json-ld"]').textContent()) ?? "{}");
+      const items = structured.itemListElement.map((item: { name: string; item?: string }) => [item.name, item.item]);
+      expect(items[1], path).toEqual([data, `https://fiscal.ge${prefix}/explorer`]);
+    }
+  }
+});
+
 test("agent instructions publish a plain-text guide with working public links", async ({ request }) => {
   const response = await request.get(`${BASE_URL}/llms.txt`);
 
@@ -211,7 +240,8 @@ test("404 recovery keeps a real not-found response with useful, accessible desti
 
   expect(response.status()).toBe(404);
   expect(response.headers()["content-type"]?.toLowerCase()).toContain("text/html");
-  for (const href of ["/", "/explorer", "/explorer/economy", "/explorer/inflation", "/explorer/unemployment", "/methodology"]) {
+  // Home, the group pages and methodology.
+  for (const href of ["/", ...DATASET_HUBS.map(({ href }) => href), "/methodology"]) {
     expect(html).toContain(`href=\"${href}\"`);
   }
 
@@ -238,8 +268,9 @@ test("404 recovery keeps a real not-found response with useful, accessible desti
     const recovery = page.getByTestId("not-found-recovery");
     await expect(recovery).toContainText("მისამართი არ არსებობს ან გვერდი გადატანილია.");
     const links = recovery.getByRole("link");
-    await expect(links).toHaveCount(22);
-    for (const href of ["/", "/explorer", "/explorer/economy", "/explorer/business", "/explorer/housing", "/explorer/inflation", "/explorer/money", "/explorer/unemployment", "/explorer/wages", "/explorer/living-standards", "/explorer/health", "/explorer/education", "/explorer/science-culture", "/explorer/crime", "/explorer/internet", "/explorer/trade", "/explorer/external", "/explorer/energy-food", "/explorer/environment", "/explorer/transport", "/explorer/demography", "/methodology"]) {
+    // Home, the group pages and methodology.
+    await expect(links).toHaveCount(DATASET_HUBS.length + 2);
+    for (const href of ["/", ...DATASET_HUBS.map(({ href }) => href), "/methodology"]) {
       await expect(recovery.locator(`[href=\"${href}\"]`)).toHaveCount(1);
     }
     await expectNoPageOverflow(page);
@@ -428,7 +459,8 @@ test("sitemap keeps its XML contract and offers a readable browser view", async 
   const xml = await response.text();
   expect(xml).toContain('<?xml-stylesheet type="text/xsl" href="/sitemap.xsl"?>');
   // The sitemap builder's URLs, the trade pages among them, are asserted in tests/seo/routes.test.ts.
-  expect([...xml.matchAll(/<loc>https:\/\/[^<]+<\/loc>/g)]).toHaveLength(1578);
+  // 1550 less the 19 old topic hubs and their 19 English mirrors, plus the 8 group pages in both languages, plus main's 14 Money and banks pairs (Who borrows, Loans by region and its 12 area pages).
+  expect([...xml.matchAll(/<loc>https:\/\/[^<]+<\/loc>/g)]).toHaveLength(1556);
 
   const consoleIssues: string[] = [];
   page.on("console", (message) => {
@@ -445,7 +477,7 @@ test("sitemap keeps its XML contract and offers a readable browser view", async 
     expect(navigation?.status()).toBe(200);
     await expect(page).toHaveTitle("Fiscal.ge / XML sitemap");
     await expect(page.getByRole("heading", { name: "Public pages" })).toHaveCount(1);
-    await expect(page.locator(".sitemap-row")).toHaveCount(1578);
+    await expect(page.locator(".sitemap-row")).toHaveCount(1556);
     await expectNoPageOverflow(page);
 
     if (viewport.width < 720) {
@@ -512,6 +544,7 @@ test("municipality breadcrumbs include the region in visible and structured hier
 
   expect(visibleLabels).toEqual([
     "მთავარი",
+    "მონაცემები",
     "ბიუჯეტი",
     "მუნიციპალიტეტები",
     "იმერეთი",
@@ -519,6 +552,7 @@ test("municipality breadcrumbs include the region in visible and structured hier
   ]);
   expect(structuredLabels).toEqual([
     "მთავარი",
+    "მონაცემები",
     "ბიუჯეტი",
     "მუნიციპალიტეტები",
     "იმერეთი",
@@ -535,6 +569,7 @@ test("Tbilisi municipality breadcrumbs distinguish the region from the city", as
 
   const expectedLabels = [
     "მთავარი",
+    "მონაცემები",
     "ბიუჯეტი",
     "მუნიციპალიტეტები",
     "თბილისის რეგიონი",
@@ -557,11 +592,12 @@ test("Tbilisi municipality breadcrumbs distinguish the region from the city", as
   );
 });
 
-test("explorer hub states its data scope in one lead line", async ({ page }) => {
-  await page.goto(`${BASE_URL}/explorer`);
+// The Budget hub moved from /explorer to the Budget group page, which keeps its one lead line.
+test("the Budget group page states its data scope in one lead line", async ({ page }) => {
+  await page.goto(`${BASE_URL}/explorer/budget`);
 
-  const introduction = page.getByTestId("explorer-hub-introduction");
-  await expect(introduction).toHaveText("ბიუჯეტის, ვალისა და დეფიციტის მონაცემები");
+  const introduction = page.locator("h1 + p");
+  await expect(introduction).toHaveText("ბიუჯეტი, ვალი და დეფიციტი");
 });
 
 test("methodology exposes a stable processed-data download", async ({ page, request }) => {

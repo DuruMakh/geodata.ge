@@ -43,7 +43,8 @@ test("language selection remains available in the collapsed desktop sidebar and 
   // The rail shows "EN"; the link's name starts with that and adds the full language name.
   await expect(page.getByTestId("language-switch").getByRole("link", { name: "EN English", exact: true })).toBeVisible();
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.getByTestId("sidebar-toggle").click();
+  // A phone opens the menu from the bar's own button.
+  await page.getByTestId("sidebar-menu-button").click();
   await expect(page.getByTestId("language-switch").getByRole("link", { name: "English", exact: true })).toBeVisible();
 });
 
@@ -128,12 +129,14 @@ test("every page family has one skip target and a skip link that points to it", 
 });
 
 // Moved from household.spec.ts.
+// Living standards opens the first topic of the Living standards and health group, which follows Labour market (with Wages).
 test("the sidebar lists Living standards after Wages, with its four pages and the current one active", async ({ page }) => {
   await page.goto("/en/explorer/living-standards/spending");
   await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
-  const entry = page.getByTestId("living-standards-link");
-  await expect(entry).toHaveText("Living standards");
-  expect(await page.getByTestId("wages-link").evaluate((wages, living) => Boolean(wages.compareDocumentPosition(living!) & Node.DOCUMENT_POSITION_FOLLOWING), await entry.elementHandle())).toBe(true);
+  const entry = page.getByTestId("group-link-living");
+  await expect(entry).toContainText("Living standards and health");
+  await expect(page.getByTestId("group-panel-living")).toContainText("Living standards");
+  expect(await page.getByTestId("group-link-labour").evaluate((labour, living) => Boolean(labour.compareDocumentPosition(living!) & Node.DOCUMENT_POSITION_FOLLOWING), await entry.elementHandle())).toBe(true);
   for (const id of ["income", "spending", "rates", "inequality"]) await expect(page.getByTestId(`living-standards-${id}-link`)).toBeVisible();
   await expect(page.getByTestId("living-standards-spending-link")).toHaveAttribute("aria-current", "page");
   await expect(page.getByTestId("living-standards-income-link")).not.toHaveAttribute("aria-current", "page");

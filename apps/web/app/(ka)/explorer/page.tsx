@@ -1,4 +1,4 @@
-import { renderHubPage, hubPageMetadata } from "../../../lib/pages/hub";
+import { allDataPageMetadata, renderAllDataPage } from "../../../lib/pages/all-data";
 
-export function generateMetadata() { return hubPageMetadata("ka"); }
-export default function Page() { return renderHubPage("ka"); }
+export function generateMetadata() { return allDataPageMetadata("ka"); }
+export default function Page() { return renderAllDataPage("ka"); }

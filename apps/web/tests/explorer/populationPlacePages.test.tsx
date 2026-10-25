@@ -270,7 +270,8 @@ describe("what each page hands on", () => {
 
   it("gives its structured breadcrumb the same trail as the visible one, through the region for a municipality", async () => {
     const root = "https://fiscal.ge/en/explorer/demography/population";
-    const trail = ["https://fiscal.ge/en", "https://fiscal.ge/en/explorer/demography", root];
+    // Home > Data (All data) > Demography > Population, as on every chart page.
+    const trail = ["https://fiscal.ge/en", "https://fiscal.ge/en/explorer", "https://fiscal.ge/en/explorer/demography", root];
     expect(breadcrumbUrls(await page({ kind: "country" }))).toEqual([...trail, `${root}/georgia`]);
     expect(breadcrumbUrls(await page({ kind: "region", id: "adjara" }))).toEqual([...trail, `${root}/region/adjara`]);
     expect(breadcrumbUrls(await page({ kind: "municipality", slug: "batumi" }))).toEqual([...trail, `${root}/region/adjara`, `${root}/batumi`]);

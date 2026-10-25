@@ -123,7 +123,7 @@ describe("landing page layout", () => {
     const { renderHomePage } = await import("../../lib/pages/home");
     const markup = renderPageMarkup("en", await renderHomePage("en"));
     const headingLinks = [...markup.matchAll(/<h2[^>]*>[\s\S]*?<\/h2>/g)].flatMap((match) => [...match[0].matchAll(/href="([^"]+)"/g)].map((link) => link[1]));
-    expect(headingLinks).toEqual(["/en/explorer/analysis", "/en/explorer/expenditure", "/en/explorer/revenue", "/en/explorer/municipalities", "/en/explorer/deficit", "/en/explorer/demography", "/en/explorer/unemployment", "/en/explorer/wages", "/en/explorer/trade", "/en/explorer/health/causes-of-death"]);
+    expect(headingLinks).toEqual(["/en/explorer/analysis", "/en/explorer/expenditure", "/en/explorer/revenue", "/en/explorer/municipalities", "/en/explorer/deficit", "/en/explorer/demography", "/en/explorer/labour#t-unemployment", "/en/explorer/labour#t-wages", "/en/explorer/external#t-trade", "/en/explorer/health/causes-of-death"]);
   });
 
   // Two municipal totals by design: chapter 01 compares the official all-local-budgets country aggregate with GDP;

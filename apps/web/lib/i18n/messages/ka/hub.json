@@ -4,14 +4,12 @@
   "hub.revenueDescription": "გადასახადები, გრანტები და სხვა შემოსულობები წლების მიხედვით.",
   "hub.taxBreaksRefundsDescription": "რამდენ გადასახადს თმობს სახელმწიფო შეღავათებით და რამდენს უბრუნებს გადამხდელებს.",
   "hub.taxBreaksRefundsFooter": "{year} · დაბრუნება {amount}",
+  "hub.taxBreaksRefundsCaption": "დაბრუნება",
   "hub.analysisDescription": "ერთი წლის სურათი — სტრუქტურა, რეიტინგი და ყოველი 100 ₾.",
   "hub.debtDescription": "მთავრობის ვალის მოცულობა, გადახდა და საპროცენტო განაკვეთები.",
   "hub.deficitDescription": "ზოგადი მთავრობის დეფიციტი ან პროფიციტი — მშპ-ის წილი და თანხა ლარში.",
   "hub.municipalDescription": "{count} მუნიციპალური საბიუჯეტო ერთეული — რაში იხარჯება ადგილობრივი ბიუჯეტები.",
   "hub.analysisFooter": "{year} · {count} კატეგორია",
   "hub.deficitFooter": "{year} · {share} მშპ-ის",
-  "hub.metaTitle": "საქართველოს ბიუჯეტის მონაცემები | Fiscal.ge",
-  "hub.metaDescription": "საქართველოს ბიუჯეტის გადამოწმებული მონაცემები: შემოსავლები, ხარჯები, მუნიციპალიტეტები, ვალი, დეფიციტი და ერთი წლის ანალიზი.",
-  "hub.heading": "საქართველოს ბიუჯეტი",
-  "hub.introduction": "ბიუჯეტის, ვალისა და დეფიციტის მონაცემები"
+  "hub.deficitCaption": "მშპ-ის"
 }

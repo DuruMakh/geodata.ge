@@ -5,6 +5,9 @@ export const MIGRATION_PATH = "/explorer/demography/migration";
 export const BIRTHS_DEATHS_PATH = "/explorer/demography/births-deaths";
 export const AGE_SEX_PATH = "/explorer/demography/age-sex";
 export const MARRIAGES_DIVORCES_PATH = "/explorer/demography/marriages-divorces";
+/** The place pages' sections the Births and Marriages pages' rows open. */
+export const BIRTHS_DEATHS_ANCHOR = "#births-deaths";
+export const MARRIAGES_DIVORCES_ANCHOR = "#marriages-divorces";
 
 /**
  * The five Demography pages in hub order, and the one place that decides which are live. A name stays a

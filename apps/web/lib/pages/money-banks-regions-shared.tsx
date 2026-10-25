@@ -10,7 +10,7 @@ export const {
   areaPages: AREA_PAGES, areaStaticParams: moneyBanksAreaStaticParams, areaForSlug, indexPageMetadata: moneyBanksRegionsPageMetadata,
   areaPageMetadata: moneyBanksAreaPageMetadata, loadWorkbookSources: loadMoneyBanksRegionsWorkbookSources, renderFrame: renderMoneyBanksRegionsFrame,
 } = regionAreaFrame<MoneyBanksArea, MoneyBanksFact>({
-  hub: "moneyBanks", hubPath: "/explorer/money", indexHref: MONEY_BANKS_REGIONS_HREF, indexKey: "regions",
+  hub: "moneyBanks", indexHref: MONEY_BANKS_REGIONS_HREF, indexKey: "regions",
   areas: MONEY_BANKS_LOAN_AREAS, areaSlug: moneyBanksAreaSlug, areaHref: moneyBanksAreaHref, mapId: moneyBanksMapId,
   areaHeadingIds: () => ["area"],
   load: loadServedMoneyBanksData, sourceIds: ["nbg_loans_regions_lreg"],

@@ -1,5 +1,5 @@
 import { expect, test, type Locator, type Page } from "@playwright/test";
-import { NAV_TREE } from "../../lib/navigation/navTree";
+import { DATASET_HUBS } from "../../lib/navigation/datasetHubs";
 
 // Mobile repairs (2026-10-07 review, owner decisions D2/D3/D10): navigation,
 // headers and editorial pages on a 390px phone.
@@ -24,8 +24,8 @@ for (const { path, label } of [
   test(`${path}: the explorer top bar stays pinned and opens a 44px-row menu`, async ({ page }) => {
     await page.goto(path);
     await ready(page);
-    const bar = page.getByTestId("data-sidebar");
-    const toggle = page.getByTestId("sidebar-toggle");
+    const bar = page.getByTestId("sidebar-topbar");
+    const toggle = page.getByTestId("sidebar-menu-button");
     await expect(toggle).toHaveAccessibleName(label);
     const toggleBox = await toggle.boundingBox();
     expect(toggleBox?.width ?? 0).toBeGreaterThanOrEqual(44);
@@ -45,11 +45,11 @@ for (const { path, label } of [
     const panelBox = await panel.boundingBox();
     expect((panelBox?.y ?? 0) + (panelBox?.height ?? 0)).toBeLessThanOrEqual(844 + 1);
 
-    for (const row of await heights(panel.locator("nav a, nav li:not(:has(a)), a[data-testid=sidebar-back-home], [data-testid=language-switch] a"))) {
+    // Every link and button of the menu, the language switch and the foot's links included (the old back-home row is the brand).
+    for (const row of await heights(panel.locator("a, button"))) {
       expect(row.height, row.text).toBeGreaterThanOrEqual(44);
     }
-    const backHome = page.getByTestId("sidebar-back-home");
-    expect((await backHome.boundingBox())?.width ?? 0).toBeGreaterThan(300);
+    expect((await page.getByTestId("all-data-link").boundingBox())?.width ?? 0).toBeGreaterThan(300);
     // Demography is a live dataset link now (its 44px row is measured above), so no reduced-emphasis teaser row is left.
     await expect(panel.locator("[data-testid^=teaser-]")).toHaveCount(0);
 
@@ -63,16 +63,16 @@ test("tapping a menu link from mid-page closes the menu on arrival", async ({ pa
   await page.goto("/explorer/expenditure");
   await ready(page);
   await page.evaluate(() => window.scrollTo(0, 1500));
-  const toggle = page.getByTestId("sidebar-toggle");
+  const toggle = page.getByTestId("sidebar-menu-button");
   await toggle.click();
-  await page.getByTestId("unemployment-link").click();
-  await expect(page).toHaveURL(/\/explorer\/unemployment$/);
+  await page.getByTestId("group-link-labour").click();
+  await expect(page).toHaveURL(/\/explorer\/labour$/);
   await expect(toggle).toHaveAttribute("aria-expanded", "false");
 });
 
 for (const { path, menu, datasets, other } of [
-  { path: "/", menu: "მენიუ", datasets: ["ბიუჯეტი", "ეკონომიკა", "ბიზნესი", "საცხოვრებელი და მშენებლობა", "ინფლაცია", "ფული და ბანკები", "უმუშევრობა", "ხელფასები", "ცხოვრების დონე", "ჯანდაცვა და სოციალური დაცვა", "განათლება", "მეცნიერება და კულტურა", "დანაშაული და მართლმსაჯულება", "ინტერნეტი და ტექნოლოგიები", "საგარეო ვაჭრობა", "საგარეო ნაკადები", "ენერგეტიკა და სურსათი", "გარემო და კლიმატი", "ტრანსპორტი", "დემოგრაფია"], other: "EN English" },
-  { path: "/en", menu: "Menu", datasets: ["Budget", "Economy", "Business", "Housing and construction", "Inflation", "Money and banks", "Unemployment", "Wages", "Living standards", "Health and social protection", "Education", "Science and culture", "Crime and justice", "Internet and technology", "Trade", "External flows", "Energy and food", "Environment and climate", "Transport", "Demography"], other: "KA ქართული" },
+  { path: "/", menu: "მენიუ", datasets: ["ბიუჯეტი", "ეკონომიკა და ბიზნესი", "ფასები და ფული", "შრომის ბაზარი", "ცხოვრების დონე და ჯანდაცვა", "საგარეო სექტორი", "დემოგრაფია", "საზოგადოება და გარემო"], other: "EN English" },
+  { path: "/en", menu: "Menu", datasets: ["Budget", "Economy and business", "Prices and money", "Labour market", "Living standards and health", "External sector", "Demography", "Society and environment"], other: "KA ქართული" },
 ]) {
   test(`${path} ☰ menu lists every dataset as 44px rows`, async ({ page }) => {
     await page.goto(path);
@@ -82,7 +82,8 @@ for (const { path, menu, datasets, other } of [
     await expect(group.getByRole("link")).toHaveText(datasets);
     const hrefs = await group.getByRole("link").evaluateAll((links) => links.map((link) => new URL((link as HTMLAnchorElement).href).pathname));
     const prefix = path === "/en" ? "/en" : "";
-    expect(hrefs).toEqual(["/explorer", "/explorer/economy", "/explorer/business", "/explorer/housing", "/explorer/inflation", "/explorer/money", "/explorer/unemployment", "/explorer/wages", "/explorer/living-standards", "/explorer/health", "/explorer/education", "/explorer/science-culture", "/explorer/crime", "/explorer/internet", "/explorer/trade", "/explorer/external", "/explorer/energy-food", "/explorer/environment", "/explorer/transport", "/explorer/demography"].map((href) => `${prefix}${href}`));
+    // The eight group pages (spec 2026-10-24-explorer-regroup).
+    expect(hrefs).toEqual(DATASET_HUBS.map(({ href }) => `${prefix}${href}`));
     for (const row of await heights(header.getByRole("navigation").getByRole("link"))) expect(row.height, row.text).toBeGreaterThanOrEqual(44);
     // On a phone the link shows "EN"/"KA"; its name starts with that and adds the full language name.
     const switchBox = await header.getByRole("group").getByRole("link", { name: other, exact: true }).boundingBox();
@@ -103,13 +104,15 @@ for (const width of [390, 768, 1280]) test(`landing calls to action are 44px tap
   for (const target of targets) expect((await target.boundingBox())?.height ?? 0).toBeGreaterThanOrEqual(44);
 });
 
+// Explorer pages have no footer; the homepage and the site's own pages carry the site footer (#221), whose data list is the groups.
 for (const { path, labels } of [
-  { path: "/explorer/unemployment", labels: ["ბიუჯეტი", "ეკონომიკა", "ბიზნესი", "საცხოვრებელი და მშენებლობა", "ინფლაცია", "ფული და ბანკები", "უმუშევრობა", "ხელფასები", "ცხოვრების დონე", "ჯანდაცვა და სოციალური დაცვა", "განათლება", "მეცნიერება და კულტურა", "დანაშაული და მართლმსაჯულება", "ინტერნეტი და ტექნოლოგიები", "საგარეო ვაჭრობა", "საგარეო ნაკადები", "ენერგეტიკა და სურსათი", "გარემო და კლიმატი", "ტრანსპორტი", "დემოგრაფია", "მეთოდოლოგია", "AI-კავშირი", "მიზანი"] },
-  { path: "/en/explorer/unemployment", labels: ["Budget", "Economy", "Business", "Housing and construction", "Inflation", "Money and banks", "Unemployment", "Wages", "Living standards", "Health and social protection", "Education", "Science and culture", "Crime and justice", "Internet and technology", "Trade", "External flows", "Energy and food", "Environment and climate", "Transport", "Demography", "Methodology", "AI connection", "About"] },
+  { path: "/", labels: [...["ბიუჯეტი", "ეკონომიკა და ბიზნესი", "ფასები და ფული", "შრომის ბაზარი", "ცხოვრების დონე და ჯანდაცვა", "საგარეო სექტორი", "დემოგრაფია", "საზოგადოება და გარემო"], "მეთოდოლოგია", "AI-კავშირი", "მიზანი", "English"] },
+  { path: "/en", labels: [...["Budget", "Economy and business", "Prices and money", "Labour market", "Living standards and health", "External sector", "Demography", "Society and environment"], "Methodology", "AI connection", "About", "ქართული"] },
 ]) {
-  test(`${path} footer names every dataset in a compact two-column grid`, async ({ page }) => {
+  test(`${path} footer names every group in two-column lists`, async ({ page }) => {
     await page.goto(path);
     const footer = page.getByTestId("site-footer");
+    await expect(footer).toHaveAttribute("data-variant", "site");
     const nav = footer.locator("ul a");
     await expect(nav).toHaveText(labels);
     // The footer carries no tagline (owner decision 2026-10-08).
@@ -117,22 +120,21 @@ for (const { path, labels } of [
     const boxes = await nav.evaluateAll((links) => links.map((link) => link.getBoundingClientRect().toJSON() as DOMRect));
     for (const box of boxes) expect(box.height).toBeGreaterThanOrEqual(44);
     expect(new Set(boxes.map((box) => Math.round(box.x))).size).toBe(2);
-    // The data line no longer repeats its own heading.
-    await expect(footer.getByText(path === "/en" ? "Data" : "მონაცემები", { exact: true })).toHaveCount(0);
-    const height = (await footer.boundingBox())?.height ?? 0;
-    // The footer lists every hub plus three links, in two columns of 44px rows; 232px is the rest of the footer
-    // (760px for twenty hubs' twelve rows, measured 2026-10-20).
-    expect(height).toBeLessThanOrEqual(Math.ceil((NAV_TREE.length + 3) / 2) * 44 + 232);
-    const marginTop = await footer.evaluate((element) => parseFloat(getComputedStyle(element).marginTop));
-    expect(marginTop).toBeLessThanOrEqual(48);
   });
 }
+
+// Explorer pages render no footer: the sidebar's foot links Methodology and AI connection.
+test("/explorer/labour has no footer on a phone", async ({ page }) => {
+  await page.goto("/explorer/labour");
+  await ready(page);
+  await expect(page.getByRole("contentinfo")).toHaveCount(0);
+});
 
 test("404 recovers to every dataset with no top band on a phone", async ({ page }) => {
   await page.goto("/this-page-does-not-exist");
   const recovery = page.getByTestId("not-found-recovery");
   const hrefs = await recovery.getByRole("link").evaluateAll((links) => links.map((link) => link.getAttribute("href")));
-  expect(hrefs).toEqual(["/", "/explorer", "/explorer/economy", "/explorer/business", "/explorer/housing", "/explorer/inflation", "/explorer/money", "/explorer/unemployment", "/explorer/wages", "/explorer/living-standards", "/explorer/health", "/explorer/education", "/explorer/science-culture", "/explorer/crime", "/explorer/internet", "/explorer/trade", "/explorer/external", "/explorer/energy-food", "/explorer/environment", "/explorer/transport", "/explorer/demography", "/methodology"]);
+  expect(hrefs).toEqual(["/", ...DATASET_HUBS.map(({ href }) => href), "/methodology"]);
   expect((await recovery.boundingBox())?.y ?? 999).toBeLessThanOrEqual(40);
   await expect(page.locator('a[href="/sitemap.xml"], a[href="/llms.txt"]')).toHaveCount(0);
 });
@@ -140,7 +142,8 @@ test("404 recovers to every dataset with no top band on a phone", async ({ page 
 for (const { path, back, href, trail } of [
   { path: "/en/explorer/unemployment/regions/adjara", back: "Unemployment by region", href: "/en/explorer/unemployment/regions", trail: ["Home", "Data", "Unemployment", "Unemployment by region", "Adjara"] },
   { path: "/explorer/inflation/cities/batumi", back: "ქალაქები", href: "/explorer/inflation/cities", trail: null },
-  { path: "/explorer/expenditure", back: "ბიუჯეტი", href: "/explorer", trail: ["მთავარი", "მონაცემები", "ბიუჯეტი", "ხარჯები"] },
+  // Budget's crumb leads to the Budget group page; /explorer is All data now.
+  { path: "/explorer/expenditure", back: "ბიუჯეტი", href: "/explorer/budget", trail: ["მთავარი", "მონაცემები", "ბიუჯეტი", "ხარჯები"] },
 ]) {
   test(`${path}: one back-crumb on a phone, the full trail from 768px`, async ({ page }) => {
     await page.goto(path);
@@ -163,11 +166,20 @@ for (const { path, back, href, trail } of [
   });
 }
 
-for (const path of ["/explorer", "/explorer/economy", "/explorer/inflation", "/explorer/unemployment", "/explorer/inflation/overview", "/explorer/economy/regions", "/explorer/economy/regions/adjara"]) {
+for (const path of ["/explorer/inflation/overview", "/explorer/economy/regions", "/explorer/economy/regions/adjara"]) {
   test(`${path} states coverage in the one shared format`, async ({ page }) => {
     await page.goto(path);
     const coverage = page.getByTestId("explorer-header").locator("p");
     await expect(coverage).toHaveText(/^\S+( \d{4})?–\S+( \d{4})? · განახლდა \d{4}-\d{2}-\d{2}$/);
+  });
+}
+
+// All data and the group pages count their topics and pages instead (spec 2026-10-24-explorer-regroup §5, §6).
+for (const path of ["/explorer", "/explorer/budget", "/explorer/economy", "/explorer/prices", "/explorer/labour"]) {
+  test(`${path} states its pages and update date in the one shared format`, async ({ page }) => {
+    await page.goto(path);
+    const coverage = page.getByTestId("explorer-header").locator("p");
+    await expect(coverage).toHaveText(/^(\d+ ქვეთემა · )?\d+ გვერდი · განახლდა \d{4}-\d{2}-\d{2}$/);
   });
 }
 
@@ -207,13 +219,12 @@ test("the GDP latest value follows the active indicator", async ({ page }) => {
   await expect(page.getByTestId("gdp-latest")).toHaveText(/^მშპ-ის ზრდა · \d{4}: [+−]\d+\.\d%( · წინასწარი)?$/);
 });
 
-// Every hub renders the shared BudgetHub card, so /explorer stands for them all.
-test("/explorer hub cards span their sparklines and keep one rhythm", async ({ page }) => {
-  await page.goto("/explorer");
-  for (const card of await page.getByTestId("hub-card").all()) {
+// Every group page renders the shared ExplorerCard, so the Budget page stands for them all.
+test("group page cards span their graphics and keep one rhythm", async ({ page }) => {
+  await page.goto("/explorer/budget");
+  for (const card of await page.getByTestId("explorer-card").all()) {
     const cardBox = (await card.boundingBox())!;
-    const graphic = card.locator("svg, [data-testid=hub-card-graphic-space]").first();
-    const box = (await graphic.boundingBox())!;
+    const box = (await card.getByTestId("explorer-card-graphic").boundingBox())!;
     expect(box.height).toBeGreaterThanOrEqual(33);
     // The card has 18px of padding on each side.
     expect(box.width).toBeGreaterThan(cardBox.width - 40);

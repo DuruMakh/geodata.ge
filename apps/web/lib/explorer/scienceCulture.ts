@@ -1,4 +1,6 @@
 import { SCIENCE_CULTURE_GROUPS, scienceCultureIndicator, type ClientScienceCultureFact, type ScienceCultureGroup, type ScienceCultureIndicator, type ScienceCultureMeasure, type ScienceCultureSeriesBreak } from "../data/scienceCulture/types";
+import { message } from "../i18n/messages";
+import type { Messages } from "../i18n/types";
 import { INK } from "./colors";
 import { educationFullLabel } from "./education";
 import { MISSING, formatInUnit, type ValueUnit } from "./format";
@@ -155,6 +157,12 @@ export function scienceCultureSeriesLabel(series: Pick<ScienceCultureSeriesDefin
 /** A unit's figures: thousands and million GEL to one decimal, persons and counts whole. */
 export function scienceCultureValueUnit(unit: ScienceCultureUnit): ValueUnit {
   return { divisor: 1, label: "", decimals: unit === "thousand" || unit === "gel" ? 1 : 0 };
+}
+
+/** Museum visitors (published in thousands) as the Museums card and its place rows write them: millions to one decimal from a million, thousands below. */
+export function museumVisitorsLabel(thousands: number, messages: Messages): string {
+  return thousands >= 1_000 ? `${formatInUnit(thousands, { divisor: 1_000, label: "", decimals: 1 })} ${message(messages, "groups.unit.million")}`
+    : `${formatInUnit(thousands, scienceCultureValueUnit("thousand"))} ${message(messages, "scienceCulture.unit.thousand")}`;
 }
 
 /** A tooltip value: thousands and million GEL name their unit, a count of persons or things stands alone. */

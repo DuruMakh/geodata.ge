@@ -1,8 +1,5 @@
 {
   "housing.title": "Housing and construction",
-  "housing.hubSummary": "Permits, completions and home prices",
-  "housing.metaTitle": "Housing and construction in Georgia",
-  "housing.metaDescription": "Building permits and completed buildings in Georgia by type and region, the home price index and new-home prices in Tbilisi’s districts, from Geostat data.",
   "housing.page.permits.title": "Building permits",
   "housing.page.permits.summary": "Building permits issued in Georgia each year, by number and floor area, for each type of building.",
   "housing.page.permits.metaTitle": "Building permits in Georgia",

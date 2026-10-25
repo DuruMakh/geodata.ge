@@ -30,7 +30,7 @@ describe("demography routes", () => {
 
 describe("demography hub cards", () => {
   it("link every page and show none as coming soon", async () => {
-    const [{ facts }, presentation] = await Promise.all([loadServedDemographyData(), getPresentation("en", ["demography", "common"], [])]);
+    const [{ facts }, presentation] = await Promise.all([loadServedDemographyData(), getPresentation("en", ["demography", "common", "groups"], [])]);
     const cards = buildDemographyHubCards(facts, presentation);
     expect(cards.map((card) => card.index)).toEqual(["01", "02", "03", "04", "05"]);
     expect(cards.map((card) => card.title)).toEqual(["Population", "Age and sex", "Migration", "Births, deaths and fertility", "Marriages and divorces"]);
@@ -45,7 +45,7 @@ describe("demography hub cards", () => {
   });
 
   it("draws the marriages card from Georgia's registered marriages", async () => {
-    const [{ facts }, presentation] = await Promise.all([loadServedDemographyData(), getPresentation("en", ["demography", "common"], [])]);
+    const [{ facts }, presentation] = await Promise.all([loadServedDemographyData(), getPresentation("en", ["demography", "common", "groups"], [])]);
     const card = buildDemographyHubCards(facts, presentation)[4]!;
     expect(card.series).toHaveLength(32);
     expect(card.series![0]).toBe(21_908);
@@ -53,7 +53,7 @@ describe("demography hub cards", () => {
   });
 
   it("draw the population card from Georgia's series with the census gap as a break in the line", async () => {
-    const [{ facts }, presentation] = await Promise.all([loadServedDemographyData(), getPresentation("en", ["demography", "common"], [])]);
+    const [{ facts }, presentation] = await Promise.all([loadServedDemographyData(), getPresentation("en", ["demography", "common", "groups"], [])]);
     const georgia = facts
       .filter((fact) => fact.seriesId === SERIES.populationTotal && fact.geographyId === "country.georgia")
       .sort((left, right) => left.year - right.year);
@@ -69,7 +69,7 @@ describe("demography hub cards", () => {
 
   it("draws the age and sex card from Georgia's share aged 65+ on 1 January", async () => {
     const { facts } = await loadServedDemographyData();
-    const presentation = await getPresentation("en", ["demography"], []);
+    const presentation = await getPresentation("en", ["demography", "groups"], []);
     const card = buildDemographyHubCards(facts, presentation)[1]!;
     // 23 years plus the gap that keeps the line from joining 2024 to 2025 across the census re-base.
     expect(card.series).toHaveLength(24);
@@ -82,7 +82,7 @@ describe("demography hub cards", () => {
 
   it("draws the migration card from Geostat's published net", async () => {
     const { facts } = await loadServedDemographyData();
-    const presentation = await getPresentation("en", ["demography"], []);
+    const presentation = await getPresentation("en", ["demography", "groups"], []);
     const card = buildDemographyHubCards(facts, presentation)[2]!;
     expect(card.series).toHaveLength(14);
     expect(card.footer).toBe("2025 · net migration +17,127 · 2012–2025");
@@ -90,7 +90,7 @@ describe("demography hub cards", () => {
 
   it("draws the births card from Georgia's registered births", async () => {
     const { facts } = await loadServedDemographyData();
-    const presentation = await getPresentation("en", ["demography"], []);
+    const presentation = await getPresentation("en", ["demography", "groups"], []);
     const card = buildDemographyHubCards(facts, presentation)[3]!;
     expect(card.series).toHaveLength(12);
     expect(card.series![0]).toBe(60_635);

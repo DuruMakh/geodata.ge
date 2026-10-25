@@ -68,7 +68,7 @@ The board's internal numbers (09, 10, 11, 13, 14) are not shown on the page. The
 
 ### 5.2 Chapter 07, youth unemployment
 
-- Heading: `ახალგაზრდებში უმუშევრობა {comparison}` / "Youth unemployment is {comparison}" (see 4) → `/explorer/unemployment`.
+- Heading: `ახალგაზრდებში უმუშევრობა {comparison}` / "Youth unemployment is {comparison}" (see 4) → `/explorer/labour#t-unemployment` (its section on the Labour group page since the explorer regroup).
 - Lede: `{year} წელს უმუშევრობის დონე {rate}% იყო, 15–29 წლის ახალგაზრდებში — {youthRate}%.`
 - Two 10×10 square grids side by side (stacked on phones): "out of every 100 people aged 15+" and "out of every 100 young people aged 15–29": employed (ink), unemployed (accent), outside the labour force (hollow). Shares are rounded so the three always add up to 100. Each grid has a key with the whole number and the count (million or thousand people). Tooltip: share, count, and a line with the unemployment rate or the size of the labour force.
 - Regions (full width): the unemployment rate in each region in the latest year, highest first, as dots on lines, with a dashed accent line at the Georgia rate. Tooltip: rate and the difference from Georgia in percentage points.
@@ -76,7 +76,7 @@ The board's internal numbers (09, 10, 11, 13, 14) are not shown on the page. The
 
 ### 5.3 Chapter 08, wages of women and men
 
-- Heading: `ვინ რამდენს გამოიმუშავებს` / "Who earns how much" → `/explorer/wages`.
+- Heading: `ვინ რამდენს გამოიმუშავებს` / "Who earns how much" → `/explorer/labour#t-wages`.
 - Lede: `საშუალო თვიური ხელფასი {year} წელს {avg} ლარი იყო; ქალები კაცების საშუალო ხელფასის {ratio}%-ს იღებენ.`
 - Dumbbell chart (left): one row per economic activity (19 today), highest average wage first. Each row shows women's average (copper dot), men's average (blue dot), the line between them and a tick at the all-employee average; women's pay as a % of men's is on the right. Tooltip: men, women, average, and the ratio.
 - Stat cards (right): average wage, with a small line of every year since the first year and a note with the first year's value; median wage; women's pay as a % of men's, with both amounts in the note; public sector average, with the non-public average in the note.
@@ -84,7 +84,7 @@ The board's internal numbers (09, 10, 11, 13, 14) are not shown on the page. The
 
 ### 5.4 Chapter 09, foreign trade
 
-- Heading: `ვისთან ვაჭრობს საქართველო` / "Who Georgia trades with" → `/explorer/trade`.
+- Heading: `ვისთან ვაჭრობს საქართველო` / "Who Georgia trades with" → `/explorer/external#t-trade`.
 - Lede: `{year} წელს საგარეო სავაჭრო ბრუნვამ {turnover} მილიარდი დოლარი შეადგინა: ექსპორტი {exports} მილიარდი იყო, იმპორტი — {imports}.`
 - Butterfly chart (left): the 10 largest partner countries by turnover in the latest year, exports to the left (green), imports to the right (dark), with values. Tooltip: turnover, exports, imports, balance.
 - Lines (right): exports and imports in billion US dollars from the first year to the latest, with the gap between them shaded as the deficit. Tooltip: both values and the balance.

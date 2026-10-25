@@ -3,7 +3,7 @@ import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { LIVE_METHODOLOGY_IDS } from "../../lib/methodology/types";
-import { NAV_TREE } from "../../lib/navigation/navTree";
+import { DATASET_HUBS } from "../../lib/navigation/datasetHubs";
 import { TEST_BASE_URL } from "./test-base-url";
 
 async function expectVisibleFocusOutline(locator: Locator) {
@@ -75,16 +75,14 @@ for (const path of [
   "/explorer/municipalities/tbilisi",
   "/explorer/municipalities/region/imereti",
 ] as const) {
-  test(`${path} keeps the methodology link in the footer rather than inline`, async ({ page }) => {
+  test(`${path} keeps the methodology link in the sidebar rather than inline`, async ({ page }) => {
     await page.goto(`${TEST_BASE_URL}${path}`);
 
-    // The owner's design puts the methodology route in the footer and in the
-    // lowest section of the main pages, not on every data surface. Until the
-    // explorer had a footer at all, that left these routes with no path to it.
-
-    const footer = page.locator("footer");
-    await expect(footer).toHaveCount(1);
-    await expect(footer.locator('a[href^="/methodology"]')).toHaveCount(1);
+    // The owner's design puts the methodology route in the sidebar's foot on explorer routes, which render no footer
+    // (DESIGN.md §6.7), and in the footer and the lowest section of the main pages, not on every data surface.
+    await expect(page.locator("footer")).toHaveCount(0);
+    // The sidebar's foot carries the site's own pages (spec 2026-10-24-explorer-regroup §4); the page itself has none.
+    await expect(page.getByTestId("data-sidebar").locator('a[href^="/methodology"]')).toHaveCount(1);
     await expect(page.locator('a[href^="/methodology"]')).toHaveCount(1);
     // No repeated methodology promotion on a content page.
     await expect(page.getByRole("link", { name: "მეთოდოლოგია და პირველწყაროები", exact: true })).toHaveCount(0);
@@ -105,8 +103,8 @@ test("future routes stay on the static 404 surface", async ({ page }) => {
     const response = await page.goto(`${TEST_BASE_URL}/methodology/${slug}`);
     expect(response?.status(), slug).toBe(404);
     await expect(page.getByRole("heading", { level: 1, name: "გვერდი ვერ მოიძებნა" })).toHaveCount(1);
-    // Home, every dataset hub and methodology.
-    await expect(page.getByTestId("not-found-recovery").getByRole("link")).toHaveCount(NAV_TREE.length + 2);
+    // Home, every group page and methodology.
+    await expect(page.getByTestId("not-found-recovery").getByRole("link")).toHaveCount(DATASET_HUBS.length + 2);
     await expect(page.locator(`link[rel="canonical"][href*="/methodology/${slug}"]`)).toHaveCount(0);
     await expect(page.locator(`meta[property="og:url"][content*="/methodology/${slug}"]`)).toHaveCount(0);
     await expect(page.getByTestId("site-json-ld")).toHaveCount(1);

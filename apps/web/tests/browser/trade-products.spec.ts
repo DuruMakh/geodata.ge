@@ -199,9 +199,9 @@ for (const prefix of ["", "/en"]) {
     await page.goForward(); await page.reload();
     await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-selected-count", "2");
     const saved = page.url();
-    if (!prefix) await page.getByTestId("sidebar-toggle").click();
+    if (!prefix) await page.getByTestId("sidebar-menu-button").click();
     await page.getByTestId("trade-products-link").click(); await expect(page).toHaveURL(saved);
-    if (!prefix) await page.getByTestId("sidebar-toggle").click();
+    if (!prefix) await page.getByTestId("sidebar-menu-button").click();
     await page.getByTestId("data-sidebar").getByRole("link", { name: prefix ? "ქართული" : "English", exact: true }).click();
     await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-selected-count", "2");
     await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-measure", "trade.imports");

@@ -1,6 +1,7 @@
 import type { Presentation } from "../../lib/i18n/types";
 import { message } from "../../lib/i18n/messages";
 import { pageHref } from "../../lib/i18n/routes";
+import { topicSection } from "../../lib/navigation/navTree";
 import Link from "next/link";
 import type { HomeChapters } from "../../lib/landing/chapters/types";
 import type { LandingGdpFigure } from "../../lib/landing/landingData";
@@ -397,13 +398,13 @@ export function LandingPage({ chapters, gdpFigure, presentation, updatedAt, mcpE
           <Chapter id="ch-06" link={chapterLink(6, "/explorer/demography")} title={chapters.sentences.headings.ageing} lede={chapters.sentences.ageing}>
             <AgeingChapter data={ageing} municipal={chapters.municipal} labels={ageingLabels} />
           </Chapter>
-          <Chapter id="ch-07" link={chapterLink(7, "/explorer/unemployment")} title={chapters.sentences.headings.youthJobs} lede={chapters.sentences.youthJobs}>
+          <Chapter id="ch-07" link={chapterLink(7, topicSection("unemployment").href)} title={chapters.sentences.headings.youthJobs} lede={chapters.sentences.youthJobs}>
             <JobsChapter data={youthJobs} labels={jobsLabels} />
           </Chapter>
-          <Chapter id="ch-08" link={chapterLink(8, "/explorer/wages")} title={t("landing.ch8.title")} lede={chapters.sentences.wageGap}>
+          <Chapter id="ch-08" link={chapterLink(8, topicSection("wages").href)} title={t("landing.ch8.title")} lede={chapters.sentences.wageGap}>
             <WagesChapter data={wageGap} labels={wagesLabels} />
           </Chapter>
-          <Chapter id="ch-09" link={chapterLink(9, "/explorer/trade")} title={t("landing.ch9.title")} lede={chapters.sentences.trade}>
+          <Chapter id="ch-09" link={chapterLink(9, topicSection("trade").href)} title={t("landing.ch9.title")} lede={chapters.sentences.trade}>
             <TradeChapter data={trade} labels={tradeLabels} />
           </Chapter>
           <Chapter id="ch-10" link={chapterLink(10, "/explorer/health/causes-of-death")} title={t("landing.ch10.title")} lede={chapters.sentences.deaths}>
