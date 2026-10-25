@@ -1,0 +1,325 @@
+"use client";
+
+import { Pause, Play } from "lucide-react";
+import { useEffect, useId, useRef, useState } from "react";
+import { formatInUnit, formatShare, MISSING, UNIT_BN } from "../../../lib/explorer/format";
+import type { Locale } from "../../../lib/i18n/types";
+import type { SpendingSeries } from "../../../lib/landing/chapters/types";
+import { blockTone, prefersReducedMotion, sparkPoints } from "./canvas";
+import { money } from "./chart-format";
+import { ChartTip, hideTip, showTip } from "./chart-tip";
+import { plannedYearText } from "./chart-tips";
+import { ChartUnavailable, Reveal, useEngine } from "./reveal";
+import type { Engine } from "./spending-engine";
+
+// Chapter 02: a squarified treemap of the 13 spending fields. The block area of a year follows
+// sqrt(total / largest total) anchored bottom-left, so a small year is a small copy of the same
+// picture; a year slider, a play button and a side list drive it. The controls and list are server
+// HTML; the drawing engine (spending-engine.ts) loads near view.
+
+export type SpendingLabels = {
+  year: string; // "წელი"
+  total: string; // "მთლიანი ხარჯი"
+  bnGel: string; // "მლრდ ₾"
+  locale: Locale; // amounts are formatted for it: "მლრდ ₾" / "bn GEL"
+  planned: string; // suffix after a planned year: "გეგმა"
+  maxFrame: string; // dashed-frame caption, the largest year already in it: "2025 წლის ბიუჯეტის მასშტაბი"
+  play: string; // button while paused part-way: "გაგრძელება"
+  pause: string; // button while playing: "პაუზა"
+  replay: string; // button at the latest year (play restarts from the first): "ჩართე 2004-დან"
+  yearPicker: string; // sr-only label of the range input: "წლის არჩევა"
+  axisCaption: string; // under the sparkline: "ხარჯები წლების მიხედვით"
+  listCaption: string; // above the side list, the year follows: "სფეროები"
+  share: string; // tooltip row: "ბიუჯეტის წილი"
+  vsPrevious: string; // tooltip foot prefix, the change follows: "წინა წელთან: "
+  chartSummary: string; // canvas aria-label lead: "სახელმწიფო ბიუჯეტის ხარჯები სფეროების მიხედვით; ფართობი ხარჯის პროპორციულია"
+  largest: string; // canvas aria-label: "ყველაზე დიდი"
+  unavailable: string; // in place of the chart when its engine fails to load
+};
+
+const loadEngine = () => import("./spending-engine");
+
+const STEP_MS = 900; // one year per step while playing
+const AUTOPLAY_VISIBLE = 0.4; // share of the chart on screen before it starts playing on its own
+
+const LABEL_CLASS = "text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]";
+// The range input is a transparent hit area over the sparkline; the accent marker shows the year.
+const RANGE_CLASS =
+  "absolute left-0 top-0 m-0 h-[44px] w-full cursor-ew-resize appearance-none bg-transparent " +
+  "[&::-webkit-slider-runnable-track]:h-[44px] [&::-webkit-slider-runnable-track]:bg-transparent " +
+  "[&::-webkit-slider-thumb]:h-[44px] [&::-webkit-slider-thumb]:w-[22px] [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:border-0 [&::-webkit-slider-thumb]:bg-transparent " +
+  "[&::-moz-range-track]:h-[44px] [&::-moz-range-track]:bg-transparent " +
+  "[&::-moz-range-thumb]:h-[44px] [&::-moz-range-thumb]:w-[22px] [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:bg-transparent";
+
+export function SpendingChapter({ data, labels }: { data: SpendingSeries; labels: SpendingLabels }) {
+  const last = data.years.length - 1;
+  const [index, setIndex] = useState(last);
+  const [playing, setPlaying] = useState(false);
+  const year = data.years[index];
+  const planned = data.planned[index] ?? false;
+  const total = data.totals[index];
+
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const tipRef = useRef<HTMLDivElement>(null);
+  const engineRef = useRef<Engine | null>(null);
+  const litRef = useRef<string | null>(null); // the field the side list highlights
+  // How the coming click on a list row was made, and what the list highlighted before it (a tap may focus the row first).
+  const pressRef = useRef<{ type: string; lit: string | null }>({ type: "", lit: null });
+  const timerRef = useRef(0);
+  const cursorRef = useRef(last); // the year index the controls last chose; the interval steps from it
+  const rangeId = useId();
+  // Read by the long-lived engine callbacks, so a year change never rebuilds the engine.
+  const live = useRef({ index, labels, data });
+  useEffect(() => {
+    live.current = { index, labels, data };
+  });
+
+  const { lib, failed } = useEngine(wrapRef, loadEngine);
+
+  useEffect(() => {
+    const wrap = wrapRef.current;
+    const canvas = canvasRef.current;
+    const tip = tipRef.current;
+    if (!lib || !wrap || !canvas || !tip) return;
+    const { index: initial } = live.current;
+    const engine = lib.createTreemap({
+      wrap,
+      canvas,
+      data,
+      initial,
+      frameText: () => live.current.labels.maxFrame,
+      amount: (gel) => money(gel, live.current.labels),
+      onHover(field, x, y) {
+        const { index: i, labels: lab, data: d } = live.current;
+        const f = d.fields[field];
+        const v = f.values[i];
+        const before = i > 0 ? f.values[i - 1] : 0;
+        const tipData = {
+          title: f.label,
+          rows: [
+            { key: blockTone(field, d.fields.length), val: money(v, lab), name: plannedYearText(d, i, lab.planned) },
+            { val: formatShare(d.totals[i] > 0 ? v / d.totals[i] : 0), name: lab.share },
+          ],
+          foot: before > 0 ? `${lab.vsPrevious}${formatShare(v / before - 1, true, 1)}` : undefined,
+        };
+        showTip(tip, tipData, x, y, wrap.clientWidth, wrap.clientHeight);
+      },
+      onLeave: () => hideTip(tip),
+    });
+    engineRef.current = engine;
+    return () => {
+      engine.destroy();
+      engineRef.current = null;
+    };
+  }, [lib, data]);
+
+  useEffect(() => {
+    // A new year drops the outside highlight in the engine as well.
+    litRef.current = null;
+    engineRef.current?.setYear(index);
+  }, [index]);
+
+  useEffect(
+    () => () => {
+      window.clearInterval(timerRef.current);
+    },
+    [],
+  );
+
+  const highlight = (id: string | null) => {
+    litRef.current = id;
+    engineRef.current?.highlight(id);
+  };
+  const select = (i: number) => {
+    cursorRef.current = i;
+    setIndex(i);
+  };
+  const stop = () => {
+    window.clearInterval(timerRef.current);
+    timerRef.current = 0;
+    setPlaying(false);
+  };
+  // Pause while playing; otherwise step one year per STEP_MS, from the first year when already at the latest.
+  const toggle = () => {
+    if (timerRef.current) {
+      stop();
+      return;
+    }
+    if (cursorRef.current >= last) select(0);
+    setPlaying(true);
+    timerRef.current = window.setInterval(() => {
+      const next = cursorRef.current + 1;
+      if (next > last) {
+        stop();
+        return;
+      }
+      select(next);
+      if (next >= last) stop();
+    }, STEP_MS);
+  };
+
+  // The first time the chart comes into view it plays through the years on its own, from the first year;
+  // pause stops it. Not under reduced motion, and not once the reader has picked a year.
+  const autoplayRef = useRef(toggle);
+  useEffect(() => {
+    autoplayRef.current = () => {
+      if (!timerRef.current && cursorRef.current === last) toggle();
+    };
+  });
+  useEffect(() => {
+    const wrap = wrapRef.current;
+    if (!wrap || typeof IntersectionObserver === "undefined" || prefersReducedMotion()) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (!entries.some((entry) => entry.isIntersecting)) return;
+        observer.disconnect();
+        autoplayRef.current();
+      },
+      { threshold: AUTOPLAY_VISIBLE },
+    );
+    observer.observe(wrap);
+    return () => observer.disconnect();
+  }, []);
+
+  // Every field keeps its row, so the list never changes height under the reader; a field with
+  // nothing that year shows "—" (and has no block in the treemap).
+  const rows = [...data.fields].sort((a, b) => b.values[index] - a.values[index]);
+  const top = rows[0]?.values[index] > 0 ? rows[0] : undefined;
+  const yearText = planned ? `${year} (${labels.planned})` : String(year);
+  const ariaLabel =
+    `${labels.chartSummary}; ${yearText}: ${formatInUnit(total, UNIT_BN)} ${labels.bnGel}` +
+    (top ? `; ${labels.largest}: ${top.label}, ${money(top.values[index], labels)}, ${formatShare(top.values[index] / total)}` : "");
+  const playLabel = playing ? labels.pause : index >= last ? labels.replay : labels.play;
+
+  const spark = sparkPoints(data.totals, 1000, 6, 39.5);
+  const line = spark.map(([x, y], i) => `${i ? "L" : "M"}${x.toFixed(1)} ${y.toFixed(1)}`).join(" ");
+  const markShare = last > 0 ? index / last : 0;
+
+  return (
+    <Reveal className="mt-8">
+      <div className="mb-[22px] flex flex-wrap items-end gap-x-8 gap-y-[18px]">
+        <div>
+          <div className={LABEL_CLASS}>{labels.year}</div>
+          <div className="font-[family-name:var(--font-display)] text-[clamp(46px,5vw,66px)] font-semibold leading-[0.92] tracking-[-0.02em] [font-variant-numeric:lining-nums]">
+            {year}
+            {planned && <small className="ml-[0.3em] text-[0.3em] font-semibold tracking-normal text-[var(--muted)]">{labels.planned}</small>}
+          </div>
+        </div>
+        <div>
+          <div className={LABEL_CLASS}>{labels.total}</div>
+          <div className="font-[family-name:var(--font-display)] text-[clamp(28px,2.8vw,36px)] font-semibold leading-none tracking-[-0.015em]">
+            {formatInUnit(total, UNIT_BN)}
+            <small className="ml-[0.25em] text-[0.45em] font-semibold tracking-normal">{labels.bnGel}</small>
+          </div>
+        </div>
+        <button
+          type="button"
+          aria-label={playLabel}
+          onClick={toggle}
+          className="inline-flex min-h-[44px] items-center gap-[9px] rounded-full border-[1.5px] border-[var(--ink)] pl-[13px] pr-4 text-[12.5px] font-semibold transition-colors hover:bg-[var(--ink)] hover:text-[var(--paper)]"
+        >
+          {playing ? <Pause aria-hidden="true" size={14} strokeWidth={1.5} /> : <Play aria-hidden="true" size={14} strokeWidth={1.5} />}
+          <span>{playLabel}</span>
+        </button>
+        <div className="relative h-[60px] min-w-[240px] flex-[1_1_300px] self-stretch">
+          <svg viewBox="0 0 1000 44" preserveAspectRatio="none" aria-hidden="true" className="absolute inset-x-[11px] top-0 h-[44px] w-[calc(100%-22px)]">
+            <path d={`${line} L1000 44 L0 44 Z`} fill="var(--hairline-soft)" />
+            <path d={line} fill="none" stroke="var(--control)" strokeWidth="1.5" vectorEffect="non-scaling-stroke" />
+          </svg>
+          <i
+            aria-hidden="true"
+            style={{ left: `calc(11px + (100% - 22px) * ${markShare})` }}
+            className="pointer-events-none absolute top-0 -ml-px h-[44px] w-0.5 bg-[var(--accent)] transition-[left] duration-[250ms] ease-[cubic-bezier(.22,.7,.18,1)] after:absolute after:-left-1 after:-top-[3px] after:h-2.5 after:w-2.5 after:rounded-full after:border-2 after:border-[var(--paper)] after:bg-[var(--accent)] after:content-[''] motion-reduce:transition-none"
+          />
+          <label htmlFor={rangeId} className="sr-only">
+            {labels.yearPicker}
+          </label>
+          <input
+            id={rangeId}
+            type="range"
+            min={data.years[0]}
+            max={data.years[last]}
+            step={1}
+            value={year}
+            aria-valuetext={yearText}
+            onChange={(event) => {
+              stop();
+              const i = data.years.indexOf(Number(event.target.value));
+              if (i >= 0) select(i);
+            }}
+            className={RANGE_CLASS}
+          />
+          <div aria-hidden="true" className="absolute inset-x-0 bottom-0 flex justify-between font-[family-name:var(--font-numeric)] text-[11px] text-[var(--muted)]">
+            <span>{data.years[0]}</span>
+            <span>{labels.axisCaption}</span>
+            <span>{data.years[last]}</span>
+          </div>
+        </div>
+      </div>
+      <div className="grid grid-cols-1 gap-[30px] min-[1000px]:grid-cols-[minmax(0,1fr)_330px] min-[1000px]:gap-10">
+        <figure>
+          <div ref={wrapRef} className="relative h-[360px] w-full min-[601px]:h-[440px] min-[1000px]:h-[520px]">
+            {failed ? (
+              <ChartUnavailable text={labels.unavailable} summary={ariaLabel} />
+            ) : (
+              <canvas ref={canvasRef} role="img" aria-label={ariaLabel} className="absolute left-0 top-0" />
+            )}
+            <ChartTip tipRef={tipRef} rows={2} />
+          </div>
+        </figure>
+        <div>
+          <div className={LABEL_CLASS}>
+            {labels.listCaption} · {yearText}
+          </div>
+          <div className="mt-2.5 flex flex-col border-t border-[var(--hairline-soft)]">
+            {rows.map((f) => (
+              <button
+                key={f.id}
+                type="button"
+                data-field={f.id}
+                onPointerEnter={(event) => {
+                  if (event.pointerType !== "touch") highlight(f.id);
+                }}
+                onPointerLeave={(event) => {
+                  if (event.pointerType !== "touch") highlight(null);
+                }}
+                onPointerDown={(event) => {
+                  pressRef.current = { type: event.pointerType, lit: litRef.current };
+                }}
+                // A tap (no hover on a phone) toggles the row's block, and so do Enter and Space (a click with no pointer).
+                onClick={() => {
+                  const { type, lit } = pressRef.current;
+                  if (type === "touch") highlight(lit === f.id ? null : f.id);
+                  else if (type === "") highlight(litRef.current === f.id ? null : f.id);
+                  pressRef.current = { type: "", lit: null };
+                }}
+                onFocus={() => highlight(f.id)}
+                onBlur={() => highlight(null)}
+                className="group grid w-full grid-cols-[minmax(0,1fr)_auto] items-baseline gap-x-3 gap-y-[5px] border-b border-[var(--row-border)] px-1 pb-2.5 pt-[9px] text-left transition-colors hover:bg-[var(--tint)] focus-visible:bg-[var(--tint)]"
+              >
+                <span className="text-[13px] font-medium leading-[1.3]">{f.label}</span>
+                <span className="whitespace-nowrap font-[family-name:var(--font-numeric)] text-xs">
+                  {f.values[index] > 0 ? (
+                    <>
+                      {money(f.values[index], labels)}
+                      <em className="ml-1.5 not-italic text-[var(--muted)]">{formatShare(f.values[index] / total)}</em>
+                    </>
+                  ) : (
+                    MISSING
+                  )}
+                </span>
+                <span aria-hidden="true" className="relative col-span-full h-[3px] overflow-hidden rounded-sm bg-[var(--hairline-soft)]">
+                  <i
+                    style={{ width: top && f.values[index] > 0 ? `${((f.values[index] / top.values[index]) * 100).toFixed(1)}%` : "0%" }}
+                    className="absolute inset-y-0 left-0 rounded-sm bg-[var(--ink)] transition-[width] duration-500 ease-[cubic-bezier(.22,.7,.18,1)] group-hover:bg-[var(--accent)] group-focus-visible:bg-[var(--accent)] motion-reduce:transition-none"
+                  />
+                </span>
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+    </Reveal>
+  );
+}

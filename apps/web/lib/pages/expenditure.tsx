@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import type { Locale } from "../i18n/types";
+import type { Locale, Messages } from "../i18n/types";
 import { getMessages } from "../i18n/messages.server";
 import { message } from "../i18n/messages";
 import { clientPresentation, getPresentation } from "../i18n/presentation.server";
@@ -16,13 +16,24 @@ import { explorerDatasetJsonLd } from "../seo/structuredData";
 import { resolveSiteUrl } from "../siteUrl";
 import { projectAdminFact, projectBudgetFact, projectGdpFact } from "../explorer/clientData";
 import { navGroup } from "../navigation/navTree";
+import { isPlannedYear } from "../explorer/explorerData";
+import type { ServedBudgetFact } from "../servedRows";
+
+// A latest year with a planned value is named as the plan it is, apart from the actual span before it.
+function expenditureDescription(messages: Messages, facts: readonly ServedBudgetFact[]): string {
+  const { firstYear, lastYear } = coverageFromYears(facts);
+  if (!isPlannedYear(facts, "expenditure", lastYear)) return message(messages, "main.metadataExpenditureDescription", { firstYear, lastYear });
+  const lastActualYear = Math.max(...facts.filter((fact) => fact.year < lastYear).map((fact) => fact.year));
+  return message(messages, "main.metadataExpenditureDescriptionPlanned", { firstYear, lastActualYear, lastYear });
+}
 
 export async function expenditurePageMetadata(locale: Locale): Promise<Metadata> {
   const [{ facts }, messages] = await Promise.all([loadServedLandingData(), getMessages(locale, ["main"])]);
-  const { firstYear, lastYear } = coverageFromYears(facts.filter(fact => fact.side === "expenditure"));
+  const ownFacts = facts.filter(fact => fact.side === "expenditure");
+  const { firstYear, lastYear } = coverageFromYears(ownFacts);
   return fiscalMetadata({ locale,
     title: message(messages, "main.metadataExpenditureTitle", { firstYear, lastYear }),
-    description: message(messages, "main.metadataExpenditureDescription", { firstYear, lastYear }),
+    description: expenditureDescription(messages, ownFacts),
     path: "/explorer/expenditure",
   });
 }
@@ -58,7 +69,7 @@ export async function renderExpenditurePage(locale: Locale) {
           origin: resolveSiteUrl(),
           path: "/explorer/expenditure",
           name: message(messages, "main.datasetExpenditureName"),
-          description: message(messages, "main.metadataExpenditureDescription", { firstYear, lastYear }),
+          description: expenditureDescription(messages, ownFacts),
           firstYear,
           lastYear,
           dateModified: lastUpdatedAt,

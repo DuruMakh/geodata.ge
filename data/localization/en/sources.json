@@ -716,6 +716,13 @@
     },
     "derivation": null
   },
+  "source.mof_2026_budget_law_planned": {
+    "name": {
+      "text": "Law of Georgia on the 2026 State Budget, Tavi III and Tavi VI (planned expenditure, Ministry of Finance)",
+      "reviewedAt": "2026-10-24"
+    },
+    "derivation": null
+  },
   "source.mof_central_government_liabilities_control": {
     "name": {
       "text": "Central Government Debt Liabilities by Maturity; Residency; and Instrument with reference to GFSM 2001",
@@ -1644,6 +1651,18 @@
   },
   "source.nbg_fsi": {
     "name": { "text": "Financial soundness indicators (FSI)", "reviewedAt": "2026-10-11" },
+    "derivation": null
+  },
+  "source.nbg_loans_structure_l3_10_1": {
+    "name": { "text": "Loans to the economy by borrower and type of activity (L3.10.1)", "reviewedAt": "2026-10-24" },
+    "derivation": null
+  },
+  "source.nbg_loans_purpose_lop": {
+    "name": { "text": "Household loans by purpose (LPR)", "reviewedAt": "2026-10-24" },
+    "derivation": null
+  },
+  "source.nbg_loans_regions_lreg": {
+    "name": { "text": "Loans by region (LREG)", "reviewedAt": "2026-10-24" },
     "derivation": null
   },
   "source.nbg_meth_monetary_statistics": {

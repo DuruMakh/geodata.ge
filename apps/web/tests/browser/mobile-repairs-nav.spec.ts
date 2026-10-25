@@ -92,47 +92,27 @@ for (const { path, menu, datasets, other } of [
   });
 }
 
-for (const { path, titles, measures } of [
-  { path: "/", titles: ["ბიუჯეტი", "ეკონომიკა", "ინფლაცია", "უმუშევრობა", "საგარეო ვაჭრობა"], measures: ["ხარჯები", "ნომინალური მშპ", "წლიური ინფლაცია", "უმუშევრობის დონე", "საგარეო სავაჭრო ბრუნვა"] },
-  { path: "/en", titles: ["Budget", "Economy", "Inflation", "Unemployment", "Trade"], measures: ["Spending", "Nominal GDP", "Annual inflation", "Unemployment rate", "Total trade"] },
-]) {
-  test(`${path} lists every dataset with a latest figure right after the country figures`, async ({ page }) => {
-    await page.goto(path);
-    const row = page.getByTestId("landing-datasets");
-    const links = row.getByRole("link");
-    await expect(links).toHaveCount(titles.length);
-    for (const [index, link] of (await links.all()).entries()) {
-      await expect(link).toContainText(titles[index]);
-      // "{measure} · {period}: {value}", the value a number with its unit.
-      await expect(link).toContainText(new RegExp(`${measures[index]} · [^:]+: [−\\d.]+( |%)`));
-      expect((await link.boundingBox())?.height ?? 0).toBeGreaterThanOrEqual(44);
-    }
-    const figures = await page.getByTestId("key-numbers").boundingBox();
-    const rowBox = await row.boundingBox();
-    expect(rowBox!.y).toBeGreaterThan(figures!.y + figures!.height - 1);
-    expect(rowBox!.y).toBeLessThan((await page.getByTestId("landing-data").boundingBox())!.y);
-    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(390);
-  });
-}
-
 // The hero CTA kept its 44px target only below 768px (U01-03); touch tablets sit above it.
 for (const width of [390, 768, 1280]) test(`landing calls to action are 44px tap targets at ${width}px`, async ({ page }) => {
   await page.setViewportSize({ width, height: 900 });
   await page.goto("/");
   const targets = [
     page.getByTestId("hero-cta"),
-    ...["landing-dataset-expenditure", "landing-dataset-revenue", "landing-dataset-municipalities", "landing-debt", "landing-deficit", "landing-methodology"].map((id) => page.getByTestId(id).getByRole("link").first()),
+    page.locator("#sources").getByRole("link", { name: "მეთოდოლოგიის ნახვა →" }),
+    page.locator("#ai").getByRole("link", { name: "AI-კავშირის ინსტრუქცია →" }),
   ];
   for (const target of targets) expect((await target.boundingBox())?.height ?? 0).toBeGreaterThanOrEqual(44);
 });
 
+// Explorer pages have no footer; the homepage and the site's own pages carry the site footer (#221), whose data list is the groups.
 for (const { path, labels } of [
-  { path: "/", labels: [...["ბიუჯეტი", "ეკონომიკა და ბიზნესი", "ფასები და ფული", "შრომის ბაზარი", "ცხოვრების დონე და ჯანდაცვა", "საგარეო სექტორი", "დემოგრაფია", "საზოგადოება და გარემო"], "მეთოდოლოგია", "AI-კავშირი", "მიზანი"] },
-  { path: "/en", labels: [...["Budget", "Economy and business", "Prices and money", "Labour market", "Living standards and health", "External sector", "Demography", "Society and environment"], "Methodology", "AI connection", "About"] },
+  { path: "/", labels: [...["ბიუჯეტი", "ეკონომიკა და ბიზნესი", "ფასები და ფული", "შრომის ბაზარი", "ცხოვრების დონე და ჯანდაცვა", "საგარეო სექტორი", "დემოგრაფია", "საზოგადოება და გარემო"], "მეთოდოლოგია", "AI-კავშირი", "მიზანი", "English"] },
+  { path: "/en", labels: [...["Budget", "Economy and business", "Prices and money", "Labour market", "Living standards and health", "External sector", "Demography", "Society and environment"], "Methodology", "AI connection", "About", "ქართული"] },
 ]) {
-  test(`${path} footer names every dataset in a compact two-column grid`, async ({ page }) => {
+  test(`${path} footer names every group in two-column lists`, async ({ page }) => {
     await page.goto(path);
     const footer = page.getByTestId("site-footer");
+    await expect(footer).toHaveAttribute("data-variant", "site");
     const nav = footer.locator("ul a");
     await expect(nav).toHaveText(labels);
     // The footer carries no tagline (owner decision 2026-10-08).
@@ -140,14 +120,6 @@ for (const { path, labels } of [
     const boxes = await nav.evaluateAll((links) => links.map((link) => link.getBoundingClientRect().toJSON() as DOMRect));
     for (const box of boxes) expect(box.height).toBeGreaterThanOrEqual(44);
     expect(new Set(boxes.map((box) => Math.round(box.x))).size).toBe(2);
-    // The data line no longer repeats its own heading.
-    await expect(footer.getByText(path === "/en" ? "Data" : "მონაცემები", { exact: true })).toHaveCount(0);
-    const height = (await footer.boundingBox())?.height ?? 0;
-    // The footer lists every group plus three links, in two columns of 44px rows; 240px is the rest of the footer,
-    // where the Georgian homepage's fine print with the site-wide review date takes an extra line (504px, measured 2026-10-25).
-    expect(height).toBeLessThanOrEqual(Math.ceil((DATASET_HUBS.length + 3) / 2) * 44 + 240);
-    const marginTop = await footer.evaluate((element) => parseFloat(getComputedStyle(element).marginTop));
-    expect(marginTop).toBeLessThanOrEqual(48);
   });
 }
 

@@ -199,3 +199,365 @@ body:has([data-menu-open]) a[href="#content"] {
     );
   }
 }
+
+/* Homepage chapters: the title is the link to its data. An accent arrow marks it; on hover it
+   underlines in accent and, from 1200px, the destination name appears to its right. */
+.home-tl {
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.2em;
+  text-decoration-color: transparent;
+  transition: text-decoration-color 0.2s;
+}
+
+.home-tl:hover,
+.home-tl:focus-visible {
+  text-decoration-color: var(--accent);
+}
+
+.home-tl-i {
+  display: inline-block;
+  width: 0.78em;
+  height: 0.78em;
+  margin-left: 0.26em;
+  vertical-align: -0.05em;
+  color: var(--accent);
+  transition: transform 0.22s cubic-bezier(0.22, 0.7, 0.18, 1);
+}
+
+.home-tl:hover .home-tl-i,
+.home-tl:focus-visible .home-tl-i {
+  transform: translateX(5px);
+}
+
+.home-tl-hint {
+  display: none;
+  position: absolute;
+  left: calc(100% + 16px);
+  top: 50%;
+  margin-top: -9px;
+  font-family: var(--font-ui);
+  font-size: 12.5px;
+  font-weight: 600;
+  line-height: 18px;
+  letter-spacing: 0;
+  color: var(--accent);
+  white-space: nowrap;
+  opacity: 0;
+  transform: translateX(-6px);
+  transition:
+    opacity 0.2s,
+    transform 0.22s;
+  pointer-events: none;
+}
+
+@media (min-width: 1200px) {
+  .home-tl-hint {
+    display: block;
+  }
+}
+
+.home-tl:hover .home-tl-hint,
+.home-tl:focus-visible .home-tl-hint {
+  opacity: 1;
+  transform: none;
+}
+
+/* On touch screens the whole heading is the tap target, at least 44px tall: the padding grows the target
+   and the equal negative margin keeps the heading where it was. */
+@media (hover: none) {
+  .home-tl {
+    display: block;
+    padding-block: 10px;
+    margin-block: -10px;
+  }
+
+  .home-tl:active {
+    opacity: 0.7;
+  }
+
+  .home-tl-hint {
+    display: none;
+  }
+}
+
+/* Scroll reveal: content rises 16px and fades in once, when Reveal sets data-in. Fail-safe: when the
+   script never runs although scripting is on (its bundle failed), the block shows by itself after 3s;
+   Reveal sets data-js as it starts, which hands the block back to the scroll reveal. */
+.home-rv {
+  opacity: 0;
+  transform: translateY(16px);
+  transition:
+    opacity 0.9s cubic-bezier(0.22, 0.7, 0.18, 1),
+    transform 0.9s cubic-bezier(0.22, 0.7, 0.18, 1);
+  animation: home-rv-show 0.9s cubic-bezier(0.22, 0.7, 0.18, 1) 3s forwards;
+}
+
+.home-rv[data-js] {
+  animation: none;
+}
+
+.home-rv[data-in] {
+  opacity: 1;
+  transform: none;
+}
+
+@keyframes home-rv-show {
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce), (scripting: none) {
+  .home-rv {
+    opacity: 1;
+    transform: none;
+    transition: none;
+    animation: none;
+  }
+}
+
+/* Homepage municipal relief (chapter 04): a full-bleed stage like the Ask AI band. Its height is fixed
+   per breakpoint, so the canvas mounting later never shifts the page. */
+.home-muni {
+  position: relative;
+  margin-left: calc(50% - 50vw);
+  width: 100vw;
+  margin-top: 36px;
+}
+
+.home-muni-stage {
+  position: relative;
+  height: 640px;
+  overflow: hidden;
+  cursor: crosshair;
+}
+
+@media (width < 900px) {
+  .home-muni-stage {
+    height: 500px;
+  }
+}
+
+@media (width < 600px) {
+  .home-muni-stage {
+    height: 330px;
+  }
+}
+
+/* Homepage sources chapter: the four steps hang on a rail with a dot running down it, and each
+   coverage bar grows in from its left edge once the list has been revealed. */
+.home-steps {
+  position: relative;
+  border-top: 1.5px solid var(--ink);
+}
+
+.home-steps::before {
+  content: "";
+  position: absolute;
+  left: 5px;
+  top: 28px;
+  bottom: 28px;
+  width: 1px;
+  background: var(--hairline);
+}
+
+.home-step {
+  position: relative;
+  padding: 18px 0 18px 32px;
+  border-bottom: 1px solid var(--hairline-soft);
+}
+
+.home-step::before {
+  content: "";
+  position: absolute;
+  left: 1px;
+  top: 24px;
+  width: 9px;
+  height: 9px;
+  background: var(--paper);
+  border: 1.5px solid var(--ink);
+}
+
+/* A dot runs down the rail by transform only: each .home-flow box is as tall as the run (rail top
+   28px to 34px above the bottom) and paints its dot at its own top, so translateY(100%) is the run.
+   Decoration, so it runs three times and stops (WCAG 2.2.2), starting once its block is revealed. */
+.home-flow {
+  position: absolute;
+  z-index: 1;
+  left: 3px;
+  top: 28px;
+  width: 5px;
+  height: calc(100% - 62px);
+  background: linear-gradient(var(--accent), var(--accent)) 0 0 / 5px 5px no-repeat;
+  opacity: 0;
+  pointer-events: none;
+  animation: home-flow 3.6s cubic-bezier(0.45, 0, 0.55, 1) 3;
+}
+
+.home-flow:nth-of-type(2) {
+  animation-delay: 1.2s;
+}
+
+.home-flow:nth-of-type(3) {
+  animation-delay: 2.4s;
+}
+
+@keyframes home-flow {
+  0% {
+    transform: translateY(0);
+    opacity: 0;
+  }
+  8%,
+  92% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+}
+
+.home-cov-bar {
+  transform-origin: 0 50%;
+  transform: scaleX(0);
+  transition: transform 0.9s cubic-bezier(0.22, 0.7, 0.18, 1);
+}
+
+.home-src-list[data-in] .home-cov-bar {
+  transform: scaleX(1);
+}
+
+.home-cov-row:hover .home-cov-bar {
+  background: var(--accent);
+}
+
+@media (prefers-reduced-motion: reduce), (scripting: none) {
+  .home-flow {
+    animation: none;
+  }
+
+  .home-cov-bar {
+    transform: none;
+    transition: none;
+  }
+}
+
+/* Homepage Ask AI band: full-bleed dark paper with a faint dot grain that fades downwards. The
+   dark palette lives on the band as custom properties; nothing else uses it. */
+.home-ai {
+  --ai-bg: var(--ink);
+  --ai-ink: var(--paper);
+  --ai-body: #d8cfbf;
+  --ai-muted: var(--ink-fg-muted);
+  --ai-accent: #e58a6f;
+  --ai-link: #f3b4a2;
+  --ai-card: #27231d;
+  --ai-line: rgba(247, 242, 233, 0.22);
+  position: relative;
+  margin-left: calc(50% - 50vw);
+  width: 100vw;
+  margin-top: 104px;
+  padding: 80px 0 88px;
+  overflow: hidden;
+  background: var(--ai-bg);
+  color: var(--ai-ink);
+}
+
+.home-ai-grain {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(rgba(247, 242, 233, 0.07) 1px, transparent 1.2px);
+  background-size: 9px 9px;
+  pointer-events: none;
+  -webkit-mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0.15));
+  mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0.15));
+}
+
+.home-ai-inner {
+  position: relative;
+  max-width: 1296px;
+  margin: 0 auto;
+  padding: 0 28px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 44px;
+}
+
+@media (min-width: 1000px) {
+  .home-ai-inner {
+    grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
+    gap: 72px;
+    align-items: start;
+  }
+}
+
+@media (max-width: 600px) {
+  .home-ai {
+    padding: 64px 0 72px;
+  }
+
+  .home-ai-inner {
+    padding: 0 20px;
+  }
+}
+
+/* How it works: a rail through the five nodes, a dot runs down it. */
+.home-ai-path {
+  position: relative;
+}
+
+.home-ai-path::before {
+  content: "";
+  position: absolute;
+  left: 10px;
+  top: 20px;
+  bottom: 24px;
+  width: 1.5px;
+  background: var(--ai-line);
+}
+
+/* Moved by transform only, like .home-flow: the box is as tall as the run (dot top 16px to 30px above
+   the bottom) and paints the 8px dot with its 4px halo at its own top. Three runs, then it stays hidden
+   at the end (forwards keeps the last keyframe's opacity 0). */
+.home-ai-path::after {
+  content: "";
+  position: absolute;
+  left: 3px;
+  top: 12px;
+  width: 16px;
+  height: calc(100% - 46px);
+  background-image: radial-gradient(circle at 8px 8px, var(--ai-accent) 3.5px, rgba(229, 138, 111, 0.2) 4.5px 7.5px, transparent 8.5px);
+  background-size: 16px 16px;
+  background-repeat: no-repeat;
+  pointer-events: none;
+  animation: home-run 3.6s cubic-bezier(0.6, 0, 0.4, 1) 3 forwards;
+}
+
+/* The decorative runs wait until Reveal shows their block. */
+.home-rv[data-js]:not([data-in]) .home-flow,
+.home-rv[data-js]:not([data-in]) .home-ai-path::after {
+  animation-play-state: paused;
+}
+
+@keyframes home-run {
+  0% {
+    transform: translateY(0);
+    opacity: 0;
+  }
+  10%,
+  88% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-ai-path::after {
+    display: none;
+  }
+}

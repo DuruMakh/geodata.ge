@@ -88,7 +88,7 @@ export async function renderAboutPage(locale: Locale) {
             </Link>
           </article>
         </main>
-        <SiteFooter locale={locale} updatedAt={model.updatedAt} />
+        <SiteFooter variant="site" path="/about" locale={locale} updatedAt={model.updatedAt} />
       </div>
     </div>
   );

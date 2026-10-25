@@ -128,7 +128,9 @@ describe("indexable Fiscal.ge routes", () => {
     // The eight group pages replace the 19 topic hubs other than Budget's (three of them keep their address): 11 fewer pairs.
     // The funded pension adds one Health and social protection page: 1 bilingual pair.
     // Tax breaks and refunds adds its Budget page and its methodology page: 2 bilingual pairs.
-    expect(urls).toHaveLength(1528);
+    // Who borrows adds one page to Money and banks: 1 bilingual pair.
+    // Loans by region adds its index and a page for Georgia and each of the 11 regions to Money and banks: 13 bilingual pairs.
+    expect(urls).toHaveLength(1556);
     expect(new Set(urls).size).toBe(urls.length);
     expect(urls.every((url) => url.startsWith("https://fiscal.ge/"))).toBe(true);
     expect(urls).toContain("https://fiscal.ge/about");

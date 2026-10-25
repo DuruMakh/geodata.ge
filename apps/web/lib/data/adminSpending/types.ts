@@ -15,7 +15,7 @@ export type AdminSpendingFact = {
   parentItemId: string | null;
   level: AdminSpendingFactLevel;
   amountGel: number;
-  basis: "actual";
+  basis: "actual" | "planned";
   sourceId: string;
   officialCode: string | null;
   officialLabelKa: string | null;

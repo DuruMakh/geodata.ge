@@ -66,7 +66,7 @@ export function BudgetExplorerFrame({ locale, messages, sectionLabel, coverage, 
   coverage: string;
   title: string;
   /** `measure` ("{year}: {series} ·") is set in the body face; only the figure is set in mono, as on `LatestValueLine`. */
-  deck: { measure?: string; lead: string; yoy: number | null };
+  deck: { measure?: string; lead: string; yoy: number | null; /** A plan year: the change stands without "year on year", which keeps the line to one line at 375px. */ plan?: boolean };
   children: ReactNode;
 }) {
   return (
@@ -96,7 +96,7 @@ export function BudgetExplorerFrame({ locale, messages, sectionLabel, coverage, 
             >
               {formatShare(deck.yoy, true)}
             </span>
-            <span>{message(messages, "main.previousYear")}</span>
+            {deck.plan ? null : <span>{message(messages, "main.previousYear")}</span>}
           </>
         ) : null}
       </p>

@@ -128,9 +128,10 @@ describe("national", () => {
 });
 
 describe("ministries", () => {
-  it("returns the exact reviewed amount for all 852 facts", () => {
+  it("returns the exact reviewed amount for all 914 facts", () => {
     const facts = snapshot.ministries.facts;
-    expect(facts.length).toBe(852);
+    // 852 for 2004-2025 + 62 planned 2026 rows from the budget law.
+    expect(facts.length).toBe(914);
 
     for (const level of ["admin_category", "major_program"] as const) {
       const levelFacts = facts.filter((f) => f.level === level);
@@ -167,7 +168,7 @@ describe("ministries", () => {
         .reduce((sum, f) => sum + f.amountGel, 0);
       expect(observation.value).toBeCloseTo(expected, 2);
 
-      // Explicitly NOT the sum of all 852 rows — but only assertable in a year
+      // Explicitly NOT the sum of all 914 rows — but only assertable in a year
       // that actually has program rows. The earliest is 2006, so in 2004 and
       // 2005 the two sums are legitimately identical.
       const programsThisYear = snapshot.ministries.facts.filter(

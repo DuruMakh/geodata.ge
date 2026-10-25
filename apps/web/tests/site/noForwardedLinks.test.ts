@@ -42,12 +42,12 @@ describe("no internal link through an old topic hub forward", () => {
 
 // Ruling R12: /explorer is All data now, so a link named Budget (`common.budget`) goes to the Budget group page.
 describe("no Budget link to All data", () => {
-  // One object literal, `{ label: message(messages, "common.budget"), href: … }` or the landing's `{ href: …, title: t("common.budget") }`.
+  // One object literal, `{ label: message(messages, "common.budget"), href: … }`.
   const budgetLinks = files.flatMap(({ file, text }) => [...text.matchAll(/\{[^{}]*common\.budget[^{}]*\}/g)].map((match) => ({ file, link: match[0] })));
 
-  it("finds the Budget links of the budget pages, their explorers and the landing", () => {
+  it("finds the Budget links of the budget pages and their explorers", () => {
     expect(budgetLinks.map(({ file }) => file)).toEqual(expect.arrayContaining([
-      "lib/pages/expenditure.tsx", "lib/pages/municipal-region.tsx", "lib/landing/landingDatasets.ts", "components/debt/debt-explorer.tsx", "components/main-explorer/budget-explorer-frame.tsx",
+      "lib/pages/expenditure.tsx", "lib/pages/municipal-region.tsx", "components/debt/debt-explorer.tsx", "components/main-explorer/budget-explorer-frame.tsx",
     ]));
     expect(navGroup("budget").href).not.toBe(ALL_DATA_PATH);
   });

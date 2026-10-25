@@ -44,6 +44,8 @@ import { loadServedEnergyFoodData } from "../data/energyFood/importEnergyFood";
 import { ENERGY_FOOD_SECTIONS, energyFoodLastReviewedAt } from "../explorer/energyFood";
 import { loadServedMoneyBanksData } from "../data/moneyBanks/importMoneyBanks";
 import { MONEY_BANKS_SECTIONS } from "../explorer/moneyBanks";
+import { MONEY_BANKS_LOAN_AREAS } from "../data/moneyBanks/types";
+import { moneyBanksAreaHref } from "../explorer/moneyBanksAreas";
 import { loadServedTaxBreaksRefundsData } from "../data/taxBreaksRefunds/importTaxBreaksRefunds";
 import { TAX_BREAKS_REFUNDS_PATH } from "../explorer/taxBreaksRefunds";
 import { loadServedBusinessData } from "../data/business/importBusiness";
@@ -338,6 +340,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${siteUrl}/explorer/inflation/cities`, lastModified: inflationModified },
     ...CITY_PAGE_PATHS.map((path) => ({ url: `${siteUrl}${path}`, lastModified: inflationModified })),
     ...MONEY_BANKS_SECTIONS.map(section => ({ url: `${siteUrl}${section.href}`, lastModified: moneyBanksModified })),
+    ...MONEY_BANKS_LOAN_AREAS.map(area => ({ url: `${siteUrl}${moneyBanksAreaHref(area)}`, lastModified: moneyBanksModified })),
     ...LIVE_DEMOGRAPHY_PAGES.map((page) => ({ url: `${siteUrl}${page.path}`, lastModified: demographyModified })),
     ...populationPlacePaths(regions.map((region) => region.id)).map((path) => ({ url: `${siteUrl}${path}`, lastModified: demographyModified })),
     { url: `${siteUrl}/explorer/expenditure`, lastModified },

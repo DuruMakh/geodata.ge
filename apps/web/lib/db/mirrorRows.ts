@@ -151,27 +151,21 @@ export async function loadAdminFactsFromMirror(db: MirrorClient): Promise<AdminS
     orderBy: [{ year: "asc" }, { itemId: "asc" }],
   });
 
-  return facts.map((fact) => {
-    if (fact.basis !== "actual") {
-      throw new Error(`Admin spending fact ${fact.id} must have basis=actual, got ${fact.basis}`);
-    }
-
-    return {
-      year: fact.year,
-      itemId: fact.itemId,
-      parentItemId: fact.parentItemId,
-      level: fact.level,
-      amountGel: Number(fact.amountGel),
-      basis: "actual" as const,
-      sourceId: fact.sourceId,
-      officialCode: fact.officialCode,
-      officialLabelKa: fact.officialLabelKa,
-      officialInstitutionCode: fact.officialInstitutionCode,
-      officialInstitutionLabelKa: fact.officialInstitutionLabelKa,
-      mappingConfidence: fact.mappingConfidence,
-      mappingNotes: fact.mappingNotes,
-    };
-  });
+  return facts.map((fact) => ({
+    year: fact.year,
+    itemId: fact.itemId,
+    parentItemId: fact.parentItemId,
+    level: fact.level,
+    amountGel: Number(fact.amountGel),
+    basis: fact.basis,
+    sourceId: fact.sourceId,
+    officialCode: fact.officialCode,
+    officialLabelKa: fact.officialLabelKa,
+    officialInstitutionCode: fact.officialInstitutionCode,
+    officialInstitutionLabelKa: fact.officialInstitutionLabelKa,
+    mappingConfidence: fact.mappingConfidence,
+    mappingNotes: fact.mappingNotes,
+  }));
 }
 
 export async function loadAdminCategoriesFromMirror(

@@ -60,6 +60,8 @@
   "allData.words.inflation.cities": "prices",
   "allData.words.money.supply": "m3",
   "allData.words.money.loans-deposits": "credit",
+  "allData.words.money.borrowers": "borrowers households businesses consumer car loans",
+  "allData.words.money.regions": "regions bank branch",
   "allData.words.money.interest-rates": "policy rate",
   "allData.words.money.bank-health": "npl",
   "allData.words.unemployment.overview": "unemployment rate",

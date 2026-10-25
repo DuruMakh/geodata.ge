@@ -33,7 +33,7 @@ const adminSpendingFactRowSchema = z.object({
   parent_item_id: z.string(),
   level: factLevelSchema,
   amount_gel: amountGelSchema,
-  basis: z.literal("actual"),
+  basis: z.enum(["actual", "planned"]),
   source_id: z.string().min(1),
   official_code: z.string(),
   official_label_ka: z.string(),

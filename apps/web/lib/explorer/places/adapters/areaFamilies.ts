@@ -2,6 +2,8 @@ import { loadServedBusinessData, toClientBusinessFact } from "../../../data/busi
 import { loadServedEnvironmentData, toClientEnvironmentFact } from "../../../data/environment/importEnvironment";
 import { loadServedHousingData, toClientHousingFact } from "../../../data/housing/importHousing";
 import { loadServedInternetData, toClientInternetFact } from "../../../data/internet/importInternet";
+import { loadServedMoneyBanksData, toClientMoneyBanksFact } from "../../../data/moneyBanks/importMoneyBanks";
+import { MONEY_BANKS_LOAN_AREAS, loansRegionIndicator } from "../../../data/moneyBanks/types";
 import { loadServedScienceCultureData, toClientScienceCultureFact } from "../../../data/scienceCulture/importScienceCulture";
 import { loadServedTransportData, toClientTransportFact } from "../../../data/transport/importTransport";
 import { message } from "../../../i18n/messages";
@@ -17,6 +19,7 @@ import { HOUSING_AREAS, HOUSING_REGIONS_HREF, housingAreaHref, housingAreaLatest
 import { internetPercent } from "../../internet";
 import { INTERNET_AREAS, INTERNET_HOMES_HREF, internetAreaHref, internetAreaLatest, internetMapId } from "../../internetAreas";
 import { scienceCultureValueUnit } from "../../scienceCulture";
+import { MONEY_BANKS_REGIONS_HREF, moneyBanksAreaHref, moneyBanksMapId } from "../../moneyBanksAreas";
 import { MUSEUM_AREAS, MUSEUMS_HREF, museumAreaHref, museumAreaLatest, museumMapId } from "../../scienceCultureMuseums";
 import { transportLatestValue } from "../../transport";
 import { TRANSPORT_AREAS, TRANSPORT_REGIONS_HREF, transportAreaHref, transportAreaLatest, transportMapId } from "../../transportAreas";
@@ -70,6 +73,15 @@ async function internet(): Promise<PlaceEntry[]> {
   });
 }
 
+/** Loans by region: each area's all loans, as its page's line states it. */
+async function moneyBanks(locale: Locale): Promise<PlaceEntry[]> {
+  const facts = (await loadServedMoneyBanksData()).facts.map(toClientMoneyBanksFact);
+  return areaEntries(MONEY_BANKS_REGIONS_HREF, MONEY_BANKS_LOAN_AREAS, moneyBanksAreaHref, moneyBanksMapId, (area) => {
+    const fact = facts.filter((f) => f.indicatorId === loansRegionIndicator(area, "total")).sort((a, b) => a.year - b.year).at(-1)!;
+    return { value: formatAmount(fact.value, locale), number: fact.value, year: fact.year };
+  });
+}
+
 async function museums(): Promise<PlaceEntry[]> {
   const facts = (await loadServedScienceCultureData()).facts.map(toClientScienceCultureFact);
   return areaEntries(MUSEUMS_HREF, MUSEUM_AREAS, museumAreaHref, museumMapId, (area) => {
@@ -92,6 +104,6 @@ async function environment(locale: Locale): Promise<PlaceEntry[]> {
   });
 }
 
-/** Business, Housing, Transport and Internet regions, Museums, Waste and Forests. */
+/** Business, Housing, Transport and Internet regions, Loans by region, Museums, Waste and Forests. */
 export const areaFamilyEntries: PlaceAdapter = async (locale) =>
-  (await Promise.all([business(locale), housing(), transport(locale), internet(), museums(), environment(locale)])).flat();
+  (await Promise.all([business(locale), housing(), transport(locale), internet(), moneyBanks(locale), museums(), environment(locale)])).flat();

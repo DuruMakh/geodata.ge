@@ -109,12 +109,12 @@ describe.each(["ka", "en"] as const)("the All data page (%s)", async (locale) =>
     expect(/<h1[^>]*>([^<]*)<\/h1>/.exec(html)![1]).toBe(locale === "ka" ? "ყველა მონაცემი" : "All data");
     const below = html.slice(html.indexOf("</h1>"), html.indexOf('data-testid="all-data-search"'));
     expect([...below.matchAll(/<p[\s>]/g)]).toHaveLength(1);
-    expect(html).toMatch(locale === "ka" ? /102 გვერდი · განახლდა \d/ : /102 pages · Updated \d/);
+    expect(html).toMatch(locale === "ka" ? /104 გვერდი · განახლდა \d/ : /104 pages · Updated \d/);
   });
 
   it("lists every page A to Z in its HTML, each linking to the page in the page's language", () => {
     const rows = [...html.matchAll(/<a[^>]*data-testid="az-row"[^>]*>/g)].map((match) => /href="([^"]+)"/.exec(match[0])![1]);
-    expect(rows).toHaveLength(102);
+    expect(rows).toHaveLength(104);
     expect(rows.every((href) => href.startsWith(`${prefix}/explorer/`))).toBe(true);
     expect(rows).toContain(`${prefix}/explorer/wages/regions`);
     const letters = [...html.matchAll(/<a[^>]*data-testid="az-letter"[^>]*>([^<]*)<\/a>/g)].map((match) => match[1]);

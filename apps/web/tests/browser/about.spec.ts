@@ -46,7 +46,8 @@ test("/about locks the approved mission contract", async ({ page }) => {
   await expect(page.getByTestId("breadcrumb-json-ld")).toHaveCount(0);
   await expect(page.getByText("ჩვენი მიზანი / ტექსტი", { exact: true })).toHaveCount(0);
   await expect(page.getByText("საჯარო მონაცემი უნდა მუშაობდეს ადამიანისთვის.", { exact: true })).toHaveCount(0);
-  await expect(page.getByText("გამოყენებადი", { exact: false })).toHaveCount(1);
+  // The shared site footer repeats the mission sentence, so count the word in the page body only.
+  await expect(page.locator("main").getByText("გამოყენებადი", { exact: false })).toHaveCount(1);
 
   await expectHeader(page, 1366);
 

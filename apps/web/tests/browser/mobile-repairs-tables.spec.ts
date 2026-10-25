@@ -137,8 +137,9 @@ for (const width of [390, 360]) {
 test("the share measure keeps percentages in the year rows", async ({ page }) => {
   await page.goto("/explorer/expenditure#m=table&sh=1");
   const scroller = page.getByTestId("explorer-table");
+  // 2026 is a plan with no published GDP yet, so its share cell is empty; 2025 is the newest year with a share.
   await expect(scroller).toHaveAttribute("data-layout", "rows");
-  await expect(scroller.locator("tbody tr[data-year]").first().locator("td").first()).toHaveText(/%$/);
+  await expect(scroller.locator("tbody tr[data-year=\"2025\"]").locator("td").first()).toHaveText(/%$/);
 });
 
 for (const path of ["/explorer/expenditure", "/explorer/revenue", "/en/explorer/expenditure"]) {

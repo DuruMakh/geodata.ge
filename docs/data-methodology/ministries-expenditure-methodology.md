@@ -413,6 +413,31 @@ protection 35 02 → 27 02 runs 2006–2025 as one series; external debt service
 across eleven code segments). Succession ranges take precedence over eras; perimeter changes
 (e.g. the 2019 border-guard split of 30 01) are NOT successions and stay separate series.
 
+#### 7.3.1 The 2026 planned year (successions and eras)
+
+2026 is the approved plan from the Law of Georgia on the 2026 State Budget (basis `planned`; full
+method in `2026-budget-plan-methodology.md`). The law renumbers institutions (`25 00` Ministry of
+Infrastructure, `35 00` Regional Development, `54 00` state-wide payments, formerly `57 00`), so 2026
+adds entries to both tables, all for 2026 only and recorded in
+`data/mappings/review/admin-spending-program-concordance-2026.csv` (42 join / 6 new / 3 separate):
+
+- **Exception to "latest code".** Planned-year successions point at the **existing canonical
+  code**, so no 2004-2025 item id changes: `54 01`→`57 01`, `54 02`→`57 02`, `54 04`→`57 04`,
+  `54 11`→`57 11`, `54 14`→`57 14` (state-wide payments), `24 16`→`24 17` `anaklia_port`,
+  `25 06`→`25 07` `tourism_infrastructure` and `25 05`→`25 06` `school_infrastructure`
+  (the law's own 2024-fact column for `25 05` equals the `25 06` series' 2024 actual). These are
+  not yet owner-approved and carry the note prefix "(2026 budget law concordance)".
+- **Eras.** The 2025 identity continues in 2026 for `26 02`, `29 07`, `29 08`, `30 01`, `30 02`,
+  `31 06` and `33 02`; reused codes get their own keys: `24 15` `maritime_vocational_education`
+  and `25 07` `sport_infrastructure`.
+- **Classification.** An institution named "ინფრასტრუქტურის სამინისტრო" or "რეგიონული განვითარების
+  სამინისტრო" goes to `regional_development_infrastructure` (no effect on 2004-2025).
+- **Planned-year qualification.** A plan never changes which actual-year series exist; a 2026 plan of
+  100 m GEL or more can add a planned-only 2026 point (6 such series) and never promotes earlier
+  actual points.
+- **Year-level resolution.** Once the base file holds any 2026 actual row, the planned 2026 rows are
+  dropped automatically (`loadReviewedAdminSpendingFacts`).
+
 ### 7.4 Code-reuse rule (the maintenance hazard)
 When a code is recycled between the pre-2017 organizational coding and the 2017+ coding, its
 pre-2017 years must be split off — but **only the genuinely-different years**, because a code can

@@ -36,7 +36,7 @@ export type ServedAdminFact = {
   parentItemId: string | null;
   level: "admin_category" | "major_program";
   amountGel: number;
-  basis: "actual";
+  basis: "actual" | "planned";
   sourceId: string;
   officialLabelKa: string | null;
   officialInstitutionLabelKa: string | null;

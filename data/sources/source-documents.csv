@@ -274,6 +274,9 @@ source.nbg_loan_rates_lwir,სესხებზე წლიური საშ
 source.nbg_deposit_rates_dwir,დეპოზიტებზე წლიური საშუალო შეწონილი საპროცენტო განაკვეთები (DWIR),docs/Raw Data/Money/nbg-money-banks-annual/official/annual-weighted-deposit-interest-rates-dwireng.xlsx,2026-10-11
 source.nbg_fsi_archive,ფინანსური მდგრადობის მაჩვენებლები (FSI) - არქივი,docs/Raw Data/Money/nbg-money-banks-annual/official/fsieng-archive.xlsx,2026-10-11
 source.nbg_fsi,ფინანსური მდგრადობის მაჩვენებლები (FSI),docs/Raw Data/Money/nbg-money-banks-annual/official/fsieng.xlsx,2026-10-11
+source.nbg_loans_structure_l3_10_1,სესხები ეროვნულ ეკონომიკაზე მსესხებლისა და საქმიანობის სახეობის მიხედვით (L3.10.1),docs/Raw Data/Money/nbg-money-banks-annual/official/loans-structure-l3-10-1eng.xlsx,2026-10-24
+source.nbg_loans_purpose_lop,შინამეურნეობების სესხები დანიშნულების მიხედვით (LPR),docs/Raw Data/Money/nbg-money-banks-annual/official/loans-by-lopeng.xlsx,2026-10-24
+source.nbg_loans_regions_lreg,სესხები რეგიონების მიხედვით (LREG),docs/Raw Data/Money/nbg-money-banks-annual/official/loans-by-regions-lregeng.xlsx,2026-10-24
 source.nbg_meth_monetary_statistics,მონეტარული სტატისტიკის მეთოდოლოგია,docs/Raw Data/Money/nbg-money-banks-annual/official/monetary-statistics-meth-eng.pdf,2026-10-11
 source.nbg_meth_loans,სესხების სტატისტიკის მეთოდოლოგია,docs/Raw Data/Money/nbg-money-banks-annual/official/loans-meth-noteseng.pdf,2026-10-11
 source.nbg_meth_deposits,დეპოზიტების სტატისტიკის მეთოდოლოგია,docs/Raw Data/Money/nbg-money-banks-annual/official/deposits-meth-noteseng.pdf,2026-10-11
@@ -639,6 +642,7 @@ source.geostat_ict_skills_ka,"15 წლის და უფროსი ას�
 source.geostat_ict_page,საინფორმაციო და საკომუნიკაციო ტექნოლოგიების გამოყენება შინამეურნეობებში (წყაროს გვერდი),docs/Raw Data/Internet/geostat-ict-households-annual/official/geostat-category-106-2026-10-20.html,2026-10-20
 source.geostat_ict_page_ka,"საინფორმაციო და საკომუნიკაციო ტექნოლოგიების გამოყენება შინამეურნეობებში (წყაროს გვერდი, ქართული ვერსია)",docs/Raw Data/Internet/geostat-ict-households-annual/official/ka/geostat-category-106-ka-2026-10-20.html,2026-10-20
 source.mof_gfs_general_government_2002_2025,Ministry of Finance of Georgia general government operations (GFSM 2001) 2002-2025,docs/Raw Data/Budget/expenditure-types/sources/general20022025.xlsx,2026-10-21
+source.mof_2026_budget_law_planned,"Law of Georgia on the 2026 State Budget, Tavi III and Tavi VI (planned expenditure, Ministry of Finance)",docs/Raw Data/Expenditure/mof.ge/budget-law-2026/2026-tavi-III.doc + docs/Raw Data/Expenditure/mof.ge/budget-law-2026/2026-tavi-VI.docx,2026-10-24
 source.mof_tax_expenditure_report_2024_xlsx_ka,საგადასახადო დანახარჯების შეფასების ანგარიში 2024: გრაფიკები და ცხრილები (ქართული),docs/Raw Data/Revenue/tax-breaks-refunds/sources/TER graphs GEO 2024.xlsx,2026-10-21
 source.mof_tax_expenditure_report_2024_xlsx_en,საგადასახადო დანახარჯების შეფასების ანგარიში 2024: გრაფიკები და ცხრილები (ინგლისური ვერსია),docs/Raw Data/Revenue/tax-breaks-refunds/sources/TER graphs ENG 2024.xlsx,2026-10-21
 source.mof_tax_expenditure_report_2024_pdf_ka,საგადასახადო დანახარჯების შეფასების ანგარიში 2024 (PDF),docs/Raw Data/Revenue/tax-breaks-refunds/sources/TER 2024 GEO.pdf,2026-10-21

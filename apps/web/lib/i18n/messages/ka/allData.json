@@ -60,6 +60,8 @@
   "allData.words.inflation.cities": "ფასები prices",
   "allData.words.money.supply": "m3",
   "allData.words.money.loans-deposits": "კრედიტები credit",
+  "allData.words.money.borrowers": "მსესხებელი შინამეურნეობები სამომხმარებლო ავტოსესხები borrowers households",
+  "allData.words.money.regions": "რეგიონები ფილიალი regions",
   "allData.words.money.interest-rates": "რეფინანსირების განაკვეთი policy rate",
   "allData.words.money.bank-health": "npl",
   "allData.words.unemployment.overview": "უმუშევრობის დონე unemployment rate",

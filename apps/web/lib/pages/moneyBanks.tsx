@@ -6,7 +6,7 @@ import { BreadcrumbJsonLd } from "../../components/seo/breadcrumb-json-ld";
 import { loadServedMoneyBanksData, toClientMoneyBanksFact } from "../data/moneyBanks/importMoneyBanks";
 import { loadServedExplorerData } from "../data/servedData";
 import { projectGdpFact } from "../explorer/clientData";
-import { MONEY_BANKS_SECTIONS, moneyBanksCoverage, moneyBanksViewSeries, moneyBanksViews, type MoneyBanksSectionId } from "../explorer/moneyBanks";
+import { MONEY_BANKS_SECTIONS, moneyBanksCoverage, moneyBanksViewSeries, moneyBanksViews, type MoneyBanksTopicId } from "../explorer/moneyBanks";
 import { coverageLabel } from "../explorer/coverageLabel";
 import { I18nProvider } from "../i18n/provider";
 import { clientPresentation, getPresentation } from "../i18n/presentation.server";
@@ -20,18 +20,18 @@ import { explorerDatasetJsonLd } from "../seo/structuredData";
 import { resolveSiteUrl } from "../siteUrl";
 import { topicSection } from "../navigation/navTree";
 
-export async function moneyBanksPageMetadata(locale: Locale, section: MoneyBanksSectionId) {
+export async function moneyBanksPageMetadata(locale: Locale, section: MoneyBanksTopicId) {
   const messages = await getMessages(locale, ["moneyBanks"]);
   return fiscalMetadata({ locale, path: MONEY_BANKS_SECTIONS.find(item => item.id === section)!.href, title: message(messages, `moneyBanks.page.${section}.metaTitle`), description: message(messages, `moneyBanks.page.${section}.summary`) });
 }
 
 /** The ids of every series a money and banks page can show (Money supply's two views share theirs). */
-function sectionSeriesIds(section: MoneyBanksSectionId): string[] {
+function sectionSeriesIds(section: MoneyBanksTopicId): string[] {
   return [...new Set(moneyBanksViews(section).flatMap(view => moneyBanksViewSeries(section, view).map(series => series.id)))];
 }
 
 /** Display names for every series a money and banks page can show, in the page's language. */
-function moneyBanksLabels(presentation: Presentation, section: MoneyBanksSectionId): Record<string, string> {
+function moneyBanksLabels(presentation: Presentation, section: MoneyBanksTopicId): Record<string, string> {
   return Object.fromEntries(sectionSeriesIds(section).map(id => [id, message(presentation.messages, `moneyBanks.series.${id}`)]));
 }
 
@@ -40,7 +40,7 @@ export function loadMoneyBanksWorkbookSources(locale: Locale): Promise<MoneyBank
   return loadSourcedWorkbookSources("money", locale);
 }
 
-export async function renderMoneyBanksPage(locale: Locale, section: MoneyBanksSectionId) {
+export async function renderMoneyBanksPage(locale: Locale, section: MoneyBanksTopicId) {
   // The % of GDP view divides by the national GDP the debt page uses, and its Excel cites the same Geostat files.
   const gdp = moneyBanksViews(section).includes("gdp");
   const [data, presentation, sources, gdpFacts, gdpSources] = await Promise.all([

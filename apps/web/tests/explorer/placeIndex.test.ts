@@ -26,6 +26,7 @@ import { loadServedMunicipalData } from "../../lib/data/servedData";
 import { NAV_TREE } from "../../lib/navigation/navTree";
 import { renderEducationPlacePage } from "../../lib/pages/education-places";
 import { renderHouseholdRegionPage } from "../../lib/pages/household";
+import { renderMoneyBanksAreaPage } from "../../lib/pages/money-banks-area";
 import { renderUnemploymentRegionPage, renderUnemploymentRegionsPage } from "../../lib/pages/unemployment-regions";
 import { renderWagesRegionsIndexPage } from "../../lib/pages/wages-regions-index";
 import { renderWagesRegionPage } from "../../lib/pages/wages";
@@ -182,7 +183,7 @@ describe.each(["ka", "en"] as const)("place index (%s)", (locale) => {
     for (const page of ["/explorer/municipalities", "/explorer/demography/population", "/explorer/education/schools", "/explorer/health/pensions"]) {
       expect([count(page, "region"), count(page, "municipality"), count(page, "country")], page).toEqual([11, 63, 1]);
     }
-    for (const page of ["/explorer/wages/regions", "/explorer/business/regions", "/explorer/living-standards/income", "/explorer/health/causes-of-death"]) {
+    for (const page of ["/explorer/wages/regions", "/explorer/business/regions", "/explorer/money/regions", "/explorer/living-standards/income", "/explorer/health/causes-of-death"]) {
       expect([count(page, "region"), count(page, "municipality"), count(page, "country")], page).toEqual([11, 0, 1]);
     }
     expect(entriesForPage(index, "/explorer/inflation/cities")).toHaveLength(6);
@@ -254,6 +255,7 @@ describe.each(["ka", "en"] as const)("place index (%s)", (locale) => {
       { placeId: "region.adjara", page: "/explorer/living-standards/income", testId: "household-latest", render: () => renderHouseholdRegionPage("income", "adjara", locale) },
       { placeId: "region.adjara", page: "/explorer/unemployment/regions", testId: "unemployment-latest", render: () => renderUnemploymentRegionPage("adjara", locale) },
       { placeId: "country.georgia", page: "/explorer/wages/regions", testId: "wages-latest", render: () => renderWagesRegionsIndexPage(locale) },
+      { placeId: "region.adjara", page: "/explorer/money/regions", testId: "money-latest", render: () => renderMoneyBanksAreaPage(locale, "adjara") },
     ];
     for (const sample of pages) {
       const line = latestLine(renderPageMarkup(locale, await sample.render()), sample.testId);

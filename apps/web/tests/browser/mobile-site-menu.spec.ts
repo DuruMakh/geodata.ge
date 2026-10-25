@@ -5,7 +5,8 @@ for (const locale of ["ka", "en"] as const) {
   for (const width of [320, 390, 768, 899]) {
     test(`${locale} compact header and menu at ${width}px`, async ({ page }) => {
       await page.setViewportSize({ width, height: 900 });
-      await page.goto(locale === "en" ? "/en?preview=menu#data" : "/?preview=menu#data");
+      // A query and an anchor that exists on the homepage: the language switch must keep both.
+      await page.goto(locale === "en" ? "/en?preview=menu#ch-01" : "/?preview=menu#ch-01");
       const header = page.getByTestId("landing-header");
       const toggle = header.getByRole("button", { name: locale === "en" ? "Menu" : "მენიუ", exact: true });
       await expect(toggle).toBeVisible();
@@ -31,7 +32,7 @@ for (const locale of ["ka", "en"] as const) {
       await expect(toggle).toHaveAttribute("aria-expanded", "false");
       await toggle.click();
       await languages.getByRole("link").click();
-      await expect(page).toHaveURL(locale === "en" ? /\/\?preview=menu#data$/ : /\/en\?preview=menu#data$/);
+      await expect(page).toHaveURL(locale === "en" ? /\/\?preview=menu#ch-01$/ : /\/en\?preview=menu#ch-01$/);
       await expect(page.getByTestId("landing-header").getByRole("button")).toHaveAttribute("aria-expanded", "false");
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     });

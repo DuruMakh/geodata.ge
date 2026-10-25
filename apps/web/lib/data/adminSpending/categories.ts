@@ -199,6 +199,12 @@ export function classifyAdminSpendingCategory(row: OfficialExpenditureRow): stri
   if (institution.includes("ფინანსთა")) return "admin_spending.finance";
   if (institution.includes("კულტურის")) return "admin_spending.culture";
   if (institution.includes("სპორტის")) return "admin_spending.sport";
+  // The 2026 law splits the Regional Development and Infrastructure ministry into the Ministry of
+  // Infrastructure (25 00) and the Ministry of Regional Development (35 00). Verified no-op for
+  // 2004-2025: no institution reaching this point carries either name.
+  if (textIncludesAny(institution, ["ინფრასტრუქტურის სამინისტრო", "რეგიონული განვითარების სამინისტრო"])) {
+    return "admin_spending.regional_development_infrastructure";
+  }
 
   return "admin_spending.other_costs";
 }

@@ -62,4 +62,30 @@ describe("active public fact selection", () => {
 
     expect(chooseActivePublicFacts(rows)[0]?.basis).toBe("planned");
   });
+
+  it("keeps the 2026 actual over the 2026 plan for the same expenditure item", () => {
+    const base: BudgetFactImportRow = {
+      year: 2026,
+      side: "expenditure",
+      itemId: "spending.health",
+      amountGel: 500,
+      basis: "planned",
+      sourceId: "source.mof_2026_budget_law",
+      officialInstitution: null,
+      officialProgram: null,
+      officialSubprogram: null,
+      publicSpendingFieldId: "spending.health",
+      mappingConfidence: "high",
+      mappingNotes: "",
+    };
+    const actual: BudgetFactImportRow = { ...base, amountGel: 450, basis: "actual", sourceId: "source.mof_2026_actual" };
+
+    for (const rows of [[base, actual], [actual, base]]) {
+      const active = chooseActivePublicFacts(rows);
+
+      expect(active).toHaveLength(1);
+      expect(active[0]?.basis).toBe("actual");
+      expect(active[0]?.amountGel).toBe(450);
+    }
+  });
 });

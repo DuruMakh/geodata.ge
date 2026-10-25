@@ -194,7 +194,8 @@ describe("public source resolution", () => {
       expect(snapshot.sources.some(source => source.sourceId.startsWith("source.geostat_services_"))).toBe(false);
       // The nineteen demography canonical inputs (eighteen annual tables and the census snapshot) extend the existing inventory;
       // the package's validation inputs and definitions are evidence, not sources.
-      expect(snapshot.sources.length).toBe(151);
+      // The 2026 budget law adds one planned-basis source.
+      expect(snapshot.sources.length).toBe(152);
     });
 
     it("resolves an extracted file to the archived original it came from", async () => {

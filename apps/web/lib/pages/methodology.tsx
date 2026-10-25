@@ -58,7 +58,7 @@ export async function renderMethodologyPage(locale: Locale) {
         breadcrumbItems={[{ name: message(messages, "common.home"), path: pageHref("/", locale) }, { name: message(messages, "common.methodology"), path: pageHref("/methodology", locale) }]}
       />
       <div className="mx-auto w-full max-w-[1240px] px-5 min-[768px]:px-7">
-        <SiteFooter locale={locale} updatedAt={landingModel.updatedAt} />
+        <SiteFooter variant="site" path="/methodology" locale={locale} updatedAt={landingModel.updatedAt} />
       </div>
     </>
   );

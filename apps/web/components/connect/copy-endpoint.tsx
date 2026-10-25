@@ -2,6 +2,9 @@
 
 import { useState } from "react";
 
+const BUTTON_CLASS =
+  "inline-flex min-h-9 shrink-0 items-center gap-2 border border-[var(--control)] px-3 py-1.5 font-[family-name:var(--font-numeric)] text-[11px] uppercase tracking-[0.04em] text-[var(--muted)] transition-colors hover:bg-[var(--tint)] hover:text-[var(--ink)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]";
+
 /**
  * Copy a short piece of text the page also renders as selectable text.
  *
@@ -17,6 +20,7 @@ export function CopyEndpoint({
   copiedLabel = "მისამართი დაკოპირდა",
   copyText = "კოპირება",
   copiedText = "დაკოპირდა",
+  className = BUTTON_CLASS,
 }: {
   /** The text to copy: the endpoint address, or the chat prompt. */
   value: string;
@@ -25,6 +29,8 @@ export function CopyEndpoint({
   copiedLabel?: string;
   copyText?: string;
   copiedText?: string;
+  /** Replaces the button's whole look, for a surface the default does not suit (the dark homepage band). */
+  className?: string;
 }) {
   const [copied, setCopied] = useState(false);
 
@@ -50,7 +56,7 @@ export function CopyEndpoint({
             // this button.
           }
         }}
-        className="inline-flex min-h-9 shrink-0 items-center gap-2 border border-[var(--control)] px-3 py-1.5 font-[family-name:var(--font-numeric)] text-[11px] uppercase tracking-[0.04em] text-[var(--muted)] transition-colors hover:bg-[var(--tint)] hover:text-[var(--ink)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
+        className={className}
       >
         {copied ? copiedText : copyText}
       </button>

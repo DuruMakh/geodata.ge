@@ -95,7 +95,7 @@ test("methodology hub separates live datasets from future markers", async ({ pag
   await expect(page.getByTestId("methodology-live-row")).toHaveCount(LIVE_METHODOLOGY_IDS.length);
   // Unemployment, trade and demography are all live, so no future row remains to name.
   await expect(page.getByTestId("methodology-future-row")).toHaveCount(0);
-  await expect(page.getByTestId("methodology-live-row").first()).toContainText(/2004–2025/);
+  await expect(page.getByTestId("methodology-live-row").first()).toContainText(/2004–2026/);
 });
 
 test("future routes stay on the static 404 surface", async ({ page }) => {
@@ -145,7 +145,7 @@ test("expenditure methodology exposes the complete layered article", async ({ pa
   await expect(page.getByTestId("decision-record")).toContainText("1,930,210,300");
   await expect(page.getByTestId("decision-record")).toContainText("ცენტრალური ბიუჯეტი");
   await expect(page.getByTestId("decision-record")).toContainText("არ ქვეყნდება");
-  await expect(page.getByTestId("source-archive-row")).toHaveCount(79);
+  await expect(page.getByTestId("source-archive-row")).toHaveCount(81);
 
   const archiveLink = page
     .getByRole("navigation", { name: "გვერდის სარჩევი" })
@@ -194,7 +194,7 @@ test("regular content pages do not repeat the methodology promotion", async ({ p
 test("source archives describe the full coverage and selected year without exposing provenance metadata", async ({ page }) => {
   // Regional economies has two files, too few for a year filter (U29-02): its caption keeps the full coverage.
   for (const [dataset, datasetTitle, coverage, selectedYear] of [
-    ["expenditure", "ხარჯების მეთოდოლოგია", "2004–2025", "2025"],
+    ["expenditure", "ხარჯების მეთოდოლოგია", "2004–2026", "2025"],
     ["revenue", "შემოსავლების მეთოდოლოგია", "2004–2025", "2025"],
     ["municipalities", "მუნიციპალიტეტების მეთოდოლოგია", "2015–2025", "2025"],
     ["regional-economies", "რეგიონების ეკონომიკა", "2010–2024", null],

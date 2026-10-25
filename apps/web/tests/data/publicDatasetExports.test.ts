@@ -36,7 +36,8 @@ describe("public SEO dataset exports", () => {
     const validations = await preparePublicDatasets({ repositoryRoot, publicRoot, mode: "write" });
 
     expect(validations.map((row) => [row.datasetId, row.rowCount])).toEqual([
-      ["national-expenditure", 286],
+      // 286 actual 2004-2025 rows + 13 planned 2026 field rows (budget law, basis planned).
+      ["national-expenditure", 299],
       ["national-revenue", 241],
       ["municipal-expenditure", 7865],
       ["government-debt", 126],

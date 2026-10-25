@@ -380,7 +380,8 @@ function buildDatasetSummary(snapshot: FactQuerySnapshot, datasetId: DatasetId, 
  * is the live case, data/glossary/category-glossary.csv:15) plus the
  * calculated total, which has no CSV row on either side (verified: neither
  * "revenue.total" nor "expenditure.total" appears as an item_id in
- * data/imports/revenue-facts-2004-2025.csv or expenditure-facts-2004-2025.csv).
+ * data/imports/revenue-facts-2004-2025.csv, expenditure-facts-2004-2025.csv or
+ * expenditure-facts-2026-planned.csv).
  */
 function nationalSeriesFor(snapshot: FactQuerySnapshot, side: "revenue" | "expenditure"): BaseSeriesEntry[] {
   const yearsByItem = new Map<string, Set<number>>();
@@ -430,7 +431,8 @@ function nationalSeriesFor(snapshot: FactQuerySnapshot, side: "revenue" | "expen
  * in that category, never assumed. major_program series have no separate
  * taxonomy: the facts ARE the catalogue, so every program itemId that occurs
  * is, by construction, served. admin_spending.total has no CSV row (verified:
- * 0 "admin_spending.total" rows in data/imports/admin-spending-facts-2004-2025.csv)
+ * 0 "admin_spending.total" rows in data/imports/admin-spending-facts-2004-2025.csv
+ * or admin-spending-facts-2026-planned.csv)
  * and is calculated only from admin_category facts — mirroring
  * lib/explorer/explorerData.ts's own total (detailFactsForTotals filters to
  * level === "admin_category" precisely to avoid double-counting programs
