@@ -549,18 +549,19 @@ for (const width of [375, 390]) {
   });
 }
 
-test("site footer on the homepage and the site pages, compact footer on explorer pages", async ({ page }) => {
+test("site footer on the homepage and the site pages, no footer on explorer pages", async ({ page }) => {
   for (const path of ["/", "/methodology", "/connect", "/about", "/en", "/en/methodology", "/en/connect", "/en/about"]) {
     await page.goto(`${baseUrl}${path}`);
     const footer = page.getByTestId("site-footer");
     await expect(footer, path).toHaveAttribute("data-variant", "site");
     await expect(footer.getByTestId("footer-language-link"), path).toHaveCount(1);
   }
+  // Explorer routes render no footer (owner, 2026-10-25); the sidebar's foot links methodology and AI connection.
   for (const path of ["/explorer/expenditure", "/en/explorer/expenditure"]) {
     await page.goto(`${baseUrl}${path}`);
-    const footer = page.getByTestId("site-footer");
-    await expect(footer, path).toHaveAttribute("data-variant", "compact");
-    await expect(footer.getByTestId("footer-language-link"), path).toHaveCount(0);
+    await expect(page.locator("body"), path).toHaveAttribute("data-app-ready", "true");
+    await expect(page.getByTestId("site-footer"), path).toHaveCount(0);
+    await expect(page.getByRole("contentinfo"), path).toHaveCount(0);
   }
 });
 
