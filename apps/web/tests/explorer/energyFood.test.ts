@@ -198,6 +198,7 @@ const COPY: Record<Locale, Record<string, string>> = {
     "energyFood.status.published": "Published", "energyFood.status.no_flow": "No flow", "energyFood.status.preliminary": "Preliminary", "energyFood.unit.price": "₾", "energyFood.unit.priceLong": "₾ per kg (milk per litre, eggs per piece)",
     "common.energySupply": "Energy supply", "common.electricity": "Electricity", "common.energyUse": "Energy use", "common.foodSelfSufficiency": "Food self-sufficiency",
     "common.farming": "Farming", "energyFood.unit.million_gel": "million ₾",
+    "energyFood.latest.food-self-sufficiency": "Wheat self-sufficiency", "energyFood.latest.farming": "Farm output",
     ...Object.fromEntries(ENERGY_FOOD_SECTIONS.flatMap(({ id }) => [[`energyFood.page.${id}.title`, `${id} title`], [`energyFood.page.${id}.summary`, `${id} summary`]])),
   },
   ka: {
@@ -205,6 +206,7 @@ const COPY: Record<Locale, Record<string, string>> = {
     "energyFood.status.published": "გამოქვეყნებული", "energyFood.status.no_flow": "ნაკადი არ არის", "energyFood.status.preliminary": "წინასწარი", "energyFood.unit.price": "₾", "energyFood.unit.priceLong": "₾ 1 კგ-ზე (რძე 1 ლიტრზე, კვერცხი 1 ცალზე)",
     "common.energySupply": "ენერგიის მიწოდება", "common.electricity": "ელექტროენერგია", "common.energyUse": "ენერგიის მოხმარება", "common.foodSelfSufficiency": "სურსათის თვითუზრუნველყოფა",
     "common.farming": "სოფლის მეურნეობა", "energyFood.unit.million_gel": "მლნ ₾",
+    "energyFood.latest.food-self-sufficiency": "ხორბლით თვითუზრუნველყოფა", "energyFood.latest.farming": "პროდუქციის გამოშვება",
     ...Object.fromEntries(ENERGY_FOOD_SECTIONS.flatMap(({ id }) => [[`energyFood.page.${id}.title`, `${id} სათაური`], [`energyFood.page.${id}.summary`, `${id} აღწერა`]])),
   },
 };
@@ -314,15 +316,19 @@ test("the hub has five cards with sparklines and the latest published values in 
   expect(cards.map(card => card.index)).toEqual(["01", "02", "03", "04", "05"]);
   expect(cards.map(card => card.title)).toEqual(["Energy supply", "Electricity", "Energy use", "Food self-sufficiency", "Farming"]);
   expect(cards.map(card => card.footer)).toEqual([
-    "2024 · 5,914.5 ktoe · 2013–2024", "2024 · 14,234.1 GWh · 2013–2024", "2024 · 5,456.7 ktoe · 2013–2024", "2025 · 19% · 2014–2025", "2025 · 8,384.9 million ₾ · 2010–2025",
+    "2024 · 5,914.5 ktoe · 2013–2024", "2024 · 14,234.1 GWh · 2013–2024", "2024 · 5,456.7 ktoe · 2013–2024", "2025 · 19% · 2014–2025", "2025 · 8,384.9 million ₾ · 2006–2025",
   ]);
-  expect(cards.map(card => card.series?.length)).toEqual([12, 12, 12, 12, 16]);
+  // Each sparkline spans its page's years; Farming's page reaches back to 2006 through its other series.
+  expect(cards.map(card => card.series?.length)).toEqual([12, 12, 12, 12, 20]);
+  expect(cards.map(card => card.latest?.caption ?? null)).toEqual([null, null, null, "Wheat self-sufficiency", "Farm output"]);
+  // Farming's latest output is published as preliminary.
+  expect(cards.map(card => card.latest?.status ?? null)).toEqual([null, null, null, null, "preliminary"]);
   expect(cards.map(card => card.series!.at(-1))).toEqual([5914.5, 14234.1, 5456.7, 19, 8384.9]);
   expect(cards.every(card => card.comingSoon === false && card.seriesColor === INK)).toBe(true);
   expect(cards.map(card => card.description)).toEqual(ENERGY_FOOD_SECTIONS.map(s => `${s.id} summary`));
   const ka = buildEnergyFoodHubCards(facts, await presentationFor("ka"));
   expect(ka.map(card => card.footer)).toEqual([
-    "2024 · 5,914.5 ათასი ტ.ნ.ე. · 2013–2024", "2024 · 14,234.1 გვტ.სთ · 2013–2024", "2024 · 5,456.7 ათასი ტ.ნ.ე. · 2013–2024", "2025 · 19% · 2014–2025", "2025 · 8,384.9 მლნ ₾ · 2010–2025",
+    "2024 · 5,914.5 ათასი ტ.ნ.ე. · 2013–2024", "2024 · 14,234.1 გვტ.სთ · 2013–2024", "2024 · 5,456.7 ათასი ტ.ნ.ე. · 2013–2024", "2025 · 19% · 2014–2025", "2025 · 8,384.9 მლნ ₾ · 2006–2025",
   ]);
 });
 

@@ -12,6 +12,8 @@ import { formatAmount, formatShare } from "./format";
 import { INK } from "./colors";
 import { BUDGET_SECTIONS } from "./sections";
 import { coverageRange } from "./coverageLabel";
+import { annualSeries } from "./sparkline";
+import type { PlaceEntry } from "./places/types";
 import type { CardGraphic, CardLatest } from "./topicHub";
 
 // Budget hub cards (DESIGN.md §6.7). Every figure is derived from the served
@@ -33,6 +35,8 @@ export type HubCardModel = {
   /** A card with no single figure whose years end in a plan year: that year as the plan (`2026 გეგმა`), which its footer names. */
   plan?: string;
   graphic?: CardGraphic;
+  /** A Regions card's figures for its spread, where they follow the measure its page maps rather than the place index's (Housing: floor area). */
+  spreadEntries?: PlaceEntry[];
 };
 
 // Mirrors what the destination pages do: sum the category rows, but let an
@@ -236,13 +240,14 @@ export function buildHubCards(
       href: BUDGET_SECTIONS.deficit.href,
       comingSoon: BUDGET_SECTIONS.deficit.href === null,
       series: actualBalanceFacts.length > 0
-        ? balanceYears.map((year) => actualBalanceFacts.find((fact) => fact.year === year)?.generalGovernmentBalancePctGdp ?? null)
+        ? annualSeries(actualBalanceFacts.map((fact) => ({ year: fact.year, value: fact.generalGovernmentBalancePctGdp })))
         : null,
       seriesColor: actualBalanceFacts.length > 0 ? INK : null,
       footer: latestBalance === null
         ? null
         : translated("hub.deficitFooter", `${latestBalance.year} · ${formatShare(latestBalance.generalGovernmentBalancePctGdp / 100)} მშპ-ის`, { year: latestBalance.year, share: formatShare(latestBalance.generalGovernmentBalancePctGdp / 100) }),
-      latest: !withLatest || latestBalance === null ? null : { value: formatShare(latestBalance.generalGovernmentBalancePctGdp / 100), period: String(latestBalance.year) },
+      // The balance keeps its sign, as the page states it; "of GDP" says what the share is of, as the footer did.
+      latest: !withLatest || latestBalance === null ? null : { value: formatShare(latestBalance.generalGovernmentBalancePctGdp / 100), period: String(latestBalance.year), caption: translated("hub.deficitCaption", "მშპ-ის") },
       years: balanceYears.length > 0 ? coverageRange(balanceYears[0], balanceYears.at(-1)!) : undefined,
     },
   ];

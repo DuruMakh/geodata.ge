@@ -10,7 +10,9 @@ import { publicLabel } from "../i18n/labels";
 import type { HubCardModel } from "./hubCards";
 import { INK } from "./colors";
 import { formatAmount, formatShare } from "./format";
+import { formatGdpLatestValue } from "./latestValue";
 import { buildSectorHighlights } from "./sectorHighlights";
+import { annualSeries } from "./sparkline";
 import { coverageRange } from "./coverageLabel";
 export function buildEconomyHubCards(
   facts: ServedGdpObservation[],
@@ -22,9 +24,6 @@ export function buildEconomyHubCards(
   const t = (k: string) => message(p.messages, `gdp.${k}`);
   const real = facts
     .filter((f) => f.seriesId === "real_usd_2015")
-    .sort((a, b) => a.year - b.year);
-  const nominal = facts
-    .filter((f) => f.seriesId === "nominal_gel")
     .sort((a, b) => a.year - b.year);
   const sectorYears = sectorFacts.filter((f) => f.measure === "nominal").map((f) => f.year);
   const latestSectorYear = sectorYears.length ? Math.max(...sectorYears) : null;
@@ -48,7 +47,9 @@ export function buildEconomyHubCards(
     : null;
   const region = largestRegion && REGIONAL_ECONOMY_REGIONS.find((r) => r.id === largestRegion.regionId);
   const regionName = region ? publicLabel(p.locale, region.id, region.kaLabel, p.englishLabels) : null;
-  const latestNominal = nominal.at(-1)!;
+  const latestReal = real.at(-1)!;
+  // The Economy overview page opens on real GDP: its line, "Real GDP · 2025: 27.1 bn USD", is the card's figure, over the line it draws.
+  const realValue = formatGdpLatestValue({ indicator: "real", currency: "usd" }, latestReal.value, p.messages);
   const sectorShare = sectorHighlights && sectorHighlights.topThreeShare !== null ? formatShare(sectorHighlights.topThreeShare / 100) : null;
   return [
     {
@@ -57,13 +58,11 @@ export function buildEconomyHubCards(
       description: t("description"),
       href: "/explorer/economy/gdp",
       comingSoon: false,
-      series: real.map((f) => f.value),
+      series: annualSeries(real),
       seriesColor: INK,
-      // One figure, the economy's size as the landing states it, instead of a
-      // three-line run of constant-dollar values and coverage ranges.
-      footer: `${latestNominal.year} · ${t("nominal")} ${formatAmount(latestNominal.value, p.locale)}`,
-      latest: { value: formatAmount(latestNominal.value, p.locale), period: String(latestNominal.year), caption: t("nominal") },
-      years: coverageRange(Math.min(...[...real, ...nominal].map((f) => f.year)), Math.max(...[...real, ...nominal].map((f) => f.year))),
+      footer: `${latestReal.year} · ${t("real")} ${realValue}`,
+      latest: { value: realValue, period: String(latestReal.year), caption: t("real"), ...(latestReal.status === "preliminary" ? { status: "preliminary" as const } : {}) },
+      years: coverageRange(real[0].year, latestReal.year),
     },
     {
       index: "02",
@@ -76,7 +75,7 @@ export function buildEconomyHubCards(
       footer: sectorHighlights && sectorShare !== null
         ? `${latestSectorYear} · ${message(p.messages, "sectors.topThree")} ${sectorShare} · ${Math.min(...sectorYears)}–${latestSectorYear}${sectorHighlights.preliminary ? ` · ${t("preliminary")}` : ""}`
         : null,
-      latest: sectorShare === null ? null : { value: sectorShare, period: String(latestSectorYear), caption: message(p.messages, "sectors.topThree") },
+      latest: sectorShare === null ? null : { value: sectorShare, period: String(latestSectorYear), caption: message(p.messages, "sectors.topThree"), ...(sectorHighlights?.preliminary ? { status: "preliminary" as const } : {}) },
       years: latestSectorYear === null ? undefined : coverageRange(Math.min(...sectorYears), latestSectorYear),
     },
     {
@@ -85,12 +84,12 @@ export function buildEconomyHubCards(
       description: t("expenditureDescription"),
       href: latestHouseholds ? "/explorer/economy/expenditure" : null,
       comingSoon: latestHouseholds === undefined,
-      series: latestHouseholds ? households.map((f) => f.value) : null,
+      series: latestHouseholds ? annualSeries(households) : null,
       seriesColor: latestHouseholds ? INK : null,
       footer: latestHouseholds
         ? `${latestHouseholds.year} · ${message(p.messages, "gdpExpenditure.householdsShare", { share: formatShare(latestHouseholds.value / 100) })} · ${households[0].year}–${latestHouseholds.year}${latestHouseholds.status === "preliminary" ? ` · ${t("preliminary")}` : ""}`
         : null,
-      latest: latestHouseholds ? { value: formatShare(latestHouseholds.value / 100), period: String(latestHouseholds.year), caption: message(p.messages, "gdpExpenditure.largest") } : null,
+      latest: latestHouseholds ? { value: formatShare(latestHouseholds.value / 100), period: String(latestHouseholds.year), caption: message(p.messages, "gdpExpenditure.largest"), ...(latestHouseholds.status === "preliminary" ? { status: "preliminary" as const } : {}) } : null,
       years: latestHouseholds ? coverageRange(households[0].year, latestHouseholds.year) : undefined,
     },
     {

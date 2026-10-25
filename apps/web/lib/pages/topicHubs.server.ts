@@ -128,10 +128,15 @@ const LOADERS: Record<TopicId, (locale: Locale) => Promise<Loaded>> = {
   },
   inflation: async (locale) => {
     const [{ facts, categories, weights, cities }, productData, presentation] = await Promise.all([loadServedInflationData(), loadServedProductData(), getPresentation(locale, ["inflation", "groups"], [])]);
-    const periods = facts.map((fact) => fact.period).sort();
+    // The months the four pages cover: the Overview opens on annual inflation, the longest of them. The price index reaches further
+    // back, but only the Overview's index tab shows it, so the header does not start there.
+    const products = buildLatestProductHubSummary(productData);
+    const periods = [
+      ...facts.filter((fact) => fact.seriesId === "cpi.headline" && fact.measure === "yoy_pct"), ...categories, ...cities,
+    ].map((fact) => fact.period).concat(products ? [products.firstPeriod, products.latestPeriod] : []).sort();
     const short = (key: string) => periodLabel(presentation.messages, periodFromKey(key), "short");
     return {
-      cards: buildInflationHubCards(facts, presentation, categories, weights, buildLatestProductHubSummary(productData), cities.map(cityFactInput)),
+      cards: buildInflationHubCards(facts, presentation, categories, weights, products, cities.map(cityFactInput)),
       firstPeriod: short(periods[0]), lastPeriod: short(periods.at(-1)!), lastReviewedAt: facts.map((fact) => fact.lastReviewedAt).sort().at(-1) ?? "",
     };
   },
@@ -186,10 +191,13 @@ const LOADERS: Record<TopicId, (locale: Locale) => Promise<Loaded>> = {
   },
   trade: async (locale) => {
     const [{ facts }, partners, products, domestic, services, composition] = await Promise.all([loadServedTradeOverviewData(), loadServedTradePartnersData(), loadServedTradeProductsData(), loadServedTradeDomesticData(), loadServedTradeServicesData(), loadServedTradeCompositionData()]);
-    // English partner names, for the largest partner the Partners card names.
-    const presentation = await getPresentation(locale, ["trade", "groups"], partners.entities.map((entity) => entity.id));
     const partnerData = toClientTradePartnersData(partners, facts);
-    const cards = buildTradeHubCards(facts.map(toClientTradeOverviewFact), presentation, tradePartnersCoverage(partnerData), tradeProductsCoverage(toClientTradeProductsData(products, [], "", PRODUCT_SOURCE_BLOCK)), toClientTradeDomesticData(domestic, []).national, toClientTradeServicesData(services).national, toClientTradeCompositionData(composition, facts).sitc.nationalFacts.filter((fact) => fact.indicatorId === "trade.exports"), partnerData);
+    // The Products and Composition pages' own data, with Georgia's totals, for the figures those pages open on.
+    const productData = toClientTradeProductsData(products, facts, "", PRODUCT_SOURCE_BLOCK);
+    const { sitc } = toClientTradeCompositionData(composition, facts);
+    // English names for the largest partner the Partners card names, and for the products and groups those pages' models label.
+    const presentation = await getPresentation(locale, ["trade", "groups"], [...partners.entities, ...productData.entities, ...sitc.entities].map((entity) => entity.id));
+    const cards = buildTradeHubCards(facts.map(toClientTradeOverviewFact), presentation, tradePartnersCoverage(partnerData), tradeProductsCoverage(productData), toClientTradeDomesticData(domestic, []).national, toClientTradeServicesData(services).national, sitc.nationalFacts.filter((fact) => fact.indicatorId === "trade.exports"), partnerData, productData, sitc);
     // The header's coverage label spans every trade dataset the hub links to (U28-06).
     const all = [...facts, ...partners.facts, ...products.facts, ...domestic.facts, ...services.facts, ...composition.facts];
     return yearly(cards, all.map((f) => f.year), all.map((f) => f.lastReviewedAt));

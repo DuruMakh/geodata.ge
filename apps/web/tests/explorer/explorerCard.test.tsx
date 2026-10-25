@@ -18,7 +18,7 @@ const text = (markup: string) => markup.replace(/<[^>]+>/g, "|").replace(/\|+/g,
 
 const SPREAD: RegionSpread = {
   points: [{ x: 10, key: true }, { x: 40, key: false }, { x: 90, key: true }], georgiaX: 60, georgiaLabel: "Georgia 13.9%",
-  low: { name: "Shida Kartli", value: "7.0%" }, high: { name: "Tbilisi", value: "17.5%" }, lowX: 10, value: "7.0–17.5%", caption: "11 regions · 2025",
+  low: { name: "Shida Kartli", value: "7.0%" }, high: { name: "Tbilisi", value: "17.5%" }, lowX: 10, value: "7.0–17.5%", caption: "11 regions · 2025", regions: "11 regions", period: "2025",
 };
 
 describe("leadSpan", () => {
@@ -47,6 +47,12 @@ describe("ExplorerCard", () => {
     expect(count(markup, /<svg/g)).toBe(2); // the corner arrow and the chart
     expect(count(markup, /<path[^>]*stroke="#1E1B16"/g)).toBeGreaterThan(0);
     expect(markup).not.toContain("Share of the labour force");
+  });
+
+  it("marks a preliminary figure after its period, as its page writes it", () => {
+    const preliminary = card({ latest: { value: "29.1%", period: "2025", caption: "Top 3 sectors’ GDP share", status: "preliminary" } });
+    expect(text(html({ card: preliminary }))).toContain("|29.1%|Top 3 sectors’ GDP share · 2025 · Preliminary|");
+    expect(text(html({ card: preliminary, locale: "ka" }))).toContain("|29.1%|Top 3 sectors’ GDP share · 2025 · წინასწარი|");
   });
 
   it("links Georgian and English cards to their own language", () => {
@@ -134,20 +140,22 @@ describe("ExplorerCard", () => {
     const markup = html({
       card: card({
         href: "/explorer/unemployment/age", series: null, seriesColor: null,
-        graphic: { kind: "bars", bars: bands.map((label, index) => ({ label, value: 40 - index * 3, accent: index < 3 })), first: "15–19", last: "65+" },
+        graphic: { kind: "bars", bars: bands.map((label, index) => ({ label, value: 40 - index * 3, accent: index < 3 })), first: "15–19", last: "65+", period: "2025" },
       }),
     });
     expect(count(markup, /data-testid="card-bar"/g)).toBe(11);
     expect(count(markup, /data-testid="card-bar"[^>]*data-accent="true"/g)).toBe(3);
     expect(markup).toContain("height:100%");
     expect(text(markup)).toContain("|15–19|65+|");
+    // The year the bars read, where a series card prints its years.
+    expect(text(markup)).toContain("|2025|");
   });
 
   it("renders a pair graphic as labelled bars scaled to the page's maximum", () => {
     const markup = html({
       card: card({
         href: "/explorer/unemployment/gender", series: null, seriesColor: null,
-        graphic: { kind: "pair", max: 20, rows: [{ label: "Men", value: 15.8, text: "15.8%", accent: true }, { label: "Women", value: 11.4, text: "11.4%", accent: false }] },
+        graphic: { kind: "pair", max: 20, rows: [{ label: "Men", value: 15.8, text: "15.8%", accent: true }, { label: "Women", value: 11.4, text: "11.4%", accent: false }], period: "2025" },
       }),
     });
     expect(text(markup)).toContain("|Men|");
@@ -158,6 +166,7 @@ describe("ExplorerCard", () => {
     expect(markup).toContain("grid-cols-[minmax(0,1fr)_max-content]");
     for (const [tag] of markup.matchAll(/<b[^>]*data-testid="card-pair-value"[^>]*>/g)) expect(tag).toContain("whitespace-nowrap");
     expect(count(markup, /data-testid="card-pair-value"/g)).toBe(2);
+    expect(text(markup)).toContain("|2025|");
   });
 
   it("makes a card without a link a plain, disabled block with a coming-soon badge", () => {
@@ -178,23 +187,23 @@ describe("ExplorerCard for assistive technology and edge cases", () => {
     const markup = html({
       card: card({
         series: null, seriesColor: null, latest: null,
-        graphic: { kind: "pair", max: 20, rows: [{ label: "Men", value: 15.8, text: "15.8%", accent: true }, { label: "Women", value: 11.4, text: "11.4%", accent: false }] },
+        graphic: { kind: "pair", max: 20, rows: [{ label: "Men", value: 15.8, text: "15.8%", accent: true }, { label: "Women", value: 11.4, text: "11.4%", accent: false }], period: "2025" },
       }),
     });
     expect(describedText(markup)).toContain("Men 15.8%, Women 11.4%");
   });
 
   it("describes a bars card by its first and last band, and a spread card by its extremes", () => {
-    const bars = html({ card: card({ series: null, seriesColor: null, graphic: { kind: "bars", first: "15–19", last: "65+", bars: [{ label: "a", value: 3, accent: true }] } }) });
+    const bars = html({ card: card({ series: null, seriesColor: null, graphic: { kind: "bars", first: "15–19", last: "65+", bars: [{ label: "a", value: 3, accent: true }], period: "2025" } }) });
     expect(describedText(bars)).toContain("15–19, 65+");
     const spread = html({ card: card({ series: null, seriesColor: null, latest: null }), spread: SPREAD });
     expect(describedText(spread)).toContain("Shida Kartli 7.0%, Tbilisi 17.5%");
   });
 
   it("draws no NaN or infinite sizes for empty bars or a zero maximum", () => {
-    const empty = html({ card: card({ series: null, seriesColor: null, graphic: { kind: "bars", first: "", last: "", bars: [] } }) });
+    const empty = html({ card: card({ series: null, seriesColor: null, graphic: { kind: "bars", first: "", last: "", bars: [], period: "2025" } }) });
     const zero = html({
-      card: card({ series: null, seriesColor: null, graphic: { kind: "pair", max: 0, rows: [{ label: "Men", value: 0, text: "0%", accent: false }] } }),
+      card: card({ series: null, seriesColor: null, graphic: { kind: "pair", max: 0, rows: [{ label: "Men", value: 0, text: "0%", accent: false }], period: "2025" } }),
     });
     for (const markup of [empty, zero]) expect(markup).not.toMatch(/NaN|Infinity/);
     expect(zero).toContain("width:0%");

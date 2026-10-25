@@ -9,6 +9,7 @@ import {
 } from "../../lib/explorer/labour";
 import { buildLabourHubCards } from "../../lib/explorer/labourHubCards";
 import { buildLabourWorkbookExportModel } from "../../lib/explorer/labourWorkbook";
+import { getMessages } from "../../lib/i18n/messages.server";
 import type { Locale, Presentation } from "../../lib/i18n/types";
 
 let facts: ClientLabourFact[];
@@ -242,8 +243,10 @@ test("names a page total under its heading on the Summary sheet, as on the Data 
   expect(informal.analysis.rows[0][1]).toBe("Informal jobs — Georgia");
 });
 
-test("builds the four hub cards", () => {
-  const en = buildLabourHubCards(facts, presentation("en"), 5);
+test("builds the four hub cards", async () => {
+  // The pages' own line captions, under the test copy.
+  const withLines = async (locale: Locale): Promise<Presentation> => ({ ...presentation(locale), messages: { ...await getMessages(locale, ["labour"]), ...MESSAGES[locale] } });
+  const en = buildLabourHubCards(facts, await withLines("en"), 5);
   expect(en.map(card => [card.index, card.title, card.href, card.description])).toEqual([
     ["05", "Jobs by industry", "/explorer/unemployment/industries", "Employed by industry."],
     ["06", "Hours worked", "/explorer/unemployment/hours", "Usual weekly hours."],
@@ -258,7 +261,9 @@ test("builds the four hub cards", () => {
   expect(en[0].series![0]).toBe(1286.9);
   expect(en[0].series!.at(-1)).toBe(1389.7);
 
-  const ka = buildLabourHubCards(facts, presentation("ka"), 5);
+  expect(en.map(card => card.latest?.caption ?? null)).toEqual(["Employed", null, null, null]);
+
+  const ka = buildLabourHubCards(facts, await withLines("ka"), 5);
   const oneDecimal = { divisor: 1, label: "", decimals: 1 };
   expect(ka.map(card => card.index)).toEqual(["05", "06", "07", "08"]);
   expect(ka.map(card => card.footer)).toEqual([

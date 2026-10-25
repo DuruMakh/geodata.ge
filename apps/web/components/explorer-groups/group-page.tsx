@@ -49,26 +49,31 @@ const HEADLINE_CLASS = [
 // The topic links' edge fade, from 900px: shown where more links lie beyond that edge. It stops above the row's bottom rule.
 const EDGE_FADE = "pointer-events-none absolute top-0 bottom-px w-10 from-[var(--paper)] to-transparent opacity-0 transition-opacity duration-150 motion-reduce:transition-none max-[900px]:hidden";
 
-function Headline({ headline, locale }: { headline: GroupHeadline; locale: Locale }) {
+function Headline({ headline, locale, messages }: { headline: GroupHeadline; locale: Locale; messages: Messages }) {
   const { figure, unit } = splitValue(headline.value);
+  // A preliminary figure's mark follows its period, as its page writes it (`2025 · წინასწარი`).
+  const period = headline.status === "preliminary" ? `${headline.period} · ${message(messages, "groups.preliminary")}` : headline.period;
+  const marked = headline.planned || headline.status === "preliminary";
   return (
-    <Link href={pageHref(headline.href, locale)} prefetch={false} data-testid="group-headline" data-planned={headline.planned || undefined} className={HEADLINE_CLASS}>
+    <Link href={pageHref(headline.href, locale)} prefetch={false} data-testid="group-headline" data-planned={headline.planned || undefined} data-status={headline.status} className={HEADLINE_CLASS}>
       <span className="block text-[12.5px] leading-[1.35] text-[var(--body)] group-hover:text-[var(--ink)] group-hover:underline group-hover:decoration-[var(--accent)] group-hover:underline-offset-[3px] max-[1101px]:min-h-[2.7em]">
         {headline.label}
       </span>
       <span className={`mt-1.5 block ${NUMERIC} text-[27px] leading-[1.1] font-semibold tracking-[-0.02em] max-[1101px]:text-[22px]`}>
         {/* The figure and the unit each stay whole; the unit is set smaller (DESIGN.md §5.2), so the pair fits one line at 1440 and
-            1024px. Only where a long unit cannot fit beside its figure does it move, whole, under it. */}
+            1024px. Only where a long unit cannot fit beside its figure does it move, whole, under it; below 400px, where a long
+            unit (`მლრდ აშშ დოლარი`) is wider than the cell, it may break between its words. */}
         <span data-testid="group-headline-figure" className="whitespace-nowrap">{figure}</span>
         {unit ? (
           <span className="text-[13px] font-normal tracking-normal text-[var(--body)]">
             {" "}
-            <span data-testid="group-headline-unit" className="whitespace-nowrap">{unit}</span>
+            <span data-testid="group-headline-unit" className="whitespace-nowrap max-[400px]:whitespace-normal">{unit}</span>
           </span>
         ) : null}
         {/* The period may go to the next line instead of the unit. Its gap is a leading space, not a margin, so the break takes it.
-            A planned figure's period is the plan (`2026 გეგმა`), set a step stronger so it is not read past. */}
-        <small className={`text-[11.5px] tracking-normal ${headline.planned ? "font-medium text-[var(--muted)]" : "font-normal text-[var(--faint)]"}`}>{` ${headline.period}`}</small>
+            A planned figure's period is the plan (`2026 გეგმა`), and a preliminary one's carries its mark; either is set a step
+            stronger so it is not read past. */}
+        <small className={`text-[11.5px] tracking-normal ${marked ? "font-medium text-[var(--muted)]" : "font-normal text-[var(--faint)]"}`}>{` ${period}`}</small>
       </span>
       {headline.caption ? <span className="mt-1 block text-[11.5px] leading-snug text-[var(--muted)]">{headline.caption}</span> : null}
       {headline.series ? (
@@ -98,7 +103,7 @@ export function GroupPage({ locale, messages, group, href, name, line, meta, hea
       </ExplorerHeading>
       <p className="max-w-[760px] text-[15px] leading-[1.55] text-[var(--body)]">{line}</p>
       <div data-testid="group-headlines" className="mt-[22px] grid grid-cols-2 border-y border-[var(--hairline)] min-[1101px]:mt-[30px] min-[1101px]:grid-cols-4">
-        {headlines.map((headline) => <Headline key={headline.href} headline={headline} locale={locale} />)}
+        {headlines.map((headline) => <Headline key={headline.href} headline={headline} locale={locale} messages={messages} />)}
       </div>
       {multi ? (
         // One row at every width, sticky, that scrolls sideways (prototype `dx-tabs`). From 900px a thin scrollbar shows, and a

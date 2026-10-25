@@ -28,12 +28,25 @@ function endHeight(series: (number | null)[], height: number): number {
 }
 
 /**
+ * The end label's width at 11px, from its characters: a Georgian letter is wider than a digit or a Latin letter, so counting every
+ * character as one width cut the Georgian units (`მლრდ აშშ დოლარი`) short.
+ */
+function labelWidth(text: string): number {
+  let width = 0;
+  for (const char of text) width += /[\u10a0-\u10ff]/.test(char) ? 8.6 : 7.4;
+  return width;
+}
+
+/** The label's half height in px: its centre stays this far inside the band, so a line that ends at the top or bottom keeps it whole. */
+const END_LABEL_HALF = 6;
+
+/**
  * The lead card's large area chart. Its last value is written at the line's end, in a gutter sized to the text, and the first and last year
  * under it. A planned last value (`planned`) is drawn as a hollow point.
  */
 export function LeadGraphic({ series, color, endLabel, years, planned = false }: { series: (number | null)[]; color: string; endLabel: string | null; years: string | undefined; planned?: boolean }) {
   const [first, last = ""] = (years ?? "").split("–");
-  const gutter = endLabel ? Math.round(endLabel.length * 7.4 + 16) : 0;
+  const gutter = endLabel ? Math.ceil(labelWidth(endLabel) + 16) : 0;
   return (
     <>
       <span className="absolute top-0 left-0 block h-full [&>svg]:mt-0 [&>svg]:h-full [&>svg]:w-full" style={{ width: `calc(100% - ${gutter}px)` }}>
@@ -41,8 +54,9 @@ export function LeadGraphic({ series, color, endLabel, years, planned = false }:
       </span>
       {endLabel ? (
         <span
+          data-testid="lead-end-label"
           className={`absolute right-0 -translate-y-1/2 ${NUMERIC} text-[11px] leading-none font-semibold whitespace-nowrap text-[var(--accent)]`}
-          style={{ top: `${endHeight(series, 160)}%`, width: gutter - 9 }}
+          style={{ top: `clamp(${END_LABEL_HALF}px, ${endHeight(series, 160)}%, calc(100% - ${END_LABEL_HALF}px))`, width: gutter - 9 }}
         >
           {endLabel}
         </span>

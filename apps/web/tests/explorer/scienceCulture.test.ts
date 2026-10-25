@@ -312,10 +312,13 @@ test("a research workbook exports million GEL as stored and persons as whole num
 });
 
 test("the hub has four cards with each default series' latest value and years", async () => {
-  const cards = buildScienceCultureHubCards(facts, await presentation());
+  const base = await presentation();
+  const cards = buildScienceCultureHubCards(facts, { ...base, messages: { ...base.messages, ...await getMessages("en", ["groups"]) } });
   expect(cards.map(card => card.href)).toEqual(SCIENCE_CULTURE_SECTIONS.map(section => section.href));
   expect(cards.map(card => card.title)).toEqual(["Research", "Patents", "Museums", "Theatres"]);
-  expect(cards.map(card => card.footer)).toEqual(["2024 · 14,046 · 2019–2024", "2025 · 79 · 2016–2025", "2025 · 1,998.9 · 2005–2025", "2025 · 620.3 · 2006–2025"]);
+  // Visitors and theatre-goers are published in thousands: the cards say so, and name what each figure counts.
+  expect(cards.map(card => card.footer)).toEqual(["2024 · 14,046 · 2019–2024", "2025 · 79 · 2016–2025", "2025 · 2.0 million · 2005–2025", "2025 · 620.3 thousand · 2006–2025"]);
+  expect(cards.map(card => card.latest?.caption)).toEqual(["Researchers", "Invention applications from Georgia", "Museum visitors", "Theatre-goers"]);
   expect(cards.map(card => card.series!.length)).toEqual([6, 10, 21, 20]);
   expect(cards[3].series!.at(-1)).toBe(620.322);
   expect(cards.every(card => card.seriesColor === INK && !card.comingSoon)).toBe(true);

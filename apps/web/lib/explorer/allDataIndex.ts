@@ -2,6 +2,8 @@ import { message } from "../i18n/messages";
 import type { Locale, Messages } from "../i18n/types";
 import { NAV_GROUPS, NAV_TREE, groupOfTopic, groupPages, topicHub, topicSection } from "../navigation/navTree";
 import { rowLabel, type SearchPage, type SearchShortcut } from "./search/searchExplorer";
+import type { HubCardModel } from "./hubCards";
+import type { RegionSpread } from "./regionSpread";
 import type { TopicHubData } from "./topicHub";
 
 // The All data page's lists (spec 2026-10-24-explorer-regroup §6): every navigation page as search and the A to Z list
@@ -27,15 +29,30 @@ const words = (href: string, messagesKa: Messages, messagesEn: Messages) =>
 const bilingual = (key: string, messagesKa: Messages, messagesEn: Messages) => ({ ka: message(messagesKa, key), en: message(messagesEn, key) });
 
 /**
- * Every navigation page, in navigation order, with its names in both languages (`common` and `allData` messages) and
- * the latest value and trend line of its card on its topic's hub.
+ * The figure a card without a latest one prints, for its row: a Regions card's spread (its range, by region count and period), or
+ * the first row of a pair (the higher rate, the highest-paid industry). Unemployment's age bands and Analysis print none.
  */
-export function buildSearchPages(topics: readonly TopicHubData[], messagesKa: Messages, messagesEn: Messages): SearchPage[] {
+function graphicFigure(card: HubCardModel, spread: RegionSpread | null): Pick<SearchPage, "value" | "period" | "caption"> | null {
+  if (card.graphic?.kind === "pair") {
+    const row = card.graphic.rows.find((candidate) => candidate.accent) ?? card.graphic.rows[0];
+    return { value: row.text, period: card.graphic.period, caption: row.label };
+  }
+  return !card.graphic && spread ? { value: spread.value, period: spread.period, caption: spread.regions } : null;
+}
+
+/**
+ * Every navigation page, in navigation order, with its names in both languages (`common` and `allData` messages) and
+ * the latest value, its caption and mark, and trend line of its card on its topic's hub. A card with no latest figure gives
+ * the figure its graphic prints, a Regions card's from its spread (`spreadOf`, as the group pages draw it).
+ */
+export function buildSearchPages(topics: readonly TopicHubData[], messagesKa: Messages, messagesEn: Messages, spreadOf: (card: HubCardModel) => RegionSpread | null = () => null): SearchPage[] {
   const cards = new Map(topics.flatMap((hub) => hub.cards.flatMap((card) => (card.href ? [[card.href, card] as const] : []))));
   return NAV_TREE.flatMap((hub) => {
     const group = groupOfTopic(hub.id);
     return hub.sections.map((section) => {
       const card = cards.get(section.href);
+      const latest = card?.latest;
+      const figure = latest ? { value: latest.value, period: latest.period, caption: latest.caption ?? "" } : (card && graphicFigure(card, spreadOf(card))) ?? { value: "", period: "", caption: "" };
       return {
         href: section.href,
         group: group.id,
@@ -44,8 +61,8 @@ export function buildSearchPages(topics: readonly TopicHubData[], messagesKa: Me
         topicName: bilingual(`common.topic.${hub.id}`, messagesKa, messagesEn),
         groupName: bilingual(group.labelKey, messagesKa, messagesEn),
         words: words(section.href, messagesKa, messagesEn),
-        value: card?.latest?.value ?? "",
-        period: card?.latest?.period ?? "",
+        ...figure,
+        ...(latest?.status ? { status: latest.status } : {}),
         spark: card?.series ?? null,
       };
     });

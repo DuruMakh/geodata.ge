@@ -18,6 +18,9 @@ export type RegionSpread = {
   value: string;
   /** `11 regions · 2025`. */
   caption: string;
+  /** The caption's two parts, `11 regions` and `2025`, for a row that sets its period apart (All data). */
+  regions: string;
+  period: string;
 };
 
 /** Scale room around the extremes, so no dot sits on the card's edge or under the label that names it. */
@@ -58,6 +61,7 @@ export function regionSpread(entries: PlaceEntry[], regionName: (id: string) => 
   const lowestNumber = lowest.number;
   const highestNumber = highest.number;
   const period = regions.map((entry) => entry.period).reduce((a, b) => (b > a ? b : a));
+  const count = message(getGroupsMessages(locale), "groups.regionsN", { n: regions.length });
 
   return {
     points: regions.map((entry) => ({ x: x(entry.number), key: entry.number === lowestNumber || entry.number === highestNumber })),
@@ -67,6 +71,8 @@ export function regionSpread(entries: PlaceEntry[], regionName: (id: string) => 
     high: { name: regionName(highest.placeId), value: highest.value },
     lowX: x(lowestNumber),
     value: rangeOf(lowest.value, highest.value),
-    caption: `${message(getGroupsMessages(locale), "groups.regionsN", { n: regions.length })} · ${period}`,
+    caption: `${count} · ${period}`,
+    regions: count,
+    period,
   };
 }

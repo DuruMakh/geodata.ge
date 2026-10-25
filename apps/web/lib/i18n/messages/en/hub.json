@@ -10,5 +10,6 @@
   "hub.deficitDescription": "General government deficit or surplus — share of GDP and nominal GEL.",
   "hub.municipalDescription": "{count} municipal budget units — where local budgets are spent.",
   "hub.analysisFooter": "{year} · {count} categories",
-  "hub.deficitFooter": "{year} · {share} of GDP"
+  "hub.deficitFooter": "{year} · {share} of GDP",
+  "hub.deficitCaption": "of GDP"
 }

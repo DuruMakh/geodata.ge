@@ -4,6 +4,7 @@ import { message } from "../i18n/messages";
 import { formatShare } from "./format";
 import { INK } from "./colors";
 import { coverageRange } from "./coverageLabel";
+import { annualSeries } from "./sparkline";
 import type { HubCardModel } from "./hubCards";
 import type { CardGraphic } from "./topicHub";
 import { UNEMPLOYMENT_SECTIONS, type UnemploymentSectionId } from "./unemploymentSections";
@@ -23,10 +24,10 @@ function graphic(section: UnemploymentSectionId, observations: readonly ClientUn
     .map(group => ({ label: presentation.locale === "en" ? group.labelEn : group.labelKa, value: rates.get(group.id)! }));
   if (section === "age") {
     const bars = rows.map((row, index) => ({ ...row, accent: index < YOUNG_BANDS }));
-    return { kind: "bars", bars, first: bars[0].label, last: bars.at(-1)!.label };
+    return { kind: "bars", bars, first: bars[0].label, last: bars.at(-1)!.label, period: String(year) };
   }
   const max = Math.max(...rows.map(row => row.value));
-  return { kind: "pair", rows: rows.map(row => ({ ...row, text: formatShare(row.value / 100), accent: row.value === max })), max };
+  return { kind: "pair", rows: rows.map(row => ({ ...row, text: formatShare(row.value / 100), accent: row.value === max })), max, period: String(year) };
 }
 
 export function buildUnemploymentHubCards(facts: readonly ClientUnemploymentObservation[], presentation: Presentation, groups?: readonly UnemploymentGroupDefinition[]): HubCardModel[] {
@@ -42,7 +43,7 @@ export function buildUnemploymentHubCards(facts: readonly ClientUnemploymentObse
       description: message(presentation.messages, `unemployment.page.${section.id}.summary`),
       href: section.href,
       comingSoon: false,
-      series: national?.map(fact => fact.value) ?? null,
+      series: national ? annualSeries(national) : null,
       seriesColor: national ? INK : null,
       footer: national ? `${last} · ${rate} · ${first}–${last}` : `${first}–${last} · ${message(presentation.messages, "unemployment.annual")}`,
       latest: rate === null ? null : { value: rate, period: String(last) },

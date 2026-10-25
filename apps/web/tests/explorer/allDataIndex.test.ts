@@ -6,6 +6,7 @@ import enCommon from "../../lib/i18n/messages/en/common.json";
 import { azColumns, azGroups, buildSearchPages, buildShortcuts, type AzGroup } from "../../lib/explorer/allDataIndex";
 import { rowLabel } from "../../lib/explorer/search/searchExplorer";
 import { NAV_GROUPS, NAV_TREE, PAGE_COUNT } from "../../lib/navigation/navTree";
+import { loadCardSpreads } from "../../lib/pages/group";
 import { loadTopicHubs } from "../../lib/pages/topicHubs.server";
 
 const messagesKa = { ...kaCommon, ...kaAllData };
@@ -40,6 +41,22 @@ describe.each(["ka", "en"] as const)("the All data pages (%s)", async (locale) =
     expect(wages.value).toMatch(/\d/);
     expect(wages.period).toMatch(/^\d{4}$/);
     expect(wages.spark?.length).toBeGreaterThan(1);
+  });
+
+  it("gives every row the figure its card prints, with the card's caption and mark", async () => {
+    const hubs = await loadTopicHubs(locale, TOPICS);
+    const { spreadOf } = await loadCardSpreads(hubs.flatMap((hub) => hub.cards), locale);
+    const rows = buildSearchPages(hubs, messagesKa, messagesEn, spreadOf);
+    // Analysis is a page of analyses with no figure of its own; the Age bars print only their bands' names.
+    expect(rows.filter((row) => !row.value).map((row) => row.href)).toEqual(["/explorer/analysis", "/explorer/unemployment/age"]);
+    const row = (href: string) => rows.find((candidate) => candidate.href === href)!;
+    // A pair prints its accent row: the higher rate, with whose it is.
+    expect(row("/explorer/unemployment/gender")).toMatchObject({ value: "15.8%", caption: locale === "en" ? "Men" : "კაცები", period: "2025" });
+    // A Regions card prints its spread over the regions, and says how many.
+    expect(row("/explorer/wages/regions").caption).toBe(locale === "en" ? "11 regions" : "11 რეგიონი");
+    expect(row("/explorer/wages/regions").value).toMatch(/–/);
+    expect(row("/explorer/demography/age-sex").caption).toBe(locale === "en" ? "Population aged 65+" : "65+ წლის მოსახლეობა");
+    expect(row("/explorer/economy/sectors").status).toBe("preliminary");
   });
 
   it("puts the topic in front of a vague page name", () => {

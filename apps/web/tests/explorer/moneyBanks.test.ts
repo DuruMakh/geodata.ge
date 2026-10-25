@@ -375,21 +375,24 @@ test.each(["ka", "en"] as const)("the %s pages hand Excel the ten archived NBG w
 });
 
 test("the hub has six cards with the first series of each page and their latest values, Loans by region only its years", async () => {
-  const cards = buildMoneyBanksHubCards(facts, await presentation());
+  const base = await presentation();
+  const cards = buildMoneyBanksHubCards(facts, { ...base, messages: { ...await getMessages("en", ["moneyBanks"]), ...base.messages } });
   expect(cards.map(card => card.href)).toEqual(MONEY_BANKS_SECTIONS.map(section => section.href));
-  // Each card follows its page's headline series: the latest year, its value and the series' own span.
-  const footer = (id: string, value: (year: number) => string) => {
-    const years = csv.yearsOf([id]), latest = years.at(-1)!;
-    return `${latest} · ${value(latest)} · ${yearSpan(years)}`;
+  // Each card follows its page's headline series, the latest year and its value, over the years the page covers: Loans and
+  // deposits reaches back to 1996 through deposits, Interest rates through deposit rates, Bank health through its other ratios.
+  const footer = (id: string, value: (year: number) => string, span: string) => {
+    const latest = csv.yearsOf([id]).at(-1)!;
+    return `${latest} · ${value(latest)} · ${span}`;
   };
   expect(cards.map(card => card.footer)).toEqual([
-    footer("money.m3", year => `${csv.billions("money.m3", year)} bn GEL`),
-    footer("loans.total", year => `${csv.billions("loans.total", year)} bn GEL`),
-    footer("borrowers.total", year => `${csv.billions("borrowers.total", year)} bn GEL`),
+    footer("money.m3", year => `${csv.billions("money.m3", year)} bn GEL`, yearSpan(csv.yearsOf(["money.m3"]))),
+    footer("loans.total", year => `${csv.billions("loans.total", year)} bn GEL`, "1996–2025"),
+    footer("borrowers.total", year => `${csv.billions("borrowers.total", year)} bn GEL`, yearSpan(csv.yearsOf(["borrowers.total"]))),
     yearSpan(csv.yearsOf(["loans_region.georgia.total"])),
-    footer("rates.policy", year => `${csv.percent("rates.policy", year)}%`),
-    footer("banks.npl_ratio", year => `${csv.percent("banks.npl_ratio", year)}%`),
+    footer("rates.policy", year => `${csv.percent("rates.policy", year)}%`, "1996–2025"),
+    footer("banks.npl_ratio", year => `${csv.percent("banks.npl_ratio", year)}%`, "2001–2025"),
   ]);
+  expect(cards.map(card => card.latest?.caption ?? null)).toEqual(["Broad money (M3)", "All loans", "All loans", null, "National Bank rate", "Bad loans, share of all loans"]);
   expect(cards[3].footer).toBe("2015–2025");
   expect([cards[3].series, cards[3].seriesColor]).toEqual([null, null]);
 });

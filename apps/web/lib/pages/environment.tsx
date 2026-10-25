@@ -1,5 +1,5 @@
 import { EnvironmentExplorer } from "../../components/environment/environment-explorer";
-import { ENVIRONMENT_SECTIONS, environmentCoverage, environmentTopicSeries, type EnvironmentTopicId } from "../explorer/environment";
+import { ENVIRONMENT_LATEST_ID, ENVIRONMENT_SECTIONS, environmentCoverage, environmentTopicSeries, type EnvironmentTopicId } from "../explorer/environment";
 import { getMessages } from "../i18n/messages.server";
 import { message } from "../i18n/messages";
 import type { Locale } from "../i18n/types";
@@ -13,12 +13,6 @@ export async function environmentPageMetadata(locale: Locale, section: Environme
   return fiscalMetadata({ locale, path: hrefOf(section), title: message(messages, `environment.page.${section}.metaTitle`), description: message(messages, `environment.page.${section}.summary`) });
 }
 
-/** The series whose latest figure is the line under each page's heading. */
-const LATEST_ID: Record<EnvironmentTopicId, string> = {
-  "greenhouse-gases": "environment.ghg.total", "air-pollution": "environment.air.co.total",
-  climate: "environment.climate.temperature.georgia", water: "environment.water.lost_share",
-};
-
 /** A national page: Greenhouse gases, Air pollution, Temperature and rain or Water. */
 export async function renderEnvironmentPage(locale: Locale, section: EnvironmentTopicId) {
   const [page, sources] = await Promise.all([loadEnvironmentPage(locale, ["format", "main", "workbook"]), loadEnvironmentWorkbookSources(locale)]);
@@ -30,7 +24,7 @@ export async function renderEnvironmentPage(locale: Locale, section: Environment
   const { min: firstYear, max: lastYear } = environmentCoverage(section, facts);
   const t = environmentTranslate(presentation);
   const title = t(`page.${section}.title`);
-  const latest = environmentLatest(facts, LATEST_ID[section], t);
+  const latest = environmentLatest(facts, ENVIRONMENT_LATEST_ID[section], t);
   // Temperature and rain names its place and adds the year's difference from the 1961–1990 average.
   const anomaly = section === "climate" ? facts.find(f => f.indicatorId === "environment.climate.temperature_anomaly.georgia" && f.year === latest.year) : undefined;
   const signed = anomaly && `${anomaly.value > 0 ? "+" : ""}${environmentLatest([anomaly], anomaly.indicatorId, t).value}`;

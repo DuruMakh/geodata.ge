@@ -12,7 +12,7 @@ import { renderPageMarkup } from "../helpers/render-localized";
 const PAGE: SearchPage = {
   href: "/explorer/wages/overview", group: "labour", topic: "wages",
   name: { ka: "მიმოხილვა", en: "Overview" }, topicName: { ka: "ხელფასები", en: "Wages" }, groupName: { ka: "შრომის ბაზარი", en: "Labour market" },
-  words: "salary", value: "2,165 ₾", period: "2025", spark: [1, 2, 3],
+  words: "salary", value: "2,165 ₾", period: "2025", caption: "", spark: [1, 2, 3],
 };
 const PLACES = { places: [], entries: [] };
 

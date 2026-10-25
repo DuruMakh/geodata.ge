@@ -101,7 +101,7 @@ Order on the page:
 | Group | Numbers (page) |
 | --- | --- |
 | Budget | Revenue, Expenditure, Debt, Deficit as % of GDP |
-| Economy and business | Nominal GDP (economy/gdp), Business sales, Jobs in business, Building permits |
+| Economy and business | Real GDP (economy/gdp; changed from Nominal GDP on 2026-10-25 so the figure follows the GDP overview page's line), Business sales, Jobs in business, Building permits |
 | Prices and money | Inflation (latest month), Interest rate (policy rate), Money supply, Loans and deposits |
 | Labour market | Unemployment rate, Average monthly wage, People in work (jobs by industry), Informal jobs |
 | Living standards and health | Household income, Poverty, Inequality (Gini), Pensioners |

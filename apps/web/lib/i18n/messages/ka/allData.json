@@ -19,6 +19,7 @@
   "allData.alphabetLabel": "ანბანი — გადადით ასოზე",
   "allData.indexTitle": "ყველა გვერდი ანბანის მიხედვით",
   "allData.results": "შედეგები",
+  "allData.preliminary": "წინასწარი",
   "allData.place.region": "რეგიონი · {n} მუნიციპალიტეტი",
   "allData.place.municipality": "მუნიციპალიტეტი · {region}",
   "allData.place.capital": "დედაქალაქი",

@@ -537,12 +537,15 @@ test("a programme that ran part of a year is marked with its months on the Data 
 });
 
 test("the hub has five cards: Georgia's headline series with their latest values and years", async () => {
-  const cards = buildSocialHubCards(facts, await presentation());
+  const base = await presentation();
+  const cards = buildSocialHubCards(facts, { ...base, messages: { ...base.messages, ...await getMessages("en", ["groups"]) } });
   expect(cards.map(card => card.href)).toEqual(SOCIAL_SECTIONS.map(section => section.href));
   expect(cards.map(card => card.title)).toEqual(["Social payments", "Pensions", "Subsistence allowance", "Social package", "Funded pension"]);
   expect(cards.map(card => card.footer)).toEqual([
-    "2025 · 6,166.1 million GEL · 2013–2025", "2025 · 888,518 · 2013–2025", "2025 · 129,506 · 2013–2025", "2025 · 187,764 · 2013–2025", "2025 · 8,237.5 million GEL · 2019–2025",
+    "2025 · 6.17 billion GEL · 2013–2025", "2025 · 888,518 · 2013–2025", "2025 · 129,506 · 2013–2025", "2025 · 187,764 · 2013–2025", "2025 · 8.24 billion GEL · 2019–2025",
   ]);
+  // The counts name who they count; the money titles name theirs.
+  expect(cards.map(card => card.latest?.caption ?? null)).toEqual([null, "Pensioners", "Families receiving the allowance", "Social package recipients", null]);
   expect(cards.map(card => card.series?.length)).toEqual([13, 13, 13, 13, 7]);
   expect(cards[1].series!.at(-1)).toBe(888518);
   expect(cards.map(card => card.index)).toEqual(["04", "05", "06", "07", "08"]);

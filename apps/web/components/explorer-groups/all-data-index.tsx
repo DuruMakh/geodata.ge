@@ -4,7 +4,7 @@ import { GROUP_ICONS } from "../shell/group-icons";
 import { Sparkline } from "../ui/sparkline";
 import { azAlphabet, azColumns, azGroups } from "../../lib/explorer/allDataIndex";
 import { pagesLabel } from "../../lib/explorer/pagesLabel";
-import { rowLabel, type SearchPage } from "../../lib/explorer/search/searchExplorer";
+import { rowLabel, valueNote, type SearchPage } from "../../lib/explorer/search/searchExplorer";
 import { message } from "../../lib/i18n/messages";
 import { pageHref } from "../../lib/i18n/routes";
 import type { Locale, Messages } from "../../lib/i18n/types";
@@ -19,7 +19,7 @@ import type { Locale, Messages } from "../../lib/i18n/types";
 
 const NUMERIC = "font-[family-name:var(--font-numeric)]";
 
-function IndexRow({ page, locale }: { page: SearchPage; locale: Locale }) {
+function IndexRow({ page, locale, preliminary }: { page: SearchPage; locale: Locale; preliminary: string }) {
   const Icon = GROUP_ICONS[page.group];
   return (
     <li>
@@ -43,7 +43,7 @@ function IndexRow({ page, locale }: { page: SearchPage; locale: Locale }) {
         </span>
         <span className={`max-w-[124px] justify-self-end text-right ${NUMERIC} text-[12px] leading-[1.3] font-semibold`}>
           {page.value}
-          {page.value ? <em className="block text-[10.5px] font-normal text-[var(--faint)] not-italic max-[768px]:text-[11px]">{page.period}</em> : null}
+          {page.value ? <em className="block text-[10.5px] font-normal text-[var(--faint)] not-italic max-[768px]:text-[11px]">{valueNote(page, preliminary)}</em> : null}
         </span>
       </Link>
     </li>
@@ -97,7 +97,7 @@ export function AllDataIndex({ locale, messages, pages }: { locale: Locale; mess
                   <span className={`${NUMERIC} text-[11px] font-normal text-[var(--muted)]`}>{pagesLabel(messages, group.rows.length)}</span>
                 </h3>
                 <ul>
-                  {group.rows.map((page) => <IndexRow key={page.href} page={page} locale={locale} />)}
+                  {group.rows.map((page) => <IndexRow key={page.href} page={page} locale={locale} preliminary={message(messages, "allData.preliminary")} />)}
                 </ul>
               </section>
             ))}

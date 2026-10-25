@@ -5,6 +5,7 @@ import { INK } from "./colors";
 import { formatInUnit } from "./format";
 import { coverageRange } from "./coverageLabel";
 import type { HubCardModel } from "./hubCards";
+import { annualSeries } from "./sparkline";
 import { POVERTY_SECTIONS, povertyCoverage, povertyViews } from "./poverty";
 
 /** Each card's sparkline: Georgia's poverty-line rate, and the Gini coefficient by total income. */
@@ -19,9 +20,10 @@ export function buildPovertyHubCards(facts: readonly ClientPovertyFact[], presen
     const value = `${formatInUnit(last.value, { divisor: 1, label: "", decimals: last.decimals })}${section.id === "rates" ? t("unitPercent") : ""}`;
     return {
       index: String(index + 1).padStart(2, "0"), title: message(presentation.messages, section.labelKey), description: t(`page.${section.id}.summary`),
-      href: section.href, comingSoon: false, series: national.map(f => f.value), seriesColor: INK,
+      href: section.href, comingSoon: false, series: annualSeries(national), seriesColor: INK,
       footer: `${last.year} · ${value} · ${years[0]}–${years.at(-1)}`,
-      latest: { value, period: String(last.year) }, years: coverageRange(years[0], years.at(-1)!),
+      // Inequality's figure is a Gini coefficient, which its page's line names; a rate's per cent says what it is.
+      latest: { value, period: String(last.year), ...(section.id === "inequality" ? { caption: t("latest.inequality") } : {}) }, years: coverageRange(years[0], years.at(-1)!),
     };
   });
 }

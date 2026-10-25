@@ -22,6 +22,10 @@ export type SearchPage = {
   words: string;
   value: string;
   period: string;
+  /** What the value measures where its card names it (`Deaths per 1,000 people, Georgia`), or empty. */
+  caption: string;
+  /** A preliminary value, marked after its period as the card marks it. */
+  status?: "preliminary";
   spark: (number | null)[] | null;
 };
 
@@ -31,7 +35,13 @@ export type SearchShortcut = { kind: "group" | "topic"; href: string; group: Gro
 /** A run of a result's name, marked where it matches the query. */
 export type Segment = { text: string; mark: boolean };
 
-export type ResultRow = { href: string; page: SearchPage; label: Segment[]; mirror: Segment[]; value: string; period: string };
+/** A result row: a page's own value with its caption and mark, or a place's value on that page, which its period alone dates. */
+export type ResultRow = { href: string; page: SearchPage; label: Segment[]; mirror: Segment[]; value: string; period: string; caption: string; status?: "preliminary" };
+
+/** The line under a row's value: its caption, its period and a preliminary mark (`preliminary`, the language's word), as a card writes them. */
+export function valueNote(row: Pick<ResultRow, "caption" | "period" | "status">, preliminary: string): string {
+  return [row.caption, row.period, row.status === "preliminary" ? preliminary : ""].filter(Boolean).join(" · ");
+}
 
 export type SearchResult = {
   /** The query read through the Georgian keyboard, when that reading is what found the results. */
@@ -243,8 +253,9 @@ export function searchExplorer(
     }
   }
 
-  const row = (page: SearchPage, href: string, value: string, period: string): ResultRow => ({
+  const row = (page: SearchPage, href: string, value: string, period: string, own?: Pick<SearchPage, "caption" | "status">): ResultRow => ({
     href, page, label: segments(rowLabel(page, locale), words), mirror: segments(page.name[locale === "ka" ? "en" : "ka"], words), value, period,
+    caption: own?.caption ?? "", ...(own?.status ? { status: own.status } : {}),
   });
   const result: SearchResult = { reading, place: null, groups: [], shortcuts: [], total: 0 };
 
@@ -277,7 +288,7 @@ export function searchExplorer(
     if (region && regional.length) result.groups.push({ kind: "region", label: placeName(region), rows: regional });
   } else {
     if (found.scored.length) {
-      result.groups.push({ kind: "flat", label: "", rows: found.scored.map(({ page }) => row(page, page.href, page.value, page.period)) });
+      result.groups.push({ kind: "flat", label: "", rows: found.scored.map(({ page }) => row(page, page.href, page.value, page.period, page)) });
     }
     const matchesAll = (name: string) => words.every((word) => wordScore(word, norm(name)) >= 0.55);
     result.shortcuts = shortcuts.filter((shortcut) => matchesAll(shortcut.name.ka) || matchesAll(shortcut.name.en));

@@ -5,7 +5,8 @@ import { INK } from "./colors";
 import { formatAmount, formatInUnit } from "./format";
 import { coverageRange } from "./coverageLabel";
 import type { HubCardModel } from "./hubCards";
-import { MONEY_BANKS_SECTIONS, type MoneyBanksTopicId } from "./moneyBanks";
+import { MONEY_BANKS_SECTIONS, moneyBanksCoverage, moneyBanksViews, type MoneyBanksTopicId } from "./moneyBanks";
+import { annualSeries } from "./sparkline";
 import { buildMoneyBanksRegionMapModel } from "./moneyBanksRegionMap";
 
 /**
@@ -14,6 +15,11 @@ import { buildMoneyBanksRegionMapModel } from "./moneyBanksRegionMap";
  */
 const HEADLINE: Record<MoneyBanksTopicId, MoneyBanksIndicator> = {
   "supply": "money.m3", "loans-deposits": "loans.total", "borrowers": "borrowers.total", "interest-rates": "rates.policy", "bank-health": "banks.npl_ratio",
+};
+
+/** The page line's measure each card states as its caption (`moneyBanks.latest.{key}`): Who borrows' line counts all loans too. */
+const CAPTION: Record<MoneyBanksTopicId, string> = {
+  "supply": "supply", "loans-deposits": "loans-deposits", "borrowers": "loans-deposits", "interest-rates": "interest-rates", "bank-health": "bank-health",
 };
 
 export function buildMoneyBanksHubCards(facts: readonly ClientMoneyBanksFact[], presentation: Presentation): HubCardModel[] {
@@ -31,10 +37,13 @@ export function buildMoneyBanksHubCards(facts: readonly ClientMoneyBanksFact[], 
     const last = headline.at(-1)!;
     const value = last.unit === "gel" ? formatAmount(last.value, presentation.locale)
       : `${formatInUnit(last.value, { divisor: 1, label: "", decimals: last.decimals })}${t("unitPercent")}`;
+    // The years every view of the page covers. A % of GDP view divides the same facts by GDP, so it covers none they do not.
+    const years = moneyBanksViews(section.id).filter(view => view !== "gdp").flatMap(view => moneyBanksCoverage(section.id, view, facts).years);
+    const first = Math.min(...years), lastYear = Math.max(...years);
     return {
-      ...card, series: headline.map(f => f.value), seriesColor: INK,
-      footer: `${last.year} · ${value} · ${headline[0].year}–${last.year}`,
-      latest: { value, period: String(last.year) }, years: coverageRange(headline[0].year, last.year),
+      ...card, series: annualSeries(headline, first, lastYear), seriesColor: INK,
+      footer: `${last.year} · ${value} · ${first}–${lastYear}`,
+      latest: { value, period: String(last.year), caption: t(`latest.${CAPTION[section.id]}`) }, years: coverageRange(first, lastYear),
     };
   });
 }

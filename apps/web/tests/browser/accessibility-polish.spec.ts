@@ -232,7 +232,8 @@ test("group page cards are named by their title, described by the rest, and the 
   await page.goto("/en/explorer/budget");
   const card = page.getByTestId("explorer-card").first();
   await expect(card).toHaveAccessibleName("Expenditure");
-  await expect(card).toHaveAccessibleDescription(/^\d+\.\d bn GEL \d{4} \d{4}–\d{4}$/);
+  // While the latest Spending year is the budget law's plan, its period reads `2026 plan`.
+  await expect(card).toHaveAccessibleDescription(/^\d+\.\d bn GEL \d{4}( plan)? \d{4}–\d{4}$/);
   await card.hover();
   const footer = card.locator("> span").last();
   await expect(async () => expectReadableText(footer, card)).toPass();

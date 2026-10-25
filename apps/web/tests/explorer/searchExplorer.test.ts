@@ -8,7 +8,7 @@ import { NAV_GROUPS, NAV_TREE, groupOfTopic, groupPages } from "../../lib/naviga
 import type { Place, PlaceEntry, PlaceIndex } from "../../lib/explorer/places/types";
 import { buildPlaceIndex } from "../../lib/explorer/places/buildPlaceIndex.server";
 import { latinToGeorgian, stem } from "../../lib/explorer/search/georgian";
-import { rowLabel, searchExplorer, type SearchPage, type SearchResult, type SearchShortcut, type Segment } from "../../lib/explorer/search/searchExplorer";
+import { rowLabel, searchExplorer, valueNote, type SearchPage, type SearchResult, type SearchShortcut, type Segment } from "../../lib/explorer/search/searchExplorer";
 
 const ka = kaCommon as Record<string, string>;
 const en = enCommon as Record<string, string>;
@@ -30,6 +30,7 @@ const PAGES: SearchPage[] = NAV_TREE.flatMap((hub) => {
       words: [kaWords[wordKey], enWords[wordKey]].filter(Boolean).join(" "),
       value: "",
       period: "",
+      caption: "",
       spark: null,
     };
   });
@@ -322,5 +323,12 @@ describe("the real 74 places", () => {
     ["სამეგრელო-ზემო სვანეთი", "ka", "Samegrelo-Zemo Svaneti"], ["Samegrelo-Zemo Svaneti", "en", "Samegrelo-Zemo Svaneti"], ["Kvemo Kartli", "en", "Kvemo Kartli"],
   ] as const)("%s finds %s", (query, locale, nameEn) => {
     expect(searchExplorer(query, locale, PAGES, SHORTCUTS, indexes[locale])!.place?.place.nameEn).toBe(nameEn);
+  });
+});
+
+describe("valueNote", () => {
+  it("writes a row's caption, period and preliminary mark as its card does", () => {
+    expect(valueNote({ caption: "Top 3 sectors’ GDP share", period: "2025", status: "preliminary" }, "Preliminary")).toBe("Top 3 sectors’ GDP share · 2025 · Preliminary");
+    expect(valueNote({ caption: "", period: "2025" }, "Preliminary")).toBe("2025");
   });
 });

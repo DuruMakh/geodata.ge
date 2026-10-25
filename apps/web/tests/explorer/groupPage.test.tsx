@@ -185,6 +185,18 @@ describe("groupHeadlines", () => {
     expect(groupHeadlines("budget", partner, messages).map(({ caption }) => caption)).toEqual(["Türkiye", "Türkiye", "Türkiye", "Türkiye"]);
   });
 
+  it("carries a preliminary figure's mark, and drops the card's caption under a headline with its own label", () => {
+    const marked = cards.map((item) => ({ ...item, latest: { value: "1", period: "2025", caption: "of GDP", status: "preliminary" as const } }));
+    const headlines = groupHeadlines("budget", marked, messages);
+    expect(headlines.map(({ status }) => status)).toEqual(["preliminary", "preliminary", "preliminary", "preliminary"]);
+    expect(headlines.map(({ caption }) => caption)).toEqual(["of GDP", "of GDP", "of GDP", null]);
+  });
+
+  it("labels the Deficit headline as its page does, the balance, keeping the figure's sign", async () => {
+    const [ka, en] = await Promise.all([import("../../lib/i18n/messages/ka/groups.json"), import("../../lib/i18n/messages/en/groups.json")]);
+    expect([ka.default["groups.headline.deficit"], en.default["groups.headline.deficit"]]).toEqual(["ბალანსი, მშპ-ის %", "Balance, % of GDP"]);
+  });
+
   it("throws when a value does not start with a figure that splitValue can cut from its unit", () => {
     for (const value of ["32.4 მლრდ ₾", "−2.1%", "+17,127", "-0.4 pp", "13.9%"]) {
       expect(() => groupHeadlines("budget", [...cards.slice(0, 3), card("/explorer/deficit", { value, period: "2025" })], messages), value).not.toThrow();

@@ -9,7 +9,7 @@ import { GROUP_ICONS } from "../shell/group-icons";
 import { Sparkline } from "../ui/sparkline";
 import { EXPLORER_SEARCH_INPUT_ID } from "./explorer-search-focus";
 import type { PlaceFact, PlaceIndex } from "../../lib/explorer/places/types";
-import { searchExplorer, type ResultRow, type SearchPage, type SearchResult, type SearchShortcut, type Segment } from "../../lib/explorer/search/searchExplorer";
+import { searchExplorer, valueNote, type ResultRow, type SearchPage, type SearchResult, type SearchShortcut, type Segment } from "../../lib/explorer/search/searchExplorer";
 import { pagesLabel } from "../../lib/explorer/pagesLabel";
 import { message } from "../../lib/i18n/messages";
 import { useI18n } from "../../lib/i18n/provider";
@@ -158,6 +158,7 @@ function ShortcutOption({ shortcut, option, active, onHover, locale, messages }:
 
 function RowOption({ row, place, option, active, onHover, locale }: OptionProps & { row: ResultRow; place: boolean }) {
   const { page } = row;
+  const note = valueNote(row, message(useI18n().messages, "allData.preliminary"));
   const Icon = GROUP_ICONS[page.group];
   const label = row.label.map((segment) => segment.text).join("");
   const sub = crumb(page, locale);
@@ -169,7 +170,7 @@ function RowOption({ row, place, option, active, onHover, locale }: OptionProps 
       prefetch={false}
       role="option"
       aria-selected={active}
-      aria-label={`${label}${row.value ? `, ${row.value} (${row.period})` : ""} — ${sub}`}
+      aria-label={`${label}${row.value ? `, ${row.value} (${note})` : ""} — ${sub}`}
       tabIndex={-1}
       data-testid="search-result"
       onMouseEnter={onHover}
@@ -191,7 +192,7 @@ function RowOption({ row, place, option, active, onHover, locale }: OptionProps 
       </span>
       <span className={`text-right ${NUMERIC} text-[13px] font-semibold whitespace-nowrap max-[768px]:max-w-[110px] max-[768px]:text-[12.5px] max-[768px]:whitespace-normal`}>
         {row.value}
-        {row.value ? <em className={`block text-[10.5px] font-normal not-italic ${muted}`}>{row.period}</em> : null}
+        {row.value ? <em className={`block text-[10.5px] font-normal not-italic ${muted}`}>{note}</em> : null}
       </span>
       <ChevronRight aria-hidden strokeWidth={1.75} className={`size-4 max-[768px]:hidden ${active ? "text-[var(--accent)]" : "text-[var(--faint)] opacity-0"}`} />
     </Link>

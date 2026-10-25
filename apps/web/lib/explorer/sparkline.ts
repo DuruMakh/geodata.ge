@@ -48,6 +48,18 @@ export function buildSparklinePath(
   return segments;
 }
 
+/**
+ * A card's sparkline over every year from `first` to `last` (by default the points' own first and last year): a year without a
+ * value is a null the line breaks on. Mapping the points instead would close the gap and re-space every later point.
+ */
+export function annualSeries(points: Iterable<{ year: number; value: number | null }>, first?: number, last?: number): (number | null)[] {
+  const values = new Map<number, number | null>();
+  for (const { year, value } of points) values.set(year, value);
+  const years = [...values.keys()];
+  const from = first ?? Math.min(...years), to = last ?? Math.max(...years);
+  return Array.from({ length: to - from + 1 }, (_, offset) => values.get(from + offset) ?? null);
+}
+
 // The "ყველაზე დიდი წილი" KPI states a percentage, so its sparkline traces that
 // percentage rather than the level — which is also why it reads jagged.
 export function buildKpiShareSeries(

@@ -18,6 +18,12 @@ export type EnvironmentSectionId = typeof ENVIRONMENT_SECTIONS[number]["id"];
 /** The four pages with one national list; City air quality, Waste and Forests open city or area pages (environmentCities.ts, environmentAreas.ts). */
 export type EnvironmentTopicId = "greenhouse-gases" | "air-pollution" | "climate" | "water";
 
+/** The series whose latest figure is the line under each national page's heading, and its group page card's figure. */
+export const ENVIRONMENT_LATEST_ID: Record<EnvironmentTopicId, string> = {
+  "greenhouse-gases": "environment.ghg.total", "air-pollution": "environment.air.co.total",
+  climate: "environment.climate.temperature.georgia", water: "environment.water.lost_share",
+};
+
 /**
  * A list row. `heading` is the key of the group it is listed under (`environment.heading.{heading}`); rows under one heading
  * share one unit. The reference is drawn in ink, a limit line dashed in grey (`color`).

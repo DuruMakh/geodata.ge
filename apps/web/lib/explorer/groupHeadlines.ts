@@ -38,7 +38,10 @@ export type GroupHeadline = {
   href: string; label: string; value: string;
   /** As the card writes it: a planned figure's period is the plan (`2026 გეგმა`). */
   period: string;
-  planned: boolean; caption: string | null; series: (number | null)[] | null;
+  planned: boolean;
+  /** The card's `status`: a preliminary figure, whose headline writes the mark after the period. */
+  status?: "preliminary";
+  caption: string | null; series: (number | null)[] | null;
 };
 
 /** A value's figure and its unit ("32.4" and "მლრდ ₾"): the text after the first space is the unit. */
@@ -53,7 +56,8 @@ const HEADLINE_FIGURE = /^[−+-]?[\d.,]+%?$/;
 /**
  * The group's headline numbers, from its topics' cards. A pick without a card or a latest figure, or whose figure is not
  * one before the first space, throws, so the build fails instead of printing a gap or half a number in the unit's type.
- * The card's caption stays where the label does not already say it (`headlineCaption`: the largest partner's name alone).
+ * The card's caption stays where the label does not already say it: a headline with its own label (`labelKey`) names the figure's
+ * measure, so it keeps only a `headlineCaption` (the largest partner's name alone).
  */
 export function groupHeadlines(group: GroupId, cards: readonly HubCardModel[], messages: Messages): GroupHeadline[] {
   return GROUP_HEADLINES[group].map(({ page, labelKey }) => {
@@ -64,7 +68,10 @@ export function groupHeadlines(group: GroupId, cards: readonly HubCardModel[], m
     const { figure, unit } = splitValue(value);
     // A unit that starts with a digit is the rest of a number split at a space (`1 234 ₾`).
     if (!HEADLINE_FIGURE.test(figure) || /^\d/.test(unit ?? "")) throw new Error(`The ${group} headline ${page} starts with "${figure}", not a figure: "${value}"`);
-    const caption = card.latest.headlineCaption ?? card.latest.caption;
-    return { href: page, label, value, period, planned: card.latest.planned === true, caption: caption && caption !== label ? caption : null, series: card.series };
+    const caption = card.latest.headlineCaption ?? (labelKey ? undefined : card.latest.caption);
+    return {
+      href: page, label, value, period, planned: card.latest.planned === true, ...(card.latest.status ? { status: card.latest.status } : {}),
+      caption: caption && caption !== label ? caption : null, series: card.series,
+    };
   });
 }

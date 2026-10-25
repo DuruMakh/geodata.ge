@@ -64,7 +64,8 @@ type CardProps = {
 
 /**
  * A card's value with each figure and each unit kept whole (`3.11 მლრდ აშშ დოლარი`): where they do not fit one line, the unit moves
- * under its figure, and a spread's range in two units (`548 მლნ ₾ – 49.4 მლრდ ₾`) may break at its dash.
+ * under its figure, and a spread's range in two units (`548 მლნ ₾ – 49.4 მლრდ ₾`) may break at its dash. Below 400px a unit too long
+ * for the card's width may also break between its words.
  */
 function ValueText({ value }: { value: string }) {
   return value.split(" – ").map((part, index) => {
@@ -73,7 +74,7 @@ function ValueText({ value }: { value: string }) {
       <Fragment key={index}>
         {index > 0 ? " – " : null}
         <span data-testid="card-value-figure" className="whitespace-nowrap">{figure}</span>
-        {unit ? <>{" "}<span data-testid="card-value-unit" className="whitespace-nowrap">{unit}</span></> : null}
+        {unit ? <>{" "}<span data-testid="card-value-unit" className="whitespace-nowrap max-[400px]:whitespace-normal">{unit}</span></> : null}
       </Fragment>
     );
   });
@@ -112,8 +113,12 @@ export function ExplorerCard(props: CardProps) {
   const base = useId();
   const ids = { title: `${base}-title`, value: `${base}-value`, detail: `${base}-detail`, footer: `${base}-footer` };
 
-  // A spread states the Regions page's range, in place of the one latest figure.
-  const caption = spread ? spread.caption : [card.latest?.caption, card.latest?.period].filter(Boolean).join(" · ");
+  // A spread states the Regions page's range, in place of the one latest figure; a pair or bars graphic states only its period. A
+  // preliminary figure's mark follows its period, as its page writes it (`2025 · წინასწარი`).
+  const status = card.latest?.status === "preliminary" ? message(groups, "groups.preliminary") : null;
+  const caption = spread ? spread.caption
+    : card.graphic ? card.graphic.period
+    : [card.latest?.caption, card.latest?.period, status].filter(Boolean).join(" · ");
   const value = spread ? spread.value : card.latest?.value;
   // A card with no figure names its years as annual data, or, where they end in a plan year (Analysis), that plan.
   const footer = card.years ? (card.latest?.period ? card.years : `${card.years} · ${card.plan ?? message(groups, "groups.annual")}`) : null;
@@ -122,7 +127,7 @@ export function ExplorerCard(props: CardProps) {
     : card.graphic?.kind === "bars" ? [card.graphic.first, card.graphic.last].join(", ")
     : !card.graphic && spread ? [spread.low, spread.high].map(({ name, value }) => `${name} ${value}`).join(", ")
     : null;
-  const described = [value ? ids.value : null, detail ? ids.detail : null, footer ? ids.footer : null].filter(Boolean).join(" ");
+  const described = [value || caption ? ids.value : null, detail ? ids.detail : null, footer ? ids.footer : null].filter(Boolean).join(" ");
   const split = lead !== undefined && lead !== "lead2x2";
   const row = (name: keyof typeof ROW) => (split ? ` ${ROW[name]}` : "");
 
@@ -152,9 +157,9 @@ export function ExplorerCard(props: CardProps) {
       {lead && card.description ? <span className={`block max-w-[560px] text-[12.5px] leading-normal text-[var(--muted)]${row("description")}`}>{card.description}</span> : null}
       <Band {...props} />
       {detail ? <span id={ids.detail} className="sr-only">{detail}</span> : null}
-      {value ? (
+      {value || caption ? (
         <span id={ids.value} className={`flex flex-wrap items-baseline gap-x-2.5 gap-y-0.5${row("value")}`}>
-          <b className={`${NUMERIC} ${lead ? "text-[32px] max-[768px]:text-[26px]" : "text-[20px]"} leading-tight font-semibold tracking-[-0.015em] text-[var(--ink)]`}><ValueText value={value} /></b>
+          {value ? <b className={`${NUMERIC} ${lead ? "text-[32px] max-[768px]:text-[26px]" : "text-[20px]"} leading-tight font-semibold tracking-[-0.015em] text-[var(--ink)]`}><ValueText value={value} /></b> : null}
           {caption ? <span className="text-[11.5px] leading-snug text-[var(--muted)]">{caption}</span> : null}
           {spread?.georgiaLabel ? (
             <span className="text-[11.5px] leading-snug text-[var(--muted)] before:mr-1.5 before:inline-block before:h-2.5 before:border-l-[1.5px] before:border-dashed before:border-[var(--accent)] before:align-[-1px] before:content-['']">

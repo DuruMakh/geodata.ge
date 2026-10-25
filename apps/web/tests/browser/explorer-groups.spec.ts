@@ -394,8 +394,10 @@ test("at 1024px the Society row fades the edge with more links beyond it, and be
   await expect(page.getByTestId("group-topic-fade-end")).toBeHidden();
 });
 
-for (const width of [1101, 1150, 1280]) {
-  test(`at ${width}px no group page scrolls sideways, and each region spread's names stay in their card`, async ({ page }) => {
+// 320px is the narrowest phone: a headline's long unit (`მლრდ აშშ დოლარი`) and a lead card's value wrap there instead of
+// pushing the page sideways.
+for (const width of [320, 1101, 1150, 1280]) {
+  test(`at ${width}px no group page scrolls sideways, and each region spread's names and lead end label stay in their card`, async ({ page }) => {
     await page.setViewportSize({ width, height: 900 });
     for (const prefix of PREFIXES) {
       for (const group of NAV_GROUPS) {
@@ -410,6 +412,13 @@ for (const width of [1101, 1150, 1280]) {
           return box.left < card.left || box.right > card.right ? [label.textContent] : [];
         }));
         expect(outside, `${prefix}${group.href}`).toEqual([]);
+        // A lead card's end label fits its gutter (Georgian letters are wider) and sits inside the chart band.
+        const labels = await page.getByTestId("lead-end-label").evaluateAll((spans) => spans.flatMap((span) => {
+          const band = span.parentElement!.getBoundingClientRect();
+          const box = span.getBoundingClientRect();
+          return span.scrollWidth > span.clientWidth + 1 || box.top < band.top - 1 || box.bottom > band.bottom + 1 ? [span.textContent] : [];
+        }));
+        expect(labels, `${prefix}${group.href}`).toEqual([]);
       }
     }
   });

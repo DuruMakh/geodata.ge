@@ -26,7 +26,8 @@ test("Economy links the delivered overview, national sectors, GDP by expenditure
   await expect(page.getByTestId("gdp-overview")).toBeVisible();
   await page.goto("/explorer/economy");
   for (let index = 0; index < 3; index += 1) await expect(chart(cards.nth(index))).toHaveCount(1);
-  await expect(cards.first()).toContainText(/\d+\.\d მლრდ ₾ნომინალური მშპ · \d{4}/);
+  // The GDP overview page's line: real GDP in US dollars.
+  await expect(cards.first()).toContainText(/\d+\.\d მლრდ აშშ დოლარირეალური მშპ · \d{4}/);
   await expect(cards.nth(1)).toContainText("ტოპ 3-ის წილი მშპ-ში");
   await expect(cards.nth(2)).toContainText(/\d+\.\d%შინამეურნეობების მოხმარება/);
   await expect(cards.nth(3)).toContainText("11 რეგიონი");
@@ -103,8 +104,8 @@ test("the health section shows one card per page, each linking to it, and the si
     for (const id of sections) await expect(page.getByTestId(`health-${id}-link`)).toBeVisible();
   }
   await expect(page.locator("#t-health").getByRole("heading", { level: 2 })).toHaveText("Health and social protection");
-  await expect(topicCards(page, "health").first()).toHaveAccessibleDescription(cardFigure("22,491", "2025", "2002–2025"));
-  await expect(topicCards(page, "health").last()).toHaveAccessibleDescription(cardFigure("8,237.5 million GEL", "2025", "2019–2025"));
+  await expect(topicCards(page, "health").first()).toHaveAccessibleDescription(cardFigure("22,491", "2025", "2002–2025", "Doctors"));
+  await expect(topicCards(page, "health").last()).toHaveAccessibleDescription(cardFigure("8.24 billion GEL", "2025", "2019–2025"));
 });
 
 test("the crime section shows one card per page, each linking to it, and the sidebar lists Crime and justice after Science and culture", async ({ page }) => {
@@ -156,7 +157,7 @@ test("the housing section shows one card per page, each linking to it, and the s
   await expect(page.locator("#t-housing").getByRole("heading", { level: 2 })).toHaveText("Housing and construction");
   const cards = topicCards(page, "housing");
   await expect(cards.first()).toHaveAccessibleDescription(cardFigure("11,578", "2025", "2006–2025"));
-  await expect(cards.nth(2)).toHaveAccessibleDescription(cardFigure("159.4", "2025", "2020–2025"));
+  await expect(cards.nth(2)).toHaveAccessibleDescription(cardFigure("159.4", "2025 Q4", "2020–2025", "Index (2020 = 100)"));
   await expect(cards.nth(3)).toContainText("2006–2025");
 });
 
@@ -175,8 +176,8 @@ test("the transport section shows one card per page, each linking to it, and the
   }
   await expect(page.locator("#t-transport").getByRole("heading", { level: 2 })).toHaveText("Transport");
   const cards = topicCards(page, "transport");
-  await expect(cards.first()).toHaveAccessibleDescription(cardFigure("1,650.0", "2025", "2000–2025"));
-  await expect(cards.nth(1)).toHaveAccessibleDescription(cardFigure("1,318.9", "2025", "2017–2025"));
+  await expect(cards.first()).toHaveAccessibleDescription(cardFigure("1.65 million", "2025", "2000–2025", "Passenger cars"));
+  await expect(cards.nth(1)).toHaveAccessibleDescription(cardFigure("1.32 million", "2025", "2017–2025", "Cars over 10 years old"));
   await expect(cards.nth(4)).toContainText("2017–2025");
 });
 

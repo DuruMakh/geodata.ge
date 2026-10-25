@@ -15,6 +15,7 @@ import { pageHref } from "../i18n/routes";
 import type { Locale, Messages } from "../i18n/types";
 import { ALL_DATA_PATH, NAV_TREE, PAGE_COUNT } from "../navigation/navTree";
 import { fiscalMetadata } from "../seo/metadata";
+import { loadCardSpreads } from "./group";
 import { loadTopicHubs } from "./topicHubs.server";
 
 /** `common` and `allData` in one language. */
@@ -34,7 +35,8 @@ export async function allDataPageMetadata(locale: Locale) {
 export async function renderAllDataPage(locale: Locale) {
   const [hubs, messagesKa, messagesEn] = await Promise.all([loadTopicHubs(locale, NAV_TREE.map((hub) => hub.id)), allDataMessages("ka"), allDataMessages("en")]);
   const messages = locale === "en" ? messagesEn : messagesKa;
-  const pages = buildSearchPages(hubs, messagesKa, messagesEn);
+  const { spreadOf } = await loadCardSpreads(hubs.flatMap((hub) => hub.cards), locale);
+  const pages = buildSearchPages(hubs, messagesKa, messagesEn, spreadOf);
   const shortcuts = buildShortcuts(messagesKa, messagesEn);
   const reviewed = hubs.map((hub) => hub.lastReviewedAt).reduce((latest, date) => (date > latest ? date : latest));
   const home = message(messages, "common.home");

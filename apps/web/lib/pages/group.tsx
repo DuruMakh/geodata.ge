@@ -1,9 +1,10 @@
 import { GroupPage, type GroupTopicSection } from "../../components/explorer-groups/group-page";
 import { updatedDate } from "../explorer/coverageLabel";
 import { groupHeadlines } from "../explorer/groupHeadlines";
+import type { HubCardModel } from "../explorer/hubCards";
 import { pagesLabel } from "../explorer/pagesLabel";
 import { buildPlaceIndex, entriesForPage } from "../explorer/places/buildPlaceIndex.server";
-import { regionSpread } from "../explorer/regionSpread";
+import { regionSpread, type RegionSpread } from "../explorer/regionSpread";
 import { getCommonMessages } from "../i18n/common.server";
 import { getGroupsMessages } from "../i18n/groups.server";
 import { message } from "../i18n/messages";
@@ -22,14 +23,19 @@ export function groupPageMetadata(group: GroupId, locale: Locale) {
 }
 
 /**
- * The places' names and the place index, for the Regions cards' spreads. Georgia is named as its Population page names it,
- * the same names the place index gives the regions.
+ * Each Regions card's spread, null for any other card, and how many regions a Regions card without one names. A spread is drawn
+ * from the card's own figures (`spreadEntries`) or else from the place index's entries for its page; places are named as their
+ * Population page names them, the same names the place index gives the regions. The group pages and All data share it.
  */
-async function loadSpreadInputs(locale: Locale) {
+export async function loadCardSpreads(cards: readonly HubCardModel[], locale: Locale): Promise<{ spreadOf: (card: HubCardModel) => RegionSpread | null; regionCount: number }> {
+  if (!cards.some((card) => isRegionsPage(card.href))) return { spreadOf: () => null, regionCount: 0 };
   const [index, { places }] = await Promise.all([buildPlaceIndex(locale), loadPopulationBasics(locale)]);
   const names = new Map(places.map((place) => [place.id, locale === "en" ? place.nameEn : place.nameKa]));
   const regionName = (id: string) => names.get(id) ?? id;
-  return { index, regionName, regionCount: index.places.filter((place) => place.kind === "region").length };
+  return {
+    spreadOf: (card) => (card.href && isRegionsPage(card.href) ? regionSpread(card.spreadEntries ?? entriesForPage(index, card.href), regionName, locale) : null),
+    regionCount: index.places.filter((place) => place.kind === "region").length,
+  };
 }
 
 /** A group page: its topics' hub cards in sections, with four headline numbers from those cards (spec 2026-10-24-explorer-regroup §5). */
@@ -37,7 +43,7 @@ export async function renderGroupPage(group: GroupId, locale: Locale) {
   const nav = navGroup(group);
   const hubs = await loadTopicHubs(locale, nav.topics);
   const cards = hubs.flatMap((hub) => hub.cards);
-  const spreadInputs = cards.some((card) => isRegionsPage(card.href)) ? await loadSpreadInputs(locale) : null;
+  const { spreadOf, regionCount } = await loadCardSpreads(cards, locale);
   const messages = { ...getCommonMessages(locale), ...getGroupsMessages(locale) };
 
   const pages = groupPages(nav).length;
@@ -52,9 +58,7 @@ export async function renderGroupPage(group: GroupId, locale: Locale) {
     meta: `${topicHubCoverage(messages, locale, hub)} · ${pagesLabel(messages, hub.cards.length)}`,
     line: nav.topics.length > 1 ? message(messages, `groups.topicLine.${hub.topic}`) : null,
     cards: hub.cards,
-    spreads: hub.cards.map((card) => (spreadInputs && card.href && isRegionsPage(card.href)
-      ? regionSpread(entriesForPage(spreadInputs.index, card.href), spreadInputs.regionName, locale)
-      : null)),
+    spreads: hub.cards.map(spreadOf),
   }));
 
   return (
@@ -68,7 +72,7 @@ export async function renderGroupPage(group: GroupId, locale: Locale) {
       meta={meta}
       headlines={groupHeadlines(group, cards, messages)}
       topics={topics}
-      regionCount={spreadInputs?.regionCount ?? 0}
+      regionCount={regionCount}
     />
   );
 }

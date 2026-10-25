@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildSparklinePath } from "../../lib/explorer/sparkline";
+import { annualSeries, buildSparklinePath } from "../../lib/explorer/sparkline";
 
 describe("buildSparklinePath", () => {
   it("draws a single segment across a complete series", () => {
@@ -31,5 +31,15 @@ describe("buildSparklinePath", () => {
 
   it("ignores non-finite values", () => {
     expect(buildSparklinePath([1, Number.NaN, 3, 4], 64, 16)).toHaveLength(1);
+  });
+});
+
+describe("annualSeries", () => {
+  it("spans the first to the last year, a year without a value a gap rather than a join", () => {
+    expect(annualSeries([{ year: 2020, value: 1 }, { year: 2023, value: 4 }, { year: 2021, value: null }])).toEqual([1, null, null, 4]);
+  });
+
+  it("spans the years it is given, beyond the points' own", () => {
+    expect(annualSeries([{ year: 2021, value: 2 }], 2019, 2022)).toEqual([null, null, 2, null]);
   });
 });

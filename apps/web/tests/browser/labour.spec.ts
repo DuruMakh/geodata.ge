@@ -60,7 +60,8 @@ test("the Unemployment section's cards 05–08 show each page total's latest fig
     const cards = topicCards(page, "unemployment");
     await expect(cards).toHaveCount(8);
     for (const [offset, [value, years]] of figures.entries()) {
-      await expect(cards.nth(4 + offset)).toHaveAccessibleDescription(cardFigure(value, "2025", years));
+      // Jobs by industry names its figure, the employed, as its page's line does; the other titles name theirs.
+      await expect(cards.nth(4 + offset)).toHaveAccessibleDescription(cardFigure(value, "2025", years, offset === 0 ? (prefix ? "Employed" : "დასაქმებული") : undefined));
       await expect(cards.nth(4 + offset).getByTestId("explorer-card-graphic").locator("svg")).toHaveCount(1);
     }
     const sidebar = ["overview", "regions", "age", "gender", "industries", "hours", "informal", "young-people"];
