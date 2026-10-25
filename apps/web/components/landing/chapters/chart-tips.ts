@@ -1,11 +1,11 @@
 import { formatInUnit, formatPerResidentGel, formatPoints, formatShare, MISSING, UNIT_PERSONS } from "../../../lib/explorer/format";
 import type { Locale } from "../../../lib/i18n/types";
-import type { AgeingChapter, DeficitChapter, MunicipalChapter, ReliefPlace, RevenueSeries } from "../../../lib/landing/chapters/types";
+import type { AgeingChapter, DeficitChapter, LabourSplit, MunicipalChapter, ReliefPlace, RevenueSeries, YouthJobsChapter } from "../../../lib/landing/chapters/types";
 import { birthsColor, birthsPer100, MIGRATION_COLORS, SEX_COLORS } from "./canvas";
-import { money, signedCount } from "./chart-format";
+import { money, points, signedCount } from "./chart-format";
 import type { TipData } from "./chart-tip";
 
-// Tooltip content of the revenue, deficit, municipal relief and ageing charts, kept apart from the engines so it can be tested.
+// Tooltip content of the revenue, deficit, municipal relief, ageing and youth jobs charts, kept apart from the engines so it can be tested.
 
 /** Year with a planned suffix when the year's value is planned: "2025 (გეგმა)". */
 export function plannedYearText(data: Pick<RevenueSeries, "years" | "planned">, i: number, planned: string): string {
@@ -128,5 +128,69 @@ export function birthsTip(
       { val: persons(entry.deaths), name: labels.deaths },
     ],
     foot: change > 0 ? `${labels.increase}: +${persons(change)}` : change < 0 ? `${labels.decrease}: ${persons(-change)}` : labels.balanced,
+  };
+}
+
+/**
+ * Labour grid tooltip for group index `i` (0 employed, 1 unemployed, 2 outside the labour force): its share of the
+ * whole age group and its count in thousands; the foot is the unemployment rate of the labour force, the labour
+ * force's size, or what "outside" means.
+ */
+export function waffleTip(
+  split: LabourSplit,
+  labels: {
+    employed: string;
+    unemployed: string;
+    outside: string;
+    who: string;
+    people: string;
+    thousand: string;
+    unemploymentRate: string;
+    ofLabourForce: string;
+    labourForce: string;
+    neither: string;
+  },
+  i: number,
+): TipData {
+  const groups = [
+    { name: labels.employed, key: "var(--ink)", value: split.employed },
+    { name: labels.unemployed, key: "var(--accent)", value: split.unemployed },
+    { name: labels.outside, key: "var(--control)", value: split.outside },
+  ];
+  const { name, key, value } = groups[i];
+  const whole = split.employed + split.unemployed + split.outside;
+  const thousands = (n: number) => `${formatInUnit(n, { divisor: 1, label: "", decimals: 1 })} ${labels.thousand}`;
+  const foot = [
+    `${labels.labourForce} — ${thousands(split.employed + split.unemployed)}`,
+    `${labels.unemploymentRate} — ${points(split.rate)} ${labels.ofLabourForce}`,
+    labels.neither,
+  ][i];
+  return {
+    title: name,
+    rows: [
+      { key, val: points((value / whole) * 100), name: labels.who },
+      { val: thousands(value), name: labels.people },
+    ],
+    foot,
+  };
+}
+
+/**
+ * Regions chart tooltip for region index `i`: its rate, and the foot says how many points it sits above or below the
+ * rate of Georgia (`{diff}` in the templates), or that it equals it.
+ */
+export function regionTip(
+  regions: YouthJobsChapter["regions"],
+  national: number,
+  labels: { rate: string; equal: string; higher: string; lower: string },
+  i: number,
+): TipData {
+  const { label, rate } = regions[i];
+  const diff = rate - national;
+  const template = Math.abs(diff) < 0.05 ? labels.equal : diff > 0 ? labels.higher : labels.lower;
+  return {
+    title: label,
+    rows: [{ key: "var(--ink)", val: points(rate), name: labels.rate }],
+    foot: template.replace("{diff}", formatPoints(Math.abs(diff), false, 1)),
   };
 }

@@ -92,6 +92,19 @@ export function valueY(value: number, lo: number, hi: number, top: number, heigh
 /** The fiscal rule line of the deficit chart, percent of GDP. */
 export const DEFICIT_RULE_PCT = -3;
 
+/** Below this width the regions chart puts each region's name above its row instead of beside it. */
+export const REGIONS_NARROW_WIDTH = 560;
+
+/** Height of the regions chart: 28 px per region (40 px when narrow, with the name above) plus 56 px for the rate line and the axis. */
+export function regionsHeight(count: number, narrow: boolean): number {
+  return count * (narrow ? 40 : 28) + 56;
+}
+
+/** Top of the regions chart's axis: the next multiple of 5 above the highest rate (17.5 gives 20, 20 gives 25). */
+export function regionsAxisTop(maxRate: number): number {
+  return (Math.floor(maxRate / 5) + 1) * 5;
+}
+
 /** "2004" for a single year, "2004–2007" for a range. */
 export function yearRange(first: number, last: number): string {
   return first === last ? String(first) : `${first}–${last}`;

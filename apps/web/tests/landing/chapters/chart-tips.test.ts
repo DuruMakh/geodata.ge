@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { birthsTip, deficitTip, migrationTip, plannedYearText, pyramidTip, reliefTip, revenueTip } from "../../../components/landing/chapters/chart-tips";
-import type { AgeingChapter, DeficitChapter, MunicipalChapter, RevenueSeries } from "../../../lib/landing/chapters/types";
+import { birthsTip, deficitTip, migrationTip, plannedYearText, pyramidTip, regionTip, reliefTip, revenueTip, waffleTip } from "../../../components/landing/chapters/chart-tips";
+import type { AgeingChapter, DeficitChapter, LabourSplit, MunicipalChapter, RevenueSeries, YouthJobsChapter } from "../../../lib/landing/chapters/types";
 
 const labels = {
   locale: "ka" as const,
@@ -203,5 +203,68 @@ describe("birthsTip", () => {
   it("says there is no data for a place without figures and for an occupied area (-2)", () => {
     expect(birthsTip(births, birthPlaces, birthsLabels, 3)).toEqual({ title: "უცნობი", rows: [{ val: "მონაცემები არ არის" }] });
     expect(birthsTip(births, birthPlaces, birthsLabels, -2)).toEqual({ title: "ოკუპირებული ტერიტორია", rows: [{ val: "მონაცემები არ არის" }] });
+  });
+});
+
+const labourAll: LabourSplit = { employed: 1389.7, unemployed: 224, outside: 1349.4, rate: 13.88, per100: [47, 8, 45] };
+const waffleLabels = {
+  employed: "დასაქმებული",
+  unemployed: "უმუშევარი",
+  outside: "შრომის ძალის გარეთ",
+  who: "15+ ასაკის მოსახლეობის",
+  people: "ადამიანი",
+  thousand: "ათასი",
+  unemploymentRate: "უმუშევრობის დონე",
+  ofLabourForce: "შრომის ძალიდან",
+  labourForce: "შრომის ძალა",
+  neither: "არც მუშაობს და არც სამსახურს ეძებს",
+};
+
+describe("waffleTip", () => {
+  it("shows each group's share of the whole and its count in thousands, with the labour-force size as the employed foot", () => {
+    expect(waffleTip(labourAll, waffleLabels, 0)).toEqual({
+      title: "დასაქმებული",
+      rows: [
+        { key: "var(--ink)", val: "46.9%", name: "15+ ასაკის მოსახლეობის" },
+        { val: "1,389.7 ათასი", name: "ადამიანი" },
+      ],
+      foot: "შრომის ძალა — 1,613.7 ათასი",
+    });
+  });
+
+  it("gives the unemployed the unemployment rate of the labour force and the outsiders the neither-nor text", () => {
+    const unemployed = waffleTip(labourAll, waffleLabels, 1);
+    expect(unemployed.rows[0]).toEqual({ key: "var(--accent)", val: "7.6%", name: "15+ ასაკის მოსახლეობის" });
+    expect(unemployed.foot).toBe("უმუშევრობის დონე — 13.9% შრომის ძალიდან");
+    const outside = waffleTip(labourAll, waffleLabels, 2);
+    expect(outside.rows[0]).toEqual({ key: "var(--control)", val: "45.5%", name: "15+ ასაკის მოსახლეობის" });
+    expect(outside.foot).toBe("არც მუშაობს და არც სამსახურს ეძებს");
+  });
+});
+
+const regions: YouthJobsChapter["regions"] = [
+  { id: "tbilisi", label: "თბილისი", rate: 17.5 },
+  { id: "imereti", label: "იმერეთი", rate: 13.9 },
+  { id: "samtskhe_javakheti", label: "სამცხე-ჯავახეთი", rate: 7 },
+];
+const regionLabels = {
+  rate: "უმუშევრობის დონე, 2025",
+  equal: "საქართველოს საშუალოს ტოლი",
+  higher: "საქართველოს საშუალოზე {diff} პ.პ.-ით მაღალი",
+  lower: "საქართველოს საშუალოზე {diff} პ.პ.-ით დაბალი",
+};
+
+describe("regionTip", () => {
+  it("shows the region's rate and how many points it is above or below the Georgia rate", () => {
+    expect(regionTip(regions, 13.88, regionLabels, 0)).toEqual({
+      title: "თბილისი",
+      rows: [{ key: "var(--ink)", val: "17.5%", name: "უმუშევრობის დონე, 2025" }],
+      foot: "საქართველოს საშუალოზე 3.6 პ.პ.-ით მაღალი",
+    });
+    expect(regionTip(regions, 13.88, regionLabels, 2).foot).toBe("საქართველოს საშუალოზე 6.9 პ.პ.-ით დაბალი");
+  });
+
+  it("says a region equals the Georgia rate when they differ by less than 0.05 points", () => {
+    expect(regionTip(regions, 13.88, regionLabels, 1).foot).toBe("საქართველოს საშუალოს ტოლი");
   });
 });

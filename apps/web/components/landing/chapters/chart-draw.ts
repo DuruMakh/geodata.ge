@@ -33,10 +33,11 @@ export function haloTxt(
   color: string,
   halo: string,
   align: CanvasTextAlign = "left",
+  baseline: CanvasTextBaseline = "alphabetic",
 ): void {
   ctx.font = font;
   ctx.textAlign = align;
-  ctx.textBaseline = "alphabetic";
+  ctx.textBaseline = baseline;
   ctx.lineJoin = "round";
   ctx.lineWidth = 4;
   ctx.strokeStyle = halo;

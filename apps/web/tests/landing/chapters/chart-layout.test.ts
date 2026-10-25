@@ -7,6 +7,8 @@ import {
   plannedRuns,
   plannedSpan,
   pointIndexAt,
+  regionsAxisTop,
+  regionsHeight,
   revenuePads,
   slotIndexAt,
   valueY,
@@ -125,5 +127,20 @@ describe("yearRange", () => {
   it("writes a single year once and a range with an en dash", () => {
     expect(yearRange(2004, 2004)).toBe("2004");
     expect(yearRange(2004, 2007)).toBe("2004–2007");
+  });
+});
+
+describe("regionsHeight", () => {
+  it("gives 28 px per region and 40 px when narrow, plus 56 px", () => {
+    expect(regionsHeight(11, false)).toBe(364);
+    expect(regionsHeight(11, true)).toBe(496);
+  });
+});
+
+describe("regionsAxisTop", () => {
+  it("is the next multiple of 5 above the highest rate, also for an exact multiple", () => {
+    expect(regionsAxisTop(17.5)).toBe(20);
+    expect(regionsAxisTop(7)).toBe(10);
+    expect(regionsAxisTop(20)).toBe(25);
   });
 });

@@ -11,6 +11,7 @@ import { AiSection, type AiLabels } from "./chapters/ai-section";
 import { BIRTH_CLASSES } from "./chapters/canvas";
 import { Chapter } from "./chapters/chapter";
 import { DeficitChart, type DeficitLabels } from "./chapters/deficit-chart";
+import { JobsChapter, type JobsLabels } from "./chapters/jobs-chapter";
 import { MunicipalRelief, type MunicipalLabels } from "./chapters/municipal-relief";
 import { RevenueChart, type RevenueLabels } from "./chapters/revenue-chart";
 import { ScaleChapter, type ScaleLabels } from "./chapters/scale-chapter";
@@ -175,6 +176,44 @@ export function LandingPage({ chapters, gdpFigure, presentation, updatedAt, mcpE
     fertility: { label: t("landing.ageing.fertility.label"), note: ageingText.fertility },
     migrationCard: { label: t("landing.ageing.migration.label"), note: ageingText.migration },
   };
+  const { youthJobs } = chapters;
+  const jobsYear = youthJobs.year;
+  const waffleLabels = (kind: "all" | "youth") => {
+    const [employed, unemployed, outside] = youthJobs[kind].per100;
+    return {
+      title: t(`landing.jobs.waffle.${kind}Title`, { year: jobsYear }),
+      who: t(`landing.jobs.waffle.${kind}Who`),
+      summary: t(`landing.jobs.waffle.${kind}Summary`, { year: jobsYear, employed, unemployed, outside }),
+      employed: t("landing.jobs.employed"),
+      unemployed: t("landing.jobs.unemployed"),
+      outside: t("landing.jobs.outside"),
+      people: t("landing.jobs.people"),
+      thousand: t("landing.jobs.thousand"),
+      million: t("landing.jobs.million"),
+      unemploymentRate: t("landing.jobs.unemploymentRate"),
+      ofLabourForce: t("landing.jobs.ofLabourForce"),
+      labourForce: t("landing.jobs.labourForce"),
+      neither: t("landing.jobs.neither"),
+      unavailable,
+    };
+  };
+  const jobsLabels: JobsLabels = {
+    all: waffleLabels("all"),
+    youth: waffleLabels("youth"),
+    regions: {
+      title: t("landing.jobs.regions.title", { year: jobsYear }),
+      national: t("landing.jobs.regions.national"),
+      rate: t("landing.jobs.regions.rate", { year: jobsYear }),
+      equal: t("landing.jobs.regions.equal"),
+      // The tooltip fills in the difference when a region is hovered.
+      higher: t("landing.jobs.regions.higher", { diff: "{diff}" }),
+      lower: t("landing.jobs.regions.lower", { diff: "{diff}" }),
+      highest: t("landing.ageing.highest"),
+      lowest: t("landing.ageing.lowest"),
+      chartSummary: t("landing.jobs.regions.chartSummary", { year: jobsYear }),
+      unavailable,
+    },
+  };
   const collections = chapters.sources.rows.length;
   const sourcesLabels: SourcesLabels = {
     title: t("landing.sources.title"),
@@ -291,6 +330,9 @@ export function LandingPage({ chapters, gdpFigure, presentation, updatedAt, mcpE
           </Chapter>
           <Chapter id="ch-06" link={chapterLink(6, "/explorer/demography")} title={chapters.sentences.headings.ageing} lede={chapters.sentences.ageing}>
             <AgeingChapter data={ageing} municipal={chapters.municipal} labels={ageingLabels} />
+          </Chapter>
+          <Chapter id="ch-07" link={chapterLink(7, "/explorer/unemployment")} title={chapters.sentences.headings.youthJobs} lede={chapters.sentences.youthJobs}>
+            <JobsChapter data={youthJobs} labels={jobsLabels} />
           </Chapter>
           <SourcesSection sources={chapters.sources} labels={sourcesLabels} locale={locale} />
           <AiSection endpoint={mcpEndpoint} tools={chapters.tools} labels={aiLabels} locale={locale} />
