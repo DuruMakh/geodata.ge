@@ -310,12 +310,15 @@ describe("the real 74 places", () => {
     }
   });
 
-  it.each(["საბავშვო ბაღები", "ბაღები", "საგარეო ვალი", "საგარეო ვაჭრობა", "საგარეო ნაკადები", "საგარეო სექტორი", "წყალი"])("%s names no place", (query) => {
+  it.each(["საბავშვო ბაღები", "ბაღები", "საგარეო", "საგარეო ვალი", "საგარეო ვაჭრობა", "საგარეო ნაკადები", "საგარეო სექტორი", "წყალი"])("%s names no place", (query) => {
     expect(searchExplorer(query, "ka", PAGES, SHORTCUTS, indexes.ka)!.place).toBeNull();
   });
 
   it.each([
     ["ბათუმში", "ka", "Batumi"], ["თბილისში", "ka", "Tbilisi"], ["აჭარაში", "ka", "Adjara"], ["ქობულეთში", "ka", "Kobuleti"],
+    // Short names take a case ending on their stem, and a municipality's whole name beats the region it starts.
+    ["გორში", "ka", "Gori"], ["ფოთში", "ka", "Poti"], ["ხონში", "ka", "Khoni"], ["ვანში", "ka", "Vani"], ["ხობში", "ka", "Khobi"],
+    ["ქედაში", "ka", "Keda"], ["ხულოში", "ka", "Khulo"], ["ონში", "ka", "Oni"], ["გორის", "ka", "Gori"], ["მცხეთაში", "ka", "Mtskheta"],
     ["სამეგრელო-ზემო სვანეთი", "ka", "Samegrelo-Zemo Svaneti"], ["Samegrelo-Zemo Svaneti", "en", "Samegrelo-Zemo Svaneti"], ["Kvemo Kartli", "en", "Kvemo Kartli"],
   ] as const)("%s finds %s", (query, locale, nameEn) => {
     expect(searchExplorer(query, locale, PAGES, SHORTCUTS, indexes[locale])!.place?.place.nameEn).toBe(nameEn);

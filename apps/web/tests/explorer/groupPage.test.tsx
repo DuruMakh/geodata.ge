@@ -3,9 +3,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("next/navigation", async (importOriginal) => ({ ...(await importOriginal<typeof import("next/navigation")>()), useRouter: () => ({ replace() {} }) }));
 
-import { splitValue } from "../../components/explorer-groups/group-page";
 import { topicScrollTarget } from "../../components/explorer-groups/group-topic-scroll";
-import { GROUP_HEADLINES, groupHeadlines } from "../../lib/explorer/groupHeadlines";
+import { GROUP_HEADLINES, groupHeadlines, splitValue } from "../../lib/explorer/groupHeadlines";
 import type { HubCardModel } from "../../lib/explorer/hubCards";
 import { NAV_GROUPS, groupPages, type GroupId } from "../../lib/navigation/navTree";
 import { groupPageMetadata, renderGroupPage } from "../../lib/pages/group";
@@ -47,15 +46,25 @@ describe("the Labour market group page (ka)", async () => {
     expect(count(html, /<span class="text-\[13px\][^"]*"> <span[^>]*data-testid="group-headline-unit"/g)).toBe(units.length);
     for (const [tag] of units) expect(tag).toContain("whitespace-nowrap");
     // The period, not the unit, is what moves to the next line when the row is tight.
-    expect(count(html, /<wbr\/><small/g)).toBe(4);
+    // Its gap is a space inside it, which a break there drops, not a margin that would indent it.
+    expect(count(html, /<small class="(?![^"]*\bml-)[^"]*"> [^ <][^<]*<\/small>/g)).toBe(4);
   });
 
-  it("wraps the topic links from 900px and keeps sideways scrolling below", () => {
+  it("keeps the topic links on one sticky row that scrolls sideways, with a thin scrollbar and edge fades from 900px", () => {
+    const row = /<div[^>]*data-testid="group-topic-row"[^>]*>/.exec(html)![0];
+    expect(row).toContain("sticky");
     const tag = /<nav[^>]*data-testid="group-topic-links"[^>]*>/.exec(html)![0];
     expect(tag).toContain("overflow-x-auto");
-    expect(tag).toContain("min-[900px]:flex-wrap");
-    expect(tag).toContain("min-[900px]:overflow-x-visible");
-    expect(tag).toContain("sticky");
+    expect(tag).not.toContain("flex-wrap");
+    expect(tag).toContain("min-[900px]:[scrollbar-width:thin]");
+    for (const edge of ["start", "end"]) {
+      const fade = new RegExp(`<span[^>]*data-testid="group-topic-fade-${edge}"[^>]*>`).exec(html)![0];
+      expect(fade).toContain("max-[900px]:hidden");
+      expect(fade).toContain(`group-data-[more-${edge}]/topics:opacity-100`);
+    }
+    // The sections' scroll margin is the one row's height (63px) and a 13px gap, fixed.
+    expect(html).not.toContain("--topic-links-h");
+    expect(count(html, /min-\[900px\]:scroll-mt-\[76px\]/g)).toBe(2);
   });
 
   it("links the two topics' sections", () => {
@@ -99,6 +108,17 @@ describe("the Budget group page (en)", async () => {
     expect(hrefs(html, "group-headline")).toEqual(GROUP_HEADLINES.budget.map(({ page }) => `/en${page}`));
     expect(html).toMatch(/8 pages · Updated \d{1,2} [A-Z][a-z]+ \d{4}/);
   });
+});
+
+describe.each([["ka", ", უმსხვილესი"], ["en", ", largest"]] as const)("the External sector group page (%s)", (locale, largest) => {
+  it("names the largest partner alone under its headline, and keeps the card's caption", async () => {
+    const html = renderToStaticMarkup(await renderGroupPage("external", locale));
+    const inner = (testId: string) => new RegExp(`<a(?=[^>]*data-testid="${testId}")(?=[^>]*href="${locale === "en" ? "/en" : ""}/explorer/trade/partners")[^>]*>([\\s\\S]*?)</a>`).exec(html)![1];
+    const caption = /<span class="mt-1 block[^"]*">([^<]+)<\/span>/.exec(inner("group-headline"))![1];
+    expect(caption.length).toBeGreaterThan(1);
+    expect(caption).not.toContain(largest.slice(2));
+    expect(inner("explorer-card")).toContain(`${caption}${largest}`);
+  }, 120_000);
 });
 
 describe("splitValue", () => {
@@ -154,6 +174,20 @@ describe("groupHeadlines", () => {
   it("keeps a caption the label does not already say", () => {
     const withCaption = cards.map((item, index) => ({ ...item, latest: { value: "1", period: "2025", caption: index === 3 ? "Deficit, % of GDP" : "Türkiye, largest" } }));
     expect(groupHeadlines("budget", withCaption, messages).map(({ caption }) => caption)).toEqual(["Türkiye, largest", "Türkiye, largest", "Türkiye, largest", null]);
+  });
+
+  it("captions with the headline's own caption where the card has one: the largest partner's name alone", () => {
+    const partner = cards.map((item) => ({ ...item, latest: { value: "1", period: "2025", caption: "Türkiye, largest", headlineCaption: "Türkiye" } }));
+    expect(groupHeadlines("budget", partner, messages).map(({ caption }) => caption)).toEqual(["Türkiye", "Türkiye", "Türkiye", "Türkiye"]);
+  });
+
+  it("throws when a value does not start with a figure that splitValue can cut from its unit", () => {
+    for (const value of ["32.4 მლრდ ₾", "−2.1%", "+17,127", "-0.4 pp", "13.9%"]) {
+      expect(() => groupHeadlines("budget", [...cards.slice(0, 3), card("/explorer/deficit", { value, period: "2025" })], messages), value).not.toThrow();
+    }
+    for (const value of ["1 234 ₾", "approx. 5%", "≈5%", "", "—"]) {
+      expect(() => groupHeadlines("budget", [...cards.slice(0, 3), card("/explorer/deficit", { value, period: "2025" })], messages), value).toThrow(/\/explorer\/deficit/);
+    }
   });
 });
 

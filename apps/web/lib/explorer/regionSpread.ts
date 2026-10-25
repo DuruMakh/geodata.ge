@@ -10,8 +10,9 @@ export type RegionSpread = {
   georgiaX: number | null;
   /** Georgia's name and figure, to key the dashed line, or null when the page states none. */
   georgiaLabel: string | null;
-  low: string;
-  high: string;
+  /** The lowest and highest region: its name and its figure, `Shida Kartli` and `7.0%`. */
+  low: { name: string; value: string };
+  high: { name: string; value: string };
   lowX: number;
   /** The range the regions span, `7.0–17.5%`. */
   value: string;
@@ -62,8 +63,8 @@ export function regionSpread(entries: PlaceEntry[], regionName: (id: string) => 
     points: regions.map((entry) => ({ x: x(entry.number), key: entry.number === lowestNumber || entry.number === highestNumber })),
     georgiaX: georgia ? x(georgia.number) : null,
     georgiaLabel: georgia ? `${regionName(GEORGIA_PLACE_ID)} ${georgia.value}` : null,
-    low: `${regionName(lowest.placeId)} ${lowest.value}`,
-    high: `${regionName(highest.placeId)} ${highest.value}`,
+    low: { name: regionName(lowest.placeId), value: lowest.value },
+    high: { name: regionName(highest.placeId), value: highest.value },
     lowX: x(lowestNumber),
     value: rangeOf(lowest.value, highest.value),
     caption: `${message(getGroupsMessages(locale), "groups.regionsN", { n: regions.length })} · ${period}`,

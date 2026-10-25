@@ -39,8 +39,8 @@ describe("regionSpread", () => {
 
   it("marks and names the lowest and highest region", () => {
     expect(spread.points.filter((point) => point.key)).toHaveLength(2);
-    expect(spread.low).toBe("Shida Kartli 7.0%");
-    expect(spread.high).toBe("Tbilisi 17.5%");
+    expect(spread.low).toEqual({ name: "Shida Kartli", value: "7.0%" });
+    expect(spread.high).toEqual({ name: "Tbilisi", value: "17.5%" });
     expect(spread.value).toBe("7.0–17.5%");
     expect(spread.caption).toBe("11 regions · 2025");
   });
@@ -81,7 +81,7 @@ describe("regionSpread", () => {
     expect(withMunicipalities.points).toHaveLength(2);
     expect(withMunicipalities.georgiaX).toBeNull();
     expect(withMunicipalities.georgiaLabel).toBeNull();
-    expect(withMunicipalities.high).toBe("region.b 9.0%");
+    expect(withMunicipalities.high).toEqual({ name: "region.b", value: "9.0%" });
   });
 
   it("returns null with fewer than two regions", () => {

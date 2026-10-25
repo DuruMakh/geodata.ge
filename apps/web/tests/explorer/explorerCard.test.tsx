@@ -18,7 +18,7 @@ const text = (markup: string) => markup.replace(/<[^>]+>/g, "|").replace(/\|+/g,
 
 const SPREAD: RegionSpread = {
   points: [{ x: 10, key: true }, { x: 40, key: false }, { x: 90, key: true }], georgiaX: 60, georgiaLabel: "Georgia 13.9%",
-  low: "Shida Kartli 7.0%", high: "Tbilisi 17.5%", lowX: 10, value: "7.0–17.5%", caption: "11 regions · 2025",
+  low: { name: "Shida Kartli", value: "7.0%" }, high: { name: "Tbilisi", value: "17.5%" }, lowX: 10, value: "7.0–17.5%", caption: "11 regions · 2025",
 };
 
 describe("leadSpan", () => {

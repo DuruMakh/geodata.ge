@@ -50,26 +50,49 @@ export function LeadGraphic({ series, color, endLabel, years }: { series: (numbe
   );
 }
 
-/** One dot per region on a shared scale, Georgia as a dashed line, the lowest and highest named. */
-export function SpreadGraphic({ spread }: { spread: RegionSpread }) {
-  const label = `absolute ${NUMERIC} text-[10.5px] leading-[1.2] whitespace-nowrap text-[var(--body)]`;
+/** A spread's end: the region's name, then its figure, which go onto two lines (name, then figure) when they do not fit beside each other. */
+function SpreadEnd({ end }: { end: RegionSpread["low"] }) {
   return (
-    <span className="absolute inset-x-0 top-[26px] block h-0.5">
-      <i className="absolute inset-x-0 top-0 h-px bg-[var(--hairline)]" />
-      {spread.georgiaX === null ? null : (
-        <i className="absolute -top-[13px] h-[13px] border-l-[1.5px] border-dashed border-[var(--accent)]" style={{ left: percent(spread.georgiaX) }} />
-      )}
-      {spread.points.map((point, index) => (
-        <i
-          key={index}
-          data-testid="region-spread-dot"
-          className={`absolute -top-[5px] -ml-[5px] size-2.5 rounded-full shadow-[0_0_0_1.5px_var(--tile)] ${point.key ? "bg-[var(--ink)]" : "bg-[var(--control)] opacity-85"}`}
-          style={{ left: percent(point.x) }}
-        />
-      ))}
-      <span className={`${label} top-[13px] -translate-x-3`} style={{ left: percent(spread.lowX) }}>{spread.low}</span>
-      <span className={`${label} right-0 bottom-3 text-right`}>{spread.high}</span>
-    </span>
+    <>
+      <span className="inline-block">{end.name}</span>{" "}<span className="inline-block whitespace-nowrap">{end.value}</span>
+    </>
+  );
+}
+
+/**
+ * One dot per region on a shared scale, Georgia as a dashed line, the lowest and highest named. Each name stays inside the band: the
+ * lowest starts 12px before its dot (or, past the middle, ends 12px after it) in the band's flow under the line, so a name too long
+ * for the band wraps and makes the band taller instead of running off the card or into the value below.
+ */
+export function SpreadGraphic({ spread }: { spread: RegionSpread }) {
+  const label = `${NUMERIC} text-[10.5px] leading-[1.2] text-[var(--body)]`;
+  const lowOnRight = spread.lowX > 50;
+  const lowEdge = `max(0px, calc(${percent(lowOnRight ? 100 - spread.lowX : spread.lowX)} - 12px))`;
+  return (
+    <>
+      <span className="absolute inset-x-0 top-[26px] block h-0.5">
+        <i className="absolute inset-x-0 top-0 h-px bg-[var(--hairline)]" />
+        {spread.georgiaX === null ? null : (
+          <i className="absolute -top-[13px] h-[13px] border-l-[1.5px] border-dashed border-[var(--accent)]" style={{ left: percent(spread.georgiaX) }} />
+        )}
+        {spread.points.map((point, index) => (
+          <i
+            key={index}
+            data-testid="region-spread-dot"
+            className={`absolute -top-[5px] -ml-[5px] size-2.5 rounded-full shadow-[0_0_0_1.5px_var(--tile)] ${point.key ? "bg-[var(--ink)]" : "bg-[var(--control)] opacity-85"}`}
+            style={{ left: percent(point.x) }}
+          />
+        ))}
+        <span data-testid="region-spread-high" className={`${label} absolute right-0 bottom-3 max-w-full text-right`}><SpreadEnd end={spread.high} /></span>
+      </span>
+      <span
+        data-testid="region-spread-low"
+        className={`${label} block pt-[39px] ${lowOnRight ? "text-right" : ""}`}
+        style={lowOnRight ? { marginRight: lowEdge } : { marginLeft: lowEdge }}
+      >
+        <SpreadEnd end={spread.low} />
+      </span>
+    </>
   );
 }
 

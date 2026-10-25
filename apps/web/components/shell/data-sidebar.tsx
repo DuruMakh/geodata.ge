@@ -23,6 +23,8 @@ import { ALL_DATA_PATH, NAV_GROUPS, PAGE_COUNT, currentEntry, currentGroup, grou
 const STORAGE_KEY = "geodata:sidebar-collapsed";
 const DESKTOP_MIN_WIDTH = 900;
 const NAV_ID = "data-sidebar-navigation";
+/** Hover intent on the rail: the pointer may be away this long, crossing to a pop-out over another rail icon, before the pop-out closes or gives way. */
+const FLY_DELAY_MS = 150;
 const ACTIVE_BG = "bg-[var(--ink-active)]";
 const COUNT = "ml-auto pl-2 font-[family-name:var(--font-numeric)] text-[11px] font-normal text-[var(--ink-fg-muted)]";
 const ICON = { "aria-hidden": true, size: 18, strokeWidth: 1.5, className: "flex-none" } as const;
@@ -51,6 +53,7 @@ export function DataSidebar() {
   const focusAfterMenu = useRef<"close" | "menu" | null>(null);
   /** Where the reader was when the menu opened: the page behind it is hidden, which takes the scroll position with it. */
   const menuOpenedAt = useRef<{ page: string; scrollY: number } | null>(null);
+  const flyTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
   const railed = isRailed(state);
   const current = currentEntry(page);
   const currentGroupId = currentGroup(page)?.id;
@@ -98,6 +101,15 @@ export function DataSidebar() {
     document.querySelector("[data-shell-page]")?.toggleAttribute("inert", state.menu);
   }, [state.menu]);
 
+  // A pointer that leaves a rail group, or enters another while a pop-out is open, changes the pop-out only once it has stayed
+  // away for FLY_DELAY_MS; coming back first cancels the change. Focus changes it at once.
+  const setFly = (id: GroupId | null, delay: boolean) => {
+    clearTimeout(flyTimer.current);
+    if (delay) flyTimer.current = setTimeout(() => dispatch({ type: "fly", id }), FLY_DELAY_MS);
+    else dispatch({ type: "fly", id });
+  };
+  useEffect(() => () => clearTimeout(flyTimer.current), []);
+
   const closeMenu = useCallback(() => {
     focusAfterMenu.current = "menu";
     dispatch({ type: "menu", open: false });
@@ -110,7 +122,7 @@ export function DataSidebar() {
       // A modal menu wraps Tab at its ends, so focus never leaves it for the inert page or the browser's own controls.
       if (event.key === "Tab" && state.menu) {
         const nav = document.getElementById(NAV_ID);
-        const stops = nav ? [...nav.querySelectorAll<HTMLElement>("a[href], button:not([disabled]), input:not([disabled])")].filter((element) => element.checkVisibility()) : [];
+        const stops = nav ? [...nav.querySelectorAll<HTMLElement>("a[href], button:not([disabled]), input:not([disabled])")].filter((element) => element.checkVisibility?.() ?? element.offsetParent !== null) : [];
         const [first, last] = [stops[0], stops.at(-1)];
         if (!first || !last) return;
         const active = document.activeElement;
@@ -128,6 +140,7 @@ export function DataSidebar() {
       // Focus inside the pop-out goes back to the rail icon it hangs from before it closes, or it would be lost with the list.
       const link = fly ? document.getElementById(groupLinkId(fly)) : null;
       if (link?.closest("li")?.contains(document.activeElement)) link.focus();
+      clearTimeout(flyTimer.current);
       dispatch({ type: "fly", id: null });
     };
     window.addEventListener("keydown", onKey);
@@ -296,11 +309,11 @@ export function DataSidebar() {
               <li
                 key={id}
                 className="border-t border-[var(--ink-divider)]"
-                onMouseEnter={railed ? () => dispatch({ type: "fly", id }) : undefined}
-                onMouseLeave={railed ? () => dispatch({ type: "fly", id: null }) : undefined}
-                onFocus={railed ? () => dispatch({ type: "fly", id }) : undefined}
+                onMouseEnter={railed ? () => setFly(id, state.fly !== null && state.fly !== id) : undefined}
+                onMouseLeave={railed ? () => setFly(null, true) : undefined}
+                onFocus={railed ? () => setFly(id, false) : undefined}
                 onBlur={railed ? (event) => {
-                  if (!event.currentTarget.contains(event.relatedTarget)) dispatch({ type: "fly", id: null });
+                  if (!event.currentTarget.contains(event.relatedTarget)) setFly(null, false);
                 } : undefined}
               >
                 <div className="flex items-stretch">
@@ -341,7 +354,7 @@ export function DataSidebar() {
                     data-testid={`group-panel-${id}`}
                     className={railed
                       // Fixed to the viewport beside the rail, so the rail can scroll on a short screen without clipping it.
-                      ? "fixed top-0 bottom-0 left-[72px] z-40 w-[320px] overflow-y-auto border-l border-[var(--ink-line)] bg-[var(--ink)] px-[22px] pt-[22px] pb-6 shadow-[14px_0_36px_rgba(30,27,22,0.16)]"
+                      ? "fixed top-0 bottom-0 left-[72px] z-40 w-[320px] overflow-y-auto overscroll-contain border-l border-[var(--ink-line)] bg-[var(--ink)] px-[22px] pt-[22px] pb-6 shadow-[14px_0_36px_rgba(30,27,22,0.16)]"
                       : "pr-1.5 pb-3 pl-[38px]"}
                   >
                     {railed ? (

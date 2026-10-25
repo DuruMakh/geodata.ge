@@ -27,23 +27,23 @@ function IndexRow({ page, locale }: { page: SearchPage; locale: Locale }) {
         href={pageHref(page.href, locale)}
         prefetch={false}
         data-testid="az-row"
-        className="group grid min-h-[54px] grid-cols-[minmax(0,1fr)_44px_minmax(84px,auto)] items-center gap-3.5 border-b border-[var(--row-border)] py-2 text-[var(--ink)] no-underline max-[767px]:min-h-[52px] max-[767px]:grid-cols-[minmax(0,1fr)_auto] max-[767px]:gap-3 max-[767px]:py-[7px]"
+        className="group grid min-h-[54px] grid-cols-[minmax(0,1fr)_44px_minmax(84px,auto)] items-center gap-3.5 border-b border-[var(--row-border)] py-2 text-[var(--ink)] no-underline max-[768px]:min-h-[52px] max-[768px]:grid-cols-[minmax(0,1fr)_auto] max-[768px]:gap-3 max-[768px]:py-[7px]"
       >
         <span className="min-w-0">
           <span className="block text-[14px] leading-[1.35] font-semibold group-hover:text-[var(--accent)] group-hover:underline group-hover:underline-offset-[3px]">{rowLabel(page, locale)}</span>
-          <span className={`mt-[3px] flex items-center gap-1.5 ${NUMERIC} text-[10.5px] leading-[1.3] text-[var(--faint)] max-[767px]:text-[11px]`}>
+          <span className={`mt-[3px] flex items-center gap-1.5 ${NUMERIC} text-[10.5px] leading-[1.3] text-[var(--faint)] max-[768px]:text-[11px]`}>
             <Icon aria-hidden strokeWidth={1.75} className="size-3 flex-none" />
             <span>{page.groupName[locale]}</span>
           </span>
         </span>
-        <span aria-hidden className="flex justify-center text-[var(--faint)] max-[767px]:hidden [&>svg]:mt-0">
+        <span aria-hidden className="flex justify-center text-[var(--faint)] max-[768px]:hidden [&>svg]:mt-0">
           {page.spark
             ? <Sparkline values={page.spark} color="var(--control)" width={44} height={14} />
             : page.href.endsWith("/regions") ? <MapIcon strokeWidth={1.75} className="size-3.5" /> : null}
         </span>
         <span className={`max-w-[124px] justify-self-end text-right ${NUMERIC} text-[12px] leading-[1.3] font-semibold`}>
           {page.value}
-          {page.value ? <em className="block text-[10.5px] font-normal text-[var(--faint)] not-italic max-[767px]:text-[11px]">{page.period}</em> : null}
+          {page.value ? <em className="block text-[10.5px] font-normal text-[var(--faint)] not-italic max-[768px]:text-[11px]">{page.period}</em> : null}
         </span>
       </Link>
     </li>
@@ -55,16 +55,16 @@ export function AllDataIndex({ locale, messages, pages }: { locale: Locale; mess
   const groups = azGroups(pages, locale);
   const present = new Map(groups.map((group) => [group.letter, group]));
   return (
-    <section data-testid="az-index" aria-labelledby="az-title" className="mt-11 max-[767px]:mt-8">
+    <section data-testid="az-index" aria-labelledby="az-title" className="mt-11 max-[768px]:mt-8">
       <h2 id="az-title" className="sr-only">{message(messages, "allData.indexTitle")}</h2>
       <nav
         aria-label={message(messages, "allData.alphabetLabel")}
-        className="sticky top-14 z-[6] border-t-[1.5px] border-b border-t-[var(--ink)] border-b-[var(--hairline)] bg-[var(--paper)] py-2 [scrollbar-width:none] min-[900px]:top-0 max-[767px]:-mx-5 max-[767px]:overflow-x-auto max-[767px]:px-3.5 max-[767px]:py-1.5"
+        className="sticky top-14 z-[6] border-t-[1.5px] border-b border-t-[var(--ink)] border-b-[var(--hairline)] bg-[var(--paper)] py-2 [scrollbar-width:none] min-[900px]:top-0 max-[768px]:-mx-5 max-[768px]:overflow-x-auto max-[768px]:px-3.5 max-[768px]:py-1.5"
       >
-        <div className="grid grid-cols-[repeat(auto-fit,minmax(26px,1fr))] gap-0.5 max-[767px]:flex max-[767px]:justify-start">
+        <div className="grid grid-cols-[repeat(auto-fit,minmax(26px,1fr))] gap-0.5 max-[768px]:flex max-[768px]:justify-start">
           {[...azAlphabet(locale)].map((letter) => {
             const group = present.get(letter);
-            const letterClass = "inline-flex h-8 min-w-[26px] items-center justify-center px-[3px] text-[14px] leading-none max-[767px]:h-11 max-[767px]:min-w-11 max-[767px]:flex-none";
+            const letterClass = "inline-flex h-8 min-w-[26px] items-center justify-center px-[3px] text-[14px] leading-none max-[768px]:h-11 max-[768px]:min-w-11 max-[768px]:flex-none";
             return group ? (
               <a
                 key={letter}
@@ -90,10 +90,10 @@ export function AllDataIndex({ locale, messages, pages }: { locale: Locale; mess
                 id={group.id}
                 aria-labelledby={`${group.id}-h`}
                 tabIndex={-1}
-                className="scroll-mt-[146px] pt-6 focus:outline-none max-[767px]:scroll-mt-[116px] max-[767px]:pt-[18px] min-[900px]:scroll-mt-[96px]"
+                className="scroll-mt-[146px] pt-6 focus:outline-none max-[768px]:scroll-mt-[116px] max-[768px]:pt-[18px] min-[900px]:scroll-mt-[96px]"
               >
                 <h3 id={`${group.id}-h`} className="flex items-baseline gap-3 border-b border-[var(--ink)] pb-1.5">
-                  <span className="font-[family-name:var(--font-display)] text-[30px] leading-[1.05] font-semibold max-[767px]:text-[24px]">{group.letter}</span>
+                  <span className="font-[family-name:var(--font-display)] text-[30px] leading-[1.05] font-semibold max-[768px]:text-[24px]">{group.letter}</span>
                   <span className={`${NUMERIC} text-[11px] font-normal text-[var(--muted)]`}>{pagesLabel(messages, group.rows.length)}</span>
                 </h3>
                 <ul>

@@ -93,7 +93,10 @@ function pageScore(page: SearchPage, words: string[]): number {
   return total;
 }
 
-type PlaceName = { name: string; firstWord: string; compact: string; firstStem: string };
+type PlaceName = { name: string; firstWord: string; compact: string; firstStem: string; nameStem: string; shortStem: string | null };
+
+/** What may follow a short name's stem: its own final vowel, if any, then a case ending (`გორში`, `ქედაში`, `ონში`), not a plural. */
+const SHORT_NAME_ENDING = /^[იაეოუ]?(?:ისთვის|იდან|ამდე|ში|ზე|ით|ად|ის|მა|ს)$/;
 
 /** A place's two names, normalised once per place object. */
 const PLACE_NAMES = new WeakMap<Place, PlaceName[]>();
@@ -102,7 +105,9 @@ function placeNames(place: Place): PlaceName[] {
   if (!names) {
     names = [place.nameKa, place.nameEn].map((raw) => {
       const name = norm(raw);
-      return { name, firstWord: name.split(" ")[0], compact: name.replace(/[\s-]/g, ""), firstStem: stem(name.split(/[\s-]/)[0]) };
+      // `stem` leaves a name under 5 letters whole, so its own stem is the name without its final vowel (`გორი` → `გორ`).
+      const short = name.length >= 3 && name.length < 5 ? name.replace(/[იაეოუ]$/, "") : name;
+      return { name, firstWord: name.split(" ")[0], compact: name.replace(/[\s-]/g, ""), firstStem: stem(name.split(/[\s-]/)[0]), nameStem: stem(name), shortStem: short === name ? null : short };
     });
     PLACE_NAMES.set(place, names);
   }
@@ -111,8 +116,9 @@ function placeNames(place: Place): PlaceName[] {
 
 /**
  * The place a word names best, and how well: the whole name 3, its first word or the name without spaces 2.6, its
- * start 2, the first word with another ending 1.8 (`ბათუმში`, `აჭარაში`). The stem must equal the name's own stem,
- * not just start it, or `საგარეო` would find Sagarejo and `ბაღები` Baghdati.
+ * start 2, the whole name with another ending 1.9 (`მცხეთაში` is Mtskheta, not Mtskheta-Mtianeti; a short name's stem
+ * then a case ending, `გორში`), the first word with another ending 1.8 (`ბათუმში`, `აჭარაში`). The stem must equal the
+ * name's own stem, not just start it, or `საგარეო` would find Sagarejo and `ბაღები` Baghdati.
  */
 function placeFor(word: string, places: Place[]): { place: Place; score: number } | null {
   if (word.length < 2) return null;
@@ -121,11 +127,13 @@ function placeFor(word: string, places: Place[]): { place: Place; score: number 
   let best: Place | null = null;
   let bestScore = 0;
   for (const place of places) {
-    for (const { name, firstWord, compact: nameCompact, firstStem } of placeNames(place)) {
+    for (const { name, firstWord, compact: nameCompact, firstStem, nameStem, shortStem } of placeNames(place)) {
       let score = 0;
       if (name === word) score = 3;
       else if (firstWord === word || nameCompact === compact) score = 2.6;
       else if (word.length >= 3 && name.startsWith(word)) score = 2;
+      else if (word.length >= 4 && wordStem.length >= 3 && wordStem === nameStem) score = 1.9;
+      else if (shortStem !== null && word.startsWith(shortStem) && SHORT_NAME_ENDING.test(word.slice(shortStem.length))) score = 1.9;
       else if (word.length >= 4 && wordStem.length >= 3 && wordStem === firstStem) score = 1.8;
       if (score > bestScore) {
         bestScore = score;

@@ -36,16 +36,30 @@ export const GROUP_HEADLINES: Record<GroupId, readonly { page: string; labelKey?
 /** One headline number: its label, the page card's latest figure with its period, and the card's series as the trend. */
 export type GroupHeadline = { href: string; label: string; value: string; period: string; caption: string | null; series: (number | null)[] | null };
 
+/** A value's figure and its unit ("32.4" and "მლრდ ₾"): the text after the first space is the unit. */
+export function splitValue(value: string): { figure: string; unit: string | null } {
+  const space = value.indexOf(" ");
+  return space < 0 ? { figure: value, unit: null } : { figure: value.slice(0, space), unit: value.slice(space + 1) };
+}
+
+/** What a headline value's figure must be, so `splitValue` cuts it in the right place: a sign, digits, separators, an optional `%`. */
+const HEADLINE_FIGURE = /^[−+-]?[\d.,]+%?$/;
+
 /**
- * The group's headline numbers, from its topics' cards. A pick without a card or a latest figure throws, so the build fails
- * instead of printing a gap. The card's caption stays where the label does not already say it (the largest partner's name).
+ * The group's headline numbers, from its topics' cards. A pick without a card or a latest figure, or whose figure is not
+ * one before the first space, throws, so the build fails instead of printing a gap or half a number in the unit's type.
+ * The card's caption stays where the label does not already say it (`headlineCaption`: the largest partner's name alone).
  */
 export function groupHeadlines(group: GroupId, cards: readonly HubCardModel[], messages: Messages): GroupHeadline[] {
   return GROUP_HEADLINES[group].map(({ page, labelKey }) => {
     const card = cards.find((candidate) => candidate.href === page);
     if (!card?.latest) throw new Error(`No latest figure for the ${group} headline ${page}`);
     const label = labelKey ? message(messages, `groups.headline.${labelKey}`) : card.title;
-    const { value, period, caption } = card.latest;
+    const { value, period } = card.latest;
+    const { figure, unit } = splitValue(value);
+    // A unit that starts with a digit is the rest of a number split at a space (`1 234 ₾`).
+    if (!HEADLINE_FIGURE.test(figure) || /^\d/.test(unit ?? "")) throw new Error(`The ${group} headline ${page} starts with "${figure}", not a figure: "${value}"`);
+    const caption = card.latest.headlineCaption ?? card.latest.caption;
     return { href: page, label, value, period, caption: caption && caption !== label ? caption : null, series: card.series };
   });
 }

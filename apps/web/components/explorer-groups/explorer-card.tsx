@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
-import { useId } from "react";
+import { Fragment, useId } from "react";
+import { splitValue } from "../../lib/explorer/groupHeadlines";
 import type { HubCardModel } from "../../lib/explorer/hubCards";
 import type { RegionSpread } from "../../lib/explorer/regionSpread";
 import { getCommonMessages } from "../../lib/i18n/common.server";
@@ -36,9 +37,9 @@ const SPAN_CLASS: Record<LeadSpan, string> = {
 };
 
 const LEAD_BAND: Record<LeadSpan, string> = {
-  lead3: "mb-6 h-[150px] max-[767px]:h-[130px] min-[1101px]:col-start-2 min-[1101px]:row-[1/span_5] min-[1101px]:mt-1 min-[1101px]:mb-[22px] min-[1101px]:h-auto min-[1101px]:min-h-[160px] min-[1101px]:self-stretch",
-  lead2: "mb-6 h-[150px] max-[767px]:h-[130px] min-[1101px]:col-start-2 min-[1101px]:row-[1/span_5] min-[1101px]:mt-1 min-[1101px]:mb-[22px] min-[1101px]:h-auto min-[1101px]:min-h-[160px] min-[1101px]:self-stretch",
-  lead2x2: "mb-6 h-[220px] max-[767px]:h-[150px]",
+  lead3: "mb-6 h-[150px] max-[768px]:h-[130px] min-[1101px]:col-start-2 min-[1101px]:row-[1/span_5] min-[1101px]:mt-1 min-[1101px]:mb-[22px] min-[1101px]:h-auto min-[1101px]:min-h-[160px] min-[1101px]:self-stretch",
+  lead2: "mb-6 h-[150px] max-[768px]:h-[130px] min-[1101px]:col-start-2 min-[1101px]:row-[1/span_5] min-[1101px]:mt-1 min-[1101px]:mb-[22px] min-[1101px]:h-auto min-[1101px]:min-h-[160px] min-[1101px]:self-stretch",
+  lead2x2: "mb-6 h-[220px] max-[768px]:h-[150px]",
 };
 
 // A split lead card's text column, one child per row, so a missing description or value leaves its row empty instead of shifting the rest up.
@@ -61,11 +62,29 @@ type CardProps = {
   regionCount: number;
 };
 
+/**
+ * A card's value with each figure and each unit kept whole (`3.11 მლრდ აშშ დოლარი`): where they do not fit one line, the unit moves
+ * under its figure, and a spread's range in two units (`548 მლნ ₾ – 49.4 მლრდ ₾`) may break at its dash.
+ */
+function ValueText({ value }: { value: string }) {
+  return value.split(" – ").map((part, index) => {
+    const { figure, unit } = splitValue(part);
+    return (
+      <Fragment key={index}>
+        {index > 0 ? " – " : null}
+        <span data-testid="card-value-figure" className="whitespace-nowrap">{figure}</span>
+        {unit ? <>{" "}<span data-testid="card-value-unit" className="whitespace-nowrap">{unit}</span></> : null}
+      </Fragment>
+    );
+  });
+}
+
 function Band({ card, locale, lead, spread, regionCount }: CardProps) {
   const { graphic, series, seriesColor } = card;
   const onRegionsPage = card.href?.endsWith("/regions") ?? false;
   const flows = graphic?.kind === "pair";
-  const size = lead ? LEAD_BAND[lead] : "h-[58px]";
+  // A spread's lowest name sits in the band's flow, so a long one that wraps makes the band taller.
+  const size = lead ? LEAD_BAND[lead] : !graphic && spread ? "min-h-[58px]" : "h-[58px]";
   const band = ["relative mt-auto", flows ? "flex h-auto min-h-[58px] flex-col justify-end" : `block ${size}`, lead && flows ? "mb-6" : ""].filter(Boolean).join(" ");
 
   return (
@@ -100,7 +119,7 @@ export function ExplorerCard(props: CardProps) {
   // What only the decorative band shows, for assistive technology: the pair's rows, the bars' first and last band, the spread's extremes.
   const detail = card.graphic?.kind === "pair" ? card.graphic.rows.map((row) => `${row.label} ${row.text}`).join(", ")
     : card.graphic?.kind === "bars" ? [card.graphic.first, card.graphic.last].join(", ")
-    : !card.graphic && spread ? [spread.low, spread.high].join(", ")
+    : !card.graphic && spread ? [spread.low, spread.high].map(({ name, value }) => `${name} ${value}`).join(", ")
     : null;
   const described = [value ? ids.value : null, detail ? ids.detail : null, footer ? ids.footer : null].filter(Boolean).join(" ");
   const split = lead !== undefined && lead !== "lead2x2";
@@ -111,7 +130,7 @@ export function ExplorerCard(props: CardProps) {
       <span className={`flex items-center justify-between ${NUMERIC} text-[11px]${row("top")}`}>
         <b aria-hidden className="font-medium text-[var(--accent)]">{card.index}</b>
         {card.comingSoon ? (
-          <span className={`rounded-[2px] border border-[var(--control)] px-1.5 py-px ${NUMERIC} text-[10.5px] text-[var(--muted)] max-[767px]:text-[11px]`}>
+          <span className={`rounded-[2px] border border-[var(--control)] px-1.5 py-px ${NUMERIC} text-[10.5px] text-[var(--muted)] max-[768px]:text-[11px]`}>
             {message(getCommonMessages(locale), "common.comingSoon")}
           </span>
         ) : (
@@ -134,7 +153,7 @@ export function ExplorerCard(props: CardProps) {
       {detail ? <span id={ids.detail} className="sr-only">{detail}</span> : null}
       {value ? (
         <span id={ids.value} className={`flex flex-wrap items-baseline gap-x-2.5 gap-y-0.5${row("value")}`}>
-          <b className={`${NUMERIC} ${lead ? "text-[32px] max-[767px]:text-[26px]" : "text-[20px]"} leading-tight font-semibold tracking-[-0.015em] text-[var(--ink)]`}>{value}</b>
+          <b className={`${NUMERIC} ${lead ? "text-[32px] max-[768px]:text-[26px]" : "text-[20px]"} leading-tight font-semibold tracking-[-0.015em] text-[var(--ink)]`}><ValueText value={value} /></b>
           {caption ? <span className="text-[11.5px] leading-snug text-[var(--muted)]">{caption}</span> : null}
           {spread?.georgiaLabel ? (
             <span className="text-[11.5px] leading-snug text-[var(--muted)] before:mr-1.5 before:inline-block before:h-2.5 before:border-l-[1.5px] before:border-dashed before:border-[var(--accent)] before:align-[-1px] before:content-['']">
@@ -144,14 +163,14 @@ export function ExplorerCard(props: CardProps) {
         </span>
       ) : null}
       {footer ? (
-        <span id={ids.footer} className={`block border-t border-[var(--row-border)] pt-[9px] ${NUMERIC} text-[10.5px] text-[var(--faint)] max-[767px]:text-[11px]${lead ? " mt-4" : ""}${row("footer")}`}>{footer}</span>
+        <span id={ids.footer} className={`block border-t border-[var(--row-border)] pt-[9px] ${NUMERIC} text-[10.5px] text-[var(--faint)] max-[768px]:text-[11px]${lead ? " mt-4" : ""}${row("footer")}`}>{footer}</span>
       ) : null}
     </>
   );
 
   // Every child but the chart band stays in the text column of a split lead card.
   const frame = [
-    "group relative flex min-h-[216px] min-w-0 flex-col gap-2 border border-[var(--hairline)] bg-[var(--tile)] px-[18px] pt-4 pb-[13px] no-underline transition-colors duration-150 max-[767px]:min-h-0 motion-reduce:transition-none",
+    "group relative flex min-h-[216px] min-w-0 flex-col gap-2 border border-[var(--hairline)] bg-[var(--tile)] px-[18px] pt-4 pb-[13px] no-underline transition-colors duration-150 max-[768px]:min-h-0 motion-reduce:transition-none",
     lead ? SPAN_CLASS[lead] : "",
     lead && lead !== "lead2x2" ? "min-[1101px]:[&>*:not([data-testid=explorer-card-graphic])]:col-start-1" : "",
   ].filter(Boolean).join(" ");

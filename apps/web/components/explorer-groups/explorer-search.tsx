@@ -69,7 +69,7 @@ const EMPTY_QUERY_HASH = /(?:^#|&)q=(?:&|$)/;
 
 const NUMERIC = "font-[family-name:var(--font-numeric)]";
 const DISPLAY = "font-[family-name:var(--font-display)]";
-const CHIP_CLASS = "inline-flex min-h-[34px] items-center border border-[var(--hairline)] bg-[var(--paper)] px-[13px] text-[12.5px] text-[var(--ink)] transition-colors duration-150 hover:border-[var(--ink)] hover:bg-[var(--tile)] motion-reduce:transition-none max-[767px]:min-h-11 max-[767px]:flex-none";
+const CHIP_CLASS = "inline-flex min-h-[34px] items-center border border-[var(--hairline)] bg-[var(--paper)] px-[13px] text-[12.5px] text-[var(--ink)] transition-colors duration-150 hover:border-[var(--ink)] hover:bg-[var(--tile)] motion-reduce:transition-none max-[768px]:min-h-11 max-[768px]:flex-none";
 const MARK_CLASS = "bg-transparent text-[var(--accent)]";
 
 const PLACE_FACT_KEYS: Record<PlaceFact["label"], string> = {
@@ -99,21 +99,21 @@ function PlaceCard({ result, locale, messages }: { result: NonNullable<SearchRes
       : message(messages, "allData.place.municipality", { region: typeLabelArgs.region ?? "" });
   return (
     <div data-testid="place-card" className="mt-[26px] border-[1.5px] border-[var(--ink)] bg-[var(--tile)]">
-      <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1.5 border-b border-[var(--hairline)] px-[22px] pt-4 pb-3.5 max-[767px]:px-4">
-        <p className={`flex items-center gap-2.5 ${DISPLAY} text-[30px] leading-[1.15] font-semibold max-[767px]:text-[25px]`}>
+      <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1.5 border-b border-[var(--hairline)] px-[22px] pt-4 pb-3.5 max-[768px]:px-4">
+        <p className={`flex items-center gap-2.5 ${DISPLAY} text-[30px] leading-[1.15] font-semibold max-[768px]:text-[25px]`}>
           <MapPin aria-hidden strokeWidth={1.75} className="size-6 flex-none text-[var(--accent)]" />
           <span>{locale === "en" ? place.nameEn : place.nameKa}</span>
         </p>
         <p className={`${NUMERIC} text-[12px] text-[var(--muted)]`}>{type}</p>
       </div>
-      <div className="grid grid-cols-4 max-[1100px]:grid-cols-2">
+      <div className="grid grid-cols-4 max-[1101px]:grid-cols-2">
         {place.facts.map((fact) => (
           <div
             key={fact.label}
             data-testid="place-fact"
-            className="border-r border-[var(--hairline-soft)] px-[22px] pt-3.5 pb-4 last:border-r-0 max-[1100px]:even:border-r-0 max-[1100px]:nth-[n+3]:border-t max-[767px]:px-4"
+            className="border-r border-[var(--hairline-soft)] px-[22px] pt-3.5 pb-4 last:border-r-0 max-[1101px]:even:border-r-0 max-[1101px]:nth-[n+3]:border-t max-[768px]:px-4"
           >
-            <b className={`block ${NUMERIC} text-[23px] leading-[1.2] font-semibold tracking-[-0.015em] max-[767px]:text-[19px]`}>{fact.value}</b>
+            <b className={`block ${NUMERIC} text-[23px] leading-[1.2] font-semibold tracking-[-0.015em] max-[768px]:text-[19px]`}>{fact.value}</b>
             <span className="mt-1 block text-[12.5px] leading-[1.35] text-[var(--body)]">{message(messages, PLACE_FACT_KEYS[fact.label])}</span>
             <em className={`mt-0.5 block ${NUMERIC} text-[10.5px] text-[var(--faint)] not-italic`}>{fact.period}</em>
           </div>
@@ -143,14 +143,14 @@ function ShortcutOption({ shortcut, option, active, onHover, locale, messages }:
       tabIndex={-1}
       data-testid="search-shortcut"
       onMouseEnter={onHover}
-      className={`mt-5 grid min-h-16 grid-cols-[22px_minmax(0,1fr)_auto_18px] items-center gap-3.5 border border-[var(--ink)] px-[18px] py-3 text-[var(--ink)] no-underline hover:bg-[var(--tint)] max-[767px]:grid-cols-[22px_minmax(0,1fr)_18px] ${active ? "bg-[var(--tint)] shadow-[inset_3px_0_0_var(--accent)]" : "bg-[var(--tile)]"}`}
+      className={`mt-5 grid min-h-16 grid-cols-[22px_minmax(0,1fr)_auto_18px] items-center gap-3.5 border border-[var(--ink)] px-[18px] py-3 text-[var(--ink)] no-underline hover:bg-[var(--tint)] max-[768px]:grid-cols-[22px_minmax(0,1fr)_18px] ${active ? "bg-[var(--tint)] shadow-[inset_3px_0_0_var(--accent)]" : "bg-[var(--tile)]"}`}
     >
       <Icon aria-hidden strokeWidth={1.75} className="size-[18px] text-[var(--accent)]" />
       <span className="min-w-0">
         <b className={`block ${DISPLAY} text-[19px] leading-[1.25] font-semibold`}>{name}</b>
         <span className="block text-[12px] text-[var(--muted)]">{kind}</span>
       </span>
-      <span className={`${NUMERIC} text-[12px] text-[var(--muted)] max-[767px]:hidden`}>{count}</span>
+      <span className={`${NUMERIC} text-[12px] text-[var(--muted)] max-[768px]:hidden`}>{count}</span>
       <ChevronRight aria-hidden strokeWidth={1.75} className="size-[18px] text-[var(--ink)]" />
     </Link>
   );
@@ -173,7 +173,7 @@ function RowOption({ row, place, option, active, onHover, locale }: OptionProps 
       tabIndex={-1}
       data-testid="search-result"
       onMouseEnter={onHover}
-      className={`group grid min-h-[60px] grid-cols-[20px_minmax(0,1fr)_88px_minmax(110px,auto)_18px] items-center gap-4 border-b border-[var(--row-border)] px-3 py-[9px] text-[var(--ink)] no-underline hover:bg-[var(--tint)] max-[1100px]:grid-cols-[20px_minmax(0,1fr)_minmax(96px,auto)_18px] max-[767px]:grid-cols-[18px_minmax(0,1fr)_auto] max-[767px]:gap-3 max-[767px]:px-2 max-[767px]:py-2.5 ${active ? "bg-[var(--tint)] shadow-[inset_3px_0_0_var(--accent)]" : ""}`}
+      className={`group grid min-h-[60px] grid-cols-[20px_minmax(0,1fr)_88px_minmax(110px,auto)_18px] items-center gap-4 border-b border-[var(--row-border)] px-3 py-[9px] text-[var(--ink)] no-underline hover:bg-[var(--tint)] max-[1101px]:grid-cols-[20px_minmax(0,1fr)_minmax(96px,auto)_18px] max-[768px]:grid-cols-[18px_minmax(0,1fr)_auto] max-[768px]:gap-3 max-[768px]:px-2 max-[768px]:py-2.5 ${active ? "bg-[var(--tint)] shadow-[inset_3px_0_0_var(--accent)]" : ""}`}
     >
       <Icon aria-hidden strokeWidth={1.75} className="size-[18px] text-[var(--muted)]" />
       <span className="min-w-0">
@@ -186,14 +186,14 @@ function RowOption({ row, place, option, active, onHover, locale }: OptionProps 
           <span lang={locale === "ka" ? "en" : "ka"}><Marked segments={row.mirror} markClass={`${MARK_CLASS} font-semibold`} /></span>
         </span>
       </span>
-      <span aria-hidden className="max-[1100px]:hidden [&>svg]:mt-0">
+      <span aria-hidden className="max-[1101px]:hidden [&>svg]:mt-0">
         {!place && page.spark ? <Sparkline values={page.spark} color="var(--ink)" width={88} height={22} /> : null}
       </span>
-      <span className={`text-right ${NUMERIC} text-[13px] font-semibold whitespace-nowrap max-[767px]:max-w-[110px] max-[767px]:text-[12.5px] max-[767px]:whitespace-normal`}>
+      <span className={`text-right ${NUMERIC} text-[13px] font-semibold whitespace-nowrap max-[768px]:max-w-[110px] max-[768px]:text-[12.5px] max-[768px]:whitespace-normal`}>
         {row.value}
         {row.value ? <em className={`block text-[10.5px] font-normal not-italic ${muted}`}>{row.period}</em> : null}
       </span>
-      <ChevronRight aria-hidden strokeWidth={1.75} className={`size-4 max-[767px]:hidden ${active ? "text-[var(--accent)]" : "text-[var(--faint)] opacity-0"}`} />
+      <ChevronRight aria-hidden strokeWidth={1.75} className={`size-4 max-[768px]:hidden ${active ? "text-[var(--accent)]" : "text-[var(--faint)] opacity-0"}`} />
     </Link>
   );
 }
@@ -266,9 +266,10 @@ export function ExplorerSearch({ locale, pages, shortcuts, children }: ExplorerS
     if (event.key === "ArrowDown" || event.key === "ArrowUp") {
       event.preventDefault();
       if (total) setActive(event.key === "ArrowDown" ? (current + 1) % total : current <= 0 ? total - 1 : current - 1);
-    } else if (event.key === "Enter" && current >= 0) {
+    } else if (event.key === "Enter" && total) {
+      // With no option highlighted, Enter opens the first.
       event.preventDefault();
-      router.push(pageHref(options[current].href, locale));
+      router.push(pageHref(options[Math.max(current, 0)].href, locale));
     } else if (event.key === "Escape" && query) {
       event.preventDefault();
       setQuery("");
@@ -285,10 +286,10 @@ export function ExplorerSearch({ locale, pages, shortcuts, children }: ExplorerS
 
   return (
     <>
-      <div role="search" data-testid="all-data-search" className="mt-7 max-[767px]:mt-5">
+      <div role="search" data-testid="all-data-search" className="mt-7 max-[768px]:mt-5">
         <label htmlFor={EXPLORER_SEARCH_INPUT_ID} className="sr-only">{message(messages, "allData.label")}</label>
         {/* The box draws the focus ring, so the input drops the site's own (an unlayered rule, hence the `!`). */}
-        <div className="flex h-[66px] items-center gap-3.5 border-[1.5px] border-[var(--ink)] bg-[var(--tile)] pr-2.5 pl-[22px] focus-within:outline-2 focus-within:outline-offset-[3px] focus-within:outline-[var(--accent)] max-[767px]:h-14 max-[767px]:gap-2.5 max-[767px]:pr-1 max-[767px]:pl-3.5">
+        <div className="flex h-[66px] items-center gap-3.5 border-[1.5px] border-[var(--ink)] bg-[var(--tile)] pr-2.5 pl-[22px] focus-within:outline-2 focus-within:outline-offset-[3px] focus-within:outline-[var(--accent)] max-[768px]:h-14 max-[768px]:gap-2.5 max-[768px]:pr-1 max-[768px]:pl-3.5">
           <Search aria-hidden strokeWidth={1.75} className="size-[22px] flex-none" />
           <input
             ref={input}
@@ -305,7 +306,7 @@ export function ExplorerSearch({ locale, pages, shortcuts, children }: ExplorerS
             value={query}
             onChange={(event) => setQuery(event.target.value)}
             onKeyDown={onKeyDown}
-            className="h-full min-w-0 flex-1 border-0 bg-transparent p-0 font-[family-name:var(--font-ui)] text-[19px] text-[var(--ink)] outline-none placeholder:text-[var(--faint)] focus-visible:outline-none! max-[767px]:text-[16.5px]"
+            className="h-full min-w-0 flex-1 border-0 bg-transparent p-0 font-[family-name:var(--font-ui)] text-[19px] text-[var(--ink)] outline-none placeholder:text-[var(--faint)] focus-visible:outline-none! max-[768px]:text-[16.5px]"
           />
           {query ? (
             <>
@@ -320,10 +321,10 @@ export function ExplorerSearch({ locale, pages, shortcuts, children }: ExplorerS
               </button>
             </>
           ) : (
-            <kbd aria-hidden className={`mr-3 border border-[var(--hairline)] bg-[var(--paper)] px-2 ${NUMERIC} text-[12px] leading-6 text-[var(--muted)] max-[767px]:hidden`}>/</kbd>
+            <kbd aria-hidden className={`mr-3 border border-[var(--hairline)] bg-[var(--paper)] px-2 ${NUMERIC} text-[12px] leading-6 text-[var(--muted)] max-[768px]:hidden`}>/</kbd>
           )}
         </div>
-        <div className="mt-3 flex flex-wrap items-center gap-2 text-[12.5px] text-[var(--muted)] [scrollbar-width:none] max-[767px]:-mx-5 max-[767px]:flex-nowrap max-[767px]:overflow-x-auto max-[767px]:px-5 max-[767px]:pb-0.5">
+        <div className="mt-3 flex flex-wrap items-center gap-2 text-[12.5px] text-[var(--muted)] [scrollbar-width:none] max-[768px]:-mx-5 max-[768px]:flex-nowrap max-[768px]:overflow-x-auto max-[768px]:px-5 max-[768px]:pb-0.5">
           <span className="flex-none">{message(messages, "allData.try")}</span>
           {[1, 2, 3, 4, 5].map((n) => {
             const word = message(messages, `allData.chip.${n}`);

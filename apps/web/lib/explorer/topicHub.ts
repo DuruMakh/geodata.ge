@@ -2,7 +2,13 @@ import type { TopicId } from "../navigation/navTree";
 import type { HubCardModel } from "./hubCards";
 
 /** A card's latest figure: the one its footer prints, with its period as the page writes it (`2025`, `2025/26`, `სექ 2026`). */
-export type CardLatest = { value: string; period: string; caption?: string };
+export type CardLatest = {
+  value: string;
+  period: string;
+  caption?: string;
+  /** What a group headline shows in place of `caption`, whose label already says the rest: the largest partner's name alone. */
+  headlineCaption?: string;
+};
 
 /** A card's own graphic, in place of the sparkline: Unemployment's age bands, or two or three bars side by side. */
 export type CardGraphic =

@@ -57,6 +57,24 @@ test.describe("the sidebar at 1440px", () => {
     await page.mouse.move(1000, 450);
     await expect(society).toHaveCount(0);
 
+    // Hover intent: crossing another group's rail icon on the way into a pop-out, or leaving it for a moment, keeps it open.
+    const labourIcon = (await page.getByTestId("group-link-labour").boundingBox())!;
+    const livingIcon = (await page.getByTestId("group-link-living").boundingBox())!;
+    await page.mouse.move(labourIcon.x + labourIcon.width / 2, labourIcon.y + labourIcon.height / 2);
+    const labour = page.getByTestId("group-panel-labour");
+    await expect(labour).toBeVisible();
+    await page.mouse.move(livingIcon.x + livingIcon.width / 2, livingIcon.y + livingIcon.height / 2);
+    await page.mouse.move(200, livingIcon.y + 120);
+    await page.waitForTimeout(300);
+    await expect(labour).toBeVisible();
+    await expect(page.getByTestId("group-panel-living")).toHaveCount(0);
+    await page.mouse.move(1000, 450);
+    await page.mouse.move(200, livingIcon.y + 120);
+    await page.waitForTimeout(300);
+    await expect(labour).toBeVisible();
+    await page.mouse.move(1000, 450);
+    await expect(labour).toHaveCount(0);
+
     // Keyboard: focus on a rail icon opens its pop-out, and Escape closes it with focus kept on the icon.
     await page.getByTestId("all-data-link").focus();
     await page.keyboard.press("Tab");
@@ -245,8 +263,12 @@ for (const prefix of PREFIXES) {
   });
 }
 
+/** Each element of `testId` inside `root` that breaks across lines: its text, for the failure message. */
+const broken = (root: Locator, testId: string) => root.getByTestId(testId).evaluateAll((elements) =>
+  elements.filter((element) => element.getClientRects().length > 1).map((element) => element.textContent));
+
 for (const viewport of [{ width: 1440, height: 900 }, { width: 1024, height: 768 }]) {
-  test(`at ${viewport.width}px no topic link is cut off, and no value parts from its unit`, async ({ page }) => {
+  test(`at ${viewport.width}px the topic links are one pinned row that scrolls, and no value parts from its unit`, async ({ page }) => {
     await page.setViewportSize(viewport);
     for (const prefix of PREFIXES) {
       for (const group of NAV_GROUPS) {
@@ -267,32 +289,122 @@ for (const viewport of [{ width: 1440, height: 900 }, { width: 1024, height: 768
           expect(parts.unit.lines, parts.text!).toBe(1);
           expect(Math.abs(parts.unit.bottom - parts.figure!.bottom), parts.text!).toBeLessThan(6);
         }
-        // Bar values on the cards stay whole.
+        // Card values and bar values stay whole: a figure and its unit never break inside themselves.
+        const content = page.locator("#content");
+        expect(await broken(content, "card-value-figure"), group.id).toEqual([]);
+        expect(await broken(content, "card-value-unit"), group.id).toEqual([]);
         for (const value of await page.getByTestId("card-pair-value").all()) {
           expect(await value.evaluate((element) => element.getClientRects().length), (await value.textContent()) ?? "").toBe(1);
           expect((await value.boundingBox())!.height).toBeLessThan(20);
         }
         if (group.topics.length < 2) continue;
-        // The topic links wrap instead of running off the edge, and stay sticky.
+        // One row, pinned, no taller than one line of links, that scrolls sideways to every link.
         const row = page.getByTestId("group-topic-links");
-        const fit = await row.evaluate((element) => ({ scroll: element.scrollWidth, client: element.clientWidth, position: getComputedStyle(element).position }));
-        expect(fit.scroll, group.id).toBeLessThanOrEqual(fit.client);
-        expect(fit.position).toBe("sticky");
+        expect(await page.getByTestId("group-topic-row").evaluate((element) => getComputedStyle(element).position)).toBe("sticky");
         const rowBox = (await row.boundingBox())!;
-        for (const link of await page.getByTestId("group-topic-link").all()) {
+        expect(rowBox.height, group.id).toBeLessThanOrEqual(70);
+        const links = page.getByTestId("group-topic-link");
+        const tops = await links.evaluateAll((elements) => elements.map((element) => Math.round(element.getBoundingClientRect().top)));
+        expect(new Set(tops).size, group.id).toBe(1);
+        for (const link of await links.all()) {
+          await link.evaluate((element) => element.scrollIntoView({ block: "nearest", inline: "nearest" }));
           const box = (await link.boundingBox())!;
-          expect(box.x).toBeGreaterThanOrEqual(rowBox.x - 0.5);
-          expect(box.x + box.width).toBeLessThanOrEqual(rowBox.x + rowBox.width + 0.5);
+          expect(box.x, (await link.textContent()) ?? "").toBeGreaterThanOrEqual(rowBox.x - 0.5);
+          expect(box.x + box.width, (await link.textContent()) ?? "").toBeLessThanOrEqual(rowBox.x + rowBox.width + 0.5);
         }
-        // With the links on several rows, a topic link still lands its section below them.
+        // A topic link lands its section below the row.
         const last = group.topics.at(-1)!;
-        await page.getByTestId("group-topic-link").last().click();
+        await links.last().click();
         const section = page.locator(`#t-${last}`);
         await expect(section).toBeInViewport();
         await expect.poll(async () => {
           const bar = (await row.boundingBox())!;
           return Math.round((await section.boundingBox())!.y) - Math.floor(bar.y + bar.height);
         }).toBeGreaterThanOrEqual(-1);
+      }
+    }
+  });
+
+  test(`at ${viewport.width}px a #t-transport address lands the Transport heading below the row and its link in the row`, async ({ page }) => {
+    await page.setViewportSize(viewport);
+    const chartPage = topicHub("transport").sections[0].href;
+    for (const prefix of PREFIXES) {
+      const landed = async () => {
+        await ready(page);
+        const bar = (await page.getByTestId("group-topic-links").boundingBox())!;
+        await expect.poll(async () => Math.round((await page.locator("#th-transport").boundingBox())!.y)).toBeGreaterThanOrEqual(Math.ceil(bar.y + bar.height));
+        await expect(page.locator("#th-transport")).toBeInViewport();
+        const link = (await page.getByTestId("group-topic-link").and(page.locator('[href="#t-transport"]')).boundingBox())!;
+        expect(link.x).toBeGreaterThanOrEqual(bar.x - 0.5);
+        expect(link.x + link.width).toBeLessThanOrEqual(bar.x + bar.width + 0.5);
+      };
+      // Typed or followed from outside the site.
+      await page.goto(`${prefix}/explorer/society#t-transport`);
+      await landed();
+      // A Transport chart page's crumb (R8).
+      await page.goto(`${prefix}${chartPage}`);
+      await ready(page);
+      await page.getByTestId("explorer-header").locator(`a[href="${prefix}/explorer/society#t-transport"]`).first().click();
+      await expect.poll(() => address(page)).toBe(`${prefix}/explorer/society#t-transport`);
+      await landed();
+    }
+  });
+}
+
+for (const viewport of [{ width: 1024, height: 768 }, { width: 1440, height: 900 }]) {
+  test(`at ${viewport.width}px Society's pinned topic row, with a scrollbar that takes room, is no taller than 70px`, async ({ playwright, browserName, channel, launchOptions, baseURL }) => {
+    // Headless Chromium hides scrollbars; Windows and Linux desktops draw the thin one under the links.
+    const browser = await playwright[browserName].launch({ ...launchOptions, channel, ignoreDefaultArgs: ["--hide-scrollbars"] });
+    try {
+      const page = await browser.newPage({ baseURL, viewport });
+      for (const prefix of PREFIXES) {
+        await page.goto(`${prefix}/explorer/society`);
+        await ready(page);
+        const row = page.getByTestId("group-topic-links");
+        expect(await row.evaluate((element) => (element as HTMLElement).offsetHeight - element.clientHeight), "the scrollbar is drawn").toBeGreaterThan(1);
+        await page.evaluate(() => window.scrollTo(0, 2000));
+        await expect.poll(async () => (await row.boundingBox())!.y).toBe(0);
+        expect((await row.boundingBox())!.height, prefix || "ka").toBeLessThanOrEqual(70);
+      }
+    } finally {
+      await browser.close();
+    }
+  });
+}
+
+test("at 1024px the Society row fades the edge with more links beyond it, and below 900px it shows no fade", async ({ page }) => {
+  await page.setViewportSize({ width: 1024, height: 768 });
+  await page.goto("/explorer/society");
+  await ready(page);
+  const opacity = (edge: "start" | "end") => page.getByTestId(`group-topic-fade-${edge}`).evaluate((element) => getComputedStyle(element).opacity);
+  const row = page.getByTestId("group-topic-links");
+  expect(await row.evaluate((element) => element.scrollWidth > element.clientWidth)).toBe(true);
+  await expect.poll(() => opacity("end")).toBe("1");
+  expect(await opacity("start")).toBe("0");
+  await row.evaluate((element) => { element.scrollLeft = element.scrollWidth; });
+  await expect.poll(() => opacity("start")).toBe("1");
+  await expect.poll(() => opacity("end")).toBe("0");
+  await page.setViewportSize({ width: 375, height: 812 });
+  await expect(page.getByTestId("group-topic-fade-start")).toBeHidden();
+  await expect(page.getByTestId("group-topic-fade-end")).toBeHidden();
+});
+
+for (const width of [1101, 1150, 1280]) {
+  test(`at ${width}px no group page scrolls sideways, and each region spread's names stay in their card`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 900 });
+    for (const prefix of PREFIXES) {
+      for (const group of NAV_GROUPS) {
+        await page.goto(`${prefix}${group.href}`);
+        await ready(page);
+        await page.evaluate(() => document.fonts.ready);
+        const fit = await page.evaluate(() => ({ scroll: document.documentElement.scrollWidth, inner: window.innerWidth }));
+        expect(fit.scroll, `${prefix}${group.href}`).toBeLessThanOrEqual(fit.inner);
+        const outside = await page.locator("[data-testid=region-spread-low], [data-testid=region-spread-high]").evaluateAll((labels) => labels.flatMap((label) => {
+          const card = label.closest("[data-testid=explorer-card]")!.getBoundingClientRect();
+          const box = label.getBoundingClientRect();
+          return box.left < card.left || box.right > card.right ? [label.textContent] : [];
+        }));
+        expect(outside, `${prefix}${group.href}`).toEqual([]);
       }
     }
   });
@@ -394,6 +506,20 @@ test.describe("All data", () => {
     await search(page).fill("xelfasebi");
     await expect(page.getByTestId("search-reading")).toContainText("ხელფასები");
     await expect(page.getByTestId("search-result").and(page.locator('[href="/explorer/wages/overview"]'))).toHaveCount(1);
+  });
+
+  test("Enter with results but nothing highlighted opens the first result", async ({ page }) => {
+    for (const prefix of PREFIXES) {
+      await page.goto(`${prefix}/explorer`);
+      await ready(page);
+      await search(page).fill(prefix ? "inflation" : "ინფლაცია");
+      const first = page.getByRole("option").first();
+      await expect(first).toBeVisible();
+      await expect(search(page)).not.toHaveAttribute("aria-activedescendant");
+      const href = (await first.getAttribute("href"))!;
+      await search(page).press("Enter");
+      await expect.poll(() => address(page)).toBe(href);
+    }
   });
 
   test("ბათუმი shows the place card and Enter opens its first row", async ({ page }) => {

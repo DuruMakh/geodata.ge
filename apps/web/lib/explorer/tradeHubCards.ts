@@ -38,7 +38,7 @@ export function buildTradeHubCards(facts: readonly ClientTradeOverviewFact[], pr
     if (!partners) return null;
     const model = buildTradePartnersModel(partners, DEFAULT_TRADE_PARTNERS_STATE, presentation);
     const top = model.ranking[0];
-    return top ? { value: `${formatInUnit(top.valueUsd, model.unit)} ${model.unit.label}`, period: String(model.range.end), caption: message(presentation.messages, "groups.caption.largest", { name: top.label }) } : null;
+    return top ? { value: `${formatInUnit(top.valueUsd, model.unit)} ${model.unit.label}`, period: String(model.range.end), caption: message(presentation.messages, "groups.caption.largest", { name: top.label }), headlineCaption: top.label } : null;
   };
   const cards: Omit<HubCardModel, "index">[] = [
     { title: message(presentation.messages, "trade.title"), description: message(presentation.messages, "trade.summary"), href: "/explorer/trade/overview", comingSoon: false, series: years.map(year => turnover.get(year) ?? null), seriesColor: INK, footer: `${min}–${max} · ${message(presentation.messages, "trade.annual")}`, latest: figure(facts, "trade.turnover", max), years: coverageRange(min, max) },
