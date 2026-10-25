@@ -10,6 +10,8 @@ import { AgeingChapter, ageingNotes, type AgeingLabels } from "./chapters/ageing
 import { AiSection, type AiLabels } from "./chapters/ai-section";
 import { BIRTH_CLASSES } from "./chapters/canvas";
 import { Chapter } from "./chapters/chapter";
+import { billions } from "./chapters/chart-format";
+import { yearRange } from "./chapters/chart-layout";
 import { DeficitChart, type DeficitLabels } from "./chapters/deficit-chart";
 import { JobsChapter, type JobsLabels } from "./chapters/jobs-chapter";
 import { MunicipalRelief, type MunicipalLabels } from "./chapters/municipal-relief";
@@ -17,6 +19,7 @@ import { RevenueChart, type RevenueLabels } from "./chapters/revenue-chart";
 import { ScaleChapter, type ScaleLabels } from "./chapters/scale-chapter";
 import { SourcesSection, type SourcesLabels } from "./chapters/sources-section";
 import { SpendingChapter, type SpendingLabels } from "./chapters/spending-chapter";
+import { TradeChapter, tradeNotes, type TradeLabels } from "./chapters/trade-chapter";
 import { WagesChapter, wagesNotes, type WagesLabels } from "./chapters/wages-chapter";
 import { HeroReliefLazy } from "./hero-relief-lazy";
 
@@ -235,6 +238,37 @@ export function LandingPage({ chapters, gdpFigure, presentation, updatedAt, mcpE
     ratio: { label: t("landing.wages.ratio.label"), note: wageText.ratio },
     publicSector: { label: t("landing.wages.public.label"), note: wageText.publicSector },
   };
+  const { trade } = chapters;
+  const tradeText = tradeNotes(trade, t);
+  const tradeUnit = t("landing.trade.unit");
+  const tradeRange = yearRange(trade.years[0], trade.years[trade.years.length - 1]);
+  const tradeLabels: TradeLabels = {
+    butterfly: {
+      title: t("landing.trade.partners.title", { count: trade.partners.length, year: trade.year }),
+      exports: t("landing.trade.exports"),
+      imports: t("landing.trade.imports"),
+      balance: t("landing.trade.balanceName"),
+      turnover: t("landing.trade.turnoverName"),
+      unit: tradeUnit,
+      exportsHead: t("landing.trade.partners.exportsHead"),
+      importsHead: t("landing.trade.partners.importsHead"),
+      chartSummary: t("landing.trade.partners.chartSummary", { count: trade.partners.length, year: trade.year }),
+      unavailable,
+    },
+    lines: {
+      title: t("landing.trade.lines.title", { range: tradeRange }),
+      exports: t("landing.trade.exports"),
+      imports: t("landing.trade.imports"),
+      balance: t("landing.trade.balanceName"),
+      deficit: t("landing.trade.deficit"),
+      unit: tradeUnit,
+      chartSummary: t("landing.trade.lines.chartSummary", { range: tradeRange, year: trade.year, exports: billions(trade.exportsUsd, 1), imports: billions(trade.importsUsd, 1) }),
+      unavailable,
+    },
+    turnover: { label: t("landing.trade.turnover.label"), note: tradeText.turnover },
+    balance: { label: t("landing.trade.balance.label"), note: tradeText.balance },
+    product: { label: t("landing.trade.product.label"), note: tradeText.product },
+  };
   const collections = chapters.sources.rows.length;
   const sourcesLabels: SourcesLabels = {
     title: t("landing.sources.title"),
@@ -357,6 +391,9 @@ export function LandingPage({ chapters, gdpFigure, presentation, updatedAt, mcpE
           </Chapter>
           <Chapter id="ch-08" link={chapterLink(8, "/explorer/wages")} title={t("landing.ch8.title")} lede={chapters.sentences.wageGap}>
             <WagesChapter data={wageGap} labels={wagesLabels} />
+          </Chapter>
+          <Chapter id="ch-09" link={chapterLink(9, "/explorer/trade")} title={t("landing.ch9.title")} lede={chapters.sentences.trade}>
+            <TradeChapter data={trade} labels={tradeLabels} />
           </Chapter>
           <SourcesSection sources={chapters.sources} labels={sourcesLabels} locale={locale} />
           <AiSection endpoint={mcpEndpoint} tools={chapters.tools} labels={aiLabels} locale={locale} />

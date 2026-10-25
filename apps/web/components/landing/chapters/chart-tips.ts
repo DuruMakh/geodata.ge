@@ -1,11 +1,11 @@
 import { formatInUnit, formatPerResidentGel, formatPoints, formatShare, MISSING, UNIT_PERSONS } from "../../../lib/explorer/format";
 import type { Locale } from "../../../lib/i18n/types";
-import type { AgeingChapter, DeficitChapter, LabourSplit, MunicipalChapter, ReliefPlace, RevenueSeries, WageGapChapter, YouthJobsChapter } from "../../../lib/landing/chapters/types";
-import { birthsColor, birthsPer100, MIGRATION_COLORS, SEX_COLORS } from "./canvas";
-import { money, points, signedCount } from "./chart-format";
+import type { AgeingChapter, DeficitChapter, LabourSplit, MunicipalChapter, ReliefPlace, RevenueSeries, TradeChapter, WageGapChapter, YouthJobsChapter } from "../../../lib/landing/chapters/types";
+import { birthsColor, birthsPer100, MIGRATION_COLORS, SEX_COLORS, TRADE_COLORS } from "./canvas";
+import { billions, money, points, signedBillions, signedCount } from "./chart-format";
 import type { TipData } from "./chart-tip";
 
-// Tooltip content of the revenue, deficit, municipal relief, ageing, youth jobs and wages charts, kept apart from the engines so it can be tested.
+// Tooltip content of the revenue, deficit, municipal relief, ageing, youth jobs, wages and trade charts, kept apart from the engines so it can be tested.
 
 /** Year with a planned suffix when the year's value is planned: "2025 (გეგმა)". */
 export function plannedYearText(data: Pick<RevenueSeries, "years" | "planned">, i: number, planned: string): string {
@@ -215,5 +215,45 @@ export function wageTip(
       { key: "var(--ink)", val: gel(average), name: labels.average },
     ],
     foot: labels.foot.replace("{pct}", formatInUnit((women / men) * 100, { ...UNIT_PERSONS, decimals: 1 })),
+  };
+}
+
+/**
+ * Partners chart tooltip for partner index `i`: exports, imports and the signed balance in billions of dollars (the
+ * year is in the title), and the turnover in the foot.
+ */
+export function tradePartnerTip(
+  partners: TradeChapter["partners"],
+  year: number,
+  labels: { exports: string; imports: string; balance: string; turnover: string; unit: string },
+  i: number,
+): TipData {
+  const { label, exportsUsd, importsUsd, turnoverUsd } = partners[i];
+  return {
+    title: `${label}, ${year}`,
+    rows: [
+      { key: TRADE_COLORS.exports, val: `${billions(exportsUsd, 2)} ${labels.unit}`, name: labels.exports },
+      { key: TRADE_COLORS.imports, val: `${billions(importsUsd, 2)} ${labels.unit}`, name: labels.imports },
+      { val: `${signedBillions(exportsUsd - importsUsd, 2)} ${labels.unit}`, name: labels.balance },
+    ],
+    foot: `${labels.turnover} — ${billions(turnoverUsd, 2)} ${labels.unit}`,
+  };
+}
+
+/** Trade lines tooltip for year index `i`: exports and imports in billions of dollars, the larger first, and the signed balance in the foot. */
+export function tradeLineTip(
+  data: Pick<TradeChapter, "years" | "exports" | "imports">,
+  labels: { exports: string; imports: string; balance: string; unit: string },
+  i: number,
+): TipData {
+  const [exportsUsd, importsUsd] = [data.exports[i], data.imports[i]];
+  const rows = [
+    { usd: exportsUsd, key: TRADE_COLORS.exports, name: labels.exports },
+    { usd: importsUsd, key: TRADE_COLORS.imports, name: labels.imports },
+  ].sort((a, b) => b.usd - a.usd);
+  return {
+    title: String(data.years[i]),
+    rows: rows.map((row) => ({ key: row.key, val: `${billions(row.usd, 1)} ${labels.unit}`, name: row.name })),
+    foot: `${labels.balance}: ${signedBillions(exportsUsd - importsUsd, 1)} ${labels.unit}`,
   };
 }

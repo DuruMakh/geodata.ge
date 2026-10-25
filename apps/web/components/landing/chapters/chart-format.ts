@@ -20,3 +20,12 @@ export function labourCount(thousands: number, l: { thousand: string; million: s
   if (thousands >= 999.5) return `${formatInUnit(thousands, { divisor: 1000, label: "", decimals: 2 })} ${l.million}`;
   return `${formatInUnit(thousands, UNIT_PERSONS)} ${l.thousand}`;
 }
+
+/** A number with en-US grouping and exactly `places` decimals: "2,165", "13.5". */
+export const decimals = (value: number, places: number) => formatInUnit(value, { ...UNIT_PERSONS, decimals: places });
+
+/** US dollars in billions with `places` decimals, no unit: "25.9", "−11.4", "0.38". */
+export const billions = (usd: number, places: number) => formatInUnit(usd, { divisor: 1_000_000_000, label: "", decimals: places });
+
+/** US dollars in billions with its sign: "+1.49", "−2.45". */
+export const signedBillions = (usd: number, places: number) => formatPoints(usd / 1_000_000_000, true, places);

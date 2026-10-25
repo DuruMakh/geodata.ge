@@ -124,6 +124,35 @@ export function largestWageGap<T extends { women: number; men: number }>(sectors
   return sectors.reduce((best, sector) => (Math.abs(sector.women - sector.men) > Math.abs(best.women - best.men) ? sector : best));
 }
 
+/** Below this width the partners chart narrows the column between the bars that holds the country names. */
+export const TRADE_NARROW_WIDTH = 560;
+
+/** Top of the partners chart's axis, in billions: the next whole billion above the largest one-way flow (2.79 gives 3, 3 gives 4). */
+export function partnersAxisTop(maxBillions: number): number {
+  return Math.floor(maxBillions) + 1;
+}
+
+/** Indices of the years named under the trade lines' axis: the first year and every tenth year after it. */
+export function tradeYearTicks(years: readonly number[]): number[] {
+  return years.flatMap((year, i) => ((year - years[0]) % 10 === 0 ? [i] : []));
+}
+
+/** Index of the year in which imports exceed exports by the most, -1 when they never do. */
+export function widestDeficitIndex(exports: readonly number[], imports: readonly number[]): number {
+  let widest = -1;
+  let gap = 0;
+  imports.forEach((value, i) => {
+    if (value - exports[i] > gap) {
+      gap = value - exports[i];
+      widest = i;
+    }
+  });
+  return widest;
+}
+
+/** US dollars in billions. */
+export const toBillions = (usd: number) => usd / 1_000_000_000;
+
 /** "2004" for a single year, "2004–2007" for a range. */
 export function yearRange(first: number, last: number): string {
   return first === last ? String(first) : `${first}–${last}`;

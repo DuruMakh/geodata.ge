@@ -91,6 +91,9 @@ export const BIRTH_CLASSES = [
   { below: Infinity, color: "#1e7f86" },
 ] as const;
 
+// Chapter 09 colours, fixed by the homepage plan: what Georgia sells and what it buys.
+export const TRADE_COLORS = { exports: "#1f6e56", imports: "#3a332a" };
+
 /** Births per 100 deaths of one place's figures. */
 export const birthsPer100 = (entry: { births: number; deaths: number }) => (entry.births / entry.deaths) * 100;
 

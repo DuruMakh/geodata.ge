@@ -6,6 +6,7 @@ import {
   dumbbellHeight,
   fiveYearIndices,
   largestWageGap,
+  partnersAxisTop,
   plannedRuns,
   plannedSpan,
   pointIndexAt,
@@ -13,8 +14,10 @@ import {
   regionsHeight,
   revenuePads,
   slotIndexAt,
+  tradeYearTicks,
   valueY,
   wagesAxisTop,
+  widestDeficitIndex,
   yearLabelIndices,
   yearRange,
 } from "../../../components/landing/chapters/chart-layout";
@@ -173,5 +176,36 @@ describe("largestWageGap", () => {
 
   it("fails without sectors", () => {
     expect(() => largestWageGap([])).toThrow("Wages chapter: no sectors");
+  });
+});
+
+describe("partnersAxisTop", () => {
+  it("is the next whole billion above the largest one-way flow, also for an exact billion", () => {
+    expect(partnersAxisTop(2.79)).toBe(3);
+    expect(partnersAxisTop(0.4)).toBe(1);
+    expect(partnersAxisTop(3)).toBe(4);
+  });
+});
+
+describe("tradeYearTicks", () => {
+  it("labels the first year and every tenth year after it", () => {
+    const years = Array.from({ length: 31 }, (_, i) => 1995 + i);
+    expect(tradeYearTicks(years).map((i) => years[i])).toEqual([1995, 2005, 2015, 2025]);
+  });
+
+  it("follows the years that exist, not their count", () => {
+    expect(tradeYearTicks([2000, 2005, 2010, 2012])).toEqual([0, 2]);
+    expect(tradeYearTicks([])).toEqual([]);
+  });
+});
+
+describe("widestDeficitIndex", () => {
+  it("is the year in which imports exceed exports by the most", () => {
+    expect(widestDeficitIndex([1, 2, 7], [3, 9, 18])).toBe(2);
+    expect(widestDeficitIndex([1, 2, 7], [3, 15, 9])).toBe(1);
+  });
+
+  it("is -1 when imports never exceed exports", () => {
+    expect(widestDeficitIndex([4, 5], [4, 3])).toBe(-1);
   });
 });

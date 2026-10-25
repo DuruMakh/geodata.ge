@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { birthsTip, deficitTip, migrationTip, plannedYearText, pyramidTip, regionTip, reliefTip, revenueTip, waffleTip, wageTip } from "../../../components/landing/chapters/chart-tips";
-import type { AgeingChapter, DeficitChapter, LabourSplit, MunicipalChapter, RevenueSeries, WageGapChapter, YouthJobsChapter } from "../../../lib/landing/chapters/types";
+import { birthsTip, deficitTip, migrationTip, plannedYearText, pyramidTip, regionTip, reliefTip, revenueTip, tradeLineTip, tradePartnerTip, waffleTip, wageTip } from "../../../components/landing/chapters/chart-tips";
+import type { AgeingChapter, DeficitChapter, LabourSplit, MunicipalChapter, RevenueSeries, TradeChapter, WageGapChapter, YouthJobsChapter } from "../../../lib/landing/chapters/types";
 
 const labels = {
   locale: "ka" as const,
@@ -290,5 +290,51 @@ describe("wageTip", () => {
 
   it("states a sector where women earn more as a share above 100", () => {
     expect(wageTip(sectors, 2025, wageLabels, 1).foot).toBe("ქალების ხელფასი კაცებისის 113.6%-ია");
+  });
+});
+
+describe("tradePartnerTip", () => {
+  const partners: TradeChapter["partners"] = [
+    { id: "p.tr", label: "თურქეთი", exportsUsd: 0.33e9, importsUsd: 2.78e9, turnoverUsd: 3.11e9 },
+    { id: "p.kg", label: "ყირგიზეთი", exportsUsd: 1.5e9, importsUsd: 0.01e9, turnoverUsd: 1.51e9 },
+  ];
+  const tradeLabels = { exports: "ექსპორტი", imports: "იმპორტი", balance: "ბალანსი", turnover: "ბრუნვა", unit: "მლრდ $" };
+
+  it("lists exports, imports and the signed balance with the year in the title, and the turnover in the foot", () => {
+    expect(tradePartnerTip(partners, 2025, tradeLabels, 0)).toEqual({
+      title: "თურქეთი, 2025",
+      rows: [
+        { key: "#1f6e56", val: "0.33 მლრდ $", name: "ექსპორტი" },
+        { key: "#3a332a", val: "2.78 მლრდ $", name: "იმპორტი" },
+        { val: "−2.45 მლრდ $", name: "ბალანსი" },
+      ],
+      foot: "ბრუნვა — 3.11 მლრდ $",
+    });
+  });
+
+  it("marks a surplus with a plus sign", () => {
+    expect(tradePartnerTip(partners, 2025, tradeLabels, 1).rows[2].val).toBe("+1.49 მლრდ $");
+  });
+});
+
+describe("tradeLineTip", () => {
+  const series = { years: [2024, 2025], exports: [6.6e9, 7.288e9], imports: [16.9e9, 18.649e9] };
+  const lineLabels = { exports: "ექსპორტი", imports: "იმპორტი", balance: "ბალანსი", unit: "მლრდ $" };
+
+  it("lists both values of the year, the larger first, and the signed balance in the foot", () => {
+    expect(tradeLineTip(series, lineLabels, 1)).toEqual({
+      title: "2025",
+      rows: [
+        { key: "#3a332a", val: "18.6 მლრდ $", name: "იმპორტი" },
+        { key: "#1f6e56", val: "7.3 მლრდ $", name: "ექსპორტი" },
+      ],
+      foot: "ბალანსი: −11.4 მლრდ $",
+    });
+  });
+
+  it("lists the larger value first also when exports exceed imports", () => {
+    const tip = tradeLineTip({ years: [2000], exports: [5e9], imports: [3e9] }, lineLabels, 0);
+    expect(tip.rows.map((row) => row.name)).toEqual(["ექსპორტი", "იმპორტი"]);
+    expect(tip.foot).toBe("ბალანსი: +2.0 მლრდ $");
   });
 });
