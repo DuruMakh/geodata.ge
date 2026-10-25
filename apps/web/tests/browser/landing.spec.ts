@@ -4,7 +4,7 @@ import enLanding from "../../lib/i18n/messages/en/landing.json";
 import kaLanding from "../../lib/i18n/messages/ka/landing.json";
 import { computedCssColorAlpha } from "./focus-outline";
 
-// Homepage (DESIGN.md §19): the hero, the country figures, the five data chapters with their charts,
+// Homepage (DESIGN.md §19): the hero, the country figures, the ten data chapters with their charts,
 // sources, Ask AI and the site footer, and the paths into the explorer. The hero is a static image
 // below 768px and WebGL at wider sizes; tests assert the matching visual mounts rather than pixel content.
 
@@ -180,14 +180,34 @@ const LANDING_COPY = {
   },
 } as const;
 
-// The five chapters in page order, with the explorer page each heading leads to.
+// The ten chapters in page order, with the explorer page each heading leads to and the canvases each draws.
+// Chapters 06 and 07 take their heading from the data (DESIGN.md §19), so they list every wording they can have.
 const CHAPTERS = [
-  { id: "ch-01", path: "/explorer/analysis", titleKey: "landing.ch1.title" },
-  { id: "ch-02", path: "/explorer/expenditure", titleKey: "landing.ch2.title" },
-  { id: "ch-03", path: "/explorer/revenue", titleKey: "landing.ch3.title" },
-  { id: "ch-04", path: "/explorer/municipalities", titleKey: "landing.ch4.title" },
-  { id: "ch-05", path: "/explorer/deficit", titleKey: "landing.ch5.title" },
+  { id: "ch-01", path: "/explorer/analysis", titleKeys: ["landing.ch1.title"], canvases: 1 },
+  { id: "ch-02", path: "/explorer/expenditure", titleKeys: ["landing.ch2.title"], canvases: 1 },
+  { id: "ch-03", path: "/explorer/revenue", titleKeys: ["landing.ch3.title"], canvases: 1 },
+  { id: "ch-04", path: "/explorer/municipalities", titleKeys: ["landing.ch4.title"], canvases: 1 },
+  { id: "ch-05", path: "/explorer/deficit", titleKeys: ["landing.ch5.title"], canvases: 1 },
+  { id: "ch-06", path: "/explorer/demography", titleKeys: ["landing.ageing.heading.ageing", "landing.ageing.heading.changing"], canvases: 3 },
+  {
+    id: "ch-07",
+    path: "/explorer/unemployment",
+    titleKeys: ["notHigher", "littleHigher", "oneAndHalf", "almostTwice", "twice", "moreThanTwice"].map((word) => `landing.jobs.heading.${word}`),
+    canvases: 3,
+  },
+  { id: "ch-08", path: "/explorer/wages", titleKeys: ["landing.ch8.title"], canvases: 1 },
+  { id: "ch-09", path: "/explorer/trade", titleKeys: ["landing.ch9.title"], canvases: 2 },
+  { id: "ch-10", path: "/explorer/health/causes-of-death", titleKeys: ["landing.ch10.title"], canvases: 1 },
 ] as const;
+const CHAPTER_IDS = CHAPTERS.map((chapter) => chapter.id);
+// The hero's canvas plus every chapter canvas.
+const MAIN_CANVASES = 1 + CHAPTERS.reduce((sum, chapter) => sum + chapter.canvases, 0);
+
+/** The chapter's heading text is one of its possible titles, in the page's language. */
+function titlePattern(chapter: (typeof CHAPTERS)[number], messages: Record<string, string>) {
+  const escape = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return new RegExp(chapter.titleKeys.map((key) => escape(messages[key]!)).join("|"));
+}
 
 // Software-GL drivers in a container log these on every WebGL canvas, the hero included; they are not app output.
 const SOFTWARE_GL_NOISE = /GPU stall|ReadPixels|GL Driver Message|software WebGL|SwiftShader/i;
@@ -225,14 +245,14 @@ for (const [locale, copy] of Object.entries(LANDING_COPY)) {
     await expect(page.locator("#ch-01 figure")).toContainText(`, ${gdpYear}`);
     await expectNoPageOverflow(page);
 
-    // Five chapters, each with its heading link, a lede, and a chart canvas.
+    // Ten chapters, each with its heading link, a lede, and its chart canvases.
     for (const chapter of CHAPTERS) {
       const section = page.locator(`#${chapter.id}`);
-      await expect(section.getByRole("heading", { level: 2 })).toContainText(copy.messages[chapter.titleKey]);
+      await expect(section.getByRole("heading", { level: 2 })).toContainText(titlePattern(chapter, copy.messages));
       expect(text(await section.locator("h2 + p").textContent()).length, `${chapter.id} lede`).toBeGreaterThan(20);
-      await expect(section.locator("canvas")).toHaveCount(1);
+      await expect(section.locator("canvas")).toHaveCount(chapter.canvases);
     }
-    expect(await page.locator("main canvas").evaluateAll((canvases) => canvases.length)).toBe(6);
+    expect(await page.locator("main canvas").evaluateAll((canvases) => canvases.length)).toBe(MAIN_CANVASES);
 
     // Sources: the methodology link, and the dark AI band with the address to copy.
     await expect(page.locator("#sources").getByRole("link", { name: copy.methodologyLink })).toHaveAttribute("href", href("/methodology"));
@@ -253,19 +273,19 @@ for (const [locale, copy] of Object.entries(LANDING_COPY)) {
 test("homepage sections appear in the approved order", async ({ page }) => {
   for (const prefix of ["", "/en"]) {
     await page.goto(`${baseUrl}${prefix}/`);
-    const order = await page.evaluate(() => {
+    const order = await page.evaluate((ids) => {
       const top = (selector: string) => document.querySelector(selector)?.getBoundingClientRect().top;
-      return ["#ch-01", "#ch-02", "#ch-03", "#ch-04", "#ch-05", "#sources", "#ai", "footer[data-variant=site]"].map((selector) => ({
+      return [...ids, "#sources", "#ai", "footer[data-variant=site]"].map((selector) => ({
         selector,
         top: top(selector) ?? null,
         // The chapters are direct children of main, the footer follows main.
         inMain: document.querySelector("main")?.contains(document.querySelector(selector)) ?? false,
       }));
-    });
+    }, CHAPTER_IDS.map((id) => `#${id}`));
     for (const entry of order) expect(entry.top, `${prefix || "/"} ${entry.selector} exists`).not.toBeNull();
     const tops = order.map((entry) => entry.top!);
     expect(tops, `${prefix || "/"} section order`).toEqual([...tops].sort((a, b) => a - b));
-    expect(order.map((entry) => entry.inMain)).toEqual([true, true, true, true, true, true, true, false]);
+    expect(order.map((entry) => entry.inMain)).toEqual([...CHAPTER_IDS.map(() => true), true, true, false]);
     // The key-number row sits above the first chapter.
     const keyNumbers = (await page.getByTestId("key-numbers").boundingBox())!;
     expect(keyNumbers.y).toBeLessThan(tops[0]!);
@@ -278,12 +298,85 @@ test("chapter headings link to their explorer pages", async ({ page }) => {
     for (const chapter of CHAPTERS) {
       const link = page.locator(`#${chapter.id} h2 a`);
       await expect(link, `${locale} ${chapter.id}`).toHaveAttribute("href", `${copy.prefix}${chapter.path}`);
-      await expect(link).toContainText(copy.messages[chapter.titleKey]);
+      await expect(link).toContainText(titlePattern(chapter, copy.messages));
     }
   }
   // The sources heading is not a link; it is a section about the page's own method.
   await page.goto(`${baseUrl}/`);
   await expect(page.locator("#sources h2 a")).toHaveCount(0);
+});
+
+test("the society chapters show their data numbers", async ({ page }) => {
+  // The latest values of the served data (the numbers are the same in both languages).
+  const expected = [
+    { id: "ch-06", number: "108.8", cards: 4, what: "women per 100 men" },
+    { id: "ch-07", number: "25.4%", cards: 0, what: "youth unemployment rate in the lede" },
+    { id: "ch-08", number: "2,165", cards: 4, what: "average wage" },
+    { id: "ch-09", number: "25.9", cards: 3, what: "trade turnover" },
+    { id: "ch-10", number: "44,319", cards: 0, what: "deaths in the lede" },
+  ];
+  for (const prefix of ["", "/en"]) {
+    await page.goto(`${baseUrl}${prefix}/`);
+    for (const { id, number, cards, what } of expected) {
+      const section = page.locator(`#${id}`);
+      // The numbers are real HTML, not canvas pixels: a stat card or the lede carries each one.
+      await expect(section, `${prefix || "/"} ${id} ${what}`).toContainText(number);
+      await expect(section.locator("[data-stat]"), `${prefix || "/"} ${id} stat cards`).toHaveCount(cards);
+      // Chapters without cards carry their number in the lede.
+      if (cards === 0) await expect(section.locator("h2 + p"), `${prefix || "/"} ${id} lede`).toContainText(number);
+    }
+  }
+});
+
+test.describe("society chart tooltips on hover", () => {
+  // Reduced motion draws every chart in its final state, so a hover is read at once.
+  test.use({ viewport: { width: 1440, height: 900 } });
+
+  // Each chart: the canvas inside its chapter (in page order) and the labels its tooltip must carry.
+  const charts = (messages: Record<string, string>) => [
+    { name: "population pyramid", id: "ch-06", index: 0, labels: [messages["landing.ageing.men"], messages["landing.ageing.women"], messages["landing.ageing.pyramid.bothSexes"]] },
+    { name: "net migration bars", id: "ch-06", index: 1, labels: [messages["landing.ageing.migration.label"]] },
+    { name: "births map", id: "ch-06", index: 2, labels: [messages["landing.ageing.map.perHundred"], messages["landing.ageing.map.births"], messages["landing.ageing.map.deaths"]] },
+    { name: "waffle, all aged 15+", id: "ch-07", index: 0, labels: [messages["landing.jobs.waffle.allWho"]] },
+    { name: "waffle, aged 15-29", id: "ch-07", index: 1, labels: [messages["landing.jobs.waffle.youthWho"]] },
+    { name: "regions", id: "ch-07", index: 2, labels: [messages["landing.jobs.regions.rate"]!.split(",")[0]!] },
+    { name: "wages dumbbell", id: "ch-08", index: 0, labels: [messages["landing.wages.tipFoot"]!.split("{pct}")[0]!] },
+    { name: "trade butterfly", id: "ch-09", index: 0, labels: [messages["landing.trade.exports"], messages["landing.trade.imports"], messages["landing.trade.balanceName"]] },
+    { name: "trade lines", id: "ch-09", index: 1, labels: [messages["landing.trade.exports"], messages["landing.trade.imports"]] },
+    { name: "causes of death", id: "ch-10", index: 0, labels: [messages["landing.deaths.tip.people"], messages["landing.deaths.tip.ofAll"]] },
+  ];
+
+  for (const [locale, copy] of Object.entries(LANDING_COPY)) {
+    test(`hovering each society chart shows a tooltip: ${locale}`, async ({ page }) => {
+      await page.emulateMedia({ reducedMotion: "reduce" });
+      await page.goto(`${baseUrl}${copy.prefix}/`);
+      for (const chart of charts(copy.messages)) {
+        const canvas = page.locator(`#${chart.id} canvas`).nth(chart.index);
+        // The tooltip sits next to its canvas inside the chart's own figure.
+        const tip = canvas.locator("xpath=..").locator("[data-chart-tip]");
+        await canvas.scrollIntoViewIfNeeded();
+        await expect.poll(() => canvas.evaluate((element) => (element as HTMLCanvasElement).style.width !== ""), { message: `${chart.name} drawn` }).toBe(true);
+        const box = (await canvas.boundingBox())!;
+        // Charts pick their mark by position, so look for one: the centre first, then across the canvas.
+        let shown = false;
+        for (const fy of [0.5, 0.25, 0.75, 0.1, 0.9]) {
+          for (const fx of [0.5, 0.25, 0.75, 0.1, 0.9]) {
+            await page.mouse.move(box.x + box.width * fx, box.y + box.height * fy);
+            shown = (await tip.evaluate((element) => getComputedStyle(element).opacity)) === "1";
+            if (shown) break;
+          }
+          if (shown) break;
+        }
+        expect(shown, `${locale} ${chart.name} tooltip appears on hover`).toBe(true);
+        const content = text(await tip.textContent());
+        expect(content, `${locale} ${chart.name} tooltip has a number`).toMatch(/\d/);
+        for (const label of chart.labels) expect(content, `${locale} ${chart.name} tooltip`).toContain(text(label));
+        // Leaving the canvas hides it again.
+        await page.mouse.move(0, 0);
+        await expect(tip, `${locale} ${chart.name} tooltip after leaving`).toHaveCSS("opacity", "0");
+      }
+    });
+  }
 });
 
 test("choosing a measure updates the readout", async ({ page }) => {
@@ -577,7 +670,7 @@ test("no console errors or warnings while scrolling the whole page", async ({ pa
 
   for (const prefix of ["", "/en"]) {
     await page.goto(`${baseUrl}${prefix}/`);
-    for (const id of ["ch-01", "ch-02", "ch-03", "ch-04", "ch-05", "sources", "ai"]) {
+    for (const id of [...CHAPTER_IDS, "sources", "ai"]) {
       await page.locator(`#${id}`).scrollIntoViewIfNeeded();
       await page.evaluate((target) => document.getElementById(target)?.scrollIntoView(), id);
     }
@@ -585,11 +678,12 @@ test("no console errors or warnings while scrolling the whole page", async ({ pa
     // Each chart's engine has loaded and sized its canvas, so start-up and first-frame output is already logged.
     await expect
       .poll(() =>
-        page.evaluate(() =>
-          ["ch-01", "ch-02", "ch-03", "ch-04", "ch-05"].map((id) => document.querySelector<HTMLCanvasElement>(`#${id} canvas`)?.style.width !== ""),
+        page.evaluate(
+          (ids) => ids.flatMap((id) => [...document.querySelectorAll<HTMLCanvasElement>(`#${id} canvas`)].map((canvas) => canvas.style.width !== "")),
+          CHAPTER_IDS,
         ),
       )
-      .toEqual([true, true, true, true, true]);
+      .toEqual(Array.from({ length: MAIN_CANVASES - 1 }, () => true));
     await expect(page.getByText(LANDING_COPY[prefix === "" ? "ka" : "en"].messages["landing.heroUnavailable"])).toHaveCount(0);
   }
 
