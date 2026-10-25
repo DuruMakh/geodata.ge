@@ -1,4 +1,4 @@
-import type { AgeingChapter, RevenueBandId } from "../../../lib/landing/chapters/types";
+import type { AgeingChapter, DeathGroupKind, RevenueBandId } from "../../../lib/landing/chapters/types";
 
 // Canvas helpers ported from the design board's chart script. Pure functions (niceTicks,
 // stackLabels, fitText) touch no DOM; the rest read `window` only when called. The treemap
@@ -93,6 +93,12 @@ export const BIRTH_CLASSES = [
 
 // Chapter 09 colours, fixed by the homepage plan: what Georgia sells and what it buys.
 export const TRADE_COLORS = { exports: "#1f6e56", imports: "#3a332a" };
+
+/**
+ * The design token a causes-of-death group's squares are drawn with: the largest established cause in the accent,
+ * other established causes in ink, the remainder and the unestablished causes (drawn hollow) in the control colour.
+ */
+export const deathSquareToken = (kind: DeathGroupKind): "accent" | "ink" | "control" => (kind === "top" ? "accent" : kind === "established" ? "ink" : "control");
 
 /** Births per 100 deaths of one place's figures. */
 export const birthsPer100 = (entry: { births: number; deaths: number }) => (entry.births / entry.deaths) * 100;

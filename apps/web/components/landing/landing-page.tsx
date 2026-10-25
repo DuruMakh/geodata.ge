@@ -10,8 +10,9 @@ import { AgeingChapter, ageingNotes, type AgeingLabels } from "./chapters/ageing
 import { AiSection, type AiLabels } from "./chapters/ai-section";
 import { BIRTH_CLASSES } from "./chapters/canvas";
 import { Chapter } from "./chapters/chapter";
-import { billions } from "./chapters/chart-format";
-import { yearRange } from "./chapters/chart-layout";
+import { billions, decimals } from "./chapters/chart-format";
+import { DEATH_UNIT, yearRange } from "./chapters/chart-layout";
+import { DeathsChapter, type DeathsLabels } from "./chapters/deaths-chapter";
 import { DeficitChart, type DeficitLabels } from "./chapters/deficit-chart";
 import { JobsChapter, type JobsLabels } from "./chapters/jobs-chapter";
 import { MunicipalRelief, type MunicipalLabels } from "./chapters/municipal-relief";
@@ -269,6 +270,18 @@ export function LandingPage({ chapters, gdpFigure, presentation, updatedAt, mcpE
     balance: { label: t("landing.trade.balance.label"), note: tradeText.balance },
     product: { label: t("landing.trade.product.label"), note: tradeText.product },
   };
+  const { deaths } = chapters;
+  const deathsLabels: DeathsLabels = {
+    title: t("landing.deaths.chart.title", { year: deaths.year }),
+    unit: t("landing.deaths.chart.unit", { count: DEATH_UNIT }),
+    unknown: t("landing.deaths.chart.unknown"),
+    summary: t("landing.deaths.chart.summary", { total: decimals(deaths.total, 0), year: deaths.year, count: DEATH_UNIT }),
+    people: t("landing.deaths.tip.people"),
+    ofAll: t("landing.deaths.tip.ofAll"),
+    // The tooltip fills in the squares of the hovered group.
+    squares: t("landing.deaths.tip.squares", { count: "{count}" }),
+    unavailable,
+  };
   const collections = chapters.sources.rows.length;
   const sourcesLabels: SourcesLabels = {
     title: t("landing.sources.title"),
@@ -394,6 +407,9 @@ export function LandingPage({ chapters, gdpFigure, presentation, updatedAt, mcpE
           </Chapter>
           <Chapter id="ch-09" link={chapterLink(9, "/explorer/trade")} title={t("landing.ch9.title")} lede={chapters.sentences.trade}>
             <TradeChapter data={trade} labels={tradeLabels} />
+          </Chapter>
+          <Chapter id="ch-10" link={chapterLink(10, "/explorer/health/causes-of-death")} title={t("landing.ch10.title")} lede={chapters.sentences.deaths}>
+            <DeathsChapter data={deaths} labels={deathsLabels} />
           </Chapter>
           <SourcesSection sources={chapters.sources} labels={sourcesLabels} locale={locale} />
           <AiSection endpoint={mcpEndpoint} tools={chapters.tools} labels={aiLabels} locale={locale} />

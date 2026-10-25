@@ -1,11 +1,12 @@
 import { formatInUnit, formatPerResidentGel, formatPoints, formatShare, MISSING, UNIT_PERSONS } from "../../../lib/explorer/format";
 import type { Locale } from "../../../lib/i18n/types";
-import type { AgeingChapter, DeficitChapter, LabourSplit, MunicipalChapter, ReliefPlace, RevenueSeries, TradeChapter, WageGapChapter, YouthJobsChapter } from "../../../lib/landing/chapters/types";
-import { birthsColor, birthsPer100, MIGRATION_COLORS, SEX_COLORS, TRADE_COLORS } from "./canvas";
-import { billions, money, points, signedBillions, signedCount } from "./chart-format";
+import type { AgeingChapter, DeathsChapter, DeficitChapter, LabourSplit, MunicipalChapter, ReliefPlace, RevenueSeries, TradeChapter, WageGapChapter, YouthJobsChapter } from "../../../lib/landing/chapters/types";
+import { birthsColor, birthsPer100, deathSquareToken, MIGRATION_COLORS, SEX_COLORS, TRADE_COLORS } from "./canvas";
+import { billions, decimals, money, points, signedBillions, signedCount } from "./chart-format";
+import { deathSquares } from "./chart-layout";
 import type { TipData } from "./chart-tip";
 
-// Tooltip content of the revenue, deficit, municipal relief, ageing, youth jobs, wages and trade charts, kept apart from the engines so it can be tested.
+// Tooltip content of the revenue, deficit, municipal relief, ageing, youth jobs, wages, trade and causes-of-death charts, kept apart from the engines so it can be tested.
 
 /** Year with a planned suffix when the year's value is planned: "2025 (გეგმა)". */
 export function plannedYearText(data: Pick<RevenueSeries, "years" | "planned">, i: number, planned: string): string {
@@ -255,5 +256,25 @@ export function tradeLineTip(
     title: String(data.years[i]),
     rows: rows.map((row) => ({ key: row.key, val: `${billions(row.usd, 1)} ${labels.unit}`, name: row.name })),
     foot: `${labels.balance}: ${signedBillions(exportsUsd - importsUsd, 1)} ${labels.unit}`,
+  };
+}
+
+/**
+ * Causes-of-death tooltip for group index `i`: the group's name with the year, its deaths and share of all deaths,
+ * and the squares it is drawn with (`squares` holds a {count} placeholder).
+ */
+export function deathGroupTip(
+  data: Pick<DeathsChapter, "year" | "total" | "groups">,
+  labels: { people: string; ofAll: string; squares: string },
+  i: number,
+): TipData {
+  const { label, count, kind } = data.groups[i];
+  return {
+    title: `${label}, ${data.year}`,
+    rows: [
+      { key: `var(--${deathSquareToken(kind)})`, val: decimals(count, 0), name: labels.people },
+      { val: formatShare(count / data.total, false, 0), name: labels.ofAll },
+    ],
+    foot: labels.squares.replace("{count}", String(deathSquares(count))),
   };
 }

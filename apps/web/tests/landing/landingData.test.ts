@@ -90,7 +90,7 @@ describe("landing page layout", () => {
     // U01-05: "მლრდ ₾" never splits into a stranded currency sign.
     expect(markup).toMatch(/<span data-testid="[^"]+" class="[^"]*whitespace-nowrap[^"]*">[^<]*₾<\/span>/);
     const anchors = [...markup.matchAll(/<section id="([^"]+)"/g)].map((match) => match[1]);
-    expect(anchors).toEqual(["ch-01", "ch-02", "ch-03", "ch-04", "ch-05", "ch-06", "ch-07", "ch-08", "ch-09", "sources", "ai"]);
+    expect(anchors).toEqual(["ch-01", "ch-02", "ch-03", "ch-04", "ch-05", "ch-06", "ch-07", "ch-08", "ch-09", "ch-10", "sources", "ai"]);
     // The charts render on the server; only their canvas engines load in the browser.
     const chapter = (id: string) => {
       const start = markup.indexOf(`<section id="${id}"`);
@@ -111,6 +111,10 @@ describe("landing page layout", () => {
     // Chapter 09: the partners chart and the exports and imports lines, then three number cards.
     expect(chapter("ch-09").match(/<canvas/g)?.length).toBe(2);
     expect(chapter("ch-09").match(/<div data-stat=""/g)?.length).toBe(3);
+    // Chapter 10: the causes-of-death chart of squares, with its two-part key.
+    expect(chapter("ch-10").match(/<canvas/g)?.length).toBe(1);
+    expect(chapter("ch-10")).toContain("გარდაცვალების მიზეზები, 2025");
+    expect(chapter("ch-10")).toContain("= 100 გარდაცვლილი");
     // The site footer, with the mission sentence.
     expect(markup).toContain("ჩვენი მიზანია");
   });
@@ -119,7 +123,7 @@ describe("landing page layout", () => {
     const { renderHomePage } = await import("../../lib/pages/home");
     const markup = renderPageMarkup("en", await renderHomePage("en"));
     const headingLinks = [...markup.matchAll(/<h2[^>]*>[\s\S]*?<\/h2>/g)].flatMap((match) => [...match[0].matchAll(/href="([^"]+)"/g)].map((link) => link[1]));
-    expect(headingLinks).toEqual(["/en/explorer/analysis", "/en/explorer/expenditure", "/en/explorer/revenue", "/en/explorer/municipalities", "/en/explorer/deficit", "/en/explorer/demography", "/en/explorer/unemployment", "/en/explorer/wages", "/en/explorer/trade"]);
+    expect(headingLinks).toEqual(["/en/explorer/analysis", "/en/explorer/expenditure", "/en/explorer/revenue", "/en/explorer/municipalities", "/en/explorer/deficit", "/en/explorer/demography", "/en/explorer/unemployment", "/en/explorer/wages", "/en/explorer/trade", "/en/explorer/health/causes-of-death"]);
   });
 
   // Two municipal totals by design: chapter 01 compares the official all-local-budgets country aggregate with GDP;

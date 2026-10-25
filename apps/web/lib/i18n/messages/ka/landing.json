@@ -303,5 +303,12 @@
   "landing.deaths.cause.congenital": "თანდაყოლილი ანომალიებით, დეფორმაციებითა და ქრომოსომული დარღვევებით",
   "landing.deaths.cause.ill_defined": "არაზუსტად განსაზღვრული მიზეზებით",
   "landing.deaths.cause.external": "გარეგანი მიზეზებით",
-  "landing.deaths.cause.covid19": "COVID-19-ით"
+  "landing.deaths.cause.covid19": "COVID-19-ით",
+  "landing.deaths.chart.title": "გარდაცვალების მიზეზები, {year}",
+  "landing.deaths.chart.unit": "= {count} გარდაცვლილი",
+  "landing.deaths.chart.unknown": "მიზეზი დაუდგენელია",
+  "landing.deaths.chart.summary": "{total} გარდაცვალება მიზეზების მიხედვით, {year} წელს, თითო კვადრატი {count} ადამიანია",
+  "landing.deaths.tip.people": "გარდაცვლილი",
+  "landing.deaths.tip.ofAll": "ყველა გარდაცვალებიდან",
+  "landing.deaths.tip.squares": "≈ {count} კვადრატი"
 }

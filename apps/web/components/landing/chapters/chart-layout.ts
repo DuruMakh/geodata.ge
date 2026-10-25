@@ -1,3 +1,5 @@
+import { wrapLines } from "./canvas";
+
 // Pure layout of the revenue and deficit charts (chapters 03 and 05): which year labels fit, where
 // bars sit, the deficit axis range, runs of planned years. No DOM; the chart engines draw from these.
 
@@ -167,3 +169,47 @@ export const toBillions = (usd: number) => usd / 1_000_000_000;
 export function yearRange(first: number, last: number): string {
   return first === last ? String(first) : `${first}–${last}`;
 }
+
+/** Deaths one square stands for in the causes-of-death chart. */
+export const DEATH_UNIT = 100;
+
+/** Below this width the causes-of-death chart puts each group's name above its squares. */
+export const UNIT_NARROW_WIDTH = 640;
+
+/** Squares drawn for `count` deaths: one per DEATH_UNIT, rounded. */
+export const deathSquares = (count: number) => Math.round(count / DEATH_UNIT);
+
+/** The square grid of the causes-of-death chart: name column width (0 when narrow), square pitch, and one block of ten columns with its 4 px gap. */
+export function unitMetrics(narrow: boolean): { labelWidth: number; step: number; groupWidth: number } {
+  const step = narrow ? 8 : 10;
+  return { labelWidth: narrow ? 0 : 256, step, groupWidth: 10 * step + 4 };
+}
+
+/**
+ * Layout of the causes-of-death chart for a chart `width` px wide: `counts` deaths per group, drawn as squares in rows
+ * of `perRow` (whole blocks of ten columns). Each group's name (`names`, measured with `measure` in the name font)
+ * breaks onto at most two lines, in a 238 px column beside the squares, or above them when narrow. `top` is where a
+ * group's squares start; `height` is the whole chart.
+ */
+export function unitLayout(
+  width: number,
+  counts: readonly number[],
+  measure: (text: string) => number,
+  names: readonly string[],
+): { narrow: boolean; perRow: number; rows: { top: number; lines: string[] }[]; height: number } {
+  const narrow = width < UNIT_NARROW_WIDTH;
+  const { labelWidth, step, groupWidth } = unitMetrics(narrow);
+  const perRow = Math.max(1, Math.floor((width - labelWidth + 4) / groupWidth)) * 10;
+  const ruler = { measureText: (text: string) => ({ width: measure(text) }) as TextMetrics };
+  let y = 4;
+  const rows = counts.map((count, i) => {
+    const lines = wrapLines(ruler, names[i], narrow ? width - 110 : labelWidth - 18);
+    const top = y + (narrow ? 16 * lines.length + 6 : 0);
+    y = top + Math.max(Math.ceil(deathSquares(count) / perRow) * step, narrow ? 0 : 16 * lines.length + 20) + 14;
+    return { top, lines };
+  });
+  return { narrow, perRow, rows, height: y + 2 };
+}
+
+/** Where group `row`'s block starts (its name's first line when narrow). */
+export const unitRowStart = (row: { top: number; lines: readonly string[] }, narrow: boolean) => (narrow ? row.top - 16 * row.lines.length - 6 : row.top);

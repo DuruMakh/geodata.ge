@@ -303,5 +303,12 @@
   "landing.deaths.cause.congenital": "from congenital malformations",
   "landing.deaths.cause.ill_defined": "from ill-defined causes",
   "landing.deaths.cause.external": "from injuries, poisoning and external causes",
-  "landing.deaths.cause.covid19": "from COVID-19"
+  "landing.deaths.cause.covid19": "from COVID-19",
+  "landing.deaths.chart.title": "Causes of death, {year}",
+  "landing.deaths.chart.unit": "= {count} deaths",
+  "landing.deaths.chart.unknown": "Cause not established",
+  "landing.deaths.chart.summary": "{total} deaths by cause, {year}, each square is {count} people",
+  "landing.deaths.tip.people": "deaths",
+  "landing.deaths.tip.ofAll": "of all deaths",
+  "landing.deaths.tip.squares": "≈ {count} squares"
 }
