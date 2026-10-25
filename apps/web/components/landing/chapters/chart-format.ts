@@ -1,4 +1,4 @@
-import { formatAmountParts, formatInUnit, formatPoints, UNIT_PERSONS } from "../../../lib/explorer/format";
+import { formatAmountParts, formatInUnit, formatPoints, UNIT_BN, UNIT_PERSONS } from "../../../lib/explorer/format";
 import type { Locale } from "../../../lib/i18n/types";
 
 // Amount formatting shared by the homepage chart chapters.
@@ -25,7 +25,7 @@ export function labourCount(thousands: number, l: { thousand: string; million: s
 export const decimals = (value: number, places: number) => formatInUnit(value, { ...UNIT_PERSONS, decimals: places });
 
 /** US dollars in billions with `places` decimals, no unit: "25.9", "−11.4", "0.38". */
-export const billions = (usd: number, places: number) => formatInUnit(usd, { divisor: 1_000_000_000, label: "", decimals: places });
+export const billions = (usd: number, places: number) => formatInUnit(usd, { ...UNIT_BN, label: "", decimals: places });
 
 /** US dollars in billions with its sign: "+1.49", "−2.45". */
-export const signedBillions = (usd: number, places: number) => formatPoints(usd / 1_000_000_000, true, places);
+export const signedBillions = (usd: number, places: number) => formatPoints(usd / UNIT_BN.divisor, true, places);

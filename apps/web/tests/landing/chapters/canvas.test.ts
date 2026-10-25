@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { anchoredRect, bindChartPointer, blockLabelTier, blockTone, fitText, gridFor, lerpRect, mixHex, niceTicks, OFF_SQUARE, sparkPoints, stackLabels } from "../../../components/landing/chapters/canvas";
+import { anchoredRect, bindChartPointer, blockLabelTier, blockTone, fitText, gridFor, lerpRect, mixHex, niceTicks, OFF_SQUARE, sparkPoints, stackLabels, twoLineWidth, wrapLines } from "../../../components/landing/chapters/canvas";
 
 describe("niceTicks", () => {
   it("covers the maximum with at most n steps of a round size", () => {
@@ -44,6 +44,33 @@ describe("fitText", () => {
     expect(fitText(ctx, "abc", 30)).toBe("abc");
     expect(fitText(ctx, "abcdefgh", 50)).toBe("abcd…");
     expect(fitText(ctx, "abcdefgh", 5)).toBe("");
+  });
+});
+
+describe("wrapLines", () => {
+  const ctx = { measureText: (s: string) => ({ width: s.length * 10 }) as TextMetrics };
+
+  it("keeps one line that fits", () => {
+    expect(wrapLines(ctx, "abc def", 70)).toEqual(["abc def"]);
+  });
+
+  it("breaks at the last space that keeps the first line within the width, and shortens only the second line", () => {
+    expect(wrapLines(ctx, "aaaa bbbb cccc", 90)).toEqual(["aaaa bbbb", "cccc"]);
+    expect(wrapLines(ctx, "aaaa bbbb cccccccccc", 90)).toEqual(["aaaa bbbb", "cccccccc…"]);
+  });
+
+  it("only shortens a single word", () => {
+    expect(wrapLines(ctx, "abcdefgh", 50)).toEqual(["abcd…"]);
+  });
+});
+
+describe("twoLineWidth", () => {
+  const ctx = { measureText: (s: string) => ({ width: s.length * 10 }) as TextMetrics };
+
+  it("is the width of the best single break, or of the whole text without a space", () => {
+    expect(twoLineWidth(ctx, "aaaa bbbb cccccccc")).toBe(90);
+    expect(twoLineWidth(ctx, "aaaa bbbb")).toBe(40);
+    expect(twoLineWidth(ctx, "abcdefgh")).toBe(80);
   });
 });
 

@@ -127,6 +127,16 @@ export function largestWageGap<T extends { women: number; men: number }>(sectors
 /** Below this width the partners chart narrows the column between the bars that holds the country names. */
 export const TRADE_NARROW_WIDTH = 560;
 
+/**
+ * Width of the column holding the partners' names between the two halves: what the widest name needs (px, as drawn;
+ * when narrow, as drawn over two lines) plus 20 (12 when narrow), at least 112 (84 when narrow) and at most a third
+ * of the plot width (44% when narrow, where the names wrap), so a long name gets room without taking the bars' space.
+ * A name that still does not fit wraps onto two lines, the second shortened.
+ */
+export function partnerNameColumn(widestName: number, plotWidth: number, narrow: boolean): number {
+  return Math.max(narrow ? 84 : 112, Math.min(widestName + (narrow ? 12 : 20), plotWidth * (narrow ? 0.44 : 0.34)));
+}
+
 /** Top of the partners chart's axis, in billions: the next whole billion above the largest one-way flow (2.79 gives 3, 3 gives 4). */
 export function partnersAxisTop(maxBillions: number): number {
   return Math.floor(maxBillions) + 1;

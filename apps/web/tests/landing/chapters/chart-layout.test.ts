@@ -6,6 +6,7 @@ import {
   dumbbellHeight,
   fiveYearIndices,
   largestWageGap,
+  partnerNameColumn,
   partnersAxisTop,
   plannedRuns,
   plannedSpan,
@@ -207,5 +208,20 @@ describe("widestDeficitIndex", () => {
 
   it("is -1 when imports never exceed exports", () => {
     expect(widestDeficitIndex([4, 5], [4, 3])).toBe(-1);
+  });
+});
+
+describe("partnerNameColumn", () => {
+  it("fits the widest name plus 20 (12 when narrow) within 112 px (84) and a third of the plot (44%)", () => {
+    expect(partnerNameColumn(60, 700, false)).toBe(112);
+    expect(partnerNameColumn(150, 700, false)).toBe(170);
+    expect(partnerNameColumn(40, 331, true)).toBe(84);
+    expect(partnerNameColumn(90, 331, true)).toBe(102);
+  });
+
+  it("never takes more than 34% of the plot width (44% when narrow), but at least its minimum", () => {
+    expect(partnerNameColumn(400, 700, false)).toBeCloseTo(238, 5);
+    expect(partnerNameColumn(400, 300, false)).toBe(112);
+    expect(partnerNameColumn(200, 331, true)).toBeCloseTo(145.64, 5);
   });
 });

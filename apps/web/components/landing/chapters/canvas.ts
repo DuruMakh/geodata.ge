@@ -180,6 +180,33 @@ export function fitText(ctx: Pick<CanvasRenderingContext2D, "measureText">, s: s
   return t.length > 1 ? `${t}…` : "";
 }
 
+/**
+ * `s` on one line when it fits `maxW`, else broken at the first space after which the next word no longer fits:
+ * the first line as is and the rest shortened with an ellipsis (a single word is only shortened). Set the font first.
+ */
+export function wrapLines(ctx: Pick<CanvasRenderingContext2D, "measureText">, s: string, maxW: number): string[] {
+  if (ctx.measureText(s).width <= maxW) return [s];
+  const words = s.split(" ");
+  let first = "";
+  for (let i = 0; i < words.length; i++) {
+    const next = first ? `${first} ${words[i]}` : words[i];
+    if (first && ctx.measureText(next).width > maxW) return [first, fitText(ctx, words.slice(i).join(" "), maxW)];
+    first = next;
+  }
+  return [fitText(ctx, s, maxW)];
+}
+
+/** The width `s` needs when it may break at one space: the smallest, over the breaks, of the wider of the two lines (the whole width without a space). Set the font first. */
+export function twoLineWidth(ctx: Pick<CanvasRenderingContext2D, "measureText">, s: string): number {
+  const words = s.split(" ");
+  let best = ctx.measureText(s).width;
+  for (let i = 1; i < words.length; i++) {
+    const wider = Math.max(ctx.measureText(words.slice(0, i).join(" ")).width, ctx.measureText(words.slice(i).join(" ")).width);
+    if (wider < best) best = wider;
+  }
+  return best;
+}
+
 /** Push overlapping labels apart by at least `gap`, keeping them inside [lo, hi]. Index 0 sits lowest on screen (largest y). */
 export function stackLabels(want: number[], gap: number, lo: number, hi: number): number[] {
   const y = want.map((v) => clamp(v, lo, hi));

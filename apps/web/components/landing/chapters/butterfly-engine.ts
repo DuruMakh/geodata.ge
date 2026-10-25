@@ -1,14 +1,14 @@
 import type { TradeChapter } from "../../../lib/landing/chapters/types";
 import type { ButterflyLabels } from "./butterfly-chart";
-import { clamp, fitText, readTokens, TRADE_COLORS } from "./canvas";
+import { clamp, readTokens, TRADE_COLORS, twoLineWidth, wrapLines } from "./canvas";
 import { createChartCore, type ChartState } from "./chart-core";
 import { easeOut, hbar, txt, vline } from "./chart-draw";
 import { billions } from "./chart-format";
-import { partnersAxisTop, toBillions, TRADE_NARROW_WIDTH } from "./chart-layout";
+import { partnerNameColumn, partnersAxisTop, toBillions, TRADE_NARROW_WIDTH } from "./chart-layout";
 
 // The canvas engine of chapter 09's partners chart, loaded only once the chart nears the viewport (butterfly-chart.tsx).
 // One row per partner, largest turnover first: exports grow left and imports right from a column holding the country
-// name, in billions of dollars, each bar with its value once drawn in. Ported from the design board's createBfly.
+// name (wide enough for the longest; a longer one wraps), in billions of dollars, each bar with its value once drawn in. Ported from the design board's createBfly.
 
 type EngineOptions = {
   wrap: HTMLElement;
@@ -30,9 +30,13 @@ export function createButterfly({ wrap, canvas, partners, labels, onHover, onLea
 
   const draw = (ctx: CanvasRenderingContext2D, state: ChartState) => {
     const narrow = state.W < TRADE_NARROW_WIDTH;
-    const gap = narrow ? 84 : 112;
     const L = 2;
     const R = state.W - 2;
+    // The name column fits the longest name at the hover weight, over two lines when narrow (see partnerNameColumn).
+    const nameSize = narrow ? 11 : 12;
+    ctx.font = `600 ${nameSize}px ${ui}`;
+    const nameWidth = (label: string) => (narrow ? twoLineWidth(ctx, label) : ctx.measureText(label).width);
+    const gap = partnerNameColumn(Math.max(...partners.map((partner) => nameWidth(partner.label))), R - L, narrow);
     const T = 30;
     const B = state.H - 24;
     const cx = Math.round(L + (R - L) / 2);
@@ -65,9 +69,11 @@ export function createButterfly({ wrap, canvas, partners, labels, onHover, onLea
       hbar(ctx, XL(exp * k), yc - barHeight / 2, XL(0) - XL(exp * k), barHeight, 4, "left");
       ctx.fillStyle = TRADE_COLORS.imports;
       hbar(ctx, XR(0), yc - barHeight / 2, XR(imp * k) - XR(0), barHeight, 4, "right");
-      const font = `${hover ? 600 : 500} ${narrow ? 11 : 12}px ${ui}`;
+      const font = `${hover ? 600 : 500} ${nameSize}px ${ui}`;
       ctx.font = font;
-      txt(ctx, fitText(ctx, partner.label, gap - 4), cx, yc, font, ink, "center", "middle");
+      // A name too long for the column wraps onto two lines, both in the row's weight.
+      const lines = wrapLines(ctx, partner.label, gap - 4);
+      lines.forEach((line, k) => txt(ctx, line, cx, yc + (k - (lines.length - 1) / 2) * (nameSize + 2), font, ink, "center", "middle"));
       if (state.p >= 1) {
         txt(ctx, billions(partner.exportsUsd, 2), XL(exp) - 6, yc, `500 11px ${num}`, muted, "right", "middle");
         txt(ctx, billions(partner.importsUsd, 2), XR(imp) + 6, yc, `500 11px ${num}`, muted, "left", "middle");
