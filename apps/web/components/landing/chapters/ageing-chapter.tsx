@@ -33,7 +33,7 @@ export function ageingNotes(data: AgeingData, t: (key: string, values?: Record<s
   const total = net.reduce((sum, v) => sum + v, 0);
   const { year, women, men } = data.lifeExpectancy;
   return {
-    women: t("landing.ageing.women.note", { ratio: decimals(data.oldestWomenPerMan, 1) }),
+    women: t("landing.ageing.women.note", { ratio: decimals(data.oldestWomenPerMan, 1), year: data.pyramid.year }),
     life: t("landing.ageing.life.note", { year, women: decimals(women, 1), men: decimals(men, 1) }),
     fertility: t("landing.ageing.fertility.note", { year: data.fertility.year }),
     migration:

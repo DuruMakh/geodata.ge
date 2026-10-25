@@ -184,7 +184,7 @@
   "landing.ageing.pyramid.oldShare": "65 წლისა და უფროსი ასაკის წილი",
   "landing.ageing.pyramid.chartSummary": "მოსახლეობის პირამიდა {year} წლის 1 იანვრისთვის {baseYear} წლის სტრუქტურასთან შედარებით",
   "landing.ageing.women.label": "ქალი 100 კაცზე",
-  "landing.ageing.women.note": "სხვაობა ასაკთან ერთად იზრდება: 85 წლისა და უფროს ასაკში ქალები კაცებზე {ratio}-ჯერ მეტია.",
+  "landing.ageing.women.note": "სხვაობა ასაკთან ერთად იზრდება: 85 წლისა და უფროს ასაკში ქალები კაცებზე {ratio}-ჯერ მეტია ({year} წლის 1 იანვარი).",
   "landing.ageing.life.label": "სიცოცხლის ხანგრძლივობა",
   "landing.ageing.life.note": "მოსალოდნელი ხანგრძლივობა დაბადებისას, {year}: ქალებისთვის {women} წელი, კაცებისთვის — {men}.",
   "landing.ageing.fertility.label": "შობადობის ჯამობრივი კოეფიციენტი",

@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 import { formatInUnit, UNIT_PERSONS } from "../../../lib/explorer/format";
 import type { AgeingChapter, MunicipalChapter } from "../../../lib/landing/chapters/types";
-import { BIRTH_CLASSES } from "./canvas";
+import { BIRTH_CLASSES, placeRatios } from "./canvas";
 import { ChartTip, hideTip, showTip } from "./chart-tip";
 import { birthsTip } from "./chart-tips";
 import { ChartUnavailable, Reveal, useEngine } from "./reveal";
@@ -28,15 +28,6 @@ export type BirthsMapLabels = {
   chartSummary: string; // canvas aria-label lead: "მუნიციპალიტეტების რუკა: დაბადება 100 გარდაცვალებაზე, 2025"
   unavailable: string; // in place of the chart when its engine fails to load
 };
-
-/** Births per 100 deaths of every municipality with figures, by place index. */
-export function placeRatios(births: AgeingChapter["births"]): { index: number; ratio: number }[] {
-  const out: { index: number; ratio: number }[] = [];
-  births.places.forEach((entry, index) => {
-    if (entry) out.push({ index, ratio: (entry.births / entry.deaths) * 100 });
-  });
-  return out;
-}
 
 const loadEngine = () => import("./births-map-engine");
 const whole = (v: number) => formatInUnit(v, UNIT_PERSONS);

@@ -1,7 +1,7 @@
 import { formatInUnit, formatPerResidentGel, formatPoints, formatShare, MISSING, UNIT_PERSONS } from "../../../lib/explorer/format";
 import type { Locale } from "../../../lib/i18n/types";
 import type { AgeingChapter, DeficitChapter, MunicipalChapter, ReliefPlace, RevenueSeries } from "../../../lib/landing/chapters/types";
-import { birthsColor, MIGRATION_COLORS, SEX_COLORS } from "./canvas";
+import { birthsColor, birthsPer100, MIGRATION_COLORS, SEX_COLORS } from "./canvas";
 import { money, signedCount } from "./chart-format";
 import type { TipData } from "./chart-tip";
 
@@ -118,7 +118,7 @@ export function birthsTip(
 ): TipData {
   const entry = i === -2 ? null : data.places[i];
   if (!entry) return { title: i === -2 ? labels.occupied : places[i].name, rows: [{ val: labels.noData }] };
-  const ratio = (entry.births / entry.deaths) * 100;
+  const ratio = birthsPer100(entry);
   const change = entry.births - entry.deaths;
   return {
     title: places[i].name,

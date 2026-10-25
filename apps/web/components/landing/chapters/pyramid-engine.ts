@@ -9,13 +9,12 @@ import type { PyramidLabels } from "./pyramid-chart";
 // Rows run from 85+ at the top to 0–4 at the bottom (the data runs youngest first); bars grow from the centre
 // column of age labels, and the first year's shape is outlined in ink. Ported from the design board's createPyr.
 
-/** The first age group of the 65+ bracket on the right edge. */
-const OLD_FROM = "65–69";
-
 type EngineOptions = {
   wrap: HTMLElement;
   canvas: HTMLCanvasElement;
   data: AgeingChapter;
+  /** How many rows from the top the 65+ bracket spans (oldRows in pyramid-chart.tsx). */
+  oldRows: number;
   labels(): PyramidLabels;
   /** The pointer is over age index `index` (youngest first). */
   onHover(index: number, x: number, y: number): void;
@@ -24,7 +23,7 @@ type EngineOptions = {
 
 const sum = (values: readonly number[]) => values.reduce((total, v) => total + v, 0);
 
-export function createPyramid({ wrap, canvas, data, labels, onHover, onLeave }: EngineOptions) {
+export function createPyramid({ wrap, canvas, data, oldRows, labels, onHover, onLeave }: EngineOptions) {
   const { paper, ink, muted, hairlineSoft, ui, num } = readTokens(wrap);
 
   const { ages, men, women, baseMen, baseWomen } = data.pyramid;
@@ -37,7 +36,6 @@ export function createPyramid({ wrap, canvas, data, labels, onHover, onLeave }: 
   const top = Math.ceil(Math.max(...shares.men, ...shares.women, ...shares.baseMen, ...shares.baseWomen) * 2) / 2;
   const ticks: number[] = [];
   for (let v = 1; v < top; v++) ticks.push(v);
-  const oldRows = ages.indexOf(OLD_FROM) < 0 ? 0 : n - ages.indexOf(OLD_FROM);
   // Row `r` from the top shows age index flip(r), and age index `i` sits in row flip(i).
   const flip = (k: number) => n - 1 - k;
 
@@ -112,7 +110,7 @@ export function createPyramid({ wrap, canvas, data, labels, onHover, onLeave }: 
       ctx.restore();
     }
 
-    if (state.p >= 1 && oldRows) {
+    if (state.p >= 1) {
       const xr = R - (narrow ? 0 : 12);
       // haloTxt sets an alphabetic baseline: +4 centres the 11-12px text on the row.
       haloTxt(ctx, `65+ — ${formatShare(data.oldShare.share)}`, xr, T + rh * 0.5 + 4, `600 12px ${num}`, ink, paper, "right");

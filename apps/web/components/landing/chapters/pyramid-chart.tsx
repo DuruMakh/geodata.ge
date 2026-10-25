@@ -27,6 +27,16 @@ export type PyramidLabels = {
 
 const loadEngine = () => import("./pyramid-engine");
 
+/** The first age group of the 65+ share the chart annotates. */
+const OLD_FROM = "65–69";
+
+/** Rows of 65+ from the top (85+ first); a model without the 65–69 group fails the build here rather than drawing a wrong bracket. */
+export function oldRows(ages: readonly string[]): number {
+  const from = ages.indexOf(OLD_FROM);
+  if (from < 0) throw new Error(`Ageing pyramid: no "${OLD_FROM}" age group to start the 65+ bracket`);
+  return ages.length - from;
+}
+
 export function PyramidChart({ data, labels }: { data: AgeingChapter; labels: PyramidLabels }) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -38,6 +48,7 @@ export function PyramidChart({ data, labels }: { data: AgeingChapter; labels: Py
   });
 
   const { lib, failed } = useEngine(wrapRef, loadEngine);
+  const rows65 = oldRows(data.pyramid.ages);
 
   useEffect(() => {
     const wrap = wrapRef.current;
@@ -48,6 +59,7 @@ export function PyramidChart({ data, labels }: { data: AgeingChapter; labels: Py
       wrap,
       canvas,
       data,
+      oldRows: rows65,
       labels: () => live.current.labels,
       onHover(index, x, y) {
         const { data: d, labels: lab } = live.current;
@@ -56,7 +68,7 @@ export function PyramidChart({ data, labels }: { data: AgeingChapter; labels: Py
       onLeave: () => hideTip(tip),
     });
     return () => engine.destroy();
-  }, [lib, data]);
+  }, [lib, data, rows65]);
 
   const { oldShare, oldShareBase } = data;
   const ariaLabel =

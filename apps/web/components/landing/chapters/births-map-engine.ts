@@ -1,7 +1,6 @@
 import { formatInUnit, UNIT_PERSONS } from "../../../lib/explorer/format";
 import type { AgeingChapter, MunicipalChapter } from "../../../lib/landing/chapters/types";
-import { placeRatios } from "./births-map";
-import { birthsColor, clamp, readTokens } from "./canvas";
+import { birthsColor, birthsPer100, clamp, placeRatios, readTokens } from "./canvas";
 import { createChartCore, type ChartState } from "./chart-core";
 import { dot, haloTxt } from "./chart-draw";
 import { reliefScene } from "./relief-math";
@@ -30,7 +29,7 @@ export function createBirthsMap({ wrap, canvas, births, municipal, onHover, onLe
   const { centers } = reliefScene(municipal);
   // The chart core counts only indices >= 0 as hovered, so an occupied area is the index after the last place.
   const OCCUPIED = municipal.places.length;
-  const colors = births.places.map((entry) => (entry ? birthsColor((entry.births / entry.deaths) * 100) : null));
+  const colors = births.places.map((entry) => (entry ? birthsColor(birthsPer100(entry)) : null));
 
   const ranked = placeRatios(births).sort((a, b) => b.ratio - a.ratio);
   const tbilisi = ranked.find((r) => municipal.places[r.index].code === TBILISI);

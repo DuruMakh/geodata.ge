@@ -1,4 +1,4 @@
-import type { RevenueBandId } from "../../../lib/landing/chapters/types";
+import type { AgeingChapter, RevenueBandId } from "../../../lib/landing/chapters/types";
 
 // Canvas helpers ported from the design board's chart script. Pure functions (niceTicks,
 // stackLabels, fitText) touch no DOM; the rest read `window` only when called. The treemap
@@ -90,6 +90,18 @@ export const BIRTH_CLASSES = [
   { below: 125, color: "#8bb9b8" },
   { below: Infinity, color: "#1e7f86" },
 ] as const;
+
+/** Births per 100 deaths of one place's figures. */
+export const birthsPer100 = (entry: { births: number; deaths: number }) => (entry.births / entry.deaths) * 100;
+
+/** Births per 100 deaths of every municipality with figures, by place index. */
+export function placeRatios(births: AgeingChapter["births"]): { index: number; ratio: number }[] {
+  const out: { index: number; ratio: number }[] = [];
+  births.places.forEach((entry, index) => {
+    if (entry) out.push({ index, ratio: birthsPer100(entry) });
+  });
+  return out;
+}
 
 export const birthsColor = (ratio: number) => (BIRTH_CLASSES.find((c) => ratio < c.below) ?? BIRTH_CLASSES[BIRTH_CLASSES.length - 1]).color;
 

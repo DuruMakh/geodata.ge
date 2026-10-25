@@ -110,13 +110,18 @@ describe("AgeingChapter (server render)", () => {
     expect(cards.map((card) => value(card[1]).split("<small")[0])).toEqual(["108.8", "76.0", "1.53", "+17,127"]);
     expect(value(cards[1][1])).toMatch(/^76\.0<small[^>]*>წელი<\/small>$/);
     expect(cards.map((card) => card[2])).toEqual([
-      "სხვაობა ასაკთან ერთად იზრდება: 85 წლისა და უფროს ასაკში ქალები კაცებზე 2.6-ჯერ მეტია.",
+      "სხვაობა ასაკთან ერთად იზრდება: 85 წლისა და უფროს ასაკში ქალები კაცებზე 2.6-ჯერ მეტია (2026 წლის 1 იანვარი).",
       "მოსალოდნელი ხანგრძლივობა დაბადებისას, 2025: ქალებისთვის 80.6 წელი, კაცებისთვის — 71.4.",
       "ბავშვების საშუალო რაოდენობა ერთ ქალზე, 2025. თაობების ჩანაცვლებას დაახლოებით 2.1 სჭირდება.",
       "2025 წელს ჩამოსულთა რიცხვმა წასულთა რიცხვს 17,127-ით გადააჭარბა; 2012–2025 წლების ჯამში სალდო უარყოფითია — −26,795.",
     ]);
     expect(html).toContain("ქალი 100 კაცზე");
     expect(html).toContain("მიგრაციის სალდო");
+  });
+
+  it("fails the render when the model has no 65–69 group to start the 65+ bracket", () => {
+    const noOld = { ...data, pyramid: { ...data.pyramid, ages: ["0–4", "60–64", "85+"] } };
+    expect(() => renderToStaticMarkup(<AgeingChapter data={noOld} municipal={municipal} labels={labels} />)).toThrow('Ageing pyramid: no "65–69" age group');
   });
 
   it("words the migration note from the data: departures in the latest year, a positive total", () => {

@@ -184,7 +184,7 @@
   "landing.ageing.pyramid.oldShare": "share aged 65 and over",
   "landing.ageing.pyramid.chartSummary": "Population pyramid on 1 January {year} compared with the {baseYear} structure",
   "landing.ageing.women.label": "Women per 100 men",
-  "landing.ageing.women.note": "The gap widens with age: among people aged 85 and over, there are {ratio} times as many women as men.",
+  "landing.ageing.women.note": "The gap widens with age: among people aged 85 and over, there are {ratio} times as many women as men (1 January {year}).",
   "landing.ageing.life.label": "Life expectancy",
   "landing.ageing.life.note": "Expected at birth, {year}: {women} years for women, {men} for men.",
   "landing.ageing.fertility.label": "Total fertility rate",
