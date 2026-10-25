@@ -194,7 +194,7 @@ export function LandingPage({ chapters, gdpFigure, presentation, updatedAt, mcpE
       outside: t("landing.jobs.outside"),
       people: t("landing.jobs.people"),
       thousand: t("landing.jobs.thousand"),
-      million: t("landing.jobs.million"),
+      million: t("landing.million"),
       unemploymentRate: t("landing.jobs.unemploymentRate"),
       ofLabourForce: t("landing.jobs.ofLabourForce"),
       labourForce: t("landing.jobs.labourForce"),
@@ -213,8 +213,6 @@ export function LandingPage({ chapters, gdpFigure, presentation, updatedAt, mcpE
       // The tooltip fills in the difference when a region is hovered.
       higher: t("landing.jobs.regions.higher", { diff: "{diff}" }),
       lower: t("landing.jobs.regions.lower", { diff: "{diff}" }),
-      highest: t("landing.ageing.highest"),
-      lowest: t("landing.ageing.lowest"),
       chartSummary: t("landing.jobs.regions.chartSummary", { year: jobsYear }),
       unavailable,
     },

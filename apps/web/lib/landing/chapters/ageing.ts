@@ -9,6 +9,7 @@ import { chapterNeed } from "./need";
 const GEORGIA = "country.georgia";
 const POPULATION = "demography.population_by_age_sex";
 const AGE_BAND = "demography.population_age_band";
+const TOTAL_CITIZENSHIP = "citizenship.total";
 const BANDS = ["band_0_14", "band_15_64", "band_65_plus"];
 const ADULT_AGES = ["5_9", "10_14", "15_19", "20_24", "25_29", "30_34", "35_39", "40_44", "45_49", "50_54", "55_59", "60_64", "65_69", "70_74", "75_79", "80_84"];
 const AGE_GROUPS = [["age_0", "age_1_4"], ...ADULT_AGES.map((age) => [`age_${age}`]), ["age_85_plus"]];
@@ -52,7 +53,7 @@ export function buildAgeingChapter(facts: ServedDemographyObservation[], places:
   const fertilityRows = series("demography.total_fertility_rate");
   const fertilityYear = latestYear("demography.total_fertility_rate", fertilityRows);
 
-  const netRows = series("demography.net_migration").filter((row) => row.sex === "total");
+  const netRows = series("demography.net_migration").filter((row) => row.sex === "total" && (row.citizenshipId ?? TOTAL_CITIZENSHIP) === TOTAL_CITIZENSHIP);
   const net = new Map(netRows.map((row) => [row.year, row.value]));
   const migrationYears = [latestYear("demography.net_migration", netRows)];
   while (net.has(migrationYears[0]! - 1)) migrationYears.unshift(migrationYears[0]! - 1);
@@ -68,13 +69,20 @@ export function buildAgeingChapter(facts: ServedDemographyObservation[], places:
     return placeBirths === undefined || placeDeaths === undefined ? null : { births: placeBirths, deaths: placeDeaths };
   };
 
+  const womenPer100Men = (100 * value(population, year, (row) => row.sex === "female" && row.ageGroup === "total", `${POPULATION} female total`)) / value(population, year, (row) => row.sex === "male" && row.ageGroup === "total", `${POPULATION} male total`);
+  const oldestWomenPerMan = women.at(-1)! / men.at(-1)!;
+  // The women card's note says the gap widens with age; fail the build rather than print a claim the data does not make.
+  if (!(oldestWomenPerMan > womenPer100Men / 100)) {
+    throw new Error(`Ageing chapter: women per man aged 85+ (${oldestWomenPerMan.toFixed(2)}) is not above the all-ages ratio (${(womenPer100Men / 100).toFixed(2)}) in ${year}`);
+  }
+
   return {
     pyramid: { year, baseYear, ages: AGE_LABELS, men, women, baseMen: ageSeries("male", baseYear), baseWomen: ageSeries("female", baseYear) },
     oldShare: { year: oldYear, share: oldShare },
     oldShareBase: { year: oldBaseYear, share: oldShareBase },
     ageing: oldShare > oldShareBase,
-    womenPer100Men: (100 * value(population, year, (row) => row.sex === "female" && row.ageGroup === "total", `${POPULATION} female total`)) / value(population, year, (row) => row.sex === "male" && row.ageGroup === "total", `${POPULATION} male total`),
-    oldestWomenPerMan: women.at(-1)! / men.at(-1)!,
+    womenPer100Men,
+    oldestWomenPerMan,
     lifeExpectancy: {
       year: lifeYear,
       total: total(lifeTotal, lifeYear, "demography.life_expectancy_total"),

@@ -1,6 +1,7 @@
 import type { HealthFact } from "../../data/health/types";
 import { message } from "../../i18n/messages";
 import type { Messages } from "../../i18n/types";
+import { chapterNeed } from "./need";
 import type { DeathGroupKind, DeathsChapter } from "./types";
 
 // Chapter 10: what Georgians die of. Pure reading of the served health facts for
@@ -11,6 +12,8 @@ const PREFIX = "health.deaths.";
 const GROUP_LIMIT = 5;
 const UNKNOWN = "ill_defined";
 
+const need = chapterNeed("Deaths chapter");
+
 /** "One in N": round(1 / share) when it lands within 2..10, otherwise null (say it as a percentage). */
 export function oneInN(share: number): number | null {
   const n = Math.round(1 / share);
@@ -20,12 +23,11 @@ export function oneInN(share: number): number | null {
 export function buildDeathsChapter(facts: HealthFact[], messages: Messages): DeathsChapter {
   const georgia = facts.filter((fact) => fact.areaId === "georgia" && fact.indicatorId.startsWith(PREFIX));
   const totalYears = georgia.filter((fact) => fact.indicatorId === `${PREFIX}total`).map((fact) => fact.year);
-  if (!totalYears.length) throw new Error("Deaths chapter: no data for registered deaths total");
-  const year = Math.max(...totalYears);
+  const year = need(totalYears.length ? Math.max(...totalYears) : undefined, "registered deaths total");
 
   const counts = new Map<string, number>();
   for (const fact of georgia) if (fact.year === year) counts.set(fact.indicatorId.slice(PREFIX.length), Number(fact.value));
-  const total = counts.get("total")!;
+  const total = need(counts.get("total"), `registered deaths total ${year}`);
   counts.delete("total");
 
   const ranked = [...counts].filter(([, count]) => count > 0).sort((a, b) => b[1] - a[1]).slice(0, GROUP_LIMIT);
@@ -41,7 +43,7 @@ export function buildDeathsChapter(facts: HealthFact[], messages: Messages): Dea
     year,
     total,
     groups,
-    top: { id: topId, label: label(topId), share: counts.get(topId)! / total },
+    top: { id: topId, label: label(topId), share: need(counts.get(topId), `${topId} deaths ${year}`) / total },
     unknownShare: (counts.get(UNKNOWN) ?? 0) / total,
   };
 }

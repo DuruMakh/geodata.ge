@@ -64,7 +64,7 @@ describe("WagesChapter (server render)", () => {
   it("gives every card note the year of its own measure", () => {
     expect(cards.map((card) => card[2])).toEqual([
       "თვიური, ნომინალური, 2025. 1995 წელს — 13.5 ₾.",
-      "2024: დასაქმებულთა ნახევარი ამაზე ნაკლებს იღებს, ნახევარი — მეტს.",
+      "2024, საგადასახადო მონაცემებით: დასაქმებულთა ნახევარი ამაზე ნაკლებს იღებს, ნახევარი — მეტს.",
       "2025: ქალების საშუალო ხელფასი — 1,743 ₾, კაცებისა — 2,587 ₾.",
       "2025: საშუალო ხელფასი; არასაჯარო სექტორში — 2,301 ₾.",
     ]);
@@ -101,8 +101,10 @@ describe("WagesChapter (server render)", () => {
     expect(aria).toBe("ქალებისა და კაცების საშუალო ხელფასი 3 დარგში, 2025; ყველაზე დიდი სხვაობა: ფინანსები და დაზღვევა, 3,300 ₾");
   });
 
-  it("starts the dumbbell at its desktop height so the page does not jump when the engine sizes it", () => {
-    expect(html).toContain("height:121px");
+  it("reserves the dumbbell's phone and desktop heights so the page does not jump when the engine sizes it", () => {
+    expect(html).toContain("--h-narrow:172px;--h-wide:121px");
+    expect(html).toContain("h-[var(--h-narrow)]");
+    expect(html).toContain("min-[640px]:h-[var(--h-wide)]");
   });
 
   it("fails the render when there are no sectors", () => {

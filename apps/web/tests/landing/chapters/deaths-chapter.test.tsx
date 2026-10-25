@@ -1,7 +1,7 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { DeathsChapter } from "../../../components/landing/chapters/deaths-chapter";
-import { deathSquares, estimatedNameWidth, UNIT_NARROW_WIDTH, unitLayout } from "../../../components/landing/chapters/chart-layout";
+import { deathSquares, estimatedNameWidth, PHONE_CHART_WIDTH, UNIT_NARROW_WIDTH, unitLayout } from "../../../components/landing/chapters/chart-layout";
 import { deathGroupTip } from "../../../components/landing/chapters/chart-tips";
 import type { UnitLabels } from "../../../components/landing/chapters/unit-chart";
 import { message } from "../../../lib/i18n/messages";
@@ -65,22 +65,27 @@ describe("DeathsChapter (server render)", () => {
     expect(caption).not.toContain("border-[var(--control)]");
   });
 
-  it("lists the three largest causes with counts and the year in the accessible name", () => {
+  it("lists every group with its count, in data order, and the year in the accessible name", () => {
     const aria = html.match(/<canvas[^>]*aria-label="([^"]*)"/)?.[1];
     expect(aria).toBe(
-      "44,319 გარდაცვალება მიზეზების მიხედვით, 2025 წელს, თითო კვადრატი 100 ადამიანია: სისხლის მიმოქცევის სისტემის ავადმყოფობები 16,711, არაზუსტად განსაზღვრული მიზეზები 9,389, სიმსივნეები 6,877",
+      "44,319 გარდაცვალება მიზეზების მიხედვით, 2025 წელს, თითო კვადრატი 100 ადამიანია: სისხლის მიმოქცევის სისტემის ავადმყოფობები 16,711, არაზუსტად განსაზღვრული მიზეზები 9,389, სიმსივნეები 6,877, სასუნთქი სისტემის ავადმყოფობები 3,533, ტრავმები, მოწამვლები და გარეგანი მიზეზები 1,973, სხვა მიზეზები 5,836",
     );
   });
 
-  it("never names the remainder group among the three, even when fewer causes exist", () => {
+  it("names the remainder group last, also when fewer causes exist", () => {
     const few: DeathsChapterModel = { ...data, groups: [data.groups[0], { ...data.groups[5], count: 30000 }] };
     const aria = renderToStaticMarkup(<DeathsChapter data={few} labels={labels} />).match(/<canvas[^>]*aria-label="([^"]*)"/)?.[1];
-    expect(aria).toBe("44,319 გარდაცვალება მიზეზების მიხედვით, 2025 წელს, თითო კვადრატი 100 ადამიანია: სისხლის მიმოქცევის სისტემის ავადმყოფობები 16,711");
+    expect(aria).toBe("44,319 გარდაცვალება მიზეზების მიხედვით, 2025 წელს, თითო კვადრატი 100 ადამიანია: სისხლის მიმოქცევის სისტემის ავადმყოფობები 16,711, სხვა მიზეზები 30,000");
   });
 
-  it("starts the chart at its desktop height so the page does not jump when the engine sizes it", () => {
-    const height = unitLayout(1180, counts, estimatedNameWidth, names).height;
-    expect(html).toContain(`height:${height}px`);
+  it("reserves the chart's phone and desktop heights so the page does not jump when the engine sizes it", () => {
+    const narrow = unitLayout(PHONE_CHART_WIDTH, counts, estimatedNameWidth, names);
+    const wide = unitLayout(1180, counts, estimatedNameWidth, names);
+    expect(narrow.narrow).toBe(true);
+    expect(narrow.height).toBeGreaterThan(wide.height);
+    expect(html).toContain(`--h-narrow:${narrow.height}px;--h-wide:${wide.height}px`);
+    expect(html).toContain("h-[var(--h-narrow)]");
+    expect(html).toContain("min-[640px]:h-[var(--h-wide)]");
   });
 
   // In the browser at 1440 (Noto Sans Georgian 600, 12.5px; names 322, 245, 83, 243, 306 and 93 px wide in the 238px
@@ -89,7 +94,7 @@ describe("DeathsChapter (server render)", () => {
     const server = unitLayout(1180, counts, estimatedNameWidth, names);
     expect(server.rows.map((row) => row.lines.length)).toEqual([2, 2, 1, 2, 2, 1]);
     expect(server.height).toBe(370);
-    expect(html).toContain("height:370px");
+    expect(html).toContain("--h-wide:370px");
   });
 
   it("fails the render without groups", () => {

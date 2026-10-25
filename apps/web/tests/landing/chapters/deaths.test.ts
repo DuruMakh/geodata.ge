@@ -69,7 +69,7 @@ describe("buildDeathsChapter", () => {
   });
 
   it("fails clearly without a total", () => {
-    expect(() => buildDeathsChapter([], messages)).toThrow(/Deaths chapter/);
+    expect(() => buildDeathsChapter([], messages)).toThrow("Deaths chapter: no data for registered deaths total");
   });
 });
 

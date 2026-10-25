@@ -55,8 +55,9 @@ The board's internal numbers (09, 10, 11, 13, 14) are not shown on the page. The
 ### 5.1 Chapter 06, an ageing population
 
 - Heading: `საქართველო ბერდება` / "Georgia is getting older" (see 4) → `/explorer/demography`.
-- Lede: `65 წლისა და უფროსი ასაკის მოსახლეობის წილი {share}%-ია — {firstYear} წელს {firstShare}% იყო; {vitalYear} წელს ყოველ 100 გარდაცვლილზე {births} ახალშობილი მოდიოდა.`
+- Lede: `{year} წლის 1 იანვრისთვის 65 წლისა და უფროსი ასაკის მოსახლეობის წილი {share}% იყო — {firstYear} წელს {firstShare}%; {vitalYear} წელს ყოველ 100 გარდაცვლილზე {births} ახალშობილი მოდიოდა.`
 - Pyramid (left, 7/12 wide on desktop): men left, women right, 18 five-year age groups from 0–4 to 85+, as % of the whole population on 1 January of the latest year. The first year's shape (2004 today) is drawn as a thin ink outline over it. Tooltip: men's and women's share and count, and both sexes' share in the first year.
+- Census break: Geostat re-based the population after the 2024 census, so the first year's outline and 65+ share predate the re-base. The outline's legend item says so ("Structure in 2004 (before the census re-base)"); no other line is added. Owner decision pending; this is the recommended option (the alternative is to compare within one basis).
 - Stat cards (right column):
   1. Women per 100 men, latest year, with a note giving the ratio in the 85+ group ("2.6 times as many").
   2. Life expectancy at birth, latest year, with women's and men's values in the note.

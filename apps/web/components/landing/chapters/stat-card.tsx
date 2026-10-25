@@ -1,6 +1,9 @@
 import type { ReactNode } from "react";
 import { Reveal } from "./reveal";
 
+/** The words of a StatCard that the page builds from messages: its small label and its note line. */
+export type StatText = { label: string; note: string };
+
 // A number card of the society chapters: 1.5px ink rule, a small label, the big number (an optional unit in
 // small type after it), an optional small chart, and one note line. Server HTML, so the number reads and
 // indexes without JavaScript. Ported from the design board's .fx-stat.

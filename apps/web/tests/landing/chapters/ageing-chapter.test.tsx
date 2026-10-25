@@ -135,7 +135,7 @@ describe("AgeingChapter (server render)", () => {
   });
 
   it("gives the pyramid an HTML legend of men, women and the first year's outline", () => {
-    expect(legendTexts("მოსახლეობა ასაკისა და სქესის მიხედვით, % · 2026 წლის 1 იანვარი")).toEqual(["კაცები", "ქალები", "2004 წლის სტრუქტურა"]);
+    expect(legendTexts("მოსახლეობა ასაკისა და სქესის მიხედვით, % · 2026 წლის 1 იანვარი")).toEqual(["კაცები", "ქალები", "2004 წლის სტრუქტურა (აღწერით გადათვლამდე)"]);
   });
 
   it("gives the births map a legend of five classes and a hollow no-data key", () => {

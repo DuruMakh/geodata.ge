@@ -2,13 +2,11 @@ import type { WageGapChapter } from "../../../lib/landing/chapters/types";
 import { sparkPoints } from "./canvas";
 import { decimals } from "./chart-format";
 import { DumbbellChart, type DumbbellLabels } from "./dumbbell-chart";
-import { StatCard } from "./stat-card";
+import { StatCard, type StatText } from "./stat-card";
 
 // Chapter 08: the wages by sector (women, men and the average) with four number cards beside it: the average wage
 // with its history as a line, the median, women's wage as a share of men's, and the public sector against the rest.
 // 8/4 columns from 1000px.
-
-type StatText = { label: string; note: string };
 
 export type WagesLabels = {
   chart: DumbbellLabels;

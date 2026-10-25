@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 import { formatInUnit, UNIT_PERSONS } from "../../../lib/explorer/format";
 import type { WageGapChapter } from "../../../lib/landing/chapters/types";
 import { SEX_COLORS } from "./canvas";
-import { dumbbellHeight, largestWageGap } from "./chart-layout";
+import { dumbbellHeight, heightVars, largestWageGap } from "./chart-layout";
 import { ChartTip, hideTip, showTip } from "./chart-tip";
 import { wageTip } from "./chart-tips";
 import { ChartUnavailable, Reveal, useEngine } from "./reveal";
@@ -81,8 +81,8 @@ export function DumbbellChart({ year, sectors, labels }: { year: number; sectors
           </ul>
         </figcaption>
         <p className="mb-4 text-[11.5px] text-[var(--muted)]">{labels.ratioHint}</p>
-        {/* The engine sets the height from the row count (narrow screens use taller rows); this is the wide-screen one. */}
-        <div ref={wrapRef} className="relative w-full" style={{ height: dumbbellHeight(sectors.length, false) }}>
+        {/* The engine sets the height from the row count (narrow screens use taller rows); until then both are reserved. */}
+        <div ref={wrapRef} className="relative h-[var(--h-narrow)] w-full min-[640px]:h-[var(--h-wide)]" style={heightVars(dumbbellHeight(sectors.length, true), dumbbellHeight(sectors.length, false))}>
           {failed ? <ChartUnavailable text={labels.unavailable} summary={ariaLabel} /> : <canvas ref={canvasRef} role="img" aria-label={ariaLabel} className="absolute left-0 top-0" />}
           <ChartTip tipRef={tipRef} rows={3} />
         </div>

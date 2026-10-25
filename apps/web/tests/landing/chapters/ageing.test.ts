@@ -93,10 +93,12 @@ describe("buildAgeingChapter with served data", () => {
   });
 });
 
-// A pyramid in which every age group holds one person per sex, so only the shares matter.
-function pyramidFixture(year: number): ServedDemographyObservation[] {
+// A pyramid in which every age group holds one person per sex (women 85+ hold `oldestWomen`), so only the shares matter.
+function pyramidFixture(year: number, oldestWomen = 2): ServedDemographyObservation[] {
   const groups = ["age_0", "age_1_4", ...["5_9", "10_14", "15_19", "20_24", "25_29", "30_34", "35_39", "40_44", "45_49", "50_54", "55_59", "60_64", "65_69", "70_74", "75_79", "80_84"].map((age) => `age_${age}`), "age_85_plus", "total"];
-  return (["male", "female"] as const).flatMap((sex) => groups.map((ageGroup) => fact("demography.population_by_age_sex", "country.georgia", year, 1, { sex, ageGroup })));
+  return (["male", "female"] as const).flatMap((sex) =>
+    groups.map((ageGroup) => fact("demography.population_by_age_sex", "country.georgia", year, sex === "female" && ageGroup === "age_85_plus" ? oldestWomen : 1, { sex, ageGroup })),
+  );
 }
 
 describe("buildAgeingChapter births and gaps", () => {
@@ -153,6 +155,20 @@ describe("buildAgeingChapter births and gaps", () => {
     ];
     expect(() => buildAgeingChapter([...base, ...shifted(2009, 2000), ...rest, ...georgiaVital], [])).toThrow(/65\+ share is for 2009 but the pyramid is for 2010/);
     expect(() => buildAgeingChapter([...base, ...shifted(2010, 2001), ...rest, ...georgiaVital], [])).toThrow(/65\+ base share is for 2001 but the pyramid base is 2000/);
+  });
+
+  it("throws when the oldest women per man is not above the all-ages ratio, which the card note says widens with age", () => {
+    const flat = [...pyramidFixture(2000, 1), ...pyramidFixture(2010, 1)];
+    expect(() => buildAgeingChapter([...flat, ...bands, ...rest, ...georgiaVital], [])).toThrow(/Ageing chapter: .*85\+.*not above/);
+    expect(buildAgeingChapter([...base, ...bands, ...rest, ...georgiaVital], []).oldestWomenPerMan).toBe(2);
+  });
+
+  it("reads net migration of the all-citizenships total only", () => {
+    const groupRow = fact("demography.net_migration", "country.georgia", 2020, 99, { sex: "total", citizenshipId: "citizenship.foreign" });
+    const totalRow = fact("demography.net_migration", "country.georgia", 2020, -2, { sex: "total", citizenshipId: "citizenship.total" });
+    const without = rest.filter((row) => !(row.seriesId === "demography.net_migration" && row.year === 2020));
+    const { migration } = buildAgeingChapter([...base, ...bands, ...without, totalRow, groupRow, ...georgiaVital], []);
+    expect(migration).toEqual({ years: [2019, 2020], net: [5, -2] });
   });
 
   it("throws with the series id when a required series has no year", () => {

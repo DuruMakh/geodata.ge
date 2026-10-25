@@ -2,9 +2,11 @@ import { describe, expect, it } from "vitest";
 import {
   barSlots,
   DEFICIT_RULE_PCT,
+  deficitFloor,
   deficitScale,
   dumbbellHeight,
   fiveYearIndices,
+  heightVars,
   largestWageGap,
   partnerNameColumn,
   partnersAxisTop,
@@ -208,6 +210,18 @@ describe("widestDeficitIndex", () => {
 
   it("is -1 when imports never exceed exports", () => {
     expect(widestDeficitIndex([4, 5], [4, 3])).toBe(-1);
+  });
+});
+
+describe("heightVars", () => {
+  it("sets the phone and desktop heights as the custom properties the wrapper's height classes read", () => {
+    expect(heightVars(216, 168)).toEqual({ "--h-narrow": "216px", "--h-wide": "168px" });
+  });
+});
+
+describe("deficitFloor", () => {
+  it("is the lower of the two lines in each year, so the shading is the gap only where imports are above exports", () => {
+    expect(deficitFloor([1, 5, 3], [3, 4, 3])).toEqual([1, 4, 3]);
   });
 });
 

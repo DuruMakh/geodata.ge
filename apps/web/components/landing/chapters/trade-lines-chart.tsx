@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import type { TradeChapter } from "../../../lib/landing/chapters/types";
 import { TRADE_COLORS } from "./canvas";
+import { widestDeficitIndex } from "./chart-layout";
 import { ChartTip, hideTip, showTip } from "./chart-tip";
 import { tradeLineTip } from "./chart-tips";
 import { ChartUnavailable, Reveal, useEngine } from "./reveal";
@@ -63,7 +64,10 @@ export function TradeLinesChart({ data, labels }: { data: Pick<TradeChapter, "ye
             {[
               { name: labels.exports, className: "h-0.5 w-3.5 rounded-[1px]", style: { background: TRADE_COLORS.exports } },
               { name: labels.imports, className: "h-0.5 w-3.5 rounded-[1px]", style: { background: TRADE_COLORS.imports } },
-              { name: labels.deficit, className: "h-2.5 w-2.5 rounded-[2px] bg-[var(--accent)] opacity-[.14]", style: undefined },
+              // Only when imports exceed exports in some year, so the shading never carries a label the data does not support.
+              ...(widestDeficitIndex(data.exports, data.imports) >= 0
+                ? [{ name: labels.deficit, className: "h-2.5 w-2.5 rounded-[2px] bg-[var(--accent)] opacity-[.14]", style: undefined }]
+                : []),
             ].map((entry) => (
               <li key={entry.name} className="inline-flex items-center gap-[7px]">
                 <i aria-hidden="true" className={`inline-block flex-none ${entry.className}`} style={entry.style} />

@@ -125,6 +125,7 @@ export function buildSocietySentences({ ageing, youthJobs, wageGap, trade, death
   const unknownIn = oneInN(deaths.unknownShare);
   return {
     ageing: text("landing.sentence.ageing", {
+      year: ageing.oldShare.year,
       share: formatShare(ageing.oldShare.share),
       firstYear: ageing.oldShareBase.year,
       firstShare: formatShare(ageing.oldShareBase.share),

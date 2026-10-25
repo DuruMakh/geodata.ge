@@ -298,7 +298,7 @@ describe("society chapter sentences and headings", () => {
 
   it("writes the Georgian ledes of the board from the real data", async () => {
     const result = await sentencesFor("ka");
-    expect(result.ageing).toBe("65 წლისა და უფროსი ასაკის მოსახლეობის წილი 18.1%-ია — 2004 წელს 14.1% იყო; 2025 წელს ყოველ 100 გარდაცვლილზე 85 ახალშობილი მოდიოდა.");
+    expect(result.ageing).toBe("2026 წლის 1 იანვრისთვის 65 წლისა და უფროსი ასაკის მოსახლეობის წილი 18.1% იყო — 2004 წელს 14.1%; 2025 წელს ყოველ 100 გარდაცვლილზე 85 ახალშობილი მოდიოდა.");
     expect(result.youthJobs).toBe("2025 წელს უმუშევრობის დონე 13.9% იყო, 15–29 წლის ახალგაზრდებში — 25.4%.");
     expect(result.wageGap).toBe("საშუალო თვიური ხელფასი 2025 წელს 2,165 ლარი იყო; ქალები კაცების საშუალო ხელფასის 67%-ს იღებენ.");
     expect(result.trade).toBe("2025 წელს საგარეო სავაჭრო ბრუნვამ 25.9 მილიარდი დოლარი შეადგინა: ექსპორტი 7.3 მილიარდი იყო, იმპორტი — 18.6.");
@@ -312,10 +312,7 @@ describe("society chapter sentences and headings", () => {
 
   it("writes the English ledes with the same numbers", async () => {
     const result = await sentencesFor("en");
-    expect(result.ageing).toContain("18.1%");
-    expect(result.ageing).toContain("14.1%");
-    expect(result.ageing).toContain("2004");
-    expect(result.ageing).toContain("85");
+    expect(result.ageing).toBe("On 1 January 2026, people aged 65 and over were 18.1% of the population, compared with 14.1% in 2004; in 2025 there were 85 births for every 100 deaths.");
     expect(result.youthJobs).toBe("In 2025, unemployment was 13.9%; among 15–29-year-olds it was 25.4%.");
     expect(result.trade).toMatch(/^In 2025, Georgia’s foreign trade/);
     expect(result.deaths).toMatch(/^In 2025, 44,319 people died/);

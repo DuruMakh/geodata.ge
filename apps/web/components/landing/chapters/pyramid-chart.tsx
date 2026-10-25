@@ -16,7 +16,7 @@ export type PyramidLabels = {
   title: string; // above the chart, with the year: "მოსახლეობა ასაკისა და სქესის მიხედვით, % · 2026 წლის 1 იანვარი"
   men: string; // legend, axis and tooltip: "კაცები"
   women: string; // legend, axis and tooltip: "ქალები"
-  base: string; // legend entry for the outline: "2004 წლის სტრუქტურა"
+  base: string; // legend entry for the outline, which predates the census re-base: "2004 წლის სტრუქტურა (აღწერით გადათვლამდე)"
   years: string; // tooltip title, follows the age group: "წელი"
   bothSexes: string; // tooltip row and foot: "ორივე სქესი"
   then: string; // on the chart before the first year's 65+ share: "2004-ში"

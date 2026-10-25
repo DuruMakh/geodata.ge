@@ -3,12 +3,12 @@ import { clamp, niceTicks, readTokens, rgb, stackLabels, TRADE_COLORS } from "./
 import { createChartCore, type ChartState } from "./chart-core";
 import { dot, easeOut, haloTxt, hline, txt, vline } from "./chart-draw";
 import { decimals } from "./chart-format";
-import { pointIndexAt, toBillions, tradeYearTicks, widestDeficitIndex } from "./chart-layout";
+import { deficitFloor, pointIndexAt, toBillions, tradeYearTicks, widestDeficitIndex } from "./chart-layout";
 import type { TradeLinesLabels } from "./trade-lines-chart";
 
 // The canvas engine of chapter 09's exports and imports lines, loaded only once the chart nears the viewport
 // (trade-lines-chart.tsx). Two lines in billions of dollars with the gap between them shaded as the deficit, labelled
-// where it is widest, and each line's latest value at the right. Ported from the design board's createTradeLines
+// where it is widest (only the years in which imports exceed exports), and each line's latest value at the right. Ported from the design board's createTradeLines
 // (and createLines, which it is built on).
 
 type EngineOptions = {
@@ -32,6 +32,7 @@ export function createTradeLines({ wrap, canvas, data, labels, onHover, onLeave 
   const { top: hi, ticks } = niceTicks(Math.max(...exp, ...imp), 4);
   const yearTicks = tradeYearTicks(data.years);
   const widest = widestDeficitIndex(exp, imp);
+  const floor = deficitFloor(exp, imp);
   const fmt = (v: number) => decimals(v, 1);
   const [accentR, accentG, accentB] = rgb(accent);
 
@@ -78,7 +79,7 @@ export function createTradeLines({ wrap, canvas, data, labels, onHover, onLeave 
     ctx.clip();
     ctx.beginPath();
     imp.forEach((v, i) => (i ? ctx.lineTo(X(i), Y(v)) : ctx.moveTo(X(i), Y(v))));
-    for (let i = n - 1; i >= 0; i--) ctx.lineTo(X(i), Y(exp[i]));
+    for (let i = n - 1; i >= 0; i--) ctx.lineTo(X(i), Y(floor[i]));
     ctx.closePath();
     ctx.fillStyle = `rgba(${accentR},${accentG},${accentB},.14)`;
     ctx.fill();

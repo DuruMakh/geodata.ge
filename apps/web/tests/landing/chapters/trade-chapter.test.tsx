@@ -124,6 +124,16 @@ describe("TradeChapter (server render)", () => {
     expect(captions[0]).toContain("#3a332a");
   });
 
+  it("keys the shaded deficit only when imports exceed exports in at least one year", () => {
+    const keys = (caption: string) => [...caption.matchAll(/<li[^>]*><i[^>]*><\/i>([^<]*)<\/li>/g)].map((m) => m[1]);
+    const linesKeys = (model: TradeChapterModel) =>
+      keys([...renderToStaticMarkup(<TradeChapter data={model} labels={labelsFor(model, ka)} />).matchAll(/<figcaption[^>]*>(.*?)<\/figcaption>/g)][1][1]);
+    expect(linesKeys(data)).toContain("დეფიციტი");
+    const surplus: TradeChapterModel = { ...data, exports: data.imports, imports: data.exports };
+    expect(linesKeys(surplus)).toEqual(["ექსპორტი", "იმპორტი"]);
+    expect(linesKeys({ ...surplus, exports: data.imports, imports: data.imports })).toEqual(["ექსპორტი", "იმპორტი"]);
+  });
+
   it("lists the ten partners in order with their turnover in the butterfly's accessible name", () => {
     const aria = [...html.matchAll(/<canvas[^>]*aria-label="([^"]*)"/g)].map((m) => m[1]);
     expect(aria).toHaveLength(2);

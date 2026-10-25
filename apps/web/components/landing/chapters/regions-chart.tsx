@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 import type { YouthJobsChapter } from "../../../lib/landing/chapters/types";
 import { points } from "./chart-format";
-import { regionsHeight } from "./chart-layout";
+import { heightVars, regionsHeight } from "./chart-layout";
 import { ChartTip, hideTip, showTip } from "./chart-tip";
 import { regionTip } from "./chart-tips";
 import { ChartUnavailable, Reveal, useEngine } from "./reveal";
@@ -18,9 +18,7 @@ export type RegionsLabels = {
   equal: string; // tooltip foot for a region equal to Georgia: "საქართველოს საშუალოს ტოლი"
   higher: string; // tooltip foot template, {diff} in points: "საქართველოს საშუალოზე {diff} პ.პ.-ით მაღალი"
   lower: string; // tooltip foot template: "საქართველოს საშუალოზე {diff} პ.პ.-ით დაბალი"
-  highest: string; // aria-label: "ყველაზე მაღალი"
-  lowest: string; // aria-label: "ყველაზე დაბალი"
-  chartSummary: string; // canvas aria-label lead, with the year: "უმუშევრობის დონე რეგიონების მიხედვით, 2025"
+  chartSummary: string; // canvas aria-label lead, with the year; every region and its rate follow: "უმუშევრობის დონე რეგიონების მიხედვით, 2025"
   unavailable: string; // in place of the chart when its engine fails to load
 };
 
@@ -58,9 +56,7 @@ export function RegionsChart({ regions, national, labels }: { regions: YouthJobs
     return () => engine.destroy();
   }, [lib, regions, national]);
 
-  const high = regions[0];
-  const low = regions[regions.length - 1];
-  const ariaLabel = `${labels.chartSummary}; ${labels.highest}: ${high.label} ${points(high.rate)}; ${labels.lowest}: ${low.label} ${points(low.rate)}`;
+  const ariaLabel = `${labels.chartSummary}: ${regions.map((region) => `${region.label} ${points(region.rate)}`).join(", ")}`;
 
   return (
     <Reveal className="mt-11 min-[768px]:mt-14">
@@ -68,8 +64,8 @@ export function RegionsChart({ regions, national, labels }: { regions: YouthJobs
         <figcaption className="mb-3">
           <b className="text-[13.5px] font-semibold">{labels.title}</b>
         </figcaption>
-        {/* The engine sets the height from the row count (narrow screens use taller rows); this is the wide-screen one. */}
-        <div ref={wrapRef} className="relative w-full" style={{ height: regionsHeight(regions.length, false) }}>
+        {/* The engine sets the height from the row count (narrow screens use taller rows); until then both are reserved. */}
+        <div ref={wrapRef} className="relative h-[var(--h-narrow)] w-full min-[560px]:h-[var(--h-wide)]" style={heightVars(regionsHeight(regions.length, true), regionsHeight(regions.length, false))}>
           {failed ? <ChartUnavailable text={labels.unavailable} summary={ariaLabel} /> : <canvas ref={canvasRef} role="img" aria-label={ariaLabel} className="absolute left-0 top-0" />}
           <ChartTip tipRef={tipRef} rows={1} />
         </div>

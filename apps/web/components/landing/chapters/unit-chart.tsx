@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 import type { DeathsChapter } from "../../../lib/landing/chapters/types";
 import { decimals } from "./chart-format";
-import { estimatedNameWidth, unitLayout } from "./chart-layout";
+import { estimatedNameWidth, heightVars, PHONE_CHART_WIDTH, unitLayout } from "./chart-layout";
 import { ChartTip, hideTip, showTip } from "./chart-tip";
 import { deathGroupTip } from "./chart-tips";
 import { ChartUnavailable, Reveal, useEngine } from "./reveal";
@@ -16,7 +16,7 @@ export type UnitLabels = {
   title: string; // above the chart, with the year: "გარდაცვალების მიზეზები, 2025"
   unit: string; // legend: "= 100 გარდაცვლილი"
   unknown: string; // legend of the hollow square: "მიზეზი დაუდგენელია"
-  summary: string; // canvas aria-label lead, with total, year and the square unit: the three largest causes follow
+  summary: string; // canvas aria-label lead, with total, year and the square unit: every group and its count follow
   people: string; // tooltip row name after the count: "გარდაცვლილი"
   ofAll: string; // tooltip row name after the share: "ყველა გარდაცვალებიდან"
   squares: string; // tooltip foot with a {count} placeholder: "≈ {count} კვადრატი"
@@ -26,7 +26,7 @@ export type UnitLabels = {
 const loadEngine = () => import("./unit-engine");
 
 // The chapter body is at most 1240px wide; the server cannot measure the font, so it lays the names out with an
-// estimate (estimatedNameWidth) and the engine sets the real height once it runs.
+// estimate (estimatedNameWidth) at a desktop and at a phone width, and the engine sets the real height once it runs.
 const DESKTOP_WIDTH = 1180;
 
 export function UnitChart({ data, labels }: { data: DeathsChapter; labels: UnitLabels }) {
@@ -60,14 +60,14 @@ export function UnitChart({ data, labels }: { data: DeathsChapter; labels: UnitL
     return () => engine.destroy();
   }, [lib, data.groups, data.total]);
 
-  const largest = data.groups.filter((group) => group.kind !== "other").slice(0, 3);
-  const ariaLabel = `${labels.summary}: ${largest.map((group) => `${group.label} ${decimals(group.count, 0)}`).join(", ")}`;
-  const initialHeight = unitLayout(
-    DESKTOP_WIDTH,
-    data.groups.map((group) => group.count),
-    estimatedNameWidth,
-    data.groups.map((group) => group.label),
-  ).height;
+  const ariaLabel = `${labels.summary}: ${data.groups.map((group) => `${group.label} ${decimals(group.count, 0)}`).join(", ")}`;
+  const heightAt = (width: number) =>
+    unitLayout(
+      width,
+      data.groups.map((group) => group.count),
+      estimatedNameWidth,
+      data.groups.map((group) => group.label),
+    ).height;
 
   return (
     <Reveal>
@@ -87,8 +87,8 @@ export function UnitChart({ data, labels }: { data: DeathsChapter; labels: UnitL
             )}
           </ul>
         </figcaption>
-        {/* The engine sets the height from the rows (narrow screens stack the names above the squares); this is the wide-screen one (it matches the measured height at 1440; a phone grows it by about 28px, 370 to 398). */}
-        <div ref={wrapRef} className="relative w-full" style={{ height: initialHeight }}>
+        {/* The engine sets the height from the rows (narrow screens stack the names above the squares); until then both estimates are reserved (the wide one matches the measured height at 1440). */}
+        <div ref={wrapRef} className="relative h-[var(--h-narrow)] w-full min-[640px]:h-[var(--h-wide)]" style={heightVars(heightAt(PHONE_CHART_WIDTH), heightAt(DESKTOP_WIDTH))}>
           {failed ? <ChartUnavailable text={labels.unavailable} summary={ariaLabel} /> : <canvas ref={canvasRef} role="img" aria-label={ariaLabel} className="absolute left-0 top-0" />}
           <ChartTip tipRef={tipRef} rows={2} />
         </div>

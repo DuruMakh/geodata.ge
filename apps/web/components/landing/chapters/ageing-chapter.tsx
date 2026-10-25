@@ -3,12 +3,10 @@ import { BirthsMap, type BirthsMapLabels } from "./births-map";
 import { decimals, signedCount } from "./chart-format";
 import { MigrationChart, type MigrationLabels } from "./migration-chart";
 import { PyramidChart, type PyramidLabels } from "./pyramid-chart";
-import { StatCard } from "./stat-card";
+import { StatCard, type StatText } from "./stat-card";
 
 // Chapter 06: the population pyramid with four number cards beside it (women per 100 men, life expectancy,
 // fertility, net migration with its bars), and the births-per-deaths map below. 7/5 columns from 1000px.
-
-type StatText = { label: string; note: string };
 
 export type AgeingLabels = {
   pyramid: PyramidLabels;

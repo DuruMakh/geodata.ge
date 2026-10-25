@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react";
 import { wrapLines } from "./canvas";
 
 // Pure layout of the revenue and deficit charts (chapters 03 and 05): which year labels fit, where
@@ -160,6 +161,22 @@ export function widestDeficitIndex(exports: readonly number[], imports: readonly
     }
   });
   return widest;
+}
+
+/** Width a chart gets on a 375 px phone (16 px gutters), where the server lays out a chart before its engine measures. */
+export const PHONE_CHART_WIDTH = 343;
+
+/**
+ * The heights a chart wrapper reserves in server HTML, as the custom properties its classes read:
+ * `h-[var(--h-narrow)] min-[Npx]:h-[var(--h-wide)]`, N being the engine's narrow threshold. The engine then sets the final height.
+ */
+export function heightVars(narrow: number, wide: number): CSSProperties {
+  return { "--h-narrow": `${narrow}px`, "--h-wide": `${wide}px` } as CSSProperties;
+}
+
+/** Per year the lower of the two lines: the shaded gap runs from it up to imports, so it is empty where exports are the higher line. */
+export function deficitFloor(exports: readonly number[], imports: readonly number[]): number[] {
+  return imports.map((value, i) => Math.min(value, exports[i]));
 }
 
 /** US dollars in billions. */

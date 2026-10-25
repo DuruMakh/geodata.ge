@@ -36,7 +36,7 @@ const waffle = (who: "all" | "youth") => {
     outside: t("landing.jobs.outside"),
     people: t("landing.jobs.people"),
     thousand: t("landing.jobs.thousand"),
-    million: t("landing.jobs.million"),
+    million: t("landing.million"),
     unemploymentRate: t("landing.jobs.unemploymentRate"),
     ofLabourForce: t("landing.jobs.ofLabourForce"),
     labourForce: t("landing.jobs.labourForce"),
@@ -54,8 +54,6 @@ const labels: JobsLabels = {
     equal: t("landing.jobs.regions.equal"),
     higher: t("landing.jobs.regions.higher", { diff: "{diff}" }),
     lower: t("landing.jobs.regions.lower", { diff: "{diff}" }),
-    highest: t("landing.ageing.highest"),
-    lowest: t("landing.ageing.lowest"),
     chartSummary: t("landing.jobs.regions.chartSummary", { year }),
     unavailable,
   },
@@ -91,15 +89,17 @@ describe("JobsChapter (server render)", () => {
     ]);
   });
 
-  it("names the three groups per 100 in each grid's accessible name, and the highest and lowest region in the regions chart's", () => {
+  it("names the three groups per 100 in each grid's accessible name, and every region with its rate in the regions chart's", () => {
     expect(canvases).toEqual([
       "2025 წელს 15 წლისა და უფროსი ასაკის 100 ადამიანიდან 47 დასაქმებულია, 8 უმუშევარი, 45 შრომის ძალის გარეთაა",
       "2025 წელს 15–29 წლის 100 ახალგაზრდიდან 35 დასაქმებულია, 12 უმუშევარი, 53 შრომის ძალის გარეთაა",
-      "უმუშევრობის დონე რეგიონების მიხედვით, 2025; ყველაზე მაღალი: თბილისი 17.5%; ყველაზე დაბალი: სამცხე-ჯავახეთი 7.0%",
+      "უმუშევრობის დონე რეგიონების მიხედვით, 2025: თბილისი 17.5%, იმერეთი 16.1%, აჭარა 9.2%, სამცხე-ჯავახეთი 7.0%",
     ]);
   });
 
-  it("starts the regions chart at its desktop height so the page does not jump when the engine sizes it", () => {
-    expect(html).toContain("height:168px");
+  it("reserves the regions chart's phone and desktop heights so the page does not jump when the engine sizes it", () => {
+    expect(html).toContain("--h-narrow:216px;--h-wide:168px");
+    expect(html).toContain("h-[var(--h-narrow)]");
+    expect(html).toContain("min-[560px]:h-[var(--h-wide)]");
   });
 });

@@ -1,14 +1,12 @@
 import type { TradeChapter as TradeChapterModel } from "../../../lib/landing/chapters/types";
 import { ButterflyChart, type ButterflyLabels } from "./butterfly-chart";
 import { billions, decimals } from "./chart-format";
-import { StatCard } from "./stat-card";
+import { StatCard, type StatText } from "./stat-card";
 import { TradeLinesChart, type TradeLinesLabels } from "./trade-lines-chart";
 
 // Chapter 09: the ten largest trading partners (exports left, imports right) beside the exports and imports lines
 // since the first year, with three number cards below: the turnover, the balance and the largest export product's
 // share. 7/5 columns from 1000px; the cards are three columns from 700px.
-
-type StatText = { label: string; note: string };
 
 export type TradeLabels = {
   butterfly: ButterflyLabels;
