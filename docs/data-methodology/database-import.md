@@ -13,9 +13,10 @@ every run. The database is never edited directly and never becomes a second
 editing surface — if the database and the CSVs ever disagree, the CSVs win and
 the import is re-run.
 
-The complete replacement and its parity checks share a five-minute transaction
-limit; opening that transaction has a separate 30-second wait limit. Exceeding
-either limit fails the import. Validation and exact row parity remain inside the
+The complete replacement and its parity checks share a ten-minute transaction
+limit (raised from five minutes on 2026-10-25, when production imports began to
+run just past five minutes); opening that transaction has a separate 30-second
+wait limit. Exceeding either limit fails the import. Validation and exact row parity remain inside the
 same all-or-nothing transaction, and a failure preserves the previous mirror.
 
 Every pull request rehearses the import: CI's `mirror` job applies every
