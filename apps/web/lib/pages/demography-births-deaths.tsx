@@ -82,6 +82,7 @@ export async function renderDemographyBirthsDeathsPage(locale: Locale) {
         <ExplorerHeading>{title}</ExplorerHeading>
         <p className="mb-[30px] max-w-[800px] text-[13px] leading-relaxed text-[var(--body)]">{t("birthsLead")}</p>
         <MunicipalitiesIndex
+          share={{ title, caption: t("ratioLegend", { year: index.year }), source: t("birthsSource", { first, last }), period: String(index.year) }}
           viewBox={index.map.viewBox}
           shapes={index.map.shapes}
           markers={index.map.markers}

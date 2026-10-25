@@ -4412,6 +4412,24 @@
     "attribution": { "text": "National Bank of Georgia", "reviewedAt": "2026-10-11" },
     "documentLanguage": "en"
   },
+  "nbg_loans_structure_l3_10_1": {
+    "title": { "text": "Loans to the economy by borrower and type of activity (L3.10.1)", "reviewedAt": "2026-10-24" },
+    "publisher": { "text": "National Bank of Georgia (NBG)", "reviewedAt": "2026-10-24" },
+    "attribution": { "text": "National Bank of Georgia", "reviewedAt": "2026-10-24" },
+    "documentLanguage": "en"
+  },
+  "nbg_loans_purpose_lop": {
+    "title": { "text": "Household loans by purpose (LPR)", "reviewedAt": "2026-10-24" },
+    "publisher": { "text": "National Bank of Georgia (NBG)", "reviewedAt": "2026-10-24" },
+    "attribution": { "text": "National Bank of Georgia", "reviewedAt": "2026-10-24" },
+    "documentLanguage": "en"
+  },
+  "nbg_loans_regions_lreg": {
+    "title": { "text": "Loans by region (LREG)", "reviewedAt": "2026-10-24" },
+    "publisher": { "text": "National Bank of Georgia (NBG)", "reviewedAt": "2026-10-24" },
+    "attribution": { "text": "National Bank of Georgia", "reviewedAt": "2026-10-24" },
+    "documentLanguage": "en"
+  },
   "nbg_meth_monetary_statistics": {
     "title": { "text": "Methodology of monetary statistics", "reviewedAt": "2026-10-11" },
     "publisher": { "text": "National Bank of Georgia (NBG)", "reviewedAt": "2026-10-11" },

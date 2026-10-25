@@ -3,7 +3,7 @@
 import { coverageLabel } from "../../lib/explorer/coverageLabel";
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import { periodMonth, periodYear } from "../../lib/data/inflation/periods";
+import { periodKey, periodMonth, periodYear } from "../../lib/data/inflation/periods";
 import type { ClientBasketWeightRow } from "../../lib/servedRows";
 import { unpackFacts, type FactsInput } from "../../lib/data/packedFacts";
 import { updatedDate } from "../../lib/explorer/coverageLabel";
@@ -31,6 +31,7 @@ import {
   type PackedCategorySeries,
   type CategoryTab,
 } from "../../lib/explorer/inflationCategories";
+import { INK } from "../../lib/explorer/colors";
 import { categoryColor, categoryLabel, formatContribution } from "../../lib/explorer/inflationCategoryLabels";
 import { buildInflationCategoryWorkbookExportModel } from "../../lib/explorer/inflationCategoryWorkbook";
 import type { InflationWorkbookSource } from "../../lib/explorer/inflationWorkbook";
@@ -54,6 +55,7 @@ import { LatestValueLine } from "../explorer-shell/latest-value-line";
 import { latestEntry } from "../../lib/explorer/latestValue";
 import { formatInflationValue } from "../../lib/explorer/inflationLabels";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
+import { ChartShareButton } from "../explorer-shell/chart-share-button";
 import { PageDataStatus } from "../explorer-shell/page-data-status";
 import { useHashState } from "../explorer-shell/use-hash-state";
 import { usePageData } from "../explorer-shell/use-page-data";
@@ -145,6 +147,56 @@ export function InflationCategories({ facts, monthlyUrl, weights, headline, head
     vals: line.values,
   }));
 
+  const segments = [
+    ...stack.segments.map((segment) => ({
+      id: segment.categoryId,
+      label: categoryLabel(messages, segment.categoryId),
+      color: categoryColor(segment.categoryId),
+      values: segment.values,
+    })),
+    {
+      id: RESIDUAL_ID,
+      label: t("categoryResidual"),
+      color: categoryColor(RESIDUAL_ID),
+      values: stack.residual,
+    },
+  ];
+  const chart = state.tab === "contrib" ? (
+    <StackedColumnChart
+      periods={stack.periods}
+      periodsPerYear={12}
+      segments={segments}
+      overlay={{ label: t("categoryHeadline"), values: stack.headline }}
+      formatPeriod={(period) =>
+        periodMonth(period) === 1 ? String(periodYear(period)) : periodLabel(messages, period, "short")
+      }
+      formatValue={(value) => `${formatContribution(value)} ${t("pp")}`}
+      ariaLabel={t("categoryTab.contrib")}
+    />
+  ) : (
+    <EditorialLineChart
+      years={lines.periods}
+      series={chartSeries}
+      share
+      unit={PCT_UNIT}
+      shareLabel={t(`categoryTab.${state.tab}`)}
+      periodsPerYear={12}
+      formatPeriod={(period, kind) => monthlyChartPeriod(messages, period, kind)}
+    />
+  );
+  const shareAction = !pending && hasSeries ? (
+    <ChartShareButton
+      title={t("categoriesHeading")}
+      caption={`${unitLine} · ${periodLabel(messages, range.start, "short")}–${periodLabel(messages, range.end, "short")}`}
+      legend={state.tab === "contrib"
+        ? [{ label: t("categoryHeadline"), color: INK }, ...segments.map(({ label, color }) => ({ label, color }))]
+        : chartSeries.map(({ label, color }) => ({ label, color }))}
+      source={t("categorySource")}
+      chart={chart}
+      period={`${periodKey(range.start)}-${periodKey(range.end)}`}
+    />
+  ) : undefined;
+
   return (
     <ExplorerPage testId="inflation-categories">
       <PageHeader
@@ -219,45 +271,8 @@ export function InflationCategories({ facts, monthlyUrl, weights, headline, head
                 range={range}
                 onTableSeriesChange={(categoryId) => update((current) => ({ ...current, tableSeries: categoryId }))}
               />
-            ) : state.tab === "contrib" ? (
-              <div className="mt-5">
-                <StackedColumnChart
-                  periods={stack.periods}
-                  periodsPerYear={12}
-                  segments={[
-                    ...stack.segments.map((segment) => ({
-                      id: segment.categoryId,
-                      label: categoryLabel(messages, segment.categoryId),
-                      color: categoryColor(segment.categoryId),
-                      values: segment.values,
-                    })),
-                    {
-                      id: RESIDUAL_ID,
-                      label: t("categoryResidual"),
-                      color: categoryColor(RESIDUAL_ID),
-                      values: stack.residual,
-                    },
-                  ]}
-                  overlay={{ label: t("categoryHeadline"), values: stack.headline }}
-                  formatPeriod={(period) =>
-                    periodMonth(period) === 1 ? String(periodYear(period)) : periodLabel(messages, period, "short")
-                  }
-                  formatValue={(value) => `${formatContribution(value)} ${t("pp")}`}
-                  ariaLabel={t("categoryTab.contrib")}
-                />
-              </div>
             ) : (
-              <div className="mt-5">
-                <EditorialLineChart
-                  years={lines.periods}
-                  series={chartSeries}
-                  share
-                  unit={PCT_UNIT}
-                  shareLabel={t(`categoryTab.${state.tab}`)}
-                  periodsPerYear={12}
-                  formatPeriod={(period, kind) => monthlyChartPeriod(messages, period, kind)}
-                />
-              </div>
+              <div className="mt-5">{chart}</div>
             )}
             {pending ? null : <>
               <ChartSelectionAids series={chartSeries} chartShown={state.mode === "chart"} share unit={PCT_UNIT} legendCap={DIVISION_IDS.length} formatValue={state.tab === "contrib" ? (value) => `${formatContribution(value)} ${t("pp")}` : undefined} />
@@ -272,7 +287,7 @@ export function InflationCategories({ facts, monthlyUrl, weights, headline, head
             </>}
           </section>
           <div className="mt-[18px] space-y-2">
-            <SourceNote testId="source-label">
+            <SourceNote testId="source-label" action={shareAction}>
               {/* The unit sits with the source, not as a second line under the heading (DESIGN §17). */}
               <span data-testid="inflation-category-unit">{unitLine}</span>
               {" · "}

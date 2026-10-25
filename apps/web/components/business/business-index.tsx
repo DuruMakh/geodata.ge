@@ -41,7 +41,7 @@ export function BusinessIndex({ facts, regionMaps }: {
     <ExplorerHeading>{t("page.regions.title")}</ExplorerHeading>
     <LatestValueLine testId="business-latest" measure={t("latest.regions", { region: largestName })} period={regionMaps.turnover.year} value={`${formatInUnit(largest.value, bn)} ${message(messages, "format.bnGel")}`} />
     <section data-testid="business-region-index" data-measure={measure} className="mt-4">
-      <RegionIndex model={regionMap} summary={[]} sourceNote={`${t("sourceNoteRegions")} · ${unitLabel} · ${regionMap.year}.`}
+      <RegionIndex title={t("page.regions.title")} model={regionMap} summary={[]} sourceNote={`${t("sourceNoteRegions")} · ${unitLabel} · ${regionMap.year}.`}
         mapControls={<SegmentedTabs<BusinessMapMeasure> ariaLabel={t("measure")} value={measure} onChange={next => update(() => next, true)} options={[
           { value: "turnover", label: t("map.turnover"), testId: "business-map-turnover", icon: <span aria-hidden="true" className="text-base">₾</span> },
           { value: "employed", label: t("map.employed"), testId: "business-map-employed", icon: <Users aria-hidden="true" size={18} strokeWidth={1.5} /> },

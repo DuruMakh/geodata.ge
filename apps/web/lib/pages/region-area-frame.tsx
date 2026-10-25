@@ -20,12 +20,12 @@ import { explorerDatasetJsonLd } from "../seo/structuredData";
 import { resolveSiteUrl } from "../siteUrl";
 
 // The frame of a hub whose index (a map of the eleven regions) opens one static page for Georgia and each region:
-// Housing, Transport and Internet, each configured once in its `-shared.tsx`. The index and the area pages are separate
-// modules, so each ships only its own explorer: keep explorer components out of this file.
+// Housing, Transport, Internet and Loans by region, each configured once in its `-shared.tsx`. The index and the area
+// pages are separate modules, so each ships only its own explorer: keep explorer components out of this file.
 
 export type RegionAreaFrameConfig<Area extends string, Fact extends { year: number; lastReviewedAt: string }> = {
-  /** The message namespace and the Dataset id. */
-  hub: "housing" | "transport" | "internet";
+  /** The message namespace and the Dataset id (Money and banks' messages are `moneyBanks`, its Dataset and sources `money`). */
+  hub: "housing" | "transport" | "internet" | "moneyBanks";
   hubPath: `/${string}`;
   indexHref: `/${string}`;
   /** The index page's messages, `<hub>.page.<indexKey>.title`, `.summary` and `.metaTitle`. */
@@ -49,6 +49,7 @@ export type RegionAreaBody<Area extends string, Fact> = {
 
 export function regionAreaFrame<Area extends string, Fact extends { year: number; lastReviewedAt: string }>(config: RegionAreaFrameConfig<Area, Fact>) {
   const { hub, hubPath, indexHref, indexKey, areas, areaSlug, areaHref, mapId } = config;
+  const datasetId = hub === "moneyBanks" ? "money" : hub;
   /** Georgia and the eleven regions; Georgia's English name is the catalogue's `georgia` label. */
   const areaPages: readonly MunicipalRegion[] = areas.map(area => area === "georgia" ? { id: area, kaLabel: "საქართველო", sortOrder: 0 } : REGIONAL_ECONOMY_REGIONS.find(region => region.id === mapId(area))!);
   const labelIds = areaPages.map(area => area.id);
@@ -79,7 +80,7 @@ export function regionAreaFrame<Area extends string, Fact extends { year: number
 
   /** The Sources sheet of the hub's workbooks: the archived workbooks behind the exported values, in the page's language and keyed by the facts' `sourceId`. */
   function loadWorkbookSources(locale: Locale): Promise<SourcedWorkbookPublicSource[]> {
-    return loadSourcedWorkbookSources(hub, locale, row => config.sourceIds.includes(row.source_id));
+    return loadSourcedWorkbookSources(datasetId, locale, row => config.sourceIds.includes(row.source_id));
   }
 
   /** The index, or with `area` that area's page: the frame both share (crumbs, Dataset, header) around the page's own body. */
@@ -99,7 +100,7 @@ export function regionAreaFrame<Area extends string, Fact extends { year: number
     const measures = area ? [...new Set(config.areaHeadingIds(area).map(id => t(`heading.${id}`)))] : [t("mapLabel")];
     return <I18nProvider {...clientPresentation(presentation)}>
       <JsonLd testId="explorer-dataset-json-ld" data={explorerDatasetJsonLd({
-        locale, origin, path: href, datasetId: hub, name: title, description, firstYear, lastYear, dateModified: lastReviewedAt,
+        locale, origin, path: href, datasetId, name: title, description, firstYear, lastYear, dateModified: lastReviewedAt,
         // An area page is a slice of the index's dataset.
         ...(area ? { spatialCoverageName: regionName, withinGeorgia: area !== "georgia", partOf: { path: indexHref, name: indexTitle, description: t(`page.${indexKey}.summary`) } } : {}),
         variableMeasured: measures,

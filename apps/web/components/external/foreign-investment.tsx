@@ -18,6 +18,7 @@ import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { SeriesAside } from "../explorer-shell/series-aside";
 import { EditorialLineChart } from "../main-explorer/editorial-line-chart";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
+import { ChartShareButton } from "../explorer-shell/chart-share-button";
 import { ExplorerTable } from "../main-explorer/explorer-table";
 import { RangeStrip } from "../main-explorer/range-strip";
 import { ExcelDownloadButton } from "../explorer/excel-download-button";
@@ -40,6 +41,9 @@ export function ForeignInvestment({ data, sources, lastReviewedAt, siteOrigin }:
   }} />;
   const valueLabel = (value: number) => `${formatInUnit(value, model.unit)} ${model.unit.label}`;
   const lineSeries = model.selectedIds.map(id => ({ id, label: label(id), color: color(id), vals: model.years.map(year => model.valuesByEntity[id][year]) }));
+  const chart = <EditorialLineChart years={model.years} series={lineSeries} share={false} unit={model.unit} shareLabel={tabLabel} showAxisUnit={false} formatTooltipValue={valueLabel} />;
+  const shareAction = model.selectedCount ? <ChartShareButton title={t("title")} caption={`${tabLabel} · ${model.unit.label} · ${model.range.start}–${model.range.end}`}
+    legend={lineSeries.map(({ label, color }) => ({ label, color }))} source={t("sourceNote")} chart={chart} period={`${model.range.start}-${model.range.end}`} /> : undefined;
   return <div data-testid="foreign-investment" className="@container">
     <ExplorerHeading>{t("title")}</ExplorerHeading>
     <div role="group" aria-label={t("tabs")} className="mb-6 flex flex-wrap justify-center gap-x-6 gap-y-3">{FOREIGN_INVESTMENT_DIMENSIONS.map(dimension => <TextTab key={dimension} label={t(`tab.${dimension}`)} active={state.dimension === dimension} onClick={() => update(s => switchForeignInvestmentTab(s, dimension, data), true)} testId={`foreign-investment-tab-${dimension}`} />)}</div>
@@ -48,12 +52,12 @@ export function ForeignInvestment({ data, sources, lastReviewedAt, siteOrigin }:
         <section data-testid="chart-panel" data-mode={state.mode} data-dimension={state.dimension} data-unit="usd" className="border-t border-[var(--ink)] pt-4">
           <div className="flex flex-wrap items-end justify-between gap-3"><ModeTabs value={state.mode} onChange={mode => update(s => ({ ...s, mode }), true)} /><span className="text-[11px] text-[var(--muted)]">{tabLabel} · {model.unit.label}</span></div>
           {!model.selectedCount ? <div className="mt-5"><Callout testId="no-selection-callout">{t("emptySelection")}</Callout></div>
-            : state.mode === "line" ? <div className="mt-5"><EditorialLineChart years={model.years} series={lineSeries} share={false} unit={model.unit} shareLabel={tabLabel} showAxisUnit={false} formatTooltipValue={valueLabel} /></div>
+            : state.mode === "line" ? <div className="mt-5">{chart}</div>
             : <ExplorerTable caption={`${t("title")} · ${tabLabel} · ${model.unit.label} · ${model.range.start}–${model.range.end}`} rows={rows.filter(row => row.itemId !== FOREIGN_INVESTMENT_TOTAL_ID)} totalRow={total} showTotal={Boolean(total)} totalFirst wrapRowLabels rowLabelsLocalized years={model.years} firstColumnLabel={t("series")} unit={model.unit} share={false} showChangeColumn={false} shareValueForYear={() => null} />}
           <ChartSelectionAids series={lineSeries} chartShown={state.mode === "line"} share={false} unit={model.unit} formatValue={valueLabel} />
           <RangeStrip years={foreignInvestmentCoverage(data, state.dimension).years} range={model.range} onChange={patch => update(s => ({ ...s, range: rangeFromPatch(resolveRange(s.range, foreignInvestmentCoverage(data, s.dimension)), patch) }))} />
         </section>
-        <div className="mt-[18px]"><SourceNote testId="source-label">{t("sourceNote")} {model.range.start}–{model.range.end} · {updatedDate(lastReviewedAt, locale)}
+        <div className="mt-[18px]"><SourceNote testId="source-label" action={shareAction}>{t("sourceNote")} {model.range.start}–{model.range.end} · {updatedDate(lastReviewedAt, locale)}
           <Link href={pageHref("/methodology/external-flows", locale)} prefetch={false} className="ml-2 text-[var(--accent)] underline underline-offset-4">{message(messages, "external.methodology")}</Link>
         </SourceNote></div>
       </div>

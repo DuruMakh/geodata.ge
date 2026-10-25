@@ -15,6 +15,8 @@ import { pageHref } from "../../lib/i18n/routes";
 import type { TemplateValues } from "../../lib/i18n/types";
 import type { ClientAgeFact } from "../../lib/servedRows";
 import { ModeTabs } from "../explorer-shell/mode-tabs";
+import { ChartShareButton } from "../explorer-shell/chart-share-button";
+import { CENSUS_YEAR } from "../../lib/data/demography/series";
 import { HeroKpi, KPI_GRID_CLASS, SideKpiList } from "../main-explorer/kpi-blocks";
 import { SectionTitle, SegmentedTabs, SourceNote, TextTab, TextTabGroup } from "../ui/editorial";
 import { Download, SECTION_CLASS } from "./demography-helpers";
@@ -59,6 +61,18 @@ export function AgeSexSection({
   const name = placeLabel(place, locale);
   const date = t("censusDate");
   const isGeorgia = place.id === GEORGIA_PLACE_ID;
+  const settlementLabel = t(SETTLEMENTS.find(({ id }) => id === settlement)!.key);
+  // The pyramid draws its own key (women and men), so the picture adds none.
+  const shareAction = (
+    <ChartShareButton
+      title={`${t("ageSexCensusHeading")} · ${name}`}
+      caption={`${settlementLabel} · ${measure === "share" ? "%" : t("measurePersons")}`}
+      source={t("censusSource")}
+      chart={<div className="mx-auto max-w-[640px]"><PopulationPyramid pyramid={pyramid} compare={null} measure={measure} ariaLabel={t("pyramidAria", { place: name, date })} testId="share-card-pyramid" /></div>}
+      period={String(CENSUS_YEAR)}
+      testId="age-sex-share"
+    />
+  );
 
   return (
     <section id="age-sex" aria-labelledby="age-sex-title" data-testid="age-sex-section" className={`@container ${SECTION_CLASS}`}>
@@ -88,7 +102,7 @@ export function AgeSexSection({
         )}
       </div>
       <div className="mt-[18px] flex flex-wrap items-start justify-between gap-4">
-        <div className="max-w-[640px]"><SourceNote testId="age-sex-source-note">{t("censusSource")}</SourceNote></div>
+        <div className="max-w-[640px]"><SourceNote testId="age-sex-source-note" action={shareAction}>{t("censusSource")}</SourceNote></div>
         <Download
           testId="age-sex-excel-download"
           build={() => buildCensusPlaceWorkbookExportModel({ facts, sources, siteOrigin, place, settlement, scope: workbookScope }, presentation)}

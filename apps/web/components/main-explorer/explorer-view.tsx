@@ -20,6 +20,7 @@ import { ModeTabs } from "../explorer-shell/mode-tabs";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { MeasurePill } from "../explorer-shell/measure-pill";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
+import { ChartShareButton } from "../explorer-shell/chart-share-button";
 import { withLari } from "../ui/lari";
 import type { ResolvedRange } from "./use-explorer-state";
 
@@ -113,6 +114,11 @@ export function ExplorerView({
   // (e.g. a program series with a pre-2016 range) — say so instead of drawing
   // a fabricated empty axis or a total-only table.
   const noRangeData = !noSelection && model.points.length === 0;
+  const chart = <EditorialLineChart years={model.years} series={series} share={share} unit={unit} shareLabel={message(messages, "main.shareGdp")} />;
+  const shareAction = noSelection || noRangeData ? undefined : <ChartShareButton
+    title={message(messages, scope === "revenue" ? "main.revenueHeading" : "main.expenditureHeading")}
+    caption={`${message(messages, share ? "main.shareGdp" : "format.bnGel")} · ${range.start}–${range.end}`}
+    legend={series.map(({ label, color }) => ({ label, color }))} source={message(messages, "main.sourceData")} chart={chart} period={`${range.start}-${range.end}`} />;
 
   return (
     <>
@@ -163,9 +169,7 @@ export function ExplorerView({
                 shareValueForYear={(row, year) => row.shareByYear?.[year] ?? null}
               />
             ) : (
-              <div className="mt-5">
-                <EditorialLineChart years={model.years} series={series} share={share} unit={unit} shareLabel={message(messages, "main.shareGdp")} />
-              </div>
+              <div className="mt-5">{chart}</div>
             )}
             <ChartSelectionAids series={series} chartShown={chartMode === "line"} share={share} unit={unit} />
 
@@ -173,7 +177,7 @@ export function ExplorerView({
           </section>
 
           <div className="mt-[18px]">
-            <SourceNote testId="source-label">
+            <SourceNote testId="source-label" action={shareAction}>
               {message(messages, "main.sourceData")}{" "}
               <span className="font-[family-name:var(--font-numeric)]">{coverage}</span>{" "}{message(messages, "main.annualExecution")}
               {CLASSIFICATION_NOTE[scope] ? " " + message(messages, CLASSIFICATION_NOTE[scope]) : null}

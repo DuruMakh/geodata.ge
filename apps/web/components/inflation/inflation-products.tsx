@@ -20,6 +20,7 @@ import { ExplorerHeading } from "../explorer-shell/explorer-heading";
 import { ExplorerPage } from "../explorer-shell/explorer-page";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
+import { ChartShareButton } from "../explorer-shell/chart-share-button";
 import { PageDataStatus } from "../explorer-shell/page-data-status";
 import { useHashState } from "../explorer-shell/use-hash-state";
 import { usePageData } from "../explorer-shell/use-page-data";
@@ -119,6 +120,28 @@ export function ProductExplorer({ index, lastReviewedAt, sources, siteOrigin }: 
   const hasValues = chartSeries.some((series) => series.vals.some((value) => value !== null));
   const toggleAction = state.indicator === "annual" ? t("productsShowCumulative") : t("productsShowAnnual");
   const displayDate = updatedDate(lastReviewedAt, locale);
+  const chartTitle = state.indicator === "annual" ? t("productsAnnualTitle") : t("productsCumulativeTitle");
+  const chart = (
+    <EditorialLineChart
+      years={periods}
+      series={chartSeries}
+      share
+      unit={PCT_UNIT}
+      shareLabel={chartTitle}
+      periodsPerYear={12}
+      formatPeriod={(period, kind) => monthlyChartPeriod(messages, period, kind)}
+    />
+  );
+  const shareAction = hasValues ? (
+    <ChartShareButton
+      title={t("productsHeading")}
+      caption={`${chartTitle} · ${state.indicator === "annual" ? t("productsAnnualUnit") : t("productsCumulativeUnit")} · ${state.range.startYear}–${periodLabel(messages, endPeriod, "short")}`}
+      legend={chartSeries.map(({ label, color }) => ({ label, color }))}
+      source={t("productsSource")}
+      chart={chart}
+      period={`${state.range.startYear}-${periodKey(endPeriod)}`}
+    />
+  ) : undefined;
 
   return <>
     <ExplorerWorkspace>
@@ -150,17 +173,7 @@ export function ProductExplorer({ index, lastReviewedAt, sources, siteOrigin }: 
             {t("productsChartSummary", { mode: state.indicator === "annual" ? t("productsAnnualTitle") : t("productsCumulativeTitle"),
               start: state.range.startYear, end: periodLabel(messages, endPeriod, "long"), count: chartSeries.length })}
           </p>
-          {hasValues ? <div className="mt-5">
-            <EditorialLineChart
-              years={periods}
-              series={chartSeries}
-              share
-              unit={PCT_UNIT}
-              shareLabel={state.indicator === "annual" ? t("productsAnnualTitle") : t("productsCumulativeTitle")}
-              periodsPerYear={12}
-              formatPeriod={(period, kind) => monthlyChartPeriod(messages, period, kind)}
-            />
-          </div> : <div className="mt-5"><Callout testId="no-selection-callout">
+          {hasValues ? <div className="mt-5">{chart}</div> : <div className="mt-5"><Callout testId="no-selection-callout">
             {state.selected.length === 0 ? t("productsNoSelection") : t("productsNoCompleteSeries")}
           </Callout></div>}
           <ChartSelectionAids series={chartSeries} chartShown share unit={PCT_UNIT} />
@@ -180,7 +193,7 @@ export function ProductExplorer({ index, lastReviewedAt, sources, siteOrigin }: 
           />
         </section>
         <div className="mt-[18px] space-y-2">
-          <SourceNote testId="source-label">{t("productsSource")} {message(messages, "main.lastUpdated", { date: displayDate })}</SourceNote>
+          <SourceNote testId="source-label" action={shareAction}>{t("productsSource")} {message(messages, "main.lastUpdated", { date: displayDate })}</SourceNote>
           <p className="text-xs text-[var(--muted)]">{t("productsDerivedNote")}</p>
           <Link href={pageHref("/methodology/inflation", locale)} prefetch={false} className="inline-flex min-h-11 items-center text-xs text-[var(--muted)] underline underline-offset-4">
             {t("methodology")}

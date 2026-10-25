@@ -3,22 +3,32 @@ import type { Presentation } from "../i18n/types";
 import { message } from "../i18n/messages";
 import { workbookMessage } from "../i18n/workbook";
 import type { ClientNationalGdpFact } from "./clientData";
-import { buildMoneyBanksModel, moneyBanksHasTotalRow, moneyBanksViewFacts, type MoneyBanksSectionId, type MoneyBanksState } from "./moneyBanks";
+import { MONEY_BANKS_LOAN_BREAKS, buildMoneyBanksModel, moneyBanksHasTotalRow, moneyBanksViewFacts, type MoneyBanksTopicId, type MoneyBanksState } from "./moneyBanks";
+import { buildMoneyBanksAreaModel, moneyBanksAreaSlug, type MoneyBanksArea } from "./moneyBanksAreas";
+import type { TopicState } from "./topicSeries";
 import { SHEET_NAMES, neededSourceYears, sourcesForNeededYears, withAbsoluteUrls, workbookFilename, type WorkbookExportModel, type WorkbookPublicSource } from "./workbookModel";
 
 const MILLION = 1_000_000;
 
-/**
- * On % of GDP, `gdpFacts` are the national GDP the shares divide by, and `gdpSources` (its Geostat files) join the NBG
- * workbooks on the Sources sheet, as on the debt page.
- */
-export function buildMoneyBanksWorkbookExportModel(input: {
-  section: MoneyBanksSectionId; facts: readonly ClientMoneyBanksFact[]; state: MoneyBanksState; labels: Readonly<Record<string, string>>; sources: readonly (WorkbookPublicSource & { sourceId: string })[]; siteOrigin: string; title?: string;
+type MoneyBanksWorkbookInput = {
+  facts: readonly ClientMoneyBanksFact[]; labels: Readonly<Record<string, string>>; sources: readonly (WorkbookPublicSource & { sourceId: string })[]; siteOrigin: string; title?: string;
   gdpFacts?: readonly ClientNationalGdpFact[]; gdpSources?: readonly WorkbookPublicSource[];
-}, presentation: Presentation): WorkbookExportModel {
-  const { section, state, labels } = input, { locale, messages } = presentation;
+} & ({ section: MoneyBanksTopicId; state: MoneyBanksState } | { area: MoneyBanksArea; state: TopicState });
+
+/**
+ * A topic page's or a Loans by region area page's selection as a workbook. On % of GDP, `gdpFacts` are the national GDP
+ * the shares divide by, and `gdpSources` (its Geostat files) join the NBG workbooks on the Sources sheet, as on the debt page.
+ */
+export function buildMoneyBanksWorkbookExportModel(input: MoneyBanksWorkbookInput, presentation: Presentation): WorkbookExportModel {
+  const { labels } = input, { locale, messages } = presentation;
   const t = (key: string) => message(messages, `moneyBanks.${key}`);
-  const model = buildMoneyBanksModel(section, input.facts, state, input.gdpFacts);
+  // An area page has one view, its amounts. Its all loans is its lari plus its foreign-currency loans, so it is a total row,
+  // as M3 is on Money supply.
+  const state: MoneyBanksState = "area" in input ? { ...input.state, view: "main" } : input.state;
+  const model = "area" in input ? buildMoneyBanksAreaModel(input.area, input.facts, input.state) : buildMoneyBanksModel(input.section, input.facts, input.state, input.gdpFacts);
+  const hasTotalRow = "area" in input || moneyBanksHasTotalRow(input.section);
+  const stem = "area" in input ? `money-loans-region-${moneyBanksAreaSlug(input.area)}` : `money-${input.section}${state.view === "main" ? "" : `-${state.view}`}`;
+  const pageTitle = input.title ?? t(`page.${"area" in input ? "regions" : input.section}.title`);
   const facts = moneyBanksViewFacts(state.view, input.facts, input.gdpFacts ?? []);
   const byCell = new Map(facts.map(f => [`${f.indicatorId}:${f.year}`, f]));
   const originals = sourcesForNeededYears(input.sources, neededSourceYears(model.selected, model.years, (series, year) => byCell.get(`${series.id}:${year}`)?.sourceId));
@@ -29,21 +39,26 @@ export function buildMoneyBanksWorkbookExportModel(input: {
   // Interest rates are the series shown to two decimals.
   const rowFormat = (decimals: number) => !isAmount && decimals === 2 ? "0.00" : undefined;
   const toExport = (value: number | null) => value === null ? null : isAmount ? value / MILLION : value;
+  // On Who borrows and the area pages a year that opens a new basis (the register's loan breaks) says so after its status.
+  const marksBreaks = "area" in input || input.section === "borrowers";
+  const isBreak = (id: string, year: number) => marksBreaks && MONEY_BANKS_LOAN_BREAKS.some(entry => entry.year === year && entry.appliesTo.includes(id));
   const status = (id: string, year: number) => {
     const fact = byCell.get(`${id}:${year}`);
-    return fact ? t(`status.${fact.valueStatus}`) : workbookMessage(locale, "workbook.unavailable");
+    if (!fact) return workbookMessage(locale, "workbook.unavailable");
+    const text = t(`status.${fact.valueStatus}`);
+    return isBreak(id, year) ? `${text} · ${t("status.break")}` : text;
   };
   const cells = model.years.flatMap(year => model.selected.map(series => ({ year, series })));
   const view = state.view === "main" ? "" : ` · ${t(`tab.${state.view}`)}`;
   return {
-    locale, filename: workbookFilename(`money-${section}${state.view === "main" ? "" : `-${state.view}`}-${model.range.start}-${model.range.end}`, locale), sheetNames: SHEET_NAMES[locale],
+    locale, filename: workbookFilename(`${stem}-${model.range.start}-${model.range.end}`, locale), sheetNames: SHEET_NAMES[locale],
     readable: {
-      title: `${input.title ?? t(`page.${section}.title`)}${view}`, subtitle: `${model.range.start}–${model.range.end} · ${unitLabel}`,
+      title: `${pageTitle}${view}`, subtitle: `${model.range.start}–${model.range.end} · ${unitLabel}`,
       unitLabel, amountDecimals: 1, years: model.years, showChangeColumn: false, numberFormat,
       rows: model.selected.map(series => {
         const values = Object.fromEntries(model.years.map(year => [year, toExport(series.valuesByYear[year])]));
         return {
-          kind: series.reference && moneyBanksHasTotalRow(section) ? "total" : "item", parentLabel: null, label: labels[series.id], change: null, valuesByYear: values,
+          kind: series.reference && hasTotalRow ? "total" : "item", parentLabel: null, label: labels[series.id], change: null, valuesByYear: values,
           ...(rowFormat(series.decimals) ? { numberFormat: rowFormat(series.decimals) } : {}),
           basisByYear: Object.fromEntries(model.years.map(year => [year, values[year] === null ? null : "actual"])),
         };

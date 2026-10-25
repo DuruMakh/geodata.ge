@@ -20,6 +20,7 @@ import { useI18n } from "../../lib/i18n/provider";
 import { pageHref } from "../../lib/i18n/routes";
 import { ExcelDownloadButton } from "../explorer/excel-download-button";
 import { ModeTabs } from "../explorer-shell/mode-tabs";
+import { ChartShareButton } from "../explorer-shell/chart-share-button";
 import { PlaceHeading } from "../explorer-shell/place-heading";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
@@ -76,6 +77,18 @@ export function RegionalEconomyExplorer({
   const previousRegion = orderedRegions[(regionIndex - 1 + orderedRegions.length) % orderedRegions.length]!;
   const nextRegion = orderedRegions[(regionIndex + 1) % orderedRegions.length]!;
 
+  const chart = <EditorialLineChart years={model.years} series={series} share={share} unit={unit} shareLabel={measureLabel} formatTooltipValue={share ? undefined : (value) => formatAmount(value, locale)} />;
+  const shareAction = state.selectedIds.length && model.hasData ? (
+    <ChartShareButton
+      title={`${t("detailHeadingLead")} ${regionLabel}`}
+      caption={`${share ? measureLabel : message(messages, "format.bnGel")} · ${model.range.start}–${model.range.end}`}
+      legend={series.map(({ label, color }) => ({ label, color }))}
+      source={`${t("source")} ${model.range.start}–${model.range.end}`}
+      chart={chart}
+      period={`${model.range.start}-${model.range.end}`}
+    />
+  ) : undefined;
+
   return (
     <div data-testid="regional-economy-explorer" className="@container">
       <PlaceHeading
@@ -103,12 +116,12 @@ export function RegionalEconomyExplorer({
             </div>
             {!state.selectedIds.length ? <div className="mt-5"><Callout testId="no-selection-callout">{message(messages, "main.noSelection")}</Callout></div>
               : !model.hasData ? <div className="mt-5"><Callout testId="no-range-data-callout">{message(messages, "main.noRangeData")}</Callout></div>
-              : state.mode === "line" ? <div className="mt-5"><EditorialLineChart years={model.years} series={series} share={share} unit={unit} shareLabel={measureLabel} formatTooltipValue={share ? undefined : (value) => formatAmount(value, locale)} /></div>
+              : state.mode === "line" ? <div className="mt-5">{chart}</div>
               : <ExplorerTable caption={`${regionLabel} · ${share ? measureLabel : message(messages, "format.bnGel")} · ${model.range.start}–${model.range.end}`} rows={model.rows.filter((row) => row.itemId !== REGIONAL_GDP_TOTAL)} totalRow={totalRow} showTotal={Boolean(totalRow)} totalFirst wrapRowLabels years={model.years} firstColumnLabel={t("sector")} unit={unit} share={share} showChangeColumn={false} shareValueForYear={(row, year) => row.valuesByYear[year] ?? null} />}
             <ChartSelectionAids series={series} chartShown={state.mode === "line"} share={share} unit={unit} formatValue={share ? undefined : (value) => formatAmount(value, locale)} />
             <RangeStrip years={model.availableYears} range={model.range} onChange={(patch) => update((previous) => ({ ...previous, range: rangeFromPatch(model.range, patch) }))} />
           </section>
-          <div className="mt-[18px]"><SourceNote testId="regional-source-label">
+          <div className="mt-[18px]"><SourceNote testId="regional-source-label" action={shareAction}>
             {/* The price basis sits with the source, not as a second line under the heading (DESIGN §17). */}
             <span data-testid="regional-context">{t(share ? "contextShare" : "contextNominal")}</span>{" "}
             {t("source")} {model.range.start}–{model.range.end}
