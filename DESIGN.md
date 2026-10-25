@@ -1041,7 +1041,7 @@ Do not:
 3. All numerals are mono; all display values serif; overlines uppercase sans 11/600.
 4. Explorer default: line mode, nominal GEL, full range, the default selection of §8.1 (with each section's documented departures, such as the sectors' five largest on share of GDP), and unrestricted line rendering.
 5. Only `ხაზი` and `ცხრილი` modes exist; the national `% მშპ-ში` measure is the only pill control on national multi-year routes.
-6. Swatches are 14×3px bars everywhere.
+6. Swatches are 14×3px bars everywhere (the homepage exception of §17 aside).
 7. Category colors match §4.2 on every surface.
 8. Analysis order: controls → year selector → 4 headlines → structure → 100 GEL → radar → field → ranking → source.
 9. Every 100 GEL renders exactly 100 cells, allocations sum to 100.
