@@ -228,6 +228,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     [...budgetFacts, ...adminFacts, ...functionFacts, ...totalFacts, ...countryFunctionFacts, ...countryTotalFacts],
     [debtFacts, balanceFacts, expenditureTypeFacts, taxBreaksRefundsFacts],
   );
+  // Expenditure, Revenue and Analysis are dated as their headers date them: the sources their own rows cite. Each cites a part
+  // of what the Budget group cites, so the group is never older than a page it lists.
+  const citedDate = (citing: readonly { sourceId: string }[]): Date | undefined => {
+    const reviewed = citedReviewedAt(sourceDocuments, citing);
+    return reviewed ? new Date(reviewed) : undefined;
+  };
   const methodologyLastModified = LIVE_METHODOLOGY_IDS.map(
     (id) => METHODOLOGY_CONTENT[id].reviewedAt,
   )
@@ -343,11 +349,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...MONEY_BANKS_LOAN_AREAS.map(area => ({ url: `${siteUrl}${moneyBanksAreaHref(area)}`, lastModified: moneyBanksModified })),
     ...LIVE_DEMOGRAPHY_PAGES.map((page) => ({ url: `${siteUrl}${page.path}`, lastModified: demographyModified })),
     ...populationPlacePaths(regions.map((region) => region.id)).map((path) => ({ url: `${siteUrl}${path}`, lastModified: demographyModified })),
-    { url: `${siteUrl}/explorer/expenditure`, lastModified },
+    { url: `${siteUrl}/explorer/expenditure`, lastModified: citedDate([...budgetFacts.filter((fact) => fact.side === "expenditure"), ...adminFacts]) },
     { url: `${siteUrl}/explorer/expenditure-types`, lastModified: expenditureTypesModified },
-    { url: `${siteUrl}/explorer/revenue`, lastModified },
+    { url: `${siteUrl}/explorer/revenue`, lastModified: citedDate(budgetFacts.filter((fact) => fact.side === "revenue")) },
     { url: `${siteUrl}${TAX_BREAKS_REFUNDS_PATH}`, lastModified: new Date(taxBreaksRefundsFacts.map(fact => fact.lastReviewedAt).sort().at(-1)!) },
-    { url: `${siteUrl}/explorer/analysis`, lastModified },
+    { url: `${siteUrl}/explorer/analysis`, lastModified: citedDate([...budgetFacts, ...adminFacts]) },
     {
       url: `${siteUrl}${DEBT_EXPLORER_PATH}`,
       lastModified: debtFacts.length > 0

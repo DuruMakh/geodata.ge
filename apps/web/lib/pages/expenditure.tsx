@@ -7,6 +7,7 @@ import { MainExplorer } from "../../components/main-explorer/main-explorer";
 import { BreadcrumbJsonLd } from "../../components/seo/breadcrumb-json-ld";
 import { JsonLd } from "../../components/seo/json-ld";
 import { publicGlossaryEntry } from "../data/glossary";
+import { citedReviewedAt } from "../data/sources";
 import { loadServedExplorerData, loadServedLandingData } from "../data/servedData";
 import { packFacts } from "../data/packedFacts";
 import { loadGdpWorkbookSources, loadWorkbookSources } from "../methodology/workbookSources";
@@ -50,10 +51,9 @@ export async function renderExpenditurePage(locale: Locale) {
   // route's explorerSide is fixed to "expenditure" by `nav`, so the 241 revenue
   // rows can never be rendered here and were 35 KB of dead RSC payload.
   const ownFacts = facts.filter((fact) => fact.side === "expenditure");
-  // Computed from the full registry, before the narrowing below: this is the
-  // displayed "განახლდა" date and narrowing it here would change what the page
-  // shows, not just what it ships.
-  const lastUpdatedAt = sourceDocuments.map((source) => source.lastReviewedAt).sort().at(-1) ?? "";
+  // The displayed "განახლდა" date: the newest source the page's own rows cite, its ministries included, as the sitemap dates
+  // it (lib/seo/sitemap.ts). The Budget group cites these rows and more, so it is never older than this page.
+  const lastUpdatedAt = citedReviewedAt(sourceDocuments, [...ownFacts, ...adminFacts]);
   const { firstYear, lastYear } = coverageFromYears(ownFacts);
   // The series search matches English names on the Georgian page too.
   const labelIds = ["expenditure.total", ...ownFacts.map(fact => fact.itemId), "admin_spending.total", ...adminFacts.map(fact => fact.itemId)];

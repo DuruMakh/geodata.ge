@@ -8,7 +8,7 @@ import { AnalysisExplorer } from "../../components/analysis/analysis-explorer";
 import { BreadcrumbJsonLd } from "../../components/seo/breadcrumb-json-ld";
 import { publicGlossaryEntry } from "../data/glossary";
 import { loadServedExplorerData } from "../data/servedData";
-import { referencedSourceIds } from "../data/sources";
+import { citedReviewedAt } from "../data/sources";
 import { projectAdminFact, projectBudgetFact } from "../explorer/clientData";
 import { coverageFromYears, fiscalMetadata } from "../seo/metadata";
 import { ALL_DATA_PATH, navGroup } from "../navigation/navTree";
@@ -33,14 +33,9 @@ export async function renderAnalysisPage(locale: Locale) {
   // cover in full (the same years either way). So the 549 major_program rows were
   // 307 KB of payload this route has no way to render.
   const ownAdminFacts = adminFacts.filter((fact) => fact.level === "admin_category");
-  // Date from the FULL corpus, so narrowing the payload cannot move the
-  // displayed "განახლდა" date.
-  const cited = referencedSourceIds([...facts, ...adminFacts]);
-  const lastUpdatedAt = sourceDocuments
-    .filter((source) => cited.has(source.sourceId))
-    .map((source) => source.lastReviewedAt)
-    .sort()
-    .at(-1) ?? "";
+  // Date from the FULL corpus, so narrowing the payload cannot move the displayed "განახლდა" date; the sitemap dates the page
+  // the same way (lib/seo/sitemap.ts).
+  const lastUpdatedAt = citedReviewedAt(sourceDocuments, [...facts, ...adminFacts]);
 
   // The snapshot model builds each item's English name beside the Georgian on both pages.
   const labelIds = [

@@ -3,7 +3,8 @@ import { fileURLToPath } from "node:url";
 import { afterEach, describe, expect, it, test, vi } from "vitest";
 import sitemap from "../../lib/seo/sitemap";
 import { MUNICIPALITY_ROUTES } from "../../lib/explorer/municipalityRoutes";
-import { loadServedGeneralGovernmentBalanceData, loadServedGovernmentDebtData, loadServedLandingData, loadServedMunicipalData } from "../../lib/data/servedData";
+import { loadServedExplorerData, loadServedGeneralGovernmentBalanceData, loadServedGovernmentDebtData, loadServedLandingData, loadServedMunicipalData } from "../../lib/data/servedData";
+import { citedReviewedAt } from "../../lib/data/sources";
 import { loadServedRegionalEconomyData } from "../../lib/data/regionalEconomies/importRegionalEconomies";
 import { loadServedTradeOverviewData } from "../../lib/data/tradeOverview/importTradeOverview";
 import { loadServedTradePartnersData } from "../../lib/data/tradePartners/importTradePartners";
@@ -580,17 +581,18 @@ describe("sitemap lastmod reports each entity's own reviewed date", () => {
     expect(new Set(municipalDates).size).toBeGreaterThan(1);
   });
 
-  it("leaves the national explorer routes on the site-wide reviewed date", async () => {
-    const [dates, { sourceDocuments }] = await Promise.all([sitemapDates(), loadServedLandingData()]);
-    const siteWide = sourceDocuments
-      .map((source) => source.lastReviewedAt)
-      .sort()
-      .at(-1);
-
-    // These pages display the site-wide maximum by design, so the sitemap must
-    // keep agreeing with them rather than being narrowed alongside the municipal URLs.
-    for (const path of ["/explorer/expenditure", "/explorer/revenue", "/explorer/analysis"]) {
-      expect(dates.get(`${SITE}${path}`)).toBe(siteWide);
+  it("dates the national budget routes by the sources their own rows cite, as their headers do", async () => {
+    const [dates, { sourceDocuments, facts, adminFacts }] = await Promise.all([sitemapDates(), loadServedExplorerData()]);
+    // Their headers date them the same way (lib/pages/expenditure.tsx, revenue.tsx, analysis.tsx); a source no budget row cites
+    // moves neither (verify-review N6, tests/seo/sitemapBudgetDate.test.ts).
+    const expected = {
+      "/explorer/expenditure": citedReviewedAt(sourceDocuments, [...facts.filter((fact) => fact.side === "expenditure"), ...adminFacts]),
+      "/explorer/revenue": citedReviewedAt(sourceDocuments, facts.filter((fact) => fact.side === "revenue")),
+      "/explorer/analysis": citedReviewedAt(sourceDocuments, [...facts, ...adminFacts]),
+    };
+    for (const [path, date] of Object.entries(expected)) {
+      expect(date, path).not.toBe("");
+      expect(dates.get(`${SITE}${path}`), path).toBe(date);
     }
   });
 

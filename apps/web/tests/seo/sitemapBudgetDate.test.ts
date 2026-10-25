@@ -1,6 +1,12 @@
 import { describe, expect, it, vi } from "vitest";
 import sitemap from "../../lib/seo/sitemap";
 import { loadTopicHubs } from "../../lib/pages/topicHubs.server";
+import { updatedDate } from "../../lib/explorer/coverageLabel";
+import { NAV_GROUPS, groupPages } from "../../lib/navigation/navTree";
+import { renderAnalysisPage } from "../../lib/pages/analysis";
+import { renderExpenditurePage } from "../../lib/pages/expenditure";
+import { renderRevenuePage } from "../../lib/pages/revenue";
+import { renderPageMarkup } from "../helpers/render-localized";
 
 // deep-review routing M2 and groups M6: the Budget group is dated by every dataset its cards read, Tax breaks and refunds
 // included, and only by the source documents its own rows cite. The real data gives every one of these the same date, so
@@ -48,4 +54,30 @@ describe("the Budget group's date", () => {
     const [budget] = await loadTopicHubs("ka", ["budget"]);
     expect(budget.lastReviewedAt).toBe(TAX_BREAKS_REVIEWED);
   });
+
+  // verify-review N6: a listing page is never older than a page it lists, whichever source an import reviews.
+  it("is never older than a page it lists, nor All data than any page, and Expenditure, Revenue and Analysis skip the uncited source", async () => {
+    vi.stubEnv("NEXT_PUBLIC_SITE_URL", "https://fiscal.ge");
+    try {
+      const entries = await sitemap();
+      const dateOf = (path: string) => {
+        const modified = entries.find((entry) => new URL(entry.url).pathname === path)?.lastModified;
+        expect(modified, path).toBeDefined();
+        return new Date(modified!).toISOString().slice(0, 10);
+      };
+      for (const group of NAV_GROUPS) {
+        for (const page of groupPages(group)) {
+          expect(dateOf(page.href) <= dateOf(group.href), `${page.href} after ${group.href}`).toBe(true);
+          expect(dateOf(page.href) <= dateOf("/explorer"), `${page.href} after All data`).toBe(true);
+        }
+      }
+      for (const [path, render] of [["/explorer/expenditure", renderExpenditurePage], ["/explorer/revenue", renderRevenuePage], ["/explorer/analysis", renderAnalysisPage]] as const) {
+        expect(dateOf(path), path).not.toBe(UNRELATED_REVIEWED);
+        // The page's header states the sitemap's date.
+        expect(renderPageMarkup("ka", await render("ka")), path).toContain(updatedDate(dateOf(path), "ka"));
+      }
+    } finally {
+      vi.unstubAllEnvs();
+    }
+  }, 120_000);
 });
