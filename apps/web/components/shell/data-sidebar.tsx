@@ -2,12 +2,12 @@
 
 import { useCallback, useEffect, useLayoutEffect, useReducer, useRef, useState, type MouseEvent } from "react";
 import { flushSync } from "react-dom";
-import { ChevronRight, LayoutGrid, Menu, PanelLeftClose, PanelLeftOpen, Search, X } from "lucide-react";
+import { BookOpen, ChevronRight, LayoutGrid, Menu, PanelLeftClose, PanelLeftOpen, Plug, Search, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { GROUP_ICONS } from "./group-icons";
 import { SidebarSectionLink } from "./section-nav";
-import { initialSidebarState, isRailed, sidebarReducer } from "./sidebar-state";
+import { PRE_PAINT_RAIL_STYLE_ID, SIDEBAR_NAV_ID, SIDEBAR_STORAGE_KEY, initialSidebarState, isRailed, sidebarReducer } from "./sidebar-state";
 import { SEARCH_PATH, useSlashSearch } from "./use-slash-search";
 import { LanguageSwitch } from "../site/language-switch";
 import { focusExplorerSearch } from "../explorer-groups/explorer-search-focus";
@@ -20,12 +20,16 @@ import { ALL_DATA_PATH, NAV_GROUPS, PAGE_COUNT, currentEntry, currentGroup, grou
 // The explorer sidebar (spec 2026-10-24-explorer-regroup §4, DESIGN.md §6.7): from 900px a 272px column or a 72px icon
 // rail whose groups open a 320px pop-out; below 900px a 56px bar whose menu opens this same column full screen.
 
-const STORAGE_KEY = "geodata:sidebar-collapsed";
+const STORAGE_KEY = SIDEBAR_STORAGE_KEY;
 const DESKTOP_MIN_WIDTH = 900;
-const NAV_ID = "data-sidebar-navigation";
+const NAV_ID = SIDEBAR_NAV_ID;
 /** Hover intent on the rail: the pointer may be away this long, crossing to a pop-out over another rail icon, before the pop-out closes or gives way. */
 const FLY_DELAY_MS = 150;
 const ACTIVE_BG = "bg-[var(--ink-active)]";
+/** The current group's and All data's accent marker; forced colours drop shadows, so there it is a real border. */
+const CURRENT_MARK = "shadow-[inset_2px_0_0_var(--accent)] forced-colors:border-l-2 forced-colors:border-l-[color:Highlight]";
+/** A rail foot link: icon only, named, with the same tooltip as the rail's search and All data icons. */
+const RAIL_FOOT_LINK = "flex size-9 items-center justify-center text-[var(--ink-fg-muted)] no-underline transition-colors duration-150 hover:text-[var(--paper)]";
 const COUNT = "ml-auto pl-2 font-[family-name:var(--font-numeric)] text-[11px] font-normal text-[var(--ink-fg-muted)]";
 const ICON = { "aria-hidden": true, size: 18, strokeWidth: 1.5, className: "flex-none" } as const;
 
@@ -58,7 +62,8 @@ export function DataSidebar() {
   const current = currentEntry(page);
   const currentGroupId = currentGroup(page)?.id;
 
-  // Read after mount: the server render cannot see localStorage, and guessing would flash the wrong width on every load.
+  // Read after mount: the server render cannot see localStorage. Until then the pre-paint script's style holds the rail's
+  // width (sidebar-state.ts); it goes once the sidebar has measured the width and drawn the stored state itself.
   useEffect(() => {
     try {
       dispatch({ type: "collapse", collapsed: window.localStorage.getItem(STORAGE_KEY) === "1" });
@@ -69,11 +74,33 @@ export function DataSidebar() {
 
   useEffect(() => {
     const query = window.matchMedia(`(min-width: ${DESKTOP_MIN_WIDTH}px)`);
-    const sync = () => dispatch({ type: "width", desktop: query.matches });
+    const sync = () => {
+      // Narrowed below 900px: the collapse toggle and the rail's pop-out are hidden, so focus held there moves to the menu button.
+      if (!query.matches && document.getElementById(NAV_ID)?.contains(document.activeElement)) menuButtonRef.current?.focus({ preventScroll: true });
+      dispatch({ type: "width", desktop: query.matches });
+    };
     sync();
     query.addEventListener("change", sync);
     return () => query.removeEventListener("change", sync);
   }, []);
+
+  useLayoutEffect(() => {
+    if (state.desktop !== null) document.getElementById(PRE_PAINT_RAIL_STYLE_ID)?.remove();
+  }, [state.desktop]);
+
+  // The current row is the reader's "you are here": on arrival, and when the rail opens or closes, the sidebar's own scroll
+  // brings it into view (nearest edge, no smooth scrolling, DESIGN.md §14). Only the sidebar scrolls; the page stays where it
+  // is. The phone menu still opens at its top, where focus lands on its close button.
+  useEffect(() => {
+    const nav = document.getElementById(NAV_ID);
+    const row = nav?.querySelector("[aria-current]");
+    if (!nav || !row) return;
+    const [view, box] = [nav.getBoundingClientRect(), row.getBoundingClientRect()];
+    if (view.height === 0 || box.height === 0) return;
+    // Whole pixels, rounded away from the row: scrollTop drops a fraction, which left the row's last half pixel outside.
+    if (box.top < view.top) nav.scrollTop -= Math.ceil(view.top - box.top);
+    else if (box.bottom > view.bottom) nav.scrollTop += Math.ceil(Math.min(box.bottom - view.bottom, box.top - view.top));
+  }, [state.page, railed]);
 
   // The menu works as a modal: opening it hands focus to its close button, closing it hands focus back to the button
   // that opened it, once the bar is shown again. Closing it without leaving the page (Escape, the close button, a
@@ -209,12 +236,18 @@ export function DataSidebar() {
         </button>
       </header>
 
-      <nav
-        id={NAV_ID}
-        // Open below 900px, the menu covers the page as a modal dialog.
+      {/* Open below 900px, the menu covers the page as a modal dialog. The dialog is this wrapper, not the nav, which ARIA does not
+          let take that role; closed, or from 900px, the wrapper adds no box and the nav sits in the shell's row. */}
+      <div
+        data-testid="sidebar-menu-dialog"
         role={state.menu ? "dialog" : undefined}
         aria-modal={state.menu ? true : undefined}
-        aria-label={message(messages, state.menu ? "common.menu" : "common.dataPanel")}
+        aria-label={state.menu ? message(messages, "common.menu") : undefined}
+        className={state.menu ? "min-[900px]:contents max-[900px]:fixed max-[900px]:inset-0 max-[900px]:z-[60]" : "contents"}
+      >
+      <nav
+        id={NAV_ID}
+        aria-label={message(messages, "common.dataPanel")}
         data-testid="data-sidebar"
         data-collapsed={railed ? "true" : "false"}
         data-menu-open={state.menu ? "true" : undefined}
@@ -224,11 +257,13 @@ export function DataSidebar() {
           if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
           const link = (event.target as Element).closest("a");
           if (!link) return;
-          // A link to another page lands at its top; only the page the menu covered gets its place back.
+          // A link to another page lands at its top; only the page the menu covered gets its place back, and with it focus
+          // goes back to the menu button, as Escape gives it: the link that held it is hidden with the menu.
           if (link.pathname !== window.location.pathname) menuOpenedAt.current = null;
+          else focusAfterMenu.current = "menu";
           dispatch({ type: "menu", open: false });
         }}
-        className={`${state.menu ? "flex max-[900px]:fixed max-[900px]:inset-0 max-[900px]:z-[60] max-[900px]:overflow-y-auto max-[900px]:overscroll-contain max-[900px]:px-3.5 max-[900px]:pt-[max(10px,env(safe-area-inset-top))] max-[900px]:pb-[22px]" : "hidden"} flex-col bg-[var(--ink)] text-[var(--paper)] [scrollbar-color:var(--ink-line)_transparent] [scrollbar-width:thin] min-[900px]:sticky min-[900px]:top-0 min-[900px]:z-30 min-[900px]:flex min-[900px]:h-screen min-[900px]:flex-none min-[900px]:overflow-y-auto ${
+        className={`${state.menu ? "flex max-[900px]:h-full max-[900px]:overflow-y-auto max-[900px]:overscroll-contain max-[900px]:px-3.5 max-[900px]:pt-[max(10px,env(safe-area-inset-top))] max-[900px]:pb-[22px]" : "hidden"} flex-col bg-[var(--ink)] text-[var(--paper)] [scrollbar-color:var(--ink-line)_transparent] [scrollbar-width:thin] min-[900px]:sticky min-[900px]:top-0 min-[900px]:z-30 min-[900px]:flex min-[900px]:h-screen min-[900px]:flex-none min-[900px]:overflow-y-auto ${
           railed ? "min-[900px]:w-[72px] min-[900px]:px-2.5 min-[900px]:py-4" : "min-[900px]:w-[272px] min-[900px]:px-3 min-[900px]:pt-[18px] min-[900px]:pb-3.5"
         } ${animateWidth ? "transition-[width] duration-150 ease-in-out" : ""}`}
       >
@@ -238,7 +273,7 @@ export function DataSidebar() {
             {railed ? null : (
               <span className="flex min-w-0 flex-col">
                 <span className="font-[family-name:var(--font-display)] text-[17px] leading-[1.1] font-semibold text-[var(--paper)]">Fiscal.ge</span>
-                <span className="mt-[3px] font-[family-name:var(--font-numeric)] text-[10.5px] text-[var(--ink-fg-muted)]">{message(messages, "common.openData")}</span>
+                <span className="mt-[3px] font-[family-name:var(--font-numeric)] text-[10.5px] text-[var(--ink-fg-muted)] max-[768px]:text-[11px]">{message(messages, "common.openData")}</span>
               </span>
             )}
           </a>
@@ -285,7 +320,7 @@ export function DataSidebar() {
           aria-current={onAllData ? "page" : undefined}
           aria-label={message(messages, "common.allData")}
           title={railed ? message(messages, "common.allData") : undefined}
-          className={`mt-2.5 flex min-h-[42px] items-center gap-2.5 text-[13.5px] font-semibold text-[var(--paper)] no-underline hover:bg-[var(--ink-active)] max-[900px]:min-h-12 ${railed ? "justify-center" : "px-2.5"} ${onAllData ? `${ACTIVE_BG} shadow-[inset_2px_0_0_var(--accent)]` : ""}`}
+          className={`mt-2.5 flex min-h-[42px] items-center gap-2.5 text-[13.5px] font-semibold text-[var(--paper)] no-underline hover:bg-[var(--ink-active)] max-[900px]:min-h-12 ${railed ? "justify-center" : "px-2.5"} ${onAllData ? `${ACTIVE_BG} ${CURRENT_MARK}` : ""}`}
         >
           <LayoutGrid {...ICON} />
           {railed ? null : (
@@ -296,7 +331,7 @@ export function DataSidebar() {
           )}
         </Link>
 
-        {railed ? null : <p className="mx-2.5 mt-5 mb-1.5 font-[family-name:var(--font-numeric)] text-[10.5px] tracking-[0.06em] text-[var(--ink-fg-faint)]">{message(messages, "common.hubsOverline")}</p>}
+        {railed ? null : <p className="mx-2.5 mt-5 mb-1.5 font-[family-name:var(--font-numeric)] text-[10.5px] tracking-[0.06em] text-[var(--ink-fg-faint)] max-[768px]:text-[11px]">{message(messages, "common.hubsOverline")}</p>}
         <ul className={`list-none ${railed ? "mt-4" : ""}`}>
           {NAV_GROUPS.map((group) => {
             const { id, href, topics } = group;
@@ -322,9 +357,10 @@ export function DataSidebar() {
                     href={pageHref(href, locale)}
                     prefetch={false}
                     data-testid={`group-link-${id}`}
-                    aria-current={page === href ? "page" : undefined}
+                    // In the rail a chart page's own row is not drawn, so its group says it holds the current page.
+                    aria-current={page === href ? "page" : railed && isCurrent ? "true" : undefined}
                     aria-label={`${name}, ${pagesLabel(messages, pages)}`}
-                    className={`group/link flex min-w-0 flex-1 items-start gap-2.5 no-underline max-[900px]:min-h-11 ${railed ? "justify-center py-[13px]" : "py-2.5 pr-1 pl-2.5 max-[900px]:py-[13px]"} ${isCurrent ? "text-[var(--paper)] shadow-[inset_2px_0_0_var(--accent)]" : "text-[var(--ink-fg-muted)]"} ${railed && open ? `${ACTIVE_BG} text-[var(--paper)]` : ""}`}
+                    className={`group/link flex min-w-0 flex-1 items-start gap-2.5 no-underline max-[900px]:min-h-11 ${railed ? "justify-center py-[13px]" : "py-2.5 pr-1 pl-2.5 max-[900px]:py-[13px]"} ${isCurrent ? `text-[var(--paper)] ${CURRENT_MARK}` : "text-[var(--ink-fg-muted)]"} ${railed && open ? `${ACTIVE_BG} text-[var(--paper)]` : ""}`}
                   >
                     <Icon {...ICON} className="mt-px flex-none" />
                     {railed ? null : (
@@ -344,7 +380,7 @@ export function DataSidebar() {
                       onClick={() => dispatch({ type: "toggleGroup", id })}
                       className="flex w-9 flex-none cursor-pointer items-start justify-center pt-[11px] text-[var(--ink-fg-faint)] hover:text-[var(--paper)] max-[900px]:w-12 max-[900px]:pt-[13px]"
                     >
-                      <ChevronRight aria-hidden="true" size={16} strokeWidth={1.5} className={`transition-transform duration-200 ${open ? "rotate-90" : ""}`} />
+                      <ChevronRight aria-hidden="true" size={16} strokeWidth={1.5} className={open ? "rotate-90" : undefined} />
                     </button>
                   )}
                 </div>
@@ -390,9 +426,19 @@ export function DataSidebar() {
           })}
         </ul>
 
-        <div className={`mt-auto flex flex-wrap items-center gap-x-3.5 gap-y-2.5 text-xs text-[var(--ink-fg-muted)] ${railed ? "justify-center pt-3.5" : "px-1.5 pt-[18px]"}`}>
+        <div className={`mt-auto flex items-center text-xs text-[var(--ink-fg-muted)] ${railed ? "flex-col gap-1.5 pt-3.5" : "flex-wrap gap-x-3.5 gap-y-2.5 px-1.5 pt-[18px]"}`}>
           <div className="max-[900px]:[&_a]:min-h-11"><LanguageSwitch compact={railed} /></div>
-          {railed ? null : (
+          {railed ? (
+            <>
+              {/* Reload across the Explorer/public layout boundary, as the brand link does. */}
+              <a href={pageHref("/methodology", locale)} data-testid="rail-methodology-link" aria-label={message(messages, "common.methodology")} title={message(messages, "common.methodology")} className={RAIL_FOOT_LINK}>
+                <BookOpen {...ICON} />
+              </a>
+              <a href={pageHref("/connect", locale)} data-testid="rail-connect-link" aria-label={message(messages, "common.aiConnection")} title={message(messages, "common.aiConnection")} className={RAIL_FOOT_LINK}>
+                <Plug {...ICON} />
+              </a>
+            </>
+          ) : (
             <span className="flex items-center gap-1.5">
               {/* Reload across the Explorer/public layout boundary, as the brand link does. */}
               <a href={pageHref("/methodology", locale)} className="inline-flex min-h-6 items-center no-underline hover:text-[var(--paper)] max-[900px]:min-h-11">{message(messages, "common.methodology")}</a>
@@ -402,6 +448,7 @@ export function DataSidebar() {
           )}
         </div>
       </nav>
+      </div>
     </>
   );
 }

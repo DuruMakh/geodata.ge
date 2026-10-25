@@ -113,7 +113,7 @@ function PlaceCard({ result, locale, messages }: { result: NonNullable<SearchRes
           >
             <b className={`block ${NUMERIC} text-[23px] leading-[1.2] font-semibold tracking-[-0.015em] max-[768px]:text-[19px]`}>{fact.value}</b>
             <span className="mt-1 block text-[12.5px] leading-[1.35] text-[var(--body)]">{message(messages, PLACE_FACT_KEYS[fact.label])}</span>
-            <em className={`mt-0.5 block ${NUMERIC} text-[10.5px] text-[var(--faint)] not-italic`}>{fact.period}</em>
+            <em className={`mt-0.5 block ${NUMERIC} text-[10.5px] text-[var(--faint)] not-italic max-[768px]:text-[11px]`}>{fact.period}</em>
           </div>
         ))}
       </div>
@@ -192,7 +192,7 @@ function RowOption({ row, place, placeName, option, active, onHover, locale }: O
       </span>
       <span className={`text-right ${NUMERIC} text-[13px] font-semibold whitespace-nowrap max-[768px]:max-w-[110px] max-[768px]:text-[12.5px] max-[768px]:whitespace-normal`}>
         {row.value}
-        {row.value ? <em className={`block text-[10.5px] font-normal not-italic ${muted}`}>{note}</em> : null}
+        {row.value ? <em className={`block text-[10.5px] font-normal not-italic max-[768px]:text-[11px] ${muted}`}>{note}</em> : null}
       </span>
       <ChevronRight aria-hidden strokeWidth={1.75} className={`size-4 max-[768px]:hidden ${active ? "text-[var(--accent)]" : "text-[var(--faint)] opacity-0"}`} />
     </Link>

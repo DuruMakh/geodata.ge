@@ -2,6 +2,7 @@ import { getMessages } from "../i18n/messages.server";
 import { I18nProvider } from "../i18n/provider";
 import type { ReactNode } from "react";
 import { DataSidebar } from "../../components/shell/data-sidebar";
+import { PRE_PAINT_RAIL_SCRIPT } from "../../components/shell/sidebar-state";
 import type { Locale } from "../i18n/types";
 
 export async function renderExplorerLayout(locale: Locale, children: ReactNode) {
@@ -9,6 +10,8 @@ export async function renderExplorerLayout(locale: Locale, children: ReactNode) 
   const messages = await getMessages(locale, ["controls"]);
   return (
     <I18nProvider locale={locale} messages={messages}>
+      {/* Before the sidebar is parsed: a stored collapse is drawn from the first paint (DESIGN.md §6.7). */}
+      <script dangerouslySetInnerHTML={{ __html: PRE_PAINT_RAIL_SCRIPT }} />
       {/* Below 900px the sidebar's open menu covers the screen, and the page behind it is hidden, so focus stays in the menu.
           Invisible rather than removed: the page keeps its layout, so its charts are not re-measured and the reader's
           place on it survives the menu. The sidebar also makes this column inert while the menu is open. */}

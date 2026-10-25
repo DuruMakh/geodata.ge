@@ -1,10 +1,10 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { DataSidebar } from "../../components/shell/data-sidebar";
-import { initialSidebarState, isRailed, sidebarReducer } from "../../components/shell/sidebar-state";
+import { PRE_PAINT_RAIL_SCRIPT, PRE_PAINT_RAIL_STYLE_ID, SIDEBAR_NAV_ID, SIDEBAR_STORAGE_KEY, initialSidebarState, isRailed, sidebarReducer } from "../../components/shell/sidebar-state";
 import { I18nProvider } from "../../lib/i18n/provider";
 import { getMessages } from "../../lib/i18n/messages.server";
-import { LEGACY_TOPIC_FORWARDS, NAV_GROUPS, NAV_TREE } from "../../lib/navigation/navTree";
+import { LEGACY_TOPIC_FORWARDS, NAV_GROUPS, NAV_TREE, PAGE_COUNT } from "../../lib/navigation/navTree";
 import type { Locale } from "../../lib/i18n/types";
 
 const navigation = vi.hoisted(() => ({ pathname: "/explorer" }));
@@ -62,7 +62,7 @@ describe("the explorer sidebar", () => {
     expect(groups).toEqual(["budget", "economy", "prices", "labour", "living", "external", "demography", "society"]);
     const counts = groups.map((id) => />(\d+)<\/span><\/a>$/.exec(element(markup, `group-link-${id}`, "a"))?.[1]);
     expect(counts).toEqual(["8", "13", "10", "11", "12", "11", "5", "34"]);
-    expect(element(markup, "all-data-link", "a")).toMatch(/>104<\/span><\/a>$/);
+    expect(element(markup, "all-data-link", "a")).toMatch(new RegExp(`>${PAGE_COUNT}</span></a>$`));
     expect(tag(markup, "group-link-labour")).toContain('aria-label="შრომის ბაზარი, 11 გვერდი"');
   });
 
@@ -144,6 +144,43 @@ describe("the explorer sidebar", () => {
     expect(tag(markup, "topbar-search")).toContain('href="/explorer#q="');
     expect(markup).not.toContain('data-testid="sidebar-close"');
     expect(tag(markup, "data-sidebar")).not.toContain("data-menu-open");
+    // The closed menu's wrapper is no dialog, and adds no box beside the nav.
+    expect(tag(markup, "sidebar-menu-dialog")).not.toContain("role=");
+    expect(tag(markup, "sidebar-menu-dialog")).toContain('class="contents"');
+    expect(tag(markup, "data-sidebar")).not.toContain("role=");
+  });
+
+  it("marks the current page's row at 600 and draws a group's chevron without animating it (DESIGN.md §6.7, §14)", async () => {
+    const markup = await render("/explorer/wages/regions");
+    expect(tag(markup, "wages-regions-link")).toContain("font-semibold");
+    expect(tag(markup, "wages-overview-link")).not.toContain("font-semibold");
+    const chevrons = [...markup.matchAll(/data-testid="group-toggle-[a-z]+"[\s\S]*?<svg[^>]*>/g)].map((match) => match[0]);
+    expect(chevrons).toHaveLength(NAV_GROUPS.length);
+    for (const chevron of chevrons) expect(chevron).not.toMatch(/transition|duration-/);
+    expect(markup).not.toMatch(/translate-x|transition-transform/);
+  });
+});
+
+describe("the pre-paint rail script", () => {
+  function run(stored: string | null, failing = false) {
+    const head: { id: string; textContent: string }[] = [];
+    const localStorage = { getItem: (key: string) => { if (failing) throw new Error("denied"); return key === SIDEBAR_STORAGE_KEY ? stored : null; } };
+    const document = { createElement: () => ({ id: "", textContent: "" }), head: { appendChild: (style: { id: string; textContent: string }) => head.push(style) } };
+    new Function("localStorage", "document", PRE_PAINT_RAIL_SCRIPT)(localStorage, document);
+    return head;
+  }
+
+  it("reserves the 72px rail from 900px when the collapse is stored, and only then", () => {
+    const [style] = run("1");
+    expect(style.id).toBe(PRE_PAINT_RAIL_STYLE_ID);
+    expect(style.textContent).toContain("@media (min-width:900px)");
+    expect(style.textContent).toContain(`#${SIDEBAR_NAV_ID}[data-collapsed=false]{width:72px}`);
+    expect(run("0")).toEqual([]);
+    expect(run(null)).toEqual([]);
+  });
+
+  it("does nothing when storage is denied", () => {
+    expect(run("1", true)).toEqual([]);
   });
 });
 

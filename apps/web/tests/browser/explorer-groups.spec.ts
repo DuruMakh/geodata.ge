@@ -1,6 +1,6 @@
 import { expect, test, type Locator, type Page } from "@playwright/test";
 import { GROUP_HEADLINES } from "../../lib/explorer/groupHeadlines";
-import { LEGACY_TOPIC_FORWARDS, NAV_GROUPS, groupPages, topicHub } from "../../lib/navigation/navTree";
+import { LEGACY_TOPIC_FORWARDS, NAV_GROUPS, PAGE_COUNT, groupPages, topicHub } from "../../lib/navigation/navTree";
 import { axeViolations } from "./axe";
 
 // The explorer regrouping (spec 2026-10-24-explorer-regroup): the eight group pages, the sidebar with its rail and phone
@@ -58,6 +58,9 @@ test.describe("the sidebar at 1440px", () => {
     await expect(society).toHaveCount(0);
 
     // Hover intent: crossing another group's rail icon on the way into a pop-out, or leaving it for a moment, keeps it open.
+    // The page's clock is paused and stepped, so the 150ms close timer has either fired or not, however loaded the runner is.
+    await page.clock.install();
+    await page.clock.pauseAt(Date.now() + 1000);
     const labourIcon = (await page.getByTestId("group-link-labour").boundingBox())!;
     const livingIcon = (await page.getByTestId("group-link-living").boundingBox())!;
     await page.mouse.move(labourIcon.x + labourIcon.width / 2, labourIcon.y + labourIcon.height / 2);
@@ -65,15 +68,22 @@ test.describe("the sidebar at 1440px", () => {
     await expect(labour).toBeVisible();
     await page.mouse.move(livingIcon.x + livingIcon.width / 2, livingIcon.y + livingIcon.height / 2);
     await page.mouse.move(200, livingIcon.y + 120);
-    await page.waitForTimeout(300);
+    await page.clock.runFor(300);
     await expect(labour).toBeVisible();
     await expect(page.getByTestId("group-panel-living")).toHaveCount(0);
+    // Away for less than 150ms and back: still open after the delay has long passed.
     await page.mouse.move(1000, 450);
+    await page.clock.runFor(100);
     await page.mouse.move(200, livingIcon.y + 120);
-    await page.waitForTimeout(300);
+    await page.clock.runFor(300);
     await expect(labour).toBeVisible();
+    // Away for good: open at 100ms, closed once 150ms have run.
     await page.mouse.move(1000, 450);
+    await page.clock.runFor(100);
+    await expect(labour).toBeVisible();
+    await page.clock.runFor(100);
     await expect(labour).toHaveCount(0);
+    await page.clock.resume();
 
     // Keyboard: focus on a rail icon opens its pop-out, and Escape closes it with focus kept on the icon.
     await page.getByTestId("all-data-link").focus();
@@ -162,8 +172,13 @@ test.describe("the phone menu at 375px", () => {
   test("opens full screen as a dialog, keeps focus inside, and Escape and X give back focus and place", async ({ page }) => {
     await openMenuAt(page, MID_PAGE);
     const nav = sidebar(page);
-    await expect(nav).toHaveAttribute("role", "dialog");
-    await expect(nav).toHaveAttribute("aria-modal", "true");
+    // The dialog is the nav's wrapper: ARIA lets a nav be no dialog (axe aria-allowed-role), so the nav stays a landmark inside it.
+    const dialog = page.getByTestId("sidebar-menu-dialog");
+    await expect(dialog).toHaveAttribute("role", "dialog");
+    await expect(dialog).toHaveAttribute("aria-modal", "true");
+    await expect(dialog).toHaveAccessibleName("მენიუ");
+    await expect(nav).not.toHaveAttribute("role");
+    await expect(page.getByRole("dialog").getByRole("navigation", { name: "მონაცემთა პანელი" })).toBeVisible();
     const box = (await nav.boundingBox())!;
     expect([box.x, box.y, Math.round(box.width), Math.round(box.height)]).toEqual([0, 0, 375, 812]);
     await expect(page.locator("#content")).not.toBeVisible();
@@ -199,7 +214,7 @@ test.describe("the phone menu at 375px", () => {
     await openMenuAt(page, MID_PAGE);
     await page.setViewportSize({ width: 1200, height: 812 });
     await expect(sidebar(page)).not.toHaveAttribute("data-menu-open");
-    await expect(sidebar(page)).not.toHaveAttribute("role", "dialog");
+    await expect(page.getByTestId("sidebar-menu-dialog")).not.toHaveAttribute("role");
     await expect.poll(() => width(sidebar(page))).toBe(272);
     await expect(page.locator("#content")).toBeVisible();
     await expect(page.getByTestId("sidebar-topbar")).toBeHidden();
@@ -656,7 +671,7 @@ test.describe("All data", () => {
       await page.goto("/explorer");
       await expect(page.getByTestId("all-data-search")).toBeHidden();
       await expect(page.getByTestId("search-chip").first()).toBeHidden();
-      await expect(page.getByTestId("az-row")).toHaveCount(104);
+      await expect(page.getByTestId("az-row")).toHaveCount(PAGE_COUNT);
       await expect(page.getByTestId("az-row").first()).toBeVisible();
     } finally {
       await context.close();
@@ -776,3 +791,133 @@ for (const viewport of [{ width: 375, height: 812 }, { width: 1440, height: 900 
     expect(failures).toEqual([]);
   });
 }
+
+// Shell review (deep-review/shell.md M2): with the phone menu open, axe's best-practice rules pass too, aria-allowed-role
+// among them, on All data, a group page and a chart page in both languages.
+test("with the phone menu open, All data, a group page and a chart page pass axe's WCAG and best-practice rules", async ({ page }) => {
+  test.setTimeout(120_000);
+  await page.setViewportSize({ width: 375, height: 812 });
+  const failures: string[] = [];
+  for (const prefix of PREFIXES) {
+    for (const path of ["/explorer", "/explorer/prices", "/explorer/inflation/overview"]) {
+      await page.goto(`${prefix}${path}`);
+      await ready(page);
+      await page.getByTestId("sidebar-menu-button").click();
+      await expect(page.getByTestId("sidebar-close")).toBeFocused();
+      failures.push(...(await axeViolations(page, [], ["best-practice"])).map((violation) => `${prefix}${path} ${violation}`));
+    }
+  }
+  expect(failures).toEqual([]);
+});
+
+test.describe("the sidebar's current row and focus", () => {
+  test("the rail's foot links Methodology and AI connection, named and with tooltips", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    for (const prefix of PREFIXES) {
+      await page.goto(`${prefix}/explorer/labour`);
+      await ready(page);
+      if ((await sidebar(page).getAttribute("data-collapsed")) === "false") await page.getByTestId("sidebar-toggle").click();
+      await expect(sidebar(page)).toHaveAttribute("data-collapsed", "true");
+      for (const [testId, path, name] of [["rail-methodology-link", "/methodology", prefix ? "Methodology" : "მეთოდოლოგია"], ["rail-connect-link", "/connect", prefix ? "AI connection" : "AI-კავშირი"]] as const) {
+        const link = page.getByTestId(testId);
+        await expect(link).toBeVisible();
+        await expect(link).toHaveAttribute("href", `${prefix}${path}`);
+        await expect(link).toHaveAccessibleName(name);
+        await expect(link).toHaveAttribute("title", name);
+        await expect(link.locator("svg")).toHaveAttribute("aria-hidden", "true");
+      }
+    }
+  });
+
+  test("a stored collapse draws the 72px rail from the first paint, with no layout shift", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.addInitScript(() => {
+      window.localStorage.setItem("geodata:sidebar-collapsed", "1");
+      (window as unknown as { shifts: number }).shifts = 0;
+      new PerformanceObserver((list) => {
+        for (const entry of list.getEntries() as (PerformanceEntry & { value: number; hadRecentInput: boolean })[]) if (!entry.hadRecentInput) (window as unknown as { shifts: number }).shifts += entry.value;
+      }).observe({ type: "layout-shift", buffered: true });
+    });
+    // Before hydration: the server's HTML, with the page's scripts held back, already reserves the rail.
+    const script = (url: URL) => url.pathname.startsWith("/_next/static/") && url.pathname.endsWith(".js");
+    await page.route(script, (route) => route.abort());
+    await page.goto("/explorer/trade/partners");
+    expect(await width(sidebar(page))).toBe(72);
+    await page.unroute(script);
+    await page.goto("/explorer/trade/partners");
+    await ready(page);
+    await expect(sidebar(page)).toHaveAttribute("data-collapsed", "true");
+    expect(await width(sidebar(page))).toBe(72);
+    await expect(page.locator("#sidebar-rail-before-hydration")).toHaveCount(0);
+    expect(await page.evaluate(() => (window as unknown as { shifts: number }).shifts)).toBeLessThan(0.1);
+    // Expanding afterwards is the reader's own choice, and nothing left over holds the rail.
+    await page.getByTestId("sidebar-toggle").click();
+    await expect.poll(() => width(sidebar(page))).toBe(272);
+  });
+
+  test("in the rail, a chart page's group says it holds the current page", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto("/explorer/inflation/overview");
+    await ready(page);
+    await expect(page.getByTestId("group-link-prices")).not.toHaveAttribute("aria-current");
+    await page.getByTestId("sidebar-toggle").click();
+    await expect(sidebar(page)).toHaveAttribute("data-collapsed", "true");
+    await expect(page.getByTestId("group-link-prices")).toHaveAttribute("aria-current", "true");
+    await expect(sidebar(page).locator("[aria-current]")).toHaveCount(1);
+  });
+
+  test("the sidebar scrolls its current row into view on arrival, and the page does not move", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    for (const path of ["/explorer/transport/regions", "/explorer/environment/air-quality"]) {
+      await page.goto(path);
+      await ready(page);
+      const row = sidebar(page).locator('[aria-current="page"]');
+      await expect.poll(() => row.evaluate((element) => {
+        const [box, view] = [element.getBoundingClientRect(), element.closest("nav")!.getBoundingClientRect()];
+        return box.top >= view.top && box.bottom <= view.bottom;
+      }), path).toBe(true);
+      expect(await page.evaluate(() => window.scrollY), path).toBe(0);
+    }
+  });
+
+  test("in forced colours the current page and the current group are marked, and other rows are not", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.emulateMedia({ forcedColors: "active" });
+    await page.goto("/explorer/inflation/overview");
+    await ready(page);
+    const style = (testId: string) => page.getByTestId(testId).evaluate((element) => {
+      const computed = getComputedStyle(element);
+      return { border: `${computed.borderLeftWidth} ${computed.borderLeftStyle} ${computed.borderLeftColor}`, weight: computed.fontWeight };
+    });
+    const [current, other, group, otherGroup] = await Promise.all([style("inflation-overview-link"), style("inflation-categories-link"), style("group-link-prices"), style("group-link-budget")]);
+    expect(current.weight).toBe("600");
+    expect(other.weight).toBe("400");
+    expect(current.border).not.toBe(other.border);
+    expect(group.border).toMatch(/^2px solid/);
+    expect(otherGroup.border).not.toMatch(/^2px solid/);
+  });
+
+  test("the current page's link in the phone menu closes it and gives focus back to the menu button", async ({ page }) => {
+    await page.setViewportSize({ width: 375, height: 740 });
+    for (const [path, testId] of [["/explorer/inflation/overview", "inflation-overview-link"], ["/explorer/prices", "group-link-prices"], ["/explorer", "all-data-link"]] as const) {
+      await page.goto(path);
+      await ready(page);
+      await page.getByTestId("sidebar-menu-button").click();
+      await expect(page.getByTestId("sidebar-close")).toBeFocused();
+      await page.getByTestId(testId).focus();
+      await page.keyboard.press("Enter");
+      await expect(page.getByTestId("sidebar-menu-button"), path).toHaveAttribute("aria-expanded", "false");
+      await expect(page.getByTestId("sidebar-menu-button"), path).toBeFocused();
+      expect(address(page)).toBe(path);
+    }
+  });
+
+  test("narrowing below 900px with focus on the collapse toggle moves it to the menu button", async ({ page }) => {
+    await page.setViewportSize({ width: 1200, height: 812 });
+    await page.goto("/explorer/labour");
+    await ready(page);
+    await page.getByTestId("sidebar-toggle").focus();
+    await page.setViewportSize({ width: 375, height: 812 });
+    await expect(page.getByTestId("sidebar-menu-button")).toBeFocused();
+  });
+});

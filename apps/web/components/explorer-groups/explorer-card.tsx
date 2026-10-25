@@ -144,7 +144,7 @@ export function ExplorerCard(props: CardProps) {
             aria-hidden
             size={14}
             strokeWidth={1.75}
-            className="text-[var(--faint)] transition duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-[var(--accent)] motion-reduce:transition-none"
+            className="text-[var(--faint)] transition-colors duration-150 group-hover:text-[var(--accent)] motion-reduce:transition-none"
           />
         )}
       </span>

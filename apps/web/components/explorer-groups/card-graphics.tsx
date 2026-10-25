@@ -61,8 +61,8 @@ export function LeadGraphic({ series, color, endLabel, years, planned = false }:
           {endLabel}
         </span>
       ) : null}
-      <span className={`absolute -bottom-[18px] left-0 ${NUMERIC} text-[10.5px] text-[var(--faint)]`}>{first}</span>
-      <span className={`absolute -bottom-[18px] ${NUMERIC} text-[10.5px] text-[var(--faint)]`} style={{ right: gutter }}>{last}</span>
+      <span className={`absolute -bottom-[18px] left-0 ${NUMERIC} text-[10.5px] text-[var(--faint)] max-[768px]:text-[11px]`}>{first}</span>
+      <span className={`absolute -bottom-[18px] ${NUMERIC} text-[10.5px] text-[var(--faint)] max-[768px]:text-[11px]`} style={{ right: gutter }}>{last}</span>
     </>
   );
 }
@@ -82,7 +82,7 @@ function SpreadEnd({ end }: { end: RegionSpread["low"] }) {
  * for the band wraps and makes the band taller instead of running off the card or into the value below.
  */
 export function SpreadGraphic({ spread }: { spread: RegionSpread }) {
-  const label = `${NUMERIC} text-[10.5px] leading-[1.2] text-[var(--body)]`;
+  const label = `${NUMERIC} text-[10.5px] leading-[1.2] text-[var(--body)] max-[768px]:text-[11px]`;
   const lowOnRight = spread.lowX > 50;
   const lowEdge = `max(0px, calc(${percent(lowOnRight ? 100 - spread.lowX : spread.lowX)} - 12px))`;
   return (
@@ -129,7 +129,7 @@ export function BarsGraphic({ graphic }: { graphic: Extract<CardGraphic, { kind:
           />
         ))}
       </span>
-      <span className={`absolute inset-x-0 bottom-0 flex justify-between ${NUMERIC} text-[10.5px] text-[var(--faint)]`}>
+      <span className={`absolute inset-x-0 bottom-0 flex justify-between ${NUMERIC} text-[10.5px] text-[var(--faint)] max-[768px]:text-[11px]`}>
         <span>{graphic.first}</span>
         <span>{graphic.last}</span>
       </span>
