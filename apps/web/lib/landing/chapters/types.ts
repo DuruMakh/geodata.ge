@@ -67,3 +67,14 @@ export type HomeChapters = {
   tools: string[];
   sentences: Record<"spending" | "revenue" | "municipal" | "deficit", string>;
 };
+
+export type AgeingChapter = {
+  pyramid: { year: number; baseYear: number; ages: string[]; men: number[]; women: number[]; baseMen: number[]; baseWomen: number[] }; // ages youngest first: "0–4" … "85+"; persons
+  oldShare: { year: number; share: number }; oldShareBase: { year: number; share: number }; // 65+ share, fraction
+  ageing: boolean; // oldShare.share > oldShareBase.share
+  womenPer100Men: number; oldestWomenPerMan: number; // latest pyramid year; 85+ women / men
+  lifeExpectancy: { year: number; total: number; women: number; men: number };
+  fertility: { year: number; rate: number };
+  migration: { years: number[]; net: number[] }; // consecutive years with a net value, ascending
+  births: { year: number; births: number; deaths: number; places: ({ births: number; deaths: number } | null)[] }; // places aligned with MunicipalChapter.places
+};
