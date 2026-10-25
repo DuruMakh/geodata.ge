@@ -869,8 +869,8 @@ test.describe("the sidebar's current row and focus", () => {
     await page.route(APP_SCRIPT, (route) => { held.push(route); });
     await page.goto("/explorer/trade/partners", { waitUntil: "domcontentloaded" });
     expect(await width(sidebar(page))).toBe(72);
+    for (const route of held.splice(0)) await route.abort();
     await page.unroute(APP_SCRIPT);
-    for (const route of held) await route.abort();
     await page.goto("/explorer/trade/partners");
     await ready(page);
     await expect(sidebar(page)).toHaveAttribute("data-collapsed", "true");
