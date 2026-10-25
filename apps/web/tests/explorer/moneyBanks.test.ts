@@ -376,7 +376,7 @@ test.each(["ka", "en"] as const)("the %s pages hand Excel the ten archived NBG w
 
 test("the hub has six cards with the first series of each page and their latest values, Loans by region only its years", async () => {
   const base = await presentation();
-  const cards = buildMoneyBanksHubCards(facts, { ...base, messages: { ...await getMessages("en", ["moneyBanks"]), ...base.messages } });
+  const cards = buildMoneyBanksHubCards(facts, { ...base, messages: { ...await getMessages("en", ["moneyBanks", "groups"]), ...base.messages } });
   expect(cards.map(card => card.href)).toEqual(MONEY_BANKS_SECTIONS.map(section => section.href));
   // Each card follows its page's headline series, the latest year and its value, over the years the page covers: Loans and
   // deposits reaches back to 1996 through deposits, Interest rates through deposit rates, Bank health through its other ratios.
@@ -392,7 +392,7 @@ test("the hub has six cards with the first series of each page and their latest 
     footer("rates.policy", year => `${csv.percent("rates.policy", year)}%`, "1996–2025"),
     footer("banks.npl_ratio", year => `${csv.percent("banks.npl_ratio", year)}%`, "2001–2025"),
   ]);
-  expect(cards.map(card => card.latest?.caption ?? null)).toEqual(["Broad money (M3)", "All loans", "All loans", null, "National Bank rate", "Bad loans, share of all loans"]);
+  expect(cards.map(card => card.latest?.caption ?? null)).toEqual(["Broad money (M3)", "All loans", "Loans to residents", null, "National Bank rate", "Bad loans, share of all loans"]);
   expect(cards[3].footer).toBe("2015–2025");
   expect([cards[3].series, cards[3].seriesColor]).toEqual([null, null]);
 });

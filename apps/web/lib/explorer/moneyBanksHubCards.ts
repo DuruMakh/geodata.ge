@@ -17,9 +17,13 @@ const HEADLINE: Record<MoneyBanksTopicId, MoneyBanksIndicator> = {
   "supply": "money.m3", "loans-deposits": "loans.total", "borrowers": "borrowers.total", "interest-rates": "rates.policy", "bank-health": "banks.npl_ratio",
 };
 
-/** The page line's measure each card states as its caption (`moneyBanks.latest.{key}`): Who borrows' line counts all loans too. */
+/**
+ * Each card's caption: the page line's measure, except Who borrows, whose table counts loans to resident sectors, principal
+ * only (docs/data-methodology/money-banks-annual.md), so that it does not read as a second "all loans" beside Loans and deposits.
+ */
 const CAPTION: Record<MoneyBanksTopicId, string> = {
-  "supply": "supply", "loans-deposits": "loans-deposits", "borrowers": "loans-deposits", "interest-rates": "interest-rates", "bank-health": "bank-health",
+  "supply": "moneyBanks.latest.supply", "loans-deposits": "moneyBanks.latest.loans-deposits", "borrowers": "groups.caption.residentLoans",
+  "interest-rates": "moneyBanks.latest.interest-rates", "bank-health": "moneyBanks.latest.bank-health",
 };
 
 export function buildMoneyBanksHubCards(facts: readonly ClientMoneyBanksFact[], presentation: Presentation): HubCardModel[] {
@@ -43,7 +47,7 @@ export function buildMoneyBanksHubCards(facts: readonly ClientMoneyBanksFact[], 
     return {
       ...card, series: annualSeries(headline, first, lastYear), seriesColor: INK,
       footer: `${last.year} · ${value} · ${first}–${lastYear}`,
-      latest: { value, period: String(last.year), caption: t(`latest.${CAPTION[section.id]}`) }, years: coverageRange(first, lastYear),
+      latest: { value, period: String(last.year), caption: message(presentation.messages, CAPTION[section.id]) }, years: coverageRange(first, lastYear),
     };
   });
 }
