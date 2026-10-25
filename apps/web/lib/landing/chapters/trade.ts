@@ -16,13 +16,18 @@ function need<T>(value: T | undefined, what: string): T {
   return value;
 }
 
+/** The chapter's year: the latest with national exports. */
+export function tradeYear(overview: TradeOverviewFact[]): number {
+  const exportYears = overview.filter((fact) => fact.indicatorId === "trade.exports").map((fact) => fact.year);
+  return need(exportYears.length ? Math.max(...exportYears) : undefined, "national exports");
+}
+
 export function buildTradeChapter(input: { overview: TradeOverviewFact[]; partners: TradePartnersData; products: TradeProductsData }, presentation: Presentation): TradeChapter {
   const totals = new Map<string, number>();
   for (const fact of input.overview) totals.set(`${fact.indicatorId}:${fact.year}`, Number(fact.valueUsd));
   const total = (indicator: TradeOverviewIndicator, year: number) => need(totals.get(`${indicator}:${year}`), `${indicator} ${year}`);
 
-  const exportYears = input.overview.filter((fact) => fact.indicatorId === "trade.exports").map((fact) => fact.year);
-  const year = need(exportYears.length ? Math.max(...exportYears) : undefined, "national exports");
+  const year = tradeYear(input.overview);
   const exportsUsd = total("trade.exports", year);
 
   const years = [...new Set(input.overview.filter((fact) => fact.indicatorId === "trade.imports" && fact.year <= year && totals.has(`trade.exports:${fact.year}`)).map((fact) => fact.year))].sort((a, b) => a - b);

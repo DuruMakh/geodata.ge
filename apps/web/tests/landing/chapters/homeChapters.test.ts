@@ -316,6 +316,9 @@ describe("society chapter sentences and headings", () => {
     expect(result.ageing).toContain("14.1%");
     expect(result.ageing).toContain("2004");
     expect(result.ageing).toContain("85");
+    expect(result.youthJobs).toBe("In 2025, unemployment was 13.9%; among 15–29-year-olds it was 25.4%.");
+    expect(result.trade).toMatch(/^In 2025, Georgia’s foreign trade/);
+    expect(result.deaths).toMatch(/^In 2025, 44,319 people died/);
     expect(result.youthJobs).toContain("13.9%");
     expect(result.youthJobs).toContain("25.4%");
     expect(result.wageGap).toContain("2,165");

@@ -21,7 +21,7 @@ import { buildDeficitChapter } from "./deficit";
 import { buildMunicipalChapter } from "./municipalRelief";
 import { buildScaleChapter, type ScaleInput } from "./scale";
 import { buildSourceRows, toolNames } from "./sourcesAi";
-import { buildTradeChapter } from "./trade";
+import { buildTradeChapter, tradeYear } from "./trade";
 import type {
   AgeingChapter, BudgetSentenceKey, DeathsChapter, DeficitChapter, HomeChapters, MunicipalChapter, RevenueSeries, SocietySentences, SpendingSeries,
   TradeChapter, WageGapChapter, YouthJobsChapter,
@@ -163,8 +163,7 @@ export function buildSocietySentences({ ageing, youthJobs, wageGap, trade, death
 
 /** English names the society chapters read: sectors, regions, country partners and the products of the trade year. */
 export function societyEnglishLabelIds({ overview, partners, products }: HomeChaptersInput["trade"]): string[] {
-  const exportYears = overview.filter((fact) => fact.indicatorId === "trade.exports").map((fact) => fact.year);
-  const year = Math.max(...exportYears);
+  const year = tradeYear(overview);
   return [
     ...WAGES_SECTORS,
     ...REGIONAL_ECONOMY_REGIONS.map((region) => region.id),
