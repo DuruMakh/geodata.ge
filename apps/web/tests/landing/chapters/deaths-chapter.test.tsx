@@ -57,6 +57,14 @@ describe("DeathsChapter (server render)", () => {
     expect(keys[1][1]).not.toContain("bg-");
   });
 
+  it("keys the hollow square only when a cause-not-established group exists", () => {
+    const without: DeathsChapterModel = { ...data, groups: data.groups.filter((group) => group.kind !== "unknown") };
+    const caption = renderToStaticMarkup(<DeathsChapter data={without} labels={labels} />).match(/<figcaption[^>]*>(.*?)<\/figcaption>/)![1];
+    expect(caption).toContain("= 100 გარდაცვლილი");
+    expect(caption).not.toContain("მიზეზი დაუდგენელია");
+    expect(caption).not.toContain("border-[var(--control)]");
+  });
+
   it("lists the three largest causes with counts and the year in the accessible name", () => {
     const aria = html.match(/<canvas[^>]*aria-label="([^"]*)"/)?.[1];
     expect(aria).toBe(

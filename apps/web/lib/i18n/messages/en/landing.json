@@ -269,7 +269,7 @@
   "landing.trade.product.label": "Largest export product",
   "landing.trade.product.note": "{year}: {product} — {usd} bn $, its share of all exports.",
   "landing.trade.product.second": "Second is {product} — {usd} bn $.",
-  "landing.sentence.ageing": "People aged 65 and over are {share} of the population, up from {firstShare} in {firstYear}; in {vitalYear} there were {births} births for every 100 deaths.",
+  "landing.sentence.ageing": "People aged 65 and over are {share} of the population, compared with {firstShare} in {firstYear}; in {vitalYear} there were {births} births for every 100 deaths.",
   "landing.sentence.youthJobs": "In {year}, unemployment was {all}; among 15–29-year-olds it was {youth}.",
   "landing.sentence.wageGap": "The average monthly wage in {year} was GEL {average}; women earn {ratio} of what men do.",
   "landing.sentence.trade": "In {year}, Georgia’s foreign trade turnover came to USD {turnover} billion: exports were {exports} billion and imports {imports} billion.",

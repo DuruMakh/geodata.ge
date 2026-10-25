@@ -146,6 +146,15 @@ describe("buildAgeingChapter births and gaps", () => {
     expect(chapter.births).toEqual({ year: 2025, births: 100, deaths: 90, places: [{ births: 10, deaths: 8 }, null] });
   });
 
+  it("throws when the 65+ share years differ from the pyramid years", () => {
+    const shifted = (latest: number, first: number) => [
+      band(first, "band_0_14", 20), band(first, "band_15_64", 60), band(first, "band_65_plus", 20),
+      band(latest, "band_0_14", 20), band(latest, "band_15_64", 65), band(latest, "band_65_plus", 15),
+    ];
+    expect(() => buildAgeingChapter([...base, ...shifted(2009, 2000), ...rest, ...georgiaVital], [])).toThrow(/65\+ share is for 2009 but the pyramid is for 2010/);
+    expect(() => buildAgeingChapter([...base, ...shifted(2010, 2001), ...rest, ...georgiaVital], [])).toThrow(/65\+ base share is for 2001 but the pyramid base is 2000/);
+  });
+
   it("throws with the series id when a required series has no year", () => {
     expect(() => buildAgeingChapter([...base, ...bands, ...rest], [])).toThrow(/demography\.live_births/);
     expect(() => buildAgeingChapter(facts.filter((row) => row.seriesId !== "demography.total_fertility_rate"), places)).toThrow(/demography\.total_fertility_rate/);

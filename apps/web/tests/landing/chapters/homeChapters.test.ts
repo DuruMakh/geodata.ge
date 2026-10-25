@@ -19,7 +19,7 @@ import { buildTradeChapter } from "../../../lib/landing/chapters/trade";
 import { buildWageGapChapter } from "../../../lib/landing/chapters/wageGap";
 import { buildYouthJobsChapter } from "../../../lib/landing/chapters/youthJobs";
 import { buildSourceRows, toolNames } from "../../../lib/landing/chapters/sourcesAi";
-import type { ComparisonId, DeficitChapter, MunicipalChapter, ReliefPlace, RevenueSeries, SpendingSeries } from "../../../lib/landing/chapters/types";
+import type { AgeingChapter, ComparisonId, DeficitChapter, MunicipalChapter, ReliefPlace, RevenueSeries, SpendingSeries } from "../../../lib/landing/chapters/types";
 import type { MethodologyHubEntry } from "../../../lib/methodology/types";
 
 const ka = { locale: "ka", englishLabels: {}, messages: kaLanding } as const;
@@ -278,13 +278,13 @@ describe("society chapter sentences and headings", () => {
     return { demography, unemployment, wages, trade: { overview: overview.facts, partners, products }, health, presentation };
   }
 
-  async function sentencesFor(locale: "ka" | "en") {
+  async function sentencesFor(locale: "ka" | "en", ageingOverride?: Partial<AgeingChapter>) {
     const data = society;
     const ids = societyEnglishLabelIds(data.trade);
     const presentation = await getPresentation(locale, ["landing", "health"], ids);
     const places: ReliefPlace[] = [];
     return buildSocietySentences({
-      ageing: buildAgeingChapter(data.demography.facts, places),
+      ageing: { ...buildAgeingChapter(data.demography.facts, places), ...ageingOverride },
       youthJobs: buildYouthJobsChapter(data.unemployment.facts, presentation),
       wageGap: buildWageGapChapter(data.wages.facts, presentation),
       trade: buildTradeChapter(data.trade, presentation),
@@ -331,6 +331,12 @@ describe("society chapter sentences and headings", () => {
     expect(result.deaths).toContain("circulatory diseases");
     expect(result.deaths).toContain("one in five");
     expect(result.headings).toEqual({ ageing: "Georgia is getting older", youthJobs: "Youth unemployment is almost twice as high" });
+  }, 120_000);
+
+  it("words the English ageing lede neutrally when the 65+ share does not rise", async () => {
+    const { ageing } = await sentencesFor("en", { ageing: false });
+    expect(ageing).toContain("14.1%");
+    expect(ageing).not.toMatch(/up from|rose|rise|risen|increase|grown|grew/i);
   }, 120_000);
 
   it("has a heading for every comparison, the ageing fallback, and a cause form for every cause, in both languages", () => {

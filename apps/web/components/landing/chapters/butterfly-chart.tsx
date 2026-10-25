@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import type { TradeChapter } from "../../../lib/landing/chapters/types";
 import { TRADE_COLORS } from "./canvas";
 import { ChartTip, hideTip, showTip } from "./chart-tip";
+import { billions } from "./chart-format";
 import { tradePartnerTip } from "./chart-tips";
 import { ChartUnavailable, Reveal, useEngine } from "./reveal";
 
@@ -57,7 +58,7 @@ export function ButterflyChart({ year, partners, labels }: { year: number; partn
     return () => engine.destroy();
   }, [lib, partners]);
 
-  const ariaLabel = `${labels.chartSummary}: ${partners.map((partner) => partner.label).join(", ")}`;
+  const ariaLabel = `${labels.chartSummary}: ${partners.map((partner) => `${partner.label} ${billions(partner.turnoverUsd, 2)}`).join(", ")} (${labels.turnover}, ${labels.unit})`;
   const legend = [
     { name: labels.exports, color: TRADE_COLORS.exports },
     { name: labels.imports, color: TRADE_COLORS.imports },

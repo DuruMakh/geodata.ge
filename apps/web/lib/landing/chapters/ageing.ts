@@ -1,5 +1,6 @@
 import type { ServedDemographyObservation } from "../../data/demography/types";
 import type { AgeingChapter, ReliefPlace } from "./types";
+import { chapterNeed } from "./need";
 
 // Chapter 06: who lives here and how that is changing. Pure reading of the
 // served demography facts for Georgia, plus births and deaths per municipality
@@ -13,10 +14,7 @@ const ADULT_AGES = ["5_9", "10_14", "15_19", "20_24", "25_29", "30_34", "35_39",
 const AGE_GROUPS = [["age_0", "age_1_4"], ...ADULT_AGES.map((age) => [`age_${age}`]), ["age_85_plus"]];
 const AGE_LABELS = ["0–4", ...ADULT_AGES.map((age) => age.replace("_", "–")), "85+"];
 
-function need<T>(value: T | undefined, what: string): T {
-  if (value === undefined) throw new Error(`Ageing chapter: no data for ${what}`);
-  return value;
-}
+const need = chapterNeed("Ageing chapter");
 
 export function buildAgeingChapter(facts: ServedDemographyObservation[], places: ReliefPlace[]): AgeingChapter {
   const georgia = facts.filter((fact) => fact.geographyId === GEORGIA);
@@ -44,6 +42,9 @@ export function buildAgeingChapter(facts: ServedDemographyObservation[], places:
   const oldBaseYear = need(bandYears.length ? Math.min(...bandYears) : undefined, AGE_BAND);
   const oldShare = oldShareAt(oldYear);
   const oldShareBase = oldShareAt(oldBaseYear);
+  // The heading and sentence compare the share with the pyramid's years, so the two series must end and start together.
+  if (oldYear !== year) throw new Error(`Ageing chapter: 65+ share is for ${oldYear} but the pyramid is for ${year}`);
+  if (oldBaseYear !== baseYear) throw new Error(`Ageing chapter: 65+ base share is for ${oldBaseYear} but the pyramid base is ${baseYear}`);
 
   const total = (rows: ServedDemographyObservation[], at: number, what: string) => value(rows, at, () => true, what);
   const lifeTotal = series("demography.life_expectancy_total");

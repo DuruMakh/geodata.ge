@@ -79,13 +79,15 @@ export function UnitChart({ data, labels }: { data: DeathsChapter; labels: UnitL
               <i aria-hidden="true" className="inline-block h-2.5 w-2.5 flex-none rounded-[2px] bg-[var(--ink)]" />
               {labels.unit}
             </li>
-            <li className="inline-flex items-center gap-[7px]">
-              <i aria-hidden="true" className="inline-block h-2.5 w-2.5 flex-none rounded-[2px] border-[1.5px] border-[var(--control)]" />
-              {labels.unknown}
-            </li>
+            {data.groups.some((group) => group.kind === "unknown") && (
+              <li className="inline-flex items-center gap-[7px]">
+                <i aria-hidden="true" className="inline-block h-2.5 w-2.5 flex-none rounded-[2px] border-[1.5px] border-[var(--control)]" />
+                {labels.unknown}
+              </li>
+            )}
           </ul>
         </figcaption>
-        {/* The engine sets the height from the rows (narrow screens stack the names above the squares); this is the wide-screen one (it matches the measured height at 1440; a phone grows it by about 60px). */}
+        {/* The engine sets the height from the rows (narrow screens stack the names above the squares); this is the wide-screen one (it matches the measured height at 1440; a phone grows it by about 28px, 370 to 398). */}
         <div ref={wrapRef} className="relative w-full" style={{ height: initialHeight }}>
           {failed ? <ChartUnavailable text={labels.unavailable} summary={ariaLabel} /> : <canvas ref={canvasRef} role="img" aria-label={ariaLabel} className="absolute left-0 top-0" />}
           <ChartTip tipRef={tipRef} rows={2} />

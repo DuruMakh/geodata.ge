@@ -124,10 +124,10 @@ describe("TradeChapter (server render)", () => {
     expect(captions[0]).toContain("#3a332a");
   });
 
-  it("lists the ten partners in order in the butterfly's accessible name", () => {
+  it("lists the ten partners in order with their turnover in the butterfly's accessible name", () => {
     const aria = [...html.matchAll(/<canvas[^>]*aria-label="([^"]*)"/g)].map((m) => m[1]);
     expect(aria).toHaveLength(2);
-    expect(aria[0]).toBe("ექსპორტი და იმპორტი 10 უმსხვილეს პარტნიორთან 2025 წელს: თურქეთი, აშშ, რუსეთი, ჩინეთი, ყირგიზეთი, გერმანია, აზერბაიჯანი, ყაზახეთი, სომხეთი, ბულგარეთი");
+    expect(aria[0]).toBe("ექსპორტი და იმპორტი 10 უმსხვილეს პარტნიორთან 2025 წელს: თურქეთი 3.11, აშშ 2.91, რუსეთი 2.69, ჩინეთი 2.32, ყირგიზეთი 1.51, გერმანია 1.38, აზერბაიჯანი 1.36, ყაზახეთი 1.00, სომხეთი 0.79, ბულგარეთი 0.70 (ბრუნვა, მლრდ $)");
   });
 
   it("gives the lines chart's accessible name its range and the latest year's values", () => {
