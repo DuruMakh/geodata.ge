@@ -330,7 +330,9 @@ describe("the real 74 places", () => {
   });
 
   it.each(["საბავშვო ბაღები", "ბაღები", "საგარეო", "საგარეო ვალი", "საგარეო ვაჭრობა", "საგარეო ნაკადები", "საგარეო სექტორი", "წყალი"])("%s names no place", (query) => {
-    expect(searchExplorer(query, "ka", PAGES, SHORTCUTS, indexes.ka)!.place).toBeNull();
+    const result = searchExplorer(query, "ka", PAGES, SHORTCUTS, indexes.ka)!;
+    expect(result.place).toBeNull();
+    expect(result.suggestions).toEqual([]);
   });
 
   it.each([
@@ -381,6 +383,42 @@ describe("the real 74 places", () => {
     expect(placeOf(query, "en")).toBeNull();
   });
 
+  const KVEMO = ["Kvemo Kartli", "Racha-Lechkhumi and Kvemo Svaneti"], ZEMO = ["Samegrelo-Zemo Svaneti"], SHIDA = ["Shida Kartli"];
+  const KARTLI = ["Kvemo Kartli", "Shida Kartli"], SVANETI = ["Racha-Lechkhumi and Kvemo Svaneti", "Samegrelo-Zemo Svaneti"];
+  it.each([
+    ["ქვემო", "ka", KVEMO], ["ზემო", "ka", ZEMO], ["შიდა", "ka", SHIDA], ["Kvemo", "en", KVEMO], ["Zemo", "en", ZEMO], ["Shida", "en", SHIDA],
+    ["ქართლი", "ka", KARTLI], ["ქართლის", "ka", KARTLI], ["სვანეთი", "ka", SVANETI], ["Kartli", "en", KARTLI], ["Svaneti", "en", SVANETI], ["kvemo", "ka", KVEMO],
+  ] as const)("a lone %s suggests the regions whose names hold it, and names none (N4)", (query, locale, names) => {
+    const result = real(query, locale);
+    expect(result.place).toBeNull();
+    expect(result.suggestions.map((candidate) => candidate.nameEn).sort()).toEqual([...names].sort());
+  });
+
+  it("keeps the pages a lone weak word finds beside its suggestions", () => {
+    const result = real("შიდა");
+    expect(rows(result).map((row) => row.href)).toEqual(expect.arrayContaining(["/explorer/economy/gdp", "/explorer/debt"]));
+    expect(result.suggestions.map((candidate) => candidate.nameEn)).toEqual(SHIDA);
+  });
+
+  it.each([
+    ["მთიანეთი", "ka", "Mtskheta-Mtianeti"], ["ლეჩხუმი", "ka", "Racha-Lechkhumi and Kvemo Svaneti"], ["ჯავახეთი", "ka", "Samtskhe-Javakheti"],
+    ["ქვემო სვანეთი", "ka", "Racha-Lechkhumi and Kvemo Svaneti"], ["ზემო სვანეთი", "ka", "Samegrelo-Zemo Svaneti"], ["ზემო სვანეთის", "ka", "Samegrelo-Zemo Svaneti"],
+    ["Kvemo Svaneti", "en", "Racha-Lechkhumi and Kvemo Svaneti"], ["zemo svaneti", "en", "Samegrelo-Zemo Svaneti"], ["mtianeti", "en", "Mtskheta-Mtianeti"],
+  ] as const)("%s, a later part of one region's name, finds %s", (query, locale, nameEn) => {
+    const result = real(query, locale);
+    expect(result.place?.place.nameEn).toBe(nameEn);
+    expect(result.suggestions).toEqual([]);
+    expect(result.total).toBeGreaterThan(0);
+  });
+
+  it("narrows a region found by a later word with the next word", () => {
+    expect(hrefsOf("ზემო სვანეთის ხელფასები")).toEqual(["/explorer/wages/regions/samegrelo_zemo_svaneti"]);
+  });
+
+  it.each(["და", "and", "შიდა ვალი", "ქვემო ქართლი", "ბათუმი", "ინფლაცია"])("%s suggests no place", (query) => {
+    expect(real(query, /^[a-z]/.test(query) ? "en" : "ka").suggestions).toEqual([]);
+  });
+
   it.each([
     ["შიდა ქართლი", "ka", "Shida Kartli"], ["Shida Kartli", "en", "Shida Kartli"], ["ქვემო ქართლი", "ka", "Kvemo Kartli"], ["kvemo kartli", "en", "Kvemo Kartli"],
     ["ქვემო ქართლის", "ka", "Kvemo Kartli"], ["მცხეთა მთიანეთი", "ka", "Mtskheta-Mtianeti"], ["mtskheta mtianeti", "en", "Mtskheta-Mtianeti"],
@@ -388,6 +426,12 @@ describe("the real 74 places", () => {
   ] as const)("%s, with its second word or as a whole, finds %s", (query, locale, nameEn) => {
     expect(placeOf(query, locale)).toBe(nameEn);
     expect(real(query, locale).total).toBeGreaterThan(0);
+  });
+
+  it.each([["შიდა ვალი", "ka"], ["საგარეო ვალი", "ka"], ["domestic debt", "en"], ["external debt", "en"]] as const)("%s finds the Debt page, which has the series (N3)", (query, locale) => {
+    const result = real(query, locale);
+    expect(result.place).toBeNull();
+    expect(rows(result).map((row) => row.href)).toContain("/explorer/debt");
   });
 
   it("reads a region's two words and a page word together", () => {

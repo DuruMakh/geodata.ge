@@ -48,6 +48,8 @@ export type SearchResult = {
   /** The query read through the Georgian keyboard, when that reading is what found the results. */
   reading: string | null;
   place: { place: Place; typeLabelArgs: { kind: "region" | "municipality" | "capital"; count?: number; region?: string } } | null;
+  /** The places a query that names none could mean: a lone weak word (`ქვემო`), or a later word several share (`ქართლი`). */
+  suggestions: Place[];
   /** A place's own rows, its region's, Georgia's (`country`, its label left to the page's strings) or the pages found. */
   groups: { kind: "own" | "region" | "country" | "flat"; label: string; rows: ResultRow[] }[];
   shortcuts: SearchShortcut[];
@@ -251,19 +253,48 @@ export function rowLabel(page: SearchPage, locale: Locale): string {
 
 type PlaceMatch = { place: Place; score: number; start: number; end: number };
 
+/** The joining word inside `რაჭა-ლეჩხუმი და ქვემო სვანეთი`, which names nothing alone. */
+const NAME_JOINING_WORDS = new Set(["და", "and"]);
+const isLoneWeakWord = (words: string[]) => words.length === 1 && WEAK_FIRST_WORDS.has(words[0]);
+
+/**
+ * The places whose names hold the words as a run of later words, each as written or, from 4 letters and unless weak, with
+ * another ending: `ქართლი` (both Kartlis), `ქვემო სვანეთი`, `mtianeti`. A name's start is `placeFor`'s, except that a weak
+ * word alone (`ქვემო`, `შიდა`) counts wherever it stands, so it can offer the regions it is part of.
+ */
+function placesHolding(words: string[], places: Place[]): Place[] {
+  if (!words.length || words.length > MAX_PLACE_WORDS || words.every((word) => NAME_JOINING_WORDS.has(word))) return [];
+  const from = isLoneWeakWord(words) ? 0 : 1;
+  // A weak word only as written: `ქვემ` on its way to `ქვემო` is not yet Kvemo Svaneti.
+  const sameWord = (word: string, nameWord: string) => nameWord === word || (!WEAK_FIRST_WORDS.has(nameWord) && word.length >= 4 && stem(word).length >= 3 && stem(nameWord) === stem(word));
+  return places.filter((place) => placeNames(place).some(({ words: nameWords }) => {
+    for (let start = from; start + words.length <= nameWords.length; start++) {
+      if (words.every((word, index) => sameWord(word, nameWords[start + index]))) return true;
+    }
+    return false;
+  }));
+}
+
 /** The longest place name, in words (`რაჭა-ლეჩხუმი და ქვემო სვანეთი`). */
 const MAX_PLACE_WORDS = 4;
 
 /**
  * The place the words name best: each run of up to four words is tried, and each word a run covers beyond its first
  * adds 1, so a place named by more of the query wins (`მცხეთა მთიანეთი` is the region, not Mtskheta and a stray word).
+ * A run of a name's later words that only one place holds names it at 1.8 (`მთიანეთი`, `ზემო სვანეთი`), unless it is a
+ * lone weak word.
  */
 function placeIn(words: string[], places: Place[]): PlaceMatch | null {
   let best: (PlaceMatch & { rank: number }) | null = null;
   for (let start = 0; start < words.length; start++) {
     for (let end = start + 1; end <= Math.min(words.length, start + MAX_PLACE_WORDS); end++) {
-      const match = placeFor(words.slice(start, end).join(" "), places);
-      if (!match || match.score < 1.8) continue;
+      const run = words.slice(start, end);
+      let match = placeFor(run.join(" "), places);
+      if (!match || match.score < 1.8) {
+        const holding = isLoneWeakWord(run) ? [] : placesHolding(run, places);
+        match = holding.length === 1 ? { place: holding[0], score: 1.8 } : null;
+      }
+      if (!match) continue;
       const rank = match.score + (end - start - 1);
       if (!best || rank > best.rank) best = { ...match, start, end, rank };
     }
@@ -287,6 +318,8 @@ type Run = {
   content: string[];
   /** The pages that match the content words, best first; with a place, those that match its other words. */
   scored: { page: SearchPage; score: number }[];
+  /** With no place named, the places the whole query could mean (`placesHolding`). */
+  suggestions: Place[];
 };
 
 function runWords(words: string[], pages: SearchPage[], places: Place[]): Run {
@@ -296,16 +329,16 @@ function runWords(words: string[], pages: SearchPage[], places: Place[]): Run {
   let place = placeIn(words, places);
   // A word half typed (`საგ` on its way to `საგარეო ვალი`) does not swap the pages it finds for a place's.
   if (place?.score === PREFIX_SCORE && scored.length) place = null;
-  if (!place) return { place, country, rest: [], content, scored };
+  if (!place) return { place, country, rest: [], content, scored, suggestions: country ? [] : placesHolding(words, places) };
   const rest = words.filter((word, index) => (index < place.start || index >= place.end) && !JOINING_WORDS.has(word) && !isCountryWord(word) && !isPlaceWord(place.place, word));
-  return { place, country: false, rest, content: rest, scored: searchPages(pages, rest, rest.join(" ")) };
+  return { place, country: false, rest, content: rest, scored: searchPages(pages, rest, rest.join(" ")), suggestions: [] };
 }
 
 /**
  * Searches the pages and, once the place index has arrived, the places. A query that names a place gives its card,
  * its own rows (its municipal budget first) and its region's other rows, each linking to the place's page; other
  * words narrow those rows, and give their pages instead when they rule all of them out. Georgia alone gives Georgia's
- * own rows. Otherwise the pages that match every word, best first, under the matching shortcuts.
+ * own rows. A query that names no place but could mean several (`ქვემო`, `ქართლი`) suggests them. Otherwise the pages that match every word, best first, under the matching shortcuts.
  * A Latin query that finds nothing is read through the Georgian keyboard, as typed (Shift letters such as `T` → `თ`)
  * and then in lower case, so `XELFASEBI` still reads `ხელფასები`. `null` for an empty query.
  */
@@ -317,11 +350,11 @@ export function searchExplorer(
   const placeList = places?.places ?? [];
   let reading: string | null = null;
   let found = runWords(words, pages, placeList);
-  if (!found.place && !found.country && !found.scored.length && isLatin(query)) {
+  if (!found.place && !found.country && !found.scored.length && !found.suggestions.length && isLatin(query)) {
     for (const typed of new Set([query.trim(), query.trim().toLowerCase()])) {
       const georgian = wordsOf(latinToGeorgian(typed));
       const retry = runWords(georgian, pages, placeList);
-      if (retry.place || retry.scored.length) {
+      if (retry.place || retry.scored.length || retry.suggestions.length) {
         reading = georgian.join(" ");
         found = retry;
         break;
@@ -334,7 +367,7 @@ export function searchExplorer(
     href, page, label: segments(rowLabel(page, locale), marks), mirror: segments(page.name[locale === "ka" ? "en" : "ka"], marks), value, period,
     caption: own?.caption ?? "", ...(own?.status ? { status: own.status } : {}),
   });
-  const result: SearchResult = { reading, place: null, groups: [], shortcuts: [], total: 0 };
+  const result: SearchResult = { reading, place: null, suggestions: found.suggestions, groups: [], shortcuts: [], total: 0 };
   const pageOf = new Map(pages.map((page) => [page.href, page]));
   const rowsFor = (placeId: string, rest: string[], skip: ReadonlySet<string> = new Set()) => (places?.entries ?? [])
     .filter((entry) => entry.placeId === placeId && !skip.has(entry.page))

@@ -8,7 +8,7 @@ import { useHashState, writeHash } from "../explorer-shell/use-hash-state";
 import { GROUP_ICONS } from "../shell/group-icons";
 import { Sparkline } from "../ui/sparkline";
 import { EXPLORER_SEARCH_INPUT_ID } from "./explorer-search-focus";
-import type { PlaceFact, PlaceIndex } from "../../lib/explorer/places/types";
+import type { Place, PlaceFact, PlaceIndex } from "../../lib/explorer/places/types";
 import { searchExplorer, valueNote, type ResultRow, type SearchPage, type SearchResult, type SearchShortcut, type Segment } from "../../lib/explorer/search/searchExplorer";
 import { pagesLabel } from "../../lib/explorer/pagesLabel";
 import { message } from "../../lib/i18n/messages";
@@ -292,15 +292,19 @@ export function ExplorerSearch({ locale, pages, shortcuts, children }: ExplorerS
 
   const trimmed = query.trim();
   const none = message(messages, "allData.none", { q: trimmed });
-  const nothing = result !== null && !total && !placesPending;
-  const loading = result !== null && !total && placesPending && placesSlow;
+  const suggestions = result?.suggestions ?? [];
+  const placeName = (candidate: Place) => (locale === "en" ? candidate.nameEn : candidate.nameKa);
+  const suggest = message(messages, "allData.suggest");
+  /** A lone `ქვემო` or `ქართლი` names no one place: the places it could be are offered instead of "nothing found". */
+  const nothing = result !== null && !total && !suggestions.length && !placesPending;
+  const loading = result !== null && !total && !suggestions.length && placesPending && placesSlow;
   const loadingText = message(messages, "allData.placesLoading");
   const country = message(messages, "allData.country");
   const groupLabel = (group: SearchResult["groups"][number]) => (group.kind === "country" ? country : group.label);
   /** The place the rows are about, which the announcement leads with: `ბათუმი: ნაპოვნია 23 შედეგი`. */
   const about = result?.place ? (locale === "en" ? result.place.place.nameEn : result.place.place.nameKa) : result?.groups[0]?.kind === "country" ? country : "";
   const found = total ? message(messages, total === 1 ? "allData.foundOne" : "allData.found", { n: total }) : "";
-  const announce = !result ? "" : total ? (about ? `${about}: ${found}` : found) : nothing ? none : loading ? loadingText : "";
+  const announce = !result ? "" : total ? (about ? `${about}: ${found}` : found) : suggestions.length ? `${suggest} ${suggestions.map(placeName).join(", ")}` : nothing ? none : loading ? loadingText : "";
   const placeTag = result?.place
     ? message(messages, result.place.typeLabelArgs.kind === "capital" ? "allData.tag.capital" : result.place.typeLabelArgs.kind === "region" ? "allData.tag.region" : "allData.tag.municipality")
     : "";
@@ -364,6 +368,17 @@ export function ExplorerSearch({ locale, pages, shortcuts, children }: ExplorerS
               <Languages aria-hidden strokeWidth={1.75} className="size-[18px] flex-none" />
               <span className="min-w-0 [overflow-wrap:anywhere]">{message(messages, "allData.reading")} <b className="font-semibold">{result.reading}</b></span>
             </p>
+          ) : null}
+          {suggestions.length ? (
+            <div data-testid="place-suggestions" className="mt-[26px] flex flex-wrap items-center gap-2 text-[12.5px] text-[var(--muted)]">
+              <span className="flex-none">{suggest}</span>
+              {suggestions.map((candidate) => (
+                <button key={candidate.id} type="button" data-testid="place-suggestion" onClick={() => pick(placeName(candidate))} className={`${CHIP_CLASS} max-w-full gap-1.5 text-left`}>
+                  <MapPin aria-hidden strokeWidth={1.75} className="size-3.5 flex-none text-[var(--accent)]" />
+                  {placeName(candidate)}
+                </button>
+              ))}
+            </div>
           ) : null}
           {result.place ? <PlaceCard result={result.place} locale={locale} messages={messages} /> : null}
           <div id="explorer-results" role={total ? "listbox" : undefined} aria-label={total ? message(messages, "allData.results") : undefined} className="mt-2">

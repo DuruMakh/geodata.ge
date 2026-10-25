@@ -693,6 +693,30 @@ test.describe("All data", () => {
     expect(labels.every((label) => /^(ბათუმი|აჭარა): /.test(label))).toBe(true);
   });
 
+  test("a lone region word suggests the regions it is part of instead of nothing found, and a suggestion opens the region (N4)", async ({ page }) => {
+    for (const [prefix, query, name] of [["", "ქვემო", "ქვემო ქართლი"], ["/en", "Kvemo", "Kvemo Kartli"]] as const) {
+      await page.goto(`${prefix}/explorer`);
+      await ready(page);
+      await search(page).fill(query);
+      const suggestions = page.getByTestId("place-suggestion");
+      await expect(suggestions).toHaveCount(2);
+      await expect(page.getByTestId("search-none")).toHaveCount(0);
+      await expect(page.getByTestId("place-card")).toHaveCount(0);
+      await expect(page.getByRole("status")).toContainText(name);
+      await suggestions.filter({ hasText: name }).click();
+      await expect(search(page)).toHaveValue(name);
+      await expect(search(page)).toBeFocused();
+      await expect(page.getByTestId("place-card")).toContainText(name);
+      await expect(page.getByTestId("place-suggestions")).toHaveCount(0);
+    }
+    // The longest name wraps inside its chip on the narrowest phone.
+    await page.setViewportSize({ width: 320, height: 700 });
+    await page.goto(`/explorer#q=${encodeURIComponent("სვანეთი")}`);
+    await ready(page);
+    await expect(page.getByTestId("place-suggestion")).toHaveCount(2);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(320);
+  });
+
   test("with a places file slower than the wait, says the places are still loading, then shows them (search #10)", async ({ page }) => {
     let release!: () => void;
     const held = new Promise<void>((resolve) => { release = resolve; });
