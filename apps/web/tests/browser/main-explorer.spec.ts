@@ -1330,11 +1330,9 @@ test("hoists the source ids the workbook builders read", async ({ request }) => 
   }
 });
 
-test("every explorer route family renders the site footer", async ({ page }) => {
-  // These are the site's main SEO landing targets, and the footer carries the
-  // CC BY 4.0 licence, the contact address and the methodology link. Under the
-  // owner's navigation design the footer is the only place the methodology
-  // route appears on data pages, so without it ~85 pages have no path there.
+test("every explorer route family renders no footer and links methodology from the sidebar", async ({ page }) => {
+  // Explorer routes render no footer (DESIGN.md §6.7): the sidebar's foot carries
+  // the methodology link, so every data page still has a path there.
   for (const route of [
     "/explorer",
     "/explorer/expenditure",
@@ -1348,11 +1346,9 @@ test("every explorer route family renders the site footer", async ({ page }) => 
   ]) {
     await page.goto(`${TEST_BASE_URL}${route}`);
 
-    const footer = page.getByTestId("site-footer");
-    await expect(footer, route).toBeVisible();
-    await expect(footer.getByRole("link", { name: "მეთოდოლოგია" }), route).toBeVisible();
-    await expect(footer, route).toContainText("CC BY 4.0");
-    await expect(footer, route).toContainText("info@fiscal.ge");
+    await expect(page.getByRole("contentinfo"), route).toHaveCount(0);
+    await expect(page.getByTestId("site-footer"), route).toHaveCount(0);
+    await expect(page.getByTestId("data-sidebar").getByRole("link", { name: "მეთოდოლოგია" }), route).toBeVisible();
   }
 });
 

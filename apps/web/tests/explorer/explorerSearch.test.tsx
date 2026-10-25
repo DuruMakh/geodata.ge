@@ -39,7 +39,7 @@ describe("the search box, rendered on the server", () => {
 
   it("offers the five example words", () => {
     const chips = [...html.matchAll(/<button[^>]*data-testid="search-chip"[^>]*>([^<]*)<\/button>/g)].map((match) => match[1]);
-    expect(chips).toEqual(["ბათუმი", "ინფლაცია", "ხელფასები", "მშპ", "NEET"]);
+    expect(chips).toEqual(["ბათუმი", "ინფლაცია", "ხელფასები", "მშპ", "ადგილობრივი ექსპორტი"]);
   });
 
   it("shows the A to Z list while the box is empty, and no results or error text", () => {

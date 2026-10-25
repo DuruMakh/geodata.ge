@@ -35,7 +35,7 @@ for (const [prefix, width] of [["", 390], ["/en", 1440]] as const) {
       await expect(page.getByTestId("unemployment-breakdown")).toHaveCount(0);
       await expect(page.getByTestId("unemployment-composition")).toHaveCount(section === "overview" ? 1 : 0);
       await expect(page.getByTestId("unemployment-national-tabs")).toHaveCount(section === "overview" ? 1 : 0);
-      await expect(page.getByRole("contentinfo")).toContainText(prefix ? "Geostat" : "საქსტატი");
+      await expect(page.getByRole("contentinfo")).toHaveCount(0);
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), section).toBe(true);
     }
     expect(errors).toEqual([]);

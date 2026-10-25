@@ -127,7 +127,7 @@ for (const width of [390, 768, 1280]) test(`landing calls to action are 44px tap
 });
 
 for (const { path, labels } of [
-  { path: "/explorer/labour", labels: [...["ბიუჯეტი", "ეკონომიკა და ბიზნესი", "ფასები და ფული", "შრომის ბაზარი", "ცხოვრების დონე და ჯანდაცვა", "საგარეო სექტორი", "დემოგრაფია", "საზოგადოება და გარემო"], "მეთოდოლოგია", "AI-კავშირი", "მიზანი"] },
+  { path: "/", labels: [...["ბიუჯეტი", "ეკონომიკა და ბიზნესი", "ფასები და ფული", "შრომის ბაზარი", "ცხოვრების დონე და ჯანდაცვა", "საგარეო სექტორი", "დემოგრაფია", "საზოგადოება და გარემო"], "მეთოდოლოგია", "AI-კავშირი", "მიზანი"] },
   { path: "/en", labels: [...["Budget", "Economy and business", "Prices and money", "Labour market", "Living standards and health", "External sector", "Demography", "Society and environment"], "Methodology", "AI connection", "About"] },
 ]) {
   test(`${path} footer names every dataset in a compact two-column grid`, async ({ page }) => {
@@ -143,13 +143,20 @@ for (const { path, labels } of [
     // The data line no longer repeats its own heading.
     await expect(footer.getByText(path === "/en" ? "Data" : "მონაცემები", { exact: true })).toHaveCount(0);
     const height = (await footer.boundingBox())?.height ?? 0;
-    // The footer lists every group plus three links, in two columns of 44px rows; 232px is the rest of the footer
-    // (760px for twenty hubs' twelve rows, measured 2026-10-20).
-    expect(height).toBeLessThanOrEqual(Math.ceil((DATASET_HUBS.length + 3) / 2) * 44 + 232);
+    // The footer lists every group plus three links, in two columns of 44px rows; 240px is the rest of the footer,
+    // where the Georgian homepage's fine print with the site-wide review date takes an extra line (504px, measured 2026-10-25).
+    expect(height).toBeLessThanOrEqual(Math.ceil((DATASET_HUBS.length + 3) / 2) * 44 + 240);
     const marginTop = await footer.evaluate((element) => parseFloat(getComputedStyle(element).marginTop));
     expect(marginTop).toBeLessThanOrEqual(48);
   });
 }
+
+// Explorer pages render no footer: the sidebar's foot links Methodology and AI connection.
+test("/explorer/labour has no footer on a phone", async ({ page }) => {
+  await page.goto("/explorer/labour");
+  await ready(page);
+  await expect(page.getByRole("contentinfo")).toHaveCount(0);
+});
 
 test("404 recovers to every dataset with no top band on a phone", async ({ page }) => {
   await page.goto("/this-page-does-not-exist");

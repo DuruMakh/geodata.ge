@@ -1,8 +1,6 @@
 import { readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import { afterEach, describe, expect, it, test, vi } from "vitest";
-import kaCommon from "../../lib/i18n/messages/ka/common.json";
-import enCommon from "../../lib/i18n/messages/en/common.json";
 import sitemap from "../../lib/seo/sitemap";
 import { MUNICIPALITY_ROUTES } from "../../lib/explorer/municipalityRoutes";
 import { loadServedGeneralGovernmentBalanceData, loadServedGovernmentDebtData, loadServedLandingData, loadServedMunicipalData } from "../../lib/data/servedData";
@@ -37,7 +35,7 @@ import { DEMOGRAPHY_PAGES } from "../../lib/explorer/demographyRoutes";
 import { listPublicPagePaths } from "../../lib/i18n/inventory.server";
 import { loadPageRevisions } from "../../lib/i18n/page-revisions.server";
 import { pageHref, splitLanguagePath } from "../../lib/i18n/routes";
-import { ALL_DATA_PATH, currentEntry, currentGroup, isActivePath, LEGACY_TOPIC_FORWARDS, NAV_GROUPS, NAV_TREE, openHub, sourceNoteKey } from "../../lib/navigation/navTree";
+import { ALL_DATA_PATH, currentEntry, currentGroup, isActivePath, LEGACY_TOPIC_FORWARDS, NAV_GROUPS, NAV_TREE, openHub } from "../../lib/navigation/navTree";
 import { inflationProductsMetadata } from "../../lib/pages/inflation-products";
 import { municipalEntityHref } from "../../lib/seo/internalLinks";
 
@@ -698,16 +696,6 @@ describe("the navigation tree", () => {
       const entry = currentEntry(route);
       expect([hub.href, ...hub.sections.map((section) => section.href)], route).toContain(entry);
       expect(hub.sections.filter((section) => isActivePath(route, section.href)).length, route).toBeLessThanOrEqual(1);
-    }
-  });
-});
-
-describe("the explorer footer source note", () => {
-  it("resolves to a note in both languages on every sitemap explorer route", async () => {
-    for (const route of await explorerRoutes()) {
-      const key = sourceNoteKey(route);
-      expect((kaCommon as Record<string, string>)[key], route).toBeTruthy();
-      expect((enCommon as Record<string, string>)[key], route).toBeTruthy();
     }
   });
 });

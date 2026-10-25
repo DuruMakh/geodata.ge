@@ -107,20 +107,16 @@ export function GroupPage({ locale, messages, group, href, name, line, meta, hea
             aria-label={message(messages, "groups.topicsNav")}
             id={TOPIC_LINKS_ID}
             data-testid="group-topic-links"
-            className="flex gap-2 overflow-x-auto border-b border-[var(--hairline)] bg-[var(--paper)] py-2.5 [scrollbar-width:none] min-[900px]:[scrollbar-color:var(--control)_transparent] min-[900px]:[scrollbar-width:thin] data-[scrollbar]:pb-1 max-[768px]:px-5"
+            className="flex gap-2 overflow-x-auto bg-[var(--paper)] py-2.5 [scrollbar-width:none] min-[900px]:[scrollbar-color:var(--control)_transparent] min-[900px]:[scrollbar-width:thin] data-[scrollbar]:pb-1 max-[768px]:px-5"
           >
             {topics.map((section) => (
               <a
                 key={section.topic}
                 href={`#t-${section.topic}`}
                 data-testid="group-topic-link"
-                className="inline-flex min-h-[42px] flex-none items-center gap-2.5 border border-[var(--hairline)] px-3.5 text-[13px] font-semibold whitespace-nowrap text-[var(--ink)] no-underline transition-colors duration-150 hover:border-[var(--ink)] hover:bg-[var(--tile)] motion-reduce:transition-none"
+                className="inline-flex min-h-[42px] flex-none items-center border border-[var(--hairline)] px-3.5 text-[13px] font-semibold whitespace-nowrap text-[var(--ink)] no-underline transition-colors duration-150 hover:border-[var(--ink)] hover:bg-[var(--tile)] motion-reduce:transition-none"
               >
-                <span>{section.label}</span>
-                <span aria-hidden className="flex gap-0.5">
-                  {section.cards.map((card) => <i key={card.href ?? card.index} className="block h-3.5 w-1 bg-[var(--ink)]" />)}
-                </span>
-                <b className={`${NUMERIC} text-[11px] font-normal text-[var(--muted)]`}>{section.cards.length}</b>
+                {section.label}
               </a>
             ))}
           </nav>

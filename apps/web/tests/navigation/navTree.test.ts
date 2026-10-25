@@ -6,7 +6,7 @@ import enGroups from "../../lib/i18n/messages/en/groups.json";
 import kaAllData from "../../lib/i18n/messages/ka/allData.json";
 import enAllData from "../../lib/i18n/messages/en/allData.json";
 import {
-  ALL_DATA_PATH, LEGACY_TOPIC_FORWARDS, NAV_GROUPS, NAV_TREE, PAGE_COUNT, currentEntry, currentGroup, groupOfTopic, groupPages, isActivePath, openHub, sourceNoteKey, topicHub,
+  ALL_DATA_PATH, LEGACY_TOPIC_FORWARDS, NAV_GROUPS, NAV_TREE, PAGE_COUNT, currentEntry, currentGroup, groupOfTopic, groupPages, isActivePath, openHub, topicHub,
 } from "../../lib/navigation/navTree";
 
 describe("the navigation tree", () => {
@@ -91,7 +91,6 @@ describe("the navigation tree", () => {
     expect(hub.sections.at(-1)).toMatchObject({ labelKey: "common.tradeComposition", testId: "trade-composition-link" });
     expect(openHub("/explorer/trade/composition")).toBe(hub);
     expect(currentEntry("/explorer/trade/composition")).toBe("/explorer/trade/composition");
-    expect(sourceNoteKey("/explorer/trade/composition")).toBe("common.geostatSourceNote");
   });
 
   it("places Housing and construction directly after Business, with its four pages", () => {
@@ -124,45 +123,6 @@ describe("the navigation tree", () => {
     }
     const testIds = NAV_TREE.flatMap((hub) => hub.sections.map((section) => section.testId)).filter(Boolean);
     expect(new Set(testIds).size).toBe(testIds.length);
-  });
-});
-
-describe("the explorer footer source note", () => {
-  it("picks a page's own note, else the longest address it sits under", () => {
-    expect(sourceNoteKey("/explorer")).toBe("common.sourceNote.allData");
-    expect(sourceNoteKey("/explorer/expenditure")).toBe("common.budgetStatisticsSourceNote");
-    expect(sourceNoteKey("/explorer/municipalities")).toBe("common.budgetStatisticsSourceNote");
-    expect(sourceNoteKey("/explorer/municipalities/region/kakheti")).toBe("common.budgetSourceNote");
-    expect(sourceNoteKey("/explorer/analysis")).toBe("common.budgetSourceNote");
-    expect(sourceNoteKey("/explorer/deficit")).toBe("common.deficitSourceNote");
-    expect(sourceNoteKey("/explorer/economy")).toBe("common.sourceNote.group.economy");
-    expect(sourceNoteKey("/explorer/economy/gdp")).toBe("common.economySourceNote");
-    expect(sourceNoteKey("/explorer/economy/sectors")).toBe("common.geostatSourceNote");
-    expect(sourceNoteKey("/explorer/economy/regions/adjara")).toBe("common.geostatSourceNote");
-    expect(sourceNoteKey("/explorer/inflation/cities/batumi")).toBe("common.inflationSourceNote");
-    expect(sourceNoteKey("/explorer/inflation/products")).toBe("common.geostatSourceNote");
-    expect(sourceNoteKey("/explorer/money/supply")).toBe("common.nbgSourceNote");
-    expect(sourceNoteKey("/explorer/business")).toBe("common.geostatSourceNote");
-    expect(sourceNoteKey("/explorer/business/regions/guria")).toBe("common.geostatSourceNote");
-    expect(sourceNoteKey("/explorer/housing/prices")).toBe("common.geostatSourceNote");
-    expect(sourceNoteKey("/explorer/housing/regions/guria")).toBe("common.geostatSourceNote");
-    expect(sourceNoteKey("/explorer/transport/freight")).toBe("common.geostatSourceNote");
-    expect(sourceNoteKey("/explorer/transport/regions/guria")).toBe("common.geostatSourceNote");
-    expect(sourceNoteKey("/explorer/external")).toBe("common.sourceNote.group.external");
-    expect(sourceNoteKey("/explorer/external/current-account")).toBe("common.nbgSourceNote");
-    expect(sourceNoteKey("/explorer/external/foreign-debt")).toBe("common.nbgSourceNote");
-    expect(sourceNoteKey("/explorer/external/reserves")).toBe("common.nbgSourceNote");
-    expect(sourceNoteKey("/explorer/external/foreign-investment")).toBe("common.geostatSourceNote");
-    expect(sourceNoteKey("/explorer/demography/population/region/imereti")).toBe("common.geostatSourceNote");
-    expect(sourceNoteKey("/explorer/education")).toBe("common.geostatSourceNote");
-    expect(sourceNoteKey("/explorer/education/schools/batumi")).toBe("common.geostatSourceNote");
-    expect(sourceNoteKey("/explorer/health/illnesses")).toBe("common.geostatSourceNote");
-    expect(sourceNoteKey("/explorer/health/social-payments")).toBe("common.socialSourceNote");
-    expect(sourceNoteKey("/explorer/health/pensions/region/guria")).toBe("common.socialSourceNote");
-    // The funded pension page is read from the Pension Fund's statements, not the Social Service Agency's tables.
-    expect(sourceNoteKey("/explorer/health/funded-pension")).toBe("common.fundedPensionSourceNote");
-    expect(sourceNoteKey("/explorer/science-culture")).toBe("common.geostatSourceNote");
-    expect(sourceNoteKey("/explorer/science-culture/museums/guria")).toBe("common.geostatSourceNote");
   });
 });
 
@@ -236,16 +196,6 @@ describe("the eight groups over the twenty topics", () => {
       expect(en[`common.topic.${hub.id}`], hub.id).toBeTruthy();
     }
   });
-
-  it("gives every group and All data a source note in both languages", () => {
-    for (const group of NAV_GROUPS) {
-      expect(sourceNoteKey(group.href)).toBe(`common.sourceNote.group.${group.id}`);
-      expect(ka[`common.sourceNote.group.${group.id}`]).toBeTruthy();
-      expect(en[`common.sourceNote.group.${group.id}`]).toBeTruthy();
-    }
-    expect(ka["common.sourceNote.allData"]).toBeTruthy();
-    expect(en["common.sourceNote.allData"]).toBeTruthy();
-  });
 });
 
 describe("the group and All data messages", () => {
@@ -271,7 +221,7 @@ describe("the group and All data messages", () => {
   });
 
   it("carry the example words and the plural-safe page count", () => {
-    expect([1, 2, 3, 4, 5].map((n) => (kaAllData as Record<string, string>)[`allData.chip.${n}`])).toEqual(["ბათუმი", "ინფლაცია", "ხელფასები", "მშპ", "NEET"]);
+    expect([1, 2, 3, 4, 5].map((n) => (kaAllData as Record<string, string>)[`allData.chip.${n}`])).toEqual(["ბათუმი", "ინფლაცია", "ხელფასები", "მშპ", "ადგილობრივი ექსპორტი"]);
     expect([1, 2, 3, 4, 5].map((n) => (enAllData as Record<string, string>)[`allData.chip.${n}`])).toEqual(["Batumi", "inflation", "wages", "GDP", "xelfasebi"]);
     expect((enCommon as Record<string, string>)["common.pagesCount"]).toBe("{n} pages");
     expect((enCommon as Record<string, string>)["common.pagesCountOne"]).toBe("{n} page");

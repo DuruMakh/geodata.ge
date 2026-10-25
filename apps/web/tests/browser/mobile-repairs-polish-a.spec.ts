@@ -173,8 +173,10 @@ test.describe("a larger text setting (root font 125%) at 360px", () => {
       await page.waitForLoadState("networkidle");
       await page.addStyleTag({ content: "html { font-size: 125% !important; }" });
       expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(360);
-      // Body copy follows the setting: the footer fine print is rem-sized.
-      expect(await page.locator("footer p").last().evaluate((element) => parseFloat(getComputedStyle(element).fontSize))).toBeGreaterThan(12);
+      // Body copy follows the setting: the fine print is rem-sized — the footer's, or on explorer pages, which have no
+      // footer, the page's own `text-xs` notes.
+      const finePrint = path.startsWith("/explorer") ? "#content p.text-xs" : "footer p";
+      expect(await page.locator(finePrint).last().evaluate((element) => parseFloat(getComputedStyle(element).fontSize))).toBeGreaterThan(12);
     });
   }
 });

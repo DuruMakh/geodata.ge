@@ -37,10 +37,10 @@ test("the inflation section links all four live pages and the sidebar reaches Ov
   await page.goto("/explorer/prices");
   await expect(page.getByTestId("group-link-prices")).toHaveAttribute("aria-current", "page");
   await expect(topicCards(page, "inflation")).toHaveCount(4);
-  // Budget and Economy stay closed and inactive; the footer names both publishers.
+  // Budget and Economy stay closed and inactive; the group page has no footer.
   await expect(page.getByTestId("section-link-expenditure")).toHaveCount(0);
   await expect(page.getByTestId("group-link-economy")).not.toHaveAttribute("aria-current", "page");
-  await expect(page.getByText("მონაცემები: საქსტატი და საქართველოს ეროვნული ბანკი", { exact: false })).toBeVisible();
+  await expect(page.getByRole("contentinfo")).toHaveCount(0);
   await topicCards(page, "inflation").first().click();
   await ready(page);
   await expect(page.getByTestId("inflation-overview-link")).toHaveAttribute("aria-current", "page");

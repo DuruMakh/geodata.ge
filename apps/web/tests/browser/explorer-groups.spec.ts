@@ -139,6 +139,8 @@ test.describe("the sidebar at 1440px", () => {
 test.describe("the phone menu at 375px", () => {
   test.use({ viewport: { width: 375, height: 812 } });
   const PATH = "/explorer/wages/overview";
+  // A place partway down the page; with no footer it scrolls about 390px at 375×812 and 247px at 1200×812.
+  const MID_PAGE = 200;
 
   async function openMenuAt(page: Page, scrollY: number) {
     await page.goto(PATH);
@@ -158,7 +160,7 @@ test.describe("the phone menu at 375px", () => {
   });
 
   test("opens full screen as a dialog, keeps focus inside, and Escape and X give back focus and place", async ({ page }) => {
-    await openMenuAt(page, 700);
+    await openMenuAt(page, MID_PAGE);
     const nav = sidebar(page);
     await expect(nav).toHaveAttribute("role", "dialog");
     await expect(nav).toHaveAttribute("aria-modal", "true");
@@ -184,24 +186,24 @@ test.describe("the phone menu at 375px", () => {
     await expect(page.getByTestId("sidebar-menu-button")).toBeFocused();
     await expect(page.locator("#content")).toBeVisible();
     await expect(page.locator("[data-shell-page]")).not.toHaveAttribute("inert");
-    expect(await page.evaluate(() => window.scrollY)).toBe(700);
+    expect(await page.evaluate(() => window.scrollY)).toBe(MID_PAGE);
 
     await page.getByTestId("sidebar-menu-button").click();
     await expect(page.getByTestId("sidebar-close")).toBeFocused();
     await page.getByTestId("sidebar-close").click();
     await expect(page.getByTestId("sidebar-menu-button")).toBeFocused();
-    expect(await page.evaluate(() => window.scrollY)).toBe(700);
+    expect(await page.evaluate(() => window.scrollY)).toBe(MID_PAGE);
   });
 
   test("widening to 1200 with the menu open shows the desktop sidebar and keeps the reader's place (Review Focus 5)", async ({ page }) => {
-    await openMenuAt(page, 700);
+    await openMenuAt(page, MID_PAGE);
     await page.setViewportSize({ width: 1200, height: 812 });
     await expect(sidebar(page)).not.toHaveAttribute("data-menu-open");
     await expect(sidebar(page)).not.toHaveAttribute("role", "dialog");
     await expect.poll(() => width(sidebar(page))).toBe(272);
     await expect(page.locator("#content")).toBeVisible();
     await expect(page.getByTestId("sidebar-topbar")).toBeHidden();
-    expect(await page.evaluate(() => window.scrollY)).toBe(700);
+    expect(await page.evaluate(() => window.scrollY)).toBe(MID_PAGE);
     // Back on a phone the menu is closed and the page is shown.
     await page.setViewportSize({ width: 375, height: 812 });
     await expect(page.getByTestId("sidebar-menu-button")).toHaveAttribute("aria-expanded", "false");
@@ -223,7 +225,7 @@ test.describe("the phone menu at 375px", () => {
   });
 
   test("a link to another page closes the menu and lands at that page's top", async ({ page }) => {
-    await openMenuAt(page, 700);
+    await openMenuAt(page, MID_PAGE);
     await page.getByTestId("wages-regions-link").click();
     await expect(page).toHaveURL(/\/explorer\/wages\/regions$/);
     await ready(page);
@@ -361,7 +363,10 @@ for (const viewport of [{ width: 1024, height: 768 }, { width: 1440, height: 900
         await page.goto(`${prefix}/explorer/society`);
         await ready(page);
         const row = page.getByTestId("group-topic-links");
-        expect(await row.evaluate((element) => (element as HTMLElement).offsetHeight - element.clientHeight), "the scrollbar is drawn").toBeGreaterThan(1);
+        // The Georgian row overflows at both widths; the English one, labels only, can fit at 1440px and then draws no scrollbar.
+        const overflows = await row.evaluate((element) => element.scrollWidth > element.clientWidth);
+        if (!prefix) expect(overflows, "the Georgian row overflows").toBe(true);
+        expect(await row.evaluate((element) => (element as HTMLElement).offsetHeight - element.clientHeight > 1), "the scrollbar is drawn when the row overflows").toBe(overflows);
         await page.evaluate(() => window.scrollTo(0, 2000));
         await expect.poll(async () => (await row.boundingBox())!.y).toBe(0);
         expect((await row.boundingBox())!.height, prefix || "ka").toBeLessThanOrEqual(70);
@@ -491,9 +496,12 @@ test.describe("All data", () => {
     }
   });
 
-  test("ინფლაცია puts Inflation overview first among the pages", async ({ page }) => {
+  test("the ადგილობრივი ექსპორტი chip puts Domestic exports first, and ინფლაცია puts Inflation overview first", async ({ page }) => {
     await page.goto("/explorer");
     await ready(page);
+    await page.getByTestId("search-chip").filter({ hasText: "ადგილობრივი ექსპორტი" }).click();
+    await expect(search(page)).toHaveValue("ადგილობრივი ექსპორტი");
+    await expect(page.getByTestId("search-result").first()).toHaveAttribute("href", "/explorer/trade/domestic-exports");
     await search(page).fill("ინფლაცია");
     await expect(page.getByTestId("search-result").first()).toHaveAttribute("href", "/explorer/inflation/overview");
     await expect(page).toHaveURL(/#q=/);
@@ -634,6 +642,16 @@ test.describe("the old topic hubs forward (Review Focus 3)", () => {
     await ready(page);
     await expect(page.getByTestId("single-year-snapshot")).toBeVisible();
   });
+});
+
+test("All data, a group page and a chart page render no footer", async ({ page }) => {
+  for (const prefix of PREFIXES) {
+    for (const path of ["/explorer", "/explorer/labour", "/explorer/wages/overview"]) {
+      await page.goto(`${prefix}${path}`);
+      await ready(page);
+      await expect(page.getByRole("contentinfo"), `${prefix}${path}`).toHaveCount(0);
+    }
+  }
 });
 
 test("no link on All data, the group pages or a page of each group goes through a forward", async ({ page }) => {

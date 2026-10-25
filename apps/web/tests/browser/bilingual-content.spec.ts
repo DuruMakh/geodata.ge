@@ -26,7 +26,9 @@ test("the English reader journey keeps human pages English and reaches the share
   // Data opens All data, whose A to Z list links every page.
   await page.getByTestId("az-index").locator('a[href="/en/explorer/expenditure"]').click();
   await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
-  await page.getByTestId("site-footer").getByRole("link", { name: "Methodology", exact: true }).click();
+  // Explorer pages have no footer; the sidebar's foot links Methodology.
+  await expect(page.getByRole("contentinfo")).toHaveCount(0);
+  await page.getByTestId("data-sidebar").getByRole("link", { name: "Methodology", exact: true }).click();
   await expect(page).toHaveURL(/\/en\/methodology$/);
   await page.locator('main a[href="/en/methodology/expenditure"]').click();
   await expect(page).toHaveURL(/\/en\/methodology\/expenditure$/);

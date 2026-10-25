@@ -57,18 +57,22 @@ describe("the Labour market group page (ka)", async () => {
     expect(tag).toContain("overflow-x-auto");
     expect(tag).not.toContain("flex-wrap");
     expect(tag).toContain("min-[900px]:[scrollbar-width:thin]");
+    // No line under the row.
+    expect(tag).not.toContain("border-b");
     for (const edge of ["start", "end"]) {
       const fade = new RegExp(`<span[^>]*data-testid="group-topic-fade-${edge}"[^>]*>`).exec(html)![0];
       expect(fade).toContain("max-[900px]:hidden");
       expect(fade).toContain(`group-data-[more-${edge}]/topics:opacity-100`);
     }
-    // The sections' scroll margin is the one row's height (63px) and a 13px gap, fixed.
+    // The sections' scroll margin is the one row's height (62px) and a 14px gap, fixed.
     expect(html).not.toContain("--topic-links-h");
     expect(count(html, /min-\[900px\]:scroll-mt-\[76px\]/g)).toBe(2);
   });
 
   it("links the two topics' sections", () => {
     expect(hrefs(html, "group-topic-link")).toEqual(["#t-unemployment", "#t-wages"]);
+    // Each link is its label alone: no page bars, no count.
+    expect([...html.matchAll(/<a[^>]*data-testid="group-topic-link"[^>]*>([\s\S]*?)<\/a>/g)].map((match) => match[1])).toEqual(["უმუშევრობა და დასაქმება", "ხელფასები"]);
     expect(sections(html).map(({ topic }) => topic)).toEqual(["unemployment", "wages"]);
   });
 

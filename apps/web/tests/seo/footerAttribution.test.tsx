@@ -14,43 +14,25 @@ function footerText(markup: string) {
 }
 
 describe("dataset footer attribution", () => {
+  // Explorer routes render no footer; their sources sit in each page's own source note.
   it.each([
-    ["/en/explorer/deficit", "IMF", "Ministry of Finance"],
-    ["/en/explorer/economy/regions/tbilisi", "Geostat", "World Bank"],
-    ["/en/explorer/economy/sectors", "Geostat", "World Bank"],
-    ["/en/explorer/economy/gdp", "World Bank and Geostat", "Ministry of Finance"],
-    ["/en/explorer/inflation/overview", "Geostat and the National Bank", "Ministry of Finance"],
-    ["/en/explorer/inflation/categories", "Geostat", "National Bank"],
-    ["/en/explorer/inflation/products", "Geostat", "National Bank"],
-    ["/en/explorer/unemployment", "Geostat", "Ministry of Finance"],
-    ["/en/explorer/demography", "Geostat", "World Bank"],
-    ["/en/explorer/demography/population", "Geostat", "Ministry of Finance"],
-  ])("uses the sources for %s without an unrelated site-wide date", async (pathname, source, unrelatedSource) => {
+    ["en", "/en/explorer/deficit"],
+    ["ka", "/explorer/deficit"],
+    ["en", "/en/explorer/labour"],
+    ["ka", "/explorer"],
+  ] as const)("renders no footer on the %s explorer route %s", async (locale, pathname) => {
     route.pathname = pathname;
-    const footer = footerText(renderPageMarkup("en", await renderExplorerLayout("en", null)));
-    expect(footer).toContain(source);
-    expect(footer).not.toContain(unrelatedSource);
-    expect(footer).not.toMatch(/\d{4}-\d{2}-\d{2}/);
-    expect(footer).toContain("CC BY 4.0");
+    expect(renderPageMarkup(locale, await renderExplorerLayout(locale, null))).not.toMatch(/<footer[\s>]/);
   });
 
-  it("uses Georgian deficit attribution after removing the language prefix", async () => {
-    route.pathname = "/explorer/deficit";
-    const footer = footerText(renderPageMarkup("ka", await renderExplorerLayout("ka", null)));
-    expect(footer).toContain("IMF");
-    expect(footer).not.toContain("ფინანსთა სამინისტრო");
-  });
-
-  // U01-21: the year is the build's, in the server footer and in the explorer layout's client footer alike.
-  it("dates the copyright line by the build, not a literal year", async () => {
-    route.pathname = "/explorer/unemployment";
+  // U01-21: the year is the build's.
+  it("dates the copyright line by the build, not a literal year", () => {
     // A build some years on: only the clock moves, so the footer must follow it.
     const later = new Date().getFullYear() + 5;
     vi.useFakeTimers({ toFake: ["Date"] });
     vi.setSystemTime(new Date(later, 5, 1));
     try {
       expect(footerText(renderToStaticMarkup(<SiteFooter locale="ka" />))).toContain(`© ${later} Fiscal.ge`);
-      expect(footerText(renderPageMarkup("en", await renderExplorerLayout("en", null)))).toContain(`© ${later} Fiscal.ge`);
     } finally {
       vi.useRealTimers();
     }
@@ -61,12 +43,5 @@ describe("dataset footer attribution", () => {
     expect(footer).toContain("Latest source review across Fiscal.ge:");
     expect(footer).toContain("2026-09-13");
     expect(footer).not.toContain("Ministry of Finance");
-  });
-
-  it("credits the Georgian unemployment survey to Geostat", async () => {
-    route.pathname = "/explorer/unemployment";
-    const footer = footerText(renderPageMarkup("ka", await renderExplorerLayout("ka", null)));
-    expect(footer).toContain("საქსტატი");
-    expect(footer).not.toContain("ფინანსთა სამინისტრო");
   });
 });
