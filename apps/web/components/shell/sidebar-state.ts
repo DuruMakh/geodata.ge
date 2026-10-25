@@ -6,13 +6,18 @@ export const SIDEBAR_NAV_ID = "data-sidebar-navigation";
 /** The style the pre-paint script adds; the sidebar removes it once it has drawn the stored state itself. */
 export const PRE_PAINT_RAIL_STYLE_ID = "sidebar-rail-before-hydration";
 
+/** How long after the page's load the pre-paint style waits for the sidebar to mount before it gives the reader the server's sidebar. */
+export const PRE_PAINT_RAIL_TIMEOUT_MS = 3000;
+
 /**
  * Run inline before the sidebar is parsed (lib/pages/explorer-layout.tsx). The server cannot read the stored collapse, so
  * without this a reader who collapsed the sidebar sees 272px and the page jumps 200px left once the sidebar has mounted.
  * It reserves the 72px rail from the first paint, blank until the sidebar draws it. A style in <head>, not an attribute on
- * an element React hydrates, so hydration finds what it rendered.
+ * an element React hydrates, so hydration finds what it rendered. Should the sidebar never mount (one of the app's own
+ * scripts fails to load, or hydration never ends; a blocked analytics script does not count), the style removes itself, on
+ * that script's error or a while after the page's load, and the server's expanded sidebar, with its links, is back.
  */
-export const PRE_PAINT_RAIL_SCRIPT = `try{if(localStorage.getItem(${JSON.stringify(SIDEBAR_STORAGE_KEY)})==="1"){var s=document.createElement("style");s.id=${JSON.stringify(PRE_PAINT_RAIL_STYLE_ID)};s.textContent="@media (min-width:900px){#${SIDEBAR_NAV_ID}[data-collapsed=false]{width:72px}#${SIDEBAR_NAV_ID}[data-collapsed=false]>*{visibility:hidden}}";document.head.appendChild(s)}}catch(e){}`;
+export const PRE_PAINT_RAIL_SCRIPT = `try{if(localStorage.getItem(${JSON.stringify(SIDEBAR_STORAGE_KEY)})==="1"){var s=document.createElement("style");s.id=${JSON.stringify(PRE_PAINT_RAIL_STYLE_ID)};s.textContent="@media (min-width:900px){#${SIDEBAR_NAV_ID}[data-collapsed=false]{width:72px}#${SIDEBAR_NAV_ID}[data-collapsed=false]>*{visibility:hidden}}";document.head.appendChild(s);var u=function(){s.remove()};addEventListener("error",function(e){var t=e.target;if(t&&t.tagName==="SCRIPT"&&/\\/_next\\//.test(t.src))u()},true);addEventListener("load",function(){setTimeout(u,${PRE_PAINT_RAIL_TIMEOUT_MS})})}}catch(e){}`;
 
 /**
  * The explorer sidebar's state (spec 2026-10-24-explorer-regroup §4). `page` is the address the open groups were last

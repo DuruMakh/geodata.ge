@@ -1,7 +1,7 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { DataSidebar } from "../../components/shell/data-sidebar";
-import { PRE_PAINT_RAIL_SCRIPT, PRE_PAINT_RAIL_STYLE_ID, SIDEBAR_NAV_ID, SIDEBAR_STORAGE_KEY, initialSidebarState, isRailed, sidebarReducer } from "../../components/shell/sidebar-state";
+import { PRE_PAINT_RAIL_SCRIPT, PRE_PAINT_RAIL_STYLE_ID, PRE_PAINT_RAIL_TIMEOUT_MS, SIDEBAR_NAV_ID, SIDEBAR_STORAGE_KEY, initialSidebarState, isRailed, sidebarReducer } from "../../components/shell/sidebar-state";
 import { I18nProvider } from "../../lib/i18n/provider";
 import { getMessages } from "../../lib/i18n/messages.server";
 import { LEGACY_TOPIC_FORWARDS, NAV_GROUPS, NAV_TREE, PAGE_COUNT } from "../../lib/navigation/navTree";
@@ -162,13 +162,24 @@ describe("the explorer sidebar", () => {
 });
 
 describe("the pre-paint rail script", () => {
-  function run(stored: string | null, failing = false) {
-    const head: { id: string; textContent: string }[] = [];
+  type Style = { id: string; textContent: string; remove: () => void };
+  type Listener = (event: { target: { tagName?: string; src?: string } | null }) => void;
+  function runWithEvents(stored: string | null, failing = false) {
+    const head: Style[] = [];
+    const listeners: Record<string, Listener[]> = {};
+    const timers: { run: () => void; ms: number }[] = [];
     const localStorage = { getItem: (key: string) => { if (failing) throw new Error("denied"); return key === SIDEBAR_STORAGE_KEY ? stored : null; } };
-    const document = { createElement: () => ({ id: "", textContent: "" }), head: { appendChild: (style: { id: string; textContent: string }) => head.push(style) } };
-    new Function("localStorage", "document", PRE_PAINT_RAIL_SCRIPT)(localStorage, document);
-    return head;
+    const document = {
+      createElement: (): Style => { const style: Style = { id: "", textContent: "", remove: () => { head.splice(head.indexOf(style), 1); } }; return style; },
+      head: { appendChild: (style: Style) => head.push(style) },
+    };
+    const addEventListener = (type: string, listener: Listener) => { (listeners[type] ??= []).push(listener); };
+    const setTimeout = (run: () => void, ms: number) => { timers.push({ run, ms }); };
+    new Function("localStorage", "document", "addEventListener", "setTimeout", PRE_PAINT_RAIL_SCRIPT)(localStorage, document, addEventListener, setTimeout);
+    const fire = (type: string, target: { tagName?: string; src?: string } | null = null) => { for (const listener of listeners[type] ?? []) listener({ target }); };
+    return { head, fire, timers };
   }
+  const run = (stored: string | null, failing = false) => runWithEvents(stored, failing).head;
 
   it("reserves the 72px rail from 900px when the collapse is stored, and only then", () => {
     const [style] = run("1");
@@ -181,6 +192,26 @@ describe("the pre-paint rail script", () => {
 
   it("does nothing when storage is denied", () => {
     expect(run("1", true)).toEqual([]);
+  });
+
+  it("gives the server's sidebar back when one of the app's scripts fails to load, but not for another script or resource", () => {
+    const { head, fire } = runWithEvents("1");
+    fire("error", { tagName: "SCRIPT", src: "https://www.clarity.ms/tag/x" });
+    fire("error", { tagName: "IMG", src: "https://fiscal.ge/_next/static/media/a.png" });
+    fire("error", null);
+    expect(head).toHaveLength(1);
+    fire("error", { tagName: "SCRIPT", src: "https://fiscal.ge/_next/static/chunks/main.js" });
+    expect(head).toEqual([]);
+  });
+
+  it("gives the server's sidebar back a while after the page's load, should the sidebar not have mounted by then", () => {
+    const { head, fire, timers } = runWithEvents("1");
+    expect(timers).toEqual([]);
+    fire("load");
+    expect(timers.map((timer) => timer.ms)).toEqual([PRE_PAINT_RAIL_TIMEOUT_MS]);
+    expect(head).toHaveLength(1);
+    timers[0]!.run();
+    expect(head).toEqual([]);
   });
 });
 

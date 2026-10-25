@@ -1,4 +1,4 @@
-import { expect, test, type Locator, type Page } from "@playwright/test";
+import { expect, test, type Locator, type Page, type Route } from "@playwright/test";
 import { GROUP_HEADLINES } from "../../lib/explorer/groupHeadlines";
 import { LEGACY_TOPIC_FORWARDS, NAV_GROUPS, PAGE_COUNT, groupPages, topicHub } from "../../lib/navigation/navTree";
 import { axeViolations } from "./axe";
@@ -15,6 +15,8 @@ const PREFIXES = ["", "/en"] as const;
 /** The page's address without its origin, compared exactly: a Georgian case that ended in English would not match. */
 const address = (page: Page) => { const url = new URL(page.url()); return url.pathname + url.search + url.hash; };
 const FORWARDED = new Set(LEGACY_TOPIC_FORWARDS.map(({ from }) => from));
+/** The app's own scripts. */
+const APP_SCRIPT = (url: URL) => url.pathname.startsWith("/_next/static/") && url.pathname.endsWith(".js");
 
 test.describe("the sidebar at 1440px", () => {
   test.use({ viewport: { width: 1440, height: 900 } });
@@ -839,11 +841,12 @@ test.describe("the sidebar's current row and focus", () => {
       }).observe({ type: "layout-shift", buffered: true });
     });
     // Before hydration: the server's HTML, with the page's scripts held back, already reserves the rail.
-    const script = (url: URL) => url.pathname.startsWith("/_next/static/") && url.pathname.endsWith(".js");
-    await page.route(script, (route) => route.abort());
-    await page.goto("/explorer/trade/partners");
+    const held: Route[] = [];
+    await page.route(APP_SCRIPT, (route) => { held.push(route); });
+    await page.goto("/explorer/trade/partners", { waitUntil: "domcontentloaded" });
     expect(await width(sidebar(page))).toBe(72);
-    await page.unroute(script);
+    await page.unroute(APP_SCRIPT);
+    for (const route of held) await route.abort();
     await page.goto("/explorer/trade/partners");
     await ready(page);
     await expect(sidebar(page)).toHaveAttribute("data-collapsed", "true");
@@ -853,6 +856,42 @@ test.describe("the sidebar's current row and focus", () => {
     // Expanding afterwards is the reader's own choice, and nothing left over holds the rail.
     await page.getByTestId("sidebar-toggle").click();
     await expect.poll(() => width(sidebar(page))).toBe(272);
+  });
+
+  /** The server's expanded sidebar, every link it renders shown. */
+  async function expectServerSidebar(page: Page) {
+    expect(await width(sidebar(page))).toBe(272);
+    const links = await sidebar(page).getByRole("link").all();
+    expect(links.length).toBeGreaterThan(10);
+    for (const link of links) await expect(link).toBeVisible();
+  }
+
+  test("a stored collapse leaves the server's sidebar usable when the app's scripts fail or never run, or JavaScript is off", async ({ browser, baseURL, page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.addInitScript(() => window.localStorage.setItem("geodata:sidebar-collapsed", "1"));
+    // A chunk that fails to load: its error gives the sidebar back at once.
+    await page.route(APP_SCRIPT, (route) => route.abort());
+    await page.goto("/explorer/labour");
+    await expectServerSidebar(page);
+    await page.unroute(APP_SCRIPT);
+    // Scripts that load but never mount the sidebar: the rail is held until a while after the page's load.
+    await page.clock.install();
+    await page.route(APP_SCRIPT, (route) => route.fulfill({ contentType: "text/javascript", body: "" }));
+    await page.goto("/explorer/labour");
+    expect(await width(sidebar(page))).toBe(72);
+    await page.clock.runFor(3000);
+    await expectServerSidebar(page);
+    // No JavaScript at all: the pre-paint script does not run, and nothing is hidden.
+    const origin = new URL(baseURL!).origin;
+    const context = await browser.newContext({ javaScriptEnabled: false, baseURL, viewport: { width: 1440, height: 900 },
+      storageState: { cookies: [], origins: [{ origin, localStorage: [{ name: "geodata:sidebar-collapsed", value: "1" }] }] } });
+    try {
+      const noScript = await context.newPage();
+      await noScript.goto("/explorer/labour");
+      await expectServerSidebar(noScript);
+    } finally {
+      await context.close();
+    }
   });
 
   test("in the rail, a chart page's group says it holds the current page", async ({ page }) => {
