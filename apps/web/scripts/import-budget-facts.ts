@@ -1450,8 +1450,8 @@ async function main() {
       },
       // maxWait: opening the transaction needs a round-trip to the pooler,
       // which can take several seconds from far-away regions.
-      // The complete mirror and parity reads need a bounded five-minute window.
-      { maxWait: 30_000, timeout: 300_000 },
+      // The complete mirror and parity reads need a bounded ten-minute window.
+      { maxWait: 30_000, timeout: 600_000 },
     );
 
     await writeParityReport(importRunId, report, parity);
