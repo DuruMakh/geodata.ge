@@ -23,6 +23,32 @@ function contrastRatio(left: string, right: string): number {
   return (lighter + 0.05) / (darker + 0.05);
 }
 
+
+/**
+ * The selector of every rule (or "" for a top-level statement) whose declarations mention a gradient,
+ * unless each of its comma-separated selectors is a homepage `.home-` selector. Comments are ignored.
+ */
+function gradientRulesOutsideHomepage(css: string): string[] {
+  const text = css.replace(/\/\*[\s\S]*?\*\//g, "");
+  const selectors: string[] = [];
+  const found: string[] = [];
+  let start = 0;
+  const check = (end: number) => {
+    if (/gradient/i.test(text.slice(start, end))) found.push(selectors.at(-1) ?? "");
+  };
+  for (let i = 0; i < text.length; i += 1) {
+    if (text[i] === "{") {
+      selectors.push(text.slice(start, i).trim());
+      start = i + 1;
+    } else if (text[i] === ";" || text[i] === "}") {
+      check(i);
+      if (text[i] === "}") selectors.pop();
+      start = i + 1;
+    }
+  }
+  return found.filter((selector) => !selector.split(",").every((part) => part.trim().startsWith(".home-")));
+}
+
 describe("editorial design system tokens", () => {
   it("defines required CSS variables", () => {
     for (const token of [
@@ -145,7 +171,8 @@ describe("editorial design system tokens", () => {
   it("does not reintroduce superseded theme systems", () => {
     expect(globalsCss).not.toContain("#0071e3");
     expect(globalsCss).not.toContain('[data-theme="night"]');
-    expect(globalsCss).not.toContain("gradient");
+    // DESIGN.md §17: no gradients anywhere, except the homepage's own `.home-` rules (the dated homepage exception).
+    expect(gradientRulesOutsideHomepage(globalsCss)).toEqual([]);
   });
 });
 
