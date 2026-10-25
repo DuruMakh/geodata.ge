@@ -1,10 +1,25 @@
-import { describe, expect, it } from "vitest";
+import { beforeAll, describe, expect, it } from "vitest";
+import { loadServedDemographyData } from "../../../lib/data/demography/importDemography";
+import { loadServedHealthData } from "../../../lib/data/health/importHealth";
+import { loadServedTradeOverviewData } from "../../../lib/data/tradeOverview/importTradeOverview";
+import { loadServedTradePartnersData } from "../../../lib/data/tradePartners/importTradePartners";
+import { loadServedTradeProductsData } from "../../../lib/data/tradeProducts/importTradeProducts";
+import { loadServedUnemploymentData } from "../../../lib/data/unemployment/importUnemployment";
+import { loadServedWagesData } from "../../../lib/data/wages/importWages";
+import { getMessages } from "../../../lib/i18n/messages.server";
+import { getPresentation } from "../../../lib/i18n/presentation.server";
+import type { Presentation } from "../../../lib/i18n/types";
 import enLanding from "../../../lib/i18n/messages/en/landing.json";
 import kaLanding from "../../../lib/i18n/messages/ka/landing.json";
 import { TOOLS } from "../../../lib/mcp/tools";
-import { buildChapterSentences } from "../../../lib/landing/chapters";
+import { buildChapterSentences, buildSocietySentences, societyEnglishLabelIds } from "../../../lib/landing/chapters";
+import { buildAgeingChapter } from "../../../lib/landing/chapters/ageing";
+import { buildDeathsChapter } from "../../../lib/landing/chapters/deaths";
+import { buildTradeChapter } from "../../../lib/landing/chapters/trade";
+import { buildWageGapChapter } from "../../../lib/landing/chapters/wageGap";
+import { buildYouthJobsChapter } from "../../../lib/landing/chapters/youthJobs";
 import { buildSourceRows, toolNames } from "../../../lib/landing/chapters/sourcesAi";
-import type { DeficitChapter, MunicipalChapter, RevenueSeries, SpendingSeries } from "../../../lib/landing/chapters/types";
+import type { ComparisonId, DeficitChapter, MunicipalChapter, ReliefPlace, RevenueSeries, SpendingSeries } from "../../../lib/landing/chapters/types";
 import type { MethodologyHubEntry } from "../../../lib/methodology/types";
 
 const ka = { locale: "ka", englishLabels: {}, messages: kaLanding } as const;
@@ -244,4 +259,102 @@ describe("buildChapterSentences", () => {
     );
     expect(result.revenue).toContain("0.0% — ვალდებულებების ზრდიდან");
   });
+});
+
+const COMPARISONS: ComparisonId[] = ["notHigher", "littleHigher", "oneAndHalf", "almostTwice", "twice", "moreThanTwice"];
+const CAUSES = [
+  "infectious", "cancer", "blood", "endocrine", "mental", "nervous", "eye", "ear", "circulatory", "respiratory", "digestive", "skin", "musculoskeletal",
+  "urogenital", "pregnancy", "perinatal", "congenital", "ill_defined", "external", "covid19",
+];
+
+describe("society chapter sentences and headings", () => {
+  let society: Awaited<ReturnType<typeof buildSociety>>;
+
+  async function buildSociety(presentation: Presentation) {
+    const [demography, unemployment, wages, overview, partners, products, health] = await Promise.all([
+      loadServedDemographyData(), loadServedUnemploymentData(), loadServedWagesData(), loadServedTradeOverviewData(),
+      loadServedTradePartnersData(), loadServedTradeProductsData(), loadServedHealthData(),
+    ]);
+    return { demography, unemployment, wages, trade: { overview: overview.facts, partners, products }, health, presentation };
+  }
+
+  async function sentencesFor(locale: "ka" | "en") {
+    const data = society;
+    const ids = societyEnglishLabelIds(data.trade);
+    const presentation = await getPresentation(locale, ["landing", "health"], ids);
+    const places: ReliefPlace[] = [];
+    return buildSocietySentences({
+      ageing: buildAgeingChapter(data.demography.facts, places),
+      youthJobs: buildYouthJobsChapter(data.unemployment.facts, presentation),
+      wageGap: buildWageGapChapter(data.wages.facts, presentation),
+      trade: buildTradeChapter(data.trade, presentation),
+      deaths: buildDeathsChapter(data.health.facts, presentation.messages),
+    }, presentation);
+  }
+
+  beforeAll(async () => {
+    society = await buildSociety({ locale: "ka", englishLabels: {}, messages: {} });
+  }, 120_000);
+
+  it("writes the Georgian ledes of the board from the real data", async () => {
+    const result = await sentencesFor("ka");
+    expect(result.ageing).toBe("65 წლისა და უფროსი ასაკის მოსახლეობის წილი 18.1%-ია — 2004 წელს 14.1% იყო; 2025 წელს ყოველ 100 გარდაცვლილზე 85 ახალშობილი მოდიოდა.");
+    expect(result.youthJobs).toBe("2025 წელს უმუშევრობის დონე 13.9% იყო, 15–29 წლის ახალგაზრდებში — 25.4%.");
+    expect(result.wageGap).toBe("საშუალო თვიური ხელფასი 2025 წელს 2 165 ლარი იყო; ქალები კაცების საშუალო ხელფასის 67%-ს იღებენ.");
+    expect(result.trade).toBe("2025 წელს საგარეო სავაჭრო ბრუნვამ 25.9 მილიარდი დოლარი შეადგინა: ექსპორტი 7.3 მილიარდი იყო, იმპორტი — 18.6.");
+    expect(result.deaths).toBe("2025 წელს 44 319 ადამიანი გარდაიცვალა, 38% — სისხლის მიმოქცევის სისტემის დაავადებებით; ყოველი მეხუთე შემთხვევის მიზეზი დადგენილი არ არის.");
+  }, 120_000);
+
+  it("writes the headings the chapter claim switches on", async () => {
+    const { headings } = await sentencesFor("ka");
+    expect(headings).toEqual({ ageing: "საქართველო ბერდება", youthJobs: "ახალგაზრდებში უმუშევრობა თითქმის ორჯერ მაღალია" });
+  }, 120_000);
+
+  it("writes the English ledes with the same numbers", async () => {
+    const result = await sentencesFor("en");
+    expect(result.ageing).toContain("18.1%");
+    expect(result.ageing).toContain("14.1%");
+    expect(result.ageing).toContain("2004");
+    expect(result.ageing).toContain("85");
+    expect(result.youthJobs).toContain("13.9%");
+    expect(result.youthJobs).toContain("25.4%");
+    expect(result.wageGap).toContain("2,165");
+    expect(result.wageGap).toContain("67%");
+    expect(result.trade).toContain("25.9");
+    expect(result.trade).toContain("7.3");
+    expect(result.trade).toContain("18.6");
+    expect(result.deaths).toContain("44,319");
+    expect(result.deaths).toContain("38%");
+    expect(result.deaths).toContain("circulatory diseases");
+    expect(result.deaths).toContain("one in five");
+    expect(result.headings).toEqual({ ageing: "Georgia is getting older", youthJobs: "Youth unemployment is almost twice as high" });
+  }, 120_000);
+
+  it("has a heading for every comparison, the ageing fallback, and a cause form for every cause, in both languages", () => {
+    for (const messages of [kaLanding, enLanding] as Record<string, string>[]) {
+      for (const id of COMPARISONS) expect(messages[`landing.jobs.heading.${id}`], id).toBeTruthy();
+      expect(messages["landing.ageing.heading.ageing"]).toBeTruthy();
+      expect(messages["landing.ageing.heading.changing"]).toBeTruthy();
+      for (const id of CAUSES) expect(messages[`landing.deaths.cause.${id}`], id).toBeTruthy();
+      for (let n = 2; n <= 10; n += 1) expect(messages[`landing.deaths.oneIn.${n}`], String(n)).toBeTruthy();
+      expect(messages["landing.deaths.share"]).toContain("{pct}");
+    }
+  });
+
+  it("switches the headings and the unknown-cause phrase with the data", async () => {
+    const real = await sentencesFor("ka");
+    const base = real.headings;
+    expect(base.ageing).toBe("საქართველო ბერდება");
+
+    const models = {
+      ageing: { ...buildAgeingChapter(society.demography.facts, []), ageing: false },
+      youthJobs: { ...buildYouthJobsChapter(society.unemployment.facts, { locale: "ka", englishLabels: {}, messages: {} }), comparison: "moreThanTwice" as const },
+      wageGap: buildWageGapChapter(society.wages.facts, { locale: "ka", englishLabels: {}, messages: {} }),
+      trade: buildTradeChapter(society.trade, { locale: "ka", englishLabels: {}, messages: {} }),
+      deaths: { ...buildDeathsChapter(society.health.facts, await getMessages("ka", ["landing", "health"])), unknownShare: 0.03 },
+    };
+    const result = buildSocietySentences(models, { locale: "ka", englishLabels: {}, messages: await getMessages("ka", ["landing", "health"]) });
+    expect(result.headings).toEqual({ ageing: "როგორ იცვლება საქართველოს მოსახლეობა", youthJobs: "ახალგაზრდებში უმუშევრობა ორჯერზე მეტად მაღალია" });
+    expect(result.deaths).toContain("; 3% შემთხვევის მიზეზი დადგენილი არ არის.");
+  }, 120_000);
 });

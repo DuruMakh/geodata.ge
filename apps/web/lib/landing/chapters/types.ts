@@ -57,17 +57,6 @@ export type MunicipalChapter = {
 
 export type SourceRow = { name: string; firstYear: number; lastYear: number; files: number };
 
-export type HomeChapters = {
-  scale: ScaleChapter;
-  spending: SpendingSeries;
-  revenue: RevenueSeries;
-  municipal: MunicipalChapter;
-  deficit: DeficitChapter;
-  sources: { rows: SourceRow[]; totalFiles: number; reviewedAt: string };
-  tools: string[];
-  sentences: Record<"spending" | "revenue" | "municipal" | "deficit", string>;
-};
-
 export type AgeingChapter = {
   pyramid: { year: number; baseYear: number; ages: string[]; men: number[]; women: number[]; baseMen: number[]; baseWomen: number[] }; // ages youngest first: "0–4" … "85+"; persons
   oldShare: { year: number; share: number }; oldShareBase: { year: number; share: number }; // 65+ share, fraction
@@ -104,4 +93,25 @@ export type DeathsChapter = {
   groups: { id: string; label: string; count: number; kind: DeathGroupKind }[]; // five largest causes by count, then "other" (the remainder); ids without the health.deaths. prefix
   top: { id: string; label: string; share: number }; // largest established cause (anything but ill_defined), share of total
   unknownShare: number; // ill_defined / total, 0 if absent
+};
+
+export type BudgetSentenceKey = "spending" | "revenue" | "municipal" | "deficit";
+export type SocietySentenceKey = "ageing" | "youthJobs" | "wageGap" | "trade" | "deaths";
+// headings: the chapter titles whose wording follows the data (06: is the old-age share growing; 07: how much higher is youth unemployment)
+export type SocietySentences = Record<SocietySentenceKey, string> & { headings: { ageing: string; youthJobs: string } };
+
+export type HomeChapters = {
+  scale: ScaleChapter;
+  spending: SpendingSeries;
+  revenue: RevenueSeries;
+  municipal: MunicipalChapter;
+  deficit: DeficitChapter;
+  ageing: AgeingChapter;
+  youthJobs: YouthJobsChapter;
+  wageGap: WageGapChapter;
+  trade: TradeChapter;
+  deaths: DeathsChapter;
+  sources: { rows: SourceRow[]; totalFiles: number; reviewedAt: string };
+  tools: string[];
+  sentences: Record<BudgetSentenceKey, string> & SocietySentences;
 };

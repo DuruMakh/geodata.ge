@@ -2,10 +2,17 @@ import path from "node:path";
 import { LandingPage } from "../../components/landing/landing-page";
 import { loadServedGeneralGovernmentBalanceData, loadServedGovernmentDebtData, loadServedLandingData, loadServedMunicipalData } from "../data/servedData";
 import { MUNICIPAL_COUNTRY_ID } from "../data/municipal/types";
+import { loadServedDemographyData } from "../data/demography/importDemography";
+import { loadServedHealthData } from "../data/health/importHealth";
+import { loadServedTradeOverviewData } from "../data/tradeOverview/importTradeOverview";
+import { loadServedTradePartnersData } from "../data/tradePartners/importTradePartners";
+import { loadServedTradeProductsData } from "../data/tradeProducts/importTradeProducts";
+import { loadServedUnemploymentData } from "../data/unemployment/importUnemployment";
+import { loadServedWagesData } from "../data/wages/importWages";
 import { loadServedForeignInvestmentData } from "../data/externalFlows/importForeignInvestment";
 import { loadServedMoneyTransfersData } from "../data/externalFlows/importMoneyTransfers";
 import { buildMunicipalListRows, MUNICIPAL_PER_RESIDENT_YEAR } from "../explorer/municipalData";
-import { buildHomeChapters } from "../landing/chapters";
+import { buildHomeChapters, societyEnglishLabelIds } from "../landing/chapters";
 import { buildLandingContext, landingGdpFigure } from "../landing/landingData";
 import { loadServedGdpOverviewData } from "../data/gdpOverview/importGdpOverview";
 import { buildMethodologyHubEntries } from "../methodology/catalog";
@@ -27,11 +34,16 @@ export async function homePageMetadata(locale: Locale) {
 
 export async function renderHomePage(locale: Locale) {
   const repositoryRoot = path.resolve(/* turbopackIgnore: true */ process.cwd(), "../..");
-  const [landingData, municipalData, debtData, balanceData, gdpData, fdiData, transferData, archives] = await Promise.all([
+  const [landingData, municipalData, debtData, balanceData, gdpData, fdiData, transferData, archives, demographyData, unemploymentData, wagesData, tradeOverview, tradePartners, tradeProducts, healthData] = await Promise.all([
     loadServedLandingData(), loadServedMunicipalData(), loadServedGovernmentDebtData(), loadServedGeneralGovernmentBalanceData(),
     loadServedGdpOverviewData(), loadServedForeignInvestmentData(), loadServedMoneyTransfersData(), loadGeneratedArchiveSummaries(repositoryRoot),
+    loadServedDemographyData(), loadServedUnemploymentData(), loadServedWagesData(),
+    loadServedTradeOverviewData(), loadServedTradePartnersData(), loadServedTradeProductsData(), loadServedHealthData(),
   ]);
-  const presentation = await getPresentation(locale, ["landing"], [...landingData.glossary.keys(), ...municipalData.municipalities.map(entity => entity.code)]);
+  const trade = { overview: tradeOverview.facts, partners: tradePartners, products: tradeProducts };
+  const presentation = await getPresentation(locale, ["landing", "health"], [
+    ...landingData.glossary.keys(), ...municipalData.municipalities.map(entity => entity.code), ...societyEnglishLabelIds(trade),
+  ]);
   const { updatedAt } = buildLandingContext(landingData);
   const municipalList = buildMunicipalListRows({
     municipalities: municipalData.municipalities,
@@ -52,6 +64,11 @@ export async function renderHomePage(locale: Locale) {
     glossary: landingData.glossary,
     municipalRows: municipalList.municipalities,
     municipalYear: MUNICIPAL_PER_RESIDENT_YEAR,
+    demographyFacts: demographyData.facts,
+    unemploymentFacts: unemploymentData.facts,
+    wagesFacts: wagesData.facts,
+    trade,
+    healthFacts: healthData.facts,
     methodologyEntries: buildMethodologyHubEntries({ budgetFacts: landingData.facts, municipalFacts: municipalData.totalFacts, debtFacts: debtData.facts, archives }, locale),
     updatedAt,
   }, presentation);
