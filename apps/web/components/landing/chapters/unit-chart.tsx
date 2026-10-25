@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 import type { DeathsChapter } from "../../../lib/landing/chapters/types";
 import { decimals } from "./chart-format";
-import { unitLayout } from "./chart-layout";
+import { estimatedNameWidth, unitLayout } from "./chart-layout";
 import { ChartTip, hideTip, showTip } from "./chart-tip";
 import { deathGroupTip } from "./chart-tips";
 import { ChartUnavailable, Reveal, useEngine } from "./reveal";
@@ -25,10 +25,9 @@ export type UnitLabels = {
 
 const loadEngine = () => import("./unit-engine");
 
-// The chapter body is at most 1240px wide less its gutters; the server measures names at 7 px per character
-// (the engine measures the real font and sets the height once it runs).
+// The chapter body is at most 1240px wide; the server cannot measure the font, so it lays the names out with an
+// estimate (estimatedNameWidth) and the engine sets the real height once it runs.
 const DESKTOP_WIDTH = 1180;
-const ESTIMATED_CHARACTER_WIDTH = 7;
 
 export function UnitChart({ data, labels }: { data: DeathsChapter; labels: UnitLabels }) {
   const wrapRef = useRef<HTMLDivElement>(null);
@@ -66,7 +65,7 @@ export function UnitChart({ data, labels }: { data: DeathsChapter; labels: UnitL
   const initialHeight = unitLayout(
     DESKTOP_WIDTH,
     data.groups.map((group) => group.count),
-    (text) => text.length * ESTIMATED_CHARACTER_WIDTH,
+    estimatedNameWidth,
     data.groups.map((group) => group.label),
   ).height;
 
@@ -86,7 +85,7 @@ export function UnitChart({ data, labels }: { data: DeathsChapter; labels: UnitL
             </li>
           </ul>
         </figcaption>
-        {/* The engine sets the height from the rows (narrow screens stack the names above the squares); this is the wide-screen one. */}
+        {/* The engine sets the height from the rows (narrow screens stack the names above the squares); this is the wide-screen one (it matches the measured height at 1440; a phone grows it by about 60px). */}
         <div ref={wrapRef} className="relative w-full" style={{ height: initialHeight }}>
           {failed ? <ChartUnavailable text={labels.unavailable} summary={ariaLabel} /> : <canvas ref={canvasRef} role="img" aria-label={ariaLabel} className="absolute left-0 top-0" />}
           <ChartTip tipRef={tipRef} rows={2} />

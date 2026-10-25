@@ -1,7 +1,7 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { DeathsChapter } from "../../../components/landing/chapters/deaths-chapter";
-import { deathSquares, UNIT_NARROW_WIDTH, unitLayout } from "../../../components/landing/chapters/chart-layout";
+import { deathSquares, estimatedNameWidth, UNIT_NARROW_WIDTH, unitLayout } from "../../../components/landing/chapters/chart-layout";
 import { deathGroupTip } from "../../../components/landing/chapters/chart-tips";
 import type { UnitLabels } from "../../../components/landing/chapters/unit-chart";
 import { message } from "../../../lib/i18n/messages";
@@ -71,8 +71,17 @@ describe("DeathsChapter (server render)", () => {
   });
 
   it("starts the chart at its desktop height so the page does not jump when the engine sizes it", () => {
-    const height = unitLayout(1180, counts, measure, names).height;
+    const height = unitLayout(1180, counts, estimatedNameWidth, names).height;
     expect(html).toContain(`height:${height}px`);
+  });
+
+  // In the browser at 1440 (Noto Sans Georgian 600, 12.5px; names 322, 245, 83, 243, 306 and 93 px wide in the 238px
+  // column) the engine breaks these names into [2, 2, 1, 2, 2, 1] lines and sizes the chart to 370px.
+  it("breaks the real names on the server into the line counts the browser measured, so the chart starts at its final 370px", () => {
+    const server = unitLayout(1180, counts, estimatedNameWidth, names);
+    expect(server.rows.map((row) => row.lines.length)).toEqual([2, 2, 1, 2, 2, 1]);
+    expect(server.height).toBe(370);
+    expect(html).toContain("height:370px");
   });
 
   it("fails the render without groups", () => {

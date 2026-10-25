@@ -186,6 +186,13 @@ export function unitMetrics(narrow: boolean): { labelWidth: number; step: number
 }
 
 /**
+ * Width of a group name on the server, where the font cannot be measured: 8 px per character. The Georgian cause names
+ * measure 7.5-7.9 px per character in the 600 weight at 12.5px; 8 breaks them at the same places the browser does
+ * for the 2025 names, so the chart starts at the height it ends at on a wide screen.
+ */
+export const estimatedNameWidth = (text: string) => text.length * 8;
+
+/**
  * Layout of the causes-of-death chart for a chart `width` px wide: `counts` deaths per group, drawn as squares in rows
  * of `perRow` (whole blocks of ten columns). Each group's name (`names`, measured with `measure` in the name font)
  * breaks onto at most two lines, in a 238 px column beside the squares, or above them when narrow. `top` is where a

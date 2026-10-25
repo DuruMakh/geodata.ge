@@ -15,7 +15,9 @@ const groups: DeathsChapter["groups"] = [
 const total = 38813;
 const ruler = (s: string) => s.length * 6.5;
 
-function draw(width: number, height: number) {
+function draw(width: number, height: number, hoverY?: number, grouped = groups) {
+  const hovers: { index: number; x: number; y: number }[] = [];
+  const handlers: Record<string, (event: unknown) => void> = {};
   const calls: { op: string; args: unknown[]; fill: unknown; stroke: unknown; font: string }[] = [];
   const noop = () => {};
   const record = (op: string) =>
@@ -32,7 +34,7 @@ function draw(width: number, height: number) {
     } as Record<string, unknown>,
     { get: (target, key: string) => (key in target ? target[key] : noop), set: (target, key: string, value) => ((target[key] = value), true) },
   );
-  const canvas = { width: 0, height: 0, style: {}, getContext: () => ctx, addEventListener: noop, removeEventListener: noop, getBoundingClientRect: () => ({ left: 0, top: 0 }) } as unknown as HTMLCanvasElement;
+  const canvas = { width: 0, height: 0, style: {}, getContext: () => ctx, addEventListener: (type: string, fn: (event: unknown) => void) => void (handlers[type] = fn), removeEventListener: noop, getBoundingClientRect: () => ({ left: 0, top: 0 }) } as unknown as HTMLCanvasElement;
   const wrap = { clientWidth: width, clientHeight: height, style: {} as Record<string, string> } as unknown as HTMLElement;
   vi.stubGlobal("window", globalThis);
   vi.stubGlobal("addEventListener", noop);
@@ -42,9 +44,10 @@ function draw(width: number, height: number) {
   vi.stubGlobal("matchMedia", () => ({ matches: true }));
   vi.stubGlobal("getComputedStyle", () => ({ getPropertyValue: () => "" }));
   vi.stubGlobal("document", { addEventListener: noop, removeEventListener: noop });
-  const engine = createUnits({ wrap, canvas, groups, total, onHover: noop, onLeave: noop });
+  const engine = createUnits({ wrap, canvas, groups: grouped, total, onHover: (index, x, y) => hovers.push({ index, x, y }), onLeave: noop });
+  if (hoverY !== undefined) handlers.pointermove({ clientX: 300, clientY: hoverY, pointerType: "mouse" });
   engine.destroy();
-  return { calls, wrap };
+  return { calls, wrap, hovers };
 }
 
 const needed = (width: number) =>
@@ -86,5 +89,12 @@ describe("createUnits", () => {
     const counts = calls.filter((call) => call.op === "fillText" && String(call.args[0]).includes("·"));
     expect(counts).toHaveLength(4);
     expect(counts.every((call) => call.args[1] === 375)).toBe(true);
+  });
+
+  it("points the tooltip at the first square of a group too small to draw one, never left of the squares", () => {
+    const small = [...groups, { id: "tiny", label: "ფსიქიკური აშლილობები", count: 40, kind: "established" as const }];
+    const layout = unitLayout(1000, small.map((group) => group.count), ruler, small.map((group) => group.label));
+    const { hovers } = draw(1000, layout.height, layout.rows[4].top + 1, small);
+    expect(hovers).toEqual([{ index: 4, x: 256 + 8, y: layout.rows[4].top }]);
   });
 });

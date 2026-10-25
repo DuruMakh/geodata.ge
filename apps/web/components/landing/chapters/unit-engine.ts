@@ -54,7 +54,7 @@ export function createUnits({ wrap, canvas, groups, total, onHover, onLeave }: E
       starts: layout.rows.map((row) => unitRowStart(row, layout.narrow)),
       // Where the tooltip points: the right end of the group's first row of squares, halfway down its block.
       end: (i) => {
-        const first = cell(Math.min(squares[i], layout.perRow) - 1, layout.rows[i].top);
+        const first = cell(Math.max(Math.min(squares[i], layout.perRow) - 1, 0), layout.rows[i].top);
         return { x: first.x + side, y: layout.rows[i].top + (Math.ceil(squares[i] / layout.perRow) * step) / 2 };
       },
     };
