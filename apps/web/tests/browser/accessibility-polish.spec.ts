@@ -323,6 +323,9 @@ const DECORATIVE = ['[data-testid="mission-cover"] [aria-hidden="true"] strong']
 test("All data, every group page, each topic's first page and the site pages pass axe's WCAG 2.1 A and AA rules on a phone", async ({ page }) => {
   test.setTimeout(300_000);
   await page.setViewportSize({ width: 375, height: 812 });
+  // The homepage's scroll reveal fades blocks in over 0.9s; axe measured contrast mid-fade. With reduced motion
+  // every block shows at once, at the colours it settles on.
+  await page.emulateMedia({ reducedMotion: "reduce" });
   const paths = [ALL_DATA_PATH, ...NAV_GROUPS.map(group => group.href), ...NAV_TREE.flatMap(hub => (hub.sections[0] ? [hub.sections[0].href] : [])), "/", "/methodology", "/connect", "/about"];
   const failures: string[] = [];
   for (const href of paths) {
