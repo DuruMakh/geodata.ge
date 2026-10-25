@@ -46,3 +46,31 @@ describe("ExplorerTable year-columns layout", () => {
     }
   });
 });
+
+describe("ExplorerTable planned values", () => {
+  it("marks a planned year on the total row and on the other rows, and no other year", () => {
+    const planned = renderGeorgianMarkup(
+      <ExplorerTable
+        caption="ხარჯები"
+        rows={[{ ...adjara, basisByYear: { 2024: "actual", 2025: "planned" } }]}
+        totalRow={{ ...georgia, basisByYear: { 2024: "actual", 2025: "planned" } }}
+        showTotal
+        years={[2024, 2025]}
+        firstColumnLabel="ტერიტორია"
+        unit={UNIT_PERSONS}
+        share={false}
+        rowLabelsLocalized
+        shareValueForYear={() => 0.1}
+      />,
+      { "controls.planned": "გეგმა" },
+    );
+    const body = /<tbody>([\s\S]*?)<\/tbody>/.exec(planned)![1]!;
+    const [seriesRow, totalRow] = [...body.matchAll(/<tr\b[^>]*>([\s\S]*?)<\/tr>/g)].map((match) => [...match[1]!.matchAll(/<td\b[^>]*>([\s\S]*?)<\/td>/g)].map((cell) => cell[1]!));
+    for (const cells of [seriesRow!, totalRow!]) {
+      expect(cells[0]).not.toContain("გეგმა");
+      expect(cells[1]).toContain("<sup");
+      expect(cells[1]).toContain("გეგმა");
+    }
+  });
+});
+

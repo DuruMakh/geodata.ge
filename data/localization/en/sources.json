@@ -716,6 +716,13 @@
     },
     "derivation": null
   },
+  "source.mof_2026_budget_law_planned": {
+    "name": {
+      "text": "Law of Georgia on the 2026 State Budget, Tavi III and Tavi VI (planned expenditure, Ministry of Finance)",
+      "reviewedAt": "2026-10-24"
+    },
+    "derivation": null
+  },
   "source.mof_central_government_liabilities_control": {
     "name": {
       "text": "Central Government Debt Liabilities by Maturity; Residency; and Instrument with reference to GFSM 2001",

@@ -126,22 +126,23 @@ export function queryMinistries(
   const facts = snapshot.ministries.facts;
   // No chooseActivePublicFacts here, unlike queryNational: ServedAdminFact
   // (lib/servedRows.ts) has no `side` field, which that helper's generic
-  // constraint requires, and its `basis` is the literal type "actual", so
-  // no planned row can exist for actual-over-planned precedence to resolve.
+  // constraint requires. Actual-over-planned is already resolved upstream, per
+  // year, by loadReviewedAdminSpendingFacts, so a year is either all actual or
+  // all planned and each cell reports its row's own basis.
   // lib/explorer/explorerData.ts's own ministries branch (buildExplorerModel,
   // isMinistryGrouping) skips it for exactly the same reason.
   //
   // isDerivedTotalItemId then strips any row that is itself the derived
   // admin total (none exist in the reviewed CSV today - verified: no
   // "admin_spending.total" item_id row in
-  // data/imports/admin-spending-facts-2004-2025.csv - but the total below
+  // data/imports/admin-spending-facts-2004-2025.csv or the 2026 planned file - but the total below
   // must never double-count one if a future row ever adds it).
   const categoryFacts = facts.filter((f) => f.level === "admin_category" && !isDerivedTotalItemId(f.itemId));
   const programFacts = facts.filter((f) => f.level === "major_program");
   const levelFacts = input.level === "admin_category" ? categoryFacts : programFacts;
 
   // The dataset's overall coverage, not the requested level's: a program
-  // year inside 2004-2025 but outside that program's own coverage is a
+  // year inside the dataset's years but outside that program's own coverage is a
   // missing cell, never an out-of-range error (brief, "Coverage is ragged").
   const datasetYears = Array.from(new Set(facts.map((f) => f.year))).sort((a, b) => a - b);
   const minYear = datasetYears[0];
@@ -213,12 +214,13 @@ export function queryMinistries(
   // reason. Plain floating-point summation, matching that file's totalByYear
   // accumulation exactly rather than a second arithmetic, so this figure is
   // provably the one the website's own ministries chart displays.
-  const totalsByYear = new Map<number, { value: number; sourceIds: string[] }>();
+  const totalsByYear = new Map<number, { value: number; basis: "actual" | "planned"; sourceIds: string[] }>();
   for (const year of input.years) {
     const yearFacts = categoryFacts.filter((f) => f.year === year);
     if (yearFacts.length === 0) continue;
     totalsByYear.set(year, {
       value: yearFacts.reduce((sum, f) => sum + f.amountGel, 0),
+      basis: yearFacts.every((f) => f.basis === "actual") ? "actual" : "planned",
       sourceIds: uniqueSorted(yearFacts.flatMap((f) => splitSourceIds(f.sourceId))),
     });
   }
@@ -242,6 +244,7 @@ export function queryMinistries(
     for (const year of input.years) {
       let numeratorAmount: number | null;
       let numeratorSourceIds: string[];
+      let numeratorBasis: "actual" | "planned" = "actual";
       let missingReasonKey: ServiceMessageKey | null;
       let originalLabelKa: string | null = null;
       // The series' latest parent is only the starting point: a year with a
@@ -253,6 +256,7 @@ export function queryMinistries(
         if (total) {
           numeratorAmount = total.value;
           numeratorSourceIds = total.sourceIds;
+          numeratorBasis = total.basis;
           missingReasonKey = null;
         } else {
           numeratorAmount = null;
@@ -264,6 +268,7 @@ export function queryMinistries(
         if (fact) {
           numeratorAmount = fact.amountGel;
           numeratorSourceIds = splitSourceIds(fact.sourceId);
+          numeratorBasis = fact.basis;
           missingReasonKey = null;
           originalLabelKa = fact.officialLabelKa !== null && fact.officialLabelKa !== seriesLabelKa ? fact.officialLabelKa : null;
           if (kind === "major_program") parentSeriesId = fact.parentItemId;
@@ -336,10 +341,9 @@ export function queryMinistries(
         availability,
         missingReason: availability === "missing" && missingReasonKey !== null ? serviceMessage(snapshot, "ka", missingReasonKey, { year: year }) : null,
         missingReasonEn: availability === "missing" && missingReasonKey !== null ? serviceMessage(snapshot, "en", missingReasonKey, { year: year }) : null,
-        // ServedAdminFact.basis is the literal "actual": the administrative
-        // dataset carries no planned rows, so an available cell is always
-        // actual and a missing one has no basis at all.
-        basis: availability === "missing" ? null : "actual",
+        // The basis of the row behind the cell (a year is all actual or all
+        // planned, see above); a missing cell has no basis at all.
+        basis: availability === "missing" ? null : numeratorBasis,
         valueDefinition: valueDefinitionFor(snapshot, "ka", kind, input.measure, originalLabelKa),
         valueDefinitionEn: valueDefinitionFor(snapshot, "en", kind, input.measure, originalLabelKa === null ? null : historicalProgrammeLabelEn(snapshot, seriesId, year)),
         // originalLabelKa is deliberately NOT in the identity. It is presentation:

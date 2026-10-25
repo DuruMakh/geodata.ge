@@ -274,6 +274,7 @@ export function ExplorerTable<Row extends ExplorerTableRowLike>({
         <td key={year} className={`${numericCellClass} font-semibold text-[var(--ink)]`} style={{ ...cellPad, ...breakStyle(year) }}>
           {cellValue(totalRow, year)}
           {totalRow.preliminaryByYear?.[year] ? <sup className={STATUS_MARK_CLASS}>{preliminaryLabel}</sup> : null}
+          {totalRow.basisByYear?.[year] === "planned" ? <sup className={STATUS_MARK_CLASS}>{message(messages, "controls.planned")}</sup> : null}
           {forecastLabel && forecastYears?.includes(year) ? (
             <sup className={STATUS_MARK_CLASS}>{forecastLabel}</sup>
           ) : null}

@@ -16,6 +16,7 @@
   "methodology.openDocument": "An open document showing the path from original sources to checked data",
   "methodology.articleOverline": "A field guide to the data",
   "methodology.methodologyReviewed": "Last methodology review · {date}",
+  "methodology.basisWithPlannedYear": "{basis}, {firstYear}–{lastActualYear}; {year}: approved plan",
   "methodology.translationReviewed": "English translation reviewed · {date}",
   "methodology.processedDownload": "Complete processed data — CSV",
   "methodology.processedNote": "UTF-8 / Excel compatible · CC BY 4.0 · Includes source and status metadata",

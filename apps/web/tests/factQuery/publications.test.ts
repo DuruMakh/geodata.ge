@@ -295,7 +295,9 @@ describe("the published bytes carry the same figures the query core returns", ()
   it("matches queryNational for every published revenue observation", async () => {
     const published = parse(datasetFiles[0]!.bytes) as unknown as PublishedFile;
 
-    const years = [...new Set(snapshot.national.facts.map((fact) => fact.year))].sort((left, right) => left - right);
+    // Revenue's own years: the planned 2026 rows are expenditure only.
+    const revenueFacts = snapshot.national.facts.filter((fact) => fact.side === "revenue");
+    const years = [...new Set(revenueFacts.map((fact) => fact.year))].sort((left, right) => left - right);
     // Includes the calculated total, which the published file carries and
     // which has no fact row to derive it from.
     const seriesIds = [

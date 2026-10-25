@@ -108,7 +108,11 @@ export async function preparePublicDatasets(options: {
   mode: "write" | "check" | "check-output";
 }): Promise<readonly PublicDatasetValidation[]> {
   const imports = path.join(options.repositoryRoot, "data", "imports");
-  const budgetRows = await readCsv(path.join(imports, "budget-facts-2004-2025.csv"));
+  // The planned-year expenditure rows live in their own file beside the 2004-2025 facts.
+  const budgetRows = [
+    ...(await readCsv(path.join(imports, "budget-facts-2004-2025.csv"))),
+    ...(await readCsv(path.join(imports, "expenditure-facts-2026-planned.csv"))),
+  ];
   const debtRows = await readCsv(path.join(imports, "government-debt-facts-2013-2030.csv"));
   const balanceRows = await readCsv(
     path.join(imports, "general-government-balance-annual-1995-2031.csv"),

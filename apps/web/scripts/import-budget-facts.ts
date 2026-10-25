@@ -159,10 +159,8 @@ import Decimal from "decimal.js";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { Prisma, PrismaClient } from "../lib/generated/prisma/client";
 import { loadAdminSpendingCategoriesFile } from "../lib/data/adminSpending/categoriesFile";
-import { loadAdminSpendingFacts } from "../lib/data/adminSpending/importAdminSpendingFacts";
 import { validateFoundationReferences } from "../lib/data/foundationValidation";
 import { loadGlossary } from "../lib/data/glossary";
-import { loadBudgetFactRows } from "../lib/data/importBudgetFacts";
 import { loadGovernmentDebtFacts } from "../lib/data/governmentDebt/importGovernmentDebtFacts";
 import {
   loadGeneralGovernmentBalanceFacts,
@@ -191,7 +189,11 @@ import {
   formatParityReport,
   type ParityReport,
 } from "../lib/data/parityReport";
-import { SERVED_DATA_FILES } from "../lib/data/servedData";
+import {
+  loadReviewedAdminSpendingFacts,
+  loadReviewedBudgetFactRows,
+  SERVED_DATA_FILES,
+} from "../lib/data/servedData";
 import {
   adjaraBudgetAdjustmentParityKey,
   adminFactParityKey,
@@ -347,8 +349,8 @@ async function main() {
     loadGlossary(SERVED_DATA_FILES.glossary),
     loadAdminSpendingCategoriesFile(SERVED_DATA_FILES.adminSpendingCategories),
     loadSourceDocuments(SERVED_DATA_FILES.sourceDocuments),
-    loadBudgetFactRows(SERVED_DATA_FILES.budgetFacts),
-    loadAdminSpendingFacts(SERVED_DATA_FILES.adminSpendingFacts),
+    loadReviewedBudgetFactRows(),
+    loadReviewedAdminSpendingFacts(),
     loadMunicipalFunctionsFile(SERVED_DATA_FILES.municipalFunctions),
     loadMunicipalRegionsFile(SERVED_DATA_FILES.municipalRegions),
     loadMunicipalitiesFile(SERVED_DATA_FILES.municipalities),
@@ -1448,8 +1450,8 @@ async function main() {
       },
       // maxWait: opening the transaction needs a round-trip to the pooler,
       // which can take several seconds from far-away regions.
-      // The complete mirror and parity reads need a bounded five-minute window.
-      { maxWait: 30_000, timeout: 300_000 },
+      // The complete mirror and parity reads need a bounded ten-minute window.
+      { maxWait: 30_000, timeout: 600_000 },
     );
 
     await writeParityReport(importRunId, report, parity);

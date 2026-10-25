@@ -132,7 +132,10 @@ export function composeFinalExpenditureFacts(input: {
   supplements: FinalExpenditureSupplementRow[];
   spendingFieldIds: string[];
   workbookTotalGel: number;
+  /** Planned years come from the budget law: Article 9 in place of PDF E11, Tavi VI in place of the workbook. */
+  basis?: "actual" | "planned";
 }): FinalExpenditureCompositionResult {
+  const basis = input.basis ?? "actual";
   const aggregated = new Map<
     string,
     {
@@ -178,14 +181,17 @@ export function composeFinalExpenditureFacts(input: {
       side: "expenditure",
       item_id: fieldId,
       amount_gel: String(Math.round(row?.amountGel ?? 0)),
-      basis: "actual",
+      basis,
       source_id: input.finalSourceId,
       official_institution: "Multiple official rows",
       official_program: "",
       official_subprogram: "",
       public_spending_field_id: fieldId,
       mapping_confidence: row?.mappingConfidence ?? "high",
-      mapping_notes: `PDF mapped rows: ${pdfRows}; workbook financial-asset/liability supplement rows: ${supplementRows}`,
+      mapping_notes:
+        basis === "planned"
+          ? `Budget law Article 9 mapped rows: ${pdfRows}; Tavi VI financial-asset/liability supplement rows: ${supplementRows}`
+          : `PDF mapped rows: ${pdfRows}; workbook financial-asset/liability supplement rows: ${supplementRows}`,
     } satisfies BudgetFactCsvRow;
   });
 
@@ -211,11 +217,18 @@ export function composeFinalExpenditureFacts(input: {
       differenceGel: Math.abs(input.workbookTotalGel - finalTotalGel),
       categoryCount: input.spendingFieldIds.length,
       sources: input.sourceFiles,
-      notes: [
-        "The PDF E11 functional source covers expenses plus non-financial assets growth.",
-        `The final ${input.year} data supplements PDF E11 with financial assets growth and liabilities decrease from the workbook/program source.`,
-        "Financial assets decrease is revenue-side and is not added to expenditure facts.",
-      ],
+      notes:
+        basis === "planned"
+          ? [
+              "The budget law Article 9 functional table covers expenses plus non-financial assets growth.",
+              `The planned ${input.year} data supplements law Article 9 with financial assets growth and liabilities decrease from the law's Tavi VI programme rows.`,
+              "Financial assets decrease is revenue-side and is not added to expenditure facts.",
+            ]
+          : [
+              "The PDF E11 functional source covers expenses plus non-financial assets growth.",
+              `The final ${input.year} data supplements PDF E11 with financial assets growth and liabilities decrease from the workbook/program source.`,
+              "Financial assets decrease is revenue-side and is not added to expenditure facts.",
+            ],
     },
   };
 }

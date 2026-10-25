@@ -182,6 +182,20 @@ export function isDerivedTotalItemId(itemId: string): boolean {
   return itemId === "expenditure.total" || itemId === "revenue.total" || itemId === ADMIN_SPENDING_TOTAL_ID;
 }
 
+/**
+ * A side's year is marked as a plan when any of its active category rows is planned: actual wins where both
+ * exist for an item, and a planned value that stays active is never shown as actual.
+ */
+export function isPlannedYear<T extends { year: number; side: ExplorerSide; itemId: string; basis: "actual" | "planned" }>(
+  facts: readonly T[],
+  side: ExplorerSide,
+  year: number | null | undefined,
+): boolean {
+  if (year === null || year === undefined) return false;
+  return chooseActivePublicFacts(facts.filter((fact) => fact.side === side && fact.year === year))
+    .some((fact) => fact.basis === "planned" && !isDerivedTotalItemId(fact.itemId));
+}
+
 function compareBaselineAmountDesc(leftId: string, rightId: string, baselineAmounts: Map<string, number>): number {
   const leftAmount = baselineAmounts.get(leftId);
   const rightAmount = baselineAmounts.get(rightId);

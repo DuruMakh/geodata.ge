@@ -41,6 +41,8 @@ type ExplorerViewProps = {
   selectedIds: string[];
   expandedMinistries: string[];
   lastUpdatedAt: string;
+  /** The scope's latest year when it is (partly) a plan, so the source note names it apart from the actual execution. */
+  plannedYear?: number;
   onGroupingChange: (grouping: ExpenditureGrouping) => void;
   onChartModeChange: (mode: ChartMode) => void;
   onShareChange: (share: boolean) => void;
@@ -79,6 +81,7 @@ export function ExplorerView({
   selectedIds,
   expandedMinistries,
   lastUpdatedAt,
+  plannedYear,
   onGroupingChange,
   onChartModeChange,
   onShareChange,
@@ -179,7 +182,7 @@ export function ExplorerView({
           <div className="mt-[18px]">
             <SourceNote testId="source-label" action={shareAction}>
               {message(messages, "main.sourceData")}{" "}
-              <span className="font-[family-name:var(--font-numeric)]">{coverage}</span>{" "}{message(messages, "main.annualExecution")}
+              <span className="font-[family-name:var(--font-numeric)]">{coverage}</span>{" "}{plannedYear === undefined ? message(messages, "main.annualExecution") : message(messages, "main.annualExecutionPlanned", { year: plannedYear })}
               {CLASSIFICATION_NOTE[scope] ? " " + message(messages, CLASSIFICATION_NOTE[scope]) : null}
               {scope === "revenue" ? " " + message(messages, "main.missing2004Liabilities") : null}
               {Object.keys(model.gdpByYear).length > 0 ? " " + message(messages, "main.gdpSource") : null}

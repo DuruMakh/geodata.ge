@@ -136,6 +136,11 @@
       "text": "Development and support of the common courts system",
       "reviewedAt": "2026-09-05",
       "originalKa": "საერთო სასამართლოების სისტემის განვითარება და ხელშეწყობა"
+    },
+    "2026": {
+      "text": "Development and support of the common courts system",
+      "reviewedAt": "2026-10-24",
+      "originalKa": "საერთო სასამართლოების სისტემის განვითარება და ხელშეწყობა"
     }
   },
   "admin_program.20_01.64d3902d": {
@@ -177,6 +182,11 @@
     "2025": {
       "text": "Ensuring state security",
       "reviewedAt": "2026-09-05",
+      "originalKa": "სახელმწიფო უსაფრთხოების უზრუნველყოფა"
+    },
+    "2026": {
+      "text": "Ensuring state security",
+      "reviewedAt": "2026-10-24",
       "originalKa": "სახელმწიფო უსაფრთხოების უზრუნველყოფა"
     }
   },
@@ -250,6 +260,11 @@
       "text": "Economic policy development and implementation",
       "reviewedAt": "2026-09-05",
       "originalKa": "ეკონომიკური პოლიტიკის შემუშავება და განხორციელება"
+    },
+    "2026": {
+      "text": "Economic policy development and implementation",
+      "reviewedAt": "2026-10-24",
+      "originalKa": "ეკონომიკური პოლიტიკის შემუშავება და განხორციელება"
     }
   },
   "admin_program.24_06.5a885022": {
@@ -296,6 +311,11 @@
     "2025": {
       "text": "State property management",
       "reviewedAt": "2026-09-05",
+      "originalKa": "სახელმწიფო ქონების მართვა"
+    },
+    "2026": {
+      "text": "State property management",
+      "reviewedAt": "2026-10-24",
       "originalKa": "სახელმწიფო ქონების მართვა"
     }
   },
@@ -344,6 +364,18 @@
       "text": "Entrepreneurship development",
       "reviewedAt": "2026-09-05",
       "originalKa": "მეწარმეობის განვითარება"
+    },
+    "2026": {
+      "text": "Entrepreneurship development",
+      "reviewedAt": "2026-10-24",
+      "originalKa": "მეწარმეობის განვითარება"
+    }
+  },
+  "admin_program.24_08.4514cb34": {
+    "2026": {
+      "text": "Development of innovation and technology in Georgia",
+      "reviewedAt": "2026-10-24",
+      "originalKa": "საქართველოში ინოვაციებისა და ტექნოლოგიების განვითარება"
     }
   },
   "admin_program.24_14.6c3a02c8": {
@@ -405,6 +437,11 @@
     "2025": {
       "text": "Development of the systemically important electricity transmission network",
       "reviewedAt": "2026-09-05",
+      "originalKa": "სასისტემო მნიშვნელობის ელექტროგადამცემი ქსელის განვითარება"
+    },
+    "2026": {
+      "text": "Development of the systemically important electricity transmission network",
+      "reviewedAt": "2026-10-24",
       "originalKa": "სასისტემო მნიშვნელობის ელექტროგადამცემი ქსელის განვითარება"
     }
   },
@@ -474,6 +511,11 @@
     "2025": {
       "text": "Development of the Anaklia deep-sea port",
       "reviewedAt": "2026-09-05",
+      "originalKa": "ანაკლიის ღრმაწყლოვანი პორტის განვითარება"
+    },
+    "2026": {
+      "text": "Development of the Anaklia deep-sea port",
+      "reviewedAt": "2026-10-24",
       "originalKa": "ანაკლიის ღრმაწყლოვანი პორტის განვითარება"
     }
   },
@@ -577,6 +619,11 @@
       "text": "Road infrastructure improvement activities",
       "reviewedAt": "2026-09-05",
       "originalKa": "საგზაო ინფრასტრუქტურის გაუმჯობესების ღონისძიებები"
+    },
+    "2026": {
+      "text": "Road infrastructure improvement activities",
+      "reviewedAt": "2026-10-24",
+      "originalKa": "საგზაო ინფრასტრუქტურის გაუმჯობესების ღონისძიებები"
     }
   },
   "admin_program.25_03.beff3036": {
@@ -649,6 +696,11 @@
       "text": "Rehabilitation of regional and municipal infrastructure",
       "reviewedAt": "2026-09-05",
       "originalKa": "რეგიონული და მუნიციპალური ინფრასტრუქტურის რეაბილიტაცია"
+    },
+    "2026": {
+      "text": "Rehabilitation of regional and municipal infrastructure",
+      "reviewedAt": "2026-10-24",
+      "originalKa": "რეგიონული და მუნიციპალური ინფრასტრუქტურის რეაბილიტაცია"
     }
   },
   "admin_program.25_04.eee6b72f": {
@@ -720,6 +772,11 @@
     "2025": {
       "text": "Restoration and rehabilitation of water supply infrastructure",
       "reviewedAt": "2026-09-05",
+      "originalKa": "წყალმომარაგების ინფრასტრუქტურის აღდგენა-რეაბილიტაცია"
+    },
+    "2026": {
+      "text": "Restoration and rehabilitation of water supply infrastructure",
+      "reviewedAt": "2026-10-24",
       "originalKa": "წყალმომარაგების ინფრასტრუქტურის აღდგენა-რეაბილიტაცია"
     }
   },
@@ -805,6 +862,18 @@
       "text": "Construction and rehabilitation of general education and preschool institutions",
       "reviewedAt": "2026-09-05",
       "originalKa": "ზოგადსაგანმანათლებლო და სკოლამდელი აღზრდის დაწესებულებების მშენებლობა-რეაბილიტაცია"
+    },
+    "2026": {
+      "text": "Construction and rehabilitation of educational institutions",
+      "reviewedAt": "2026-10-24",
+      "originalKa": "საგანმანათლებლო დაწესებულებების მშენებლობა-რეაბილიტაცია"
+    }
+  },
+  "admin_program.25_07.9b10dc83": {
+    "2026": {
+      "text": "Sport infrastructure support activities",
+      "reviewedAt": "2026-10-24",
+      "originalKa": "სპორტული ინფრასტრუქტურის მხარდამჭერი ღონისძიებები"
     }
   },
   "admin_program.25_07.b8cdb293": {
@@ -821,6 +890,11 @@
     "2025": {
       "text": "Tourism infrastructure improvement activities",
       "reviewedAt": "2026-09-05",
+      "originalKa": "ტურისტული ინფრასტრუქტურის გაუმჯობესების ღონისძიებები"
+    },
+    "2026": {
+      "text": "Tourism infrastructure improvement activities",
+      "reviewedAt": "2026-10-24",
       "originalKa": "ტურისტული ინფრასტრუქტურის გაუმჯობესების ღონისძიებები"
     }
   },
@@ -894,6 +968,11 @@
       "text": "Development and management of state policy for lawmaking and legal support of the country's interests, including criminal justice reform",
       "reviewedAt": "2026-09-05",
       "originalKa": "სამართალშემოქმედებისა და ქვეყნის ინტერესების სამართლებრივი მხარდაჭერის მიზნით სახელმწიფო პოლიტიკის შემუშავება და მართვა, მათ შორის, სისხლის სამართლის სისტემის რეფორმის განხორციელება"
+    },
+    "2026": {
+      "text": "Development and management of state policy for lawmaking and legal support of the country's interests, including criminal justice reform",
+      "reviewedAt": "2026-10-24",
+      "originalKa": "სამართალშემოქმედებისა და ქვეყნის ინტერესების სამართლებრივი მხარდაჭერის მიზნით სახელმწიფო პოლიტიკის შემუშავება და მართვა, მათ შორის, სისხლის სამართლის სისტემის რეფორმის განხორციელება"
     }
   },
   "admin_program.26_02.652b3ee4": {
@@ -966,6 +1045,11 @@
       "text": "Establishment of a penitentiary system meeting international standards",
       "reviewedAt": "2026-09-05",
       "originalKa": "საერთაშორისო სტანდარტების შესაბამისი პენიტენციური სისტემის ჩამოყალიბება"
+    },
+    "2026": {
+      "text": "Establishment of a penitentiary system meeting international standards",
+      "reviewedAt": "2026-10-24",
+      "originalKa": "საერთაშორისო სტანდარტების შესაბამისი პენიტენციური სისტემის ჩამოყალიბება"
     }
   },
   "admin_program.27_01.985ee587": {
@@ -1002,6 +1086,11 @@
     "2025": {
       "text": "Management of programmes for persons displaced from occupied territories, labour, health and social protection",
       "reviewedAt": "2026-09-05",
+      "originalKa": "ოკუპირებული ტერიტორიებიდან დევნილთა, შრომის, ჯანმრთელობისა და სოციალური დაცვის პროგრამების მართვა"
+    },
+    "2026": {
+      "text": "Management of programmes for persons displaced from occupied territories, labour, health and social protection",
+      "reviewedAt": "2026-10-24",
       "originalKa": "ოკუპირებული ტერიტორიებიდან დევნილთა, შრომის, ჯანმრთელობისა და სოციალური დაცვის პროგრამების მართვა"
     }
   },
@@ -1105,6 +1194,11 @@
       "text": "Social protection of the population",
       "reviewedAt": "2026-09-05",
       "originalKa": "მოსახლეობის სოციალური დაცვა"
+    },
+    "2026": {
+      "text": "Social protection of the population",
+      "reviewedAt": "2026-10-24",
+      "originalKa": "მოსახლეობის სოციალური დაცვა"
     }
   },
   "admin_program.27_03.0e2913c7": {
@@ -1207,6 +1301,11 @@
       "text": "Healthcare for the population",
       "reviewedAt": "2026-09-05",
       "originalKa": "მოსახლეობის ჯანმრთელობის დაცვა"
+    },
+    "2026": {
+      "text": "Healthcare for the population",
+      "reviewedAt": "2026-10-24",
+      "originalKa": "მოსახლეობის ჯანმრთელობის დაცვა"
     }
   },
   "admin_program.27_05.35edf475": {
@@ -1243,6 +1342,11 @@
     "2025": {
       "text": "Employment system reform programme",
       "reviewedAt": "2026-09-05",
+      "originalKa": "დასაქმების სისტემის რეფორმების პროგრამა"
+    },
+    "2026": {
+      "text": "Employment system reform programme",
+      "reviewedAt": "2026-10-24",
       "originalKa": "დასაქმების სისტემის რეფორმების პროგრამა"
     }
   },
@@ -1346,6 +1450,11 @@
       "text": "Support for internally displaced persons and migrants",
       "reviewedAt": "2026-09-05",
       "originalKa": "იძულებით გადაადგილებულ პირთა და მიგრანტთა ხელშეწყობა"
+    },
+    "2026": {
+      "text": "Support for internally displaced persons and migrants",
+      "reviewedAt": "2026-10-24",
+      "originalKa": "იძულებით გადაადგილებულ პირთა და მიგრანტთა ხელშეწყობა"
     }
   },
   "admin_program.28_01.10c69e87": {
@@ -1448,6 +1557,11 @@
       "text": "Implementation of foreign policy",
       "reviewedAt": "2026-09-05",
       "originalKa": "საგარეო პოლიტიკის განხორციელება"
+    },
+    "2026": {
+      "text": "Implementation of foreign policy",
+      "reviewedAt": "2026-10-24",
+      "originalKa": "საგარეო პოლიტიკის განხორციელება"
     }
   },
   "admin_program.29_01.c41caf84": {
@@ -1519,6 +1633,11 @@
     "2025": {
       "text": "Defence management",
       "reviewedAt": "2026-09-05",
+      "originalKa": "თავდაცვის მართვა"
+    },
+    "2026": {
+      "text": "Defence management",
+      "reviewedAt": "2026-10-24",
       "originalKa": "თავდაცვის მართვა"
     }
   },
@@ -1592,6 +1711,11 @@
       "text": "Professional military education",
       "reviewedAt": "2026-09-05",
       "originalKa": "პროფესიული სამხედრო განათლება"
+    },
+    "2026": {
+      "text": "Professional military education",
+      "reviewedAt": "2026-10-24",
+      "originalKa": "პროფესიული სამხედრო განათლება"
     }
   },
   "admin_program.29_05.a7ad04fb": {
@@ -1638,6 +1762,11 @@
     "2025": {
       "text": "Infrastructure development",
       "reviewedAt": "2026-09-05",
+      "originalKa": "ინფრასტრუქტურის განვითარება"
+    },
+    "2026": {
+      "text": "Infrastructure development",
+      "reviewedAt": "2026-10-24",
       "originalKa": "ინფრასტრუქტურის განვითარება"
     }
   },
@@ -1686,6 +1815,11 @@
       "text": "Development of defence capabilities",
       "reviewedAt": "2026-09-05",
       "originalKa": "თავდაცვის შესაძლებლობების განვითარება"
+    },
+    "2026": {
+      "text": "Development of defence capabilities",
+      "reviewedAt": "2026-10-24",
+      "originalKa": "თავდაცვის შესაძლებლობების განვითარება"
     }
   },
   "admin_program.29_08.5c94a9b3": {
@@ -1728,6 +1862,11 @@
       "text": "Logistical support",
       "reviewedAt": "2026-09-05",
       "originalKa": "ლოჯისტიკური უზრუნველყოფა"
+    },
+    "2026": {
+      "text": "Logistical support",
+      "reviewedAt": "2026-10-24",
+      "originalKa": "ლოჯისტიკური უზრუნველყოფა"
     }
   },
   "admin_program.30_01.43adff48": {
@@ -1764,6 +1903,11 @@
     "2025": {
       "text": "Public order and development of international cooperation",
       "reviewedAt": "2026-09-05",
+      "originalKa": "საზოგადოებრივი წესრიგი და საერთაშორისო თანამშრომლობის განვითარება/გაღრმავება"
+    },
+    "2026": {
+      "text": "Public order and development of international cooperation",
+      "reviewedAt": "2026-10-24",
       "originalKa": "საზოგადოებრივი წესრიგი და საერთაშორისო თანამშრომლობის განვითარება/გაღრმავება"
     }
   },
@@ -1839,6 +1983,11 @@
       "text": "State border protection",
       "reviewedAt": "2026-09-05",
       "originalKa": "სახელმწიფო საზღვრის დაცვა"
+    },
+    "2026": {
+      "text": "State border protection",
+      "reviewedAt": "2026-10-24",
+      "originalKa": "სახელმწიფო საზღვრის დაცვა"
     }
   },
   "admin_program.30_06.99ee9b0c": {
@@ -1891,6 +2040,18 @@
       "text": "Improvement of civil safety and establishment and management of state material reserves",
       "reviewedAt": "2026-09-05",
       "originalKa": "სამოქალაქო უსაფრთხოების დონის ამაღლება, სახელმწიფო მატერიალური რეზერვების შექმნა და მართვა"
+    },
+    "2026": {
+      "text": "Improvement of civil safety and establishment and management of state material reserves",
+      "reviewedAt": "2026-10-24",
+      "originalKa": "სამოქალაქო უსაფრთხოების დონის ამაღლება, სახელმწიფო მატერიალური რეზერვების შექმნა და მართვა"
+    }
+  },
+  "admin_program.31_02.4c716ffc": {
+    "2026": {
+      "text": "Food safety, plant protection and epizootic well-being",
+      "reviewedAt": "2026-10-24",
+      "originalKa": "სურსათის უვნებლობა, მცენარეთა დაცვა და ეპიზოოტიური კეთილსაიმედოობა"
     }
   },
   "admin_program.31_03.c8e552ff": {
@@ -1932,6 +2093,11 @@
     "2025": {
       "text": "Development of viticulture and winemaking",
       "reviewedAt": "2026-09-05",
+      "originalKa": "მევენახეობა-მეღვინეობის განვითარება"
+    },
+    "2026": {
+      "text": "Development of viticulture and winemaking",
+      "reviewedAt": "2026-10-24",
       "originalKa": "მევენახეობა-მეღვინეობის განვითარება"
     }
   },
@@ -1980,6 +2146,11 @@
       "text": "Unified agricultural project",
       "reviewedAt": "2026-09-05",
       "originalKa": "ერთიანი აგროპროექტი"
+    },
+    "2026": {
+      "text": "Unified agricultural project",
+      "reviewedAt": "2026-10-24",
+      "originalKa": "ერთიანი აგროპროექტი"
     }
   },
   "admin_program.31_06.8aad417e": {
@@ -2026,6 +2197,11 @@
     "2025": {
       "text": "Modernisation of irrigation and drainage systems",
       "reviewedAt": "2026-09-05",
+      "originalKa": "სამელიორაციო სისტემების მოდერნიზაცია"
+    },
+    "2026": {
+      "text": "Modernisation of irrigation and drainage systems",
+      "reviewedAt": "2026-10-24",
       "originalKa": "სამელიორაციო სისტემების მოდერნიზაცია"
     }
   },
@@ -2129,6 +2305,11 @@
       "text": "Preschool and general education",
       "reviewedAt": "2026-09-05",
       "originalKa": "სკოლამდელი და ზოგადი განათლება"
+    },
+    "2026": {
+      "text": "Preschool and general education",
+      "reviewedAt": "2026-10-24",
+      "originalKa": "სკოლამდელი და ზოგადი განათლება"
     }
   },
   "admin_program.32_03.85c13dd5": {
@@ -2200,6 +2381,11 @@
     "2025": {
       "text": "Vocational education",
       "reviewedAt": "2026-09-05",
+      "originalKa": "პროფესიული განათლება"
+    },
+    "2026": {
+      "text": "Vocational education",
+      "reviewedAt": "2026-10-24",
       "originalKa": "პროფესიული განათლება"
     }
   },
@@ -2303,6 +2489,18 @@
       "text": "Higher education",
       "reviewedAt": "2026-09-05",
       "originalKa": "უმაღლესი განათლება"
+    },
+    "2026": {
+      "text": "Higher education",
+      "reviewedAt": "2026-10-24",
+      "originalKa": "უმაღლესი განათლება"
+    }
+  },
+  "admin_program.32_06.75b0daad": {
+    "2026": {
+      "text": "Inclusive education",
+      "reviewedAt": "2026-10-24",
+      "originalKa": "ინკლუზიური განათლება"
     }
   },
   "admin_program.32_07.1f0c1c68": {
@@ -2350,6 +2548,11 @@
       "text": "Infrastructure development",
       "reviewedAt": "2026-09-05",
       "originalKa": "ინფრასტრუქტურის განვითარება"
+    },
+    "2026": {
+      "text": "Support for the development of educational and scientific infrastructure",
+      "reviewedAt": "2026-10-24",
+      "originalKa": "საგანმანათლებლო და სამეცნიერო ინფრასტრუქტურის განვითარების ხელშეწყობა"
     }
   },
   "admin_program.32_09.22d64905": {
@@ -2413,6 +2616,11 @@
     "2025": {
       "text": "Support for cultural development",
       "reviewedAt": "2026-09-05",
+      "originalKa": "კულტურის განვითარების ხელშეწყობა"
+    },
+    "2026": {
+      "text": "Support for cultural development",
+      "reviewedAt": "2026-10-24",
       "originalKa": "კულტურის განვითარების ხელშეწყობა"
     }
   },
@@ -2496,6 +2704,25 @@
       "text": "Development and promotion of grassroots and high-performance sport",
       "reviewedAt": "2026-09-05",
       "originalKa": "მასობრივი და მაღალი მიღწევების სპორტის განვითარება და პოპულარიზაცია"
+    },
+    "2026": {
+      "text": "Development and promotion of grassroots and high-performance sport",
+      "reviewedAt": "2026-10-24",
+      "originalKa": "მასობრივი და მაღალი მიღწევების სპორტის განვითარება და პოპულარიზაცია"
+    }
+  },
+  "admin_program.40_01.4da4c450": {
+    "2026": {
+      "text": "Security of protected persons and facilities",
+      "reviewedAt": "2026-10-24",
+      "originalKa": "დასაცავ პირთა და ობიექტთა უსაფრთხოების უზრუნველყოფა"
+    }
+  },
+  "admin_program.54_07.a43df73b": {
+    "2026": {
+      "text": "Fund for projects implemented in the regions of Georgia",
+      "reviewedAt": "2026-10-24",
+      "originalKa": "საქართველოს რეგიონებში განსახორციელებელი პროექტების ფონდი"
     }
   },
   "admin_program.55_14.7452e9e9": {
@@ -2580,6 +2807,11 @@
       "text": "Servicing and repayment of external government liabilities",
       "reviewedAt": "2026-09-05",
       "originalKa": "საგარეო სახელმწიფო ვალდებულებების მომსახურება და დაფარვა"
+    },
+    "2026": {
+      "text": "Servicing and repayment of external government liabilities",
+      "reviewedAt": "2026-10-24",
+      "originalKa": "საგარეო სახელმწიფო ვალდებულებების მომსახურება და დაფარვა"
     }
   },
   "admin_program.57_02.a3dc00f4": {
@@ -2651,6 +2883,11 @@
     "2025": {
       "text": "Servicing and repayment of domestic government liabilities",
       "reviewedAt": "2026-09-05",
+      "originalKa": "საშინაო სახელმწიფო ვალდებულებების მომსახურება და დაფარვა"
+    },
+    "2026": {
+      "text": "Servicing and repayment of domestic government liabilities",
+      "reviewedAt": "2026-10-24",
       "originalKa": "საშინაო სახელმწიფო ვალდებულებების მომსახურება და დაფარვა"
     }
   },
@@ -2724,6 +2961,11 @@
       "text": "Transfers to autonomous republics and municipalities",
       "reviewedAt": "2026-09-05",
       "originalKa": "ავტონომიური რესპუბლიკებისა და მუნიციპალიტეტებისათვის გადასაცემი ტრანსფერები"
+    },
+    "2026": {
+      "text": "Transfers to autonomous republics and municipalities",
+      "reviewedAt": "2026-10-24",
+      "originalKa": "ავტონომიური რესპუბლიკებისა და მუნიციპალიტეტებისათვის გადასაცემი ტრანსფერები"
     }
   },
   "admin_program.57_11.c2eeef9e": {
@@ -2765,6 +3007,11 @@
     "2025": {
       "text": "Co-financing the funded pension scheme",
       "reviewedAt": "2026-09-05",
+      "originalKa": "დაგროვებითი საპენსიო სქემის თანადაფინანსება"
+    },
+    "2026": {
+      "text": "Co-financing the funded pension scheme",
+      "reviewedAt": "2026-10-24",
       "originalKa": "დაგროვებითი საპენსიო სქემის თანადაფინანსება"
     }
   },
@@ -2837,6 +3084,11 @@
     "2025": {
       "text": "Donor-financed payments of national importance",
       "reviewedAt": "2026-09-05",
+      "originalKa": "დონორების მიერ დაფინანსებული საერთო-სახელმწიფოებრივი მნიშვნელობის გადასახდელები"
+    },
+    "2026": {
+      "text": "Donor-financed payments of national importance",
+      "reviewedAt": "2026-10-24",
       "originalKa": "დონორების მიერ დაფინანსებული საერთო-სახელმწიფოებრივი მნიშვნელობის გადასახდელები"
     }
   }

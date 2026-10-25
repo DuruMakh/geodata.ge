@@ -69,16 +69,19 @@ function AnalysisExplorerContent({ facts: shippedFacts, adminFacts: shippedAdmin
   useReplaceHash(serializeAnalysisHash({ analysisSide: side, analysisGrouping: grouping, analysisYear: year }));
 
   // Years whose ACTIVE values are planned (actual wins over planned), for the
-  // year selector's გეგმა tags. Admin facts are actual-only by contract, so the
-  // ministries grouping never has planned years.
+  // year selector's გეგმა tags. The ministries grouping reads the admin facts,
+  // which resolve actual over planned per year when they are loaded.
   const plannedYears = useMemo(() => {
     const planned = new Set<number>();
-    if (side === "expenditure" && grouping === "ministries") return planned;
+    if (side === "expenditure" && grouping === "ministries") {
+      for (const fact of adminFacts) if (fact.basis === "planned") planned.add(fact.year);
+      return planned;
+    }
     for (const fact of chooseActivePublicFacts(facts)) {
       if (fact.side === side && fact.basis === "planned") planned.add(fact.year);
     }
     return planned;
-  }, [facts, side, grouping]);
+  }, [facts, adminFacts, side, grouping]);
 
   const model = useMemo(
     () => buildSingleYearSnapshotModel({

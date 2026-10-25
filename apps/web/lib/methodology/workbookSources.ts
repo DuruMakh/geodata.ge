@@ -33,8 +33,9 @@ const expenditureSourceId = (year: number, kind: string) => `source.mof.expendit
 
 // These tables mirror the reviewed fact generators and the source lineage in
 // docs/data-methodology/treasury-functional-expenditure-methodology-2004-2025.md,
-// docs/data-methodology/ministries-drilldown-programs-methodology.md, and
-// docs/data-methodology/2005-2014-ministries-expenditure-methodology.md. They
+// docs/data-methodology/ministries-drilldown-programs-methodology.md,
+// docs/data-methodology/2005-2014-ministries-expenditure-methodology.md, and
+// docs/data-methodology/2026-budget-plan-methodology.md. They
 // intentionally name the exact manifest identity used for each year, including
 // the 2013 Chapter VI PDF and the 2014 actual column carried by 2015-fact.xlsx.
 const EXPENDITURE_FIELD_LINEAGE: Readonly<Record<number, readonly string[]>> = {
@@ -55,6 +56,9 @@ const EXPENDITURE_FIELD_LINEAGE: Readonly<Record<number, readonly string[]>> = {
     const year = 2017 + index;
     return [year, [expenditureSourceId(year, "treasury_e11"), expenditureSourceId(year, "mof_excel_fact")]];
   })),
+  // The approved 2026 plan (basis planned): Article 9 of the budget law plus
+  // the Tavi VI appropriations that supply the financial-asset supplement rows.
+  2026: [expenditureSourceId(2026, "budget_law_tavi_iii"), expenditureSourceId(2026, "budget_law_tavi_vi")],
 };
 
 const MINISTRY_LINEAGE: Readonly<Record<number, readonly string[]>> = {
@@ -76,6 +80,8 @@ const MINISTRY_LINEAGE: Readonly<Record<number, readonly string[]>> = {
     const year = 2017 + index;
     return [year, [expenditureSourceId(year, "mof_excel_fact")]];
   })),
+  // The approved 2026 plan (basis planned): the budget law's Tavi VI appropriations.
+  2026: [expenditureSourceId(2026, "budget_law_tavi_vi")],
 };
 
 export function projectWorkbookSources(

@@ -16,6 +16,8 @@ type MethodologyArticleProps = {
   messages: Messages;
   content: MethodologyContent;
   coverage: { firstYear: number; lastYear: number };
+  /** The latest covered year when it is a plan, and the last actual year before it. */
+  plannedYear?: { year: number; lastActualYear: number };
   rows: readonly PublicSourceManifestRow[];
   archiveSummary: MethodologyArchiveSummary;
   processedDataHref: `/downloads/data/${string}.csv` | null;
@@ -35,7 +37,7 @@ function sectionAnchorId(section: MethodologyContent["sections"][number]) {
   return section.kind === "archive" ? "source-archive" : section.id;
 }
 
-export function MethodologyArticle({ locale, messages, content, coverage, rows, archiveSummary, processedDataHref, processedDataJsonLinks, breadcrumbItems }: MethodologyArticleProps) {
+export function MethodologyArticle({ locale, messages, content, coverage, plannedYear, rows, archiveSummary, processedDataHref, processedDataJsonLinks, breadcrumbItems }: MethodologyArticleProps) {
   const journeyDescriptions = [
     firstParagraphByKind(content, "archive", content.summary),
     firstParagraphByKind(content, "sources", content.summary),
@@ -64,7 +66,11 @@ export function MethodologyArticle({ locale, messages, content, coverage, rows, 
           <div key={fact.label} className="border-b border-[var(--hairline)] py-5 last:border-b-0 min-[620px]:px-4 min-[1040px]:border-b-0 min-[1040px]:border-r min-[1040px]:border-[var(--hairline)] min-[1040px]:first:pl-0 min-[1040px]:last:border-r-0">
             <dt className="text-[0.6875rem] min-[768px]:text-[10px] font-semibold uppercase tracking-[0.07em] text-[var(--muted)]">{fact.label}</dt>
             <dd className="mt-2 font-[family-name:var(--font-numeric)] text-[0.75rem] leading-relaxed">
-              {fact.valueKind === "coverage" ? `${coverage.firstYear}–${coverage.lastYear}` : fact.value}
+              {fact.valueKind === "coverage"
+                ? `${coverage.firstYear}–${coverage.lastYear}`
+                : fact.valueKind === "basis" && fact.value && plannedYear
+                  ? message(messages, "methodology.basisWithPlannedYear", { basis: fact.value, firstYear: coverage.firstYear, ...plannedYear })
+                  : fact.value}
             </dd>
           </div>
         ))}

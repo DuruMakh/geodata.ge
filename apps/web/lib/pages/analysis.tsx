@@ -29,7 +29,7 @@ export async function renderAnalysisPage(locale: Locale) {
   // buildSingleYearSnapshotModel keeps only admin_category rows (singleYear.ts),
   // and the route's other admin readers agree: totalsByScope filters to the same
   // level, and yearsByScope.ministries needs a year set the category rows already
-  // cover in full (2004-2025 either way). So the 549 major_program rows were
+  // cover in full (the same years either way). So the 549 major_program rows were
   // 307 KB of payload this route has no way to render.
   const ownAdminFacts = adminFacts.filter((fact) => fact.level === "admin_category");
   // Date from the FULL corpus, so narrowing the payload cannot move the
