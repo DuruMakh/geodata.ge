@@ -78,3 +78,7 @@ export type AgeingChapter = {
   migration: { years: number[]; net: number[] }; // consecutive years with a net value, ascending
   births: { year: number; births: number; deaths: number; places: ({ births: number; deaths: number } | null)[] }; // places aligned with MunicipalChapter.places
 };
+
+export type LabourSplit = { employed: number; unemployed: number; outside: number; rate: number; per100: [number, number, number] }; // thousand persons; rate percent
+export type ComparisonId = "notHigher" | "littleHigher" | "oneAndHalf" | "almostTwice" | "twice" | "moreThanTwice";
+export type YouthJobsChapter = { year: number; all: LabourSplit; youth: LabourSplit; ratio: number; comparison: ComparisonId; regions: { id: string; label: string; rate: number }[] }; // regions rate desc
