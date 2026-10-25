@@ -160,5 +160,6 @@
   "landing.municipal.rank": "რანგი ბიუჯეტით",
   "landing.municipal.occupied": "ოკუპირებული ტერიტორია",
   "landing.municipal.occupiedNote": "მუნიციპალური ბიუჯეტის მონაცემები არ არსებობს",
-  "landing.municipal.chartSummary": "საქართველოს მუნიციპალიტეტების ბიუჯეტის სამგანზომილებიანი რელიეფი"
+  "landing.municipal.chartSummary": "საქართველოს მუნიციპალიტეტების ბიუჯეტის სამგანზომილებიანი რელიეფი",
+  "landing.deaths.other": "სხვა მიზეზები"
 }

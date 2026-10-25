@@ -97,3 +97,11 @@ export type TradeChapter = {
   partners: { id: string; label: string; exportsUsd: number; importsUsd: number; turnoverUsd: number }[]; // countries only, at most 10, turnover desc
   topProduct: { label: string; usd: number; share: number }; secondProduct: { label: string; usd: number } | null; // share of national exports
 };
+
+export type DeathGroupKind = "top" | "unknown" | "established" | "other";
+export type DeathsChapter = {
+  year: number; total: number;
+  groups: { id: string; label: string; count: number; kind: DeathGroupKind }[]; // five largest causes by count, then "other" (the remainder); ids without the health.deaths. prefix
+  top: { id: string; label: string; share: number }; // largest established cause (anything but ill_defined), share of total
+  unknownShare: number; // ill_defined / total, 0 if absent
+};
