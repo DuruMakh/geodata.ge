@@ -15,7 +15,7 @@ import { GEORGIA_PLACE_ID } from "../../demographyAreas";
 import { ENVIRONMENT_AREAS, environmentAreaIndexHref, environmentAreaRoutes, environmentAreaSeries, type EnvironmentAreaTopic } from "../../environmentAreas";
 import { formatAmount } from "../../format";
 import { housingValueLabel } from "../../housing";
-import { HOUSING_AREAS, HOUSING_REGIONS_HREF, housingAreaHref, housingAreaSeries, housingMapId } from "../../housingAreas";
+import { HOUSING_AREAS, HOUSING_REGIONS_HREF, housingAreaSeries, housingMapId } from "../../housingAreas";
 import { internetPercent } from "../../internet";
 import { INTERNET_AREAS, INTERNET_HOMES_HREF, internetAreaHref, internetAreaLatest, internetMapId } from "../../internetAreas";
 import { museumVisitorsLabel } from "../../scienceCulture";
@@ -48,12 +48,15 @@ async function business(locale: Locale): Promise<PlaceEntry[]> {
   });
 }
 
-/** Floor area permitted, the measure the Regions card spreads and its map ranks, rather than the permit count the area pages lead with. */
+/**
+ * Floor area permitted, the measure the Regions card spreads and its map ranks, rather than the permit count the area pages lead with;
+ * so each row opens the Regions page, whose map and list state that floor area for Georgia and every region.
+ */
 async function housing(locale: Locale): Promise<PlaceEntry[]> {
   const [{ facts: served }, { messages }] = await Promise.all([loadServedHousingData(), getPresentation(locale, ["housing"], [])]);
   const facts = served.map(toClientHousingFact);
   const t = (key: string) => message(messages, `housing.${key}`);
-  return areaEntries(HOUSING_REGIONS_HREF, HOUSING_AREAS, housingAreaHref, housingMapId, (area) => {
+  return areaEntries(HOUSING_REGIONS_HREF, HOUSING_AREAS, () => HOUSING_REGIONS_HREF, housingMapId, (area) => {
     const id = housingAreaSeries(area).find((series) => series.reference && series.heading === "permitsArea")!.id;
     const fact = facts.filter((f) => f.indicatorId === id).sort((a, b) => a.year - b.year).at(-1)!;
     return { value: housingValueLabel(fact.value, "area", t), number: fact.value, year: fact.year };

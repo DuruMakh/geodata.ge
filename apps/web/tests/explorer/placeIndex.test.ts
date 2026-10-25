@@ -26,7 +26,9 @@ import type { PlaceIndex } from "../../lib/explorer/places/types";
 import { loadServedMunicipalData } from "../../lib/data/servedData";
 import { NAV_TREE } from "../../lib/navigation/navTree";
 import { renderEducationPlacePage } from "../../lib/pages/education-places";
+import { renderHealthDeathsIndex } from "../../lib/pages/health-deaths-index";
 import { renderHouseholdRegionPage } from "../../lib/pages/household";
+import { renderHousingRegionsPage } from "../../lib/pages/housing-regions";
 import { renderMoneyBanksAreaPage } from "../../lib/pages/money-banks-area";
 import { renderUnemploymentRegionPage, renderUnemploymentRegionsPage } from "../../lib/pages/unemployment-regions";
 import { renderWagesRegionsIndexPage } from "../../lib/pages/wages-regions-index";
@@ -275,6 +277,19 @@ describe.each(["ka", "en"] as const)("place index (%s)", (locale) => {
     expect(tile, "national tile").not.toBeNull();
     const georgia = entry("country.georgia", "/explorer/unemployment/regions");
     expect([georgia.value, georgia.period]).toEqual([tile![1], tile![2]]);
+  }, 120_000);
+
+  it("opens, for a row that follows its card's measure, the page that maps that figure for every place", async () => {
+    // Causes of death and Housing regions rows state the card's rate and floor area; their area pages lead with counts (spec §8).
+    for (const [page, render] of [["/explorer/health/causes-of-death", renderHealthDeathsIndex], ["/explorer/housing/regions", renderHousingRegionsPage]] as const) {
+      const rows = entriesForPage(index, page);
+      expect(rows, page).toHaveLength(12);
+      const html = renderPageMarkup(locale, await render(locale)).replace(/<[^>]+>/g, " ");
+      for (const row of rows) {
+        expect(row.href, `${page} ${row.placeId}`).toBe(page);
+        expect(html, `${page} ${row.placeId}`).toContain(row.value.split(" ")[0]);
+      }
+    }
   }, 120_000);
 
   it("states the figure each sampled place page's latest line renders", async () => {

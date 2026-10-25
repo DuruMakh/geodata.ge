@@ -177,7 +177,7 @@ The page names, values and trend lines are already on the page for the A to Z li
 
 ## 8. Place index
 
-One adapter per place page family. Each turns that family's served facts into `{ placeId, href, value, period }` with the same latest figure the place page shows. The adapter lives beside the family's existing route helper, and place ids are the shared ones (`region.{id}`, municipality code; `demographyAreas.ts`, `placePageHref`).
+One adapter per place page family. Each turns that family's served facts into `{ placeId, href, value, period }` with the latest figure its page's card states, and `href` is a page that shows that figure: the place's own page, or, where that page leads with another measure, the page that maps the card's measure for every place (below). The adapter lives beside the family's existing route helper, and place ids are the shared ones (`region.{id}`, municipality code; `demographyAreas.ts`, `placePageHref`).
 
 | Level | Families (place page exists) |
 | --- | --- |
@@ -187,14 +187,14 @@ One adapter per place page family. Each turns that family's served facts into `{
 
 A page with place figures but no place page (Births and deaths, Marriages and divorces, the regions' census share aged 65+ on Age and sex) links to the general page, or the place's Population section, with the place's value. Births and deaths states the place's births and Marriages and divorces its marriages, each captioned as the page's card is. The place card's four facts come from the Population, Municipal budget (total and per resident) and Births and deaths data. For a region, the budget is the sum of its municipalities, as the municipal region pages already show.
 
-Every row states the measure, unit and caption of its page's card (fix round 4, 2026-10-25), so a reader sees in search what the group page says: Causes of death the death rate per 1,000 people, Museums its visitors in the card's scale (`2.0 million`, a region below a million in thousands), Waste the card's million tonnes (a region in thousand tonnes), Housing regions the floor area permitted that its card spreads, and the rows of Schools, Kindergartens, Pensions, Subsistence allowance, Museums, Waste, Forests and City air quality the card's caption. Where a place page's own line leads with another measure (Causes of death and Housing regions lead with counts), the row follows the card. `tests/explorer/placeEntryCards.test.ts` compares each family's Georgia row with its card.
+Every row states the measure, unit and caption of its page's card (fix round 4, 2026-10-25), so a reader sees in search what the group page says: Causes of death the death rate per 1,000 people, Museums its visitors in the card's scale (`2.0 million`, a region below a million in thousands), Waste the card's million tonnes (a region in thousand tonnes), Housing regions the floor area permitted that its card spreads, and the rows of Schools, Kindergartens, Pensions, Subsistence allowance, Museums, Waste, Forests and City air quality the card's caption. Where a place page's own line leads with another measure (Causes of death and Housing regions lead with counts), the row follows the card and links to the page whose map and list state that figure for Georgia and every region (`/explorer/health/causes-of-death`, `/explorer/housing/regions`), so the figure is where the link lands. `tests/explorer/placeEntryCards.test.ts` compares each family's Georgia row with its card.
 
 The same index feeds the region-spread graphic of §5.
 
 ## 9. Where the build differs from the prototype
 
 - Phone layout from 900px, not 768px (§4).
-- Place results link to the place's own page rather than the general page (agreed in part 3).
+- Place results link to the place's own page rather than the general page (agreed in part 3), except where that page does not state the row's figure (§8).
 - The rail and pop-out icons are Lucide (the project's one icon family). The prototype's inline icons are the same Lucide shapes.
 - The prototype's numbers were copied from the live site on 2026-10-24. The build computes them, so they follow the data.
 - Footer: explorer routes have no footer (owner decision 2026-10-25), so neither the explorer footer nor the prototype's one-line footer is built. Methodology and AI connection stay reachable from the sidebar's foot, expanded and collapsed (§4).
