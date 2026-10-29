@@ -14,6 +14,7 @@ import { serviceLabelEn, serviceMessage, type ServiceMessageKey } from "./locali
 import { compare } from "./compare";
 import { describeCoverage } from "./describeCoverage";
 import { buildResponseMeta } from "./meta";
+import { caveatIdsForObservation } from "./observations";
 import { inflationObservations } from "./queryInflation";
 import { queryInflationProducts } from "./queryInflationProducts";
 import { inflationProductSources } from "./inflationProductData";
@@ -25,7 +26,7 @@ import { selectSources } from "./sources";
 import { AGGREGATE_ONLY_MUNICIPAL_CODES } from "./types";
 import type { Comparison } from "./compare";
 import type { Observation } from "./observations";
-import type { Basis, DatasetId, FactQueryError, FactQueryResponse, FactQuerySnapshot, Measure, ResolvedSource, Unit } from "./types";
+import type { Basis, Caveat, DatasetId, FactQueryError, FactQueryResponse, FactQuerySnapshot, Measure, ResolvedSource, Unit } from "./types";
 
 const EXCLUDED = new Set<string>(AGGREGATE_ONLY_MUNICIPAL_CODES);
 const TOTAL_LEVEL = "total";
@@ -87,6 +88,10 @@ type Candidate = {
   caveatIds: string[];
   period?: string;
   calculationBasePeriod?: string;
+  /** Documents behind this row: the observation's, or both endpoints' of the comparison. */
+  documentIds: string[];
+  /** The cells the value was read from, to narrow caveat `affects` to the rows a ranking returns. */
+  cells: { year: number; period?: string }[];
   /** Stable sort key, used only to break exact ties reproducibly. */
   stableId: string;
 };
@@ -100,6 +105,41 @@ function groupByReason(flat: readonly { id: string; reason: string; reasonEn: st
     else group.ids.push(id);
   }
   return [...byReason.values()];
+}
+
+/**
+ * Which of the documents a ranking read are given in full: those behind the rows
+ * it returns, and any document every candidate cites (a shared workbook or
+ * population table supports the whole ordering). The rest fixed the order but
+ * back no returned row, so they are named by id and resolved with get_sources.
+ * A ranking with no returned row has nothing to prefer, so it keeps them all.
+ */
+function splitDocuments(all: readonly string[], candidates: readonly Candidate[], returned: readonly Candidate[]) {
+  const documentIds = [...new Set(all)];
+  if (returned.length === 0) return { cited: documentIds, inputOnly: [] as string[] };
+  const full = new Set(returned.flatMap((candidate) => candidate.documentIds));
+  for (const id of candidates[0]!.documentIds) {
+    if (candidates.every((candidate) => candidate.documentIds.includes(id))) full.add(id);
+  }
+  return { cited: documentIds.filter((id) => full.has(id)), inputOnly: documentIds.filter((id) => !full.has(id)) };
+}
+
+/**
+ * List in `affects` only the items that name a returned row, and count the rest.
+ * A caveat that applies to every candidate otherwise names all of them: 305
+ * product-month ids on a top-5 answer. Code, kind and wording are untouched.
+ */
+function narrowAffects(caveats: readonly Caveat[], returned: readonly Candidate[], measure: Measure): Caveat[] {
+  if (returned.length === 0) return [...caveats];
+  const rows = returned.flatMap((candidate) =>
+    candidate.cells.map((cell) => ({ entityId: candidate.entityId, seriesId: candidate.seriesId, measure, ...cell })),
+  );
+  return caveats.map((caveat) => {
+    const affects = caveat.affects.filter((item) =>
+      rows.some((row) => caveatIdsForObservation([{ ...caveat, affects: [item] }], row).length > 0),
+    );
+    return affects.length === caveat.affects.length ? caveat : { ...caveat, affects, affectsOtherCount: caveat.affects.length - affects.length };
+  });
 }
 
 const REASON_NOT_COMPARABLE = "ranking.notComparable";
@@ -412,6 +452,8 @@ export function rank(snapshot: FactQuerySnapshot, rawInput: unknown): FactQueryR
         caveatIds: observation.caveatIds,
         ...(observation.period !== undefined ? { period: observation.period } : {}),
         ...(observation.calculationBasePeriod !== undefined ? { calculationBasePeriod: observation.calculationBasePeriod } : {}),
+        documentIds: observation.documentIds,
+        cells: [{ year: observation.year, ...(observation.period !== undefined ? { period: observation.period } : {}) }],
         stableId,
       });
     }
@@ -482,6 +524,8 @@ export function rank(snapshot: FactQuerySnapshot, rawInput: unknown): FactQueryR
         unit: input.metric === "absolute_change" ? comparison.unit : input.metric === "percentage_point_change" ? "percentage_points" : "percent",
         basis: comparison.to.basis,
         caveatIds: comparison.caveatIds,
+        documentIds: [...comparison.from.documentIds, ...comparison.to.documentIds],
+        cells: [comparison.from, comparison.to].map(({ year, period }) => ({ year, ...(period !== undefined ? { period } : {}) })),
         stableId,
       });
     }
@@ -560,11 +604,17 @@ export function rank(snapshot: FactQuerySnapshot, rawInput: unknown): FactQueryR
   const status: "ok" | "partial" | "empty" =
     entries.length === 0 ? "empty" : exclusions.length === 0 ? "ok" : "partial";
 
-  // A RankEntry carries no documentIds of its own, so the narrowing comes from
-  // the observations the ranking was computed from: every document those cite,
-  // and no more. A ranking over all 64 municipalities still names 64 workbooks -
-  // it genuinely read them - but not the documents its sources merely archive.
-  const meta = buildResponseMeta(snapshot, { sources, caveats, citedDocumentIds });
+  // A ranking over all 64 municipalities genuinely read 64 workbooks, and every
+  // one is still named. Only the workbooks behind the returned rows (plus any
+  // that all candidates share) are given in full; the others fixed the order
+  // and are listed by id. Not the documents its sources merely archive.
+  const { cited, inputOnly } = splitDocuments(citedDocumentIds, candidates, cut);
+  const meta = buildResponseMeta(snapshot, {
+    sources,
+    caveats: narrowAffects(caveats, cut, input.measure),
+    citedDocumentIds: cited,
+    inputOnlyDocumentIds: inputOnly,
+  });
 
   const data: RankData = {
     entries,

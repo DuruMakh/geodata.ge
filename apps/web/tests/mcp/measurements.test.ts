@@ -4,6 +4,10 @@ import { mkdtempSync, readFileSync, rmSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { beforeAll, describe, expect, it } from "vitest";
+import { testSnapshot } from "../helpers/factQuerySnapshot";
+import { describeCoverage } from "../../lib/factQuery/describeCoverage";
+import { rank } from "../../lib/factQuery/rank";
+import { toolResult } from "../../lib/mcp/result";
 
 type Measurement = {
   name: string; sampleCount: number; warmupCount: number; requestedCells: number; returnedCount: number; rowCount: number;
@@ -132,5 +136,43 @@ describe("packaged MCP measurement CLI", () => {
       expect(sample.boundedBytes).toBeLessThanOrEqual(524_288);
       if (sample.limitOutcome === "accepted") expect(sample.boundedBytes).toBe(sample.completeBytes);
     }
+  });
+});
+
+// Wire size is the UTF-8 length of the tool result as the server returns it:
+// structuredContent and its text twin together, as the measurement CLI counts
+// completeBytes. Measured in-process before the change (this snapshot):
+// municipal top-5 103,092 B, product top-5 35,049 B (structuredContent 18,490 B),
+// inflation-products catalogue 469,421 B (469,567 B over HTTP, which adds the
+// JSON-RPC envelope). After: 26,125 B, 18,821 B (structuredContent 10,048 B) and
+// 307,753 B.
+describe("heavy answers stay light", () => {
+  const wire = (response: ReturnType<typeof rank>) => Buffer.byteLength(JSON.stringify(toolResult(response)), "utf8");
+  const structured = (response: ReturnType<typeof rank>) => Buffer.byteLength(JSON.stringify(toolResult(response).structuredContent), "utf8");
+  const snapshot = testSnapshot({ releaseCommit: "test", generatedAt: "2026-10-29T00:00:00.000Z" });
+
+  it("municipal top-5 by GEL per resident is under 32 KiB", () => {
+    const result = rank(snapshot, { datasetId: "municipal-expenditure", dimension: "entities", entityType: "municipality", seriesId: "municipal.total", measure: "gel_per_resident", metric: "value", year: 2025, limit: 5 });
+    expect(result.kind).toBe("ranking");
+    expect(wire(result)).toBeLessThan(32 * 1024);
+  });
+
+  // The caveat messages and the one source record are the floor here: they are
+  // required to stay byte-identical, and each is written twice (structured and
+  // text). Under 16 KiB holds for the structured answer; the wire, which carries
+  // the text twin as well, is under 20 KiB.
+  it("product cumulative top-5 is under 16 KiB structured and 20 KiB on the wire", () => {
+    const result = rank(snapshot, { datasetId: "inflation-products", dimension: "series", measure: "cumulative_pct", metric: "value", period: "2026-09", startYear: 2020, limit: 5 });
+    expect(result.kind).toBe("ranking");
+    expect(structured(result)).toBeLessThan(16 * 1024);
+    expect(wire(result)).toBeLessThan(20 * 1024);
+  });
+
+  // Dropping the per-measure spans that repeat a product's own span takes a third
+  // off. What remains (history notes, labels, the year list itself) repeats nothing.
+  it("the inflation-products catalogue is at least a third smaller than the 469,567 B it was", () => {
+    const result = describeCoverage(snapshot, { datasetId: "inflation-products" });
+    expect(result.kind).toBe("catalogue");
+    expect(wire(result)).toBeLessThanOrEqual(469_567 * (2 / 3));
   });
 });

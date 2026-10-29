@@ -24,9 +24,17 @@ export type ResponseMetaExtra = {
    * source" rather than "which documents support this answer".
    *
    * Omitted by getSources, whose result IS the document listing, and by
-   * describeCoverage and rank, whose results carry no documentIds to narrow by.
+   * describeCoverage, whose result carries no documentIds to narrow by.
    */
   citedDocumentIds?: readonly string[];
+  /**
+   * Documents the answer was computed from but whose rows it does not show - a
+   * top-N ranking reads every candidate's workbook and returns a few rows. They
+   * are named by id on their source (`inputDocumentIds`) instead of being given
+   * in full, so no document the answer used is dropped. Used with
+   * `citedDocumentIds`; a document in both stays in full.
+   */
+  inputOnlyDocumentIds?: readonly string[];
 };
 
 /**
@@ -81,6 +89,7 @@ function compactSource(source: ResolvedSource): ResponseSource {
 export function buildResponseMeta(snapshot: FactQuerySnapshot, extra?: ResponseMetaExtra): ResponseMeta {
   const sources = extra?.sources ?? [];
   const cited = extra?.citedDocumentIds === undefined ? null : new Set(extra.citedDocumentIds);
+  const inputOnly = extra?.inputOnlyDocumentIds === undefined ? null : new Set(extra.inputOnlyDocumentIds);
 
   return {
     schemaVersion: snapshot.schemaVersion,
@@ -92,16 +101,19 @@ export function buildResponseMeta(snapshot: FactQuerySnapshot, extra?: ResponseM
     // Narrow first, then compact what survives: which documents belong here is
     // a different question from how compactly to state them.
     sources: (cited === null
-      ? sources
+      ? sources.map(compactSource)
       : sources.map((source) => {
           const kept = source.documents.filter((document) => cited.has(document.documentId));
+          const inputIds = inputOnly === null ? [] : source.documents.map((document) => document.documentId).filter((id) => inputOnly.has(id) && !cited.has(id));
           // Narrowing points at the right original; it never hides
           // provenance. A source the rows cite must always show something a
           // reader can open, so an empty filter falls back to everything the
-          // source archives - the same rule resolveDocumentIds applies.
-          return kept.length > 0 ? { ...source, documents: kept } : source;
-        })
-    ).map(compactSource),
+          // source archives - the same rule resolveDocumentIds applies. A source
+          // whose only documents are ranking inputs is named by those ids instead.
+          if (kept.length === 0 && inputIds.length === 0) return compactSource(source);
+          const compact = compactSource({ ...source, documents: kept });
+          return inputIds.length > 0 ? { ...compact, inputDocumentIds: inputIds } : compact;
+        })),
     caveats: extra?.caveats ?? [],
   };
 }

@@ -831,6 +831,20 @@ representation carries every definition, but prints each one once in a legend
 keyed by the `definitionId` its rows name, so a long monthly series does not
 spend the cap on repeated sentences.
 
+**What a ranking gives in full and what it names by id.** A top-N ranking reads
+every candidate to fix the order but returns a few rows. `meta.sources[].documents`
+holds the full record of each document behind a returned row, plus any document
+that every candidate cites. Every other document the ranking read is named in
+`meta.sources[].inputDocumentIds` (ids only; `get_sources` resolves them), so the
+two lists together are exactly the set a ranking has always cited and none is
+dropped. Likewise a caveat's `affects` lists only the returned rows, and
+`affectsOtherCount` says how many further items it would have named; a caveat's
+code, severity and text are not changed. In a product catalogue
+(`describe_coverage` with `datasetId: inflation-products`, and the published
+catalogue that embeds it) a series omits `yearsByMeasure` and `periodsByMeasure`
+when every measure has the same span as the series' `years` and `periods`;
+absent means the same as `years`/`periods`.
+
 The endpoint reads no database and fetches no document at request time. It
 answers from the snapshot bundled into the deployment, so it keeps working
 if the database is unavailable. Operating limits, the pause switch, and the

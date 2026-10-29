@@ -24,6 +24,8 @@ const caveat = z
     methodologyRef: z.string(),
     methodologyRefEn: z.string().min(1),
     affects: z.array(z.string()),
+    /** Rankings only: items `affects` would have listed had it not been narrowed to the returned rows. */
+    affectsOtherCount: z.number().int().optional(),
   })
   .loose();
 
@@ -72,6 +74,8 @@ const responseSource = z
     /** Values shared by every document below; a field absent from a document is given here. */
     documentDefaults: responseDocument.pick({ publisher: true, publisherKa: true, publisherEn: true, attribution: true, attributionKa: true, attributionEn: true, licenceId: true, mediaType: true, retrievedAt: true, datasetId: true, role: true }).optional(),
     documents: z.array(responseDocument),
+    /** Rankings only: ids of documents that fixed the order but whose rows are not shown; resolve with get_sources. */
+    inputDocumentIds: z.array(z.string()).optional(),
   })
   .loose();
 

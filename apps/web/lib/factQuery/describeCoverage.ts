@@ -680,8 +680,28 @@ function baseSeriesForDataset(snapshot: FactQuerySnapshot, datasetId: DatasetId,
     case "inflation":
       return inflationCatalogueSeries(snapshot, cityScope);
     case "inflation-products":
-      return inflationProductCatalogue(snapshot);
+      return inflationProductCatalogue(snapshot).map(withoutRepeatedMeasureSpans);
   }
+}
+
+/**
+ * A product states its span once as `years`/`periods` and again per measure.
+ * Where every legal measure has exactly that span, the per-measure copies say
+ * nothing new and were 46% of this catalogue's size, so they are left out:
+ * absent means the same as `years`/`periods`. They stay whenever any measure
+ * differs, or has no span at all, because there absent would misstate it.
+ */
+function withoutRepeatedMeasureSpans<T extends BaseSeriesEntry>(entry: T): T {
+  const measures: readonly string[] = entry.measures ?? [];
+  const same = (left: unknown, right: unknown) => JSON.stringify(left) === JSON.stringify(right);
+  const { yearsByMeasure, periodsByMeasure, ...rest } = entry;
+  const repeatsYears = yearsByMeasure !== undefined && measures.length > 0 && measures.every((measure) => same(yearsByMeasure[measure], entry.years));
+  const repeatsPeriods = periodsByMeasure !== undefined && entry.periods !== undefined && measures.length > 0 && measures.every((measure) => same(periodsByMeasure[measure], entry.periods));
+  return {
+    ...rest,
+    ...(yearsByMeasure !== undefined && !repeatsYears ? { yearsByMeasure } : {}),
+    ...(periodsByMeasure !== undefined && !repeatsPeriods ? { periodsByMeasure } : {}),
+  } as T;
 }
 
 /**

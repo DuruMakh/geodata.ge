@@ -91,6 +91,11 @@ export type Caveat = {
   methodologyRef: string;
   methodologyRefEn: string;
   affects: string[];
+  /**
+   * Rankings only: how many further items `affects` would have listed, had it not
+   * been narrowed to the rows the ranking returns. Absent when nothing was dropped.
+   */
+  affectsOtherCount?: number;
 };
 
 export type Coverage = {
@@ -197,6 +202,12 @@ export type ResponseSource = Omit<ResolvedSource, "documents"> & {
    */
   documentDefaults?: DocumentDefaults;
   documents: ResponseDocument[];
+  /**
+   * Rankings only: documents the ranking read to establish its order but whose
+   * rows it does not show, named by id. Resolve them with get_sources. Together
+   * with `documents` this is every document the ranking cited.
+   */
+  inputDocumentIds?: string[];
 };
 
 export type ResolvedSource = {

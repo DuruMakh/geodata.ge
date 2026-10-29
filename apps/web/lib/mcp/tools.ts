@@ -153,7 +153,8 @@ export const TOOLS: readonly ToolDefinition[] = [
       "it belongs to, so you can find an id before you know where it lives. A search answers with the matches and " +
       "the datasets they belong to, not the whole catalogue. Use one meaningful keyword; if a phrase returns no matches, " +
       "try the principal word or browse the named dataset. A failed phrase match is not proof that the data is absent. Georgian case endings " +
-      "are handled: `ბათუმის` finds `ბათუმი`. Never guess a series or entity id; take it from here.",
+      "are handled: `ბათუმის` finds `ბათუმი`. Never guess a series or entity id; take it from here. " +
+      "A product series omits yearsByMeasure and periodsByMeasure when they are the same as its years and periods.",
     schema: describeCoverageInput,
     run: (snapshot, input) => describeCoverage(snapshot, input),
   },
@@ -245,7 +246,8 @@ export const TOOLS: readonly ToolDefinition[] = [
       "level division or subgroup (optionally parentSeriesId), and period with metric value or fromPeriod and toPeriod with percentage_point_change. " +
       "For inflation cities: dimension entities, entityType city, one seriesId, and the same period fields. " +
       "For inflation-products: dimension series, metric value, period, and yoy_pct or cumulative_pct (the latter requires startYear and states its previous-December base). " +
-      "All current products are candidates; incomplete histories are explicitly excluded. No product entity/region/parent/level filters or change-ranking metrics.",
+      "All current products are candidates; incomplete histories are explicitly excluded. No product entity/region/parent/level filters or change-ranking metrics. " +
+      "Sources give full records for the returned rows; other documents read to fix the order are listed by id in inputDocumentIds (resolve with get_sources).",
     schema: rankInput,
     run: (snapshot, input) => rank(snapshot, input),
   },

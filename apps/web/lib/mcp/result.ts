@@ -257,6 +257,9 @@ function sourceLines(source: ResponseSource | ResolvedSource): string[] {
       const { documentId, titleKa, titleEn, title, years, officialUrl, archiveUrl, documentLanguage, ...metadata } = document;
       return line(documentId, titleKa, titleEn, title, years.join(","), officialUrl, archiveUrl, documentLanguage, JSON.stringify(metadata));
     }),
+    ...("inputDocumentIds" in source && source.inputDocumentIds !== undefined && source.inputDocumentIds.length > 0
+      ? [`inputs (ids only, used to establish the order; resolve with get_sources): ${source.inputDocumentIds.join(",")}`]
+      : []),
   ];
 }
 
@@ -279,7 +282,7 @@ function evidenceOf(sources: readonly ResponseSource[], caveats: readonly Caveat
     out.push("", "## შენიშვნები / caveats");
     for (const caveat of ordered) {
       out.push(`${caveat.code} (${caveat.severity}): ${caveat.messageKa} | ${caveat.messageEn}`);
-      out.push(`methodology: ${caveat.methodologyRef} | ${caveat.methodologyRefEn}; affects: ${caveat.affects.join(",")}`);
+      out.push(`methodology: ${caveat.methodologyRef} | ${caveat.methodologyRefEn}; affects: ${caveat.affects.join(",")}${caveat.affectsOtherCount === undefined ? "" : ` (+${caveat.affectsOtherCount} not listed; only the returned rows are named)`}`);
     }
   }
 

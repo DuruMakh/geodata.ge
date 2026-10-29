@@ -192,3 +192,28 @@ describe("every tool's structured output matches its declared schema", () => {
     expect(result.structuredContent).toBeUndefined();
   });
 });
+
+describe("ranking provenance fields", () => {
+  const municipalTop5 = () => rank(snapshot, { datasetId: "municipal-expenditure", dimension: "entities", entityType: "municipality", seriesId: "municipal.total", measure: "gel_per_resident", metric: "value", year: 2025, limit: 5 });
+  const productTop5 = () => rank(snapshot, { datasetId: "inflation-products", dimension: "series", measure: "cumulative_pct", metric: "value", period: "2026-09", startYear: 2020, limit: 5 });
+
+  it("declares inputDocumentIds on a source and affectsOtherCount on a caveat, and accepts a real ranking carrying them", () => {
+    const schema = outputSchemaFor("rank");
+    const municipal = municipalTop5();
+    const products = productTop5();
+    expect(municipal.meta.sources.some((source) => (source.inputDocumentIds ?? []).length > 0)).toBe(true);
+    expect(products.meta.caveats.some((caveat) => typeof caveat.affectsOtherCount === "number")).toBe(true);
+    expect(schema.safeParse(municipal).success).toBe(true);
+    expect(schema.safeParse(products).success).toBe(true);
+
+    const bad = structuredClone(municipal);
+    bad.meta.sources[0]!.inputDocumentIds = [1 as unknown as string];
+    expect(schema.safeParse(bad).success).toBe(false);
+  });
+
+  it("says in the text twin which documents are ids only and that caveat lists were narrowed", () => {
+    const municipalText = toolResult(municipalTop5()).content[0]!.text;
+    expect(municipalText).toMatch(/^inputs \(ids only, used to establish the order; resolve with get_sources\): \S+/m);
+    expect(toolResult(productTop5()).content[0]!.text).toMatch(/affects: \S+(,\S+)* \(\+\d+ not listed; only the returned rows are named\)/);
+  });
+});
