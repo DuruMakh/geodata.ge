@@ -71,6 +71,42 @@ for (const { name, path, minYears } of columnCases) {
   });
 }
 
+// Leaving chart mode keeps the table that was hidden in the page: it must still open on the latest year.
+test("the table tab opens a four-series table on the latest year at 390px", async ({ page }) => {
+  await page.goto("/explorer/municipalities/batumi#sel=municipal.total,municipal.education,municipal.social_protection,municipal.economic_affairs");
+  await page.getByRole("button", { name: /^(ცხრილი|Table)$/ }).first().click();
+  const scroller = page.getByTestId("explorer-table");
+  await scroller.scrollIntoViewIfNeeded();
+  await expect(scroller).toHaveAttribute("data-layout", "columns");
+  await expect.poll(() => scroller.evaluate((element) => element.scrollLeft)).toBeGreaterThan(0);
+  const latestVisible = await scroller.evaluate((element) => {
+    const latest = element.querySelector("thead th[data-latest-year]")!.getBoundingClientRect();
+    const frame = element.getBoundingClientRect();
+    return latest.right <= frame.right + 1 && latest.left >= frame.left;
+  });
+  expect(latestVisible).toBe(true);
+});
+
+// A table with up to three series lists years as rows from its first frame, not a frame after the tab press.
+test("the table tab shows the year rows in its first frame at 390px", async ({ page }) => {
+  await page.goto("/explorer/municipalities/batumi");
+  const tab = page.getByRole("button", { name: /^(ცხრილი|Table)$/ }).first();
+  await expect(tab).toBeVisible();
+  // A mutation observer sees the table the moment it enters the page, before the browser paints or a ResizeObserver reports.
+  const firstLayout = await page.evaluate(() => new Promise<string | null>((resolve) => {
+    const observer = new MutationObserver(() => {
+      const table = document.querySelector("[data-testid=explorer-table]");
+      if (!table) return;
+      observer.disconnect();
+      resolve(table.getAttribute("data-layout"));
+    });
+    observer.observe(document.body, { childList: true, subtree: true, attributes: true });
+    const button = [...document.querySelectorAll("button")].find((candidate) => /^(ცხრილი|Table)$/.test(candidate.textContent?.trim() ?? ""));
+    button!.click();
+  }));
+  expect(firstLayout).toBe("rows");
+});
+
 const threeSeries = "#g=fields&m=table&r=2004-2025&sel=expenditure.total%2Cspending.social_protection%2Cspending.infrastructure_regional_development";
 
 // Up to three series list the years as rows, newest first, with no sideways scroll (D5).

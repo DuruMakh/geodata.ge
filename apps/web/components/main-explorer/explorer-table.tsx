@@ -162,7 +162,7 @@ export function ExplorerTable<Row extends ExplorerTableRowLike>({
     const observer = new ResizeObserver(measure);
     observer.observe(element);
     return () => observer.disconnect();
-  }, []);
+  }, [crawlCopy]);
   const seriesRows = showTotal && totalRow ? (totalFirst ? [totalRow, ...rows] : [...rows, totalRow]) : rows;
   const rowsLayout = usesRowsLayout(seriesRows.length, tableWidth);
 
@@ -173,7 +173,7 @@ export function ExplorerTable<Row extends ExplorerTableRowLike>({
     if (!latest) return;
     const offset = latest.getBoundingClientRect().right - scroller.getBoundingClientRect().left + scroller.scrollLeft;
     scroller.scrollLeft = Math.max(0, offset - scroller.clientWidth);
-  }, [firstYear, endYear, years.length, rowsLayout]);
+  }, [firstYear, endYear, years.length, rowsLayout, crawlCopy]);
 
   const statusMarks = (row: Row, year: number): ReactNode => (
     <>
