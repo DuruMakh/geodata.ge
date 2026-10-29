@@ -11,6 +11,9 @@ const PAGES = [
   { path: "/en/explorer/education/schools/khashuri", tab: "chart-mode-table", panel: "chart-panel", figure: null },
   { path: "/explorer/health/pensions/khashuri", tab: "chart-mode-table", panel: "chart-panel", figure: null },
   { path: "/explorer/municipalities/khashuri", tab: "municipal-mode-table", panel: null, figure: null },
+  { path: "/en/explorer/unemployment/regions/imereti", tab: "chart-mode-table", panel: "chart-panel", figure: "20.9" },
+  { path: "/explorer/money/regions/imereti", tab: "chart-mode-table", panel: "chart-panel", figure: null },
+  { path: "/explorer/economy/regions/imereti", tab: "regional-mode-table", panel: "regional-chart-panel", figure: null },
 ] as const;
 
 for (const { path, tab, panel, figure } of PAGES) {
