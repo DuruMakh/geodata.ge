@@ -218,32 +218,36 @@ export function DebtExplorerSurface(props: DebtExplorerSurfaceProps) {
                   {message(messages, "main.noRangeData")}
                 </Callout>
               </div>
-            ) : props.chartMode === "table" ? (
-              <ExplorerTable
-                caption={message(messages, "debt.caption", { family: message(messages, FAMILY_LABEL[props.family]), start: props.range.start, end: props.range.end })}
-                rows={model.tableRows.filter((row) => row.itemId !== totalItemId)}
-                totalRow={model.totalRow}
-                showTotal={Boolean(totalItemId && props.selectedIds.includes(totalItemId))}
-                years={model.years}
-                firstColumnLabel={message(messages, "controls.seriesColumn")}
-                unit={unit}
-                share={isPercent}
-                showChangeColumn={false}
-                forecastYears={forecastYears}
-                forecastLabel={message(messages, "debt.forecast")}
-                {...(props.family === "rate"
-                  ? { shareDecimalsForRow: (row: { itemId: string }, year: number) => rateDecimals(row.itemId, year) }
-                  : {})}
-                shareValueForYear={(row, year) => props.family === "rate"
-                  ? row.valuesByYear[year] === null || row.valuesByYear[year] === undefined
-                    ? null
-                    : row.valuesByYear[year]! / 100
-                  : row.shareByYear?.[year] ?? null}
-              />
             ) : (
-              <div className="mt-5">
-                {chart}
-              </div>
+              <>
+                <ExplorerTable
+                  caption={message(messages, "debt.caption", { family: message(messages, FAMILY_LABEL[props.family]), start: props.range.start, end: props.range.end })}
+                  rows={model.tableRows.filter((row) => row.itemId !== totalItemId)}
+                  totalRow={model.totalRow}
+                  showTotal={Boolean(totalItemId && props.selectedIds.includes(totalItemId))}
+                  years={model.years}
+                  firstColumnLabel={message(messages, "controls.seriesColumn")}
+                  unit={unit}
+                  share={isPercent}
+                  showChangeColumn={false}
+                  forecastYears={forecastYears}
+                  forecastLabel={message(messages, "debt.forecast")}
+                  {...(props.family === "rate"
+                    ? { shareDecimalsForRow: (row: { itemId: string }, year: number) => rateDecimals(row.itemId, year) }
+                    : {})}
+                  shareValueForYear={(row, year) => props.family === "rate"
+                    ? row.valuesByYear[year] === null || row.valuesByYear[year] === undefined
+                      ? null
+                      : row.valuesByYear[year]! / 100
+                    : row.shareByYear?.[year] ?? null}
+                  crawlCopy={props.chartMode === "line"}
+                />
+                {props.chartMode === "line" ? (
+                  <div className="mt-5">
+                    {chart}
+                  </div>
+                ) : null}
+              </>
             )}
             <ChartSelectionAids
               series={chartSeries}

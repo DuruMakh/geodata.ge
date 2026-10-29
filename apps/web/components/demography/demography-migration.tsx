@@ -159,6 +159,25 @@ export function MigrationExplorer({
     />
   ) : undefined;
 
+  // The yearly table; in chart mode it is rendered hidden so crawlers read its numbers.
+  const table = (crawlCopy: boolean) => (
+    <ExplorerTable
+      caption={t("migrationTableCaption", { direction: direction(state.direction), start: model.range.start, end })}
+      rows={tableRows}
+      totalRow={totalRow}
+      showTotal={totalRow !== null}
+      wrapRowLabels
+      rowLabelsLocalized
+      years={model.years}
+      firstColumnLabel={t("citizenshipHeader")}
+      unit={UNIT_PERSONS}
+      share={false}
+      showChangeColumn={false}
+      shareValueForYear={() => null}
+      crawlCopy={crawlCopy}
+    />
+  );
+
   return (
     <div data-testid="migration-explorer" className="@container">
       <ExplorerWorkspace>
@@ -177,6 +196,7 @@ export function MigrationExplorer({
               <div className="mt-5"><Callout testId="no-selection-callout">{t("migrationEmpty")}</Callout></div>
             ) : state.mode === "line" ? (
               <div className="mt-5">
+                {table(true)}
                 <p className="mb-2 text-[11px] text-[var(--muted)]">{t("chartUnit")}</p>
                 {chart}
               </div>
@@ -189,20 +209,7 @@ export function MigrationExplorer({
                   options={MIGRATION_DIRECTIONS.map((id) => ({ value: id, label: direction(id), testId: `migration-direction-${id}` }))}
                 />
                 <div className="mt-4">
-                  <ExplorerTable
-                    caption={t("migrationTableCaption", { direction: direction(state.direction), start: model.range.start, end })}
-                    rows={tableRows}
-                    totalRow={totalRow}
-                    showTotal={totalRow !== null}
-                    wrapRowLabels
-                    rowLabelsLocalized
-                    years={model.years}
-                    firstColumnLabel={t("citizenshipHeader")}
-                    unit={UNIT_PERSONS}
-                    share={false}
-                    showChangeColumn={false}
-                    shareValueForYear={() => null}
-                  />
+                  {table(false)}
                 </div>
               </div>
             )}

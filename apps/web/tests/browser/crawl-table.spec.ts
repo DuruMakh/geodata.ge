@@ -14,6 +14,8 @@ const PAGES = [
   { path: "/en/explorer/unemployment/regions/imereti", tab: "chart-mode-table", panel: "chart-panel", figure: "20.9" },
   { path: "/explorer/money/regions/imereti", tab: "chart-mode-table", panel: "chart-panel", figure: null },
   { path: "/explorer/economy/regions/imereti", tab: "regional-mode-table", panel: "regional-chart-panel", figure: null },
+  { path: "/explorer/expenditure", tab: "chart-mode-table", panel: "chart-panel", figure: null },
+  { path: "/en/explorer/trade/partners", tab: "chart-mode-table", panel: "chart-panel", figure: null },
 ] as const;
 
 for (const { path, tab, panel, figure } of PAGES) {

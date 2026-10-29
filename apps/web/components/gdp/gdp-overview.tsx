@@ -215,25 +215,23 @@ export function GdpOverview({
           ) : null}
         </div>
         <div className="mt-5">
-          {state.mode === "line" ? (
-            chart
-          ) : (
-            <ExplorerTable
-              caption={`${d.label} · ${d.fullUnitLabel}`}
-              rows={[row]}
-              totalRow={null}
-              showTotal={false}
-              years={m.years}
-              firstColumnLabel={t("indicator")}
-              unit={d.unit}
-              share={d.growth}
-              showChangeColumn={false}
-              preliminaryYears={m.preliminaryYears}
-              preliminaryLabel={t("preliminary")}
-              rowLabelsLocalized
-              shareValueForYear={(r, y) => r.valuesByYear[y] ?? null}
-            />
-          )}
+          <ExplorerTable
+            caption={`${d.label} · ${d.fullUnitLabel}`}
+            rows={[row]}
+            totalRow={null}
+            showTotal={false}
+            years={m.years}
+            firstColumnLabel={t("indicator")}
+            unit={d.unit}
+            share={d.growth}
+            showChangeColumn={false}
+            preliminaryYears={m.preliminaryYears}
+            preliminaryLabel={t("preliminary")}
+            rowLabelsLocalized
+            shareValueForYear={(r, y) => r.valuesByYear[y] ?? null}
+            crawlCopy={state.mode === "line"}
+          />
+          {state.mode === "line" ? chart : null}
         </div>
         <RangeStrip
           years={m.availableYears}

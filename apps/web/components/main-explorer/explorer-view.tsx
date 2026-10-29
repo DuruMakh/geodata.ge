@@ -158,21 +158,25 @@ export function ExplorerView({
                   {message(messages, "main.noRangeData")}
                 </Callout>
               </div>
-            ) : chartMode === "table" ? (
-              <ExplorerTable
-                caption={message(messages, "main.tableCaption", { coverage: coverageLabel, measure: message(messages, share ? "main.shareGdp" : scope === "revenue" ? "main.revenueGel" : "main.expenditureGel"), startYear: range.start, endYear: range.end })}
-                rows={model.tableRows.filter((row) => row.level !== "total")}
-                totalRow={model.totalRow}
-                showTotal={Boolean(model.totalRow && selectedIds.includes(model.totalRow.itemId))}
-                years={model.years}
-                firstColumnLabel={message(messages, FIRST_COL_LABEL[scope])}
-                unit={unit}
-                share={share}
-                showChangeColumn={false}
-                shareValueForYear={(row, year) => row.shareByYear?.[year] ?? null}
-              />
             ) : (
-              <div className="mt-5">{chart}</div>
+              <>
+                <ExplorerTable
+                  caption={message(messages, "main.tableCaption", { coverage: coverageLabel, measure: message(messages, share ? "main.shareGdp" : scope === "revenue" ? "main.revenueGel" : "main.expenditureGel"), startYear: range.start, endYear: range.end })}
+                  rows={model.tableRows.filter((row) => row.level !== "total")}
+                  totalRow={model.totalRow}
+                  showTotal={Boolean(model.totalRow && selectedIds.includes(model.totalRow.itemId))}
+                  years={model.years}
+                  firstColumnLabel={message(messages, FIRST_COL_LABEL[scope])}
+                  unit={unit}
+                  share={share}
+                  showChangeColumn={false}
+                  shareValueForYear={(row, year) => row.shareByYear?.[year] ?? null}
+                  crawlCopy={chartMode === "line"}
+                />
+                {chartMode === "line" ? (
+                  <div className="mt-5">{chart}</div>
+                ) : null}
+              </>
             )}
             <ChartSelectionAids series={series} chartShown={chartMode === "line"} share={share} unit={unit} />
 
