@@ -8,21 +8,38 @@ const georgia = { itemId: "country.georgia", kaLabel: "საქართვე�
 const adjara = { itemId: "region.adjara", kaLabel: "აჭარა", color: "#B3402A", valuesByYear: { 2024: 354_000, 2025: 413_214 }, change: 0.17 };
 const imereti = { itemId: "region.imereti", kaLabel: "იმერეთი", color: "#2F5D8A", valuesByYear: { 2024: 470_000, 2025: 460_000 }, change: -0.02 };
 
-const html = renderGeorgianMarkup(
-  <ExplorerTable
-    caption="მოსახლეობა"
-    rows={[adjara, imereti]}
-    totalRow={georgia}
-    showTotal
-    years={[2024, 2025]}
-    firstColumnLabel="ტერიტორია"
-    unit={UNIT_PERSONS}
-    share={false}
-    shareColumnLabel="წილი"
-    rowLabelsLocalized
-    shareValueForYear={() => 0.1}
-  />,
-);
+const sameProps = {
+  caption: "მოსახლეობა",
+  rows: [adjara, imereti],
+  totalRow: georgia,
+  showTotal: true,
+  years: [2024, 2025],
+  firstColumnLabel: "ტერიტორია",
+  unit: UNIT_PERSONS,
+  share: false,
+  shareColumnLabel: "წილი",
+  rowLabelsLocalized: true,
+  shareValueForYear: () => 0.1,
+};
+
+const html = renderGeorgianMarkup(<ExplorerTable {...sameProps} />);
+
+describe("ExplorerTable crawl copy", () => {
+  const crawl = renderGeorgianMarkup(<ExplorerTable {...sameProps} crawlCopy />);
+  it("is hidden by a stylesheet class only", () => {
+    expect(crawl).toMatch(/<div class="[^"]*\bhidden\b[^"]*"/);
+    expect(crawl).not.toMatch(/\shidden(=|\s|>)/);
+    expect(crawl).not.toMatch(/<div[^>]*aria-hidden/);
+    expect(crawl).not.toMatch(/style="[^"]*display/);
+  });
+  it("keeps every figure and a test id of its own", () => {
+    expect(crawl).toContain('data-testid="explorer-table-crawl"');
+    expect(crawl).not.toContain('data-testid="explorer-table"');
+    expect(crawl).not.toContain("tabindex");
+    for (const year of ["2024", "2025"]) expect(crawl).toContain(`>${year}<`);
+  });
+  it("leaves the visible table unchanged", () => expect(renderGeorgianMarkup(<ExplorerTable {...sameProps} />)).toBe(html));
+});
 
 describe("ExplorerTable year-columns layout", () => {
   it("column headers carry scope=col and row labels are th scope=row", () => {

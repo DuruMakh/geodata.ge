@@ -51,6 +51,8 @@ type ExplorerTableProps<Row extends ExplorerTableRowLike> = {
   shareDecimalsForRow?: (row: Row, year: number) => number;
   /** A row's own number of decimals, for tables whose rows are published at different precisions; omit to use `unit.decimals`. */
   decimalsForRow?: (row: Row) => number;
+  /** A copy for search engines and AI crawlers: hidden from visitors by a stylesheet class only, with its own test id and no keyboard stop. */
+  crawlCopy?: boolean;
 };
 
 const headCellClass =
@@ -119,6 +121,7 @@ export function ExplorerTable<Row extends ExplorerTableRowLike>({
   percentDecimals = 1,
   shareDecimalsForRow,
   decimalsForRow,
+  crawlCopy = false,
 }: ExplorerTableProps<Row>) {
   const { locale, messages, englishLabels } = useI18n();
   const rowLabel = (row: Row) => (rowLabelsLocalized ? row.kaLabel : publicLabel(locale, row.itemId, row.kaLabel, englishLabels));
@@ -181,6 +184,9 @@ export function ExplorerTable<Row extends ExplorerTableRowLike>({
     </>
   );
 
+  const containerClass = crawlCopy ? "@container mt-[18px] hidden" : "@container mt-[18px]";
+  const scrollerTestId = crawlCopy ? "explorer-table-crawl" : "explorer-table";
+
   if (rowsLayout) {
     const isTotal = (row: Row) => showTotal && row === totalRow;
     const summaryRows = [
@@ -192,8 +198,8 @@ export function ExplorerTable<Row extends ExplorerTableRowLike>({
         : []),
     ];
     return (
-      <div ref={containerRef} className="@container mt-[18px]">
-        <div ref={scrollerRef} data-testid="explorer-table" data-layout="rows" role="region" aria-label={caption} className="overflow-x-auto">
+      <div ref={containerRef} className={containerClass}>
+        <div ref={scrollerRef} data-testid={scrollerTestId} data-layout="rows" role="region" aria-label={caption} className="overflow-x-auto">
           <table className="w-full table-fixed border-collapse">
             <caption className="sr-only">{caption}</caption>
             <colgroup>
@@ -297,13 +303,13 @@ export function ExplorerTable<Row extends ExplorerTableRowLike>({
   ) : null;
 
   return (
-    <div ref={containerRef} className="@container mt-[18px]">
+    <div ref={containerRef} className={containerClass}>
       <div
         ref={scrollerRef}
-        data-testid="explorer-table"
+        data-testid={scrollerTestId}
         data-layout="columns"
         role="region"
-        tabIndex={0}
+        tabIndex={crawlCopy ? undefined : 0}
         aria-label={message(messages, "controls.tableScrollable")}
         className="overflow-x-auto focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
       >
