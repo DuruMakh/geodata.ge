@@ -258,7 +258,7 @@ function sourceLines(source: ResponseSource | ResolvedSource): string[] {
       return line(documentId, titleKa, titleEn, title, years.join(","), officialUrl, archiveUrl, documentLanguage, JSON.stringify(metadata));
     }),
     ...("inputDocumentIds" in source && source.inputDocumentIds !== undefined && source.inputDocumentIds.length > 0
-      ? [`inputs (ids only, used to establish the order; resolve with get_sources): ${source.inputDocumentIds.join(",")}`]
+      ? [`inputs (ids only, used to establish the order; call get_sources with this sourceId, narrowed with years/entityIds): ${source.inputDocumentIds.join(",")}`]
       : []),
   ];
 }

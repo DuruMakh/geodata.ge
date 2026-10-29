@@ -1,5 +1,8 @@
+import { readFileSync } from "node:fs";
+import path from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { createCounter } from "../../lib/mcp/limits";
+import { TOOLS } from "../../lib/mcp/tools";
 
 afterEach(() => { vi.unstubAllEnvs(); vi.unstubAllGlobals(); });
 function configure() {
@@ -114,6 +117,28 @@ describe("the daily usage tally", () => {
     vi.stubGlobal("fetch", fetcher);
     await createCounter().record("2026-10-29", field);
     expect(fetcher).toHaveBeenCalledTimes(1);
+  });
+
+  // The route labels a call by a TOOLS name, a protocol method or a fixed fallback; a label the
+  // pattern refuses would drop that tool out of the tally without a sound.
+  it("accepts a field for every tool name, protocol method and fallback label the route can write", async () => {
+    const route = readFileSync(path.join(process.cwd(), "app", "mcp", "route.ts"), "utf8");
+    const methods = [...(/const PROTOCOL_METHODS = new Set\(\[([^\]]*)\]\)/.exec(route)?.[1] ?? "").matchAll(/"([^"]+)"/g)].map((match) => match[1]!);
+    expect(methods).toContain("tools/call");
+    const labels = [...TOOLS.map((tool) => tool.name), ...methods, "unknown_tool", "unknown_method", "unparsed"];
+    configure();
+    const fetcher = vi.fn().mockImplementation(() => Promise.resolve(Response.json({ result: 1 })));
+    vi.stubGlobal("fetch", fetcher);
+    for (const label of labels) await createCounter().record("2026-10-29", `${label}|error|rate_limited|key_day|anthropic`);
+    expect(fetcher.mock.calls.map((call) => JSON.parse(call[1].body)[4].split("|")[0])).toEqual(labels);
+  });
+
+  it("releases the response body of a tally write", async () => {
+    configure();
+    const response = Response.json({ result: 1 });
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(response));
+    await createCounter().record("2026-10-29", "ping|ok|-|-|other");
+    expect(response.bodyUsed).toBe(true);
   });
 
   it("is a harmless no-op on the in-process counter and when no limiter is configured", async () => {

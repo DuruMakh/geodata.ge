@@ -74,7 +74,7 @@ const responseSource = z
     /** Values shared by every document below; a field absent from a document is given here. */
     documentDefaults: responseDocument.pick({ publisher: true, publisherKa: true, publisherEn: true, attribution: true, attributionKa: true, attributionEn: true, licenceId: true, mediaType: true, retrievedAt: true, datasetId: true, role: true }).optional(),
     documents: z.array(responseDocument),
-    /** Rankings only: ids of documents that fixed the order but whose rows are not shown; resolve with get_sources. */
+    /** Rankings only: ids of documents that fixed the order but whose rows are not shown; call get_sources with this sourceId (narrow with years/entityIds). */
     inputDocumentIds: z.array(z.string()).optional(),
   })
   .loose();

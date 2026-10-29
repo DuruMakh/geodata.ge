@@ -213,7 +213,7 @@ describe("ranking provenance fields", () => {
 
   it("says in the text twin which documents are ids only and that caveat lists were narrowed", () => {
     const municipalText = toolResult(municipalTop5()).content[0]!.text;
-    expect(municipalText).toMatch(/^inputs \(ids only, used to establish the order; resolve with get_sources\): \S+/m);
+    expect(municipalText).toMatch(/^inputs \(ids only, used to establish the order; call get_sources with this sourceId, narrowed with years\/entityIds\): \S+/m);
     expect(toolResult(productTop5()).content[0]!.text).toMatch(/affects: \S+(,\S+)* \(\+\d+ not listed; only the returned rows are named\)/);
   });
 });

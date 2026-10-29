@@ -690,7 +690,7 @@ function baseSeriesForDataset(snapshot: FactQuerySnapshot, datasetId: DatasetId,
 /**
  * A product states its span once as `years`/`periods` and again per measure.
  * Where every legal measure has exactly that span, the per-measure copies say
- * nothing new and were 46% of this catalogue's size, so they are left out:
+ * nothing new and were about 35% of this catalogue's bytes, so they are left out:
  * absent means the same as `years`/`periods`. They stay whenever any measure
  * differs, or has no span at all, because there absent would misstate it.
  */

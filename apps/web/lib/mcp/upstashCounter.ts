@@ -70,13 +70,15 @@ export function upstashCounter(): Counter {
     async record(day, field) {
       if (!configured || !DAY_PATTERN.test(day) || !FIELD_PATTERN.test(field)) return;
       try {
-        await fetch(url!, {
+        const response = await fetch(url!, {
           method: "POST",
           headers: { authorization: `Bearer ${token}`, "content-type": "application/json" },
           body: JSON.stringify(["EVAL", RECORD, 1, `${namespace}:mcp:stats:${day}`, field, STATS_EXPIRY_SECONDS]),
           cache: "no-store",
           signal: AbortSignal.timeout(1500),
         });
+        // Nothing in the reply is read; release it so the connection is not held open.
+        await response.body?.cancel();
       } catch { /* A lost tally is not worth a log line or a retry. */ }
     },
   };

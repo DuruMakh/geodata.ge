@@ -1,4 +1,4 @@
-import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 
 // A counter that records which keys it is asked about, in order, so the
 // SEQUENCE of the limit checks becomes observable.
@@ -226,6 +226,11 @@ describe("the daily usage tally", () => {
       body: JSON.stringify(body),
     });
   }
+  // vi.spyOn hands back the file's one stdout spy, so a capture would outlive its test and parse the
+  // next test's output; each test ends on the file's silent default again.
+  afterEach(() => {
+    vi.spyOn(process.stdout, "write").mockImplementation(() => true);
+  });
   function captureLogs(): Record<string, unknown>[] {
     const written: Record<string, unknown>[] = [];
     vi.spyOn(process.stdout, "write").mockImplementation((chunk: unknown) => {

@@ -248,7 +248,7 @@ export const TOOLS: readonly ToolDefinition[] = [
       "For inflation cities: dimension entities, entityType city, one seriesId, and the same period fields. " +
       "For inflation-products: dimension series, metric value, period, and yoy_pct or cumulative_pct (the latter requires startYear and states its previous-December base). " +
       "All current products are candidates; incomplete histories are explicitly excluded. No product entity/region/parent/level filters or change-ranking metrics. " +
-      "Sources give full records for the returned rows; other documents read to fix the order are listed by id in inputDocumentIds (resolve with get_sources).",
+      "Sources give full records for the returned rows; other documents read to fix the order are listed by id in inputDocumentIds; to read them, call get_sources with that source's sourceId (narrow with years/entityIds).",
     schema: rankInput,
     run: (snapshot, input) => rank(snapshot, input),
   },

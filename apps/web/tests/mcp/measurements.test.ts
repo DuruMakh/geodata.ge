@@ -144,8 +144,10 @@ describe("packaged MCP measurement CLI", () => {
 // completeBytes. Measured in-process before the change (this snapshot):
 // municipal top-5 103,092 B, product top-5 35,049 B (structuredContent 18,490 B),
 // inflation-products catalogue 469,421 B (469,567 B over HTTP, which adds the
-// JSON-RPC envelope). After: 26,125 B, 18,821 B (structuredContent 10,048 B) and
-// 307,753 B.
+// JSON-RPC envelope; structuredContent 224,652 B). After: 26,125 B (26,167 B once
+// the text twin says how to call get_sources for the inputs), 18,857 B
+// (structuredContent 10,048 B) and 307,789 B (structuredContent 146,774 B), with a
+// 40-character releaseCommit; this file's releaseCommit "test" makes each 36 B smaller.
 describe("heavy answers stay light", () => {
   const wire = (response: ReturnType<typeof rank>) => Buffer.byteLength(JSON.stringify(toolResult(response)), "utf8");
   const structured = (response: ReturnType<typeof rank>) => Buffer.byteLength(JSON.stringify(toolResult(response).structuredContent), "utf8");
@@ -174,5 +176,6 @@ describe("heavy answers stay light", () => {
     const result = describeCoverage(snapshot, { datasetId: "inflation-products" });
     expect(result.kind).toBe("catalogue");
     expect(wire(result)).toBeLessThanOrEqual(469_567 * (2 / 3));
+    expect(structured(result)).toBeLessThanOrEqual(224_652 * (2 / 3));
   });
 });
