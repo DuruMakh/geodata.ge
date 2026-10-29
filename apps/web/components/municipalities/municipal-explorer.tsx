@@ -319,9 +319,9 @@ function MunicipalExplorerContent(props: MunicipalExplorerProps) {
               <div className="mt-5">
                 <Callout testId="no-selection-callout">{message(messages, "municipal.noSelection")}</Callout>
               </div>
-            ) : state.chartMode === "line" ? (
-              chart
             ) : (
+              <>
+              {/* The crawl copy comes first: the phone legend is the element right after the chart's wrapper (globals.css). */}
               <ExplorerTable
                 caption={message(messages, state.share ? "municipal.tableCaptionShare" : "municipal.tableCaptionAmount", { name: props.triggerLabel, start: state.range.start, end: state.range.end })}
                 rows={model.rows.filter((row) => state.selectedIds.includes(row.itemId))}
@@ -333,7 +333,10 @@ function MunicipalExplorerContent(props: MunicipalExplorerProps) {
                 share={state.share}
                 shareColumnLabel={message(messages, "municipal.share")}
                 shareValueForYear={(row, year) => municipalShareValueForYear(model, row, year)}
+                crawlCopy={state.chartMode === "line"}
               />
+              {state.chartMode === "line" ? chart : null}
+              </>
             )}
             <ChartSelectionAids
               series={series}

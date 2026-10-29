@@ -157,9 +157,9 @@ export function PopulationPlaceExplorer({
                 <div className="mt-5"><Callout testId="no-selection-callout">{message(messages, "main.noSelection")}</Callout></div>
               ) : !model.hasData ? (
                 <div className="mt-5"><Callout testId="no-range-data-callout">{message(messages, "main.noRangeData")}</Callout></div>
-              ) : state.chartMode === "line" ? (
-                chart
               ) : (
+                <>
+                {/* The crawl copy comes first: the phone legend is the element right after the chart's wrapper (globals.css). */}
                 <ExplorerTable
                   // The census re-base sentence is the note right under the chart panel, not repeated here (U26-12).
                   caption={`${t("tableCaption")} · ${model.range.start}–${model.range.end}`}
@@ -177,7 +177,10 @@ export function PopulationPlaceExplorer({
                   breakYears={[CENSUS_STEP.toYear]}
                   breakLabel={breakLabel}
                   shareValueForYear={() => null}
+                  crawlCopy={state.chartMode === "line"}
                 />
+                {state.chartMode === "line" ? chart : null}
+                </>
               )}
               <ChartSelectionAids
                 series={model.series}
