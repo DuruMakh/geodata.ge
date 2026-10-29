@@ -53,3 +53,74 @@ describe("production shared counter", () => {
     expect(fetcher).not.toHaveBeenCalled();
   });
 });
+
+describe("the daily usage tally", () => {
+  it("sends one EVAL that counts the field and sets a 100-day expiry on the first count", async () => {
+    configure();
+    const fetcher = vi.fn().mockResolvedValue(Response.json({ result: 1 }));
+    vi.stubGlobal("fetch", fetcher);
+
+    await createCounter().record("2026-10-29", "tools/list|ok|-|-|anthropic");
+
+    expect(fetcher).toHaveBeenCalledTimes(1);
+    const command = JSON.parse(fetcher.mock.calls[0][1].body);
+    expect(command[0]).toBe("EVAL");
+    expect(command[1]).toContain("HINCRBY");
+    expect(command[1]).toMatch(/== 1 then[^\n]*EXPIRE/);
+    expect(command.slice(2)).toEqual([1, "production:mcp:stats:2026-10-29", "tools/list|ok|-|-|anthropic", 8_640_000]);
+    expect(fetcher.mock.calls[0][1].signal).toBeInstanceOf(AbortSignal);
+  });
+
+  it("uses the preview namespace outside production", async () => {
+    configure();
+    vi.stubEnv("VERCEL_ENV", "preview");
+    const fetcher = vi.fn().mockResolvedValue(Response.json({ result: 1 }));
+    vi.stubGlobal("fetch", fetcher);
+
+    await createCounter().record("2026-10-29", "ping|ok|-|-|other");
+
+    expect(JSON.parse(fetcher.mock.calls[0][1].body)[3]).toBe("preview:mcp:stats:2026-10-29");
+  });
+
+  it("never throws, whatever the service does", async () => {
+    configure();
+    vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new Error("network secret detail")));
+    await expect(createCounter().record("2026-10-29", "ping|ok|-|-|other")).resolves.toBeUndefined();
+
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response("nope", { status: 500 })));
+    await expect(createCounter().record("2026-10-29", "ping|ok|-|-|other")).resolves.toBeUndefined();
+  });
+
+  it("sends nothing without HTTPS credentials, and refuses a day or field outside the expected shape", async () => {
+    configure();
+    const fetcher = vi.fn();
+    vi.stubGlobal("fetch", fetcher);
+    await createCounter().record("today", "ping|ok|-|-|other");
+    await createCounter().record("2026-10-29", "ping|ok|-|-|203.0.113.7 evil");
+    vi.stubEnv("KV_REST_API_URL", "http://counter.upstash.io");
+    await createCounter().record("2026-10-29", "ping|ok|-|-|other");
+    expect(fetcher).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    "query_inflation_products|error|unsupported_comparison|-|other",
+    "notifications/initialized|ok|-|-|unkeyed",
+    "unknown_method|error|protocol_error|-|anthropic",
+    "initialize|error|rate_limited|key_day|anthropic",
+    "tools/call|error|service_unavailable|-|other",
+  ])("accepts the field %s", async (field) => {
+    configure();
+    const fetcher = vi.fn().mockResolvedValue(Response.json({ result: 1 }));
+    vi.stubGlobal("fetch", fetcher);
+    await createCounter().record("2026-10-29", field);
+    expect(fetcher).toHaveBeenCalledTimes(1);
+  });
+
+  it("is a harmless no-op on the in-process counter and when no limiter is configured", async () => {
+    vi.stubEnv("MCP_RATE_LIMITER", "memory");
+    await expect(createCounter().record("2026-10-29", "ping|ok|-|-|other")).resolves.toBeUndefined();
+    vi.stubEnv("MCP_RATE_LIMITER", "");
+    await expect(createCounter().record("2026-10-29", "ping|ok|-|-|other")).resolves.toBeUndefined();
+  });
+});
+

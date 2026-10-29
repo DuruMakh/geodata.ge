@@ -11,7 +11,22 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from "vites
 // offering no protection at all, because the very requests it denied were the
 // ones doing the spending.
 type Verdict = "allow" | "deny" | "unavailable";
-const state = vi.hoisted(() => ({ hits: [] as string[], calls: [] as { key: string; windowSeconds: number; max: number }[], perKeyVerdict: "allow" as Verdict, perKeyDailyVerdict: "allow" as Verdict, dailyVerdict: "allow" as Verdict }));
+const state = vi.hoisted(() => ({
+  hits: [] as string[],
+  calls: [] as { key: string; windowSeconds: number; max: number }[],
+  records: [] as { day: string; field: string }[],
+  record: undefined as undefined | ((day: string, field: string) => Promise<void>),
+  perKeyVerdict: "allow" as Verdict,
+  perKeyDailyVerdict: "allow" as Verdict,
+  dailyVerdict: "allow" as Verdict,
+}));
+
+// Route tests run outside a request scope, where the real `after` throws. Run
+// the callback at once and do not wait for it, which is what a request does.
+vi.mock("next/server", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("next/server")>()),
+  after: (callback: () => unknown) => { void callback(); },
+}));
 
 vi.mock("../../lib/mcp/limits", async (importOriginal) => {
   const actual = await importOriginal<typeof import("../../lib/mcp/limits")>();
@@ -23,6 +38,10 @@ vi.mock("../../lib/mcp/limits", async (importOriginal) => {
         state.calls.push({ key, windowSeconds, max });
         if (key.startsWith("mcp:rate:")) return Promise.resolve(state.perKeyVerdict);
         return Promise.resolve(key.startsWith("mcp:keyday:") ? state.perKeyDailyVerdict : state.dailyVerdict);
+      },
+      record: (day: string, field: string) => {
+        state.records.push({ day, field });
+        return state.record?.(day, field) ?? Promise.resolve();
       },
     }),
   };
@@ -47,6 +66,8 @@ afterAll(() => {
 beforeEach(() => {
   state.hits.length = 0;
   state.calls.length = 0;
+  state.records.length = 0;
+  state.record = undefined;
   state.perKeyVerdict = "allow";
   state.perKeyDailyVerdict = "allow";
   state.dailyVerdict = "allow";
@@ -190,5 +211,127 @@ describe("the order the request limits are charged in", () => {
 
     expect(state.hits[0]).not.toContain("203.0.113.7");
     expect(state.hits[0]).toMatch(/^mcp:rate:[0-9a-f]{32}$/);
+  });
+});
+
+// The anonymous daily tally (F04 Stage 1). It only records after the response;
+// it never decides admission, and nothing it writes identifies a caller.
+describe("the daily usage tally", () => {
+  const TODAY = new Date().toISOString().slice(0, 10);
+  const tools = (name: string, args: unknown = {}): Record<string, unknown> => ({ jsonrpc: "2.0", id: 5, method: "tools/call", params: { name, arguments: args } });
+  function callOf(body: unknown, headers: Record<string, string> = {}): Request {
+    return new Request(ENDPOINT, {
+      method: "POST",
+      headers: { "content-type": "application/json", accept: "application/json, text/event-stream", host: "fiscal.ge", "mcp-protocol-version": "2025-11-25", ...headers },
+      body: JSON.stringify(body),
+    });
+  }
+  function captureLogs(): Record<string, unknown>[] {
+    const written: Record<string, unknown>[] = [];
+    vi.spyOn(process.stdout, "write").mockImplementation((chunk: unknown) => {
+      written.push(JSON.parse(String(chunk)) as Record<string, unknown>);
+      return true;
+    });
+    return written;
+  }
+
+  it("records one anonymous field per counted request, under today's UTC day", async () => {
+    await POST(post({ "x-vercel-forwarded-for": "160.79.104.9" }));
+
+    expect(state.records).toEqual([{ day: TODAY, field: "initialize|ok|-|-|anthropic" }]);
+  });
+
+  it.each([
+    ["key_day", { perKeyDailyVerdict: "deny" }, "initialize|error|rate_limited|key_day|other"],
+    ["global", { dailyVerdict: "deny" }, "initialize|error|rate_limited|global|other"],
+  ] as const)("records which limit refused a request (%s) and logs it", async (limit, verdicts, field) => {
+    Object.assign(state, verdicts);
+    const logs = captureLogs();
+
+    const response = await POST(post({ "x-vercel-forwarded-for": "203.0.113.7" }));
+
+    expect(response.status).toBe(429);
+    expect(state.records).toEqual([{ day: TODAY, field }]);
+    expect(logs.at(-1)).toMatchObject({ errorCode: "rate_limited", limit, clientClass: "other" });
+  });
+
+  it("logs the minute limit but does not tally it, so a flood of retries costs no extra commands", async () => {
+    state.perKeyVerdict = "deny";
+    const logs = captureLogs();
+
+    const response = await POST(post({ "x-vercel-forwarded-for": "203.0.113.7" }));
+
+    expect(response.status).toBe(429);
+    expect(logs.at(-1)).toMatchObject({ errorCode: "rate_limited", limit: "minute", clientClass: "other" });
+    expect(state.records).toEqual([]);
+  });
+
+  it("tallies an unidentifiable caller as unkeyed", async () => {
+    await POST(post());
+
+    expect(state.records[0]!.field).toMatch(/\|unkeyed$/);
+  });
+
+  it("tallies nothing for a request refused before the limiter ran", async () => {
+    await POST(callOf({ jsonrpc: "2.0", id: 1, method: "ping" }, { origin: "https://evil.example" }));
+    await POST(new Request(ENDPOINT, { method: "POST", headers: { host: "fiscal.ge" }, body: "{not json" }));
+
+    expect(state.records).toEqual([]);
+  });
+
+  it("maps a caller-supplied tool name to the fixed labels, never quoting it", async () => {
+    const injected = "totally-made-up-".repeat(10);
+    await POST(callOf(tools(injected, { secret: "khulo-budget" })));
+    await POST(callOf({ jsonrpc: "2.0", id: 6, method: "nonsense/method", params: {} }));
+    await POST(callOf(tools("describe_coverage")));
+
+    const fields = state.records.map((record) => record.field);
+    expect(fields).toHaveLength(3);
+    expect(fields[0]).toMatch(/^unknown_tool\|/);
+    expect(fields[1]).toMatch(/^unknown_method\|/);
+    expect(fields[2]).toMatch(/^describe_coverage\|ok\|-\|-\|unkeyed$/);
+    for (const field of fields) expect(field).toMatch(/^[a-z_/]+\|(ok|error)\|[a-z_-]+\|[a-z_-]+\|(anthropic|other|unkeyed)$/);
+    expect(JSON.stringify(state.records)).not.toMatch(/totally-made-up|khulo|nonsense/);
+  });
+
+  it("carries neither an address nor a hash in a log line or a tally field", async () => {
+    const logs = captureLogs();
+    state.perKeyDailyVerdict = "deny";
+
+    await POST(post({ "x-vercel-forwarded-for": "203.0.113.7" }));
+
+    const key = state.hits[0]!.slice("mcp:rate:".length);
+    const everything = JSON.stringify([logs, state.records]);
+    expect(everything).not.toContain("203.0.113.7");
+    expect(everything).not.toContain(key);
+    expect(everything).not.toMatch(/[0-9a-f]{16}/);
+  });
+
+  it("leaves the response and its timing unchanged when the tally throws", async () => {
+    state.record = () => { throw new Error("boom"); };
+
+    const response = await POST(post({ "x-vercel-forwarded-for": "203.0.113.7" }));
+
+    expect(response.status).toBe(200);
+    expect(state.records).toHaveLength(1);
+  });
+
+  it("leaves the response and its timing unchanged when the tally rejects", async () => {
+    state.record = () => Promise.reject(new Error("boom"));
+
+    const response = await POST(post({ "x-vercel-forwarded-for": "203.0.113.7" }));
+
+    expect(response.status).toBe(200);
+  });
+
+  it("does not wait for a tally that hangs for two seconds", async () => {
+    state.record = () => new Promise<void>((resolve) => setTimeout(resolve, 2_000));
+    const startedAt = Date.now();
+
+    const response = await POST(post({ "x-vercel-forwarded-for": "203.0.113.7" }));
+
+    expect(response.status).toBe(200);
+    expect(Date.now() - startedAt).toBeLessThan(1_000);
+    expect(state.records).toHaveLength(1);
   });
 });

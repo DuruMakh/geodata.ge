@@ -13,6 +13,7 @@
     "build": "next build",
     "postbuild": "npm run check:function-size",
     "check:function-size": "tsx scripts/check-function-size.ts",
+    "mcp:usage": "tsx scripts/mcp-usage.ts",
     "start": "next start",
     "lint": "eslint --max-warnings 0",
     "typecheck": "next typegen && tsc --noEmit",

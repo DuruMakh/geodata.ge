@@ -558,16 +558,54 @@ The free service has its own monthly quota (500,000 commands at setup).
 [Upstash counts EVAL and its nested Redis commands](https://upstash.com/docs/redis/sdks/ratelimit-ts/costs):
 the current successful request uses six for the minute bucket and three for each
 of the two daily buckets (a daily key's expiry is set once, by the first hit of
-the day), twelve in all. That allows roughly 41,000 accepted requests per month
-before other usage. Refused requests also consume commands: about four for a
-minute refusal, eight for a per-client daily refusal and eleven for a global
-daily refusal, which passes both per-client checks first. The
+the day), twelve in all, plus two for the usage tally (below), fourteen in all.
+That allows roughly 35,700 accepted requests per month (500,000 / 14) before
+other usage; it was about 41,000 at twelve. Refused requests also consume
+commands: about four for a minute refusal (which is not tallied), ten for a
+per-client daily refusal (eight plus the tally's two) and thirteen for a global
+daily refusal (eleven plus two), which passes both per-client checks first. The
 10,000/day application ceiling is not guaranteed sustainable daily capacity on
 the free plan. It does
 not guarantee continuous availability under an attack or sustained maximum
 traffic. Provider quota exhaustion pauses MCP through the same fail-closed 503;
 static pages and bulk files continue working. Review usage before changing the
 free plan. Upgrading or enabling automatic upgrades needs explicit approval.
+
+#### Usage tally and which limit refused
+
+After each response, `handle` adds one to an anonymous daily tally in Upstash
+(`after()` from `next/server`, so it adds no latency; it never decides
+admission, a failed or slow write is dropped, and it gives up after 1.5 s). The
+key is `<production|preview>:mcp:stats:<YYYY-MM-DD>`, a hash whose field is
+`tool|outcome|errorCode|limit|clientClass`, counted with `HINCRBY` and given a
+100-day expiry (8,640,000 s) when a field is first created. For example
+`query_national|ok|-|-|anthropic` or `initialize|error|rate_limited|key_day|anthropic`.
+
+- `tool` is the fixed label from `toolNameOf` (a known tool or protocol method,
+  else `unknown_tool` or `unknown_method`); `outcome` is `ok` or `error`;
+  `errorCode` is the bounded log code or `-`; `limit` is `minute`, `key_day` or
+  `global` on a 429 and `-` otherwise.
+- `clientClass` is `anthropic` when the trusted platform address is inside
+  `160.79.104.0/21` (Anthropic's published egress range, vendored in
+  `lib/mcp/providerRanges.ts` with its source; nothing is fetched), `other` for
+  any other readable or unreadable address, `unkeyed` when there is none. It is
+  a three-word class of traffic, never an identity.
+- Counted: every request that reached the limiter, except a per-minute refusal
+  (so a flood of retries cannot spend commands on bookkeeping). A request
+  refused earlier (paused, bad host or origin, oversized or unreadable body) is
+  not counted. The tally costs two commands (`EVAL` and `HINCRBY`), three for the
+  first count of a field each day, which is a few hundred times a day at most. The
+  hash holds well under 1,000 fields a day, a few megabytes in 100 days against
+  the 250 MB allowance.
+- Read it with `npm run mcp:usage -- --days 7` (add `--namespace preview` for
+  previews). The script reads one hash per day (one command each) with the
+  integration's read-only token and needs `KV_REST_API_URL` and
+  `KV_REST_API_READ_ONLY_TOKEN` in the environment; without them it stops with a
+  message and reads nothing. Or run `HGETALL production:mcp:stats:<date>` in the
+  Upstash console.
+- **Decision trigger:** any non-zero `rate_limited|key_day|anthropic` count means
+  Claude.ai traffic reached the per-address daily cap. Send it to the owner for
+  the Stage 2 decision in the F04 review; do not change a limit on your own.
 
 ### Other operating limits
 
@@ -698,13 +736,18 @@ establish assistant acceptance, and no acceptance prompts have been run by Task 
 ### Logs and privacy
 
 Application logs use the allowlist in `lib/mcp/log.ts`: tool, data version,
-response bytes, duration, outcome, and bounded error code. HTTP 200 tool errors
+response bytes, duration, outcome, bounded error code, and for a request that
+reached the limiter the coarse `clientClass` (`anthropic`, `other` or `unkeyed`)
+and, on a 429, which `limit` refused it (`minute`, `key_day` or `global`). HTTP 200 tool errors
 are logged as failures. Early refusals are counted too. Unknown caller-provided
 tool and method names are recorded as fixed unknown labels, never echoed.
 
 Do not log raw prompts, request bodies, invalid parameter strings, credentials,
 addresses, or provider error text. The temporary hashed counter key is not an
-application log field. The operating target is **14 days of detailed allowlisted
+application log field. The anonymous daily tally in Upstash (see "Usage tally and
+which limit refused") holds the same fixed vocabulary and nothing else: no
+address, hash, query text, id or argument; it is counted per UTC day and expires
+after 100 days. The operating target is **14 days of detailed allowlisted
 application events and 90 days of aggregates**. Vercel/Upstash infrastructure logs are separate;
 do not claim providers never process request addresses.
 
