@@ -28,11 +28,21 @@ retain the archived byte sizes and hashes.
 No language input is needed. Existing valid requests continue to work; catalogue
 search accepts either language. Schema 1.7.0 adds the optional `searchMatch` field
 (`all_words` or `some_words`) to catalogue searches, which match whole words and
-Georgian stems rather than letters inside a word. A search without `datasetId` also
-returns the optional `websitePages` (at most five, with `websitePagesNoteKa` and
-`websitePagesNoteEn`) when the website's own page search finds a Fiscal.ge page whose
-figures this service does not serve: names and links in both languages, never a value.
-`status` still describes the served series and entities only. Schema 1.6.0 added `internal_error` and the
+Georgian stems rather than letters inside a word. A `some_words` answer also carries
+`searchMatchNoteKa` and `searchMatchNoteEn`: only some words matched, the entries may be
+about something else, and if none fits the data is not served here. A search without
+`datasetId` also returns the optional `websitePages` (at most five, with
+`websitePagesNoteKa` and `websitePagesNoteEn`) for Fiscal.ge pages whose figures this
+service does not serve: names and links in both languages, never a value. A page is
+linked only when every word of the search is a whole word of its names, topic or extra
+words, and an id-like search links none; when a `some_words` answer links no page for
+the whole search, each word that no served entry meets looks for its own page.
+`status` still describes the served series and entities only. A top-N ranking gives full
+source records for the returned rows and names the other documents read to fix the order
+by id in `inputDocumentIds`, resolved with `get_sources` and that source's `sourceId`; a
+ranking caveat's `affects` lists the returned rows only, with `affectsOtherCount` for the
+rest. Product catalogue series omit `yearsByMeasure` and `periodsByMeasure` when they equal
+`years` and `periods`; absent means the same. Schema 1.6.0 added `internal_error` and the
 `preserved_derived` source narrowing outcome, retaining the current-product
 dataset, annual/cumulative query and optional `calculationBasePeriod`. Strict
 clients caching output enums must refresh discovery; clients rejecting additive
@@ -42,6 +52,13 @@ Responses are not byte-identical to older schemas. The unchanged 512 KiB complet
 limit counts both structured and text output; a source-heavy request can now
 require fewer sources. `result_too_large` preserves narrower-query and shared
 bulk-manifest guidance. No evidence is silently removed to make an answer fit.
+
+Human sentences name measures and filters in words: definitions, ranking definitions,
+universe descriptions and the municipal total basis say "GEL per resident", not
+`gel_per_resident`, and name a region or parent by its label, not by an id such as
+`region.adjara`. The words come from reviewed service messages (`measures.*`,
+`metrics.*`, `municipalTotalMeasures.*`). Machine fields keep their codes: ids, `measure`,
+`valueDefinitionId` and every other field a client filters on are unchanged.
 
 City-scoped inflation discovery uses the existing city vocabulary and reviewed
 city facts: headline annual, monthly and twelve-month average rates, plus annual

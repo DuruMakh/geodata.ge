@@ -27,8 +27,15 @@ with row count, bytes and SHA-256; the manifest itself is one additional artifac
 not one of its listed files. Derive changing inventories from these owners rather
 than retaining old fixed counts. Requests do not gain a language argument.
 Schema 1.7.0 adds the optional `searchMatch` field (`all_words` or `some_words`) to
-catalogue searches, which now match whole words and Georgian stems; a search without
-`datasetId` may also carry the optional `websitePages` links to website-only pages. Schema 1.6.0 added
+catalogue searches, which now match whole words and Georgian stems, with
+`searchMatchNoteKa`/`searchMatchNoteEn` when only some words matched; a search without
+`datasetId` may also carry the optional `websitePages` links to website-only pages, with
+`websitePagesNoteKa`/`websitePagesNoteEn`. A top-N ranking names the documents read only to
+fix the order by id in `inputDocumentIds` (call `get_sources` with that source's
+`sourceId`), and a ranking caveat's `affects` lists the returned rows only, with
+`affectsOtherCount` for the rest. Product catalogue series omit `yearsByMeasure` and
+`periodsByMeasure` when they equal `years` and `periods` (absent means the same), in `/mcp`
+and in the published `inflation-products.json` and `catalogue.json`. Schema 1.6.0 added
 `internal_error` and the `preserved_derived` source narrowing outcome. Strict clients
 caching output enums must refresh discovery; clients requiring schema 1.6.0 must
 update their validation. Request shapes stay unchanged.
