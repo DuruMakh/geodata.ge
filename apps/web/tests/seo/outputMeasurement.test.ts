@@ -2,7 +2,7 @@ import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { afterEach, describe, expect, test } from "vitest";
-import { measureSeoOutput } from "../../scripts/measure-seo-output";
+import { AUDITED_ROUTES, measureSeoOutput } from "../../scripts/measure-seo-output";
 
 const fixtures: string[] = [];
 
@@ -39,5 +39,28 @@ describe("measureSeoOutput", () => {
         fontPreloadBytes: 30,
       },
     ]);
+  });
+
+  test("audits the pages that carry a crawl copy of their yearly table", () => {
+    const fixtureRoot = mkdtempSync(path.join(tmpdir(), "seo-output-"));
+    fixtures.push(fixtureRoot);
+
+    for (const route of AUDITED_ROUTES) {
+      const file = path.join(fixtureRoot, ".next", "server", "app", route.replace(/^\/+/, ""));
+      mkdirSync(path.dirname(file), { recursive: true });
+      writeFileSync(`${file}.html`, "<html></html>");
+      writeFileSync(`${file}.rsc`, "r");
+    }
+
+    const measured = measureSeoOutput(fixtureRoot).map((row) => row.route);
+
+    expect(measured).toEqual([...AUDITED_ROUTES]);
+    expect(measured).toEqual(
+      expect.arrayContaining([
+        "/explorer/municipalities/georgia",
+        "/en/explorer/trade/partners",
+        "/explorer/demography/population/khashuri",
+      ]),
+    );
   });
 });

@@ -5,6 +5,9 @@ export const AUDITED_ROUTES = [
   "/explorer/expenditure",
   "/explorer/municipalities",
   "/explorer/analysis",
+  "/explorer/municipalities/georgia",
+  "/en/explorer/trade/partners",
+  "/explorer/demography/population/khashuri",
 ] as const;
 
 export type SeoOutputMeasurement = {
