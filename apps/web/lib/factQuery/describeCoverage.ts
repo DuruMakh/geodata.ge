@@ -107,6 +107,9 @@ export type CoverageData = {
   exclusions: { entityId: string; reason: string; reasonEn: string }[];
   /** Present whenever `search` was given: whether every word of it matched an entry, or only some words did. */
   searchMatch?: "all_words" | "some_words";
+  /** Only with `searchMatch: "some_words"`: these entries may be about another subject, and when none fits the data is not served here. */
+  searchMatchNoteKa?: string;
+  searchMatchNoteEn?: string;
   /** Only on a search without `datasetId`: Fiscal.ge pages that show the topic but whose figures are not served here, best first, at most five. */
   websitePages?: {
     topicId: string; labelKa: string; labelEn: string; topicLabelKa: string; topicLabelEn: string; urlKa: string; urlEn: string;
@@ -843,6 +846,9 @@ function wordMatches(queryWord: string, fieldWord: string): boolean {
   return singular(queryWord) === singular(fieldWord);
 }
 
+/** A folded query with a "." or "_" looks like an id ("revenue.vat", "57_11"). */
+const looksLikeId = (folded: string) => /[._]/.test(folded);
+
 /** A query that looks like an id ("revenue.vat", "57_11") also names it: the whole id, its beginning, or a segment after a ".". */
 function idMatches(query: string, field: string): boolean {
   const id = fold(field);
@@ -859,18 +865,20 @@ function idMatches(query: string, field: string): boolean {
  * region's entitySlug) are skipped, which is what makes "for municipalities"
  * (the brief's search contract) fall out of the data instead of needing a
  * special case. Pass every entry the response may hold at once: the all/some
- * choice is made once, not per dataset.
+ * choice is made once, not per dataset. `aliases: false` reads a whole-query
+ * alias as the word it is, for entries that are not series (website pages).
  */
 export function searchCatalogue<T>(
   query: string,
   entries: T[],
   fields: (entry: T) => (string | null)[],
+  { aliases = true }: { aliases?: boolean } = {},
 ): { matches: T[]; searchMatch: "all_words" | "some_words" } {
   const folded = fold(query.trim());
-  const needle = Object.hasOwn(SEARCH_ALIASES, folded) ? SEARCH_ALIASES[folded]! : folded;
+  const needle = aliases && Object.hasOwn(SEARCH_ALIASES, folded) ? SEARCH_ALIASES[folded]! : folded;
   const allWords = searchWords(needle);
   const queryWords = allWords.some((word) => !JOINING_WORDS.has(word)) ? allWords.filter((word) => !JOINING_WORDS.has(word)) : allWords;
-  const idQuery = /[._]/.test(needle);
+  const idQuery = looksLikeId(needle);
 
   const rows = entries.map((entry) => {
     const present = fields(entry).filter((field): field is string => field !== null);
@@ -911,6 +919,29 @@ function searchSeriesAndEntities<S extends SeriesEntry, E extends EntityEntry>(s
     entities: matches.filter((entry): entry is E => !("seriesId" in entry)),
     searchMatch,
   };
+}
+
+/**
+ * The pages, best first by the website's own search, that show `search`'s subject. The website's search matches
+ * inside a word from three letters and retries a Latin query on the Georgian keyboard, which linked "ICT" to
+ * convictions and "port" to transport, so a page is kept only when the catalogue's own matcher finds every word of
+ * the search in its names, topic or extra words. A search that looks like an id names a series, not a page.
+ */
+function websitePagesFor(snapshot: FactQuerySnapshot, search: string): WebsitePage[] {
+  if (looksLikeId(fold(search.trim()))) return [];
+  return (searchExplorer(search, "en", snapshot.website.pages, [], null)?.groups ?? [])
+    .flatMap((group) => group.rows.map(({ page }) => page as WebsitePage))
+    .filter((page) => {
+      const found = searchCatalogue(search, [page], (entry) => [entry.name.ka, entry.name.en, entry.topicName.ka, entry.topicName.en, entry.words], { aliases: false });
+      return found.searchMatch === "all_words" && found.matches.length > 0;
+    });
+}
+
+/** The note every some-words answer carries: its entries may be about something else. */
+function someWordsNote(snapshot: FactQuerySnapshot, searchMatch: "all_words" | "some_words") {
+  return searchMatch === "some_words"
+    ? { searchMatchNoteKa: serviceMessage(snapshot, "ka", "catalogue.someWords"), searchMatchNoteEn: serviceMessage(snapshot, "en", "catalogue.someWords") }
+    : {};
 }
 
 function errorResponse(snapshot: FactQuerySnapshot, error: FactQueryError): FactQueryResponse {
@@ -1020,15 +1051,22 @@ export function describeCoverage(snapshot: FactQuerySnapshot, rawInput: unknown)
     // matches belong to and any excluded code it names, not the whole
     // catalogue, which the no-argument call already returns.
     const matchedDatasets = new Set<DatasetId>([...foundSeries, ...foundEntities].map((entry) => entry.datasetId));
-    // The website's own page search, unchanged, over the pages this service does not serve: a topic the site shows and the
-    // catalogue does not hold gets a link to its page instead of a dead end. Links only; the status stays the series' own.
-    const websitePages = (searchExplorer(search, "en", snapshot.website.pages, [], null)?.groups ?? [])
-      .flatMap((group) => group.rows)
+    // The website's pages that this service does not serve: a topic the site shows and the catalogue does not hold gets
+    // a link to its page instead of a dead end. Links only; the status stays the series' own. When a some-words answer
+    // links no page for the whole search, each word no served entry meets looks for its own, so "poverty rate", whose
+    // "rate" finds debt rates, still links the poverty page; "money supply", which has its page, gains no other money page.
+    const servesNothing = (word: string) => {
+      const found = searchSeriesAndEntities(word, taggedSeries, taggedEntities);
+      return found.series.length === 0 && found.entities.length === 0;
+    };
+    const wholePages = websitePagesFor(snapshot, search);
+    const wordPages = searchMatch === "some_words" && wholePages.length === 0
+      ? searchWords(search).filter((word) => word.length >= 3 && !JOINING_WORDS.has(word) && servesNothing(word)).flatMap((word) => websitePagesFor(snapshot, word))
+      : [];
+    const pagesByUrl = new Map([...wholePages, ...wordPages].map((page) => [page.urlKa, page]));
+    const websitePages = [...pagesByUrl.values()]
       .slice(0, WEBSITE_PAGES_LIMIT)
-      .map(({ page }) => {
-        const { urlKa, urlEn } = page as WebsitePage;
-        return { topicId: page.topic, labelKa: page.name.ka, labelEn: page.name.en, topicLabelKa: page.topicName.ka, topicLabelEn: page.topicName.en, urlKa, urlEn };
-      });
+      .map((page) => ({ topicId: page.topic, labelKa: page.name.ka, labelEn: page.name.en, topicLabelKa: page.topicName.ka, topicLabelEn: page.topicName.en, urlKa: page.urlKa, urlEn: page.urlEn }));
     return {
       kind: "catalogue",
       status: foundSeries.length === 0 && foundEntities.length === 0 ? "empty" : "ok",
@@ -1039,6 +1077,7 @@ export function describeCoverage(snapshot: FactQuerySnapshot, rawInput: unknown)
         // A code names an exclusion exactly ("05"), never by a letter inside it.
         exclusions: exclusions.filter((exclusion) => exclusion.entityId === fold(search!.trim())),
         searchMatch,
+        ...someWordsNote(snapshot, searchMatch),
         ...(websitePages.length > 0
           ? {
             websitePages,
@@ -1067,7 +1106,7 @@ export function describeCoverage(snapshot: FactQuerySnapshot, rawInput: unknown)
   return {
     kind: "catalogue",
     status: isEmpty ? "empty" : "ok",
-    data: { datasets, series, ...(entities !== undefined ? { entities } : {}), exclusions, ...(searched !== undefined ? { searchMatch: searched.searchMatch } : {}) },
+    data: { datasets, series, ...(entities !== undefined ? { entities } : {}), exclusions, ...(searched !== undefined ? { searchMatch: searched.searchMatch, ...someWordsNote(snapshot, searched.searchMatch) } : {}) },
     meta,
   };
 }

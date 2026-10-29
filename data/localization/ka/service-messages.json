@@ -32,6 +32,7 @@
   "ranking.inflationSubgroupsWithinParent": "COICOP ქვეჯგუფები განყოფილებაში „{parentLabel}“.",
   "ranking.valueDefinitionPeriod": "დალაგება მაჩვენებლით: {measure}, {period}, {order}.",
   "catalogue.websitePages": "ეს Fiscal.ge-ის გვერდები აჩვენებს ამ თემას, მაგრამ მათ მაჩვენებლებს ეს კავშირი არ გასცემს. მიაწოდეთ მომხმარებელს ბმული მისი ენის მიხედვით და ამ თემაზე რიცხვი არ დაასახელოთ.",
+  "catalogue.someWords": "ამ ძიების მხოლოდ ზოგიერთი სიტყვა დაემთხვა, ამიტომ ეს ჩანაწერები შესაძლოა სხვა თემას ეხებოდეს. თუ არცერთი არ შეესაბამება, ამ მონაცემებს ეს კავშირი არ გასცემს; websitePages, თუ მოცემულია, მათ Fiscal.ge-ზე აჩვენებს.",
   "measures.amount_gel": "თანხა ლარში",
   "measures.share_of_total_pct": "პროცენტული წილი ჯამში",
   "measures.share_of_gdp_pct": "პროცენტული წილი მშპ-ში",

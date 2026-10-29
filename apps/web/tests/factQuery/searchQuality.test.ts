@@ -10,6 +10,8 @@ import { describeCoverage } from "../../lib/factQuery/describeCoverage";
 import { stem } from "../../lib/explorer/search/georgian";
 import type { FactQuerySnapshot } from "../../lib/factQuery/types";
 import { QUERIES, type SearchQuery } from "./fixtures/searchQueries";
+import { outputSchemaFor } from "../../lib/mcp/outputSchema";
+import { renderText } from "../../lib/mcp/result";
 
 type Hit = { key: string; label: string; fields: (string | null)[] };
 type Found = { status: string; searchMatch?: string; hits: Hit[] };
@@ -168,6 +170,51 @@ describe("catalogue search answers a phrase that no entry matches in full", () =
     const scoped = describeCoverage(snapshot, { datasetId: "government-debt", search: "debt" });
     expect(searchMatchOf(scoped)).toBe("all_words");
     expect(everywhere.searchMatch).toBe("all_words");
+  });
+});
+
+// A some-words answer can be about another subject ("average wage" finds weighted-average debt rates), so it says so,
+// and a word the catalogue does not hold still looks for its own website page (audit F08 section 5.2, F01).
+describe("a some-words answer says that only some words matched", () => {
+  const SOME_WORDS_EN =
+    "Only some words of this search matched, so these entries may be about something else. If none of them fits, this connection does not serve that data; websitePages, when given, show it on Fiscal.ge.";
+  const SOME_WORDS_KA =
+    "ამ ძიების მხოლოდ ზოგიერთი სიტყვა დაემთხვა, ამიტომ ეს ჩანაწერები შესაძლოა სხვა თემას ეხებოდეს. თუ არცერთი არ შეესაბამება, ამ მონაცემებს ეს კავშირი არ გასცემს; websitePages, თუ მოცემულია, მათ Fiscal.ge-ზე აჩვენებს.";
+  type Noted = { searchMatch?: string; searchMatchNoteKa?: string; searchMatchNoteEn?: string; websitePages?: { topicId: string; labelEn: string; urlKa: string }[] };
+  const dataOf = (response: ReturnType<typeof describeCoverage>) => (response as { data: Noted }).data;
+
+  it.each(["poverty rate", "average wage", "საშუალო ხელფასი", "trade balance"])("notes it on %s", (query) => {
+    const response = describeCoverage(snapshot, { search: query });
+    expect(response.status).toBe("ok");
+    expect(dataOf(response).searchMatch).toBe("some_words");
+    expect(dataOf(response).searchMatchNoteEn).toBe(SOME_WORDS_EN);
+    expect(dataOf(response).searchMatchNoteKa).toBe(SOME_WORDS_KA);
+    expect(renderText(response)).toContain(SOME_WORDS_EN);
+  });
+
+  it("notes it inside one dataset too", () => {
+    const found = dataOf(describeCoverage(snapshot, { datasetId: "government-debt", search: "public debt" }));
+    expect(found.searchMatch).toBe("some_words");
+    expect(found.searchMatchNoteEn).toBe(SOME_WORDS_EN);
+  });
+
+  it.each(["income tax", "zzzznotathing"])("adds no note to the all-words answer for %s", (query) => {
+    const found = dataOf(describeCoverage(snapshot, { search: query }));
+    expect(found).not.toHaveProperty("searchMatchNoteEn");
+    expect(found).not.toHaveProperty("searchMatchNoteKa");
+  });
+
+  it("links the poverty page for poverty rate, whose word rate alone matched served series", () => {
+    const poverty = snapshot.website.pages.find((page) => page.name.en === "Poverty")!;
+    const pages = dataOf(describeCoverage(snapshot, { search: "poverty rate" })).websitePages ?? [];
+    expect(pages.map((page) => page.urlKa)).toContain(poverty.urlKa);
+    for (const page of pages) expect(page.topicId).toBe("living-standards");
+  });
+
+  it("validates against the published describe_coverage output schema", () => {
+    for (const query of ["poverty rate", "average wage"]) {
+      expect(outputSchemaFor("describe_coverage").safeParse(describeCoverage(snapshot, { search: query })).success, query).toBe(true);
+    }
   });
 });
 

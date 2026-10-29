@@ -32,6 +32,7 @@
   "ranking.inflationSubgroupsWithinParent": "COICOP subgroups within {parentLabel}.",
   "ranking.valueDefinitionPeriod": "Ranked by {measure} for {period}, {order}.",
   "catalogue.websitePages": "These Fiscal.ge pages show this topic; this connection does not serve their figures. Give the user the link in their language; do not quote a figure for it.",
+  "catalogue.someWords": "Only some words of this search matched, so these entries may be about something else. If none of them fits, this connection does not serve that data; websitePages, when given, show it on Fiscal.ge.",
   "measures.amount_gel": "amount in GEL",
   "measures.share_of_total_pct": "percentage share of the total",
   "measures.share_of_gdp_pct": "percentage share of GDP",

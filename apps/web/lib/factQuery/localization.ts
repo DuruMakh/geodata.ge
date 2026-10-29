@@ -20,6 +20,7 @@ export const SERVICE_MESSAGE_KEYS = [
   "missing.inflationProductAnnual",
   "missing.inflationProductMonthlyInput",
   "catalogue.websitePages",
+  "catalogue.someWords",
   "measures.amount_gel",
   "measures.share_of_total_pct",
   "measures.share_of_gdp_pct",

@@ -153,7 +153,8 @@ export const TOOLS: readonly ToolDefinition[] = [
       "it belongs to, so you can find an id before you know where it lives. A search answers with the matches and " +
       "the datasets they belong to, not the whole catalogue. Use one meaningful keyword; if a phrase returns no matches, " +
       "try the principal word or browse the named dataset. A failed phrase match is not proof that the data is absent. Georgian case endings " +
-      "are handled: `ბათუმის` finds `ბათუმი`. Never guess a series or entity id; take it from here. " +
+      "are handled: `ბათუმის` finds `ბათუმი`. searchMatch some_words means no entry has every word: the matches may be about " +
+      "something else, and if none fits the data is not served here. Never guess a series or entity id; take it from here. " +
       "A product series omits yearsByMeasure and periodsByMeasure when they are the same as its years and periods.",
     schema: describeCoverageInput,
     run: (snapshot, input) => describeCoverage(snapshot, input),

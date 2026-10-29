@@ -348,6 +348,24 @@ describe("search points to website pages the connection does not serve", () => {
     expect(urls).toContain("https://fiscal.ge/explorer/health/pensions");
   });
 
+  // The website's own search matches inside words from three letters and retries a Latin query on the Georgian
+  // keyboard; a page is linked only when the catalogue's whole-word matcher finds every word in it.
+  it.each(["ice", "art", "rent", "port", "sector.f"])("links no page that %s meets only inside a word or as an id", (search) => {
+    expect(data(describeCoverage(snapshot, { search }))).not.toHaveProperty("websitePages");
+  });
+
+  it("links no page of another topic for ICT", () => {
+    for (const page of data(describeCoverage(snapshot, { search: "ICT" })).websitePages ?? []) expect(page.topicId).toBe("internet");
+  });
+
+  it.each(["unemployment", "უმუშევრობა"])("still answers %s with the unemployment overview first", (search) => {
+    const overview = topicHub("unemployment").sections[0]!.href;
+    const pages = data(describeCoverage(snapshot, { search })).websitePages ?? [];
+    expect(pages[0]?.urlKa).toBe(`https://fiscal.ge${overview}`);
+    expect(pages[0]?.urlEn).toBe(`https://fiscal.ge/en${overview}`);
+    for (const page of pages) expect(page.topicId).toBe("unemployment");
+  });
+
   it("adds nothing when the search matches no website page", () => {
     const found = data(describeCoverage(snapshot, { search: "zzzznotathing" }));
     expect(found).not.toHaveProperty("websitePages");
