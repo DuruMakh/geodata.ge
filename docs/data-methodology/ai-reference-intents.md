@@ -15,7 +15,7 @@ an external assistant's language understanding.
 
 No reference intent requests a real GDP overview series, so `gdp_world_bank_preliminary_basis` does not appear in the 48-intent fixture. A future intent that asks for `real_usd_2015` or `real_growth_percent` in a Geostat-preliminary year must expect it.
 
-**Questions and responses are bilingual; the current data schema is 1.6.0.** Reviewed Georgian and
+**Questions and responses are bilingual; the current data schema is 1.7.0.** Reviewed Georgian and
 English labels, definitions, missingness, comparisons, ranking explanations and
 source descriptions travel with the same figures. Clients use the appropriate
 `*Ka`/`*En` fields. The existing numerical, source and comparability expectations

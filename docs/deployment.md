@@ -20,16 +20,18 @@ The two social images at `/opengraph-image` and `/en/opengraph-image` use explic
 are generated at build time. All human pages remain prerendered and `/mcp` remains
 the sole request-time route.
 
-Data schema **1.6.0** includes current-product inflation and reviewed language
+Data schema **1.7.0** includes current-product inflation and reviewed language
 companions. The authoritative tool inventory is `tools/list`; dataset families
 and coverage are in `catalogue.json`. `manifest.json` lists every publication
 with row count, bytes and SHA-256; the manifest itself is one additional artifact,
 not one of its listed files. Derive changing inventories from these owners rather
 than retaining old fixed counts. Requests do not gain a language argument.
-Schema 1.6.0 adds `internal_error` and the `preserved_derived` source narrowing
-outcome. Strict clients caching output enums must refresh discovery; clients
-requiring schema 1.5.0 must update their validation. Request shapes stay unchanged.
-Clients must accept additive fields and data schema 1.6.0; byte-identical response
+Schema 1.7.0 adds the optional `searchMatch` field (`all_words` or `some_words`) to
+catalogue searches, which now match whole words and Georgian stems. Schema 1.6.0 added
+`internal_error` and the `preserved_derived` source narrowing outcome. Strict clients
+caching output enums must refresh discovery; clients requiring schema 1.6.0 must
+update their validation. Request shapes stay unchanged.
+Clients must accept additive fields and data schema 1.7.0; byte-identical response
 compatibility is not promised. Transport revisions are a separate contract:
 modern `2026-07-28` and preserved legacy `2025-11-25` share the endpoint.
 Translation changes alter `dataVersion`. Retain the existing body, cell, pair,
@@ -480,7 +482,7 @@ and publications remain static. The endpoint exposes the read-only tools listed
 by `tools/list` through pinned server SDK 2.2.0. Stateless Streamable HTTP supports
 modern `2026-07-28` discovery and per-request metadata, and preserved legacy
 `2025-11-25` initialization. Both return finite JSON responses; neither creates
-sessions or subscriptions. GET and DELETE remain 405. The data schema is 1.6.0,
+sessions or subscriptions. GET and DELETE remain 405. The data schema is 1.7.0,
 independent of either protocol revision.
 The legacy adapter also retains `2025-06-18`, `2025-03-26`, `2024-11-05` and
 `2024-10-07`; the modern era is never proposed during legacy initialization.
@@ -784,7 +786,7 @@ actual alert/recovery delivery must be demonstrated before operations is verifie
 From `apps/web`, use an explicit target and independently reviewed release identity:
 
 ```text
-npx tsx scripts/smoke-mcp.ts --url <target-mcp-url> --expected-schema 1.6.0 --expected-data-version <reviewed-sha256> --output <existing-output-directory/report.json>
+npx tsx scripts/smoke-mcp.ts --url <target-mcp-url> --expected-schema 1.7.0 --expected-data-version <reviewed-sha256> --output <existing-output-directory/report.json>
 ```
 
 The operator command has no production default, authentication input, new secret
