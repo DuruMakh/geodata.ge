@@ -21,11 +21,11 @@
 
 Read each one's §5 ("Recommended fix") and §7 ("How to verify") before starting its task. The owner-facing report is https://claude.ai/artifact/F4nhFwAGLgHfzCqDp6AC7A. The reviewers' probe scripts are in `/mnt/project-files/mcp-audit/scripts/` (project files, not the repository).
 
-**Status:** Plan only, written 2026-10-29. Execution needs the owner's go-ahead. Task 5 step A also needs owner decision D1 (below).
+**Status:** Plan only, written 2026-10-29. Execution needs the owner's go-ahead. D1 approved by the owner on 2026-10-29 (21:42 Tbilisi).
 
 ## Owner decisions
 
-- **D1 (Task 5, step A): rankings attach full records only for the documents behind the rows shown.** The other inputs stay listed by ID. This reverses the recorded rule at `rank.ts:548-552`, which is pinned by `tests/factQuery/meta.test.ts:90`. If declined, skip Task 5 step A and still do steps B and C.
+- **D1 (Task 5, step A): rankings attach full records only for the documents behind the rows shown.** The other inputs stay listed by ID. This reverses the recorded rule at `rank.ts:548-552`, which is pinned by `tests/factQuery/meta.test.ts:90`. **Approved 2026-10-29.**
 - **Not in this plan:**
   - Fix 11 (more topics in MCP) is a scope decision under `Project_Definition.md` §2 and needs its own brainstorm and spec.
   - Two-way search aliases (F08 §5.3) would extend the reviewed alias list, which spec §33 reserves to the owner.
@@ -290,7 +290,7 @@ git commit -m "fix(mcp): say measures and filters in words, not internal codes"
   - Response source `inputDocumentIds?: string[]`. These are ids only, resolvable with `get_sources`.
   - Caveat `affectsOtherCount?: number`.
 
-- [ ] **Step A (needs D1): ranking provenance.**
+- [ ] **Step A (D1, approved): ranking provenance.**
   - **Test first, in `rank.test.ts`.** Cover municipal value, municipal change and product rankings. The union of `documents[].documentId` and `inputDocumentIds` equals today's document set exactly. Every document cited by a returned entry's observation has a full record. Every caveat code is still present. Rewrite `meta.test.ts:90` ("legitimately cites every municipality's workbook") to this rule.
   - **Implement.**
     - Carry `documentIds` on `Candidate`: from `observation.documentIds`, or from the comparison's `from`/`to` `documentIds`.
