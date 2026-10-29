@@ -129,6 +129,7 @@ const dataShapes = {
     })).optional(),
     entities: z.array(z.object({ entityId: z.string(), entityType: z.string(), labelKa: z.string(), labelEn: z.string().min(1), entitySlug: z.string().nullable(), periods: z.array(z.string()).length(2).optional(), datasetId: z.string().optional() })).optional(),
     exclusions: z.array(bilingualExcludedEntity),
+    searchMatch: z.enum(["all_words", "some_words"]).optional(),
   }),
   sources: z.object({
     sources: z.array(z.object({

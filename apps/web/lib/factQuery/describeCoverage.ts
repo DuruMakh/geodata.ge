@@ -13,6 +13,8 @@ import { PRODUCT_QUERY_MEASURES } from "./inflationProductSeries";
 import { inflationProductCatalogue } from "./inflationProductData";
 import { serviceLabelEn, serviceMessage } from "./localization";
 import { MUNICIPAL_COUNTRY_ID } from "../data/municipal/types";
+import { stem } from "../explorer/search/georgian";
+import { fold } from "../i18n/search";
 import { CAVEAT_RULES, evaluateCaveats } from "./caveats";
 import { buildResponseMeta } from "./meta";
 import { debtMeasure, deficitMeasure, describeCoverageInput, municipalMeasure, nationalMeasure } from "./schemas";
@@ -102,6 +104,8 @@ export type CoverageData = {
   series?: SeriesEntry[];
   entities?: EntityEntry[];
   exclusions: { entityId: string; reason: string; reasonEn: string }[];
+  /** Present whenever `search` was given: whether every word of it matched an entry, or only some words did. */
+  searchMatch?: "all_words" | "some_words";
 };
 
 // Same wording as the municipality_not_territorial caveat rule
@@ -757,39 +761,115 @@ function matchesLevel(entry: BaseSeriesEntry, level: string | undefined, dataset
 }
 
 /**
- * Georgian case endings, longest first.
- *
- * A real question says "ბათუმის ბიუჯეტი" while the label is "ბათუმი", and
- * "განათლების" against "განათლება" changes the final vowel rather than only
- * appending one - so plain substring matching misses the form a question
- * actually uses, which is the form a model passes through.
+ * Words that only join others ("budget of the state"): the explorer's set
+ * (searchExplorer.ts) plus "to", "by" and "და", dropped while another word remains.
  */
-const GEORGIAN_CASE_ENDINGS = ["თვის", "ებში", "ში", "ზე", "ის", "ად", "ით", "მა", "ს"] as const;
+const JOINING_WORDS = new Set(["in", "of", "the", "for", "and", "at", "to", "by", "და"]);
 
-/** The query with one case ending removed, or null when none applies. Longest ending wins. */
-function georgianStem(query: string): string | null {
-  for (const ending of GEORGIAN_CASE_ENDINGS) {
-    if (query.endsWith(ending) && query.length - ending.length >= 2) return query.slice(0, -ending.length);
-  }
-  return null;
+/**
+ * The two reviewed one-way aliases, applied when one is the whole query. Not a
+ * synonym catalogue: extending it needs the owner's say-so (spec section 33).
+ */
+const SEARCH_ALIASES: Record<string, string> = { "დღგ": "revenue.vat", pension: "საპენსიო" };
+
+/** The letters and digits of a text, folded: "მშპ-ის" gives ["მშპ", "ის"], an id splits at "." and "_". */
+const searchWords = (text: string): string[] => fold(text).split(/[^\p{L}\p{N}]+/u).filter(Boolean);
+
+/** "taxes" and "tax", "pensions" and "pension" - English words of five letters or more, without a plural -s/-es. */
+function singular(word: string): string {
+  if (word.length < 5 || !/^[a-z]+$/.test(word)) return word;
+  if (/(x|s|ch|sh)es$/.test(word)) return word.slice(0, -2);
+  return word.endsWith("s") && !word.endsWith("ss") ? word.slice(0, -1) : word;
 }
 
-/** Case-insensitive substring match. `null` candidates (e.g. a region's entitySlug) are skipped, which is what makes "for municipalities" (the brief's search contract) fall out of the data instead of needing a special case. */
-function matchesSearch(query: string, candidates: (string | null)[]): boolean {
-  const aliases: Record<string, string> = { "დღგ": "revenue.vat", pension: "საპენსიო" };
-  const normalized = query.trim().toLowerCase();
-  const needle = Object.hasOwn(aliases, normalized) ? aliases[normalized] : normalized;
-  const stem = georgianStem(needle);
+/**
+ * A query word meets a label word when they are the same word, when the query
+ * word of four letters or more begins it ("education" finds "educational"; the
+ * three letters of "oil" do not find "toilet"), when their Georgian stems of three
+ * letters or more agree up to a missing final vowel or two ("განათლების" and
+ * "განათლება" stem to განათლ and განათლებ; the stem alone cannot be a prefix of
+ * any longer word, or ვალ would find ვალუტა), or when they differ only by an
+ * English plural. Never "somewhere inside the word": that found `port` in
+ * "Import" and `VAT` in "innovation".
+ */
+function wordMatches(queryWord: string, fieldWord: string): boolean {
+  if (queryWord === fieldWord) return true;
+  if (queryWord.length >= 4 && fieldWord.startsWith(queryWord)) return true;
+  if (/\p{Script=Georgian}/u.test(queryWord)) {
+    const queryStem = stem(queryWord);
+    const fieldStem = stem(fieldWord);
+    const [shorter, longer] = queryStem.length <= fieldStem.length ? [queryStem, fieldStem] : [fieldStem, queryStem];
+    return shorter.length >= 3 && longer.length - shorter.length <= (shorter.length >= 5 ? 2 : 1) && longer.startsWith(shorter);
+  }
+  return singular(queryWord) === singular(fieldWord);
+}
 
-  return candidates.some((candidate) => {
-    if (candidate === null) return false;
-    const hay = candidate.toLowerCase();
-    if (hay.includes(needle)) return true;
-    if (stem === null) return false;
-    // A two-character stem is ambiguous - "ონ" sits inside plenty of unrelated
-    // labels - so it has to begin the label rather than merely appear in it.
-    return stem.length >= 3 ? hay.includes(stem) : hay.startsWith(stem);
+/** A query that looks like an id ("revenue.vat", "57_11") also names it: the whole id, its beginning, or a segment after a ".". */
+function idMatches(query: string, field: string): boolean {
+  const id = fold(field);
+  return id === query || id.startsWith(query) || id.includes(`.${query}`);
+}
+
+/**
+ * Searches a catalogue by whole words, not by letters. Every word of the query
+ * has to meet a word of the entry's fields (`wordMatches`); entries that meet
+ * all of them answer as `all_words`. When none does, the entries that meet any
+ * word of three letters or more answer as `some_words`, the ones meeting the
+ * rarer words first (ties keep catalogue order), so a phrase such as "annual
+ * inflation" still finds its keyword rather than nothing. `null` fields (e.g. a
+ * region's entitySlug) are skipped, which is what makes "for municipalities"
+ * (the brief's search contract) fall out of the data instead of needing a
+ * special case. Pass every entry the response may hold at once: the all/some
+ * choice is made once, not per dataset.
+ */
+export function searchCatalogue<T>(
+  query: string,
+  entries: T[],
+  fields: (entry: T) => (string | null)[],
+): { matches: T[]; searchMatch: "all_words" | "some_words" } {
+  const folded = fold(query.trim());
+  const needle = Object.hasOwn(SEARCH_ALIASES, folded) ? SEARCH_ALIASES[folded]! : folded;
+  const allWords = searchWords(needle);
+  const queryWords = allWords.some((word) => !JOINING_WORDS.has(word)) ? allWords.filter((word) => !JOINING_WORDS.has(word)) : allWords;
+  const idQuery = /[._]/.test(needle);
+
+  const rows = entries.map((entry) => {
+    const present = fields(entry).filter((field): field is string => field !== null);
+    const fieldWords = present.flatMap(searchWords);
+    return {
+      entry,
+      meets: queryWords.map((queryWord) => fieldWords.some((fieldWord) => wordMatches(queryWord, fieldWord))),
+      isId: idQuery && present.some((field) => idMatches(needle, field)),
+    };
   });
+
+  const all = rows.filter((row) => row.isId || (queryWords.length > 0 && row.meets.every(Boolean)));
+  if (all.length > 0 || queryWords.length === 0) return { matches: all.map((row) => row.entry), searchMatch: "all_words" };
+
+  // Rarity: a word that few entries meet says more than one that most do, and a
+  // word that most meet says nothing ("product", in every product's id).
+  const weights = queryWords.map((word, index) => {
+    const count = rows.filter((row) => row.meets[index]).length;
+    return word.length >= 3 && count > 0 && count * 2 <= rows.length ? Math.log(rows.length / count) : 0;
+  });
+  const scored = rows
+    .map((row) => ({ entry: row.entry, score: weights.reduce((sum, weight, index) => sum + (row.meets[index] ? weight : 0), 0) }))
+    .filter((row) => row.score > 0);
+  // Array.prototype.sort is stable.
+  scored.sort((left, right) => right.score - left.score);
+  return { matches: scored.map((row) => row.entry), searchMatch: scored.length > 0 ? "some_words" : "all_words" };
+}
+
+/** One `searchCatalogue` over a response's series and entities together, so the all/some choice is made once for both. */
+function searchSeriesAndEntities<S extends SeriesEntry, E extends EntityEntry>(search: string, series: S[], entities: E[]) {
+  const { matches, searchMatch } = searchCatalogue<S | E>(search, [...series, ...entities], (entry) =>
+    "seriesId" in entry ? [entry.seriesId, entry.labelKa, entry.labelEn] : [entry.entityId, entry.labelKa, entry.labelEn, entry.entitySlug],
+  );
+  return {
+    series: matches.filter((entry): entry is S => "seriesId" in entry),
+    entities: matches.filter((entry): entry is E => !("seriesId" in entry)),
+    searchMatch,
+  };
 }
 
 function errorResponse(snapshot: FactQuerySnapshot, error: FactQueryError): FactQueryResponse {
@@ -877,26 +957,21 @@ export function describeCoverage(snapshot: FactQuerySnapshot, rawInput: unknown)
       return { kind: "catalogue", status: "ok", data: { datasets, exclusions }, meta };
     }
 
-    const foundSeries: (SeriesEntry & { datasetId: DatasetId })[] = [];
-    const foundEntities: (EntityEntry & { datasetId: DatasetId })[] = [];
+    const taggedSeries: (SeriesEntry & { datasetId: DatasetId })[] = [];
+    const taggedEntities: (EntityEntry & { datasetId: DatasetId })[] = [];
 
     for (const id of eligibleDatasets) {
       for (const entry of seriesForDataset(snapshot, id, cityScope)) {
-        if (matchesLevel(entry, input.level, id) && matchesSearch(input.search, [entry.seriesId, entry.labelKa, entry.labelEn])) {
-          // Tagged, because a match found without a dataset is useless until the
-          // caller knows which dataset to ask.
-          foundSeries.push({ ...entry, datasetId: id });
-        }
+        // Tagged, because a match found without a dataset is useless until the
+        // caller knows which dataset to ask.
+        if (matchesLevel(entry, input.level, id)) taggedSeries.push({ ...entry, datasetId: id });
       }
       for (const entry of entitiesForDataset(snapshot, id) ?? []) {
-        if (
-          (input.entityType === undefined || entry.entityType === input.entityType) &&
-          matchesSearch(input.search, [entry.entityId, entry.labelKa, entry.labelEn, entry.entitySlug])
-        ) {
-          foundEntities.push({ ...entry, datasetId: id });
-        }
+        if (input.entityType === undefined || entry.entityType === input.entityType) taggedEntities.push({ ...entry, datasetId: id });
       }
     }
+
+    const { series: foundSeries, entities: foundEntities, searchMatch } = searchSeriesAndEntities(input.search, taggedSeries, taggedEntities);
 
     // A search is a lookup, so it answers with what matched: the datasets the
     // matches belong to and any excluded code it names, not the whole
@@ -909,31 +984,31 @@ export function describeCoverage(snapshot: FactQuerySnapshot, rawInput: unknown)
         datasets: datasets.filter((dataset) => matchedDatasets.has(dataset.datasetId)),
         series: foundSeries,
         entities: foundEntities,
-        exclusions: exclusions.filter((exclusion) => matchesSearch(input.search!, [exclusion.entityId])),
+        // A code names an exclusion exactly ("05"), never by a letter inside it.
+        exclusions: exclusions.filter((exclusion) => exclusion.entityId === fold(input.search!.trim())),
+        searchMatch,
       },
       meta,
     };
   }
 
   const datasetId = input.datasetId;
-  const series = (eligibleDatasets.includes(datasetId) ? seriesForDataset(snapshot, datasetId, cityScope) : []).filter(
-    (entry) =>
-      matchesLevel(entry, input.level, datasetId) &&
-      (input.search === undefined || matchesSearch(input.search, [entry.seriesId, entry.labelKa, entry.labelEn])),
+  const levelled = (eligibleDatasets.includes(datasetId) ? seriesForDataset(snapshot, datasetId, cityScope) : []).filter((entry) =>
+    matchesLevel(entry, input.level, datasetId),
   );
-
-  const entities = entitiesForDataset(snapshot, input.datasetId)?.filter(
-    (entry) =>
-      (input.entityType === undefined || entry.entityType === input.entityType) &&
-      (input.search === undefined || matchesSearch(input.search, [entry.entityId, entry.labelKa, entry.labelEn, entry.entitySlug])),
+  const typed = entitiesForDataset(snapshot, input.datasetId)?.filter(
+    (entry) => input.entityType === undefined || entry.entityType === input.entityType,
   );
+  const searched = input.search === undefined ? undefined : searchSeriesAndEntities(input.search, levelled, typed ?? []);
+  const series = searched?.series ?? levelled;
+  const entities = searched === undefined || typed === undefined ? typed : searched.entities;
 
   const isEmpty = series.length === 0 && (entities === undefined || entities.length === 0);
 
   return {
     kind: "catalogue",
     status: isEmpty ? "empty" : "ok",
-    data: { datasets, series, ...(entities !== undefined ? { entities } : {}), exclusions },
+    data: { datasets, series, ...(entities !== undefined ? { entities } : {}), exclusions, ...(searched !== undefined ? { searchMatch: searched.searchMatch } : {}) },
     meta,
   };
 }

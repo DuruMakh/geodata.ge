@@ -24,8 +24,8 @@ let snapshot: FactQuerySnapshot;
 beforeAll(async () => { snapshot = await buildFactQuerySnapshot(options); });
 
 describe("reviewed product snapshot", () => {
-  it("packages the exact reviewed roster and source-precision facts with schema 1.6.0", async () => {
-    expect(SCHEMA_VERSION).toBe("1.6.0");
+  it("packages the exact reviewed roster and source-precision facts with schema 1.7.0", async () => {
+    expect(SCHEMA_VERSION).toBe("1.7.0");
     const served = await loadServedProductData();
     expect(snapshot.inflationProducts.catalogue).toEqual(served.catalogue.map(({ productId, coicopCode, labelKa, labelEn, firstPeriod }) => ({ productId, coicopCode, labelKa, labelEn, firstPeriod })).sort((a, b) => a.productId.localeCompare(b.productId)));
     expect(snapshot.inflationProducts.facts).toEqual(served.facts.map(({ productId, measure, period, index100, availability, sourceId }) => ({ productId, measure, period, index100, availability, sourceId })).sort((a, b) => a.productId.localeCompare(b.productId) || a.measure.localeCompare(b.measure) || a.period.localeCompare(b.period)));
