@@ -38,7 +38,12 @@ describe("ExplorerTable crawl copy", () => {
     expect(crawl).not.toContain("tabindex");
     for (const year of ["2024", "2025"]) expect(crawl).toContain(`>${year}<`);
   });
-  it("leaves the visible table unchanged", () => expect(renderGeorgianMarkup(<ExplorerTable {...sameProps} />)).toBe(html));
+  it("leaves the default render visible, focusable and under the table test id", () => {
+    expect(html).not.toMatch(/<div class="[^"]*\bhidden\b/);
+    expect(html).toContain('tabindex="0"');
+    expect(html).toContain('data-testid="explorer-table"');
+    expect(html).not.toContain("explorer-table-crawl");
+  });
 });
 
 describe("ExplorerTable year-columns layout", () => {

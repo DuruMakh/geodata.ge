@@ -27,7 +27,12 @@ for (const { path, tab, panel, figure } of PAGES) {
     // Scripts are stripped so a figure found only in the data payload does not count.
     const serverHtml = (await response.text()).replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, " ");
     expect(serverHtml).toContain("explorer-table-crawl");
-    if (figure) expect(serverHtml).toContain(figure);
+    // The figure must sit in the crawl copy itself, from its test id to the end of its table.
+    const start = serverHtml.indexOf('data-testid="explorer-table-crawl"');
+    expect(start).toBeGreaterThan(-1);
+    const end = serverHtml.indexOf("</table>", start);
+    expect(end).toBeGreaterThan(start);
+    if (figure) expect(serverHtml.slice(start, end)).toContain(figure);
   });
 
   test(`${path}: the crawl copy is hidden in chart mode`, async ({ page }) => {

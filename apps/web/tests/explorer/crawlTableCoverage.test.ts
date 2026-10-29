@@ -15,6 +15,8 @@ describe("crawl table coverage", () => {
       return source.includes("<ExplorerTable") && source.includes("<ModeTabs");
     });
     expect(switchers.length).toBeGreaterThanOrEqual(47);
-    expect(switchers.filter((file) => !read(file).includes("crawlCopy="))).toEqual([]);
+    // One crawlCopy prop per table: a file that renders two tables cannot pass on the strength of one.
+    const count = (source: string, pattern: string) => source.split(pattern).length - 1;
+    expect(switchers.filter((file) => count(read(file), "<ExplorerTable") !== count(read(file), "crawlCopy="))).toEqual([]);
   });
 });
