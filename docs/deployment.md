@@ -27,7 +27,8 @@ with row count, bytes and SHA-256; the manifest itself is one additional artifac
 not one of its listed files. Derive changing inventories from these owners rather
 than retaining old fixed counts. Requests do not gain a language argument.
 Schema 1.7.0 adds the optional `searchMatch` field (`all_words` or `some_words`) to
-catalogue searches, which now match whole words and Georgian stems. Schema 1.6.0 added
+catalogue searches, which now match whole words and Georgian stems; a search without
+`datasetId` may also carry the optional `websitePages` links to website-only pages. Schema 1.6.0 added
 `internal_error` and the `preserved_derived` source narrowing outcome. Strict clients
 caching output enums must refresh discovery; clients requiring schema 1.6.0 must
 update their validation. Request shapes stay unchanged.
@@ -686,7 +687,7 @@ Direct ChatGPT custom-connector setup remains unverified and is not advertised;
 the page retains its separate web-reading prompt and static-file fallback. Future
 human proof must record app/version, account eligibility, date, protocol and a
 completed question citing Fiscal.ge's source/limitations, without collecting secrets.
-The eleven paired English/Georgian prompts and review requirements live separately
+The thirteen paired English/Georgian prompts and review requirements live separately
 from the 48 numerical references in
 `apps/web/tests/factQuery/fixtures/mcpAssistantIntents.ts`. Record actual tool
 selection, units, original citations, caveats, missingness, version consistency

@@ -49,12 +49,22 @@ describe("MCP tool surface", () => {
     expect(text.length).toBeLessThanOrEqual(4096);
     expect(text.split("\n\n")[0]!.length).toBeLessThanOrEqual(512);
     for (const rule of ["SIGNED", "Always keep the sign", "revenue minus expenditure is NOT a deficit",
-      "Missing is not zero", "https://fiscal.ge/explorer/unemployment/overview",
-      "https://fiscal.ge/en/explorer/unemployment/overview", "Do not put them in the answer",
+      "Missing is not zero", "websitePages", "Do not put them in the answer",
       "messageKa/messageEn", "https://fiscal.ge/downloads/data/sources.json", "CC BY 4.0",
       "preceding December", "index_100", "result_too_large"]) expect(text).toContain(rule);
     // The schema history is for developers and lives on /connect.
     expect(text).not.toMatch(/[Ss]chema 1\.\d/);
+  });
+
+  // The pointer the instructions used to give for unemployment is now the search's to give.
+  it.each([
+    { search: "unemployment", url: "https://fiscal.ge/en/explorer/unemployment/overview", field: "urlEn" },
+    { search: "უმუშევრობა", url: "https://fiscal.ge/explorer/unemployment/overview", field: "urlKa" },
+  ])("answers a $search search with the unemployment page and no figure", ({ search, url, field }) => {
+    const response = describeCoverage(loadPackagedSnapshot(), { search });
+    if (response.kind !== "catalogue") throw new Error("expected a catalogue");
+    const pages = (response.data as { websitePages?: Record<string, string>[] }).websitePages ?? [];
+    expect(pages.map((page) => page[field])).toContain(url);
   });
 
   it("puts the complete discovery-to-evidence workflow in the opening 512 characters", () => {

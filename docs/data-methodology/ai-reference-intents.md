@@ -79,7 +79,7 @@ hide one.
 The table above records the first 34 intents. The executable fixture additionally
 covers regional GDP (#35–37), city inflation and early missingness (#38–40), and
 product annual/cumulative values, history limits, rankings and refusals (#41–48).
-Its source-checked expectations are authoritative; the separate eleven-pair
+Its source-checked expectations are authoritative; the separate thirteen-pair
 `mcpAssistantIntents.ts` rubric assesses actual assistant behavior.
 
 ## What the list is designed to catch

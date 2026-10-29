@@ -6,22 +6,17 @@ import { BreadcrumbJsonLd } from "../../components/seo/breadcrumb-json-ld";
 import { LegacyHashRedirect } from "../../components/shell/legacy-hash-redirect";
 import { PageHeader } from "../../components/shell/page-header";
 import { buildSearchPages, buildShortcuts, searchMessages } from "../explorer/allDataIndex";
+import { allDataMessages } from "../explorer/allDataMessages";
 import { updatedDate } from "../explorer/coverageLabel";
-import { getCommonMessages } from "../i18n/common.server";
 import { message } from "../i18n/messages";
 import { getMessages } from "../i18n/messages.server";
 import { I18nProvider } from "../i18n/provider";
 import { pageHref } from "../i18n/routes";
-import type { Locale, Messages } from "../i18n/types";
+import type { Locale } from "../i18n/types";
 import { ALL_DATA_PATH, NAV_TREE, PAGE_COUNT } from "../navigation/navTree";
 import { fiscalMetadata } from "../seo/metadata";
 import { loadCardSpreads } from "./group";
 import { loadTopicHubs } from "./topicHubs.server";
-
-/** `common` and `allData` in one language. */
-async function allDataMessages(locale: Locale): Promise<Messages> {
-  return { ...getCommonMessages(locale), ...await getMessages(locale, ["allData"]) };
-}
 
 export async function allDataPageMetadata(locale: Locale) {
   const messages = await getMessages(locale, ["allData"]);

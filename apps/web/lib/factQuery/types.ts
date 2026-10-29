@@ -7,6 +7,7 @@ import type {
   ServedNationalGdpFact,
 } from "../servedRows";
 import type { AdminSpendingCategory } from "../data/adminSpending/types";
+import type { SearchPage } from "../explorer/search/searchExplorer";
 import type {
   AdjaraBudgetAdjustment,
   Municipality,
@@ -277,8 +278,13 @@ export type FactQuerySnapshot = {
     historyNotes: import("./inflationProductSeries").ProductHistoryNote[];
   };
   gdpFacts: ServedNationalGdpFact[];
+  /** The Fiscal.ge pages whose figures this service does not serve: names and links only, never a value. */
+  website: { pages: WebsitePage[] };
   sources: ResolvedSource[];
 };
+
+/** A navigation page as the website's own search sees it (no value, period, caption or trend), with its Georgian and English addresses. */
+export type WebsitePage = SearchPage & { urlKa: string; urlEn: string };
 
 /**
  * The nine debt series and their Georgian labels, in publication order.

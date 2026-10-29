@@ -31,6 +31,7 @@
   "ranking.inflationSubgroups": "COICOP subgroups of the national consumer price index.",
   "ranking.inflationSubgroupsWithinParent": "COICOP subgroups within {parentId}.",
   "ranking.valueDefinitionPeriod": "Ranked by {measure} in {period}, {order}.",
+  "catalogue.websitePages": "These Fiscal.ge pages show this topic; this connection does not serve their figures. Give the user the link in their language; do not quote a figure for it.",
   "caveats.adjara_consolidation_applied": "The result applies the net Adjara republican adjustment once.",
   "caveats.admin_category_not_yet_established": "The requested administrative category does not exist in that year's classification — it was established later; a missing value is not zero.",
   "caveats.budget_scopes_differ": "National revenue and expenditure totals use different budget concepts; subtracting them does not establish a deficit.",

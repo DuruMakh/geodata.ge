@@ -130,6 +130,9 @@ const dataShapes = {
     entities: z.array(z.object({ entityId: z.string(), entityType: z.string(), labelKa: z.string(), labelEn: z.string().min(1), entitySlug: z.string().nullable(), periods: z.array(z.string()).length(2).optional(), datasetId: z.string().optional() })).optional(),
     exclusions: z.array(bilingualExcludedEntity),
     searchMatch: z.enum(["all_words", "some_words"]).optional(),
+    websitePages: z.array(z.object({ topicId: z.string(), labelKa: z.string(), labelEn: z.string().min(1), topicLabelKa: z.string(), topicLabelEn: z.string().min(1), urlKa: z.string(), urlEn: z.string() })).optional(),
+    websitePagesNoteKa: z.string().optional(),
+    websitePagesNoteEn: z.string().optional(),
   }),
   sources: z.object({
     sources: z.array(z.object({

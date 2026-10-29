@@ -19,6 +19,7 @@ export const SERVICE_MESSAGE_KEYS = [
   "missing.inflationProductStart",
   "missing.inflationProductAnnual",
   "missing.inflationProductMonthlyInput",
+  "catalogue.websitePages",
   "caveats.adjara_consolidation_applied",
   "caveats.admin_category_not_yet_established",
   "caveats.budget_scopes_differ",

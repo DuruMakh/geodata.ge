@@ -4,7 +4,10 @@ import { testSnapshot } from "../helpers/factQuerySnapshot";
 import { describeCoverage } from "../../lib/factQuery/describeCoverage";
 import { queryMinistries } from "../../lib/factQuery/queryMinistries";
 import { envelopeSchema } from "../../lib/factQuery/schemas";
+import { MCP_SERVED_PAGES } from "../../lib/factQuery/servedPages";
 import { AGGREGATE_ONLY_MUNICIPAL_CODES, type FactQuerySnapshot } from "../../lib/factQuery/types";
+import { outputSchemaFor } from "../../lib/mcp/outputSchema";
+import { NAV_TREE, PAGE_COUNT, topicHub } from "../../lib/navigation/navTree";
 
 let snapshot: FactQuerySnapshot;
 
@@ -17,6 +20,9 @@ type CoverageData = {
   series?: { seriesId: string; labelKa: string; availability: string; level: string; years: number[]; datasetId?: string }[];
   entities?: { entityId: string; labelKa: string; entitySlug: string | null; datasetId?: string }[];
   exclusions: { entityId: string; reason: string }[];
+  websitePages?: { topicId: string; labelKa: string; labelEn: string; topicLabelKa: string; topicLabelEn: string; urlKa: string; urlEn: string }[];
+  websitePagesNoteKa?: string;
+  websitePagesNoteEn?: string;
 };
 
 const data = (result: ReturnType<typeof describeCoverage>) => (result as { data: CoverageData }).data;
@@ -314,5 +320,79 @@ describe("search understands Georgian case endings", () => {
   it("does not let a short stem match mid-word", () => {
     const entities = data(describeCoverage(snapshot, { datasetId: "municipal-expenditure", search: "ონის" })).entities ?? [];
     for (const entity of entities) expect(entity.labelKa.startsWith("ონ")).toBe(true);
+  });
+});
+
+// A topic the website shows and this connection does not serve: the search says where the page is,
+// and carries no figure (spec: 2026-10-29 MCP audit, F01).
+describe("search points to website pages the connection does not serve", () => {
+  const firstWagesPage = topicHub("wages").sections[0]!.href;
+
+  it.each(["wages", "ხელფასი"])("answers %s with the wages page and no series", (search) => {
+    const result = describeCoverage(snapshot, { search });
+    expect(result.status).toBe("empty");
+    const pages = data(result).websitePages ?? [];
+    expect(pages[0]?.topicId).toBe("wages");
+    expect(pages[0]?.urlEn).toBe(`https://fiscal.ge/en${firstWagesPage}`);
+    expect(pages[0]?.urlKa).toBe(`https://fiscal.ge${firstWagesPage}`);
+    expect(pages.length).toBeLessThanOrEqual(5);
+    expect(data(result).websitePagesNoteEn).toContain("do not quote a figure");
+    expect(data(result).websitePagesNoteKa).toBeTruthy();
+  });
+
+  it("keeps the served series for pension and adds the pensions page", () => {
+    const result = describeCoverage(snapshot, { search: "pension" });
+    expect(result.status).toBe("ok");
+    expect((data(result).series ?? []).map((entry) => (entry as { labelEn?: string }).labelEn).join("|")).toMatch(/funded pension/i);
+    const urls = (data(result).websitePages ?? []).map((page) => page.urlKa);
+    expect(urls).toContain("https://fiscal.ge/explorer/health/pensions");
+  });
+
+  it("adds nothing when the search matches no website page", () => {
+    const found = data(describeCoverage(snapshot, { search: "zzzznotathing" }));
+    expect(found).not.toHaveProperty("websitePages");
+    expect(found).not.toHaveProperty("websitePagesNoteEn");
+  });
+
+  it("adds nothing to a search inside one dataset", () => {
+    const found = data(describeCoverage(snapshot, { datasetId: "national-expenditure", search: "wages" }));
+    expect(found).not.toHaveProperty("websitePages");
+    expect(found).not.toHaveProperty("websitePagesNoteEn");
+  });
+
+  it("never carries a figure or a page the connection serves", () => {
+    const served = new Set(Object.keys(MCP_SERVED_PAGES));
+    for (const search of ["wages", "pension", "unemployment", "ექსპორტი", "health", "budget", "inflation", "gdp", "debt"]) {
+      for (const page of data(describeCoverage(snapshot, { search })).websitePages ?? []) {
+        expect(Object.keys(page).sort()).toEqual(["labelEn", "labelKa", "topicId", "topicLabelEn", "topicLabelKa", "urlEn", "urlKa"]);
+        for (const value of Object.values(page)) expect(typeof value).toBe("string");
+        for (const url of [page.urlKa, page.urlEn]) {
+          expect(url.startsWith("https://fiscal.ge/")).toBe(true);
+          expect(served.has(url.replace("https://fiscal.ge", "").replace(/^\/en(?=\/)/, ""))).toBe(false);
+        }
+      }
+    }
+  });
+
+  it("validates against the published describe_coverage output schema", () => {
+    for (const search of ["wages", "pension", "ხელფასი", "zzzznotathing"]) {
+      expect(outputSchemaFor("describe_coverage").safeParse(describeCoverage(snapshot, { search })).success, search).toBe(true);
+    }
+  });
+
+  it("serves exactly the pages MCP_SERVED_PAGES names and offers the rest", () => {
+    const hrefs = new Set(NAV_TREE.flatMap((hub) => hub.sections.map((section) => section.href as string)));
+    const served = Object.keys(MCP_SERVED_PAGES);
+    expect(served).toHaveLength(12);
+    for (const href of served) expect(hrefs.has(href), href).toBe(true);
+    // Every dataset the catalogue lists is shown by at least one served page.
+    const shown = new Set(Object.values(MCP_SERVED_PAGES).flat());
+    for (const dataset of data(describeCoverage(snapshot, {})).datasets) expect(shown.has(dataset.datasetId as never), dataset.datasetId).toBe(true);
+    expect(snapshot.website.pages).toHaveLength(PAGE_COUNT - served.length);
+    for (const page of snapshot.website.pages) {
+      expect(served).not.toContain(page.href);
+      expect([page.value, page.period, page.caption]).toEqual(["", "", ""]);
+      expect(page.spark).toBeNull();
+    }
   });
 });

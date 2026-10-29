@@ -28,7 +28,11 @@ retain the archived byte sizes and hashes.
 No language input is needed. Existing valid requests continue to work; catalogue
 search accepts either language. Schema 1.7.0 adds the optional `searchMatch` field
 (`all_words` or `some_words`) to catalogue searches, which match whole words and
-Georgian stems rather than letters inside a word. Schema 1.6.0 added `internal_error` and the
+Georgian stems rather than letters inside a word. A search without `datasetId` also
+returns the optional `websitePages` (at most five, with `websitePagesNoteKa` and
+`websitePagesNoteEn`) when the website's own page search finds a Fiscal.ge page whose
+figures this service does not serve: names and links in both languages, never a value.
+`status` still describes the served series and entities only. Schema 1.6.0 added `internal_error` and the
 `preserved_derived` source narrowing outcome, retaining the current-product
 dataset, annual/cumulative query and optional `calculationBasePeriod`. Strict
 clients caching output enums must refresh discovery; clients rejecting additive

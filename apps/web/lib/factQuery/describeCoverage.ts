@@ -14,13 +14,14 @@ import { inflationProductCatalogue } from "./inflationProductData";
 import { serviceLabelEn, serviceMessage } from "./localization";
 import { MUNICIPAL_COUNTRY_ID } from "../data/municipal/types";
 import { stem } from "../explorer/search/georgian";
+import { searchExplorer } from "../explorer/search/searchExplorer";
 import { fold } from "../i18n/search";
 import { CAVEAT_RULES, evaluateCaveats } from "./caveats";
 import { buildResponseMeta } from "./meta";
 import { debtMeasure, deficitMeasure, describeCoverageInput, municipalMeasure, nationalMeasure } from "./schemas";
 import { AGGREGATE_ONLY_MUNICIPAL_CODES } from "./types";
 import { DEBT_SERIES_LABELS_KA, DEFICIT_SERIES_ID } from "./types";
-import type { DatasetId, FactQueryError, FactQueryResponse, FactQuerySnapshot, Measure } from "./types";
+import type { DatasetId, FactQueryError, FactQueryResponse, FactQuerySnapshot, Measure, WebsitePage } from "./types";
 
 // Typed as DatasetId[] rather than derived from the union, so widening
 // DatasetId does NOT force an entry here - unlike DATASET_META below, which is
@@ -106,7 +107,16 @@ export type CoverageData = {
   exclusions: { entityId: string; reason: string; reasonEn: string }[];
   /** Present whenever `search` was given: whether every word of it matched an entry, or only some words did. */
   searchMatch?: "all_words" | "some_words";
+  /** Only on a search without `datasetId`: Fiscal.ge pages that show the topic but whose figures are not served here, best first, at most five. */
+  websitePages?: {
+    topicId: string; labelKa: string; labelEn: string; topicLabelKa: string; topicLabelEn: string; urlKa: string; urlEn: string;
+  }[];
+  websitePagesNoteKa?: string;
+  websitePagesNoteEn?: string;
 };
+
+/** How many website pages one search points to: a topic's name matches every one of its pages, so the list is capped. */
+const WEBSITE_PAGES_LIMIT = 5;
 
 // Same wording as the municipality_not_territorial caveat rule
 // (caveats/rules.municipal.ts) — reused here as the reason string for these
@@ -990,6 +1000,15 @@ export function describeCoverage(snapshot: FactQuerySnapshot, rawInput: unknown)
     // matches belong to and any excluded code it names, not the whole
     // catalogue, which the no-argument call already returns.
     const matchedDatasets = new Set<DatasetId>([...foundSeries, ...foundEntities].map((entry) => entry.datasetId));
+    // The website's own page search, unchanged, over the pages this service does not serve: a topic the site shows and the
+    // catalogue does not hold gets a link to its page instead of a dead end. Links only; the status stays the series' own.
+    const websitePages = (searchExplorer(search, "en", snapshot.website.pages, [], null)?.groups ?? [])
+      .flatMap((group) => group.rows)
+      .slice(0, WEBSITE_PAGES_LIMIT)
+      .map(({ page }) => {
+        const { urlKa, urlEn } = page as WebsitePage;
+        return { topicId: page.topic, labelKa: page.name.ka, labelEn: page.name.en, topicLabelKa: page.topicName.ka, topicLabelEn: page.topicName.en, urlKa, urlEn };
+      });
     return {
       kind: "catalogue",
       status: foundSeries.length === 0 && foundEntities.length === 0 ? "empty" : "ok",
@@ -1000,6 +1019,13 @@ export function describeCoverage(snapshot: FactQuerySnapshot, rawInput: unknown)
         // A code names an exclusion exactly ("05"), never by a letter inside it.
         exclusions: exclusions.filter((exclusion) => exclusion.entityId === fold(search!.trim())),
         searchMatch,
+        ...(websitePages.length > 0
+          ? {
+            websitePages,
+            websitePagesNoteKa: serviceMessage(snapshot, "ka", "catalogue.websitePages"),
+            websitePagesNoteEn: serviceMessage(snapshot, "en", "catalogue.websitePages"),
+          }
+          : {}),
       },
       meta,
     };
