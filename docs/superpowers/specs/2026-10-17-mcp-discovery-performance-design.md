@@ -32,6 +32,8 @@ The 512-character target follows [current Codex server-instruction guidance](htt
 
 Explain search recovery once in the shared guidance: use one meaningful keyword; if a phrase returns no matches, try the principal word or browse the named dataset. A failed phrase match is not proof that the data is absent. Reuse existing English/Georgian matching; do not add a guessed synonym catalogue or make the tool pretend to understand arbitrary natural-language questions.
 
+Note (2026-10-29, MCP audit fixes): catalogue search now matches whole words and Georgian stems, and links website-only topics through the site's own All data search (`websitePages`). Both reuse the existing English/Georgian labels and the site search; no synonym or keyword catalogue was added.
+
 Keep descriptions specific about what a tool can answer and its supported filters. Do not repeatedly insert the full workflow into every description or remove descriptions merely to improve an unmeasured token estimate.
 
 ## 3. Make city discovery queryable
