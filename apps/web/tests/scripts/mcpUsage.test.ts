@@ -1,7 +1,7 @@
 import { spawnSync } from "node:child_process";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
-import { DECISION_FIELD, lastDays, main, parseArguments, parseHash, report, totals } from "../../scripts/mcp-usage";
+import { DECISION_SUFFIX, lastDays, main, parseArguments, parseHash, report, totals } from "../../scripts/mcp-usage";
 
 // The script itself is never run against Upstash here: only its day keys,
 // argument and reply parsing, report and its refusal to start without
@@ -25,15 +25,15 @@ describe("mcp:usage", () => {
     expect(parseHash([]).size).toBe(0);
   });
 
-  it("sums days and flags the Stage 2 decision field when it is non-zero", () => {
-    const monday = parseHash(["ping|ok|-|-|other", "3"]);
-    const tuesday = parseHash(["ping|ok|-|-|other", "2", DECISION_FIELD, "4"]);
+  it("sums days and flags the Stage 2 decision when any tool's Anthropic key_day refusals are non-zero", () => {
+    const monday = parseHash(["ping|ok|-|-|other", "3", "query_national|error|rate_limited|key_day|other", "9"]);
+    const tuesday = parseHash(["ping|ok|-|-|other", "2", "query_municipal|error|rate_limited|key_day|anthropic", "4", "initialize|error|rate_limited|key_day|anthropic", "1"]);
     expect(totals([monday, tuesday]).get("ping|ok|-|-|other")).toBe(5);
 
     const quiet = report([{ day: "2026-10-28", counts: monday }]);
-    expect(quiet).toContain("2026-10-28  (3 requests)");
+    expect(quiet).toContain("2026-10-28  (12 requests)");
     expect(quiet).not.toContain("DECISION NEEDED");
-    expect(report([{ day: "2026-10-28", counts: monday }, { day: "2026-10-29", counts: tuesday }])).toContain(`DECISION NEEDED: 4 x ${DECISION_FIELD}`);
+    expect(report([{ day: "2026-10-28", counts: monday }, { day: "2026-10-29", counts: tuesday }])).toContain(`DECISION NEEDED: 5 x *${DECISION_SUFFIX}`);
   });
 
   it("refuses to start without the Upstash read-only credentials, before any request", async () => {

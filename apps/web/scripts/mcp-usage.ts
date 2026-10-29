@@ -11,8 +11,8 @@ import { runAsCli } from "../lib/runAsCli";
 
 const DEFAULT_DAYS = 7;
 const MAX_DAYS = 90; // the hashes expire after 100 days; stay well inside
-/** F04 Stage 2 trigger: the Anthropic range being refused by its per-key daily cap. */
-export const DECISION_FIELD = "rate_limited|key_day|anthropic";
+/** F04 Stage 2 trigger: the Anthropic range being refused by its per-key daily cap, on any tool (the field's first part). */
+export const DECISION_SUFFIX = "|rate_limited|key_day|anthropic";
 
 /** The last `days` UTC dates up to and including `now`'s, newest first. */
 export function lastDays(days: number, now: Date): string[] {
@@ -63,8 +63,8 @@ export function report(daily: readonly { day: string; counts: Map<string, number
   }
   const all = totals(daily.map(({ counts }) => counts));
   lines.push("", `All ${daily.length} days  (${[...all.values()].reduce((sum, count) => sum + count, 0)} requests)`, ...table(all));
-  const refused = all.get(DECISION_FIELD) ?? 0;
-  if (refused > 0) lines.push("", `DECISION NEEDED: ${refused} x ${DECISION_FIELD}. Send this to the owner for F04 Stage 2.`);
+  const refused = [...all].reduce((sum, [field, count]) => (field.endsWith(DECISION_SUFFIX) ? sum + count : sum), 0);
+  if (refused > 0) lines.push("", `DECISION NEEDED: ${refused} x *${DECISION_SUFFIX}. Send this to the owner for F04 Stage 2.`);
   return lines.join("\n");
 }
 

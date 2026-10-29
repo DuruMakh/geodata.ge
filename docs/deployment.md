@@ -603,8 +603,9 @@ key is `<production|preview>:mcp:stats:<YYYY-MM-DD>`, a hash whose field is
   `KV_REST_API_READ_ONLY_TOKEN` in the environment; without them it stops with a
   message and reads nothing. Or run `HGETALL production:mcp:stats:<date>` in the
   Upstash console.
-- **Decision trigger:** any non-zero `rate_limited|key_day|anthropic` count means
-  Claude.ai traffic reached the per-address daily cap. Send it to the owner for
+- **Decision trigger:** any non-zero count of fields ending in
+  `|rate_limited|key_day|anthropic`, summed over every tool (the script prints
+  `DECISION NEEDED`), means Claude.ai traffic reached the per-address daily cap. Send it to the owner for
   the Stage 2 decision in the F04 review; do not change a limit on your own.
 
 ### Other operating limits
