@@ -67,6 +67,16 @@ they do not prove an external AI client's menus, account eligibility or interpre
 Current official application guidance and the unverified human-flow boundary are
 recorded in `docs/deployment.md#human-application-guidance-and-evidence-boundary`.
 
+The server instructions (`apps/web/lib/mcp/instructions.ts`) are one static text of at
+most 4,096 characters, with an opening of at most 512. Claude Code cuts server
+instructions at 4,096 characters (2,048 before v2.1.296) and Codex and ChatGPT advise a
+self-contained first 512, so the rules that change an answer come first: what is not
+served, the boundaries never to combine, units and missing values, inflation, and how to
+present and cite. Year ranges, entity counts and call mechanics live in the tool
+descriptions, which read them from the snapshot, and are not repeated. The per-schema
+history developers need is on `/connect` only. Tests pin the length limits and the
+presence of each rule, not the wording.
+
 ## Why caveats exist at all
 
 The query core exists so that a language model answering a question about the Georgian budget quotes reviewed figures instead of inventing them. That is only half the problem. A correct number presented without its limitation is still a wrong answer: 2004 receipts really are 2,283,035,800 GEL, and growth from that figure to 2005 is still meaningless, because the two totals count different things.

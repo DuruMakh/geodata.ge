@@ -101,6 +101,13 @@ describe("scope rules", () => {
   it("municipal_country_scope fires for the georgia aggregate", () => {
     expect(codes(context({ entityIds: ["country.georgia"] }))).toContain("municipal_country_scope");
   });
+  // The server instructions no longer state the 69/64 budget counts; this caveat
+  // is what carries them next to the figure.
+  it("municipal_country_scope says the aggregate covers 69 reviewed budgets plus the net Adjara adjustment", () => {
+    const message = snapshot.localization.messages.en["caveats.municipal_country_scope"];
+    expect(message).toContain("69 reviewed budgets");
+    expect(message).toContain("net Adjara adjustment");
+  });
   it("municipal_country_scope does not fire for an ordinary region total (a naive implementation might conflate region and country aggregates)", () => {
     expect(codes(context({ entityIds: ["region.adjara"], seriesIds: ["municipal.total"] }))).not.toContain("municipal_country_scope");
   });

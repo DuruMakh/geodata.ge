@@ -10,281 +10,41 @@
 // data, and nothing here is a substitute for reading the caveats a response
 // actually returns.
 
-import type { SECTOR_QUERY_MEASURES } from "../factQuery/economicSectorsSeries";
-import type { DatasetId } from "../factQuery/types";
-
-/** `2010-2025` per sector query measure; the measures do not share a first year. */
-export type SectorMeasureYears = Partial<Record<keyof typeof SECTOR_QUERY_MEASURES, string>>;
-
 /**
- * Built from the snapshot's own catalogue rather than written down.
- *
- * A hardcoded range rots the first time the data extends, and it rotted here
- * before it ever shipped: this text said ministries covered "2005-2025" while
- * the catalogue said 2004-2025, because the ministries dataset carries 2004
- * administrative rows. Same rule as the UI (DESIGN.md section 2.1) - derive
- * coverage from loaded facts, never hardcode it.
+ * Static on purpose, and short on purpose: Claude Code cuts server instructions at
+ * 4,096 characters (2,048 before v2.1.296), so the rules that change an answer come
+ * first and everything a tool description or a returned caveat already says is left
+ * to them. Year ranges and entity counts live in the descriptions, which read them
+ * from the snapshot (DESIGN.md section 2.1: derive coverage from loaded facts, never
+ * hardcode it), so this text states none. The schema history is for developers and
+ * lives on /connect.
  */
-export function serverInstructions(
-  coverage: Partial<Record<DatasetId, string>>,
-  entities: {
-    municipalities: number;
-    regions: number;
-    regionalEconomyRegions?: number;
-    regionalActivities?: number;
-    regionalLastYear?: number;
-    sectorActivities?: number;
-    cities?: number;
-    cityDivisions?: number;
-    cityFirstPeriod?: string;
-  },
-  sectorMeasureYears: SectorMeasureYears = {},
-): string {
-  const range = (id: DatasetId) => coverage[id] ?? "see describe_coverage";
-  const sectorRange = (measure: keyof SectorMeasureYears) => sectorMeasureYears[measure] ?? "see describe_coverage";
-  // Counts read from the snapshot like the ranges; without one the sentence
-  // still reads, it just states no number.
-  const counted = (count: number | undefined) => (count === undefined ? "" : `${count} `);
-
+export function serverInstructions(): string {
   return `Use describe_coverage with short keywords before querying. Use returned IDs and supported measures; keep expectedDataVersion consistent. Preserve units, missing values, projections and caveats. Cite the returned original documents and Fiscal.ge. For product questions, search first and request only the required series and dates. Use the published files for bulk analysis.
 
-Search with one meaningful keyword. If a phrase returns no matches, try the principal word or browse the named dataset. A failed phrase match is not proof that the data is absent.
+Fiscal.ge serves reviewed data on Georgia's state and municipal budgets, government debt, the general government balance, GDP and economic sectors (annual), and consumer-price and product inflation (monthly). Never assume a year, series or entity exists; describe_coverage says what does. If a phrase finds nothing, retry the principal word or browse the dataset: an empty match is not proof that the data is absent. If the data does not cover the question, say so; do not fill the gap from other sources. Unemployment is not served by this MCP: offer https://fiscal.ge/explorer/unemployment/overview (English: https://fiscal.ge/en/explorer/unemployment/overview) and do not give a rate.
 
-Fiscal.ge serves reviewed data on Georgia's state and municipal budgets, government
-debt and fiscal balance, GDP and national economic sectors (all annual), and monthly
-consumer-price inflation.
+NEVER COMBINE
+- National revenue is consolidated budget RECEIPTS; national expenditure is STATE-BUDGET expenditure. They are different accounting boundaries: revenue minus expenditure is NOT a deficit, surplus or balance.
+- The balance served is the IMF general government balance. It is SIGNED: negative is a deficit, positive a surplus. Always keep the sign. It is not receipts minus expenditure.
+- Government debt is a stock of central government liabilities, not spending. Never add it to or subtract it from budget figures.
+- Municipal figures are municipal budgets, not a split of national spending. Do not add them to national totals or rebuild the Georgia aggregate by summing municipalities or regions.
 
-WHAT IS SERVED
-- Regional economies, ${range("regional-economies")}, through query_regional_economies.
-  ${counted(entities.regionalEconomyRegions)}regions, Total regional GDP and ${counted(entities.regionalActivities)}NACE Rev.2 activities. Values
-  are current-price GEL; activity shares divide basic-price GVA by the same
-  region's complete market-price GDP. No ${entities.regionalLastYear === undefined ? "" : `year after ${entities.regionalLastYear}, `}real growth, per-capita value or
-  region share of Georgia's GDP is served. Do not imply a multi-region chart.
-- National economic sectors, ${range("economic-sectors")}, through query_economic_sectors.
-  ${counted(entities.sectorActivities)}NACE Rev.2 activities and a separately published Total GDP reference.
-  Nominal GEL and GDP shares cover ${sectorRange("amount_gel")}; annual real growth covers ${sectorRange("real_growth_pct")}.
-  Inspect yearsByMeasure in describe_coverage. Sectors are GVA at basic prices;
-  shares divide by market-price GDP and need not sum to 100%. Growth 7.5 means 7.5%.
-  No regional sectors, rankings, contributions or cumulative sector comparisons.
-- GDP overview, ${range("gdp-overview")}, through query_gdp. Choose one or more of
-  six discovered series IDs; each fixes its units and price basis. Real GDP is
-  constant-2015 USD; nominal GDP and nominal GDP per capita are current GEL/USD.
-  Annual real growth is percent (7.5 means 7.5%), not a fraction.
-  Values are published or preliminary, never budget planned values. Per-capita
-  GDP is output per person, not income. Preserve historical and revision caveats.
-  Individual series have shorter year coverage. GDP ranking and cumulative
-  comparisons are not supported; do not mix currencies or nominal/real changes.
-- National consolidated budget RECEIPTS, ${range("national-revenue")}, and
-  national STATE-BUDGET expenditure, ${range("national-expenditure")}, by
-  category. Those are two different accounting boundaries; see BUDGET
-  BOUNDARIES below before combining them.
-- Ministries: administrative categories and their major programs, ${range("ministries")}.
-- Municipal expenditure by function for ${entities.municipalities} municipalities,
-  ${entities.regions} regions and a Georgia aggregate, ${range("municipal-expenditure")}.
-- Government debt: how much is owed, what was paid on it, and at what rate,
-  ${range("government-debt")}.
-- The general government balance (the deficit or surplus) as measured by the
-  IMF, ${range("general-government-balance")}.
-- Consumer-price inflation, ${range("inflation")}, through query_inflation. It is
-  monthly; read INFLATION below before answering.
-- Reviewed current-basket product inflation, ${range("inflation-products")}, through
-  query_inflation_products. Discover product IDs, firstPeriod, measure spans and
-  history notes under inflation-products; read PRODUCT INFLATION below.
-Coverage is derived from the loaded data and is reported by describe_coverage.
-Do not assume a year or a series exists; ask.
-
-LANGUAGES AND COMPATIBILITY
-Schema 1.6.0 adds internal_error and the preserved_derived source narrowing outcome.
-Schema 1.5.0 adds reviewed product inflation, cumulative_pct and optional
-calculationBasePeriod on cumulative observations and rankings. Schema 1.4.0 added
-inflation cities (the city entity type and query_inflation entityIds) after schema 1.3.0 added regional economies and schema 1.2.0 introduced the optional period (YYYY-MM) on inflation observations, comparison endpoints and ranking entries, while retaining reviewed Georgian (*Ka) and English (*En) names, definitions,
-missing-value explanations, comparison reasons, rankings and source descriptions.
-Answer in the user's language using those fields. Catalogue search matches both
-languages. The discovered tools and input schemas work without a language argument.
-Generic source/document fields preserve original wording and mandatory attribution;
-translated companions describe it without replacing it. documentLanguage is null
-when unverified; a translated title does not mean the source document was translated.
-Translation corrections change dataVersion because the text is part of the pinned
-data identity. Reuse a dataVersion only with responses from that same snapshot.
-Clients must accept additive fields and schema 1.6.0. Strict cached output-enum
-validators must refresh discovery; exact-version or unknown-field validators need
-updating. Byte-for-byte response compatibility is not promised.
-Both /connect and /en/connect describe the shared /mcp endpoint and /downloads/data/
-publications. Static publications carry the same bilingual evidence and remain
-available without an MCP connection. Text rows include both languages; values and
-stable identifiers are not translated.
-
-WHAT IS NOT SERVED
-Quarterly or monthly data for any dataset other than inflation; retail product
-prices in GEL, product weights/contributions, city products, retired products,
-city subgroups, city price-index levels, city weights and core
-inflation by city, HICP and other price indices; live budget execution, individual
-capital projects, procurement, and anything after the last reviewed year that is not
-explicitly served as a projection. There
-is no such thing as a partial answer assembled from outside sources: if the data
-does not cover the question, say so.
-Unemployment is not served by this MCP. For that question, offer the existing
-Fiscal.ge unemployment explorer in the user's language: Georgian
-https://fiscal.ge/explorer/unemployment/overview or English
-https://fiscal.ge/en/explorer/unemployment/overview. Do not invent a rate.
-
-UNITS AND VALUES
-- Budget, municipal and debt amounts are nominal GEL at current prices. That is
-  the standard basis for budget figures, and adjusting for inflation is a
-  separate step taken deliberately when it is wanted - so treat this as
-  background, not as a warning to repeat on every answer. Where a long-run change
-  could genuinely be mistaken for real growth, say once that the figures are nominal.
-- GDP and sector figures are NOT all GEL. Every observation states its unit:
-  current GEL or USD, constant-2015 USD, GEL or USD per person, or percent. Read
-  the unit, and never convert between currencies or price bases yourself.
-- share_of_total_pct, share_of_gdp_pct, share_of_region_gdp_pct, rate_percent, real_growth_pct and GDP
-  growth are percentages: 7.5 means 7.5%, not a fraction. gel_per_resident is
-  GEL per resident using the reviewed population denominator.
-- basis is "actual", "planned" or "projection" for budget, debt and balance
-  figures, and "published" or "preliminary" for GDP, sector and inflation figures. For
-  budget facts where both actual and planned exist, actual is served and wins.
-  A preliminary figure can still be revised; say so when one is in the answer.
-- availability "missing" means the reviewed data does not contain that cell.
-  Never estimate it, interpolate it, infer it from neighbouring years, or report
-  it as zero. Missing is not zero, and zero is a real reviewed value.
-
-BUDGET BOUNDARIES
-National revenue and national expenditure are DIFFERENT accounting boundaries.
-Subtracting one total from the other does NOT produce a deficit, a surplus, or
-any fiscal balance, and presenting it as one is wrong. A caveat marks this
-whenever both totals are in play; report what it says, not the code it says it
-under.
-Municipal figures are municipal budgets only; they are not a territorial split
-of national spending, and they must not be added to national totals.
-The Georgia aggregate combines 69 reviewed budgets plus the net Adjara adjustment exactly once.
-It differs from the 64 territorial municipalities available for territorial comparisons:
-the five excluded municipal codes remain in the combined-budget aggregate.
-Do not reproduce that aggregate by summing territorial municipalities or regional rows.
-
-DEBT AND FISCAL BALANCE
-Two datasets sit outside the budget boundaries above, and neither may be
-combined with them.
-- Government debt is CENTRAL GOVERNMENT LIABILITIES, published by the Ministry
-  of Finance. It is a stock of obligations, not spending. Do not add it to
-  expenditure, subtract it from receipts, or present it as part of a budget.
-- The general government balance is published by the IMF for GENERAL
-  government, a wider boundary than either national series here. It is NOT the
-  difference between the receipts and the expenditure this service serves;
-  subtracting one from the other does not reproduce it, and the gap between the
-  two is not something to explain away.
-- Balance values are SIGNED. A negative value is a deficit; a positive one is a
-  surplus. Report the sign. Dropping it turns a deficit into a surplus, which is
-  the worst error available in this data.
-- Years whose basis is "projection" are not recorded outcomes. A debt-service
-  projection is the payment schedule of debt already outstanding; a balance
-  projection is an IMF forecast that a later vintage can revise. Say which, and
-  say that it is a projection, whenever one appears in an answer.
+VALUES
+- Read each value's unit. Budget, municipal and debt amounts are nominal GEL; GDP and sector values can be GEL, USD, constant-2015 USD, per person (output, not income) or percent. Never convert currencies or price bases yourself.
+- Percentages are already percent: 7.5 means 7.5%. Inflation contributions are percentage points.
+- availability "missing" is not zero. Never estimate, interpolate or report it as 0. Missing is not zero; zero is a real value.
+- Budget, debt and balance basis is actual, planned or projection (actual wins over planned); GDP, sector and inflation figures are "published" or "preliminary". Say when a figure is planned, a projection or preliminary.
 
 INFLATION
-- Inflation is the only monthly dataset. Periods are YYYY-MM. Take the latest
-  month from describe_coverage; never assume the current month is published.
-- Annual (yoy_pct), monthly (mom_pct) and 12-month average (avg12_pct) are
-  different measures. Monthly changes do not add up to the annual change, and
-  the 12-month average is not annual inflation.
-- 2.4 means 2.4%. Contributions (contribution_pp) are percentage points; with
-  the residual that comes with them they sum to the published headline annual
-  rate. They are Fiscal.ge's approximation, not a Geostat figure - say so.
-- The National Bank of Georgia target is a reference. "Above target" compares
-  two published numbers; it is not a verdict on the central bank. No target
-  before the first reviewed month is verified; do not say none existed.
-- City figures (query_inflation entityIds, rank dimension entities with entityType
-  city) cover the ${counted(entities.cities)}cities where Geostat records prices, from ${entities.cityFirstPeriod ?? "the first period describe_coverage reports"}, for the
-  total and the ${counted(entities.cityDivisions)}divisions. A city's inflation is not its region's, nor that
-  city's cost of living or price level. Some prices are recorded once and applied
-  to every city; say so when a city difference in a division is the point.
-- The national CPI is a weighted mean of the city indices. Geostat does not publish
-  the city weights and this service does not supply them: the national rate is not
-  the plain average of the cities, and do not estimate weights yourself. It is not
-  a household's cost of living or wage growth.
-- This service does not adjust budget figures for inflation. If you do, present
-  it as your own calculation, not as a Fiscal.ge figure.
-- Do not state causes of price changes or the success or failure of monetary policy.
-- One inflation answer fits about 250 cells (entities × series × months), below
-  the general 500-cell limit. For more, split the request by period or use the
-  bulk files.
+- Inflation is the only monthly dataset. Annual, monthly and 12-month-average rates are different measures; monthly changes do not add up to the annual rate. Take the latest month from describe_coverage.
+- A city's rate is not its region's or its cost of living, and the national rate is not the average of cities. Comparing with the National Bank target is not a verdict on policy. Do not state causes of price changes.
+- Contributions and cumulative product changes are Fiscal.ge calculations over Geostat inputs (cumulative: base is the preceding December); say so. In the bulk inflation-products.csv, index_100 values (mom_index_100, yoy_index_100) are indices: 100 means no price change.
 
-PRODUCT INFLATION
-- Query measures are exactly yoy_pct and cumulative_pct. Annual is the published
-  annual index minus 100. Percent 2.4 means 2.4%; it is not a retail GEL price.
-- Cumulative requires startYear <= the year of fromPeriod. Compound every monthly
-  index from January startYear to each endpoint; the base is the preceding December,
-  stated in calculationBasePeriod. Say this is Fiscal.ge's derived calculation over
-  Geostat monthly inputs, not a Geostat publication of the cumulative figure.
-- Missing inputs and products starting after January startYear return missing with
-  the first missing month or actual start. Never sum rates, bridge identity splits,
-  interpolate or report a partial accumulated value. Catalogue cumulative spans are
-  conditional on startYear and complete inputs, not promises of uninterrupted data.
-- Linked descriptions do not prove an unchanged brand or retail specification.
-  Preserve history limitations and the reviewed bilingual-label discrepancy caveat.
-- Product compare supports annual percentage-point changes only. Cumulative compare
-  is refused; query_inflation_products with startYear answers accumulated price change.
-- Product rank uses all current products, dimension series, metric value and one period.
-  Cumulative rank also requires startYear. Missing histories are excluded with reasons;
-  never treat them as zero. No entity/region/parent/level filters or change rankings.
-- Output cells count products times output months, not preceding compounding inputs.
-  Narrow products/months if the 500-cell or 512 KiB evidence-inclusive limit refuses
-  a call, or use the bulk inputs and metadata under /downloads/data/.
-- The bulk inflation-products.csv contains raw index_100 values, with measures
-  mom_index_100 and yoy_index_100: 100 means no price change, not 100% inflation.
-  These are not the query's percentage changes. Subtract 100 from the annual index;
-  compound complete monthly indices for cumulative changes using the preceding December base.
-  inflation-products.json supplies the catalogue, history limits and calculation metadata.
-
-HOW TO PRESENT AN ANSWER
-The reader is a member of the public asking about their country's budget, not a
-developer reading an API.
-
-Ids, codes, measure names and enum values - national-revenue, municipal.total,
-amount_gel, gel_per_resident, budget_scopes_differ, consolidated_budget_receipts,
-actual - exist so you can CALL these tools. Do not put them in the answer, not
-even in parentheses after the thing they name. They tell the reader nothing and
-make an ordinary fact about public money look like a technical artefact.
-
-Say what they mean instead:
-- Name things with the reviewed labels in the user's language
-  (entityLabelKa/En, seriesLabelKa/En), not with their ids.
-- Describe a caveat with its own messageKa/messageEn, never its code. A severe
-  caveat must still be shown in full - state its meaning, not its identifier.
-- Give an accounting boundary in words. "Consolidated budget receipts" is a
-  phrase; consolidated_budget_receipts is a token.
-- Round money and percentages the way a reader reads them. A per-resident figure
-  of 4373.278503508772 is a float, not a number anyone would write.
-
-CITATIONS AND LICENCE
-Every response carries meta.sources, narrowed to the public originals this
-particular answer rests on. Cite from those. Both structured observations and
-text rows carry documentIds for the specific figure, resolved by the source
-evidence in the same response. For static evidence, manifest.json inventories publication files
-with their hashes and byte sizes; sources.json contains the complete original-document catalogue.
-When asked for all underlying evidence, include https://fiscal.ge/downloads/data/sources.json
-alongside the relevant source groups; first/last examples alone are not a complete citation path.
-Do not describe the manifest as the original-document list. The data is
-published under CC BY 4.0
-(https://creativecommons.org/licenses/by/4.0/); attribute Fiscal.ge.
-
-CAVEATS
-Responses carry caveats with severity "severe" or "note". Show every severe
-caveat to the user, next to the figure it qualifies - not collected in a
-footnote at the end. A severe caveat can mean the number does not mean what its
-label suggests, or that two years are not comparable. Do not summarise a severe
-caveat away.
-
-WHAT YOU MUST NOT CLAIM
-You may explain verified figures and offer clearly identified interpretations.
-You must not present unsupported causes, outcomes, assumptions or predictions as
-established fact. An increase in spending does not by itself prove improved
-services, better efficiency, corruption, waste, or policy success or failure. A
-citation to a budget figure does not support such an explanation. When the
-available data cannot answer a question, say that it cannot.
-
-ERRORS
-Failed tool calls carry isError and bilingual text, including the error code,
-retryable flag, and often valid choices; they have no structuredContent. An unknown id returns suggestions drawn only from
-ids that exist. result_too_large means narrow the request - fewer years first,
-then fewer entities, then fewer series - or download the bulk file it names.`;
+ANSWERING
+- The reader is the public, not a developer reading an API. IDs, codes, measure and enum names are for calling tools: Do not put them in the answer. Use the returned labels in the user's language.
+- Show every severe caveat in full, next to its figure, in its own words (messageKa/messageEn), never by code.
+- Round as a reader would. Explain only verified figures: a spending change does not by itself show better services, efficiency, waste or policy success or failure.
+- Cite meta.sources and each figure's documentIds. When asked for all underlying evidence, include https://fiscal.ge/downloads/data/sources.json, the complete original-document catalogue; first/last examples alone are not a complete citation path, and manifest.json lists files, not originals. Data is CC BY 4.0; attribute Fiscal.ge.
+- result_too_large: ask for fewer years, then entities, then series, or use the bulk file it names.`;
 }

@@ -22,9 +22,6 @@ async function connected(): Promise<Client> {
   return client;
 }
 
-/** Any counts; these tests are about how the text is built, not about the data. */
-const ENTITY_COUNTS = { municipalities: 64, regions: 11 };
-
 const TOOL_NAMES = [
   "compare",
   "describe_coverage",
@@ -43,36 +40,40 @@ const TOOL_NAMES = [
 ];
 
 describe("MCP tool surface", () => {
-  it("explains aggregate scope, bulk evidence and the existing unsupported-dataset alternative", () => {
-    const instructions = serverInstructions({}, ENTITY_COUNTS);
-    for (const required of [
-      "69 reviewed budgets", "64 territorial municipalities", "net Adjara adjustment exactly once",
-      "manifest.json inventories publication files", "sources.json contains the complete original-document catalogue",
-      "When asked for all underlying evidence", "https://fiscal.ge/downloads/data/sources.json",
-      "first/last examples alone are not a complete citation path",
-      "inflation-products.csv", "index_100", "mom_index_100", "yoy_index_100", "100 means no price change",
-      "Unemployment is not served by this MCP", "https://fiscal.ge/explorer/unemployment/overview",
-      "https://fiscal.ge/en/explorer/unemployment/overview",
-    ]) expect(instructions).toContain(required);
+  // Claude Code cuts server instructions at 4,096 characters (2,048 before v2.1.296),
+  // so every rule that changes an answer has to sit inside that, and the pins below
+  // check behaviour (the rule is there, the text fits) rather than a heading or a
+  // sentence's wording.
+  it("fits Claude Code's 4,096-character cap and carries every answer-changing rule", () => {
+    const text = serverInstructions();
+    expect(text.length).toBeLessThanOrEqual(4096);
+    expect(text.split("\n\n")[0]!.length).toBeLessThanOrEqual(512);
+    for (const rule of ["SIGNED", "Always keep the sign", "revenue minus expenditure is NOT a deficit",
+      "Missing is not zero", "https://fiscal.ge/explorer/unemployment/overview",
+      "https://fiscal.ge/en/explorer/unemployment/overview", "Do not put them in the answer",
+      "messageKa/messageEn", "https://fiscal.ge/downloads/data/sources.json", "CC BY 4.0",
+      "preceding December", "index_100", "result_too_large"]) expect(text).toContain(rule);
+    // The schema history is for developers and lives on /connect.
+    expect(text).not.toMatch(/[Ss]chema 1\.\d/);
   });
 
   it("puts the complete discovery-to-evidence workflow in the opening 512 characters", () => {
-    const instructions = serverInstructions({}, ENTITY_COUNTS);
-    const opening = instructions.split("\n\n")[0]!;
+    const opening = serverInstructions().split("\n\n")[0]!;
     expect(opening.length).toBeLessThanOrEqual(512);
     for (const required of ["describe_coverage", "short keywords", "returned IDs", "supported measures", "expectedDataVersion", "units", "missing values", "projections", "caveats", "original documents", "Fiscal.ge", "product", "series and dates", "published files", "bulk"]) {
       expect(opening).toContain(required);
     }
-    // The short opening supplements the domain rules; it must not replace them.
-    for (const heading of ["BUDGET BOUNDARIES", "DEBT AND FISCAL BALANCE", "INFLATION", "PRODUCT INFLATION", "CITATIONS AND LICENCE", "CAVEATS", "WHAT YOU MUST NOT CLAIM"]) {
-      expect(instructions).toContain(heading);
-    }
-    expect(instructions).toContain("Missing is not zero");
-    expect(instructions).toContain("preceding December");
+  });
+
+  // Tool descriptions are cut at the same kind of cap, and Tasks that add rules to
+  // them must not push one over.
+  it("keeps every tool description within 2,048 characters", async () => {
+    const { tools } = await (await connected()).listTools();
+    for (const tool of tools) expect((tool.description ?? "").length, tool.name).toBeLessThanOrEqual(2048);
   });
 
   it("teaches recovery from empty phrase searches without treating them as absent data", async () => {
-    const instructions = serverInstructions({}, ENTITY_COUNTS);
+    const instructions = serverInstructions();
     expect(instructions).toContain("principal word");
     expect(instructions).toContain("not proof that the data is absent");
     const client = await connected();
@@ -274,7 +275,7 @@ describe("MCP tool surface", () => {
 
   it("tells the client what the service is for and what it must not claim", () => {
     // Spec 13: the truth policy is part of the contract, not decoration.
-    const instructions = serverInstructions({ "national-revenue": "2004-2025" }, ENTITY_COUNTS);
+    const instructions = serverInstructions();
 
     expect(instructions).toContain("CC BY 4.0");
     expect(instructions).toContain("GEL");
@@ -294,34 +295,21 @@ describe("MCP tool surface", () => {
     expect(TOOLS).toHaveLength(TOOL_NAMES.length);
   });
 
-  // The instructions state coverage, so they must read it from the catalogue
-  // rather than carry a written-down range. This one had already drifted before
-  // it shipped: the text said ministries covered 2005-2025 while the catalogue
-  // said 2004-2025.
+  // Coverage ranges live in the tool descriptions, read from the catalogue, and the
+  // instructions state none. This one had already drifted before it shipped: the
+  // text said ministries covered 2005-2025 while the catalogue said 2004-2025.
   it("states coverage from the catalogue rather than a hardcoded range", async () => {
     const { tools } = await (await connected()).listTools();
     const ministries = tools.find((tool) => tool.name === "query_ministries")!;
 
-    const filled = serverInstructions({ ministries: "1999-2001" }, ENTITY_COUNTS);
-    expect(filled).toContain("1999-2001");
-    expect(serverInstructions({}, ENTITY_COUNTS)).toContain("see describe_coverage");
-    // And the live server agrees with itself: the tool description carries the
-    // real range, not a different one.
     expect(ministries.description).toMatch(/\d{4}-\d{4}/);
-  });
-
-  // Same rule as the year ranges: the entity counts are read from the snapshot,
-  // so "64 municipalities" cannot go stale in the text while the data moves on.
-  it("counts municipalities and regions rather than stating them", () => {
-    expect(serverInstructions({}, { municipalities: 7, regions: 3 })).toContain("7 municipalities");
-    expect(serverInstructions({}, { municipalities: 7, regions: 3 })).toContain("3 regions");
   });
 
   // Revenue is consolidated receipts; expenditure is state-budget expenditure.
   // A client told they are both "state budget" has been handed the premise for
   // a deficit subtraction the whole caveat exists to prevent.
   it("names the two national accounting boundaries as different", () => {
-    const instructions = serverInstructions({}, ENTITY_COUNTS);
+    const instructions = serverInstructions();
 
     expect(instructions).toContain("consolidated budget RECEIPTS");
     expect(instructions).toContain("STATE-BUDGET expenditure");
@@ -341,10 +329,6 @@ describe("MCP tool surface", () => {
 
     expect(sectors.description).toContain(`shares cover ${range("nominal")}`);
     expect(sectors.description).toContain(`real growth covers ${range("real_growth")}`);
-    const filled = serverInstructions({}, ENTITY_COUNTS, { amount_gel: "1999-2001", real_growth_pct: "2000-2001" });
-    expect(filled).toContain("shares cover 1999-2001");
-    expect(filled).toContain("real growth covers 2000-2001");
-    expect(serverInstructions({}, ENTITY_COUNTS)).toContain("shares cover see describe_coverage");
   });
 
   it("counts the datasets describe_coverage searches rather than naming a number", async () => {
@@ -359,7 +343,7 @@ describe("MCP tool surface", () => {
 
   it("never glues a number to the word before it", async () => {
     const { tools } = await (await connected()).listTools();
-    const texts = [...tools.map((tool) => tool.description ?? ""), serverInstructions({}, ENTITY_COUNTS)];
+    const texts = [...tools.map((tool) => tool.description ?? ""), serverInstructions()];
     // A glued year ("cover2010") is the regression. Measure ids such as avg12_pct
     // legitimately put a digit after a letter.
     for (const text of texts) expect(text).not.toMatch(/[a-z]\d{4}/i);
@@ -369,12 +353,12 @@ describe("MCP tool surface", () => {
   // and preliminary statuses. Telling a client that every amount is nominal GEL
   // with an actual/planned/projection basis is false of two datasets.
   it("does not describe every value as nominal GEL with a budget basis", () => {
-    const instructions = serverInstructions({}, ENTITY_COUNTS);
+    const instructions = serverInstructions();
 
     expect(instructions).not.toContain("All amounts are nominal GEL");
     expect(instructions).toContain('"published"');
     expect(instructions).toContain('"preliminary"');
-    expect(instructions).toContain("real_growth_pct");
+    expect(instructions).toContain("constant-2015 USD");
   });
 
   it("answers query_inflation with a monthly period in structured content", async () => {
@@ -462,10 +446,9 @@ describe("MCP tool surface", () => {
   });
 
   it("tells clients inflation is the one monthly dataset", () => {
-    const instructions = serverInstructions({}, ENTITY_COUNTS);
+    const instructions = serverInstructions();
     expect(instructions).toContain("INFLATION");
     expect(instructions).toContain("only monthly dataset");
-    expect(instructions).toContain("schema 1.6.0");
     expect(instructions).not.toContain("Quarterly or monthly data, live budget execution");
   });
 
@@ -552,13 +535,7 @@ describe("MCP tool surface", () => {
     expect(describe("query_municipal")).toContain(`for ${snapshot.municipal.municipalities.length} municipalities, ${snapshot.municipal.regions.length} regions`);
     expect(describe("query_municipal")).toContain(`gel_per_resident (${MUNICIPAL_PER_RESIDENT_YEAR} municipality/region totals only)`);
 
-    const filled = serverInstructions({}, { ...ENTITY_COUNTS, regionalEconomyRegions: 4, regionalActivities: 9, regionalLastYear: 2001, sectorActivities: 8, cities: 2, cityDivisions: 3, cityFirstPeriod: "1999-01" });
-    expect(filled).toContain("4 regions, Total regional GDP and 9 NACE Rev.2 activities");
-    expect(filled).toContain("No year after 2001, real growth");
-    expect(filled).toContain("8 NACE Rev.2 activities and a separately published Total GDP reference");
-    expect(filled).toContain("cover the 2 cities where Geostat records prices, from 1999-01, for the");
-    expect(filled).toContain("total and the 3 divisions");
-    expect(serverInstructions({}, ENTITY_COUNTS)).not.toMatch(/No 2025|Eleven regions|twenty NACE|six cities|12 divisions/i);
+    expect(serverInstructions()).not.toMatch(/No 2025|Eleven regions|twenty NACE|six cities|12 divisions/i);
   });
 
   it("keeps every tool name in the advertised set", () => {
