@@ -783,24 +783,33 @@ function singular(word: string): string {
 }
 
 /**
+ * Two Georgian words share a stem (`stem`, three letters or more) when the
+ * stems are equal, or when one is the other plus a final vowel or "ს"
+ * (ვალ + ი: "ვალის" and "ვალი"; ონი + ს: "ონის" and "ონი", where a word under
+ * five letters keeps its ending), or plus "ებ" of a noun in -ება (განათლ +
+ * ებ + ა: "განათლების" and "განათლება"). Any other difference is another
+ * word: საგარეო (foreign) is not საგარეჯო (Sagarejo), ფარში is not ფარდა.
+ */
+function sharesStem(queryWord: string, fieldWord: string): boolean {
+  const queryStem = stem(queryWord);
+  const fieldStem = stem(fieldWord);
+  const [shorter, longer, longerWord] = queryStem.length <= fieldStem.length ? [queryStem, fieldStem, fieldWord] : [fieldStem, queryStem, queryWord];
+  if (shorter.length < 3 || !longer.startsWith(shorter)) return false;
+  const rest = longer.slice(shorter.length);
+  return rest === "" || /^[იაეოუს]$/.test(rest) || (rest === "ებ" && longerWord === `${shorter}ება`);
+}
+
+/**
  * A query word meets a label word when they are the same word, when the query
  * word of four letters or more begins it ("education" finds "educational"; the
- * three letters of "oil" do not find "toilet"), when their Georgian stems of three
- * letters or more agree up to a missing final vowel or two ("განათლების" and
- * "განათლება" stem to განათლ and განათლებ; the stem alone cannot be a prefix of
- * any longer word, or ვალ would find ვალუტა), or when they differ only by an
- * English plural. Never "somewhere inside the word": that found `port` in
- * "Import" and `VAT` in "innovation".
+ * three letters of "oil" do not find "toilet"), when they share a Georgian stem,
+ * or when they differ only by an English plural. Never "somewhere inside the
+ * word": that found `port` in "Import" and `VAT` in "innovation".
  */
 function wordMatches(queryWord: string, fieldWord: string): boolean {
   if (queryWord === fieldWord) return true;
   if (queryWord.length >= 4 && fieldWord.startsWith(queryWord)) return true;
-  if (/\p{Script=Georgian}/u.test(queryWord)) {
-    const queryStem = stem(queryWord);
-    const fieldStem = stem(fieldWord);
-    const [shorter, longer] = queryStem.length <= fieldStem.length ? [queryStem, fieldStem] : [fieldStem, queryStem];
-    return shorter.length >= 3 && longer.length - shorter.length <= (shorter.length >= 5 ? 2 : 1) && longer.startsWith(shorter);
-  }
+  if (/\p{Script=Georgian}/u.test(queryWord)) return sharesStem(queryWord, fieldWord);
   return singular(queryWord) === singular(fieldWord);
 }
 
@@ -846,12 +855,14 @@ export function searchCatalogue<T>(
   const all = rows.filter((row) => row.isId || (queryWords.length > 0 && row.meets.every(Boolean)));
   if (all.length > 0 || queryWords.length === 0) return { matches: all.map((row) => row.entry), searchMatch: "all_words" };
 
-  // Rarity: a word that few entries meet says more than one that most do, and a
-  // word that most meet says nothing ("product", in every product's id).
-  const weights = queryWords.map((word, index) => {
-    const count = rows.filter((row) => row.meets[index]).length;
-    return word.length >= 3 && count > 0 && count * 2 <= rows.length ? Math.log(rows.length / count) : 0;
-  });
+  // A phrase that is mostly words the catalogue has never met ("unreviewed-retired-product",
+  // where only "product" is known) is another subject, not a partial match: the known
+  // words must be at least half of the words that can count.
+  const counted = queryWords.map((word, index) => (word.length >= 3 ? rows.filter((row) => row.meets[index]).length : -1));
+  const candidates = counted.filter((count) => count >= 0);
+  if (candidates.filter((count) => count > 0).length * 2 < candidates.length) return { matches: [], searchMatch: "all_words" };
+  // Rarity: a word that few entries meet says more than one that most do.
+  const weights = counted.map((count) => (count > 0 ? Math.log(1 + rows.length / count) : 0));
   const scored = rows
     .map((row) => ({ entry: row.entry, score: weights.reduce((sum, weight, index) => sum + (row.meets[index] ? weight : 0), 0) }))
     .filter((row) => row.score > 0);
@@ -894,6 +905,8 @@ export function describeCoverage(snapshot: FactQuerySnapshot, rawInput: unknown)
   }
 
   const input = parsed.data;
+  // A search with no letters or digits ("", "   ", "-") names nothing to look for: it is no search.
+  const search = input.search !== undefined && searchWords(input.search).length > 0 ? input.search : undefined;
 
   if (input.expectedDataVersion !== undefined && input.expectedDataVersion !== snapshot.dataVersion) {
     return errorResponse(snapshot, {
@@ -953,7 +966,7 @@ export function describeCoverage(snapshot: FactQuerySnapshot, rawInput: unknown)
     // know an id" - has to hold before the dataset is known too, which is
     // exactly the moment a caller cannot name one. Searching within nothing and
     // returning nothing looked like "no such thing" instead of "wrong call".
-    if (input.search === undefined) {
+    if (search === undefined) {
       return { kind: "catalogue", status: "ok", data: { datasets, exclusions }, meta };
     }
 
@@ -971,7 +984,7 @@ export function describeCoverage(snapshot: FactQuerySnapshot, rawInput: unknown)
       }
     }
 
-    const { series: foundSeries, entities: foundEntities, searchMatch } = searchSeriesAndEntities(input.search, taggedSeries, taggedEntities);
+    const { series: foundSeries, entities: foundEntities, searchMatch } = searchSeriesAndEntities(search, taggedSeries, taggedEntities);
 
     // A search is a lookup, so it answers with what matched: the datasets the
     // matches belong to and any excluded code it names, not the whole
@@ -985,7 +998,7 @@ export function describeCoverage(snapshot: FactQuerySnapshot, rawInput: unknown)
         series: foundSeries,
         entities: foundEntities,
         // A code names an exclusion exactly ("05"), never by a letter inside it.
-        exclusions: exclusions.filter((exclusion) => exclusion.entityId === fold(input.search!.trim())),
+        exclusions: exclusions.filter((exclusion) => exclusion.entityId === fold(search!.trim())),
         searchMatch,
       },
       meta,
@@ -999,7 +1012,7 @@ export function describeCoverage(snapshot: FactQuerySnapshot, rawInput: unknown)
   const typed = entitiesForDataset(snapshot, input.datasetId)?.filter(
     (entry) => input.entityType === undefined || entry.entityType === input.entityType,
   );
-  const searched = input.search === undefined ? undefined : searchSeriesAndEntities(input.search, levelled, typed ?? []);
+  const searched = search === undefined ? undefined : searchSeriesAndEntities(search, levelled, typed ?? []);
   const series = searched?.series ?? levelled;
   const entities = searched === undefined || typed === undefined ? typed : searched.entities;
 

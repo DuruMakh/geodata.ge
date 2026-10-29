@@ -7,6 +7,7 @@
 import { beforeAll, describe, expect, it } from "vitest";
 import { testSnapshot } from "../helpers/factQuerySnapshot";
 import { describeCoverage } from "../../lib/factQuery/describeCoverage";
+import { stem } from "../../lib/explorer/search/georgian";
 import type { FactQuerySnapshot } from "../../lib/factQuery/types";
 import { QUERIES, type SearchQuery } from "./fixtures/searchQueries";
 
@@ -43,11 +44,26 @@ function isAccepted(item: SearchQuery, hit: Hit): boolean {
   return item.req.includes(hit.key) || (item.ok ?? []).some((ok) => (typeof ok === "string" ? ok === hit.key : ok.test(hit.label)));
 }
 
+// A hit is justified when some query word is a word-start of a hit word, or the two share a Georgian stem the way
+// the matcher allows: equal stems, or one stem plus a final vowel or "ს", or plus "ებ" of a noun in -ება. The audit's own check
+// also accepted a hit word starting with the query word minus its last two letters, which let `საგარეჯო` stand for
+// `საგარეო` and `ფარში` for `ფარდა`; it is gone.
+function sharesStem(t: string, w: string): boolean {
+  const [a, b] = [stem(t), stem(w)];
+  const [shorter, longer, longerWord] = a.length <= b.length ? [a, b, w] : [b, a, t];
+  if (shorter.length < 3 || !longer.startsWith(shorter)) return false;
+  const rest = longer.slice(shorter.length);
+  return rest === "" || /^[იაეოუს]$/.test(rest) || (rest === "ებ" && longerWord === `${shorter}ება`);
+}
+
 function isInsideWord(query: string, hit: Hit): boolean {
   const queryWords = words(query);
   const hitWords = hit.fields.flatMap(words);
-  return !queryWords.some((t) => hitWords.some((w) => w.startsWith(t) || (t.length > 3 && w.startsWith(t.slice(0, -2)))));
+  return !queryWords.some((t) => hitWords.some((w) => w.startsWith(t) || sharesStem(t, w) || (isEnglish(t) && singular(t) === singular(w))));
 }
+
+const isEnglish = (word: string) => /^[a-z]+$/.test(word);
+const singular = (word: string) => (word.length >= 5 ? word.replace(/(x|s|ch|sh)es$/, "$1").replace(/([^s])s$/, "$1") : word);
 
 const insideWordHits = (query: string) => search(query).hits.filter((hit) => isInsideWord(query, hit)).map((hit) => hit.label);
 
@@ -75,7 +91,64 @@ describe("catalogue search matches words, not letters inside words", () => {
   });
 });
 
+describe("catalogue search keeps unrelated Georgian words apart", () => {
+  it("does not read საგარეჯო (Sagarejo) as foreign", () => {
+    const keys = keysOf("საგარეჯო");
+    expect(keys).toContain("E:17");
+    expect(keys).not.toContain("debt.stock.external");
+    expect(keys).not.toContain("admin_spending.foreign_affairs");
+  });
+
+  it("does not read საგარეო (foreign) as Sagarejo", () => {
+    const keys = keysOf("საგარეო");
+    expect(keys).toContain("debt.stock.external");
+    expect(keys).not.toContain("E:17");
+  });
+
+  it("does not read ფარში (mince) as a curtain", () => {
+    const curtain = search("ფარდა").hits.map((hit) => hit.key);
+    expect(curtain.length).toBeGreaterThan(0);
+    const keys = keysOf("ფარში");
+    for (const key of curtain) expect(keys).not.toContain(key);
+  });
+
+  it.each(["ვალი", "ვალის"])("does not read %s as a currency word", (query) => {
+    for (const hit of search(query).hits) expect(hit.fields.flatMap(words).filter((word) => word.startsWith("ვალუტ"))).toEqual([]);
+  });
+
+  it.each([
+    ["სახლი", "სახის"],
+    ["საშუალო", "საშუალებებით"],
+  ])("does not read %s as %s", (query, other) => {
+    for (const hit of search(query).hits) expect(hit.fields.flatMap(words)).not.toContain(other);
+  });
+});
+
+describe("catalogue search with nothing to look for", () => {
+  it.each(["", "   ", "-", "."])("treats %j as no search", (query) => {
+    const plain = describeCoverage(snapshot, { datasetId: "inflation" });
+    const blank = describeCoverage(snapshot, { datasetId: "inflation", search: query });
+    expect(blank.status).toBe("ok");
+    expect(blank).toEqual(plain);
+    expect(searchMatchOf(blank)).toBeUndefined();
+    expect(describeCoverage(snapshot, { search: query })).toEqual(describeCoverage(snapshot, {}));
+  });
+});
+
 describe("catalogue search answers a phrase that no entry matches in full", () => {
+  it("returns nothing when most of the phrase is unknown to the catalogue", () => {
+    expect(search("unreviewed-retired-product").status).toBe("empty");
+    const scoped = describeCoverage(snapshot, { datasetId: "inflation-products", search: "unreviewed-retired-product" });
+    expect(scoped.status).toBe("empty");
+  });
+
+  it.each(["public debt", "government debt", "debt zzzz"])("still finds a dataset's own keyword in %s", (query) => {
+    const found = describeCoverage(snapshot, { datasetId: "government-debt", search: query });
+    expect(found.status).toBe("ok");
+    expect(searchMatchOf(found)).toBe("some_words");
+    expect(((found as { data: { series: unknown[] } }).data.series).length).toBeGreaterThan(0);
+  });
+
   it("reports all_words when one entry has every word and some_words when none has", () => {
     expect(search("income tax").searchMatch).toBe("all_words");
     expect(search("zzzznotathing").searchMatch).toBe("all_words");
