@@ -20,6 +20,28 @@ export const SERVICE_MESSAGE_KEYS = [
   "missing.inflationProductAnnual",
   "missing.inflationProductMonthlyInput",
   "catalogue.websitePages",
+  "measures.amount_gel",
+  "measures.share_of_total_pct",
+  "measures.share_of_gdp_pct",
+  "measures.share_of_region_gdp_pct",
+  "measures.gel_per_resident",
+  "measures.rate_percent",
+  "measures.real_growth_pct",
+  "measures.yoy_pct",
+  "measures.mom_pct",
+  "measures.avg12_pct",
+  "measures.index_2010",
+  "measures.target_pct",
+  "measures.basket_weight_pct",
+  "measures.contribution_pp",
+  "measures.cumulative_pct",
+  "metrics.value",
+  "metrics.absolute_change",
+  "metrics.percentage_change",
+  "metrics.percentage_point_change",
+  "municipalTotalMeasures.total_payments",
+  "municipalTotalMeasures.portal_functional_total_fallback",
+  "municipalTotalMeasures.functional_total_fallback_missing_payment_actual",
   "caveats.adjara_consolidation_applied",
   "caveats.admin_category_not_yet_established",
   "caveats.budget_scopes_differ",
@@ -184,7 +206,7 @@ export const SERVICE_MESSAGE_PARAMETERS: Partial<Record<ServiceMessageKey, { ka:
   "errors.periodsOutOfRange": { ka: ["first", "last", "outOfRangePeriods"], en: ["first", "last", "outOfRangePeriods"] },
   "missing.inflationContributionStart": { ka: ["firstYear"], en: ["firstYear"] },
   "ranking.changeDefinitionPeriod": { ka: ["fromPeriod", "measure", "metric", "order", "toPeriod"], en: ["fromPeriod", "measure", "metric", "order", "toPeriod"] },
-  "ranking.inflationSubgroupsWithinParent": { ka: ["parentId"], en: ["parentId"] },
+  "ranking.inflationSubgroupsWithinParent": { ka: ["parentLabel"], en: ["parentLabel"] },
   "ranking.valueDefinitionPeriod": { ka: ["measure", "order", "period"], en: ["measure", "order", "period"] },
   "definitions.historicalName": {
     "ka": [
@@ -357,10 +379,10 @@ export const SERVICE_MESSAGE_PARAMETERS: Partial<Record<ServiceMessageKey, { ka:
   },
   "ranking.programmesWithinParent": {
     "ka": [
-      "parentId"
+      "parentLabel"
     ],
     "en": [
-      "parentId"
+      "parentLabel"
     ]
   },
   "ranking.valueDefinition": {
@@ -377,10 +399,10 @@ export const SERVICE_MESSAGE_PARAMETERS: Partial<Record<ServiceMessageKey, { ka:
   },
   "ranking.withinRegion": {
     "ka": [
-      "regionId"
+      "regionLabel"
     ],
     "en": [
-      "regionId"
+      "regionLabel"
     ]
   }
 };

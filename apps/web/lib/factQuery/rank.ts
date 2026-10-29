@@ -1,4 +1,4 @@
-import { serviceMessage, type ServiceMessageKey } from "./localization";
+import { serviceLabelEn, serviceMessage, type ServiceMessageKey } from "./localization";
 // apps/web/lib/factQuery/rank.ts
 //
 // Ordering among PEERS (spec section 6.7). The constraint that shapes this
@@ -231,7 +231,8 @@ export function rank(snapshot: FactQuerySnapshot, rawInput: unknown): FactQueryR
   let entityIds: string[] = [];
   let seriesIds: string[] = [];
   let universeKey: ServiceMessageKey;
-  let universeValues: Record<string, string> = {};
+  // The universe sentence names its region or parent in words, so the label is resolved per language.
+  let universeValues: (locale: "ka" | "en") => Record<string, string> = () => ({});
 
   if (isMunicipal) {
     if (input.seriesId === undefined || input.entityType === undefined) {
@@ -256,7 +257,11 @@ export function rank(snapshot: FactQuerySnapshot, rawInput: unknown): FactQueryR
         .map((row) => row.code)
         .sort();
       universeKey = input.withinRegionId ? "ranking.withinRegion" : "ranking.municipalities";
-      if (input.withinRegionId) universeValues = { regionId: input.withinRegionId };
+      if (input.withinRegionId) {
+        const regionId = input.withinRegionId;
+        const region = snapshot.municipal.regions.find((row) => row.id === regionId);
+        universeValues = (locale) => ({ regionLabel: locale === "ka" ? region?.kaLabel ?? regionId : serviceLabelEn(snapshot, regionId) });
+      }
     }
   } else {
     const series = isProduct ? [] : catalogueSeries(snapshot, input.datasetId);
@@ -284,7 +289,11 @@ export function rank(snapshot: FactQuerySnapshot, rawInput: unknown): FactQueryR
       universeKey = input.level === "subgroup"
         ? input.parentSeriesId ? "ranking.inflationSubgroupsWithinParent" : "ranking.inflationSubgroups"
         : "ranking.inflationDivisions";
-      if (input.parentSeriesId) universeValues = { parentId: input.parentSeriesId };
+      if (input.parentSeriesId) {
+        const parentId = input.parentSeriesId;
+        const parent = snapshot.inflation.groups.find((group) => group.id === parentId);
+        universeValues = (locale) => ({ parentLabel: (locale === "ka" ? parent?.labelKa : parent?.labelEn) ?? parentId });
+      }
     } else if (input.datasetId === "ministries") {
       const level = input.level ?? "admin_category";
       seriesIds = series
@@ -298,7 +307,11 @@ export function rank(snapshot: FactQuerySnapshot, rawInput: unknown): FactQueryR
       universeKey = level === "major_program"
         ? input.parentSeriesId ? "ranking.programmesWithinParent" : "ranking.programmes"
         : "ranking.categories";
-      if (input.parentSeriesId) universeValues = { parentId: input.parentSeriesId };
+      if (input.parentSeriesId) {
+        const parentId = input.parentSeriesId;
+        const parent = snapshot.ministries.categories.find((category) => category.id === parentId);
+        universeValues = (locale) => ({ parentLabel: (locale === "ka" ? parent?.kaLabel : parent?.enLabel) ?? parentId });
+      }
     } else {
       seriesIds = series
         .filter((entry) => entry.level !== TOTAL_LEVEL)
@@ -531,15 +544,17 @@ export function rank(snapshot: FactQuerySnapshot, rawInput: unknown): FactQueryR
 
   const rankingDefinitionFor = (locale: "ka" | "en") => {
     const order = serviceMessage(snapshot, locale, input.order === "ascending" ? "ranking.ascending" : "ranking.descending");
+    const measure = serviceMessage(snapshot, locale, `measures.${input.measure}`);
+    const metric = serviceMessage(snapshot, locale, `metrics.${input.metric}`);
     if (isProduct && input.measure === "cumulative_pct") return serviceMessage(snapshot, locale, "ranking.productCumulativeDefinition", { period: input.period!, basePeriod: `${input.startYear! - 1}-12`, order });
     if (isInflation || isProduct) {
       return isValueMetric
-        ? serviceMessage(snapshot, locale, "ranking.valueDefinitionPeriod", { measure: input.measure, period: input.period as string, order })
-        : serviceMessage(snapshot, locale, "ranking.changeDefinitionPeriod", { metric: input.metric, measure: input.measure, fromPeriod: input.fromPeriod as string, toPeriod: input.toPeriod as string, order });
+        ? serviceMessage(snapshot, locale, "ranking.valueDefinitionPeriod", { measure, period: input.period as string, order })
+        : serviceMessage(snapshot, locale, "ranking.changeDefinitionPeriod", { metric, measure, fromPeriod: input.fromPeriod as string, toPeriod: input.toPeriod as string, order });
     }
     return isValueMetric
-      ? serviceMessage(snapshot, locale, "ranking.valueDefinition", { measure: input.measure, year: input.year as number, order })
-      : serviceMessage(snapshot, locale, "ranking.changeDefinition", { metric: input.metric, measure: input.measure, fromYear: input.fromYear as number, toYear: input.toYear as number, order });
+      ? serviceMessage(snapshot, locale, "ranking.valueDefinition", { measure, year: input.year as number, order })
+      : serviceMessage(snapshot, locale, "ranking.changeDefinition", { metric, measure, fromYear: input.fromYear as number, toYear: input.toYear as number, order });
   };
 
   const status: "ok" | "partial" | "empty" =
@@ -555,8 +570,8 @@ export function rank(snapshot: FactQuerySnapshot, rawInput: unknown): FactQueryR
     entries,
     universe: {
       dimension: input.dimension,
-      description: serviceMessage(snapshot, "ka", universeKey, universeValues),
-      descriptionEn: serviceMessage(snapshot, "en", universeKey, universeValues),
+      description: serviceMessage(snapshot, "ka", universeKey, universeValues("ka")),
+      descriptionEn: serviceMessage(snapshot, "en", universeKey, universeValues("en")),
       candidateCount,
       eligibleCount: candidates.length,
       returnedCount: entries.length,

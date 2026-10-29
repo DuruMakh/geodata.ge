@@ -65,7 +65,8 @@ describe("queryMunicipal", () => {
       // Every other 2024 municipality is a payment total; this one is the
       // functional sum standing in for a missing payment actual, and the
       // definition must say so rather than reading like the others.
-      expect(observation?.valueDefinition).toMatch(/functional_total_fallback_missing_payment_actual/);
+      expect(observation?.valueDefinition).toBe("მუნიციპალიტეტის საჯარო ჯამი, გაზომვის საფუძველი: ფუნქციების მიხედვით ხარჯების ჯამი, რომელიც გამოიყენება, რადგან ფაქტობრივი ჯამური გადახდები გამოქვეყნებული არ არის.");
+      expect(observation?.valueDefinitionEn).toBe("The municipality's public total, measured on the following basis: sum of spending by function, used because actual total payments are not published.");
     });
 
     it("fires municipal_source_actual_missing even though show_warning is false", () => {
@@ -235,7 +236,9 @@ describe("queryMunicipal", () => {
       expect(in2015?.value).not.toBeNull();
       expect(in2020?.value).not.toBeNull();
       expect(in2015?.valueDefinition).not.toBe(in2020?.valueDefinition);
-      expect(in2015?.valueDefinition).toMatch(/portal_functional_total_fallback/);
+      expect(in2015?.valueDefinition).toBe("მუნიციპალიტეტის საჯარო ჯამი, გაზომვის საფუძველი: არქივირებული მუნიციპალური პორტალის ფუნქციების მიხედვით ხარჯების ჯამი, რომელიც ოფიციალური ჯამური გადახდების ნაცვლად გამოიყენება.");
+      expect(in2015?.valueDefinitionEn).toBe("The municipality's public total, measured on the following basis: sum of spending by function from the archived municipal portal, used instead of the official total payments.");
+      expect(in2020?.valueDefinitionEn).toBe("The municipality's public total, measured on the following basis: official total payments.");
     });
   });
 

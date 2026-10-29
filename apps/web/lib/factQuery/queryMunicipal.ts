@@ -303,9 +303,11 @@ export function queryMunicipal(
     // The measure is part of the figure's meaning, not decoration: 2015 is
     // portal_functional_total_fallback for every municipality while later
     // years are total_payments, so two years of "the same" series are not the
-    // same concept.
+    // same concept. It is said in words; the code stays in valueDefinitionId.
     return measure
-      ? serviceMessage(snapshot, locale, "definitions.municipalityTotalBasis", { measure })
+      ? serviceMessage(snapshot, locale, "definitions.municipalityTotalBasis", {
+          measure: serviceMessage(snapshot, locale, `municipalTotalMeasures.${measure}` as ServiceMessageKey),
+        })
       : serviceMessage(snapshot, locale, "definitions.municipalityTotal");
   };
 
