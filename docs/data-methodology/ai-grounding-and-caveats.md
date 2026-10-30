@@ -27,16 +27,25 @@ retain the archived byte sizes and hashes.
 
 No language input is needed. Existing valid requests continue to work; catalogue
 search accepts either language. Schema 1.7.0 adds the optional `searchMatch` field
-(`all_words` or `some_words`) to catalogue searches, which match whole words and
-Georgian stems rather than letters inside a word. A `some_words` answer also carries
-`searchMatchNoteKa` and `searchMatchNoteEn`: only some words matched, the entries may be
-about something else, and if none fits the data is not served here. A search without
-`datasetId` also returns the optional `websitePages` (at most five, with
-`websitePagesNoteKa` and `websitePagesNoteEn`) for Fiscal.ge pages whose figures this
-service does not serve: names and links in both languages, never a value. A page is
-linked only when every word of the search is a whole word of its names, topic or extra
-words, and an id-like search links none; when a `some_words` answer links no page for
-the whole search, each word that no served entry meets looks for its own page.
+(`all_words` or `some_words`) to catalogue searches, which match whole words, word
+beginnings of four letters or more, and Georgian stems rather than letters inside a
+word. `all_words` with no entries means nothing matched. A `some_words` answer lists
+first the entries whose dataset's own label a search word meets, then those meeting the
+rarer words over more of their label, and also carries `searchMatchNoteKa` and
+`searchMatchNoteEn`: only some words matched, so the entries may be about something
+else; before saying the data is not served, retry the missing part with another word or
+browse the dataset. A search without `datasetId` also returns the optional
+`websitePages` (at most five, with `websitePagesNoteKa` and `websitePagesNoteEn`) for
+Fiscal.ge pages whose figures this service does not serve: names and links in both
+languages, never a value. A page is linked when every word of the search meets its
+names, topic or extra words by the same whole words, word beginnings of four letters or
+more, and Georgian stems; an id-like search links none. Failing that, the search is
+tried without the words that name a served place (a municipality, region, city or
+Georgia), which no page names. Failing that too, when the answer is empty or
+`some_words`, each word looks for its own pages, best first by how many of the words
+they meet: first the words that no served entry meets, then, only if those link nothing,
+words that meet a served series and whose pages are all in one topic. A word that meets
+a dataset's own label (`prices` meets Consumer price inflation) looks for no page.
 `status` still describes the served series and entities only. A top-N ranking gives full
 source records for the returned rows and names the other documents read to fix the order
 by id in `inputDocumentIds`, resolved with `get_sources` and that source's `sourceId`; a
