@@ -472,11 +472,22 @@ test("the long view's readout follows the keys", async ({ page }) => {
   await page.keyboard.press("ArrowRight");
   await expect(tip).toBeVisible();
   await expect(tip).toContainText(String(years[0]));
+  // The readout a key moved is also spoken, once, through a polite live region.
+  const said = page.getByTestId("long-view-said");
+  await expect(said).toHaveAttribute("aria-live", "polite");
+  await expect(said).toContainText(String(years[0]));
   await page.keyboard.press("End");
   await expect(tip).toContainText(`${years.at(-1)} · გეგმა`);
+  await expect(said).toContainText(`${years.at(-1)} · გეგმა`);
   expect(await axeViolations(page)).toEqual([]);
   await page.keyboard.press("Escape");
   await expect(tip).toHaveCount(0);
+  await expect(said).toHaveText("");
+  // A pointer over the plot shows the readout but does not speak it.
+  const box = (await plot.boundingBox())!;
+  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+  await expect(tip).toBeVisible();
+  await expect(said).toHaveText("");
 });
 
 test("the page has no WCAG A or AA violations with a category picked or in the plan year", async ({ page }) => {
@@ -559,9 +570,13 @@ test.describe("on a touch phone", () => {
     }
     await expect(ruler.locator("[data-ruler-scrub]")).toHaveCount(0);
 
-    // A tap picks the stop under the finger.
-    await ruler.locator(`[data-year="${years[4]}"]`).tap();
+    // A tap picks the stop under the finger. As pointer events on the ruler alone, with no click, so the year is the
+    // ruler's own tap branch and not a stop's click handler; a real tap then takes the click path too.
+    await finger("pointerdown", xOf(years[4]!), y);
+    await finger("pointerup", xOf(years[4]!), y);
     await expectYear(page, years[4]!);
+    await ruler.locator(`[data-year="${years[6]}"]`).tap();
+    await expectYear(page, years[6]!);
 
     // A sideways drag picks as it goes, with the chosen year shown above the finger, and ends on the stop it is lifted over.
     await finger("pointerdown", xOf(years[4]!), y);

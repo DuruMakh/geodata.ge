@@ -32,6 +32,7 @@ type SparklineProps = {
 const END_DOT = 7;
 const END_RING = 11;
 const END_HOLE = 3;
+const PLAN_DOT = 6;
 
 function endPoint(segment: string): { x: string; y: string } {
   const [x, y] = segment.slice(segment.lastIndexOf("L") + 1).trim().split(" ");
@@ -50,6 +51,20 @@ export function Sparkline({ values, color, width = 64, height = 16, fluidOnMobil
   const drawn = [...segments, ...planned];
   if (drawn.length === 0) return null;
   const end = dotIndex === undefined ? endPoint(drawn.at(-1)!) : sparklinePoint(values, dotIndex, width, height);
+  // A dot on an actual point before the plan hides the dashed tail under its halo, so the plan's last point
+  // gets its own hollow mark, painted between the halo and the dot.
+  const planEnd = endDot && planFrom !== undefined && dotIndex !== undefined && dotIndex < planFrom && planned.length > 0 ? endPoint(planned.at(-1)!) : null;
+  const dots = [
+    { id: "ring", stroke: "var(--tile)", size: END_RING, at: end },
+    ...(planEnd
+      ? [
+          { id: "plan", stroke: dotColor, size: PLAN_DOT, at: planEnd },
+          { id: "plan-hole", stroke: "var(--tile)", size: END_HOLE, at: planEnd, testId: "sparkline-plan-end" },
+        ]
+      : []),
+    { id: "dot", stroke: dotColor, size: END_DOT, at: end },
+    ...(hollowEnd ? [{ id: "hole", stroke: "var(--tile)", size: END_HOLE, at: end, testId: "sparkline-hollow-end" }] : []),
+  ];
 
   return (
     <svg
@@ -92,12 +107,8 @@ export function Sparkline({ values, color, width = 64, height = 16, fluidOnMobil
         />
       ))}
       {endDot && end
-        ? [
-            { stroke: "var(--tile)", size: END_RING },
-            { stroke: dotColor, size: END_DOT },
-            ...(hollowEnd ? [{ stroke: "var(--tile)", size: END_HOLE }] : []),
-          ].map(({ stroke, size }) => (
-            <path key={size} data-testid={size === END_HOLE ? "sparkline-hollow-end" : undefined} d={`M${end.x} ${end.y} L${end.x} ${end.y}`} fill="none" stroke={stroke} strokeWidth={size} strokeLinecap="round" vectorEffect="non-scaling-stroke" />
+        ? dots.map(({ id, stroke, size, at, testId }) => (
+            <path key={id} data-testid={testId} d={`M${at!.x} ${at!.y} L${at!.x} ${at!.y}`} fill="none" stroke={stroke} strokeWidth={size} strokeLinecap="round" vectorEffect="non-scaling-stroke" />
           ))
         : null}
     </svg>

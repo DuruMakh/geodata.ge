@@ -73,6 +73,16 @@ describe("Sparkline planFrom", () => {
     expect(markup).not.toContain("L63.0 1.0 L63.0 16");
   });
 
+  it("marks the last plan point with a hollow dot between the chosen dot's ring and the dot, only while the dot is before the plan", () => {
+    const markup = render({ planFrom: 3 });
+    const order = [...markup.matchAll(/d="M([\d.]+ [\d.]+) L[\d.]+ [\d.]+" fill="none" stroke="([^"]+)" stroke-width="(\d+)"/g)].map((m) => `${m[1]}|${m[2]}|${m[3]}`);
+    expect(order).toEqual(["21.7 11.5|var(--tile)|11", "63.0 1.0|var(--accent)|6", "63.0 1.0|var(--tile)|3", "21.7 11.5|var(--accent)|7"]);
+    expect(markup).toContain('data-testid="sparkline-plan-end"');
+    expect(render({ planFrom: 3, dotIndex: 3 })).not.toContain("sparkline-plan-end");
+    expect(render({ planFrom: 3, dotIndex: 2 })).toContain("sparkline-plan-end");
+    expect(render()).not.toContain("sparkline-plan-end");
+  });
+
   it("leaves the drawing unchanged without it", () => {
     expect(render()).not.toContain("sparkline-plan");
     expect(render()).toContain("L63.0 1.0 L63.0 16");

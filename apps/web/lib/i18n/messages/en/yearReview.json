@@ -7,7 +7,7 @@
   "yearReview.pinHint": "Selecting highlights this category in every chart",
   "yearReview.fb": "{y} data",
   "yearReview.said": "{y}: state budget spending {v}",
-  "yearReview.saidPin": "{y}: {what} {v}",
+  "yearReview.saidPin": "{y} · {what}: {v}",
   "yearReview.h01": "{y} at a glance",
   "yearReview.m01": "Where {y} has no data, the nearest available year is shown",
   "yearReview.kSpend": "State budget spending",

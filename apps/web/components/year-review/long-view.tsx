@@ -35,6 +35,8 @@ export function LongView({ data, year, grouping, side, measure, focus, pin, onFo
   const { locale, messages } = useI18n();
   const text = (key: string, values?: Record<string, string | number>) => message(messages, key, values);
   const [hover, setHover] = useState<Hover | null>(null);
+  // The readout was moved by a key, not the pointer: only then is it also spoken (a live region), so a hover is not announced.
+  const [byKey, setByKey] = useState(false);
   // The drawn view, and the same in GEL for the readout's amounts and shares; neither follows a hover.
   const { view, gel } = useMemo(
     () => ({ view: longView(data, grouping, side, measure), gel: longView(data, grouping, side, "gel") }),
@@ -142,11 +144,13 @@ export function LongView({ data, year, grouping, side, measure, focus, pin, onFo
     const next = at(event);
     if (!next) return;
     if (next.column === hover?.column && next.band === hover.band) return;
+    setByKey(false);
     setHover(next);
     if (event.pointerType !== "touch" && next.band !== hover?.band) onFocus(next.band);
   };
   const leave = (event: PointerEvent<HTMLDivElement>) => {
     if (event.pointerType === "touch") return;
+    setByKey(false);
     setHover(null);
     onFocus(null);
   };
@@ -155,6 +159,7 @@ export function LongView({ data, year, grouping, side, measure, focus, pin, onFo
     const next = stepPeriodIndex(event.key, hover?.column ?? null, count);
     if (next === undefined) return;
     event.preventDefault();
+    setByKey(next !== null);
     setHover(next === null ? null : { column: next, band: hover?.band ?? picked });
   };
   // The readout (DESIGN.md §8.3): the year, the drawn total, and the band under the pointer with its amount and share.
@@ -207,7 +212,10 @@ export function LongView({ data, year, grouping, side, measure, focus, pin, onFo
           : {
               tabIndex: 0,
               onKeyDown: step,
-              onBlur: () => setHover(null),
+              onBlur: () => {
+                setByKey(false);
+                setHover(null);
+              },
               onPointerMove: move,
               onPointerDown: move,
               onPointerLeave: leave,
@@ -340,6 +348,9 @@ export function LongView({ data, year, grouping, side, measure, focus, pin, onFo
         </dl>
       ) : null}
       {chart(false)}
+      <p role="status" aria-live="polite" data-testid="long-view-said" className="sr-only">
+        {byKey && tip ? [tip.header, tip.total, ...tip.rows.map((row) => `${row.label} ${tip.format(row.value)}`)].join(", ") : ""}
+      </p>
       {tip ? (
         <div className="@min-[640px]:hidden">
           <ChartTooltip testId="long-view-panel" variant="panel" leftPercent={tip.x} header={tip.header} headerRight={tip.total} rows={tip.rows} hidden={0} formatValue={tip.format} />
