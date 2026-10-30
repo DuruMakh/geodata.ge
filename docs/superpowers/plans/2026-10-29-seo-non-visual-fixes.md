@@ -34,7 +34,7 @@ This plan fixes four findings from the [reviewed SEO audit](https://claude.ai/ar
 
 ### Out of scope
 
-A4 and every finding rated Low or Low–medium: B1, B2, B3, B5, B7, B8, B9, C1, C2, C3, C4, and N3–N10. Inflation tables (`InflationTable`, `InflationCityTable`, the client-loaded Inflation by product page) are left as they are: inflation is already served as CSV and through MCP. Air-quality city titles are left as they are: they name measuring stations, not municipalities. No MCP tool is added.
+A4 and every finding rated Low or Low–medium: B1, B2, B3, B5, B7, B8, B9, C1, C2, C3, C4, and N3–N10. Inflation tables (`InflationTable`, `InflationCityTable`, the client-loaded Inflation by product page) are left as they are: inflation is already served as CSV and through MCP. The age-sex pyramid (`PyramidTable`) is left as it is: it shows one date, not a yearly table. Air-quality city titles are left as they are: they name measuring stations, not municipalities. No MCP tool is added.
 
 ### Global constraints
 
