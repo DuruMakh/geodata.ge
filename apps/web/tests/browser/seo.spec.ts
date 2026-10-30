@@ -676,3 +676,49 @@ test("the country aggregate does not claim the per-resident measure", async ({ p
   const measures = node.variableMeasured.map((measure: { propertyID: string }) => measure.propertyID);
   expect(measures).toEqual(["amount_gel", "share_of_total_pct"]);
 });
+
+// Release 2 page titles: every place page of these families is titled for the way people search.
+const PLACE_TITLE_FAMILY =
+  /^\/explorer\/(?:demography\/population|education\/(?:schools|kindergartens)|health\/(?:pensions|subsistence-allowance|causes-of-death\/regions)|unemployment\/regions|wages\/regions|money\/regions|business\/regions|housing\/regions|internet\/homes|transport\/regions|living-standards\/(?:income|spending)\/regions|science-culture\/museums|environment\/(?:waste|forests)|economy\/regions)\/[^/]+(?:\/[^/]+)?$/;
+
+test("sitemap-wide: every deep explorer page has a unique title, and place-page titles are search-shaped", async ({ request }) => {
+  test.setTimeout(180_000);
+
+  const xml = await (await request.get(`${BASE_URL}/sitemap.xml`)).text();
+  const paths = [...xml.matchAll(/<loc>https:\/\/[^/]+([^<]+)<\/loc>/g)].map((match) => match[1]!);
+  // Four or more path segments, counted after the optional /en prefix, so a Georgian page and its English mirror
+  // sit at the same depth (/explorer/demography/population/khashuri is 4; /en/explorer/... is also 4).
+  const deepPaths = paths.filter((path) => {
+    const unprefixed = path.replace(/^\/en(?=\/)/, "");
+    return unprefixed.startsWith("/explorer/") && unprefixed.split("/").length - 1 >= 4;
+  });
+  expect(deepPaths.length).toBeGreaterThan(1000);
+
+  const titles = new Map<string, string>();
+  const queue = [...deepPaths];
+  await Promise.all(
+    Array.from({ length: 16 }, async () => {
+      while (queue.length > 0) {
+        const path = queue.shift()!;
+        const response = await request.get(`${BASE_URL}${path}`);
+        expect(response.status(), path).toBe(200);
+        const match = (await response.text()).match(/<title[^>]*>([^<]*)<\/title>/);
+        expect(match, `${path} has a <title>`).not.toBeNull();
+        titles.set(path, match![1]!.replace(/&amp;/g, "&").replace(/&#x27;|&#39;/g, "'").replace(/&quot;/g, '"'));
+      }
+    }),
+  );
+
+  const byTitle = new Map<string, string[]>();
+  for (const [path, title] of titles) byTitle.set(title, [...(byTitle.get(title) ?? []), path]);
+  const duplicates = [...byTitle].filter(([, group]) => group.length > 1).map(([title, group]) => `${title}: ${group.join(", ")}`);
+  expect(duplicates).toEqual([]);
+
+  const familyPaths = deepPaths.filter((path) => PLACE_TITLE_FAMILY.test(path.replace(/^\/en(?=\/)/, "")));
+  expect(familyPaths.length).toBeGreaterThan(500);
+  const dashed = familyPaths.filter((path) => titles.get(path)!.includes(" — "));
+  expect(dashed).toEqual([]);
+
+  const georgianInEnglish = deepPaths.filter((path) => path.startsWith("/en/") && /[Ⴀ-ჿ]/.test(titles.get(path)!));
+  expect(georgianInEnglish).toEqual([]);
+});
