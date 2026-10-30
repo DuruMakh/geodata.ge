@@ -22,7 +22,7 @@ export const REVENUE_BANDS: Record<RevenueBandId, readonly string[]> = {
   liabilities: ["revenue.increase_liabilities"],
 };
 
-const TAX_BAND_IDS: readonly RevenueBandId[] = ["vat", "income", "profit", "excise", "otherTaxes"];
+export const TAX_BAND_IDS: readonly RevenueBandId[] = ["vat", "income", "profit", "excise", "otherTaxes"];
 
 function activeDetailFacts(facts: ServedBudgetFact[], side: ServedBudgetFact["side"]): ServedBudgetFact[] {
   return chooseActivePublicFacts(facts).filter((fact) => fact.side === side && !isDerivedTotalItemId(fact.itemId));
