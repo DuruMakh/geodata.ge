@@ -165,11 +165,11 @@ export async function educationPlaceMetadata(route: EducationPlaceRoute, locale:
   const place = places.find(candidate => candidate.id === placeIdForRoute(route));
   if (!place) notFound();
   const values = { section: message(presentation.messages, `education.page.${set}.title`), place: placeLabel(place, locale) };
-  // The title is worded the way people search it and ends in the place's latest school year, as the table header prints it
-  // (with the en dash a title uses); the page's own heading and Dataset name keep education.place.metaTitle.
+  // The title is worded the way people search it and ends in the place's latest school year, as the table header prints it;
+  // the page's own heading and Dataset name keep education.place.metaTitle.
   const series = educationPlaceSeries(set, place.id);
   const latest = latestYearOf(facts, f => f.geographyId === place.id && series.some(({ id }) => id === f.indicatorId));
-  const seoValues = { place: locale === "ka" ? placeOfKa(place) : placeTitleNameEn(place), period: educationPeriodLabel(set)(latest).replace("/", "–") };
+  const seoValues = { place: locale === "ka" ? placeOfKa(place) : placeTitleNameEn(place), period: educationPeriodLabel(set)(latest) };
   return fiscalMetadata({
     locale,
     path: placePageHref(educationPlaceBase(set), place.id),

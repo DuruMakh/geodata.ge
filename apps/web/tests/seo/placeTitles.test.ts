@@ -32,11 +32,11 @@ describe("population place titles", () => {
 });
 
 describe("education place titles", () => {
-  it("name the school year the table's last column shows", async () => {
-    expect((await educationPlaceMetadata(AKHALKALAKI, "ka", "schools")).title).toMatch(/^ახალქალაქის მუნიციპალიტეტის სკოლები \d{4}–\d{2} \| Fiscal\.ge$/);
-    expect((await educationPlaceMetadata(BATUMI, "ka", "kindergartens")).title).toMatch(/^ბათუმის საბავშვო ბაღები \d{4}–\d{2} \| Fiscal\.ge$/);
-    expect((await educationPlaceMetadata(KHASHURI, "en", "schools")).title).toMatch(/^Schools in Khashuri Municipality \d{4}–\d{2} \| Fiscal\.ge$/);
-    expect((await educationPlaceMetadata(GURIA, "en", "kindergartens")).title).toMatch(/^Kindergartens in Guria \d{4}–\d{2} \| Fiscal\.ge$/);
+  it("name the school year the table's last column shows, as the table prints it", async () => {
+    expect((await educationPlaceMetadata(AKHALKALAKI, "ka", "schools")).title).toMatch(/^ახალქალაქის მუნიციპალიტეტის სკოლები \d{4}\/\d{2} \| Fiscal\.ge$/);
+    expect((await educationPlaceMetadata(BATUMI, "ka", "kindergartens")).title).toMatch(/^ბათუმის საბავშვო ბაღები \d{4}\/\d{2} \| Fiscal\.ge$/);
+    expect((await educationPlaceMetadata(KHASHURI, "en", "schools")).title).toMatch(/^Schools in Khashuri Municipality \d{4}\/\d{2} \| Fiscal\.ge$/);
+    expect((await educationPlaceMetadata(GURIA, "en", "kindergartens")).title).toMatch(/^Kindergartens in Guria \d{4}\/\d{2} \| Fiscal\.ge$/);
   });
 });
 
@@ -61,7 +61,7 @@ describe("every English place title", () => {
       ].map(String);
       for (const title of titles) {
         expect(title, JSON.stringify(route)).not.toMatch(GEORGIAN_LETTER);
-        expect(title, JSON.stringify(route)).toMatch(/ \d{4}(–\d{2})? \| Fiscal\.ge$/);
+        expect(title, JSON.stringify(route)).toMatch(/ \d{4}(\/\d{2})? \| Fiscal\.ge$/);
         expect(title.split("Fiscal.ge")).toHaveLength(2);
       }
     }
