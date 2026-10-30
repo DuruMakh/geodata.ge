@@ -203,7 +203,12 @@ function buildDebt(input: YearReviewInput): YearReviewData["debt"] {
   };
 }
 
-/** The Municipalities page's own list (same year, population and Adjara adjustment), so the two pages agree. */
+/**
+ * The Municipalities page's own municipality rows (same year and population), so the two pages agree municipality by
+ * municipality. Its region rows are not taken: there Adjara's carries the Autonomous Republic's net payments (the
+ * adjustment, which touches no municipality row), while this page's region averages (yearView regionsView) are their
+ * municipalities' alone, the republic's budget left out as the board's note (yearReview.mpNote) says.
+ */
 function buildMunicipal(input: YearReviewInput, presentation: Presentation): YearReviewData["municipal"] {
   const { municipalities, regions, totalFacts, populationFacts, adjaraBudgetAdjustments } = input.municipal;
   const { locale, englishLabels } = presentation;

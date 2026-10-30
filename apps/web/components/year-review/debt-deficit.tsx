@@ -1,5 +1,6 @@
 "use client";
 
+import { memo } from "react";
 import { ACCENT, DEBT_DOMESTIC, INK_LINE, NEGATIVE, POSITIVE } from "../../lib/explorer/colors";
 import { formatAmount, formatAmountParts, formatInUnit, formatPerResidentGel, formatShare, UNIT_BN } from "../../lib/explorer/format";
 import { message } from "../../lib/i18n/messages";
@@ -24,7 +25,7 @@ const hatchedFrom = (from: number | undefined, label: string): { projectionFrom:
   from === undefined ? {} : { projectionFrom: from, projectionLabel: label };
 
 /** Section 04 for the chosen year. */
-export function DebtDeficit({ data, year }: Pick<YearReviewSectionProps, "data" | "year">) {
+export const DebtDeficit = memo(function DebtDeficit({ data, year }: Pick<YearReviewSectionProps, "data" | "year">) {
   const { locale, messages } = useI18n();
   const text = (key: string, values?: Record<string, string | number>) => message(messages, key, values);
   const { balance, debt: debtData } = data;
@@ -46,6 +47,7 @@ export function DebtDeficit({ data, year }: Pick<YearReviewSectionProps, "data" 
   // A projection year's value says so to a screen reader, as its tag does on screen.
   const pctAt = (index: number) => (balance.projection[index] ? `${pct(balance.pctGdp[index]!)}, ${projection}` : pct(balance.pctGdp[index]!));
   const balProjFrom = firstProjection(balance.years, balance.projection);
+  const balProjTo = balance.years.findLast((_, index) => balance.projection[index]);
   const dfHeading = text("yearReview.dfH");
   const surplusLabel = text("yearReview.dfSur");
   const deficitLabel = text("yearReview.dfDef");
@@ -181,7 +183,7 @@ export function DebtDeficit({ data, year }: Pick<YearReviewSectionProps, "data" 
           share={
             <ChartShareButton
               title={dfHeading}
-              caption={`${text("main.percentGdp")} · ${bal.from}–${bal.to}`}
+              caption={`${text("main.percentGdp")} · ${bal.from}–${bal.to}${balProjFrom === undefined || balProjTo === undefined ? "" : ` · ${projection} ${balProjFrom}–${balProjTo}`}`}
               legend={[{ label: surplusLabel, color: POSITIVE }, { label: deficitLabel, color: NEGATIVE }]}
               source={data.sources.balance}
               chart={deficitChart}
@@ -279,7 +281,7 @@ export function DebtDeficit({ data, year }: Pick<YearReviewSectionProps, "data" 
           share={
             <ChartShareButton
               title={wallHeading}
-              caption={`${text("yearReview.bn")} · ${rep.from}–${rep.to}`}
+              caption={`${text("yearReview.bn")} · ${rep.from}–${rep.to}${repProjFrom === undefined || projTo === undefined ? "" : ` · ${projection} ${repProjFrom}–${projTo}`}`}
               legend={[{ label: principalLabel, color: INK_LINE }, { label: interestLabel, color: ACCENT }]}
               source={data.sources.debt}
               chart={wallChart}
@@ -295,4 +297,4 @@ export function DebtDeficit({ data, year }: Pick<YearReviewSectionProps, "data" 
       </div>
     </Section>
   );
-}
+});

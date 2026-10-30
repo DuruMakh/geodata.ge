@@ -216,7 +216,12 @@ test("the plan year marks its figures as a plan and keeps every section filled",
   await page.setViewportSize({ width: 1440, height: 1000 });
   await open(page, "/explorer/analysis");
   const last = Number(await page.getByTestId("year-ruler").getByRole("radio").last().getAttribute("data-year"));
+  // The screen-reader line says the chosen year's spending, and that it is a plan in a plan year.
+  const said = page.getByTestId("year-review").locator(':scope > p[role="status"]');
+  await expect(said).toHaveText(new RegExp(`^${await chosenYear(page)}: `));
+  await expect(said).not.toContainText("გეგმა");
   await pickYear(page, last);
+  await expect(said).toHaveText(new RegExp(`^${last}: .*, გეგმა$`));
   await expect(page.locator('[data-kpi="spend"] [data-plan-tag]')).toHaveText("გეგმა");
   await expect(page.locator('#year-review-where [data-panel="change"] h3')).toContainText(`${last} — გეგმა, ${last - 1} — ფაქტი`);
   // Datasets without the plan year show the year they use, never a blank.

@@ -1,4 +1,4 @@
-import { beforeAll, describe, expect, test } from "vitest";
+import { beforeAll, describe, expect, test, vi } from "vitest";
 import { DebtDeficit } from "../../components/year-review/debt-deficit";
 import { GivesUp } from "../../components/year-review/gives-up";
 import { formatAmountParts } from "../../lib/explorer/format";
@@ -8,7 +8,15 @@ import type { YearReviewData } from "../../lib/yearReview/types";
 import { refundsView } from "../../lib/yearReview/yearView";
 import { chartGeometry, renderPageMarkup } from "../helpers/render-localized";
 
-// Sections 02 (what the state gives up) and 04 (deficit and debt) as static markup, on the served data.
+// Sections 02 (what the state gives up) and 04 (deficit and debt) as static markup, on the served data. The share
+// button stands in with its title and caption on it, as in section03.test.tsx: the real one mounts its card only
+// when opened, so its caption never reaches static markup.
+
+vi.mock("../../components/explorer-shell/chart-share-button", () => ({
+  ChartShareButton: ({ title, caption }: { title: string; caption: string }) => (
+    <button type="button" data-testid="chart-share" data-title={title} data-caption={caption} />
+  ),
+}));
 
 const GEORGIAN = /\p{Script=Georgian}/gu;
 const loaded: Partial<Record<"ka" | "en", { data: YearReviewData; presentation: Presentation }>> = {};
@@ -89,6 +97,26 @@ describe("Year in review sections 02 and 04", () => {
     const deficitHeading = (html: string) => /data-chart="deficit"[\s\S]*?<\/h3>/.exec(html)?.[0] ?? "";
     expect(deficitHeading(markup)).toMatch(/data-plan-tag=""[^>]*>პროგნოზი/);
     expect(deficitHeading(sections(2025))).not.toContain("data-plan-tag");
+  });
+
+  test("the deficit and repayments share pictures name their projection years", () => {
+    for (const locale of ["ka", "en"] as const) {
+      const { data, presentation } = loaded[locale]!;
+      const projection = presentation.messages["yearReview.proj"]!;
+      const markup = sections(2025, locale);
+      const caption = (html: string) => /data-caption="([^"]*)"/.exec(html)?.[1] ?? "";
+      const span = (years: number[], projected: boolean[]) => {
+        const hatched = years.filter((_, index) => projected[index]);
+        return `${hatched[0]}–${hatched.at(-1)}`;
+      };
+      const { balance, debt } = data;
+      expect(caption(from(markup, 'data-chart="deficit"'))).toBe(
+        `${presentation.messages["main.percentGdp"]} · ${balance.years[0]}–${balance.years.at(-1)} · ${projection} ${span(balance.years, balance.projection)}`,
+      );
+      expect(caption(part(markup, "repayments"))).toMatch(new RegExp(` · ${projection} ${span(debt.service.years, debt.service.projection)}$`));
+      // The debt stock has no projection, and its caption names none.
+      expect(caption(from(markup, 'data-chart="debt-stock"'))).not.toContain(projection);
+    }
   });
 
   test("in English the two sections have no Georgian text", () => {

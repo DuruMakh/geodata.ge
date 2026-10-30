@@ -394,7 +394,10 @@ export function perResidentRows(
   ];
 }
 
-/** Each region's average (its total over its residents), highest first, and the median municipality. */
+/**
+ * Each region's average (its municipalities' total over their residents), highest first, and the median municipality.
+ * Municipalities only: unlike the Municipalities page's Adjara row, the Autonomous Republic's budget is not added.
+ */
 export function regionsView(data: YearReviewData): {
   median: number;
   regions: { id: string; label: string; average: number; places: YearReviewData["municipal"]["places"] }[];

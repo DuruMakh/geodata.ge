@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { memo, useMemo } from "react";
 import { updatedDate } from "../../lib/explorer/coverageLabel";
 import { formatPerResidentGel } from "../../lib/explorer/format";
 import { message } from "../../lib/i18n/messages";
@@ -17,7 +17,7 @@ import { PlanTag, YearTag } from "./year-tag";
 // resident divides by Geostat's population on 1 January of each year (spec §9.4).
 
 /** Section 05 for the chosen year. */
-export function CountryRegions({ data, year }: Pick<YearReviewSectionProps, "data" | "year">) {
+export const CountryRegions = memo(function CountryRegions({ data, year }: Pick<YearReviewSectionProps, "data" | "year">) {
   const { locale, messages } = useI18n();
   const text = (key: string, values?: Record<string, string | number>) => message(messages, key, values);
   const rows = useMemo(() => perResidentRows(data, year), [data, year]);
@@ -78,4 +78,4 @@ export function CountryRegions({ data, year }: Pick<YearReviewSectionProps, "dat
       <RegionsDots data={data} year={year} />
     </Section>
   );
-}
+});

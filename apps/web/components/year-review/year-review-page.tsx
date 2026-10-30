@@ -119,14 +119,16 @@ function YearReviewContent({ data }: { data: YearReviewData }) {
         ) : null}
       </div>
       <p role="status" aria-live="polite" className="sr-only">
-        {text("yearReview.said", { y: year, v: formatAmount(spend[years.indexOf(year)], locale) })}
+        {/* One text node, so the whole line is announced, the plan word with it in a planned budget year. */}
+        {`${text("yearReview.said", { y: year, v: formatAmount(spend[years.indexOf(year)], locale) })}${planned[years.indexOf(year)] ? `, ${text("yearReview.plan")}` : ""}`}
       </p>
 
       <Glance {...sectionProps} />
-      <GivesUp {...sectionProps} />
+      {/* Memoized and given only what they read, so a hover elsewhere on the page does not redraw them. */}
+      <GivesUp data={data} year={year} />
       <WhereMoneyGoes {...sectionProps} />
-      <DebtDeficit {...sectionProps} />
-      <CountryRegions {...sectionProps} />
+      <DebtDeficit data={data} year={year} />
+      <CountryRegions data={data} year={year} />
       <LongView {...sectionProps} />
       <YearReviewNotes data={data} year={year} />
     </div>

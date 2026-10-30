@@ -1,5 +1,6 @@
 "use client";
 
+import { memo } from "react";
 import { ACCENT, INK, OTHER_COLOR } from "../../lib/explorer/colors";
 import { formatAmountParts, formatInUnit, formatShare, UNIT_PERSONS } from "../../lib/explorer/format";
 import { message } from "../../lib/i18n/messages";
@@ -65,7 +66,7 @@ function IceChart({ columns, ariaLabel }: { columns: IceColumn[]; ariaLabel: str
 }
 
 /** Section 02 for the chosen year. */
-export function GivesUp({ data, year }: Pick<YearReviewSectionProps, "data" | "year">) {
+export const GivesUp = memo(function GivesUp({ data, year }: Pick<YearReviewSectionProps, "data" | "year">) {
   const { locale, messages } = useI18n();
   const text = (key: string, values?: Record<string, string | number>) => message(messages, key, values);
   const breaks = givesUpView(data, year);
@@ -178,4 +179,4 @@ export function GivesUp({ data, year }: Pick<YearReviewSectionProps, "data" | "y
       <p className={`${FOOT_NOTE} mt-2.5`}>{text("yearReview.tbNote", { to: taxBreaks.years.at(-1)! })}</p>
     </Section>
   );
-}
+});

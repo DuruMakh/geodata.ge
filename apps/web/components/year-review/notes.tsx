@@ -2,6 +2,7 @@
 
 import { ArrowUpRight } from "lucide-react";
 import Link from "next/link";
+import { memo } from "react";
 import { updatedDate } from "../../lib/explorer/coverageLabel";
 import { formatInUnit, UNIT_PERSONS } from "../../lib/explorer/format";
 import { BUDGET_SECTIONS } from "../../lib/explorer/sections";
@@ -29,7 +30,7 @@ function rangeOf(years: readonly number[], values: Values, keep: (value: number,
 const flagged = (years: readonly number[], flags: readonly boolean[]): Range | null => rangeOf(years, years.map((_, index) => (flags[index] ? 0 : null)));
 
 /** The notes for the chosen year (the population figure is that year's, or the nearest one's). */
-export function YearReviewNotes({ data, year }: { data: YearReviewData; year: number }) {
+export const YearReviewNotes = memo(function YearReviewNotes({ data, year }: { data: YearReviewData; year: number }) {
   const { locale, messages } = useI18n();
   const text = (key: string, values?: Record<string, string | number>) => message(messages, key, values);
   const { budget, taxBreaks, refunds, balance, debt, municipal } = data;
@@ -118,4 +119,4 @@ export function YearReviewNotes({ data, year }: { data: YearReviewData; year: nu
       </p>
     </section>
   );
-}
+});

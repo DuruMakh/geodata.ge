@@ -7,11 +7,17 @@ import {
   loadServedGovernmentDebtData,
   loadServedMunicipalData,
 } from "../../lib/data/servedData";
-import { isDerivedTotalItemId } from "../../lib/explorer/explorerData";
+import { publicGlossaryEntry } from "../../lib/data/glossary";
+import { projectBalanceFact, projectBudgetFact, projectDebtFact, projectGdpFact } from "../../lib/explorer/clientData";
+import { buildDebtExplorerModel } from "../../lib/explorer/debtExplorer";
+import { buildDeficitExplorerModel, DEFICIT_SERIES_ID } from "../../lib/explorer/deficitExplorer";
+import { buildExplorerModel, isDerivedTotalItemId } from "../../lib/explorer/explorerData";
 import { buildMunicipalListRows, MUNICIPAL_PER_RESIDENT_YEAR } from "../../lib/explorer/municipalData";
+import { getPresentation } from "../../lib/i18n/presentation.server";
 import { REVENUE_BANDS } from "../../lib/landing/chapters/budgetSeries";
 import { loadYearReviewData } from "../../lib/yearReview/buildYearReviewData";
 import type { Values } from "../../lib/yearReview/types";
+import { glanceKpis } from "../../lib/yearReview/yearView";
 
 // Real CSV-mode served data: the page must agree with the topic pages it summarises.
 
@@ -111,6 +117,53 @@ describe("buildYearReviewData", () => {
     }
     expect(data.debt.stock.years.length).toBeGreaterThan(0);
     for (const fact of debt.filter((row) => row.family === "stock")) expect(fact.status).toBe("actual");
+  });
+
+  test("2025's tax revenue, balance and debt are the Revenue, Deficit and Debt pages' own figures", async () => {
+    const { data } = await loadYearReviewData("ka");
+    const kpis = new Map(glanceKpis(data, 2025).map((kpi) => [kpi.id, kpi]));
+    const year = { start: 2025, end: 2025 };
+
+    // Revenue: the page's model (MainExplorer on the revenue side), its tax items summed.
+    const { facts, glossary, gdpFacts } = await loadServedExplorerData();
+    const revenue = buildExplorerModel({
+      facts: facts.filter((fact) => fact.side === "revenue").map(projectBudgetFact),
+      glossary: new Map(Array.from(glossary.values(), (entry) => [entry.id, publicGlossaryEntry(entry)])),
+      gdpFacts: gdpFacts.map(projectGdpFact),
+      side: "revenue",
+      selectedItemIds: [...TAX_IDS],
+      startYear: year.start,
+      endYear: year.end,
+      measure: "nominal",
+    });
+    expect(revenue.tableRows.map((row) => row.itemId).sort()).toEqual([...TAX_IDS].sort());
+    const tax = kpis.get("tax")!;
+    expect(tax).toMatchObject({ year: 2025, fallback: false, planned: false });
+    expect(tax.value).toBeCloseTo(sum(revenue.tableRows.map((row) => row.valuesByYear[2025] ?? null)), 2);
+
+    // Balance: the Deficit page's model, % of GDP.
+    const { facts: balanceFacts } = await loadServedGeneralGovernmentBalanceData();
+    // The page's own presentation (lib/pages/deficit.tsx): the model names its one series in English from it.
+    const deficitPresentation = await getPresentation("ka", ["format", "main", "deficit"], [DEFICIT_SERIES_ID], [DEFICIT_SERIES_ID]);
+    const deficit = buildDeficitExplorerModel({ facts: balanceFacts.map(projectBalanceFact), range: year, percentage: true, selected: true }, deficitPresentation);
+    const balance = kpis.get("balance")!;
+    expect(balance).toMatchObject({ year: 2025, fallback: false, planned: false });
+    expect(deficit.points).toHaveLength(1);
+    expect(balance.value).toBe(deficit.points[0]!.value);
+
+    // Debt: the Debt page's model, the stock total at the end of 2025.
+    const { facts: debtFacts } = await loadServedGovernmentDebtData();
+    const debt = buildDebtExplorerModel({
+      facts: debtFacts.map(projectDebtFact),
+      gdpFacts: gdpFacts.map(projectGdpFact),
+      family: "stock",
+      selectedIds: ["debt.stock.total"],
+      range: year,
+      shareOfGdp: false,
+    });
+    const debtKpi = kpis.get("debt")!;
+    expect(debtKpi).toMatchObject({ year: 2025, fallback: false });
+    expect(debtKpi.value).toBe(debt.totalRow!.valuesByYear[2025]);
   });
 
   test("municipal places agree with the Municipalities page", async () => {
