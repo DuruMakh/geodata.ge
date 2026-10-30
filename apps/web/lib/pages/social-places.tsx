@@ -142,7 +142,7 @@ export async function renderSocialIndexPage(locale: Locale, set: SocialPlaceSet)
       {/* The index is the set's dataset; each place page is a slice of it. */}
       <JsonLd testId="explorer-dataset-json-ld" data={explorerDatasetJsonLd({
         locale, origin: resolveSiteUrl(), path: base, datasetId: "social-protection", name: title, description: t(`page.${set}.summary`),
-        firstYear: min, lastYear: max, dateModified: lastReviewedAt, variableMeasured: headingNames(messages, set),
+        firstYear: min, lastYear: max, dateModified: lastReviewedAt, downloadPath: "/downloads/data/social-protection.csv", variableMeasured: headingNames(messages, set),
       })} />
       <BreadcrumbJsonLd items={[
         { name: crumbs[0].label, path: pageHref("/", locale) },

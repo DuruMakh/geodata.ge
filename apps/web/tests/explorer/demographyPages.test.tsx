@@ -136,7 +136,8 @@ describe("population index page", () => {
     const html = renderPageMarkup("en", await renderDemographyPopulationPage("en"));
     expect(html).toContain('data-testid="breadcrumb-json-ld"');
     expect(datasetNode(html)).toMatchObject({ "@type": "Dataset", name: "Population", url: "https://fiscal.ge/en/explorer/demography/population" });
-    expect(html).not.toContain("/downloads/data/");
+    // The only download the page names is the population file, in the Dataset's distribution.
+    expect([...html.matchAll(/\/downloads\/data\/[^"\\<]*/g)].map((match) => match[0])).toEqual(["/downloads/data/population.csv"]);
     expect(html).toContain('href="/en/methodology/demography"');
     expect(html).toMatch(SENTENCE_CLOSED_BEFORE_BOUNDARIES);
     expect(html).not.toMatch(GEORGIAN);
@@ -347,7 +348,7 @@ describe("population sources", () => {
 });
 
 // Every page, in both languages, names one Dataset of the demography vocabulary after its own title and series, credits Geostat,
-// and claims no download: the population file is published later, and only the Population index will point at it.
+// and claims no download except the Population index, which points at the published population file.
 describe("every demography page's Dataset", () => {
   const pages = [
     ["population", "/explorer/demography/population", renderDemographyPopulationPage],
@@ -361,7 +362,7 @@ describe("every demography page's Dataset", () => {
   afterEach(() => { process.env.NEXT_PUBLIC_SITE_URL = original; });
 
   it.each(pages.flatMap(([slug, path, render]) => (["ka", "en"] as const).map((locale) => [slug, locale, path, render] as const)))(
-    "%s, %s", async (_slug, locale, path, render) => {
+    "%s, %s", async (slug, locale, path, render) => {
       const html = renderPageMarkup(locale, await render(locale));
       const node = datasetNode(html);
       expect(node["@type"]).toBe("Dataset");
@@ -370,8 +371,14 @@ describe("every demography page's Dataset", () => {
       expect(node.keywords).toContain(locale === "en" ? "demography" : "დემოგრაფია");
       expect([node.provider].flat().map((agency) => agency.name)).toEqual([locale === "en" ? "National Statistics Office of Georgia (Geostat)" : "საქართველოს სტატისტიკის ეროვნული სამსახური (საქსტატი)"]);
       expect(node.variableMeasured.length).toBeGreaterThan(0);
-      expect(node).not.toHaveProperty("distribution");
-      expect(html).not.toContain("/downloads/data/");
+      if (slug === "population") {
+        expect(node.distribution).toEqual([
+          { "@type": "DataDownload", encodingFormat: "text/csv", contentUrl: "https://fiscal.ge/downloads/data/population.csv" },
+        ]);
+      } else {
+        expect(node).not.toHaveProperty("distribution");
+        expect(html).not.toContain("/downloads/data/");
+      }
       if (locale === "en") expect(JSON.stringify(node)).not.toMatch(GEORGIAN);
     });
 });

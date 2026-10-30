@@ -156,7 +156,7 @@ Georgian first, English complete. A new message scope `demography` (`lib/i18n/me
 
 Each live page has metadata (title, description, canonical, reciprocal hreflang), `BreadcrumbList` JSON-LD and sitemap rows in both languages with `lastModified` from the family's latest review date. **No Dataset JSON-LD and no download links in this release.** Dataset markup is keyed by the fact-query `DatasetId` and points at bulk files, both of which belong to the MCP and publications follow-up; the inflation hub, overview, categories and cities pages already emit breadcrumbs only. Nothing may advertise a route or download whose artifact does not exist; a test asserts no demography page emits a `downloadPath`.
 
-Amended 2026-10-30: this release lifts the "No Dataset JSON-LD and no download links" decision above. Every demography page emits Dataset JSON-LD with `datasetId: "demography"` (the population place pages are `partOf` the Population index), and the population figures are to be published as the bulk file `/downloads/data/population.csv`; only the index will point at it, once it is published, and a test still asserts no other demography page emits a `downloadPath`. The MCP tool stays out of scope.
+Amended 2026-10-30: this release lifts the "No Dataset JSON-LD and no download links" decision above. Every demography page emits Dataset JSON-LD with `datasetId: "demography"` (the population place pages are `partOf` the Population index), and the population figures are published as the bulk file `/downloads/data/population.csv`; only the index points at it, in its Dataset markup, and a test still asserts no other demography page emits a `downloadPath`. The MCP tool stays out of scope.
 
 ## 11. Methodology and sources
 

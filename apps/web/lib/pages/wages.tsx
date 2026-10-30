@@ -58,6 +58,8 @@ export async function renderWagesPage(locale: Locale, section: WagesSectionId, r
   return <I18nProvider {...clientPresentation(presentation)}>
     <JsonLd testId="explorer-dataset-json-ld" data={explorerDatasetJsonLd({
       locale, origin, path: href, datasetId: "wages", name: title, description, firstYear, lastYear, dateModified: lastReviewedAt,
+      // A region page is a slice of the Regions page's dataset and links no file of its own.
+      ...(regionId ? {} : { downloadPath: "/downloads/data/wages.csv" as const }),
       ...(regionId ? { spatialCoverageName: regionName, withinGeorgia: true, partOf: wagesRegionsDataset(presentation.messages) } : {}),
       variableMeasured: [...new Set(facts.map(f => f.indicatorId))].map(id => t(id === "median_monthly_earnings" ? "series.median" : "series.average")),
     })} />

@@ -14,6 +14,10 @@ const llmsPath = fileURLToPath(new URL("../../public/llms.txt", import.meta.url)
 // "names every hub, section and methodology route"). Published files are not pages, so their exact list stays here.
 const requiredFileTargets = [
   "https://fiscal.ge/downloads/data/inflation-cpi-national.csv",
+  "https://fiscal.ge/downloads/data/unemployment.csv",
+  "https://fiscal.ge/downloads/data/wages.csv",
+  "https://fiscal.ge/downloads/data/social-protection.csv",
+  "https://fiscal.ge/downloads/data/population.csv",
   "https://fiscal.ge/downloads/data/gdp-overview.json",
   "https://fiscal.ge/downloads/data/gdp-overview.csv",
   "https://fiscal.ge/downloads/data/economic-sectors.json",
@@ -220,6 +224,33 @@ describe("Fiscal.ge agent instructions", () => {
       expect(series.yearsByMeasure?.real_growth_pct, series.seriesId).toEqual(growthYears);
     }
     expect(nominalYears.filter(year => !growthYears.includes(year))).toEqual([missingGrowthYear]);
+  });
+  // Each of these topics now has a bulk file, linked once on its own line; the other demography and health lines still have none.
+  it("links the population, wages, unemployment and social-protection files from their lines and keeps no-bulk-file wording elsewhere", async () => {
+    const lines = (await readFile(llmsPath, "utf8")).split(/\r?\n/);
+    const lineOf = (url: string) => lines.find((line) => line.startsWith(`- [`) && line.includes(`](https://fiscal.ge${url})`))!;
+    for (const [url, file] of [
+      ["/explorer/demography/population", "population.csv"],
+      ["/explorer/labour#t-wages", "wages.csv"],
+      ["/explorer/labour#t-unemployment", "unemployment.csv"],
+      ["/explorer/living#t-health", "social-protection.csv"],
+    ] as const) {
+      const line = lineOf(url);
+      expect(line, url).toContain(`(https://fiscal.ge/downloads/data/${file})`);
+      expect(line, url).toMatch(/Bulk file: \[[^\]]*CSV\]/);
+      expect(line, url).toContain("there is no MCP tool");
+      expect(line, url).not.toMatch(/no bulk file for (demography|wages|unemployment|health or social protection)/);
+      expect(line, url).not.toContain("Browse-only for now");
+    }
+    expect(lineOf("/explorer/living#t-health")).toContain("no bulk file for health");
+    for (const slug of ["migration", "births-deaths", "marriages-divorces"]) {
+      expect(lineOf(`/explorer/demography/${slug}`), slug).toContain("no bulk file for demography");
+    }
+    // The bulk-file list beside the manifest names the four files too, without repeating their links.
+    const bulk = lines.slice(lines.indexOf("## Bulk data files"));
+    for (const file of ["population.csv", "wages.csv", "unemployment.csv", "social-protection.csv"]) {
+      expect(bulk.some((line) => line.includes(`\`${file}\``)), file).toBe(true);
+    }
   });
   it("advertises every registered read-only tool", async () => {
     const content = await readFile(llmsPath, "utf8");

@@ -129,6 +129,7 @@ export async function renderDemographyPopulationPage(locale: Locale) {
           firstYear: start,
           lastYear: end,
           dateModified: facts.map((fact) => fact.lastReviewedAt).sort().at(-1)!,
+          downloadPath: "/downloads/data/population.csv",
           variableMeasured: [t("measurePopulation"), t("sideDensity")],
         })}
       />
