@@ -73,7 +73,7 @@ export async function museumAreaMetadata(slug: string, locale: Locale) {
   const name = museumAreaLabels(presentation)[area];
   // The title is worded the way people search it and ends in the area's latest year; the page's own heading and Dataset name keep regionTitle.
   const ids = new Set<string>(museumAreaSeries(area).map(series => series.id));
-  const seoTitle = message(presentation.messages, "scienceCulture.page.area.seoTitle", { place: areaTitleForm(AREA_PAGES[MUSEUM_AREAS.indexOf(area)].id, name, locale, "of"), year: latestYearOf(data.facts, f => ids.has(f.indicatorId)) });
+  const seoTitle = message(presentation.messages, "scienceCulture.page.area.seoTitle", { place: areaTitleForm(museumMapId(area), name, locale, "of"), year: latestYearOf(data.facts, f => ids.has(f.indicatorId)) });
   return fiscalMetadata({ locale, path: museumAreaHref(area), title: seoTitle, description: message(presentation.messages, "scienceCulture.page.area.regionSummary", { region: name }) });
 }
 

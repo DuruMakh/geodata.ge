@@ -27,7 +27,6 @@ beforeEach(() => { process.env.NEXT_PUBLIC_SITE_URL = "https://fiscal.ge"; });
 afterEach(() => { process.env.NEXT_PUBLIC_SITE_URL = original; });
 
 const SLUGS = ["georgia", "tbilisi", "imereti", "racha_lechkhumi_kvemo_svaneti"];
-const frameSlug = (slug: string) => slug === "georgia" ? slug : `region_${slug}`;
 
 describe("region page titles", () => {
   it("word a region's unemployment title with the region in the locative and its own latest year", async () => {
@@ -103,7 +102,7 @@ describe("regional economy description", () => {
 describe("every region title", () => {
   const loaders: Record<string, (slug: string, locale: "ka" | "en") => Promise<{ title?: unknown }>> = {
     unemployment: (s, l) => unemploymentRegionPageMetadata(s, l), wages: (s, l) => wagesRegionPageMetadata(s, l),
-    loans: (s, l) => moneyBanksAreaPageMetadata(s, l), business: (s, l) => businessAreaPageMetadata(frameSlug(s).replace(/^region_/, ""), l),
+    loans: (s, l) => moneyBanksAreaPageMetadata(s, l), business: (s, l) => businessAreaPageMetadata(s, l),
     housing: (s, l) => housingAreaPageMetadata(s, l), internet: (s, l) => internetAreaPageMetadata(s, l), transport: (s, l) => transportAreaPageMetadata(s, l),
     income: (s, l) => householdRegionPageMetadata("income", s, l), spending: (s, l) => householdRegionPageMetadata("spending", s, l),
     deaths: (s, l) => healthDeathsAreaPageMetadata(l, s), museums: (s, l) => museumAreaMetadata(s, l),

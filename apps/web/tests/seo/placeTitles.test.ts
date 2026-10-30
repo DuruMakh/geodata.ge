@@ -1,5 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { educationPlaceMetadata } from "../../lib/pages/education-places";
+import { loadPopulationBasics } from "../../lib/explorer/populationBasics.server";
+import { placeIdForRoute } from "../../lib/explorer/demographyPlaceRoutes";
+import { placeYears } from "../../lib/explorer/demographyPopulation";
 import { populationPlaceMetadata, type PopulationPlaceRoute } from "../../lib/pages/demography-population-place";
 import { socialPlaceMetadata } from "../../lib/pages/social-places";
 
@@ -18,10 +21,13 @@ const ROUTES = [GEORGIA, GURIA, KHASHURI, BATUMI];
 
 describe("population place titles", () => {
   it("word a municipality's title the way people search it, with its latest year", async () => {
-    expect((await populationPlaceMetadata(KHASHURI, "ka")).title).toBe("ხაშურის მუნიციპალიტეტის მოსახლეობა 2026 | Fiscal.ge");
-    expect((await populationPlaceMetadata(KHASHURI, "en")).title).toBe("Khashuri Municipality population 2026 | Fiscal.ge");
-    expect((await populationPlaceMetadata(KUTAISI, "ka")).title).toBe("ქუთაისის მოსახლეობა 2026 | Fiscal.ge");
-    expect((await populationPlaceMetadata(GEORGIA, "ka")).title).toBe("საქართველოს მოსახლეობა 2026 | Fiscal.ge");
+    // The latest year comes from the same loader and helper the page uses.
+    const { clientFacts, places } = await loadPopulationBasics("ka");
+    const latest = (route: PopulationPlaceRoute) => placeYears(clientFacts, places.find((place) => place.id === placeIdForRoute(route))!).at(-1);
+    expect((await populationPlaceMetadata(KHASHURI, "ka")).title).toBe(`ხაშურის მუნიციპალიტეტის მოსახლეობა ${latest(KHASHURI)} | Fiscal.ge`);
+    expect((await populationPlaceMetadata(KHASHURI, "en")).title).toBe(`Khashuri Municipality population ${latest(KHASHURI)} | Fiscal.ge`);
+    expect((await populationPlaceMetadata(KUTAISI, "ka")).title).toBe(`ქუთაისის მოსახლეობა ${latest(KUTAISI)} | Fiscal.ge`);
+    expect((await populationPlaceMetadata(GEORGIA, "ka")).title).toBe(`საქართველოს მოსახლეობა ${latest(GEORGIA)} | Fiscal.ge`);
   });
 
   it("keeps the social-card titles the same as the page title", async () => {

@@ -715,9 +715,11 @@ test("sitemap-wide: every deep explorer page has a unique title, and place-page 
   expect(duplicates).toEqual([]);
 
   const familyPaths = deepPaths.filter((path) => PLACE_TITLE_FAMILY.test(path.replace(/^\/en(?=\/)/, "")));
-  expect(familyPaths.length).toBeGreaterThan(500);
+  expect(familyPaths.length).toBeGreaterThanOrEqual(1080); // 540 per language today
   const dashed = familyPaths.filter((path) => titles.get(path)!.includes(" — "));
   expect(dashed).toEqual([]);
+  const unshaped = familyPaths.filter((path) => !/ \d{4}(\/\d{2})? \| Fiscal\.ge$/.test(titles.get(path)!));
+  expect(unshaped).toEqual([]);
 
   const georgianInEnglish = deepPaths.filter((path) => path.startsWith("/en/") && /[Ⴀ-ჿ]/.test(titles.get(path)!));
   expect(georgianInEnglish).toEqual([]);

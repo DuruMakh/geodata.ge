@@ -65,7 +65,7 @@ describe("Georgian and English place forms for titles", () => {
     }
   });
 
-  it("gives every municipality forms that differ from its display name", () => {
+  it("gives every municipality the forms its official name or city name dictates", () => {
     expect(municipalRows).toHaveLength(64);
     for (const row of municipalRows) {
       const title: TitlePlace = {
@@ -76,9 +76,21 @@ describe("Georgian and English place forms for titles", () => {
         officialNameKa: row.nameKa,
         selfGoverningCity: row.isSelfGoverningCity,
       };
-      expect(placeOfKa(title), row.code).not.toBe(row.displayNameKa);
-      expect(placeInKa(title), row.code).not.toBe(row.displayNameKa);
+      if (row.isSelfGoverningCity) {
+        expect(row.displayNameKa, row.code).toMatch(/ი$/);
+        expect(placeOfKa(title), row.code).toBe(`${row.displayNameKa.slice(0, -1)}ის`);
+        expect(placeInKa(title), row.code).toBe(`${row.displayNameKa.slice(0, -1)}ში`);
+      } else {
+        expect(placeOfKa(title), row.code).toBe(`${row.nameKa}ს`);
+        expect(placeInKa(title), row.code).toMatch(/მუნიციპალიტეტში$/);
+      }
     }
+  });
+
+  it("throws for a region id with no stored form", () => {
+    const unknown: TitlePlace = { id: "region.nowhere", level: "region", nameKa: "არსად", nameEn: "Nowhere" };
+    expect(() => placeOfKa(unknown)).toThrow(/region\.nowhere/);
+    expect(() => placeInKa(unknown)).toThrow(/region\.nowhere/);
   });
 
   it("rejects an official name that does not end in მუნიციპალიტეტი", () => {
