@@ -81,9 +81,6 @@ const FONT = 11;
 // The phone drawing, one unit per CSS pixel: the padding fits the labels it has.
 const MOBILE_PAD_L = 30;
 const MOBILE_PAD_R = 12;
-// EditorialLineChart owns "chart-dot-lattice"; both charts render on the
-// categories page, so this one needs its own id to avoid a defs collision.
-const LATTICE_ID = "stack-dot-lattice";
 
 /**
  * SVG coordinates at full double precision cost ~40 characters a rect and buy
@@ -189,7 +186,8 @@ export function StackedColumnChart({
   projectionLabel,
 }: StackedColumnChartProps) {
   const captionId = useId();
-  // useId yields ":" or "«" in its ids, which a url(#…) reference does not take; the hatch ids are built from it.
+  // useId yields ":" or "«" in its ids, which a url(#…) reference does not take; the hatch and lattice ids are built
+  // from it, so each chart on a page fills from its own patterns.
   const hatchId = useId().replace(/[^A-Za-z0-9_-]/g, "");
   const highlightIndex = highlightPeriod === undefined ? -1 : periods.indexOf(highlightPeriod);
   // One hatch per segment colour, so two segments sharing a colour share a pattern.
@@ -364,9 +362,13 @@ export function StackedColumnChart({
     setHover(next);
   }
 
+  // The caption's mark on a value from a projected period; nothing (not an empty string) otherwise, so the markup is unchanged.
+  const projectedAt = (index: number) =>
+    projectionFrom !== undefined && index >= 0 && periods[index]! >= projectionFrom ? `, ${projectionLabel}` : null;
+
   const renderSvg = (plot: Plot, className: string) => {
     const { width, height, padLeft, padRight, band, barWidth, x, y, lattice } = plot;
-    const latticeId = plot.mobile ? `${LATTICE_ID}-mobile` : LATTICE_ID;
+    const latticeId = `${hatchId}-lattice${plot.mobile ? "-mobile" : ""}`;
     const plotWidth = width - padLeft - padRight;
     const plotHeight = height - PAD_T - PAD_B;
     const zeroY = y(0);
@@ -618,14 +620,16 @@ export function StackedColumnChart({
       </ChartScrollFrame>
       {active.mobile ? readout : null}
 
-      {/* The chart is never colour-only: the same numbers read as text. */}
+      {/* The chart is never colour-only: the same numbers read as text, a projected one marked as its column is. */}
       <figcaption id={captionId} className="sr-only">
         <ul>
           {segments.map((segment) => {
-            const last = [...segment.values].reverse().find((value) => value !== null && value !== undefined);
+            const lastIndex = segment.values.findLastIndex((value) => value !== null && value !== undefined);
+            const last = lastIndex < 0 ? undefined : segment.values[lastIndex];
             return (
               <li key={segment.id}>
                 {segment.label}: {last === null || last === undefined ? "—" : formatValue(last)}
+                {projectedAt(lastIndex)}
               </li>
             );
           })}
@@ -636,6 +640,7 @@ export function StackedColumnChart({
                 const last = [...overlay.values].reverse().find((value) => value !== null && value !== undefined);
                 return last === null || last === undefined ? "—" : formatOverlayValue(last);
               })()}
+              {projectedAt(overlay.values.findLastIndex((value) => value !== null && value !== undefined))}
             </li>
           )}
         </ul>

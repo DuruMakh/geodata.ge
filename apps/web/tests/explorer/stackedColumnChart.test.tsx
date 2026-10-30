@@ -346,7 +346,7 @@ describe("StackedColumnChart", () => {
           expect(pattern).toMatch(/<rect[^>]*width="3"[^>]*fill="#(B3402A|4A707A)"|<rect[^>]*fill="#(B3402A|4A707A)"[^>]*width="3"/);
         }
         // Every fill reference points at a pattern that exists.
-        for (const [, id] of svg.matchAll(/fill="url\(#([^)"]+)\)"/g)) if (id !== "stack-dot-lattice" && id !== "stack-dot-lattice-mobile") expect(svg).toContain(`id="${id}"`);
+        for (const [, id] of svg.matchAll(/fill="url\(#([^)"]+)\)"/g)) expect(svg).toContain(`id="${id}"`);
       }
     });
 
@@ -357,10 +357,41 @@ describe("StackedColumnChart", () => {
           <StackedColumnChart {...yearProps} projectionFrom={2026} projectionLabel="plan" />
         </>,
       );
-      const ids = [...two.matchAll(/<pattern[^>]*\bid="([^"]+)"/g)].map((match) => match[1]!).filter((id) => !id.startsWith("stack-dot-lattice"));
-      // Two colours, two drawings, two charts.
-      expect(ids).toHaveLength(8);
+      const ids = [...two.matchAll(/<pattern[^>]*\bid="([^"]+)"/g)].map((match) => match[1]!);
+      // Two drawings, two charts: two hatch colours and one dot lattice in each.
+      expect(ids).toHaveLength(12);
       expect(new Set(ids).size).toBe(ids.length);
+    });
+
+    it("gives each chart on a page its own dot lattice, which its lattice rect fills from", () => {
+      const two = renderGeorgianMarkup(
+        <>
+          <StackedColumnChart {...yearProps} />
+          <StackedColumnChart {...yearProps} />
+        </>,
+      );
+      const drawings = [...two.matchAll(/<svg[^>]*data-geometry="(?:desktop|mobile)"[^>]*>[\s\S]*?<\/svg>/g)].map((match) => match[0]);
+      expect(drawings).toHaveLength(4);
+      const latticeIds = drawings.map((svg) => {
+        const fill = /<rect[^>]*data-testid="stack-dot-lattice"[^>]*fill="url\(#([^)"]+)\)"/.exec(svg)?.[1];
+        expect(fill).toBeDefined();
+        // The pattern it fills from is drawn in the same svg, and it holds the lattice dot.
+        expect(svg).toMatch(new RegExp(`<pattern[^>]*id="${fill}"[^>]*><circle`));
+        return fill!;
+      });
+      expect(new Set(latticeIds).size).toBe(4);
+    });
+
+    it("marks a caption value from a projected period with the projection label, and only those", () => {
+      const caption = (html: string) => /<figcaption[^>]*>([\s\S]*?)<\/figcaption>/.exec(html)![1]!;
+      const plain = renderGeorgianMarkup(<StackedColumnChart {...yearProps} />);
+      expect(caption(renderGeorgianMarkup(<StackedColumnChart {...yearProps} projectionFrom={2026} projectionLabel="plan" />))).toBe(
+        "<ul><li>Food: 3.0, plan</li><li>Communication: -2.0, plan</li><li>Other: 1.0, plan</li></ul>",
+      );
+      // A segment whose last value precedes the projection stays unmarked.
+      const ended = { ...yearProps, segments: [{ ...yearProps.segments[0]!, values: years.map((year) => (year <= 2025 ? 3 : null)) }] };
+      expect(caption(renderGeorgianMarkup(<StackedColumnChart {...ended} projectionFrom={2026} projectionLabel="plan" />))).toBe("<ul><li>Food: 3.0</li></ul>");
+      expect(caption(renderGeorgianMarkup(<StackedColumnChart {...yearProps} projectionFrom={2040} projectionLabel="plan" />))).toBe(caption(plain));
     });
 
     it("appends the projection label to the readout header from projectionFrom on", () => {
