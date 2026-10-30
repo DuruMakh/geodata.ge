@@ -154,7 +154,7 @@ export const MCP_ASSISTANT_INTENTS: readonly McpAssistantIntent[] = [
   {
     id: "outside-mcp-scope-wages",
     promptEn: "What is the average monthly wage in Georgia, and is there a Fiscal.ge page that shows it?",
-    promptKa: "როგორია საშუალო თვიური ხელფასი საქართველოში და არის თუ არა Fiscal.ge-ზე გვერდი, რომელიც მას აჩვენებს?",
+    promptKa: "რამდენია საშუალო თვიური ხელფასი საქართველოში და არის თუ არა Fiscal.ge-ზე გვერდი, რომელიც მას აჩვენებს?",
     requiredBehaviors: [
       "Search the catalogue; wages are outside the approved MCP datasets, so state that this connection does not serve them and invent no tool.",
       "Offer the Fiscal.ge page link from websitePages in the user's language, with no figure: do not quote a wage from unrelated data or from memory.",
