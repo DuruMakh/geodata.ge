@@ -56,7 +56,8 @@ rest. Product catalogue series omit `yearsByMeasure` and `periodsByMeasure` when
 dataset, annual/cumulative query and optional `calculationBasePeriod`. Strict
 clients caching output enums must refresh discovery; clients rejecting additive
 fields or requiring an earlier exact schema must update their validation.
-Translation corrections change `dataVersion`, just as other snapshot changes do.
+Translation corrections change `dataVersion`, just as other snapshot changes do; so do the
+website page names and search words used by catalogue search and `websitePages`.
 Responses are not byte-identical to older schemas. The unchanged 512 KiB complete-result
 limit counts both structured and text output; a source-heavy request can now
 require fewer sources. `result_too_large` preserves narrower-query and shared
