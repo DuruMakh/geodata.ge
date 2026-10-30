@@ -96,7 +96,6 @@ export function MarriageSection({
           </div>
         </div>
         <div className="mt-5">
-          {mode === "line" ? chart : null}
           <ExplorerTable
             caption={t("marriageTableCaption", { place: name, first, last, unit: unitLabel })}
             rows={[
@@ -117,6 +116,7 @@ export function MarriageSection({
             breakLabel={t("breakLabel")}
             crawlCopy={mode === "line"}
           />
+          {mode === "line" ? chart : null}
         </div>
       </div>
       <div className="mt-[18px] flex flex-wrap items-start justify-between gap-4">

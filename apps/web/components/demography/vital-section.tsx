@@ -88,7 +88,6 @@ export function VitalSection({
       <div data-testid="vital-chart-panel" data-mode={mode} className="mt-5">
         <ModeTabs value={mode} onChange={setMode} testId="vital" lineLabel={t("columns")} />
         <div className="mt-5">
-          {mode === "line" ? chart : null}
           <ExplorerTable
             caption={t("vitalTableCaption", { place: name, first, last })}
             rows={[
@@ -107,6 +106,7 @@ export function VitalSection({
             shareValueForYear={() => null}
             crawlCopy={mode === "line"}
           />
+          {mode === "line" ? chart : null}
         </div>
       </div>
       <div className="mt-[18px] flex flex-wrap items-start justify-between gap-4">
