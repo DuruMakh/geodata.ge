@@ -14,7 +14,7 @@ const PAGES = [
   { path: "/en/explorer/unemployment/regions/imereti", tab: "chart-mode-table", panel: "chart-panel", figure: "20.9" },
   { path: "/explorer/money/regions/imereti", tab: "chart-mode-table", panel: "chart-panel", figure: null },
   { path: "/explorer/economy/regions/imereti", tab: "regional-mode-table", panel: "regional-chart-panel", figure: null },
-  { path: "/explorer/expenditure", tab: "chart-mode-table", panel: "chart-panel", figure: null },
+  { path: "/explorer/expenditure", tab: "chart-mode-table", panel: "chart-panel", figure: "30.9" },
   { path: "/en/explorer/trade/partners", tab: "chart-mode-table", panel: "chart-panel", figure: null },
 ] as const;
 
@@ -32,7 +32,14 @@ for (const { path, tab, panel, figure } of PAGES) {
     expect(start).toBeGreaterThan(-1);
     const end = serverHtml.indexOf("</table>", start);
     expect(end).toBeGreaterThan(start);
-    if (figure) expect(serverHtml.slice(start, end)).toContain(figure);
+    const crawl = serverHtml.slice(start, end);
+    if (figure) expect(crawl).toContain(figure);
+    // The latest year heads the last year column, and the body holds at least one formatted number.
+    const years = [...crawl.matchAll(/<th\b[^>]*scope="col"[^>]*>\s*(\d{4})\b/g)].map((match) => Number(match[1]));
+    const latest = /<th\b[^>]*data-latest-year[^>]*>\s*(\d{4})\b/.exec(crawl);
+    expect(latest, "the crawl copy marks its latest-year header").not.toBeNull();
+    expect(Number(latest![1])).toBe(Math.max(...years));
+    expect(crawl, "the crawl copy holds formatted figures").toMatch(/<td\b[^>]*>\s*-?\d[\d,.]*/);
   });
 
   test(`${path}: the crawl copy is hidden in chart mode`, async ({ page }) => {

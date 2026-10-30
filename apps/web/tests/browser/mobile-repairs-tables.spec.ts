@@ -74,6 +74,7 @@ for (const { name, path, minYears } of columnCases) {
 // Leaving chart mode keeps the table that was hidden in the page: it must still open on the latest year.
 test("the table tab opens a four-series table on the latest year at 390px", async ({ page }) => {
   await page.goto("/explorer/municipalities/batumi#sel=municipal.total,municipal.education,municipal.social_protection,municipal.economic_affairs");
+  await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
   await page.getByRole("button", { name: /^(ცხრილი|Table)$/ }).first().click();
   const scroller = page.getByTestId("explorer-table");
   await scroller.scrollIntoViewIfNeeded();
@@ -90,6 +91,7 @@ test("the table tab opens a four-series table on the latest year at 390px", asyn
 // A table with up to three series lists years as rows from its first frame, not a frame after the tab press.
 test("the table tab shows the year rows in its first frame at 390px", async ({ page }) => {
   await page.goto("/explorer/municipalities/batumi");
+  await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
   const tab = page.getByRole("button", { name: /^(ცხრილი|Table)$/ }).first();
   await expect(tab).toBeVisible();
   // A mutation observer sees the table the moment it enters the page, before the browser paints or a ResizeObserver reports.
