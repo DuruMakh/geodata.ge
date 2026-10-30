@@ -249,7 +249,7 @@ describe("queryMunicipal", () => {
       expect(in2015?.value).not.toBeNull();
       expect(in2020?.value).not.toBeNull();
       expect(in2015?.valueDefinition).not.toBe(in2020?.valueDefinition);
-      expect(in2015?.valueDefinition).toBe("მუნიციპალიტეტის საჯარო ჯამი, გაზომვის საფუძველი: ფუნქციების მიხედვით ხარჯების ჯამი მუნიციპალიტეტების ანალიტიკური პორტალის დაარქივებული მონაცემებიდან, რომელიც ოფიციალური ჯამური გადახდების ნაცვლად გამოიყენება.");
+      expect(in2015?.valueDefinition).toBe("მუნიციპალიტეტის საჯარო ჯამი, გაზომვის საფუძველი: ფუნქციების მიხედვით ხარჯების ჯამი, რომელიც მუნიციპალიტეტების ანალიტიკური პორტალის დაარქივებული მონაცემებიდანაა აღებული და ოფიციალური ჯამური გადახდების ნაცვლად გამოიყენება.");
       expect(in2015?.valueDefinitionEn).toBe("The municipality's public total, measured on the following basis: sum of spending by function from the archived municipal portal, used instead of the official total payments.");
       expect(in2020?.valueDefinitionEn).toBe("The municipality's public total, measured on the following basis: official total payments.");
     });

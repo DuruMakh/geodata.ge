@@ -53,7 +53,7 @@
   "metrics.percentage_change": "პროცენტული ცვლილება",
   "metrics.percentage_point_change": "ცვლილება პროცენტულ პუნქტებში",
   "municipalTotalMeasures.total_payments": "ოფიციალური ჯამური გადახდები",
-  "municipalTotalMeasures.portal_functional_total_fallback": "ფუნქციების მიხედვით ხარჯების ჯამი მუნიციპალიტეტების ანალიტიკური პორტალის დაარქივებული მონაცემებიდან, რომელიც ოფიციალური ჯამური გადახდების ნაცვლად გამოიყენება",
+  "municipalTotalMeasures.portal_functional_total_fallback": "ფუნქციების მიხედვით ხარჯების ჯამი, რომელიც მუნიციპალიტეტების ანალიტიკური პორტალის დაარქივებული მონაცემებიდანაა აღებული და ოფიციალური ჯამური გადახდების ნაცვლად გამოიყენება",
   "municipalTotalMeasures.functional_total_fallback_missing_payment_actual": "ფუნქციების მიხედვით ხარჯების ჯამი, რომელიც გამოიყენება, რადგან ფაქტობრივი ჯამური გადახდები გამოქვეყნებული არ არის",
   "caveats.adjara_consolidation_applied": "შედეგი იყენებს აჭარის რესპუბლიკური გადახდების ნეტო კორექციას, ერთხელ.",
   "caveats.admin_category_not_yet_established": "მოთხოვნილი ადმინისტრაციული კატეგორია ამ წლის კლასიფიკაციაში არ არსებობს — ის მოგვიანებით ჩამოყალიბდა; არარსებული მნიშვნელობა ნული არ არის.",
