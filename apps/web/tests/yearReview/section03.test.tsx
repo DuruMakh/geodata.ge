@@ -99,6 +99,7 @@ describe("Year in review section 03", () => {
     expect(others.every((tag) => tag.includes("data-dim"))).toBe(true);
     // The grid dims every cell but the focused category's.
     const cells = [...markup.matchAll(/<i[^>]*data-cell="([^"]*)"[^>]*>/g)];
+    expect(cells).toHaveLength(100);
     expect(cells.filter(([tag, cell]) => cell !== id && !tag.includes("data-dim"))).toEqual([]);
     expect(cells.filter(([tag, cell]) => cell === id && tag.includes("data-dim"))).toEqual([]);
     // A dimmed row's text turns muted rather than faded: only its swatch and trend line fade (contrast).
@@ -121,6 +122,7 @@ describe("Year in review section 03", () => {
     expect(plan).toContain(`${planYear} · სახელმწიფო ბიუჯეტი · გეგმა`);
     // The change bars' share picture says plan against actual too, and each ranking row says plan to a screen reader.
     expect(/data-caption="([^"]*)"/.exec(part(markup, "change"))?.[1]).toContain(basis);
+    expect(rowTags(markup).length).toBeGreaterThan(0);
     expect(rowTags(markup).every((tag) => /aria-label="[^"]*, გეგმა, /.test(tag))).toBe(true);
     expect(/data-caption="([^"]*)"/.exec(part(section(planYear! - 1), "change"))?.[1]).not.toContain("გეგმა");
   });

@@ -380,6 +380,7 @@ export function LongView({ data, year, grouping, side, measure, focus, pin, onFo
       <ChartFoot
         share={
           <ChartShareButton
+            testId="long-view-share"
             title={heading}
             caption={`${measure === "share" ? "%" : text("yearReview.bn")} · ${from}–${to}${planLabel ? ` · ${planLabel}` : ""}`}
             legend={bands.map(({ label, color }) => ({ label, color }))}

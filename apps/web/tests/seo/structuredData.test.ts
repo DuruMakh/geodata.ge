@@ -654,7 +654,7 @@ describe("Dataset nodes across the sitemap", () => {
   afterAll(() => vi.unstubAllEnvs());
 
   // The pages with no Dataset of their own: the hubs (the navigation tree's hub rows) and the group pages, demography (spec
-  // section 10: no Dataset markup yet), the single-year analysis view, the methodology catalog page and the site pages.
+  // section 10: no Dataset markup yet), Year in review, the methodology catalog page and the site pages.
   const hubs = new Set<string>([...NAV_TREE.map((hub) => hub.href), ...NAV_GROUPS.map((group) => group.href)]);
   const carriesDataset = (page: string) =>
     (page.startsWith("/explorer/") || page.startsWith("/methodology/")) && !hubs.has(page) &&

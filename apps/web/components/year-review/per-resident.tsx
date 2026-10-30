@@ -64,6 +64,7 @@ export const CountryRegions = memo(function CountryRegions({ data, year }: Pick<
         <ChartFoot
           share={
             <ChartShareButton
+              testId="per-resident-share"
               title={heading}
               caption={`${text("yearReview.lari")} ${text("yearReview.dbPer")} · ${year}`}
               source={text("yearReview.nSrc", { date: updatedDate(data.updatedAt, locale) })}

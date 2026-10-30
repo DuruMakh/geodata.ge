@@ -186,6 +186,7 @@ export const DebtDeficit = memo(function DebtDeficit({ data, year }: Pick<YearRe
         <ChartFoot
           share={
             <ChartShareButton
+              testId="deficit-share"
               title={dfHeading}
               caption={`${text("main.percentGdp")} · ${bal.from}–${bal.to}${balProjFrom === undefined || balProjTo === undefined ? "" : ` · ${projection} ${balProjFrom}–${balProjTo}`}`}
               legend={[{ label: surplusLabel, color: POSITIVE }, { label: deficitLabel, color: NEGATIVE }]}
@@ -234,6 +235,7 @@ export const DebtDeficit = memo(function DebtDeficit({ data, year }: Pick<YearRe
           <ChartFoot
             share={
               <ChartShareButton
+                testId="rates-share"
                 title={rtHeading}
                 caption={`% · ${rt.from}–${rt.to}`}
                 legend={rateLines.map(({ label, color }) => ({ label, color }))}
@@ -257,6 +259,7 @@ export const DebtDeficit = memo(function DebtDeficit({ data, year }: Pick<YearRe
           <ChartFoot
             share={
               <ChartShareButton
+                testId="debt-stock-share"
                 title={stHeading}
                 caption={`${text("yearReview.bn")} · ${st.from}–${st.to}`}
                 legend={split.map(({ label, color }) => ({ label, color }))}
@@ -284,6 +287,7 @@ export const DebtDeficit = memo(function DebtDeficit({ data, year }: Pick<YearRe
         <ChartFoot
           share={
             <ChartShareButton
+              testId="repayments-share"
               title={wallHeading}
               caption={`${text("yearReview.bn")} · ${rep.from}–${rep.to}${repProjFrom === undefined || projTo === undefined ? "" : ` · ${projection} ${repProjFrom}–${projTo}`}`}
               legend={[{ label: principalLabel, color: INK_LINE }, { label: interestLabel, color: ACCENT }]}

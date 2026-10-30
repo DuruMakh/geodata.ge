@@ -216,6 +216,7 @@ export function RegionsDots({ data, year }: { data: YearReviewData; year: number
       <ChartFoot
         share={
           <ChartShareButton
+            testId="regions-share"
             title={heading}
             caption={`${lari} ${text("yearReview.dbPer")} · ${municipalYear}`}
             source={`${data.sources.municipal} ${text("yearReview.mpNote")}`}

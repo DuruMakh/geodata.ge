@@ -48,14 +48,14 @@ The page uses the normal explorer shell (sidebar, breadcrumbs, the updated-date 
 
 Right-hand line: `სადაც {year} წლის მონაცემი არ არის, ნაჩვენებია უახლოესი ხელმისაწვდომი წელი`.
 
-**Six headline numbers**, each with a small trend line for every year and a dot on the chosen year:
+**Six headline numbers**, each with a small trend line for every year and a dot on the chosen year (plan or projection years dashed; the per-resident line breaks at the census re-basing):
 
 | Number | Source page | Detail line |
 | --- | --- | --- |
 | State budget spending | Expenditure | change on the year before (`+6.8% · 2024 წელთან`) |
 | Tax revenue | Revenue (taxes only) | share of GDP |
-| Balance, % of GDP | Deficit | amount in GEL and a record phrase (`deficit — smallest since 2018`, `largest since 1995`, or `surplus`) |
-| Public debt | Debt | share of GDP and the external share |
+| Balance, % of GDP | Deficit | amount in GEL and a record phrase (`deficit — smallest since 2018`, `largest since 1995`, `smallest since the 2007 surplus`, or `surplus`) |
+| Government debt (`მთავრობის ვალი`, the Debt page's name) | Debt | share of GDP and the external share |
 | Tax breaks | Tax breaks and refunds | `GEL per 100 GEL of tax` |
 | Spending per resident | Expenditure ÷ Geostat population on 1 January | GEL a day |
 
@@ -77,7 +77,7 @@ The exact sentence patterns are the board's (the `f1`…`f6` strings). Section 7
 Right-hand line: `შეღავათები: {year} · დაბრუნება: {year}`.
 
 - **Collected vs given up** (left): three columns (VAT, income and profit tax, all taxes). The ink part above the line is what came in; the hatched accent part below it is what tax breaks cost. Under each column: `{n} ₾ ყოველ 100 ₾-ზე`.
-- **Tax refunds** (right): the big number for the chosen year, its share of tax revenue, and a record phrase when it is the highest since 2008. Below it, a column chart 2008–latest with the chosen year in ink.
+- **Tax refunds** (right): the big number for the chosen year, its share of tax revenue, and a record phrase when it is the highest since 2008. Below it, a column chart 2008–latest with the chosen year in ink and its value labelled.
 - The board's note under the section stays.
 
 ### 03 · `სად მიდის ფული` / `Where the money goes`
@@ -91,13 +91,13 @@ Right-hand line: `{year} · სახელმწიფო ბიუჯეტი
 ### 04 · `დეფიციტი და ვალი` / `Deficit and debt`
 
 - **Deficit and surplus, % of GDP**: one column per year 1995–2031, surplus green and deficit accent red, projection years hatched. The chosen year has a value label, and so does the deepest deficit.
-- **Debt at year end**: the big number, a two-part bar (external / domestic, with percentages and amounts), then three figures: to GDP, per resident, and the average interest rate. Under them, a small line chart of average interest rates (all debt, external, domestic). Beside them, a column chart of debt by year, external and domestic stacked.
+- **Debt at year end**: the big number, a two-part bar (external / domestic, with percentages and amounts), then three figures: to GDP, per resident, and the average interest rate. Under them, a small line chart of average interest rates (all debt, external, domestic). Beside them, a column chart of debt by year, external and domestic stacked, the chosen year's total labelled.
 - **Debt repayments by year**: principal and interest stacked, 2013–2030, the years from 2026 hatched as the schedule for existing debt. The peak is labelled. The board's note about new borrowing stays.
 
 ### 05 · `ქვეყანა და რეგიონები` / `Country and regions`
 
-- **`{year}: how much per resident`**: six rows, each with a name, its scope in small text, a bar and the GEL amount: state budget spending, tax revenue, public debt, debt repayments and interest, social benefits (general government), and the median municipality's spending. The board's note that the rows come from different datasets stays.
-- **By region**: one row per region, sorted by its average. Each municipality is a dot at its spending per resident, with a tick for the region's average and a dashed line for the national median. Hovering a dot names the municipality. A screen-reader list gives every municipality's figure. The board's note about Adjara stays.
+- **`{year}: how much per resident`**: six rows, each with a name, its scope in small text, a bar and the GEL amount: state budget spending, tax revenue, government debt, debt repayments and interest, social benefits (general government), and the median municipality's spending. The board's note that the rows come from different datasets stays.
+- **By region**: one row per region, sorted by its average. Each municipality is a dot at its spending per resident, with a tick for the region's average and a dashed line for the national median. Hovering a dot names the municipality. Pressing a region lists its municipalities under the row, highest first; pressing it again closes the list. A screen-reader list gives every municipality's figure. The board's note about Adjara stays.
 
 Municipal figures are the Municipalities page's own (same per-resident year, same population, same exclusions), so the two pages always agree. When the chosen year is not that year, the year tag shows it.
 
@@ -125,18 +125,19 @@ Every number comes from the existing served data, the same loaders the topic pag
 | Balance | `loadServedGeneralGovernmentBalanceData` | general government, actual + projection |
 | Debt stock, service, schedule, rates | `loadServedGovernmentDebtData` | MoF |
 | Municipal spending and per resident | `loadServedMunicipalData` + `buildMunicipalListRows` | as on the Municipalities page |
-| Population on 1 January | demography served data (`demography.population_total`, Georgia) | Geostat |
+| Population on 1 January | demography served data (`demography.population_total`, Georgia) and the demography break register | Geostat |
 
-The server turns these into one small year-review data object: a few hundred numbers per series, with names in the page language. The browser gets only that object, not the raw facts (today's Analysis page ships every budget fact). The browser then works out the chosen year's view from it, so moving the ruler needs no network request.
+The server turns these into one small year-review data object (`lib/yearReview/types.ts`; besides the series it carries `budget.populationBreak`, the census re-basing year from the break register, `municipal.median`, by the Municipalities page's own function, and each place's `populationPersons`): a few hundred numbers per series, with names in the page language. The browser gets only that object, not the raw facts (today's Analysis page ships every budget fact). The browser then works out the chosen year's view from it, so moving the ruler needs no network request.
 
 ## 7. Rules for computed text
 
 - **Nearest year.** A dataset without the chosen year uses its nearest year at or before it; if there is none before, the nearest after it. The year shown in the tag is the one used.
 - **Records** (balance, refunds): the phrase is chosen by comparing the chosen year with every earlier actual year in that series. Projection years never count.
 - **Plan years.** A planned value is always marked `გეგმა` / `plan`, and a change from a plan year to an actual year says so (`planVsActual`).
-- **Finding 1 (taxes).** Among tax lines with a positive value in both years: if exactly one fell, `f6one`; if several fell, `f6many` naming the largest fall; if none fell, `f6none` naming the fastest growth.
+- **Per resident.** Nothing per resident is compared across `populationBreak` (Geostat's census re-basing): the trend line breaks there and the notes say so (`nPopBreak`).
+- **Finding 1 (taxes).** A line fell when it has a value in both years and is lower now, including one that ends at or below zero. If exactly one fell, `f6one`; if several fell, `f6many` naming the largest fall in GEL; if none fell, `f6none` naming the fastest growth, ranked among lines positive in both years. A named line that is not positive in both years has no percentage (`f6dSign`).
 - **Finding 3 (debt service).** If debt service is the largest field, `f1top`; otherwise `f1h` with its rank written as a Georgian ordinal (`მე-4`) or an English one (`4th`), and the gap to the field above it (`f1close` when the gap is under 1% of the total, otherwise `f1far`).
-- **Finding 4 (spending types).** If exactly one type moved against the direction of all the others, `f3onlyDown` or `f3onlyUp`; otherwise the type with the largest percentage change.
+- **Finding 4 (spending types).** `{n}` counts every type with a value in both years. If exactly one type with a positive base moved against all the others (a flat one does not count against it), `f3onlyDown` or `f3onlyUp`; otherwise the type with the largest percentage change.
 - **Finding 6 (municipalities).** The smallest number of municipalities, largest first, whose spending passes half of the municipal total.
 - Georgian sentences are templates with whole words only, so no grammatical case is built in code. Every template is in the message files and goes through `i18n:check`.
 
@@ -153,7 +154,8 @@ The server turns these into one small year-review data object: a few hundred num
 
 **Small additions**
 
-- `StackedColumnChart` (`components/main-explorer/stacked-column-chart.tsx`) draws refunds, the deficit, debt by year and repayments. It gets two optional props whose defaults leave every current chart unchanged: a highlighted period (the chosen year in ink, with its label) and a "projection from" period (hatched columns).
+- `StackedColumnChart` (`components/main-explorer/stacked-column-chart.tsx`) draws refunds, the deficit, debt by year and repayments. It gets optional props whose defaults leave every current chart unchanged: a highlighted period (the chosen year in ink, with its label), a "projection from" period (hatched columns), `fitWidth`, `valueLabels` and `captionPeriods` (each caption line names its year).
+- `Sparkline` gets `dotIndex`, `dotColor` and `planFrom` (dashed from that point), and `buildSparklinePath` optional `from`/`to`; `lib/landing/chapters/budgetSeries.ts` exports `activeDetailFacts` and `revenueBandOf`, so the page counts receipts and spending items as the homepage does.
 - `urlState.ts`: `as=revenue` now selects the long-view side.
 - The navigation label key for the page, and the homepage chapter 01 destination name.
 
@@ -181,7 +183,8 @@ The server turns these into one small year-review data object: a few hundred num
 
 - Unit tests for the year-review builder against the real served data: totals match the topic pages for 2025 (state spending, tax revenue, balance, debt, tax breaks, refunds, the Municipalities page's per-resident figures), nearest-year fallback, plan marking, and each findings rule with small synthetic inputs (including the "none fell" and "debt service is largest" branches).
 - `StackedColumnChart`: the new props are off by default (existing snapshots unchanged), and on, they draw the highlighted and hatched periods.
-- Browser tests: the page renders in both languages, the ruler changes every section, the grouping switch and the long-view switches work, picking highlights and the chip clears it, old `#ay=` / `#ag=` / `#as=` links, no horizontal scroll at 375px, the heading line fits one line at 375px, axe accessibility scan, and each share button produces a picture.
+- A unit parity test: the Georgian and English data, views and findings agree on everything but words (numbers, years, ids, colours, order).
+- Browser tests: the page renders in both languages, the ruler changes every section, the grouping switch and the long-view switches work, picking highlights and the chip clears it, old `#ay=` / `#ag=` / `#as=` links, no horizontal scroll at 375px, the heading line fits one line at 375px, axe accessibility scan, touch on the ruler (tap, sideways drag, vertical swipe), focus never hidden under the sticky row, the region list, and each share button (each with its own test id) produces a picture.
 - `tests/explorer/chartShareCoverage.test.ts` stays green; the new page's chart files are added to it.
 - The existing browser and SEO tests that name `ანალიზი` / `Analysis` are updated to the new name.
 - Done-check per CLAUDE.md: `npm run check`, `npm run build`, the browser suite, after Duru approves the screenshots and preview.

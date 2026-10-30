@@ -8,6 +8,7 @@ import {
   loadServedGovernmentDebtData,
   loadServedMunicipalData,
 } from "../../lib/data/servedData";
+import { loadServedTaxBreaksRefundsData } from "../../lib/data/taxBreaksRefunds/importTaxBreaksRefunds";
 import { publicGlossaryEntry } from "../../lib/data/glossary";
 import { projectBalanceFact, projectBudgetFact, projectDebtFact, projectGdpFact } from "../../lib/explorer/clientData";
 import { buildDebtExplorerModel } from "../../lib/explorer/debtExplorer";
@@ -29,12 +30,20 @@ const TAX_IDS = new Set([...REVENUE_BANDS.vat, ...REVENUE_BANDS.income, ...REVEN
 describe("buildYearReviewData", () => {
   test("budget years run from the first active expenditure year to the plan year; the default is the last actual year", async () => {
     const { data } = await loadYearReviewData("ka");
-    expect(data.budget.years[0]).toBe(2004);
-    expect(data.budget.defaultYear).toBe(2025);
-    expect(data.budget.planned.at(-1)).toBe(true);
+    const { facts } = await loadServedExplorerData();
+    const active = chooseActivePublicFacts(facts);
+    const spendYears = [...new Set(active.filter((fact) => fact.side === "expenditure").map((fact) => fact.year))].sort((a, b) => a - b);
+    expect(data.budget.years).toEqual(spendYears);
     expect(data.budget.planned.length).toBe(data.budget.years.length);
-    // Receipts have no plan-year values: null there, never 0.
-    for (const receipt of data.budget.receipts) expect(receipt.values.at(-1)).toBeNull();
+    // The default is the last year whose active spending is not planned; every later year is a plan.
+    const plannedYears = new Set(active.filter((fact) => fact.side === "expenditure" && fact.basis === "planned").map((fact) => fact.year));
+    expect(data.budget.defaultYear).toBe(spendYears.findLast((year) => !plannedYears.has(year)));
+    expect(data.budget.planned).toEqual(spendYears.map((year) => plannedYears.has(year)));
+    // A budget year with no receipts (the plan year today) is null for every receipt, never 0.
+    const revenueYears = new Set(active.filter((fact) => fact.side === "revenue").map((fact) => fact.year));
+    for (const [index, year] of data.budget.years.entries()) {
+      if (!revenueYears.has(year)) for (const receipt of data.budget.receipts) expect(receipt.values[index], `${receipt.id} ${year}`).toBeNull();
+    }
   });
 
   test("the fields and institutions add up to the Expenditure page's totals", async () => {
@@ -111,8 +120,13 @@ describe("buildYearReviewData", () => {
 
   test("tax breaks and refunds are in GEL", async () => {
     const { data } = await loadYearReviewData("ka");
-    expect(at(data.taxBreaks.years, data.taxBreaks.all, 2024)).toBeCloseTo(6403.18e6, -4);
-    expect(at(data.refunds.years, data.refunds.values, 2025)).toBeCloseTo(2721.1e6, -4);
+    const { facts } = await loadServedTaxBreaksRefundsData();
+    // The served value is million GEL as decimal text; the page's is lari, for the latest year of each.
+    const served = (indicatorId: string, year: number) => Number(facts.find((fact) => fact.indicatorId === indicatorId && fact.year === year)!.value) * 1e6;
+    const breaksYear = data.taxBreaks.years.at(-1)!;
+    const refundsYear = data.refunds.years.at(-1)!;
+    expect(at(data.taxBreaks.years, data.taxBreaks.all, breaksYear)).toBeCloseTo(served("tax_breaks.total", breaksYear), -1);
+    expect(at(data.refunds.years, data.refunds.values, refundsYear)).toBeCloseTo(served("tax_refunds.total", refundsYear), -1);
   });
 
   test("balance and debt-service projection flags follow the served status", async () => {
@@ -181,7 +195,6 @@ describe("buildYearReviewData", () => {
   test("municipal places agree with the Municipalities page", async () => {
     const { data } = await loadYearReviewData("ka");
     expect(data.municipal.year).toBe(MUNICIPAL_PER_RESIDENT_YEAR);
-    expect(data.municipal.places.length).toBe(64);
     const municipal = await loadServedMunicipalData();
     const list = buildMunicipalListRows({
       municipalities: municipal.municipalities,
@@ -191,6 +204,7 @@ describe("buildYearReviewData", () => {
       adjaraBudgetAdjustments: municipal.adjaraBudgetAdjustments,
       year: MUNICIPAL_PER_RESIDENT_YEAR,
     });
+    expect(data.municipal.places.length).toBe(list.municipalities.length);
     const byCode = new Map(list.municipalities.map((row) => [row.id, row]));
     const residents = new Map(municipal.populationFacts.map((row) => [row.municipalityCode, row.populationPersons]));
     for (const place of data.municipal.places) {

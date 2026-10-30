@@ -17,8 +17,8 @@ import { renderPageMarkup } from "../helpers/render-localized";
 // and click picking are in the browser spec (Task 10). The share button stands in with its title on it.
 
 vi.mock("../../components/explorer-shell/chart-share-button", () => ({
-  ChartShareButton: ({ title, caption, source }: { title: string; caption: string; source: string }) => (
-    <button type="button" data-testid="chart-share" data-title={title} data-caption={caption} data-source={source} />
+  ChartShareButton: ({ title, caption, source, testId }: { title: string; caption: string; source: string; testId?: string }) => (
+    <button type="button" data-testid="chart-share" data-share={testId} data-title={title} data-caption={caption} data-source={source} />
   ),
 }));
 
@@ -203,7 +203,9 @@ describe("Year in review notes", () => {
       "/methodology",
     ]);
     const english = render("notes", year, { locale: "en" });
-    expect([...english.matchAll(/<a[^>]*href="([^"]*)"/g)].every((match) => match[1]!.startsWith("/en/"))).toBe(true);
+    const englishLinks = [...english.matchAll(/<a[^>]*href="([^"]*)"/g)].map((match) => match[1]!);
+    expect(englishLinks).toHaveLength(links.length);
+    expect(englishLinks.every((href) => href.startsWith("/en/"))).toBe(true);
   });
 
   test("without a plan year or a negative other-taxes year, the budget and receipts notes keep their ranges", () => {
@@ -234,6 +236,11 @@ describe("Year in review page, sections 05 to the notes", () => {
     expect(start).toBeGreaterThan(0);
     expect(markup.slice(start).match(/data-testid="chart-share"/g)).toHaveLength(3);
     expect(markup).toContain('id="year-review-notes"');
+    // Each of the page's twelve share buttons has a test id of its own, so no two share a menu (chart-share.spec.ts).
+    const shareIds = [...markup.matchAll(/data-testid="chart-share"[^>]*data-share="([^"]*)"/g)].map((match) => match[1]);
+    expect(markup.match(/data-testid="chart-share"/g)).toHaveLength(12);
+    expect(new Set(shareIds).size).toBe(12);
+    for (const id of shareIds) expect(id).toMatch(/^[a-z-]+-share$/);
   });
 
   test("in English sections 05, 06 and the notes have no Georgian text", () => {

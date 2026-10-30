@@ -45,36 +45,45 @@ describe("Year in review page", () => {
     expect(radios).toHaveLength(data.budget.years.length);
     const checked = radios.filter((tag) => tag.includes('aria-checked="true"'));
     expect(checked).toHaveLength(1);
-    expect(checked[0]).toContain('data-year="2025"');
+    expect(checked[0]).toContain(`data-year="${data.budget.defaultYear}"`);
     // Roving tabindex: only the chosen year is a tab stop.
     expect(radios.filter((tag) => tag.includes('tabindex="0"'))).toEqual(checked);
-    // The plan year carries its tag in the ruler.
-    expect(markup).toMatch(/data-year="2026"[^>]*>[\s\S]*?გეგმა/);
+    // The plan year carries its tag in the ruler, inside its own radio.
+    const planYear = data.budget.years.at(-1)!;
+    expect(data.budget.planned.at(-1)).toBe(true);
+    expect(markup).toMatch(new RegExp(`<button[^>]*data-year="${planYear}"[^>]*>(?:(?!</button>)[\\s\\S])*გეგმა(?:(?!</button>)[\\s\\S])*</button>`));
     // Section 06 names the years the long view spans, from the data.
     expect(markup).toContain(`დიდი სურათი: ${data.budget.years[0]}–${data.budget.years.at(-1)}`);
   });
 
-  test("01 for 2025 has six headline numbers and six finding links", () => {
-    const markup = glance(2025);
+  test("01 for the default year has six headline numbers and six finding links", () => {
+    const { data } = loaded.ka!;
+    const year = data.budget.defaultYear;
+    const markup = glance(year);
     expect(markup.match(/data-kpi="/g)).toHaveLength(6);
     expect(markup.match(/<a[^>]*data-finding="/g)).toHaveLength(6);
-    expect(markup).toContain("2025 ერთ სურათზე");
-    // Only tax breaks fall back in 2025 (their report ends a year earlier); spending is an actual year.
-    expect(kpi(markup, "breaks")).toContain('data-year-tag="2024"');
+    expect(markup).toContain(`${year} ერთ სურათზე`);
+    // Tax breaks fall back to their report's last year when it ends earlier; spending is an actual year.
+    const lastBreaks = data.taxBreaks.years.at(-1)!;
+    if (lastBreaks < year) expect(kpi(markup, "breaks")).toContain(`data-year-tag="${lastBreaks}"`);
+    else expect(kpi(markup, "breaks")).not.toContain("data-year-tag");
     expect(kpi(markup, "spend")).not.toContain("data-year-tag");
     expect(kpi(markup, "spend")).not.toContain("data-plan-tag");
   });
 
   test("01 for the plan year tags every number from another year, and marks planned values", () => {
-    const markup = glance(2026);
-    expect(kpi(markup, "breaks")).toContain('data-year-tag="2024"');
-    expect(kpi(markup, "tax")).toContain('data-year-tag="2025"');
-    expect(kpi(markup, "debt")).toContain('data-year-tag="2025"');
+    const { data } = loaded.ka!;
+    const planYear = data.budget.years.at(-1)!;
+    const lastWith = (years: number[], values: (number | null)[]) => years.filter((_, index) => values[index] !== null).at(-1)!;
+    const markup = glance(planYear);
+    expect(kpi(markup, "breaks")).toContain(`data-year-tag="${lastWith(data.taxBreaks.years, data.taxBreaks.all)}"`);
+    expect(kpi(markup, "tax")).toContain(`data-year-tag="${lastWith(data.budget.years, data.budget.receipts[0]!.values)}"`);
+    expect(kpi(markup, "debt")).toContain(`data-year-tag="${lastWith(data.debt.stock.years, data.debt.stock.total)}"`);
     expect(kpi(markup, "spend")).toContain("data-plan-tag");
     expect(kpi(markup, "spend")).toContain("გეგმა");
     expect(kpi(markup, "balance")).toContain("პროგნოზი");
     // A fallback year shows the section's note on nearest years.
-    expect(markup).toContain("სადაც 2026 წლის მონაცემი არ არის");
+    expect(markup).toContain(`სადაც ${planYear} წლის მონაცემი არ არის`);
   });
 
   test("01's computed lines: the plan against an actual year, one precision for the balance in GEL, record phrases", () => {

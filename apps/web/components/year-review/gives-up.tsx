@@ -151,6 +151,7 @@ export const GivesUp = memo(function GivesUp({ data, year }: Pick<YearReviewSect
           <ChartFoot
             share={
               <ChartShareButton
+                testId="ice-share"
                 title={text("yearReview.h03")}
                 caption={`${text("yearReview.bn")} · ${breaks.year}`}
                 legend={[{ label: text("yearReview.iceUp"), color: INK }, { label: text("yearReview.iceDown"), color: ACCENT }]}
@@ -175,6 +176,7 @@ export const GivesUp = memo(function GivesUp({ data, year }: Pick<YearReviewSect
           <ChartFoot
             share={
               <ChartShareButton
+                testId="refunds-share"
                 title={rfHeading}
                 caption={`${text("yearReview.bn")} · ${rfFrom}–${rfTo}`}
                 legend={[{ label: rfHeading, color: OTHER_COLOR }, { label: chosenLabel, color: INK }]}

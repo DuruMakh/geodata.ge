@@ -253,6 +253,23 @@ describe("buildFindings", () => {
     });
   });
 
+  test("details in realistic magnitudes read in mln and bn", () => {
+    // The fixture scaled to lari the size of the served data: 10 → 1 bn, so 5 → 500 mln.
+    const data = withDebtService();
+    const scale = (values: (number | null)[]) => values.map((value) => (value === null ? null : value * 1e8));
+    for (const row of [...data.budget.receipts, ...data.budget.fields, ...data.spendingTypes.types]) row.values = scale(row.values);
+    data.spendingTypes.total = scale(data.spendingTypes.total);
+    data.taxBreaks = { ...data.taxBreaks, vat: scale(data.taxBreaks.vat), income: scale(data.taxBreaks.income), all: scale(data.taxBreaks.all) };
+    data.debt.service = { ...data.debt.service, principal: scale(data.debt.service.principal), interest: scale(data.debt.service.interest) };
+    const detail = (id: Finding["id"], year = 2025, locale: "ka" | "en" = "en") => finding(data, year, id, locale).detail;
+    expect(detail("taxes")).toBe("1.0 bn → 1.5 bn, +50.0% vs 2024");
+    expect(detail("taxes", 2025, "ka")).toBe("1.0 მლრდ → 1.5 მლრდ · +50.0% 2024 წელთან");
+    expect(detail("breaks", 2023)).toBe("5.0 bn collected · 1.0 bn given up");
+    expect(detail("debtRank")).toBe("label spending.c was only 100 mln more");
+    expect(detail("types")).toBe("2.5 bn → 3.7 bn · general government");
+    expect(detail("service", 2026)).toBe("principal 800 mln · interest 200 mln");
+  });
+
   test("English findings have no Georgian text, in the fixture and in the served data for every budget year", async () => {
     const text = (findings: Finding[]) => findings.flatMap((item) => [item.topic, item.heading, item.detail, ...(item.visual.kind === "bars" ? item.visual.rows.map((row) => row.label) : [])]);
     for (const year of withDebtService().budget.years) {

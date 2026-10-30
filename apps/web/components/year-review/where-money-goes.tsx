@@ -252,6 +252,7 @@ export function WhereMoneyGoes({ data, year, grouping, focus, pin, onFocus, onPi
             <ChartFoot
               share={
                 <ChartShareButton
+                  testId="hundred-share"
                   title={hundredHeading}
                   caption={`${text("yearReview.cellNote")} · ${year}${where.planned ? ` · ${text("yearReview.plan")}` : ""}`}
                   source={text("main.sourceData")}
@@ -293,6 +294,7 @@ export function WhereMoneyGoes({ data, year, grouping, focus, pin, onFocus, onPi
             <ChartFoot
               share={
                 <ChartShareButton
+                  testId="change-share"
                   title={changed.heading}
                   caption={`${lari} · ${changed.previousYear}–${year}${changed.basis === "planVsActual" ? ` · ${changed.basisLine}` : ""}`}
                   source={text("main.sourceData")}
@@ -319,6 +321,7 @@ export function WhereMoneyGoes({ data, year, grouping, focus, pin, onFocus, onPi
         <ChartFoot
           share={
             <ChartShareButton
+              testId="buys-share"
               title={buysHeading}
               caption={`${text("yearReview.bn")} · ${buys.year}`}
               source={data.sources.spendingTypes}

@@ -1,5 +1,6 @@
 import { readFile } from "node:fs/promises";
-import { expect, test, type Page } from "@playwright/test";
+import { gzipSync } from "node:zlib";
+import { expect, test, type Locator, type Page } from "@playwright/test";
 import { axeViolations } from "./axe";
 import { expectEnglish } from "./expect-english";
 
@@ -18,6 +19,14 @@ async function open(page: Page, path: string) {
 async function chosenYear(page: Page): Promise<number> {
   return Number(await page.getByTestId("year-ruler").locator('[role="radio"][aria-checked="true"]').getAttribute("data-year"));
 }
+
+/** The ruler's chosen year, retried until it settles (the hash restore and a key step commit asynchronously). */
+async function expectYear(page: Page, year: number) {
+  await expect(page.getByTestId("year-ruler").locator('[role="radio"][aria-checked="true"]')).toHaveAttribute("data-year", String(year));
+}
+
+/** The ruler's years, first to last. */
+const rulerYears = (page: Page) => page.getByTestId("year-ruler").getByRole("radio").evaluateAll((radios) => radios.map((radio) => Number(radio.getAttribute("data-year"))));
 
 async function pickYear(page: Page, year: number) {
   await page.getByTestId("year-ruler").locator(`[data-year="${year}"]`).click();
@@ -70,6 +79,7 @@ test("the ruler moves every section, and 2020 reads as the deepest deficit in th
   await open(page, "/explorer/analysis");
   const spend = page.locator('[data-kpi="spend"]');
   const before = await spend.innerText();
+  const sectionsBefore = await Promise.all(SECTIONS.map((id) => page.locator(`#${id}`).innerText()));
   await pickYear(page, 2020);
   await expect.poll(() => hashParams(page).ay).toBe("2020");
   await expect(page.locator("#year-review-glance h2")).toHaveText("2020 ერთ სურათზე");
@@ -80,16 +90,21 @@ test("the ruler moves every section, and 2020 reads as the deepest deficit in th
   await expect(page.locator("#year-review-where")).toContainText("2020 · სახელმწიფო ბიუჯეტი");
   await expect(page.locator('#year-review-where [data-panel="change"] h3')).toContainText("რა შეიცვალა 2019 წელთან შედარებით");
   await expect(page.locator('#year-review-long [data-chosen-label]')).toHaveText("2020");
+  // Every section redraws for the new year, 02, 04 and 05 included.
+  for (const [index, id] of SECTIONS.entries()) await expect(page.locator(`#${id}`), id).not.toHaveText(sectionsBefore[index]!);
 
-  // The keys step the ruler: the chosen year keeps the focus.
+  // The keys step the ruler (←/↑ back, →/↓ on, Home and End to the ends): the chosen year keeps the focus.
+  const years = await rulerYears(page);
   await page.getByTestId("year-ruler").locator('[data-year="2020"]').focus();
-  await page.keyboard.press("ArrowRight");
-  expect(await chosenYear(page)).toBe(2021);
-  await expect(page.getByTestId("year-ruler").locator('[data-year="2021"]')).toBeFocused();
+  for (const [key, year] of [["ArrowRight", 2021], ["ArrowDown", 2022], ["ArrowUp", 2021], ["ArrowLeft", 2020], ["End", years.at(-1)!]] as const) {
+    await page.keyboard.press(key);
+    await expectYear(page, year);
+    await expect(page.getByTestId("year-ruler").locator(`[data-year="${year}"]`), key).toBeFocused();
+  }
   await page.keyboard.press("Home");
-  expect(await chosenYear(page)).toBe(2004);
+  await expectYear(page, years[0]!);
   // The first year has nothing to compare with.
-  await expect(page.locator('#year-review-where [data-panel="change"]')).toContainText("2004 პირველი წელია მონაცემებში");
+  await expect(page.locator('#year-review-where [data-panel="change"]')).toContainText(`${years[0]} პირველი წელია მონაცემებში`);
   await expect(spend).toContainText("პირველი წელი");
 });
 
@@ -111,10 +126,12 @@ test("the grouping, side and measure switches redraw their sections", async ({ p
   const bands = () => long.locator("path[data-band]").evaluateAll((paths) => paths.map((path) => path.getAttribute("data-band")));
   const institutions = await bands();
   // The long view follows the grouping on the expenditure side.
-  expect(institutions.sort()).toEqual([...(await rankIds())].sort());
+  expect([...institutions].sort()).toEqual([...(await rankIds())].sort());
   await long.getByRole("group", { name: "ბიუჯეტის მხარე" }).getByRole("button", { name: "შემოსავლები" }).click();
   await expect.poll(() => hashParams(page).as).toBe("revenue");
-  await expect.poll(bands).not.toEqual(institutions);
+  // Redrawn with the receipts: VAT is a band, and no institution is.
+  await expect.poll(bands).toContain("revenue.vat");
+  for (const id of await bands()) expect(institutions).not.toContain(id);
   await expect(long.locator("[data-y-tick]")).toHaveCount(5);
   await expect(long.locator('[data-y-tick="1"]')).toHaveText("100%");
 
@@ -157,7 +174,7 @@ test("an old Analysis link survives a reload and the language switch", async ({ 
   await page.reload();
   await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
   const expectState = async (institutions: string, receipts: string) => {
-    expect(await chosenYear(page)).toBe(2024);
+    await expectYear(page, 2024);
     await expect(page.locator("#year-review-where").getByRole("button", { name: institutions, exact: true })).toHaveAttribute("aria-pressed", "true");
     await expect(page.locator("#year-review-long").getByRole("button", { name: receipts, exact: true })).toHaveAttribute("aria-pressed", "true");
     await expect.poll(() => hashParams(page)).toEqual({ ay: "2024", ag: "ministries", as: "revenue" });
@@ -224,9 +241,12 @@ test("the plan year marks its figures as a plan and keeps every section filled",
   await expect(said).toHaveText(new RegExp(`^${last}: .*, გეგმა$`));
   await expect(page.locator('[data-kpi="spend"] [data-plan-tag]')).toHaveText("გეგმა");
   await expect(page.locator('#year-review-where [data-panel="change"] h3')).toContainText(`${last} — გეგმა, ${last - 1} — ფაქტი`);
-  // Datasets without the plan year show the year they use, never a blank.
-  await expect(page.locator("[data-year-tag]")).not.toHaveCount(0);
-  for (const id of SECTIONS) await expect(page.locator(`#${id}`)).not.toContainText("NaN");
+  // Datasets without the plan year show the year they use, never a blank: the tax breaks' own last year among them.
+  await expect(page.locator('[data-kpi="breaks"] [data-year-tag]')).toHaveAttribute("data-year-tag", /^\d{4}$/);
+  for (const id of SECTIONS) {
+    const shown = await page.locator(`#${id}`).innerText();
+    for (const bad of ["NaN", "Infinity", "undefined", "null", "{"]) expect(shown, `${id}: ${bad}`).not.toContain(bad);
+  }
 });
 
 test("no sideways scroll on a 375px phone, and the ruler's labels never collide", async ({ page }) => {
@@ -284,16 +304,287 @@ test("the page has no WCAG A or AA violations", async ({ page }) => {
   expect(await axeViolations(page)).toEqual([]);
 });
 
-test("a chart's share button downloads a 2400px PNG", async ({ page }) => {
+// Spec §11: each share button produces a picture. Every chart has a button of its own (chart-share.spec.ts), and each
+// one, the HTML-drawn ice, grid, bars, treemap, ledger and dots as well as the hatched stacked charts, makes a PNG.
+const SHARE_IDS = [
+  "ice-share", "refunds-share", "hundred-share", "change-share", "buys-share", "deficit-share", "rates-share", "debt-stock-share",
+  "repayments-share", "per-resident-share", "regions-share", "long-view-share",
+];
+
+test("every chart's share button downloads a 2400px PNG", async ({ page }) => {
+  test.setTimeout(150_000);
   await page.setViewportSize({ width: 1440, height: 1000 });
   await open(page, "/explorer/analysis");
-  const shares = page.getByTestId("chart-share");
-  expect(await shares.count()).toBeGreaterThanOrEqual(10);
-  const button = page.locator("#year-review-long").getByTestId("chart-share");
-  await button.click();
-  const [download] = await Promise.all([page.waitForEvent("download"), page.locator("#year-review-long").getByTestId("chart-share-download").click()]);
-  const bytes = await readFile(await download.path());
-  expect(bytes.subarray(1, 4).toString()).toBe("PNG");
-  expect(bytes.readUInt32BE(16)).toBe(2400);
-  expect(download.suggestedFilename()).toMatch(/^fiscal-.+\.png$/);
+  await expect(page.getByTestId("chart-share")).toHaveCount(0);
+  await expect(page.locator('[data-testid$="-share"]')).toHaveCount(SHARE_IDS.length);
+  for (const testId of SHARE_IDS) {
+    const button = page.getByTestId(testId);
+    await expect(button, testId).toHaveCount(1);
+    await button.click();
+    await expect(page.getByTestId(`${testId}-menu`)).toBeVisible();
+    const [download] = await Promise.all([page.waitForEvent("download"), page.getByTestId(`${testId}-download`).click()]);
+    const bytes = await readFile(await download.path());
+    expect(bytes.subarray(1, 4).toString(), testId).toBe("PNG");
+    expect(bytes.readUInt32BE(16), testId).toBe(2400);
+    expect(bytes.readUInt32BE(20), testId).toBeGreaterThan(400);
+    expect(download.suggestedFilename(), testId).toMatch(/^fiscal-analysis-\d{4}(-\d{4})?\.png$/);
+    await expect(page.getByTestId(`${testId}-menu`)).toHaveCount(0);
+  }
+});
+
+// Spec §1: the page ships less than the Analysis page it replaced; the budget is its size on 2026-10-30 (66 KB and
+// 61 KB gzipped) with a little room.
+const KA_HTML_GZIP_LIMIT = 75_000;
+const EN_HTML_GZIP_LIMIT = 70_000;
+
+test("the page's HTML stays inside its size budget", async ({ request }) => {
+  for (const [prefix, limit] of [["", KA_HTML_GZIP_LIMIT], ["/en", EN_HTML_GZIP_LIMIT]] as const) {
+    const html = await (await request.get(`${prefix}/explorer/analysis`)).text();
+    expect(gzipSync(html).length, prefix || "/").toBeLessThan(limit);
+  }
+});
+
+test("the ruler's focus ring sits inside its stop", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await open(page, "/explorer/analysis");
+  await page.getByTestId("year-ruler").locator('[aria-checked="true"]').focus();
+  await page.keyboard.press("ArrowLeft");
+  const ring = await page.getByTestId("year-ruler").locator('[aria-checked="true"]').evaluate((element) => {
+    const style = getComputedStyle(element);
+    return { offset: style.outlineOffset, style: style.outlineStyle };
+  });
+  expect(ring).toEqual({ offset: "-2px", style: expect.not.stringMatching(/^none$/) });
+});
+
+test("hovering a grid cell, a treemap tile or a dot names what it is", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await open(page, "/explorer/analysis");
+  const where = page.locator("#year-review-where");
+  // A cell of the hundred highlights its category's row.
+  const cell = where.locator("[data-cell]").nth(40);
+  const cellId = (await cell.getAttribute("data-cell"))!;
+  await cell.hover();
+  await expect(where.locator(`button[data-rank-row="${cellId}"]`)).toHaveAttribute("data-focus", "");
+  await page.mouse.move(5, 5);
+  await expect(where.locator("button[data-rank-row][data-focus]")).toHaveCount(0);
+  // A treemap tile lights up and dims the others.
+  const tiles = where.locator("[data-tile]:visible");
+  const tile = tiles.first();
+  await tile.hover();
+  await expect(tile).toHaveAttribute("data-focus", "");
+  await expect(where.locator("[data-tile][data-dim]:visible")).toHaveCount((await tiles.count()) - 1);
+  await page.mouse.move(5, 5);
+  // A municipality's dot names it with its figure (spec §4).
+  const country = page.locator("#year-review-country");
+  const dot = country.locator("[data-dot]").first();
+  await dot.scrollIntoViewIfNeeded();
+  await dot.hover();
+  await expect(country.locator("[data-dot-label]")).toHaveCount(1);
+  await expect(country.locator("[data-dot-label]")).toHaveText(/^\S.* · [\d,]+ ₾$/);
+});
+
+for (const [width, height] of [[1440, 1000], [375, 812]] as const) {
+  test(`pressing a region at ${width}px lists its municipalities, and pressing again hides them`, async ({ page }) => {
+    await page.setViewportSize({ width, height });
+    await open(page, "/explorer/analysis");
+    const country = page.locator("#year-review-country");
+    const regions = country.locator("[data-region-row] > button");
+    const regionOf = (button: Locator) => button.evaluate((element) => element.parentElement!.getAttribute("data-region-row")!);
+    const first = regions.nth(0);
+    const id = await regionOf(first);
+    await first.click();
+    await expect(first).toHaveAttribute("aria-pressed", "true");
+    const list = country.locator(`[data-region-places="${id}"]`);
+    await expect(list).toBeVisible();
+    await expect(first).toHaveAttribute("aria-controls", (await list.getAttribute("id"))!);
+    // One row per municipality of the region, a name and its figure, highest first.
+    await expect(list.locator("li")).toHaveCount(await country.locator(`[data-region-row="${id}"] [data-dot]`).count());
+    const rows = await list.locator("li").evaluateAll((items) => items.map((item) => [item.children[0]!.textContent!, item.children[1]!.textContent!]));
+    for (const [name, figure] of rows) {
+      expect(name).toMatch(/\S/);
+      expect(figure).toMatch(/^[\d,]+ ₾$/);
+    }
+    const figures = rows.map(([, figure]) => Number(figure!.replace(/[^\d]/g, "")));
+    expect(figures).toEqual([...figures].sort((a, b) => b - a));
+    await noSidewaysScroll(page);
+
+    // Pressing again hides it; the keyboard opens another region's, and a second region moves the list.
+    await first.click();
+    await expect(country.locator("[data-region-places]")).toHaveCount(0);
+    await expect(first).not.toHaveAttribute("aria-controls");
+    const second = regions.nth(1);
+    await second.focus();
+    await page.keyboard.press("Enter");
+    await expect(country.locator(`[data-region-places="${await regionOf(second)}"]`)).toBeVisible();
+    await first.focus();
+    await page.keyboard.press("Space");
+    await expect(country.locator("[data-region-places]")).toHaveCount(1);
+    await expect(list).toBeVisible();
+    await expect(second).toHaveAttribute("aria-pressed", "false");
+
+    // The share picture never shows the list: opening it mounts the card, and the page still has one list.
+    await page.getByTestId("regions-share").click();
+    await expect(page.getByTestId("regions-share-menu")).toBeVisible();
+    await expect(page.locator("[data-region-places]")).toHaveCount(1);
+    await page.keyboard.press("Escape");
+    if (width === 1440) expect(await axeViolations(page)).toEqual([]);
+  });
+}
+
+test("the status line speaks once a run of year steps settles, and names a pinned category", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await open(page, "/explorer/analysis");
+  const [first] = await rulerYears(page);
+  const said = page.getByTestId("year-review").locator(':scope > p[role="status"]');
+  await page.getByTestId("year-ruler").locator('[aria-checked="true"]').focus();
+  await page.keyboard.press("Home");
+  await expect(said).toHaveText(new RegExp(`^${first}: `));
+  await said.evaluate((element) => {
+    const heard: string[] = [];
+    (window as unknown as { heard: string[] }).heard = heard;
+    new MutationObserver(() => heard.push(element.textContent ?? "")).observe(element, { childList: true, characterData: true, subtree: true });
+  });
+  for (let step = 0; step < 3; step += 1) await page.keyboard.press("ArrowRight");
+  await expectYear(page, first! + 3);
+  await expect(said).toHaveText(new RegExp(`^${first! + 3}: `));
+  // The steps between were not read out one by one.
+  const heard = await page.evaluate(() => (window as unknown as { heard: string[] }).heard);
+  expect([...new Set(heard.map((line) => line.slice(0, 4)))]).toEqual([String(first! + 3)]);
+
+  // With a category pinned, the line speaks of it.
+  await page.locator("#year-review-where button[data-rank-row]").first().click();
+  const chip = page.getByRole("button", { name: /^მონიშვნის მოხსნა: / });
+  const label = (await chip.getAttribute("aria-label"))!.replace("მონიშვნის მოხსნა: ", "");
+  await page.getByTestId("year-ruler").locator('[aria-checked="true"]').focus();
+  await page.keyboard.press("ArrowRight");
+  await expect(said).toHaveText(new RegExp(`^${first! + 4}: ${label.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")} — `));
+});
+
+test("the long view's readout follows the keys", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await open(page, "/explorer/analysis");
+  const years = await rulerYears(page);
+  const plot = page.locator('#year-review-long [role="img"]');
+  const tip = page.getByTestId("long-view-tooltip");
+  await plot.scrollIntoViewIfNeeded();
+  await plot.focus();
+  await expect(plot).toBeFocused();
+  await page.keyboard.press("ArrowRight");
+  await expect(tip).toBeVisible();
+  await expect(tip).toContainText(String(years[0]));
+  await page.keyboard.press("End");
+  await expect(tip).toContainText(`${years.at(-1)} · გეგმა`);
+  expect(await axeViolations(page)).toEqual([]);
+  await page.keyboard.press("Escape");
+  await expect(tip).toHaveCount(0);
+});
+
+test("the page has no WCAG A or AA violations with a category picked or in the plan year", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await open(page, "/explorer/analysis");
+  await page.locator("#year-review-where button[data-rank-row]").first().click();
+  await page.mouse.move(5, 5);
+  expect(await axeViolations(page)).toEqual([]);
+  await pickYear(page, (await rulerYears(page)).at(-1)!);
+  expect(await axeViolations(page)).toEqual([]);
+});
+
+for (const width of [820, 1440]) {
+  test(`at ${width}px a control reached by the keyboard is never hidden under the sticky ruler`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 900 });
+    await open(page, "/explorer/analysis");
+    const sticky = page.getByTestId("year-ruler").locator("..");
+    for (const selector of ["#year-review-where button[data-rank-row]", "#year-review-country [data-region-row] > button", "#year-review-long button[data-legend]"]) {
+      const target = page.locator(selector).nth(1);
+      // The control sits just under the stuck ruler row; the next one has the focus, without scrolling.
+      await target.evaluate((element) => window.scrollBy(0, element.getBoundingClientRect().top - 30));
+      await expect.poll(async () => (await target.boundingBox())!.y, { message: selector }).toBeLessThan((await sticky.boundingBox())!.y + (await sticky.boundingBox())!.height);
+      await page.locator(selector).nth(2).evaluate((element) => (element as HTMLElement).focus({ preventScroll: true }));
+      await page.keyboard.press("Shift+Tab");
+      await expect(target, selector).toBeFocused();
+      await expect.poll(async () => {
+        const [box, row] = await Promise.all([target.boundingBox(), sticky.boundingBox()]);
+        return box!.y - (row!.y + row!.height);
+      }, { message: selector }).toBeGreaterThanOrEqual(0);
+    }
+  });
+}
+
+test("a jump to a section at 1440px clears the sticky ruler", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await open(page, "/explorer/analysis");
+  const ruler = page.getByTestId("year-ruler").locator("..");
+  for (const id of ["year-review-debt", "year-review-long"]) {
+    await page.locator(`#${id}`).evaluate((element) => element.scrollIntoView());
+    await expect.poll(async () => {
+      const [section, sticky] = await Promise.all([page.locator(`#${id} h2`).boundingBox(), ruler.boundingBox()]);
+      return section!.y - (sticky!.y + sticky!.height);
+    }, { message: id }).toBeGreaterThanOrEqual(0);
+  }
+});
+
+test.describe("on a touch phone", () => {
+  test.use({ hasTouch: true, viewport: { width: 375, height: 812 } });
+
+  test("a swipe up or down over the ruler scrolls and keeps the year; a tap picks; a sideways drag picks with the year above the finger", async ({ page }) => {
+    await open(page, "/explorer/analysis");
+    const ruler = page.getByTestId("year-ruler");
+    const years = await rulerYears(page);
+    const opened = await chosenYear(page);
+    const hash = new URL(page.url()).hash;
+    const box = (await ruler.boundingBox())!;
+    const xOf = (year: number) => box.x + ((years.indexOf(year) + 0.5) / years.length) * box.width;
+    const y = box.y + box.height / 2;
+    const finger = (type: string, x: number, at: number) =>
+      ruler.dispatchEvent(type, { pointerType: "touch", pointerId: 7, isPrimary: true, clientX: x, clientY: at, button: type === "pointermove" ? -1 : 0, buttons: type === "pointerdown" || type === "pointermove" ? 1 : 0, bubbles: true });
+
+    // A real vertical swipe that starts on a stop scrolls the page; the browser cancels the touch and the year stays.
+    const cdp = await page.context().newCDPSession(page);
+    const scrolled = await page.evaluate(() => window.scrollY);
+    const swipe = { x: xOf(years[2]!), y };
+    await cdp.send("Input.dispatchTouchEvent", { type: "touchStart", touchPoints: [swipe] });
+    for (let step = 1; step <= 10; step += 1) await cdp.send("Input.dispatchTouchEvent", { type: "touchMove", touchPoints: [{ x: swipe.x + 1, y: swipe.y - step * 20 }] });
+    await cdp.send("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] });
+    await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(scrolled);
+    await expectYear(page, opened);
+    expect(new URL(page.url()).hash).toBe(hash);
+    await page.evaluate(() => window.scrollTo(0, 0));
+
+    // The same move as pointer events: down on a stop, 40px down and 2px sideways, then cancelled or lifted there.
+    for (const end of ["pointercancel", "pointerup"]) {
+      await finger("pointerdown", xOf(years[2]!), y);
+      await finger("pointermove", xOf(years[2]!) + 2, y + 40);
+      await finger(end, xOf(years[2]!) + 2, y + 40);
+      await expectYear(page, opened);
+    }
+    await expect(ruler.locator("[data-ruler-scrub]")).toHaveCount(0);
+
+    // A tap picks the stop under the finger.
+    await ruler.locator(`[data-year="${years[4]}"]`).tap();
+    await expectYear(page, years[4]!);
+
+    // A sideways drag picks as it goes, with the chosen year shown above the finger, and ends on the stop it is lifted over.
+    await finger("pointerdown", xOf(years[4]!), y);
+    await finger("pointermove", xOf(years[4]!) + 14, y + 1);
+    await finger("pointermove", xOf(years[9]!), y + 2);
+    await expect(ruler.locator("[data-ruler-scrub]")).toBeVisible();
+    await expect(ruler.locator("[data-ruler-scrub]")).toHaveText(String(years[9]));
+    await expectYear(page, years[9]!);
+    await finger("pointerup", xOf(years[9]!), y + 2);
+    await expect(ruler.locator("[data-ruler-scrub]")).toHaveCount(0);
+    await expectYear(page, years[9]!);
+    await noSidewaysScroll(page);
+  });
+
+  test("a tap on the long view shows its readout under the chart", async ({ page }) => {
+    await open(page, "/en/explorer/analysis");
+    const plot = page.locator('#year-review-long [role="img"]');
+    await plot.scrollIntoViewIfNeeded();
+    await plot.tap();
+    await expect(page.getByTestId("long-view-panel")).toBeVisible();
+    await expect(page.getByTestId("long-view-tooltip")).toBeHidden();
+    const [panel, chart] = await Promise.all([page.getByTestId("long-view-panel").boundingBox(), plot.boundingBox()]);
+    expect(panel!.y).toBeGreaterThanOrEqual(chart!.y + chart!.height);
+    await noSidewaysScroll(page);
+  });
 });

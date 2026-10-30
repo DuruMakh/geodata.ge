@@ -16,9 +16,8 @@ import { DECK_LINE_CLASS } from "../explorer-shell/latest-value-line";
 import { withLari } from "../ui/lari";
 import { navGroup, ALL_DATA_PATH } from "../../lib/navigation/navTree";
 
-// The budget explorer (expenditure, revenue) and the single-year analysis are
-// separate client entries, so neither route ships the other's view; this is
-// what the two share.
+// What the budget explorer's client entry (main-explorer.tsx) and its state hook
+// (use-explorer-state.ts) share.
 
 /** The years each scope offers. */
 export function budgetYearsByScope(facts: ClientBudgetFact[], adminFacts: ClientAdminFact[]): Record<ExplorerScope, number[]> {
