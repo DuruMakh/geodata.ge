@@ -702,6 +702,8 @@ describe("Dataset nodes across the sitemap", () => {
           for (const producer of producers) expect(producer, pathname).toEqual({ "@type": "Organization", name: expect.any(String), url: expect.stringMatching(/^https:\/\/(www\.geostat\.ge|nbg\.gov\.ge|ssa\.moh\.gov\.ge|mof\.ge|www\.treasury\.ge|pensions\.ge)$/) });
         }
         expect(String(dataset.description).length, pathname).toBeGreaterThanOrEqual(50);
+        // A page that is part of a parent's dataset links no file of its own; the parent carries the distribution.
+        if (dataset.isPartOf) expect(dataset, pathname).not.toHaveProperty("distribution");
         // Every node it points at is the same language's: its parent, its subsets and the catalog.
         const related = [dataset.isPartOf, dataset.includedInDataCatalog, ...((dataset.hasPart as unknown[] | undefined) ?? [])]
           .filter(Boolean).map((node) => (node as { "@id": string })["@id"]);

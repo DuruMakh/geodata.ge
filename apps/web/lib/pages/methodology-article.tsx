@@ -125,7 +125,7 @@ const DATASET_DOWNLOADS = {
   unemployment: null,
   trade: null,
   "external-flows": null,
-  // Demography has no bulk files and no MCP entry yet (spec section 10).
+  // Demography has no MCP entry yet (spec section 10); its population file is linked from the Population index, not from this page, which would add a visible download.
   demography: null,
   wages: null,
   poverty: null,

@@ -58,7 +58,7 @@ async function main() {
 
   if (write) {
     // Deliberately NOT clearing OUTPUT_DIR: preparePublicDatasets wipes and
-    // rewrites it with its five public CSVs earlier in the prebuild chain, and
+    // rewrites it with its nine public CSVs earlier in the prebuild chain, and
     // regional-economy and inflation CSVs are also written between the two.
     await mkdir(OUTPUT_DIR, { recursive: true });
     for (const artifact of artifacts) {

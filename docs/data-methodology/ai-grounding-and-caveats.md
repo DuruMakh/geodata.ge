@@ -7,7 +7,9 @@ This document is the single owner of the caveat catalogue used by the fact-query
 ## Bilingual response contract, schema 1.7.0
 
 The shared `/mcp` endpoint and the manifest-listed `/downloads/data/` publications
-use one reviewed snapshot. `tools/list`, `catalogue.json` and `manifest.json` own
+use one reviewed snapshot. The manifest also lists ten topic CSVs written earlier in
+prebuild that are not cut from the snapshot; their change shows in their per-file
+`sha256`, not in the snapshot `dataVersion`. `tools/list`, `catalogue.json` and `manifest.json` own
 the changing tool, dataset and publication inventories. Descriptions, labels,
 definitions, missingness, comparison
 reasons and ranking explanations include Georgian and English. Caveat text is
@@ -820,7 +822,9 @@ logical-source sets and retains `derivation_upstream` roles.
 
 `npm run data:prepare-fact-query-publications` writes the files; it runs last in
 the `prebuild` chain, after `data:prepare-public-datasets`, which clears the
-output directory before writing its CSVs.
+output directory before writing its CSVs. It needs the topic CSVs that step and the
+inflation step wrote already on disk, because the manifest lists them, and it stops
+at the first one that is missing.
 
 Both the write and the check read the snapshot that `data:prepare-fact-query-snapshot`
 wrote earlier in the chain (`lib/factQuery/generated/snapshot.json`, the file `/mcp`

@@ -243,6 +243,9 @@ describe("Fiscal.ge agent instructions", () => {
       expect(line, url).not.toContain("Browse-only for now");
     }
     expect(lineOf("/explorer/living#t-health")).toContain("no bulk file for health");
+    // The unemployment file covers four pages; the four labour detail pages are said to have none.
+    expect(lineOf("/explorer/labour#t-unemployment")).toMatch(/overview, regions, age and gender pages; jobs by industry, hours worked, informal jobs and young people have no bulk file/);
+    expect(lineOf("/explorer/demography/population")).toContain("population counts only, no density");
     for (const slug of ["migration", "births-deaths", "marriages-divorces"]) {
       expect(lineOf(`/explorer/demography/${slug}`), slug).toContain("no bulk file for demography");
     }
