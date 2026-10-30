@@ -121,7 +121,8 @@ export function RankingList({ rows, focus, pin = null, unit, ariaLabel, hintId, 
                 onClick={() => onPin(row.id)}
                 onPointerEnter={onFocus ? pointerHover(() => onFocus(row.id)) : undefined}
                 onPointerLeave={onFocus ? () => onFocus(null) : undefined}
-                onFocus={onFocus ? () => onFocus(row.id) : undefined}
+                // A keyboard focus only: a tap focuses the button after its pointerleave, which would leave a hover behind.
+                onFocus={onFocus ? (event) => { if (event.currentTarget.matches(":focus-visible")) onFocus(row.id); } : undefined}
                 onBlur={onFocus ? () => onFocus(null) : undefined}
                 className={className}
               >

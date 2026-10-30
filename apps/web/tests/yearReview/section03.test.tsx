@@ -1,4 +1,4 @@
-import { beforeAll, describe, expect, test } from "vitest";
+import { beforeAll, describe, expect, test, vi } from "vitest";
 import { WhereMoneyGoes } from "../../components/year-review/where-money-goes";
 import type { Presentation } from "../../lib/i18n/types";
 import { loadYearReviewData } from "../../lib/yearReview/buildYearReviewData";
@@ -7,7 +7,14 @@ import { buysView, type Grouping } from "../../lib/yearReview/yearView";
 import { renderPageMarkup } from "../helpers/render-localized";
 
 // Section 03 (where the money goes) as static markup, on the served data. Hover and click picking are in the
-// browser spec (Task 10).
+// browser spec (Task 10). The share button stands in with its title and caption on it: the real one mounts its card
+// only when opened, so its caption never reaches static markup.
+
+vi.mock("../../components/explorer-shell/chart-share-button", () => ({
+  ChartShareButton: ({ title, caption }: { title: string; caption: string }) => (
+    <button type="button" data-testid="chart-share" data-title={title} data-caption={caption} />
+  ),
+}));
 
 const GEORGIAN = /\p{Script=Georgian}/gu;
 const loaded: Partial<Record<"ka" | "en", { data: YearReviewData; presentation: Presentation }>> = {};
@@ -36,6 +43,12 @@ function present(data: YearReviewData, grouping: Grouping, year: number) {
   return categories.filter((category) => (category.values[index] ?? 0) !== 0);
 }
 const rowTags = (markup: string) => [...markup.matchAll(/<button[^>]*data-rank-row="[^"]*"[^>]*>/g)].map(([tag]) => tag);
+/** The markup of one panel: from its `data-panel` mark to the next panel's, or the end. */
+function part(markup: string, id: string): string {
+  const start = markup.indexOf(`data-panel="${id}"`);
+  const next = markup.indexOf("data-panel=", start + 1);
+  return start < 0 ? "" : markup.slice(start, next < 0 ? undefined : next);
+}
 const plain = (markup: string) => markup.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ");
 
 describe("Year in review section 03", () => {
@@ -92,10 +105,41 @@ describe("Year in review section 03", () => {
     const [first] = data.budget.years;
     expect(plain(section(first!))).toContain(`${first} პირველი წელია მონაცემებში`);
     const planYear = data.budget.years.find((_, index) => data.budget.planned[index]);
-    if (planYear === undefined) return;
-    const plan = plain(section(planYear));
-    expect(plan).toContain(`${planYear} — გეგმა, ${planYear - 1} — ფაქტი`);
+    expect(planYear).toBeDefined();
+    const markup = section(planYear!);
+    const plan = plain(markup);
+    const basis = `${planYear} — გეგმა, ${planYear! - 1} — ფაქტი`;
+    expect(plan).toContain(basis);
     expect(plan).toContain(`${planYear} · სახელმწიფო ბიუჯეტი · გეგმა`);
+    // The change bars' share picture says plan against actual too, and each ranking row says plan to a screen reader.
+    expect(/data-caption="([^"]*)"/.exec(part(markup, "change"))?.[1]).toContain(basis);
+    expect(rowTags(markup).every((tag) => /aria-label="[^"]*, გეგმა, /.test(tag))).toBe(true);
+    expect(/data-caption="([^"]*)"/.exec(part(section(planYear! - 1), "change"))?.[1]).not.toContain("გეგმა");
+  });
+
+  test("a category with no value the year before has the newCat note instead of a bar", () => {
+    const { data } = loaded.ka!;
+    const { years } = data.budget;
+    const found = (["fields", "institutions"] as const).flatMap((grouping) =>
+      (grouping === "fields" ? data.budget.fields : data.budget.institutions).flatMap((category) =>
+        years.flatMap((year, index) =>
+          index > 0 && (category.values[index] ?? 0) !== 0 && category.values[index - 1] === null ? [{ grouping, category, year, previous: years[index - 1]! }] : [],
+        ),
+      ),
+    )[0];
+    expect(found).toBeDefined();
+    const change = part(section(found!.year, { grouping: found!.grouping }), "change");
+    expect(plain(change)).toContain(`${found!.category.label} — ${found!.previous} წელს მონაცემი არ არის`);
+    expect(change).not.toContain(`data-change-row="${found!.category.id}"`);
+  });
+
+  test("the treemap carries a year tag when spending by type falls back to another year", () => {
+    const { data } = loaded.ka!;
+    const year = data.budget.years.find((target) => buysView(data, target).fallback);
+    expect(year).toBeDefined();
+    const used = buysView(data, year!).year;
+    expect(part(section(year!), "buys")).toContain(`data-year-tag="${used}"`);
+    expect(part(section(used), "buys")).not.toContain("data-year-tag");
   });
 
   test("the treemap labels tiles of 3% and more on the tile and lists the smaller ones under it", () => {

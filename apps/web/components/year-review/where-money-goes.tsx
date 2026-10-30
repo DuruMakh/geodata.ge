@@ -1,5 +1,7 @@
 "use client";
 
+import { useMemo } from "react";
+import { squarify } from "../../lib/explorer/treemapLayout";
 import { formatAmountParts, formatShare, MISSING } from "../../lib/explorer/format";
 import { message } from "../../lib/i18n/messages";
 import { useI18n } from "../../lib/i18n/provider";
@@ -8,7 +10,7 @@ import { buysView, changeView, whereView, type Grouping } from "../../lib/yearRe
 import { ChartShareButton } from "../explorer-shell/chart-share-button";
 import { SegmentedTabs } from "../ui/editorial";
 import { withLari } from "../ui/lari";
-import { BuysTreemap, type BuysTile } from "./buys-treemap";
+import { BuysTreemap, TALL, type BuysTile } from "./buys-treemap";
 import { ChangeBars, type ChangeBar } from "./change-bars";
 import { ChartFoot, FOOT_NOTE, H3, H3_META, Section, type YearReviewSectionProps } from "./section";
 import { RankingList, WaffleGrid, type RankRow } from "./waffle";
@@ -33,9 +35,16 @@ export function WhereMoneyGoes({ data, year, grouping, focus, pin, onFocus, onPi
   const lari = text("yearReview.lari");
   const { years } = data.budget;
   const index = years.indexOf(year);
-  const where = whereView(data, grouping, year);
-  const change = changeView(data, grouping, year);
-  const buys = buysView(data, year);
+  // The views and the tall treemap layout follow the year and grouping only, not a hover.
+  const { where, change, buys, tall } = useMemo(() => {
+    const buys = buysView(data, year);
+    return {
+      where: whereView(data, grouping, year),
+      change: changeView(data, grouping, year),
+      buys,
+      tall: squarify(buys.value.tiles.map((tile) => tile.value), 0, 0, TALL.width, TALL.height),
+    };
+  }, [data, grouping, year]);
 
   const categories = grouping === "fields" ? data.budget.fields : data.budget.institutions;
   const byId = new Map(categories.map((category) => [category.id, category]));
@@ -57,6 +66,7 @@ export function WhereMoneyGoes({ data, year, grouping, focus, pin, onFocus, onPi
     items: where.items.filter((item) => item.cells > 0).map((item) => `${item.label} — ${item.cells} ${lari}`).join(", "),
   });
   const vsPrevious = index > 0 ? text("yearReview.vsPrev", { y: years[index - 1]! }) : "";
+  const planSaid = where.planned ? `, ${text("yearReview.plan")}` : "";
   const rows: RankRow[] = where.items.map((item) => {
     const share = formatShare(item.share);
     const growth = item.change === null ? null : formatShare(item.change, true);
@@ -66,7 +76,7 @@ export function WhereMoneyGoes({ data, year, grouping, focus, pin, onFocus, onPi
       color: item.color,
       cells: item.value < 0 ? MISSING : item.cells === 0 ? "<1" : String(item.cells),
       sub: [money(item.value), share, ...(growth ? [growth] : []), ...(item.value < 0 ? [text("yearReview.negTag")] : [])].join(" · "),
-      said: `${item.label}: ${money(item.value)}, ${share}${growth ? `, ${growth} ${vsPrevious}` : ""}`,
+      said: `${item.label}: ${money(item.value)}${planSaid}, ${share}${growth ? `, ${growth} ${vsPrevious}` : ""}`,
       spark: item.spark,
       sparkIndex: index,
       planned: where.planned,
@@ -76,7 +86,10 @@ export function WhereMoneyGoes({ data, year, grouping, focus, pin, onFocus, onPi
 
   // The comparison grid: the focused category's lari then and now, else (as on the board) the one that moved most.
   const tally = (ids: string[]) => ids.reduce((counts, id) => counts.set(id, (counts.get(id) ?? 0) + 1), new Map<string, number>());
-  const thenOf = tally(where.thenCells);
+  // Every category positive in the comparison year, with its cells: a small one has none and reads `<1`.
+  const thenCount = tally(where.thenCells);
+  const thenIndex = years.indexOf(where.thenYear);
+  const thenOf = new Map(categories.filter((category) => (category.values[thenIndex] ?? 0) > 0).map((category) => [category.id, thenCount.get(category.id) ?? 0]));
   const nowOf = new Map(where.items.filter((item) => item.value > 0).map((item) => [item.id, item.cells]));
   const moved = (id: string) => Math.abs((nowOf.get(id) ?? 0) - (thenOf.get(id) ?? 0));
   const compared =
@@ -161,15 +174,17 @@ export function WhereMoneyGoes({ data, year, grouping, focus, pin, onFocus, onPi
     const chart = (still: boolean) => (
       <ChangeBars rows={bars} zero={zeroAt} focus={still ? null : picked} ariaLabel={ariaLabel} {...(still ? {} : { onFocus, onPin })} />
     );
-    return { previousYear, heading, facts, notes, chart, basis: change.basis };
+    const basisLine = change.basis === "planVsActual" ? text("yearReview.planVsActual", { a: year, b: previousYear }) : text("yearReview.actual");
+    return { previousYear, heading, facts, notes, chart, basis: change.basis, basisLine };
   })();
 
   // What the money buys: general government by economic type, in its nearest year.
   const { total: buysTotal, tiles } = buys.value;
   const typeYears = data.spendingTypes.years;
   const typeBefore = typeYears[typeYears.indexOf(buys.year) - 1];
-  const buysTiles: BuysTile[] = tiles.map((tile) => ({
+  const buysTiles: BuysTile[] = tiles.map((tile, position) => ({
     ...tile,
+    tall: tall[position]!,
     amount: `${shortAmount(tile.value, messages)} · ${formatShare(tile.share)}`,
     change: tile.change === null || typeBefore === undefined ? null : text("yearReview.tmChg", { p: formatShare(tile.change, true), y: typeBefore }),
   }));
@@ -255,7 +270,7 @@ export function WhereMoneyGoes({ data, year, grouping, focus, pin, onFocus, onPi
             <h3 className={`${H3} mt-10 min-[768px]:mt-[52px]`}>
               {changed.heading}{" "}
               <span className={H3_META}>
-                {changed.basis === "planVsActual" ? text("yearReview.planVsActual", { a: year, b: changed.previousYear }) : text("yearReview.actual")}
+                {changed.basisLine}
               </span>
             </h3>
             <dl className="mt-[22px] grid grid-cols-1 gap-x-8 gap-y-4 @min-[640px]:grid-cols-3">
@@ -274,7 +289,7 @@ export function WhereMoneyGoes({ data, year, grouping, focus, pin, onFocus, onPi
               share={
                 <ChartShareButton
                   title={changed.heading}
-                  caption={`${lari} · ${changed.previousYear}–${year}`}
+                  caption={`${lari} · ${changed.previousYear}–${year}${changed.basis === "planVsActual" ? ` · ${changed.basisLine}` : ""}`}
                   source={text("main.sourceData")}
                   chart={<div className="@container">{changed.chart(true)}</div>}
                   period={`${changed.previousYear}-${year}`}

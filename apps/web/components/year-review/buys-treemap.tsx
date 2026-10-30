@@ -1,6 +1,6 @@
 "use client";
 
-import { squarify, type TreemapRect } from "../../lib/explorer/treemapLayout";
+import type { TreemapRect } from "../../lib/explorer/treemapLayout";
 import { TREEMAP_HEIGHT, TREEMAP_WIDTH } from "../../lib/yearReview/yearView";
 import { pointerHover } from "./section";
 
@@ -12,9 +12,10 @@ import { pointerHover } from "./section";
 // The share of the total from which a tile is labelled on the drawing (a ruling: the cut-off lives in the UI).
 const LABEL_FROM = 0.03;
 const WIDE = { width: TREEMAP_WIDTH, height: TREEMAP_HEIGHT };
-const TALL = { width: 335, height: 620 }; // the board's phone layout
+/** The board's phone layout box; the caller squarifies the tiles into it (`tall`). */
+export const TALL = { width: 335, height: 620 };
 
-/** One tile in buysView's order (largest first), with its rect in buysView's wide box. */
+/** One tile in buysView's order (largest first), with its rect in buysView's wide box and in the tall one. */
 export type BuysTile = {
   id: string;
   label: string;
@@ -22,6 +23,7 @@ export type BuysTile = {
   value: number;
   share: number;
   rect: TreemapRect;
+  tall: TreemapRect;
   /** `amount · share`. */
   amount: string;
   /** The change line, or null when the type has no earlier year. */
@@ -82,12 +84,11 @@ export function BuysTreemap({ tiles, focus, ariaLabel, onFocus }: {
   onFocus?: (id: string | null) => void;
 }) {
   const small = tiles.filter((tile) => tile.share < LABEL_FROM);
-  const tall = squarify(tiles.map((tile) => tile.value), 0, 0, TALL.width, TALL.height);
   return (
     <div className="mt-4">
       <div role="img" aria-label={ariaLabel} onPointerLeave={onFocus ? () => onFocus(null) : undefined}>
         <Layout tiles={tiles.map((tile) => ({ ...tile, at: tile.rect }))} box={WIDE} focus={focus} onFocus={onFocus} className="hidden @min-[640px]:block" />
-        <Layout tiles={tiles.map((tile, index) => ({ ...tile, at: tall[index]! }))} box={TALL} focus={focus} onFocus={onFocus} className="@min-[640px]:hidden" />
+        <Layout tiles={tiles.map((tile) => ({ ...tile, at: tile.tall }))} box={TALL} focus={focus} onFocus={onFocus} className="@min-[640px]:hidden" />
       </div>
       {small.length > 0 ? (
         <ul aria-hidden="true" className="m-0 mt-3 flex list-none flex-wrap gap-x-6 gap-y-1.5 p-0">
