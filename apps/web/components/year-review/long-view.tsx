@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo, useState, type MouseEvent, type PointerEvent } from "react";
+import { useMemo, useState, type KeyboardEvent, type MouseEvent, type PointerEvent } from "react";
+import { stepPeriodIndex } from "../../lib/explorer/chartNavigation";
 import { formatAmount, formatInUnit, formatShare, UNIT_BN } from "../../lib/explorer/format";
 import { message } from "../../lib/i18n/messages";
 import { useI18n } from "../../lib/i18n/provider";
@@ -14,8 +15,10 @@ import { ChartFoot, pointerHover, Section, type YearReviewSectionProps } from ".
 // Section 06, "The long view" (spec §4, board `an-area`): every category of the side (expenditure in the chosen
 // grouping, or receipts) over all its years as stacked areas, in shares or GEL. The plan year is hatched, the chosen
 // year is a line with its label on top, the last year's bands are named at the right edge, and a pointer over the
-// plot draws a crosshair and a readout of the band under it. Hovering a band, an edge label or a legend item focuses
-// that category on the page (spec §5); a click or tap pins it.
+// plot draws a crosshair and a readout of the band under it; with the plot focused, the arrow keys, Home and End step
+// the readout's year (as the column charts do) and Escape closes it. The readout floats over the plot from 640px of
+// section width and sits under the chart below it (DESIGN.md §8.3). Hovering a band, an edge label or a legend item
+// focuses that category on the page (spec §5); a click or tap pins it.
 
 const WIDTH = 1000; // the drawing's viewBox width; it stretches to the plot
 const HEIGHT = 400; // the plot's height from 640px of section width, and the viewBox height
@@ -120,7 +123,6 @@ export function LongView({ data, year, grouping, side, measure, focus, pin, onFo
     a: from,
     b: to,
     items: bands
-      .slice(0, 6)
       .map((band, index) => `${band.label} ${sharedAt(index, 0)} → ${sharedAt(index, last)}`)
       .join("; "),
   });
@@ -147,6 +149,13 @@ export function LongView({ data, year, grouping, side, measure, focus, pin, onFo
     if (event.pointerType === "touch") return;
     setHover(null);
     onFocus(null);
+  };
+  // The keys step the readout's year; it shows the focused category's band, if it has one here.
+  const step = (event: KeyboardEvent<HTMLDivElement>) => {
+    const next = stepPeriodIndex(event.key, hover?.column ?? null, count);
+    if (next === undefined) return;
+    event.preventDefault();
+    setHover(next === null ? null : { column: next, band: hover?.band ?? picked });
   };
   // The readout (DESIGN.md §8.3): the year, the drawn total, and the band under the pointer with its amount and share.
   const tip = hover === null ? null : (() => {
@@ -190,10 +199,15 @@ export function LongView({ data, year, grouping, side, measure, focus, pin, onFo
       <div
         role="img"
         aria-label={ariaLabel}
-        className={`relative col-start-2 row-start-2 ${still ? "" : "cursor-crosshair touch-pan-y"}`}
+        className={`relative col-start-2 row-start-2 ${
+          still ? "" : "cursor-crosshair touch-pan-y [&:focus:not(:focus-visible)]:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
+        }`}
         {...(still
           ? {}
           : {
+              tabIndex: 0,
+              onKeyDown: step,
+              onBlur: () => setHover(null),
               onPointerMove: move,
               onPointerDown: move,
               onPointerLeave: leave,
@@ -234,7 +248,9 @@ export function LongView({ data, year, grouping, side, measure, focus, pin, onFo
         {!still && tip ? (
           <>
             <i className="pointer-events-none absolute inset-y-0 block w-0 border-l border-dashed border-[var(--ink)] opacity-70" style={{ left: `${tip.x}%` }} />
-            <ChartTooltip testId="long-view-tooltip" leftPercent={tip.x} header={tip.header} headerRight={tip.total} rows={tip.rows} hidden={0} formatValue={tip.format} />
+            <div className="hidden @min-[640px]:contents">
+              <ChartTooltip testId="long-view-tooltip" leftPercent={tip.x} header={tip.header} headerRight={tip.total} rows={tip.rows} hidden={0} formatValue={tip.format} />
+            </div>
           </>
         ) : null}
       </div>
@@ -324,7 +340,13 @@ export function LongView({ data, year, grouping, side, measure, focus, pin, onFo
         </dl>
       ) : null}
       {chart(false)}
-      <ul className="m-0 mt-[18px] flex list-none flex-wrap gap-x-[18px] gap-y-2 p-0">
+      {tip ? (
+        <div className="@min-[640px]:hidden">
+          <ChartTooltip testId="long-view-panel" variant="panel" leftPercent={tip.x} header={tip.header} headerRight={tip.total} rows={tip.rows} hidden={0} formatValue={tip.format} />
+        </div>
+      ) : null}
+      {/* Below 768px each item is a 36px target (DESIGN.md §12); the rows then need no gap. */}
+      <ul className="m-0 mt-[18px] flex list-none flex-wrap gap-x-[18px] gap-y-0 p-0 min-[768px]:gap-y-2">
         {bands.map((band) => {
           const { on, dim } = markOf(band.id, false);
           return (
@@ -338,7 +360,7 @@ export function LongView({ data, year, grouping, side, measure, focus, pin, onFo
                 onPointerLeave={() => onFocus(null)}
                 onFocus={(event) => { if (event.currentTarget.matches(":focus-visible")) onFocus(band.id); }}
                 onBlur={() => onFocus(null)}
-                className={`inline-flex min-h-6 cursor-pointer items-center gap-[7px] text-left text-[12.5px] transition-opacity duration-200 ${
+                className={`inline-flex min-h-9 cursor-pointer items-center min-[768px]:min-h-6 gap-[7px] text-left text-[12.5px] transition-opacity duration-200 ${
                   on ? "font-semibold text-[var(--ink)]" : dim ? "text-[var(--muted)]" : "text-[var(--body)]"
                 }`}
               >
@@ -349,7 +371,7 @@ export function LongView({ data, year, grouping, side, measure, focus, pin, onFo
           );
         })}
         {planLabel ? (
-          <li aria-hidden="true" className="inline-flex min-h-6 items-center gap-[7px] text-[12.5px] text-[var(--muted)]">
+          <li aria-hidden="true" className="inline-flex min-h-9 items-center min-[768px]:min-h-6 gap-[7px] text-[12.5px] text-[var(--muted)]">
             <i className={`block h-2.5 w-4 rounded-[2px] ${HATCH_SWATCH}`} />
             {planLabel}
           </li>

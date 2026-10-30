@@ -3,6 +3,7 @@
 import { niceScale } from "../../lib/explorer/chartScale";
 import { formatInUnit, formatShare, UNIT_PERSONS } from "../../lib/explorer/format";
 import type { Values } from "../../lib/yearReview/types";
+import { stackLabels } from "../landing/chapters/canvas";
 
 // The small line chart of average interest rates under the debt panel (the AN-App board): one line per rate, its
 // latest value labelled at the right end (labels kept apart), a dot on each line at the chosen year, years every five
@@ -14,22 +15,6 @@ const VIEW_W = 300;
 const VIEW_H = 120;
 const LABEL_GAP = 15; // in view units, between two end labels
 const LABEL_EDGE = 6;
-
-/** Label positions at least `LABEL_GAP` apart and inside the box, kept in the order of `wanted` (sorted ascending). */
-function spread(wanted: number[]): number[] {
-  const placed = [...wanted];
-  for (let index = 1; index < placed.length; index += 1) placed[index] = Math.max(placed[index]!, placed[index - 1]! + LABEL_GAP);
-  const last = placed.length - 1;
-  if (last >= 0 && placed[last]! > VIEW_H - LABEL_EDGE) {
-    placed[last] = VIEW_H - LABEL_EDGE;
-    for (let index = last - 1; index >= 0; index -= 1) placed[index] = Math.min(placed[index]!, placed[index + 1]! - LABEL_GAP);
-  }
-  if (placed.length && placed[0]! < LABEL_EDGE) {
-    placed[0] = LABEL_EDGE;
-    for (let index = 1; index < placed.length; index += 1) placed[index] = Math.max(placed[index]!, placed[index - 1]! + LABEL_GAP);
-  }
-  return placed;
-}
 
 /** The rates in percent over `years`; `year` (clamped to them) gets a dot on every line with a value there. */
 export function RateLines({ years, lines, year, ariaLabel }: { years: number[]; lines: RateLine[]; year: number; ariaLabel: string }) {
@@ -51,8 +36,9 @@ export function RateLines({ years, lines, year, ariaLabel }: { years: number[]; 
       .join("");
     return { ...line, path, last: lastIndex < 0 ? null : line.values[lastIndex]!, dot: chosenIndex < 0 ? null : line.values[chosenIndex] ?? null };
   }).filter((line) => line.last !== null);
-  const order = drawn.map((line, index) => ({ index, at: y(line.last!) })).sort((left, right) => left.at - right.at);
-  const placed = spread(order.map((entry) => entry.at));
+  // The end labels kept LABEL_GAP apart inside the box, lowest on screen first (stackLabels' order, as the long view's).
+  const order = drawn.map((line, index) => ({ index, at: y(line.last!) })).sort((left, right) => right.at - left.at);
+  const placed = stackLabels(order.map((entry) => entry.at), LABEL_GAP, LABEL_EDGE, VIEW_H - LABEL_EDGE);
   const labelAt = new Map(order.map((entry, rank) => [entry.index, placed[rank]!]));
   const percent = (value: number) => formatShare(value / 100);
 

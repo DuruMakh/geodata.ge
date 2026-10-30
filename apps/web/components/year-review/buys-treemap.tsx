@@ -95,22 +95,24 @@ export function BuysTreemap({ tiles, focus, ariaLabel, onFocus }: {
       </div>
       {small.length > 0 ? (
         <ul aria-hidden="true" className="m-0 mt-3 flex list-none flex-wrap gap-x-6 gap-y-1.5 p-0">
-          {small.map((tile) => (
-            <li
-              key={tile.id}
-              data-small-tile={tile.id}
-              onPointerEnter={onFocus ? pointerHover(() => onFocus(tile.id)) : undefined}
-              onPointerLeave={onFocus ? () => onFocus(null) : undefined}
-              className={`flex items-baseline gap-2 font-[family-name:var(--font-numeric)] text-[11px] leading-[1.45] text-[var(--body)] transition-opacity duration-200 ${
-                focus !== null && focus !== tile.id ? "opacity-25" : ""
-              }`}
-            >
-              <i className="block size-2.5 flex-none self-center rounded-[2px]" style={{ backgroundColor: tile.color }} />
-              <span>
-                <b className="font-[family-name:var(--font-ui)] text-xs font-semibold text-[var(--ink)]">{tile.label}</b> {tile.amount}
-              </span>
-            </li>
-          ))}
+          {small.map((tile) => {
+            const dim = focus !== null && focus !== tile.id;
+            return (
+              <li
+                key={tile.id}
+                data-small-tile={tile.id}
+                onPointerEnter={onFocus ? pointerHover(() => onFocus(tile.id)) : undefined}
+                onPointerLeave={onFocus ? () => onFocus(null) : undefined}
+                className={`flex items-baseline gap-2 font-[family-name:var(--font-numeric)] text-[11px] leading-[1.45] transition-colors duration-200 ${dim ? "text-[var(--muted)]" : "text-[var(--body)]"}`}
+              >
+                {/* A dimmed type fades its swatch only; its text turns muted, as the ranking's does. */}
+                <i className={`block size-2.5 flex-none self-center rounded-[2px] transition-opacity duration-200 ${dim ? "opacity-25" : ""}`} style={{ backgroundColor: tile.color }} />
+                <span>
+                  <b className={`font-[family-name:var(--font-ui)] text-xs font-semibold ${dim ? "" : "text-[var(--ink)]"}`}>{tile.label}</b> {tile.amount}
+                </span>
+              </li>
+            );
+          })}
         </ul>
       ) : null}
     </div>

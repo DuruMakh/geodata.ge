@@ -70,23 +70,24 @@ export function ChartFoot({ children, share }: { children?: ReactNode; share: Re
 /**
  * One numbered section of the page: a 1px ink rule, the number in accent, the H2, and on the right a short mono line
  * and the section's own switches (after the line, when there is one). Below 768px they wrap under the heading.
+ * `first` is the section right under the ruler row, which sits closer to it (the board's gap).
  */
-export function Section({ number, id, heading, meta, controls, children }: {
+export function Section({ number, id, heading, meta, controls, first = false, children }: {
   number: string;
   id: string;
   heading: string;
   meta?: string | null;
   controls?: ReactNode;
+  first?: boolean;
   children?: ReactNode;
 }) {
   const headingId = `${id}-heading`;
   return (
-    // A jump to a section clears what sticks above it: the shell's top bar below 900px (56px and the safe area), the
-    // page's ruler row from 768px (year-review-page.tsx), both from 768px to 899px.
+    // A jump to a section clears what sticks above it through the page's scroll padding (globals.css, "Year in review").
     <section
       id={id}
       aria-labelledby={headingId}
-      className="mt-16 scroll-mt-[calc(70px+env(safe-area-inset-top))] min-[768px]:mt-[84px] min-[768px]:scroll-mt-[calc(140px+env(safe-area-inset-top))] min-[900px]:scroll-mt-[84px]"
+      className={first ? "mt-[30px] min-[768px]:mt-10" : "mt-16 min-[768px]:mt-[84px]"}
     >
       <header className="flex flex-wrap items-baseline gap-x-3.5 gap-y-1.5 border-t border-[var(--ink)] pt-3.5">
         <span aria-hidden="true" className="font-[family-name:var(--font-numeric)] text-xs font-semibold text-[var(--accent)]">{number}</span>

@@ -1,12 +1,14 @@
 "use client";
 
-import { useRef, type KeyboardEvent, type PointerEvent } from "react";
+import { useRef, useState, type KeyboardEvent, type PointerEvent } from "react";
 
 // The year ruler (spec §3, the board's `an-tl`): one stop per budget year on a track that is ink up to the chosen
 // year. A radio group with a roving tab stop (WAI-ARIA radio group keys): ←/↑ and →/↓ step a year, Home and End jump to
-// the ends. A press, or a press-and-drag along the ruler, picks the year under the pointer and focuses it. Planned years carry a small plan tag. A narrow
-// ruler labels every fourth year, the plan year and the chosen one (none within two years of it, so they never
-// collide); from 840px of its own width every year is labelled.
+// the ends. A press, or a press-and-drag along the ruler, picks the year under the pointer and focuses it. A finger
+// waits to see what it does: a tap picks the year under it, a clearly sideways drag picks as it goes (the year shown
+// above the finger), and an up or down move is the page's scroll (touch-action: pan-y), which leaves the year as it
+// was. Planned years carry a small plan tag. A narrow ruler labels every fourth year, the plan year and the chosen one
+// (none within two years of it, so they never collide); from 840px of its own width every year is labelled.
 
 type YearRulerProps = {
   years: readonly number[];
@@ -20,6 +22,9 @@ type YearRulerProps = {
   yearLabel: (year: number) => string;
   planLabel: string;
 };
+
+// How far (px) a finger may move and still tap; past it, a move more sideways than up or down starts a drag.
+const TAP_SLOP = 10;
 
 const STEP: Record<string, (index: number, last: number) => number> = {
   ArrowLeft: (index) => Math.max(0, index - 1),
@@ -48,7 +53,11 @@ function yearClass(selected: boolean, plan: boolean, labelled: boolean): string 
 
 export function YearRuler({ years, planned, value, onChange, label, yearLabel, planLabel }: YearRulerProps) {
   const buttons = useRef<(HTMLButtonElement | null)[]>([]);
-  const dragging = useRef(false);
+  // The press in progress: where it started, and whether it picks as it moves (a mouse or pen at once, a finger once
+  // it drags sideways).
+  const press = useRef<{ x: number; y: number; dragging: boolean } | null>(null);
+  // A finger is dragging along the ruler: the chosen year shows above it.
+  const [scrubbing, setScrubbing] = useState(false);
   const count = years.length;
   const chosen = Math.max(0, years.indexOf(value));
 
@@ -59,6 +68,14 @@ export function YearRuler({ years, planned, value, onChange, label, yearLabel, p
     if (years[index] !== value) onChange(years[index]!);
     // A drag can end over another year than the one pressed; the picked year takes the tab stop and the focus.
     buttons.current[index]?.focus();
+  };
+
+  const capture = (event: PointerEvent<HTMLDivElement>) => {
+    try {
+      event.currentTarget.setPointerCapture(event.pointerId);
+    } catch {
+      // A synthetic or already-released pointer cannot be captured; the press still picks its year.
+    }
   };
 
   const onKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
@@ -79,19 +96,36 @@ export function YearRuler({ years, planned, value, onChange, label, yearLabel, p
       onKeyDown={onKeyDown}
       onPointerDown={(event) => {
         if (event.button !== 0) return;
-        dragging.current = true;
-        try {
-          event.currentTarget.setPointerCapture(event.pointerId);
-        } catch {
-          // A synthetic or already-released pointer cannot be captured; the press still picks its year.
-        }
+        const touch = event.pointerType === "touch";
+        press.current = { x: event.clientX, y: event.clientY, dragging: !touch };
+        if (touch) return;
+        capture(event);
         pickAt(event);
       }}
       onPointerMove={(event) => {
-        if (dragging.current) pickAt(event);
+        const start = press.current;
+        if (!start) return;
+        if (!start.dragging) {
+          const dx = Math.abs(event.clientX - start.x);
+          if (dx < TAP_SLOP || dx <= Math.abs(event.clientY - start.y)) return;
+          start.dragging = true;
+          capture(event);
+          setScrubbing(true);
+        }
+        pickAt(event);
       }}
-      onPointerUp={() => { dragging.current = false; }}
-      onPointerCancel={() => { dragging.current = false; }}
+      onPointerUp={(event) => {
+        const start = press.current;
+        press.current = null;
+        setScrubbing(false);
+        // A finger that neither dragged nor moved off the spot tapped: it picks the year under it.
+        if (start && !start.dragging && Math.hypot(event.clientX - start.x, event.clientY - start.y) < TAP_SLOP) pickAt(event);
+      }}
+      onPointerCancel={() => {
+        // The browser took the touch for a scroll: the year stays.
+        press.current = null;
+        setScrubbing(false);
+      }}
     >
       <span
         aria-hidden="true"
@@ -115,7 +149,9 @@ export function YearRuler({ years, planned, value, onChange, label, yearLabel, p
             tabIndex={selected ? 0 : -1}
             data-year={year}
             onClick={() => onChange(year)}
-            className="group relative h-full min-w-0 flex-1 focus-visible:outline-offset-[-2px]"
+            // The ring inside the stop, so it does not cover its neighbours (globals.css, data-focus-inset).
+            data-focus-inset=""
+            className="group relative h-full min-w-0 flex-1"
           >
             {plan ? (
               <span aria-hidden="true" className="pointer-events-none absolute top-0 right-0 whitespace-nowrap font-[family-name:var(--font-numeric)] text-[11px] leading-3 text-[var(--accent)] min-[768px]:right-auto min-[768px]:left-1/2 min-[768px]:-translate-x-1/2 min-[768px]:text-[10px]">
@@ -127,6 +163,16 @@ export function YearRuler({ years, planned, value, onChange, label, yearLabel, p
           </button>
         );
       })}
+      {scrubbing ? (
+        <span
+          aria-hidden="true"
+          data-ruler-scrub=""
+          className="pointer-events-none absolute bottom-[calc(100%+10px)] z-10 -translate-x-1/2 whitespace-nowrap bg-[var(--ink)] px-2 py-1 font-[family-name:var(--font-numeric)] text-[15px] font-semibold leading-none text-[var(--paper)]"
+          style={{ left: `clamp(24px, ${((chosen + 0.5) / count) * 100}%, calc(100% - 24px))` }}
+        >
+          {years[chosen]}
+        </span>
+      ) : null}
     </div>
   );
 }

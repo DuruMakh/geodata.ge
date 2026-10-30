@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useId, useMemo, useState } from "react";
 import { POSITIVE } from "../../lib/explorer/colors";
 import { formatAmount, formatInUnit, formatPerResidentGel, UNIT_PERSONS } from "../../lib/explorer/format";
 import { message } from "../../lib/i18n/messages";
@@ -15,8 +15,9 @@ import { YearTag } from "./year-tag";
 
 // Section 05's "by region" (board `an-dots`): one row per region, highest average first, each municipality a dot at
 // its spending per resident, the region's average a tick in ink and the national median a dashed line. Hovering a
-// region (or pressing its name) dims the others; hovering or tapping a dot names its municipality. The figures are
-// the Municipalities page's own, in its year. A screen reader gets every municipality from the list under the chart.
+// region (or pressing its name) dims the others; pressing it also lists its municipalities with their figures under
+// the row, and pressing again hides them. Hovering or tapping a dot names its municipality. The figures are the
+// Municipalities page's own, in its year. A screen reader gets every municipality from the list under the chart.
 
 const ROW_HEIGHT = 46;
 // Dots closer than this (in % of the axis) move to the next lane, up or down from the row's middle (px).
@@ -50,7 +51,12 @@ export function RegionsDots({ data, year }: { data: YearReviewData; year: number
       const sorted = [...region.places].sort((left, right) => left.perResidentGel - right.perResidentGel);
       const xs = sorted.map((place) => (place.perResidentGel / domain) * 100);
       const offsets = lanes(xs);
-      return { region, dots: sorted.map((place, index) => ({ place, x: xs[index]!, offset: offsets[index]! })) };
+      return {
+        region,
+        dots: sorted.map((place, index) => ({ place, x: xs[index]!, offset: offsets[index]! })),
+        // The pressed region's list, highest first.
+        listed: [...sorted].reverse(),
+      };
     });
     return {
       view,
@@ -63,6 +69,7 @@ export function RegionsDots({ data, year }: { data: YearReviewData; year: number
   const [regionHover, setRegionHover] = useState<string | null>(null);
   const [regionPin, setRegionPin] = useState<string | null>(null);
   const [placeHover, setPlaceHover] = useState<string | null>(null);
+  const idBase = useId();
   const municipalYear = data.municipal.year;
   const at = (value: number) => (value / domain) * 100;
   const gel = (value: number) => formatPerResidentGel(value, locale);
@@ -86,9 +93,11 @@ export function RegionsDots({ data, year }: { data: YearReviewData; year: number
           ))}
         </div>
         <div>
-          {rows.map(({ region, dots }) => {
+          {rows.map(({ region, dots, listed }) => {
             const on = active === region.id;
             const dim = active !== null && !on;
+            const open = !still && regionPin === region.id;
+            const listId = `${idBase}-${region.id}`;
             const name = (
               <>
                 <b className={`text-[13px] font-semibold leading-[1.3] ${dim ? "text-[var(--muted)]" : ""}`}>{region.label}</b>
@@ -110,6 +119,7 @@ export function RegionsDots({ data, year }: { data: YearReviewData; year: number
                   <button
                     type="button"
                     aria-pressed={regionPin === region.id}
+                    aria-controls={open ? listId : undefined}
                     aria-label={text(region.places.length === 1 ? "yearReview.rgAria1" : "yearReview.rgAria", { name: region.label, v: gel(region.average), n: region.places.length })}
                     onPointerEnter={pointerHover(() => setRegionHover(region.id))}
                     onPointerLeave={() => setRegionHover(null)}
@@ -160,6 +170,20 @@ export function RegionsDots({ data, year }: { data: YearReviewData; year: number
                     );
                   })}
                 </span>
+                {open ? (
+                  <ul
+                    id={listId}
+                    data-region-places={region.id}
+                    className="m-0 grid list-none grid-cols-1 gap-x-6 gap-y-1 px-2 pt-1 pb-3 @min-[480px]:grid-cols-2 @min-[640px]:col-start-2 @min-[640px]:px-0 @min-[900px]:grid-cols-3"
+                  >
+                    {listed.map((place) => (
+                      <li key={place.code} className="flex items-baseline justify-between gap-3 border-b border-[var(--row-border)] py-1 text-[12.5px] leading-[1.35]">
+                        <span className="min-w-0">{place.label}</span>
+                        <span className="whitespace-nowrap font-[family-name:var(--font-numeric)] text-xs font-semibold tabular-nums">{withLari(gel(place.perResidentGel))}</span>
+                      </li>
+                    ))}
+                  </ul>
+                ) : null}
               </div>
             );
           })}

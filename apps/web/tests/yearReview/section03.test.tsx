@@ -101,6 +101,11 @@ describe("Year in review section 03", () => {
     const cells = [...markup.matchAll(/<i[^>]*data-cell="([^"]*)"[^>]*>/g)];
     expect(cells.filter(([tag, cell]) => cell !== id && !tag.includes("data-dim"))).toEqual([]);
     expect(cells.filter(([tag, cell]) => cell === id && tag.includes("data-dim"))).toEqual([]);
+    // A dimmed row's text turns muted rather than faded: only its swatch and trend line fade (contrast).
+    const dimmed = /<button[^>]*data-dim=""[\s\S]*?<\/button>/.exec(markup)![0];
+    expect(dimmed).toMatch(/^<button[^>]*text-\[var\(--muted\)\]/);
+    expect(dimmed.match(/opacity-25/g)).toHaveLength(2);
+    expect(/<span[^>]*>(?:<!-- -->)?<b[^>]*text-\[28px\]/.exec(dimmed)![0]).not.toContain("opacity-25");
   });
 
   test("the first year has nothing to compare with; the plan year says plan against actual", () => {

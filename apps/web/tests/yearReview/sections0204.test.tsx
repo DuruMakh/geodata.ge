@@ -119,6 +119,33 @@ describe("Year in review sections 02 and 04", () => {
     }
   });
 
+  test("refunds and debt by year label the chosen year's value, and the captions say which year each value is for", () => {
+    const { data } = loaded.en!;
+    const markup = sections(2025, "en");
+    expect(chartGeometry(part(markup, "refunds"), "desktop")).toContain(`data-value-label="${refundsView(data, 2025).year}"`);
+    expect(chartGeometry(from(markup, 'data-chart="debt-stock"'), "desktop")).toContain('data-value-label="2025"');
+    // Every caption line of the four column charts reads `name · year: value`; refunds names its two years.
+    const lines = [...markup.matchAll(/<figcaption[^>]*>([\s\S]*?)<\/figcaption>/g)].flatMap((match) =>
+      [...match[1]!.matchAll(/<li>([\s\S]*?)<\/li>/g)].map((item) => item[1]!.replace(/<!-- -->/g, "")),
+    );
+    expect(lines.length).toBeGreaterThanOrEqual(8);
+    for (const line of lines) expect(line).toMatch(/ · \d{4}: /);
+    const refunds = /<figcaption[^>]*>([\s\S]*?)<\/figcaption>/.exec(part(markup, "refunds"))![1]!.replace(/<!-- -->/g, "");
+    expect(refunds).toContain("Tax refunds · 2024: ");
+    expect(refunds).toContain("Tax refunds · 2025: ");
+  });
+
+  test("the ice chart names its year once, and the sub-chart titles are headings", () => {
+    const year = (html: string) => (/<p[^>]*>([\s\S]*?)<\/p>/.exec(part(html, "gives-up"))![1]!.replace(/<span class="sr-only">[^<]*<\/span>/g, "").replace(/<[^>]+>/g, "").match(/2024/g) ?? []).length;
+    // On screen: the fallback year in its tag, or the chosen year in the line (the tag's screen-reader words aside).
+    expect(year(sections(2025))).toBe(1);
+    expect(year(sections(2024))).toBe(1);
+    const markup = sections(2025, "en");
+    expect(markup).toMatch(/<h3[^>]*>Tax refunds<\/h3>/);
+    expect(markup).toMatch(/<h4[^>]*>Average interest rate<\/h4>/);
+    expect(markup).toMatch(/<h3[^>]*>Debt by year<\/h3>/);
+  });
+
   test("in English the two sections have no Georgian text", () => {
     const text = sections(2025, "en").replace(/<[^>]+>/g, " ");
     expect(text.match(GEORGIAN) ?? []).toEqual([]);

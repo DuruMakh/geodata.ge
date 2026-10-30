@@ -1,7 +1,7 @@
 "use client";
 
 import { X } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { memo, useCallback, useDeferredValue, useEffect, useRef, useState } from "react";
 import { formatAmount } from "../../lib/explorer/format";
 import { parseExplorerHash, serializeAnalysisHash } from "../../lib/explorer/urlState";
 import { message } from "../../lib/i18n/messages";
@@ -23,6 +23,10 @@ import { YearRuler } from "./year-ruler";
 
 type YearReviewPageProps = { data: YearReviewData; presentation: Presentation };
 
+// The screen-reader status waits this long (ms) after the last year step, so a drag or a run of arrow keys is said
+// once, after the radio under focus has said its own year.
+const SAID_DELAY = 800;
+
 /** /explorer/analysis below its heading: the year ruler, then the six sections, all moved by the one chosen year. */
 export function YearReviewPage({ data, presentation }: YearReviewPageProps) {
   return <I18nProvider {...presentation}><YearReviewContent data={data} /></I18nProvider>;
@@ -35,6 +39,8 @@ function YearReviewContent({ data }: { data: YearReviewData }) {
   const { years, planned, defaultYear } = data.budget;
 
   const [year, setYear] = useState(defaultYear);
+  // The ruler follows `year` at once; the sections redraw for it when the browser has time, so a drag stays smooth.
+  const shownYear = useDeferredValue(year);
   const [grouping, setGrouping] = useState<Grouping>("fields");
   const [side, setSide] = useState<"expenditure" | "revenue">("expenditure");
   const [measure, setMeasure] = useState<"share" | "gel">("share");
@@ -54,7 +60,7 @@ function YearReviewContent({ data }: { data: YearReviewData }) {
     if (parsed.analysisGrouping) setGrouping(parsed.analysisGrouping === "ministries" ? "institutions" : "fields");
     if (parsed.analysisSide) setSide(parsed.analysisSide);
   }, [years]);
-  useReplaceHash(serializeAnalysisHash({ analysisSide: side, analysisGrouping: grouping === "institutions" ? "ministries" : "fields", analysisYear: year }));
+  useReplaceHash(serializeAnalysisHash({ analysisSide: side, analysisGrouping: grouping === "institutions" ? "ministries" : "fields", analysisYear: shownYear }));
   useAppReady();
 
   const spend = spendTotals(data);
@@ -62,22 +68,31 @@ function YearReviewContent({ data }: { data: YearReviewData }) {
   // The ruler names each year's state spending, or the picked category's amount when one is pinned.
   const series = pinned?.values ?? spend;
   const amountOf = (target: number) => series[years.indexOf(target)] ?? null;
-  const yearLabel = (target: number) => {
+  const amountText = (target: number) => {
     const amount = amountOf(target);
-    const plan = planned[years.indexOf(target)] ? `, ${text("yearReview.plan")}` : "";
-    return `${target}: ${amount === null ? text("yearReview.noData") : formatAmount(amount, locale)}${plan}`;
+    return amount === null ? text("yearReview.noData") : formatAmount(amount, locale);
   };
+  const planText = (target: number) => (planned[years.indexOf(target)] ? `, ${text("yearReview.plan")}` : "");
+  const yearLabel = (target: number) => `${target}: ${amountText(target)}${planText(target)}`;
+  // The status names the same series as the radios, the plan word with it in a planned budget year.
+  const saidNow = `${pinned ? text("yearReview.saidPin", { y: year, what: pinned.label, v: amountText(year) }) : text("yearReview.said", { y: year, v: amountText(year) })}${planText(year)}`;
+  const [said, setSaid] = useState(saidNow);
+  useEffect(() => {
+    const timer = window.setTimeout(() => setSaid(saidNow), SAID_DELAY);
+    return () => window.clearTimeout(timer);
+  }, [saidNow]);
+  const onPin = useCallback((id: string) => setPin((current) => (current === id ? null : id)), []);
 
   const sectionProps: YearReviewSectionProps = {
     data,
-    year,
+    year: shownYear,
     grouping,
     side,
     measure,
     focus: hover ?? pin,
     pin,
     onFocus: setHover,
-    onPin: (id) => setPin((current) => (current === id ? null : id)),
+    onPin,
     onGrouping: setGrouping,
     onSide: setSide,
     onMeasure: setMeasure,
@@ -118,11 +133,19 @@ function YearReviewContent({ data }: { data: YearReviewData }) {
           </button>
         ) : null}
       </div>
-      <p role="status" aria-live="polite" className="sr-only">
-        {/* One text node, so the whole line is announced, the plan word with it in a planned budget year. */}
-        {`${text("yearReview.said", { y: year, v: formatAmount(spend[years.indexOf(year)], locale) })}${planned[years.indexOf(year)] ? `, ${text("yearReview.plan")}` : ""}`}
-      </p>
+      {/* One text node, so the whole line is announced. */}
+      <p role="status" aria-live="polite" className="sr-only">{said}</p>
 
+      <Sections {...sectionProps} />
+    </div>
+  );
+}
+
+/** The six sections and the notes: memoized, so a ruler step redraws only the ruler until the deferred year arrives. */
+const Sections = memo(function Sections(sectionProps: YearReviewSectionProps) {
+  const { data, year } = sectionProps;
+  return (
+    <>
       <Glance {...sectionProps} />
       {/* Memoized and given only what they read, so a hover elsewhere on the page does not redraw them. */}
       <GivesUp data={data} year={year} />
@@ -131,6 +154,6 @@ function YearReviewContent({ data }: { data: YearReviewData }) {
       <CountryRegions data={data} year={year} />
       <LongView {...sectionProps} />
       <YearReviewNotes data={data} year={year} />
-    </div>
+    </>
   );
-}
+});

@@ -127,6 +127,25 @@ describe("Year in review page", () => {
     expect(receipts).toMatch(/aria-label="Composition [^"]*Increase in liabilities — → \d/);
   });
 
+  test("a finding card with bars says their amounts in its link; the long view's label names every band and its legend is a phone-sized target", () => {
+    const markup = glance(2025, "en");
+    const links = [...markup.matchAll(/<a[^>]*data-finding="[^"]*"[\s\S]*?<\/a>/g)].map(([link]) => link);
+    const withBars = links.filter((link) => link.includes("h-[9px]"));
+    expect(withBars.length).toBeGreaterThan(0);
+    for (const link of withBars) expect(link).toMatch(/<span class="sr-only">[^<]*: [\d.]+ (bn|mln)[^<]*; [^<]*: [\d.]+ (bn|mln)/);
+    const noop = () => {};
+    const long = section("en", (d) => (
+      <LongView data={d} year={2025} grouping="institutions" side="expenditure" measure="share" focus={null} pin={null} onFocus={noop} onPin={noop} onSide={noop} onMeasure={noop} />
+    ));
+    const label = /<div[^>]*role="img"[^>]*aria-label="([^"]*)"/.exec(long)![1]!;
+    const legend = [...long.matchAll(/<button[^>]*data-legend="[^"]*"[^>]*>/g)].map(([tag]) => tag);
+    expect(label.split("; ")).toHaveLength(legend.length);
+    expect(legend.length).toBeGreaterThan(6);
+    for (const tag of legend) expect(tag).toMatch(/min-h-9 [\s\S]*min-\[768px\]:min-h-6/);
+    // The plot is a keyboard stop for its readout.
+    expect(/<div[^>]*role="img"[^>]*>/.exec(long)![0]).toContain('tabindex="0"');
+  });
+
   test("01 in English has no Georgian text", () => {
     const text = glance(2025, "en").replace(/<[^>]+>/g, " ");
     expect(text.match(new RegExp(GEORGIAN.source, "gu")) ?? []).toEqual([]);

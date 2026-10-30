@@ -394,6 +394,15 @@ describe("StackedColumnChart", () => {
       expect(caption(renderGeorgianMarkup(<StackedColumnChart {...yearProps} projectionFrom={2040} projectionLabel="plan" />))).toBe(caption(plain));
     });
 
+    it("names each caption value's period with captionPeriods, and is unchanged without it", () => {
+      const caption = (html: string) => /<figcaption[^>]*>([\s\S]*?)<\/figcaption>/.exec(html)![1]!;
+      const ended = { ...yearProps, segments: [{ ...yearProps.segments[0]!, values: years.map((year) => (year <= 2025 ? 3 : null)) }, yearProps.segments[1]!] };
+      expect(caption(renderGeorgianMarkup(<StackedColumnChart {...ended} captionPeriods projectionFrom={2026} projectionLabel="plan" />))).toBe(
+        "<ul><li>Food · 2025: 3.0</li><li>Communication · 2031: -2.0, plan</li></ul>",
+      );
+      expect(renderGeorgianMarkup(<StackedColumnChart {...ended} captionPeriods={false} />)).toBe(renderGeorgianMarkup(<StackedColumnChart {...ended} />));
+    });
+
     it("appends the projection label to the readout header from projectionFrom on", () => {
       const header = (period: number) => stackReadoutHeader(period, (value) => `y${value}`, 2026, "plan");
       expect(header(2025)).toBe("y2025");

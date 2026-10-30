@@ -1060,7 +1060,7 @@ Do:
 Do not:
 
 - No cards, panels with backgrounds, container shadows, or radii above 3px (pill exceptions only). The single card exception is the explorer cards (§6.6): the group pages' cards, All data's place card and shortcut rows, and the City air quality index's city cards; it does not generalize to any other surface.
-- Year in review exception (Duru's board, 2026-10-30): section 01's six findings are link cards (§9.2), and the page's chart keys, legends and grid use the board's small rounded-square swatches and cells (2–3px radius) and its `repeating-linear-gradient` hatches for planned, projected and given-up amounts. It does not extend to any other page.
+- Year in review exception (Duru's board, 2026-10-30): section 01's six findings are link cards (§9.2), and the page's chart keys, legends and grid use the board's small rounded-square swatches and cells (2–3px radius) and its `repeating-linear-gradient` hatches for planned, projected and given-up amounts and the faint horizontal "sea" lines under section 02's waterline. It does not extend to any other page.
 - No white surfaces; no gradients anywhere.
 - No blue `#0071e3` or any v3.x Apple token; no night theme or theme toggle.
 - No dots/rounded-square swatches — bars only.

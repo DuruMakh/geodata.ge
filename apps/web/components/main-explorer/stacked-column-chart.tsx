@@ -65,6 +65,8 @@ type StackedColumnChartBaseProps = {
   fitWidth?: boolean;
   /** Values written on given columns: above a column that rises from zero, below one that only hangs under it; none when absent. */
   valueLabels?: ReadonlyArray<{ period: number; text: string }>;
+  /** Names, in the screen-reader caption, the period each line's latest value is from (`label · period: value`); off by default. */
+  captionPeriods?: boolean;
 };
 /** Columns from `projectionFrom` on are hatched, and the readout header says so with `projectionLabel`. */
 export type StackedColumnChartProps = StackedColumnChartBaseProps &
@@ -182,6 +184,7 @@ export function StackedColumnChart({
   highlightPeriod,
   fitWidth = false,
   valueLabels,
+  captionPeriods = false,
   projectionFrom,
   projectionLabel,
 }: StackedColumnChartProps) {
@@ -365,6 +368,8 @@ export function StackedColumnChart({
   // The caption's mark on a value from a projected period; nothing (not an empty string) otherwise, so the markup is unchanged.
   const projectedAt = (index: number) =>
     projectionFrom !== undefined && index >= 0 && periods[index]! >= projectionFrom ? `, ${projectionLabel}` : null;
+  // The caption's name for a line, with the period of its latest value when `captionPeriods` asks for it.
+  const captionName = (label: string, index: number) => (captionPeriods && index >= 0 ? `${label} · ${formatPeriod(periods[index]!)}` : label);
 
   const renderSvg = (plot: Plot, className: string) => {
     const { width, height, padLeft, padRight, band, barWidth, x, y, lattice } = plot;
@@ -628,14 +633,14 @@ export function StackedColumnChart({
             const last = lastIndex < 0 ? undefined : segment.values[lastIndex];
             return (
               <li key={segment.id}>
-                {segment.label}: {last === null || last === undefined ? "—" : formatValue(last)}
+                {captionName(segment.label, lastIndex)}: {last === null || last === undefined ? "—" : formatValue(last)}
                 {projectedAt(lastIndex)}
               </li>
             );
           })}
           {overlay !== null && (
             <li>
-              {overlay.label}:{" "}
+              {captionName(overlay.label, overlay.values.findLastIndex((value) => value !== null && value !== undefined))}:{" "}
               {(() => {
                 const last = [...overlay.values].reverse().find((value) => value !== null && value !== undefined);
                 return last === null || last === undefined ? "—" : formatOverlayValue(last);

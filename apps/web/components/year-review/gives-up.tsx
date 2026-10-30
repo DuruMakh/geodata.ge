@@ -100,14 +100,15 @@ export const GivesUp = memo(function GivesUp({ data, year }: Pick<YearReviewSect
     ...(refunds.value.record ? [text("yearReview.rfRec", { from: rfFrom })] : []),
   ].join(" · ");
   const rfHeading = text("yearReview.rfH");
-  // The chosen year's column in ink (spec §4, 02): its own one-value segment, the other years in sand.
+  // The chosen year's column in ink (spec §4, 02): its own one-value segment, the other years in sand. Both carry the
+  // plain name, and the caption says which year each value is for.
   const refundBillions = (keep: (index: number) => boolean) =>
     data.refunds.values.map((value, index) => (value === null || !keep(index) ? null : value / 1e9));
   const usedIndex = refundYears.indexOf(refunds.year);
   const chosenLabel = `${rfHeading} · ${refunds.year}`;
   const refundSegments = [
     { id: "refunds", label: rfHeading, color: OTHER_COLOR, values: refundBillions((index) => index !== usedIndex) },
-    { id: "refunds-chosen", label: chosenLabel, readoutLabel: rfHeading, color: INK, values: refundBillions((index) => index === usedIndex) },
+    { id: "refunds-chosen", label: rfHeading, color: INK, values: refundBillions((index) => index === usedIndex) },
   ];
   const refundsChart = (
     <StackedColumnChart
@@ -120,6 +121,8 @@ export const GivesUp = memo(function GivesUp({ data, year }: Pick<YearReviewSect
       ariaLabel={text("yearReview.rfAria", { from: rfFrom, to: rfTo, y: refunds.year, v: `${big.num} ${big.unit}` })}
       frameLabel={rfHeading}
       highlightPeriod={refunds.year}
+      valueLabels={[{ period: refunds.year, text: shortAmount(refunds.value.value, messages) }]}
+      captionPeriods
       fitWidth
     />
   );
@@ -133,9 +136,16 @@ export const GivesUp = memo(function GivesUp({ data, year }: Pick<YearReviewSect
     >
       <div className="mt-[26px] grid grid-cols-1 items-start gap-10 @min-[1100px]:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] @min-[1100px]:gap-14">
         <figure data-panel="gives-up" className="m-0 min-w-0">
+          {/* The year once: in the line, or as the tag of a fallback year. */}
           <p className={`${FIG_KEY} flex flex-wrap items-center gap-x-2 gap-y-1`}>
-            <span>{text("yearReview.iceK", { y: breaks.year })}</span>
-            {breaks.fallback ? <YearTag year={breaks.year} /> : null}
+            {breaks.fallback ? (
+              <>
+                <span>{text("yearReview.iceK0")}</span>
+                <YearTag year={breaks.year} />
+              </>
+            ) : (
+              <span>{text("yearReview.iceK", { y: breaks.year })}</span>
+            )}
           </p>
           {ice}
           <ChartFoot
@@ -152,7 +162,7 @@ export const GivesUp = memo(function GivesUp({ data, year }: Pick<YearReviewSect
           />
         </figure>
         <figure data-panel="refunds" className="m-0 min-w-0">
-          <p className={FIG_KEY}>{rfHeading}</p>
+          <h3 className={FIG_KEY}>{rfHeading}</h3>
           <p data-refunds-big="" className="mt-3 flex flex-wrap items-baseline gap-x-3 gap-y-1">
             <b className="whitespace-nowrap font-[family-name:var(--font-display)] text-[30px] font-semibold tracking-[-0.02em] tabular-nums min-[768px]:text-4xl">
               {withLari(`${big.num} ${big.unit}`)}

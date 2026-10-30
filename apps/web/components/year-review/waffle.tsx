@@ -82,6 +82,7 @@ export function RankingList({ rows, focus, pin = null, unit, ariaLabel, hintId, 
       {rows.map((row, rank) => {
         const focused = focus === row.id;
         const dim = focus !== null && !focused;
+        // The swatch and the trend fade; the text, the lari figure included, turns muted (contrast, the Task 8 ruling).
         const faded = dim ? "opacity-25" : "";
         const body = (
           <>
@@ -89,7 +90,7 @@ export function RankingList({ rows, focus, pin = null, unit, ariaLabel, hintId, 
               {String(rank + 1).padStart(2, "0")}
             </span>
             <i aria-hidden="true" className={`block size-2.5 rounded-[2px] ${faded}`} style={{ backgroundColor: row.color }} />
-            <span aria-hidden="true" className={`flex items-baseline gap-[3px] whitespace-nowrap font-[family-name:var(--font-display)] font-semibold ${faded}`}>
+            <span aria-hidden="true" className="flex items-baseline gap-[3px] whitespace-nowrap font-[family-name:var(--font-display)] font-semibold">
               <b className="text-[28px] leading-none tracking-[-0.02em] tabular-nums">{row.cells}</b>
               <small className="text-[13px] font-medium text-[var(--muted)] [&:lang(en)]:text-[11px]">{unit}</small>
             </span>

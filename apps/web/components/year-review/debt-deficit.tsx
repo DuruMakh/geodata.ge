@@ -73,6 +73,7 @@ export const DebtDeficit = memo(function DebtDeficit({ data, year }: Pick<YearRe
       frameLabel={dfHeading}
       highlightPeriod={balUsed.year}
       valueLabels={[...new Set([balUsed.index, deepest])].map((index) => ({ period: balance.years[index]!, text: pct(balance.pctGdp[index]!) }))}
+      captionPeriods
       {...hatchedFrom(balProjFrom, projection)}
     />
   );
@@ -125,6 +126,8 @@ export const DebtDeficit = memo(function DebtDeficit({ data, year }: Pick<YearRe
       ariaLabel={text("yearReview.stAria", { from: st.from, to: st.to, y: debt.year, v: formatAmount(total, locale) })}
       frameLabel={stHeading}
       highlightPeriod={debt.year}
+      valueLabels={[{ period: debt.year, text: shortAmount(total, messages) }]}
+      captionPeriods
       fitWidth
     />
   );
@@ -157,6 +160,7 @@ export const DebtDeficit = memo(function DebtDeficit({ data, year }: Pick<YearRe
       }
       frameLabel={wallHeading}
       valueLabels={[{ period: service.years[peak]!, text: shortAmount(serviceTotal[peak]!, messages) }]}
+      captionPeriods
       {...(serviceYear === null ? {} : { highlightPeriod: serviceYear })}
       {...hatchedFrom(repProjFrom, projection)}
     />
@@ -225,7 +229,7 @@ export const DebtDeficit = memo(function DebtDeficit({ data, year }: Pick<YearRe
               </div>
             ))}
           </dl>
-          <p className={`${FIG_KEY} mt-[26px]`}>{rtHeading}</p>
+          <h4 className={`${FIG_KEY} mt-[26px]`}>{rtHeading}</h4>
           {ratesChart}
           <ChartFoot
             share={
@@ -247,7 +251,7 @@ export const DebtDeficit = memo(function DebtDeficit({ data, year }: Pick<YearRe
           </ChartFoot>
         </div>
         <figure data-chart="debt-stock" className="m-0 min-w-0 @min-[1100px]:mt-[52px]">
-          <p className={FIG_KEY}>{stHeading}</p>
+          <h3 className={FIG_KEY}>{stHeading}</h3>
           <p className={`${UNIT_LINE} mt-4`}>{withLari(text("yearReview.bn"))}</p>
           <div className="mt-1">{stockChart}</div>
           <ChartFoot

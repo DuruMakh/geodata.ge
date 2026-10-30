@@ -171,6 +171,10 @@ function FindingCard({ finding }: { finding: Finding }) {
           {finding.heading}
         </b>
         <span className="mt-1.5 font-[family-name:var(--font-numeric)] text-[11.5px] leading-normal text-[var(--body)]">{finding.detail}</span>
+        {/* The amounts the bars print, for the link's name: the picture itself is hidden from assistive tech. */}
+        {finding.visual.kind === "bars" ? (
+          <span className="sr-only">{finding.visual.rows.map((row) => `${row.label}: ${shortAmount(row.value, messages)}`).join("; ")}</span>
+        ) : null}
         <span aria-hidden="true" className="mt-auto block pt-3.5">
           <FindingPicture visual={finding.visual} />
         </span>
@@ -190,6 +194,7 @@ export function Glance({ data, year }: { data: YearReviewData; year: number }) {
     <Section
       number="01"
       id="year-review-glance"
+      first
       heading={message(messages, "yearReview.h01", { y: year })}
       meta={fallback ? message(messages, "yearReview.m01", { y: year }) : null}
     >
