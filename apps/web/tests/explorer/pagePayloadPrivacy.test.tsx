@@ -36,6 +36,7 @@ import { findTradeProducts } from "../../lib/explorer/tradeProductsCatalogue";
 import { DEFAULT_TRADE_PRODUCTS_STATE } from "../../lib/explorer/tradeProductsState";
 import { I18nProvider } from "../../lib/i18n/provider";
 import type { Locale, Presentation } from "../../lib/i18n/types";
+import { renderAnalysisPage } from "../../lib/pages/analysis";
 import { renderDebtPage } from "../../lib/pages/debt";
 import { renderDemographyAgeSexPage } from "../../lib/pages/demography-age-sex";
 import { renderPopulationPlacePage } from "../../lib/pages/demography-population-place";
@@ -80,9 +81,11 @@ const count = (text: string, part: string) => text.split(part).length - 1;
 
 type PageRender = [string, (locale: Locale) => Promise<ReactNode>];
 
-const budgetPages: PageRender[] = [
-  ["expenditure", renderExpenditurePage],
-  ["revenue", renderRevenuePage],
+// [page, render, a key its payload always carries]: the glossary for Expenditure and Revenue, the year-review data for Year in review.
+const budgetPages: [...PageRender, string][] = [
+  ["expenditure", renderExpenditurePage, '"kaLabel":'],
+  ["revenue", renderRevenuePage, '"kaLabel":'],
+  ["year in review", renderAnalysisPage, '"defaultYear":'],
 ];
 
 const municipalPages: PageRender[] = [
@@ -92,12 +95,12 @@ const municipalPages: PageRender[] = [
 ];
 
 describe.each(["ka", "en"] as const)("%s", (locale) => {
-  test.each(budgetPages)("budget pages ship no glossary notes: %s", async (_name, renderPage) => {
+  test.each(budgetPages)("budget pages ship no glossary notes: %s", async (_name, renderPage, shipped) => {
     const page = await renderPage(locale);
     const html = renderPageMarkup(locale, page) + shippedProps(page);
     expect(["Confirm against source", "Temporary source aggregate", "by user decision"].filter((note) => html.includes(note))).toEqual([]);
-    // The glossary still ships, so the check above is not passing on an empty payload.
-    expect(html).toContain('"kaLabel":');
+    // The page's data still ships, so the check above is not passing on an empty payload.
+    expect(html).toContain(shipped);
   });
 
   test.each(municipalPages)("municipal pages ship only public fact fields: %s", async (_name, renderPage) => {

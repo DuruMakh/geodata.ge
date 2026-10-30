@@ -22,11 +22,6 @@ export function YearReviewPage({ data, presentation }: YearReviewPageProps) {
   return <I18nProvider {...presentation}><YearReviewContent data={data} /></I18nProvider>;
 }
 
-/** A section still to be built: its number and heading only. */
-function PendingSection({ number, id, heading }: { number: string; id: string; heading: string }) {
-  return <Section number={number} id={id} heading={heading} />;
-}
-
 function YearReviewContent({ data }: { data: YearReviewData }) {
   // The provider adds the layout's namespaces to the page's: read them from it, not from the prop.
   const { locale, messages } = useI18n();
@@ -36,10 +31,11 @@ function YearReviewContent({ data }: { data: YearReviewData }) {
   const [year, setYear] = useState(defaultYear);
   const [grouping, setGrouping] = useState<Grouping>("fields");
   const [side, setSide] = useState<"expenditure" | "revenue">("expenditure");
-  const [measure] = useState<"share" | "gel">("share");
+  const [measure, setMeasure] = useState<"share" | "gel">("share");
   const [hover, setHover] = useState<string | null>(null);
   const [pin, setPin] = useState<string | null>(null);
   const hashAppliedRef = useRef(false);
+  const controlsRef = useRef<HTMLDivElement>(null);
 
   // Old Analysis links keep working: `ay` is the year, `ag` the grouping (ministries are the institutions), `as` the
   // long view's side. The hash is a one-time external input on load, so the one extra render is intended.
@@ -75,11 +71,24 @@ function YearReviewContent({ data }: { data: YearReviewData }) {
     focus: hover ?? pin,
     onFocus: setHover,
     onPin: (id) => setPin((current) => (current === id ? null : id)),
+    onGrouping: setGrouping,
+    onSide: setSide,
+    onMeasure: setMeasure,
+  };
+  // The chip goes once pressed, so focus moves to the ruler's chosen year rather than falling to the page.
+  const unpin = () => {
+    controlsRef.current?.querySelector<HTMLElement>('[role="radio"][aria-checked="true"]')?.focus();
+    setPin(null);
+    setHover(null);
   };
 
   return (
     <div data-testid="year-review" className="min-w-0">
-      <div className="z-20 mt-5 border-b border-[var(--hairline)] bg-[var(--paper)] pt-2.5 pb-3 min-[768px]:sticky min-[768px]:top-0 min-[768px]:mt-[26px] min-[768px]:flex min-[768px]:items-center min-[768px]:gap-7">
+      {/* Sticky from 768px; below 900px it sits under the shell's sticky top bar (data-sidebar.tsx: 56px and the safe area). */}
+      <div
+        ref={controlsRef}
+        className="z-20 mt-5 border-b border-[var(--hairline)] bg-[var(--paper)] pt-2.5 pb-3 min-[768px]:sticky min-[768px]:top-[calc(56px+env(safe-area-inset-top))] min-[768px]:mt-[26px] min-[768px]:flex min-[768px]:items-center min-[768px]:gap-7 min-[900px]:top-0"
+      >
         <YearRuler
           years={years}
           planned={planned}
@@ -93,7 +102,7 @@ function YearReviewContent({ data }: { data: YearReviewData }) {
           <button
             type="button"
             aria-label={`${text("yearReview.unpin")}: ${pinned.label}`}
-            onClick={() => { setPin(null); setHover(null); }}
+            onClick={unpin}
             className="group mt-1.5 inline-flex min-h-11 w-full items-center gap-2 border border-[var(--ink)] bg-[var(--tile)] pr-2 pl-3 text-[13px] font-semibold min-[768px]:mt-0 min-[768px]:min-h-10 min-[768px]:w-auto min-[768px]:max-w-[330px]"
           >
             <span aria-hidden="true" className="h-[3px] w-3.5 flex-none" style={{ backgroundColor: pinned.color }} />
@@ -107,11 +116,12 @@ function YearReviewContent({ data }: { data: YearReviewData }) {
       </p>
 
       <Glance {...sectionProps} />
-      <PendingSection number="02" id="year-review-gives-up" heading={text("yearReview.h03")} />
-      <PendingSection number="03" id="year-review-where" heading={text("yearReview.h04")} />
-      <PendingSection number="04" id="year-review-debt" heading={text("yearReview.h05")} />
-      <PendingSection number="05" id="year-review-country" heading={text("yearReview.h06")} />
-      <PendingSection number="06" id="year-review-long" heading={`${text("yearReview.s3")}: ${years[0]}–${years.at(-1)}`} />
+      {/* Sections 02–06: number and heading until Tasks 7–9 fill them. */}
+      <Section number="02" id="year-review-gives-up" heading={text("yearReview.h03")} />
+      <Section number="03" id="year-review-where" heading={text("yearReview.h04")} />
+      <Section number="04" id="year-review-debt" heading={text("yearReview.h05")} />
+      <Section number="05" id="year-review-country" heading={text("yearReview.h06")} />
+      <Section number="06" id="year-review-long" heading={text("yearReview.s3Title", { from: years[0]!, to: years.at(-1)! })} />
     </div>
   );
 }

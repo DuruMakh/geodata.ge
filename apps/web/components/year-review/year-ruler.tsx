@@ -3,8 +3,8 @@
 import { useRef, type KeyboardEvent, type PointerEvent } from "react";
 
 // The year ruler (spec §3, the board's `an-tl`): one stop per budget year on a track that is ink up to the chosen
-// year. A radio group with a roving tab stop: ←/↓ and →/↑ step a year, Home and End jump to the ends. A press, or a
-// press-and-drag along the ruler, picks the year under the pointer. Planned years carry a small plan tag. A narrow
+// year. A radio group with a roving tab stop (WAI-ARIA radio group keys): ←/↑ and →/↓ step a year, Home and End jump to
+// the ends. A press, or a press-and-drag along the ruler, picks the year under the pointer and focuses it. Planned years carry a small plan tag. A narrow
 // ruler labels every fourth year, the plan year and the chosen one (none within two years of it, so they never
 // collide); from 840px of its own width every year is labelled.
 
@@ -23,9 +23,9 @@ type YearRulerProps = {
 
 const STEP: Record<string, (index: number, last: number) => number> = {
   ArrowLeft: (index) => Math.max(0, index - 1),
-  ArrowDown: (index) => Math.max(0, index - 1),
+  ArrowUp: (index) => Math.max(0, index - 1),
   ArrowRight: (index, last) => Math.min(last, index + 1),
-  ArrowUp: (index, last) => Math.min(last, index + 1),
+  ArrowDown: (index, last) => Math.min(last, index + 1),
   Home: () => 0,
   End: (_, last) => last,
 };
@@ -57,6 +57,8 @@ export function YearRuler({ years, planned, value, onChange, label, yearLabel, p
     if (!box.width) return;
     const index = Math.min(count - 1, Math.max(0, Math.floor(((event.clientX - box.left) / box.width) * count)));
     if (years[index] !== value) onChange(years[index]!);
+    // A drag can end over another year than the one pressed; the picked year takes the tab stop and the focus.
+    buttons.current[index]?.focus();
   };
 
   const onKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {

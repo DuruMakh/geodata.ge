@@ -38,6 +38,8 @@ describe("Year in review page", () => {
     expect(radios.filter((tag) => tag.includes('tabindex="0"'))).toEqual(checked);
     // The plan year carries its tag in the ruler.
     expect(markup).toMatch(/data-year="2026"[^>]*>[\s\S]*?გეგმა/);
+    // Section 06 names the years the long view spans, from the data.
+    expect(markup).toContain(`დიდი სურათი: ${data.budget.years[0]}–${data.budget.years.at(-1)}`);
   });
 
   test("01 for 2025 has six headline numbers and six finding links", () => {

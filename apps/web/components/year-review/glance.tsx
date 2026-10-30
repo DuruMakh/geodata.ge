@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useId } from "react";
+import { useId, useMemo } from "react";
 import { INK, PAPER } from "../../lib/explorer/colors";
 import { formatInUnit, formatShare, formatSignedAmount, UNIT_BN, UNIT_PERSONS } from "../../lib/explorer/format";
 import { message } from "../../lib/i18n/messages";
@@ -178,8 +178,9 @@ function FindingCard({ finding }: { finding: Finding }) {
 /** Section 01 for the chosen year. */
 export function Glance({ data, year }: { data: YearReviewData; year: number }) {
   const { locale, messages } = useI18n();
-  const kpis = glanceKpis(data, year);
-  const findings = buildFindings(data, year, messages, locale);
+  // Hovering a category elsewhere re-renders the page; the year's figures only change with the year or language.
+  const kpis = useMemo(() => glanceKpis(data, year), [data, year]);
+  const findings = useMemo(() => buildFindings(data, year, messages, locale), [data, year, messages, locale]);
   const fallback = kpis.some((kpi) => kpi.fallback) || findings.some((finding) => finding.yearTag !== null);
   return (
     <Section
