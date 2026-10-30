@@ -78,7 +78,7 @@ describe("buildHubCards", () => {
   it("orders expenditure, spending by type, revenue, tax breaks and refunds, municipalities, analysis, debt, deficit", () => {
     const cards = buildHubCards(FACTS, MUNICIPAL_TOTALS, DEBT_FACTS);
 
-    expect(cards.map((card) => card.title)).toEqual(["ხარჯები", "ხარჯების სახეები", "შემოსავლები", "შეღავათები და დაბრუნება", "მუნიციპალიტეტები", "ანალიზი", "ვალი", "დეფიციტი"]);
+    expect(cards.map((card) => card.title)).toEqual(["ხარჯები", "ხარჯების სახეები", "შემოსავლები", "შეღავათები და დაბრუნება", "მუნიციპალიტეტები", "წლის მიმოხილვა", "ვალი", "დეფიციტი"]);
     expect(cards.map((card) => card.index)).toEqual(["01", "02", "03", "04", "05", "06", "07", "08"]);
   });
 

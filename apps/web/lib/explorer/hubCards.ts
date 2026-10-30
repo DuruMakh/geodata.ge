@@ -209,7 +209,7 @@ export function buildHubCards(
     {
       index: "06",
       title: translated("common.analysis", BUDGET_SECTIONS.analysis.label),
-      description: translated("hub.analysisDescription", "ერთი წლის სურათი — სტრუქტურა, რეიტინგი და ყოველი 100 ₾."),
+      description: translated("hub.analysisDescription", "ერთი წელი ყველა კუთხიდან: შემოსავალი, შეღავათები, ხარჯი, ვალი და მუნიციპალიტეტები."),
       href: BUDGET_SECTIONS.analysis.href,
       comingSoon: BUDGET_SECTIONS.analysis.href === null,
       series: null,

@@ -1542,7 +1542,7 @@ test("the Budget group page lists eight cards, all eight live", async ({ page })
   // Card 05 carries the same contract.
   await expect(municipalities).toContainText(/[\d,]+\.\d მლრდ ₾\d{4}/);
 
-  await expect(cards.nth(5).getByRole("heading")).toHaveText("ანალიზი");
+  await expect(cards.nth(5).getByRole("heading")).toHaveText("წლის მიმოხილვა");
 
   const debt = cards.nth(6);
   await expect(debt).toContainText("ვალი");
