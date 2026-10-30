@@ -280,7 +280,7 @@ const SATURATION_BAND = { min: 14, max: 84 };
 
 // --paper and --tint from globals.css. Lines are drawn on paper; series swatches
 // and checked boxes also sit on tinted selected/hovered rows.
-const PAPER = "#F7F2E9";
+export const PAPER = "#F7F2E9";
 const TINT = "#F1EADC";
 const SERIES_BACKGROUNDS = [PAPER, TINT] as const;
 

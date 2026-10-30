@@ -3,7 +3,7 @@
 import { useId, type KeyboardEvent } from "react";
 import { stepPeriodIndex } from "../../lib/explorer/chartNavigation";
 import { axisLabelWidth, axisLeftPaddingFor, decimalsFor, fitAxisLabels, niceScale, periodAnchors } from "../../lib/explorer/chartScale";
-import { CHART_AXIS_LABEL, CHART_LATTICE, INK } from "../../lib/explorer/colors";
+import { CHART_AXIS_LABEL, CHART_LATTICE, INK, PAPER } from "../../lib/explorer/colors";
 import { buildDotLattice, type DotLattice } from "../../lib/explorer/dotLattice";
 import { formatInUnit } from "../../lib/explorer/format";
 import { periodLabelIndices } from "../../lib/explorer/periodAxis";
@@ -36,7 +36,7 @@ export type StackSegment = {
   marker?: "up" | "down";
 };
 export type StackReadoutOrder = "value" | "sign-then-magnitude";
-export type StackedColumnChartProps = {
+type StackedColumnChartBaseProps = {
   periods: number[];
   segments: StackSegment[];
   overlay: { label: string; values: Array<number | null> } | null;
@@ -59,7 +59,12 @@ export type StackedColumnChartProps = {
   legend?: { id: string; label: string; color: string }[];
   /** Counting changes drawn as a dashed rule before their period, as the line chart draws them; none when absent. */
   breaks?: ReadonlyArray<{ period: number; label: string }>;
+  /** The chosen period: its axis label is always drawn, in ink at weight 600 over a short ink rule; labels that would touch it are dropped. */
+  highlightPeriod?: number;
 };
+/** Columns from `projectionFrom` on are hatched, and the readout header says so with `projectionLabel`. */
+export type StackedColumnChartProps = StackedColumnChartBaseProps &
+  ({ projectionFrom?: undefined; projectionLabel?: string } | { projectionFrom: number; projectionLabel: string });
 
 const W = 920;
 const H = 320;
@@ -82,6 +87,13 @@ const LATTICE_ID = "stack-dot-lattice";
  */
 const px = (value: number) => Number(value.toFixed(2));
 const MAX_BAR_WIDTH = 28;
+// The highlighted period's rule under its label, and the hatch of projected columns.
+const HIGHLIGHT_RULE_WIDTH = 16;
+const HIGHLIGHT_RULE_HEIGHT = 2;
+const HATCH_SIZE = 6;
+const HATCH_STRIPE = 3;
+// Axis labels keep this much clear between them (fitAxisLabels' own default).
+const LABEL_GAP = 8;
 
 type Plot = {
   mobile: boolean;
@@ -138,6 +150,17 @@ export function buildStackReadout(
   };
 }
 
+/** The readout's header at one period: its label, and the projection label from the first projected period on. */
+export function stackReadoutHeader(
+  period: number,
+  formatPeriod: (period: number) => string,
+  projectionFrom?: number,
+  projectionLabel?: string,
+): string {
+  const label = formatPeriod(period);
+  return projectionFrom !== undefined && period >= projectionFrom && projectionLabel ? `${label} ${projectionLabel}` : label;
+}
+
 export function StackedColumnChart({
   periods,
   segments,
@@ -153,8 +176,16 @@ export function StackedColumnChart({
   periodsPerYear = 12,
   legend,
   breaks,
+  highlightPeriod,
+  projectionFrom,
+  projectionLabel,
 }: StackedColumnChartProps) {
   const captionId = useId();
+  // useId yields ":" or "«" in its ids, which a url(#…) reference does not take; the hatch ids are built from it.
+  const hatchId = useId().replace(/[^A-Za-z0-9_-]/g, "");
+  const highlightIndex = highlightPeriod === undefined ? -1 : periods.indexOf(highlightPeriod);
+  // One hatch per segment colour, so two segments sharing a colour share a pattern.
+  const hatchColors = projectionFrom === undefined ? [] : [...new Set(segments.map((segment) => segment.color))];
   const { ref: layoutRef, mobileWidth } = useChartLayout<HTMLElement>();
   const count = periods.length;
 
@@ -201,13 +232,13 @@ export function StackedColumnChart({
     const x = (index: number) => padLeft + band * (index + 0.5);
     const y = (value: number) => PAD_T + ((top - value) / span) * (height - PAD_T - PAD_B);
     const labels = new Map<number, number | null>();
+    // On a phone a label starts where it fits: centred on its column, slid
+    // inward at the plot's edges, and thinned until no two collide.
+    const start = (index: number) => {
+      const labelWidth = axisLabelWidth(formatPeriod(periods[index]!), FONT);
+      return Math.min(width - padRight - labelWidth, Math.max(padLeft, x(index) - labelWidth / 2));
+    };
     if (mobile) {
-      // On a phone a label starts where it fits: centred on its column, slid
-      // inward at the plot's edges, and thinned until no two collide.
-      const start = (index: number) => {
-        const labelWidth = axisLabelWidth(formatPeriod(periods[index]!), FONT);
-        return Math.min(width - padRight - labelWidth, Math.max(padLeft, x(index) - labelWidth / 2));
-      };
       const fitted = fitAxisLabels(count, periodAnchors(periods, periodsPerYear), (index) => [
         start(index),
         start(index) + axisLabelWidth(formatPeriod(periods[index]!), FONT),
@@ -215,6 +246,21 @@ export function StackedColumnChart({
       for (const index of fitted) labels.set(index, start(index));
     } else {
       for (const index of periodLabelIndices(periods, periodsPerYear)) labels.set(index, null);
+    }
+    if (highlightIndex >= 0) {
+      // The chosen period is always labelled; any label that would touch it gives way.
+      const extent = (index: number): [number, number] => {
+        const labelWidth = axisLabelWidth(formatPeriod(periods[index]!), FONT);
+        const left = labels.get(index) ?? x(index) - labelWidth / 2;
+        return [left, left + labelWidth];
+      };
+      labels.set(highlightIndex, mobile ? start(highlightIndex) : null);
+      const [chosenLeft, chosenRight] = extent(highlightIndex);
+      for (const index of [...labels.keys()]) {
+        if (index === highlightIndex) continue;
+        const [left, right] = extent(index);
+        if (!(right + LABEL_GAP <= chosenLeft || chosenRight + LABEL_GAP <= left)) labels.delete(index);
+      }
     }
     // The lattice columns run between the first and last column centres.
     const lattice = buildDotLattice({
@@ -293,7 +339,7 @@ export function StackedColumnChart({
         testId="stack-chart-tooltip"
         pinned={pinned}
         leftPercent={(active.x(hover) / active.width) * 100}
-        header={formatPeriod(periods[hover]!)}
+        header={stackReadoutHeader(periods[hover]!, formatPeriod, projectionFrom, projectionLabel)}
         headerRight={overlay !== null && overlayAtHover !== null ? `${overlay.label} ${formatOverlayValue(overlayAtHover)}` : null}
         rows={tooltip.rows}
         hidden={tooltip.hidden}
@@ -324,6 +370,16 @@ export function StackedColumnChart({
             .filter((entry): entry is string => entry !== null)
             .join(" ");
     const isActive = plot === active;
+    // The highlight's rule sits under the middle of its label, which starts at its x on a phone and is centred on it on a desktop.
+    const highlightStart = plot.labels.get(highlightIndex);
+    const highlightCentre =
+      highlightStart === undefined
+        ? null
+        : highlightStart === null
+          ? x(highlightIndex)
+          : highlightStart + axisLabelWidth(formatPeriod(periods[highlightIndex]!), FONT) / 2;
+    // The phone and desktop drawings share a page before the browser measures, so each gets its own ids.
+    const hatchPatternId = (drawing: Plot, colorIndex: number) => `${hatchId}-${drawing.mobile ? "mobile" : "desktop"}-${colorIndex}`;
 
     return (
       <svg
@@ -370,6 +426,24 @@ export function StackedColumnChart({
 
         {gridLines.map((value) => axisText(plot, value))}
 
+        {hatchColors.length > 0 && (
+          <defs>
+            {hatchColors.map((color, colorIndex) => (
+              <pattern
+                key={color}
+                id={hatchPatternId(plot, colorIndex)}
+                patternUnits="userSpaceOnUse"
+                width={HATCH_SIZE}
+                height={HATCH_SIZE}
+                patternTransform="rotate(45)"
+              >
+                <rect width={HATCH_SIZE} height={HATCH_SIZE} fill={PAPER} />
+                <rect width={HATCH_STRIPE} height={HATCH_SIZE} fill={color} />
+              </pattern>
+            ))}
+          </defs>
+        )}
+
         {segments.map((segment) =>
           segment.values.map((value, index) => {
             if (value === null || value === undefined || value === 0) return null;
@@ -385,15 +459,17 @@ export function StackedColumnChart({
             }
             const start = value > 0 ? base + value : base;
             const columnHeight = Math.abs(y(0) - y(Math.abs(value)));
+            const projected = projectionFrom !== undefined && periods[index]! >= projectionFrom;
             return (
               <rect
                 key={`${segment.id}-${index}`}
                 data-segment={segment.id}
+                data-projection={projected ? "" : undefined}
                 x={px(x(index) - barWidth / 2)}
                 y={px(value > 0 ? y(start) : y(base))}
                 width={px(barWidth)}
                 height={px(columnHeight)}
-                fill={segment.color}
+                fill={projected ? `url(#${hatchPatternId(plot, hatchColors.indexOf(segment.color))})` : segment.color}
               />
             );
           }),
@@ -431,6 +507,7 @@ export function StackedColumnChart({
         {periods.map((period, index) => {
           if (!plot.labels.has(index)) return null;
           const start = plot.labels.get(index) ?? null;
+          const chosen = index === highlightIndex;
           return (
             <text
               key={`label-${period}`}
@@ -438,13 +515,25 @@ export function StackedColumnChart({
               y={height - 8}
               textAnchor={start === null ? "middle" : "start"}
               fontSize={FONT}
-              fill={CHART_AXIS_LABEL}
+              fontWeight={chosen ? 600 : undefined}
+              fill={chosen ? INK : CHART_AXIS_LABEL}
               style={{ fontFamily: "var(--font-numeric)" }}
             >
               {formatPeriod(period)}
             </text>
           );
         })}
+
+        {highlightCentre !== null ? (
+          <rect
+            data-highlight
+            x={px(highlightCentre - HIGHLIGHT_RULE_WIDTH / 2)}
+            y={height - 5}
+            width={HIGHLIGHT_RULE_WIDTH}
+            height={HIGHLIGHT_RULE_HEIGHT}
+            fill={INK}
+          />
+        ) : null}
       </svg>
     );
   };
