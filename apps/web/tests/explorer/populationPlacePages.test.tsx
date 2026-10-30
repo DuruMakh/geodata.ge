@@ -177,12 +177,12 @@ describe("place metadata", () => {
     expect(georgia.alternates?.canonical).toBe("https://fiscal.ge/en/explorer/demography/population/georgia");
     // The title and description say what the page is, with the years the place has; a municipality names its region,
     // and only Georgia and a region carry the census age section (U26-11).
-    expect(en.title).toBe("Batumi — Population | Fiscal.ge");
+    expect(en.title).toBe("Batumi population 2026 | Fiscal.ge");
     expect(en.description).toBe("Batumi, Adjara: population on 1 January, 2015–2026, and births and deaths, from Geostat data.");
-    expect(georgia.title).toBe("Georgia — Population | Fiscal.ge");
+    expect(georgia.title).toBe("Georgia population 2026 | Fiscal.ge");
     expect(georgia.description).toBe("Georgia: population on 1 January, 2004–2026, births and deaths, and the census age and sex structure, from Geostat data.");
     const adjara = await populationPlaceMetadata({ kind: "region", id: "adjara" }, "ka");
-    expect(adjara.title).toBe("აჭარა — მოსახლეობა | Fiscal.ge");
+    expect(adjara.title).toBe("აჭარის მოსახლეობა 2026 | Fiscal.ge");
     expect(adjara.description).toBe("აჭარა: მოსახლეობა 1 იანვრის მდგომარეობით, 2015–2026, დაბადებები, გარდაცვალებები და აღწერის ასაკობრივ-სქესობრივი სტრუქტურა (საქსტატი).");
   });
 

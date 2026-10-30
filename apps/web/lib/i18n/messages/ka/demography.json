@@ -34,6 +34,7 @@
   "demography.metaRegionOne": "{members} მუნიციპალიტეტი · {rank} ადგილი {count}-⁠დან · 1 იანვარი {year}",
   "demography.metaMunicipality": "{region} · {rank} ადგილი {count}-⁠დან · 1 იანვარი {year}",
   "demography.placeMetaTitle": "{name} — მოსახლეობა",
+  "demography.placeSeoTitle": "{place} მოსახლეობა {year}",
   "demography.placeMetaDescription": "{name}: მოსახლეობა 1 იანვრის მდგომარეობით, {first}–{last}, დაბადებები, გარდაცვალებები და აღწერის ასაკობრივ-სქესობრივი სტრუქტურა (საქსტატი).",
   "demography.placeMunicipalityMetaDescription": "{name}, {region}: მოსახლეობა 1 იანვრის მდგომარეობით, {first}–{last}, დაბადებები და გარდაცვალებები (საქსტატი).",
   "demography.rangeChanged": "პერიოდი {start}–{end}",

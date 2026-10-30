@@ -30,6 +30,7 @@ import { pageHref } from "../i18n/routes";
 import type { Locale, Messages, TemplateValues } from "../i18n/types";
 import { loadSourcedWorkbookSources } from "../methodology/workbookSources";
 import { fiscalMetadata } from "../seo/metadata";
+import { latestYearOf, placeOfKa, placeTitleNameEn } from "../seo/placeTitleForms";
 import { explorerDatasetJsonLd } from "../seo/structuredData";
 import { resolveSiteUrl } from "../siteUrl";
 import { workbookScopeFor } from "./demography-population-place";
@@ -160,14 +161,19 @@ export async function renderEducationIndexPage(locale: Locale, set: EducationPla
 }
 
 export async function educationPlaceMetadata(route: EducationPlaceRoute, locale: Locale, set: EducationPlaceSet) {
-  const { presentation, places } = await loadEducationPlaceBasics(locale);
+  const { facts, presentation, places } = await loadEducationPlaceBasics(locale);
   const place = places.find(candidate => candidate.id === placeIdForRoute(route));
   if (!place) notFound();
   const values = { section: message(presentation.messages, `education.page.${set}.title`), place: placeLabel(place, locale) };
+  // The title is worded the way people search it and ends in the place's latest school year, as the table header prints it
+  // (with the en dash a title uses); the page's own heading and Dataset name keep education.place.metaTitle.
+  const series = educationPlaceSeries(set, place.id);
+  const latest = latestYearOf(facts, f => f.geographyId === place.id && series.some(({ id }) => id === f.indicatorId));
+  const seoValues = { place: locale === "ka" ? placeOfKa(place) : placeTitleNameEn(place), period: educationPeriodLabel(set)(latest).replace("/", "–") };
   return fiscalMetadata({
     locale,
     path: placePageHref(educationPlaceBase(set), place.id),
-    title: message(presentation.messages, "education.place.metaTitle", values),
+    title: message(presentation.messages, `education.place.seoTitle.${set}`, seoValues),
     description: message(presentation.messages, "education.place.metaDescription", values),
   });
 }

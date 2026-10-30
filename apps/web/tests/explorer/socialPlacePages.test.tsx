@@ -110,7 +110,7 @@ describe("place pages", () => {
 
   it("has the section and place as its title", async () => {
     const metadata = await socialPlaceMetadata({ kind: "region", id: "guria" }, "en", "pensions");
-    expect(metadata.title).toBe("Pensions — Guria | Fiscal.ge");
+    expect(metadata.title).toBe("Pensions in Guria 2025 | Fiscal.ge");
     expect(metadata.alternates?.canonical).toBe("https://fiscal.ge/en/explorer/health/pensions/region/guria");
   });
 });

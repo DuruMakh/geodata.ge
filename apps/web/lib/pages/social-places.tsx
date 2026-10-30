@@ -34,6 +34,7 @@ import { pageHref } from "../i18n/routes";
 import type { Locale, Messages, TemplateValues } from "../i18n/types";
 import { loadSourcedWorkbookSources, type SourcedWorkbookPublicSource } from "../methodology/workbookSources";
 import { fiscalMetadata } from "../seo/metadata";
+import { latestYearOf, placeInKa, placeTitleNameEn } from "../seo/placeTitleForms";
 import { explorerDatasetJsonLd } from "../seo/structuredData";
 import { resolveSiteUrl } from "../siteUrl";
 import { workbookScopeFor } from "./demography-population-place";
@@ -183,14 +184,18 @@ export async function renderSocialIndexPage(locale: Locale, set: SocialPlaceSet)
 }
 
 export async function socialPlaceMetadata(route: SocialPlaceRoute, locale: Locale, set: SocialPlaceSet) {
-  const { presentation, places } = await loadSocialPlaceBasics(locale);
+  const { facts, presentation, places } = await loadSocialPlaceBasics(locale);
   const place = places.find(candidate => candidate.id === placeIdForRoute(route));
   if (!place) notFound();
   const values = { section: message(presentation.messages, `social.page.${set}.title`), place: placeLabel(place, locale) };
+  // The title is worded the way people search it and ends in the place's latest year; the page's own heading and Dataset name keep social.place.metaTitle.
+  const series = socialPlaceSeries(set);
+  const year = latestYearOf(facts, f => f.geographyId === place.id && series.some(({ id }) => id === f.indicatorId));
+  const seoValues = { place: locale === "ka" ? placeInKa(place) : placeTitleNameEn(place), year };
   return fiscalMetadata({
     locale,
     path: placePageHref(socialPlaceBase(set), place.id),
-    title: message(presentation.messages, "social.place.metaTitle", values),
+    title: message(presentation.messages, `social.place.seoTitle.${set}`, seoValues),
     description: message(presentation.messages, "social.place.metaDescription", values),
   });
 }

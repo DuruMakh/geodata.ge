@@ -141,7 +141,7 @@ describe("place pages", () => {
 
   it("has the section and place as its title", async () => {
     const metadata = await educationPlaceMetadata({ kind: "region", id: "guria" }, "en", "schools");
-    expect(metadata.title).toBe("Schools — Guria | Fiscal.ge");
+    expect(metadata.title).toBe("Schools in Guria 2025–26 | Fiscal.ge");
     expect(metadata.alternates?.canonical).toBe("https://fiscal.ge/en/explorer/education/schools/region/guria");
   });
 });
