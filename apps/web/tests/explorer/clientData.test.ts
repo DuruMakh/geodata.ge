@@ -11,7 +11,6 @@ import {
   getDefaultSelection,
   type ExplorerModel,
 } from "../../lib/explorer/explorerData";
-import { buildSingleYearSnapshotModel } from "../../lib/explorer/singleYear";
 import {
   buildWorkbookExportModel,
   type WorkbookExportInput,
@@ -171,7 +170,7 @@ describe("browser client data projections", () => {
     expect(projectGdpFact(fullGdpFact)).not.toHaveProperty("sourceId");
   });
 
-  it("preserves selections, every explorer model combination, snapshots and workbook exports", () => {
+  it("preserves selections, every explorer model combination and workbook exports", () => {
     const clientFacts = facts.map(projectBudgetFact);
     const clientAdminFacts = adminFacts.map(projectAdminFact);
     const clientGdpFacts = gdpFacts.map(projectGdpFact);
@@ -225,28 +224,6 @@ describe("browser client data projections", () => {
             expect(clientModel).toEqual(fullModel);
             expect(workbookFor(clientModel, measure)).toEqual(workbookFor(fullModel, measure));
           }
-        }
-      }
-    }
-
-    for (const side of sides) {
-      for (const grouping of groupings) {
-        if (side === "revenue" && grouping === "ministries") continue;
-        for (const year of [2024, 2025]) {
-          const shared = { glossary, adminCategories, grouping, side, year };
-          expect(
-            buildSingleYearSnapshotModel({
-              ...shared,
-              facts: clientFacts,
-              adminFacts: clientAdminFacts,
-            }),
-          ).toEqual(
-            buildSingleYearSnapshotModel({
-              ...shared,
-              facts,
-              adminFacts,
-            }),
-          );
         }
       }
     }

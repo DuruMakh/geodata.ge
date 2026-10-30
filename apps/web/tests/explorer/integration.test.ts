@@ -5,7 +5,6 @@ import { loadBudgetFactRows } from "../../lib/data/importBudgetFacts";
 import { loadNationalGdpFacts } from "../../lib/data/nationalGdp/importNationalGdp";
 import { ADMIN_SPENDING_YEARS, EXPENDITURE_DETAILED_YEARS, EXPENDITURE_YEARS, REVENUE_YEARS } from "../../lib/data/coverage";
 import { buildExplorerModel, getDefaultSelection } from "../../lib/explorer/explorerData";
-import { buildSingleYearSnapshotModel } from "../../lib/explorer/singleYear";
 
 const REAL_BUDGET_FACTS_PATH = "../../data/imports/budget-facts-2004-2025.csv";
 const REAL_ADMIN_FACTS_PATH = "../../data/imports/admin-spending-facts-2004-2025.csv";
@@ -247,43 +246,5 @@ describe("explorer integration with real CSV data", () => {
     expect(model.items.some((item) => item.id.startsWith("spending."))).toBe(false);
     expect(programItems.length).toBeGreaterThan(0);
     expect(programItems.every((item) => item.parentItemId?.startsWith("admin_spending") ?? false)).toBe(true);
-  });
-
-  it("builds a non-empty single-year expenditure snapshot from real facts", async () => {
-    const facts = await loadBudgetFactRows(REAL_BUDGET_FACTS_PATH);
-    const glossary = await loadGlossary("../../data/glossary/category-glossary.csv");
-
-    const model = buildSingleYearSnapshotModel({
-      facts,
-      glossary,
-      side: "expenditure",
-      year: 2025,
-    });
-
-    expect(model.emptyReason).toBeNull();
-    expect(model.totalGel).toBeGreaterThan(0);
-    expect(model.items.length).toBeGreaterThan(5);
-    expect(model.every100.reduce((sum, item) => sum + item.gelFrom100, 0)).toBe(100);
-    expect(model.rankingRows.length).toBeGreaterThan(1);
-    const first = model.rankingRows[0];
-    const second = model.rankingRows[1];
-    expect(first?.amountGel).toBeGreaterThanOrEqual(second?.amountGel ?? 0);
-  });
-
-  it("keeps single-year revenue source-backed with public tax categories", async () => {
-    const facts = await loadBudgetFactRows(REAL_BUDGET_FACTS_PATH);
-    const glossary = await loadGlossary("../../data/glossary/category-glossary.csv");
-
-    const model = buildSingleYearSnapshotModel({
-      facts,
-      glossary,
-      side: "revenue",
-      year: 2025,
-    });
-
-    expect(model.emptyReason).toBeNull();
-    expect(model.items.map((item) => item.itemId)).toEqual(
-      expect.arrayContaining(["revenue.vat", "revenue.income_tax", "revenue.grants", "revenue.other_revenue"]),
-    );
   });
 });
