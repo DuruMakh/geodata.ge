@@ -66,11 +66,12 @@ test("public header keeps landing active, exposes mission, and leaves methodolog
   }
 });
 
+// Year in review (/explorer/analysis) is left out: its notes end in the board's row of links to the source pages and
+// Methodology (spec 2026-10-30-year-in-review-design §4, "Notes and source").
 for (const path of [
   "/explorer",
   "/explorer/expenditure",
   "/explorer/revenue",
-  "/explorer/analysis",
   "/explorer/municipalities",
   "/explorer/municipalities/tbilisi",
   "/explorer/municipalities/region/imereti",

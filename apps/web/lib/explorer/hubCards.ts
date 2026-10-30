@@ -41,7 +41,7 @@ export type HubCardModel = {
 
 // Mirrors what the destination pages do: sum the category rows, but let an
 // explicit `<side>.total` row win for its year when the source carries one, the
-// way singleYear.ts and explorerData.ts already do. Adding such a row to the sum
+// way explorerData.ts already does. Adding such a row to the sum
 // instead of overriding with it would report the budget at several times its size.
 function totalsByYear(facts: ServedBudgetFact[], side: "expenditure" | "revenue"): Map<number, number> {
   const totals = new Map<number, number>();

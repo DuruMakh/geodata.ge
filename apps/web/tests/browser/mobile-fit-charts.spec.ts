@@ -3,9 +3,9 @@ import { join, resolve } from "node:path";
 import { expect, test, type Page } from "@playwright/test";
 import { TEST_BASE_URL } from "./test-base-url";
 
-// D1 (owner-approved 2026-10-07): below 768px the line charts, the stacked
-// column charts and the analysis budget field draw at the phone's width instead
-// of scrolling a 720px-minimum desktop drawing whose labels rendered at 8.6px.
+// D1 (owner-approved 2026-10-07): below 768px the line charts and the stacked
+// column charts draw at the phone's width instead of scrolling a 720px-minimum
+// desktop drawing whose labels rendered at 8.6px.
 test.use({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
 
 async function ready(page: Page, path: string) {
@@ -33,8 +33,6 @@ function measureCharts(page: Page): Promise<ChartMetrics[]> {
       const svg = frame.querySelector<SVGSVGElement>('svg[role="img"]');
       if (svg) drawings.push({ testId: frame.getAttribute("data-testid")!, frame, svg, periodAxis: true });
     }
-    const field = document.querySelector<SVGSVGElement>('[data-testid="budget-field"] svg');
-    if (field) drawings.push({ testId: "budget-field", frame: field.parentElement!.parentElement!, svg: field, periodAxis: false });
 
     return drawings.map(({ testId, frame, svg, periodAxis }) => {
       const box = svg.getBoundingClientRect();
@@ -45,6 +43,7 @@ function measureCharts(page: Page): Promise<ChartMetrics[]> {
         box: text.getBoundingClientRect(),
         size: Number(text.getAttribute("font-size")) * scale,
         y: Number(text.getAttribute("y")),
+        chosen: text.getAttribute("font-weight") === "600",
       }));
       const xLabels = texts.filter((text) => text.y >= viewBox.height - 16).sort((a, b) => a.box.left - b.box.left);
       const overlaps: string[] = [];
@@ -60,8 +59,8 @@ function measureCharts(page: Page): Promise<ChartMetrics[]> {
         xLabels: xLabels.map((text) => text.text),
         overlaps,
         outside: texts.filter((text) => text.box.left < box.left - 0.5 || text.box.right > box.right + 0.5).map((text) => text.text),
-        // The latest period closes the axis, fully on screen.
-        latestAtEnd: !periodAxis || (last !== undefined && last.box.right <= Math.min(box.right, innerWidth) + 0.5 && last.box.right >= box.right - 40),
+        // The latest period closes the axis, fully on screen, unless it gave way to a chosen period's label (highlightPeriod).
+        latestAtEnd: !periodAxis || (last !== undefined && last.box.right <= Math.min(box.right, innerWidth) + 0.5 && (last.box.right >= box.right - 40 || last.chosen)),
       };
     });
   });
@@ -174,32 +173,6 @@ for (const [path, frameId, readoutId] of [
     await expect(readout).toHaveCount(0);
   });
 }
-
-test("a tap on a budget-field circle reads its name, amount and growth under the field", async ({ page }) => {
-  await ready(page, "/explorer/analysis");
-  const field = page.getByTestId("budget-field");
-  const svg = field.locator("svg");
-  await svg.scrollIntoViewIfNeeded();
-  const svgBox = (await svg.boundingBox())!;
-  const circles = field.locator("circle");
-  expect(await circles.count()).toBeGreaterThan(3);
-  for (const circle of await circles.all()) {
-    const circleBox = (await circle.boundingBox())!;
-    expect(circleBox.x).toBeGreaterThanOrEqual(svgBox.x - 0.5);
-    expect(circleBox.x + circleBox.width).toBeLessThanOrEqual(svgBox.x + svgBox.width + 0.5);
-  }
-
-  const largest = circles.first();
-  const circleBox = (await largest.boundingBox())!;
-  await page.touchscreen.tap(circleBox.x + circleBox.width / 2, circleBox.y + circleBox.height / 2);
-  const readout = page.getByTestId("budget-field-tooltip");
-  await expect(readout).toBeVisible();
-  await expect(readout).toHaveAttribute("data-placement", "panel");
-  await expect(readout).toContainText(/ცვლილება [+−]?\d/);
-  expect((await readout.boundingBox())!.y).toBeGreaterThanOrEqual(svgBox.y + svgBox.height - 0.5);
-  await page.getByRole("heading", { level: 1 }).tap();
-  await expect(readout).toHaveCount(0);
-});
 
 test("landscape phones and desktops keep the desktop drawing", async ({ page }) => {
   for (const viewport of [{ width: 844, height: 390 }, { width: 1440, height: 900 }]) {
@@ -346,7 +319,8 @@ const layoutWidths = [390, 768, 1440] as const;
 async function settleAt(page: Page, width: number) {
   await expect.poll(() => page.evaluate((width) => {
     const bars = [...document.querySelectorAll('[data-testid="sidebar-topbar"]')];
-    const drawings = [...document.querySelectorAll("svg[data-geometry]")].filter((drawing) => drawing.checkVisibility());
+    // A fit-width chart (in a column narrower than the desktop drawing) draws the phone geometry at every width.
+    const drawings = [...document.querySelectorAll("svg[data-geometry]:not([data-fit-width])")].filter((drawing) => drawing.checkVisibility());
     return bars.every((bar) => bar.checkVisibility() === width < 900)
       && drawings.every((drawing) => drawing.getAttribute("data-geometry") === (width < 768 ? "mobile" : "desktop"));
   }, width), { message: `rendered for ${width}px` }).toBe(true);

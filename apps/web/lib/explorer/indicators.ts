@@ -13,7 +13,7 @@ import type { ExplorerTableRow } from "./types";
  *
  * Returns null rather than a misleading figure when either endpoint is missing
  * or non-positive, or when there is no period to compound over.
- * explorerData.ts and singleYear.ts reject a non-positive start for the same
+ * explorerData.ts rejects a non-positive start for the same
  * reason; the guard on the END is this function's own, because a fractional
  * root of a negative ratio is not a real number.
  */
