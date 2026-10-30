@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { checkRequest, clientKey } from "../../lib/mcp/security";
+import { checkRequest, clientClass, clientKey } from "../../lib/mcp/security";
+import { ANTHROPIC_EGRESS_CIDR, inIpv4Cidr } from "../../lib/mcp/providerRanges";
 
 const untouched = vi.hoisted(() => ({ counter: vi.fn(), snapshot: vi.fn(), server: vi.fn() }));
 vi.mock("../../lib/mcp/limits", async importOriginal => ({
@@ -97,6 +98,58 @@ describe("client identification", () => {
     // Never the raw address: it is hashed, and hashing does not make a
     // persistent record anonymous, so it is also short-lived by policy (11.5).
     expect(key).not.toContain("5.6.7.8");
+  });
+});
+
+// A coarse class for the usage tally, never an identity. It tests the same
+// trusted address clientKey hashes, and answers only one of three words.
+describe("clientClass", () => {
+  const classOf = (headers: Record<string, string>): string => clientClass(request({ host: "fiscal.ge", ...headers }));
+
+  it("calls an address inside Anthropic's published egress range anthropic", () => {
+    expect(ANTHROPIC_EGRESS_CIDR).toBe("160.79.104.0/21");
+    expect(classOf({ "x-vercel-forwarded-for": "160.79.104.1" })).toBe("anthropic");
+    expect(classOf({ "x-vercel-forwarded-for": "160.79.111.255" })).toBe("anthropic");
+  });
+
+  it("calls an address just outside that range other", () => {
+    expect(classOf({ "x-vercel-forwarded-for": "160.79.112.0" })).toBe("other");
+    expect(classOf({ "x-vercel-forwarded-for": "160.79.103.255" })).toBe("other");
+    expect(classOf({ "x-vercel-forwarded-for": "203.0.113.7" })).toBe("other");
+  });
+
+  it("calls an address it cannot read other, and a request with none unkeyed", () => {
+    expect(classOf({ "x-vercel-forwarded-for": "2001:db8::1" })).toBe("other");
+    expect(classOf({ "x-vercel-forwarded-for": "not an address" })).toBe("other");
+    expect(classOf({})).toBe("unkeyed");
+    expect(classOf({ "x-vercel-forwarded-for": "" })).toBe("unkeyed");
+  });
+
+  it("does not trust a client-supplied address, exactly like clientKey", () => {
+    expect(classOf({ "x-forwarded-for": "160.79.104.1" })).toBe("unkeyed");
+  });
+});
+
+describe("inIpv4Cidr", () => {
+  it.each([
+    ["10.0.0.0", "10.0.0.0/8", true],
+    ["10.255.255.255", "10.0.0.0/8", true],
+    ["11.0.0.0", "10.0.0.0/8", false],
+    ["192.0.2.1", "192.0.2.1/32", true],
+    ["192.0.2.2", "192.0.2.1/32", false],
+    ["1.2.3.4", "0.0.0.0/0", true],
+    ["255.255.255.255", "128.0.0.0/1", true],
+    ["127.0.0.1", "128.0.0.0/1", false],
+  ])("%s in %s is %s", (ip, cidr, expected) => {
+    expect(inIpv4Cidr(ip, cidr)).toBe(expected);
+  });
+
+  it.each(["", "1.2.3", "1.2.3.4.5", "256.1.1.1", "1.2.3.-4", "01.2.3.4x", "::1", " 1.2.3.4", "1.2.3.4 "])("rejects the non-address %j", (ip) => {
+    expect(inIpv4Cidr(ip, "0.0.0.0/0")).toBe(false);
+  });
+
+  it.each(["10.0.0.0", "10.0.0.0/33", "10.0.0.0/-1", "10.0.0.0/x", "bad/8"])("treats the malformed range %j as matching nothing", (cidr) => {
+    expect(inIpv4Cidr("10.0.0.1", cidr)).toBe(false);
   });
 });
 

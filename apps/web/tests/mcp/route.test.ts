@@ -74,6 +74,29 @@ describe("/mcp route", () => {
     expect(result.instructions).toContain("CC BY 4.0");
   });
 
+  // Claude Code cuts server instructions at 4,096 characters, and the two handshakes
+  // must tell a client the same thing.
+  it("serves the same instructions on initialize and server/discover, inside 4,096 characters", async () => {
+    const MODERN = "2026-07-28";
+    const discover = await POST(post(
+      {
+        jsonrpc: "2.0", id: 3, method: "server/discover",
+        params: { _meta: {
+          "io.modelcontextprotocol/protocolVersion": MODERN,
+          "io.modelcontextprotocol/clientInfo": { name: "route-test", version: "1.0.0" },
+          "io.modelcontextprotocol/clientCapabilities": {},
+        } },
+      },
+      { "mcp-protocol-version": MODERN, "mcp-method": "server/discover", "x-vercel-forwarded-for": "route-test-discover" },
+    ));
+    const discovered = ((await jsonOf(discover)) as unknown as { result: { instructions?: string } }).result.instructions;
+    const initialized = ((await jsonOf(await POST(post(initialize)))) as unknown as { result: { instructions?: string } }).result.instructions;
+
+    expect(initialized).toBeDefined();
+    expect(discovered).toBe(initialized);
+    expect(initialized!.length).toBeLessThanOrEqual(4096);
+  });
+
   it("lists every tool", async () => {
     const body = await jsonOf(
       await POST(post({ jsonrpc: "2.0", id: 2, method: "tools/list", params: {} }, { "mcp-protocol-version": PROTOCOL })),

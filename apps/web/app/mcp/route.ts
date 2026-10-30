@@ -1,3 +1,4 @@
+import { after } from "next/server";
 import { createMcpHandler, isLegacyRequest, WebStandardStreamableHTTPServerTransport } from "@modelcontextprotocol/server";
 import {
   LIMITS,
@@ -8,9 +9,10 @@ import {
   createCounter,
   isPaused,
 } from "../../lib/mcp/limits";
-import { checkRequest, clientKey, corsOriginFor } from "../../lib/mcp/security";
-import { TOOLS, createMcpServer } from "../../lib/mcp/tools";
-import { logToolCall } from "../../lib/mcp/log";
+import { checkRequest, clientClass, clientKey, corsOriginFor } from "../../lib/mcp/security";
+import { createMcpServer } from "../../lib/mcp/tools";
+import { toolNameOf } from "../../lib/mcp/toolNames";
+import { logToolCall, type ToolCallLog } from "../../lib/mcp/log";
 import { errorCodeSchema } from "../../lib/factQuery/schemas";
 import { loadPackagedSnapshot } from "../../lib/mcp/snapshot";
 import { cellCount, resultSizeKind, tooLargeResponse, toolResult } from "../../lib/mcp/result";
@@ -81,34 +83,8 @@ function methodNotAllowed(): Response {
   );
 }
 
-/** The protocol methods this server implements, so the log can name them. */
-const PROTOCOL_METHODS = new Set(["server/discover", "initialize", "notifications/initialized", "ping", "tools/list", "tools/call"]);
-
-/**
- * What this call was, for the log. Never the arguments, never the body.
- *
- * Every value this returns is one of a fixed set of constants. The caller
- * controls `method` and `params.name` completely, and section 11.5 allows a
- * tool name and validated stable IDs while forbidding invalid parameter
- * strings - so echoing either straight through would write unbounded
- * caller-supplied text into retained records, sixty times a minute per key.
- * Matching against the known surface first means an unrecognised name is
- * counted, not quoted.
- */
-function toolNameOf(body: unknown): string {
-  if (typeof body !== "object" || body === null) return "unparsed";
-  const message = body as { method?: unknown; params?: { name?: unknown } };
-
-  if (message.method === "tools/call") {
-    const name = message.params?.name;
-    return typeof name === "string" && TOOLS.some((tool) => tool.name === name) ? name : "unknown_tool";
-  }
-  if (typeof message.method !== "string") return "unparsed";
-  return PROTOCOL_METHODS.has(message.method) ? message.method : "unknown_method";
-}
-
 /** What a refused caller is told for one limit. */
-type Denial = { messageKa: string; messageEn: string; retryAfter: () => string };
+type Denial = { limit: NonNullable<ToolCallLog["limit"]>; messageKa: string; messageEn: string; retryAfter: () => string };
 
 /**
  * The response a counter verdict demands, or null to carry on. Carries the
@@ -136,16 +112,19 @@ function refusalFor(verdict: CounterVerdict, denial: Denial, id: string | number
 const untilMidnight = (): string => String(DAY_SECONDS - Math.floor(Date.now() / 1000) % DAY_SECONDS);
 
 const MINUTE_DENIAL: Denial = {
+  limit: "minute",
   messageKa: "მოთხოვნების რაოდენობა ლიმიტს გადააჭარბა. სცადეთ ერთი წუთის შემდეგ, ან ჩამოტვირთეთ ფაილები.",
   messageEn: "Rate limit exceeded. Retry in a minute, or download the published files at https://fiscal.ge/downloads/data/manifest.json.",
   retryAfter: () => String(RATE_WINDOW_SECONDS),
 };
 const KEY_DAY_DENIAL: Denial = {
+  limit: "key_day",
   messageKa: "თქვენი დღიური ლიმიტი ამოიწურა. გამოიყენეთ ჩამოსატვირთი ფაილები ან სცადეთ შემდეგ UTC დღეს.",
   messageEn: "Your daily request allowance is exhausted. Retry after the next UTC midnight or use https://fiscal.ge/downloads/data/manifest.json.",
   retryAfter: untilMidnight,
 };
 const SHARED_DAY_DENIAL: Denial = {
+  limit: "global",
   messageKa: "დღიური ლიმიტი ამოიწურა. გამოიყენეთ ჩამოსატვირთი ფაილები ან სცადეთ შემდეგ UTC დღეს.",
   messageEn: "The daily request allowance is exhausted. Retry after the next UTC midnight or use https://fiscal.ge/downloads/data/manifest.json.",
   retryAfter: untilMidnight,
@@ -194,7 +173,7 @@ function withResponseHeaders(request: Request, response: Response): Response {
 
 const LOG_ERROR_CODES = new Set<string>([...errorCodeSchema.options, "request_too_large", "forbidden_host", "forbidden_origin", "internal_error"]);
 
-type RequestContext = { tool: string; dataVersion: string; id?: string | number };
+type RequestContext = Pick<ToolCallLog, "tool" | "dataVersion" | "limit" | "clientClass"> & { id?: string | number };
 
 /**
  * Nothing thrown inside `serve` reaches the caller or the log.
@@ -227,14 +206,42 @@ async function handle(request: Request): Promise<Response> {
   // The SDK rejects a schema-shape mistake itself, in English and without the
   // core's `error <code>` line; it is still the caller's bad arguments.
   const code = body?.error?.data?.code ?? /^error ([a-z_]+)/m.exec(toolText)?.[1] ?? (/^Input validation error/.test(toolText) ? "invalid_parameters" : undefined);
+  const errorCode = failed ? (LOG_ERROR_CODES.has(code) ? code : "protocol_error") : undefined;
+  const outcome = failed ? "error" : "ok";
   logToolCall({
     ...context,
     resultBytes: Buffer.byteLength(text, "utf8"),
     durationMs: Date.now() - startedAt,
-    outcome: failed ? "error" : "ok",
-    ...(failed ? { errorCode: LOG_ERROR_CODES.has(code) ? code : "protocol_error" } : {}),
+    outcome,
+    ...(errorCode !== undefined ? { errorCode } : {}),
   });
+  // Only a request that reached the limiter is tallied (a bad host or an
+  // oversized body costs nothing), and a minute refusal is not, so a flood of
+  // retries cannot spend Upstash commands on bookkeeping.
+  if (context.clientClass !== undefined && context.limit !== "minute") {
+    recordUsage(`${context.tool}|${outcome}|${errorCode ?? "-"}|${context.limit ?? "-"}|${context.clientClass}`);
+  }
   return response;
+}
+
+/**
+ * Adds one to today's anonymous tally after the response has been sent.
+ *
+ * The field is built from fixed vocabularies only: the tool label from
+ * `toolNameOf`, the outcome, a bounded error code, which limit refused, and a
+ * three-value client class. No address, hash, query text or argument. The tally
+ * never decides admission and nothing here can change the response: `after`
+ * runs the callback once the reply is sent, a failure inside it is swallowed,
+ * and outside a request scope (a unit test) `after` itself throws and the
+ * tally is simply skipped.
+ */
+function recordUsage(field: string): void {
+  const day = new Date().toISOString().slice(0, 10);
+  try {
+    after(async () => {
+      try { await counter().record(day, field); } catch { /* Best effort. */ }
+    });
+  } catch { /* Not inside a request. */ }
 }
 
 async function serve(request: Request, context: RequestContext): Promise<Response> {
@@ -325,17 +332,23 @@ async function serve(request: Request, context: RequestContext): Promise<Respons
   // keyed; anywhere else this fails towards refusing rather than towards
   // serving, which is the posture the rest of this module takes.
   const id = context.id ?? null;
+  context.clientClass = clientClass(request);
+  // Names the limit in the log and the tally; the response is refusalFor's.
+  const refuse = (verdict: CounterVerdict, denial: Denial): Response | null => {
+    if (verdict === "deny") context.limit = denial.limit;
+    return refusalFor(verdict, denial, id);
+  };
   const perKey = await counter().hit(`mcp:rate:${key ?? "unkeyed"}`, RATE_WINDOW_SECONDS, RATE_MAX_REQUESTS);
-  const perKeyRefusal = refusalFor(perKey, MINUTE_DENIAL, id);
+  const perKeyRefusal = refuse(perKey, MINUTE_DENIAL);
   if (perKeyRefusal !== null) return perKeyRefusal;
 
   const today = new Date().toISOString().slice(0, 10);
   const perKeyDaily = await counter().hit(`mcp:keyday:${key ?? "unkeyed"}:${today}`, DAY_SECONDS, RATE_PER_KEY_DAILY_MAX, "fixed");
-  const perKeyDailyRefusal = refusalFor(perKeyDaily, KEY_DAY_DENIAL, id);
+  const perKeyDailyRefusal = refuse(perKeyDaily, KEY_DAY_DENIAL);
   if (perKeyDailyRefusal !== null) return perKeyDailyRefusal;
 
   const daily = await counter().hit(`mcp:daily:${today}`, DAY_SECONDS, DAILY_MAX, "fixed");
-  const dailyRefusal = refusalFor(daily, SHARED_DAY_DENIAL, id);
+  const dailyRefusal = refuse(daily, SHARED_DAY_DENIAL);
   if (dailyRefusal !== null) return dailyRefusal;
 
   // 5. The SDK classifies protocol eras. Its default legacy adapter streams

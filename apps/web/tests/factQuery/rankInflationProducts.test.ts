@@ -42,7 +42,8 @@ describe("product value ranking", () => {
     expect(result.entries.every(row => row.unit === "percent")).toBe(true);
     expect(result.exclusions[0]).toMatchObject({ ids: [id(5)], reasonEn: expect.stringContaining("2026-01") });
     expect(result.rankingDefinitionEn).toContain("2025-12");
-    expect(response.meta.caveats).toContainEqual(expect.objectContaining({ code: "inflation_product_cumulative_derived", affects: expect.arrayContaining([`${id(5)}:2026-02`]) }));
+    // The caveat names the returned products; the excluded one is counted, and its reason is in `exclusions`.
+    expect(response.meta.caveats).toContainEqual(expect.objectContaining({ code: "inflation_product_cumulative_derived", affects: result.entries.map(row => `${row.seriesId}:2026-02`).sort(), affectsOtherCount: 1 }));
     expect(response.meta.sources[0]).toMatchObject({ sourceId: "source.geostat_product_mom", derivationEn: expect.stringContaining("Fiscal.ge"), documentDefaults: { role: "derivation_upstream" } });
     expect(JSON.stringify(snapshot.sources)).toBe(originals);
   });

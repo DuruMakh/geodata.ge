@@ -4,7 +4,7 @@ This document is the single owner of the caveat catalogue used by the fact-query
 
 **A code appearing in this document is not evidence that its trigger is correct.** The firing and non-firing tests under `apps/web/tests/factQuery/caveats/` are what establish that, and they have twice caught a rule attaching a warning to figures it did not describe. Read this document to learn what a code means; read the tests to learn when it fires.
 
-## Bilingual response contract, schema 1.6.0
+## Bilingual response contract, schema 1.7.0
 
 The shared `/mcp` endpoint and the manifest-listed `/downloads/data/` publications
 use one reviewed snapshot. `tools/list`, `catalogue.json` and `manifest.json` own
@@ -26,16 +26,57 @@ evidence and shared document defaults retain both languages. Full source records
 retain the archived byte sizes and hashes.
 
 No language input is needed. Existing valid requests continue to work; catalogue
-search accepts either language. Schema 1.6.0 adds `internal_error` and the
+search accepts either language. Schema 1.7.0 adds the optional `searchMatch` field
+(`all_words` or `some_words`) to catalogue searches, which match whole words, word
+beginnings of four letters or more, and Georgian stems rather than letters inside a
+word. `all_words` with no entries means nothing matched. A `some_words` answer lists
+first the entries whose dataset's own label a search word meets, then those meeting the
+rarer words over more of their label, ahead of those whose label's last word no search
+word meets (a closing `total`, `სულ` or `ჯამი` does not count as that last word, so
+Total taxes leads `გადასახადები თბილისში`), and also carries `searchMatchNoteKa` and
+`searchMatchNoteEn`: only some words matched, so the entries may be about something
+else; before saying the data is not served, retry the missing part with another word or
+browse the dataset. A search without `datasetId` also returns the optional
+`websitePages` (at most five, with `websitePagesNoteKa` and `websitePagesNoteEn`) for
+Fiscal.ge pages whose figures this service does not serve: names and links in both
+languages, never a value. A page is linked when every word of the search meets its
+names, topic or extra words by the same whole words, word beginnings of four letters or
+more, and Georgian stems; an id-like search links none. When the answer has entries with
+every word, nothing else is tried. Otherwise, failing the whole search, the
+search is tried without the words that name a served place, all words of one of its
+names together (`შიდა ქართლის` names Shida Kartli; `შიდა` alone names nothing). Failing
+that too, each word looks for its own pages, best first by how many of the words they
+meet: a word that no served entry meets links all its pages, and a word that only budget
+programmes' names hold links a page it names in full (`pension` links Pensions). A word
+the served data holds otherwise looks for no page. Joining words (`of`, `from`, `with`, `or`,
+`მიხედვით` and the like) never count. A word that meets a dataset's own label (`prices`
+meets Consumer price inflation) looks for no page either, unless no served entry meets
+it and the other words reach beyond that dataset; it then links only the pages whose own
+name it meets, and only when those are all of one topic (`house prices` links Home
+prices; `bread prices`, `debt overview` and `consumer debt` link nothing).
+`status` still describes the served series and entities only. A top-N ranking gives full
+source records for the returned rows and names the other documents read to fix the order
+by id in `inputDocumentIds`, resolved with `get_sources` and that source's `sourceId`; a
+ranking caveat's `affects` lists the returned rows only, with `affectsOtherCount` for the
+rest. Product catalogue series omit `yearsByMeasure` and `periodsByMeasure` when they equal
+`years` and `periods`; absent means the same. Schema 1.6.0 added `internal_error` and the
 `preserved_derived` source narrowing outcome, retaining the current-product
 dataset, annual/cumulative query and optional `calculationBasePeriod`. Strict
 clients caching output enums must refresh discovery; clients rejecting additive
 fields or requiring an earlier exact schema must update their validation.
-Translation corrections change `dataVersion`, just as other snapshot changes do.
+Translation corrections change `dataVersion`, just as other snapshot changes do; so do the
+website page names and search words used by catalogue search and `websitePages`.
 Responses are not byte-identical to older schemas. The unchanged 512 KiB complete-result
 limit counts both structured and text output; a source-heavy request can now
 require fewer sources. `result_too_large` preserves narrower-query and shared
 bulk-manifest guidance. No evidence is silently removed to make an answer fit.
+
+Human sentences name measures and filters in words: definitions, ranking definitions,
+universe descriptions and the municipal total basis say "GEL per resident", not
+`gel_per_resident`, and name a region or parent by its label, not by an id such as
+`region.adjara`. The words come from reviewed service messages (`measures.*`,
+`metrics.*`, `municipalTotalMeasures.*`). Machine fields keep their codes: ids, `measure`,
+`valueDefinitionId` and every other field a client filters on are unchanged.
 
 City-scoped inflation discovery uses the existing city vocabulary and reviewed
 city facts: headline annual, monthly and twelve-month average rates, plus annual
@@ -62,10 +103,20 @@ cumulative percentage is Fiscal.ge's calculation. Missing inputs stay unavailabl
 not zero, and annual/cumulative rankings preserve every exclusion.
 
 MCP modern `2026-07-28` and legacy `2025-11-25` are transport revisions, separate
-from schema 1.6.0. SDK tests prove protocol, serialization and response contracts;
+from schema 1.7.0. SDK tests prove protocol, serialization and response contracts;
 they do not prove an external AI client's menus, account eligibility or interpretation.
 Current official application guidance and the unverified human-flow boundary are
 recorded in `docs/deployment.md#human-application-guidance-and-evidence-boundary`.
+
+The server instructions (`apps/web/lib/mcp/instructions.ts`) are one static text of at
+most 4,096 characters, with an opening of at most 512. Claude Code cuts server
+instructions at 4,096 characters (2,048 before v2.1.296) and Codex and ChatGPT advise a
+self-contained first 512, so the rules that change an answer come first: what is not
+served, the boundaries never to combine, units and missing values, inflation, and how to
+present and cite. Year ranges, entity counts and call mechanics live in the tool
+descriptions, which read them from the snapshot, and are not repeated. The per-schema
+history developers need is on `/connect` only. Tests pin the length limits and the
+presence of each rule, not the wording.
 
 ## Why caveats exist at all
 
@@ -814,6 +865,20 @@ result fit would publish a figure without its limitations. The text
 representation carries every definition, but prints each one once in a legend
 keyed by the `definitionId` its rows name, so a long monthly series does not
 spend the cap on repeated sentences.
+
+**What a ranking gives in full and what it names by id.** A top-N ranking reads
+every candidate to fix the order but returns a few rows. `meta.sources[].documents`
+holds the full record of each document behind a returned row, plus any document
+that every candidate cites. Every other document the ranking read is named in
+`meta.sources[].inputDocumentIds` (ids only; `get_sources` resolves them), so the
+two lists together are exactly the set a ranking has always cited and none is
+dropped. Likewise a caveat's `affects` lists only the returned rows, and
+`affectsOtherCount` says how many further items it would have named; a caveat's
+code, severity and text are not changed. In a product catalogue
+(`describe_coverage` with `datasetId: inflation-products`, and the published
+catalogue that embeds it) a series omits `yearsByMeasure` and `periodsByMeasure`
+when every measure has the same span as the series' `years` and `periods`;
+absent means the same as `years`/`periods`.
 
 The endpoint reads no database and fetches no document at request time. It
 answers from the snapshot bundled into the deployment, so it keeps working
