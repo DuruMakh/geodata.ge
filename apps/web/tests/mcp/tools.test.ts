@@ -82,6 +82,20 @@ describe("MCP tool surface", () => {
     for (const tool of tools) expect((tool.description ?? "").length, tool.name).toBeLessThanOrEqual(2048);
   });
 
+  // Owner review B: a severe caveat narrowed to the returned rows can have an empty `affects`, and a client following
+  // "show every severe caveat next to its figure" would pin it to a figure it does not concern.
+  it("tells a client not to attach a ranking caveat that names no returned row to a returned figure", async () => {
+    const client = await connected();
+    try {
+      const { tools } = await client.listTools();
+      const description = tools.find(tool => tool.name === "rank")!.description!;
+      expect(description).toContain("A caveat whose affects is empty and that carries affectsOtherCount concerns only rows that were not returned; each entry's caveatIds is its per-row link; do not attach such a caveat to a returned figure.");
+      const affectsOtherCount = (tools.find(tool => tool.name === "rank")!.outputSchema as unknown as { properties: { meta: { properties: { caveats: { items: { properties: { affectsOtherCount: { description?: string } } } } } } } }).properties.meta.properties.caveats.items.properties.affectsOtherCount;
+      expect(affectsOtherCount.description).toContain("not returned");
+      expect(affectsOtherCount.description).toContain("caveatIds");
+    } finally { await client.close(); }
+  });
+
   it("teaches recovery from empty phrase searches without treating them as absent data", async () => {
     const instructions = serverInstructions();
     expect(instructions).toContain("principal word");

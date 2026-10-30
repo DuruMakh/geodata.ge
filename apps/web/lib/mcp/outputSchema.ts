@@ -161,7 +161,25 @@ export const toolOutput = z
   })
   .loose();
 
+/**
+ * Only a ranking narrows a caveat's `affects` to the returned rows, so only its schema carries the explanation of
+ * `affectsOtherCount`. The caveat is declared in all fourteen output schemas and `tools/list` repeats each in full.
+ */
+const rankingMeta = responseMeta.extend({
+  caveats: z.array(
+    caveat.extend({
+      affectsOtherCount: z
+        .number()
+        .int()
+        .optional()
+        .describe(
+          "Rankings only: how many further rows, not returned, this caveat concerns. With an empty affects it concerns only rows that were not returned; each entry's caveatIds is its per-row link; do not attach it to a returned figure.",
+        ),
+    }),
+  ),
+});
+
 export function outputSchemaFor(tool: string) {
   const kind = tool === "describe_coverage" ? "catalogue" : tool === "get_sources" ? "sources" : tool === "compare" ? "comparisons" : tool === "rank" ? "ranking" : "observations";
-  return toolOutput.extend({ kind: z.literal(kind), data: dataShapes[kind] });
+  return toolOutput.extend({ kind: z.literal(kind), data: dataShapes[kind], ...(kind === "ranking" ? { meta: rankingMeta } : {}) });
 }
