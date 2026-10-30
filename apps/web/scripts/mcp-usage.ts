@@ -58,11 +58,12 @@ function table(counts: ReadonlyMap<string, number>): string[] {
 export function report(daily: readonly { day: string; counts: Map<string, number> }[]): string {
   const lines: string[] = [];
   for (const { day, counts } of daily) {
-    lines.push(`${day}  (${[...counts.values()].reduce((sum, count) => sum + count, 0)} requests)`);
+    lines.push(`${day}  (${[...counts.values()].reduce((sum, count) => sum + count, 0)} counted requests)`);
     lines.push(...(counts.size === 0 ? ["  no data"] : table(counts)));
   }
   const all = totals(daily.map(({ counts }) => counts));
-  lines.push("", `All ${daily.length} days  (${[...all.values()].reduce((sum, count) => sum + count, 0)} requests)`, ...table(all));
+  lines.push("", `All ${daily.length} days  (${[...all.values()].reduce((sum, count) => sum + count, 0)} counted requests)`, ...table(all));
+  lines.push("", "Per-minute refusals and requests refused before the limiter are not counted, so these sums are not traffic totals.");
   const refused = [...all].reduce((sum, [field, count]) => (field.endsWith(DECISION_SUFFIX) ? sum + count : sum), 0);
   if (refused > 0) lines.push("", `DECISION NEEDED: ${refused} x *${DECISION_SUFFIX}. Send this to the owner for F04 Stage 2.`);
   return lines.join("\n");

@@ -10,7 +10,8 @@ import {
   isPaused,
 } from "../../lib/mcp/limits";
 import { checkRequest, clientClass, clientKey, corsOriginFor } from "../../lib/mcp/security";
-import { TOOLS, createMcpServer } from "../../lib/mcp/tools";
+import { createMcpServer } from "../../lib/mcp/tools";
+import { toolNameOf } from "../../lib/mcp/toolNames";
 import { logToolCall, type ToolCallLog } from "../../lib/mcp/log";
 import { errorCodeSchema } from "../../lib/factQuery/schemas";
 import { loadPackagedSnapshot } from "../../lib/mcp/snapshot";
@@ -80,32 +81,6 @@ function methodNotAllowed(): Response {
     }),
     { status: 405, headers: { "content-type": "application/json", allow: "POST", link: '<https://fiscal.ge/connect>; rel="help"' } },
   );
-}
-
-/** The protocol methods this server implements, so the log can name them. */
-const PROTOCOL_METHODS = new Set(["server/discover", "initialize", "notifications/initialized", "ping", "tools/list", "tools/call"]);
-
-/**
- * What this call was, for the log. Never the arguments, never the body.
- *
- * Every value this returns is one of a fixed set of constants. The caller
- * controls `method` and `params.name` completely, and section 11.5 allows a
- * tool name and validated stable IDs while forbidding invalid parameter
- * strings - so echoing either straight through would write unbounded
- * caller-supplied text into retained records, sixty times a minute per key.
- * Matching against the known surface first means an unrecognised name is
- * counted, not quoted.
- */
-function toolNameOf(body: unknown): string {
-  if (typeof body !== "object" || body === null) return "unparsed";
-  const message = body as { method?: unknown; params?: { name?: unknown } };
-
-  if (message.method === "tools/call") {
-    const name = message.params?.name;
-    return typeof name === "string" && TOOLS.some((tool) => tool.name === name) ? name : "unknown_tool";
-  }
-  if (typeof message.method !== "string") return "unparsed";
-  return PROTOCOL_METHODS.has(message.method) ? message.method : "unknown_method";
 }
 
 /** What a refused caller is told for one limit. */

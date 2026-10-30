@@ -38,11 +38,13 @@ fix the order by id in `inputDocumentIds` (call `get_sources` with that source's
 and in the published `inflation-products.json` and `catalogue.json`. Schema 1.6.0 added
 `internal_error` and the `preserved_derived` source narrowing outcome. Strict clients
 caching output enums must refresh discovery; clients requiring schema 1.6.0 must
-update their validation. Request shapes stay unchanged.
+update their validation. Request shapes stay unchanged. The one non-additive change is that
+when the per-measure maps are absent, readers fall back to the series' `years` and `periods`.
 Clients must accept additive fields and data schema 1.7.0; byte-identical response
 compatibility is not promised. Transport revisions are a separate contract:
 modern `2026-07-28` and preserved legacy `2025-11-25` share the endpoint.
-Translation changes alter `dataVersion`. Retain the existing body, cell, pair,
+Translation changes alter `dataVersion`, and so do the website page names and search words
+that catalogue search matches. Retain the existing body, cell, pair,
 ranking, byte, duration, rate and pause limits. Large bilingual evidence responses
 can require narrower queries; never trim evidence or increase limits to fit.
 
@@ -501,10 +503,12 @@ There is no session store, model invocation, authentication, or write tool.
 All MCP data answers use `apps/web/lib/factQuery/generated/snapshot.json`, prepared
 at build time and cached once per function instance. It is written minified: 32.1 MB
 on 2026-10-13 (46.3 MB indented), about 0.2 s to read and 0.3 s to parse on the first
-request of each instance. The server text built from it (coverage, tool descriptions,
-instructions) and the tools' JSON Schemas are also built once per instance. The sole runtime network
-exception is `lib/mcp/upstashCounter.ts`, which sends fixed Redis rate-limit
-commands to the configured Upstash endpoint. It never sends query arguments,
+request of each instance. The server text built from it (coverage and tool descriptions)
+and the tools' JSON Schemas are also built once per instance; the server instructions are
+static text in `lib/mcp/instructions.ts` and are not built from the snapshot. The sole runtime
+network exception is `lib/mcp/upstashCounter.ts`, which sends fixed Redis rate-limit
+commands (`EVAL` scripts) and the anonymous daily usage tally's `EVAL`
+(`HINCRBY` with `EXPIRE`) to the configured Upstash endpoint. It never sends query arguments,
 figures, source documents, prompts, or raw client addresses. There is no runtime
 dataset-database access or external data fallback.
 
@@ -612,8 +616,11 @@ key is `<production|preview>:mcp:stats:<YYYY-MM-DD>`, a hash whose field is
   Upstash console.
 - **Decision trigger:** any non-zero count of fields ending in
   `|rate_limited|key_day|anthropic`, summed over every tool (the script prints
-  `DECISION NEEDED`), means Claude.ai traffic reached the per-address daily cap. Send it to the owner for
-  the Stage 2 decision in the F04 review; do not change a limit on your own.
+  `DECISION NEEDED`), means traffic from Anthropic's servers (the Claude apps'
+  connectors and the API's MCP connector) reached the per-address daily cap. Send it to the owner for
+  the Stage 2 decision in the F04 review; do not change a limit on your own. The tally
+  cannot see per-minute refusals, so a busy-minute 429 for Anthropic traffic appears only in
+  the one-hour application logs (`limit:"minute"`), never in the tally or this trigger.
 
 ### Other operating limits
 
@@ -756,7 +763,8 @@ application log field. The anonymous daily tally in Upstash (see "Usage tally an
 which limit refused") holds the same fixed vocabulary and nothing else: no
 address, hash, query text, id or argument; it is counted per UTC day and expires
 after 100 days. The operating target is **14 days of detailed allowlisted
-application events and 90 days of aggregates**. Vercel/Upstash infrastructure logs are separate;
+application events and 90 days of aggregates**; the tally is that aggregate store, and
+its 100-day expiry is deliberate headroom above the 90-day target, not a drift from it. Vercel/Upstash infrastructure logs are separate;
 do not claim providers never process request addresses.
 
 **Observed 17 October 2026:** authenticated Vercel inspection confirmed production

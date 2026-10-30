@@ -1,7 +1,6 @@
-import { readFileSync } from "node:fs";
-import path from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { createCounter } from "../../lib/mcp/limits";
+import { PROTOCOL_METHODS, toolNameOf } from "../../lib/mcp/toolNames";
 import { TOOLS } from "../../lib/mcp/tools";
 
 afterEach(() => { vi.unstubAllEnvs(); vi.unstubAllGlobals(); });
@@ -122,9 +121,13 @@ describe("the daily usage tally", () => {
   // The route labels a call by a TOOLS name, a protocol method or a fixed fallback; a label the
   // pattern refuses would drop that tool out of the tally without a sound.
   it("accepts a field for every tool name, protocol method and fallback label the route can write", async () => {
-    const route = readFileSync(path.join(process.cwd(), "app", "mcp", "route.ts"), "utf8");
-    const methods = [...(/const PROTOCOL_METHODS = new Set\(\[([^\]]*)\]\)/.exec(route)?.[1] ?? "").matchAll(/"([^"]+)"/g)].map((match) => match[1]!);
+    const methods = [...PROTOCOL_METHODS];
     expect(methods).toContain("tools/call");
+    // The fixed fallbacks are what the route writes for a name it does not know, never the caller's text.
+    expect(toolNameOf({ method: "tools/call", params: { name: "drop table" } })).toBe("unknown_tool");
+    expect(toolNameOf({ method: "evil" })).toBe("unknown_method");
+    expect(toolNameOf("text")).toBe("unparsed");
+    expect(toolNameOf({ method: "tools/call", params: { name: "rank" } })).toBe("rank");
     const labels = [...TOOLS.map((tool) => tool.name), ...methods, "unknown_tool", "unknown_method", "unparsed"];
     configure();
     const fetcher = vi.fn().mockImplementation(() => Promise.resolve(Response.json({ result: 1 })));

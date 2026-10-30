@@ -1,4 +1,5 @@
 import { beforeAll, describe, expect, it } from "vitest";
+import { z } from "zod";
 import { testSnapshot } from "../helpers/factQuerySnapshot";
 import { TOOLS } from "../../lib/mcp/tools";
 import { outputSchemaFor, toolOutput } from "../../lib/mcp/outputSchema";
@@ -215,5 +216,42 @@ describe("ranking provenance fields", () => {
     const municipalText = toolResult(municipalTop5()).content[0]!.text;
     expect(municipalText).toMatch(/^inputs \(ids only, used to establish the order; call get_sources with this sourceId, narrowed with years\/entityIds\): \S+/m);
     expect(toolResult(productTop5()).content[0]!.text).toMatch(/affects: \S+(,\S+)* \(\+\d+ not listed; only the returned rows are named\)/);
+  });
+});
+
+// z.object strips unknown keys, so the validation tests above pass whether or not a new field is declared. A field that is
+// not declared never reaches the JSON Schema a client downloads, and a strict client may then reject it. This reads the
+// published schema itself.
+describe("declared public fields", () => {
+  const declaredNames = (value: unknown, names = new Set<string>()): Set<string> => {
+    if (Array.isArray(value)) value.forEach((item) => declaredNames(item, names));
+    else if (value !== null && typeof value === "object") {
+      for (const [key, child] of Object.entries(value)) {
+        if (key === "properties" && child !== null && typeof child === "object") Object.keys(child).forEach((name) => names.add(name));
+        declaredNames(child, names);
+      }
+    }
+    return names;
+  };
+
+  it.each([
+    ["describe_coverage", ["searchMatch", "searchMatchNoteKa", "searchMatchNoteEn", "websitePages", "websitePagesNoteKa", "websitePagesNoteEn"]],
+    ["rank", ["inputDocumentIds", "affectsOtherCount"]],
+  ])("%s declares every 1.7.0 field in the JSON Schema clients download", (tool, fields) => {
+    const published = declaredNames(z.toJSONSchema(outputSchemaFor(tool)));
+    for (const field of fields) expect(published.has(field), `${tool} must declare ${field}`).toBe(true);
+  });
+
+  it("rejects a wrongly typed searchMatch or affectsOtherCount", () => {
+    const coverage = structuredClone(describeCoverage(snapshot, { search: "defense budget" }));
+    if (coverage.kind !== "catalogue") throw new Error("Expected a catalogue");
+    expect(outputSchemaFor("describe_coverage").safeParse(coverage).success).toBe(true);
+    (coverage.data as { searchMatch?: unknown }).searchMatch = "bogus";
+    expect(outputSchemaFor("describe_coverage").safeParse(coverage).success).toBe(false);
+
+    const ranking = structuredClone(rank(snapshot, { datasetId: "inflation-products", dimension: "series", measure: "cumulative_pct", metric: "value", period: "2026-09", startYear: 2020, limit: 5 }));
+    const caveat = ranking.meta.caveats.find((candidate) => typeof candidate.affectsOtherCount === "number")!;
+    (caveat as { affectsOtherCount: unknown }).affectsOtherCount = "x";
+    expect(outputSchemaFor("rank").safeParse(ranking).success).toBe(false);
   });
 });

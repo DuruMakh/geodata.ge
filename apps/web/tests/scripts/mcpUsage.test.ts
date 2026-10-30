@@ -31,7 +31,10 @@ describe("mcp:usage", () => {
     expect(totals([monday, tuesday]).get("ping|ok|-|-|other")).toBe(5);
 
     const quiet = report([{ day: "2026-10-28", counts: monday }]);
-    expect(quiet).toContain("2026-10-28  (12 requests)");
+    expect(quiet).toContain("2026-10-28  (12 counted requests)");
+    expect(quiet).toContain("All 1 days  (12 counted requests)");
+    // Per-minute refusals and requests refused before the limiter never reach the tally, so the sums are not traffic totals.
+    expect(quiet).toMatch(/Per-minute refusals and requests refused before the limiter are not counted/);
     expect(quiet).not.toContain("DECISION NEEDED");
     expect(report([{ day: "2026-10-28", counts: monday }, { day: "2026-10-29", counts: tuesday }])).toContain(`DECISION NEEDED: 5 x *${DECISION_SUFFIX}`);
   });
