@@ -6,13 +6,14 @@ import { VitalSection } from "../../components/demography/vital-section";
 import { ExplorerPage } from "../../components/explorer-shell/explorer-page";
 import { EntityMemberList } from "../../components/municipalities/entity-member-list";
 import { BreadcrumbJsonLd } from "../../components/seo/breadcrumb-json-ld";
+import { JsonLd } from "../../components/seo/json-ld";
 import { PageHeader } from "../../components/shell/page-header";
 import { loadServedDemographyData } from "../data/demography/importDemography";
 import { SOURCE_ID } from "../data/demography/series";
 import { packFacts } from "../data/packedFacts";
 import { loadServedMunicipalData } from "../data/servedData";
 import { ageYears, annualAgeFacts, censusAgeFactsForPlace } from "../explorer/demographyAgeSex";
-import { GEORGIA_PLACE_ID, TBILISI_PLACE_ID, placeLabel } from "../explorer/demographyAreas";
+import { GEORGIA_PLACE_ID, TBILISI_PLACE_ID, placeLabel, type DemographyPlace } from "../explorer/demographyAreas";
 import {
   POPULATION_PATH,
   placeIdForRoute,
@@ -34,11 +35,12 @@ import { message } from "../i18n/messages";
 import { I18nProvider } from "../i18n/provider";
 import { clientPresentation } from "../i18n/presentation.server";
 import { pageHref } from "../i18n/routes";
-import type { Locale, TemplateValues } from "../i18n/types";
+import type { Locale, Messages, TemplateValues } from "../i18n/types";
 import { fiscalMetadata } from "../seo/metadata";
 import { placeOfKa, placeTitleNameEn } from "../seo/placeTitleForms";
+import { explorerDatasetJsonLd } from "../seo/structuredData";
 import { resolveSiteUrl } from "../siteUrl";
-import { loadPopulationBasics, loadPopulationSources, loadTbilisiAreaLabel, populationSourceNote } from "./demography-population";
+import { loadPopulationBasics, loadPopulationSources, loadTbilisiAreaLabel, populationDataset, populationSourceNote } from "./demography-population";
 import { ALL_DATA_PATH } from "../navigation/navTree";
 
 export type PopulationPlaceRoute = PlaceRoute;
@@ -57,6 +59,14 @@ export function workbookScopeFor(route: PopulationPlaceRoute): string {
   return route.kind === "region" ? `region-${route.id}` : route.slug;
 }
 
+/** A municipality's page names its region and has no census age section; Georgia's and a region's carry both. */
+function placeDescription(messages: Messages, locale: Locale, place: DemographyPlace, places: readonly DemographyPlace[], span: { name: string; first: number; last: number }) {
+  const region = places.find((candidate) => candidate.id === place.regionId);
+  return region
+    ? message(messages, "demography.placeMunicipalityMetaDescription", { ...span, region: placeLabel(region, locale) })
+    : message(messages, "demography.placeMetaDescription", span);
+}
+
 export async function populationPlaceMetadata(route: PopulationPlaceRoute, locale: Locale) {
   const { clientFacts, presentation, places } = await loadPopulationBasics(locale);
   const place = places.find((candidate) => candidate.id === placeIdForRoute(route));
@@ -65,16 +75,12 @@ export async function populationPlaceMetadata(route: PopulationPlaceRoute, local
   const t = (key: string, values?: TemplateValues) => message(presentation.messages, `demography.${key}`, values);
   const name = placeLabel(place, locale);
   const span = { name, first: years[0]!, last: years.at(-1)! };
-  // A municipality's page names its region and has no census age section; Georgia's and a region's carry both.
-  const region = places.find((candidate) => candidate.id === place.regionId);
   return fiscalMetadata({
     locale,
     path: populationPlaceHref(place.id),
     // Worded the way people search it ("<place> მოსახლეობა <year>"); the page's own heading keeps placeMetaTitle. `span.last` is the place's latest population year.
     title: t("placeSeoTitle", { place: locale === "ka" ? placeOfKa(place) : placeTitleNameEn(place), year: span.last }),
-    description: region
-      ? t("placeMunicipalityMetaDescription", { ...span, region: placeLabel(region, locale) })
-      : t("placeMetaDescription", span),
+    description: placeDescription(presentation.messages, locale, place, places, span),
   });
 }
 
@@ -157,6 +163,30 @@ export async function renderPopulationPlacePage(route: PopulationPlaceRoute, loc
 
   return (
     <I18nProvider {...clientPresentation(presentation)}>
+      <JsonLd
+        testId="explorer-dataset-json-ld"
+        data={explorerDatasetJsonLd({
+          locale,
+          origin: resolveSiteUrl(),
+          path: populationPlaceHref(place.id),
+          datasetId: "demography",
+          name: t("placeMetaTitle", { name: placeLabel(place, locale) }),
+          description: placeDescription(messages, locale, place, places, { name: placeLabel(place, locale), first, last }),
+          firstYear: first,
+          lastYear: last,
+          dateModified: served.facts.map((fact) => fact.lastReviewedAt).sort().at(-1)!,
+          spatialCoverageName: placeLabel(place, locale),
+          withinGeorgia: place.level !== "country",
+          partOf: { path: POPULATION_PATH, ...populationDataset(messages) },
+          variableMeasured: [
+            t("measurePopulation"),
+            ...(showsDensity ? [t("sideDensity")] : []),
+            t("vitalBirths"), t("vitalDeaths"), t("vitalNatural"),
+            t("marriageSeries.marriages"), t("marriageSeries.divorces"),
+            ...(place.level === "municipality" ? [] : [t("ageSexTitle")]),
+          ],
+        })}
+      />
       <BreadcrumbJsonLd
         items={[
           { name: crumbs[0].label, path: pageHref("/", locale) },

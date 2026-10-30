@@ -4,6 +4,7 @@ import { MunicipalitiesIndex } from "../../components/municipalities/municipalit
 import { ExplorerHeading } from "../../components/explorer-shell/explorer-heading";
 import { ExplorerPage } from "../../components/explorer-shell/explorer-page";
 import { BreadcrumbJsonLd } from "../../components/seo/breadcrumb-json-ld";
+import { JsonLd } from "../../components/seo/json-ld";
 import { PageHeader } from "../../components/shell/page-header";
 import { loadDensityRows } from "../data/demography/densityRows";
 import { SERIES } from "../data/demography/series";
@@ -20,10 +21,12 @@ import { message } from "../i18n/messages";
 import { clientPresentation, getPresentation } from "../i18n/presentation.server";
 import { I18nProvider } from "../i18n/provider";
 import { pageHref } from "../i18n/routes";
-import type { Locale, Presentation, TemplateValues } from "../i18n/types";
+import type { Locale, Messages, Presentation, TemplateValues } from "../i18n/types";
 import { projectPublicSources } from "../methodology/publicSources";
 import { loadReviewedSourceManifest } from "../methodology/sourceManifest";
 import { fiscalMetadata } from "../seo/metadata";
+import { explorerDatasetJsonLd } from "../seo/structuredData";
+import { resolveSiteUrl } from "../siteUrl";
 import { loadPopulationBasics } from "../explorer/populationBasics.server";
 
 // The other Demography pages take the shared loader from here, beside the source loader.
@@ -38,6 +41,11 @@ export async function demographyPopulationPageMetadata(locale: Locale) {
     title: message(p.messages, "demography.populationMetaTitle"),
     description: message(p.messages, "demography.populationDescription"),
   });
+}
+
+/** The Population index's Dataset, which every place page names as its parent. */
+export function populationDataset(messages: Messages) {
+  return { name: message(messages, "demography.populationTitle"), description: message(messages, "demography.populationDescription") } as const;
 }
 
 /**
@@ -109,6 +117,21 @@ export async function renderDemographyPopulationPage(locale: Locale) {
   ];
   return (
     <I18nProvider {...clientPresentation(presentation)}>
+      {/* The parent of every place page's Dataset (`populationDataset`). */}
+      <JsonLd
+        testId="explorer-dataset-json-ld"
+        data={explorerDatasetJsonLd({
+          locale,
+          origin: resolveSiteUrl(),
+          path: POPULATION_PATH,
+          datasetId: "demography",
+          ...populationDataset(messages),
+          firstYear: start,
+          lastYear: end,
+          dateModified: facts.map((fact) => fact.lastReviewedAt).sort().at(-1)!,
+          variableMeasured: [t("measurePopulation"), t("sideDensity")],
+        })}
+      />
       <BreadcrumbJsonLd
         items={[
           { name: crumbs[0].label, path: pageHref("/", locale) },
