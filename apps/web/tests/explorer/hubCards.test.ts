@@ -113,7 +113,7 @@ describe("buildHubCards", () => {
   it("lets an explicit total row win its year, the way the section pages do", () => {
     const cards = buildHubCards(FACTS, MUNICIPAL_TOTALS, DEBT_FACTS);
 
-    // singleYear.ts and explorerData.ts both prefer an explicit `<side>.total`
+    // explorerData.ts prefers an explicit `<side>.total`
     // over the category sum, so the hub has to agree or the same year reads
     // differently on the card and on the page behind it. 2.00 would be the bare
     // category sum; 11.00 would be the sum with the total double-counted in.

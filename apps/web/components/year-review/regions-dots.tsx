@@ -78,7 +78,7 @@ export function RegionsDots({ data, year }: { data: YearReviewData; year: number
           {ticks.map((tick, index) => (
             <span
               key={tick}
-              className="absolute top-0 -translate-x-1/2 whitespace-nowrap font-[family-name:var(--font-numeric)] text-[10.5px] text-[var(--faint)]"
+              className="absolute top-0 -translate-x-1/2 whitespace-nowrap font-[family-name:var(--font-numeric)] text-[11px] text-[var(--faint)] min-[768px]:text-[10.5px]"
               style={{ left: `${at(tick)}%` }}
             >
               {withLari(index === ticks.length - 1 && tick > 0 ? `${formatInUnit(tick, UNIT_PERSONS)} ${lari}` : formatInUnit(tick, UNIT_PERSONS))}
@@ -167,7 +167,7 @@ export function RegionsDots({ data, year }: { data: YearReviewData; year: number
         <div aria-hidden="true" className="relative h-6 @min-[640px]:ml-[196px] @min-[1100px]:ml-[236px]">
           <p
             data-median-label=""
-            className="absolute top-1.5 -translate-x-1/2 whitespace-nowrap font-[family-name:var(--font-numeric)] text-[10.5px] text-[var(--body)]"
+            className="absolute top-1.5 -translate-x-1/2 whitespace-nowrap font-[family-name:var(--font-numeric)] text-[11px] text-[var(--body)] min-[768px]:text-[10.5px]"
             style={{ left: `${at(view.median)}%` }}
           >
             {withLari(medianLabel)}

@@ -1,6 +1,6 @@
 // Editorial category colors (DESIGN.md §4.2). A category keeps the same color on
-// every surface: chart lines, table swatches, series panel, treemap, Every 100 GEL,
-// radar, budget field, ranking.
+// every surface: chart lines, table swatches, series panel, the year in review's
+// 100-cell grid, ranking, change bars and long view.
 
 export const INK = "#1E1B16";
 // Declared before SERIES_COLORS because the computed citizenship remainder reuses it.

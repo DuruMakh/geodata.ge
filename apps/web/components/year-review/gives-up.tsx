@@ -45,13 +45,13 @@ function IceChart({ columns, ariaLabel }: { columns: IceColumn[]; ariaLabel: str
             className="absolute left-0 w-[38px] rounded-b-[3px] min-[768px]:w-[54px]"
             style={{ top: WATERLINE, height: column.given * scale, backgroundColor: ACCENT, backgroundImage: GIVEN_HATCH }}
           >
-            <em className="absolute top-0 left-full mt-1 ml-1.5 whitespace-nowrap font-[family-name:var(--font-numeric)] text-[10.5px] font-semibold text-[var(--accent)] not-italic min-[768px]:ml-2 min-[768px]:text-[11.5px]">
+            <em className="absolute top-0 left-full mt-1 ml-1.5 whitespace-nowrap font-[family-name:var(--font-numeric)] text-[11px] font-semibold text-[var(--accent)] not-italic min-[768px]:ml-2 min-[768px]:text-[11.5px]">
               {shortAmount(column.given, messages)}
             </em>
           </span>
           <span className="absolute right-2.5 bottom-0 left-0 flex flex-col gap-[3px]">
             <b className="text-[11.5px] font-semibold leading-[1.3] min-[768px]:text-[12.5px]">{column.name}</b>
-            <span className="font-[family-name:var(--font-numeric)] text-[10px] leading-[1.3] text-[var(--muted)] min-[768px]:text-[11px]">
+            <span className="font-[family-name:var(--font-numeric)] text-[11px] leading-[1.3] text-[var(--muted)]">
               <strong className="block font-[family-name:var(--font-display)] text-lg font-semibold text-[var(--accent)] min-[768px]:inline min-[768px]:text-xl">
                 {withLari(`${formatInUnit(column.per100, UNIT_PERSONS)} ${message(messages, "yearReview.lari")}`)}
               </strong>{" "}

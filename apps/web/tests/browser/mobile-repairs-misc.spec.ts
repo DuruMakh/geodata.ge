@@ -40,7 +40,10 @@ test.describe("phone", () => {
   test("year in review: the spending-type treemap draws its tall layout inside the phone's gutters", async ({ page }) => {
     await page.goto("/explorer/analysis");
     await ready(page);
-    expect(await treemapFit(page)).toEqual({ tiles: expect.any(Number), outside: [], clipped: [] });
+    const fit = await treemapFit(page);
+    // Eight spending types, seven labelled: a selector that finds no tile must not pass.
+    expect(fit.tiles).toBeGreaterThan(3);
+    expect(fit).toEqual({ tiles: fit.tiles, outside: [], clipped: [] });
   });
 
   test("economy map: Tbilisi gets a fingertip target, the first tap previews and the second opens (D7)", async ({ page }) => {
@@ -171,5 +174,7 @@ test("year in review: the spending-type treemap tiles stay inside it, their labe
   await page.setViewportSize({ width: 800, height: 1000 });
   await page.goto("/explorer/analysis");
   await ready(page);
-  expect(await treemapFit(page)).toEqual({ tiles: expect.any(Number), outside: [], clipped: [] });
+  const fit = await treemapFit(page);
+  expect(fit.tiles).toBeGreaterThan(3);
+  expect(fit).toEqual({ tiles: fit.tiles, outside: [], clipped: [] });
 });

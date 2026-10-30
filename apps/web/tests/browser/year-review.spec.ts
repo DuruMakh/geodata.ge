@@ -71,7 +71,7 @@ test("the ruler moves every section, and 2020 reads as the deepest deficit in th
   const spend = page.locator('[data-kpi="spend"]');
   const before = await spend.innerText();
   await pickYear(page, 2020);
-  expect(hashParams(page).ay).toBe("2020");
+  await expect.poll(() => hashParams(page).ay).toBe("2020");
   await expect(page.locator("#year-review-glance h2")).toHaveText("2020 ერთ სურათზე");
   await expect(spend).not.toHaveText(before);
   await expect(spend).toContainText("2019 წელთან");
@@ -103,7 +103,7 @@ test("the grouping, side and measure switches redraw their sections", async ({ p
 
   await where.getByRole("group", { name: "დაჯგუფება" }).getByRole("button", { name: "უწყებები" }).click();
   await expect(where.getByRole("group", { name: "დაჯგუფება" }).getByRole("button", { name: "უწყებები" })).toHaveAttribute("aria-pressed", "true");
-  expect(hashParams(page).ag).toBe("ministries");
+  await expect.poll(() => hashParams(page).ag).toBe("ministries");
   await expect.poll(rankIds).not.toEqual(fields);
   await expect(where.locator("[data-cell]")).toHaveCount(100);
 
@@ -113,7 +113,7 @@ test("the grouping, side and measure switches redraw their sections", async ({ p
   // The long view follows the grouping on the expenditure side.
   expect(institutions.sort()).toEqual([...(await rankIds())].sort());
   await long.getByRole("group", { name: "ბიუჯეტის მხარე" }).getByRole("button", { name: "შემოსავლები" }).click();
-  expect(hashParams(page).as).toBe("revenue");
+  await expect.poll(() => hashParams(page).as).toBe("revenue");
   await expect.poll(bands).not.toEqual(institutions);
   await expect(long.locator("[data-y-tick]")).toHaveCount(5);
   await expect(long.locator('[data-y-tick="1"]')).toHaveText("100%");
@@ -160,7 +160,7 @@ test("an old Analysis link survives a reload and the language switch", async ({ 
     expect(await chosenYear(page)).toBe(2024);
     await expect(page.locator("#year-review-where").getByRole("button", { name: institutions, exact: true })).toHaveAttribute("aria-pressed", "true");
     await expect(page.locator("#year-review-long").getByRole("button", { name: receipts, exact: true })).toHaveAttribute("aria-pressed", "true");
-    expect(hashParams(page)).toEqual({ ay: "2024", ag: "ministries", as: "revenue" });
+    await expect.poll(() => hashParams(page)).toEqual({ ay: "2024", ag: "ministries", as: "revenue" });
   };
   await expectState("უწყებები", "შემოსავლები");
 

@@ -178,7 +178,7 @@ export function LongView({ data, year, grouping, side, measure, focus, pin, onFo
           <span
             key={tick.value}
             data-y-tick={tick.value}
-            className="absolute right-2.5 translate-y-1/2 whitespace-nowrap font-[family-name:var(--font-numeric)] text-[10.5px] leading-none text-[var(--faint)]"
+            className="absolute right-2.5 translate-y-1/2 whitespace-nowrap font-[family-name:var(--font-numeric)] text-[11px] leading-none text-[var(--faint)] min-[768px]:text-[10.5px]"
             style={{ bottom: `${tick.at * 100}%` }}
           >
             {tick.label}
@@ -265,7 +265,7 @@ export function LongView({ data, year, grouping, side, measure, focus, pin, onFo
           column % 2 === 0 ? (
             <span
               key={label}
-              className={`absolute top-[9px] whitespace-nowrap font-[family-name:var(--font-numeric)] text-[10.5px] leading-none text-[var(--faint)] ${column % 4 === 0 ? "" : "hidden @min-[900px]:block"} ${
+              className={`absolute top-[9px] whitespace-nowrap font-[family-name:var(--font-numeric)] text-[11px] leading-none text-[var(--faint)] min-[768px]:text-[10.5px] ${column % 4 === 0 ? "" : "hidden @min-[900px]:block"} ${
                 column === 0 ? "" : column === last ? "-translate-x-full" : "-translate-x-1/2"
               }`}
               style={{ left: `${pos(column)}%` }}
