@@ -1,5 +1,6 @@
 import type { DemographyPlace } from "../explorer/demographyAreas";
 import { REGION_GENITIVE_KA, REGION_LOCATIVE_KA } from "../explorer/municipalLabels";
+import type { Locale } from "../i18n/types";
 import { municipalityOfficialNameGenitiveKa } from "./metadata";
 
 // Georgian "of" and "-ში" ("in") forms of a place, for page titles worded the way people search
@@ -64,4 +65,14 @@ export function latestYearOf<T extends { year: number }>(facts: readonly T[], ke
   const years = facts.filter(keep).map((fact) => fact.year);
   if (years.length === 0) throw new Error("No fact is kept, so there is no latest year");
   return Math.max(...years);
+}
+
+/**
+ * The title form of a Georgia-or-region page's area: `id` is `georgia` or a `region.*` id, `name` the page's own label in its
+ * language. Georgian takes the stored "of" or "-ში" form; English the name itself.
+ */
+export function areaTitleForm(id: string, name: string, locale: Locale, form: "of" | "in"): string {
+  const place: TitlePlace = { id, level: id === "georgia" ? "country" : "region", nameKa: name, nameEn: name };
+  if (locale === "en") return placeTitleNameEn(place);
+  return form === "of" ? placeOfKa(place) : placeInKa(place);
 }

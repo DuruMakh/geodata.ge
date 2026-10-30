@@ -8,6 +8,7 @@
   "unemployment.page.regions.title": "უმუშევრობა რეგიონების მიხედვით",
   "unemployment.page.regions.summary": "აირჩიეთ რეგიონი რუკაზე ან სიაში და გაეცანით უმუშევრობისა და შრომის ძალის დინამიკას. რუკაზე ნაჩვენებია ბოლო გამოქვეყნებული წლის უმუშევრობის დონე.",
   "unemployment.regionTitle": "უმუშევრობა — {region}",
+  "unemployment.regionSeoTitle": "უმუშევრობა {place} {year}",
   "unemployment.regionHeadingLead": "უმუშევრობა —",
   "unemployment.regionSummary": "{region} — უმუშევრობისა და შრომის ძალის დინამიკა. შეადარეთ დონეები ან ადამიანთა რაოდენობა რეგიონის გამოქვეყნებულ წლებში.",
   "unemployment.regionMapAria": "რეგიონების უმუშევრობის დონის რუკა, {year} წელი",

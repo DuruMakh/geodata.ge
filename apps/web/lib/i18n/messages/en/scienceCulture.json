@@ -13,6 +13,7 @@
   "scienceCulture.page.theatres.summary": "The audience, shows and events of Georgia’s professional theatres each year, the theatres by type, their seats and their staff.",
   "scienceCulture.page.theatres.metaTitle": "Theatres in Georgia",
   "scienceCulture.page.area.regionTitle": "Museums — {region}",
+  "scienceCulture.page.area.seoTitle": "Museums in {place} {year}",
   "scienceCulture.page.area.regionHeadingLead": "Museums —",
   "scienceCulture.page.area.regionSummary": "Museum visitors, group tours, exhibitions and museums in {region}, each year.",
   "scienceCulture.area.georgia": "Georgia",

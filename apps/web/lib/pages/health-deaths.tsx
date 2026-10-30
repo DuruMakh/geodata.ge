@@ -7,6 +7,7 @@ import { getPresentation } from "../i18n/presentation.server";
 import { message } from "../i18n/messages";
 import type { Locale } from "../i18n/types";
 import { fiscalMetadata } from "../seo/metadata";
+import { areaTitleForm, latestYearOf } from "../seo/placeTitleForms";
 import { resolveSiteUrl } from "../siteUrl";
 import { HEALTH_AREA_PAGES, healthAreaLabels, healthSources, renderHealthFrame } from "./health-shared";
 
@@ -22,9 +23,12 @@ function areaForSlug(slug: string) {
 }
 
 export async function healthDeathsAreaPageMetadata(locale: Locale, slug: string) {
-  const area = areaForSlug(slug), presentation = await getPresentation(locale, ["health"], HEALTH_DEATH_AREAS);
+  const area = areaForSlug(slug), [presentation, data] = await Promise.all([getPresentation(locale, ["health"], HEALTH_DEATH_AREAS), loadServedHealthData()]);
   const region = healthAreaLabels(presentation)[area];
-  return fiscalMetadata({ locale, path: healthDeathsAreaHref(area), title: message(presentation.messages, "health.page.area.regionTitle", { region }), description: message(presentation.messages, "health.page.area.regionSummary", { region }) });
+  // The title is worded the way people search it and ends in the area's latest year; the page's own heading and Dataset name keep regionTitle.
+  const ids = new Set<string>(healthDeathsSeries().map(series => series.id));
+  const seoTitle = message(presentation.messages, "health.page.area.seoTitle", { place: areaTitleForm(area, region, locale, "in"), year: latestYearOf(data.facts, f => f.areaId === area && ids.has(f.indicatorId)) });
+  return fiscalMetadata({ locale, path: healthDeathsAreaHref(area), title: seoTitle, description: message(presentation.messages, "health.page.area.regionSummary", { region }) });
 }
 
 /** An area's causes-of-death page: its deaths by cause, 2014–2025. */

@@ -13,7 +13,7 @@ const routes = areaRoutes<Area>(INDEX);
 const frame = regionAreaFrame<Area, { year: number; lastReviewedAt: string }>({
   hub: "housing", indexHref: INDEX, indexKey: "regions",
   areas: AREAS, areaSlug: routes.areaSlug, areaHref: routes.areaHref, mapId: routes.mapId,
-  areaHeadingIds: () => [], load: async () => ({ facts: [] }), sourceIds: [],
+  areaHeadingIds: () => [], load: async () => ({ facts: [] }), latestYear: () => 0, sourceIds: [],
 });
 
 describe("regionAreaFrame", () => {

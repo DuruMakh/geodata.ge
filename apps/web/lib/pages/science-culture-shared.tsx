@@ -20,6 +20,7 @@ import { pageHref } from "../i18n/routes";
 import type { Locale, Messages, Presentation } from "../i18n/types";
 import { loadSourcedWorkbookSources, type SourcedWorkbookPublicSource } from "../methodology/workbookSources";
 import { fiscalMetadata } from "../seo/metadata";
+import { areaTitleForm, latestYearOf } from "../seo/placeTitleForms";
 import { explorerDatasetJsonLd } from "../seo/structuredData";
 import { resolveSiteUrl } from "../siteUrl";
 import { topicSection, ALL_DATA_PATH } from "../navigation/navTree";
@@ -68,9 +69,12 @@ export async function museumsIndexMetadata(locale: Locale) {
 }
 
 export async function museumAreaMetadata(slug: string, locale: Locale) {
-  const area = museumAreaForSlug(slug), presentation = await getPresentation(locale, ["scienceCulture"], AREA_LABEL_IDS);
+  const area = museumAreaForSlug(slug), [presentation, data] = await Promise.all([getPresentation(locale, ["scienceCulture"], AREA_LABEL_IDS), loadServedScienceCultureData()]);
   const name = museumAreaLabels(presentation)[area];
-  return fiscalMetadata({ locale, path: museumAreaHref(area), title: message(presentation.messages, "scienceCulture.page.area.regionTitle", { region: name }), description: message(presentation.messages, "scienceCulture.page.area.regionSummary", { region: name }) });
+  // The title is worded the way people search it and ends in the area's latest year; the page's own heading and Dataset name keep regionTitle.
+  const ids = new Set<string>(museumAreaSeries(area).map(series => series.id));
+  const seoTitle = message(presentation.messages, "scienceCulture.page.area.seoTitle", { place: areaTitleForm(AREA_PAGES[MUSEUM_AREAS.indexOf(area)].id, name, locale, "of"), year: latestYearOf(data.facts, f => ids.has(f.indicatorId)) });
+  return fiscalMetadata({ locale, path: museumAreaHref(area), title: seoTitle, description: message(presentation.messages, "scienceCulture.page.area.regionSummary", { region: name }) });
 }
 
 export type MuseumsBody = { facts: ScienceCultureFact[]; presentation: Presentation; areaLabels: Record<MuseumArea, string>; origin: string; lastReviewedAt: string };

@@ -11,6 +11,7 @@
   "health.page.causes-of-death.metaTitle": "Causes of death in Georgia",
   "health.page.area.regionHeadingLead": "Causes of death —",
   "health.page.area.regionTitle": "Causes of death — {region}",
+  "health.page.area.seoTitle": "Causes of death in {place} {year}",
   "health.page.area.regionSummary": "Registered deaths in {region} each year, by main group of causes.",
   "health.heading.groups": "Disease groups",
   "health.heading.single": "Single diseases",

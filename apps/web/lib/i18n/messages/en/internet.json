@@ -13,6 +13,7 @@
   "internet.page.devices.summary": "Who owns a mobile phone or a smartphone, and who used a computer in the last three months, by group.",
   "internet.page.devices.metaTitle": "Mobile phones, smartphones and computers in Georgia",
   "internet.page.area.regionTitle": "Internet at home — {region}",
+  "internet.page.area.seoTitle": "Home internet in {place} {year}",
   "internet.page.area.regionHeadingLead": "Internet at home —",
   "internet.page.area.regionSummary": "Homes with internet and with a computer in {region}, from Geostat’s yearly household survey.",
   "internet.area.georgia": "Georgia",
