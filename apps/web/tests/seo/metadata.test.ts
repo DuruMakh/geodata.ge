@@ -162,21 +162,12 @@ describe("every page's search snippet and share card", () => {
   });
 });
 
-describe("the single-year analysis title follows the basis of its year (U05-12)", () => {
-  afterAll(() => {
-    vi.doUnmock("../../lib/data/servedData");
-    vi.resetModules();
-  });
-
-  it("calls a year with no actual row a plan, and a year with one actuals", async () => {
-    const served = { facts: [{ year: 2025, basis: "actual" }, { year: 2026, basis: "planned" }] };
-    vi.doMock("../../lib/data/servedData", async (original) => ({ ...(await original<object>()), loadServedExplorerData: async () => served }));
-    vi.resetModules();
+describe("the Year in review title names the year the page opens on", () => {
+  it("is the last year with actual spending, from the data", async () => {
     const { analysisPageMetadata } = await import("../../lib/pages/analysis");
-    expect(String((await analysisPageMetadata("en")).title)).toBe("Georgia budget analysis — 2026 plan | Fiscal.ge");
-    expect(String((await analysisPageMetadata("ka")).description)).toContain("დაგეგმილი");
-    served.facts.push({ year: 2026, basis: "actual" });
-    expect(String((await analysisPageMetadata("en")).title)).toBe("Georgia budget analysis — 2026 actuals | Fiscal.ge");
+    const { loadYearReviewData } = await import("../../lib/yearReview/buildYearReviewData");
+    const { data } = await loadYearReviewData("en");
+    expect(String((await analysisPageMetadata("en")).title)).toBe(`${data.budget.defaultYear} — Year in review | Fiscal.ge`);
   });
 });
 

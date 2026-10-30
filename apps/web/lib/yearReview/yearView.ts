@@ -8,7 +8,7 @@ import { REVENUE_BANDS } from "../landing/chapters/budgetSeries";
 import type { Category, Values, YearReviewData } from "./types";
 
 export type Picked<T> = { year: number; value: T; fallback: boolean }; // fallback: year !== chosen year
-type Grouping = "fields" | "institutions";
+export type Grouping = "fields" | "institutions";
 
 const SOCIAL_BENEFITS_ID = "spending_type.social_benefits";
 const TREEMAP_WIDTH = 1000;
@@ -82,7 +82,7 @@ function budgetIndex(data: YearReviewData, year: number): number {
 
 const groupOf = (data: YearReviewData, grouping: Grouping): Category[] =>
   grouping === "fields" ? data.budget.fields : data.budget.institutions;
-const spendTotals = (data: YearReviewData): Values => sumOf(data.budget.fields.map((field) => field.values), data.budget.years.length);
+export const spendTotals = (data: YearReviewData): Values => sumOf(data.budget.fields.map((field) => field.values), data.budget.years.length);
 export const taxTotals = (data: YearReviewData): Values =>
   sumOf(data.budget.receipts.filter((receipt) => receipt.tax).map((receipt) => receipt.values), data.budget.years.length);
 

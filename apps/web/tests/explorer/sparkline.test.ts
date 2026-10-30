@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { annualSeries, buildSparklinePath } from "../../lib/explorer/sparkline";
+import { annualSeries, buildSparklinePath, sparklinePoint } from "../../lib/explorer/sparkline";
 
 describe("buildSparklinePath", () => {
   it("draws a single segment across a complete series", () => {
@@ -31,6 +31,14 @@ describe("buildSparklinePath", () => {
 
   it("ignores non-finite values", () => {
     expect(buildSparklinePath([1, Number.NaN, 3, 4], 64, 16)).toHaveLength(1);
+  });
+});
+
+describe("sparklinePoint", () => {
+  it("is the point the path draws for that index, and null where the value or the line is missing", () => {
+    expect(sparklinePoint([0, 1, 2], 1, 64, 16)).toEqual({ x: "32.0", y: "8.0" });
+    expect(sparklinePoint([0, null, 2, 3], 1, 64, 16)).toBeNull();
+    expect(sparklinePoint([7], 0, 64, 16)).toBeNull();
   });
 });
 

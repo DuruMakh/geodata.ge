@@ -1,4 +1,4 @@
-import { buildSparklinePath } from "../../lib/explorer/sparkline";
+import { buildSparklinePath, sparklinePoint } from "../../lib/explorer/sparkline";
 
 // 64×16 trend mark under a side KPI (DESIGN.md §7.11). Decorative: the KPI value
 // and detail line already carry the meaning, so it is hidden from assistive tech.
@@ -16,6 +16,8 @@ type SparklineProps = {
   endDot?: boolean;
   /** With `endDot`: the last point is a plan, so the dot is hollow, as the explorer chart draws a planned point. */
   hollowEnd?: boolean;
+  /** With `endDot`: the dot marks this point (the year review's chosen year) instead of the last drawn one. */
+  dotIndex?: number;
 };
 
 // The dot is a zero-length stroke with round caps, not a circle: a stretched chart (preserveAspectRatio "none")
@@ -35,10 +37,10 @@ function areaPath(segment: string, height: number): string {
   return `${segment} L${last.x} ${height} L${first[0]} ${height} Z`;
 }
 
-export function Sparkline({ values, color, width = 64, height = 16, fluidOnMobile = false, area = false, endDot = false, hollowEnd = false }: SparklineProps) {
+export function Sparkline({ values, color, width = 64, height = 16, fluidOnMobile = false, area = false, endDot = false, hollowEnd = false, dotIndex }: SparklineProps) {
   const segments = buildSparklinePath(values, width, height);
   if (segments.length === 0) return null;
-  const end = endPoint(segments.at(-1)!);
+  const end = dotIndex === undefined ? endPoint(segments.at(-1)!) : sparklinePoint(values, dotIndex, width, height);
 
   return (
     <svg
@@ -67,7 +69,7 @@ export function Sparkline({ values, color, width = 64, height = 16, fluidOnMobil
           vectorEffect={fluidOnMobile ? "non-scaling-stroke" : undefined}
         />
       ))}
-      {endDot
+      {endDot && end
         ? [
             { stroke: "var(--tile)", size: END_RING },
             { stroke: "var(--accent)", size: END_DOT },

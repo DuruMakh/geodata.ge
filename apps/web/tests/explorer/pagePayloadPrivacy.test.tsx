@@ -36,7 +36,6 @@ import { findTradeProducts } from "../../lib/explorer/tradeProductsCatalogue";
 import { DEFAULT_TRADE_PRODUCTS_STATE } from "../../lib/explorer/tradeProductsState";
 import { I18nProvider } from "../../lib/i18n/provider";
 import type { Locale, Presentation } from "../../lib/i18n/types";
-import { renderAnalysisPage } from "../../lib/pages/analysis";
 import { renderDebtPage } from "../../lib/pages/debt";
 import { renderDemographyAgeSexPage } from "../../lib/pages/demography-age-sex";
 import { renderPopulationPlacePage } from "../../lib/pages/demography-population-place";
@@ -84,7 +83,6 @@ type PageRender = [string, (locale: Locale) => Promise<ReactNode>];
 const budgetPages: PageRender[] = [
   ["expenditure", renderExpenditurePage],
   ["revenue", renderRevenuePage],
-  ["analysis", renderAnalysisPage],
 ];
 
 const municipalPages: PageRender[] = [

@@ -1,10 +1,10 @@
 import { isValidElement, type ReactNode } from "react";
 import { describe, expect, test, vi } from "vitest";
-import { AnalysisExplorer } from "../../components/analysis/analysis-explorer";
 import { MainExplorer } from "../../components/main-explorer/main-explorer";
 import { GroupPage } from "../../components/explorer-groups/group-page";
 import { MethodologyArticle } from "../../components/methodology/methodology-article";
 import { MunicipalExplorer } from "../../components/municipalities/municipal-explorer";
+import { YearReviewPage } from "../../components/year-review/year-review-page";
 import { getMessages } from "../../lib/i18n/messages.server";
 import { clientPresentation, getPresentation, LAYOUT_SCOPES } from "../../lib/i18n/presentation.server";
 import { I18nProvider } from "../../lib/i18n/provider";
@@ -65,7 +65,7 @@ const layoutKey = (key: string) => LAYOUT_SCOPES.some((scope) => key.startsWith(
 
 // Server components that render a page's provider inside them are called, so their providers are read too.
 const SERVER_COMPONENTS = new Set<unknown>([GroupPage, MethodologyArticle]);
-const EXPLORERS = new Set<unknown>([MainExplorer, AnalysisExplorer, MunicipalExplorer]);
+const EXPLORERS = new Set<unknown>([MainExplorer, YearReviewPage, MunicipalExplorer]);
 
 /** The messages every I18nProvider and client explorer in a page's tree receives. */
 function shippedMessages(node: ReactNode): Messages[] {
