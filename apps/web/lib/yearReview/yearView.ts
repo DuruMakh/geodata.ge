@@ -11,8 +11,8 @@ export type Picked<T> = { year: number; value: T; fallback: boolean }; // fallba
 export type Grouping = "fields" | "institutions";
 
 const SOCIAL_BENEFITS_ID = "spending_type.social_benefits";
-const TREEMAP_WIDTH = 1000;
-const TREEMAP_HEIGHT = 430;
+export const TREEMAP_WIDTH = 1000; // buysView's layout box, in the units of its rects
+export const TREEMAP_HEIGHT = 430;
 
 const valueAt = (years: readonly number[], values: Values, year: number): number | null => values[years.indexOf(year)] ?? null;
 

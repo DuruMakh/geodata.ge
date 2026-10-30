@@ -18,6 +18,8 @@ type SparklineProps = {
   hollowEnd?: boolean;
   /** With `endDot`: the dot marks this point (the year review's chosen year) instead of the last drawn one. */
   dotIndex?: number;
+  /** With `endDot`: the dot's colour (the year review's ranking draws it in the category's); accent by default. */
+  dotColor?: string;
 };
 
 // The dot is a zero-length stroke with round caps, not a circle: a stretched chart (preserveAspectRatio "none")
@@ -37,7 +39,7 @@ function areaPath(segment: string, height: number): string {
   return `${segment} L${last.x} ${height} L${first[0]} ${height} Z`;
 }
 
-export function Sparkline({ values, color, width = 64, height = 16, fluidOnMobile = false, area = false, endDot = false, hollowEnd = false, dotIndex }: SparklineProps) {
+export function Sparkline({ values, color, width = 64, height = 16, fluidOnMobile = false, area = false, endDot = false, hollowEnd = false, dotIndex, dotColor = "var(--accent)" }: SparklineProps) {
   const segments = buildSparklinePath(values, width, height);
   if (segments.length === 0) return null;
   const end = dotIndex === undefined ? endPoint(segments.at(-1)!) : sparklinePoint(values, dotIndex, width, height);
@@ -72,7 +74,7 @@ export function Sparkline({ values, color, width = 64, height = 16, fluidOnMobil
       {endDot && end
         ? [
             { stroke: "var(--tile)", size: END_RING },
-            { stroke: "var(--accent)", size: END_DOT },
+            { stroke: dotColor, size: END_DOT },
             ...(hollowEnd ? [{ stroke: "var(--tile)", size: END_HOLE }] : []),
           ].map(({ stroke, size }) => (
             <path key={size} data-testid={size === END_HOLE ? "sparkline-hollow-end" : undefined} d={`M${end.x} ${end.y} L${end.x} ${end.y}`} fill="none" stroke={stroke} strokeWidth={size} strokeLinecap="round" vectorEffect="non-scaling-stroke" />

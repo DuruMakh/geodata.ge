@@ -15,6 +15,7 @@ import { DebtDeficit } from "./debt-deficit";
 import { GivesUp } from "./gives-up";
 import { Glance } from "./glance";
 import { Section, type YearReviewSectionProps } from "./section";
+import { WhereMoneyGoes } from "./where-money-goes";
 import { YearRuler } from "./year-ruler";
 
 type YearReviewPageProps = { data: YearReviewData; presentation: Presentation };
@@ -71,6 +72,7 @@ function YearReviewContent({ data }: { data: YearReviewData }) {
     side,
     measure,
     focus: hover ?? pin,
+    pin,
     onFocus: setHover,
     onPin: (id) => setPin((current) => (current === id ? null : id)),
     onGrouping: setGrouping,
@@ -119,9 +121,9 @@ function YearReviewContent({ data }: { data: YearReviewData }) {
 
       <Glance {...sectionProps} />
       <GivesUp {...sectionProps} />
-      {/* Sections 03, 05 and 06: number and heading until Tasks 8–9 fill them. */}
-      <Section number="03" id="year-review-where" heading={text("yearReview.h04")} />
+      <WhereMoneyGoes {...sectionProps} />
       <DebtDeficit {...sectionProps} />
+      {/* Sections 05 and 06: number and heading until Task 9 fills them. */}
       <Section number="05" id="year-review-country" heading={text("yearReview.h06")} />
       <Section number="06" id="year-review-long" heading={text("yearReview.s3Title", { from: years[0]!, to: years.at(-1)! })} />
     </div>

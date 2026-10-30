@@ -68,6 +68,6 @@ export function fixture(): YearReviewData {
       ],
     },
     updatedAt: "2026-10-30",
-    sources: { taxBreaks: "source tax breaks", balance: "source balance", debt: "source debt" },
+    sources: { taxBreaks: "source tax breaks", balance: "source balance", debt: "source debt", spendingTypes: "source spending types" },
   };
 }

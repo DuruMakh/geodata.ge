@@ -31,5 +31,5 @@ export type YearReviewData = {
   updatedAt: string;            // citedReviewedAt over budget + admin facts, as today's page
   sources: YearReviewSources;   // the source pages' own source lines, for the share pictures
 };
-/** Each source page's source line in the page language: Tax breaks and refunds, Deficit (with its WEO edition), Debt. */
-export type YearReviewSources = { taxBreaks: string; balance: string; debt: string };
+/** Each source page's source line in the page language: Tax breaks and refunds, Deficit (with its WEO edition), Debt, Spending by type. */
+export type YearReviewSources = { taxBreaks: string; balance: string; debt: string; spendingTypes: string };

@@ -10,15 +10,13 @@ import { ChartShareButton } from "../explorer-shell/chart-share-button";
 import { StackedColumnChart } from "../main-explorer/stacked-column-chart";
 import { withLari } from "../ui/lari";
 import { RateLines } from "./rate-lines";
-import { ChartFoot, ChartKey, FIG_KEY, FOOT_NOTE, Section, UNIT_LINE, type YearReviewSectionProps } from "./section";
+import { ChartFoot, ChartKey, FIG_KEY, FOOT_NOTE, H3, H3_META, Section, UNIT_LINE, type YearReviewSectionProps } from "./section";
 import { PlanTag, YearTag } from "./year-tag";
 
 // Section 04, "Deficit and debt" (spec §4): the balance every year with its projection hatched, the debt at the end
 // of the chosen year (big number, external / domestic split, three figures, average rates) beside the debt by year,
 // then repayments by year with the schedule of existing debt hatched. Each in its dataset's nearest year.
 
-const H3 = "flex flex-wrap items-baseline gap-x-3 gap-y-1 font-[family-name:var(--font-display)] text-[18.5px] font-semibold leading-[1.3] tracking-[-0.005em] [text-wrap:balance] min-[768px]:text-[21px]";
-const H3_META = "font-[family-name:var(--font-numeric)] text-[11.5px] font-normal tracking-normal text-[var(--muted)]";
 const billions = (values: (number | null)[]) => values.map((value) => (value === null ? null : value / 1e9));
 const firstProjection = (years: number[], projection: boolean[]) => years.find((_, index) => projection[index]);
 /** The column chart's projection props: both or neither. */
