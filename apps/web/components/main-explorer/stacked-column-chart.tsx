@@ -61,6 +61,8 @@ type StackedColumnChartBaseProps = {
   breaks?: ReadonlyArray<{ period: number; label: string }>;
   /** The chosen period: its axis label is always drawn, in ink at weight 600 over a short ink rule; labels that would touch it are dropped. */
   highlightPeriod?: number;
+  /** Draws at the frame's measured width on every screen, as on a phone, for a chart in a column narrower than the 920-unit desktop drawing. */
+  fitWidth?: boolean;
 };
 /** Columns from `projectionFrom` on are hatched, and the readout header says so with `projectionLabel`. */
 export type StackedColumnChartProps = StackedColumnChartBaseProps &
@@ -177,6 +179,7 @@ export function StackedColumnChart({
   legend,
   breaks,
   highlightPeriod,
+  fitWidth = false,
   projectionFrom,
   projectionLabel,
 }: StackedColumnChartProps) {
@@ -186,7 +189,7 @@ export function StackedColumnChart({
   const highlightIndex = highlightPeriod === undefined ? -1 : periods.indexOf(highlightPeriod);
   // One hatch per segment colour, so two segments sharing a colour share a pattern.
   const hatchColors = projectionFrom === undefined ? [] : [...new Set(segments.map((segment) => segment.color))];
-  const { ref: layoutRef, mobileWidth } = useChartLayout<HTMLElement>();
+  const { ref: layoutRef, mobileWidth } = useChartLayout<HTMLElement>(fitWidth);
   const count = periods.length;
 
   // The domain covers the tallest positive stack and the deepest negative one, so

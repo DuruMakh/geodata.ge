@@ -21,6 +21,11 @@ export type YearReviewSectionProps = {
   onMeasure: (measure: "share" | "gel") => void;
 };
 
+// The board's small type around a chart: a figure's key line, the unit above a chart, and the note under it.
+export const FIG_KEY = "font-[family-name:var(--font-numeric)] text-[11.5px] leading-[1.45] text-[var(--muted)]";
+export const UNIT_LINE = "font-[family-name:var(--font-numeric)] text-[10.5px] leading-none text-[var(--faint)]";
+export const FOOT_NOTE = "font-[family-name:var(--font-numeric)] text-[11px] leading-normal text-[var(--faint)]";
+
 /**
  * One numbered section of the page: a 1px ink rule, the number in accent, the H2, and on the right a short mono line
  * and the section's own switches (after the line, when there is one). Below 768px they wrap under the heading.

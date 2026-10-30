@@ -18,7 +18,8 @@ import { resolveSiteUrl } from "../siteUrl";
 import { projectBalanceFact } from "../explorer/clientData";
 import { ALL_DATA_PATH, navGroup } from "../navigation/navTree";
 
-function editionLabel(messages: Parameters<typeof message>[0], publicationDate: string): string {
+/** The WEO edition the Deficit page cites, e.g. `2026 წლის აპრილი`; the Year in review's share pictures cite it too. */
+export function editionLabel(messages: Parameters<typeof message>[0], publicationDate: string): string {
   const [year, month] = publicationDate.split("-");
   return message(messages, "deficit.weoEdition", {
     year: year!,

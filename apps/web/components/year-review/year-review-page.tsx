@@ -11,6 +11,8 @@ import type { YearReviewData } from "../../lib/yearReview/types";
 import { spendTotals, type Grouping } from "../../lib/yearReview/yearView";
 import { useAppReady } from "../explorer-shell/use-app-ready";
 import { useReplaceHash } from "../explorer-shell/use-replace-hash";
+import { DebtDeficit } from "./debt-deficit";
+import { GivesUp } from "./gives-up";
 import { Glance } from "./glance";
 import { Section, type YearReviewSectionProps } from "./section";
 import { YearRuler } from "./year-ruler";
@@ -116,10 +118,10 @@ function YearReviewContent({ data }: { data: YearReviewData }) {
       </p>
 
       <Glance {...sectionProps} />
-      {/* Sections 02–06: number and heading until Tasks 7–9 fill them. */}
-      <Section number="02" id="year-review-gives-up" heading={text("yearReview.h03")} />
+      <GivesUp {...sectionProps} />
+      {/* Sections 03, 05 and 06: number and heading until Tasks 8–9 fill them. */}
       <Section number="03" id="year-review-where" heading={text("yearReview.h04")} />
-      <Section number="04" id="year-review-debt" heading={text("yearReview.h05")} />
+      <DebtDeficit {...sectionProps} />
       <Section number="05" id="year-review-country" heading={text("yearReview.h06")} />
       <Section number="06" id="year-review-long" heading={text("yearReview.s3Title", { from: years[0]!, to: years.at(-1)! })} />
     </div>

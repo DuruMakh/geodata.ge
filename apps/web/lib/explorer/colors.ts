@@ -248,6 +248,10 @@ export const MAP_NO_DATA_STROKE = "#C4B69C";
 // first, step from ink to sand (the last step repeats past six); the rest is one pale band.
 export const SPLIT_SHADES = [INK, "#4F483C", "#7A6F5D", "#A39782", "#BCB09B", "#CDC2AE"];
 export const SPLIT_REST = "#E3D9C7";
+// Year in review, debt (the AN-App board): external debt and repaid principal in the ink line (globals.css
+// `--ink-line`), domestic debt in bronze; 11.0:1 and 3.7:1 on paper, above the 3:1 graphical floor.
+export const INK_LINE = "#3A342B";
+export const DEBT_DOMESTIC = "#9A7650";
 
 // Major programs take their ministry's hue and step through lightness and
 // saturation inside it, so a line's parentage is legible from its colour.

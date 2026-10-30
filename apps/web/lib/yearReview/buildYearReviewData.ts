@@ -21,11 +21,15 @@ import { colorForItem, SERIES_COLORS } from "../explorer/colors";
 import { isDerivedTotalItemId } from "../explorer/explorerData";
 import { buildMunicipalListRows, MUNICIPAL_PER_RESIDENT_YEAR } from "../explorer/municipalData";
 import { publicLabel } from "../i18n/labels";
+import { message } from "../i18n/messages";
+import { getMessages } from "../i18n/messages.server";
 import { getPresentation } from "../i18n/presentation.server";
 import type { Locale, Presentation } from "../i18n/types";
 import { OTHER_UNCLASSIFIED_ID, REVENUE_BANDS, TAX_BAND_IDS } from "../landing/chapters/budgetSeries";
+import { loadImfWeoManifest } from "../methodology/workbookSources";
+import { editionLabel } from "../pages/deficit";
 import type { ServedGeneralGovernmentBalanceFact, ServedGovernmentDebtFact } from "../servedRows";
-import type { Category, Values, YearReviewData } from "./types";
+import type { Category, Values, YearReviewData, YearReviewSources } from "./types";
 
 /** The seven served loads, by name: everything the page reads. */
 export type YearReviewInput = {
@@ -228,7 +232,7 @@ function buildMunicipal(input: YearReviewInput, presentation: Presentation): Yea
 }
 
 /** Pure: the page's data object from the served loads, named in `presentation.locale`. */
-export function buildYearReviewData(input: YearReviewInput, presentation: Presentation): YearReviewData {
+export function buildYearReviewData(input: YearReviewInput, presentation: Presentation, sources: YearReviewSources): YearReviewData {
   const { facts, adminFacts, sourceDocuments } = input.explorer;
   return {
     budget: buildBudget(input, presentation),
@@ -239,6 +243,17 @@ export function buildYearReviewData(input: YearReviewInput, presentation: Presen
     municipal: buildMunicipal(input, presentation),
     // Dated from the budget and ministry facts, as the page was before (lib/pages/analysis.tsx) and the sitemap dates it.
     updatedAt: citedReviewedAt(sourceDocuments, [...facts, ...adminFacts]),
+    sources,
+  };
+}
+
+/** The source lines of the Tax breaks and refunds, Deficit and Debt pages, worded as those pages word them. */
+async function loadSources(locale: Locale): Promise<YearReviewSources> {
+  const [messages, manifest] = await Promise.all([getMessages(locale, ["taxBreaksRefunds", "deficit", "debt"]), loadImfWeoManifest()]);
+  return {
+    taxBreaks: message(messages, "taxBreaksRefunds.sourceNote"),
+    balance: message(messages, "deficit.source", { edition: editionLabel(messages, manifest.publicationDate) }),
+    debt: message(messages, "debt.source"),
   };
 }
 
@@ -254,7 +269,7 @@ export function yearReviewLabelIds(input: YearReviewInput): string[] {
 }
 
 export async function loadYearReviewData(locale: Locale): Promise<{ data: YearReviewData; presentation: Presentation }> {
-  const [explorer, expenditureTypes, taxBreaksRefunds, balance, debt, municipal, demography] = await Promise.all([
+  const [explorer, expenditureTypes, taxBreaksRefunds, balance, debt, municipal, demography, sources] = await Promise.all([
     loadServedExplorerData(),
     loadServedExpenditureTypesData(),
     loadServedTaxBreaksRefundsData(),
@@ -262,10 +277,11 @@ export async function loadYearReviewData(locale: Locale): Promise<{ data: YearRe
     loadServedGovernmentDebtData(),
     loadServedMunicipalData(),
     loadServedDemographyData(),
+    loadSources(locale),
   ]);
   const input: YearReviewInput = { explorer, expenditureTypes, taxBreaksRefunds, balance, debt, municipal, demography };
   // The English names ride along on the Georgian page too, as on the page this replaces (lib/pages/analysis.tsx).
   const ids = yearReviewLabelIds(input);
   const presentation = await getPresentation(locale, ["yearReview", "format", "main"], ids, ids);
-  return { data: buildYearReviewData(input, presentation), presentation };
+  return { data: buildYearReviewData(input, presentation, sources), presentation };
 }
