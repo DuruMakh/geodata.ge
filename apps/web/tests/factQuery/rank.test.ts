@@ -3,7 +3,9 @@ import { beforeAll, describe, expect, it } from "vitest";
 import { testSnapshot } from "../helpers/factQuerySnapshot";
 import { rank } from "../../lib/factQuery/rank";
 import { compare, type Comparison } from "../../lib/factQuery/compare";
-import { envelopeSchema } from "../../lib/factQuery/schemas";
+import { queryInflationProducts } from "../../lib/factQuery/queryInflationProducts";
+import { queryMunicipal } from "../../lib/factQuery/queryMunicipal";
+import { INPUT_LIMITS, envelopeSchema } from "../../lib/factQuery/schemas";
 import { AGGREGATE_ONLY_MUNICIPAL_CODES, type FactQuerySnapshot } from "../../lib/factQuery/types";
 import type { RankData } from "../../lib/factQuery/rank";
 
@@ -801,5 +803,125 @@ describe("country-level datasets", () => {
       expect(response.error.messageEn).toContain("single entity");
       expect(response.error.messageEn).toContain("query_debt");
     }
+  });
+});
+
+// D1 (owner-approved): a top-N ranking attaches full source records only for the
+// rows it shows, plus any document every candidate cites. Every other document
+// that fixed the order is named by id in `inputDocumentIds`, so the union of the
+// two is exactly the set a ranking has always cited and nothing is dropped.
+describe("ranking provenance: full records for shown rows, ids for the other inputs", () => {
+  const MUNICIPAL = { datasetId: "municipal-expenditure", dimension: "entities", entityType: "municipality", seriesId: "municipal.total" } as const;
+  const municipalCodes = () => snapshot.municipal.municipalities.map((row) => row.code).filter((code) => !AGGREGATE_ONLY_MUNICIPAL_CODES.includes(code as never)).sort();
+
+  const rankingOf = (result: ReturnType<typeof rank>) => {
+    if (result.kind !== "ranking") throw new Error(`expected a ranking, got ${result.kind}`);
+    return result;
+  };
+  const fullIds = (result: ReturnType<typeof rank>) => rankingOf(result).meta.sources.flatMap((source) => source.documents.map((document) => document.documentId));
+  const inputIds = (result: ReturnType<typeof rank>) =>
+    rankingOf(result).meta.sources.flatMap((source) => (source as { inputDocumentIds?: string[] }).inputDocumentIds ?? []);
+  const citedSet = (result: ReturnType<typeof rank>) => [...new Set([...fullIds(result), ...inputIds(result)])].sort();
+  const codes = (caveats: readonly { code: string }[]) => caveats.map((caveat) => caveat.code).sort();
+
+  it("municipal value ranking: the union equals the set the unfiltered sub-query cites, and shown rows are in full", () => {
+    const result = rank(snapshot, { ...MUNICIPAL, measure: "gel_per_resident", metric: "value", year: 2025, limit: 5 });
+    const all = queryMunicipal(snapshot, { entityIds: municipalCodes(), seriesIds: ["municipal.total"], years: [2025], measure: "gel_per_resident" });
+    if (all.kind === "error") throw new Error(all.error.messageEn);
+
+    const base = [...new Set(all.meta.sources.flatMap((source) => source.documents.map((document) => document.documentId)))].sort();
+    expect(base.length).toBeGreaterThan(60);
+    expect(citedSet(result)).toEqual(base);
+    // Never in both lists.
+    expect(fullIds(result).filter((id) => inputIds(result).includes(id))).toEqual([]);
+    expect(inputIds(result).length).toBeGreaterThan(40);
+    expect(fullIds(result).length).toBeLessThan(base.length / 2);
+
+    const shown = queryMunicipal(snapshot, { entityIds: data(result).entries.map((entry) => entry.entityId), seriesIds: ["municipal.total"], years: [2025], measure: "gel_per_resident" });
+    if (shown.kind === "error") throw new Error(shown.error.messageEn);
+    const shownDocs = (shown.data as { observations: { documentIds: string[] }[] }).observations.flatMap((observation) => observation.documentIds);
+    expect(shownDocs.length).toBeGreaterThan(0);
+    for (const id of shownDocs) expect(fullIds(result), id).toContain(id);
+
+    expect(codes(result.meta.caveats)).toEqual(codes(all.meta.caveats));
+  });
+
+  it("municipal change ranking: the union equals the set the unfiltered comparison cites, and both endpoints of shown rows are in full", () => {
+    const input = { fromYear: 2024, toYear: 2025, measure: "amount_gel" } as const;
+    const result = rank(snapshot, { ...MUNICIPAL, ...input, metric: "absolute_change", limit: 5 });
+    const all = compare(snapshot, { target: { dataset: "municipal", entityIds: municipalCodes(), seriesIds: ["municipal.total"] }, ...input });
+    if (all.kind === "error") throw new Error(all.error.messageEn);
+
+    const base = [...new Set(all.meta.sources.flatMap((source) => source.documents.map((document) => document.documentId)))].sort();
+    expect(citedSet(result)).toEqual(base);
+    expect(inputIds(result).length).toBeGreaterThan(40);
+
+    const returned = new Set(data(result).entries.map((entry) => entry.entityId));
+    const shownDocs = (all.data as { comparisons: Comparison[] }).comparisons
+      .filter((comparison) => returned.has(comparison.entityId))
+      .flatMap((comparison) => [...comparison.from.documentIds, ...comparison.to.documentIds]);
+    expect(shownDocs.length).toBeGreaterThan(0);
+    for (const id of shownDocs) expect(fullIds(result), id).toContain(id);
+
+    expect(codes(result.meta.caveats)).toEqual(codes(all.meta.caveats));
+    // Messages and severity are the same words; every affected item is either still listed or counted.
+    for (const caveat of result.meta.caveats as { code: string; severity: string; messageKa: string; messageEn: string; affects: string[]; affectsOtherCount?: number }[]) {
+      const before = all.meta.caveats.find((candidate) => candidate.code === caveat.code)!;
+      expect({ severity: caveat.severity, messageKa: caveat.messageKa, messageEn: caveat.messageEn }).toEqual({ severity: before.severity, messageKa: before.messageKa, messageEn: before.messageEn });
+      expect(caveat.affects.length + (caveat.affectsOtherCount ?? 0), caveat.code).toBe(before.affects.length);
+      for (const item of caveat.affects) expect(before.affects, item).toContain(item);
+    }
+  });
+
+  /** What a product ranking has always cited: every ranked product's observations and caveats, un-narrowed. */
+  const productBase = () => {
+    const ids = snapshot.inflationProducts.catalogue.map((product) => product.productId).sort();
+    const documentIds = new Set<string>();
+    const affects = new Map<string, Set<string>>();
+    for (let offset = 0; offset < ids.length; offset += INPUT_LIMITS.series) {
+      const batch = queryInflationProducts(snapshot, { seriesIds: ids.slice(offset, offset + INPUT_LIMITS.series), measure: "cumulative_pct", fromPeriod: "2026-09", toPeriod: "2026-09", startYear: 2020 });
+      if (batch.kind === "error") throw new Error(batch.error.messageEn);
+      for (const observation of (batch.data as { observations: { documentIds: string[] }[] }).observations) for (const id of observation.documentIds) documentIds.add(id);
+      for (const caveat of batch.meta.caveats) {
+        const seen = affects.get(caveat.code) ?? new Set<string>();
+        for (const item of caveat.affects) seen.add(item);
+        affects.set(caveat.code, seen);
+      }
+    }
+    return { documentIds: [...documentIds].sort(), affects };
+  };
+  const productRanking = () => rank(snapshot, { datasetId: "inflation-products", dimension: "series", measure: "cumulative_pct", metric: "value", period: "2026-09", startYear: 2020, limit: 5 });
+
+  it("product ranking: the document set is unchanged and every caveat code survives", () => {
+    const base = productBase();
+    const result = productRanking();
+
+    expect(citedSet(result)).toEqual(base.documentIds);
+    expect(fullIds(result).length).toBeGreaterThan(0);
+    expect(codes(result.meta.caveats)).toEqual([...base.affects.keys()].sort());
+    expect(base.affects.get("inflation_product_cumulative_derived")!.size).toBeGreaterThan(100);
+  });
+
+  it("a caveat that applies to the whole candidate set lists only the returned entries and counts the rest", () => {
+    const base = productBase();
+    const result = productRanking();
+    const returned = data(result).entries.map((entry) => entry.seriesId);
+
+    for (const caveat of result.meta.caveats as { code: string; affects: string[]; affectsOtherCount?: number }[]) {
+      const before = base.affects.get(caveat.code)!;
+      // Only returned entries stay listed; every other item is counted, none vanishes.
+      for (const item of caveat.affects) expect(returned.some((seriesId) => item.startsWith(seriesId)), item).toBe(true);
+      expect(caveat.affects.length + (caveat.affectsOtherCount ?? 0), caveat.code).toBe(before.size);
+    }
+    const derived = result.meta.caveats.find((caveat) => caveat.code === "inflation_product_cumulative_derived") as { affects: string[]; affectsOtherCount?: number; messageEn: string };
+    expect(derived.affects.slice().sort()).toEqual(returned.map((seriesId) => `${seriesId}:2026-09`).sort());
+    expect(derived.affectsOtherCount).toBe(base.affects.get("inflation_product_cumulative_derived")!.size - 5);
+    // The words are untouched; only the list narrows.
+    expect(derived.messageEn.length).toBeGreaterThan(20);
+  });
+
+  it("leaves a caveat alone when everything it names is already a returned entry", () => {
+    const result = rank(snapshot, { ...MUNICIPAL, measure: "amount_gel", metric: "value", year: 2025, limit: 100 });
+    for (const caveat of result.meta.caveats as { affectsOtherCount?: number }[]) expect(caveat).not.toHaveProperty("affectsOtherCount");
   });
 });

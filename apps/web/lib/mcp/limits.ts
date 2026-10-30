@@ -43,6 +43,11 @@ export type CounterWindow = "rolling" | "fixed";
 
 export type Counter = {
   hit(key: string, windowSeconds: number, max: number, window?: CounterWindow): Promise<CounterVerdict>;
+  /**
+   * Adds one to an anonymous per-day tally field, after the response. Never
+   * decides admission, never throws, and gives up after 1.5 s.
+   */
+  record(day: string, field: string): Promise<void>;
 };
 
 /**
@@ -70,12 +75,14 @@ export function memoryCounter(): Counter {
       existing.count += 1;
       return Promise.resolve("allow");
     },
+    // Development and tests keep no tally.
+    record: () => Promise.resolve(),
   };
 }
 
 /** Fails closed. Serving unlimited public traffic is not a safe default. */
 function unavailableCounter(): Counter {
-  return { hit: () => Promise.resolve("unavailable") };
+  return { hit: () => Promise.resolve("unavailable"), record: () => Promise.resolve() };
 }
 
 /**

@@ -13,6 +13,8 @@ import type { EnglishCatalogue } from "../i18n/types";
 import { SERVICE_MESSAGE_KEYS } from "./localization";
 import { loadServedExplorerData, loadServedMunicipalData } from "../data/servedData";
 import { loadTaxonomyFiles } from "../data/taxonomy";
+import { buildSearchPages } from "../explorer/allDataIndex";
+import { allDataMessages } from "../explorer/allDataMessages";
 import { MUNICIPALITY_ROUTES } from "../explorer/municipalityRoutes";
 import { absoluteWorkbookSourceUrl } from "../explorer/workbookModel";
 import { PROGRAM_SUCCESSIONS, findProgramSuccession } from "../data/adminSpending/programSuccessions";
@@ -38,10 +40,12 @@ import { NATIONAL_SERIES, RESIDUAL_SERIES, RESIDUAL_SERIES_ID, TARGET_SERIES, TA
 import { loadServedGeneralGovernmentBalanceData } from "../data/generalGovernmentBalance/importGeneralGovernmentBalance";
 import { loadServedGovernmentDebtData } from "../data/governmentDebt/importGovernmentDebtFacts";
 import { DEMOGRAPHY_RAW_ROOT, latestDemographyVintage } from "../data/demography/sourceFiles";
+import { pageHref } from "../i18n/routes";
 import { loadReviewedSourceManifest } from "../methodology/sourceManifest";
 import { hashDataVersion } from "./canonical";
+import { MCP_SERVED_PAGES } from "./servedPages";
 import { resolvePublicSources, type ManifestDocument } from "./sources";
-import { AGGREGATE_ONLY_MUNICIPAL_CODES, DEBT_SERIES_LABELS_KA, DEFICIT_SERIES_ID, SCHEMA_VERSION, type BudgetItemMeta, type FactQuerySnapshot, type RawResolvedSource, type ResolvedSource, type ServiceLocalization } from "./types";
+import { AGGREGATE_ONLY_MUNICIPAL_CODES, DEBT_SERIES_LABELS_KA, DEFICIT_SERIES_ID, SCHEMA_VERSION, type BudgetItemMeta, type FactQuerySnapshot, type RawResolvedSource, type ResolvedSource, type ServiceLocalization, type WebsitePage } from "./types";
 import { EXPENDITURE_TYPES_SOURCE_ID } from "../data/expenditureTypes/types";
 
 export type BuildSnapshotOptions = { releaseCommit: string; generatedAt: string };
@@ -547,6 +551,17 @@ export function enrichSourceTranslations(sources: readonly RawResolvedSource[], 
   });
 }
 
+/**
+ * Every navigation page this service does not serve, as the website's own search sees it (`buildSearchPages` with no hub data,
+ * so no value, period, caption or trend) and with its Georgian and English address, for the catalogue search to point to.
+ */
+async function buildWebsitePages(): Promise<WebsitePage[]> {
+  const [ka, en] = await Promise.all([allDataMessages("ka"), allDataMessages("en")]);
+  return buildSearchPages([], ka, en)
+    .filter((page) => !Object.hasOwn(MCP_SERVED_PAGES, page.href))
+    .map((page) => ({ ...page, urlKa: `${PUBLIC_SITE_ORIGIN}${pageHref(page.href, "ka")}`, urlEn: `${PUBLIC_SITE_ORIGIN}${pageHref(page.href, "en")}` }));
+}
+
 export async function buildFactQuerySnapshot(options: BuildSnapshotOptions): Promise<FactQuerySnapshot> {
   const repositoryRoot = path.resolve(process.cwd(), "../..");
   const [explorer, municipal, taxonomy, manifestDocuments, debt, deficit, catalogue, serviceKa, serviceEn, gdpOverview, economicSectors, regionalEconomies, products, productHistory] = await Promise.all([
@@ -778,6 +793,7 @@ export async function buildFactQuerySnapshot(options: BuildSnapshotOptions): Pro
       historyNotes: sortedBy(productHistory, row => row.productId, row => row.boundaryYear),
     },
     gdpFacts: sortedBy(explorer.gdpFacts, (f) => f.year),
+    website: { pages: await buildWebsitePages() },
     sources,
   };
 

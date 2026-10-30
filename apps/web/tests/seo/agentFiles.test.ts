@@ -6,6 +6,7 @@ import { describe, expect, it } from "vitest";
 import { TOOLS } from "../../lib/mcp/tools";
 import { loadPackagedSnapshot } from "../../lib/mcp/snapshot";
 import { catalogueData } from "../../lib/factQuery/publications";
+import { SCHEMA_VERSION } from "../../lib/factQuery/types";
 import { schoolYearLabel } from "../../lib/explorer/education";
 
 const llmsPath = fileURLToPath(new URL("../../public/llms.txt", import.meta.url));
@@ -224,6 +225,23 @@ describe("Fiscal.ge agent instructions", () => {
     const content = await readFile(llmsPath, "utf8");
     const advertised = content.match(/Its current read-only tools are ([^;]+); tools\/list is authoritative\./)?.[1].split(/,\s*/);
     expect(advertised?.sort()).toEqual(TOOLS.map(tool => tool.name).sort());
+  });
+  // A mention of "data schema X" names the version a client must accept, so it must be the current one; a history
+  // line is worded "schema X added ..." and may name an earlier version, but never a later one.
+  it("names the current data schema wherever it states which version clients accept", async () => {
+    const content = await readFile(llmsPath, "utf8");
+    const mentions = [...content.matchAll(/\b[Ss]chema (\d+\.\d+\.\d+)( added)?/g)].map((match) => ({ version: match[1], history: match[2] !== undefined }));
+    const current = mentions.filter((mention) => !mention.history);
+    expect(current.length, "the guide must state the data schema in at least its changes paragraph and its endpoint paragraph").toBeGreaterThanOrEqual(2);
+    expect(current.map((mention) => mention.version)).toEqual(current.map(() => SCHEMA_VERSION));
+    const isEarlier = (version: string, other: string) => {
+      const [left, right] = [version, other].map((value) => value.split(".").map(Number));
+      const at = left.findIndex((part, index) => part !== right[index]);
+      return at !== -1 && left[at] < right[at];
+    };
+    for (const mention of mentions.filter((candidate) => candidate.history)) {
+      expect(isEarlier(mention.version, SCHEMA_VERSION), `history line ${mention.version}`).toBe(true);
+    }
   });
   it("publishes a concise guide with clear scope and unique public links", async () => {
     const content = await readFile(llmsPath, "utf8");

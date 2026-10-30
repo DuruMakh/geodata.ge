@@ -38,7 +38,7 @@ import {
 } from "../factQuery/schemas";
 import { SECTOR_QUERY_MEASURES, sectorMeasureYearSpans } from "../factQuery/economicSectorsSeries";
 import { MUNICIPAL_PER_RESIDENT_YEAR } from "../explorer/municipalData";
-import { serverInstructions, type SectorMeasureYears } from "./instructions";
+import { serverInstructions } from "./instructions";
 import { outputSchemaFor } from "./outputSchema";
 import { boundedToolResult, internalErrorResult, LIMITS, resultSizeKind, tooLargeResponse, toolResult } from "./result";
 import { loadPackagedSnapshot } from "./snapshot";
@@ -55,6 +55,9 @@ export type ToolDefinition = {
 
 type DatasetCoverage = Record<DatasetId, string>;
 
+/** `2010-2025` per sector query measure; the measures do not share a first year. */
+type SectorMeasureYears = Partial<Record<keyof typeof SECTOR_QUERY_MEASURES, string>>;
+
 /** Other counts and ranges the text states, read from the same snapshot. */
 type ServiceFacts = {
   datasetCount: number;
@@ -66,10 +69,8 @@ type ServiceFacts = {
   regionalLastYear: number;
   cityLabelsEn: string[];
   cityFirstPeriod: string;
-  cityDivisions: number;
   municipalities: number;
   municipalRegions: number;
-  sectorActivities: number;
 };
 
 /**
@@ -121,6 +122,7 @@ export const TOOLS: readonly ToolDefinition[] = [
       "A measure a series does not publish is rejected with the valid measures. Percent values use 2.4 for 2.4%. " +
       "Contributions are percentage points, never mix divisions and subgroups, and arrive with a residual series that closes them on the published headline. " +
       "Take the latest month from describe_coverage. Monthly changes do not add up to annual inflation, and the 12-month average is not annual inflation. " +
+      "No target before the first reviewed month is verified; do not say none existed. " +
       "One answer fits about 250 cells (entities × series × months): a single series' full history, or a year of every division's contributions. " +
       "Beyond that ask for fewer months or groups; a result over the response-size limit is refused and points to the bulk files. " +
       `Optional entityIds: country.georgia (default) or the ${facts.cityLabelsEn.length} city.* ids from describe_coverage — ${facts.cityLabelsEn.join(", ")} — from ${facts.cityFirstPeriod}, for cpi.headline and cpi.cat.01–12 (yoy_pct, mom_pct; avg12_pct for cpi.headline). Cells count entities × series × months.`,
@@ -151,7 +153,11 @@ export const TOOLS: readonly ToolDefinition[] = [
       "it belongs to, so you can find an id before you know where it lives. A search answers with the matches and " +
       "the datasets they belong to, not the whole catalogue. Use one meaningful keyword; if a phrase returns no matches, " +
       "try the principal word or browse the named dataset. A failed phrase match is not proof that the data is absent. Georgian case endings " +
-      "are handled: `ბათუმის` finds `ბათუმი`. Never guess a series or entity id; take it from here.",
+      "are handled: `ბათუმის` finds `ბათუმი`. searchMatch some_words means no entry has every word: the matches may be about " +
+      "something else, so if none fits, retry the missing part before saying it is not served; all_words with no entries means nothing matched. " +
+      "A search without a datasetId also gives websitePages: Fiscal.ge pages on topics this connection does not serve. " +
+      "Never guess a series or entity id; take it from here. " +
+      "A product series omits yearsByMeasure and periodsByMeasure when they are the same as its years and periods.",
     schema: describeCoverageInput,
     run: (snapshot, input) => describeCoverage(snapshot, input),
   },
@@ -243,7 +249,9 @@ export const TOOLS: readonly ToolDefinition[] = [
       "level division or subgroup (optionally parentSeriesId), and period with metric value or fromPeriod and toPeriod with percentage_point_change. " +
       "For inflation cities: dimension entities, entityType city, one seriesId, and the same period fields. " +
       "For inflation-products: dimension series, metric value, period, and yoy_pct or cumulative_pct (the latter requires startYear and states its previous-December base). " +
-      "All current products are candidates; incomplete histories are explicitly excluded. No product entity/region/parent/level filters or change-ranking metrics.",
+      "All current products are candidates; incomplete histories are explicitly excluded. No product entity/region/parent/level filters or change-ranking metrics. " +
+      "Sources give full records for the returned rows; other documents read to fix the order are listed by id in inputDocumentIds; to read them, call get_sources with that source's sourceId (narrow with years/entityIds). " +
+      "A caveat whose affects is empty and that carries affectsOtherCount concerns only rows that were not returned; each entry's caveatIds is its per-row link; do not attach such a caveat to a returned figure.",
     schema: rankInput,
     run: (snapshot, input) => rank(snapshot, input),
   },
@@ -254,7 +262,8 @@ export const TOOLS: readonly ToolDefinition[] = [
       "The public originals behind a set of sourceIds: title, publisher, official and archived URLs, " +
       "checksum and coverage years. Optionally narrowed by dataset, years or entities. A source " +
       "whose figures are Fiscal.ge's own reviewed calculation states its derivation and cites the " +
-      "upstream originals instead of a publication of the derived figures, because none exists.",
+      "upstream originals instead of a publication of the derived figures, because none exists. " +
+      "documentLanguage is null when unverified; a translated title does not mean the source document was translated.",
     schema: getSourcesInput,
     run: (snapshot, input) => getSources(snapshot, input),
   },
@@ -288,10 +297,8 @@ function serviceFacts(snapshot: FactQuerySnapshot, coverage: DatasetCoverage): S
     regionalLastYear: Math.max(...snapshot.regionalEconomies.facts.map((fact) => fact.year)),
     cityLabelsEn: snapshot.inflation.cityEntities.map((city) => city.labelEn),
     cityFirstPeriod: [...inflationEntityPeriods(snapshot).values()].map(([first]) => first).sort()[0] ?? "see describe_coverage",
-    cityDivisions: new Set(snapshot.inflation.cities.map((fact) => fact.seriesId).filter((id) => id.startsWith("cpi.cat."))).size,
     municipalities: snapshot.municipal.municipalities.length,
     municipalRegions: snapshot.municipal.regions.length,
-    sectorActivities: activities(snapshot.economicSectors.registry),
   };
 }
 
@@ -312,22 +319,7 @@ function serviceText(snapshot: FactQuerySnapshot): ServiceText {
   const coverage = datasetCoverage(snapshot);
   const facts = serviceFacts(snapshot, coverage);
   const text: ServiceText = {
-    instructions: serverInstructions(
-      coverage,
-      {
-        // Counted, not written down, for the same reason the year ranges are.
-        municipalities: facts.municipalities,
-        regions: facts.municipalRegions,
-        regionalEconomyRegions: facts.regionalRegions,
-        regionalActivities: facts.regionalActivities,
-        regionalLastYear: facts.regionalLastYear,
-        sectorActivities: facts.sectorActivities,
-        cities: facts.cityLabelsEn.length,
-        cityDivisions: facts.cityDivisions,
-        cityFirstPeriod: facts.cityFirstPeriod,
-      },
-      facts.sectorMeasureYears,
-    ),
+    instructions: serverInstructions(),
     descriptions: new Map(TOOLS.map((tool) => [tool.name, tool.describe(coverage, facts)])),
   };
   serviceTextBySnapshot.set(snapshot, text);
