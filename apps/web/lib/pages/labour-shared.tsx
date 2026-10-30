@@ -39,7 +39,7 @@ export function renderLabourFrame({ locale, presentation, path: href, title, des
   const crumbs = [{ label: home, href: pageHref("/", locale) }, { label: message(messages, "common.data"), href: pageHref(ALL_DATA_PATH, locale) }, { label: hubTitle, href: pageHref(topicSection("unemployment").href, locale) }, { label: title }];
   return <I18nProvider {...clientPresentation(presentation)}>
     <JsonLd testId="explorer-dataset-json-ld" data={explorerDatasetJsonLd({
-      locale, origin, path: href, datasetId: "unemployment", name: title, description, firstYear, lastYear, dateModified: lastReviewedAt, downloadPath: "/downloads/data/unemployment.csv",
+      locale, origin, path: href, datasetId: "unemployment", name: title, description, firstYear, lastYear, dateModified: lastReviewedAt,
       // Every row the page lists, not only the headline one.
       variableMeasured,
     })} />
