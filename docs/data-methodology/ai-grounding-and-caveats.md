@@ -31,7 +31,8 @@ search accepts either language. Schema 1.7.0 adds the optional `searchMatch` fie
 beginnings of four letters or more, and Georgian stems rather than letters inside a
 word. `all_words` with no entries means nothing matched. A `some_words` answer lists
 first the entries whose dataset's own label a search word meets, then those meeting the
-rarer words over more of their label, and also carries `searchMatchNoteKa` and
+rarer words over more of their label, ahead of those whose label's last word no search
+word meets, and also carries `searchMatchNoteKa` and
 `searchMatchNoteEn`: only some words matched, so the entries may be about something
 else; before saying the data is not served, retry the missing part with another word or
 browse the dataset. A search without `datasetId` also returns the optional
@@ -39,13 +40,17 @@ browse the dataset. A search without `datasetId` also returns the optional
 Fiscal.ge pages whose figures this service does not serve: names and links in both
 languages, never a value. A page is linked when every word of the search meets its
 names, topic or extra words by the same whole words, word beginnings of four letters or
-more, and Georgian stems; an id-like search links none. Failing that, the search is
-tried without the words that name a served place (a municipality, region, city or
-Georgia), which no page names. Failing that too, when the answer is empty or
-`some_words`, each word looks for its own pages, best first by how many of the words
-they meet: first the words that no served entry meets, then, only if those link nothing,
-words that meet a served series and whose pages are all in one topic. A word that meets
-a dataset's own label (`prices` meets Consumer price inflation) looks for no page.
+more, and Georgian stems; an id-like search links none. When the answer has entries with
+every word, nothing else is tried. Otherwise, failing the whole search, the
+search is tried without the words that name a served place, all words of one of its
+names together (`შიდა ქართლის` names Shida Kartli; `შიდა` alone names nothing). Failing
+that too, each word looks for its own pages, best first by how many of the words they
+meet: a word that no served entry meets links all its pages, and a word that only budget
+programmes' names hold links a page it names in full (`pension` links Pensions). A word
+the served data holds otherwise looks for no page. Joining words (`of`, `from`, `with`, `or`
+and the like) never count. A word that meets a dataset's own label (`prices` meets
+Consumer price inflation) looks for no page either, unless no served entry meets it and
+the other words reach beyond that dataset (`house prices`, not `bread prices`).
 `status` still describes the served series and entities only. A top-N ranking gives full
 source records for the returned rows and names the other documents read to fix the order
 by id in `inputDocumentIds`, resolved with `get_sources` and that source's `sourceId`; a

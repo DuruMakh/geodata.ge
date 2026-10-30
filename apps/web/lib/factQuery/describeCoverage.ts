@@ -795,9 +795,11 @@ function matchesLevel(entry: BaseSeriesEntry, level: string | undefined, dataset
 
 /**
  * Words that only join others ("budget of the state"): the explorer's set
- * (searchExplorer.ts) plus "to", "by" and "და", dropped while another word remains.
+ * (searchExplorer.ts) plus "to", "by", "from", "with", "or" and "და", dropped
+ * while another word remains. "from" met a programme's name and so linked
+ * "Money from abroad" for "imports from China".
  */
-const JOINING_WORDS = new Set(["in", "of", "the", "for", "and", "at", "to", "by", "და"]);
+const JOINING_WORDS = new Set(["in", "of", "the", "for", "and", "at", "to", "by", "from", "with", "or", "და"]);
 
 /**
  * The two reviewed one-way aliases, applied when one is the whole query. Not a
@@ -868,14 +870,15 @@ function idMatches(query: string, field: string): boolean {
  * a query word meets, so "inflation rate" lists inflation before the debt
  * interest rates; then by the rarity of the words they meet, times the share
  * of the entry's best field that the query covers, so "tax rate" lists Income
- * tax before "Weighted-average interest rate — total"; ties keep catalogue
- * order. `null` fields (e.g. a region's entitySlug) are skipped, which is what
- * makes "for municipalities" (the brief's search contract) fall out of the data
- * instead of needing a special case. Pass every entry the response may hold at
+ * tax before "Weighted-average interest rate — total", halved when the query
+ * meets no field's last word; ties keep catalogue order. `null` fields (e.g. a
+ * region's entitySlug) are skipped, which is what makes "for municipalities"
+ * (the brief's search contract) fall out of the data instead of needing a
+ * special case. Pass every entry the response may hold at
  * once: the all/some choice is made once, not per dataset. `aliases: false`
  * reads a whole-query alias as the word it is, for entries that are not series
  * (website pages). The answer also gives the query's own `words` and, for each,
- * how many entries meet it (`counts`), for a caller to reuse instead of
+ * the entries that meet it (`wordMatches`), for a caller to reuse instead of
  * searching again word by word.
  */
 export function searchCatalogue<T>(
@@ -883,7 +886,7 @@ export function searchCatalogue<T>(
   entries: T[],
   fields: (entry: T) => (string | null)[],
   { aliases = true, ahead }: { aliases?: boolean; ahead?: (entry: T) => (string | null)[] } = {},
-): { matches: T[]; searchMatch: "all_words" | "some_words"; words: string[]; counts: number[] } {
+): { matches: T[]; searchMatch: "all_words" | "some_words"; words: string[]; wordMatches: T[][] } {
   const folded = fold(query.trim());
   const needle = aliases && Object.hasOwn(SEARCH_ALIASES, folded) ? SEARCH_ALIASES[folded]! : folded;
   const allWords = searchWords(needle);
@@ -901,8 +904,9 @@ export function searchCatalogue<T>(
       isId: idQuery && present.some((field) => idMatches(needle, field)),
     };
   });
-  const counts = queryWords.map((_, index) => rows.filter((row) => row.meets[index]).length);
-  const answer = (matches: T[], searchMatch: "all_words" | "some_words") => ({ matches, searchMatch, words: queryWords, counts });
+  const byWord = queryWords.map((_, index) => rows.filter((row) => row.meets[index]).map((row) => row.entry));
+  const counts = byWord.map((found) => found.length);
+  const answer = (matches: T[], searchMatch: "all_words" | "some_words") => ({ matches, searchMatch, words: queryWords, wordMatches: byWord });
 
   const all = rows.filter((row) => row.isId || (queryWords.length > 0 && row.meets.every(Boolean)));
   if (all.length > 0 || queryWords.length === 0) return answer(all.map((row) => row.entry), "all_words");
@@ -929,10 +933,13 @@ export function searchCatalogue<T>(
   const scored = rows
     .map((row) => ({ row, rarity: weights.reduce((sum, weight, index) => sum + (row.meets[index] ? weight : 0), 0) }))
     .filter(({ rarity }) => rarity > 0)
-    .map(({ row, rarity }) => ({
+    .map(({ row, rarity }) => ({ row, rarity, fields: row.fieldWords.filter((words) => words.length > 0) }))
+    .map(({ row, rarity, fields }) => ({
       entry: row.entry,
       ahead: isAhead(row.entry),
-      score: rarity * Math.max(0, ...row.fieldWords.filter((words) => words.length > 0).map(share)),
+      // A label's last word names what the entry is: "Annual real GDP growth" is a growth, "Economic affairs" are
+      // affairs, so "economic growth" lists real growth first.
+      score: rarity * Math.max(0, ...fields.map(share)) * (fields.some((words) => share([words.at(-1)!]) > 0) ? 1 : 0.5),
     }));
   // Array.prototype.sort is stable.
   scored.sort((left, right) => Number(right.ahead) - Number(left.ahead) || right.score - left.score);
@@ -944,7 +951,7 @@ export function searchCatalogue<T>(
  * `datasetLabel`, given for entries from several datasets, names each entry's dataset, to order a some-words answer.
  */
 function searchSeriesAndEntities<S extends SeriesEntry, E extends EntityEntry>(search: string, series: S[], entities: E[], datasetLabel?: (entry: S | E) => string[]) {
-  const { matches, searchMatch, words, counts } = searchCatalogue<S | E>(
+  const { matches, searchMatch, words, wordMatches } = searchCatalogue<S | E>(
     search,
     [...series, ...entities],
     (entry) => ("seriesId" in entry ? [entry.seriesId, entry.labelKa, entry.labelEn] : [entry.entityId, entry.labelKa, entry.labelEn, entry.entitySlug]),
@@ -955,7 +962,7 @@ function searchSeriesAndEntities<S extends SeriesEntry, E extends EntityEntry>(s
     entities: matches.filter((entry): entry is E => !("seriesId" in entry)),
     searchMatch,
     words,
-    counts,
+    wordMatches,
   };
 }
 
@@ -976,47 +983,73 @@ function websitePagesFor(snapshot: FactQuerySnapshot, search: string): WebsitePa
 }
 
 /**
+ * What a search word is to the page search: a place's (`place`), a word that meets a dataset's own label
+ * (`dataset`: "prices" meets Consumer price inflation), one that no served entry meets (`unserved`), one that only
+ * budget programmes' names hold (`programme`: "pension" meets "Co-financing the funded pension scheme"), or one the
+ * served data holds otherwise (`served`).
+ */
+type PageWord = "place" | "dataset" | "unserved" | "programme" | "served";
+
+/**
+ * The words that together name a served place: every word of one of its names. "შიდა ქართლის" names Shida Kartli,
+ * while "შიდა" (domestic) alone names nothing, so "შიდა ვალი" stays domestic debt.
+ */
+function placeWordsIn(words: string[], entities: EntityEntry[]): boolean[] {
+  const place = words.map(() => false);
+  for (const name of new Set(entities.flatMap((entity) => [entity.labelKa, entity.labelEn]))) {
+    const nameWords = searchWords(name).filter((word) => !JOINING_WORDS.has(word));
+    const meeting = nameWords.map((nameWord) => words.flatMap((word, index) => (wordMatches(word, nameWord) ? [index] : [])));
+    if (nameWords.length > 0 && meeting.every((found) => found.length > 0)) for (const index of meeting.flat()) place[index] = true;
+  }
+  return place;
+}
+
+/** Whether `word` meets every word of a page's own name in either language: "pension" names Pensions, not Funded pension. */
+function namesPage(word: string, page: WebsitePage): boolean {
+  return [page.name.ka, page.name.en].some((name) => {
+    const nameWords = searchWords(name).filter((nameWord) => !JOINING_WORDS.has(nameWord));
+    return nameWords.length > 0 && nameWords.every((nameWord) => wordMatches(word, nameWord));
+  });
+}
+
+/**
  * The website pages a search without a datasetId links, best first (owner review of F01):
  * 1. the pages of the whole search (`websitePagesFor`);
- * 2. failing that, the pages of the search without its place words (`placeWords`, those that meet a served
- *    municipality, region, city or Georgia), which no page names; the website's own search sets a place apart the same
- *    way (`runWords`), so "hospitals in Kutaisi" links the hospitals page;
- * 3. failing that, when the answer is empty or only some words matched (`partial`), the pages of each word, so
- *    "unemployment among women" still links the unemployment pages. A word that meets a dataset's own label
- *    (`datasetWords`: "prices" meets Consumer price inflation) is served and looks for no page. The words no served
- *    entry meets (`servedCounts`) look first. The others look only when those link nothing, and only when their pages
- *    are all one topic's: "average pension", whose "pension" also meets the funded-pension programme, links Pensions,
- *    while "rate" (interest rates, unemployment) links nothing, so "poverty rate" links Poverty alone and "inflation
- *    rate" links no page. Pages that meet more of the words, of either kind, come first: "unemployment among women"
- *    puts unemployment by sex first. This runs only when the whole search links no page, so "money supply", which has
- *    its own page, gains none of the other money pages.
- * `words` are the search's words as `searchCatalogue` reads them, each list aligned with them.
+ * 2. failing that, when the answer is empty or only some words matched (`partial`), the pages of the search without
+ *    its place words, which no page names; the website's own search sets a place apart the same way (`runWords`), so
+ *    "hospitals in Kutaisi" links the hospitals page;
+ * 3. failing that too, the pages of each word, best first by how many of the words they meet: all the pages of an
+ *    `unserved` word ("unemployment among women"), and the page a `programme` word names in full ("average pension"
+ *    links Pensions). A `served` word looks for no page, as it is the served data's own word ("spending", "city",
+ *    "food"), but still counts in the order; a `dataset` word neither looks nor counts.
+ * A phrase answered in full, with every word, links only the pages of the whole search. `kinds` is aligned with `words`,
+ * the search's words as `searchCatalogue` reads them.
  */
 function websitePagesForSearch(
   snapshot: FactQuerySnapshot,
   search: string,
-  { words, servedCounts, placeWords, datasetWords, partial }: { words: string[]; servedCounts: number[]; placeWords: boolean[]; datasetWords: boolean[]; partial: boolean },
+  { words, kinds, partial }: { words: string[]; kinds: PageWord[]; partial: boolean },
 ): WebsitePage[] {
   const whole = websitePagesFor(snapshot, search);
-  if (whole.length > 0 || looksLikeId(fold(search.trim()))) return whole;
+  if (whole.length > 0 || !partial || looksLikeId(fold(search.trim()))) return whole;
   const indexes = words.map((_, index) => index);
-  const content = indexes.some((index) => !placeWords[index]) ? indexes.filter((index) => !placeWords[index]) : indexes;
+  const content = indexes.some((index) => kinds[index] !== "place") ? indexes.filter((index) => kinds[index] !== "place") : indexes;
   if (content.length < words.length) {
     const withoutPlaces = websitePagesFor(snapshot, content.map((index) => words[index]).join(" "));
     if (withoutPlaces.length > 0) return withoutPlaces;
   }
-  if (!partial || content.length < 2) return [];
-  const looking = content.filter((index) => words[index]!.length >= 3 && !datasetWords[index]);
+  if (content.length < 2) return [];
+  const looking = content.filter((index) => words[index]!.length >= 3 && kinds[index] !== "dataset");
   const pagesOf = new Map(looking.map((index) => [index, websitePagesFor(snapshot, words[index]!)]));
+  const sources = looking.flatMap((index) =>
+    kinds[index] === "unserved" ? pagesOf.get(index)! : kinds[index] === "programme" ? pagesOf.get(index)!.filter((page) => namesPage(words[index]!, page)) : [],
+  );
   const wordsMet = (page: WebsitePage) => looking.filter((index) => pagesOf.get(index)!.some((other) => other.urlKa === page.urlKa)).length;
-  const oneTopic = (index: number) => new Set(pagesOf.get(index)!.map((page) => page.topic)).size === 1;
-  const tiers = [looking.filter((index) => servedCounts[index] === 0), looking.filter((index) => servedCounts[index]! > 0 && oneTopic(index))];
-  for (const tier of tiers) {
-    const pages = [...new Map(tier.flatMap((index) => pagesOf.get(index)!).map((page) => [page.urlKa, page])).values()];
-    // Array.prototype.sort is stable: pages that meet as many words keep the order of the words, then the website's own.
-    if (pages.length > 0) return pages.map((page) => ({ page, met: wordsMet(page) })).sort((left, right) => right.met - left.met).map(({ page }) => page);
-  }
-  return [];
+  // Array.prototype.sort is stable: pages that meet as many words keep the order of the words, then the website's own.
+  return [...new Map(sources.map((page) => [page.urlKa, page])).values()]
+    .map((page) => ({ page, met: wordsMet(page) }))
+    .sort((left, right) => right.met - left.met)
+    .map(({ page }) => page);
 }
 
 /** The note every some-words answer carries: its entries may be about something else. */
@@ -1128,22 +1161,36 @@ export function describeCoverage(snapshot: FactQuerySnapshot, rawInput: unknown)
     }
 
     const datasetLabels = new Map(eligibleDatasets.map((id) => [id, [DATASET_META[id].labelKa, serviceLabelEn(snapshot, id)]]));
-    const { series: foundSeries, entities: foundEntities, searchMatch, words, counts } = searchSeriesAndEntities(search, taggedSeries, taggedEntities, (entry) => datasetLabels.get(entry.datasetId)!);
+    const { series: foundSeries, entities: foundEntities, searchMatch, words, wordMatches: matchesByWord } = searchSeriesAndEntities(search, taggedSeries, taggedEntities, (entry) => datasetLabels.get(entry.datasetId)!);
 
     // A search is a lookup, so it answers with what matched: the datasets the
     // matches belong to and any excluded code it names, not the whole
     // catalogue, which the no-argument call already returns.
     const matchedDatasets = new Set<DatasetId>([...foundSeries, ...foundEntities].map((entry) => entry.datasetId));
     // The website's pages that this service does not serve: a topic the site shows and the catalogue does not hold gets
-    // a link to its page instead of a dead end. Links only; the status stays the series' own. Each word's served
-    // entries, places and dataset labels come from the search above and two small ones over the same words (the same
-    // query gives `searchCatalogue` the same words), not from a search of the whole catalogue per word.
-    const meetsAny = <T,>(entries: T[], fields: (entry: T) => (string | null)[]) => searchCatalogue(search, entries, fields).counts.map((count) => count > 0);
+    // a link to its page instead of a dead end. Links only; the status stays the series' own. What each word is to
+    // the page search comes from the search above, the entities' names and one small search of the datasets' labels
+    // over the same words (the same query gives `searchCatalogue` the same words), not from a search per word.
+    const placeWords = placeWordsIn(words, taggedEntities);
+    const labelled = searchCatalogue(search, eligibleDatasets, (id) => datasetLabels.get(id)!).wordMatches;
+    const kinds = words.map((_, index): PageWord => {
+      const served = matchesByWord[index]!;
+      if (placeWords[index]) return "place";
+      if (labelled[index]!.length > 0) {
+        // A word that only a dataset's label holds ("prices") is that dataset's word beside one of its own entries
+        // ("bread prices", "fuel prices"), but the home prices page's beside a word the served data holds elsewhere
+        // too ("house prices"). Datasets of one scope (consumer prices) count as one.
+        const scopes = new Set(labelled[index]!.map((id) => DATASET_META[id].budgetScope));
+        const others = words.flatMap((_, other) => (other !== index && !placeWords[other] && matchesByWord[other]!.length > 0 ? [matchesByWord[other]!] : []));
+        const besideOwnEntry = others.some((found) => found.every((entry) => scopes.has(DATASET_META[entry.datasetId].budgetScope)));
+        return served.length === 0 && others.length > 0 && !besideOwnEntry ? "unserved" : "dataset";
+      }
+      if (served.length === 0) return "unserved";
+      return served.every((entry) => "seriesId" in entry && entry.level === LEVEL_MAJOR_PROGRAM) ? "programme" : "served";
+    });
     const websitePages = websitePagesForSearch(snapshot, search, {
       words,
-      servedCounts: counts,
-      placeWords: meetsAny(taggedEntities, (entry) => [entry.labelKa, entry.labelEn]),
-      datasetWords: meetsAny([...datasetLabels.values()], (labels) => labels),
+      kinds,
       partial: searchMatch === "some_words" || foundSeries.length + foundEntities.length === 0,
     })
       .slice(0, WEBSITE_PAGES_LIMIT)

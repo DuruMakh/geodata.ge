@@ -461,3 +461,37 @@ describe("search links the topic page behind a phrase", () => {
     expect(topicsOf("wages.")[0]).toBe("wages");
   });
 });
+
+// Owner re-review of wave 1: a word the connection already serves links no page of another subject, a common word
+// inside a region's name is no place, and a qualified price word still finds the home prices page.
+describe("search links no page of another subject", () => {
+  const pagesOf = (search: string) => data(describeCoverage(snapshot, { search })).websitePages ?? [];
+
+  it.each([
+    "imports from China", "revenue from tourism", "grants from the EU", "transfers from the budget", "food inflation",
+    "city budget", "ქალაქის ბიუჯეტი", "use of funds", "funds not spent", "road construction spending", "domestic revenue",
+    "foreign aid", "car imports",
+  ])("links no page for %s", (search) => {
+    expect(pagesOf(search).map((page) => page.labelEn)).toEqual([]);
+  });
+
+  it.each([
+    ["gas prices", "environment"],
+    ["food prices", "energy-food"],
+  ])("links no %s page through a word the prices series already serve", (search, topic) => {
+    expect(pagesOf(search).map((page) => page.topicId)).not.toContain(topic);
+  });
+
+  // შიდა (domestic, inner) is one word of შიდა ქართლი, which names the place only with ქართლი beside it.
+  it("reads შიდა ვალი as domestic debt, not as a place and a debt page", () => {
+    expect(pagesOf("შიდა ვალი").map((page) => page.labelEn)).toEqual([]);
+  });
+
+  it("drops a two-word region name and links the schools page", () => {
+    expect(pagesOf("შიდა ქართლის სკოლები").map((page) => page.labelEn)).toContain("Schools");
+  });
+
+  it.each(["house prices", "Tbilisi house prices"])("links the home prices page for %s", (search) => {
+    expect(pagesOf(search).map((page) => page.labelEn)).toContain("Home prices");
+  });
+});

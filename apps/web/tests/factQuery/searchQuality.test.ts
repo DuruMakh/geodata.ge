@@ -239,6 +239,10 @@ describe("a some-words answer puts the subject first", () => {
     expect(found.series[0]?.datasetId).toBe("inflation");
   });
 
+  it("lists real GDP growth first for economic growth", () => {
+    expect(firstOf("economic growth").series[0]?.seriesId).toBe("real_growth_percent");
+  });
+
   it("lists a tax series first for tax rate", () => {
     const found = firstOf("tax rate");
     expect(found.searchMatch).toBe("some_words");
