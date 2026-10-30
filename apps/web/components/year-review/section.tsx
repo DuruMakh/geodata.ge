@@ -29,7 +29,7 @@ export const H3_META = "font-[family-name:var(--font-numeric)] text-[11.5px] fon
 
 // The board's small type around a chart: a figure's key line, the unit above a chart, and the note under it.
 export const FIG_KEY = "font-[family-name:var(--font-numeric)] text-[11.5px] leading-[1.45] text-[var(--muted)]";
-export const UNIT_LINE = "font-[family-name:var(--font-numeric)] text-[10.5px] leading-none text-[var(--faint)]";
+export const UNIT_LINE = "font-[family-name:var(--font-numeric)] text-[11px] leading-none text-[var(--faint)] min-[768px]:text-[10.5px]";
 export const FOOT_NOTE = "font-[family-name:var(--font-numeric)] text-[11px] leading-normal text-[var(--faint)]";
 
 /** A hover from a mouse or pen; a touch goes straight to the click that pins, so it never leaves a hover behind. */

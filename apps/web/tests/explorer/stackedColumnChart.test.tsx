@@ -271,6 +271,13 @@ describe("StackedColumnChart", () => {
       expect(renderGeorgianMarkup(<StackedColumnChart {...yearProps} breaks={[{ period: 2024, label: "Break" }]} />)).toMatchSnapshot("annual fixture");
     });
 
+    it("marks a fit-width chart's drawings, which draw the phone geometry at every width, and no other chart's", () => {
+      expect(markup).not.toContain("data-fit-width");
+      const fitted = renderGeorgianMarkup(<StackedColumnChart {...yearProps} fitWidth />);
+      expect(fitted.match(/<svg[^>]*data-geometry="[^"]+"[^>]*data-fit-width=""/g)?.length).toBeGreaterThan(0);
+      expect(fitted.match(/<svg[^>]*data-geometry=/g)).toHaveLength(fitted.match(/data-fit-width=""/g)!.length);
+    });
+
     it("marks the highlighted period's label and puts one ink rule under it", () => {
       for (const geometry of ["desktop", "mobile"] as const) {
         const svg = chartGeometry(renderGeorgianMarkup(<StackedColumnChart {...yearProps} highlightPeriod={2025} />), geometry);

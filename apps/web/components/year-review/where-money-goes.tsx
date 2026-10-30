@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
+import { fillUnderWhiteText } from "../../lib/explorer/colors";
 import { squarify } from "../../lib/explorer/treemapLayout";
 import { formatAmountParts, formatShare, MISSING } from "../../lib/explorer/format";
 import { message } from "../../lib/i18n/messages";
@@ -182,8 +183,10 @@ export function WhereMoneyGoes({ data, year, grouping, focus, pin, onFocus, onPi
   const { total: buysTotal, tiles } = buys.value;
   const typeYears = data.spendingTypes.years;
   const typeBefore = typeYears[typeYears.indexOf(buys.year) - 1];
+  // A tile's name and figures are white on its fill, so a type whose colour is too light for them is drawn darker.
   const buysTiles: BuysTile[] = tiles.map((tile, position) => ({
     ...tile,
+    color: fillUnderWhiteText(tile.color),
     tall: tall[position]!,
     amount: `${shortAmount(tile.value, messages)} · ${formatShare(tile.share)}`,
     change: tile.change === null || typeBefore === undefined ? null : text("yearReview.tmChg", { p: formatShare(tile.change, true), y: typeBefore }),

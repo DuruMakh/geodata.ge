@@ -394,6 +394,7 @@ export function StackedColumnChart({
         key={plot.mobile ? "mobile" : "desktop"}
         ref={isActive ? svgRef : undefined}
         data-geometry={plot.mobile ? "mobile" : "desktop"}
+        data-fit-width={fitWidth ? "" : undefined}
         viewBox={`0 0 ${width} ${height}`}
         className={`h-auto w-full [&:focus:not(:focus-visible)]:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] ${className}`}
         role="img"

@@ -367,6 +367,26 @@ function darkenToFloor(hsl: { h: number; s: number; l: number }): string {
   return hex;
 }
 
+// White text on a tile (the year in review's spending-type treemap) owes WCAG 1.4.3 4.5:1.
+const WHITE_TEXT_FLOOR = 4.5;
+
+/**
+ * The tile fill under white text: `hex` itself when white already reads 4.5:1 on it, else the same hue and saturation
+ * darkened one whole L at a time until it does, as darkenToFloor pays the series floor.
+ */
+export function fillUnderWhiteText(hex: string): string {
+  const contrast = (fill: string) => 1.05 / (relativeLuminance(fill) + 0.05);
+  if (contrast(hex) >= WHITE_TEXT_FLOOR) return hex;
+  const hsl = hexToHsl(hex);
+  let { l } = hsl;
+  let fill = hex;
+  while (contrast(fill) < WHITE_TEXT_FLOOR && l > 0) {
+    l -= 1;
+    fill = hslToHex({ ...hsl, l });
+  }
+  return fill;
+}
+
 export function colorForProgram(parentColor: string, ordinal: number): string {
   const parent = hexToHsl(parentColor);
   const used = new Set<string>();

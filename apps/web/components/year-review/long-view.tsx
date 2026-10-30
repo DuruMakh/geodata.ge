@@ -258,12 +258,14 @@ export function LongView({ data, year, grouping, side, measure, focus, pin, onFo
           );
         })}
       </div>
+      {/* Every fourth year, and every second from 900px of section width: below it the edge labels, pinned to the plot's
+          ends, would touch their centred neighbours. */}
       <div aria-hidden="true" className="relative col-start-2 row-start-3">
         {years.map((label, column) =>
           column % 2 === 0 ? (
             <span
               key={label}
-              className={`absolute top-[9px] whitespace-nowrap font-[family-name:var(--font-numeric)] text-[10.5px] leading-none text-[var(--faint)] ${column % 4 === 0 ? "" : "hidden @min-[640px]:block"} ${
+              className={`absolute top-[9px] whitespace-nowrap font-[family-name:var(--font-numeric)] text-[10.5px] leading-none text-[var(--faint)] ${column % 4 === 0 ? "" : "hidden @min-[900px]:block"} ${
                 column === 0 ? "" : column === last ? "-translate-x-full" : "-translate-x-1/2"
               }`}
               style={{ left: `${pos(column)}%` }}

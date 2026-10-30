@@ -1,5 +1,8 @@
 import { beforeAll, describe, expect, test, vi } from "vitest";
+import { renderToStaticMarkup } from "react-dom/server";
+import { BuysTreemap, type BuysTile } from "../../components/year-review/buys-treemap";
 import { WhereMoneyGoes } from "../../components/year-review/where-money-goes";
+import { fillUnderWhiteText } from "../../lib/explorer/colors";
 import type { Presentation } from "../../lib/i18n/types";
 import { loadYearReviewData } from "../../lib/yearReview/buildYearReviewData";
 import type { YearReviewData } from "../../lib/yearReview/types";
@@ -152,6 +155,27 @@ describe("Year in review section 03", () => {
     expect(labelled.sort()).toEqual(tiles.filter((tile) => tile.share >= 0.03).flatMap((tile) => [tile.id, tile.id]).sort());
     const listed = [...markup.matchAll(/data-small-tile="([^"]*)"/g)].map((match) => match[1]);
     expect(listed).toEqual(tiles.filter((tile) => tile.share < 0.03).map((tile) => tile.id));
+  });
+
+  test("a treemap tile whose colour is too light for its white text is drawn darker, the others in their own colour", () => {
+    const { data } = loaded.ka!;
+    const markup = section(data.budget.defaultYear);
+    const fill = (id: string) => new RegExp(`data-tile="${id}"[^>]*background-color:(#[0-9A-Fa-f]{6})`).exec(markup)?.[1];
+    const own = (id: string) => data.spendingTypes.types.find((type) => type.id === id)!.color;
+    expect(fill("spending_type.social_benefits")).toBe(own("spending_type.social_benefits"));
+    expect(fill("spending_type.compensation")).toBe(fillUnderWhiteText(own("spending_type.compensation")));
+    expect(fill("spending_type.compensation")).not.toBe(own("spending_type.compensation"));
+  });
+
+  test("a labelled treemap tile too short for its change line leaves it out", () => {
+    const tile = (id: string, height: number): BuysTile => ({
+      id, label: id, color: "#34609E", value: 1, share: 0.4, rect: [0, 0, 200, height], tall: [0, 0, 200, height], amount: `${id} amount`, change: `${id} change`,
+    });
+    const markup = renderToStaticMarkup(<BuysTreemap tiles={[tile("short", 90), tile("tall", 200)]} focus={null} ariaLabel="treemap" />);
+    // Each tile is drawn in both layouts.
+    expect(markup.match(/short amount/g)).toHaveLength(2);
+    expect(markup).not.toContain("short change");
+    expect(markup.match(/tall change/g)).toHaveLength(2);
   });
 
   test("in English the section has no Georgian text", () => {

@@ -11,6 +11,9 @@ import { pointerHover } from "./section";
 
 // The share of the total from which a tile is labelled on the drawing (a ruling: the cut-off lives in the UI).
 const LABEL_FROM = 0.03;
+// The height (px: both layouts draw at their box's height) a labelled tile needs for its change line under a name of
+// two lines and its amount; a shorter tile leaves the change line out rather than cut it off.
+const CHANGE_FROM_HEIGHT = 112;
 const WIDE = { width: TREEMAP_WIDTH, height: TREEMAP_HEIGHT };
 /** The board's phone layout box; the caller squarifies the tiles into it (`tall`). */
 export const TALL = { width: 335, height: 620 };
@@ -67,7 +70,7 @@ function Layout({ tiles, box, focus, className, onFocus }: {
               <>
                 <b className="block text-[13.5px] font-semibold leading-[1.3]">{tile.label}</b>
                 <span className="mt-1 block font-[family-name:var(--font-numeric)] text-[11.5px] leading-[1.35]">{tile.amount}</span>
-                {tile.change ? <span className="mt-1 block font-[family-name:var(--font-numeric)] text-[11.5px] leading-[1.35]">{tile.change}</span> : null}
+                {tile.change && h >= CHANGE_FROM_HEIGHT ? <span className="mt-1 block font-[family-name:var(--font-numeric)] text-[11.5px] leading-[1.35]">{tile.change}</span> : null}
               </>
             ) : null}
           </div>
