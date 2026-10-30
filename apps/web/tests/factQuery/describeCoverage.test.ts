@@ -414,3 +414,50 @@ describe("search points to website pages the connection does not serve", () => {
     }
   });
 });
+
+// Owner review of the F01 fix: a price word, a place beside a topic, and a phrase that matches nothing in full still
+// reach the right page, and the money-supply noise the whole-phrase rule removed stays gone.
+describe("search links the topic page behind a phrase", () => {
+  const topicsOf = (search: string) => (data(describeCoverage(snapshot, { search })).websitePages ?? []).map((page) => page.topicId);
+
+  // "prices" meets the inflation dataset's own label, Consumer price inflation, so it is a served word, not the
+  // housing page's subject.
+  it.each(["bread prices", "fuel prices"])("links no housing page for %s", (search) => {
+    expect(topicsOf(search)).not.toContain("housing");
+  });
+
+  // A place is no page's word, as the website's own search drops it; a topic word that also meets some served series
+  // (Hospital services, School book, the funded-pension programme) still finds its page; and a phrase whose answer is
+  // empty still looks word by word. The last two are the reference-intent prompts (mcpAssistantIntents.ts).
+  it.each([
+    ["hospitals in Kutaisi", "health"],
+    ["ბათუმის სკოლები", "education"],
+    ["home prices Tbilisi", "housing"],
+    ["unemployment among women", "unemployment"],
+    ["average pension in Georgia", "health"],
+    ["საშუალო თვიური ხელფასი", "wages"],
+  ])("links %s to the %s topic", (search, topic) => {
+    const topics = topicsOf(search);
+    expect(topics.length).toBeGreaterThan(0);
+    for (const found of topics) expect(found).toBe(topic);
+  });
+
+  it("puts the page that meets the most words first", () => {
+    const pages = data(describeCoverage(snapshot, { search: "unemployment among women" })).websitePages ?? [];
+    expect(pages[0]?.labelEn).toBe("Sex");
+  });
+
+  // "rate" meets the debt interest rates and links pages of two topics, so it names no page by itself.
+  it.each(["inflation rate", "poverty rate"])("links no interest-rate page for %s", (search) => {
+    expect(topicsOf(search)).not.toContain("money");
+  });
+
+  it("links only the money supply page for money supply", () => {
+    expect((data(describeCoverage(snapshot, { search: "money supply" })).websitePages ?? []).map((page) => page.labelEn)).toEqual(["Money supply"]);
+  });
+
+  // A trailing full stop is punctuation, not an id: only a word, a "." or "_", and a word again looks like one.
+  it("reads wages. as the word wages", () => {
+    expect(topicsOf("wages.")[0]).toBe("wages");
+  });
+});

@@ -176,10 +176,9 @@ describe("catalogue search answers a phrase that no entry matches in full", () =
 // A some-words answer can be about another subject ("average wage" finds weighted-average debt rates), so it says so,
 // and a word the catalogue does not hold still looks for its own website page (audit F08 section 5.2, F01).
 describe("a some-words answer says that only some words matched", () => {
-  const SOME_WORDS_EN =
-    "Only some words of this search matched, so these entries may be about something else. If none of them fits, this connection does not serve that data; websitePages, when given, show it on Fiscal.ge.";
-  const SOME_WORDS_KA =
-    "ამ ძიების მხოლოდ ზოგიერთი სიტყვა დაემთხვა, ამიტომ ეს ჩანაწერები შესაძლოა სხვა თემას ეხებოდეს. თუ არცერთი არ შეესაბამება, ამ მონაცემებს ეს კავშირი არ გასცემს; websitePages, თუ მოცემულია, მათ Fiscal.ge-ზე აჩვენებს.";
+  // The note's wording is the service message's own; what it must say is pinned below.
+  const SOME_WORDS_EN = () => snapshot.localization.messages.en["catalogue.someWords"];
+  const SOME_WORDS_KA = () => snapshot.localization.messages.ka["catalogue.someWords"];
   type Noted = { searchMatch?: string; searchMatchNoteKa?: string; searchMatchNoteEn?: string; websitePages?: { topicId: string; labelEn: string; urlKa: string }[] };
   const dataOf = (response: ReturnType<typeof describeCoverage>) => (response as { data: Noted }).data;
 
@@ -187,15 +186,26 @@ describe("a some-words answer says that only some words matched", () => {
     const response = describeCoverage(snapshot, { search: query });
     expect(response.status).toBe("ok");
     expect(dataOf(response).searchMatch).toBe("some_words");
-    expect(dataOf(response).searchMatchNoteEn).toBe(SOME_WORDS_EN);
-    expect(dataOf(response).searchMatchNoteKa).toBe(SOME_WORDS_KA);
-    expect(renderText(response)).toContain(SOME_WORDS_EN);
+    expect(dataOf(response).searchMatchNoteEn).toBe(SOME_WORDS_EN());
+    expect(dataOf(response).searchMatchNoteKa).toBe(SOME_WORDS_KA());
+    expect(renderText(response)).toContain(SOME_WORDS_EN());
   });
 
   it("notes it inside one dataset too", () => {
     const found = dataOf(describeCoverage(snapshot, { datasetId: "government-debt", search: "public debt" }));
     expect(found.searchMatch).toBe("some_words");
-    expect(found.searchMatchNoteEn).toBe(SOME_WORDS_EN);
+    expect(found.searchMatchNoteEn).toBe(SOME_WORDS_EN());
+  });
+
+  // "defense budget" finds only the municipal total, while defence spending is served: the note must not say
+  // that what is missing is not served, only that the entries may be about something else (owner review D-2).
+  it("does not claim that the missing part is not served", () => {
+    const found = dataOf(describeCoverage(snapshot, { search: "defense budget" }));
+    expect(found.searchMatch).toBe("some_words");
+    expect(found.searchMatchNoteEn).toContain("before saying it is not served");
+    expect(found.searchMatchNoteEn).not.toContain("does not serve that data");
+    expect(found.searchMatchNoteKa).toContain("ეს კავშირი");
+    expect(found.searchMatchNoteKa).not.toContain("არ გასცემს");
   });
 
   it.each(["income tax", "zzzznotathing"])("adds no note to the all-words answer for %s", (query) => {
@@ -215,6 +225,25 @@ describe("a some-words answer says that only some words matched", () => {
     for (const query of ["poverty rate", "average wage"]) {
       expect(outputSchemaFor("describe_coverage").safeParse(describeCoverage(snapshot, { search: query })).success, query).toBe(true);
     }
+  });
+});
+
+// A some-words answer puts the entries of the dataset a query word names first: "rate" alone meets the three debt
+// rates, which are rarer than inflation or tax series, but they are not the subject (owner review A-I3).
+describe("a some-words answer puts the subject first", () => {
+  const firstOf = (query: string) => (describeCoverage(snapshot, { search: query }) as { data: { searchMatch?: string; series: { seriesId: string; datasetId?: string }[] } }).data;
+
+  it("lists an inflation series first for inflation rate", () => {
+    const found = firstOf("inflation rate");
+    expect(found.searchMatch).toBe("some_words");
+    expect(found.series[0]?.datasetId).toBe("inflation");
+  });
+
+  it("lists a tax series first for tax rate", () => {
+    const found = firstOf("tax rate");
+    expect(found.searchMatch).toBe("some_words");
+    expect(found.series[0]?.datasetId).toBe("national-revenue");
+    expect(found.series[0]?.seriesId).toMatch(/tax/);
   });
 });
 
@@ -245,8 +274,9 @@ describe("the labelled queries", () => {
     expect(rows.length - failing.length, failing.join("\n")).toBeGreaterThanOrEqual(111);
   });
 
-  it("returns at most 4 inside-word false positives", () => {
+  // The audit allowed 4; whole-word matching reaches none (owner review D-9).
+  it("returns no inside-word false positives", () => {
     const inside = rows.flatMap((row) => row.inside.map((label) => `${row.q} -> ${label}`));
-    expect(inside.length, inside.join("\n")).toBeLessThanOrEqual(4);
+    expect(inside).toEqual([]);
   });
 });

@@ -93,6 +93,12 @@ describe("MCP tool surface", () => {
       expect(discovery).toContain("one meaningful keyword");
       expect(discovery).toContain("phrase returns no matches");
       expect(discovery).toContain("browse the named dataset");
+      // Owner review: a some-words answer is not proof that the rest is not served (D-2), an empty answer still
+      // reports all_words (A-M4, D-12), and website pages come only from a search without a datasetId (A-M8).
+      expect(discovery).not.toContain("the data is not served here");
+      expect(discovery).toContain("all_words with no entries means nothing matched");
+      expect(discovery).toContain("websitePages");
+      expect(serverInstructions()).toContain("a search without datasetId returns websitePages");
     } finally {
       await client.close();
     }
