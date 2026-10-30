@@ -24,6 +24,18 @@ function sumOf(series: readonly Values[], length: number): Values {
   });
 }
 
+/** `values` (aligned to `from`) re-aligned to `years`, null where `from` has no such year. */
+const onYears = (years: readonly number[], from: readonly number[], values: Values): Values => years.map((year) => valueAt(from, values, year));
+
+/** Per position: the first series' value where every series has one, else null, so a nearest year has every part. */
+function whereAll(series: readonly Values[]): Values {
+  return series[0]!.map((value, index) => (series.every((values) => values[index] !== null && values[index] !== undefined) ? value : null));
+}
+
+/** Per position: the sum of the series, null where any one is missing. */
+const sumAll = (series: readonly Values[]): Values =>
+  whereAll(series).map((value, index) => (value === null ? null : series.reduce((sum, values) => sum + values[index]!, 0)));
+
 /** Per year: `values` divided by the population of that year, null where either is missing. */
 function perResident(data: YearReviewData, years: readonly number[], values: Values): Values {
   return years.map((year, index) => {
@@ -59,6 +71,13 @@ function picked(what: string, years: number[], values: Values, chosen: number): 
 /** Whole cells of 100 per item, largest remainder, ties to the earlier item; a value of zero or less gets none. */
 export function hundredCells(values: number[]): number[] {
   return wholePercents(values.map((value) => Math.max(0, value)));
+}
+
+/** The position of a budget year; the ruler only offers budget years, so any other year is a caller error. */
+function budgetIndex(data: YearReviewData, year: number): number {
+  const index = data.budget.years.indexOf(year);
+  if (index < 0) throw new Error(`Year in review: ${year} is not a state-budget year`);
+  return index;
 }
 
 const groupOf = (data: YearReviewData, grouping: Grouping): Category[] =>
@@ -151,11 +170,11 @@ function ranked(categories: readonly Category[], index: number) {
 
 const cellIds = (rows: readonly { id: string; cells: number }[]) => rows.flatMap((row) => Array<string>(row.cells).fill(row.id));
 
-/** Every 100 GEL of the chosen year, and the same grid in the first year the grouping has a positive value. */
+/** Every 100 GEL of the chosen year, and the same grid in the grouping's first year (or, from that year, the last actual one). */
 export function whereView(data: YearReviewData, grouping: Grouping, year: number): WhereView {
   const { years, planned } = data.budget;
   const categories = groupOf(data, grouping);
-  const index = years.indexOf(year);
+  const index = budgetIndex(data, year);
   const rows = ranked(categories, index);
   const total = rows.reduce((sum, row) => sum + row.value, 0);
   const cells = hundredCells(rows.map((row) => row.value));
@@ -170,7 +189,9 @@ export function whereView(data: YearReviewData, grouping: Grouping, year: number
     spark: category.values,
   }));
 
-  const thenIndex = years.findIndex((_, position) => categories.some((category) => (category.values[position] ?? 0) > 0));
+  // The first year the grouping has a positive value; when that is the chosen year, the last actual year instead.
+  const firstIndex = years.findIndex((_, position) => categories.some((category) => (category.values[position] ?? 0) > 0));
+  const thenIndex = index <= firstIndex ? planned.findLastIndex((plan) => !plan) : firstIndex;
   const then = ranked(categories, thenIndex).filter((row) => row.value > 0);
   const thenCells = hundredCells(then.map((row) => row.value));
   return {
@@ -179,7 +200,7 @@ export function whereView(data: YearReviewData, grouping: Grouping, year: number
     thenYear: years[thenIndex]!,
     thenCells: cellIds(then.map((row, rank) => ({ id: row.category.id, cells: thenCells[rank]! }))),
     total,
-    planned: planned[index] ?? false,
+    planned: planned[index]!,
   };
 }
 
@@ -200,8 +221,8 @@ export type ChangeView =
 /** Change on the year before, per category with a value in the chosen year; one without a previous value has no change. */
 export function changeView(data: YearReviewData, grouping: Grouping, year: number): ChangeView {
   const { years, planned } = data.budget;
-  const index = years.indexOf(year);
-  if (index <= 0) return { none: true };
+  const index = budgetIndex(data, year);
+  if (index === 0) return { none: true };
   const categories = groupOf(data, grouping);
   const totals = sumOf(categories.map((category) => category.values), years.length);
   const now = totals[index] ?? 0;
@@ -279,26 +300,31 @@ export function buysView(data: YearReviewData, year: number): BuysView {
   };
 }
 
-/** [collected, given up] for VAT, income and profit tax, and all taxes, in the nearest tax-breaks year. */
+/** [collected, given up] for VAT, income and profit tax, and all taxes, in the nearest year that has all six. */
 export function givesUpView(
   data: YearReviewData,
   year: number,
 ): Picked<{ vat: [number, number]; income: [number, number]; all: [number, number]; per100: { vat: number; income: number; all: number } }> {
   const { budget, taxBreaks } = data;
-  const used = picked("tax breaks", taxBreaks.years, taxBreaks.all, year);
-  const collected = (ids: readonly string[]) =>
-    budget.receipts.filter((receipt) => ids.includes(receipt.id)).reduce((sum, receipt) => sum + (valueAt(budget.years, receipt.values, used.year) ?? 0), 0);
-  const vat: [number, number] = [collected(REVENUE_BANDS.vat), taxBreaks.vat[used.index] ?? 0];
-  const income: [number, number] = [collected([...REVENUE_BANDS.income, ...REVENUE_BANDS.profit]), taxBreaks.income[used.index] ?? 0];
-  const all: [number, number] = [valueAt(budget.years, taxTotals(data), used.year) ?? 0, taxBreaks.all[used.index]!];
+  const receipt = (id: string) => onYears(taxBreaks.years, budget.years, budget.receipts.find((row) => row.id === id)?.values ?? []);
+  const collectedVat = sumAll(REVENUE_BANDS.vat.map(receipt));
+  const collectedIncome = sumAll([...REVENUE_BANDS.income, ...REVENUE_BANDS.profit].map(receipt));
+  const collectedAll = onYears(taxBreaks.years, budget.years, taxTotals(data));
+  const parts = [collectedVat, taxBreaks.vat, collectedIncome, taxBreaks.income, collectedAll, taxBreaks.all];
+  const used = picked("tax breaks", taxBreaks.years, whereAll(parts), year);
+  const pair = (collected: Values, given: Values): [number, number] => [collected[used.index]!, given[used.index]!];
+  const vat = pair(collectedVat, taxBreaks.vat);
+  const income = pair(collectedIncome, taxBreaks.income);
+  const all = pair(collectedAll, taxBreaks.all);
   const per100 = ([got, given]: [number, number]) => (given / got) * 100;
   return { year: used.year, fallback: used.fallback, value: { vat, income, all, per100: { vat: per100(vat), income: per100(income), all: per100(all) } } };
 }
 
-/** Tax refunds in the nearest year, their share of tax revenue, and whether they top every earlier year. */
+/** Tax refunds in the nearest year that also has tax revenue, their share of it, and whether they top every earlier year. */
 export function refundsView(data: YearReviewData, year: number): Picked<{ value: number; shareOfTax: number; record: boolean }> {
   const { years, values } = data.refunds;
-  const used = picked("tax refunds", years, values, year);
+  const tax = onYears(years, data.budget.years, taxTotals(data));
+  const used = picked("tax refunds", years, whereAll([values, tax]), year);
   const value = values[used.index]!;
   const earlier = values.slice(0, used.index).filter((other): other is number => other !== null);
   return {
@@ -306,19 +332,19 @@ export function refundsView(data: YearReviewData, year: number): Picked<{ value:
     fallback: used.fallback,
     value: {
       value,
-      shareOfTax: value / valueAt(data.budget.years, taxTotals(data), used.year)!,
+      shareOfTax: value / tax[used.index]!,
       record: earlier.length > 0 && earlier.every((other) => other < value),
     },
   };
 }
 
-/** Debt at the end of the nearest year; GDP, population and the average rate of that same year, null where missing. */
+/** Debt at the end of the nearest year with all three stock figures; GDP, population and the average rate of that same year, null where missing. */
 export function debtView(
   data: YearReviewData,
   year: number,
 ): Picked<{ total: number; external: number; domestic: number; toGdp: number | null; perResident: number | null; rate: number | null }> {
   const { stock, rates } = data.debt;
-  const used = picked("debt", stock.years, stock.total, year);
+  const used = picked("debt", stock.years, whereAll([stock.total, stock.external, stock.domestic]), year);
   const total = stock.total[used.index]!;
   const gdp = valueAt(data.budget.years, data.budget.gdp, used.year);
   return {
@@ -326,44 +352,44 @@ export function debtView(
     fallback: used.fallback,
     value: {
       total,
-      external: stock.external[used.index] ?? 0,
-      domestic: stock.domestic[used.index] ?? 0,
+      external: stock.external[used.index]!,
+      domestic: stock.domestic[used.index]!,
       toGdp: gdp ? total / gdp : null,
-      perResident: perResident(data, [used.year], [total])[0]!,
+      perResident: perResident(data, [used.year], [total])[0] ?? null,
       rate: valueAt(rates.years, rates.total, used.year),
     },
   };
 }
 
-/** The ledger: six GEL-per-resident figures, each from its own dataset in its nearest year; municipal is the median place. */
+/**
+ * The ledger: six GEL-per-resident figures, each from its own dataset in its nearest year; municipal is the median place.
+ * `planned`: the value comes from a planned budget year or a debt-service projection year.
+ */
 export function perResidentRows(
   data: YearReviewData,
   year: number,
-): { id: "spend" | "tax" | "debt" | "svc" | "soc" | "mun"; value: number; year: number; fallback: boolean }[] {
+): { id: "spend" | "tax" | "debt" | "svc" | "soc" | "mun"; value: number; year: number; fallback: boolean; planned: boolean }[] {
   const { budget, debt, spendingTypes, municipal } = data;
-  const row = (id: "spend" | "tax" | "debt" | "svc" | "soc", years: number[], values: Values) => {
+  const row = (id: "spend" | "tax" | "debt" | "svc" | "soc", years: number[], values: Values, planned: readonly boolean[] | null) => {
     const series = perResident(data, years, values);
     const used = picked(`${id} per resident`, years, series, year);
-    return { id, value: series[used.index]!, year: used.year, fallback: used.fallback };
+    return { id, value: series[used.index]!, year: used.year, fallback: used.fallback, planned: planned?.[used.index] ?? false };
   };
-  const service = debt.service.years.map((_, index) => {
-    const principal = debt.service.principal[index] ?? null;
-    const interest = debt.service.interest[index] ?? null;
-    return principal === null || interest === null ? null : principal + interest;
-  });
+  const service = sumAll([debt.service.principal, debt.service.interest]);
   const social = spendingTypes.types.find((type) => type.id === SOCIAL_BENEFITS_ID);
   if (!social) throw new Error(`Year in review: spending type ${SOCIAL_BENEFITS_ID} is missing`);
   return [
-    row("spend", budget.years, spendTotals(data)),
-    row("tax", budget.years, taxTotals(data)),
-    row("debt", debt.stock.years, debt.stock.total),
-    row("svc", debt.service.years, service),
-    row("soc", spendingTypes.years, social.values),
+    row("spend", budget.years, spendTotals(data), budget.planned),
+    row("tax", budget.years, taxTotals(data), budget.planned),
+    row("debt", debt.stock.years, debt.stock.total, null),
+    row("svc", debt.service.years, service, debt.service.projection),
+    row("soc", spendingTypes.years, social.values, null),
     {
       id: "mun",
       value: median(municipal.places.map((place) => place.perResidentGel)),
       year: municipal.year,
       fallback: municipal.year !== year,
+      planned: false,
     },
   ];
 }
@@ -398,12 +424,12 @@ export type LongView = {
 };
 
 /**
- * Every category over the years the side has data, as stacked bands of shares or GEL; a negative or missing value
+ * Every category of the side (expenditure in the chosen grouping) over the years it has data, as stacked bands of shares or GEL; a negative or missing value
  * counts as 0. Gain and loss compare shares in the first year with the last actual year.
  */
-export function longView(data: YearReviewData, side: "expenditure" | "revenue", measure: "share" | "gel"): LongView {
+export function longView(data: YearReviewData, grouping: Grouping, side: "expenditure" | "revenue", measure: "share" | "gel"): LongView {
   const { budget } = data;
-  const categories: Category[] = side === "expenditure" ? budget.fields : budget.receipts;
+  const categories: Category[] = side === "expenditure" ? groupOf(data, grouping) : budget.receipts;
   const present = budget.years.map((_, index) => categories.some((category) => category.values[index] !== null));
   const first = present.indexOf(true);
   const last = present.lastIndexOf(true);

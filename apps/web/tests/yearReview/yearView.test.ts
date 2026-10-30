@@ -180,6 +180,17 @@ describe("whereView", () => {
     expect(view.planned).toBe(false);
   });
 
+  test("in the first year the then grid shows the last actual year", () => {
+    const view = whereView(fixture(), "fields", 2022);
+    expect(view.thenYear).toBe(2025);
+    expect(view.thenCells.slice(0, 72).every((id) => id === "spending.a")).toBe(true);
+  });
+
+  test("a year outside the state budget is an error", () => {
+    expect(() => whereView(fixture(), "fields", 2030)).toThrow(/2030/);
+    expect(() => changeView(fixture(), "fields", 2021)).toThrow(/2021/);
+  });
+
   test("an institution without a value that year is left out of the ranking", () => {
     const view = whereView(fixture(), "institutions", 2022);
     expect(view.items.map((item) => item.id)).toEqual(["admin.x", "admin.z"]);
@@ -233,6 +244,14 @@ describe("givesUpView", () => {
     expect(view.value).toMatchObject({ vat: [60, 14], income: [40, 7], all: [105, 28] });
     expect(view.value.per100.vat).toBeCloseTo((14 / 60) * 100, 12);
   });
+
+  test("a year without the collected amount falls back to one that has every part", () => {
+    const data = fixture();
+    data.budget.receipts.find((receipt) => receipt.id === "revenue.profit_tax")!.values[2] = null;
+    const view = givesUpView(data, 2024);
+    expect(view).toMatchObject({ year: 2023, fallback: true });
+    expect(view.value).toMatchObject({ vat: [50, 10], income: [35, 5] });
+  });
 });
 
 describe("refundsView", () => {
@@ -243,6 +262,14 @@ describe("refundsView", () => {
     expect(refundsView(fixture(), 2025).value.record).toBe(false);
     expect(refundsView(fixture(), 2026)).toMatchObject({ year: 2025, fallback: true });
   });
+
+  test("refunds of a year without tax revenue fall back to the last year that has both", () => {
+    const data = fixture();
+    data.refunds = { years: [2022, 2023, 2024, 2025, 2026], values: [8, 6, 9, 7, 10] };
+    const view = refundsView(data, 2026);
+    expect(view).toMatchObject({ year: 2025, fallback: true, value: { value: 7 } });
+    expect(view.value.shareOfTax).toBeCloseTo(7 / 125, 12);
+  });
 });
 
 describe("debtView", () => {
@@ -251,6 +278,12 @@ describe("debtView", () => {
     expect(view).toMatchObject({ year: 2025, fallback: true, value: { total: 60, external: 36, domestic: 24, perResident: 6, rate: 5 } });
     expect(view.value.toGdp).toBeCloseTo(60 / 650, 12);
     expect(debtView(fixture(), 2022).value.rate).toBeNull();
+  });
+
+  test("a year without the external/domestic split falls back to one that has it", () => {
+    const data = fixture();
+    data.debt.stock.external[3] = null;
+    expect(debtView(data, 2025)).toMatchObject({ year: 2024, fallback: true, value: { total: 56, external: 34, domestic: 22 } });
   });
 });
 
@@ -266,6 +299,12 @@ describe("perResidentRows", () => {
     expect(byId.svc).toMatchObject({ value: 1.2, year: 2026, fallback: false });
     expect(byId.soc).toMatchObject({ value: 5, year: 2025, fallback: true });
     expect(byId.mun).toMatchObject({ value: 45, year: 2025, fallback: true });
+  });
+
+  test("a value from the plan year or the debt-service schedule is planned", () => {
+    const planned = Object.fromEntries(perResidentRows(fixture(), 2026).map((row) => [row.id, row.planned]));
+    expect(planned).toEqual({ spend: true, tax: false, debt: false, svc: true, soc: false, mun: false });
+    expect(perResidentRows(fixture(), 2025).every((row) => !row.planned)).toBe(true);
   });
 });
 
@@ -283,7 +322,7 @@ describe("regionsView", () => {
 
 describe("longView", () => {
   test("shares: every column sums to 1 with a negative item counted as 0", () => {
-    const view = longView(fixture(), "revenue", "share");
+    const view = longView(fixture(), "fields", "revenue", "share");
     expect(view.years).toEqual([2022, 2023, 2024, 2025]);
     expect(view.planned).toEqual([false, false, false, false]);
     view.years.forEach((_, index) => {
@@ -294,12 +333,17 @@ describe("longView", () => {
   });
 
   test("GEL: the plan year is marked; gain and loss compare the first and last actual year", () => {
-    const view = longView(fixture(), "expenditure", "gel");
+    const view = longView(fixture(), "fields", "expenditure", "gel");
     expect(view.years).toEqual([2022, 2023, 2024, 2025, 2026]);
     expect(view.planned.at(-1)).toBe(true);
     expect(view.top).toEqual([100, 105, 115, 125, 143]);
     expect(view.gain).toEqual({ id: "spending.a", from: 0.58, to: 0.72 });
     expect(view.loss).toEqual({ id: "spending.c", from: 0.12, to: 0.04 });
+  });
+
+  test("expenditure bands follow the grouping; receipts ignore it", () => {
+    expect(longView(fixture(), "institutions", "expenditure", "gel").bands.map((band) => band.id)).toEqual(["admin.x", "admin.y", "admin.z"]);
+    expect(longView(fixture(), "institutions", "revenue", "gel")).toEqual(longView(fixture(), "fields", "revenue", "gel"));
   });
 });
 
@@ -325,10 +369,9 @@ describe("every view over the served data", () => {
       balanceRecord(data, year);
     }
     for (const side of ["expenditure", "revenue"] as const) {
-      longView(data, side, "share").top.forEach((top) => expect(top).toBeCloseTo(1, 9));
+      for (const grouping of ["fields", "institutions"] as const) {
+        longView(data, grouping, side, "share").top.forEach((top) => expect(top).toBeCloseTo(1, 9));
+      }
     }
-    const plan = data.budget.years.at(-1)!;
-    expect(debtView(data, plan)).toMatchObject({ fallback: true });
-    expect(refundsView(data, plan)).toMatchObject({ fallback: true });
   });
 });
