@@ -243,6 +243,15 @@ describe("a some-words answer puts the subject first", () => {
     expect(firstOf("economic growth").series[0]?.seriesId).toBe("real_growth_percent");
   });
 
+  // A trailing "total" ("Total taxes" is "გადასახადები სულ") does not name the entry, so a total is not halved.
+  it("lists total taxes first for გადასახადები თბილისში", () => {
+    expect(firstOf("გადასახადები თბილისში").series[0]?.seriesId).toBe("revenue.taxes_total");
+  });
+
+  it("lists the total interest rate first for interest rate on debt", () => {
+    expect(firstOf("interest rate on debt").series[0]?.seriesId).toBe("debt.rate.total");
+  });
+
   it("lists a tax series first for tax rate", () => {
     const found = firstOf("tax rate");
     expect(found.searchMatch).toBe("some_words");

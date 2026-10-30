@@ -495,3 +495,14 @@ describe("search links no page of another subject", () => {
     expect(pagesOf(search).map((page) => page.labelEn)).toContain("Home prices");
   });
 });
+
+// Owner re-review, round 3: a word that only a dataset's label holds ("overview", "consumer") is a served subject's
+// qualifier, and "მიხედვით" (by) only joins, so neither links a page of another subject.
+describe("search links no page through a dataset's generic label word", () => {
+  it.each([
+    "debt overview", "ბიუჯეტის მიმოხილვა", "consumer debt",
+    "ხარჯები სექტორების მიხედვით", "ვალი ვალუტების მიხედვით", "შემოსავლები წყაროების მიხედვით",
+  ])("links no page for %s", (search) => {
+    expect((data(describeCoverage(snapshot, { search })).websitePages ?? []).map((page) => page.labelEn)).toEqual([]);
+  });
+});

@@ -32,7 +32,8 @@ beginnings of four letters or more, and Georgian stems rather than letters insid
 word. `all_words` with no entries means nothing matched. A `some_words` answer lists
 first the entries whose dataset's own label a search word meets, then those meeting the
 rarer words over more of their label, ahead of those whose label's last word no search
-word meets, and also carries `searchMatchNoteKa` and
+word meets (a closing `total`, `სულ` or `ჯამი` does not count as that last word, so
+Total taxes leads `გადასახადები თბილისში`), and also carries `searchMatchNoteKa` and
 `searchMatchNoteEn`: only some words matched, so the entries may be about something
 else; before saying the data is not served, retry the missing part with another word or
 browse the dataset. A search without `datasetId` also returns the optional
@@ -47,10 +48,12 @@ names together (`შიდა ქართლის` names Shida Kartli; `ში
 that too, each word looks for its own pages, best first by how many of the words they
 meet: a word that no served entry meets links all its pages, and a word that only budget
 programmes' names hold links a page it names in full (`pension` links Pensions). A word
-the served data holds otherwise looks for no page. Joining words (`of`, `from`, `with`, `or`
-and the like) never count. A word that meets a dataset's own label (`prices` meets
-Consumer price inflation) looks for no page either, unless no served entry meets it and
-the other words reach beyond that dataset (`house prices`, not `bread prices`).
+the served data holds otherwise looks for no page. Joining words (`of`, `from`, `with`, `or`,
+`მიხედვით` and the like) never count. A word that meets a dataset's own label (`prices`
+meets Consumer price inflation) looks for no page either, unless no served entry meets
+it and the other words reach beyond that dataset; it then links only the pages whose own
+name it meets, and only when those are all of one topic (`house prices` links Home
+prices; `bread prices`, `debt overview` and `consumer debt` link nothing).
 `status` still describes the served series and entities only. A top-N ranking gives full
 source records for the returned rows and names the other documents read to fix the order
 by id in `inputDocumentIds`, resolved with `get_sources` and that source's `sourceId`; a
