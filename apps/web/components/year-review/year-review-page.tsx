@@ -14,7 +14,10 @@ import { useReplaceHash } from "../explorer-shell/use-replace-hash";
 import { DebtDeficit } from "./debt-deficit";
 import { GivesUp } from "./gives-up";
 import { Glance } from "./glance";
-import { Section, type YearReviewSectionProps } from "./section";
+import { LongView } from "./long-view";
+import { YearReviewNotes } from "./notes";
+import { CountryRegions } from "./per-resident";
+import type { YearReviewSectionProps } from "./section";
 import { WhereMoneyGoes } from "./where-money-goes";
 import { YearRuler } from "./year-ruler";
 
@@ -123,9 +126,9 @@ function YearReviewContent({ data }: { data: YearReviewData }) {
       <GivesUp {...sectionProps} />
       <WhereMoneyGoes {...sectionProps} />
       <DebtDeficit {...sectionProps} />
-      {/* Sections 05 and 06: number and heading until Task 9 fills them. */}
-      <Section number="05" id="year-review-country" heading={text("yearReview.h06")} />
-      <Section number="06" id="year-review-long" heading={text("yearReview.s3Title", { from: years[0]!, to: years.at(-1)! })} />
+      <CountryRegions {...sectionProps} />
+      <LongView {...sectionProps} />
+      <YearReviewNotes data={data} year={year} />
     </div>
   );
 }
