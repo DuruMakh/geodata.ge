@@ -92,6 +92,8 @@ describe("ExplorerTable planned values", () => {
       expect(cells[0]).not.toContain("გეგმა");
       expect(cells[1]).toContain("<sup");
       expect(cells[1]).toContain("გეგმა");
+      // Plain-text readers (crawlers) must not read the figure and its mark as one word.
+      expect(cells[1]!.replace(/<[^>]+>/g, ""), "figure and mark are apart in plain text").toMatch(/\d\s+გეგმა$/);
     }
   });
 });

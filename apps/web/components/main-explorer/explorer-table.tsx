@@ -51,7 +51,10 @@ type ExplorerTableProps<Row extends ExplorerTableRowLike> = {
   shareDecimalsForRow?: (row: Row, year: number) => number;
   /** A row's own number of decimals, for tables whose rows are published at different precisions; omit to use `unit.decimals`. */
   decimalsForRow?: (row: Row) => number;
-  /** A copy for search engines and AI crawlers: hidden from visitors by a stylesheet class only, with its own test id and no keyboard stop. */
+  /**
+   * A copy for search engines and AI crawlers: hidden from visitors by a stylesheet class only, with its own test id and no keyboard stop.
+   * Render it only in chart mode, before the chart wrapper, at the same tree position as the visible table (DESIGN.md §8.4).
+   */
   crawlCopy?: boolean;
 };
 
@@ -62,6 +65,15 @@ const numericCellClass =
 // On phones a status mark (preliminary, planned, forecast) drops under its number
 // rather than widening every year column.
 export const STATUS_MARK_CLASS = "ml-1 text-[11px] min-[768px]:text-[9px] font-medium text-[var(--faint)] @max-[768px]:top-0 @max-[768px]:ml-0 @max-[768px]:block @max-[768px]:leading-tight";
+
+// A status mark follows its figure with no text between them, so plain-text readers (crawlers) would run them
+// together ("30.9გეგმა"); the screen-reader-only space reads them apart and takes no room.
+const statusMark = (label: ReactNode, extraClass = "") => (
+  <sup className={`${STATUS_MARK_CLASS}${extraClass}`}>
+    <span className="sr-only"> </span>
+    {label}
+  </sup>
+);
 
 // Below 768px of table width (DESIGN.md §12) the sticky label column wraps and is capped at
 // 40% of the scroller, and the change/share columns scroll with the years instead of
@@ -131,7 +143,7 @@ export function ExplorerTable<Row extends ExplorerTableRowLike>({
   const breakStyle = (year: number) => (breakSet.has(year) ? { borderLeft: "2px solid var(--ink)" } : undefined);
   // The label rides on its year's header in both layouts; on phones it drops under the year at 11px, as the status marks do.
   const breakMark = (year: number) =>
-    breakLabel && breakSet.has(year) ? <sup className={`${STATUS_MARK_CLASS} normal-case tracking-normal`}>{breakLabel}</sup> : null;
+    breakLabel && breakSet.has(year) ? statusMark(breakLabel, " normal-case tracking-normal") : null;
   const cellValue = (row: Row, year: number): string => {
     const amount = row.valuesByYear[year];
     if (amount === null || amount === undefined) return MISSING;
@@ -154,6 +166,7 @@ export function ExplorerTable<Row extends ExplorerTableRowLike>({
   // effect swaps in the year rows before the first paint on a phone.
   const containerRef = useRef<HTMLDivElement>(null);
   const [tableWidth, setTableWidth] = useState(0);
+  // `crawlCopy` is a dependency because the hidden copy measures width 0 and the same instance becomes the visible table when the mode switches.
   useLayoutEffect(() => {
     const element = containerRef.current;
     if (!element) return;
@@ -166,7 +179,9 @@ export function ExplorerTable<Row extends ExplorerTableRowLike>({
   const seriesRows = showTotal && totalRow ? (totalFirst ? [totalRow, ...rows] : [...rows, totalRow]) : rows;
   const rowsLayout = usesRowsLayout(seriesRows.length, tableWidth);
 
+  // `crawlCopy` is a dependency because the hidden copy measures width 0 and the same instance becomes the visible table when the mode switches.
   useEffect(() => {
+    if (crawlCopy) return;
     const scroller = scrollerRef.current;
     if (!scroller || scroller.clientWidth >= 768) return;
     const latest = scroller.querySelector<HTMLElement>("thead th[data-latest-year]");
@@ -177,10 +192,10 @@ export function ExplorerTable<Row extends ExplorerTableRowLike>({
 
   const statusMarks = (row: Row, year: number): ReactNode => (
     <>
-      {(row.preliminaryByYear?.[year] ?? preliminaryYears?.includes(year)) ? <sup className={STATUS_MARK_CLASS}>{preliminaryLabel}</sup> : null}
-      {row.basisByYear?.[year] === "planned" ? <sup className={STATUS_MARK_CLASS}>{message(messages, "controls.planned")}</sup> : null}
-      {forecastLabel && forecastYears?.includes(year) ? <sup className={STATUS_MARK_CLASS}>{forecastLabel}</sup> : null}
-      {row.markByYear?.[year] ? <sup className={STATUS_MARK_CLASS}>{row.markByYear[year]}</sup> : null}
+      {(row.preliminaryByYear?.[year] ?? preliminaryYears?.includes(year)) ? statusMark(preliminaryLabel) : null}
+      {row.basisByYear?.[year] === "planned" ? statusMark(message(messages, "controls.planned")) : null}
+      {forecastLabel && forecastYears?.includes(year) ? statusMark(forecastLabel) : null}
+      {row.markByYear?.[year] ? statusMark(row.markByYear[year]) : null}
     </>
   );
 
@@ -279,11 +294,9 @@ export function ExplorerTable<Row extends ExplorerTableRowLike>({
       {years.map((year) => (
         <td key={year} className={`${numericCellClass} font-semibold text-[var(--ink)]`} style={{ ...cellPad, ...breakStyle(year) }}>
           {cellValue(totalRow, year)}
-          {totalRow.preliminaryByYear?.[year] ? <sup className={STATUS_MARK_CLASS}>{preliminaryLabel}</sup> : null}
-          {totalRow.basisByYear?.[year] === "planned" ? <sup className={STATUS_MARK_CLASS}>{message(messages, "controls.planned")}</sup> : null}
-          {forecastLabel && forecastYears?.includes(year) ? (
-            <sup className={STATUS_MARK_CLASS}>{forecastLabel}</sup>
-          ) : null}
+          {totalRow.preliminaryByYear?.[year] ? statusMark(preliminaryLabel) : null}
+          {totalRow.basisByYear?.[year] === "planned" ? statusMark(message(messages, "controls.planned")) : null}
+          {forecastLabel && forecastYears?.includes(year) ? statusMark(forecastLabel) : null}
         </td>
       ))}
       {showChangeColumn ? (
