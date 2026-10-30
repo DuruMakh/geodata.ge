@@ -1,5 +1,6 @@
 import { describe, expect, test } from "vitest";
 import { chooseActivePublicFacts } from "../../lib/data/activeFacts";
+import { buildBreakRegister } from "../../lib/data/demography/breaks";
 import { loadServedDemographyData } from "../../lib/data/demography/importDemography";
 import {
   loadServedExplorerData,
@@ -12,7 +13,7 @@ import { projectBalanceFact, projectBudgetFact, projectDebtFact, projectGdpFact 
 import { buildDebtExplorerModel } from "../../lib/explorer/debtExplorer";
 import { buildDeficitExplorerModel, DEFICIT_SERIES_ID } from "../../lib/explorer/deficitExplorer";
 import { buildExplorerModel, isDerivedTotalItemId } from "../../lib/explorer/explorerData";
-import { buildMunicipalListRows, MUNICIPAL_PER_RESIDENT_YEAR } from "../../lib/explorer/municipalData";
+import { buildMedianMunicipalBudgetPerResident, buildMunicipalListRows, MUNICIPAL_PER_RESIDENT_YEAR } from "../../lib/explorer/municipalData";
 import { getPresentation } from "../../lib/i18n/presentation.server";
 import { REVENUE_BANDS } from "../../lib/landing/chapters/budgetSeries";
 import { loadYearReviewData } from "../../lib/yearReview/buildYearReviewData";
@@ -86,6 +87,17 @@ describe("buildYearReviewData", () => {
     expect(at(data.budget.years, data.budget.population, 2025)).toBe(georgia2025.value);
     const { gdpFacts } = await loadServedExplorerData();
     expect(at(data.budget.years, data.budget.gdp, 2025)).toBe(gdpFacts.find((fact) => fact.year === 2025)!.gdpCurrentPricesGel);
+  });
+
+  test("the population break is the register's census recalculation, where the served population changes basis", async () => {
+    const { data } = await loadYearReviewData("ka");
+    const census = buildBreakRegister().find((row) => row.appliesTo.includes("demography.population_total"))!;
+    expect(data.budget.populationBreak).toBe(Number(census.referenceDate.slice(0, 4)));
+    const { facts } = await loadServedDemographyData();
+    const basis = (year: number) =>
+      facts.find((fact) => fact.seriesId === "demography.population_total" && fact.geographyId === "country.georgia" && fact.year === year)!.estimateBasis;
+    expect(basis(data.budget.populationBreak!)).toBe("census_based");
+    expect(basis(data.budget.populationBreak! - 1)).not.toBe("census_based");
   });
 
   test("spending types exclude the total and running-cost subtotal", async () => {
@@ -180,10 +192,14 @@ describe("buildYearReviewData", () => {
       year: MUNICIPAL_PER_RESIDENT_YEAR,
     });
     const byCode = new Map(list.municipalities.map((row) => [row.id, row]));
+    const residents = new Map(municipal.populationFacts.map((row) => [row.municipalityCode, row.populationPersons]));
     for (const place of data.municipal.places) {
       expect(place.perResidentGel).toBe(byCode.get(place.code)!.budgetPerResidentGel);
       expect(place.totalGel).toBe(byCode.get(place.code)!.valueGel);
+      expect(place.populationPersons).toBe(residents.get(place.code));
     }
+    // The median is the Municipalities page's own (its index KPI).
+    expect(data.municipal.median).toBe(buildMedianMunicipalBudgetPerResident(list.municipalities));
     // One dot-plot row per region, Tbilisi included, and every place's region is listed.
     const regionIds = new Set(data.municipal.regions.map((region) => region.id));
     expect(regionIds.size).toBe(11);

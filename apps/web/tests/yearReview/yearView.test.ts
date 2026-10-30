@@ -70,6 +70,27 @@ describe("glanceKpis", () => {
     const spend = glanceKpis(fixture(), 2022).find((kpi) => kpi.id === "spend")!;
     expect(spend.previous).toBeNull();
   });
+
+  test("each spark knows its first plan or projection point, whichever year is chosen", () => {
+    const byId = Object.fromEntries(glanceKpis(fixture(), 2024).map((kpi) => [kpi.id, kpi]));
+    expect(byId.spend).toMatchObject({ sparkIndex: 2, sparkPlanFrom: 4 });
+    expect(byId.balance).toMatchObject({ sparkIndex: 4, sparkPlanFrom: 6 });
+    expect(byId.perResident!.sparkPlanFrom).toBe(4);
+    expect(byId.debt!.sparkPlanFrom).toBeNull();
+    expect(byId.breaks!.sparkPlanFrom).toBeNull();
+  });
+
+  test("per resident: a re-based population splits the spark, and the points after the break shift one place", () => {
+    const data = fixture();
+    data.budget.populationBreak = 2024;
+    const perResident = (year: number) => glanceKpis(data, year).find((kpi) => kpi.id === "perResident")!;
+    expect(perResident(2026)).toMatchObject({ value: 14.3, spark: [10, 10.5, null, 11.5, 12.5, 14.3], sparkIndex: 5, sparkPlanFrom: 5 });
+    expect(perResident(2023)).toMatchObject({ sparkIndex: 1, previous: { year: 2022, value: 10 } });
+    // Nothing is compared across the break.
+    expect(perResident(2024)).toMatchObject({ sparkIndex: 3, previous: null });
+    // The other headline numbers are not per resident and keep their line whole.
+    expect(glanceKpis(data, 2026).find((kpi) => kpi.id === "spend")!.spark).toEqual([100, 105, 115, 125, 143]);
+  });
 });
 
 describe("balanceRecord", () => {
@@ -88,7 +109,7 @@ describe("balanceRecord", () => {
     expect(balanceRecord(fixture(), 2023)).toEqual({ kind: "largestSince", since: 2021 });
     const data = fixture();
     data.balance.pctGdp[5] = -2.5;
-    expect(balanceRecord(data, 2025)).toEqual({ kind: "smallestSince", since: 2022 });
+    expect(balanceRecord(data, 2025)).toEqual({ kind: "smallestSince", since: 2022, sinceSurplus: false });
     expect(balanceRecord(fixture(), 2025)).toEqual({ kind: "smallestEver" });
     expect(balanceRecord(fixture(), 2028)).toEqual({ kind: "surplus" });
   });
@@ -238,14 +259,21 @@ describe("perResidentRows", () => {
 });
 
 describe("regionsView", () => {
-  test("a region's average is its total over its population; the median of 4 is the mean of the middle two", () => {
+  test("a region's average is its total over its population; the median is the data's own", () => {
     const view = regionsView(fixture());
     expect(view.median).toBe(45);
     expect(view.regions.map((region) => region.id)).toEqual(["region.one", "region.two"]);
-    // region.one: 100 + 300 GEL over 100/50 + 300/100 = 5 residents.
+    // region.one: 100 + 300 GEL over 2 + 3 = 5 residents.
     expect(view.regions[0]!.average).toBeCloseTo(400 / 5, 12);
     expect(view.regions[1]!.average).toBeCloseTo(100 / 4, 12);
     expect(view.regions[0]!.places.map((place) => place.code)).toEqual(["01", "02"]);
+  });
+
+  test("a municipality that spent nothing still counts its residents, so no average is NaN", () => {
+    const data = fixture();
+    data.municipal.places[3] = { ...data.municipal.places[3]!, totalGel: 0, perResidentGel: 0 };
+    const two = regionsView(data).regions.find((region) => region.id === "region.two")!;
+    expect(two.average).toBe(60 / 4);
   });
 });
 

@@ -20,6 +20,11 @@ type SparklineProps = {
   dotIndex?: number;
   /** With `endDot`: the dot's colour (the year review's ranking draws it in the category's); accent by default. */
   dotColor?: string;
+  /**
+   * The first plan or projection point of a series that ends in them: the line from the point before it on is dashed
+   * and has no area, so a planned value stays marked wherever the dot is (the year review's sparklines).
+   */
+  planFrom?: number;
 };
 
 // The dot is a zero-length stroke with round caps, not a circle: a stretched chart (preserveAspectRatio "none")
@@ -39,10 +44,12 @@ function areaPath(segment: string, height: number): string {
   return `${segment} L${last.x} ${height} L${first[0]} ${height} Z`;
 }
 
-export function Sparkline({ values, color, width = 64, height = 16, fluidOnMobile = false, area = false, endDot = false, hollowEnd = false, dotIndex, dotColor = "var(--accent)" }: SparklineProps) {
-  const segments = buildSparklinePath(values, width, height);
-  if (segments.length === 0) return null;
-  const end = dotIndex === undefined ? endPoint(segments.at(-1)!) : sparklinePoint(values, dotIndex, width, height);
+export function Sparkline({ values, color, width = 64, height = 16, fluidOnMobile = false, area = false, endDot = false, hollowEnd = false, dotIndex, dotColor = "var(--accent)", planFrom }: SparklineProps) {
+  const segments = buildSparklinePath(values, width, height, 1, 0, planFrom);
+  const planned = planFrom === undefined ? [] : buildSparklinePath(values, width, height, 1, Math.max(0, planFrom - 1));
+  const drawn = [...segments, ...planned];
+  if (drawn.length === 0) return null;
+  const end = dotIndex === undefined ? endPoint(drawn.at(-1)!) : sparklinePoint(values, dotIndex, width, height);
 
   return (
     <svg
@@ -68,6 +75,19 @@ export function Sparkline({ values, color, width = 64, height = 16, fluidOnMobil
           strokeWidth={1.2}
           strokeLinejoin="round"
           strokeLinecap="round"
+          vectorEffect={fluidOnMobile ? "non-scaling-stroke" : undefined}
+        />
+      ))}
+      {planned.map((path, index) => (
+        <path
+          key={`plan-${index}`}
+          data-testid="sparkline-plan"
+          d={path}
+          fill="none"
+          stroke={color}
+          strokeWidth={1.2}
+          strokeDasharray="2 1.5"
+          strokeLinejoin="round"
           vectorEffect={fluidOnMobile ? "non-scaling-stroke" : undefined}
         />
       ))}

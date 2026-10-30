@@ -1,4 +1,4 @@
-import { chooseActivePublicFacts } from "../data/activeFacts";
+import { buildBreakRegister } from "../data/demography/breaks";
 import { loadServedDemographyData } from "../data/demography/importDemography";
 import { SERIES } from "../data/demography/series";
 import type { ServedDemographyObservation } from "../data/demography/types";
@@ -18,14 +18,13 @@ import { citedReviewedAt } from "../data/sources";
 import { loadServedTaxBreaksRefundsData, toClientTaxBreaksRefundsFact } from "../data/taxBreaksRefunds/importTaxBreaksRefunds";
 import type { TaxBreaksRefundsFact } from "../data/taxBreaksRefunds/types";
 import { colorForItem, SERIES_COLORS } from "../explorer/colors";
-import { isDerivedTotalItemId } from "../explorer/explorerData";
-import { buildMunicipalListRows, MUNICIPAL_PER_RESIDENT_YEAR } from "../explorer/municipalData";
+import { buildMedianMunicipalBudgetPerResident, buildMunicipalListRows, MUNICIPAL_PER_RESIDENT_YEAR } from "../explorer/municipalData";
 import { publicLabel } from "../i18n/labels";
 import { message } from "../i18n/messages";
 import { getMessages } from "../i18n/messages.server";
 import { getPresentation } from "../i18n/presentation.server";
 import type { Locale, Presentation } from "../i18n/types";
-import { OTHER_UNCLASSIFIED_ID, REVENUE_BANDS, TAX_BAND_IDS } from "../landing/chapters/budgetSeries";
+import { activeDetailFacts, OTHER_UNCLASSIFIED_ID, revenueBandOf, TAX_BAND_IDS } from "../landing/chapters/budgetSeries";
 import { editionLabel, loadImfWeoManifest } from "../methodology/workbookSources";
 import type { ServedGeneralGovernmentBalanceFact, ServedGovernmentDebtFact } from "../servedRows";
 import type { Category, Values, YearReviewData, YearReviewSources } from "./types";
@@ -43,8 +42,6 @@ export type YearReviewInput = {
 
 /** Running costs: the subtotal of the types beside it, so a chart of the types leaves it out with the grand total. */
 const EXPENDITURE_TYPES_EXPENSE = "spending_type.expense";
-const TAX_IDS = new Set(TAX_BAND_IDS.flatMap((band) => REVENUE_BANDS[band]));
-const BANDED_REVENUE_IDS = new Set(Object.values(REVENUE_BANDS).flat());
 
 function sortedYears(rows: readonly { year: number }[]): number[] {
   return [...new Set(rows.map((row) => row.year))].sort((left, right) => left - right);
@@ -83,12 +80,25 @@ function coloured<T extends Omit<Category, "color">>(categories: T[]): (T & { co
   return categories.map((category, index) => ({ ...category, color: colorForItem(category.id, index) }));
 }
 
+/**
+ * The first budget year whose 1 January population is on a new basis, from the demography break register (the census
+ * recalculation the Population, Crime and Social protection pages mark), when the population has a value on both sides.
+ */
+function populationBreak(years: readonly number[], population: Values): number | null {
+  const starts = buildBreakRegister()
+    .filter((row) => row.appliesTo.includes(SERIES.populationTotal))
+    .map((row) => Number(row.referenceDate.slice(0, 4)));
+  if (starts.length > 1) throw new Error("Year in review: the per-resident line splits at one population break, and the register has several");
+  const index = starts.length ? years.indexOf(starts[0]!) : -1;
+  return index > 0 && population[index] !== null && population.slice(0, index).some((value) => value !== null) ? years[index]! : null;
+}
+
 function buildBudget(input: YearReviewInput, presentation: Presentation): YearReviewData["budget"] {
   const { facts, glossary, adminFacts, adminCategories, gdpFacts } = input.explorer;
   const { locale, englishLabels } = presentation;
-  const active = chooseActivePublicFacts(facts).filter((fact) => !isDerivedTotalItemId(fact.itemId));
-  const expenditure = active.filter((fact) => fact.side === "expenditure");
-  const revenue = active.filter((fact) => fact.side === "revenue");
+  // The homepage chapters' own active detail facts (actual wins over planned), so the two count the same items.
+  const expenditure = activeDetailFacts(facts, "expenditure");
+  const revenue = activeDetailFacts(facts, "revenue");
 
   const years = span(expenditure.map((fact) => fact.year));
   const planned = years.map((year) => expenditure.some((fact) => fact.year === year && fact.basis === "planned"));
@@ -110,13 +120,11 @@ function buildBudget(input: YearReviewInput, presentation: Presentation): YearRe
     (id, fact) => publicLabel(locale, id, categoryLabels.get(id) ?? fact.officialLabelKa ?? id, englishLabels),
   ), defaultIndex));
 
-  for (const fact of revenue) {
-    if (!BANDED_REVENUE_IDS.has(fact.itemId)) throw new Error(`Revenue item ${fact.itemId} is not assigned to a homepage band`);
-  }
+  // revenueBandOf throws for an item in no band, as the homepage chapter does, so no receipt drops out of the tax total unseen.
   const receipts = coloured(sortCategories(byItem(revenue, budgetLabel), defaultIndex))
-    .map((receipt) => ({ ...receipt, tax: TAX_IDS.has(receipt.id) }));
+    .map((receipt) => ({ ...receipt, tax: TAX_BAND_IDS.includes(revenueBandOf(receipt.id)) }));
 
-  const population = input.demography.facts.filter((fact) => fact.seriesId === SERIES.populationTotal && fact.geographyId === MUNICIPAL_COUNTRY_ID);
+  const population = aligned(years, input.demography.facts.filter((fact) => fact.seriesId === SERIES.populationTotal && fact.geographyId === MUNICIPAL_COUNTRY_ID), (fact) => fact.value);
   return {
     years,
     planned,
@@ -125,7 +133,8 @@ function buildBudget(input: YearReviewInput, presentation: Presentation): YearRe
     institutions,
     receipts,
     gdp: aligned(years, gdpFacts, (fact) => fact.gdpCurrentPricesGel),
-    population: aligned(years, population, (fact) => fact.value),
+    population,
+    populationBreak: populationBreak(years, population),
   };
 }
 
@@ -212,6 +221,7 @@ function buildDebt(input: YearReviewInput): YearReviewData["debt"] {
 function buildMunicipal(input: YearReviewInput, presentation: Presentation): YearReviewData["municipal"] {
   const { municipalities, regions, totalFacts, populationFacts, adjaraBudgetAdjustments } = input.municipal;
   const { locale, englishLabels } = presentation;
+  const residents = new Map(populationFacts.map((row) => [row.municipalityCode, row.populationPersons]));
   const list = buildMunicipalListRows({
     municipalities,
     regionLabels: new Map(regions.map((region) => [region.id, region.kaLabel])),
@@ -220,8 +230,11 @@ function buildMunicipal(input: YearReviewInput, presentation: Presentation): Yea
     adjaraBudgetAdjustments,
     year: MUNICIPAL_PER_RESIDENT_YEAR,
   });
+  const median = buildMedianMunicipalBudgetPerResident(list.municipalities);
+  if (median === null) throw new Error(`Year in review: no municipality has a ${MUNICIPAL_PER_RESIDENT_YEAR} figure per resident`);
   return {
     year: MUNICIPAL_PER_RESIDENT_YEAR,
+    median,
     regions: [...regions]
       .sort((left, right) => left.sortOrder - right.sortOrder)
       .map((region) => ({ id: region.id, label: publicLabel(locale, region.id, region.kaLabel, englishLabels) })),
@@ -230,6 +243,7 @@ function buildMunicipal(input: YearReviewInput, presentation: Presentation): Yea
       label: publicLabel(locale, row.id, row.nameKa, englishLabels),
       regionId: row.regionId!,
       totalGel: row.valueGel,
+      populationPersons: residents.get(row.id)!,
       perResidentGel: row.budgetPerResidentGel!,
     })),
   };
@@ -286,8 +300,7 @@ export async function loadYearReviewData(locale: Locale): Promise<{ data: YearRe
     loadSources(locale),
   ]);
   const input: YearReviewInput = { explorer, expenditureTypes, taxBreaksRefunds, balance, debt, municipal, demography };
-  // The English names ride along on the Georgian page too, as on the page this replaces (lib/pages/analysis.tsx).
-  const ids = yearReviewLabelIds(input);
-  const presentation = await getPresentation(locale, ["yearReview", "format", "main"], ids, ids);
+  // Every name is resolved into `data` here, so a Georgian page needs no English names (publicLabel keeps the Georgian).
+  const presentation = await getPresentation(locale, ["yearReview", "format", "main"], yearReviewLabelIds(input));
   return { data: buildYearReviewData(input, presentation, sources), presentation };
 }

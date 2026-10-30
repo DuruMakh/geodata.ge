@@ -13,6 +13,7 @@ export type YearReviewData = {
     receipts: (Category & { tax: boolean })[]; // revenue items, GEL, same years (null where absent)
     gdp: Values;                // GEL, current prices
     population: Values;         // persons on 1 January, demography.population_total, country.georgia
+    populationBreak: number | null; // first year of the census re-based population (demography break register); nothing per resident is compared across it
   };
   spendingTypes: { years: number[]; total: Values; types: Category[] }; // nominal GEL; types exclude spending_type.total and .expense
   taxBreaks: { years: number[]; vat: Values; income: Values; all: Values }; // GEL (served value is mln: ×1e6)
@@ -25,8 +26,9 @@ export type YearReviewData = {
   };
   municipal: {
     year: number;               // MUNICIPAL_PER_RESIDENT_YEAR
+    median: number;             // GEL per resident of the median municipality, by the Municipalities page's own function
     regions: { id: string; label: string }[];
-    places: { code: string; label: string; regionId: string; totalGel: number; perResidentGel: number }[];
+    places: { code: string; label: string; regionId: string; totalGel: number; populationPersons: number; perResidentGel: number }[];
   };
   updatedAt: string;            // citedReviewedAt over budget + admin facts, as today's page
   sources: YearReviewSources;   // the source pages' own source lines, for the share pictures

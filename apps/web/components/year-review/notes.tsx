@@ -72,7 +72,9 @@ export const YearReviewNotes = memo(function YearReviewNotes({ data, year }: { d
     text("yearReview.nMun", { year: municipal.year }),
     populationYear === null
       ? null
-      : text("yearReview.nPop", { y: populationYear, v: formatInUnit(budget.population[budget.years.indexOf(populationYear)], UNIT_PERSONS) }),
+      : budget.populationBreak === null
+        ? text("yearReview.nPop", { y: populationYear, v: formatInUnit(budget.population[budget.years.indexOf(populationYear)], UNIT_PERSONS) })
+        : text("yearReview.nPopBreak", { y: populationYear, v: formatInUnit(budget.population[budget.years.indexOf(populationYear)], UNIT_PERSONS), b: budget.populationBreak }),
     gdp ? text("yearReview.nGdp", { prelim: gdp.to }) : null,
     text("yearReview.nRound"),
     text("yearReview.nNominal"),

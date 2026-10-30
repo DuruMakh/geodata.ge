@@ -61,6 +61,28 @@ describe("buildFindings", () => {
       expect(finding(data, 2025, "taxes").heading).toBe("Largest fall: label revenue.vat");
     });
 
+    test("a line falling to zero or below is a fall, shown without a percentage; growth ranks lines positive in both years", () => {
+      const data = withDebtService();
+      setValues(data, "revenue.other_taxes", [5, 5, 5, -3, null]);
+      const item = finding(data, 2025, "taxes");
+      expect(item.heading).toBe("label revenue.other_taxes was the only tax that fell");
+      expect(item.detail).toBe("<1 mln → >−1 mln vs 2024");
+      expect(finding(data, 2025, "taxes", "ka").detail).toBe("<1 მლნ → >−1 მლნ · 2024 წელთან");
+      // A line rising from below zero is no fall, and has no growth rate to rank.
+      setValues(data, "revenue.other_taxes", [5, 5, -3, 5, null]);
+      expect(finding(data, 2025, "taxes").heading).toBe("Every tax grew; label revenue.profit_tax grew fastest");
+    });
+
+    test("served data: in 2019 “Other taxes” fell below zero, and in 2020 further, so neither year reads “every tax grew”", async () => {
+      const [{ data: en }, { data: ka }] = await Promise.all([loadYearReviewData("en"), loadYearReviewData("ka")]);
+      expect(finding(en, 2019, "taxes")).toMatchObject({ heading: "Other taxes was the only tax that fell", detail: "115 mln → −230 mln vs 2018" });
+      expect(finding(ka, 2019, "taxes", "ka")).toMatchObject({
+        heading: "სხვა გადასახადები — ერთადერთი გადასახადი, რომელიც შემცირდა",
+        detail: "115 მლნ → −230 მლნ · 2018 წელთან",
+      });
+      expect(finding(en, 2020, "taxes").heading).toBe("Largest fall: VAT");
+    });
+
     test("a year without receipts falls back to the last one, with its year tag", () => {
       expect(finding(withDebtService(), 2026, "taxes")).toMatchObject({ yearTag: 2025, heading: "Every tax grew; label revenue.profit_tax grew fastest" });
     });
@@ -164,6 +186,25 @@ describe("buildFindings", () => {
       expect(finding(data, 2025, "types", "ka").detail).toBe("4 სახიდან ერთადერთი, რომელიც გაიზარდა");
     });
 
+    test("“of {n}” counts every type with a value in both years, a zero base included, and names only one with a percentage", () => {
+      const data = withDebtService();
+      setValues(data, "spending_type.other", [0, 0, 4]); // 0 → 4: grew, no percentage
+      setValues(data, "spending_type.investment", [30, 35, 40]);
+      setValues(data, "spending_type.interest", [25, 25, 20]); // the only fall
+      expect(finding(data, 2025, "types")).toMatchObject({ heading: "label spending_type.interest: −20.0% vs 2024", detail: "the only one of 4 spending types that fell" });
+      // A lone riser from zero has no percentage, so the largest percentage change is named instead.
+      setValues(data, "spending_type.social_benefits", [40, 45, 40]);
+      setValues(data, "spending_type.investment", [30, 35, 30]);
+      setValues(data, "spending_type.interest", [25, 25, 24]);
+      expect(finding(data, 2025, "types").heading).toBe("label spending_type.investment: −14.3% vs 2024");
+    });
+
+    test("served data: 2004 counts all eight spending types", async () => {
+      const { data } = await loadYearReviewData("en");
+      expect(finding(data, 2004, "types").detail).toBe(`the only one of ${data.spendingTypes.types.length} spending types that fell`);
+      expect(data.spendingTypes.types).toHaveLength(8);
+    });
+
     test("otherwise the largest percentage change, with its amounts", () => {
       const item = finding(withDebtService(), 2025, "types");
       expect(item.heading).toBe("label spending_type.interest: +48.0% vs 2024");
@@ -183,7 +224,7 @@ describe("buildFindings", () => {
         kind: "bars",
         rows: [
           { label: "taxes", value: 125, color: "#1E1B16" },
-          { label: "debt service", value: 10, color: "#B3402A" },
+          { label: "repayments and interest", value: 10, color: "#B3402A" },
         ],
       });
     });
@@ -193,7 +234,7 @@ describe("buildFindings", () => {
     test("the fewest places, largest first, whose spending passes half: 50 alone does not", () => {
       const data = withDebtService();
       data.municipal.places = [10, 50, 10, 30].map((totalGel, index) => ({
-        code: `0${index + 1}`, label: `p${index + 1}`, regionId: "region.one", totalGel, perResidentGel: 10,
+        code: `0${index + 1}`, label: `p${index + 1}`, regionId: "region.one", totalGel, populationPersons: totalGel / 10, perResidentGel: 10,
       }));
       const item = finding(data, 2025, "municipal");
       expect(item.heading).toBe("80% of municipal spending is in just 2 of the 4 municipalities");

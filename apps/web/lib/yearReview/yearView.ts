@@ -50,12 +50,6 @@ function change(value: number | null, previous: number | null): number | null {
   return previous === null || previous <= 0 || value === null || value < 0 ? null : value / previous - 1;
 }
 
-function median(values: readonly number[]): number {
-  const sorted = [...values].sort((left, right) => left - right);
-  const middle = sorted.length >> 1;
-  return sorted.length % 2 ? sorted[middle]! : (sorted[middle - 1]! + sorted[middle]!) / 2;
-}
-
 /** The chosen year if it has a value; else the nearest earlier year with one; else the nearest later one. */
 export function nearestYear(years: number[], values: Values, chosen: number): number | null {
   const present = years.filter((_, index) => values[index] !== null && values[index] !== undefined);
@@ -95,6 +89,7 @@ export type GlanceKpi = {
   previous: { year: number; value: number } | null;
   spark: Values;
   sparkIndex: number;
+  sparkPlanFrom: number | null; // the spark's first plan or projection point; every later one is one too
 };
 
 /** The six headline numbers, each in its dataset's nearest year to the chosen one. */
@@ -104,6 +99,7 @@ export function glanceKpis(data: YearReviewData, year: number): GlanceKpi[] {
   const kpi = (id: GlanceKpi["id"], years: number[], values: Values, planned: readonly boolean[] | null): GlanceKpi => {
     const used = picked(id, years, values, year);
     const previous = used.index > 0 ? values[used.index - 1] ?? null : null;
+    const planFrom = planned?.indexOf(true) ?? -1;
     return {
       id,
       year: used.year,
@@ -113,6 +109,21 @@ export function glanceKpis(data: YearReviewData, year: number): GlanceKpi[] {
       previous: previous === null ? null : { year: years[used.index - 1]!, value: previous },
       spark: values,
       sparkIndex: used.index,
+      sparkPlanFrom: planFrom < 0 ? null : planFrom,
+    };
+  };
+  // Per resident divides by a population re-based at the census: a null before the break draws the line in two parts,
+  // as the Population page's sparklines are (demographyPopulation sparkValues), and no change is computed across it.
+  const breakAt = budget.populationBreak === null ? -1 : budget.years.indexOf(budget.populationBreak);
+  const split = (item: GlanceKpi): GlanceKpi => {
+    if (breakAt <= 0) return item;
+    const shift = (index: number) => (index >= breakAt ? index + 1 : index);
+    return {
+      ...item,
+      previous: item.sparkIndex === breakAt ? null : item.previous,
+      spark: [...item.spark.slice(0, breakAt), null, ...item.spark.slice(breakAt)],
+      sparkIndex: shift(item.sparkIndex),
+      sparkPlanFrom: item.sparkPlanFrom === null ? null : shift(item.sparkPlanFrom),
     };
   };
   return [
@@ -121,11 +132,15 @@ export function glanceKpis(data: YearReviewData, year: number): GlanceKpi[] {
     kpi("balance", balance.years, balance.pctGdp, balance.projection),
     kpi("debt", debt.stock.years, debt.stock.total, null),
     kpi("breaks", taxBreaks.years, taxBreaks.all, null),
-    kpi("perResident", budget.years, perResident(data, budget.years, spend), budget.planned),
+    split(kpi("perResident", budget.years, perResident(data, budget.years, spend), budget.planned)),
   ];
 }
 
-export type BalanceRecord = { kind: "surplus" } | { kind: "smallestSince" | "largestSince"; since: number } | { kind: "smallestEver" | "largestEver" };
+export type BalanceRecord =
+  | { kind: "surplus" }
+  | { kind: "smallestSince"; since: number; sinceSurplus: boolean } // sinceSurplus: that year had no deficit to compare with
+  | { kind: "largestSince"; since: number }
+  | { kind: "smallestEver" | "largestEver" };
 
 /**
  * The record phrase for the balance: against every earlier actual year (projections never count). A deficit smaller
@@ -143,7 +158,7 @@ export function balanceRecord(data: YearReviewData, year: number): BalanceRecord
   const previous = earlier.at(-1);
   if (previous && value > previous.value) {
     const since = earlier.findLast((other) => other.value >= value);
-    return since ? { kind: "smallestSince", since: since.year } : { kind: "smallestEver" };
+    return since ? { kind: "smallestSince", since: since.year, sinceSurplus: since.value > 0 } : { kind: "smallestEver" };
   }
   const since = earlier.findLast((other) => other.value <= value);
   return since ? { kind: "largestSince", since: since.year } : { kind: "largestEver" };
@@ -386,7 +401,7 @@ export function perResidentRows(
     row("soc", spendingTypes.years, social.values, null),
     {
       id: "mun",
-      value: median(municipal.places.map((place) => place.perResidentGel)),
+      value: municipal.median,
       year: municipal.year,
       fallback: municipal.year !== year,
       planned: false,
@@ -402,14 +417,14 @@ export function regionsView(data: YearReviewData): {
   median: number;
   regions: { id: string; label: string; average: number; places: YearReviewData["municipal"]["places"] }[];
 } {
-  const { regions, places } = data.municipal;
+  const { regions, places, median } = data.municipal;
   return {
-    median: median(places.map((place) => place.perResidentGel)),
+    median,
     regions: regions
       .map((region) => {
         const own = places.filter((place) => place.regionId === region.id);
         const total = own.reduce((sum, place) => sum + place.totalGel, 0);
-        const residents = own.reduce((sum, place) => sum + place.totalGel / place.perResidentGel, 0);
+        const residents = own.reduce((sum, place) => sum + place.populationPersons, 0);
         return { id: region.id, label: region.label, average: total / residents, places: own };
       })
       .filter((region) => region.places.length > 0)

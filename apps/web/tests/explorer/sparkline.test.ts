@@ -1,4 +1,7 @@
+import { createElement } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
+import { Sparkline } from "../../components/ui/sparkline";
 import { annualSeries, buildSparklinePath, sparklinePoint } from "../../lib/explorer/sparkline";
 
 describe("buildSparklinePath", () => {
@@ -32,6 +35,11 @@ describe("buildSparklinePath", () => {
   it("ignores non-finite values", () => {
     expect(buildSparklinePath([1, Number.NaN, 3, 4], 64, 16)).toHaveLength(1);
   });
+
+  it("draws only the points in [from, to), on the whole series' scale", () => {
+    expect(buildSparklinePath([0, 1, 2], 64, 16, 1, 0, 2)).toEqual(["M1.0 15.0 L32.0 8.0"]);
+    expect(buildSparklinePath([0, 1, 2], 64, 16, 1, 1)).toEqual(["M32.0 8.0 L63.0 1.0"]);
+  });
 });
 
 describe("sparklinePoint", () => {
@@ -49,5 +57,24 @@ describe("annualSeries", () => {
 
   it("spans the years it is given, beyond the points' own", () => {
     expect(annualSeries([{ year: 2021, value: 2 }], 2019, 2022)).toEqual([null, null, 2, null]);
+  });
+});
+
+describe("Sparkline planFrom", () => {
+  const render = (props: Partial<Parameters<typeof Sparkline>[0]> = {}) =>
+    renderToStaticMarkup(createElement(Sparkline, { values: [0, 1, 2, 4], color: "#000", area: true, endDot: true, dotIndex: 1, ...props }));
+
+  it("draws the line from the last actual point to the plan dashed and without area, whatever point the dot marks", () => {
+    const markup = render({ planFrom: 3 });
+    expect(markup).toContain('<path data-testid="sparkline-plan" d="M42.3 8.0 L63.0 1.0" fill="none" stroke="#000" stroke-width="1.2" stroke-dasharray="2 1.5"');
+    expect(markup).toContain('<path d="M1.0 15.0 L21.7 11.5 L42.3 8.0 L42.3 16 L1.0 16 Z"');
+    // The dot stays on the chosen point.
+    expect(markup).toContain('d="M21.7 11.5 L21.7 11.5"');
+    expect(markup).not.toContain("L63.0 1.0 L63.0 16");
+  });
+
+  it("leaves the drawing unchanged without it", () => {
+    expect(render()).not.toContain("sparkline-plan");
+    expect(render()).toContain("L63.0 1.0 L63.0 16");
   });
 });

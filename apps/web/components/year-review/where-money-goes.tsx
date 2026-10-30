@@ -36,6 +36,7 @@ export function WhereMoneyGoes({ data, year, grouping, focus, pin, onFocus, onPi
   const lari = text("yearReview.lari");
   const { years } = data.budget;
   const index = years.indexOf(year);
+  const planFrom = data.budget.planned.indexOf(true);
   // The views and the tall treemap layout follow the year and grouping only, not a hover.
   const { where, change, buys, tall } = useMemo(() => {
     const buys = buysView(data, year);
@@ -81,6 +82,7 @@ export function WhereMoneyGoes({ data, year, grouping, focus, pin, onFocus, onPi
       spark: item.spark,
       sparkIndex: index,
       planned: where.planned,
+      ...(planFrom < 0 ? {} : { sparkPlanFrom: planFrom }),
     };
   });
   const listAria = text("yearReview.listAria", { y: year });

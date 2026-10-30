@@ -110,7 +110,7 @@ export function RegionsDots({ data, year }: { data: YearReviewData; year: number
                   <button
                     type="button"
                     aria-pressed={regionPin === region.id}
-                    aria-label={text("yearReview.rgAria", { name: region.label, v: gel(region.average), n: region.places.length })}
+                    aria-label={text(region.places.length === 1 ? "yearReview.rgAria1" : "yearReview.rgAria", { name: region.label, v: gel(region.average), n: region.places.length })}
                     onPointerEnter={pointerHover(() => setRegionHover(region.id))}
                     onPointerLeave={() => setRegionHover(null)}
                     onFocus={(event) => { if (event.currentTarget.matches(":focus-visible")) setRegionHover(region.id); }}

@@ -28,6 +28,7 @@ export function fixture(): YearReviewData {
       ],
       gdp: [500, 550, 600, 650, null],
       population: [10, 10, 10, 10, 10],
+      populationBreak: null,
     },
     spendingTypes: {
       years: [2023, 2024, 2025],
@@ -59,12 +60,13 @@ export function fixture(): YearReviewData {
     },
     municipal: {
       year: 2025,
+      median: 45,
       regions: [{ id: "region.one", label: "One" }, { id: "region.two", label: "Two" }],
       places: [
-        { code: "01", label: "p1", regionId: "region.one", totalGel: 100, perResidentGel: 50 },
-        { code: "02", label: "p2", regionId: "region.one", totalGel: 300, perResidentGel: 100 },
-        { code: "03", label: "p3", regionId: "region.two", totalGel: 60, perResidentGel: 20 },
-        { code: "04", label: "p4", regionId: "region.two", totalGel: 40, perResidentGel: 40 },
+        { code: "01", label: "p1", regionId: "region.one", totalGel: 100, populationPersons: 2, perResidentGel: 50 },
+        { code: "02", label: "p2", regionId: "region.one", totalGel: 300, populationPersons: 3, perResidentGel: 100 },
+        { code: "03", label: "p3", regionId: "region.two", totalGel: 60, populationPersons: 3, perResidentGel: 20 },
+        { code: "04", label: "p4", regionId: "region.two", totalGel: 40, populationPersons: 1, perResidentGel: 40 },
       ],
     },
     updatedAt: "2026-10-30",

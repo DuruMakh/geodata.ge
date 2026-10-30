@@ -62,6 +62,8 @@ export type RankRow = {
   spark: Values;
   sparkIndex: number;
   planned: boolean;
+  /** The spark's first plan point, drawn dashed (Sparkline `planFrom`). */
+  sparkPlanFrom?: number;
 };
 
 /**
@@ -96,7 +98,7 @@ export function RankingList({ rows, focus, pin = null, unit, ariaLabel, hintId, 
               <span className="mt-[3px] block font-[family-name:var(--font-numeric)] text-[11.5px] leading-[1.45] text-[var(--muted)]">{row.sub}</span>
             </span>
             <span aria-hidden="true" className={`col-start-3 block min-w-0 @min-[640px]:col-start-auto ${faded}`}>
-              <Sparkline values={row.spark} color={row.color} width={120} height={30} fluidOnMobile area endDot dotIndex={row.sparkIndex} dotColor={row.color} hollowEnd={row.planned} />
+              <Sparkline values={row.spark} color={row.color} width={120} height={30} fluidOnMobile area endDot dotIndex={row.sparkIndex} dotColor={row.color} hollowEnd={row.planned} planFrom={row.sparkPlanFrom} />
             </span>
           </>
         );

@@ -7,6 +7,7 @@ import { PopulationPlaceExplorer } from "../../components/demography/population-
 import { EconomicSectorsExplorer } from "../../components/economic-sectors/economic-sectors-explorer";
 import { MoneyFromAbroad } from "../../components/external/money-from-abroad";
 import { HouseholdExplorer } from "../../components/household/household-explorer";
+import { YearReviewPage } from "../../components/year-review/year-review-page";
 import { loadServedTradeProductsData } from "../../lib/data/tradeProducts/importTradeProducts";
 import { loadEnglishCatalogue } from "../../lib/i18n/catalogue.server";
 import { getMessages } from "../../lib/i18n/messages.server";
@@ -128,6 +129,15 @@ describe("English names on Georgian pages", () => {
     const model = buildTradeProductsModel(data, DEFAULT_TRADE_PRODUCTS_STATE, presentation);
     const found = findTradeProducts({ data, model, presentation, view: "all", categoryId: null, query: "live horses", selectedIds: [], page: 0 });
     expect(found.rows.map((row) => row.entityId)).toEqual(["goods.hs4.2020-2025.0101"]);
+  });
+
+  test.each(["ka", "en"] as const)("%s: Year in review ships no English names and, of `main`, only the two strings it reads", async (locale) => {
+    const page = await renderAnalysisPage(locale);
+    const [{ presentation }] = propsOf<{ presentation: Presentation }>(page, YearReviewPage);
+    // Every name is resolved inside its data on the server.
+    expect(presentation.englishLabels).toEqual({});
+    expect(Object.keys(presentation.messages).filter((key) => key.startsWith("main.")).sort()).toEqual(["main.percentGdp", "main.sourceData"]);
+    expect(shippedProps(page)).not.toContain('"englishLabels":{"');
   });
 
   test("the English trade products page ships each English name once", async () => {

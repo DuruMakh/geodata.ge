@@ -48,7 +48,11 @@ function ordinal(rank: number, text: Text, locale: Locale): string {
   return locale === "en" ? text(`yearReview.ordinal.${new Intl.PluralRules("en", { type: "ordinal" }).select(rank)}`, { n: rank }) : text("yearReview.ordinal", { n: rank });
 }
 
-/** Finding 1: among tax lines positive in both years, the one that fell, the largest fall, or the fastest growth. */
+/**
+ * Finding 1: the tax line that fell, the largest fall, or the fastest growth. A fall counts on any line with a value in
+ * both years, one that ends at or below zero too (revenue.other_taxes 2019–2020), so "every tax grew" is never said
+ * over a fall; growth is ranked among lines positive in both years, the only ones with a percentage.
+ */
 function taxes(data: YearReviewData, year: number, text: Text, amount: (value: number) => string): Body {
   const { years, receipts } = data.budget;
   const used = picked("tax revenue change", years, withPrevious(taxTotals(data)), year);
@@ -57,22 +61,22 @@ function taxes(data: YearReviewData, year: number, text: Text, amount: (value: n
     .flatMap((tax) => {
       const before = tax.values[used.index - 1] ?? null;
       const now = tax.values[used.index] ?? null;
-      return before !== null && now !== null && before > 0 && now > 0 ? [{ tax, before, now }] : [];
+      return before !== null && now !== null ? [{ tax, before, now }] : [];
     });
+  const positive = (move: (typeof moves)[number]) => move.before > 0 && move.now > 0;
   const fell = moves.filter((move) => move.now < move.before).sort((left, right) => left.now - left.before - (right.now - right.before));
-  const named = fell[0] ?? moves.toSorted((left, right) => right.now / right.before - left.now / left.before)[0];
+  const named = fell[0] ?? moves.filter(positive).toSorted((left, right) => right.now / right.before - left.now / left.before)[0];
   if (!named) throw new Error(`Year in review: no tax line has a value in ${years[used.index - 1]} and ${used.year}`);
   const key = fell.length === 1 ? "yearReview.f6one" : fell.length > 1 ? "yearReview.f6many" : "yearReview.f6none";
+  const y = years[used.index - 1]!;
   return {
     yearTag: used.fallback ? used.year : null,
     planned: false,
     heading: text(key, { name: named.tax.label }),
-    detail: text("yearReview.f6d", {
-      a: amount(named.before),
-      b: amount(named.now),
-      p: formatShare(named.now / named.before - 1, true),
-      y: years[used.index - 1]!,
-    }),
+    // A change to or from zero or below has no percentage.
+    detail: positive(named)
+      ? text("yearReview.f6d", { a: amount(named.before), b: amount(named.now), p: formatShare(named.now / named.before - 1, true), y })
+      : text("yearReview.f6dSign", { a: amount(named.before), b: amount(named.now), y }),
     visual: { kind: "spark", values: named.tax.values, index: used.index, color: named.tax.color },
   };
 }
@@ -120,28 +124,34 @@ function debtRank(data: YearReviewData, year: number, text: Text, amount: (value
   };
 }
 
-/** Finding 4: the spending type that moved against all the others, else the largest percentage change. */
+/**
+ * Finding 4: the spending type that moved against all the others, else the largest percentage change. Every type with
+ * a value in both years counts towards "the only one of {n}" (grants 0 → 0 and other costs 0 → 16 mln in 2004 too); a
+ * percentage needs a positive base, so only such a type is named.
+ */
 function types(data: YearReviewData, year: number, text: Text, amount: (value: number) => string): Body {
   const { years, total, types: all } = data.spendingTypes;
   const used = picked("spending by type change", years, withPrevious(total), year);
-  const moves = all.flatMap((type) => {
+  const compared = all.flatMap((type) => {
     const before = type.values[used.index - 1] ?? null;
     const now = type.values[used.index] ?? null;
-    return before !== null && now !== null && before > 0 ? [{ type, before, now, change: now / before - 1 }] : [];
+    return before !== null && now !== null ? [{ type, before, now, change: before > 0 ? now / before - 1 : null }] : [];
   });
-  const down = moves.filter((move) => move.change < 0);
-  const up = moves.filter((move) => move.change > 0);
-  const lone =
-    down.length === 1 && up.length === moves.length - 1 ? { move: down[0]!, key: "yearReview.f3onlyDown" }
-    : up.length === 1 && down.length === moves.length - 1 ? { move: up[0]!, key: "yearReview.f3onlyUp" }
-    : null;
+  const moves = compared.filter((move): move is (typeof compared)[number] & { change: number } => move.change !== null);
+  const down = compared.filter((move) => move.now < move.before);
+  const up = compared.filter((move) => move.now > move.before);
+  // The lone mover against the rest: none of the others moved its way, and it has a percentage to show.
+  const against = (one: typeof down, rest: typeof up) => (one.length === 1 && rest.length > 0 ? moves.find((move) => move.type === one[0]!.type) ?? null : null);
+  const loneDown = against(down, up);
+  const loneUp = loneDown ? null : against(up, down);
+  const lone = loneDown ? { move: loneDown, key: "yearReview.f3onlyDown" } : loneUp ? { move: loneUp, key: "yearReview.f3onlyUp" } : null;
   const named = lone?.move ?? moves.toSorted((left, right) => Math.abs(right.change) - Math.abs(left.change))[0];
   if (!named) throw new Error(`Year in review: no spending type has a value in ${years[used.index - 1]} and ${used.year}`);
   return {
     yearTag: used.fallback ? used.year : null,
     planned: false,
     heading: text("yearReview.f3h", { name: named.type.label, p: formatShare(named.change, true), y: years[used.index - 1]! }),
-    detail: lone ? text(lone.key, { n: moves.length }) : text("yearReview.f3d", { a: amount(named.before), b: amount(named.now) }),
+    detail: lone ? text(lone.key, { n: compared.length }) : text("yearReview.f3d", { a: amount(named.before), b: amount(named.now) }),
     visual: { kind: "spark", values: named.type.values, index: used.index, color: named.type.color },
   };
 }

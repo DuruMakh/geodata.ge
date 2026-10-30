@@ -33,11 +33,14 @@ export function sparklinePoint(values: (number | null)[], index: number, width =
   return { x: scale.x(index).toFixed(1), y: scale.y(value).toFixed(1) };
 }
 
+/** The line's runs of consecutive values, one path each; only points `from` ≤ index < `to` are drawn, while every value sets the scale. */
 export function buildSparklinePath(
   values: (number | null)[],
   width = 64,
   height = 16,
   inset = 1,
+  from = 0,
+  to = values.length,
 ): string[] {
   const scale = sparklineScale(values, width, height, inset);
   if (!scale) return [];
@@ -53,7 +56,7 @@ export function buildSparklinePath(
   };
 
   for (const [index, value] of values.entries()) {
-    if (value === null || !Number.isFinite(value)) {
+    if (index < from || index >= to || value === null || !Number.isFinite(value)) {
       flush();
       continue;
     }

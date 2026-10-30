@@ -106,6 +106,11 @@ export function LongView({ data, year, grouping, side, measure, focus, pin, onFo
 
   // Shares at a year's column, whatever the measure.
   const shareAt = (index: number, column: number) => (gel.top[column] ? gel.bands[index]!.values[column]! / gel.top[column]! : 0);
+  // The readout's amount is the category's own, a negative one included; its share is of the drawn total.
+  const categories = side === "expenditure" ? groupOf(data, grouping) : data.budget.receipts;
+  const rawValue = (id: string, target: number) => categories.find((category) => category.id === id)?.values[data.budget.years.indexOf(target)] ?? null;
+  // The drawing counts a missing value as 0; the description says it is missing.
+  const sharedAt = (index: number, column: number) => formatShare(rawValue(bands[index]!.id, years[column]!) === null ? null : shareAt(index, column));
   const gainLoss = [
     { key: "yearReview.s3Up", move: view.gain },
     { key: "yearReview.s3Down", move: view.loss },
@@ -116,7 +121,7 @@ export function LongView({ data, year, grouping, side, measure, focus, pin, onFo
     b: to,
     items: bands
       .slice(0, 6)
-      .map((band, index) => `${band.label} ${formatShare(shareAt(index, 0))} → ${formatShare(shareAt(index, last))}`)
+      .map((band, index) => `${band.label} ${sharedAt(index, 0)} → ${sharedAt(index, last)}`)
       .join("; "),
   });
 
@@ -143,9 +148,6 @@ export function LongView({ data, year, grouping, side, measure, focus, pin, onFo
     setHover(null);
     onFocus(null);
   };
-  // The readout's amount is the category's own, a negative one included; its share is of the drawn total.
-  const categories = side === "expenditure" ? groupOf(data, grouping) : data.budget.receipts;
-  const rawValue = (id: string, target: number) => categories.find((category) => category.id === id)?.values[data.budget.years.indexOf(target)] ?? null;
   // The readout (DESIGN.md §8.3): the year, the drawn total, and the band under the pointer with its amount and share.
   const tip = hover === null ? null : (() => {
     const index = hover.band === null ? -1 : bands.findIndex((band) => band.id === hover.band);

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useId, useMemo } from "react";
 import { INK, PAPER } from "../../lib/explorer/colors";
-import { formatInUnit, formatShare, formatSignedAmount, UNIT_BN, UNIT_PERSONS } from "../../lib/explorer/format";
+import { formatAmountParts, formatInUnit, formatShare, UNIT_BN, UNIT_PERSONS } from "../../lib/explorer/format";
 import { message } from "../../lib/i18n/messages";
 import { useI18n } from "../../lib/i18n/provider";
 import type { Locale, Messages } from "../../lib/i18n/types";
@@ -39,13 +39,15 @@ function kpiText(kpi: GlanceKpi, data: YearReviewData, messages: Messages, local
   const ofGdp = (value: number) => (gdp ? text("yearReview.ofGdp", { p: formatShare(value / gdp) }) : "");
   const billions = { value: formatInUnit(kpi.value, UNIT_BN), unit: text("yearReview.bn") };
   switch (kpi.id) {
-    case "spend":
-      return {
-        ...billions,
-        detail: kpi.previous
-          ? `${formatShare(kpi.value / kpi.previous.value - 1, true)} · ${text("yearReview.vsPrev", { y: kpi.previous.year })}`
-          : text("yearReview.firstYear"),
-      };
+    case "spend": {
+      if (!kpi.previous) return { ...billions, detail: text("yearReview.firstYear") };
+      // A plan compared with an actual year says so, as section 03's change line does (spec §7).
+      const planVsActual = kpi.planned && !budget.planned[budget.years.indexOf(kpi.previous.year)];
+      const against = planVsActual
+        ? text("yearReview.planVsActual", { a: kpi.year, b: kpi.previous.year })
+        : text("yearReview.vsPrev", { y: kpi.previous.year });
+      return { ...billions, detail: `${formatShare(kpi.value / kpi.previous.value - 1, true)} · ${against}` };
+    }
     case "tax":
       return { ...billions, detail: ofGdp(kpi.value) };
     case "balance": {
@@ -53,12 +55,14 @@ function kpiText(kpi: GlanceKpi, data: YearReviewData, messages: Messages, local
       const first = data.balance.years[0]!;
       const phrase =
         record.kind === "surplus" ? text("yearReview.surplus")
-        : record.kind === "smallestSince" ? text("yearReview.balSmall", { y: record.since })
+        : record.kind === "smallestSince" ? text(record.sinceSurplus ? "yearReview.balSmallSur" : "yearReview.balSmall", { y: record.since })
         : record.kind === "largestSince" ? text("yearReview.balLarge", { y: record.since })
         : record.kind === "smallestEver" ? text("yearReview.balMin", { from: first })
         : text("yearReview.balMax", { from: first });
       const gel = at(data.balance.years, data.balance.gel, kpi.year);
-      return { value: formatShare(kpi.value / 100, true), unit: "", detail: gel === null ? phrase : `${formatSignedAmount(gel, locale)} · ${phrase}` };
+      // The precision section 04 gives the same amount (formatAmountParts with significant billions).
+      const amount = gel === null ? null : formatAmountParts(gel, true, locale, true);
+      return { value: formatShare(kpi.value / 100, true), unit: "", detail: amount === null ? phrase : `${amount.num} ${amount.unit} · ${phrase}` };
     }
     case "debt": {
       const external = at(data.debt.stock.years, data.debt.stock.external, kpi.year);
@@ -96,7 +100,7 @@ function Kpi({ kpi, data }: { kpi: GlanceKpi; data: YearReviewData }) {
       </p>
       <p className="mt-2 mb-3 font-[family-name:var(--font-numeric)] text-xs leading-normal text-[var(--muted)]">{withLari(detail)}</p>
       <div className="mt-auto">
-        <Sparkline values={kpi.spark} color={INK} width={120} height={30} area endDot dotIndex={kpi.sparkIndex} hollowEnd={kpi.planned} />
+        <Sparkline values={kpi.spark} color={INK} width={120} height={30} area endDot dotIndex={kpi.sparkIndex} hollowEnd={kpi.planned} planFrom={kpi.sparkPlanFrom ?? undefined} />
       </div>
     </li>
   );

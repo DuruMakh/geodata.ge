@@ -8,12 +8,27 @@ import { coverageLabel } from "../explorer/coverageLabel";
 import { message } from "../i18n/messages";
 import { clientPresentation } from "../i18n/presentation.server";
 import { pageHref } from "../i18n/routes";
-import type { Locale } from "../i18n/types";
+import type { Locale, Presentation } from "../i18n/types";
 import { ALL_DATA_PATH, navGroup } from "../navigation/navTree";
 import { fiscalMetadata } from "../seo/metadata";
 import { loadYearReviewData } from "../yearReview/buildYearReviewData";
 
 const PATH = "/explorer/analysis";
+// The two `main` strings the page's client reads: the budget pages' source line and the deficit picture's unit.
+const MAIN_KEYS = new Set(["main.sourceData", "main.percentGdp"]);
+
+/**
+ * What the client gets: no English names (every name is resolved inside `data` on the server) and, of `main`, only the
+ * two strings it reads. A key left out throws when read (message), which the every-year render test would catch.
+ */
+function yearReviewClientPresentation(presentation: Presentation): Presentation {
+  const { messages, ...rest } = clientPresentation(presentation);
+  return {
+    ...rest,
+    englishLabels: {},
+    messages: Object.fromEntries(Object.entries(messages).filter(([key]) => !key.startsWith("main.") || MAIN_KEYS.has(key))),
+  };
+}
 
 /** The title names the year the page opens on: the last year with actual spending, from the data. */
 export async function analysisPageMetadata(locale: Locale): Promise<Metadata> {
@@ -48,7 +63,7 @@ export async function renderAnalysisPage(locale: Locale) {
         <PageHeader locale={locale} messages={messages} crumbs={crumbs} coverage={coverageLabel(messages, locale, years[0], years.at(-1), data.updatedAt || undefined)} />
         <ExplorerHeading>{message(messages, "yearReview.title")}</ExplorerHeading>
         <p data-testid="year-review-line" className="text-[15px] leading-[1.55] text-[var(--body)]">{message(messages, "yearReview.line")}</p>
-        <YearReviewPage data={data} presentation={clientPresentation(presentation)} />
+        <YearReviewPage data={data} presentation={yearReviewClientPresentation(presentation)} />
       </ExplorerPage>
     </>
   );
