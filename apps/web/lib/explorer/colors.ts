@@ -244,6 +244,11 @@ export const MAP_RAMP = ["#F3EBDB", "#E9D6C6", "#DEBBA6", "#D19A80", "#C4735A", 
 export const MAP_NO_DATA_FILL = "#E5DBC9";
 export const MAP_NO_DATA_STROKE = "#C4B69C";
 
+// Year in review, municipal finding (the AN-App board): the places that hold half of municipal spending, largest
+// first, step from ink to sand (the last step repeats past six); the rest is one pale band.
+export const SPLIT_SHADES = [INK, "#4F483C", "#7A6F5D", "#A39782", "#BCB09B", "#CDC2AE"];
+export const SPLIT_REST = "#E3D9C7";
+
 // Major programs take their ministry's hue and step through lightness and
 // saturation inside it, so a line's parentage is legible from its colour.
 // EDITORIAL_PALETTE cannot serve them: it holds the very hexes the categories

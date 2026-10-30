@@ -25,15 +25,15 @@ function sumOf(series: readonly Values[], length: number): Values {
 }
 
 /** `values` (aligned to `from`) re-aligned to `years`, null where `from` has no such year. */
-const onYears = (years: readonly number[], from: readonly number[], values: Values): Values => years.map((year) => valueAt(from, values, year));
+export const onYears = (years: readonly number[], from: readonly number[], values: Values): Values => years.map((year) => valueAt(from, values, year));
 
 /** Per position: the first series' value where every series has one, else null, so a nearest year has every part. */
-function whereAll(series: readonly Values[]): Values {
+export function whereAll(series: readonly Values[]): Values {
   return series[0]!.map((value, index) => (series.every((values) => values[index] !== null && values[index] !== undefined) ? value : null));
 }
 
 /** Per position: the sum of the series, null where any one is missing. */
-const sumAll = (series: readonly Values[]): Values =>
+export const sumAll = (series: readonly Values[]): Values =>
   whereAll(series).map((value, index) => (value === null ? null : series.reduce((sum, values) => sum + values[index]!, 0)));
 
 /** Per year: `values` divided by the population of that year, null where either is missing. */
@@ -62,7 +62,7 @@ export function nearestYear(years: number[], values: Values, chosen: number): nu
   return present.findLast((year) => year <= chosen) ?? present.find((year) => year > chosen) ?? null;
 }
 
-function picked(what: string, years: number[], values: Values, chosen: number): { year: number; index: number; fallback: boolean } {
+export function picked(what: string, years: number[], values: Values, chosen: number): { year: number; index: number; fallback: boolean } {
   const year = nearestYear(years, values, chosen);
   if (year === null) throw new Error(`Year in review: ${what} has no value in any year`);
   return { year, index: years.indexOf(year), fallback: year !== chosen };
@@ -83,7 +83,7 @@ function budgetIndex(data: YearReviewData, year: number): number {
 const groupOf = (data: YearReviewData, grouping: Grouping): Category[] =>
   grouping === "fields" ? data.budget.fields : data.budget.institutions;
 const spendTotals = (data: YearReviewData): Values => sumOf(data.budget.fields.map((field) => field.values), data.budget.years.length);
-const taxTotals = (data: YearReviewData): Values =>
+export const taxTotals = (data: YearReviewData): Values =>
   sumOf(data.budget.receipts.filter((receipt) => receipt.tax).map((receipt) => receipt.values), data.budget.years.length);
 
 export type GlanceKpi = {
