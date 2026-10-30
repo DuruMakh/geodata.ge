@@ -131,6 +131,7 @@
   "yearReview.wallPri": "ძირი",
   "yearReview.wallInt": "პროცენტი",
   "yearReview.wallAria": "ვალის მომსახურება {from}–{to} ({projFrom}-დან პროგნოზი). პიკი — {y}, {v}.",
+  "yearReview.wallAriaActual": "ვალის მომსახურება {from}–{to}. პიკი — {y}, {v}.",
   "yearReview.wallNote": "{projFrom}–{to} — მხოლოდ უკვე აღებული ვალის დაფარვის გრაფიკი; ახალი სესხები მასში არ შედის.",
   "yearReview.h06": "ქვეყანა და რეგიონები",
   "yearReview.m06": "ერთ მცხოვრებზე · {count} მუნიციპალიტეტი",

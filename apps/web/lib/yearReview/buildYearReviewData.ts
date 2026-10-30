@@ -26,8 +26,7 @@ import { getMessages } from "../i18n/messages.server";
 import { getPresentation } from "../i18n/presentation.server";
 import type { Locale, Presentation } from "../i18n/types";
 import { OTHER_UNCLASSIFIED_ID, REVENUE_BANDS, TAX_BAND_IDS } from "../landing/chapters/budgetSeries";
-import { loadImfWeoManifest } from "../methodology/workbookSources";
-import { editionLabel } from "../pages/deficit";
+import { editionLabel, loadImfWeoManifest } from "../methodology/workbookSources";
 import type { ServedGeneralGovernmentBalanceFact, ServedGovernmentDebtFact } from "../servedRows";
 import type { Category, Values, YearReviewData, YearReviewSources } from "./types";
 

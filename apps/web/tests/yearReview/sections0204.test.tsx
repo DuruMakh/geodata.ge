@@ -56,6 +56,22 @@ describe("Year in review sections 02 and 04", () => {
     const solid = rects.filter((tag) => !tag.includes("data-projection"));
     expect(solid).toHaveLength(data.balance.years.length - projected.length);
     expect(Math.min(...hatched.map(x))).toBeGreaterThan(Math.max(...solid.map(x)));
+    // The chosen year and the deepest deficit carry their values on the bars.
+    const deepest = data.balance.years[data.balance.pctGdp.indexOf(Math.min(...data.balance.pctGdp.filter((value): value is number => value !== null)))]!;
+    expect([...deficit.matchAll(/data-value-label="(\d+)"/g)].map((match) => Number(match[1])).sort()).toEqual([deepest, 2025].sort());
+
+    // Refunds: the year used is the one ink column.
+    const refundsSvg = chartGeometry(from(markup, 'data-panel="refunds"'), "desktop");
+    expect(refundsSvg.match(/data-segment="refunds-chosen"/g)).toHaveLength(1);
+    expect(refundsSvg.match(/data-segment="refunds"/g)).toHaveLength(data.refunds.years.length - 1);
+
+    // Repayments: the peak is labelled on its bar, and its line marks it as a projection when it is one.
+    const service = data.debt.service;
+    const totals = service.principal.map((value, index) => value! + service.interest[index]!);
+    const peak = totals.indexOf(Math.max(...totals));
+    const repayments = part(markup, "repayments");
+    expect(chartGeometry(repayments, "desktop")).toContain(`data-value-label="${service.years[peak]}"`);
+    expect(/<h3[\s\S]*?<\/h3>/.exec(repayments)![0].includes("data-plan-tag")).toBe(service.projection[peak]);
   });
 
   test("2025: the tax breaks fall back to their last report year; refunds and debt do not", () => {

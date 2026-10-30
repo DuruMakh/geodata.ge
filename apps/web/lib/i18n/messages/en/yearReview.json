@@ -131,6 +131,7 @@
   "yearReview.wallPri": "principal",
   "yearReview.wallInt": "interest",
   "yearReview.wallAria": "Debt service {from}–{to} (projection from {projFrom}). Peak: {y}, {v}.",
+  "yearReview.wallAriaActual": "Debt service {from}–{to}. Peak: {y}, {v}.",
   "yearReview.wallNote": "{projFrom}–{to} shows only the repayment schedule for debt already taken on; new borrowing is not included.",
   "yearReview.h06": "Country and regions",
   "yearReview.m06": "per resident · {count} municipalities",

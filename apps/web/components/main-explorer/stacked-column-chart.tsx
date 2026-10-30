@@ -63,6 +63,8 @@ type StackedColumnChartBaseProps = {
   highlightPeriod?: number;
   /** Draws at the frame's measured width on every screen, as on a phone, for a chart in a column narrower than the 920-unit desktop drawing. */
   fitWidth?: boolean;
+  /** Values written on given columns: above a column that rises from zero, below one that only hangs under it; none when absent. */
+  valueLabels?: ReadonlyArray<{ period: number; text: string }>;
 };
 /** Columns from `projectionFrom` on are hatched, and the readout header says so with `projectionLabel`. */
 export type StackedColumnChartProps = StackedColumnChartBaseProps &
@@ -96,6 +98,8 @@ const HATCH_SIZE = 6;
 const HATCH_STRIPE = 3;
 // Axis labels keep this much clear between them (fitAxisLabels' own default).
 const LABEL_GAP = 8;
+// A value label sits this far off its column's end.
+const VALUE_LABEL_GAP = 4;
 
 type Plot = {
   mobile: boolean;
@@ -180,6 +184,7 @@ export function StackedColumnChart({
   breaks,
   highlightPeriod,
   fitWidth = false,
+  valueLabels,
   projectionFrom,
   projectionLabel,
 }: StackedColumnChartProps) {
@@ -506,6 +511,42 @@ export function StackedColumnChart({
         {overlayLastValue !== null ? (
           <circle data-overlay-end cx={px(x(overlayLast))} cy={px(y(overlayLastValue))} r={3.5} fill={INK} />
         ) : null}
+
+        {(valueLabels ?? []).map((entry) => {
+          const index = periods.indexOf(entry.period);
+          if (index < 0) return null;
+          // The column's ends: the top of its positive stack, the bottom of its negative one.
+          let positive = 0;
+          let negative = 0;
+          for (const segment of segments) {
+            const value = segment.values[index];
+            if (value === null || value === undefined) continue;
+            if (value > 0) positive += value;
+            else negative += value;
+          }
+          const labelWidth = axisLabelWidth(entry.text, FONT);
+          // Inside the plot: clear of the period labels below it and of the drawing's sides.
+          const ly = positive > 0 ? y(positive) - VALUE_LABEL_GAP : Math.min(y(negative) + FONT + VALUE_LABEL_GAP, height - PAD_B - 2);
+          const lx = Math.min(width - padRight - labelWidth / 2, Math.max(padLeft + labelWidth / 2, x(index)));
+          return (
+            <text
+              key={`value-${entry.period}`}
+              data-value-label={entry.period}
+              x={px(lx)}
+              y={px(ly)}
+              textAnchor="middle"
+              fontSize={FONT}
+              fontWeight={600}
+              fill={INK}
+              stroke={PAPER}
+              strokeWidth={3}
+              paintOrder="stroke"
+              style={{ fontFamily: "var(--font-numeric)" }}
+            >
+              {entry.text}
+            </text>
+          );
+        })}
 
         {periods.map((period, index) => {
           if (!plot.labels.has(index)) return null;

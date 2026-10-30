@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import type { Grouping } from "../../lib/yearReview/yearView";
 import type { YearReviewData } from "../../lib/yearReview/types";
+import { HATCH_SWATCH } from "../ui/editorial";
 
 /**
  * What the page hands every section (spec §4–§5): the data, the ruler's year, the switches and their setters, and the
@@ -25,6 +26,36 @@ export type YearReviewSectionProps = {
 export const FIG_KEY = "font-[family-name:var(--font-numeric)] text-[11.5px] leading-[1.45] text-[var(--muted)]";
 export const UNIT_LINE = "font-[family-name:var(--font-numeric)] text-[10.5px] leading-none text-[var(--faint)]";
 export const FOOT_NOTE = "font-[family-name:var(--font-numeric)] text-[11px] leading-normal text-[var(--faint)]";
+
+/** The colour key under a chart, for the eye (the chart names its parts to a screen reader); `projection` adds the hatch. */
+export function ChartKey({ items, projection }: { items: { label: string; color: string }[]; projection?: string }) {
+  return (
+    <ul aria-hidden="true" className="flex flex-wrap gap-x-[18px] gap-y-1.5 text-xs text-[var(--body)]">
+      {items.map((item) => (
+        <li key={item.label} className="inline-flex items-center gap-[7px]">
+          <i className="block h-2.5 w-3 rounded-[2px]" style={{ backgroundColor: item.color }} />
+          {item.label}
+        </li>
+      ))}
+      {projection ? (
+        <li className="inline-flex items-center gap-[7px]">
+          <i className={`block h-2.5 w-3 rounded-[2px] ${HATCH_SWATCH}`} />
+          {projection}
+        </li>
+      ) : null}
+    </ul>
+  );
+}
+
+/** The row under a chart (spec §9.2): its key or note on the left, the share button on the right, or alone on the right. */
+export function ChartFoot({ children, share }: { children?: ReactNode; share: ReactNode }) {
+  return (
+    <div className="mt-2.5 flex flex-wrap items-start justify-between gap-x-6 gap-y-2.5">
+      <div className="min-w-0 flex-1">{children}</div>
+      <div className="ml-auto flex-none">{share}</div>
+    </div>
+  );
+}
 
 /**
  * One numbered section of the page: a 1px ink rule, the number in accent, the H2, and on the right a short mono line

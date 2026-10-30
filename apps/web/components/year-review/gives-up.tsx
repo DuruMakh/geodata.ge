@@ -9,7 +9,7 @@ import { givesUpView, refundsView } from "../../lib/yearReview/yearView";
 import { ChartShareButton } from "../explorer-shell/chart-share-button";
 import { StackedColumnChart } from "../main-explorer/stacked-column-chart";
 import { withLari } from "../ui/lari";
-import { FIG_KEY, FOOT_NOTE, Section, UNIT_LINE, type YearReviewSectionProps } from "./section";
+import { ChartFoot, FIG_KEY, FOOT_NOTE, Section, UNIT_LINE, type YearReviewSectionProps } from "./section";
 import { YearTag } from "./year-tag";
 
 // Section 02, "What the state gives up" (spec §4): what came in against what tax breaks cost, three columns either
@@ -99,11 +99,20 @@ export function GivesUp({ data, year }: Pick<YearReviewSectionProps, "data" | "y
     ...(refunds.value.record ? [text("yearReview.rfRec", { from: rfFrom })] : []),
   ].join(" · ");
   const rfHeading = text("yearReview.rfH");
+  // The chosen year's column in ink (spec §4, 02): its own one-value segment, the other years in sand.
+  const refundBillions = (keep: (index: number) => boolean) =>
+    data.refunds.values.map((value, index) => (value === null || !keep(index) ? null : value / 1e9));
+  const usedIndex = refundYears.indexOf(refunds.year);
+  const chosenLabel = `${rfHeading} · ${refunds.year}`;
+  const refundSegments = [
+    { id: "refunds", label: rfHeading, color: OTHER_COLOR, values: refundBillions((index) => index !== usedIndex) },
+    { id: "refunds-chosen", label: chosenLabel, readoutLabel: rfHeading, color: INK, values: refundBillions((index) => index === usedIndex) },
+  ];
   const refundsChart = (
     <StackedColumnChart
       periods={refundYears}
       periodsPerYear={1}
-      segments={[{ id: "refunds", label: rfHeading, color: OTHER_COLOR, values: data.refunds.values.map((value) => (value === null ? null : value / 1e9)) }]}
+      segments={refundSegments}
       overlay={null}
       formatPeriod={String}
       formatValue={(value) => shortAmount(value * 1e9, messages)}
@@ -128,16 +137,18 @@ export function GivesUp({ data, year }: Pick<YearReviewSectionProps, "data" | "y
             {breaks.fallback ? <YearTag year={breaks.year} /> : null}
           </p>
           {ice}
-          <div className="mt-3 flex justify-end">
-            <ChartShareButton
-              title={text("yearReview.h03")}
-              caption={`${text("yearReview.bn")} · ${breaks.year}`}
-              legend={[{ label: text("yearReview.iceUp"), color: INK }, { label: text("yearReview.iceDown"), color: ACCENT }]}
-              source={data.sources.taxBreaks}
-              chart={ice}
-              period={String(breaks.year)}
-            />
-          </div>
+          <ChartFoot
+            share={
+              <ChartShareButton
+                title={text("yearReview.h03")}
+                caption={`${text("yearReview.bn")} · ${breaks.year}`}
+                legend={[{ label: text("yearReview.iceUp"), color: INK }, { label: text("yearReview.iceDown"), color: ACCENT }]}
+                source={data.sources.taxBreaks}
+                chart={ice}
+                period={String(breaks.year)}
+              />
+            }
+          />
         </figure>
         <figure data-panel="refunds" className="m-0 min-w-0">
           <p className={FIG_KEY}>{rfHeading}</p>
@@ -150,16 +161,18 @@ export function GivesUp({ data, year }: Pick<YearReviewSectionProps, "data" | "y
           </p>
           <p className={`${UNIT_LINE} mt-3`}>{withLari(text("yearReview.bn"))}</p>
           <div className="mt-1">{refundsChart}</div>
-          <div className="mt-3 flex justify-end">
-            <ChartShareButton
-              title={rfHeading}
-              caption={`${text("yearReview.bn")} · ${rfFrom}–${rfTo}`}
-              legend={[{ label: rfHeading, color: OTHER_COLOR }]}
-              source={data.sources.taxBreaks}
-              chart={refundsChart}
-              period={`${rfFrom}-${rfTo}`}
-            />
-          </div>
+          <ChartFoot
+            share={
+              <ChartShareButton
+                title={rfHeading}
+                caption={`${text("yearReview.bn")} · ${rfFrom}–${rfTo}`}
+                legend={[{ label: rfHeading, color: OTHER_COLOR }, { label: chosenLabel, color: INK }]}
+                source={data.sources.taxBreaks}
+                chart={refundsChart}
+                period={`${rfFrom}-${rfTo}`}
+              />
+            }
+          />
         </figure>
       </div>
       <p className={`${FOOT_NOTE} mt-2.5`}>{text("yearReview.tbNote", { to: taxBreaks.years.at(-1)! })}</p>

@@ -369,4 +369,45 @@ describe("StackedColumnChart", () => {
       expect(html).not.toContain("data-projection");
     });
   });
+
+  describe("value labels", () => {
+    const years = [2020, 2021, 2022, 2023];
+    const signed: StackedColumnChartProps = {
+      ...props,
+      periods: years,
+      periodsPerYear: 1,
+      segments: [
+        { id: "up", label: "Surplus", color: "#1F6E56", values: [2, null, null, 1] },
+        { id: "down", label: "Deficit", color: "#B3402A", values: [null, -3, -9, null] },
+      ],
+      overlay: null,
+    };
+    const labels = (svg: string) => [...svg.matchAll(/<text[^>]*data-value-label="(\d+)"[^>]*>([^<]*)<\/text>/g)];
+    const attribute = (tag: string, name: string) => Number(new RegExp(`\\b${name}="([-\\d.]+)"`).exec(tag)![1]);
+    const columnY = (svg: string, id: string, position: number) => {
+      const rect = [...svg.matchAll(new RegExp(`<rect[^>]*data-segment="${id}"[^>]*>`, "g"))][position]![0];
+      return { top: attribute(rect, "y"), bottom: attribute(rect, "y") + attribute(rect, "height") };
+    };
+
+    it("draws nothing extra when none are given", () => {
+      expect(renderGeorgianMarkup(<StackedColumnChart {...signed} valueLabels={[]} />)).toBe(renderGeorgianMarkup(<StackedColumnChart {...signed} />));
+      expect(renderGeorgianMarkup(<StackedColumnChart {...signed} />)).not.toContain("data-value-label");
+    });
+
+    it("writes each label above a rising column and below a hanging one, inside the plot, skipping periods off the axis", () => {
+      const html = renderGeorgianMarkup(<StackedColumnChart {...signed} valueLabels={[{ period: 2020, text: "+2.0%" }, { period: 2022, text: "−9.0%" }, { period: 1999, text: "x" }]} />);
+      for (const geometry of ["desktop", "mobile"] as const) {
+        const svg = chartGeometry(html, geometry);
+        const found = labels(svg);
+        expect(found.map((match) => [match[1], match[2]])).toEqual([["2020", "+2.0%"], ["2022", "−9.0%"]]);
+        const [rising, hanging] = found.map((match) => match[0]);
+        expect(rising).toContain(`fill="${INK}"`);
+        expect(attribute(rising!, "y")).toBeLessThan(columnY(svg, "up", 0).top);
+        expect(attribute(hanging!, "y")).toBeGreaterThan(columnY(svg, "down", 1).bottom);
+        // Above the period labels' row (they sit 8 units from the bottom).
+        const height = Number(/viewBox="0 0 [\d.]+ ([\d.]+)"/.exec(svg)![1]);
+        expect(attribute(hanging!, "y")).toBeLessThan(height - 26);
+      }
+    });
+  });
 });

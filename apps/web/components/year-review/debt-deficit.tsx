@@ -1,6 +1,5 @@
 "use client";
 
-import type { ReactNode } from "react";
 import { ACCENT, DEBT_DOMESTIC, INK_LINE, NEGATIVE, POSITIVE } from "../../lib/explorer/colors";
 import { formatAmount, formatAmountParts, formatInUnit, formatPerResidentGel, formatShare, UNIT_BN } from "../../lib/explorer/format";
 import { message } from "../../lib/i18n/messages";
@@ -11,7 +10,7 @@ import { ChartShareButton } from "../explorer-shell/chart-share-button";
 import { StackedColumnChart } from "../main-explorer/stacked-column-chart";
 import { withLari } from "../ui/lari";
 import { RateLines } from "./rate-lines";
-import { FIG_KEY, FOOT_NOTE, Section, UNIT_LINE, type YearReviewSectionProps } from "./section";
+import { ChartFoot, ChartKey, FIG_KEY, FOOT_NOTE, Section, UNIT_LINE, type YearReviewSectionProps } from "./section";
 import { PlanTag, YearTag } from "./year-tag";
 
 // Section 04, "Deficit and debt" (spec §4): the balance every year with its projection hatched, the debt at the end
@@ -20,44 +19,11 @@ import { PlanTag, YearTag } from "./year-tag";
 
 const H3 = "flex flex-wrap items-baseline gap-x-3 gap-y-1 font-[family-name:var(--font-display)] text-[18.5px] font-semibold leading-[1.3] tracking-[-0.005em] [text-wrap:balance] min-[768px]:text-[21px]";
 const H3_META = "font-[family-name:var(--font-numeric)] text-[11.5px] font-normal tracking-normal text-[var(--muted)]";
-// The board's projection swatch (as the homepage revenue chart's planned key): paper stripes over the bar sand.
-const HATCH_SWATCH = "[background:repeating-linear-gradient(135deg,var(--paper)_0_1.5px,transparent_1.5px_4px),var(--control)]";
-
 const billions = (values: (number | null)[]) => values.map((value) => (value === null ? null : value / 1e9));
 const firstProjection = (years: number[], projection: boolean[]) => years.find((_, index) => projection[index]);
 /** The column chart's projection props: both or neither. */
 const hatchedFrom = (from: number | undefined, label: string): { projectionFrom: number; projectionLabel: string } | { projectionFrom?: undefined } =>
   from === undefined ? {} : { projectionFrom: from, projectionLabel: label };
-
-/** The colour key under a chart (it carries its own figcaption, so this is for the eye); `projection` adds the hatch. */
-function Key({ items, projection }: { items: { label: string; color: string }[]; projection?: string }) {
-  return (
-    <ul aria-hidden="true" className="flex flex-wrap gap-x-[18px] gap-y-1.5 text-xs text-[var(--body)]">
-      {items.map((item) => (
-        <li key={item.label} className="inline-flex items-center gap-[7px]">
-          <i className="block h-2.5 w-3 rounded-[2px]" style={{ backgroundColor: item.color }} />
-          {item.label}
-        </li>
-      ))}
-      {projection ? (
-        <li className="inline-flex items-center gap-[7px]">
-          <i className={`block h-2.5 w-3 rounded-[2px] ${HATCH_SWATCH}`} />
-          {projection}
-        </li>
-      ) : null}
-    </ul>
-  );
-}
-
-/** The row under a chart: its key or note on the left, the share button on the right. */
-function Foot({ children, share }: { children?: ReactNode; share: ReactNode }) {
-  return (
-    <div className="mt-2.5 flex flex-wrap items-start justify-between gap-x-6 gap-y-2.5">
-      <div className="min-w-0 flex-1">{children}</div>
-      <div className="ml-auto flex-none">{share}</div>
-    </div>
-  );
-}
 
 /** Section 04 for the chosen year. */
 export function DebtDeficit({ data, year }: Pick<YearReviewSectionProps, "data" | "year">) {
@@ -79,6 +45,8 @@ export function DebtDeficit({ data, year }: Pick<YearReviewSectionProps, "data" 
   const balProjected = balance.projection[balUsed.index]!;
   const deepest = balance.pctGdp.reduce<number>((low, value, index) => (value !== null && value < (balance.pctGdp[low] ?? Infinity) ? index : low), 0);
   const pct = (value: number) => formatShare(value / 100, true);
+  // A projection year's value says so to a screen reader, as its tag does on screen.
+  const pctAt = (index: number) => (balance.projection[index] ? `${pct(balance.pctGdp[index]!)}, ${projection}` : pct(balance.pctGdp[index]!));
   const balProjFrom = firstProjection(balance.years, balance.projection);
   const dfHeading = text("yearReview.dfH");
   const surplusLabel = text("yearReview.dfSur");
@@ -98,12 +66,13 @@ export function DebtDeficit({ data, year }: Pick<YearReviewSectionProps, "data" 
         from: bal.from,
         to: bal.to,
         y: balUsed.year,
-        v: pct(balValue),
+        v: pctAt(balUsed.index),
         my: balance.years[deepest]!,
-        mv: pct(balance.pctGdp[deepest]!),
+        mv: pctAt(deepest),
       })}
       frameLabel={dfHeading}
       highlightPeriod={balUsed.year}
+      valueLabels={[...new Set([balUsed.index, deepest])].map((index) => ({ period: balance.years[index]!, text: pct(balance.pctGdp[index]!) }))}
       {...hatchedFrom(balProjFrom, projection)}
     />
   );
@@ -166,6 +135,7 @@ export function DebtDeficit({ data, year }: Pick<YearReviewSectionProps, "data" 
   const serviceYear = nearestYear(service.years, serviceTotal, year);
   const repProjFrom = firstProjection(service.years, service.projection);
   const projTo = service.years.findLast((_, index) => service.projection[index]);
+  const peakSaid = service.projection[peak] ? `${formatAmount(serviceTotal[peak]!, locale)}, ${projection}` : formatAmount(serviceTotal[peak]!, locale);
   const wallHeading = text("yearReview.wallH");
   const principalLabel = text("yearReview.wallPri");
   const interestLabel = text("yearReview.wallInt");
@@ -180,14 +150,13 @@ export function DebtDeficit({ data, year }: Pick<YearReviewSectionProps, "data" 
       overlay={null}
       formatPeriod={String}
       formatValue={(value) => shortAmount(value * 1e9, messages)}
-      ariaLabel={text("yearReview.wallAria", {
-        from: rep.from,
-        to: rep.to,
-        projFrom: repProjFrom ?? rep.to,
-        y: service.years[peak]!,
-        v: formatAmount(serviceTotal[peak]!, locale),
-      })}
+      ariaLabel={
+        repProjFrom === undefined
+          ? text("yearReview.wallAriaActual", { from: rep.from, to: rep.to, y: service.years[peak]!, v: formatAmount(serviceTotal[peak]!, locale) })
+          : text("yearReview.wallAria", { from: rep.from, to: rep.to, projFrom: repProjFrom, y: service.years[peak]!, v: peakSaid })
+      }
       frameLabel={wallHeading}
+      valueLabels={[{ period: service.years[peak]!, text: shortAmount(serviceTotal[peak]!, messages) }]}
       {...(serviceYear === null ? {} : { highlightPeriod: serviceYear })}
       {...hatchedFrom(repProjFrom, projection)}
     />
@@ -210,7 +179,7 @@ export function DebtDeficit({ data, year }: Pick<YearReviewSectionProps, "data" 
           </span>
         </h3>
         <div className="mt-[18px]">{deficitChart}</div>
-        <Foot
+        <ChartFoot
           share={
             <ChartShareButton
               title={dfHeading}
@@ -222,8 +191,8 @@ export function DebtDeficit({ data, year }: Pick<YearReviewSectionProps, "data" 
             />
           }
         >
-          <Key items={[{ label: surplusLabel, color: POSITIVE }, { label: deficitLabel, color: NEGATIVE }]} {...(balProjFrom === undefined ? {} : { projection: text("yearReview.dfProj") })} />
-        </Foot>
+          <ChartKey items={[{ label: surplusLabel, color: POSITIVE }, { label: deficitLabel, color: NEGATIVE }]} {...(balProjFrom === undefined ? {} : { projection: text("yearReview.dfProj") })} />
+        </ChartFoot>
       </div>
 
       <div className="mt-3 grid grid-cols-1 items-start gap-10 @min-[1100px]:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] @min-[1100px]:gap-14">
@@ -258,7 +227,7 @@ export function DebtDeficit({ data, year }: Pick<YearReviewSectionProps, "data" 
           </dl>
           <p className={`${FIG_KEY} mt-[26px]`}>{rtHeading}</p>
           {ratesChart}
-          <Foot
+          <ChartFoot
             share={
               <ChartShareButton
                 title={rtHeading}
@@ -275,13 +244,13 @@ export function DebtDeficit({ data, year }: Pick<YearReviewSectionProps, "data" 
                 {text("yearReview.rtLine", { y: bothYear, d: formatShare(rateIn(rates.domestic, bothYear) / 100), e: formatShare(rateIn(rates.external, bothYear) / 100) })}
               </p>
             )}
-          </Foot>
+          </ChartFoot>
         </div>
         <figure data-chart="debt-stock" className="m-0 min-w-0 @min-[1100px]:mt-[52px]">
           <p className={FIG_KEY}>{stHeading}</p>
           <p className={`${UNIT_LINE} mt-4`}>{withLari(text("yearReview.bn"))}</p>
           <div className="mt-1">{stockChart}</div>
-          <Foot
+          <ChartFoot
             share={
               <ChartShareButton
                 title={stHeading}
@@ -293,19 +262,22 @@ export function DebtDeficit({ data, year }: Pick<YearReviewSectionProps, "data" 
               />
             }
           >
-            <Key items={split} />
-          </Foot>
+            <ChartKey items={split} />
+          </ChartFoot>
         </figure>
       </div>
 
       <div data-panel="repayments">
         <h3 className={`${H3} mt-10 min-[768px]:mt-[52px]`}>
           {wallHeading}
-          <span className={H3_META}>{withLari(text("yearReview.wallM", { y: service.years[peak]!, v: shortAmount(serviceTotal[peak]!, messages) }))}</span>
+          <span className={`${H3_META} inline-flex flex-wrap items-center gap-x-2 gap-y-1`}>
+            <span>{withLari(text("yearReview.wallM", { y: service.years[peak]!, v: shortAmount(serviceTotal[peak]!, messages) }))}</span>
+            {service.projection[peak] ? <PlanTag label={projection} /> : null}
+          </span>
         </h3>
         <p className={`${UNIT_LINE} mt-4`}>{withLari(text("yearReview.bn"))}</p>
         <div className="mt-1">{wallChart}</div>
-        <Foot
+        <ChartFoot
           share={
             <ChartShareButton
               title={wallHeading}
@@ -317,11 +289,11 @@ export function DebtDeficit({ data, year }: Pick<YearReviewSectionProps, "data" 
             />
           }
         >
-          <Key items={[{ label: principalLabel, color: INK_LINE }, { label: interestLabel, color: ACCENT }]} {...(repProjFrom === undefined ? {} : { projection: text("yearReview.dfProj") })} />
+          <ChartKey items={[{ label: principalLabel, color: INK_LINE }, { label: interestLabel, color: ACCENT }]} {...(repProjFrom === undefined ? {} : { projection: text("yearReview.dfProj") })} />
           {repProjFrom === undefined || projTo === undefined ? null : (
             <p className={`${FOOT_NOTE} mt-2.5`}>{text("yearReview.wallNote", { projFrom: repProjFrom, to: projTo })}</p>
           )}
-        </Foot>
+        </ChartFoot>
       </div>
     </Section>
   );
