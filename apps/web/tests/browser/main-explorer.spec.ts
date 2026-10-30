@@ -283,7 +283,7 @@ test("explorer controls expose line, table, grouping, and the share pill", async
   await expect(page.getByTestId("explorer-table")).toContainText("მთლიანი ხარჯი");
   await expect(page.getByTestId("explorer-table")).not.toContainText("ცვლილება");
   await expect(page.getByTestId("explorer-table").locator("caption")).toHaveText(
-    "ხარჯვითი მონაცემები — ხარჯები ლარში, 2004–2026",
+    "ხარჯვითი მონაცემები — ხარჯები ლარში · მლრდ ₾, 2004–2026",
   );
 
   await chartPanel.getByTestId("chart-mode-line").click();

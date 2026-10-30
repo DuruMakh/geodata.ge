@@ -161,7 +161,7 @@ export function ExplorerView({
             ) : (
               <>
                 <ExplorerTable
-                  caption={message(messages, "main.tableCaption", { coverage: coverageLabel, measure: message(messages, share ? "main.shareGdp" : scope === "revenue" ? "main.revenueGel" : "main.expenditureGel"), startYear: range.start, endYear: range.end })}
+                  caption={message(messages, "main.tableCaption", { coverage: coverageLabel, measure: share ? message(messages, "main.shareGdp") : `${message(messages, scope === "revenue" ? "main.revenueGel" : "main.expenditureGel")} · ${message(messages, "format.bnGel")}`, startYear: range.start, endYear: range.end })}
                   rows={model.tableRows.filter((row) => row.level !== "total")}
                   totalRow={model.totalRow}
                   showTotal={Boolean(model.totalRow && selectedIds.includes(model.totalRow.itemId))}

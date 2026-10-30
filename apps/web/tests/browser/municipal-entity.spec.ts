@@ -372,7 +372,7 @@ test.describe("entity picker accessibility", () => {
     await page.getByTestId("municipal-mode-table").click();
     await expect(
       page.getByTestId("explorer-table").getByRole("table", {
-        name: /ბათუმი — ხარჯები ლარში/,
+        name: /ბათუმი — ხარჯები, მლნ ₾/,
       }),
     ).toHaveCount(1);
   });
@@ -468,7 +468,7 @@ test.describe("municipality page", () => {
     await page.getByTestId("municipal-mode-table").click();
     const table = page.getByTestId("explorer-table");
     await expect(table).toBeVisible();
-    await expect(table.locator("caption")).toHaveText("თბილისი — ხარჯები ლარში, 2015–2025");
+    await expect(table.locator("caption")).toHaveText("თბილისი — ხარჯები, მლნ ₾, 2015–2025");
     await expect(page.getByTestId("comparison-table").locator("caption")).toHaveText(
       "თბილისი — პერიოდის შედარება, 2015–2025",
     );

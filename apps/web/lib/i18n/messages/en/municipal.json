@@ -37,7 +37,7 @@
   "municipal.shareOfBudget": "Share of total budget",
   "municipal.noSelection": "No series is selected. Choose one from the Series panel.",
   "municipal.tableCaptionShare": "{name} — share of total budget, {start}–{end}",
-  "municipal.tableCaptionAmount": "{name} — expenditure in GEL, {start}–{end}",
+  "municipal.tableCaptionAmount": "{name} — expenditure, {unit}, {start}–{end}",
   "municipal.function": "Function",
   "municipal.share": "Share",
   "municipal.allMunicipalities": "← All municipalities",

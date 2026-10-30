@@ -142,10 +142,11 @@ export function DebtExplorerSurface(props: DebtExplorerSurfaceProps) {
       {...(formatRate ? { formatTooltipValue: formatRate } : {})}
     />
   );
+  const measureCaption = `${message(messages, FAMILY_LABEL[props.family])} · ${props.family === "rate" ? "%" : isPercent ? message(messages, "main.shareGdp") : message(messages, "format.bnGel")} · ${props.range.start}–${props.range.end}`;
   const shareAction = noSelection || noRangeData ? undefined : (
     <ChartShareButton
       title={message(messages, "debt.heading")}
-      caption={`${message(messages, FAMILY_LABEL[props.family])} · ${props.family === "rate" ? "%" : isPercent ? message(messages, "main.shareGdp") : message(messages, "format.bnGel")} · ${props.range.start}–${props.range.end}`}
+      caption={measureCaption}
       legend={chartSeries.map(({ label, color }) => ({ label, color }))}
       source={message(messages, "debt.source")}
       chart={chart}
@@ -221,7 +222,7 @@ export function DebtExplorerSurface(props: DebtExplorerSurfaceProps) {
             ) : (
               <>
                 <ExplorerTable
-                  caption={message(messages, "debt.caption", { family: message(messages, FAMILY_LABEL[props.family]), start: props.range.start, end: props.range.end })}
+                  caption={measureCaption}
                   rows={model.tableRows.filter((row) => row.itemId !== totalItemId)}
                   totalRow={model.totalRow}
                   showTotal={Boolean(totalItemId && props.selectedIds.includes(totalItemId))}

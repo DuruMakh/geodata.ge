@@ -323,7 +323,7 @@ function MunicipalExplorerContent(props: MunicipalExplorerProps) {
               <>
               {/* The crawl copy comes first: the phone legend is the element right after the chart's wrapper (globals.css). */}
               <ExplorerTable
-                caption={message(messages, state.share ? "municipal.tableCaptionShare" : "municipal.tableCaptionAmount", { name: props.triggerLabel, start: state.range.start, end: state.range.end })}
+                caption={message(messages, state.share ? "municipal.tableCaptionShare" : "municipal.tableCaptionAmount", { name: props.triggerLabel, unit: message(messages, "municipal.amountMeasureShort"), start: state.range.start, end: state.range.end })}
                 rows={model.rows.filter((row) => state.selectedIds.includes(row.itemId))}
                 totalRow={model.totalRow}
                 showTotal={state.selectedIds.includes(model.totalRow.itemId)}
