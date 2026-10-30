@@ -80,7 +80,7 @@ function budgetIndex(data: YearReviewData, year: number): number {
   return index;
 }
 
-const groupOf = (data: YearReviewData, grouping: Grouping): Category[] =>
+export const groupOf = (data: YearReviewData, grouping: Grouping): Category[] =>
   grouping === "fields" ? data.budget.fields : data.budget.institutions;
 export const spendTotals = (data: YearReviewData): Values => sumOf(data.budget.fields.map((field) => field.values), data.budget.years.length);
 export const taxTotals = (data: YearReviewData): Values =>

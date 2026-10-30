@@ -17,8 +17,8 @@ import { renderPageMarkup } from "../helpers/render-localized";
 // and click picking are in the browser spec (Task 10). The share button stands in with its title on it.
 
 vi.mock("../../components/explorer-shell/chart-share-button", () => ({
-  ChartShareButton: ({ title, caption }: { title: string; caption: string }) => (
-    <button type="button" data-testid="chart-share" data-title={title} data-caption={caption} />
+  ChartShareButton: ({ title, caption, source }: { title: string; caption: string; source: string }) => (
+    <button type="button" data-testid="chart-share" data-title={title} data-caption={caption} data-source={source} />
   ),
 }));
 
@@ -30,12 +30,19 @@ beforeAll(async () => {
 
 const noop = () => {};
 type Options = { side?: "expenditure" | "revenue"; measure?: "share" | "gel"; focus?: string | null; locale?: "ka" | "en" };
-function render(which: "05" | "06" | "notes", year: number, options: Options = {}): string {
+function render(which: "05" | "06" | "notes", year: number, options: Options & { data?: YearReviewData } = {}): string {
   const { side = "expenditure", measure = "share", focus = null, locale = "ka" } = options;
-  const { data, presentation } = loaded[locale]!;
+  const { presentation } = loaded[locale]!;
+  const data = options.data ?? loaded[locale]!.data;
   const props = { data, year, grouping: "fields" as const, side, measure, focus, pin: focus, onFocus: noop, onPin: noop, onSide: noop, onMeasure: noop };
   const node = which === "05" ? <CountryRegions {...props} /> : which === "06" ? <LongView {...props} /> : <YearReviewNotes data={data} year={year} />;
   return renderPageMarkup(locale, node, presentation.messages);
+}
+/** The markup of one panel: from its `data-panel` mark to the next panel's, or the end. */
+function part(markup: string, id: string): string {
+  const start = markup.indexOf(`data-panel="${id}"`);
+  const next = markup.indexOf("data-panel=", start + 1);
+  return start < 0 ? "" : markup.slice(start, next < 0 ? undefined : next);
 }
 const plain = (markup: string) => markup.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ");
 const marks = (markup: string, name: string) => [...markup.matchAll(new RegExp(`<[a-z]+[^>]*data-${name}="([^"]*)"[^>]*>`, "g"))];
@@ -93,6 +100,19 @@ describe("Year in review section 05", () => {
     }
     expect(perResidentRows(data, first!).find((ledger) => ledger.id === "debt")!.fallback).toBe(true);
     expect(new RegExp(row("mun")).exec(markup)![0]).toContain(`data-year-tag="${data.municipal.year}"`);
+  });
+  test("the dot plot's share picture cites the Municipalities page's source, and its heading tags another year", () => {
+    const { data, presentation } = loaded.ka!;
+    const markup = render("05", data.budget.defaultYear);
+    const regions = part(markup, "regions");
+    const source = /data-source="([^"]*)"/.exec(regions)?.[1];
+    expect(source).toBe(`${data.sources.municipal} ${presentation.messages["yearReview.mpNote"]}`);
+    expect(source).toContain("ფინანსთა სამინისტრო");
+    expect(regions.slice(0, regions.indexOf("</h3>"))).not.toContain("data-year-tag");
+    const planYear = data.budget.years.find((_, index) => data.budget.planned[index])!;
+    expect(planYear).not.toBe(data.municipal.year);
+    const planRegions = part(render("05", planYear), "regions");
+    expect(planRegions.slice(0, planRegions.indexOf("</h3>"))).toContain(`data-year-tag="${data.municipal.year}"`);
   });
 });
 
@@ -184,6 +204,24 @@ describe("Year in review notes", () => {
     ]);
     const english = render("notes", year, { locale: "en" });
     expect([...english.matchAll(/<a[^>]*href="([^"]*)"/g)].every((match) => match[1]!.startsWith("/en/"))).toBe(true);
+  });
+
+  test("without a plan year or a negative other-taxes year, the budget and receipts notes keep their ranges", () => {
+    const { data } = loaded.ka!;
+    const stripped: YearReviewData = {
+      ...data,
+      budget: {
+        ...data.budget,
+        planned: data.budget.planned.map(() => false),
+        receipts: data.budget.receipts.map((receipt) => ({ ...receipt, values: receipt.values.map((value) => (value === null ? null : Math.abs(value))) })),
+      },
+    };
+    const text = plain(render("notes", data.budget.defaultYear, { data: stripped }));
+    const spendYears = data.budget.years.filter((_, index) => data.budget.fields.some((field) => field.values[index] !== null));
+    expect(text).toContain(`სახელმწიფო ბიუჯეტი: ${spendYears[0]}–${spendYears.at(-1)} — 12-თვიანი ფაქტობრივი შესრულება.`);
+    expect(text).not.toContain("დამტკიცებული გეგმა");
+    expect(text).toMatch(/შემოსავლები: \d{4}–\d{4} ფაქტი\./);
+    expect(text).not.toContain("„სხვა გადასახადები“");
   });
 });
 

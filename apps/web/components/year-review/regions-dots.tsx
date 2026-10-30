@@ -25,8 +25,6 @@ const LANES = [0, -8, 8, -16, 16];
 // A dot's name flips to the left of it from here (% of the axis), so it stays inside the chart.
 const LABEL_FLIP = 80;
 
-type Places = YearReviewData["municipal"]["places"];
-
 /** Each dot's lane: the first one where no dot already placed sits within CROWDED of it. */
 function lanes(xs: number[]): number[] {
   const placed: number[][] = LANES.map(() => []);
@@ -41,21 +39,36 @@ function lanes(xs: number[]): number[] {
 export function RegionsDots({ data, year }: { data: YearReviewData; year: number }) {
   const { locale, messages } = useI18n();
   const text = (key: string, values?: Record<string, string | number>) => message(messages, key, values);
-  const view = useMemo(() => regionsView(data), [data]);
+  // The regions, each municipality's dot (x in % of the axis, lane offset in px), the axis and the ranked list follow
+  // the data only, not a hover.
+  const { view, domain, ticks, rows, ranked } = useMemo(() => {
+    const view = regionsView(data);
+    const { places } = data.municipal;
+    // The axis runs a little past the highest municipality; its ticks are the round values inside it.
+    const domain = Math.max(...places.map((place) => place.perResidentGel)) * 1.04;
+    const rows = view.regions.map((region) => {
+      const sorted = [...region.places].sort((left, right) => left.perResidentGel - right.perResidentGel);
+      const xs = sorted.map((place) => (place.perResidentGel / domain) * 100);
+      const offsets = lanes(xs);
+      return { region, dots: sorted.map((place, index) => ({ place, x: xs[index]!, offset: offsets[index]! })) };
+    });
+    return {
+      view,
+      domain,
+      ticks: niceTicks(domain, 5).ticks.filter((tick) => tick <= domain),
+      rows,
+      ranked: [...places].sort((left, right) => right.perResidentGel - left.perResidentGel),
+    };
+  }, [data]);
   const [regionHover, setRegionHover] = useState<string | null>(null);
   const [regionPin, setRegionPin] = useState<string | null>(null);
   const [placeHover, setPlaceHover] = useState<string | null>(null);
-  const { places, year: municipalYear } = data.municipal;
-
-  // The axis runs a little past the highest municipality; its ticks are the round values inside it.
-  const domain = Math.max(...places.map((place) => place.perResidentGel)) * 1.04;
-  const ticks = niceTicks(domain, 5).ticks.filter((tick) => tick <= domain);
+  const municipalYear = data.municipal.year;
   const at = (value: number) => (value / domain) * 100;
   const gel = (value: number) => formatPerResidentGel(value, locale);
   const lari = text("yearReview.lari");
   const heading = text("yearReview.rgH");
   const medianLabel = text("yearReview.medL", { v: gel(view.median) });
-  const ranked: Places = [...places].sort((left, right) => right.perResidentGel - left.perResidentGel);
 
   const chart = (still: boolean) => {
     const active = still ? null : regionHover ?? regionPin;
@@ -73,12 +86,9 @@ export function RegionsDots({ data, year }: { data: YearReviewData; year: number
           ))}
         </div>
         <div>
-          {view.regions.map((region) => {
+          {rows.map(({ region, dots }) => {
             const on = active === region.id;
             const dim = active !== null && !on;
-            const sorted = [...region.places].sort((left, right) => left.perResidentGel - right.perResidentGel);
-            const xs = sorted.map((place) => at(place.perResidentGel));
-            const offsets = lanes(xs);
             const name = (
               <>
                 <b className={`text-[13px] font-semibold leading-[1.3] ${dim ? "text-[var(--muted)]" : ""}`}>{region.label}</b>
@@ -118,9 +128,8 @@ export function RegionsDots({ data, year }: { data: YearReviewData; year: number
                     className={`absolute inset-y-[9px] -ml-px w-0 border-l-2 border-[var(--ink)] transition-opacity duration-200 ${dim ? "opacity-25" : ""}`}
                     style={{ left: `${at(region.average)}%` }}
                   />
-                  {sorted.map((place, index) => {
-                    const x = xs[index]!;
-                    const top = ROW_HEIGHT / 2 + offsets[index]!;
+                  {dots.map(({ place, x, offset }) => {
+                    const top = ROW_HEIGHT / 2 + offset;
                     const named = !still && placeHover === place.code;
                     return (
                       <span key={place.code}>
@@ -185,7 +194,7 @@ export function RegionsDots({ data, year }: { data: YearReviewData; year: number
           <ChartShareButton
             title={heading}
             caption={`${lari} ${text("yearReview.dbPer")} · ${municipalYear}`}
-            source={`${text("yearReview.nMun", { year: municipalYear })} ${text("yearReview.mpNote")}`}
+            source={`${data.sources.municipal} ${text("yearReview.mpNote")}`}
             chart={<div className="@container">{chart(true)}</div>}
             period={String(municipalYear)}
           />

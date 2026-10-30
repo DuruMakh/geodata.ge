@@ -246,14 +246,15 @@ export function buildYearReviewData(input: YearReviewInput, presentation: Presen
   };
 }
 
-/** The source lines of the Tax breaks and refunds, Deficit, Debt and Spending by type pages, worded as those pages word them. */
+/** The source lines of the Tax breaks and refunds, Deficit, Debt, Spending by type and Municipalities pages, worded as those pages word them. */
 async function loadSources(locale: Locale): Promise<YearReviewSources> {
-  const [messages, manifest] = await Promise.all([getMessages(locale, ["taxBreaksRefunds", "deficit", "debt", "expenditureTypes"]), loadImfWeoManifest()]);
+  const [messages, manifest] = await Promise.all([getMessages(locale, ["taxBreaksRefunds", "deficit", "debt", "expenditureTypes", "municipal"]), loadImfWeoManifest()]);
   return {
     taxBreaks: message(messages, "taxBreaksRefunds.sourceNote"),
     balance: message(messages, "deficit.source", { edition: editionLabel(messages, manifest.publicationDate) }),
     debt: message(messages, "debt.source"),
     spendingTypes: message(messages, "expenditureTypes.source"),
+    municipal: message(messages, "municipal.source"),
   };
 }
 

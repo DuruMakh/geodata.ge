@@ -12,8 +12,9 @@ import type { Values, YearReviewData } from "../../lib/yearReview/types";
 import { nearestYear, spendTotals } from "../../lib/yearReview/yearView";
 
 // The page's "Notes and source" (spec §4, board `an-notes`): the board's list with every date, year range and
-// population figure filled in from the data, then the links to the source pages and Methodology. A note whose years
-// the data does not have (no plan year, no projection) is left out rather than shown with a gap. No footer line
+// population figure filled in from the data, then the links to the source pages and Methodology. Without a plan year
+// or a negative "other taxes" year the budget and receipts notes keep their ranges and drop that clause; another note
+// whose years the data does not have (no projection) is left out rather than shown with a gap. No footer line
 // follows (spec §9.1).
 
 const OTHER_TAXES_ID = "revenue.other_taxes";
@@ -52,8 +53,16 @@ export function YearReviewNotes({ data, year }: { data: YearReviewData; year: nu
   const notes = [
     text("yearReview.nSrc", { date: updatedDate(data.updatedAt, locale) }),
     text("yearReview.nScope"),
-    actual && plan ? text("yearReview.nBasisExp", { from: actual.from, to: actual.to, planYear: plan.from }) : null,
-    receipts && negative ? text("yearReview.nRev", { from: receipts.from, to: receipts.to, negFrom: negative.from, negTo: negative.to }) : null,
+    actual === null
+      ? null
+      : plan
+        ? text("yearReview.nBasisExp", { from: actual.from, to: actual.to, planYear: plan.from })
+        : text("yearReview.nBasisExpActual", { from: actual.from, to: actual.to }),
+    receipts === null
+      ? null
+      : negative
+        ? text("yearReview.nRev", { from: receipts.from, to: receipts.to, negFrom: negative.from, negTo: negative.to })
+        : text("yearReview.nRevBase", { from: receipts.from, to: receipts.to }),
     breaks && refunded ? text("yearReview.nTB", { tbFrom: breaks.from, tbTo: breaks.to, rfFrom: refunded.from, rfTo: refunded.to }) : null,
     balanceActual && balanceProjection
       ? text("yearReview.nDef", { from: balanceActual.from, actualTo: balanceActual.to, projFrom: balanceProjection.from, projTo: balanceProjection.to })

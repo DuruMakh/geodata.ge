@@ -4,7 +4,7 @@ import { useMemo, useState, type MouseEvent, type PointerEvent } from "react";
 import { formatAmount, formatInUnit, formatShare, UNIT_BN } from "../../lib/explorer/format";
 import { message } from "../../lib/i18n/messages";
 import { useI18n } from "../../lib/i18n/provider";
-import { longView } from "../../lib/yearReview/yearView";
+import { groupOf, longView } from "../../lib/yearReview/yearView";
 import { ChartShareButton } from "../explorer-shell/chart-share-button";
 import { ChartTooltip } from "../main-explorer/chart-frame";
 import { niceTicks, stackLabels } from "../landing/chapters/canvas";
@@ -54,39 +54,41 @@ export function LongView({ data, year, grouping, side, measure, focus, pin, onFo
       }))
     : [0, 0.25, 0.5, 0.75, 1].map((tick) => ({ value: tick, at: tick, label: tick === 0 ? "0" : formatShare(tick, false, 0) }));
 
-  // Each band's lower and upper edge per year, stacked in the view's order from the bottom.
-  const edges = useMemo(() => {
+  // The drawing: each band's lower and upper edge per year, stacked in the view's order from the bottom, its path,
+  // and the categories named at the right edge (wide enough at the last year, the widest kept when they cannot all
+  // fit). It follows the view and the scale only, not a hover.
+  const last = count - 1;
+  const { edges, paths, named, labelTops } = useMemo(() => {
+    const y = (value: number) => HEIGHT - (value / top) * HEIGHT;
+    const x = (column: number) => ((last > 0 ? column / last : 0.5) * WIDTH).toFixed(1);
     const cumulative = years.map(() => 0);
-    return bands.map((band) => {
+    const edges = bands.map((band) => {
       const low = [...cumulative];
       band.values.forEach((value, column) => {
         cumulative[column] = cumulative[column]! + value;
       });
       return { low, high: [...cumulative] };
     });
-  }, [bands, years]);
-  const y = (value: number) => HEIGHT - (value / top) * HEIGHT;
-  const paths = edges.map(({ low, high }) => {
-    const upper = high.map((value, column) => `${column ? "L" : "M"}${((pos(column) / 100) * WIDTH).toFixed(1)} ${y(value).toFixed(1)}`);
-    const lower = low.map((value, column) => `L${((pos(column) / 100) * WIDTH).toFixed(1)} ${y(value).toFixed(1)}`).reverse();
-    return `${upper.join("")}${lower.join("")}Z`;
-  });
-
-  // The categories named at the right edge: wide enough at the last year, the widest kept when they cannot all fit.
-  const last = count - 1;
-  const fits = Math.floor((HEIGHT - 2 * LABEL_EDGE) / LABEL_GAP) + 1;
-  const named = bands
-    .map((band, index) => ({ band, index, height: ((edges[index]!.high[last]! - edges[index]!.low[last]!) / top) * HEIGHT }))
-    .filter((entry) => entry.height >= LABEL_MIN_BAND)
-    .sort((left, right) => right.height - left.height)
-    .slice(0, fits)
-    .sort((left, right) => left.index - right.index);
-  const labelTops = stackLabels(
-    named.map((entry) => y((edges[entry.index]!.low[last]! + edges[entry.index]!.high[last]!) / 2)),
-    LABEL_GAP,
-    LABEL_EDGE,
-    HEIGHT - LABEL_EDGE,
-  );
+    const paths = edges.map(({ low, high }) => {
+      const upper = high.map((value, column) => `${column ? "L" : "M"}${x(column)} ${y(value).toFixed(1)}`);
+      const lower = low.map((value, column) => `L${x(column)} ${y(value).toFixed(1)}`).reverse();
+      return `${upper.join("")}${lower.join("")}Z`;
+    });
+    const fits = Math.floor((HEIGHT - 2 * LABEL_EDGE) / LABEL_GAP) + 1;
+    const named = bands
+      .map((band, index) => ({ band, index, height: ((edges[index]!.high[last]! - edges[index]!.low[last]!) / top) * HEIGHT }))
+      .filter((entry) => entry.height >= LABEL_MIN_BAND)
+      .sort((left, right) => right.height - left.height)
+      .slice(0, fits)
+      .sort((left, right) => left.index - right.index);
+    const labelTops = stackLabels(
+      named.map((entry) => y((edges[entry.index]!.low[last]! + edges[entry.index]!.high[last]!) / 2)),
+      LABEL_GAP,
+      LABEL_EDGE,
+      HEIGHT - LABEL_EDGE,
+    );
+    return { edges, paths, named, labelTops };
+  }, [bands, years, top, last]);
 
   // The chosen year, or the nearest end of the view when the side has no such year.
   const chosen = years.includes(year) ? years.indexOf(year) : year < from ? 0 : last;
@@ -132,6 +134,7 @@ export function LongView({ data, year, grouping, side, measure, focus, pin, onFo
   const move = (event: PointerEvent<HTMLDivElement>) => {
     const next = at(event);
     if (!next) return;
+    if (next.column === hover?.column && next.band === hover.band) return;
     setHover(next);
     if (event.pointerType !== "touch" && next.band !== hover?.band) onFocus(next.band);
   };
@@ -141,7 +144,7 @@ export function LongView({ data, year, grouping, side, measure, focus, pin, onFo
     onFocus(null);
   };
   // The readout's amount is the category's own, a negative one included; its share is of the drawn total.
-  const categories = side === "expenditure" ? (grouping === "fields" ? data.budget.fields : data.budget.institutions) : data.budget.receipts;
+  const categories = side === "expenditure" ? groupOf(data, grouping) : data.budget.receipts;
   const rawValue = (id: string, target: number) => categories.find((category) => category.id === id)?.values[data.budget.years.indexOf(target)] ?? null;
   // The readout (DESIGN.md §8.3): the year, the drawn total, and the band under the pointer with its amount and share.
   const tip = hover === null ? null : (() => {
