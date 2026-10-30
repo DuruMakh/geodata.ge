@@ -1,7 +1,7 @@
 # Year in review (წლის მიმოხილვა)
 
 Date: 2026-10-30
-Status: Draft for Duru's review.
+Status: Approved (Duru, 2026-10-30 09:36 Tbilisi, "Ok"; D1 and D2 as recommended).
 Design source: Duru's redesign canvas https://claude.ai/artifact/NTvuHd3oasbXxkNcZto2Wz, page "analysis" ("წლის მიმოხილვა — რედიზაინი"). The prototype is `project/AN-App.dc.html`. The other boards import it with different settings: `AN-Pin` (a category picked), `AN-2020` (another year), `AN-Adm` (institutions), `AN-En` (English), `AN-Phone` and `AN-Phone-2026` (375px phone).
 
 ## 1. Intended result
@@ -22,6 +22,7 @@ Success means:
 | --- | --- |
 | 2026-10-30 08:41 | Build the redesign of the year review page from the canvas page "analysis". |
 | 2026-10-30 09:18 | Release all six sections at once, not in two steps. |
+| 2026-10-30 09:36 | Spec approved. D1: the line under the heading is `ერთი წელი ყველა კუთხიდან` / `One year from every angle`. D2: no Excel download on this page. |
 
 Assumptions told to Duru on 2026-10-30 (none corrected): same address, new name in the menu; the radar and the bubble field go; numbers only from served data; a share button on every chart; no footer line; the notes list stays; per-resident figures use Geostat population for every year.
 
@@ -171,7 +172,7 @@ The server turns these into one small year-review data object: a few hundred num
 4. **Per resident** uses Geostat's population on 1 January of each year, so the figure exists for every year from 2004. The board had it only for 2025 and 2026, with 2025 worked out from municipal data. The notes say so.
 5. The `8 მონაცემთა ნაკრები · განახლდა …` line becomes the site's usual updated-date line in the same place.
 
-## 10. Open questions for Duru
+## 10. Questions settled with Duru (2026-10-30 09:36)
 
 - **D1 — the line under the heading.** The board's line, `ერთი წელი ყველა კუთხიდან: შემოსავალი, შეღავათები, ხარჯი, ვალი და მუნიციპალიტეტები.`, takes three lines on a phone. Your rule is one short line that fits a phone. Recommended: `ერთი წელი ყველა კუთხიდან` / `One year from every angle`.
 - **D2 — Excel.** Today's Analysis page has no Excel download and neither does the board. Recommended: none on this page; the source links at the bottom lead to each page's own Excel.
