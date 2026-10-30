@@ -13,6 +13,7 @@
   "scienceCulture.page.theatres.summary": "საქართველოს პროფესიული თეატრების მაყურებელი, სპექტაკლები და ღონისძიებები ყოველწლიურად, თეატრები ტიპების მიხედვით, ადგილები დარბაზებში და პერსონალი.",
   "scienceCulture.page.theatres.metaTitle": "თეატრები საქართველოში",
   "scienceCulture.page.area.regionTitle": "მუზეუმები — {region}",
+  "scienceCulture.page.area.seoTitle": "{place} მუზეუმები {year}",
   "scienceCulture.page.area.regionHeadingLead": "მუზეუმები —",
   "scienceCulture.page.area.regionSummary": "{region} — მუზეუმების დამთვალიერებლები, ექსკურსიები, გამოფენები და მუზეუმები, წლების მიხედვით.",
   "scienceCulture.area.georgia": "საქართველო",

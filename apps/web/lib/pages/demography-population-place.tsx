@@ -36,6 +36,7 @@ import { clientPresentation } from "../i18n/presentation.server";
 import { pageHref } from "../i18n/routes";
 import type { Locale, TemplateValues } from "../i18n/types";
 import { fiscalMetadata } from "../seo/metadata";
+import { placeOfKa, placeTitleNameEn } from "../seo/placeTitleForms";
 import { resolveSiteUrl } from "../siteUrl";
 import { loadPopulationBasics, loadPopulationSources, loadTbilisiAreaLabel, populationSourceNote } from "./demography-population";
 import { ALL_DATA_PATH } from "../navigation/navTree";
@@ -69,7 +70,8 @@ export async function populationPlaceMetadata(route: PopulationPlaceRoute, local
   return fiscalMetadata({
     locale,
     path: populationPlaceHref(place.id),
-    title: t("placeMetaTitle", { name }),
+    // Worded the way people search it ("<place> მოსახლეობა <year>"); the page's own heading keeps placeMetaTitle. `span.last` is the place's latest population year.
+    title: t("placeSeoTitle", { place: locale === "ka" ? placeOfKa(place) : placeTitleNameEn(place), year: span.last }),
     description: region
       ? t("placeMunicipalityMetaDescription", { ...span, region: placeLabel(region, locale) })
       : t("placeMetaDescription", span),

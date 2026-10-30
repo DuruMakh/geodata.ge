@@ -77,15 +77,20 @@ export function fiscalMetadata({
   };
 }
 
+/** The genitive ("of") of an official municipality name; titles word it as "<name>ს <topic>". */
+export function municipalityOfficialNameGenitiveKa(nameKa: string): string {
+  if (!nameKa.endsWith("მუნიციპალიტეტი")) {
+    throw new Error(`Official municipality name must end in მუნიციპალიტეტი: ${nameKa}`);
+  }
+  return `${nameKa}ს`;
+}
+
 export function municipalityBudgetTitleKa(
   nameKa: string,
   firstYear: number,
   lastYear: number,
 ): string {
-  if (!nameKa.endsWith("მუნიციპალიტეტი")) {
-    throw new Error(`Official municipality name must end in მუნიციპალიტეტი: ${nameKa}`);
-  }
-  return `${nameKa}ს ბიუჯეტი ${firstYear}–${lastYear} | Fiscal.ge`;
+  return `${municipalityOfficialNameGenitiveKa(nameKa)} ბიუჯეტი ${firstYear}–${lastYear} | Fiscal.ge`;
 }
 
 export function governmentDebtMetadata(

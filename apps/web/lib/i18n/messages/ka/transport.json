@@ -16,6 +16,7 @@
   "transport.page.regions.summary": "რეგისტრირებული ავტომობილები და გზების სიგრძე რეგიონების მიხედვით. აირჩიეთ რეგიონი მისი მონაცემების სანახავად.",
   "transport.page.regions.metaTitle": "ტრანსპორტი საქართველოს რეგიონებში",
   "transport.page.area.regionTitle": "ტრანსპორტი — {region}",
+  "transport.page.area.seoTitle": "ტრანსპორტი {place} {year}",
   "transport.page.area.regionHeadingLead": "ტრანსპორტი —",
   "transport.page.area.regionSummary": "{region} — რეგისტრირებული ავტომობილები ტიპის, საწვავის, ასაკისა და მფლობელის მიხედვით და გზების სიგრძე.",
   "transport.area.georgia": "საქართველო",

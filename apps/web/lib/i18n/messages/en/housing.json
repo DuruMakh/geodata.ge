@@ -13,6 +13,7 @@
   "housing.page.regions.summary": "Building permits and completed buildings by region. Select a region to see its data.",
   "housing.page.regions.metaTitle": "Housing and construction in Georgia’s regions",
   "housing.page.area.regionTitle": "Housing and construction — {region}",
+  "housing.page.area.seoTitle": "Housing and construction in {place} {year}",
   "housing.page.area.regionHeadingLead": "Housing and construction —",
   "housing.page.area.regionSummary": "Building permits and completed buildings in {region}, by number and floor area, for all buildings and residential buildings.",
   "housing.area.georgia": "Georgia",

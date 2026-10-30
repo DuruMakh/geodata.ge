@@ -1,6 +1,7 @@
 import { loadServedHousingData } from "../data/housing/importHousing";
 import { HOUSING_SOURCES, type HousingFact } from "../data/housing/types";
 import { HOUSING_AREAS, HOUSING_REGIONS_HREF, housingAreaHref, housingAreaSeries, housingAreaSlug, housingMapId, type HousingArea } from "../explorer/housingAreas";
+import { latestYearOf } from "../seo/placeTitleForms";
 import { regionAreaFrame, type RegionAreaBody } from "./region-area-frame";
 
 // Shared by the housing page modules: the Regions index and the area pages share the frame in region-area-frame.tsx.
@@ -14,7 +15,9 @@ export const {
   hub: "housing", indexHref: HOUSING_REGIONS_HREF, indexKey: "regions",
   areas: HOUSING_AREAS, areaSlug: housingAreaSlug, areaHref: housingAreaHref, mapId: housingMapId,
   areaHeadingIds: area => housingAreaSeries(area).map(series => series.heading),
-  load: loadServedHousingData, sourceIds: HOUSING_SOURCES,
+  load: loadServedHousingData,
+  latestYear: (facts, area) => { const ids = new Set<string>(housingAreaSeries(area).map(series => series.id)); return latestYearOf(facts, fact => ids.has(fact.indicatorId)); },
+  sourceIds: HOUSING_SOURCES,
 });
 
 export type HousingRegionsBody = RegionAreaBody<HousingArea, HousingFact>;

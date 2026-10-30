@@ -11,6 +11,7 @@
   "health.page.causes-of-death.metaTitle": "სიკვდილის მიზეზები საქართველოში",
   "health.page.area.regionHeadingLead": "სიკვდილის მიზეზები —",
   "health.page.area.regionTitle": "სიკვდილის მიზეზები — {region}",
+  "health.page.area.seoTitle": "სიკვდილის მიზეზები {place} {year}",
   "health.page.area.regionSummary": "{region} — რეგისტრირებული გარდაცვალებები მიზეზების ძირითადი კლასების მიხედვით.",
   "health.heading.groups": "დაავადებათა ჯგუფები",
   "health.heading.single": "ცალკეული დაავადებები",

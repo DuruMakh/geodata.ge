@@ -28,6 +28,24 @@ export const REGION_GENITIVE_KA: Record<string, string> = {
 };
 
 /**
+ * "-ში" ("in") forms for region page titles ("იმერეთში მოსახლეობა"). Reviewed once and stored, for the same reason as
+ * REGION_GENITIVE_KA: the compound region takes "-სა" on its first part, which no suffix rule derives.
+ */
+export const REGION_LOCATIVE_KA: Record<string, string> = {
+  "region.tbilisi": "თბილისში",
+  "region.adjara": "აჭარაში",
+  "region.guria": "გურიაში",
+  "region.imereti": "იმერეთში",
+  "region.kakheti": "კახეთში",
+  "region.mtskheta_mtianeti": "მცხეთა-მთიანეთში",
+  "region.racha_lechkhumi_kvemo_svaneti": "რაჭა-ლეჩხუმსა და ქვემო სვანეთში",
+  "region.samegrelo_zemo_svaneti": "სამეგრელო-ზემო სვანეთში",
+  "region.samtskhe_javakheti": "სამცხე-ჯავახეთში",
+  "region.kvemo_kartli": "ქვემო ქართლში",
+  "region.shida_kartli": "შიდა ქართლში",
+};
+
+/**
  * Georgian ordinal for a rank. First place is პირველი, never მე-1. Georgian counts in twenties:
  * 2–20 and whole twenties take the prefix (მე-20, მე-40), the rest the suffix (21-ე, 37-ე).
  */

@@ -20,6 +20,7 @@ import { publicLabel } from "../i18n/labels";
 import { pageHref } from "../i18n/routes";
 import type { Locale } from "../i18n/types";
 import { fiscalMetadata } from "../seo/metadata";
+import { areaTitleForm } from "../seo/placeTitleForms";
 import { explorerDatasetJsonLd } from "../seo/structuredData";
 import { resolveSiteUrl } from "../siteUrl";
 import path from "node:path";
@@ -59,11 +60,12 @@ export async function regionalEconomyPageMetadata(slug: string, locale: Locale) 
   const region = regionForSlug(slug);
   const [{ facts }, presentation] = await Promise.all([loadServedRegionalEconomyData(), regionalPresentation(locale)]);
   const regionName = publicLabel(locale, region.id, region.kaLabel, presentation.englishLabels);
-  const params = { ...regionalCoverage(facts.filter((fact) => fact.regionId === region.id), locale).params, region: regionName };
+  const params = { ...regionalCoverage(facts.filter((fact) => fact.regionId === region.id), locale).params, region: regionName, regionOf: areaTitleForm(region.id, regionName, locale, "of") };
   return fiscalMetadata({
     locale,
     path: `/explorer/economy/regions/${slug}`,
-    title: message(presentation.messages, "regionalEconomies.detailMetaTitle", params),
+    // The title is worded the way people search it and ends in the region's latest year; detailMetaTitle stays the Dataset name.
+    title: message(presentation.messages, "regionalEconomies.detailSeoTitle", { place: params.regionOf, year: params.lastYear }),
     description: message(presentation.messages, "regionalEconomies.detailMetaDescription", params),
   });
 }
@@ -88,7 +90,7 @@ export async function renderRegionalEconomyPage(slug: string, locale: Locale) {
   if (regionalFacts.length === 0) notFound();
   const { reviewedAt, params: regionParams } = regionalCoverage(regionalFacts, locale);
   const { firstYear, lastYear } = regionParams;
-  const params = { ...regionParams, region: regionName };
+  const params = { ...regionParams, region: regionName, regionOf: areaTitleForm(region.id, regionName, locale, "of") };
   const title = message(presentation.messages, "regionalEconomies.heading");
   const publicSources = projectPublicSources(manifest, locale, catalogue.documents);
   const sources = manifest.map((source) => {
