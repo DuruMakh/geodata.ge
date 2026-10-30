@@ -109,9 +109,8 @@ export function MarriageExplorer({ place, labels, listLabels, sources, lastRevie
               </div>
             </div>
             {!model.selected.length ? <div className="mt-5"><Callout testId="no-selection-callout">{t("marriageEmpty")}</Callout></div>
-              : state.mode === "line" ? <div className="mt-5">{chart}</div>
-              : <ExplorerTable caption={`${title} · ${unitLabel} · ${model.range.start}–${model.range.end}`} rows={rows} totalRow={null} showTotal={false} wrapRowLabels rowLabelsLocalized years={model.years} firstColumnLabel={t("seriesHeader")} unit={unit} share={false} showChangeColumn={false} shareValueForYear={() => null}
-                breakYears={model.breaks.map((item) => item.year)} breakLabel={breakLabel} />}
+              : <><ExplorerTable caption={`${title} · ${unitLabel} · ${model.range.start}–${model.range.end}`} rows={rows} totalRow={null} showTotal={false} wrapRowLabels rowLabelsLocalized years={model.years} firstColumnLabel={t("seriesHeader")} unit={unit} share={false} showChangeColumn={false} shareValueForYear={() => null}
+                breakYears={model.breaks.map((item) => item.year)} breakLabel={breakLabel} crawlCopy={state.mode === "line"} />{state.mode === "line" ? <div className="mt-5">{chart}</div> : null}</>}
             <ChartSelectionAids series={lineSeries} chartShown={state.mode === "line"} share={false} unit={unit} formatValue={valueLabel} />
             <RangeStrip years={years} range={model.range} onChange={(patch) => update((s) => ({ ...s, range: rangeFromPatch(buildMarriageModel(place, s).range, patch) }))} />
           </section>

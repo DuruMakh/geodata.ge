@@ -116,9 +116,8 @@ export function SocialPlaceExplorer({
             <span data-testid="social-unit-label" className="text-[11px] text-[var(--muted)]">{unitLabel}</span>
           </div>
           {!model.selected.length ? <div className="mt-5"><Callout testId="no-selection-callout">{t("emptySelection")}</Callout></div>
-            : state.mode === "line" ? <div className="mt-5">{chart}</div>
-            : <ExplorerTable caption={`${chartLabel} · ${unitLabel} · ${model.range.start}–${model.range.end}`} rows={rows} totalRow={null} showTotal={false} wrapRowLabels rowLabelsLocalized years={model.years} firstColumnLabel={t("series")} unit={unit} share={false} showChangeColumn={false} shareValueForYear={() => null}
-              breakYears={model.breaks.map(item => item.year)} breakLabel={newCounting} />}
+            : <><ExplorerTable caption={`${chartLabel} · ${unitLabel} · ${model.range.start}–${model.range.end}`} rows={rows} totalRow={null} showTotal={false} wrapRowLabels rowLabelsLocalized years={model.years} firstColumnLabel={t("series")} unit={unit} share={false} showChangeColumn={false} shareValueForYear={() => null}
+              breakYears={model.breaks.map(item => item.year)} breakLabel={newCounting} crawlCopy={state.mode === "line"} />{state.mode === "line" ? <div className="mt-5">{chart}</div> : null}</>}
           <ChartSelectionAids series={lineSeries} chartShown={state.mode === "line"} share={false} unit={unit} formatValue={valueLabel} />
           <RangeStrip years={socialPlaceCoverage(set, place.id, shown, state.selectedIds).years} range={model.range}
             onChange={patch => update(s => ({ ...s, range: rangeFromPatch(buildSocialPlaceModel(set, place.id, shown, s, breaks).range, patch) }))} />

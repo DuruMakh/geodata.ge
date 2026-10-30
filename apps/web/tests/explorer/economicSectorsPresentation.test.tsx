@@ -55,7 +55,7 @@ test("renders one workspace, a removable GDP default and all activities in both 
       },
     ];
     const html = renderToStaticMarkup(
-      <I18nProvider locale={locale} messages={messages}>
+      <I18nProvider locale={locale} messages={messages} englishLabels={{ "economy.gdp_total": "Total GDP" }}>
         <EconomicSectorsExplorer
           facts={facts} sourceIdByMeasure={sourceIdByMeasure(facts)}
           registry={registry}
@@ -247,6 +247,7 @@ test("growth renders negative domains, isolated points and gaps through the shar
         "main",
         "workbook",
       ])}
+      englishLabels={{ "economy.gdp_total": "Total GDP", "sector.a": "Agriculture, forestry and fishing" }}
     >
       <EconomicSectorsExplorer
         facts={facts} sourceIdByMeasure={sourceIdByMeasure(facts)}

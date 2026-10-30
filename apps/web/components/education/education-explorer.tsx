@@ -89,8 +89,7 @@ export function EducationExplorer({ section, facts, labels, headingLabels, lates
             <span data-testid="education-unit-label" className="text-[11px] text-[var(--muted)]">{unitLabel}</span>
           </div>
           {!model.selected.length ? <div className="mt-5"><Callout testId="no-selection-callout">{t("emptySelection")}</Callout></div>
-            : state.mode === "line" ? <div className="mt-5">{chart}</div>
-            : <ExplorerTable caption={`${title} · ${unitLabel} · ${period(model.range.start)}–${period(model.range.end)}`} rows={rows.filter(row => row !== total)} totalRow={total} showTotal={Boolean(total)} totalFirst wrapRowLabels rowLabelsLocalized years={model.years} yearLabel={period} firstColumnLabel={t("series")} unit={unit} share={false} showChangeColumn={false} shareValueForYear={() => null} />}
+            : <><ExplorerTable caption={`${title} · ${unitLabel} · ${period(model.range.start)}–${period(model.range.end)}`} rows={rows.filter(row => row !== total)} totalRow={total} showTotal={Boolean(total)} totalFirst wrapRowLabels rowLabelsLocalized years={model.years} yearLabel={period} firstColumnLabel={t("series")} unit={unit} share={false} showChangeColumn={false} shareValueForYear={() => null} crawlCopy={state.mode === "line"} />{state.mode === "line" ? <div className="mt-5">{chart}</div> : null}</>}
           <ChartSelectionAids series={lineSeries} chartShown={state.mode === "line"} share={false} unit={unit} formatValue={valueLabel} />
           <RangeStrip years={educationCoverage(section, facts, state.selectedIds).years} range={model.range} formatPeriod={period}
             onChange={patch => update(s => ({ ...s, range: rangeFromPatch(buildEducationModel(section, facts, s).range, patch) }))} />
