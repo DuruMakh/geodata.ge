@@ -17,6 +17,7 @@
   "business.page.regions.summary": "Firms’ sales and jobs by region. Select a region to see its data.",
   "business.page.regions.metaTitle": "Business in Georgia’s regions",
   "business.page.area.regionTitle": "Business — {region}",
+  "business.page.area.seoTitle": "Business in {place} {year}",
   "business.page.area.regionHeadingLead": "Business —",
   "business.page.area.regionSummary": "Firms’ sales, investment, profit and loss, jobs, and firms opened and closed in {region}.",
   "business.area.georgia": "Georgia",

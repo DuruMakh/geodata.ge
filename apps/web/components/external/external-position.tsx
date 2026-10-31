@@ -102,9 +102,8 @@ export function ExternalPositionExplorer({ section, facts, labels, sources, gdp,
             </div>
           </div>
           {!model.selected.length ? <div className="mt-5"><Callout testId="no-selection-callout">{t("emptySelection")}</Callout></div>
-            : state.mode === "line" ? <div className="mt-5">{chart}</div>
-            : <ExplorerTable caption={`${title} · ${tabLabel} · ${unitLabel} · ${model.range.start}–${model.range.end}`} rows={rows.filter(row => row !== totalRow)} totalRow={totalRow} showTotal={Boolean(totalRow)} totalFirst wrapRowLabels rowLabelsLocalized years={model.years} yearLabel={yearLabel} firstColumnLabel={t("series")} unit={unit} share={percent} showChangeColumn={false}
-              shareValueForYear={(row, year) => { const value = row.valuesByYear[year]; return value == null ? null : value / 100; }} />}
+            : <><ExplorerTable caption={`${title} · ${tabLabel} · ${unitLabel} · ${model.range.start}–${model.range.end}`} rows={rows.filter(row => row !== totalRow)} totalRow={totalRow} showTotal={Boolean(totalRow)} totalFirst wrapRowLabels rowLabelsLocalized years={model.years} yearLabel={yearLabel} firstColumnLabel={t("series")} unit={unit} share={percent} showChangeColumn={false}
+              shareValueForYear={(row, year) => { const value = row.valuesByYear[year]; return value == null ? null : value / 100; }} crawlCopy={state.mode === "line"} />{state.mode === "line" ? <div className="mt-5">{chart}</div> : null}</>}
           <ChartSelectionAids series={lineSeries} chartShown={state.mode === "line"} share={percent} unit={unit} formatValue={valueLabel} />
           <RangeStrip years={externalPositionCoverage(section, state.view, facts, gdp).years} range={model.range} onChange={patch => update(s => ({ ...s, range: rangeFromPatch(buildExternalPositionModel(section, facts, s, gdp).range, patch) }))} />
         </section>

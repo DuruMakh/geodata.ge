@@ -314,10 +314,10 @@ test("the hub has a poverty and an inequality card with national sparklines and 
 
 // U19-04: on a budget site "Spending — Tbilisi" reads as the municipality's budget, so the area pages' titles say "household".
 test.each([
-  ["en", "spending", "tbilisi", "Household spending — Tbilisi"],
-  ["en", "income", "georgia", "Household income — Georgia"],
-  ["ka", "spending", "tbilisi", "შინამეურნეობების ხარჯები — თბილისი"],
-  ["ka", "income", "georgia", "შინამეურნეობების შემოსავლები — საქართველო"],
+  ["en", "spending", "tbilisi", "Household spending in Tbilisi 2025"],
+  ["en", "income", "georgia", "Household income in Georgia 2025"],
+  ["ka", "spending", "tbilisi", "შინამეურნეობების ხარჯები თბილისში 2025"],
+  ["ka", "income", "georgia", "შინამეურნეობების შემოსავლები საქართველოში 2025"],
 ] as const)("the %s %s page for %s is titled as household data", async (locale, section, slug, title) => {
   const metadata = await householdRegionPageMetadata(section, slug, locale);
   // The brand is appended once, by fiscalMetadata (U28-11).

@@ -18,7 +18,7 @@ for (const prefix of ["", "/en"]) {
     await expect(bilingual.locator("li")).toHaveCount(10);
     await expect(bilingual).toContainText("2025");
     await expect(bilingual).toContainText("2024");
-    await expect(page.getByTestId("connect-technical")).toContainText("1.6.0");
+    await expect(page.getByTestId("connect-technical")).toContainText("1.7.0");
     await expect(page.getByTestId("connect-technical")).toContainText("dataVersion");
     await expect(page.getByTestId("connect-technical")).toContainText("2026-07-28");
     await expect(page.getByTestId("connect-technical")).toContainText("2025-11-25");

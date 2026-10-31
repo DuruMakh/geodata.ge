@@ -38,9 +38,9 @@ for (const [section, breakdown] of [["overview", "national"], ["age", "age"], ["
   expect(markup).toContain(section === "age" ? "2020–2025" : "2010–2025"); expect(markup).toContain("2026-10-03");
   const json = JSON.parse(/data-testid="explorer-dataset-json-ld"[^>]*>(.*?)<\/script>/.exec(markup)![1]);
   expect(json.temporalCoverage).toBe(section === "age" ? "2020/2025" : "2010/2025");
-  // No bulk file, so no distribution; the shared builder files the page in the catalog of its own language.
-  expect(json.distribution).toBeUndefined(); expect(json.includedInDataCatalog["@id"]).toBe(`${new URL(json.url).origin}${locale === "en" ? "/en" : ""}/methodology#catalog`);
-  expect(markup).not.toContain("/downloads/data/unemployment");
+  // The national pages point at unemployment.csv; the shared builder files the page in the catalog of its own language.
+  expect(json.distribution).toEqual([{ "@type": "DataDownload", encodingFormat: "text/csv", contentUrl: `${new URL(json.url).origin}/downloads/data/unemployment.csv` }]);
+  expect(json.includedInDataCatalog["@id"]).toBe(`${new URL(json.url).origin}${locale === "en" ? "/en" : ""}/methodology#catalog`);
   const metadata = await unemploymentPageMetadata(locale, section);
   expect(metadata.alternates?.canonical).toEqual(expect.stringContaining(`${locale === "en" ? "/en" : ""}/explorer/unemployment/${section}`));
   expect(metadata.alternates?.languages).toMatchObject({ ka: expect.stringContaining(`/explorer/unemployment/${section}`), en: expect.stringContaining(`/en/explorer/unemployment/${section}`) });

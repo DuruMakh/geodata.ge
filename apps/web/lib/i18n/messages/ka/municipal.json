@@ -37,7 +37,7 @@
   "municipal.shareOfBudget": "წილი მთლიან ბიუჯეტში",
   "municipal.noSelection": "არც ერთი სერია არ არის არჩეული. აირჩიე სერია პანელიდან „სერიები“.",
   "municipal.tableCaptionShare": "{name} — წილი მთლიან ბიუჯეტში, {start}–{end}",
-  "municipal.tableCaptionAmount": "{name} — ხარჯები ლარში, {start}–{end}",
+  "municipal.tableCaptionAmount": "{name} — ხარჯები, {unit}, {start}–{end}",
   "municipal.function": "ფუნქცია",
   "municipal.share": "წილი",
   "municipal.allMunicipalities": "← ყველა მუნიციპალიტეტი",

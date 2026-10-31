@@ -88,27 +88,25 @@ export function VitalSection({
       <div data-testid="vital-chart-panel" data-mode={mode} className="mt-5">
         <ModeTabs value={mode} onChange={setMode} testId="vital" lineLabel={t("columns")} />
         <div className="mt-5">
-          {mode === "line" ? (
-            chart
-          ) : (
-            <ExplorerTable
-              caption={t("vitalTableCaption", { place: name, first, last })}
-              rows={[
-                { itemId: "vital.births", kaLabel: t("vitalBirths"), color: BIRTHS, valuesByYear: model.births },
-                { itemId: "vital.deaths", kaLabel: t("vitalDeaths"), color: DEATHS, valuesByYear: model.deaths },
-              ]}
-              totalRow={{ itemId: "vital.natural", kaLabel: t("vitalNatural"), color: INK, valuesByYear: model.natural }}
-              showTotal
-              wrapRowLabels
-              rowLabelsLocalized
-              years={model.years}
-              firstColumnLabel={t("seriesHeader")}
-              unit={UNIT_PERSONS}
-              share={false}
-              showChangeColumn={false}
-              shareValueForYear={() => null}
-            />
-          )}
+          <ExplorerTable
+            caption={t("vitalTableCaption", { place: name, first, last })}
+            rows={[
+              { itemId: "vital.births", kaLabel: t("vitalBirths"), color: BIRTHS, valuesByYear: model.births },
+              { itemId: "vital.deaths", kaLabel: t("vitalDeaths"), color: DEATHS, valuesByYear: model.deaths },
+            ]}
+            totalRow={{ itemId: "vital.natural", kaLabel: t("vitalNatural"), color: INK, valuesByYear: model.natural }}
+            showTotal
+            wrapRowLabels
+            rowLabelsLocalized
+            years={model.years}
+            firstColumnLabel={t("seriesHeader")}
+            unit={UNIT_PERSONS}
+            share={false}
+            showChangeColumn={false}
+            shareValueForYear={() => null}
+            crawlCopy={mode === "line"}
+          />
+          {mode === "line" ? chart : null}
         </div>
       </div>
       <div className="mt-[18px] flex flex-wrap items-start justify-between gap-4">

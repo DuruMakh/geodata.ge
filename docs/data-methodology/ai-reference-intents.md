@@ -15,7 +15,7 @@ an external assistant's language understanding.
 
 No reference intent requests a real GDP overview series, so `gdp_world_bank_preliminary_basis` does not appear in the 48-intent fixture. A future intent that asks for `real_usd_2015` or `real_growth_percent` in a Geostat-preliminary year must expect it.
 
-**Questions and responses are bilingual; the current data schema is 1.6.0.** Reviewed Georgian and
+**Questions and responses are bilingual; the current data schema is 1.7.0.** Reviewed Georgian and
 English labels, definitions, missingness, comparisons, ranking explanations and
 source descriptions travel with the same figures. Clients use the appropriate
 `*Ka`/`*En` fields. The existing numerical, source and comparability expectations
@@ -79,8 +79,10 @@ hide one.
 The table above records the first 34 intents. The executable fixture additionally
 covers regional GDP (#35–37), city inflation and early missingness (#38–40), and
 product annual/cumulative values, history limits, rankings and refusals (#41–48).
-Its source-checked expectations are authoritative; the separate eleven-pair
-`mcpAssistantIntents.ts` rubric assesses actual assistant behavior.
+Its source-checked expectations are authoritative; the separate thirteen-pair
+`mcpAssistantIntents.ts` rubric assesses actual assistant behavior. Two of its pairs (wages, pensions) ask about topics that Fiscal.ge shows but MCP does not serve: the
+assistant must say this connection does not serve them, offer the `websitePages` link from
+`describe_coverage` in the user's language, and quote no figure from unrelated data or memory.
 
 ## What the list is designed to catch
 

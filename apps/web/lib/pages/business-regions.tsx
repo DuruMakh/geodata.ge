@@ -23,6 +23,7 @@ import { publicLabel } from "../i18n/labels";
 import { pageHref } from "../i18n/routes";
 import type { Locale, Presentation } from "../i18n/types";
 import { fiscalMetadata } from "../seo/metadata";
+import { areaTitleForm, latestYearOf } from "../seo/placeTitleForms";
 import { explorerDatasetJsonLd } from "../seo/structuredData";
 import { resolveSiteUrl } from "../siteUrl";
 import { topicSection, ALL_DATA_PATH } from "../navigation/navTree";
@@ -50,9 +51,12 @@ export async function businessRegionsPageMetadata(locale: Locale) {
 }
 
 export async function businessAreaPageMetadata(slug: string, locale: Locale) {
-  const area = areaForSlug(slug), presentation = await getPresentation(locale, ["business"], AREA_LABEL_IDS);
+  const area = areaForSlug(slug), [presentation, data] = await Promise.all([getPresentation(locale, ["business"], AREA_LABEL_IDS), loadServedBusinessData()]);
   const name = businessAreaLabels(presentation)[area];
-  return fiscalMetadata({ locale, path: businessAreaHref(area), title: message(presentation.messages, "business.page.area.regionTitle", { region: name }), description: message(presentation.messages, "business.page.area.regionSummary", { region: name }) });
+  // The title is worded the way people search it and ends in the area's latest year; the page's own heading and Dataset name keep regionTitle.
+  const ids = new Set<string>(businessAreaSeries(area).map(series => series.id));
+  const seoTitle = message(presentation.messages, "business.page.area.seoTitle", { place: areaTitleForm(businessMapId(area), name, locale, "in"), year: latestYearOf(data.facts, f => ids.has(f.indicatorId)) });
+  return fiscalMetadata({ locale, path: businessAreaHref(area), title: seoTitle, description: message(presentation.messages, "business.page.area.regionSummary", { region: name }) });
 }
 
 type BusinessRegionsBody = { facts: BusinessFact[]; presentation: Presentation; areaLabels: Record<BusinessArea, string>; origin: string; lastReviewedAt: string };

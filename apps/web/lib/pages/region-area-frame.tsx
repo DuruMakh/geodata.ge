@@ -16,6 +16,7 @@ import { pageHref } from "../i18n/routes";
 import type { Locale, Presentation } from "../i18n/types";
 import { loadSourcedWorkbookSources, type SourcedWorkbookPublicSource } from "../methodology/workbookSources";
 import { fiscalMetadata } from "../seo/metadata";
+import { areaTitleForm } from "../seo/placeTitleForms";
 import { explorerDatasetJsonLd } from "../seo/structuredData";
 import { resolveSiteUrl } from "../siteUrl";
 import { topicSection, ALL_DATA_PATH } from "../navigation/navTree";
@@ -39,6 +40,8 @@ export type RegionAreaFrameConfig<Area extends string, Fact extends { year: numb
   /** The headings an area page lists, named in Dataset metadata as `<hub>.heading.<id>`. */
   areaHeadingIds(area: Area): readonly string[];
   load(): Promise<{ facts: Fact[] }>;
+  /** The latest year the area's own series have a value in: the year its page title carries. */
+  latestYear(facts: Fact[], area: Area): number;
   /** The workbooks the values are read from: a workbook's Sources sheet lists only these, not the files kept for reference. */
   sourceIds: readonly string[];
 };
@@ -73,9 +76,11 @@ export function regionAreaFrame<Area extends string, Fact extends { year: number
   }
 
   async function areaPageMetadata(slug: string, locale: Locale) {
-    const area = areaForSlug(slug), presentation = await getPresentation(locale, [hub], labelIds);
+    const area = areaForSlug(slug), [presentation, data] = await Promise.all([getPresentation(locale, [hub], labelIds), config.load()]);
     const name = areaLabels(presentation)[area];
-    return fiscalMetadata({ locale, path: areaHref(area), title: message(presentation.messages, `${hub}.page.area.regionTitle`, { region: name }), description: message(presentation.messages, `${hub}.page.area.regionSummary`, { region: name }) });
+    // The title is worded the way people search it and ends in the area's latest year; the page's own heading and Dataset name keep `regionTitle`.
+    const seoTitle = message(presentation.messages, `${hub}.page.area.seoTitle`, { place: areaTitleForm(mapId(area), name, locale, "in"), year: config.latestYear(data.facts, area) });
+    return fiscalMetadata({ locale, path: areaHref(area), title: seoTitle, description: message(presentation.messages, `${hub}.page.area.regionSummary`, { region: name }) });
   }
 
   /** The Sources sheet of the hub's workbooks: the archived workbooks behind the exported values, in the page's language and keyed by the facts' `sourceId`. */

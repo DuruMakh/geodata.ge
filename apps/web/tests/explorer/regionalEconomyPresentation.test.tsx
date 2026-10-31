@@ -68,6 +68,9 @@ test("selected-region workspace renders only the approved GEL and regional-share
       "region.guria": "Guria",
       "region.imereti": "Imereti",
       "region.kakheti": "Kakheti",
+      [REGIONAL_GDP_TOTAL]: "Regional GDP",
+      "sector.a": "Agriculture, forestry and fishing",
+      "sector.b": "Mining and quarrying",
     }}>
       <RegionalEconomyExplorer
         facts={facts}

@@ -28,7 +28,7 @@ export async function renderWagesRegionsIndexPage(locale: Locale) {
   return <I18nProvider {...clientPresentation(presentation)}>
     <JsonLd testId="explorer-dataset-json-ld" data={explorerDatasetJsonLd({
       locale, origin: resolveSiteUrl(), path: parent.path, datasetId: "wages", name: parent.name, description: parent.description,
-      firstYear: regionMap.firstYear, lastYear: regionMap.year, dateModified: lastReviewedAt, variableMeasured: [t("series.average")],
+      firstYear: regionMap.firstYear, lastYear: regionMap.year, dateModified: lastReviewedAt, downloadPath: "/downloads/data/wages.csv", variableMeasured: [t("series.average")],
     })} />
     <BreadcrumbJsonLd items={[{ name: crumbs[0].label, path: pageHref("/", locale) }, { name: message(presentation.messages, "common.data"), path: pageHref(ALL_DATA_PATH, locale) }, { name: t("title"), path: pageHref(topicSection("wages").path, locale) }, { name: title, path: pageHref("/explorer/wages/regions", locale) }]} />
     <ExplorerPage containerQueries={false}>

@@ -3,6 +3,7 @@ import { testSnapshot } from "../helpers/factQuerySnapshot";
 import { compare } from "../../lib/factQuery/compare";
 import { getSources } from "../../lib/factQuery/getSources";
 import { queryMunicipal } from "../../lib/factQuery/queryMunicipal";
+import { buildResponseMeta } from "../../lib/factQuery/meta";
 import { rank } from "../../lib/factQuery/rank";
 import type { Comparison } from "../../lib/factQuery/compare";
 import type { GetSourcesData } from "../../lib/factQuery/getSources";
@@ -87,9 +88,11 @@ describe("response meta carries only the evidence behind the answer", () => {
   });
 });
 
-// A ranking over every municipality legitimately cites every municipality's
-// workbook, so narrowing cannot help it. The repetition can: 65 documents
-// carried seven identical values each.
+// A ranking over every municipality reads every municipality's workbook, but it
+// shows only a few rows. Rows it shows carry the full record of each document
+// behind them; the other inputs are named by id (`inputDocumentIds`), so nothing
+// the ranking read is dropped and nothing it merely used to order is spelled out.
+// What remains in full still states once what its documents agree on.
 describe("a source states once what all of its documents agree on", () => {
   const rankAllMunicipalities = () =>
     rank(snapshot, {
@@ -167,33 +170,82 @@ describe("a source states once what all of its documents agree on", () => {
     expect(source.documentDefaults).not.toHaveProperty("years");
   });
 
-  it("names every document it read, invents none, and is materially smaller", () => {
+  it("names every document it read, invents none, and gives the full record only for the rows it shows", () => {
     const result = rankAllMunicipalities();
     if (result.kind === "error") throw new Error(result.error.messageEn);
 
-    const cited = result.meta.sources.flatMap((s) => s.documents.map((d) => d.documentId));
+    const full = result.meta.sources.flatMap((s) => s.documents.map((d) => d.documentId));
+    const inputs = result.meta.sources.flatMap((s) => (s as { inputDocumentIds?: string[] }).inputDocumentIds ?? []);
+    const cited = [...full, ...inputs];
     const archived = new Set(
       result.meta.sources.flatMap((s) => snapshot.sources.find((a) => a.sourceId === s.sourceId)!.documents.map((d) => d.documentId)),
     );
 
     // A ranking over every municipality genuinely reads every municipality's
-    // workbook, so it names them - one entry each, none repeated, none invented.
+    // workbook, so it still names them - one entry each, none repeated, none
+    // invented - but only the documents behind the 5 shown rows (and any
+    // document every candidate cites) are given in full.
     expect(cited.length).toBeGreaterThan(60);
     expect(new Set(cited).size).toBe(cited.length);
     for (const documentId of cited) expect(archived.has(documentId)).toBe(true);
+    expect(inputs.length).toBeGreaterThan(40);
+    expect(full.length).toBeLessThan(cited.length / 2);
 
     // The original 45 KB ceiling covered Georgian-only titles. Bilingual
     // evidence necessarily adds per-document titles; verify at least 40%
-    // saving against the same evidence without shared fields instead.
-    const expanded = result.meta.sources.map(source => {
+    // saving against the evidence a ranking used to carry: every document it
+    // read, in full, with nothing shared. The full records still reassemble
+    // exactly from the shared fields plus their own.
+    const previous = result.meta.sources.map(source => {
       const original = snapshot.sources.find(row => row.sourceId === source.sourceId)!;
-      return { ...original, documents: source.documents.map(document => {
-        const { sha256: _hash, byteSize: _size, ...full } = original.documents.find(row => row.documentId === document.documentId)!;
-        expect({ ...source.documentDefaults, ...document }).toEqual(full);
-        return full;
-      }) };
+      const ids = new Set([...source.documents.map(document => document.documentId), ...((source as { inputDocumentIds?: string[] }).inputDocumentIds ?? [])]);
+      for (const document of source.documents) {
+        const { sha256: _hash, byteSize: _size, ...whole } = original.documents.find(row => row.documentId === document.documentId)!;
+        expect({ ...source.documentDefaults, ...document }).toEqual(whole);
+      }
+      return { ...original, documents: original.documents.filter(row => ids.has(row.documentId)).map(({ sha256: _hash, byteSize: _size, ...whole }) => whole) };
     });
-    expect(bytes(result.meta.sources)).toBeLessThan(bytes(expanded) * 0.6);
+    expect(bytes(result.meta.sources)).toBeLessThan(bytes(previous) * 0.6);
     expect(bytes(result.meta.sources)).toBeLessThan(64 * 1024);
+  });
+});
+
+describe("buildResponseMeta input-only documents", () => {
+  const document = (documentId: string) => ({
+    documentId, title: documentId, titleKa: documentId, titleEn: documentId, documentLanguage: "ka" as const,
+    officialUrl: null, archiveUrl: null, years: [2025], publisher: "p", publisherKa: "p", publisherEn: "p",
+    attribution: null, attributionKa: null, attributionEn: null, licenceId: null, mediaType: "m", retrievedAt: "2026-01-01",
+    datasetId: null, role: "primary" as const, sha256: "a".repeat(64), byteSize: 1,
+  });
+  const source = (sourceId: string, ids: string[]) => ({
+    sourceId, name: sourceId, nameKa: sourceId, nameEn: sourceId, derivationKa: null, derivationEn: null,
+    lastReviewedAt: "2026-01-01", derivation: null, documents: ids.map(document),
+  });
+
+  it("moves input-only documents to ids on their source and keeps cited ones in full", () => {
+    const meta = buildResponseMeta(snapshot, {
+      sources: [source("s.a", ["d1", "d2", "d3"])],
+      citedDocumentIds: ["d1"],
+      inputOnlyDocumentIds: ["d2", "d3"],
+    });
+    expect(meta.sources[0]!.documents.map((d) => d.documentId)).toEqual(["d1"]);
+    expect(meta.sources[0]!.inputDocumentIds).toEqual(["d2", "d3"]);
+  });
+
+  it("leaves a source with only input documents holding documents: [] and its ids", () => {
+    const meta = buildResponseMeta(snapshot, {
+      sources: [source("s.a", ["d1"]), source("s.b", ["d2", "d3"])],
+      citedDocumentIds: ["d1"],
+      inputOnlyDocumentIds: ["d2", "d3"],
+    });
+    expect(meta.sources[1]!.documents).toEqual([]);
+    expect(meta.sources[1]!.inputDocumentIds).toEqual(["d2", "d3"]);
+    expect(meta.sources[0]!).not.toHaveProperty("inputDocumentIds");
+  });
+
+  it("is unchanged when no input-only documents are supplied", () => {
+    const meta = buildResponseMeta(snapshot, { sources: [source("s.a", ["d1", "d2"])], citedDocumentIds: ["d1"] });
+    expect(meta.sources[0]!.documents.map((d) => d.documentId)).toEqual(["d1"]);
+    expect(meta.sources[0]!).not.toHaveProperty("inputDocumentIds");
   });
 });

@@ -468,7 +468,14 @@ export function buildGdpCsv(snapshot: FactQuerySnapshot): PublicationArtifact {
   return { fileName: "gdp-overview.csv", bytes: Buffer.from(text, "utf8"), rowCount: rows.length };
 }
 
-export function buildAllPublications(snapshot: FactQuerySnapshot): PublicationArtifact[] {
+/**
+ * `sideFiles` are published files this module does not build (the topic CSVs
+ * `prepare-public-datasets` and `prepare-inflation` write earlier in the
+ * chain). They are listed in the manifest after the snapshot artifacts, with
+ * their own hash, but are not returned: the caller already holds their bytes
+ * on disk and must not write them again.
+ */
+export function buildAllPublications(snapshot: FactQuerySnapshot, sideFiles: readonly PublicationArtifact[] = []): PublicationArtifact[] {
   const inflationCategories = inflationCategoryParts(snapshot);
   const inflationCategoriesCsv = buildInflationCategoriesCsv(inflationCategories);
   const inflationCities = inflationCityParts(snapshot);
@@ -501,7 +508,7 @@ export function buildAllPublications(snapshot: FactQuerySnapshot): PublicationAr
     inflationProductsCsv,
     buildInflationProductsJson(snapshot, inflationProductsCsv),
   ];
-  return [...artifacts, buildManifestFile(snapshot, artifacts)];
+  return [...artifacts, buildManifestFile(snapshot, [...artifacts, ...sideFiles])];
 }
 
 export function buildRegionalEconomiesCsv(snapshot: {

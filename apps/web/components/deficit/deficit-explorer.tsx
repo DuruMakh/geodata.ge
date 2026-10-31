@@ -178,25 +178,29 @@ export function DeficitExplorer({ facts, workbookSources, edition, siteOrigin, l
                   {message(messages, "main.noSelection")}
                 </Callout>
               </div>
-            ) : chartMode === "table" ? (
-              <ExplorerTable
-                caption={message(messages, "deficit.caption", { start: range.start, end: range.end })}
-                rows={[model.tableRow]}
-                totalRow={null}
-                showTotal={false}
-                years={model.years}
-                firstColumnLabel={message(messages, "controls.seriesColumn")}
-                unit={unit}
-                share={percentage}
-                showChangeColumn={false}
-                forecastYears={forecastYears}
-                forecastLabel={message(messages, "deficit.forecast")}
-                shareValueForYear={(row, year) => row.shareByYear?.[year] ?? null}
-              />
             ) : (
-              <div className="mt-5">
-                {chart}
-              </div>
+              <>
+                <ExplorerTable
+                  caption={message(messages, "deficit.caption", { start: range.start, end: range.end })}
+                  rows={[model.tableRow]}
+                  totalRow={null}
+                  showTotal={false}
+                  years={model.years}
+                  firstColumnLabel={message(messages, "controls.seriesColumn")}
+                  unit={unit}
+                  share={percentage}
+                  showChangeColumn={false}
+                  forecastYears={forecastYears}
+                  forecastLabel={message(messages, "deficit.forecast")}
+                  shareValueForYear={(row, year) => row.shareByYear?.[year] ?? null}
+                  crawlCopy={chartMode === "line"}
+                />
+                {chartMode === "line" ? (
+                  <div className="mt-5">
+                    {chart}
+                  </div>
+                ) : null}
+              </>
             )}
             <ChartSelectionAids series={chartSeries} chartShown={chartMode === "line"} share={percentage} unit={unit} />
 

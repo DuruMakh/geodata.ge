@@ -17,6 +17,8 @@
   "social.place.headingLead.pensions": "Pensions —",
   "social.place.headingLead.subsistence-allowance": "Subsistence allowance —",
   "social.place.metaTitle": "{section} — {place}",
+  "social.place.seoTitle.pensions": "Pensions in {place} {year}",
+  "social.place.seoTitle.subsistence-allowance": "Subsistence allowance in {place} {year}",
   "social.place.metaDescription": "{section} in {place}, year by year, from Social Service Agency data.",
   "social.heading.money": "Money paid",
   "social.heading.pensioners": "Pensioners",

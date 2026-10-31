@@ -4,7 +4,10 @@ import { testSnapshot } from "../helpers/factQuerySnapshot";
 import { describeCoverage } from "../../lib/factQuery/describeCoverage";
 import { queryMinistries } from "../../lib/factQuery/queryMinistries";
 import { envelopeSchema } from "../../lib/factQuery/schemas";
+import { MCP_SERVED_PAGES } from "../../lib/factQuery/servedPages";
 import { AGGREGATE_ONLY_MUNICIPAL_CODES, type FactQuerySnapshot } from "../../lib/factQuery/types";
+import { outputSchemaFor } from "../../lib/mcp/outputSchema";
+import { NAV_TREE, PAGE_COUNT, topicHub } from "../../lib/navigation/navTree";
 
 let snapshot: FactQuerySnapshot;
 
@@ -17,6 +20,9 @@ type CoverageData = {
   series?: { seriesId: string; labelKa: string; availability: string; level: string; years: number[]; datasetId?: string }[];
   entities?: { entityId: string; labelKa: string; entitySlug: string | null; datasetId?: string }[];
   exclusions: { entityId: string; reason: string }[];
+  websitePages?: { topicId: string; labelKa: string; labelEn: string; topicLabelKa: string; topicLabelEn: string; urlKa: string; urlEn: string }[];
+  websitePagesNoteKa?: string;
+  websitePagesNoteEn?: string;
 };
 
 const data = (result: ReturnType<typeof describeCoverage>) => (result as { data: CoverageData }).data;
@@ -314,5 +320,189 @@ describe("search understands Georgian case endings", () => {
   it("does not let a short stem match mid-word", () => {
     const entities = data(describeCoverage(snapshot, { datasetId: "municipal-expenditure", search: "ონის" })).entities ?? [];
     for (const entity of entities) expect(entity.labelKa.startsWith("ონ")).toBe(true);
+  });
+});
+
+// A topic the website shows and this connection does not serve: the search says where the page is,
+// and carries no figure (spec: 2026-10-29 MCP audit, F01).
+describe("search points to website pages the connection does not serve", () => {
+  const firstWagesPage = topicHub("wages").sections[0]!.href;
+
+  it.each(["wages", "ხელფასი"])("answers %s with the wages page and no series", (search) => {
+    const result = describeCoverage(snapshot, { search });
+    expect(result.status).toBe("empty");
+    const pages = data(result).websitePages ?? [];
+    expect(pages[0]?.topicId).toBe("wages");
+    expect(pages[0]?.urlEn).toBe(`https://fiscal.ge/en${firstWagesPage}`);
+    expect(pages[0]?.urlKa).toBe(`https://fiscal.ge${firstWagesPage}`);
+    expect(pages.length).toBeLessThanOrEqual(5);
+    expect(data(result).websitePagesNoteEn).toContain("do not quote a figure");
+    expect(data(result).websitePagesNoteKa).toBeTruthy();
+  });
+
+  it("keeps the served series for pension and adds the pensions page", () => {
+    const result = describeCoverage(snapshot, { search: "pension" });
+    expect(result.status).toBe("ok");
+    expect((data(result).series ?? []).map((entry) => (entry as { labelEn?: string }).labelEn).join("|")).toMatch(/funded pension/i);
+    const urls = (data(result).websitePages ?? []).map((page) => page.urlKa);
+    expect(urls).toContain("https://fiscal.ge/explorer/health/pensions");
+  });
+
+  // The website's own search matches inside words from three letters and retries a Latin query on the Georgian
+  // keyboard; a page is linked only when the catalogue's whole-word matcher finds every word in it.
+  it.each(["ice", "art", "rent", "port", "sector.f"])("links no page that %s meets only inside a word or as an id", (search) => {
+    expect(data(describeCoverage(snapshot, { search }))).not.toHaveProperty("websitePages");
+  });
+
+  it("links no page of another topic for ICT", () => {
+    for (const page of data(describeCoverage(snapshot, { search: "ICT" })).websitePages ?? []) expect(page.topicId).toBe("internet");
+  });
+
+  it.each(["unemployment", "უმუშევრობა"])("still answers %s with the unemployment overview first", (search) => {
+    const overview = topicHub("unemployment").sections[0]!.href;
+    const pages = data(describeCoverage(snapshot, { search })).websitePages ?? [];
+    expect(pages[0]?.urlKa).toBe(`https://fiscal.ge${overview}`);
+    expect(pages[0]?.urlEn).toBe(`https://fiscal.ge/en${overview}`);
+    for (const page of pages) expect(page.topicId).toBe("unemployment");
+  });
+
+  it("adds nothing when the search matches no website page", () => {
+    const found = data(describeCoverage(snapshot, { search: "zzzznotathing" }));
+    expect(found).not.toHaveProperty("websitePages");
+    expect(found).not.toHaveProperty("websitePagesNoteEn");
+  });
+
+  it("adds nothing to a search inside one dataset", () => {
+    const found = data(describeCoverage(snapshot, { datasetId: "national-expenditure", search: "wages" }));
+    expect(found).not.toHaveProperty("websitePages");
+    expect(found).not.toHaveProperty("websitePagesNoteEn");
+  });
+
+  it("never carries a figure or a page the connection serves", () => {
+    const served = new Set(Object.keys(MCP_SERVED_PAGES));
+    for (const search of ["wages", "pension", "unemployment", "ექსპორტი", "health", "budget", "inflation", "gdp", "debt"]) {
+      for (const page of data(describeCoverage(snapshot, { search })).websitePages ?? []) {
+        expect(Object.keys(page).sort()).toEqual(["labelEn", "labelKa", "topicId", "topicLabelEn", "topicLabelKa", "urlEn", "urlKa"]);
+        for (const value of Object.values(page)) expect(typeof value).toBe("string");
+        for (const url of [page.urlKa, page.urlEn]) {
+          expect(url.startsWith("https://fiscal.ge/")).toBe(true);
+          expect(served.has(url.replace("https://fiscal.ge", "").replace(/^\/en(?=\/)/, ""))).toBe(false);
+        }
+      }
+    }
+  });
+
+  it("validates against the published describe_coverage output schema", () => {
+    for (const search of ["wages", "pension", "ხელფასი", "zzzznotathing"]) {
+      expect(outputSchemaFor("describe_coverage").safeParse(describeCoverage(snapshot, { search })).success, search).toBe(true);
+    }
+  });
+
+  it("serves exactly the pages MCP_SERVED_PAGES names and offers the rest", () => {
+    const hrefs = new Set(NAV_TREE.flatMap((hub) => hub.sections.map((section) => section.href as string)));
+    const served = Object.keys(MCP_SERVED_PAGES);
+    expect(served).toHaveLength(12);
+    for (const href of served) expect(hrefs.has(href), href).toBe(true);
+    // Every dataset the catalogue lists is shown by at least one served page.
+    const shown = new Set(Object.values(MCP_SERVED_PAGES).flat());
+    for (const dataset of data(describeCoverage(snapshot, {})).datasets) expect(shown.has(dataset.datasetId as never), dataset.datasetId).toBe(true);
+    expect(snapshot.website.pages).toHaveLength(PAGE_COUNT - served.length);
+    for (const page of snapshot.website.pages) {
+      expect(served).not.toContain(page.href);
+      expect([page.value, page.period, page.caption]).toEqual(["", "", ""]);
+      expect(page.spark).toBeNull();
+    }
+  });
+});
+
+// Owner review of the F01 fix: a price word, a place beside a topic, and a phrase that matches nothing in full still
+// reach the right page, and the money-supply noise the whole-phrase rule removed stays gone.
+describe("search links the topic page behind a phrase", () => {
+  const topicsOf = (search: string) => (data(describeCoverage(snapshot, { search })).websitePages ?? []).map((page) => page.topicId);
+
+  // "prices" meets the inflation dataset's own label, Consumer price inflation, so it is a served word, not the
+  // housing page's subject.
+  it.each(["bread prices", "fuel prices"])("links no housing page for %s", (search) => {
+    expect(topicsOf(search)).not.toContain("housing");
+  });
+
+  // A place is no page's word, as the website's own search drops it; a topic word that also meets some served series
+  // (Hospital services, School book, the funded-pension programme) still finds its page; and a phrase whose answer is
+  // empty still looks word by word. The last two are the reference-intent prompts (mcpAssistantIntents.ts).
+  it.each([
+    ["hospitals in Kutaisi", "health"],
+    ["ბათუმის სკოლები", "education"],
+    ["home prices Tbilisi", "housing"],
+    ["unemployment among women", "unemployment"],
+    ["average pension in Georgia", "health"],
+    ["საშუალო თვიური ხელფასი", "wages"],
+  ])("links %s to the %s topic", (search, topic) => {
+    const topics = topicsOf(search);
+    expect(topics.length).toBeGreaterThan(0);
+    for (const found of topics) expect(found).toBe(topic);
+  });
+
+  it("puts the page that meets the most words first", () => {
+    const pages = data(describeCoverage(snapshot, { search: "unemployment among women" })).websitePages ?? [];
+    expect(pages[0]?.labelEn).toBe("Sex");
+  });
+
+  // "rate" meets the debt interest rates and links pages of two topics, so it names no page by itself.
+  it.each(["inflation rate", "poverty rate"])("links no interest-rate page for %s", (search) => {
+    expect(topicsOf(search)).not.toContain("money");
+  });
+
+  it("links only the money supply page for money supply", () => {
+    expect((data(describeCoverage(snapshot, { search: "money supply" })).websitePages ?? []).map((page) => page.labelEn)).toEqual(["Money supply"]);
+  });
+
+  // A trailing full stop is punctuation, not an id: only a word, a "." or "_", and a word again looks like one.
+  it("reads wages. as the word wages", () => {
+    expect(topicsOf("wages.")[0]).toBe("wages");
+  });
+});
+
+// Owner re-review of wave 1: a word the connection already serves links no page of another subject, a common word
+// inside a region's name is no place, and a qualified price word still finds the home prices page.
+describe("search links no page of another subject", () => {
+  const pagesOf = (search: string) => data(describeCoverage(snapshot, { search })).websitePages ?? [];
+
+  it.each([
+    "imports from China", "revenue from tourism", "grants from the EU", "transfers from the budget", "food inflation",
+    "city budget", "ქალაქის ბიუჯეტი", "use of funds", "funds not spent", "road construction spending", "domestic revenue",
+    "foreign aid", "car imports",
+  ])("links no page for %s", (search) => {
+    expect(pagesOf(search).map((page) => page.labelEn)).toEqual([]);
+  });
+
+  it.each([
+    ["gas prices", "environment"],
+    ["food prices", "energy-food"],
+  ])("links no %s page through a word the prices series already serve", (search, topic) => {
+    expect(pagesOf(search).map((page) => page.topicId)).not.toContain(topic);
+  });
+
+  // შიდა (domestic, inner) is one word of შიდა ქართლი, which names the place only with ქართლი beside it.
+  it("reads შიდა ვალი as domestic debt, not as a place and a debt page", () => {
+    expect(pagesOf("შიდა ვალი").map((page) => page.labelEn)).toEqual([]);
+  });
+
+  it("drops a two-word region name and links the schools page", () => {
+    expect(pagesOf("შიდა ქართლის სკოლები").map((page) => page.labelEn)).toContain("Schools");
+  });
+
+  it.each(["house prices", "Tbilisi house prices"])("links the home prices page for %s", (search) => {
+    expect(pagesOf(search).map((page) => page.labelEn)).toContain("Home prices");
+  });
+});
+
+// Owner re-review, round 3: a word that only a dataset's label holds ("overview", "consumer") is a served subject's
+// qualifier, and "მიხედვით" (by) only joins, so neither links a page of another subject.
+describe("search links no page through a dataset's generic label word", () => {
+  it.each([
+    "debt overview", "ბიუჯეტის მიმოხილვა", "consumer debt",
+    "ხარჯები სექტორების მიხედვით", "ვალი ვალუტების მიხედვით", "შემოსავლები წყაროების მიხედვით",
+  ])("links no page for %s", (search) => {
+    expect((data(describeCoverage(snapshot, { search })).websitePages ?? []).map((page) => page.labelEn)).toEqual([]);
   });
 });

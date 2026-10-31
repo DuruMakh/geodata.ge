@@ -66,8 +66,7 @@ export function CurrentAccount({ facts, gdp, sources, gdpSources = [], lastRevie
             </div>
           </div>
           {!shown.length ? <div className="mt-5"><Callout testId="no-selection-callout">{t("emptySelection")}</Callout></div>
-            : state.mode === "table" ? <ExplorerTable caption={`${t("title")} · ${tabLabel} · ${model.unit.label} · ${model.range.start}–${model.range.end}`} rows={rows.filter(row => row.itemId !== "ca.balance")} totalRow={total} showTotal={Boolean(total)} totalFirst wrapRowLabels rowLabelsLocalized years={model.years} firstColumnLabel={t("series")} unit={model.unit} share={false} showChangeColumn={false} shareValueForYear={() => null} />
-            : <div className="mt-5">{chart}</div>}
+            : <><ExplorerTable caption={`${t("title")} · ${tabLabel} · ${model.unit.label} · ${model.range.start}–${model.range.end}`} rows={rows.filter(row => row.itemId !== "ca.balance")} totalRow={total} showTotal={Boolean(total)} totalFirst wrapRowLabels rowLabelsLocalized years={model.years} firstColumnLabel={t("series")} unit={model.unit} share={false} showChangeColumn={false} shareValueForYear={() => null} crawlCopy={state.mode === "line"} />{state.mode === "line" ? <div className="mt-5">{chart}</div> : null}</>}
           {/* The Balance stack is a chart (the return pill says so) but has its own key, so it gets no legend. */}
           <ChartSelectionAids series={lineSeries} chartShown={state.mode === "line"} share={false} unit={model.unit} formatValue={valueLabel} legendCap={balance ? 0 : undefined} />
           <RangeStrip years={currentAccountCoverage(facts).years} range={model.range} onChange={patch => update(s => ({ ...s, range: rangeFromPatch(resolveRange(s.range, currentAccountCoverage(facts)), patch) }))} />

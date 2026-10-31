@@ -65,6 +65,28 @@ describe("product discovery", () => {
     ] } };
     expect(catalogue(snapshot, { datasetId: "inflation-products" }).series?.[0]).toMatchObject({ years: [2024, 2026], yearsByMeasure: { yoy_pct: [2026], cumulative_pct: [2024] }, periodsByMeasure: { yoy_pct: ["2026-01", "2026-01"], cumulative_pct: ["2024-02", "2024-02"] } });
   });
+  it("omits the per-measure spans when they only repeat the series' own years and periods", () => {
+    const fact = (period: string, measure: "yoy_index_100" | "mom_index_100", index100: string | null) => ({ productId: "cpi.product.p0001", period, measure, index100, availability: index100 === null ? "not_published" as const : "published" as const, sourceId: measure === "yoy_index_100" ? "source.geostat_product_yoy" : "source.geostat_product_mom" });
+    const snapshot = { ...real, inflationProducts: { catalogue: [{ productId: "cpi.product.p0001", labelKa: "პური", labelEn: "Bread", coicopCode: "0111", firstPeriod: "2024-02" }], historyNotes: [], facts: [
+      fact("2024-02", "mom_index_100", "100"), fact("2026-01", "mom_index_100", "101"), fact("2024-02", "yoy_index_100", "100"), fact("2026-01", "yoy_index_100", "105"),
+    ] } };
+    const same = catalogue(snapshot, { datasetId: "inflation-products" }).series?.[0];
+    expect(same).toMatchObject({ years: [2024, 2026], periods: ["2024-02", "2026-01"], measures: ["yoy_pct", "cumulative_pct"] });
+    expect(same).not.toHaveProperty("yearsByMeasure");
+    expect(same).not.toHaveProperty("periodsByMeasure");
+
+    // A measure that spans less than the series keeps both maps: absent would read as "the same".
+    const narrower = { ...snapshot, inflationProducts: { ...snapshot.inflationProducts, facts: snapshot.inflationProducts.facts.filter(row => !(row.measure === "yoy_index_100" && row.period === "2024-02")) } };
+    expect(catalogue(narrower, { datasetId: "inflation-products" }).series?.[0]).toMatchObject({ yearsByMeasure: { yoy_pct: [2026], cumulative_pct: [2024, 2026] }, periodsByMeasure: { yoy_pct: ["2026-01", "2026-01"], cumulative_pct: ["2024-02", "2026-01"] } });
+  });
+  it("keeps per-measure spans on the real catalogue only where they differ from the series span", () => {
+    const rows = catalogue(real, { datasetId: "inflation-products" }).series!;
+    for (const row of rows) {
+      if (row.yearsByMeasure !== undefined) expect(Object.values(row.yearsByMeasure).some(years => JSON.stringify(years) !== JSON.stringify(row.years)), row.seriesId).toBe(true);
+      if (row.periodsByMeasure !== undefined) expect(Object.values(row.periodsByMeasure).some(span => JSON.stringify(span) !== JSON.stringify(row.periods)) || Object.keys(row.periodsByMeasure).length < (row.measures?.length ?? 0), row.seriesId).toBe(true);
+    }
+    expect(rows.some(row => row.yearsByMeasure === undefined)).toBe(true);
+  });
   it("filters only product originals while retaining their registered dataset and no-match fallback", () => {
     const originals = JSON.stringify(real.sources);
     const result = getSources(real, { datasetId: "inflation-products", sourceIds: ["source.geostat_product_yoy", "source.geostat_product_mom"] });

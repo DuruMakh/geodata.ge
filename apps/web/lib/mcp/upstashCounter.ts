@@ -24,6 +24,19 @@ end
 return 1
 `;
 
+// The anonymous usage tally: one hash per UTC day, one field per
+// tool|outcome|error|limit|clientClass combination, counted with HINCRBY. The
+// hash is given its expiry (100 days) when a field is first created.
+const RECORD = `
+if redis.call('HINCRBY', KEYS[1], ARGV[1], 1) == 1 then redis.call('EXPIRE', KEYS[1], tonumber(ARGV[2])) end
+return 1
+`;
+const STATS_EXPIRY_SECONDS = 100 * 24 * 60 * 60;
+// The route builds both values from fixed vocabularies; refuse anything else
+// rather than let a future caller put free text into the hash.
+const DAY_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
+const FIELD_PATTERN = /^[a-z_/]{1,40}\|(?:ok|error)\|[a-z_-]{1,40}\|[a-z_-]{1,20}\|(?:anthropic|other|unkeyed)$/;
+
 export function upstashCounter(): Counter {
   const url = process.env.KV_REST_API_URL;
   const token = process.env.KV_REST_API_TOKEN;
@@ -52,6 +65,21 @@ export function upstashCounter(): Counter {
         // Never retain provider errors: they can contain URLs or credentials.
         return "unavailable";
       }
+    },
+
+    async record(day, field) {
+      if (!configured || !DAY_PATTERN.test(day) || !FIELD_PATTERN.test(field)) return;
+      try {
+        const response = await fetch(url!, {
+          method: "POST",
+          headers: { authorization: `Bearer ${token}`, "content-type": "application/json" },
+          body: JSON.stringify(["EVAL", RECORD, 1, `${namespace}:mcp:stats:${day}`, field, STATS_EXPIRY_SECONDS]),
+          cache: "no-store",
+          signal: AbortSignal.timeout(1500),
+        });
+        // Nothing in the reply is read; release it so the connection is not held open.
+        await response.body?.cancel();
+      } catch { /* A lost tally is not worth a log line or a retry. */ }
     },
   };
 }

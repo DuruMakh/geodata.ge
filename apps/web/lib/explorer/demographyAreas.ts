@@ -26,6 +26,10 @@ export type DemographyPlace = {
   municipalityCount: number;
   /** The place's one colour, the same on every page: Georgia is ink and no region shares a colour with a municipality of its own. */
   color: string;
+  /** Municipalities: the official name ("ხაშურის მუნიციპალიტეტი"), from which page titles derive their Georgian forms. */
+  officialNameKa?: string;
+  /** Municipalities: whether it is a self-governing city, whose titles use the short city name. */
+  selfGoverningCity?: boolean;
 };
 
 /**
@@ -106,6 +110,8 @@ export function buildDemographyPlaces({
       sortOrder: municipality.sortId,
       municipalityCount: 0,
       color: memberColours.get(municipality.code)!,
+      officialNameKa: municipality.nameKa,
+      selfGoverningCity: municipality.isSelfGoverningCity,
     })),
   ];
 }

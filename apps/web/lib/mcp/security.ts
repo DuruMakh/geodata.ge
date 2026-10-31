@@ -6,6 +6,7 @@
 // browser page on another origin from driving the endpoint with a visitor's
 // credentials, and stop a caller naming a host it does not own.
 import { createHash } from "node:crypto";
+import { ANTHROPIC_EGRESS_CIDR, inIpv4Cidr } from "./providerRanges";
 
 export type SecurityVerdict = { ok: true } | { ok: false; status: number; code: string };
 
@@ -112,8 +113,26 @@ export function corsOriginFor(request: Request): string | null {
  * enforcement window and never written to application logs.
  */
 export function clientKey(request: Request): string | null {
-  const trusted = request.headers.get("x-vercel-forwarded-for") ?? request.headers.get("x-real-ip");
-  if (trusted === null || trusted.length === 0) return null;
+  const trusted = trustedAddress(request);
+  if (trusted === null) return null;
 
   return createHash("sha256").update(trusted).digest("hex").slice(0, 32);
+}
+
+function trustedAddress(request: Request): string | null {
+  const trusted = request.headers.get("x-vercel-forwarded-for") ?? request.headers.get("x-real-ip");
+  return trusted === null || trusted.length === 0 ? null : trusted;
+}
+
+/**
+ * A three-word class for the daily usage tally: which kind of caller, never
+ * which one. Tests the same trusted address `clientKey` hashes against the
+ * vendored provider range; the address itself is not returned or retained.
+ * It only labels traffic after the fact and never changes a limit.
+ */
+export function clientClass(request: Request): "anthropic" | "other" | "unkeyed" {
+  const trusted = trustedAddress(request);
+  if (trusted === null) return "unkeyed";
+
+  return inIpv4Cidr(trusted, ANTHROPIC_EGRESS_CIDR) ? "anthropic" : "other";
 }

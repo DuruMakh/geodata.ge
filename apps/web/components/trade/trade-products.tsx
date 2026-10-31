@@ -52,6 +52,8 @@ export function TradeProducts({ data, sources, lastReviewedAt, siteOrigin }: { d
   const lineSeries = useMemo(() => model.selectedIds.map(id => ({ id, label: labels.get(id)!, color: tradeProductColor(id), vals: model.years.map(year => model.valuesByEntity[id][year]) })), [model, labels]);
   const valueLabel = useCallback((value: number) => `${formatInUnit(value, model.unit)} ${model.unit.label}`, [model.unit]);
   const chart = useMemo(() => <EditorialLineChart years={model.years} series={lineSeries} share={false} unit={model.unit} shareLabel={measureLabel} showAxisUnit={false} formatTooltipValue={valueLabel} />, [model, lineSeries, measureLabel, valueLabel]);
+  // The yearly table; in chart mode it is rendered hidden so crawlers read its numbers.
+  const table = (crawlCopy: boolean) => <ExplorerTable caption={`${t("title")} · ${measureLabel} · ${model.unit.label} · ${model.range.start}–${model.range.end}`} rows={rows.filter(row => row.itemId !== TRADE_PRODUCT_TOTAL_ID)} totalRow={total} showTotal={Boolean(total)} totalFirst wrapRowLabels rowLabelsLocalized years={model.years} firstColumnLabel={t("series")} unit={model.unit} share={false} showChangeColumn={false} shareValueForYear={() => null} crawlCopy={crawlCopy} />;
   const shareAction = model.selectedCount ? <ChartShareButton title={domestic ? message(messages, "trade.domestic.productsTitle") : t("title")} caption={`${measureLabel} · ${model.unit.label} · ${model.range.start}–${model.range.end}`}
     legend={lineSeries.map(({ label, color }) => ({ label, color }))} source={message(messages, "trade.sourceNote")} chart={chart} period={`${model.range.start}-${model.range.end}`} /> : undefined;
   return <div data-testid="trade-products" className="@container">
@@ -70,8 +72,8 @@ export function TradeProducts({ data, sources, lastReviewedAt, siteOrigin }: { d
         }} /></div>
       </div>
       {!model.selectedCount ? <div className="my-5"><Callout testId="no-selection-callout">{t("emptySelection")}</Callout></div>
-        : state.mode === "line" ? <div className="mt-4" data-testid="trade-products-plot">{chart}</div>
-        : <div data-testid="trade-products-table" data-page={page + 1}><ExplorerTable caption={`${t("title")} · ${measureLabel} · ${model.unit.label} · ${model.range.start}–${model.range.end}`} rows={rows.filter(row => row.itemId !== TRADE_PRODUCT_TOTAL_ID)} totalRow={total} showTotal={Boolean(total)} totalFirst wrapRowLabels rowLabelsLocalized years={model.years} firstColumnLabel={t("series")} unit={model.unit} share={false} showChangeColumn={false} shareValueForYear={() => null} />
+        : state.mode === "line" ? <>{table(true)}<div className="mt-4" data-testid="trade-products-plot">{chart}</div></>
+        : <div data-testid="trade-products-table" data-page={page + 1}>{table(false)}
           <TablePager label={t("tablePages")} summary={`${t("selected")} · ${model.selectedCount}`} page={page} pageCount={pageCount} onPage={setPage} previous={t("previous")} next={t("next")} testIdPrefix="trade-products-table" />
         </div>}
       {/* Directly after the plot, before the chips: the readout CSS and the return pill look for the chart as the previous sibling. With more than ten products the chips name the selection, so the legend is left out. */}

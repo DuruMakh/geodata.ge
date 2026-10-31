@@ -17,6 +17,7 @@ import { I18nProvider } from "../i18n/provider";
 import { pageHref } from "../i18n/routes";
 import type { Locale } from "../i18n/types";
 import { fiscalMetadata } from "../seo/metadata";
+import { areaTitleForm } from "../seo/placeTitleForms";
 import { explorerDatasetJsonLd } from "../seo/structuredData";
 import { resolveSiteUrl } from "../siteUrl";
 import { ExplorerHeading } from "../../components/explorer-shell/explorer-heading";
@@ -107,7 +108,7 @@ export async function renderRegionalEconomiesPage(locale: Locale) {
             name,
             description: message(presentation.messages, "regionalEconomies.detailMetaDescription", {
               ...regionalCoverage(facts.filter((fact) => fact.regionId === region.id), locale).params,
-              region: name,
+              regionOf: areaTitleForm(region.id, name, locale, "of"),
             }),
           };
         }),

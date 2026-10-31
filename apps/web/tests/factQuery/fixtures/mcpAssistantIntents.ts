@@ -151,4 +151,22 @@ export const MCP_ASSISTANT_INTENTS: readonly McpAssistantIntent[] = [
       "Point to the documented website unemployment explorer as the alternative; do not promise an unsupported MCP or bulk dataset.",
     ],
   },
+  {
+    id: "outside-mcp-scope-wages",
+    promptEn: "What is the average monthly wage in Georgia, and is there a Fiscal.ge page that shows it?",
+    promptKa: "რამდენია საშუალო თვიური ხელფასი საქართველოში და არის თუ არა Fiscal.ge-ზე გვერდი, რომელიც მას აჩვენებს?",
+    requiredBehaviors: [
+      "Search the catalogue; wages are outside the approved MCP datasets, so state that this connection does not serve them and invent no tool.",
+      "Offer the Fiscal.ge page link from websitePages in the user's language, with no figure: do not quote a wage from unrelated data or from memory.",
+    ],
+  },
+  {
+    id: "outside-mcp-scope-pension",
+    promptEn: "What is the average pension in Georgia? Where can I see it on Fiscal.ge?",
+    promptKa: "რამდენია საშუალო პენსია საქართველოში? სად შემიძლია ამის ნახვა Fiscal.ge-ზე?",
+    requiredBehaviors: [
+      "Do not present the funded-pension co-financing programme that the search also returns as the average pension; it is a budget programme, not a pension amount.",
+      "Offer the Fiscal.ge page link from websitePages in the user's language, with no figure: do not quote a pension amount.",
+    ],
+  },
 ];

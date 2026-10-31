@@ -392,17 +392,21 @@ describe("business methodology", () => {
 });
 
 describe("methodology without bulk files", () => {
-  it("renders the demography article with its breadcrumb and archived originals but no download or Dataset markup", async () => {
+  it.each(["ka", "en"] as const)("renders the %s demography article with its breadcrumb, archived originals and Dataset markup but no download", async (locale) => {
     const { renderMethodologyArticle } = await import("../../lib/pages/methodology-article");
-    const markup = renderToStaticMarkup(await renderMethodologyArticle("en", { params: Promise.resolve({ dataset: "demography" }) }));
+    const markup = renderToStaticMarkup(await renderMethodologyArticle(locale, { params: Promise.resolve({ dataset: "demography" }) }));
     expect(markup).not.toContain("processed-dataset-download");
-    expect(markup).not.toContain('data-testid="dataset-json-ld"');
+    const jsonLd = markup.match(/<script[^>]*data-testid="dataset-json-ld"[^>]*>([\s\S]*?)<\/script>/)?.[1] ?? "";
+    const dataset = JSON.parse(jsonLd);
+    expect(dataset["@type"]).toBe("Dataset");
+    expect(new URL(dataset.url).pathname).toBe(`${locale === "en" ? "/en" : ""}/methodology/demography`);
+    expect(jsonLd).not.toContain("distribution");
     expect(markup).not.toContain("/downloads/data/");
     expect(markup).toContain('data-testid="breadcrumb-json-ld"');
     expect(markup).toContain("/downloads/methodology/demography/files/");
   });
 
-  it("lists demography on the hub but keeps it out of the data catalog, which names only Dataset nodes", async () => {
+  it("lists demography on the hub and in the data catalog, which names Dataset nodes", async () => {
     const { renderMethodologyPage } = await import("../../lib/pages/methodology");
     // The hub's coming-next list is empty, so no client-side ComingSoonBadge renders now; the provider stays for the day a
     // future-dataset row returns, because the real locale layout supplies one.
@@ -410,7 +414,7 @@ describe("methodology without bulk files", () => {
     const markup = renderToStaticMarkup(<I18nProvider locale="en" messages={messages}>{await renderMethodologyPage("en")}</I18nProvider>);
     const catalog = markup.match(/<script data-testid="catalog-json-ld"[^>]*>([\s\S]*?)<\/script>/)![1]!;
     expect(catalog).toContain('/methodology/inflation"');
-    expect(catalog).not.toContain("/methodology/demography");
+    expect(catalog).toContain('/methodology/demography"');
     expect(markup).toContain('href="/en/methodology/demography"');
   });
 });

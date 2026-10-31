@@ -19,7 +19,8 @@ for (const [locale, prefix, heading, coverage, net] of [
     await expect(page.getByTestId("chart-panel")).toContainText(net);
     await expect(page.getByTestId("migration-highlights")).toContainText("+17,127");
     await expect(page.getByTestId("breadcrumb-json-ld")).toHaveCount(1);
-    await expect(page.getByTestId("explorer-dataset-json-ld")).toHaveCount(0);
+    await expect(page.getByTestId("explorer-dataset-json-ld")).toHaveCount(1);
+    expect(JSON.parse((await page.getByTestId("explorer-dataset-json-ld").textContent()) ?? "{}")).toMatchObject({ "@type": "Dataset" });
     expect(new URL(page.url()).hash).toBe("");
   });
 }

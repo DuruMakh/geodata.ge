@@ -5,7 +5,6 @@
   "debt.rate": "Interest rate",
   "debt.forecast": "Forecast",
   "debt.pp": "pp",
-  "debt.caption": "{family}, {start}–{end}",
   "debt.expand": "{name} — expand subseries",
   "debt.collapse": "{name} — collapse subseries",
   "debt.portfolioForecast": "The 2026–2030 forecast covers the debt portfolio outstanding on 31 December 2025. It is a repayment schedule for that portfolio, rather than a complete forecast of future government budgets.",

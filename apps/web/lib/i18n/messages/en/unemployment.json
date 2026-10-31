@@ -8,6 +8,7 @@
   "unemployment.page.regions.title": "Unemployment by region",
   "unemployment.page.regions.summary": "Select a region on the map or in the list to explore its unemployment and labour-force trends. The map shows the latest published unemployment rates.",
   "unemployment.regionTitle": "Unemployment — {region}",
+  "unemployment.regionSeoTitle": "Unemployment in {place} {year}",
   "unemployment.regionHeadingLead": "Unemployment —",
   "unemployment.regionSummary": "{region}: unemployment and labour-force trends. Compare rates or people counts over the region’s published years.",
   "unemployment.regionMapAria": "Regional unemployment-rate map for {year}",

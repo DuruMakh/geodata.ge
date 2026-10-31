@@ -68,8 +68,7 @@ export function TradeOverview({ facts, sources, lastReviewedAt, siteOrigin, data
             <span className="text-[11px] text-[var(--muted)]">{model.unit.label}</span>
           </div>
           {!model.selectedIds.length ? <div className="mt-5"><Callout testId="no-selection-callout">{t(domestic ? "domestic.emptySelection" : "emptySelection")}</Callout></div>
-            : state.mode === "line" ? <div className="mt-5">{chart}</div>
-            : <ExplorerTable caption={`${title} · ${model.unit.label} · ${model.range.start}–${model.range.end}`} rows={rows.filter(row => row.itemId !== totalId)} totalRow={total} showTotal={Boolean(total)} totalFirst wrapRowLabels rowLabelsLocalized years={model.years} firstColumnLabel={t("series")} unit={model.unit} share={false} showChangeColumn={false} shareValueForYear={() => null} />}
+            : <><ExplorerTable caption={`${title} · ${model.unit.label} · ${model.range.start}–${model.range.end}`} rows={rows.filter(row => row.itemId !== totalId)} totalRow={total} showTotal={Boolean(total)} totalFirst wrapRowLabels rowLabelsLocalized years={model.years} firstColumnLabel={t("series")} unit={model.unit} share={false} showChangeColumn={false} shareValueForYear={() => null} crawlCopy={state.mode === "line"} />{state.mode === "line" ? <div className="mt-5">{chart}</div> : null}</>}
           <ChartSelectionAids series={lineSeries} chartShown={state.mode === "line"} share={false} unit={model.unit} formatValue={valueLabel} />
           <RangeStrip years={tradeOverviewCoverage(facts).years} range={model.range} onChange={patch => update(s => ({ ...s, range: rangeFromPatch(buildTradeOverviewModel(facts, s, presentation).range, patch) }))} />
         </section>

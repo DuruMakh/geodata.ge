@@ -35,6 +35,17 @@ describe("the Labour pages", () => {
     expect(html).toContain('href="/en/explorer/labour#t-unemployment"');
   });
 
+  // These pages are served from labour-annual.csv, which unemployment.csv does not contain, so no page may claim that file.
+  it.each([["ka"], ["en"]] as const)("every detail page's Dataset claims no download, in %s", async (locale) => {
+    for (const section of ["industries", "hours", "informal", "young-people"] as const) {
+      const html = await page(locale, section);
+      const json = html.match(/<script[^>]*data-testid="explorer-dataset-json-ld"[^>]*>([\s\S]*?)<\/script>/)?.[1];
+      expect(json, section).toBeDefined();
+      expect(JSON.parse(json!), section).not.toHaveProperty("distribution");
+      expect(html, section).not.toContain("/downloads/data/");
+    }
+  });
+
   it("a selection without any published value shows a short message, not an empty chart", async () => {
     // Without the total's values the default selection (the total) has none, as when only Geostat's unpublished
     // "Men — Households as employers" is ticked.

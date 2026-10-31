@@ -13,6 +13,7 @@
   "internet.page.devices.summary": "ვინ ფლობს მობილურ ტელეფონს ან სმარტფონს და ვინ გამოიყენა კომპიუტერი ბოლო სამ თვეში — ჯგუფების მიხედვით.",
   "internet.page.devices.metaTitle": "მობილური ტელეფონები, სმარტფონები და კომპიუტერები საქართველოში",
   "internet.page.area.regionTitle": "ინტერნეტი სახლში — {region}",
+  "internet.page.area.seoTitle": "სახლის ინტერნეტი {place} {year}",
   "internet.page.area.regionHeadingLead": "ინტერნეტი სახლში —",
   "internet.page.area.regionSummary": "{region} — ინტერნეტითა და კომპიუტერით უზრუნველყოფილი შინამეურნეობები, საქსტატის ყოველწლიური კვლევიდან.",
   "internet.area.georgia": "საქართველო",

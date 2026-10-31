@@ -8,6 +8,7 @@
   "wages.page.regions.title": "Wages by region",
   "wages.page.regions.summary": "Compare average monthly wages across Georgia’s regions. The map and list show the latest published year; select a region to see its wages over time.",
   "wages.regionTitle": "Wages — {region}",
+  "wages.regionSeoTitle": "Wages in {place} {year}",
   "wages.regionHeadingLead": "Wages —",
   "wages.series.georgiaAverage": "Georgia average",
   "wages.regionSummary": "Average monthly wage in {region} since {regionsFrom}, with Georgia’s average for comparison.",

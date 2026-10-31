@@ -30,6 +30,10 @@ export type ToolCallLog = {
   durationMs: number;
   outcome: "ok" | "error";
   errorCode?: string;
+  /** Which limit refused a 429: a fixed three-value label, never a count or a key. */
+  limit?: "minute" | "key_day" | "global";
+  /** A three-value class of caller, never an identity, an address or a hash. */
+  clientClass?: "anthropic" | "other" | "unkeyed";
 };
 
 /**
@@ -55,6 +59,8 @@ export function logToolCall(record: ToolCallLog): void {
     durationMs: record.durationMs,
     outcome: record.outcome,
     errorCode: record.errorCode,
+    limit: record.limit,
+    clientClass: record.clientClass,
   };
 
   process.stdout.write(`${JSON.stringify(safe)}\n`);

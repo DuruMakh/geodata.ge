@@ -37,7 +37,7 @@ export type FiscalDatasetId = Exclude<DatasetId, "ministries" | "inflation" | "i
  * `variableMeasured` comes from the page (`explorerDatasetJsonLd`), which knows its series' labels.
  */
 export type TopicDatasetId =
-  | Exclude<MethodologyDatasetId, "expenditure" | "revenue" | "municipalities" | "debt" | "gdp" | "economic-sectors" | "regional-economies" | "demography">
+  | Exclude<MethodologyDatasetId, "expenditure" | "revenue" | "municipalities" | "debt" | "gdp" | "economic-sectors" | "regional-economies">
   | "inflation-products"
   | "funded-pension";
 
@@ -520,6 +520,17 @@ const TOPIC_DATASETS: Record<TopicDatasetId, { keywords: Record<Locale, readonly
     measurementTechnique: {
       ka: "გადამოწმებული ამოღება საქსტატის ტრანსპორტისა და გარემოს მდგომარეობის ინდიკატორების ოფიციალური გამოქვეყნებული ცხრილებიდან.",
       en: "Reviewed extraction from Geostat's official published transport and environmental indicator tables.",
+    },
+    sources: ["geostat"],
+  },
+  demography: {
+    keywords: {
+      ka: ["საქართველო", "მოსახლეობა", "დემოგრაფია", "მიგრაცია", "შობადობა", "მოკვდაობა", "ქორწინება"],
+      en: ["Georgia", "population", "demography", "migration", "births", "deaths", "marriages"],
+    },
+    measurementTechnique: {
+      ka: "საქსტატის 1 იანვრის მოსახლეობის შეფასებები, 2024 წლის აღწერა და დარეგისტრირებული დაბადებები, გარდაცვალებები, ქორწინებები, განქორწინებები და საზღვრის კვეთები.",
+      en: "Geostat's 1 January population estimates, the 2024 census and registered births, deaths, marriages, divorces and border crossings.",
     },
     sources: ["geostat"],
   },

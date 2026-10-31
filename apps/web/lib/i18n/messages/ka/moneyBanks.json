@@ -14,6 +14,7 @@
   "moneyBanks.page.regions.summary": "ბანკების სესხები საქართველოს თითოეულ რეგიონში, აღრიცხული გამსესხებელი ბანკის ფილიალის მდებარეობის მიხედვით. აირჩიეთ ტერიტორია მისი მონაცემების სანახავად.",
   "moneyBanks.page.regions.metaTitle": "ბანკების სესხები საქართველოს რეგიონებში",
   "moneyBanks.page.area.regionTitle": "სესხები — {region}",
+  "moneyBanks.page.area.seoTitle": "ბანკების სესხები {place} {year}",
   "moneyBanks.page.area.regionHeadingLead": "სესხები —",
   "moneyBanks.page.area.regionSummary": "{region} — ბანკების სესხები სულ, ლარში და უცხოურ ვალუტაში, საქართველოს ეროვნული ბანკის მონაცემებით.",
   "moneyBanks.area.georgia": "საქართველო",

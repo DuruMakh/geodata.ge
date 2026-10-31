@@ -17,6 +17,7 @@
   "business.page.regions.summary": "საწარმოების ბრუნვა და დასაქმებულები რეგიონების მიხედვით. აირჩიეთ რეგიონი მისი მონაცემების სანახავად.",
   "business.page.regions.metaTitle": "ბიზნესი საქართველოს რეგიონებში",
   "business.page.area.regionTitle": "ბიზნესი — {region}",
+  "business.page.area.seoTitle": "ბიზნესი {place} {year}",
   "business.page.area.regionHeadingLead": "ბიზნესი —",
   "business.page.area.regionSummary": "{region} — საწარმოების ბრუნვა, ინვესტიციები, მოგება და ზარალი, დასაქმებულები, ახალი და დახურული საწარმოები.",
   "business.area.georgia": "საქართველო",

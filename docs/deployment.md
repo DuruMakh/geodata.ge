@@ -20,19 +20,31 @@ The two social images at `/opengraph-image` and `/en/opengraph-image` use explic
 are generated at build time. All human pages remain prerendered and `/mcp` remains
 the sole request-time route.
 
-Data schema **1.6.0** includes current-product inflation and reviewed language
+Data schema **1.7.0** includes current-product inflation and reviewed language
 companions. The authoritative tool inventory is `tools/list`; dataset families
 and coverage are in `catalogue.json`. `manifest.json` lists every publication
 with row count, bytes and SHA-256; the manifest itself is one additional artifact,
 not one of its listed files. Derive changing inventories from these owners rather
 than retaining old fixed counts. Requests do not gain a language argument.
-Schema 1.6.0 adds `internal_error` and the `preserved_derived` source narrowing
-outcome. Strict clients caching output enums must refresh discovery; clients
-requiring schema 1.5.0 must update their validation. Request shapes stay unchanged.
-Clients must accept additive fields and data schema 1.6.0; byte-identical response
+Schema 1.7.0 adds the optional `searchMatch` field (`all_words` or `some_words`) to
+catalogue searches, which now match whole words and Georgian stems, with
+`searchMatchNoteKa`/`searchMatchNoteEn` when only some words matched; a search without
+`datasetId` may also carry the optional `websitePages` links to website-only pages, with
+`websitePagesNoteKa`/`websitePagesNoteEn`. A top-N ranking names the documents read only to
+fix the order by id in `inputDocumentIds` (call `get_sources` with that source's
+`sourceId`), and a ranking caveat's `affects` lists the returned rows only, with
+`affectsOtherCount` for the rest. Product catalogue series omit `yearsByMeasure` and
+`periodsByMeasure` when they equal `years` and `periods` (absent means the same), in `/mcp`
+and in the published `inflation-products.json` and `catalogue.json`. Schema 1.6.0 added
+`internal_error` and the `preserved_derived` source narrowing outcome. Strict clients
+caching output enums must refresh discovery; clients requiring schema 1.6.0 must
+update their validation. Request shapes stay unchanged. The one non-additive change is that
+when the per-measure maps are absent, readers fall back to the series' `years` and `periods`.
+Clients must accept additive fields and data schema 1.7.0; byte-identical response
 compatibility is not promised. Transport revisions are a separate contract:
 modern `2026-07-28` and preserved legacy `2025-11-25` share the endpoint.
-Translation changes alter `dataVersion`. Retain the existing body, cell, pair,
+Translation changes alter `dataVersion`, and so do the website page names and search words
+that catalogue search matches. Retain the existing body, cell, pair,
 ranking, byte, duration, rate and pause limits. Large bilingual evidence responses
 can require narrower queries; never trim evidence or increase limits to fit.
 
@@ -480,7 +492,7 @@ and publications remain static. The endpoint exposes the read-only tools listed
 by `tools/list` through pinned server SDK 2.2.0. Stateless Streamable HTTP supports
 modern `2026-07-28` discovery and per-request metadata, and preserved legacy
 `2025-11-25` initialization. Both return finite JSON responses; neither creates
-sessions or subscriptions. GET and DELETE remain 405. The data schema is 1.6.0,
+sessions or subscriptions. GET and DELETE remain 405. The data schema is 1.7.0,
 independent of either protocol revision.
 The legacy adapter also retains `2025-06-18`, `2025-03-26`, `2024-11-05` and
 `2024-10-07`; the modern era is never proposed during legacy initialization.
@@ -491,10 +503,12 @@ There is no session store, model invocation, authentication, or write tool.
 All MCP data answers use `apps/web/lib/factQuery/generated/snapshot.json`, prepared
 at build time and cached once per function instance. It is written minified: 32.1 MB
 on 2026-10-13 (46.3 MB indented), about 0.2 s to read and 0.3 s to parse on the first
-request of each instance. The server text built from it (coverage, tool descriptions,
-instructions) and the tools' JSON Schemas are also built once per instance. The sole runtime network
-exception is `lib/mcp/upstashCounter.ts`, which sends fixed Redis rate-limit
-commands to the configured Upstash endpoint. It never sends query arguments,
+request of each instance. The server text built from it (coverage and tool descriptions)
+and the tools' JSON Schemas are also built once per instance; the server instructions are
+static text in `lib/mcp/instructions.ts` and are not built from the snapshot. The sole runtime
+network exception is `lib/mcp/upstashCounter.ts`, which sends fixed Redis rate-limit
+commands (`EVAL` scripts) and the anonymous daily usage tally's `EVAL`
+(`HINCRBY` with `EXPIRE`) to the configured Upstash endpoint. It never sends query arguments,
 figures, source documents, prompts, or raw client addresses. There is no runtime
 dataset-database access or external data fallback.
 
@@ -555,16 +569,58 @@ The free service has its own monthly quota (500,000 commands at setup).
 [Upstash counts EVAL and its nested Redis commands](https://upstash.com/docs/redis/sdks/ratelimit-ts/costs):
 the current successful request uses six for the minute bucket and three for each
 of the two daily buckets (a daily key's expiry is set once, by the first hit of
-the day), twelve in all. That allows roughly 41,000 accepted requests per month
-before other usage. Refused requests also consume commands: about four for a
-minute refusal, eight for a per-client daily refusal and eleven for a global
-daily refusal, which passes both per-client checks first. The
+the day), twelve in all, plus two for the usage tally (below), fourteen in all.
+That allows roughly 35,700 accepted requests per month (500,000 / 14) before
+other usage; it was about 41,000 at twelve. Refused requests also consume
+commands: about four for a minute refusal (which is not tallied), ten for a
+per-client daily refusal (eight plus the tally's two) and thirteen for a global
+daily refusal (eleven plus two), which passes both per-client checks first. The
 10,000/day application ceiling is not guaranteed sustainable daily capacity on
 the free plan. It does
 not guarantee continuous availability under an attack or sustained maximum
 traffic. Provider quota exhaustion pauses MCP through the same fail-closed 503;
 static pages and bulk files continue working. Review usage before changing the
 free plan. Upgrading or enabling automatic upgrades needs explicit approval.
+
+#### Usage tally and which limit refused
+
+After each response, `handle` adds one to an anonymous daily tally in Upstash
+(`after()` from `next/server`, so it adds no latency; it never decides
+admission, a failed or slow write is dropped, and it gives up after 1.5 s). The
+key is `<production|preview>:mcp:stats:<YYYY-MM-DD>`, a hash whose field is
+`tool|outcome|errorCode|limit|clientClass`, counted with `HINCRBY` and given a
+100-day expiry (8,640,000 s) when a field is first created. For example
+`query_national|ok|-|-|anthropic` or `initialize|error|rate_limited|key_day|anthropic`.
+
+- `tool` is the fixed label from `toolNameOf` (a known tool or protocol method,
+  else `unknown_tool` or `unknown_method`); `outcome` is `ok` or `error`;
+  `errorCode` is the bounded log code or `-`; `limit` is `minute`, `key_day` or
+  `global` on a 429 and `-` otherwise.
+- `clientClass` is `anthropic` when the trusted platform address is inside
+  `160.79.104.0/21` (Anthropic's published egress range, vendored in
+  `lib/mcp/providerRanges.ts` with its source; nothing is fetched), `other` for
+  any other readable or unreadable address, `unkeyed` when there is none. It is
+  a three-word class of traffic, never an identity.
+- Counted: every request that reached the limiter, except a per-minute refusal
+  (so a flood of retries cannot spend commands on bookkeeping). A request
+  refused earlier (paused, bad host or origin, oversized or unreadable body) is
+  not counted. The tally costs two commands (`EVAL` and `HINCRBY`), three for the
+  first count of a field each day, which is a few hundred times a day at most. The
+  hash holds well under 1,000 fields a day, a few megabytes in 100 days against
+  the 250 MB allowance.
+- Read it with `npm run mcp:usage -- --days 7` (add `--namespace preview` for
+  previews). The script reads one hash per day (one command each) with the
+  integration's read-only token and needs `KV_REST_API_URL` and
+  `KV_REST_API_READ_ONLY_TOKEN` in the environment; without them it stops with a
+  message and reads nothing. Or run `HGETALL production:mcp:stats:<date>` in the
+  Upstash console.
+- **Decision trigger:** any non-zero count of fields ending in
+  `|rate_limited|key_day|anthropic`, summed over every tool (the script prints
+  `DECISION NEEDED`), means traffic from Anthropic's servers (the Claude apps'
+  connectors and the API's MCP connector) reached the per-address daily cap. Send it to the owner for
+  the Stage 2 decision in the F04 review; do not change a limit on your own. The tally
+  cannot see per-minute refusals, so a busy-minute 429 for Anthropic traffic appears only in
+  the one-hour application logs (`limit:"minute"`), never in the tally or this trigger.
 
 ### Other operating limits
 
@@ -684,7 +740,7 @@ Direct ChatGPT custom-connector setup remains unverified and is not advertised;
 the page retains its separate web-reading prompt and static-file fallback. Future
 human proof must record app/version, account eligibility, date, protocol and a
 completed question citing Fiscal.ge's source/limitations, without collecting secrets.
-The eleven paired English/Georgian prompts and review requirements live separately
+The thirteen paired English/Georgian prompts and review requirements live separately
 from the 48 numerical references in
 `apps/web/tests/factQuery/fixtures/mcpAssistantIntents.ts`. Record actual tool
 selection, units, original citations, caveats, missingness, version consistency
@@ -695,14 +751,20 @@ establish assistant acceptance, and no acceptance prompts have been run by Task 
 ### Logs and privacy
 
 Application logs use the allowlist in `lib/mcp/log.ts`: tool, data version,
-response bytes, duration, outcome, and bounded error code. HTTP 200 tool errors
+response bytes, duration, outcome, bounded error code, and for a request that
+reached the limiter the coarse `clientClass` (`anthropic`, `other` or `unkeyed`)
+and, on a 429, which `limit` refused it (`minute`, `key_day` or `global`). HTTP 200 tool errors
 are logged as failures. Early refusals are counted too. Unknown caller-provided
 tool and method names are recorded as fixed unknown labels, never echoed.
 
 Do not log raw prompts, request bodies, invalid parameter strings, credentials,
 addresses, or provider error text. The temporary hashed counter key is not an
-application log field. The operating target is **14 days of detailed allowlisted
-application events and 90 days of aggregates**. Vercel/Upstash infrastructure logs are separate;
+application log field. The anonymous daily tally in Upstash (see "Usage tally and
+which limit refused") holds the same fixed vocabulary and nothing else: no
+address, hash, query text, id or argument; it is counted per UTC day and expires
+after 100 days. The operating target is **14 days of detailed allowlisted
+application events and 90 days of aggregates**; the tally is that aggregate store, and
+its 100-day expiry is deliberate headroom above the 90-day target, not a drift from it. Vercel/Upstash infrastructure logs are separate;
 do not claim providers never process request addresses.
 
 **Observed 17 October 2026:** authenticated Vercel inspection confirmed production
@@ -784,7 +846,7 @@ actual alert/recovery delivery must be demonstrated before operations is verifie
 From `apps/web`, use an explicit target and independently reviewed release identity:
 
 ```text
-npx tsx scripts/smoke-mcp.ts --url <target-mcp-url> --expected-schema 1.6.0 --expected-data-version <reviewed-sha256> --output <existing-output-directory/report.json>
+npx tsx scripts/smoke-mcp.ts --url <target-mcp-url> --expected-schema 1.7.0 --expected-data-version <reviewed-sha256> --output <existing-output-directory/report.json>
 ```
 
 The operator command has no production default, authentication input, new secret

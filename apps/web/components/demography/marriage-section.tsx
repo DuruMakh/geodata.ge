@@ -96,29 +96,27 @@ export function MarriageSection({
           </div>
         </div>
         <div className="mt-5">
-          {mode === "line" ? (
-            chart
-          ) : (
-            <ExplorerTable
-              caption={t("marriageTableCaption", { place: name, first, last, unit: unitLabel })}
-              rows={[
-                { itemId: "marriages", kaLabel: labels.marriages, color: MARRIAGES, valuesByYear: marriages!.valuesByYear },
-                { itemId: "divorces", kaLabel: labels.divorces, color: DIVORCES, valuesByYear: divorces!.valuesByYear },
-              ]}
-              totalRow={null}
-              showTotal={false}
-              wrapRowLabels
-              rowLabelsLocalized
-              years={model.years}
-              firstColumnLabel={t("seriesHeader")}
-              unit={unit}
-              share={false}
-              showChangeColumn={false}
-              shareValueForYear={() => null}
-              breakYears={model.breaks.map((item) => item.year)}
-              breakLabel={t("breakLabel")}
-            />
-          )}
+          <ExplorerTable
+            caption={t("marriageTableCaption", { place: name, first, last, unit: unitLabel })}
+            rows={[
+              { itemId: "marriages", kaLabel: labels.marriages, color: MARRIAGES, valuesByYear: marriages!.valuesByYear },
+              { itemId: "divorces", kaLabel: labels.divorces, color: DIVORCES, valuesByYear: divorces!.valuesByYear },
+            ]}
+            totalRow={null}
+            showTotal={false}
+            wrapRowLabels
+            rowLabelsLocalized
+            years={model.years}
+            firstColumnLabel={t("seriesHeader")}
+            unit={unit}
+            share={false}
+            showChangeColumn={false}
+            shareValueForYear={() => null}
+            breakYears={model.breaks.map((item) => item.year)}
+            breakLabel={t("breakLabel")}
+            crawlCopy={mode === "line"}
+          />
+          {mode === "line" ? chart : null}
         </div>
       </div>
       <div className="mt-[18px] flex flex-wrap items-start justify-between gap-4">

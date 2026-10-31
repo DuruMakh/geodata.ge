@@ -111,26 +111,26 @@ export function NationalVitalCharts({
         <h3 className="mt-6 mb-3 text-[15px] text-[var(--ink)]">{`${t("tfrLabel")} (${t("tfrUnit")})`}</h3>
         <ModeTabs value={tfrMode} onChange={setTfrMode} testId="tfr" />
         <div className="mt-5">
+          <ExplorerTable
+            caption={t("tfrChartAria", { first, last })}
+            rows={[{ itemId: SERIES.totalFertilityRate, kaLabel: t("tfrLabel"), color: INK, valuesByYear: tfr }]}
+            totalRow={null}
+            showTotal={false}
+            wrapRowLabels
+            rowLabelsLocalized
+            years={years}
+            firstColumnLabel={t("seriesHeader")}
+            unit={UNIT_RATE_2}
+            share={false}
+            showChangeColumn={false}
+            breakYears={[CENSUS_STEP.toYear]}
+            breakLabel={t("breakLabel")}
+            shareValueForYear={() => null}
+            crawlCopy={tfrMode === "line"}
+          />
           {tfrMode === "line" ? (
             tfrChart
-          ) : (
-            <ExplorerTable
-              caption={t("tfrChartAria", { first, last })}
-              rows={[{ itemId: SERIES.totalFertilityRate, kaLabel: t("tfrLabel"), color: INK, valuesByYear: tfr }]}
-              totalRow={null}
-              showTotal={false}
-              wrapRowLabels
-              rowLabelsLocalized
-              years={years}
-              firstColumnLabel={t("seriesHeader")}
-              unit={UNIT_RATE_2}
-              share={false}
-              showChangeColumn={false}
-              breakYears={[CENSUS_STEP.toYear]}
-              breakLabel={t("breakLabel")}
-              shareValueForYear={() => null}
-            />
-          )}
+          ) : null}
         </div>
         {/* The rate has no source line of its own (it shares the life section's), so its button sits under the chart, at the right. */}
         <div className="mt-3 flex justify-end">
@@ -139,6 +139,28 @@ export function NationalVitalCharts({
         <h3 className="mt-10 mb-3 text-[15px] text-[var(--ink)]">{t("asfrLabel")}</h3>
         <ModeTabs value={ageMode} onChange={setAgeMode} testId="asfr" />
         <div className="mt-5" data-testid="asfr-panel">
+          <ExplorerTable
+            caption={`${t("asfrLabel")}, ${curves.years[0]!}–${curves.years.at(-1)!}`}
+            rows={AGE_GROUPS.map((group) => ({
+              itemId: group,
+              kaLabel: t(`ageGroup.${group}`),
+              color: OTHER_COLOR,
+              valuesByYear: seriesByYear(facts, SERIES.ageSpecificFertilityRate, group),
+            }))}
+            totalRow={null}
+            showTotal={false}
+            wrapRowLabels
+            rowLabelsLocalized
+            years={curves.years}
+            firstColumnLabel={t("ageHeader")}
+            unit={UNIT_DENSITY}
+            share={false}
+            showChangeColumn={false}
+            breakYears={[CENSUS_STEP.toYear]}
+            breakLabel={t("breakLabel")}
+            shareValueForYear={() => null}
+            crawlCopy={ageMode === "line"}
+          />
           {ageMode === "line" ? (
             <>
               <ul className="mb-3 flex flex-wrap gap-x-5 gap-y-1 text-[12px] text-[var(--body)]" data-testid="asfr-legend">
@@ -151,29 +173,7 @@ export function NationalVitalCharts({
               </ul>
               {asfrChart}
             </>
-          ) : (
-            <ExplorerTable
-              caption={`${t("asfrLabel")}, ${curves.years[0]!}–${curves.years.at(-1)!}`}
-              rows={AGE_GROUPS.map((group) => ({
-                itemId: group,
-                kaLabel: t(`ageGroup.${group}`),
-                color: OTHER_COLOR,
-                valuesByYear: seriesByYear(facts, SERIES.ageSpecificFertilityRate, group),
-              }))}
-              totalRow={null}
-              showTotal={false}
-              wrapRowLabels
-              rowLabelsLocalized
-              years={curves.years}
-              firstColumnLabel={t("ageHeader")}
-              unit={UNIT_DENSITY}
-              share={false}
-              showChangeColumn={false}
-              breakYears={[CENSUS_STEP.toYear]}
-              breakLabel={t("breakLabel")}
-              shareValueForYear={() => null}
-            />
-          )}
+          ) : null}
         </div>
         <div className="mt-[18px] max-w-[740px]"><SourceNote testId="asfr-note" action={
           <ChartShareButton title={t("asfrLabel")} caption={`${curves.years[0]!}–${curves.years.at(-1)!}`} legend={asfrLegend} source={nationalSource} chart={asfrChart} period={`${curves.years[0]!}-${curves.years.at(-1)!}`} testId="asfr-share" />
@@ -184,26 +184,26 @@ export function NationalVitalCharts({
         <SectionTitle>{t("lifeTitle")}</SectionTitle>
         <div className="mt-5"><ModeTabs value={lifeMode} onChange={setLifeMode} testId="life" /></div>
         <div className="mt-5">
+          <ExplorerTable
+            caption={t("lifeChartAria", { first, last })}
+            rows={LIFE_SERIES.map((line) => ({ itemId: line.seriesId, kaLabel: t(line.key), color: lifeColor(line.colorKey), valuesByYear: seriesByYear(facts, line.seriesId) }))}
+            totalRow={null}
+            showTotal={false}
+            wrapRowLabels
+            rowLabelsLocalized
+            years={years}
+            firstColumnLabel={t("seriesHeader")}
+            unit={UNIT_DENSITY}
+            share={false}
+            showChangeColumn={false}
+            breakYears={[CENSUS_STEP.toYear]}
+            breakLabel={t("breakLabel")}
+            shareValueForYear={() => null}
+            crawlCopy={lifeMode === "line"}
+          />
           {lifeMode === "line" ? (
             lifeChart
-          ) : (
-            <ExplorerTable
-              caption={t("lifeChartAria", { first, last })}
-              rows={LIFE_SERIES.map((line) => ({ itemId: line.seriesId, kaLabel: t(line.key), color: lifeColor(line.colorKey), valuesByYear: seriesByYear(facts, line.seriesId) }))}
-              totalRow={null}
-              showTotal={false}
-              wrapRowLabels
-              rowLabelsLocalized
-              years={years}
-              firstColumnLabel={t("seriesHeader")}
-              unit={UNIT_DENSITY}
-              share={false}
-              showChangeColumn={false}
-              breakYears={[CENSUS_STEP.toYear]}
-              breakLabel={t("breakLabel")}
-              shareValueForYear={() => null}
-            />
-          )}
+          ) : null}
         </div>
         <ChartSelectionAids series={lifeSeries} chartShown={lifeMode === "line"} share={false} unit={UNIT_DENSITY} formatValue={rate1} />
         <div className="mt-[18px] max-w-[740px]"><SourceNote testId="national-source-note" action={

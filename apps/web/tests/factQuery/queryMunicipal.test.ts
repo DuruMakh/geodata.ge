@@ -65,7 +65,8 @@ describe("queryMunicipal", () => {
       // Every other 2024 municipality is a payment total; this one is the
       // functional sum standing in for a missing payment actual, and the
       // definition must say so rather than reading like the others.
-      expect(observation?.valueDefinition).toMatch(/functional_total_fallback_missing_payment_actual/);
+      expect(observation?.valueDefinition).toBe("მუნიციპალიტეტის საჯარო ჯამი, გაზომვის საფუძველი: ფუნქციების მიხედვით ხარჯების ჯამი, რომელიც გამოიყენება, რადგან ფაქტობრივი ჯამური გადახდები გამოქვეყნებული არ არის.");
+      expect(observation?.valueDefinitionEn).toBe("The municipality's public total, measured on the following basis: sum of spending by function, used because actual total payments are not published.");
     });
 
     it("fires municipal_source_actual_missing even though show_warning is false", () => {
@@ -221,6 +222,19 @@ describe("queryMunicipal", () => {
   });
 
   describe("2015 is a different measure from later years", () => {
+    // queryMunicipal looks the measure up by `municipalTotalMeasures.<id>` and throws on a missing key, so a new
+    // public_total_measure in the reviewed CSV must fail here, with its name, before any query does.
+    it("has a Georgian and an English name for every public total measure the snapshot holds", () => {
+      const held = [...new Set(snapshot.municipal.totalFacts.map((fact) => fact.publicTotalMeasure))].sort();
+      expect(held.length).toBeGreaterThan(0);
+      for (const measure of held) {
+        for (const locale of ["ka", "en"] as const) {
+          const messages = snapshot.localization.messages[locale] as Record<string, string>;
+          expect(messages[`municipalTotalMeasures.${measure}`]?.trim(), `add municipalTotalMeasures.${measure} to data/localization/${locale}/service-messages.json and to SERVICE_MESSAGE_KEYS`).toBeTruthy();
+        }
+      }
+    });
+
     it("gives a 2015 total a different valueDefinition than a 2020 total", () => {
       const result = queryMunicipal(snapshot, {
         entityIds: [KHULO],
@@ -235,7 +249,9 @@ describe("queryMunicipal", () => {
       expect(in2015?.value).not.toBeNull();
       expect(in2020?.value).not.toBeNull();
       expect(in2015?.valueDefinition).not.toBe(in2020?.valueDefinition);
-      expect(in2015?.valueDefinition).toMatch(/portal_functional_total_fallback/);
+      expect(in2015?.valueDefinition).toBe("მუნიციპალიტეტის საჯარო ჯამი, გაზომვის საფუძველი: ფუნქციების მიხედვით ხარჯების ჯამი, რომელიც მუნიციპალიტეტების ანალიტიკური პორტალის დაარქივებული მონაცემებიდანაა აღებული და ოფიციალური ჯამური გადახდების ნაცვლად გამოიყენება.");
+      expect(in2015?.valueDefinitionEn).toBe("The municipality's public total, measured on the following basis: sum of spending by function from the archived municipal portal, used instead of the official total payments.");
+      expect(in2020?.valueDefinitionEn).toBe("The municipality's public total, measured on the following basis: official total payments.");
     });
   });
 

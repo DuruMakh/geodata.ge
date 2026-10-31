@@ -13,6 +13,7 @@
   "housing.page.regions.summary": "მშენებლობის ნებართვები და ექსპლუატაციაში მიღებული ობიექტები რეგიონების მიხედვით. აირჩიეთ რეგიონი მისი მონაცემების სანახავად.",
   "housing.page.regions.metaTitle": "საცხოვრებელი და მშენებლობა საქართველოს რეგიონებში",
   "housing.page.area.regionTitle": "საცხოვრებელი და მშენებლობა — {region}",
+  "housing.page.area.seoTitle": "საცხოვრებელი და მშენებლობა {place} {year}",
   "housing.page.area.regionHeadingLead": "საცხოვრებელი და მშენებლობა —",
   "housing.page.area.regionSummary": "{region} — მშენებლობის ნებართვები და ექსპლუატაციაში მიღებული ობიექტები: რაოდენობა და ფართობი, ყველა შენობა და საცხოვრებელი შენობები.",
   "housing.area.georgia": "საქართველო",

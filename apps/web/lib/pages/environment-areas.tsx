@@ -6,9 +6,9 @@ import { formatInUnit } from "../explorer/format";
 import { environmentValueUnit } from "../explorer/environment";
 import { message } from "../i18n/messages";
 import type { Locale } from "../i18n/types";
-import { getPresentation } from "../i18n/presentation.server";
 import { getMessages } from "../i18n/messages.server";
 import { fiscalMetadata } from "../seo/metadata";
+import { areaTitleForm, latestYearOf } from "../seo/placeTitleForms";
 import {
   ENVIRONMENT_AREA_LABEL_IDS, ENVIRONMENT_AREA_PAGES, environmentAreaForSlug, environmentAreaName, environmentAreaParent, environmentLabels, environmentLatest,
   environmentTranslate, loadEnvironmentPage, loadEnvironmentWorkbookSources, renderEnvironmentFrame,
@@ -23,9 +23,12 @@ export async function environmentRegionIndexMetadata(locale: Locale, topic: Envi
 }
 
 export async function environmentAreaPageMetadata(slug: string, locale: Locale, topic: EnvironmentAreaTopic) {
-  const area = environmentAreaForSlug(slug), presentation = await getPresentation(locale, ["environment"], ENVIRONMENT_AREA_LABEL_IDS, ENVIRONMENT_AREA_LABEL_IDS);
-  const name = environmentAreaName(presentation, area), t = environmentTranslate(presentation);
-  return fiscalMetadata({ locale, path: environmentAreaRoutes(topic).areaHref(area), title: t(`page.area.${topic}.title`, { region: name }), description: t(`page.area.${topic}.summary`, { region: name }) });
+  const area = environmentAreaForSlug(slug), { presentation, facts } = await loadEnvironmentPage(locale, [], ENVIRONMENT_AREA_LABEL_IDS);
+  const name = environmentAreaName(presentation, area), t = environmentTranslate(presentation), routes = environmentAreaRoutes(topic);
+  // The title is worded the way people search it and ends in the area's latest year; the page's own heading and Dataset name keep page.area.<topic>.title.
+  const ids = new Set(environmentAreaSeries(topic, area, facts).map(series => series.id));
+  const seoTitle = t(`page.area.${topic}.seoTitle`, { place: areaTitleForm(routes.mapId(area), name, locale, "of"), year: latestYearOf(facts, f => ids.has(f.indicatorId)) });
+  return fiscalMetadata({ locale, path: routes.areaHref(area), title: seoTitle, description: t(`page.area.${topic}.summary`, { region: name }) });
 }
 
 /**

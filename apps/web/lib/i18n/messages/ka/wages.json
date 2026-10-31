@@ -8,6 +8,7 @@
   "wages.page.regions.title": "ხელფასები რეგიონების მიხედვით",
   "wages.page.regions.summary": "შეადარეთ საშუალო თვიური ხელფასი საქართველოს რეგიონებში. რუკა და სია ბოლო გამოქვეყნებულ წელს აჩვენებს; აირჩიეთ რეგიონი მისი ხელფასების დინამიკის სანახავად.",
   "wages.regionTitle": "ხელფასები — {region}",
+  "wages.regionSeoTitle": "ხელფასები {place} {year}",
   "wages.regionHeadingLead": "ხელფასები —",
   "wages.series.georgiaAverage": "საქართველოს საშუალო",
   "wages.regionSummary": "{region} — საშუალო თვიური ხელფასი {regionsFrom} წლიდან, შესადარებლად საქართველოს საშუალოსთან ერთად.",

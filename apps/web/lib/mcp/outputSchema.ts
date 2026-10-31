@@ -24,6 +24,8 @@ const caveat = z
     methodologyRef: z.string(),
     methodologyRefEn: z.string().min(1),
     affects: z.array(z.string()),
+    /** Rankings only: items `affects` would have listed had it not been narrowed to the returned rows. */
+    affectsOtherCount: z.number().int().optional(),
   })
   .loose();
 
@@ -72,6 +74,8 @@ const responseSource = z
     /** Values shared by every document below; a field absent from a document is given here. */
     documentDefaults: responseDocument.pick({ publisher: true, publisherKa: true, publisherEn: true, attribution: true, attributionKa: true, attributionEn: true, licenceId: true, mediaType: true, retrievedAt: true, datasetId: true, role: true }).optional(),
     documents: z.array(responseDocument),
+    /** Rankings only: ids of documents that fixed the order but whose rows are not shown; call get_sources with this sourceId (narrow with years/entityIds). */
+    inputDocumentIds: z.array(z.string()).optional(),
   })
   .loose();
 
@@ -129,6 +133,12 @@ const dataShapes = {
     })).optional(),
     entities: z.array(z.object({ entityId: z.string(), entityType: z.string(), labelKa: z.string(), labelEn: z.string().min(1), entitySlug: z.string().nullable(), periods: z.array(z.string()).length(2).optional(), datasetId: z.string().optional() })).optional(),
     exclusions: z.array(bilingualExcludedEntity),
+    searchMatch: z.enum(["all_words", "some_words"]).optional(),
+    searchMatchNoteKa: z.string().optional(),
+    searchMatchNoteEn: z.string().optional(),
+    websitePages: z.array(z.object({ topicId: z.string(), labelKa: z.string(), labelEn: z.string().min(1), topicLabelKa: z.string(), topicLabelEn: z.string().min(1), urlKa: z.string(), urlEn: z.string() })).optional(),
+    websitePagesNoteKa: z.string().optional(),
+    websitePagesNoteEn: z.string().optional(),
   }),
   sources: z.object({
     sources: z.array(z.object({
@@ -151,7 +161,25 @@ export const toolOutput = z
   })
   .loose();
 
+/**
+ * Only a ranking narrows a caveat's `affects` to the returned rows, so only its schema carries the explanation of
+ * `affectsOtherCount`. The caveat is declared in all fourteen output schemas and `tools/list` repeats each in full.
+ */
+const rankingMeta = responseMeta.extend({
+  caveats: z.array(
+    caveat.extend({
+      affectsOtherCount: z
+        .number()
+        .int()
+        .optional()
+        .describe(
+          "Rankings only: how many further rows, not returned, this caveat concerns. With an empty affects it concerns only rows that were not returned; each entry's caveatIds is its per-row link; do not attach it to a returned figure.",
+        ),
+    }),
+  ),
+});
+
 export function outputSchemaFor(tool: string) {
   const kind = tool === "describe_coverage" ? "catalogue" : tool === "get_sources" ? "sources" : tool === "compare" ? "comparisons" : tool === "rank" ? "ranking" : "observations";
-  return toolOutput.extend({ kind: z.literal(kind), data: dataShapes[kind] });
+  return toolOutput.extend({ kind: z.literal(kind), data: dataShapes[kind], ...(kind === "ranking" ? { meta: rankingMeta } : {}) });
 }

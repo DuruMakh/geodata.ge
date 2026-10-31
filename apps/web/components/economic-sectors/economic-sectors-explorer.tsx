@@ -193,28 +193,32 @@ export function EconomicSectorsExplorer({
                   {message(messages, "main.noRangeData")}
                 </Callout>
               </div>
-            ) : state.mode === "line" ? (
-              <div className="mt-5">
-                {chart}
-              </div>
             ) : (
-              <ExplorerTable
-                caption={`${t("heading")} · ${percent ? measureLabel : message(messages, "format.bnGel")} · ${model.range.start}–${model.range.end}`}
-                rows={model.rows.filter((r) => r.itemId !== totalId)}
-                totalRow={total}
-                showTotal={Boolean(total)}
-                totalFirst
-                wrapRowLabels
-                years={model.years}
-                firstColumnLabel={t("sector")}
-                unit={unit}
-                share={percent}
-                showChangeColumn={false}
-                preliminaryLabel={t("preliminary")}
-                shareValueForYear={(row, year) =>
-                  row.valuesByYear[year] ?? null
-                }
-              />
+              <>
+                <ExplorerTable
+                  caption={`${t("heading")} · ${percent ? measureLabel : message(messages, "format.bnGel")} · ${model.range.start}–${model.range.end}`}
+                  rows={model.rows.filter((r) => r.itemId !== totalId)}
+                  totalRow={total}
+                  showTotal={Boolean(total)}
+                  totalFirst
+                  wrapRowLabels
+                  years={model.years}
+                  firstColumnLabel={t("sector")}
+                  unit={unit}
+                  share={percent}
+                  showChangeColumn={false}
+                  preliminaryLabel={t("preliminary")}
+                  shareValueForYear={(row, year) =>
+                    row.valuesByYear[year] ?? null
+                  }
+                  crawlCopy={state.mode === "line"}
+                />
+                {state.mode === "line" ? (
+                  <div className="mt-5">
+                    {chart}
+                  </div>
+                ) : null}
+              </>
             )}
             <ChartSelectionAids series={series} chartShown={state.mode === "line"} share={percent} unit={unit} formatValue={percent ? undefined : value => formatAmount(value, locale)} />
             <RangeStrip

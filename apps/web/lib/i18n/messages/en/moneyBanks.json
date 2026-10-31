@@ -14,6 +14,7 @@
   "moneyBanks.page.regions.summary": "Bank loans in each of Georgia’s regions, counted where the lending bank branch is. Select an area to see its data.",
   "moneyBanks.page.regions.metaTitle": "Bank loans in Georgia’s regions",
   "moneyBanks.page.area.regionTitle": "Loans — {region}",
+  "moneyBanks.page.area.seoTitle": "Bank loans in {place} {year}",
   "moneyBanks.page.area.regionHeadingLead": "Loans —",
   "moneyBanks.page.area.regionSummary": "Bank loans in {region}, in total, in lari and in foreign currency, from National Bank of Georgia data.",
   "moneyBanks.area.georgia": "Georgia",

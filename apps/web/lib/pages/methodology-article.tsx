@@ -74,6 +74,7 @@ const DATASET_SCHEMA_IDS = {
   money: "money",
   business: "business",
   housing: "housing",
+  demography: "demography",
 } as const;
 
 const DATASET_SOURCE_NOTES = {
@@ -124,7 +125,7 @@ const DATASET_DOWNLOADS = {
   unemployment: null,
   trade: null,
   "external-flows": null,
-  // Demography has no bulk files and no MCP entry yet (spec section 10).
+  // Demography has no MCP entry yet (spec section 10); its population file is linked from the Population index, not from this page, which would add a visible download.
   demography: null,
   wages: null,
   poverty: null,
@@ -274,8 +275,6 @@ export async function renderMethodologyArticle(locale: Locale, { params }: Metho
 
   return (
     <>
-      {/* Demography has no Dataset markup yet (spec section 10): its page keeps the breadcrumb and the archived originals. */}
-      {dataset === "demography" ? null : (
       <JsonLd
         // A dataset with no bulk file (DATASET_DOWNLOADS null) claims no distribution.
         data={datasetJsonLd({ locale,
@@ -292,7 +291,6 @@ export async function renderMethodologyArticle(locale: Locale, { params }: Metho
         })}
         testId="dataset-json-ld"
       />
-      )}
       <MethodologyArticle
         locale={locale}
         messages={messages}

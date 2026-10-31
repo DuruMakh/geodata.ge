@@ -16,6 +16,7 @@
   "transport.page.regions.summary": "Registered vehicles and road length by region. Select a region to see its data.",
   "transport.page.regions.metaTitle": "Transport in Georgia’s regions",
   "transport.page.area.regionTitle": "Transport — {region}",
+  "transport.page.area.seoTitle": "Transport in {place} {year}",
   "transport.page.area.regionHeadingLead": "Transport —",
   "transport.page.area.regionSummary": "Registered vehicles in {region} by type, fuel, age and owner, and the length of its roads.",
   "transport.area.georgia": "Georgia",

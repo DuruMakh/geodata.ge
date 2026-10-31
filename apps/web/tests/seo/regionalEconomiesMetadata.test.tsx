@@ -52,10 +52,13 @@ test.each(["ka", "en"] as const)("regional titles and descriptions quote the loa
   reshape.facts = narrowed;
   const index = await regionalEconomiesPageMetadata(locale);
   const detail = await regionalEconomyPageMetadata("imereti", locale);
-  for (const text of [index.title, index.description, detail.title, detail.description]) {
+  for (const text of [index.title, index.description, detail.description]) {
     expect(String(text)).toMatch(/2012(–| through )2023/);
     expect(String(text)).not.toContain("2010");
   }
+  // The region's title names only its latest year.
+  expect(String(detail.title)).toMatch(/ 2023 \| Fiscal\.ge$/);
+  expect(String(detail.title)).not.toContain("2010");
   expect(index.description).toContain(locale === "en" ? "Georgia’s 10 published regions" : "საქართველოს 10 გამოქვეყნებული");
   expect(detail.description).toContain(locale === "en" ? "19 economic activities" : "19 ეკონომიკურ საქმიანობას");
 });

@@ -152,6 +152,38 @@ describe("manifest.json", () => {
     }
   });
 
+  it("lists side files after the snapshot artifacts, as CSV with their own hash, and leaves the default output alone", () => {
+    const sideFiles = [
+      { fileName: "population.csv", bytes: Buffer.from("series_id,value\na,1\nb,2\n", "utf8"), rowCount: 2 },
+      { fileName: "wages.csv", bytes: Buffer.from("series_id,value\nc,3\n", "utf8"), rowCount: 1 },
+    ];
+    const withSide = buildAllPublications(snapshot, sideFiles);
+    const manifestOf = (files: typeof withSide) =>
+      parse(files.find((file) => file.fileName === "manifest.json")!.bytes) as unknown as {
+        files: { fileName: string; rowCount: number; byteSize: number; sha256: string; url: string; mediaType: string }[];
+      };
+
+    const base = manifestOf(allPublications).files;
+    const listed = manifestOf(withSide).files;
+    expect(listed.map((file) => file.fileName)).toEqual([...base.map((file) => file.fileName), "population.csv", "wages.csv"]);
+    for (const side of sideFiles) {
+      expect(listed.find((file) => file.fileName === side.fileName)).toEqual({
+        fileName: side.fileName,
+        url: `/downloads/data/${side.fileName}`,
+        rowCount: side.rowCount,
+        byteSize: side.bytes.byteLength,
+        sha256: createHash("sha256").update(side.bytes).digest("hex"),
+        mediaType: "text/csv",
+      });
+    }
+    // The side files are already on disk: they are listed, not returned to be written again.
+    expect(withSide.map((file) => file.fileName)).toEqual(allPublications.map((file) => file.fileName));
+    // The default leaves the manifest byte-identical.
+    expect(buildAllPublications(snapshot).find((file) => file.fileName === "manifest.json")!.bytes.equals(
+      allPublications.find((file) => file.fileName === "manifest.json")!.bytes,
+    )).toBe(true);
+  });
+
   it("does not describe itself", async () => {
     const catalogue = catalogueFile;
     const manifest = parse(buildManifestFile(snapshot, [catalogue]).bytes) as unknown as {

@@ -62,7 +62,8 @@ export async function renderUnemploymentPage(locale: Locale, section: Unemployme
   return <I18nProvider {...clientPresentation(presentation)}>
     <JsonLd testId="explorer-dataset-json-ld" data={explorerDatasetJsonLd({
       locale, origin, path: sectionPath, datasetId: "unemployment", name: title, description, firstYear, lastYear, dateModified: lastReviewedAt,
-      // A region page is a slice of the Regions page's dataset.
+      // A region page is a slice of the Regions page's dataset and links no file of its own.
+      ...(region ? {} : { downloadPath: "/downloads/data/unemployment.csv" as const }),
       ...(region ? { spatialCoverageName: regionName, withinGeorgia: true, partOf: { path: "/explorer/unemployment/regions", name: message(presentation.messages, "unemployment.page.regions.title"), description: message(presentation.messages, "unemployment.page.regions.summary") } } : {}),
       variableMeasured: [...new Set(facts.map(f => f.indicatorId))].map(indicator => message(presentation.messages, `unemployment.indicator.${indicator}`)),
     })} />

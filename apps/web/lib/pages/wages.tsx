@@ -18,6 +18,7 @@ import { pageHref } from "../i18n/routes";
 import type { Locale } from "../i18n/types";
 import { loadSourcedWorkbookSources } from "../methodology/workbookSources";
 import { fiscalMetadata } from "../seo/metadata";
+import { areaTitleForm, latestYearOf } from "../seo/placeTitleForms";
 import { explorerDatasetJsonLd } from "../seo/structuredData";
 import { resolveSiteUrl } from "../siteUrl";
 import { loadWagesPage, wagesLabels, wagesRegionsDataset } from "./wages-shared";
@@ -32,7 +33,9 @@ function regionForSlug(slug: string) {
 export async function wagesRegionPageMetadata(slug: string, locale: Locale) {
   const region = regionForSlug(slug), [presentation, data] = await Promise.all([getPresentation(locale, ["wages"], [region.id]), loadServedWagesData()]);
   const name = publicLabel(locale, region.id, region.kaLabel, presentation.englishLabels);
-  return fiscalMetadata({ locale, path: wagesRegionHref(region.id), title: message(presentation.messages, "wages.regionTitle", { region: name }), description: message(presentation.messages, "wages.regionSummary", { region: name, ...wagesSummaryValues(data.facts.map(toClientWagesFact)) }) });
+  // The title is worded the way people search it and ends in the region's latest year; the page's own heading and Dataset name keep regionTitle.
+  const year = latestYearOf(data.facts, f => f.dimension === "region" && f.groupId === region.id);
+  return fiscalMetadata({ locale, path: wagesRegionHref(region.id), title: message(presentation.messages, "wages.regionSeoTitle", { place: areaTitleForm(region.id, name, locale, "in"), year }), description: message(presentation.messages, "wages.regionSummary", { region: name, ...wagesSummaryValues(data.facts.map(toClientWagesFact)) }) });
 }
 export const renderWagesRegionPage = (slug: string, locale: Locale) => renderWagesPage(locale, "regions", regionForSlug(slug).id);
 
@@ -55,6 +58,8 @@ export async function renderWagesPage(locale: Locale, section: WagesSectionId, r
   return <I18nProvider {...clientPresentation(presentation)}>
     <JsonLd testId="explorer-dataset-json-ld" data={explorerDatasetJsonLd({
       locale, origin, path: href, datasetId: "wages", name: title, description, firstYear, lastYear, dateModified: lastReviewedAt,
+      // A region page is a slice of the Regions page's dataset and links no file of its own.
+      ...(regionId ? {} : { downloadPath: "/downloads/data/wages.csv" as const }),
       ...(regionId ? { spatialCoverageName: regionName, withinGeorgia: true, partOf: wagesRegionsDataset(presentation.messages) } : {}),
       variableMeasured: [...new Set(facts.map(f => f.indicatorId))].map(id => t(id === "median_monthly_earnings" ? "series.median" : "series.average")),
     })} />

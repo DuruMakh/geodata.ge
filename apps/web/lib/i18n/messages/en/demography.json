@@ -34,6 +34,7 @@
   "demography.metaRegionOne": "{members} municipality · Rank {rank} of {count} · 1 January {year}",
   "demography.metaMunicipality": "{region} · Rank {rank} of {count} · 1 January {year}",
   "demography.placeMetaTitle": "{name} — Population",
+  "demography.placeSeoTitle": "{place} population {year}",
   "demography.placeMetaDescription": "{name}: population on 1 January, {first}–{last}, births and deaths, and the census age and sex structure, from Geostat data.",
   "demography.placeMunicipalityMetaDescription": "{name}, {region}: population on 1 January, {first}–{last}, and births and deaths, from Geostat data.",
   "demography.rangeChanged": "Period {start}–{end}",

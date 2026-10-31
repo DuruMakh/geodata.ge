@@ -17,6 +17,8 @@
   "social.place.headingLead.pensions": "პენსიები —",
   "social.place.headingLead.subsistence-allowance": "საარსებო შემწეობა —",
   "social.place.metaTitle": "{section} — {place}",
+  "social.place.seoTitle.pensions": "პენსიები {place} {year}",
+  "social.place.seoTitle.subsistence-allowance": "საარსებო შემწეობა {place} {year}",
   "social.place.metaDescription": "{section} — {place}, წლების მიხედვით, სოციალური მომსახურების სააგენტოს მონაცემებით.",
   "social.heading.money": "გაცემული თანხა",
   "social.heading.pensioners": "პენსიონერები",

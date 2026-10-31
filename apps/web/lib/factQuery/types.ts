@@ -7,6 +7,7 @@ import type {
   ServedNationalGdpFact,
 } from "../servedRows";
 import type { AdminSpendingCategory } from "../data/adminSpending/types";
+import type { SearchPage } from "../explorer/search/searchExplorer";
 import type {
   AdjaraBudgetAdjustment,
   Municipality,
@@ -23,7 +24,7 @@ import type {
 export type { MunicipalTotalFact } from "../data/municipal/types";
 export type { ServedNationalGdpFact } from "../servedRows";
 
-export const SCHEMA_VERSION = "1.6.0" as const;
+export const SCHEMA_VERSION = "1.7.0" as const;
 
 /** Municipal codes whose budgets are not territorially attributable (spec section 5.4). */
 export const AGGREGATE_ONLY_MUNICIPAL_CODES = ["05", "42", "43", "46", "64"] as const;
@@ -90,6 +91,11 @@ export type Caveat = {
   methodologyRef: string;
   methodologyRefEn: string;
   affects: string[];
+  /**
+   * Rankings only: how many further items `affects` would have listed, had it not
+   * been narrowed to the rows the ranking returns. Absent when nothing was dropped.
+   */
+  affectsOtherCount?: number;
 };
 
 export type Coverage = {
@@ -196,6 +202,12 @@ export type ResponseSource = Omit<ResolvedSource, "documents"> & {
    */
   documentDefaults?: DocumentDefaults;
   documents: ResponseDocument[];
+  /**
+   * Rankings only: documents the ranking read to establish its order but whose
+   * rows it does not show, named by id. Resolve them with get_sources. Together
+   * with `documents` this is every document the ranking cited.
+   */
+  inputDocumentIds?: string[];
 };
 
 export type ResolvedSource = {
@@ -277,8 +289,13 @@ export type FactQuerySnapshot = {
     historyNotes: import("./inflationProductSeries").ProductHistoryNote[];
   };
   gdpFacts: ServedNationalGdpFact[];
+  /** The Fiscal.ge pages whose figures this service does not serve: names and links only, never a value. */
+  website: { pages: WebsitePage[] };
   sources: ResolvedSource[];
 };
+
+/** A navigation page as the website's own search sees it (no value, period, caption or trend), with its Georgian and English addresses. */
+export type WebsitePage = SearchPage & { urlKa: string; urlEn: string };
 
 /**
  * The nine debt series and their Georgian labels, in publication order.

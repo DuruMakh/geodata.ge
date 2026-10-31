@@ -28,8 +28,8 @@ describe("inflation snapshot and catalogue", () => {
     expect(country.series!.map(series => series.seriesId)).toContain("cpi.cat.01_1");
   });
 
-  it("retains inflation city coverage under schema 1.6.0", () => {
-    expect(SCHEMA_VERSION).toBe("1.6.0");
+  it("retains inflation city coverage under schema 1.7.0", () => {
+    expect(SCHEMA_VERSION).toBe("1.7.0");
   });
 
   it("carries every served inflation row", async () => {
