@@ -33,7 +33,8 @@ for (const [locale, prefix, heading, coverage, khulo, batumi] of [
     await expect(page.getByTestId("municipal-list-row")).toHaveCount(65);
     await expect(page.locator('[data-testid^="population-level-"], [data-testid^="population-measure-"], [data-testid="population-georgia-pill"]')).toHaveCount(0);
     await expect(page.getByTestId("breadcrumb-json-ld")).toHaveCount(1);
-    await expect(page.getByTestId("explorer-dataset-json-ld")).toHaveCount(0);
+    await expect(page.getByTestId("explorer-dataset-json-ld")).toHaveCount(1);
+    expect(JSON.parse((await page.getByTestId("explorer-dataset-json-ld").textContent()) ?? "{}")).toMatchObject({ "@type": "Dataset" });
 
     // The retired ids above are only three names. The Budget index is the page this one copies, so a row of buttons above the map,
     // under any other id, would show as more buttons before the map than the Budget index has.

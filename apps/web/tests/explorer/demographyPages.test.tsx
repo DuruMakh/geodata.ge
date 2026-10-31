@@ -21,6 +21,12 @@ import { renderPageMarkup } from "../helpers/render-localized";
 
 const GEORGIAN = /\p{Script=Georgian}/u;
 const count = (html: string, token: RegExp) => (html.match(token) ?? []).length;
+// The page's one Dataset node, parsed from its explorer-dataset-json-ld script.
+const datasetNode = (html: string) => {
+  const json = html.match(/<script[^>]*data-testid="explorer-dataset-json-ld"[^>]*>([\s\S]*?)<\/script>/)?.[1];
+  expect(json, "the page carries explorer-dataset-json-ld").toBeDefined();
+  return JSON.parse(json!) as Record<string, unknown> & { "@type": string; name: string; description: string; url: string; keywords: string[]; variableMeasured: string[]; provider: { name: string } | { name: string }[] };
+};
 // The methodology link closes the source sentence with a full stop, so the Boundaries credit the index appends starts a new one.
 // Written without either language's words, so it holds for both.
 const SENTENCE_CLOSED_BEFORE_BOUNDARIES = /\/methodology\/demography"[^>]*>[^<]+<\/a>\. [^<]+<a href="https:\/\/www\.openstreetmap\.org\/copyright"/;
@@ -126,11 +132,12 @@ describe("population index page", () => {
     expect(html).toContain("persons, 1 January 2026");
   });
 
-  it("has a breadcrumb, the methodology link and no dataset markup, download or Georgian text in English", async () => {
+  it("has a breadcrumb, the methodology link and its Dataset, with no download or Georgian text in English", async () => {
     const html = renderPageMarkup("en", await renderDemographyPopulationPage("en"));
     expect(html).toContain('data-testid="breadcrumb-json-ld"');
-    expect(html).not.toContain('data-testid="explorer-dataset-json-ld"');
-    expect(html).not.toContain("/downloads/data/");
+    expect(datasetNode(html)).toMatchObject({ "@type": "Dataset", name: "Population", url: "https://fiscal.ge/en/explorer/demography/population" });
+    // The only download the page names is the population file, in the Dataset's distribution.
+    expect([...html.matchAll(/\/downloads\/data\/[^"\\<]*/g)].map((match) => match[0])).toEqual(["/downloads/data/population.csv"]);
     expect(html).toContain('href="/en/methodology/demography"');
     expect(html).toMatch(SENTENCE_CLOSED_BEFORE_BOUNDARIES);
     expect(html).not.toMatch(GEORGIAN);
@@ -155,7 +162,7 @@ describe("population index page", () => {
 });
 
 describe("migration page", () => {
-  it("renders the heading, coverage, breadcrumb and the explorer, with no dataset markup", async () => {
+  it("renders the heading, coverage, breadcrumb and the explorer, with its Dataset", async () => {
     const html = renderPageMarkup("en", await renderDemographyMigrationPage("en"));
     expect(html).toContain(">Migration</h1>");
     expect(html).toContain("2012–2025 · annual");
@@ -163,7 +170,7 @@ describe("migration page", () => {
     expect(html).not.toContain("persons per year");
     expect(html).toContain('data-testid="migration-explorer"');
     expect(html).toContain('data-testid="breadcrumb-json-ld"');
-    expect(html).not.toContain('"@type":"Dataset"');
+    expect(datasetNode(html)["@type"]).toBe("Dataset");
     expect(html).toContain('href="/en/methodology/demography"');
   });
 
@@ -190,7 +197,7 @@ describe("migration page", () => {
 });
 
 describe("births and deaths page", () => {
-  it("renders the places block, fertility and life expectancy, with no dataset markup", async () => {
+  it("renders the places block, fertility and life expectancy, with its Dataset", async () => {
     const html = renderPageMarkup("en", await renderDemographyBirthsDeathsPage("en"));
     expect(html).toContain(">Births, deaths and fertility</h1>");
     expect(html).toContain("2014–2025 · annual");
@@ -204,7 +211,7 @@ describe("births and deaths page", () => {
     expect(html).toContain('aria-label="Births per 1,000 women by mother&#x27;s age, one line per year, 2014–2025"');
     expect(html).toContain('aria-label="Life expectancy at birth, total, men and women, Georgia, 2014–2025"');
     expect(html).toContain('data-testid="breadcrumb-json-ld"');
-    expect(html).not.toContain('"@type":"Dataset"');
+    expect(datasetNode(html)["@type"]).toBe("Dataset");
     expect(html).not.toMatch(GEORGIAN);
   });
 
@@ -216,7 +223,7 @@ describe("births and deaths page", () => {
 });
 
 describe("marriages and divorces page", () => {
-  it("renders one latest line and no paragraph under the heading, the explorer, then the places block, with no dataset markup or Georgian in English", async () => {
+  it("renders one latest line and no paragraph under the heading, the explorer, then the places block, with its Dataset and no Georgian in English", async () => {
     const html = renderPageMarkup("en", await renderDemographyMarriagesDivorcesPage("en"));
     expect(html).toContain(">Marriages and divorces</h1>");
     const heading = html.slice(html.indexOf(">Marriages and divorces</h1>"), html.indexOf('data-testid="chart-panel"'));
@@ -228,7 +235,7 @@ describe("marriages and divorces page", () => {
     expect(html).toContain('href="/en/explorer/demography/population/region/tbilisi#marriages-divorces"');
     expect(html).toContain('href="/en/explorer/demography/population/kazbegi#marriages-divorces"');
     expect(html).toContain('data-testid="breadcrumb-json-ld"');
-    expect(html).not.toContain('"@type":"Dataset"');
+    expect(datasetNode(html)["@type"]).toBe("Dataset");
     expect(html).not.toMatch(GEORGIAN);
   });
 
@@ -246,7 +253,7 @@ describe("marriages and divorces page", () => {
 });
 
 describe("age and sex page", () => {
-  it("renders the pyramid, the heat map and a regional glance, in that order, with no dataset markup or Georgian in English", async () => {
+  it("renders the pyramid, the heat map and a regional glance, in that order, with its Dataset and no Georgian in English", async () => {
     const html = renderPageMarkup("en", await renderDemographyAgeSexPage("en"));
     expect(html).toContain(">Age and sex</h1>");
     expect(html).toContain("2004–2026 · annual, and the 2024 census");
@@ -259,7 +266,7 @@ describe("age and sex page", () => {
     expect(html).not.toContain('data-testid="age-sex-bands"');
     expect(html).toContain('href="/en/methodology/demography"');
     expect(html).toContain('data-testid="breadcrumb-json-ld"');
-    expect(html).not.toContain('"@type":"Dataset"');
+    expect(datasetNode(html)["@type"]).toBe("Dataset");
     expect(html).not.toMatch(GEORGIAN);
   });
 
@@ -338,4 +345,40 @@ describe("population sources", () => {
     }
     for (const source of await loadPopulationSources("ka")) expect(source.title, source.sourceId).toMatch(GEORGIAN);
   });
+});
+
+// Every page, in both languages, names one Dataset of the demography vocabulary after its own title and series, credits Geostat,
+// and claims no download except the Population index, which points at the published population file.
+describe("every demography page's Dataset", () => {
+  const pages = [
+    ["population", "/explorer/demography/population", renderDemographyPopulationPage],
+    ["migration", "/explorer/demography/migration", renderDemographyMigrationPage],
+    ["births-deaths", "/explorer/demography/births-deaths", renderDemographyBirthsDeathsPage],
+    ["age-sex", "/explorer/demography/age-sex", renderDemographyAgeSexPage],
+    ["marriages-divorces", "/explorer/demography/marriages-divorces", renderDemographyMarriagesDivorcesPage],
+  ] as const;
+  const original = process.env.NEXT_PUBLIC_SITE_URL;
+  beforeEach(() => { process.env.NEXT_PUBLIC_SITE_URL = "https://fiscal.ge"; });
+  afterEach(() => { process.env.NEXT_PUBLIC_SITE_URL = original; });
+
+  it.each(pages.flatMap(([slug, path, render]) => (["ka", "en"] as const).map((locale) => [slug, locale, path, render] as const)))(
+    "%s, %s", async (slug, locale, path, render) => {
+      const html = renderPageMarkup(locale, await render(locale));
+      const node = datasetNode(html);
+      expect(node["@type"]).toBe("Dataset");
+      expect(node.url).toBe(`https://fiscal.ge${locale === "en" ? "/en" : ""}${path}`);
+      expect(node.description.length).toBeGreaterThanOrEqual(50);
+      expect(node.keywords).toContain(locale === "en" ? "demography" : "დემოგრაფია");
+      expect([node.provider].flat().map((agency) => agency.name)).toEqual([locale === "en" ? "National Statistics Office of Georgia (Geostat)" : "საქართველოს სტატისტიკის ეროვნული სამსახური (საქსტატი)"]);
+      expect(node.variableMeasured.length).toBeGreaterThan(0);
+      if (slug === "population") {
+        expect(node.distribution).toEqual([
+          { "@type": "DataDownload", encodingFormat: "text/csv", contentUrl: "https://fiscal.ge/downloads/data/population.csv" },
+        ]);
+      } else {
+        expect(node).not.toHaveProperty("distribution");
+        expect(html).not.toContain("/downloads/data/");
+      }
+      if (locale === "en") expect(JSON.stringify(node)).not.toMatch(GEORGIAN);
+    });
 });

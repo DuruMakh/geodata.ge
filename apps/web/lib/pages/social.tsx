@@ -68,6 +68,7 @@ export async function renderSocialTopicPage(locale: Locale, section: SocialTopic
   return <I18nProvider {...clientPresentation(presentation)}>
     <JsonLd testId="explorer-dataset-json-ld" data={explorerDatasetJsonLd({
       locale, origin, path: href, datasetId: section === "funded-pension" ? "funded-pension" : "social-protection", name: title, description, firstYear: min, lastYear: max, dateModified: lastReviewedAt,
+      downloadPath: "/downloads/data/social-protection.csv",
       variableMeasured: [...new Set(Object.values(headingLabels))],
       // SSA's statistics; only Social payments' % of GDP view divides by Geostat's GDP. The funded pension has its own dataset vocabulary.
       ...(gdp ? {} : { sources: ["ssa"] as const }),

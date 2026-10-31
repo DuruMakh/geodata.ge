@@ -410,6 +410,18 @@ for (const prefix of ["", "/en"]) {
 }
 
 
+for (const prefix of ["", "/en"]) {
+  test(`demography methodology carries Dataset markup and is listed in the catalog ${prefix || "ka"}`, async ({ page }) => {
+    await page.goto(`${TEST_BASE_URL}${prefix}/methodology/demography`);
+    const json = JSON.parse(await page.getByTestId("dataset-json-ld").textContent() ?? "{}");
+    expect(json["@type"]).toBe("Dataset");
+    expect(json).not.toHaveProperty("distribution");
+    await page.goto(`${TEST_BASE_URL}${prefix}/methodology`);
+    const catalog = JSON.parse(await page.getByTestId("catalog-json-ld").textContent() ?? "{}");
+    expect(JSON.stringify(catalog)).toContain(`${prefix}/methodology/demography`);
+  });
+}
+
 test("the two HTML originals open as sandboxed text without executing archived website scripts", async ({ page, request }) => {
   await page.goto(`${TEST_BASE_URL}/en/methodology/trade`);
   const trackingRequests: string[] = [];

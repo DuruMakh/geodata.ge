@@ -3,6 +3,7 @@ import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { parse } from "csv-parse/sync";
 import { serializeBomCsv } from "./csvEscape";
+import { SERIES } from "./demography/series";
 import { budgetFactHeaders } from "./factCsv";
 
 export type PublicDatasetId =
@@ -10,7 +11,24 @@ export type PublicDatasetId =
   | "national-revenue"
   | "municipal-expenditure"
   | "government-debt"
-  | "general-government-balance";
+  | "general-government-balance"
+  | "population"
+  | "wages"
+  | "unemployment"
+  | "social-protection";
+
+/** Every CSV this module writes under /downloads/data/, in the order of its outputs. */
+export const PUBLIC_DATASET_FILE_NAMES: readonly string[] = [
+  "national-expenditure.csv",
+  "national-revenue.csv",
+  "municipal-expenditure.csv",
+  "government-debt.csv",
+  "general-government-balance.csv",
+  "population.csv",
+  "wages.csv",
+  "unemployment.csv",
+  "social-protection.csv",
+];
 
 export type PublicDatasetValidation = {
   status: "PASS";
@@ -33,6 +51,30 @@ const MUNICIPAL_HEADERS = [
   "amount_gel",
   "basis",
   "source_id",
+] as const;
+
+// Public columns of the topic files. The reviewed CSVs' source_sheet, source_cell, source_workbook and
+// source_number_format stay out: they locate a figure inside a workbook and are not public metadata.
+const POPULATION_HEADERS = [
+  "series_id", "geography_id", "year", "value", "unit", "estimate_basis", "status", "source_id", "source_locator", "last_reviewed_at",
+] as const;
+const WAGES_HEADERS = [
+  "year", "indicator_id", "dimension", "group_id", "sector_id", "value", "published_value", "unit", "basis", "value_status", "source_id",
+  "last_reviewed_at",
+] as const;
+const UNEMPLOYMENT_HEADERS = [
+  "year", "frequency", "dimension", "group_id", "group_label_en", "indicator_id", "sex", "unit", "value", "published_value", "basis",
+  "value_status", "methodology_epoch", "role", "source_id",
+] as const;
+const SOCIAL_HEADERS = [
+  "year", "indicator_id", "geography_id", "value", "unit", "months", "basis", "value_status", "source_id", "last_reviewed_at",
+] as const;
+// The four files loadUnemploymentFacts reads. Only the education and long-term files carry a sex column.
+const UNEMPLOYMENT_FILES = [
+  "unemployment-annual.csv",
+  "unemployment-education-annual.csv",
+  "unemployment-long-term-annual.csv",
+  "unemployment-employment-status-annual.csv",
 ] as const;
 
 function sha256(bytes: Uint8Array): string {
@@ -58,6 +100,29 @@ function byYearAndId(left: CsvRow, right: CsvRow): number {
     (left.row_type ?? "").localeCompare(right.row_type ?? "", "en") ||
     (left.category_id ?? "").localeCompare(right.category_id ?? "", "en")
   );
+}
+
+// The four topic files below have no item_id or entity_id, so they sort on the year, then every other
+// column in the file's own order. That is total and plain code-unit order, so the bytes never depend on
+// the locale or on the order the reviewed CSV happens to list its rows in.
+function byYearThenColumns(headers: readonly string[]) {
+  return (left: CsvRow, right: CsvRow): number => {
+    const byYear = Number(left.year) - Number(right.year);
+    if (byYear !== 0) return byYear;
+    for (const header of headers) {
+      const a = left[header] ?? "";
+      const b = right[header] ?? "";
+      if (a !== b) return a < b ? -1 : 1;
+    }
+    return 0;
+  };
+}
+
+// A topic file's rows, cut to its public columns and sorted.
+function topicRows(rows: readonly CsvRow[], headers: readonly string[]): CsvRow[] {
+  return rows
+    .map((row) => Object.fromEntries(headers.map((header) => [header, row[header] ?? ""])))
+    .toSorted(byYearThenColumns(headers));
 }
 
 function validation(datasetId: PublicDatasetId, rows: readonly CsvRow[], bytes: Buffer): PublicDatasetValidation {
@@ -133,6 +198,20 @@ export async function preparePublicDatasets(options: {
     ...countryTotals.map((row) => totalRow(row, "scope_id")),
   ].toSorted(byYearAndId);
 
+  // Each topic file publishes the rows its pages serve, which are the rows of its reviewed CSV: wages,
+  // unemployment and social protection load every row (tests/data/publicDatasetExports.test.ts holds the
+  // counts equal to their served loaders), and the population pages read only the population total.
+  const [populationFacts, wagesFacts, socialFacts, ...unemploymentParts] = await Promise.all([
+    readCsv(path.join(imports, "demography-population-annual.csv")),
+    readCsv(path.join(imports, "wages-annual.csv")),
+    readCsv(path.join(imports, "social-protection-annual.csv")),
+    ...UNEMPLOYMENT_FILES.map((name) => readCsv(path.join(imports, name))),
+  ]);
+  const populationRows = topicRows(populationFacts.filter((row) => row.series_id === SERIES.populationTotal), POPULATION_HEADERS);
+  const wagesRows = topicRows(wagesFacts, WAGES_HEADERS);
+  const unemploymentRows = topicRows(unemploymentParts.flat(), UNEMPLOYMENT_HEADERS);
+  const socialRows = topicRows(socialFacts, SOCIAL_HEADERS);
+
   const outputs = [
     {
       datasetId: "national-expenditure" as const,
@@ -180,6 +259,30 @@ export async function preparePublicDatasets(options: {
         "source_id",
         "last_reviewed_at",
       ], balanceRows),
+    },
+    {
+      datasetId: "population" as const,
+      fileName: "population.csv",
+      rows: populationRows,
+      bytes: serialize(POPULATION_HEADERS, populationRows),
+    },
+    {
+      datasetId: "wages" as const,
+      fileName: "wages.csv",
+      rows: wagesRows,
+      bytes: serialize(WAGES_HEADERS, wagesRows),
+    },
+    {
+      datasetId: "unemployment" as const,
+      fileName: "unemployment.csv",
+      rows: unemploymentRows,
+      bytes: serialize(UNEMPLOYMENT_HEADERS, unemploymentRows),
+    },
+    {
+      datasetId: "social-protection" as const,
+      fileName: "social-protection.csv",
+      rows: socialRows,
+      bytes: serialize(SOCIAL_HEADERS, socialRows),
     },
   ];
 

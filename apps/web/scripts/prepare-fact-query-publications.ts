@@ -2,7 +2,8 @@ import { createHash } from "node:crypto";
 import { existsSync } from "node:fs";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
-import { buildAllPublications } from "../lib/factQuery/publications";
+import { PUBLIC_DATASET_FILE_NAMES } from "../lib/data/publicDatasetExports";
+import { buildAllPublications, type PublicationArtifact } from "../lib/factQuery/publications";
 import type { FactQuerySnapshot } from "../lib/factQuery/types";
 import { loadPackagedSnapshot } from "../lib/mcp/snapshot";
 
@@ -26,17 +27,38 @@ function packagedSnapshot(): FactQuerySnapshot {
   }
 }
 
+// Published files this step does not build, written earlier in prebuild and predev: the public topic CSVs
+// (data:prepare-public-datasets) and the national CPI CSV (data:prepare-inflation-public). The manifest names
+// them so a client can find and verify every file. A missing one stops the step with its name.
+const SIDE_FILE_NAMES = [...PUBLIC_DATASET_FILE_NAMES, "inflation-cpi-national.csv"];
+
+async function sideFiles(): Promise<PublicationArtifact[]> {
+  return Promise.all(
+    SIDE_FILE_NAMES.map(async (fileName) => {
+      const bytes = await readFile(path.join(OUTPUT_DIR, fileName)).catch(() => null);
+      if (bytes === null) {
+        throw new Error(
+          `public/downloads/data/${fileName} is missing. It is written earlier in prebuild: run npm run data:prepare-public-datasets and npm run data:prepare-inflation-public first.`,
+        );
+      }
+      // One header line; every other non-empty line is a data row.
+      const rowCount = Math.max(0, bytes.toString("utf8").split(/\r?\n/).filter((line) => line !== "").length - 1);
+      return { fileName, bytes, rowCount };
+    }),
+  );
+}
+
 async function main() {
   const write = process.argv.includes("--write");
   const check = process.argv.includes("--check");
   if (write === check) throw new Error("Pass exactly one of --write or --check");
 
   const snapshot = packagedSnapshot();
-  const artifacts = buildAllPublications(snapshot);
+  const artifacts = buildAllPublications(snapshot, await sideFiles());
 
   if (write) {
     // Deliberately NOT clearing OUTPUT_DIR: preparePublicDatasets wipes and
-    // rewrites it with its five public CSVs earlier in the prebuild chain, and
+    // rewrites it with its nine public CSVs earlier in the prebuild chain, and
     // regional-economy and inflation CSVs are also written between the two.
     await mkdir(OUTPUT_DIR, { recursive: true });
     for (const artifact of artifacts) {

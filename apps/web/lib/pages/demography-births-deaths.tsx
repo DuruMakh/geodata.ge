@@ -4,6 +4,7 @@ import { ExplorerHeading } from "../../components/explorer-shell/explorer-headin
 import { ExplorerPage } from "../../components/explorer-shell/explorer-page";
 import { MunicipalitiesIndex } from "../../components/municipalities/municipalities-index";
 import { BreadcrumbJsonLd } from "../../components/seo/breadcrumb-json-ld";
+import { JsonLd } from "../../components/seo/json-ld";
 import { PageHeader } from "../../components/shell/page-header";
 import { loadServedDemographyData } from "../data/demography/importDemography";
 import { SERIES, SOURCE_ID } from "../data/demography/series";
@@ -19,6 +20,7 @@ import { I18nProvider } from "../i18n/provider";
 import { pageHref } from "../i18n/routes";
 import type { Locale, TemplateValues } from "../i18n/types";
 import { fiscalMetadata } from "../seo/metadata";
+import { explorerDatasetJsonLd } from "../seo/structuredData";
 import { resolveSiteUrl } from "../siteUrl";
 import { loadPopulationBasics, loadPopulationSources } from "./demography-population";
 import { ALL_DATA_PATH } from "../navigation/navTree";
@@ -69,6 +71,21 @@ export async function renderDemographyBirthsDeathsPage(locale: Locale) {
   );
   return (
     <I18nProvider {...clientPresentation(presentation)}>
+      <JsonLd
+        testId="explorer-dataset-json-ld"
+        data={explorerDatasetJsonLd({
+          locale,
+          origin: resolveSiteUrl(),
+          path: BIRTHS_DEATHS_PATH,
+          datasetId: "demography",
+          name: title,
+          description: t("birthsDeathsMetaDescription", { first, last }),
+          firstYear: first,
+          lastYear: last,
+          dateModified: served.map((fact) => fact.lastReviewedAt).sort().at(-1)!,
+          variableMeasured: [t("vitalBirths"), t("vitalDeaths"), t("vitalRatio"), t("tfrLabel"), t("lifeTitle")],
+        })}
+      />
       <BreadcrumbJsonLd
         items={[
           { name: crumbs[0].label, path: pageHref("/", locale) },

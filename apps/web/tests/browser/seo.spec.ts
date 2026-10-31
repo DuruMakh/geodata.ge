@@ -115,6 +115,10 @@ test("explorer datasets publish stable ids and downloadable CSV distributions", 
     { route: "/explorer/revenue", downloadPath: "/downloads/data/national-revenue.csv" },
     { route: "/explorer/municipalities", downloadPath: "/downloads/data/municipal-expenditure.csv" },
     { route: "/explorer/deficit", downloadPath: "/downloads/data/general-government-balance.csv" },
+    { route: "/explorer/demography/population", downloadPath: "/downloads/data/population.csv" },
+    { route: "/explorer/wages/overview", downloadPath: "/downloads/data/wages.csv" },
+    { route: "/explorer/unemployment/overview", downloadPath: "/downloads/data/unemployment.csv" },
+    { route: "/explorer/health/social-payments", downloadPath: "/downloads/data/social-protection.csv" },
   ] as const) {
     await page.goto(`${BASE_URL}${route}`);
     const node = JSON.parse(await page.getByTestId("explorer-dataset-json-ld").textContent() ?? "{}");
@@ -125,7 +129,9 @@ test("explorer datasets publish stable ids and downloadable CSV distributions", 
         contentUrl: `https://fiscal.ge${downloadPath}`,
       }),
     ]);
-    expect((await request.get(`${BASE_URL}${downloadPath}`)).status()).toBe(200);
+    const download = await request.get(`${BASE_URL}${downloadPath}`);
+    expect(download.status()).toBe(200);
+    expect(download.headers()["content-type"]).toContain("text/csv");
   }
 });
 

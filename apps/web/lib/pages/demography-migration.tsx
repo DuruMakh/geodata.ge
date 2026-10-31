@@ -3,6 +3,7 @@ import { MigrationExplorer } from "../../components/demography/demography-migrat
 import { ExplorerHeading } from "../../components/explorer-shell/explorer-heading";
 import { ExplorerPage } from "../../components/explorer-shell/explorer-page";
 import { BreadcrumbJsonLd } from "../../components/seo/breadcrumb-json-ld";
+import { JsonLd } from "../../components/seo/json-ld";
 import { PageHeader } from "../../components/shell/page-header";
 import { loadServedDemographyData } from "../data/demography/importDemography";
 import { SOURCE_ID } from "../data/demography/series";
@@ -16,6 +17,7 @@ import { I18nProvider } from "../i18n/provider";
 import { pageHref } from "../i18n/routes";
 import type { Locale, TemplateValues } from "../i18n/types";
 import { fiscalMetadata } from "../seo/metadata";
+import { explorerDatasetJsonLd } from "../seo/structuredData";
 import { resolveSiteUrl } from "../siteUrl";
 import { loadPopulationSources } from "./demography-population";
 import { ALL_DATA_PATH } from "../navigation/navTree";
@@ -63,6 +65,21 @@ export async function renderDemographyMigrationPage(locale: Locale) {
   );
   return (
     <I18nProvider {...clientPresentation(presentation)}>
+      <JsonLd
+        testId="explorer-dataset-json-ld"
+        data={explorerDatasetJsonLd({
+          locale,
+          origin: resolveSiteUrl(),
+          path: MIGRATION_PATH,
+          datasetId: "demography",
+          name: title,
+          description: t("migrationMetaDescription", { first, last }),
+          firstYear: first,
+          lastYear: last,
+          dateModified: served.map((fact) => fact.lastReviewedAt).sort().at(-1)!,
+          variableMeasured: [t("dirArrivals"), t("dirDepartures"), t("netLabel")],
+        })}
+      />
       <BreadcrumbJsonLd
         items={[
           { name: crumbs[0].label, path: pageHref("/", locale) },

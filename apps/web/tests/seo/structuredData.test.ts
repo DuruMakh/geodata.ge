@@ -3,7 +3,6 @@ import { isValidElement, type ReactNode } from "react";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { JsonLd } from "../../components/seo/json-ld";
 import { appRoutes, routeFor } from "../helpers/appRoutes";
-import { DEMOGRAPHY_HUB_PATH } from "../../lib/explorer/demographyRoutes";
 import { pageHref, splitLanguagePath } from "../../lib/i18n/routes";
 import { NAV_GROUPS, NAV_TREE, openHub } from "../../lib/navigation/navTree";
 import { isTopicDatasetId } from "../../lib/seo/datasetVocabulary";
@@ -653,12 +652,11 @@ describe("Dataset nodes across the sitemap", () => {
   beforeAll(() => vi.stubEnv("NEXT_PUBLIC_SITE_URL", "https://fiscal.ge"));
   afterAll(() => vi.unstubAllEnvs());
 
-  // The pages with no Dataset of their own: the hubs (the navigation tree's hub rows) and the group pages, demography (spec
-  // section 10: no Dataset markup yet), the single-year analysis view, the methodology catalog page and the site pages.
+  // The pages with no Dataset of their own: the hubs (the navigation tree's hub rows) and the group pages, the single-year
+  // analysis view, the methodology catalog page and the site pages.
   const hubs = new Set<string>([...NAV_TREE.map((hub) => hub.href), ...NAV_GROUPS.map((group) => group.href)]);
   const carriesDataset = (page: string) =>
-    (page.startsWith("/explorer/") || page.startsWith("/methodology/")) && !hubs.has(page) &&
-    !page.startsWith(`${DEMOGRAPHY_HUB_PATH}/`) && page !== "/methodology/demography" && page !== "/explorer/analysis";
+    (page.startsWith("/explorer/") || page.startsWith("/methodology/")) && !hubs.has(page) && page !== "/explorer/analysis";
   // Official statistics read from Geostat or the NBG: every page outside the Budget and Economy hubs, and the
   // methodology article of each such dataset. Those name their producer beside Fiscal.ge, the creator.
   const creditsSource = (page: string) =>
@@ -704,6 +702,8 @@ describe("Dataset nodes across the sitemap", () => {
           for (const producer of producers) expect(producer, pathname).toEqual({ "@type": "Organization", name: expect.any(String), url: expect.stringMatching(/^https:\/\/(www\.geostat\.ge|nbg\.gov\.ge|ssa\.moh\.gov\.ge|mof\.ge|www\.treasury\.ge|pensions\.ge)$/) });
         }
         expect(String(dataset.description).length, pathname).toBeGreaterThanOrEqual(50);
+        // A page that is part of a parent's dataset links no file of its own; the parent carries the distribution.
+        if (dataset.isPartOf) expect(dataset, pathname).not.toHaveProperty("distribution");
         // Every node it points at is the same language's: its parent, its subsets and the catalog.
         const related = [dataset.isPartOf, dataset.includedInDataCatalog, ...((dataset.hasPart as unknown[] | undefined) ?? [])]
           .filter(Boolean).map((node) => (node as { "@id": string })["@id"]);

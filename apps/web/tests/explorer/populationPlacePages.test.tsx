@@ -17,6 +17,7 @@ import {
   populationRegionParams,
   renderPopulationPlacePage,
 } from "../../lib/pages/demography-population-place";
+import { renderDemographyPopulationPage } from "../../lib/pages/demography-population";
 import { renderPageMarkup } from "../helpers/render-localized";
 
 const GEORGIAN = /\p{Script=Georgian}/u;
@@ -88,13 +89,63 @@ describe("place pages", () => {
     expect(html).toContain('href="/explorer/demography/population/region/adjara"');
   });
 
-  it("carries no dataset markup and no download link", async () => {
-    for (const route of [{ kind: "country" }, { kind: "region", id: "imereti" }, { kind: "municipality", slug: "khulo" }] as const) {
-      const html = await page(route);
-      expect(html).not.toContain('data-testid="explorer-dataset-json-ld"');
+  const datasetOf = (html: string) =>
+    JSON.parse(html.match(/<script[^>]*data-testid="explorer-dataset-json-ld"[^>]*>([\s\S]*?)<\/script>/)![1]!) as {
+      description: string;
+      isPartOf: { "@id": string; url: string; name: string; description: string };
+      "@id": string;
+      name: string;
+      variableMeasured: string[];
+      spatialCoverage: { name: string; containedInPlace?: { name: string } };
+      [key: string]: unknown;
+    };
+
+  it.each(["ka", "en"] as const)("carries a Dataset that is part of the Population index and no download link, in %s", async (locale) => {
+    const prefix = locale === "en" ? "/en" : "";
+    const routes = [{ kind: "country" }, { kind: "region", id: "imereti" }, { kind: "municipality", slug: "khulo" }] as const;
+    for (const route of routes) {
+      const html = await page(route, locale);
+      const dataset = datasetOf(html);
+      expect(dataset["@type"]).toBe("Dataset");
+      expect(dataset.isPartOf.url).toBe(`https://fiscal.ge${prefix}/explorer/demography/population`);
+      expect(dataset).not.toHaveProperty("includedInDataCatalog");
+      expect(dataset.description.length).toBeGreaterThanOrEqual(50);
+      expect(dataset).not.toHaveProperty("distribution");
       expect(html).not.toContain("/downloads/data/");
-      expect(html).toContain('href="/en/methodology/demography"');
+      expect(html).toContain(`href="${prefix}/methodology/demography"`);
+      if (locale === "en") expect(JSON.stringify(dataset)).not.toMatch(GEORGIAN);
     }
+  });
+
+  it("names the place as the Dataset's coverage, inside Georgia except for Georgia", async () => {
+    const khashuri = datasetOf(await page({ kind: "municipality", slug: "khashuri" }, "en"));
+    expect(khashuri.spatialCoverage).toMatchObject({ name: "Khashuri", containedInPlace: { name: "Georgia" } });
+    expect(khashuri.isPartOf.url).toMatch(/\/explorer\/demography\/population$/);
+    expect(datasetOf(await page({ kind: "municipality", slug: "khashuri" }, "ka")).spatialCoverage).toMatchObject({ name: "ხაშური", containedInPlace: { name: "საქართველო" } });
+    const georgia = datasetOf(await page({ kind: "country" }, "en"));
+    expect(georgia.spatialCoverage).toMatchObject({ name: "Georgia" });
+    expect(georgia.spatialCoverage).not.toHaveProperty("containedInPlace");
+    expect(datasetOf(await page({ kind: "region", id: "imereti" }, "en")).spatialCoverage).toMatchObject({ name: "Imereti", containedInPlace: { name: "Georgia" } });
+  });
+
+  it("lists the series each kind of place shows: density on Georgia and regions, age and sex off the municipalities", async () => {
+    const measured = async (route: Parameters<typeof renderPopulationPlacePage>[0]) => datasetOf(await page(route, "en")).variableMeasured;
+    const everywhere = ["Population", "Births", "Deaths", "Natural increase", "Marriages", "Divorces"];
+    const municipality = await measured({ kind: "municipality", slug: "khulo" });
+    expect(municipality).toEqual(expect.arrayContaining(everywhere));
+    expect(municipality).not.toContain("Density");
+    expect(municipality).not.toContain("Age and sex");
+    for (const route of [{ kind: "country" }, { kind: "region", id: "imereti" }] as const) {
+      expect(await measured(route), JSON.stringify(route)).toEqual(expect.arrayContaining([...everywhere, "Density", "Age and sex"]));
+    }
+  });
+
+  it("names the Population index's own Dataset node as its parent, with the same @id, name and description", async () => {
+    const index = datasetOf(renderPageMarkup("en", await renderDemographyPopulationPage("en")));
+    const { isPartOf } = datasetOf(await page({ kind: "municipality", slug: "khulo" }, "en"));
+    expect(isPartOf["@id"]).toBe(index["@id"]);
+    expect(isPartOf.name).toBe(index.name);
+    expect(isPartOf.description).toBe(index.description);
   });
 
   it("ends its source line with the methodology link and a full stop, as the index does before its Boundaries credit", async () => {
