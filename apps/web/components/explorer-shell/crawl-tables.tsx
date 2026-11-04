@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import { crawlTables } from "../../lib/explorer/crawlTables";
 import type { WorkbookExportModel } from "../../lib/explorer/workbookModel";
 import { useI18n } from "../../lib/i18n/provider";
@@ -8,7 +9,8 @@ import { workbookMessage } from "../../lib/i18n/workbook";
 /** Every series of a chart page as plain tables, hidden from visitors, so crawlers read the numbers. */
 export function CrawlTables({ models }: { models: readonly WorkbookExportModel[] }) {
   const { locale, messages } = useI18n();
-  const tables = crawlTables(models, messages);
+  // Formatted once per models and messages, not on every click of the page around it.
+  const tables = useMemo(() => crawlTables(models, messages), [models, messages]);
   if (tables.length === 0) return null;
   const category = workbookMessage(locale, "workbook.category");
   return (

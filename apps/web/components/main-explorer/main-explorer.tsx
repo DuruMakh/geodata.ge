@@ -50,7 +50,11 @@ export function MainExplorer(props: MainExplorerProps) {
   return <I18nProvider {...props.presentation}><MainExplorerContent {...props} /></I18nProvider>;
 }
 
-function MainExplorerContent({ nav, facts: shippedFacts, adminFacts: shippedAdminFacts = [], adminCategories = [], glossaryEntries, gdpFacts = [], workbookSources = [], adminWorkbookSources = [], gdpWorkbookSources = [], siteOrigin, lastUpdatedAt }: MainExplorerProps) {
+// One empty array for every omitted list prop (the revenue route sends no admin corpus): a fresh `[]` per render would
+// change the memo inputs below on every click and rebuild the crawl models.
+const NONE: never[] = [];
+
+function MainExplorerContent({ nav, facts: shippedFacts, adminFacts: shippedAdminFacts = NONE, adminCategories = NONE, glossaryEntries, gdpFacts = NONE, workbookSources = NONE, adminWorkbookSources = NONE, gdpWorkbookSources = NONE, siteOrigin, lastUpdatedAt }: MainExplorerProps) {
   const facts = unpackFacts(shippedFacts), adminFacts = unpackFacts(shippedAdminFacts);
   // The provider adds the layout's namespaces to the page's: read them from it, not from the prop.
   const presentation = useI18n();
