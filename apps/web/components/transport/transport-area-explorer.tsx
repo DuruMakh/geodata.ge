@@ -1,11 +1,11 @@
 "use client";
 import Link from "next/link";
 import { ChevronDown } from "lucide-react";
-import { useCallback, useId, useRef, useState } from "react";
+import { useCallback, useId, useMemo, useRef, useState } from "react";
 import type { ClientTransportFact } from "../../lib/data/transport/types";
 import type { MunicipalRegion } from "../../lib/data/municipal/types";
 import { transportLatestValue, transportSeriesLabel, transportUnitLabel, transportValueLabel, transportValueUnit, serializeTransportHash, type TransportSeriesModel, type TransportTranslate } from "../../lib/explorer/transport";
-import { TRANSPORT_REGIONS_HREF, buildTransportAreaModel, changeTransportAreaSelection, transportAreaCoverage, transportAreaLatest, transportAreaOfMapId, transportAreaSelectionHash, transportMapId, transportRegionHref, parseTransportAreaHash, type TransportArea } from "../../lib/explorer/transportAreas";
+import { TRANSPORT_REGIONS_HREF, buildTransportAreaModel, changeTransportAreaSelection, transportAreaCoverage, transportAreaCrawlStates, transportAreaLatest, transportAreaOfMapId, transportAreaSelectionHash, transportMapId, transportRegionHref, parseTransportAreaHash, type TransportArea } from "../../lib/explorer/transportAreas";
 import { buildTransportWorkbookExportModel } from "../../lib/explorer/transportWorkbook";
 import { updatedDate } from "../../lib/explorer/coverageLabel";
 import { formatInUnit } from "../../lib/explorer/format";
@@ -17,6 +17,7 @@ import { pageHref } from "../../lib/i18n/routes";
 import { ModeTabs } from "../explorer-shell/mode-tabs";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { ChartShareButton } from "../explorer-shell/chart-share-button";
+import { CrawlTables } from "../explorer-shell/crawl-tables";
 import { ExplorerHeading } from "../explorer-shell/explorer-heading";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { LatestValueLine } from "../explorer-shell/latest-value-line";
@@ -65,6 +66,9 @@ export function TransportAreaExplorer({ area, facts, labels, areaLabels, sources
   const latest = transportAreaLatest(area, facts);
   const areaName = areaLabels[area];
   const title = t("page.area.regionTitle", { region: areaName });
+  // Every unit of the area's list, every row of it over its years, for the hidden crawl tables: built from the props alone, so a click never rebuilds them.
+  const crawlModels = useMemo(() => transportAreaCrawlStates(area, facts).map(crawl =>
+    buildTransportWorkbookExportModel({ area, facts, state: crawl, labels, sources, siteOrigin, title }, presentation)), [area, facts, labels, sources, siteOrigin, title, presentation]);
   // The chart is named after the heading of the selection's unit (its text before the unit).
   const chartLabel = `${t(`heading.${model.unit === "km" ? "roads" : "registered"}`).split(" · ")[0]} · ${areaName}`;
   // Links to another area's page carry the selection, moved to that area, and nothing else.
@@ -98,7 +102,8 @@ export function TransportAreaExplorer({ area, facts, labels, areaLabels, sources
             <span data-testid="transport-unit-label" className="text-[11px] text-[var(--muted)]">{unitLabel}</span>
           </div>
           {!model.selected.length ? <div className="mt-5"><Callout testId="no-selection-callout">{t("emptySelection")}</Callout></div>
-            : <><ExplorerTable caption={`${chartLabel} · ${unitLabel} · ${model.range.start}–${model.range.end}`} rows={rows.filter(row => row !== total)} totalRow={total} showTotal={Boolean(total)} totalFirst wrapRowLabels rowLabelsLocalized years={model.years} firstColumnLabel={t("series")} unit={unit} share={false} showChangeColumn={false} shareValueForYear={() => null} crawlCopy={state.mode === "line"} />{state.mode === "line" ? <div className="mt-5">{chart}</div> : null}</>}
+            : state.mode === "line" ? <div className="mt-5">{chart}</div>
+            : <ExplorerTable caption={`${chartLabel} · ${unitLabel} · ${model.range.start}–${model.range.end}`} rows={rows.filter(row => row !== total)} totalRow={total} showTotal={Boolean(total)} totalFirst wrapRowLabels rowLabelsLocalized years={model.years} firstColumnLabel={t("series")} unit={unit} share={false} showChangeColumn={false} shareValueForYear={() => null} />}
           <ChartSelectionAids series={lineSeries} chartShown={state.mode === "line"} share={false} unit={unit} formatValue={valueLabel} />
           <RangeStrip years={transportAreaCoverage(area, facts, state.selectedIds).years} range={model.range} onChange={patch => update(s => ({ ...s, range: rangeFromPatch(buildTransportAreaModel(area, facts, s).range, patch) }))} />
         </section>
@@ -115,5 +120,6 @@ export function TransportAreaExplorer({ area, facts, labels, areaLabels, sources
           await downloadWorkbook(buildTransportWorkbookExportModel({ area, facts, state, labels, sources, siteOrigin, title }, presentation));
         }} />} />
     </ExplorerWorkspace>
+    <CrawlTables models={crawlModels} />
   </div>;
 }

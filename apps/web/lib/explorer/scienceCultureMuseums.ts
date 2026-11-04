@@ -5,6 +5,7 @@ import {
   type ScienceCultureListModel, type ScienceCultureSeriesDefinition,
 } from "./scienceCulture";
 import type { TopicState } from "./topicSeries";
+import { unitListCrawlStates } from "./unitList";
 
 /** The areas with a page: Georgia, then the eleven regions. */
 export const MUSEUM_AREAS = ["georgia", ...SCIENCE_CULTURE_REGIONS] as const;
@@ -41,6 +42,10 @@ export const museumAreaDefaultSelection = (area: MuseumArea): string[] => [museu
 /** An area's years for a selection (any of the area's series when nothing is selected). */
 export const museumAreaCoverage = (area: MuseumArea, facts: readonly ClientScienceCultureFact[], selectedIds: readonly string[] = []) =>
   scienceCultureListCoverage(museumAreaSeries(area), selectedIds, facts);
+
+/** The hidden crawl tables' states: each unit of the area's list (visitors in thousands, the counts), every row of it with facts. */
+export const museumAreaCrawlStates = (area: MuseumArea, facts: readonly ClientScienceCultureFact[]): TopicState[] =>
+  unitListCrawlStates(museumAreaSeries(area), facts);
 
 /** Reads the view of the page for `area`: its selection, kept to one unit, and the years. */
 export const parseMuseumAreaHash = (hash: string, area: MuseumArea, facts: readonly ClientScienceCultureFact[]): TopicState =>

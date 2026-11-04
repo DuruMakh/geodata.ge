@@ -16,6 +16,7 @@ import type { TemplateValues } from "../../lib/i18n/types";
 import type { ClientDemographyObservation } from "../../lib/servedRows";
 import { ModeTabs } from "../explorer-shell/mode-tabs";
 import { ChartShareButton } from "../explorer-shell/chart-share-button";
+import { CrawlTables } from "../explorer-shell/crawl-tables";
 import { ExplorerTable } from "../main-explorer/explorer-table";
 import { HeroKpi, KPI_GRID_CLASS, SideKpiList } from "../main-explorer/kpi-blocks";
 import { StackedColumnChart } from "../main-explorer/stacked-column-chart";
@@ -47,6 +48,9 @@ export function VitalSection({
   const t = (key: string, values?: TemplateValues) => message(messages, `demography.${key}`, values);
   const [mode, setMode] = useState<ChartMode>("line");
   const model = useMemo(() => buildVitalPlaceModel(facts, place.id), [facts, place.id]);
+  // Births, deaths and natural increase over every year, for the hidden crawl tables: built from the props alone, so a click never rebuilds them.
+  const crawlModels = useMemo(() => (model ? [buildVitalWorkbookExportModel({ facts, place, sources, siteOrigin, scope: workbookScope }, presentation)] : []),
+    [model, facts, place, sources, siteOrigin, workbookScope, presentation]);
   if (!model) return null;
   const name = placeLabel(place, locale);
   const [first, last] = [model.years[0]!, model.years.at(-1)!];
@@ -88,7 +92,7 @@ export function VitalSection({
       <div data-testid="vital-chart-panel" data-mode={mode} className="mt-5">
         <ModeTabs value={mode} onChange={setMode} testId="vital" lineLabel={t("columns")} />
         <div className="mt-5">
-          <ExplorerTable
+          {mode === "line" ? chart : <ExplorerTable
             caption={t("vitalTableCaption", { place: name, first, last })}
             rows={[
               { itemId: "vital.births", kaLabel: t("vitalBirths"), color: BIRTHS, valuesByYear: model.births },
@@ -104,9 +108,7 @@ export function VitalSection({
             share={false}
             showChangeColumn={false}
             shareValueForYear={() => null}
-            crawlCopy={mode === "line"}
-          />
-          {mode === "line" ? chart : null}
+          />}
         </div>
       </div>
       <div className="mt-[18px] flex flex-wrap items-start justify-between gap-4">
@@ -140,6 +142,7 @@ export function VitalSection({
       >
         {t("vitalCompare")}
       </Link>
+      <CrawlTables models={crawlModels} />
     </section>
   );
 }

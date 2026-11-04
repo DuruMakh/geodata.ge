@@ -6,7 +6,7 @@ import { INK } from "./colors";
 import { MISSING, formatInUnit, type ValueUnit } from "./format";
 import type { ResolvedPeriodRange } from "./periodRange";
 import { buildTopicModel, serializeTopicHash, topicSeriesColor, type TopicSeriesModel, type TopicState } from "./topicSeries";
-import { changeUnitListSelection, parseUnitListHash, unitListCoverage } from "./unitList";
+import { changeUnitListSelection, parseUnitListHash, unitListCoverage, unitListCrawlStates } from "./unitList";
 
 export const TRANSPORT_HUB_PATH = "/explorer/transport";
 export const TRANSPORT_SECTIONS = [
@@ -99,6 +99,10 @@ export const changeTransportSelection = (state: TopicState, definitions: readonl
 /** A topic page's years for its selection. */
 export const transportCoverage = (section: TransportTopicId, facts: readonly ClientTransportFact[], selectedIds: readonly string[] = []) =>
   transportListCoverage(transportTopicSeries(section), selectedIds, facts);
+
+/** The hidden crawl tables' states: each unit of the page's list (per person kept: the page lists no population), every row of it with facts. */
+export const transportCrawlStates = (section: TransportTopicId, facts: readonly ClientTransportFact[]): TransportState[] =>
+  unitListCrawlStates(transportTopicSeries(section), facts);
 
 export const parseTransportHash = (hash: string, section: TransportTopicId, facts: readonly ClientTransportFact[]): TransportState =>
   parseTransportListHash(hash, transportTopicSeries(section), transportDefaultSelection(section), facts);

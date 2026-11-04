@@ -74,6 +74,15 @@ export function parseMigrationHash(hash: string, facts: readonly ClientMigration
   };
 }
 
+/**
+ * The hidden crawl tables' states: each sex (its workbook holds every group's arrivals and departures and the net), over
+ * every year. The table's direction tab is not a view: the workbook has both directions. A sex without arrivals has none.
+ */
+export function migrationCrawlStates(facts: readonly ClientMigrationFact[]): MigrationState[] {
+  return MIGRATION_SEXES.filter((sex) => facts.some((fact) => fact.seriesId === SERIES.immigrantsByCitizenshipGroup && fact.sex === sex))
+    .map((sex) => ({ ...DEFAULT_MIGRATION_STATE, selectedIds: [...MIGRATION_GROUPS], sex }));
+}
+
 export function serializeMigrationHash(state: MigrationState): string {
   const params = new URLSearchParams({ view: state.mode });
   if (state.selectedIds.length !== MIGRATION_GROUPS.length) params.set("sel", state.selectedIds.join(","));

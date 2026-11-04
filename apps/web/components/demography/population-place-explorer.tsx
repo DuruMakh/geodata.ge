@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useMemo, useState, type ReactNode } from "react";
 import { CENSUS_STEP } from "../../lib/data/demography/series";
 import { partsOf, placeColor, placeLabel, type DemographyPlace } from "../../lib/explorer/demographyAreas";
-import { buildPopulationHighlights, buildPopulationModel, placeYears, populationBasisKey } from "../../lib/explorer/demographyPopulation";
+import { buildPopulationHighlights, buildPopulationModel, placeYears, populationBasisKey, populationPlaceCrawlQueries } from "../../lib/explorer/demographyPopulation";
 import { buildPopulationWorkbookExportModel } from "../../lib/explorer/demographyPopulationWorkbook";
 import { formatInUnit, thousandsUnit, UNIT_PERSONS } from "../../lib/explorer/format";
 import type { WorkbookPublicSource } from "../../lib/explorer/workbookModel";
@@ -19,6 +19,7 @@ import { ExcelDownloadButton } from "../explorer/excel-download-button";
 import { ModeTabs } from "../explorer-shell/mode-tabs";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { ChartShareButton } from "../explorer-shell/chart-share-button";
+import { CrawlTables } from "../explorer-shell/crawl-tables";
 import { useAppReady } from "../explorer-shell/use-app-ready";
 import { EditorialLineChart } from "../main-explorer/editorial-line-chart";
 import { ExplorerTable } from "../main-explorer/explorer-table";
@@ -91,6 +92,9 @@ export function PopulationPlaceExplorer({
     [facts, places, state.selectedIds, state.range.start, state.range.end, locale],
   );
   const highlights = useMemo(() => buildPopulationHighlights(model, facts, places, place.id), [model, facts, places, place.id]);
+  // The place and every part it lists over the place's years, for the hidden crawl tables: built from the props alone, so a click never rebuilds them.
+  const crawlModels = useMemo(() => populationPlaceCrawlQueries(facts, place, places).map((crawl) =>
+    buildPopulationWorkbookExportModel(facts, places, crawl, presentation, sources, siteOrigin, workbookScope, place.id)), [facts, place, places, presentation, sources, siteOrigin, workbookScope]);
   // The tick-list: the page's own place first whatever its value (the total stays first), then its parts in the order the model ranks them.
   const listed = useMemo(
     () => [place, ...model.ranked.filter((candidate) => candidate.id !== place.id && listedIds.has(candidate.id))],
@@ -159,8 +163,7 @@ export function PopulationPlaceExplorer({
                 <div className="mt-5"><Callout testId="no-range-data-callout">{message(messages, "main.noRangeData")}</Callout></div>
               ) : (
                 <>
-                {/* The crawl copy comes first: the phone legend is the element right after the chart's wrapper (globals.css). */}
-                <ExplorerTable
+                {state.chartMode === "table" ? <ExplorerTable
                   // The census re-base sentence is the note right under the chart panel, not repeated here (U26-12).
                   caption={`${t("tableCaption")} · ${model.range.start}–${model.range.end}`}
                   rows={model.rows.filter((row) => row.itemId !== place.id)}
@@ -177,8 +180,7 @@ export function PopulationPlaceExplorer({
                   breakYears={[CENSUS_STEP.toYear]}
                   breakLabel={breakLabel}
                   shareValueForYear={() => null}
-                  crawlCopy={state.chartMode === "line"}
-                />
+                /> : null}
                 {state.chartMode === "line" ? chart : null}
                 </>
               )}
@@ -264,6 +266,7 @@ export function PopulationPlaceExplorer({
         }
       />
       {highlights ? <PopulationHighlightsSection highlights={highlights} densityNote={densityNote} /> : null}
+      <CrawlTables models={crawlModels} />
     </>
   );
 }

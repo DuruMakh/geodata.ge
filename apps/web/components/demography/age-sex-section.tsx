@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { INK } from "../../lib/explorer/colors";
-import { bandShares, censusPyramid, urbanShare, type AgeMeasure } from "../../lib/explorer/demographyAgeSex";
+import { bandShares, censusCrawlSettlements, censusPyramid, urbanShare, type AgeMeasure } from "../../lib/explorer/demographyAgeSex";
 import { buildCensusPlaceWorkbookExportModel } from "../../lib/explorer/demographyAgeSexWorkbook";
 import { GEORGIA_PLACE_ID, placeLabel, type DemographyPlace } from "../../lib/explorer/demographyAreas";
 import { formatInUnit, formatShare, UNIT_PERSONS } from "../../lib/explorer/format";
@@ -16,6 +16,7 @@ import type { TemplateValues } from "../../lib/i18n/types";
 import type { ClientAgeFact } from "../../lib/servedRows";
 import { ModeTabs } from "../explorer-shell/mode-tabs";
 import { ChartShareButton } from "../explorer-shell/chart-share-button";
+import { CrawlTables } from "../explorer-shell/crawl-tables";
 import { CENSUS_YEAR } from "../../lib/data/demography/series";
 import { HeroKpi, KPI_GRID_CLASS, SideKpiList } from "../main-explorer/kpi-blocks";
 import { SectionTitle, SegmentedTabs, SourceNote, TextTab, TextTabGroup } from "../ui/editorial";
@@ -57,6 +58,9 @@ export function AgeSexSection({
   const [mode, setMode] = useState<ChartMode>("line");
   const whole = useMemo(() => (facts.length === 0 ? null : censusPyramid(facts, "total")), [facts]);
   const pyramid = useMemo(() => (facts.length === 0 ? null : censusPyramid(facts, settlement)), [facts, settlement]);
+  // Each settlement's counts by age and sex (the shares divide them by the total row), for the hidden crawl tables: built from the props alone, so a click never rebuilds them.
+  const crawlModels = useMemo(() => censusCrawlSettlements(facts).map((crawl) =>
+    buildCensusPlaceWorkbookExportModel({ facts, sources, siteOrigin, place, settlement: crawl, scope: workbookScope }, presentation)), [facts, sources, siteOrigin, place, workbookScope, presentation]);
   if (whole === null || pyramid === null) return null;
   const name = placeLabel(place, locale);
   const date = t("censusDate");
@@ -127,6 +131,7 @@ export function AgeSexSection({
       >
         {t(isGeorgia ? "ageSexGeorgiaLink" : "ageSexNationalLink", { first: firstYear })}
       </Link>
+      <CrawlTables models={crawlModels} />
     </section>
   );
 }

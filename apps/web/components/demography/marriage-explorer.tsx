@@ -6,6 +6,7 @@ import { updatedDate } from "../../lib/explorer/coverageLabel";
 import {
   buildMarriageModel,
   changeMarriageSelection,
+  marriageCrawlStates,
   parseMarriageHash,
   serializeMarriageHash,
   type MarriageMeasure,
@@ -22,6 +23,7 @@ import { pageHref } from "../../lib/i18n/routes";
 import { ModeTabs } from "../explorer-shell/mode-tabs";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { ChartShareButton } from "../explorer-shell/chart-share-button";
+import { CrawlTables } from "../explorer-shell/crawl-tables";
 import { ExplorerHeading } from "../explorer-shell/explorer-heading";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { LatestFigure, LatestValueLine } from "../explorer-shell/latest-value-line";
@@ -73,6 +75,9 @@ export function MarriageExplorer({ place, labels, listLabels, sources, lastRevie
   const latestOf = (id: string) => place.facts.filter((fact) => fact.indicatorId === id).sort((a, b) => a.year - b.year).at(-1)!;
   const [marriages, divorces] = [latestOf("marriages"), latestOf("divorces")];
   const title = t("marriagesTitle");
+  // Counts and years as published, counts per 1,000, every row over its years, for the hidden crawl tables: built from the props alone, so a click never rebuilds them.
+  const crawlModels = useMemo(() => marriageCrawlStates(place).map((crawl) =>
+    buildMarriageWorkbookExportModel({ place, state: crawl, labels, sources, siteOrigin, title, scope: "georgia" }, presentation)), [place, labels, sources, siteOrigin, title, presentation]);
   const changeMeasure = (measure: MarriageMeasure) => {
     if (measure !== state.measure) update((s) => ({ ...s, measure }), true);
   };
@@ -109,8 +114,9 @@ export function MarriageExplorer({ place, labels, listLabels, sources, lastRevie
               </div>
             </div>
             {!model.selected.length ? <div className="mt-5"><Callout testId="no-selection-callout">{t("marriageEmpty")}</Callout></div>
-              : <><ExplorerTable caption={`${title} · ${unitLabel} · ${model.range.start}–${model.range.end}`} rows={rows} totalRow={null} showTotal={false} wrapRowLabels rowLabelsLocalized years={model.years} firstColumnLabel={t("seriesHeader")} unit={unit} share={false} showChangeColumn={false} shareValueForYear={() => null}
-                breakYears={model.breaks.map((item) => item.year)} breakLabel={breakLabel} crawlCopy={state.mode === "line"} />{state.mode === "line" ? <div className="mt-5">{chart}</div> : null}</>}
+              : state.mode === "line" ? <div className="mt-5">{chart}</div>
+              : <ExplorerTable caption={`${title} · ${unitLabel} · ${model.range.start}–${model.range.end}`} rows={rows} totalRow={null} showTotal={false} wrapRowLabels rowLabelsLocalized years={model.years} firstColumnLabel={t("seriesHeader")} unit={unit} share={false} showChangeColumn={false} shareValueForYear={() => null}
+                breakYears={model.breaks.map((item) => item.year)} breakLabel={breakLabel} />}
             <ChartSelectionAids series={lineSeries} chartShown={state.mode === "line"} share={false} unit={unit} formatValue={valueLabel} />
             <RangeStrip years={years} range={model.range} onChange={(patch) => update((s) => ({ ...s, range: rangeFromPatch(buildMarriageModel(place, s).range, patch) }))} />
           </section>
@@ -122,6 +128,7 @@ export function MarriageExplorer({ place, labels, listLabels, sources, lastRevie
           selectedIds={state.selectedIds} onSelectionChange={(selectedIds) => update((s) => changeMarriageSelection(s, selectedIds, place), true)}
           query={query} onQueryChange={setQuery} searchPlaceholder={t("marriageSearch")} searchable={model.series.length > SEARCHABLE_MIN_ROWS} />
       </ExplorerWorkspace>
+      <CrawlTables models={crawlModels} />
     </div>
   );
 }

@@ -6,7 +6,7 @@ import { INK, colorForItem } from "./colors";
 import { formatInUnit, type ValueUnit } from "./format";
 import type { ResolvedPeriodRange } from "./periodRange";
 import { buildTopicModel, serializeTopicHash, topicSeriesColor, type TopicSeriesModel, type TopicState } from "./topicSeries";
-import { changeUnitListSelection, parseUnitListHash, unitListCoverage } from "./unitList";
+import { changeUnitListSelection, parseUnitListHash, unitListCoverage, unitListCrawlStates } from "./unitList";
 
 export const INTERNET_HUB_PATH = "/explorer/internet";
 export const INTERNET_SECTIONS = [
@@ -81,6 +81,12 @@ const headingOf = (definitions: readonly InternetSeriesDefinition[]) => {
 export const internetCoverage = (section: InternetTopicId, facts: readonly ClientInternetFact[], selectedIds: readonly string[] = []) => {
   const definitions = internetTopicSeries(section);
   return unitListCoverage(definitions, selectedIds, facts, noInternetYears(definitions), headingOf(definitions));
+};
+
+/** The hidden crawl tables' states: each heading of the page's list (one group of people each), every row of it with facts. */
+export const internetCrawlStates = (section: InternetTopicId, facts: readonly ClientInternetFact[]): InternetState[] => {
+  const definitions = internetTopicSeries(section);
+  return unitListCrawlStates(definitions, facts, headingOf(definitions));
 };
 
 /** Reads a topic page's hash: a selection that mixes headings keeps only its first row's heading, and the years fit that heading. */

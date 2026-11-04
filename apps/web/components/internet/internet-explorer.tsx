@@ -3,7 +3,7 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import { updatedDate } from "../../lib/explorer/coverageLabel";
 import type { ClientInternetFact } from "../../lib/data/internet/types";
-import { INTERNET_PERCENT, buildInternetModel, changeInternetSelection, internetCoverage, internetPercent, internetSeriesLabel, parseInternetHash, serializeInternetHash, type InternetSeriesModel, type InternetTopicId, type InternetTranslate } from "../../lib/explorer/internet";
+import { INTERNET_PERCENT, buildInternetModel, changeInternetSelection, internetCoverage, internetCrawlStates, internetPercent, internetSeriesLabel, parseInternetHash, serializeInternetHash, type InternetSeriesModel, type InternetTopicId, type InternetTranslate } from "../../lib/explorer/internet";
 import { buildInternetWorkbookExportModel } from "../../lib/explorer/internetWorkbook";
 import { MISSING, formatInUnit } from "../../lib/explorer/format";
 import { rangeFromPatch } from "../../lib/explorer/periodRange";
@@ -15,6 +15,7 @@ import { pageHref } from "../../lib/i18n/routes";
 import { ModeTabs } from "../explorer-shell/mode-tabs";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { ChartShareButton } from "../explorer-shell/chart-share-button";
+import { CrawlTables } from "../explorer-shell/crawl-tables";
 import { ExplorerHeading } from "../explorer-shell/explorer-heading";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { LatestFigure, LatestValueLine } from "../explorer-shell/latest-value-line";
@@ -56,6 +57,9 @@ export function InternetExplorer({ section, facts, labels, sources, lastReviewed
   // The latest-value line is the page's headline (its default series), whatever the list shows.
   const latest = facts.filter(f => f.indicatorId === model.series[0].id).sort((a, b) => a.year - b.year).at(-1)!;
   const unitLabel = t("unitPercent");
+  // Every heading of the list, every row of it over its years, for the hidden crawl tables: built from the props alone, so a click never rebuilds them.
+  const crawlModels = useMemo(() => internetCrawlStates(section, facts).map(crawl =>
+    buildInternetWorkbookExportModel({ section, facts, state: crawl, labels, sources, siteOrigin, title }, presentation)), [section, facts, labels, sources, siteOrigin, title, presentation]);
   const downloadAction = <ExcelDownloadButton testId="internet-excel-download" disabled={!model.selected.length} onDownload={async () => {
     const { downloadWorkbook } = await import("../../lib/explorer/workbookWriter.client");
     await downloadWorkbook(buildInternetWorkbookExportModel({ section, facts, state, labels, sources, siteOrigin, title }, presentation));
@@ -74,7 +78,8 @@ export function InternetExplorer({ section, facts, labels, sources, lastReviewed
             <span data-testid="internet-unit-label" className="text-[11px] text-[var(--muted)]">{unitLabel}</span>
           </div>
           {!model.selected.length ? <div className="mt-5"><Callout testId="no-selection-callout">{t("emptySelection")}</Callout></div>
-            : <><ExplorerTable caption={`${chartLabel} · ${unitLabel} · ${model.range.start}–${model.range.end}`} rows={rows.filter(row => row !== total)} totalRow={total} showTotal={Boolean(total)} totalFirst wrapRowLabels rowLabelsLocalized years={model.years} firstColumnLabel={t("series")} unit={INTERNET_PERCENT} share={false} showChangeColumn={false} shareValueForYear={() => null} crawlCopy={state.mode === "line"} />{state.mode === "line" ? <div className="mt-5">{chart}</div> : null}</>}
+            : state.mode === "line" ? <div className="mt-5">{chart}</div>
+            : <ExplorerTable caption={`${chartLabel} · ${unitLabel} · ${model.range.start}–${model.range.end}`} rows={rows.filter(row => row !== total)} totalRow={total} showTotal={Boolean(total)} totalFirst wrapRowLabels rowLabelsLocalized years={model.years} firstColumnLabel={t("series")} unit={INTERNET_PERCENT} share={false} showChangeColumn={false} shareValueForYear={() => null} />}
           <ChartSelectionAids series={lineSeries} chartShown={state.mode === "line"} share={false} unit={INTERNET_PERCENT} formatValue={valueLabel} />
           <RangeStrip years={internetCoverage(section, facts, state.selectedIds).years} range={model.range} onChange={patch => update(s => ({ ...s, range: rangeFromPatch(buildInternetModel(section, facts, s).range, patch) }))} />
         </section>
@@ -88,5 +93,6 @@ export function InternetExplorer({ section, facts, labels, sources, lastReviewed
         totalId={model.series[0].id} pinTotal selectedIds={state.selectedIds} onSelectionChange={selectedIds => update(s => changeInternetSelection(section, s, selectedIds, facts), true)}
         query={query} onQueryChange={setQuery} searchPlaceholder={t("search")} searchable={model.series.length > SEARCHABLE_MIN_ROWS} />
     </ExplorerWorkspace>
+    <CrawlTables models={crawlModels} />
   </div>;
 }

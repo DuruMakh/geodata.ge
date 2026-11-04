@@ -2,7 +2,7 @@ import { CRIME_INDICATORS, crimeFactKey, type ClientCrimeFact, type CrimeIndicat
 import { buildBreakRegister } from "../data/demography/breaks";
 import type { ResolvedPeriodRange } from "./periodRange";
 import { buildTopicModel, parseTopicHash, serializeTopicHash, topicCoverage, topicHashView, topicSeriesColor, type TopicCoverage, type TopicSeriesModel, type TopicState } from "./topicSeries";
-import { keepOneUnit } from "./unitList";
+import { keepOneUnit, unitListCrawlStates } from "./unitList";
 
 export const CRIME_HUB_PATH = "/explorer/crime";
 
@@ -106,6 +106,17 @@ export function serializeCrimeHash(state: CrimeState): string {
 /** Switching measure keeps the selection, range and mode: both views cover the same years. */
 export function changeCrimeMeasure(state: CrimeState, measure: CrimeMeasure): CrimeState {
   return { ...state, measure };
+}
+
+/**
+ * The hidden crawl tables' states: each unit of the list (Road accidents' accidents and people apart), as published counts
+ * and per 100,000 people (kept: the page lists no population). Without a population year the rates have no state.
+ */
+export function crimeCrawlStates(section: CrimeSectionId, facts: readonly ClientCrimeFact[], population: CrimePopulation): CrimeState[] {
+  const units = unitListCrawlStates(crimeSeries(section), facts);
+  const years = new Set(population.map(p => p.year));
+  const hasRates = (ids: readonly string[]) => facts.some(f => ids.includes(f.indicatorId) && years.has(f.year));
+  return MEASURES.flatMap(measure => units.filter(state => measure === "count" || hasRates(state.selectedIds)).map(state => ({ ...state, measure })));
 }
 
 export type CrimeSeriesModel = TopicSeriesModel<CrimeSeriesDefinition & { decimals: number }>;

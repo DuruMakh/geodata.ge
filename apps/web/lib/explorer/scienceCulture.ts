@@ -6,7 +6,7 @@ import { educationFullLabel } from "./education";
 import { MISSING, formatInUnit, type ValueUnit } from "./format";
 import type { ResolvedPeriodRange } from "./periodRange";
 import { serializeTopicHash, topicSeriesColor, type TopicSeriesModel, type TopicState } from "./topicSeries";
-import { buildUnitListModel, changeUnitListSelection, parseUnitListHash, unitListCoverage } from "./unitList";
+import { buildUnitListModel, changeUnitListSelection, parseUnitListHash, unitListCoverage, unitListCrawlStates } from "./unitList";
 
 export const SCIENCE_CULTURE_HUB_PATH = "/explorer/science-culture";
 export const SCIENCE_CULTURE_SECTIONS = [
@@ -112,6 +112,10 @@ export const changeScienceCultureSelection = (state: TopicState, definitions: re
 /** A topic page's years for its selection. */
 export const scienceCultureCoverage = (section: ScienceCultureTopicId, facts: readonly ClientScienceCultureFact[], selectedIds: readonly string[] = []) =>
   scienceCultureListCoverage(scienceCultureTopicSeries(section), selectedIds, facts);
+
+/** The hidden crawl tables' states (lib/explorer/crawlTables.ts): each unit of the page's list, every row of it with facts. */
+export const scienceCultureCrawlStates = (section: ScienceCultureTopicId, facts: readonly ClientScienceCultureFact[]): ScienceCultureState[] =>
+  unitListCrawlStates(scienceCultureTopicSeries(section), facts);
 
 export const parseScienceCultureHash = (hash: string, section: ScienceCultureTopicId, facts: readonly ClientScienceCultureFact[]): ScienceCultureState =>
   parseScienceCultureListHash(hash, scienceCultureTopicSeries(section), scienceCultureDefaultSelection(section), facts);

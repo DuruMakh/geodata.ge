@@ -3,7 +3,7 @@ import { SERIES, SOURCE_ID } from "../data/demography/series";
 import type { ServedDemographyObservation } from "../data/demography/types";
 import type { ResolvedPeriodRange } from "./periodRange";
 import { buildTopicModel, parseTopicHash, serializeTopicHash, topicCoverage, topicHashView, topicSeriesColor, type TopicSeriesModel, type TopicState } from "./topicSeries";
-import { keepOneUnit } from "./unitList";
+import { keepOneUnit, unitListCrawlStates } from "./unitList";
 
 // The marriages and divorces page and the place pages' section: Georgia's counts with its average ages and marriage
 // length, and every place's counts, as published or per 1,000 residents of Geostat's mid-year population.
@@ -111,6 +111,20 @@ export function serializeMarriageHash(state: MarriageState): string {
 /** A new selection, kept to counts or to years. */
 export function changeMarriageSelection(state: MarriageState, next: readonly string[], place: MarriagePlaceFacts): MarriageState {
   return { ...state, selectedIds: keepOneUnit(next, state.selectedIds, place.facts, groupOf) };
+}
+
+/**
+ * The hidden crawl tables' states: the counts and the years (ages, length) the place has, as published, and the counts per
+ * 1,000 residents (kept: the page lists no population; the years read the same in both measures). Without a mid-year
+ * population the rates have no state.
+ */
+export function marriageCrawlStates(place: MarriagePlaceFacts): MarriageState[] {
+  const groups = unitListCrawlStates(definitionsOf(place), place.facts, groupOf);
+  const counts = groups.filter((state) => groupOf(state.selectedIds[0]!) === "count");
+  return [
+    ...groups.map((state) => ({ ...state, measure: "count" as const })),
+    ...(place.midYear.length ? counts.map((state) => ({ ...state, measure: "per1000" as const })) : []),
+  ];
 }
 
 export type MarriageSeriesModel = TopicSeriesModel<MarriageSeriesDefinition>;

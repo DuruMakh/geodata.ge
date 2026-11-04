@@ -1,12 +1,12 @@
 "use client";
 import Link from "next/link";
-import { useCallback, type ReactNode } from "react";
+import { useCallback, useMemo, type ReactNode } from "react";
 import type { ClientEducationFact } from "../../lib/data/education/types";
 import { updatedDate } from "../../lib/explorer/coverageLabel";
 import { placeLabel, type DemographyPlace } from "../../lib/explorer/demographyAreas";
 import { educationFullLabel, educationPeriodLabel, serializeEducationHash } from "../../lib/explorer/education";
 import {
-  buildEducationPlaceModel, changeEducationPlaceSelection, educationPlaceCoverage, educationPlaceLinkHash, educationPlaceList, parseEducationPlaceHash, type EducationPlaceSet,
+  buildEducationPlaceModel, changeEducationPlaceSelection, educationPlaceCoverage, educationPlaceCrawlStates, educationPlaceLinkHash, educationPlaceList, parseEducationPlaceHash, type EducationPlaceSet,
 } from "../../lib/explorer/educationPlaces";
 import { buildEducationWorkbookExportModel } from "../../lib/explorer/educationWorkbook";
 import { formatInUnit, thousandsUnit, UNIT_PERSONS, type ValueUnit } from "../../lib/explorer/format";
@@ -18,6 +18,7 @@ import { pageHref } from "../../lib/i18n/routes";
 import { ExcelDownloadButton } from "../explorer/excel-download-button";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { ChartShareButton } from "../explorer-shell/chart-share-button";
+import { CrawlTables } from "../explorer-shell/crawl-tables";
 import { FlatSeriesPanel } from "../explorer-shell/flat-series-panel";
 import { LatestValueLine } from "../explorer-shell/latest-value-line";
 import { ModeTabs } from "../explorer-shell/mode-tabs";
@@ -91,6 +92,10 @@ export function EducationPlaceExplorer({
   const reference = model.series.find(series => series.reference);
   const placeName = placeLabel(place, locale);
   const chartLabel = `${headingLabels[model.heading]} · ${placeName}`;
+  // Every heading the place lists, every row of it over its years, for the hidden crawl tables: built from the props alone, so a click never rebuilds them.
+  const crawlModels = useMemo(() => educationPlaceCrawlStates(set, place.id, facts).map(crawl => buildEducationWorkbookExportModel({
+    set, placeId: place.id, scope: workbookScope, facts, state: crawl, labels, headingLabels, sources, siteOrigin, title: `${title} ${placeName}`,
+  }, presentation)), [set, place.id, workbookScope, facts, labels, headingLabels, sources, siteOrigin, title, placeName, presentation]);
   // Links to another place's page carry the mode, the years and the selection, moved to that place (its parse refits the years).
   const withState = (href: string, placeId: string) => `${href}${educationPlaceLinkHash(state, set, placeId)}`;
   const overrides = { ...pickerOverrides, hrefById: Object.fromEntries(Object.entries(pickerOverrides.hrefById).map(([id, href]) => [id, withState(href, id)])) };
@@ -112,7 +117,8 @@ export function EducationPlaceExplorer({
             <span data-testid="education-unit-label" className="text-[11px] text-[var(--muted)]">{unitLabel}</span>
           </div>
           {!model.selected.length ? <div className="mt-5"><Callout testId="no-selection-callout">{t("emptySelection")}</Callout></div>
-            : <><ExplorerTable caption={`${chartLabel} · ${unitLabel} · ${period(model.range.start)}–${period(model.range.end)}`} rows={rows.filter(row => row !== total)} totalRow={total} showTotal={Boolean(total)} totalFirst wrapRowLabels rowLabelsLocalized years={model.years} yearLabel={period} firstColumnLabel={t("series")} unit={unit} share={false} showChangeColumn={false} shareValueForYear={() => null} crawlCopy={state.mode === "line"} />{state.mode === "line" ? <div className="mt-5">{chart}</div> : null}</>}
+            : state.mode === "line" ? <div className="mt-5">{chart}</div>
+            : <ExplorerTable caption={`${chartLabel} · ${unitLabel} · ${period(model.range.start)}–${period(model.range.end)}`} rows={rows.filter(row => row !== total)} totalRow={total} showTotal={Boolean(total)} totalFirst wrapRowLabels rowLabelsLocalized years={model.years} yearLabel={period} firstColumnLabel={t("series")} unit={unit} share={false} showChangeColumn={false} shareValueForYear={() => null} />}
           <ChartSelectionAids series={lineSeries} chartShown={state.mode === "line"} share={false} unit={unit} formatValue={valueLabel} />
           <RangeStrip years={educationPlaceCoverage(set, place.id, facts, state.selectedIds).years} range={model.range} formatPeriod={period}
             onChange={patch => update(s => ({ ...s, range: rangeFromPatch(buildEducationPlaceModel(set, place.id, facts, s).range, patch) }))} />
@@ -134,5 +140,6 @@ export function EducationPlaceExplorer({
           const { downloadWorkbook } = await import("../../lib/explorer/workbookWriter.client");
           await downloadWorkbook(buildEducationWorkbookExportModel({ set, placeId: place.id, scope: workbookScope, facts, state, labels, headingLabels, sources, siteOrigin, title: `${title} ${placeName}` }, presentation));
         }} />} />} />
+    <CrawlTables models={crawlModels} />
   </div>;
 }
