@@ -52,5 +52,6 @@
   "controls.share.native": "გაზიარება…",
   "controls.share.working": "სურათი მზადდება…",
   "controls.share.copied": "სურათი დაკოპირდა",
-  "controls.share.error": "სურათი ვერ მომზადდა — სცადეთ თავიდან."
+  "controls.share.error": "სურათი ვერ მომზადდა — სცადეთ თავიდან.",
+  "controls.crawlTop": "პირველი {kept} {of}-დან; ყველა — Excel-ის ფაილში"
 }
