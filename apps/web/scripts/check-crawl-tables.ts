@@ -21,7 +21,7 @@ const NO_CRAWL_TABLES: Record<string, string> = {
 };
 
 const WRAPPER = '<div hidden="" data-testid="crawl-tables">';
-const CHART_PANEL = /data-testid="[\w-]*chart-panel"/;
+const CHART_PANEL = /data-testid="(?:[\w-]*chart-panel|municipal-chart-controls)"/;
 
 type Page = { route: string; html: string; wrappers: string[]; cells: number; gzip: number };
 
