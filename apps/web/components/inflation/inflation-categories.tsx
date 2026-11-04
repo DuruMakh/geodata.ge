@@ -102,8 +102,8 @@ export function InflationCategories({ facts, monthlyUrl, weights, headline, head
     [facts, monthly, weights],
   );
   const headlineByPeriod = useMemo(() => new Map(headline.map((row) => [row.period, row.value])), [headline]);
-  // The divisions' contributions and every category's changes over the last 36 months, for the hidden crawl tables: built from
-  // the props and the monthly runs once they arrive, never on a click.
+  // The divisions' contributions and every category's annual change over the last 36 months, for the hidden crawl tables:
+  // built from the props, never on a click (the monthly runs fetched after load add no table).
   const crawlModels = useMemo(() => categoryCrawlStates(index).map((crawl) => crawlMonthlyModel(buildInflationCategoryWorkbookExportModel({
     index, state: crawl, range: resolveCategoryRange(crawl, index), headline: headlineByPeriod, presentation, sources, siteOrigin,
   }))), [index, headlineByPeriod, presentation, sources, siteOrigin]);

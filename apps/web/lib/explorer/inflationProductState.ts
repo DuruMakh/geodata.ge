@@ -7,14 +7,6 @@ export type ProductState = {
   selected: string[];
 };
 
-/**
- * The hidden crawl tables' state (lib/explorer/crawlTables.ts): every product, over every year. The Summary sheet lists
- * every product whatever is ticked; the annual and cumulative switch only picks which of its two columns the chart draws.
- */
-export function productCrawlStates(index: ProductIndex): ProductState[] {
-  return [{ indicator: "annual", range: { startYear: index.earliestYear, endYear: index.defaultRange.endYear }, selected: rankProducts(index) }];
-}
-
 export function parseProductHash(hash: string, index: ProductIndex): ProductState {
   const params = new URLSearchParams(hash.replace(/^#/, ""));
   const indicator = params.get("i") === "cumulative" ? "cumulative" : "annual";

@@ -1,6 +1,5 @@
 import { beforeAll, describe, expect, it } from "vitest";
 import { loadServedInflationData } from "../../lib/data/inflation/importInflation";
-import { loadProductCatalogueCsv, loadProductFactsCsv } from "../../lib/data/inflation/importProducts";
 import { periodFromKey, periodYear } from "../../lib/data/inflation/periods";
 import { CPI_CITY_IDS, cityFactInput, type CityFactInput, type CpiCityMeasure } from "../../lib/data/inflation/types";
 import { loadMoneyBanksFacts, toClientMoneyBanksFact } from "../../lib/data/moneyBanks/importMoneyBanks";
@@ -15,10 +14,7 @@ import { GEORGIA_LINE_ID, buildCityIndex, cityCrawlStates, cityViewLineIds, reso
 import { GEORGIA_VIEW, type CityView } from "../../lib/explorer/inflationCityRoutes";
 import { buildInflationCityWorkbookExportModel } from "../../lib/explorer/inflationCityWorkbook";
 import { drawableKeys, indexInflationFacts, inflationCrawlStates, resolveInflationRange, type InflationIndex } from "../../lib/explorer/inflationOverview";
-import { productCrawlStates } from "../../lib/explorer/inflationProductState";
-import { buildProductIndex, packProductFacts, type ProductIndex } from "../../lib/explorer/inflationProducts";
-import { buildInflationProductWorkbookExportModel } from "../../lib/explorer/inflationProductWorkbook";
-import { buildInflationWorkbookExportModel, crawlMonthlyModel, type InflationWorkbookSource } from "../../lib/explorer/inflationWorkbook";
+import { buildInflationWorkbookExportModel, crawlMonthlyModel } from "../../lib/explorer/inflationWorkbook";
 import { MONEY_BANKS_SECTIONS, moneyBanksCrawlStates, moneyBanksViewSeries, type MoneyBanksTopicId } from "../../lib/explorer/moneyBanks";
 import { moneyBanksAreaCrawlStates, moneyBanksAreaSeries } from "../../lib/explorer/moneyBanksAreas";
 import { buildMoneyBanksWorkbookExportModel } from "../../lib/explorer/moneyBanksWorkbook";
@@ -37,9 +33,6 @@ const lastThirtySix = (range: { start: number; end: number; max: number; min: nu
 
 let en: Presentation;
 let data: Awaited<ReturnType<typeof loadServedInflationData>>;
-const productSources: InflationWorkbookSource[] = ["source.geostat_product_yoy", "source.geostat_product_mom"].map((sourceId) => ({
-  sourceId, language: "en", years: [2026], title: sourceId, organization: "Geostat", downloadHref: `/downloads/methodology/inflation/files/en/${sourceId}.xlsx`, retrievedAt: "2026-09-27",
-}));
 beforeAll(async () => {
   en = await getPresentation("en", ["format", "main", "workbook", "inflation", "moneyBanks"], []);
   data = await loadServedInflationData();
@@ -105,12 +98,8 @@ describe("inflation categories", () => {
     expect(models[0]!.readable.rows.some((row) => row.label.startsWith("The rest — "))).toBe(true);
   });
 
-  it("adds the monthly change once its runs have arrived", () => {
-    const index = indexOf(["yoy_pct", "mom_pct"]);
-    const states = categoryCrawlStates(index);
-    expect(states.map((state) => state.tab)).toEqual(["contrib", "yoy", "mom"]);
-    expect(new Set(states[2]!.selected)).toEqual(new Set(index.order));
-    for (const model of build(index)) expect(rowsOf(model)).toBeGreaterThanOrEqual(1);
+  it("adds no monthly-change table once its runs, fetched after load, have arrived", () => {
+    expect(categoryCrawlStates(indexOf(["yoy_pct", "mom_pct"])).map((state) => state.tab)).toEqual(["contrib", "yoy"]);
   });
 });
 
@@ -151,23 +140,6 @@ describe("inflation cities", () => {
     expect(cityCrawlStates(buildCityIndex(facts), view)[0]!.selected).not.toContain("cpi.cat.02");
     const others = data.cities.filter((fact) => fact.cityId !== "city.batumi" && isPageFact(fact)).map(cityFactInput);
     expect(cityCrawlStates(buildCityIndex(others), view)).toEqual([]);
-  });
-});
-
-describe("inflation products", () => {
-  let index: ProductIndex;
-  beforeAll(async () => {
-    const [catalogue, facts] = await Promise.all([loadProductCatalogueCsv(), loadProductFactsCsv()]);
-    index = buildProductIndex(catalogue, packProductFacts(facts));
-  });
-
-  it("every product, over every year", () => {
-    const states = productCrawlStates(index);
-    expect(states).toHaveLength(1);
-    expect(new Set(states[0]!.selected)).toEqual(new Set(index.products.map((product) => product.productId)));
-    expect(states[0]!.range).toEqual({ startYear: index.earliestYear, endYear: index.defaultRange.endYear });
-    const model = buildInflationProductWorkbookExportModel({ index, state: states[0]!, presentation: en, sources: productSources, siteOrigin: ORIGIN });
-    expect(rowsOf(model)).toBe(index.products.length);
   });
 });
 
