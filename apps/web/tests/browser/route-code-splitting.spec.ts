@@ -44,12 +44,12 @@ test("no topic hub loads explorer code", async ({ request }) => {
   }
 });
 
-test("expenditure and revenue load no analysis view, and the analysis no multi-year explorer", async ({ request }) => {
-  const testIds = ["series-excel", "budget-radar"];
+test("expenditure and revenue load no year in review, and the year in review no multi-year explorer", async ({ request }) => {
+  const testIds = ["series-excel", "year-ruler"];
   for (const path of ["/explorer/expenditure", "/explorer/revenue"]) {
     expect(await testIdsShipped(request, path, testIds), path).toEqual(["series-excel"]);
   }
-  expect(await testIdsShipped(request, "/explorer/analysis", testIds)).toEqual(["budget-radar"]);
+  expect(await testIdsShipped(request, "/explorer/analysis", testIds)).toEqual(["year-ruler"]);
 });
 
 test("the wages, household, causes-of-death, housing, museums, transport and internet map indexes load no explorer, and their pages no map index", async ({ request }) => {

@@ -26,6 +26,14 @@ describe("chart share coverage", () => {
     }
   });
 
+  it("every year-review section that draws a chart has one, and each drawing-only file is drawn by one of them", () => {
+    const sections = ["gives-up", "where-money-goes", "debt-deficit", "per-resident", "regions-dots", "long-view"].map((name) => `components/year-review/${name}.tsx`);
+    for (const file of sections) expect(read(file), file).toContain("<ChartShareButton");
+    for (const [drawing, caller] of [["waffle", "where-money-goes"], ["change-bars", "where-money-goes"], ["buys-treemap", "where-money-goes"], ["rate-lines", "debt-deficit"]]) {
+      expect(read(`components/year-review/${caller}.tsx`), drawing).toContain(`from "./${drawing}"`);
+    }
+  });
+
   it("the picture library is only loaded on demand", () => {
     for (const file of [...sourceFiles("components"), ...sourceFiles("lib"), ...sourceFiles("app")]) expect(read(file), file).not.toMatch(/from ["']modern-screenshot["']/);
     expect(read("lib/explorer/chartPicture.client.ts")).toContain('import("modern-screenshot")');

@@ -1,10 +1,8 @@
 import { describe, expect, it, vi } from "vitest";
-import { FullRanking } from "../../components/analysis/ranking";
 import { ExplorerView } from "../../components/main-explorer/explorer-view";
 import type { ExplorerModel } from "../../lib/explorer/explorerData";
 import { UNIT_BN } from "../../lib/explorer/format";
-import type { ExplorerItem, ExplorerTableRow, SnapshotItem } from "../../lib/explorer/types";
-import analysis from "../../lib/i18n/messages/ka/analysis.json";
+import type { ExplorerItem, ExplorerTableRow } from "../../lib/explorer/types";
 import format from "../../lib/i18n/messages/ka/format.json";
 import main from "../../lib/i18n/messages/ka/main.json";
 import { renderGeorgianMarkup } from "../helpers/render-localized";
@@ -92,19 +90,5 @@ describe("series names", () => {
     expect(indicators).toMatch(new RegExp(`\n${HEALTH}\n+, 2025\n`)); // largest share of GDP; its year is its own span
     expect(indicators.match(new RegExp(`\n${ROADS}\n`, "g"))?.length).toBeGreaterThanOrEqual(3);
     expect(legend + indicators).not.toContain("…");
-  });
-
-  it("long names reach the ranking in full at every width", () => {
-    const snapshot = (source: ExplorerItem, amountGel: number): SnapshotItem => ({
-      itemId: source.id, kaLabel: source.kaLabel, enLabel: source.enLabel, color: source.color, amountGel, shareOfTotal: amountGel / 9e9,
-      previousAmountGel: null, changeFromPreviousYear: null, amountChangeFromPreviousYear: null, basis: "actual",
-    });
-    const html = renderGeorgianMarkup(
-      <FullRanking rows={[snapshot(health, 6e9), snapshot(roads, 3e9)]} side="expenditure" grouping="fields" year={2025} />,
-      analysis,
-    );
-    const body = textOf(/<tbody>[\s\S]*<\/tbody>/.exec(html)![0]);
-    for (const name of [HEALTH, ROADS]) expect(body.match(new RegExp(`\n${name}\n`, "g")), name).toHaveLength(1);
-    expect(body).not.toContain("…");
   });
 });

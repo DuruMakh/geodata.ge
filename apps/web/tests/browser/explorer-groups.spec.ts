@@ -712,11 +712,11 @@ test.describe("the old topic hubs forward (Review Focus 3)", () => {
     await expect(page.locator("#t-wages")).toBeInViewport();
   });
 
-  test("/explorer#nav=analysis lands on Analysis", async ({ page }) => {
+  test("/explorer#nav=analysis lands on Year in review", async ({ page }) => {
     await page.goto("/explorer#nav=analysis");
     await expect.poll(() => address(page)).toBe("/explorer/analysis");
     await ready(page);
-    await expect(page.getByTestId("single-year-snapshot")).toBeVisible();
+    await expect(page.getByTestId("year-review")).toBeVisible();
   });
 });
 

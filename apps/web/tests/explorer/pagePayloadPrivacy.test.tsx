@@ -7,6 +7,7 @@ import { PopulationPlaceExplorer } from "../../components/demography/population-
 import { EconomicSectorsExplorer } from "../../components/economic-sectors/economic-sectors-explorer";
 import { MoneyFromAbroad } from "../../components/external/money-from-abroad";
 import { HouseholdExplorer } from "../../components/household/household-explorer";
+import { YearReviewPage } from "../../components/year-review/year-review-page";
 import { loadServedTradeProductsData } from "../../lib/data/tradeProducts/importTradeProducts";
 import { loadEnglishCatalogue } from "../../lib/i18n/catalogue.server";
 import { getMessages } from "../../lib/i18n/messages.server";
@@ -81,10 +82,11 @@ const count = (text: string, part: string) => text.split(part).length - 1;
 
 type PageRender = [string, (locale: Locale) => Promise<ReactNode>];
 
-const budgetPages: PageRender[] = [
-  ["expenditure", renderExpenditurePage],
-  ["revenue", renderRevenuePage],
-  ["analysis", renderAnalysisPage],
+// [page, render, a key its payload always carries]: the glossary for Expenditure and Revenue, the year-review data for Year in review.
+const budgetPages: [...PageRender, string][] = [
+  ["expenditure", renderExpenditurePage, '"kaLabel":'],
+  ["revenue", renderRevenuePage, '"kaLabel":'],
+  ["year in review", renderAnalysisPage, '"defaultYear":'],
 ];
 
 const municipalPages: PageRender[] = [
@@ -94,12 +96,12 @@ const municipalPages: PageRender[] = [
 ];
 
 describe.each(["ka", "en"] as const)("%s", (locale) => {
-  test.each(budgetPages)("budget pages ship no glossary notes: %s", async (_name, renderPage) => {
+  test.each(budgetPages)("budget pages ship no glossary notes: %s", async (_name, renderPage, shipped) => {
     const page = await renderPage(locale);
     const html = renderPageMarkup(locale, page) + shippedProps(page);
     expect(["Confirm against source", "Temporary source aggregate", "by user decision"].filter((note) => html.includes(note))).toEqual([]);
-    // The glossary still ships, so the check above is not passing on an empty payload.
-    expect(html).toContain('"kaLabel":');
+    // The page's data still ships, so the check above is not passing on an empty payload.
+    expect(html).toContain(shipped);
   });
 
   test.each(municipalPages)("municipal pages ship only public fact fields: %s", async (_name, renderPage) => {
@@ -127,6 +129,15 @@ describe("English names on Georgian pages", () => {
     const model = buildTradeProductsModel(data, DEFAULT_TRADE_PRODUCTS_STATE, presentation);
     const found = findTradeProducts({ data, model, presentation, view: "all", categoryId: null, query: "live horses", selectedIds: [], page: 0 });
     expect(found.rows.map((row) => row.entityId)).toEqual(["goods.hs4.2020-2025.0101"]);
+  });
+
+  test.each(["ka", "en"] as const)("%s: Year in review ships no English names and, of `main`, only the two strings it reads", async (locale) => {
+    const page = await renderAnalysisPage(locale);
+    const [{ presentation }] = propsOf<{ presentation: Presentation }>(page, YearReviewPage);
+    // Every name is resolved inside its data on the server.
+    expect(presentation.englishLabels).toEqual({});
+    expect(Object.keys(presentation.messages).filter((key) => key.startsWith("main.")).sort()).toEqual(["main.percentGdp", "main.sourceData"]);
+    expect(shippedProps(page)).not.toContain('"englishLabels":{"');
   });
 
   test("the English trade products page ships each English name once", async () => {

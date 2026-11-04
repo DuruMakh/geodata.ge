@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import { formatShare } from "../../../lib/explorer/format";
 import type { Locale } from "../../../lib/i18n/types";
 import type { RevenueSeries } from "../../../lib/landing/chapters/types";
+import { HATCH_SWATCH } from "../../ui/editorial";
 import { revenueBandColor } from "./canvas";
 import { money } from "./chart-format";
 import { yearRange } from "./chart-layout";
@@ -84,7 +85,7 @@ export function RevenueChart({ data, labels }: { data: RevenueSeries; labels: Re
               <li data-band="planned" className="inline-flex items-center gap-[7px]">
                 <i
                   aria-hidden="true"
-                  className="inline-block h-2.5 w-2.5 flex-none rounded-[2px] [background:repeating-linear-gradient(135deg,var(--paper)_0_1.5px,transparent_1.5px_4px),var(--control)]"
+                  className={`inline-block h-2.5 w-2.5 flex-none rounded-[2px] ${HATCH_SWATCH}`}
                 />
                 {labels.planned}
               </li>

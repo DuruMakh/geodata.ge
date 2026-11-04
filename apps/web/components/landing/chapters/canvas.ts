@@ -2,7 +2,7 @@ import type { AgeingChapter, DeathGroupKind, RevenueBandId } from "../../../lib/
 
 // Canvas helpers ported from the design board's chart script. Pure functions (niceTicks,
 // stackLabels, fitText) touch no DOM; the rest read `window` only when called. The treemap
-// layout is shared with the Analysis page (lib/explorer/treemapLayout.ts).
+// layout is shared with Year in review (lib/explorer/treemapLayout.ts).
 
 export type Rect = [x: number, y: number, w: number, h: number];
 

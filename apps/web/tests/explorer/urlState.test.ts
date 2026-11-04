@@ -33,9 +33,15 @@ describe("serializeExplorerHash", () => {
 });
 
 describe("serializeAnalysisHash", () => {
-  it("writes the side, the grouping on expenditure only, and the year", () => {
+  it("writes the side, the grouping on either side, and the year", () => {
     expect(serializeAnalysisHash({ analysisSide: "expenditure", analysisGrouping: "ministries", analysisYear: 2024 })).toBe("as=expenditure&ag=ministries&ay=2024");
-    expect(serializeAnalysisHash({ analysisSide: "revenue", analysisGrouping: "ministries", analysisYear: null })).toBe("as=revenue");
+    expect(serializeAnalysisHash({ analysisSide: "revenue", analysisGrouping: "ministries", analysisYear: null })).toBe("as=revenue&ag=ministries");
+  });
+
+  it("round-trips an old link with the institutions grouping and the receipts long view", () => {
+    const parsed = parseExplorerHash("#ay=2024&ag=ministries&as=revenue", "analysis");
+    const written = serializeAnalysisHash({ analysisSide: parsed.analysisSide!, analysisGrouping: parsed.analysisGrouping!, analysisYear: parsed.analysisYear! });
+    expect(parseExplorerHash(`#${written}`, "analysis")).toMatchObject({ analysisSide: "revenue", analysisGrouping: "ministries", analysisYear: 2024 });
   });
 });
 

@@ -27,7 +27,7 @@ import { useExplorerState } from "./use-explorer-state";
 
 type MainExplorerProps = {
   presentation: Presentation;
-  /** The route: /explorer/analysis has its own client entry (AnalysisExplorer). */
+  /** The route: /explorer/analysis has its own client entry (YearReviewPage). */
   nav: ExplorerSide;
   facts: FactsInput<ClientBudgetFact>;
   // Optional because the ministries scope is unreachable on the revenue route:

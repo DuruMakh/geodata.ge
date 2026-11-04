@@ -13,18 +13,10 @@ import type { WorkbookPublicSource } from "../explorer/workbookModel";
 import { coverageFromYears, generalGovernmentDeficitMetadata } from "../seo/metadata";
 import { DEFICIT_EXPLORER_PATH } from "../seo/internalLinks";
 import { explorerDatasetJsonLd } from "../seo/structuredData";
-import { loadImfWeoManifest, type ImfWeoManifest } from "../methodology/workbookSources";
+import { editionLabel, loadImfWeoManifest, type ImfWeoManifest } from "../methodology/workbookSources";
 import { resolveSiteUrl } from "../siteUrl";
 import { projectBalanceFact } from "../explorer/clientData";
 import { ALL_DATA_PATH, navGroup } from "../navigation/navTree";
-
-function editionLabel(messages: Parameters<typeof message>[0], publicationDate: string): string {
-  const [year, month] = publicationDate.split("-");
-  return message(messages, "deficit.weoEdition", {
-    year: year!,
-    month: message(messages, `deficit.weoMonth.${Number(month)}`),
-  });
-}
 
 function workbookSourcesFor(
   messages: Parameters<typeof message>[0],

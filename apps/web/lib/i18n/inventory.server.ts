@@ -121,7 +121,7 @@ export async function loadTranslationInventory(): Promise<TranslationInventory> 
       ...tradeProducts.map(row => row.id),
       ...explorer.glossary.keys(), ...explorer.adminCategories.map((row) => row.id),
       ...programmeHistory.map((row) => row.seriesId),
-      "expenditure.total", "revenue.total", "admin_spending.total", "municipal.total", "country.georgia", "snapshot.other",
+      "expenditure.total", "revenue.total", "admin_spending.total", "municipal.total", "country.georgia",
       ...municipal.functions.map((row) => row.id), ...municipal.regions.map((row) => row.id),
       ...municipal.municipalities.flatMap((row) => [row.code, `${row.code}.official-name`]),
       ...AGGREGATE_ONLY_MUNICIPAL_CODES, ...Object.keys(DEBT_SERIES_LABELS_KA), DEFICIT_SERIES_ID,

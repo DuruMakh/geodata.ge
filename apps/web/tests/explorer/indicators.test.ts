@@ -75,7 +75,7 @@ describe("compoundAnnualGrowth", () => {
   });
 
   // Growth from or to a non-positive value is not meaningful for display — the
-  // same rule explorerData.ts and singleYear.ts apply to period change.
+  // same rule explorerData.ts applies to period change.
   it("has no rate from a non-positive base or to a non-positive end", () => {
     expect(compoundAnnualGrowth(0, 200, 2020, 2025)).toBeNull();
     expect(compoundAnnualGrowth(-50, 200, 2020, 2025)).toBeNull();

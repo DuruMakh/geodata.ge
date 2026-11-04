@@ -166,8 +166,10 @@ test("the contribution chart fits phones, hovers without moving the page and ans
   expect((await strip.boundingBox())!.y).toBe(before);
 
   const lattice = await page.evaluate(() => {
-    const circle = document.querySelector("#stack-dot-lattice circle");
     const rect = document.querySelector('[data-testid="stack-dot-lattice"]');
+    // The lattice pattern's id is the chart's own (useId); the rect names it in its fill.
+    const id = /url\(#([^)]+)\)/.exec(rect?.getAttribute("fill") ?? "")?.[1];
+    const circle = id ? document.getElementById(id)?.querySelector("circle") : null;
     return { fill: circle ? getComputedStyle(circle).fill : null, opacity: rect ? getComputedStyle(rect).opacity : null };
   });
   expect(lattice).toEqual({ fill: "rgb(201, 190, 169)", opacity: "0.6" });

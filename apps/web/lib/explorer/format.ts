@@ -26,17 +26,6 @@ function fixed(value: number, decimals: number): string {
   return formatter.format(value);
 }
 
-/**
- * Chart/table cell value in the active unit: billions with 1 decimal.
- *
- * Delegates rather than reimplements, so the two can never drift on the
- * below-threshold floor — the analysis ranking and the period comparison read
- * real amounts through here.
- */
-export function formatBn(value: number | null | undefined): string {
-  return formatInUnit(value, UNIT_BN);
-}
-
 export type AmountParts = { num: string; unit: string };
 
 // Decimals that leave three significant digits for a value from 1 to 999.
@@ -202,7 +191,7 @@ export function unitFor(values: readonly number[], base: ValueUnit, cap = 2): Va
   return { ...base, decimals: cap };
 }
 
-/** Cell value in the given unit. UNIT_BN is byte-identical to formatBn. */
+/** Cell value in the given unit. */
 export function formatInUnit(value: number | null | undefined, unit: ValueUnit): string {
   if (value === null || value === undefined) return MISSING;
   const scaled = value / unit.divisor;

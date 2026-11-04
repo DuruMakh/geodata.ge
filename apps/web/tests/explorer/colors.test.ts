@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { loadServedExplorerData } from "../../lib/data/servedData";
-import { colorForProgram, SERIES_COLORS } from "../../lib/explorer/colors";
+import { colorForProgram, fillUnderWhiteText, SERIES_COLORS } from "../../lib/explorer/colors";
 import { buildDebtExplorerModel } from "../../lib/explorer/debtExplorer";
 import { buildExplorerModel } from "../../lib/explorer/explorerData";
 
@@ -170,6 +170,27 @@ describe("inflation city colours", () => {
       expect(colour).toMatch(/^#[0-9A-F]{6}$/);
       expect(contrastRatio(colour!, PAPER)).toBeGreaterThanOrEqual(3);
       expect(contrastRatio(colour!, TINT)).toBeGreaterThanOrEqual(3);
+    }
+  });
+});
+
+describe("tile fill under white text", () => {
+  const contrast = (hex: string) => {
+    const [r, g, b] = [1, 3, 5].map((at) => {
+      const srgb = parseInt(hex.slice(at, at + 2), 16) / 255;
+      return srgb <= 0.03928 ? srgb / 12.92 : ((srgb + 0.055) / 1.055) ** 2.4;
+    }) as [number, number, number];
+    return 1.05 / (0.2126 * r + 0.7152 * g + 0.0722 * b + 0.05);
+  };
+
+  it("keeps a colour white already reads on, and darkens the others just enough for 4.5:1", () => {
+    expect(fillUnderWhiteText(SERIES_COLORS["spending_type.social_benefits"]!)).toBe(SERIES_COLORS["spending_type.social_benefits"]);
+    for (const id of ["spending_type.compensation", "spending_type.goods_services"]) {
+      const colour = SERIES_COLORS[id]!;
+      expect(contrast(colour), id).toBeLessThan(4.5);
+      const fill = fillUnderWhiteText(colour);
+      expect(contrast(fill), id).toBeGreaterThanOrEqual(4.5);
+      expect(contrast(fill), id).toBeLessThan(4.8);
     }
   });
 });

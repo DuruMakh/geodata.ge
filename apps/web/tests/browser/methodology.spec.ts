@@ -70,7 +70,6 @@ for (const path of [
   "/explorer",
   "/explorer/expenditure",
   "/explorer/revenue",
-  "/explorer/analysis",
   "/explorer/municipalities",
   "/explorer/municipalities/tbilisi",
   "/explorer/municipalities/region/imereti",
@@ -88,6 +87,16 @@ for (const path of [
     await expect(page.getByRole("link", { name: "მეთოდოლოგია და პირველწყაროები", exact: true })).toHaveCount(0);
   });
 }
+
+// Year in review's notes end in the board's row of links to the source pages and Methodology (spec
+// 2026-10-30-year-in-review-design §4, "Notes and source"): the sidebar's link and that one, no other.
+test("/explorer/analysis links methodology from the sidebar and from its notes only", async ({ page }) => {
+  await page.goto(`${TEST_BASE_URL}/explorer/analysis`);
+  await expect(page.locator("footer")).toHaveCount(0);
+  await expect(page.getByTestId("data-sidebar").locator('a[href^="/methodology"]')).toHaveCount(1);
+  await expect(page.locator("#year-review-notes").locator('a[href^="/methodology"]')).toHaveCount(1);
+  await expect(page.locator('a[href^="/methodology"]')).toHaveCount(2);
+});
 
 test("methodology hub separates live datasets from future markers", async ({ page }) => {
   await page.goto(`${TEST_BASE_URL}/methodology`);

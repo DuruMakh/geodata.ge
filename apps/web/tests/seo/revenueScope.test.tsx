@@ -53,22 +53,6 @@ test("the revenue period comparison prints the table's two decimals", async () =
   expect(comparison).not.toMatch(/>[+−]?<0\.1</);
 });
 
-// U05-14: the analysis deck is the change on the year before only; the year, category count and total are the first
-// headline card right below it.
-test("the analysis deck does not repeat the first headline card", async () => {
-  const { renderAnalysisPage } = await import("../../lib/pages/analysis");
-  const html = renderPageMarkup("en", await renderAnalysisPage("en"));
-  const deck = html.match(/<p data-testid="budget-deck"[^>]*>([\s\S]*?)<\/p>/)![1]!.replace(/<[^>]+>/g, " ");
-  expect(deck).not.toMatch(/categories|Total/);
-  expect(deck).toMatch(/^\s*[+−]\d+\.\d%\s+year on year\s*$/);
-});
-
-// The analysis page's bubble-chart note words the y axis as its deck does ("year on year" / "წინა წელთან").
-test.each(["ka", "en"] as const)("the analysis bubble note uses the deck's year-on-year phrase: %s", async (locale) => {
-  const messages = await getMessages(locale, ["main", "analysis"]);
-  expect(message(messages, "analysis.budgetFieldNote")).toContain(message(messages, "main.previousYear"));
-});
-
 // U03-14: in the line view the phone chart's own axis caption names the unit, so the mode row's caption is desktop-only;
 // U04-10: its lari sign is set in the UI face like every other ₾ on the page.
 test("the mode row's unit caption is desktop-only in the line view and sets ₾ in the UI face", async () => {

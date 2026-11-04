@@ -5,7 +5,7 @@
   "hub.taxBreaksRefundsDescription": "Tax the state gives up through tax breaks, and overpaid tax it pays back.",
   "hub.taxBreaksRefundsFooter": "{year} · Refunds {amount}",
   "hub.taxBreaksRefundsCaption": "Refunds",
-  "hub.analysisDescription": "One year at a glance — composition, rankings and every GEL 100.",
+  "hub.analysisDescription": "One year from every angle: receipts, tax breaks, spending, debt and municipalities.",
   "hub.debtDescription": "Government debt stock, repayments and interest rates.",
   "hub.deficitDescription": "General government deficit or surplus — share of GDP and nominal GEL.",
   "hub.municipalDescription": "{count} municipal budget units — where local budgets are spent.",

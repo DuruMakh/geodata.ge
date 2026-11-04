@@ -7,6 +7,24 @@ async function ready(page: Page) {
   await expect(page.locator("body")).toHaveAttribute("data-app-ready", "true");
 }
 
+// The year in review's spending-type treemap (section 03): the drawn layout's tiles inside the drawing and the page's
+// gutters, and no labelled tile cutting off its own text.
+async function treemapFit(page: Page) {
+  return page.locator('#year-review-where [data-panel="buys"] [role="img"]').evaluate((root) => {
+    const box = root.getBoundingClientRect();
+    const width = document.documentElement.clientWidth;
+    const tiles = [...root.querySelectorAll<HTMLElement>("[data-tile]")].filter((tile) => tile.getClientRects().length > 0);
+    return {
+      tiles: tiles.length,
+      outside: tiles.filter((tile) => {
+        const rect = tile.getBoundingClientRect();
+        return rect.left < box.left - 0.5 || rect.right > box.right + 0.5 || rect.right > width - 16 + 0.5;
+      }).map((tile) => tile.dataset.tile),
+      clipped: tiles.filter((tile) => tile.hasAttribute("data-labelled") && (tile.scrollHeight > tile.clientHeight + 1 || tile.scrollWidth > tile.clientWidth + 1)).map((tile) => tile.dataset.tile),
+    };
+  });
+}
+
 // The economy regions index does not mark the body ready; wait for React to
 // attach its handlers to the map instead.
 async function mapHydrated(page: Page) {
@@ -19,39 +37,13 @@ async function mapHydrated(page: Page) {
 test.describe("phone", () => {
   test.use({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
 
-  test("analysis structure is a stacked bar and a full list on phones (D6)", async ({ page }) => {
+  test("year in review: the spending-type treemap draws its tall layout inside the phone's gutters", async ({ page }) => {
     await page.goto("/explorer/analysis");
     await ready(page);
-    const treemap = page.getByTestId("snapshot-treemap");
-    await expect(treemap.getByTestId("snapshot-structure-grid")).toBeHidden();
-    await expect(treemap.getByTestId("snapshot-structure-bar")).toBeVisible();
-
-    // Same items, same order as the desktop tiles.
-    const tileNames = await treemap.getByTestId("snapshot-structure-card").evaluateAll((tiles) => tiles.map((tile) => tile.getAttribute("title")!.split(" — ")[0]));
-    const rowNames = await treemap.getByTestId("snapshot-structure-row").locator("th").allInnerTexts();
-    expect(rowNames.map((name) => name.trim())).toEqual(tileNames);
-    expect(rowNames.length).toBeGreaterThan(5);
-
-    // Full names wrap instead of truncating, and nothing crosses the right gutter.
-    const geometry = await treemap.evaluate((root) => {
-      const width = document.documentElement.clientWidth;
-      const bar = root.querySelector("[data-testid='snapshot-structure-bar']")!.getBoundingClientRect();
-      const rows = [...root.querySelectorAll("[data-testid='snapshot-structure-row']")];
-      return {
-        width,
-        barRight: bar.right,
-        rowRight: Math.max(...rows.map((row) => row.getBoundingClientRect().right)),
-        clipped: rows.filter((row) => {
-          const name = row.querySelector("th span span:last-child")!;
-          return name.scrollWidth > name.clientWidth + 1;
-        }).length,
-        pageOverflow: document.documentElement.scrollWidth - width,
-      };
-    });
-    expect(geometry.barRight).toBeLessThanOrEqual(geometry.width - 16);
-    expect(geometry.rowRight).toBeLessThanOrEqual(geometry.width - 16);
-    expect(geometry.clipped).toBe(0);
-    expect(geometry.pageOverflow).toBeLessThanOrEqual(0);
+    const fit = await treemapFit(page);
+    // Eight spending types, seven labelled: a selector that finds no tile must not pass.
+    expect(fit.tiles).toBeGreaterThan(3);
+    expect(fit).toEqual({ tiles: fit.tiles, outside: [], clipped: [] });
   });
 
   test("economy map: Tbilisi gets a fingertip target, the first tap previews and the second opens (D7)", async ({ page }) => {
@@ -178,17 +170,11 @@ test("mouse clicks still open a map place at once and the touch disks ignore the
   await expect(page.getByTestId("map-touch-preview")).toHaveCount(0);
 });
 
-test("treemap tiles stay inside the treemap at tablet width", async ({ page }) => {
+test("year in review: the spending-type treemap tiles stay inside it, their labels unclipped, at tablet width", async ({ page }) => {
   await page.setViewportSize({ width: 800, height: 1000 });
-  for (const hash of ["", "#as=revenue"]) {
-    await page.goto(`/explorer/analysis${hash}`);
-    await ready(page);
-    const grid = page.getByTestId("snapshot-structure-grid");
-    await expect(grid).toBeVisible();
-    const overflow = await grid.evaluate((root) => {
-      const box = root.getBoundingClientRect();
-      return Math.max(...[...root.querySelectorAll("[data-testid='snapshot-structure-card']")].map((tile) => tile.getBoundingClientRect().right - box.right));
-    });
-    expect(overflow).toBeLessThanOrEqual(0.5);
-  }
+  await page.goto("/explorer/analysis");
+  await ready(page);
+  const fit = await treemapFit(page);
+  expect(fit.tiles).toBeGreaterThan(3);
+  expect(fit).toEqual({ tiles: fit.tiles, outside: [], clipped: [] });
 });

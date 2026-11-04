@@ -22,10 +22,18 @@ export const REVENUE_BANDS: Record<RevenueBandId, readonly string[]> = {
   liabilities: ["revenue.increase_liabilities"],
 };
 
-const TAX_BAND_IDS: readonly RevenueBandId[] = ["vat", "income", "profit", "excise", "otherTaxes"];
+export const TAX_BAND_IDS: readonly RevenueBandId[] = ["vat", "income", "profit", "excise", "otherTaxes"];
 
-function activeDetailFacts(facts: ServedBudgetFact[], side: ServedBudgetFact["side"]): ServedBudgetFact[] {
+/** One side's active facts (actual wins over planned) without the derived totals: the parts the chapters and the Year in review sum. */
+export function activeDetailFacts(facts: ServedBudgetFact[], side: ServedBudgetFact["side"]): ServedBudgetFact[] {
   return chooseActivePublicFacts(facts).filter((fact) => fact.side === side && !isDerivedTotalItemId(fact.itemId));
+}
+
+/** The band of a revenue item; an item in no band throws, so a new item cannot drop out of the totals unseen. */
+export function revenueBandOf(itemId: string): RevenueBandId {
+  const bandId = (Object.keys(REVENUE_BANDS) as RevenueBandId[]).find((id) => REVENUE_BANDS[id].includes(itemId));
+  if (!bandId) throw new Error(`Revenue item ${itemId} is not assigned to a homepage band`);
+  return bandId;
 }
 
 function yearRange(facts: ServedBudgetFact[]): number[] {
@@ -81,10 +89,6 @@ export function buildRevenueSeries(
   presentation: Presentation,
 ): RevenueSeries {
   const active = activeDetailFacts(facts, "revenue");
-  const bandOfItem = new Map<string, RevenueBandId>();
-  for (const [bandId, itemIds] of Object.entries(REVENUE_BANDS) as [RevenueBandId, readonly string[]][]) {
-    for (const itemId of itemIds) bandOfItem.set(itemId, bandId);
-  }
 
   const years = yearRange(active);
   const yearIndex = new Map(years.map((year, index) => [year, index]));
@@ -93,8 +97,7 @@ export function buildRevenueSeries(
   const planned = years.map(() => false);
 
   for (const fact of active) {
-    const bandId = bandOfItem.get(fact.itemId);
-    if (!bandId) throw new Error(`Revenue item ${fact.itemId} is not assigned to a homepage band`);
+    const bandId = revenueBandOf(fact.itemId);
     const series = values.get(bandId)!;
     const index = yearIndex.get(fact.year)!;
     if (fact.basis === "planned") planned[index] = true;
