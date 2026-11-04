@@ -77,7 +77,7 @@ export function TaxBreaksRefundsExplorer({ facts, labels, headings, sources, gdp
     return Number.isFinite(year) && year !== model.range.end ? `${headings[heading]} · ${year}` : headings[heading];
   };
   // Every series over all its years, for the hidden crawl table: built from the props alone, so a click never rebuilds it.
-  const crawlModels = useCrawlModels(() => taxBreaksRefundsCrawlStates(facts).map(crawl =>
+  const crawlModels = useCrawlModels(() => taxBreaksRefundsCrawlStates(facts, gdpFacts).map(crawl =>
     buildTaxBreaksRefundsWorkbookExportModel({ facts, state: crawl, labels, sources, siteOrigin, title, gdpFacts, gdpSources }, presentation)));
   const changeView = (view: TaxBreaksRefundsView) => {
     if (view === state.view) return;

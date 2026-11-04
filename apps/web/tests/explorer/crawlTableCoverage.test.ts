@@ -49,11 +49,15 @@ describe("crawl table coverage", () => {
     for (const file of INDEX_CARRIERS) expect(read(file), `${file} must render <CrawlTables (${RULE})`).toContain("<CrawlTables");
   });
 
-  it("every exported crawl-state function is named in a crawlStates test (.ts or .tsx)", () => {
+  it("every exported crawl-state helper is named in a crawlStates test (.ts or .tsx)", () => {
     const tests = (readdirSync(resolve(process.cwd(), "tests/explorer")) as string[]).filter((file) => /^crawlStates\.\w+\.test\.tsx?$/.test(file)).map((file) => read(`tests/explorer/${file}`));
     expect(tests.length).toBeGreaterThanOrEqual(6);
-    const functions = sourceFiles("lib").flatMap((file) => [...read(file).matchAll(/export function (\w+CrawlStates)\b/g)].map((match) => match[1]!));
-    expect(functions.length).toBeGreaterThanOrEqual(30);
+    // Functions and arrow constants alike, and the helpers named for what they return (censusCrawlSettlements,
+    // populationPlaceCrawlQueries); crawlTables.ts holds the renderer, not crawl states.
+    const functions = sourceFiles("lib").filter((file) => file !== "lib/explorer/crawlTables.ts")
+      .flatMap((file) => [...read(file).matchAll(/export (?:function|const) (\w+Crawl[A-Z]\w*)\b/g)].map((match) => match[1]!));
+    expect(functions.length).toBeGreaterThanOrEqual(50);
+    expect(functions).toEqual(expect.arrayContaining(["businessCrawlStates", "censusCrawlSettlements", "populationPlaceCrawlQueries"]));
     expect(functions.filter((name) => !(name in UNTESTED_CRAWL_STATES) && !tests.some((source) => new RegExp(`\\b${name}\\b`).test(source))), "These crawl-state functions have no test.").toEqual([]);
   });
 

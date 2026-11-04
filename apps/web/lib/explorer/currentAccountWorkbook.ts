@@ -15,7 +15,7 @@ export function buildCurrentAccountWorkbookModel(input: { facts: readonly Client
   const ids = input.state.tab === "balance" ? [...CURRENT_ACCOUNT_SERIES] : model.selectedIds;
   const percent = input.state.unit === "gdp";
   const exportModel = buildWorkbookExportModel({
-    locale: presentation.locale, filenameBase: "current-account", title: t("account.title"), groupLabel: tab, years: model.years,
+    locale: presentation.locale, filenameBase: "current-account", title: t("account.title"), view: tab, groupLabel: tab, years: model.years,
     measure: percent ? { kind: "percentage", unitLabel: model.unit.label, analysisHeader: model.unit.label } : { kind: "amount", unitLabel: model.unit.label, readableScale: model.unit.divisor },
     totalId: "ca.balance", includeTotalsInAnalysis: true, showChangeColumn: false,
     series: ids.map(id => ({ id, kind: id === "ca.balance" ? "total" : "item", label: model.series.find(item => item.id === id)!.label, parentLabel: null, pointsByYear: Object.fromEntries(model.years.map(year => [year, { amountGel: usd.valuesById[id][year], measureValue: percent ? model.valuesById[id][year] : undefined, basis: "actual" as const }])) })),

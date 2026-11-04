@@ -33,7 +33,7 @@ export function buildHouseholdWorkbookExportModel(input: { section: HouseholdSec
     locale, filename: workbookFilename(`household-${section}-${area.replace(/\./g, "-")}-${MEASURE_FILE_WORDS[state.measure]}-${model.range.start}-${model.range.end}`, locale), sheetNames: SHEET_NAMES[locale],
     readable: {
       title, subtitle: `${model.range.start}–${model.range.end} · ${t(`unitLong.${state.measure}`)}`,
-      unitLabel: t("unitGel"), amountDecimals: 1, years: model.years, showChangeColumn: false, numberFormat: NUMBER_FORMAT,
+      unitLabel: t("unitGel"), longUnit: t(`unitLong.${state.measure}`), amountDecimals: 1, years: model.years, showChangeColumn: false, numberFormat: NUMBER_FORMAT,
       rows: model.selected.map(series => ({ kind: kind(series), parentLabel: series.parentId ? labels[series.parentId] ?? null : null, label: labels[series.id], change: null,
         valuesByYear: Object.fromEntries(model.years.map(year => [year, series.valuesByYear[year]])),
         basisByYear: Object.fromEntries(model.years.map(year => [year, series.valuesByYear[year] === null ? null : "actual"])),

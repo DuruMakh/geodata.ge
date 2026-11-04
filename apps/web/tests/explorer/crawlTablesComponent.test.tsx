@@ -20,7 +20,7 @@ const model: WorkbookExportModel = {
 describe("CrawlTables", () => {
   it.each(["en", "ka"] as const)("renders one minimal hidden table per model in %s", (locale) => {
     expect(renderPageMarkup(locale, <CrawlTables models={[model]} />)).toBe(
-      `<div hidden="" data-testid="crawl-tables"><table><caption>T · S</caption><thead><tr><th>${workbookMessage(locale, "workbook.category")}</th><th>2024</th><th>2025</th></tr></thead>` +
+      `<div hidden="" data-testid="crawl-tables"><table><caption>T · GEL · 2024–2025 · Actual</caption><thead><tr><th>${workbookMessage(locale, "workbook.category")}</th><th>2024</th><th>2025</th></tr></thead>` +
       `<tbody><tr><th>Total</th><td>1.0</td><td>2.0</td></tr><tr><th>Other</th><td>3.0</td><td>—</td></tr></tbody></table></div>`,
     );
   });
@@ -48,7 +48,7 @@ describe("useCrawlModels", () => {
   it("builds the models during the server render", () => {
     const build = vi.fn(() => [model]);
     expect(useCrawlModels(build)).toEqual([model]);
-    expect(renderPageMarkup("en", <Page build={build} />)).toContain("<table><caption>T · S</caption>");
+    expect(renderPageMarkup("en", <Page build={build} />)).toContain("<table><caption>T · GEL · 2024–2025 · Actual</caption>");
     expect(build).toHaveBeenCalledTimes(2);
   });
 

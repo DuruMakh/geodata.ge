@@ -24,6 +24,7 @@ import type { ExplorerSide } from "../../lib/explorer/types";
 import type { ClientGovernmentDebtFact } from "../../lib/servedRows";
 import { getPresentation } from "../../lib/i18n/presentation.server";
 import type { Presentation } from "../../lib/i18n/types";
+import { workbookMessage } from "../../lib/i18n/workbook";
 
 const ORIGIN = "https://fiscal.ge";
 const NO_SOURCES = { budget: [], admin: [], gdp: [] };
@@ -47,10 +48,10 @@ describe("budget explorer (expenditure and revenue)", () => {
     facts: facts.filter((fact) => fact.side === side), gdpFacts, adminFacts,
     adminCategories: new Map(data.adminCategories.map((category) => [category.id, category])),
     expenditureGrouping: state.grouping, glossary: new Map(Array.from(data.glossary.values(), publicGlossaryEntry).map((entry) => [entry.id, entry])),
-    side, selectedItemIds: state.selectedIds, startYear: state.startYear, endYear: state.endYear, measure: "nominal",
+    side, selectedItemIds: state.selectedIds, startYear: state.startYear, endYear: state.endYear, measure: "share" in state && state.share ? "share_of_gdp" : "nominal",
   }, en);
   const workbookFor = (side: ExplorerSide, state: BudgetCrawlState) => buildWorkbookExportModel(buildBudgetWorkbookInput({
-    model: modelFor(side, state), presentation: en, scope: state.scope, share: false, title: "T", sources: NO_SOURCES, siteOrigin: ORIGIN,
+    model: modelFor(side, state), presentation: en, scope: state.scope, share: state.share, title: "T", sources: NO_SOURCES, siteOrigin: ORIGIN,
   }));
   // Everything the series list offers: the list is the model's items, whatever is ticked.
   const listIds = (side: ExplorerSide, grouping: "fields" | "ministries") =>
@@ -76,6 +77,21 @@ describe("budget explorer (expenditure and revenue)", () => {
     const [fields] = budgetCrawlStates("expenditure", facts.filter((fact) => fact.side === "expenditure"), adminFacts);
     const years = facts.filter((fact) => fact.side === "expenditure").map((fact) => fact.year);
     expect([fields.startYear, fields.endYear]).toEqual([Math.min(...years), Math.max(...years)]);
+  });
+
+  it("with GDP, each scope adds its % of GDP view after its amounts, with the same series and years", () => {
+    const states = budgetCrawlStates("expenditure", facts.filter((fact) => fact.side === "expenditure"), adminFacts, gdpFacts);
+    expect(states.map((state) => [state.scope, state.share])).toEqual([["fields", false], ["fields", true], ["ministries", false], ["ministries", true]]);
+    for (const [amounts, shares] of [[states[0]!, states[1]!], [states[2]!, states[3]!]]) {
+      expect({ ...shares, share: false }).toEqual(amounts);
+      const workbook = workbookFor("expenditure", shares);
+      expect(workbook.readable.unitLabel).toBe("% of GDP");
+      const total = workbook.readable.rows[0]!;
+      const year = workbook.readable.years.find((y) => total.valuesByYear[y] !== null)!;
+      expect(total.valuesByYear[year]).toBeGreaterThan(0);
+      expect(total.valuesByYear[year]).toBeLessThan(1);
+    }
+    expect(budgetCrawlStates("revenue", facts.filter((fact) => fact.side === "revenue"), [], gdpFacts).map((state) => state.share)).toEqual([false, true]);
   });
 
   it("a scope without rows yields no state", () => {
@@ -136,15 +152,20 @@ describe("debt explorer", () => {
     gdpFacts = (await loadServedExplorerData()).gdpFacts.map(projectGdpFact);
   });
 
-  it("one state per family (stock, service, rate), every series of the list, amounts not shares of GDP", () => {
-    const states = debtCrawlStates(facts);
-    expect(states.map((state) => state.family)).toEqual(["stock", "service", "rate"]);
+  it("one state per family (stock, service, rate), every series of the list; stock also as % of GDP, which the page cannot work out", () => {
+    const states = debtCrawlStates(facts, gdpFacts);
+    expect(states.map((state) => [state.family, state.shareOfGdp])).toEqual([["stock", false], ["stock", true], ["service", false], ["rate", false]]);
     const listed = buildDebtExplorerModel({ facts, gdpFacts, family: "stock", selectedIds: [], range: { start: 0, end: 9999 }, shareOfGdp: false }).items.map((item) => item.id);
     expect(ids(states)).toEqual(new Set(listed));
     for (const state of states) {
-      expect(state.shareOfGdp).toBe(false);
       expect(rowsOf(buildDebtWorkbookExportModel({ facts, gdpFacts, ...state, sources: [], gdpSources: [], siteOrigin: ORIGIN }))).toBe(3);
     }
+    const shares = buildDebtWorkbookExportModel({ facts, gdpFacts, ...states[1]!, sources: [], gdpSources: [], siteOrigin: ORIGIN });
+    expect(shares.readable.unitLabel).toBe(workbookMessage("ka", "workbook.percentGdp"));
+    const total = shares.readable.rows[0]!, year = shares.readable.years.at(-1)!;
+    expect(total.valuesByYear[year]).toBeGreaterThan(0);
+    expect(total.valuesByYear[year]).toBeLessThan(1);
+    expect(debtCrawlStates(facts).map((state) => state.shareOfGdp)).toEqual([false, false, false]);
   });
 
   it("a family without facts has no state", () => {
@@ -166,14 +187,19 @@ describe("deficit explorer", () => {
 });
 
 describe("tax breaks and refunds explorer", () => {
-  it("one amount state with every series of the list", async () => {
+  it("an amount state and a % of GDP state, each with every series of the list", async () => {
     const facts = (await loadTaxBreaksRefundsFacts()).map(toClientTaxBreaksRefundsFact);
     const gdpFacts = (await loadNationalGdpFacts(SERVED_DATA_FILES.gdpFacts)).map(projectGdpFact);
-    const states = taxBreaksRefundsCrawlStates(facts);
-    expect(states).toEqual([{ mode: "line", view: "amount", range: { kind: "all" }, selectedIds: TAX_BREAKS_REFUNDS_SERIES.map((series) => series.id) }]);
+    const states = taxBreaksRefundsCrawlStates(facts, gdpFacts);
+    const selectedIds = TAX_BREAKS_REFUNDS_SERIES.map((series) => series.id);
+    expect(states).toEqual([{ mode: "line", view: "amount", range: { kind: "all" }, selectedIds }, { mode: "line", view: "gdp", range: { kind: "all" }, selectedIds }]);
     const en = await getPresentation("en", ["taxBreaksRefunds"], []);
-    const workbook = buildTaxBreaksRefundsWorkbookExportModel({ facts, state: states[0], labels: {}, sources: [], siteOrigin: ORIGIN, gdpFacts, gdpSources: [] }, en);
-    expect(rowsOf(workbook)).toBe(TAX_BREAKS_REFUNDS_SERIES.length);
+    for (const state of states) {
+      const workbook = buildTaxBreaksRefundsWorkbookExportModel({ facts, state, labels: {}, sources: [], siteOrigin: ORIGIN, gdpFacts, gdpSources: [] }, en);
+      expect(rowsOf(workbook)).toBe(TAX_BREAKS_REFUNDS_SERIES.length);
+    }
+    // Without GDP the % of GDP view has no values, so no state.
+    expect(taxBreaksRefundsCrawlStates(facts).map((state) => state.view)).toEqual(["amount"]);
     expect(taxBreaksRefundsCrawlStates([])).toEqual([]);
   });
 });

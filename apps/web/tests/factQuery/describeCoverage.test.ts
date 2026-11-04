@@ -336,7 +336,7 @@ describe("search points to website pages the connection does not serve", () => {
     expect(pages[0]?.urlEn).toBe(`https://fiscal.ge/en${firstWagesPage}`);
     expect(pages[0]?.urlKa).toBe(`https://fiscal.ge${firstWagesPage}`);
     expect(pages.length).toBeLessThanOrEqual(5);
-    expect(data(result).websitePagesNoteEn).toContain("do not quote a figure");
+    expect(data(result).websitePagesNoteEn).toContain("never quote a figure from memory");
     expect(data(result).websitePagesNoteKa).toBeTruthy();
   });
 

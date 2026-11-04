@@ -131,7 +131,7 @@ function MainExplorerContent({ nav, facts: shippedFacts, adminFacts: shippedAdmi
 
   // Every series of every scope the route offers, for the hidden crawl tables: built from the props alone, so a click
   // never rebuilds them.
-  const crawlModels = useCrawlModels(() => budgetCrawlStates(nav, facts, adminFacts).map((crawl) => buildWorkbookExportModel(buildBudgetWorkbookInput({
+  const crawlModels = useCrawlModels(() => budgetCrawlStates(nav, facts, adminFacts, gdpFacts).map((crawl) => buildWorkbookExportModel(buildBudgetWorkbookInput({
     model: buildExplorerModel({
       facts,
       gdpFacts,
@@ -143,11 +143,11 @@ function MainExplorerContent({ nav, facts: shippedFacts, adminFacts: shippedAdmi
       selectedItemIds: crawl.selectedIds,
       startYear: crawl.startYear,
       endYear: crawl.endYear,
-      measure: "nominal",
+      measure: crawl.share ? "share_of_gdp" : "nominal",
     }, presentation),
     presentation,
     scope: crawl.scope,
-    share: false,
+    share: crawl.share,
     // The caption names the grouping (fields or ministries), as the tabs do; revenue has one.
     title: nav === "expenditure" ? `${screenTitle} · ${message(messages, crawl.grouping === "ministries" ? "controls.ministries" : "controls.fields")}` : screenTitle,
     sources: { budget: workbookSources, admin: adminWorkbookSources, gdp: gdpWorkbookSources },

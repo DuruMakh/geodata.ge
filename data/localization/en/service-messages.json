@@ -31,7 +31,7 @@
   "ranking.inflationSubgroups": "COICOP subgroups of the national consumer price index.",
   "ranking.inflationSubgroupsWithinParent": "COICOP subgroups within {parentLabel}.",
   "ranking.valueDefinitionPeriod": "Ranked by {measure} for {period}, {order}.",
-  "catalogue.websitePages": "These Fiscal.ge pages show this topic; this connection does not serve their figures. Give the user the link in their language; do not quote a figure for it.",
+  "catalogue.websitePages": "These Fiscal.ge pages show this topic; this connection does not serve their figures. Each page's HTML carries its year-by-year table: if you can open it, quote from it with the link in the user's language; never quote a figure from memory.",
   "catalogue.someWords": "Only some words of this search matched, so these entries may be about something else. If none fits, retry with another word for the missing part or browse the dataset before saying it is not served; websitePages, when given, show the topic on Fiscal.ge.",
   "measures.amount_gel": "amount in GEL",
   "measures.share_of_total_pct": "percentage share of the total",

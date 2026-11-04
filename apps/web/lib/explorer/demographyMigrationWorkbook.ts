@@ -56,6 +56,7 @@ export function buildMigrationWorkbookExportModel(
     readable: {
       title: t("migrationWorkbookTitle"),
       subtitle: `${model.range.start}–${model.range.end} · ${t(SEX_KEYS[input.state.sex])} · ${unitLabel} · ${t("migrationGroupsNote")}`,
+      view: t(SEX_KEYS[input.state.sex]),
       unitLabel,
       amountDecimals: 0,
       showChangeColumn: false,

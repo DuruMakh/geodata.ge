@@ -283,6 +283,11 @@ describe("Fiscal.ge agent instructions", () => {
     expect(latestText({ value: "3.11 billion USD", period: "2025", caption: "Türkiye, largest", headlineCaption: "Türkiye" })).toBe("latest: Türkiye: 3.11 billion USD (2025). ");
     expect(latestText({ value: "−1.5%", period: "2025", caption: "of GDP" })).toBe("latest: −1.5% of GDP (2025). ");
   });
+  it("places a line's note right after the value, so the real GDP figure names its prices", async () => {
+    expect(latestText({ value: "27.1 bn USD", period: "2025", caption: "Real GDP" }, "at constant 2015 prices")).toBe("latest: Real GDP: 27.1 bn USD at constant 2015 prices (2025). ");
+    const line = (await llmsText()).split(/\r?\n/).find((candidate) => candidate.includes("](https://fiscal.ge/explorer/economy/gdp)"));
+    expect(line).toMatch(/ — latest: Real GDP: [\d.,]+ bn USD at constant 2015 prices \(\d{4}/);
+  });
   it("is at most half the size of the hand-written guide it replaced", async () => {
     expect(Buffer.byteLength(await llmsText())).toBeLessThanOrEqual(27_000);
   });

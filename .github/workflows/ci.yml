@@ -146,6 +146,10 @@ jobs:
         env:
           NEXT_PUBLIC_SITE_URL: https://fiscal.ge
           GEODATA_TYPECHECK_GATED: "1"
+      # The hidden crawl tables on the built HTML: every chart page carries them, no page passes the cell cap, and the
+      # spot-checked figures are there. The gzip ceiling only prints here: its fixed baseline goes stale as data grows.
+      - name: Check the crawl tables
+        run: npm run crawl:check -- --size-report-only
       # Everything `next start` serves that is not in the checkout: the build, and
       # the files prebuild generates (downloads, page data, the /mcp snapshot).
       # .next/cache stays out (it is cached above and next start never reads it),

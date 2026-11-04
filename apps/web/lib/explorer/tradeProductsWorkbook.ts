@@ -21,7 +21,7 @@ export function buildTradeProductsWorkbookModel(input: { data: ClientTradeProduc
   }
   const sources = input.sources.filter(source => filenames.has(source.downloadHref.split("/").at(-1)!));
   const exportModel = buildWorkbookExportModel({
-    locale: presentation.locale, filenameBase: domestic ? "trade-domestic-products" : "trade-products", title: t(domestic ? "domestic.productsTitle" : "products.title"), groupLabel: t(`indicator.${input.state.measure}`), years: model.years,
+    locale: presentation.locale, filenameBase: domestic ? "trade-domestic-products" : "trade-products", title: t(domestic ? "domestic.productsTitle" : "products.title"), view: t(`indicator.${input.state.measure}`), groupLabel: t(`indicator.${input.state.measure}`), years: model.years,
     measure: { kind: "amount", unitLabel: model.unit.label, readableScale: model.unit.divisor }, totalId: TRADE_PRODUCT_TOTAL_ID, includeTotalsInAnalysis: true, showChangeColumn: false,
     series: model.selectedIds.map(id => {
       const entity = entities.get(id);

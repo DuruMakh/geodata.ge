@@ -113,7 +113,8 @@ export function buildInflationCategoryWorkbookExportModel(input: {
 
   const chosen = pickLocaleEditions(sources, usedSourceIds, locale);
 
-  const subtitle = `${periodLabel(messages, range.start, "long")} – ${periodLabel(messages, range.end, "long")} · ${t(`categoryWorkbookUnit.${state.tab}`)}`;
+  const period = `${periodLabel(messages, range.start, "long")} – ${periodLabel(messages, range.end, "long")}`;
+  const subtitle = `${period} · ${t(`categoryWorkbookUnit.${state.tab}`)}`;
 
   return {
     locale,
@@ -124,6 +125,8 @@ export function buildInflationCategoryWorkbookExportModel(input: {
       // A derived measure says so on the sheet, not only on the page.
       subtitle: contribution ? `${subtitle} · ${t("categoryContributionNote")}` : subtitle,
       ...(contribution ? { fitSubtitle: true } : {}),
+      // The columns are months; the caption names the months the rows span.
+      period,
       unitLabel: t(`categoryWorkbookUnit.${state.tab}`),
       numberFormat: contribution ? "+0.0;−0.0;0.0" : "0.0%",
       showChangeColumn: false,

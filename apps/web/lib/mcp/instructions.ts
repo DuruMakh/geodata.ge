@@ -22,7 +22,7 @@
 export function serverInstructions(): string {
   return `Use describe_coverage with short keywords before querying. Use returned IDs and supported measures; keep expectedDataVersion consistent. Preserve units, missing values, projections and caveats. Cite the returned original documents and Fiscal.ge. For product questions, search first and request only the required series and dates. Use the published files for bulk analysis.
 
-Fiscal.ge serves reviewed data on Georgia's state and municipal budgets, government debt, the general government balance, GDP and economic sectors (annual), and consumer-price and product inflation (monthly). Never assume a year, series or entity exists; describe_coverage says what does. If a phrase finds nothing, retry the principal word or browse the dataset: an empty match is not proof that the data is absent. If the data does not cover the question, say so; do not fill the gap from other sources. Many Fiscal.ge website topics are not served here; a search without datasetId returns websitePages for them: offer that link in the user's language and give no figure.
+Fiscal.ge serves reviewed data on Georgia's state and municipal budgets, government debt, the general government balance, GDP and economic sectors (annual), and consumer-price and product inflation (monthly). Never assume a year, series or entity exists; describe_coverage says what does. If a phrase finds nothing, retry the principal word or browse the dataset: an empty match is not proof that the data is absent. If the data does not cover the question, say so; do not fill the gap from other sources. For website topics this connection does not serve, a search without datasetId returns websitePages; each page's HTML carries its year-by-year table: if you can open it, quote from it with the link, in the user's language; never from memory.
 
 NEVER COMBINE
 - National revenue is consolidated budget RECEIPTS; national expenditure is STATE-BUDGET expenditure. They are different accounting boundaries: revenue minus expenditure is NOT a deficit, surplus or balance.
@@ -33,18 +33,18 @@ NEVER COMBINE
 VALUES
 - Read each value's unit. Budget, municipal and debt amounts are nominal GEL; GDP and sector values can be GEL, USD, constant-2015 USD, per person (output, not income) or percent. Never convert currencies or price bases yourself.
 - Percentages are already percent: 7.5 means 7.5%. Inflation contributions are percentage points.
-- availability "missing" is not zero. Never estimate, interpolate or report it as 0. Missing is not zero; zero is a real value.
+- availability "missing": never estimate, interpolate or report it as 0. Missing is not zero; zero is a real value.
 - Budget, debt and balance basis is actual, planned or projection (actual wins over planned); GDP, sector and inflation figures are "published" or "preliminary". Say when a figure is planned, a projection or preliminary.
 
 INFLATION
 - Inflation is the only monthly dataset. Annual, monthly and 12-month-average rates are different measures; monthly changes do not add up to the annual rate. Take the latest month from describe_coverage.
 - A city's rate is not its region's or its cost of living, and the national rate is not the average of cities. Comparing with the National Bank target is not a verdict on policy. Do not state causes of price changes.
-- Contributions and cumulative product changes are Fiscal.ge calculations over Geostat inputs (cumulative: base is the preceding December); say so. In the bulk inflation-products.csv, index_100 values (mom_index_100, yoy_index_100) are indices: 100 means no price change.
+- Contributions and cumulative product changes are Fiscal.ge calculations over Geostat inputs (cumulative: base is the preceding December); say so. In inflation-products.csv, index_100 values (mom_index_100, yoy_index_100) are indices: 100 means no price change.
 
 ANSWERING
 - The reader is the public, not a developer reading an API. IDs, codes, measure and enum names are for calling tools: Do not put them in the answer. Use the returned labels in the user's language.
 - Lead with the figure, its period and unit; then each severe caveat, briefly, in its own words (messageKa/messageEn), never by code.
-- Round as a reader would. Explain only verified figures: a spending change does not by itself show better services, efficiency, waste or policy success or failure.
-- Cite meta.sources and each figure's documentIds. When asked for all underlying evidence, include https://fiscal.ge/downloads/data/sources.json, the complete original-document catalogue; first/last examples alone are not a complete citation path, and manifest.json lists files, not originals. Data is CC BY 4.0; attribute Fiscal.ge.
+- Round as a reader would. Explain only verified figures: a spending change alone does not show better services, efficiency, waste or policy success or failure.
+- Cite meta.sources and each figure's documentIds. When asked for all underlying evidence, include https://fiscal.ge/downloads/data/sources.json, the complete original-document catalogue (examples are not; manifest.json lists files, not originals). Data is CC BY 4.0; attribute Fiscal.ge.
 - result_too_large: ask for fewer years, then entities, then series, or use the bulk file it names.`;
 }

@@ -194,6 +194,19 @@ describe("buildWorkbookExportModel", () => {
     expect(withBasis("published").readable.subtitle).toBe("2020–2021 · გამოქვეყნებული · მილიონი ₾");
     expect(withBasis("preliminary").readable.subtitle).toBe("2020–2021 · წინასწარი · მილიონი ₾");
   });
+
+  it("names actual values as actual even beside unavailable years, and only an all-unavailable sheet as not available", () => {
+    const withBases = (bases: Record<number, "actual" | "not_available">) => buildWorkbookExportModel({
+      ...input,
+      series: input.series.map((series) => ({
+        ...series,
+        pointsByYear: Object.fromEntries(Object.entries(series.pointsByYear).map(([year, point]) => [year, point && { ...point, basis: bases[Number(year)]! }])),
+      })),
+    });
+
+    expect(withBases({ 2020: "not_available", 2021: "actual" }).readable.subtitle).toBe("2020–2021 · ფაქტი · მილიონი ₾");
+    expect(withBases({ 2020: "not_available", 2021: "not_available" }).readable.subtitle).toBe("2020–2021 · არ არის ხელმისაწვდომი · მილიონი ₾");
+  });
 });
 
 describe("pictureFilename", () => {

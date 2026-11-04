@@ -1,6 +1,8 @@
 // The hidden crawl tables on a production build (DESIGN.md §8.4): every chart page carries them, no page holds more than
 // the cell cap, the HTML stays within its size ceiling, and a few known figures reach the prerendered HTML.
 // Run after `NEXT_PUBLIC_SITE_URL=https://fiscal.ge npm run build`: `npm run crawl:check`. Not part of `npm run check`.
+// CI runs it with `--size-report-only` after its build: the gzip ceiling then prints but does not fail, because its fixed
+// baseline would go stale as the data grows; every other check (wrapper, cell cap, spot checks) still fails the run.
 import { readdirSync, readFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { gzipSync } from "node:zlib";
@@ -90,7 +92,7 @@ const SPOT_CHECKS: SpotCheck[] = [
 
 const bytes = (value: number) => value.toLocaleString("en-US");
 
-export async function checkCrawlTables(root = process.cwd()): Promise<boolean> {
+export async function checkCrawlTables(root = process.cwd(), { sizeReportOnly = false }: { sizeReportOnly?: boolean } = {}): Promise<boolean> {
   const appDir = join(root, ".next/server/app");
   const files = htmlFiles(appDir);
   const pages: Page[] = files.map((file) => {
@@ -114,7 +116,8 @@ export async function checkCrawlTables(root = process.cwd()): Promise<boolean> {
   for (const page of pages.filter((entry) => entry.cells > CRAWL_CELL_CAP)) failures.push(`${page.route}: ${bytes(page.cells)} crawl cells, over the ${bytes(CRAWL_CELL_CAP)} cap`);
 
   const totalGzip = pages.reduce((total, page) => total + page.gzip, 0);
-  if (totalGzip > GZIP_CEILING_BYTES) failures.push(`total gzip ${bytes(totalGzip)} bytes is over the ${bytes(GZIP_CEILING_BYTES)} ceiling`);
+  const overCeiling = totalGzip > GZIP_CEILING_BYTES ? `total gzip ${bytes(totalGzip)} bytes is over the ${bytes(GZIP_CEILING_BYTES)} ceiling` : null;
+  if (overCeiling && !sizeReportOnly) failures.push(overCeiling);
 
   const messages = { ka: loadMessages("ka"), en: loadMessages("en") };
   const spotResults = SPOT_CHECKS.flatMap((check) => (["ka", "en"] as const).map((locale) => {
@@ -132,6 +135,7 @@ export async function checkCrawlTables(root = process.cwd()): Promise<boolean> {
   console.log(`HTML files: ${files.length} (baseline ${BASELINE_HTML_FILES})`);
   console.log(`Chart pages: ${chartPages.length}; pages with crawl tables: ${withTables.length}; crawl cells in all: ${bytes(pages.reduce((total, page) => total + page.cells, 0))}`);
   console.log(`Total gzip (level 6): before ${bytes(BASELINE_GZIP_BYTES)} bytes, after ${bytes(totalGzip)} bytes (${((totalGzip / BASELINE_GZIP_BYTES - 1) * 100).toFixed(1)}%), ceiling ${bytes(GZIP_CEILING_BYTES)} bytes`);
+  if (overCeiling && sizeReportOnly) console.log(`WARNING (size report only, not a failure): ${overCeiling}`);
   console.log(`Top 10 pages by crawl cells (cap ${bytes(CRAWL_CELL_CAP)}):`);
   for (const page of [...pages].sort((a, b) => b.cells - a.cells || a.route.localeCompare(b.route)).slice(0, 10)) {
     console.log(`  ${String(page.cells).padStart(5)} cells  ${page.wrappers.length} wrapper(s)  ${bytes(page.gzip).padStart(9)} gzip  /${page.route}`);
@@ -148,5 +152,5 @@ export async function checkCrawlTables(root = process.cwd()): Promise<boolean> {
 }
 
 runAsCli(import.meta.url, async () => {
-  if (!(await checkCrawlTables())) process.exitCode = 1;
+  if (!(await checkCrawlTables(process.cwd(), { sizeReportOnly: process.argv.includes("--size-report-only") }))) process.exitCode = 1;
 });

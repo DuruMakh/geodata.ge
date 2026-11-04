@@ -70,11 +70,13 @@ export function buildTaxBreaksRefundsModel(allFacts: readonly ClientTaxBreaksRef
 }
 
 /**
- * The hidden crawl tables' state (lib/explorer/crawlTables.ts): every series of the list over all its years, in amounts —
- * the % of GDP view only divides them by GDP. No facts, no state.
+ * The hidden crawl tables' states (lib/explorer/crawlTables.ts): every series of the list over all its years, in amounts
+ * and as % of GDP — the page lists no GDP, so those shares exist nowhere else on it. A view without values (no facts, or
+ * % of GDP without a GDP year) has no state.
  */
-export function taxBreaksRefundsCrawlStates(facts: readonly ClientTaxBreaksRefundsFact[]): TaxBreaksRefundsState[] {
-  return facts.length === 0 ? [] : [{ mode: "line", view: "amount", range: { kind: "all" }, selectedIds: TAX_BREAKS_REFUNDS_SERIES.map(series => series.id) }];
+export function taxBreaksRefundsCrawlStates(facts: readonly ClientTaxBreaksRefundsFact[], gdpFacts: readonly ClientNationalGdpFact[] = []): TaxBreaksRefundsState[] {
+  return VIEWS.filter(view => taxBreaksRefundsViewFacts(view, facts, gdpFacts).length > 0)
+    .map((view): TaxBreaksRefundsState => ({ mode: "line", view, range: { kind: "all" }, selectedIds: TAX_BREAKS_REFUNDS_SERIES.map(series => series.id) }));
 }
 
 /** The heading line's figure: the latest refunds. Both totals do not fit one 375px line, so tax breaks are left to the list. */

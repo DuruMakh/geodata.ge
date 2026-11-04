@@ -41,7 +41,8 @@ else; before saying the data is not served, retry the missing part with another 
 browse the dataset. A search without `datasetId` also returns the optional
 `websitePages` (at most five, with `websitePagesNoteKa` and `websitePagesNoteEn`) for
 Fiscal.ge pages whose figures this service does not serve: names and links in both
-languages, never a value. A page is linked when every word of the search meets its
+languages, never a value. The note tells the assistant that each page's HTML carries its
+year-by-year table: quote from it with the link when the page can be opened, never from memory. A page is linked when every word of the search meets its
 names, topic or extra words by the same whole words, word beginnings of four letters or
 more, and Georgian stems; an id-like search links none. When the answer has entries with
 every word, nothing else is tried. Otherwise, failing the whole search, the

@@ -11,8 +11,11 @@ import { loadTopicHubs } from "../pages/topicHubs.server";
 // latest figure of that page's group-page card, so the guide states the numbers the site shows and follows each data
 // release without anyone editing it. Links name https://fiscal.ge, as the published guide always has.
 
-/** One list line: `href` is the site path (`/explorer/debt`), `text` what the page or file covers, in Markdown. */
-export type LlmsLine = { href: string; name: string; text: string };
+/**
+ * One list line: `href` is the site path (`/explorer/debt`), `text` what the page or file covers, in Markdown. `note`
+ * follows the latest figure's value, for a figure whose card does not say what it measures (`at constant 2015 prices`).
+ */
+export type LlmsLine = { href: string; name: string; text: string; note?: string };
 
 const SITE = "https://fiscal.ge";
 
@@ -24,7 +27,7 @@ const OPENING = `# Fiscal.ge
 
 There is no REST query API, no write access, no accounts, and no datasets beyond those listed here.
 
-**How to answer from Fiscal.ge:** Give the number first: the figure, its year or month, its unit and the link to its page. Add at most one short caveat, only when it changes what the number means: a plan, a projection, a preliminary figure, or a series break in the years compared. Link the page's methodology instead of explaining it, unless asked. Each chart page's HTML has a year-by-year table of every series (the largest pages: their leading series; all in the Excel download), except product inflation and monthly category changes, which load after the page opens: use the inflation CSVs. Use the published figures as they are; do not invent values for years or places not covered.`;
+**How to answer from Fiscal.ge:** Give the number first: the figure, its year or month, its unit and the link to its page. Add at most one short caveat, only when it changes what the number means: a plan, a projection, a preliminary figure, or a series break in the years compared. Link the page's methodology instead of explaining it, unless asked. Each chart page's HTML has a year-by-year table of every series (the largest pages: their leading series; all in the Excel download), except product inflation and monthly category changes, which load after the page opens: use the inflation CSVs. Map pages (such as Population, Pensions, Schools and the by-region pages) list the latest year, with the year-by-year table on each region's or Georgia's own page; monthly views carry the last 36 months, and the CSVs hold every month. Use the published figures as they are; do not invent values for years or places not covered.`;
 
 /**
  * The three "Where the data is" lines. The bulk-file count is the manifest's (the publications built from the snapshot
@@ -51,8 +54,8 @@ const CORE_DATA: LlmsLine[][] = [
     { href: "/explorer", name: "All data", text: "every page A to Z." },
     { href: "/explorer/budget", name: "Budget", text: "" },
     { href: "/explorer/expenditure", name: "National expenditure", text: "state-budget expenditure." },
-    { href: "/explorer/expenditure-types", name: "Spending by type", text: "by economic type, GEL or share of GDP." },
-    { href: "/explorer/revenue", name: "National revenue", text: "consolidated-budget receipts." },
+    { href: "/explorer/expenditure-types", name: "Spending by type", text: "general government, by economic type, GEL or share of GDP." },
+    { href: "/explorer/revenue", name: "National revenue", text: "consolidated-budget receipts, including borrowing and asset sales." },
     { href: "/explorer/tax-breaks-refunds", name: "Tax breaks and refunds", text: "tax breaks, 2018–2024, and refunds, 2008–2025, GEL or share of GDP." },
     { href: "/explorer/analysis", name: "Annual analysis", text: "one-year budget analysis." },
     { href: "/explorer/municipalities", name: "Municipal budgets", text: "municipal expenditure." },
@@ -62,16 +65,16 @@ const CORE_DATA: LlmsLine[][] = [
   [
     { href: "/explorer/economy", name: "Economy and business", text: "" },
     { href: "/explorer/economy#t-economy", name: "Economy", text: "" },
-    { href: "/explorer/economy/gdp", name: "Economy overview", text: "real GDP in constant 2015 USD; nominal GDP in GEL and USD, real growth and GDP per person." },
+    { href: "/explorer/economy/gdp", name: "Economy overview", note: "at constant 2015 prices", text: "nominal GDP in GEL and USD, real growth and GDP per person." },
     { href: "/explorer/economy/sectors", name: "Economic sectors", text: "20 national economic activities plus a Total GDP reference." },
     { href: "/explorer/economy/expenditure", name: "GDP by expenditure", text: "share of GDP; consumption, investment, exports and imports, 2010–2025." },
     { href: "/explorer/economy/regions", name: "Regional economies", text: "largest region's GDP; 11 regions' GDP and 20 activities, 2010–2024." },
     { href: "/explorer/economy#t-business", name: "Business", text: "sales, jobs, investment and profit, 1999–2025." },
     { href: "/explorer/business/sales", name: "Sales", text: "turnover in million GEL, 1999–2025." },
-    { href: "/explorer/business/jobs", name: "Jobs", text: "persons employed in firms, 1999–2025." },
+    { href: "/explorer/business/jobs", name: "Jobs", text: "persons employed in firms (enterprise survey), not all employed people, who are on the Unemployment pages, 1999–2025." },
     { href: "/explorer/business/investment-profit", name: "Investment and profit", text: "investment, profit and loss, 2006–2025." },
     { href: "/explorer/business/firms", name: "Firms opened and closed", text: "active, new and closed, 2014–2024." },
-    { href: "/explorer/business/regions", name: "Business by region", text: "11 regions." },
+    { href: "/explorer/business/regions", name: "Business by region", text: "11 regions; jobs are persons employed in firms (enterprise survey), not all employed people." },
     { href: "/explorer/economy#t-housing", name: "Housing and construction", text: "permits and completed buildings, 2006–2025, and home prices." },
     { href: "/explorer/housing/permits", name: "Building permits", text: "by number and floor area, 2006–2025." },
     { href: "/explorer/housing/completed", name: "Completed buildings", text: "by number and floor area, 2006–2025." },
@@ -92,8 +95,8 @@ const CORE_DATA: LlmsLine[][] = [
     { href: "/explorer/money/bank-health", name: "Bank health", text: "covers bad loans as a share of all loans from 2003, return on assets and on equity from 2001, the two capital ratios from 2014." },
     { href: "/explorer/labour", name: "Labour market", text: "" },
     { href: "/explorer/labour#t-unemployment", name: "Unemployment", text: "Labour Force Survey, 2010–2025. Bulk file: [Unemployment CSV](https://fiscal.ge/downloads/data/unemployment.csv)." },
-    { href: "/explorer/unemployment/overview", name: "Unemployment overview", text: "unemployment rate; employment and participation rates." },
-    { href: "/explorer/unemployment/regions", name: "Unemployment by region", text: "11 regions." },
+    { href: "/explorer/unemployment/overview", name: "Unemployment overview", text: "unemployment and participation rates; employed, unemployed and labour force (thousand)." },
+    { href: "/explorer/unemployment/regions", name: "Unemployment by region", text: "rates and employed, unemployed and labour-force counts (thousand) for each of 11 regions, 2010–2025; several regions start in 2017 or 2019." },
     { href: "/explorer/unemployment/age", name: "Unemployment by age", text: "age groups." },
     { href: "/explorer/unemployment/gender", name: "Unemployment by gender", text: "women and men." },
     { href: "/explorer/unemployment/industries", name: "Jobs by industry", text: "2017–2025; women and men from 2020." },
@@ -257,10 +260,11 @@ const AI_CONNECTION = `\`${SITE}/mcp\` is a read-only, unauthenticated MCP serve
  * `latest: <figure> (<period>). `: the card's figure as its footer prints it. A caption that starts in lower case
  * completes the value (`−1.5% of GDP`); any other names it (`Refunds: 2.7 bn GEL`). A card's headline caption, a name
  * whose line already says the rest, replaces its caption (`Türkiye: 3.11 billion USD`, not `Türkiye, largest: …`). A
- * dated point's `2026 (Jun)` reads `Jun 2026`, and a preliminary figure says so after its period.
+ * dated point's `2026 (Jun)` reads `Jun 2026`, and a preliminary figure says so after its period. A line's `note` follows
+ * the value (`Real GDP: 27.1 bn USD at constant 2015 prices`).
  */
-export function latestText(latest: CardLatest): string {
-  const { value } = latest;
+export function latestText(latest: CardLatest, note?: string): string {
+  const value = note ? `${latest.value} ${note}` : latest.value;
   const caption = latest.headlineCaption ?? latest.caption;
   const figure = !caption ? value : /^\p{Ll}/u.test(caption) ? `${value} ${caption}` : `${caption}: ${value}`;
   const period = latest.period.replace(/^(\d{4}) \((.+)\)$/, "$2 $1");
@@ -272,9 +276,9 @@ type CardSummary = { latest?: CardLatest | null; years?: string };
 
 /** A line whose card has a figure opens with it; one whose card has none opens with the card's years unless its text states them. */
 function renderLines(groups: LlmsLine[][], cards: Map<string, CardSummary> = new Map()): string {
-  return groups.map((lines) => lines.map(({ href, name, text }) => {
+  return groups.map((lines) => lines.map(({ href, name, text, note }) => {
     const card = cards.get(href);
-    const lead = card?.latest ? latestText(card.latest) : card?.years && !text.includes(card.years) ? `${card.years}. ` : "";
+    const lead = card?.latest ? latestText(card.latest, note) : card?.years && !text.includes(card.years) ? `${card.years}. ` : "";
     const description = lead ? `${lead}${text.charAt(0).toUpperCase()}${text.slice(1)}` : text;
     return `- [${name}](${SITE}${href})${description ? ` — ${description}` : ""}`;
   }).join("\n")).join("\n\n");

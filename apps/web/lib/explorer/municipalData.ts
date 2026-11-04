@@ -224,6 +224,8 @@ export function buildMunicipalWorkbookInput(
     locale,
     filenameBase: context.workbookBasename,
     title: context.title,
+    // The title is the place alone; the crawl caption names what its figures measure.
+    view: workbookMessage(locale, "workbook.municipalExpenditure"),
     groupLabel: workbookMessage(locale, "workbook.municipalExpenditure"),
     years,
     measure: state.share

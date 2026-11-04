@@ -180,28 +180,31 @@ export function getDefaultSelection(
 }
 
 /** A crawl table's state: one scope, its series and its years, as buildExplorerModel reads them. */
-export type BudgetCrawlState = { scope: ExplorerScope; grouping: ExpenditureGrouping; selectedIds: string[]; startYear: number; endYear: number };
+export type BudgetCrawlState = { scope: ExplorerScope; grouping: ExpenditureGrouping; selectedIds: string[]; startYear: number; endYear: number; share: boolean };
 
 /**
- * The hidden crawl tables of a route (lib/explorer/crawlTables.ts): one state per scope it offers, each with every series
- * of that scope's list (a ministry's programmes too) from the first to the last year of the scope's rows, the years
- * budgetYearsByScope (components/main-explorer) offers it, in amounts — the share of GDP only divides them. A scope
- * without rows has no state.
+ * The hidden crawl tables of a route (lib/explorer/crawlTables.ts): per scope it offers, every series of that scope's list
+ * (a ministry's programmes too) from the first to the last year of the scope's rows, the years budgetYearsByScope
+ * (components/main-explorer) offers it — in amounts, then as % of GDP, since the page lists no GDP to work the shares out
+ * from. A scope without rows has no state; without a GDP year in the scope's span it has no % of GDP state.
  */
-export function budgetCrawlStates(side: ExplorerSide, facts: ClientBudgetFact[], adminFacts: ClientAdminFact[] = []): BudgetCrawlState[] {
+export function budgetCrawlStates(side: ExplorerSide, facts: ClientBudgetFact[], adminFacts: ClientAdminFact[] = [], gdpFacts: readonly Pick<ClientNationalGdpFact, "year">[] = []): BudgetCrawlState[] {
   const groupings: ExpenditureGrouping[] = side === "expenditure" ? ["fields", "ministries"] : ["fields"];
   return groupings.flatMap((grouping) => {
     const ministries = grouping === "ministries";
     const rows = ministries ? adminFacts : facts.filter((fact) => fact.side === side && !isDerivedTotalItemId(fact.itemId));
     if (rows.length === 0) return [];
     const years = rows.map((fact) => fact.year);
-    return [{
+    const state: BudgetCrawlState = {
       scope: ministries ? "ministries" : side === "revenue" ? "revenue" : "fields",
       grouping,
       selectedIds: [...new Set([ministries ? ADMIN_SPENDING_TOTAL_ID : totalIdFor(side), ...rows.map((fact) => fact.itemId)])],
       startYear: Math.min(...years),
       endYear: Math.max(...years),
-    }];
+      share: false,
+    };
+    const withShare = gdpFacts.some((fact) => fact.year >= state.startYear && fact.year <= state.endYear);
+    return withShare ? [state, { ...state, share: true }] : [state];
   });
 }
 
