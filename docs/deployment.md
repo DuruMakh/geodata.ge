@@ -197,7 +197,9 @@ brings (the owner's answer to the week review's question: "Renew to 1 Dec
 (its registry entry last changed 2024-09-18) and PR #72 is unreleased;
 `eslint.config.mjs` sets no `next.rootDir`; all five chain entries are
 `dev: true` in the lockfile; and the 124 files traced into the built `/mcp`
-route (`.next/server/app/mcp/route.js.nft.json`) include none of them.
+route (`.next/server/app/mcp/route.js.nft.json`) include none of them. (Since the
+2026-11 static switch `/mcp` is `api/mcp.ts`; a renewal re-checks its trace in
+the Vercel build output instead.)
 
 The inspected Next ESLint helper receives its root-directory pattern from
 repository-owned ESLint settings; this repository does not set `next.rootDir`,
@@ -323,6 +325,11 @@ project.
   (normally unnecessary — the *Deploy production* workflow owns production;
   this is the GitHub-Actions-outage fallback, see the Runbook)
 - Rollback: `vercel rollback` (or dashboard → Deployments → ⋯ → *Instant Rollback*)
+  On Hobby this can only go back to the deployment just before the current one.
+  While rolled back, new deploy-hook builds are not put on the domain until the
+  rollback is undone (dashboard *Undo Rollback*, or `vercel promote`). Rolling back
+  across the 2026-11 static switch returns to the old Next.js deployment and its
+  ISR Reads and Fast Origin Transfer use.
 
 ## Environment variables
 
@@ -420,6 +427,30 @@ its query string, the security and `Content-Security-Policy-Report-Only`
 headers are present, `/_next/static/…` is `immutable`, `/opengraph-image` is
 `image/png`; and run `scripts/smoke-mcp.ts` against `https://fiscal.ge/mcp`.
 On the Usage page, ISR Reads should stay about 0 in the following days.
+
+**Preview check before merging a hosting or `/mcp` change** (the deploy shape,
+`vercel.json`, `api/`, or `lib/mcp/`). Give the branch Preview-scoped variables
+`MCP_ENABLED=true` and `MCP_RATE_LIMITER=memory`, push the branch, and on its
+Preview deployment confirm (Previews sit behind Vercel Authentication: sign in for
+the browser checks, and for `curl` and `scripts/smoke-mcp.ts` use a shareable
+link or a Protection Bypass token from the project's Deployment Protection
+settings):
+
+- the Vercel build log shows no errors for `api/mcp.ts`, and lists the function;
+- pages carry no `x-nextjs-prerender` header; an unknown address answers 404 with
+  the not-found page;
+- a municipality code redirect and a legacy hub forward each answer 308 and keep
+  an added query string (`/en/explorer/wages?utm_source=x` →
+  `/en/explorer/labour?topic=wages&utm_source=x`);
+- the security, `Content-Security-Policy-Report-Only` and `X-Robots-Tag` headers
+  are present where `lib/site/routing.ts` puts them (on pages, files and 404s;
+  Vercel applies header rules after redirects, so a 308 carries none of them); `/_next/static/…` is
+  `immutable`; `/opengraph-image` is `image/png`;
+- `/mcp` answers `initialize` **and a real `tools/call` that returns figures**
+  (`scripts/smoke-mcp.ts` against the Preview URL). A failure there blocks the
+  merge: an unreadable snapshot fails every call;
+- Georgian and English pages open, client navigation works, and an Excel
+  download succeeds.
 
 ## Connecting the custom domain (owner steps)
 
@@ -837,7 +868,7 @@ Verify provider READY/SHA separately: the probe's data identities do not establi
 the production deployment commit by themselves.
 
 For built-local proof, preserve build-time `NEXT_PUBLIC_SITE_URL=https://fiscal.ge`.
-Set only the dedicated server process to `MCP_ENABLED=true`,
+Serve it with `npm run start -- --port 3100` and set only that server process to `MCP_ENABLED=true`,
 `MCP_RATE_LIMITER=memory`, `VERCEL_ENV=preview`, `VERCEL_URL=localhost:3100`;
 confirm discovery succeeds before the full probe. This uses the existing local
 Host allowance. Restore that process environment and stop its process tree after

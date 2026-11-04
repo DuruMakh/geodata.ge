@@ -60,9 +60,9 @@ pause the Supabase project. Delete the Supabase project after about 30 quiet day
 - `postbuild` (`check-function-size.ts`) measures the Next.js server function. That function is
   gone, so the guard and its script are removed. The new function's size is checked by Vercel
   itself (250 MB limit), and the snapshot is about 32 MB.
-- `next dev` still works for local editing. In dev it no longer applies redirects or headers,
-  which only matters for testing those two things. The tests in 3.5 cover them against the
-  real config.
+- `next dev` still works for local editing. `next.config.ts` hands it the same redirects and
+  headers in development only (the export ignores them), so local runs of the redirect and header
+  browser specs behave as in production.
 
 ### 3.2 Redirects and headers move to a generated `vercel.json`
 
@@ -114,8 +114,12 @@ inspected by eye.
 - `lib/mcp/` and `lib/factQuery/` purity tests keep their rules: no database and no network
   beyond Upstash.
 
-**Main risk.** `@modelcontextprotocol/server` is ESM-only and is loaded from a function that
-Vercel compiles. This cannot be proven locally and is proven on the Preview (3.6).
+**Main risk.** How Vercel compiles and starts the function. The deployment review (2026-11-04)
+found the SDK ships a CommonJS build, so it is not the risk; two other things were, and are fixed:
+Vercel compiles `.ts` with the nearest tsconfig and does not convert it to CommonJS, so
+`api/tsconfig.json` sets `module: commonjs`; and Vercel's Node functions start in the bundle root,
+not `apps/web`, so `lib/mcp/snapshot.ts` also looks under `apps/web/`. Both were reproduced with
+Vercel's own builder packages, and the Preview (3.6) is the final proof.
 
 **Fallback.** If it cannot work in this project, a separate small project serves
 `mcp.fiscal.ge`. The connector address changes, which would be the owner's call. It is not

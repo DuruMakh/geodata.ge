@@ -37,8 +37,7 @@ export default defineConfig({
     // between the two is otherwise ungated: CSS layer ordering and minification
     // (globals.css relies on unlayered rules beating Tailwind's utilities layer),
     // the next/dynamic chunk split behind the hero, prerendered HTML, and
-    // production-mode hydration, and the redirects and headers, which only the
-    // static server applies (from vercel.json). Locally `dev` stays the fast path.
+    // production-mode hydration. Locally `dev` stays the fast path.
     command: process.env.CI ? "npm run build && npm run start -- --port 3100" : "npm run dev -- --port 3100",
     // Never reuse a leftover server when a data source is pinned: a stale
     // csv-mode dev server on the port would silently masquerade as a db run.

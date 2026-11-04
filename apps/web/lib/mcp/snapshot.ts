@@ -5,11 +5,17 @@
 // answer with no database and no network (spec sections 4.4 and 11.2), so the
 // snapshot written by `data:prepare-fact-query-snapshot` during prebuild is
 // read from the deployed bundle exactly once per instance.
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { SCHEMA_VERSION, type FactQuerySnapshot } from "../factQuery/types";
 
-const SNAPSHOT_PATH = path.join(process.cwd(), "lib", "factQuery", "generated", "snapshot.json");
+// Locally, in tests and in CI the process runs in apps/web. Vercel's Node functions start in the bundle root,
+// where this project's files sit under apps/web/. This picks where the one bundled file is, not which data.
+const SNAPSHOT_CANDIDATES = [
+  path.join(process.cwd(), "lib", "factQuery", "generated", "snapshot.json"),
+  path.join(process.cwd(), "apps", "web", "lib", "factQuery", "generated", "snapshot.json"),
+];
+const SNAPSHOT_PATH = SNAPSHOT_CANDIDATES.find(candidate => existsSync(candidate)) ?? SNAPSHOT_CANDIDATES[0];
 
 let cached: FactQuerySnapshot | undefined;
 

@@ -1,4 +1,5 @@
-import { describe, expect, it } from "vitest";
+import path from "node:path";
+import { describe, expect, it, vi } from "vitest";
 import { hashDataVersion } from "../../lib/factQuery/canonical";
 import { queryNational } from "../../lib/factQuery/queryNational";
 import { SCHEMA_VERSION } from "../../lib/factQuery/types";
@@ -38,6 +39,18 @@ describe("packaged snapshot", () => {
 
     expect(text.startsWith("{\"")).toBe(true);
     expect(text.trimEnd()).not.toContain("\n");
+  });
+
+  it("is found when the function runs from the repository root", async () => {
+    // Vercel's Node functions start in the bundle root, where this project's files sit under apps/web/.
+    const cwd = vi.spyOn(process, "cwd").mockReturnValue(path.resolve("..", ".."));
+    try {
+      vi.resetModules();
+      const fresh = await import("../../lib/mcp/snapshot");
+      expect(fresh.loadPackagedSnapshot().dataVersion).toBe(loadPackagedSnapshot().dataVersion);
+    } finally {
+      cwd.mockRestore();
+    }
   });
 
   it("is bundled into the /mcp function", async () => {

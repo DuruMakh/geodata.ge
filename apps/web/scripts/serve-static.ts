@@ -7,10 +7,10 @@ import { pathToRegexp } from "next/dist/compiled/path-to-regexp";
 import { runAsCli } from "../lib/runAsCli";
 import type { VercelConfig } from "./prepare-vercel-config";
 
-// `npm run start`: serves the static export in out/ the way Vercel does with vercel.json, for the browser tests
+// `npm run start`: serves the static export in out/ following the vercel.json rules (close to Vercel, not identical), for the browser tests
 // (locally and in CI) and for looking at a build. In order: the trailing-slash redirect, the redirects, the /mcp
 // rewrite to its function, the files (clean URLs), then 404.html with status 404. Every matching header rule is
-// added to every response. `next start` cannot serve a static export.
+// added to every response that is not a redirect. (`next start` cannot serve a static export.)
 
 type McpHandler = (request: Request) => Promise<Response> | Response;
 type Options = { root: string; config: VercelConfig; mcpHandler?: McpHandler };
@@ -67,14 +67,22 @@ export function createStaticServer({ root, config, mcpHandler }: Options): http.
   }
 
   return http.createServer((request, response) => {
-    const url = new URL(request.url ?? "/", `http://${request.headers.host ?? "localhost"}`);
+    let url: URL;
+    try {
+      url = new URL(request.url ?? "/", `http://${request.headers.host ?? "localhost"}`);
+    } catch {
+      response.writeHead(400);
+      return response.end();
+    }
     const pathname = url.pathname;
-    for (const rule of headerRules) if (rule.pattern.test(pathname)) for (const { key, value } of rule.headers) response.setHeader(key, value);
 
-    const redirect = (location: string) => { response.writeHead(308, { location }); response.end(); };
+    // One leading slash only: `//host` in a Location header would send the browser to another site.
+    const redirect = (location: string) => { response.writeHead(308, { location: location.replace(/^\/{2,}/, "/") }); response.end(); };
     if (pathname.length > 1 && pathname.endsWith("/")) return redirect(`${pathname.replace(/\/+$/, "")}${url.search}`);
     const destination = redirects.get(pathname);
     if (destination !== undefined) return redirect(withQuery(destination, url.searchParams));
+    // Vercel applies header rules after its redirects, so a 308 carries none of them.
+    for (const rule of headerRules) if (rule.pattern.test(pathname)) for (const { key, value } of rule.headers) response.setHeader(key, value);
     if (rewrites.has(pathname)) {
       handleMcp(request, response, url).catch(() => { if (!response.headersSent) response.writeHead(500); response.end(); });
       return;
@@ -95,7 +103,7 @@ export function createStaticServer({ root, config, mcpHandler }: Options): http.
     if (!response.hasHeader("content-type")) response.setHeader("content-type", CONTENT_TYPES[path.extname(file)] ?? "application/octet-stream");
     response.writeHead(status);
     if (request.method === "HEAD") return response.end();
-    createReadStream(file).pipe(response);
+    createReadStream(file).on("error", () => response.destroy()).pipe(response);
   });
 }
 

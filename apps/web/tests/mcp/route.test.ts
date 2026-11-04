@@ -178,7 +178,21 @@ describe("/mcp route", () => {
 
     expect(config.rewrites).toContainEqual({ source: "/mcp", destination: "/api/mcp" });
     expect(config.functions["api/mcp.ts"].maxDuration).toBe(10);
-    expect(api.POST).toBe(POST);
+    expect([api.POST, api.OPTIONS, api.GET, api.DELETE]).toEqual([POST, OPTIONS, GET, DELETE]);
+  });
+
+  it("is compiled to CommonJS for the function, whatever the app's module setting", async () => {
+    // Vercel's Node builder compiles api/ and every file it imports with the tsconfig nearest api/mcp.ts,
+    // and does not convert compiled TypeScript to CommonJS. With the app's `module: esnext` the deployed
+    // file is an ES module whose extensionless imports Node cannot resolve, so every call fails on load.
+    const ts = await import("typescript");
+    const parsed = ts.getParsedCommandLineOfConfigFile("api/tsconfig.json", {}, { ...ts.sys, onUnRecoverableConfigFileDiagnostic: () => {} });
+    expect(parsed?.options.module).toBe(ts.ModuleKind.CommonJS);
+    for (const file of ["api/mcp.ts", "lib/mcp/handler.ts"]) {
+      const { outputText } = ts.transpileModule(ts.sys.readFile(file) ?? "", { compilerOptions: parsed?.options, fileName: file });
+      expect(outputText).not.toMatch(/^\s*(export|import)\s/m);
+      expect(outputText).toContain("require(");
+    }
   });
 });
 

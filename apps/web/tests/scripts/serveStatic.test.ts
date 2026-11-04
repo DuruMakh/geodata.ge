@@ -88,6 +88,13 @@ describe("serve-static", () => {
     expect(response.headers.get("location")).toBe("/explorer/trade");
   });
 
+  it("leaves the header rules off redirects, as Vercel's route order does", async () => {
+    const response = await get("/explorer/wages");
+
+    expect(response.status).toBe(308);
+    expect(response.headers.get("x-frame-options")).toBeNull();
+  });
+
   it("adds the site-wide security headers to a page and to a 404", async () => {
     for (const address of ["/explorer/labour", "/nope"]) {
       const response = await get(address);
@@ -101,6 +108,30 @@ describe("serve-static", () => {
     expect(data.headers.get("x-robots-tag")).toBe("noindex");
     expect(data.headers.get("cache-control")).toBe("public, max-age=31536000, immutable");
     expect((await get("/opengraph-image")).headers.get("content-type")).toBe("image/png");
+  });
+
+  // A raw request, because fetch would normalise these targets before sending them.
+  async function raw(target: string, host = "localhost"): Promise<{ status: number; location?: string }> {
+    const http = await import("node:http");
+    return new Promise((resolve, reject) => {
+      const request = http.request({ host: "127.0.0.1", port: new URL(base).port, path: target, headers: { host } }, (response) => {
+        response.resume();
+        resolve({ status: response.statusCode ?? 0, location: response.headers.location });
+      });
+      request.on("error", reject);
+      request.end();
+    });
+  }
+
+  it("never redirects to another site", async () => {
+    const response = await raw("/.//evil.com/");
+    expect(response.status).toBe(308);
+    expect(response.location).toBe("/evil.com");
+  });
+
+  it("answers a request target it cannot parse with 400 and keeps serving", async () => {
+    expect((await raw("//", "bad host")).status).toBe(400);
+    expect((await get("/")).status).toBe(200);
   });
 
   it("never serves a file outside its folder", async () => {
