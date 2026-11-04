@@ -53,7 +53,8 @@ export function buildTradePartnersWorkbookModel(input: { dataset?: "services" | 
   exportModel.analysis.headers[3] = t("workbook.amount");
   if (!composition) {
     exportModel.analysis.headers.push(t("workbook.publication"));
-    exportModel.analysis.rows = exportModel.analysis.rows.map(row => [...row, t("publicationUnspecified")]);
+    const unspecified = t("publicationUnspecified");
+    exportModel.analysis.rows = exportModel.analysis.rows.map(row => [...row, unspecified]);
   }
   exportModel.analysis.numericFormats = { 4: EXACT_SIGNED_FORMAT };
   return exportModel;

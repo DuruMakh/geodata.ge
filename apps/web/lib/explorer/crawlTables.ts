@@ -17,6 +17,18 @@ const STATUS_KEYS = {
 
 const isNumberSection = (section: string | undefined): section is string => section !== undefined && /[0#]/.test(section);
 
+// One shared formatter per shape: building an Intl.NumberFormat per cell dominated hydration on capped pages.
+const formatters = new Map<string, Intl.NumberFormat>();
+function numberFormatter(minimum: number, maximum: number, useGrouping: boolean): Intl.NumberFormat {
+  const key = `${minimum}:${maximum}:${useGrouping}`;
+  let formatter = formatters.get(key);
+  if (!formatter) {
+    formatter = new Intl.NumberFormat("en-US", { minimumFractionDigits: minimum, maximumFractionDigits: maximum, useGrouping });
+    formatters.set(key, formatter);
+  }
+  return formatter;
+}
+
 // A deliberately small reading of an Excel format: decimals, grouping, percent and sign only.
 export function formatCrawlCell(value: number | null, basis: WorkbookBasis | null, numberFormat: string, locale: Locale): string {
   if (value === null || basis === "not_available") return MISSING;
@@ -27,11 +39,7 @@ export function formatCrawlCell(value: number | null, basis: WorkbookBasis | nul
   const minimum = (decimalPart.match(/0/g) ?? []).length;
   const maximum = minimum + (decimalPart.match(/#/g) ?? []).length;
   const percent = section.includes("%");
-  const digits = new Intl.NumberFormat("en-US", {
-    minimumFractionDigits: minimum,
-    maximumFractionDigits: maximum,
-    useGrouping: integerPart.includes(","),
-  }).format(Math.abs(percent ? value * 100 : value));
+  const digits = numberFormatter(minimum, maximum, integerPart.includes(",")).format(Math.abs(percent ? value * 100 : value));
   const sign = value < 0 ? "−" : section.trimStart().startsWith("+") ? "+" : "";
   const text = `${sign}${digits}${percent ? "%" : ""}`;
   const status = basis !== null && basis in STATUS_KEYS ? STATUS_KEYS[basis as keyof typeof STATUS_KEYS] : null;
