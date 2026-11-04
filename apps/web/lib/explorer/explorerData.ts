@@ -16,6 +16,7 @@ import type {
   ExplorerItem,
   ExplorerItemLevel,
   ExplorerPoint,
+  ExplorerScope,
   ExplorerSide,
   ExplorerTableRow,
   MeasureMode,
@@ -176,6 +177,31 @@ export function getDefaultSelection(
         );
 
   return hasSelectableRows ? [totalId] : [];
+}
+
+/** A crawl table's state: one scope, its series and its years, as buildExplorerModel reads them. */
+export type BudgetCrawlState = { scope: ExplorerScope; grouping: ExpenditureGrouping; selectedIds: string[]; startYear: number; endYear: number };
+
+/**
+ * The hidden crawl tables of a route (lib/explorer/crawlTables.ts): one state per scope it offers, each with every series
+ * of that scope's list (a ministry's programmes too) over every year the scope offers (budgetYearsByScope), in amounts —
+ * the share of GDP only divides them. A scope without rows has no state.
+ */
+export function budgetCrawlStates(side: ExplorerSide, facts: ClientBudgetFact[], adminFacts: ClientAdminFact[] = []): BudgetCrawlState[] {
+  const groupings: ExpenditureGrouping[] = side === "expenditure" ? ["fields", "ministries"] : ["fields"];
+  return groupings.flatMap((grouping) => {
+    const ministries = grouping === "ministries";
+    const rows = ministries ? adminFacts : facts.filter((fact) => fact.side === side && !isDerivedTotalItemId(fact.itemId));
+    if (rows.length === 0) return [];
+    const years = rows.map((fact) => fact.year);
+    return [{
+      scope: ministries ? "ministries" : side === "revenue" ? "revenue" : "fields",
+      grouping,
+      selectedIds: [...new Set([ministries ? ADMIN_SPENDING_TOTAL_ID : totalIdFor(side), ...rows.map((fact) => fact.itemId)])],
+      startYear: Math.min(...years),
+      endYear: Math.max(...years),
+    }];
+  });
 }
 
 export function isDerivedTotalItemId(itemId: string): boolean {

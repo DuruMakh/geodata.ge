@@ -3,7 +3,7 @@
 import { coverageLabel } from "../../lib/explorer/coverageLabel";
 import { useMemo } from "react";
 import type { ClientGeneralGovernmentBalanceFact } from "../../lib/explorer/clientData";
-import { buildDeficitExplorerModel, DEFICIT_ITEM } from "../../lib/explorer/deficitExplorer";
+import { buildDeficitExplorerModel, deficitCrawlStates, DEFICIT_ITEM } from "../../lib/explorer/deficitExplorer";
 import { parseDeficitHash, serializeDeficitHash } from "../../lib/explorer/deficitUrlState";
 import { buildDeficitWorkbookExportModel } from "../../lib/explorer/deficitWorkbook";
 import { message } from "../../lib/i18n/messages";
@@ -31,6 +31,7 @@ import { ExplorerPage } from "../explorer-shell/explorer-page";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { MeasurePill } from "../explorer-shell/measure-pill";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
+import { CrawlTables } from "../explorer-shell/crawl-tables";
 import { ChartShareButton } from "../explorer-shell/chart-share-button";
 import { useHashState } from "../explorer-shell/use-hash-state";
 import { DECK_LINE_CLASS } from "../explorer-shell/latest-value-line";
@@ -82,6 +83,14 @@ export function DeficitExplorer({ facts, workbookSources, edition, siteOrigin, l
     () => buildDeficitExplorerModel({ facts, range, percentage, selected }, presentation),
     [facts, range, percentage, selected, presentation],
   );
+  // The series over every year, as % of GDP and in GEL, for the hidden crawl tables: built from the props alone, so a
+  // click never rebuilds them.
+  const crawlModels = useMemo(() => deficitCrawlStates(facts).map((crawl) => buildDeficitWorkbookExportModel({
+    facts,
+    ...crawl,
+    sources: workbookSources,
+    siteOrigin: siteOrigin ?? "",
+  }, presentation)), [facts, workbookSources, siteOrigin, presentation]);
   const forecastBoundaryYear = facts.find((fact) => fact.status === "projection")?.year ?? null;
   const actualYears = facts.filter((fact) => fact.status === "actual").map((fact) => fact.year);
   const projectionYears = facts.filter((fact) => fact.status === "projection").map((fact) => fact.year);
@@ -178,29 +187,25 @@ export function DeficitExplorer({ facts, workbookSources, edition, siteOrigin, l
                   {message(messages, "main.noSelection")}
                 </Callout>
               </div>
+            ) : chartMode === "table" ? (
+              <ExplorerTable
+                caption={message(messages, "deficit.caption", { start: range.start, end: range.end })}
+                rows={[model.tableRow]}
+                totalRow={null}
+                showTotal={false}
+                years={model.years}
+                firstColumnLabel={message(messages, "controls.seriesColumn")}
+                unit={unit}
+                share={percentage}
+                showChangeColumn={false}
+                forecastYears={forecastYears}
+                forecastLabel={message(messages, "deficit.forecast")}
+                shareValueForYear={(row, year) => row.shareByYear?.[year] ?? null}
+              />
             ) : (
-              <>
-                <ExplorerTable
-                  caption={message(messages, "deficit.caption", { start: range.start, end: range.end })}
-                  rows={[model.tableRow]}
-                  totalRow={null}
-                  showTotal={false}
-                  years={model.years}
-                  firstColumnLabel={message(messages, "controls.seriesColumn")}
-                  unit={unit}
-                  share={percentage}
-                  showChangeColumn={false}
-                  forecastYears={forecastYears}
-                  forecastLabel={message(messages, "deficit.forecast")}
-                  shareValueForYear={(row, year) => row.shareByYear?.[year] ?? null}
-                  crawlCopy={chartMode === "line"}
-                />
-                {chartMode === "line" ? (
-                  <div className="mt-5">
-                    {chart}
-                  </div>
-                ) : null}
-              </>
+              <div className="mt-5">
+                {chart}
+              </div>
             )}
             <ChartSelectionAids series={chartSeries} chartShown={chartMode === "line"} share={percentage} unit={unit} />
 
@@ -270,6 +275,7 @@ export function DeficitExplorer({ facts, workbookSources, edition, siteOrigin, l
           />
         </SeriesAside>
       </ExplorerWorkspace>
+      <CrawlTables models={crawlModels} />
     </ExplorerPage>
   );
 }

@@ -69,6 +69,14 @@ export function buildTaxBreaksRefundsModel(allFacts: readonly ClientTaxBreaksRef
   };
 }
 
+/**
+ * The hidden crawl tables' state (lib/explorer/crawlTables.ts): every series of the list over all its years, in amounts —
+ * the % of GDP view only divides them by GDP. No facts, no state.
+ */
+export function taxBreaksRefundsCrawlStates(facts: readonly ClientTaxBreaksRefundsFact[]): TaxBreaksRefundsState[] {
+  return facts.length === 0 ? [] : [{ mode: "line", view: "amount", range: { kind: "all" }, selectedIds: TAX_BREAKS_REFUNDS_SERIES.map(series => series.id) }];
+}
+
 /** The heading line's figure: the latest refunds. Both totals do not fit one 375px line, so tax breaks are left to the list. */
 export function taxBreaksRefundsHeadline(facts: readonly ClientTaxBreaksRefundsFact[]): { year: number; value: number } {
   const fact = facts.filter(f => f.indicatorId === "tax_refunds.total").sort((a, b) => a.year - b.year).at(-1)!;
