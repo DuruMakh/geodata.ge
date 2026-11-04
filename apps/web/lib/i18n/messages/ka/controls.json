@@ -53,5 +53,5 @@
   "controls.share.working": "სურათი მზადდება…",
   "controls.share.copied": "სურათი დაკოპირდა",
   "controls.share.error": "სურათი ვერ მომზადდა — სცადეთ თავიდან.",
-  "controls.crawlTop": "პირველი {kept} {of}-დან; ყველა — Excel-ის ფაილში"
+  "controls.crawlTop": "უდიდესი {kept} {of}-დან; ყველა — Excel-ის ფაილში"
 }
