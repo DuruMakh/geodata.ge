@@ -82,19 +82,27 @@ alongside the current build. The full local report is `.tmp/bilingual/final/comp
 | Production URL | https://fiscal.ge |
 | Git repository | `github.com/DuruMakh/geodata.ge` (git-connected) |
 | Root Directory | `apps/web` |
-| Framework preset | Next.js (default build/install commands) |
+| Framework preset | Other — set by `framework: null` in `apps/web/vercel.json`, with `buildCommand: npm run build` and `outputDirectory: out`, so the dashboard values do not apply |
 | Node.js | 24.x (also pinned via `engines` in `apps/web/package.json`) |
-| Environment variables | Production: `DATABASE_URL` + `GEODATA_DATA_SOURCE=db` (see Environment variables below); previews/dev: none — CSV-mode builds read `data/imports/` from the repo checkout |
+| Environment variables | Production: the `/mcp` variables and `NEXT_PUBLIC_SITE_URL` (see Environment variables below); every build reads `data/imports/` from the repo checkout |
 
 The repo clone on the build machine includes the repo root, so the build can
 read `data/` via the `../../` relative paths in `apps/web/lib/data/servedData.ts`.
 Before Next.js builds, `prebuild` deterministically prepares the ignored public
 methodology downloads from the reviewed manifests and immutable originals; see
-`docs/data-methodology/public-methodology-and-source-archives.md`. Every
-human page—`/`, All data, every group, chart and place page, the methodology
-hub and its category pages, `/about` and `/connect`—and `/robots.txt`,
-`/sitemap.xml` and the 404 page are prerendered at build time. The only
-request-time route is `/mcp` (see "The `/mcp` runtime" below).
+`docs/data-methodology/public-methodology-and-source-archives.md`. The site is
+a static export (`output: "export"` in `apps/web/next.config.ts`): every human
+page—`/`, All data, every group, chart and place page, the methodology hub and
+its category pages, `/about` and `/connect`—and `/robots.txt`, `/sitemap.xml`
+and `404.html` are written to `apps/web/out/` at build time and Vercel serves
+them as plain files. Since 2026-11 (spec
+`docs/superpowers/specs/2026-11-04-static-export-and-supabase-retirement-design.md`)
+no page is an ISR object, so page traffic no longer counts against Hobby's ISR
+Reads or Fast Origin Transfer. The redirects and response headers live in
+`apps/web/lib/site/routing.ts`; `npm run site:prepare-vercel-config` writes them
+into `apps/web/vercel.json`, which Vercel applies (`tests/site/vercelConfig.test.ts`
+fails when the file has drifted). The only request-time code is the `/mcp`
+function (see "The `/mcp` runtime" below).
 
 ## How deploys happen
 
@@ -102,45 +110,29 @@ request-time route is `/mcp` (see "The `/mcp` runtime" below).
   auto-deploy for `main` is disabled (`apps/web/vercel.json`), and the only
   road to production is `.github/workflows/deploy-production.yml`:
   1. CI (`.github/workflows/ci.yml`) completes green on `main`;
-  2. the workflow applies any new Prisma migrations (`npm run prisma:deploy`)
-     and re-runs the parity-checked import (`npm run data:import`),
-     converging the Supabase mirror to the checkout — unconditionally, on
-     every deploy (the import is idempotent; the parity report is in the
-     workflow log);
-  3. it runs the db-mode build itself (`GEODATA_DATA_SOURCE=db npm run
-     build`, over the pooled `DATABASE_URL`), so the exact build Vercel is
-     about to run is proven before the hook fires — nothing earlier in the
-     pipeline exercises that path for this commit, because PR CI builds only
-     in CSV mode and `db-health.yml` runs on a weekly schedule rather than per
-     commit;
-  4. it POSTs the Vercel deploy hook, and Vercel builds latest `main` with
-     `GEODATA_DATA_SOURCE=db`, regenerating and validating the methodology
-     archives in `prebuild`, and re-verifying the mirror row-by-row during the
-     build.
-  A failure at any step leaves production serving its previous deploy, and a
-  red `main` blocks production updates by design. The workflow's manual
-  trigger (Actions → *Deploy production* → *Run workflow*) is the
-  "import + redeploy" escape hatch.
-- **Function size**: Vercel refuses any server function over 250 MB. On
-  2026-10-10 the methodology pages traced every file under `public/downloads`
-  into their functions (250.13 MB) and the production deploy failed; the fix
-  is `outputFileTracingExcludes: { "*": ["./public/downloads/**"] }` in
-  `apps/web/next.config.ts` (the pages are prerendered and the CDN serves
-  `public/` directly). `npm run check:function-size`, run in `postbuild`, sums
-  every route's `.nft.json` trace together with the shared
-  `next-server.js.nft.json` files, prints the five largest and fails the build
-  above 200 MB, so the next such regression fails in CI rather than at deploy.
-  A data loader that reads files under `public/` or `docs/Raw Data/` at
-  request time, without a `/* turbopackIgnore: true */` path hint, is the
-  usual cause.
+  2. it POSTs the Vercel deploy hook, and Vercel builds latest `main` from the
+     reviewed CSVs, regenerating and validating the methodology archives in
+     `prebuild`.
+  A failure leaves production serving its previous deploy, and a red `main`
+  blocks production updates by design. The workflow's manual trigger
+  (Actions → *Deploy production* → *Run workflow*) redeploys latest `main`.
+  Until 2026-11 the workflow also converged a Supabase mirror and built from it
+  first; that mirror changed no published figure (every build proved it equal to
+  the CSVs) and is retired (`docs/data-methodology/database-import.md`).
+- **Function size**: Vercel refuses any function over 250 MB. The only function
+  is `/mcp` (`apps/web/api/mcp.ts`), whose bundle holds the about 32 MB snapshot
+  named in `vercel.json` `includeFiles`; pages are static files and have no
+  function.
 - **CI** (`.github/workflows/ci.yml`, every PR and every push to `main`):
   the `checks` job (lint, typecheck, unit tests, `data:validate`) and the `build`
   job run in parallel. `build` builds the site once (with
   `NEXT_PUBLIC_SITE_URL=https://fiscal.ge`, and `GEODATA_TYPECHECK_GATED=1` so
   `next build` skips the TypeScript pass `checks` already runs) and uploads the
   build and the files `prebuild` generates as the `next-build` artifact, without
-  `.next/cache` or source maps. The `e2e` job waits for `build` only: it
-  downloads the artifact, starts `next start` on port 3100, waits until it
+  `.next/cache`: the static export in `out/` and the `/mcp` snapshot. The `e2e` job waits for `build` only: it
+  downloads the artifact, starts `npm run start` (`scripts/serve-static.ts`,
+  which serves `out/` with `vercel.json`'s redirects and headers and routes
+  `/mcp` to its handler) on port 3100, waits until it
   answers, runs the browser suite against it and prints the server log if
   anything fails. The `mirror` job (since 2026-10-22) runs in parallel too: on a
   disposable PostgreSQL 17 service it creates Supabase's `anon` and
@@ -181,10 +173,11 @@ request-time route is `/mcp` (see "The `/mcp` runtime" below).
   - Load-dependent, cause not established: `municipal-entity.spec.ts` "sourced
     percentage workbook", download or request specs under a loaded machine, and
     the unit test `tests/seo/opengraphImage.test.ts`.
-- **Previews**: unchanged — every push to any other branch (and every PR)
-  gets its own preview deployment, always CSV-mode (the database env vars
-  are scoped to Production only), so data-PR previews never depend on the
-  mirror. Preview deployments are automatically `noindex`ed by Vercel.
+- **Previews**: every push to any other branch (and every PR) gets its own
+  preview deployment, built exactly as production (same `vercel.json`).
+  Preview deployments are automatically `noindex`ed by Vercel. `/mcp` on a
+  Preview stays paused unless `MCP_ENABLED=true` and `MCP_RATE_LIMITER=memory`
+  are set as Preview variables scoped to that branch.
 
 ## Temporary dependency-security exception
 
@@ -333,26 +326,19 @@ project.
 
 ## Environment variables
 
-Production builds from the Supabase mirror; previews and local dev need none.
+Builds read the reviewed CSVs and need no database variable; local dev needs none.
 
 | Variable | Scope | Value |
 | --- | --- | --- |
-| `DATABASE_URL` | Production only | Supabase pooled connection (port 6543, `?pgbouncer=true`) |
-| `GEODATA_DATA_SOURCE` | Production only | `db` |
 | `NEXT_PUBLIC_SITE_URL` | Production only | canonical site origin, exactly `https://fiscal.ge` |
 | `MCP_ENABLED` | Production only | `true` to serve `/mcp`; anything else (including unset) keeps it paused |
 | `MCP_RATE_LIMITER` | Production: `upstash` | Shared Redis counter; missing/unknown configuration fails closed. `memory` remains local-only. |
 | `MCP_ALLOWED_ORIGINS` | Production only | Comma-separated approved browser origins; server clients without Origin are permitted. |
 | `KV_REST_API_URL`, `KV_REST_API_TOKEN` | Production | Encrypted credentials injected by the Upstash integration. Never expose through NEXT_PUBLIC variables. |
 
-- The db-mode build renders from the mirror and re-verifies it row-by-row
-  against the checkout's CSVs; see
-  `docs/data-methodology/database-import.md`.
-- **Break-glass CSV fallback**: set `GEODATA_DATA_SOURCE` to `csv` (or
-  remove it) in Vercel → Settings → Environment Variables (Production) and
-  redeploy; production then builds straight from the reviewed CSVs with no
-  database involved. Both modes are guaranteed identical by the parity
-  checks.
+- `DATABASE_URL` and `GEODATA_DATA_SOURCE` are no longer set (removed with
+  the static-export release). A leftover `GEODATA_DATA_SOURCE=db` would make the
+  build read the retired mirror.
 - **`NEXT_PUBLIC_SITE_URL`**: set to exactly `https://fiscal.ge` in Production.
   It owns Open Graph URLs, canonicals, `robots.txt`, and `sitemap.xml`
   (`apps/web/lib/siteUrl.ts`) independently of Vercel alias ordering. The value
@@ -394,13 +380,12 @@ provider. Browser tests intercept vendor requests to avoid polluting real report
 
 ## GitHub Actions credentials
 
-Three repository secrets (GitHub → Settings → Secrets and variables →
+Repository secrets (GitHub → Settings → Secrets and variables →
 Actions):
 
 | Secret | Value | Used by |
 | --- | --- | --- |
-| `DIRECT_URL` | Supabase **session pooler** string (port 5432, user `postgres.<project-ref>`). GitHub runners are IPv4-only and the true direct host (`db.<ref>.supabase.co`) is IPv6-only, so this project uses the session pooler for direct-style connections both in CI and in the local `.env`. | migrations + import in `deploy-production.yml` |
-| `DATABASE_URL` | Supabase pooled string (port 6543, `?pgbouncer=true`) | weekly build in `db-health.yml` |
+| `DIRECT_URL`, `DATABASE_URL` | Supabase connection strings | Nothing since the static-export release. Delete both once the database code is removed (release 2 of the 2026-11-04 spec). |
 | `VERCEL_DEPLOY_HOOK_URL` | Deploy hook URL (Vercel → Settings → Git → Deploy Hooks, branch `main`). Treat as a secret: anyone holding it can trigger rebuilds of latest `main` (a nuisance, not a data risk); rotate in Vercel settings if leaked. | deploy step of `deploy-production.yml` |
 
 ## Runbook
@@ -417,55 +402,24 @@ polling `GET /v13/deployments/{id}` with the hook's returned job id — which
 the workflow now extracts and prints — until `READY`/`ERROR`, and that needs a
 `VERCEL_TOKEN` secret this pipeline does not currently hold.)
 
-What a green run *does* now prove is that the build works: the workflow runs
-`GEODATA_DATA_SOURCE=db npm run build` against the converged mirror before it
-fires the hook. A code-level db-mode failure — a `mirrorRows.ts` mapping gap, a
-parity assertion, a pooler-only query problem — therefore fails the workflow
-red rather than surfacing later as a Vercel email. What remains outside that
-gate is environment drift between the runner and Vercel: a pooler paused
-between the two builds, or a stale Vercel Production `DATABASE_URL`. Those
-still show up only as the Vercel failed-deployment email in the table below,
-and with `main` auto-deploy off nothing retries on its own.
+CI's `build` job builds the same static export on every PR and push to `main`,
+so a code-level build failure turns `main` red before the hook can fire. Vercel
+failures beyond that show up only as the Vercel failed-deployment email in the
+table below, and with `main` auto-deploy off nothing retries on its own.
 
 | Failure | Symptom | Response |
 | --- | --- | --- |
-| Import fails (validation, parity, connection) | *Deploy production* red + GitHub email; the mirror transaction rolled back | Fix the data (or transient cause); rerun the workflow from the Actions tab |
-| Vercel build fails (Supabase paused or unreachable) | Vercel failed-deployment email | Resume the project in the Supabase dashboard; rerun *Deploy production* |
+| Vercel build fails | Vercel failed-deployment email | Read the build log in the Vercel dashboard; fix `main` or rerun *Deploy production* |
 | CI red on `main` | No deploy triggered | Fix `main`; or run *Deploy production* manually to deploy past a known-flaky check |
-| GitHub Actions outage / broken workflow | Deploys stall (visible in the Actions tab) | From a clean `main` checkout: `npm run prisma:deploy` (if new migrations), `npm run data:import`, then `vercel deploy --prod`; or revert the `git.deploymentEnabled` line in `apps/web/vercel.json` to restore auto-deploy |
-| Persistent db-mode blocker | Repeated build failures | Break-glass: switch production to CSV mode (see Environment variables) |
+| GitHub Actions outage / broken workflow | Deploys stall (visible in the Actions tab) | From a clean `main` checkout: `vercel deploy --prod`; or set `git.deploymentEnabled.main` to `true` in `apps/web/scripts/prepare-vercel-config.ts` and regenerate `vercel.json` to restore auto-deploy |
+| A release breaks the live site | Pages, redirects or `/mcp` misbehave on fiscal.ge | Vercel → Deployments → the previous production deploy → *Instant Rollback* (see Manual operations), then fix forward |
 
-### Credential rotation
-
-1. Rotate the database password in the Supabase dashboard.
-2. Update the two GitHub secrets (`DIRECT_URL`, `DATABASE_URL`), the Vercel
-   Production `DATABASE_URL`, and local `apps/web/.env`.
-3. From the Actions tab, run *DB health* (validates the pooled
-   `DATABASE_URL` secret) and *Deploy production* (validates `DIRECT_URL`
-   via migrate + import, and the Vercel Production `DATABASE_URL` via the
-   hook-triggered build); confirm both go green.
-
-### Backups
-
-Deliberately none: the database is a mirror of git-versioned CSVs and
-rebuilds from any checkout in minutes (`npm run data:import`). Do not add
-backup jobs or PITR — restoring an old snapshot would only create drift for
-the next import or build to flag.
-
-## Scheduled health check
-
-`.github/workflows/db-health.yml` runs a db-mode build every Monday
-06:00 UTC (plus on demand via *Run workflow*). One green run proves the
-database is reachable and credentialed and that the mirror still matches
-the checkout's CSVs; the activity also counts against Supabase free-tier
-pausing (~7-day inactivity window — weekly cadence is deliberate, an owner
-decision; bump the cron to twice-weekly if a quiet week ever pauses the
-project). A failure emails the repo owner via GitHub's standard
-failed-workflow notification. Note: GitHub auto-disables scheduled
-workflows after ~60 days without repository activity (it emails a warning
-first); if that happens, re-enable the workflow in the Actions tab — and
-if Supabase paused in the meantime, resume the project in the dashboard
-before rerunning.
+After every release, check on fiscal.ge with `curl -sI`: a page has no
+`x-nextjs-prerender` header, an unknown address answers 404, a redirect keeps
+its query string, the security and `Content-Security-Policy-Report-Only`
+headers are present, `/_next/static/…` is `immutable`, `/opengraph-image` is
+`image/png`; and run `scripts/smoke-mcp.ts` against `https://fiscal.ge/mcp`.
+On the Usage page, ISR Reads should stay about 0 in the following days.
 
 ## Connecting the custom domain (owner steps)
 
@@ -512,10 +466,12 @@ commands (`EVAL` scripts) and the anonymous daily usage tally's `EVAL`
 figures, source documents, prompts, or raw client addresses. There is no runtime
 dataset-database access or external data fallback.
 
-The snapshot is included by `outputFileTracingIncludes`. Check the production
-build trace at `apps/web/.next/server/app/mcp/route.js.nft.json` for the snapshot
-path before release. An unreadable snapshot returns a service error, not data
-from a different release.
+`/mcp` runs as a Vercel Node function: `apps/web/api/mcp.ts` re-exports the
+handlers in `apps/web/lib/mcp/handler.ts`, and `vercel.json` rewrites `/mcp` to
+it, caps it at `maxDuration: 10` and bundles the snapshot through
+`includeFiles`. The anonymous usage tally is kept alive past the reply with
+`waitUntil` from `@vercel/functions`. An unreadable snapshot returns a service
+error, not data from a different release.
 
 ### Shared production rate limiter
 
@@ -907,19 +863,19 @@ no budget data and require no migration when a code release is rolled back.
 - Both pages set Georgian titles/descriptions, Open Graph tags, and canonical
   URLs; `metadataBase` comes from `resolveSiteUrl()`.
 - Security headers (nosniff, `X-Frame-Options: DENY`, referrer policy,
-  permissions policy) are set in `apps/web/next.config.ts` `headers()`;
-  Vercel adds HSTS itself.
+  permissions policy) are set in `apps/web/lib/site/routing.ts` `siteHeaders()`
+  and reach Vercel through the generated `vercel.json`; Vercel adds HSTS itself.
 - Page data under `/page-data/` (`apps/web/lib/data/pageDataFiles.ts`): JSON a
   page fetches after load instead of carrying it in its HTML, today the
   inflation products runs and the categories' monthly runs. Each name carries a
-  hash of its content, so the rule in `headers()` sends
+  hash of its content, so the rule in `siteHeaders()` sends
   `Cache-Control: public, max-age=31536000, immutable` and
   `X-Robots-Tag: noindex`. `prebuild` writes the files and reads them back
   (`data:prepare-inflation-public`; `data:check-inflation-public` repeats that
   check on its own); they are not publications and appear in no manifest,
   `llms.txt` or sitemap.
 - Every response also carries a `Content-Security-Policy-Report-Only` header
-  (the `contentSecurityPolicy` constant in `apps/web/next.config.ts`): only the
+  (the `contentSecurityPolicy` constant in `apps/web/lib/site/routing.ts`): only the
   site itself, plus Google Analytics (`www.googletagmanager.com`,
   `*.google-analytics.com`, `*.analytics.google.com`) and Microsoft Clarity
   (`*.clarity.ms`, `c.bing.com`) as loaded by
@@ -942,12 +898,12 @@ no budget data and require no migration when a code release is rolled back.
   `/(.*)` source a negative lookahead for that path. This matters because while the policy is
   report-only the archive rule's enforcing `sandbox; default-src 'none'` header
   has a different key and is sent alongside it, but once both rules set
-  `Content-Security-Policy` Next.js keeps only the later rule's value, and the
+  `Content-Security-Policy` only the later rule's value survives, and the
   site-wide rule comes later today, so it would silently replace the sandbox.
   Keeping it off the archive also keeps `object-src 'none'` away from the
   archived PDFs, which must still open in the browser's viewer. Then rename the
   header key to `Content-Security-Policy`, update
-  `tests/seo/nextConfig.test.ts`, and confirm with `curl -sI` that a non-PDF
+  `tests/seo/nextConfig.test.ts`, regenerate `vercel.json`, and confirm with `curl -sI` that a non-PDF
   archive file still receives the sandbox policy.
 
 
@@ -1067,4 +1023,4 @@ For the Tax breaks and refunds release, require the Actions-owned pipeline to ap
 
 ### When a release step fails
 
-A failing step stops the job before the deploy hook, so Vercel builds nothing and production keeps serving its previous deploy. A failed import rolls back completely: fix the cause and rerun *Deploy production*. A migration that fails while running is recorded by Prisma as failed, and every later run then stops at `prisma:deploy` with P3009 until `npx prisma migrate resolve --rolled-back 20261008100000_demography` (after removing any half-made table; `--applied` only if the table was completed by hand) is run from `apps/web` with `DIRECT_URL` set. To undo a release use Vercel's Instant Rollback (see Manual operations), not a git revert of the merge: the reverted importer no longer deletes `DemographyFact`, so its `SourceDocument` delete hits the table's `ON DELETE RESTRICT` foreign key and every later deploy fails at the import until someone empties the table by hand. After a rollback Vercel stops assigning new production deployments to the domain until one is promoted (for example with `vercel promote`).
+Until 2026-11 the release workflow migrated and imported the Supabase mirror; the rest of this paragraph applies only to that retired pipeline. A failing step stops the job before the deploy hook, so Vercel builds nothing and production keeps serving its previous deploy. A failed import rolls back completely: fix the cause and rerun *Deploy production*. A migration that fails while running is recorded by Prisma as failed, and every later run then stops at `prisma:deploy` with P3009 until `npx prisma migrate resolve --rolled-back 20261008100000_demography` (after removing any half-made table; `--applied` only if the table was completed by hand) is run from `apps/web` with `DIRECT_URL` set. To undo a release use Vercel's Instant Rollback (see Manual operations), not a git revert of the merge: the reverted importer no longer deletes `DemographyFact`, so its `SourceDocument` delete hits the table's `ON DELETE RESTRICT` foreign key and every later deploy fails at the import until someone empties the table by hand. After a rollback Vercel stops assigning new production deployments to the domain until one is promoted (for example with `vercel promote`).
