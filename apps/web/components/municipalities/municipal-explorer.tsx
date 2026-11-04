@@ -39,7 +39,7 @@ import { MunicipalIndicators } from "./municipal-indicators";
 import { useMunicipalState } from "./use-municipal-state";
 import { ModeTabs } from "../explorer-shell/mode-tabs";
 import { useAppReady } from "../explorer-shell/use-app-ready";
-import { CrawlTables } from "../explorer-shell/crawl-tables";
+import { CrawlTables, useCrawlModels } from "../explorer-shell/crawl-tables";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { ChartShareButton } from "../explorer-shell/chart-share-button";
 
@@ -206,10 +206,7 @@ function MunicipalExplorerContent(props: MunicipalExplorerProps) {
   }), [allYears, locale, props.entityId, metrics.kind, props.pickerCountry.nameKa, props.triggerLabel, englishLabels, props.workbookBasename, props.workbookSources, props.functionalWorkbookSources, props.supplementalWorkbookSources, props.siteOrigin]);
   // The total and every function over the whole span, for the hidden crawl table: built from the full-span model, which
   // only the props change, so a click never rebuilds it.
-  const crawlModels = useMemo(
-    () => municipalCrawlStates(fullModel).map((crawl) => buildWorkbookExportModel(buildMunicipalWorkbookInput(fullModel, crawl, workbookContext, i18n))),
-    [fullModel, workbookContext, i18n],
-  );
+  const crawlModels = useCrawlModels(() => municipalCrawlStates(fullModel).map((crawl) => buildWorkbookExportModel(buildMunicipalWorkbookInput(fullModel, crawl, workbookContext, i18n))));
 
   useAppReady();
 

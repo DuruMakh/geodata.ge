@@ -16,7 +16,7 @@ import { pageHref } from "../../lib/i18n/routes";
 import { ModeTabs } from "../explorer-shell/mode-tabs";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { ChartShareButton } from "../explorer-shell/chart-share-button";
-import { CrawlTables } from "../explorer-shell/crawl-tables";
+import { CrawlTables, useCrawlModels } from "../explorer-shell/crawl-tables";
 import { ExplorerHeading } from "../explorer-shell/explorer-heading";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { LatestValueLine } from "../explorer-shell/latest-value-line";
@@ -76,11 +76,11 @@ export function ExternalPositionExplorer({ section, facts, labels, sources, gdp,
   const latestValue = percent ? valueLabel(model.latest.value) : `${format(model.latest.value)} ${t("unitBnUsdShort")}`;
   const title = message(messages, `external.${key}.title`);
   // The amounts and % of GDP, every series over its years, for the hidden crawl tables: built from the props alone, so a click never rebuilds them.
-  const crawlModels = useMemo(() => externalPositionCrawlStates(section, facts, gdp).map(crawl => {
+  const crawlModels = useCrawlModels(() => externalPositionCrawlStates(section, facts, gdp).map(crawl => {
     const { latest } = buildExternalPositionModel(section, facts, crawl, gdp);
     return buildExternalPositionWorkbookExportModel({ section, facts, state: crawl, labels, sources, siteOrigin, title, gdp, gdpSources,
       latestLabel: latest.latestPeriod ? externalPositionLatestLabel(latest, presentation.messages) : undefined }, presentation);
-  }), [section, facts, labels, sources, siteOrigin, title, gdp, gdpSources, presentation]);
+  }));
   const tabLabel = t(`tab.${state.view}`);
   // % of GDP divides by the nominal GDP Current account uses: the source line names it and its preliminary years.
   const preliminaryGdpYears = percent ? model.years.filter(year => gdp.some(row => row.year === year && row.preliminary)) : [];

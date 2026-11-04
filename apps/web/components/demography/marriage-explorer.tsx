@@ -23,7 +23,7 @@ import { pageHref } from "../../lib/i18n/routes";
 import { ModeTabs } from "../explorer-shell/mode-tabs";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { ChartShareButton } from "../explorer-shell/chart-share-button";
-import { CrawlTables } from "../explorer-shell/crawl-tables";
+import { CrawlTables, useCrawlModels } from "../explorer-shell/crawl-tables";
 import { ExplorerHeading } from "../explorer-shell/explorer-heading";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { LatestFigure, LatestValueLine } from "../explorer-shell/latest-value-line";
@@ -76,8 +76,8 @@ export function MarriageExplorer({ place, labels, listLabels, sources, lastRevie
   const [marriages, divorces] = [latestOf("marriages"), latestOf("divorces")];
   const title = t("marriagesTitle");
   // Counts and years as published, counts per 1,000, every row over its years, for the hidden crawl tables: built from the props alone, so a click never rebuilds them.
-  const crawlModels = useMemo(() => marriageCrawlStates(place).map((crawl) =>
-    buildMarriageWorkbookExportModel({ place, state: crawl, labels, sources, siteOrigin, title, scope: "georgia" }, presentation)), [place, labels, sources, siteOrigin, title, presentation]);
+  const crawlModels = useCrawlModels(() => marriageCrawlStates(place).map((crawl) =>
+    buildMarriageWorkbookExportModel({ place, state: crawl, labels, sources, siteOrigin, title, scope: "georgia" }, presentation)));
   const changeMeasure = (measure: MarriageMeasure) => {
     if (measure !== state.measure) update((s) => ({ ...s, measure }), true);
   };

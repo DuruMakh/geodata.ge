@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { ChevronDown } from "lucide-react";
-import { useCallback, useId, useMemo, useRef, useState } from "react";
+import { useCallback, useId, useRef, useState } from "react";
 import type { ClientHousingFact } from "../../lib/data/housing/types";
 import type { MunicipalRegion } from "../../lib/data/municipal/types";
 import { housingCount, housingSeriesLabel, housingUnitLabel, housingValueLabel, housingValueUnit, serializeHousingHash, type HousingSeriesModel, type HousingTranslate } from "../../lib/explorer/housing";
@@ -17,7 +17,7 @@ import { pageHref } from "../../lib/i18n/routes";
 import { ModeTabs } from "../explorer-shell/mode-tabs";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { ChartShareButton } from "../explorer-shell/chart-share-button";
-import { CrawlTables } from "../explorer-shell/crawl-tables";
+import { CrawlTables, useCrawlModels } from "../explorer-shell/crawl-tables";
 import { ExplorerHeading } from "../explorer-shell/explorer-heading";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { LatestValueLine } from "../explorer-shell/latest-value-line";
@@ -68,8 +68,8 @@ export function HousingAreaExplorer({ area, facts, labels, areaLabels, sources, 
   const areaName = areaLabels[area];
   const title = t("page.area.regionTitle", { region: areaName });
   // The area's numbers and floor areas, every series over its years, for the hidden crawl tables: built from the props alone, so a click never rebuilds them.
-  const crawlModels = useMemo(() => housingAreaCrawlStates(area, facts).map(crawl =>
-    buildHousingWorkbookExportModel({ area, facts, state: crawl, labels, sources, siteOrigin, title }, presentation)), [area, facts, labels, sources, siteOrigin, title, presentation]);
+  const crawlModels = useCrawlModels(() => housingAreaCrawlStates(area, facts).map(crawl =>
+    buildHousingWorkbookExportModel({ area, facts, state: crawl, labels, sources, siteOrigin, title }, presentation)));
   // The chart is named after the heading of the selection's unit (its text before the unit).
   const chartLabel = `${t(`heading.${model.unit === "area" ? "area" : "count"}`).split(" · ")[0]} · ${areaName}`;
   // Links to another area's page carry the selection, moved to that area, and nothing else.

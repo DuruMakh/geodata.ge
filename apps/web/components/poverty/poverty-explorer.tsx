@@ -20,7 +20,7 @@ import { useHashState } from "../explorer-shell/use-hash-state";
 import { EditorialLineChart } from "../main-explorer/editorial-line-chart";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { ChartShareButton } from "../explorer-shell/chart-share-button";
-import { CrawlTables } from "../explorer-shell/crawl-tables";
+import { CrawlTables, useCrawlModels } from "../explorer-shell/crawl-tables";
 import { ExplorerTable } from "../main-explorer/explorer-table";
 import { RangeStrip } from "../main-explorer/range-strip";
 import { SEARCHABLE_MIN_ROWS } from "../main-explorer/series-selector";
@@ -61,8 +61,8 @@ export function PovertyExplorer({ section, facts, labels, sources, lastReviewedA
   const title = t(`page.${section}.title`);
   const tabLabel = state.view === "main" ? title : t(`tab.${state.view}`);
   // Every tab's series over its years, for the hidden crawl tables: built from the props alone, so a click never rebuilds them.
-  const crawlModels = useMemo(() => povertyCrawlStates(section, facts).map(crawl =>
-    buildPovertyWorkbookExportModel({ section, facts, state: crawl, labels, sources, siteOrigin, title }, presentation)), [section, facts, labels, sources, siteOrigin, title, presentation]);
+  const crawlModels = useCrawlModels(() => povertyCrawlStates(section, facts).map(crawl =>
+    buildPovertyWorkbookExportModel({ section, facts, state: crawl, labels, sources, siteOrigin, title }, presentation)));
   const changeView = (view: PovertyView) => { if (view === state.view) return; setQuery(""); setExpanded({}); update(s => changePovertyView(s, section, view, facts), true); };
   const downloadAction = <ExcelDownloadButton testId="poverty-excel-download" disabled={!model.selected.length} onDownload={async () => {
     const { downloadWorkbook } = await import("../../lib/explorer/workbookWriter.client");

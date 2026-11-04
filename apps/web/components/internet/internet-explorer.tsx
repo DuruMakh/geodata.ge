@@ -15,7 +15,7 @@ import { pageHref } from "../../lib/i18n/routes";
 import { ModeTabs } from "../explorer-shell/mode-tabs";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { ChartShareButton } from "../explorer-shell/chart-share-button";
-import { CrawlTables } from "../explorer-shell/crawl-tables";
+import { CrawlTables, useCrawlModels } from "../explorer-shell/crawl-tables";
 import { ExplorerHeading } from "../explorer-shell/explorer-heading";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { LatestFigure, LatestValueLine } from "../explorer-shell/latest-value-line";
@@ -58,8 +58,8 @@ export function InternetExplorer({ section, facts, labels, sources, lastReviewed
   const latest = facts.filter(f => f.indicatorId === model.series[0].id).sort((a, b) => a.year - b.year).at(-1)!;
   const unitLabel = t("unitPercent");
   // Every heading of the list, every row of it over its years, for the hidden crawl tables: built from the props alone, so a click never rebuilds them.
-  const crawlModels = useMemo(() => internetCrawlStates(section, facts).map(crawl =>
-    buildInternetWorkbookExportModel({ section, facts, state: crawl, labels, sources, siteOrigin, title }, presentation)), [section, facts, labels, sources, siteOrigin, title, presentation]);
+  const crawlModels = useCrawlModels(() => internetCrawlStates(section, facts).map(crawl =>
+    buildInternetWorkbookExportModel({ section, facts, state: crawl, labels, sources, siteOrigin, title }, presentation)));
   const downloadAction = <ExcelDownloadButton testId="internet-excel-download" disabled={!model.selected.length} onDownload={async () => {
     const { downloadWorkbook } = await import("../../lib/explorer/workbookWriter.client");
     await downloadWorkbook(buildInternetWorkbookExportModel({ section, facts, state, labels, sources, siteOrigin, title }, presentation));

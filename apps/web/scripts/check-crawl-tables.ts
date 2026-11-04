@@ -27,13 +27,17 @@ type Page = { route: string; html: string; wrappers: string[]; cells: number; gz
 
 const stripScripts = (html: string) => html.replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, " ");
 
-/** Each crawl-tables wrapper's inner HTML: it holds only tables, so the first closing div ends it. */
+/**
+ * Each crawl-tables wrapper's inner HTML: it holds only tables, so the first closing div ends it. A wrapper with no table
+ * (the server had none to write there) does not count, so it never satisfies "a chart page carries crawl tables".
+ */
 export function crawlWrappers(html: string): string[] {
   const wrappers: string[] = [];
   let at = html.indexOf(WRAPPER);
   while (at !== -1) {
     const end = html.indexOf("</div>", at);
-    wrappers.push(html.slice(at + WRAPPER.length, end));
+    const inner = html.slice(at + WRAPPER.length, end);
+    if (inner.includes("<table>")) wrappers.push(inner);
     at = html.indexOf(WRAPPER, end);
   }
   return wrappers;

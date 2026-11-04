@@ -27,17 +27,22 @@ for (const { path, figure } of PAGES) {
     if (figure) expect(crawl).toContain(figure);
   });
 
-  test(`${path}: the crawl tables are hidden and chart mode shows no table`, async ({ page }) => {
-    // A crawl table that renders differently on the client than in the prerendered HTML is a hydration error.
+  test(`${path}: hydration keeps the server's hidden crawl tables and chart mode shows no table`, async ({ page, request }) => {
+    // The browser never builds the crawl tables (DESIGN.md §8.4): each wrapper keeps the tables the server wrote, with no hydration error.
     const errors: string[] = [];
     page.on("pageerror", (error) => errors.push(error.message));
     page.on("console", (entry) => { if (entry.type() === "error") errors.push(entry.text()); });
+    const serverHtml = (await (await request.get(`${TEST_BASE_URL}${path}`)).text()).replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, " ");
+    const serverTables = serverHtml.split('<div hidden="" data-testid="crawl-tables">').slice(1).map((rest) => rest.slice(0, rest.indexOf("</div>")).split("<table>").length - 1);
     await page.goto(path);
     await ready(page);
     const wrappers = page.getByTestId("crawl-tables");
     expect(await wrappers.count()).toBeGreaterThanOrEqual(1);
-    for (const wrapper of await wrappers.all()) await expect(wrapper).toBeHidden();
-    expect(await page.locator('[data-testid="crawl-tables"] table').count()).toBeGreaterThanOrEqual(1);
+    for (const wrapper of await wrappers.all()) {
+      await expect(wrapper).toBeHidden();
+      expect(await wrapper.locator("table").count(), "each wrapper still holds the server's tables after hydration").toBeGreaterThanOrEqual(1);
+    }
+    expect(await wrappers.evaluateAll((nodes) => nodes.map((node) => node.querySelectorAll("table").length))).toEqual(serverTables);
     await expect(page.getByTestId("explorer-table")).toHaveCount(0);
     // The page's own visible tables (period comparison, partners ranking) are not the yearly table; nothing else shows one.
     const ownTables = '[data-testid="period-comparison"] table, [data-testid="trade-partners-ranking"] table';

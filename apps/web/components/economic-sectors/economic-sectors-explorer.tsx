@@ -37,7 +37,7 @@ import { LatestValueLine } from "../explorer-shell/latest-value-line";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { ChartShareButton } from "../explorer-shell/chart-share-button";
-import { CrawlTables } from "../explorer-shell/crawl-tables";
+import { CrawlTables, useCrawlModels } from "../explorer-shell/crawl-tables";
 import { rangeFromPatch } from "../../lib/explorer/periodRange";
 
 export type EconomicSectorsExplorerProps = {
@@ -71,11 +71,8 @@ export function EconomicSectorsExplorer({
   );
   // Every measure's rows over every year, for the hidden crawl tables: built from the props alone, so a click never
   // rebuilds them (unpackFacts returns the same rows for the same props).
-  const crawlModels = useMemo(
-    () => sectorCrawlStates(facts, registry, sourceIdByMeasure, config).map((crawl) =>
-      buildEconomicSectorsWorkbookExportModel(facts, registry, crawl, presentation, sources, siteOrigin, sourceIdByMeasure, config)),
-    [facts, registry, sourceIdByMeasure, config, presentation, sources, siteOrigin],
-  );
+  const crawlModels = useCrawlModels(() => sectorCrawlStates(facts, registry, sourceIdByMeasure, config).map((crawl) =>
+    buildEconomicSectorsWorkbookExportModel(facts, registry, crawl, presentation, sources, siteOrigin, sourceIdByMeasure, config)));
   const percent = state.measure !== "nominal";
   const measureLabel = t(
     state.measure === "share_of_gdp"

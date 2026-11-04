@@ -31,7 +31,7 @@ import { ExplorerPage } from "../explorer-shell/explorer-page";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { MeasurePill } from "../explorer-shell/measure-pill";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
-import { CrawlTables } from "../explorer-shell/crawl-tables";
+import { CrawlTables, useCrawlModels } from "../explorer-shell/crawl-tables";
 import { ChartShareButton } from "../explorer-shell/chart-share-button";
 import { useHashState } from "../explorer-shell/use-hash-state";
 import { DECK_LINE_CLASS } from "../explorer-shell/latest-value-line";
@@ -85,12 +85,12 @@ export function DeficitExplorer({ facts, workbookSources, edition, siteOrigin, l
   );
   // The series over every year, as % of GDP and in GEL, for the hidden crawl tables: built from the props alone, so a
   // click never rebuilds them.
-  const crawlModels = useMemo(() => deficitCrawlStates(facts).map((crawl) => buildDeficitWorkbookExportModel({
+  const crawlModels = useCrawlModels(() => deficitCrawlStates(facts).map((crawl) => buildDeficitWorkbookExportModel({
     facts,
     ...crawl,
     sources: workbookSources,
     siteOrigin: siteOrigin ?? "",
-  }, presentation)), [facts, workbookSources, siteOrigin, presentation]);
+  }, presentation)));
   const forecastBoundaryYear = facts.find((fact) => fact.status === "projection")?.year ?? null;
   const actualYears = facts.filter((fact) => fact.status === "actual").map((fact) => fact.year);
   const projectionYears = facts.filter((fact) => fact.status === "projection").map((fact) => fact.year);

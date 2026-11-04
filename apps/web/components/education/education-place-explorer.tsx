@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { useCallback, useMemo, type ReactNode } from "react";
+import { useCallback, type ReactNode } from "react";
 import type { ClientEducationFact } from "../../lib/data/education/types";
 import { updatedDate } from "../../lib/explorer/coverageLabel";
 import { placeLabel, type DemographyPlace } from "../../lib/explorer/demographyAreas";
@@ -18,7 +18,7 @@ import { pageHref } from "../../lib/i18n/routes";
 import { ExcelDownloadButton } from "../explorer/excel-download-button";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { ChartShareButton } from "../explorer-shell/chart-share-button";
-import { CrawlTables } from "../explorer-shell/crawl-tables";
+import { CrawlTables, useCrawlModels } from "../explorer-shell/crawl-tables";
 import { FlatSeriesPanel } from "../explorer-shell/flat-series-panel";
 import { LatestValueLine } from "../explorer-shell/latest-value-line";
 import { ModeTabs } from "../explorer-shell/mode-tabs";
@@ -93,9 +93,9 @@ export function EducationPlaceExplorer({
   const placeName = placeLabel(place, locale);
   const chartLabel = `${headingLabels[model.heading]} · ${placeName}`;
   // Every heading the place lists, every row of it over its years, for the hidden crawl tables: built from the props alone, so a click never rebuilds them.
-  const crawlModels = useMemo(() => educationPlaceCrawlStates(set, place.id, facts).map(crawl => buildEducationWorkbookExportModel({
+  const crawlModels = useCrawlModels(() => educationPlaceCrawlStates(set, place.id, facts).map(crawl => buildEducationWorkbookExportModel({
     set, placeId: place.id, scope: workbookScope, facts, state: crawl, labels, headingLabels, sources, siteOrigin, title: `${title} ${placeName}`,
-  }, presentation)), [set, place.id, workbookScope, facts, labels, headingLabels, sources, siteOrigin, title, placeName, presentation]);
+  }, presentation)));
   // Links to another place's page carry the mode, the years and the selection, moved to that place (its parse refits the years).
   const withState = (href: string, placeId: string) => `${href}${educationPlaceLinkHash(state, set, placeId)}`;
   const overrides = { ...pickerOverrides, hrefById: Object.fromEntries(Object.entries(pickerOverrides.hrefById).map(([id, href]) => [id, withState(href, id)])) };

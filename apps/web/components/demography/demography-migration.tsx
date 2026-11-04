@@ -1,7 +1,7 @@
 "use client";
 
 import { ArrowDown, ArrowUp, Mars, Users, Venus } from "lucide-react";
-import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import {
   buildMigrationIndicators,
   buildMigrationModel,
@@ -32,7 +32,7 @@ import type { TemplateValues } from "../../lib/i18n/types";
 import type { ClientMigrationFact } from "../../lib/servedRows";
 import { ExcelDownloadButton } from "../explorer/excel-download-button";
 import { ChartShareButton } from "../explorer-shell/chart-share-button";
-import { CrawlTables } from "../explorer-shell/crawl-tables";
+import { CrawlTables, useCrawlModels } from "../explorer-shell/crawl-tables";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { ModeTabs } from "../explorer-shell/mode-tabs";
 import { SeriesAside } from "../explorer-shell/series-aside";
@@ -92,8 +92,8 @@ export function MigrationExplorer({
 
   const update = (change: (previous: MigrationState) => MigrationState) => setState(change);
   // Each sex, every group's arrivals and departures and the net over every year, for the hidden crawl tables: built from the props alone, so a click never rebuilds them.
-  const crawlModels = useMemo(() => migrationCrawlStates(facts).map((crawl) =>
-    buildMigrationWorkbookExportModel({ facts, state: crawl, sources, siteOrigin }, presentation)), [facts, sources, siteOrigin, presentation]);
+  const crawlModels = useCrawlModels(() => migrationCrawlStates(facts).map((crawl) =>
+    buildMigrationWorkbookExportModel({ facts, state: crawl, sources, siteOrigin }, presentation)));
   const model = buildMigrationModel(facts, state);
   const indicators = buildMigrationIndicators(facts, state);
   const groupLabel = (group: MigrationGroup) => t(`group.${group}`);

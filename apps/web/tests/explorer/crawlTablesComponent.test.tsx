@@ -1,6 +1,6 @@
 import React from "react";
-import { describe, expect, it } from "vitest";
-import { CrawlTables } from "../../components/explorer-shell/crawl-tables";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { CrawlTables, useCrawlModels } from "../../components/explorer-shell/crawl-tables";
 import type { WorkbookExportModel } from "../../lib/explorer/workbookModel";
 import { workbookMessage } from "../../lib/i18n/workbook";
 import { renderPageMarkup } from "../helpers/render-localized";
@@ -35,7 +35,29 @@ describe("CrawlTables", () => {
     expect(markup.slice(markup.indexOf("<table"))).not.toMatch(/class=|style=/);
   });
 
-  it("renders nothing without models", () => {
-    expect(renderPageMarkup("en", <CrawlTables models={[]} />)).toBe("");
+  it("renders the empty hidden wrapper without models, as the browser does", () => {
+    expect(renderPageMarkup("en", <CrawlTables models={[]} />)).toBe('<div hidden="" data-testid="crawl-tables"></div>');
+  });
+});
+
+// Tests run in Node, where there is no window: the server render. Stubbing window makes it the browser's.
+describe("useCrawlModels", () => {
+  afterEach(() => vi.unstubAllGlobals());
+  const Page = ({ build }: { build: () => readonly WorkbookExportModel[] }) => <CrawlTables models={useCrawlModels(build)} />;
+
+  it("builds the models during the server render", () => {
+    const build = vi.fn(() => [model]);
+    expect(useCrawlModels(build)).toEqual([model]);
+    expect(renderPageMarkup("en", <Page build={build} />)).toContain("<table><caption>T · S</caption>");
+    expect(build).toHaveBeenCalledTimes(2);
+  });
+
+  it("never builds them in the browser, which renders the same wrapper empty for hydration to keep the server's tables", () => {
+    vi.stubGlobal("window", {});
+    const build = vi.fn(() => [model]);
+    expect(useCrawlModels(build)).toEqual([]);
+    expect(useCrawlModels(build)).toBe(useCrawlModels(build));
+    expect(renderPageMarkup("en", <Page build={build} />)).toBe('<div hidden="" data-testid="crawl-tables"></div>');
+    expect(build).not.toHaveBeenCalled();
   });
 });

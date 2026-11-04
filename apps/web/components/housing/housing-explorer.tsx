@@ -14,7 +14,7 @@ import { pageHref } from "../../lib/i18n/routes";
 import { ModeTabs } from "../explorer-shell/mode-tabs";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { ChartShareButton } from "../explorer-shell/chart-share-button";
-import { CrawlTables } from "../explorer-shell/crawl-tables";
+import { CrawlTables, useCrawlModels } from "../explorer-shell/crawl-tables";
 import { ExplorerHeading } from "../explorer-shell/explorer-heading";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { LatestValueLine } from "../explorer-shell/latest-value-line";
@@ -64,8 +64,8 @@ export function HousingExplorer({ section, facts, labels, sources, lastReviewedA
   const latestValue = section === "prices" ? formatInUnit(latest.value, housingValueUnit("index")) : housingCount(latest.value);
   const title = t(`page.${section}.title`);
   // Every unit's series over its years, for the hidden crawl tables: built from the props alone, so a click never rebuilds them.
-  const crawlModels = useMemo(() => housingCrawlStates(section, facts).map(crawl =>
-    buildHousingWorkbookExportModel({ section, facts, state: crawl, labels, sources, siteOrigin, title }, presentation)), [section, facts, labels, sources, siteOrigin, title, presentation]);
+  const crawlModels = useCrawlModels(() => housingCrawlStates(section, facts).map(crawl =>
+    buildHousingWorkbookExportModel({ section, facts, state: crawl, labels, sources, siteOrigin, title }, presentation)));
   const downloadAction = <ExcelDownloadButton testId="housing-excel-download" disabled={!model.selected.length} onDownload={async () => {
     const { downloadWorkbook } = await import("../../lib/explorer/workbookWriter.client");
     await downloadWorkbook(buildHousingWorkbookExportModel({ section, facts, state, labels, sources, siteOrigin, title }, presentation));

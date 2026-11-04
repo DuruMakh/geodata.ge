@@ -18,7 +18,7 @@ import { pageHref } from "../../lib/i18n/routes";
 import { ModeTabs } from "../explorer-shell/mode-tabs";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { ChartShareButton } from "../explorer-shell/chart-share-button";
-import { CrawlTables } from "../explorer-shell/crawl-tables";
+import { CrawlTables, useCrawlModels } from "../explorer-shell/crawl-tables";
 import { ExplorerHeading } from "../explorer-shell/explorer-heading";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { LatestFigure, LatestValueLine } from "../explorer-shell/latest-value-line";
@@ -67,8 +67,8 @@ export function ScienceCultureExplorer({ section, facts, breaks, labels, sources
   const latest = facts.filter(f => f.indicatorId === headline.id).sort((a, b) => a.year - b.year).at(-1)!;
   const title = t(`page.${section}.title`);
   // Every unit of the list, every row of it over its years, for the hidden crawl tables: built from the props alone, so a click never rebuilds them.
-  const crawlModels = useMemo(() => scienceCultureCrawlStates(section, facts).map(crawl =>
-    buildScienceCultureWorkbookExportModel({ section, facts, state: crawl, labels, sources, siteOrigin, title }, presentation)), [section, facts, labels, sources, siteOrigin, title, presentation]);
+  const crawlModels = useCrawlModels(() => scienceCultureCrawlStates(section, facts).map(crawl =>
+    buildScienceCultureWorkbookExportModel({ section, facts, state: crawl, labels, sources, siteOrigin, title }, presentation)));
   const downloadAction = <ExcelDownloadButton testId="science-culture-excel-download" disabled={!state.selectedIds.length} onDownload={async () => {
     const { downloadWorkbook } = await import("../../lib/explorer/workbookWriter.client");
     await downloadWorkbook(buildScienceCultureWorkbookExportModel({ section, facts, state, labels, sources, siteOrigin, title }, presentation));

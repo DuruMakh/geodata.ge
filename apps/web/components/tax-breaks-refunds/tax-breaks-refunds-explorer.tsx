@@ -19,7 +19,7 @@ import { pageHref } from "../../lib/i18n/routes";
 import { ModeTabs } from "../explorer-shell/mode-tabs";
 import { ChartShareButton } from "../explorer-shell/chart-share-button";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
-import { CrawlTables } from "../explorer-shell/crawl-tables";
+import { CrawlTables, useCrawlModels } from "../explorer-shell/crawl-tables";
 import { ExplorerHeading } from "../explorer-shell/explorer-heading";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { LatestFigure, LatestValueLine } from "../explorer-shell/latest-value-line";
@@ -77,8 +77,8 @@ export function TaxBreaksRefundsExplorer({ facts, labels, headings, sources, gdp
     return Number.isFinite(year) && year !== model.range.end ? `${headings[heading]} · ${year}` : headings[heading];
   };
   // Every series over all its years, for the hidden crawl table: built from the props alone, so a click never rebuilds it.
-  const crawlModels = useMemo(() => taxBreaksRefundsCrawlStates(facts).map(crawl =>
-    buildTaxBreaksRefundsWorkbookExportModel({ facts, state: crawl, labels, sources, siteOrigin, title, gdpFacts, gdpSources }, presentation)), [facts, labels, sources, siteOrigin, title, gdpFacts, gdpSources, presentation]);
+  const crawlModels = useCrawlModels(() => taxBreaksRefundsCrawlStates(facts).map(crawl =>
+    buildTaxBreaksRefundsWorkbookExportModel({ facts, state: crawl, labels, sources, siteOrigin, title, gdpFacts, gdpSources }, presentation)));
   const changeView = (view: TaxBreaksRefundsView) => {
     if (view === state.view) return;
     update(s => ({ ...s, view, range: refitRange(s.range, taxBreaksRefundsCoverage(view, s.selectedIds, facts, gdpFacts), { collapseToAll: false }) }), true);

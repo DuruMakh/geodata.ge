@@ -16,7 +16,7 @@ import type { TemplateValues } from "../../lib/i18n/types";
 import type { ClientAgeFact } from "../../lib/servedRows";
 import { ModeTabs } from "../explorer-shell/mode-tabs";
 import { ChartShareButton } from "../explorer-shell/chart-share-button";
-import { CrawlTables } from "../explorer-shell/crawl-tables";
+import { CrawlTables, useCrawlModels } from "../explorer-shell/crawl-tables";
 import { CENSUS_YEAR } from "../../lib/data/demography/series";
 import { HeroKpi, KPI_GRID_CLASS, SideKpiList } from "../main-explorer/kpi-blocks";
 import { SectionTitle, SegmentedTabs, SourceNote, TextTab, TextTabGroup } from "../ui/editorial";
@@ -59,8 +59,8 @@ export function AgeSexSection({
   const whole = useMemo(() => (facts.length === 0 ? null : censusPyramid(facts, "total")), [facts]);
   const pyramid = useMemo(() => (facts.length === 0 ? null : censusPyramid(facts, settlement)), [facts, settlement]);
   // Each settlement's counts by age and sex (the shares divide them by the total row), for the hidden crawl tables: built from the props alone, so a click never rebuilds them.
-  const crawlModels = useMemo(() => censusCrawlSettlements(facts).map((crawl) =>
-    buildCensusPlaceWorkbookExportModel({ facts, sources, siteOrigin, place, settlement: crawl, scope: workbookScope }, presentation)), [facts, sources, siteOrigin, place, workbookScope, presentation]);
+  const crawlModels = useCrawlModels(() => censusCrawlSettlements(facts).map((crawl) =>
+    buildCensusPlaceWorkbookExportModel({ facts, sources, siteOrigin, place, settlement: crawl, scope: workbookScope }, presentation)));
   if (whole === null || pyramid === null) return null;
   const name = placeLabel(place, locale);
   const date = t("censusDate");

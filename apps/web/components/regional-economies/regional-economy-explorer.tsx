@@ -22,7 +22,7 @@ import { pageHref } from "../../lib/i18n/routes";
 import { ExcelDownloadButton } from "../explorer/excel-download-button";
 import { ModeTabs } from "../explorer-shell/mode-tabs";
 import { ChartShareButton } from "../explorer-shell/chart-share-button";
-import { CrawlTables } from "../explorer-shell/crawl-tables";
+import { CrawlTables, useCrawlModels } from "../explorer-shell/crawl-tables";
 import { PlaceHeading } from "../explorer-shell/place-heading";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
@@ -69,9 +69,8 @@ export function RegionalEconomyExplorer({
   const model = useMemo(() => buildRegionalEconomyModel(facts, registry, state), [facts, registry, state]);
   // The region's total and every sector over every year, for the hidden crawl tables: built from the props alone, so a
   // click never rebuilds them (unpackFacts returns the same rows for the same props).
-  const crawlModels = useMemo(() => regionalEconomyCrawlStates(facts, registry).map((crawl) =>
-    buildRegionalEconomyWorkbookExportModel(facts, registry, crawl, region, presentation, sources, siteOrigin)),
-  [facts, registry, region, presentation, sources, siteOrigin]);
+  const crawlModels = useCrawlModels(() => regionalEconomyCrawlStates(facts, registry).map((crawl) =>
+    buildRegionalEconomyWorkbookExportModel(facts, registry, crawl, region, presentation, sources, siteOrigin)));
   const share = state.measure === "share_of_region_gdp";
   const measureLabel = t(share ? "shareOfRegionGdp" : "nominal");
   const unit = useMemo(() => unitFor(facts.filter((fact) => fact.measure === "nominal").map((fact) => fact.value), unitsFor(locale).bn), [facts, locale]);

@@ -17,7 +17,7 @@ import { pageHref } from "../../lib/i18n/routes";
 import { ExcelDownloadButton } from "../explorer/excel-download-button";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { ChartShareButton } from "../explorer-shell/chart-share-button";
-import { CrawlTables } from "../explorer-shell/crawl-tables";
+import { CrawlTables, useCrawlModels } from "../explorer-shell/crawl-tables";
 import { ExplorerHeading } from "../explorer-shell/explorer-heading";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { FlatSeriesPanel } from "../explorer-shell/flat-series-panel";
@@ -73,8 +73,8 @@ export function EducationExplorer({ section, facts, labels, headingLabels, lates
   const total = rows.find(row => row.itemId === reference?.id) ?? null;
   const title = t(`page.${section}.title`);
   // Every row of the list over its years, for the hidden crawl tables: built from the props alone, so a click never rebuilds them.
-  const crawlModels = useMemo(() => educationCrawlStates(section, facts).map(crawl =>
-    buildEducationWorkbookExportModel({ section, facts, state: crawl, labels, headingLabels, sources, siteOrigin, title }, presentation)), [section, facts, labels, headingLabels, sources, siteOrigin, title, presentation]);
+  const crawlModels = useCrawlModels(() => educationCrawlStates(section, facts).map(crawl =>
+    buildEducationWorkbookExportModel({ section, facts, state: crawl, labels, headingLabels, sources, siteOrigin, title }, presentation)));
   const downloadAction = <ExcelDownloadButton testId="education-excel-download" disabled={!model.selected.length} onDownload={async () => {
     const { downloadWorkbook } = await import("../../lib/explorer/workbookWriter.client");
     await downloadWorkbook(buildEducationWorkbookExportModel({ section, facts, state, labels, headingLabels, sources, siteOrigin, title }, presentation));

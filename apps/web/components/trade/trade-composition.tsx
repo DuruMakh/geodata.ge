@@ -1,10 +1,10 @@
 "use client";
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useRef } from "react";
 import type { toClientTradeCompositionData } from "../../lib/data/tradeComposition/importTradeComposition";
 import type { WorkbookPublicSource } from "../../lib/explorer/workbookModel";
 import { message } from "../../lib/i18n/messages";
 import { useI18n } from "../../lib/i18n/provider";
-import { CrawlTables } from "../explorer-shell/crawl-tables";
+import { CrawlTables, useCrawlModels } from "../explorer-shell/crawl-tables";
 import { ExplorerHeading } from "../explorer-shell/explorer-heading";
 import { TextTab } from "../ui/editorial";
 import { TradePartners, useTradePartnersCrawlModels } from "./trade-partners";
@@ -17,7 +17,7 @@ export function TradeComposition({ data, sources, lastReviewedAt, siteOrigin }: 
   const pendingFocus = useRef<string | null>(null);
   // Both classifications' tables, whichever is open: only SITC renders on the server, BEC opens from the hash.
   const sitcModels = useTradePartnersCrawlModels(data.sitc, sources, siteOrigin), becModels = useTradePartnersCrawlModels(data.bec, sources, siteOrigin);
-  const crawlModels = useMemo(() => [...sitcModels, ...becModels], [sitcModels, becModels]);
+  const crawlModels = useCrawlModels(() => [...sitcModels, ...becModels]);
   useEffect(() => {
     if (!pendingFocus.current) return;
     document.getElementById(pendingFocus.current)?.focus();

@@ -17,7 +17,7 @@ import { pageHref } from "../../lib/i18n/routes";
 import { ModeTabs } from "../explorer-shell/mode-tabs";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { ChartShareButton } from "../explorer-shell/chart-share-button";
-import { CrawlTables } from "../explorer-shell/crawl-tables";
+import { CrawlTables, useCrawlModels } from "../explorer-shell/crawl-tables";
 import { ExplorerHeading } from "../explorer-shell/explorer-heading";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { LatestFigure, LatestValueLine } from "../explorer-shell/latest-value-line";
@@ -77,9 +77,8 @@ export function MoneyBanksExplorer({ section, facts, labels, sources, gdpFacts, 
   const latestValue = latest.unit === "gel" ? formatAmount(latest.value, locale) : `${formatInUnit(latest.value, { divisor: 1, label: "", decimals: latest.decimals })}${t("unitPercent")}`;
   const title = t(`page.${section}.title`);
   // Every series of each view over every year, for the hidden crawl tables: built from the props alone, so a click never rebuilds them.
-  const crawlModels = useMemo(() => moneyBanksCrawlStates(section, facts, gdpFacts).map(crawl =>
-    buildMoneyBanksWorkbookExportModel({ section, facts, state: crawl, labels, sources, siteOrigin, title, gdpFacts, gdpSources }, presentation)),
-  [section, facts, gdpFacts, labels, sources, siteOrigin, title, gdpSources, presentation]);
+  const crawlModels = useCrawlModels(() => moneyBanksCrawlStates(section, facts, gdpFacts).map(crawl =>
+    buildMoneyBanksWorkbookExportModel({ section, facts, state: crawl, labels, sources, siteOrigin, title, gdpFacts, gdpSources }, presentation)));
   const tabLabel = state.view === "main" ? title : t(`tab.${state.view}`);
   // Money supply and Loans and deposits switch between their amounts and a share with the icon measure switch (DESIGN §7.2a), not tabs.
   const changeView = (view: MoneyBanksView) => { if (view === state.view) return; setExpanded({}); update(s => changeMoneyBanksView(s, section, view, facts, gdpFacts), true); };

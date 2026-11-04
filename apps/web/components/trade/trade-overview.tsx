@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { updatedDate } from "../../lib/explorer/coverageLabel";
 import { type ClientTradeOverviewFact, type TradeChartIndicator } from "../../lib/data/tradeOverview/types";
 import { buildTradeOverviewModel, TRADE_OVERVIEW_COLORS } from "../../lib/explorer/tradeOverview";
@@ -21,7 +21,7 @@ import { useHashState, type HashStateOptions } from "../explorer-shell/use-hash-
 import { EditorialLineChart } from "../main-explorer/editorial-line-chart";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { ChartShareButton } from "../explorer-shell/chart-share-button";
-import { CrawlTables } from "../explorer-shell/crawl-tables";
+import { CrawlTables, useCrawlModels } from "../explorer-shell/crawl-tables";
 import { ExplorerTable } from "../main-explorer/explorer-table";
 import { RangeStrip } from "../main-explorer/range-strip";
 import { SEARCHABLE_MIN_ROWS, SeriesSelector, SeriesSelectorRow } from "../main-explorer/series-selector";
@@ -44,7 +44,7 @@ const NO_MODELS: WorkbookExportModel[] = [];
  */
 export function useTradeOverviewCrawlModels(facts: readonly ClientTradeOverviewFact[] | null, sources: readonly WorkbookPublicSource[], siteOrigin: string, dataset?: "services"): readonly WorkbookExportModel[] {
   const presentation = useI18n();
-  return useMemo(() => facts ? tradeOverviewCrawlStates(facts).map(state => buildTradeOverviewWorkbookExportModel({ facts, state, sources, siteOrigin, dataset }, presentation)) : NO_MODELS, [facts, sources, siteOrigin, dataset, presentation]);
+  return useCrawlModels(() => facts ? tradeOverviewCrawlStates(facts).map(state => buildTradeOverviewWorkbookExportModel({ facts, state, sources, siteOrigin, dataset }, presentation)) : NO_MODELS);
 }
 
 export function TradeOverview({ facts, sources, lastReviewedAt, siteOrigin, dataset }: { dataset?: "services"; facts: ClientTradeOverviewFact[]; sources: WorkbookPublicSource[]; lastReviewedAt: string; siteOrigin: string }) {
@@ -113,6 +113,6 @@ export function TradeOverview({ facts, sources, lastReviewedAt, siteOrigin, data
       <p className="my-4 text-[11px] text-[var(--muted)]">{model.unit.label} · {model.range.start}–{model.range.end}</p>
       <StackedColumnChart periods={model.years} periodsPerYear={1} segments={[{ id: "trade.balance", label: label("trade.balance"), color: TRADE_OVERVIEW_COLORS["trade.balance"], values: model.balanceValues.map(value => value === null ? null : value / model.unit.divisor) }]} overlay={null} formatPeriod={String} formatValue={value => valueLabel(value * model.unit.divisor)} ariaLabel={t(services ? "services.balanceAria" : "balanceAria")} frameLabel={label("trade.balance")} />
     </section> : null}
-    <CrawlTables models={crawlModels} />
+    {domestic || services ? null : <CrawlTables models={crawlModels} />}
   </div>;
 }

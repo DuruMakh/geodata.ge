@@ -1,6 +1,5 @@
 "use client";
 import Link from "next/link";
-import { useMemo } from "react";
 import type { ClientForeignInvestmentData } from "../../lib/data/externalFlows/importForeignInvestment";
 import { FOREIGN_INVESTMENT_DIMENSIONS, FOREIGN_INVESTMENT_TOTAL_ID } from "../../lib/data/externalFlows/types";
 import { buildForeignInvestmentModel } from "../../lib/explorer/foreignInvestment";
@@ -20,7 +19,7 @@ import { SeriesAside } from "../explorer-shell/series-aside";
 import { EditorialLineChart } from "../main-explorer/editorial-line-chart";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { ChartShareButton } from "../explorer-shell/chart-share-button";
-import { CrawlTables } from "../explorer-shell/crawl-tables";
+import { CrawlTables, useCrawlModels } from "../explorer-shell/crawl-tables";
 import { ExplorerTable } from "../main-explorer/explorer-table";
 import { RangeStrip } from "../main-explorer/range-strip";
 import { ExcelDownloadButton } from "../explorer/excel-download-button";
@@ -35,8 +34,8 @@ export function ForeignInvestment({ data, sources, lastReviewedAt, siteOrigin }:
   const { state, update } = useHashState(data, parseForeignInvestmentHash, serializeForeignInvestmentHash), model = buildForeignInvestmentModel(data, state, presentation);
   const label = (id: string) => model.series.find(item => item.id === id)!.label, color = (id: string) => model.series.find(item => item.id === id)!.color;
   // Every tab's list over its years, for the hidden crawl tables: built from the props alone, so a click never rebuilds them.
-  const crawlModels = useMemo(() => foreignInvestmentCrawlStates(data).map(crawl =>
-    buildForeignInvestmentWorkbookModel({ data, state: crawl, sources, siteOrigin }, presentation)), [data, sources, siteOrigin, presentation]);
+  const crawlModels = useCrawlModels(() => foreignInvestmentCrawlStates(data).map(crawl =>
+    buildForeignInvestmentWorkbookModel({ data, state: crawl, sources, siteOrigin }, presentation)));
   const tabLabel = t(`tab.${state.dimension}`);
   const rows = model.selectedIds.map(id => ({ itemId: id, kaLabel: label(id), color: color(id), valuesByYear: model.valuesByEntity[id] }));
   const total = rows.find(row => row.itemId === FOREIGN_INVESTMENT_TOTAL_ID) ?? null;

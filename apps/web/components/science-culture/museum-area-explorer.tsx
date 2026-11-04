@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { ChevronDown } from "lucide-react";
-import { useCallback, useId, useMemo, useRef, useState } from "react";
+import { useCallback, useId, useRef, useState } from "react";
 import type { ClientScienceCultureFact } from "../../lib/data/scienceCulture/types";
 import type { MunicipalRegion } from "../../lib/data/municipal/types";
 import { updatedDate } from "../../lib/explorer/coverageLabel";
@@ -20,7 +20,7 @@ import { pageHref } from "../../lib/i18n/routes";
 import { ModeTabs } from "../explorer-shell/mode-tabs";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { ChartShareButton } from "../explorer-shell/chart-share-button";
-import { CrawlTables } from "../explorer-shell/crawl-tables";
+import { CrawlTables, useCrawlModels } from "../explorer-shell/crawl-tables";
 import { ExplorerHeading } from "../explorer-shell/explorer-heading";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { LatestFigure, LatestValueLine } from "../explorer-shell/latest-value-line";
@@ -74,8 +74,8 @@ export function MuseumAreaExplorer({ area, facts, labels, areaLabels, sources, l
   const areaName = areaLabels[area];
   const title = t("page.area.regionTitle", { region: areaName });
   // Every unit of the area's list, every row of it over its years, for the hidden crawl tables: built from the props alone, so a click never rebuilds them.
-  const crawlModels = useMemo(() => museumAreaCrawlStates(area, facts).map(crawl =>
-    buildScienceCultureWorkbookExportModel({ area, facts, state: crawl, labels, sources, siteOrigin, title }, presentation)), [area, facts, labels, sources, siteOrigin, title, presentation]);
+  const crawlModels = useCrawlModels(() => museumAreaCrawlStates(area, facts).map(crawl =>
+    buildScienceCultureWorkbookExportModel({ area, facts, state: crawl, labels, sources, siteOrigin, title }, presentation)));
   // The chart is named after the heading of the selection's first row (its text before the unit) and the area.
   const chartLabel = `${t(`heading.${(model.selected[0] ?? headline).heading}`).split(" · ")[0]} · ${areaName}`;
   // Links to another area's page carry the selection, moved to that area, and nothing else.

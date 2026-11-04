@@ -1,6 +1,5 @@
 "use client";
 import Link from "next/link";
-import { useMemo } from "react";
 import type { ClientCurrentAccountFact } from "../../lib/data/externalFlows/importCurrentAccount";
 import { CURRENT_ACCOUNT_PARTS, CURRENT_ACCOUNT_SERIES, type CurrentAccountSeriesId } from "../../lib/data/externalFlows/types";
 import { buildCurrentAccountModel, currentAccountCrawlStates, type CurrentAccountGdp } from "../../lib/explorer/currentAccount";
@@ -21,7 +20,7 @@ import { SeriesAside } from "../explorer-shell/series-aside";
 import { EditorialLineChart } from "../main-explorer/editorial-line-chart";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { ChartShareButton } from "../explorer-shell/chart-share-button";
-import { CrawlTables } from "../explorer-shell/crawl-tables";
+import { CrawlTables, useCrawlModels } from "../explorer-shell/crawl-tables";
 import { INK } from "../../lib/explorer/colors";
 import { ExplorerTable } from "../main-explorer/explorer-table";
 import { RangeStrip } from "../main-explorer/range-strip";
@@ -38,8 +37,8 @@ export function CurrentAccount({ facts, gdp, sources, gdpSources = NO_SOURCES, l
   const t = (key: string, values?: Record<string, string | number>) => message(messages, `external.account.${key}`, values);
   const { state, update } = useHashState(facts, parseCurrentAccountHash, serializeCurrentAccountHash), model = buildCurrentAccountModel(facts, gdp, state, presentation);
   // Every tab in US dollars and as % of GDP, all five series over their years, for the hidden crawl tables: built from the props alone, so a click never rebuilds them.
-  const crawlModels = useMemo(() => currentAccountCrawlStates(facts, gdp).map(crawl =>
-    buildCurrentAccountWorkbookModel({ facts, gdp, state: crawl, sources, gdpSources, siteOrigin }, presentation)), [facts, gdp, sources, gdpSources, siteOrigin, presentation]);
+  const crawlModels = useCrawlModels(() => currentAccountCrawlStates(facts, gdp).map(crawl =>
+    buildCurrentAccountWorkbookModel({ facts, gdp, state: crawl, sources, gdpSources, siteOrigin }, presentation)));
   const balance = state.tab === "balance", percent = state.unit === "gdp";
   const shown: CurrentAccountSeriesId[] = balance ? [...CURRENT_ACCOUNT_SERIES] : model.selectedIds;
   const label = (id: CurrentAccountSeriesId) => model.series.find(item => item.id === id)!.label, color = (id: CurrentAccountSeriesId) => model.series.find(item => item.id === id)!.color;

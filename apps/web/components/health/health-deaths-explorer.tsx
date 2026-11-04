@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useState } from "react";
 import { updatedDate } from "../../lib/explorer/coverageLabel";
 import type { ClientHealthFact, HealthArea } from "../../lib/data/health/types";
 import type { MunicipalRegion } from "../../lib/data/municipal/types";
@@ -16,7 +16,7 @@ import { pageHref } from "../../lib/i18n/routes";
 import { ModeTabs } from "../explorer-shell/mode-tabs";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { ChartShareButton } from "../explorer-shell/chart-share-button";
-import { CrawlTables } from "../explorer-shell/crawl-tables";
+import { CrawlTables, useCrawlModels } from "../explorer-shell/crawl-tables";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { LatestValueLine } from "../explorer-shell/latest-value-line";
 import { FlatSeriesPanel } from "../explorer-shell/flat-series-panel";
@@ -65,8 +65,8 @@ export function HealthDeathsExplorer({ area, areas, facts, labels, areaLabels, s
   const title = t("page.area.regionTitle", { region: areaName });
   const chartLabel = `${t("page.causes-of-death.title")} · ${areaName}`;
   // All deaths and every cause over the area's years, for the hidden crawl table: built from the props alone, so a click never rebuilds it.
-  const crawlModels = useMemo(() => healthDeathsCrawlStates(area, facts).map(crawl =>
-    buildHealthWorkbookExportModel({ section: "causes-of-death", area, facts, state: crawl, labels, sources, siteOrigin, title }, presentation)), [area, facts, labels, sources, siteOrigin, title, presentation]);
+  const crawlModels = useCrawlModels(() => healthDeathsCrawlStates(area, facts).map(crawl =>
+    buildHealthWorkbookExportModel({ section: "causes-of-death", area, facts, state: crawl, labels, sources, siteOrigin, title }, presentation)));
   const index = areas.findIndex(item => item.id === area);
   const neighbours = { previous: areas[(index - 1 + areas.length) % areas.length]!, next: areas[(index + 1) % areas.length]! };
   const coverage = healthSeriesCoverage(facts, area, healthDeathsSeries(), `No causes-of-death years for ${area}`);

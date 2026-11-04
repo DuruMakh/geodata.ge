@@ -108,3 +108,16 @@ export function crawlTables(models: readonly WorkbookExportModel[], messages: Me
   });
   return tables;
 }
+
+const HTML_ESCAPES: Record<string, string> = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#x27;" };
+// React's own text escaping, so the string is byte for byte the markup React rendered from the same tables.
+const escapeHtml = (text: string) => text.replace(/[&<>"']/g, (character) => HTML_ESCAPES[character]!);
+
+/** The crawl tables as the HTML inside their hidden wrapper; `category` heads the label column of a table that names none. */
+export function crawlTablesHtml(tables: readonly CrawlTable[], category: string): string {
+  return tables.map((table) =>
+    `<table><caption>${escapeHtml(table.caption)}</caption>` +
+    `<thead><tr><th>${escapeHtml(table.category ?? category)}</th>${table.columns.map((column) => `<th>${escapeHtml(column)}</th>`).join("")}</tr></thead>` +
+    `<tbody>${table.rows.map((row) => `<tr><th>${escapeHtml(row.label)}</th>${row.cells.map((cell) => `<td>${escapeHtml(cell)}</td>`).join("")}</tr>`).join("")}</tbody></table>`,
+  ).join("");
+}

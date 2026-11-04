@@ -32,7 +32,7 @@ import { LatestValueLine } from "../explorer-shell/latest-value-line";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { ChartShareButton } from "../explorer-shell/chart-share-button";
-import { CrawlTables } from "../explorer-shell/crawl-tables";
+import { CrawlTables, useCrawlModels } from "../explorer-shell/crawl-tables";
 import { Callout, SELECT_CLASS, SegmentedTabs, SourceNote, SwatchBar, SectionTitle, TextTab } from "../ui/editorial";
 import { UnemploymentSeriesPanel } from "./unemployment-series-panel";
 import { UnemploymentOverviewSeriesPanel } from "./unemployment-overview-series-panel";
@@ -46,8 +46,8 @@ export type UnemploymentExplorerProps = { section: UnemploymentSectionId; region
  */
 export function useUnemploymentCrawlModels({ section, regionId, facts, registry, sources, siteOrigin }: Pick<UnemploymentExplorerProps, "section" | "regionId" | "facts" | "registry" | "sources" | "siteOrigin">) {
   const presentation = useI18n();
-  return useMemo(() => unemploymentCrawlStates(facts, registry, section, regionId).map(crawl =>
-    buildUnemploymentWorkbookExportModel(facts, registry, crawl, presentation, sources, siteOrigin)), [facts, registry, section, regionId, presentation, sources, siteOrigin]);
+  return useCrawlModels(() => unemploymentCrawlStates(facts, registry, section, regionId).map(crawl =>
+    buildUnemploymentWorkbookExportModel(facts, registry, crawl, presentation, sources, siteOrigin)));
 }
 
 export function UnemploymentExplorer({ section, regionId, regionSplit, regions, facts, registry, sources, lastReviewedAt, siteOrigin }: UnemploymentExplorerProps) {

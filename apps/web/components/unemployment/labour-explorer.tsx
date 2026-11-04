@@ -17,7 +17,7 @@ import { pageHref } from "../../lib/i18n/routes";
 import { ExcelDownloadButton } from "../explorer/excel-download-button";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { ChartShareButton } from "../explorer-shell/chart-share-button";
-import { CrawlTables } from "../explorer-shell/crawl-tables";
+import { CrawlTables, useCrawlModels } from "../explorer-shell/crawl-tables";
 import { ExplorerHeading } from "../explorer-shell/explorer-heading";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { FlatSeriesPanel } from "../explorer-shell/flat-series-panel";
@@ -71,8 +71,8 @@ export function LabourExplorer({ section, facts, labels, headingLabels, latestLi
   const total = rows.find(row => row.itemId === reference?.id) ?? null;
   const title = t(`page.${section}.title`);
   // Every row with a figure over the page's years, for the hidden crawl tables: built from the props alone, so a click never rebuilds them.
-  const crawlModels = useMemo(() => labourCrawlStates(section, facts).map(crawl =>
-    buildLabourWorkbookExportModel({ section, facts, state: crawl, labels, headingLabels, sources, siteOrigin, title }, presentation)), [section, facts, labels, headingLabels, sources, siteOrigin, title, presentation]);
+  const crawlModels = useCrawlModels(() => labourCrawlStates(section, facts).map(crawl =>
+    buildLabourWorkbookExportModel({ section, facts, state: crawl, labels, headingLabels, sources, siteOrigin, title }, presentation)));
   // Geostat publishes no figure for some rows (men in households as employers): such a selection alone has nothing to draw.
   const hasValues = model.selected.some(series => model.years.some(year => series.valuesByYear[year] != null));
   const downloadAction = <ExcelDownloadButton testId="labour-excel-download" disabled={!model.selected.length} onDownload={async () => {

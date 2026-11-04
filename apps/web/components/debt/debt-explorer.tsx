@@ -37,7 +37,7 @@ import { ExplorerPage } from "../explorer-shell/explorer-page";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { MeasurePill } from "../explorer-shell/measure-pill";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
-import { CrawlTables } from "../explorer-shell/crawl-tables";
+import { CrawlTables, useCrawlModels } from "../explorer-shell/crawl-tables";
 import { DECK_LINE_CLASS } from "../explorer-shell/latest-value-line";
 import { navGroup, ALL_DATA_PATH } from "../../lib/navigation/navTree";
 
@@ -84,14 +84,14 @@ export function DebtExplorerSurface(props: DebtExplorerSurfaceProps) {
   }, presentation), [props.facts, props.gdpFacts, props.family, props.selectedIds, props.range, props.shareOfGdp, presentation]);
   // Every family's series over its whole span, for the hidden crawl tables: built from the props alone, so a click never
   // rebuilds them.
-  const crawlModels = useMemo(() => debtCrawlStates(props.facts).map((crawl) => buildDebtWorkbookExportModel({
+  const crawlModels = useCrawlModels(() => debtCrawlStates(props.facts).map((crawl) => buildDebtWorkbookExportModel({
     facts: props.facts,
     gdpFacts: props.gdpFacts,
     ...crawl,
     sources: props.workbookSources,
     gdpSources: props.gdpWorkbookSources ?? [],
     siteOrigin: props.siteOrigin ?? "",
-  }, presentation)), [props.facts, props.gdpFacts, props.workbookSources, props.gdpWorkbookSources, props.siteOrigin, presentation]);
+  }, presentation)));
   const familyYears = useMemo(() => Array.from(new Set(
     props.facts.filter((fact) => fact.family === props.family).map((fact) => fact.year),
   )).sort((left, right) => left - right), [props.facts, props.family]);

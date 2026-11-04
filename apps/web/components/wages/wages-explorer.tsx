@@ -14,7 +14,7 @@ import { useI18n } from "../../lib/i18n/provider";
 import { message } from "../../lib/i18n/messages";
 import { pageHref } from "../../lib/i18n/routes";
 import { ModeTabs } from "../explorer-shell/mode-tabs";
-import { CrawlTables } from "../explorer-shell/crawl-tables";
+import { CrawlTables, useCrawlModels } from "../explorer-shell/crawl-tables";
 import { ExplorerHeading } from "../explorer-shell/explorer-heading";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { LatestValueLine } from "../explorer-shell/latest-value-line";
@@ -67,8 +67,8 @@ export function WagesExplorer({ section, facts: shippedFacts, labels, sources, l
   const latest = wagesPlaceLatest(facts, regionId);
   const title = regionId ? t("regionTitle", { region: regionName }) : t(`page.${section}.title`);
   // Every group's series over its years, for the hidden crawl tables: built from the props alone, so a click never rebuilds them.
-  const crawlModels = useMemo(() => wagesCrawlStates(section, facts).map(crawl =>
-    buildWagesWorkbookExportModel({ section, facts, state: crawl, labels, sources, siteOrigin, title, regionId }, presentation)), [section, facts, labels, sources, siteOrigin, title, regionId, presentation]);
+  const crawlModels = useCrawlModels(() => wagesCrawlStates(section, facts).map(crawl =>
+    buildWagesWorkbookExportModel({ section, facts, state: crawl, labels, sources, siteOrigin, title, regionId }, presentation)));
   const changeView = (view: WagesView) => { if (view === state.view) return; setQuery(""); update(s => changeWagesView(s, section, view, facts), true); };
   const downloadAction = <ExcelDownloadButton testId="wages-excel-download" disabled={!model.selected.length} onDownload={async () => {
     const { downloadWorkbook } = await import("../../lib/explorer/workbookWriter.client");

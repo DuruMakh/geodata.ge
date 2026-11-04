@@ -15,7 +15,7 @@ import { pageHref } from "../../lib/i18n/routes";
 import { ModeTabs } from "../explorer-shell/mode-tabs";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { ChartShareButton } from "../explorer-shell/chart-share-button";
-import { CrawlTables } from "../explorer-shell/crawl-tables";
+import { CrawlTables, useCrawlModels } from "../explorer-shell/crawl-tables";
 import { ExplorerHeading } from "../explorer-shell/explorer-heading";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { LatestValueLine } from "../explorer-shell/latest-value-line";
@@ -71,8 +71,8 @@ export function EnergyFoodExplorer({ section, facts, labels, sources, lastReview
     : section === "electricity" ? t("latestNote.electricity", { imports: plain("electricity.imports"), exports: plain("electricity.exports") }) : undefined;
   const title = t(`page.${section}.title`);
   // Every group of the list a chart can hold, every row of it over its years, for the hidden crawl tables: built from the props alone, so a click never rebuilds them.
-  const crawlModels = useMemo(() => energyFoodCrawlStates(section, facts).map(crawl =>
-    buildEnergyFoodWorkbookExportModel({ section, facts, state: crawl, labels, sources, siteOrigin, title }, presentation)), [section, facts, labels, sources, siteOrigin, title, presentation]);
+  const crawlModels = useCrawlModels(() => energyFoodCrawlStates(section, facts).map(crawl =>
+    buildEnergyFoodWorkbookExportModel({ section, facts, state: crawl, labels, sources, siteOrigin, title }, presentation)));
   const downloadAction = <ExcelDownloadButton testId="energy-food-excel-download" disabled={!model.selected.length} onDownload={async () => {
     const { downloadWorkbook } = await import("../../lib/explorer/workbookWriter.client");
     await downloadWorkbook(buildEnergyFoodWorkbookExportModel({ section, facts, state, labels, sources, siteOrigin, title }, presentation));

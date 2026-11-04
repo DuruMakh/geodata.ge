@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { Fragment, useMemo, type ReactNode } from "react";
+import { Fragment, type ReactNode } from "react";
 import { updatedDate } from "../../lib/explorer/coverageLabel";
 import type { ClientTradePartnersData } from "../../lib/data/tradePartners/importTradePartners";
 import { TRADE_OVERVIEW_INDICATORS, type TradeChartIndicator } from "../../lib/data/tradeOverview/types";
@@ -21,7 +21,7 @@ import { SeriesAside } from "../explorer-shell/series-aside";
 import { EditorialLineChart } from "../main-explorer/editorial-line-chart";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { ChartShareButton } from "../explorer-shell/chart-share-button";
-import { CrawlTables } from "../explorer-shell/crawl-tables";
+import { CrawlTables, useCrawlModels } from "../explorer-shell/crawl-tables";
 import { ExplorerTable } from "../main-explorer/explorer-table";
 import { RangeStrip } from "../main-explorer/range-strip";
 import { ExcelDownloadButton } from "../explorer/excel-download-button";
@@ -40,7 +40,7 @@ const NO_MODELS: WorkbookExportModel[] = [];
  */
 export function useTradePartnersCrawlModels(data: ClientTradePartnersData | null, sources: readonly WorkbookPublicSource[], siteOrigin: string): readonly WorkbookExportModel[] {
   const presentation = useI18n();
-  return useMemo(() => data ? tradePartnersCrawlStates(data).map(state => buildTradePartnersWorkbookModel({ data, state, sources, siteOrigin }, presentation)) : NO_MODELS, [data, sources, siteOrigin, presentation]);
+  return useCrawlModels(() => data ? tradePartnersCrawlStates(data).map(state => buildTradePartnersWorkbookModel({ data, state, sources, siteOrigin }, presentation)) : NO_MODELS);
 }
 
 export function TradePartners({ data, sources, lastReviewedAt, siteOrigin, navigation, seriesControls }: { data: ClientTradePartnersData; sources: WorkbookPublicSource[]; lastReviewedAt: string; siteOrigin: string; navigation?: (measure: TradeChartIndicator, changeMeasure: (next: TradeChartIndicator) => void) => ReactNode; seriesControls?: ReactNode }) {
@@ -92,6 +92,6 @@ export function TradePartners({ data, sources, lastReviewedAt, siteOrigin, navig
       <SeriesAside label={message(messages, "controls.series")}><TradePartnersSeriesPanel key={state.tab} data={data} state={state} model={model} onTabChange={tab => update(s => setTradePartnersTab(s, tab), true)} onSelectionChange={selectedIds => update(s => ({ ...s, selectedIds }), true)} measureControls={seriesControls ?? (navigation ? undefined : measureControls)} downloadAction={downloadAction} /></SeriesAside>
     </ExplorerWorkspace>
     <TradePartnersRanking key={`${state.tab}:${state.measure}:${model.range.end}`} model={model} tab={state.tab} measure={state.measure} services={services} />
-    <CrawlTables models={crawlModels} />
+    {embedded ? null : <CrawlTables models={crawlModels} />}
   </div>;
 }

@@ -21,7 +21,7 @@ import { SeriesAside } from "../explorer-shell/series-aside";
 import { EditorialLineChart } from "../main-explorer/editorial-line-chart";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { ChartShareButton } from "../explorer-shell/chart-share-button";
-import { CrawlTables } from "../explorer-shell/crawl-tables";
+import { CrawlTables, useCrawlModels } from "../explorer-shell/crawl-tables";
 import { ExplorerTable } from "../main-explorer/explorer-table";
 import { RangeStrip } from "../main-explorer/range-strip";
 import { ExcelDownloadButton } from "../explorer/excel-download-button";
@@ -38,8 +38,8 @@ export function MoneyFromAbroad({ data: input, sources, lastReviewedAt, siteOrig
   const { state, update } = useHashState(data, parseMoneyTransfersHash, serializeMoneyTransfersHash), model = buildMoneyTransfersModel(data, state, presentation);
   const label = (id: string) => model.series.find(item => item.id === id)!.label;
   // Received and sent, each list over its years, for the hidden crawl tables: built from the props alone, so a click never rebuilds them.
-  const crawlModels = useMemo(() => moneyTransfersCrawlStates(data).map(crawl =>
-    buildMoneyTransfersWorkbookModel({ data, state: crawl, sources, siteOrigin }, presentation)), [data, sources, siteOrigin, presentation]);
+  const crawlModels = useCrawlModels(() => moneyTransfersCrawlStates(data).map(crawl =>
+    buildMoneyTransfersWorkbookModel({ data, state: crawl, sources, siteOrigin }, presentation)));
   const measureLabel = message(messages, `external.measure.${state.measure}`);
   const partialByYear = (id: string) => Object.fromEntries(Object.keys(model.partialMonths[id] ?? {}).map(year => [Number(year), true]));
   const rows = model.selectedIds.map(id => ({ itemId: id, kaLabel: label(id), color: model.colorById[id], valuesByYear: model.valuesByEntity[id], preliminaryByYear: partialByYear(id) }));

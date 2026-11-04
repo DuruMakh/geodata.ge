@@ -34,7 +34,7 @@ import { ExplorerPage } from "../explorer-shell/explorer-page";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { ChartShareButton } from "../explorer-shell/chart-share-button";
-import { CrawlTables } from "../explorer-shell/crawl-tables";
+import { CrawlTables, useCrawlModels } from "../explorer-shell/crawl-tables";
 import { useHashState } from "../explorer-shell/use-hash-state";
 import { topicSection, ALL_DATA_PATH } from "../../lib/navigation/navTree";
 
@@ -71,9 +71,9 @@ export function InflationOverview({ facts, sourceIdBySeriesMeasure, lastReviewed
   );
   const { state, update } = useHashState(index, parseOverviewHash, serializeInflationHash);
   // Every tab's rows over its last three calendar years (at most 36 months), for the hidden crawl tables: built from the props alone, so a click never rebuilds them.
-  const crawlModels = useMemo(() => inflationCrawlStates(index).map((crawl) => buildInflationWorkbookExportModel({
+  const crawlModels = useCrawlModels(() => inflationCrawlStates(index).map((crawl) => buildInflationWorkbookExportModel({
     index, targets, state: crawl, range: resolveInflationRange(crawl, index), presentation, sources, siteOrigin,
-  })), [index, targets, presentation, sources, siteOrigin]);
+  })));
   const [announcement, setAnnouncement] = useState("");
 
   const range = resolveInflationRange(state, index);

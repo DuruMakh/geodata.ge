@@ -22,7 +22,7 @@ import { ExcelDownloadButton } from "../explorer/excel-download-button";
 import { EditorialLineChart } from "../main-explorer/editorial-line-chart";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { ChartShareButton } from "../explorer-shell/chart-share-button";
-import { CrawlTables } from "../explorer-shell/crawl-tables";
+import { CrawlTables, useCrawlModels } from "../explorer-shell/crawl-tables";
 import { ExplorerTable } from "../main-explorer/explorer-table";
 import { RangeStrip } from "../main-explorer/range-strip";
 import { Callout, SourceNote, SwatchBar, TextTab } from "../ui/editorial";
@@ -40,7 +40,7 @@ const NO_MODELS: WorkbookExportModel[] = [];
  */
 export function useTradeProductsCrawlModels(data: ClientTradeProductsData | null, sources: readonly WorkbookPublicSource[], siteOrigin: string): readonly WorkbookExportModel[] {
   const presentation = useI18n();
-  return useMemo(() => data ? tradeProductsCrawlStates(data).map(state => buildTradeProductsWorkbookModel({ data, state, sources, siteOrigin }, presentation)) : NO_MODELS, [data, sources, siteOrigin, presentation]);
+  return useCrawlModels(() => data ? tradeProductsCrawlStates(data).map(state => buildTradeProductsWorkbookModel({ data, state, sources, siteOrigin }, presentation)) : NO_MODELS);
 }
 
 export function TradeProducts({ data, sources, lastReviewedAt, siteOrigin }: { data: ClientTradeProductsData; sources: WorkbookPublicSource[]; lastReviewedAt: string; siteOrigin: string }) {
@@ -105,6 +105,6 @@ export function TradeProducts({ data, sources, lastReviewedAt, siteOrigin }: { d
     <div className="mt-[18px]"><SourceNote testId="source-label" action={shareAction}>{message(messages, "trade.sourceNote")} · {model.range.start}–{model.range.end} · <span className="whitespace-nowrap">{updatedDate(lastReviewedAt, locale)}</span><Link href={pageHref("/methodology/trade", locale)} prefetch={false} className="ml-2 text-[var(--accent)] underline underline-offset-4">{message(messages, "trade.methodology")}</Link></SourceNote><p className="mt-2 max-w-[850px] text-[11px] leading-relaxed text-[var(--muted)]">{domestic ? message(messages, "trade.domestic.productDefinitions") : `${data.sourceBlock ? "" : `${t("historicalNote")} `}${t("definitions")}`}</p></div>
     <TradePartnersRanking key={`${state.measure}:${model.range.end}`} model={model} tab="products" measure={state.measure} pageSize={25} />
     {picker ? <TradeProductsPicker data={data} model={model} selectedIds={state.selectedIds} initialView={picker.view} returnFocusTo={picker.opener} onApply={selectedIds => update(previous => ({ ...previous, selectedIds }), true)} onClose={() => setPicker(null)} /> : null}
-    <CrawlTables models={crawlModels} />
+    {domestic ? null : <CrawlTables models={crawlModels} />}
   </div>;
 }

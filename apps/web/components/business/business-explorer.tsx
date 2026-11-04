@@ -14,7 +14,7 @@ import { pageHref } from "../../lib/i18n/routes";
 import { ModeTabs } from "../explorer-shell/mode-tabs";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { ChartShareButton } from "../explorer-shell/chart-share-button";
-import { CrawlTables } from "../explorer-shell/crawl-tables";
+import { CrawlTables, useCrawlModels } from "../explorer-shell/crawl-tables";
 import { ExplorerHeading } from "../explorer-shell/explorer-heading";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { LatestValueLine } from "../explorer-shell/latest-value-line";
@@ -75,8 +75,8 @@ export function BusinessExplorer({ section, facts, labels, sources, lastReviewed
   const closed = section === "firms" ? facts.find(f => f.indicatorId === "business.deaths.total" && f.year === latest.year) : undefined;
   const title = t(`page.${section}.title`);
   // Every unit's series over its years, for the hidden crawl tables: built from the props alone, so a click never rebuilds them.
-  const crawlModels = useMemo(() => businessCrawlStates(section, facts).map(crawl =>
-    buildBusinessWorkbookExportModel({ section, facts, state: crawl, labels, sources, siteOrigin, title }, presentation)), [section, facts, labels, sources, siteOrigin, title, presentation]);
+  const crawlModels = useCrawlModels(() => businessCrawlStates(section, facts).map(crawl =>
+    buildBusinessWorkbookExportModel({ section, facts, state: crawl, labels, sources, siteOrigin, title }, presentation)));
   const chartLabel = percent ? t("measure.rate") : title;
   const downloadAction = <ExcelDownloadButton testId="business-excel-download" disabled={!model.selected.length} onDownload={async () => {
     const { downloadWorkbook } = await import("../../lib/explorer/workbookWriter.client");

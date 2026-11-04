@@ -57,7 +57,7 @@ import { latestEntry } from "../../lib/explorer/latestValue";
 import { formatInflationValue } from "../../lib/explorer/inflationLabels";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { ChartShareButton } from "../explorer-shell/chart-share-button";
-import { CrawlTables } from "../explorer-shell/crawl-tables";
+import { CrawlTables, useCrawlModels } from "../explorer-shell/crawl-tables";
 import { PageDataStatus } from "../explorer-shell/page-data-status";
 import { useHashState } from "../explorer-shell/use-hash-state";
 import { usePageData } from "../explorer-shell/use-page-data";
@@ -104,9 +104,9 @@ export function InflationCategories({ facts, monthlyUrl, weights, headline, head
   const headlineByPeriod = useMemo(() => new Map(headline.map((row) => [row.period, row.value])), [headline]);
   // The divisions' contributions and every category's annual change over the last three calendar years (at most 36 months), for the hidden crawl tables:
   // built from the props, never on a click (the monthly runs fetched after load add no table).
-  const crawlModels = useMemo(() => categoryCrawlStates(index).map((crawl) => buildInflationCategoryWorkbookExportModel({
+  const crawlModels = useCrawlModels(() => categoryCrawlStates(index).map((crawl) => buildInflationCategoryWorkbookExportModel({
     index, state: crawl, range: resolveCategoryRange(crawl, index), headline: headlineByPeriod, presentation, sources, siteOrigin,
-  })), [index, headlineByPeriod, presentation, sources, siteOrigin]);
+  })));
   const { state, update } = useHashState(index, parseCategoriesHash, serializeCategoryHash);
   const [announcement, setAnnouncement] = useState("");
   if (state.tab === "mom" && !monthlyWanted) setMonthlyWanted(true);

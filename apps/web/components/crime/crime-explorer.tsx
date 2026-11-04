@@ -16,7 +16,7 @@ import { pageHref } from "../../lib/i18n/routes";
 import { ModeTabs } from "../explorer-shell/mode-tabs";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { ChartShareButton } from "../explorer-shell/chart-share-button";
-import { CrawlTables } from "../explorer-shell/crawl-tables";
+import { CrawlTables, useCrawlModels } from "../explorer-shell/crawl-tables";
 import { ExplorerHeading } from "../explorer-shell/explorer-heading";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { LatestValueLine } from "../explorer-shell/latest-value-line";
@@ -74,8 +74,8 @@ export function CrimeExplorer({ section, facts, population, breaks, labels, sour
   const killed = section === "road-accidents" ? latestOf(ROAD_KILLED) : null;
   const title = t(`page.${section}.title`);
   // Every unit of the list as counts and per 100,000, every series over its years, for the hidden crawl tables: built from the props alone, so a click never rebuilds them.
-  const crawlModels = useMemo(() => crimeCrawlStates(section, facts, population).map(crawl =>
-    buildCrimeWorkbookExportModel({ section, facts, population, state: crawl, labels, sources, siteOrigin, title }, presentation)), [section, facts, population, labels, sources, siteOrigin, title, presentation]);
+  const crawlModels = useCrawlModels(() => crimeCrawlStates(section, facts, population).map(crawl =>
+    buildCrimeWorkbookExportModel({ section, facts, population, state: crawl, labels, sources, siteOrigin, title }, presentation)));
   const changeMeasure = (measure: CrimeMeasure) => {
     if (measure !== state.measure) update(s => changeCrimeMeasure(s, measure), true);
   };

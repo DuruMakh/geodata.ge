@@ -17,7 +17,7 @@ import { budgetCrawlStates, buildExplorerModel, isPlannedYear } from "../../lib/
 import { buildBudgetWorkbookInput } from "../../lib/explorer/budgetWorkbook";
 import { formatAmount, unitFor, unitsFor } from "../../lib/explorer/format";
 import { useAppReady } from "../explorer-shell/use-app-ready";
-import { CrawlTables } from "../explorer-shell/crawl-tables";
+import { CrawlTables, useCrawlModels } from "../explorer-shell/crawl-tables";
 import type { ExplorerSide } from "../../lib/explorer/types";
 import { buildWorkbookExportModel, type WorkbookPublicSource } from "../../lib/explorer/workbookModel";
 import { downloadWorkbook } from "../../lib/explorer/workbookWriter.client";
@@ -131,7 +131,7 @@ function MainExplorerContent({ nav, facts: shippedFacts, adminFacts: shippedAdmi
 
   // Every series of every scope the route offers, for the hidden crawl tables: built from the props alone, so a click
   // never rebuilds them.
-  const crawlModels = useMemo(() => budgetCrawlStates(nav, facts, adminFacts).map((crawl) => buildWorkbookExportModel(buildBudgetWorkbookInput({
+  const crawlModels = useCrawlModels(() => budgetCrawlStates(nav, facts, adminFacts).map((crawl) => buildWorkbookExportModel(buildBudgetWorkbookInput({
     model: buildExplorerModel({
       facts,
       gdpFacts,
@@ -152,7 +152,7 @@ function MainExplorerContent({ nav, facts: shippedFacts, adminFacts: shippedAdmi
     title: nav === "expenditure" ? `${screenTitle} · ${message(messages, crawl.grouping === "ministries" ? "controls.ministries" : "controls.fields")}` : screenTitle,
     sources: { budget: workbookSources, admin: adminWorkbookSources, gdp: gdpWorkbookSources },
     siteOrigin: siteOrigin ?? "",
-  }))), [nav, facts, gdpFacts, adminFacts, adminCategoryMap, glossary, presentation, messages, screenTitle, workbookSources, adminWorkbookSources, gdpWorkbookSources, siteOrigin]);
+  }))));
 
   const deck = useMemo(() => {
     const totals = totalsByScope[scope];

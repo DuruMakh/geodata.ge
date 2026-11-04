@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { CENSUS_STEP, SERIES } from "../../lib/data/demography/series";
 import { ACCENT, INK, OTHER_COLOR, SERIES_COLORS } from "../../lib/explorer/colors";
 import { AGE_GROUPS, ageCurves, LIFE_SERIES, nationalYears, seriesByYear, UNIT_RATE_2 } from "../../lib/explorer/demographyNational";
@@ -14,7 +14,7 @@ import type { TemplateValues } from "../../lib/i18n/types";
 import type { ClientNationalFact } from "../../lib/servedRows";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { ChartShareButton } from "../explorer-shell/chart-share-button";
-import { CrawlTables } from "../explorer-shell/crawl-tables";
+import { CrawlTables, useCrawlModels } from "../explorer-shell/crawl-tables";
 import { ModeTabs } from "../explorer-shell/mode-tabs";
 import { useAppReady } from "../explorer-shell/use-app-ready";
 import { EditorialLineChart } from "../main-explorer/editorial-line-chart";
@@ -40,8 +40,7 @@ export function NationalVitalCharts({
   useAppReady();
   // The fertility workbook (the total rate and the seven age rates) and the life expectancy one, for the hidden crawl tables:
   // built from the props alone, so a click never rebuilds them.
-  const crawlModels = useMemo(() => [buildFertilityWorkbookExportModel({ facts, sources, siteOrigin }, presentation), buildLifeWorkbookExportModel({ facts, sources, siteOrigin }, presentation)],
-    [facts, sources, siteOrigin, presentation]);
+  const crawlModels = useCrawlModels(() => [buildFertilityWorkbookExportModel({ facts, sources, siteOrigin }, presentation), buildLifeWorkbookExportModel({ facts, sources, siteOrigin }, presentation)]);
   const [tfrMode, setTfrMode] = useState<ChartMode>("line");
   const [ageMode, setAgeMode] = useState<ChartMode>("line");
   const [lifeMode, setLifeMode] = useState<ChartMode>("line");

@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { ChevronDown } from "lucide-react";
-import { useCallback, useId, useMemo, useRef, useState } from "react";
+import { useCallback, useId, useRef, useState } from "react";
 import type { ClientInternetFact } from "../../lib/data/internet/types";
 import type { MunicipalRegion } from "../../lib/data/municipal/types";
 import { INTERNET_PERCENT, internetPercent, internetSeriesLabel, serializeInternetHash, type InternetSeriesModel, type InternetTranslate } from "../../lib/explorer/internet";
@@ -18,7 +18,7 @@ import { pageHref } from "../../lib/i18n/routes";
 import { ModeTabs } from "../explorer-shell/mode-tabs";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { ChartShareButton } from "../explorer-shell/chart-share-button";
-import { CrawlTables } from "../explorer-shell/crawl-tables";
+import { CrawlTables, useCrawlModels } from "../explorer-shell/crawl-tables";
 import { ExplorerHeading } from "../explorer-shell/explorer-heading";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { LatestFigure, LatestValueLine } from "../explorer-shell/latest-value-line";
@@ -68,8 +68,8 @@ export function InternetAreaExplorer({ area, facts, labels, areaLabels, sources,
   const areaName = areaLabels[area];
   const title = t("page.area.regionTitle", { region: areaName });
   // The area's every row over its years, for the hidden crawl tables: built from the props alone, so a click never rebuilds them.
-  const crawlModels = useMemo(() => internetAreaCrawlStates(area, facts).map(crawl =>
-    buildInternetWorkbookExportModel({ area, facts, state: crawl, labels, sources, siteOrigin, title }, presentation)), [area, facts, labels, sources, siteOrigin, title, presentation]);
+  const crawlModels = useCrawlModels(() => internetAreaCrawlStates(area, facts).map(crawl =>
+    buildInternetWorkbookExportModel({ area, facts, state: crawl, labels, sources, siteOrigin, title }, presentation)));
   const chartLabel = `${t("heading.homes").split(" · ")[0]} · ${areaName}`;
   // Links to another area's page carry the selection, moved to that area, and nothing else.
   const areaHref = (id: string) => `${internetRegionHref(id)}${internetAreaSelectionHash(state.selectedIds, internetAreaOfMapId(id))}`;

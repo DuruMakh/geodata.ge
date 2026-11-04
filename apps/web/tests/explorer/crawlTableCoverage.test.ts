@@ -30,6 +30,17 @@ describe("crawl table coverage", () => {
     expect(covered.filter((file) => !read(file).includes("<CrawlTables")), `${RULE} These files render no <CrawlTables.`).toEqual([]);
   });
 
+  it("crawl models are built through useCrawlModels, never in a useMemo the browser would run", () => {
+    // The browser never builds them: a crawl useMemo cost Trading partners over half a second of hydration (DESIGN.md §8.4).
+    const crawlFiles = sourceFiles("components").filter((file) => file !== "components/explorer-shell/crawl-tables.tsx" && /<CrawlTables|export function use\w+CrawlModels\(/.test(read(file)));
+    expect(crawlFiles.length).toBeGreaterThanOrEqual(47);
+    expect(crawlFiles.filter((file) => /<CrawlTables/.test(read(file)) && !/\buse\w*CrawlModels\(/.test(read(file))), "These files render <CrawlTables without useCrawlModels.").toEqual([]);
+    const hooks = crawlFiles.flatMap((file) => [...read(file).matchAll(/export function (use\w+CrawlModels)\([\s\S]*?\n}\n/g)].map((match) => ({ name: match[1]!, body: match[0] })));
+    expect(hooks.length).toBeGreaterThanOrEqual(4);
+    expect(hooks.filter((hook) => !hook.body.includes("useCrawlModels(") || hook.body.includes("useMemo(")).map((hook) => hook.name), "These crawl hooks do not build through useCrawlModels.").toEqual([]);
+    expect(crawlFiles.filter((file) => /crawl\w*\s*=\s*useMemo\(/i.test(read(file))), "These files build crawl models in a useMemo.").toEqual([]);
+  });
+
   it("no component passes the retired crawlCopy prop, and ExplorerTable no longer takes it", () => {
     expect(sourceFiles("components").filter((file) => read(file).includes("crawlCopy")), RULE).toEqual([]);
   });

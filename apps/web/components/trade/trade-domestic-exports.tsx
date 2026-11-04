@@ -1,10 +1,9 @@
 "use client";
-import { useMemo } from "react";
 import type { toClientTradeDomesticData } from "../../lib/data/tradeDomestic/importTradeDomestic";
 import type { WorkbookPublicSource } from "../../lib/explorer/workbookModel";
 import { message } from "../../lib/i18n/messages";
 import { useI18n } from "../../lib/i18n/provider";
-import { CrawlTables } from "../explorer-shell/crawl-tables";
+import { CrawlTables, useCrawlModels } from "../explorer-shell/crawl-tables";
 import { ExplorerHeading } from "../explorer-shell/explorer-heading";
 import { TextTab } from "../ui/editorial";
 import { TradeOverview, useTradeOverviewCrawlModels } from "./trade-overview";
@@ -22,7 +21,7 @@ export function TradeDomesticExports({ data, sources, lastReviewedAt, siteOrigin
   const overviewModels = useTradeOverviewCrawlModels(data.national, sources, siteOrigin);
   const countryModels = useTradePartnersCrawlModels(data.countries, sources, siteOrigin);
   const productModels = useTradeProductsCrawlModels(data.products, sources, siteOrigin);
-  const crawlModels = useMemo(() => [...overviewModels, ...countryModels, ...productModels], [overviewModels, countryModels, productModels]);
+  const crawlModels = useCrawlModels(() => [...overviewModels, ...countryModels, ...productModels]);
   return <div data-testid="trade-domestic" data-section={section} className="@container">
     <ExplorerHeading>{t("title")}</ExplorerHeading>
     <div role="group" aria-label={t("views")} className="mb-5 flex flex-wrap items-center gap-5">

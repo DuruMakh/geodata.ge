@@ -19,7 +19,7 @@ import { ExcelDownloadButton } from "../explorer/excel-download-button";
 import { ModeTabs } from "../explorer-shell/mode-tabs";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { ChartShareButton } from "../explorer-shell/chart-share-button";
-import { CrawlTables } from "../explorer-shell/crawl-tables";
+import { CrawlTables, useCrawlModels } from "../explorer-shell/crawl-tables";
 import { useAppReady } from "../explorer-shell/use-app-ready";
 import { EditorialLineChart } from "../main-explorer/editorial-line-chart";
 import { ExplorerTable } from "../main-explorer/explorer-table";
@@ -93,8 +93,8 @@ export function PopulationPlaceExplorer({
   );
   const highlights = useMemo(() => buildPopulationHighlights(model, facts, places, place.id), [model, facts, places, place.id]);
   // The place and every part it lists over the place's years, for the hidden crawl tables: built from the props alone, so a click never rebuilds them.
-  const crawlModels = useMemo(() => populationPlaceCrawlQueries(facts, place, places).map((crawl) =>
-    buildPopulationWorkbookExportModel(facts, places, crawl, presentation, sources, siteOrigin, workbookScope, place.id)), [facts, place, places, presentation, sources, siteOrigin, workbookScope]);
+  const crawlModels = useCrawlModels(() => populationPlaceCrawlQueries(facts, place, places).map((crawl) =>
+    buildPopulationWorkbookExportModel(facts, places, crawl, presentation, sources, siteOrigin, workbookScope, place.id)));
   // The tick-list: the page's own place first whatever its value (the total stays first), then its parts in the order the model ranks them.
   const listed = useMemo(
     () => [place, ...model.ranked.filter((candidate) => candidate.id !== place.id && listedIds.has(candidate.id))],

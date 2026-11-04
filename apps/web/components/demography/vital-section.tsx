@@ -16,7 +16,7 @@ import type { TemplateValues } from "../../lib/i18n/types";
 import type { ClientDemographyObservation } from "../../lib/servedRows";
 import { ModeTabs } from "../explorer-shell/mode-tabs";
 import { ChartShareButton } from "../explorer-shell/chart-share-button";
-import { CrawlTables } from "../explorer-shell/crawl-tables";
+import { CrawlTables, useCrawlModels } from "../explorer-shell/crawl-tables";
 import { ExplorerTable } from "../main-explorer/explorer-table";
 import { HeroKpi, KPI_GRID_CLASS, SideKpiList } from "../main-explorer/kpi-blocks";
 import { StackedColumnChart } from "../main-explorer/stacked-column-chart";
@@ -49,8 +49,7 @@ export function VitalSection({
   const [mode, setMode] = useState<ChartMode>("line");
   const model = useMemo(() => buildVitalPlaceModel(facts, place.id), [facts, place.id]);
   // Births, deaths and natural increase over every year, for the hidden crawl tables: built from the props alone, so a click never rebuilds them.
-  const crawlModels = useMemo(() => (model ? [buildVitalWorkbookExportModel({ facts, place, sources, siteOrigin, scope: workbookScope }, presentation)] : []),
-    [model, facts, place, sources, siteOrigin, workbookScope, presentation]);
+  const crawlModels = useCrawlModels(() => (model ? [buildVitalWorkbookExportModel({ facts, place, sources, siteOrigin, scope: workbookScope }, presentation)] : []));
   if (!model) return null;
   const name = placeLabel(place, locale);
   const [first, last] = [model.years[0]!, model.years.at(-1)!];

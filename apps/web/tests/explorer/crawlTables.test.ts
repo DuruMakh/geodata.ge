@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { makePeriod } from "../../lib/data/inflation/periods";
-import { CRAWL_CELL_CAP, CRAWL_MONTH_COLUMNS, crawlTables, formatCrawlCell } from "../../lib/explorer/crawlTables";
+import { CRAWL_CELL_CAP, CRAWL_MONTH_COLUMNS, crawlTables, crawlTablesHtml, formatCrawlCell } from "../../lib/explorer/crawlTables";
 import { lastPeriodsRange } from "../../lib/explorer/periodRange";
 import { readableRowLabel, type WorkbookExportModel, type WorkbookReadableRow } from "../../lib/explorer/workbookModel";
 import { workbookMessage } from "../../lib/i18n/workbook";
@@ -120,6 +120,37 @@ describe("crawlTables", () => {
     const [t] = crawlTables([model({ years: y, rows })], en);
     expect(t.rows.map((r) => r.label)).toEqual(["Total", "Ministry — Programme", "Alone"]);
     expect(t.rows.map((r) => r.label)).toEqual(rows.map(readableRowLabel));
+  });
+});
+
+describe("crawlTablesHtml", () => {
+  it("writes caption, header row and rows as React rendered them", () => {
+    expect(crawlTablesHtml(crawlTables([model({ years: [2024, 2025], rows: [row("Total", [1, 2], [2024, 2025])] })], en), "Category")).toBe(
+      "<table><caption>T · S</caption><thead><tr><th>Category</th><th>2024</th><th>2025</th></tr></thead>" +
+      "<tbody><tr><th>Total</th><td>1.0</td><td>2.0</td></tr></tbody></table>",
+    );
+  });
+
+  it("heads the label column with the table's own label, else the fallback", () => {
+    const named = crawlTablesHtml([{ caption: "C", category: "Region", columns: ["2024"], rows: [] }], "Category");
+    expect(named).toContain("<thead><tr><th>Region</th><th>2024</th></tr></thead>");
+    expect(crawlTablesHtml([{ caption: "C", columns: [], rows: [] }], "Category")).toContain("<thead><tr><th>Category</th></tr></thead>");
+  });
+
+  it("escapes every text as React does: & < > \" '", () => {
+    const html = crawlTablesHtml([{ caption: `A & B <i>"x"</i> 'y'`, category: "<b>", columns: ["1&2"], rows: [{ label: "R&D <x>", cells: ["'5'"] }] }], "Category");
+    expect(html).toBe(
+      "<table><caption>A &amp; B &lt;i&gt;&quot;x&quot;&lt;/i&gt; &#x27;y&#x27;</caption><thead><tr><th>&lt;b&gt;</th><th>1&amp;2</th></tr></thead>" +
+      "<tbody><tr><th>R&amp;D &lt;x&gt;</th><td>&#x27;5&#x27;</td></tr></tbody></table>",
+    );
+  });
+
+  it("carries the cap note in the caption, and writes nothing for no tables", () => {
+    const y = years(20);
+    const items = Array.from({ length: 300 }, (_, i) => row(`I${i}`, y.map(() => i), y));
+    const html = crawlTablesHtml(crawlTables([model({ years: y, rows: items })], en), "Category");
+    expect(html).toMatch(/<caption>T · S · top \d+ of 300; all of them in the Excel download<\/caption>/);
+    expect(crawlTablesHtml([], "Category")).toBe("");
   });
 });
 

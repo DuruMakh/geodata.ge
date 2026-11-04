@@ -16,7 +16,7 @@ import { pageHref } from "../../lib/i18n/routes";
 import { ModeTabs } from "../explorer-shell/mode-tabs";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { ChartShareButton } from "../explorer-shell/chart-share-button";
-import { CrawlTables } from "../explorer-shell/crawl-tables";
+import { CrawlTables, useCrawlModels } from "../explorer-shell/crawl-tables";
 import { ExplorerHeading } from "../explorer-shell/explorer-heading";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { LatestValueLine } from "../explorer-shell/latest-value-line";
@@ -70,8 +70,8 @@ export function HouseholdExplorer({ section, facts: shippedFacts, labels: lineLa
   const title = t(`page.${section}.title`);
   const chartLabel = `${t(`tab.parts.${section}`)} · ${areaLabels[area]}`;
   // Per household and per person, every series of the area over its years, for the hidden crawl tables: built from the props alone, so a click never rebuilds them.
-  const crawlModels = useMemo(() => householdCrawlStates(section, area, facts).map(crawl =>
-    buildHouseholdWorkbookExportModel({ section, area, facts, state: crawl, labels, areaLabel: areaLabels[area], sources, siteOrigin, title }, presentation)), [section, area, facts, labels, areaLabels, sources, siteOrigin, title, presentation]);
+  const crawlModels = useCrawlModels(() => householdCrawlStates(section, area, facts).map(crawl =>
+    buildHouseholdWorkbookExportModel({ section, area, facts, state: crawl, labels, areaLabel: areaLabels[area], sources, siteOrigin, title }, presentation)));
   const pagePath = HOUSEHOLD_SECTIONS.find(item => item.id === section)!.href;
   // Links to another area's page carry the per household or per person choice, and nothing else.
   const areaHref = (id: string) => `${householdRegionHref(section, id)}${householdMeasureHash(state.measure)}`;

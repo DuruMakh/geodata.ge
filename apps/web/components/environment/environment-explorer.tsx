@@ -22,7 +22,7 @@ import { pageHref } from "../../lib/i18n/routes";
 import { ModeTabs } from "../explorer-shell/mode-tabs";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { ChartShareButton } from "../explorer-shell/chart-share-button";
-import { CrawlTables } from "../explorer-shell/crawl-tables";
+import { CrawlTables, useCrawlModels } from "../explorer-shell/crawl-tables";
 import { ExplorerHeading } from "../explorer-shell/explorer-heading";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { LatestValueLine } from "../explorer-shell/latest-value-line";
@@ -124,8 +124,8 @@ export function EnvironmentExplorer({ scope, facts, labels, sources, lastReviewe
   const listEnd = resolveRange(state.range, list.coverage(facts)).end;
   const listRows = listLatestByHeading(facts, model.series, listEnd);
   // Every unit of the list, every row of it over its years, for the hidden crawl tables: built from the props alone, so a click never rebuilds them.
-  const crawlModels = useMemo(() => environmentListCrawlStates(list.series(facts), facts).map(crawl =>
-    buildEnvironmentWorkbookExportModel({ ...workbookPage(scope), facts, state: crawl, labels, sources, siteOrigin, title }, presentation)), [list, scope, facts, labels, sources, siteOrigin, title, presentation]);
+  const crawlModels = useCrawlModels(() => environmentListCrawlStates(list.series(facts), facts).map(crawl =>
+    buildEnvironmentWorkbookExportModel({ ...workbookPage(scope), facts, state: crawl, labels, sources, siteOrigin, title }, presentation)));
   const downloadAction = <ExcelDownloadButton testId="environment-excel-download" disabled={!model.selected.length} onDownload={async () => {
     const { downloadWorkbook } = await import("../../lib/explorer/workbookWriter.client");
     await downloadWorkbook(buildEnvironmentWorkbookExportModel({ ...workbookPage(scope), facts, state, labels, sources, siteOrigin, title }, presentation));

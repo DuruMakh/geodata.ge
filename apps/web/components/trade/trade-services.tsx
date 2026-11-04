@@ -1,11 +1,11 @@
 "use client";
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useRef } from "react";
 import type { toClientTradeServicesData } from "../../lib/data/tradeServices/importTradeServices";
 import { TRADE_OVERVIEW_INDICATORS, type TradeChartIndicator } from "../../lib/data/tradeOverview/types";
 import type { WorkbookPublicSource } from "../../lib/explorer/workbookModel";
 import { message } from "../../lib/i18n/messages";
 import { useI18n } from "../../lib/i18n/provider";
-import { CrawlTables } from "../explorer-shell/crawl-tables";
+import { CrawlTables, useCrawlModels } from "../explorer-shell/crawl-tables";
 import { ExplorerHeading } from "../explorer-shell/explorer-heading";
 import { TextTab } from "../ui/editorial";
 import { TradeOverview, useTradeOverviewCrawlModels } from "./trade-overview";
@@ -21,7 +21,7 @@ export function TradeServices({ data, sources, lastReviewedAt, siteOrigin }: { d
   const overviewModels = useTradeOverviewCrawlModels(data.national, sources, siteOrigin, "services");
   const typeModels = useTradePartnersCrawlModels(data.types, sources, siteOrigin);
   const countryModels = useTradePartnersCrawlModels(data.countries, sources, siteOrigin);
-  const crawlModels = useMemo(() => [...overviewModels, ...typeModels, ...countryModels], [overviewModels, typeModels, countryModels]);
+  const crawlModels = useCrawlModels(() => [...overviewModels, ...typeModels, ...countryModels]);
   useEffect(() => {
     if (!pendingFocus.current) return;
     document.getElementById(pendingFocus.current)?.focus({ preventScroll: true });

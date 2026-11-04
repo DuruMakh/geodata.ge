@@ -20,7 +20,7 @@ import { pageHref } from "../../lib/i18n/routes";
 import { ExcelDownloadButton } from "../explorer/excel-download-button";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { ChartShareButton } from "../explorer-shell/chart-share-button";
-import { CrawlTables } from "../explorer-shell/crawl-tables";
+import { CrawlTables, useCrawlModels } from "../explorer-shell/crawl-tables";
 import { ExplorerHeading } from "../explorer-shell/explorer-heading";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { FlatSeriesPanel } from "../explorer-shell/flat-series-panel";
@@ -87,9 +87,9 @@ export function SocialExplorer({ section, facts, gdpFacts, gdpSources, breaks, l
   const title = t(`page.${section}.title`);
   const chartLabel = `${title} · ${headingLabels[model.heading]}`;
   // Every heading of each view (money also as % of GDP) over its years, for the hidden crawl tables: built from the props alone, so a click never rebuilds them.
-  const crawlModels = useMemo(() => socialCrawlStates(section, facts, gdpFacts).map(crawl => buildSocialWorkbookExportModel({
+  const crawlModels = useCrawlModels(() => socialCrawlStates(section, facts, gdpFacts).map(crawl => buildSocialWorkbookExportModel({
     section, facts, state: crawl, gdpFacts, labels, headingLabels, sources, populationSources: [], cpiSources: [], gdpSources, siteOrigin, title,
-  }, presentation)), [section, facts, gdpFacts, labels, headingLabels, sources, gdpSources, siteOrigin, title, presentation]);
+  }, presentation)));
   const newCounting = t("break.newCounting");
   const views = socialViews(section, model.heading);
   // % of GDP divides by the debt page's GDP: the source line names it and its preliminary years, as on Money and banks.

@@ -16,7 +16,7 @@ import { pageHref } from "../../lib/i18n/routes";
 import type { TemplateValues } from "../../lib/i18n/types";
 import { ModeTabs } from "../explorer-shell/mode-tabs";
 import { ChartShareButton } from "../explorer-shell/chart-share-button";
-import { CrawlTables } from "../explorer-shell/crawl-tables";
+import { CrawlTables, useCrawlModels } from "../explorer-shell/crawl-tables";
 import { ExplorerTable } from "../main-explorer/explorer-table";
 import { StackedColumnChart } from "../main-explorer/stacked-column-chart";
 import { SectionTitle, SegmentedTabs, SourceNote } from "../ui/editorial";
@@ -53,12 +53,12 @@ export function MarriageSection({
   const model = useMemo(() => buildMarriageModel(facts, state), [facts, state]);
   const name = placeLabel(place, locale);
   // The counts as published and per 1,000 over every year, for the hidden crawl tables: built from the props alone, so a click never rebuilds them.
-  const crawlModels = useMemo(() => {
+  const crawlModels = useCrawlModels(() => {
     const words = (key: string) => message(presentation.messages, `demography.${key}`);
     const labels = { marriages: words("marriageSeries.marriages"), divorces: words("marriageSeries.divorces") };
     return marriageCrawlStates(facts).map((crawl) =>
       buildMarriageWorkbookExportModel({ place: facts, state: crawl, labels, sources, siteOrigin, title: `${words("marriageSectionTitle")} · ${name}`, scope: workbookScope }, presentation));
-  }, [facts, sources, siteOrigin, name, workbookScope, presentation]);
+  });
   if (!model.years.length) return null;
   const [first, last] = [model.years[0]!, model.years.at(-1)!];
   const unit: ValueUnit = { divisor: 1, label: "", decimals: model.decimals };
