@@ -8,6 +8,7 @@ import { REGIONAL_GDP_TOTAL } from "../../lib/data/regionalEconomies/types";
 import {
   buildRegionalEconomyModel,
   changeRegionalEconomyMeasure,
+  regionalEconomyCrawlStates,
   regionalEconomyDefinitions,
 } from "../../lib/explorer/regionalEconomies";
 import { buildRegionalEconomyWorkbookExportModel } from "../../lib/explorer/regionalEconomiesWorkbook";
@@ -21,6 +22,7 @@ import { pageHref } from "../../lib/i18n/routes";
 import { ExcelDownloadButton } from "../explorer/excel-download-button";
 import { ModeTabs } from "../explorer-shell/mode-tabs";
 import { ChartShareButton } from "../explorer-shell/chart-share-button";
+import { CrawlTables } from "../explorer-shell/crawl-tables";
 import { PlaceHeading } from "../explorer-shell/place-heading";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
@@ -65,6 +67,11 @@ export function RegionalEconomyExplorer({
   const t = (key: string) => message(messages, `regionalEconomies.${key}`);
   const { state, update } = useRegionalEconomyState(facts, registry);
   const model = useMemo(() => buildRegionalEconomyModel(facts, registry, state), [facts, registry, state]);
+  // The region's total and every sector over every year, for the hidden crawl tables: built from the props alone, so a
+  // click never rebuilds them (unpackFacts returns the same rows for the same props).
+  const crawlModels = useMemo(() => regionalEconomyCrawlStates(facts, registry).map((crawl) =>
+    buildRegionalEconomyWorkbookExportModel(facts, registry, crawl, region, presentation, sources, siteOrigin)),
+  [facts, registry, region, presentation, sources, siteOrigin]);
   const share = state.measure === "share_of_region_gdp";
   const measureLabel = t(share ? "shareOfRegionGdp" : "nominal");
   const unit = useMemo(() => unitFor(facts.filter((fact) => fact.measure === "nominal").map((fact) => fact.value), unitsFor(locale).bn), [facts, locale]);
@@ -116,7 +123,8 @@ export function RegionalEconomyExplorer({
             </div>
             {!state.selectedIds.length ? <div className="mt-5"><Callout testId="no-selection-callout">{message(messages, "main.noSelection")}</Callout></div>
               : !model.hasData ? <div className="mt-5"><Callout testId="no-range-data-callout">{message(messages, "main.noRangeData")}</Callout></div>
-              : <><ExplorerTable caption={`${regionLabel} · ${share ? measureLabel : message(messages, "format.bnGel")} · ${model.range.start}–${model.range.end}`} rows={model.rows.filter((row) => row.itemId !== REGIONAL_GDP_TOTAL)} totalRow={totalRow} showTotal={Boolean(totalRow)} totalFirst wrapRowLabels years={model.years} firstColumnLabel={t("sector")} unit={unit} share={share} showChangeColumn={false} shareValueForYear={(row, year) => row.valuesByYear[year] ?? null} crawlCopy={state.mode === "line"} />{state.mode === "line" ? <div className="mt-5">{chart}</div> : null}</>}
+              : state.mode === "line" ? <div className="mt-5">{chart}</div>
+              : <ExplorerTable caption={`${regionLabel} · ${share ? measureLabel : message(messages, "format.bnGel")} · ${model.range.start}–${model.range.end}`} rows={model.rows.filter((row) => row.itemId !== REGIONAL_GDP_TOTAL)} totalRow={totalRow} showTotal={Boolean(totalRow)} totalFirst wrapRowLabels years={model.years} firstColumnLabel={t("sector")} unit={unit} share={share} showChangeColumn={false} shareValueForYear={(row, year) => row.valuesByYear[year] ?? null} />}
             <ChartSelectionAids series={series} chartShown={state.mode === "line"} share={share} unit={unit} formatValue={share ? undefined : (value) => formatAmount(value, locale)} />
             <RangeStrip years={model.availableYears} range={model.range} onChange={(patch) => update((previous) => ({ ...previous, range: rangeFromPatch(model.range, patch) }))} />
           </section>
@@ -135,6 +143,7 @@ export function RegionalEconomyExplorer({
         } />
       </ExplorerWorkspace>
       <RegionHighlights facts={facts} registry={registry} year={model.range.end} />
+      <CrawlTables models={crawlModels} />
     </div>
   );
 }

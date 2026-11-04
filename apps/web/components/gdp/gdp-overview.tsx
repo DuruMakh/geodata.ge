@@ -10,6 +10,7 @@ import {
   DEFAULT_GDP_STATE,
   buildGdpOverviewModel,
   changeGdpIndicator,
+  gdpCrawlStates,
   parseGdpHash,
   serializeGdpHash,
   type GdpIndicator,
@@ -32,6 +33,7 @@ import { GdpSummary } from "./gdp-summary";
 import { ModeTabs } from "../explorer-shell/mode-tabs";
 import { ExplorerHeading } from "../explorer-shell/explorer-heading";
 import { ChartShareButton } from "../explorer-shell/chart-share-button";
+import { CrawlTables } from "../explorer-shell/crawl-tables";
 import { LatestValueLine } from "../explorer-shell/latest-value-line";
 import { formatGdpLatestValue } from "../../lib/explorer/latestValue";
 import { ExplorerPage } from "../explorer-shell/explorer-page";
@@ -78,6 +80,16 @@ export function GdpOverview({
     () => buildGdpOverviewModel(facts, state, sourceIdRanges),
     [facts, state, sourceIdRanges],
   );
+  // Every indicator and currency over every year, for the hidden crawl tables: built from the props alone, so a click
+  // never rebuilds them.
+  const crawlModels = useMemo(() => gdpCrawlStates(facts).map((crawl) => buildGdpWorkbookExportModel(
+    facts,
+    crawl,
+    presentation,
+    gdpSelectionSources(sources, buildGdpOverviewModel(facts, crawl, sourceIdRanges).sourceIds),
+    siteOrigin,
+    sourceIdRanges,
+  )), [facts, presentation, sources, siteOrigin, sourceIdRanges]);
   const d = gdpDisplay(state, presentation);
   // The latest loaded year of the active indicator, whatever range is selected.
   const latest = useMemo(() => buildGdpOverviewModel(facts, { ...state, range: { kind: "all" } }, sourceIdRanges).headline, [facts, state, sourceIdRanges]);
@@ -215,23 +227,25 @@ export function GdpOverview({
           ) : null}
         </div>
         <div className="mt-5">
-          <ExplorerTable
-            caption={`${d.label} · ${d.fullUnitLabel}`}
-            rows={[row]}
-            totalRow={null}
-            showTotal={false}
-            years={m.years}
-            firstColumnLabel={t("indicator")}
-            unit={d.unit}
-            share={d.growth}
-            showChangeColumn={false}
-            preliminaryYears={m.preliminaryYears}
-            preliminaryLabel={t("preliminary")}
-            rowLabelsLocalized
-            shareValueForYear={(r, y) => r.valuesByYear[y] ?? null}
-            crawlCopy={state.mode === "line"}
-          />
-          {state.mode === "line" ? chart : null}
+          {state.mode === "line" ? (
+            chart
+          ) : (
+            <ExplorerTable
+              caption={`${d.label} · ${d.fullUnitLabel}`}
+              rows={[row]}
+              totalRow={null}
+              showTotal={false}
+              years={m.years}
+              firstColumnLabel={t("indicator")}
+              unit={d.unit}
+              share={d.growth}
+              showChangeColumn={false}
+              preliminaryYears={m.preliminaryYears}
+              preliminaryLabel={t("preliminary")}
+              rowLabelsLocalized
+              shareValueForYear={(r, y) => r.valuesByYear[y] ?? null}
+            />
+          )}
         </div>
         <RangeStrip
           years={m.availableYears}
@@ -290,6 +304,7 @@ export function GdpOverview({
         </Link>
       </div>
       <GdpSummary indicator={state.indicator} />
+      <CrawlTables models={crawlModels} />
     </ExplorerPage>
   );
 }
