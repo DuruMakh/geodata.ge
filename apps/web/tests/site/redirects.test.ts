@@ -1,11 +1,12 @@
 import { describe, expect, it } from "vitest";
 import nextConfig from "../../next.config";
+import { siteRedirects } from "../../lib/site/routing";
 import { ALL_DATA_PATH, LEGACY_TOPIC_FORWARDS, NAV_GROUPS } from "../../lib/navigation/navTree";
 
 // Review Focus 3 at config level (spec 2026-10-24-explorer-regroup §3.1): every old topic hub address, in both languages,
 // forwards permanently to its group page with the topic in the query; the browser keeps any `#…` the old link had.
 describe("old topic hub forwards", async () => {
-  const redirects = (await nextConfig.redirects?.()) ?? [];
+  const redirects = siteRedirects();
   const prefixes = ["", "/en"] as const;
 
   it.each(LEGACY_TOPIC_FORWARDS.flatMap((row) => prefixes.map((prefix) => ({ ...row, prefix }))))(
