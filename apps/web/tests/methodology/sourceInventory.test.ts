@@ -109,7 +109,7 @@ describe("original-source inventory", () => {
       "docs/Raw Data/Inflation/geostat-cpi/2026-09/ka/cpi-index-2010.xlsx",
       "docs/Raw Data/Municipalities/geostat-population-regional-gdp/official/01-population-by-self-governed-unit.xlsx",
     ]);
-    // The PR #170 rule: the 206 MB of SSA workbooks stay out of the published archive and the methodology bundle (public/downloads is excluded from the function trace in next.config.ts).
+    // The PR #170 rule: the 206 MB of SSA workbooks stay out of the published archive.
     expect(rows.filter((row) => !row.path.startsWith("docs/Raw Data/Social/pension-fund/")).reduce(sumBytes, 0)).toBeLessThan(1_000_000);
     expect(fund.reduce(sumBytes, 0)).toBeLessThan(15_000_000);
     // Every SSA table the served facts cite is registered on one of these captures.

@@ -290,7 +290,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // crawler's GET with 405, so it is not a page to index.
     // All data lists every page, so it changes when any topic does.
     { url: `${siteUrl}/explorer`, lastModified: groupModified(Object.keys(topicModified) as TopicId[]) },
-    // The group pages replace the topic hubs, whose addresses forward to them (next.config.ts).
+    // The group pages replace the topic hubs, whose addresses forward to them (lib/site/routing.ts).
     ...NAV_GROUPS.map((group) => ({ url: `${siteUrl}${group.href}`, lastModified: groupModified(group.topics) })),
     { url: `${siteUrl}/explorer/economy/gdp`, lastModified: gdpModified },
     { url: `${siteUrl}/explorer/economy/sectors`, lastModified: sectorsModified },

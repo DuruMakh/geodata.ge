@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import nextConfig from "../../next.config";
 import { siteRedirects } from "../../lib/site/routing";
+import { buildVercelConfig } from "../../scripts/prepare-vercel-config";
 import { ALL_DATA_PATH, LEGACY_TOPIC_FORWARDS, NAV_GROUPS } from "../../lib/navigation/navTree";
 
 // Review Focus 3 at config level (spec 2026-10-24-explorer-regroup §3.1): every old topic hub address, in both languages,
@@ -41,9 +41,8 @@ describe("old topic hub forwards", async () => {
     }
   });
 
-  // `/explorer/wages/` reaches the forward through Next.js's own trailing-slash redirect, which stays on.
+  // `/explorer/wages/` reaches the forward through Vercel's trailing-slash redirect (vercel.json), which stays on.
   it("keeps the trailing-slash redirect that sends /explorer/wages/ to /explorer/wages", () => {
-    expect(nextConfig.trailingSlash).not.toBe(true);
-    expect(nextConfig.skipTrailingSlashRedirect).not.toBe(true);
+    expect(buildVercelConfig().trailingSlash).toBe(false);
   });
 });

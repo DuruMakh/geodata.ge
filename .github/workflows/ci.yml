@@ -146,10 +146,8 @@ jobs:
         env:
           NEXT_PUBLIC_SITE_URL: https://fiscal.ge
           GEODATA_TYPECHECK_GATED: "1"
-      # Everything `next start` serves that is not in the checkout: the build, and
-      # the files prebuild generates (downloads, page data, the /mcp snapshot).
-      # .next/cache stays out (it is cached above and next start never reads it),
-      # and so do source maps, which no test reads, and a dev server's output.
+      # Everything `npm run start` (scripts/serve-static.ts) serves that is not in
+      # the checkout: the static export, and the /mcp snapshot prebuild writes.
       # Kept 7 days so "Re-run failed jobs" on the browser job still finds it
       # the next day; after a week, use "Re-run all jobs".
       - name: Upload the build for the browser tests
@@ -160,12 +158,7 @@ jobs:
           retention-days: 7
           if-no-files-found: error
           path: |
-            apps/web/.next
-            !apps/web/.next/cache
-            !apps/web/.next/dev
-            !apps/web/.next/**/*.map
-            apps/web/public/downloads
-            apps/web/public/page-data
+            apps/web/out
             apps/web/lib/factQuery/generated
       # Same guard as the checks job: the build must not write into the repository.
       - name: Fail if the job wrote into the repository
@@ -218,7 +211,7 @@ jobs:
       # The server keeps running for the steps below; the runner stops it when
       # the job ends. The tests start only once it answers. Its log is printed
       # below whenever the job fails.
-      - name: Start the production server
+      - name: Start the static server
         run: |
           nohup npm run start -- --port 3100 > "$RUNNER_TEMP/next-start.log" 2>&1 &
           for attempt in $(seq 1 60); do
