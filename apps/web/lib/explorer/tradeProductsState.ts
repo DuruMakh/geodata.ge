@@ -3,7 +3,7 @@ import { TRADE_PRODUCT_MEASURES } from "../data/tradeProducts/types";
 import type { TradeChartIndicator } from "../data/tradeOverview/types";
 import { refitRange, type PeriodRange } from "./periodRange";
 import { parseYearRangeKeys, writeYearRangeKeys } from "./urlState";
-import { TRADE_PRODUCT_TOTAL_ID, encodeTradeProductsSelection, decodeTradeProductsSelection } from "./tradeProductsSelection";
+import { TRADE_PRODUCT_TOTAL_ID, encodeTradeProductsSelection, decodeTradeProductsSelection, tradeProductsBulkSelection } from "./tradeProductsSelection";
 export { TRADE_PRODUCT_TOTAL_ID, tradeProductsBulkSelection } from "./tradeProductsSelection";
 
 export type TradeProductsState = { mode: "line" | "table"; measure: TradeChartIndicator; range: PeriodRange; selectedIds: string[] };
@@ -25,6 +25,12 @@ export function tradeProductsCoverage(data: ClientTradeProductsData, state?: Pic
   const available = numeric.size ? numeric : published;
   const min = available.size ? Math.min(...available) : years[0], max = available.size ? Math.max(...available) : years.at(-1)!;
   return { min, max, years: years.filter(year => year >= min && year <= max) };
+}
+/** The hidden crawl tables' states (lib/explorer/crawlTables.ts): each measure, every product the bulk action ticks, over every year; a measure without a published value has none. */
+export function tradeProductsCrawlStates(data: ClientTradeProductsData): TradeProductsState[] {
+  const published = new Set(data.facts.filter(fact => fact[3] !== null).map(fact => fact[2]));
+  const selectedIds = tradeProductsBulkSelection(data);
+  return (data.measures ?? TRADE_PRODUCT_MEASURES).filter((_, index) => published.has(index as 0 | 1)).map(measure => ({ mode: "line", measure, range: { kind: "all" }, selectedIds }));
 }
 export function parseTradeProductsHash(hash: string, data: ClientTradeProductsData): TradeProductsState & { selectionReset: boolean } {
   const params = new URLSearchParams(hash.replace(/^#/, "")), measure = params.get("measure") as TradeChartIndicator, measures = data.measures ?? TRADE_PRODUCT_MEASURES;

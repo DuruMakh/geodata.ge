@@ -5,7 +5,7 @@ import type { ClientMoneyTransferFact, ClientMoneyTransfersData } from "../../li
 import { unpackFacts, type FactsInput } from "../../lib/data/packedFacts";
 import { MONEY_TRANSFER_MEASURES, MONEY_TRANSFER_TOTAL_ID } from "../../lib/data/externalFlows/types";
 import { buildMoneyTransfersModel } from "../../lib/explorer/moneyTransfers";
-import { moneyTransfersCoverage, parseMoneyTransfersHash, serializeMoneyTransfersHash } from "../../lib/explorer/moneyTransfersState";
+import { moneyTransfersCoverage, moneyTransfersCrawlStates, parseMoneyTransfersHash, serializeMoneyTransfersHash } from "../../lib/explorer/moneyTransfersState";
 import { buildMoneyTransfersWorkbookModel } from "../../lib/explorer/moneyTransfersWorkbook";
 import { rangeFromPatch, resolveRange } from "../../lib/explorer/periodRange";
 import { formatInUnit } from "../../lib/explorer/format";
@@ -21,6 +21,7 @@ import { SeriesAside } from "../explorer-shell/series-aside";
 import { EditorialLineChart } from "../main-explorer/editorial-line-chart";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { ChartShareButton } from "../explorer-shell/chart-share-button";
+import { CrawlTables } from "../explorer-shell/crawl-tables";
 import { ExplorerTable } from "../main-explorer/explorer-table";
 import { RangeStrip } from "../main-explorer/range-strip";
 import { ExcelDownloadButton } from "../explorer/excel-download-button";
@@ -36,6 +37,9 @@ export function MoneyFromAbroad({ data: input, sources, lastReviewedAt, siteOrig
   const t = (key: string, values?: Record<string, string | number>) => message(messages, `external.money.${key}`, values);
   const { state, update } = useHashState(data, parseMoneyTransfersHash, serializeMoneyTransfersHash), model = buildMoneyTransfersModel(data, state, presentation);
   const label = (id: string) => model.series.find(item => item.id === id)!.label;
+  // Received and sent, each list over its years, for the hidden crawl tables: built from the props alone, so a click never rebuilds them.
+  const crawlModels = useMemo(() => moneyTransfersCrawlStates(data).map(crawl =>
+    buildMoneyTransfersWorkbookModel({ data, state: crawl, sources, siteOrigin }, presentation)), [data, sources, siteOrigin, presentation]);
   const measureLabel = message(messages, `external.measure.${state.measure}`);
   const partialByYear = (id: string) => Object.fromEntries(Object.keys(model.partialMonths[id] ?? {}).map(year => [Number(year), true]));
   const rows = model.selectedIds.map(id => ({ itemId: id, kaLabel: label(id), color: model.colorById[id], valuesByYear: model.valuesByEntity[id], preliminaryByYear: partialByYear(id) }));
@@ -58,7 +62,8 @@ export function MoneyFromAbroad({ data: input, sources, lastReviewedAt, siteOrig
         <section data-testid="chart-panel" data-mode={state.mode} data-measure={state.measure} data-unit="usd" className="border-t border-[var(--ink)] pt-4">
           <div className="flex flex-wrap items-end justify-between gap-3"><ModeTabs value={state.mode} onChange={mode => update(s => ({ ...s, mode }), true)} /><span className="text-[11px] text-[var(--muted)]">{measureLabel} · {model.unit.label}</span></div>
           {!model.selectedCount ? <div className="mt-5"><Callout testId="no-selection-callout">{t("emptySelection")}</Callout></div>
-            : <><ExplorerTable caption={`${message(messages, "external.money.title")} · ${measureLabel} · ${model.unit.label} · ${model.range.start}–${model.range.end}`} rows={rows.filter(row => row.itemId !== MONEY_TRANSFER_TOTAL_ID)} totalRow={total} showTotal={Boolean(total)} totalFirst wrapRowLabels rowLabelsLocalized years={model.years} firstColumnLabel={t("series")} unit={model.unit} share={false} showChangeColumn={false} shareValueForYear={() => null} preliminaryLabel={t("partial")} crawlCopy={state.mode === "line"} />{state.mode === "line" ? <div className="mt-5">{chart}</div> : null}</>}
+            : state.mode === "line" ? <div className="mt-5">{chart}</div>
+            : <ExplorerTable caption={`${message(messages, "external.money.title")} · ${measureLabel} · ${model.unit.label} · ${model.range.start}–${model.range.end}`} rows={rows.filter(row => row.itemId !== MONEY_TRANSFER_TOTAL_ID)} totalRow={total} showTotal={Boolean(total)} totalFirst wrapRowLabels rowLabelsLocalized years={model.years} firstColumnLabel={t("series")} unit={model.unit} share={false} showChangeColumn={false} shareValueForYear={() => null} preliminaryLabel={t("partial")} />}
           <ChartSelectionAids series={lineSeries} chartShown={state.mode === "line"} share={false} unit={model.unit} formatValue={valueLabel} />
           <RangeStrip years={moneyTransfersCoverage(data).years} range={model.range} onChange={patch => update(s => ({ ...s, range: rangeFromPatch(resolveRange(s.range, moneyTransfersCoverage(data)), patch) }))} />
         </section>
@@ -70,5 +75,6 @@ export function MoneyFromAbroad({ data: input, sources, lastReviewedAt, siteOrig
       <SeriesAside label={message(messages, "controls.series")}><MoneyFromAbroadSeriesPanel model={model} onSelectionChange={selectedIds => update(s => ({ ...s, selectedIds }), true)} downloadAction={downloadAction} /></SeriesAside>
     </ExplorerWorkspace>
     <MoneyFromAbroadRanking key={`${state.measure}:${model.range.end}`} model={model} measure={state.measure} />
+    <CrawlTables models={crawlModels} />
   </div>;
 }

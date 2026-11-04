@@ -55,6 +55,16 @@ export function defaultExternalPositionState(section: ExternalPositionSectionId)
   return { mode: "line", range: { kind: "all" }, view: VIEWS[0], selectedIds: defaultSelection(section) };
 }
 
+/**
+ * The hidden crawl tables' states (lib/explorer/crawlTables.ts): the amounts and, when there is GDP, % of GDP (the page lists
+ * no GDP to work the shares out from), each with every series over every year. A view without the total has none.
+ */
+export function externalPositionCrawlStates(section: ExternalPositionSectionId, facts: readonly ClientExternalPositionFact[], gdp: readonly CurrentAccountGdp[]): ExternalPositionState[] {
+  const series = externalPositionSeries(section), selectedIds = series.map(s => s.id);
+  return VIEWS.filter(view => externalPositionViewFacts(view, facts, gdp).some(f => f.indicatorId === series[0].id))
+    .map(view => ({ ...defaultExternalPositionState(section), view, selectedIds }));
+}
+
 export function parseExternalPositionHash(hash: string, section: ExternalPositionSectionId, facts: readonly ClientExternalPositionFact[], gdp: readonly CurrentAccountGdp[]): ExternalPositionState {
   const p = new URLSearchParams(hash.replace(/^#/, ""));
   const view = topicHashView(p, VIEWS);

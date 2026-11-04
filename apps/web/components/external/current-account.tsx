@@ -1,8 +1,9 @@
 "use client";
 import Link from "next/link";
+import { useMemo } from "react";
 import type { ClientCurrentAccountFact } from "../../lib/data/externalFlows/importCurrentAccount";
 import { CURRENT_ACCOUNT_PARTS, CURRENT_ACCOUNT_SERIES, type CurrentAccountSeriesId } from "../../lib/data/externalFlows/types";
-import { buildCurrentAccountModel, type CurrentAccountGdp } from "../../lib/explorer/currentAccount";
+import { buildCurrentAccountModel, currentAccountCrawlStates, type CurrentAccountGdp } from "../../lib/explorer/currentAccount";
 import { CURRENT_ACCOUNT_TABS, currentAccountCoverage, parseCurrentAccountHash, serializeCurrentAccountHash } from "../../lib/explorer/currentAccountState";
 import { buildCurrentAccountWorkbookModel } from "../../lib/explorer/currentAccountWorkbook";
 import { rangeFromPatch, resolveRange } from "../../lib/explorer/periodRange";
@@ -20,6 +21,7 @@ import { SeriesAside } from "../explorer-shell/series-aside";
 import { EditorialLineChart } from "../main-explorer/editorial-line-chart";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { ChartShareButton } from "../explorer-shell/chart-share-button";
+import { CrawlTables } from "../explorer-shell/crawl-tables";
 import { INK } from "../../lib/explorer/colors";
 import { ExplorerTable } from "../main-explorer/explorer-table";
 import { RangeStrip } from "../main-explorer/range-strip";
@@ -29,10 +31,15 @@ import { Callout, SourceNote, SwatchBar, TextTab } from "../ui/editorial";
 import { useHashState } from "../explorer-shell/use-hash-state";
 import { MoneyFromAbroadSeriesPanel } from "./money-from-abroad-series-panel";
 
-export function CurrentAccount({ facts, gdp, sources, gdpSources = [], lastReviewedAt, siteOrigin }: { facts: ClientCurrentAccountFact[]; gdp: CurrentAccountGdp[]; sources: WorkbookPublicSource[]; gdpSources?: WorkbookPublicSource[]; lastReviewedAt: string; siteOrigin: string }) {
+const NO_SOURCES: WorkbookPublicSource[] = [];
+
+export function CurrentAccount({ facts, gdp, sources, gdpSources = NO_SOURCES, lastReviewedAt, siteOrigin }: { facts: ClientCurrentAccountFact[]; gdp: CurrentAccountGdp[]; sources: WorkbookPublicSource[]; gdpSources?: WorkbookPublicSource[]; lastReviewedAt: string; siteOrigin: string }) {
   const presentation = useI18n(), { locale, messages } = presentation;
   const t = (key: string, values?: Record<string, string | number>) => message(messages, `external.account.${key}`, values);
   const { state, update } = useHashState(facts, parseCurrentAccountHash, serializeCurrentAccountHash), model = buildCurrentAccountModel(facts, gdp, state, presentation);
+  // Every tab in US dollars and as % of GDP, all five series over their years, for the hidden crawl tables: built from the props alone, so a click never rebuilds them.
+  const crawlModels = useMemo(() => currentAccountCrawlStates(facts, gdp).map(crawl =>
+    buildCurrentAccountWorkbookModel({ facts, gdp, state: crawl, sources, gdpSources, siteOrigin }, presentation)), [facts, gdp, sources, gdpSources, siteOrigin, presentation]);
   const balance = state.tab === "balance", percent = state.unit === "gdp";
   const shown: CurrentAccountSeriesId[] = balance ? [...CURRENT_ACCOUNT_SERIES] : model.selectedIds;
   const label = (id: CurrentAccountSeriesId) => model.series.find(item => item.id === id)!.label, color = (id: CurrentAccountSeriesId) => model.series.find(item => item.id === id)!.color;
@@ -66,7 +73,8 @@ export function CurrentAccount({ facts, gdp, sources, gdpSources = [], lastRevie
             </div>
           </div>
           {!shown.length ? <div className="mt-5"><Callout testId="no-selection-callout">{t("emptySelection")}</Callout></div>
-            : <><ExplorerTable caption={`${t("title")} · ${tabLabel} · ${model.unit.label} · ${model.range.start}–${model.range.end}`} rows={rows.filter(row => row.itemId !== "ca.balance")} totalRow={total} showTotal={Boolean(total)} totalFirst wrapRowLabels rowLabelsLocalized years={model.years} firstColumnLabel={t("series")} unit={model.unit} share={false} showChangeColumn={false} shareValueForYear={() => null} crawlCopy={state.mode === "line"} />{state.mode === "line" ? <div className="mt-5">{chart}</div> : null}</>}
+            : state.mode === "line" ? <div className="mt-5">{chart}</div>
+            : <ExplorerTable caption={`${t("title")} · ${tabLabel} · ${model.unit.label} · ${model.range.start}–${model.range.end}`} rows={rows.filter(row => row.itemId !== "ca.balance")} totalRow={total} showTotal={Boolean(total)} totalFirst wrapRowLabels rowLabelsLocalized years={model.years} firstColumnLabel={t("series")} unit={model.unit} share={false} showChangeColumn={false} shareValueForYear={() => null} />}
           {/* The Balance stack is a chart (the return pill says so) but has its own key, so it gets no legend. */}
           <ChartSelectionAids series={lineSeries} chartShown={state.mode === "line"} share={false} unit={model.unit} formatValue={valueLabel} legendCap={balance ? 0 : undefined} />
           <RangeStrip years={currentAccountCoverage(facts).years} range={model.range} onChange={patch => update(s => ({ ...s, range: rangeFromPatch(resolveRange(s.range, currentAccountCoverage(facts)), patch) }))} />
@@ -91,5 +99,6 @@ export function CurrentAccount({ facts, gdp, sources, gdpSources = [], lastRevie
         </> : <MoneyFromAbroadSeriesPanel model={{ ...model, valuesByEntity: model.valuesById, selectedCount: model.selectedIds.length, totalCount: CURRENT_ACCOUNT_SERIES.length }} totalId="ca.balance" onSelectionChange={selectedIds => update(s => ({ ...s, selectedIds: CURRENT_ACCOUNT_SERIES.filter(id => selectedIds.includes(id)) }), true)} downloadAction={downloadAction} />}
       </SeriesAside>
     </ExplorerWorkspace>
+    <CrawlTables models={crawlModels} />
   </div>;
 }

@@ -7,11 +7,11 @@ import { updatedDate } from "../../lib/explorer/coverageLabel";
 import type { ClientTradeProductsData } from "../../lib/data/tradeProducts/importTradeProducts";
 import { TRADE_PRODUCT_MEASURES } from "../../lib/data/tradeProducts/types";
 import { buildTradeProductsModel, tradeProductColor, tradeProductLabel } from "../../lib/explorer/tradeProducts";
-import { TRADE_PRODUCT_TOTAL_ID } from "../../lib/explorer/tradeProductsState";
+import { TRADE_PRODUCT_TOTAL_ID, tradeProductsCrawlStates } from "../../lib/explorer/tradeProductsState";
 import { buildTradeProductsWorkbookModel } from "../../lib/explorer/tradeProductsWorkbook";
 import { formatInUnit } from "../../lib/explorer/format";
 import { rangeFromPatch } from "../../lib/explorer/periodRange";
-import type { WorkbookPublicSource } from "../../lib/explorer/workbookModel";
+import type { WorkbookExportModel, WorkbookPublicSource } from "../../lib/explorer/workbookModel";
 import { publicLabel } from "../../lib/i18n/labels";
 import { message } from "../../lib/i18n/messages";
 import { pageHref } from "../../lib/i18n/routes";
@@ -22,6 +22,7 @@ import { ExcelDownloadButton } from "../explorer/excel-download-button";
 import { EditorialLineChart } from "../main-explorer/editorial-line-chart";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { ChartShareButton } from "../explorer-shell/chart-share-button";
+import { CrawlTables } from "../explorer-shell/crawl-tables";
 import { ExplorerTable } from "../main-explorer/explorer-table";
 import { RangeStrip } from "../main-explorer/range-strip";
 import { Callout, SourceNote, SwatchBar, TextTab } from "../ui/editorial";
@@ -30,11 +31,24 @@ import { TradePartnersRanking } from "./trade-partners-ranking";
 import { TradeProductsPicker } from "./trade-products-picker";
 import { useTradeProductsState } from "./use-trade-products-state";
 
+const NO_MODELS: WorkbookExportModel[] = [];
+
+/**
+ * Each measure with every product over its years, for the hidden crawl tables (their cap keeps the largest): built from the
+ * props alone, so a click never rebuilds them. Null data builds none (inside Domestic exports, whose page carries every
+ * section's tables).
+ */
+export function useTradeProductsCrawlModels(data: ClientTradeProductsData | null, sources: readonly WorkbookPublicSource[], siteOrigin: string): readonly WorkbookExportModel[] {
+  const presentation = useI18n();
+  return useMemo(() => data ? tradeProductsCrawlStates(data).map(state => buildTradeProductsWorkbookModel({ data, state, sources, siteOrigin }, presentation)) : NO_MODELS, [data, sources, siteOrigin, presentation]);
+}
+
 export function TradeProducts({ data, sources, lastReviewedAt, siteOrigin }: { data: ClientTradeProductsData; sources: WorkbookPublicSource[]; lastReviewedAt: string; siteOrigin: string }) {
   const domestic = Boolean(data.measures);
   const presentation = useI18n(), { locale, messages, englishLabels } = presentation;
   const t = (key: string) => message(messages, `trade.products.${key}`);
   const { state, selectionReset, update } = useTradeProductsState(data);
+  const crawlModels = useTradeProductsCrawlModels(domestic ? null : data, sources, siteOrigin);
   const model = useMemo(() => buildTradeProductsModel(data, state, presentation), [data, state, presentation]);
   const entities = useMemo(() => new Map(data.entities.map(entity => [entity.id, entity])), [data]);
   const labels = useMemo(() => new Map([[TRADE_PRODUCT_TOTAL_ID, message(messages, "trade.partners.total")], ...data.entities.map(entity => [entity.id, tradeProductLabel(entity, presentation, !data.sourceBlock)] as const)]), [data, presentation, messages]);
@@ -52,8 +66,7 @@ export function TradeProducts({ data, sources, lastReviewedAt, siteOrigin }: { d
   const lineSeries = useMemo(() => model.selectedIds.map(id => ({ id, label: labels.get(id)!, color: tradeProductColor(id), vals: model.years.map(year => model.valuesByEntity[id][year]) })), [model, labels]);
   const valueLabel = useCallback((value: number) => `${formatInUnit(value, model.unit)} ${model.unit.label}`, [model.unit]);
   const chart = useMemo(() => <EditorialLineChart years={model.years} series={lineSeries} share={false} unit={model.unit} shareLabel={measureLabel} showAxisUnit={false} formatTooltipValue={valueLabel} />, [model, lineSeries, measureLabel, valueLabel]);
-  // The yearly table; in chart mode it is rendered hidden so crawlers read its numbers.
-  const table = (crawlCopy: boolean) => <ExplorerTable caption={`${t("title")} · ${measureLabel} · ${model.unit.label} · ${model.range.start}–${model.range.end}`} rows={rows.filter(row => row.itemId !== TRADE_PRODUCT_TOTAL_ID)} totalRow={total} showTotal={Boolean(total)} totalFirst wrapRowLabels rowLabelsLocalized years={model.years} firstColumnLabel={t("series")} unit={model.unit} share={false} showChangeColumn={false} shareValueForYear={() => null} crawlCopy={crawlCopy} />;
+  const table = <ExplorerTable caption={`${t("title")} · ${measureLabel} · ${model.unit.label} · ${model.range.start}–${model.range.end}`} rows={rows.filter(row => row.itemId !== TRADE_PRODUCT_TOTAL_ID)} totalRow={total} showTotal={Boolean(total)} totalFirst wrapRowLabels rowLabelsLocalized years={model.years} firstColumnLabel={t("series")} unit={model.unit} share={false} showChangeColumn={false} shareValueForYear={() => null} />;
   const shareAction = model.selectedCount ? <ChartShareButton title={domestic ? message(messages, "trade.domestic.productsTitle") : t("title")} caption={`${measureLabel} · ${model.unit.label} · ${model.range.start}–${model.range.end}`}
     legend={lineSeries.map(({ label, color }) => ({ label, color }))} source={message(messages, "trade.sourceNote")} chart={chart} period={`${model.range.start}-${model.range.end}`} /> : undefined;
   return <div data-testid="trade-products" className="@container">
@@ -72,8 +85,8 @@ export function TradeProducts({ data, sources, lastReviewedAt, siteOrigin }: { d
         }} /></div>
       </div>
       {!model.selectedCount ? <div className="my-5"><Callout testId="no-selection-callout">{t("emptySelection")}</Callout></div>
-        : state.mode === "line" ? <>{table(true)}<div className="mt-4" data-testid="trade-products-plot">{chart}</div></>
-        : <div data-testid="trade-products-table" data-page={page + 1}>{table(false)}
+        : state.mode === "line" ? <div className="mt-4" data-testid="trade-products-plot">{chart}</div>
+        : <div data-testid="trade-products-table" data-page={page + 1}>{table}
           <TablePager label={t("tablePages")} summary={`${t("selected")} · ${model.selectedCount}`} page={page} pageCount={pageCount} onPage={setPage} previous={t("previous")} next={t("next")} testIdPrefix="trade-products-table" />
         </div>}
       {/* Directly after the plot, before the chips: the readout CSS and the return pill look for the chart as the previous sibling. With more than ten products the chips name the selection, so the legend is left out. */}
@@ -92,5 +105,6 @@ export function TradeProducts({ data, sources, lastReviewedAt, siteOrigin }: { d
     <div className="mt-[18px]"><SourceNote testId="source-label" action={shareAction}>{message(messages, "trade.sourceNote")} · {model.range.start}–{model.range.end} · <span className="whitespace-nowrap">{updatedDate(lastReviewedAt, locale)}</span><Link href={pageHref("/methodology/trade", locale)} prefetch={false} className="ml-2 text-[var(--accent)] underline underline-offset-4">{message(messages, "trade.methodology")}</Link></SourceNote><p className="mt-2 max-w-[850px] text-[11px] leading-relaxed text-[var(--muted)]">{domestic ? message(messages, "trade.domestic.productDefinitions") : `${data.sourceBlock ? "" : `${t("historicalNote")} `}${t("definitions")}`}</p></div>
     <TradePartnersRanking key={`${state.measure}:${model.range.end}`} model={model} tab="products" measure={state.measure} pageSize={25} />
     {picker ? <TradeProductsPicker data={data} model={model} selectedIds={state.selectedIds} initialView={picker.view} returnFocusTo={picker.opener} onApply={selectedIds => update(previous => ({ ...previous, selectedIds }), true)} onClose={() => setPicker(null)} /> : null}
+    <CrawlTables models={crawlModels} />
   </div>;
 }

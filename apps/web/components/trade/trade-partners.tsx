@@ -1,15 +1,15 @@
 "use client";
 import Link from "next/link";
-import { Fragment, type ReactNode } from "react";
+import { Fragment, useMemo, type ReactNode } from "react";
 import { updatedDate } from "../../lib/explorer/coverageLabel";
 import type { ClientTradePartnersData } from "../../lib/data/tradePartners/importTradePartners";
 import { TRADE_OVERVIEW_INDICATORS, type TradeChartIndicator } from "../../lib/data/tradeOverview/types";
 import { buildTradePartnersModel, tradePartnerColor } from "../../lib/explorer/tradePartners";
-import { tradePartnersTotalId, setTradePartnersTab, tradePartnersCoverage } from "../../lib/explorer/tradePartnersState";
+import { tradePartnersTotalId, setTradePartnersTab, tradePartnersCoverage, tradePartnersCrawlStates } from "../../lib/explorer/tradePartnersState";
 import { buildTradePartnersWorkbookModel } from "../../lib/explorer/tradePartnersWorkbook";
 import { rangeFromPatch } from "../../lib/explorer/periodRange";
 import { formatInUnit } from "../../lib/explorer/format";
-import type { WorkbookPublicSource } from "../../lib/explorer/workbookModel";
+import type { WorkbookExportModel, WorkbookPublicSource } from "../../lib/explorer/workbookModel";
 import { publicLabel } from "../../lib/i18n/labels";
 import { message } from "../../lib/i18n/messages";
 import { pageHref } from "../../lib/i18n/routes";
@@ -21,6 +21,7 @@ import { SeriesAside } from "../explorer-shell/series-aside";
 import { EditorialLineChart } from "../main-explorer/editorial-line-chart";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { ChartShareButton } from "../explorer-shell/chart-share-button";
+import { CrawlTables } from "../explorer-shell/crawl-tables";
 import { ExplorerTable } from "../main-explorer/explorer-table";
 import { RangeStrip } from "../main-explorer/range-strip";
 import { ExcelDownloadButton } from "../explorer/excel-download-button";
@@ -29,6 +30,18 @@ import { useTradePartnersState } from "./use-trade-partners-state";
 import { TablePager, useTablePage } from "./table-pager";
 import { TradePartnersSeriesPanel } from "./trade-partners-series-panel";
 import { TradePartnersRanking } from "./trade-partners-ranking";
+
+const NO_MODELS: WorkbookExportModel[] = [];
+
+/**
+ * Every measure with every country and group (or type, or category) over its years, for the hidden crawl tables: built from the
+ * props alone, so a click never rebuilds them. Null data builds none (inside Domestic exports, Services and Composition, whose
+ * page carries every section's tables).
+ */
+export function useTradePartnersCrawlModels(data: ClientTradePartnersData | null, sources: readonly WorkbookPublicSource[], siteOrigin: string): readonly WorkbookExportModel[] {
+  const presentation = useI18n();
+  return useMemo(() => data ? tradePartnersCrawlStates(data).map(state => buildTradePartnersWorkbookModel({ data, state, sources, siteOrigin }, presentation)) : NO_MODELS, [data, sources, siteOrigin, presentation]);
+}
 
 export function TradePartners({ data, sources, lastReviewedAt, siteOrigin, navigation, seriesControls }: { data: ClientTradePartnersData; sources: WorkbookPublicSource[]; lastReviewedAt: string; siteOrigin: string; navigation?: (measure: TradeChartIndicator, changeMeasure: (next: TradeChartIndicator) => void) => ReactNode; seriesControls?: ReactNode }) {
   const services = data.dataset === "services", countries = services && data.dimension === "countries", composition = data.dataset === "composition", domestic = !services && !composition && Boolean(data.measures), embedded = services || domestic || composition;
@@ -41,6 +54,7 @@ export function TradePartners({ data, sources, lastReviewedAt, siteOrigin, navig
     return message(messages, `trade.${composition ? "composition" : serviceKey ? "services" : "partners"}.${key}`);
   };
   const { state, update } = useTradePartnersState(data), model = buildTradePartnersModel(data, state, presentation);
+  const crawlModels = useTradePartnersCrawlModels(embedded ? null : data, sources, siteOrigin);
   const entities = new Map(data.entities.map(entity => [entity.id, entity]));
   const label = (id: string) => id === totalId ? t("total") : publicLabel(locale, id, entities.get(id)!.labelKa, englishLabels);
   const measureLabel = message(messages, `trade.${composition ? "composition." : services ? "services." : ""}indicator.${state.measure}`);
@@ -67,8 +81,9 @@ export function TradePartners({ data, sources, lastReviewedAt, siteOrigin, navig
         <section data-testid="chart-panel" data-mode={state.mode} data-measure={state.measure} data-unit="usd" className="border-t border-[var(--ink)] pt-4">
           <div className="flex flex-wrap items-end justify-between gap-3"><ModeTabs value={state.mode} onChange={mode => update(s => ({ ...s, mode }), true)} /><span className="text-[11px] text-[var(--muted)]">{measureLabel} · {model.unit.label}</span></div>
           {!model.selectedCount ? <div className="mt-5"><Callout testId="no-selection-callout">{t("emptySelection")}</Callout></div>
-            : <><ExplorerTable caption={`${t("title")} · ${measureLabel} · ${model.unit.label} · ${model.range.start}–${model.range.end}`} rows={rows.filter(row => row.itemId !== totalId)} totalRow={total} showTotal={Boolean(total)} totalFirst wrapRowLabels rowLabelsLocalized years={model.years} firstColumnLabel={t("series")} unit={model.unit} share={false} showChangeColumn={false} shareValueForYear={() => null} crawlCopy={state.mode === "line"} />
-              {state.mode === "line" ? <div className="mt-5">{chart}</div> : pageCount > 1 ? <TablePager label={message(messages, "trade.partners.tablePages")} summary={`${message(messages, "trade.products.selected")} · ${model.selectedIds.length}`} page={page} pageCount={pageCount} onPage={setPage} previous={message(messages, "trade.products.previous")} next={message(messages, "trade.products.next")} testIdPrefix="trade-partners-table" /> : null}</>}
+            : state.mode === "line" ? <div className="mt-5">{chart}</div>
+            : <><ExplorerTable caption={`${t("title")} · ${measureLabel} · ${model.unit.label} · ${model.range.start}–${model.range.end}`} rows={rows.filter(row => row.itemId !== totalId)} totalRow={total} showTotal={Boolean(total)} totalFirst wrapRowLabels rowLabelsLocalized years={model.years} firstColumnLabel={t("series")} unit={model.unit} share={false} showChangeColumn={false} shareValueForYear={() => null} />
+              {pageCount > 1 ? <TablePager label={message(messages, "trade.partners.tablePages")} summary={`${message(messages, "trade.products.selected")} · ${model.selectedIds.length}`} page={page} pageCount={pageCount} onPage={setPage} previous={message(messages, "trade.products.previous")} next={message(messages, "trade.products.next")} testIdPrefix="trade-partners-table" /> : null}</>}
           <ChartSelectionAids series={lineSeries} chartShown={state.mode === "line"} share={false} unit={model.unit} formatValue={valueLabel} />
           <RangeStrip years={tradePartnersCoverage(data).years} range={model.range} onChange={patch => update(s => ({ ...s, range: rangeFromPatch(buildTradePartnersModel(data, s, presentation).range, patch) }))} />
         </section>
@@ -77,5 +92,6 @@ export function TradePartners({ data, sources, lastReviewedAt, siteOrigin, navig
       <SeriesAside label={message(messages, "controls.series")}><TradePartnersSeriesPanel key={state.tab} data={data} state={state} model={model} onTabChange={tab => update(s => setTradePartnersTab(s, tab), true)} onSelectionChange={selectedIds => update(s => ({ ...s, selectedIds }), true)} measureControls={seriesControls ?? (navigation ? undefined : measureControls)} downloadAction={downloadAction} /></SeriesAside>
     </ExplorerWorkspace>
     <TradePartnersRanking key={`${state.tab}:${state.measure}:${model.range.end}`} model={model} tab={state.tab} measure={state.measure} services={services} />
+    <CrawlTables models={crawlModels} />
   </div>;
 }

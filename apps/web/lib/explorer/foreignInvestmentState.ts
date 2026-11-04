@@ -9,15 +9,27 @@ export const DEFAULT_FOREIGN_INVESTMENT_STATE: ForeignInvestmentState = { mode: 
 export const FOREIGN_INVESTMENT_OTHERS_ID = "fdi.others";
 
 /** A tab's years: those where any of its items has a value. */
-export function foreignInvestmentCoverage(data: ClientForeignInvestmentData, dimension: ForeignInvestmentDimension) {
+function foreignInvestmentYears(data: ClientForeignInvestmentData, dimension: ForeignInvestmentDimension): number[] {
   const ids = new Set(data.entities.filter(entity => entity.dimension === dimension).map(entity => entity.id));
-  const years = [...new Set(data.facts.filter(fact => ids.has(fact.entityId) && fact.valueUsd !== null).map(fact => fact.year))].sort((a, b) => a - b);
+  return [...new Set(data.facts.filter(fact => ids.has(fact.entityId) && fact.valueUsd !== null).map(fact => fact.year))].sort((a, b) => a - b);
+}
+export function foreignInvestmentCoverage(data: ClientForeignInvestmentData, dimension: ForeignInvestmentDimension) {
+  const years = foreignInvestmentYears(data, dimension);
   if (!years.length) throw new Error(`No foreign investment years for ${dimension}`);
   return { min: years[0], max: years.at(-1)!, years };
 }
 /** Every id a saved view on this tab may select, in list order. */
 function foreignInvestmentTabIds(data: ClientForeignInvestmentData, dimension: ForeignInvestmentDimension): string[] {
   return [FOREIGN_INVESTMENT_TOTAL_ID, ...data.entities.filter(entity => entity.dimension === dimension).map(entity => entity.id), ...(dimension === "country" ? [FOREIGN_INVESTMENT_OTHERS_ID] : [])];
+}
+/**
+ * The hidden crawl tables' states (lib/explorer/crawlTables.ts): each tab with years, everything a saved view on it may select
+ * (the model keeps the rows its list offers: the total, the end year's top 10 and Other countries, or every sector or region),
+ * over every year.
+ */
+export function foreignInvestmentCrawlStates(data: ClientForeignInvestmentData): ForeignInvestmentState[] {
+  return FOREIGN_INVESTMENT_DIMENSIONS.filter(dimension => foreignInvestmentYears(data, dimension).length)
+    .map(dimension => ({ mode: "line", dimension, range: { kind: "all" }, selectedIds: foreignInvestmentTabIds(data, dimension) }));
 }
 export function switchForeignInvestmentTab(state: ForeignInvestmentState, dimension: ForeignInvestmentDimension, data: ClientForeignInvestmentData): ForeignInvestmentState {
   return { ...state, dimension, selectedIds: [FOREIGN_INVESTMENT_TOTAL_ID], range: refitRange(state.range, foreignInvestmentCoverage(data, dimension), { collapseToAll: true }) };

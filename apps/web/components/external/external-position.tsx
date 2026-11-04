@@ -5,7 +5,7 @@ import { ChartPie } from "lucide-react";
 import { updatedDate } from "../../lib/explorer/coverageLabel";
 import type { ClientExternalPositionFact } from "../../lib/data/externalPosition/types";
 import type { CurrentAccountGdp } from "../../lib/explorer/currentAccount";
-import { buildExternalPositionModel, changeExternalPositionView, externalPositionCoverage, externalPositionLatestLabel, externalPositionLatestMonth, parseExternalPositionHash, serializeExternalPositionHash, type ExternalPositionSectionId, type ExternalPositionState, type ExternalPositionView } from "../../lib/explorer/externalPosition";
+import { buildExternalPositionModel, changeExternalPositionView, externalPositionCoverage, externalPositionCrawlStates, externalPositionLatestLabel, externalPositionLatestMonth, parseExternalPositionHash, serializeExternalPositionHash, type ExternalPositionSectionId, type ExternalPositionState, type ExternalPositionView } from "../../lib/explorer/externalPosition";
 import { buildExternalPositionWorkbookExportModel } from "../../lib/explorer/externalPositionWorkbook";
 import { formatInUnit, unitFor, type ValueUnit } from "../../lib/explorer/format";
 import { rangeFromPatch } from "../../lib/explorer/periodRange";
@@ -16,6 +16,7 @@ import { pageHref } from "../../lib/i18n/routes";
 import { ModeTabs } from "../explorer-shell/mode-tabs";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { ChartShareButton } from "../explorer-shell/chart-share-button";
+import { CrawlTables } from "../explorer-shell/crawl-tables";
 import { ExplorerHeading } from "../explorer-shell/explorer-heading";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { LatestValueLine } from "../explorer-shell/latest-value-line";
@@ -74,6 +75,12 @@ export function ExternalPositionExplorer({ section, facts, labels, sources, gdp,
   // The line under the heading must stay one line at 375px (DESIGN §17), so it uses the short unit (`მლრდ $` in Georgian).
   const latestValue = percent ? valueLabel(model.latest.value) : `${format(model.latest.value)} ${t("unitBnUsdShort")}`;
   const title = message(messages, `external.${key}.title`);
+  // The amounts and % of GDP, every series over its years, for the hidden crawl tables: built from the props alone, so a click never rebuilds them.
+  const crawlModels = useMemo(() => externalPositionCrawlStates(section, facts, gdp).map(crawl => {
+    const { latest } = buildExternalPositionModel(section, facts, crawl, gdp);
+    return buildExternalPositionWorkbookExportModel({ section, facts, state: crawl, labels, sources, siteOrigin, title, gdp, gdpSources,
+      latestLabel: latest.latestPeriod ? externalPositionLatestLabel(latest, presentation.messages) : undefined }, presentation);
+  }), [section, facts, labels, sources, siteOrigin, title, gdp, gdpSources, presentation]);
   const tabLabel = t(`tab.${state.view}`);
   // % of GDP divides by the nominal GDP Current account uses: the source line names it and its preliminary years.
   const preliminaryGdpYears = percent ? model.years.filter(year => gdp.some(row => row.year === year && row.preliminary)) : [];
@@ -102,8 +109,9 @@ export function ExternalPositionExplorer({ section, facts, labels, sources, gdp,
             </div>
           </div>
           {!model.selected.length ? <div className="mt-5"><Callout testId="no-selection-callout">{t("emptySelection")}</Callout></div>
-            : <><ExplorerTable caption={`${title} · ${tabLabel} · ${unitLabel} · ${model.range.start}–${model.range.end}`} rows={rows.filter(row => row !== totalRow)} totalRow={totalRow} showTotal={Boolean(totalRow)} totalFirst wrapRowLabels rowLabelsLocalized years={model.years} yearLabel={yearLabel} firstColumnLabel={t("series")} unit={unit} share={percent} showChangeColumn={false}
-              shareValueForYear={(row, year) => { const value = row.valuesByYear[year]; return value == null ? null : value / 100; }} crawlCopy={state.mode === "line"} />{state.mode === "line" ? <div className="mt-5">{chart}</div> : null}</>}
+            : state.mode === "line" ? <div className="mt-5">{chart}</div>
+            : <ExplorerTable caption={`${title} · ${tabLabel} · ${unitLabel} · ${model.range.start}–${model.range.end}`} rows={rows.filter(row => row !== totalRow)} totalRow={totalRow} showTotal={Boolean(totalRow)} totalFirst wrapRowLabels rowLabelsLocalized years={model.years} yearLabel={yearLabel} firstColumnLabel={t("series")} unit={unit} share={percent} showChangeColumn={false}
+              shareValueForYear={(row, year) => { const value = row.valuesByYear[year]; return value == null ? null : value / 100; }} />}
           <ChartSelectionAids series={lineSeries} chartShown={state.mode === "line"} share={percent} unit={unit} formatValue={valueLabel} />
           <RangeStrip years={externalPositionCoverage(section, state.view, facts, gdp).years} range={model.range} onChange={patch => update(s => ({ ...s, range: rangeFromPatch(buildExternalPositionModel(section, facts, s, gdp).range, patch) }))} />
         </section>
@@ -118,5 +126,6 @@ export function ExternalPositionExplorer({ section, facts, labels, sources, gdp,
         rows={model.series.map(series => ({ id: series.id, label: labels[series.id], color: series.color, value: format(series.endValue) }))}
         totalId={total.id} pinTotal selectedIds={state.selectedIds} onSelectionChange={selectedIds => update(s => ({ ...s, selectedIds }), true)} searchable={false} />
     </ExplorerWorkspace>
+    <CrawlTables models={crawlModels} />
   </div>;
 }
