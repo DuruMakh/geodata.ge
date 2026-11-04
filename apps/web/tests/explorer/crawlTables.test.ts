@@ -30,6 +30,11 @@ describe("formatCrawlCell", () => {
     [0.5, "actual", "0.0#", "0.5"],
     [null, null, "0.0", "—"],
     [5, "not_available", "0.0", "—"],
+    // A negative that rounds to zero digits carries no minus sign.
+    [-0.04, "actual", "#,##0.0", "0.0"],
+    [-0.00004, "actual", "0.0%", "0.0%"],
+    [-0.01, "actual", "+0.0;−0.0;0.0", "0.0"],
+    [-0.05, "actual", "#,##0.0", "−0.1"],
   ] as const)("%s %s %s", (v, b, f, out) => expect(formatCrawlCell(v, b, f, "en")).toBe(out));
 
   it.each(["planned", "preliminary", "forecast"] as const)("marks %s", (basis) => {
@@ -57,6 +62,14 @@ describe("crawlTables", () => {
       { label: "B", cells: ["50.0%", "25.0%"] },
       { label: "C", cells: ["1.0", "2.00"] },
     ]);
+  });
+
+  it("carries the workbook's own label-column heading, and none without one", () => {
+    const y = [2020];
+    const [named] = crawlTables([model({ years: y, headerLabels: { category: "Region", columns: ["2020"] }, rows: [row("A", [1], y)] })], en);
+    expect(named.category).toBe("Region");
+    const [plain] = crawlTables([model({ years: y, rows: [row("A", [1], y)] })], en);
+    expect(plain).not.toHaveProperty("category");
   });
 
   it("defaults to a percentage format when the unit has %", () => {

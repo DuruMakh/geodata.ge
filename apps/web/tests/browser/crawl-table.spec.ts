@@ -28,6 +28,10 @@ for (const { path, figure } of PAGES) {
   });
 
   test(`${path}: the crawl tables are hidden and chart mode shows no table`, async ({ page }) => {
+    // A crawl table that renders differently on the client than in the prerendered HTML is a hydration error.
+    const errors: string[] = [];
+    page.on("pageerror", (error) => errors.push(error.message));
+    page.on("console", (entry) => { if (entry.type() === "error") errors.push(entry.text()); });
     await page.goto(path);
     await ready(page);
     const wrappers = page.getByTestId("crawl-tables");
@@ -38,5 +42,6 @@ for (const { path, figure } of PAGES) {
     // The page's own visible tables (period comparison, partners ranking) are not the yearly table; nothing else shows one.
     const ownTables = '[data-testid="period-comparison"] table, [data-testid="trade-partners-ranking"] table';
     expect(await page.locator("table").evaluateAll((tables, own) => tables.filter((table) => table.checkVisibility() && !table.matches(own)).length, ownTables)).toBe(0);
+    expect(errors, "no page or hydration errors").toEqual([]);
   });
 }

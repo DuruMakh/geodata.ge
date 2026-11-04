@@ -11,7 +11,7 @@ import { SCHEMA_VERSION } from "../../lib/factQuery/types";
 import { schoolYearLabel } from "../../lib/explorer/education";
 import { NAV_GROUPS } from "../../lib/navigation/navTree";
 import { loadTopicHubs } from "../../lib/pages/topicHubs.server";
-import { llmsText } from "../../lib/seo/llmsText";
+import { latestText, llmsText } from "../../lib/seo/llmsText";
 
 // Pages are checked both ways against the sitemap in routes.test.ts ("links only to public sitemap pages",
 // "names every hub, section and methodology route"). Published files are not pages, so their exact list stays here.
@@ -278,6 +278,10 @@ describe("Fiscal.ge agent instructions", () => {
         expect(line, card.href!).toContain(card.years!);
       }
     }
+  });
+  it("names a figure by its headline caption when the card has one, so the largest partner reads as a name", () => {
+    expect(latestText({ value: "3.11 billion USD", period: "2025", caption: "Türkiye, largest", headlineCaption: "Türkiye" })).toBe("latest: Türkiye: 3.11 billion USD (2025). ");
+    expect(latestText({ value: "−1.5%", period: "2025", caption: "of GDP" })).toBe("latest: −1.5% of GDP (2025). ");
   });
   it("is at most half the size of the hand-written guide it replaced", async () => {
     expect(Buffer.byteLength(await llmsText())).toBeLessThanOrEqual(27_000);

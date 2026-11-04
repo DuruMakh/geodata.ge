@@ -118,10 +118,6 @@ export function defaultHealthState(section: HealthNationalSectionId, facts: read
 }
 
 /**
- * Reads the hash. `tab` names the view on Doctors and hospitals only (an unknown one is staff). A selection naming
- * nothing the view has, such as a link from another view, falls back to the view's default; an empty one stays empty.
- */
-/**
  * The hidden crawl tables' states (lib/explorer/crawlTables.ts): each view (staff, hospitals), split by the units its list
  * cannot mix (hospitals and clinics, beds, visits), each with every row of the unit that has facts, over every year.
  */
@@ -130,6 +126,10 @@ export function healthCrawlStates(section: HealthNationalSectionId, facts: reado
   return healthViews(section).flatMap(view => unitListCrawlStates(healthViewSeries(section, view), own, unitOf).map(state => ({ ...state, view })));
 }
 
+/**
+ * Reads the hash. `tab` names the view on Doctors and hospitals only (an unknown one is staff). A selection naming
+ * nothing the view has, such as a link from another view, falls back to the view's default; an empty one stays empty.
+ */
 export function parseHealthHash(hash: string, section: HealthNationalSectionId, facts: readonly ClientHealthFact[]): HealthState {
   const p = new URLSearchParams(hash.replace(/^#/, ""));
   const view = topicHashView(p, healthViews(section));

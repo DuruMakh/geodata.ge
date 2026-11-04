@@ -20,7 +20,7 @@ export function CrawlTables({ models }: { models: readonly WorkbookExportModel[]
           <caption>{table.caption}</caption>
           <thead>
             <tr>
-              <th>{category}</th>
+              <th>{table.category ?? category}</th>
               {table.columns.map((column) => <th key={column}>{column}</th>)}
             </tr>
           </thead>

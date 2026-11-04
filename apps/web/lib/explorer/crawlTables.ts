@@ -8,7 +8,8 @@ export const CRAWL_CELL_CAP = 3000;
 /** The most months a monthly view's crawl tables carry; its crawl states choose the window (`lastPeriodsRange`). */
 export const CRAWL_MONTH_COLUMNS = 36;
 
-export type CrawlTable = { caption: string; columns: string[]; rows: { label: string; cells: string[] }[] };
+/** `category` heads the label column when the workbook names it (`headerLabels.category`); otherwise the page writes "Category". */
+export type CrawlTable = { caption: string; category?: string; columns: string[]; rows: { label: string; cells: string[] }[] };
 
 const STATUS_KEYS = {
   planned: "workbook.planned",
@@ -41,7 +42,8 @@ export function formatCrawlCell(value: number | null, basis: WorkbookBasis | nul
   const maximum = minimum + (decimalPart.match(/#/g) ?? []).length;
   const percent = section.includes("%");
   const digits = numberFormatter(minimum, maximum, integerPart.includes(",")).format(Math.abs(percent ? value * 100 : value));
-  const sign = value < 0 ? "−" : section.trimStart().startsWith("+") ? "+" : "";
+  // A negative that rounds to zero digits reads "0.0", not "−0.0".
+  const sign = value < 0 ? (/[1-9]/.test(digits) ? "−" : "") : section.trimStart().startsWith("+") ? "+" : "";
   const text = `${sign}${digits}${percent ? "%" : ""}`;
   const status = basis !== null && basis in STATUS_KEYS ? STATUS_KEYS[basis as keyof typeof STATUS_KEYS] : null;
   return status ? `${text} (${workbookMessage(locale, status).toLowerCase()})` : text;
@@ -91,6 +93,7 @@ export function crawlTables(models: readonly WorkbookExportModel[], messages: Me
     const fallback = defaultFormat(readable);
     tables.push({
       caption,
+      ...(readable.headerLabels ? { category: readable.headerLabels.category } : {}),
       columns,
       rows: kept.map((row) => ({
         label: readableRowLabel(row),

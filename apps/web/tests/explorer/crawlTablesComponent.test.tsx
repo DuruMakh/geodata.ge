@@ -25,6 +25,11 @@ describe("CrawlTables", () => {
     );
   });
 
+  it("heads the label column with the workbook's own label when it has one", () => {
+    const named: WorkbookExportModel = { ...model, readable: { ...model.readable, headerLabels: { category: "Region", columns: ["2024", "2025"] } } };
+    expect(renderPageMarkup("en", <CrawlTables models={[named]} />)).toContain("<thead><tr><th>Region</th><th>2024</th><th>2025</th></tr></thead>");
+  });
+
   it("carries no class or style inside the wrapper", () => {
     const markup = renderPageMarkup("en", <CrawlTables models={[model]} />);
     expect(markup.slice(markup.indexOf("<table"))).not.toMatch(/class=|style=/);

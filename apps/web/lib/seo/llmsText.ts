@@ -18,13 +18,13 @@ const SITE = "https://fiscal.ge";
 
 const OPENING = `# Fiscal.ge
 
-> Fiscal.ge is a Georgian and English guide to reviewed annual data on Georgia's state and municipal budgets, GDP, national economic sectors, regional economies, business, money and banks, unemployment, wages, poverty and inequality, education, science and culture, trade in goods and services, external flows, energy and food, the environment and climate, and population, and to Geostat's monthly consumer-price inflation.
+> Fiscal.ge is a Georgian and English guide to reviewed annual data on Georgia's state and municipal budgets, economy, money, jobs, living standards, society, environment, trade and population, and to Geostat's monthly consumer-price inflation.
 
-**When to use Fiscal.ge:** Use it to look up, compare and cite the latest and historical figures for any topic below.
+**When to use Fiscal.ge:** Look up, compare and cite the latest and historical figures for any topic below.
 
-Most data are annual; inflation is monthly. There is no REST query API, no write access, no accounts, and no datasets beyond those listed here.
+There is no REST query API, no write access, no accounts, and no datasets beyond those listed here.
 
-**How to answer from Fiscal.ge:** Give the number first: the figure, its year or month, its unit and the link to its page. Add at most one short caveat, and only when it changes what the number means — a planned budget, a projection, a preliminary figure, or a series break inside the years compared. Do not explain methodology unless the user asks; link the page's methodology instead. Every chart page carries its year-by-year table, every series, in its HTML (the largest pages carry their leading series; all of them are in the page's Excel download). Use the published figures as they are, and do not invent values for years or places that are not covered.`;
+**How to answer from Fiscal.ge:** Give the number first: the figure, its year or month, its unit and the link to its page. Add at most one short caveat, only when it changes what the number means: a plan, a projection, a preliminary figure, or a series break in the years compared. Link the page's methodology instead of explaining it, unless asked. Each chart page's HTML has a year-by-year table of every series (the largest pages: their leading series; all in the Excel download), except product inflation and monthly category changes, which load after the page opens: use the inflation CSVs. Use the published figures as they are; do not invent values for years or places not covered.`;
 
 /**
  * The three "Where the data is" lines. The bulk-file count is the manifest's (the publications built from the snapshot
@@ -38,8 +38,8 @@ function whereTheDataIs(): string {
   const bulkFiles = buildAllPublications(snapshot).filter((file) => file.fileName !== "manifest.json").length + MANIFEST_SIDE_FILE_NAMES.length;
   const datasets = catalogueData(snapshot).datasets.map((dataset) => dataset.labelEn);
   where = `**Where the data is:**
-- Every topic's figures are on its chart pages below; each chart page's line opens with its latest figure where the page has one.
-- Bulk files: \`${SITE}/downloads/data/manifest.json\` lists all ${bulkFiles} bulk files (CSV and JSON) with their hashes.
+- Each chart page's line below opens with its latest figure, where it has one.
+- Bulk files: \`${SITE}/downloads/data/manifest.json\` lists all ${bulkFiles} bulk files with their hashes.
 - The read-only MCP connection at \`${SITE}/mcp\` serves ${datasets.slice(0, -1).join(", ")} and ${datasets.at(-1)}.`;
   return where;
 }
@@ -49,54 +49,54 @@ const CORE_DATA: LlmsLine[][] = [
   [
     { href: "/", name: "Fiscal.ge home", text: "scope and coverage." },
     { href: "/explorer", name: "All data", text: "every page A to Z." },
-    { href: "/explorer/budget", name: "Budget", text: "group page." },
+    { href: "/explorer/budget", name: "Budget", text: "" },
     { href: "/explorer/expenditure", name: "National expenditure", text: "state-budget expenditure." },
     { href: "/explorer/expenditure-types", name: "Spending by type", text: "by economic type, GEL or share of GDP." },
     { href: "/explorer/revenue", name: "National revenue", text: "consolidated-budget receipts." },
-    { href: "/explorer/tax-breaks-refunds", name: "Tax breaks and refunds", text: "tax breaks, 2018–2024, and refunds, 2008–2025, million GEL or share of GDP." },
+    { href: "/explorer/tax-breaks-refunds", name: "Tax breaks and refunds", text: "tax breaks, 2018–2024, and refunds, 2008–2025, GEL or share of GDP." },
     { href: "/explorer/analysis", name: "Annual analysis", text: "one-year budget analysis." },
     { href: "/explorer/municipalities", name: "Municipal budgets", text: "municipal expenditure." },
-    { href: "/explorer/debt", name: "Government debt explorer", text: "debt stock, debt service and interest rates." },
-    { href: "/explorer/deficit", name: "Deficit explorer", text: "IMF general-government balance, share of GDP or GEL." },
+    { href: "/explorer/debt", name: "Government debt", text: "debt stock, debt service and interest rates." },
+    { href: "/explorer/deficit", name: "Deficit", text: "IMF general-government balance, share of GDP or GEL." },
   ],
   [
-    { href: "/explorer/economy", name: "Economy and business", text: "group page." },
+    { href: "/explorer/economy", name: "Economy and business", text: "" },
     { href: "/explorer/economy#t-economy", name: "Economy", text: "" },
     { href: "/explorer/economy/gdp", name: "Economy overview", text: "real GDP in constant 2015 USD; nominal GDP in GEL and USD, real growth and GDP per person." },
     { href: "/explorer/economy/sectors", name: "Economic sectors", text: "20 national economic activities plus a Total GDP reference." },
     { href: "/explorer/economy/expenditure", name: "GDP by expenditure", text: "share of GDP; consumption, investment, exports and imports, 2010–2025." },
     { href: "/explorer/economy/regions", name: "Regional economies", text: "largest region's GDP; 11 regions' GDP and 20 activities, 2010–2024." },
-    { href: "/explorer/economy#t-business", name: "Business", text: "firms' sales, jobs, investment, profit and loss, 1999–2025." },
+    { href: "/explorer/economy#t-business", name: "Business", text: "sales, jobs, investment and profit, 1999–2025." },
     { href: "/explorer/business/sales", name: "Sales", text: "turnover in million GEL, 1999–2025." },
     { href: "/explorer/business/jobs", name: "Jobs", text: "persons employed in firms, 1999–2025." },
     { href: "/explorer/business/investment-profit", name: "Investment and profit", text: "investment, profit and loss, 2006–2025." },
-    { href: "/explorer/business/firms", name: "Firms opened and closed", text: "active, new and closed firms, 2014–2024." },
+    { href: "/explorer/business/firms", name: "Firms opened and closed", text: "active, new and closed, 2014–2024." },
     { href: "/explorer/business/regions", name: "Business by region", text: "11 regions." },
     { href: "/explorer/economy#t-housing", name: "Housing and construction", text: "permits and completed buildings, 2006–2025, and home prices." },
     { href: "/explorer/housing/permits", name: "Building permits", text: "by number and floor area, 2006–2025." },
     { href: "/explorer/housing/completed", name: "Completed buildings", text: "by number and floor area, 2006–2025." },
-    { href: "/explorer/housing/prices", name: "Home prices", text: "index for all homes, flats and houses, 2020–2025; Tbilisi asking prices per m² in ten districts, 2021–2025." },
+    { href: "/explorer/housing/prices", name: "Home prices", text: "index for all homes, flats and houses, 2020–2025; Tbilisi asking prices per m², ten districts, 2021–2025." },
     { href: "/explorer/housing/regions", name: "Housing by region", text: "11 regions, 2006–2025." },
-    { href: "/explorer/prices", name: "Prices and money", text: "group page." },
+    { href: "/explorer/prices", name: "Prices and money", text: "" },
     { href: "/explorer/prices#t-inflation", name: "Inflation", text: "" },
     { href: "/explorer/inflation/overview", name: "Inflation overview", text: "annual (year-on-year) CPI inflation by month, core inflation and the NBG target. The [inflation CSV](https://fiscal.ge/downloads/data/inflation-cpi-national.csv) has every value; 2.4 means 2.4%." },
-    { href: "/explorer/inflation/categories", name: "Inflation categories", text: "12 COICOP divisions, 43 subgroups, weights and contributions." },
+    { href: "/explorer/inflation/categories", name: "Inflation categories", text: "largest contribution to annual inflation; 12 COICOP divisions and 43 subgroups, with weights." },
     { href: "/explorer/inflation/cities", name: "Inflation by city", text: "highest annual rate of six cities, from 2016." },
     { href: "/explorer/inflation/products", name: "Inflation by product", text: "annual price change of the fastest-rising current-basket product." },
     { href: "/explorer/prices#t-money", name: "Money and banks", text: "money, loans, deposits, rates and bank health, 1995–2025." },
-    { href: "/explorer/money/supply", name: "Money supply", text: "M0–M3 in million GEL from 1995, and all four as a share of GDP from 1996." },
+    { href: "/explorer/money/supply", name: "Money supply", text: "M0–M3 in million GEL from 1995; all four as a share of GDP from 1996." },
     { href: "/explorer/money/loans-deposits", name: "Loans and deposits", text: "covers bank loans from 2002 and deposits from 1996, deposits of people from 2002 and of companies and organisations from 2015." },
     { href: "/explorer/money/borrowers", name: "Who borrows", text: "loans by borrower and industry from 2003, household borrowing from 2015, billion GEL." },
     { href: "/explorer/money/regions", name: "Loans by region", text: "11 regions, 2015–2025." },
     { href: "/explorer/money/interest-rates", name: "Interest rates", text: "the policy rate from 2008; rates on loans and on deposits from 1996." },
     { href: "/explorer/money/bank-health", name: "Bank health", text: "covers bad loans as a share of all loans from 2003, return on assets and on equity from 2001, the two capital ratios from 2014." },
-    { href: "/explorer/labour", name: "Labour market", text: "group page." },
-    { href: "/explorer/labour#t-unemployment", name: "Unemployment", text: "Labour Force Survey, 2010–2025. Bulk file: [Unemployment CSV](https://fiscal.ge/downloads/data/unemployment.csv) for the overview, regions, age and gender pages." },
-    { href: "/explorer/unemployment/overview", name: "Unemployment overview", text: "unemployment, employment and participation rates." },
+    { href: "/explorer/labour", name: "Labour market", text: "" },
+    { href: "/explorer/labour#t-unemployment", name: "Unemployment", text: "Labour Force Survey, 2010–2025. Bulk file: [Unemployment CSV](https://fiscal.ge/downloads/data/unemployment.csv)." },
+    { href: "/explorer/unemployment/overview", name: "Unemployment overview", text: "unemployment rate; employment and participation rates." },
     { href: "/explorer/unemployment/regions", name: "Unemployment by region", text: "11 regions." },
     { href: "/explorer/unemployment/age", name: "Unemployment by age", text: "age groups." },
     { href: "/explorer/unemployment/gender", name: "Unemployment by gender", text: "women and men." },
-    { href: "/explorer/unemployment/industries", name: "Jobs by industry", text: "jobs by industry, 2017–2025; women and men from 2020." },
+    { href: "/explorer/unemployment/industries", name: "Jobs by industry", text: "2017–2025; women and men from 2020." },
     { href: "/explorer/unemployment/hours", name: "Hours worked", text: "usual weekly hours, 2020–2025." },
     { href: "/explorer/unemployment/informal", name: "Informal jobs", text: "informal share of non-farm jobs, 2020–2025." },
     { href: "/explorer/unemployment/young-people", name: "Young people not in work or study", text: "NEET shares, 2020–2025." },
@@ -104,7 +104,7 @@ const CORE_DATA: LlmsLine[][] = [
     { href: "/explorer/wages/overview", name: "Wages overview", text: "average wage from 1995, median from 2018." },
     { href: "/explorer/wages/industries", name: "Wages by industry", text: "19 NACE sections." },
     { href: "/explorer/wages/regions", name: "Wages by region", text: "11 regions." },
-    { href: "/explorer/living", name: "Living standards and health", text: "group page." },
+    { href: "/explorer/living", name: "Living standards and health", text: "" },
     { href: "/explorer/living#t-living-standards", name: "Living standards", text: "household income and spending from 2002, poverty rates from 2004, inequality from 2006." },
     { href: "/explorer/living-standards/income", name: "Household income", text: "monthly household income by source." },
     { href: "/explorer/living-standards/spending", name: "Household spending", text: "monthly household spending by category." },
@@ -114,18 +114,18 @@ const CORE_DATA: LlmsLine[][] = [
     { href: "/explorer/health/doctors-hospitals", name: "Doctors and hospitals", text: "staff, hospitals, beds and visits, 2002–2025." },
     { href: "/explorer/health/illnesses", name: "Illnesses", text: "new cases by disease group, 2002–2025; diabetes and anaemia from 2016." },
     { href: "/explorer/health/causes-of-death", name: "Causes of death", text: "deaths by cause and death rate, 2014–2025." },
-    { href: "/explorer/health/social-payments", name: "Social payments", text: "18 programmes, million GEL, 2013–2025; COVID-19 compensation in 2020 and 2021." },
+    { href: "/explorer/health/social-payments", name: "Social payments", text: "total of 18 programmes, 2013–2025; COVID-19 compensation in 2020 and 2021." },
     { href: "/explorer/health/pensions", name: "Pensions", text: "pensioners and pensions, 2013–2025." },
     { href: "/explorer/health/subsistence-allowance", name: "Subsistence allowance", text: "families, people and money paid, 2013–2025; employment programme (from 2022)." },
     { href: "/explorer/health/social-package", name: "Social package", text: "recipients and money paid, 2013–2025; four disability rows from 2017, war participants from 2019." },
     { href: "/explorer/health/funded-pension", name: "Funded pension", text: "savings, assets, members and return, 2019–2025; securities gains and dividends from 2022." },
-    { href: "/explorer/society", name: "Society and environment", text: "group page." },
+    { href: "/explorer/society", name: "Society and environment", text: "" },
     { href: "/explorer/society#t-education", name: "Education", text: "schools (2000/01–2025/26), kindergartens (2017/18–2025/26), universities (2010/11–2025/26), vocational colleges (2013–2025)." },
     { href: "/explorer/education/schools", name: "Schools", text: "pupils, teachers and schools; Georgia from 2000/01." },
     { href: "/explorer/education/kindergartens", name: "Kindergartens", text: "children and staff, 2017/18–2025/26." },
     { href: "/explorer/education/universities", name: "Universities", text: "students (2011/12–2025/26), graduates (2010/11–2024/25)." },
     { href: "/explorer/education/vocational", name: "Vocational colleges", text: "admissions and graduates, 2013–2025." },
-    { href: "/explorer/society#t-science-culture", name: "Science and culture", text: "researchers and research spending (2019–2024), patents and grants (2016–2025), museum visitors (2005–2025), theatres (2006–2025)." },
+    { href: "/explorer/society#t-science-culture", name: "Science and culture", text: "research spending (2019–2024), patents and grants (2016–2025), museum visitors (2005–2025), theatres (2006–2025)." },
     { href: "/explorer/science-culture/research", name: "Research", text: "researchers and R&D spending, 2019–2024." },
     { href: "/explorer/science-culture/patents", name: "Patents", text: "applications and grants, 2016–2025." },
     { href: "/explorer/science-culture/museums", name: "Museums", text: "visitors and museums, 2005–2025; staff (2020–2025)." },
@@ -137,11 +137,11 @@ const CORE_DATA: LlmsLine[][] = [
     { href: "/explorer/crime/victims", name: "Victims", text: "victims of crime, 2007–2011 and 2015–2025." },
     { href: "/explorer/crime/road-accidents", name: "Road accidents", text: "accidents, killed and injured, 2001–2025." },
     { href: "/explorer/society#t-internet", name: "Internet and technology", text: "ICT survey, 2016–2026." },
-    { href: "/explorer/internet/homes", name: "Internet at home", text: "homes with internet or a computer, 2016–2026." },
-    { href: "/explorer/internet/users", name: "Internet users", text: "internet use by group, 2016–2026." },
+    { href: "/explorer/internet/homes", name: "Internet at home", text: "share of homes with internet; also with a computer, 2016–2026." },
+    { href: "/explorer/internet/users", name: "Internet users", text: "by group, 2016–2026." },
     { href: "/explorer/internet/online", name: "Shopping and services online", text: "online shopping and services, 2016–2026." },
     { href: "/explorer/internet/devices", name: "Phones and computers", text: "mobile phone, smartphone (from 2019) and computer use, 2016–2026." },
-    { href: "/explorer/external", name: "External sector", text: "group page." },
+    { href: "/explorer/external", name: "External sector", text: "" },
     { href: "/explorer/external#t-trade", name: "Trade", text: "" },
     { href: "/explorer/trade/overview", name: "Trade overview", text: "total trade (exports plus imports); exports, imports and balance, 1995–2025." },
     { href: "/explorer/trade/partners", name: "Trading partners", text: "largest partner by total trade; 212 countries and five groups, 1995–2025." },
@@ -165,17 +165,17 @@ const CORE_DATA: LlmsLine[][] = [
     { href: "/explorer/environment/greenhouse-gases", name: "Greenhouse gases", text: "total, by sector and gas, 2000–2022." },
     { href: "/explorer/environment/air-pollution", name: "Air pollution", text: "eight pollutants, thousand tonnes, 2013–2024." },
     { href: "/explorer/environment/air-quality", name: "City air quality", text: "16 stations in nine cities, 2005–2025." },
-    { href: "/explorer/environment/climate", name: "Temperature and rain", text: "temperature and rain, 1990, 1995 and from 2000 to 2024." },
+    { href: "/explorer/environment/climate", name: "Temperature and rain", text: "1990, 1995 and from 2000 to 2024." },
     { href: "/explorer/environment/water", name: "Water", text: "million m³, 2015–2025." },
     { href: "/explorer/environment/waste", name: "Waste", text: "thousand tonnes, by region, 2015–2024." },
     { href: "/explorer/environment/forests", name: "Forests", text: "timber cut and illegal logging, m³, 2010–2024." },
-    { href: "/explorer/society#t-transport", name: "Transport", text: "road vehicle fleet, 2000–2025; passengers, freight and regions." },
+    { href: "/explorer/society#t-transport", name: "Transport", text: "road vehicle fleet, 2000–2025." },
     { href: "/explorer/transport/vehicles", name: "Vehicles", text: "fleet by type, thousands, 2000–2025; by fuel from 2017." },
     { href: "/explorer/transport/vehicle-age", name: "Vehicle age", text: "by age, thousands, 2017–2025." },
     { href: "/explorer/transport/passengers", name: "Passengers", text: "passenger-km and passengers, 2000–2025." },
     { href: "/explorer/transport/freight", name: "Freight", text: "tonne-km and goods carried, 2000–2025." },
     { href: "/explorer/transport/regions", name: "Transport by region", text: "registered vehicles by region, 2017–2025; road length, 2011–2024." },
-    { href: "/explorer/demography", name: "Demography", text: "group page." },
+    { href: "/explorer/demography", name: "Demography", text: "" },
     { href: "/explorer/demography/population", name: "Population", text: "on 1 January: Georgia, 2004–2026; regions and municipalities, 2015–2026. Bulk file: [Population CSV](https://fiscal.ge/downloads/data/population.csv)." },
     { href: "/explorer/demography/migration", name: "Migration", text: "by sex and citizenship, 2012–2025." },
     { href: "/explorer/demography/births-deaths", name: "Births, deaths and fertility", text: "births and deaths, Georgia 2014–2025, regions and municipalities 2015–2025; fertility and life expectancy." },
@@ -186,7 +186,7 @@ const CORE_DATA: LlmsLine[][] = [
 
 const METHODOLOGY: LlmsLine[][] = [
   [
-    { href: "/methodology", name: "Methodology hub", text: "how the data is prepared." },
+    { href: "/methodology", name: "Methodology hub", text: "" },
     { href: "/methodology/expenditure", name: "Expenditure", text: "" },
     { href: "/methodology/expenditure-types", name: "Spending by type", text: "" },
     { href: "/methodology/revenue", name: "Revenue", text: "" },
@@ -224,14 +224,14 @@ const METHODOLOGY: LlmsLine[][] = [
 
 const BULK_FILES: LlmsLine[][] = [
   [
-    { href: "/downloads/data/gdp-overview.json", name: "GDP overview", text: "six series; also as the [GDP CSV](https://fiscal.ge/downloads/data/gdp-overview.csv). 7.5 means 7.5%." },
+    { href: "/downloads/data/gdp-overview.json", name: "GDP overview", text: "also as the [GDP CSV](https://fiscal.ge/downloads/data/gdp-overview.csv). 7.5 means 7.5%." },
     { href: "/downloads/data/economic-sectors.json", name: "Economic sectors JSON", text: "also as the [economic sectors CSV](https://fiscal.ge/downloads/data/economic-sectors.csv). Nominal GEL and GDP shares cover 2010–2025; real growth covers 2011–2025, with 2010 explicitly missing." },
-    { href: "/downloads/data/regional-economies.json", name: "Regional economies JSON", text: "11 regions and 20 activities, 2010–2024; also as the [regional economies CSV](https://fiscal.ge/downloads/data/regional-economies.csv)." },
+    { href: "/downloads/data/regional-economies.json", name: "Regional economies JSON", text: "also as the [regional economies CSV](https://fiscal.ge/downloads/data/regional-economies.csv)." },
     { href: "/downloads/data/inflation-national.json", name: "Inflation, national", text: "monthly CPI and NBG target; 2.4 means 2.4%." },
     { href: "/downloads/data/inflation-categories.csv", name: "Inflation categories CSV", text: "with [its metadata](https://fiscal.ge/downloads/data/inflation-categories.json): group changes and contributions." },
-    { href: "/downloads/data/inflation-cities.csv", name: "Inflation cities CSV", text: "with [its metadata](https://fiscal.ge/downloads/data/inflation-cities.json): six cities from 2016." },
+    { href: "/downloads/data/inflation-cities.csv", name: "Inflation cities CSV", text: "with [its metadata](https://fiscal.ge/downloads/data/inflation-cities.json)." },
     { href: "/downloads/data/inflation-products.csv", name: "Inflation products CSV", text: "with [its metadata](https://fiscal.ge/downloads/data/inflation-products.json): price indices (base 100)." },
-    { href: "/downloads/data/manifest.json", name: "Data manifest", text: "every file with its SHA-256." },
+    { href: "/downloads/data/manifest.json", name: "Data manifest", text: "" },
     { href: "/downloads/data/government-debt.json", name: "Government debt", text: "debt stock and service, GEL." },
     { href: "/downloads/data/general-government-balance.json", name: "General government balance", text: "share of GDP; negative is a deficit." },
     { href: "/downloads/data/catalogue.json", name: "Capability catalogue", text: "datasets, entities and series." },
@@ -242,8 +242,8 @@ const BULK_FILES: LlmsLine[][] = [
 const SITE_NAVIGATION: LlmsLine[][] = [
   [
     { href: "/en", name: "English home", text: "scope and coverage." },
-    { href: "/en/explorer", name: "English All data", text: "every page in English." },
-    { href: "/en/methodology/expenditure", name: "English methodology", text: "definitions and sources." },
+    { href: "/en/explorer", name: "English All data", text: "" },
+    { href: "/en/methodology/expenditure", name: "English methodology", text: "" },
   ],
   [
     { href: "/about", name: "Mission — Fiscal.ge", text: "purpose and data boundaries." },
@@ -251,15 +251,17 @@ const SITE_NAVIGATION: LlmsLine[][] = [
   ],
 ];
 
-const AI_CONNECTION = `The endpoint \`${SITE}/mcp\` is a read-only, unauthenticated MCP server. Call describe_coverage first with one keyword: it returns the ids, measures and year or month ranges. Its current read-only tools are ${TOOLS.map((tool) => tool.name).join(", ")}; tools/list is authoritative. Clients must accept additive fields and data schema ${SCHEMA_VERSION}. Setup: [Connect an AI assistant](${SITE}/connect), [in English](${SITE}/en/connect).`;
+const AI_CONNECTION = `\`${SITE}/mcp\` is a read-only, unauthenticated MCP server. Call describe_coverage first with one keyword: it returns the ids, measures and year or month ranges. Its current read-only tools are ${TOOLS.map((tool) => tool.name).join(", ")}; tools/list is authoritative. Clients must accept additive fields and data schema ${SCHEMA_VERSION}. Setup: [Connect an AI assistant](${SITE}/connect), [in English](${SITE}/en/connect).`;
 
 /**
  * `latest: <figure> (<period>). `: the card's figure as its footer prints it. A caption that starts in lower case
- * completes the value (`−1.5% of GDP`); any other names it (`Refunds: 2.7 bn GEL`). A dated point's `2026 (Jun)` reads
- * `Jun 2026`, and a preliminary figure says so after its period.
+ * completes the value (`−1.5% of GDP`); any other names it (`Refunds: 2.7 bn GEL`). A card's headline caption, a name
+ * whose line already says the rest, replaces its caption (`Türkiye: 3.11 billion USD`, not `Türkiye, largest: …`). A
+ * dated point's `2026 (Jun)` reads `Jun 2026`, and a preliminary figure says so after its period.
  */
 export function latestText(latest: CardLatest): string {
-  const { value, caption } = latest;
+  const { value } = latest;
+  const caption = latest.headlineCaption ?? latest.caption;
   const figure = !caption ? value : /^\p{Ll}/u.test(caption) ? `${value} ${caption}` : `${caption}: ${value}`;
   const period = latest.period.replace(/^(\d{4}) \((.+)\)$/, "$2 $1");
   return `latest: ${figure} (${latest.status === "preliminary" ? `${period}, preliminary` : period}). `;

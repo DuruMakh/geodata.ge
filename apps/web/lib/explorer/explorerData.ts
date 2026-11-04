@@ -184,8 +184,9 @@ export type BudgetCrawlState = { scope: ExplorerScope; grouping: ExpenditureGrou
 
 /**
  * The hidden crawl tables of a route (lib/explorer/crawlTables.ts): one state per scope it offers, each with every series
- * of that scope's list (a ministry's programmes too) over every year the scope offers (budgetYearsByScope), in amounts —
- * the share of GDP only divides them. A scope without rows has no state.
+ * of that scope's list (a ministry's programmes too) from the first to the last year of the scope's rows, the years
+ * budgetYearsByScope (components/main-explorer) offers it, in amounts — the share of GDP only divides them. A scope
+ * without rows has no state.
  */
 export function budgetCrawlStates(side: ExplorerSide, facts: ClientBudgetFact[], adminFacts: ClientAdminFact[] = []): BudgetCrawlState[] {
   const groupings: ExpenditureGrouping[] = side === "expenditure" ? ["fields", "ministries"] : ["fields"];
