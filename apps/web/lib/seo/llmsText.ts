@@ -57,7 +57,7 @@ const CORE_DATA: LlmsLine[][] = [
     { href: "/explorer/expenditure-types", name: "Spending by type", text: "general government, by economic type, GEL or share of GDP." },
     { href: "/explorer/revenue", name: "National revenue", text: "consolidated-budget receipts, including borrowing and asset sales." },
     { href: "/explorer/tax-breaks-refunds", name: "Tax breaks and refunds", text: "tax breaks, 2018–2024, and refunds, 2008–2025, GEL or share of GDP." },
-    { href: "/explorer/analysis", name: "Annual analysis", text: "one-year budget analysis." },
+    { href: "/explorer/analysis", name: "Year in review", text: "one year of public finances: revenue, spending, deficit, debt and tax breaks." },
     { href: "/explorer/municipalities", name: "Municipal budgets", text: "municipal expenditure." },
     { href: "/explorer/debt", name: "Government debt", text: "debt stock, debt service and interest rates." },
     { href: "/explorer/deficit", name: "Deficit", text: "IMF general-government balance, share of GDP or GEL." },
