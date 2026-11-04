@@ -10,9 +10,10 @@ import { message } from "../../lib/i18n/messages";
 import { useI18n } from "../../lib/i18n/provider";
 import { pageHref } from "../../lib/i18n/routes";
 import { RegionIndex } from "../regional-economies/regional-economies-index";
+import { CrawlTables } from "../explorer-shell/crawl-tables";
 import { ExplorerHeading } from "../explorer-shell/explorer-heading";
 import { useAppReady } from "../explorer-shell/use-app-ready";
-import { UnemploymentExplorer, type UnemploymentExplorerProps } from "./unemployment-explorer";
+import { UnemploymentExplorer, useUnemploymentCrawlModels, type UnemploymentExplorerProps } from "./unemployment-explorer";
 
 export function UnemploymentRegionsIndex({ model, explorer }: { model: RegionMapModel; explorer: UnemploymentExplorerProps }) {
   const { locale, messages } = useI18n();
@@ -26,6 +27,8 @@ export function UnemploymentRegionsIndex({ model, explorer }: { model: RegionMap
     return () => { window.removeEventListener("hashchange", restore); window.removeEventListener("popstate", restore); };
   }, []);
   useAppReady();
+  // The comparison only opens in the browser, so the map view carries its hidden crawl tables for readers that run no page code.
+  const crawlModels = useUnemploymentCrawlModels(explorer);
   const t = (key: string) => message(messages, `unemployment.${key}`);
   // An in-app move to the same path drops the hash without a hashchange event, so the click leaves comparison itself.
   if (comparison) return <><Link href={pageHref("/explorer/unemployment/regions", locale)} prefetch={false} onClick={() => setComparison(false)} className="mb-4 inline-block text-[12px] text-[var(--accent)] underline underline-offset-4">{message(messages, "regionalEconomies.allRegions")}</Link><UnemploymentExplorer {...explorer} /></>;
@@ -44,5 +47,6 @@ export function UnemploymentRegionsIndex({ model, explorer }: { model: RegionMap
     ]} />
     <p className="mt-3 max-w-[900px] text-[11px] leading-relaxed text-[var(--muted)]">{t("regionNote")} <Link href={pageHref("/methodology/unemployment", locale)} prefetch={false} className="text-[var(--accent)] underline underline-offset-4">{t("methodology")}</Link></p>
     <a href="#breakdown=region" className="mt-3 inline-block text-[12px] text-[var(--accent)] underline underline-offset-4">{t("regionalComparison")}</a>
+    <CrawlTables models={crawlModels} />
   </div>;
 }

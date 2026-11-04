@@ -60,8 +60,21 @@ export type HouseholdState = TopicState & { measure: HouseholdMeasure };
 
 /** An area's years: every year any of its series has a value for the measure. */
 export function householdCoverage(section: HouseholdSectionId, area: HouseholdArea, measure: HouseholdMeasure, facts: readonly ClientHouseholdFact[]) {
+  return topicCoverage(householdYears(section, area, measure, facts), `No household years for ${section}:${area}:${measure}`);
+}
+function householdYears(section: HouseholdSectionId, area: HouseholdArea, measure: HouseholdMeasure, facts: readonly ClientHouseholdFact[]): number[] {
   const cells = new Set(householdViewSeries(section, area).map(s => `${s.indicatorId}:${s.areaId}`));
-  return topicCoverage(facts.filter(f => f.measure === measure && cells.has(`${f.indicatorId}:${f.areaId}`)).map(f => f.year), `No household years for ${section}:${area}:${measure}`);
+  return facts.filter(f => f.measure === measure && cells.has(`${f.indicatorId}:${f.areaId}`)).map(f => f.year);
+}
+
+/**
+ * The hidden crawl tables' states (lib/explorer/crawlTables.ts): per household and per person (the page lists no household
+ * size, so the per-person figures appear nowhere else), every series the area lists, over every year; a measure without
+ * years has none.
+ */
+export function householdCrawlStates(section: HouseholdSectionId, area: HouseholdArea, facts: readonly ClientHouseholdFact[]): HouseholdState[] {
+  return HOUSEHOLD_MEASURES.filter(measure => householdYears(section, area, measure, facts).length > 0)
+    .map(measure => ({ mode: "line", range: { kind: "all" }, measure, selectedIds: householdViewSeries(section, area).map(series => series.id) }));
 }
 
 export function defaultHouseholdState(section: HouseholdSectionId): HouseholdState {

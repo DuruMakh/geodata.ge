@@ -9,7 +9,7 @@ import { formatInUnit, formatShare, type ValueUnit } from "../../lib/explorer/fo
 import { rangeFromPatch } from "../../lib/explorer/periodRange";
 import type { SocialPlaceSet, SocialPopulation, SocialPriceIndex, SocialShownFact, SocialUnit } from "../../lib/explorer/social";
 import {
-  buildSocialPlaceModel, changeSocialPlaceSelection, parseSocialPlaceHash, socialPlaceCoverage, socialPlaceFacts, socialPlaceList,
+  buildSocialPlaceModel, changeSocialPlaceSelection, parseSocialPlaceHash, socialPlaceCoverage, socialPlaceCrawlStates, socialPlaceFacts, socialPlaceList,
 } from "../../lib/explorer/socialPlaces";
 import { buildSocialWorkbookExportModel, SOCIAL_UNIT_KEYS } from "../../lib/explorer/socialWorkbook";
 import { serializeTopicHash, type TopicState } from "../../lib/explorer/topicSeries";
@@ -20,6 +20,7 @@ import { pageHref } from "../../lib/i18n/routes";
 import { ExcelDownloadButton } from "../explorer/excel-download-button";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { ChartShareButton } from "../explorer-shell/chart-share-button";
+import { CrawlTables } from "../explorer-shell/crawl-tables";
 import { FlatSeriesPanel } from "../explorer-shell/flat-series-panel";
 import { LatestValueLine } from "../explorer-shell/latest-value-line";
 import { ModeTabs } from "../explorer-shell/mode-tabs";
@@ -102,6 +103,11 @@ export function SocialPlaceExplorer({
   const newCounting = t("break.newCounting");
   const placeName = placeLabel(place, locale);
   const chartLabel = `${headingLabels[model.heading]} · ${placeName}`;
+  // Every heading the place has, every row of it over its years, for the hidden crawl tables: built from the props alone, so a click never rebuilds them.
+  const crawlModels = useMemo(() => socialPlaceCrawlStates(set, shown).map(crawl => buildSocialWorkbookExportModel({
+    set, placeId: place.id, scope: workbookScope, facts, state: crawl, extras: { population, cpi }, labels, headingLabels,
+    sources, populationSources, cpiSources, gdpSources: [], siteOrigin, title: `${title} ${placeName}`,
+  }, presentation)), [set, shown, place.id, workbookScope, facts, population, cpi, labels, headingLabels, sources, populationSources, cpiSources, siteOrigin, title, placeName, presentation]);
   const chart = <EditorialLineChart years={model.years} series={lineSeries} share={false} unit={unit} shareLabel={chartLabel} formatTooltipValue={valueLabel} breaks={model.breaks.map(item => ({ year: item.year, label: newCounting }))} />;
   const shareAction = model.selected.length ? <ChartShareButton title={`${title} ${placeName}`} caption={`${unitLabel} · ${model.range.start}–${model.range.end}`}
     legend={lineSeries.map(({ label, color }) => ({ label, color }))} source={t(`sourceNote.${set}`)} chart={chart} period={`${model.range.start}-${model.range.end}`} /> : undefined;
@@ -116,8 +122,9 @@ export function SocialPlaceExplorer({
             <span data-testid="social-unit-label" className="text-[11px] text-[var(--muted)]">{unitLabel}</span>
           </div>
           {!model.selected.length ? <div className="mt-5"><Callout testId="no-selection-callout">{t("emptySelection")}</Callout></div>
-            : <><ExplorerTable caption={`${chartLabel} · ${unitLabel} · ${model.range.start}–${model.range.end}`} rows={rows} totalRow={null} showTotal={false} wrapRowLabels rowLabelsLocalized years={model.years} firstColumnLabel={t("series")} unit={unit} share={false} showChangeColumn={false} shareValueForYear={() => null}
-              breakYears={model.breaks.map(item => item.year)} breakLabel={newCounting} crawlCopy={state.mode === "line"} />{state.mode === "line" ? <div className="mt-5">{chart}</div> : null}</>}
+            : state.mode === "line" ? <div className="mt-5">{chart}</div>
+            : <ExplorerTable caption={`${chartLabel} · ${unitLabel} · ${model.range.start}–${model.range.end}`} rows={rows} totalRow={null} showTotal={false} wrapRowLabels rowLabelsLocalized years={model.years} firstColumnLabel={t("series")} unit={unit} share={false} showChangeColumn={false} shareValueForYear={() => null}
+              breakYears={model.breaks.map(item => item.year)} breakLabel={newCounting} />}
           <ChartSelectionAids series={lineSeries} chartShown={state.mode === "line"} share={false} unit={unit} formatValue={valueLabel} />
           <RangeStrip years={socialPlaceCoverage(set, place.id, shown, state.selectedIds).years} range={model.range}
             onChange={patch => update(s => ({ ...s, range: rangeFromPatch(buildSocialPlaceModel(set, place.id, shown, s, breaks).range, patch) }))} />
@@ -144,5 +151,6 @@ export function SocialPlaceExplorer({
             sources, populationSources, cpiSources, gdpSources: [], siteOrigin, title: `${title} ${placeName}`,
           }, presentation));
         }} />} />} />
+    <CrawlTables models={crawlModels} />
   </div>;
 }

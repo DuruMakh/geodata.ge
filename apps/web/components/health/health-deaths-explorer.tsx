@@ -1,11 +1,11 @@
 "use client";
 import Link from "next/link";
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { updatedDate } from "../../lib/explorer/coverageLabel";
 import type { ClientHealthFact, HealthArea } from "../../lib/data/health/types";
 import type { MunicipalRegion } from "../../lib/data/municipal/types";
 import { HEALTH_SECTIONS, healthSeriesCoverage } from "../../lib/explorer/health";
-import { buildHealthDeathsModel, healthDeathsAreaHref, healthDeathsAreaLatest, healthDeathsSeries, parseHealthDeathsHash, serializeHealthDeathsHash } from "../../lib/explorer/healthDeaths";
+import { buildHealthDeathsModel, healthDeathsAreaHref, healthDeathsAreaLatest, healthDeathsCrawlStates, healthDeathsSeries, parseHealthDeathsHash, serializeHealthDeathsHash } from "../../lib/explorer/healthDeaths";
 import { buildHealthWorkbookExportModel } from "../../lib/explorer/healthWorkbook";
 import { formatInUnit, type ValueUnit } from "../../lib/explorer/format";
 import { rangeFromPatch } from "../../lib/explorer/periodRange";
@@ -16,6 +16,7 @@ import { pageHref } from "../../lib/i18n/routes";
 import { ModeTabs } from "../explorer-shell/mode-tabs";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { ChartShareButton } from "../explorer-shell/chart-share-button";
+import { CrawlTables } from "../explorer-shell/crawl-tables";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { LatestValueLine } from "../explorer-shell/latest-value-line";
 import { FlatSeriesPanel } from "../explorer-shell/flat-series-panel";
@@ -63,6 +64,9 @@ export function HealthDeathsExplorer({ area, areas, facts, labels, areaLabels, s
   const areaName = areaLabels[area];
   const title = t("page.area.regionTitle", { region: areaName });
   const chartLabel = `${t("page.causes-of-death.title")} · ${areaName}`;
+  // All deaths and every cause over the area's years, for the hidden crawl table: built from the props alone, so a click never rebuilds it.
+  const crawlModels = useMemo(() => healthDeathsCrawlStates(area, facts).map(crawl =>
+    buildHealthWorkbookExportModel({ section: "causes-of-death", area, facts, state: crawl, labels, sources, siteOrigin, title }, presentation)), [area, facts, labels, sources, siteOrigin, title, presentation]);
   const index = areas.findIndex(item => item.id === area);
   const neighbours = { previous: areas[(index - 1 + areas.length) % areas.length]!, next: areas[(index + 1) % areas.length]! };
   const coverage = healthSeriesCoverage(facts, area, healthDeathsSeries(), `No causes-of-death years for ${area}`);
@@ -86,7 +90,8 @@ export function HealthDeathsExplorer({ area, areas, facts, labels, areaLabels, s
             <span className="text-[11px] text-[var(--muted)]">{unitLabel}</span>
           </div>
           {!model.selected.length ? <div className="mt-5"><Callout testId="no-selection-callout">{t("emptySelection")}</Callout></div>
-            : <><ExplorerTable caption={`${chartLabel} · ${unitLabel} · ${model.range.start}–${model.range.end}`} rows={rows.filter(row => row !== total)} totalRow={total} showTotal={Boolean(total)} totalFirst wrapRowLabels rowLabelsLocalized years={model.years} firstColumnLabel={t("series")} unit={UNIT} share={false} showChangeColumn={false} shareValueForYear={() => null} crawlCopy={state.mode === "line"} />{state.mode === "line" ? <div className="mt-5">{chart}</div> : null}</>}
+            : state.mode === "line" ? <div className="mt-5">{chart}</div>
+            : <ExplorerTable caption={`${chartLabel} · ${unitLabel} · ${model.range.start}–${model.range.end}`} rows={rows.filter(row => row !== total)} totalRow={total} showTotal={Boolean(total)} totalFirst wrapRowLabels rowLabelsLocalized years={model.years} firstColumnLabel={t("series")} unit={UNIT} share={false} showChangeColumn={false} shareValueForYear={() => null} />}
           <ChartSelectionAids series={lineSeries} chartShown={state.mode === "line"} share={false} unit={UNIT} formatValue={valueLabel} />
           <RangeStrip years={coverage.years} range={model.range} onChange={patch => update(s => ({ ...s, range: rangeFromPatch(buildHealthDeathsModel(area, facts, s).range, patch) }))} />
         </section>
@@ -102,5 +107,6 @@ export function HealthDeathsExplorer({ area, areas, facts, labels, areaLabels, s
           await downloadWorkbook(buildHealthWorkbookExportModel({ section: "causes-of-death", area, facts, state, labels, sources, siteOrigin, title }, presentation));
         }} />} />
     </ExplorerWorkspace>
+    <CrawlTables models={crawlModels} />
   </div>;
 }

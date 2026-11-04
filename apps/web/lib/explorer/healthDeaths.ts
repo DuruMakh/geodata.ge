@@ -2,6 +2,7 @@ import { HEALTH_AREAS, HEALTH_INDICATORS, type ClientHealthFact, type HealthArea
 import { HEALTH_SECTIONS, buildHealthSeriesModel, healthSeriesCoverage, type HealthSeriesModel } from "./health";
 import type { ResolvedPeriodRange } from "./periodRange";
 import { parseTopicHash, serializeTopicHash, type TopicState } from "./topicSeries";
+import { unitListCrawlStates } from "./unitList";
 
 /** Georgia and the eleven regions each have a causes-of-death page; Abkhazia is never served. */
 export const HEALTH_DEATH_AREAS = HEALTH_AREAS;
@@ -31,6 +32,10 @@ export function defaultHealthDeathsState(): HealthDeathsState {
 }
 
 const coverage = (area: HealthArea, facts: readonly ClientHealthFact[]) => healthSeriesCoverage(facts, area, healthDeathsSeries(), `No causes-of-death years for ${area}`);
+
+/** The hidden crawl tables' state (lib/explorer/crawlTables.ts): all deaths and every cause the area has, over every year; none for an area without deaths. */
+export const healthDeathsCrawlStates = (area: HealthArea, facts: readonly ClientHealthFact[]): HealthDeathsState[] =>
+  unitListCrawlStates(healthDeathsSeries(), facts.filter(f => f.areaId === area));
 
 /** Reads an area page's hash. An id the page does not have (a link from another page) is dropped; none left falls back to All deaths, but an empty `sel=` stays empty. */
 export function parseHealthDeathsHash(hash: string, area: HealthArea, facts: readonly ClientHealthFact[]): HealthDeathsState {

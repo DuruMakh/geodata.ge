@@ -9,7 +9,7 @@ import { educationFullLabel } from "../../lib/explorer/education";
 import { formatInUnit, type ValueUnit } from "../../lib/explorer/format";
 import { rangeFromPatch } from "../../lib/explorer/periodRange";
 import {
-  buildSocialModel, changeSocialSelection, changeSocialView, isSocialTotal, parseSocialHash, serializeSocialHash, socialCoverage, socialTopicList, socialViews,
+  buildSocialModel, changeSocialSelection, changeSocialView, isSocialTotal, parseSocialHash, serializeSocialHash, socialCoverage, socialCrawlStates, socialTopicList, socialViews,
   type SocialPayView, type SocialState, type SocialTopicId,
 } from "../../lib/explorer/social";
 import { buildSocialWorkbookExportModel, SOCIAL_UNIT_KEYS } from "../../lib/explorer/socialWorkbook";
@@ -20,6 +20,7 @@ import { pageHref } from "../../lib/i18n/routes";
 import { ExcelDownloadButton } from "../explorer/excel-download-button";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { ChartShareButton } from "../explorer-shell/chart-share-button";
+import { CrawlTables } from "../explorer-shell/crawl-tables";
 import { ExplorerHeading } from "../explorer-shell/explorer-heading";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { FlatSeriesPanel } from "../explorer-shell/flat-series-panel";
@@ -85,6 +86,10 @@ export function SocialExplorer({ section, facts, gdpFacts, gdpSources, breaks, l
   const total = rows.find(row => row.itemId === reference?.id) ?? null;
   const title = t(`page.${section}.title`);
   const chartLabel = `${title} · ${headingLabels[model.heading]}`;
+  // Every heading of each view (money also as % of GDP) over its years, for the hidden crawl tables: built from the props alone, so a click never rebuilds them.
+  const crawlModels = useMemo(() => socialCrawlStates(section, facts, gdpFacts).map(crawl => buildSocialWorkbookExportModel({
+    section, facts, state: crawl, gdpFacts, labels, headingLabels, sources, populationSources: [], cpiSources: [], gdpSources, siteOrigin, title,
+  }, presentation)), [section, facts, gdpFacts, labels, headingLabels, sources, gdpSources, siteOrigin, title, presentation]);
   const newCounting = t("break.newCounting");
   const views = socialViews(section, model.heading);
   // % of GDP divides by the debt page's GDP: the source line names it and its preliminary years, as on Money and banks.
@@ -116,10 +121,11 @@ export function SocialExplorer({ section, facts, gdpFacts, gdpSources, breaks, l
             </div>
           </div>
           {!model.selected.length ? <div className="mt-5"><Callout testId="no-selection-callout">{t("emptySelection")}</Callout></div>
-            : <><ExplorerTable caption={`${chartLabel} · ${unitLabel} · ${model.range.start}–${model.range.end}`} rows={rows.filter(row => row !== total)} totalRow={total} showTotal={Boolean(total)} totalFirst wrapRowLabels rowLabelsLocalized years={model.years} firstColumnLabel={t("series")} unit={unit} share={gdpView} showChangeColumn={false}
+            : state.mode === "line" ? <div className="mt-5">{chart}</div>
+            : <ExplorerTable caption={`${chartLabel} · ${unitLabel} · ${model.range.start}–${model.range.end}`} rows={rows.filter(row => row !== total)} totalRow={total} showTotal={Boolean(total)} totalFirst wrapRowLabels rowLabelsLocalized years={model.years} firstColumnLabel={t("series")} unit={unit} share={gdpView} showChangeColumn={false}
               // % of GDP cells print as Money and banks prints them, "5.90%".
               shareValueForYear={(row, year) => { const value = row.valuesByYear[year]; return value == null ? null : value / 100; }} shareDecimalsForRow={() => lead.decimals}
-              breakYears={model.breaks.map(item => item.year)} breakLabel={newCounting} crawlCopy={state.mode === "line"} />{state.mode === "line" ? <div className="mt-5">{chart}</div> : null}</>}
+              breakYears={model.breaks.map(item => item.year)} breakLabel={newCounting} />}
           <ChartSelectionAids series={lineSeries} chartShown={state.mode === "line"} share={gdpView} unit={unit} formatValue={valueLabel} />
           <RangeStrip years={socialCoverage(section, state.view, facts, gdpFacts, state.selectedIds).years} range={model.range}
             onChange={patch => update(s => ({ ...s, range: rangeFromPatch(buildSocialModel(section, facts, s, { breaks, gdpFacts }).range, patch) }))} />
@@ -141,5 +147,6 @@ export function SocialExplorer({ section, facts, gdpFacts, gdpSources, breaks, l
         totalId={reference?.id} pinTotal selectedIds={state.selectedIds} onSelectionChange={selectedIds => update(s => changeSocialSelection(s, section, selectedIds, facts, gdpFacts), true)}
         query={query} onQueryChange={setQuery} searchPlaceholder={t("search")} searchable />
     </ExplorerWorkspace>
+    <CrawlTables models={crawlModels} />
   </div>;
 }

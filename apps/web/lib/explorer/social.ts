@@ -8,7 +8,7 @@ import { placeIdForMunicipalityCode } from "./demographyAreas";
 import { HEALTH_HUB_PATH } from "./health";
 import { refitRange, resolveRange, type ResolvedPeriodRange } from "./periodRange";
 import { buildTopicModel, serializeTopicHash, topicHashView, topicSeriesColor, type TopicCoverage, type TopicSeriesModel, type TopicState } from "./topicSeries";
-import { changeUnitListSelection, listLatestByHeading, parseUnitListHash, unitListCoverage } from "./unitList";
+import { changeUnitListSelection, listLatestByHeading, parseUnitListHash, unitListCoverage, unitListCrawlStates } from "./unitList";
 
 /** The five pages sit on the Health and social protection hub, after its Health sections. */
 export const SOCIAL_SECTIONS = [
@@ -234,6 +234,17 @@ export function defaultSocialState(section: SocialTopicId): SocialState {
 export function socialCoverage(section: SocialTopicId, view: SocialPayView, facts: readonly ClientSocialFact[], gdpFacts: readonly ClientNationalGdpFact[], selectedIds: readonly string[] = []): TopicCoverage {
   const definitions = socialTopicSeries(section);
   return unitListCoverage(definitions, selectedIds, socialTopicFacts(section, view, facts, gdpFacts), noSocialYears(section), socialHeadingOf(definitions));
+}
+
+/**
+ * The hidden crawl tables' states (lib/explorer/crawlTables.ts): each heading of each view, every row of it with facts, over
+ * every year. The % of GDP view is kept, as the page lists no GDP, for the headings that have it; without GDP facts it has none.
+ */
+export function socialCrawlStates(section: SocialTopicId, facts: readonly ClientSocialFact[], gdpFacts: readonly ClientNationalGdpFact[]): SocialState[] {
+  const definitions = socialTopicSeries(section), headingOf = socialHeadingOf(definitions);
+  return socialViews(section).filter(view => view === "amount" || gdpFacts.length > 0).flatMap(view =>
+    unitListCrawlStates(definitions, socialTopicFacts(section, view, facts, gdpFacts), headingOf)
+      .filter(state => socialViews(section, headingOf(state.selectedIds[0]) as SocialHeading).includes(view)).map(state => ({ ...state, view })));
 }
 
 /** Reads a topic page's hash: `tab` names Social payments' view; a selection that mixes headings keeps its first row's heading, and the years fit it. */

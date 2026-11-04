@@ -46,6 +46,13 @@ export function povertyCoverage(section: PovertySectionId, view: PovertyView, fa
   return topicCoverage(facts.filter(f => ids.has(seriesId(f.indicatorId, f.groupId))).map(f => f.year), `No poverty years for ${section}:${view}`);
 }
 
+/** The hidden crawl tables' states (lib/explorer/crawlTables.ts): each tab, every series its list offers, over every year; a tab without facts has none. */
+export function povertyCrawlStates(section: PovertySectionId, facts: readonly ClientPovertyFact[]): PovertyState[] {
+  const listed = new Set(facts.map(f => seriesId(f.indicatorId, f.groupId)));
+  return povertyViews(section).map(view => ({ view, ids: povertyViewSeries(section, view).map(s => s.id) })).filter(({ ids }) => ids.some(id => listed.has(id)))
+    .map(({ view, ids }) => ({ mode: "line", range: { kind: "all" }, view, selectedIds: ids }));
+}
+
 export function defaultPovertyState(section: PovertySectionId): PovertyState {
   const view = povertyViews(section)[0];
   return { mode: "line", range: { kind: "all" }, view, selectedIds: [povertyViewSeries(section, view)[0].id] };
