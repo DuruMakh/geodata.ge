@@ -1,5 +1,3 @@
-import { readFile } from "node:fs/promises";
-import { fileURLToPath } from "node:url";
 import { afterEach, describe, expect, it, test, vi } from "vitest";
 import sitemap from "../../lib/seo/sitemap";
 import { MUNICIPALITY_ROUTES } from "../../lib/explorer/municipalityRoutes";
@@ -39,8 +37,8 @@ import { pageHref, splitLanguagePath } from "../../lib/i18n/routes";
 import { ALL_DATA_PATH, currentEntry, currentGroup, isActivePath, LEGACY_TOPIC_FORWARDS, NAV_GROUPS, NAV_TREE, openHub } from "../../lib/navigation/navTree";
 import { inflationProductsMetadata } from "../../lib/pages/inflation-products";
 import { municipalEntityHref } from "../../lib/seo/internalLinks";
+import { llmsText } from "../../lib/seo/llmsText";
 
-const llmsPath = fileURLToPath(new URL("../../public/llms.txt", import.meta.url));
 const originalEnv = { ...process.env };
 
 afterEach(() => {
@@ -444,7 +442,7 @@ describe("product inflation discovery", () => {
 describe("Fiscal.ge agent instructions", () => {
   it("links only to public sitemap pages and the sitemap document", async () => {
     process.env.NEXT_PUBLIC_SITE_URL = "https://fiscal.ge";
-    const content = await readFile(llmsPath, "utf8");
+    const content = await llmsText();
     const targets = [...content.matchAll(/\]\((https:\/\/fiscal\.ge\/[^)]*)\)/g)].map((match) => match[1]!);
     // Downloads are published files, not pages: they are deliberately absent
     // from the sitemap, which lists public HTML routes. Spec section 16 said
@@ -462,7 +460,7 @@ describe("Fiscal.ge agent instructions", () => {
 
   it("llms.txt names every hub, section and methodology route in the sitemap", async () => {
     process.env.NEXT_PUBLIC_SITE_URL = "https://fiscal.ge";
-    const content = await readFile(llmsPath, "utf8");
+    const content = await llmsText();
     const linked = new Set([...content.matchAll(/\]\((https:\/\/fiscal\.ge\/[^)]*)\)/g)].map((match) => new URL(match[1]!).pathname));
     // Georgia and the 64 municipalities are places inside Municipal budgets, at
     // the same depth as a section; the deeper place pages (regions, cities)
