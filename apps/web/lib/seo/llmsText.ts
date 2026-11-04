@@ -1,4 +1,7 @@
+import { MANIFEST_SIDE_FILE_NAMES } from "../data/publicDatasetExports";
+import { buildAllPublications, catalogueData } from "../factQuery/publications";
 import { SCHEMA_VERSION } from "../factQuery/types";
+import { loadPackagedSnapshot } from "../mcp/snapshot";
 import { TOOLS } from "../mcp/tools";
 import type { CardLatest } from "../explorer/topicHub";
 import { NAV_GROUPS } from "../navigation/navTree";
@@ -17,16 +20,29 @@ const OPENING = `# Fiscal.ge
 
 > Fiscal.ge is a Georgian and English guide to reviewed annual data on Georgia's state and municipal budgets, GDP, national economic sectors, regional economies, business, money and banks, unemployment, wages, poverty and inequality, education, science and culture, trade in goods and services, external flows, energy and food, the environment and climate, and population, and to Geostat's monthly consumer-price inflation.
 
-**When to use Fiscal.ge:** Use it to understand, compare, and cite the published budget data, its scope, and its documented sources.
+**When to use Fiscal.ge:** Use it to look up, compare and cite the latest and historical figures for any topic below.
 
-Budget and GDP data are annual; inflation is the one monthly dataset. There is no REST query API, no write access, no accounts, and no datasets beyond those listed here.
+Most data are annual; inflation is monthly. There is no REST query API, no write access, no accounts, and no datasets beyond those listed here.
 
-**How to answer from Fiscal.ge:** Give the number first: the figure, its year or month, its unit and the link to its page. Add at most one short caveat, and only when it changes what the number means — a planned budget, a projection, a preliminary figure, or a series break inside the years compared. Do not explain methodology unless the user asks; link the page's methodology instead. Every chart page carries its full year-by-year table, every series, in its HTML. Use the published figures as they are, and do not invent values for years or places that are not covered.
+**How to answer from Fiscal.ge:** Give the number first: the figure, its year or month, its unit and the link to its page. Add at most one short caveat, and only when it changes what the number means — a planned budget, a projection, a preliminary figure, or a series break inside the years compared. Do not explain methodology unless the user asks; link the page's methodology instead. Every chart page carries its year-by-year table, every series, in its HTML (the largest pages carry their leading series; all of them are in the page's Excel download). Use the published figures as they are, and do not invent values for years or places that are not covered.`;
 
-**Where the data is:**
-- Every topic's figures are on its chart pages below; each line opens with the page's latest figure.
-- Bulk files under \`${SITE}/downloads/data/\`: \`national-expenditure.csv\`, \`national-revenue.csv\`, \`municipal-expenditure.csv\`, \`government-debt.json\`, \`general-government-balance.json\`, \`gdp-overview.json\`, \`economic-sectors.json\`, \`regional-economies.json\`, \`inflation-cpi-national.csv\`, \`inflation-national.json\`, \`inflation-categories.csv\`, \`inflation-cities.csv\`, \`inflation-products.csv\`, \`unemployment.csv\`, \`wages.csv\`, \`social-protection.csv\` and \`population.csv\`; \`manifest.json\` lists each with its hash.
-- The read-only MCP connection at \`${SITE}/mcp\` serves national expenditure and revenue, ministries, municipal budgets, government debt, the deficit, GDP, economic sectors, regional economies, inflation and inflation products.`;
+/**
+ * The three "Where the data is" lines. The bulk-file count is the manifest's (the publications built from the snapshot
+ * plus the topic CSVs), and the MCP datasets are the catalogue's, so neither list drifts from what is published.
+ */
+let where: string | undefined;
+
+function whereTheDataIs(): string {
+  if (where !== undefined) return where;
+  const snapshot = loadPackagedSnapshot();
+  const bulkFiles = buildAllPublications(snapshot).filter((file) => file.fileName !== "manifest.json").length + MANIFEST_SIDE_FILE_NAMES.length;
+  const datasets = catalogueData(snapshot).datasets.map((dataset) => dataset.labelEn);
+  where = `**Where the data is:**
+- Every topic's figures are on its chart pages below; each chart page's line opens with its latest figure where the page has one.
+- Bulk files: \`${SITE}/downloads/data/manifest.json\` lists all ${bulkFiles} bulk files (CSV and JSON) with their hashes.
+- The read-only MCP connection at \`${SITE}/mcp\` serves ${datasets.slice(0, -1).join(", ")} and ${datasets.at(-1)}.`;
+  return where;
+}
 
 /** The page lines, grouped as the guide prints them: a blank line between groups. */
 const CORE_DATA: LlmsLine[][] = [
@@ -46,7 +62,7 @@ const CORE_DATA: LlmsLine[][] = [
   [
     { href: "/explorer/economy", name: "Economy and business", text: "group page." },
     { href: "/explorer/economy#t-economy", name: "Economy", text: "" },
-    { href: "/explorer/economy/gdp", name: "Economy overview", text: "real and nominal GDP, growth and GDP per person." },
+    { href: "/explorer/economy/gdp", name: "Economy overview", text: "real GDP in constant 2015 USD; nominal GDP in GEL and USD, real growth and GDP per person." },
     { href: "/explorer/economy/sectors", name: "Economic sectors", text: "20 national economic activities plus a Total GDP reference." },
     { href: "/explorer/economy/expenditure", name: "GDP by expenditure", text: "consumption, investment, exports and imports, 2010–2025." },
     { href: "/explorer/economy/regions", name: "Regional economies", text: "11 regions' GDP and 20 activities, 2010–2024." },
@@ -55,7 +71,7 @@ const CORE_DATA: LlmsLine[][] = [
     { href: "/explorer/business/jobs", name: "Jobs", text: "persons employed in firms, 1999–2025." },
     { href: "/explorer/business/investment-profit", name: "Investment and profit", text: "investment, profit and loss, 2006–2025." },
     { href: "/explorer/business/firms", name: "Firms opened and closed", text: "active, new and closed firms, 2014–2024." },
-    { href: "/explorer/business/regions", name: "Business by region", text: "11 regions from 2006." },
+    { href: "/explorer/business/regions", name: "Business by region", text: "11 regions." },
     { href: "/explorer/economy#t-housing", name: "Housing and construction", text: "permits and completed buildings, 2006–2025, and home prices." },
     { href: "/explorer/housing/permits", name: "Building permits", text: "by number and floor area, 2006–2025." },
     { href: "/explorer/housing/completed", name: "Completed buildings", text: "by number and floor area, 2006–2025." },
@@ -70,7 +86,7 @@ const CORE_DATA: LlmsLine[][] = [
     { href: "/explorer/prices#t-money", name: "Money and banks", text: "money, loans, deposits, rates and bank health, 1995–2025." },
     { href: "/explorer/money/supply", name: "Money supply", text: "M0–M3 in million GEL from 1995, and all four as a share of GDP from 1996." },
     { href: "/explorer/money/loans-deposits", name: "Loans and deposits", text: "covers bank loans from 2002 and deposits from 1996, deposits of people from 2002 and of companies and organisations from 2015." },
-    { href: "/explorer/money/borrowers", name: "Who borrows", text: "loans by borrower and purpose from 2003, billion GEL." },
+    { href: "/explorer/money/borrowers", name: "Who borrows", text: "loans by borrower and industry from 2003, household borrowing from 2015, billion GEL." },
     { href: "/explorer/money/regions", name: "Loans by region", text: "11 regions, 2015–2025." },
     { href: "/explorer/money/interest-rates", name: "Interest rates", text: "the policy rate from 2008; rates on loans and on deposits from 1996." },
     { href: "/explorer/money/bank-health", name: "Bank health", text: "covers bad loans as a share of all loans from 2003, return on assets and on equity from 2001, the two capital ratios from 2014." },
@@ -78,7 +94,7 @@ const CORE_DATA: LlmsLine[][] = [
     { href: "/explorer/labour#t-unemployment", name: "Unemployment", text: "Labour Force Survey, 2010–2025. Bulk file: [Unemployment CSV](https://fiscal.ge/downloads/data/unemployment.csv) for the overview, regions, age and gender pages." },
     { href: "/explorer/unemployment/overview", name: "Unemployment overview", text: "unemployment, employment and participation rates." },
     { href: "/explorer/unemployment/regions", name: "Unemployment by region", text: "11 regions." },
-    { href: "/explorer/unemployment/age", name: "Unemployment by age", text: "age groups from 2020." },
+    { href: "/explorer/unemployment/age", name: "Unemployment by age", text: "age groups." },
     { href: "/explorer/unemployment/gender", name: "Unemployment by gender", text: "women and men." },
     { href: "/explorer/unemployment/industries", name: "Jobs by industry", text: "jobs by industry, 2017–2025; women and men from 2020." },
     { href: "/explorer/unemployment/hours", name: "Hours worked", text: "usual weekly hours, 2020–2025." },
@@ -86,8 +102,8 @@ const CORE_DATA: LlmsLine[][] = [
     { href: "/explorer/unemployment/young-people", name: "Young people not in work or study", text: "NEET shares, 2020–2025." },
     { href: "/explorer/labour#t-wages", name: "Wages", text: "gross monthly earnings in GEL. Bulk file: [Wages CSV](https://fiscal.ge/downloads/data/wages.csv)." },
     { href: "/explorer/wages/overview", name: "Wages overview", text: "average wage from 1995, median from 2018." },
-    { href: "/explorer/wages/industries", name: "Wages by industry", text: "19 NACE sections from 2014." },
-    { href: "/explorer/wages/regions", name: "Wages by region", text: "11 regions from 2010." },
+    { href: "/explorer/wages/industries", name: "Wages by industry", text: "19 NACE sections." },
+    { href: "/explorer/wages/regions", name: "Wages by region", text: "11 regions." },
     { href: "/explorer/living", name: "Living standards and health", text: "group page." },
     { href: "/explorer/living#t-living-standards", name: "Living standards", text: "household income and spending from 2002, poverty rates from 2004, inequality from 2006." },
     { href: "/explorer/living-standards/income", name: "Household income", text: "monthly household income by source." },
@@ -127,24 +143,24 @@ const CORE_DATA: LlmsLine[][] = [
     { href: "/explorer/internet/devices", name: "Phones and computers", text: "mobile phone, smartphone (from 2019) and computer use, 2016–2026." },
     { href: "/explorer/external", name: "External sector", text: "group page." },
     { href: "/explorer/external#t-trade", name: "Trade", text: "" },
-    { href: "/explorer/trade/overview", name: "Trade overview", text: "exports, imports and balance, 1995–2025." },
-    { href: "/explorer/trade/partners", name: "Trading partners", text: "212 countries and five groups, 1995–2025." },
+    { href: "/explorer/trade/overview", name: "Trade overview", text: "total trade (exports plus imports); exports, imports and balance, 1995–2025." },
+    { href: "/explorer/trade/partners", name: "Trading partners", text: "largest partner by total trade; 212 countries and five groups, 1995–2025." },
     { href: "/explorer/trade/products", name: "Products", text: "1,192 HS4 products, 2020–2025." },
     { href: "/explorer/trade/domestic-exports", name: "Domestic exports", text: "domestic exports and re-exports, 2014–2025." },
-    { href: "/explorer/trade/services", name: "Services trade", text: "12 service types, 2020–2024." },
+    { href: "/explorer/trade/services", name: "Services trade", text: "total services trade (exports plus imports); 12 service types, 2020–2024." },
     { href: "/explorer/trade/composition", name: "Trade composition", text: "SITC and BEC groups, 2000–2025." },
     { href: "/explorer/external#t-external", name: "External flows", text: "" },
-    { href: "/explorer/external/money-from-abroad", name: "Money from abroad", text: "transfers received and sent, 2000–2025." },
+    { href: "/explorer/external/money-from-abroad", name: "Money from abroad", text: "money received from abroad; transfers received and sent, 2000–2025." },
     { href: "/explorer/external/foreign-investment", name: "Foreign investment", text: "FDI by country (1996–2025), sector (2016–2025) and region (2009–2025)." },
     { href: "/explorer/external/current-account", name: "Current account", text: "four parts, 2000–2025, USD or share of GDP." },
     { href: "/explorer/external/foreign-debt", name: "Foreign debt", text: "by debtor, 2006–2026, USD or share of GDP." },
     { href: "/explorer/external/reserves", name: "Reserves", text: "1995–2026, USD or share of GDP." },
     { href: "/explorer/society#t-energy-food", name: "Energy and food", text: "energy balance, 2013–2024; food self-sufficiency, 2014–2025; farming, 2006–2025." },
     { href: "/explorer/energy-food/energy-supply", name: "Energy supply", text: "supply by fuel, production and trade." },
-    { href: "/explorer/energy-food/electricity", name: "Electricity", text: "production, trade and use." },
+    { href: "/explorer/energy-food/electricity", name: "Electricity", text: "electricity produced; production, trade and use." },
     { href: "/explorer/energy-food/energy-use", name: "Energy use", text: "final consumption by user and fuel." },
     { href: "/explorer/energy-food/food-self-sufficiency", name: "Food self-sufficiency", text: "twelve foods, percent." },
-    { href: "/explorer/energy-food/farming", name: "Farming", text: "output, harvests, livestock and prices, 2006–2025." },
+    { href: "/explorer/energy-food/farming", name: "Farming", text: "farm output from 2010, harvests and livestock, 2006–2025, prices from 2014." },
     { href: "/explorer/society#t-environment", name: "Environment and climate", text: "" },
     { href: "/explorer/environment/greenhouse-gases", name: "Greenhouse gases", text: "total, by sector and gas, 2000–2022." },
     { href: "/explorer/environment/air-pollution", name: "Air pollution", text: "eight pollutants, thousand tonnes, 2013–2024." },
@@ -154,7 +170,7 @@ const CORE_DATA: LlmsLine[][] = [
     { href: "/explorer/environment/waste", name: "Waste", text: "thousand tonnes, by region, 2015–2024." },
     { href: "/explorer/environment/forests", name: "Forests", text: "timber cut and illegal logging, m³, 2010–2024." },
     { href: "/explorer/society#t-transport", name: "Transport", text: "road vehicle fleet, 2000–2025; passengers, freight and regions." },
-    { href: "/explorer/transport/vehicles", name: "Vehicles", text: "fleet by type and fuel, thousands, 2000–2025." },
+    { href: "/explorer/transport/vehicles", name: "Vehicles", text: "fleet by type, thousands, 2000–2025; by fuel from 2017." },
     { href: "/explorer/transport/vehicle-age", name: "Vehicle age", text: "by age, thousands, 2017–2025." },
     { href: "/explorer/transport/passengers", name: "Passengers", text: "passenger-km and passengers, 2000–2025." },
     { href: "/explorer/transport/freight", name: "Freight", text: "tonne-km and goods carried, 2000–2025." },
@@ -162,8 +178,8 @@ const CORE_DATA: LlmsLine[][] = [
     { href: "/explorer/demography", name: "Demography", text: "group page." },
     { href: "/explorer/demography/population", name: "Population", text: "on 1 January: Georgia, 2004–2026; regions and municipalities, 2015–2026. Bulk file: [Population CSV](https://fiscal.ge/downloads/data/population.csv)." },
     { href: "/explorer/demography/migration", name: "Migration", text: "by sex and citizenship, 2012–2025." },
-    { href: "/explorer/demography/births-deaths", name: "Births, deaths and fertility", text: "births, deaths, fertility and life expectancy, 2014–2025." },
-    { href: "/explorer/demography/marriages-divorces", name: "Marriages and divorces", text: "counts or per 1,000 residents, 1994–2025." },
+    { href: "/explorer/demography/births-deaths", name: "Births, deaths and fertility", text: "births and deaths, Georgia 2014–2025, regions and municipalities 2015–2025; fertility and life expectancy." },
+    { href: "/explorer/demography/marriages-divorces", name: "Marriages and divorces", text: "counts or per 1,000 residents, Georgia 1994–2025, regions and municipalities 2009–2025." },
     { href: "/explorer/demography/age-sex", name: "Age and sex", text: "population pyramid, 2004–2026." },
   ],
 ];
@@ -237,17 +253,27 @@ const SITE_NAVIGATION: LlmsLine[][] = [
 
 const AI_CONNECTION = `The endpoint \`${SITE}/mcp\` is a read-only, unauthenticated MCP server. Call describe_coverage first with one keyword: it returns the ids, measures and year or month ranges. Its current read-only tools are ${TOOLS.map((tool) => tool.name).join(", ")}; tools/list is authoritative. Clients must accept additive fields and data schema ${SCHEMA_VERSION}. Setup: [Connect an AI assistant](${SITE}/connect), [in English](${SITE}/en/connect).`;
 
-/** `latest: <value>, <caption> (<period>, preliminary). `: the card's figure as its footer prints it. */
-function latestText(latest: CardLatest): string {
-  const value = latest.caption ? `${latest.value}, ${latest.caption}` : latest.value;
-  const period = latest.status === "preliminary" ? `${latest.period}, preliminary` : latest.period;
-  return `latest: ${value} (${period}). `;
+/**
+ * `latest: <figure> (<period>). `: the card's figure as its footer prints it. A caption that starts in lower case
+ * completes the value (`−1.5% of GDP`); any other names it (`Refunds: 2.7 bn GEL`). A dated point's `2026 (Jun)` reads
+ * `Jun 2026`, and a preliminary figure says so after its period.
+ */
+export function latestText(latest: CardLatest): string {
+  const { value, caption } = latest;
+  const figure = !caption ? value : /^\p{Ll}/u.test(caption) ? `${value} ${caption}` : `${caption}: ${value}`;
+  const period = latest.period.replace(/^(\d{4}) \((.+)\)$/, "$2 $1");
+  return `latest: ${figure} (${latest.status === "preliminary" ? `${period}, preliminary` : period}). `;
 }
 
-function renderLines(groups: LlmsLine[][], latest: Map<string, CardLatest> = new Map()): string {
+/** A card's figure, or, for a card without one, the years it covers. */
+type CardSummary = { latest?: CardLatest | null; years?: string };
+
+/** A line whose card has a figure opens with it; one whose card has none opens with the card's years unless its text states them. */
+function renderLines(groups: LlmsLine[][], cards: Map<string, CardSummary> = new Map()): string {
   return groups.map((lines) => lines.map(({ href, name, text }) => {
-    const figure = latest.get(href);
-    const description = figure ? `${latestText(figure)}${text.charAt(0).toUpperCase()}${text.slice(1)}` : text;
+    const card = cards.get(href);
+    const lead = card?.latest ? latestText(card.latest) : card?.years && !text.includes(card.years) ? `${card.years}. ` : "";
+    const description = lead ? `${lead}${text.charAt(0).toUpperCase()}${text.slice(1)}` : text;
     return `- [${name}](${SITE}${href})${description ? ` — ${description}` : ""}`;
   }).join("\n")).join("\n\n");
 }
@@ -255,15 +281,17 @@ function renderLines(groups: LlmsLine[][], latest: Map<string, CardLatest> = new
 /** The guide served at /llms.txt, with each page's latest figure from its group-page card (English). */
 export async function llmsText(): Promise<string> {
   const hubs = await loadTopicHubs("en", NAV_GROUPS.flatMap((group) => group.topics));
-  const latest = new Map<string, CardLatest>();
+  const cards = new Map<string, CardSummary>();
   for (const card of hubs.flatMap((hub) => hub.cards)) {
-    if (card.href !== null && card.latest) latest.set(card.href, card.latest);
+    if (card.href !== null) cards.set(card.href, card);
   }
   return `${OPENING}
 
+${whereTheDataIs()}
+
 ## Core data
 
-${renderLines(CORE_DATA, latest)}
+${renderLines(CORE_DATA, cards)}
 
 ## Methodology and sources
 

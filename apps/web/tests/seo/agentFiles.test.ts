@@ -5,7 +5,8 @@ import { parse } from "csv-parse/sync";
 import { describe, expect, it } from "vitest";
 import { TOOLS } from "../../lib/mcp/tools";
 import { loadPackagedSnapshot } from "../../lib/mcp/snapshot";
-import { catalogueData } from "../../lib/factQuery/publications";
+import { buildAllPublications, catalogueData } from "../../lib/factQuery/publications";
+import { MANIFEST_SIDE_FILE_NAMES } from "../../lib/data/publicDatasetExports";
 import { SCHEMA_VERSION } from "../../lib/factQuery/types";
 import { schoolYearLabel } from "../../lib/explorer/education";
 import { NAV_GROUPS } from "../../lib/navigation/navTree";
@@ -245,15 +246,12 @@ describe("Fiscal.ge agent instructions", () => {
     expect(content).not.toMatch(/Browse-only|no MCP tool|no bulk file/);
     const where = content.slice(content.indexOf("**Where the data is:**"), content.indexOf("## Core data"));
     expect(where.split(/\r?\n/).filter((line) => line.startsWith("- "))).toHaveLength(3);
-    for (const file of [
-      "national-expenditure.csv", "national-revenue.csv", "municipal-expenditure.csv", "government-debt.json", "general-government-balance.json",
-      "gdp-overview.json", "economic-sectors.json", "regional-economies.json", "inflation-cpi-national.csv", "inflation-national.json",
-      "inflation-categories.csv", "inflation-cities.csv", "inflation-products.csv", "unemployment.csv", "wages.csv", "social-protection.csv",
-      "population.csv", "manifest.json",
-    ]) {
-      expect(where, file).toContain(`\`${file}\``);
-    }
-    expect(where).toMatch(/read-only MCP connection at `https:\/\/fiscal\.ge\/mcp`/);
+    // The manifest lists what the publications step builds (less the manifest itself) and the topic CSVs written before it.
+    const snapshot = loadPackagedSnapshot();
+    const published = buildAllPublications(snapshot).filter((file) => file.fileName !== "manifest.json").length + MANIFEST_SIDE_FILE_NAMES.length;
+    expect(where).toContain(`\`https://fiscal.ge/downloads/data/manifest.json\` lists all ${published} bulk files`);
+    const mcp = where.split(/\r?\n/).find((line) => line.startsWith("- The read-only MCP connection at `https://fiscal.ge/mcp`"));
+    for (const dataset of catalogueData(snapshot).datasets) expect(mcp, dataset.datasetId).toContain(dataset.labelEn);
   });
   it("puts the answer-first guidance before the first page link", async () => {
     const content = await llmsText();
@@ -262,17 +260,23 @@ describe("Fiscal.ge agent instructions", () => {
     expect(guidance).toBeLessThan(content.indexOf("](https://fiscal.ge/explorer"));
   });
   // The figure each line opens with is its group-page card's, so the guide follows each data release by itself.
-  it("opens every page line whose card has a latest figure with that figure", async () => {
+  it("opens every page line with its card's latest figure and period, or the card's years", async () => {
     const lines = (await llmsText()).split(/\r?\n/);
     const hubs = await loadTopicHubs("en", NAV_GROUPS.flatMap((group) => group.topics));
-    const cards = hubs.flatMap((hub) => hub.cards).filter((card) => card.href !== null && card.latest);
-    expect(cards.length).toBeGreaterThan(0);
+    const cards = hubs.flatMap((hub) => hub.cards).filter((card) => card.href !== null);
+    expect(cards.filter((card) => card.latest).length).toBeGreaterThan(0);
     for (const card of cards) {
       const link = `](https://fiscal.ge${card.href})`;
       const line = lines.find((candidate) => candidate.startsWith("- [") && candidate.includes(link));
       expect(line, card.href!).toBeDefined();
-      expect(line!.slice(line!.indexOf(link) + link.length), card.href!).toMatch(/^ — latest: /);
-      expect(line, card.href!).toContain(card.latest!.value);
+      if (card.latest) {
+        expect(line!.slice(line!.indexOf(link) + link.length), card.href!).toMatch(/^ — latest: /);
+        expect(line, card.href!).toContain(card.latest.value);
+        // A dated point's `2026 (Jun)` reads `Jun 2026`.
+        expect(line, card.href!).toContain(`(${card.latest.period.replace(/^(\d{4}) \((.+)\)$/, "$2 $1")}`);
+      } else {
+        expect(line, card.href!).toContain(card.years!);
+      }
     }
   });
   it("is at most half the size of the hand-written guide it replaced", async () => {
