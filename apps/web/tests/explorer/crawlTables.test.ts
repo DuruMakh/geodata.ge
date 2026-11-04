@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { CRAWL_CELL_CAP, crawlTables, formatCrawlCell } from "../../lib/explorer/crawlTables";
-import type { WorkbookExportModel, WorkbookReadableRow } from "../../lib/explorer/workbookModel";
+import { makePeriod } from "../../lib/data/inflation/periods";
+import { CRAWL_CELL_CAP, CRAWL_MONTH_COLUMNS, crawlTables, formatCrawlCell } from "../../lib/explorer/crawlTables";
+import { lastPeriodsRange } from "../../lib/explorer/periodRange";
+import { readableRowLabel, type WorkbookExportModel, type WorkbookReadableRow } from "../../lib/explorer/workbookModel";
 import { workbookMessage } from "../../lib/i18n/workbook";
 import en from "../../lib/i18n/messages/en/controls.json";
 
@@ -85,14 +87,41 @@ describe("crawlTables", () => {
     expect(b.rows.length).toBe(150);
   });
 
-  it("keeps the last 36 month columns", () => {
-    const y = years(60);
-    const cols = y.map((v) => `M${v}`);
+  it("keeps every column of a yearly table with header labels", () => {
+    const y = years(40);
+    const cols = y.map((v) => `${v}*`);
     const [t] = crawlTables([model({ years: y, headerLabels: { category: "c", columns: cols }, rows: [row("A", y.map((_, i) => i), y)] })], en);
-    expect(t.columns).toEqual(cols.slice(24));
-    expect(t.rows[0].cells).toHaveLength(36);
-    expect(t.rows[0].cells[35]).toBe("59.0");
-    const [short] = crawlTables([model({ years: years(30), headerLabels: { category: "c", columns: years(30).map(String) }, rows: [row("A", [], years(30))] })], en);
-    expect(short.columns).toHaveLength(30);
+    expect(t.columns).toEqual(cols);
+    expect(t.rows[0].cells).toHaveLength(40);
+    expect(t.rows[0].cells[0]).toBe("0.0");
+    expect(t.rows[0].cells[39]).toBe("39.0");
+  });
+
+  it("prints an item under a parent as the Excel Summary sheet does", () => {
+    const y = [2020];
+    const rows = [
+      row("Total", [3], y, { kind: "total", parentLabel: "Total" }),
+      row("Programme", [1], y, { parentLabel: "Ministry" }),
+      row("Alone", [2], y),
+    ];
+    const [t] = crawlTables([model({ years: y, rows })], en);
+    expect(t.rows.map((r) => r.label)).toEqual(["Total", "Ministry — Programme", "Alone"]);
+    expect(t.rows.map((r) => r.label)).toEqual(rows.map(readableRowLabel));
+  });
+});
+
+describe("lastPeriodsRange (monthly crawl window)", () => {
+  it("starts in January two years before the latest month's year", () => {
+    expect(lastPeriodsRange({ min: makePeriod(2010, 1), max: makePeriod(2026, 9) }, CRAWL_MONTH_COLUMNS))
+      .toEqual({ kind: "manual", start: makePeriod(2024, 1), end: makePeriod(2026, 9) });
+    expect(lastPeriodsRange({ min: makePeriod(2010, 1), max: makePeriod(2026, 12) }, CRAWL_MONTH_COLUMNS))
+      .toEqual({ kind: "manual", start: makePeriod(2024, 1), end: makePeriod(2026, 12) });
+    expect(lastPeriodsRange({ min: makePeriod(2010, 1), max: makePeriod(2026, 1) }, CRAWL_MONTH_COLUMNS))
+      .toEqual({ kind: "manual", start: makePeriod(2024, 1), end: makePeriod(2026, 1) });
+  });
+
+  it("never starts before the coverage", () => {
+    expect(lastPeriodsRange({ min: makePeriod(2025, 3), max: makePeriod(2026, 9) }, CRAWL_MONTH_COLUMNS))
+      .toEqual({ kind: "manual", start: makePeriod(2025, 3), end: makePeriod(2026, 9) });
   });
 });

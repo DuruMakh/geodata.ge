@@ -24,25 +24,11 @@ const sameProps = {
 
 const html = renderGeorgianMarkup(<ExplorerTable {...sameProps} />);
 
-describe("ExplorerTable crawl copy", () => {
-  const crawl = renderGeorgianMarkup(<ExplorerTable {...sameProps} crawlCopy />);
-  it("is hidden by a stylesheet class only", () => {
-    expect(crawl).toMatch(/<div class="[^"]*\bhidden\b[^"]*"/);
-    expect(crawl).not.toMatch(/\shidden(=|\s|>)/);
-    expect(crawl).not.toMatch(/<div[^>]*aria-hidden/);
-    expect(crawl).not.toMatch(/style="[^"]*display/);
-  });
-  it("keeps every figure and a test id of its own", () => {
-    expect(crawl).toContain('data-testid="explorer-table-crawl"');
-    expect(crawl).not.toContain('data-testid="explorer-table"');
-    expect(crawl).not.toContain("tabindex");
-    for (const year of ["2024", "2025"]) expect(crawl).toContain(`>${year}<`);
-  });
-  it("leaves the default render visible, focusable and under the table test id", () => {
+describe("ExplorerTable default render", () => {
+  it("is visible, focusable and under the table test id", () => {
     expect(html).not.toMatch(/<div class="[^"]*\bhidden\b/);
     expect(html).toContain('tabindex="0"');
     expect(html).toContain('data-testid="explorer-table"');
-    expect(html).not.toContain("explorer-table-crawl");
   });
 });
 

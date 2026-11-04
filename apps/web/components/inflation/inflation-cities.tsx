@@ -29,7 +29,7 @@ import { CITIES_PATH } from "../../lib/explorer/inflationCityRoutes";
 import { buildInflationCityWorkbookExportModel } from "../../lib/explorer/inflationCityWorkbook";
 import { formatInflationValue, periodLabel, monthlyChartPeriod, PCT_UNIT } from "../../lib/explorer/inflationLabels";
 import { LatestValueLine } from "../explorer-shell/latest-value-line";
-import { crawlMonthlyModel, type InflationWorkbookSource } from "../../lib/explorer/inflationWorkbook";
+import type { InflationWorkbookSource } from "../../lib/explorer/inflationWorkbook";
 import { downloadWorkbook } from "../../lib/explorer/workbookWriter.client";
 import { message } from "../../lib/i18n/messages";
 import { useI18n } from "../../lib/i18n/provider";
@@ -76,10 +76,10 @@ export function InflationCities({ view, facts, lastReviewedAt, sources, siteOrig
   const index = useMemo(() => buildCityIndex(unpackCityFacts(facts)), [facts]);
   const hashData = useMemo(() => ({ index, view }), [index, view]);
   const { state, update } = useHashState(hashData, parseCityState, serializeCityState);
-  // Every line of the page over its last 36 months, for the hidden crawl tables: built from the props alone, so a click never rebuilds them.
-  const crawlModels = useMemo(() => cityCrawlStates(index, view).map((crawl) => crawlMonthlyModel(buildInflationCityWorkbookExportModel({
+  // Every line of the page over its last three calendar years (at most 36 months), for the hidden crawl tables: built from the props alone, so a click never rebuilds them.
+  const crawlModels = useMemo(() => cityCrawlStates(index, view).map((crawl) => buildInflationCityWorkbookExportModel({
     index, view, state: crawl, range: resolveCityRange(crawl, index, view), presentation, sources, siteOrigin,
-  }))), [index, view, presentation, sources, siteOrigin]);
+  })), [index, view, presentation, sources, siteOrigin]);
 
   const range = resolveCityRange(state, index, view);
   const coverage = cityCoverage(index, view);

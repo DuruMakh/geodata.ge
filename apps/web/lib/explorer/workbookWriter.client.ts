@@ -2,7 +2,7 @@ import type { Locale } from "../i18n/types";
 import { workbookMessage } from "../i18n/workbook";
 
 import type { WorkbookView, Worksheet } from "exceljs";
-import type { WorkbookExportModel, WorkbookReadableRow } from "./workbookModel";
+import { readableRowLabel, type WorkbookExportModel, type WorkbookReadableRow } from "./workbookModel";
 
 const XLSX_MIME = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
 const PERCENTAGE_NUMBER_FORMAT = "0.0%;[Red](0.0%);–";
@@ -92,7 +92,7 @@ function writeReadableRow(
   numberFormat?: string,
 ): void {
   const label = worksheet.getCell(rowNumber, 1);
-  label.value = row.kind === "item" && row.parentLabel ? `${row.parentLabel} — ${row.label}` : row.label;
+  label.value = readableRowLabel(row);
   label.alignment = { vertical: "middle", wrapText: true, indent: row.kind === "item" && row.parentLabel ? 1 : 0 };
 
   for (const [index, year] of years.entries()) {

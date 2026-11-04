@@ -2,9 +2,10 @@ import { message } from "../i18n/messages";
 import type { Locale, Messages } from "../i18n/types";
 import { workbookMessage } from "../i18n/workbook";
 import { MISSING } from "./format";
-import type { WorkbookBasis, WorkbookExportModel, WorkbookReadableRow } from "./workbookModel";
+import { readableRowLabel, type WorkbookBasis, type WorkbookExportModel, type WorkbookReadableRow } from "./workbookModel";
 
 export const CRAWL_CELL_CAP = 3000;
+/** The most months a monthly view's crawl tables carry; its crawl states choose the window (`lastPeriodsRange`). */
 export const CRAWL_MONTH_COLUMNS = 36;
 
 export type CrawlTable = { caption: string; columns: string[]; rows: { label: string; cells: string[] }[] };
@@ -68,9 +69,10 @@ export function crawlTables(models: readonly WorkbookExportModel[], messages: Me
   let remaining = CRAWL_CELL_CAP;
   withRows.forEach((model, index) => {
     const { readable, locale } = model;
-    const trim = readable.headerLabels ? -CRAWL_MONTH_COLUMNS : 0;
-    const years = trim ? readable.years.slice(trim) : readable.years;
-    const columns = readable.headerLabels ? readable.headerLabels.columns.slice(trim) : years.map(String);
+    // Every column is kept: a monthly workbook has a row per year and at most 13 columns, and its crawl state already
+    // narrows it to the last months, so trimming columns here would only cut the early years of a yearly table.
+    const years = readable.years;
+    const columns = readable.headerLabels ? readable.headerLabels.columns : years.map(String);
     const budget = Math.floor(remaining / (withRows.length - index));
     const maxRows = Math.max(1, Math.floor(budget / Math.max(1, years.length)));
     const allRows = readable.rows;
@@ -91,7 +93,7 @@ export function crawlTables(models: readonly WorkbookExportModel[], messages: Me
       caption,
       columns,
       rows: kept.map((row) => ({
-        label: row.label,
+        label: readableRowLabel(row),
         cells: years.map((year) => formatCrawlCell(
           row.valuesByYear[year] ?? null,
           row.basisByYear[year] ?? null,

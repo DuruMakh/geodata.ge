@@ -35,7 +35,7 @@ import {
 import { INK } from "../../lib/explorer/colors";
 import { categoryColor, categoryLabel, formatContribution } from "../../lib/explorer/inflationCategoryLabels";
 import { buildInflationCategoryWorkbookExportModel } from "../../lib/explorer/inflationCategoryWorkbook";
-import { crawlMonthlyModel, type InflationWorkbookSource } from "../../lib/explorer/inflationWorkbook";
+import type { InflationWorkbookSource } from "../../lib/explorer/inflationWorkbook";
 import { downloadWorkbook } from "../../lib/explorer/workbookWriter.client";
 import { message } from "../../lib/i18n/messages";
 import { useI18n } from "../../lib/i18n/provider";
@@ -102,11 +102,11 @@ export function InflationCategories({ facts, monthlyUrl, weights, headline, head
     [facts, monthly, weights],
   );
   const headlineByPeriod = useMemo(() => new Map(headline.map((row) => [row.period, row.value])), [headline]);
-  // The divisions' contributions and every category's annual change over the last 36 months, for the hidden crawl tables:
+  // The divisions' contributions and every category's annual change over the last three calendar years (at most 36 months), for the hidden crawl tables:
   // built from the props, never on a click (the monthly runs fetched after load add no table).
-  const crawlModels = useMemo(() => categoryCrawlStates(index).map((crawl) => crawlMonthlyModel(buildInflationCategoryWorkbookExportModel({
+  const crawlModels = useMemo(() => categoryCrawlStates(index).map((crawl) => buildInflationCategoryWorkbookExportModel({
     index, state: crawl, range: resolveCategoryRange(crawl, index), headline: headlineByPeriod, presentation, sources, siteOrigin,
-  }))), [index, headlineByPeriod, presentation, sources, siteOrigin]);
+  })), [index, headlineByPeriod, presentation, sources, siteOrigin]);
   const { state, update } = useHashState(index, parseCategoriesHash, serializeCategoryHash);
   const [announcement, setAnnouncement] = useState("");
   if (state.tab === "mom" && !monthlyWanted) setMonthlyWanted(true);

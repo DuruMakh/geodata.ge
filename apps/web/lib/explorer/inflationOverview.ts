@@ -108,7 +108,7 @@ export function drawableSelection(index: InflationIndex, state: InflationState):
 }
 
 /**
- * The hidden crawl tables' states (lib/explorer/crawlTables.ts): each tab with every row it draws, over its last 36 months.
+ * The hidden crawl tables' states (lib/explorer/crawlTables.ts): each tab with every row it draws, over its last three calendar years (at most 36 months).
  * The workbook writes a row per series and year, so the window is the range, not a column trim. A tab without data has none.
  */
 export function inflationCrawlStates(index: InflationIndex): InflationState[] {

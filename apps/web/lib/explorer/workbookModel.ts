@@ -62,6 +62,11 @@ export type WorkbookReadableRow = {
   numberFormatByYear?: Record<number, string>;
 };
 
+/** A readable row's label as the Summary sheet and the crawl tables print it: an item under a parent reads "Parent — Label". */
+export function readableRowLabel(row: Pick<WorkbookReadableRow, "kind" | "parentLabel" | "label">): string {
+  return row.kind === "item" && row.parentLabel ? `${row.parentLabel} — ${row.label}` : row.label;
+}
+
 export const SHEET_NAMES = {
   ka: ["მარტივი ცხრილი", "მონაცემები", "წყაროები"],
   en: ["Summary", "Data", "Sources"],

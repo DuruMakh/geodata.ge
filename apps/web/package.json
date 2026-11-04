@@ -23,6 +23,7 @@
     "test:browser": "playwright test",
     "test:watch": "vitest",
     "seo:measure": "tsx scripts/measure-seo-output.ts",
+    "crawl:check": "tsx scripts/check-crawl-tables.ts",
     "check": "npm run lint && npm run typecheck && npm run test && npm run data:validate && npm run i18n:check",
     "i18n:check": "tsx scripts/check-localization.ts --check",
     "data:validate": "tsx scripts/validate-all.ts",

@@ -1,6 +1,6 @@
 import { beforeAll, describe, expect, it } from "vitest";
 import { loadServedInflationData } from "../../lib/data/inflation/importInflation";
-import { periodFromKey, periodYear } from "../../lib/data/inflation/periods";
+import { makePeriod, periodFromKey, periodYear } from "../../lib/data/inflation/periods";
 import { CPI_CITY_IDS, cityFactInput, type CityFactInput, type CpiCityMeasure } from "../../lib/data/inflation/types";
 import { loadMoneyBanksFacts, toClientMoneyBanksFact } from "../../lib/data/moneyBanks/importMoneyBanks";
 import { MONEY_BANKS_LOAN_AREAS, type ClientMoneyBanksFact } from "../../lib/data/moneyBanks/types";
@@ -14,7 +14,7 @@ import { GEORGIA_LINE_ID, buildCityIndex, cityCrawlStates, cityViewLineIds, reso
 import { GEORGIA_VIEW, type CityView } from "../../lib/explorer/inflationCityRoutes";
 import { buildInflationCityWorkbookExportModel } from "../../lib/explorer/inflationCityWorkbook";
 import { drawableKeys, indexInflationFacts, inflationCrawlStates, resolveInflationRange, type InflationIndex } from "../../lib/explorer/inflationOverview";
-import { buildInflationWorkbookExportModel, crawlMonthlyModel } from "../../lib/explorer/inflationWorkbook";
+import { buildInflationWorkbookExportModel } from "../../lib/explorer/inflationWorkbook";
 import { MONEY_BANKS_SECTIONS, moneyBanksCrawlStates, moneyBanksViewSeries, type MoneyBanksTopicId } from "../../lib/explorer/moneyBanks";
 import { moneyBanksAreaCrawlStates, moneyBanksAreaSeries } from "../../lib/explorer/moneyBanksAreas";
 import { buildMoneyBanksWorkbookExportModel } from "../../lib/explorer/moneyBanksWorkbook";
@@ -25,10 +25,11 @@ import type { Presentation } from "../../lib/i18n/types";
 const ORIGIN = "https://fiscal.ge";
 const ids = <K extends string>(states: readonly { selected?: readonly K[]; selectedIds?: readonly K[] }[]) => new Set(states.flatMap((state) => state.selected ?? state.selectedIds ?? []));
 const rowsOf = (model: WorkbookExportModel) => model.readable.rows.length;
-/** A monthly crawl state covers the view's last 36 months: its range ends on the view's last month and starts 35 months before. */
+/** A monthly crawl state covers whole calendar years: January of (latest year − 2) through the view's last month, 25–36 months. */
 const lastThirtySix = (range: { start: number; end: number; max: number; min: number }) => {
   expect(range.end).toBe(range.max);
-  expect(range.start).toBe(Math.max(range.min, range.max - 35));
+  expect(range.start).toBe(Math.max(range.min, makePeriod(periodYear(range.max) - 2, 1)));
+  expect(range.end - range.start + 1).toBeLessThanOrEqual(36);
 };
 
 let en: Presentation;
@@ -42,9 +43,9 @@ describe("inflation overview", () => {
   let index: InflationIndex;
   beforeAll(() => { index = indexInflationFacts(data.facts, sourceIdBySeriesMeasure(data.facts)); });
   const build = (built: InflationIndex) => inflationCrawlStates(built).map((state) =>
-    crawlMonthlyModel(buildInflationWorkbookExportModel({ index: built, targets: data.targets, state, range: resolveInflationRange(state, built), presentation: en, sources: [], siteOrigin: ORIGIN })));
+    buildInflationWorkbookExportModel({ index: built, targets: data.targets, state, range: resolveInflationRange(state, built), presentation: en, sources: [], siteOrigin: ORIGIN }));
 
-  it("each tab with every row it draws, over its last 36 months", () => {
+  it("each tab with every row it draws, over its last three calendar years", () => {
     const states = inflationCrawlStates(index);
     expect(states.map((state) => state.tab)).toEqual(["yoy", "mom", "index"]);
     for (const state of states) {
@@ -57,14 +58,16 @@ describe("inflation overview", () => {
   });
 
   it("names each year row after its series, so the crawl table reads which line a year belongs to", () => {
-    const [yoy] = build(index);
-    expect(yoy!.readable.rows.every((row) => /^.+ — \d{4}$/.test(row.label) && row.parentLabel === null)).toBe(true);
-    const latestYear = periodYear(resolveInflationRange(inflationCrawlStates(index)[0]!, index).end);
-    expect(yoy!.readable.rows.map((row) => row.label)).toContain(`Headline inflation — ${latestYear}`);
-    // Three tabs over 36 months fit the page's cap whole: no table is cut.
     const tables = crawlTables(build(index), en.messages);
+    expect(tables[0]!.rows.every((row) => /^.+ — \d{4}$/.test(row.label))).toBe(true);
+    const latestYear = periodYear(resolveInflationRange(inflationCrawlStates(index)[0]!, index).end);
+    expect(tables[0]!.rows.map((row) => row.label)).toContain(`Headline inflation — ${latestYear}`);
+    // A year row of the window shows every published month: the first year starts in January.
+    expect(tables[0]!.rows.map((row) => row.label)).toContain(`Headline inflation — ${latestYear - 2}`);
+    expect(tables[0]!.rows.find((row) => row.label === `Headline inflation — ${latestYear - 2}`)!.cells.slice(0, 12)).not.toContain("—");
+    // Three tabs over three calendar years fit the page's cap whole: no table is cut.
     expect(tables.flatMap((table) => table.rows.map((row) => row.cells.length)).reduce((sum, cells) => sum + cells, 0)).toBeLessThanOrEqual(CRAWL_CELL_CAP);
-    expect(tables.flatMap((table) => table.rows.map((row) => row.label))).toEqual(build(index).flatMap((model) => model.readable.rows.map((row) => row.label)));
+    expect(tables.flatMap((table) => table.rows.map((row) => row.label))).toEqual(build(index).flatMap((model) => model.readable.rows.map((row) => `${row.parentLabel} — ${row.label}`)));
   });
 
   it("leaves out a tab with no data", () => {
@@ -78,7 +81,7 @@ describe("inflation categories", () => {
   const headline = () => new Map(data.facts.filter((fact) => fact.seriesId === "cpi.headline" && fact.measure === "yoy_pct").map((fact) => [periodFromKey(fact.period), fact.value]));
   const indexOf = (measures: readonly string[]) => buildCategoryIndex(data.categories.filter((fact) => measures.includes(fact.measure)), data.weights);
   const build = (index: CategoryIndex) => categoryCrawlStates(index).map((state) =>
-    crawlMonthlyModel(buildInflationCategoryWorkbookExportModel({ index, state, range: resolveCategoryRange(state, index), headline: headline(), presentation: en, sources: [], siteOrigin: ORIGIN })));
+    buildInflationCategoryWorkbookExportModel({ index, state, range: resolveCategoryRange(state, index), headline: headline(), presentation: en, sources: [], siteOrigin: ORIGIN }));
 
   it("as the page loads (annual changes only): the contributions of every division, then every category's annual change", () => {
     const index = indexOf(["yoy_pct"]);
@@ -95,7 +98,7 @@ describe("inflation categories", () => {
     const models = build(index);
     for (const model of models) expect(rowsOf(model)).toBeGreaterThanOrEqual(1);
     // The contribution table closes on the headline with the residual row.
-    expect(models[0]!.readable.rows.some((row) => row.label.startsWith("The rest — "))).toBe(true);
+    expect(crawlTables(models, en.messages)[0]!.rows.some((row) => row.label.startsWith("The rest — "))).toBe(true);
   });
 
   it("adds no monthly-change table once its runs, fetched after load, have arrived", () => {
@@ -108,10 +111,10 @@ describe("inflation cities", () => {
   const build = (facts: CityFactInput[], view: CityView) => {
     const index = buildCityIndex(facts);
     return cityCrawlStates(index, view).map((state) =>
-      crawlMonthlyModel(buildInflationCityWorkbookExportModel({ index, view, state, range: resolveCityRange(state, index, view), presentation: en, sources: [], siteOrigin: ORIGIN })));
+      buildInflationCityWorkbookExportModel({ index, view, state, range: resolveCityRange(state, index, view), presentation: en, sources: [], siteOrigin: ORIGIN }));
   };
 
-  it("the Georgia page: every place on the total, over the last 36 months", () => {
+  it("the Georgia page: every place on the total, over the last three calendar years", () => {
     const georgia: CityFactInput[] = data.facts.filter((fact) => fact.seriesId === "cpi.headline" && isPageFact(fact) && fact.period >= "2016-12")
       .map((fact) => ({ lineId: GEORGIA_LINE_ID, seriesId: "cpi.headline", measure: fact.measure as CpiCityMeasure, period: fact.period, value: fact.value }));
     const facts = [...georgia, ...data.cities.filter((fact) => fact.seriesId === "cpi.headline" && isPageFact(fact)).map(cityFactInput)];

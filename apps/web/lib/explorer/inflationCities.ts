@@ -106,7 +106,7 @@ export function resolveCityRange(state: CityState, index: CityIndex, view: CityV
 
 export { rangeFromPatch };
 
-/** The hidden crawl tables' state (lib/explorer/crawlTables.ts): every line of the page with data, over its last 36 months; none for a place without any. */
+/** The hidden crawl tables' state (lib/explorer/crawlTables.ts): every line of the page with data, over its last three calendar years (at most 36 months); none for a place without any. */
 export function cityCrawlStates(index: CityIndex, view: CityView): CityState[] {
   const selected = cityViewLineIds(view).filter((lineId) => lineValues(index, view, lineId) !== undefined);
   if (selected.length === 0) return [];

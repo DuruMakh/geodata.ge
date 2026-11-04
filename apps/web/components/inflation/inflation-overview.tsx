@@ -16,7 +16,7 @@ import {
   type InflationIndex, type InflationState, type InflationTab,
 } from "../../lib/explorer/inflationOverview";
 import type { PackedCategorySeries } from "../../lib/explorer/inflationCategories";
-import { buildInflationWorkbookExportModel, crawlMonthlyModel, type InflationWorkbookSource } from "../../lib/explorer/inflationWorkbook";
+import { buildInflationWorkbookExportModel, type InflationWorkbookSource } from "../../lib/explorer/inflationWorkbook";
 import { downloadWorkbook } from "../../lib/explorer/workbookWriter.client";
 import { message } from "../../lib/i18n/messages";
 import { useI18n } from "../../lib/i18n/provider";
@@ -70,10 +70,10 @@ export function InflationOverview({ facts, sourceIdBySeriesMeasure, lastReviewed
     [facts, sourceIdBySeriesMeasure],
   );
   const { state, update } = useHashState(index, parseOverviewHash, serializeInflationHash);
-  // Every tab's rows over its last 36 months, for the hidden crawl tables: built from the props alone, so a click never rebuilds them.
-  const crawlModels = useMemo(() => inflationCrawlStates(index).map((crawl) => crawlMonthlyModel(buildInflationWorkbookExportModel({
+  // Every tab's rows over its last three calendar years (at most 36 months), for the hidden crawl tables: built from the props alone, so a click never rebuilds them.
+  const crawlModels = useMemo(() => inflationCrawlStates(index).map((crawl) => buildInflationWorkbookExportModel({
     index, targets, state: crawl, range: resolveInflationRange(crawl, index), presentation, sources, siteOrigin,
-  }))), [index, targets, presentation, sources, siteOrigin]);
+  })), [index, targets, presentation, sources, siteOrigin]);
   const [announcement, setAnnouncement] = useState("");
 
   const range = resolveInflationRange(state, index);
