@@ -8,7 +8,7 @@ import { readdir, readFile } from "node:fs/promises";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
 
-const RUNTIME_DIRS = [path.join(process.cwd(), "lib", "mcp"), path.join(process.cwd(), "app", "mcp")];
+const RUNTIME_DIRS = [path.join(process.cwd(), "lib", "mcp"), path.join(process.cwd(), "api")];
 
 const FORBIDDEN: [RegExp, string][] = [
   // Spec 13 and decision 6: no provider SDK anywhere in this release's
@@ -47,7 +47,7 @@ describe("MCP runtime purity", () => {
       const text = await readFile(file, "utf8");
       // The SDK's fetch is the inbound Request→Response adapter, not network IO.
       // Exempt this exact route call; every other fetch remains forbidden.
-      const source = path.basename(file) === "route.ts" ? text.replace("modernHandler.fetch(checkedRequest)", "inboundMcpRequest(checkedRequest)") : text;
+      const source = path.basename(file) === "handler.ts" ? text.replace("modernHandler.fetch(checkedRequest)", "inboundMcpRequest(checkedRequest)") : text;
       for (const [pattern, what] of FORBIDDEN) {
         // The production limiter is the sole network exception: only fixed
         // Redis commands over configured credentials, never dataset fetching.

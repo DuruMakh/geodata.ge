@@ -22,7 +22,7 @@ vi.mock("../../lib/mcp/tools", async (importOriginal) => {
   };
 });
 
-import { POST } from "../../app/mcp/route";
+import { POST } from "../../lib/mcp/handler";
 
 const ENDPOINT = "https://fiscal.ge/mcp";
 const original = { ...process.env };

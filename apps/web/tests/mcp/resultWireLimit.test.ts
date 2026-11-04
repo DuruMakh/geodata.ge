@@ -1,5 +1,5 @@
 import { afterAll, beforeAll, expect, it, vi } from "vitest";
-import { POST } from "../../app/mcp/route";
+import { POST } from "../../lib/mcp/handler";
 import { TOOLS } from "../../lib/mcp/tools";
 import { loadPackagedSnapshot } from "../../lib/mcp/snapshot";
 import { LIMITS, toolResult } from "../../lib/mcp/result";

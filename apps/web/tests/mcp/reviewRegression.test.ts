@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { POST } from "../../app/mcp/route";
+import { POST } from "../../lib/mcp/handler";
 import { loadPackagedSnapshot } from "../../lib/mcp/snapshot";
 import { toolOutput } from "../../lib/mcp/outputSchema";
 import { observationSchema } from "../../lib/factQuery/schemas";

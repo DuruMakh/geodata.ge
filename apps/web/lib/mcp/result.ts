@@ -45,7 +45,7 @@ export const LIMITS = {
   /**
    * Request duration.
    *
-   * Documents the platform setting - `maxDuration` in app/mcp/route.ts - which
+   * Documents the platform setting - `maxDuration` for api/mcp.ts in vercel.json - which
    * is what actually stops a long request. Nothing in this module enforces it.
    */
   durationMs: 10_000,

@@ -21,11 +21,11 @@ const state = vi.hoisted(() => ({
   dailyVerdict: "allow" as Verdict,
 }));
 
-// Route tests run outside a request scope, where the real `after` throws. Run
-// the callback at once and do not wait for it, which is what a request does.
-vi.mock("next/server", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("next/server")>()),
-  after: (callback: () => unknown) => { void callback(); },
+// Outside Vercel `waitUntil` does nothing; record each promise the handler
+// hands it, so a test can see the tally is kept alive past the reply.
+const waited = vi.hoisted(() => [] as Promise<unknown>[]);
+vi.mock("@vercel/functions", () => ({
+  waitUntil: (promise: Promise<unknown>) => { waited.push(promise); },
 }));
 
 vi.mock("../../lib/mcp/limits", async (importOriginal) => {
@@ -47,7 +47,7 @@ vi.mock("../../lib/mcp/limits", async (importOriginal) => {
   };
 });
 
-import { POST } from "../../app/mcp/route";
+import { POST } from "../../lib/mcp/handler";
 
 const ENDPOINT = "https://fiscal.ge/mcp";
 const original = { ...process.env };
@@ -68,6 +68,7 @@ beforeEach(() => {
   state.calls.length = 0;
   state.records.length = 0;
   state.record = undefined;
+  waited.length = 0;
   state.perKeyVerdict = "allow";
   state.perKeyDailyVerdict = "allow";
   state.dailyVerdict = "allow";
@@ -269,6 +270,24 @@ describe("the daily usage tally", () => {
     expect(response.status).toBe(429);
     expect(logs.at(-1)).toMatchObject({ errorCode: "rate_limited", limit: "minute", clientClass: "other" });
     expect(state.records).toEqual([]);
+  });
+
+  it("keeps the tally alive past the reply through waitUntil, once per tallied request", async () => {
+    await POST(post({ "x-vercel-forwarded-for": "160.79.104.9" }));
+
+    expect(waited).toHaveLength(1);
+    await waited[0];
+    expect(state.records).toEqual([{ day: TODAY, field: "initialize|ok|-|-|anthropic" }]);
+  });
+
+  it("answers the same when the tally fails", async () => {
+    const ok = await POST(post({ "x-vercel-forwarded-for": "160.79.104.9" }));
+    state.record = () => Promise.reject(new Error("upstash down"));
+    const failing = await POST(post({ "x-vercel-forwarded-for": "160.79.104.9" }));
+
+    await expect(Promise.all(waited)).resolves.toBeDefined();
+    expect(failing.status).toBe(ok.status);
+    expect(await failing.text()).toBe(await ok.text());
   });
 
   it("tallies an unidentifiable caller as unkeyed", async () => {

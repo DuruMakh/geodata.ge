@@ -40,14 +40,13 @@ describe("packaged snapshot", () => {
     expect(text.trimEnd()).not.toContain("\n");
   });
 
-  it("is traced into the /mcp function bundle", async () => {
+  it("is bundled into the /mcp function", async () => {
     // The artifact is written by prebuild and read at request time rather than
-    // imported, so Next cannot see it statically. Without this entry the
+    // imported, so the bundler cannot see it statically. Without this entry the
     // deployed function has no data to answer from and every call fails.
     const { readFile } = await import("node:fs/promises");
-    const config = await readFile("next.config.ts", "utf8");
+    const config = JSON.parse(await readFile("vercel.json", "utf8"));
 
-    expect(config).toContain("outputFileTracingIncludes");
-    expect(config).toMatch(/"\/mcp":\s*\[\s*"\.\/lib\/factQuery\/generated\/snapshot\.json"\s*\]/);
+    expect(config.functions["api/mcp.ts"].includeFiles).toBe("lib/factQuery/generated/snapshot.json");
   });
 });
