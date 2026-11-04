@@ -21,7 +21,7 @@ export function buildTradeProductsWorkbookModel(input: { data: ClientTradeProduc
   }
   const sources = input.sources.filter(source => filenames.has(source.downloadHref.split("/").at(-1)!));
   const exportModel = buildWorkbookExportModel({
-    locale: presentation.locale, filenameBase: domestic ? "trade-domestic-products" : "trade-products", title: t(domestic ? "domestic.productsTitle" : "products.title"), groupLabel: t(`indicator.${input.state.measure}`), years: model.years,
+    locale: presentation.locale, filenameBase: domestic ? "trade-domestic-products" : "trade-products", title: t(domestic ? "domestic.productsTitle" : "products.title"), view: t(`indicator.${input.state.measure}`), groupLabel: t(`indicator.${input.state.measure}`), years: model.years,
     measure: { kind: "amount", unitLabel: model.unit.label, readableScale: model.unit.divisor }, totalId: TRADE_PRODUCT_TOTAL_ID, includeTotalsInAnalysis: true, showChangeColumn: false,
     series: model.selectedIds.map(id => {
       const entity = entities.get(id);
@@ -37,7 +37,8 @@ export function buildTradeProductsWorkbookModel(input: { data: ClientTradeProduc
   applySignedAmountFormat(exportModel, values, model.unit);
   exportModel.analysis.headers[3] = t("workbook.amount");
   exportModel.analysis.headers.push(t("workbook.publication"));
-  exportModel.analysis.rows = exportModel.analysis.rows.map(row => [...row, t("publicationUnspecified")]);
+  const unspecified = t("publicationUnspecified");
+  exportModel.analysis.rows = exportModel.analysis.rows.map(row => [...row, unspecified]);
   exportModel.analysis.numericFormats = { 4: EXACT_SIGNED_FORMAT };
   return exportModel;
 }

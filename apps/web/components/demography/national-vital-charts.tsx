@@ -14,6 +14,7 @@ import type { TemplateValues } from "../../lib/i18n/types";
 import type { ClientNationalFact } from "../../lib/servedRows";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { ChartShareButton } from "../explorer-shell/chart-share-button";
+import { CrawlTables, useCrawlModels } from "../explorer-shell/crawl-tables";
 import { ModeTabs } from "../explorer-shell/mode-tabs";
 import { useAppReady } from "../explorer-shell/use-app-ready";
 import { EditorialLineChart } from "../main-explorer/editorial-line-chart";
@@ -37,6 +38,9 @@ export function NationalVitalCharts({
   const { messages } = presentation;
   const t = (key: string, values?: TemplateValues) => message(messages, `demography.${key}`, values);
   useAppReady();
+  // The fertility workbook (the total rate and the seven age rates) and the life expectancy one, for the hidden crawl tables:
+  // built from the props alone, so a click never rebuilds them.
+  const crawlModels = useCrawlModels(() => [buildFertilityWorkbookExportModel({ facts, sources, siteOrigin }, presentation), buildLifeWorkbookExportModel({ facts, sources, siteOrigin }, presentation)]);
   const [tfrMode, setTfrMode] = useState<ChartMode>("line");
   const [ageMode, setAgeMode] = useState<ChartMode>("line");
   const [lifeMode, setLifeMode] = useState<ChartMode>("line");
@@ -111,7 +115,7 @@ export function NationalVitalCharts({
         <h3 className="mt-6 mb-3 text-[15px] text-[var(--ink)]">{`${t("tfrLabel")} (${t("tfrUnit")})`}</h3>
         <ModeTabs value={tfrMode} onChange={setTfrMode} testId="tfr" />
         <div className="mt-5">
-          <ExplorerTable
+          {tfrMode === "line" ? tfrChart : <ExplorerTable
             caption={t("tfrChartAria", { first, last })}
             rows={[{ itemId: SERIES.totalFertilityRate, kaLabel: t("tfrLabel"), color: INK, valuesByYear: tfr }]}
             totalRow={null}
@@ -126,11 +130,7 @@ export function NationalVitalCharts({
             breakYears={[CENSUS_STEP.toYear]}
             breakLabel={t("breakLabel")}
             shareValueForYear={() => null}
-            crawlCopy={tfrMode === "line"}
-          />
-          {tfrMode === "line" ? (
-            tfrChart
-          ) : null}
+          />}
         </div>
         {/* The rate has no source line of its own (it shares the life section's), so its button sits under the chart, at the right. */}
         <div className="mt-3 flex justify-end">
@@ -139,7 +139,7 @@ export function NationalVitalCharts({
         <h3 className="mt-10 mb-3 text-[15px] text-[var(--ink)]">{t("asfrLabel")}</h3>
         <ModeTabs value={ageMode} onChange={setAgeMode} testId="asfr" />
         <div className="mt-5" data-testid="asfr-panel">
-          <ExplorerTable
+          {ageMode === "table" ? <ExplorerTable
             caption={`${t("asfrLabel")}, ${curves.years[0]!}–${curves.years.at(-1)!}`}
             rows={AGE_GROUPS.map((group) => ({
               itemId: group,
@@ -159,8 +159,7 @@ export function NationalVitalCharts({
             breakYears={[CENSUS_STEP.toYear]}
             breakLabel={t("breakLabel")}
             shareValueForYear={() => null}
-            crawlCopy={ageMode === "line"}
-          />
+          /> : null}
           {ageMode === "line" ? (
             <>
               <ul className="mb-3 flex flex-wrap gap-x-5 gap-y-1 text-[12px] text-[var(--body)]" data-testid="asfr-legend">
@@ -184,7 +183,7 @@ export function NationalVitalCharts({
         <SectionTitle>{t("lifeTitle")}</SectionTitle>
         <div className="mt-5"><ModeTabs value={lifeMode} onChange={setLifeMode} testId="life" /></div>
         <div className="mt-5">
-          <ExplorerTable
+          {lifeMode === "line" ? lifeChart : <ExplorerTable
             caption={t("lifeChartAria", { first, last })}
             rows={LIFE_SERIES.map((line) => ({ itemId: line.seriesId, kaLabel: t(line.key), color: lifeColor(line.colorKey), valuesByYear: seriesByYear(facts, line.seriesId) }))}
             totalRow={null}
@@ -199,11 +198,7 @@ export function NationalVitalCharts({
             breakYears={[CENSUS_STEP.toYear]}
             breakLabel={t("breakLabel")}
             shareValueForYear={() => null}
-            crawlCopy={lifeMode === "line"}
-          />
-          {lifeMode === "line" ? (
-            lifeChart
-          ) : null}
+          />}
         </div>
         <ChartSelectionAids series={lifeSeries} chartShown={lifeMode === "line"} share={false} unit={UNIT_DENSITY} formatValue={rate1} />
         <div className="mt-[18px] max-w-[740px]"><SourceNote testId="national-source-note" action={
@@ -211,6 +206,7 @@ export function NationalVitalCharts({
         }>{nationalSource}</SourceNote></div>
         <Download testId="life-excel-download" build={() => buildLifeWorkbookExportModel({ facts, sources, siteOrigin }, presentation)} />
       </section>
+      <CrawlTables models={crawlModels} />
     </>
   );
 }

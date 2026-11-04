@@ -4,7 +4,7 @@ import type { Presentation } from "../i18n/types";
 import { MISSING, formatInUnit, type ValueUnit } from "./format";
 import type { ResolvedPeriodRange } from "./periodRange";
 import { buildTopicModel, serializeTopicHash, topicSeriesColor, type TopicSeriesModel, type TopicState } from "./topicSeries";
-import { changeUnitListSelection, parseUnitListHash, unitListCoverage } from "./unitList";
+import { changeUnitListSelection, parseUnitListHash, unitListCoverage, unitListCrawlStates } from "./unitList";
 
 export const ENVIRONMENT_HUB_PATH = "/explorer/environment";
 export const ENVIRONMENT_SECTIONS = [
@@ -113,6 +113,10 @@ export function parseEnvironmentListHash(hash: string, definitions: readonly Env
 /** A list's new selection, kept to one unit; the years stay, clamped to the selection's coverage. */
 export const changeEnvironmentListSelection = (state: TopicState, definitions: readonly EnvironmentSeriesDefinition[], next: readonly string[], facts: readonly ClientEnvironmentFact[]): TopicState =>
   changeUnitListSelection(state, withFacts(definitions, facts), next, facts, noYears(definitions));
+
+/** The hidden crawl tables' states of a topic, city or area list: each unit, every row of it with facts. */
+export const environmentListCrawlStates = (definitions: readonly EnvironmentSeriesDefinition[], facts: readonly ClientEnvironmentFact[]): EnvironmentState[] =>
+  unitListCrawlStates(withFacts(definitions, facts), facts);
 
 export const parseEnvironmentHash = (hash: string, section: EnvironmentTopicId, facts: readonly ClientEnvironmentFact[]): EnvironmentState =>
   parseEnvironmentListHash(hash, environmentTopicSeries(section), environmentDefaultSelection(section), facts);

@@ -3,7 +3,7 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import { updatedDate } from "../../lib/explorer/coverageLabel";
 import type { ClientPovertyFact } from "../../lib/data/poverty/types";
-import { buildPovertyModel, changePovertyView, parsePovertyHash, povertyCoverage, povertyViews, serializePovertyHash, type PovertySectionId, type PovertyState, type PovertyView } from "../../lib/explorer/poverty";
+import { buildPovertyModel, changePovertyView, parsePovertyHash, povertyCoverage, povertyCrawlStates, povertyViews, serializePovertyHash, type PovertySectionId, type PovertyState, type PovertyView } from "../../lib/explorer/poverty";
 import { buildPovertyWorkbookExportModel } from "../../lib/explorer/povertyWorkbook";
 import { formatInUnit, type ValueUnit } from "../../lib/explorer/format";
 import { rangeFromPatch } from "../../lib/explorer/periodRange";
@@ -20,6 +20,7 @@ import { useHashState } from "../explorer-shell/use-hash-state";
 import { EditorialLineChart } from "../main-explorer/editorial-line-chart";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { ChartShareButton } from "../explorer-shell/chart-share-button";
+import { CrawlTables, useCrawlModels } from "../explorer-shell/crawl-tables";
 import { ExplorerTable } from "../main-explorer/explorer-table";
 import { RangeStrip } from "../main-explorer/range-strip";
 import { SEARCHABLE_MIN_ROWS } from "../main-explorer/series-selector";
@@ -59,6 +60,9 @@ export function PovertyExplorer({ section, facts, labels, sources, lastReviewedA
   const latestKey = state.view === "relative" || state.view === "international" ? state.view : section;
   const title = t(`page.${section}.title`);
   const tabLabel = state.view === "main" ? title : t(`tab.${state.view}`);
+  // Every tab's series over its years, for the hidden crawl tables: built from the props alone, so a click never rebuilds them.
+  const crawlModels = useCrawlModels(() => povertyCrawlStates(section, facts).map(crawl =>
+    buildPovertyWorkbookExportModel({ section, facts, state: crawl, labels, sources, siteOrigin, title }, presentation)));
   const changeView = (view: PovertyView) => { if (view === state.view) return; setQuery(""); setExpanded({}); update(s => changePovertyView(s, section, view, facts), true); };
   const downloadAction = <ExcelDownloadButton testId="poverty-excel-download" disabled={!model.selected.length} onDownload={async () => {
     const { downloadWorkbook } = await import("../../lib/explorer/workbookWriter.client");
@@ -82,7 +86,8 @@ export function PovertyExplorer({ section, facts, labels, sources, lastReviewedA
             <span className="text-[11px] text-[var(--muted)]">{unitLabel}</span>
           </div>
           {!model.selected.length ? <div className="mt-5"><Callout testId="no-selection-callout">{t("emptySelection")}</Callout></div>
-            : <><ExplorerTable caption={`${tabLabel} · ${unitLabel} · ${model.range.start}–${model.range.end}`} rows={rows.filter(row => row.itemId !== reference.id)} totalRow={total} showTotal={Boolean(total)} totalFirst wrapRowLabels rowLabelsLocalized years={model.years} firstColumnLabel={t("series")} unit={unit} share={percent} showChangeColumn={false} shareValueForYear={(row, year) => { const value = row.valuesByYear[year]; return value == null ? null : value / 100; }} crawlCopy={state.mode === "line"} />{state.mode === "line" ? <div className="mt-5">{chart}</div> : null}</>}
+            : state.mode === "line" ? <div className="mt-5">{chart}</div>
+            : <ExplorerTable caption={`${tabLabel} · ${unitLabel} · ${model.range.start}–${model.range.end}`} rows={rows.filter(row => row.itemId !== reference.id)} totalRow={total} showTotal={Boolean(total)} totalFirst wrapRowLabels rowLabelsLocalized years={model.years} firstColumnLabel={t("series")} unit={unit} share={percent} showChangeColumn={false} shareValueForYear={(row, year) => { const value = row.valuesByYear[year]; return value == null ? null : value / 100; }} />}
           <ChartSelectionAids series={lineSeries} chartShown={state.mode === "line"} share={false} unit={unit} formatValue={valueLabel} />
           <RangeStrip years={povertyCoverage(section, state.view, facts).years} range={model.range} onChange={patch => update(s => ({ ...s, range: rangeFromPatch(buildPovertyModel(section, facts, s).range, patch) }))} />
         </section>
@@ -97,5 +102,6 @@ export function PovertyExplorer({ section, facts, labels, sources, lastReviewedA
         query={query} onQueryChange={setQuery} searchPlaceholder={t("search")} searchable={model.series.length > SEARCHABLE_MIN_ROWS}
         nesting={{ selectedLabel: t("nestedSelected"), expansionLabel: label => t("subcategoriesFor", { label }), expanded, onExpandedChange: setExpanded }} />
     </ExplorerWorkspace>
+    <CrawlTables models={crawlModels} />
   </div>;
 }

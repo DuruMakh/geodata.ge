@@ -4,6 +4,7 @@ import type { ClientNationalGdpFact } from "./clientData";
 import { shareOfGdp } from "./debtExplorer";
 import { refitRange, type ResolvedPeriodRange } from "./periodRange";
 import { buildTopicModel, parseTopicHash, serializeTopicHash, topicCoverage, topicHashView, topicSeriesColor, type TopicSeriesModel, type TopicState } from "./topicSeries";
+import { unitListCrawlStates } from "./unitList";
 
 export const MONEY_BANKS_SECTIONS = [
   { id: "supply", href: "/explorer/money/supply", labelKey: "common.moneySupply" },
@@ -133,6 +134,16 @@ export function moneyBanksCoverage(section: MoneyBanksTopicId, view: MoneyBanksV
 export function defaultMoneyBanksState(section: MoneyBanksTopicId): MoneyBanksState {
   const view = moneyBanksViews(section)[0];
   return { mode: "line", range: { kind: "all" }, view, selectedIds: moneyBanksDefaultSelection(section, view) };
+}
+
+/**
+ * The hidden crawl tables' states (lib/explorer/crawlTables.ts): each view with every series it lists, over every year; a view
+ * without facts (% of GDP without GDP) has none. The foreign-currency shares are a currency's loans or deposits over their
+ * total, both listed on the amounts, so that switch has no state; % of GDP divides by a GDP the page does not list, so it keeps one.
+ */
+export function moneyBanksCrawlStates(section: MoneyBanksTopicId, facts: readonly ClientMoneyBanksFact[], gdpFacts: readonly ClientNationalGdpFact[] = []): MoneyBanksState[] {
+  return moneyBanksViews(section).filter(view => view !== "fx_share").flatMap(view =>
+    unitListCrawlStates(moneyBanksViewSeries(section, view), moneyBanksViewFacts(view, facts, gdpFacts)).map(state => ({ ...state, view })));
 }
 
 export function parseMoneyBanksHash(hash: string, section: MoneyBanksTopicId, facts: readonly ClientMoneyBanksFact[], gdpFacts: readonly ClientNationalGdpFact[] = []): MoneyBanksState {

@@ -1,9 +1,11 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { LabourExplorer } from "../../components/unemployment/labour-explorer";
 import { loadLabourFacts, toClientLabourFact } from "../../lib/data/labour/importLabour";
+import { LABOUR_SOURCES } from "../../lib/data/labour/types";
 import { LABOUR_SECTIONS, labourFullLabel, labourSeries } from "../../lib/explorer/labour";
 import en from "../../lib/i18n/messages/en/labour.json";
 import ka from "../../lib/i18n/messages/ka/labour.json";
+import { loadSourcedWorkbookSources } from "../../lib/methodology/workbookSources";
 import { labourPageMetadata } from "../../lib/pages/labour-shared";
 import { renderLabourPage } from "../../lib/pages/labour";
 import { renderPageMarkup } from "../helpers/render-localized";
@@ -52,10 +54,12 @@ describe("the Labour pages", () => {
     const facts = (await loadLabourFacts()).map(toClientLabourFact).filter(f => f.indicatorId.startsWith("labour.hours.") && f.indicatorId !== "labour.hours.all.total");
     const series = labourSeries("hours");
     for (const [locale, messages] of [["ka", ka], ["en", en]] as const) {
+      // The page's own Sources sheet rows, as renderLabourPage passes them: the hidden crawl tables build the workbook at render.
+      const sources = await loadSourcedWorkbookSources("unemployment", locale, row => LABOUR_SOURCES.includes(row.source_id));
       const html = renderPageMarkup(locale, <LabourExplorer section="hours" facts={facts}
         labels={Object.fromEntries(series.map(({ id, item }) => [id, messages[`labour.row.${item}` as keyof typeof messages]]))}
         headingLabels={Object.fromEntries(series.map(({ heading }) => [heading, messages[`labour.heading.${heading}` as keyof typeof messages]]))}
-        latestLine="" sources={[]} lastReviewedAt="2026-10-20" siteOrigin="https://fiscal.ge" />, messages);
+        latestLine="" sources={sources} lastReviewedAt="2026-10-20" siteOrigin="https://fiscal.ge" />, messages);
       expect(html).toContain('data-testid="no-values-callout"');
       expect(text(html)).toContain(messages["labour.noValues"]);
       expect(html).not.toContain('data-testid="no-selection-callout"');

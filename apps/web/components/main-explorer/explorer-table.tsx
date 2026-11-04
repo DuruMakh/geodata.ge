@@ -51,11 +51,6 @@ type ExplorerTableProps<Row extends ExplorerTableRowLike> = {
   shareDecimalsForRow?: (row: Row, year: number) => number;
   /** A row's own number of decimals, for tables whose rows are published at different precisions; omit to use `unit.decimals`. */
   decimalsForRow?: (row: Row) => number;
-  /**
-   * A copy for search engines and AI crawlers: hidden from visitors by a stylesheet class only, with its own test id and no keyboard stop.
-   * Render it only in chart mode, before the chart wrapper, at the same tree position as the visible table (DESIGN.md §8.4).
-   */
-  crawlCopy?: boolean;
 };
 
 const headCellClass =
@@ -133,7 +128,6 @@ export function ExplorerTable<Row extends ExplorerTableRowLike>({
   percentDecimals = 1,
   shareDecimalsForRow,
   decimalsForRow,
-  crawlCopy = false,
 }: ExplorerTableProps<Row>) {
   const { locale, messages, englishLabels } = useI18n();
   const rowLabel = (row: Row) => (rowLabelsLocalized ? row.kaLabel : publicLabel(locale, row.itemId, row.kaLabel, englishLabels));
@@ -166,7 +160,6 @@ export function ExplorerTable<Row extends ExplorerTableRowLike>({
   // effect swaps in the year rows before the first paint on a phone.
   const containerRef = useRef<HTMLDivElement>(null);
   const [tableWidth, setTableWidth] = useState(0);
-  // `crawlCopy` is a dependency because the hidden copy measures width 0 and the same instance becomes the visible table when the mode switches.
   useLayoutEffect(() => {
     const element = containerRef.current;
     if (!element) return;
@@ -175,20 +168,18 @@ export function ExplorerTable<Row extends ExplorerTableRowLike>({
     const observer = new ResizeObserver(measure);
     observer.observe(element);
     return () => observer.disconnect();
-  }, [crawlCopy]);
+  }, []);
   const seriesRows = showTotal && totalRow ? (totalFirst ? [totalRow, ...rows] : [...rows, totalRow]) : rows;
   const rowsLayout = usesRowsLayout(seriesRows.length, tableWidth);
 
-  // `crawlCopy` is a dependency because the hidden copy measures width 0 and the same instance becomes the visible table when the mode switches.
   useEffect(() => {
-    if (crawlCopy) return;
     const scroller = scrollerRef.current;
     if (!scroller || scroller.clientWidth >= 768) return;
     const latest = scroller.querySelector<HTMLElement>("thead th[data-latest-year]");
     if (!latest) return;
     const offset = latest.getBoundingClientRect().right - scroller.getBoundingClientRect().left + scroller.scrollLeft;
     scroller.scrollLeft = Math.max(0, offset - scroller.clientWidth);
-  }, [firstYear, endYear, years.length, rowsLayout, crawlCopy]);
+  }, [firstYear, endYear, years.length, rowsLayout]);
 
   const statusMarks = (row: Row, year: number): ReactNode => (
     <>
@@ -198,9 +189,6 @@ export function ExplorerTable<Row extends ExplorerTableRowLike>({
       {row.markByYear?.[year] ? statusMark(row.markByYear[year]) : null}
     </>
   );
-
-  const containerClass = crawlCopy ? "@container mt-[18px] hidden" : "@container mt-[18px]";
-  const scrollerTestId = crawlCopy ? "explorer-table-crawl" : "explorer-table";
 
   if (rowsLayout) {
     const isTotal = (row: Row) => showTotal && row === totalRow;
@@ -213,8 +201,8 @@ export function ExplorerTable<Row extends ExplorerTableRowLike>({
         : []),
     ];
     return (
-      <div ref={containerRef} className={containerClass}>
-        <div ref={scrollerRef} data-testid={scrollerTestId} data-layout="rows" role="region" aria-label={caption} className="overflow-x-auto">
+      <div ref={containerRef} className="@container mt-[18px]">
+        <div ref={scrollerRef} data-testid="explorer-table" data-layout="rows" role="region" aria-label={caption} className="overflow-x-auto">
           <table className="w-full table-fixed border-collapse">
             <caption className="sr-only">{caption}</caption>
             <colgroup>
@@ -316,13 +304,13 @@ export function ExplorerTable<Row extends ExplorerTableRowLike>({
   ) : null;
 
   return (
-    <div ref={containerRef} className={containerClass}>
+    <div ref={containerRef} className="@container mt-[18px]">
       <div
         ref={scrollerRef}
-        data-testid={scrollerTestId}
+        data-testid="explorer-table"
         data-layout="columns"
         role="region"
-        tabIndex={crawlCopy ? undefined : 0}
+        tabIndex={0}
         aria-label={message(messages, "controls.tableScrollable")}
         className="overflow-x-auto focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)]"
       >

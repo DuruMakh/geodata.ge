@@ -13,7 +13,7 @@ export function buildForeignInvestmentWorkbookModel(input: { data: ClientForeign
   const t = (key: string) => message(presentation.messages, `external.${key}`), tab = t(`investment.tab.${input.state.dimension}`);
   const files = new Set<string>([...SOURCE_FILES.always, SOURCE_FILES[input.state.dimension]]);
   const exportModel = buildWorkbookExportModel({
-    locale: presentation.locale, filenameBase: "foreign-investment", title: t("investment.title"), groupLabel: tab, years: model.years,
+    locale: presentation.locale, filenameBase: "foreign-investment", title: t("investment.title"), view: tab, groupLabel: tab, years: model.years,
     measure: { kind: "amount", unitLabel: model.unit.label, readableScale: model.unit.divisor }, totalId: FOREIGN_INVESTMENT_TOTAL_ID, includeTotalsInAnalysis: true, showChangeColumn: false,
     series: model.selectedIds.map(id => ({ id, kind: id === FOREIGN_INVESTMENT_TOTAL_ID ? "total" : "item", label: model.series.find(item => item.id === id)!.label, parentLabel: null, pointsByYear: Object.fromEntries(model.years.map(year => [year, { amountGel: model.valuesByEntity[id][year], basis: "actual" as const }])) })),
     sources: input.sources.filter(source => model.selectedCount > 0 && files.has(source.downloadHref.split("/").at(-1)!)), siteOrigin: input.siteOrigin,

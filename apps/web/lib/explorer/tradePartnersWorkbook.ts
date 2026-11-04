@@ -38,7 +38,9 @@ export function buildTradePartnersWorkbookModel(input: { dataset?: "services" | 
     if (input.state.measure !== "trade.exports") filenames.add(`import-${suffix}-1995-2026.xlsx`);
   }
   const exportModel = buildWorkbookExportModel({
-    locale: presentation.locale, filenameBase: composition ? `trade-composition-${classification}` : services ? `trade-services-${countries ? "countries" : "types"}` : domestic ? "trade-domestic-countries" : "trade-partners", title: t(composition ? "composition.title" : services ? countries ? "services.countriesTitle" : "services.typesTitle" : domestic ? "domestic.countriesTitle" : "partners.title"), groupLabel: indicatorLabel, years: model.years,
+    locale: presentation.locale, filenameBase: composition ? `trade-composition-${classification}` : services ? `trade-services-${countries ? "countries" : "types"}` : domestic ? "trade-domestic-countries" : "trade-partners", title: t(composition ? "composition.title" : services ? countries ? "services.countriesTitle" : "services.typesTitle" : domestic ? "domestic.countriesTitle" : "partners.title"),
+    // Composition names its classification as the page's switch does (goods groups are SITC, economic categories BEC).
+    view: composition ? `${t(`composition.${classification}`)} · ${indicatorLabel}` : indicatorLabel, groupLabel: indicatorLabel, years: model.years,
     measure: { kind: "amount", unitLabel: model.unit.label, readableScale: model.unit.divisor }, totalId: totalId, includeTotalsInAnalysis: true, showChangeColumn: false,
     series: model.selectedIds.map(id => {
       const entity = entities.get(id);
@@ -53,7 +55,8 @@ export function buildTradePartnersWorkbookModel(input: { dataset?: "services" | 
   exportModel.analysis.headers[3] = t("workbook.amount");
   if (!composition) {
     exportModel.analysis.headers.push(t("workbook.publication"));
-    exportModel.analysis.rows = exportModel.analysis.rows.map(row => [...row, t("publicationUnspecified")]);
+    const unspecified = t("publicationUnspecified");
+    exportModel.analysis.rows = exportModel.analysis.rows.map(row => [...row, unspecified]);
   }
   exportModel.analysis.numericFormats = { 4: EXACT_SIGNED_FORMAT };
   return exportModel;

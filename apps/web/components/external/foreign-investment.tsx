@@ -3,7 +3,7 @@ import Link from "next/link";
 import type { ClientForeignInvestmentData } from "../../lib/data/externalFlows/importForeignInvestment";
 import { FOREIGN_INVESTMENT_DIMENSIONS, FOREIGN_INVESTMENT_TOTAL_ID } from "../../lib/data/externalFlows/types";
 import { buildForeignInvestmentModel } from "../../lib/explorer/foreignInvestment";
-import { foreignInvestmentCoverage, parseForeignInvestmentHash, serializeForeignInvestmentHash, switchForeignInvestmentTab } from "../../lib/explorer/foreignInvestmentState";
+import { foreignInvestmentCoverage, foreignInvestmentCrawlStates, parseForeignInvestmentHash, serializeForeignInvestmentHash, switchForeignInvestmentTab } from "../../lib/explorer/foreignInvestmentState";
 import { buildForeignInvestmentWorkbookModel } from "../../lib/explorer/foreignInvestmentWorkbook";
 import { rangeFromPatch, resolveRange } from "../../lib/explorer/periodRange";
 import { formatInUnit } from "../../lib/explorer/format";
@@ -19,6 +19,7 @@ import { SeriesAside } from "../explorer-shell/series-aside";
 import { EditorialLineChart } from "../main-explorer/editorial-line-chart";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { ChartShareButton } from "../explorer-shell/chart-share-button";
+import { CrawlTables, useCrawlModels } from "../explorer-shell/crawl-tables";
 import { ExplorerTable } from "../main-explorer/explorer-table";
 import { RangeStrip } from "../main-explorer/range-strip";
 import { ExcelDownloadButton } from "../explorer/excel-download-button";
@@ -32,6 +33,9 @@ export function ForeignInvestment({ data, sources, lastReviewedAt, siteOrigin }:
   const t = (key: string, values?: Record<string, string | number>) => message(messages, `external.investment.${key}`, values);
   const { state, update } = useHashState(data, parseForeignInvestmentHash, serializeForeignInvestmentHash), model = buildForeignInvestmentModel(data, state, presentation);
   const label = (id: string) => model.series.find(item => item.id === id)!.label, color = (id: string) => model.series.find(item => item.id === id)!.color;
+  // Every tab's list over its years, for the hidden crawl tables: built from the props alone, so a click never rebuilds them.
+  const crawlModels = useCrawlModels(() => foreignInvestmentCrawlStates(data).map(crawl =>
+    buildForeignInvestmentWorkbookModel({ data, state: crawl, sources, siteOrigin }, presentation)));
   const tabLabel = t(`tab.${state.dimension}`);
   const rows = model.selectedIds.map(id => ({ itemId: id, kaLabel: label(id), color: color(id), valuesByYear: model.valuesByEntity[id] }));
   const total = rows.find(row => row.itemId === FOREIGN_INVESTMENT_TOTAL_ID) ?? null;
@@ -52,7 +56,8 @@ export function ForeignInvestment({ data, sources, lastReviewedAt, siteOrigin }:
         <section data-testid="chart-panel" data-mode={state.mode} data-dimension={state.dimension} data-unit="usd" className="border-t border-[var(--ink)] pt-4">
           <div className="flex flex-wrap items-end justify-between gap-3"><ModeTabs value={state.mode} onChange={mode => update(s => ({ ...s, mode }), true)} /><span className="text-[11px] text-[var(--muted)]">{tabLabel} · {model.unit.label}</span></div>
           {!model.selectedCount ? <div className="mt-5"><Callout testId="no-selection-callout">{t("emptySelection")}</Callout></div>
-            : <><ExplorerTable caption={`${t("title")} · ${tabLabel} · ${model.unit.label} · ${model.range.start}–${model.range.end}`} rows={rows.filter(row => row.itemId !== FOREIGN_INVESTMENT_TOTAL_ID)} totalRow={total} showTotal={Boolean(total)} totalFirst wrapRowLabels rowLabelsLocalized years={model.years} firstColumnLabel={t("series")} unit={model.unit} share={false} showChangeColumn={false} shareValueForYear={() => null} crawlCopy={state.mode === "line"} />{state.mode === "line" ? <div className="mt-5">{chart}</div> : null}</>}
+            : state.mode === "line" ? <div className="mt-5">{chart}</div>
+            : <ExplorerTable caption={`${t("title")} · ${tabLabel} · ${model.unit.label} · ${model.range.start}–${model.range.end}`} rows={rows.filter(row => row.itemId !== FOREIGN_INVESTMENT_TOTAL_ID)} totalRow={total} showTotal={Boolean(total)} totalFirst wrapRowLabels rowLabelsLocalized years={model.years} firstColumnLabel={t("series")} unit={model.unit} share={false} showChangeColumn={false} shareValueForYear={() => null} />}
           <ChartSelectionAids series={lineSeries} chartShown={state.mode === "line"} share={false} unit={model.unit} formatValue={valueLabel} />
           <RangeStrip years={foreignInvestmentCoverage(data, state.dimension).years} range={model.range} onChange={patch => update(s => ({ ...s, range: rangeFromPatch(resolveRange(s.range, foreignInvestmentCoverage(data, s.dimension)), patch) }))} />
         </section>
@@ -63,5 +68,6 @@ export function ForeignInvestment({ data, sources, lastReviewedAt, siteOrigin }:
       <SeriesAside label={message(messages, "controls.series")}><MoneyFromAbroadSeriesPanel key={state.dimension} model={model} totalId={FOREIGN_INVESTMENT_TOTAL_ID} onSelectionChange={selectedIds => update(s => ({ ...s, selectedIds }), true)} downloadAction={downloadAction} /></SeriesAside>
     </ExplorerWorkspace>
     <ExternalRanking key={`${state.dimension}:${model.range.end}`} testId="foreign-investment" data={{ "end-year": model.range.end, dimension: state.dimension }} title={t(`ranking.${state.dimension}`, { year: model.range.end })} itemLabel={t(`item.${state.dimension}`)} shareLabel={t("share")} note={t("shareNote")} empty={t("noRanking")} rows={model.ranking} other={model.other} />
+    <CrawlTables models={crawlModels} />
   </div>;
 }

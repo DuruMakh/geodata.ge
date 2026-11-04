@@ -57,7 +57,8 @@ export function buildInflationCityWorkbookExportModel(input: {
   const usedSourceIds = new Set<string>(["source.geostat_cpi_yoy"]);
   if (withSummary) usedSourceIds.add("source.geostat_cpi_avg12");
   const chosen = pickLocaleEditions(sources, usedSourceIds, locale);
-  const subtitle = `${periodLabel(messages, range.start, "long")} – ${periodLabel(messages, range.end, "long")} · ${t("categoryUnit.yoy")}`;
+  const period = `${periodLabel(messages, range.start, "long")} – ${periodLabel(messages, range.end, "long")}`;
+  const subtitle = `${period} · ${t("categoryUnit.yoy")}`;
   const stem = view.kind === "georgia" ? "inflation-cities" : `inflation-${citySlug(view.cityId)}`;
 
   return {
@@ -68,6 +69,8 @@ export function buildInflationCityWorkbookExportModel(input: {
       title: `${t("citiesHeading")} · ${cityPlaceLabel(messages, view)}`,
       subtitle: `${subtitle} · ${t("cityCentralPricesNote")}`,
       fitSubtitle: true,
+      // The columns are months; the caption names the months the rows span.
+      period,
       unitLabel: t("categoryWorkbookUnit.yoy"),
       numberFormat: "0.0%",
       showChangeColumn: false,

@@ -60,7 +60,7 @@ type Part = { pyramid: Pyramid; year: number; basis: string };
 
 function pyramidWorkbook(
   presentation: Presentation,
-  spec: { title: string; subtitle: string; unitLabel: string; stem: string; parts: Part[]; sourceYears: number[]; sources: WorkbookExportModel["sources"] },
+  spec: { title: string; subtitle: string; view?: string; period: string; unitLabel: string; stem: string; parts: Part[]; sourceYears: number[]; sources: WorkbookExportModel["sources"] },
 ): WorkbookExportModel {
   const { locale, t, w } = helpers(presentation);
   const labelled = spec.parts.length > 1;
@@ -88,6 +88,9 @@ function pyramidWorkbook(
     readable: {
       title: spec.title,
       subtitle: spec.subtitle,
+      ...(spec.view === undefined ? {} : { view: spec.view }),
+      // The columns are sexes, not years, so the caption takes its period from here.
+      period: spec.period,
       unitLabel: spec.unitLabel,
       amountDecimals: 0,
       showChangeColumn: false,
@@ -124,6 +127,7 @@ export function buildPyramidWorkbookExportModel(input: Input & { year: number; c
     title: t("pyramidWorkbookTitle"),
     // Counts are not comparable across the 2025 re-base, so the readable sheet says so beside the years.
     subtitle: `${years.join(" · ")} · ${t("unitPersons")}${input.compare !== null && crossesBreak(input.year, input.compare) ? ` · ${t("breakLabel")}` : ""}`,
+    period: years.join(" · "),
     unitLabel: t("unitPersons"),
     stem: `demography-age-sex-georgia-${years.join("-")}`,
     parts: years.map((year) => ({ pyramid: annualPyramid(input.facts, year), year, basis: annualBasis(year) })),
@@ -141,6 +145,8 @@ export function buildCensusPlaceWorkbookExportModel(
   return pyramidWorkbook(presentation, {
     title: t("censusWorkbookTitle", { place: placeLabel(input.place, locale) }),
     subtitle: `${t(SETTLEMENT_KEYS[input.settlement])} · ${t("censusDate")}`,
+    view: t(SETTLEMENT_KEYS[input.settlement]),
+    period: t("censusDate"),
     unitLabel: t("personsHeader"),
     stem: `demography-age-sex-${input.scope}-census-${year}-${input.settlement}`,
     parts: [{ pyramid: censusPyramid(input.facts, input.settlement), year, basis: t("censusBasis") }],

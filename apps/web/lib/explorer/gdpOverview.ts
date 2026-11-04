@@ -40,6 +40,16 @@ export function changeGdpIndicator(
     { min, max } = resolveGdpRange(next, facts);
   return { ...next, range: refitRange(state.range, { min, max }, { collapseToAll: true }) };
 }
+/**
+ * The hidden crawl tables' states (lib/explorer/crawlTables.ts): each indicator the tabs offer, nominal and per-person GDP
+ * in GEL and in US dollars (neither the exchange rate nor the population is on the page), every year, the series each has.
+ */
+export function gdpCrawlStates(facts: readonly Pick<ClientGdpObservation, "seriesId">[]): GdpState[] {
+  return (["real", "nominal", "growth", "per_capita"] as const)
+    .flatMap((indicator) => (indicator === "nominal" || indicator === "per_capita" ? (["gel", "usd"] as const) : [DEFAULT_GDP_STATE.currency])
+      .map((currency): GdpState => ({ ...DEFAULT_GDP_STATE, indicator, currency })))
+    .filter((state) => facts.some((fact) => fact.seriesId === seriesFor(state)));
+}
 /** The newest run that starts at or before `year`. */
 export function sourceIdForYear(
   ranges: SourceIdRanges,

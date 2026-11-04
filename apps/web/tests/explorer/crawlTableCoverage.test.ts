@@ -2,38 +2,68 @@ import { readdirSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 
-// Every chart page that can switch to a yearly table also carries that table in its HTML, hidden, so crawlers read the numbers.
-const RULE = "Every <ExplorerTable> outside explorer-table.tsx takes crawlCopy={<mode> === \"line\"} (or crawlCopy={crawlCopy} in a helper that passes it on), one per table; see DESIGN.md §8.4 Table Mode.";
+// Every chart page carries every series of every view as hidden crawl tables, built by the page's own Excel workbook
+// builders, so crawlers and AI tools read the numbers (DESIGN.md §8.4 Table Mode).
+const RULE = "Every file under components/ that calls a workbook builder (build…Workbook…Model) renders <CrawlTables models={…} /> and passes no crawlCopy prop; see DESIGN.md §8.4 Table Mode.";
 const read = (file: string) => readFileSync(resolve(process.cwd(), file), "utf8");
 const sourceFiles = (dir: string) => (readdirSync(resolve(process.cwd(), dir), { recursive: true }) as string[])
   .map((file) => `${dir}/${file.replaceAll("\\", "/")}`)
   .filter((file) => /\.tsx?$/.test(file));
-const count = (source: string, pattern: string) => source.split(pattern).length - 1;
-// Files that render an ExplorerTable but are not switched between chart and table, so they need no crawl copy.
-// None today: every such file in components/ has a ModeTabs. Add a file here with a one-line reason, never silently.
-const NOT_MODE_SWITCHED: Record<string, string> = {};
+const BUILDER_CALL = /build\w*Workbook\w*Model\(/;
+// Files that call a workbook builder but render no crawl tables of their own. Add a file here with a one-line reason, never silently.
+const NO_CRAWL_TABLES: Record<string, string> = {
+  "components/inflation/inflation-products.tsx": "data fetched after page load; never in prerendered HTML",
+};
+// Exported crawl-state helpers with no test of their own, each with a one-line reason.
+const UNTESTED_CRAWL_STATES: Record<string, string> = {
+  unitListCrawlStates: "shared helper; tested through the explorers' own crawl states that call it",
+};
+// Components that carry the crawl tables of views their page opens only after a click, so the server never renders those explorers.
+const INDEX_CARRIERS = ["components/unemployment/unemployment-regions-index.tsx"];
 
 describe("crawl table coverage", () => {
-  const tableFiles = sourceFiles("components").filter((file) => file !== "components/main-explorer/explorer-table.tsx" && read(file).includes("<ExplorerTable") && !(file in NOT_MODE_SWITCHED));
+  const workbookFiles = sourceFiles("components").filter((file) => file !== "components/explorer-shell/crawl-tables.tsx" && BUILDER_CALL.test(read(file)));
+  const covered = workbookFiles.filter((file) => !(file in NO_CRAWL_TABLES));
 
-  it("every file that renders an ExplorerTable carries one crawlCopy prop per table", () => {
-    expect(tableFiles.length, `${RULE} Expected at least 47 table files.`).toBeGreaterThanOrEqual(47);
-    // One crawlCopy prop per table: a file that renders two tables cannot pass on the strength of one.
-    expect(tableFiles.filter((file) => count(read(file), "<ExplorerTable") !== count(read(file), "crawlCopy=")), `${RULE} These files differ in tables and crawlCopy props.`).toEqual([]);
+  it("every file that builds a workbook model renders crawl tables", () => {
+    expect(covered.length, `${RULE} Expected at least 47 workbook files.`).toBeGreaterThanOrEqual(47);
+    expect(covered.filter((file) => !read(file).includes("<CrawlTables")), `${RULE} These files render no <CrawlTables.`).toEqual([]);
   });
 
-  it("every crawlCopy value is one of the accepted forms", () => {
-    const accepted = /^crawlCopy=\{(?:[A-Za-z_$][\w$]*(?:\.[A-Za-z_$][\w$]*)? === "line"|crawlCopy)\}/;
-    const offending = tableFiles.flatMap((file) => read(file).split("crawlCopy=").slice(1)
-      .map((rest) => `crawlCopy=${rest}`)
-      .filter((value) => !accepted.test(value))
-      .map((value) => `${file}: ${value.slice(0, 60).split("\n")[0]}`));
-    expect(offending, `${RULE} These crawlCopy values are not an accepted form.`).toEqual([]);
+  it("crawl models are built through useCrawlModels, never in a useMemo the browser would run", () => {
+    // The browser never builds them: a crawl useMemo cost Trading partners over half a second of hydration (DESIGN.md §8.4).
+    const crawlFiles = sourceFiles("components").filter((file) => file !== "components/explorer-shell/crawl-tables.tsx" && /<CrawlTables|export function use\w+CrawlModels\(/.test(read(file)));
+    expect(crawlFiles.length).toBeGreaterThanOrEqual(47);
+    expect(crawlFiles.filter((file) => /<CrawlTables/.test(read(file)) && !/\buse\w*CrawlModels\(/.test(read(file))), "These files render <CrawlTables without useCrawlModels.").toEqual([]);
+    const hooks = crawlFiles.flatMap((file) => [...read(file).matchAll(/export function (use\w+CrawlModels)\([\s\S]*?\n}\n/g)].map((match) => ({ name: match[1]!, body: match[0] })));
+    expect(hooks.length).toBeGreaterThanOrEqual(4);
+    expect(hooks.filter((hook) => !hook.body.includes("useCrawlModels(") || hook.body.includes("useMemo(")).map((hook) => hook.name), "These crawl hooks do not build through useCrawlModels.").toEqual([]);
+    expect(crawlFiles.filter((file) => /crawl\w*\s*=\s*useMemo\(/i.test(read(file))), "These files build crawl models in a useMemo.").toEqual([]);
   });
 
-  it("the exemption list names only files that still render a table and have no ModeTabs", () => {
-    for (const file of Object.keys(NOT_MODE_SWITCHED)) {
-      expect(read(file).includes("<ExplorerTable") && !read(file).includes("<ModeTabs"), `${file} no longer qualifies for an exemption (${RULE})`).toBe(true);
+  it("no component passes the retired crawlCopy prop, and ExplorerTable no longer takes it", () => {
+    expect(sourceFiles("components").filter((file) => read(file).includes("crawlCopy")), RULE).toEqual([]);
+  });
+
+  it("an index that opens a view only after a click carries that view's crawl tables", () => {
+    for (const file of INDEX_CARRIERS) expect(read(file), `${file} must render <CrawlTables (${RULE})`).toContain("<CrawlTables");
+  });
+
+  it("every exported crawl-state helper is named in a crawlStates test (.ts or .tsx)", () => {
+    const tests = (readdirSync(resolve(process.cwd(), "tests/explorer")) as string[]).filter((file) => /^crawlStates\.\w+\.test\.tsx?$/.test(file)).map((file) => read(`tests/explorer/${file}`));
+    expect(tests.length).toBeGreaterThanOrEqual(6);
+    // Functions and arrow constants alike, and the helpers named for what they return (censusCrawlSettlements,
+    // populationPlaceCrawlQueries); crawlTables.ts holds the renderer, not crawl states.
+    const functions = sourceFiles("lib").filter((file) => file !== "lib/explorer/crawlTables.ts")
+      .flatMap((file) => [...read(file).matchAll(/export (?:function|const) (\w+Crawl[A-Z]\w*)\b/g)].map((match) => match[1]!));
+    expect(functions.length).toBeGreaterThanOrEqual(50);
+    expect(functions).toEqual(expect.arrayContaining(["businessCrawlStates", "censusCrawlSettlements", "populationPlaceCrawlQueries"]));
+    expect(functions.filter((name) => !(name in UNTESTED_CRAWL_STATES) && !tests.some((source) => new RegExp(`\\b${name}\\b`).test(source))), "These crawl-state functions have no test.").toEqual([]);
+  });
+
+  it("the exemption list names only files that still build a workbook and render no crawl tables", () => {
+    for (const file of Object.keys(NO_CRAWL_TABLES)) {
+      expect(BUILDER_CALL.test(read(file)) && !read(file).includes("<CrawlTables"), `${file} no longer qualifies for an exemption (${RULE})`).toBe(true);
     }
   });
 });

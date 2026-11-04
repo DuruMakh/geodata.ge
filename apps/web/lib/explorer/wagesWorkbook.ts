@@ -23,7 +23,7 @@ export function buildWagesWorkbookExportModel(input: { section: WagesSectionId; 
     locale, filename: workbookFilename(`wages-${section}${input.regionId ? `-${input.regionId.replace(/^region\./, "")}` : ""}${state.view === "main" ? "" : `-${state.view}`}-${model.range.start}-${model.range.end}`, locale), sheetNames: SHEET_NAMES[locale],
     readable: {
       title: `${input.title ?? t(`page.${section}.title`)}${view}`, subtitle: `${model.range.start}–${model.range.end} · ${t("unitMonthly")} · ${t("nominalNote")}`,
-      unitLabel: t("unit"), amountDecimals: model.decimals, years: model.years, showChangeColumn: false, numberFormat,
+      unitLabel: t("unit"), longUnit: t("unitMonthly"), amountDecimals: model.decimals, years: model.years, showChangeColumn: false, numberFormat,
       rows: model.selected.map(series => ({ kind: series.reference ? "total" : "item", parentLabel: null, label: labels[series.id], change: null,
         ...(rowFormat(series) ? { numberFormat: rowFormat(series) } : {}),
         valuesByYear: Object.fromEntries(model.years.map(year => [year, series.valuesByYear[year]])),

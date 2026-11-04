@@ -12,7 +12,7 @@ export function buildMoneyTransfersWorkbookModel(input: { data: ClientMoneyTrans
   const t = (key: string) => message(presentation.messages, `external.${key}`);
   const months = new Map(input.data.facts.filter(f => f.measure === input.state.measure).map(f => [`${f.entityId}:${f.year}`, f.monthsReported]));
   const exportModel = buildWorkbookExportModel({
-    locale: presentation.locale, filenameBase: "money-from-abroad", title: t("money.title"), groupLabel: t(`measure.${input.state.measure}`), years: model.years,
+    locale: presentation.locale, filenameBase: "money-from-abroad", title: t("money.title"), view: t(`measure.${input.state.measure}`), groupLabel: t(`measure.${input.state.measure}`), years: model.years,
     measure: { kind: "amount", unitLabel: model.unit.label, readableScale: model.unit.divisor }, totalId: MONEY_TRANSFER_TOTAL_ID, includeTotalsInAnalysis: true, showChangeColumn: false,
     series: model.selectedIds.map(id => {
       return { id, kind: id === MONEY_TRANSFER_TOTAL_ID ? "total" : "item", label: model.series.find(item => item.id === id)!.label, parentLabel: null, pointsByYear: Object.fromEntries(model.years.map(year => [year, { amountGel: model.valuesByEntity[id][year], basis: "actual" as const }])) };

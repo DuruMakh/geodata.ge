@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { updatedDate } from "../../lib/explorer/coverageLabel";
 import { Hospital, Users, type LucideIcon } from "lucide-react";
 import type { ClientHealthFact, HealthSeriesBreak } from "../../lib/data/health/types";
-import { buildHealthModel, changeHealthView, healthCoverage, healthDisplay, healthViews, healthViewSeries, keepOneHealthUnit, parseHealthHash, scaled, serializeHealthHash, type HealthNationalSectionId, type HealthState, type HealthView } from "../../lib/explorer/health";
+import { buildHealthModel, changeHealthView, healthCoverage, healthCrawlStates, healthDisplay, healthViews, healthViewSeries, keepOneHealthUnit, parseHealthHash, scaled, serializeHealthHash, type HealthNationalSectionId, type HealthState, type HealthView } from "../../lib/explorer/health";
 import { buildHealthWorkbookExportModel } from "../../lib/explorer/healthWorkbook";
 import { formatInUnit, type ValueUnit } from "../../lib/explorer/format";
 import { rangeFromPatch } from "../../lib/explorer/periodRange";
@@ -15,6 +15,7 @@ import { pageHref } from "../../lib/i18n/routes";
 import { ModeTabs } from "../explorer-shell/mode-tabs";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { ChartShareButton } from "../explorer-shell/chart-share-button";
+import { CrawlTables, useCrawlModels } from "../explorer-shell/crawl-tables";
 import { ExplorerHeading } from "../explorer-shell/explorer-heading";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { LatestValueLine } from "../explorer-shell/latest-value-line";
@@ -75,6 +76,9 @@ export function HealthExplorer({ section, facts, breaks, labels, sources, lastRe
   const measureLabel = section === "illnesses" || state.view === views[0] ? t(`latest.${section}`) : labels[headline];
   const title = t(`page.${section}.title`);
   const chartLabel = views.length > 1 ? t(`view.${state.view}`) : title;
+  // Every view's series, one table per unit, over their years, for the hidden crawl tables: built from the props alone, so a click never rebuilds them.
+  const crawlModels = useCrawlModels(() => healthCrawlStates(section, facts).map(crawl =>
+    buildHealthWorkbookExportModel({ section, facts, state: crawl, labels, sources, siteOrigin, title }, presentation)));
   const changeView = (view: HealthView) => {
     if (view === state.view) return;
     setQuery("");
@@ -104,8 +108,9 @@ export function HealthExplorer({ section, facts, breaks, labels, sources, lastRe
             </div>
           </div>
           {!model.selected.length ? <div className="mt-5"><Callout testId="no-selection-callout">{t("emptySelection")}</Callout></div>
-            : <><ExplorerTable caption={`${chartLabel} · ${unitLabel} · ${model.range.start}–${model.range.end}`} rows={rows.filter(row => row !== total)} totalRow={total} showTotal={Boolean(total)} totalFirst wrapRowLabels rowLabelsLocalized years={model.years} firstColumnLabel={t("series")} unit={unit} share={false} showChangeColumn={false} shareValueForYear={() => null}
-              breakYears={model.breaks.map(item => item.year)} breakLabel={newCounting} crawlCopy={state.mode === "line"} />{state.mode === "line" ? <div className="mt-5">{chart}</div> : null}</>}
+            : state.mode === "line" ? <div className="mt-5">{chart}</div>
+            : <ExplorerTable caption={`${chartLabel} · ${unitLabel} · ${model.range.start}–${model.range.end}`} rows={rows.filter(row => row !== total)} totalRow={total} showTotal={Boolean(total)} totalFirst wrapRowLabels rowLabelsLocalized years={model.years} firstColumnLabel={t("series")} unit={unit} share={false} showChangeColumn={false} shareValueForYear={() => null}
+              breakYears={model.breaks.map(item => item.year)} breakLabel={newCounting} />}
           <ChartSelectionAids series={lineSeries} chartShown={state.mode === "line"} share={false} unit={unit} formatValue={valueLabel} />
           <RangeStrip years={healthCoverage(section, state.view, facts).years} range={model.range} onChange={patch => update(s => ({ ...s, range: rangeFromPatch(buildHealthModel(section, facts, s, breaks).range, patch) }))} />
         </section>
@@ -118,5 +123,6 @@ export function HealthExplorer({ section, facts, breaks, labels, sources, lastRe
         totalId={reference?.id} pinTotal selectedIds={state.selectedIds} onSelectionChange={selectedIds => update(s => ({ ...s, selectedIds: keepOneHealthUnit(selectedIds, s.selectedIds) }), true)}
         query={query} onQueryChange={setQuery} searchPlaceholder={t("search")} searchable={model.series.length > SEARCHABLE_MIN_ROWS} />
     </ExplorerWorkspace>
+    <CrawlTables models={crawlModels} />
   </div>;
 }

@@ -13,10 +13,11 @@ import type {
   ClientNationalGdpFact,
 } from "../../lib/explorer/clientData";
 import { unpackFacts, type FactsInput } from "../../lib/data/packedFacts";
-import { buildExplorerModel, isPlannedYear } from "../../lib/explorer/explorerData";
+import { budgetCrawlStates, buildExplorerModel, isPlannedYear } from "../../lib/explorer/explorerData";
 import { buildBudgetWorkbookInput } from "../../lib/explorer/budgetWorkbook";
 import { formatAmount, unitFor, unitsFor } from "../../lib/explorer/format";
 import { useAppReady } from "../explorer-shell/use-app-ready";
+import { CrawlTables, useCrawlModels } from "../explorer-shell/crawl-tables";
 import type { ExplorerSide } from "../../lib/explorer/types";
 import { buildWorkbookExportModel, type WorkbookPublicSource } from "../../lib/explorer/workbookModel";
 import { downloadWorkbook } from "../../lib/explorer/workbookWriter.client";
@@ -49,7 +50,11 @@ export function MainExplorer(props: MainExplorerProps) {
   return <I18nProvider {...props.presentation}><MainExplorerContent {...props} /></I18nProvider>;
 }
 
-function MainExplorerContent({ nav, facts: shippedFacts, adminFacts: shippedAdminFacts = [], adminCategories = [], glossaryEntries, gdpFacts = [], workbookSources = [], adminWorkbookSources = [], gdpWorkbookSources = [], siteOrigin, lastUpdatedAt }: MainExplorerProps) {
+// One empty array for every omitted list prop (the revenue route sends no admin corpus): a fresh `[]` per render would
+// change the memo inputs below on every click and rebuild the crawl models.
+const NONE: never[] = [];
+
+function MainExplorerContent({ nav, facts: shippedFacts, adminFacts: shippedAdminFacts = NONE, adminCategories = NONE, glossaryEntries, gdpFacts = NONE, workbookSources = NONE, adminWorkbookSources = NONE, gdpWorkbookSources = NONE, siteOrigin, lastUpdatedAt }: MainExplorerProps) {
   const facts = unpackFacts(shippedFacts), adminFacts = unpackFacts(shippedAdminFacts);
   // The provider adds the layout's namespaces to the page's: read them from it, not from the prop.
   const presentation = useI18n();
@@ -120,6 +125,35 @@ function MainExplorerContent({ nav, facts: shippedFacts, adminFacts: shippedAdmi
     measure: share ? "share_of_gdp" : "nominal",
   }, presentation), [facts, gdpFacts, adminFacts, adminCategoryMap, grouping, glossary, explorerSide, selectedIds, range.start, range.end, share, presentation]);
 
+  const screenTitle = nav === "expenditure"
+    ? message(messages, "main.expenditureHeading")
+    : message(messages, "main.revenueHeading");
+
+  // Every series of every scope the route offers, for the hidden crawl tables: built from the props alone, so a click
+  // never rebuilds them.
+  const crawlModels = useCrawlModels(() => budgetCrawlStates(nav, facts, adminFacts, gdpFacts).map((crawl) => buildWorkbookExportModel(buildBudgetWorkbookInput({
+    model: buildExplorerModel({
+      facts,
+      gdpFacts,
+      adminFacts,
+      adminCategories: adminCategoryMap,
+      expenditureGrouping: crawl.grouping,
+      glossary,
+      side: nav,
+      selectedItemIds: crawl.selectedIds,
+      startYear: crawl.startYear,
+      endYear: crawl.endYear,
+      measure: crawl.share ? "share_of_gdp" : "nominal",
+    }, presentation),
+    presentation,
+    scope: crawl.scope,
+    share: crawl.share,
+    // The caption names the grouping (fields or ministries), as the tabs do; revenue has one.
+    title: nav === "expenditure" ? `${screenTitle} · ${message(messages, crawl.grouping === "ministries" ? "controls.ministries" : "controls.fields")}` : screenTitle,
+    sources: { budget: workbookSources, admin: adminWorkbookSources, gdp: gdpWorkbookSources },
+    siteOrigin: siteOrigin ?? "",
+  }))));
+
   const deck = useMemo(() => {
     const totals = totalsByScope[scope];
     const latestYear = scopeYears.at(-1);
@@ -144,9 +178,6 @@ function MainExplorerContent({ nav, facts: shippedFacts, adminFacts: shippedAdmi
       : { measure: `${yearLabel}: ${message(messages, "main.total")}`, lead: formatAmount(latestTotal, locale), yoy, plan: planned };
   }, [totalsByScope, scope, scopeYears, facts, adminFacts, explorerSide, locale, messages]);
 
-  const screenTitle = nav === "expenditure"
-    ? message(messages, "main.expenditureHeading")
-    : message(messages, "main.revenueHeading");
   const sectionLabel = message(messages, nav === "revenue" ? "common.revenue" : "common.expenditure");
   const coverage = coverageLabel(messages, locale, scopeYears[0], scopeYears.at(-1), lastUpdatedAt || undefined);
 
@@ -189,6 +220,7 @@ function MainExplorerContent({ nav, facts: shippedFacts, adminFacts: shippedAdmi
           />
         }
       />
+      <CrawlTables models={crawlModels} />
     </BudgetExplorerFrame>
   );
 }

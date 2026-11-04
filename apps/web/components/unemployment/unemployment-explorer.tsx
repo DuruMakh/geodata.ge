@@ -5,7 +5,7 @@ import type { ClientUnemploymentObservation, UnemploymentBreakdown, Unemployment
 import { unemploymentIndicators, unemploymentIsRate } from "../../lib/data/unemployment/types";
 import { buildUnemploymentModel, buildUnemploymentComposition, formatUnemploymentValue, unemploymentCountUnit, unemploymentPlaceLatest } from "../../lib/explorer/unemployment";
 import { buildUnemploymentAgeHeatmap } from "../../lib/explorer/unemploymentAge";
-import { changeUnemploymentBreakdown, changeUnemploymentEducationSex, changeUnemploymentIndicator, changeUnemploymentOverviewSelection, type UnemploymentState } from "../../lib/explorer/unemploymentState";
+import { changeUnemploymentBreakdown, changeUnemploymentEducationSex, changeUnemploymentIndicator, changeUnemploymentOverviewSelection, unemploymentCrawlStates, type UnemploymentState } from "../../lib/explorer/unemploymentState";
 import { unemploymentSeriesLabel, unemploymentUsesIndicatorSeries } from "../../lib/explorer/unemploymentOverview";
 import { NATIONAL_UNEMPLOYMENT_VIEWS, type UnemploymentSectionId } from "../../lib/explorer/unemploymentSections";
 import { buildUnemploymentWorkbookExportModel } from "../../lib/explorer/unemploymentWorkbook";
@@ -32,6 +32,7 @@ import { LatestValueLine } from "../explorer-shell/latest-value-line";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { ChartShareButton } from "../explorer-shell/chart-share-button";
+import { CrawlTables, useCrawlModels } from "../explorer-shell/crawl-tables";
 import { Callout, SELECT_CLASS, SegmentedTabs, SourceNote, SwatchBar, SectionTitle, TextTab } from "../ui/editorial";
 import { UnemploymentSeriesPanel } from "./unemployment-series-panel";
 import { UnemploymentOverviewSeriesPanel } from "./unemployment-overview-series-panel";
@@ -39,6 +40,16 @@ import { useUnemploymentState } from "./use-unemployment-state";
 import { UnemploymentAgeHeatmap } from "./unemployment-age-heatmap";
 
 export type UnemploymentExplorerProps = { section: UnemploymentSectionId; regionId?: string; regionSplit?: boolean; regions?: MunicipalRegion[]; facts: ClientUnemploymentObservation[]; registry: UnemploymentGroupDefinition[]; sources: (WorkbookPublicSource & { sourceId: string })[]; lastReviewedAt: string; siteOrigin: string };
+/**
+ * Every view and unit of the page, every series of its list over its years, for the hidden crawl tables: built from the props
+ * alone, so a click never rebuilds them. The Regions index's map view carries the same tables as its comparison.
+ */
+export function useUnemploymentCrawlModels({ section, regionId, facts, registry, sources, siteOrigin }: Pick<UnemploymentExplorerProps, "section" | "regionId" | "facts" | "registry" | "sources" | "siteOrigin">) {
+  const presentation = useI18n();
+  return useCrawlModels(() => unemploymentCrawlStates(facts, registry, section, regionId).map(crawl =>
+    buildUnemploymentWorkbookExportModel(facts, registry, crawl, presentation, sources, siteOrigin)));
+}
+
 export function UnemploymentExplorer({ section, regionId, regionSplit, regions, facts, registry, sources, lastReviewedAt, siteOrigin }: UnemploymentExplorerProps) {
   const presentation = useI18n(), { locale, messages } = presentation;
   const t = (key: string) => message(messages, `unemployment.${key}`);
@@ -53,6 +64,7 @@ export function UnemploymentExplorer({ section, regionId, regionSplit, regions, 
     next: orderedRegions[(regionIndex + 1) % orderedRegions.length]!,
   };
   const model = useMemo(() => buildUnemploymentModel(facts, registry, state), [facts, registry, state]);
+  const crawlModels = useUnemploymentCrawlModels({ section, regionId, facts, registry, sources, siteOrigin });
   const composition = useMemo(() => buildUnemploymentComposition(facts, model.years), [facts, model.years]);
   const ageHeatmap = useMemo(() => section === "age" ? buildUnemploymentAgeHeatmap(facts, registry, state.indicator, model.years) : null, [section, facts, registry, state.indicator, model.years]);
   const regionalStatusYears = section === "regions" ? facts.filter(f => f.dimension === "region" && ["hired", "self_employed"].includes(f.indicatorId)).map(f => f.year) : [];
@@ -119,8 +131,9 @@ export function UnemploymentExplorer({ section, regionId, regionSplit, regions, 
           </div>
           {!state.selectedIds.length ? <div className="mt-5"><Callout testId="no-selection-callout">{t("emptySelection")}</Callout></div>
             : !model.hasData ? <div className="mt-5"><Callout testId="no-range-data-callout">{t("emptyRange")}</Callout></div>
-            : <><ExplorerTable caption={`${indicatorLabel} · ${model.percent ? "%" : unit.label} · ${model.range.start}–${model.range.end}`} rows={rows.filter(row => row.itemId !== model.referenceId)} totalRow={total} showTotal={Boolean(total)} totalFirst wrapRowLabels rowLabelsLocalized
-              years={model.years} firstColumnLabel={t(unemploymentUsesIndicatorSeries(state) ? "series" : "group")} unit={unit} share={model.percent} showChangeColumn={false} shareValueForYear={(row, year) => row.valuesByYear[year] ?? null} crawlCopy={state.mode === "line"} />{state.mode === "line" ? <div className="mt-5">{chart}</div> : null}</>}
+            : state.mode === "line" ? <div className="mt-5">{chart}</div>
+            : <ExplorerTable caption={`${indicatorLabel} · ${model.percent ? "%" : unit.label} · ${model.range.start}–${model.range.end}`} rows={rows.filter(row => row.itemId !== model.referenceId)} totalRow={total} showTotal={Boolean(total)} totalFirst wrapRowLabels rowLabelsLocalized
+              years={model.years} firstColumnLabel={t(unemploymentUsesIndicatorSeries(state) ? "series" : "group")} unit={unit} share={model.percent} showChangeColumn={false} shareValueForYear={(row, year) => row.valuesByYear[year] ?? null} />}
           <ChartSelectionAids series={model.series.map(series => ({ ...series, label: labels.get(series.id)! }))} chartShown={state.mode === "line"} share={model.percent} unit={unit} formatValue={valueLabel} />
           <RangeStrip years={model.availableYears} range={model.range} onChange={patch => update(s => ({ ...s, range: rangeFromPatch(buildUnemploymentModel(facts, registry, s).range, patch) }))} />
         </section>
@@ -143,5 +156,6 @@ export function UnemploymentExplorer({ section, regionId, regionSplit, regions, 
       <div className="my-4 flex flex-wrap gap-x-6 gap-y-2 text-[11px] text-[var(--muted)]">{composition.segments.map(segment => <span key={segment.id} className="flex items-center gap-2"><SwatchBar color={segment.color} />{t(`composition.${segment.id}`)}</span>)}</div>
       <StackedColumnChart {...composition} periodsPerYear={1} segments={composition.segments.map(segment => ({ ...segment, label: t(`composition.${segment.id}`) }))} formatPeriod={String} formatValue={value => `${formatInUnit(value, unit)} ${unit.label}`} ariaLabel={t("compositionAria")} />
     </section> : null}
+    <CrawlTables models={crawlModels} />
   </div>;
 }

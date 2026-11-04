@@ -3,7 +3,7 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import { Hash, Users, type LucideIcon } from "lucide-react";
 import type { ClientCrimeFact, CrimeSeriesBreak } from "../../lib/data/crime/types";
-import { buildCrimeModel, changeCrimeMeasure, crimeCoverage, crimeDefaultSelection, crimeUnitKey, parseCrimeHash, serializeCrimeHash, type CrimeMeasure, type CrimePopulation, type CrimeSectionId, type CrimeState } from "../../lib/explorer/crime";
+import { buildCrimeModel, changeCrimeMeasure, crimeCoverage, crimeCrawlStates, crimeDefaultSelection, crimeUnitKey, parseCrimeHash, serializeCrimeHash, type CrimeMeasure, type CrimePopulation, type CrimeSectionId, type CrimeState } from "../../lib/explorer/crime";
 import { buildCrimeWorkbookExportModel } from "../../lib/explorer/crimeWorkbook";
 import { updatedDate } from "../../lib/explorer/coverageLabel";
 import { formatInUnit, type ValueUnit } from "../../lib/explorer/format";
@@ -16,6 +16,7 @@ import { pageHref } from "../../lib/i18n/routes";
 import { ModeTabs } from "../explorer-shell/mode-tabs";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { ChartShareButton } from "../explorer-shell/chart-share-button";
+import { CrawlTables, useCrawlModels } from "../explorer-shell/crawl-tables";
 import { ExplorerHeading } from "../explorer-shell/explorer-heading";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { LatestValueLine } from "../explorer-shell/latest-value-line";
@@ -72,6 +73,9 @@ export function CrimeExplorer({ section, facts, population, breaks, labels, sour
   const latest = latestOf(crimeDefaultSelection(section)[0]);
   const killed = section === "road-accidents" ? latestOf(ROAD_KILLED) : null;
   const title = t(`page.${section}.title`);
+  // Every unit of the list as counts and per 100,000, every series over its years, for the hidden crawl tables: built from the props alone, so a click never rebuilds them.
+  const crawlModels = useCrawlModels(() => crimeCrawlStates(section, facts, population).map(crawl =>
+    buildCrimeWorkbookExportModel({ section, facts, population, state: crawl, labels, sources, siteOrigin, title }, presentation)));
   const changeMeasure = (measure: CrimeMeasure) => {
     if (measure !== state.measure) update(s => changeCrimeMeasure(s, measure), true);
   };
@@ -99,8 +103,9 @@ export function CrimeExplorer({ section, facts, population, breaks, labels, sour
             </div>
           </div>
           {!model.selected.length ? <div className="mt-5"><Callout testId="no-selection-callout">{t("emptySelection")}</Callout></div>
-            : <><ExplorerTable caption={`${title} · ${unitLabel} · ${model.range.start}–${model.range.end}`} rows={rows.filter(row => row !== total)} totalRow={total} showTotal={Boolean(total)} totalFirst wrapRowLabels rowLabelsLocalized years={model.years} firstColumnLabel={t("series")} unit={unit} share={false} showChangeColumn={false} shareValueForYear={() => null}
-              breakYears={model.breaks.map(item => item.year)} breakLabel={newCounting} crawlCopy={state.mode === "line"} />{state.mode === "line" ? <div className="mt-5">{chart}</div> : null}</>}
+            : state.mode === "line" ? <div className="mt-5">{chart}</div>
+            : <ExplorerTable caption={`${title} · ${unitLabel} · ${model.range.start}–${model.range.end}`} rows={rows.filter(row => row !== total)} totalRow={total} showTotal={Boolean(total)} totalFirst wrapRowLabels rowLabelsLocalized years={model.years} firstColumnLabel={t("series")} unit={unit} share={false} showChangeColumn={false} shareValueForYear={() => null}
+              breakYears={model.breaks.map(item => item.year)} breakLabel={newCounting} />}
           <ChartSelectionAids series={lineSeries} chartShown={state.mode === "line"} share={false} unit={unit} formatValue={valueLabel} />
           <RangeStrip years={crimeCoverage(section, facts).years} range={model.range} onChange={patch => update(s => ({ ...s, range: rangeFromPatch(buildCrimeModel(section, facts, population, s, breaks).range, patch) }))} />
         </section>
@@ -112,5 +117,6 @@ export function CrimeExplorer({ section, facts, population, breaks, labels, sour
         totalId={reference?.id} pinTotal selectedIds={state.selectedIds} onSelectionChange={selectedIds => update(s => ({ ...s, selectedIds: keepOneUnit(selectedIds, s.selectedIds, facts) }), true)}
         query={query} onQueryChange={setQuery} searchPlaceholder={t("search")} searchable={model.series.length > SEARCHABLE_MIN_ROWS} />
     </ExplorerWorkspace>
+    <CrawlTables models={crawlModels} />
   </div>;
 }

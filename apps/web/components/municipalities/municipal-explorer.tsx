@@ -7,7 +7,6 @@ import { pageHref } from "../../lib/i18n/routes";
 import type { Presentation } from "../../lib/i18n/types";
 import { I18nProvider, useI18n } from "../../lib/i18n/provider";
 import { publicLabel } from "../../lib/i18n/labels";
-import { workbookMessage } from "../../lib/i18n/workbook";
 import { useMemo, useState, type ReactNode } from "react";
 import type { MunicipalFunction } from "../../lib/data/municipal/types";
 import type { ClientMunicipalFunctionFact, ClientMunicipalTotalFact } from "../../lib/explorer/clientData";
@@ -18,16 +17,14 @@ import {
   buildMunicipalIndicatorPresentation,
   buildMovers,
   buildMunicipalEntityModel,
+  buildMunicipalWorkbookInput,
   getDefaultMunicipalSelection,
+  municipalCrawlStates,
   municipalShareValueForYear,
+  type MunicipalWorkbookContext,
 } from "../../lib/explorer/municipalData";
 import { formatAmount, unitFor, unitsFor } from "../../lib/explorer/format";
-import {
-  buildWorkbookExportModel,
-  type WorkbookExportInput,
-  type WorkbookPublicSource,
-  type WorkbookSeries,
-} from "../../lib/explorer/workbookModel";
+import { buildWorkbookExportModel, type WorkbookPublicSource } from "../../lib/explorer/workbookModel";
 import { downloadWorkbook } from "../../lib/explorer/workbookWriter.client";
 import { ExcelDownloadButton } from "../explorer/excel-download-button";
 import { Callout, SourceNote } from "../ui/editorial";
@@ -42,6 +39,7 @@ import { MunicipalIndicators } from "./municipal-indicators";
 import { useMunicipalState } from "./use-municipal-state";
 import { ModeTabs } from "../explorer-shell/mode-tabs";
 import { useAppReady } from "../explorer-shell/use-app-ready";
+import { CrawlTables, useCrawlModels } from "../explorer-shell/crawl-tables";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { ChartShareButton } from "../explorer-shell/chart-share-button";
 
@@ -197,61 +195,18 @@ function MunicipalExplorerContent(props: MunicipalExplorerProps) {
     state.setSelectedIds(hasSelection ? [] : selectableRows.map((row) => row.itemId));
   }
 
-  function buildWorkbookInput(): WorkbookExportInput {
-    const selectedRows = [model.totalRow, ...model.rows].filter((row) =>
-      state.selectedIds.includes(row.itemId),
-    );
-    const years = allYears.filter(
-      (year) => year >= state.range.start && year <= state.range.end,
-    );
-    const workbookSeries = selectedRows.map<WorkbookSeries>((row) => {
-      const pointsByYear: WorkbookSeries["pointsByYear"] = {};
-      for (const year of years) {
-        const amountGel = row.valuesByYear[year];
-        const basis = row.basisByYear[year];
-        pointsByYear[year] = amountGel === null || amountGel === undefined || basis === undefined
-          ? null
-          : {
-              amountGel,
-              measureValue: state.share ? municipalShareValueForYear(model, row, year) : undefined,
-              basis,
-            };
-      }
-
-      return {
-        id: row.itemId,
-        kind: row.itemId === model.totalRow.itemId ? "total" : "item",
-        parentLabel: null,
-        label: publicLabel(locale, row.itemId, row.kaLabel, englishLabels),
-        pointsByYear,
-      };
-    });
-    const hasFunctionSeries = selectedRows.some((row) => row.itemId !== model.totalRow.itemId);
-    const hasTotalSeries = selectedRows.some((row) => row.itemId === model.totalRow.itemId);
-    const useTotalSources = hasTotalSeries || (state.share && hasFunctionSeries);
-    return {
-      locale,
-      filenameBase: props.workbookBasename,
-      title: publicLabel(locale, props.entityId, metrics.kind === "country" ? props.pickerCountry.nameKa : props.triggerLabel, englishLabels),
-      groupLabel: workbookMessage(locale, "workbook.municipalExpenditure"),
-      years,
-      measure: state.share
-        ? {
-            kind: "percentage",
-            unitLabel: workbookMessage(locale, "workbook.percentShare"),
-            analysisHeader: workbookMessage(locale, "workbook.budgetShareHeader"),
-          }
-        : { kind: "amount", unitLabel: workbookMessage(locale, "workbook.millionGel"), readableScale: 1_000_000 },
-      totalId: model.totalRow.itemId,
-      series: workbookSeries,
-      sources: [
-        ...(hasFunctionSeries ? props.functionalWorkbookSources ?? [] : []),
-        ...(useTotalSources ? props.workbookSources : []),
-        ...(useTotalSources ? props.supplementalWorkbookSources ?? [] : []),
-      ],
-      siteOrigin: props.siteOrigin,
-    };
-  }
+  const workbookContext = useMemo<MunicipalWorkbookContext>(() => ({
+    allYears,
+    title: publicLabel(locale, props.entityId, metrics.kind === "country" ? props.pickerCountry.nameKa : props.triggerLabel, englishLabels),
+    workbookBasename: props.workbookBasename,
+    workbookSources: props.workbookSources,
+    functionalWorkbookSources: props.functionalWorkbookSources,
+    supplementalWorkbookSources: props.supplementalWorkbookSources,
+    siteOrigin: props.siteOrigin,
+  }), [allYears, locale, props.entityId, metrics.kind, props.pickerCountry.nameKa, props.triggerLabel, englishLabels, props.workbookBasename, props.workbookSources, props.functionalWorkbookSources, props.supplementalWorkbookSources, props.siteOrigin]);
+  // The total and every function over the whole span, for the hidden crawl table: built from the full-span model, which
+  // only the props change, so a click never rebuilds it.
+  const crawlModels = useCrawlModels(() => municipalCrawlStates(fullModel).map((crawl) => buildWorkbookExportModel(buildMunicipalWorkbookInput(fullModel, crawl, workbookContext, i18n))));
 
   useAppReady();
 
@@ -319,9 +274,9 @@ function MunicipalExplorerContent(props: MunicipalExplorerProps) {
               <div className="mt-5">
                 <Callout testId="no-selection-callout">{message(messages, "municipal.noSelection")}</Callout>
               </div>
+            ) : state.chartMode === "line" ? (
+              chart
             ) : (
-              <>
-              {/* The crawl copy comes first: the phone legend is the element right after the chart's wrapper (globals.css). */}
               <ExplorerTable
                 caption={message(messages, state.share ? "municipal.tableCaptionShare" : "municipal.tableCaptionAmount", { name: props.triggerLabel, unit: message(messages, "municipal.amountMeasureShort"), start: state.range.start, end: state.range.end })}
                 rows={model.rows.filter((row) => state.selectedIds.includes(row.itemId))}
@@ -333,10 +288,7 @@ function MunicipalExplorerContent(props: MunicipalExplorerProps) {
                 share={state.share}
                 shareColumnLabel={message(messages, "municipal.share")}
                 shareValueForYear={(row, year) => municipalShareValueForYear(model, row, year)}
-                crawlCopy={state.chartMode === "line"}
               />
-              {state.chartMode === "line" ? chart : null}
-              </>
             )}
             <ChartSelectionAids
               series={series}
@@ -396,7 +348,7 @@ function MunicipalExplorerContent(props: MunicipalExplorerProps) {
             <ExcelDownloadButton
               testId="municipal-excel"
               disabled={state.selectedIds.length === 0}
-              onDownload={() => downloadWorkbook(buildWorkbookExportModel(buildWorkbookInput()))}
+              onDownload={() => downloadWorkbook(buildWorkbookExportModel(buildMunicipalWorkbookInput(model, state, workbookContext, i18n)))}
             />
 
             <Link
@@ -421,6 +373,7 @@ function MunicipalExplorerContent(props: MunicipalExplorerProps) {
         startYear={state.range.start}
         endYear={state.range.end}
       />
+      <CrawlTables models={crawlModels} />
     </>
   );
 }

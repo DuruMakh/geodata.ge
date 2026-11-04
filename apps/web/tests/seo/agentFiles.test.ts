@@ -5,11 +5,14 @@ import { parse } from "csv-parse/sync";
 import { describe, expect, it } from "vitest";
 import { TOOLS } from "../../lib/mcp/tools";
 import { loadPackagedSnapshot } from "../../lib/mcp/snapshot";
-import { catalogueData } from "../../lib/factQuery/publications";
+import { buildAllPublications, catalogueData } from "../../lib/factQuery/publications";
+import { MANIFEST_SIDE_FILE_NAMES } from "../../lib/data/publicDatasetExports";
 import { SCHEMA_VERSION } from "../../lib/factQuery/types";
 import { schoolYearLabel } from "../../lib/explorer/education";
+import { NAV_GROUPS } from "../../lib/navigation/navTree";
+import { loadTopicHubs } from "../../lib/pages/topicHubs.server";
+import { latestText, llmsText } from "../../lib/seo/llmsText";
 
-const llmsPath = fileURLToPath(new URL("../../public/llms.txt", import.meta.url));
 // Pages are checked both ways against the sitemap in routes.test.ts ("links only to public sitemap pages",
 // "names every hub, section and methodology route"). Published files are not pages, so their exact list stays here.
 const requiredFileTargets = [
@@ -188,7 +191,7 @@ const statedCoverage: { url: string; file: string; rows?: (row: CsvRow) => boole
 
 describe("Fiscal.ge agent instructions", () => {
   it("states each dataset's coverage years as its reviewed CSV has them", async () => {
-    const lines = (await readFile(llmsPath, "utf8")).split(/\r?\n/);
+    const lines = (await llmsText()).split(/\r?\n/);
     const imports = fileURLToPath(new URL("../../../../data/imports/", import.meta.url));
     const readYears = async (file: string, rows: (row: CsvRow) => boolean = () => true) =>
       (parse(await readFile(path.join(imports, file)), { columns: true, bom: true }) as CsvRow[]).filter(rows).map((row) => Number(row.year));
@@ -202,10 +205,10 @@ describe("Fiscal.ge agent instructions", () => {
     }
   });
   it("keeps authored sector counts and measure years consistent with the generated catalogue", async () => {
-    const content = await readFile(llmsPath, "utf8");
+    const content = await llmsText();
     const snapshot = loadPackagedSnapshot();
     const catalogue = catalogueData(snapshot, "economic-sectors");
-    const count = content.match(/— (\d+) national economic activities plus a Total GDP reference\./);
+    const count = content.match(/(\d+) national economic activities plus a Total GDP reference\./);
     expect(count, "sector activity count and national-only scope must be stated").not.toBeNull();
     expect(Number(count![1])).toBe(snapshot.economicSectors.registry.filter(series => series.classificationCode !== null).length);
     expect(catalogue.series?.filter(series => series.level === "total").map(series => series.seriesId)).toEqual(["economy.gdp_total"]);
@@ -225,9 +228,10 @@ describe("Fiscal.ge agent instructions", () => {
     }
     expect(nominalYears.filter(year => !growthYears.includes(year))).toEqual([missingGrowthYear]);
   });
-  // Each of these topics now has a bulk file, linked once on its own line; the other demography and health lines still have none.
-  it("links the population, wages, unemployment and social-protection files from their lines and keeps no-bulk-file wording elsewhere", async () => {
-    const lines = (await readFile(llmsPath, "utf8")).split(/\r?\n/);
+  // Each of these topics has a bulk file, linked once on its own line; "Where the data is" names every bulk file and the MCP.
+  it("links the population, wages, unemployment and social-protection files from their lines and says where the data is", async () => {
+    const content = await llmsText();
+    const lines = content.split(/\r?\n/);
     const lineOf = (url: string) => lines.find((line) => line.startsWith(`- [`) && line.includes(`](https://fiscal.ge${url})`))!;
     for (const [url, file] of [
       ["/explorer/demography/population", "population.csv"],
@@ -238,35 +242,67 @@ describe("Fiscal.ge agent instructions", () => {
       const line = lineOf(url);
       expect(line, url).toContain(`(https://fiscal.ge/downloads/data/${file})`);
       expect(line, url).toMatch(/Bulk file: \[[^\]]*CSV\]/);
-      expect(line, url).toContain("there is no MCP tool");
-      expect(line, url).not.toMatch(/no bulk file for (demography|wages|unemployment|health or social protection)/);
-      expect(line, url).not.toContain("Browse-only for now");
     }
-    expect(lineOf("/explorer/living#t-health")).toContain("no bulk file for health");
-    // The unemployment file covers four pages; the four labour detail pages are said to have none.
-    expect(lineOf("/explorer/labour#t-unemployment")).toMatch(/overview, regions, age and gender pages; jobs by industry, hours worked, informal jobs and young people have no bulk file/);
-    expect(lineOf("/explorer/demography/population")).toContain("population counts only, no density");
-    for (const slug of ["migration", "births-deaths", "marriages-divorces"]) {
-      expect(lineOf(`/explorer/demography/${slug}`), slug).toContain("no bulk file for demography");
-    }
-    // The bulk-file list beside the manifest names the four files too, without repeating their links.
-    const bulk = lines.slice(lines.indexOf("## Bulk data files"));
-    for (const file of ["population.csv", "wages.csv", "unemployment.csv", "social-protection.csv"]) {
-      expect(bulk.some((line) => line.includes(`\`${file}\``)), file).toBe(true);
+    expect(content).not.toMatch(/Browse-only|no MCP tool|no bulk file/);
+    const where = content.slice(content.indexOf("**Where the data is:**"), content.indexOf("## Core data"));
+    expect(where.split(/\r?\n/).filter((line) => line.startsWith("- "))).toHaveLength(3);
+    // The manifest lists what the publications step builds (less the manifest itself) and the topic CSVs written before it.
+    const snapshot = loadPackagedSnapshot();
+    const published = buildAllPublications(snapshot).filter((file) => file.fileName !== "manifest.json").length + MANIFEST_SIDE_FILE_NAMES.length;
+    expect(where).toContain(`\`https://fiscal.ge/downloads/data/manifest.json\` lists all ${published} bulk files`);
+    const mcp = where.split(/\r?\n/).find((line) => line.startsWith("- The read-only MCP connection at `https://fiscal.ge/mcp`"));
+    for (const dataset of catalogueData(snapshot).datasets) expect(mcp, dataset.datasetId).toContain(dataset.labelEn);
+  });
+  it("puts the answer-first guidance before the first page link", async () => {
+    const content = await llmsText();
+    const guidance = content.indexOf("**How to answer from Fiscal.ge:**");
+    expect(guidance).toBeGreaterThan(-1);
+    expect(guidance).toBeLessThan(content.indexOf("](https://fiscal.ge/explorer"));
+  });
+  // The figure each line opens with is its group-page card's, so the guide follows each data release by itself.
+  it("opens every page line with its card's latest figure and period, or the card's years", async () => {
+    const lines = (await llmsText()).split(/\r?\n/);
+    const hubs = await loadTopicHubs("en", NAV_GROUPS.flatMap((group) => group.topics));
+    const cards = hubs.flatMap((hub) => hub.cards).filter((card) => card.href !== null);
+    expect(cards.filter((card) => card.latest).length).toBeGreaterThan(0);
+    for (const card of cards) {
+      const link = `](https://fiscal.ge${card.href})`;
+      const line = lines.find((candidate) => candidate.startsWith("- [") && candidate.includes(link));
+      expect(line, card.href!).toBeDefined();
+      if (card.latest) {
+        expect(line!.slice(line!.indexOf(link) + link.length), card.href!).toMatch(/^ — latest: /);
+        expect(line, card.href!).toContain(card.latest.value);
+        // A dated point's `2026 (Jun)` reads `Jun 2026`.
+        expect(line, card.href!).toContain(`(${card.latest.period.replace(/^(\d{4}) \((.+)\)$/, "$2 $1")}`);
+      } else {
+        expect(line, card.href!).toContain(card.years!);
+      }
     }
   });
+  it("names a figure by its headline caption when the card has one, so the largest partner reads as a name", () => {
+    expect(latestText({ value: "3.11 billion USD", period: "2025", caption: "Türkiye, largest", headlineCaption: "Türkiye" })).toBe("latest: Türkiye: 3.11 billion USD (2025). ");
+    expect(latestText({ value: "−1.5%", period: "2025", caption: "of GDP" })).toBe("latest: −1.5% of GDP (2025). ");
+  });
+  it("places a line's note right after the value, so the real GDP figure names its prices", async () => {
+    expect(latestText({ value: "27.1 bn USD", period: "2025", caption: "Real GDP" }, "at constant 2015 prices")).toBe("latest: Real GDP: 27.1 bn USD at constant 2015 prices (2025). ");
+    const line = (await llmsText()).split(/\r?\n/).find((candidate) => candidate.includes("](https://fiscal.ge/explorer/economy/gdp)"));
+    expect(line).toMatch(/ — latest: Real GDP: [\d.,]+ bn USD at constant 2015 prices \(\d{4}/);
+  });
+  it("is at most half the size of the hand-written guide it replaced", async () => {
+    expect(Buffer.byteLength(await llmsText())).toBeLessThanOrEqual(27_000);
+  });
   it("advertises every registered read-only tool", async () => {
-    const content = await readFile(llmsPath, "utf8");
+    const content = await llmsText();
     const advertised = content.match(/Its current read-only tools are ([^;]+); tools\/list is authoritative\./)?.[1].split(/,\s*/);
     expect(advertised?.sort()).toEqual(TOOLS.map(tool => tool.name).sort());
   });
   // A mention of "data schema X" names the version a client must accept, so it must be the current one; a history
   // line is worded "schema X added ..." and may name an earlier version, but never a later one.
   it("names the current data schema wherever it states which version clients accept", async () => {
-    const content = await readFile(llmsPath, "utf8");
+    const content = await llmsText();
     const mentions = [...content.matchAll(/\b[Ss]chema (\d+\.\d+\.\d+)( added)?/g)].map((match) => ({ version: match[1], history: match[2] !== undefined }));
     const current = mentions.filter((mention) => !mention.history);
-    expect(current.length, "the guide must state the data schema in at least its changes paragraph and its endpoint paragraph").toBeGreaterThanOrEqual(2);
+    expect(current.length, "the guide must state the data schema clients must accept").toBeGreaterThanOrEqual(1);
     expect(current.map((mention) => mention.version)).toEqual(current.map(() => SCHEMA_VERSION));
     const isEarlier = (version: string, other: string) => {
       const [left, right] = [version, other].map((value) => value.split(".").map(Number));
@@ -278,7 +314,7 @@ describe("Fiscal.ge agent instructions", () => {
     }
   });
   it("publishes a concise guide with clear scope and unique public links", async () => {
-    const content = await readFile(llmsPath, "utf8");
+    const content = await llmsText();
 
     expect(content).toMatch(/^# Fiscal\.ge\r?\n\r?\n> .+/);
     expect(content.match(/^# .+$/gm)).toEqual(["# Fiscal.ge"]);

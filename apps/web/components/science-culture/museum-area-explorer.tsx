@@ -9,7 +9,7 @@ import { formatInUnit } from "../../lib/explorer/format";
 import { rangeFromPatch } from "../../lib/explorer/periodRange";
 import { scienceCultureSeriesLabel, scienceCultureValueLabel, scienceCultureValueUnit, serializeScienceCultureHash, type ScienceCultureSeriesModel } from "../../lib/explorer/scienceCulture";
 import {
-  MUSEUMS_HREF, buildMuseumAreaModel, changeMuseumAreaSelection, museumAreaCoverage, museumAreaLatest, museumAreaOfMapId, museumAreaSelectionHash, museumMapId, museumRegionHref, parseMuseumAreaHash, type MuseumArea,
+  MUSEUMS_HREF, buildMuseumAreaModel, changeMuseumAreaSelection, museumAreaCoverage, museumAreaCrawlStates, museumAreaLatest, museumAreaOfMapId, museumAreaSelectionHash, museumMapId, museumRegionHref, parseMuseumAreaHash, type MuseumArea,
 } from "../../lib/explorer/scienceCultureMuseums";
 import { buildScienceCultureWorkbookExportModel } from "../../lib/explorer/scienceCultureWorkbook";
 import type { WorkbookPublicSource } from "../../lib/explorer/workbookModel";
@@ -20,6 +20,7 @@ import { pageHref } from "../../lib/i18n/routes";
 import { ModeTabs } from "../explorer-shell/mode-tabs";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { ChartShareButton } from "../explorer-shell/chart-share-button";
+import { CrawlTables, useCrawlModels } from "../explorer-shell/crawl-tables";
 import { ExplorerHeading } from "../explorer-shell/explorer-heading";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { LatestFigure, LatestValueLine } from "../explorer-shell/latest-value-line";
@@ -72,6 +73,9 @@ export function MuseumAreaExplorer({ area, facts, labels, areaLabels, sources, l
   const latest = museumAreaLatest(area, facts);
   const areaName = areaLabels[area];
   const title = t("page.area.regionTitle", { region: areaName });
+  // Every unit of the area's list, every row of it over its years, for the hidden crawl tables: built from the props alone, so a click never rebuilds them.
+  const crawlModels = useCrawlModels(() => museumAreaCrawlStates(area, facts).map(crawl =>
+    buildScienceCultureWorkbookExportModel({ area, facts, state: crawl, labels, sources, siteOrigin, title }, presentation)));
   // The chart is named after the heading of the selection's first row (its text before the unit) and the area.
   const chartLabel = `${t(`heading.${(model.selected[0] ?? headline).heading}`).split(" · ")[0]} · ${areaName}`;
   // Links to another area's page carry the selection, moved to that area, and nothing else.
@@ -107,7 +111,8 @@ export function MuseumAreaExplorer({ area, facts, labels, areaLabels, sources, l
             <span data-testid="science-culture-unit-label" className="text-[11px] text-[var(--muted)]">{unitLabel}</span>
           </div>
           {!model.selected.length ? <div className="mt-5"><Callout testId="no-selection-callout">{t("emptySelection")}</Callout></div>
-            : <><ExplorerTable caption={`${chartLabel} · ${unitLabel} · ${model.range.start}–${model.range.end}`} rows={rows.filter(row => row !== total)} totalRow={total} showTotal={Boolean(total)} totalFirst wrapRowLabels rowLabelsLocalized years={model.years} firstColumnLabel={t("series")} unit={unit} share={false} showChangeColumn={false} shareValueForYear={() => null} crawlCopy={state.mode === "line"} />{state.mode === "line" ? <div className="mt-5">{chart}</div> : null}</>}
+            : state.mode === "line" ? <div className="mt-5">{chart}</div>
+            : <ExplorerTable caption={`${chartLabel} · ${unitLabel} · ${model.range.start}–${model.range.end}`} rows={rows.filter(row => row !== total)} totalRow={total} showTotal={Boolean(total)} totalFirst wrapRowLabels rowLabelsLocalized years={model.years} firstColumnLabel={t("series")} unit={unit} share={false} showChangeColumn={false} shareValueForYear={() => null} />}
           <ChartSelectionAids series={lineSeries} chartShown={state.mode === "line"} share={false} unit={unit} formatValue={valueLabel} />
           <RangeStrip years={museumAreaCoverage(area, facts, state.selectedIds).years} range={model.range} onChange={patch => update(s => ({ ...s, range: rangeFromPatch(buildMuseumAreaModel(area, facts, s).range, patch) }))} />
         </section>
@@ -125,5 +130,6 @@ export function MuseumAreaExplorer({ area, facts, labels, areaLabels, sources, l
           await downloadWorkbook(buildScienceCultureWorkbookExportModel({ area, facts, state, labels, sources, siteOrigin, title }, presentation));
         }} />} />
     </ExplorerWorkspace>
+    <CrawlTables models={crawlModels} />
   </div>;
 }

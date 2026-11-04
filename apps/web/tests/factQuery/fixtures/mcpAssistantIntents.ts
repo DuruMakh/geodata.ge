@@ -157,7 +157,7 @@ export const MCP_ASSISTANT_INTENTS: readonly McpAssistantIntent[] = [
     promptKa: "რამდენია საშუალო თვიური ხელფასი საქართველოში და არის თუ არა Fiscal.ge-ზე გვერდი, რომელიც მას აჩვენებს?",
     requiredBehaviors: [
       "Search the catalogue; wages are outside the approved MCP datasets, so state that this connection does not serve them and invent no tool.",
-      "Offer the Fiscal.ge page link from websitePages in the user's language, with no figure: do not quote a wage from unrelated data or from memory.",
+      "Offer the Fiscal.ge page link from websitePages in the user's language. Quote a wage only from that page's year-by-year table, with the link, if you can open it; never from unrelated data or from memory.",
     ],
   },
   {
@@ -166,7 +166,7 @@ export const MCP_ASSISTANT_INTENTS: readonly McpAssistantIntent[] = [
     promptKa: "რამდენია საშუალო პენსია საქართველოში? სად შემიძლია ამის ნახვა Fiscal.ge-ზე?",
     requiredBehaviors: [
       "Do not present the funded-pension co-financing programme that the search also returns as the average pension; it is a budget programme, not a pension amount.",
-      "Offer the Fiscal.ge page link from websitePages in the user's language, with no figure: do not quote a pension amount.",
+      "Offer the Fiscal.ge page link from websitePages in the user's language. Quote a pension amount only from that page's year-by-year table, with the link, if you can open it; never from memory.",
     ],
   },
 ];

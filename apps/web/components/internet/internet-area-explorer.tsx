@@ -5,7 +5,7 @@ import { useCallback, useId, useRef, useState } from "react";
 import type { ClientInternetFact } from "../../lib/data/internet/types";
 import type { MunicipalRegion } from "../../lib/data/municipal/types";
 import { INTERNET_PERCENT, internetPercent, internetSeriesLabel, serializeInternetHash, type InternetSeriesModel, type InternetTranslate } from "../../lib/explorer/internet";
-import { INTERNET_HOMES_HREF, buildInternetAreaModel, changeInternetAreaSelection, internetAreaCoverage, internetAreaLatest, internetAreaOfMapId, internetAreaSelectionHash, internetMapId, internetRegionHref, parseInternetAreaHash, type InternetArea } from "../../lib/explorer/internetAreas";
+import { INTERNET_HOMES_HREF, buildInternetAreaModel, changeInternetAreaSelection, internetAreaCoverage, internetAreaCrawlStates, internetAreaLatest, internetAreaOfMapId, internetAreaSelectionHash, internetMapId, internetRegionHref, parseInternetAreaHash, type InternetArea } from "../../lib/explorer/internetAreas";
 import { buildInternetWorkbookExportModel } from "../../lib/explorer/internetWorkbook";
 import { updatedDate } from "../../lib/explorer/coverageLabel";
 import { MISSING, formatInUnit } from "../../lib/explorer/format";
@@ -18,6 +18,7 @@ import { pageHref } from "../../lib/i18n/routes";
 import { ModeTabs } from "../explorer-shell/mode-tabs";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { ChartShareButton } from "../explorer-shell/chart-share-button";
+import { CrawlTables, useCrawlModels } from "../explorer-shell/crawl-tables";
 import { ExplorerHeading } from "../explorer-shell/explorer-heading";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { LatestFigure, LatestValueLine } from "../explorer-shell/latest-value-line";
@@ -66,6 +67,9 @@ export function InternetAreaExplorer({ area, facts, labels, areaLabels, sources,
   const latest = internetAreaLatest(area, facts);
   const areaName = areaLabels[area];
   const title = t("page.area.regionTitle", { region: areaName });
+  // The area's every row over its years, for the hidden crawl tables: built from the props alone, so a click never rebuilds them.
+  const crawlModels = useCrawlModels(() => internetAreaCrawlStates(area, facts).map(crawl =>
+    buildInternetWorkbookExportModel({ area, facts, state: crawl, labels, sources, siteOrigin, title }, presentation)));
   const chartLabel = `${t("heading.homes").split(" · ")[0]} · ${areaName}`;
   // Links to another area's page carry the selection, moved to that area, and nothing else.
   const areaHref = (id: string) => `${internetRegionHref(id)}${internetAreaSelectionHash(state.selectedIds, internetAreaOfMapId(id))}`;
@@ -98,7 +102,8 @@ export function InternetAreaExplorer({ area, facts, labels, areaLabels, sources,
             <span data-testid="internet-unit-label" className="text-[11px] text-[var(--muted)]">{unitLabel}</span>
           </div>
           {!model.selected.length ? <div className="mt-5"><Callout testId="no-selection-callout">{t("emptySelection")}</Callout></div>
-            : <><ExplorerTable caption={`${chartLabel} · ${unitLabel} · ${model.range.start}–${model.range.end}`} rows={rows.filter(row => row !== total)} totalRow={total} showTotal={Boolean(total)} totalFirst wrapRowLabels rowLabelsLocalized years={model.years} firstColumnLabel={t("series")} unit={INTERNET_PERCENT} share={false} showChangeColumn={false} shareValueForYear={() => null} crawlCopy={state.mode === "line"} />{state.mode === "line" ? <div className="mt-5">{chart}</div> : null}</>}
+            : state.mode === "line" ? <div className="mt-5">{chart}</div>
+            : <ExplorerTable caption={`${chartLabel} · ${unitLabel} · ${model.range.start}–${model.range.end}`} rows={rows.filter(row => row !== total)} totalRow={total} showTotal={Boolean(total)} totalFirst wrapRowLabels rowLabelsLocalized years={model.years} firstColumnLabel={t("series")} unit={INTERNET_PERCENT} share={false} showChangeColumn={false} shareValueForYear={() => null} />}
           <ChartSelectionAids series={lineSeries} chartShown={state.mode === "line"} share={false} unit={INTERNET_PERCENT} formatValue={valueLabel} />
           <RangeStrip years={internetAreaCoverage(area, facts, state.selectedIds).years} range={model.range} onChange={patch => update(s => ({ ...s, range: rangeFromPatch(buildInternetAreaModel(area, facts, s).range, patch) }))} />
         </section>
@@ -115,5 +120,6 @@ export function InternetAreaExplorer({ area, facts, labels, areaLabels, sources,
           await downloadWorkbook(buildInternetWorkbookExportModel({ area, facts, state, labels, sources, siteOrigin, title }, presentation));
         }} />} />
     </ExplorerWorkspace>
+    <CrawlTables models={crawlModels} />
   </div>;
 }

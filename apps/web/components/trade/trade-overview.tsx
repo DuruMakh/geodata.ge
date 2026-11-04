@@ -4,11 +4,11 @@ import { useState } from "react";
 import { updatedDate } from "../../lib/explorer/coverageLabel";
 import { type ClientTradeOverviewFact, type TradeChartIndicator } from "../../lib/data/tradeOverview/types";
 import { buildTradeOverviewModel, TRADE_OVERVIEW_COLORS } from "../../lib/explorer/tradeOverview";
-import { parseTradeOverviewHash, serializeTradeOverviewHash, tradeOverviewCoverage, tradeOverviewIndicators, type TradeOverviewState } from "../../lib/explorer/tradeOverviewState";
+import { parseTradeOverviewHash, serializeTradeOverviewHash, tradeOverviewCoverage, tradeOverviewCrawlStates, tradeOverviewIndicators, type TradeOverviewState } from "../../lib/explorer/tradeOverviewState";
 import { buildTradeOverviewWorkbookExportModel } from "../../lib/explorer/tradeOverviewWorkbook";
 import { formatInUnit } from "../../lib/explorer/format";
 import { rangeFromPatch } from "../../lib/explorer/periodRange";
-import type { WorkbookPublicSource } from "../../lib/explorer/workbookModel";
+import type { WorkbookExportModel, WorkbookPublicSource } from "../../lib/explorer/workbookModel";
 import { useI18n } from "../../lib/i18n/provider";
 import { message } from "../../lib/i18n/messages";
 import { pageHref } from "../../lib/i18n/routes";
@@ -21,6 +21,7 @@ import { useHashState, type HashStateOptions } from "../explorer-shell/use-hash-
 import { EditorialLineChart } from "../main-explorer/editorial-line-chart";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { ChartShareButton } from "../explorer-shell/chart-share-button";
+import { CrawlTables, useCrawlModels } from "../explorer-shell/crawl-tables";
 import { ExplorerTable } from "../main-explorer/explorer-table";
 import { RangeStrip } from "../main-explorer/range-strip";
 import { SEARCHABLE_MIN_ROWS, SeriesSelector, SeriesSelectorRow } from "../main-explorer/series-selector";
@@ -35,6 +36,16 @@ const serializeOverview = (state: TradeOverviewState, facts: readonly ClientTrad
 const serializeServicesOverview = (state: TradeOverviewState) => `${serializeTradeOverviewHash(state)}&section=overview`;
 const OVERVIEW_OPTIONS: HashStateOptions<ClientTradeOverviewFact[], TradeOverviewState> = { afterWrite: facts => { if (isDomestic(facts)) window.dispatchEvent(new Event("trade-domestic-state")); } };
 const SERVICES_OVERVIEW_OPTIONS: HashStateOptions<ClientTradeOverviewFact[], TradeOverviewState> = { afterWrite: () => window.dispatchEvent(new Event("trade-services-state")) };
+const NO_MODELS: WorkbookExportModel[] = [];
+
+/**
+ * Every indicator over its years, for the hidden crawl tables: built from the props alone, so a click never rebuilds them. Null
+ * facts build none (inside Domestic exports and Services, whose page carries every section's tables).
+ */
+export function useTradeOverviewCrawlModels(facts: readonly ClientTradeOverviewFact[] | null, sources: readonly WorkbookPublicSource[], siteOrigin: string, dataset?: "services"): readonly WorkbookExportModel[] {
+  const presentation = useI18n();
+  return useCrawlModels(() => facts ? tradeOverviewCrawlStates(facts).map(state => buildTradeOverviewWorkbookExportModel({ facts, state, sources, siteOrigin, dataset }, presentation)) : NO_MODELS);
+}
 
 export function TradeOverview({ facts, sources, lastReviewedAt, siteOrigin, dataset }: { dataset?: "services"; facts: ClientTradeOverviewFact[]; sources: WorkbookPublicSource[]; lastReviewedAt: string; siteOrigin: string }) {
   const presentation = useI18n(), { locale, messages } = presentation;
@@ -44,6 +55,7 @@ export function TradeOverview({ facts, sources, lastReviewedAt, siteOrigin, data
   const title = t(services ? "services.title" : domestic ? "domestic.title" : "title");
   const { state, update } = useHashState(facts, parseTradeOverviewHash, services ? serializeServicesOverview : serializeOverview, services ? SERVICES_OVERVIEW_OPTIONS : OVERVIEW_OPTIONS);
   const [query, setQuery] = useState("");
+  const crawlModels = useTradeOverviewCrawlModels(domestic || services ? null : facts, sources, siteOrigin);
   const model = buildTradeOverviewModel(facts, state, presentation);
   const label = (id: TradeChartIndicator) => t(services ? `services.indicator.${id}` : domestic && id === "trade.exports" ? "domestic.totalExports" : `indicator.${id}`);
   const matches = (id: TradeChartIndicator) => matchesLabelQuery(query, [label(id)]);
@@ -68,7 +80,8 @@ export function TradeOverview({ facts, sources, lastReviewedAt, siteOrigin, data
             <span className="text-[11px] text-[var(--muted)]">{model.unit.label}</span>
           </div>
           {!model.selectedIds.length ? <div className="mt-5"><Callout testId="no-selection-callout">{t(domestic ? "domestic.emptySelection" : "emptySelection")}</Callout></div>
-            : <><ExplorerTable caption={`${title} · ${model.unit.label} · ${model.range.start}–${model.range.end}`} rows={rows.filter(row => row.itemId !== totalId)} totalRow={total} showTotal={Boolean(total)} totalFirst wrapRowLabels rowLabelsLocalized years={model.years} firstColumnLabel={t("series")} unit={model.unit} share={false} showChangeColumn={false} shareValueForYear={() => null} crawlCopy={state.mode === "line"} />{state.mode === "line" ? <div className="mt-5">{chart}</div> : null}</>}
+            : state.mode === "line" ? <div className="mt-5">{chart}</div>
+            : <ExplorerTable caption={`${title} · ${model.unit.label} · ${model.range.start}–${model.range.end}`} rows={rows.filter(row => row.itemId !== totalId)} totalRow={total} showTotal={Boolean(total)} totalFirst wrapRowLabels rowLabelsLocalized years={model.years} firstColumnLabel={t("series")} unit={model.unit} share={false} showChangeColumn={false} shareValueForYear={() => null} />}
           <ChartSelectionAids series={lineSeries} chartShown={state.mode === "line"} share={false} unit={model.unit} formatValue={valueLabel} />
           <RangeStrip years={tradeOverviewCoverage(facts).years} range={model.range} onChange={patch => update(s => ({ ...s, range: rangeFromPatch(buildTradeOverviewModel(facts, s, presentation).range, patch) }))} />
         </section>
@@ -100,5 +113,6 @@ export function TradeOverview({ facts, sources, lastReviewedAt, siteOrigin, data
       <p className="my-4 text-[11px] text-[var(--muted)]">{model.unit.label} · {model.range.start}–{model.range.end}</p>
       <StackedColumnChart periods={model.years} periodsPerYear={1} segments={[{ id: "trade.balance", label: label("trade.balance"), color: TRADE_OVERVIEW_COLORS["trade.balance"], values: model.balanceValues.map(value => value === null ? null : value / model.unit.divisor) }]} overlay={null} formatPeriod={String} formatValue={value => valueLabel(value * model.unit.divisor)} ariaLabel={t(services ? "services.balanceAria" : "balanceAria")} frameLabel={label("trade.balance")} />
     </section> : null}
+    {domestic || services ? null : <CrawlTables models={crawlModels} />}
   </div>;
 }

@@ -14,7 +14,9 @@ import type { ClientMunicipalFunctionFact, ClientMunicipalTotalFact } from "./cl
 import { message } from "../i18n/messages";
 import { publicLabel } from "../i18n/labels";
 import type { Presentation, TemplateValues } from "../i18n/types";
+import { workbookMessage } from "../i18n/workbook";
 import type { ExplorerTableRow } from "./types";
+import type { WorkbookExportInput, WorkbookPublicSource, WorkbookSeries } from "./workbookModel";
 import { colorForItem, INK } from "./colors";
 import { formatAmount, formatAmountParts, formatPerResidentGel, formatShare, MISSING } from "./format";
 import { compoundAnnualGrowth, isGrowthRankable } from "./indicators";
@@ -165,6 +167,98 @@ export function buildMunicipalEntityModel(input: MunicipalEntityInput, presentat
 /** The official total is the only pristine municipal selection. */
 export function getDefaultMunicipalSelection(model: MunicipalEntityModel): string[] {
   return model.years.length === 0 ? [] : [model.totalRow.itemId];
+}
+
+/** What a municipal workbook exports: the selected rows over the range, in GEL or as shares of the budget. */
+export type MunicipalWorkbookState = { selectedIds: readonly string[]; range: { start: number; end: number }; share: boolean };
+/** The place's own workbook settings, fixed by the route. */
+export type MunicipalWorkbookContext = {
+  allYears: readonly number[];
+  title: string;
+  workbookBasename: string;
+  workbookSources: readonly WorkbookPublicSource[];
+  functionalWorkbookSources?: readonly WorkbookPublicSource[];
+  supplementalWorkbookSources?: readonly WorkbookPublicSource[];
+  siteOrigin: string;
+};
+
+/** The municipal explorer's Excel input, from the model of the range it exports. */
+export function buildMunicipalWorkbookInput(
+  model: MunicipalEntityModel,
+  state: MunicipalWorkbookState,
+  context: MunicipalWorkbookContext,
+  { locale, englishLabels }: Pick<Presentation, "locale" | "englishLabels">,
+): WorkbookExportInput {
+  const selectedRows = [model.totalRow, ...model.rows].filter((row) =>
+    state.selectedIds.includes(row.itemId),
+  );
+  const years = context.allYears.filter(
+    (year) => year >= state.range.start && year <= state.range.end,
+  );
+  const workbookSeries = selectedRows.map<WorkbookSeries>((row) => {
+    const pointsByYear: WorkbookSeries["pointsByYear"] = {};
+    for (const year of years) {
+      const amountGel = row.valuesByYear[year];
+      const basis = row.basisByYear[year];
+      pointsByYear[year] = amountGel === null || amountGel === undefined || basis === undefined
+        ? null
+        : {
+            amountGel,
+            measureValue: state.share ? municipalShareValueForYear(model, row, year) : undefined,
+            basis,
+          };
+    }
+
+    return {
+      id: row.itemId,
+      kind: row.itemId === model.totalRow.itemId ? "total" : "item",
+      parentLabel: null,
+      label: publicLabel(locale, row.itemId, row.kaLabel, englishLabels),
+      pointsByYear,
+    };
+  });
+  const hasFunctionSeries = selectedRows.some((row) => row.itemId !== model.totalRow.itemId);
+  const hasTotalSeries = selectedRows.some((row) => row.itemId === model.totalRow.itemId);
+  const useTotalSources = hasTotalSeries || (state.share && hasFunctionSeries);
+  return {
+    locale,
+    filenameBase: context.workbookBasename,
+    title: context.title,
+    // The title is the place alone; the crawl caption names what its figures measure.
+    view: workbookMessage(locale, "workbook.municipalExpenditure"),
+    groupLabel: workbookMessage(locale, "workbook.municipalExpenditure"),
+    years,
+    measure: state.share
+      ? {
+          kind: "percentage",
+          unitLabel: workbookMessage(locale, "workbook.percentShare"),
+          analysisHeader: workbookMessage(locale, "workbook.budgetShareHeader"),
+        }
+      : { kind: "amount", unitLabel: workbookMessage(locale, "workbook.millionGel"), readableScale: 1_000_000 },
+    totalId: model.totalRow.itemId,
+    series: workbookSeries,
+    sources: [
+      ...(hasFunctionSeries ? context.functionalWorkbookSources ?? [] : []),
+      ...(useTotalSources ? context.workbookSources : []),
+      ...(useTotalSources ? context.supplementalWorkbookSources ?? [] : []),
+    ],
+    siteOrigin: context.siteOrigin,
+  };
+}
+
+/**
+ * The hidden crawl table's state (lib/explorer/crawlTables.ts), from the place's full-span model: the total and every
+ * function over every year, in GEL — the share of the budget only divides them. A place without years has none.
+ */
+export function municipalCrawlStates(fullModel: MunicipalEntityModel): (MunicipalWorkbookState & { chartMode: "line" })[] {
+  const { years } = fullModel;
+  if (years.length === 0) return [];
+  return [{
+    chartMode: "line",
+    share: false,
+    range: { start: years[0], end: years.at(-1)! },
+    selectedIds: [fullModel.totalRow.itemId, ...fullModel.rows.map((row) => row.itemId)],
+  }];
 }
 
 /**

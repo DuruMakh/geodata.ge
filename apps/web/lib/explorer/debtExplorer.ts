@@ -118,6 +118,25 @@ export function debtRangeForFamily(
   return { start: Math.min(...years), end: Math.max(...years) };
 }
 
+export type DebtCrawlState = { family: DebtFamily; chartMode: "line"; shareOfGdp: boolean; range: { start: number; end: number }; selectedIds: DebtSeriesId[] };
+
+/**
+ * The hidden crawl tables' states (lib/explorer/crawlTables.ts): each family with facts, all three of its series, over
+ * the family's whole span. Stock also keeps its % of GDP view after the amounts: the page lists no GDP to divide by, so
+ * those shares exist nowhere else on it. Without a GDP year in stock's span that view has no state.
+ */
+export function debtCrawlStates(
+  facts: readonly Pick<ClientGovernmentDebtFact, "family" | "year">[],
+  gdpFacts: readonly Pick<ClientNationalGdpFact, "year">[] = [],
+): DebtCrawlState[] {
+  return DEBT_FAMILIES.filter((family) => facts.some((fact) => fact.family === family)).flatMap((family) => {
+    const range = debtRangeForFamily(facts, family);
+    const state: DebtCrawlState = { family, chartMode: "line", shareOfGdp: false, range, selectedIds: [...SERIES_BY_FAMILY[family]] };
+    const withShare = family === "stock" && gdpFacts.some((fact) => fact.year >= range.start && fact.year <= range.end);
+    return withShare ? [state, { ...state, shareOfGdp: true }] : [state];
+  });
+}
+
 // Interest rates keep the decimals the Ministry printed (DESIGN.md §11): the monthly report's
 // chart labels and the 2019-2021 strategy show one ("3.1%", "8.3%"), the 2022-2025, 2023-2026
 // and 2025-2029 strategy tables two ("8.21%", "9.20%"). A rate is never padded to a decimal its

@@ -2,6 +2,7 @@ import { BUSINESS_REGIONS, businessIndicator, type BusinessMeasure, type ClientB
 import { areaRoutes } from "./areaRoutes";
 import { BUSINESS_SECTIONS, buildBusinessSeriesModel, businessListCoverage, parseBusinessListHash, type BusinessModel, type BusinessSeriesDefinition } from "./business";
 import type { TopicState } from "./topicSeries";
+import { unitListCrawlStates } from "./unitList";
 
 /** The areas with a page: Georgia, then the eleven regions. Abkhazeti AR and the unknown region are part of the firms total but have no page. */
 export const BUSINESS_AREAS = ["georgia", ...BUSINESS_REGIONS] as const;
@@ -36,6 +37,10 @@ export type BusinessAreaState = TopicState;
 export function businessAreaCoverage(area: BusinessArea, facts: readonly ClientBusinessFact[], selectedIds: readonly string[] = []) {
   return businessListCoverage(businessAreaSeries(area), selectedIds, facts);
 }
+
+/** The hidden crawl tables' states: the area's money, jobs and firm counts, each group with every series it has facts for. */
+export const businessAreaCrawlStates = (area: BusinessArea, facts: readonly ClientBusinessFact[]): BusinessAreaState[] =>
+  unitListCrawlStates(businessAreaSeries(area), facts);
 
 /** Reads the view of the page for `area`: its selection, kept to one unit, and the years. */
 export function parseBusinessAreaHash(hash: string, area: BusinessArea, facts: readonly ClientBusinessFact[]): BusinessAreaState {

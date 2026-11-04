@@ -3,7 +3,7 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import { updatedDate } from "../../lib/explorer/coverageLabel";
 import type { ClientEnergyFoodFact } from "../../lib/data/energyFood/types";
-import { buildEnergyFoodModel, changeEnergyFoodSelection, energyFoodCoverage, energyFoodDisplayLabels, parseEnergyFoodHash, serializeEnergyFoodHash, type EnergyFoodSectionId, type EnergyFoodState, type EnergyFoodUnit } from "../../lib/explorer/energyFood";
+import { buildEnergyFoodModel, changeEnergyFoodSelection, energyFoodCoverage, energyFoodCrawlStates, energyFoodDisplayLabels, parseEnergyFoodHash, serializeEnergyFoodHash, type EnergyFoodSectionId, type EnergyFoodState, type EnergyFoodUnit } from "../../lib/explorer/energyFood";
 import { buildEnergyFoodWorkbookExportModel } from "../../lib/explorer/energyFoodWorkbook";
 import { formatInUnit, type ValueUnit } from "../../lib/explorer/format";
 import { rangeFromPatch, resolveRange } from "../../lib/explorer/periodRange";
@@ -15,6 +15,7 @@ import { pageHref } from "../../lib/i18n/routes";
 import { ModeTabs } from "../explorer-shell/mode-tabs";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { ChartShareButton } from "../explorer-shell/chart-share-button";
+import { CrawlTables, useCrawlModels } from "../explorer-shell/crawl-tables";
 import { ExplorerHeading } from "../explorer-shell/explorer-heading";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { LatestValueLine } from "../explorer-shell/latest-value-line";
@@ -69,6 +70,9 @@ export function EnergyFoodExplorer({ section, facts, labels, sources, lastReview
   const note = section === "energy-supply" ? t("latestNote.energy-supply", { value: plain("energy.imports.total") })
     : section === "electricity" ? t("latestNote.electricity", { imports: plain("electricity.imports"), exports: plain("electricity.exports") }) : undefined;
   const title = t(`page.${section}.title`);
+  // Every group of the list a chart can hold, every row of it over its years, for the hidden crawl tables: built from the props alone, so a click never rebuilds them.
+  const crawlModels = useCrawlModels(() => energyFoodCrawlStates(section, facts).map(crawl =>
+    buildEnergyFoodWorkbookExportModel({ section, facts, state: crawl, labels, sources, siteOrigin, title }, presentation)));
   const downloadAction = <ExcelDownloadButton testId="energy-food-excel-download" disabled={!model.selected.length} onDownload={async () => {
     const { downloadWorkbook } = await import("../../lib/explorer/workbookWriter.client");
     await downloadWorkbook(buildEnergyFoodWorkbookExportModel({ section, facts, state, labels, sources, siteOrigin, title }, presentation));
@@ -87,8 +91,9 @@ export function EnergyFoodExplorer({ section, facts, labels, sources, lastReview
             <span className="text-[11px] text-[var(--muted)]">{unitLabel}</span>
           </div>
           {!model.selected.length ? <div className="mt-5"><Callout testId="no-selection-callout">{t("emptySelection")}</Callout></div>
+            : state.mode === "line" ? <div className="mt-5">{chart}</div>
             // Food ratios are whole percents, as Geostat prints them.
-            : <><ExplorerTable caption={`${title} · ${unitLabel} · ${model.range.start}–${model.range.end}`} rows={rows.filter(row => row.itemId !== reference.id)} totalRow={total} showTotal={Boolean(total)} totalFirst wrapRowLabels rowLabelsLocalized years={model.years} firstColumnLabel={t("series")} unit={unit} share={percent} percentDecimals={0} showChangeColumn={false} shareValueForYear={(row, year) => { const value = row.valuesByYear[year]; return value == null ? null : value / 100; }} crawlCopy={state.mode === "line"} />{state.mode === "line" ? <div className="mt-5">{chart}</div> : null}</>}
+            : <ExplorerTable caption={`${title} · ${unitLabel} · ${model.range.start}–${model.range.end}`} rows={rows.filter(row => row.itemId !== reference.id)} totalRow={total} showTotal={Boolean(total)} totalFirst wrapRowLabels rowLabelsLocalized years={model.years} firstColumnLabel={t("series")} unit={unit} share={percent} percentDecimals={0} showChangeColumn={false} shareValueForYear={(row, year) => { const value = row.valuesByYear[year]; return value == null ? null : value / 100; }} />}
           <ChartSelectionAids series={lineSeries} chartShown={state.mode === "line"} share={percent} unit={unit} formatValue={value => valueLabel(value)} />
           <RangeStrip years={energyFoodCoverage(section, facts, state.selectedIds).years} range={model.range} onChange={patch => update(s => ({ ...s, range: rangeFromPatch(resolveRange(s.range, energyFoodCoverage(section, facts, s.selectedIds)), patch) }))} />
         </section>
@@ -109,5 +114,6 @@ export function EnergyFoodExplorer({ section, facts, labels, sources, lastReview
         query={query} onQueryChange={setQuery} searchPlaceholder={t("search")} searchable={model.series.length > SEARCHABLE_MIN_ROWS}
         nesting={{ selectedLabel: t("nestedSelected"), expansionLabel: label => t("subcategoriesFor", { label }) }} />
     </ExplorerWorkspace>
+    <CrawlTables models={crawlModels} />
   </div>;
 }

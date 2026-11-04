@@ -11,6 +11,7 @@ import {
   MIGRATION_GROUPS,
   MIGRATION_SEXES,
   migrationCoverage,
+  migrationCrawlStates,
   parseMigrationHash,
   serializeMigrationHash,
   type MigrationDirection,
@@ -31,6 +32,7 @@ import type { TemplateValues } from "../../lib/i18n/types";
 import type { ClientMigrationFact } from "../../lib/servedRows";
 import { ExcelDownloadButton } from "../explorer/excel-download-button";
 import { ChartShareButton } from "../explorer-shell/chart-share-button";
+import { CrawlTables, useCrawlModels } from "../explorer-shell/crawl-tables";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { ModeTabs } from "../explorer-shell/mode-tabs";
 import { SeriesAside } from "../explorer-shell/series-aside";
@@ -89,6 +91,9 @@ export function MigrationExplorer({
   useReplaceHash(serializeMigrationHash(state), ready);
 
   const update = (change: (previous: MigrationState) => MigrationState) => setState(change);
+  // Each sex, every group's arrivals and departures and the net over every year, for the hidden crawl tables: built from the props alone, so a click never rebuilds them.
+  const crawlModels = useCrawlModels(() => migrationCrawlStates(facts).map((crawl) =>
+    buildMigrationWorkbookExportModel({ facts, state: crawl, sources, siteOrigin }, presentation)));
   const model = buildMigrationModel(facts, state);
   const indicators = buildMigrationIndicators(facts, state);
   const groupLabel = (group: MigrationGroup) => t(`group.${group}`);
@@ -159,8 +164,8 @@ export function MigrationExplorer({
     />
   ) : undefined;
 
-  // The yearly table; in chart mode it is rendered hidden so crawlers read its numbers.
-  const table = (crawlCopy: boolean) => (
+  // The yearly table, shown in table mode.
+  const table = (
     <ExplorerTable
       caption={t("migrationTableCaption", { direction: direction(state.direction), start: model.range.start, end })}
       rows={tableRows}
@@ -174,7 +179,6 @@ export function MigrationExplorer({
       share={false}
       showChangeColumn={false}
       shareValueForYear={() => null}
-      crawlCopy={crawlCopy}
     />
   );
 
@@ -196,7 +200,6 @@ export function MigrationExplorer({
               <div className="mt-5"><Callout testId="no-selection-callout">{t("migrationEmpty")}</Callout></div>
             ) : state.mode === "line" ? (
               <div className="mt-5">
-                {table(true)}
                 <p className="mb-2 text-[11px] text-[var(--muted)]">{t("chartUnit")}</p>
                 {chart}
               </div>
@@ -209,7 +212,7 @@ export function MigrationExplorer({
                   options={MIGRATION_DIRECTIONS.map((id) => ({ value: id, label: direction(id), testId: `migration-direction-${id}` }))}
                 />
                 <div className="mt-4">
-                  {table(false)}
+                  {table}
                 </div>
               </div>
             )}
@@ -307,6 +310,7 @@ export function MigrationExplorer({
         </div>
         <div className="mt-5"><SourceNote>{t("migrationIndicatorsNote")}</SourceNote></div>
       </section>
+      <CrawlTables models={crawlModels} />
     </div>
   );
 }
