@@ -203,7 +203,8 @@ export function budgetCrawlStates(side: ExplorerSide, facts: ClientBudgetFact[],
       endYear: Math.max(...years),
       share: false,
     };
-    const withShare = gdpFacts.some((fact) => fact.year >= state.startYear && fact.year <= state.endYear);
+    // Ministries keep every programme under the cell cap rather than a share-of-GDP copy of them.
+    const withShare = !ministries && gdpFacts.some((fact) => fact.year >= state.startYear && fact.year <= state.endYear);
     return withShare ? [state, { ...state, share: true }] : [state];
   });
 }

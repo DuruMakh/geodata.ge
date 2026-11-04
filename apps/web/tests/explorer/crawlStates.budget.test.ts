@@ -79,10 +79,10 @@ describe("budget explorer (expenditure and revenue)", () => {
     expect([fields.startYear, fields.endYear]).toEqual([Math.min(...years), Math.max(...years)]);
   });
 
-  it("with GDP, each scope adds its % of GDP view after its amounts, with the same series and years", () => {
+  it("with GDP, fields and revenue add their % of GDP view after their amounts; ministries keep amounts only", () => {
     const states = budgetCrawlStates("expenditure", facts.filter((fact) => fact.side === "expenditure"), adminFacts, gdpFacts);
-    expect(states.map((state) => [state.scope, state.share])).toEqual([["fields", false], ["fields", true], ["ministries", false], ["ministries", true]]);
-    for (const [amounts, shares] of [[states[0]!, states[1]!], [states[2]!, states[3]!]]) {
+    expect(states.map((state) => [state.scope, state.share])).toEqual([["fields", false], ["fields", true], ["ministries", false]]);
+    for (const [amounts, shares] of [[states[0]!, states[1]!]]) {
       expect({ ...shares, share: false }).toEqual(amounts);
       const workbook = workbookFor("expenditure", shares);
       expect(workbook.readable.unitLabel).toBe("% of GDP");
