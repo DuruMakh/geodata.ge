@@ -1,5 +1,5 @@
 import type { ClientTradePartnersData } from "../data/tradePartners/importTradePartners";
-import { TRADE_OVERVIEW_INDICATORS, type TradeChartIndicator } from "../data/tradeOverview/types";
+import { TRADE_CHART_INDICATORS, TRADE_OVERVIEW_INDICATORS, type TradeChartIndicator } from "../data/tradeOverview/types";
 import { refitRange, type PeriodRange } from "./periodRange";
 import { parseYearRangeKeys, writeYearRangeKeys } from "./urlState";
 
@@ -24,6 +24,16 @@ export function parseTradePartnersHash(hash: string, data: ClientTradePartnersDa
   const requested = params.has("sel") ? params.get("sel")!.split(",") : [tradePartnersTotalId(data)];
   const measure = params.get("measure") as TradeChartIndicator, measures = data.measures ?? TRADE_OVERVIEW_INDICATORS;
   return { mode: params.get("view") === "table" ? "table" : "line", measure: measures.some(id => id === measure) ? measure : measures[0], tab: data.dataset === "composition" ? "categories" : data.dataset === "services" ? data.dimension === "countries" ? "countries" : "types" : params.get("tab") === "groups" && data.entities.some(entity => entity.kind === "group") ? "groups" : "countries", range: refitRange(parseYearRangeKeys(params), tradePartnersCoverage(data), { collapseToAll: true }), selectedIds: tradePartnersBulkSelection(data).filter(id => requested.includes(id)) };
+}
+/**
+ * The hidden crawl tables' states (lib/explorer/crawlTables.ts): each measure the page offers, with everything the bulk action
+ * ticks (the total, every country and every group), over every year. The Countries and Groups tabs only change the ranking
+ * and the list shown, not the selection, so they are not states of their own. A measure without a published value has none.
+ */
+export function tradePartnersCrawlStates(data: ClientTradePartnersData): TradePartnersState[] {
+  const published = new Set(data.facts.filter(fact => fact[3] !== null).map(fact => TRADE_CHART_INDICATORS[fact[2]]));
+  const opening = parseTradePartnersHash("", data), selectedIds = tradePartnersBulkSelection(data);
+  return (data.measures ?? TRADE_OVERVIEW_INDICATORS).filter(measure => published.has(measure)).map(measure => ({ ...opening, measure, selectedIds }));
 }
 export function serializeTradePartnersHash(state: TradePartnersState, data?: ClientTradePartnersData): string {
   const params = new URLSearchParams({ measure: state.measure, tab: state.tab, view: state.mode, sel: state.selectedIds.join(",") });

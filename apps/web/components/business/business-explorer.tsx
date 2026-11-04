@@ -3,7 +3,7 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import { updatedDate } from "../../lib/explorer/coverageLabel";
 import type { ClientBusinessFact } from "../../lib/data/business/types";
-import { buildBusinessModel, businessCoverage, businessHeadingLabel, businessTopicSeries, changeBusinessSelection, parseBusinessHash, serializeBusinessHash, type BusinessTopicId, type BusinessUnit } from "../../lib/explorer/business";
+import { buildBusinessModel, businessCoverage, businessCrawlStates, businessHeadingLabel, businessTopicSeries, changeBusinessSelection, parseBusinessHash, serializeBusinessHash, type BusinessTopicId, type BusinessUnit } from "../../lib/explorer/business";
 import { buildBusinessWorkbookExportModel } from "../../lib/explorer/businessWorkbook";
 import { formatAmount, formatInUnit, thousandsUnit, unitsFor, type ValueUnit } from "../../lib/explorer/format";
 import { rangeFromPatch } from "../../lib/explorer/periodRange";
@@ -14,6 +14,7 @@ import { pageHref } from "../../lib/i18n/routes";
 import { ModeTabs } from "../explorer-shell/mode-tabs";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { ChartShareButton } from "../explorer-shell/chart-share-button";
+import { CrawlTables, useCrawlModels } from "../explorer-shell/crawl-tables";
 import { ExplorerHeading } from "../explorer-shell/explorer-heading";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { LatestValueLine } from "../explorer-shell/latest-value-line";
@@ -73,6 +74,9 @@ export function BusinessExplorer({ section, facts, labels, sources, lastReviewed
   const latestValue = section === "jobs" ? `${formatInUnit(latest.value, { divisor: 1_000, label: "", decimals: 1 })} ${t("unitThousandPersons")}` : section === "firms" ? count(latest.value) : formatAmount(latest.value, locale);
   const closed = section === "firms" ? facts.find(f => f.indicatorId === "business.deaths.total" && f.year === latest.year) : undefined;
   const title = t(`page.${section}.title`);
+  // Every unit's series over its years, for the hidden crawl tables: built from the props alone, so a click never rebuilds them.
+  const crawlModels = useCrawlModels(() => businessCrawlStates(section, facts).map(crawl =>
+    buildBusinessWorkbookExportModel({ section, facts, state: crawl, labels, sources, siteOrigin, title }, presentation)));
   const chartLabel = percent ? t("measure.rate") : title;
   const downloadAction = <ExcelDownloadButton testId="business-excel-download" disabled={!model.selected.length} onDownload={async () => {
     const { downloadWorkbook } = await import("../../lib/explorer/workbookWriter.client");
@@ -92,8 +96,9 @@ export function BusinessExplorer({ section, facts, labels, sources, lastReviewed
             <span data-testid="business-unit-label" className="text-[11px] text-[var(--muted)]">{unitLabel}</span>
           </div>
           {!model.selected.length ? <div className="mt-5"><Callout testId="no-selection-callout">{t("emptySelection")}</Callout></div>
-            : <><ExplorerTable caption={`${chartLabel} · ${unitLabel} · ${model.range.start}–${model.range.end}`} rows={rows.filter(row => row !== total)} totalRow={total} showTotal={Boolean(total)} totalFirst wrapRowLabels rowLabelsLocalized years={model.years} firstColumnLabel={t("series")} unit={unit} share={percent} showChangeColumn={false}
-              shareValueForYear={(row, year) => { const value = row.valuesByYear[year]; return value == null ? null : value / 100; }} shareDecimalsForRow={() => 1} crawlCopy={state.mode === "line"} />{state.mode === "line" ? <div className="mt-5">{chart}</div> : null}</>}
+            : state.mode === "line" ? <div className="mt-5">{chart}</div>
+            : <ExplorerTable caption={`${chartLabel} · ${unitLabel} · ${model.range.start}–${model.range.end}`} rows={rows.filter(row => row !== total)} totalRow={total} showTotal={Boolean(total)} totalFirst wrapRowLabels rowLabelsLocalized years={model.years} firstColumnLabel={t("series")} unit={unit} share={percent} showChangeColumn={false}
+              shareValueForYear={(row, year) => { const value = row.valuesByYear[year]; return value == null ? null : value / 100; }} shareDecimalsForRow={() => 1} />}
           <ChartSelectionAids series={lineSeries} chartShown={state.mode === "line"} share={percent} unit={unit} formatValue={valueLabel} />
           <RangeStrip years={businessCoverage(section, facts, state.selectedIds).years} range={model.range} onChange={patch => update(s => ({ ...s, range: rangeFromPatch(buildBusinessModel(section, facts, s).range, patch) }))} />
         </section>
@@ -109,5 +114,6 @@ export function BusinessExplorer({ section, facts, labels, sources, lastReviewed
         query={query} onQueryChange={setQuery} searchPlaceholder={t("search")} searchable={model.series.length > SEARCHABLE_MIN_ROWS}
         nesting={{ selectedLabel: t("nestedSelected"), expansionLabel: label => t("subcategoriesFor", { label }) }} />
     </ExplorerWorkspace>
+    <CrawlTables models={crawlModels} />
   </div>;
 }

@@ -2,7 +2,7 @@ import type { ClientUnemploymentObservation, UnemploymentBreakdown, Unemployment
 import { unemploymentIndicators, unemploymentIsRate } from "../data/unemployment/types";
 import { refitRange, type PeriodRange } from "./periodRange";
 import { parseYearRangeKeys, writeYearRangeKeys } from "./urlState";
-import { unemploymentCoverage, unemploymentReferenceId, unemploymentScopeFacts } from "./unemployment";
+import { buildUnemploymentModel, primaryFacts, unemploymentCoverage, unemploymentReferenceId, unemploymentScopeFacts } from "./unemployment";
 import { unemploymentBreakdownsForSection, type UnemploymentSectionId } from "./unemploymentSections";
 import { unemploymentOverviewDefinitions, unemploymentOverviewIndicators, unemploymentUsesIndicatorSeries } from "./unemploymentOverview";
 
@@ -44,6 +44,30 @@ export function changeUnemploymentIndicator(state: UnemploymentState, indicator:
 export function changeUnemploymentEducationSex(state: UnemploymentState, educationSex: UnemploymentSex, facts: readonly ClientUnemploymentObservation[]): UnemploymentState {
   const next = { ...state, educationSex };
   return fit({ ...next, selectedIds: [unemploymentReferenceId(next)] }, facts);
+}
+/**
+ * The hidden crawl tables' states (lib/explorer/crawlTables.ts): each view the page offers (the Overview's four tabs, each
+ * sex of Education, each indicator of Age), split where its list cannot mix units (rates apart from people), each selecting
+ * every series that list offers over every year. A view without facts has no state.
+ */
+export function unemploymentCrawlStates(facts: readonly ClientUnemploymentObservation[], registry: readonly UnemploymentGroupDefinition[], section: UnemploymentSectionId, regionId?: string): UnemploymentState[] {
+  const opening = parseUnemploymentHash("", facts, registry, section, regionId);
+  const all = (state: UnemploymentState, selectedIds = buildUnemploymentModel(facts, registry, state).definitions.map(group => group.id)): UnemploymentState =>
+    ({ ...state, mode: "line", range: { kind: "all" }, selectedIds });
+  const covered = (state: UnemploymentState) => primaryFacts(facts, state).length > 0;
+  return unemploymentBreakdownsForSection(section).flatMap(breakdown => {
+    if (breakdown !== opening.breakdown && !covered({ ...opening, breakdown, indicator: unemploymentOverviewIndicators(breakdown)[0] })) return [];
+    const view = breakdown === opening.breakdown ? opening : changeUnemploymentBreakdown(opening, breakdown, facts);
+    if (unemploymentUsesIndicatorSeries(view)) {
+      const definitions = buildUnemploymentModel(facts, registry, view).definitions;
+      return [true, false].flatMap(rate => {
+        const listed = definitions.filter(group => unemploymentIsRate(group.indicatorId) === rate);
+        return listed.length ? [all({ ...view, indicator: listed[0].indicatorId }, listed.map(group => group.id))] : [];
+      });
+    }
+    if (breakdown === "education") return (["total", "women", "men"] as const).filter(educationSex => covered({ ...view, educationSex })).map(educationSex => all(changeUnemploymentEducationSex(view, educationSex, facts)));
+    return unemploymentIndicators(breakdown).filter(indicator => covered({ ...view, indicator })).map(indicator => all(changeUnemploymentIndicator(view, indicator, facts)));
+  });
 }
 export function parseUnemploymentHash(hash: string, facts: readonly ClientUnemploymentObservation[], registry: readonly UnemploymentGroupDefinition[], section?: UnemploymentSectionId, regionId?: string): UnemploymentState {
   const p = new URLSearchParams(hash.replace(/^#/, ""));

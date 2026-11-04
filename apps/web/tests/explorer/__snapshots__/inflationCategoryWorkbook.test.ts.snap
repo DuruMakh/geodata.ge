@@ -87,6 +87,7 @@ exports[`buildInflationCategoryWorkbookExportModel > builds a stable model for a
       ],
     },
     "numberFormat": "+0.0;−0.0;0.0",
+    "period": "აგვისტო 2026 – აგვისტო 2026",
     "rows": [
       {
         "basisByYear": {
@@ -345,6 +346,7 @@ exports[`buildInflationCategoryWorkbookExportModel > builds a stable model for a
       ],
     },
     "numberFormat": "0.0%",
+    "period": "აგვისტო 2026 – აგვისტო 2026",
     "rows": [
       {
         "basisByYear": {
@@ -534,6 +536,7 @@ exports[`buildInflationCategoryWorkbookExportModel > builds a stable model for a
       ],
     },
     "numberFormat": "0.0%",
+    "period": "აგვისტო 2026 – აგვისტო 2026",
     "rows": [
       {
         "basisByYear": {

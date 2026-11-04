@@ -17,7 +17,9 @@ beforeAll(async () => {
 
 const render = (scope: EnvironmentScope) => {
   const labels = Object.fromEntries(facts.filter(f => !f.indicatorId.includes(".treatment_")).map(f => [f.indicatorId, message(messages, `environment.${environmentLabelKey(f.indicatorId)}`)]));
-  return renderPageMarkup("en", <EnvironmentExplorer scope={scope} facts={facts} labels={labels} sources={[]} lastReviewedAt="2026-10-20" siteOrigin="https://fiscal.ge"
+  // The hidden crawl tables build the page's workbooks, which cite a source for every value shown.
+  const sources = [...new Set(facts.map(f => f.sourceId))].map(sourceId => ({ sourceId, title: sourceId, organization: "Geostat", downloadHref: "https://geostat.ge/source" as const, retrievedAt: "2026-01-01", years: [...new Set(facts.map(f => f.year))] }));
+  return renderPageMarkup("en", <EnvironmentExplorer scope={scope} facts={facts} labels={labels} sources={sources} lastReviewedAt="2026-10-20" siteOrigin="https://fiscal.ge"
     title="Title" latest={{ measure: "Measure", year: 2022, value: "20.1" }} />, messages);
 };
 const textOf = (html: string) => html.replace(/<[^>]+>/g, "|").split("|").map(part => part.trim()).filter(Boolean);

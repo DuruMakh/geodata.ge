@@ -75,7 +75,7 @@ When NBG publishes a newer file, archive it under `official/`, then change every
 - `apps/web/lib/data/externalPosition/validation.ts`: `LATEST_YEAR`, `LATEST_PERIOD`, the anchors and the year ranges (coverage); the comment in `types.ts`.
 - `apps/web/lib/data/externalPosition/prepareExternalPosition.ts`: the 254 row count; then `npm run data:prepare-external-position`, and the 254 in `docs/deployment.md`.
 - Methodology content, `lib/methodology/content/external-flows.ts` (ka) and `content/en/external-flows.ts`: the latest amounts and dates, the retrieval and listing dates, and the 254 / 21 dates / 32 dates counts.
-- `apps/web/public/llms.txt`: "end of June" / "end of September" and the year ranges.
+- `apps/web/lib/seo/llmsText.ts`: the year ranges on the Foreign debt and Reserves lines (the latest month comes from the group-page card).
 - `DESIGN.md` §30.3 and §30.4 and the `Project_Definition.md` §2 paragraph: dates, months, coverage.
 - `docs/data-methodology/external-flows-annual.md`: the row count and the Dates bullet.
 - A new latest month needs no new message: `external.position.latestMonth.01` to `.12` all exist in `ka` and `en` `external.json`.

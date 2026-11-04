@@ -5,7 +5,7 @@ import { updatedDate } from "../../lib/explorer/coverageLabel";
 import type { MunicipalRegion } from "../../lib/data/municipal/types";
 import { unpackFacts, type FactsInput } from "../../lib/data/packedFacts";
 import type { ClientWagesFact } from "../../lib/data/wages/types";
-import { buildWagesHeatmap, buildWagesModel, changeWagesView, parseWagesHash, serializeWagesHash, wagesCoverage, wagesPlaceLatest, wagesRegionHref, wagesViews, type WagesSectionId, type WagesState, type WagesView } from "../../lib/explorer/wages";
+import { buildWagesHeatmap, buildWagesModel, changeWagesView, parseWagesHash, serializeWagesHash, wagesCoverage, wagesCrawlStates, wagesPlaceLatest, wagesRegionHref, wagesViews, type WagesSectionId, type WagesState, type WagesView } from "../../lib/explorer/wages";
 import { buildWagesWorkbookExportModel } from "../../lib/explorer/wagesWorkbook";
 import { formatInUnit, type ValueUnit } from "../../lib/explorer/format";
 import { rangeFromPatch } from "../../lib/explorer/periodRange";
@@ -14,6 +14,7 @@ import { useI18n } from "../../lib/i18n/provider";
 import { message } from "../../lib/i18n/messages";
 import { pageHref } from "../../lib/i18n/routes";
 import { ModeTabs } from "../explorer-shell/mode-tabs";
+import { CrawlTables, useCrawlModels } from "../explorer-shell/crawl-tables";
 import { ExplorerHeading } from "../explorer-shell/explorer-heading";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { LatestValueLine } from "../explorer-shell/latest-value-line";
@@ -65,6 +66,9 @@ export function WagesExplorer({ section, facts: shippedFacts, labels, sources, l
   // The latest-value line states the page's own place: Georgia, or the region.
   const latest = wagesPlaceLatest(facts, regionId);
   const title = regionId ? t("regionTitle", { region: regionName }) : t(`page.${section}.title`);
+  // Every group's series over its years, for the hidden crawl tables: built from the props alone, so a click never rebuilds them.
+  const crawlModels = useCrawlModels(() => wagesCrawlStates(section, facts).map(crawl =>
+    buildWagesWorkbookExportModel({ section, facts, state: crawl, labels, sources, siteOrigin, title, regionId }, presentation)));
   const changeView = (view: WagesView) => { if (view === state.view) return; setQuery(""); update(s => changeWagesView(s, section, view, facts), true); };
   const downloadAction = <ExcelDownloadButton testId="wages-excel-download" disabled={!model.selected.length} onDownload={async () => {
     const { downloadWorkbook } = await import("../../lib/explorer/workbookWriter.client");
@@ -101,7 +105,8 @@ export function WagesExplorer({ section, facts: shippedFacts, labels, sources, l
             </label> : <span className="text-[11px] text-[var(--muted)]">{t("unitMonthly")}</span>}
           </div>
           {!model.selected.length ? <div className="mt-5"><Callout testId="no-selection-callout">{t("emptySelection")}</Callout></div>
-            : <><ExplorerTable caption={`${title} · ${t("unitMonthly")} · ${model.range.start}–${model.range.end}`} rows={rows.filter(row => row.itemId !== reference.id)} totalRow={total} showTotal={Boolean(total)} totalFirst wrapRowLabels rowLabelsLocalized years={model.years} firstColumnLabel={t("series")} unit={unit} share={false} showChangeColumn={false} shareValueForYear={() => null} decimalsForRow={row => decimalsOf(row.itemId)} crawlCopy={state.mode === "line"} />{state.mode === "line" ? <div className="mt-5">{chart}</div> : null}</>}
+            : state.mode === "line" ? <div className="mt-5">{chart}</div>
+            : <ExplorerTable caption={`${title} · ${t("unitMonthly")} · ${model.range.start}–${model.range.end}`} rows={rows.filter(row => row.itemId !== reference.id)} totalRow={total} showTotal={Boolean(total)} totalFirst wrapRowLabels rowLabelsLocalized years={model.years} firstColumnLabel={t("series")} unit={unit} share={false} showChangeColumn={false} shareValueForYear={() => null} decimalsForRow={row => decimalsOf(row.itemId)} />}
           <ChartSelectionAids series={lineSeries} chartShown={state.mode === "line"} share={false} unit={unit} formatValue={(value, id) => valueLabel(value, id)} />
           <RangeStrip years={wagesCoverage(section, state.view, facts).years} range={model.range} onChange={patch => update(s => ({ ...s, range: rangeFromPatch(buildWagesModel(section, facts, s).range, patch) }))} />
         </section>
@@ -121,5 +126,6 @@ export function WagesExplorer({ section, facts: shippedFacts, labels, sources, l
     {heatmap ? <HeatmapSection testId="wages-industry-heatmap" indicator={state.view} unit="gel" title={t("heatmapTitle")} caption={`${t(`group.${state.view}`)} · ${t("unitMonthly")} · ${model.years[0]}–${model.years.at(-1)}`}
       note={t("heatmapNote")} scaleLabel={t("heatmapScale")} rowHeader={t("industry")} years={heatmap.years} maximum={heatmap.maximum} format={value => format(value)} wrapRowLabels
       rows={heatmap.rows.map(row => ({ id: row.id, label: labels[row.id], values: row.values }))} /> : null}
+    <CrawlTables models={crawlModels} />
   </div>;
 }

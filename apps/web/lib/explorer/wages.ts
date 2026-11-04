@@ -74,14 +74,23 @@ function seriesYears(series: readonly WagesSeriesDefinition[], facts: readonly C
  * the main measure, takes its years, and a region page takes its region's years.
  */
 export function wagesCoverage(section: WagesSectionId, view: WagesView, facts: readonly ClientWagesFact[]) {
+  return topicCoverage(comparedYears(section, view, facts), `No wages years for ${section}:${view}`);
+}
+function comparedYears(section: WagesSectionId, view: WagesView, facts: readonly ClientWagesFact[]): number[] {
   const series = wagesViewSeries(section, view, facts);
   const compared = section === "overview" ? series : section === "regions" ? series.filter(s => s.dimension === "region") : series.filter(s => !s.reference);
-  return topicCoverage(seriesYears(compared, facts), `No wages years for ${section}:${view}`);
+  return seriesYears(compared, facts);
 }
 
 export function defaultWagesState(section: WagesSectionId, facts: readonly ClientWagesFact[]): WagesState {
   const view = wagesViews(section)[0];
   return { mode: "line", range: { kind: "all" }, view, selectedIds: [wagesViewSeries(section, view, facts)[0].id] };
+}
+
+/** The hidden crawl tables' states (lib/explorer/crawlTables.ts): each view (Industries' eight groups), every series its list offers, over every year; a view without years has none. */
+export function wagesCrawlStates(section: WagesSectionId, facts: readonly ClientWagesFact[]): WagesState[] {
+  return wagesViews(section).filter(view => comparedYears(section, view, facts).length > 0)
+    .map(view => ({ mode: "line", range: { kind: "all" }, view, selectedIds: wagesViewSeries(section, view, facts).map(series => series.id) }));
 }
 
 export function parseWagesHash(hash: string, section: WagesSectionId, facts: readonly ClientWagesFact[]): WagesState {

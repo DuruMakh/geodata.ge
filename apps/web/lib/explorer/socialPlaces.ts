@@ -7,7 +7,7 @@ import {
   type SocialModel, type SocialPlaceSet, type SocialPopulation, type SocialPriceIndex, type SocialSeriesDefinition, type SocialShownFact,
 } from "./social";
 import type { TopicCoverage, TopicState } from "./topicSeries";
-import { changeUnitListSelection, listLatestByHeading, parseUnitListHash, unitListCoverage } from "./unitList";
+import { changeUnitListSelection, listLatestByHeading, parseUnitListHash, unitListCoverage, unitListCrawlStates } from "./unitList";
 
 /** The base path a set's index and place pages sit under; `placePageHref` adds the place. */
 export const socialPlaceBase = (set: SocialPlaceSet): `${typeof HEALTH_HUB_PATH}/${SocialPlaceSet}` => `${HEALTH_HUB_PATH}/${set}`;
@@ -77,6 +77,15 @@ export function parseSocialPlaceHash(hash: string, set: SocialPlaceSet, placeId:
 export function changeSocialPlaceSelection(state: TopicState, set: SocialPlaceSet, placeId: string, next: readonly string[], facts: readonly SocialShownFact[]): TopicState {
   const definitions = socialPlaceSeries(set);
   return changeUnitListSelection(state, definitions, next, facts, noSocialYears(placeId), socialHeadingOf(definitions));
+}
+
+/**
+ * The hidden crawl tables' states (lib/explorer/crawlTables.ts): each heading the place has facts for, every row of it with
+ * facts, over every year. Shares of residents and 2025 prices are kept: the page lists no population or price index.
+ */
+export function socialPlaceCrawlStates(set: SocialPlaceSet, facts: readonly SocialShownFact[]): TopicState[] {
+  const definitions = socialPlaceSeries(set);
+  return unitListCrawlStates(definitions, facts, socialHeadingOf(definitions));
 }
 
 /** A place page's model; `breaks` are the counting-change register, of which the model keeps the ones touching the selection. */

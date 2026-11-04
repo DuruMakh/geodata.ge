@@ -5,7 +5,7 @@ import type { ClientEnvironmentFact, EnvironmentCity } from "../../lib/data/envi
 import type { MunicipalRegion } from "../../lib/data/municipal/types";
 import { updatedDate } from "../../lib/explorer/coverageLabel";
 import {
-  buildEnvironmentModel, changeEnvironmentSelection, environmentCoverage, environmentSeriesLabel, environmentTopicSeries, environmentUnitLabelKey,
+  buildEnvironmentModel, changeEnvironmentSelection, environmentCoverage, environmentListCrawlStates, environmentSeriesLabel, environmentTopicSeries, environmentUnitLabelKey,
   environmentValueLabel, environmentValueUnit, parseEnvironmentHash, serializeEnvironmentHash, type EnvironmentModel, type EnvironmentSeriesDefinition,
   type EnvironmentState, type EnvironmentTopicId, type EnvironmentTranslate,
 } from "../../lib/explorer/environment";
@@ -22,6 +22,7 @@ import { pageHref } from "../../lib/i18n/routes";
 import { ModeTabs } from "../explorer-shell/mode-tabs";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { ChartShareButton } from "../explorer-shell/chart-share-button";
+import { CrawlTables, useCrawlModels } from "../explorer-shell/crawl-tables";
 import { ExplorerHeading } from "../explorer-shell/explorer-heading";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { LatestValueLine } from "../explorer-shell/latest-value-line";
@@ -122,6 +123,9 @@ export function EnvironmentExplorer({ scope, facts, labels, sources, lastReviewe
   // a group whose newest figure is older (a station that closed) names its year in its heading.
   const listEnd = resolveRange(state.range, list.coverage(facts)).end;
   const listRows = listLatestByHeading(facts, model.series, listEnd);
+  // Every unit of the list, every row of it over its years, for the hidden crawl tables: built from the props alone, so a click never rebuilds them.
+  const crawlModels = useCrawlModels(() => environmentListCrawlStates(list.series(facts), facts).map(crawl =>
+    buildEnvironmentWorkbookExportModel({ ...workbookPage(scope), facts, state: crawl, labels, sources, siteOrigin, title }, presentation)));
   const downloadAction = <ExcelDownloadButton testId="environment-excel-download" disabled={!model.selected.length} onDownload={async () => {
     const { downloadWorkbook } = await import("../../lib/explorer/workbookWriter.client");
     await downloadWorkbook(buildEnvironmentWorkbookExportModel({ ...workbookPage(scope), facts, state, labels, sources, siteOrigin, title }, presentation));
@@ -142,7 +146,8 @@ export function EnvironmentExplorer({ scope, facts, labels, sources, lastReviewe
             <span data-testid="environment-unit-label" className="text-[11px] text-[var(--muted)]">{unitLabel}</span>
           </div>
           {!model.selected.length ? <div className="mt-5"><Callout testId="no-selection-callout">{t("emptySelection")}</Callout></div>
-            : <><ExplorerTable caption={`${title} · ${unitLabel} · ${model.range.start}–${model.range.end}`} rows={rows.filter(row => row !== total)} totalRow={total} showTotal={Boolean(total)} totalFirst wrapRowLabels rowLabelsLocalized years={model.years} firstColumnLabel={t("series")} unit={unit} share={false} showChangeColumn={false} shareValueForYear={() => null} crawlCopy={state.mode === "line"} />{state.mode === "line" ? <div className="mt-5">{chart}</div> : null}</>}
+            : state.mode === "line" ? <div className="mt-5">{chart}</div>
+            : <ExplorerTable caption={`${title} · ${unitLabel} · ${model.range.start}–${model.range.end}`} rows={rows.filter(row => row !== total)} totalRow={total} showTotal={Boolean(total)} totalFirst wrapRowLabels rowLabelsLocalized years={model.years} firstColumnLabel={t("series")} unit={unit} share={false} showChangeColumn={false} shareValueForYear={() => null} />}
           <ChartSelectionAids series={lineSeries} chartShown={state.mode === "line"} share={false} unit={unit} formatValue={valueLabel} />
           <RangeStrip years={list.coverage(facts, state.selectedIds).years} range={model.range} onChange={patch => update(s => ({ ...s, range: rangeFromPatch(list.build(facts, s).range, patch) }))} />
         </section>
@@ -161,5 +166,6 @@ export function EnvironmentExplorer({ scope, facts, labels, sources, lastReviewe
         totalId={model.series.find(series => series.reference)?.id} pinTotal selectedIds={state.selectedIds} onSelectionChange={selectedIds => update(s => list.change(s, selectedIds, facts), true)}
         query={query} onQueryChange={setQuery} searchPlaceholder={t("search")} searchable={model.series.length > SEARCHABLE_MIN_ROWS} />
     </ExplorerWorkspace>
+    <CrawlTables models={crawlModels} />
   </div>;
 }

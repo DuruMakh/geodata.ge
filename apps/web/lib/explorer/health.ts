@@ -1,6 +1,7 @@
 import { HEALTH_INDICATORS, healthFactKey, type ClientHealthFact, type HealthArea, type HealthIndicator, type HealthSeriesBreak } from "../data/health/types";
 import { refitRange, type PeriodRange, type ResolvedPeriodRange } from "./periodRange";
 import { buildTopicModel, parseTopicHash, serializeTopicHash, topicCoverage, topicHashView, topicSeriesColor, type TopicCoverage, type TopicSeriesModel, type TopicState } from "./topicSeries";
+import { unitListCrawlStates } from "./unitList";
 
 export const HEALTH_HUB_PATH = "/explorer/health";
 
@@ -114,6 +115,15 @@ export type HealthState = TopicState & { view: HealthView };
 export function defaultHealthState(section: HealthNationalSectionId, facts: readonly ClientHealthFact[]): HealthState {
   const view = healthViews(section)[0];
   return { mode: "line", range: { kind: "all" }, view, selectedIds: healthDefaultSelection(section, view, facts) };
+}
+
+/**
+ * The hidden crawl tables' states (lib/explorer/crawlTables.ts): each view (staff, hospitals), split by the units its list
+ * cannot mix (hospitals and clinics, beds, visits), each with every row of the unit that has facts, over every year.
+ */
+export function healthCrawlStates(section: HealthNationalSectionId, facts: readonly ClientHealthFact[]): HealthState[] {
+  const own = areaFacts(facts, "georgia");
+  return healthViews(section).flatMap(view => unitListCrawlStates(healthViewSeries(section, view), own, unitOf).map(state => ({ ...state, view })));
 }
 
 /**

@@ -203,7 +203,7 @@ test("sector source notes and metadata name the correct dataset",async({page})=>
   await expect(page.getByTestId("source-label")).toContainText("Geostat");
   await expect(page.getByTestId("source-label")).not.toContainText("World Bank");
   await page.getByTestId("chart-mode-table").click();
-  await expect(page.locator("caption")).toContainText("bn GEL");
+  await expect(page.getByTestId("explorer-table").locator("caption")).toContainText("bn GEL");
   await expect(page.getByTestId("explorer-table")).toContainText("Preliminary");
 });
 

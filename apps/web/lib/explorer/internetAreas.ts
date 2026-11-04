@@ -2,7 +2,7 @@ import { INTERNET_REGIONS, internetIndicator, type ClientInternetFact, type Inte
 import { INTERNET_SECTIONS, buildInternetSeriesModel, type InternetModel, type InternetSeriesDefinition } from "./internet";
 import { areaRoutes } from "./areaRoutes";
 import type { TopicState } from "./topicSeries";
-import { changeUnitListSelection, parseUnitListHash, unitListCoverage } from "./unitList";
+import { changeUnitListSelection, parseUnitListHash, unitListCoverage, unitListCrawlStates } from "./unitList";
 
 /** The areas with a page: Georgia, then the eleven regions. */
 export const INTERNET_AREAS = ["georgia", ...INTERNET_REGIONS] as const;
@@ -33,6 +33,10 @@ const noYears = (area: InternetArea) => `No internet years for ${area}`;
 /** An area's years for a selection (any of the area's series when nothing is selected). */
 export const internetAreaCoverage = (area: InternetArea, facts: readonly ClientInternetFact[], selectedIds: readonly string[] = []) =>
   unitListCoverage(internetAreaSeries(area), selectedIds, facts, noYears(area));
+
+/** The hidden crawl tables' states: the area's homes with internet and with a computer, every row with facts (all shares of homes, so one table). */
+export const internetAreaCrawlStates = (area: InternetArea, facts: readonly ClientInternetFact[]): InternetAreaState[] =>
+  unitListCrawlStates(internetAreaSeries(area), facts);
 
 /** Reads the view of the page for `area`. Every row is a share of homes, so rows of both kinds are shown together. */
 export const parseInternetAreaHash = (hash: string, area: InternetArea, facts: readonly ClientInternetFact[]): InternetAreaState =>

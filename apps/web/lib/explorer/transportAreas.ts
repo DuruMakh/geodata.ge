@@ -2,6 +2,7 @@ import { TRANSPORT_REGIONS, TRANSPORT_ROAD_PARTS, TRANSPORT_ZERO_ROWS, transport
 import { TRANSPORT_SECTIONS, buildTransportSeriesModel, changeTransportSelection, parseTransportListHash, transportListCoverage, type TransportModel, type TransportSeriesDefinition } from "./transport";
 import { areaRoutes } from "./areaRoutes";
 import type { TopicState } from "./topicSeries";
+import { unitListCrawlStates } from "./unitList";
 
 /** The areas with a page: Georgia, then the eleven regions. Abkhazia and "region unknown" are served but have no page. */
 export const TRANSPORT_AREAS = ["georgia", ...TRANSPORT_REGIONS] as const;
@@ -42,6 +43,10 @@ export type TransportAreaState = TopicState;
 /** An area's years for a selection (any of the area's series when nothing is selected). */
 export const transportAreaCoverage = (area: TransportArea, facts: readonly ClientTransportFact[], selectedIds: readonly string[] = []) =>
   transportListCoverage(transportAreaSeries(area), selectedIds, facts);
+
+/** The hidden crawl tables' states: each unit of the area's list, every row of it with facts. */
+export const transportAreaCrawlStates = (area: TransportArea, facts: readonly ClientTransportFact[]): TransportAreaState[] =>
+  unitListCrawlStates(transportAreaSeries(area), facts);
 
 /** Reads the view of the page for `area`: its selection, kept to one unit, and the years. */
 export const parseTransportAreaHash = (hash: string, area: TransportArea, facts: readonly ClientTransportFact[]): TransportAreaState =>

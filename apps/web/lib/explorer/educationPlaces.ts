@@ -1,7 +1,7 @@
 import { EDUCATION_GEORGIA, educationIndicator, type ClientEducationFact, type EducationGroup, type EducationMeasure } from "../data/education/types";
 import { placeIdForMunicipalityCode } from "./demographyAreas";
 import { EDUCATION_HUB_PATH, buildEducationList, buildEducationSeriesModel, serializeEducationHash, type EducationModel, type EducationSeriesDefinition, type EducationState } from "./education";
-import { changeUnitListSelection, parseUnitListHash, unitListCoverage } from "./unitList";
+import { changeUnitListSelection, parseUnitListHash, unitListCoverage, unitListCrawlStates } from "./unitList";
 
 /** The two Education page sets with a map index and a page per place (Georgia, the 11 regions and the 63 other municipalities). */
 export type EducationPlaceSet = "schools" | "kindergartens";
@@ -67,6 +67,12 @@ const noEducationYears = (placeId: string) => `No education years for ${placeId}
 export function educationPlaceCoverage(set: EducationPlaceSet, placeId: string, facts: readonly ClientEducationFact[], selectedIds: readonly string[] = []) {
   const definitions = educationPlaceSeries(set, placeId);
   return unitListCoverage(definitions, selectedIds, placeFacts(facts, placeId), noEducationYears(placeId), headingOf(definitions));
+}
+
+/** The hidden crawl tables' states: each heading the place lists (one heading is charted at a time), every row of it with facts. */
+export function educationPlaceCrawlStates(set: EducationPlaceSet, placeId: string, facts: readonly ClientEducationFact[]): EducationState[] {
+  const definitions = educationPlaceSeries(set, placeId);
+  return unitListCrawlStates(definitions, placeFacts(facts, placeId), headingOf(definitions));
 }
 
 /** Reads a place page's hash: a selection that mixes headings keeps only its first row's heading, and the years fit that heading. */

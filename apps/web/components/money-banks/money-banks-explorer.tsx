@@ -5,7 +5,7 @@ import { ChartPie, CircleDollarSign } from "lucide-react";
 import { updatedDate } from "../../lib/explorer/coverageLabel";
 import type { ClientMoneyBanksFact } from "../../lib/data/moneyBanks/types";
 import type { ClientNationalGdpFact } from "../../lib/explorer/clientData";
-import { buildMoneyBanksModel, changeMoneyBanksView, moneyBanksCoverage, moneyBanksHasTotalRow, moneyBanksViewFacts, moneyBanksViews, moneyBanksViewSeries, parseMoneyBanksHash, serializeMoneyBanksHash, type MoneyBanksTopicId, type MoneyBanksState, type MoneyBanksView } from "../../lib/explorer/moneyBanks";
+import { buildMoneyBanksModel, changeMoneyBanksView, moneyBanksCoverage, moneyBanksCrawlStates, moneyBanksHasTotalRow, moneyBanksViewFacts, moneyBanksViews, moneyBanksViewSeries, parseMoneyBanksHash, serializeMoneyBanksHash, type MoneyBanksTopicId, type MoneyBanksState, type MoneyBanksView } from "../../lib/explorer/moneyBanks";
 import { buildMoneyBanksWorkbookExportModel } from "../../lib/explorer/moneyBanksWorkbook";
 import { formatAmount, formatInUnit, unitFor, unitsFor, type ValueUnit } from "../../lib/explorer/format";
 import { rangeFromPatch } from "../../lib/explorer/periodRange";
@@ -17,6 +17,7 @@ import { pageHref } from "../../lib/i18n/routes";
 import { ModeTabs } from "../explorer-shell/mode-tabs";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { ChartShareButton } from "../explorer-shell/chart-share-button";
+import { CrawlTables, useCrawlModels } from "../explorer-shell/crawl-tables";
 import { ExplorerHeading } from "../explorer-shell/explorer-heading";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { LatestFigure, LatestValueLine } from "../explorer-shell/latest-value-line";
@@ -75,6 +76,9 @@ export function MoneyBanksExplorer({ section, facts, labels, sources, gdpFacts, 
   const preliminaryGdpYears = state.view === "gdp" ? model.years.filter(year => gdpFacts.some(f => f.year === year && f.status === "preliminary")) : [];
   const latestValue = latest.unit === "gel" ? formatAmount(latest.value, locale) : `${formatInUnit(latest.value, { divisor: 1, label: "", decimals: latest.decimals })}${t("unitPercent")}`;
   const title = t(`page.${section}.title`);
+  // Every series of each view over every year, for the hidden crawl tables: built from the props alone, so a click never rebuilds them.
+  const crawlModels = useCrawlModels(() => moneyBanksCrawlStates(section, facts, gdpFacts).map(crawl =>
+    buildMoneyBanksWorkbookExportModel({ section, facts, state: crawl, labels, sources, siteOrigin, title, gdpFacts, gdpSources }, presentation)));
   const tabLabel = state.view === "main" ? title : t(`tab.${state.view}`);
   // Money supply and Loans and deposits switch between their amounts and a share with the icon measure switch (DESIGN §7.2a), not tabs.
   const changeView = (view: MoneyBanksView) => { if (view === state.view) return; setExpanded({}); update(s => changeMoneyBanksView(s, section, view, facts, gdpFacts), true); };
@@ -104,8 +108,9 @@ export function MoneyBanksExplorer({ section, facts, labels, sources, gdpFacts, 
             </div>
           </div>
           {!model.selected.length ? <div className="mt-5"><Callout testId="no-selection-callout">{t("emptySelection")}</Callout></div>
-            : <><ExplorerTable caption={`${tabLabel} · ${unitLabel} · ${model.range.start}–${model.range.end}`} rows={rows.filter(row => row !== total)} totalRow={total} showTotal={Boolean(total)} totalFirst wrapRowLabels rowLabelsLocalized years={model.years} firstColumnLabel={t("series")} unit={unit} share={percent} showChangeColumn={false}
-              shareValueForYear={(row, year) => { const value = row.valuesByYear[year]; return value == null ? null : value / 100; }} shareDecimalsForRow={row => decimalsOf(row.itemId)} crawlCopy={state.mode === "line"} />{state.mode === "line" ? <div className="mt-5">{chart}</div> : null}</>}
+            : state.mode === "line" ? <div className="mt-5">{chart}</div>
+            : <ExplorerTable caption={`${tabLabel} · ${unitLabel} · ${model.range.start}–${model.range.end}`} rows={rows.filter(row => row !== total)} totalRow={total} showTotal={Boolean(total)} totalFirst wrapRowLabels rowLabelsLocalized years={model.years} firstColumnLabel={t("series")} unit={unit} share={percent} showChangeColumn={false}
+              shareValueForYear={(row, year) => { const value = row.valuesByYear[year]; return value == null ? null : value / 100; }} shareDecimalsForRow={row => decimalsOf(row.itemId)} />}
           <ChartSelectionAids series={lineSeries} chartShown={state.mode === "line"} share={percent} unit={unit} formatValue={valueLabel} />
           <RangeStrip years={moneyBanksCoverage(section, state.view, facts, gdpFacts).years} range={model.range} onChange={patch => update(s => ({ ...s, range: rangeFromPatch(buildMoneyBanksModel(section, facts, s, gdpFacts).range, patch) }))} />
         </section>
@@ -122,5 +127,6 @@ export function MoneyBanksExplorer({ section, facts, labels, sources, gdpFacts, 
         searchable={model.series.length > SEARCHABLE_MIN_ROWS} query={query} onQueryChange={setQuery} searchPlaceholder={t("search")}
         nesting={{ selectedLabel: t("nestedSelected"), expansionLabel: label => t("subcategoriesFor", { label }), expanded, onExpandedChange: setExpanded }} />
     </ExplorerWorkspace>
+    <CrawlTables models={crawlModels} />
   </div>;
 }

@@ -41,7 +41,7 @@ describe("measureSeoOutput", () => {
     ]);
   });
 
-  test("audits the pages that carry a crawl copy of their yearly table", () => {
+  test("audits the pages that carry hidden crawl tables of every series", () => {
     const fixtureRoot = mkdtempSync(path.join(tmpdir(), "seo-output-"));
     fixtures.push(fixtureRoot);
 

@@ -30,6 +30,9 @@ export const PUBLIC_DATASET_FILE_NAMES: readonly string[] = [
   "social-protection.csv",
 ];
 
+/** Every published file the manifest lists that the fact-query publications do not build: these CSVs and the national CPI CSV. */
+export const MANIFEST_SIDE_FILE_NAMES: readonly string[] = [...PUBLIC_DATASET_FILE_NAMES, "inflation-cpi-national.csv"];
+
 export type PublicDatasetValidation = {
   status: "PASS";
   datasetId: PublicDatasetId;

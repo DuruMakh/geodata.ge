@@ -5,7 +5,7 @@ import { useCallback, useId, useRef, useState } from "react";
 import type { ClientHousingFact } from "../../lib/data/housing/types";
 import type { MunicipalRegion } from "../../lib/data/municipal/types";
 import { housingCount, housingSeriesLabel, housingUnitLabel, housingValueLabel, housingValueUnit, serializeHousingHash, type HousingSeriesModel, type HousingTranslate } from "../../lib/explorer/housing";
-import { HOUSING_REGIONS_HREF, buildHousingAreaModel, changeHousingAreaSelection, housingAreaCoverage, housingAreaLatest, housingAreaOfMapId, housingAreaSelectionHash, housingMapId, housingRegionHref, parseHousingAreaHash, type HousingArea } from "../../lib/explorer/housingAreas";
+import { HOUSING_REGIONS_HREF, buildHousingAreaModel, changeHousingAreaSelection, housingAreaCoverage, housingAreaCrawlStates, housingAreaLatest, housingAreaOfMapId, housingAreaSelectionHash, housingMapId, housingRegionHref, parseHousingAreaHash, type HousingArea } from "../../lib/explorer/housingAreas";
 import { buildHousingWorkbookExportModel } from "../../lib/explorer/housingWorkbook";
 import { updatedDate } from "../../lib/explorer/coverageLabel";
 import { formatInUnit } from "../../lib/explorer/format";
@@ -17,6 +17,7 @@ import { pageHref } from "../../lib/i18n/routes";
 import { ModeTabs } from "../explorer-shell/mode-tabs";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { ChartShareButton } from "../explorer-shell/chart-share-button";
+import { CrawlTables, useCrawlModels } from "../explorer-shell/crawl-tables";
 import { ExplorerHeading } from "../explorer-shell/explorer-heading";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { LatestValueLine } from "../explorer-shell/latest-value-line";
@@ -66,6 +67,9 @@ export function HousingAreaExplorer({ area, facts, labels, areaLabels, sources, 
   const latest = housingAreaLatest(area, facts);
   const areaName = areaLabels[area];
   const title = t("page.area.regionTitle", { region: areaName });
+  // The area's numbers and floor areas, every series over its years, for the hidden crawl tables: built from the props alone, so a click never rebuilds them.
+  const crawlModels = useCrawlModels(() => housingAreaCrawlStates(area, facts).map(crawl =>
+    buildHousingWorkbookExportModel({ area, facts, state: crawl, labels, sources, siteOrigin, title }, presentation)));
   // The chart is named after the heading of the selection's unit (its text before the unit).
   const chartLabel = `${t(`heading.${model.unit === "area" ? "area" : "count"}`).split(" · ")[0]} · ${areaName}`;
   // Links to another area's page carry the selection, moved to that area, and nothing else.
@@ -100,7 +104,8 @@ export function HousingAreaExplorer({ area, facts, labels, areaLabels, sources, 
             <span data-testid="housing-unit-label" className="text-[11px] text-[var(--muted)]">{unitLabel}</span>
           </div>
           {!model.selected.length ? <div className="mt-5"><Callout testId="no-selection-callout">{t("emptySelection")}</Callout></div>
-            : <><ExplorerTable caption={`${chartLabel} · ${unitLabel} · ${model.range.start}–${model.range.end}`} rows={rows.filter(row => row !== total)} totalRow={total} showTotal={Boolean(total)} totalFirst wrapRowLabels rowLabelsLocalized years={model.years} firstColumnLabel={t("series")} unit={unit} share={false} showChangeColumn={false} shareValueForYear={() => null} crawlCopy={state.mode === "line"} />{state.mode === "line" ? <div className="mt-5">{chart}</div> : null}</>}
+            : state.mode === "line" ? <div className="mt-5">{chart}</div>
+            : <ExplorerTable caption={`${chartLabel} · ${unitLabel} · ${model.range.start}–${model.range.end}`} rows={rows.filter(row => row !== total)} totalRow={total} showTotal={Boolean(total)} totalFirst wrapRowLabels rowLabelsLocalized years={model.years} firstColumnLabel={t("series")} unit={unit} share={false} showChangeColumn={false} shareValueForYear={() => null} />}
           <ChartSelectionAids series={lineSeries} chartShown={state.mode === "line"} share={false} unit={unit} formatValue={valueLabel} />
           <RangeStrip years={housingAreaCoverage(area, facts, state.selectedIds).years} range={model.range} onChange={patch => update(s => ({ ...s, range: rangeFromPatch(buildHousingAreaModel(area, facts, s).range, patch) }))} />
         </section>
@@ -117,5 +122,6 @@ export function HousingAreaExplorer({ area, facts, labels, areaLabels, sources, 
           await downloadWorkbook(buildHousingWorkbookExportModel({ area, facts, state, labels, sources, siteOrigin, title }, presentation));
         }} />} />
     </ExplorerWorkspace>
+    <CrawlTables models={crawlModels} />
   </div>;
 }

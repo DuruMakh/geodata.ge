@@ -86,6 +86,21 @@ export function changeUnitListSelection(state: TopicState, definitions: readonly
   return { ...state, selectedIds, range: refitRange(state.range, unitListCoverage(definitions, selectedIds, facts, missing, groupOf), { collapseToAll: false }) };
 }
 
+/**
+ * The hidden crawl tables' states of a list (lib/explorer/crawlTables.ts): one per unit group, in list order, each
+ * selecting every row of the group that has facts, over the group's every year. A group without facts has no state.
+ */
+export function unitListCrawlStates(definitions: readonly { id: string }[], facts: readonly UnitFact[], groupOf?: GroupOf): TopicState[] {
+  const unitOf = groupsOf(facts, groupOf);
+  const withFacts = new Set(facts.map(f => f.indicatorId));
+  const groups = new Map<string, string[]>();
+  for (const { id } of definitions) {
+    const unit = unitOf(id);
+    if (unit !== undefined && withFacts.has(id)) groups.set(unit, [...(groups.get(unit) ?? []), id]);
+  }
+  return [...groups.values()].map(selectedIds => ({ mode: "line", range: { kind: "all" }, selectedIds }));
+}
+
 /** What a list's model needs of a fact: the unit-list fields plus its value and display decimals. */
 export type ListFact = UnitFact & { value: number; decimals: number };
 export type UnitListModel<D extends TopicSeriesDefinition, F extends ListFact, X extends object> = {

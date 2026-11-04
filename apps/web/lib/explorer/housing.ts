@@ -3,7 +3,7 @@ import { INK, OTHER_COLOR } from "./colors";
 import { MISSING, formatInUnit, type ValueUnit } from "./format";
 import type { ResolvedPeriodRange } from "./periodRange";
 import { serializeTopicHash, topicSeriesColor, type TopicSeriesModel, type TopicState } from "./topicSeries";
-import { buildUnitListModel, changeUnitListSelection, parseUnitListHash, unitListCoverage } from "./unitList";
+import { buildUnitListModel, changeUnitListSelection, parseUnitListHash, unitListCoverage, unitListCrawlStates } from "./unitList";
 
 export const HOUSING_HUB_PATH = "/explorer/housing";
 export const HOUSING_SECTIONS = [
@@ -100,6 +100,10 @@ export const changeHousingSelection = (state: TopicState, definitions: readonly 
 /** A topic page's years for its selection. */
 export const housingCoverage = (section: HousingTopicId, facts: readonly ClientHousingFact[], selectedIds: readonly string[] = []) =>
   housingListCoverage(housingTopicSeries(section), selectedIds, facts);
+
+/** The hidden crawl tables' states: each unit of the page's list (number and floor area, or the index and prices), every series of it. */
+export const housingCrawlStates = (section: HousingTopicId, facts: readonly ClientHousingFact[]): HousingState[] =>
+  unitListCrawlStates(housingTopicSeries(section), facts);
 
 export const parseHousingHash = (hash: string, section: HousingTopicId, facts: readonly ClientHousingFact[]): HousingState =>
   parseHousingListHash(hash, housingTopicSeries(section), housingDefaultSelection(section), facts);

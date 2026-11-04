@@ -8,6 +8,7 @@ import {
   buildCityIndex,
   buildCityLines,
   cityCoverage,
+  cityCrawlStates,
   rangeFromPatch,
   resolveCityRange,
   restoreCityState,
@@ -38,6 +39,7 @@ import { ExplorerPage } from "../explorer-shell/explorer-page";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { ChartShareButton } from "../explorer-shell/chart-share-button";
+import { CrawlTables, useCrawlModels } from "../explorer-shell/crawl-tables";
 import { useHashState } from "../explorer-shell/use-hash-state";
 import { EditorialLineChart, type ChartSeries } from "../main-explorer/editorial-line-chart";
 import { RangeStrip } from "../main-explorer/range-strip";
@@ -74,6 +76,10 @@ export function InflationCities({ view, facts, lastReviewedAt, sources, siteOrig
   const index = useMemo(() => buildCityIndex(unpackCityFacts(facts)), [facts]);
   const hashData = useMemo(() => ({ index, view }), [index, view]);
   const { state, update } = useHashState(hashData, parseCityState, serializeCityState);
+  // Every line of the page over its last three calendar years (at most 36 months), for the hidden crawl tables: built from the props alone, so a click never rebuilds them.
+  const crawlModels = useCrawlModels(() => cityCrawlStates(index, view).map((crawl) => buildInflationCityWorkbookExportModel({
+    index, view, state: crawl, range: resolveCityRange(crawl, index, view), presentation, sources, siteOrigin,
+  })));
 
   const range = resolveCityRange(state, index, view);
   const coverage = cityCoverage(index, view);
@@ -197,6 +203,7 @@ export function InflationCities({ view, facts, lastReviewedAt, sources, siteOrig
       </ExplorerWorkspace>
 
       {view.kind === "georgia" ? <InflationCityIndicators index={index} /> : <InflationCityCategoryIndicators index={index} cityId={view.cityId} />}
+      <CrawlTables models={crawlModels} />
     </ExplorerPage>
   );
 }

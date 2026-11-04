@@ -135,6 +135,18 @@ export function latestRegionalGdpTotal<Fact extends Pick<ClientRegionalEconomyOb
     .at(-1) ?? null;
 }
 
+/**
+ * The hidden crawl tables' state (lib/explorer/crawlTables.ts): a region's GEL amounts, the total and every sector, over
+ * every year; none for a region without them. The share of the region's GDP only divides them by the listed total.
+ */
+export function regionalEconomyCrawlStates(
+  facts: readonly ClientRegionalEconomyObservation[],
+  registry: readonly SectorDefinition[],
+): RegionalEconomyState[] {
+  if (!facts.some((fact) => fact.measure === DEFAULT_REGIONAL_ECONOMY_STATE.measure)) return [];
+  return [{ ...DEFAULT_REGIONAL_ECONOMY_STATE, selectedIds: regionalEconomyDefinitions(registry).map((definition) => definition.id) }];
+}
+
 export function buildRegionalEconomyModel(
   facts: readonly ClientRegionalEconomyObservation[],
   registry: readonly SectorDefinition[],

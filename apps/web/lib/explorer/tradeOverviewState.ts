@@ -10,6 +10,10 @@ export function tradeOverviewCoverage(facts: readonly ClientTradeOverviewFact[])
   if (!years.length) throw new Error("No Trade Overview source years");
   return { min: years[0], max: years.at(-1)!, years };
 }
+/** The hidden crawl tables' state (lib/explorer/crawlTables.ts): every indicator of the list, over every year; none without facts. */
+export function tradeOverviewCrawlStates(facts: readonly ClientTradeOverviewFact[]): TradeOverviewState[] {
+  return facts.length ? [{ mode: "line", range: { kind: "all" }, selectedIds: [...tradeOverviewIndicators(facts)] }] : [];
+}
 export function parseTradeOverviewHash(hash: string, facts: readonly ClientTradeOverviewFact[]): TradeOverviewState {
   const p = new URLSearchParams(hash.replace(/^#/, ""));
   const indicators = tradeOverviewIndicators(facts), requested = p.has("sel") ? p.get("sel")!.split(",") : [indicators[0]];

@@ -906,6 +906,10 @@ no budget data and require no migration when a code release is rolled back.
   dataset its cards read), and a page's Georgian and English URLs share it.
 - Both pages set Georgian titles/descriptions, Open Graph tags, and canonical
   URLs; `metadataBase` comes from `resolveSiteUrl()`.
+- `/llms.txt` is built at build time by `apps/web/app/llms.txt/route.ts` from
+  `apps/web/lib/seo/llmsText.ts`. Each chart page's line opens with its
+  group-page card's latest figure, so the file changes with each data release;
+  tests cap it at 27,000 bytes.
 - Security headers (nosniff, `X-Frame-Options: DENY`, referrer policy,
   permissions policy) are set in `apps/web/next.config.ts` `headers()`;
   Vercel adds HSTS itself.

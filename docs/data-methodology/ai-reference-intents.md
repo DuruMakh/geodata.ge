@@ -82,7 +82,8 @@ product annual/cumulative values, history limits, rankings and refusals (#41–4
 Its source-checked expectations are authoritative; the separate thirteen-pair
 `mcpAssistantIntents.ts` rubric assesses actual assistant behavior. Two of its pairs (wages, pensions) ask about topics that Fiscal.ge shows but MCP does not serve: the
 assistant must say this connection does not serve them, offer the `websitePages` link from
-`describe_coverage` in the user's language, and quote no figure from unrelated data or memory.
+`describe_coverage` in the user's language, and quote a figure only from that page's year-by-year
+table with its link, when it can open the page; never from unrelated data or memory.
 
 ## What the list is designed to catch
 

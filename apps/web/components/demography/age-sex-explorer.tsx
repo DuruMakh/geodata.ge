@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { CENSUS_STEP } from "../../lib/data/demography/series";
 import {
+  ageSexCrawlStates,
   ageYears,
   annualPyramid,
   bandShares,
@@ -30,6 +31,7 @@ import type { ClientAgeFact } from "../../lib/servedRows";
 import { unpackFacts, type FactsInput } from "../../lib/data/packedFacts";
 import { useAppReady } from "../explorer-shell/use-app-ready";
 import { ChartShareButton } from "../explorer-shell/chart-share-button";
+import { CrawlTables, useCrawlModels } from "../explorer-shell/crawl-tables";
 import { useReplaceHash } from "../explorer-shell/use-replace-hash";
 import { HeatmapTable } from "../main-explorer/heatmap-table";
 import { Callout, SectionTitle, SegmentedTabs, SourceNote } from "../ui/editorial";
@@ -54,6 +56,10 @@ export function AgeSexExplorer({
   const { locale, messages } = presentation;
   const t = (key: string, values?: TemplateValues) => message(messages, `demography.${key}`, values);
   const years = useMemo(() => ageYears(facts), [facts]);
+  // Every year's counts by age and sex (the shares and the heat map divide them by the total row), for the hidden crawl tables:
+  // built from the props alone, so a click never rebuilds them.
+  const crawlModels = useCrawlModels(() => ageSexCrawlStates(facts).map((crawl) =>
+    buildPyramidWorkbookExportModel({ facts, sources, siteOrigin, year: crawl.year, compare: crawl.compare }, presentation)));
   const [state, setState] = useState<AgeSexState>(() => parseAgeSexHash("", years));
   const [ready, setReady] = useState(false);
 
@@ -195,6 +201,7 @@ export function AgeSexExplorer({
         <div className="mt-[18px] max-w-[740px]"><SourceNote testId="age-sex-heatmap-source">{source}</SourceNote></div>
         <Download testId="age-sex-heatmap-excel-download" build={() => buildAgeYearWorkbookExportModel({ facts, sources, siteOrigin }, presentation)} />
       </section>
+      <CrawlTables models={crawlModels} />
     </>
   );
 }

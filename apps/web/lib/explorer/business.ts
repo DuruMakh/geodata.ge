@@ -5,7 +5,7 @@ import {
 import { INK, OTHER_COLOR } from "./colors";
 import type { ResolvedPeriodRange } from "./periodRange";
 import { buildTopicModel, serializeTopicHash, topicSeriesColor, type TopicSeriesModel, type TopicState } from "./topicSeries";
-import { changeUnitListSelection, keepOneUnit, parseUnitListHash, unitListCoverage } from "./unitList";
+import { changeUnitListSelection, keepOneUnit, parseUnitListHash, unitListCoverage, unitListCrawlStates } from "./unitList";
 
 export const BUSINESS_HUB_PATH = "/explorer/business";
 export const BUSINESS_SECTIONS = [
@@ -125,6 +125,10 @@ export function businessCoverage(section: BusinessTopicId, facts: readonly Clien
 export function defaultBusinessState(section: BusinessTopicId): BusinessState {
   return { mode: "line", range: { kind: "all" }, selectedIds: businessDefaultSelection(section) };
 }
+
+/** The hidden crawl tables' states: each unit of the page's list (Firms' counts and rates apart), every series of it. */
+export const businessCrawlStates = (section: BusinessTopicId, facts: readonly ClientBusinessFact[]): BusinessState[] =>
+  unitListCrawlStates(businessTopicSeries(section), facts);
 
 export function parseBusinessHash(hash: string, section: BusinessTopicId, facts: readonly ClientBusinessFact[]): BusinessState {
   return parseBusinessListHash(hash, businessTopicSeries(section), businessDefaultSelection(section), facts);

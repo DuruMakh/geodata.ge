@@ -2,7 +2,7 @@ import { createHash } from "node:crypto";
 import { existsSync } from "node:fs";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
-import { PUBLIC_DATASET_FILE_NAMES } from "../lib/data/publicDatasetExports";
+import { MANIFEST_SIDE_FILE_NAMES } from "../lib/data/publicDatasetExports";
 import { buildAllPublications, type PublicationArtifact } from "../lib/factQuery/publications";
 import type { FactQuerySnapshot } from "../lib/factQuery/types";
 import { loadPackagedSnapshot } from "../lib/mcp/snapshot";
@@ -30,11 +30,10 @@ function packagedSnapshot(): FactQuerySnapshot {
 // Published files this step does not build, written earlier in prebuild and predev: the public topic CSVs
 // (data:prepare-public-datasets) and the national CPI CSV (data:prepare-inflation-public). The manifest names
 // them so a client can find and verify every file. A missing one stops the step with its name.
-const SIDE_FILE_NAMES = [...PUBLIC_DATASET_FILE_NAMES, "inflation-cpi-national.csv"];
 
 async function sideFiles(): Promise<PublicationArtifact[]> {
   return Promise.all(
-    SIDE_FILE_NAMES.map(async (fileName) => {
+    MANIFEST_SIDE_FILE_NAMES.map(async (fileName) => {
       const bytes = await readFile(path.join(OUTPUT_DIR, fileName)).catch(() => null);
       if (bytes === null) {
         throw new Error(

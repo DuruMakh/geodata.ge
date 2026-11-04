@@ -6,7 +6,7 @@ import { updatedDate } from "../../lib/explorer/coverageLabel";
 import type { ClientTaxBreaksRefundsFact } from "../../lib/data/taxBreaksRefunds/types";
 import type { ClientNationalGdpFact } from "../../lib/explorer/clientData";
 import {
-  buildTaxBreaksRefundsModel, parseTaxBreaksRefundsHash, serializeTaxBreaksRefundsHash, taxBreaksRefundsCoverage, taxBreaksRefundsHeadline, taxBreaksRefundsViewFacts,
+  buildTaxBreaksRefundsModel, parseTaxBreaksRefundsHash, serializeTaxBreaksRefundsHash, taxBreaksRefundsCoverage, taxBreaksRefundsCrawlStates, taxBreaksRefundsHeadline, taxBreaksRefundsViewFacts,
   type TaxBreaksRefundsHeading, type TaxBreaksRefundsState, type TaxBreaksRefundsView,
 } from "../../lib/explorer/taxBreaksRefunds";
 import { buildTaxBreaksRefundsWorkbookExportModel } from "../../lib/explorer/taxBreaksRefundsWorkbook";
@@ -19,6 +19,7 @@ import { pageHref } from "../../lib/i18n/routes";
 import { ModeTabs } from "../explorer-shell/mode-tabs";
 import { ChartShareButton } from "../explorer-shell/chart-share-button";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
+import { CrawlTables, useCrawlModels } from "../explorer-shell/crawl-tables";
 import { ExplorerHeading } from "../explorer-shell/explorer-heading";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { LatestFigure, LatestValueLine } from "../explorer-shell/latest-value-line";
@@ -75,6 +76,9 @@ export function TaxBreaksRefundsExplorer({ facts, labels, headings, sources, gdp
     const year = headingYear(heading);
     return Number.isFinite(year) && year !== model.range.end ? `${headings[heading]} · ${year}` : headings[heading];
   };
+  // Every series over all its years, for the hidden crawl table: built from the props alone, so a click never rebuilds it.
+  const crawlModels = useCrawlModels(() => taxBreaksRefundsCrawlStates(facts, gdpFacts).map(crawl =>
+    buildTaxBreaksRefundsWorkbookExportModel({ facts, state: crawl, labels, sources, siteOrigin, title, gdpFacts, gdpSources }, presentation)));
   const changeView = (view: TaxBreaksRefundsView) => {
     if (view === state.view) return;
     update(s => ({ ...s, view, range: refitRange(s.range, taxBreaksRefundsCoverage(view, s.selectedIds, facts, gdpFacts), { collapseToAll: false }) }), true);
@@ -103,8 +107,9 @@ export function TaxBreaksRefundsExplorer({ facts, labels, headings, sources, gdp
             </div>
           </div>
           {!model.selected.length ? <div className="mt-5"><Callout testId="no-selection-callout">{t("emptySelection")}</Callout></div>
-            : <><ExplorerTable caption={`${tabLabel} · ${unitLabel} · ${model.range.start}–${model.range.end}`} rows={rows} totalRow={null} showTotal={false} wrapRowLabels rowLabelsLocalized years={model.years} firstColumnLabel={t("series")} unit={unit} share={percent} showChangeColumn={false}
-              shareValueForYear={(row, year) => { const value = row.valuesByYear[year]; return value == null ? null : value / 100; }} shareDecimalsForRow={row => decimalsOf(row.itemId)} crawlCopy={state.mode === "line"} />{state.mode === "line" ? <div className="mt-5">{chart}</div> : null}</>}
+            : state.mode === "line" ? <div className="mt-5">{chart}</div>
+            : <ExplorerTable caption={`${tabLabel} · ${unitLabel} · ${model.range.start}–${model.range.end}`} rows={rows} totalRow={null} showTotal={false} wrapRowLabels rowLabelsLocalized years={model.years} firstColumnLabel={t("series")} unit={unit} share={percent} showChangeColumn={false}
+              shareValueForYear={(row, year) => { const value = row.valuesByYear[year]; return value == null ? null : value / 100; }} shareDecimalsForRow={row => decimalsOf(row.itemId)} />}
           <ChartSelectionAids series={lineSeries} chartShown={state.mode === "line"} share={percent} unit={unit} formatValue={valueLabel} />
           <RangeStrip years={taxBreaksRefundsCoverage(state.view, state.selectedIds, facts, gdpFacts).years} range={model.range} onChange={patch => update(s => ({ ...s, range: rangeFromPatch(buildTaxBreaksRefundsModel(facts, s, gdpFacts).range, patch) }))} />
         </section>
@@ -122,5 +127,6 @@ export function TaxBreaksRefundsExplorer({ facts, labels, headings, sources, gdp
         })}
         selectedIds={state.selectedIds} onSelectionChange={selectedIds => update(s => ({ ...s, selectedIds }), true)} searchable={false} />
     </ExplorerWorkspace>
+    <CrawlTables models={crawlModels} />
   </div>;
 }

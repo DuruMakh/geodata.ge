@@ -2,7 +2,7 @@ import { ENERGY_FOOD_UNIT_DECIMALS, energyFoodIndicatorUnit, type ClientEnergyFo
 import { EDITORIAL_PALETTE, INK } from "./colors";
 import type { ResolvedPeriodRange } from "./periodRange";
 import { buildTopicModel, serializeTopicHash, type TopicSeriesModel, type TopicState } from "./topicSeries";
-import { changeUnitListSelection, parseUnitListHash, unitListCoverage } from "./unitList";
+import { changeUnitListSelection, parseUnitListHash, unitListCoverage, unitListCrawlStates } from "./unitList";
 
 export const ENERGY_FOOD_HUB_PATH = "/explorer/energy-food";
 export const ENERGY_FOOD_SECTIONS = [
@@ -138,6 +138,11 @@ export function energyFoodLastReviewedAt(section: EnergyFoodSectionId, facts: re
 
 export function defaultEnergyFoodState(section: EnergyFoodSectionId): EnergyFoodState {
   return { mode: "line", range: { kind: "all" }, selectedIds: [energyFoodSeries(section)[0].id] };
+}
+
+/** The hidden crawl tables' states: each group one chart can hold (`energyFoodGroup`), every row of it with facts. */
+export function energyFoodCrawlStates(section: EnergyFoodSectionId, facts: readonly ClientEnergyFoodFact[]): EnergyFoodState[] {
+  return unitListCrawlStates(energyFoodSeries(section), facts, energyFoodGroup);
 }
 
 /** The hash carries no tab: a legacy `tab=` key is ignored. A selection that mixes groups keeps its first row's group. */

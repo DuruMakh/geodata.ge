@@ -5,7 +5,7 @@ import { useCallback, useId, useRef, useState } from "react";
 import type { ClientBusinessFact } from "../../lib/data/business/types";
 import type { MunicipalRegion } from "../../lib/data/municipal/types";
 import { businessHeadingLabel, changeBusinessSelection, serializeBusinessHash, type BusinessUnit } from "../../lib/explorer/business";
-import { BUSINESS_REGIONS_HREF, buildBusinessAreaModel, businessAreaCoverage, businessAreaLatest, businessAreaOfMapId, businessAreaSelectionHash, businessAreaSeries, businessMapId, businessRegionHref, parseBusinessAreaHash, type BusinessArea } from "../../lib/explorer/businessAreas";
+import { BUSINESS_REGIONS_HREF, buildBusinessAreaModel, businessAreaCoverage, businessAreaCrawlStates, businessAreaLatest, businessAreaOfMapId, businessAreaSelectionHash, businessAreaSeries, businessMapId, businessRegionHref, parseBusinessAreaHash, type BusinessArea } from "../../lib/explorer/businessAreas";
 import { buildBusinessWorkbookExportModel } from "../../lib/explorer/businessWorkbook";
 import { updatedDate } from "../../lib/explorer/coverageLabel";
 import { formatAmount, formatInUnit, thousandsUnit, unitsFor, type ValueUnit } from "../../lib/explorer/format";
@@ -18,6 +18,7 @@ import { pageHref } from "../../lib/i18n/routes";
 import { ModeTabs } from "../explorer-shell/mode-tabs";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { ChartShareButton } from "../explorer-shell/chart-share-button";
+import { CrawlTables, useCrawlModels } from "../explorer-shell/crawl-tables";
 import { ExplorerHeading } from "../explorer-shell/explorer-heading";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { LatestValueLine } from "../explorer-shell/latest-value-line";
@@ -73,6 +74,9 @@ export function BusinessAreaExplorer({ area, facts, labels, areaLabels, sources,
   const latest = businessAreaLatest(area, facts);
   const areaName = areaLabels[area];
   const title = t("page.area.regionTitle", { region: areaName });
+  // The area's money, jobs and firm counts, every series over its years, for the hidden crawl tables: built from the props alone, so a click never rebuilds them.
+  const crawlModels = useCrawlModels(() => businessAreaCrawlStates(area, facts).map(crawl =>
+    buildBusinessWorkbookExportModel({ area, facts, state: crawl, labels, sources, siteOrigin, title }, presentation)));
   // The chart is named after the heading of the selection's unit group.
   const chartLabel = `${t(`measure.${model.series.find(series => series.unit === model.unit)!.heading}`)} · ${areaName}`;
   // Links to another area's page carry the selection, moved to that area, and nothing else; the index reads only the jobs choice.
@@ -106,7 +110,8 @@ export function BusinessAreaExplorer({ area, facts, labels, areaLabels, sources,
             <span data-testid="business-unit-label" className="text-[11px] text-[var(--muted)]">{unitLabel}</span>
           </div>
           {!model.selected.length ? <div className="mt-5"><Callout testId="no-selection-callout">{t("emptySelection")}</Callout></div>
-            : <><ExplorerTable caption={`${chartLabel} · ${unitLabel} · ${model.range.start}–${model.range.end}`} rows={rows.filter(row => row !== total)} totalRow={total} showTotal={Boolean(total)} totalFirst wrapRowLabels rowLabelsLocalized years={model.years} firstColumnLabel={t("series")} unit={unit} share={false} showChangeColumn={false} shareValueForYear={() => null} crawlCopy={state.mode === "line"} />{state.mode === "line" ? <div className="mt-5">{chart}</div> : null}</>}
+            : state.mode === "line" ? <div className="mt-5">{chart}</div>
+            : <ExplorerTable caption={`${chartLabel} · ${unitLabel} · ${model.range.start}–${model.range.end}`} rows={rows.filter(row => row !== total)} totalRow={total} showTotal={Boolean(total)} totalFirst wrapRowLabels rowLabelsLocalized years={model.years} firstColumnLabel={t("series")} unit={unit} share={false} showChangeColumn={false} shareValueForYear={() => null} />}
           <ChartSelectionAids series={lineSeries} chartShown={state.mode === "line"} share={false} unit={unit} formatValue={valueLabel} />
           <RangeStrip years={businessAreaCoverage(area, facts, state.selectedIds).years} range={model.range} onChange={patch => update(s => ({ ...s, range: rangeFromPatch(buildBusinessAreaModel(area, facts, s).range, patch) }))} />
         </section>
@@ -130,5 +135,6 @@ export function BusinessAreaExplorer({ area, facts, labels, areaLabels, sources,
           await downloadWorkbook(buildBusinessWorkbookExportModel({ area, facts, state, labels, sources, siteOrigin, title }, presentation));
         }} />} />
     </ExplorerWorkspace>
+    <CrawlTables models={crawlModels} />
   </div>;
 }

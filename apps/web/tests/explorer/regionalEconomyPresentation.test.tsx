@@ -39,6 +39,7 @@ const regionalMessages = {
   "regionalEconomies.nominal": "Nominal value in GEL",
   "regionalEconomies.shareOfRegionGdp": "Share of regional GDP",
   "regionalEconomies.sector": "Economic activity",
+  "regionalEconomies.region": "Region",
   "regionalEconomies.rowYear": "Values for {year}",
   "regionalEconomies.source": "Source: Geostat",
   "regionalEconomies.accountingNote": "Sector shares may total less than 100% because regional GDP includes net product taxes.",

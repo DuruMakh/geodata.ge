@@ -3,7 +3,7 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import { updatedDate } from "../../lib/explorer/coverageLabel";
 import type { ClientTransportFact } from "../../lib/data/transport/types";
-import { buildTransportModel, changeTransportSelection, transportCoverage, transportLatestValue, transportSeriesLabel, transportTopicSeries, transportUnitLabel, transportValueLabel, transportValueUnit, parseTransportHash, serializeTransportHash, type TransportSeriesModel, type TransportTopicId, type TransportTranslate } from "../../lib/explorer/transport";
+import { buildTransportModel, changeTransportSelection, transportCoverage, transportCrawlStates, transportLatestValue, transportSeriesLabel, transportTopicSeries, transportUnitLabel, transportValueLabel, transportValueUnit, parseTransportHash, serializeTransportHash, type TransportSeriesModel, type TransportTopicId, type TransportTranslate } from "../../lib/explorer/transport";
 import { buildTransportWorkbookExportModel } from "../../lib/explorer/transportWorkbook";
 import { formatInUnit } from "../../lib/explorer/format";
 import { rangeFromPatch } from "../../lib/explorer/periodRange";
@@ -14,6 +14,7 @@ import { pageHref } from "../../lib/i18n/routes";
 import { ModeTabs } from "../explorer-shell/mode-tabs";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { ChartShareButton } from "../explorer-shell/chart-share-button";
+import { CrawlTables, useCrawlModels } from "../explorer-shell/crawl-tables";
 import { ExplorerHeading } from "../explorer-shell/explorer-heading";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { LatestValueLine } from "../explorer-shell/latest-value-line";
@@ -62,6 +63,9 @@ export function TransportExplorer({ section, facts, labels, sources, lastReviewe
   const latestOf = (id: string) => facts.filter(f => f.indicatorId === id).sort((a, b) => a.year - b.year).at(-1)!;
   const latest = latestOf(LATEST_ID[section]);
   const title = t(`page.${section}.title`);
+  // Every unit of the list, every row of it over its years, for the hidden crawl tables: built from the props alone, so a click never rebuilds them.
+  const crawlModels = useCrawlModels(() => transportCrawlStates(section, facts).map(crawl =>
+    buildTransportWorkbookExportModel({ section, facts, state: crawl, labels, sources, siteOrigin, title }, presentation)));
   const downloadAction = <ExcelDownloadButton testId="transport-excel-download" disabled={!model.selected.length} onDownload={async () => {
     const { downloadWorkbook } = await import("../../lib/explorer/workbookWriter.client");
     await downloadWorkbook(buildTransportWorkbookExportModel({ section, facts, state, labels, sources, siteOrigin, title }, presentation));
@@ -80,7 +84,8 @@ export function TransportExplorer({ section, facts, labels, sources, lastReviewe
             <span data-testid="transport-unit-label" className="text-[11px] text-[var(--muted)]">{unitLabel}</span>
           </div>
           {!model.selected.length ? <div className="mt-5"><Callout testId="no-selection-callout">{t("emptySelection")}</Callout></div>
-            : <><ExplorerTable caption={`${title} · ${unitLabel} · ${model.range.start}–${model.range.end}`} rows={rows.filter(row => row !== total)} totalRow={total} showTotal={Boolean(total)} totalFirst wrapRowLabels rowLabelsLocalized years={model.years} firstColumnLabel={t("series")} unit={unit} share={false} showChangeColumn={false} shareValueForYear={() => null} crawlCopy={state.mode === "line"} />{state.mode === "line" ? <div className="mt-5">{chart}</div> : null}</>}
+            : state.mode === "line" ? <div className="mt-5">{chart}</div>
+            : <ExplorerTable caption={`${title} · ${unitLabel} · ${model.range.start}–${model.range.end}`} rows={rows.filter(row => row !== total)} totalRow={total} showTotal={Boolean(total)} totalFirst wrapRowLabels rowLabelsLocalized years={model.years} firstColumnLabel={t("series")} unit={unit} share={false} showChangeColumn={false} shareValueForYear={() => null} />}
           <ChartSelectionAids series={lineSeries} chartShown={state.mode === "line"} share={false} unit={unit} formatValue={valueLabel} />
           <RangeStrip years={transportCoverage(section, facts, state.selectedIds).years} range={model.range} onChange={patch => update(s => ({ ...s, range: rangeFromPatch(buildTransportModel(section, facts, s).range, patch) }))} />
         </section>
@@ -94,5 +99,6 @@ export function TransportExplorer({ section, facts, labels, sources, lastReviewe
         totalId={model.series.find(series => series.reference)?.id} pinTotal selectedIds={state.selectedIds} onSelectionChange={selectedIds => update(s => changeTransportSelection(s, transportTopicSeries(section), selectedIds, facts), true)}
         query={query} onQueryChange={setQuery} searchPlaceholder={t("search")} searchable={model.series.length > SEARCHABLE_MIN_ROWS} />
     </ExplorerWorkspace>
+    <CrawlTables models={crawlModels} />
   </div>;
 }

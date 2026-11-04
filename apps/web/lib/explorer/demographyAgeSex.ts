@@ -44,7 +44,12 @@ export function ageYears(facts: readonly ClientAgeFact[]): number[] {
   return [...new Set(facts.map((fact) => fact.year))].sort((a, b) => a - b);
 }
 
-function buildPyramid(count: (group: string, sex: ClientAgeFact["sex"]) => number | undefined, label: string): Pyramid {
+type Count = (group: string, sex: ClientAgeFact["sex"]) => number | undefined;
+
+/** True when every group has both sexes' counts, so `buildPyramid` will not throw. */
+const complete = (count: Count) => AGE_SEX_GROUPS.every((group) => count(group, "male") !== undefined && count(group, "female") !== undefined);
+
+function buildPyramid(count: Count, label: string): Pyramid {
   const need = (group: string, sex: ClientAgeFact["sex"]): number => {
     const value = count(group, sex);
     if (value === undefined) throw new Error(`Missing ${sex} count for ${group} (${label})`);
@@ -60,21 +65,43 @@ function cells(facts: readonly ClientAgeFact[]): Map<string, number> {
   return new Map(facts.map((fact) => [`${fact.year}|${fact.settlement}|${fact.sex}|${fact.ageGroup}`, fact.value]));
 }
 
-/** One 1 January: `age_0_4` is the annual table's `age_0` plus `age_1_4`. */
-export function annualPyramid(facts: readonly ClientAgeFact[], year: number): Pyramid {
-  const cell = cells(facts);
+/** One 1 January's counts: `age_0_4` is the annual table's `age_0` plus `age_1_4`. */
+function annualCount(cell: Map<string, number>, year: number): Count {
   const at = (group: string, sex: ClientAgeFact["sex"]) => cell.get(`${year}|total|${sex}|${group}`);
-  return buildPyramid((group, sex) => {
+  return (group, sex) => {
     if (group !== "age_0_4") return at(group, sex);
     const [first, rest] = [at("age_0", sex), at("age_1_4", sex)];
     return first === undefined || rest === undefined ? undefined : first + rest;
-  }, String(year));
+  };
 }
+
+/** One 1 January: `age_0_4` is the annual table's `age_0` plus `age_1_4`. */
+export function annualPyramid(facts: readonly ClientAgeFact[], year: number): Pyramid {
+  return buildPyramid(annualCount(cells(facts), year), String(year));
+}
+
+const censusCount = (facts: readonly ClientAgeFact[], settlement: ClientAgeFact["settlement"]): Count => {
+  const cell = new Map(facts.filter((fact) => fact.settlement === settlement).map((fact) => [`${fact.sex}|${fact.ageGroup}`, fact.value]));
+  return (group, sex) => cell.get(`${sex}|${group}`);
+};
 
 /** The 2024 census count of one settlement type in the place the facts describe. */
 export function censusPyramid(facts: readonly ClientAgeFact[], settlement: ClientAgeFact["settlement"]): Pyramid {
-  const cell = new Map(facts.filter((fact) => fact.settlement === settlement).map((fact) => [`${fact.sex}|${fact.ageGroup}`, fact.value]));
-  return buildPyramid((group, sex) => cell.get(`${sex}|${group}`), settlement);
+  return buildPyramid(censusCount(facts, settlement), settlement);
+}
+
+/**
+ * The hidden crawl tables' states of Georgia's age structure: every year's pyramid in persons (its shares and the heat
+ * map divide those counts by the total row). A year missing a count has none.
+ */
+export function ageSexCrawlStates(facts: readonly ClientAgeFact[]): AgeSexState[] {
+  const cell = cells(facts);
+  return ageYears(facts).filter((year) => complete(annualCount(cell, year))).map((year) => ({ year, compare: null, measure: "persons" }));
+}
+
+/** The hidden crawl tables' settlements of a place's census pyramid: each one with every count, in the page's tab order. */
+export function censusCrawlSettlements(facts: readonly ClientAgeFact[]): ClientAgeFact["settlement"][] {
+  return (["total", "urban", "rural"] as const).filter((settlement) => complete(censusCount(facts, settlement)));
 }
 
 /** A part as a percent of a total. */

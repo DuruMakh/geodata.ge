@@ -5,7 +5,7 @@ import type { ClientLabourFact } from "../../lib/data/labour/types";
 import { updatedDate } from "../../lib/explorer/coverageLabel";
 import { formatInUnit } from "../../lib/explorer/format";
 import {
-  buildLabourModel, changeLabourSelection, labourCoverage, labourFullLabel, labourList, ONE_DECIMAL, parseLabourHash, serializeLabourHash,
+  buildLabourModel, changeLabourSelection, labourCoverage, labourCrawlStates, labourFullLabel, labourList, ONE_DECIMAL, parseLabourHash, serializeLabourHash,
   type LabourHeading, type LabourSectionId,
 } from "../../lib/explorer/labour";
 import { buildLabourWorkbookExportModel } from "../../lib/explorer/labourWorkbook";
@@ -17,6 +17,7 @@ import { pageHref } from "../../lib/i18n/routes";
 import { ExcelDownloadButton } from "../explorer/excel-download-button";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { ChartShareButton } from "../explorer-shell/chart-share-button";
+import { CrawlTables, useCrawlModels } from "../explorer-shell/crawl-tables";
 import { ExplorerHeading } from "../explorer-shell/explorer-heading";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { FlatSeriesPanel } from "../explorer-shell/flat-series-panel";
@@ -69,6 +70,9 @@ export function LabourExplorer({ section, facts, labels, headingLabels, latestLi
   const reference = model.series.find(series => series.reference);
   const total = rows.find(row => row.itemId === reference?.id) ?? null;
   const title = t(`page.${section}.title`);
+  // Every row with a figure over the page's years, for the hidden crawl tables: built from the props alone, so a click never rebuilds them.
+  const crawlModels = useCrawlModels(() => labourCrawlStates(section, facts).map(crawl =>
+    buildLabourWorkbookExportModel({ section, facts, state: crawl, labels, headingLabels, sources, siteOrigin, title }, presentation)));
   // Geostat publishes no figure for some rows (men in households as employers): such a selection alone has nothing to draw.
   const hasValues = model.selected.some(series => model.years.some(year => series.valuesByYear[year] != null));
   const downloadAction = <ExcelDownloadButton testId="labour-excel-download" disabled={!model.selected.length} onDownload={async () => {
@@ -90,7 +94,8 @@ export function LabourExplorer({ section, facts, labels, headingLabels, latestLi
           </div>
           {!model.selected.length ? <div className="mt-5"><Callout testId="no-selection-callout">{t("emptySelection")}</Callout></div>
             : !hasValues ? <div className="mt-5"><Callout testId="no-values-callout">{t("noValues")}</Callout></div>
-            : <><ExplorerTable caption={`${title} · ${unitLabel} · ${model.range.start}–${model.range.end}`} rows={rows.filter(row => row !== total)} totalRow={total} showTotal={Boolean(total)} totalFirst wrapRowLabels rowLabelsLocalized years={model.years} firstColumnLabel={t("series")} unit={unit} share={false} showChangeColumn={false} shareValueForYear={() => null} crawlCopy={state.mode === "line"} />{state.mode === "line" ? <div className="mt-5">{chart}</div> : null}</>}
+            : state.mode === "line" ? <div className="mt-5">{chart}</div>
+            : <ExplorerTable caption={`${title} · ${unitLabel} · ${model.range.start}–${model.range.end}`} rows={rows.filter(row => row !== total)} totalRow={total} showTotal={Boolean(total)} totalFirst wrapRowLabels rowLabelsLocalized years={model.years} firstColumnLabel={t("series")} unit={unit} share={false} showChangeColumn={false} shareValueForYear={() => null} />}
           <ChartSelectionAids series={lineSeries} chartShown={state.mode === "line"} share={false} unit={unit} formatValue={valueLabel} />
           <RangeStrip years={labourCoverage(section, facts, state.selectedIds).years} range={model.range}
             onChange={patch => update(s => ({ ...s, range: rangeFromPatch(buildLabourModel(section, facts, s).range, patch) }))} />
@@ -108,5 +113,6 @@ export function LabourExplorer({ section, facts, labels, headingLabels, latestLi
         totalId={reference?.id} pinTotal selectedIds={state.selectedIds} onSelectionChange={selectedIds => update(s => changeLabourSelection(s, section, selectedIds, facts), true)}
         query={query} onQueryChange={setQuery} searchPlaceholder={t("search")} searchable />
     </ExplorerWorkspace>
+    <CrawlTables models={crawlModels} />
   </div>;
 }

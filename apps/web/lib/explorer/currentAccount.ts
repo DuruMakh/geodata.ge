@@ -5,7 +5,7 @@ import { message } from "../i18n/messages";
 import { INK, SERIES_COLORS } from "./colors";
 import { unitFor, type ValueUnit } from "./format";
 import { resolveRange, type ResolvedPeriodRange } from "./periodRange";
-import { currentAccountCoverage, type CurrentAccountState, type CurrentAccountTab } from "./currentAccountState";
+import { CURRENT_ACCOUNT_TABS, currentAccountCoverage, type CurrentAccountState, type CurrentAccountTab } from "./currentAccountState";
 
 const CURRENT_ACCOUNT_COLORS: Record<CurrentAccountSeriesId, string> = { "ca.balance": INK, "ca.goods": SERIES_COLORS["ca.goods"]!, "ca.services": SERIES_COLORS["ca.services"]!, "ca.primary_income": SERIES_COLORS["ca.primary_income"]!, "ca.secondary_income": SERIES_COLORS["ca.secondary_income"]! };
 const FLOW_BY_TAB: Record<CurrentAccountTab, CurrentAccountFlow> = { balance: "net", in: "credit", out: "debit" };
@@ -17,6 +17,16 @@ export type CurrentAccountModel = {
   /** Years in range whose GDP is preliminary, named only when the unit is % of GDP. */
   preliminaryGdpYears: number[];
 };
+
+/**
+ * The hidden crawl tables' states (lib/explorer/crawlTables.ts): each tab whose flow has facts, in US dollars and, when there
+ * is GDP, as % of GDP (the page lists no GDP to work the shares out from), each with all five series over every year.
+ */
+export function currentAccountCrawlStates(facts: readonly ClientCurrentAccountFact[], gdp: readonly CurrentAccountGdp[]): CurrentAccountState[] {
+  const flows = new Set(facts.map(fact => fact.flow));
+  const units = gdp.length ? (["usd", "gdp"] as const) : (["usd"] as const);
+  return CURRENT_ACCOUNT_TABS.filter(tab => flows.has(FLOW_BY_TAB[tab])).flatMap(tab => units.map(unit => ({ tab, unit, mode: "line" as const, range: { kind: "all" as const }, selectedIds: [...CURRENT_ACCOUNT_SERIES] })));
+}
 
 /** The tab picks the flow (net, credit or debit); the unit is nominal USD or a percentage of nominal GDP in USD. */
 export function buildCurrentAccountModel(facts: readonly ClientCurrentAccountFact[], gdp: readonly CurrentAccountGdp[], state: CurrentAccountState, presentation: Presentation): CurrentAccountModel {

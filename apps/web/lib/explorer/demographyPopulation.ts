@@ -4,6 +4,7 @@ import type { ClientDemographyObservation } from "../servedRows";
 import {
   GEORGIA_PLACE_ID,
   TBILISI_PLACE_ID,
+  partsOf,
   placeColor,
   placeIdForMunicipalityCode,
   placeLabel,
@@ -90,6 +91,16 @@ export function placeYears(facts: readonly ClientDemographyObservation[], place:
   return [...new Set(facts
     .filter((fact) => fact.seriesId === SERIES.populationTotal && placeIdForMunicipalityCode(fact.geographyId) === place.id)
     .map((fact) => fact.year))].sort((left, right) => left - right);
+}
+
+/**
+ * The hidden crawl tables' query of a place page: the place and every part its list offers, over the place's years. A
+ * place without a population year has none.
+ */
+export function populationPlaceCrawlQueries(facts: readonly ClientDemographyObservation[], place: DemographyPlace, places: readonly DemographyPlace[]): PopulationQuery[] {
+  const years = placeYears(facts, place);
+  if (!years.length) return [];
+  return [{ selectedIds: [place.id, ...partsOf(place, places).map((part) => part.id)], range: { kind: "manual", start: years[0]!, end: years.at(-1)! } }];
 }
 
 /** The message key for the plain-language lineage of a 1 January population (foundation section 5, R6). */

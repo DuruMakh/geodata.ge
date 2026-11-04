@@ -183,12 +183,13 @@ test("the contribution chart fits phones, hovers without moving the page and ans
 });
 
 // U13-03: the monthly-change runs (about half the facts) shipped with every page view although only the monthly tab
-// reads them; they now load from a long-cached file when that tab opens.
+// reads them; they now load from a long-cached file when that tab opens. The limit rose 135,000 -> 140,000 when the
+// hidden crawl tables (last 36 months of contributions and annual rates) joined the HTML.
 test("the monthly runs load only for the monthly tab", async ({ page, request }) => {
   for (const prefix of ["", "/en"]) {
     const html = await (await request.get(`${prefix}${CATEGORIES}`)).text();
     expect(html.includes("mom_pct"), "a monthly run in the HTML").toBe(false);
-    expect(gzipSync(html).length).toBeLessThan(135_000);
+    expect(gzipSync(html).length).toBeLessThan(140_000);
   }
   const requested: string[] = [];
   page.on("request", (sent) => { if (sent.url().includes("/page-data/")) requested.push(new URL(sent.url()).pathname); });

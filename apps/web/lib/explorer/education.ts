@@ -8,7 +8,7 @@ import { INK } from "./colors";
 import { formatInUnit, UNIT_PERSONS } from "./format";
 import { refitRange, resolveRange, type ResolvedPeriodRange } from "./periodRange";
 import { buildTopicModel, parseTopicHash, serializeTopicHash, topicCoverage, topicSeriesColor, type TopicCoverage, type TopicSeriesModel, type TopicState } from "./topicSeries";
-import { listLatestByHeading } from "./unitList";
+import { listLatestByHeading, unitListCrawlStates } from "./unitList";
 
 export const EDUCATION_HUB_PATH = "/explorer/education";
 export const EDUCATION_SECTIONS = [
@@ -111,6 +111,11 @@ export function educationCoverage(section: EducationTopicId, facts: readonly Cli
 
 export function defaultEducationState(section: EducationTopicId): EducationState {
   return { mode: "line", range: { kind: "all" }, selectedIds: educationDefaultSelection(section) };
+}
+
+/** The hidden crawl tables' states: every row counts persons, so one state with every row Georgia has facts for. */
+export function educationCrawlStates(section: EducationTopicId, facts: readonly ClientEducationFact[]): EducationState[] {
+  return unitListCrawlStates(educationTopicSeries(section), facts.filter(f => f.geographyId === EDUCATION_GEORGIA), () => "persons");
 }
 
 /** Reads a topic page's hash: its selection (any mix of rows) and the years, fitted to the selection's coverage. */

@@ -125,6 +125,21 @@ export function changeSectorMeasure(state: SectorState, measure: SectorMeasure, 
   return largest.length ? { ...next, selectedIds: largest } : next;
 }
 
+/**
+ * The hidden crawl tables' states (lib/explorer/crawlTables.ts): each measure the page offers and has facts for, as it
+ * opens, with every row its list shows, over every year. A share of GDP only divides the amounts by the GDP row, so it is
+ * left out where the list carries that row (Sectors, GDP by expenditure) and kept where it does not (Spending by type).
+ */
+export function sectorCrawlStates(facts: readonly ClientSectorObservation[], registry: readonly SectorDefinition[], sourceIdByMeasure: Record<string, string>, config: SectorPageConfig = SECTORS_PAGE_CONFIG): SectorState[] {
+  const listsGdp = registry.some(r => r.id === SECTOR_GDP);
+  return (config.measures ?? ALL_SECTOR_MEASURES)
+    .filter(measure => facts.some(f => f.measure === measure) && !(measure === "share_of_gdp" && listsGdp))
+    .map(measure => {
+      const state: SectorState = { ...changeSectorMeasure(defaultSectorState(config), measure, facts, config), mode: "line", range: { kind: "all" } };
+      return { ...state, selectedIds: buildEconomicSectorsModel(facts, registry, state, sourceIdByMeasure, config).visibleIds };
+    });
+}
+
 export function buildEconomicSectorsModel(facts: readonly ClientSectorObservation[], registry: readonly SectorDefinition[], state: SectorState, sourceIdByMeasure: Record<string, string>, config: SectorPageConfig = SECTORS_PAGE_CONFIG) {
   const range = resolveRange(state, facts);
   const years = Array.from({ length: range.end - range.start + 1 }, (_, i) => range.start + i);

@@ -11,7 +11,7 @@ import { useI18n } from "../../lib/i18n/provider";
 import type { SourcedWorkbookPublicSource } from "../../lib/methodology/workbookSources";
 import type { WorkbookPublicSource } from "../../lib/explorer/workbookModel";
 import { downloadWorkbook } from "../../lib/explorer/workbookWriter.client";
-import { buildDebtDeck, buildDebtExplorerModel, debtRateDecimalsFor, formatDebtRate } from "../../lib/explorer/debtExplorer";
+import { buildDebtDeck, buildDebtExplorerModel, debtCrawlStates, debtRateDecimalsFor, formatDebtRate } from "../../lib/explorer/debtExplorer";
 import { NEGATIVE, POSITIVE } from "../../lib/explorer/colors";
 import { formatAmount, formatPoints, formatShare, unitFor, unitsFor } from "../../lib/explorer/format";
 import { updatedDate } from "../../lib/explorer/coverageLabel";
@@ -37,6 +37,7 @@ import { ExplorerPage } from "../explorer-shell/explorer-page";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { MeasurePill } from "../explorer-shell/measure-pill";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
+import { CrawlTables, useCrawlModels } from "../explorer-shell/crawl-tables";
 import { DECK_LINE_CLASS } from "../explorer-shell/latest-value-line";
 import { navGroup, ALL_DATA_PATH } from "../../lib/navigation/navTree";
 
@@ -81,6 +82,16 @@ export function DebtExplorerSurface(props: DebtExplorerSurfaceProps) {
     range: props.range,
     shareOfGdp: props.shareOfGdp,
   }, presentation), [props.facts, props.gdpFacts, props.family, props.selectedIds, props.range, props.shareOfGdp, presentation]);
+  // Every family's series over its whole span, for the hidden crawl tables: built from the props alone, so a click never
+  // rebuilds them.
+  const crawlModels = useCrawlModels(() => debtCrawlStates(props.facts, props.gdpFacts).map((crawl) => buildDebtWorkbookExportModel({
+    facts: props.facts,
+    gdpFacts: props.gdpFacts,
+    ...crawl,
+    sources: props.workbookSources,
+    gdpSources: props.gdpWorkbookSources ?? [],
+    siteOrigin: props.siteOrigin ?? "",
+  }, presentation)));
   const familyYears = useMemo(() => Array.from(new Set(
     props.facts.filter((fact) => fact.family === props.family).map((fact) => fact.year),
   )).sort((left, right) => left - right), [props.facts, props.family]);
@@ -219,36 +230,32 @@ export function DebtExplorerSurface(props: DebtExplorerSurfaceProps) {
                   {message(messages, "main.noRangeData")}
                 </Callout>
               </div>
+            ) : props.chartMode === "table" ? (
+              <ExplorerTable
+                caption={measureCaption}
+                rows={model.tableRows.filter((row) => row.itemId !== totalItemId)}
+                totalRow={model.totalRow}
+                showTotal={Boolean(totalItemId && props.selectedIds.includes(totalItemId))}
+                years={model.years}
+                firstColumnLabel={message(messages, "controls.seriesColumn")}
+                unit={unit}
+                share={isPercent}
+                showChangeColumn={false}
+                forecastYears={forecastYears}
+                forecastLabel={message(messages, "debt.forecast")}
+                {...(props.family === "rate"
+                  ? { shareDecimalsForRow: (row: { itemId: string }, year: number) => rateDecimals(row.itemId, year) }
+                  : {})}
+                shareValueForYear={(row, year) => props.family === "rate"
+                  ? row.valuesByYear[year] === null || row.valuesByYear[year] === undefined
+                    ? null
+                    : row.valuesByYear[year]! / 100
+                  : row.shareByYear?.[year] ?? null}
+              />
             ) : (
-              <>
-                <ExplorerTable
-                  caption={measureCaption}
-                  rows={model.tableRows.filter((row) => row.itemId !== totalItemId)}
-                  totalRow={model.totalRow}
-                  showTotal={Boolean(totalItemId && props.selectedIds.includes(totalItemId))}
-                  years={model.years}
-                  firstColumnLabel={message(messages, "controls.seriesColumn")}
-                  unit={unit}
-                  share={isPercent}
-                  showChangeColumn={false}
-                  forecastYears={forecastYears}
-                  forecastLabel={message(messages, "debt.forecast")}
-                  {...(props.family === "rate"
-                    ? { shareDecimalsForRow: (row: { itemId: string }, year: number) => rateDecimals(row.itemId, year) }
-                    : {})}
-                  shareValueForYear={(row, year) => props.family === "rate"
-                    ? row.valuesByYear[year] === null || row.valuesByYear[year] === undefined
-                      ? null
-                      : row.valuesByYear[year]! / 100
-                    : row.shareByYear?.[year] ?? null}
-                  crawlCopy={props.chartMode === "line"}
-                />
-                {props.chartMode === "line" ? (
-                  <div className="mt-5">
-                    {chart}
-                  </div>
-                ) : null}
-              </>
+              <div className="mt-5">
+                {chart}
+              </div>
             )}
             <ChartSelectionAids
               series={chartSeries}
@@ -315,6 +322,7 @@ export function DebtExplorerSurface(props: DebtExplorerSurfaceProps) {
           )}
         />
       </ExplorerWorkspace>
+      <CrawlTables models={crawlModels} />
     </ExplorerPage>
   );
 }

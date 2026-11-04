@@ -26,7 +26,8 @@ export function unemploymentReferenceId(state: Pick<UnemploymentState, "breakdow
   if (state.overview && state.breakdown !== "education") return `georgia:${state.breakdown === "long_term" ? "long_term_unemployment_rate" : "unemployment_rate"}`;
   return state.breakdown === "education" && state.educationSex !== "total" ? state.educationSex : "georgia";
 }
-function primaryFacts(facts: readonly ClientUnemploymentObservation[], state: UnemploymentState): ClientUnemploymentObservation[] {
+/** A view's own facts: its breakdown's (and region's), indicator's and, on Education, sex's; their years are the view's coverage. */
+export function primaryFacts(facts: readonly ClientUnemploymentObservation[], state: UnemploymentState): ClientUnemploymentObservation[] {
   return facts.filter(f => f.dimension === state.breakdown && (!state.regionId || f.groupId === state.regionId) && f.indicatorId === state.indicator && (state.breakdown !== "education" || f.sex === state.educationSex) && (state.breakdown !== "age" || f.year >= UNEMPLOYMENT_AGE_FIRST_YEAR));
 }
 export function unemploymentCoverage(facts: readonly ClientUnemploymentObservation[], state: UnemploymentState) {

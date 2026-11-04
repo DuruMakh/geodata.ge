@@ -51,7 +51,7 @@ describe("MCP tool surface", () => {
     for (const rule of ["SIGNED", "Always keep the sign", "revenue minus expenditure is NOT a deficit",
       "Missing is not zero", "websitePages", "Do not put them in the answer",
       "messageKa/messageEn", "https://fiscal.ge/downloads/data/sources.json", "CC BY 4.0",
-      "preceding December", "index_100", "result_too_large"]) expect(text).toContain(rule);
+      "preceding December", "index_100", "result_too_large", "quote from it with the link", "never from memory"]) expect(text).toContain(rule);
     // The schema history is for developers and lives on /connect.
     expect(text).not.toMatch(/[Ss]chema 1\.\d/);
   });

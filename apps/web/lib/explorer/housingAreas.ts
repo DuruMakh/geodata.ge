@@ -3,6 +3,7 @@ import { HOUSING_SECTIONS, buildHousingSeriesModel, changeHousingSelection, hous
 import { areaRoutes } from "./areaRoutes";
 import { INK } from "./colors";
 import { topicSeriesColor, type TopicState } from "./topicSeries";
+import { unitListCrawlStates } from "./unitList";
 
 /** The areas with a page: Georgia, then the eleven regions. */
 export const HOUSING_AREAS = ["georgia", ...HOUSING_REGIONS] as const;
@@ -43,6 +44,10 @@ export type HousingAreaState = TopicState;
 /** An area's years for a selection (any of the area's series when nothing is selected). */
 export const housingAreaCoverage = (area: HousingArea, facts: readonly ClientHousingFact[], selectedIds: readonly string[] = []) =>
   housingListCoverage(housingAreaSeries(area), selectedIds, facts);
+
+/** The hidden crawl tables' states: the area's numbers and floor areas, each group with every series it has facts for. */
+export const housingAreaCrawlStates = (area: HousingArea, facts: readonly ClientHousingFact[]): HousingAreaState[] =>
+  unitListCrawlStates(housingAreaSeries(area), facts);
 
 /** Reads the view of the page for `area`: its selection, kept to one unit, and the years. */
 export const parseHousingAreaHash = (hash: string, area: HousingArea, facts: readonly ClientHousingFact[]): HousingAreaState =>

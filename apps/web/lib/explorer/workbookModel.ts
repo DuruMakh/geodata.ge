@@ -39,6 +39,8 @@ export type WorkbookExportInput = {
   totalId: string | null;
   series: WorkbookSeries[];
   includeTotalsInAnalysis?: boolean;
+  /** The readable sheet's `view`, for a title that does not name what the figures measure. */
+  view?: string;
   /** false drops the readable sheet's relative change column (percentage measures). */
   showChangeColumn?: boolean;
   sources: WorkbookPublicSource[];
@@ -62,6 +64,11 @@ export type WorkbookReadableRow = {
   numberFormatByYear?: Record<number, string>;
 };
 
+/** A readable row's label as the Summary sheet and the crawl tables print it: an item under a parent reads "Parent — Label". */
+export function readableRowLabel(row: Pick<WorkbookReadableRow, "kind" | "parentLabel" | "label">): string {
+  return row.kind === "item" && row.parentLabel ? `${row.parentLabel} — ${row.label}` : row.label;
+}
+
 export const SHEET_NAMES = {
   ka: ["მარტივი ცხრილი", "მონაცემები", "წყაროები"],
   en: ["Summary", "Data", "Sources"],
@@ -74,7 +81,16 @@ export type WorkbookExportModel = {
   readable: {
     title: string;
     subtitle: string;
+    /**
+     * The view (tab, indicator or measure) the sheet shows when its title does not name it. Only a crawl table's caption
+     * reads it (title · view · unit · period · basis, lib/explorer/crawlTables.ts); the Summary sheet says it in its subtitle.
+     */
+    view?: string;
+    /** The caption's period when the columns are not calendar years (months, sexes); otherwise the first and last year. */
+    period?: string;
     unitLabel: string;
+    /** The unit as the caption names it, where `unitLabel` is the Summary sheet's short form (`GEL` for `GEL per month`). */
+    longUnit?: string;
     amountDecimals?: number;
     showChangeColumn?: boolean;
     years: number[];
@@ -201,10 +217,15 @@ function readableValue(measure: WorkbookMeasure, point: WorkbookPoint | null | u
       : point.amountGel / measure.readableScale;
 }
 
-function subtitle(rows: WorkbookReadableRow[], years: number[], unitLabel: string, locale: Locale): string {
-  const statuses = Object.values(rows.flatMap((row) => Object.values(row.basisByYear))).filter((basis): basis is WorkbookBasis => basis !== null);
+/**
+ * The status the readable sheet's subtitle (and a crawl table's caption) names for its rows, or null when no cell has
+ * one. Actual values count even beside unavailable cells: only a sheet with no value at all reads "Not available".
+ */
+export function readableBasisLabel(rows: readonly Pick<WorkbookReadableRow, "basisByYear">[], locale: Locale): string | null {
+  const statuses = rows.flatMap((row) => Object.values(row.basisByYear)).filter((basis): basis is WorkbookBasis => basis !== null && basis !== undefined);
+  if (statuses.length === 0) return null;
   const bases = new Set(statuses.filter((basis) => basis !== "not_available"));
-  const basis = bases.has("actual") && bases.has("forecast")
+  return bases.has("actual") && bases.has("forecast")
     ? workbookMessage(locale, "workbook.actualForecast")
     : bases.has("actual") && bases.has("planned")
       ? workbookMessage(locale, "workbook.actualPlanned")
@@ -217,9 +238,13 @@ function subtitle(rows: WorkbookReadableRow[], years: number[], unitLabel: strin
             ? workbookMessage(locale, "workbook.preliminary")
             : bases.has("published")
               ? workbookMessage(locale, "workbook.published")
-              : statuses.includes("not_available")
+              : bases.size === 0
                 ? workbookMessage(locale, "workbook.unavailable")
                 : workbookMessage(locale, "workbook.actual");
+}
+
+function subtitle(rows: WorkbookReadableRow[], years: number[], unitLabel: string, locale: Locale): string {
+  const basis = readableBasisLabel(rows, locale) ?? workbookMessage(locale, "workbook.actual");
   const period = years.length > 0 ? `${years[0]}–${years.at(-1)}` : workbookMessage(locale, "workbook.noPeriod");
   return `${period} · ${basis} · ${unitLabel}`;
 }
@@ -295,6 +320,7 @@ export function buildWorkbookExportModel(input: WorkbookExportInput): WorkbookEx
     readable: {
       title: input.title,
       subtitle: subtitle(rows, years, input.measure.unitLabel, input.locale),
+      ...(input.view === undefined ? {} : { view: input.view }),
       unitLabel: input.measure.unitLabel,
       ...(input.showChangeColumn === undefined ? {} : { showChangeColumn: input.showChangeColumn }),
       years,

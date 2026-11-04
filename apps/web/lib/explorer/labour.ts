@@ -3,7 +3,7 @@ import { colorForItem, colorForProgram, INK, OTHER_COLOR } from "./colors";
 import type { ValueUnit } from "./format";
 import { refitRange, resolveRange, type ResolvedPeriodRange } from "./periodRange";
 import { buildTopicModel, parseTopicHash, serializeTopicHash, topicCoverage, type TopicCoverage, type TopicSeriesModel, type TopicState } from "./topicSeries";
-import { listLatestByHeading } from "./unitList";
+import { listLatestByHeading, unitListCrawlStates } from "./unitList";
 
 /** The four Labour Force Survey detail pages, listed after Unemployment's own four. */
 export const LABOUR_SECTIONS = [
@@ -109,6 +109,10 @@ export function parseLabourHash(hash: string, section: LabourSectionId, facts: r
 export function changeLabourSelection(state: LabourState, section: LabourSectionId, next: readonly string[], facts: readonly ClientLabourFact[]): LabourState {
   return { ...state, selectedIds: [...next], range: refitRange(state.range, labourCoverage(section, facts, next), { collapseToAll: false }) };
 }
+
+/** The hidden crawl tables' state (lib/explorer/crawlTables.ts): the page's one unit, every row with a published figure, over every year. */
+export const labourCrawlStates = (section: LabourSectionId, facts: readonly ClientLabourFact[]): LabourState[] =>
+  unitListCrawlStates(labourSeries(section), facts);
 
 /** A page's hash: the keys every topic page shares, and nothing else. */
 export const serializeLabourHash = (state: LabourState) => serializeTopicHash(state);

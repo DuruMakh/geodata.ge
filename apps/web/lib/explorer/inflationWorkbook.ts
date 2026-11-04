@@ -136,6 +136,8 @@ export function buildInflationWorkbookExportModel(input: {
     readable: {
       title: t(`tab.${state.tab}`),
       subtitle: `${periodLabel(messages, range.start, "long")} – ${periodLabel(messages, range.end, "long")} · ${t(`unit.${state.tab}`)}`,
+      // The columns are months; the caption names the months the rows span.
+      period: `${periodLabel(messages, range.start, "long")} – ${periodLabel(messages, range.end, "long")}`,
       unitLabel: t(`workbookUnit.${state.tab}`),
       // Inflation is never coloured good/bad, and a published 0.0 must not read as blank.
       numberFormat: percent ? "0.0%" : "#,##0.0",

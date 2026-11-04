@@ -8,6 +8,7 @@ import {
   ALL_SECTOR_MEASURES,
   buildEconomicSectorsModel,
   changeSectorMeasure,
+  sectorCrawlStates,
   sectorTotalId,
   SECTORS_PAGE_CONFIG,
   type SectorPageConfig,
@@ -36,6 +37,7 @@ import { LatestValueLine } from "../explorer-shell/latest-value-line";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { ChartShareButton } from "../explorer-shell/chart-share-button";
+import { CrawlTables, useCrawlModels } from "../explorer-shell/crawl-tables";
 import { rangeFromPatch } from "../../lib/explorer/periodRange";
 
 export type EconomicSectorsExplorerProps = {
@@ -67,6 +69,10 @@ export function EconomicSectorsExplorer({
     () => buildEconomicSectorsModel(facts, registry, state, sourceIdByMeasure, config),
     [facts, registry, state, sourceIdByMeasure, config],
   );
+  // Every measure's rows over every year, for the hidden crawl tables: built from the props alone, so a click never
+  // rebuilds them (unpackFacts returns the same rows for the same props).
+  const crawlModels = useCrawlModels(() => sectorCrawlStates(facts, registry, sourceIdByMeasure, config).map((crawl) =>
+    buildEconomicSectorsWorkbookExportModel(facts, registry, crawl, presentation, sources, siteOrigin, sourceIdByMeasure, config)));
   const percent = state.measure !== "nominal";
   const measureLabel = t(
     state.measure === "share_of_gdp"
@@ -193,32 +199,28 @@ export function EconomicSectorsExplorer({
                   {message(messages, "main.noRangeData")}
                 </Callout>
               </div>
+            ) : state.mode === "line" ? (
+              <div className="mt-5">
+                {chart}
+              </div>
             ) : (
-              <>
-                <ExplorerTable
-                  caption={`${t("heading")} · ${percent ? measureLabel : message(messages, "format.bnGel")} · ${model.range.start}–${model.range.end}`}
-                  rows={model.rows.filter((r) => r.itemId !== totalId)}
-                  totalRow={total}
-                  showTotal={Boolean(total)}
-                  totalFirst
-                  wrapRowLabels
-                  years={model.years}
-                  firstColumnLabel={t("sector")}
-                  unit={unit}
-                  share={percent}
-                  showChangeColumn={false}
-                  preliminaryLabel={t("preliminary")}
-                  shareValueForYear={(row, year) =>
-                    row.valuesByYear[year] ?? null
-                  }
-                  crawlCopy={state.mode === "line"}
-                />
-                {state.mode === "line" ? (
-                  <div className="mt-5">
-                    {chart}
-                  </div>
-                ) : null}
-              </>
+              <ExplorerTable
+                caption={`${t("heading")} · ${percent ? measureLabel : message(messages, "format.bnGel")} · ${model.range.start}–${model.range.end}`}
+                rows={model.rows.filter((r) => r.itemId !== totalId)}
+                totalRow={total}
+                showTotal={Boolean(total)}
+                totalFirst
+                wrapRowLabels
+                years={model.years}
+                firstColumnLabel={t("sector")}
+                unit={unit}
+                share={percent}
+                showChangeColumn={false}
+                preliminaryLabel={t("preliminary")}
+                shareValueForYear={(row, year) =>
+                  row.valuesByYear[year] ?? null
+                }
+              />
             )}
             <ChartSelectionAids series={series} chartShown={state.mode === "line"} share={percent} unit={unit} formatValue={percent ? undefined : value => formatAmount(value, locale)} />
             <RangeStrip
@@ -280,6 +282,7 @@ export function EconomicSectorsExplorer({
         />
       </ExplorerWorkspace>
       {config.highlights ? <SectorHighlights facts={facts} registry={registry} year={model.range.end} /> : null}
+      <CrawlTables models={crawlModels} />
     </div>
   );
 }
