@@ -97,9 +97,10 @@ for (const section of ["expenditure", "revenue", "analysis"] as const) {
       await page.goto(`${TEST_BASE_URL}/explorer/${section}`);
       await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
       if (section === "analysis") {
-        const snapshot = page.getByTestId("single-year-snapshot");
-        await expect(snapshot).toBeVisible();
-        await expect(snapshot.locator("svg").first()).toBeVisible();
+        // Year in review: every section and its column charts are in the prerendered HTML.
+        await expect(page.getByTestId("year-review")).toBeVisible();
+        await expect(page.locator("#year-review-debt").getByTestId("stack-chart-frame").locator("svg:visible").first()).toBeVisible();
+        await expect(page.locator("#year-review-where [data-cell]")).toHaveCount(100);
       } else {
         await expectLineChartRendered(page);
         await expect(page.locator(`[data-series-id="${section}.total"]`)).toBeVisible();
@@ -110,8 +111,8 @@ for (const section of ["expenditure", "revenue", "analysis"] as const) {
         // The English analysis is in the initial HTML too.
         expect((await page.goto(`${TEST_BASE_URL}/en/explorer/analysis`))?.status()).toBe(200);
         await expect(page.locator("html")).toHaveAttribute("lang", "en");
-        await expect(page.getByTestId("single-year-snapshot")).toBeVisible();
-        for (const id of ["snapshot-treemap", "every-100-gel", "budget-radar", "budget-field", "single-year-ranking"]) await expect(page.getByTestId(id)).toBeVisible();
+        await expect(page.getByTestId("year-review")).toBeVisible();
+        for (const id of ["year-review-glance", "year-review-gives-up", "year-review-where", "year-review-debt", "year-review-country", "year-review-long"]) await expect(page.locator(`#${id}`)).toBeVisible();
         await expectEnglish(page);
       }
     } finally {
@@ -341,9 +342,10 @@ test("sidebar section links move between sections in-app", async ({ page }) => {
   await expect(sidebar.getByTestId("section-link-revenue")).toHaveAttribute("aria-current", "page");
   await expect(sidebar.getByTestId("section-link-expenditure")).not.toHaveAttribute("aria-current", "page");
 
+  await expect(sidebar.getByTestId("section-link-analysis")).toHaveText("წლის მიმოხილვა");
   await sidebar.getByTestId("section-link-analysis").click();
   await expect(page).toHaveURL(/\/explorer\/analysis/);
-  await expect(page.getByTestId("single-year-snapshot")).toBeVisible();
+  await expect(page.getByTestId("year-review")).toBeVisible();
   await expect(sidebar.getByTestId("section-link-analysis")).toHaveAttribute("aria-current", "page");
 
   await sidebar.getByTestId("section-link-expenditure").click();
@@ -862,137 +864,61 @@ test("Excel button shows working and retryable error states", async ({ page }) =
   await expect(button).toBeDisabled();
 });
 
-test("analysis view renders the fixed single-year section order", async ({ page }) => {
+test("the year in review renders its six numbered sections in order", async ({ page }) => {
   const consoleProblems = collectConsoleProblems(page);
 
   await page.goto(`${TEST_BASE_URL}/explorer/analysis`);
   await expectAppReady(page);
 
-  await expect(page.getByTestId("single-year-snapshot")).toBeVisible();
-  await expect(page.getByRole("heading", { level: 1 })).toContainText("ბიუჯეტის სურათი");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("წლის მიმოხილვა");
   await expect(page.locator("main h1")).toHaveCount(1);
-  await expect(page.locator("main h2")).toHaveCount(5);
-
-  await expect(page.getByTestId("analysis-year-selector")).toContainText("2025");
-  // On a desktop the years wrap instead of scrolling (phones scroll one row; see the mobile test).
-  expect(await page.getByTestId("analysis-year-selector").evaluate((element) => element.scrollWidth <= element.clientWidth)).toBe(true);
-  await expect(page.getByTestId("snapshot-treemap")).toBeVisible();
-  await expect(page.getByTestId("snapshot-structure-grid")).toBeVisible();
-  expect(await page.getByTestId("snapshot-structure-card").count()).toBeGreaterThan(5);
-
-  await expect(page.getByTestId("every-100-gel")).toBeVisible();
-  await expect(page.getByTestId("every-100-grid").locator("[data-cell='gel']")).toHaveCount(100);
-  await expect(page.getByTestId("budget-radar")).toBeVisible();
-  await expect(page.getByTestId("budget-field")).toBeVisible();
-  await expect(page.getByTestId("single-year-ranking")).toBeVisible();
-  await expect(page.getByTestId("single-year-ranking").locator("caption")).toHaveText(
-    "ხარჯები სფეროების მიხედვით — სრული რეიტინგი, 2026",
-  );
-  await expect(page.getByTestId("single-year-ranking").locator("thead th")).toHaveCount(4);
-  await expect(page.getByTestId("single-year-ranking").getByTestId("ranking-share-bar").first()).toBeVisible();
-  await expect(page.getByTestId("single-year-ranking").locator('td[title="ინფრასტრუქტურა და რეგიონული განვითარება"]')).toContainText("ინფრასტრუქტურა და რეგიონული განვითარება");
+  // Six numbered sections and the notes.
+  await expect(page.locator("main h2")).toHaveCount(7);
+  await expect(page.getByTestId("year-ruler").locator('[aria-checked="true"]')).toHaveAttribute("data-year", "2025");
 
   const sectionOrder = await page.evaluate(() => {
-    const ids = ["snapshot-treemap", "every-100-gel", "budget-radar", "budget-field", "single-year-ranking"];
-    return ids.map((id) => document.querySelector(`[data-testid="${id}"]`)?.getBoundingClientRect().top ?? 0);
+    const ids = ["year-review-glance", "year-review-gives-up", "year-review-where", "year-review-debt", "year-review-country", "year-review-long", "year-review-notes"];
+    return ids.map((id) => document.getElementById(id)?.getBoundingClientRect().top ?? 0);
   });
   for (let index = 1; index < sectionOrder.length; index += 1) {
     expect(sectionOrder[index]).toBeGreaterThan(sectionOrder[index - 1]);
   }
+  await expect(page.locator("#year-review-where [data-cell]")).toHaveCount(100);
+  await expect(page.locator("#year-review-where button[data-rank-row]").first()).toBeVisible();
 
-  // Treemap tiles shrink with rank.
-  const tileAreas = await page.getByTestId("snapshot-structure-grid").evaluate((grid) =>
-    Array.from(grid.querySelectorAll("[data-testid='snapshot-structure-card']"))
-      .slice(0, 3)
-      .map((tile) => {
-        const box = tile.getBoundingClientRect();
-        return Math.round(box.width * box.height);
-      }),
-  );
-  expect(tileAreas[0]).toBeGreaterThan(tileAreas[1] ?? 0);
-  expect(tileAreas[1]).toBeGreaterThan(tileAreas[2] ?? 0);
-
-  // Revenue side reuses the same layout.
-  await page.getByTestId("analysis-side-revenue").click();
-  await expect(page.getByTestId("single-year-ranking")).toContainText("დამატებული ღირებულების გადასახადი");
-  await expect(page.getByTestId("single-year-ranking").locator("caption")).toHaveText(
-    "შემოსავლები კატეგორიების მიხედვით — სრული რეიტინგი, 2025",
-  );
-  await expect(page.getByTestId("analysis-grouping-fields")).toHaveCount(0);
-
-  await page.getByTestId("analysis-year-selector").getByRole("button", { name: "2024", exact: true }).click();
-  await expect(page.getByTestId("single-year-ranking").locator("caption")).toHaveText(
-    "შემოსავლები კატეგორიების მიხედვით — სრული რეიტინგი, 2024",
-  );
-
-  // Ministries grouping in analysis (categories only).
-  await page.getByTestId("analysis-side-expenditure").click();
-  await page.getByTestId("analysis-grouping-ministries").click();
-  await expect(page.getByTestId("snapshot-treemap")).toContainText("სტრუქტურა უწყებების მიხედვით");
-  await expect(page.getByTestId("single-year-ranking").locator("caption")).toHaveText(
-    "ხარჯები უწყებების მიხედვით — სრული რეიტინგი, 2024",
-  );
+  // The institutions grouping redraws the grid and the ranking.
+  await page.locator("#year-review-where").getByRole("button", { name: "უწყებები", exact: true }).click();
+  await expect(page.locator("#year-review-where").getByRole("button", { name: "უწყებები", exact: true })).toHaveAttribute("aria-pressed", "true");
+  await expect(page.locator("#year-review-where [data-cell]")).toHaveCount(100);
 
   expect(consoleProblems).toEqual([]);
 });
 
-// U05-15: the side tabs, grouping tabs and year row are reached with Tab and pressed with Enter or Space.
-test("the analysis tabs and year row work from the keyboard", async ({ page }) => {
+// U05-15: the switches and the year ruler are reached with Tab and pressed with Enter or Space, the ruler stepped with the arrows.
+test("the year in review switches and ruler work from the keyboard", async ({ page }) => {
   await page.goto(`${TEST_BASE_URL}/explorer/analysis`);
   await expectAppReady(page);
-  const caption = page.getByTestId("single-year-ranking").locator("caption");
-  const expenditure = page.getByTestId("analysis-side-expenditure"), revenue = page.getByTestId("analysis-side-revenue");
+  const where = page.locator("#year-review-where");
+  const fields = where.getByRole("button", { name: "სფეროები", exact: true });
+  const institutions = where.getByRole("button", { name: "უწყებები", exact: true });
 
-  await expenditure.focus();
+  await fields.focus();
   await page.keyboard.press("Tab");
-  await expect(revenue).toBeFocused();
+  await expect(institutions).toBeFocused();
   await page.keyboard.press("Enter");
-  await expect(revenue).toHaveAttribute("aria-pressed", "true");
-  await expect(caption).toContainText("შემოსავლები კატეგორიების მიხედვით");
-
+  await expect(institutions).toHaveAttribute("aria-pressed", "true");
   await page.keyboard.press("Shift+Tab");
-  await expect(expenditure).toBeFocused();
+  await expect(fields).toBeFocused();
   await page.keyboard.press("Space");
-  await expect(expenditure).toHaveAttribute("aria-pressed", "true");
-  // Revenue, then the grouping row's fields and ministries.
-  for (let press = 0; press < 3; press += 1) await page.keyboard.press("Tab");
-  const ministries = page.getByTestId("analysis-grouping-ministries");
-  await expect(ministries).toBeFocused();
-  await page.keyboard.press("Enter");
-  await expect(ministries).toHaveAttribute("aria-pressed", "true");
-  await expect(caption).toContainText("ხარჯები უწყებების მიხედვით");
+  await expect(fields).toHaveAttribute("aria-pressed", "true");
 
-  const years = page.getByTestId("analysis-year-selector").getByRole("button");
-  const earlier = years.nth((await years.count()) - 2);
-  const year = (await earlier.textContent())!.match(/\d{4}/)![0];
-  await earlier.focus();
-  await page.keyboard.press("Space");
-  await expect(earlier).toHaveAttribute("aria-pressed", "true");
-  await expect(caption).toContainText(year);
-});
-
-test("budget field identifies a circle with its category and amount on hover and focus", async ({ page }) => {
-  await page.goto(`${TEST_BASE_URL}/explorer/analysis#as=expenditure&ay=2025`);
-  await expectAppReady(page);
-
-  const field = page.getByTestId("budget-field");
-  await expect(field.getByRole("group", { name: "ბიუჯეტის ველი" })).toBeVisible();
-  const point = field.getByRole("img", { name: "სოციალური დაცვა · 7.2 მლრდ ₾" });
-
-  await point.hover();
-
-  const tooltip = page.getByTestId("budget-field-tooltip");
-  await expect(tooltip).toBeVisible();
-  await expect(tooltip).toContainText("სოციალური დაცვა");
-  await expect(tooltip).toContainText("7.2 მლრდ ₾");
-  // D1 (2026-10-07): the readout also states the growth its y position encodes.
-  await expect(tooltip).toContainText(/ცვლილება \+?−?\d+\.\d%/);
-  await expect(tooltip).not.toContainText(/წილი/);
-
-  await page.getByRole("heading", { name: "ბიუჯეტის ველი" }).hover();
-  await expect(tooltip).toHaveCount(0);
-  await point.focus();
-  await expect(tooltip).toBeVisible();
+  const chosen = page.getByTestId("year-ruler").locator('[aria-checked="true"]');
+  const year = Number(await chosen.getAttribute("data-year"));
+  await chosen.focus();
+  await page.keyboard.press("ArrowLeft");
+  await expect(chosen).toHaveAttribute("data-year", String(year - 1));
+  await expect(chosen).toBeFocused();
+  await expect(page.locator("#year-review-glance h2")).toHaveText(`${year - 1} ერთ სურათზე`);
 });
 
 test("the line chart is named from its series and read with the arrow keys", async ({ page }) => {
@@ -1036,119 +962,32 @@ test("the line chart is named from its series and read with the arrow keys", asy
   await expect(page.getByTestId("chart-tooltip")).toHaveCount(0);
 });
 
-test("mobile analysis layouts have no page overflow", async ({ page }) => {
+test("mobile year in review layouts have no page overflow", async ({ page }) => {
   const consoleProblems = collectConsoleProblems(page);
-  await page.setViewportSize({ width: 390, height: 844 });
-
-  await page.goto(`${TEST_BASE_URL}/explorer/analysis`);
-  await expectAppReady(page);
-
-  await expect(page.getByTestId("single-year-snapshot")).toBeVisible();
-  await expect(page.getByTestId("every-100-grid").locator("[data-cell='gel']")).toHaveCount(100);
-  // No native select on the phone analysis page; the radar still shows there.
-  await expect(page.locator("select")).toHaveCount(0);
-  await expect(page.getByTestId("budget-radar")).toBeVisible();
-  await expectNoPageOverflow(page);
 
   for (const width of [320, 375, 390]) {
     await page.setViewportSize({ width, height: 844 });
     await page.goto(`${TEST_BASE_URL}/explorer/analysis`);
     await expectAppReady(page);
-
-    const selector = page.getByTestId("analysis-year-selector");
-    const yearButtons = selector.locator("button");
-    const activeYear = selector.locator("button[aria-pressed='true']");
-
-    const metrics = await selector.evaluate((element) => ({
-      clientWidth: element.clientWidth,
-      scrollWidth: element.scrollWidth,
-    }));
-    // Phones: one horizontally scrolling row (DESIGN §12), opened on the active year.
-    expect(metrics.scrollWidth).toBeGreaterThan(metrics.clientWidth);
-
-    const boxes = await yearButtons.evaluateAll((buttons) =>
-      buttons.map((button) => {
-        const box = button.getBoundingClientRect();
-        return { left: box.left, right: box.right, top: box.top, width: box.width, height: box.height };
-      }),
-    );
-    expect(boxes.every((box) => box.width >= 36 && box.height >= 36)).toBe(true);
-    expect(new Set(boxes.map((box) => Math.round(box.top))).size).toBe(1);
-
-    const activeBox = await activeYear.boundingBox();
-    const selectorBox = await selector.boundingBox();
-    expect(activeBox).not.toBeNull();
-    expect(selectorBox).not.toBeNull();
-    expect(activeBox!.x).toBeGreaterThanOrEqual(selectorBox!.x);
-    expect(activeBox!.x + activeBox!.width).toBeLessThanOrEqual(selectorBox!.x + selectorBox!.width + 1);
-
-    const tabGroups = page.getByTestId("analysis-tab-groups");
-    expect(await tabGroups.evaluate((element) => element.scrollWidth <= element.clientWidth)).toBe(true);
-    const snapshot = page.getByTestId("single-year-snapshot");
-    expect(await snapshot.evaluate((element) => getComputedStyle(element).overflowX)).not.toBe("clip");
-
-    const ranking = page.getByTestId("single-year-ranking");
-    const rankingTable = ranking.locator("table");
-    expect(await rankingTable.evaluate((element) => element.scrollWidth <= element.clientWidth)).toBe(true);
-    await expect(rankingTable.locator("thead th").nth(1)).toHaveText("მლრდ ₾");
-    expect(await ranking.getByTestId("ranking-share-bar").evaluateAll((elements) => elements.every((element) => getComputedStyle(element).display === "none"))).toBe(true);
-    const longLabel = ranking.locator('tbody td[title="ინფრასტრუქტურა და რეგიონული განვითარება"]');
-    await expect(longLabel).toHaveCount(1);
-    // The whole name is in the cell; CSS clamps it to two lines on a phone.
-    await expect(longLabel).toContainText("ინფრასტრუქტურა და რეგიონული განვითარება");
-    expect(await longLabel.locator(".line-clamp-2").evaluate((element) => element.getBoundingClientRect().height / parseFloat(getComputedStyle(element).lineHeight))).toBeLessThanOrEqual(2.05);
-
-    for (const sideTestId of ["analysis-side-expenditure", "analysis-side-revenue"]) {
-      await page.getByTestId(sideTestId).click();
-
-      const headlineCards = page.locator("[data-testid='single-year-snapshot'] > div[class*='grid-cols-2'] > div");
-      await expect(headlineCards).toHaveCount(4);
-
-      for (let index = 0; index < (await headlineCards.count()); index += 1) {
-        const card = headlineCards.nth(index);
-        const value = card.locator("p").first();
-        const unit = value.locator("span");
-        const unitCount = await unit.count();
-
-        const [valueMetrics, cardMetrics, rootMetrics] = await Promise.all([
-          value.evaluate((element) => ({
-            clientWidth: element.clientWidth,
-            scrollWidth: element.scrollWidth,
-            left: element.getBoundingClientRect().left,
-            right: element.getBoundingClientRect().right,
-          })),
-          card.evaluate((element) => ({
-            left: element.getBoundingClientRect().left,
-            right: element.getBoundingClientRect().right,
-          })),
-          snapshot.evaluate((element) => ({
-            left: element.getBoundingClientRect().left,
-            right: element.getBoundingClientRect().right,
-          })),
-        ]);
-
-        expect(valueMetrics.scrollWidth).toBeLessThanOrEqual(valueMetrics.clientWidth);
-        expect(valueMetrics.left).toBeGreaterThanOrEqual(Math.max(cardMetrics.left, rootMetrics.left));
-        expect(valueMetrics.right).toBeLessThanOrEqual(Math.min(cardMetrics.right, rootMetrics.right));
-        for (let unitIndex = 0; unitIndex < unitCount; unitIndex += 1) {
-          const unitMetrics = await unit.nth(unitIndex).evaluate((element) => ({
-            visible: element.checkVisibility(),
-            left: element.getBoundingClientRect().left,
-            right: element.getBoundingClientRect().right,
-          }));
-          expect(unitMetrics.visible).toBe(true);
-          expect(unitMetrics.left).toBeGreaterThanOrEqual(Math.max(valueMetrics.left, cardMetrics.left, rootMetrics.left));
-          expect(unitMetrics.right).toBeLessThanOrEqual(Math.min(valueMetrics.right, cardMetrics.right, rootMetrics.right));
-        }
-      }
-    }
-
+    // No native select on the phone page.
+    await expect(page.locator("select")).toHaveCount(0);
     await expectNoPageOverflow(page);
 
-    // Picking an early year keeps it in view and still drives the page.
-    await selector.evaluate((element) => { element.scrollLeft = 0; });
-    await selector.getByRole("button", { name: "2010", exact: true }).click();
-    await expect(selector.getByRole("button", { name: "2010", exact: true })).toHaveAttribute("aria-pressed", "true");
+    // Phones: one row of year stops across the width, the chosen one on screen (spec §4).
+    const ruler = page.getByTestId("year-ruler");
+    const boxes = await ruler.getByRole("radio").evaluateAll((radios) => radios.map((radio) => {
+      const box = radio.getBoundingClientRect();
+      return { left: box.left, right: box.right, top: box.top };
+    }));
+    expect(new Set(boxes.map((box) => Math.round(box.top))).size).toBe(1);
+    expect(Math.min(...boxes.map((box) => box.left))).toBeGreaterThanOrEqual(0);
+    expect(Math.max(...boxes.map((box) => box.right))).toBeLessThanOrEqual(width);
+
+    // A tap on an early year drives the page.
+    await ruler.locator('[data-year="2010"]').click();
+    await expect(ruler.locator('[data-year="2010"]')).toHaveAttribute("aria-checked", "true");
+    await expect(page.locator("#year-review-glance h2")).toHaveText("2010 ერთ სურათზე");
+    await expectNoPageOverflow(page);
   }
 
   expect(consoleProblems).toEqual([]);
@@ -1542,7 +1381,7 @@ test("the Budget group page lists eight cards, all eight live", async ({ page })
   // Card 05 carries the same contract.
   await expect(municipalities).toContainText(/[\d,]+\.\d მლრდ ₾\d{4}/);
 
-  await expect(cards.nth(5).getByRole("heading")).toHaveText("ანალიზი");
+  await expect(cards.nth(5).getByRole("heading")).toHaveText("წლის მიმოხილვა");
 
   const debt = cards.nth(6);
   await expect(debt).toContainText("ვალი");
@@ -1573,7 +1412,7 @@ test("legacy nav hashes redirect to their route", async ({ page }) => {
   await expectAppReady(page);
   await expect(page).toHaveURL(/\/explorer\/analysis/);
   await expect(page).toHaveURL(/ay=2024/);
-  await expect(page.getByTestId("single-year-snapshot")).toBeVisible();
+  await expect(page.getByTestId("year-ruler").locator('[aria-checked="true"]')).toHaveAttribute("data-year", "2024");
 
   await page.goto(`${TEST_BASE_URL}/explorer#nav=revenue&m=table`);
   await expectAppReady(page);
@@ -1641,27 +1480,28 @@ test("the Excel workbook marks 2026 as planned", async ({ page }) => {
   expect(sourceText).toContain("/downloads/methodology/expenditure/files/2026/budget-law-tavi-vi.docx");
 });
 
-test("a year with only a plan is selectable on the analysis page and labelled as planned budget data", async ({ page }) => {
+test("a year with only a plan is selectable on the year in review and labelled as a plan", async ({ page }) => {
   await page.goto(`${TEST_BASE_URL}/explorer/analysis`);
   await expectAppReady(page);
 
-  // 2026 is the default year of the spending side: the newest year there is.
-  await expect(page.getByTestId("single-year-snapshot")).toContainText("გეგმური ბიუჯეტის მონაცემები");
-  await expect(page.getByTestId("analysis-year-selector")).toContainText("2026");
-  await expect(page.getByTestId("analysis-year-selector")).toContainText("გეგმა");
+  // The page opens on 2025, the newest year with actual spending; 2026 is on the ruler as a plan.
+  const ruler = page.getByTestId("year-ruler");
+  await expect(ruler.locator('[aria-checked="true"]')).toHaveAttribute("data-year", "2025");
+  await expect(ruler.locator('[data-year="2026"]')).toHaveAttribute("aria-label", /, გეგმა$/);
+  await expect(ruler.locator('[data-year="2026"]')).toContainText("გეგმა");
 
   await page.goto(`${TEST_BASE_URL}/explorer/analysis#as=expenditure&ag=ministries&ay=2026`);
   await page.reload();
   await expectAppReady(page);
-  await expect(page.getByTestId("single-year-snapshot")).toContainText("გეგმური ბიუჯეტის მონაცემები");
-  await expect(page.getByTestId("analysis-year-selector")).toContainText("გეგმა");
+  await expect(ruler.locator('[aria-checked="true"]')).toHaveAttribute("data-year", "2026");
+  await expect(page.locator('[data-kpi="spend"] [data-plan-tag]')).toHaveText("გეგმა");
+  await expect(page.locator("#year-review-where")).toContainText("2026 · სახელმწიფო ბიუჯეტი · გეგმა");
 
-  // The revenue side has no 2026: no such year, no plan label.
+  // Receipts have no 2026: the long view marks their last year instead, with no plan label.
   await page.goto(`${TEST_BASE_URL}/explorer/analysis#as=revenue&ay=2026`);
   await page.reload();
   await expectAppReady(page);
-  await expect(page.getByTestId("analysis-year-selector")).not.toContainText("2026");
-  await expect(page.getByTestId("single-year-snapshot")).not.toContainText("გეგმური ბიუჯეტის მონაცემები");
+  await expect(page.locator("#year-review-long [data-chosen-label]")).toHaveText("2025");
 });
 
 test("the revenue side shows no 2026 column, point or empty year", async ({ page }) => {

@@ -15,7 +15,7 @@ export const BUDGET_SECTIONS: Record<BudgetSectionId, BudgetSection> = {
   revenue: { label: "შემოსავლები", href: "/explorer/revenue" },
   taxBreaksRefunds: { label: "შეღავათები და დაბრუნება", href: "/explorer/tax-breaks-refunds" },
   municipalities: { label: "მუნიციპალიტეტები", href: "/explorer/municipalities" },
-  analysis: { label: "ანალიზი", href: "/explorer/analysis" },
+  analysis: { label: "წლის მიმოხილვა", href: "/explorer/analysis" },
   debt: { label: "ვალი", href: "/explorer/debt" },
   deficit: { label: "დეფიციტი", href: "/explorer/deficit" },
 };

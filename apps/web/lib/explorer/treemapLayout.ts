@@ -1,4 +1,4 @@
-// Squarified treemap layout (Bruls, Huizing and van Wijk), shared by the Analysis page's structure
+// Squarified treemap layout (Bruls, Huizing and van Wijk), shared by Year in review's spending-type
 // treemap (DOM tiles) and the homepage's spending treemap (canvas). Pure arithmetic, no React.
 
 /** [x, y, width, height] */

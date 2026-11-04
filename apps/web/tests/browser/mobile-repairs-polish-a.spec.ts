@@ -84,11 +84,11 @@ test("unemployment denominators count the top-level rows only (§7.7)", async ({
 // of scope; the year-range strip and the municipal map legend are owned by
 // their own repair specs.
 // `root` narrows the walk to one region; `decorative` also reads aria-hidden text there, for a
-// band (the explorer cards' graphics) whose labels a sighted reader still reads.
+// band (the explorer cards' graphics) whose labels a sighted reader still reads, and its figures' HTML labels.
 async function textBelowFloor(page: Page, { root = "body", decorative = false }: { root?: string; decorative?: boolean } = {}): Promise<string[]> {
   return page.evaluate(({ root, decorative }) => {
     const found: string[] = [];
-    const skip = `svg, figure, .sr-only, ${decorative ? "" : "[aria-hidden='true'], "}[data-testid='year-range-strip'], [data-testid='municipality-map']`;
+    const skip = `svg, .sr-only, ${decorative ? "" : "figure, [aria-hidden='true'], "}[data-testid='year-range-strip'], [data-testid='municipality-map']`;
     for (const scope of document.querySelectorAll(root)) {
       const walker = document.createTreeWalker(scope, NodeFilter.SHOW_TEXT);
       while (walker.nextNode()) {
@@ -147,6 +147,18 @@ test.describe("the explorer's own text keeps the phone floor (DESIGN §5.2)", ()
     await expect(page.getByTestId("place-card")).toBeVisible();
     expect(await textBelowFloor(page, { root: "[data-testid='place-card'], [data-testid='search-result']" })).toEqual([]);
   });
+
+  // Year in review (DESIGN §9): its charts' HTML labels, aria-hidden ones included, keep the floor on a phone.
+  for (const path of ["/explorer/analysis", "/en/explorer/analysis"]) {
+    test(`${path}: every section's labels, chart labels included, are 11px or more`, async ({ page }) => {
+      await page.goto(path);
+      await ready(page);
+      // The ruler and the six sections with their notes, each by its own root.
+      const roots = "[data-testid='year-ruler'], section[id^='year-review-']";
+      expect(await page.locator(roots).count()).toBe(8);
+      expect(await textBelowFloor(page, { root: roots, decorative: true })).toEqual([]);
+    });
+  }
 
   for (const path of ["/explorer/economy", "/explorer/prices", "/en/explorer/living"]) {
     test(`${path}: the cards' graphics label their figures at 11px or more`, async ({ page }) => {

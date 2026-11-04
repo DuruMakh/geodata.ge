@@ -193,7 +193,8 @@ export function serializeAnalysisHash(input: {
   const params = new URLSearchParams();
 
   params.set("as", input.analysisSide);
-  if (input.analysisSide === "expenditure") params.set("ag", input.analysisGrouping);
+  // Year in review: the grouping is section 03's and the side the long view's, so each is kept whatever the other is.
+  params.set("ag", input.analysisGrouping);
   if (input.analysisYear !== null) params.set("ay", String(input.analysisYear));
   return params.toString();
 }

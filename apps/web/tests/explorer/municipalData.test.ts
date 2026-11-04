@@ -888,7 +888,7 @@ describe("buildIndexKpis — dedicated Georgia aggregate denominator", () => {
 
 // growth's sign prefix and formatShare's differ at exactly zero: formatShare
 // (and every other change/growth KPI in the app — indicators.tsx,
-// explorer-table.tsx, main-explorer.tsx, budget-field.tsx, ranking.tsx — all
+// explorer-table.tsx, main-explorer.tsx — all
 // call formatShare(x, true)) only prefixes "+" when the value is > 0, so a
 // flat total renders unsigned. Pinned here so a future edit cannot silently
 // reintroduce the old hand-rolled ">= 0" branch, which prefixed "+0%".

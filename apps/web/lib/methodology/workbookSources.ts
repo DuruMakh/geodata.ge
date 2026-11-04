@@ -4,7 +4,8 @@ import { readFile } from "node:fs/promises";
 import { parse } from "csv-parse/sync";
 import { z } from "zod";
 import type { WorkbookPublicSource } from "../explorer/workbookModel";
-import type { EnglishCatalogue, Locale } from "../i18n/types";
+import { message } from "../i18n/messages";
+import type { EnglishCatalogue, Locale, Messages } from "../i18n/types";
 import { loadEnglishCatalogue } from "../i18n/catalogue.server";
 import {
   loadReviewedSourceManifest,
@@ -307,6 +308,15 @@ export type ImfWeoManifest = {
   yearMin: number;
   yearMax: number;
 };
+
+/** The WEO edition cited for the deficit data (`2026 წლის აპრილი`, `April 2026`), from its publication date; needs the `deficit` messages. */
+export function editionLabel(messages: Messages, publicationDate: string): string {
+  const [year, month] = publicationDate.split("-");
+  return message(messages, "deficit.weoEdition", {
+    year: year!,
+    month: message(messages, `deficit.weoMonth.${Number(month)}`),
+  });
+}
 
 /** The reviewed IMF WEO edition behind the deficit dataset, read from its package manifest. */
 export function loadImfWeoManifest(): Promise<ImfWeoManifest> {

@@ -78,7 +78,7 @@ describe("buildHubCards", () => {
   it("orders expenditure, spending by type, revenue, tax breaks and refunds, municipalities, analysis, debt, deficit", () => {
     const cards = buildHubCards(FACTS, MUNICIPAL_TOTALS, DEBT_FACTS);
 
-    expect(cards.map((card) => card.title)).toEqual(["ხარჯები", "ხარჯების სახეები", "შემოსავლები", "შეღავათები და დაბრუნება", "მუნიციპალიტეტები", "ანალიზი", "ვალი", "დეფიციტი"]);
+    expect(cards.map((card) => card.title)).toEqual(["ხარჯები", "ხარჯების სახეები", "შემოსავლები", "შეღავათები და დაბრუნება", "მუნიციპალიტეტები", "წლის მიმოხილვა", "ვალი", "დეფიციტი"]);
     expect(cards.map((card) => card.index)).toEqual(["01", "02", "03", "04", "05", "06", "07", "08"]);
   });
 
@@ -113,7 +113,7 @@ describe("buildHubCards", () => {
   it("lets an explicit total row win its year, the way the section pages do", () => {
     const cards = buildHubCards(FACTS, MUNICIPAL_TOTALS, DEBT_FACTS);
 
-    // singleYear.ts and explorerData.ts both prefer an explicit `<side>.total`
+    // explorerData.ts prefers an explicit `<side>.total`
     // over the category sum, so the hub has to agree or the same year reads
     // differently on the card and on the page behind it. 2.00 would be the bare
     // category sum; 11.00 would be the sum with the total double-counted in.

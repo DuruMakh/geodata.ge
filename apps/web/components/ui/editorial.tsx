@@ -76,6 +76,9 @@ export function Callout({ children, testId }: CalloutProps) {
   );
 }
 
+/** A key swatch's hatching for planned or projected values: paper stripes over the control colour (a Tailwind class). */
+export const HATCH_SWATCH = "[background:repeating-linear-gradient(135deg,var(--paper)_0_1.5px,transparent_1.5px_4px),var(--control)]";
+
 type SwatchBarProps = {
   color: string;
   className?: string;

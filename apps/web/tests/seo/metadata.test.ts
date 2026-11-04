@@ -162,21 +162,23 @@ describe("every page's search snippet and share card", () => {
   });
 });
 
-describe("the single-year analysis title follows the basis of its year (U05-12)", () => {
-  afterAll(() => {
-    vi.doUnmock("../../lib/data/servedData");
-    vi.resetModules();
-  });
-
-  it("calls a year with no actual row a plan, and a year with one actuals", async () => {
-    const served = { facts: [{ year: 2025, basis: "actual" }, { year: 2026, basis: "planned" }] };
-    vi.doMock("../../lib/data/servedData", async (original) => ({ ...(await original<object>()), loadServedExplorerData: async () => served }));
-    vi.resetModules();
+describe("the Year in review title names the year the page opens on", () => {
+  it("is the last year with actual spending, from the served facts, and the description is the page's own", async () => {
     const { analysisPageMetadata } = await import("../../lib/pages/analysis");
-    expect(String((await analysisPageMetadata("en")).title)).toBe("Georgia budget analysis — 2026 plan | Fiscal.ge");
-    expect(String((await analysisPageMetadata("ka")).description)).toContain("დაგეგმილი");
-    served.facts.push({ year: 2026, basis: "actual" });
-    expect(String((await analysisPageMetadata("en")).title)).toBe("Georgia budget analysis — 2026 actuals | Fiscal.ge");
+    const { loadServedExplorerData } = await import("../../lib/data/servedData");
+    const { chooseActivePublicFacts } = await import("../../lib/data/activeFacts");
+    const { facts } = await loadServedExplorerData();
+    // Worked out apart from the page's loader: the newest expenditure year with no active planned fact.
+    const spending = chooseActivePublicFacts(facts).filter((fact) => fact.side === "expenditure");
+    const planned = new Set(spending.filter((fact) => fact.basis === "planned").map((fact) => fact.year));
+    const opened = Math.max(...spending.map((fact) => fact.year).filter((year) => !planned.has(year)));
+    const en = await analysisPageMetadata("en");
+    const ka = await analysisPageMetadata("ka");
+    expect(String(en.title)).toBe(`${opened} — Year in review | Fiscal.ge`);
+    expect(String(ka.title)).toMatch(new RegExp(`^${opened} — წლის მიმოხილვა`));
+    // The description is the Year in review one (spec §3), not the old Analysis page's.
+    expect(en.description).toBe("Georgia’s public finances in one year: receipts, tax breaks, spending, deficit, debt and municipalities on one page, with a year to choose.");
+    expect(ka.description).toBe("საქართველოს საჯარო ფინანსები ერთ წელში: შემოსავლები, საგადასახადო შეღავათები, ხარჯები, დეფიციტი, ვალი და მუნიციპალიტეტები ერთ გვერდზე, წლის არჩევით.");
   });
 });
 

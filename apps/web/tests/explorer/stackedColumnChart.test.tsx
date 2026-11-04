@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { buildStackReadout, StackedColumnChart, type StackedColumnChartProps } from "../../components/main-explorer/stacked-column-chart";
+import { INK, PAPER } from "../../lib/explorer/colors";
+import { buildStackReadout, stackReadoutHeader, StackedColumnChart, type StackedColumnChartProps } from "../../components/main-explorer/stacked-column-chart";
 import { chartGeometry, renderGeorgianMarkup } from "../helpers/render-localized";
 
 const props: StackedColumnChartProps = {
@@ -249,5 +250,211 @@ describe("StackedColumnChart", () => {
     expect(markup).not.toContain("stack-chart-legend");
     expect(html.replace(row, "")).toBe(markup);
     expect(renderGeorgianMarkup(<StackedColumnChart {...props} legend={[]} />)).toBe(markup);
+  });
+  describe("highlight and projection", () => {
+    const years = Array.from({ length: 16 }, (_, index) => 2016 + index);
+    const yearProps: StackedColumnChartProps = {
+      ...props,
+      periods: years,
+      periodsPerYear: 1,
+      segments: [
+        { id: "a", label: "Food", color: "#B3402A", values: years.map(() => 3) },
+        { id: "b", label: "Communication", color: "#4A707A", values: years.map(() => -2) },
+        { id: "c", label: "Other", color: "#B3402A", values: years.map(() => 1) },
+      ],
+      overlay: null,
+    };
+    const rects = (svg: string) => [...svg.matchAll(/<rect[^>]*data-segment="[^"]+"[^>]*>/g)].map((match) => match[0]);
+    // Proves the new props are additive: these two drawings were recorded before they existed.
+    it("draws exactly what it drew before when neither prop is given", () => {
+      expect(markup).toMatchSnapshot("inflation fixture");
+      expect(renderGeorgianMarkup(<StackedColumnChart {...yearProps} breaks={[{ period: 2024, label: "Break" }]} />)).toMatchSnapshot("annual fixture");
+    });
+
+    it("marks a fit-width chart's drawings, which draw the phone geometry at every width, and no other chart's", () => {
+      expect(markup).not.toContain("data-fit-width");
+      const fitted = renderGeorgianMarkup(<StackedColumnChart {...yearProps} fitWidth />);
+      expect(fitted.match(/<svg[^>]*data-geometry="[^"]+"[^>]*data-fit-width=""/g)?.length).toBeGreaterThan(0);
+      expect(fitted.match(/<svg[^>]*data-geometry=/g)).toHaveLength(fitted.match(/data-fit-width=""/g)!.length);
+    });
+
+    it("marks the highlighted period's label and puts one ink rule under it", () => {
+      for (const geometry of ["desktop", "mobile"] as const) {
+        const svg = chartGeometry(renderGeorgianMarkup(<StackedColumnChart {...yearProps} highlightPeriod={2025} />), geometry);
+        expect(svg.match(/data-highlight/g)).toHaveLength(1);
+        const label = /<text x="([\d.]+)"[^>]*font-weight="600"[^>]*>2025<\/text>/.exec(svg);
+        expect(label, geometry).not.toBeNull();
+        expect(label![0]).toContain(`fill="${INK}"`);
+        expect(svg.match(/font-weight="600"/g)).toHaveLength(1);
+        const rule = /<rect[^>]*data-highlight[^>]*>/.exec(svg)![0];
+        expect(rule).toContain('width="16"');
+        expect(rule).toContain('height="2"');
+        expect(rule).toContain(`fill="${INK}"`);
+        // Centred under the label, which starts at its x on a phone and is centred on it on a desktop.
+        const labelWidth = 4 * 6.6;
+        const centre = geometry === "mobile" ? Number(label![1]) + labelWidth / 2 : Number(label![1]);
+        expect(Number(/\bx="([-\d.]+)"/.exec(rule)![1]) + 8).toBeCloseTo(centre, 0);
+        // Below the label's baseline, inside the drawing.
+        const height = Number(/viewBox="0 0 [\d.]+ ([\d.]+)"/.exec(svg)![1]);
+        const ruleY = Number(/\by="([-\d.]+)"/.exec(rule)![1]);
+        expect(ruleY).toBeGreaterThan(height - 8);
+        expect(ruleY + 2).toBeLessThanOrEqual(height);
+      }
+    });
+
+    it("shows a highlighted label the axis would have skipped and drops the ones it would touch", () => {
+      const plain = chartGeometry(renderGeorgianMarkup(<StackedColumnChart {...yearProps} />), "mobile");
+      const labelled = (svg: string) => [...svg.matchAll(/<text x="[\d.]+"[^>]*text-anchor="start"[^>]*>(\d{4})<\/text>/g)].map((match) => match[1]);
+      const before = labelled(plain);
+      const skipped = years.find((year, index) => index > 0 && index < years.length - 1 && !before.includes(String(year)))!;
+      const withHighlight = chartGeometry(renderGeorgianMarkup(<StackedColumnChart {...yearProps} highlightPeriod={skipped} />), "mobile");
+      const after = labelled(withHighlight);
+      expect(after).toContain(String(skipped));
+      expect(after).not.toContain(String(skipped - 1));
+      expect(after).not.toContain(String(skipped + 1));
+      // Labels that still show never touch: four-digit labels are 26.4 units wide plus the 8 unit gap.
+      const starts = [...withHighlight.matchAll(/<text x="([\d.]+)"[^>]*text-anchor="start"[^>]*>\d{4}<\/text>/g)].map((match) => Number(match[1]));
+      for (let index = 1; index < starts.length; index += 1) expect(starts[index]! - starts[index - 1]!).toBeGreaterThanOrEqual(26.4 + 8);
+      // The first and latest label stay unless they collide with it.
+      expect(after).toContain("2031");
+    });
+
+    it("draws no rule for a period that is not on the axis", () => {
+      const html = renderGeorgianMarkup(<StackedColumnChart {...yearProps} highlightPeriod={1999} />);
+      expect(html).not.toContain("data-highlight");
+      expect(html).toBe(renderGeorgianMarkup(<StackedColumnChart {...yearProps} />));
+    });
+
+    it("hatches every column from projectionFrom on, and only those, in each segment's own colour", () => {
+      const html = renderGeorgianMarkup(<StackedColumnChart {...yearProps} projectionFrom={2026} projectionLabel="plan" />);
+      for (const geometry of ["desktop", "mobile"] as const) {
+        const svg = chartGeometry(html, geometry);
+        const all = rects(svg);
+        expect(all).toHaveLength(48);
+        // Rects come segment by segment, column by column: 16 per segment.
+        all.forEach((rect, position) => {
+          const year = years[position % 16]!;
+          expect(rect.includes("data-projection"), `${geometry} ${year}`).toBe(year >= 2026);
+          if (year >= 2026) expect(rect).toMatch(/fill="url\(#[^)"]+\)"/);
+          else expect(rect).toMatch(/fill="#[0-9A-F]{6}"/);
+        });
+        // One pattern per distinct colour (two segments share one): 45 degrees, a 3px stripe on paper.
+        const patterns = [...svg.matchAll(/<pattern[^>]*>[\s\S]*?<\/pattern>/g)].map((match) => match[0]).filter((pattern) => pattern.includes("rotate(45)"));
+        expect(patterns).toHaveLength(2);
+        for (const pattern of patterns) {
+          expect(pattern).toContain(`fill="${PAPER}"`);
+          expect(pattern).toMatch(/<rect[^>]*width="3"[^>]*fill="#(B3402A|4A707A)"|<rect[^>]*fill="#(B3402A|4A707A)"[^>]*width="3"/);
+        }
+        // Every fill reference points at a pattern that exists.
+        for (const [, id] of svg.matchAll(/fill="url\(#([^)"]+)\)"/g)) expect(svg).toContain(`id="${id}"`);
+      }
+    });
+
+    it("keeps pattern ids unique across charts and between the two drawings of one chart", () => {
+      const two = renderGeorgianMarkup(
+        <>
+          <StackedColumnChart {...yearProps} projectionFrom={2026} projectionLabel="plan" />
+          <StackedColumnChart {...yearProps} projectionFrom={2026} projectionLabel="plan" />
+        </>,
+      );
+      const ids = [...two.matchAll(/<pattern[^>]*\bid="([^"]+)"/g)].map((match) => match[1]!);
+      // Two drawings, two charts: two hatch colours and one dot lattice in each.
+      expect(ids).toHaveLength(12);
+      expect(new Set(ids).size).toBe(ids.length);
+    });
+
+    it("gives each chart on a page its own dot lattice, which its lattice rect fills from", () => {
+      const two = renderGeorgianMarkup(
+        <>
+          <StackedColumnChart {...yearProps} />
+          <StackedColumnChart {...yearProps} />
+        </>,
+      );
+      const drawings = [...two.matchAll(/<svg[^>]*data-geometry="(?:desktop|mobile)"[^>]*>[\s\S]*?<\/svg>/g)].map((match) => match[0]);
+      expect(drawings).toHaveLength(4);
+      const latticeIds = drawings.map((svg) => {
+        const fill = /<rect[^>]*data-testid="stack-dot-lattice"[^>]*fill="url\(#([^)"]+)\)"/.exec(svg)?.[1];
+        expect(fill).toBeDefined();
+        // The pattern it fills from is drawn in the same svg, and it holds the lattice dot.
+        expect(svg).toMatch(new RegExp(`<pattern[^>]*id="${fill}"[^>]*><circle`));
+        return fill!;
+      });
+      expect(new Set(latticeIds).size).toBe(4);
+    });
+
+    it("marks a caption value from a projected period with the projection label, and only those", () => {
+      const caption = (html: string) => /<figcaption[^>]*>([\s\S]*?)<\/figcaption>/.exec(html)![1]!;
+      const plain = renderGeorgianMarkup(<StackedColumnChart {...yearProps} />);
+      expect(caption(renderGeorgianMarkup(<StackedColumnChart {...yearProps} projectionFrom={2026} projectionLabel="plan" />))).toBe(
+        "<ul><li>Food: 3.0, plan</li><li>Communication: -2.0, plan</li><li>Other: 1.0, plan</li></ul>",
+      );
+      // A segment whose last value precedes the projection stays unmarked.
+      const ended = { ...yearProps, segments: [{ ...yearProps.segments[0]!, values: years.map((year) => (year <= 2025 ? 3 : null)) }] };
+      expect(caption(renderGeorgianMarkup(<StackedColumnChart {...ended} projectionFrom={2026} projectionLabel="plan" />))).toBe("<ul><li>Food: 3.0</li></ul>");
+      expect(caption(renderGeorgianMarkup(<StackedColumnChart {...yearProps} projectionFrom={2040} projectionLabel="plan" />))).toBe(caption(plain));
+    });
+
+    it("names each caption value's period with captionPeriods, and is unchanged without it", () => {
+      const caption = (html: string) => /<figcaption[^>]*>([\s\S]*?)<\/figcaption>/.exec(html)![1]!;
+      const ended = { ...yearProps, segments: [{ ...yearProps.segments[0]!, values: years.map((year) => (year <= 2025 ? 3 : null)) }, yearProps.segments[1]!] };
+      expect(caption(renderGeorgianMarkup(<StackedColumnChart {...ended} captionPeriods projectionFrom={2026} projectionLabel="plan" />))).toBe(
+        "<ul><li>Food · 2025: 3.0</li><li>Communication · 2031: -2.0, plan</li></ul>",
+      );
+      expect(renderGeorgianMarkup(<StackedColumnChart {...ended} captionPeriods={false} />)).toBe(renderGeorgianMarkup(<StackedColumnChart {...ended} />));
+    });
+
+    it("appends the projection label to the readout header from projectionFrom on", () => {
+      const header = (period: number) => stackReadoutHeader(period, (value) => `y${value}`, 2026, "plan");
+      expect(header(2025)).toBe("y2025");
+      expect(header(2026)).toBe("y2026 plan");
+      expect(header(2031)).toBe("y2031 plan");
+      expect(stackReadoutHeader(2031, (value) => `y${value}`)).toBe("y2031");
+    });
+
+    it("hatches nothing when projectionFrom lies beyond the last period", () => {
+      const html = renderGeorgianMarkup(<StackedColumnChart {...yearProps} projectionFrom={2040} projectionLabel="plan" />);
+      expect(html).not.toContain("data-projection");
+    });
+  });
+
+  describe("value labels", () => {
+    const years = [2020, 2021, 2022, 2023];
+    const signed: StackedColumnChartProps = {
+      ...props,
+      periods: years,
+      periodsPerYear: 1,
+      segments: [
+        { id: "up", label: "Surplus", color: "#1F6E56", values: [2, null, null, 1] },
+        { id: "down", label: "Deficit", color: "#B3402A", values: [null, -3, -9, null] },
+      ],
+      overlay: null,
+    };
+    const labels = (svg: string) => [...svg.matchAll(/<text[^>]*data-value-label="(\d+)"[^>]*>([^<]*)<\/text>/g)];
+    const attribute = (tag: string, name: string) => Number(new RegExp(`\\b${name}="([-\\d.]+)"`).exec(tag)![1]);
+    const columnY = (svg: string, id: string, position: number) => {
+      const rect = [...svg.matchAll(new RegExp(`<rect[^>]*data-segment="${id}"[^>]*>`, "g"))][position]![0];
+      return { top: attribute(rect, "y"), bottom: attribute(rect, "y") + attribute(rect, "height") };
+    };
+
+    it("draws nothing extra when none are given", () => {
+      expect(renderGeorgianMarkup(<StackedColumnChart {...signed} valueLabels={[]} />)).toBe(renderGeorgianMarkup(<StackedColumnChart {...signed} />));
+      expect(renderGeorgianMarkup(<StackedColumnChart {...signed} />)).not.toContain("data-value-label");
+    });
+
+    it("writes each label above a rising column and below a hanging one, inside the plot, skipping periods off the axis", () => {
+      const html = renderGeorgianMarkup(<StackedColumnChart {...signed} valueLabels={[{ period: 2020, text: "+2.0%" }, { period: 2022, text: "−9.0%" }, { period: 1999, text: "x" }]} />);
+      for (const geometry of ["desktop", "mobile"] as const) {
+        const svg = chartGeometry(html, geometry);
+        const found = labels(svg);
+        expect(found.map((match) => [match[1], match[2]])).toEqual([["2020", "+2.0%"], ["2022", "−9.0%"]]);
+        const [rising, hanging] = found.map((match) => match[0]);
+        expect(rising).toContain(`fill="${INK}"`);
+        expect(attribute(rising!, "y")).toBeLessThan(columnY(svg, "up", 0).top);
+        expect(attribute(hanging!, "y")).toBeGreaterThan(columnY(svg, "down", 1).bottom);
+        // Above the period labels' row (they sit 8 units from the bottom).
+        const height = Number(/viewBox="0 0 [\d.]+ ([\d.]+)"/.exec(svg)![1]);
+        expect(attribute(hanging!, "y")).toBeLessThan(height - 26);
+      }
+    });
   });
 });

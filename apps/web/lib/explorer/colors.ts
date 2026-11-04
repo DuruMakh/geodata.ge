@@ -1,6 +1,6 @@
 // Editorial category colors (DESIGN.md §4.2). A category keeps the same color on
-// every surface: chart lines, table swatches, series panel, treemap, Every 100 GEL,
-// radar, budget field, ranking.
+// every surface: chart lines, table swatches, series panel, the year in review's
+// 100-cell grid, ranking, change bars and long view.
 
 export const INK = "#1E1B16";
 // Declared before SERIES_COLORS because the computed citizenship remainder reuses it.
@@ -244,6 +244,15 @@ export const MAP_RAMP = ["#F3EBDB", "#E9D6C6", "#DEBBA6", "#D19A80", "#C4735A", 
 export const MAP_NO_DATA_FILL = "#E5DBC9";
 export const MAP_NO_DATA_STROKE = "#C4B69C";
 
+// Year in review, municipal finding (the AN-App board): the places that hold half of municipal spending, largest
+// first, step from ink to sand (the last step repeats past six); the rest is one pale band.
+export const SPLIT_SHADES = [INK, "#4F483C", "#7A6F5D", "#A39782", "#BCB09B", "#CDC2AE"];
+export const SPLIT_REST = "#E3D9C7";
+// Year in review, debt (the AN-App board): external debt and repaid principal in the ink line (globals.css
+// `--ink-line`), domestic debt in bronze; 11.0:1 and 3.7:1 on paper, above the 3:1 graphical floor.
+export const INK_LINE = "#3A342B";
+export const DEBT_DOMESTIC = "#9A7650";
+
 // Major programs take their ministry's hue and step through lightness and
 // saturation inside it, so a line's parentage is legible from its colour.
 // EDITORIAL_PALETTE cannot serve them: it holds the very hexes the categories
@@ -275,7 +284,7 @@ const SATURATION_BAND = { min: 14, max: 84 };
 
 // --paper and --tint from globals.css. Lines are drawn on paper; series swatches
 // and checked boxes also sit on tinted selected/hovered rows.
-const PAPER = "#F7F2E9";
+export const PAPER = "#F7F2E9";
 const TINT = "#F1EADC";
 const SERIES_BACKGROUNDS = [PAPER, TINT] as const;
 
@@ -356,6 +365,26 @@ function darkenToFloor(hsl: { h: number; s: number; l: number }): string {
   }
 
   return hex;
+}
+
+// White text on a tile (the year in review's spending-type treemap) owes WCAG 1.4.3 4.5:1.
+const WHITE_TEXT_FLOOR = 4.5;
+
+/**
+ * The tile fill under white text: `hex` itself when white already reads 4.5:1 on it, else the same hue and saturation
+ * darkened one whole L at a time until it does, as darkenToFloor pays the series floor.
+ */
+export function fillUnderWhiteText(hex: string): string {
+  const contrast = (fill: string) => 1.05 / (relativeLuminance(fill) + 0.05);
+  if (contrast(hex) >= WHITE_TEXT_FLOOR) return hex;
+  const hsl = hexToHsl(hex);
+  let { l } = hsl;
+  let fill = hex;
+  while (contrast(fill) < WHITE_TEXT_FLOOR && l > 0) {
+    l -= 1;
+    fill = hslToHex({ ...hsl, l });
+  }
+  return fill;
 }
 
 export function colorForProgram(parentColor: string, ordinal: number): string {

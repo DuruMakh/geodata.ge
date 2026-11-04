@@ -652,8 +652,8 @@ describe("Dataset nodes across the sitemap", () => {
   beforeAll(() => vi.stubEnv("NEXT_PUBLIC_SITE_URL", "https://fiscal.ge"));
   afterAll(() => vi.unstubAllEnvs());
 
-  // The pages with no Dataset of their own: the hubs (the navigation tree's hub rows) and the group pages, the single-year
-  // analysis view, the methodology catalog page and the site pages.
+  // The pages with no Dataset of their own: the hubs (the navigation tree's hub rows) and the group pages, Year in
+  // review, the methodology catalog page and the site pages.
   const hubs = new Set<string>([...NAV_TREE.map((hub) => hub.href), ...NAV_GROUPS.map((group) => group.href)]);
   const carriesDataset = (page: string) =>
     (page.startsWith("/explorer/") || page.startsWith("/methodology/")) && !hubs.has(page) && page !== "/explorer/analysis";

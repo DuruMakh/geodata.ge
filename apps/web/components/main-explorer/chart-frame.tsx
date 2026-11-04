@@ -55,7 +55,8 @@ export function mobileChartHeight(width: number, ratio: number, min: number, max
  */
 export const ChartGeometryContext = createContext<"screen" | "desktop">("screen");
 
-export function useChartLayout<T extends HTMLElement = HTMLDivElement>() {
+/** `everyScreen`: draw at the measured width on every screen, as phones do, for a chart in a column narrower than the desktop drawing. */
+export function useChartLayout<T extends HTMLElement = HTMLDivElement>(everyScreen = false) {
   const ref = useRef<T>(null);
   const desktop = useContext(ChartGeometryContext) === "desktop";
   const [mobileWidth, setMobileWidth] = useState<number | null | undefined>(desktop ? null : undefined);
@@ -68,7 +69,7 @@ export function useChartLayout<T extends HTMLElement = HTMLDivElement>() {
       return;
     }
     const query = window.matchMedia(MOBILE_CHART_QUERY);
-    const measure = () => setMobileWidth(query.matches ? Math.round(element.clientWidth) : null);
+    const measure = () => setMobileWidth(everyScreen || query.matches ? Math.round(element.clientWidth) : null);
     measure();
     const observer = new ResizeObserver(measure);
     observer.observe(element);
@@ -77,7 +78,7 @@ export function useChartLayout<T extends HTMLElement = HTMLDivElement>() {
       observer.disconnect();
       query.removeEventListener("change", measure);
     };
-  }, [desktop]);
+  }, [desktop, everyScreen]);
 
   return {
     ref,
