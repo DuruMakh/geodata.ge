@@ -2,7 +2,8 @@ import { buildContributionIndex } from "../data/inflation/contributions";
 import { periodFromKey, periodKey } from "../data/inflation/periods";
 import type { CategoryFactInput } from "../data/inflation/types";
 import type { ClientBasketWeightRow } from "../servedRows";
-import { periodBounds, rangeFromPatch, refitRange, resolveRange, type PeriodRange, type ResolvedPeriodRange } from "./periodRange";
+import { CRAWL_MONTH_COLUMNS } from "./crawlTables";
+import { lastPeriodsRange, periodBounds, rangeFromPatch, refitRange, resolveRange, type PeriodRange, type ResolvedPeriodRange } from "./periodRange";
 import { parseMonthRangeKey, writeMonthRangeKey } from "./urlState";
 
 // Pure state and data selection for the inflation categories section. The period
@@ -177,6 +178,20 @@ export function changeCategoryTab(state: CategoryState, tab: CategoryTab, index:
 }
 
 export { rangeFromPatch };
+
+/**
+ * The hidden crawl tables' states (lib/explorer/crawlTables.ts), each over its tab's last 36 months: the contributions of
+ * the twelve divisions (what select all ticks; a division and its subgroups never stack together), then every category's
+ * annual and monthly change. A tab whose runs have not arrived (the monthly one, until it is opened) has none.
+ */
+export function categoryCrawlStates(index: CategoryIndex): CategoryState[] {
+  const views: [CategoryTab, readonly string[]][] = [["contrib", DIVISION_IDS], ["yoy", index.order], ["mom", index.order]];
+  return views.flatMap(([tab, ids]) => {
+    const selected = categoryTabLoaded(index, tab) ? ids.filter((categoryId) => categoryValues(index, categoryId, tab) !== undefined) : [];
+    if (selected.length === 0) return [];
+    return [{ ...DEFAULT_CATEGORY_STATE, tab, selected, range: lastPeriodsRange(categoryCoverage(index, tab), CRAWL_MONTH_COLUMNS) }];
+  });
+}
 
 /** `cpi.cat.01_1` → `cpi.cat.01`; a division is its own. */
 function divisionOf(categoryId: string): string {

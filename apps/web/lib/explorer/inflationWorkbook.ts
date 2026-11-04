@@ -49,6 +49,15 @@ export function monthlyReadableRows(
   });
 }
 
+/**
+ * A monthly workbook as the hidden crawl tables read it. Its rows are a series' years ("2025" under "Headline inflation"),
+ * and crawlTables prints a row's own label, so each carries its series as the Excel sheet writes it: "Headline inflation — 2025".
+ */
+export function crawlMonthlyModel(model: WorkbookExportModel): WorkbookExportModel {
+  const rows = model.readable.rows.map((row) => (row.parentLabel ? { ...row, parentLabel: null, label: `${row.parentLabel} — ${row.label}` } : row));
+  return { ...model, readable: { ...model.readable, rows } };
+}
+
 /** Link the archive copy in the reader's language when one exists, else the English one. */
 export function pickLocaleEditions(
   sources: readonly InflationWorkbookSource[],

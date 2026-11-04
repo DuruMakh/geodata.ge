@@ -25,7 +25,11 @@ beforeAll(async () => {
   props = {
     products: catalogue.map(({ productId, labelEn, labelKa, firstPeriod }) => ({ productId, labelEn, labelKa, firstPeriod })),
     dataUrl: "/page-data/inflation-products.0123456789abcdef.json", coverage: productRunBounds(runs),
-    lastReviewedAt: "2026-09-27", sources: [], siteOrigin: "https://fiscal.ge",
+    // The two Geostat editions the page always passes: the hidden crawl table builds the workbook on render.
+    lastReviewedAt: "2026-09-27", siteOrigin: "https://fiscal.ge",
+    sources: ["source.geostat_product_yoy", "source.geostat_product_mom"].map((sourceId) => ({
+      sourceId, language: "ka" as const, years: [2026], title: sourceId, organization: "Geostat", downloadHref: `/downloads/methodology/inflation/files/ka/${sourceId}.xlsx`, retrievedAt: "2026-09-27",
+    })),
   };
   index = buildProductIndex(catalogue, runs);
   indicatorState = { indicator: "annual", range: index.defaultRange, selected: rankProducts(index).slice(0, 2) };

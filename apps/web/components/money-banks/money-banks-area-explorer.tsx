@@ -1,10 +1,10 @@
 "use client";
 import Link from "next/link";
 import { ChevronDown } from "lucide-react";
-import { useCallback, useId, useRef, useState } from "react";
+import { useCallback, useId, useMemo, useRef, useState } from "react";
 import type { ClientMoneyBanksFact } from "../../lib/data/moneyBanks/types";
 import type { MunicipalRegion } from "../../lib/data/municipal/types";
-import { MONEY_BANKS_REGIONS_HREF, buildMoneyBanksAreaModel, moneyBanksAreaCoverage, moneyBanksAreaOfMapId, moneyBanksAreaSelectionHash, moneyBanksMapId, moneyBanksRegionHref, parseMoneyBanksAreaHash, type MoneyBanksArea } from "../../lib/explorer/moneyBanksAreas";
+import { MONEY_BANKS_REGIONS_HREF, buildMoneyBanksAreaModel, moneyBanksAreaCoverage, moneyBanksAreaCrawlStates, moneyBanksAreaOfMapId, moneyBanksAreaSelectionHash, moneyBanksMapId, moneyBanksRegionHref, parseMoneyBanksAreaHash, type MoneyBanksArea } from "../../lib/explorer/moneyBanksAreas";
 import { buildMoneyBanksWorkbookExportModel } from "../../lib/explorer/moneyBanksWorkbook";
 import { updatedDate } from "../../lib/explorer/coverageLabel";
 import { MISSING, formatAmount, formatInUnit, unitsFor } from "../../lib/explorer/format";
@@ -18,6 +18,7 @@ import { pageHref } from "../../lib/i18n/routes";
 import { ModeTabs } from "../explorer-shell/mode-tabs";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { ChartShareButton } from "../explorer-shell/chart-share-button";
+import { CrawlTables } from "../explorer-shell/crawl-tables";
 import { ExplorerHeading } from "../explorer-shell/explorer-heading";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { LatestFigure, LatestValueLine } from "../explorer-shell/latest-value-line";
@@ -66,6 +67,9 @@ export function MoneyBanksAreaExplorer({ area, facts, labels, areaLabels, source
   const latest = facts.filter(f => f.indicatorId === model.series[0].id).sort((a, b) => a.year - b.year).at(-1)!;
   const areaName = areaLabels[area];
   const title = t("page.area.regionTitle", { region: areaName });
+  // The area's three loan rows over every year, for the hidden crawl tables: built from the props alone, so a click never rebuilds them.
+  const crawlModels = useMemo(() => moneyBanksAreaCrawlStates(area, facts).map(crawl =>
+    buildMoneyBanksWorkbookExportModel({ area, facts, state: crawl, labels, sources, siteOrigin, title }, presentation)), [area, facts, labels, sources, siteOrigin, title, presentation]);
   const chartLabel = `${t("heading.area")} · ${areaName}`;
   // Links to another area's page carry the selection, moved to that area, and nothing else.
   const areaHref = (id: string) => `${moneyBanksRegionHref(id)}${moneyBanksAreaSelectionHash(state.selectedIds, moneyBanksAreaOfMapId(id))}`;
@@ -98,7 +102,8 @@ export function MoneyBanksAreaExplorer({ area, facts, labels, areaLabels, source
             <span data-testid="money-unit-label" className="text-[11px] text-[var(--muted)]">{unitLabel}</span>
           </div>
           {!model.selected.length ? <div className="mt-5"><Callout testId="no-selection-callout">{t("emptySelection")}</Callout></div>
-            : <><ExplorerTable caption={`${chartLabel} · ${unitLabel} · ${model.range.start}–${model.range.end}`} rows={rows.filter(row => row !== total)} totalRow={total} showTotal={Boolean(total)} totalFirst wrapRowLabels rowLabelsLocalized years={model.years} firstColumnLabel={t("series")} unit={unit} share={false} showChangeColumn={false} shareValueForYear={() => null} crawlCopy={state.mode === "line"} />{state.mode === "line" ? <div className="mt-5">{chart}</div> : null}</>}
+            : state.mode === "line" ? <div className="mt-5">{chart}</div>
+            : <ExplorerTable caption={`${chartLabel} · ${unitLabel} · ${model.range.start}–${model.range.end}`} rows={rows.filter(row => row !== total)} totalRow={total} showTotal={Boolean(total)} totalFirst wrapRowLabels rowLabelsLocalized years={model.years} firstColumnLabel={t("series")} unit={unit} share={false} showChangeColumn={false} shareValueForYear={() => null} />}
           <ChartSelectionAids series={lineSeries} chartShown={state.mode === "line"} share={false} unit={unit} formatValue={valueLabel} />
           <RangeStrip years={moneyBanksAreaCoverage(area, facts).years} range={model.range} onChange={patch => update(s => ({ ...s, range: rangeFromPatch(buildMoneyBanksAreaModel(area, facts, s).range, patch) }))} />
         </section>
@@ -114,5 +119,6 @@ export function MoneyBanksAreaExplorer({ area, facts, labels, areaLabels, source
           await downloadWorkbook(buildMoneyBanksWorkbookExportModel({ area, facts, state, labels, sources, siteOrigin, title }, presentation));
         }} />} />
     </ExplorerWorkspace>
+    <CrawlTables models={crawlModels} />
   </div>;
 }

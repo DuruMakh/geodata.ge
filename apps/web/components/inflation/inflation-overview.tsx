@@ -11,12 +11,12 @@ import { latestEntry } from "../../lib/explorer/latestValue";
 import { ModeTabs } from "../explorer-shell/mode-tabs";
 import { LatestValueLine } from "../explorer-shell/latest-value-line";
 import {
-  INFLATION_COLORS, INFLATION_TABS, buildInflationLines, changeInflationTab, indexInflationFacts,
+  INFLATION_COLORS, INFLATION_TABS, buildInflationLines, changeInflationTab, indexInflationFacts, inflationCrawlStates,
   parseInflationHash, rangeFromPatch, resolveInflationRange, seriesGroup, serializeInflationHash, toggleSelection, unpackCpiFacts,
   type InflationIndex, type InflationState, type InflationTab,
 } from "../../lib/explorer/inflationOverview";
 import type { PackedCategorySeries } from "../../lib/explorer/inflationCategories";
-import { buildInflationWorkbookExportModel, type InflationWorkbookSource } from "../../lib/explorer/inflationWorkbook";
+import { buildInflationWorkbookExportModel, crawlMonthlyModel, type InflationWorkbookSource } from "../../lib/explorer/inflationWorkbook";
 import { downloadWorkbook } from "../../lib/explorer/workbookWriter.client";
 import { message } from "../../lib/i18n/messages";
 import { useI18n } from "../../lib/i18n/provider";
@@ -34,6 +34,7 @@ import { ExplorerPage } from "../explorer-shell/explorer-page";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { ChartShareButton } from "../explorer-shell/chart-share-button";
+import { CrawlTables } from "../explorer-shell/crawl-tables";
 import { useHashState } from "../explorer-shell/use-hash-state";
 import { topicSection, ALL_DATA_PATH } from "../../lib/navigation/navTree";
 
@@ -69,6 +70,10 @@ export function InflationOverview({ facts, sourceIdBySeriesMeasure, lastReviewed
     [facts, sourceIdBySeriesMeasure],
   );
   const { state, update } = useHashState(index, parseOverviewHash, serializeInflationHash);
+  // Every tab's rows over its last 36 months, for the hidden crawl tables: built from the props alone, so a click never rebuilds them.
+  const crawlModels = useMemo(() => inflationCrawlStates(index).map((crawl) => crawlMonthlyModel(buildInflationWorkbookExportModel({
+    index, targets, state: crawl, range: resolveInflationRange(crawl, index), presentation, sources, siteOrigin,
+  }))), [index, targets, presentation, sources, siteOrigin]);
   const [announcement, setAnnouncement] = useState("");
 
   const range = resolveInflationRange(state, index);
@@ -204,6 +209,7 @@ export function InflationOverview({ facts, sourceIdBySeriesMeasure, lastReviewed
       </ExplorerWorkspace>
 
       <InflationIndicators index={index} targets={targets} />
+      <CrawlTables models={crawlModels} />
     </ExplorerPage>
   );
 }

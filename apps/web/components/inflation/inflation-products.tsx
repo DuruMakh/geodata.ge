@@ -8,7 +8,7 @@ import { makePeriod, periodKey, periodYear } from "../../lib/data/inflation/peri
 import { updatedDate } from "../../lib/explorer/coverageLabel";
 import { periodLabel, monthlyChartPeriod, PCT_UNIT } from "../../lib/explorer/inflationLabels";
 import { buildProductIndex, productAnnual, productColor, productCumulative, productEndPeriod, type ClientProduct, type PackedProductSeries, type ProductIndex } from "../../lib/explorer/inflationProducts";
-import { parseProductHash, serializeProductHash, toggleProduct } from "../../lib/explorer/inflationProductState";
+import { parseProductHash, productCrawlStates, serializeProductHash, toggleProduct } from "../../lib/explorer/inflationProductState";
 import { buildInflationProductWorkbookExportModel } from "../../lib/explorer/inflationProductWorkbook";
 import type { InflationWorkbookSource } from "../../lib/explorer/inflationWorkbook";
 import { downloadWorkbook } from "../../lib/explorer/workbookWriter.client";
@@ -21,6 +21,7 @@ import { ExplorerPage } from "../explorer-shell/explorer-page";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { ChartShareButton } from "../explorer-shell/chart-share-button";
+import { CrawlTables } from "../explorer-shell/crawl-tables";
 import { PageDataStatus } from "../explorer-shell/page-data-status";
 import { useHashState } from "../explorer-shell/use-hash-state";
 import { usePageData } from "../explorer-shell/use-page-data";
@@ -91,6 +92,9 @@ export function ProductExplorer({ index, lastReviewedAt, sources, siteOrigin }: 
   const { state, update } = useHashState(index, parseProductHash, serializeProductHash);
   // Stable, so a click re-renders only the selector rows whose selection changed.
   const toggle = useCallback((id: string) => update((current) => toggleProduct(current, id)), [update]);
+  // Every product over every year, for the hidden crawl tables: built once the runs arrive, never on a click.
+  const crawlModels = useMemo(() => productCrawlStates(index).map((crawl) =>
+    buildInflationProductWorkbookExportModel({ index, state: crawl, presentation, sources, siteOrigin })), [index, presentation, sources, siteOrigin]);
 
   const minYear = index.earliestYear;
   const maxYear = periodYear(index.latestPeriod);
@@ -215,5 +219,6 @@ export function ProductExplorer({ index, lastReviewedAt, sources, siteOrigin }: 
     </ExplorerWorkspace>
     <InflationProductIndicators index={index} state={state} />
     <InflationProductTable index={index} state={state} onToggle={toggle} />
+    <CrawlTables models={crawlModels} />
   </>;
 }

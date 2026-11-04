@@ -2,6 +2,7 @@ import { MONEY_BANKS_LOAN_AREAS, loansRegionIndicator, type ClientMoneyBanksFact
 import { areaRoutes } from "./areaRoutes";
 import { MONEY_BANKS_SECTIONS, moneyBanksSeriesColor, type MoneyBanksModel, type MoneyBanksSeriesDefinition } from "./moneyBanks";
 import { buildTopicModel, parseTopicHash, topicCoverage, type TopicState } from "./topicSeries";
+import { unitListCrawlStates } from "./unitList";
 
 /** The areas with a page: Georgia, then the eleven regions. */
 export type MoneyBanksArea = typeof MONEY_BANKS_LOAN_AREAS[number];
@@ -21,6 +22,10 @@ export const moneyBanksAreaCoverage = (area: MoneyBanksArea, facts: readonly Cli
   const ids = new Set<string>(moneyBanksAreaSeries(area).map(s => s.id));
   return topicCoverage(facts.filter(f => ids.has(f.indicatorId)).map(f => f.year), `No loans by region years for ${area}`);
 };
+
+/** The hidden crawl tables' state (lib/explorer/crawlTables.ts): the area's three loan rows, over every year; none for an area without loans. */
+export const moneyBanksAreaCrawlStates = (area: MoneyBanksArea, facts: readonly ClientMoneyBanksFact[]): TopicState[] =>
+  unitListCrawlStates(moneyBanksAreaSeries(area), facts);
 
 /** Reads the view of the page for `area`. All three rows are in one unit, so any selection is allowed. */
 export const parseMoneyBanksAreaHash = (hash: string, area: MoneyBanksArea, facts: readonly ClientMoneyBanksFact[]): TopicState =>

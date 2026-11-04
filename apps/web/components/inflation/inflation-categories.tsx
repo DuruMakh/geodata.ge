@@ -17,6 +17,7 @@ import {
   buildCategoryLines,
   buildStackModel,
   categoryCoverage,
+  categoryCrawlStates,
   categoryTabLoaded,
   changeCategoryTab,
   parseCategoryHash,
@@ -34,7 +35,7 @@ import {
 import { INK } from "../../lib/explorer/colors";
 import { categoryColor, categoryLabel, formatContribution } from "../../lib/explorer/inflationCategoryLabels";
 import { buildInflationCategoryWorkbookExportModel } from "../../lib/explorer/inflationCategoryWorkbook";
-import type { InflationWorkbookSource } from "../../lib/explorer/inflationWorkbook";
+import { crawlMonthlyModel, type InflationWorkbookSource } from "../../lib/explorer/inflationWorkbook";
 import { downloadWorkbook } from "../../lib/explorer/workbookWriter.client";
 import { message } from "../../lib/i18n/messages";
 import { useI18n } from "../../lib/i18n/provider";
@@ -56,6 +57,7 @@ import { latestEntry } from "../../lib/explorer/latestValue";
 import { formatInflationValue } from "../../lib/explorer/inflationLabels";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { ChartShareButton } from "../explorer-shell/chart-share-button";
+import { CrawlTables } from "../explorer-shell/crawl-tables";
 import { PageDataStatus } from "../explorer-shell/page-data-status";
 import { useHashState } from "../explorer-shell/use-hash-state";
 import { usePageData } from "../explorer-shell/use-page-data";
@@ -100,6 +102,11 @@ export function InflationCategories({ facts, monthlyUrl, weights, headline, head
     [facts, monthly, weights],
   );
   const headlineByPeriod = useMemo(() => new Map(headline.map((row) => [row.period, row.value])), [headline]);
+  // The divisions' contributions and every category's changes over the last 36 months, for the hidden crawl tables: built from
+  // the props and the monthly runs once they arrive, never on a click.
+  const crawlModels = useMemo(() => categoryCrawlStates(index).map((crawl) => crawlMonthlyModel(buildInflationCategoryWorkbookExportModel({
+    index, state: crawl, range: resolveCategoryRange(crawl, index), headline: headlineByPeriod, presentation, sources, siteOrigin,
+  }))), [index, headlineByPeriod, presentation, sources, siteOrigin]);
   const { state, update } = useHashState(index, parseCategoriesHash, serializeCategoryHash);
   const [announcement, setAnnouncement] = useState("");
   if (state.tab === "mom" && !monthlyWanted) setMonthlyWanted(true);
@@ -346,6 +353,7 @@ export function InflationCategories({ facts, monthlyUrl, weights, headline, head
       </ExplorerWorkspace>
 
       <InflationCategoryIndicators index={index} />
+      <CrawlTables models={crawlModels} />
     </ExplorerPage>
   );
 }

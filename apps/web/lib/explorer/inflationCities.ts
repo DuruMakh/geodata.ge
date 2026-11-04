@@ -1,9 +1,10 @@
 import { periodFromKey, periodKey } from "../data/inflation/periods";
 import { CPI_CITY_IDS, type CityFactInput, type CpiCityMeasure } from "../data/inflation/types";
 import { decemberAverages } from "./inflationGrid";
+import { CRAWL_MONTH_COLUMNS } from "./crawlTables";
 import type { CityView } from "./inflationCityRoutes";
 import { latestEntry } from "./latestValue";
-import { periodBounds, rangeFromPatch, refitRange, resolveRange, type PeriodRange, type ResolvedPeriodRange } from "./periodRange";
+import { lastPeriodsRange, periodBounds, rangeFromPatch, refitRange, resolveRange, type PeriodRange, type ResolvedPeriodRange } from "./periodRange";
 import { parseMonthRangeKey, writeMonthRangeKey } from "./urlState";
 
 // Pure state and data selection for the inflation cities pages
@@ -104,6 +105,13 @@ export function resolveCityRange(state: CityState, index: CityIndex, view: CityV
 }
 
 export { rangeFromPatch };
+
+/** The hidden crawl tables' state (lib/explorer/crawlTables.ts): every line of the page with data, over its last 36 months; none for a place without any. */
+export function cityCrawlStates(index: CityIndex, view: CityView): CityState[] {
+  const selected = cityViewLineIds(view).filter((lineId) => lineValues(index, view, lineId) !== undefined);
+  if (selected.length === 0) return [];
+  return [{ ...defaultCityState(view), selected, range: lastPeriodsRange(cityCoverage(index, view), CRAWL_MONTH_COLUMNS) }];
+}
 
 export function toggleCityLine(state: CityState, view: CityView, lineId: string): CityState {
   const next = state.selected.includes(lineId) ? state.selected.filter((entry) => entry !== lineId) : [...state.selected, lineId];

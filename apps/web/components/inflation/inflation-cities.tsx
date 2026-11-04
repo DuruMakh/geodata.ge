@@ -8,6 +8,7 @@ import {
   buildCityIndex,
   buildCityLines,
   cityCoverage,
+  cityCrawlStates,
   rangeFromPatch,
   resolveCityRange,
   restoreCityState,
@@ -28,7 +29,7 @@ import { CITIES_PATH } from "../../lib/explorer/inflationCityRoutes";
 import { buildInflationCityWorkbookExportModel } from "../../lib/explorer/inflationCityWorkbook";
 import { formatInflationValue, periodLabel, monthlyChartPeriod, PCT_UNIT } from "../../lib/explorer/inflationLabels";
 import { LatestValueLine } from "../explorer-shell/latest-value-line";
-import type { InflationWorkbookSource } from "../../lib/explorer/inflationWorkbook";
+import { crawlMonthlyModel, type InflationWorkbookSource } from "../../lib/explorer/inflationWorkbook";
 import { downloadWorkbook } from "../../lib/explorer/workbookWriter.client";
 import { message } from "../../lib/i18n/messages";
 import { useI18n } from "../../lib/i18n/provider";
@@ -38,6 +39,7 @@ import { ExplorerPage } from "../explorer-shell/explorer-page";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { ChartShareButton } from "../explorer-shell/chart-share-button";
+import { CrawlTables } from "../explorer-shell/crawl-tables";
 import { useHashState } from "../explorer-shell/use-hash-state";
 import { EditorialLineChart, type ChartSeries } from "../main-explorer/editorial-line-chart";
 import { RangeStrip } from "../main-explorer/range-strip";
@@ -74,6 +76,10 @@ export function InflationCities({ view, facts, lastReviewedAt, sources, siteOrig
   const index = useMemo(() => buildCityIndex(unpackCityFacts(facts)), [facts]);
   const hashData = useMemo(() => ({ index, view }), [index, view]);
   const { state, update } = useHashState(hashData, parseCityState, serializeCityState);
+  // Every line of the page over its last 36 months, for the hidden crawl tables: built from the props alone, so a click never rebuilds them.
+  const crawlModels = useMemo(() => cityCrawlStates(index, view).map((crawl) => crawlMonthlyModel(buildInflationCityWorkbookExportModel({
+    index, view, state: crawl, range: resolveCityRange(crawl, index, view), presentation, sources, siteOrigin,
+  }))), [index, view, presentation, sources, siteOrigin]);
 
   const range = resolveCityRange(state, index, view);
   const coverage = cityCoverage(index, view);
@@ -197,6 +203,7 @@ export function InflationCities({ view, facts, lastReviewedAt, sources, siteOrig
       </ExplorerWorkspace>
 
       {view.kind === "georgia" ? <InflationCityIndicators index={index} /> : <InflationCityCategoryIndicators index={index} cityId={view.cityId} />}
+      <CrawlTables models={crawlModels} />
     </ExplorerPage>
   );
 }

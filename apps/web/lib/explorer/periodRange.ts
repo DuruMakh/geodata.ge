@@ -28,6 +28,11 @@ export function resolveRange(range: PeriodRange, { min, max }: PeriodCoverage): 
   return start > end ? { min, max, start: min, end: max } : { min, max, start, end };
 }
 
+/** The coverage's last `count` periods as a range: the months a monthly page's hidden crawl tables carry (spec §3.4). */
+export function lastPeriodsRange({ min, max }: PeriodCoverage, count: number): PeriodRange {
+  return { kind: "manual", start: Math.max(min, max - count + 1), end: max };
+}
+
 /** A range-strip change. A span that covers everything is stored as "all". */
 export function rangeFromPatch(range: ResolvedPeriodRange, patch: { start?: number; end?: number }): PeriodRange {
   const start = patch.start ?? range.start;
