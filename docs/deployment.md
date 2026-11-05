@@ -2,8 +2,8 @@
 
 The site is a fully static Next.js build served by Vercel. This doc records the
 project configuration and the operational workflows: the production deploy pipeline, manual deploys/rollback, environment
-variables, GitHub Actions credentials, the runbook, the scheduled health
-check, and connecting the custom domain.
+variables, GitHub Actions credentials, the runbook, and connecting the custom
+domain.
 
 ## Bilingual release contract
 
@@ -57,8 +57,7 @@ from supplied encoded-length headers, build inventory, publication hashes and
 baseline comparison; `scripts/measure-bilingual-mcp.ts` retains complete-result
 measurements. Historical asset reports are local evidence under `.tmp/bilingual/`;
 current MCP evidence lives under `docs/superpowers/reviews/`. Neither is deployment
-proof. A local CSV build with credential-free database-loader fixtures does not
-replace the production pipeline's database-mode parity check. Verify the deployed
+proof. Verify the deployed
 commit and both language URL families separately after an authorized release.
 
 The 2026-09-06 local comparison measured 99 to 191 static-generation entries,
@@ -279,8 +278,7 @@ replacement; if none exists, raise the unresolved release blocker for an
 explicit owner decision. Passing the policy command does not mean all findings
 are fixed. The focused policy, MCP failure/privacy, legacy/modern protocol,
 output-schema, security and unchanged reference tests verify this maintenance;
-the integrated completion gate and production function-size check remain
-separate release requirements.
+the integrated completion gate remains a separate release requirement.
 
 ## Methodology archive release checks
 
@@ -344,8 +342,12 @@ Builds read the reviewed CSVs and need no database variable; local dev needs non
 | `KV_REST_API_URL`, `KV_REST_API_TOKEN` | Production | Encrypted credentials injected by the Upstash integration. Never expose through NEXT_PUBLIC variables. |
 
 - `DATABASE_URL` and `GEODATA_DATA_SOURCE` are no longer set (removed with
-  the static-export release). A leftover `GEODATA_DATA_SOURCE=db` would make the
-  build read the retired mirror.
+  the static-export release). A leftover `GEODATA_DATA_SOURCE=db` makes the
+  build read the retired mirror and compare it with the CSVs: the first build
+  can still pass, and the next CSV change, or Supabase pausing itself, then fails
+  every Vercel build while the *Deploy production* workflow stays green. On
+  release day confirm with `vercel env ls production` that both are gone, and
+  that the merge commit's deployment reaches READY.
 - **`NEXT_PUBLIC_SITE_URL`**: set to exactly `https://fiscal.ge` in Production.
   It owns Open Graph URLs, canonicals, `robots.txt`, and `sitemap.xml`
   (`apps/web/lib/siteUrl.ts`) independently of Vercel alias ordering. The value
@@ -432,23 +434,30 @@ On the Usage page, ISR Reads should stay about 0 in the following days.
 `vercel.json`, `api/`, or `lib/mcp/`). Give the branch Preview-scoped variables
 `MCP_ENABLED=true` and `MCP_RATE_LIMITER=memory`, push the branch, and on its
 Preview deployment confirm (Previews sit behind Vercel Authentication: sign in for
-the browser checks, and for `curl` and `scripts/smoke-mcp.ts` use a shareable
-link or a Protection Bypass token from the project's Deployment Protection
-settings):
+the browser checks; for `curl`, send a *Protection Bypass for Automation* token
+from the project's Deployment Protection settings as the
+`x-vercel-protection-bypass` header. `scripts/smoke-mcp.ts` takes no header and
+follows no redirect, so it cannot pass that protection):
 
 - the Vercel build log shows no errors for `api/mcp.ts`, and lists the function;
 - pages carry no `x-nextjs-prerender` header; an unknown address answers 404 with
   the not-found page;
-- a municipality code redirect and a legacy hub forward each answer 308 and keep
-  an added query string (`/en/explorer/wages?utm_source=x` →
-  `/en/explorer/labour?topic=wages&utm_source=x`);
+- a municipality code redirect, a legacy hub forward and an address with a
+  trailing slash each answer 308 and keep an added query string
+  (`/en/explorer/wages?utm_source=x` → `/en/explorer/labour?topic=wages&utm_source=x`);
 - the security, `Content-Security-Policy-Report-Only` and `X-Robots-Tag` headers
   are present where `lib/site/routing.ts` puts them (on pages, files and 404s;
   Vercel applies header rules after redirects, so a 308 carries none of them); `/_next/static/…` is
-  `immutable`; `/opengraph-image` is `image/png`;
+  `immutable`; `/opengraph-image` is `image/png`; `curl -sI` shows the content
+  types `seo.spec.ts` checks only against the local server: `/favicon.ico`
+  `image/x-icon`, `/llms.txt` `text/plain`, `/sitemap.xml` XML;
 - `/mcp` answers `initialize` **and a real `tools/call` that returns figures**
-  (`scripts/smoke-mcp.ts` against the Preview URL). A failure there blocks the
-  merge: an unreadable snapshot fails every call;
+  (for example `describe_coverage`), each a JSON-RPC `POST` with
+  `content-type: application/json`, `accept: application/json, text/event-stream`
+  and the bypass header. A `GET` proves nothing (it answers 405 even when every
+  call fails). A failure here blocks the merge: an unreadable snapshot or a
+  function that cannot load fails every call. After the release, run
+  `scripts/smoke-mcp.ts` against `https://fiscal.ge/mcp`;
 - Georgian and English pages open, client navigation works, and an Excel
   download succeeds.
 
@@ -572,7 +581,7 @@ free plan. Upgrading or enabling automatic upgrades needs explicit approval.
 #### Usage tally and which limit refused
 
 After each response, `handle` adds one to an anonymous daily tally in Upstash
-(`after()` from `next/server`, so it adds no latency; it never decides
+(`waitUntil()` from `@vercel/functions`, so it adds no latency; it never decides
 admission, a failed or slow write is dropped, and it gives up after 1.5 s). The
 key is `<production|preview>:mcp:stats:<YYYY-MM-DD>`, a hash whose field is
 `tool|outcome|errorCode|limit|clientClass`, counted with `HINCRBY` and given a
@@ -943,6 +952,11 @@ no budget data and require no migration when a code release is rolled back.
 
 
 ## Dataset release checks
+
+These per-dataset notes were written while releases imported the Supabase
+mirror. Since the 2026-11 static-export release there is no migration, import
+or database-mode build to run: read those steps as history, and keep the page,
+download, methodology and `/mcp` checks.
 
 ### National sectors release checks
 

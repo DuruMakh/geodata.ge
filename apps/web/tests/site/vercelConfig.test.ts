@@ -18,6 +18,11 @@ describe("vercel.json", () => {
     expect(config.redirects.every(rule => rule.permanent)).toBe(true);
   });
 
+  it("uses only literal redirect and rewrite sources, which scripts/serve-static.ts matches exactly", () => {
+    // A pattern source (`:path*`, `(.*)`) would work on Vercel but be skipped locally and in CI.
+    expect([...config.redirects, ...config.rewrites].filter(rule => /[:(*]/.test(rule.source))).toEqual([]);
+  });
+
   it("serves the static export with clean URLs and no trailing slash", () => {
     expect(config.framework).toBeNull();
     expect(config.buildCommand).toBe("npm run build");

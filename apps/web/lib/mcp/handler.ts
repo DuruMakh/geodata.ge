@@ -132,7 +132,7 @@ const SHARED_DAY_DENIAL: Denial = {
  *
  * A browser sends this before any POST carrying `content-type:
  * application/json`, so without it an origin approved in MCP_ALLOWED_ORIGINS
- * still could not reach the endpoint: Next's generated OPTIONS answers 204
+ * still could not reach the endpoint: a platform-generated OPTIONS answers 204
  * with an `Allow` header and no CORS headers at all, and the browser stops
  * there. Runs the same pause, host and origin checks as a real request - a
  * preflight is not a reason to skip them.
@@ -176,7 +176,7 @@ type RequestContext = Pick<ToolCallLog, "tool" | "dataVersion" | "limit" | "clie
  * Nothing thrown inside `serve` reaches the caller or the log.
  *
  * Without the catch below, an unexpected throw - an unreadable snapshot, a
- * transport fault - returns Next's default 500 instead of the bilingual
+ * transport fault - returns the platform's default 500 instead of the bilingual
  * envelope every other failure uses, emits no log record at all, and writes a
  * stack containing absolute bundle paths to the platform log. Sections 11.2 and
  * 11.5 forbid publishing both. The caught value is deliberately never inspected.
@@ -234,9 +234,11 @@ async function handle(request: Request): Promise<Response> {
  */
 function recordUsage(field: string): void {
   const day = new Date().toISOString().slice(0, 10);
-  waitUntil((async () => {
+  const write = (async () => {
     try { await counter().record(day, field); } catch { /* Best effort. */ }
-  })());
+  })();
+  // The write has started either way; a platform that cannot extend the function must not cost the answer.
+  try { waitUntil(write); } catch { /* Best effort. */ }
 }
 
 async function serve(request: Request, context: RequestContext): Promise<Response> {

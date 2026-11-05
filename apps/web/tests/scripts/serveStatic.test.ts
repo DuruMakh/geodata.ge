@@ -88,6 +88,25 @@ describe("serve-static", () => {
     expect(response.headers.get("location")).toBe("/explorer/trade");
   });
 
+  it("strips .html and /index before anything else, as Vercel's clean URLs do, with no header rules", async () => {
+    const page = await get("/explorer/trade.html?x=1");
+    expect(page.status).toBe(308);
+    expect(page.headers.get("location")).toBe("/explorer/trade?x=1");
+    expect(page.headers.get("x-frame-options")).toBeNull();
+    // A forwarded address keeps forwarding once its .html is gone.
+    expect((await get("/explorer/wages.html")).headers.get("location")).toBe("/explorer/wages");
+    expect((await get("/index")).headers.get("location")).toBe("/");
+    expect((await get("/explorer/index.html")).headers.get("location")).toBe("/explorer");
+  });
+
+  it("keeps every value of a repeated query key on a redirect", async () => {
+    expect((await get("/en/explorer/wages?a=1&a=2")).headers.get("location")).toBe("/en/explorer/labour?topic=wages&a=1&a=2");
+  });
+
+  it("matches header rules case-sensitively, as Vercel does", async () => {
+    expect((await get("/PAGE-DATA/x.json")).headers.get("x-robots-tag")).toBeNull();
+  });
+
   it("leaves the header rules off redirects, as Vercel's route order does", async () => {
     const response = await get("/explorer/wages");
 

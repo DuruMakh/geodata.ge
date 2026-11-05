@@ -8,8 +8,8 @@ import { runAsCli } from "../lib/runAsCli";
 import type { VercelConfig } from "./prepare-vercel-config";
 
 // `npm run start`: serves the static export in out/ following the vercel.json rules (close to Vercel, not identical), for the browser tests
-// (locally and in CI) and for looking at a build. In order: the trailing-slash redirect, the redirects, the /mcp
-// rewrite to its function, the files (clean URLs), then 404.html with status 404. Every matching header rule is
+// (locally and in CI) and for looking at a build. In order: the clean-URL redirect (`.html`, `/index`), the trailing-slash redirect, the redirects, the /mcp
+// rewrite to its function, the files (path, path.html, path/index.html), then 404.html with status 404. Every matching header rule is
 // added to every response that is not a redirect. (`next start` cannot serve a static export.)
 
 type McpHandler = (request: Request) => Promise<Response> | Response;
@@ -34,6 +34,9 @@ const CONTENT_TYPES: Record<string, string> = {
   ".zip": "application/zip",
   ".xlsx": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
   ".xls": "application/vnd.ms-excel",
+  ".doc": "application/msword",
+  ".docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  ".xsl": "application/xml; charset=utf-8",
 };
 
 function isFile(candidate: string): boolean {
@@ -43,12 +46,13 @@ function isFile(candidate: string): boolean {
 /** Query of `requested` appended to `destination`, keeping any query the destination already has. */
 function withQuery(destination: string, requested: URLSearchParams): string {
   const target = new URL(destination, "http://local");
-  for (const [key, value] of requested) if (!target.searchParams.has(key)) target.searchParams.append(key, value);
+  const own = new Set(target.searchParams.keys());
+  for (const [key, value] of requested) if (!own.has(key)) target.searchParams.append(key, value);
   return `${target.pathname}${target.search}`;
 }
 
 export function createStaticServer({ root, config, mcpHandler }: Options): http.Server {
-  const headerRules = config.headers.map(rule => ({ pattern: pathToRegexp(rule.source), headers: rule.headers }));
+  const headerRules = config.headers.map(rule => ({ pattern: pathToRegexp(rule.source, [], { sensitive: true }), headers: rule.headers }));
   const redirects = new Map(config.redirects.map(rule => [rule.source, rule.destination]));
   const rewrites = new Set(config.rewrites.map(rule => rule.source));
   const rootDir = path.resolve(root);
@@ -78,6 +82,9 @@ export function createStaticServer({ root, config, mcpHandler }: Options): http.
 
     // One leading slash only: `//host` in a Location header would send the browser to another site.
     const redirect = (location: string) => { response.writeHead(308, { location: location.replace(/^\/{2,}/, "/") }); response.end(); };
+    // Clean URLs come first on Vercel: any `.html` or `/index` address loses it, whether or not the file exists.
+    const clean = pathname.replace(/\/index(?:\.html)?$/, "").replace(/\.html$/, "");
+    if (clean !== pathname) return redirect(`${clean || "/"}${url.search}`);
     if (pathname.length > 1 && pathname.endsWith("/")) return redirect(`${pathname.replace(/\/+$/, "")}${url.search}`);
     const destination = redirects.get(pathname);
     if (destination !== undefined) return redirect(withQuery(destination, url.searchParams));
@@ -92,7 +99,6 @@ export function createStaticServer({ root, config, mcpHandler }: Options): http.
     try { decoded = decodeURIComponent(pathname); } catch { decoded = ""; }
     const base = path.resolve(rootDir, `.${decoded}`);
     const inside = decoded !== "" && (base === rootDir || base.startsWith(`${rootDir}${path.sep}`));
-    if (inside && decoded.endsWith(".html") && isFile(base)) return redirect(`${pathname.slice(0, -".html".length)}${url.search}`);
     const found = inside ? [base, `${base}.html`, path.join(base, "index.html")].find(isFile) : undefined;
     const file = found ?? path.join(rootDir, "404.html");
     const status = found ? 200 : 404;

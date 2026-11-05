@@ -24,8 +24,12 @@ const state = vi.hoisted(() => ({
 // Outside Vercel `waitUntil` does nothing; record each promise the handler
 // hands it, so a test can see the tally is kept alive past the reply.
 const waited = vi.hoisted(() => [] as Promise<unknown>[]);
+const platform = vi.hoisted(() => ({ waitUntilThrows: false }));
 vi.mock("@vercel/functions", () => ({
-  waitUntil: (promise: Promise<unknown>) => { waited.push(promise); },
+  waitUntil: (promise: Promise<unknown>) => {
+    if (platform.waitUntilThrows) throw new Error("no request context");
+    waited.push(promise);
+  },
 }));
 
 vi.mock("../../lib/mcp/limits", async (importOriginal) => {
@@ -69,6 +73,7 @@ beforeEach(() => {
   state.records.length = 0;
   state.record = undefined;
   waited.length = 0;
+  platform.waitUntilThrows = false;
   state.perKeyVerdict = "allow";
   state.perKeyDailyVerdict = "allow";
   state.dailyVerdict = "allow";
@@ -278,6 +283,15 @@ describe("the daily usage tally", () => {
     expect(waited).toHaveLength(1);
     await waited[0];
     expect(state.records).toEqual([{ day: TODAY, field: "initialize|ok|-|-|anthropic" }]);
+  });
+
+  it("answers the same when the platform cannot keep the tally alive", async () => {
+    const ok = await POST(post({ "x-vercel-forwarded-for": "160.79.104.9" }));
+    platform.waitUntilThrows = true;
+    const failing = await POST(post({ "x-vercel-forwarded-for": "160.79.104.9" }));
+
+    expect(failing.status).toBe(ok.status);
+    expect(await failing.text()).toBe(await ok.text());
   });
 
   it("answers the same when the tally fails", async () => {

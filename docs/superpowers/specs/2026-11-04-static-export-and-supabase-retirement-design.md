@@ -71,8 +71,8 @@ pause the Supabase project. Delete the Supabase project after about 30 quiet day
   - It exports `siteRedirects()` and `siteHeaders()`, built from the same sources as today:
     `MUNICIPALITY_ROUTES`, `LEGACY_TOPIC_FORWARDS` and the CSP string.
 - `scripts/prepare-vercel-config.ts` writes `apps/web/vercel.json` from that module. It follows
-  the repo's existing `prepare-* --check` pattern, and `--check` runs in `data:validate`, so a
-  stale file fails `npm run check`.
+  the repo's existing `prepare-* --check` pattern; `tests/site/vercelConfig.test.ts` compares the
+  file with the script's output, so a stale file fails `npm test` and `npm run check`.
 - The generated file holds:
   - `framework: null`, `buildCommand: "npm run build"` and `outputDirectory: "out"`. Setting
     these in the file means nobody changes Vercel dashboard settings, and the Preview tests
@@ -197,9 +197,11 @@ After release:
 ### 3.7 Rollback
 
 Vercel's Instant Rollback to the last pre-switch deployment restores the old site in a minute.
-That deployment is already built and does not read Supabase at request time. A code revert also
-works while the Supabase project is still alive, which is why the project is only paused after
-release 2.
+That deployment is already built and does not read Supabase at request time. Without the
+scheduled health check the free Supabase project pauses itself after about a week, so a code
+revert must keep the new `deploy-production.yml` (the old code builds from the CSVs when
+`GEODATA_DATA_SOURCE` is unset), or resume the project first: the old workflow migrates and
+imports before it deploys.
 
 ## 4. Reuse (AGENTS.md "Reuse first")
 

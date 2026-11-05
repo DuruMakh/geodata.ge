@@ -187,6 +187,8 @@ describe("/mcp route", () => {
     // file is an ES module whose extensionless imports Node cannot resolve, so every call fails on load.
     const ts = await import("typescript");
     const parsed = ts.getParsedCommandLineOfConfigFile("api/tsconfig.json", {}, { ...ts.sys, onUnRecoverableConfigFileDiagnostic: () => {} });
+    // A TypeScript major that rejects these settings fails here, not on the deployed function.
+    expect(parsed?.errors).toEqual([]);
     expect(parsed?.options.module).toBe(ts.ModuleKind.CommonJS);
     for (const file of ["api/mcp.ts", "lib/mcp/handler.ts"]) {
       const { outputText } = ts.transpileModule(ts.sys.readFile(file) ?? "", { compilerOptions: parsed?.options, fileName: file });

@@ -7,7 +7,7 @@
 - `npm run check` — lint + typecheck + unit tests + data validation + `i18n:check`. Run before claiming any work done.
 - `npm run test:browser` — Playwright e2e (local Edge; CI uses Chromium). Run for UI-affecting changes.
 - `npm run build` — production build: a static export to `apps/web/out/`, read from the CSVs in `data/imports` (no `.env` needed).
-- `npm run start` — serves `out/` the way Vercel does (`scripts/serve-static.ts`: `vercel.json` redirects and headers, `/mcp` routed to its handler).
+- `npm run start` — serves `out/` with the `vercel.json` rules (`scripts/serve-static.ts`: clean URLs, redirects, headers, `/mcp` routed to its handler). Close to Vercel, not identical: a hosting change is proven on a Vercel Preview (`docs/deployment.md`).
 - `npm run site:prepare-vercel-config` — regenerate `apps/web/vercel.json` after changing `lib/site/routing.ts`.
 - `npm run data:prepare-fact-query-snapshot` — rebuild the snapshot `/mcp` and the JSON publications answer from. Runs in `prebuild`; `--check` runs in `data:validate`.
 - `npm run data:check-fact-query-publications` — verify the published JSON files match the snapshot. `prebuild`'s `data:prepare-fact-query-publications` runs the same check on what it has just written.

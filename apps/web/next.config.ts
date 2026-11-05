@@ -7,6 +7,8 @@ const nextConfig: NextConfig = {
   output: "export",
   allowedDevOrigins: ["127.0.0.1"],
   poweredByHeader: false,
+  // A static site has no image optimizer; this keeps a future <Image> from shipping /_next/image addresses that 404.
+  images: { unoptimized: true },
   experimental: { globalNotFound: true },
   // CI's build job sets GEODATA_TYPECHECK_GATED=1: its checks job runs `npm run typecheck` on the same commit, and
   // CI must pass before a merge, so the build skips its own second TypeScript pass there. Everywhere else, local

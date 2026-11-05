@@ -70,10 +70,9 @@ jobs:
             exit 1
           fi
 
-  # The production deploy applies migrations and runs the parity-checked import
-  # against the live mirror; nothing else does. Rehearse both here on a throwaway
-  # database, so a schema that cannot hold the reviewed CSVs (a too-narrow decimal,
-  # a missing column) fails the pull request instead of the deploy.
+  # The database mirror is retired from releases (2026-11); its code stays until
+  # it is removed. Until then this keeps the migrations and the parity-checked
+  # import working on a throwaway database.
   mirror:
     name: Database mirror (disposable PostgreSQL)
     runs-on: ubuntu-latest
