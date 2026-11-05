@@ -1,4 +1,947 @@
 {
+  "framework": null,
+  "buildCommand": "npm run build",
+  "outputDirectory": "out",
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "redirects": [
+    {
+      "source": "/explorer/municipalities/04",
+      "destination": "/explorer/municipalities/tbilisi",
+      "permanent": true
+    },
+    {
+      "source": "/en/explorer/municipalities/04",
+      "destination": "/en/explorer/municipalities/tbilisi",
+      "permanent": true
+    },
+    {
+      "source": "/explorer/municipalities/06",
+      "destination": "/explorer/municipalities/batumi",
+      "permanent": true
+    },
+    {
+      "source": "/en/explorer/municipalities/06",
+      "destination": "/en/explorer/municipalities/batumi",
+      "permanent": true
+    },
+    {
+      "source": "/explorer/municipalities/07",
+      "destination": "/explorer/municipalities/kobuleti",
+      "permanent": true
+    },
+    {
+      "source": "/en/explorer/municipalities/07",
+      "destination": "/en/explorer/municipalities/kobuleti",
+      "permanent": true
+    },
+    {
+      "source": "/explorer/municipalities/08",
+      "destination": "/explorer/municipalities/khelvachauri",
+      "permanent": true
+    },
+    {
+      "source": "/en/explorer/municipalities/08",
+      "destination": "/en/explorer/municipalities/khelvachauri",
+      "permanent": true
+    },
+    {
+      "source": "/explorer/municipalities/09",
+      "destination": "/explorer/municipalities/keda",
+      "permanent": true
+    },
+    {
+      "source": "/en/explorer/municipalities/09",
+      "destination": "/en/explorer/municipalities/keda",
+      "permanent": true
+    },
+    {
+      "source": "/explorer/municipalities/10",
+      "destination": "/explorer/municipalities/shuakhevi",
+      "permanent": true
+    },
+    {
+      "source": "/en/explorer/municipalities/10",
+      "destination": "/en/explorer/municipalities/shuakhevi",
+      "permanent": true
+    },
+    {
+      "source": "/explorer/municipalities/11",
+      "destination": "/explorer/municipalities/khulo",
+      "permanent": true
+    },
+    {
+      "source": "/en/explorer/municipalities/11",
+      "destination": "/en/explorer/municipalities/khulo",
+      "permanent": true
+    },
+    {
+      "source": "/explorer/municipalities/12",
+      "destination": "/explorer/municipalities/akhmeta",
+      "permanent": true
+    },
+    {
+      "source": "/en/explorer/municipalities/12",
+      "destination": "/en/explorer/municipalities/akhmeta",
+      "permanent": true
+    },
+    {
+      "source": "/explorer/municipalities/13",
+      "destination": "/explorer/municipalities/gurjaani",
+      "permanent": true
+    },
+    {
+      "source": "/en/explorer/municipalities/13",
+      "destination": "/en/explorer/municipalities/gurjaani",
+      "permanent": true
+    },
+    {
+      "source": "/explorer/municipalities/14",
+      "destination": "/explorer/municipalities/dedoplistskaro",
+      "permanent": true
+    },
+    {
+      "source": "/en/explorer/municipalities/14",
+      "destination": "/en/explorer/municipalities/dedoplistskaro",
+      "permanent": true
+    },
+    {
+      "source": "/explorer/municipalities/15",
+      "destination": "/explorer/municipalities/telavi",
+      "permanent": true
+    },
+    {
+      "source": "/en/explorer/municipalities/15",
+      "destination": "/en/explorer/municipalities/telavi",
+      "permanent": true
+    },
+    {
+      "source": "/explorer/municipalities/16",
+      "destination": "/explorer/municipalities/lagodekhi",
+      "permanent": true
+    },
+    {
+      "source": "/en/explorer/municipalities/16",
+      "destination": "/en/explorer/municipalities/lagodekhi",
+      "permanent": true
+    },
+    {
+      "source": "/explorer/municipalities/17",
+      "destination": "/explorer/municipalities/sagarejo",
+      "permanent": true
+    },
+    {
+      "source": "/en/explorer/municipalities/17",
+      "destination": "/en/explorer/municipalities/sagarejo",
+      "permanent": true
+    },
+    {
+      "source": "/explorer/municipalities/18",
+      "destination": "/explorer/municipalities/sighnaghi",
+      "permanent": true
+    },
+    {
+      "source": "/en/explorer/municipalities/18",
+      "destination": "/en/explorer/municipalities/sighnaghi",
+      "permanent": true
+    },
+    {
+      "source": "/explorer/municipalities/19",
+      "destination": "/explorer/municipalities/kvareli",
+      "permanent": true
+    },
+    {
+      "source": "/en/explorer/municipalities/19",
+      "destination": "/en/explorer/municipalities/kvareli",
+      "permanent": true
+    },
+    {
+      "source": "/explorer/municipalities/20",
+      "destination": "/explorer/municipalities/kutaisi",
+      "permanent": true
+    },
+    {
+      "source": "/en/explorer/municipalities/20",
+      "destination": "/en/explorer/municipalities/kutaisi",
+      "permanent": true
+    },
+    {
+      "source": "/explorer/municipalities/21",
+      "destination": "/explorer/municipalities/chiatura",
+      "permanent": true
+    },
+    {
+      "source": "/en/explorer/municipalities/21",
+      "destination": "/en/explorer/municipalities/chiatura",
+      "permanent": true
+    },
+    {
+      "source": "/explorer/municipalities/22",
+      "destination": "/explorer/municipalities/tkibuli",
+      "permanent": true
+    },
+    {
+      "source": "/en/explorer/municipalities/22",
+      "destination": "/en/explorer/municipalities/tkibuli",
+      "permanent": true
+    },
+    {
+      "source": "/explorer/municipalities/23",
+      "destination": "/explorer/municipalities/tskaltubo",
+      "permanent": true
+    },
+    {
+      "source": "/en/explorer/municipalities/23",
+      "destination": "/en/explorer/municipalities/tskaltubo",
+      "permanent": true
+    },
+    {
+      "source": "/explorer/municipalities/24",
+      "destination": "/explorer/municipalities/baghdati",
+      "permanent": true
+    },
+    {
+      "source": "/en/explorer/municipalities/24",
+      "destination": "/en/explorer/municipalities/baghdati",
+      "permanent": true
+    },
+    {
+      "source": "/explorer/municipalities/25",
+      "destination": "/explorer/municipalities/vani",
+      "permanent": true
+    },
+    {
+      "source": "/en/explorer/municipalities/25",
+      "destination": "/en/explorer/municipalities/vani",
+      "permanent": true
+    },
+    {
+      "source": "/explorer/municipalities/26",
+      "destination": "/explorer/municipalities/zestafoni",
+      "permanent": true
+    },
+    {
+      "source": "/en/explorer/municipalities/26",
+      "destination": "/en/explorer/municipalities/zestafoni",
+      "permanent": true
+    },
+    {
+      "source": "/explorer/municipalities/27",
+      "destination": "/explorer/municipalities/terjola",
+      "permanent": true
+    },
+    {
+      "source": "/en/explorer/municipalities/27",
+      "destination": "/en/explorer/municipalities/terjola",
+      "permanent": true
+    },
+    {
+      "source": "/explorer/municipalities/28",
+      "destination": "/explorer/municipalities/samtredia",
+      "permanent": true
+    },
+    {
+      "source": "/en/explorer/municipalities/28",
+      "destination": "/en/explorer/municipalities/samtredia",
+      "permanent": true
+    },
+    {
+      "source": "/explorer/municipalities/29",
+      "destination": "/explorer/municipalities/sachkhere",
+      "permanent": true
+    },
+    {
+      "source": "/en/explorer/municipalities/29",
+      "destination": "/en/explorer/municipalities/sachkhere",
+      "permanent": true
+    },
+    {
+      "source": "/explorer/municipalities/30",
+      "destination": "/explorer/municipalities/kharagauli",
+      "permanent": true
+    },
+    {
+      "source": "/en/explorer/municipalities/30",
+      "destination": "/en/explorer/municipalities/kharagauli",
+      "permanent": true
+    },
+    {
+      "source": "/explorer/municipalities/31",
+      "destination": "/explorer/municipalities/khoni",
+      "permanent": true
+    },
+    {
+      "source": "/en/explorer/municipalities/31",
+      "destination": "/en/explorer/municipalities/khoni",
+      "permanent": true
+    },
+    {
+      "source": "/explorer/municipalities/32",
+      "destination": "/explorer/municipalities/poti",
+      "permanent": true
+    },
+    {
+      "source": "/en/explorer/municipalities/32",
+      "destination": "/en/explorer/municipalities/poti",
+      "permanent": true
+    },
+    {
+      "source": "/explorer/municipalities/33",
+      "destination": "/explorer/municipalities/zugdidi",
+      "permanent": true
+    },
+    {
+      "source": "/en/explorer/municipalities/33",
+      "destination": "/en/explorer/municipalities/zugdidi",
+      "permanent": true
+    },
+    {
+      "source": "/explorer/municipalities/34",
+      "destination": "/explorer/municipalities/abasha",
+      "permanent": true
+    },
+    {
+      "source": "/en/explorer/municipalities/34",
+      "destination": "/en/explorer/municipalities/abasha",
+      "permanent": true
+    },
+    {
+      "source": "/explorer/municipalities/35",
+      "destination": "/explorer/municipalities/martvili",
+      "permanent": true
+    },
+    {
+      "source": "/en/explorer/municipalities/35",
+      "destination": "/en/explorer/municipalities/martvili",
+      "permanent": true
+    },
+    {
+      "source": "/explorer/municipalities/36",
+      "destination": "/explorer/municipalities/mestia",
+      "permanent": true
+    },
+    {
+      "source": "/en/explorer/municipalities/36",
+      "destination": "/en/explorer/municipalities/mestia",
+      "permanent": true
+    },
+    {
+      "source": "/explorer/municipalities/37",
+      "destination": "/explorer/municipalities/senaki",
+      "permanent": true
+    },
+    {
+      "source": "/en/explorer/municipalities/37",
+      "destination": "/en/explorer/municipalities/senaki",
+      "permanent": true
+    },
+    {
+      "source": "/explorer/municipalities/38",
+      "destination": "/explorer/municipalities/chkhorotsku",
+      "permanent": true
+    },
+    {
+      "source": "/en/explorer/municipalities/38",
+      "destination": "/en/explorer/municipalities/chkhorotsku",
+      "permanent": true
+    },
+    {
+      "source": "/explorer/municipalities/39",
+      "destination": "/explorer/municipalities/tsalenjikha",
+      "permanent": true
+    },
+    {
+      "source": "/en/explorer/municipalities/39",
+      "destination": "/en/explorer/municipalities/tsalenjikha",
+      "permanent": true
+    },
+    {
+      "source": "/explorer/municipalities/40",
+      "destination": "/explorer/municipalities/khobi",
+      "permanent": true
+    },
+    {
+      "source": "/en/explorer/municipalities/40",
+      "destination": "/en/explorer/municipalities/khobi",
+      "permanent": true
+    },
+    {
+      "source": "/explorer/municipalities/41",
+      "destination": "/explorer/municipalities/gori",
+      "permanent": true
+    },
+    {
+      "source": "/en/explorer/municipalities/41",
+      "destination": "/en/explorer/municipalities/gori",
+      "permanent": true
+    },
+    {
+      "source": "/explorer/municipalities/44",
+      "destination": "/explorer/municipalities/kareli",
+      "permanent": true
+    },
+    {
+      "source": "/en/explorer/municipalities/44",
+      "destination": "/en/explorer/municipalities/kareli",
+      "permanent": true
+    },
+    {
+      "source": "/explorer/municipalities/45",
+      "destination": "/explorer/municipalities/kaspi",
+      "permanent": true
+    },
+    {
+      "source": "/en/explorer/municipalities/45",
+      "destination": "/en/explorer/municipalities/kaspi",
+      "permanent": true
+    },
+    {
+      "source": "/explorer/municipalities/47",
+      "destination": "/explorer/municipalities/khashuri",
+      "permanent": true
+    },
+    {
+      "source": "/en/explorer/municipalities/47",
+      "destination": "/en/explorer/municipalities/khashuri",
+      "permanent": true
+    },
+    {
+      "source": "/explorer/municipalities/48",
+      "destination": "/explorer/municipalities/rustavi",
+      "permanent": true
+    },
+    {
+      "source": "/en/explorer/municipalities/48",
+      "destination": "/en/explorer/municipalities/rustavi",
+      "permanent": true
+    },
+    {
+      "source": "/explorer/municipalities/49",
+      "destination": "/explorer/municipalities/bolnisi",
+      "permanent": true
+    },
+    {
+      "source": "/en/explorer/municipalities/49",
+      "destination": "/en/explorer/municipalities/bolnisi",
+      "permanent": true
+    },
+    {
+      "source": "/explorer/municipalities/50",
+      "destination": "/explorer/municipalities/gardabani",
+      "permanent": true
+    },
+    {
+      "source": "/en/explorer/municipalities/50",
+      "destination": "/en/explorer/municipalities/gardabani",
+      "permanent": true
+    },
+    {
+      "source": "/explorer/municipalities/51",
+      "destination": "/explorer/municipalities/dmanisi",
+      "permanent": true
+    },
+    {
+      "source": "/en/explorer/municipalities/51",
+      "destination": "/en/explorer/municipalities/dmanisi",
+      "permanent": true
+    },
+    {
+      "source": "/explorer/municipalities/52",
+      "destination": "/explorer/municipalities/tetritskaro",
+      "permanent": true
+    },
+    {
+      "source": "/en/explorer/municipalities/52",
+      "destination": "/en/explorer/municipalities/tetritskaro",
+      "permanent": true
+    },
+    {
+      "source": "/explorer/municipalities/53",
+      "destination": "/explorer/municipalities/marneuli",
+      "permanent": true
+    },
+    {
+      "source": "/en/explorer/municipalities/53",
+      "destination": "/en/explorer/municipalities/marneuli",
+      "permanent": true
+    },
+    {
+      "source": "/explorer/municipalities/54",
+      "destination": "/explorer/municipalities/tsalka",
+      "permanent": true
+    },
+    {
+      "source": "/en/explorer/municipalities/54",
+      "destination": "/en/explorer/municipalities/tsalka",
+      "permanent": true
+    },
+    {
+      "source": "/explorer/municipalities/55",
+      "destination": "/explorer/municipalities/lanchkhuti",
+      "permanent": true
+    },
+    {
+      "source": "/en/explorer/municipalities/55",
+      "destination": "/en/explorer/municipalities/lanchkhuti",
+      "permanent": true
+    },
+    {
+      "source": "/explorer/municipalities/56",
+      "destination": "/explorer/municipalities/ozurgeti",
+      "permanent": true
+    },
+    {
+      "source": "/en/explorer/municipalities/56",
+      "destination": "/en/explorer/municipalities/ozurgeti",
+      "permanent": true
+    },
+    {
+      "source": "/explorer/municipalities/57",
+      "destination": "/explorer/municipalities/chokhatauri",
+      "permanent": true
+    },
+    {
+      "source": "/en/explorer/municipalities/57",
+      "destination": "/en/explorer/municipalities/chokhatauri",
+      "permanent": true
+    },
+    {
+      "source": "/explorer/municipalities/58",
+      "destination": "/explorer/municipalities/borjomi",
+      "permanent": true
+    },
+    {
+      "source": "/en/explorer/municipalities/58",
+      "destination": "/en/explorer/municipalities/borjomi",
+      "permanent": true
+    },
+    {
+      "source": "/explorer/municipalities/59",
+      "destination": "/explorer/municipalities/adigeni",
+      "permanent": true
+    },
+    {
+      "source": "/en/explorer/municipalities/59",
+      "destination": "/en/explorer/municipalities/adigeni",
+      "permanent": true
+    },
+    {
+      "source": "/explorer/municipalities/60",
+      "destination": "/explorer/municipalities/aspindza",
+      "permanent": true
+    },
+    {
+      "source": "/en/explorer/municipalities/60",
+      "destination": "/en/explorer/municipalities/aspindza",
+      "permanent": true
+    },
+    {
+      "source": "/explorer/municipalities/61",
+      "destination": "/explorer/municipalities/akhalkalaki",
+      "permanent": true
+    },
+    {
+      "source": "/en/explorer/municipalities/61",
+      "destination": "/en/explorer/municipalities/akhalkalaki",
+      "permanent": true
+    },
+    {
+      "source": "/explorer/municipalities/62",
+      "destination": "/explorer/municipalities/akhaltsikhe",
+      "permanent": true
+    },
+    {
+      "source": "/en/explorer/municipalities/62",
+      "destination": "/en/explorer/municipalities/akhaltsikhe",
+      "permanent": true
+    },
+    {
+      "source": "/explorer/municipalities/63",
+      "destination": "/explorer/municipalities/ninotsminda",
+      "permanent": true
+    },
+    {
+      "source": "/en/explorer/municipalities/63",
+      "destination": "/en/explorer/municipalities/ninotsminda",
+      "permanent": true
+    },
+    {
+      "source": "/explorer/municipalities/65",
+      "destination": "/explorer/municipalities/dusheti",
+      "permanent": true
+    },
+    {
+      "source": "/en/explorer/municipalities/65",
+      "destination": "/en/explorer/municipalities/dusheti",
+      "permanent": true
+    },
+    {
+      "source": "/explorer/municipalities/66",
+      "destination": "/explorer/municipalities/tianeti",
+      "permanent": true
+    },
+    {
+      "source": "/en/explorer/municipalities/66",
+      "destination": "/en/explorer/municipalities/tianeti",
+      "permanent": true
+    },
+    {
+      "source": "/explorer/municipalities/67",
+      "destination": "/explorer/municipalities/mtskheta",
+      "permanent": true
+    },
+    {
+      "source": "/en/explorer/municipalities/67",
+      "destination": "/en/explorer/municipalities/mtskheta",
+      "permanent": true
+    },
+    {
+      "source": "/explorer/municipalities/68",
+      "destination": "/explorer/municipalities/kazbegi",
+      "permanent": true
+    },
+    {
+      "source": "/en/explorer/municipalities/68",
+      "destination": "/en/explorer/municipalities/kazbegi",
+      "permanent": true
+    },
+    {
+      "source": "/explorer/municipalities/69",
+      "destination": "/explorer/municipalities/ambrolauri",
+      "permanent": true
+    },
+    {
+      "source": "/en/explorer/municipalities/69",
+      "destination": "/en/explorer/municipalities/ambrolauri",
+      "permanent": true
+    },
+    {
+      "source": "/explorer/municipalities/70",
+      "destination": "/explorer/municipalities/lentekhi",
+      "permanent": true
+    },
+    {
+      "source": "/en/explorer/municipalities/70",
+      "destination": "/en/explorer/municipalities/lentekhi",
+      "permanent": true
+    },
+    {
+      "source": "/explorer/municipalities/71",
+      "destination": "/explorer/municipalities/oni",
+      "permanent": true
+    },
+    {
+      "source": "/en/explorer/municipalities/71",
+      "destination": "/en/explorer/municipalities/oni",
+      "permanent": true
+    },
+    {
+      "source": "/explorer/municipalities/72",
+      "destination": "/explorer/municipalities/tsageri",
+      "permanent": true
+    },
+    {
+      "source": "/en/explorer/municipalities/72",
+      "destination": "/en/explorer/municipalities/tsageri",
+      "permanent": true
+    },
+    {
+      "source": "/explorer/poverty",
+      "destination": "/explorer/living?topic=living-standards",
+      "permanent": true
+    },
+    {
+      "source": "/en/explorer/poverty",
+      "destination": "/en/explorer/living?topic=living-standards",
+      "permanent": true
+    },
+    {
+      "source": "/explorer/poverty/rates",
+      "destination": "/explorer/living-standards/poverty",
+      "permanent": true
+    },
+    {
+      "source": "/en/explorer/poverty/rates",
+      "destination": "/en/explorer/living-standards/poverty",
+      "permanent": true
+    },
+    {
+      "source": "/explorer/poverty/inequality",
+      "destination": "/explorer/living-standards/inequality",
+      "permanent": true
+    },
+    {
+      "source": "/en/explorer/poverty/inequality",
+      "destination": "/en/explorer/living-standards/inequality",
+      "permanent": true
+    },
+    {
+      "source": "/explorer/business",
+      "destination": "/explorer/economy?topic=business",
+      "permanent": true
+    },
+    {
+      "source": "/en/explorer/business",
+      "destination": "/en/explorer/economy?topic=business",
+      "permanent": true
+    },
+    {
+      "source": "/explorer/housing",
+      "destination": "/explorer/economy?topic=housing",
+      "permanent": true
+    },
+    {
+      "source": "/en/explorer/housing",
+      "destination": "/en/explorer/economy?topic=housing",
+      "permanent": true
+    },
+    {
+      "source": "/explorer/inflation",
+      "destination": "/explorer/prices?topic=inflation",
+      "permanent": true
+    },
+    {
+      "source": "/en/explorer/inflation",
+      "destination": "/en/explorer/prices?topic=inflation",
+      "permanent": true
+    },
+    {
+      "source": "/explorer/money",
+      "destination": "/explorer/prices?topic=money",
+      "permanent": true
+    },
+    {
+      "source": "/en/explorer/money",
+      "destination": "/en/explorer/prices?topic=money",
+      "permanent": true
+    },
+    {
+      "source": "/explorer/unemployment",
+      "destination": "/explorer/labour?topic=unemployment",
+      "permanent": true
+    },
+    {
+      "source": "/en/explorer/unemployment",
+      "destination": "/en/explorer/labour?topic=unemployment",
+      "permanent": true
+    },
+    {
+      "source": "/explorer/wages",
+      "destination": "/explorer/labour?topic=wages",
+      "permanent": true
+    },
+    {
+      "source": "/en/explorer/wages",
+      "destination": "/en/explorer/labour?topic=wages",
+      "permanent": true
+    },
+    {
+      "source": "/explorer/living-standards",
+      "destination": "/explorer/living?topic=living-standards",
+      "permanent": true
+    },
+    {
+      "source": "/en/explorer/living-standards",
+      "destination": "/en/explorer/living?topic=living-standards",
+      "permanent": true
+    },
+    {
+      "source": "/explorer/health",
+      "destination": "/explorer/living?topic=health",
+      "permanent": true
+    },
+    {
+      "source": "/en/explorer/health",
+      "destination": "/en/explorer/living?topic=health",
+      "permanent": true
+    },
+    {
+      "source": "/explorer/education",
+      "destination": "/explorer/society?topic=education",
+      "permanent": true
+    },
+    {
+      "source": "/en/explorer/education",
+      "destination": "/en/explorer/society?topic=education",
+      "permanent": true
+    },
+    {
+      "source": "/explorer/science-culture",
+      "destination": "/explorer/society?topic=science-culture",
+      "permanent": true
+    },
+    {
+      "source": "/en/explorer/science-culture",
+      "destination": "/en/explorer/society?topic=science-culture",
+      "permanent": true
+    },
+    {
+      "source": "/explorer/crime",
+      "destination": "/explorer/society?topic=crime",
+      "permanent": true
+    },
+    {
+      "source": "/en/explorer/crime",
+      "destination": "/en/explorer/society?topic=crime",
+      "permanent": true
+    },
+    {
+      "source": "/explorer/internet",
+      "destination": "/explorer/society?topic=internet",
+      "permanent": true
+    },
+    {
+      "source": "/en/explorer/internet",
+      "destination": "/en/explorer/society?topic=internet",
+      "permanent": true
+    },
+    {
+      "source": "/explorer/trade",
+      "destination": "/explorer/external?topic=trade",
+      "permanent": true
+    },
+    {
+      "source": "/en/explorer/trade",
+      "destination": "/en/explorer/external?topic=trade",
+      "permanent": true
+    },
+    {
+      "source": "/explorer/energy-food",
+      "destination": "/explorer/society?topic=energy-food",
+      "permanent": true
+    },
+    {
+      "source": "/en/explorer/energy-food",
+      "destination": "/en/explorer/society?topic=energy-food",
+      "permanent": true
+    },
+    {
+      "source": "/explorer/environment",
+      "destination": "/explorer/society?topic=environment",
+      "permanent": true
+    },
+    {
+      "source": "/en/explorer/environment",
+      "destination": "/en/explorer/society?topic=environment",
+      "permanent": true
+    },
+    {
+      "source": "/explorer/transport",
+      "destination": "/explorer/society?topic=transport",
+      "permanent": true
+    },
+    {
+      "source": "/en/explorer/transport",
+      "destination": "/en/explorer/society?topic=transport",
+      "permanent": true
+    }
+  ],
+  "headers": [
+    {
+      "source": "/downloads/methodology/:dataset/files/:path*",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, follow"
+        }
+      ]
+    },
+    {
+      "source": "/downloads/methodology/:dataset/files/:path((?!.*\\.pdf$).*)",
+      "headers": [
+        {
+          "key": "Content-Security-Policy",
+          "value": "sandbox; default-src 'none'"
+        }
+      ]
+    },
+    {
+      "source": "/page-data/:file*",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        },
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex"
+        }
+      ]
+    },
+    {
+      "source": "/explorer-places.:locale(ka|en).json",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex"
+        }
+      ]
+    },
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        },
+        {
+          "key": "Permissions-Policy",
+          "value": "camera=(), microphone=(), geolocation=()"
+        },
+        {
+          "key": "Content-Security-Policy-Report-Only",
+          "value": "default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://*.clarity.ms https://c.bing.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://*.google-analytics.com https://*.googletagmanager.com https://*.clarity.ms https://c.bing.com; font-src 'self'; connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://*.clarity.ms https://c.bing.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
+        }
+      ]
+    },
+    {
+      "source": "/_next/static/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    },
+    {
+      "source": "/opengraph-image",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "image/png"
+        }
+      ]
+    },
+    {
+      "source": "/en/opengraph-image",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "image/png"
+        }
+      ]
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/mcp",
+      "destination": "/api/mcp"
+    }
+  ],
+  "functions": {
+    "api/mcp.ts": {
+      "maxDuration": 10,
+      "includeFiles": "lib/factQuery/generated/snapshot.json"
+    }
+  },
   "git": {
     "deploymentEnabled": {
       "main": false

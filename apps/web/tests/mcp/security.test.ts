@@ -12,7 +12,7 @@ vi.mock("../../lib/mcp/tools", async importOriginal => ({
   ...await importOriginal<typeof import("../../lib/mcp/tools")>(),
   createMcpServer: untouched.server,
 }));
-import { GET, DELETE } from "../../app/mcp/route";
+import { GET, DELETE } from "../../lib/mcp/handler";
 
 const ENDPOINT = "https://fiscal.ge/mcp";
 const original = { ...process.env };

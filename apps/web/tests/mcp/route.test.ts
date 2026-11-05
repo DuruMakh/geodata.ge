@@ -1,5 +1,5 @@
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
-import { POST, OPTIONS, GET, DELETE } from "../../app/mcp/route";
+import { POST, OPTIONS, GET, DELETE } from "../../lib/mcp/handler";
 import { LIMITS } from "../../lib/mcp/limits";
 
 const ENDPOINT = "https://fiscal.ge/mcp";
@@ -171,12 +171,30 @@ describe("/mcp route", () => {
     expect(DELETE(new Request(ENDPOINT, { method: "DELETE", headers: { host: "fiscal.ge" } })).status).toBe(405);
   });
 
-  it("declares the runtime and duration the deployment needs", async () => {
-    const segment = await import("../../app/mcp/route");
+  it("is served by the api/ function at /mcp with a 10 s ceiling", async () => {
+    const { readFile } = await import("node:fs/promises");
+    const config = JSON.parse(await readFile("vercel.json", "utf8"));
+    const api = await import("../../api/mcp");
 
-    expect(segment.runtime).toBe("nodejs");
-    expect(segment.dynamic).toBe("force-dynamic");
-    expect(segment.maxDuration).toBe(10);
+    expect(config.rewrites).toContainEqual({ source: "/mcp", destination: "/api/mcp" });
+    expect(config.functions["api/mcp.ts"].maxDuration).toBe(10);
+    expect([api.POST, api.OPTIONS, api.GET, api.DELETE]).toEqual([POST, OPTIONS, GET, DELETE]);
+  });
+
+  it("is compiled to CommonJS for the function, whatever the app's module setting", async () => {
+    // Vercel's Node builder compiles api/ and every file it imports with the tsconfig nearest api/mcp.ts,
+    // and does not convert compiled TypeScript to CommonJS. With the app's `module: esnext` the deployed
+    // file is an ES module whose extensionless imports Node cannot resolve, so every call fails on load.
+    const ts = await import("typescript");
+    const parsed = ts.getParsedCommandLineOfConfigFile("api/tsconfig.json", {}, { ...ts.sys, onUnRecoverableConfigFileDiagnostic: () => {} });
+    // A TypeScript major that rejects these settings fails here, not on the deployed function.
+    expect(parsed?.errors).toEqual([]);
+    expect(parsed?.options.module).toBe(ts.ModuleKind.CommonJS);
+    for (const file of ["api/mcp.ts", "lib/mcp/handler.ts"]) {
+      const { outputText } = ts.transpileModule(ts.sys.readFile(file) ?? "", { compilerOptions: parsed?.options, fileName: file });
+      expect(outputText).not.toMatch(/^\s*(export|import)\s/m);
+      expect(outputText).toContain("require(");
+    }
   });
 });
 
@@ -231,7 +249,7 @@ describe("/mcp guards", () => {
     process.env.MCP_RATE_LIMITER = "";
     vi.resetModules();
     try {
-      const { POST: freshPost } = await import("../../app/mcp/route");
+      const { POST: freshPost } = await import("../../lib/mcp/handler");
       const response = await freshPost(post(initialize));
 
       expect(response.status).toBe(503);
@@ -250,7 +268,7 @@ describe("/mcp guards", () => {
     vi.useFakeTimers({ toFake: ["Date"] });
     vi.setSystemTime(new Date("2026-10-12T06:00:00Z"));
     try {
-      const { POST: freshPost } = await import("../../app/mcp/route");
+      const { POST: freshPost } = await import("../../lib/mcp/handler");
       const from = (address: string, body: unknown = initialize) => post(body, { "x-vercel-forwarded-for": address });
 
       // Every request counts, including one the protocol layer then rejects.

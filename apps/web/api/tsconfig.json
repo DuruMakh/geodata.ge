@@ -1,0 +1,6 @@
+{
+  // Vercel's Node builder compiles api/ and everything it imports with this file. CommonJS output lets
+  // Node load the compiled function; the app's own `module: esnext` would not (tests/mcp/route.test.ts).
+  "extends": "../tsconfig.json",
+  "compilerOptions": { "module": "commonjs", "moduleResolution": "node10" }
+}

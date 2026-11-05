@@ -445,9 +445,8 @@ Frontend and backend:
 Data serving (current):
 
 - Reviewed CSV files under `data/imports/` remain the canonical human-reviewed source of truth.
-- Supabase Postgres (via Prisma 7) is the canonical serving store, populated from those CSVs by an idempotent import (`npm run data:import`) that proves exact parity (row counts and GEL totals) on every run.
-- Pages are still rendered at build time (`GEODATA_DATA_SOURCE=db` reads the database during the build); the deployed app stays fully static, so database downtime never affects visitors.
-- `GEODATA_DATA_SOURCE=csv` (the default when unset) builds directly from the CSVs — the documented fallback, guaranteed identical by the import parity check. See `docs/data-methodology/database-import.md`.
+- Every build reads those CSVs directly and writes the whole site as a static export (plain files); `/mcp` is the one function.
+- The Supabase Postgres mirror (2026-07 to 2026-11) is retired: it never changed a published figure, and keeping it cost a release step and a weekly check. See `docs/data-methodology/database-import.md`.
 
 UI:
 

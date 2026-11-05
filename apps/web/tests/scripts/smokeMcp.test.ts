@@ -1,5 +1,5 @@
 import { afterAll, beforeAll, expect, it, vi } from "vitest";
-import { POST, GET, DELETE } from "../../app/mcp/route";
+import { POST, GET, DELETE } from "../../lib/mcp/handler";
 import { loadPackagedSnapshot } from "../../lib/mcp/snapshot";
 import { httpBridge } from "../mcp/httpBridge";
 import type { SmokeReport } from "../../scripts/smoke-mcp";

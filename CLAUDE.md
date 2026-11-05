@@ -6,8 +6,9 @@
 
 - `npm run check` — lint + typecheck + unit tests + data validation + `i18n:check`. Run before claiming any work done.
 - `npm run test:browser` — Playwright e2e (local Edge; CI uses Chromium). Run for UI-affecting changes.
-- `npm run build` — production build (static; reads CSVs from `data/imports` by default, no `.env` needed; `GEODATA_DATA_SOURCE=db` builds from the Supabase mirror instead).
-- `npm run data:import` — parity-checked CSV→Supabase import (needs `apps/web/.env`; see `docs/data-methodology/database-import.md`).
+- `npm run build` — production build: a static export to `apps/web/out/`, read from the CSVs in `data/imports` (no `.env` needed).
+- `npm run start` — serves `out/` with the `vercel.json` rules (`scripts/serve-static.ts`: clean URLs, redirects, headers, `/mcp` routed to its handler). Close to Vercel, not identical: a hosting change is proven on a Vercel Preview (`docs/deployment.md`).
+- `npm run site:prepare-vercel-config` — regenerate `apps/web/vercel.json` after changing `lib/site/routing.ts`.
 - `npm run data:prepare-fact-query-snapshot` — rebuild the snapshot `/mcp` and the JSON publications answer from. Runs in `prebuild`; `--check` runs in `data:validate`.
 - `npm run data:check-fact-query-publications` — verify the published JSON files match the snapshot. `prebuild`'s `data:prepare-fact-query-publications` runs the same check on what it has just written.
 
@@ -60,9 +61,9 @@ CI=1 NEXT_PUBLIC_SITE_URL=https://fiscal.ge PLAYWRIGHT_BASE_URL=http://localhost
 A Linux cloud session has no Edge, so `CI=1` (bundled Chromium) is required there, not
 optional. `CI=1` also turns on one retry, so treat a test the summary calls flaky as a
 failure to investigate. Start the server in its own process group in the background, note
-the group id, and stop the whole group with it when done (`npm run start` runs `next start`,
-which runs `next-server`; `pkill -f next-server` run from a shell matches that shell's own
-command line and kills it):
+the group id, and stop the whole group with it when done (`npm run start` runs `tsx`, which
+runs node; a `pkill -f` pattern run from a shell matches that shell's own command line and
+kills it):
 
 ```
 cd apps/web && NEXT_PUBLIC_SITE_URL=https://fiscal.ge npm run build && (setsid nohup npm run start -- --port 3100 > /tmp/start-3100.log 2>&1 < /dev/null & echo $! > /tmp/start-3100.pgid)
@@ -74,14 +75,14 @@ kill -- -"$(cat /tmp/start-3100.pgid)"
 into the static HTML at build time. Without it on the test run ~10 `seo.spec.ts` assertions
 fail; without it on the build ~140 URL assertions across seo, bilingual-seo, connect and
 municipal specs fail with `http://localhost:3000` — none of it related to your change. Stop
-the server before rebuilding: a running `next start` corrupts the `.next` it is serving.
+the server before rebuilding: the build replaces the `out/` it is serving.
 
 ## Definition of done
 
 1. `npm run check` and `npm run build` pass locally.
 2. UI changes: `npm run test:browser` passes.
 3. Data changes: the matching methodology doc under `docs/data-methodology/` is updated in the same change.
-4. Query-service changes (`lib/factQuery/`, `lib/mcp/`, `app/mcp/`): the reference fixture (`npx vitest run tests/factQuery/reference.test.ts`) passes. A disagreement there is a stop condition — report it rather than editing the expectation.
+4. Query-service changes (`lib/factQuery/`, `lib/mcp/`, `api/mcp.ts`): the reference fixture (`npx vitest run tests/factQuery/reference.test.ts`) passes. A disagreement there is a stop condition — report it rather than editing the expectation.
 5. Durable project changes update their canonical owner: scope in `Project_Definition.md`, visuals in `DESIGN.md`, data/deployment behavior in the relevant methodology or runbook, and `AGENTS.md` only for always-relevant operational rules.
 6. CI (`.github/workflows/ci.yml`) must be green before a PR merges.
 

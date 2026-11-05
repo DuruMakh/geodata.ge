@@ -1,19 +1,12 @@
 name: Deploy production
 
-# The single road to production (spec: docs/superpowers/specs/
-# 2026-07-28-database-production-readiness-design.md). Vercel auto-deploy for
-# main is disabled in apps/web/vercel.json, so production only updates when
-# this workflow succeeds: CI green on main -> converge the Supabase mirror to
-# the checkout (migrations + parity-checked import, unconditionally — the
-# import is idempotent) -> run the db-mode build here, which re-verifies the
-# mirror row-by-row over the pooled connection -> POST the Vercel deploy hook,
-# whose own build repeats that verification. Any failure leaves production
-# serving its previous deploy.
-#
-# The build gate is deliberately AFTER the import: it reads the mirror and
-# asserts it matches this checkout's CSVs, so it can only pass once the mirror
-# has been converged. The import is transactional and idempotent, so a build
-# failure here leaves the mirror correct-and-converged, not half-written.
+# The single road to production. Vercel auto-deploy for main is disabled in
+# apps/web/vercel.json, so production only updates when this workflow succeeds:
+# CI green on main (its build job builds the same static export) -> POST the
+# Vercel deploy hook, and Vercel builds latest main from the reviewed CSVs.
+# Until 2026-11 this workflow also migrated, imported and built from a Supabase
+# mirror; that mirror is retired (spec docs/superpowers/specs/
+# 2026-11-04-static-export-and-supabase-retirement-design.md).
 
 on:
   workflow_run:
@@ -29,67 +22,25 @@ concurrency:
   group: production-deploy
   cancel-in-progress: false
 
-defaults:
-  run:
-    working-directory: apps/web
-
 jobs:
-  import-and-deploy:
-    name: Converge mirror, then deploy
+  deploy:
+    name: Deploy
     # workflow_run also fires when CI fails; deploy only after green CI —
     # and only for push-triggered CI runs: a fork PR's CI run can carry
     # head_branch == main, so admitting pull_request-sourced runs would let
     # outside PRs trigger production deploys. workflow_dispatch is the
     # manual escape hatch (reruns, rollout, deploying past a flaky check),
     # and only from main: a dispatch runs the workflow file from the chosen
-    # branch with the production database secrets.
+    # branch with the deploy hook secret.
     if: (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main') || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push')
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 10
+    # Nothing to check out: the hook makes Vercel build latest main itself.
     steps:
-      # The deploy hook always builds latest main, so the import must also
-      # run from latest main (not the workflow_run head SHA).
-      - uses: actions/checkout@v4
-        with:
-          ref: main
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 24
-          cache: npm
-          cache-dependency-path: apps/web/package-lock.json
-      - run: npm ci
-      # DIRECT_URL is the Supabase session pooler string (port 5432): GitHub
-      # runners are IPv4-only and the true direct host is IPv6-only.
-      # prisma.config.ts and the import both resolve DIRECT_URL first.
-      - name: Apply migrations (no-op when none are new)
-        env:
-          DIRECT_URL: ${{ secrets.DIRECT_URL }}
-        run: npm run prisma:deploy
-      - name: Converge mirror (parity-checked import)
-        env:
-          DIRECT_URL: ${{ secrets.DIRECT_URL }}
-        run: npm run data:import
-      # Prove the build Vercel is about to run, before triggering it. Nothing
-      # earlier exercises this path for this commit: CI builds only in csv
-      # mode (its separate Build job), and db-health.yml runs weekly
-      # against whatever main happened to be. The db path differs in ways that
-      # matter — it reads over the POOLED DATABASE_URL (the import above uses
-      # DIRECT_URL) and runs the full row-by-row parity check in
-      # lib/data/servedData.ts. Building here turns a broken db path into a red
-      # job instead of a Vercel-side failure that nobody is told about: the
-      # hook below never fires, and production keeps serving its previous
-      # deploy — which it would have done anyway, but now visibly.
-      - name: Verify the production build against the mirror
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          GEODATA_DATA_SOURCE: db
-        run: npm run build
-      # Still not proof the deploy LANDED: Vercel builds asynchronously after
-      # accepting the hook. What changed is that the build itself is now known
-      # good, so an accepted hook that never goes live is an infrastructure
-      # problem rather than a code one. Closing the last gap needs a
-      # VERCEL_TOKEN secret to poll GET /v13/deployments/{id} — see the runbook
-      # note in docs/deployment.md.
+      # Not proof the deploy LANDED: Vercel builds asynchronously after
+      # accepting the hook. Closing that gap needs a VERCEL_TOKEN secret to
+      # poll GET /v13/deployments/{id} — see the runbook note in
+      # docs/deployment.md.
       - name: Trigger Vercel production build
         env:
           VERCEL_DEPLOY_HOOK_URL: ${{ secrets.VERCEL_DEPLOY_HOOK_URL }}

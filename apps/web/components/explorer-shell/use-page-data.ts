@@ -9,7 +9,7 @@ const requests = new Map<string, Promise<unknown>>();
 function request(url: string): Promise<unknown> {
   let pending = requests.get(url);
   if (!pending) {
-    // The files are cached as immutable for a year (next.config.ts), and a browser may keep an error answer under
+    // The files are cached as immutable for a year (lib/site/routing.ts), and a browser may keep an error answer under
     // the same header: a name asked for during a rollback or a deploy can 404 once and exist later. One retry that
     // bypasses the cache keeps that visitor from being stuck on the error.
     pending = fetch(url)

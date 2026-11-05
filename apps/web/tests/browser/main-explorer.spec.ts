@@ -375,7 +375,7 @@ test("sidebar section links move between sections in-app", async ({ page }) => {
 
 // Next prefetches a <Link> as soon as it enters the viewport, so every sidebar, footer and
 // list row used to pull its page's data in the background. Prefetch runs only in production:
-// against `next dev` these tests pass without proving anything (CI runs them on `next start`).
+// against `next dev` these tests pass without proving anything (CI runs them on the served static build).
 // The municipal index also at phone width, where the whole 64-row list is in the page; the
 // regional index and a region page list their regions; dataset pages link their methodology
 // page; the methodology hub lists every dataset.

@@ -61,7 +61,7 @@ Each page shows the published value: one decimal, in lari a month. Missing years
 
 Excel downloads hold Summary, Data and Sources sheets in the reader's language, with the selected series and years, the area, per household or per person, the survey-estimate status, empty cells for missing values and validated links to the archived Geostat workbooks the values came from. The Sources sheet is built from the 12 served workbooks of the archive. Internal cell references are not exported.
 
-The methodology page `/methodology/household-income` publishes the archive of 21 originals: the 18 workbooks, the two page captures (downloaded as text files) and the metadata. They are served from `public/downloads/methodology/household-income/files/` and are excluded from the function bundle with the other methodology downloads (`outputFileTracingExcludes` in `next.config.ts`).
+The methodology page `/methodology/household-income` publishes the archive of 21 originals: the 18 workbooks, the two page captures (downloaded as text files) and the metadata. They are served from `public/downloads/methodology/household-income/files/` as static files; like the other methodology downloads they are not part of the `/mcp` function.
 
 ## Statistical limitations and future use
 

@@ -4,7 +4,7 @@ import { Client as LegacyClient } from "@modelcontextprotocol/sdk/client/index.j
 import { StreamableHTTPClientTransport as LegacyClientTransport } from "@modelcontextprotocol/sdk/client/streamableHttp.js";
 import { McpServer as LegacyServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { WebStandardStreamableHTTPServerTransport as LegacyServerTransport } from "@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js";
-import { POST, GET, DELETE, OPTIONS } from "../../app/mcp/route";
+import { POST, GET, DELETE, OPTIONS } from "../../lib/mcp/handler";
 import { TOOLS } from "../../lib/mcp/tools";
 import { loadPackagedSnapshot } from "../../lib/mcp/snapshot";
 import { boundedToolResult, LIMITS } from "../../lib/mcp/result";

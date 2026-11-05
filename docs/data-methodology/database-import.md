@@ -1,6 +1,13 @@
 # Database import: CSV → Supabase workflow
 
-Status: active since 2026-07 (database activation PR).
+Status: **retired from releases in 2026-11** (spec
+`docs/superpowers/specs/2026-11-04-static-export-and-supabase-retirement-design.md`).
+Releases no longer migrate, import or read the mirror: every build reads the
+reviewed CSVs directly. The mirror never changed a published figure, because
+every build proved it equal to the CSVs row by row. The code described below is
+still in the repository and still exercised by CI's `mirror` job, until the
+second release of that spec removes it. This page is kept until then as a record.
+Active from 2026-07 (database activation PR) to 2026-11.
 
 ## Principle
 

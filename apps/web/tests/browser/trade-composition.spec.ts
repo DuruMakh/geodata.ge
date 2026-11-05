@@ -252,7 +252,7 @@ for (const classification of ["sitc", "bec"] as const) for (const flow of ["trad
     for (const link of originalLinks) {
       expect(link).toContain("https://fiscal.ge/downloads/methodology/trade/files/");
       const response = await request.get(new URL(link).pathname); expect(response.ok()).toBe(true);
-      const local = await readFile(path.join(process.cwd(), "public", new URL(link).pathname));
+      const local = await readFile(path.join(process.cwd(), "out", new URL(link).pathname));
       expect(createHash("sha256").update(await response.body()).digest("hex")).toBe(createHash("sha256").update(local).digest("hex"));
     }
     await toggle(page, "goods.total").click();

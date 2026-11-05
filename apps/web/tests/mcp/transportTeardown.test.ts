@@ -11,7 +11,7 @@ vi.mock("../../lib/mcp/tools", async importOriginal => {
     return server;
   } };
 });
-import { POST } from "../../app/mcp/route";
+import { POST } from "../../lib/mcp/handler";
 
 const original = { ...process.env };
 beforeAll(() => {

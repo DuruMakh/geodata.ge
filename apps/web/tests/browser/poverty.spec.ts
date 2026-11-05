@@ -115,7 +115,7 @@ test("inequality shows the Gini coefficient with two decimals and no tabs, and e
 });
 
 test("an old poverty bookmark lands on the new address with its tab", async ({ page }) => {
-  // Redirects come from next.config and next dev serves them too (the municipality redirect specs run there); this one is skipped on the default local dev webServer and runs against a served build (PLAYWRIGHT_BASE_URL) or in CI.
+  // Redirects come from lib/site/routing.ts, which next dev serves too (the municipality redirect specs run there); this one is skipped on the default local dev webServer and runs against a served build (PLAYWRIGHT_BASE_URL) or in CI.
   test.skip(!process.env.PLAYWRIGHT_BASE_URL && !process.env.CI, "redirects are checked against a served build");
   await page.goto("/en/explorer/poverty/rates#tab=relative");
   await expect(page).toHaveURL(/\/en\/explorer\/living-standards\/poverty#tab=relative/);

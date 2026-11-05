@@ -372,7 +372,7 @@ async function main() {
   process.env.MCP_ENABLED = "true";
   process.env.MCP_RATE_LIMITER = "memory";
   process.env.NEXT_PUBLIC_SITE_URL = "https://fiscal.ge";
-  const { POST } = await import("../app/mcp/route");
+  const { POST } = await import("../lib/mcp/handler");
   const wire = [];
   for (const name of ["national-one-cell", "product-search-milk", "product-search-rice", "city-discovery-batumi", "catalogue-inflation-products", "products-cumulative-endpoints", "products-cumulative-rank-100", "products-500-output-cells"]) {
     const scenario = measurements.find(sample => sample.name === name)!;

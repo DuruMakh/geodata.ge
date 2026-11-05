@@ -89,7 +89,7 @@ vi.mock("../../lib/mcp/outputSchema", async importOriginal => {
   } };
 });
 
-import { POST } from "../../app/mcp/route";
+import { POST } from "../../lib/mcp/handler";
 
 const original = { ...process.env };
 const logs: string[] = [];

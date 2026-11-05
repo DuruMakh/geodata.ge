@@ -7,7 +7,7 @@ import path from "node:path";
  * every prerendered HTML file. Written under `public/page-data/` by the prebuild step that owns the data, which reads
  * it back, like the publications under `public/downloads/data/` (scripts/prepare-fact-query-publications.ts).
  * It is not one of those publications: no manifest, llms.txt, sitemap or methodology link names it, and /mcp never
- * reads it. The name carries a hash of the content, so a file never changes once published and next.config.ts lets
+ * reads it. The name carries a hash of the content, so a file never changes once published and lib/site/routing.ts lets
  * browsers keep it for a year; Georgian and English pages share it.
  */
 export type PageDataFile = { fileName: string; url: string; content: string };

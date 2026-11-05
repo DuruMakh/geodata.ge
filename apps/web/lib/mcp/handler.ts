@@ -1,4 +1,4 @@
-import { after } from "next/server";
+import { waitUntil } from "@vercel/functions";
 import { createMcpHandler, isLegacyRequest, WebStandardStreamableHTTPServerTransport } from "@modelcontextprotocol/server";
 import {
   LIMITS,
@@ -8,22 +8,19 @@ import {
   type CounterVerdict,
   createCounter,
   isPaused,
-} from "../../lib/mcp/limits";
-import { checkRequest, clientClass, clientKey, corsOriginFor } from "../../lib/mcp/security";
-import { createMcpServer } from "../../lib/mcp/tools";
-import { toolNameOf } from "../../lib/mcp/toolNames";
-import { logToolCall, type ToolCallLog } from "../../lib/mcp/log";
-import { errorCodeSchema } from "../../lib/factQuery/schemas";
-import { loadPackagedSnapshot } from "../../lib/mcp/snapshot";
-import { cellCount, resultSizeKind, tooLargeResponse, toolResult } from "../../lib/mcp/result";
+} from "./limits";
+import { checkRequest, clientClass, clientKey, corsOriginFor } from "./security";
+import { createMcpServer } from "./tools";
+import { toolNameOf } from "./toolNames";
+import { logToolCall, type ToolCallLog } from "./log";
+import { errorCodeSchema } from "../factQuery/schemas";
+import { loadPackagedSnapshot } from "./snapshot";
+import { cellCount, resultSizeKind, tooLargeResponse, toolResult } from "./result";
 
-// The only request-time code in the repository. Every other route is
-// prerendered. Node runtime because the snapshot loader reads the artifact from
-// the deployed bundle; never prerendered because this is a protocol endpoint,
-// not a page.
-export const runtime = "nodejs";
-export const dynamic = "force-dynamic";
-export const maxDuration = 10; // spec section 11.3: 10 s request ceiling
+// The only request-time code in the repository; every page is a static file.
+// api/mcp.ts serves these handlers as a Vercel Node function, reached at /mcp
+// through the rewrite in vercel.json, which also sets the 10 s request ceiling
+// (spec section 11.3) and bundles the snapshot the loader reads.
 
 /**
  * One counter per instance, built on first use rather than at module load so
@@ -135,7 +132,7 @@ const SHARED_DAY_DENIAL: Denial = {
  *
  * A browser sends this before any POST carrying `content-type:
  * application/json`, so without it an origin approved in MCP_ALLOWED_ORIGINS
- * still could not reach the endpoint: Next's generated OPTIONS answers 204
+ * still could not reach the endpoint: a platform-generated OPTIONS answers 204
  * with an `Allow` header and no CORS headers at all, and the browser stops
  * there. Runs the same pause, host and origin checks as a real request - a
  * preflight is not a reason to skip them.
@@ -179,7 +176,7 @@ type RequestContext = Pick<ToolCallLog, "tool" | "dataVersion" | "limit" | "clie
  * Nothing thrown inside `serve` reaches the caller or the log.
  *
  * Without the catch below, an unexpected throw - an unreadable snapshot, a
- * transport fault - returns Next's default 500 instead of the bilingual
+ * transport fault - returns the platform's default 500 instead of the bilingual
  * envelope every other failure uses, emits no log record at all, and writes a
  * stack containing absolute bundle paths to the platform log. Sections 11.2 and
  * 11.5 forbid publishing both. The caught value is deliberately never inspected.
@@ -225,23 +222,23 @@ async function handle(request: Request): Promise<Response> {
 }
 
 /**
- * Adds one to today's anonymous tally after the response has been sent.
+ * Adds one to today's anonymous tally without holding up the response.
  *
  * The field is built from fixed vocabularies only: the tool label from
  * `toolNameOf`, the outcome, a bounded error code, which limit refused, and a
  * three-value client class. No address, hash, query text or argument. The tally
- * never decides admission and nothing here can change the response: `after`
- * runs the callback once the reply is sent, a failure inside it is swallowed,
- * and outside a request scope (a unit test) `after` itself throws and the
- * tally is simply skipped.
+ * never decides admission and nothing here can change the response: the reply
+ * does not wait for it, `waitUntil` keeps the function alive until it settles,
+ * and a failure inside it is swallowed. Outside Vercel (a unit test, the local
+ * server) `waitUntil` does nothing and the write simply runs on its own.
  */
 function recordUsage(field: string): void {
   const day = new Date().toISOString().slice(0, 10);
-  try {
-    after(async () => {
-      try { await counter().record(day, field); } catch { /* Best effort. */ }
-    });
-  } catch { /* Not inside a request. */ }
+  const write = (async () => {
+    try { await counter().record(day, field); } catch { /* Best effort. */ }
+  })();
+  // The write has started either way; a platform that cannot extend the function must not cost the answer.
+  try { waitUntil(write); } catch { /* Best effort. */ }
 }
 
 async function serve(request: Request, context: RequestContext): Promise<Response> {

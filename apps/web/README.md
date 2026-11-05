@@ -24,7 +24,8 @@ npm run dev
 
 ```powershell
 npm run dev            # dev server
-npm run build          # production build
+npm run build          # production build: a static export to out/
+npm run start          # serve out/ with the vercel.json rules, /mcp included
 npm run lint           # eslint (zero warnings allowed)
 npm run typecheck      # tsc --noEmit
 npm run check          # lint + typecheck + unit tests + data validation + i18n check

@@ -1,8 +1,8 @@
 import { expect, it } from "vitest";
-import nextConfig from "../../next.config";
+import { siteHeaders } from "../../lib/site/routing";
 
 it("noindexes every archived original and serves every non-PDF archived original sandboxed", async () => {
-  const headers = await nextConfig.headers?.();
+  const headers = siteHeaders();
 
   expect(headers?.filter(rule => rule.source.startsWith("/downloads/methodology/"))).toEqual([
     {
@@ -17,7 +17,7 @@ it("noindexes every archived original and serves every non-PDF archived original
 });
 
 it("noindexes only third-party methodology source originals", async () => {
-  const headers = await nextConfig.headers?.();
+  const headers = siteHeaders();
 
   expect(headers).not.toContainEqual(
     expect.objectContaining({ source: "/downloads/data/:path*" }),
@@ -29,7 +29,7 @@ it("noindexes only third-party methodology source originals", async () => {
 
 // U14-01: page data is fetched by the page after load; its name carries a hash of its content, so it is cached for good.
 it("lets browsers keep content-hashed page data for a year, out of search results", async () => {
-  const headers = await nextConfig.headers?.();
+  const headers = siteHeaders();
 
   expect(headers).toContainEqual({
     source: "/page-data/:file*",
@@ -42,14 +42,14 @@ it("lets browsers keep content-hashed page data for a year, out of search result
 
 // deep-review known #10: the place index that All data's search fetches stays out of search results, in both languages.
 it("noindexes the place index files", async () => {
-  const headers = await nextConfig.headers?.();
+  const headers = siteHeaders();
   const rule = headers?.find(entry => entry.source.startsWith("/explorer-places"));
   expect(rule).toEqual({ source: "/explorer-places.:locale(ka|en).json", headers: [{ key: "X-Robots-Tag", value: "noindex" }] });
   // tests/browser/seo.spec.ts checks the served files carry it, and All data does not.
 });
 
 it("retains the general security headers on every route", async () => {
-  const headers = await nextConfig.headers?.();
+  const headers = siteHeaders();
 
   expect(headers).toContainEqual({
     source: "/(.*)",
@@ -64,7 +64,7 @@ it("retains the general security headers on every route", async () => {
 });
 
 it("every page sends a report-only CSP that allows only the site, Google Analytics and Clarity", async () => {
-  const headers = await nextConfig.headers?.();
+  const headers = siteHeaders();
   const policy = headers
     ?.find(rule => rule.source === "/(.*)")
     ?.headers.find(header => header.key === "Content-Security-Policy-Report-Only")

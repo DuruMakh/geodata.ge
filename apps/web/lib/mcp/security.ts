@@ -61,8 +61,8 @@ export function checkRequest(request: Request): SecurityVerdict {
   const host = request.headers.get("host")?.toLowerCase() ?? null;
 
   if (hosts.size === 0) {
-    // Nothing configured at all. Running locally that is ordinary - a bare
-    // `next start` has no site URL - but in production it is a
+    // Nothing configured at all. Running locally that is ordinary - a
+    // bare local server has no site URL - but in production it is a
     // misconfiguration, not permission to answer on whatever host a caller
     // cares to name. The escape hatch stays where it is useful and closes
     // where it is dangerous.
@@ -104,7 +104,7 @@ export function corsOriginFor(request: Request): string | null {
  *
  * "Trusted" here means Vercel specifically, which sets X-Vercel-Forwarded-For
  * itself and overwrites X-Forwarded-For so a caller cannot forge it. Behind any
- * other proxy, or on a self-hosted `next start`, these are ordinary
+ * other proxy, or on a self-hosted server, these are ordinary
  * caller-supplied headers and confer no such guarantee - which is why the route
  * puts unkeyed requests in one shared bucket instead of exempting them.
  *
