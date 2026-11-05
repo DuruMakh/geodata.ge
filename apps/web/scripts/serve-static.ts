@@ -43,12 +43,18 @@ function isFile(candidate: string): boolean {
   try { return statSync(candidate).isFile(); } catch { return false; }
 }
 
-/** Query of `requested` appended to `destination`, keeping any query the destination already has. */
+/**
+ * `destination` with the requested query in front of its own, as Vercel answers (seen on a Preview, 2026-11-05:
+ * `/en/explorer/wages?utm_source=x` -> `/en/explorer/labour?utm_source=x&topic=wages`). A key the destination sets
+ * keeps the destination's value.
+ */
 function withQuery(destination: string, requested: URLSearchParams): string {
   const target = new URL(destination, "http://local");
-  const own = new Set(target.searchParams.keys());
-  for (const [key, value] of requested) if (!own.has(key)) target.searchParams.append(key, value);
-  return `${target.pathname}${target.search}`;
+  const query = new URLSearchParams();
+  for (const [key, value] of requested) if (!target.searchParams.has(key)) query.append(key, value);
+  for (const [key, value] of target.searchParams) query.append(key, value);
+  const search = query.toString();
+  return `${target.pathname}${search ? `?${search}` : ""}`;
 }
 
 export function createStaticServer({ root, config, mcpHandler }: Options): http.Server {

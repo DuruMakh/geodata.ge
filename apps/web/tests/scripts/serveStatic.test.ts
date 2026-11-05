@@ -53,7 +53,7 @@ describe("serve-static", () => {
 
     const withQuery = await get("/en/explorer/wages?utm_source=x");
     expect(withQuery.status).toBe(308);
-    expect(withQuery.headers.get("location")).toBe("/en/explorer/labour?topic=wages&utm_source=x");
+    expect(withQuery.headers.get("location")).toBe("/en/explorer/labour?utm_source=x&topic=wages");
   });
 
   it("keeps the query on a plain redirect", async () => {
@@ -100,7 +100,7 @@ describe("serve-static", () => {
   });
 
   it("keeps every value of a repeated query key on a redirect", async () => {
-    expect((await get("/en/explorer/wages?a=1&a=2")).headers.get("location")).toBe("/en/explorer/labour?topic=wages&a=1&a=2");
+    expect((await get("/en/explorer/wages?a=1&a=2")).headers.get("location")).toBe("/en/explorer/labour?a=1&a=2&topic=wages");
   });
 
   it("matches header rules case-sensitively, as Vercel does", async () => {

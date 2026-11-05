@@ -444,7 +444,7 @@ follows no redirect, so it cannot pass that protection):
   the not-found page;
 - a municipality code redirect, a legacy hub forward and an address with a
   trailing slash each answer 308 and keep an added query string
-  (`/en/explorer/wages?utm_source=x` → `/en/explorer/labour?topic=wages&utm_source=x`);
+  (`/en/explorer/wages?utm_source=x` → `/en/explorer/labour?utm_source=x&topic=wages`);
 - the security, `Content-Security-Policy-Report-Only` and `X-Robots-Tag` headers
   are present where `lib/site/routing.ts` puts them (on pages, files and 404s;
   Vercel applies header rules after redirects, so a 308 carries none of them); `/_next/static/…` is
