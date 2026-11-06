@@ -168,7 +168,7 @@ export const PHONE_CHART_WIDTH = 343;
 
 /**
  * The heights a chart wrapper reserves in server HTML, as the custom properties its classes read:
- * `h-[var(--h-narrow)] min-[Npx]:h-[var(--h-wide)]`, N being the engine's narrow threshold. The engine then sets the final height.
+ * `h-[var(--h-narrow)]`, and `h-[var(--h-wide)]` from the engine's narrow threshold up. The engine then sets the final height.
  */
 export function heightVars(narrow: number, wide: number): CSSProperties {
   return { "--h-narrow": `${narrow}px`, "--h-wide": `${wide}px` } as CSSProperties;
