@@ -101,6 +101,7 @@
   "health.unitUnits": "units",
   "health.unitBeds": "beds",
   "health.unitThousandBeds": "thousand beds",
+  "health.unitThousandUnits": "thousand units",
   "health.unitMillionVisits": "million visits",
   "health.unitThousandVisits": "thousand visits",
   "health.unitThousandCases": "thousand new cases",

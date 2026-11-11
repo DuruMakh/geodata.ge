@@ -251,7 +251,11 @@ describe("Fiscal.ge agent instructions", () => {
     const published = buildAllPublications(snapshot).filter((file) => file.fileName !== "manifest.json").length + MANIFEST_SIDE_FILE_NAMES.length;
     expect(where).toContain(`\`https://fiscal.ge/downloads/data/manifest.json\` lists all ${published} bulk files`);
     const mcp = where.split(/\r?\n/).find((line) => line.startsWith("- The read-only MCP connection at `https://fiscal.ge/mcp`"));
-    for (const dataset of catalogueData(snapshot).datasets) expect(mcp, dataset.datasetId).toContain(dataset.labelEn);
+    // The core datasets by name; the chart pages' topic datasets by their number, each named in catalogue.json.
+    const topics = new Set(snapshot.topics.datasets.map((dataset) => dataset.page.datasetId));
+    for (const dataset of catalogueData(snapshot).datasets.filter((entry) => !topics.has(entry.datasetId))) expect(mcp, dataset.datasetId).toContain(dataset.labelEn);
+    expect(topics.size).toBeGreaterThan(0);
+    expect(mcp).toContain(`, and the data of ${topics.size} Explorer chart pages (topic datasets, listed in \`https://fiscal.ge/downloads/data/catalogue.json\`).`);
   });
   it("puts the answer-first guidance before the first page link", async () => {
     const content = await llmsText();

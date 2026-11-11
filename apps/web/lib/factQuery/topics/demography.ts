@@ -23,17 +23,10 @@ import { vitalFactsForPlace } from "../../explorer/demographyVital";
 import { loadPopulationBasics } from "../../explorer/populationBasics.server";
 import { message } from "../../i18n/messages";
 import type { Messages } from "../../i18n/types";
-import type { Basis } from "../types";
 import { loadTopicBreaks } from "./breaks";
+import { collectTopicDataset, span, type Cell, type Names, type SeriesSpec } from "./collect";
 import { placeEntity } from "./education";
-import { TOPIC_PAGES } from "./pages";
-import type { TopicAdapter, TopicBreak, TopicDatasetBuild, TopicEntity, TopicFact, TopicPage, TopicSeries, TopicValueStatus } from "./types";
-
-/** A name in both languages: a message key read in each, or text built from the page's own words in each. */
-export type Names = { ka: string; en: string };
-/** One served cell's value, the rows it rests on, whether the page adds them up itself and, for a part of a year, its months. */
-export type Cell = { value: number; unit: string; sourceIds: string[]; status: TopicValueStatus; monthsReported?: number };
-export type SeriesSpec = { seriesId: string; indicatorId: string; label: Names; heading: Names | null; parentSeriesId: string | null; isTotal: boolean };
+import type { TopicAdapter, TopicBreak, TopicDatasetBuild, TopicEntity } from "./types";
 
 /** The dimensions a reviewed demography row may carry besides its series, place and year. */
 type Dimensions = { sex?: string; ageGroup?: string; settlement?: string; citizenshipId?: string };
@@ -56,57 +49,6 @@ function rowIndex(served: readonly ServedDemographyObservation[]) {
   return { row, published, summed };
 }
 
-/**
- * Collects one page's dataset. `add` adds a series' cells for one place over the years the page prints them: missing
- * (`value: null`) in a year it prints nothing for, never zero. The first place that lists a series names it. Every cell
- * carries `basis` (Demography's rows are published figures). The Health and Social adapters collect theirs with it too.
- */
-export function demographyDataset(datasetId: string, title: Names, basis: Basis = "published") {
-  const page: TopicPage = TOPIC_PAGES.find((candidate) => candidate.datasetId === datasetId)!;
-  const series = new Map<string, TopicSeries & { indicatorId: string }>();
-  const entities = new Map<string, TopicEntity>();
-  const facts: TopicFact[] = [];
-
-  function add(entity: TopicEntity, spec: SeriesSpec, years: readonly number[], cellAt: (year: number) => Cell | undefined) {
-    const cells = years.map((year) => ({ year, cell: cellAt(year) }));
-    const units = new Set(cells.flatMap(({ cell }) => (cell ? [cell.unit] : [])));
-    if (units.size !== 1) throw new Error(`${datasetId}: ${entity.entityId} ${spec.seriesId} has units ${[...units].join(", ") || "none"}`);
-    const unit = [...units][0]!;
-    const known = series.get(spec.seriesId);
-    if (known && known.unit !== unit) throw new Error(`${datasetId}: ${spec.seriesId} is ${known.unit} and ${unit}`);
-    if (!known) {
-      series.set(spec.seriesId, {
-        seriesId: spec.seriesId, labelKa: spec.label.ka, labelEn: spec.label.en, headingKa: spec.heading?.ka ?? null, headingEn: spec.heading?.en ?? null,
-        parentSeriesId: spec.parentSeriesId, isTotal: spec.isTotal, unit, indicatorId: spec.indicatorId,
-      });
-    }
-    if (!entities.has(entity.entityId)) entities.set(entity.entityId, entity);
-    for (const { year, cell } of cells) {
-      facts.push(cell
-        ? { entityId: entity.entityId, seriesId: spec.seriesId, year, value: cell.value, basis, status: cell.status, sourceIds: cell.sourceIds, ...(cell.monthsReported === undefined ? {} : { monthsReported: cell.monthsReported }) }
-        : { entityId: entity.entityId, seriesId: spec.seriesId, year, value: null, basis, status: "official", sourceIds: [] });
-    }
-  }
-
-  /** The reviewed breaks name indicators; a dataset's break lists the served series that rest on them. */
-  function build(breaks: readonly TopicBreak[]): TopicDatasetBuild {
-    const list = [...series.values()];
-    return {
-      page, titleKa: title.ka, titleEn: title.en,
-      series: list.map(({ indicatorId: _indicatorId, ...entry }) => entry),
-      entities: [...entities.values()],
-      facts,
-      breaks: breaks.flatMap((entry) => {
-        const seriesIds = list.filter((candidate) => entry.seriesIds.includes(candidate.indicatorId)).map((candidate) => candidate.seriesId);
-        return seriesIds.length ? [{ ...entry, seriesIds }] : [];
-      }),
-    };
-  }
-  return { add, build };
-}
-
-/** Every year from a list's first to its last. */
-export const span = (years: readonly number[]) => (years.length ? Array.from({ length: years.at(-1)! - years[0]! + 1 }, (_, index) => years[0]! + index) : []);
 const yearsOf = (facts: readonly { year: number }[]) => [...new Set(facts.map((fact) => fact.year))].sort((a, b) => a - b);
 
 type Context = {
@@ -126,7 +68,7 @@ const plain = (text: string): Names => ({ ka: text, en: text });
 
 /** Population: each place's population over its page's years, and the density Georgia and the regions publish. */
 function buildPopulation(context: Context, clientFacts: Parameters<typeof placeYears>[0], breaks: readonly TopicBreak[]): TopicDatasetBuild {
-  const dataset = demographyDataset("demography-population", names(context, "populationTitle"));
+  const dataset = collectTopicDataset("demography-population", names(context, "populationTitle"));
   // Municipality 04 and the region of Tbilisi carry the same number; the page keeps one place for it.
   const population = new Map(context.served.filter((fact) => fact.seriesId === SERIES.populationTotal).map((fact) => [`${placeIdForMunicipalityCode(fact.geographyId)}:${fact.year}`, fact]));
   const density = context.served.filter((fact) => fact.seriesId === SERIES.populationDensity);
@@ -144,7 +86,7 @@ function buildPopulation(context: Context, clientFacts: Parameters<typeof placeY
 
 /** Births and deaths: every place's births, deaths and natural increase, and Georgia's fertility and life expectancy. */
 function buildBirthsDeaths(context: Context, breaks: readonly TopicBreak[]): TopicDatasetBuild {
-  const dataset = demographyDataset("demography-births-deaths", names(context, "birthsDeathsTitle"));
+  const dataset = collectTopicDataset("demography-births-deaths", names(context, "birthsDeathsTitle"));
   const { index } = context;
   const vitalHeading = names(context, "vitalTitle");
   const vital = [[SERIES.liveBirths, "vitalBirths"], [SERIES.deaths, "vitalDeaths"], [SERIES.naturalIncrease, "vitalNatural"]] as const;
@@ -175,7 +117,7 @@ function buildBirthsDeaths(context: Context, breaks: readonly TopicBreak[]): Top
 
 /** Marriages and divorces: Georgia's nine rows under the page's headings, and every other place's two counts. */
 function buildMarriages(context: Context, breaks: readonly TopicBreak[]): TopicDatasetBuild {
-  const dataset = demographyDataset("demography-marriages-divorces", names(context, "marriagesTitle"));
+  const dataset = collectTopicDataset("demography-marriages-divorces", names(context, "marriagesTitle"));
   const { index } = context;
   const [ka, en] = [marriagePageData(context.ka, context.served), marriagePageData(context.en, context.served)];
   for (const { place, entity } of context.places) {
@@ -196,7 +138,7 @@ function buildMarriages(context: Context, breaks: readonly TopicBreak[]): TopicD
 
 /** Migration: Georgia's arrivals and departures by citizenship group, each sex the page offers, and the net. */
 function buildMigration(context: Context, breaks: readonly TopicBreak[]): TopicDatasetBuild {
-  const dataset = demographyDataset("demography-migration", names(context, "migrationTitle"));
+  const dataset = collectTopicDataset("demography-migration", names(context, "migrationTitle"));
   const { index } = context;
   const facts = migrationPageFacts(context.served);
   const { years } = migrationCoverage(facts);
@@ -233,7 +175,7 @@ function buildMigration(context: Context, breaks: readonly TopicBreak[]): TopicD
  * are its series under its total.
  */
 function buildAgeSex(context: Context, breaks: readonly TopicBreak[]): TopicDatasetBuild {
-  const dataset = demographyDataset("demography-age-sex", names(context, "ageSexTitle"));
+  const dataset = collectTopicDataset("demography-age-sex", names(context, "ageSexTitle"));
   const { index } = context;
   const sexes = [["male", "sexMale"], ["female", "sexFemale"], ["total", "totalHeader"]] as const;
   const total = names(context, "totalHeader");

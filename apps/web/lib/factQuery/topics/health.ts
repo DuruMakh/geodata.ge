@@ -16,7 +16,7 @@ import { message } from "../../i18n/messages";
 import { getPresentation } from "../../i18n/presentation.server";
 import type { Presentation } from "../../i18n/types";
 import { loadTopicBreaks } from "./breaks";
-import { demographyDataset, span, type Cell, type Names } from "./demography";
+import { collectTopicDataset, span, type Cell, type Names } from "./collect";
 import type { TopicAdapter, TopicBreak, TopicDatasetBuild, TopicEntity } from "./types";
 
 const DEATHS_TOTAL = "health.deaths.total";
@@ -54,7 +54,7 @@ function cellOf(context: Context, indicatorId: string, area: HealthArea, year: n
 
 /** Doctors and hospitals or Illnesses: each crawl table's rows (a view's rows of one unit), over the view's years. */
 function buildNational(context: Context, section: HealthNationalSectionId): TopicDatasetBuild {
-  const dataset = demographyDataset(`health-${section}`, names(context, `page.${section}.title`), "actual");
+  const dataset = collectTopicDataset(`health-${section}`, names(context, `page.${section}.title`), "actual");
   const [ka, en] = [healthNationalPageData(context.served, context.ka.messages, section), healthNationalPageData(context.served, context.en.messages, section)];
   const georgia = areaEntity(context, "georgia");
   for (const state of healthCrawlStates(section, ka.facts)) {
@@ -73,7 +73,7 @@ function buildNational(context: Context, section: HealthNationalSectionId): Topi
 
 /** Causes of death: each area page's causes over the area's years, and the death rate in the years the index prints it. */
 function buildCausesOfDeath(context: Context): TopicDatasetBuild {
-  const dataset = demographyDataset("health-causes-of-death", names(context, "page.causes-of-death.title"), "actual");
+  const dataset = collectTopicDataset("health-causes-of-death", names(context, "page.causes-of-death.title"), "actual");
   const rates = healthDeathRatePageData(context.served.facts);
   // The map shows every region's rate in its year, beside Georgia's; the latest line Georgia's latest year.
   const rateYears = (area: HealthArea) => area === "georgia"

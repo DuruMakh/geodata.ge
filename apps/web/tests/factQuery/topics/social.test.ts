@@ -60,6 +60,8 @@ describe("social topic adapter", () => {
     expect(places).toHaveLength(75);
     for (const id of ["health-pensions", "health-subsistence-allowance"]) {
       expect(dataset(id).entities.map((entity) => entity.entityId)).toEqual(places.map((place) => place.id));
+      const ofType = (type: string) => dataset(id).entities.filter((entity) => entity.entityType === type).map((entity) => entity.entityId);
+      expect([ofType("country"), ofType("region").length, ofType("municipality").length]).toEqual([[SOCIAL_GEORGIA], 11, 63]);
       expect(dataset(id).entities.find((entity) => entity.entityId === SHUAKHEVI)).toMatchObject({ entityType: "municipality", parentEntityId: ADJARA, labelEn: "Shuakhevi" });
       expect(dataset(id).entities.find((entity) => entity.entityId === "region.tbilisi")).toMatchObject({ entityType: "region", parentEntityId: SOCIAL_GEORGIA });
     }
@@ -113,6 +115,11 @@ describe("social topic adapter", () => {
     const units = new Set(builds.flatMap((build) => build.series.map((series) => series.unit)));
     expect([...units].sort()).toEqual(["employers", "families", "gel", "gel_million", "percent", "persons"]);
     expect(builds.flatMap((build) => build.series.filter((series) => series.unit === "percent").map((series) => series.seriesId))).toEqual([`${FUNDED}return`]);
+    // Every GEL series is a monthly average, so `gel` reads "GEL a month"; money is million GEL.
+    expect(builds.flatMap((build) => build.series.filter((series) => series.unit === "gel")).every((series) => series.seriesId.endsWith(".avg_monthly"))).toBe(true);
+    const names = testSnapshot({ releaseCommit: "test", generatedAt: "2026-11-11T00:00:00.000Z" }).topics.units;
+    expect(names.gel).toEqual({ labelKa: "ლარი თვეში", labelEn: "GEL a month" });
+    expect(names.gel_million).toEqual({ labelKa: "მლნ ლარი", labelEn: "million GEL" });
   });
 });
 

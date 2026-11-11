@@ -119,6 +119,8 @@ describe("health topic adapter", () => {
   it("names its units with the site's own unit words; none is a percent", () => {
     const units = new Set(builds.flatMap((build) => build.series.map((series) => series.unit)));
     expect([...units].sort()).toEqual(["per_1000_population", "persons", "persons_thousand", "units", "units_thousand", "visits_thousand"]);
+    // A shared token takes the family-neutral word: beds are counted in thousand units.
+    expect(testSnapshot({ releaseCommit: "test", generatedAt: "2026-11-11T00:00:00.000Z" }).topics.units.units_thousand).toEqual({ labelKa: "ათასი ერთეული", labelEn: "thousand units" });
   });
 });
 

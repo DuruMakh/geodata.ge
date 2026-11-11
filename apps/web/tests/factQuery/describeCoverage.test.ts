@@ -436,8 +436,8 @@ describe("search links the topic page behind a phrase", () => {
   });
 
   // A place is no page's word, as the website's own search drops it; a topic word that also meets some served series
-  // (Hospital services, School book, the funded-pension programme) still finds its page; and a phrase whose answer is
-  // empty still looks word by word. The last one is a reference-intent prompt (mcpAssistantIntents.ts).
+  // ("prices" meets Consumer price inflation) still finds its page; and a phrase whose answer is empty still looks word
+  // by word. The last one is a reference-intent prompt (mcpAssistantIntents.ts).
   it.each([
     ["home prices Tbilisi", "housing"],
     ["unemployment among women", "unemployment"],

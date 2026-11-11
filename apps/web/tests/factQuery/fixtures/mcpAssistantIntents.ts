@@ -161,12 +161,12 @@ export const MCP_ASSISTANT_INTENTS: readonly McpAssistantIntent[] = [
     ],
   },
   {
-    id: "outside-mcp-scope-pension",
+    id: "average-pension",
     promptEn: "What is the average pension in Georgia? Where can I see it on Fiscal.ge?",
     promptKa: "რამდენია საშუალო პენსია საქართველოში? სად შემიძლია ამის ნახვა Fiscal.ge-ზე?",
     requiredBehaviors: [
       "Do not present the funded-pension co-financing programme that the search also returns as the average pension; it is a budget programme, not a pension amount.",
-      "Offer the Fiscal.ge page link from websitePages in the user's language. Quote a pension amount only from that page's year-by-year table, with the link, if you can open it; never from memory.",
+      "Answer from the Pensions dataset (health-pensions): the average pension (social.pension.avg_monthly) for Georgia, in GEL a month, for the latest year, with its source; never from memory.",
     ],
   },
 ];

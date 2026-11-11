@@ -18,7 +18,7 @@ import type { TopicCoverage, TopicState } from "../../explorer/topicSeries";
 import { message } from "../../i18n/messages";
 import type { Messages } from "../../i18n/types";
 import { loadTopicBreaks } from "./breaks";
-import { demographyDataset, span, type Cell, type Names } from "./demography";
+import { collectTopicDataset, span, type Cell, type Names } from "./collect";
 import { placeEntity } from "./education";
 import type { TopicBreak, TopicAdapter, TopicDatasetBuild, TopicEntity } from "./types";
 
@@ -47,7 +47,7 @@ function cellOf(context: Context, definition: SocialSeriesDefinition, geographyI
  * missing (`value: null`) in a year SSA printed nothing for, never zero. Calculated rows (`#share`, `#real`) are skipped.
  */
 function socialDataset(context: Context, datasetId: string, title: Names) {
-  const dataset = demographyDataset(datasetId, title, "actual");
+  const dataset = collectTopicDataset(datasetId, title, "actual");
   function addList(entity: TopicEntity, geographyId: string, definitions: readonly SocialSeriesDefinition[], names: { ka: ListNames; en: ListNames }, states: readonly TopicState[], coverageOf: (selectedIds: readonly string[]) => TopicCoverage) {
     for (const state of states) {
       const { min, max } = coverageOf(state.selectedIds);
