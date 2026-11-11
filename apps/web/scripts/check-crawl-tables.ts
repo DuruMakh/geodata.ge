@@ -35,7 +35,7 @@ const MAP_INDEX_ROUTES = [
 const WRAPPER = '<div hidden="" data-testid="crawl-tables">';
 const CHART_PANEL = /data-testid="(?:[\w-]*chart-panel|municipal-chart-controls)"/;
 
-type Page = { route: string; html: string; wrappers: string[]; cells: number; gzip: number };
+type Page = { route: string; html: string; wrappers: string[]; cells: number; gzip: number; payloadTables: boolean };
 
 const stripScripts = (html: string) => html.replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, " ");
 
@@ -120,7 +120,9 @@ export async function checkCrawlTables(root = process.cwd(), { sizeReportOnly = 
     const raw = readFileSync(join(appDir, file));
     const html = stripScripts(raw.toString("utf8"));
     const wrappers = crawlWrappers(html);
-    return { route: file.replace(/\.html$/, ""), html, wrappers, cells: countCells(wrappers), gzip: gzipSync(raw, { level: 6 }).length };
+    // Table markup in the page's scripts means the tables travel twice: in the HTML and again in the data payload.
+    const payloadTables = /\\u003ctable\\u003e|<table>/.test(raw.toString("utf8").match(/<script\b[^>]*>[\s\S]*?<\/script>/gi)?.join("") ?? "");
+    return { route: file.replace(/\.html$/, ""), html, wrappers, cells: countCells(wrappers), gzip: gzipSync(raw, { level: 6 }).length, payloadTables };
   });
   const failures: string[] = [];
 
@@ -136,6 +138,7 @@ export async function checkCrawlTables(root = process.cwd(), { sizeReportOnly = 
     for (const prefix of ["", "en/"]) {
       const page = pages.find((entry) => entry.route === `${prefix}${route}`);
       if (!page || page.wrappers.length === 0) failures.push(`${prefix}${route}: a map index page without its every-year tables`);
+      else if (page.payloadTables) failures.push(`${prefix}${route}: its crawl tables' markup is repeated in the page's data payload`);
     }
   }
   const unwrappedTables = pages.filter((page) => page.wrappers.some((inner) => /<div\b/.test(inner)));
