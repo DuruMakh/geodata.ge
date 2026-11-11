@@ -230,7 +230,7 @@ export const TOOLS: readonly ToolDefinition[] = [
     title: "თემატური მონაცემები / Topic data",
     describe: () =>
       "Annual figures from every other Fiscal.ge chart page: population, education, health and pensions, jobs and wages, business, living standards, housing, internet, transport, money and banks, trade, external accounts, crime, environment, science and culture, energy and farming. " +
-      "Take datasetId, seriesIds and entityIds from describe_coverage; never guess. Values are as the page shows them, in each series' own unit; school years print as 2025/26. Missing is not zero. Use compare and rank for changes.",
+      "Take datasetId, seriesIds and entityIds from describe_coverage; never guess. Values are the page's own figures, in each series' own unit; a school year is its first year (year 2025 = 2025/26). Missing is not zero. Use compare and rank for changes.",
     schema: queryIndicatorsInput,
     run: queryIndicators,
   },
@@ -428,7 +428,9 @@ export function createMcpServer(): McpServer {
         try {
           // The SDK has validated and deduplicated these arrays. Reject the
           // requested product before calculating cells or resolving their sources.
-          const input = args as { datasetId?: string; years?: number[]; fromYear?: number; toYear?: number; seriesIds?: string[]; entityIds?: string[]; regionIds?: string[]; target?: { seriesIds?: string[]; entityIds?: string[] } };
+          const input = args as { datasetId?: string; years?: number[]; fromYear?: number; toYear?: number; seriesIds?: string[]; entityIds?: string[]; regionIds?: string[]; target?: { datasetId?: string; seriesIds?: string[]; entityIds?: string[] } };
+          // A topic refusal names the dataset's own CSV; compare names its dataset in the target.
+          const datasetId = input.datasetId ?? input.target?.datasetId;
           const regionalYears = input.years?.length ?? (
             input.fromYear !== undefined && input.toYear !== undefined
               ? input.toYear - input.fromYear + 1
@@ -450,8 +452,8 @@ export function createMcpServer(): McpServer {
                 ? (input.entityIds?.length ?? 1) * (input.seriesIds?.length ?? 1) * (input.years?.length ?? 1)
                 : 0;
           const limit = tool.name === "compare" ? LIMITS.comparisonPairs : LIMITS.cells;
-          if (count > limit) return toolResult(tooLargeResponse(snapshot, { returned: count, bytes: 0, datasetId: input.datasetId }));
-          const result = boundedToolResult(snapshot, tool.run(snapshot, args), resultSizeKind(tool.name), input.datasetId);
+          if (count > limit) return toolResult(tooLargeResponse(snapshot, { returned: count, bytes: 0, datasetId }));
+          const result = boundedToolResult(snapshot, tool.run(snapshot, args), resultSizeKind(tool.name), datasetId);
           if (!result.isError && result.structuredContent === undefined) throw new Error(safeValidationError);
           return result;
         } catch {

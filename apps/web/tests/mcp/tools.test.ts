@@ -586,7 +586,7 @@ describe("MCP tool surface", () => {
       expect(tool.title).toBe("თემატური მონაცემები / Topic data");
       expect(tool.annotations).toEqual({ readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false });
       expect(tool.description!.length).toBeLessThanOrEqual(700);
-      expect(tool.description).toContain("school years print as 2025/26");
+      expect(tool.description).toContain("a school year is its first year (year 2025 = 2025/26)");
       expect(tool.description).toContain("Missing is not zero");
     } finally { await client.close(); }
   });
@@ -616,6 +616,24 @@ describe("MCP tool surface", () => {
       run.mockRestore();
       await client.close();
     }
+  });
+
+  // Final review Minor 2: compare names its dataset in target.datasetId, and its refusal pointed to the manifest.
+  it("refuses a topic comparison of 300 pairs with the dataset's CSV", async () => {
+    const client = await connected();
+    try {
+      const dataset = loadPackagedSnapshot().topics.datasets.find((entry) => entry.page.datasetId === "education-schools")!;
+      const entityIds = dataset.entities.filter((entity) => entity.entityType === "municipality").slice(0, 60).map((entity) => entity.entityId);
+      const seriesIds = dataset.series.slice(0, 5).map((series) => series.seriesId);
+      const result = await client.callTool({ name: "compare", arguments: {
+        target: { dataset: "topic", datasetId: "education-schools", seriesIds, entityIds }, fromYear: 2015, toYear: 2025, measure: "value",
+      } });
+      const text = (result.content as { text: string }[])[0]!.text;
+      expect(result.isError).toBe(true);
+      expect(text).toContain("result_too_large");
+      expect(text).toContain("https://fiscal.ge/downloads/data/topics/education-schools.csv");
+      expect(text).not.toContain("manifest.json");
+    } finally { await client.close(); }
   });
 
   it("keeps every tool name in the advertised set", () => {
