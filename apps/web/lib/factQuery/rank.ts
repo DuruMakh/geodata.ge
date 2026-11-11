@@ -16,16 +16,19 @@ import { describeCoverage } from "./describeCoverage";
 import { buildResponseMeta } from "./meta";
 import { caveatIdsForObservation } from "./observations";
 import { inflationObservations } from "./queryInflation";
+import { queryIndicators } from "./queryIndicators";
 import { queryInflationProducts } from "./queryInflationProducts";
 import { inflationProductSources } from "./inflationProductData";
 import { queryMinistries } from "./queryMinistries";
 import { queryMunicipal } from "./queryMunicipal";
 import { queryNational } from "./queryNational";
-import { INPUT_LIMITS, rankInput } from "./schemas";
+import { INPUT_LIMITS, RANK_CORE_DATASETS, rankInput } from "./schemas";
 import { selectSources } from "./sources";
+import { topicPeriodLabel } from "./topics/store";
 import { AGGREGATE_ONLY_MUNICIPAL_CODES } from "./types";
 import type { Comparison } from "./compare";
 import type { Observation } from "./observations";
+import type { TopicDataset } from "./topics/types";
 import type { Basis, Caveat, DatasetId, FactQueryError, FactQueryResponse, FactQuerySnapshot, Measure, ResolvedSource } from "./types";
 
 const EXCLUDED = new Set<string>(AGGREGATE_ONLY_MUNICIPAL_CODES);
@@ -149,6 +152,43 @@ function errorResponse(snapshot: FactQuerySnapshot, error: FactQueryError): Fact
   return { kind: "error", status: "error", error, meta: buildResponseMeta(snapshot) };
 }
 
+function chunks<T>(items: readonly T[], size: number): T[][] {
+  return Array.from({ length: Math.ceil(items.length / size) }, (_unused, index) => items.slice(index * size, (index + 1) * size));
+}
+
+/**
+ * Topic queries and comparisons take at most INPUT_LIMITS ids per call, and a dataset can list more places or
+ * series than that: ask in chunks and join the answers, as the product ranking does. One chunk returns its own answer.
+ */
+function topicBatches(
+  snapshot: FactQuerySnapshot,
+  entityIds: readonly string[],
+  seriesIds: readonly string[],
+  key: "observations" | "comparisons",
+  ask: (entityIds: string[], seriesIds: string[]) => FactQueryResponse,
+): FactQueryResponse {
+  const answers: Exclude<FactQueryResponse, { kind: "error" }>[] = [];
+  for (const entityChunk of chunks(entityIds, INPUT_LIMITS.entities)) {
+    for (const seriesChunk of chunks(seriesIds, INPUT_LIMITS.series)) {
+      const answer = ask(entityChunk, seriesChunk);
+      if (answer.kind === "error") return answer;
+      answers.push(answer);
+    }
+  }
+  if (answers.length === 1) return answers[0]!;
+  const caveats = new Map<string, Caveat>();
+  for (const caveat of answers.flatMap((answer) => answer.meta.caveats)) {
+    caveats.set(caveat.code, { ...caveat, affects: [...new Set([...(caveats.get(caveat.code)?.affects ?? []), ...caveat.affects])] });
+  }
+  const sourceIds = [...new Set(answers.flatMap((answer) => answer.meta.sources.map((source) => source.sourceId)))];
+  const meta = buildResponseMeta(snapshot, {
+    sources: selectSources(snapshot, sourceIds),
+    caveats: [...caveats.values()],
+    citedDocumentIds: [...new Set(answers.flatMap((answer) => answer.meta.sources.flatMap((source) => source.documents.map((document) => document.documentId))))],
+  });
+  return { kind: key, status: "ok", data: { [key]: answers.flatMap((answer) => (answer.data as Record<string, unknown[]>)[key]!) }, meta } as FactQueryResponse;
+}
+
 type CatalogueSeries = { seriesId: string; labelKa: string; level: string; parentSeriesId: string | null; availability: string };
 
 function catalogueSeries(snapshot: FactQuerySnapshot, datasetId: DatasetId): CatalogueSeries[] {
@@ -172,6 +212,17 @@ export function rank(snapshot: FactQuerySnapshot, rawInput: unknown): FactQueryR
       messageEn: serviceMessage(snapshot, "en", "errors.rankSingleEntity", { requestedDataset }),
       retryable: false,
       validChoices: ["national-revenue", "national-expenditure", "ministries", "municipal-expenditure", "inflation"],
+    });
+  }
+
+  const topicIds = snapshot.topics.datasets.map((dataset) => dataset.page.datasetId);
+  if (typeof requestedDataset === "string" && !(RANK_CORE_DATASETS as readonly string[]).includes(requestedDataset) && !topicIds.includes(requestedDataset)) {
+    return errorResponse(snapshot, {
+      code: "invalid_parameters",
+      messageKa: serviceMessage(snapshot, "ka", "errors.unknownDataset", { datasetId: requestedDataset }),
+      messageEn: serviceMessage(snapshot, "en", "errors.unknownDataset", { datasetId: requestedDataset }),
+      retryable: false,
+      validChoices: [...RANK_CORE_DATASETS, ...topicIds],
     });
   }
 
@@ -202,14 +253,19 @@ export function rank(snapshot: FactQuerySnapshot, rawInput: unknown): FactQueryR
   const isInflation = input.datasetId === "inflation";
   const isProduct = input.datasetId === "inflation-products";
   const isValueMetric = input.metric === "value";
+  // The dataset's own rows, for any id that is not one of the core rankable datasets (checked above).
+  const topicDataset: TopicDataset | undefined = snapshot.topics.datasets.find((dataset) => dataset.page.datasetId === input.datasetId);
+  const regionIds = topicDataset
+    ? topicDataset.entities.filter((entity) => entity.entityType === "region").map((entity) => entity.entityId)
+    : snapshot.municipal.regions.map((r) => r.id);
 
-  if (input.withinRegionId !== undefined && !snapshot.municipal.regions.some((r) => r.id === input.withinRegionId)) {
+  if (input.withinRegionId !== undefined && !regionIds.includes(input.withinRegionId)) {
     return errorResponse(snapshot, {
       code: "unknown_entity",
       messageKa: serviceMessage(snapshot, "ka", "errors.rankUnknownRegion"),
       messageEn: serviceMessage(snapshot, "en", "errors.rankUnknownRegion"),
       retryable: false,
-      validChoices: snapshot.municipal.regions.map((r) => r.id),
+      validChoices: regionIds,
     });
   }
 
@@ -257,7 +313,9 @@ export function rank(snapshot: FactQuerySnapshot, rawInput: unknown): FactQueryR
 
   const entityRanking = input.dimension === "entities";
   const inflationCities = isInflation && entityRanking;
-  if ((entityRanking && !isMunicipal && !isInflation) || (!entityRanking && isMunicipal)) {
+  // Rankings whose rows are places: the same read-out as municipal and inflation-city rankings.
+  const byEntity = isMunicipal || inflationCities || (topicDataset !== undefined && entityRanking);
+  if ((entityRanking && !isMunicipal && !isInflation && !topicDataset) || (!entityRanking && isMunicipal)) {
     return errorResponse(snapshot, {
       code: "invalid_parameters",
       messageKa: serviceMessage(snapshot, "ka", "errors.rankDimension"),
@@ -303,8 +361,54 @@ export function rank(snapshot: FactQuerySnapshot, rawInput: unknown): FactQueryR
         universeValues = (locale) => ({ regionLabel: locale === "ka" ? region?.kaLabel ?? regionId : serviceLabelEn(snapshot, regionId) });
       }
     }
+  } else if (topicDataset) {
+    const invalid = () => errorResponse(snapshot, {
+      code: "invalid_parameters",
+      messageKa: serviceMessage(snapshot, "ka", "errors.rankTopicInput"),
+      messageEn: serviceMessage(snapshot, "en", "errors.rankTopicInput"),
+      retryable: false,
+    });
+    if (entityRanking) {
+      if (input.seriesId === undefined || input.entityType === undefined) return invalid();
+      seriesIds = [input.seriesId];
+      entityIds = topicDataset.entities
+        .filter((entity) => entity.entityType === input.entityType)
+        .filter((entity) => input.withinRegionId === undefined || entity.parentEntityId === input.withinRegionId)
+        .map((entity) => entity.entityId)
+        .sort();
+      universeKey = input.withinRegionId ? "ranking.withinRegion" : "ranking.topicPlaces";
+      if (input.withinRegionId) {
+        const region = topicDataset.entities.find((entity) => entity.entityId === input.withinRegionId);
+        universeValues = (locale) => ({ regionLabel: (locale === "ka" ? region?.labelKa : region?.labelEn) ?? input.withinRegionId! });
+      }
+    } else {
+      // One place: the one named, else the dataset's country (or its only entity).
+      const defaults = topicDataset.entities.filter((entity) => entity.entityType === "country");
+      const placeId = input.entityId ?? (defaults.length === 1 ? defaults : topicDataset.entities.length === 1 ? topicDataset.entities : [])[0]?.entityId;
+      if (placeId === undefined) return invalid();
+      entityIds = [placeId];
+      // Peers: the series under one heading (that of seriesId) or one parent, never a total.
+      const anchor = topicDataset.series.find((entry) => entry.seriesId === input.seriesId);
+      if (input.parentSeriesId === undefined) {
+        if (input.seriesId === undefined || (anchor !== undefined && anchor.headingKa === null)) return invalid();
+        if (anchor === undefined) {
+          return errorResponse(snapshot, {
+            code: "unknown_series",
+            messageKa: serviceMessage(snapshot, "ka", "errors.unknownSeries", { unknownSeriesIds: input.seriesId }),
+            messageEn: serviceMessage(snapshot, "en", "errors.unknownSeries", { unknownSeriesIds: input.seriesId }),
+            retryable: false,
+            validChoices: topicDataset.series.map((entry) => entry.seriesId).slice(0, 50),
+          });
+        }
+      }
+      seriesIds = topicDataset.series
+        .filter((entry) => !entry.isTotal && (input.parentSeriesId !== undefined ? entry.parentSeriesId === input.parentSeriesId : entry.headingKa === anchor!.headingKa))
+        .map((entry) => entry.seriesId)
+        .sort();
+      universeKey = "ranking.topicSeries";
+    }
   } else {
-    const series = isProduct ? [] : catalogueSeries(snapshot, input.datasetId);
+    const series = isProduct ? [] : catalogueSeries(snapshot, input.datasetId as DatasetId);
     if (inflationCities) {
       if (input.seriesId === undefined || input.entityType !== "city") {
         return errorResponse(snapshot, {
@@ -362,7 +466,7 @@ export function rank(snapshot: FactQuerySnapshot, rawInput: unknown): FactQueryR
     entityIds = inflationCities ? snapshot.inflation.cityEntities.map((city) => city.id) : ["country.georgia"];
   }
 
-  const candidateCount = isMunicipal || inflationCities ? entityIds.length : seriesIds.length;
+  const candidateCount = byEntity ? entityIds.length : seriesIds.length;
 
   if (candidateCount === 0) {
     return errorResponse(snapshot, {
@@ -401,7 +505,10 @@ export function rank(snapshot: FactQuerySnapshot, rawInput: unknown): FactQueryR
 
   if (isValueMetric) {
     let result: FactQueryResponse;
-    if (isProduct) {
+    if (topicDataset) {
+      result = topicBatches(snapshot, entityIds, seriesIds, "observations", (entityChunk, seriesChunk) =>
+        queryIndicators(snapshot, { datasetId: input.datasetId, seriesIds: seriesChunk, entityIds: entityChunk, years: [input.year as number] }));
+    } else if (isProduct) {
       const observations: Observation[] = [];
       const mergedCaveats = new Map<string, FactQueryResponse["meta"]["caveats"][number]>();
       // Keep each query within the public series cap, while covering the entire roster.
@@ -434,7 +541,7 @@ export function rank(snapshot: FactQuerySnapshot, rawInput: unknown): FactQueryR
 
 
     for (const observation of observations) {
-      const stableId = isMunicipal || inflationCities ? observation.entityId : observation.seriesId;
+      const stableId = byEntity ? observation.entityId : observation.seriesId;
       if (observation.value === null) {
         exclusions.push({ id: stableId, reason: observation.missingReason ?? serviceMessage(snapshot, "ka", REASON_NO_VALUE), reasonEn: observation.missingReasonEn ?? serviceMessage(snapshot, "en", REASON_NO_VALUE) });
         continue;
@@ -466,12 +573,15 @@ export function rank(snapshot: FactQuerySnapshot, rawInput: unknown): FactQueryR
           ? ({ dataset: "ministries", level: input.level ?? "admin_category", seriesIds } as const)
           : ({ dataset: "national", side: input.datasetId === "national-revenue" ? "revenue" : "expenditure", seriesIds } as const);
 
-    const result = compare(
-      snapshot,
-      isInflation
-        ? { target, fromPeriod: input.fromPeriod, toPeriod: input.toPeriod, measure: input.measure }
-        : { target, fromYear: input.fromYear as number, toYear: input.toYear as number, measure: input.measure },
-    );
+    const result = topicDataset
+      ? topicBatches(snapshot, entityIds, seriesIds, "comparisons", (entityChunk, seriesChunk) =>
+        compare(snapshot, { target: { dataset: "topic", datasetId: input.datasetId, seriesIds: seriesChunk, entityIds: entityChunk }, fromYear: input.fromYear as number, toYear: input.toYear as number, measure: input.measure }))
+      : compare(
+        snapshot,
+        isInflation
+          ? { target, fromPeriod: input.fromPeriod, toPeriod: input.toPeriod, measure: input.measure }
+          : { target, fromYear: input.fromYear as number, toYear: input.toYear as number, measure: input.measure },
+      );
     if (result.kind === "error") return errorResponse(snapshot, result.error);
 
     const comparisons = (result.data as { comparisons: Comparison[] }).comparisons;
@@ -480,7 +590,7 @@ export function rank(snapshot: FactQuerySnapshot, rawInput: unknown): FactQueryR
     caveats = result.meta.caveats;
 
     for (const comparison of comparisons) {
-      const stableId = isMunicipal || inflationCities ? comparison.entityId : comparison.seriesId;
+      const stableId = byEntity ? comparison.entityId : comparison.seriesId;
 
       // Spec section 6.7: omit what is not comparable and report it. A
       // `limited` comparison may remain, carrying its caveat.
@@ -596,9 +706,11 @@ export function rank(snapshot: FactQuerySnapshot, rawInput: unknown): FactQueryR
         ? serviceMessage(snapshot, locale, "ranking.valueDefinitionPeriod", { measure, period: input.period as string, order })
         : serviceMessage(snapshot, locale, "ranking.changeDefinitionPeriod", { metric, measure, fromPeriod: input.fromPeriod as string, toPeriod: input.toPeriod as string, order });
     }
+    // A school-year dataset prints 2015/16, as its page does.
+    const periodName = (year: number) => (topicDataset && topicPeriodLabel(topicDataset, year)) ?? year;
     return isValueMetric
-      ? serviceMessage(snapshot, locale, "ranking.valueDefinition", { measure, year: input.year as number, order })
-      : serviceMessage(snapshot, locale, "ranking.changeDefinition", { metric, measure, fromYear: input.fromYear as number, toYear: input.toYear as number, order });
+      ? serviceMessage(snapshot, locale, "ranking.valueDefinition", { measure, year: periodName(input.year as number), order })
+      : serviceMessage(snapshot, locale, "ranking.changeDefinition", { metric, measure, fromYear: periodName(input.fromYear as number), toYear: periodName(input.toYear as number), order });
   };
 
   const status: "ok" | "partial" | "empty" =
