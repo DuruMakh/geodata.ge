@@ -256,6 +256,18 @@ describe("rank topic series peers", () => {
     expect(idsOf(seriesRanking("trade-partners", { seriesId: "trade.exports.group.eu" }, 2024))).toEqual(idsOf(groups));
   });
 
+  // Re-review NEW-I1: one heading, one unit, but several measures, each under its own parent.
+  it("ranks a series among its own parent's children: shares of GDP without real growth, active firms without new or closed ones, one poverty line", () => {
+    const shares = seriesRanking("economy-expenditure", { seriesId: "gdp_use.imports.share_of_gdp" }, 2024);
+    expect(shares.entries.length).toBeGreaterThan(1);
+    expect(idsOf(shares).every((id) => id.endsWith(".share_of_gdp"))).toBe(true);
+    const firms = seriesRanking("business-firms", { seriesId: "business.active.sector_c" }, 2023);
+    expect(firms.entries.length).toBeGreaterThan(1);
+    expect(idsOf(firms).every((id) => id.startsWith("business.active.sector_"))).toBe(true);
+    const poverty = seriesRanking("living-standards-poverty", { seriesId: "poverty.relative_60.settlement.urban" }, 2024);
+    expect(idsOf(poverty).sort()).toEqual(["poverty.relative_60.settlement.rural", "poverty.relative_60.settlement.urban"]);
+  });
+
   it("says a series under no heading has no peers to rank (money-interest-rates)", () => {
     const response = rank(snapshot, { datasetId: "money-interest-rates", dimension: "series", seriesId: "rates.policy", measure: "value", metric: "value", year: 2024 });
     expect(response).toMatchObject({ kind: "error", error: { code: "invalid_parameters" } });

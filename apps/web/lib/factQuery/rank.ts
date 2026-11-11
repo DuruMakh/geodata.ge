@@ -411,6 +411,9 @@ export function rank(snapshot: FactQuerySnapshot, rawInput: unknown): FactQueryR
         }
       }
       let peers = topicDataset.series.filter((entry) => !entry.isTotal && (input.parentSeriesId !== undefined ? entry.parentSeriesId === input.parentSeriesId : entry.headingKa === anchor!.headingKa));
+      // A heading can hold several measures of one unit, each under its own parent (shares of GDP and real growth, active
+      // and new firms, the 60% and 40% poverty lines): a named series with a parent ranks among its siblings only.
+      if (input.parentSeriesId === undefined && anchor!.parentSeriesId !== null) peers = peers.filter((entry) => entry.parentSeriesId === anchor!.parentSeriesId);
       // A parent whose children the page lists under several headings, each a breakdown of its own (trade partners by
       // country and by country group, investment by country and by sector), ranks one: the named series' heading, else
       // the first. Children that each stand alone under their heading (the VAT and income-tax totals) rank together.
