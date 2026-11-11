@@ -105,7 +105,7 @@ const coverage = z.object({
   excludedEntities: z.array(bilingualExcludedEntity), returnedCount: z.number().int(), expectedCount: z.number().int(),
   requestedPeriods: z.array(z.string()).optional(), availablePeriods: z.array(z.string()).length(2).nullable().optional(),
 });
-const endpoint = observationSchema.pick({ year: true, period: true, value: true, availability: true, missingReason: true, missingReasonEn: true, basis: true, valueDefinition: true, valueDefinitionEn: true, valueDefinitionId: true, sourceIds: true, documentIds: true }).extend({ periodLabel: z.string().optional() });
+const endpoint = observationSchema.pick({ year: true, period: true, value: true, availability: true, missingReason: true, missingReasonEn: true, basis: true, valueDefinition: true, valueDefinitionEn: true, valueDefinitionId: true, sourceIds: true, documentIds: true }).extend({ periodLabel: z.string().optional(), periodEnd: z.string().optional() });
 const dataShapes = {
   observations: z.object({ observations: z.array(observationSchema), coverage }),
   /** query_indicators: topic observations, years only. */
@@ -122,7 +122,7 @@ const dataShapes = {
   ranking: z.object({
     entries: z.array(z.object({
       position: z.number(), tied: z.boolean(), entityId: z.string(), entityLabelKa: z.string(), entityLabelEn: z.string().min(1), seriesId: z.string(), seriesLabelKa: z.string(), seriesLabelEn: z.string().min(1),
-      value: z.number().nullable(), unit: observationSchema.shape.unit, basis: observationSchema.shape.basis, caveatIds: z.array(z.string()), period: z.string().optional(), calculationBasePeriod: periodKeySchema.optional(),
+      value: z.number().nullable(), unit: observationSchema.shape.unit, basis: observationSchema.shape.basis, caveatIds: z.array(z.string()), period: z.string().optional(), calculationBasePeriod: periodKeySchema.optional(), periodEnd: z.string().optional(),
     })),
     universe: z.object({ dimension: z.enum(["series", "entities"]), description: z.string(), descriptionEn: z.string().min(1), candidateCount: z.number(), eligibleCount: z.number(), returnedCount: z.number(), cutoffSplitsTie: z.boolean() }),
     exclusions: z.array(z.object({ reason: z.string(), reasonEn: z.string().min(1), ids: z.array(z.string()) })), rankingDefinition: z.string(), rankingDefinitionEn: z.string().min(1),

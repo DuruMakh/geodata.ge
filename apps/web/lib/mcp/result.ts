@@ -114,7 +114,8 @@ function comparisonLine(comparison: Comparison): string {
     comparison.entityLabelEn,
     comparison.seriesLabelKa,
     comparison.seriesLabelEn,
-    `${comparison.from.period ?? comparison.from.periodLabel ?? comparison.from.year}→${comparison.to.period ?? comparison.to.periodLabel ?? comparison.to.year}`,
+    // A dated endpoint (the latest Foreign debt or Reserves amount) reads as its date, never as a whole year.
+    `${comparison.from.period ?? comparison.from.periodLabel ?? comparison.from.periodEnd ?? comparison.from.year}→${comparison.to.period ?? comparison.to.periodLabel ?? comparison.to.periodEnd ?? comparison.to.year}`,
     comparison.measure,
     comparison.from.value,
     comparison.to.value,
@@ -218,13 +219,14 @@ function bodyOf(response: Extract<FactQueryResponse, { kind: Exclude<FactQueryRe
     const { entries, universe, exclusions, rankingDefinition, rankingDefinitionEn } = data as RankData;
     const includePeriod = entries.some(entry => entry.period !== undefined);
     const includeBase = entries.some(entry => entry.calculationBasePeriod !== undefined);
+    const includePeriodEnd = entries.some(entry => entry.periodEnd !== undefined);
     return [
       rankingDefinition,
       rankingDefinitionEn,
       `${universe.description} | ${universe.descriptionEn}`,
-      "# position\tentityKa\tentityEn\tseriesKa\tseriesEn\tvalue\tunit\tbasis\ttied\tcaveats\tentityId\tseriesId" + (includePeriod ? "\tperiod" : "") + (includeBase ? "\tcalculationBasePeriod" : ""),
+      "# position\tentityKa\tentityEn\tseriesKa\tseriesEn\tvalue\tunit\tbasis\ttied\tcaveats\tentityId\tseriesId" + (includePeriod ? "\tperiod" : "") + (includeBase ? "\tcalculationBasePeriod" : "") + (includePeriodEnd ? "\tperiodEnd" : ""),
       ...entries.map((entry) =>
-        line(entry.position, entry.entityLabelKa, entry.entityLabelEn, entry.seriesLabelKa, entry.seriesLabelEn, entry.value, entry.unit, entry.basis, entry.tied ? "tied" : "", entry.caveatIds.join(","), entry.entityId, entry.seriesId, ...(includePeriod ? [entry.period ?? null] : []), ...(includeBase ? [entry.calculationBasePeriod ?? null] : [])),
+        line(entry.position, entry.entityLabelKa, entry.entityLabelEn, entry.seriesLabelKa, entry.seriesLabelEn, entry.value, entry.unit, entry.basis, entry.tied ? "tied" : "", entry.caveatIds.join(","), entry.entityId, entry.seriesId, ...(includePeriod ? [entry.period ?? null] : []), ...(includeBase ? [entry.calculationBasePeriod ?? null] : []), ...(includePeriodEnd ? [entry.periodEnd ?? null] : [])),
       ),
       `${universe.returnedCount} of ${universe.eligibleCount} eligible from ${universe.candidateCount} candidates` +
         (universe.cutoffSplitsTie ? " — the cutoff splits a tie, so the last place is arbitrary" : ""),

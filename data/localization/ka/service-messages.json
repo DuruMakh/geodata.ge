@@ -644,5 +644,15 @@
   "sources.source.geostat_trade_export_sitc_2000_2026.name": "საქონლის ექსპორტი SITC კატეგორიებით, 2000–2025",
   "sources.source.geostat_trade_export_bec_2000_2026.name": "საქონლის ექსპორტი BEC კატეგორიებით, 2000–2025",
   "sources.source.geostat_trade_import_sitc_2000_2026.name": "საქონლის იმპორტი SITC კატეგორიებით, 2000–2025",
-  "sources.source.geostat_trade_import_bec_2000_2026.name": "საქონლის იმპორტი BEC კატეგორიებით, 2000–2025"
+  "sources.source.geostat_trade_import_bec_2000_2026.name": "საქონლის იმპორტი BEC კატეგორიებით, 2000–2025",
+  "documents.geostat_fdi_by_quarters.attribution": "საქსტატი",
+  "documents.geostat_fdi_by_countries.attribution": "საქსტატი",
+  "documents.geostat_fdi_by_sectors.attribution": "საქსტატი",
+  "documents.geostat_fdi_by_regions.attribution": "საქსტატი",
+  "documents.nbg_balance_of_payments_bpm6.attribution": "საქართველოს ეროვნული ბანკი",
+  "documents.nbg_money_transfers_by_countries.attribution": "საქართველოს ეროვნული ბანკი",
+  "documents.nbg_gross_external_debt_bpm6.attribution": "საქართველოს ეროვნული ბანკი",
+  "documents.nbg_official_reserve_assets.attribution": "საქართველოს ეროვნული ბანკი",
+  "sources.source.nbg_gross_external_debt_bpm6.name": "მთლიანი საგარეო ვალი სექტორების მიხედვით (ED-6; BPM6)",
+  "sources.source.nbg_official_reserve_assets.name": "ოფიციალური სარეზერვო აქტივები (OIR)"
 }

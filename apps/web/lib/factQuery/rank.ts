@@ -52,6 +52,8 @@ export type RankEntry = {
   /** Inflation value rankings only: the month ranked. */
   period?: string;
   calculationBasePeriod?: string;
+  /** Topic value rankings only: the date of an amount dated other than its year's end (the latest Foreign debt and Reserves point). */
+  periodEnd?: string;
 };
 
 export type RankData = {
@@ -91,6 +93,7 @@ type Candidate = {
   caveatIds: string[];
   period?: string;
   calculationBasePeriod?: string;
+  periodEnd?: string;
   /** Documents behind this row: the observation's, or both endpoints' of the comparison. */
   documentIds: string[];
   /** The cells the value was read from, to narrow caveat `affects` to the rows a ranking returns. */
@@ -567,6 +570,7 @@ export function rank(snapshot: FactQuerySnapshot, rawInput: unknown): FactQueryR
         caveatIds: observation.caveatIds,
         ...(observation.period !== undefined ? { period: observation.period } : {}),
         ...(observation.calculationBasePeriod !== undefined ? { calculationBasePeriod: observation.calculationBasePeriod } : {}),
+        ...(observation.periodEnd !== undefined ? { periodEnd: observation.periodEnd } : {}),
         documentIds: observation.documentIds,
         cells: [{ year: observation.year, ...(observation.period !== undefined ? { period: observation.period } : {}) }],
         stableId,
@@ -702,6 +706,7 @@ export function rank(snapshot: FactQuerySnapshot, rawInput: unknown): FactQueryR
     caveatIds: entry.caveatIds,
     ...(entry.period !== undefined ? { period: entry.period } : {}),
     ...(entry.calculationBasePeriod !== undefined ? { calculationBasePeriod: entry.calculationBasePeriod } : {}),
+    ...(entry.periodEnd !== undefined ? { periodEnd: entry.periodEnd } : {}),
   }));
 
   const rankingDefinitionFor = (locale: "ka" | "en") => {

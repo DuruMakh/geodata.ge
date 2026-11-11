@@ -17,7 +17,7 @@ import { CURRENT_ACCOUNT_SERIES, CURRENT_ACCOUNT_SOURCE, FOREIGN_INVESTMENT_SOUR
 import { moneyTransfersCoverage } from "../explorer/moneyTransfersState";
 import { foreignInvestmentCoverage } from "../explorer/foreignInvestmentState";
 import { currentAccountCoverage } from "../explorer/currentAccountState";
-import { EXTERNAL_POSITION_SECTIONS, externalPositionCoverage, externalPositionSeries, type ExternalPositionSectionId } from "../explorer/externalPosition";
+import { EXTERNAL_POSITION_SECTIONS, externalPositionCoverage, externalPositionLabels, externalPositionPageFacts, type ExternalPositionSectionId } from "../explorer/externalPosition";
 import { coverageLabel } from "../explorer/coverageLabel";
 import { I18nProvider } from "../i18n/provider";
 import { clientPresentation, getPresentation } from "../i18n/presentation.server";
@@ -158,8 +158,7 @@ const positionHref = (section: ExternalPositionSectionId) => EXTERNAL_POSITION_S
 /** One page's observations (the dataset serves both pages' indicators) and its years, which the amounts view spans. */
 async function loadClientExternalPosition(section: ExternalPositionSectionId) {
   const { facts } = await loadServedExternalPositionData();
-  const ids = new Set<string>(externalPositionSeries(section).map(series => series.id));
-  const pageFacts = facts.filter(fact => ids.has(fact.indicatorId));
+  const pageFacts = externalPositionPageFacts(facts, section);
   const client = pageFacts.map(toClientExternalPositionFact);
   const { min, max } = externalPositionCoverage(section, "amount", client, []);
   return { facts: pageFacts, client, min, max };
@@ -181,7 +180,7 @@ export async function renderExternalPositionPage(locale: Locale, section: Extern
   const gdp = nominalGdpUsd(gdpFacts);
   // The workbook cites only the files these observations come from.
   const sourceIds = new Set(client.map(fact => fact.sourceId));
-  const labels = Object.fromEntries(externalPositionSeries(section).map(series => [series.id, message(presentation.messages, `external.${key}.series.${series.id}`)]));
+  const labels = externalPositionLabels(section, presentation.messages);
   const lastReviewedAt = facts.map(fact => fact.lastReviewedAt).sort().at(-1)!, origin = resolveSiteUrl();
   const t = (suffix: string) => message(presentation.messages, `external.${suffix}`);
   const crumbs = [{ label: message(presentation.messages, "common.home"), href: pageHref("/", locale) }, { label: message(presentation.messages, "common.data"), href: pageHref(ALL_DATA_PATH, locale) }, { label: t("hubTitle"), href: pageHref(topicSection("external").href, locale) }, { label: t(`${key}.title`) }];

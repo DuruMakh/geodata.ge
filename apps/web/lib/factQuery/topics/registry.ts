@@ -19,6 +19,7 @@ import type { Basis, RawResolvedSource } from "../types";
 import { businessTopicAdapter } from "./business";
 import { demographyTopicAdapter } from "./demography";
 import { educationTopicAdapter } from "./education";
+import { externalTopicAdapter } from "./external";
 import { healthTopicAdapter } from "./health";
 import { housingTopicAdapter } from "./housing";
 import { internetTopicAdapter } from "./internet";
@@ -33,7 +34,7 @@ import { unemploymentTopicAdapter } from "./unemployment";
 import { wagesTopicAdapter } from "./wages";
 import type { TopicAdapter, TopicDataset, TopicDatasetBuild, TopicsSnapshot, TopicValueStatus } from "./types";
 
-export const TOPIC_ADAPTERS: readonly TopicAdapter[] = [educationTopicAdapter, demographyTopicAdapter, healthTopicAdapter, socialTopicAdapter, unemploymentTopicAdapter, wagesTopicAdapter, businessTopicAdapter, moneyBanksTopicAdapter, livingStandardsTopicAdapter, housingTopicAdapter, internetTopicAdapter, transportTopicAdapter, tradeTopicAdapter];
+export const TOPIC_ADAPTERS: readonly TopicAdapter[] = [educationTopicAdapter, demographyTopicAdapter, healthTopicAdapter, socialTopicAdapter, unemploymentTopicAdapter, wagesTopicAdapter, businessTopicAdapter, moneyBanksTopicAdapter, livingStandardsTopicAdapter, housingTopicAdapter, internetTopicAdapter, transportTopicAdapter, tradeTopicAdapter, externalTopicAdapter];
 
 /**
  * The site's own message for each unit token the topic CSVs use (R7: unit ids are the CSVs' tokens). One name per
@@ -77,6 +78,7 @@ const TOPIC_UNIT_MESSAGES: Readonly<Record<string, string>> = {
   thousand_tonnes: "transport.unitThousandTonnes",
   km: "transport.unitKm",
   usd: "gdp.usd",
+  usd_million: "external.position.unitMlnUsd",
 };
 
 /** The source registry's id (data/sources/source-documents.csv) of an archive's source id: the registry adds `source.`, which some archives already carry. */

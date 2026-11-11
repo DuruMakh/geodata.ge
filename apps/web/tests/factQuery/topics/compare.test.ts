@@ -86,8 +86,17 @@ describe("compare topic", () => {
     expect(pair!.absoluteChange).not.toBeNull();
   });
 
-  // Enabled in Task 16 with the money-transfers data: a transfer year with months the source left blank.
-  it.todo("a partial money-transfer year endpoint is limited: comparability 'limited', caveatIds contain 'topic_partial_period'");
+  // The money-transfers data: in 2019 the source left months blank for countries outside the 2025 top 10, so the page
+  // marks Other countries 2019 partial (5 months, the fewest any of them reports).
+  it("a partial money-transfer year endpoint is limited: comparability 'limited', caveatIds contain 'topic_partial_period'", () => {
+    const [pair] = comparisons(topicCompare("external-money-from-abroad", ["transfer.others.received"], 2018, 2019));
+    expect(pair).toMatchObject({ comparability: "limited", reasons: [], to: { year: 2019, availability: "available" } });
+    expect(pair!.caveatIds).toContain("topic_partial_period");
+    expect(pair!.to.valueDefinitionEn).toContain("it covers 5 months of the year");
+    expect(pair!.absoluteChange).not.toBeNull();
+    // Two full years either side are comparable.
+    expect(comparisons(topicCompare("external-money-from-abroad", ["transfer.others.received"], 2020, 2025))[0]).toMatchObject({ comparability: "comparable", caveatIds: ["topic_derived"] });
+  });
 });
 
 describe("query_indicators series-break caveat", () => {

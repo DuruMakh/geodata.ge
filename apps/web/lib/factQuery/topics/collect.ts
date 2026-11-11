@@ -9,8 +9,11 @@ import type { TopicBreak, TopicDatasetBuild, TopicEntity, TopicFact, TopicPage, 
 
 /** A name in both languages: a message key read in each, or text built from the page's own words in each. */
 export type Names = { ka: string; en: string };
-/** One served cell's value, the rows it rests on, whether the page adds them up itself and, for a part of a year, its months. */
-export type Cell = { value: number; unit: string; sourceIds: string[]; status: TopicValueStatus; monthsReported?: number };
+/**
+ * One served cell's value, the rows it rests on, whether the page adds them up itself and, for a part of a year, its
+ * months; for an amount dated other than the year's end (the latest Foreign debt and Reserves point), its date.
+ */
+export type Cell = { value: number; unit: string; sourceIds: string[]; status: TopicValueStatus; monthsReported?: number; periodEnd?: string };
 export type SeriesSpec = { seriesId: string; indicatorId: string; label: Names; heading: Names | null; parentSeriesId: string | null; isTotal: boolean };
 
 /**
@@ -40,7 +43,10 @@ export function collectTopicDataset(datasetId: string, title: Names, basis: Basi
     if (!entities.has(entity.entityId)) entities.set(entity.entityId, entity);
     for (const { year, cell } of cells) {
       facts.push(cell
-        ? { entityId: entity.entityId, seriesId: spec.seriesId, year, value: cell.value, basis, status: cell.status, sourceIds: cell.sourceIds, ...(cell.monthsReported === undefined ? {} : { monthsReported: cell.monthsReported }) }
+        ? {
+          entityId: entity.entityId, seriesId: spec.seriesId, year, value: cell.value, basis, status: cell.status, sourceIds: cell.sourceIds,
+          ...(cell.periodEnd === undefined ? {} : { periodEnd: cell.periodEnd }), ...(cell.monthsReported === undefined ? {} : { monthsReported: cell.monthsReported }),
+        }
         : { entityId: entity.entityId, seriesId: spec.seriesId, year, value: null, basis, status: "official", sourceIds: [] });
     }
   }

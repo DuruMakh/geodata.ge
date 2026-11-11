@@ -30,7 +30,7 @@ describe("buildFactQuerySnapshot", () => {
     const sources = await loadSourceDocuments("../../data/sources/source-documents.csv");
     // The nineteen demography canonical inputs (eighteen annual tables, six of them for marriages and divorces, and the census snapshot) supply new fact sources; the
     // package's validation inputs and definitions remain evidence.
-    // The seven Wages workbooks, the seven Poverty documents, the 21 Household income and spending documents, the 55 Energy and food sources, the twenty-three Money and banks documents, the 26 Business documents, the 21 Housing archived sources, the 36 Health archived sources, the 22 Crime and justice archived sources, the 14 Labour detail archived sources, the 46 Education documents, the 46 Environment and climate archived sources, the 33 Science and culture archived sources, the 25 Social Service Agency sources, the six Pension Fund sources, the 25 Transport archived sources, the 36 Internet and technology archived sources, the five Tax breaks and refunds originals, the four Services trade workbooks, the four Trade composition originals and the three Foreign debt and Reserves originals are registered sources of human explorers only.
+    // The seven Wages workbooks, the seven Poverty documents, the 21 Household income and spending documents, the 55 Energy and food sources, the twenty-three Money and banks documents, the 26 Business documents, the 21 Housing archived sources, the 36 Health archived sources, the 22 Crime and justice archived sources, the 14 Labour detail archived sources, the 46 Education documents, the 46 Environment and climate archived sources, the 33 Science and culture archived sources, the 25 Social Service Agency sources, the six Pension Fund sources, the 25 Transport archived sources, the 36 Internet and technology archived sources, the five Tax breaks and refunds originals, the four Services trade workbooks, and the four Trade composition originals are registered sources of human explorers only.
     // The 2026 State Budget law (source.mof_2026_budget_law_planned) is the one planned-basis source behind the 2026 Spending plan.
     expect(sources).toHaveLength(649);
     expect(sources.filter(source => source.sourceId.startsWith("source.geostat_services_")).map(source => source.sourceId).sort()).toEqual([
@@ -64,7 +64,8 @@ describe("buildFactQuerySnapshot", () => {
     // Only the Health sources a topic page's facts cite reach the snapshot.
     expect(snapshot.sources.filter(source => HEALTH_PUBLIC_SOURCES.map(healthSourceDocumentId).includes(source.sourceId)).map(source => source.sourceId)).toEqual(snapshot.topics.sourceIds.filter(id => HEALTH_PUBLIC_SOURCES.map(healthSourceDocumentId).includes(id)));
     expect(snapshot.sources.some(source => CRIME_PUBLIC_SOURCES.map(crimeSourceDocumentId).includes(source.sourceId))).toBe(false);
-    expect(snapshot.sources.some(source => EXTERNAL_POSITION_PUBLIC_SOURCES.map(externalPositionSourceDocumentId).includes(source.sourceId))).toBe(false);
+    // Only the Foreign debt and Reserves workbooks those pages' facts cite reach the snapshot (not the NBG file listing).
+    expect(snapshot.sources.filter(source => EXTERNAL_POSITION_PUBLIC_SOURCES.map(externalPositionSourceDocumentId).includes(source.sourceId)).map(source => source.sourceId)).toEqual(["source.nbg_gross_external_debt_bpm6", "source.nbg_official_reserve_assets"]);
     expect(snapshot.sources.some(source => source.sourceId.startsWith("source.geostat_gdp_use_"))).toBe(false);
     // All 21 registered housing sources are in the registry, and only those a topic page's facts cite reach the snapshot.
     expect(HOUSING_PUBLIC_SOURCES.map(housingSourceDocumentId).filter(id => !sources.some(source => source.sourceId === id))).toEqual([]);
@@ -80,7 +81,10 @@ describe("buildFactQuerySnapshot", () => {
     // All 25 registered transport sources are in the registry, and only those a topic page's facts cite reach the snapshot.
     expect(TRANSPORT_PUBLIC_SOURCES.map(transportSourceDocumentId).filter(id => !sources.some(source => source.sourceId === id))).toEqual([]);
     expect(snapshot.sources.filter(source => TRANSPORT_PUBLIC_SOURCES.map(transportSourceDocumentId).includes(source.sourceId)).map(source => source.sourceId)).toEqual(snapshot.topics.sourceIds.filter(id => TRANSPORT_PUBLIC_SOURCES.map(transportSourceDocumentId).includes(id)));
-    expect(snapshot.sources.some(source => source.sourceId.startsWith("source.nbg_money_transfers_") || source.sourceId.startsWith("source.geostat_fdi_") || source.sourceId === "source.nbg_balance_of_payments_bpm6")).toBe(false);
+    // Money from abroad, Foreign investment and Current account cite these, and they reach the snapshot as topic sources.
+    expect(snapshot.sources.filter(source => source.sourceId.startsWith("source.nbg_money_transfers_") || source.sourceId.startsWith("source.geostat_fdi_") || source.sourceId === "source.nbg_balance_of_payments_bpm6").map(source => source.sourceId).sort()).toEqual([
+      "source.geostat_fdi_by_countries", "source.geostat_fdi_by_quarters", "source.geostat_fdi_by_regions", "source.geostat_fdi_by_sectors", "source.nbg_balance_of_payments_bpm6", "source.nbg_money_transfers_by_countries",
+    ]);
     expect(snapshot.sources.map(source => source.sourceId)).toEqual(expect.arrayContaining([
       "source.geostat_sector_growth", "source.geostat_sector_volume",
       "source.geostat_regional_gdp", "source.geostat_regional_gdp_by_activity", "source.fiscal_regional_economy_share",

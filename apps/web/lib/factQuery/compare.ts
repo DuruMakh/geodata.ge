@@ -41,6 +41,8 @@ export type ComparisonEndpoint = {
   period?: string;
   /** School-year periods only (topic datasets): `2015/16`. */
   periodLabel?: string;
+  /** An amount dated other than its year's end (topic datasets: the latest Foreign debt and Reserves point): its date. */
+  periodEnd?: string;
   value: number | null;
   availability: "available" | "missing";
   missingReason: string | null;
@@ -163,6 +165,7 @@ function endpointOf(observation: Observation): ComparisonEndpoint {
     year: observation.year,
     ...(observation.period !== undefined ? { period: observation.period } : {}),
     ...(observation.periodLabel !== undefined ? { periodLabel: observation.periodLabel } : {}),
+    ...(observation.periodEnd !== undefined ? { periodEnd: observation.periodEnd } : {}),
     value: observation.value,
     availability: observation.availability,
     missingReason: observation.missingReason,

@@ -1,4 +1,4 @@
-import type { ClientExternalPositionFact, ExternalPositionIndicator } from "../data/externalPosition/types";
+import type { ClientExternalPositionFact, ExternalPositionFact, ExternalPositionIndicator } from "../data/externalPosition/types";
 import type { CurrentAccountGdp } from "./currentAccount";
 import { message } from "../i18n/messages";
 import type { Messages } from "../i18n/types";
@@ -23,6 +23,18 @@ export function externalPositionSeries(section: ExternalPositionSectionId): Exte
   return section === "foreign-debt"
     ? withParts("ext_debt.total", ["ext_debt.government", "ext_debt.banks", "ext_debt.companies", "ext_debt.intercompany", "ext_debt.central_bank"])
     : withParts("reserves.total", ["reserves.fx", "reserves.gold", "reserves.sdr"]);
+}
+
+/** One page's observations: the dataset serves both pages' indicators. */
+export function externalPositionPageFacts(facts: readonly ExternalPositionFact[], section: ExternalPositionSectionId): ExternalPositionFact[] {
+  const ids = new Set<string>(externalPositionSeries(section).map(series => series.id));
+  return facts.filter(fact => ids.has(fact.indicatorId));
+}
+
+/** Each series' name on its page: `external.debt.series.<id>` or `external.reserves.series.<id>`. */
+export function externalPositionLabels(section: ExternalPositionSectionId, messages: Messages): Record<string, string> {
+  const key = section === "foreign-debt" ? "debt" : "reserves";
+  return Object.fromEntries(externalPositionSeries(section).map(series => [series.id, message(messages, `external.${key}.series.${series.id}`)]));
 }
 
 export type ExternalPositionState = TopicState & { view: ExternalPositionView };

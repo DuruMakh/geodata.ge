@@ -644,5 +644,15 @@
   "sources.source.geostat_trade_export_sitc_2000_2026.name": "Georgian Exports by Standard International Trade Classification (SITC) section",
   "sources.source.geostat_trade_export_bec_2000_2026.name": "Georgian Exports by Broad Economic Categories (BEC)",
   "sources.source.geostat_trade_import_sitc_2000_2026.name": "Georgian Imports by Standard International Trade Classification (SITC) section",
-  "sources.source.geostat_trade_import_bec_2000_2026.name": "Georgian Imports by Broad Economic Categories (BEC)"
+  "sources.source.geostat_trade_import_bec_2000_2026.name": "Georgian Imports by Broad Economic Categories (BEC)",
+  "documents.geostat_fdi_by_quarters.attribution": "Geostat",
+  "documents.geostat_fdi_by_countries.attribution": "Geostat",
+  "documents.geostat_fdi_by_sectors.attribution": "Geostat",
+  "documents.geostat_fdi_by_regions.attribution": "Geostat",
+  "documents.nbg_balance_of_payments_bpm6.attribution": "National Bank of Georgia",
+  "documents.nbg_money_transfers_by_countries.attribution": "National Bank of Georgia",
+  "documents.nbg_gross_external_debt_bpm6.attribution": "National Bank of Georgia",
+  "documents.nbg_official_reserve_assets.attribution": "National Bank of Georgia",
+  "sources.source.nbg_gross_external_debt_bpm6.name": "NBG Gross External Debt by sector (ED-6 BPM-6)",
+  "sources.source.nbg_official_reserve_assets.name": "NBG Official Reserve Assets (OIR)"
 }
