@@ -132,8 +132,13 @@ export function changeSectorMeasure(state: SectorState, measure: SectorMeasure, 
  */
 export function sectorCrawlStates(facts: readonly ClientSectorObservation[], registry: readonly SectorDefinition[], sourceIdByMeasure: Record<string, string>, config: SectorPageConfig = SECTORS_PAGE_CONFIG): SectorState[] {
   const listsGdp = registry.some(r => r.id === SECTOR_GDP);
+  return sectorMeasureStates(facts, registry, sourceIdByMeasure, config).filter(state => !(state.measure === "share_of_gdp" && listsGdp));
+}
+
+/** Each measure the page offers and has facts for, as it opens, with every row its list shows, over every year. */
+export function sectorMeasureStates(facts: readonly ClientSectorObservation[], registry: readonly SectorDefinition[], sourceIdByMeasure: Record<string, string>, config: SectorPageConfig = SECTORS_PAGE_CONFIG): SectorState[] {
   return (config.measures ?? ALL_SECTOR_MEASURES)
-    .filter(measure => facts.some(f => f.measure === measure) && !(measure === "share_of_gdp" && listsGdp))
+    .filter(measure => facts.some(f => f.measure === measure))
     .map(measure => {
       const state: SectorState = { ...changeSectorMeasure(defaultSectorState(config), measure, facts, config), mode: "line", range: { kind: "all" } };
       return { ...state, selectedIds: buildEconomicSectorsModel(facts, registry, state, sourceIdByMeasure, config).visibleIds };

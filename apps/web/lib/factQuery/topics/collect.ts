@@ -11,15 +11,17 @@ import type { TopicBreak, TopicDatasetBuild, TopicEntity, TopicFact, TopicPage, 
 export type Names = { ka: string; en: string };
 /**
  * One served cell's value, the rows it rests on, whether the page adds them up itself and, for a part of a year, its
- * months; for an amount dated other than the year's end (the latest Foreign debt and Reserves point), its date.
+ * months; for an amount dated other than the year's end (the latest Foreign debt and Reserves point), its date; for a
+ * cell whose basis is not the dataset's (a preliminary year), its own.
  */
-export type Cell = { value: number; unit: string; sourceIds: string[]; status: TopicValueStatus; monthsReported?: number; periodEnd?: string };
+export type Cell = { value: number; unit: string; sourceIds: string[]; status: TopicValueStatus; monthsReported?: number; periodEnd?: string; basis?: Basis };
 export type SeriesSpec = { seriesId: string; indicatorId: string; label: Names; heading: Names | null; parentSeriesId: string | null; isTotal: boolean; note?: TopicSeriesNote };
 
 /**
  * Collects one page's dataset. `add` adds a series' cells for one place over the years the page prints them: missing
  * (`value: null`) in a year it prints nothing for, never zero. The first place that lists a series names it. Every cell
- * carries `basis` ("published" unless the family says otherwise: Health and Social protection serve "actual").
+ * carries `basis` ("published" unless the family says otherwise: Health and Social protection serve "actual"; a cell
+ * may name its own).
  */
 export function collectTopicDataset(datasetId: string, title: Names, basis: Basis = "published") {
   const page: TopicPage = TOPIC_PAGES.find((candidate) => candidate.datasetId === datasetId)!;
@@ -44,7 +46,7 @@ export function collectTopicDataset(datasetId: string, title: Names, basis: Basi
     for (const { year, cell } of cells) {
       facts.push(cell
         ? {
-          entityId: entity.entityId, seriesId: spec.seriesId, year, value: cell.value, basis, status: cell.status, sourceIds: cell.sourceIds,
+          entityId: entity.entityId, seriesId: spec.seriesId, year, value: cell.value, basis: cell.basis ?? basis, status: cell.status, sourceIds: cell.sourceIds,
           ...(cell.periodEnd === undefined ? {} : { periodEnd: cell.periodEnd }), ...(cell.monthsReported === undefined ? {} : { monthsReported: cell.monthsReported }),
         }
         : { entityId: entity.entityId, seriesId: spec.seriesId, year, value: null, basis, status: "official", sourceIds: [] });

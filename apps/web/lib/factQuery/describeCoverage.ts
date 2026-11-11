@@ -1318,9 +1318,19 @@ export function describeCoverage(snapshot: FactQuerySnapshot, rawInput: unknown)
     const datasetLabels = new Map(eligibleDatasets.map((id) => [id, datasetLabelsOf(snapshot, id)]));
     const pageLabels = new Map(eligibleDatasets.map((id) => [id, datasetLabelsOf(snapshot, id, true)]));
     const titleFields = (entry: SeriesEntry & { datasetId: AnyDatasetId }) => (entry.level === LEVEL_TOTAL && !isCoreDataset(entry.datasetId) ? datasetLabels.get(entry.datasetId)! : []);
+    // A topic page the search names: every word of its title (joining words aside), in Georgian or English, meets a word
+    // of the search. "tax" and "GDP" share a word with Tax breaks and refunds and GDP by expenditure; they do not name them.
+    const queryWords = searchWords(search).filter((word) => !JOINING_WORDS.has(word));
+    const namesTitle = (title: string) => searchWords(title).filter((word) => !JOINING_WORDS.has(word)).every((word) => queryWords.some((queryWord) => wordMatches(queryWord, word)));
+    const namesPage = (id: AnyDatasetId) => pageLabels.get(id)!.some(namesTitle);
     // A some-words answer puts ahead the entries whose dataset's page title meets a word: a word the topic's name meets
-    // ("education" of Education — Universities) would put every series of the topic ahead of the budget's.
-    const found = searchSeriesAndEntities(search, taggedSeries, taggedEntities, (entry) => pageLabels.get(entry.datasetId)!, titleFields);
+    // ("education" of Education — Universities) would put every series of the topic ahead of the budget's. A topic page's
+    // title not by a word the core datasets' own entries meet: "tax rate" does not put Tax breaks and refunds ahead of the taxes.
+    const coreWords = new Set([...taggedSeries, ...taggedEntities].filter((entry) => isCoreDataset(entry.datasetId)).flatMap((entry) =>
+      ("seriesId" in entry ? [entry.seriesId, entry.labelKa, entry.labelEn, entry.headingKa ?? "", entry.headingEn ?? ""] : [entry.entityId, entry.labelKa, entry.labelEn, entry.entitySlug ?? ""]).flatMap(searchWords)));
+    const coreMet = queryWords.filter((queryWord) => [...coreWords].some((word) => wordMatches(queryWord, word)));
+    const topicAhead = new Map<AnyDatasetId, string[]>(eligibleDatasets.filter((id) => !isCoreDataset(id)).map((id) => [id, pageLabels.get(id)!.map((title) => searchWords(title).filter((word) => !coreMet.some((queryWord) => wordMatches(queryWord, word))).join(" "))]));
+    const found = searchSeriesAndEntities(search, taggedSeries, taggedEntities, (entry) => topicAhead.get(entry.datasetId) ?? pageLabels.get(entry.datasetId)!, titleFields);
     const { entities: foundEntities, searchMatch, words, wordMatches: matchesByWord } = found;
     // A topic dataset whose search name meets every word of the search, as typed (a whole-query alias names budget
     // programmes, not a page: "pension" is still Pensions), comes first and is listed: its series are what was asked for.
@@ -1329,8 +1339,16 @@ export function describeCoverage(snapshot: FactQuerySnapshot, rawInput: unknown)
     const titled = searchMatch === "all_words" ? searchCatalogue(search, topicIds, (id) => datasetLabels.get(id)!, { aliases: false }) : undefined;
     const topicNamed = titled?.searchMatch === "all_words" ? searchCatalogue(search, titled.matches, (id) => topicNamesOf(snapshot, id), { aliases: false }) : undefined;
     const topicOnly = new Set<AnyDatasetId>(topicNamed?.searchMatch === "all_words" ? topicNamed.matches : []);
-    const titledIds = new Set<AnyDatasetId>(titled?.searchMatch === "all_words" ? titled.matches.filter((id) => !topicOnly.has(id)) : []);
-    const foundSeries = titledIds.size > 0 ? [...found.series.filter((entry) => titledIds.has(entry.datasetId)), ...found.series.filter((entry) => !titledIds.has(entry.datasetId))] : found.series;
+    // Nor when its page title alone meets every word but the search does not name the page ("tax", "GDP"). A search that
+    // needs the topic's name as well ("external debt" of External flows — Foreign debt) is aimed at the page.
+    const pageNamed = titled?.searchMatch === "all_words" ? searchCatalogue(search, titled.matches, (id) => pageLabels.get(id)!, { aliases: false }) : undefined;
+    const titleInPart = new Set<AnyDatasetId>(pageNamed?.searchMatch === "all_words" ? pageNamed.matches.filter((id) => !namesPage(id)) : []);
+    const titledIds = new Set<AnyDatasetId>(titled?.searchMatch === "all_words" ? titled.matches.filter((id) => !topicOnly.has(id) && !titleInPart.has(id)) : []);
+    // After the core datasets, the topic datasets whose search name meets every word come before the others whose
+    // entries do: "wages" lists the Wages pages before Spending by type's wages and salaries.
+    const named = new Set<AnyDatasetId>(titled?.searchMatch === "all_words" ? titled.matches : []);
+    const tier = (entry: { datasetId: AnyDatasetId }) => (titledIds.has(entry.datasetId) ? 0 : isCoreDataset(entry.datasetId) ? 1 : named.has(entry.datasetId) ? 2 : 3);
+    const foundSeries = searchMatch === "all_words" ? found.series.toSorted((left, right) => tier(left) - tier(right)) : found.series;
 
     // A search is a lookup, so it answers with what matched: the datasets the
     // matches belong to and any excluded code it names, not the whole
@@ -1368,7 +1386,7 @@ export function describeCoverage(snapshot: FactQuerySnapshot, rawInput: unknown)
       kind: "catalogue",
       status: foundSeries.length === 0 && foundEntities.length === 0 ? "empty" : "ok",
       data: {
-        datasets: datasets.filter((dataset) => matchedDatasets.has(dataset.datasetId)).sort((left, right) => Number(titledIds.has(right.datasetId)) - Number(titledIds.has(left.datasetId))),
+        datasets: datasets.filter((dataset) => matchedDatasets.has(dataset.datasetId)).sort((left, right) => tier(left) - tier(right)),
         series: foundSeries,
         entities: foundEntities,
         // A code names an exclusion exactly ("05"), never by a letter inside it.

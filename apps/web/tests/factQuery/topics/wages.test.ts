@@ -78,7 +78,7 @@ describe("wages topic adapter", () => {
     const adjara = rowOf(AVERAGE, "region", ADJARA, "total", 2025);
     expect(factOf("wages-regions", ADJARA, AVERAGE, 2025)).toMatchObject({ value: Number(adjara.published_value), status: "survey_estimate" });
     expect(dataset("wages-regions").series).toEqual([expect.objectContaining({ seriesId: AVERAGE, labelEn: "Average monthly wage", unit: "gel" })]);
-    expect(testSnapshot({ releaseCommit: "test", generatedAt: "2026-11-11T00:00:00.000Z" }).topics.units.gel).toEqual({ labelKa: "ლარი თვეში", labelEn: "GEL a month" });
+    expect(testSnapshot({ releaseCommit: "test", generatedAt: "2026-11-11T00:00:00.000Z" }).topics.units.gel).toEqual({ labelKa: "₾", labelEn: "GEL" });
   });
 
   it("serves nothing a page does not show: no row Geostat publishes only as unavailable, no years before a group's first", () => {

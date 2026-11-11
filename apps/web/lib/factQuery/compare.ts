@@ -368,7 +368,10 @@ export function compare(snapshot: FactQuerySnapshot, rawInput: unknown): FactQue
     const reasons: ServiceMessageKey[] = [];
 
     if (from.value === null || to.value === null) reasons.push(REASON_ENDPOINT_MISSING);
-    if (from.basis !== null && to.basis !== null && from.basis !== to.basis) reasons.push(REASON_BASIS_DIFFERS);
+    // A topic's preliminary year is the same kind of figure as its recorded ones, still to be revised: topic_preliminary
+    // limits a change into it rather than refusing it, as a plan or a projection beside an outturn is refused.
+    const preliminaryBeside = topicDataset !== undefined && [from.basis, to.basis].includes("preliminary") && [from.basis, to.basis].every((basis) => basis === "preliminary" || basis === "published" || basis === "actual");
+    if (from.basis !== null && to.basis !== null && from.basis !== to.basis && !preliminaryBeside) reasons.push(REASON_BASIS_DIFFERS);
     // The STRUCTURED identity, never the display prose. valueDefinition is written
     // for a reader: it stays constant across the municipal 2015 portal-fallback
     // break (so a +572.1% education "growth" was published, and rank turned it

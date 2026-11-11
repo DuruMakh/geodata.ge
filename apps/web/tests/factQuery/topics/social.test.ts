@@ -115,10 +115,11 @@ describe("social topic adapter", () => {
     const units = new Set(builds.flatMap((build) => build.series.map((series) => series.unit)));
     expect([...units].sort()).toEqual(["employers", "families", "gel", "gel_million", "percent", "persons"]);
     expect(builds.flatMap((build) => build.series.filter((series) => series.unit === "percent").map((series) => series.seriesId))).toEqual([`${FUNDED}return`]);
-    // Every GEL series is a monthly average, so `gel` reads "GEL a month"; money is million GEL.
+    // Every GEL series here is a monthly average; `gel` also names Spending by type's and GDP by expenditure's annual
+    // amounts, so it reads the neutral "GEL" (Task 17). Money is million GEL.
     expect(builds.flatMap((build) => build.series.filter((series) => series.unit === "gel")).every((series) => series.seriesId.endsWith(".avg_monthly"))).toBe(true);
     const names = testSnapshot({ releaseCommit: "test", generatedAt: "2026-11-11T00:00:00.000Z" }).topics.units;
-    expect(names.gel).toEqual({ labelKa: "ლარი თვეში", labelEn: "GEL a month" });
+    expect(names.gel).toEqual({ labelKa: "₾", labelEn: "GEL" });
     expect(names.gel_million).toEqual({ labelKa: "მლნ ლარი", labelEn: "million GEL" });
   });
 });

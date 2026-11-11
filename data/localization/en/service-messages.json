@@ -657,5 +657,12 @@
   "documents.nbg_gross_external_debt_bpm6.attribution": "National Bank of Georgia",
   "documents.nbg_official_reserve_assets.attribution": "National Bank of Georgia",
   "sources.source.nbg_gross_external_debt_bpm6.name": "NBG Gross External Debt by sector (ED-6 BPM-6)",
-  "sources.source.nbg_official_reserve_assets.name": "NBG Official Reserve Assets (OIR)"
+  "sources.source.nbg_official_reserve_assets.name": "NBG Official Reserve Assets (OIR)",
+  "documents.source.geostat_gdp_use_current.attribution": "Geostat",
+  "documents.source.geostat_gdp_use_growth.attribution": "Geostat",
+  "documents.mof_tax_expenditure_report_2024_xlsx_ka.attribution": "Ministry of Finance of Georgia",
+  "documents.treasury_tax_refunds_chart.attribution": "State Treasury of Georgia",
+  "sources.source.geostat_gdp_use_current.name": "Geostat GDP by categories of use at current prices",
+  "sources.source.geostat_gdp_use_growth.name": "Geostat real GDP growth by categories of use",
+  "sources.source.mof_gfs_general_government_2002_2025.name": "Ministry of Finance of Georgia general government operations (GFSM 2001) 2002-2025"
 }

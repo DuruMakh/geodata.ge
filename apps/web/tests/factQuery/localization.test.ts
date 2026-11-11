@@ -99,12 +99,12 @@ describe("snapshot-pinned translations", () => {
         expect(document.attribution === null).toBe(document.attributionEn === null);
         // World Bank JSON, sector originals and English inflation originals (whose Georgian
         // twins sit beside them in the archive) declare their language, as do the Education and
-        // Health, Labour Force Survey, earnings, business, household survey, poverty, housing, ICT survey, transport, goods trade, services trade and foreign investment workbooks and NBG's money and banks and external sector workbooks the topic pages cite
+        // Health, Labour Force Survey, earnings, business, household survey, poverty, housing, ICT survey, transport, goods trade, services trade and foreign investment workbooks, Geostat's GDP by use tables, the Ministry's GFS workbook and NBG's money and banks and external sector workbooks the topic pages cite
         // (English tables), and the SSA pages and
-        // Pension Fund documents the Social protection pages cite (Georgian, but the 2025 IFRS
+        // Pension Fund documents the Social protection pages cite and the Ministry's tax-expenditure workbook and the Treasury's refunds chart Tax breaks and refunds cites (Georgian, but the 2025 IFRS
         // statements in English; SSA's high-mountain, IDP, maternity and other pages declare none).
-        const english = /^(source\.(wb_gdp_|geostat_sector_|geostat_regional_gdp|geostat_cpi_|geostat_core_|geostat_basket_weights|geostat_product_|geostat_demography_|geostat_census2024_|nbg_inflation_target)|geostat_education_|geostat_health_|geostat_death|geostat_lfs_|geostat_earnings_|geostat_business_|geostat_household_|geostat_poverty_|geostat_gini$|geostat_housing_|geostat_ict_|geostat_transport_|geostat_trade_|geostat_services_|geostat_fdi_|nbg_(money|loan|deposit|policy|fsi|balance_of_payments|gross_external_debt|official_reserve)|pension_fund_ifrs_2025$)/;
-        const georgian = /^(ssa_(statistics|pension|socpackage|tsa_allowance|tsa_db|compensation|utilitysubsidy|demography|workinjury)$|pension_fund_)/;
+        const english = /^(source\.(wb_gdp_|geostat_sector_|geostat_regional_gdp|geostat_cpi_|geostat_core_|geostat_basket_weights|geostat_product_|geostat_demography_|geostat_census2024_|nbg_inflation_target)|geostat_education_|geostat_health_|geostat_death|geostat_lfs_|geostat_earnings_|geostat_business_|geostat_household_|geostat_poverty_|geostat_gini$|geostat_housing_|geostat_ict_|geostat_transport_|geostat_trade_|geostat_services_|geostat_fdi_|source\.geostat_gdp_use_|source\.mof_gfs_general_government_|nbg_(money|loan|deposit|policy|fsi|balance_of_payments|gross_external_debt|official_reserve)|pension_fund_ifrs_2025$)/;
+        const georgian = /^(ssa_(statistics|pension|socpackage|tsa_allowance|tsa_db|compensation|utilitysubsidy|demography|workinjury)$|pension_fund_|mof_tax_expenditure_report_2024_xlsx_ka$|treasury_tax_refunds_chart$)/;
         expect(document.documentLanguage).toBe(english.test(document.documentId) ? 'en' : georgian.test(document.documentId) ? 'ka' : null);
       }
     }

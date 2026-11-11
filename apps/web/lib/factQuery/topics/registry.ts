@@ -16,6 +16,7 @@ import { groupOfTopic, NAV_TREE, type NavHub } from "../../navigation/navTree";
 import { methodologyManifestDocument, PUBLIC_SITE_ORIGIN } from "../manifestDocuments";
 import { findSourceProvenanceFailures, resolvePublicSources } from "../sources";
 import type { Basis, RawResolvedSource } from "../types";
+import { budgetExtrasTopicAdapter } from "./budgetExtras";
 import { businessTopicAdapter } from "./business";
 import { demographyTopicAdapter } from "./demography";
 import { educationTopicAdapter } from "./education";
@@ -34,7 +35,7 @@ import { unemploymentTopicAdapter } from "./unemployment";
 import { wagesTopicAdapter } from "./wages";
 import type { TopicAdapter, TopicDataset, TopicDatasetBuild, TopicsSnapshot, TopicValueStatus } from "./types";
 
-export const TOPIC_ADAPTERS: readonly TopicAdapter[] = [educationTopicAdapter, demographyTopicAdapter, healthTopicAdapter, socialTopicAdapter, unemploymentTopicAdapter, wagesTopicAdapter, businessTopicAdapter, moneyBanksTopicAdapter, livingStandardsTopicAdapter, housingTopicAdapter, internetTopicAdapter, transportTopicAdapter, tradeTopicAdapter, externalTopicAdapter];
+export const TOPIC_ADAPTERS: readonly TopicAdapter[] = [educationTopicAdapter, demographyTopicAdapter, healthTopicAdapter, socialTopicAdapter, unemploymentTopicAdapter, wagesTopicAdapter, businessTopicAdapter, moneyBanksTopicAdapter, livingStandardsTopicAdapter, housingTopicAdapter, internetTopicAdapter, transportTopicAdapter, tradeTopicAdapter, externalTopicAdapter, budgetExtrasTopicAdapter];
 
 /**
  * The site's own message for each unit token the topic CSVs use (R7: unit ids are the CSVs' tokens). One name per
@@ -58,7 +59,7 @@ const TOPIC_UNIT_MESSAGES: Readonly<Record<string, string>> = {
   per_1000_population: "health.unitPerThousand",
   families: "social.unitFamilies",
   employers: "social.unitEmployers",
-  gel: "social.unitGel",
+  gel: "format.gel",
   gel_million: "social.unitMlnGel",
   percent: "social.unitReturn",
   thousand_persons: "health.unitThousandPersons",

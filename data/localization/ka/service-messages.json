@@ -657,5 +657,12 @@
   "documents.nbg_gross_external_debt_bpm6.attribution": "საქართველოს ეროვნული ბანკი",
   "documents.nbg_official_reserve_assets.attribution": "საქართველოს ეროვნული ბანკი",
   "sources.source.nbg_gross_external_debt_bpm6.name": "მთლიანი საგარეო ვალი სექტორების მიხედვით (ED-6; BPM6)",
-  "sources.source.nbg_official_reserve_assets.name": "ოფიციალური სარეზერვო აქტივები (OIR)"
+  "sources.source.nbg_official_reserve_assets.name": "ოფიციალური სარეზერვო აქტივები (OIR)",
+  "documents.source.geostat_gdp_use_current.attribution": "საქსტატი",
+  "documents.source.geostat_gdp_use_growth.attribution": "საქსტატი",
+  "documents.mof_tax_expenditure_report_2024_xlsx_ka.attribution": "საქართველოს ფინანსთა სამინისტრო",
+  "documents.treasury_tax_refunds_chart.attribution": "სახაზინო სამსახური",
+  "sources.source.geostat_gdp_use_current.name": "მშპ დანახარჯების მიხედვით მიმდინარე ფასებში",
+  "sources.source.geostat_gdp_use_growth.name": "მშპ-ის რეალური ზრდა დანახარჯების მიხედვით",
+  "sources.source.mof_gfs_general_government_2002_2025.name": "ზოგადი მთავრობის ოპერაციები (GFSM 2001), 2002–2025"
 }
