@@ -22,6 +22,16 @@ const NO_CRAWL_TABLES: Record<string, string> = {
   "explorer/inflation/products": "data fetched after page load; never in prerendered HTML",
 };
 
+// Map index pages: each carries every year of its figures for every place it lists (DESIGN.md §8.4), in ka and en.
+const MAP_INDEX_ROUTES = [
+  "explorer/education/schools", "explorer/education/kindergartens", "explorer/demography/population", "explorer/demography/births-deaths",
+  "explorer/demography/marriages-divorces", "explorer/health/pensions", "explorer/health/subsistence-allowance", "explorer/municipalities",
+  "explorer/business/regions", "explorer/economy/regions", "explorer/housing/regions", "explorer/money/regions", "explorer/transport/regions",
+  "explorer/wages/regions", "explorer/internet/homes", "explorer/living-standards/income", "explorer/living-standards/spending",
+  "explorer/science-culture/museums", "explorer/environment/forests", "explorer/environment/waste", "explorer/environment/air-quality",
+  "explorer/health/causes-of-death",
+];
+
 const WRAPPER = '<div hidden="" data-testid="crawl-tables">';
 const CHART_PANEL = /data-testid="(?:[\w-]*chart-panel|municipal-chart-controls)"/;
 
@@ -64,7 +74,18 @@ type SpotCheck = { name: string; route: string; test: (inner: string, messages: 
 const rowsOf = (inner: string) => [...inner.matchAll(/<tr><th>([^<]*)<\/th>((?:<td>[^<]*<\/td>)+)<\/tr>/g)].map((match) => ({ label: match[1]!, cells: [...match[2]!.matchAll(/<td>([^<]*)<\/td>/g)].map((cell) => cell[1]!) }));
 const tablesOf = (inner: string) => inner.split("<table>").slice(1).map((table) => ({ caption: /<caption>([^<]*)<\/caption>/.exec(table)?.[1] ?? "", rows: rowsOf(table) }));
 
+/** A row named `label` (by its Georgian or English name) with every figure in `cells`. */
+const hasRow = (inner: string, labels: readonly string[], cells: readonly string[]) =>
+  rowsOf(inner).some((row) => labels.includes(row.label) && cells.every((cell) => row.cells.includes(cell)));
+
 const SPOT_CHECKS: SpotCheck[] = [
+  {
+    name: "Schools map: Khulo's pupils 3,936 and 2,075, Shuakhevi's 2,410 and 1,137",
+    route: "explorer/education/schools",
+    test: (inner) => hasRow(inner, ["ხულო", "Khulo"], ["3,936", "2,075"]) && hasRow(inner, ["შუახევი", "Shuakhevi"], ["2,410", "1,137"]),
+  },
+  { name: "Business regions map: sales and jobs tables", route: "explorer/business/regions", test: (inner) => tablesOf(inner).length === 2 },
+  { name: "Pensions map: pensioners and their share, for municipalities and regions", route: "explorer/health/pensions", test: (inner) => tablesOf(inner).length === 4 },
   {
     name: "Samegrelo-Zemo Svaneti: the employed row reads 118.9 and 118.5",
     route: "explorer/unemployment/regions/samegrelo_zemo_svaneti",
@@ -109,6 +130,12 @@ export async function checkCrawlTables(root = process.cwd(), { sizeReportOnly = 
     for (const prefix of ["", "en/"]) {
       const page = pages.find((entry) => entry.route === `${prefix}${route}`);
       if (!page || page.wrappers.length > 0) failures.push(`${prefix}${route}: no longer qualifies for the no-crawl-tables exemption`);
+    }
+  }
+  for (const route of MAP_INDEX_ROUTES) {
+    for (const prefix of ["", "en/"]) {
+      const page = pages.find((entry) => entry.route === `${prefix}${route}`);
+      if (!page || page.wrappers.length === 0) failures.push(`${prefix}${route}: a map index page without its every-year tables`);
     }
   }
   const unwrappedTables = pages.filter((page) => page.wrappers.some((inner) => /<div\b/.test(inner)));
