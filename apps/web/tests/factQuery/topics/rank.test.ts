@@ -205,3 +205,62 @@ describe("rank topic datasets", () => {
     expect(population("municipality", 2025, 2026).entries).toHaveLength(63);
   });
 });
+
+// Final review I1: a series ranking orders like with like - one unit, never a series beside its own parts, and one
+// breakdown of a parent (trade partners by country, not the country groups that overlap them).
+describe("rank topic series peers", () => {
+  const seriesRanking = (datasetId: string, peers: { seriesId?: string; parentSeriesId?: string }, year: number) =>
+    ranking(rank(snapshot, { datasetId, dimension: "series", ...peers, measure: "value", metric: "value", year, limit: 100 }));
+  const idsOf = (data: RankData) => data.entries.map((entry) => entry.seriesId);
+
+  it("ranks the National counts of unemployment-overview without the rates beside them, and without employed beside its parts", () => {
+    const data = seriesRanking("unemployment-overview", { seriesId: "unemployed" }, 2024);
+    expect(new Set(data.entries.map((entry) => entry.unit))).toEqual(new Set(["thousand_persons"]));
+    expect(idsOf(data)).toEqual(expect.arrayContaining(["unemployed", "self_employed", "hired", "labour_force"]));
+    expect(idsOf(data)).not.toContain("participation_rate");
+    expect(idsOf(data)).not.toContain("employed");
+    // The rate ranks among the rates of its heading (the unemployment rate is the heading's total).
+    expect(idsOf(seriesRanking("unemployment-overview", { seriesId: "participation_rate" }, 2024))).toEqual(["participation_rate"]);
+  });
+
+  it("ranks farming output in tonnes apart from litres and pieces, and farm-gate prices per kg apart from per litre", () => {
+    const meat = seriesRanking("energy-food-farming", { seriesId: "farming.products.beef" }, 2023);
+    expect(new Set(meat.entries.map((entry) => entry.unit))).toEqual(new Set(["thousand_tonnes"]));
+    expect(idsOf(meat)).not.toContain("farming.products.milk");
+    expect(idsOf(meat)).not.toContain("farming.products.eggs");
+    const prices = seriesRanking("energy-food-farming", { seriesId: "farming.price.wheat" }, 2023);
+    expect(new Set(prices.entries.map((entry) => entry.unit))).toEqual(new Set(["gel_per_kg"]));
+  });
+
+  it("ranks GDP by expenditure amounts in GEL apart from the shares of GDP", () => {
+    const data = seriesRanking("economy-expenditure", { seriesId: "gdp_use.households.nominal" }, 2024);
+    expect(data.entries.length).toBeGreaterThan(1);
+    expect(new Set(data.entries.map((entry) => entry.unit))).toEqual(new Set(["gel"]));
+    expect(idsOf(data).every((id) => id.endsWith(".nominal"))).toBe(true);
+  });
+
+  it("ranks the VAT breaks without the VAT total, and the group totals together by their parent", () => {
+    const vat = seriesRanking("tax-breaks-refunds", { seriesId: "tax_breaks.vat.education" }, 2024);
+    expect(idsOf(vat)).not.toContain("tax_breaks.vat.total");
+    expect(idsOf(vat)).toHaveLength(8);
+    expect(idsOf(vat).every((id) => id.startsWith("tax_breaks.vat."))).toBe(true);
+    expect(idsOf(seriesRanking("tax-breaks-refunds", { parentSeriesId: "tax_breaks.total" }, 2024))).toEqual(["tax_breaks.vat.total", "tax_breaks.income.total"]);
+  });
+
+  it("ranks trade partners by country without the country groups, and the groups by themselves", () => {
+    const countries = seriesRanking("trade-partners", { parentSeriesId: "trade.exports" }, 2024);
+    expect(countries.universe.candidateCount).toBe(187);
+    expect(idsOf(countries).some((id) => id.includes(".group."))).toBe(false);
+    const groups = seriesRanking("trade-partners", { parentSeriesId: "trade.exports", seriesId: "trade.exports.group.eu" }, 2024);
+    expect(idsOf(groups).sort()).toEqual(["trade.exports.group.bsec", "trade.exports.group.cis", "trade.exports.group.eu", "trade.exports.group.guam", "trade.exports.group.oecd"]);
+    expect(idsOf(seriesRanking("trade-partners", { seriesId: "trade.exports.group.eu" }, 2024))).toEqual(idsOf(groups));
+  });
+
+  it("says a series under no heading has no peers to rank (money-interest-rates)", () => {
+    const response = rank(snapshot, { datasetId: "money-interest-rates", dimension: "series", seriesId: "rates.policy", measure: "value", metric: "value", year: 2024 });
+    expect(response).toMatchObject({ kind: "error", error: { code: "invalid_parameters" } });
+    if (response.kind !== "error") throw new Error("unreachable");
+    expect(response.error.messageEn).toContain("rates.policy is listed under no heading");
+    expect(response.error.messageKa).toContain("rates.policy");
+  });
+});

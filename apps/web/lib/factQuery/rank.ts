@@ -394,7 +394,12 @@ export function rank(snapshot: FactQuerySnapshot, rawInput: unknown): FactQueryR
       // Peers: the series under one heading (that of seriesId) or one parent, never a total.
       const anchor = topicDataset.series.find((entry) => entry.seriesId === input.seriesId);
       if (input.parentSeriesId === undefined) {
-        if (input.seriesId === undefined || (anchor !== undefined && anchor.headingKa === null)) return invalid();
+        if (input.seriesId === undefined) return invalid();
+        // A series under no heading has no peers on its page (money-interest-rates lists its rates so): say that, not the input rule.
+        if (anchor !== undefined && anchor.headingKa === null) {
+          const values = { seriesId: anchor.seriesId };
+          return errorResponse(snapshot, { code: "invalid_parameters", messageKa: serviceMessage(snapshot, "ka", "errors.rankTopicNoHeading", values), messageEn: serviceMessage(snapshot, "en", "errors.rankTopicNoHeading", values), retryable: false });
+        }
         if (anchor === undefined) {
           return errorResponse(snapshot, {
             code: "unknown_series",
@@ -405,8 +410,23 @@ export function rank(snapshot: FactQuerySnapshot, rawInput: unknown): FactQueryR
           });
         }
       }
-      seriesIds = topicDataset.series
-        .filter((entry) => !entry.isTotal && (input.parentSeriesId !== undefined ? entry.parentSeriesId === input.parentSeriesId : entry.headingKa === anchor!.headingKa))
+      let peers = topicDataset.series.filter((entry) => !entry.isTotal && (input.parentSeriesId !== undefined ? entry.parentSeriesId === input.parentSeriesId : entry.headingKa === anchor!.headingKa));
+      // A parent whose children the page lists under several headings, each a breakdown of its own (trade partners by
+      // country and by country group, investment by country and by sector), ranks one: the named series' heading, else
+      // the first. Children that each stand alone under their heading (the VAT and income-tax totals) rank together.
+      if (input.parentSeriesId !== undefined) {
+        const perHeading = peers.reduce((counts, entry) => counts.set(entry.headingKa, (counts.get(entry.headingKa) ?? 0) + 1), new Map<string | null, number>());
+        if (perHeading.size > 1 && [...perHeading.values()].some((count) => count > 1)) {
+          const heading = (peers.find((entry) => entry.seriesId === input.seriesId) ?? peers[0])!.headingKa;
+          peers = peers.filter((entry) => entry.headingKa === heading);
+        }
+      }
+      // One unit, that of the series named (or of the parent): thousand persons never rank beside a rate.
+      const unit = (anchor ?? topicDataset.series.find((entry) => entry.seriesId === input.parentSeriesId) ?? peers[0])?.unit;
+      peers = peers.filter((entry) => entry.unit === unit);
+      // Never a series beside its own parts: one whose parts are ranked is left out, as a total is.
+      seriesIds = peers
+        .filter((entry) => !peers.some((other) => other.parentSeriesId === entry.seriesId))
         .map((entry) => entry.seriesId)
         .sort();
       universeKey = "ranking.topicSeries";
