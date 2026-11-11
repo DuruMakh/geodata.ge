@@ -6,7 +6,7 @@
 // of the entry's fields (the entry matched only on letters in the middle of a word).
 import { beforeAll, describe, expect, it } from "vitest";
 import { testSnapshot } from "../helpers/factQuerySnapshot";
-import { describeCoverage } from "../../lib/factQuery/describeCoverage";
+import { describeCoverage, searchCatalogue } from "../../lib/factQuery/describeCoverage";
 import { stem } from "../../lib/explorer/search/georgian";
 import type { FactQuerySnapshot } from "../../lib/factQuery/types";
 import { QUERIES, type SearchQuery } from "./fixtures/searchQueries";
@@ -259,6 +259,29 @@ describe("a some-words answer puts the subject first", () => {
     expect(found.searchMatch).toBe("some_words");
     expect(found.series[0]?.datasetId).toBe("national-revenue");
     expect(found.series[0]?.seriesId).toMatch(/tax/);
+  });
+
+  // The rule behind "tax rate" on a small catalogue: "pear" is the commonest word, "apple" the rarer one.
+  type Entry = { label: string; dataset: string };
+  const order = (query: string, entries: Entry[]) =>
+    searchCatalogue(query, entries, (entry) => [entry.label], { ahead: (entry) => [entry.dataset] }).matches.map((entry) => entry.label);
+
+  it("puts a dataset ahead on a rarer word its label meets, never on the commonest word alone", () => {
+    const found = order("apple pear", [
+      { label: "pear juice", dataset: "Pear drinks" }, { label: "apple pie", dataset: "Desserts" }, { label: "pear tart", dataset: "Apple orchard" },
+      { label: "pear cake", dataset: "Other" }, { label: "pear salad", dataset: "Other" },
+    ]);
+    expect(found[0]).toBe("pear tart");
+    expect(found.indexOf("apple pie")).toBeLessThan(found.indexOf("pear juice"));
+  });
+
+  it("leaves out only one of two equally common words, so the other still puts its dataset ahead", () => {
+    const found = order("apple pear", [
+      { label: "apple x", dataset: "Pear drinks" }, { label: "pear y", dataset: "Apple orchard" }, { label: "apple", dataset: "Other" }, { label: "pear", dataset: "Other" },
+    ]);
+    // The first of the tied words ("apple") is the one left out: "Pear drinks" goes ahead, "Apple orchard" does not.
+    expect(found[0]).toBe("apple x");
+    expect(found.indexOf("pear y")).toBeGreaterThan(0);
   });
 });
 

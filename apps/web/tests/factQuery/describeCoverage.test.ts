@@ -459,6 +459,11 @@ describe("search links the topic page behind a phrase", () => {
     ["average pension in Georgia", "health-pensions", "social.pension.avg_monthly"],
     ["money supply", "money-supply", "money.m3"],
     ["new firms", "business-firms", "business.births.total"],
+    // "ბიზნესი" (the topic, which no Business page title holds) and bank loans in both languages are reviewed aliases.
+    ["business", "business-sales", "business.turnover.total"],
+    ["ბიზნესი", "business-sales", "business.turnover.total"],
+    ["bank loans", "money-loans-deposits", "loans.total"],
+    ["საბანკო სესხები", "money-loans-deposits", "loans.total"],
     ["unemployment among women", "unemployment-overview", "unemployment_rate.women"],
     ["საშუალო თვიური ხელფასი", "wages-overview", "average_monthly_nominal_earnings"],
   ])("answers %s with the dataset it serves and no page link of its topic", (search, datasetId, seriesId) => {

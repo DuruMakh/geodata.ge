@@ -909,10 +909,14 @@ const JOINING_WORDS = new Set(["in", "of", "the", "for", "and", "at", "to", "by"
 const TOTAL_WORDS = new Set(["total", "სულ", "ჯამი"]);
 
 /**
- * The two reviewed one-way aliases, applied when one is the whole query. Not a
+ * The reviewed one-way aliases, applied when one is the whole query. Not a
  * synonym catalogue: extending it needs the owner's say-so (spec section 33).
+ * "ბიზნესი" is the Business pages' topic, which no page title holds; "bank
+ * loans" and "საბანკო სესხები" are all loans on Loans and deposits.
  */
-const SEARCH_ALIASES: Record<string, string> = { "დღგ": "revenue.vat", pension: "საპენსიო" };
+const SEARCH_ALIASES: Record<string, string> = {
+  "დღგ": "revenue.vat", pension: "საპენსიო", "ბიზნესი": "business", "bank loans": "loans.total", "საბანკო სესხები": "loans.total",
+};
 
 /** The letters and digits of a text, folded: "მშპ-ის" gives ["მშპ", "ის"], an id splits at "." and "_". */
 const searchWords = (text: string): string[] => fold(text).split(/[^\p{L}\p{N}]+/u).filter(Boolean);
@@ -1028,16 +1032,17 @@ export function searchCatalogue<T>(
   // Rarity: a word that few entries meet says more than one that most do.
   const weights = counted.map((count) => (count > 0 ? Math.log(1 + rows.length / count) : 0));
   // Of two or more known words, the commonest ("rate" in "tax rate") does not put a dataset ahead: its label would win
-  // on the word the query shares with everything ("Interest rates" before Income tax).
+  // on the word the query shares with everything ("Interest rates" before Income tax). Of words tied as the commonest,
+  // only the first is left out, so a query of two equally common words still lets either put its dataset ahead.
   const known = weights.filter((weight) => weight > 0);
-  const commonest = known.length < 2 ? -1 : Math.min(...known);
+  const commonest = known.length < 2 ? -1 : weights.indexOf(Math.min(...known));
   // A label shared by many entries (a dataset's) is read once.
   const aheadByLabel = new Map<string, boolean>();
   const isAhead = (entry: T) => {
     if (ahead === undefined) return false;
     const labels = ahead(entry).filter((field): field is string => field !== null);
     const key = labels.join("\n");
-    if (!aheadByLabel.has(key)) aheadByLabel.set(key, meetsWord(labels.flatMap(searchWords)).some((meets, index) => meets && weights[index]! > 0 && weights[index] !== commonest));
+    if (!aheadByLabel.has(key)) aheadByLabel.set(key, meetsWord(labels.flatMap(searchWords)).some((meets, index) => meets && weights[index]! > 0 && index !== commonest));
     return aheadByLabel.get(key)!;
   };
   // The share of a field's words that the query's counted words meet: "Income tax" is half tax.
