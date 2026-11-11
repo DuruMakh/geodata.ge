@@ -2,7 +2,8 @@ import React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { IndexCrawlTables } from "../../components/explorer-shell/index-crawl-tables";
-import { historyCaption, historyCrawlTable, municipalHistoryTables } from "../../lib/explorer/indexCrawlTables";
+import { historyCaption, historyCrawlTable, historyFromFacts, indexHistoryTables, municipalHistoryTables } from "../../lib/explorer/indexCrawlTables";
+import type { MunicipalListRow } from "../../lib/explorer/municipalData";
 
 const format = (value: number) => value.toLocaleString("en-US");
 
@@ -54,5 +55,32 @@ describe("index crawl tables", () => {
     expect(html).toContain("<td>3,936</td>");
     expect(html).toContain("<th>Place</th>");
     expect(renderToStaticMarkup(React.createElement(IndexCrawlTables, { tables: [], category: "Place" }))).toBe('<div hidden="" data-testid="crawl-tables"></div>');
+  });
+
+  it("indexHistoryTables writes two tables per figure, each over the years that figure covers", () => {
+    const row = (id: string, nameKa: string, kind: MunicipalListRow["kind"]): MunicipalListRow => ({ id, kind, nameKa, subtitleKa: "", regionId: null, valueGel: 0, budgetPerResidentGel: null, rank: null });
+    const history = historyFromFacts([
+      { id: "count", facts: [{ geographyId: "country.georgia", year: 2013, value: 700000 }, { geographyId: "region.tbilisi", year: 2013, value: 160000 }, { geographyId: "11", year: 2014, value: 4547 }] },
+      { id: "share", facts: [{ geographyId: "11", year: 2014, value: 21.3 }] },
+    ]);
+    const tables = indexHistoryTables({
+      history,
+      rows: { country: row("country.georgia", "საქართველო", "country"), municipalities: [row("04", "თბილისი", "municipality"), row("11", "ხულო", "municipality")], regions: [row("region.adjara", "აჭარა", "region")] },
+      label: (listRow) => listRow.nameKa,
+      levels: { municipalities: "მუნიციპალიტეტები", regions: "რეგიონები" },
+      column: String,
+      figures: { count: { parts: ["პენსიები", "პენსიონერები"], format }, share: { parts: ["პენსიები", "წილი"], format: (value) => value.toFixed(1) } },
+    });
+    expect(tables).toHaveLength(4);
+    expect(tables[0]!.columns).toEqual(["2013", "2014"]);
+    expect(tables[0]!.caption).toBe("პენსიები · პენსიონერები · მუნიციპალიტეტები · 2013–2014");
+    expect(tables[0]!.rows).toEqual([
+      { label: "საქართველო", cells: ["700,000", "—"] },
+      { label: "თბილისი", cells: ["160,000", "—"] },
+      { label: "ხულო", cells: ["—", "4,547"] },
+    ]);
+    expect(tables[2]!.columns).toEqual(["2014"]);
+    expect(tables[2]!.rows[2]).toEqual({ label: "ხულო", cells: ["21.3"] });
+    expect(tables[3]!.rows.map((r) => r.label)).toEqual(["საქართველო", "აჭარა"]);
   });
 });

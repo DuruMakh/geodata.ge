@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { EducationPlaceExplorer } from "../../components/education/education-place-explorer";
 import { ExplorerHeading } from "../../components/explorer-shell/explorer-heading";
 import { ExplorerPage } from "../../components/explorer-shell/explorer-page";
+import { IndexCrawlTables } from "../../components/explorer-shell/index-crawl-tables";
 import { LatestFigure, LatestValueLine } from "../../components/explorer-shell/latest-value-line";
 import { EntityMemberList } from "../../components/municipalities/entity-member-list";
 import { MunicipalitiesIndex } from "../../components/municipalities/municipalities-index";
@@ -13,6 +14,8 @@ import { loadServedEducationData, shownEducationFacts, toClientEducationFact } f
 import { EDUCATION_GEORGIA, EDUCATION_SOURCES, educationIndicator, type ClientEducationFact } from "../data/education/types";
 import { loadServedMunicipalData } from "../data/servedData";
 import { coverageLabel } from "../explorer/coverageLabel";
+import { formatCrawlCell } from "../explorer/crawlTables";
+import { indexHistoryTables } from "../explorer/indexCrawlTables";
 import { GEORGIA_PLACE_ID, TBILISI_PLACE_ID, buildDemographyPlaces, placeLabel, type DemographyPlace } from "../explorer/demographyAreas";
 import { placeHrefById, placeIdForRoute, placeNeighbours, placePageHref, type PlaceRoute } from "../explorer/demographyPlaceRoutes";
 import { educationCountLabel, educationPeriodLabel, educationSeriesLabel, educationTemporalCoverage } from "../explorer/education";
@@ -21,6 +24,7 @@ import { educationPlaceBase, educationPlaceCoverage, educationPlaceDefaultSelect
 import { formatInUnit, UNIT_PERSONS } from "../explorer/format";
 import { buildPickerCountry, pickerGroupsFromRows } from "../explorer/municipalData";
 import { latestOf } from "../explorer/unitList";
+import { publicLabel } from "../i18n/labels";
 import { Message } from "../i18n/message";
 import { message } from "../i18n/messages";
 import { getMessages } from "../i18n/messages.server";
@@ -28,6 +32,7 @@ import { clientPresentation, getPresentation } from "../i18n/presentation.server
 import { I18nProvider } from "../i18n/provider";
 import { pageHref } from "../i18n/routes";
 import type { Locale, Messages, TemplateValues } from "../i18n/types";
+import { workbookMessage } from "../i18n/workbook";
 import { loadSourcedWorkbookSources } from "../methodology/workbookSources";
 import { fiscalMetadata } from "../seo/metadata";
 import { latestYearOf, placeOfKa, placeTitleNameEn } from "../seo/placeTitleForms";
@@ -155,6 +160,12 @@ export async function renderEducationIndexPage(locale: Locale, set: EducationPla
             }}
           />
         </section>
+        {/* Every school year of the map's measure for every place, for readers that run no page code (DESIGN.md §8.4). */}
+        <IndexCrawlTables category={workbookMessage(locale, "workbook.category")} tables={indexHistoryTables({
+          history: index.history, rows: index, label: row => publicLabel(locale, row.id, row.nameKa, presentation.englishLabels),
+          levels: { municipalities: message(messages, "municipal.municipalities"), regions: message(messages, "municipal.regions") }, column: period,
+          figures: { [index.history.figures[0]!.id]: { parts: [title, measure, t("unitPersons")], format: value => formatCrawlCell(value, null, "#,##0", locale) } },
+        })} />
       </ExplorerPage>
     </I18nProvider>
   );

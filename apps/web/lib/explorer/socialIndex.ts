@@ -3,6 +3,7 @@ import { SOCIAL_GEORGIA, type ClientSocialFact } from "../data/social/types";
 import { placeIdForMunicipalityCode } from "./demographyAreas";
 import { placeIndexRows } from "./demographyPopulationIndex";
 import { formatShare } from "./format";
+import { historyFromFacts, type IndexHistory } from "./indexCrawlTables";
 import type { MunicipalListRow } from "./municipalData";
 import { buildMunicipalityValueMapModel, type MunicipalityMapModel } from "./municipalityMapData";
 import { sharePerHundred, type SocialPlaceSet, type SocialPopulation } from "./social";
@@ -21,6 +22,8 @@ export type SocialIndexModel = {
   regions: MunicipalListRow[];
   /** Georgia, first and unranked. */
   country: MunicipalListRow;
+  /** Every year of the recipients count and of the share for every listed place, for the page's hidden crawl tables. */
+  history: IndexHistory;
 };
 
 /** The share an index is shaded by: pensioners, or people in receiving families, per 100 residents. */
@@ -48,5 +51,9 @@ export function buildSocialIndexModel(set: SocialPlaceSet, facts: readonly Clien
     year,
     map: buildMunicipalityValueMapModel({ municipalities, values: new Map(municipalities.map(m => [m.code, valueOf(m.code)])), display: (_code, value) => formatShare(value / 100) }),
     ...placeIndexRows({ regions, municipalities, valueOf }),
+    history: historyFromFacts([
+      { id: "count", facts: facts.filter(f => f.indicatorId === INDEX_SHARE[set].replace(/#share$/, "")) },
+      { id: "share", facts: shares },
+    ]),
   };
 }

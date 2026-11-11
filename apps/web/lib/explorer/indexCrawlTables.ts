@@ -1,5 +1,7 @@
 import type { CrawlTable } from "./crawlTables";
+import { placeIdForMunicipalityCode } from "./demographyAreas";
 import { MISSING } from "./format";
+import type { MunicipalListRow } from "./municipalData";
 
 /**
  * Every-year crawl tables for the map index pages (DESIGN.md §8.4): each place the map and list show, with every year of
@@ -53,4 +55,48 @@ export function municipalHistoryTables({ caption, levels, years, columns, countr
     historyCrawlTable({ caption: caption(levels.municipalities), years, columns, rows: [country, ...municipalities], format }),
     historyCrawlTable({ caption: caption(levels.regions), years, columns, rows: [country, ...regions], format }),
   ];
+}
+
+/** One figure of a municipal index, by list row id (municipality code with Tbilisi as `04`, region id, `country.georgia`) and year. */
+export type IndexHistoryFigure = { id: string; valueAt: (listRowId: string, year: number) => number | null };
+/** Every year a municipal index's figures cover, and the figures. */
+export type IndexHistory = { years: number[]; figures: IndexHistoryFigure[] };
+
+/** A municipal index's history from facts already narrowed to each figure, keyed by fact place (`region.tbilisi` for Tbilisi). */
+export function historyFromFacts(figures: ReadonlyArray<{ id: string; facts: ReadonlyArray<{ geographyId: string; year: number; value: number }> }>): IndexHistory {
+  const years = [...new Set(figures.flatMap((figure) => figure.facts.map((fact) => fact.year)))].sort((a, b) => a - b);
+  return {
+    years,
+    figures: figures.map(({ id, facts }) => {
+      const values = new Map(facts.map((fact) => [`${fact.geographyId}|${fact.year}`, fact.value]));
+      return { id, valueAt: (listRowId, year) => values.get(`${placeIdForMunicipalityCode(listRowId)}|${year}`) ?? null };
+    }),
+  };
+}
+
+/**
+ * A municipal index's tables: for each figure of its history named in `figures`, a municipalities table and a regions
+ * table, Georgia first, the places in the list's order. Each figure's columns are the years any listed place has it.
+ */
+export function indexHistoryTables({ history, rows, label, levels, column, figures }: {
+  history: IndexHistory;
+  rows: { country: MunicipalListRow; municipalities: readonly MunicipalListRow[]; regions: readonly MunicipalListRow[] };
+  label: (row: MunicipalListRow) => string;
+  levels: { municipalities: string; regions: string };
+  /** A year as the page writes it (`2015/16` for a school year). */
+  column: (year: number) => string;
+  figures: Readonly<Record<string, { parts: readonly string[]; format: (value: number) => string }>>;
+}): CrawlTable[] {
+  const listed = [rows.country, ...rows.municipalities, ...rows.regions];
+  return history.figures.flatMap((figure) => {
+    const shown = figures[figure.id];
+    if (!shown) return [];
+    const years = history.years.filter((year) => listed.some((row) => figure.valueAt(row.id, year) !== null));
+    const columns = years.map(column);
+    const historyRow = (row: MunicipalListRow): HistoryRow => ({ label: label(row), valuesByYear: Object.fromEntries(years.map((year) => [year, figure.valueAt(row.id, year)])) });
+    return municipalHistoryTables({
+      caption: (level) => historyCaption([...shown.parts, level], columns), levels, years, columns,
+      country: historyRow(rows.country), municipalities: rows.municipalities.map(historyRow), regions: rows.regions.map(historyRow), format: shown.format,
+    });
+  });
 }

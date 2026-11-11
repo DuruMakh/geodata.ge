@@ -4,6 +4,7 @@ import { placeIdForMunicipalityCode } from "./demographyAreas";
 import { placeIndexRows } from "./demographyPopulationIndex";
 import type { EducationPlaceSet } from "./educationPlaces";
 import { formatInUnit, UNIT_PERSONS } from "./format";
+import { historyFromFacts, type IndexHistory } from "./indexCrawlTables";
 import type { MunicipalListRow } from "./municipalData";
 import { buildMunicipalityValueMapModel, type MunicipalityMapModel } from "./municipalityMapData";
 
@@ -23,12 +24,14 @@ export type EducationIndexModel = {
   /** The 11 regions ranked highest first. */
   regions: MunicipalListRow[];
   country: MunicipalListRow;
+  /** Every school year of the measure for every listed place, for the page's hidden crawl tables. */
+  history: IndexHistory;
 };
 
 /** The index's measure: pupils (Georgia's from the national table) or kindergarten children. */
-const INDEX_MEASURE: Record<EducationPlaceSet, { place: string; country: string }> = {
-  schools: { place: educationIndicator("pupils", "total"), country: educationIndicator("pupils_national", "total") },
-  kindergartens: { place: educationIndicator("kg_children", "total"), country: educationIndicator("kg_children", "total") },
+const INDEX_MEASURE: Record<EducationPlaceSet, { id: string; place: string; country: string }> = {
+  schools: { id: "pupils", place: educationIndicator("pupils", "total"), country: educationIndicator("pupils_national", "total") },
+  kindergartens: { id: "children", place: educationIndicator("kg_children", "total"), country: educationIndicator("kg_children", "total") },
 };
 
 export function buildEducationIndexModel(set: EducationPlaceSet, facts: readonly ClientEducationFact[], regions: readonly MunicipalRegion[], municipalities: Municipality[]): EducationIndexModel {
@@ -47,5 +50,6 @@ export function buildEducationIndexModel(set: EducationPlaceSet, facts: readonly
     year,
     map: buildMunicipalityValueMapModel({ municipalities, values: new Map(municipalities.map(m => [m.code, valueOf(m.code)])), display: (_code, value) => formatInUnit(value, UNIT_PERSONS) }),
     ...placeIndexRows({ regions, municipalities, valueOf }),
+    history: historyFromFacts([{ id: measure.id, facts: facts.filter(f => f.indicatorId === (f.geographyId === EDUCATION_GEORGIA ? measure.country : measure.place)) }]),
   };
 }
