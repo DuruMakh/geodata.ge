@@ -220,7 +220,7 @@ export const SERVICE_MESSAGE_PARAMETERS: Partial<Record<ServiceMessageKey, { ka:
   "errors.internalError": { ka: ["bulkUrl"], en: ["bulkUrl"] },
   "definitions.topicValue": { ka: ["page", "unit"], en: ["page", "unit"] },
   "definitions.topicValuePartial": { ka: ["months", "page", "unit"], en: ["months", "page", "unit"] },
-  "definitions.topicOtherCountries": { ka: ["file", "year"], en: ["file", "year"] },
+  "definitions.topicOtherCountries": { ka: ["year"], en: ["year"] },
   "definitions.topicValueDated": { ka: ["date", "page", "unit"], en: ["date", "page", "unit"] },
   "caveats.topic_series_break": { ka: ["detail"], en: ["detail"] },
   "comparison.seriesBreak": { ka: ["detail"], en: ["detail"] },

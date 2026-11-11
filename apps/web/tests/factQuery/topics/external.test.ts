@@ -189,11 +189,11 @@ describe("the dated point, the partial year and the sources over the tools", () 
     const [row] = observations(queryIndicators(snapshot, { datasetId: "external-money-from-abroad", seriesIds: ["transfer.others.received"], years: [2019] }));
     expect(row).toMatchObject({ caveatIds: ["topic_partial_period"], valueDefinitionEn: expect.stringContaining("it covers 5 months of the year") });
     expect(comparison("external-money-from-abroad", "transfer.others.received", 2018, 2019)).toMatchObject({ comparability: "limited", caveatIds: expect.arrayContaining(["topic_partial_period"]) });
-    // Other countries says what it leaves out: every country but the end year's top 10, each one in the reviewed import file.
-    for (const [datasetId, seriesId, file] of [["external-money-from-abroad", "transfer.others.sent", "money-transfers-annual.csv"], ["external-foreign-investment", "fdi.others", "foreign-investment-annual.csv"]] as const) {
+    // Other countries says what it leaves out: every country but the end year's top 10.
+    for (const [datasetId, seriesId] of [["external-money-from-abroad", "transfer.others.sent"], ["external-foreign-investment", "fdi.others"]] as const) {
       const end = snapshot.topics.datasets.find((entry) => entry.page.datasetId === datasetId)!.lastYear;
       const [other] = observations(queryIndicators(snapshot, { datasetId, seriesIds: [seriesId], years: [end] }));
-      expect(other!.valueDefinitionEn, seriesId).toContain(`Other countries are every country except the ${end} top 10 this dataset lists; each country's amount is in the reviewed import file data/imports/${file}.`);
+      expect(other!.valueDefinitionEn, seriesId).toContain(`Other countries are every country except the ${end} top 10 this dataset lists.`);
       expect(other!.valueDefinition, seriesId).toContain(`${end} წლის ათი უმსხვილესი ქვეყნისა`);
     }
     expect(observations(queryIndicators(snapshot, { datasetId: "external-money-from-abroad", seriesIds: ["transfer.total.sent"], years: [2025] }))[0]!.valueDefinitionEn).not.toContain("Other countries");

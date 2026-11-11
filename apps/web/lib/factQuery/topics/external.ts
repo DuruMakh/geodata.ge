@@ -27,7 +27,6 @@ import { buildForeignInvestmentModel } from "../../explorer/foreignInvestment";
 import { FOREIGN_INVESTMENT_OTHERS_ID, foreignInvestmentCrawlStates } from "../../explorer/foreignInvestmentState";
 import { buildMoneyTransfersModel } from "../../explorer/moneyTransfers";
 import { moneyTransfersCrawlStates, OTHER_COUNTRIES_ID } from "../../explorer/moneyTransfersState";
-import { SERVED_DATA_FILES } from "../../data/servedData";
 import { publicLabel } from "../../i18n/labels";
 import { message } from "../../i18n/messages";
 import { getPresentation } from "../../i18n/presentation.server";
@@ -45,8 +44,8 @@ function georgia(context: Context): TopicEntity {
   return { entityId: GEORGIA_PLACE_ID, entityType: "country", labelKa: message(context.ka.messages, "demography.georgia"), labelEn: message(context.en.messages, "demography.georgia"), parentEntityId: null };
 }
 
-/** Other countries' definition note: every country but the end year's top 10, each one's amount in the reviewed import file. */
-const otherCountries = (year: number, file: string): TopicSeriesNote => ({ key: "definitions.topicOtherCountries", values: { year, file: file.replace(/^(\.\.\/)+/, "") } });
+/** Other countries' definition note: every country but the end year's top 10. */
+const otherCountries = (year: number): TopicSeriesNote => ({ key: "definitions.topicOtherCountries", values: { year } });
 
 /** Adds a place's series once: a total every tab of a page lists is served under the first tab's years, which span the others'. */
 function addOnce(dataset: Dataset, added: Set<string>, ...[entity, spec, years, cellAt]: Parameters<Dataset["add"]>) {
@@ -127,7 +126,7 @@ function foreignInvestmentDataset(context: Context, data: ForeignInvestmentData)
       addOnce(dataset, added, entity, {
         seriesId, indicatorId: seriesId, label: both(context, label(seriesId)), heading: total || place ? null : both(context, external(`investment.tab.${state.dimension}`)),
         parentSeriesId: total || place ? null : FOREIGN_INVESTMENT_TOTAL_ID, isTotal: total || place,
-        ...(others ? { note: otherCountries(model.range.end, SERVED_DATA_FILES.foreignInvestmentFacts) } : {}),
+        ...(others ? { note: otherCountries(model.range.end) } : {}),
       }, model.years, (year) => {
         const value = model.valuesByEntity[id]![year];
         if (value === null || value === undefined) return undefined;
@@ -161,7 +160,7 @@ function moneyTransfersDataset(context: Context, data: MoneyTransfersData): Topi
       const total = id === MONEY_TRANSFER_TOTAL_ID, others = id === OTHER_COUNTRIES_ID;
       dataset.add(georgia(context), {
         seriesId: `${id}.${measure}`, indicatorId: id, label: both(context, label(id)), heading: both(context, external(`measure.${measure}`)), parentSeriesId: total ? null : `${MONEY_TRANSFER_TOTAL_ID}.${measure}`, isTotal: total,
-        ...(others ? { note: otherCountries(model.range.end, SERVED_DATA_FILES.moneyTransferFacts) } : {}),
+        ...(others ? { note: otherCountries(model.range.end) } : {}),
       }, model.years, (year) => {
         const value = model.valuesByEntity[id]![year];
         if (value === null || value === undefined) return undefined;

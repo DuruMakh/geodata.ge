@@ -134,7 +134,7 @@
   "definitions.regionTotal": "The sum of the region's member municipalities.",
   "definitions.reviewedAmount": "Reviewed value in GEL at full precision.",
   "definitions.shareOfGdp": "Share of the same year's GDP at current prices, on a 0–100 scale.",
-  "definitions.topicOtherCountries": "Other countries are every country except the {year} top 10 this dataset lists; each country's amount is in the reviewed import file {file}.",
+  "definitions.topicOtherCountries": "Other countries are every country except the {year} top 10 this dataset lists.",
   "definitions.topicValue": "The value as the Fiscal.ge page shows it ({page}), in {unit}.",
   "definitions.topicValueDated": "The value as the Fiscal.ge page shows it ({page}), in {unit}; it is the position on {date}, not at year end.",
   "definitions.topicValuePartial": "The value as the Fiscal.ge page shows it ({page}), in {unit}; it covers {months} months of the year.",
