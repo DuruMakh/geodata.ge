@@ -7,7 +7,7 @@
 // and that every dataset appears here.
 import type { DatasetId } from "./types";
 
-export const MCP_SERVED_PAGES: Readonly<Record<string, readonly DatasetId[]>> = {
+export const CORE_SERVED_PAGES: Readonly<Record<string, readonly DatasetId[]>> = {
   "/explorer/expenditure": ["national-expenditure", "ministries"],
   "/explorer/revenue": ["national-revenue"],
   "/explorer/municipalities": ["municipal-expenditure"],
@@ -21,3 +21,6 @@ export const MCP_SERVED_PAGES: Readonly<Record<string, readonly DatasetId[]>> = 
   "/explorer/inflation/products": ["inflation-products"],
   "/explorer/inflation/cities": ["inflation"],
 };
+
+/** What the service serves today: the core pages. Topic pages join it when the topic adapters are wired in. */
+export const MCP_SERVED_PAGES = CORE_SERVED_PAGES;
