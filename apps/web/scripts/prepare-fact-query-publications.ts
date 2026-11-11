@@ -61,6 +61,7 @@ async function main() {
     // regional-economy and inflation CSVs are also written between the two.
     await mkdir(OUTPUT_DIR, { recursive: true });
     for (const artifact of artifacts) {
+      await mkdir(path.dirname(path.join(OUTPUT_DIR, artifact.fileName)), { recursive: true });
       await writeFile(path.join(OUTPUT_DIR, artifact.fileName), artifact.bytes);
       process.stdout.write(`${artifact.fileName}: ${artifact.rowCount} rows, ${artifact.bytes.byteLength} bytes\n`);
     }

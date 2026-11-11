@@ -189,6 +189,10 @@ export function getSources(snapshot: FactQuerySnapshot, rawInput: unknown): Fact
     inflation: "inflation",
     "inflation-products": "inflation",
   }[input.datasetId];
+  // A topic dataset's sources are the ones its facts cite; its documents all carry the methodology dataset's id, which
+  // would not tell the topic pages apart.
+  const topicDataset = input.datasetId === undefined ? undefined : snapshot.topics.datasets.find((dataset) => dataset.page.datasetId === input.datasetId);
+  const topicSourceIds = new Set(topicDataset?.columns.sources.flatMap((indexes) => indexes.map((index) => snapshot.topics.sourceIds[index]!)));
   const entityCodes = (input.entityIds ?? []).flatMap((id) => {
     if (id.startsWith("region.")) return snapshot.municipal.municipalities.filter((m) => m.regionId === id).map((m) => m.code);
     return [id];
@@ -224,6 +228,7 @@ export function getSources(snapshot: FactQuerySnapshot, rawInput: unknown): Fact
     if (hasNarrowing && source.derivation === null) {
       const filtered = source.documents.filter((document) => {
         if (input.datasetId === "inflation-products" && !["source.geostat_product_yoy", "source.geostat_product_mom"].includes(source.sourceId)) return false;
+        if (topicDataset !== undefined && !topicSourceIds.has(source.sourceId)) return false;
         // A document with no datasetId is NOT treated as matching every dataset.
         // Exempting it returned the Geostat municipal-population workbook as a
         // match for national-revenue; the honest outcome is that the filter

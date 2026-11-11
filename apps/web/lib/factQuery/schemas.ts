@@ -278,7 +278,7 @@ export type QueryIndicatorsInput = z.infer<typeof queryIndicatorsInput>;
 
 export const getSourcesInput = z.strictObject({
   sourceIds: sourceIdList,
-  datasetId: z.enum(["national-revenue", "national-expenditure", "ministries", "municipal-expenditure", "government-debt", "general-government-balance", "gdp-overview", "economic-sectors", "regional-economies", "inflation", "inflation-products"]).optional(),
+  datasetId: z.union([z.enum(["national-revenue", "national-expenditure", "ministries", "municipal-expenditure", "government-debt", "general-government-balance", "gdp-overview", "economic-sectors", "regional-economies", "inflation", "inflation-products"]), idString]).optional(),
   years: uniqueSortedYears.optional(),
   entityIds: entityIdList.optional(),
   expectedDataVersion,

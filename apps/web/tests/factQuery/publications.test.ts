@@ -77,7 +77,8 @@ describe("catalogue.json", () => {
       "national-expenditure",
       "national-revenue",
       "regional-economies",
-    ]);
+      ...snapshot.topics.datasets.map((dataset) => dataset.page.datasetId),
+    ].sort());
     for (const dataset of catalogue.datasets) {
       expect(dataset.series.length, `${dataset.datasetId} series`).toBeGreaterThan(0);
     }
@@ -318,6 +319,7 @@ describe("dataset publications", () => {
       "inflation-cities.json",
       "inflation-products.csv",
       "inflation-products.json",
+      ...snapshot.topics.datasets.map((dataset) => `topics/${dataset.page.datasetId}.csv`),
       "manifest.json",
     ]);
   });
@@ -515,10 +517,8 @@ describe("the published catalogue", () => {
     const served = describeCoverage(snapshot, {});
     if (served.kind !== "catalogue") throw new Error("expected a catalogue");
 
-    // The topic datasets join the published catalogue with their CSVs (Task 8); until then it lists the core datasets.
-    const topicIds = new Set(snapshot.topics.datasets.map((topic) => topic.page.datasetId));
     expect(catalogue.datasets.map((d) => d.datasetId).sort()).toEqual(
-      (served.data as { datasets: { datasetId: string }[] }).datasets.map((d) => d.datasetId).filter((id) => !topicIds.has(id)).sort(),
+      (served.data as { datasets: { datasetId: string }[] }).datasets.map((d) => d.datasetId).sort(),
     );
   });
 });
