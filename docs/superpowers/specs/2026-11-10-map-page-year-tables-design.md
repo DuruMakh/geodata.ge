@@ -71,27 +71,29 @@ one decimal). Captions follow §8.4: title · figure · unit · first–last per
 ## 4. How it is built
 
 **Reused as is**
-- The crawl-table markup, caption, number formatting and cell cap: `crawlTables`, `crawlTablesHtml`, `crawlCaption`,
-  `formatCrawlCell`, `CRAWL_CELL_CAP` (`lib/explorer/crawlTables.ts`).
-- The `WorkbookReadableRow` shape (`lib/explorer/workbookModel.ts`) for each place row.
-- Each index's own model builder and the facts it already loads on the server (`educationIndex.ts`, `socialIndex.ts`,
-  `demographyPopulationIndex.ts`, `demographyVitalIndex.ts`, `demographyMarriageIndex.ts`, the municipal index, and the
-  region map builders through `latestCompleteRegionYear`).
-- Place names and order: `placeIndexRows` and the region map models.
+- The crawl-table markup and number formatting: `crawlTablesHtml`, `formatCrawlCell`, `CrawlTable`, `MISSING`
+  (`lib/explorer/crawlTables.ts`, `lib/explorer/format.ts`), and the 3,000-cell page limit `CRAWL_CELL_CAP`, enforced
+  by `npm run crawl:check`. Tables here are never trimmed: every place stays.
+- Each index's own model builder and the facts its page already loads on the server; the region map builders through
+  `latestCompleteRegionYear` / `buildLatestValueRegionMapModel`.
+- Place names and list order: the index models' ranked rows (`placeIndexRows`, the region map models), and each region
+  page's existing value formatter and legend (`RegionMapMetric.formatValue`, `.legend`), so cells print as the list does.
+- The list tab names `municipal.municipalities` / `municipal.regions` and the label-column heading `workbook.category`.
 
 **Small additions**
-- `crawlTables` accepts any object with the `readable`, `locale` and `periodLabel` parts of a workbook model (a type
-  widening; current callers and output unchanged).
-- Each index builder also returns its figures for every year (a `history` beside the latest-year values it already
-  computes), from the facts it already reads. The latest-year map and list stay as they are.
-- One shared helper turns a history into crawl-table rows (Georgia first, then places in list order).
+- `RegionMapModel` gains an optional `history` (every year's value for each region), filled by the shared region map
+  builders from the facts they already read. The latest-year map and list stay as they are.
+- `RegionIndex` gains an optional `crawl` prop: the views whose every-year tables it writes (one per map measure), with
+  Georgia's values for the lead row where the list has one. Pages that pass nothing are unchanged.
 
 **Genuinely new**
-- One small server component that writes crawl tables as the same hidden wrapper markup
-  (`<div hidden data-testid="crawl-tables">`) from a page's server code. The existing `CrawlTables` is a client
-  component: handing it whole workbook models from a server page would ship those models to the browser. The new one
-  ships only the finished table HTML, which compresses to almost nothing beside the HTML copy (measured on Schools:
-  +3.8 KB brotli, +6.0 KB gzip). The browser still never builds the tables.
+- `lib/explorer/indexCrawlTables.ts`: turns a history (places x years) into `CrawlTable`s; one helper for municipal pages
+  (two tables per figure, municipalities and regions, Georgia first in each) and one for region pages.
+- `components/explorer-shell/index-crawl-tables.tsx`: writes those tables as the same hidden wrapper markup
+  (`<div hidden data-testid="crawl-tables">`). It has no hooks, so municipal page renderers use it on the server and
+  `RegionIndex` uses it in the browser tree, where it builds nothing (the server HTML is kept, as `CrawlTables` does).
+  The existing `CrawlTables` takes whole workbook models; handing those from a server page would ship them to the
+  browser. Measured on Schools: +3.8 KB brotli, +6.0 KB gzip for the table and its copy in the page data.
 
 Each of the 22 page renderers places the wrapper as the last child of its explorer section, as §8.4 asks.
 
