@@ -1440,7 +1440,12 @@ export function describeCoverage(snapshot: FactQuerySnapshot, rawInput: unknown)
     // each in the search's own order (a topic whose page title meets a word before another: "wages" lists the Wages
     // pages before Spending by type's wages and salaries).
     const tier = (entry: { datasetId: AnyDatasetId }) => (titledIds.has(entry.datasetId) ? 0 : isCoreDataset(entry.datasetId) ? 1 : 2);
-    const ranked = searchMatch === "all_words" ? found.matches.toSorted((left, right) => tier(left) - tier(right)) : found.matches;
+    // A page the search names whose rows hold none of its words, because it has no total to carry its title (Interest
+    // rates lists "National Bank rate" and six more side by side), answers with its top-level rows.
+    const untitledRows = taggedSeries.filter((entry) => titledIds.has(entry.datasetId) && entry.parentSeriesId === null
+      && !snapshot.topics.datasets.some((dataset) => dataset.page.datasetId === entry.datasetId && dataset.series.some((series) => series.isTotal))
+      && !found.matches.some((match) => match.datasetId === entry.datasetId));
+    const ranked = searchMatch === "all_words" ? [...found.matches, ...untitledRows].toSorted((left, right) => tier(left) - tier(right)) : found.matches;
     const matchedSeries = ranked.filter((entry): entry is SeriesEntry & { datasetId: AnyDatasetId } => "seriesId" in entry);
     // Bounded: a topic dataset lists its first matches, and its entry says how many more a search within it lists.
     const perTopic = new Map<AnyDatasetId, number>();

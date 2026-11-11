@@ -77,6 +77,9 @@ looks for no page but still counts in the order. Joining words (`of`, `from`, `w
 (`prices` meets Consumer price inflation) looks for no page either, unless no served
 entry meets it and the other words reach beyond that dataset; it then links only the
 pages whose own name it meets, and only when those are all of one topic.
+A page the search names whose rows hold none of its words, because it has no total row
+to carry its title (Interest rates lists the National Bank rate and the banks' rates side
+by side), answers with its top-level rows.
 A search without `datasetId` lists at most 20 series of one topic dataset, the first in
 the search's order; the core datasets' series are not cut. The dataset's entry then
 carries `seriesOmitted`, and the answer `seriesOmitted` with `seriesOmittedNoteKa` and

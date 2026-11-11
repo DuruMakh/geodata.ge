@@ -234,3 +234,14 @@ describe("a search across all datasets lists a bounded number of each topic data
     expect((products.series ?? []).filter((entry) => entry.datasetId === "inflation-products").length).toBeGreaterThan(20);
   });
 });
+
+// Final review Minor 9: a page with no total had no row carrying its title, so "interest rates" listed the dataset alone.
+describe("a search naming a page with no total", () => {
+  it("lists the page's top-level rows: interest rates finds the National Bank and bank rates", () => {
+    const found = dataOf(snapshot, { search: "interest rates" });
+    expect(found.datasets[0]?.datasetId).toBe("money-interest-rates");
+    expect(found.series?.filter((entry) => entry.datasetId === "money-interest-rates").map((entry) => entry.seriesId)).toEqual(["rates.policy", "rates.loans_total", "rates.deposits_total"]);
+    // The government's own interest rates are still listed.
+    expect(found.series?.map((entry) => entry.seriesId)).toContain("debt.rate.total");
+  });
+});
