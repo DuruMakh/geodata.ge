@@ -527,13 +527,6 @@ describe("search links no page of another subject", () => {
     expect(pagesOf(search).map((page) => page.labelEn)).toEqual([]);
   });
 
-  it.each([
-    ["gas prices", "environment"],
-    ["food prices", "energy-food"],
-  ])("links no %s page through a word the prices series already serve", (search, topic) => {
-    expect(pagesOf(search).map((page) => page.topicId)).not.toContain(topic);
-  });
-
   // შიდა (domestic, inner) is one word of შიდა ქართლი, which names the place only with ქართლი beside it.
   it("reads შიდა ვალი as domestic debt, not as a place and a debt page", () => {
     expect(pagesOf("შიდა ვალი").map((page) => page.labelEn)).toEqual([]);

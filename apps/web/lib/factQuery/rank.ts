@@ -24,7 +24,7 @@ import { queryMunicipal } from "./queryMunicipal";
 import { queryNational } from "./queryNational";
 import { INPUT_LIMITS, RANK_CORE_DATASETS, rankInput } from "./schemas";
 import { selectSources } from "./sources";
-import { isTopicPercentUnit, topicPeriodLabel } from "./topics/store";
+import { isTopicIntervalUnit, isTopicPercentUnit, topicPeriodLabel } from "./topics/store";
 import { AGGREGATE_ONLY_MUNICIPAL_CODES } from "./types";
 import type { Comparison } from "./compare";
 import type { Observation } from "./observations";
@@ -417,6 +417,10 @@ export function rank(snapshot: FactQuerySnapshot, rawInput: unknown): FactQueryR
     if (!isValueMetric && (input.metric === "percentage_point_change") !== percent) {
       const key = percent ? "errors.rankAmountChanges" : "errors.rankPercentagePoints";
       return errorResponse(snapshot, { code: "unsupported_measure", messageKa: serviceMessage(snapshot, "ka", key), messageEn: serviceMessage(snapshot, "en", key), retryable: false });
+    }
+    // A temperature (an interval-scale unit) ranks by its difference only (R33).
+    if (input.metric === "percentage_change" && units.some(isTopicIntervalUnit)) {
+      return errorResponse(snapshot, { code: "unsupported_measure", messageKa: serviceMessage(snapshot, "ka", "errors.rankIntervalChanges"), messageEn: serviceMessage(snapshot, "en", "errors.rankIntervalChanges"), retryable: false });
     }
   } else {
     const series = isProduct ? [] : catalogueSeries(snapshot, input.datasetId as DatasetId);

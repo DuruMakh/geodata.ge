@@ -14,6 +14,7 @@ import { buildEnvironmentWorkbookExportModel, type EnvironmentWorkbookPage } fro
 import type { WorkbookExportModel, WorkbookReadableRow } from "../../../lib/explorer/workbookModel";
 import { compare, type Comparison } from "../../../lib/factQuery/compare";
 import { getSources } from "../../../lib/factQuery/getSources";
+import { rank, type RankData } from "../../../lib/factQuery/rank";
 import { environmentTopicAdapter } from "../../../lib/factQuery/topics/environment";
 import { TOPIC_PAGES } from "../../../lib/factQuery/topics/pages";
 import { TOPIC_ADAPTERS } from "../../../lib/factQuery/topics/registry";
@@ -107,7 +108,8 @@ describe("environment topic adapter", () => {
     expect(units("air-quality")).toMatchObject({ "environment.aq.pm10_limit": "ug_m3", "environment.aq.pm10_days.rustavi_d1": "days" });
     expect(units("forests")).toMatchObject({ "environment.forest.fires": "fires", "environment.forest.burnt_area": "hectares" });
     // A row is named as the workbook names it, under its heading's own words.
-    expect(seriesOf("air-pollution", "environment.air.co.total")).toMatchObject({ labelEn: "Total — Carbon monoxide (CO)", headingEn: "Carbon monoxide (CO)", isTotal: false });
+    expect(seriesOf("air-pollution", "environment.air.co.total")).toMatchObject({ labelEn: "Total — Carbon monoxide (CO)", headingEn: "Carbon monoxide (CO)", isTotal: true, parentSeriesId: null });
+    expect(seriesOf("air-pollution", "environment.air.co.stationary")).toMatchObject({ headingEn: "Carbon monoxide (CO)", isTotal: false, parentSeriesId: null });
     expect(seriesOf("air-quality", "environment.aq.pm10_limit")).toMatchObject({ labelEn: "Yearly limit — Fine dust PM10, yearly average", headingEn: "Fine dust PM10, yearly average" });
     expect(seriesOf("climate", "environment.climate.temperature.georgia")).toMatchObject({ labelEn: "Georgia — Yearly average temperature", isTotal: true });
     expect(seriesOf("greenhouse-gases", "environment.ghg.total")).toMatchObject({ labelEn: "Total emissions", headingEn: "Total", isTotal: true });
@@ -155,6 +157,41 @@ describe("compare and sources on the environment datasets", () => {
     expect(station.absoluteChange).toBeCloseTo(published("environment.aq.pm10_avg.rustavi_d1", 2024) - published("environment.aq.pm10_avg.rustavi_d1", 2019), 9);
     const waste = comparison("waste", "environment.waste.collected", 2015, 2024, [ADJARA]);
     expect(waste.absoluteChange).toBeCloseTo(published("environment.waste.collected.region_adjara", 2024) - published("environment.waste.collected.region_adjara", 2015), 9);
+  });
+
+  it("gives a temperature's change as a difference only, never a percentage (R33), and rain its percentage", () => {
+    for (const seriesId of ["environment.climate.temperature.georgia", "environment.climate.temperature_anomaly.georgia"]) {
+      const change = comparison("climate", seriesId, 2011, 2024);
+      expect(change, seriesId).toMatchObject({ comparability: "comparable", unit: "celsius", percentageChange: null, percentagePointChange: null });
+      expect(change.absoluteChange, seriesId).toBeCloseTo(published(seriesId, 2024) - published(seriesId, 2011), 9);
+      expect(change.reasonsEn, seriesId).toEqual([]);
+    }
+    const rain = comparison("climate", "environment.climate.precipitation.georgia", 2011, 2024);
+    expect(rain).toMatchObject({ comparability: "comparable", unit: "mm", percentagePointChange: null });
+    expect(rain.percentageChange).toBeCloseTo((published("environment.climate.precipitation.georgia", 2024) / published("environment.climate.precipitation.georgia", 2011) - 1) * 100, 9);
+  });
+
+  it("ranks temperatures by their difference and refuses their percentage change (R33); rain ranks by percentage", () => {
+    const ranked = (seriesId: string, metric: string) => rank(snapshot, { datasetId: "environment-climate", dimension: "series", seriesId, measure: "value", metric, fromYear: 2011, toYear: 2024 } as Parameters<typeof rank>[1]);
+    for (const seriesId of ["environment.climate.temperature.tbilisi", "environment.climate.temperature_anomaly.tbilisi"]) {
+      const refused = ranked(seriesId, "percentage_change") as { kind: string; error: { code: string; messageEn: string } };
+      expect(refused.kind, seriesId).toBe("error");
+      expect(refused.error).toMatchObject({ code: "unsupported_measure", messageEn: expect.stringContaining("absolute_change") });
+      const response = ranked(seriesId, "absolute_change");
+      if (response.kind !== "ranking") throw new Error(JSON.stringify(response));
+      // The heading's places, the national figure (the page's reference) aside.
+      expect((response.data as RankData).entries.map((entry) => entry.seriesId).sort(), seriesId).toEqual([seriesId.replace(".tbilisi", ".coldest"), seriesId, seriesId.replace(".tbilisi", ".warmest")]);
+      expect((response.data as RankData).entries.every((entry) => entry.unit === "celsius"), seriesId).toBe(true);
+    }
+    const rain = ranked("environment.climate.precipitation.tbilisi", "percentage_change");
+    if (rain.kind !== "ranking") throw new Error(JSON.stringify(rain));
+    expect((rain.data as RankData).entries.every((entry) => entry.unit === "percent")).toBe(true);
+  });
+
+  it("ranks a pollutant's two sources against each other, never against its total", () => {
+    const response = rank(snapshot, { datasetId: "environment-air-pollution", dimension: "series", seriesId: "environment.air.co.stationary", measure: "value", metric: "value", year: 2024 } as Parameters<typeof rank>[1]);
+    if (response.kind !== "ranking") throw new Error(JSON.stringify(response));
+    expect((response.data as RankData).entries.map((entry) => entry.seriesId).sort()).toEqual(["environment.air.co.mobile", "environment.air.co.stationary"]);
   });
 
   it("cites exactly the 13 Geostat workbooks the values are read from, resolved through get_sources", () => {

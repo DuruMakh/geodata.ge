@@ -48,7 +48,8 @@ function cellOf(context: Context, indicatorId: string, year: number): Cell | und
 /**
  * One page's list for one place: each crawl table's rows (one unit each) over the table's years. `servedId` names the
  * series a row is served as (an area or city row without its place); a row is named as the page's workbook names it and
- * sits under its heading's own words, without the unit the page adds after " · ".
+ * sits under its heading's own words, without the unit the page adds after " · ". A total is the page's reference row or a
+ * pollutant's total, which Air pollution lists flat beside its two sources under the pollutant's heading.
  */
 function addList(
   context: Context, dataset: Dataset, entity: TopicEntity, series: readonly EnvironmentSeriesDefinition[],
@@ -63,7 +64,7 @@ function addList(
       const seriesId = servedId(row.id);
       dataset.add(entity, {
         seriesId, indicatorId: seriesId, label: { ka: environmentSeriesLabel(row, ka, words(context.ka)), en: environmentSeriesLabel(row, en, words(context.en)) },
-        heading: both(context, (presentation) => words(presentation)(`heading.${row.heading}`).split(" · ")[0]!), parentSeriesId: null, isTotal: row.reference,
+        heading: both(context, (presentation) => words(presentation)(`heading.${row.heading}`).split(" · ")[0]!), parentSeriesId: null, isTotal: row.reference || row.id.endsWith(".total"),
       }, model.years, (year) => cellOf(context, row.id, year));
     }
   }

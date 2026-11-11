@@ -30,7 +30,7 @@ import { queryMunicipal } from "./queryMunicipal";
 import { queryNational } from "./queryNational";
 import { compareInput } from "./schemas";
 import { selectSources } from "./sources";
-import { breakBetween, isTopicPercentUnit, topicBreakDetail } from "./topics/store";
+import { breakBetween, isTopicIntervalUnit, isTopicPercentUnit, topicBreakDetail } from "./topics/store";
 import type { AnyDatasetId, TopicDatasetId } from "./topics/types";
 import type { Observation } from "./observations";
 import type { Basis, FactQueryError, FactQueryResponse, FactQuerySnapshot, Measure } from "./types";
@@ -403,7 +403,10 @@ export function compare(snapshot: FactQuerySnapshot, rawInput: unknown): FactQue
         percentagePointChange = to.value - from.value;
       } else {
         absoluteChange = to.value - from.value;
-        if (from.value > 0) {
+        // A temperature (an interval-scale unit token) changes by a difference only: no percentage of it means anything (R33).
+        if (topicDataset !== undefined && isTopicIntervalUnit(from.unit)) {
+          percentageChange = null;
+        } else if (from.value > 0) {
           percentageChange = ((to.value - from.value) / from.value) * 100;
         } else {
           // Spec section 6.6: a zero or negative base makes percentage change

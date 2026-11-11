@@ -145,6 +145,7 @@ export const SERVICE_MESSAGE_KEYS = [
   "errors.rankChangeYears",
   "errors.rankDimension",
   "errors.rankInflationCityInput",
+  "errors.rankIntervalChanges",
   "errors.rankMixedBasis",
   "errors.rankMunicipalInput",
   "errors.rankNoCandidates",
