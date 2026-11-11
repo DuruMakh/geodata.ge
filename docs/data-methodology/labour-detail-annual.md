@@ -11,7 +11,7 @@ This methodology governs the research package at `docs/Raw Data/Unemployment/geo
 | Informal jobs (`/explorer/unemployment/informal`) | 11 | percent | 2020–2025 |
 | Young people not in work or study (`/explorer/unemployment/young-people`) | 14 | percent | 2020–2025 |
 
-All four are national and annual. Nothing is published through MCP or included in the central machine-readable publications. The existing annual Labour Force Survey series (unemployment, labour force, education, long-term unemployment) are described in `unemployment-annual.md` and are not changed.
+All four are national and annual. The data of these pages is served through `query_indicators` and `/downloads/data/topics/<id>.csv`. The existing annual Labour Force Survey series (unemployment, labour force, education, long-term unemployment) are described in `unemployment-annual.md` and are not changed.
 
 ## Sources and coverage
 
@@ -107,7 +107,7 @@ Reconciliation with the pages the site already serves (`npm run data:prepare-lab
 
 The Prisma mirror table `LabourFact` is created by migration `20261020090000_labour` with row-level security on and public grants revoked, and is filled only by the transactional, parity-checked `npm run data:import`; CSV and database modes serve identical rows (`assertLabourParity`). The live migration and import happen only when the branch is merged, through the release pipeline.
 
-The Unemployment pages are served by a static build only. These facts are not added to the `/mcp` snapshot or to the JSON publications; the `source.geostat_lfs_` prefix is kept out of the snapshot, and no page makes a request-time database or file read. Excel downloads hold Summary, Data and Sources sheets in the reader's language, with the selected rows named with their headings and the selected years, explicit units, blank cells for missing values and validated links to the archived Geostat workbooks on fiscal.ge. Internal identifiers and cell references are not exported.
+No page makes a request-time database or file read. The data of the Unemployment pages is served through `query_indicators` and `/downloads/data/topics/<id>.csv`. Excel downloads hold Summary, Data and Sources sheets in the reader's language, with the selected rows named with their headings and the selected years, explicit units, blank cells for missing values and validated links to the archived Geostat workbooks on fiscal.ge. Internal identifiers and cell references are not exported.
 
 ## How to rerun
 

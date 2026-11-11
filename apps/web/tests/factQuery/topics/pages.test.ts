@@ -3,7 +3,9 @@ import { describe, expect, it } from "vitest";
 import { allDataMessages } from "../../../lib/explorer/allDataMessages";
 import { buildSearchPages } from "../../../lib/explorer/allDataIndex";
 import { CORE_SERVED_PAGES, MCP_SERVED_PAGES } from "../../../lib/factQuery/servedPages";
+import { catalogueData } from "../../../lib/factQuery/publications";
 import { TOPIC_PAGES, topicDatasetId } from "../../../lib/factQuery/topics/pages";
+import { testSnapshot } from "../../helpers/factQuerySnapshot";
 
 describe("TOPIC_PAGES", () => {
   it("lists the 91 chart pages of spec section 3", () => {
@@ -33,5 +35,20 @@ describe("TOPIC_PAGES", () => {
     const chartPages = buildSearchPages([], ka, en).map((page) => page.href).filter((href) => href !== "/explorer/analysis");
     const served = [...Object.keys(CORE_SERVED_PAGES), ...TOPIC_PAGES.map((page) => page.pagePath)];
     expect([...chartPages].sort()).toEqual([...served].sort());
+  });
+  // The shared snapshot is what the registered adapters build, so a page no adapter builds would be missing from it.
+  it("builds every topic page's dataset in the snapshot, once, with series", () => {
+    const snapshot = testSnapshot();
+    const built = snapshot.topics.datasets.map((dataset) => dataset.page.datasetId);
+    expect([...built].sort()).toEqual(TOPIC_PAGES.map((page) => page.datasetId).sort());
+    expect(built).toHaveLength(91);
+    for (const dataset of snapshot.topics.datasets) expect(dataset.series.length, dataset.page.datasetId).toBeGreaterThan(0);
+  });
+  it("lists the 102 datasets of the catalogue: 11 core and 91 topic", () => {
+    const datasets = catalogueData(testSnapshot()).datasets;
+    expect(datasets).toHaveLength(102);
+    const topicIds = new Set<string>(TOPIC_PAGES.map((page) => page.datasetId));
+    expect(datasets.filter((dataset) => topicIds.has(dataset.datasetId))).toHaveLength(91);
+    expect(datasets.filter((dataset) => !topicIds.has(dataset.datasetId))).toHaveLength(11);
   });
 });

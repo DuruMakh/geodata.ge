@@ -31,32 +31,52 @@ No language input is needed. Existing valid requests continue to work; catalogue
 search accepts either language. Schema 1.7.0 adds the optional `searchMatch` field
 (`all_words` or `some_words`) to catalogue searches, which match whole words, word
 beginnings of four letters or more, and Georgian stems rather than letters inside a
-word. `all_words` with no entries means nothing matched. A `some_words` answer lists
-first the entries whose dataset's own label a search word meets, then those meeting the
-rarer words over more of their label, ahead of those whose label's last word no search
-word meets (a closing `total`, `სულ` or `ჯამი` does not count as that last word, so
-Total taxes leads `გადასახადები თბილისში`), and also carries `searchMatchNoteKa` and
+word. `all_words` with no entries means nothing matched. Entries are ordered by rules that each
+only break the ties of the rule before (equal entries keep catalogue order). First by how
+much of the search the entry's dataset name meets, a word counting more the fewer entries
+meet it, so the subject comes first: `food prices` lists Consumer price inflation's series
+first. A topic dataset does not come first when its group's name alone meets every word
+of the search (the groups are named like the budget's functions: Education, Health and
+social protection, Housing and construction), so the budget datasets lead for words that name
+a budget function. When every word matched, an entry the search names in full with its last
+word comes before one it does not (`personal income tax` holds Income tax); then entries
+whose own or dataset name meets the rarer words come first, so `food inflation` lists Food
+before Headline inflation, and an all-words answer ends there. A `some_words` answer
+orders differently across datasets and within one, for a reason. Across datasets (no
+`datasetId`) the dataset's name still comes first, because entries of different datasets
+say little by their own labels. Within one dataset (`datasetId` given) there is no
+dataset name to tell entries apart, so the entries that meet more of the search's words
+come first (`ministry of health programmes` lists a health programme before Solid waste
+management programme), then those meeting the rarer words over more of their label.
+Both orders then use the dataset's stated preference, the entries the search names in
+full (`hospitals` for `hospitals in Kutaisi`), `total` entries (`crime rate` lists All
+recorded crimes before Drug crimes), and the share of the entry's best label that the
+search covers, halved when the search meets no label's last word (a closing `total`,
+`სულ` or `ჯამი` does not count as that last word, so Total taxes leads
+`გადასახადები თბილისში`). A `some_words` answer also carries `searchMatchNoteKa` and
 `searchMatchNoteEn`: only some words matched, so the entries may be about something
 else; before saying the data is not served, retry the missing part with another word or
 browse the dataset. A search without `datasetId` also returns the optional
 `websitePages` (at most five, with `websitePagesNoteKa` and `websitePagesNoteEn`) for
-Fiscal.ge pages whose figures this service does not serve: names and links in both
-languages, never a value. The note tells the assistant that each page's HTML carries its
-year-by-year table: quote from it with the link when the page can be opened, never from memory. A page is linked when every word of the search meets its
-names, topic or extra words by the same whole words, word beginnings of four letters or
-more, and Georgian stems; an id-like search links none. When the answer has entries with
-every word, nothing else is tried. Otherwise, failing the whole search, the
+Fiscal.ge pages that hold no served figures (methodology, about and the like): names and
+links in both languages, never a value. The note tells the assistant that the page's HTML
+can carry the text: quote from it with the link when the page can be opened, never from
+memory. A page is linked when every word of the search meets its names, topic or extra
+words by the same whole words, word beginnings of four letters or more, and Georgian
+stems; an id-like search links none. When the answer has entries with every word, only
+the pages that meet every word are linked. Otherwise, failing the whole search, the
 search is tried without the words that name a served place, all words of one of its
 names together (`შიდა ქართლის` names Shida Kartli; `შიდა` alone names nothing). Failing
 that too, each word looks for its own pages, best first by how many of the words they
 meet: a word that no served entry meets links all its pages, and a word that only budget
-programmes' names hold links a page it names in full (`pension` links Pensions). A word
-the served data holds otherwise looks for no page. Joining words (`of`, `from`, `with`, `or`,
-`მიხედვით` and the like) never count. A word that meets a dataset's own label (`prices`
-meets Consumer price inflation) looks for no page either, unless no served entry meets
-it and the other words reach beyond that dataset; it then links only the pages whose own
-name it meets, and only when those are all of one topic (`house prices` links Home
-prices; `bread prices`, `debt overview` and `consumer debt` link nothing).
+programmes' names hold links a page it names in full. A search that a served topic
+dataset answers (`hospitals in Kutaisi`, `average pension`, `home prices Tbilisi`) links no
+page of that topic: its dataset is the answer. A word the served data holds otherwise
+looks for no page but still counts in the order. Joining words (`of`, `from`, `with`,
+`or`, `მიხედვით` and the like) never count, and a word that meets a dataset's own label
+(`prices` meets Consumer price inflation) looks for no page either, unless no served
+entry meets it and the other words reach beyond that dataset; it then links only the
+pages whose own name it meets, and only when those are all of one topic.
 `status` still describes the served series and entities only. A top-N ranking gives full
 source records for the returned rows and names the other documents read to fix the order
 by id in `inputDocumentIds`, resolved with `get_sources` and that source's `sourceId`; a

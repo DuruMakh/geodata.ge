@@ -2,7 +2,7 @@
 
 ## Purpose and status
 
-This methodology governs the research package at `docs/Raw Data/Wages/geostat-earnings-annual/`, collected on 2026-10-09, the publication day of Geostat's 2025 annual earnings. The research captures are immutable. The 1,917 primary values and the 12 unavailable cells are served on the Wages pages under the approved design `docs/superpowers/specs/2026-10-09-wages-explorer-design.md`; see [Serving on the Wages pages](#serving-on-the-wages-pages). Nothing is published through MCP or included in central machine-readable publications.
+This methodology governs the research package at `docs/Raw Data/Wages/geostat-earnings-annual/`, collected on 2026-10-09, the publication day of Geostat's 2025 annual earnings. The research captures are immutable. The 1,917 primary values and the 12 unavailable cells are served on the Wages pages under the approved design `docs/superpowers/specs/2026-10-09-wages-explorer-design.md`; see [Serving on the Wages pages](#serving-on-the-wages-pages). The data of these pages is served through `query_indicators` and `/downloads/data/topics/<id>.csv`.
 
 The user approved annual data only, with these breakdowns: Georgia, economic activity, sex, public/non-public ownership, business/non-business sector, region and median earnings. Quarterly earnings, real (inflation-adjusted) wages, and the occupation, labour-cost and adjusted gender-pay-gap tables are excluded. Real wages are deferred by the user's decision. They would be a derived calculation against the CPI dataset and need their own review.
 

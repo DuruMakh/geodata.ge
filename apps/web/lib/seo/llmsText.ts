@@ -44,7 +44,7 @@ function whereTheDataIs(): string {
   const core = catalogueData(snapshot).datasets.filter((dataset) => !topics.has(dataset.datasetId)).map((dataset) => dataset.labelEn);
   where = `**Where the data is:**
 - Each chart page's line below opens with its latest figure, where it has one.
-- Bulk files: \`${SITE}/downloads/data/manifest.json\` lists all ${bulkFiles} bulk files with their hashes.
+- Bulk files: \`${SITE}/downloads/data/manifest.json\` lists all ${bulkFiles} bulk files with their hashes; each topic dataset's CSV is at \`${SITE}/downloads/data/topics/<datasetId>.csv\`.
 - The read-only MCP connection at \`${SITE}/mcp\` serves ${core.join(", ")}, and the data of ${topics.size} Explorer chart pages (topic datasets, listed in \`${SITE}/downloads/data/catalogue.json\`).`;
   return where;
 }

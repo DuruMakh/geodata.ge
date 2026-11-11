@@ -152,10 +152,11 @@ export const QUERIES: SearchQuery[] = [
   { q: "educaton", cat: "typo", req: ["spending.education", "admin_spending.education_science_youth", "municipal.education"], ok: [EDU] },
   { q: "goverment debt", cat: "typo", req: ["debt.stock.total"], ok: [DEBT] },
   { q: "Tbilsi", cat: "typo", req: ["E:04", "E:region.tbilisi", "E:city.tbilisi"] },
-  // --- Not served: the correct answer is nothing
-  { q: "wages", cat: "not-served", req: [] },
-  { q: "salary", cat: "not-served", req: [] },
-  { q: "unemployment", cat: "not-served", req: [] },
-  { q: "population", cat: "not-served", req: [], ok: [/27_0[23]|24_15/] },
-  { q: "exports", cat: "not-served", req: [] },
+  // --- Served by topic datasets since the topic coverage: the audit labelled these "not served" (the correct answer was
+  // nothing). Their `req` stays empty, as ported: no core series is required for them.
+  { q: "wages", cat: "topic-served", req: [] },
+  { q: "salary", cat: "topic-served", req: [] },
+  { q: "unemployment", cat: "topic-served", req: [] },
+  { q: "population", cat: "topic-served", req: [], ok: [/27_0[23]|24_15/] },
+  { q: "exports", cat: "topic-served", req: [] },
 ];

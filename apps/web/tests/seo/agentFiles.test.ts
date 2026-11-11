@@ -244,6 +244,7 @@ describe("Fiscal.ge agent instructions", () => {
       expect(line, url).toMatch(/Bulk file: \[[^\]]*CSV\]/);
     }
     expect(content).not.toMatch(/Browse-only|no MCP tool|no bulk file/);
+    expect(content).toContain("`https://fiscal.ge/downloads/data/topics/<datasetId>.csv`");
     const where = content.slice(content.indexOf("**Where the data is:**"), content.indexOf("## Core data"));
     expect(where.split(/\r?\n/).filter((line) => line.startsWith("- "))).toHaveLength(3);
     // The manifest lists what the publications step builds (less the manifest itself) and the topic CSVs written before it.

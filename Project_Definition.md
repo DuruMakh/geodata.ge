@@ -79,7 +79,10 @@ section states what V2 adds, and what stays excluded.
 - A **read-only MCP connection** at `/mcp`, so an outside AI client can ask a
   budget question and receive the same reviewed figures the site shows, with
   their sources and limitations attached. Unauthenticated and free, bounded by
-  documented operating limits.
+  documented operating limits. It serves the data of every Explorer chart page:
+  the core datasets through their own tools and every other page, annual, as a
+  topic dataset through `query_indicators`, each with its CSV under
+  `/downloads/data/topics/`.
 - **Static data publications** under `/downloads/data/`: a manifest, the
   capability catalogue, the source resolution, and one or more files per served
   dataset (four at launch; the manifest lists the current set). These are

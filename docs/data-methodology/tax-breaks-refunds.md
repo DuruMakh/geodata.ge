@@ -73,4 +73,4 @@ Refresh:
 
 ## Serving
 
-The mirror table `TaxBreaksRefundsFact` holds the same 123 rows and is compared field by field inside the import transaction. The page is browse-only: it has no `/mcp` tool and no central JSON/CSV file.
+The mirror table `TaxBreaksRefundsFact` holds the same 123 rows and is compared field by field inside the import transaction. The page's data is served through `query_indicators` and `/downloads/data/topics/<id>.csv`.

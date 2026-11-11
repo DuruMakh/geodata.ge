@@ -57,6 +57,14 @@ describe("MCP tool surface", () => {
     expect(text).not.toMatch(/[Ss]chema 1\.\d/);
   });
 
+  it("says the topic tool serves every other chart page, with school years and survey estimates", () => {
+    const text = serverInstructions();
+    expect(text).toContain("through query_indicators, every other chart page on the site");
+    expect(text).toContain("school years print as 2025/26");
+    expect(text).toContain("survey figures are estimates");
+    expect(text).toContain("For non-data website pages");
+  });
+
   // The pointer the instructions used to give for unemployment is now the search's to give: the served dataset and its page.
   it.each([
     { search: "unemployment", url: "https://fiscal.ge/en/explorer/unemployment/overview", field: "pageUrlEn" },
