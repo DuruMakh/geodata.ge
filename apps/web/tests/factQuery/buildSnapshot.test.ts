@@ -55,7 +55,10 @@ describe("buildFactQuerySnapshot", () => {
     expect(sources.filter(source => source.sourceId.startsWith("source.pension_fund_"))).toHaveLength(6);
     // A document of the Social protection methodology archive (SSA's page captures and the Pension Fund's documents) reaches it only through a cited source.
     expect(snapshot.sources.filter(source => source.documents.some(document => document.datasetId === "social-protection")).every(source => snapshot.topics.sourceIds.includes(source.sourceId) && socialIds.includes(source.sourceId))).toBe(true);
-    expect(snapshot.sources.some(source => MONEY_BANKS_PUBLIC_SOURCES.map(moneyBanksSourceDocumentId).includes(source.sourceId))).toBe(false);
+    // Only the Money and banks and the Business sources a topic page's facts cite reach the snapshot.
+    for (const ids of [MONEY_BANKS_PUBLIC_SOURCES.map(moneyBanksSourceDocumentId), BUSINESS_PUBLIC_SOURCES.map(businessSourceDocumentId)]) {
+      expect(snapshot.sources.filter(source => ids.includes(source.sourceId)).map(source => source.sourceId)).toEqual(snapshot.topics.sourceIds.filter(id => ids.includes(id)));
+    }
     // Only the Health sources a topic page's facts cite reach the snapshot.
     expect(snapshot.sources.filter(source => HEALTH_PUBLIC_SOURCES.map(healthSourceDocumentId).includes(source.sourceId)).map(source => source.sourceId)).toEqual(snapshot.topics.sourceIds.filter(id => HEALTH_PUBLIC_SOURCES.map(healthSourceDocumentId).includes(id)));
     expect(snapshot.sources.some(source => CRIME_PUBLIC_SOURCES.map(crimeSourceDocumentId).includes(source.sourceId))).toBe(false);
@@ -68,7 +71,6 @@ describe("buildFactQuerySnapshot", () => {
     // All 36 registered internet sources are in the registry, and none of them reaches the snapshot.
     expect(INTERNET_PUBLIC_SOURCES.map(internetSourceDocumentId).filter(id => !sources.some(source => source.sourceId === id))).toEqual([]);
     expect(snapshot.sources.some(source => INTERNET_PUBLIC_SOURCES.map(internetSourceDocumentId).includes(source.sourceId))).toBe(false);
-    expect(snapshot.sources.some(source => BUSINESS_PUBLIC_SOURCES.map(businessSourceDocumentId).includes(source.sourceId))).toBe(false);
     // Only the Education sources a topic page's facts cite reach the snapshot.
     expect(snapshot.sources.filter(source => EDUCATION_PUBLIC_SOURCES.map(educationSourceDocumentId).includes(source.sourceId)).map(source => source.sourceId)).toEqual(snapshot.topics.sourceIds.filter(id => EDUCATION_PUBLIC_SOURCES.map(educationSourceDocumentId).includes(id)));
     // All 33 registered science and culture sources are in the registry, and none of them reaches the snapshot.

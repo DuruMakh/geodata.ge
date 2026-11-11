@@ -64,3 +64,21 @@ export function collectTopicDataset(datasetId: string, title: Names, basis: Basi
 
 /** Every year from a list's first to its last. */
 export const span = (years: readonly number[]) => (years.length ? Array.from({ length: years.at(-1)! - years[0]! + 1 }, (_, index) => years[0]! + index) : []);
+
+/**
+ * Breaks on a series a page serves under one id across its places, where each place's figure is its own reviewed
+ * indicator (an area page's sales, `business.turnover`, rests on `business.turnover.total` for Georgia and
+ * `business.turnover.region_<id>` for each region): `members` maps the served id to those indicators. A break that names
+ * every one of them also names the served id; one that names only some stops the build, since a dataset's break holds
+ * for the series at every place.
+ */
+export function breaksOnServedSeries(breaks: readonly TopicBreak[], members: ReadonlyMap<string, readonly string[]>): TopicBreak[] {
+  return breaks.map((entry) => {
+    const served = [...members].flatMap(([seriesId, indicatorIds]) => {
+      const named = indicatorIds.filter((id) => entry.seriesIds.includes(id)).length;
+      if (named && named !== indicatorIds.length) throw new Error(`Break ${entry.breakId} names ${named} of the ${indicatorIds.length} places of ${seriesId}`);
+      return named ? [seriesId] : [];
+    });
+    return served.length ? { ...entry, seriesIds: [...entry.seriesIds, ...served] } : entry;
+  });
+}

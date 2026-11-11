@@ -93,7 +93,8 @@ describe("get_sources for a topic dataset", () => {
   it("returns the Geostat workbooks the dataset's facts cite, with their official URLs", () => {
     const schools = snapshot.topics.datasets.find((dataset) => dataset.page.datasetId === "education-schools")!;
     const cited = [...new Set(schools.columns.sources.flat().map((index) => snapshot.topics.sourceIds[index]!))];
-    const unrelated = snapshot.topics.sourceIds.filter((id) => !cited.includes(id));
+    // get_sources takes at most 100 ids.
+    const unrelated = snapshot.topics.sourceIds.filter((id) => !cited.includes(id)).slice(0, 100 - cited.length);
     const result = getSources(snapshot, { sourceIds: [...cited, ...unrelated], datasetId: "education-schools" });
     expect(result.kind).toBe("sources");
     const sources = (result as { data: GetSourcesData }).data.sources;

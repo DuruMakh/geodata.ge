@@ -974,8 +974,9 @@ function idMatches(query: string, field: string): boolean {
  * word of three letters or more answer as `some_words`, so a phrase such as
  * "annual inflation" still finds its keyword rather than nothing. They come in
  * this order: first the entries whose `ahead` fields (a series' dataset label)
- * a query word meets, so "inflation rate" lists inflation before the debt
- * interest rates; then by the rarity of the words they meet, times the share
+ * a query word meets, other than the commonest of two or more, so "inflation
+ * rate" lists inflation before the debt interest rates and "tax rate" does not
+ * put the Interest rates page ahead; then by the rarity of the words they meet, times the share
  * of the entry's best field that the query covers, so "tax rate" lists Income
  * tax before "Weighted-average interest rate — total", halved when the query
  * meets no field's last word (a closing "total" aside); ties keep catalogue order. `null` fields (e.g. a
@@ -1026,13 +1027,17 @@ export function searchCatalogue<T>(
   if (candidates.filter((count) => count > 0).length * 2 < candidates.length) return answer([], "all_words");
   // Rarity: a word that few entries meet says more than one that most do.
   const weights = counted.map((count) => (count > 0 ? Math.log(1 + rows.length / count) : 0));
+  // Of two or more known words, the commonest ("rate" in "tax rate") does not put a dataset ahead: its label would win
+  // on the word the query shares with everything ("Interest rates" before Income tax).
+  const known = weights.filter((weight) => weight > 0);
+  const commonest = known.length < 2 ? -1 : Math.min(...known);
   // A label shared by many entries (a dataset's) is read once.
   const aheadByLabel = new Map<string, boolean>();
   const isAhead = (entry: T) => {
     if (ahead === undefined) return false;
     const labels = ahead(entry).filter((field): field is string => field !== null);
     const key = labels.join("\n");
-    if (!aheadByLabel.has(key)) aheadByLabel.set(key, meetsWord(labels.flatMap(searchWords)).some((meets, index) => meets && weights[index]! > 0));
+    if (!aheadByLabel.has(key)) aheadByLabel.set(key, meetsWord(labels.flatMap(searchWords)).some((meets, index) => meets && weights[index]! > 0 && weights[index] !== commonest));
     return aheadByLabel.get(key)!;
   };
   // The share of a field's words that the query's counted words meet: "Income tax" is half tax.

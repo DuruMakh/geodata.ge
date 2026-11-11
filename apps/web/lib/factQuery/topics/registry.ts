@@ -14,9 +14,11 @@ import { groupOfTopic, NAV_TREE } from "../../navigation/navTree";
 import { methodologyManifestDocument, PUBLIC_SITE_ORIGIN } from "../manifestDocuments";
 import { findSourceProvenanceFailures, resolvePublicSources } from "../sources";
 import type { Basis, RawResolvedSource } from "../types";
+import { businessTopicAdapter } from "./business";
 import { demographyTopicAdapter } from "./demography";
 import { educationTopicAdapter } from "./education";
 import { healthTopicAdapter } from "./health";
+import { moneyBanksTopicAdapter } from "./moneyBanks";
 import { TOPIC_PAGES } from "./pages";
 import { socialTopicAdapter } from "./social";
 import { packTopicFacts } from "./store";
@@ -24,7 +26,7 @@ import { unemploymentTopicAdapter } from "./unemployment";
 import { wagesTopicAdapter } from "./wages";
 import type { TopicAdapter, TopicDataset, TopicDatasetBuild, TopicsSnapshot, TopicValueStatus } from "./types";
 
-export const TOPIC_ADAPTERS: readonly TopicAdapter[] = [educationTopicAdapter, demographyTopicAdapter, healthTopicAdapter, socialTopicAdapter, unemploymentTopicAdapter, wagesTopicAdapter];
+export const TOPIC_ADAPTERS: readonly TopicAdapter[] = [educationTopicAdapter, demographyTopicAdapter, healthTopicAdapter, socialTopicAdapter, unemploymentTopicAdapter, wagesTopicAdapter, businessTopicAdapter, moneyBanksTopicAdapter];
 
 /**
  * The site's own message for each unit token the topic CSVs use (R7: unit ids are the CSVs' tokens). One name per
@@ -52,6 +54,7 @@ const TOPIC_UNIT_MESSAGES: Readonly<Record<string, string>> = {
   percent: "social.unitReturn",
   thousand_persons: "health.unitThousandPersons",
   hours: "labour.unit.hours",
+  enterprises: "business.unitFirms",
 };
 
 /** The source registry's id (data/sources/source-documents.csv) of an archive's source id: the registry adds `source.`, which some archives already carry. */

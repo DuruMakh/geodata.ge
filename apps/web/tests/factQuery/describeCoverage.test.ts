@@ -430,7 +430,7 @@ describe("search points to website pages the connection does not serve", () => {
 });
 
 // Owner review of the F01 fix: a price word, a place beside a topic, and a phrase that matches nothing in full still
-// reach the right page, and the money-supply noise the whole-phrase rule removed stays gone.
+// reach the right page, and the money-supply noise the whole-phrase rule removed stays gone (Money supply is served now).
 describe("search links the topic page behind a phrase", () => {
   const topicsOf = (search: string) => (data(describeCoverage(snapshot, { search })).websitePages ?? []).map((page) => page.topicId);
 
@@ -457,6 +457,8 @@ describe("search links the topic page behind a phrase", () => {
   it.each([
     ["hospitals in Kutaisi", "health-doctors-hospitals", "health.facilities.hospitals"],
     ["average pension in Georgia", "health-pensions", "social.pension.avg_monthly"],
+    ["money supply", "money-supply", "money.m3"],
+    ["new firms", "business-firms", "business.births.total"],
     ["unemployment among women", "unemployment-overview", "unemployment_rate.women"],
     ["საშუალო თვიური ხელფასი", "wages-overview", "average_monthly_nominal_earnings"],
   ])("answers %s with the dataset it serves and no page link of its topic", (search, datasetId, seriesId) => {
@@ -479,10 +481,6 @@ describe("search links the topic page behind a phrase", () => {
   // "rate" meets the debt interest rates and links pages of two topics, so it names no page by itself.
   it.each(["inflation rate", "poverty rate"])("links no interest-rate page for %s", (search) => {
     expect(topicsOf(search)).not.toContain("money");
-  });
-
-  it("links only the money supply page for money supply", () => {
-    expect((data(describeCoverage(snapshot, { search: "money supply" })).websitePages ?? []).map((page) => page.labelEn)).toEqual(["Money supply"]);
   });
 
   // A trailing full stop is punctuation, not an id: only a word, a "." or "_", and a word again looks like one.
