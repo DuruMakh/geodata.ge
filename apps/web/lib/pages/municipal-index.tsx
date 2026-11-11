@@ -8,6 +8,10 @@ import { publicLabel } from "../i18n/labels";
 import { pageHref } from "../i18n/routes";
 import type { Metadata } from "next";
 import { MunicipalitiesIndex } from "../../components/municipalities/municipalities-index";
+import { IndexCrawlTables } from "../../components/explorer-shell/index-crawl-tables";
+import { formatCrawlCell } from "../explorer/crawlTables";
+import { indexHistoryTables } from "../explorer/indexCrawlTables";
+import { workbookMessage } from "../i18n/workbook";
 import { ExplorerPage } from "../../components/explorer-shell/explorer-page";
 import { BreadcrumbJsonLd } from "../../components/seo/breadcrumb-json-ld";
 import { JsonLd } from "../../components/seo/json-ld";
@@ -20,6 +24,7 @@ import {
   latestReviewedAtForMunicipalFacts,
   MUNICIPAL_COUNTRY_BUDGET_COUNT,
   MUNICIPAL_PER_RESIDENT_YEAR,
+  municipalIndexHistory,
 } from "../explorer/municipalData";
 import { formatPerResidentGel } from "../explorer/format";
 import { buildMunicipalityMapModel } from "../explorer/municipalityMapData";
@@ -61,6 +66,8 @@ export async function renderMunicipalIndex(locale: Locale) {
   const regionLabels = new Map(regions.map((region) => [region.id, region.kaLabel]));
 
   const list = buildMunicipalListRows({ municipalities, regionLabels, totalFacts, populationFacts, adjaraBudgetAdjustments, year: comparisonYear });
+  const country = buildCountryListRow(countryTotalFacts, comparisonYear);
+  const title = message(messages, "municipal.indexTitle");
   const map = buildMunicipalityMapModel({
     municipalities,
     municipalityRows: list.municipalities,
@@ -138,7 +145,7 @@ export async function renderMunicipalIndex(locale: Locale) {
         legendMax={formatPerResidentGel(map.legendMaxPerResidentGel, locale)}
         municipalities={list.municipalities}
         regions={list.regions}
-        country={buildCountryListRow(countryTotalFacts, comparisonYear)}
+        country={country}
         sourceNote={message(messages, "municipal.indexSource", { year: comparisonYear, municipalities: municipalities.length, budgets: MUNICIPAL_COUNTRY_BUDGET_COUNT }) + municipalUpdatedNote(messages, locale, lastUpdatedAt)}
         kpis={buildIndexKpis({
           municipalities,
@@ -153,6 +160,15 @@ export async function renderMunicipalIndex(locale: Locale) {
         }, presentation)}
       />
       </I18nProvider>
+      {/* Every year of the index's figures for every place, for readers that run no page code (DESIGN.md §8.4). */}
+      <IndexCrawlTables category={workbookMessage(locale, "workbook.category")} tables={indexHistoryTables({
+        history: municipalIndexHistory(data, years), rows: { country, ...list }, label: (row) => publicLabel(locale, row.id, row.nameKa, presentation.englishLabels),
+        levels: { municipalities: message(messages, "municipal.municipalities"), regions: message(messages, "municipal.regions") }, column: String,
+        figures: {
+          total: { parts: [title, message(messages, "municipal.amountMeasure")], format: (value) => formatCrawlCell(value / 1e6, null, "#,##0.0", locale) },
+          perResident: { parts: [title, `₾ ${message(messages, "municipal.perResident")}`], format: (value) => formatCrawlCell(value, null, "#,##0", locale) },
+        },
+      })} />
     </ExplorerPage>
   );
 }
