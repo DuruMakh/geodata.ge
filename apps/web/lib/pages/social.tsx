@@ -10,7 +10,7 @@ import { projectGdpFact } from "../explorer/clientData";
 import { coverageLabel } from "../explorer/coverageLabel";
 import { formatInUnit, UNIT_PERSONS } from "../explorer/format";
 import { SOCIAL_SECTIONS, socialCoverage, socialViews, type SocialTopicId } from "../explorer/social";
-import { loadSocialWorkbookSources, socialTopicPageData } from "../explorer/socialPageData";
+import { socialTopicPageData } from "../explorer/socialPageData";
 import { Message } from "../i18n/message";
 import { message } from "../i18n/messages";
 import { getMessages } from "../i18n/messages.server";
@@ -22,6 +22,9 @@ import { loadGdpWorkbookSources } from "../methodology/workbookSources";
 import { fiscalMetadata } from "../seo/metadata";
 import { explorerDatasetJsonLd } from "../seo/structuredData";
 import { resolveSiteUrl } from "../siteUrl";
+// Imported from the place pages' module, as before the MCP work: that import is what puts the place explorer in these
+// pages' client manifest, and importing it from socialPageData instead changed their shipped JS (out/ stays byte-identical).
+import { loadSocialWorkbookSources } from "./social-places";
 import { topicSection, ALL_DATA_PATH } from "../navigation/navTree";
 
 const topicHref = (section: SocialTopicId) => SOCIAL_SECTIONS.find(item => item.id === section)!.href;
