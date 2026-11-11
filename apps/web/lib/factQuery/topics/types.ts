@@ -3,9 +3,15 @@
 // The shared topic format: what an adapter builds for one chart page (TopicDatasetBuild) and what the snapshot keeps
 // (TopicDataset, facts packed into parallel columns). Types only; store.ts packs and unpacks.
 import type { MethodologyDatasetId } from "../../methodology/types";
-import type { Basis } from "../types";
+import type { Basis, DatasetId } from "../types";
 
 export type TopicFamilyId = "education" | "demography" | "health" | "social" | "unemployment" | "wages" | "business" | "money-banks" | "living-standards" | "housing" | "internet" | "transport" | "trade" | "external" | "budget-extras" | "crime" | "science-culture" | "environment" | "energy-food";
+
+/** A topic page's dataset id (`education-schools`): kept apart from the core DatasetId, whose per-dataset maps it does not join. */
+export type TopicDatasetId = (typeof import("./pages").TOPIC_PAGES)[number]["datasetId"];
+
+/** A core or a topic dataset id, where topic data flows alongside the core datasets. */
+export type AnyDatasetId = DatasetId | TopicDatasetId;
 
 export type TopicPage = { datasetId: string; pagePath: `/explorer/${string}`; family: TopicFamilyId; periodKind: "year" | "school_year" };
 

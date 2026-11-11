@@ -488,5 +488,11 @@
   "documents.source.geostat_demography_marriage_duration.publisher": "National Statistics Office of Georgia (Geostat)",
   "sources.source.geostat_demography_mean_age_divorced.name": "Mean age of divorced people by order of marriages and sex",
   "documents.source.geostat_demography_mean_age_divorced.title": "Mean age of divorced people by order of marriages and sex",
-  "documents.source.geostat_demography_mean_age_divorced.publisher": "National Statistics Office of Georgia (Geostat)"
+  "documents.source.geostat_demography_mean_age_divorced.publisher": "National Statistics Office of Georgia (Geostat)",
+  "documents.geostat_education_higher.attribution": "Geostat",
+  "documents.geostat_education_kindergartens.attribution": "Geostat",
+  "documents.geostat_education_municipal.attribution": "Geostat",
+  "documents.geostat_education_schools_national.attribution": "Geostat",
+  "documents.geostat_education_teachers_national.attribution": "Geostat",
+  "documents.geostat_education_vocational.attribution": "Geostat"
 }

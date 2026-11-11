@@ -5,6 +5,7 @@
 // positive when it is neither in `req` nor accepted by `ok`, and an inside-word one when no query word starts any word
 // of the entry's fields (the entry matched only on letters in the middle of a word).
 import { beforeAll, describe, expect, it } from "vitest";
+import { coreServedSnapshot } from "../helpers/coreServedSnapshot";
 import { testSnapshot } from "../helpers/factQuerySnapshot";
 import { describeCoverage } from "../../lib/factQuery/describeCoverage";
 import { stem } from "../../lib/explorer/search/georgian";
@@ -214,9 +215,11 @@ describe("a some-words answer says that only some words matched", () => {
     expect(found).not.toHaveProperty("searchMatchNoteKa");
   });
 
-  it("links the poverty page for poverty rate, whose word rate alone matched served series", () => {
-    const poverty = snapshot.website.pages.find((page) => page.name.en === "Poverty")!;
-    const pages = dataOf(describeCoverage(snapshot, { search: "poverty rate" })).websitePages ?? [];
+  // On the page list of the core-only snapshot (tests/helpers/coreServedSnapshot.ts): Poverty is a served topic page now.
+  it("links the poverty page for poverty rate, whose word rate alone matched served series", async () => {
+    const coreOnly = await coreServedSnapshot();
+    const poverty = coreOnly.website.pages.find((page) => page.name.en === "Poverty")!;
+    const pages = dataOf(describeCoverage(coreOnly, { search: "poverty rate" })).websitePages ?? [];
     expect(pages.map((page) => page.urlKa)).toContain(poverty.urlKa);
     for (const page of pages) expect(page.topicId).toBe("living-standards");
   });

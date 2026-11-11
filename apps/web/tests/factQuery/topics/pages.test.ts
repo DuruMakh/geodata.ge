@@ -23,8 +23,8 @@ describe("TOPIC_PAGES", () => {
   it("shares no page with the core served pages", () => {
     for (const page of TOPIC_PAGES) expect(Object.hasOwn(CORE_SERVED_PAGES, page.pagePath)).toBe(false);
   });
-  it("leaves MCP_SERVED_PAGES as the core pages until the topic adapters are wired in", () => {
-    expect(MCP_SERVED_PAGES).toBe(CORE_SERVED_PAGES);
+  it("serves the core pages and every topic page, each topic page with its own dataset", () => {
+    expect(MCP_SERVED_PAGES).toEqual({ ...CORE_SERVED_PAGES, ...Object.fromEntries(TOPIC_PAGES.map((page) => [page.pagePath, [page.datasetId]])) });
   });
   it("covers every chart page in the navigation: core pages plus topic pages", async () => {
     const [ka, en] = await Promise.all([allDataMessages("ka"), allDataMessages("en")]);

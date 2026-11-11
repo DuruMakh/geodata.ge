@@ -488,5 +488,11 @@
   "documents.source.geostat_demography_marriage_duration.publisher": "საქართველოს სტატისტიკის ეროვნული სამსახური (საქსტატი)",
   "sources.source.geostat_demography_mean_age_divorced.name": "განქორწინებულთა საშუალო ასაკი წინა ქორწინების რიგითობის და სქესის მიხედვით",
   "documents.source.geostat_demography_mean_age_divorced.title": "განქორწინებულთა საშუალო ასაკი წინა ქორწინების რიგითობის და სქესის მიხედვით",
-  "documents.source.geostat_demography_mean_age_divorced.publisher": "საქართველოს სტატისტიკის ეროვნული სამსახური (საქსტატი)"
+  "documents.source.geostat_demography_mean_age_divorced.publisher": "საქართველოს სტატისტიკის ეროვნული სამსახური (საქსტატი)",
+  "documents.geostat_education_higher.attribution": "საქსტატი",
+  "documents.geostat_education_kindergartens.attribution": "საქსტატი",
+  "documents.geostat_education_municipal.attribution": "საქსტატი",
+  "documents.geostat_education_schools_national.attribution": "საქსტატი",
+  "documents.geostat_education_teachers_national.attribution": "საქსტატი",
+  "documents.geostat_education_vocational.attribution": "საქსტატი"
 }
