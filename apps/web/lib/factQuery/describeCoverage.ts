@@ -112,6 +112,8 @@ type DatasetSummary = {
   periodKind?: "year" | "school_year";
   seriesCount?: number;
   entityCount?: number;
+  /** A search without `datasetId` only: this topic dataset's matches left out of `series` (SEARCH_TOPIC_SERIES_LIMIT). */
+  seriesOmitted?: number;
 };
 
 export type CoverageData = {
@@ -141,6 +143,13 @@ export type CoverageData = {
 
 /** A topic series list longer than this returns its totals and headings only; `search` narrows it. */
 const TOPIC_SERIES_LIMIT = 300;
+
+/**
+ * A search without `datasetId` lists at most this many series of one topic dataset, the first in the search's order;
+ * the dataset's entry counts the rest. "exports" meets 1,937 series, most of them trade products, and one answer
+ * holds about 500 series.
+ */
+const SEARCH_TOPIC_SERIES_LIMIT = 20;
 
 /** How many website pages one search points to: a topic's name matches every one of its pages, so the list is capped. */
 const WEBSITE_PAGES_LIMIT = 5;
@@ -1432,7 +1441,17 @@ export function describeCoverage(snapshot: FactQuerySnapshot, rawInput: unknown)
     // pages before Spending by type's wages and salaries).
     const tier = (entry: { datasetId: AnyDatasetId }) => (titledIds.has(entry.datasetId) ? 0 : isCoreDataset(entry.datasetId) ? 1 : 2);
     const ranked = searchMatch === "all_words" ? found.matches.toSorted((left, right) => tier(left) - tier(right)) : found.matches;
-    const foundSeries = ranked.filter((entry): entry is SeriesEntry & { datasetId: AnyDatasetId } => "seriesId" in entry);
+    const matchedSeries = ranked.filter((entry): entry is SeriesEntry & { datasetId: AnyDatasetId } => "seriesId" in entry);
+    // Bounded: a topic dataset lists its first matches, and its entry says how many more a search within it lists.
+    const perTopic = new Map<AnyDatasetId, number>();
+    const foundSeries = matchedSeries.filter((entry) => {
+      if (isCoreDataset(entry.datasetId)) return true;
+      const count = (perTopic.get(entry.datasetId) ?? 0) + 1;
+      perTopic.set(entry.datasetId, count);
+      return count <= SEARCH_TOPIC_SERIES_LIMIT;
+    });
+    const omittedBy = new Map([...perTopic].filter(([, count]) => count > SEARCH_TOPIC_SERIES_LIMIT).map(([id, count]) => [id, count - SEARCH_TOPIC_SERIES_LIMIT]));
+    const omittedValues = { omitted: matchedSeries.length - foundSeries.length, total: matchedSeries.length, limit: SEARCH_TOPIC_SERIES_LIMIT };
     const foundEntities = ranked.filter((entry): entry is EntityEntry & { datasetId: AnyDatasetId } => !("seriesId" in entry));
 
     // A search is a lookup, so it answers with what matched: the datasets the
@@ -1472,13 +1491,21 @@ export function describeCoverage(snapshot: FactQuerySnapshot, rawInput: unknown)
       kind: "catalogue",
       status: foundSeries.length === 0 && foundEntities.length === 0 ? "empty" : "ok",
       data: {
-        datasets: datasets.filter((dataset) => datasetRank.has(dataset.datasetId)).sort((left, right) => datasetRank.get(left.datasetId)! - datasetRank.get(right.datasetId)!),
+        datasets: datasets.filter((dataset) => datasetRank.has(dataset.datasetId)).sort((left, right) => datasetRank.get(left.datasetId)! - datasetRank.get(right.datasetId)!)
+          .map((dataset) => (omittedBy.has(dataset.datasetId) ? { ...dataset, seriesOmitted: omittedBy.get(dataset.datasetId)! } : dataset)),
         series: foundSeries,
         entities: foundEntities,
         // A code names an exclusion exactly ("05"), never by a letter inside it.
         exclusions: exclusions.filter((exclusion) => exclusion.entityId === fold(search!.trim())),
         searchMatch,
         ...someWordsNote(snapshot, searchMatch),
+        ...(omittedBy.size > 0
+          ? {
+            seriesOmitted: omittedValues.omitted,
+            seriesOmittedNoteKa: serviceMessage(snapshot, "ka", "catalogue.searchSeriesOmitted", omittedValues),
+            seriesOmittedNoteEn: serviceMessage(snapshot, "en", "catalogue.searchSeriesOmitted", omittedValues),
+          }
+          : {}),
         ...(websitePages.length > 0
           ? {
             websitePages,

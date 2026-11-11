@@ -69,4 +69,14 @@ describe("every tool answers every topic dataset (recommendation 2)", () => {
     }
     expect(broken).toEqual([]);
   });
+
+  // The documented workflow is "one meaningful keyword"; these used to exceed 512 KiB (C2).
+  it.each([
+    "exports", "export", "imports", "trade", "goods", "services", "products", "ექსპორტი", "იმპორტი", "exports to Turkey",
+    "spending", "budget", "ბიუჯეტი", "population", "მოსახლეობა", "prices", "ფასები", "wages", "ხელფასი", "age", "women", "total",
+  ])("answers the search %s without a datasetId", async (search) => {
+    const result = await call("describe_coverage", { search });
+    expect(brokenCode(result)).toBeUndefined();
+    expect(result.isError).toBeFalsy();
+  });
 });

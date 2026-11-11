@@ -77,6 +77,12 @@ looks for no page but still counts in the order. Joining words (`of`, `from`, `w
 (`prices` meets Consumer price inflation) looks for no page either, unless no served
 entry meets it and the other words reach beyond that dataset; it then links only the
 pages whose own name it meets, and only when those are all of one topic.
+A search without `datasetId` lists at most 20 series of one topic dataset, the first in
+the search's order; the core datasets' series are not cut. The dataset's entry then
+carries `seriesOmitted`, and the answer `seriesOmitted` with `seriesOmittedNoteKa` and
+`seriesOmittedNoteEn`, which point to the same or a narrower search with that
+`datasetId` (`exports` meets 1,937 series, most of them trade products, against about
+500 that fit one answer).
 `status` still describes the served series and entities only. A top-N ranking gives full
 source records for the returned rows and names the other documents read to fix the order
 by id in `inputDocumentIds`, resolved with `get_sources` and that source's `sourceId`; a

@@ -11,7 +11,7 @@ import { LIMITS, boundedToolResult } from "../../../lib/mcp/result";
 import { outputSchemaFor } from "../../../lib/mcp/outputSchema";
 
 type Data = {
-  datasets: { datasetId: string; labelKa: string; labelEn: string; years: [number, number]; entityTypes: string[]; periodKind?: string; pageUrlKa?: string; pageUrlEn?: string; seriesCount?: number; entityCount?: number }[];
+  datasets: { datasetId: string; labelKa: string; labelEn: string; years: [number, number]; entityTypes: string[]; periodKind?: string; pageUrlKa?: string; pageUrlEn?: string; seriesCount?: number; entityCount?: number; seriesOmitted?: number }[];
   series?: { seriesId: string; labelEn?: string; datasetId?: string; headingKa?: string; headingEn?: string; unit?: string; years: number[]; level: string }[];
   entities?: { entityId: string; entityType: string; datasetId?: string }[];
   breaks?: { breakId: string; seriesIds: string[]; referenceDate: string; reasonEn: string }[];
@@ -202,5 +202,35 @@ describe("a series list over the limit returns its totals, its headings and how 
     const found = dataOf(large, { datasetId: "synthetic-large", search: "group a" });
     expect(found.series).toHaveLength(200);
     expect(found).not.toHaveProperty("seriesOmitted");
+  });
+});
+
+// Final review C2: a search without datasetId met 1,937 series for "exports" and was refused as too large.
+describe("a search across all datasets lists a bounded number of each topic dataset's series", () => {
+  it("lists the first 20 of each topic dataset, counts the rest per dataset, and points to a search within it", () => {
+    const response = describeCoverage(snapshot, { search: "exports" });
+    const found = (response as unknown as { data: Data }).data;
+    const perDataset = Map.groupBy(found.series ?? [], (entry) => entry.datasetId);
+    expect(Math.max(...[...perDataset.values()].map((entries) => entries.length))).toBe(20);
+    const products = found.datasets.find((entry) => entry.datasetId === "trade-products")!;
+    expect(products.seriesOmitted).toBeGreaterThan(1000);
+    expect(perDataset.get("trade-products")).toHaveLength(20);
+    // The total comes first, as before the bound.
+    expect(found.series?.[0]).toMatchObject({ datasetId: "trade-domestic-exports", seriesId: "trade.exports" });
+    const omitted = found.datasets.reduce((sum, entry) => sum + (entry.seriesOmitted ?? 0), 0);
+    expect(found.seriesOmitted).toBe(omitted);
+    expect(found.seriesOmittedNoteEn).toContain(String(omitted + (found.series?.length ?? 0)));
+    expect(found.seriesOmittedNoteEn).toContain("datasetId");
+    expect(found.seriesOmittedNoteKa).toContain("datasetId");
+    expect(boundedToolResult(snapshot, response).isError).toBe(false);
+    expect(outputSchemaFor("describe_coverage").safeParse(response).success).toBe(true);
+  });
+
+  it("leaves a narrow search and the core datasets' series uncut", () => {
+    const found = (describeCoverage(snapshot, { search: "debt" }) as unknown as { data: Data }).data;
+    expect(found).not.toHaveProperty("seriesOmitted");
+    expect(found.datasets.every((entry) => entry.seriesOmitted === undefined)).toBe(true);
+    const products = (describeCoverage(snapshot, { search: "products" }) as unknown as { data: Data }).data;
+    expect((products.series ?? []).filter((entry) => entry.datasetId === "inflation-products").length).toBeGreaterThan(20);
   });
 });
