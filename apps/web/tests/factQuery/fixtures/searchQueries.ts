@@ -1,7 +1,8 @@
 // apps/web/tests/factQuery/fixtures/searchQueries.ts
 //
-// The hand-labelled catalogue-search queries of the 29 Oct 2026 MCP audit (finding F08), ported unchanged from the
-// audit's eval-F08-search-quality/queries.mjs. `req` is what a correct search must return (recall); `ok` lists further
+// The hand-labelled catalogue-search queries of the 29 Oct 2026 MCP audit (finding F08), ported from the
+// audit's eval-F08-search-quality/queries.mjs unchanged, except that five "not served" labels became "topic-served" once the
+// topics were served (their expectations are unchanged). `req` is what a correct search must return (recall); `ok` lists further
 // results that are reasonable and not counted as false positives. Keys: a series id, or "E:" + an entity id. An `ok`
 // entry may be a RegExp, tested against "key | labelEn | labelKa".
 export type SearchQuery = { q: string; cat: string; req: string[]; ok?: (string | RegExp)[] };

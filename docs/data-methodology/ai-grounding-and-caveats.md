@@ -4,7 +4,7 @@ This document is the single owner of the caveat catalogue used by the fact-query
 
 **A code appearing in this document is not evidence that its trigger is correct.** The firing and non-firing tests under `apps/web/tests/factQuery/caveats/` are what establish that, and they have twice caught a rule attaching a warning to figures it did not describe. Read this document to learn what a code means; read the tests to learn when it fires.
 
-## Bilingual response contract, schema 1.7.0
+## Bilingual response contract, schema 1.8.0
 
 The shared `/mcp` endpoint and the manifest-listed `/downloads/data/` publications
 use one reviewed snapshot. The manifest also lists ten topic CSVs written earlier in
@@ -58,7 +58,7 @@ search covers, halved when the search meets no label's last word (a closing `tot
 else; before saying the data is not served, retry the missing part with another word or
 browse the dataset. A search without `datasetId` also returns the optional
 `websitePages` (at most five, with `websitePagesNoteKa` and `websitePagesNoteEn`) for
-Fiscal.ge pages that hold no served figures (methodology, about and the like): names and
+Fiscal.ge navigation pages without a served dataset (today, Analysis): names and
 links in both languages, never a value. The note tells the assistant that the page's HTML
 can carry the text: quote from it with the link when the page can be opened, never from
 memory. A page is linked when every word of the search meets its names, topic or extra
@@ -126,7 +126,7 @@ cumulative percentage is Fiscal.ge's calculation. Missing inputs stay unavailabl
 not zero, and annual/cumulative rankings preserve every exclusion.
 
 MCP modern `2026-07-28` and legacy `2025-11-25` are transport revisions, separate
-from schema 1.7.0. SDK tests prove protocol, serialization and response contracts;
+from schema 1.8.0. SDK tests prove protocol, serialization and response contracts;
 they do not prove an external AI client's menus, account eligibility or interpretation.
 Current official application guidance and the unverified human-flow boundary are
 recorded in `docs/deployment.md#human-application-guidance-and-evidence-boundary`.
@@ -134,8 +134,9 @@ recorded in `docs/deployment.md#human-application-guidance-and-evidence-boundary
 The server instructions (`apps/web/lib/mcp/instructions.ts`) are one static text of at
 most 4,096 characters, with an opening of at most 512. Claude Code cuts server
 instructions at 4,096 characters (2,048 before v2.1.296) and Codex and ChatGPT advise a
-self-contained first 512, so the rules that change an answer come first: what is not
-served, the boundaries never to combine, units and missing values, inflation, and how to
+self-contained first 512, so the rules that change an answer come first: what Fiscal.ge
+serves (the core datasets and, through `query_indicators`, every other chart page),
+the boundaries never to combine, units and missing values, inflation, and how to
 present and cite. Year ranges, entity counts and call mechanics live in the tool
 descriptions, which read them from the snapshot, and are not repeated. The per-schema
 history developers need is on `/connect` only. Tests pin the length limits and the

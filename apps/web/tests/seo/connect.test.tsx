@@ -71,6 +71,7 @@ test.each(["ka", "en"] as const)("Connect includes real national, city and produ
   for (const name of ["inflation-products.csv", "inflation-products.json"]) expect(html).toContain(`href="/downloads/data/${name}"`);
   expect(item("products-cumulative")).toMatch(/December|დეკემბ/);
   expect(html).toContain("1.7.0");
+  expect(html).toContain("1.8.0");
   expect(html).toContain("2026-07-28");
   expect(html).toContain("2025-11-25");
   expect(html).not.toContain("Codex / ChatGPT");
