@@ -5,6 +5,7 @@ import { useMemo, useState, type ReactNode } from "react";
 import type { RegionalEconomyMapModel, RegionMapModel } from "../../lib/explorer/regionalEconomyMap";
 import { regionalEconomyHref } from "../../lib/explorer/regionalEconomyRoutes";
 import { MISSING, formatAmount } from "../../lib/explorer/format";
+import { formatCrawlCell } from "../../lib/explorer/crawlTables";
 import { matchesLabelQuery } from "../../lib/i18n/search";
 import { publicLabel } from "../../lib/i18n/labels";
 import { message } from "../../lib/i18n/messages";
@@ -27,7 +28,9 @@ export function RegionalEconomiesIndex({ model, sourceNote }: { model: RegionalE
     hrefForRegion: regionalEconomyHref, formatValue: value => formatAmount(value, locale), mapAria: message(messages, "regionalEconomies.mapAria", { year: model.year }),
     entityAria: (name, value, year) => message(messages, "regionalEconomies.mapEntityAria", { name, amount: formatAmount(value, locale), year }),
     legend: message(messages, "regionalEconomies.legend"), testId: "regional-economy-map",
-  }} summary={[
+  }} crawl={[{ model: regionalEconomyMapData(model), metric: {
+    legend: `${message(messages, "regionalEconomies.legend")} · ${message(messages, "format.mlnGel")}`, formatValue: value => formatCrawlCell(value / 1_000_000, null, "#,##0.0", locale),
+  } }]} summary={[
     { label: message(messages, "regionalEconomies.regionCount"), value: String(model.regions.length), detail: message(messages, "regionalEconomies.currentPrices") },
     { label: message(messages, "regionalEconomies.largestRegion"), value: publicLabel(locale, largest.regionId, largest.nameKa, englishLabels), detail: formatAmount(largest.totalGdpGel, locale) },
     { label: message(messages, "regionalEconomies.period"), value: `${model.firstYear}–${model.year}`, detail: message(messages, "regionalEconomies.currentPrices") },

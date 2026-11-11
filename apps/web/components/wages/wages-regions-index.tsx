@@ -1,4 +1,5 @@
 "use client";
+import { formatCrawlCell } from "../../lib/explorer/crawlTables";
 import { formatInUnit } from "../../lib/explorer/format";
 import type { RegionMapModel } from "../../lib/explorer/regionalEconomyMap";
 import { wagesRegionHref } from "../../lib/explorer/wages";
@@ -11,7 +12,7 @@ import { RegionIndex } from "../regional-economies/regional-economies-index";
 
 /** The Regions index: the map and ranked list only; each region opens its own page. */
 export function WagesRegionsIndex({ regionMap, national }: { regionMap: RegionMapModel; national: { year: number; value: number } }) {
-  const { messages } = useI18n();
+  const { locale, messages } = useI18n();
   const t = (key: string, values?: Record<string, string | number>) => message(messages, `wages.${key}`, values);
   const amount = (value: number) => `${formatInUnit(value, { divisor: 1, label: t("unit"), decimals: 1 })} ${t("unit")}`;
   useAppReady();
@@ -25,7 +26,7 @@ export function WagesRegionsIndex({ regionMap, national }: { regionMap: RegionMa
         hrefForRegion: wagesRegionHref, formatValue: amount,
         mapAria: t("regionMapAria", { year: regionMap.year }), entityAria: (name, value, year) => t("regionMapEntityAria", { name, amount: amount(value), year }),
         legend: t("series.average"), testId: "wages-region-map",
-      }} />
+      }} crawl={[{ model: regionMap, metric: { legend: `${t("series.average")} · ${t("unit")}`, formatValue: value => formatCrawlCell(value, null, "#,##0.0", locale) } }]} />
       <p className="mt-3 max-w-[900px] text-[11px] leading-relaxed text-[var(--muted)]">{t("regionNote")}</p>
     </div>
   </div>;

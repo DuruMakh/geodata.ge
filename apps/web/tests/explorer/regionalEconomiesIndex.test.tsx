@@ -34,6 +34,7 @@ const messages: Record<string, string> = {
   "regionalEconomies.boundaries": "Boundaries",
   "regionalEconomies.heading": "Regional economies",
   "controls.share.button": "Share",
+  "format.mlnGel": "mln GEL",
 };
 
 test("credits geoBoundaries, overlays the two occupied areas and claims no share of Georgia", async () => {
