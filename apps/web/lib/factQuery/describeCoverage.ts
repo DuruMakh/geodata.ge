@@ -1208,8 +1208,8 @@ export function describeCoverage(snapshot: FactQuerySnapshot, rawInput: unknown)
   if (input.datasetId !== undefined && !allDatasetIds(snapshot).includes(input.datasetId as AnyDatasetId)) {
     return errorResponse(snapshot, {
       code: "invalid_parameters",
-      messageKa: serviceMessage(snapshot, "ka", "errors.invalidParameters"),
-      messageEn: serviceMessage(snapshot, "en", "errors.invalidParameters", { issues: "datasetId: Invalid option" }),
+      messageKa: serviceMessage(snapshot, "ka", "errors.unknownDataset", { datasetId: input.datasetId }),
+      messageEn: serviceMessage(snapshot, "en", "errors.unknownDataset", { datasetId: input.datasetId }),
       retryable: false,
       validChoices: allDatasetIds(snapshot),
     });
@@ -1338,7 +1338,7 @@ export function describeCoverage(snapshot: FactQuerySnapshot, rawInput: unknown)
       kind: "catalogue",
       status: foundSeries.length === 0 && foundEntities.length === 0 ? "empty" : "ok",
       data: {
-        datasets: datasets.filter((dataset) => matchedDatasets.has(dataset.datasetId)),
+        datasets: datasets.filter((dataset) => matchedDatasets.has(dataset.datasetId)).sort((left, right) => Number(titledIds.has(right.datasetId)) - Number(titledIds.has(left.datasetId))),
         series: foundSeries,
         entities: foundEntities,
         // A code names an exclusion exactly ("05"), never by a letter inside it.

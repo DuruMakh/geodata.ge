@@ -18,8 +18,17 @@ describe("snapshot-pinned translations", () => {
     if (overview.kind !== "catalogue") throw new Error("Expected catalogue");
     const topicIds = new Set(snapshot.topics.datasets.map((topic) => topic.page.datasetId));
     for (const dataset of (overview.data as CoverageData).datasets) {
-      // A topic dataset carries its own English labels (tests/factQuery/topics/describeCoverage.test.ts), not the snapshot's label map.
-      if (topicIds.has(dataset.datasetId)) continue;
+      // A topic dataset carries its own English labels, not the snapshot's label map: check those in place.
+      if (topicIds.has(dataset.datasetId)) {
+        const topic = snapshot.topics.datasets.find((entry) => entry.page.datasetId === dataset.datasetId)!;
+        const english = [topic.titleEn, ...topic.series.flatMap((series) => [series.labelEn, series.headingEn]), ...topic.entities.map((entity) => entity.labelEn)];
+        for (const label of english) {
+          if (label === null) continue;
+          expect(label.trim(), `${dataset.datasetId}: ${label}`).not.toBe("");
+          expect(label, `${dataset.datasetId}: ${label}`).not.toMatch(/\p{Script=Georgian}/u);
+        }
+        continue;
+      }
       expect(serviceLabelEn(snapshot, dataset.datasetId)).not.toBe("");
       const response = describeCoverage(snapshot, { datasetId: dataset.datasetId });
       if (response.kind !== "catalogue") throw new Error("Expected catalogue");

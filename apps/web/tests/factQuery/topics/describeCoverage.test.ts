@@ -69,8 +69,10 @@ describe("describe_coverage lists the topic datasets", () => {
   });
 
   it("rejects an unknown dataset id and names the topic datasets among the valid choices", () => {
-    const result = describeCoverage(snapshot, { datasetId: "not-a-dataset" }) as unknown as { error: { code: string; validChoices: string[] } };
+    const result = describeCoverage(snapshot, { datasetId: "not-a-dataset" }) as unknown as { error: { code: string; messageKa: string; messageEn: string; validChoices: string[] } };
     expect(result.error.code).toBe("invalid_parameters");
+    expect(result.error.messageKa).toContain("not-a-dataset");
+    expect(result.error.messageEn).toContain("not-a-dataset");
     expect(result.error.validChoices).toEqual(expect.arrayContaining(["national-revenue", "education-schools"]));
   });
 });
@@ -78,7 +80,7 @@ describe("describe_coverage lists the topic datasets", () => {
 describe("search finds topic datasets, series, headings and places in both languages", () => {
   it.each(["სკოლა", "schools"])("answers %s with education-schools first, holding education.pupils.total", (search) => {
     const found = dataOf(snapshot, { search });
-    expect(found.datasets.map((entry) => entry.datasetId)).toContain("education-schools");
+    expect(found.datasets[0]?.datasetId).toBe("education-schools");
     expect(found.series?.[0]?.datasetId).toBe("education-schools");
     expect(found.series?.filter((entry) => entry.datasetId === "education-schools").map((entry) => entry.seriesId)).toContain("education.pupils.total");
   });
