@@ -26,9 +26,9 @@ describe("index crawl tables", () => {
     expect(withNull.rows[0]!.cells).toEqual(["—", "0"]);
   });
 
-  it("historyCaption names the first and last column", () => {
-    expect(historyCaption(["Schools", "Pupils"], ["2005/06", "2025/26"])).toBe("Schools · Pupils · 2005/06–2025/26");
-    expect(historyCaption(["Schools"], ["2025/26"])).toBe("Schools · 2025/26");
+  it("historyCaption names the first and last column, then the basis", () => {
+    expect(historyCaption(["Schools", "Pupils"], ["2005/06", "2025/26"], "Published")).toBe("Schools · Pupils · 2005/06–2025/26 · Published");
+    expect(historyCaption(["Schools"], ["2025/26"], "Published")).toBe("Schools · 2025/26 · Published");
   });
 
   it("municipalHistoryTables puts Georgia first in both tables", () => {
@@ -70,10 +70,11 @@ describe("index crawl tables", () => {
       levels: { municipalities: "მუნიციპალიტეტები", regions: "რეგიონები" },
       column: String,
       figures: { count: { parts: ["პენსიები", "პენსიონერები"], format }, share: { parts: ["პენსიები", "წილი"], format: (value) => value.toFixed(1) } },
+      basis: "გამოქვეყნებული",
     });
     expect(tables).toHaveLength(4);
     expect(tables[0]!.columns).toEqual(["2013", "2014"]);
-    expect(tables[0]!.caption).toBe("პენსიები · პენსიონერები · მუნიციპალიტეტები · 2013–2014");
+    expect(tables[0]!.caption).toBe("პენსიები · პენსიონერები · მუნიციპალიტეტები · 2013–2014 · გამოქვეყნებული");
     expect(tables[0]!.rows).toEqual([
       { label: "საქართველო", cells: ["700,000", "—"] },
       { label: "თბილისი", cells: ["160,000", "—"] },
@@ -82,5 +83,22 @@ describe("index crawl tables", () => {
     expect(tables[2]!.columns).toEqual(["2014"]);
     expect(tables[2]!.rows[2]).toEqual({ label: "ხულო", cells: ["21.3"] });
     expect(tables[3]!.rows.map((r) => r.label)).toEqual(["საქართველო", "აჭარა"]);
+  });
+
+  it("indexHistoryTables keeps the latest years that fit maxCells, for every figure alike", () => {
+    const row = (id: string, kind: MunicipalListRow["kind"]): MunicipalListRow => ({ id, kind, nameKa: id, subtitleKa: "", regionId: null, valueGel: 0, budgetPerResidentGel: null, rank: null });
+    const facts = [2020, 2021, 2022].flatMap((year) => [{ geographyId: "11", year, value: year }, { geographyId: "region.adjara", year, value: year }]);
+    const input = {
+      history: historyFromFacts([{ id: "a", facts }, { id: "b", facts }]),
+      rows: { country: row("country.georgia", "country"), municipalities: [row("11", "municipality")], regions: [row("region.adjara", "region")] },
+      label: (listRow: MunicipalListRow) => listRow.nameKa, levels: { municipalities: "M", regions: "R" }, column: String, basis: "P",
+      figures: { a: { parts: ["A"], format }, b: { parts: ["B"], format } },
+    };
+    // Four tables of two rows: 24 cells over three years, 16 over two.
+    expect(indexHistoryTables(input).flatMap((table) => table.columns)).toHaveLength(12);
+    const trimmed = indexHistoryTables({ ...input, maxCells: 23 });
+    expect(trimmed.map((table) => table.columns)).toEqual([["2021", "2022"], ["2021", "2022"], ["2021", "2022"], ["2021", "2022"]]);
+    expect(trimmed[0]!.caption).toBe("A · M · 2021–2022 · P");
+    expect(indexHistoryTables({ ...input, maxCells: 24 })[0]!.columns).toEqual(["2020", "2021", "2022"]);
   });
 });

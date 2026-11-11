@@ -78,8 +78,8 @@ describe("RegionIndex crawl tables", () => {
     ]);
     const wrapper = html.match(/<div hidden="" data-testid="crawl-tables">(.*?)<\/div>/)![1]!;
     expect(wrapper.match(/<table>/g)).toHaveLength(2);
-    expect(wrapper).toContain("<caption>Test index · Persons · 2023–2024</caption>");
-    expect(wrapper).toContain("<caption>Test index · Per person · 2023–2024</caption>");
+    expect(wrapper).toContain("<caption>Test index · Persons · 2023–2024 · Published</caption>");
+    expect(wrapper).toContain("<caption>Test index · Per person · 2023–2024 · Published</caption>");
     expect(wrapper).toMatch(/<tbody><tr><th>Georgia<\/th><td>66<\/td><td>1,000<\/td><\/tr>/);
     expect(wrapper).toMatch(/<tr><th>Guria<\/th><td>—<\/td>/);
   });

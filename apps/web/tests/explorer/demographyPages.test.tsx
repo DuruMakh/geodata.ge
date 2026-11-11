@@ -390,6 +390,9 @@ describe("the place indexes' every-year tables", () => {
   it("Population carries every 1 January for every place", async () => {
     const [inner] = indexTables(renderPageMarkup("en", await renderDemographyPopulationPage("en")));
     expect(captions(inner!)).toHaveLength(2);
+    expect(captions(inner!)[0]).toMatch(/ · Published$/);
+    // The census re-base is marked on its year, as on each place's own page.
+    expect(inner).toContain("<th>2025 · Census re-base</th>");
     expect(inner).toMatch(/<tr><th>Khulo<\/th><td>23,976<\/td>/);
   });
 
@@ -399,10 +402,10 @@ describe("the place indexes' every-year tables", () => {
     expect(inner).toMatch(/<tr><th>Khulo<\/th><td>456<\/td>/);
   });
 
-  it("Marriages and divorces carries both counts from 2009, not the rate", async () => {
+  it("Marriages and divorces carries both counts, not the rate, in the latest years that leave Georgia's tables room under the cap", async () => {
     const [inner] = indexTables(renderPageMarkup("en", await renderDemographyMarriagesDivorcesPage("en")));
     expect(captions(inner!)).toHaveLength(4);
-    expect(captions(inner!)[0]).toMatch(/2009–2025$/);
-    expect(inner).toMatch(/<tr><th>Khulo<\/th><td>276<\/td>/);
+    expect(captions(inner!)[0]).toMatch(/2010–2025 · Published$/);
+    expect((inner!.match(/<td>/g) ?? []).length).toBeLessThanOrEqual(2600);
   });
 });

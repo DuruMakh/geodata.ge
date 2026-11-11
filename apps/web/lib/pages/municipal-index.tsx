@@ -162,6 +162,7 @@ export async function renderMunicipalIndex(locale: Locale) {
       </I18nProvider>
       {/* Every year of the index's figures for every place, for readers that run no page code (DESIGN.md §8.4). */}
       <IndexCrawlTables category={workbookMessage(locale, "workbook.category")} tables={indexHistoryTables({
+        basis: workbookMessage(locale, "workbook.actual"),
         history: municipalIndexHistory(data, years), rows: { country, ...list }, label: (row) => publicLabel(locale, row.id, row.nameKa, presentation.englishLabels),
         levels: { municipalities: message(messages, "municipal.municipalities"), regions: message(messages, "municipal.regions") }, column: String,
         figures: {

@@ -41,7 +41,7 @@ export async function renderEnvironmentAirQualityIndex(locale: Locale) {
     const tableYears = [...new Set(rows.flatMap(row => row.facts.map(f => f.year)))].sort((a, b) => a - b);
     const columns = tableYears.map(String);
     return historyCrawlTable({
-      caption: historyCaption([t("page.air-quality.title"), t(`heading.${measure}Avg`)], columns), years: tableYears, columns,
+      caption: historyCaption([t("page.air-quality.title"), t(`heading.${measure}Avg`)], columns, workbookMessage(locale, "workbook.published")), years: tableYears, columns,
       rows: rows.map(({ station, facts }) => ({ label: `${t(`city.${station.city}`)} — ${t(`station.${station.id}`)}`, valuesByYear: Object.fromEntries(facts.map(f => [f.year, f.value])) })),
       format: value => formatCrawlCell(value, null, "#,##0.##", locale),
     });

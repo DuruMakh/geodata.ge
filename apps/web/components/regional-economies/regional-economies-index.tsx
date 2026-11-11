@@ -204,7 +204,7 @@ export function RegionIndex({ title, model, sourceNote, metric, summary = [], le
         const columns = history.years.map(String);
         const label = (region: { regionId: string; nameKa: string }) => publicLabel(locale, region.regionId, region.nameKa, englishLabels);
         return historyCrawlTable({
-          caption: historyCaption([title, entry.metric.legend], columns), years: history.years, columns, format: entry.metric.formatValue,
+          caption: historyCaption([title, entry.metric.legend], columns, workbookMessage(locale, "workbook.published")), years: history.years, columns, format: entry.metric.formatValue,
           rows: [
             ...(entry.lead ? [entry.lead] : []),
             ...[...entry.model.regions, ...(entry.model.withoutValue ?? [])].map((region) => ({ label: label(region), valuesByYear: history.byRegion[region.regionId] ?? {} })),

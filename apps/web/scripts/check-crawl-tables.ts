@@ -170,6 +170,10 @@ export async function checkCrawlTables(root = process.cwd(), { sizeReportOnly = 
   for (const page of [...pages].sort((a, b) => b.cells - a.cells || a.route.localeCompare(b.route)).slice(0, 10)) {
     console.log(`  ${String(page.cells).padStart(5)} cells  ${page.wrappers.length} wrapper(s)  ${bytes(page.gzip).padStart(9)} gzip  /${page.route}`);
   }
+  // A map index page within a year's growth of the cap: its tables will need room before the next data update fails this check.
+  for (const page of pages.filter((entry) => MAP_INDEX_ROUTES.includes(entry.route.replace(/^en\//, "")) && entry.cells > CRAWL_CELL_CAP - 250)) {
+    console.log(`WARNING: /${page.route} has ${bytes(page.cells)} crawl cells, within 250 of the ${bytes(CRAWL_CELL_CAP)} cap`);
+  }
   console.log("Spot checks:");
   for (const line of spotResults) console.log(`  ${line}`);
   if (failures.length > 0) {

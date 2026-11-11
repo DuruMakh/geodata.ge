@@ -162,6 +162,7 @@ export async function renderEducationIndexPage(locale: Locale, set: EducationPla
         </section>
         {/* Every school year of the map's measure for every place, for readers that run no page code (DESIGN.md §8.4). */}
         <IndexCrawlTables category={workbookMessage(locale, "workbook.category")} tables={indexHistoryTables({
+          basis: workbookMessage(locale, "workbook.published"),
           history: index.history, rows: index, label: row => publicLabel(locale, row.id, row.nameKa, presentation.englishLabels),
           levels: { municipalities: message(messages, "municipal.municipalities"), regions: message(messages, "municipal.regions") }, column: period,
           figures: { [index.history.figures[0]!.id]: { parts: [title, measure, t("unitPersons")], format: value => formatCrawlCell(value, null, "#,##0", locale) } },

@@ -8,6 +8,12 @@ import type { MunicipalListRow } from "./municipalData";
  * its figure, so a reader that runs no page code gets the years the map's single year leaves out. Never trimmed.
  */
 
+/**
+ * Cells Births and deaths and Marriages and divorces keep free, under the page's cell cap, for Georgia's own national tables
+ * on the same page (Marriages: 352 in 2026, about 11 more a year); their map tables keep the latest years that fit the rest.
+ */
+export const GEORGIA_TABLES_ROOM = 400;
+
 /** One place's figure by year; a year it has no figure for is absent or null and prints as a dash. */
 export type HistoryRow = { label: string; valuesByYear: Readonly<Record<number, number | null>> };
 
@@ -34,10 +40,10 @@ export function historyCrawlTable({ caption, years, columns, rows, format, categ
   };
 }
 
-/** The caption's parts, then the first and last column: `Schools · Pupils · 2005/06–2025/26`. */
-export function historyCaption(parts: readonly string[], columns: readonly string[]): string {
+/** The caption's parts, the first and last column, then the basis, as every crawl table ends: `Schools · Pupils · 2005/06–2025/26 · Published`. */
+export function historyCaption(parts: readonly string[], columns: readonly string[], basis: string): string {
   const period = columns.length > 1 ? `${columns[0]}–${columns.at(-1)}` : (columns[0] ?? "");
-  return [...parts, period].filter((part) => part !== "").join(" · ");
+  return [...parts, period, basis].filter((part) => part !== "").join(" · ");
 }
 
 /** A municipal index's two tables for one figure, as its list's two tabs: municipalities, then regions, Georgia first in each. */
@@ -77,8 +83,9 @@ export function historyFromFacts(figures: ReadonlyArray<{ id: string; facts: Rea
 /**
  * A municipal index's tables: for each figure of its history named in `figures`, a municipalities table and a regions
  * table, Georgia first, the places in the list's order. Each figure's columns are the years any municipality or region has it.
+ * `maxCells` leaves room under the page's cell cap for its other tables: past it, the earliest years go first, from every figure alike.
  */
-export function indexHistoryTables({ history, rows, label, levels, column, figures }: {
+export function indexHistoryTables({ history, rows, label, levels, column, figures, basis, maxCells = Infinity }: {
   history: IndexHistory;
   rows: { country: MunicipalListRow; municipalities: readonly MunicipalListRow[]; regions: readonly MunicipalListRow[] };
   label: (row: MunicipalListRow) => string;
@@ -86,18 +93,27 @@ export function indexHistoryTables({ history, rows, label, levels, column, figur
   /** A year as the page writes it (`2015/16` for a school year). */
   column: (year: number) => string;
   figures: Readonly<Record<string, { parts: readonly string[]; format: (value: number) => string }>>;
+  /** The figures' basis, the caption's last part (`workbook.published` or `workbook.actual`). */
+  basis: string;
+  maxCells?: number;
 }): CrawlTable[] {
   // Georgia's own longer series stays on Georgia's page: the columns are the years its places have, which keeps the
   // longest (Marriages, Georgia from 1994) under the page's cell cap.
   const places = [...rows.municipalities, ...rows.regions];
-  return history.figures.flatMap((figure) => {
+  const rowCount = places.length + 2;
+  const shownFigures = history.figures.flatMap((figure) => {
     const shown = figures[figure.id];
-    if (!shown) return [];
-    const years = history.years.filter((year) => places.some((row) => figure.valueAt(row.id, year) !== null));
+    return shown ? [{ figure, shown, years: history.years.filter((year) => places.some((row) => figure.valueAt(row.id, year) !== null)) }] : [];
+  });
+  let from = -Infinity;
+  const cells = () => shownFigures.reduce((total, entry) => total + entry.years.filter((year) => year >= from).length * rowCount, 0);
+  while (cells() > maxCells) from = Math.min(...shownFigures.flatMap((entry) => entry.years.filter((year) => year >= from))) + 1;
+  return shownFigures.flatMap(({ figure, shown, years: figureYears }) => {
+    const years = figureYears.filter((year) => year >= from);
     const columns = years.map(column);
     const historyRow = (row: MunicipalListRow): HistoryRow => ({ label: label(row), valuesByYear: Object.fromEntries(years.map((year) => [year, figure.valueAt(row.id, year)])) });
     return municipalHistoryTables({
-      caption: (level) => historyCaption([...shown.parts, level], columns), levels, years, columns,
+      caption: (level) => historyCaption([...shown.parts, level], columns, basis), levels, years, columns,
       country: historyRow(rows.country), municipalities: rows.municipalities.map(historyRow), regions: rows.regions.map(historyRow), format: shown.format,
     });
   });

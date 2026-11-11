@@ -187,6 +187,7 @@ export async function renderSocialIndexPage(locale: Locale, set: SocialPlaceSet)
         </section>
         {/* Every year of the count and the share for every place, for readers that run no page code (DESIGN.md §8.4). */}
         <IndexCrawlTables category={workbookMessage(locale, "workbook.category")} tables={indexHistoryTables({
+          basis: workbookMessage(locale, "workbook.published"),
           history: index.history, rows: index, label: row => publicLabel(locale, row.id, row.nameKa, presentation.englishLabels),
           levels: { municipalities: message(messages, "municipal.municipalities"), regions: message(messages, "municipal.regions") }, column: String,
           figures: {

@@ -7,7 +7,7 @@ import { BreadcrumbJsonLd } from "../../components/seo/breadcrumb-json-ld";
 import { JsonLd } from "../../components/seo/json-ld";
 import { PageHeader } from "../../components/shell/page-header";
 import { loadDensityRows } from "../data/demography/densityRows";
-import { SERIES } from "../data/demography/series";
+import { CENSUS_STEP, SERIES } from "../data/demography/series";
 import { GEORGIA_PLACE_ID, TBILISI_PLACE_ID } from "../explorer/demographyAreas";
 import { POPULATION_PATH, populationHrefById } from "../explorer/demographyPlaceRoutes";
 import { buildPopulationHighlights, buildPopulationModel } from "../explorer/demographyPopulation";
@@ -186,8 +186,9 @@ export async function renderDemographyPopulationPage(locale: Locale) {
         />
         {/* Every year of the index's figures for every place, for readers that run no page code (DESIGN.md §8.4). */}
         <IndexCrawlTables category={workbookMessage(locale, "workbook.category")} tables={indexHistoryTables({
+          basis: workbookMessage(locale, "workbook.published"),
           history: index.history, rows: index, label: row => publicLabel(locale, row.id, row.nameKa, presentation.englishLabels),
-          levels: { municipalities: message(messages, "municipal.municipalities"), regions: message(messages, "municipal.regions") }, column: String,
+          levels: { municipalities: message(messages, "municipal.municipalities"), regions: message(messages, "municipal.regions") }, column: (year) => (year === CENSUS_STEP.toYear ? `${year} · ${t("breakLabel")}` : String(year)),
           figures: {
             population: { parts: [title, t("unitPersons")], format: value => formatCrawlCell(value, null, "#,##0", locale) },
           },
