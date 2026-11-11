@@ -6,7 +6,6 @@ import { ID_MAX_LENGTH } from "../../lib/factQuery/schemas";
 import { MUNICIPAL_PER_RESIDENT_YEAR } from "../../lib/explorer/municipalData";
 import { serverInstructions } from "../../lib/mcp/instructions";
 import { loadPackagedSnapshot } from "../../lib/mcp/snapshot";
-import { coreServedSnapshot } from "../helpers/coreServedSnapshot";
 import { TOOLS, createMcpServer } from "../../lib/mcp/tools";
 
 // Passes straight through to the real catalogue; the spy only counts calls, so
@@ -57,13 +56,12 @@ describe("MCP tool surface", () => {
     expect(text).not.toMatch(/[Ss]chema 1\.\d/);
   });
 
-  // The pointer the instructions used to give for unemployment is now the search's to give. Unemployment is a served
-  // topic page now, so the rule is tested on the core-only snapshot's page list (tests/helpers/coreServedSnapshot.ts).
+  // The pointer the instructions used to give for unemployment is now the search's to give.
   it.each([
     { search: "unemployment", url: "https://fiscal.ge/en/explorer/unemployment/overview", field: "urlEn" },
     { search: "უმუშევრობა", url: "https://fiscal.ge/explorer/unemployment/overview", field: "urlKa" },
-  ])("answers a $search search with the unemployment page and no figure", async ({ search, url, field }) => {
-    const response = describeCoverage(await coreServedSnapshot(), { search });
+  ])("answers a $search search with the unemployment page and no figure", ({ search, url, field }) => {
+    const response = describeCoverage(loadPackagedSnapshot(), { search });
     if (response.kind !== "catalogue") throw new Error("expected a catalogue");
     const pages = (response.data as { websitePages?: Record<string, string>[] }).websitePages ?? [];
     expect(pages.map((page) => page[field])).toContain(url);

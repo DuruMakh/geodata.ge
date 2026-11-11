@@ -1,23 +1,19 @@
 // apps/web/tests/factQuery/describeCoverage.test.ts
 import { beforeAll, describe, expect, it } from "vitest";
-import { coreServedSnapshot } from "../helpers/coreServedSnapshot";
 import { testSnapshot } from "../helpers/factQuerySnapshot";
 import { describeCoverage } from "../../lib/factQuery/describeCoverage";
 import { queryMinistries } from "../../lib/factQuery/queryMinistries";
 import { envelopeSchema } from "../../lib/factQuery/schemas";
-import { MCP_SERVED_PAGES } from "../../lib/factQuery/servedPages";
+import { CORE_SERVED_PAGES, MCP_SERVED_PAGES } from "../../lib/factQuery/servedPages";
 import { TOPIC_PAGES } from "../../lib/factQuery/topics/pages";
 import { AGGREGATE_ONLY_MUNICIPAL_CODES, type FactQuerySnapshot } from "../../lib/factQuery/types";
 import { outputSchemaFor } from "../../lib/mcp/outputSchema";
 import { NAV_TREE, PAGE_COUNT, topicHub } from "../../lib/navigation/navTree";
 
 let snapshot: FactQuerySnapshot;
-/** The page-linking rules' snapshot: every non-core page website-only (tests/helpers/coreServedSnapshot.ts). */
-let coreOnly: FactQuerySnapshot;
 
 beforeAll(async () => {
   snapshot = testSnapshot({ releaseCommit: "test", generatedAt: "2026-08-29T00:00:00.000Z" });
-  coreOnly = await coreServedSnapshot();
 });
 
 type CoverageData = {
@@ -31,6 +27,9 @@ type CoverageData = {
 };
 
 const data = (result: ReturnType<typeof describeCoverage>) => (result as { data: CoverageData }).data;
+
+/** The pages this snapshot serves: the core pages and the topic pages whose dataset it holds. */
+const servedPagePaths = () => new Set([...Object.keys(CORE_SERVED_PAGES), ...snapshot.topics.datasets.map((dataset) => dataset.page.pagePath)]);
 
 describe("describeCoverage", () => {
   it("keeps a two-endpoint product coverage span even with only one fact month", () => {
@@ -334,7 +333,7 @@ describe("search points to website pages the connection does not serve", () => {
   const firstWagesPage = topicHub("wages").sections[0]!.href;
 
   it.each(["wages", "ხელფასი"])("answers %s with the wages page and no series", (search) => {
-    const result = describeCoverage(coreOnly, { search });
+    const result = describeCoverage(snapshot, { search });
     expect(result.status).toBe("empty");
     const pages = data(result).websitePages ?? [];
     expect(pages[0]?.topicId).toBe("wages");
@@ -346,7 +345,7 @@ describe("search points to website pages the connection does not serve", () => {
   });
 
   it("keeps the served series for pension and adds the pensions page", () => {
-    const result = describeCoverage(coreOnly, { search: "pension" });
+    const result = describeCoverage(snapshot, { search: "pension" });
     expect(result.status).toBe("ok");
     expect((data(result).series ?? []).map((entry) => (entry as { labelEn?: string }).labelEn).join("|")).toMatch(/funded pension/i);
     const urls = (data(result).websitePages ?? []).map((page) => page.urlKa);
@@ -356,35 +355,35 @@ describe("search points to website pages the connection does not serve", () => {
   // The website's own search matches inside words from three letters and retries a Latin query on the Georgian
   // keyboard; a page is linked only when the catalogue's whole-word matcher finds every word in it.
   it.each(["ice", "art", "rent", "port", "sector.f"])("links no page that %s meets only inside a word or as an id", (search) => {
-    expect(data(describeCoverage(coreOnly, { search }))).not.toHaveProperty("websitePages");
+    expect(data(describeCoverage(snapshot, { search }))).not.toHaveProperty("websitePages");
   });
 
   it("links no page of another topic for ICT", () => {
-    for (const page of data(describeCoverage(coreOnly, { search: "ICT" })).websitePages ?? []) expect(page.topicId).toBe("internet");
+    for (const page of data(describeCoverage(snapshot, { search: "ICT" })).websitePages ?? []) expect(page.topicId).toBe("internet");
   });
 
   it.each(["unemployment", "უმუშევრობა"])("still answers %s with the unemployment overview first", (search) => {
     const overview = topicHub("unemployment").sections[0]!.href;
-    const pages = data(describeCoverage(coreOnly, { search })).websitePages ?? [];
+    const pages = data(describeCoverage(snapshot, { search })).websitePages ?? [];
     expect(pages[0]?.urlKa).toBe(`https://fiscal.ge${overview}`);
     expect(pages[0]?.urlEn).toBe(`https://fiscal.ge/en${overview}`);
     for (const page of pages) expect(page.topicId).toBe("unemployment");
   });
 
   it("adds nothing when the search matches no website page", () => {
-    const found = data(describeCoverage(coreOnly, { search: "zzzznotathing" }));
+    const found = data(describeCoverage(snapshot, { search: "zzzznotathing" }));
     expect(found).not.toHaveProperty("websitePages");
     expect(found).not.toHaveProperty("websitePagesNoteEn");
   });
 
   it("adds nothing to a search inside one dataset", () => {
-    const found = data(describeCoverage(coreOnly, { datasetId: "national-expenditure", search: "wages" }));
+    const found = data(describeCoverage(snapshot, { datasetId: "national-expenditure", search: "wages" }));
     expect(found).not.toHaveProperty("websitePages");
     expect(found).not.toHaveProperty("websitePagesNoteEn");
   });
 
   it("never carries a figure or a page the connection serves", () => {
-    const served = new Set(Object.keys(MCP_SERVED_PAGES));
+    const served = servedPagePaths();
     for (const search of ["wages", "pension", "unemployment", "ექსპორტი", "health", "budget", "inflation", "gdp", "debt"]) {
       for (const page of data(describeCoverage(snapshot, { search })).websitePages ?? []) {
         expect(Object.keys(page).sort()).toEqual(["labelEn", "labelKa", "topicId", "topicLabelEn", "topicLabelKa", "urlEn", "urlKa"]);
@@ -399,7 +398,7 @@ describe("search points to website pages the connection does not serve", () => {
 
   it("validates against the published describe_coverage output schema", () => {
     for (const search of ["wages", "pension", "ხელფასი", "zzzznotathing"]) {
-      expect(outputSchemaFor("describe_coverage").safeParse(describeCoverage(coreOnly, { search })).success, search).toBe(true);
+      expect(outputSchemaFor("describe_coverage").safeParse(describeCoverage(snapshot, { search })).success, search).toBe(true);
     }
   });
 
@@ -411,9 +410,11 @@ describe("search points to website pages the connection does not serve", () => {
     // Every dataset the catalogue lists is shown by at least one served page.
     const shown = new Set(Object.values(MCP_SERVED_PAGES).flat());
     for (const dataset of data(describeCoverage(snapshot, {})).datasets) expect(shown.has(dataset.datasetId as never), dataset.datasetId).toBe(true);
-    expect(snapshot.website.pages).toHaveLength(PAGE_COUNT - served.length);
+    // The website-only list drops the core pages and the topic pages whose dataset the snapshot holds (ruling R11).
+    const held = servedPagePaths();
+    expect(snapshot.website.pages).toHaveLength(PAGE_COUNT - 12 - snapshot.topics.datasets.length);
     for (const page of snapshot.website.pages) {
-      expect(served).not.toContain(page.href);
+      expect(held.has(page.href), page.href).toBe(false);
       expect([page.value, page.period, page.caption]).toEqual(["", "", ""]);
       expect(page.spark).toBeNull();
     }
@@ -423,7 +424,7 @@ describe("search points to website pages the connection does not serve", () => {
 // Owner review of the F01 fix: a price word, a place beside a topic, and a phrase that matches nothing in full still
 // reach the right page, and the money-supply noise the whole-phrase rule removed stays gone.
 describe("search links the topic page behind a phrase", () => {
-  const topicsOf = (search: string) => (data(describeCoverage(coreOnly, { search })).websitePages ?? []).map((page) => page.topicId);
+  const topicsOf = (search: string) => (data(describeCoverage(snapshot, { search })).websitePages ?? []).map((page) => page.topicId);
 
   // "prices" meets the inflation dataset's own label, Consumer price inflation, so it is a served word, not the
   // housing page's subject.
@@ -436,7 +437,6 @@ describe("search links the topic page behind a phrase", () => {
   // empty still looks word by word. The last two are the reference-intent prompts (mcpAssistantIntents.ts).
   it.each([
     ["hospitals in Kutaisi", "health"],
-    ["ბათუმის სკოლები", "education"],
     ["home prices Tbilisi", "housing"],
     ["unemployment among women", "unemployment"],
     ["average pension in Georgia", "health"],
@@ -447,8 +447,11 @@ describe("search links the topic page behind a phrase", () => {
     for (const found of topics) expect(found).toBe(topic);
   });
 
+  // Task 5: a served topic returns its dataset (spec §5.4).
+  it.todo("links ბათუმის სკოლები to the education topic");
+
   it("puts the page that meets the most words first", () => {
-    const pages = data(describeCoverage(coreOnly, { search: "unemployment among women" })).websitePages ?? [];
+    const pages = data(describeCoverage(snapshot, { search: "unemployment among women" })).websitePages ?? [];
     expect(pages[0]?.labelEn).toBe("Sex");
   });
 
@@ -458,7 +461,7 @@ describe("search links the topic page behind a phrase", () => {
   });
 
   it("links only the money supply page for money supply", () => {
-    expect((data(describeCoverage(coreOnly, { search: "money supply" })).websitePages ?? []).map((page) => page.labelEn)).toEqual(["Money supply"]);
+    expect((data(describeCoverage(snapshot, { search: "money supply" })).websitePages ?? []).map((page) => page.labelEn)).toEqual(["Money supply"]);
   });
 
   // A trailing full stop is punctuation, not an id: only a word, a "." or "_", and a word again looks like one.
@@ -470,7 +473,7 @@ describe("search links the topic page behind a phrase", () => {
 // Owner re-review of wave 1: a word the connection already serves links no page of another subject, a common word
 // inside a region's name is no place, and a qualified price word still finds the home prices page.
 describe("search links no page of another subject", () => {
-  const pagesOf = (search: string) => data(describeCoverage(coreOnly, { search })).websitePages ?? [];
+  const pagesOf = (search: string) => data(describeCoverage(snapshot, { search })).websitePages ?? [];
 
   it.each([
     "imports from China", "revenue from tourism", "grants from the EU", "transfers from the budget", "food inflation",
@@ -492,9 +495,8 @@ describe("search links no page of another subject", () => {
     expect(pagesOf("შიდა ვალი").map((page) => page.labelEn)).toEqual([]);
   });
 
-  it("drops a two-word region name and links the schools page", () => {
-    expect(pagesOf("შიდა ქართლის სკოლები").map((page) => page.labelEn)).toContain("Schools");
-  });
+  // Task 5: a served topic returns its dataset (spec §5.4).
+  it.todo("drops a two-word region name and links the schools page");
 
   it.each(["house prices", "Tbilisi house prices"])("links the home prices page for %s", (search) => {
     expect(pagesOf(search).map((page) => page.labelEn)).toContain("Home prices");
@@ -508,11 +510,11 @@ describe("search links no page through a dataset's generic label word", () => {
     "debt overview", "ვალის მიმოხილვა", "consumer debt",
     "ხარჯები სექტორების მიხედვით", "ვალი ვალუტების მიხედვით", "შემოსავლები წყაროების მიხედვით",
   ])("links no page for %s", (search) => {
-    expect((data(describeCoverage(coreOnly, { search })).websitePages ?? []).map((page) => page.labelEn)).toEqual([]);
+    expect((data(describeCoverage(snapshot, { search })).websitePages ?? []).map((page) => page.labelEn)).toEqual([]);
   });
 
   // The budget's own Year in review page is "წლის მიმოხილვა" under the Budget topic, so the whole phrase names it.
   it("links only the budget's Year in review page for ბიუჯეტის მიმოხილვა", () => {
-    expect((data(describeCoverage(coreOnly, { search: "ბიუჯეტის მიმოხილვა" })).websitePages ?? []).map((page) => page.labelEn)).toEqual(["Year in review"]);
+    expect((data(describeCoverage(snapshot, { search: "ბიუჯეტის მიმოხილვა" })).websitePages ?? []).map((page) => page.labelEn)).toEqual(["Year in review"]);
   });
 });

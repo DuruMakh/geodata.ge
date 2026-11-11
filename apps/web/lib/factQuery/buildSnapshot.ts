@@ -43,8 +43,9 @@ import { DEMOGRAPHY_RAW_ROOT, latestDemographyVintage } from "../data/demography
 import { pageHref } from "../i18n/routes";
 import { loadReviewedSourceManifest } from "../methodology/sourceManifest";
 import { hashDataVersion } from "./canonical";
-import { MCP_SERVED_PAGES } from "./servedPages";
+import { CORE_SERVED_PAGES } from "./servedPages";
 import { buildTopicsSnapshot } from "./topics/registry";
+import type { AnyDatasetId, TopicDatasetId } from "./topics/types";
 import { isCleanHttpsUrl, methodologyManifestDocument, PUBLIC_SITE_ORIGIN } from "./manifestDocuments";
 import { resolvePublicSources, type ManifestDocument } from "./sources";
 import { AGGREGATE_ONLY_MUNICIPAL_CODES, DEBT_SERIES_LABELS_KA, DEFICIT_SERIES_ID, SCHEMA_VERSION, type BudgetItemMeta, type FactQuerySnapshot, type RawResolvedSource, type ResolvedSource, type ServiceLocalization, type WebsitePage } from "./types";
@@ -484,9 +485,10 @@ export function enrichSourceTranslations(sources: readonly RawResolvedSource[], 
 /**
  * Every navigation page this service does not serve, as the website's own search sees it (`buildSearchPages` with no hub data,
  * so no value, period, caption or trend) and with its Georgian and English address, for the catalogue search to point to.
- * `served` is MCP_SERVED_PAGES; tests pass the core pages alone to rebuild the list as it was before the topic pages were served.
+ * `served` is the core pages and the topic pages whose dataset the snapshot holds: a topic page with no adapter yet stays
+ * website-only (ruling R11).
  */
-export async function buildWebsitePages(served: Readonly<Record<string, unknown>> = MCP_SERVED_PAGES): Promise<WebsitePage[]> {
+async function buildWebsitePages(served: Readonly<Record<string, readonly AnyDatasetId[]>>): Promise<WebsitePage[]> {
   const [ka, en] = await Promise.all([allDataMessages("ka"), allDataMessages("en")]);
   return buildSearchPages([], ka, en)
     .filter((page) => !Object.hasOwn(served, page.href))
@@ -732,7 +734,7 @@ export async function buildFactQuerySnapshot(options: BuildSnapshotOptions): Pro
     },
     gdpFacts: sortedBy(explorer.gdpFacts, (f) => f.year),
     topics: topics.topics,
-    website: { pages: await buildWebsitePages() },
+    website: { pages: await buildWebsitePages({ ...CORE_SERVED_PAGES, ...Object.fromEntries(topics.topics.datasets.map(({ page }) => [page.pagePath, [page.datasetId as TopicDatasetId]])) }) },
     sources,
   };
 

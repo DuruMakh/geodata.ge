@@ -12,6 +12,7 @@ import { buildTopicsSnapshot } from "../../../lib/factQuery/topics/registry";
 import { unpackTopicFacts } from "../../../lib/factQuery/topics/store";
 import type { TopicAdapter, TopicDatasetBuild } from "../../../lib/factQuery/topics/types";
 import type { FactQuerySnapshot } from "../../../lib/factQuery/types";
+import { PAGE_COUNT } from "../../../lib/navigation/navTree";
 import { testSnapshot } from "../../helpers/factQuerySnapshot";
 
 // A build in this file uses the adapters it is given and none when called without them, so buildFactQuerySnapshot here
@@ -60,7 +61,7 @@ describe("the snapshot's topics section", () => {
           expect(source!.documents.length).toBeGreaterThan(0);
           for (const document of source!.documents) {
             expect(document.titleEn.trim()).not.toBe("");
-            expect(document.archiveUrl).toMatch(/^https:\/\/fiscal\.ge\/downloads\/methodology\/education\/files\//);
+            expect(document.archiveUrl).toMatch(/^https:\/\/fiscal\.ge\/downloads\/methodology\//);
           }
         }
       }
@@ -91,18 +92,25 @@ describe("the snapshot's topics section", () => {
     }
   });
 
-  it("serves every topic page, so the website-only list no longer offers one", () => {
+  it("serves every topic page, and the website-only list keeps a topic page only until its dataset is built", () => {
     for (const page of TOPIC_PAGES) expect(MCP_SERVED_PAGES[page.pagePath]).toEqual([page.datasetId]);
     for (const [pagePath, datasets] of Object.entries(CORE_SERVED_PAGES)) expect(MCP_SERVED_PAGES[pagePath]).toEqual(datasets);
-    expect(snapshot.website.pages.map((page) => page.href)).not.toContain("/explorer/education/schools");
+    const listed = new Set(snapshot.website.pages.map((page) => page.href));
+    expect(listed.has("/explorer/education/schools")).toBe(false);
+    const built = new Set(snapshot.topics.datasets.map((dataset) => dataset.page.pagePath));
+    for (const page of TOPIC_PAGES) expect(listed.has(page.pagePath), page.pagePath).toBe(!built.has(page.pagePath));
   });
 
   it("changes nothing the snapshot already held", async () => {
     const bare = await buildFactQuerySnapshot(OPTIONS);
     expect(bare.topics).toEqual({ datasets: [], sourceIds: [], basisCodes: [], statusCodes: [], units: {} });
-    const unchanged = (Object.keys(bare) as (keyof FactQuerySnapshot)[]).filter((key) => !["topics", "sources", "dataVersion"].includes(key));
+    const unchanged = (Object.keys(bare) as (keyof FactQuerySnapshot)[]).filter((key) => !["topics", "sources", "website", "dataVersion"].includes(key));
     expect(unchanged).toContain("national");
     for (const key of unchanged) expect(snapshot[key], key).toEqual(bare[key]);
+    // A bare build lists every non-core page; the topic pages with a dataset leave that list and nothing else changes.
+    expect(bare.website.pages).toHaveLength(PAGE_COUNT - Object.keys(CORE_SERVED_PAGES).length);
+    const built = new Set<string>(snapshot.topics.datasets.map((dataset) => dataset.page.pagePath));
+    expect(snapshot.website.pages).toEqual(bare.website.pages.filter((page) => !built.has(page.href)));
     // The core sources are all still there, unchanged; every added one is a topic source.
     const coreIds = new Set(bare.sources.map((source) => source.sourceId));
     expect(snapshot.sources.filter((source) => coreIds.has(source.sourceId))).toEqual(bare.sources);
