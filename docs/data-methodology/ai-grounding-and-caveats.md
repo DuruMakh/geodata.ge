@@ -147,7 +147,7 @@ This field exists because `compare` previously consulted a hand-maintained list 
 
 ## The catalogue
 
-42 codes are registered.
+48 codes are registered.
 
 | Code | Severity | Comparison effect | Owner document |
 | --- | --- | --- | --- |
@@ -193,6 +193,12 @@ This field exists because `compare` previously consulted a hand-maintained list 
 | `debt_gdp_share_vintage` | note | `none` | `ai-grounding-and-caveats.md#debt_gdp_share_vintage` |
 | `deficit_general_government_scope` | severe | `none` | `ai-grounding-and-caveats.md#deficit_general_government_scope` |
 | `deficit_projection` | severe | `breaks` | `ai-grounding-and-caveats.md#deficit_projection` |
+| `topic_survey_estimate` | note | `none` | `ai-grounding-and-caveats.md#topic_survey_estimate` |
+| `topic_derived` | note | `none` | `ai-grounding-and-caveats.md#topic_derived` |
+| `topic_partial_period` | severe | `limits` | `ai-grounding-and-caveats.md#topic_partial_period` |
+| `topic_planned` | severe | `none` | `ai-grounding-and-caveats.md#topic_planned` |
+| `topic_preliminary` | note | `limits` | `ai-grounding-and-caveats.md#topic_preliminary` |
+| `topic_projection` | severe | `breaks` | `ai-grounding-and-caveats.md#topic_projection` |
 
 ### `planned_values`
 
@@ -733,6 +739,91 @@ The sibling of `budget_scopes_differ`, one boundary further out. General governm
 **English.** Future-year values are an IMF forecast, not a recorded outcome.
 
 A separate code from `debt_service_projection` rather than one shared projection rule, because the reason differs and the reason is what a reader needs. A debt-service projection is a schedule of obligations already incurred; this is a forecast of an economy, and the next WEO vintage can revise it. One message cannot say both truthfully.
+
+
+### `topic_survey_estimate`
+
+**Severity:** note  
+**Comparison effect:** `none`  
+**Owner document:** `ai-grounding-and-caveats.md#topic_survey_estimate`
+
+**Trigger.** Any available topic cell whose value status is `survey_estimate`. Topic cells only (`query_indicators`); a missing cell carries no status disclosure.
+
+**Georgian.** ეს მნიშვნელობები კვლევის შეფასებებია და არა აღწერის რაოდენობები; მათ შერჩევის ცდომილება ახლავს.
+
+**English.** These values are survey estimates, not census counts, and carry sampling error.
+
+Survey figures (the Labour Force Survey and the like) are estimates from a sample. The disclosure travels with the figure so an answer does not read it as a count.
+
+### `topic_derived`
+
+**Severity:** note  
+**Comparison effect:** `none`  
+**Owner document:** `ai-grounding-and-caveats.md#topic_derived`
+
+**Trigger.** Any available topic cell whose value status is `derived`. Topic cells only (`query_indicators`); a missing cell carries no status disclosure.
+
+**Georgian.** ამ მაჩვენებელს Fiscal.ge ითვლის წყაროს გამოქვეყნებული მონაცემებიდან; წყარო მას არ აქვეყნებს. გამოთვლის წესი წყაროს აღწერაშია მოცემული.
+
+**English.** Fiscal.ge calculates this figure from the source's published figures; the source does not publish it. The source entry states the derivation.
+
+Fiscal.ge publishes a few figures the source does not, such as a trade balance computed from exports and imports. The cited source entry carries the derivation and the upstream originals, as the existing derived sources do.
+
+### `topic_partial_period`
+
+**Severity:** severe  
+**Comparison effect:** `limits`  
+**Owner document:** `ai-grounding-and-caveats.md#topic_partial_period`
+
+**Trigger.** Any available topic cell whose value status is `partial`. Topic cells only (`query_indicators`); a missing cell carries no status disclosure.
+
+**Georgian.** მნიშვნელობა მხოლოდ წყაროს მიერ გამოქვეყნებულ თვეებს მოიცავს და არა მთელ წელს; თვეების რაოდენობა მის განმარტებაშია მითითებული.
+
+**English.** A value covers only the months the source published, not the full year; its value definition gives the number of months.
+
+A partial year (for example a money-transfer year with months the source left blank) is still served, but it is not a full-year figure. The number of months stands in that row's own value definition, not in this shared message, so a request spanning several partial years states each one's months on its own row.
+
+### `topic_planned`
+
+**Severity:** severe  
+**Comparison effect:** `none`  
+**Owner document:** `ai-grounding-and-caveats.md#topic_planned`
+
+**Trigger.** Any available topic cell whose `basis` is `planned`. Topic cells only (`query_indicators`); a missing cell carries no status disclosure.
+
+**Georgian.** შედეგი შეიცავს გეგმურ (და არა ფაქტობრივ) მაჩვენებელს.
+
+**English.** The result contains planned rather than actual values.
+
+The same sentence as `planned_values`, under a topic code. `planned_values` names `series:year`, which in a topic request across several places would mark every place's cell in that year planned; this code names the `entity:series:year` cell.
+
+### `topic_preliminary`
+
+**Severity:** note  
+**Comparison effect:** `limits`  
+**Owner document:** `ai-grounding-and-caveats.md#topic_preliminary`
+
+**Trigger.** Any available topic cell whose `basis` is `preliminary`. Topic cells only (`query_indicators`); a missing cell carries no status disclosure.
+
+**Georgian.** ეს მონაცემები წინასწარია და შეიძლება გადაიხედოს.
+
+**English.** These observations are preliminary and subject to revision.
+
+Scoped by status, never by year, like `sectors_preliminary`. A comparison with a preliminary end is limited, not refused.
+
+### `topic_projection`
+
+**Severity:** severe  
+**Comparison effect:** `breaks`  
+**Owner document:** `ai-grounding-and-caveats.md#topic_projection`
+
+**Trigger.** Any available topic cell whose `basis` is `projection`. Topic cells only (`query_indicators`); a missing cell carries no status disclosure.
+
+**Georgian.** ეს მნიშვნელობები პროგნოზია და არა დაფიქსირებული შედეგი.
+
+**English.** These values are a projection, not a recorded outcome.
+
+A projection is not an outcome, so a change into a projected year is not a change (as for `debt_service_projection` and `deficit_projection`).
 
 
 ## Published bulk files

@@ -73,9 +73,10 @@ describe("CAVEAT_RULES registry", () => {
   // overview codes and one economic-sectors code, registered on 2026-09-14 after
   // those datasets shipped them inline, plus the World Bank preliminary-basis
   // disclosure registered by the data-refresh safeguards, plus one city-inflation
-  // code registered on 2026-09-26 when city CPI facts began being served.
+  // code registered on 2026-09-26 when city CPI facts began being served, plus
+  // six topic-dataset codes (rules.topics.ts) registered with query_indicators.
   it("registers spec section 9.2's codes, less nominal_gel, plus the approved splits, new datasets and 2004 component guard", () => {
-    expect(CAVEAT_RULES).toHaveLength(42);
+    expect(CAVEAT_RULES).toHaveLength(48);
     const codes = CAVEAT_RULES.map((rule) => rule.code);
     expect(codes).toContain("admin_category_not_yet_established");
     expect(codes).toContain("program_parent_category_modern_grouping");
@@ -91,5 +92,6 @@ describe("CAVEAT_RULES registry", () => {
     expect(codes).toContain("inflation_product_cumulative_derived");
     expect(codes).toContain("inflation_product_history_limits");
     expect(codes).toContain("inflation_product_label_discrepancy");
+    for (const code of ["topic_survey_estimate", "topic_derived", "topic_partial_period", "topic_planned", "topic_preliminary", "topic_projection"]) expect(codes).toContain(code);
   });
 });

@@ -60,7 +60,7 @@ it("pinned and automatic v2 clients and a real v1 client complete the same sourc
     expect(pinned.getProtocolEra()).toBe("modern");
     expect(automatic.getProtocolEra()).toBe("modern");
     const order = (await legacy.listTools()).tools.map(tool => tool.name);
-    expect(order).toEqual(["query_regional_economies", "query_economic_sectors", "query_gdp", "query_inflation", "query_inflation_products", "describe_coverage", "query_national", "query_ministries", "query_municipal", "query_debt", "query_deficit", "compare", "rank", "get_sources"]);
+    expect(order).toEqual(["query_regional_economies", "query_economic_sectors", "query_gdp", "query_inflation", "query_inflation_products", "describe_coverage", "query_national", "query_ministries", "query_municipal", "query_debt", "query_deficit", "query_indicators", "compare", "rank", "get_sources"]);
     for (const client of [pinned, automatic]) expect((await client.listTools()).tools.map(tool => tool.name)).toEqual(order);
     await legacy.ping();
     const coverage = await legacy.callTool({ name: "describe_coverage", arguments: { datasetId: "inflation" } });

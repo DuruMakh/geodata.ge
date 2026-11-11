@@ -13,7 +13,7 @@
 // union below supports validation of any response; registration narrows it to
 // the one kind of answer the selected tool returns.
 import { z } from "zod";
-import { observationSchema, periodKeySchema } from "../factQuery/schemas";
+import { observationSchema, periodKeySchema, topicObservationSchema } from "../factQuery/schemas";
 
 const caveat = z
   .object({
@@ -108,6 +108,8 @@ const coverage = z.object({
 const endpoint = observationSchema.pick({ year: true, period: true, value: true, availability: true, missingReason: true, missingReasonEn: true, basis: true, valueDefinition: true, valueDefinitionEn: true, valueDefinitionId: true, sourceIds: true, documentIds: true });
 const dataShapes = {
   observations: z.object({ observations: z.array(observationSchema), coverage }),
+  /** query_indicators: topic observations, years only. */
+  topicObservations: z.object({ observations: z.array(topicObservationSchema), coverage: coverage.omit({ requestedPeriods: true, availablePeriods: true }) }),
   comparisons: z.object({
     comparisons: z.array(z.object({
       comparisonId: z.string(), datasetId: z.string(), entityId: z.string(), entityLabelKa: z.string(), entityLabelEn: z.string().min(1), seriesId: z.string(), seriesLabelKa: z.string(), seriesLabelEn: z.string().min(1),
@@ -156,7 +158,7 @@ export const toolOutput = z
     /** How complete the answer is, not whether the call worked. */
     status: z.enum(["ok", "partial", "empty"]),
     /** Present on every successful answer. Its shape is what differs between tools. */
-    data: z.union([dataShapes.observations, dataShapes.comparisons, dataShapes.ranking, dataShapes.catalogue, dataShapes.sources]),
+    data: z.union([dataShapes.observations, dataShapes.topicObservations, dataShapes.comparisons, dataShapes.ranking, dataShapes.catalogue, dataShapes.sources]),
     meta: responseMeta,
   })
   .loose();
@@ -181,5 +183,5 @@ const rankingMeta = responseMeta.extend({
 
 export function outputSchemaFor(tool: string) {
   const kind = tool === "describe_coverage" ? "catalogue" : tool === "get_sources" ? "sources" : tool === "compare" ? "comparisons" : tool === "rank" ? "ranking" : "observations";
-  return toolOutput.extend({ kind: z.literal(kind), data: dataShapes[kind], ...(kind === "ranking" ? { meta: rankingMeta } : {}) });
+  return toolOutput.extend({ kind: z.literal(kind), data: tool === "query_indicators" ? dataShapes.topicObservations : dataShapes[kind], ...(kind === "ranking" ? { meta: rankingMeta } : {}) });
 }

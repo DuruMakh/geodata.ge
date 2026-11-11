@@ -22,6 +22,8 @@ import { queryInflationInput } from "../factQuery/schemas";
 import { productQueryCellCount, queryInflationProducts } from "../factQuery/queryInflationProducts";
 import { queryInflationProductsInput } from "../factQuery/schemas";
 import { queryDeficit } from "../factQuery/queryDeficit";
+import { indicatorCellCount, queryIndicators } from "../factQuery/queryIndicators";
+import { queryIndicatorsInput } from "../factQuery/schemas";
 import { queryMunicipal } from "../factQuery/queryMunicipal";
 import { queryNational } from "../factQuery/queryNational";
 import { rank } from "../factQuery/rank";
@@ -224,6 +226,15 @@ export const TOOLS: readonly ToolDefinition[] = [
     run: (snapshot, input) => queryDeficit(snapshot, input),
   },
   {
+    name: "query_indicators",
+    title: "თემატური მონაცემები / Topic data",
+    describe: () =>
+      "Annual figures from every other Fiscal.ge chart page: population, education, health and pensions, jobs and wages, business, living standards, housing, internet, transport, money and banks, trade, external accounts, crime, environment, science and culture, energy and farming. " +
+      "Take datasetId, seriesIds and entityIds from describe_coverage; never guess. Values are as the page shows them, in each series' own unit; school years print as 2025/26. Missing is not zero. Use compare and rank for changes.",
+    schema: queryIndicatorsInput,
+    run: queryIndicators,
+  },
+  {
     name: "compare",
     title: "შედარება ორ წელს შორის / Comparison between two years",
     describe: () =>
@@ -415,7 +426,7 @@ export function createMcpServer(): McpServer {
         try {
           // The SDK has validated and deduplicated these arrays. Reject the
           // requested product before calculating cells or resolving their sources.
-          const input = args as { years?: number[]; fromYear?: number; toYear?: number; seriesIds?: string[]; entityIds?: string[]; regionIds?: string[]; target?: { seriesIds?: string[]; entityIds?: string[] } };
+          const input = args as { datasetId?: string; years?: number[]; fromYear?: number; toYear?: number; seriesIds?: string[]; entityIds?: string[]; regionIds?: string[]; target?: { seriesIds?: string[]; entityIds?: string[] } };
           const regionalYears = input.years?.length ?? (
             input.fromYear !== undefined && input.toYear !== undefined
               ? input.toYear - input.fromYear + 1
@@ -431,12 +442,14 @@ export function createMcpServer(): McpServer {
               ? inflationCellCount(args as Parameters<typeof inflationCellCount>[0])
               : tool.name === "query_inflation_products"
                 ? productQueryCellCount(args as Parameters<typeof productQueryCellCount>[0])
+              : tool.name === "query_indicators"
+                ? indicatorCellCount(snapshot, args)
               : tool.name.startsWith("query_")
                 ? (input.entityIds?.length ?? 1) * (input.seriesIds?.length ?? 1) * (input.years?.length ?? 1)
                 : 0;
           const limit = tool.name === "compare" ? LIMITS.comparisonPairs : LIMITS.cells;
-          if (count > limit) return toolResult(tooLargeResponse(snapshot, { returned: count, bytes: 0 }));
-          const result = boundedToolResult(snapshot, tool.run(snapshot, args), resultSizeKind(tool.name));
+          if (count > limit) return toolResult(tooLargeResponse(snapshot, { returned: count, bytes: 0, datasetId: input.datasetId }));
+          const result = boundedToolResult(snapshot, tool.run(snapshot, args), resultSizeKind(tool.name), input.datasetId);
           if (!result.isError && result.structuredContent === undefined) throw new Error(safeValidationError);
           return result;
         } catch {

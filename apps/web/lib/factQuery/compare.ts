@@ -30,7 +30,7 @@ import { queryNational } from "./queryNational";
 import { compareInput } from "./schemas";
 import { selectSources } from "./sources";
 import type { Observation } from "./observations";
-import type { Basis, DatasetId, FactQueryError, FactQueryResponse, FactQuerySnapshot, Measure, Unit } from "./types";
+import type { Basis, DatasetId, FactQueryError, FactQueryResponse, FactQuerySnapshot, Measure } from "./types";
 
 export type ComparisonEndpoint = {
   year: number;
@@ -59,7 +59,7 @@ export type Comparison = {
   seriesLabelKa: string;
   seriesLabelEn: string;
   measure: Measure;
-  unit: Unit;
+  unit: Observation["unit"];
   from: ComparisonEndpoint;
   to: ComparisonEndpoint;
   /** GEL (or GEL-per-resident) difference. Null for percentage measures. */

@@ -3,7 +3,7 @@
 // Packs a topic dataset's facts into parallel columns for the snapshot and reads them back. Runtime code imports
 // this file, so it stays pure.
 import type { Basis } from "../types";
-import type { TopicColumns, TopicDataset, TopicDatasetBuild, TopicFact, TopicsSnapshot, TopicValueStatus } from "./types";
+import type { TopicColumns, TopicDataset, TopicPage, TopicDatasetBuild, TopicFact, TopicsSnapshot, TopicValueStatus } from "./types";
 
 function indexOf<T>(list: readonly T[]): Map<T, number> {
   return new Map(list.map((item, index) => [item, index]));
@@ -74,4 +74,12 @@ function rowsOf(dataset: TopicDataset): Map<string, number> {
 export function topicCell(dataset: TopicDataset, entityId: string, seriesId: string, year: number, topics: TopicsSnapshot): TopicFact | undefined {
   const row = rowsOf(dataset).get(`${entityId}:${seriesId}:${year}`);
   return row === undefined ? undefined : factAt(dataset, topics, row);
+}
+
+/**
+ * How a page prints a period: a school year stored as its start year reads `2015/16`; a calendar year has no label.
+ * The same rule as lib/explorer/education.ts schoolYearLabel, restated here because that module is not runtime-light.
+ */
+export function topicPeriodLabel(dataset: { page: Pick<TopicPage, "periodKind"> }, year: number): string | undefined {
+  return dataset.page.periodKind === "school_year" ? `${year}/${String((year + 1) % 100).padStart(2, "0")}` : undefined;
 }

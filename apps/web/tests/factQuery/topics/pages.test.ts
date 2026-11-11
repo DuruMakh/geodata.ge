@@ -16,9 +16,10 @@ describe("TOPIC_PAGES", () => {
     expect(topicDatasetId("/explorer/education/schools")).toBe("education-schools");
     expect(topicDatasetId("/explorer/expenditure-types")).toBe("expenditure-types");
   });
-  it("uses school years only for the four education pages", () => {
+  // Vocational colleges count calendar years, as their page does (educationPeriodLabel("vocational") is String).
+  it("uses school years only for the schools, kindergartens and universities pages", () => {
     const schoolYear = TOPIC_PAGES.filter((page) => page.periodKind === "school_year").map((page) => page.pagePath).sort();
-    expect(schoolYear).toEqual(["/explorer/education/kindergartens", "/explorer/education/schools", "/explorer/education/universities", "/explorer/education/vocational"]);
+    expect(schoolYear).toEqual(["/explorer/education/kindergartens", "/explorer/education/schools", "/explorer/education/universities"]);
   });
   it("shares no page with the core served pages", () => {
     for (const page of TOPIC_PAGES) expect(Object.hasOwn(CORE_SERVED_PAGES, page.pagePath)).toBe(false);

@@ -50,7 +50,7 @@ export const TOPIC_PAGES = [
   { datasetId: "education-schools", pagePath: "/explorer/education/schools", family: "education", periodKind: "school_year" },
   { datasetId: "education-kindergartens", pagePath: "/explorer/education/kindergartens", family: "education", periodKind: "school_year" },
   { datasetId: "education-universities", pagePath: "/explorer/education/universities", family: "education", periodKind: "school_year" },
-  { datasetId: "education-vocational", pagePath: "/explorer/education/vocational", family: "education", periodKind: "school_year" },
+  { datasetId: "education-vocational", pagePath: "/explorer/education/vocational", family: "education", periodKind: "year" },
   { datasetId: "science-culture-research", pagePath: "/explorer/science-culture/research", family: "science-culture", periodKind: "year" },
   { datasetId: "science-culture-patents", pagePath: "/explorer/science-culture/patents", family: "science-culture", periodKind: "year" },
   { datasetId: "science-culture-museums", pagePath: "/explorer/science-culture/museums", family: "science-culture", periodKind: "year" },

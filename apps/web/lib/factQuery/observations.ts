@@ -8,7 +8,11 @@
 // row, and deciding which already-evaluated request-level caveats belong on
 // one specific observation's caveatIds.
 import type { CaveatContext } from "./caveats";
+import type { AnyDatasetId } from "./topics/types";
 import type { Availability, Basis, Caveat, DatasetId, Measure, PublicDocument, ResolvedSource, Unit } from "./types";
+
+/** A topic series' own unit: the token of its reviewed CSV (persons, institutions, ...), named in snapshot.topics.units. */
+export type TopicUnit = string & {};
 
 /**
  * One value on one line of a query-function response, per spec section 7.2.
@@ -17,7 +21,7 @@ import type { Availability, Basis, Caveat, DatasetId, Measure, PublicDocument, R
  */
 export type Observation = {
   observationId: string;
-  datasetId: DatasetId;
+  datasetId: AnyDatasetId;
   budgetScope: string;
   entityId: string;
   entityType: "country" | "municipality" | "region" | "city";
@@ -35,8 +39,13 @@ export type Observation = {
   period?: string;
   /** December before the first cumulative calculation year; absent for other measures. */
   calculationBasePeriod?: string;
+  /** Topic school-year datasets only: how the page prints the period (`2015/16` for year 2015). */
+  periodLabel?: string;
+  /** Topic datasets only: the date the value stands at, when it is not a year-end or calendar-year value (YYYY-MM-DD). */
+  periodEnd?: string;
   measure: Measure;
-  unit: Unit;
+  /** Topic datasets carry their series' own unit token (TopicUnit); every other dataset one of Unit. */
+  unit: Unit | TopicUnit;
   value: number | null;
   availability: Availability;
   missingReason: string | null;
@@ -67,7 +76,7 @@ export type Observation = {
 };
 
 /** observationId's one fixed template (spec section 7.2). A monthly observation puts its period where the year goes. */
-export function buildObservationId(datasetId: DatasetId, entityId: string, seriesId: string, yearOrPeriod: number | string, measure: Measure): string {
+export function buildObservationId(datasetId: AnyDatasetId, entityId: string, seriesId: string, yearOrPeriod: number | string, measure: Measure): string {
   return `${datasetId}:${entityId}:${seriesId}:${yearOrPeriod}:${measure}`;
 }
 

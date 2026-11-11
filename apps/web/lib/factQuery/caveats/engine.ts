@@ -1,7 +1,8 @@
 // apps/web/lib/factQuery/caveats/engine.ts
-import type { Basis, Caveat, DatasetId, FactQuerySnapshot, Measure, Severity } from "../types";
+import type { Basis, Caveat, FactQuerySnapshot, Measure, Severity } from "../types";
 import { serviceMessage, type ServiceMessageKey } from "../localization";
 import type { MunicipalTotalFact, ServedNationalGdpFact } from "../types";
+import type { AnyDatasetId, TopicValueStatus } from "../topics/types";
 
 /**
  * Everything a rule may inspect. Deliberately includes the raw quality state of
@@ -26,7 +27,8 @@ import type { MunicipalTotalFact, ServedNationalGdpFact } from "../types";
  * make rules over-fire, and no type error will catch it.
  */
 export type CaveatContext = {
-  datasetId: DatasetId;
+  /** A topic dataset's id only from query_indicators, which evaluates TOPIC_CAVEAT_RULES alone. */
+  datasetId: AnyDatasetId;
   measure: Measure;
   years: number[];
   seriesIds: string[];
@@ -51,6 +53,8 @@ export type CaveatContext = {
     basis: Basis | null;
     /** Mirrors Observation.valueDefinitionId, so a rule can detect a real definition break between two years without reading display prose. */
     valueDefinitionId: string;
+    /** Topic observations only: the cell's value status. Absent on every core observation, which is what gates the topic rules. */
+    status?: TopicValueStatus;
   }[];
   municipalTotalInputs: MunicipalTotalFact[];
   /**

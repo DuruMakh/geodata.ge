@@ -26,7 +26,7 @@ import { selectSources } from "./sources";
 import { AGGREGATE_ONLY_MUNICIPAL_CODES } from "./types";
 import type { Comparison } from "./compare";
 import type { Observation } from "./observations";
-import type { Basis, Caveat, DatasetId, FactQueryError, FactQueryResponse, FactQuerySnapshot, Measure, ResolvedSource, Unit } from "./types";
+import type { Basis, Caveat, DatasetId, FactQueryError, FactQueryResponse, FactQuerySnapshot, Measure, ResolvedSource } from "./types";
 
 const EXCLUDED = new Set<string>(AGGREGATE_ONLY_MUNICIPAL_CODES);
 const TOTAL_LEVEL = "total";
@@ -43,7 +43,7 @@ export type RankEntry = {
   seriesLabelKa: string;
   seriesLabelEn: string;
   value: number | null;
-  unit: Unit;
+  unit: Observation["unit"];
   basis: Basis | null;
   caveatIds: string[];
   /** Inflation value rankings only: the month ranked. */
@@ -83,7 +83,7 @@ type Candidate = {
   seriesLabelEn: string;
   /** Never null: a row with no value is an exclusion, never a candidate. */
   value: number;
-  unit: Unit;
+  unit: Observation["unit"];
   basis: Basis | null;
   caveatIds: string[];
   period?: string;

@@ -18,7 +18,7 @@ beforeAll(() => {
 afterAll(() => { process.env = { ...original }; vi.restoreAllMocks(); });
 
 // Independent release inventory: removing execution while retaining discovery must fail.
-const required = ["query_regional_economies", "query_economic_sectors", "query_gdp", "query_inflation", "query_inflation_products", "describe_coverage", "query_national", "query_ministries", "query_municipal", "query_debt", "query_deficit", "compare", "rank", "get_sources"];
+const required = ["query_regional_economies", "query_economic_sectors", "query_gdp", "query_inflation", "query_inflation_products", "describe_coverage", "query_national", "query_ministries", "query_municipal", "query_debt", "query_deficit", "query_indicators", "compare", "rank", "get_sources"];
 const snapshot = loadPackagedSnapshot();
 const identities = { expectedSchema: "1.8.0", expectedDataVersion: snapshot.dataVersion };
 let key = 0;
@@ -55,13 +55,13 @@ it("executes every advertised required tool", async () => {
     ]);
     const httpRequestCount = exchanges.length;
     expect(httpRequestCount).toBeLessThanOrEqual(30);
-    expect(httpRequestCount).toBe(29);
+    expect(httpRequestCount).toBe(30);
     expect(report.httpRequestCount).toBe(httpRequestCount);
-    expect(exchanges.filter(method => method === "tools/call")).toHaveLength(21);
+    expect(exchanges.filter(method => method === "tools/call")).toHaveLength(22);
     expect(exchanges).toContain("notifications/initialized");
     expect(exchanges).toContain("GET");
     expect(exchanges).not.toContain("DELETE");
-    expect(signals).toHaveLength(29);
+    expect(signals).toHaveLength(30);
     expect(signals.every(signal => signal.aborted)).toBe(true);
     expect(console.warn).toBe(warning);
   } finally { await bridge.close(); }

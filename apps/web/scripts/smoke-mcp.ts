@@ -8,7 +8,7 @@ import { StreamableHTTPClientTransport as LegacyTransport } from "@modelcontextp
 const VERSION = "2026-07-28";
 const REQUEST_LIMIT = 30;
 const BYTE_LIMIT = 512 * 1024;
-const REQUIRED = ["query_regional_economies", "query_economic_sectors", "query_gdp", "query_inflation", "query_inflation_products", "describe_coverage", "query_national", "query_ministries", "query_municipal", "query_debt", "query_deficit", "compare", "rank", "get_sources"] as const;
+const REQUIRED = ["query_regional_economies", "query_economic_sectors", "query_gdp", "query_inflation", "query_inflation_products", "describe_coverage", "query_national", "query_ministries", "query_municipal", "query_debt", "query_deficit", "query_indicators", "compare", "rank", "get_sources"] as const;
 type Tool = typeof REQUIRED[number];
 type Era = "pinned-modern" | "automatic-modern" | "legacy";
 type Failure = "invalid_arguments" | "request_budget_exhausted" | "timeout" | "redirect" | "response_too_large" | "rate_limited" | "service_unavailable" | "http_error" | "protocol_error" | "inventory_mismatch" | "tool_error" | "malformed_output" | "schema_mismatch" | "data_version_mismatch" | "assertion_failed" | "parity_mismatch" | "stale_version_not_refused" | "output_write_failed";
@@ -40,6 +40,7 @@ const SCENARIOS: Record<Tool, Record<string, unknown>> = {
   query_municipal: { entityIds: ["11"], seriesIds: ["municipal.total"], years: [2024], measure: "amount_gel" },
   query_debt: { seriesIds: ["debt.stock.total"], years: [2024], measure: "amount_gel" },
   query_deficit: { years: [2020], measure: "share_of_gdp_pct" },
+  query_indicators: { datasetId: "education-schools", seriesIds: ["education.pupils.total"], entityIds: ["10"], years: [2025] },
   compare: { target: { dataset: "municipal", entityIds: ["11"], seriesIds: ["municipal.total"] }, fromYear: 2023, toYear: 2024, measure: "amount_gel" },
   rank: { datasetId: "national-revenue", dimension: "series", fromYear: 2019, toYear: 2023, measure: "share_of_total_pct", metric: "percentage_point_change", limit: 5 },
   get_sources: {}, // Filled from the sourced city answer, then reused in each era.

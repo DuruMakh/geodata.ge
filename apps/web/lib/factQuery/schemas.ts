@@ -242,6 +242,29 @@ export const rankInput = z
     }
   });
 
+/**
+ * query_indicators: one topic dataset, its series and places as describe_coverage lists them. Without entityIds the
+ * dataset's country entity (or its only one) answers; without years, every year of the dataset.
+ */
+export const queryIndicatorsInput = z
+  .strictObject({
+    datasetId: idString,
+    seriesIds: seriesIdList,
+    entityIds: entityIdList.optional(),
+    years: uniqueSortedYears.optional(),
+    fromYear: z.number().int().optional(),
+    toYear: z.number().int().optional(),
+    expectedDataVersion,
+  })
+  .superRefine((input, context) => {
+    const issue = (path: string, message: string) => context.addIssue({ code: "custom", path: [path], message });
+    const ranged = input.fromYear !== undefined || input.toYear !== undefined;
+    if (ranged && (input.fromYear === undefined || input.toYear === undefined)) issue("fromYear", "fromYear and toYear must be supplied together");
+    else if (ranged && input.fromYear! > input.toYear!) issue("fromYear", "fromYear must not be later than toYear");
+    if (ranged && input.years !== undefined) issue("years", "Use years or fromYear/toYear, not both");
+  });
+export type QueryIndicatorsInput = z.infer<typeof queryIndicatorsInput>;
+
 export const getSourcesInput = z.strictObject({
   sourceIds: sourceIdList,
   datasetId: z.enum(["national-revenue", "national-expenditure", "ministries", "municipal-expenditure", "government-debt", "general-government-balance", "gdp-overview", "economic-sectors", "regional-economies", "inflation", "inflation-products"]).optional(),
@@ -305,6 +328,13 @@ export const observationSchema = z.object({
   sourceIds: z.array(z.string()),
   documentIds: z.array(z.string()),
   caveatIds: z.array(z.string()),
+});
+
+/** A topic observation: the series' own unit token, the page's school-year label, and the date of a dated value. */
+export const topicObservationSchema = observationSchema.omit({ period: true, calculationBasePeriod: true }).extend({
+  unit: z.string(),
+  periodLabel: z.string().optional(),
+  periodEnd: z.string().optional(),
 });
 
 export const envelopeSchema = z.discriminatedUnion("status", [
