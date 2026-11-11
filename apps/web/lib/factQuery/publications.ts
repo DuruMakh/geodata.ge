@@ -487,7 +487,7 @@ export const TOPIC_CSV_COLUMNS = [
 
 /**
  * One file per topic dataset, `topics/<datasetId>.csv`: a row for every cell the page shows, a missing cell as an empty
- * value with no basis and no sources (never 0). Units are the dataset's own tokens. The internal workbook-location
+ * value with no basis, no status and no sources (never 0). Units are the dataset's own tokens. The internal workbook-location
  * columns of the reviewed CSVs are not part of the public file.
  */
 export function buildTopicCsvFiles(snapshot: FactQuerySnapshot): PublicationArtifact[] {
@@ -501,7 +501,7 @@ export function buildTopicCsvFiles(snapshot: FactQuerySnapshot): PublicationArti
       return [
         fact.year, topicPeriodLabel(dataset, fact.year) ?? "", entity.entityId, entity.labelKa, entity.labelEn,
         series.seriesId, series.labelKa, series.labelEn, series.headingKa ?? "", series.headingEn ?? "",
-        fact.value, series.unit, present ? fact.basis : "", fact.status, fact.periodEnd ?? "", fact.monthsReported ?? "",
+        fact.value, series.unit, present ? fact.basis : "", present ? fact.status : "", fact.periodEnd ?? "", fact.monthsReported ?? "",
         present ? fact.sourceIds.join(";") : "",
       ].map(csvEscape).join(",");
     });

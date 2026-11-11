@@ -1,6 +1,6 @@
 // apps/web/tests/factQuery/topics/store.test.ts
 import { describe, expect, it } from "vitest";
-import { packTopicFacts, topicCell, unpackTopicFacts } from "../../../lib/factQuery/topics/store";
+import { packTopicFacts, topicCell, topicNumber, unpackTopicFacts } from "../../../lib/factQuery/topics/store";
 import type { TopicDataset, TopicDatasetBuild, TopicFact, TopicsSnapshot } from "../../../lib/factQuery/topics/types";
 
 const entities = ["country.georgia", "region.tbilisi", "region.adjara"].map((entityId) => ({ entityId, entityType: entityId.startsWith("country") ? "country" as const : "region" as const, labelKa: entityId, labelEn: entityId, parentEntityId: null }));
@@ -46,5 +46,12 @@ describe("topic column store", () => {
     expect(topicCell(dataset, "region.tbilisi", "a", 1999, topics)).toBeUndefined();
     expect(topicCell(dataset, "region.nowhere", "a", 2023, topics)).toBeUndefined();
     expect(topicCell(dataset, "region.tbilisi", "zzz", 2023, topics)).toBeUndefined();
+  });
+  it("serves a number to 12 significant digits: a floating-point sum's noise is gone, a reviewed figure keeps its digits", () => {
+    expect(topicNumber(155199297.00000012)).toBe(155199297);
+    expect(topicNumber(1.2908329999999992)).toBe(1.290833);
+    expect(topicNumber(559.415)).toBe(559.415);
+    const noisy = { ...build, facts: [{ ...facts[0]!, value: 2975.246654386985 }, ...facts.slice(1)] };
+    expect(packTopicFacts(noisy, new Map(sourceIds.map((id, index) => [id, index])), [...basisCodes], [...statusCodes]).value[0]).toBe(2975.24665439);
   });
 });

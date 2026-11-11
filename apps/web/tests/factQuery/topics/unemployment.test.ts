@@ -25,7 +25,7 @@ import { queryIndicators } from "../../../lib/factQuery/queryIndicators";
 import { rank } from "../../../lib/factQuery/rank";
 import { TOPIC_PAGES } from "../../../lib/factQuery/topics/pages";
 import { TOPIC_ADAPTERS } from "../../../lib/factQuery/topics/registry";
-import { breakBetween } from "../../../lib/factQuery/topics/store";
+import { breakBetween, topicNumber } from "../../../lib/factQuery/topics/store";
 import type { TopicDatasetBuild, TopicFact } from "../../../lib/factQuery/topics/types";
 import { lfsEpochBreaks, unemploymentTopicAdapter } from "../../../lib/factQuery/topics/unemployment";
 import type { FactQueryResponse, FactQuerySnapshot } from "../../../lib/factQuery/types";
@@ -162,7 +162,7 @@ describe("query, compare and rank on the unemployment datasets", () => {
   it("marks every observation a survey estimate", () => {
     const response = queryIndicators(snapshot, { datasetId: "unemployment-overview", seriesIds: ["unemployment_rate"], years: [2025] });
     const [observation] = (response as { data: { observations: Observation[] } }).data.observations;
-    expect(observation).toMatchObject({ entityId: GEORGIA_PLACE_ID, unit: "percent", value: Number(rowOf("national", "georgia", "unemployment_rate", 2025).value), caveatIds: ["topic_survey_estimate"] });
+    expect(observation).toMatchObject({ entityId: GEORGIA_PLACE_ID, unit: "percent", value: topicNumber(Number(rowOf("national", "georgia", "unemployment_rate", 2025).value)), caveatIds: ["topic_survey_estimate"] });
     expect(response.meta.caveats.find((caveat) => caveat.code === "topic_survey_estimate")).toMatchObject({ severity: "note" });
     const hours = queryIndicators(snapshot, { datasetId: "unemployment-hours", seriesIds: ["labour.hours.all.total"], years: [2025] }) as FactQueryResponse & { data: { observations: Observation[] } };
     expect(hours.data.observations[0]).toMatchObject({ unit: "hours", caveatIds: ["topic_survey_estimate"] });

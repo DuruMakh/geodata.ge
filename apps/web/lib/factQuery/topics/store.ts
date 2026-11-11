@@ -15,6 +15,12 @@ function code<T>(codes: Map<T, number>, value: T, what: string): number {
   return found;
 }
 
+/**
+ * A topic number to 12 significant digits: a sum the page's model adds up in floating point (155199297.00000012) serves
+ * as the number it is (155199297). Twelve digits are below every page's display precision (R34).
+ */
+export const topicNumber = (value: number) => Number(value.toPrecision(12));
+
 /** Facts as columns, in the build's order. Entity and series are positions in the build's lists; basis, status and sources are codes from the snapshot's. */
 export function packTopicFacts(build: TopicDatasetBuild, sourceIndex: Map<string, number>, basisCodes: Basis[], statusCodes: TopicValueStatus[]): TopicColumns {
   const entities = indexOf(build.entities.map((entity) => entity.entityId));
@@ -26,7 +32,7 @@ export function packTopicFacts(build: TopicDatasetBuild, sourceIndex: Map<string
     columns.entity.push(code(entities, fact.entityId, "entity"));
     columns.series.push(code(series, fact.seriesId, "series"));
     columns.year.push(fact.year);
-    columns.value.push(fact.value);
+    columns.value.push(fact.value === null ? null : topicNumber(fact.value));
     columns.basis.push(code(basis, fact.basis, "basis"));
     columns.status.push(code(status, fact.status, "status"));
     columns.sources.push(fact.sourceIds.map((id) => code(sourceIndex, id, "source")));

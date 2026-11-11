@@ -44,7 +44,7 @@ describe("topic CSV files", () => {
     }
   });
 
-  it("writes a missing cell as an empty value with no basis and no sources", () => {
+  it("writes a missing cell as an empty value with no basis, no status and no sources", () => {
     const base = snapshot.topics.datasets[0]!;
     const row = base.columns.year.findIndex((_year, at) => base.columns.value[at] !== null && base.columns.sources[at]!.length > 0);
     const value = base.columns.value.map((entry, at) => (at === row ? null : entry));
@@ -54,9 +54,10 @@ describe("topic CSV files", () => {
     expect(missing.length).toBeGreaterThan(0);
     for (const entry of missing) {
       expect(entry.basis).toBe("");
+      expect(entry.value_status).toBe("");
       expect(entry.source_ids).toBe("");
     }
-    expect(rows.filter((entry) => entry.value !== "").every((entry) => entry.basis !== "" && entry.source_ids !== "")).toBe(true);
+    expect(rows.filter((entry) => entry.value !== "").every((entry) => entry.basis !== "" && entry.value_status !== "" && entry.source_ids !== "")).toBe(true);
   });
 
   it("writes school years as 2015/16 and the series' own unit token", () => {

@@ -30,7 +30,7 @@ import { queryMunicipal } from "./queryMunicipal";
 import { queryNational } from "./queryNational";
 import { compareInput } from "./schemas";
 import { selectSources } from "./sources";
-import { breakBetween, isTopicIntervalUnit, isTopicPercentUnit, topicBreakDetail } from "./topics/store";
+import { breakBetween, isTopicIntervalUnit, isTopicPercentUnit, topicBreakDetail, topicNumber } from "./topics/store";
 import type { AnyDatasetId, TopicDatasetId } from "./topics/types";
 import type { Observation } from "./observations";
 import type { Basis, FactQueryError, FactQueryResponse, FactQuerySnapshot, Measure } from "./types";
@@ -400,9 +400,9 @@ export function compare(snapshot: FactQuerySnapshot, rawInput: unknown): FactQue
     if (comparable && from.value !== null && to.value !== null) {
       // A topic series measured in percent (its unit token) changes in percentage points, as a percentage measure does.
       if (isPercentage || (topicDataset !== undefined && isTopicPercentUnit(from.unit))) {
-        percentagePointChange = to.value - from.value;
+        percentagePointChange = topicDataset ? topicNumber(to.value - from.value) : to.value - from.value;
       } else {
-        absoluteChange = to.value - from.value;
+        absoluteChange = topicDataset ? topicNumber(to.value - from.value) : to.value - from.value;
         // A temperature (an interval-scale unit token) changes by a difference only: no percentage of it means anything (R33).
         if (topicDataset !== undefined && isTopicIntervalUnit(from.unit)) {
           percentageChange = null;
