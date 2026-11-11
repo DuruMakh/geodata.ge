@@ -18,6 +18,7 @@ import { findSourceProvenanceFailures, resolvePublicSources } from "../sources";
 import type { Basis, RawResolvedSource } from "../types";
 import { budgetExtrasTopicAdapter } from "./budgetExtras";
 import { businessTopicAdapter } from "./business";
+import { crimeTopicAdapter } from "./crime";
 import { demographyTopicAdapter } from "./demography";
 import { educationTopicAdapter } from "./education";
 import { externalTopicAdapter } from "./external";
@@ -27,6 +28,7 @@ import { internetTopicAdapter } from "./internet";
 import { livingStandardsTopicAdapter } from "./livingStandards";
 import { moneyBanksTopicAdapter } from "./moneyBanks";
 import { TOPIC_PAGES } from "./pages";
+import { scienceCultureTopicAdapter } from "./scienceCulture";
 import { socialTopicAdapter } from "./social";
 import { packTopicFacts } from "./store";
 import { tradeTopicAdapter } from "./trade";
@@ -35,7 +37,7 @@ import { unemploymentTopicAdapter } from "./unemployment";
 import { wagesTopicAdapter } from "./wages";
 import type { TopicAdapter, TopicDataset, TopicDatasetBuild, TopicsSnapshot, TopicValueStatus } from "./types";
 
-export const TOPIC_ADAPTERS: readonly TopicAdapter[] = [educationTopicAdapter, demographyTopicAdapter, healthTopicAdapter, socialTopicAdapter, unemploymentTopicAdapter, wagesTopicAdapter, businessTopicAdapter, moneyBanksTopicAdapter, livingStandardsTopicAdapter, housingTopicAdapter, internetTopicAdapter, transportTopicAdapter, tradeTopicAdapter, externalTopicAdapter, budgetExtrasTopicAdapter];
+export const TOPIC_ADAPTERS: readonly TopicAdapter[] = [educationTopicAdapter, demographyTopicAdapter, healthTopicAdapter, socialTopicAdapter, unemploymentTopicAdapter, wagesTopicAdapter, businessTopicAdapter, moneyBanksTopicAdapter, livingStandardsTopicAdapter, housingTopicAdapter, internetTopicAdapter, transportTopicAdapter, tradeTopicAdapter, externalTopicAdapter, budgetExtrasTopicAdapter, scienceCultureTopicAdapter, crimeTopicAdapter];
 
 /**
  * The site's own message for each unit token the topic CSVs use (R7: unit ids are the CSVs' tokens). One name per
@@ -80,6 +82,9 @@ const TOPIC_UNIT_MESSAGES: Readonly<Record<string, string>> = {
   km: "transport.unitKm",
   usd: "gdp.usd",
   usd_million: "external.position.unitMlnUsd",
+  count_thousand: "scienceCulture.unit.thousand",
+  crimes: "crime.unitCrimes",
+  accidents: "crime.unitAccidents",
 };
 
 /** The source registry's id (data/sources/source-documents.csv) of an archive's source id: the registry adds `source.`, which some archives already carry. */

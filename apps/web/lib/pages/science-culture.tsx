@@ -3,9 +3,10 @@ import { ExplorerPage } from "../../components/explorer-shell/explorer-page";
 import { PageHeader } from "../../components/shell/page-header";
 import { JsonLd } from "../../components/seo/json-ld";
 import { BreadcrumbJsonLd } from "../../components/seo/breadcrumb-json-ld";
-import { loadServedScienceCultureData, toClientScienceCultureFact } from "../data/scienceCulture/importScienceCulture";
+import { loadServedScienceCultureData } from "../data/scienceCulture/importScienceCulture";
 import { coverageLabel } from "../explorer/coverageLabel";
 import { SCIENCE_CULTURE_SECTIONS, scienceCultureCoverage, scienceCultureTopicSeries, type ScienceCultureTopicId } from "../explorer/scienceCulture";
+import { scienceCultureLabels, scienceCulturePageFacts } from "../explorer/scienceCulturePageData";
 import { I18nProvider } from "../i18n/provider";
 import { clientPresentation, getPresentation } from "../i18n/presentation.server";
 import { getMessages } from "../i18n/messages.server";
@@ -15,7 +16,7 @@ import type { Locale } from "../i18n/types";
 import { fiscalMetadata } from "../seo/metadata";
 import { explorerDatasetJsonLd } from "../seo/structuredData";
 import { resolveSiteUrl } from "../siteUrl";
-import { loadScienceCultureWorkbookSources, scienceCultureLabels } from "./science-culture-shared";
+import { loadScienceCultureWorkbookSources } from "./science-culture-shared";
 import { topicSection, ALL_DATA_PATH } from "../navigation/navTree";
 
 const topicHref = (section: ScienceCultureTopicId) => SCIENCE_CULTURE_SECTIONS.find(item => item.id === section)!.href;
@@ -33,7 +34,7 @@ export async function renderScienceCulturePage(locale: Locale, section: ScienceC
   const series = scienceCultureTopicSeries(section);
   // Each page receives only the observations its list can show, and the counting changes that touch them.
   const ids = new Set<string>(series.map(({ id }) => id));
-  const facts = data.facts.map(toClientScienceCultureFact).filter(f => ids.has(f.indicatorId));
+  const facts = scienceCulturePageFacts(data.facts, section);
   const breaks = data.breaks.filter(item => item.appliesTo.some(id => ids.has(id)));
   const { min: firstYear, max: lastYear } = scienceCultureCoverage(section, facts);
   const href = topicHref(section);

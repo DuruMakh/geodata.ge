@@ -1152,9 +1152,9 @@ function namesPage(word: string, page: WebsitePage, some = false): boolean {
  * 1. the pages of the whole search (`websitePagesFor`);
  * 2. failing that, when the answer is empty or only some words matched (`partial`), the pages of the search without
  *    its place words, which no page names; the website's own search sets a place apart the same way (`runWords`), so
- *    "crimes Tbilisi" links the Recorded crimes page;
+ *    "year in review Tbilisi" links the Year in review page;
  * 3. failing that too, the pages of each word, best first by how many of the words they meet: all the pages of an
- *    `unserved` word ("recorded road accidents"), and the page a `programme` word names in full. A search a served
+ *    `unserved` word (a word no served entry meets), and the page a `programme` word names in full. A search a served
  *    topic dataset answers ("hospitals in Kutaisi", "average pension", "unemployment among women", "home prices
  *    Tbilisi") links no page of that topic: its dataset is the answer. A `served` word looks for no page, as it is the
  *    served data's own word ("spending", "city", "food"), but still counts in the order; a `datasetPage` word links only

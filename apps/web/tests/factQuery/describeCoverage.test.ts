@@ -8,7 +8,7 @@ import { CORE_SERVED_PAGES, MCP_SERVED_PAGES } from "../../lib/factQuery/servedP
 import { TOPIC_PAGES } from "../../lib/factQuery/topics/pages";
 import { AGGREGATE_ONLY_MUNICIPAL_CODES, type FactQuerySnapshot } from "../../lib/factQuery/types";
 import { outputSchemaFor } from "../../lib/mcp/outputSchema";
-import { NAV_TREE, PAGE_COUNT, topicHub } from "../../lib/navigation/navTree";
+import { NAV_TREE, PAGE_COUNT } from "../../lib/navigation/navTree";
 
 let snapshot: FactQuerySnapshot;
 
@@ -329,17 +329,16 @@ describe("search understands Georgian case endings", () => {
   });
 });
 
-// A topic the website shows and this connection does not serve: the search says where the page is,
-// and carries no figure (spec: 2026-10-29 MCP audit, F01).
+// A page the website shows and this connection does not serve (Year in review, which charts no dataset of its own): the
+// search says where the page is, and carries no figure (spec: 2026-10-29 MCP audit, F01).
 describe("search points to website pages the connection does not serve", () => {
-  const firstCrimePage = topicHub("crime").sections[0]!.href;
-
-  it("answers crime. with the crime pages and no series", () => {
-    const result = describeCoverage(snapshot, { search: "crime." });
+  it("answers review with the Year in review page and no series", () => {
+    const result = describeCoverage(snapshot, { search: "review" });
     const pages = data(result).websitePages ?? [];
-    expect(pages[0]?.topicId).toBe("crime");
-    expect(pages[0]?.urlEn).toBe(`https://fiscal.ge/en${firstCrimePage}`);
-    expect(pages[0]?.urlKa).toBe(`https://fiscal.ge${firstCrimePage}`);
+    expect(data(result).series ?? []).toEqual([]);
+    expect(pages[0]).toMatchObject({ topicId: "budget", labelEn: "Year in review" });
+    expect(pages[0]?.urlEn).toBe("https://fiscal.ge/en/explorer/analysis");
+    expect(pages[0]?.urlKa).toBe("https://fiscal.ge/explorer/analysis");
     expect(pages.length).toBeLessThanOrEqual(5);
     expect(data(result).websitePagesNoteEn).toContain("never quote a figure from memory");
     expect(data(result).websitePagesNoteKa).toBeTruthy();
@@ -351,6 +350,9 @@ describe("search points to website pages the connection does not serve", () => {
     ["ხელფასი", "wages-overview", "average_monthly_nominal_earnings"],
     ["unemployment", "unemployment-overview", "unemployment_rate"],
     ["უმუშევრობა", "unemployment-overview", "unemployment_rate"],
+    ["crime", "crime-recorded", "crime.recorded.total"],
+    ["დანაშაული", "crime-recorded", "crime.recorded.total"],
+    ["museums", "science-culture-museums", "science_culture.museum_visitors"],
   ])("answers %s with the %s dataset it serves and no page link", (search, datasetId, seriesId) => {
     const result = describeCoverage(snapshot, { search });
     expect(result.status).toBe("ok");
@@ -441,11 +443,11 @@ describe("search links the topic page behind a phrase", () => {
     expect(topicsOf(search)).not.toContain("housing");
   });
 
-  // A place is no page's word, as the website's own search drops it; a topic word that also meets some served series
-  // ("road" meets a road programme) still finds its page; and a phrase whose answer is empty still looks word by word.
+  // A place is no page's word, as the website's own search drops it, and a phrase whose answer is empty still looks
+  // word by word.
   it.each([
-    ["crimes Tbilisi", "crime"],
-    ["road accidents in regions", "crime"],
+    ["year in review Tbilisi", "budget"],
+    ["year in review in regions", "budget"],
   ])("links %s to the %s topic", (search, topic) => {
     const topics = topicsOf(search);
     expect(topics.length).toBeGreaterThan(0);
@@ -472,6 +474,9 @@ describe("search links the topic page behind a phrase", () => {
     ["poverty", "living-standards-poverty", "poverty.absolute"],
     ["სიღარიბე", "living-standards-poverty", "poverty.absolute"],
     ["Gini", "living-standards-inequality", "gini.total_income"],
+    // A place beside a topic word, and a topic word that also meets other served series ("road" meets a road programme).
+    ["road accidents in regions", "crime-road-accidents", "crime.road.accidents"],
+    ["prisoners", "crime-prisons", "crime.prison.total"],
   ])("answers %s with the dataset it serves and no page link of its topic", (search, datasetId, seriesId) => {
     const found = data(describeCoverage(snapshot, { search }));
     expect(found.series?.[0]).toMatchObject({ datasetId, seriesId });
@@ -484,9 +489,18 @@ describe("search links the topic page behind a phrase", () => {
     expect((found.websitePages ?? []).map((page) => page.topicId)).not.toContain("education");
   });
 
+  it("answers crimes Tbilisi with Recorded crimes and no crime page link", () => {
+    expect(data(describeCoverage(snapshot, { search: "crimes Tbilisi" })).series?.[0]?.datasetId).toBe("crime-recorded");
+    expect(topicsOf("crimes Tbilisi")).not.toContain("crime");
+  });
+
+  // Every chart page is served, so two pages the connection does not serve are made up for this rule.
   it("puts the page that meets the most words first", () => {
-    const pages = data(describeCoverage(snapshot, { search: "recorded road accidents" })).websitePages ?? [];
-    expect(pages.map((page) => page.labelEn)).toEqual(["Road accidents", "Recorded crimes"]);
+    const review = snapshot.website.pages.find((page) => page.href === "/explorer/analysis")!;
+    const page = (href: `/explorer/${string}`, en: string) => ({ ...review, href, name: { ka: en, en }, words: "", urlKa: `https://fiscal.ge${href}`, urlEn: `https://fiscal.ge/en${href}` });
+    const withPages = { ...snapshot, website: { pages: [...snapshot.website.pages, page("/explorer/zz-balloonists", "Balloonists"), page("/explorer/zz-hangars", "Zeppelin hangars")] } };
+    const pages = data(describeCoverage(withPages, { search: "balloonists zeppelin hangars" })).websitePages ?? [];
+    expect(pages.map((entry) => entry.labelEn)).toEqual(["Zeppelin hangars", "Balloonists"]);
   });
 
   // "rate" meets the debt interest rates and links pages of two topics, so it names no page by itself.
@@ -495,8 +509,8 @@ describe("search links the topic page behind a phrase", () => {
   });
 
   // A trailing full stop is punctuation, not an id: only a word, a "." or "_", and a word again looks like one.
-  it("reads crime. as the word crime", () => {
-    expect(topicsOf("crime.")[0]).toBe("crime");
+  it("reads review. as the word review", () => {
+    expect(topicsOf("review.")[0]).toBe("budget");
   });
 });
 

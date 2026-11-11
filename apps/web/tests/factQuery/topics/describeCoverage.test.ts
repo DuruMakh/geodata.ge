@@ -123,7 +123,7 @@ describe("search finds topic datasets, series, headings and places in both langu
     for (const search of ["schools", "სკოლა", "kindergartens", "education", "უმუშევრობა", "wages", "housing.", "crime."]) {
       for (const page of dataOf(snapshot, { search }).websitePages ?? []) expect(served.has(page.urlKa), `${search}: ${page.urlKa}`).toBe(false);
     }
-    expect((dataOf(snapshot, { search: "crime." }).websitePages ?? []).map((page) => page.topicId)).toContain("crime");
+    expect((dataOf(snapshot, { search: "review" }).websitePages ?? []).map((page) => page.urlKa)).toContain("https://fiscal.ge/explorer/analysis");
     expect(dataOf(snapshot, { search: "zzzznotathing" })).not.toHaveProperty("websitePages");
   });
 });
