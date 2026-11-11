@@ -183,8 +183,8 @@ describe("education parity with the pages' workbook models", () => {
     for (const set of ["schools", "kindergartens"] as const) {
       it(`${set} (${locale}): Georgia, Adjara and Shuakhevi`, async () => {
         const matcher = educationMatcher();
-        const models = await placeModels(locale, set, [EDUCATION_GEORGIA, "region.adjara", SHUAKHEVI], matcher);
-        expectWorkbookParity(dataset(`education-${set}`), models, matcher.match);
+        const places = [EDUCATION_GEORGIA, "region.adjara", SHUAKHEVI];
+        expectWorkbookParity(dataset(`education-${set}`), await placeModels(locale, set, places, matcher), matcher.match, places);
       });
     }
     for (const section of ["universities", "vocational"] as const) {
@@ -203,17 +203,25 @@ describe("education parity with the pages' workbook models", () => {
     }
   });
 
-  it("the harness fails on a changed value, a served year no row prints, an unmatched row and a served series without a row", async () => {
+  it("the harness fails on a changed value, a served year no row prints, an unmatched row, a served series without a row, no match at all and an uncovered place", async () => {
     const matcher = educationMatcher();
     const models = await placeModels("en", "schools", [SHUAKHEVI], matcher);
     const build = dataset("education-schools");
     const at = build.facts.findIndex((fact) => fact.entityId === SHUAKHEVI && fact.seriesId === "education.pupils.total" && fact.year === 2015);
     const changed = { ...build, facts: build.facts.map((fact, index) => index === at ? { ...fact, value: fact.value! + 1 } : fact) };
-    expect(() => expectWorkbookParity(changed, models, matcher.match)).toThrow(/serves/);
+    const only = [SHUAKHEVI];
+    expectWorkbookParity(build, models, matcher.match, only);
+    expect(() => expectWorkbookParity(changed, models, matcher.match, only)).toThrow(/serves/);
     const extraYear = { ...build, facts: [...build.facts, { ...build.facts[at]!, year: 1990 }] };
-    expect(() => expectWorkbookParity(extraYear, models, matcher.match)).toThrow(/no workbook row prints the year/);
-    expect(() => expectWorkbookParity(build, models, () => null)).toThrow(/no served series matches the row/);
+    expect(() => expectWorkbookParity(extraYear, models, matcher.match, only)).toThrow(/no workbook row prints the year/);
+    expect(() => expectWorkbookParity(build, models, () => null, only)).toThrow(/no served series matches the row/);
+    // Nothing to compare is a failure, never a pass: no models, or no row that matches.
+    expect(() => expectWorkbookParity(build, [], matcher.match, only)).toThrow(/no workbook row matched/);
+    expect(() => expectWorkbookParity(build, models, () => null, only)).toThrow(/no workbook row matched/);
+    // A place the test expects (by default every entity the dataset serves) that no row covers, as when its crawl states are empty.
+    expect(() => expectWorkbookParity(build, models, matcher.match, [SHUAKHEVI, "region.adjara"])).toThrow(/region\.adjara: no workbook row covers the entity/);
+    expect(() => expectWorkbookParity(build, models, matcher.match)).toThrow(/country\.georgia: no workbook row covers the entity/);
     const withoutTeachers = models.filter((model) => !model.readable.rows.some((row) => matcher.match(row, model)?.seriesId.startsWith("education.teachers.")));
-    expect(() => expectWorkbookParity(build, withoutTeachers, matcher.match)).toThrow(/no workbook row prints it/);
+    expect(() => expectWorkbookParity(build, withoutTeachers, matcher.match, only)).toThrow(/no workbook row prints it/);
   });
 });

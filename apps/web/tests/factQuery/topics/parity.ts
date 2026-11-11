@@ -6,13 +6,8 @@
 import type { TopicDatasetBuild, TopicFact } from "../../../lib/factQuery/topics/types";
 import { readableRowLabel, type WorkbookExportModel, type WorkbookReadableRow } from "../../../lib/explorer/workbookModel";
 
-/**
- * The served cell a workbook row shows. `scale`, when the workbook prints the series in another magnitude than it is
- * served (a series served in persons that the workbook prints in thousands), is the factor that turns a printed value
- * into the served one: served = printed × scale. Omitted, it is 1. The served value stays the reviewed CSV value; only
- * the comparison is scaled.
- */
-export type ParityTarget = { entityId: string; seriesId: string; scale?: number };
+/** The served cell a workbook row shows. Its value must be the number the page's model carries: nothing is rescaled. */
+export type ParityTarget = { entityId: string; seriesId: string };
 
 const RELATIVE_TOLERANCE = 1e-9;
 const key = (entityId: string, seriesId: string) => `${entityId}\u0000${seriesId}`;
@@ -23,17 +18,20 @@ const labelOnly = (row: WorkbookReadableRow) => row.kind === "group" && Object.v
 
 /**
  * Fails, listing every disagreement, unless:
+ * - at least one row matched (no models, or none that match, is a failure, never a pass);
  * - every readable row of every model (label-only heading rows aside) maps through `match` to a served entity and series;
- * - in each of the row's years a printed value equals the served value (relative tolerance 1e-9, after `scale`), and an
- *   empty cell is a missing one (a fact with `value: null`, or no fact);
+ * - in each of the row's years a printed value equals the served value (relative tolerance 1e-9), and an empty cell is a
+ *   missing one (a fact with `value: null`, or no fact);
  * - the dataset serves no year of a matched entity and series that no row prints (the page's years, nothing more);
- * - every series the dataset serves for an entity the models cover has a row in some model.
- * The models cover the entities their rows match; the dataset's other entities are not checked.
+ * - every entity in `expectedEntityIds` (by default every entity the dataset serves) is covered by some row, and every
+ *   series the dataset serves for it has a row in some model.
+ * A test that builds the models of only some places names them in `expectedEntityIds`.
  */
 export function expectWorkbookParity(
   build: TopicDatasetBuild,
   models: readonly WorkbookExportModel[],
   match: (row: WorkbookReadableRow, model: WorkbookExportModel) => ParityTarget | null,
+  expectedEntityIds: readonly string[] = build.entities.map((entity) => entity.entityId),
 ): void {
   const served = new Map<string, Map<number, TopicFact>>();
   for (const fact of build.facts) {
@@ -53,7 +51,7 @@ export function expectWorkbookParity(
         problems.push(`${where}: no served series matches the row`);
         continue;
       }
-      const { entityId, seriesId, scale = 1 } = target;
+      const { entityId, seriesId } = target;
       covered.add(entityId);
       const cells = served.get(key(entityId, seriesId));
       if (!cells) {
@@ -68,13 +66,16 @@ export function expectWorkbookParity(
         const value = cells.get(year)?.value ?? null;
         if (printed === null && value !== null) problems.push(`${where} ${year}: the page prints nothing, ${entityId} ${seriesId} serves ${value}`);
         else if (printed !== null && value === null) problems.push(`${where} ${year}: the page prints ${printed}, ${entityId} ${seriesId} serves nothing`);
-        else if (printed !== null && value !== null && !near(value, printed * scale)) problems.push(`${where} ${year}: the page prints ${printed} (× ${scale}), ${entityId} ${seriesId} serves ${value}`);
+        else if (printed !== null && value !== null && !near(value, printed)) problems.push(`${where} ${year}: the page prints ${printed}, ${entityId} ${seriesId} serves ${value}`);
       }
     }
   }
+  if (!covered.size) problems.push("no workbook row matched a served series");
+  const expected = new Set(expectedEntityIds);
+  for (const entityId of expected) if (!covered.has(entityId)) problems.push(`${entityId}: no workbook row covers the entity`);
   for (const [cellKey, cells] of served) {
     const [entityId, seriesId] = cellKey.split("\u0000") as [string, string];
-    if (!covered.has(entityId)) continue;
+    if (!expected.has(entityId) && !covered.has(entityId)) continue;
     const years = printedYears.get(cellKey);
     if (!years) {
       problems.push(`${entityId} ${seriesId}: served, but no workbook row prints it`);
