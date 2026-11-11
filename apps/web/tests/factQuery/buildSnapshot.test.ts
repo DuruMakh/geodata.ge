@@ -63,11 +63,10 @@ describe("buildFactQuerySnapshot", () => {
     expect(snapshot.sources.filter(source => HEALTH_PUBLIC_SOURCES.map(healthSourceDocumentId).includes(source.sourceId)).map(source => source.sourceId)).toEqual(snapshot.topics.sourceIds.filter(id => HEALTH_PUBLIC_SOURCES.map(healthSourceDocumentId).includes(id)));
     expect(snapshot.sources.some(source => CRIME_PUBLIC_SOURCES.map(crimeSourceDocumentId).includes(source.sourceId))).toBe(false);
     expect(snapshot.sources.some(source => EXTERNAL_POSITION_PUBLIC_SOURCES.map(externalPositionSourceDocumentId).includes(source.sourceId))).toBe(false);
-    expect(snapshot.sources.some(source => source.sourceId.startsWith("source.geostat_housing_"))).toBe(false);
     expect(snapshot.sources.some(source => source.sourceId.startsWith("source.geostat_gdp_use_"))).toBe(false);
-    // All 21 registered housing sources are in the registry, and none of them reaches the snapshot.
+    // All 21 registered housing sources are in the registry, and only those a topic page's facts cite reach the snapshot.
     expect(HOUSING_PUBLIC_SOURCES.map(housingSourceDocumentId).filter(id => !sources.some(source => source.sourceId === id))).toEqual([]);
-    expect(snapshot.sources.some(source => HOUSING_PUBLIC_SOURCES.map(housingSourceDocumentId).includes(source.sourceId))).toBe(false);
+    expect(snapshot.sources.filter(source => HOUSING_PUBLIC_SOURCES.map(housingSourceDocumentId).includes(source.sourceId)).map(source => source.sourceId)).toEqual(snapshot.topics.sourceIds.filter(id => HOUSING_PUBLIC_SOURCES.map(housingSourceDocumentId).includes(id)));
     // All 36 registered internet sources are in the registry, and none of them reaches the snapshot.
     expect(INTERNET_PUBLIC_SOURCES.map(internetSourceDocumentId).filter(id => !sources.some(source => source.sourceId === id))).toEqual([]);
     expect(snapshot.sources.some(source => INTERNET_PUBLIC_SOURCES.map(internetSourceDocumentId).includes(source.sourceId))).toBe(false);

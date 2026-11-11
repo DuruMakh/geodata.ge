@@ -1126,7 +1126,7 @@ function placeWordsIn(words: string[], entities: EntityEntry[]): boolean[] {
 
 /**
  * Whether `word` meets every word of a page's own name in either language ("pension" names Pensions, not Funded
- * pension), or with `some`, any word of it ("prices" meets Home prices).
+ * pension), or with `some`, any word of it ("road" meets Road accidents).
  */
 function namesPage(word: string, page: WebsitePage, some = false): boolean {
   return [page.name.ka, page.name.en].some((name) => {
@@ -1141,13 +1141,13 @@ function namesPage(word: string, page: WebsitePage, some = false): boolean {
  * 1. the pages of the whole search (`websitePagesFor`);
  * 2. failing that, when the answer is empty or only some words matched (`partial`), the pages of the search without
  *    its place words, which no page names; the website's own search sets a place apart the same way (`runWords`), so
- *    "home prices Tbilisi" links the Home prices page;
+ *    "crimes Tbilisi" links the Recorded crimes page;
  * 3. failing that too, the pages of each word, best first by how many of the words they meet: all the pages of an
- *    `unserved` word ("building permits in regions"), and the page a `programme` word names in full. A search a
- *    served topic dataset answers ("hospitals in Kutaisi", "average pension", "unemployment among women") links no page
- *    of that topic: its dataset is the answer. A `served` word looks for no page, as it is the served data's own word
- *    ("spending", "city", "food"), but still counts in the order; a `datasetPage` word links only pages of one topic
- *    whose names hold it ("house prices" links Home prices); a `dataset` word neither looks nor counts.
+ *    `unserved` word ("recorded road accidents"), and the page a `programme` word names in full. A search a served
+ *    topic dataset answers ("hospitals in Kutaisi", "average pension", "unemployment among women", "home prices
+ *    Tbilisi") links no page of that topic: its dataset is the answer. A `served` word looks for no page, as it is the
+ *    served data's own word ("spending", "city", "food"), but still counts in the order; a `datasetPage` word links only
+ *    pages of one topic whose names hold it; a `dataset` word neither looks nor counts.
  * A phrase answered in full, with every word, links only the pages of the whole search. `kinds` is aligned with `words`,
  * the search's words as `searchCatalogue` reads them.
  */
@@ -1167,8 +1167,8 @@ function websitePagesForSearch(
   if (content.length < 2) return [];
   const looking = content.filter((index) => words[index]!.length >= 3 && kinds[index] !== "dataset");
   const pagesOf = new Map(looking.map((index) => [index, websitePagesFor(snapshot, words[index]!)]));
-  // A `datasetPage` word links the pages its word is in the name of, when those are all one topic's: "prices" links
-  // Home prices, while "overview" (trade, unemployment, wages) and "consumer" (no page's name) link none.
+  // A `datasetPage` word links the pages its word is in the name of, when those are all one topic's: "overview" (trade
+  // and others) and "consumer" (no page's name) link none.
   const ownPages = (index: number) => {
     const named = pagesOf.get(index)!.filter((page) => namesPage(words[index]!, page, true));
     return new Set(named.map((page) => page.topic)).size === 1 ? named : [];
@@ -1329,8 +1329,8 @@ export function describeCoverage(snapshot: FactQuerySnapshot, rawInput: unknown)
       if (placeWords[index]) return "place";
       if (labelled[index]!.length > 0) {
         // A word that only a dataset's label holds ("prices") is that dataset's word beside one of its own entries
-        // ("bread prices", "fuel prices"), but may name a page beside a word the served data holds elsewhere too
-        // ("house prices" links Home prices). Datasets of one scope (consumer prices) count as one.
+        // ("bread prices", "fuel prices"), but may name a page beside a word the served data holds elsewhere too.
+        // Datasets of one scope (consumer prices) count as one.
         const scopes = new Set(labelled[index]!.map(scopeOf));
         const others = words.flatMap((_, other) => (other !== index && !placeWords[other] && matchesByWord[other]!.length > 0 ? [matchesByWord[other]!] : []));
         const besideOwnEntry = others.some((found) => found.every((entry) => scopes.has(scopeOf(entry.datasetId))));

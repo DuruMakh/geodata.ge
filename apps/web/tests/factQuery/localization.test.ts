@@ -99,11 +99,11 @@ describe("snapshot-pinned translations", () => {
         expect(document.attribution === null).toBe(document.attributionEn === null);
         // World Bank JSON, sector originals and English inflation originals (whose Georgian
         // twins sit beside them in the archive) declare their language, as do the Education and
-        // Health, Labour Force Survey, earnings and business workbooks and NBG's money and banks workbooks the topic pages cite
+        // Health, Labour Force Survey, earnings, business, household survey, poverty and housing workbooks and NBG's money and banks workbooks the topic pages cite
         // (English tables), and the SSA pages and
         // Pension Fund documents the Social protection pages cite (Georgian, but the 2025 IFRS
         // statements in English; SSA's high-mountain, IDP, maternity and other pages declare none).
-        const english = /^(source\.(wb_gdp_|geostat_sector_|geostat_regional_gdp|geostat_cpi_|geostat_core_|geostat_basket_weights|geostat_product_|geostat_demography_|geostat_census2024_|nbg_inflation_target)|geostat_education_|geostat_health_|geostat_death|geostat_lfs_|geostat_earnings_|geostat_business_|nbg_(money|loan|deposit|policy|fsi)|pension_fund_ifrs_2025$)/;
+        const english = /^(source\.(wb_gdp_|geostat_sector_|geostat_regional_gdp|geostat_cpi_|geostat_core_|geostat_basket_weights|geostat_product_|geostat_demography_|geostat_census2024_|nbg_inflation_target)|geostat_education_|geostat_health_|geostat_death|geostat_lfs_|geostat_earnings_|geostat_business_|geostat_household_|geostat_poverty_|geostat_gini$|geostat_housing_|nbg_(money|loan|deposit|policy|fsi)|pension_fund_ifrs_2025$)/;
         const georgian = /^(ssa_(statistics|pension|socpackage|tsa_allowance|tsa_db|compensation|utilitysubsidy|demography|workinjury)$|pension_fund_)/;
         expect(document.documentLanguage).toBe(english.test(document.documentId) ? 'en' : georgian.test(document.documentId) ? 'ka' : null);
       }

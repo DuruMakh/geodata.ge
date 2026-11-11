@@ -35,6 +35,7 @@
   "poverty.unitPercent": "%",
   "poverty.unitPercentLong": "% of population",
   "poverty.unitIndex": "Gini coefficient (0–1)",
+  "poverty.unitIndexPlain": "index",
   "poverty.latest.rates": "Share of people below the poverty line",
   "poverty.latest.inequality": "Gini coefficient by total income",
   "poverty.latest.relative": "Below 60% of median consumption",

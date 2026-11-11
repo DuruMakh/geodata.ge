@@ -120,10 +120,10 @@ describe("search finds topic datasets, series, headings and places in both langu
 
   it("links no website page for a topic it serves, and keeps links for pages it does not", () => {
     const served = new Set(snapshot.topics.datasets.map((dataset) => dataset.urlKa));
-    for (const search of ["schools", "სკოლა", "kindergartens", "education", "უმუშევრობა", "wages", "housing."]) {
+    for (const search of ["schools", "სკოლა", "kindergartens", "education", "უმუშევრობა", "wages", "housing.", "crime."]) {
       for (const page of dataOf(snapshot, { search }).websitePages ?? []) expect(served.has(page.urlKa), `${search}: ${page.urlKa}`).toBe(false);
     }
-    expect((dataOf(snapshot, { search: "housing." }).websitePages ?? []).map((page) => page.topicId)).toContain("housing");
+    expect((dataOf(snapshot, { search: "crime." }).websitePages ?? []).map((page) => page.topicId)).toContain("crime");
     expect(dataOf(snapshot, { search: "zzzznotathing" })).not.toHaveProperty("websitePages");
   });
 });

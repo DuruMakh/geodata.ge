@@ -332,14 +332,14 @@ describe("search understands Georgian case endings", () => {
 // A topic the website shows and this connection does not serve: the search says where the page is,
 // and carries no figure (spec: 2026-10-29 MCP audit, F01).
 describe("search points to website pages the connection does not serve", () => {
-  const firstHousingPage = topicHub("housing").sections[0]!.href;
+  const firstCrimePage = topicHub("crime").sections[0]!.href;
 
-  it("answers housing. with the housing pages and no series", () => {
-    const result = describeCoverage(snapshot, { search: "housing." });
+  it("answers crime. with the crime pages and no series", () => {
+    const result = describeCoverage(snapshot, { search: "crime." });
     const pages = data(result).websitePages ?? [];
-    expect(pages[0]?.topicId).toBe("housing");
-    expect(pages[0]?.urlEn).toBe(`https://fiscal.ge/en${firstHousingPage}`);
-    expect(pages[0]?.urlKa).toBe(`https://fiscal.ge${firstHousingPage}`);
+    expect(pages[0]?.topicId).toBe("crime");
+    expect(pages[0]?.urlEn).toBe(`https://fiscal.ge/en${firstCrimePage}`);
+    expect(pages[0]?.urlKa).toBe(`https://fiscal.ge${firstCrimePage}`);
     expect(pages.length).toBeLessThanOrEqual(5);
     expect(data(result).websitePagesNoteEn).toContain("never quote a figure from memory");
     expect(data(result).websitePagesNoteKa).toBeTruthy();
@@ -430,7 +430,8 @@ describe("search points to website pages the connection does not serve", () => {
 });
 
 // Owner review of the F01 fix: a price word, a place beside a topic, and a phrase that matches nothing in full still
-// reach the right page, and the money-supply noise the whole-phrase rule removed stays gone (Money supply is served now).
+// reach the right page, and the money-supply noise the whole-phrase rule removed stays gone (Money supply, Home prices
+// and Building permits are served now, so their phrases answer with data).
 describe("search links the topic page behind a phrase", () => {
   const topicsOf = (search: string) => (data(describeCoverage(snapshot, { search })).websitePages ?? []).map((page) => page.topicId);
 
@@ -441,11 +442,10 @@ describe("search links the topic page behind a phrase", () => {
   });
 
   // A place is no page's word, as the website's own search drops it; a topic word that also meets some served series
-  // ("prices" meets Consumer price inflation) still finds its page; and a phrase whose answer is empty still looks word
-  // by word.
+  // ("road" meets a road programme) still finds its page; and a phrase whose answer is empty still looks word by word.
   it.each([
-    ["home prices Tbilisi", "housing"],
-    ["building permits in regions", "housing"],
+    ["crimes Tbilisi", "crime"],
+    ["road accidents in regions", "crime"],
   ])("links %s to the %s topic", (search, topic) => {
     const topics = topicsOf(search);
     expect(topics.length).toBeGreaterThan(0);
@@ -466,6 +466,12 @@ describe("search links the topic page behind a phrase", () => {
     ["საბანკო სესხები", "money-loans-deposits", "loans.total"],
     ["unemployment among women", "unemployment-overview", "unemployment_rate.women"],
     ["საშუალო თვიური ხელფასი", "wages-overview", "average_monthly_nominal_earnings"],
+    ["home prices Tbilisi", "housing-prices", "housing.price_index.total"],
+    ["building permits in regions", "housing-permits", "housing.permits_count.total"],
+    ["household income", "living-standards-income", "income.total.per_household"],
+    ["poverty", "living-standards-poverty", "poverty.absolute"],
+    ["სიღარიბე", "living-standards-poverty", "poverty.absolute"],
+    ["Gini", "living-standards-inequality", "gini.total_income"],
   ])("answers %s with the dataset it serves and no page link of its topic", (search, datasetId, seriesId) => {
     const found = data(describeCoverage(snapshot, { search }));
     expect(found.series?.[0]).toMatchObject({ datasetId, seriesId });
@@ -479,8 +485,8 @@ describe("search links the topic page behind a phrase", () => {
   });
 
   it("puts the page that meets the most words first", () => {
-    const pages = data(describeCoverage(snapshot, { search: "building permits in regions" })).websitePages ?? [];
-    expect(pages.map((page) => page.labelEn)).toEqual(["Building permits", "Completed buildings"]);
+    const pages = data(describeCoverage(snapshot, { search: "recorded road accidents" })).websitePages ?? [];
+    expect(pages.map((page) => page.labelEn)).toEqual(["Road accidents", "Recorded crimes"]);
   });
 
   // "rate" meets the debt interest rates and links pages of two topics, so it names no page by itself.
@@ -489,8 +495,8 @@ describe("search links the topic page behind a phrase", () => {
   });
 
   // A trailing full stop is punctuation, not an id: only a word, a "." or "_", and a word again looks like one.
-  it("reads housing. as the word housing", () => {
-    expect(topicsOf("housing.")[0]).toBe("housing");
+  it("reads crime. as the word crime", () => {
+    expect(topicsOf("crime.")[0]).toBe("crime");
   });
 });
 
@@ -527,8 +533,13 @@ describe("search links no page of another subject", () => {
     expect(pagesOf("შიდა ქართლის სკოლები").map((page) => page.labelEn)).not.toContain("Schools");
   });
 
-  it.each(["house prices", "Tbilisi house prices"])("links the home prices page for %s", (search) => {
-    expect(pagesOf(search).map((page) => page.labelEn)).toContain("Home prices");
+  // Spec §5.4: the Home prices page is served, so a qualified price word answers with its dataset, not a link to it.
+  it.each([
+    ["house prices", "housing.price_index.houses"],
+    ["Tbilisi house prices", "housing.price_house.district_gldani"],
+  ])("answers %s with the home prices dataset and no housing page link", (search, seriesId) => {
+    expect(data(describeCoverage(snapshot, { search })).series?.[0]).toMatchObject({ datasetId: "housing-prices", seriesId });
+    expect(pagesOf(search).map((page) => page.topicId)).not.toContain("housing");
   });
 });
 

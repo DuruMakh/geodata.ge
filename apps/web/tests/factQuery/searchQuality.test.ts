@@ -3,7 +3,8 @@
 // describe_coverage search quality (audit finding F08): the 139 hand-labelled queries of the audit, scored the way the
 // audit's score.mjs scored them. A query is "full recall" when every id in `req` is returned; a returned id is a false
 // positive when it is neither in `req` nor accepted by `ok`, and an inside-word one when no query word starts any word
-// of the entry's fields (the entry matched only on letters in the middle of a word).
+// of the entry's fields, a topic series' heading and dataset title among them (the entry matched only on letters in the
+// middle of a word).
 import { beforeAll, describe, expect, it } from "vitest";
 import { testSnapshot } from "../helpers/factQuerySnapshot";
 import { describeCoverage, searchCatalogue } from "../../lib/factQuery/describeCoverage";
@@ -23,16 +24,22 @@ beforeAll(() => {
 
 const searchMatchOf = (response: ReturnType<typeof describeCoverage>) => (response as { data: { searchMatch?: string } }).data.searchMatch;
 
+/** A topic dataset's titles, which its series are searched under too. */
+const topicTitles = (datasetId: string | undefined) => {
+  const dataset = snapshot.topics.datasets.find((entry) => entry.page.datasetId === datasetId);
+  return dataset ? [dataset.titleKa, dataset.titleEn] : [];
+};
+
 function search(query: string): Found {
   const response = describeCoverage(snapshot, { search: query });
   if (response.kind !== "catalogue") throw new Error(`expected a catalogue for ${query}`);
   const data = response.data as {
     searchMatch?: string;
-    series?: { seriesId: string; labelKa: string; labelEn: string }[];
+    series?: { seriesId: string; labelKa: string; labelEn: string; headingKa?: string; headingEn?: string; datasetId?: string }[];
     entities?: { entityId: string; labelKa: string; labelEn: string; entitySlug: string | null }[];
   };
   const hits: Hit[] = [
-    ...(data.series ?? []).map((s) => ({ key: s.seriesId, label: `${s.seriesId} | ${s.labelEn} | ${s.labelKa}`, fields: [s.seriesId, s.labelKa, s.labelEn] })),
+    ...(data.series ?? []).map((s) => ({ key: s.seriesId, label: `${s.seriesId} | ${s.labelEn} | ${s.labelKa}`, fields: [s.seriesId, s.labelKa, s.labelEn, s.headingKa ?? null, s.headingEn ?? null, ...topicTitles(s.datasetId)] })),
     ...(data.entities ?? []).map((e) => ({ key: `E:${e.entityId}`, label: `E:${e.entityId} | ${e.labelEn} | ${e.labelKa}`, fields: [e.entityId, e.labelKa, e.labelEn, e.entitySlug] })),
   ];
   return { status: response.status, searchMatch: data.searchMatch, hits };
@@ -216,11 +223,11 @@ describe("a some-words answer says that only some words matched", () => {
     expect(found).not.toHaveProperty("searchMatchNoteKa");
   });
 
-  it("links the poverty page for poverty rate, whose word rate alone matched served series", () => {
-    const poverty = snapshot.website.pages.find((page) => page.name.en === "Poverty")!;
-    const pages = dataOf(describeCoverage(snapshot, { search: "poverty rate" })).websitePages ?? [];
-    expect(pages.map((page) => page.urlKa)).toContain(poverty.urlKa);
-    for (const page of pages) expect(page.topicId).toBe("living-standards");
+  // Spec §5.4: the Poverty page is served, so "poverty rate" answers with its dataset's rates, not a link to the page.
+  it("lists the served poverty rates first for poverty rate, and links no page of their topic", () => {
+    const found = describeCoverage(snapshot, { search: "poverty rate" }) as { data: Noted & { series: { seriesId: string; datasetId?: string }[] } };
+    expect(found.data.series[0]).toMatchObject({ datasetId: "living-standards-poverty", seriesId: "poverty.absolute" });
+    expect((found.data.websitePages ?? []).map((page) => page.topicId)).not.toContain("living-standards");
   });
 
   it("validates against the published describe_coverage output schema", () => {
