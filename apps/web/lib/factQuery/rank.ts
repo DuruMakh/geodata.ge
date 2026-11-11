@@ -24,7 +24,7 @@ import { queryMunicipal } from "./queryMunicipal";
 import { queryNational } from "./queryNational";
 import { INPUT_LIMITS, RANK_CORE_DATASETS, rankInput } from "./schemas";
 import { selectSources } from "./sources";
-import { topicPeriodLabel } from "./topics/store";
+import { isTopicPercentUnit, topicPeriodLabel } from "./topics/store";
 import { AGGREGATE_ONLY_MUNICIPAL_CODES } from "./types";
 import type { Comparison } from "./compare";
 import type { Observation } from "./observations";
@@ -290,7 +290,8 @@ export function rank(snapshot: FactQuerySnapshot, rawInput: unknown): FactQueryR
     });
   }
 
-  if (!isValueMetric) {
+  // A topic dataset ranks by value only; whether its series are percents waits for the series (below).
+  if (!isValueMetric && !topicDataset) {
     const wantsPercentagePoints = input.metric === "percentage_point_change";
     const measureIsPercentage = PERCENTAGE_MEASURES.has(input.measure);
     if (wantsPercentagePoints && !measureIsPercentage) {
@@ -406,6 +407,13 @@ export function rank(snapshot: FactQuerySnapshot, rawInput: unknown): FactQueryR
         .map((entry) => entry.seriesId)
         .sort();
       universeKey = "ranking.topicSeries";
+    }
+    // A percent series (its unit says so) changes in percentage points only, as a core rate does.
+    const units = topicDataset.series.filter((entry) => seriesIds.includes(entry.seriesId)).map((entry) => entry.unit);
+    const percent = units.length > 0 && units.every(isTopicPercentUnit);
+    if (!isValueMetric && (input.metric === "percentage_point_change") !== percent) {
+      const key = percent ? "errors.rankAmountChanges" : "errors.rankPercentagePoints";
+      return errorResponse(snapshot, { code: "unsupported_measure", messageKa: serviceMessage(snapshot, "ka", key), messageEn: serviceMessage(snapshot, "en", key), retryable: false });
     }
   } else {
     const series = isProduct ? [] : catalogueSeries(snapshot, input.datasetId as DatasetId);

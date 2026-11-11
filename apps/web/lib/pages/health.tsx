@@ -1,6 +1,7 @@
 import { HealthExplorer } from "../../components/health/health-explorer";
-import { loadServedHealthData, toClientHealthFact } from "../data/health/importHealth";
-import { HEALTH_SECTIONS, healthViews, healthViewSeries, type HealthNationalSectionId } from "../explorer/health";
+import { loadServedHealthData } from "../data/health/importHealth";
+import { HEALTH_SECTIONS, type HealthNationalSectionId } from "../explorer/health";
+import { healthNationalPageData } from "../explorer/healthPageData";
 import { getPresentation } from "../i18n/presentation.server";
 import { message } from "../i18n/messages";
 import type { Locale } from "../i18n/types";
@@ -12,13 +13,8 @@ const sectionHref = (section: HealthNationalSectionId) => HEALTH_SECTIONS.find(i
 /** Doctors and hospitals or Illnesses: Georgia's figures, every view's series. */
 export async function renderHealthPage(locale: Locale, section: HealthNationalSectionId) {
   const [data, presentation] = await Promise.all([loadServedHealthData(), getPresentation(locale, ["health", "format", "main", "workbook"], [])]);
-  // Each page receives only the observations its series show, and only the counting changes that touch them.
-  const ids = new Set<string>(healthViews(section).flatMap(view => healthViewSeries(section, view).map(series => series.id)));
-  const served = data.facts.filter(f => f.areaId === "georgia" && ids.has(f.indicatorId));
-  const facts = served.map(toClientHealthFact);
-  const breaks = data.breaks.filter(item => item.appliesTo.some(id => ids.has(id)));
+  const { served, facts, breaks, labels } = healthNationalPageData(data, presentation.messages, section);
   const t = (key: string) => message(presentation.messages, `health.${key}`);
-  const labels = Object.fromEntries([...ids].map(id => [id, t(`series.${id}`)]));
   const title = t(`page.${section}.title`);
   const lastReviewedAt = served.map(f => f.lastReviewedAt).sort().at(-1)!;
   return renderHealthFrame({

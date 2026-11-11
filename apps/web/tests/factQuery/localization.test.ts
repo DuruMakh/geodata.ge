@@ -98,9 +98,13 @@ describe("snapshot-pinned translations", () => {
         expect(document.attribution === null).toBe(document.attributionKa === null);
         expect(document.attribution === null).toBe(document.attributionEn === null);
         // World Bank JSON, sector originals and English inflation originals (whose Georgian
-        // twins sit beside them in the archive) declare their language, as do the Education
-        // workbooks the topic pages cite (English Geostat tables).
-        expect(document.documentLanguage).toBe(/^(source\.(wb_gdp_|geostat_sector_|geostat_regional_gdp|geostat_cpi_|geostat_core_|geostat_basket_weights|geostat_product_|geostat_demography_|geostat_census2024_|nbg_inflation_target)|geostat_education_)/.test(document.documentId) ? 'en' : null);
+        // twins sit beside them in the archive) declare their language, as do the Education and
+        // Health workbooks the topic pages cite (English Geostat tables), and the SSA pages and
+        // Pension Fund documents the Social protection pages cite (Georgian, but the 2025 IFRS
+        // statements in English; SSA's high-mountain, IDP, maternity and other pages declare none).
+        const english = /^(source\.(wb_gdp_|geostat_sector_|geostat_regional_gdp|geostat_cpi_|geostat_core_|geostat_basket_weights|geostat_product_|geostat_demography_|geostat_census2024_|nbg_inflation_target)|geostat_education_|geostat_health_|geostat_death|pension_fund_ifrs_2025$)/;
+        const georgian = /^(ssa_(statistics|pension|socpackage|tsa_allowance|tsa_db|compensation|utilitysubsidy|demography|workinjury)$|pension_fund_)/;
+        expect(document.documentLanguage).toBe(english.test(document.documentId) ? 'en' : georgian.test(document.documentId) ? 'ka' : null);
       }
     }
     expect(Object.keys(snapshot.localization.messages.en).some(key => /^(sources|documents)\./.test(key))).toBe(false);

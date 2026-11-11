@@ -1297,15 +1297,16 @@ export function describeCoverage(snapshot: FactQuerySnapshot, rawInput: unknown)
     const titleFields = (entry: SeriesEntry & { datasetId: AnyDatasetId }) => (entry.level === LEVEL_TOTAL && !isCoreDataset(entry.datasetId) ? datasetLabels.get(entry.datasetId)! : []);
     const found = searchSeriesAndEntities(search, taggedSeries, taggedEntities, (entry) => datasetLabels.get(entry.datasetId)!, titleFields);
     const { entities: foundEntities, searchMatch, words, wordMatches: matchesByWord } = found;
-    // A topic dataset whose title meets every word of the search comes first: its series are what was asked for.
-    const titled = searchMatch === "all_words" ? searchCatalogue(search, eligibleDatasets.filter((id) => !isCoreDataset(id)), (id) => datasetLabels.get(id)!) : undefined;
+    // A topic dataset whose title meets every word of the search, as typed (a whole-query alias names budget programmes,
+    // not a page: "pension" is still Pensions), comes first and is listed: its series are what was asked for.
+    const titled = searchMatch === "all_words" ? searchCatalogue(search, eligibleDatasets.filter((id) => !isCoreDataset(id)), (id) => datasetLabels.get(id)!, { aliases: false }) : undefined;
     const titledIds = new Set<AnyDatasetId>(titled?.searchMatch === "all_words" ? titled.matches : []);
     const foundSeries = titledIds.size > 0 ? [...found.series.filter((entry) => titledIds.has(entry.datasetId)), ...found.series.filter((entry) => !titledIds.has(entry.datasetId))] : found.series;
 
     // A search is a lookup, so it answers with what matched: the datasets the
     // matches belong to and any excluded code it names, not the whole
     // catalogue, which the no-argument call already returns.
-    const matchedDatasets = new Set<AnyDatasetId>([...foundSeries, ...foundEntities].map((entry) => entry.datasetId));
+    const matchedDatasets = new Set<AnyDatasetId>([...[...foundSeries, ...foundEntities].map((entry) => entry.datasetId), ...titledIds]);
     // The website's pages that this service does not serve: a topic the site shows and the catalogue does not hold gets
     // a link to its page instead of a dead end. Links only; the status stays the series' own. What each word is to
     // the page search comes from the search above, the entities' names and one small search of the datasets' labels

@@ -110,6 +110,14 @@ describe("search finds topic datasets, series, headings and places in both langu
     }
   });
 
+  it("finds the Pensions dataset first when searching pension, in both languages", () => {
+    for (const search of ["პენსია", "პენსიები", "pensions", "pension"]) {
+      const found = dataOf(snapshot, { search });
+      expect(found.datasets[0]?.datasetId, search).toBe("health-pensions");
+      expect(found.datasets.map((dataset) => dataset.datasetId), search).toContain("health-funded-pension");
+    }
+  });
+
   it("links no website page for a topic it serves, and keeps links for pages it does not", () => {
     const served = new Set(snapshot.topics.datasets.map((dataset) => dataset.urlKa));
     for (const search of ["schools", "სკოლა", "kindergartens", "education", "უმუშევრობა", "wages"]) {

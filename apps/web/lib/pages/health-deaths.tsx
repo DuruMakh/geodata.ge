@@ -1,8 +1,9 @@
 import { notFound } from "next/navigation";
 import { HealthDeathsExplorer } from "../../components/health/health-deaths-explorer";
-import { loadServedHealthData, toClientHealthFact } from "../data/health/importHealth";
+import { loadServedHealthData } from "../data/health/importHealth";
 import { HEALTH_SECTIONS } from "../explorer/health";
 import { HEALTH_DEATH_AREAS, healthDeathsAreaForSlug, healthDeathsAreaHref, healthDeathsSeries } from "../explorer/healthDeaths";
+import { healthDeathsAreaPageData } from "../explorer/healthPageData";
 import { getPresentation } from "../i18n/presentation.server";
 import { message } from "../i18n/messages";
 import type { Locale } from "../i18n/types";
@@ -35,11 +36,8 @@ export async function healthDeathsAreaPageMetadata(locale: Locale, slug: string)
 export async function renderHealthDeathsAreaPage(locale: Locale, slug: string) {
   const area = areaForSlug(slug);
   const [data, presentation] = await Promise.all([loadServedHealthData(), getPresentation(locale, ["health", "regionalEconomies", "format", "main", "workbook"], HEALTH_DEATH_AREAS, HEALTH_DEATH_AREAS)]);
-  const ids = new Set<string>(healthDeathsSeries().map(series => series.id));
-  const served = data.facts.filter(f => f.areaId === area && ids.has(f.indicatorId));
-  const facts = served.map(toClientHealthFact);
+  const { served, facts, labels } = healthDeathsAreaPageData(data.facts, presentation.messages, area);
   const t = (key: string, values?: Record<string, string>) => message(presentation.messages, `health.${key}`, values);
-  const labels = Object.fromEntries([...ids].map(id => [id, t(`series.${id}`)]));
   const areaLabels = healthAreaLabels(presentation), region = areaLabels[area];
   const sectionTitle = t("page.causes-of-death.title");
   return renderHealthFrame({

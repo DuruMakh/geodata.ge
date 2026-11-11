@@ -16,11 +16,13 @@ import { findSourceProvenanceFailures, resolvePublicSources } from "../sources";
 import type { Basis, RawResolvedSource } from "../types";
 import { demographyTopicAdapter } from "./demography";
 import { educationTopicAdapter } from "./education";
+import { healthTopicAdapter } from "./health";
 import { TOPIC_PAGES } from "./pages";
+import { socialTopicAdapter } from "./social";
 import { packTopicFacts } from "./store";
 import type { TopicAdapter, TopicDataset, TopicDatasetBuild, TopicsSnapshot, TopicValueStatus } from "./types";
 
-export const TOPIC_ADAPTERS: readonly TopicAdapter[] = [educationTopicAdapter, demographyTopicAdapter];
+export const TOPIC_ADAPTERS: readonly TopicAdapter[] = [educationTopicAdapter, demographyTopicAdapter, healthTopicAdapter, socialTopicAdapter];
 
 /**
  * The site's own message for each unit token the topic CSVs use (R7: unit ids are the CSVs' tokens). One name per
@@ -37,6 +39,15 @@ const TOPIC_UNIT_MESSAGES: Readonly<Record<string, string>> = {
   years: "demography.lifeUnit",
   marriages: "demography.marriageLatestMarriages",
   divorces: "demography.marriageLatestDivorces",
+  units: "health.unitUnits",
+  units_thousand: "health.unitThousandBeds",
+  visits_thousand: "health.unitThousandVisits",
+  per_1000_population: "health.unitPerThousand",
+  families: "social.unitFamilies",
+  employers: "social.unitEmployers",
+  gel: "format.gel",
+  gel_million: "social.unitMlnGel",
+  percent: "social.unitReturn",
 };
 
 /** The source registry's id (data/sources/source-documents.csv) of an archive's source id: the registry adds `source.`, which some archives already carry. */

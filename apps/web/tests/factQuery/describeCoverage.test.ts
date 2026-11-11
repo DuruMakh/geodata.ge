@@ -346,12 +346,13 @@ describe("search points to website pages the connection does not serve", () => {
     expect(data(result).websitePagesNoteKa).toBeTruthy();
   });
 
-  it("keeps the served series for pension and adds the pensions page", () => {
+  it("keeps the served series for pension and lists the Pensions dataset, which it serves, instead of the page", () => {
     const result = describeCoverage(snapshot, { search: "pension" });
     expect(result.status).toBe("ok");
     expect((data(result).series ?? []).map((entry) => (entry as { labelEn?: string }).labelEn).join("|")).toMatch(/funded pension/i);
+    expect(data(result).datasets.map((dataset) => dataset.datasetId)[0]).toBe("health-pensions");
     const urls = (data(result).websitePages ?? []).map((page) => page.urlKa);
-    expect(urls).toContain("https://fiscal.ge/explorer/health/pensions");
+    expect(urls).not.toContain("https://fiscal.ge/explorer/health/pensions");
   });
 
   // The website's own search matches inside words from three letters and retries a Latin query on the Georgian
@@ -436,12 +437,10 @@ describe("search links the topic page behind a phrase", () => {
 
   // A place is no page's word, as the website's own search drops it; a topic word that also meets some served series
   // (Hospital services, School book, the funded-pension programme) still finds its page; and a phrase whose answer is
-  // empty still looks word by word. The last two are the reference-intent prompts (mcpAssistantIntents.ts).
+  // empty still looks word by word. The last one is a reference-intent prompt (mcpAssistantIntents.ts).
   it.each([
-    ["hospitals in Kutaisi", "health"],
     ["home prices Tbilisi", "housing"],
     ["unemployment among women", "unemployment"],
-    ["average pension in Georgia", "health"],
     ["საშუალო თვიური ხელფასი", "wages"],
   ])("links %s to the %s topic", (search, topic) => {
     const topics = topicsOf(search);
@@ -450,6 +449,14 @@ describe("search links the topic page behind a phrase", () => {
   });
 
   // Spec §5.4: a served topic returns its dataset and ids, not a websitePages link.
+  it.each([
+    ["hospitals in Kutaisi", "health-doctors-hospitals", "health.facilities.hospitals"],
+    ["average pension in Georgia", "health-pensions", "social.pension.avg_monthly"],
+  ])("answers %s with the health dataset it serves and no health page link", (search, datasetId, seriesId) => {
+    const found = data(describeCoverage(snapshot, { search }));
+    expect(found.series?.[0]).toMatchObject({ datasetId, seriesId });
+    expect(topicsOf(search)).not.toContain("health");
+  });
   it("answers ბათუმის სკოლები with the education-schools dataset and no education page link", () => {
     const found = data(describeCoverage(snapshot, { search: "ბათუმის სკოლები" }));
     expect(found.datasets.map((dataset) => dataset.datasetId)).toContain("education-schools");

@@ -9,30 +9,24 @@ import { BreadcrumbJsonLd } from "../../components/seo/breadcrumb-json-ld";
 import { JsonLd } from "../../components/seo/json-ld";
 import { PageHeader } from "../../components/shell/page-header";
 import { SocialPlaceExplorer } from "../../components/social/social-place-explorer";
-import { loadServedDemographyData } from "../data/demography/importDemography";
-import { SOURCE_ID } from "../data/demography/series";
-import { loadServedInflationData } from "../data/inflation/importInflation";
-import { loadServedMunicipalData } from "../data/servedData";
-import { loadServedSocialData, toClientSocialFact } from "../data/social/importSocial";
-import { FUNDED_PENSION_SOURCES, SOCIAL_GEORGIA, SOCIAL_PUBLIC_SOURCES, socialArchiveSourceId, type ClientSocialFact } from "../data/social/types";
+import { SOCIAL_GEORGIA, type ClientSocialFact } from "../data/social/types";
 import { coverageLabel } from "../explorer/coverageLabel";
-import { GEORGIA_PLACE_ID, TBILISI_PLACE_ID, buildDemographyPlaces, placeLabel, type DemographyPlace } from "../explorer/demographyAreas";
+import { GEORGIA_PLACE_ID, TBILISI_PLACE_ID, placeLabel, type DemographyPlace } from "../explorer/demographyAreas";
 import { placeHrefById, placeIdForRoute, placeNeighbours, placePageHref, type PlaceRoute } from "../explorer/demographyPlaceRoutes";
 import { formatInUnit, formatShare, UNIT_PERSONS } from "../explorer/format";
 import { buildPickerCountry, pickerGroupsFromRows } from "../explorer/municipalData";
-import { socialAnnualCpi, socialPopulation, type SocialPlaceSet } from "../explorer/social";
+import type { SocialPlaceSet } from "../explorer/social";
 import { buildSocialIndexModel } from "../explorer/socialIndex";
+import { loadSocialPlaceBasics, loadSocialWorkbookSources, socialPlacePageData } from "../explorer/socialPageData";
 import { socialPlaceBase, socialPlaceCoverage, socialPlaceDefaultSelection, socialPlaceFacts, socialPlaceSeries } from "../explorer/socialPlaces";
 import { latestOf } from "../explorer/unitList";
-import type { WorkbookPublicSource } from "../explorer/workbookModel";
 import { Message } from "../i18n/message";
 import { message } from "../i18n/messages";
 import { getMessages } from "../i18n/messages.server";
-import { clientPresentation, getPresentation } from "../i18n/presentation.server";
+import { clientPresentation } from "../i18n/presentation.server";
 import { I18nProvider } from "../i18n/provider";
 import { pageHref } from "../i18n/routes";
 import type { Locale, Messages, TemplateValues } from "../i18n/types";
-import { loadSourcedWorkbookSources, type SourcedWorkbookPublicSource } from "../methodology/workbookSources";
 import { fiscalMetadata } from "../seo/metadata";
 import { latestYearOf, placeInKa, placeTitleNameEn } from "../seo/placeTitleForms";
 import { explorerDatasetJsonLd } from "../seo/structuredData";
@@ -43,56 +37,10 @@ import { topicSection, ALL_DATA_PATH } from "../navigation/navTree";
 /** The same three kinds of place page as Population and Education, with the same 11 region ids and 63 municipality slugs. */
 export type SocialPlaceRoute = PlaceRoute;
 export { populationMunicipalityParams as socialMunicipalityParams, populationRegionParams as socialRegionParams } from "./demography-population-place";
+export { loadSocialWorkbookSources } from "../explorer/socialPageData";
 
 /** The methodology page the source lines link to. */
 const METHODOLOGY_PATH = "/methodology/social-protection";
-
-/**
- * What the index and the place pages share: the served facts and counting changes, the population and price index the
- * calculated rows divide by, the registries, the language and the place list.
- */
-async function loadSocialPlaceBasics(locale: Locale) {
-  const [{ facts: served, breaks }, demography, inflation, municipal, georgian] = await Promise.all([
-    loadServedSocialData(), loadServedDemographyData(), loadServedInflationData(), loadServedMunicipalData(), getMessages("ka", ["municipal"]),
-  ]);
-  const ids = [GEORGIA_PLACE_ID, ...municipal.regions.map(region => region.id), ...municipal.municipalities.map(m => m.code)];
-  // `municipal` is loaded for the map's and the picker's words (tabs, search, boundaries, member counts).
-  const presentation = await getPresentation(locale, ["social", "format", "main", "workbook", "municipal"], ids, ids);
-  const places = buildDemographyPlaces({
-    regions: municipal.regions, municipalities: municipal.municipalities, englishLabels: presentation.englishLabels, georgiaNameKa: message(georgian, "municipal.georgia"),
-  });
-  const lastReviewedAt = served.map(f => f.lastReviewedAt).sort().at(-1)!;
-  return {
-    facts: served.map(toClientSocialFact), breaks, population: socialPopulation(demography.facts), cpi: socialAnnualCpi(inflation.facts),
-    municipal, presentation, places, lastReviewedAt,
-  };
-}
-
-/**
- * The Excel Sources sheet's files, in the page's language: each SSA table the facts cite, as its archived topic page
- * (data/methodology/source-archives/social-protection.csv) under the table's own id, the Pension Fund's six documents (the funded
- * pension page's), and Geostat's population table (shares of residents) and price index (2025 prices) from the Population and
- * Inflation archives.
- */
-export async function loadSocialWorkbookSources(locale: Locale): Promise<{ ssa: SourcedWorkbookPublicSource[]; pensionFund: SourcedWorkbookPublicSource[]; population: WorkbookPublicSource[]; cpi: WorkbookPublicSource[] }> {
-  const cpiId = locale === "ka" ? "source.geostat_cpi_index_2010_ka" : "source.geostat_cpi_index_2010";
-  const [pages, population, cpi] = await Promise.all([
-    loadSourcedWorkbookSources("social-protection", locale, row => row.source_id.startsWith("ssa_") || row.source_id.startsWith("pension_fund_")),
-    loadSourcedWorkbookSources("demography", locale, row => row.source_id === SOURCE_ID.populationUnits),
-    loadSourcedWorkbookSources("inflation", locale, row => row.source_id === cpiId),
-  ]);
-  // Each SSA table is cited by its topic's archived page; a Pension Fund document is archived under its own id. The two lists stay apart so
-  // an SSA workbook is never offered the Pension Fund's PDFs, and a funded pension workbook none of SSA's pages.
-  const sourced = (sourceIds: readonly string[], what: string) => sourceIds.map(sourceId => {
-    const page = pages.find(row => row.sourceId === socialArchiveSourceId(sourceId));
-    if (!page) throw new Error(`No archived ${what} for ${sourceId}`);
-    return { ...page, sourceId };
-  });
-  return {
-    ssa: sourced(SOCIAL_PUBLIC_SOURCES.filter(sourceId => !FUNDED_PENSION_SOURCES.includes(sourceId)), "SSA page"),
-    pensionFund: sourced(FUNDED_PENSION_SOURCES, "Pension Fund document"), population, cpi,
-  };
-}
 
 /** The headings a set's pages list, named in the page's language: the measures the Dataset markup says the page shows. */
 function headingNames(messages: Messages, set: SocialPlaceSet): string[] {
@@ -210,9 +158,7 @@ export async function renderSocialPlacePage(route: SocialPlaceRoute, locale: Loc
   const base = socialPlaceBase(set);
   const href = (target: DemographyPlace) => pageHref(placePageHref(base, target.id), locale);
   const index = buildSocialIndexModel(set, facts, population, municipal.regions, municipal.municipalities);
-  const series = socialPlaceSeries(set);
-  const placeFacts = facts.filter(f => f.geographyId === place.id && series.some(({ id }) => id === f.indicatorId));
-  const placePopulation = population.filter(row => row.geographyId === place.id);
+  const { facts: placeFacts, population: placePopulation, labels, headingLabels } = socialPlacePageData({ facts, population }, messages, set, place.id);
   const headline = latestOf(placeFacts, socialPlaceDefaultSelection(set)[0], place.id);
   const name = placeLabel(place, locale);
   const { min, max } = socialPlaceCoverage(set, place.id, socialPlaceFacts(set, place.id, placeFacts, { population: placePopulation, cpi }));
@@ -266,8 +212,8 @@ export async function renderSocialPlacePage(route: SocialPlaceRoute, locale: Loc
           population={placePopulation}
           cpi={cpi}
           breaks={breaks}
-          labels={Object.fromEntries(series.map(({ id }) => [id, t(`series.${id}`)]))}
-          headingLabels={Object.fromEntries(series.map(({ heading }) => [heading, t(`heading.${heading}`)]))}
+          labels={labels}
+          headingLabels={headingLabels}
           title={t(`place.headingLead.${set}`)}
           metaLine={<Message messages={messages} id={`social.latest.place.${set}`} values={{ period: headline.year, value: <LatestFigure value={countLabel(headline)} /> }} />}
           navigation={navigation}

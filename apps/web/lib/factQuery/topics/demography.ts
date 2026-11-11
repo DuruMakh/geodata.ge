@@ -23,16 +23,17 @@ import { vitalFactsForPlace } from "../../explorer/demographyVital";
 import { loadPopulationBasics } from "../../explorer/populationBasics.server";
 import { message } from "../../i18n/messages";
 import type { Messages } from "../../i18n/types";
+import type { Basis } from "../types";
 import { loadTopicBreaks } from "./breaks";
 import { placeEntity } from "./education";
 import { TOPIC_PAGES } from "./pages";
 import type { TopicAdapter, TopicBreak, TopicDatasetBuild, TopicEntity, TopicFact, TopicPage, TopicSeries, TopicValueStatus } from "./types";
 
 /** A name in both languages: a message key read in each, or text built from the page's own words in each. */
-type Names = { ka: string; en: string };
-/** One served cell's value, the rows it rests on and whether the page adds them up itself. */
-type Cell = { value: number; unit: string; sourceIds: string[]; status: TopicValueStatus };
-type SeriesSpec = { seriesId: string; indicatorId: string; label: Names; heading: Names | null; parentSeriesId: string | null; isTotal: boolean };
+export type Names = { ka: string; en: string };
+/** One served cell's value, the rows it rests on, whether the page adds them up itself and, for a part of a year, its months. */
+export type Cell = { value: number; unit: string; sourceIds: string[]; status: TopicValueStatus; monthsReported?: number };
+export type SeriesSpec = { seriesId: string; indicatorId: string; label: Names; heading: Names | null; parentSeriesId: string | null; isTotal: boolean };
 
 /** The dimensions a reviewed demography row may carry besides its series, place and year. */
 type Dimensions = { sex?: string; ageGroup?: string; settlement?: string; citizenshipId?: string };
@@ -57,9 +58,10 @@ function rowIndex(served: readonly ServedDemographyObservation[]) {
 
 /**
  * Collects one page's dataset. `add` adds a series' cells for one place over the years the page prints them: missing
- * (`value: null`) in a year it prints nothing for, never zero. The first place that lists a series names it.
+ * (`value: null`) in a year it prints nothing for, never zero. The first place that lists a series names it. Every cell
+ * carries `basis` (Demography's rows are published figures). The Health and Social adapters collect theirs with it too.
  */
-function demographyDataset(datasetId: string, title: Names) {
+export function demographyDataset(datasetId: string, title: Names, basis: Basis = "published") {
   const page: TopicPage = TOPIC_PAGES.find((candidate) => candidate.datasetId === datasetId)!;
   const series = new Map<string, TopicSeries & { indicatorId: string }>();
   const entities = new Map<string, TopicEntity>();
@@ -81,8 +83,8 @@ function demographyDataset(datasetId: string, title: Names) {
     if (!entities.has(entity.entityId)) entities.set(entity.entityId, entity);
     for (const { year, cell } of cells) {
       facts.push(cell
-        ? { entityId: entity.entityId, seriesId: spec.seriesId, year, value: cell.value, basis: "published", status: cell.status, sourceIds: cell.sourceIds }
-        : { entityId: entity.entityId, seriesId: spec.seriesId, year, value: null, basis: "published", status: "official", sourceIds: [] });
+        ? { entityId: entity.entityId, seriesId: spec.seriesId, year, value: cell.value, basis, status: cell.status, sourceIds: cell.sourceIds, ...(cell.monthsReported === undefined ? {} : { monthsReported: cell.monthsReported }) }
+        : { entityId: entity.entityId, seriesId: spec.seriesId, year, value: null, basis, status: "official", sourceIds: [] });
     }
   }
 
@@ -104,7 +106,7 @@ function demographyDataset(datasetId: string, title: Names) {
 }
 
 /** Every year from a list's first to its last. */
-const span = (years: readonly number[]) => (years.length ? Array.from({ length: years.at(-1)! - years[0]! + 1 }, (_, index) => years[0]! + index) : []);
+export const span = (years: readonly number[]) => (years.length ? Array.from({ length: years.at(-1)! - years[0]! + 1 }, (_, index) => years[0]! + index) : []);
 const yearsOf = (facts: readonly { year: number }[]) => [...new Set(facts.map((fact) => fact.year))].sort((a, b) => a - b);
 
 type Context = {

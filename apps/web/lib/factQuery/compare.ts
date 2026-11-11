@@ -30,7 +30,7 @@ import { queryMunicipal } from "./queryMunicipal";
 import { queryNational } from "./queryNational";
 import { compareInput } from "./schemas";
 import { selectSources } from "./sources";
-import { breakBetween, topicBreakDetail } from "./topics/store";
+import { breakBetween, isTopicPercentUnit, topicBreakDetail } from "./topics/store";
 import type { AnyDatasetId, TopicDatasetId } from "./topics/types";
 import type { Observation } from "./observations";
 import type { Basis, FactQueryError, FactQueryResponse, FactQuerySnapshot, Measure } from "./types";
@@ -392,7 +392,8 @@ export function compare(snapshot: FactQuerySnapshot, rawInput: unknown): FactQue
     let percentagePointChange: number | null = null;
 
     if (comparable && from.value !== null && to.value !== null) {
-      if (isPercentage) {
+      // A topic series measured in percent (its unit token) changes in percentage points, as a percentage measure does.
+      if (isPercentage || (topicDataset !== undefined && isTopicPercentUnit(from.unit))) {
         percentagePointChange = to.value - from.value;
       } else {
         absoluteChange = to.value - from.value;

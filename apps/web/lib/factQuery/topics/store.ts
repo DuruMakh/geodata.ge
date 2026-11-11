@@ -107,3 +107,7 @@ export function breakBetween(breaks: readonly TopicBreak[], seriesId: string, fr
 export function topicBreakDetail(entry: TopicBreak): string {
   return `${entry.referenceDate}: ${entry.reasonEn}`;
 }
+
+/** The unit tokens whose values are percents (the funded pension's return): a change between two is in percentage points, never a percentage, as for a core rate. */
+const TOPIC_PERCENT_UNITS: ReadonlySet<string> = new Set(["percent"]);
+export const isTopicPercentUnit = (unit: string): boolean => TOPIC_PERCENT_UNITS.has(unit);
