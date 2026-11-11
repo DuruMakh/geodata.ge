@@ -321,10 +321,13 @@ describe("years only the newer datasets reach", () => {
         expect(cited.length, dataset.page.datasetId).toBeGreaterThan(0);
         const response = getSources(snapshot, { sourceIds: cited, datasetId: dataset.page.datasetId, years: [dataset.lastYear] });
         expect(response.kind, dataset.page.datasetId).toBe("sources");
-        const { sources } = (response as { data: { sources: { sourceId: string; documents: { officialUrl: string }[]; narrowingOutcome: string }[] } }).data;
+        const { sources } = (response as { data: { sources: { sourceId: string; documents: { documentId: string; officialUrl: string }[]; narrowingOutcome: string }[] } }).data;
         expect(sources.map((source) => source.sourceId).sort()).toEqual([...cited].sort());
+        // Each cited id comes back once, and each of its documents once.
+        expect(new Set(sources.map((source) => source.sourceId)).size).toBe(sources.length);
         for (const source of sources) {
           expect(source.documents.length, source.sourceId).toBeGreaterThan(0);
+          expect(new Set(source.documents.map((document) => document.documentId)).size, source.sourceId).toBe(source.documents.length);
           expect(source.documents.every((document) => document.officialUrl.startsWith("https://")), source.sourceId).toBe(true);
         }
         expect(snapshot.sources.filter((source) => cited.includes(source.sourceId))).toHaveLength(cited.length);

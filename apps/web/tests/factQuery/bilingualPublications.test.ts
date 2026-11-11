@@ -15,7 +15,10 @@ const read = (name: string) => JSON.parse(artifacts.find(file => file.fileName =
 
 describe("bilingual bulk publications", () => {
   it("publishes all JSON and CSV files under the same version and verifies their exact bytes", () => {
-    expect(artifacts.map(file => file.fileName).sort()).toEqual(["manifest.json", "catalogue.json", "sources.json", "national-revenue.json", "national-expenditure.json", "ministries.json", "municipal-expenditure.json", "government-debt.json", "government-debt-rates.json", "general-government-balance.json", "gdp-overview.json", "gdp-overview.csv", "economic-sectors.json", "economic-sectors.csv", "regional-economies.json", "regional-economies.csv", "inflation-national.json", "inflation-categories.csv", "inflation-categories.json", "inflation-cities.csv", "inflation-cities.json", "inflation-products.csv", "inflation-products.json"].sort());
+    expect(artifacts.map(file => file.fileName).sort()).toEqual(["manifest.json", "catalogue.json", "sources.json", "national-revenue.json", "national-expenditure.json", "ministries.json", "municipal-expenditure.json", "government-debt.json", "government-debt-rates.json", "general-government-balance.json", "gdp-overview.json", "gdp-overview.csv", "economic-sectors.json", "economic-sectors.csv", "regional-economies.json", "regional-economies.csv", "inflation-national.json", "inflation-categories.csv", "inflation-categories.json", "inflation-cities.csv", "inflation-cities.json", "inflation-products.csv", "inflation-products.json",
+      // One CSV per topic dataset the snapshot serves (lib/factQuery/publications.ts, buildTopicCsvFiles).
+      ...snapshot.topics.datasets.map(dataset => `topics/${dataset.page.datasetId}.csv`)].sort());
+    expect(snapshot.topics.datasets.length).toBeGreaterThan(0);
     for (const artifact of artifacts.filter(file=>file.fileName.endsWith(".json"))) {
       const published = read(artifact.fileName);
       expect(published.schemaVersion).toBe("1.8.0");

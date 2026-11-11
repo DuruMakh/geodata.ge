@@ -73,6 +73,8 @@ describe("demography topic adapter", () => {
     expect(dataset("demography-migration").entities.map((entity) => entity.entityId)).toEqual([GEORGIA_PLACE_ID]);
     // Tbilisi is one place, the region; its municipality code is never an entity.
     for (const build of builds) expect(build.entities.some((entity) => entity.entityId === "04")).toBe(false);
+    // Codes 05, 42, 43, 46 and 64 are budgets not attributable to spending inside one place: never an entity (AGENTS.md).
+    for (const build of builds) expect(build.entities.filter((entity) => ["05", "42", "43", "46", "64"].includes(entity.entityId)), build.page.datasetId).toEqual([]);
   });
 
   it("Shuakhevi's population in 2015 and 2025 and its 2024 births are the reviewed CSV rows", async () => {
