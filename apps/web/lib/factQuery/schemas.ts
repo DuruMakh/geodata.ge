@@ -144,6 +144,7 @@ export const compareInput = z
       z.strictObject({ dataset: z.literal("deficit") }),
       z.strictObject({ dataset: z.literal("inflation"), seriesIds: seriesIdList, entityIds: entityIdList.optional() }),
       z.strictObject({ dataset: z.literal("inflation-products"), seriesIds: seriesIdList }),
+      z.strictObject({ dataset: z.literal("topic"), datasetId: idString, seriesIds: seriesIdList, entityIds: entityIdList.optional() }),
     ]),
     fromYear: z.number().int().optional(),
     toYear: z.number().int().optional(),
@@ -151,12 +152,13 @@ export const compareInput = z
     toPeriod: periodKeySchema.optional().describe("Inflation monthly measures only: the later month, YYYY-MM."),
     measure: z.enum([
       "amount_gel", "share_of_total_pct", "share_of_gdp_pct", "gel_per_resident", "rate_percent",
-      "yoy_pct", "mom_pct", "avg12_pct", "index_2010", "target_pct", "basket_weight_pct", "contribution_pp", "cumulative_pct",
+      "yoy_pct", "mom_pct", "avg12_pct", "index_2010", "target_pct", "basket_weight_pct", "contribution_pp", "cumulative_pct", "value",
     ]),
     expectedDataVersion,
   })
   .superRefine((input, context) => {
     const issue = (path: string, message: string) => context.addIssue({ code: "custom", path: [path], message });
+    if ((input.measure === "value") !== (input.target.dataset === "topic")) issue("measure", "measure value applies to topic targets only, and topic targets take it");
     const monthly = input.target.dataset === "inflation-products" || input.target.dataset === "inflation" && input.measure !== "basket_weight_pct";
     if (input.measure === "cumulative_pct" && input.target.dataset !== "inflation-products") issue("measure", "cumulative_pct applies only to inflation-products");
     if (monthly) {

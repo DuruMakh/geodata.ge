@@ -245,6 +245,7 @@ export const TOOLS: readonly ToolDefinition[] = [
       "percentage and percentage-point change as the measure allows, plus a comparability of " +
       "comparable, limited or not_comparable. Use this rather than subtracting two query results " +
       "yourself: it is what detects a definition change between the two years. " +
+      "Topic target { dataset: topic, datasetId, seriesIds, entityIds? } uses measure value and fromYear < toYear. " +
       "Product target { dataset: inflation-products, seriesIds } supports yoy_pct percentage-point change only. Cumulative comparison is refused; query_inflation_products with startYear returns accumulated price change.",
     schema: compareInput,
     run: (snapshot, input) => compare(snapshot, input),

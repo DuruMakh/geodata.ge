@@ -114,7 +114,7 @@ function comparisonLine(comparison: Comparison): string {
     comparison.entityLabelEn,
     comparison.seriesLabelKa,
     comparison.seriesLabelEn,
-    `${comparison.from.period ?? comparison.from.year}→${comparison.to.period ?? comparison.to.year}`,
+    `${comparison.from.period ?? comparison.from.periodLabel ?? comparison.from.year}→${comparison.to.period ?? comparison.to.periodLabel ?? comparison.to.year}`,
     comparison.measure,
     comparison.from.value,
     comparison.to.value,

@@ -133,6 +133,8 @@ export type CaveatRule = {
    */
   applies: (context: CaveatContext, snapshot: FactQuerySnapshot) => boolean;
   affects: (context: CaveatContext, snapshot: FactQuerySnapshot) => string[];
+  /** Values for the message's {placeholders}, when the sentence names something request-specific. */
+  messageValues?: (context: CaveatContext, snapshot: FactQuerySnapshot) => Record<string, string | number>;
 };
 
 const SEVERITY_ORDER: Record<Severity, number> = { severe: 0, note: 1 };
@@ -146,8 +148,8 @@ export function evaluateCaveats(snapshot: FactQuerySnapshot, context: CaveatCont
     emitted.set(rule.code, {
       code: rule.code,
       severity: rule.severity,
-      messageKa: serviceMessage(snapshot, "ka", rule.messageKey),
-      messageEn: serviceMessage(snapshot, "en", rule.messageKey),
+      messageKa: serviceMessage(snapshot, "ka", rule.messageKey, rule.messageValues?.(context, snapshot)),
+      messageEn: serviceMessage(snapshot, "en", rule.messageKey, rule.messageValues?.(context, snapshot)),
       methodologyRef: rule.methodologyRef,
       methodologyRefEn: rule.methodologyRefEn,
       affects: rule.affects(context, snapshot),

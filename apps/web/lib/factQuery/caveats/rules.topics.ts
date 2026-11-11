@@ -5,7 +5,8 @@
 // codes the store holds for it (ruling R8). Affects is the precise entity:series:year cell.
 import type { CaveatContext, CaveatRule } from "./engine";
 import type { ServiceMessageKey } from "../localization";
-import type { Severity } from "../types";
+import type { FactQuerySnapshot, Severity } from "../types";
+import { breakBetween, topicBreakDetail } from "../topics/store";
 
 type Cell = CaveatContext["observations"][number];
 
@@ -24,6 +25,20 @@ function topicRule(code: string, severity: Severity, comparisonEffect: CaveatRul
   };
 }
 
+// A reviewed series break (the registers in data/imports) inside the requested years: the series' cells carry it, and a
+// change across it is refused by compare and rank. Wording is one generic bilingual sentence plus the register's English
+// reason (ruling R9).
+const breaksIn = (c: CaveatContext, snapshot: FactQuerySnapshot) => {
+  const dataset = snapshot.topics.datasets.find((entry) => entry.page.datasetId === c.datasetId);
+  if (!dataset || c.years.length === 0) return [];
+  const first = Math.min(...c.years);
+  const last = Math.max(...c.years);
+  return cells(c, () => true).flatMap((cell) => {
+    const found = breakBetween(dataset.breaks, cell.seriesId, first, last, dataset.page.periodKind);
+    return found ? [{ cell, found }] : [];
+  });
+};
+
 export const TOPIC_CAVEAT_RULES: readonly CaveatRule[] = [
   topicRule("topic_survey_estimate", "note", "none", "caveats.topic_survey_estimate", (o) => o.status === "survey_estimate"),
   topicRule("topic_derived", "note", "none", "caveats.topic_derived", (o) => o.status === "derived"),
@@ -34,4 +49,15 @@ export const TOPIC_CAVEAT_RULES: readonly CaveatRule[] = [
   topicRule("topic_preliminary", "note", "limits", "caveats.topic_preliminary", (o) => o.basis === "preliminary"),
   // A projection is not an outcome: like debt_service_projection and deficit_projection, a change into it is not a change.
   topicRule("topic_projection", "severe", "breaks", "caveats.topic_projection", (o) => o.basis === "projection"),
+  {
+    code: "topic_series_break",
+    severity: "severe",
+    comparisonEffect: "breaks",
+    messageKey: "caveats.topic_series_break",
+    methodologyRef: "ai-grounding-and-caveats.md#topic_series_break",
+    methodologyRefEn: "/en/methodology",
+    applies: (c, snapshot) => breaksIn(c, snapshot).length > 0,
+    affects: (c, snapshot) => breaksIn(c, snapshot).map(({ cell }) => `${cell.entityId}:${cell.seriesId}:${cell.year}`),
+    messageValues: (c, snapshot) => ({ detail: [...new Set(breaksIn(c, snapshot).map(({ found }) => topicBreakDetail(found)))].join("; ") }),
+  },
 ];

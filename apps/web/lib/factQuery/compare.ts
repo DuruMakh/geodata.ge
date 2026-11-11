@@ -23,19 +23,24 @@ import { buildResponseMeta } from "./meta";
 import { queryMinistries } from "./queryMinistries";
 import { queryDebt } from "./queryDebt";
 import { queryDeficit } from "./queryDeficit";
+import { queryIndicators } from "./queryIndicators";
 import { inflationObservations } from "./queryInflation";
 import { queryInflationProducts } from "./queryInflationProducts";
 import { queryMunicipal } from "./queryMunicipal";
 import { queryNational } from "./queryNational";
 import { compareInput } from "./schemas";
 import { selectSources } from "./sources";
+import { breakBetween, topicBreakDetail } from "./topics/store";
+import type { AnyDatasetId, TopicDatasetId } from "./topics/types";
 import type { Observation } from "./observations";
-import type { Basis, DatasetId, FactQueryError, FactQueryResponse, FactQuerySnapshot, Measure } from "./types";
+import type { Basis, FactQueryError, FactQueryResponse, FactQuerySnapshot, Measure } from "./types";
 
 export type ComparisonEndpoint = {
   year: number;
   /** Monthly endpoints only (inflation): YYYY-MM. */
   period?: string;
+  /** School-year periods only (topic datasets): `2015/16`. */
+  periodLabel?: string;
   value: number | null;
   availability: "available" | "missing";
   missingReason: string | null;
@@ -51,7 +56,7 @@ export type ComparisonEndpoint = {
 
 export type Comparison = {
   comparisonId: string;
-  datasetId: DatasetId;
+  datasetId: AnyDatasetId;
   entityId: string;
   entityLabelKa: string;
   entityLabelEn: string;
@@ -147,6 +152,7 @@ const REASON_NON_POSITIVE_BASE = "comparison.nonPositiveBase";
 const REASON_GDP_STANDARD_BREAK = "comparison.gdpStandardBreak";
 const REASON_HISTORICAL_JOIN = "comparison.historicalJoin";
 const REASON_BASKET_REWEIGHTED = "comparison.basketReweighted";
+const REASON_SERIES_BREAK = "comparison.seriesBreak";
 
 function errorResponse(snapshot: FactQuerySnapshot, error: FactQueryError): FactQueryResponse {
   return { kind: "error", status: "error", error, meta: buildResponseMeta(snapshot) };
@@ -156,6 +162,7 @@ function endpointOf(observation: Observation): ComparisonEndpoint {
   return {
     year: observation.year,
     ...(observation.period !== undefined ? { period: observation.period } : {}),
+    ...(observation.periodLabel !== undefined ? { periodLabel: observation.periodLabel } : {}),
     value: observation.value,
     availability: observation.availability,
     missingReason: observation.missingReason,
@@ -221,7 +228,7 @@ export function compare(snapshot: FactQuerySnapshot, rawInput: unknown): FactQue
   // formula). Their own caveats are recomputed below with `comparison` set,
   // because two rules exist only for comparisons.
   let endpointResult: FactQueryResponse;
-  let datasetId: DatasetId;
+  let datasetId: AnyDatasetId;
 
   if (target.dataset === "national") {
     datasetId = target.side === "revenue" ? "national-revenue" : "national-expenditure";
@@ -293,6 +300,9 @@ export function compare(snapshot: FactQuerySnapshot, rawInput: unknown): FactQue
     datasetId = "general-government-balance";
     // No seriesIds: the dataset has exactly one series.
     endpointResult = queryDeficit(snapshot, { years, measure: input.measure }, comparisonWindow);
+  } else if (target.dataset === "topic") {
+    datasetId = target.datasetId as TopicDatasetId;
+    endpointResult = queryIndicators(snapshot, { datasetId, seriesIds: target.seriesIds, entityIds: target.entityIds, years, expectedDataVersion: input.expectedDataVersion });
   } else {
     datasetId = "municipal-expenditure";
     endpointResult = queryMunicipal(
@@ -342,6 +352,7 @@ export function compare(snapshot: FactQuerySnapshot, rawInput: unknown): FactQue
     byPair.set(key, pair);
   }
 
+  const topicDataset = target.dataset === "topic" ? snapshot.topics.datasets.find((entry) => entry.page.datasetId === datasetId) : undefined;
   const gdpStandardBreak = endpointCaveats.some((c) => c.code === "gdp_sna_break_2010");
 
   const comparisons: Comparison[] = [];
@@ -362,6 +373,9 @@ export function compare(snapshot: FactQuerySnapshot, rawInput: unknown): FactQue
     // merely renamed (so 48 of 48 programs were excluded and rankings came back
     // empty). It is wrong in both directions and must not decide this.
     if (definitionChangeBreaks(from.valueDefinitionId, to.valueDefinitionId)) reasons.push(REASON_DEFINITION_CHANGED);
+    // A reviewed series break between the two years: the series is not the same quantity across it.
+    const seriesBreak = topicDataset && breakBetween(topicDataset.breaks, from.seriesId, fromYear, toYear, topicDataset.page.periodKind);
+    if (seriesBreak) reasons.push(REASON_SERIES_BREAK);
 
     // A coverage-changing caveat that describes one endpoint and not the other.
     const codes = Array.from(new Set([...from.caveatIds, ...to.caveatIds]));
@@ -424,8 +438,8 @@ export function compare(snapshot: FactQuerySnapshot, rawInput: unknown): FactQue
       percentageChange,
       percentagePointChange,
       comparability,
-      reasons: reasons.map(key => serviceMessage(snapshot, "ka", key)),
-      reasonsEn: reasons.map(key => serviceMessage(snapshot, "en", key)),
+      reasons: reasons.map(key => serviceMessage(snapshot, "ka", key, key === REASON_SERIES_BREAK && seriesBreak ? { detail: topicBreakDetail(seriesBreak) } : {})),
+      reasonsEn: reasons.map(key => serviceMessage(snapshot, "en", key, key === REASON_SERIES_BREAK && seriesBreak ? { detail: topicBreakDetail(seriesBreak) } : {})),
       caveatIds: Array.from(new Set([...from.caveatIds, ...to.caveatIds])).sort(),
     });
   }

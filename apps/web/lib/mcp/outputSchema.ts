@@ -105,7 +105,7 @@ const coverage = z.object({
   excludedEntities: z.array(bilingualExcludedEntity), returnedCount: z.number().int(), expectedCount: z.number().int(),
   requestedPeriods: z.array(z.string()).optional(), availablePeriods: z.array(z.string()).length(2).nullable().optional(),
 });
-const endpoint = observationSchema.pick({ year: true, period: true, value: true, availability: true, missingReason: true, missingReasonEn: true, basis: true, valueDefinition: true, valueDefinitionEn: true, valueDefinitionId: true, sourceIds: true, documentIds: true });
+const endpoint = observationSchema.pick({ year: true, period: true, value: true, availability: true, missingReason: true, missingReasonEn: true, basis: true, valueDefinition: true, valueDefinitionEn: true, valueDefinitionId: true, sourceIds: true, documentIds: true }).extend({ periodLabel: z.string().optional() });
 const dataShapes = {
   observations: z.object({ observations: z.array(observationSchema), coverage }),
   /** query_indicators: topic observations, years only. */
@@ -113,7 +113,7 @@ const dataShapes = {
   comparisons: z.object({
     comparisons: z.array(z.object({
       comparisonId: z.string(), datasetId: z.string(), entityId: z.string(), entityLabelKa: z.string(), entityLabelEn: z.string().min(1), seriesId: z.string(), seriesLabelKa: z.string(), seriesLabelEn: z.string().min(1),
-      measure: z.string(), unit: observationSchema.shape.unit, from: endpoint, to: endpoint,
+      measure: z.string(), unit: topicObservationSchema.shape.unit, from: endpoint, to: endpoint,
       absoluteChange: z.number().nullable(), percentageChange: z.number().nullable(), percentagePointChange: z.number().nullable(),
       comparability: z.enum(["comparable", "limited", "not_comparable"]), reasons: z.array(z.string()), reasonsEn: z.array(z.string()), caveatIds: z.array(z.string()),
     })),

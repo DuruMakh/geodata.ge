@@ -3,7 +3,7 @@
 // Packs a topic dataset's facts into parallel columns for the snapshot and reads them back. Runtime code imports
 // this file, so it stays pure.
 import type { Basis } from "../types";
-import type { TopicColumns, TopicDataset, TopicPage, TopicDatasetBuild, TopicFact, TopicsSnapshot, TopicValueStatus } from "./types";
+import type { TopicBreak, TopicColumns, TopicDataset, TopicPage, TopicDatasetBuild, TopicFact, TopicsSnapshot, TopicValueStatus } from "./types";
 
 function indexOf<T>(list: readonly T[]): Map<T, number> {
   return new Map(list.map((item, index) => [item, index]));
@@ -82,4 +82,28 @@ export function topicCell(dataset: TopicDataset, entityId: string, seriesId: str
  */
 export function topicPeriodLabel(dataset: { page: Pick<TopicPage, "periodKind"> }, year: number): string | undefined {
   return dataset.page.periodKind === "school_year" ? `${year}/${String((year + 1) % 100).padStart(2, "0")}` : undefined;
+}
+
+/**
+ * The stored year of the period a date falls in: a calendar year Y runs from Y-01-01, a school year Y (`2020/21`) from
+ * Y-09-01. A break dated inside a period starts in that period, as the money-and-banks register reads its dates.
+ */
+function periodOf(date: string, periodKind: TopicPage["periodKind"]): number {
+  const year = Number(date.slice(0, 4));
+  return periodKind === "school_year" && date.slice(5) < "09-01" ? year - 1 : year;
+}
+
+/** The first break on a series that separates `fromYear` and `toYear` (either order): the period it starts in lies after the earlier year and no later than the later one. */
+export function breakBetween(breaks: readonly TopicBreak[], seriesId: string, fromYear: number, toYear: number, periodKind: TopicPage["periodKind"]): TopicBreak | null {
+  const [early, late] = fromYear <= toYear ? [fromYear, toYear] : [toYear, fromYear];
+  return breaks.find((entry) => {
+    if (!entry.seriesIds.includes(seriesId)) return false;
+    const starts = periodOf(entry.referenceDate, periodKind);
+    return early < starts && starts <= late;
+  }) ?? null;
+}
+
+/** How a break reads in an answer: its reference date and the register's English reason (the registers are English-only). */
+export function topicBreakDetail(entry: TopicBreak): string {
+  return `${entry.referenceDate}: ${entry.reasonEn}`;
 }

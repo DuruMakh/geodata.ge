@@ -10,7 +10,8 @@ import { educationPlaceListData, educationPlacePageData, educationTopicPageData 
 import { educationPlaceCrawlStates, type EducationPlaceSet } from "../../../lib/explorer/educationPlaces";
 import { buildEducationWorkbookExportModel } from "../../../lib/explorer/educationWorkbook";
 import type { WorkbookExportModel, WorkbookReadableRow } from "../../../lib/explorer/workbookModel";
-import { breakBetween, loadTopicBreaks } from "../../../lib/factQuery/topics/breaks";
+import { loadTopicBreaks } from "../../../lib/factQuery/topics/breaks";
+import { breakBetween } from "../../../lib/factQuery/topics/store";
 import { educationTopicAdapter } from "../../../lib/factQuery/topics/education";
 import { TOPIC_PAGES } from "../../../lib/factQuery/topics/pages";
 import { TOPIC_ADAPTERS } from "../../../lib/factQuery/topics/registry";

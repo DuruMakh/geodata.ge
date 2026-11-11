@@ -147,7 +147,7 @@ This field exists because `compare` previously consulted a hand-maintained list 
 
 ## The catalogue
 
-48 codes are registered.
+49 codes are registered.
 
 | Code | Severity | Comparison effect | Owner document |
 | --- | --- | --- | --- |
@@ -199,6 +199,7 @@ This field exists because `compare` previously consulted a hand-maintained list 
 | `topic_planned` | severe | `none` | `ai-grounding-and-caveats.md#topic_planned` |
 | `topic_preliminary` | note | `limits` | `ai-grounding-and-caveats.md#topic_preliminary` |
 | `topic_projection` | severe | `breaks` | `ai-grounding-and-caveats.md#topic_projection` |
+| `topic_series_break` | severe | `breaks` | `ai-grounding-and-caveats.md#topic_series_break` |
 
 ### `planned_values`
 
@@ -824,6 +825,20 @@ Scoped by status, never by year, like `sectors_preliminary`. A comparison with a
 **English.** These values are a projection, not a recorded outcome.
 
 A projection is not an outcome, so a change into a projected year is not a change (as for `debt_service_projection` and `deficit_projection`).
+
+### `topic_series_break`
+
+**Severity:** severe  
+**Comparison effect:** `breaks`  
+**Owner document:** `ai-grounding-and-caveats.md#topic_series_break`
+
+**Trigger.** A reviewed series break (the `*-series-breaks.csv` registers under `data/imports/`) starts after the earliest and no later than the latest requested year, for a series the response returns. It marks that series' available cells (`entity:series:year`). Topic cells only (`query_indicators`).
+
+**Georgian.** მოთხოვნილ წლებში მწკრივს დადასტურებული წყვეტა აქვს ({detail}); ამ წერტილის გავლით ცვლილება არ ითვლება.
+
+**English.** A reviewed series break falls inside the requested years ({detail}); no change is computed across this point.
+
+`{detail}` is each break's reference date and the register's English reason, joined with `; `. The registers are English-only, so the Georgian sentence carries the English reason rather than an invented translation. `compare` states the same fact as the reason a break makes a pair `not_comparable` (`comparison.seriesBreak`), and returns both endpoint values with no change.
 
 
 ## Published bulk files
