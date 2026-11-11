@@ -1,4 +1,5 @@
 "use client";
+import { formatCrawlCell } from "../../lib/explorer/crawlTables";
 import type { ClientMoneyBanksFact } from "../../lib/data/moneyBanks/types";
 import { formatInUnit, unitsFor } from "../../lib/explorer/format";
 import { moneyBanksRegionHref } from "../../lib/explorer/moneyBanksAreas";
@@ -34,6 +35,10 @@ export function MoneyBanksIndex({ facts, regionMap }: {
   const largest = regionMap.regions[0];
   const largestName = publicLabel(locale, largest.regionId, largest.nameKa, englishLabels);
   const georgiaValue = facts.find(f => f.year === regionMap.year)?.value;
+  // The hidden every-year table prints million GEL to one decimal, finer than the map's billions.
+  const crawl = [{ model: regionMap, lead: { label: t("area.georgia"), valuesByYear: Object.fromEntries(facts.map(f => [f.year, f.value])) }, metric: {
+    legend: `${mapLabel} · ${message(messages, "format.mlnGel")}`, formatValue: (value: number) => formatCrawlCell(value / 1_000_000, null, "#,##0.0", locale),
+  } }];
   return <div data-testid="money-regions" className="@container">
     <ExplorerHeading>{t("page.regions.title")}</ExplorerHeading>
     <LatestValueLine testId="money-latest" sentence={<Message messages={messages} id="moneyBanks.latest.regions" values={{ year: regionMap.year, region: largestName, value: <LatestFigure value={valueLabel(largest.value)} /> }} />} />
@@ -42,7 +47,7 @@ export function MoneyBanksIndex({ facts, regionMap }: {
         leadRow={georgiaValue === undefined ? undefined : { id: "georgia", label: t("area.georgia"), value: georgiaValue }} metric={{
           hrefForRegion: moneyBanksRegionHref, formatValue: valueLabel, legend: `${mapLabel} · ${unitLabel}`, testId: "money-region-map",
           mapAria: t("regionMapAria", { total: mapLabel, unit: unitLabel, year: regionMap.year }), entityAria: (name, value, year) => t("regionMapEntityAria", { name, amount: valueLabel(value), year }),
-        }} />
+        }} crawl={crawl} />
     </section>
   </div>;
 }

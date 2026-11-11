@@ -288,6 +288,11 @@ describe("Fiscal.ge agent instructions", () => {
     const line = (await llmsText()).split(/\r?\n/).find((candidate) => candidate.includes("](https://fiscal.ge/explorer/economy/gdp)"));
     expect(line).toMatch(/ — latest: Real GDP: [\d.,]+ bn USD at constant 2015 prices \(\d{4}/);
   });
+  it("says map pages carry every year of every place they list", async () => {
+    const content = await llmsText();
+    expect(content).toContain("Map pages (such as Population, Pensions, Schools and the by-region pages) have a year-by-year table of every place they list");
+    expect(content).not.toContain("list the latest year");
+  });
   it("is at most half the size of the hand-written guide it replaced", async () => {
     expect(Buffer.byteLength(await llmsText())).toBeLessThanOrEqual(27_000);
   });

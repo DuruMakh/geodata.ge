@@ -31,15 +31,17 @@ export function TransportIndex({ facts, regionMap }: {
   const largest = regionMap.regions[0];
   const largestName = publicLabel(locale, largest.regionId, largest.nameKa, englishLabels);
   const georgiaValue = facts.find(f => f.indicatorId === "transport.registered.total" && f.year === regionMap.year)?.value;
+  const shown = { formatValue: (value: number) => formatInUnit(value, transportValueUnit("vehicles")), legend: `${mapLabel} · ${unitLabel}` };
+  const lead = { label: t("area.georgia"), valuesByYear: Object.fromEntries(facts.filter(f => f.indicatorId === "transport.registered.total").map(f => [f.year, f.value])) };
   return <div data-testid="transport-regions" className="@container">
     <ExplorerHeading>{t("page.regions.title")}</ExplorerHeading>
     <LatestValueLine testId="transport-latest" measure={t("latest.regions", { region: largestName })} period={regionMap.year} value={transportLatestValue(largest.value, "thousand", t)} />
     <section data-testid="transport-region-index" className="mt-4">
       <RegionIndex title={t("page.regions.title")} model={regionMap} summary={[]} sourceNote={`${t("sourceNoteRegions")} · ${unitLabel} · ${regionMap.year}.`}
         leadRow={georgiaValue === undefined ? undefined : { id: "georgia", label: t("area.georgia"), value: georgiaValue }} metric={{
-          hrefForRegion: transportRegionHref, formatValue: value => formatInUnit(value, transportValueUnit("vehicles")), legend: `${mapLabel} · ${unitLabel}`, testId: "transport-region-map",
+          ...shown, hrefForRegion: transportRegionHref, testId: "transport-region-map",
           mapAria: t("regionMapAria", { total: mapLabel, unit: unitLabel, year: regionMap.year }), entityAria: (name, value, year) => t("regionMapEntityAria", { name, amount: valueLabel(value), year }),
-        }} />
+        }} crawl={[{ model: regionMap, metric: shown, lead }]} />
     </section>
   </div>;
 }

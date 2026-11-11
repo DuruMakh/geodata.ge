@@ -109,7 +109,17 @@ export type RegionalEconomyMapModel = {
   occupiedAreas: Array<{ key: "abkhazia" | "tskhinvali"; pathD: string }>;
   legendMinGel: number;
   legendMaxGel: number;
+  history?: RegionMapHistory;
 };
+
+/** Every year of a region map's figure for each region (keys are the map's `region.<id>` ids), for the page's hidden crawl tables. */
+export type RegionMapHistory = { years: number[]; byRegion: Readonly<Record<string, Readonly<Record<number, number>>>> };
+
+export function regionMapHistory(facts: readonly { regionId: string; year: number; value: number }[]): RegionMapHistory {
+  const byRegion: Record<string, Record<number, number>> = {};
+  for (const fact of facts) (byRegion[fact.regionId] ??= {})[fact.year] = fact.value;
+  return { years: [...new Set(facts.map((fact) => fact.year))].sort((a, b) => a - b), byRegion };
+}
 
 export function quantileBucket(values: number[]) {
   const sorted = [...values].sort((left, right) => left - right);
@@ -131,6 +141,7 @@ export type RegionMapModel = {
   occupiedAreas: RegionalEconomyMapModel["occupiedAreas"];
   legendMin: number;
   legendMax: number;
+  history?: RegionMapHistory;
 };
 
 export function regionalMapGeometry() {
@@ -158,7 +169,8 @@ export function latestCompleteRegionYear(facts: readonly { indicatorId: string; 
   if (!complete.length) throw new Error(missing);
   const year = Math.max(...complete);
   const latest = new Map(regional.filter(f => f.year === year).map(f => [regionOf.get(f.indicatorId)!, f.value]));
-  return { latest, year, firstYear: Math.min(...regional.map(f => f.year)) };
+  const history = regionMapHistory(regional.map(f => ({ regionId: regionOf.get(f.indicatorId)!, year: f.year, value: f.value })));
+  return { latest, year, firstYear: Math.min(...regional.map(f => f.year)), history };
 }
 
 /**
@@ -166,13 +178,14 @@ export function latestCompleteRegionYear(facts: readonly { indicatorId: string; 
  * listed region needs a value and a shape, and every value a listed region; `measure` names the value in errors. The
  * regions named in `withoutValue` need only a shape: they are kept apart, unranked and uncoloured.
  */
-export function buildLatestValueRegionMapModel({ regions, latest, year, firstYear, measure, withoutValue }: {
+export function buildLatestValueRegionMapModel({ regions, latest, year, firstYear, measure, withoutValue, history }: {
   regions: readonly { id: string; kaLabel: string; sortOrder: number }[];
   latest: ReadonlyMap<string, number>;
   year: number;
   firstYear: number;
   measure: string;
   withoutValue?: readonly string[];
+  history?: RegionMapHistory;
 }): RegionMapModel {
   const geometry = regionalMapGeometry();
   const unvalued = regions.filter(region => withoutValue?.includes(region.id)).map(region => {
@@ -194,6 +207,7 @@ export function buildLatestValueRegionMapModel({ regions, latest, year, firstYea
     regions: placed.sort((a, b) => b.value - a.value || a.sortOrder - b.sortOrder).map((region, index) => ({ regionId: region.regionId, nameKa: region.nameKa, value: region.value, pathD: region.pathD, rank: index + 1, bucket: bucketOf(region.value) })),
     legendMin: Math.min(...placed.map(region => region.value)), legendMax: Math.max(...placed.map(region => region.value)),
     ...(withoutValue ? { withoutValue: unvalued } : {}),
+    ...(history ? { history } : {}),
   };
 }
 
@@ -256,5 +270,6 @@ export function buildRegionalEconomyMapModel({
     occupiedAreas,
     legendMinGel: Math.min(...regionRows.map((region) => region.totalGdpGel)),
     legendMaxGel: Math.max(...regionRows.map((region) => region.totalGdpGel)),
+    history: regionMapHistory(totalFacts),
   };
 }

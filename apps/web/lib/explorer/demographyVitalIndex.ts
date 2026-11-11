@@ -5,6 +5,7 @@ import { GEORGIA_PLACE_ID } from "./demographyAreas";
 import { placeIndexRows } from "./demographyPopulationIndex";
 import { birthsPer100Deaths } from "./demographyVital";
 import { formatInUnit, UNIT_PERSONS } from "./format";
+import { historyFromFacts, type IndexHistory } from "./indexCrawlTables";
 import type { MunicipalListRow } from "./municipalData";
 import { buildMunicipalityValueMapModel, type MunicipalityMapModel } from "./municipalityMapData";
 
@@ -20,6 +21,8 @@ export type VitalIndexModel = {
   /** Municipalities (Tbilisi as 04) whose deaths exceeded births in the latest year. */
   deathsAhead: number;
   municipalityCount: number;
+  /** Every year of the index's figures for every listed place, for the page's hidden crawl tables. */
+  history: IndexHistory;
 };
 
 const isMunicipality = (id: string) => /^\d{2}$/.test(id);
@@ -39,6 +42,14 @@ function countsFor(facts: readonly ServedDemographyObservation[], year: number):
 /** Municipalities (Tbilisi as 04) whose registered deaths exceeded births in the year; an equal year does not count. */
 export function deathsAheadCount(facts: readonly ServedDemographyObservation[], year: number): number {
   return [...countsFor(facts, year)].filter(([id, { births, deaths }]) => isMunicipality(id) && deaths > births).length;
+}
+
+/** Births per 100 deaths for every place and year with both counts and a finite ratio. */
+function vitalRatios(facts: readonly ServedDemographyObservation[]): Array<{ geographyId: string; year: number; value: number }> {
+  return [...new Set(facts.map((fact) => fact.year))].flatMap((year) => [...countsFor(facts, year)].flatMap(([geographyId, { births, deaths }]) => {
+    const value = birthsPer100Deaths(births, deaths);
+    return value === null || !Number.isFinite(value) ? [] : [{ geographyId, year, value }];
+  }));
 }
 
 /**
@@ -79,5 +90,10 @@ export function buildVitalIndexModel({
     countsById,
     deathsAhead: deathsAheadCount(facts, year),
     municipalityCount: municipalities.length,
+    history: historyFromFacts([
+      { id: "births", facts: facts.filter((fact) => fact.seriesId === SERIES.liveBirths) },
+      { id: "deaths", facts: facts.filter((fact) => fact.seriesId === SERIES.deaths) },
+      { id: "birthsPer100Deaths", facts: vitalRatios(facts) },
+    ]),
   };
 }

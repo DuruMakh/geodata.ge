@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ExplorerHeading } from "../../components/explorer-shell/explorer-heading";
 import { ExplorerPage } from "../../components/explorer-shell/explorer-page";
+import { IndexCrawlTables } from "../../components/explorer-shell/index-crawl-tables";
 import { LatestFigure, LatestValueLine } from "../../components/explorer-shell/latest-value-line";
 import { EntityMemberList } from "../../components/municipalities/entity-member-list";
 import { MunicipalitiesIndex } from "../../components/municipalities/municipalities-index";
@@ -16,6 +17,8 @@ import { loadServedMunicipalData } from "../data/servedData";
 import { loadServedSocialData, toClientSocialFact } from "../data/social/importSocial";
 import { FUNDED_PENSION_SOURCES, SOCIAL_GEORGIA, SOCIAL_PUBLIC_SOURCES, socialArchiveSourceId, type ClientSocialFact } from "../data/social/types";
 import { coverageLabel } from "../explorer/coverageLabel";
+import { formatCrawlCell } from "../explorer/crawlTables";
+import { indexHistoryTables } from "../explorer/indexCrawlTables";
 import { GEORGIA_PLACE_ID, TBILISI_PLACE_ID, buildDemographyPlaces, placeLabel, type DemographyPlace } from "../explorer/demographyAreas";
 import { placeHrefById, placeIdForRoute, placeNeighbours, placePageHref, type PlaceRoute } from "../explorer/demographyPlaceRoutes";
 import { formatInUnit, formatShare, UNIT_PERSONS } from "../explorer/format";
@@ -25,7 +28,9 @@ import { buildSocialIndexModel } from "../explorer/socialIndex";
 import { socialPlaceBase, socialPlaceCoverage, socialPlaceDefaultSelection, socialPlaceFacts, socialPlaceSeries } from "../explorer/socialPlaces";
 import { latestOf } from "../explorer/unitList";
 import type { WorkbookPublicSource } from "../explorer/workbookModel";
+import { publicLabel } from "../i18n/labels";
 import { Message } from "../i18n/message";
+import { workbookMessage } from "../i18n/workbook";
 import { message } from "../i18n/messages";
 import { getMessages } from "../i18n/messages.server";
 import { clientPresentation, getPresentation } from "../i18n/presentation.server";
@@ -134,8 +139,10 @@ export async function renderSocialIndexPage(locale: Locale, set: SocialPlaceSet)
   const headline = latestOf(facts, socialPlaceDefaultSelection(set)[0], SOCIAL_GEORGIA);
   const { min, max } = socialPlaceCoverage(set, SOCIAL_GEORGIA, socialPlaceFacts(set, SOCIAL_GEORGIA, facts, { population, cpi }));
   const title = t(`page.${set}.title`);
-  // The map's measure is the set's first share of residents.
-  const measure = t(`series.${socialPlaceSeries(set).find(series => series.calculated === "share")!.id}`);
+  // The map's measure is the set's first share of residents; the count it divides is its first row without the suffix.
+  const shareSeries = socialPlaceSeries(set).find(series => series.calculated === "share")!;
+  const measure = t(`series.${shareSeries.id}`);
+  const countSeries = socialPlaceSeries(set).find(series => series.id === shareSeries.id.replace(/#share$/, ""))!;
   const crumbs = [...hubCrumbs(messages, locale), { label: title }];
   return (
     <I18nProvider {...clientPresentation(presentation)}>
@@ -178,6 +185,16 @@ export async function renderSocialIndexPage(locale: Locale, set: SocialPlaceSet)
             }}
           />
         </section>
+        {/* Every year of the count and the share for every place, for readers that run no page code (DESIGN.md §8.4). */}
+        <IndexCrawlTables category={workbookMessage(locale, "workbook.category")} tables={indexHistoryTables({
+          basis: workbookMessage(locale, "workbook.published"),
+          history: index.history, rows: index, label: row => publicLabel(locale, row.id, row.nameKa, presentation.englishLabels),
+          levels: { municipalities: message(messages, "municipal.municipalities"), regions: message(messages, "municipal.regions") }, column: String,
+          figures: {
+            count: { parts: [title, `${t(`heading.${countSeries.heading}`)} — ${t(`series.${countSeries.id}`)}`, t("unitPersons")], format: value => formatCrawlCell(value, null, "#,##0", locale) },
+            share: { parts: [title, measure, t("unitPercent")], format: value => formatCrawlCell(value, null, "0.0", locale) },
+          },
+        })} />
       </ExplorerPage>
     </I18nProvider>
   );

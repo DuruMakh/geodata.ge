@@ -30,6 +30,15 @@ type Route = Parameters<typeof renderSocialPlacePage>[0];
 const place = async (route: Route, set: Set = "pensions", locale: "ka" | "en" = "en") => renderPageMarkup(locale, await renderSocialPlacePage(route, locale, set));
 const index = async (set: Set, locale: "ka" | "en" = "en") => renderPageMarkup(locale, await renderSocialIndexPage(locale, set));
 
+describe("the indexes' every-year tables", () => {
+  it("Pensions carries the count and the share for municipalities and regions", async () => {
+    const html = (await index("pensions")).match(/<div hidden="" data-testid="crawl-tables">(.*?)<\/div>/)?.[1] ?? "";
+    expect(html.match(/<table>/g)).toHaveLength(4);
+    expect(html).toContain("Pensioners — State pension · persons · Municipalities · 2013–2025");
+    expect(html).toMatch(/<tr><th>Georgia<\/th>.*?<td>888,518<\/td><\/tr>/);
+  });
+});
+
 describe("the indexes", () => {
   it("Pensions: the one latest line, the map of pensioners per 100 residents, Georgia first, every place linked, no indicators", async () => {
     const html = await index("pensions");

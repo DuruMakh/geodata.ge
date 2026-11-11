@@ -32,7 +32,9 @@ import {
   latestReviewedAtForMunicipalFacts,
   MUNICIPAL_AGGREGATE_ONLY_COUNT,
   MUNICIPAL_COUNTRY_BUDGET_COUNT,
+  MUNICIPAL_PER_RESIDENT_YEAR,
   MUNICIPAL_PUBLIC_PAGE_COUNT,
+  municipalIndexHistory,
   municipalShareValueForYear,
   regionFactsFor,
 } from "../../lib/explorer/municipalData";
@@ -1368,5 +1370,29 @@ describe("municipalShareValueForYear", () => {
     const model = build(2016, 2016);
 
     expect(municipalShareValueForYear(model, model.totalRow, 2016)).toBe(1);
+  });
+});
+
+describe("municipalIndexHistory", () => {
+  it("municipal index history matches the list in the comparison year", async () => {
+    const data = await loadServedMunicipalData();
+    const years = Array.from(new Set(data.totalFacts.map((row) => row.year))).sort((a, b) => a - b);
+    const history = municipalIndexHistory(data, years);
+    const total = history.figures.find((figure) => figure.id === "total")!;
+    const perResident = history.figures.find((figure) => figure.id === "perResident")!;
+    expect(history.years).toEqual(years);
+
+    const regionLabels = new Map(data.regions.map((region) => [region.id, region.kaLabel]));
+    const list = buildMunicipalListRows({ ...data, regionLabels, year: MUNICIPAL_PER_RESIDENT_YEAR });
+    for (const row of [...list.municipalities, ...list.regions]) {
+      expect(total.valueAt(row.id, MUNICIPAL_PER_RESIDENT_YEAR)).toBe(row.valueGel);
+      expect(perResident.valueAt(row.id, MUNICIPAL_PER_RESIDENT_YEAR)).toBe(row.budgetPerResidentGel);
+    }
+    for (const year of years) {
+      for (const municipality of data.municipalities) expect(total.valueAt(municipality.code, year)).not.toBeNull();
+    }
+    expect(total.valueAt("country.georgia", 2025)).toBe(buildCountryListRow(data.countryTotalFacts, 2025).valueGel);
+    expect(perResident.valueAt("country.georgia", 2025)).toBeNull();
+    expect(perResident.valueAt(list.municipalities[0]!.id, years[0]!)).toBeNull();
   });
 });
