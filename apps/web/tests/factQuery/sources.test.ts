@@ -191,7 +191,7 @@ describe("public source resolution", () => {
         .map((source) => source.sourceId);
 
       expect(unresolved).toEqual([]);
-      expect(snapshot.sources.some(source => source.sourceId.startsWith("source.geostat_services_"))).toBe(false);
+      expect(snapshot.sources.filter(source => source.sourceId.startsWith("source.geostat_services_")).every(source => snapshot.topics.sourceIds.includes(source.sourceId))).toBe(true);
       // The nineteen demography canonical inputs (eighteen annual tables and the census snapshot) extend the existing inventory;
       // the package's validation inputs and definitions are evidence, not sources.
       // The 2026 budget law adds one planned-basis source. The topic pages' sources come on top, except the Demography ones,

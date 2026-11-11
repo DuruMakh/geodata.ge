@@ -191,7 +191,7 @@ describe("a some-words answer says that only some words matched", () => {
   type Noted = { searchMatch?: string; searchMatchNoteKa?: string; searchMatchNoteEn?: string; websitePages?: { topicId: string; labelEn: string; urlKa: string }[] };
   const dataOf = (response: ReturnType<typeof describeCoverage>) => (response as { data: Noted }).data;
 
-  it.each(["poverty rate", "average salary", "საშუალო ქირა", "trade balance"])("notes it on %s", (query) => {
+  it.each(["poverty rate", "average salary", "საშუალო ქირა", "trade deficit"])("notes it on %s", (query) => {
     const response = describeCoverage(snapshot, { search: query });
     expect(response.status).toBe("ok");
     expect(dataOf(response).searchMatch).toBe("some_words");
@@ -306,6 +306,9 @@ describe("a topic dataset is searched under its topic's name and its page title"
     ["health", "national-expenditure", "spending.health"],
     ["social protection", "national-expenditure", "spending.social_protection"],
     ["სოციალური დაცვა", "national-expenditure", "spending.social_protection"],
+    // The Trade pages' imports do not take the import tax's place.
+    ["import tax", "national-revenue", "revenue.import_tax"],
+    ["იმპორტის გადასახადი", "national-revenue", "revenue.import_tax"],
   ])("lists the budget's or inflation's series first for %s", (query, datasetId, seriesId) => {
     expect(firstOf(query)).toMatchObject({ datasetId, seriesId });
   });
@@ -327,6 +330,9 @@ describe("a topic dataset is searched under its topic's name and its page title"
     ["housing prices", "housing-prices", "housing.price_index.total"],
     ["internet users", "internet-users", "internet.used_3m.total"],
     ["registered vehicles", "transport-regions", "transport.registered"],
+    ["trade balance", "trade-overview", "trade.balance"],
+    ["imports from China", "trade-partners", "trade.imports.partner.1995-2025.156"],
+    ["wine exports", "trade-products", "trade.exports.goods.hs4.2020-2025.2204"],
   ])("keeps a topic's own answer first for %s", (query, datasetId, seriesId) => {
     expect(firstOf(query)).toMatchObject({ datasetId, seriesId });
   });

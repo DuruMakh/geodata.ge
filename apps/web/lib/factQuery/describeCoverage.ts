@@ -1178,8 +1178,8 @@ function websitePagesForSearch(
   if (content.length < 2) return [];
   const looking = content.filter((index) => words[index]!.length >= 3 && kinds[index] !== "dataset");
   const pagesOf = new Map(looking.map((index) => [index, websitePagesFor(snapshot, words[index]!)]));
-  // A `datasetPage` word links the pages its word is in the name of, when those are all one topic's: "overview" (trade
-  // and others) and "consumer" (no page's name) link none.
+  // A `datasetPage` word links the pages its word is in the name of, when those are all one topic's: a word in two
+  // topics' page names, or "consumer" (no page's name), links none.
   const ownPages = (index: number) => {
     const named = pagesOf.get(index)!.filter((page) => namesPage(words[index]!, page, true));
     return new Set(named.map((page) => page.topic)).size === 1 ? named : [];

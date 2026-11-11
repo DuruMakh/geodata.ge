@@ -27,12 +27,13 @@ import { moneyBanksTopicAdapter } from "./moneyBanks";
 import { TOPIC_PAGES } from "./pages";
 import { socialTopicAdapter } from "./social";
 import { packTopicFacts } from "./store";
+import { tradeTopicAdapter } from "./trade";
 import { transportTopicAdapter } from "./transport";
 import { unemploymentTopicAdapter } from "./unemployment";
 import { wagesTopicAdapter } from "./wages";
 import type { TopicAdapter, TopicDataset, TopicDatasetBuild, TopicsSnapshot, TopicValueStatus } from "./types";
 
-export const TOPIC_ADAPTERS: readonly TopicAdapter[] = [educationTopicAdapter, demographyTopicAdapter, healthTopicAdapter, socialTopicAdapter, unemploymentTopicAdapter, wagesTopicAdapter, businessTopicAdapter, moneyBanksTopicAdapter, livingStandardsTopicAdapter, housingTopicAdapter, internetTopicAdapter, transportTopicAdapter];
+export const TOPIC_ADAPTERS: readonly TopicAdapter[] = [educationTopicAdapter, demographyTopicAdapter, healthTopicAdapter, socialTopicAdapter, unemploymentTopicAdapter, wagesTopicAdapter, businessTopicAdapter, moneyBanksTopicAdapter, livingStandardsTopicAdapter, housingTopicAdapter, internetTopicAdapter, transportTopicAdapter, tradeTopicAdapter];
 
 /**
  * The site's own message for each unit token the topic CSVs use (R7: unit ids are the CSVs' tokens). One name per
@@ -75,6 +76,7 @@ const TOPIC_UNIT_MESSAGES: Readonly<Record<string, string>> = {
   million_tonne_km: "transport.unitMillionTkm",
   thousand_tonnes: "transport.unitThousandTonnes",
   km: "transport.unitKm",
+  usd: "gdp.usd",
 };
 
 /** The source registry's id (data/sources/source-documents.csv) of an archive's source id: the registry adds `source.`, which some archives already carry. */
@@ -134,12 +136,17 @@ async function topicSources(sourceIds: readonly string[], archives: readonly Top
     loadSourceDocuments(SERVED_DATA_FILES.sourceDocuments),
     ...archives.map((archive) => loadReviewedSourceManifest(repositoryRoot, archive)),
   ]);
+  const documents = manifests.flat().map(methodologyManifestDocument);
+  // A registry row that names its workbook's official URL rather than the archived file (four Trade workbooks) is the
+  // archived document of that URL.
+  const archivedAt = new Map(documents.flatMap((document) => (document.officialUrl ? [[document.officialUrl, document.repositoryPath] as const] : [])));
   const rows = sourceIds.map((id) => {
     const row = registry.find((entry) => entry.sourceId === id);
     if (!row) throw new Error(`Topic source ${id} is not in the source registry`);
-    return row;
+    const archived = archivedAt.get(row.sourceUrlOrFile);
+    return archived ? { ...row, sourceUrlOrFile: archived } : row;
   });
-  const sources = resolvePublicSources({ sourceDocuments: rows, manifestDocuments: manifests.flat().map(methodologyManifestDocument) });
+  const sources = resolvePublicSources({ sourceDocuments: rows, manifestDocuments: documents });
   const failures = findSourceProvenanceFailures(sources);
   if (failures.length) throw new Error(`Topic source ${failures.map((failure) => failure.sourceId).join(", ")} resolves to no archived document`);
   return sources.map((source) => ({ ...source, documents: [...source.documents].sort((a, b) => (a.documentId < b.documentId ? -1 : 1)) }));

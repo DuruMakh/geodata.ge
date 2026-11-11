@@ -129,6 +129,11 @@ export function buildCatalogueFile(snapshot: FactQuerySnapshot): PublicationArti
       ...summary,
       series: data.series ?? [],
       ...(data.entities !== undefined ? { entities: data.entities } : {}),
+      // A topic dataset with too many series to list (Trade products) lists its totals, as describe_coverage does, and
+      // says how many it left out and where its CSV holds them all.
+      ...(data.seriesOmitted !== undefined
+        ? { headings: data.headings, seriesOmitted: data.seriesOmitted, seriesOmittedNoteKa: data.seriesOmittedNoteKa, seriesOmittedNoteEn: data.seriesOmittedNoteEn, bulkUrl: data.bulkUrl }
+        : {}),
     };
   });
 
