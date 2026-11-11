@@ -8,6 +8,7 @@ import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
 import { loadPackagedSnapshot } from "../../lib/mcp/snapshot";
 import { createMcpServer } from "../../lib/mcp/tools";
+import { queryIndicators } from "../../lib/factQuery/queryIndicators";
 
 type CallResult = { isError?: boolean; content: { type: string; text: string }[]; structuredContent?: Record<string, unknown> };
 
@@ -78,5 +79,26 @@ describe("every tool answers every topic dataset (recommendation 2)", () => {
     const result = await call("describe_coverage", { search });
     expect(brokenCode(result)).toBeUndefined();
     expect(result.isError).toBeFalsy();
+  });
+});
+
+// A unit name that ends in an abbreviation's stop ("million t CO₂ eq.") used to end the definition with two.
+describe("every topic unit's value definition", () => {
+  it("names the unit and ends with one full stop", () => {
+    const snapshot = loadPackagedSnapshot();
+    const doubled: string[] = [];
+    for (const dataset of snapshot.topics.datasets) {
+      for (const unit of new Set(dataset.series.map((series) => series.unit))) {
+        const series = dataset.series.find((entry) => entry.unit === unit)!;
+        const response = queryIndicators(snapshot, { datasetId: dataset.page.datasetId, seriesIds: [series.seriesId], entityIds: [dataset.entities[0]!.entityId], years: [dataset.lastYear] });
+        if (response.kind !== "observations") continue;
+        for (const observation of (response.data as { observations: { valueDefinition: string; valueDefinitionEn: string }[] }).observations) {
+          for (const text of [observation.valueDefinition, observation.valueDefinitionEn]) if (/\.\.(\s|$)/u.test(text)) doubled.push(`${dataset.page.datasetId} ${unit}: ${text}`);
+        }
+      }
+    }
+    expect(doubled).toEqual([]);
+    const co2 = queryIndicators(snapshot, { datasetId: "environment-greenhouse-gases", seriesIds: ["environment.ghg.total"], years: [2020] }) as { data: { observations: { valueDefinitionEn: string }[] } };
+    expect(co2.data.observations[0]!.valueDefinitionEn).toMatch(/in million t CO₂ eq\.$/u);
   });
 });

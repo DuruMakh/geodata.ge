@@ -102,11 +102,12 @@ export function queryIndicators(snapshot: FactQuerySnapshot, rawInput: unknown):
     const months = fact?.status === "partial" && fact.monthsReported !== undefined ? fact.monthsReported : undefined;
     const date = fact?.periodEnd;
     const definitionKey = months !== undefined ? "definitions.topicValuePartial" : date !== undefined ? "definitions.topicValueDated" : "definitions.topicValue";
-    // A series note (what an "Other countries" line leaves out) follows the value's own sentence.
+    // A series note (what an "Other countries" line leaves out) follows the value's own sentence. A unit name that ends
+    // in an abbreviation's stop ("million t CO₂ eq.") ends the sentence with that one stop.
     const definition = (locale: "ka" | "en") => [serviceMessage(snapshot, locale, definitionKey, {
       page: locale === "ka" ? dataset.urlKa : dataset.urlEn, unit: locale === "ka" ? unit.labelKa : unit.labelEn,
       ...(months !== undefined ? { months } : date !== undefined ? { date } : {}),
-    }), ...(series.note === undefined ? [] : [serviceMessage(snapshot, locale, series.note.key, series.note.values)])].join(" ");
+    }).replace(/\.\.$/u, "."), ...(series.note === undefined ? [] : [serviceMessage(snapshot, locale, series.note.key, series.note.values)])].join(" ");
     const observation: Observation = {
       observationId: buildObservationId(dataset.page.datasetId as Observation["datasetId"], entityId, seriesId, year, "value"),
       datasetId: dataset.page.datasetId as Observation["datasetId"],
