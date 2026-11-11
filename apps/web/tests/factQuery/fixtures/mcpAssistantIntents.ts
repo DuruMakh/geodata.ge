@@ -143,21 +143,21 @@ export const MCP_ASSISTANT_INTENTS: readonly McpAssistantIntent[] = [
     ],
   },
   {
-    id: "outside-mcp-scope",
+    id: "unemployment-rate",
     promptEn: "What was Georgia's unemployment rate in 2025? Can this connection answer it, and where can I find the reviewed figure if it cannot?",
     promptKa: "რამდენი იყო საქართველოში უმუშევრობის დონე 2025 წელს? შეუძლია ამ კავშირს პასუხის გაცემა და, თუ არა, სად ვნახო გადამოწმებული მაჩვენებელი?",
     requiredBehaviors: [
-      "State unemployment is outside the approved MCP datasets; do not invent a tool or a factual value from unrelated data.",
-      "Point to the documented website unemployment explorer as the alternative; do not promise an unsupported MCP or bulk dataset.",
+      "Answer from the Unemployment overview dataset (unemployment-overview): Georgia's unemployment rate (unemployment_rate) for 2025, in %, with its source and the page link; never from memory or unrelated data.",
+      "Say the figure is a Labour Force Survey estimate (the topic_survey_estimate caveat); a change of the rate is in percentage points, never a percentage.",
     ],
   },
   {
-    id: "outside-mcp-scope-wages",
+    id: "average-wage",
     promptEn: "What is the average monthly wage in Georgia, and is there a Fiscal.ge page that shows it?",
     promptKa: "რამდენია საშუალო თვიური ხელფასი საქართველოში და არის თუ არა Fiscal.ge-ზე გვერდი, რომელიც მას აჩვენებს?",
     requiredBehaviors: [
-      "Search the catalogue; wages are outside the approved MCP datasets, so state that this connection does not serve them and invent no tool.",
-      "Offer the Fiscal.ge page link from websitePages in the user's language. Quote a wage only from that page's year-by-year table, with the link, if you can open it; never from unrelated data or from memory.",
+      "Answer from the Wages overview dataset (wages-overview): the average monthly nominal wage (average_monthly_nominal_earnings) for Georgia, in GEL a month, for the latest year, with its source and the page link in the user's language; never from memory.",
+      "Do not give the median wage (median_monthly_earnings) as the average; they are different series.",
     ],
   },
   {

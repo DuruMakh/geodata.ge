@@ -1133,11 +1133,11 @@ function namesPage(word: string, page: WebsitePage, some = false): boolean {
  *    its place words, which no page names; the website's own search sets a place apart the same way (`runWords`), so
  *    "home prices Tbilisi" links the Home prices page;
  * 3. failing that too, the pages of each word, best first by how many of the words they meet: all the pages of an
- *    `unserved` word ("unemployment among women"), and the page a `programme` word names in full. A search a served
- *    topic dataset answers ("hospitals in Kutaisi", "average pension") links no page of that topic: its dataset is the
- *    answer. A `served` word looks for no page, as it is the served data's own word ("spending", "city",
- *    "food"), but still counts in the order; a `datasetPage` word links only pages of one topic whose names hold it
- *    ("house prices" links Home prices); a `dataset` word neither looks nor counts.
+ *    `unserved` word ("building permits in regions"), and the page a `programme` word names in full. A search a
+ *    served topic dataset answers ("hospitals in Kutaisi", "average pension", "unemployment among women") links no page
+ *    of that topic: its dataset is the answer. A `served` word looks for no page, as it is the served data's own word
+ *    ("spending", "city", "food"), but still counts in the order; a `datasetPage` word links only pages of one topic
+ *    whose names hold it ("house prices" links Home prices); a `dataset` word neither looks nor counts.
  * A phrase answered in full, with every word, links only the pages of the whole search. `kinds` is aligned with `words`,
  * the search's words as `searchCatalogue` reads them.
  */

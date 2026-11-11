@@ -13,6 +13,10 @@ const RELATIVE_TOLERANCE = 1e-9;
 const key = (entityId: string, seriesId: string) => `${entityId}\u0000${seriesId}`;
 const near = (served: number, printed: number) => Math.abs(served - printed) <= RELATIVE_TOLERANCE * Math.max(Math.abs(served), Math.abs(printed));
 
+/** A percent-formatted cell (`0.0%`) stores the fraction Excel shows ×100: the shown number (a rate of 24.6%) is compared. */
+const shown = (row: WorkbookReadableRow, model: WorkbookExportModel, printed: number | null) =>
+  printed !== null && (row.numberFormat ?? model.readable.numberFormat ?? "").endsWith("%") ? printed * 100 : printed;
+
 /** A label-only row: a heading line that prints no figure (kind "group", every year empty). It names nothing to serve. */
 const labelOnly = (row: WorkbookReadableRow) => row.kind === "group" && Object.values(row.valuesByYear).every((value) => value === null);
 
@@ -20,8 +24,8 @@ const labelOnly = (row: WorkbookReadableRow) => row.kind === "group" && Object.v
  * Fails, listing every disagreement, unless:
  * - at least one row matched (no models, or none that match, is a failure, never a pass);
  * - every readable row of every model (label-only heading rows aside) maps through `match` to a served entity and series;
- * - in each of the row's years a printed value equals the served value (relative tolerance 1e-9), and an empty cell is a
- *   missing one (a fact with `value: null`, or no fact);
+ * - in each of the row's years a printed value equals the served value (relative tolerance 1e-9; a percent-formatted cell
+ *   as Excel shows it), and an empty cell is a missing one (a fact with `value: null`, or no fact);
  * - the dataset serves no year of a matched entity and series that no row prints (the page's years, nothing more);
  * - every entity in `expectedEntityIds` (by default every entity the dataset serves) is covered by some row, and every
  *   series the dataset serves for it has a row in some model.
@@ -60,8 +64,8 @@ export function expectWorkbookParity(
       }
       const years = printedYears.get(key(entityId, seriesId)) ?? new Set<number>();
       printedYears.set(key(entityId, seriesId), years);
-      for (const [yearText, printed] of Object.entries(row.valuesByYear)) {
-        const year = Number(yearText);
+      for (const [yearText, stored] of Object.entries(row.valuesByYear)) {
+        const year = Number(yearText), printed = shown(row, model, stored);
         years.add(year);
         const value = cells.get(year)?.value ?? null;
         if (printed === null && value !== null) problems.push(`${where} ${year}: the page prints nothing, ${entityId} ${seriesId} serves ${value}`);

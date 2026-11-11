@@ -82,11 +82,13 @@ describe("catalogue search matches words, not letters inside words", () => {
     ["Batumi budget", "E:06"],
     ["განათლებისთვის", "spending.education"],
     ["pensions", "admin_program.57_11.c2eeef9e"],
+    ["wages", "average_monthly_nominal_earnings"],
+    ["unemployment", "unemployment_rate"],
   ])("%s finds %s", (query, target) => {
     expect(keysOf(query)).toContain(target);
   });
 
-  it.each(["wages", "salary", "unemployment", "exports", "zzz-no-such-series", "constructor", "__proto__"])("%s stays empty", (query) => {
+  it.each(["salary", "exports", "zzz-no-such-series", "constructor", "__proto__"])("%s stays empty", (query) => {
     const found = search(query);
     expect(found.status).toBe("empty");
     expect(found.hits).toEqual([]);
@@ -173,7 +175,7 @@ describe("catalogue search answers a phrase that no entry matches in full", () =
   });
 });
 
-// A some-words answer can be about another subject ("average wage" finds weighted-average debt rates), so it says so,
+// A some-words answer can be about another subject ("average salary" finds weighted-average debt rates), so it says so,
 // and a word the catalogue does not hold still looks for its own website page (audit F08 section 5.2, F01).
 describe("a some-words answer says that only some words matched", () => {
   // The note's wording is the service message's own; what it must say is pinned below.
@@ -182,7 +184,7 @@ describe("a some-words answer says that only some words matched", () => {
   type Noted = { searchMatch?: string; searchMatchNoteKa?: string; searchMatchNoteEn?: string; websitePages?: { topicId: string; labelEn: string; urlKa: string }[] };
   const dataOf = (response: ReturnType<typeof describeCoverage>) => (response as { data: Noted }).data;
 
-  it.each(["poverty rate", "average wage", "საშუალო ხელფასი", "trade balance"])("notes it on %s", (query) => {
+  it.each(["poverty rate", "average salary", "საშუალო ქირა", "trade balance"])("notes it on %s", (query) => {
     const response = describeCoverage(snapshot, { search: query });
     expect(response.status).toBe("ok");
     expect(dataOf(response).searchMatch).toBe("some_words");
@@ -222,7 +224,7 @@ describe("a some-words answer says that only some words matched", () => {
   });
 
   it("validates against the published describe_coverage output schema", () => {
-    for (const query of ["poverty rate", "average wage"]) {
+    for (const query of ["poverty rate", "average salary"]) {
       expect(outputSchemaFor("describe_coverage").safeParse(describeCoverage(snapshot, { search: query })).success, query).toBe(true);
     }
   });

@@ -20,9 +20,11 @@ import { healthTopicAdapter } from "./health";
 import { TOPIC_PAGES } from "./pages";
 import { socialTopicAdapter } from "./social";
 import { packTopicFacts } from "./store";
+import { unemploymentTopicAdapter } from "./unemployment";
+import { wagesTopicAdapter } from "./wages";
 import type { TopicAdapter, TopicDataset, TopicDatasetBuild, TopicsSnapshot, TopicValueStatus } from "./types";
 
-export const TOPIC_ADAPTERS: readonly TopicAdapter[] = [educationTopicAdapter, demographyTopicAdapter, healthTopicAdapter, socialTopicAdapter];
+export const TOPIC_ADAPTERS: readonly TopicAdapter[] = [educationTopicAdapter, demographyTopicAdapter, healthTopicAdapter, socialTopicAdapter, unemploymentTopicAdapter, wagesTopicAdapter];
 
 /**
  * The site's own message for each unit token the topic CSVs use (R7: unit ids are the CSVs' tokens). One name per
@@ -48,6 +50,8 @@ const TOPIC_UNIT_MESSAGES: Readonly<Record<string, string>> = {
   gel: "social.unitGel",
   gel_million: "social.unitMlnGel",
   percent: "social.unitReturn",
+  thousand_persons: "health.unitThousandPersons",
+  hours: "labour.unit.hours",
 };
 
 /** The source registry's id (data/sources/source-documents.csv) of an archive's source id: the registry adds `source.`, which some archives already carry. */

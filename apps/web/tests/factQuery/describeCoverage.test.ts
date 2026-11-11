@@ -332,18 +332,31 @@ describe("search understands Georgian case endings", () => {
 // A topic the website shows and this connection does not serve: the search says where the page is,
 // and carries no figure (spec: 2026-10-29 MCP audit, F01).
 describe("search points to website pages the connection does not serve", () => {
-  const firstWagesPage = topicHub("wages").sections[0]!.href;
+  const firstHousingPage = topicHub("housing").sections[0]!.href;
 
-  it.each(["wages", "ხელფასი"])("answers %s with the wages page and no series", (search) => {
-    const result = describeCoverage(snapshot, { search });
-    expect(result.status).toBe("empty");
+  it("answers housing. with the housing pages and no series", () => {
+    const result = describeCoverage(snapshot, { search: "housing." });
     const pages = data(result).websitePages ?? [];
-    expect(pages[0]?.topicId).toBe("wages");
-    expect(pages[0]?.urlEn).toBe(`https://fiscal.ge/en${firstWagesPage}`);
-    expect(pages[0]?.urlKa).toBe(`https://fiscal.ge${firstWagesPage}`);
+    expect(pages[0]?.topicId).toBe("housing");
+    expect(pages[0]?.urlEn).toBe(`https://fiscal.ge/en${firstHousingPage}`);
+    expect(pages[0]?.urlKa).toBe(`https://fiscal.ge${firstHousingPage}`);
     expect(pages.length).toBeLessThanOrEqual(5);
     expect(data(result).websitePagesNoteEn).toContain("never quote a figure from memory");
     expect(data(result).websitePagesNoteKa).toBeTruthy();
+  });
+
+  // Spec §5.4: the Wages and Unemployment pages are served, so the search returns their datasets, not their pages.
+  it.each([
+    ["wages", "wages-overview", "average_monthly_nominal_earnings"],
+    ["ხელფასი", "wages-overview", "average_monthly_nominal_earnings"],
+    ["unemployment", "unemployment-overview", "unemployment_rate"],
+    ["უმუშევრობა", "unemployment-overview", "unemployment_rate"],
+  ])("answers %s with the %s dataset it serves and no page link", (search, datasetId, seriesId) => {
+    const result = describeCoverage(snapshot, { search });
+    expect(result.status).toBe("ok");
+    expect(data(result).datasets[0]?.datasetId).toBe(datasetId);
+    expect(data(result).series?.[0]).toMatchObject({ datasetId, seriesId });
+    expect(data(result)).not.toHaveProperty("websitePages");
   });
 
   it("keeps the served series for pension and lists the Pensions dataset, which it serves, instead of the page", () => {
@@ -363,14 +376,6 @@ describe("search points to website pages the connection does not serve", () => {
 
   it("links no page of another topic for ICT", () => {
     for (const page of data(describeCoverage(snapshot, { search: "ICT" })).websitePages ?? []) expect(page.topicId).toBe("internet");
-  });
-
-  it.each(["unemployment", "უმუშევრობა"])("still answers %s with the unemployment overview first", (search) => {
-    const overview = topicHub("unemployment").sections[0]!.href;
-    const pages = data(describeCoverage(snapshot, { search })).websitePages ?? [];
-    expect(pages[0]?.urlKa).toBe(`https://fiscal.ge${overview}`);
-    expect(pages[0]?.urlEn).toBe(`https://fiscal.ge/en${overview}`);
-    for (const page of pages) expect(page.topicId).toBe("unemployment");
   });
 
   it("adds nothing when the search matches no website page", () => {
@@ -437,25 +442,27 @@ describe("search links the topic page behind a phrase", () => {
 
   // A place is no page's word, as the website's own search drops it; a topic word that also meets some served series
   // ("prices" meets Consumer price inflation) still finds its page; and a phrase whose answer is empty still looks word
-  // by word. The last one is a reference-intent prompt (mcpAssistantIntents.ts).
+  // by word.
   it.each([
     ["home prices Tbilisi", "housing"],
-    ["unemployment among women", "unemployment"],
-    ["საშუალო თვიური ხელფასი", "wages"],
+    ["building permits in regions", "housing"],
   ])("links %s to the %s topic", (search, topic) => {
     const topics = topicsOf(search);
     expect(topics.length).toBeGreaterThan(0);
     for (const found of topics) expect(found).toBe(topic);
   });
 
-  // Spec §5.4: a served topic returns its dataset and ids, not a websitePages link.
+  // Spec §5.4: a served topic returns its dataset and ids, not a websitePages link. The last one is a reference-intent
+  // prompt (mcpAssistantIntents.ts).
   it.each([
     ["hospitals in Kutaisi", "health-doctors-hospitals", "health.facilities.hospitals"],
     ["average pension in Georgia", "health-pensions", "social.pension.avg_monthly"],
-  ])("answers %s with the health dataset it serves and no health page link", (search, datasetId, seriesId) => {
+    ["unemployment among women", "unemployment-overview", "unemployment_rate.women"],
+    ["საშუალო თვიური ხელფასი", "wages-overview", "average_monthly_nominal_earnings"],
+  ])("answers %s with the dataset it serves and no page link of its topic", (search, datasetId, seriesId) => {
     const found = data(describeCoverage(snapshot, { search }));
     expect(found.series?.[0]).toMatchObject({ datasetId, seriesId });
-    expect(topicsOf(search)).not.toContain("health");
+    expect(topicsOf(search)).not.toContain(TOPIC_PAGES.find((page) => page.datasetId === datasetId)!.pagePath.split("/")[2]);
   });
   it("answers ბათუმის სკოლები with the education-schools dataset and no education page link", () => {
     const found = data(describeCoverage(snapshot, { search: "ბათუმის სკოლები" }));
@@ -465,8 +472,8 @@ describe("search links the topic page behind a phrase", () => {
   });
 
   it("puts the page that meets the most words first", () => {
-    const pages = data(describeCoverage(snapshot, { search: "unemployment among women" })).websitePages ?? [];
-    expect(pages[0]?.labelEn).toBe("Sex");
+    const pages = data(describeCoverage(snapshot, { search: "building permits in regions" })).websitePages ?? [];
+    expect(pages.map((page) => page.labelEn)).toEqual(["Building permits", "Completed buildings"]);
   });
 
   // "rate" meets the debt interest rates and links pages of two topics, so it names no page by itself.
@@ -479,8 +486,8 @@ describe("search links the topic page behind a phrase", () => {
   });
 
   // A trailing full stop is punctuation, not an id: only a word, a "." or "_", and a word again looks like one.
-  it("reads wages. as the word wages", () => {
-    expect(topicsOf("wages.")[0]).toBe("wages");
+  it("reads housing. as the word housing", () => {
+    expect(topicsOf("housing.")[0]).toBe("housing");
   });
 });
 

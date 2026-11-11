@@ -1,4 +1,3 @@
-import path from "node:path";
 import { UnemploymentExplorer } from "../../components/unemployment/unemployment-explorer";
 import { UnemploymentRegionsIndex } from "../../components/unemployment/unemployment-regions-index";
 import { buildUnemploymentRegionMapModel, UNEMPLOYMENT_REGIONS } from "../explorer/unemploymentRegionMap";
@@ -14,17 +13,12 @@ import { getMessages } from "../i18n/messages.server";
 import { message } from "../i18n/messages";
 import { pageHref } from "../i18n/routes";
 import type { Locale } from "../i18n/types";
-import { loadEnglishCatalogue } from "../i18n/catalogue.server";
-import { loadReviewedSourceManifest } from "../methodology/sourceManifest";
-import { projectPublicSources } from "../methodology/publicSources";
 import { fiscalMetadata } from "../seo/metadata";
 import { explorerDatasetJsonLd } from "../seo/structuredData";
 import { coverageLabel } from "../explorer/coverageLabel";
 import { resolveSiteUrl } from "../siteUrl";
-import { unemploymentIndicators } from "../data/unemployment/types";
-import { unemploymentOverviewIndicators } from "../explorer/unemploymentOverview";
-import { UNEMPLOYMENT_SECTIONS, unemploymentBreakdownsForSection, type UnemploymentSectionId } from "../explorer/unemploymentSections";
-import { UNEMPLOYMENT_AGE_FIRST_YEAR } from "../explorer/unemploymentAge";
+import { UNEMPLOYMENT_SECTIONS, type UnemploymentSectionId } from "../explorer/unemploymentSections";
+import { unemploymentPageFacts, unemploymentWorkbookSources } from "../explorer/unemploymentPageData";
 import { topicSection, ALL_DATA_PATH } from "../navigation/navTree";
 
 export async function unemploymentPageMetadata(locale: Locale, section: UnemploymentSectionId) {
@@ -33,20 +27,12 @@ export async function unemploymentPageMetadata(locale: Locale, section: Unemploy
 }
 
 export async function renderUnemploymentPage(locale: Locale, section: UnemploymentSectionId, regionId?: string) {
-  const root = path.resolve(/* turbopackIgnore: true */ process.cwd(), "../..");
-  const [data, presentation, manifest, catalogue] = await Promise.all([
+  const [data, presentation, sources] = await Promise.all([
     loadServedUnemploymentData(), getPresentation(locale, ["unemployment", "regionalEconomies", "format", "main", "workbook"], UNEMPLOYMENT_GROUPS.map(group => group.id), UNEMPLOYMENT_REGIONS.map(region => region.id)),
-    loadReviewedSourceManifest(root, "unemployment"), loadEnglishCatalogue(root),
+    unemploymentWorkbookSources(locale),
   ]);
-  const dimensions = new Set([...unemploymentBreakdownsForSection(section), "national", ...(section === "overview" ? ["sex"] : [])]);
-  const mainBreakdown = UNEMPLOYMENT_SECTIONS.find(item => item.id === section)!.breakdown;
-  const facts = data.facts.filter(fact => (section !== "age" || fact.dimension === "age" && fact.year >= UNEMPLOYMENT_AGE_FIRST_YEAR) && (!regionId || fact.dimension === "region" && fact.groupId === regionId) && dimensions.has(fact.dimension) && (section === "overview" ? (fact.dimension === "sex" ? fact.indicatorId === "unemployment_rate" : unemploymentOverviewIndicators(fact.dimension).includes(fact.indicatorId)) : section === "regions" ? unemploymentOverviewIndicators("region").includes(fact.indicatorId) : unemploymentIndicators(mainBreakdown).includes(fact.indicatorId)));
+  const { served: facts, facts: clientFacts } = unemploymentPageFacts(data.facts, section, regionId);
   const sectionPath = regionId ? unemploymentRegionHref(regionId) : UNEMPLOYMENT_SECTIONS.find(item => item.id === section)!.href;
-  const publicSources = projectPublicSources(manifest, locale, catalogue.documents);
-  const sources = manifest.map(source => {
-    const translated = publicSources.find(row => row.source_id === source.source_id)!;
-    return { sourceId: source.source_id, years: source.years, title: translated.title, organization: translated.publisher, downloadHref: source.downloadHref, retrievedAt: source.retrieved_at };
-  });
   const region = regionId ? UNEMPLOYMENT_GROUPS.find(group => group.id === regionId)! : null;
   const regionName = region ? locale === "en" ? region.labelEn : region.labelKa : "";
   const title = region ? message(presentation.messages, "unemployment.regionTitle", { region: regionName }) : message(presentation.messages, `unemployment.page.${section}.title`), firstYear = Math.min(...facts.map(f => f.year)), lastYear = Math.max(...facts.map(f => f.year));
@@ -58,7 +44,7 @@ export async function renderUnemploymentPage(locale: Locale, section: Unemployme
   // carries the split-region note (U17-11). Read from the facts, not listed.
   const regionFirstYear = (id?: string) => Math.min(...data.facts.filter(f => f.dimension === "region" && (!id || f.groupId === id)).map(f => f.year));
   const regionSplit = regionId ? regionFirstYear(regionId) > regionFirstYear() : undefined;
-  const explorer = { section, regionId, regionSplit, regions: regionId ? UNEMPLOYMENT_REGIONS : undefined, facts: facts.map(({ dimension, groupId, sex, indicatorId, year, value, sourceId }) => ({ dimension, groupId, sex, indicatorId, year, value, sourceId })), registry: UNEMPLOYMENT_REGISTRY, sources, lastReviewedAt, siteOrigin: origin };
+  const explorer = { section, regionId, regionSplit, regions: regionId ? UNEMPLOYMENT_REGIONS : undefined, facts: clientFacts, registry: UNEMPLOYMENT_REGISTRY, sources, lastReviewedAt, siteOrigin: origin };
   return <I18nProvider {...clientPresentation(presentation)}>
     <JsonLd testId="explorer-dataset-json-ld" data={explorerDatasetJsonLd({
       locale, origin, path: sectionPath, datasetId: "unemployment", name: title, description, firstYear, lastYear, dateModified: lastReviewedAt,

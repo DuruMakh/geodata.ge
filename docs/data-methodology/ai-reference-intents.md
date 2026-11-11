@@ -80,12 +80,12 @@ The table above records the first 34 intents. The executable fixture additionall
 covers regional GDP (#35–37), city inflation and early missingness (#38–40), and
 product annual/cumulative values, history limits, rankings and refusals (#41–48).
 Its source-checked expectations are authoritative; the separate thirteen-pair
-`mcpAssistantIntents.ts` rubric assesses actual assistant behavior. Its wages pair asks about a topic that Fiscal.ge shows but MCP does not serve: the
-assistant must say this connection does not serve it, offer the `websitePages` link from
-`describe_coverage` in the user's language, and quote a figure only from that page's year-by-year
-table with its link, when it can open the page; never from unrelated data or memory. Its pensions
-pair is served: the assistant answers from the Pensions dataset (`health-pensions`), the average
-pension in GEL a month for the latest year with its source.
+`mcpAssistantIntents.ts` rubric assesses actual assistant behavior. Its unemployment, wages and
+pensions pairs are served: the assistant answers from the Unemployment overview dataset
+(`unemployment-overview`), Georgia's unemployment rate in % as a Labour Force Survey estimate, from
+the Wages overview dataset (`wages-overview`), the average monthly wage in GEL a month, and from the
+Pensions dataset (`health-pensions`), the average pension in GEL a month, each for the latest year
+with its source; never from memory.
 
 ## What the list is designed to catch
 

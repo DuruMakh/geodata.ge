@@ -1,9 +1,10 @@
 import { LatestFigure } from "../../components/explorer-shell/latest-value-line";
 import { LabourExplorer } from "../../components/unemployment/labour-explorer";
-import { loadServedLabourData, toClientLabourFact } from "../data/labour/importLabour";
+import { loadServedLabourData } from "../data/labour/importLabour";
 import { LABOUR_SOURCES } from "../data/labour/types";
 import { formatInUnit, formatShare } from "../explorer/format";
-import { labourDefaultSelection, labourFullLabel, labourSeries, labourUnit, ONE_DECIMAL, type LabourSectionId } from "../explorer/labour";
+import { labourDefaultSelection, labourFullLabel, labourUnit, ONE_DECIMAL, type LabourSectionId } from "../explorer/labour";
+import { labourPageData } from "../explorer/labourPageData";
 import { getPresentation } from "../i18n/presentation.server";
 import { message } from "../i18n/messages";
 import type { Locale } from "../i18n/types";
@@ -18,13 +19,7 @@ export async function renderLabourPage(locale: Locale, section: LabourSectionId)
     loadServedLabourData(), getPresentation(locale, ["labour", "format", "main", "workbook"], []), loadSourcedWorkbookSources("unemployment", locale, row => LABOUR_SOURCES.includes(row.source_id)),
   ]);
   const t = (key: string) => message(presentation.messages, `labour.${key}`);
-  const series = labourSeries(section);
-  // The page receives only the observations its list shows.
-  const ids = new Set<string>(series.map(({ id }) => id));
-  const served = all.filter(f => ids.has(f.indicatorId));
-  const facts = served.map(toClientLabourFact);
-  const labels = Object.fromEntries(series.map(({ id, item }) => [id, t(`row.${item}`)]));
-  const headingLabels = Object.fromEntries(series.map(({ heading }) => [heading, t(`heading.${heading}`)]));
+  const { series, served, facts, labels, headingLabels } = labourPageData(all, presentation.messages, section);
   const title = t(`page.${section}.title`);
   // "{measure} · {year}: {value}": the page total's latest published figure.
   const [totalId] = labourDefaultSelection(section);
