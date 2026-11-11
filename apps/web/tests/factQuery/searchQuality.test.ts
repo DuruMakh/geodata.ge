@@ -77,7 +77,7 @@ const singular = (word: string) => (word.length >= 5 ? word.replace(/(x|s|ch|sh)
 const insideWordHits = (query: string) => search(query).hits.filter((hit) => isInsideWord(query, hit)).map((hit) => hit.label);
 
 describe("catalogue search matches words, not letters inside words", () => {
-  it.each(["VAT", "grants", "oil", "Oni", "port", "ვალი", "ხორცი", "პური"])("%s returns nothing that matched only inside a word", (query) => {
+  it.each(["VAT", "grants", "oil", "Oni", "port", "exports", "ვალი", "ხორცი", "პური"])("%s returns nothing that matched only inside a word", (query) => {
     expect(insideWordHits(query)).toEqual([]);
   });
 
@@ -95,7 +95,7 @@ describe("catalogue search matches words, not letters inside words", () => {
     expect(keysOf(query)).toContain(target);
   });
 
-  it.each(["salary", "exports", "zzz-no-such-series", "constructor", "__proto__"])("%s stays empty", (query) => {
+  it.each(["salary", "zzz-no-such-series", "constructor", "__proto__"])("%s stays empty", (query) => {
     const found = search(query);
     expect(found.status).toBe("empty");
     expect(found.hits).toEqual([]);
@@ -319,6 +319,31 @@ describe("a topic dataset is searched under its topic's name and its page title"
     ["Gini", "living-standards-inequality", "gini.total_income"],
   ])("still lists the page a query names first for %s", (query, datasetId, seriesId) => {
     expect(firstOf(query)).toMatchObject({ datasetId, seriesId });
+  });
+
+  it.each([
+    ["school pupils", "education-schools", "education.pupils_national.total"],
+    ["doctors", "health-doctors-hospitals", "health.staff.doctors"],
+    ["housing prices", "housing-prices", "housing.price_index.total"],
+    ["internet users", "internet-users", "internet.used_3m.total"],
+    ["registered vehicles", "transport-regions", "transport.registered"],
+  ])("keeps a topic's own answer first for %s", (query, datasetId, seriesId) => {
+    expect(firstOf(query)).toMatchObject({ datasetId, seriesId });
+  });
+
+  // A some-words answer puts ahead the series whose page title meets a word, not those whose topic's name does: by
+  // the topic's name ("Education — Universities") every Education series would come before the ministry's spending.
+  it("lists the budget's series first for ministry of education, not an Education page's", () => {
+    expect(firstOf("ministry of education")).toMatchObject({ datasetId: "national-expenditure", seriesId: "spending.education" });
+  });
+
+  it("names every topic dataset for search by its topic's name, then its published title", () => {
+    for (const dataset of snapshot.topics.datasets) {
+      expect(dataset.searchKa.endsWith(` — ${dataset.titleKa}`), dataset.page.datasetId).toBe(true);
+      expect(dataset.searchEn.endsWith(` — ${dataset.titleEn}`), dataset.page.datasetId).toBe(true);
+      expect(dataset.searchKa.length).toBeGreaterThan(` — ${dataset.titleKa}`.length);
+      expect(dataset.searchEn.length).toBeGreaterThan(` — ${dataset.titleEn}`.length);
+    }
   });
 
   it("keeps the published title apart from the search name", () => {

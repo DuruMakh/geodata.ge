@@ -67,17 +67,17 @@ describe("buildFactQuerySnapshot", () => {
     // All 21 registered housing sources are in the registry, and only those a topic page's facts cite reach the snapshot.
     expect(HOUSING_PUBLIC_SOURCES.map(housingSourceDocumentId).filter(id => !sources.some(source => source.sourceId === id))).toEqual([]);
     expect(snapshot.sources.filter(source => HOUSING_PUBLIC_SOURCES.map(housingSourceDocumentId).includes(source.sourceId)).map(source => source.sourceId)).toEqual(snapshot.topics.sourceIds.filter(id => HOUSING_PUBLIC_SOURCES.map(housingSourceDocumentId).includes(id)));
-    // All 36 registered internet sources are in the registry, and none of them reaches the snapshot.
+    // All 36 registered internet sources are in the registry, and only those a topic page's facts cite reach the snapshot.
     expect(INTERNET_PUBLIC_SOURCES.map(internetSourceDocumentId).filter(id => !sources.some(source => source.sourceId === id))).toEqual([]);
-    expect(snapshot.sources.some(source => INTERNET_PUBLIC_SOURCES.map(internetSourceDocumentId).includes(source.sourceId))).toBe(false);
+    expect(snapshot.sources.filter(source => INTERNET_PUBLIC_SOURCES.map(internetSourceDocumentId).includes(source.sourceId)).map(source => source.sourceId)).toEqual(snapshot.topics.sourceIds.filter(id => INTERNET_PUBLIC_SOURCES.map(internetSourceDocumentId).includes(id)));
     // Only the Education sources a topic page's facts cite reach the snapshot.
     expect(snapshot.sources.filter(source => EDUCATION_PUBLIC_SOURCES.map(educationSourceDocumentId).includes(source.sourceId)).map(source => source.sourceId)).toEqual(snapshot.topics.sourceIds.filter(id => EDUCATION_PUBLIC_SOURCES.map(educationSourceDocumentId).includes(id)));
     // All 33 registered science and culture sources are in the registry, and none of them reaches the snapshot.
     expect(SCIENCE_CULTURE_PUBLIC_SOURCES.map(scienceCultureSourceDocumentId).filter(id => !sources.some(source => source.sourceId === id))).toEqual([]);
     expect(snapshot.sources.some(source => SCIENCE_CULTURE_PUBLIC_SOURCES.map(scienceCultureSourceDocumentId).includes(source.sourceId))).toBe(false);
-    // All 25 registered transport sources are in the registry, and none of them reaches the snapshot.
+    // All 25 registered transport sources are in the registry, and only those a topic page's facts cite reach the snapshot.
     expect(TRANSPORT_PUBLIC_SOURCES.map(transportSourceDocumentId).filter(id => !sources.some(source => source.sourceId === id))).toEqual([]);
-    expect(snapshot.sources.some(source => TRANSPORT_PUBLIC_SOURCES.map(transportSourceDocumentId).includes(source.sourceId))).toBe(false);
+    expect(snapshot.sources.filter(source => TRANSPORT_PUBLIC_SOURCES.map(transportSourceDocumentId).includes(source.sourceId)).map(source => source.sourceId)).toEqual(snapshot.topics.sourceIds.filter(id => TRANSPORT_PUBLIC_SOURCES.map(transportSourceDocumentId).includes(id)));
     expect(snapshot.sources.some(source => source.sourceId.startsWith("source.nbg_money_transfers_") || source.sourceId.startsWith("source.geostat_fdi_") || source.sourceId === "source.nbg_balance_of_payments_bpm6")).toBe(false);
     expect(snapshot.sources.map(source => source.sourceId)).toEqual(expect.arrayContaining([
       "source.geostat_sector_growth", "source.geostat_sector_volume",

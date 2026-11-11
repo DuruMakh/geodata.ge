@@ -21,16 +21,18 @@ import { demographyTopicAdapter } from "./demography";
 import { educationTopicAdapter } from "./education";
 import { healthTopicAdapter } from "./health";
 import { housingTopicAdapter } from "./housing";
+import { internetTopicAdapter } from "./internet";
 import { livingStandardsTopicAdapter } from "./livingStandards";
 import { moneyBanksTopicAdapter } from "./moneyBanks";
 import { TOPIC_PAGES } from "./pages";
 import { socialTopicAdapter } from "./social";
 import { packTopicFacts } from "./store";
+import { transportTopicAdapter } from "./transport";
 import { unemploymentTopicAdapter } from "./unemployment";
 import { wagesTopicAdapter } from "./wages";
 import type { TopicAdapter, TopicDataset, TopicDatasetBuild, TopicsSnapshot, TopicValueStatus } from "./types";
 
-export const TOPIC_ADAPTERS: readonly TopicAdapter[] = [educationTopicAdapter, demographyTopicAdapter, healthTopicAdapter, socialTopicAdapter, unemploymentTopicAdapter, wagesTopicAdapter, businessTopicAdapter, moneyBanksTopicAdapter, livingStandardsTopicAdapter, housingTopicAdapter];
+export const TOPIC_ADAPTERS: readonly TopicAdapter[] = [educationTopicAdapter, demographyTopicAdapter, healthTopicAdapter, socialTopicAdapter, unemploymentTopicAdapter, wagesTopicAdapter, businessTopicAdapter, moneyBanksTopicAdapter, livingStandardsTopicAdapter, housingTopicAdapter, internetTopicAdapter, transportTopicAdapter];
 
 /**
  * The site's own message for each unit token the topic CSVs use (R7: unit ids are the CSVs' tokens). One name per
@@ -66,6 +68,13 @@ const TOPIC_UNIT_MESSAGES: Readonly<Record<string, string>> = {
   square_metres: "housing.unitSquareMetres",
   index_2020: "housing.unitIndex",
   gel_per_square_metre: "housing.unitGelPerSquareMetre",
+  thousand_units: "units.thousandUnits",
+  million_passenger_km: "transport.unitMillionPkm",
+  passenger_km_per_person: "transport.unitPkmPerPerson",
+  thousand_passengers: "transport.unitThousandPassengers",
+  million_tonne_km: "transport.unitMillionTkm",
+  thousand_tonnes: "transport.unitThousandTonnes",
+  km: "transport.unitKm",
 };
 
 /** The source registry's id (data/sources/source-documents.csv) of an archive's source id: the registry adds `source.`, which some archives already carry. */
