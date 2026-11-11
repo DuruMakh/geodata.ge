@@ -496,12 +496,13 @@ describe("MCP tool surface", () => {
   // 120 KB; the integer bounds and empty `additionalProperties` Zod emitted
   // carried nothing. Most of what remains is the evidence envelope each of the
   // 14 output schemas must declare in full, because MCP gives tools no way to
-  // share a definition.
-  it("tools/list stays under 115 KB", async () => {
+  // share a definition. query_indicators added a 15th tool, and its output schema
+  // must declare that envelope in full too, so it costs ~6 KB: the bound is 125 KiB.
+  it("tools/list stays under 125 KB", async () => {
     const client = await connected();
     try {
       const listed = await client.listTools();
-      expect(Buffer.byteLength(JSON.stringify(listed), "utf8")).toBeLessThan(115 * 1024);
+      expect(Buffer.byteLength(JSON.stringify(listed), "utf8")).toBeLessThan(125 * 1024);
       expect(JSON.stringify(listed)).not.toContain("9007199254740991");
     } finally { await client.close(); }
   });
