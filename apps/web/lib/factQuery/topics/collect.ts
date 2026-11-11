@@ -3,12 +3,15 @@
 // The collector every topic adapter builds its datasets with: the series, places and cells a page prints, checked for one
 // unit per series, with the reviewed breaks narrowed to the served series. Build-time only: runtime code never imports
 // it (tests/factQuery/purity.test.ts).
+import type { Presentation } from "../../i18n/types";
 import type { Basis } from "../types";
 import { TOPIC_PAGES } from "./pages";
 import type { TopicBreak, TopicDatasetBuild, TopicEntity, TopicFact, TopicPage, TopicSeries, TopicSeriesNote, TopicValueStatus } from "./types";
 
 /** A name in both languages: a message key read in each, or text built from the page's own words in each. */
 export type Names = { ka: string; en: string };
+/** A name read the same way from the Georgian and the English presentation. */
+export const both = (presentations: { ka: Presentation; en: Presentation }, read: (presentation: Presentation) => string): Names => ({ ka: read(presentations.ka), en: read(presentations.en) });
 /**
  * One served cell's value, the rows it rests on, whether the page adds them up itself and, for a part of a year, its
  * months; for an amount dated other than the year's end (the latest Foreign debt and Reserves point), its date; for a

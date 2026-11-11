@@ -19,15 +19,13 @@ import { regionAreaLabels, regionAreaPages } from "../../explorer/regionAreaPage
 import { message } from "../../i18n/messages";
 import { getPresentation } from "../../i18n/presentation.server";
 import type { Presentation } from "../../i18n/types";
-import { collectTopicDataset, type Cell, type Names } from "./collect";
+import { both, collectTopicDataset, type Cell } from "./collect";
 import type { TopicAdapter, TopicDatasetBuild, TopicEntity } from "./types";
 
 type Context = { facts: readonly TransportFact[]; rows: ReadonlyMap<string, TransportFact>; ka: Presentation; en: Presentation };
 
 const AREA_PAGES = regionAreaPages(TRANSPORT_AREAS, transportMapId);
 const AREA_LABEL_IDS = AREA_PAGES.map((area) => area.id);
-
-const both = (context: Context, read: (presentation: Presentation) => string): Names => ({ ka: read(context.ka), en: read(context.en) });
 
 /** A heading's own words, without the display unit the page adds after " · " ("Passenger-km · million"), as the page's own series names cut it: the served unit is the row's own. */
 const headingText = (presentation: Presentation, heading: TransportHeading) => message(presentation.messages, `transport.heading.${heading}`).split(" · ")[0]!;

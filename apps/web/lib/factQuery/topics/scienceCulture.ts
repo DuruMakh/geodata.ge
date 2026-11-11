@@ -21,15 +21,13 @@ import { message } from "../../i18n/messages";
 import { getPresentation } from "../../i18n/presentation.server";
 import type { Presentation } from "../../i18n/types";
 import { loadTopicBreaks } from "./breaks";
-import { breaksOnServedSeries, collectTopicDataset, type Cell, type Names } from "./collect";
+import { breaksOnServedSeries, both, collectTopicDataset, type Cell } from "./collect";
 import type { TopicAdapter, TopicBreak, TopicDatasetBuild, TopicEntity } from "./types";
 
 type Context = { facts: readonly ScienceCultureFact[]; rows: ReadonlyMap<string, ScienceCultureFact>; breaks: readonly TopicBreak[]; ka: Presentation; en: Presentation };
 
 const AREA_PAGES = regionAreaPages(MUSEUM_AREAS, museumMapId);
 const AREA_LABEL_IDS = AREA_PAGES.map((area) => area.id);
-
-const both = (context: Context, read: (presentation: Presentation) => string): Names => ({ ka: read(context.ka), en: read(context.en) });
 
 /** A heading's own words, without the display unit the page adds after " · " ("Visitors · thousand"), as the page's own series names cut it: the served unit is the row's own. */
 const headingOf = (context: Context, heading: ScienceCultureHeading) => both(context, ({ messages }) => message(messages, `scienceCulture.heading.${heading}`).split(" · ")[0]!);

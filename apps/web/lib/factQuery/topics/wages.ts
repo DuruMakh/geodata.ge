@@ -15,12 +15,10 @@ import { WAGES_LABEL_IDS, wagesLabels, wagesPageFacts, wagesRegionPageData } fro
 import { message } from "../../i18n/messages";
 import { getPresentation } from "../../i18n/presentation.server";
 import type { Presentation } from "../../i18n/types";
-import { collectTopicDataset, type Cell, type Names, type SeriesSpec } from "./collect";
+import { both, collectTopicDataset, type Cell, type Names, type SeriesSpec } from "./collect";
 import type { TopicAdapter, TopicDatasetBuild, TopicEntity, TopicSeriesNote } from "./types";
 
 type Context = { rows: ReadonlyMap<string, WagesFact>; facts: readonly ClientWagesFact[]; ka: Presentation; en: Presentation };
-
-const both = (context: Context, read: (presentation: Presentation) => string): Names => ({ ka: read(context.ka), en: read(context.en) });
 
 /** A served series: the indicator, then the group and the economic section when they are not Georgia's and all activities. */
 const seriesIdOf = (series: { indicatorId: string; groupId: string; sectorId: string }) =>

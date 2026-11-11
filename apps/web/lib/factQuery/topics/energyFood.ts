@@ -16,12 +16,10 @@ import { energyFoodLabels, energyFoodPageFacts } from "../../explorer/energyFood
 import { message } from "../../i18n/messages";
 import { getPresentation } from "../../i18n/presentation.server";
 import type { Presentation } from "../../i18n/types";
-import { collectTopicDataset, type Cell, type Names } from "./collect";
+import { both, collectTopicDataset, type Cell } from "./collect";
 import type { TopicAdapter, TopicDatasetBuild, TopicEntity } from "./types";
 
 type Context = { facts: readonly EnergyFoodFact[]; rows: ReadonlyMap<string, EnergyFoodFact>; ka: Presentation; en: Presentation };
-
-const both = (context: Context, read: (presentation: Presentation) => string): Names => ({ ka: read(context.ka), en: read(context.en) });
 
 /**
  * A Farming heading's own words, without the unit the page adds after the last comma ("Harvests, thousand tonnes"): the

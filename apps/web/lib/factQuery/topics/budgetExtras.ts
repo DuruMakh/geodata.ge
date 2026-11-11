@@ -27,12 +27,10 @@ import { buildTaxBreaksRefundsModel, TAX_BREAKS_REFUNDS_DEFAULT, taxBreaksRefund
 import { message } from "../../i18n/messages";
 import { getPresentation } from "../../i18n/presentation.server";
 import type { Presentation } from "../../i18n/types";
-import { collectTopicDataset, type Names } from "./collect";
+import { both, collectTopicDataset } from "./collect";
 import type { TopicAdapter, TopicDatasetBuild, TopicEntity } from "./types";
 
 type Context = { ka: Presentation; en: Presentation };
-
-const both = (context: Context, read: (presentation: Presentation) => string): Names => ({ ka: read(context.ka), en: read(context.en) });
 
 function georgia(context: Context): TopicEntity {
   return { entityId: GEORGIA_PLACE_ID, entityType: "country", labelKa: message(context.ka.messages, "demography.georgia"), labelEn: message(context.en.messages, "demography.georgia"), parentEntityId: null };

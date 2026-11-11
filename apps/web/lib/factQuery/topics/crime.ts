@@ -16,12 +16,10 @@ import { message } from "../../i18n/messages";
 import { getPresentation } from "../../i18n/presentation.server";
 import type { Presentation } from "../../i18n/types";
 import { loadTopicBreaks } from "./breaks";
-import { collectTopicDataset, type Cell, type Names } from "./collect";
+import { both, collectTopicDataset, type Cell } from "./collect";
 import type { TopicAdapter, TopicBreak, TopicDatasetBuild, TopicEntity } from "./types";
 
 type Context = { facts: readonly CrimeFact[]; rows: ReadonlyMap<string, CrimeFact>; breaks: readonly TopicBreak[]; ka: Presentation; en: Presentation };
-
-const both = (context: Context, read: (presentation: Presentation) => string): Names => ({ ka: read(context.ka), en: read(context.en) });
 
 /** A reviewed row as the page's workbook prints it: Geostat's published whole count, in its stored unit. */
 function cellOf(context: Context, indicatorId: string, year: number): Cell | undefined {

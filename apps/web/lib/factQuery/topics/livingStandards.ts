@@ -20,12 +20,10 @@ import { povertyLabels, povertyPageFacts } from "../../explorer/povertyPageData"
 import { message } from "../../i18n/messages";
 import { getPresentation } from "../../i18n/presentation.server";
 import type { Presentation } from "../../i18n/types";
-import { collectTopicDataset, type Cell, type Names } from "./collect";
+import { both, collectTopicDataset, type Cell } from "./collect";
 import type { TopicAdapter, TopicDatasetBuild, TopicEntity } from "./types";
 
 type Context = { household: readonly HouseholdFact[]; householdRows: ReadonlyMap<string, HouseholdFact>; poverty: readonly PovertyFact[]; povertyRows: ReadonlyMap<string, PovertyFact>; ka: Presentation; en: Presentation };
-
-const both = (context: Context, read: (presentation: Presentation) => string): Names => ({ ka: read(context.ka), en: read(context.en) });
 
 /** A reviewed survey row as the page prints it: Geostat's published figure, in its stored unit. */
 const surveyCell = (row: HouseholdFact | PovertyFact | undefined): Cell | undefined =>

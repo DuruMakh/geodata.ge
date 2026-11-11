@@ -31,13 +31,12 @@ import { publicLabel } from "../../i18n/labels";
 import { message } from "../../i18n/messages";
 import { getPresentation } from "../../i18n/presentation.server";
 import type { Presentation } from "../../i18n/types";
-import { collectTopicDataset, type Cell, type Names } from "./collect";
+import { both, collectTopicDataset, type Cell } from "./collect";
 import type { TopicAdapter, TopicDatasetBuild, TopicEntity, TopicSeriesNote } from "./types";
 
 type Context = { ka: Presentation; en: Presentation };
 type Dataset = ReturnType<typeof collectTopicDataset>;
 
-const both = (context: Context, read: (presentation: Presentation) => string): Names => ({ ka: read(context.ka), en: read(context.en) });
 const external = (key: string) => (presentation: Presentation) => message(presentation.messages, `external.${key}`);
 
 function georgia(context: Context): TopicEntity {

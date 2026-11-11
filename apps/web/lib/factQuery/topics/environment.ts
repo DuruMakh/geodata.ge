@@ -27,7 +27,7 @@ import { regionAreaLabels, regionAreaPages } from "../../explorer/regionAreaPage
 import { message } from "../../i18n/messages";
 import { getPresentation } from "../../i18n/presentation.server";
 import type { Presentation } from "../../i18n/types";
-import { collectTopicDataset, type Cell, type Names } from "./collect";
+import { both, collectTopicDataset, type Cell } from "./collect";
 import type { TopicAdapter, TopicDatasetBuild, TopicEntity } from "./types";
 
 type Context = { facts: readonly ClientEnvironmentFact[]; rows: ReadonlyMap<string, EnvironmentFact>; ka: Presentation; en: Presentation };
@@ -36,7 +36,6 @@ type Dataset = ReturnType<typeof collectTopicDataset>;
 const AREA_PAGES = regionAreaPages(ENVIRONMENT_AREAS, environmentAreaRoutes("waste").mapId);
 const AREA_LABEL_IDS = AREA_PAGES.map((area) => area.id);
 
-const both = (context: Context, read: (presentation: Presentation) => string): Names => ({ ka: read(context.ka), en: read(context.en) });
 const words = (presentation: Presentation) => (key: string) => message(presentation.messages, `environment.${key}`);
 
 /** A reviewed row as the page's workbook prints it: Geostat's figure at its published precision, in its stored unit. */

@@ -29,7 +29,7 @@ import { publicLabel } from "../../i18n/labels";
 import { message } from "../../i18n/messages";
 import { getPresentation } from "../../i18n/presentation.server";
 import type { Presentation } from "../../i18n/types";
-import { collectTopicDataset, type Cell, type Names } from "./collect";
+import { both, collectTopicDataset, type Cell, type Names } from "./collect";
 import type { TopicAdapter, TopicDatasetBuild, TopicEntity } from "./types";
 
 type Presentations = { ka: Presentation; en: Presentation };
@@ -42,7 +42,6 @@ const DERIVED: ReadonlySet<TradeChartIndicator> = new Set(["trade.turnover", "tr
 const GOODS = "goods.total";
 const SERVICES = "services.total";
 
-const both = (presentations: Presentations, read: (presentation: Presentation) => string): Names => ({ ka: read(presentations.ka), en: read(presentations.en) });
 const trade = (key: string) => (presentation: Presentation) => message(presentation.messages, `trade.${key}`);
 /** A page's presentation in English with the entity names it ships (Domestic exports, Services, Composition carry their own). */
 const withLabels = (context: Context, englishLabels: Readonly<Record<string, string>>): Presentations => ({ ka: context.ka, en: { ...context.en, englishLabels: { ...context.en.englishLabels, ...englishLabels } } });

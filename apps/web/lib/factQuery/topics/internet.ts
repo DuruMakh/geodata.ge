@@ -18,15 +18,13 @@ import { regionAreaLabels, regionAreaPages } from "../../explorer/regionAreaPage
 import { message } from "../../i18n/messages";
 import { getPresentation } from "../../i18n/presentation.server";
 import type { Presentation } from "../../i18n/types";
-import { collectTopicDataset, type Cell, type Names } from "./collect";
+import { both, collectTopicDataset, type Cell, type Names } from "./collect";
 import type { TopicAdapter, TopicDatasetBuild, TopicEntity } from "./types";
 
 type Context = { facts: readonly InternetFact[]; rows: ReadonlyMap<string, InternetFact>; ka: Presentation; en: Presentation };
 
 const AREA_PAGES = regionAreaPages(INTERNET_AREAS, internetMapId);
 const AREA_LABEL_IDS = AREA_PAGES.map((area) => area.id);
-
-const both = (context: Context, read: (presentation: Presentation) => string): Names => ({ ka: read(context.ka), en: read(context.en) });
 
 /** A heading in full: the measure and, after " · ", the people it is a share of ("% of internet users aged 15+"), which the unit alone does not say. */
 const headingOf = (context: Context, heading: InternetHeading) => both(context, ({ messages }) => message(messages, `internet.heading.${heading}`));

@@ -18,15 +18,13 @@ import { regionAreaLabels, regionAreaPages } from "../../explorer/regionAreaPage
 import { message } from "../../i18n/messages";
 import { getPresentation } from "../../i18n/presentation.server";
 import type { Presentation } from "../../i18n/types";
-import { collectTopicDataset, type Cell, type Names } from "./collect";
+import { both, collectTopicDataset, type Cell } from "./collect";
 import type { TopicAdapter, TopicDatasetBuild, TopicEntity } from "./types";
 
 type Context = { facts: readonly HousingFact[]; rows: ReadonlyMap<string, HousingFact>; ka: Presentation; en: Presentation };
 
 const AREA_PAGES = regionAreaPages(HOUSING_AREAS, housingMapId);
 const AREA_LABEL_IDS = AREA_PAGES.map((area) => area.id);
-
-const both = (context: Context, read: (presentation: Presentation) => string): Names => ({ ka: read(context.ka), en: read(context.en) });
 
 /** A heading's own words, without the display unit the page adds after " · " ("Floor area · thousand m²"), as the page's own series names cut it: the served unit is the row's own. */
 const headingText = (presentation: Presentation, heading: HousingHeading) => message(presentation.messages, `housing.heading.${heading}`).split(" · ")[0]!;

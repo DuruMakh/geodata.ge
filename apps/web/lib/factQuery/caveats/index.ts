@@ -21,7 +21,7 @@ import { TOPIC_CAVEAT_RULES } from "./rules.topics";
  * rules.national.ts), and the debt and general-government-balance datasets add
  * four and two codes of their own. The GDP overview and economic sectors add
  * two and one, registered on 2026-09-14 after shipping inline, and inflation
- * adds four; the GDP overview's preliminary cells share gdp_preliminary. The topic datasets add six
+ * adds four; the GDP overview's preliminary cells share gdp_preliminary. The topic datasets add eight
  * (rules.topics.ts). The count is asserted against ai-grounding-and-caveats.md rather than
  * written here.
  */

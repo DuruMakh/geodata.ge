@@ -23,12 +23,10 @@ import { unemploymentCrawlStates, type UnemploymentState } from "../../explorer/
 import { message } from "../../i18n/messages";
 import { getPresentation } from "../../i18n/presentation.server";
 import type { Presentation } from "../../i18n/types";
-import { collectTopicDataset, type Cell, type Names, type SeriesSpec } from "./collect";
+import { both, collectTopicDataset, type Cell, type Names, type SeriesSpec } from "./collect";
 import type { TopicAdapter, TopicBreak, TopicDatasetBuild, TopicEntity } from "./types";
 
 type Context = { unemployment: readonly ServedUnemploymentObservation[]; rows: ReadonlyMap<string, ServedUnemploymentObservation>; labour: readonly LabourFact[]; ka: Presentation; en: Presentation };
-
-const both = (context: Context, read: (presentation: Presentation) => string): Names => ({ ka: read(context.ka), en: read(context.en) });
 
 /** A survey row as the page's model carries it: the stored estimate, in its own unit. */
 const surveyCell = (row: { value: number; unit: string; sourceId: string; valueStatus: string }): Cell =>
