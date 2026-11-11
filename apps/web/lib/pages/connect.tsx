@@ -58,7 +58,7 @@ function coverage(): {
 
   const { datasets, exclusions } = response.data as CoverageData;
   const ranges = {} as Record<DatasetId, string>;
-  for (const dataset of datasets) ranges[dataset.datasetId] = `${dataset.years[0]}–${dataset.years[1]}`;
+  for (const dataset of datasets) ranges[dataset.datasetId as DatasetId] = `${dataset.years[0]}–${dataset.years[1]}`;
 
   return {
     ranges,

@@ -16,7 +16,10 @@ describe("snapshot-pinned translations", () => {
   it("covers every exposed catalogue identity, including excluded municipalities", () => {
     const overview = describeCoverage(snapshot, {});
     if (overview.kind !== "catalogue") throw new Error("Expected catalogue");
+    const topicIds = new Set(snapshot.topics.datasets.map((topic) => topic.page.datasetId));
     for (const dataset of (overview.data as CoverageData).datasets) {
+      // A topic dataset carries its own English labels (tests/factQuery/topics/describeCoverage.test.ts), not the snapshot's label map.
+      if (topicIds.has(dataset.datasetId)) continue;
       expect(serviceLabelEn(snapshot, dataset.datasetId)).not.toBe("");
       const response = describeCoverage(snapshot, { datasetId: dataset.datasetId });
       if (response.kind !== "catalogue") throw new Error("Expected catalogue");

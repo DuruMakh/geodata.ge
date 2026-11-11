@@ -18,10 +18,12 @@ import { searchExplorer } from "../explorer/search/searchExplorer";
 import { fold } from "../i18n/search";
 import { CAVEAT_RULES, evaluateCaveats } from "./caveats";
 import { buildResponseMeta } from "./meta";
+import { bulkUrlFor } from "../mcp/result";
 import { debtMeasure, deficitMeasure, describeCoverageInput, municipalMeasure, nationalMeasure } from "./schemas";
 import { AGGREGATE_ONLY_MUNICIPAL_CODES } from "./types";
 import { DEBT_SERIES_LABELS_KA, DEFICIT_SERIES_ID } from "./types";
 import type { DatasetId, FactQueryError, FactQueryResponse, FactQuerySnapshot, Measure, WebsitePage } from "./types";
+import type { AnyDatasetId, TopicBreak, TopicDataset } from "./topics/types";
 
 // Typed as DatasetId[] rather than derived from the union, so widening
 // DatasetId does NOT force an entry here - unlike DATASET_META below, which is
@@ -39,6 +41,8 @@ const DATASET_IDS: readonly DatasetId[] = [
   "inflation",
   "inflation-products",
 ];
+
+const isCoreDataset = (datasetId: string): datasetId is DatasetId => (DATASET_IDS as readonly string[]).includes(datasetId);
 
 type EntityType = "country" | "municipality" | "region" | "city";
 type Availability = "served" | "calculated_total" | "taxonomy_only";
@@ -72,6 +76,10 @@ type BaseSeriesEntry = {
   firstPeriod?: string;
   measures?: Measure[];
   historyNotes?: { boundaryYear: number; noteKa: string; noteEn: string }[];
+  /** Topic series only: the page's heading the series sits under, and its unit token. */
+  headingKa?: string;
+  headingEn?: string;
+  unit?: string;
 };
 
 type SeriesEntry = BaseSeriesEntry & { labelEn: string };
@@ -87,7 +95,7 @@ type BaseEntityEntry = {
 type EntityEntry = BaseEntityEntry & { labelEn: string };
 
 type DatasetSummary = {
-  datasetId: DatasetId;
+  datasetId: AnyDatasetId;
   budgetScope: string;
   labelKa: string;
   years: [number, number];
@@ -98,6 +106,12 @@ type DatasetSummary = {
   measureNotes?: Record<string, string>;
   measureNotesEn?: Record<string, string>;
   measureNotesKa?: Record<string, string>;
+  /** Topic datasets only: the chart page, the kind of period its years are, and what it lists. */
+  pageUrlKa?: string;
+  pageUrlEn?: string;
+  periodKind?: "year" | "school_year";
+  seriesCount?: number;
+  entityCount?: number;
 };
 
 export type CoverageData = {
@@ -116,7 +130,17 @@ export type CoverageData = {
   }[];
   websitePagesNoteKa?: string;
   websitePagesNoteEn?: string;
+  /** Only with a topic `datasetId`: the reviewed breaks in its series, the dataset's CSV, and a series list cut to its totals. */
+  breaks?: TopicBreak[];
+  bulkUrl?: string;
+  headings?: { headingKa: string | null; headingEn: string | null; seriesCount: number }[];
+  seriesOmitted?: number;
+  seriesOmittedNoteKa?: string;
+  seriesOmittedNoteEn?: string;
 };
+
+/** A topic series list longer than this returns its totals and headings only; `search` narrows it. */
+const TOPIC_SERIES_LIMIT = 300;
 
 /** How many website pages one search points to: a topic's name matches every one of its pages, so the list is capped. */
 const WEBSITE_PAGES_LIMIT = 5;
@@ -241,7 +265,84 @@ function buildExclusions(snapshot: FactQuerySnapshot): CoverageData["exclusions"
   return AGGREGATE_ONLY_MUNICIPAL_CODES.map((entityId) => ({ entityId, reason: serviceMessage(snapshot, "ka", "exclusions.catalogueMunicipality"), reasonEn: serviceMessage(snapshot, "en", "exclusions.catalogueMunicipality") }));
 }
 
-function buildDatasetSummary(snapshot: FactQuerySnapshot, datasetId: DatasetId, cityScope = false): DatasetSummary {
+function topicDatasetOf(snapshot: FactQuerySnapshot, datasetId: string): TopicDataset | undefined {
+  return snapshot.topics.datasets.find((dataset) => dataset.page.datasetId === datasetId);
+}
+
+/** The core datasets, then the topic datasets the snapshot holds. */
+function allDatasetIds(snapshot: FactQuerySnapshot): AnyDatasetId[] {
+  return [...DATASET_IDS, ...snapshot.topics.datasets.map((dataset) => dataset.page.datasetId as AnyDatasetId)];
+}
+
+const topicEntityTypes = (dataset: TopicDataset): EntityType[] => [...new Set(dataset.entities.map((entity) => entity.entityType))];
+
+function entityTypesOf(snapshot: FactQuerySnapshot, datasetId: AnyDatasetId): readonly EntityType[] {
+  return isCoreDataset(datasetId) ? DATASET_META[datasetId].entityTypes : topicEntityTypes(topicDatasetOf(snapshot, datasetId)!);
+}
+
+/** Datasets of one scope count as one where a search word meets their labels; each topic dataset is its own scope. */
+const scopeOf = (datasetId: AnyDatasetId): string => (isCoreDataset(datasetId) ? DATASET_META[datasetId].budgetScope : datasetId);
+
+function datasetLabelsOf(snapshot: FactQuerySnapshot, datasetId: AnyDatasetId): string[] {
+  if (isCoreDataset(datasetId)) return [DATASET_META[datasetId].labelKa, serviceLabelEn(snapshot, datasetId)];
+  const topic = topicDatasetOf(snapshot, datasetId)!;
+  return [topic.titleKa, topic.titleEn];
+}
+
+function topicSummary(dataset: TopicDataset, cityScope: boolean): DatasetSummary {
+  return {
+    datasetId: dataset.page.datasetId as AnyDatasetId,
+    budgetScope: "topic",
+    labelKa: dataset.titleKa,
+    labelEn: dataset.titleEn,
+    years: [dataset.firstYear, dataset.lastYear],
+    entityTypes: cityScope ? ["city"] : topicEntityTypes(dataset),
+    measures: ["value"],
+    pageUrlKa: dataset.urlKa,
+    pageUrlEn: dataset.urlEn,
+    periodKind: dataset.page.periodKind,
+    seriesCount: dataset.series.length,
+    entityCount: dataset.entities.length,
+  };
+}
+
+const topicSeriesCache = new WeakMap<TopicDataset, SeriesEntry[]>();
+
+/** A topic dataset's series as catalogue entries; `years` are the years the series has a value in. Built once per dataset. */
+function topicSeriesFor(dataset: TopicDataset): SeriesEntry[] {
+  let entries = topicSeriesCache.get(dataset);
+  if (entries === undefined) {
+    const { columns } = dataset;
+    const yearsOf = new Map<number, Set<number>>();
+    columns.series.forEach((seriesIndex, row) => {
+      if (columns.value[row] === null) return;
+      const years = yearsOf.get(seriesIndex) ?? new Set<number>();
+      years.add(columns.year[row]!);
+      yearsOf.set(seriesIndex, years);
+    });
+    entries = dataset.series.map((series, index) => ({
+      seriesId: series.seriesId,
+      labelKa: series.labelKa,
+      labelEn: series.labelEn,
+      level: series.isTotal ? LEVEL_TOTAL : "series",
+      parentSeriesId: series.parentSeriesId,
+      availability: "served",
+      years: sortedUniqueYears(yearsOf.get(index) ?? []),
+      unit: series.unit,
+      ...(series.headingKa !== null ? { headingKa: series.headingKa } : {}),
+      ...(series.headingEn !== null ? { headingEn: series.headingEn } : {}),
+    }));
+    topicSeriesCache.set(dataset, entries);
+  }
+  return entries;
+}
+
+function topicEntitiesFor(dataset: TopicDataset): EntityEntry[] {
+  return dataset.entities.map((entity) => ({ entityId: entity.entityId, entityType: entity.entityType, labelKa: entity.labelKa, labelEn: entity.labelEn, entitySlug: null }));
+}
+
+function buildDatasetSummary(snapshot: FactQuerySnapshot, datasetId: AnyDatasetId, cityScope = false): DatasetSummary {
+  if (!isCoreDataset(datasetId)) return topicSummary(topicDatasetOf(snapshot, datasetId)!, cityScope);
   const citySeries = cityScope ? inflationCatalogueSeries(snapshot, true) : undefined;
   let years: [number, number];
 
@@ -745,11 +846,13 @@ function municipalEntitiesFor(snapshot: FactQuerySnapshot): BaseEntityEntry[] {
   return [country, ...regions, ...municipalities];
 }
 
-function seriesForDataset(snapshot: FactQuerySnapshot, datasetId: DatasetId, cityScope = false): SeriesEntry[] {
+function seriesForDataset(snapshot: FactQuerySnapshot, datasetId: AnyDatasetId, cityScope = false): SeriesEntry[] {
+  if (!isCoreDataset(datasetId)) return topicSeriesFor(topicDatasetOf(snapshot, datasetId)!).map((entry) => ({ ...entry }));
   return baseSeriesForDataset(snapshot, datasetId, cityScope).map(series => ({ ...series, labelEn: series.labelEn ?? serviceLabelEn(snapshot, series.seriesId) }));
 }
 
-function entitiesForDataset(snapshot: FactQuerySnapshot, datasetId: DatasetId): EntityEntry[] | undefined {
+function entitiesForDataset(snapshot: FactQuerySnapshot, datasetId: AnyDatasetId): EntityEntry[] | undefined {
+  if (!isCoreDataset(datasetId)) return topicEntitiesFor(topicDatasetOf(snapshot, datasetId)!);
   if (datasetId === "inflation-products") return [{ entityId: "country.georgia", entityType: "country", labelKa: "საქართველო", labelEn: "Georgia", entitySlug: null }];
   if (datasetId === "municipal-expenditure") return municipalEntitiesFor(snapshot).map(entity => ({ ...entity, labelEn: serviceLabelEn(snapshot, entity.entityId) }));
   if (datasetId === "regional-economies")
@@ -787,7 +890,7 @@ function entitiesForDataset(snapshot: FactQuerySnapshot, datasetId: DatasetId): 
  * and admin_category/major_program are not their request levels — widening for
  * them would leak a national total into a ministries-shaped filter.
  */
-function matchesLevel(entry: BaseSeriesEntry, level: string | undefined, datasetId: DatasetId): boolean {
+function matchesLevel(entry: BaseSeriesEntry, level: string | undefined, datasetId: AnyDatasetId): boolean {
   if (level === undefined) return true;
   if (datasetId === "ministries" && entry.level === LEVEL_TOTAL) return level === LEVEL_ADMIN_CATEGORY;
   return entry.level === level;
@@ -953,12 +1056,14 @@ export function searchCatalogue<T>(
 /**
  * One `searchCatalogue` over a response's series and entities together, so the all/some choice is made once for both.
  * `datasetLabel`, given for entries from several datasets, names each entry's dataset, to order a some-words answer.
+ * `titleFields` adds words to a series' fields: a topic dataset's title for its total series, so a search for the
+ * dataset's name finds the dataset and its headline series.
  */
-function searchSeriesAndEntities<S extends SeriesEntry, E extends EntityEntry>(search: string, series: S[], entities: E[], datasetLabel?: (entry: S | E) => string[]) {
+function searchSeriesAndEntities<S extends SeriesEntry, E extends EntityEntry>(search: string, series: S[], entities: E[], datasetLabel?: (entry: S | E) => string[], titleFields?: (entry: S) => string[]) {
   const { matches, searchMatch, words, wordMatches } = searchCatalogue<S | E>(
     search,
     [...series, ...entities],
-    (entry) => ("seriesId" in entry ? [entry.seriesId, entry.labelKa, entry.labelEn] : [entry.entityId, entry.labelKa, entry.labelEn, entry.entitySlug]),
+    (entry) => ("seriesId" in entry ? [entry.seriesId, entry.labelKa, entry.labelEn, entry.headingKa ?? null, entry.headingEn ?? null, ...(titleFields?.(entry as S) ?? [])] : [entry.entityId, entry.labelKa, entry.labelEn, entry.entitySlug]),
     { ahead: datasetLabel },
   );
   return {
@@ -1095,11 +1200,20 @@ export function describeCoverage(snapshot: FactQuerySnapshot, rawInput: unknown)
       // must change the request first, so this is not "retryable" in the
       // transient sense rate_limited/service_unavailable use.
       retryable: false,
-      validChoices: [...DATASET_IDS],
+      validChoices: allDatasetIds(snapshot),
     });
   }
 
   const input = parsed.data;
+  if (input.datasetId !== undefined && !allDatasetIds(snapshot).includes(input.datasetId as AnyDatasetId)) {
+    return errorResponse(snapshot, {
+      code: "invalid_parameters",
+      messageKa: serviceMessage(snapshot, "ka", "errors.invalidParameters"),
+      messageEn: serviceMessage(snapshot, "en", "errors.invalidParameters", { issues: "datasetId: Invalid option" }),
+      retryable: false,
+      validChoices: allDatasetIds(snapshot),
+    });
+  }
   // A search with no letters or digits ("", "   ", "-") names nothing to look for: it is no search.
   const search = input.search !== undefined && searchWords(input.search).length > 0 ? input.search : undefined;
 
@@ -1124,7 +1238,7 @@ export function describeCoverage(snapshot: FactQuerySnapshot, rawInput: unknown)
   // arbitrary fixed member of DatasetId when the request did not name one.
   const caveats = evaluateCaveats(snapshot,
     {
-      datasetId: input.datasetId ?? "national-revenue",
+      datasetId: (input.datasetId ?? "national-revenue") as AnyDatasetId,
       measure: "amount_gel",
       years: [],
       seriesIds: [],
@@ -1150,7 +1264,7 @@ export function describeCoverage(snapshot: FactQuerySnapshot, rawInput: unknown)
   // just an implementation detail — asserted below by the
   // "narrows datasets to the requested one" test.
   const cityScope = input.entityType === "city";
-  const eligibleDatasets = DATASET_IDS.filter(id => !cityScope || DATASET_META[id].entityTypes.includes("city"));
+  const eligibleDatasets = allDatasetIds(snapshot).filter(id => !cityScope || entityTypesOf(snapshot, id).includes("city"));
   const datasets = eligibleDatasets.filter((id) => input.datasetId === undefined || id === input.datasetId).map((id) =>
     buildDatasetSummary(snapshot, id, cityScope),
   );
@@ -1165,8 +1279,8 @@ export function describeCoverage(snapshot: FactQuerySnapshot, rawInput: unknown)
       return { kind: "catalogue", status: "ok", data: { datasets, exclusions }, meta };
     }
 
-    const taggedSeries: (SeriesEntry & { datasetId: DatasetId })[] = [];
-    const taggedEntities: (EntityEntry & { datasetId: DatasetId })[] = [];
+    const taggedSeries: (SeriesEntry & { datasetId: AnyDatasetId })[] = [];
+    const taggedEntities: (EntityEntry & { datasetId: AnyDatasetId })[] = [];
 
     for (const id of eligibleDatasets) {
       for (const entry of seriesForDataset(snapshot, id, cityScope)) {
@@ -1179,13 +1293,19 @@ export function describeCoverage(snapshot: FactQuerySnapshot, rawInput: unknown)
       }
     }
 
-    const datasetLabels = new Map(eligibleDatasets.map((id) => [id, [DATASET_META[id].labelKa, serviceLabelEn(snapshot, id)]]));
-    const { series: foundSeries, entities: foundEntities, searchMatch, words, wordMatches: matchesByWord } = searchSeriesAndEntities(search, taggedSeries, taggedEntities, (entry) => datasetLabels.get(entry.datasetId)!);
+    const datasetLabels = new Map(eligibleDatasets.map((id) => [id, datasetLabelsOf(snapshot, id)]));
+    const titleFields = (entry: SeriesEntry & { datasetId: AnyDatasetId }) => (entry.level === LEVEL_TOTAL && !isCoreDataset(entry.datasetId) ? datasetLabels.get(entry.datasetId)! : []);
+    const found = searchSeriesAndEntities(search, taggedSeries, taggedEntities, (entry) => datasetLabels.get(entry.datasetId)!, titleFields);
+    const { entities: foundEntities, searchMatch, words, wordMatches: matchesByWord } = found;
+    // A topic dataset whose title meets every word of the search comes first: its series are what was asked for.
+    const titled = searchMatch === "all_words" ? searchCatalogue(search, eligibleDatasets.filter((id) => !isCoreDataset(id)), (id) => datasetLabels.get(id)!) : undefined;
+    const titledIds = new Set<AnyDatasetId>(titled?.searchMatch === "all_words" ? titled.matches : []);
+    const foundSeries = titledIds.size > 0 ? [...found.series.filter((entry) => titledIds.has(entry.datasetId)), ...found.series.filter((entry) => !titledIds.has(entry.datasetId))] : found.series;
 
     // A search is a lookup, so it answers with what matched: the datasets the
     // matches belong to and any excluded code it names, not the whole
     // catalogue, which the no-argument call already returns.
-    const matchedDatasets = new Set<DatasetId>([...foundSeries, ...foundEntities].map((entry) => entry.datasetId));
+    const matchedDatasets = new Set<AnyDatasetId>([...foundSeries, ...foundEntities].map((entry) => entry.datasetId));
     // The website's pages that this service does not serve: a topic the site shows and the catalogue does not hold gets
     // a link to its page instead of a dead end. Links only; the status stays the series' own. What each word is to
     // the page search comes from the search above, the entities' names and one small search of the datasets' labels
@@ -1199,9 +1319,9 @@ export function describeCoverage(snapshot: FactQuerySnapshot, rawInput: unknown)
         // A word that only a dataset's label holds ("prices") is that dataset's word beside one of its own entries
         // ("bread prices", "fuel prices"), but may name a page beside a word the served data holds elsewhere too
         // ("house prices" links Home prices). Datasets of one scope (consumer prices) count as one.
-        const scopes = new Set(labelled[index]!.map((id) => DATASET_META[id].budgetScope));
+        const scopes = new Set(labelled[index]!.map(scopeOf));
         const others = words.flatMap((_, other) => (other !== index && !placeWords[other] && matchesByWord[other]!.length > 0 ? [matchesByWord[other]!] : []));
-        const besideOwnEntry = others.some((found) => found.every((entry) => scopes.has(DATASET_META[entry.datasetId].budgetScope)));
+        const besideOwnEntry = others.some((found) => found.every((entry) => scopes.has(scopeOf(entry.datasetId))));
         return served.length === 0 && others.length > 0 && !besideOwnEntry ? "datasetPage" : "dataset";
       }
       if (served.length === 0) return "unserved";
@@ -1237,11 +1357,11 @@ export function describeCoverage(snapshot: FactQuerySnapshot, rawInput: unknown)
     };
   }
 
-  const datasetId = input.datasetId;
+  const datasetId = input.datasetId as AnyDatasetId;
   const levelled = (eligibleDatasets.includes(datasetId) ? seriesForDataset(snapshot, datasetId, cityScope) : []).filter((entry) =>
     matchesLevel(entry, input.level, datasetId),
   );
-  const typed = entitiesForDataset(snapshot, input.datasetId)?.filter(
+  const typed = entitiesForDataset(snapshot, datasetId)?.filter(
     (entry) => input.entityType === undefined || entry.entityType === input.entityType,
   );
   const searched = search === undefined ? undefined : searchSeriesAndEntities(search, levelled, typed ?? []);
@@ -1250,10 +1370,38 @@ export function describeCoverage(snapshot: FactQuerySnapshot, rawInput: unknown)
 
   const isEmpty = series.length === 0 && (entities === undefined || entities.length === 0);
 
+  // A topic dataset: its reviewed breaks and CSV, and, when its series list is too long for one answer, only the
+  // totals with the page's headings and how many series were left out, to be narrowed with `search`.
+  const topic = topicDatasetOf(snapshot, datasetId);
+  const truncated = topic !== undefined && series.length > TOPIC_SERIES_LIMIT;
+  const shown = truncated ? series.filter((entry) => entry.level === LEVEL_TOTAL).slice(0, TOPIC_SERIES_LIMIT) : series;
+  const omittedValues = { omitted: series.length - shown.length, total: series.length };
+  const headings = truncated ? [...series.reduce((found, entry) => {
+    const key = `${entry.headingKa ?? ""}\n${entry.headingEn ?? ""}`;
+    const heading = found.get(key) ?? { headingKa: entry.headingKa ?? null, headingEn: entry.headingEn ?? null, seriesCount: 0 };
+    heading.seriesCount += 1;
+    return found.set(key, heading);
+  }, new Map<string, { headingKa: string | null; headingEn: string | null; seriesCount: number }>()).values()] : undefined;
+
   return {
     kind: "catalogue",
     status: isEmpty ? "empty" : "ok",
-    data: { datasets, series, ...(entities !== undefined ? { entities } : {}), exclusions, ...(searched !== undefined ? { searchMatch: searched.searchMatch, ...someWordsNote(snapshot, searched.searchMatch) } : {}) },
+    data: {
+      datasets,
+      series: shown,
+      ...(entities !== undefined ? { entities } : {}),
+      exclusions,
+      ...(searched !== undefined ? { searchMatch: searched.searchMatch, ...someWordsNote(snapshot, searched.searchMatch) } : {}),
+      ...(topic !== undefined ? { breaks: topic.breaks, bulkUrl: bulkUrlFor(snapshot, datasetId) } : {}),
+      ...(headings !== undefined
+        ? {
+          headings,
+          seriesOmitted: omittedValues.omitted,
+          seriesOmittedNoteKa: serviceMessage(snapshot, "ka", "catalogue.seriesOmitted", omittedValues),
+          seriesOmittedNoteEn: serviceMessage(snapshot, "en", "catalogue.seriesOmitted", omittedValues),
+        }
+        : {}),
+    },
     meta,
   };
 }

@@ -75,6 +75,7 @@ describe("describeCoverage", () => {
     expect(envelopeSchema.parse(result)).toBeTruthy();
     expect(result.kind).toBe("catalogue");
     expect(data(result).datasets.map((d) => d.datasetId).sort()).toEqual([
+      ...snapshot.topics.datasets.map((dataset) => dataset.page.datasetId),
       "economic-sectors",
       "gdp-overview",
       "general-government-balance",
@@ -86,7 +87,7 @@ describe("describeCoverage", () => {
       "national-expenditure",
       "national-revenue",
       "regional-economies",
-    ]);
+    ].sort());
   });
 
   it("describes regional GDP coverage, regions, activities and only the two approved measures", () => {
@@ -260,12 +261,13 @@ describe("search before you know the dataset", () => {
   it("names the dataset each cross-dataset match belongs to", () => {
     const found = data(describeCoverage(snapshot, { search: "ბათუმი" }));
     const entities = found.entities ?? [];
-    // "ბათუმი" now genuinely matches across two datasets: the Batumi
-    // municipality and the Batumi inflation city entity added by schema 1.4.0.
-    // Each match must carry the dataset it actually belongs to, not a
-    // hardcoded single dataset from when only one ever matched.
+    // "ბათუმი" matches across datasets: the Batumi municipality, the Batumi
+    // inflation city entity added by schema 1.4.0, and the topic datasets that
+    // list the municipality. Each match must carry the dataset it actually
+    // belongs to, not a hardcoded single dataset from when only one ever matched.
     expect(entities.length).toBeGreaterThan(0);
-    for (const entity of entities) expect(["municipal-expenditure", "inflation"]).toContain(entity.datasetId);
+    const topicIds = snapshot.topics.datasets.map((dataset) => dataset.page.datasetId);
+    for (const entity of entities) expect(["municipal-expenditure", "inflation", ...topicIds]).toContain(entity.datasetId);
     expect(entities.find((e) => e.entityId === "06")?.datasetId).toBe("municipal-expenditure");
     expect(entities.find((e) => e.entityId === "city.batumi")?.datasetId).toBe("inflation");
   });
@@ -447,8 +449,13 @@ describe("search links the topic page behind a phrase", () => {
     for (const found of topics) expect(found).toBe(topic);
   });
 
-  // Task 5: a served topic returns its dataset (spec §5.4).
-  it.todo("links ბათუმის სკოლები to the education topic");
+  // Spec §5.4: a served topic returns its dataset and ids, not a websitePages link.
+  it("answers ბათუმის სკოლები with the education-schools dataset and no education page link", () => {
+    const found = data(describeCoverage(snapshot, { search: "ბათუმის სკოლები" }));
+    expect(found.datasets.map((dataset) => dataset.datasetId)).toContain("education-schools");
+    expect(found.series?.map((entry) => entry.datasetId)).toContain("education-schools");
+    expect((found.websitePages ?? []).map((page) => page.topicId)).not.toContain("education");
+  });
 
   it("puts the page that meets the most words first", () => {
     const pages = data(describeCoverage(snapshot, { search: "unemployment among women" })).websitePages ?? [];
@@ -495,8 +502,13 @@ describe("search links no page of another subject", () => {
     expect(pagesOf("შიდა ვალი").map((page) => page.labelEn)).toEqual([]);
   });
 
-  // Task 5: a served topic returns its dataset (spec §5.4).
-  it.todo("drops a two-word region name and links the schools page");
+  // Spec §5.4: the schools page is served, so the search returns its dataset instead of a link to it.
+  it("drops a two-word region name and answers with the schools dataset, not a schools page link", () => {
+    const found = data(describeCoverage(snapshot, { search: "შიდა ქართლის სკოლები" }));
+    expect(found.datasets.map((dataset) => dataset.datasetId)).toContain("education-schools");
+    expect(found.entities?.find((entity) => entity.datasetId === "education-schools")?.entityId).toBe("region.shida_kartli");
+    expect(pagesOf("შიდა ქართლის სკოლები").map((page) => page.labelEn)).not.toContain("Schools");
+  });
 
   it.each(["house prices", "Tbilisi house prices"])("links the home prices page for %s", (search) => {
     expect(pagesOf(search).map((page) => page.labelEn)).toContain("Home prices");

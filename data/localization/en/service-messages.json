@@ -33,6 +33,7 @@
   "ranking.valueDefinitionPeriod": "Ranked by {measure} for {period}, {order}.",
   "catalogue.websitePages": "These Fiscal.ge pages show this topic; this connection does not serve their figures. Each page's HTML carries its year-by-year table: if you can open it, quote from it with the link in the user's language; never quote a figure from memory.",
   "catalogue.someWords": "Only some words of this search matched, so these entries may be about something else. If none fits, retry with another word for the missing part or browse the dataset before saying it is not served; websitePages, when given, show the topic on Fiscal.ge.",
+  "catalogue.seriesOmitted": "This dataset lists {total} series, too many for one answer. Only the totals and the headings are shown; {omitted} series are left out. Call describe_coverage again with this datasetId and a `search` word (a series name, a heading or a place) to list the series you need, or download the whole dataset from bulkUrl.",
   "measures.amount_gel": "amount in GEL",
   "measures.share_of_total_pct": "percentage share of the total",
   "measures.share_of_gdp_pct": "percentage share of GDP",

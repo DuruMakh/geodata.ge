@@ -128,8 +128,9 @@ const dataShapes = {
     exclusions: z.array(z.object({ reason: z.string(), reasonEn: z.string().min(1), ids: z.array(z.string()) })), rankingDefinition: z.string(), rankingDefinitionEn: z.string().min(1),
   }),
   catalogue: z.object({
-    datasets: z.array(z.object({ datasetId: z.string(), budgetScope: z.string(), labelKa: z.string(), labelEn: z.string().min(1), years: z.array(z.number()).length(2), entityTypes: z.array(z.string()), measures: z.array(z.string()), periods: z.array(z.string()).length(2).optional(), measureNotes: z.record(z.string(), z.string()).optional(), measureNotesEn: z.record(z.string(), z.string()).optional(), measureNotesKa: z.record(z.string(), z.string()).optional() })),
-    series: z.array(z.object({ seriesId: z.string(), labelKa: z.string(), labelEn: z.string().min(1), level: z.string(), parentSeriesId: z.string().nullable(), availability: z.enum(["served", "calculated_total", "taxonomy_only"]), years: z.array(z.number()), yearsByMeasure: z.record(z.string(), z.array(z.number())).optional(), periods: z.array(z.string()).length(2).optional(), periodsByMeasure: z.record(z.string(), z.array(z.string()).length(2)).optional(), datasetId: z.string().optional(),
+    datasets: z.array(z.object({ datasetId: z.string(), budgetScope: z.string(), labelKa: z.string(), labelEn: z.string().min(1), years: z.array(z.number()).length(2), entityTypes: z.array(z.string()), measures: z.array(z.string()), periods: z.array(z.string()).length(2).optional(), measureNotes: z.record(z.string(), z.string()).optional(), measureNotesEn: z.record(z.string(), z.string()).optional(), measureNotesKa: z.record(z.string(), z.string()).optional(),
+      pageUrlKa: z.string().optional(), pageUrlEn: z.string().optional(), periodKind: z.enum(["year", "school_year"]).optional(), seriesCount: z.number().int().optional(), entityCount: z.number().int().optional() })),
+    series: z.array(z.object({ seriesId: z.string(), labelKa: z.string(), labelEn: z.string().min(1), level: z.string(), parentSeriesId: z.string().nullable(), availability: z.enum(["served", "calculated_total", "taxonomy_only"]), years: z.array(z.number()), yearsByMeasure: z.record(z.string(), z.array(z.number())).optional(), periods: z.array(z.string()).length(2).optional(), periodsByMeasure: z.record(z.string(), z.array(z.string()).length(2)).optional(), datasetId: z.string().optional(), headingKa: z.string().optional(), headingEn: z.string().optional(), unit: z.string().optional(),
       coicopCode: z.string().optional(), firstPeriod: periodKeySchema.optional(), measures: z.array(z.enum(["yoy_pct", "cumulative_pct"])).optional(),
       historyNotes: z.array(z.object({ boundaryYear: z.number().int(), noteKa: z.string().min(1), noteEn: z.string().min(1) })).optional(),
     })).optional(),
@@ -141,6 +142,12 @@ const dataShapes = {
     websitePages: z.array(z.object({ topicId: z.string(), labelKa: z.string(), labelEn: z.string().min(1), topicLabelKa: z.string(), topicLabelEn: z.string().min(1), urlKa: z.string(), urlEn: z.string() })).optional(),
     websitePagesNoteKa: z.string().optional(),
     websitePagesNoteEn: z.string().optional(),
+    breaks: z.array(z.object({ breakId: z.string(), seriesIds: z.array(z.string()), referenceDate: z.string(), reasonEn: z.string().min(1) })).optional(),
+    bulkUrl: z.string().optional(),
+    headings: z.array(z.object({ headingKa: z.string().nullable(), headingEn: z.string().nullable(), seriesCount: z.number().int() })).optional(),
+    seriesOmitted: z.number().int().optional(),
+    seriesOmittedNoteKa: z.string().optional(),
+    seriesOmittedNoteEn: z.string().optional(),
   }),
   sources: z.object({
     sources: z.array(z.object({

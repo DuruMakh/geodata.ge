@@ -80,7 +80,8 @@ export const queryInflationInput = z.strictObject({
 });
 
 export const describeCoverageInput = z.strictObject({
-  datasetId: z.enum(["national-revenue", "national-expenditure", "ministries", "municipal-expenditure", "government-debt", "general-government-balance", "gdp-overview", "economic-sectors", "regional-economies", "inflation", "inflation-products"]).optional(),
+  // Any core or topic dataset id: describeCoverage checks it against the snapshot's datasets.
+  datasetId: idString.optional(),
   search: z.string().max(120).optional(),
   entityType: z.enum(["country", "municipality", "region", "city"]).optional(),
   level: z.enum(["admin_category", "major_program", "division", "subgroup"]).optional(),

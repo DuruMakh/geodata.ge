@@ -61,7 +61,7 @@ export type ToolResult = {
 export const BULK_DATA_URL = "https://fiscal.ge/downloads/data/manifest.json";
 
 /** A topic dataset's own published file, when the snapshot holds that dataset; otherwise the manifest. */
-function bulkUrlFor(snapshot: FactQuerySnapshot, datasetId: string | undefined): string {
+export function bulkUrlFor(snapshot: FactQuerySnapshot, datasetId: string | undefined): string {
   return datasetId !== undefined && snapshot.topics.datasets.some((dataset) => dataset.page.datasetId === datasetId)
     ? `https://fiscal.ge/downloads/data/topics/${datasetId}.csv`
     : BULK_DATA_URL;
