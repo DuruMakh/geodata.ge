@@ -47,11 +47,10 @@ describe("the indexes' every-year tables", () => {
   const crawl = (html: string) => html.match(/<div hidden="" data-testid="crawl-tables">(.*?)<\/div>/)?.[1] ?? "";
   it("Schools carries every school year for every municipality and region, in both languages", async () => {
     const en = crawl(await index("schools"));
-    expect(en).toContain("<caption>Schools · Pupils · persons · Municipalities · 2000/01–2025/26</caption>");
+    expect(en).toContain("<caption>Schools · Pupils · persons · Municipalities · 2005/06–2025/26</caption>");
     expect(en).toMatch(/<tr><th>Khulo<\/th>(<td>[^<]*<\/td>)*<td>3,936<\/td>/);
     expect(en).toMatch(/<tr><th>Khulo<\/th>.*?<td>2,075<\/td><\/tr>/);
     expect(en).toMatch(/<tr><th>Shuakhevi<\/th>.*?<td>2,410<\/td>.*?<td>1,137<\/td><\/tr>/);
-    expect(en).toMatch(/<tr><th>Khulo<\/th><td>—<\/td>/);
     expect(en.match(/<table>/g)).toHaveLength(2);
     const ka = crawl(await index("schools", "ka"));
     expect(ka).toMatch(/<tr><th>ხულო<\/th>.*?<td>3,936<\/td>/);

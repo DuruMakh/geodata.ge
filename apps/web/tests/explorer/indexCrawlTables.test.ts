@@ -57,10 +57,10 @@ describe("index crawl tables", () => {
     expect(renderToStaticMarkup(React.createElement(IndexCrawlTables, { tables: [], category: "Place" }))).toBe('<div hidden="" data-testid="crawl-tables"></div>');
   });
 
-  it("indexHistoryTables writes two tables per figure, each over the years that figure covers", () => {
+  it("indexHistoryTables writes two tables per figure, each over the years its places have (not Georgia's longer series)", () => {
     const row = (id: string, nameKa: string, kind: MunicipalListRow["kind"]): MunicipalListRow => ({ id, kind, nameKa, subtitleKa: "", regionId: null, valueGel: 0, budgetPerResidentGel: null, rank: null });
     const history = historyFromFacts([
-      { id: "count", facts: [{ geographyId: "country.georgia", year: 2013, value: 700000 }, { geographyId: "region.tbilisi", year: 2013, value: 160000 }, { geographyId: "11", year: 2014, value: 4547 }] },
+      { id: "count", facts: [{ geographyId: "country.georgia", year: 2012, value: 690000 }, { geographyId: "country.georgia", year: 2013, value: 700000 }, { geographyId: "region.tbilisi", year: 2013, value: 160000 }, { geographyId: "11", year: 2014, value: 4547 }] },
       { id: "share", facts: [{ geographyId: "11", year: 2014, value: 21.3 }] },
     ]);
     const tables = indexHistoryTables({
