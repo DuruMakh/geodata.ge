@@ -188,5 +188,20 @@ describe("rank topic datasets", () => {
     expect(ranking(schoolRanking()).entries).toEqual(ranking(schoolRanking()).entries);
   });
 
-  it.todo("excludes every place with the census re-base reason when ranking the population 2024 to 2025 (enabled with the demography adapter)");
+  it("excludes every place with the census re-base reason when ranking the population 2024 to 2025", () => {
+    const population = (entityType: string, fromYear: number, toYear: number) => ranking(rank(snapshot, {
+      datasetId: "demography-population", dimension: "entities", entityType, seriesId: "demography.population_total", measure: "value", metric: "percentage_change", fromYear, toYear, limit: 100,
+    }));
+    for (const [entityType, count] of [["municipality", 63], ["region", 11]] as const) {
+      const across = population(entityType, 2024, 2025);
+      expect(across.entries).toEqual([]);
+      expect(across.exclusions).toHaveLength(1);
+      expect(across.exclusions[0]!.ids).toHaveLength(count);
+      expect(across.exclusions[0]!.reasonEn).toContain("2025-01-01: Geostat recalculated the 1 January 2025 population from the 2024 census");
+      expect(across.exclusions[0]!.reason).toContain("2025-01-01: ");
+    }
+    // Either side of the re-base ranks every place.
+    expect(population("municipality", 2015, 2024).entries).toHaveLength(63);
+    expect(population("municipality", 2025, 2026).entries).toHaveLength(63);
+  });
 });

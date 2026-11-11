@@ -194,8 +194,10 @@ describe("public source resolution", () => {
       expect(snapshot.sources.some(source => source.sourceId.startsWith("source.geostat_services_"))).toBe(false);
       // The nineteen demography canonical inputs (eighteen annual tables and the census snapshot) extend the existing inventory;
       // the package's validation inputs and definitions are evidence, not sources.
-      // The 2026 budget law adds one planned-basis source. The topic pages' sources come on top.
-      expect(snapshot.sources.filter(source => !snapshot.topics.sourceIds.includes(source.sourceId))).toHaveLength(152);
+      // The 2026 budget law adds one planned-basis source. The topic pages' sources come on top, except the Demography ones,
+      // which these core sources already are.
+      const coreDemography = /^source\.geostat_(demography_|census2024_|municipal_population$)/;
+      expect(snapshot.sources.filter(source => !snapshot.topics.sourceIds.includes(source.sourceId) || coreDemography.test(source.sourceId))).toHaveLength(152);
     });
 
     it("resolves an extracted file to the archived original it came from", async () => {

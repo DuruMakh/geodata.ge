@@ -23,7 +23,7 @@ export type MarriageHeading = "number" | "ageMarriage" | "ageDivorce" | "duratio
 export type MarriageSeriesDefinition = { id: MarriageSeriesId; reference: boolean; heading: MarriageHeading; group: "count" | "years" };
 
 /** The served series behind each row: its series id, the Geostat table it is read from and, for an average age, the sex. */
-const SOURCES: Record<MarriageSeriesId, { seriesId: string; sourceId: string; sex?: "male" | "female" }> = {
+export const SOURCES: Record<MarriageSeriesId, { seriesId: string; sourceId: string; sex?: "male" | "female" }> = {
   marriages: { seriesId: SERIES.marriages, sourceId: SOURCE_ID.marriages },
   divorces: { seriesId: SERIES.divorces, sourceId: SOURCE_ID.divorces },
   age_marriage_male: { seriesId: SERIES.meanAgeAtMarriage, sourceId: SOURCE_ID.meanAgeSpouses, sex: "male" },

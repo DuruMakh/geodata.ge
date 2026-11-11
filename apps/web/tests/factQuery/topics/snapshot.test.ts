@@ -23,6 +23,8 @@ vi.mock("../../../lib/factQuery/topics/registry", async (importOriginal) => {
 });
 
 const OPTIONS = { releaseCommit: "test-commit", generatedAt: "2026-08-28T00:00:00.000Z" };
+/** The Demography sources the core datasets already resolve, from the Geostat demography package (sources.test.ts). */
+const CORE_RESOLVED = /^source\.geostat_(demography_|census2024_|municipal_population$)/;
 
 let snapshot: FactQuerySnapshot;
 beforeAll(() => { snapshot = testSnapshot(OPTIONS); });
@@ -61,7 +63,10 @@ describe("the snapshot's topics section", () => {
           expect(source!.documents.length).toBeGreaterThan(0);
           for (const document of source!.documents) {
             expect(document.titleEn.trim()).not.toBe("");
-            expect(document.archiveUrl).toMatch(/^https:\/\/fiscal\.ge\/downloads\/methodology\//);
+            // A source the core datasets already cite keeps the core's resolution, listed once: the Geostat demography package's
+            // own manifest names each official file and its hash, with no archived copy.
+            if (CORE_RESOLVED.test(source!.sourceId)) expect(document).toMatchObject({ officialUrl: expect.stringMatching(/^https:\/\//), sha256: expect.stringMatching(/^[0-9a-f]{64}$/), archiveUrl: null });
+            else expect(document.archiveUrl).toMatch(/^https:\/\/fiscal\.ge\/downloads\/methodology\//);
           }
         }
       }

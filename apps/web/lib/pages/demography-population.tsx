@@ -15,22 +15,19 @@ import { buildPopulationIndexModel } from "../explorer/demographyPopulationIndex
 import { buildPopulationKpis, populationIndexKpis } from "../explorer/demographyPopulationKpis";
 import { DEMOGRAPHY_HUB_PATH } from "../explorer/demographyRoutes";
 import { formatInUnit, UNIT_DENSITY, UNIT_PERSONS } from "../explorer/format";
-import type { WorkbookPublicSource } from "../explorer/workbookModel";
-import { loadEnglishCatalogue } from "../i18n/catalogue.server";
 import { message } from "../i18n/messages";
 import { clientPresentation, getPresentation } from "../i18n/presentation.server";
 import { I18nProvider } from "../i18n/provider";
 import { pageHref } from "../i18n/routes";
 import type { Locale, Messages, Presentation, TemplateValues } from "../i18n/types";
-import { projectPublicSources } from "../methodology/publicSources";
-import { loadReviewedSourceManifest } from "../methodology/sourceManifest";
 import { fiscalMetadata } from "../seo/metadata";
 import { explorerDatasetJsonLd } from "../seo/structuredData";
 import { resolveSiteUrl } from "../siteUrl";
 import { loadPopulationBasics } from "../explorer/populationBasics.server";
+import { loadPopulationSources } from "../explorer/demographyPageData";
 
 // The other Demography pages take the shared loader from here, beside the source loader.
-export { loadPopulationBasics };
+export { loadPopulationBasics, loadPopulationSources };
 import { ALL_DATA_PATH } from "../navigation/navTree";
 
 export async function demographyPopulationPageMetadata(locale: Locale) {
@@ -61,24 +58,6 @@ export function populationSourceNote({ locale, messages }: Presentation, start: 
       </Link>.
     </>
   );
-}
-
-/** The reviewed originals the workbook and the source note name, in the page's language. */
-export async function loadPopulationSources(locale: Locale): Promise<(WorkbookPublicSource & { sourceId: string })[]> {
-  const repositoryRoot = path.resolve(/* turbopackIgnore: true */ process.cwd(), "../..");
-  const [manifest, catalogue] = await Promise.all([loadReviewedSourceManifest(repositoryRoot, "demography"), loadEnglishCatalogue(repositoryRoot)]);
-  const publicSources = projectPublicSources(manifest, locale, catalogue.documents);
-  return manifest.map((source) => {
-    const translated = publicSources.find((candidate) => candidate.source_id === source.source_id)!;
-    return {
-      sourceId: source.source_id,
-      years: source.years,
-      title: translated.title,
-      organization: translated.publisher,
-      downloadHref: source.downloadHref,
-      retrievedAt: source.retrieved_at,
-    };
-  });
 }
 
 /** Tbilisi's area in km² as the reviewed density mapping records it, for the note every page that shows a density carries. */

@@ -69,8 +69,8 @@ function educationDataset(section: EducationSectionId, ka: Messages, en: Message
   return { entities, addList, build };
 }
 
-/** The entity of a place the Schools and Kindergartens pages list, named as its page names it in each language. */
-function placeEntity(ka: DemographyPlace, en: DemographyPlace): TopicEntity {
+/** The entity of a place the Schools and Kindergartens (and the Demography) pages list, named as its page names it in each language. */
+export function placeEntity(ka: DemographyPlace, en: DemographyPlace): TopicEntity {
   return {
     entityId: ka.id, entityType: ka.level, labelKa: placeLabel(ka, "ka"), labelEn: placeLabel(en, "en"),
     parentEntityId: ka.level === "country" ? null : ka.level === "region" ? GEORGIA_PLACE_ID : ka.regionId,

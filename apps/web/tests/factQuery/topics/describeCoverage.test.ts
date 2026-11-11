@@ -102,6 +102,14 @@ describe("search finds topic datasets, series, headings and places in both langu
     expect(datasets).toEqual(expect.arrayContaining(["education-schools", "education-kindergartens"]));
   });
 
+  it("finds Shuakhevi in the Population dataset, in both languages", () => {
+    for (const search of ["Shuakhevi", "შუახევი"]) {
+      const found = dataOf(snapshot, { search });
+      expect(found.datasets.map((dataset) => dataset.datasetId)).toContain("demography-population");
+      expect(found.entities).toEqual(expect.arrayContaining([expect.objectContaining({ datasetId: "demography-population", entityId: "10", entityType: "municipality" })]));
+    }
+  });
+
   it("links no website page for a topic it serves, and keeps links for pages it does not", () => {
     const served = new Set(snapshot.topics.datasets.map((dataset) => dataset.urlKa));
     for (const search of ["schools", "სკოლა", "kindergartens", "education", "უმუშევრობა", "wages"]) {

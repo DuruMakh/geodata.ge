@@ -8,10 +8,10 @@ import { JsonLd } from "../../components/seo/json-ld";
 import { PageHeader } from "../../components/shell/page-header";
 import { loadServedDemographyData } from "../data/demography/importDemography";
 import { SERIES, SOURCE_ID } from "../data/demography/series";
-import { projectNationalObservation } from "../explorer/clientData";
 import { populationHrefById } from "../explorer/demographyPlaceRoutes";
 import { BIRTHS_DEATHS_ANCHOR, BIRTHS_DEATHS_PATH, DEMOGRAPHY_HUB_PATH } from "../explorer/demographyRoutes";
-import { NATIONAL_SERIES, nationalYears } from "../explorer/demographyNational";
+import { nationalYears } from "../explorer/demographyNational";
+import { birthsDeathsNationalFacts } from "../explorer/demographyPageData";
 import { buildVitalIndexModel } from "../explorer/demographyVitalIndex";
 import { formatInUnit, UNIT_PERSONS } from "../explorer/format";
 import { message } from "../i18n/messages";
@@ -48,7 +48,7 @@ export async function renderDemographyBirthsDeathsPage(locale: Locale) {
   const t = (key: string, values?: TemplateValues) => message(messages, `demography.${key}`, values);
   const index = buildVitalIndexModel({ facts: served, regions: municipal.regions, municipalities: municipal.municipalities });
   // Only the national series go to the browser (132 rows); the places block is drawn from server-built rows.
-  const nationalFacts = served.filter((fact) => NATIONAL_SERIES.includes(fact.seriesId)).map(projectNationalObservation);
+  const nationalFacts = birthsDeathsNationalFacts(served);
   const nationalSources = sources.filter((source) => source.sourceId === SOURCE_ID.fertility || source.sourceId === SOURCE_ID.lifeExpectancy);
   const birthYears = served.filter((fact) => fact.seriesId === SERIES.liveBirths).map((fact) => fact.year);
   const [first, last] = [Math.min(...birthYears), Math.max(...birthYears)];

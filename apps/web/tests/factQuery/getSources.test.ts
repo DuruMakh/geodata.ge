@@ -314,5 +314,21 @@ describe("years only the newer datasets reach", () => {
       expect(errorOf(rejected).code).toBe("unknown_entity");
       expect(errorOf(rejected).validChoices).toContain(own);
     });
+
+    it("resolves every source a demography dataset cites, once, though the core datasets already list it", () => {
+      for (const dataset of snapshot.topics.datasets.filter((entry) => entry.page.family === "demography")) {
+        const cited = [...new Set(dataset.columns.sources.flat())].map((index) => snapshot.topics.sourceIds[index]!);
+        expect(cited.length, dataset.page.datasetId).toBeGreaterThan(0);
+        const response = getSources(snapshot, { sourceIds: cited, datasetId: dataset.page.datasetId, years: [dataset.lastYear] });
+        expect(response.kind, dataset.page.datasetId).toBe("sources");
+        const { sources } = (response as { data: { sources: { sourceId: string; documents: { officialUrl: string }[]; narrowingOutcome: string }[] } }).data;
+        expect(sources.map((source) => source.sourceId).sort()).toEqual([...cited].sort());
+        for (const source of sources) {
+          expect(source.documents.length, source.sourceId).toBeGreaterThan(0);
+          expect(source.documents.every((document) => document.officialUrl.startsWith("https://")), source.sourceId).toBe(true);
+        }
+        expect(snapshot.sources.filter((source) => cited.includes(source.sourceId))).toHaveLength(cited.length);
+      }
+    });
   });
 });

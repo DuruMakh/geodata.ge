@@ -14,12 +14,13 @@ import { groupOfTopic, NAV_TREE } from "../../navigation/navTree";
 import { methodologyManifestDocument, PUBLIC_SITE_ORIGIN } from "../manifestDocuments";
 import { findSourceProvenanceFailures, resolvePublicSources } from "../sources";
 import type { Basis, RawResolvedSource } from "../types";
+import { demographyTopicAdapter } from "./demography";
 import { educationTopicAdapter } from "./education";
 import { TOPIC_PAGES } from "./pages";
 import { packTopicFacts } from "./store";
 import type { TopicAdapter, TopicDataset, TopicDatasetBuild, TopicsSnapshot, TopicValueStatus } from "./types";
 
-export const TOPIC_ADAPTERS: readonly TopicAdapter[] = [educationTopicAdapter];
+export const TOPIC_ADAPTERS: readonly TopicAdapter[] = [educationTopicAdapter, demographyTopicAdapter];
 
 /**
  * The site's own message for each unit token the topic CSVs use (R7: unit ids are the CSVs' tokens). One name per
@@ -30,6 +31,12 @@ const TOPIC_UNIT_MESSAGES: Readonly<Record<string, string>> = {
   persons: "education.unitPersons",
   persons_thousand: "health.unitThousandPersons",
   institutions: "education.unitInstitutions",
+  persons_per_km2: "demography.densityUnitLong",
+  children_per_woman: "demography.tfrUnit",
+  births_per_1000_women: "demography.asfrUnit",
+  years: "demography.lifeUnit",
+  marriages: "demography.marriageLatestMarriages",
+  divorces: "demography.marriageLatestDivorces",
 };
 
 /** The source registry's id (data/sources/source-documents.csv) of an archive's source id: the registry adds `source.`, which some archives already carry. */

@@ -7,8 +7,8 @@ import { JsonLd } from "../../components/seo/json-ld";
 import { PageHeader } from "../../components/shell/page-header";
 import { loadServedDemographyData } from "../data/demography/importDemography";
 import { SOURCE_ID } from "../data/demography/series";
-import { projectMigrationObservation } from "../explorer/clientData";
-import { MIGRATION_SERIES, migrationCoverage, migrationSearchLabels } from "../explorer/demographyMigration";
+import { migrationCoverage, migrationSearchLabels } from "../explorer/demographyMigration";
+import { migrationPageFacts } from "../explorer/demographyPageData";
 import { DEMOGRAPHY_HUB_PATH, MIGRATION_PATH } from "../explorer/demographyRoutes";
 import { message } from "../i18n/messages";
 import { getMessages } from "../i18n/messages.server";
@@ -24,7 +24,7 @@ import { ALL_DATA_PATH } from "../navigation/navTree";
 
 export async function demographyMigrationPageMetadata(locale: Locale) {
   const [{ facts: served }, p] = await Promise.all([loadServedDemographyData(), getPresentation(locale, ["demography"], [])]);
-  const { min: first, max: last } = migrationCoverage(served.filter((fact) => MIGRATION_SERIES.includes(fact.seriesId)).map(projectMigrationObservation));
+  const { min: first, max: last } = migrationCoverage(migrationPageFacts(served));
   return fiscalMetadata({
     locale,
     path: MIGRATION_PATH,
@@ -46,7 +46,7 @@ export async function renderDemographyMigrationPage(locale: Locale) {
   const migrationSources = sources.filter((source) => source.sourceId === SOURCE_ID.migrationCitizenship || source.sourceId === SOURCE_ID.netMigration);
   const t = (key: string, values?: TemplateValues) => message(messages, `demography.${key}`, values);
   // Only the three series the page reads go to the browser (518 rows), never the whole mirrored file.
-  const facts = served.filter((fact) => MIGRATION_SERIES.includes(fact.seriesId)).map(projectMigrationObservation);
+  const facts = migrationPageFacts(served);
   const { min: first, max: last } = migrationCoverage(facts);
   const title = t("migrationTitle");
   const crumbs = [
