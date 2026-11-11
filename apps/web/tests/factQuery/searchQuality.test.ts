@@ -290,6 +290,15 @@ describe("a some-words answer puts the subject first", () => {
     expect(found[0]).toBe("apple x");
     expect(found.indexOf("pear y")).toBeGreaterThan(0);
   });
+
+  // "personal income tax" holds Income tax in full, with its last word; "Personal" lacks the tax, and a phrase with a
+  // joining word ("share of income tax") names what comes before it, so nothing joins it.
+  it("lets an entry the query names in full, with its last word, join an all-words answer after the full matches", () => {
+    const entries = [{ label: "Personal income tax", dataset: "Breaks" }, { label: "Income tax", dataset: "Revenue" }, { label: "Personal", dataset: "Revenue" }, { label: "Share of income tax", dataset: "Breaks" }];
+    const joined = (query: string) => searchCatalogue(query, entries, (entry) => [entry.label], { joins: (entry) => entry.dataset === "Revenue" });
+    expect(joined("personal income tax")).toMatchObject({ searchMatch: "all_words", matches: [entries[0], entries[1]] });
+    expect(joined("share of income tax").matches).toEqual([entries[3]]);
+  });
 });
 
 // Ruling R26: a topic dataset is searched under "<topic> — <page title>", not its one-word page title, so a budget
@@ -315,10 +324,10 @@ describe("a topic dataset is searched under its topic's name and its page title"
 
   // A topic page whose title shares one word with a budget or economy query does not take its place: Tax breaks and
   // refunds, Spending by type and GDP by expenditure are not the answer to "tax", "spending" in general or "GDP"; a Foreign
-  // debt or Domestic exports title does not answer "debt" or "exports" alone.
+  // debt title does not answer "debt" alone (the pinned fiscal suite below).
   it.each([
     ["GDP", "gdp-overview"], ["მშპ", "gdp-overview"], ["tax", "national-revenue"], ["taxes", "national-revenue"], ["tax revenue", "national-revenue"],
-    ["VAT", "national-revenue"], ["დღგ", "national-revenue"], ["health spending", "national-expenditure"], ["debt", "national-expenditure"], ["ვალი", "national-expenditure"],
+    ["VAT", "national-revenue"], ["დღგ", "national-revenue"], ["health spending", "national-expenditure"],
   ])("keeps the core answer first for %s", (query, datasetId) => {
     expect(firstOf(query)?.datasetId).toBe(datasetId);
   });
@@ -404,6 +413,66 @@ describe("a topic dataset is searched under its topic's name and its page title"
   });
 });
 
+// Ruling R31: Fiscal.ge is a fiscal site first, so a budget question finds the core budget data first, and a topic's own
+// question still finds its topic. Each query's first dataset and, where named, its first series.
+describe("the pinned fiscal query suite", () => {
+  type Answer = { datasets: { datasetId: string }[]; series?: { datasetId?: string; seriesId: string }[]; entities?: { datasetId?: string; entityId: string }[] };
+  const answerOf = (query: string) => (describeCoverage(snapshot, { search: query }) as { data: Answer }).data;
+
+  // "დეფიციტი" is in no served label (the deficit is General government balance, id `deficit.general_government.balance`),
+  // so it finds no series without an owner-approved alias. "debt" alone is the government's debt, not the budget's debt
+  // service or the country's foreign debt.
+  it.each([
+    ["personal income tax", "national-revenue", "revenue.income_tax"], ["საშემოსავლო გადასახადი", "national-revenue", "revenue.income_tax"],
+    ["government debt", "government-debt", "debt.stock.total"], ["public debt", "government-debt", "debt.stock.total"],
+    ["სახელმწიფო ვალი", "government-debt", "debt.stock.total"], ["debt", "government-debt", "debt.stock.total"], ["ვალი", "government-debt", "debt.stock.total"],
+    ["budget balance", "general-government-balance", "deficit.general_government.balance"], ["deficit", "general-government-balance", "deficit.general_government.balance"],
+    ["import duties", "national-revenue", "revenue.import_tax"], ["import tax", "national-revenue", "revenue.import_tax"], ["იმპორტის გადასახადი", "national-revenue", "revenue.import_tax"],
+    ["VAT", "national-revenue", "revenue.vat"], ["დღგ", "national-revenue", "revenue.vat"], ["tax revenue", "national-revenue", "revenue.taxes_total"],
+    ["health spending", "national-expenditure", "spending.health"], ["ჯანდაცვის ხარჯები", "national-expenditure", "spending.health"],
+    ["education spending", "national-expenditure", "spending.education"], ["განათლების ხარჯები", "national-expenditure", "spending.education"],
+    ["spending on culture", "national-expenditure", "spending.culture"], ["კულტურის ხარჯები", "national-expenditure", "spending.culture"],
+    ["agriculture spending", "national-expenditure", "spending.agriculture_environment"], ["agriculture", "national-expenditure", "spending.agriculture_environment"],
+    ["GDP", "gdp-overview"], ["მშპ", "gdp-overview"],
+  ])("answers the budget question %s with %s first", (query, datasetId, seriesId?: string) => {
+    const found = answerOf(query);
+    expect(found.datasets[0]?.datasetId).toBe(datasetId);
+    expect(found.series?.[0]?.datasetId).toBe(datasetId);
+    if (seriesId !== undefined) expect(found.series?.[0]?.seriesId).toBe(seriesId);
+  });
+
+  // A search that holds a topic page's title in full is aimed at the page: "პენსია" is Pensions and "სოფლის მეურნეობა"
+  // is Farming, whose Georgian title it is (the budget's Agriculture and environment comes next). "pension" is a reviewed
+  // alias for the funded pension programme's word, so its first series is that programme, but its first dataset is Pensions.
+  it.each([
+    ["school pupils", "education-schools", "education.pupils_national.total"], ["doctors", "health-doctors-hospitals", "health.staff.doctors"],
+    ["housing prices", "housing-prices", "housing.price_index.total"], ["unemployment rate", "unemployment-overview", "unemployment_rate"],
+    ["average wage", "wages-overview", "average_monthly_nominal_earnings"], ["pension", "health-pensions"], ["პენსია", "health-pensions", "social.pension.recipients"],
+    ["wine exports", "trade-products", "trade.exports.goods.hs4.2020-2025.2204"], ["remittances", "living-standards-income", "income.remittances.per_household"],
+    ["FDI", "external-foreign-investment", "fdi.total"], ["crime", "crime-recorded", "crime.recorded.total"], ["crime rate", "crime-recorded", "crime.recorded.total"],
+    ["museums", "science-culture-museums", "science_culture.museum_visitors"], ["air quality Tbilisi", "environment-air-quality"],
+    ["temperature", "environment-climate", "environment.climate.temperature.georgia"], ["სოფლის მეურნეობა", "energy-food-farming", "farming.output.total"],
+    ["waste Adjara", "environment-waste", "environment.waste.collected"],
+  ])("answers the topic question %s with %s first", (query, datasetId, seriesId?: string) => {
+    const found = answerOf(query);
+    expect(found.datasets[0]?.datasetId).toBe(datasetId);
+    if (seriesId !== undefined) expect(found.series?.[0]).toMatchObject({ datasetId, seriesId });
+  });
+
+  // A place's name is where, not what: the place leads, in the budget's municipalities first.
+  it.each([
+    ["Shuakhevi", "10"], ["შუახევი", "10"], ["Batumi", "06"], ["Kutaisi", "20"], ["Tbilisi", "region.tbilisi"],
+  ])("answers the place %s with the municipality first", (query, entityId) => {
+    const found = answerOf(query);
+    expect(found.datasets[0]?.datasetId).toBe("municipal-expenditure");
+    expect(found.entities?.[0]).toMatchObject({ datasetId: "municipal-expenditure", entityId });
+  });
+
+  it("finds the place first among the City air quality entries for air quality Tbilisi", () => {
+    expect(answerOf("air quality Tbilisi").entities?.[0]).toMatchObject({ datasetId: "environment-air-quality", entityId: "city.tbilisi" });
+  });
+});
+
 describe("the labelled queries", () => {
   const scored = QUERIES.filter((item) => item.req.length > 0);
   let rows: { q: string; missing: string[]; inside: string[] }[] = [];
@@ -426,13 +495,11 @@ describe("the labelled queries", () => {
   // typos. Without a synonym list (spec section 33), the two reviewed aliases only, and no typo correction, the
   // 23 queries stay out of reach: `healthcare`, `defense`, `police`, `petrol`, `ჯანდაცვა`, `პენსია` and the rest
   // are different words for a label, not forms of it. Raising this number needs the owner's approval of those additions.
-  // A 24th since Foreign debt is served: `government debt` meets every word of the NBG's Government row of foreign debt
-  // ("Government", id `ext_debt.government`), so it no longer reaches the government's own Total debt, which meets only
-  // "debt" (Task 16 report, for the owner). A 25th since Tax breaks and refunds is served: `personal income tax` meets every
-  // word of its "Personal income tax" break, so it no longer reaches the budget's Income tax (Task 17 report, for the owner).
-  it("reaches full recall on at least 109 of 134", () => {
+  // `government debt` and `personal income tax` also meet every word of a topic row (the NBG's "Government" row of foreign
+  // debt, the "Personal income tax" break); the core series they name in full, Total debt and Income tax, join their answers.
+  it("reaches full recall on at least 111 of 134", () => {
     const failing = rows.filter((row) => row.missing.length > 0).map((row) => `${row.q} -> missing ${row.missing.join(", ")}`);
-    expect(rows.length - failing.length, failing.join("\n")).toBeGreaterThanOrEqual(109);
+    expect(rows.length - failing.length, failing.join("\n")).toBeGreaterThanOrEqual(111);
   });
 
   // The audit allowed 4; whole-word matching reaches none (owner review D-9).

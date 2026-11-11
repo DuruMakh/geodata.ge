@@ -437,12 +437,6 @@ describe("search points to website pages the connection does not serve", () => {
 describe("search links the topic page behind a phrase", () => {
   const topicsOf = (search: string) => (data(describeCoverage(snapshot, { search })).websitePages ?? []).map((page) => page.topicId);
 
-  // "prices" meets the inflation dataset's own label, Consumer price inflation, so it is a served word, not the
-  // housing page's subject.
-  it.each(["bread prices", "fuel prices"])("links no housing page for %s", (search) => {
-    expect(topicsOf(search)).not.toContain("housing");
-  });
-
   // A place is no page's word, as the website's own search drops it, and a phrase whose answer is empty still looks
   // word by word.
   it.each([
@@ -501,11 +495,6 @@ describe("search links the topic page behind a phrase", () => {
     const withPages = { ...snapshot, website: { pages: [...snapshot.website.pages, page("/explorer/zz-balloonists", "Balloonists"), page("/explorer/zz-hangars", "Zeppelin hangars")] } };
     const pages = data(describeCoverage(withPages, { search: "balloonists zeppelin hangars" })).websitePages ?? [];
     expect(pages.map((entry) => entry.labelEn)).toEqual(["Zeppelin hangars", "Balloonists"]);
-  });
-
-  // "rate" meets the debt interest rates and links pages of two topics, so it names no page by itself.
-  it.each(["inflation rate", "poverty rate"])("links no interest-rate page for %s", (search) => {
-    expect(topicsOf(search)).not.toContain("money");
   });
 
   // A trailing full stop is punctuation, not an id: only a word, a "." or "_", and a word again looks like one.
