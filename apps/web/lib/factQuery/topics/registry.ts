@@ -21,6 +21,8 @@ import { businessTopicAdapter } from "./business";
 import { crimeTopicAdapter } from "./crime";
 import { demographyTopicAdapter } from "./demography";
 import { educationTopicAdapter } from "./education";
+import { energyFoodTopicAdapter } from "./energyFood";
+import { environmentTopicAdapter } from "./environment";
 import { externalTopicAdapter } from "./external";
 import { healthTopicAdapter } from "./health";
 import { housingTopicAdapter } from "./housing";
@@ -37,7 +39,7 @@ import { unemploymentTopicAdapter } from "./unemployment";
 import { wagesTopicAdapter } from "./wages";
 import type { TopicAdapter, TopicDataset, TopicDatasetBuild, TopicsSnapshot, TopicValueStatus } from "./types";
 
-export const TOPIC_ADAPTERS: readonly TopicAdapter[] = [educationTopicAdapter, demographyTopicAdapter, healthTopicAdapter, socialTopicAdapter, unemploymentTopicAdapter, wagesTopicAdapter, businessTopicAdapter, moneyBanksTopicAdapter, livingStandardsTopicAdapter, housingTopicAdapter, internetTopicAdapter, transportTopicAdapter, tradeTopicAdapter, externalTopicAdapter, budgetExtrasTopicAdapter, scienceCultureTopicAdapter, crimeTopicAdapter];
+export const TOPIC_ADAPTERS: readonly TopicAdapter[] = [educationTopicAdapter, demographyTopicAdapter, healthTopicAdapter, socialTopicAdapter, unemploymentTopicAdapter, wagesTopicAdapter, businessTopicAdapter, moneyBanksTopicAdapter, livingStandardsTopicAdapter, housingTopicAdapter, internetTopicAdapter, transportTopicAdapter, tradeTopicAdapter, externalTopicAdapter, budgetExtrasTopicAdapter, scienceCultureTopicAdapter, crimeTopicAdapter, energyFoodTopicAdapter, environmentTopicAdapter];
 
 /**
  * The site's own message for each unit token the topic CSVs use (R7: unit ids are the CSVs' tokens). One name per
@@ -85,6 +87,29 @@ const TOPIC_UNIT_MESSAGES: Readonly<Record<string, string>> = {
   count_thousand: "scienceCulture.unit.thousand",
   crimes: "crime.unitCrimes",
   accidents: "crime.unitAccidents",
+  ktoe: "energyFood.unit.ktoe",
+  gwh: "energyFood.unit.gwh",
+  million_gel: "social.unitMlnGel",
+  thousand_head: "energyFood.unit.thousand_head",
+  million_litres: "energyFood.unit.million_litres",
+  million_pieces: "units.millionPieces",
+  gel_per_kg: "units.gelPerKg",
+  gel_per_litre: "units.gelPerLitre",
+  gel_per_piece: "units.gelPerPiece",
+  mt_co2e: "environment.unit.mt_co2e",
+  kt_co2e: "environment.unit.kt_co2e",
+  t_co2e_per_person: "environment.unit.t_co2e_per_person",
+  ug_m3: "environment.unit.ug_m3",
+  days: "environment.unit.days",
+  celsius: "environment.unit.celsius",
+  mm: "environment.unit.mm",
+  million_m3: "environment.unit.million_m3",
+  million_persons: "environment.unit.million_persons",
+  m3_per_person: "environment.unit.m3_per_person",
+  kg_per_person: "environment.unit.kg_per_person",
+  m3: "environment.unit.m3",
+  fires: "environment.unit.fires",
+  hectares: "environment.unit.hectares",
 };
 
 /** The source registry's id (data/sources/source-documents.csv) of an archive's source id: the registry adds `source.`, which some archives already carry. */

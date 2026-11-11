@@ -5,6 +5,7 @@ import { AGGREGATE_ONLY_MUNICIPAL_CODES, type FactQuerySnapshot } from "../../li
 import { loadTaxonomyFiles } from "../../lib/data/taxonomy";
 import { loadSourceDocuments } from "../../lib/data/sources";
 import { CRIME_PUBLIC_SOURCES, crimeSourceDocumentId } from "../../lib/data/crime/types";
+import { ENERGY_FOOD_PUBLIC_SOURCES, energyFoodSourceDocumentId } from "../../lib/data/energyFood/types";
 import { ENVIRONMENT_PUBLIC_SOURCES, environmentSourceDocumentId } from "../../lib/data/environment/types";
 import { HEALTH_PUBLIC_SOURCES, healthSourceDocumentId } from "../../lib/data/health/types";
 import { MONEY_BANKS_PUBLIC_SOURCES, moneyBanksSourceDocumentId } from "../../lib/data/moneyBanks/types";
@@ -65,6 +66,9 @@ describe("buildFactQuerySnapshot", () => {
     expect(snapshot.sources.filter(source => HEALTH_PUBLIC_SOURCES.map(healthSourceDocumentId).includes(source.sourceId)).map(source => source.sourceId)).toEqual(snapshot.topics.sourceIds.filter(id => HEALTH_PUBLIC_SOURCES.map(healthSourceDocumentId).includes(id)));
     // Only the Crime and justice workbooks a topic page's facts cite reach the snapshot.
     expect(snapshot.sources.filter(source => CRIME_PUBLIC_SOURCES.map(crimeSourceDocumentId).includes(source.sourceId)).map(source => source.sourceId)).toEqual(snapshot.topics.sourceIds.filter(id => CRIME_PUBLIC_SOURCES.map(crimeSourceDocumentId).includes(id)));
+    // Only the Environment and climate and the Energy and food workbooks a topic page's facts cite reach the snapshot.
+    expect(snapshot.sources.filter(source => ENVIRONMENT_PUBLIC_SOURCES.map(environmentSourceDocumentId).includes(source.sourceId)).map(source => source.sourceId)).toEqual(snapshot.topics.sourceIds.filter(id => ENVIRONMENT_PUBLIC_SOURCES.map(environmentSourceDocumentId).includes(id)));
+    expect(snapshot.sources.filter(source => ENERGY_FOOD_PUBLIC_SOURCES.map(energyFoodSourceDocumentId).includes(source.sourceId)).map(source => source.sourceId)).toEqual(snapshot.topics.sourceIds.filter(id => ENERGY_FOOD_PUBLIC_SOURCES.map(energyFoodSourceDocumentId).includes(id)));
     // Only the Foreign debt and Reserves workbooks those pages' facts cite reach the snapshot (not the NBG file listing).
     expect(snapshot.sources.filter(source => EXTERNAL_POSITION_PUBLIC_SOURCES.map(externalPositionSourceDocumentId).includes(source.sourceId)).map(source => source.sourceId)).toEqual(["source.nbg_gross_external_debt_bpm6", "source.nbg_official_reserve_assets"]);
     // GDP by expenditure, Spending by type and Tax breaks and refunds cite these, and they reach the snapshot as topic sources

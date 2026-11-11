@@ -10,7 +10,7 @@ import { getMessages } from "../i18n/messages.server";
 import { fiscalMetadata } from "../seo/metadata";
 import { areaTitleForm, latestYearOf } from "../seo/placeTitleForms";
 import {
-  ENVIRONMENT_AREA_LABEL_IDS, ENVIRONMENT_AREA_PAGES, environmentAreaForSlug, environmentAreaName, environmentAreaParent, environmentLabels, environmentLatest,
+  ENVIRONMENT_AREA_LABEL_IDS, ENVIRONMENT_AREA_PAGES, environmentAreaForSlug, environmentAreaName, environmentAreaParent, environmentLabels, environmentLatest, environmentListFacts,
   environmentTranslate, loadEnvironmentPage, loadEnvironmentWorkbookSources, renderEnvironmentFrame,
 } from "./environment-shared";
 
@@ -59,8 +59,7 @@ export async function renderEnvironmentAreaPage(locale: Locale, topic: Environme
   const [page, sources] = await Promise.all([loadEnvironmentPage(locale, ["regionalEconomies", "format", "main", "workbook"], ENVIRONMENT_AREA_LABEL_IDS), loadEnvironmentWorkbookSources(locale)]);
   const { presentation } = page, t = environmentTranslate(presentation);
   const series = environmentAreaSeries(topic, area, page.facts);
-  const ids = new Set(series.map(item => item.id));
-  const facts = page.facts.filter(f => ids.has(f.indicatorId));
+  const facts = environmentListFacts(page.facts, series);
   const { min: firstYear, max: lastYear } = environmentAreaCoverage(topic, area, facts);
   const name = environmentAreaName(presentation, area);
   const title = t(`page.area.${topic}.title`, { region: name });
@@ -71,7 +70,7 @@ export async function renderEnvironmentAreaPage(locale: Locale, topic: Environme
     ...page, href: environmentAreaRoutes(topic).areaHref(area), title, description: t(`page.area.${topic}.summary`, { region: name }), firstYear, lastYear,
     measures: [...new Set(series.map(item => t(`heading.${item.heading}`)))],
     parents: [environmentAreaParent(presentation, topic)], area: { name, withinGeorgia: area !== "georgia" },
-    children: <EnvironmentExplorer key={`${topic}-${area}`} scope={{ kind: "area", topic, area }} facts={facts} labels={environmentLabels(presentation, [...ids])} sources={sources}
+    children: <EnvironmentExplorer key={`${topic}-${area}`} scope={{ kind: "area", topic, area }} facts={facts} labels={environmentLabels(presentation, series.map(item => item.id))} sources={sources}
       lastReviewedAt={page.lastReviewedAt} siteOrigin={page.origin} title={title} areas={ENVIRONMENT_AREA_PAGES} latest={{ measure, year: latest.year, value: latest.value }} />,
   });
 }

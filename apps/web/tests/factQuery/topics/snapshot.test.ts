@@ -106,6 +106,10 @@ describe("the snapshot's topics section", () => {
     for (const page of TOPIC_PAGES) expect(listed.has(page.pagePath), page.pagePath).toBe(!built.has(page.pagePath));
   });
 
+  it("builds a dataset for every topic page: every Explorer chart page is served", () => {
+    expect(snapshot.topics.datasets.map((dataset) => dataset.page)).toEqual(TOPIC_PAGES);
+  });
+
   it("changes nothing the snapshot already held", async () => {
     const bare = await buildFactQuerySnapshot(OPTIONS);
     expect(bare.topics).toEqual({ datasets: [], sourceIds: [], basisCodes: [], statusCodes: [], units: {} });

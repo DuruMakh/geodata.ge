@@ -3,15 +3,16 @@ import { ExplorerPage } from "../../components/explorer-shell/explorer-page";
 import { PageHeader } from "../../components/shell/page-header";
 import { JsonLd } from "../../components/seo/json-ld";
 import { BreadcrumbJsonLd } from "../../components/seo/breadcrumb-json-ld";
-import { loadServedEnergyFoodData, toClientEnergyFoodFact } from "../data/energyFood/importEnergyFood";
-import { ENERGY_FOOD_SECTIONS, energyFoodCoverage, energyFoodLastReviewedAt, energyFoodSeries, type EnergyFoodSectionId } from "../explorer/energyFood";
+import { loadServedEnergyFoodData } from "../data/energyFood/importEnergyFood";
+import { ENERGY_FOOD_SECTIONS, energyFoodCoverage, energyFoodLastReviewedAt, type EnergyFoodSectionId } from "../explorer/energyFood";
+import { energyFoodLabels, energyFoodPageFacts } from "../explorer/energyFoodPageData";
 import { coverageLabel } from "../explorer/coverageLabel";
 import { I18nProvider } from "../i18n/provider";
 import { clientPresentation, getPresentation } from "../i18n/presentation.server";
 import { getMessages } from "../i18n/messages.server";
 import { message } from "../i18n/messages";
 import { pageHref } from "../i18n/routes";
-import type { Locale, Presentation } from "../i18n/types";
+import type { Locale } from "../i18n/types";
 import { loadSourcedWorkbookSources, type SourcedWorkbookPublicSource } from "../methodology/workbookSources";
 import { fiscalMetadata } from "../seo/metadata";
 import { explorerDatasetJsonLd } from "../seo/structuredData";
@@ -21,11 +22,6 @@ import { topicSection, ALL_DATA_PATH } from "../navigation/navTree";
 export async function energyFoodPageMetadata(locale: Locale, section: EnergyFoodSectionId) {
   const messages = await getMessages(locale, ["energyFood"]);
   return fiscalMetadata({ locale, path: ENERGY_FOOD_SECTIONS.find(item => item.id === section)!.href, title: message(messages, `energyFood.page.${section}.metaTitle`), description: message(messages, `energyFood.page.${section}.summary`) });
-}
-
-/** Display names for every series a page shows, in the page's language. */
-function energyFoodLabels(presentation: Presentation, section: EnergyFoodSectionId): Record<string, string> {
-  return Object.fromEntries(energyFoodSeries(section).map(series => [series.id, message(presentation.messages, `energyFood.series.${series.id}`)]));
 }
 
 /**
@@ -47,8 +43,7 @@ export async function renderEnergyFoodPage(locale: Locale, section: EnergyFoodSe
     loadServedEnergyFoodData(), getPresentation(locale, ["energyFood", "format", "main", "workbook"], []),
   ]);
   // Each page receives only the observations its series show.
-  const ids = new Set<string>(energyFoodSeries(section).map(series => series.id));
-  const facts = data.facts.map(toClientEnergyFoodFact).filter(f => ids.has(f.indicatorId));
+  const facts = energyFoodPageFacts(data.facts, section);
   const { min: firstYear, max: lastYear } = energyFoodCoverage(section, facts);
   const href = ENERGY_FOOD_SECTIONS.find(item => item.id === section)!.href;
   const labels = energyFoodLabels(presentation, section);

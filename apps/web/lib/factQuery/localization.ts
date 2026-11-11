@@ -210,7 +210,11 @@ export const SERVICE_MESSAGE_KEYS = [
   "ranking.withinRegion",
   "supporting.populationTransformation",
   "supporting.populationUnit",
+  "units.gelPerKg",
+  "units.gelPerLitre",
+  "units.gelPerPiece",
   "units.index",
+  "units.millionPieces",
   "units.thousandUnits"
 ] as const;
 export type ServiceMessageKey = (typeof SERVICE_MESSAGE_KEYS)[number];
