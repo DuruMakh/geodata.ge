@@ -24,7 +24,7 @@ const statusCodes = ["official", "survey_estimate", "derived", "partial"] as con
 function fixture() {
   const columns = packTopicFacts(build, new Map(sourceIds.map((id, index) => [id, index])), [...basisCodes], [...statusCodes]);
   const { facts: _facts, ...rest } = build;
-  const dataset: TopicDataset = { ...rest, urlKa: "k", urlEn: "e", groupId: "society", firstYear: 2022, lastYear: 2024, columns };
+  const dataset: TopicDataset = { ...rest, urlKa: "k", urlEn: "e", groupId: "society", searchKa: "k", searchEn: "e", firstYear: 2022, lastYear: 2024, columns };
   const topics: TopicsSnapshot = { datasets: [dataset], sourceIds, basisCodes: [...basisCodes], statusCodes: [...statusCodes], units: {} };
   return { dataset, topics };
 }

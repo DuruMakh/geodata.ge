@@ -339,6 +339,8 @@
   "sources.source.treasury_consolidated_revenue_actual.name": "სახაზინო სამსახურის წლიური კონსოლიდირებული შემოსავლების ანგარიშები — ტრანსფერები ავტონომიური რესპუბლიკიდან",
   "supporting.populationTransformation": "წყაროს ფურცელი „{sheet}“, უჯრა {cell}, წელი {year}; შენარჩუნებულია გამოქვეყნებული ათასები; მოსახლეობა ადამიანებში = ათასები × 1000; შეფასებები არ გამოიყენება.",
   "supporting.populationUnit": "ათასი",
+  "units.index": "ინდექსი",
+  "units.thousandUnits": "ათასი ერთეული",
   "sources.source.wb_gdp_real_usd_2015.name": "მსოფლიო ბანკი · რეალური მშპ",
   "sources.source.wb_gdp_real_growth_percent.name": "მსოფლიო ბანკი · მშპ-ის რეალური ზრდა",
   "sources.source.geostat_cpi_index_2010.name": "საქსტატი · სამომხმარებლო ფასების ინდექსი, 2010 წლის საშუალო = 100",

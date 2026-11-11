@@ -35,7 +35,6 @@
   "poverty.unitPercent": "%",
   "poverty.unitPercentLong": "მოსახლეობის %",
   "poverty.unitIndex": "ჯინის კოეფიციენტი (0–1)",
-  "poverty.unitIndexPlain": "ინდექსი",
   "poverty.latest.rates": "სიღარიბის ზღვარს ქვემოთ მყოფი მოსახლეობის წილი",
   "poverty.latest.inequality": "ჯინის კოეფიციენტი მთლიანი შემოსავლების მიხედვით",
   "poverty.latest.relative": "მედიანური მოხმარების 60%-ზე ნაკლები",

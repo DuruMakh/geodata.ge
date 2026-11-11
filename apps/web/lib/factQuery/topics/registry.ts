@@ -2,6 +2,7 @@
 //
 // Every topic adapter, one per family; each adapter task adds its entry. Build-time only: the snapshot build and tests
 // import it, runtime code never does (tests/factQuery/purity.test.ts), so no loader or source file reaches /mcp.
+import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { loadSourceDocuments } from "../../data/sources";
 import { SERVED_DATA_FILES } from "../../data/servedData";
@@ -9,8 +10,9 @@ import { message } from "../../i18n/messages";
 import { getMessages } from "../../i18n/messages.server";
 import { pageHref } from "../../i18n/routes";
 import type { Locale, MessageScope } from "../../i18n/types";
+import { serviceMessagesSchema } from "../../i18n/validation";
 import { loadReviewedSourceManifest } from "../../methodology/sourceManifest";
-import { groupOfTopic, NAV_TREE } from "../../navigation/navTree";
+import { groupOfTopic, NAV_TREE, type NavHub } from "../../navigation/navTree";
 import { methodologyManifestDocument, PUBLIC_SITE_ORIGIN } from "../manifestDocuments";
 import { findSourceProvenanceFailures, resolvePublicSources } from "../sources";
 import type { Basis, RawResolvedSource } from "../types";
@@ -33,7 +35,8 @@ export const TOPIC_ADAPTERS: readonly TopicAdapter[] = [educationTopicAdapter, d
 /**
  * The site's own message for each unit token the topic CSVs use (R7: unit ids are the CSVs' tokens). One name per
  * token across every topic, so a shared token takes the family-neutral wording (`persons_thousand` is "thousand
- * persons", not Education's "thousand pupils"). A token missing here stops the build.
+ * persons", not Education's "thousand pupils"). A `units.` key is a service message (data/localization/{ka,en}/
+ * service-messages.json): a name no page prints, kept out of the pages' message bundles. A token missing here stops the build.
  */
 const TOPIC_UNIT_MESSAGES: Readonly<Record<string, string>> = {
   persons: "education.unitPersons",
@@ -46,7 +49,7 @@ const TOPIC_UNIT_MESSAGES: Readonly<Record<string, string>> = {
   marriages: "demography.marriageLatestMarriages",
   divorces: "demography.marriageLatestDivorces",
   units: "health.unitUnits",
-  units_thousand: "health.unitThousandUnits",
+  units_thousand: "units.thousandUnits",
   visits_thousand: "health.unitThousandVisits",
   per_1000_population: "health.unitPerThousand",
   families: "social.unitFamilies",
@@ -58,7 +61,7 @@ const TOPIC_UNIT_MESSAGES: Readonly<Record<string, string>> = {
   hours: "labour.unit.hours",
   enterprises: "business.unitFirms",
   gel_month: "social.unitGel",
-  index: "poverty.unitIndexPlain",
+  index: "units.index",
   count: "housing.unitCount",
   square_metres: "housing.unitSquareMetres",
   index_2020: "housing.unitIndex",
@@ -72,11 +75,11 @@ function registrySourceId(id: string): string {
 
 const sorted = <T>(values: Iterable<T>) => [...new Set(values)].sort();
 
-/** The navigation group a topic page sits under: the group of the hub whose sidebar lists it. */
-function groupIdOf(pagePath: string): string {
+/** The hub whose sidebar lists a topic page. */
+function hubOf(pagePath: string): NavHub {
   const hub = NAV_TREE.find((entry) => entry.sections.some((section) => section.href === pagePath));
   if (!hub) throw new Error(`Topic page ${pagePath} is not in the navigation`);
-  return groupOfTopic(hub.id).id;
+  return hub;
 }
 
 /** One fact per entity, series and year, and a value somewhere for every listed series. */
@@ -92,15 +95,21 @@ function checkDataset(build: TopicDatasetBuild): void {
   for (const series of build.series) if (!valued.has(series.seriesId)) throw new Error(`${datasetId}: series ${series.seriesId} has no value`);
 }
 
-/** Each used unit's Georgian and English name, from the site's unit messages. */
+/** A locale's service messages, as the snapshot build reads them. */
+async function serviceMessages(locale: Locale) {
+  const file = path.resolve(/* turbopackIgnore: true */ process.cwd(), `../../data/localization/${locale}/service-messages.json`);
+  return serviceMessagesSchema.parse(JSON.parse(await readFile(file, "utf8")));
+}
+
+/** Each used unit's Georgian and English name, from the site's unit messages or a `units.` service message. */
 async function unitNames(units: readonly string[]): Promise<TopicsSnapshot["units"]> {
   const keys = units.map((unit) => {
     const key = TOPIC_UNIT_MESSAGES[unit];
     if (!key) throw new Error(`Topic unit ${unit} has no name`);
     return key;
   });
-  const scopes = keys.map((key) => key.split(".")[0] as MessageScope);
-  const [ka, en] = await Promise.all((["ka", "en"] as const satisfies readonly Locale[]).map((locale) => getMessages(locale, scopes)));
+  const scopes = keys.filter((key) => !key.startsWith("units.")).map((key) => key.split(".")[0] as MessageScope);
+  const [ka, en] = await Promise.all((["ka", "en"] as const satisfies readonly Locale[]).map(async (locale) => ({ ...(await getMessages(locale, scopes)), ...(await serviceMessages(locale)) })));
   return Object.fromEntries(units.map((unit, index) => [unit, { labelKa: message(ka!, keys[index]!), labelEn: message(en!, keys[index]!) }]));
 }
 
@@ -146,19 +155,24 @@ export async function buildTopicsSnapshot(adapters: readonly TopicAdapter[] = TO
   const sourceIndex = new Map(facts.flatMap((fact) => fact.sourceIds).map((id) => [id, sourceIds.indexOf(registrySourceId(id))]));
   const basisCodes: Basis[] = sorted(facts.map((fact) => fact.basis));
   const statusCodes: TopicValueStatus[] = sorted(facts.map((fact) => fact.status));
-  const [units, sources] = await Promise.all([
+  const [units, sources, commonKa, commonEn] = await Promise.all([
     unitNames(sorted(builds.flatMap((build) => build.series.map((series) => series.unit)))),
     topicSources(sourceIds, sorted(adapters.flatMap((adapter) => adapter.sourceArchive))),
+    getMessages("ka", ["common"]), getMessages("en", ["common"]),
   ]);
 
   const datasets = builds.map((build): TopicDataset => {
     const { facts: _facts, ...dataset } = build;
     // Not Math.min(...years): a large dataset's year column overflows the call's argument limit.
     const years = build.facts.reduce((span, { year }) => ({ min: Math.min(span.min, year), max: Math.max(span.max, year) }), { min: Infinity, max: -Infinity });
+    const hub = hubOf(build.page.pagePath);
     return {
       ...dataset,
       urlKa: `${PUBLIC_SITE_ORIGIN}${pageHref(build.page.pagePath, "ka")}`, urlEn: `${PUBLIC_SITE_ORIGIN}${pageHref(build.page.pagePath, "en")}`,
-      groupId: groupIdOf(build.page.pagePath), firstYear: years.min, lastYear: years.max,
+      groupId: groupOfTopic(hub.id).id,
+      // The search name: the sidebar's topic name, then the page title (R26).
+      searchKa: `${message(commonKa, hub.labelKey)} — ${build.titleKa}`, searchEn: `${message(commonEn, hub.labelKey)} — ${build.titleEn}`,
+      firstYear: years.min, lastYear: years.max,
       columns: packTopicFacts(build, sourceIndex, basisCodes, statusCodes),
     };
   });

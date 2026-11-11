@@ -205,7 +205,9 @@ export const SERVICE_MESSAGE_KEYS = [
   "ranking.valueDefinitionPeriod",
   "ranking.withinRegion",
   "supporting.populationTransformation",
-  "supporting.populationUnit"
+  "supporting.populationUnit",
+  "units.index",
+  "units.thousandUnits"
 ] as const;
 export type ServiceMessageKey = (typeof SERVICE_MESSAGE_KEYS)[number];
 

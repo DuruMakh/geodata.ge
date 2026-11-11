@@ -6,7 +6,7 @@ import { povertyViews, povertyViewSeries, type PovertySectionId } from "./povert
 
 /*
  * What the poverty pages hand their explorer: the observations a page shows and its series' names. Shared by the page
- * (lib/pages/poverty.tsx) and the MCP snapshot build (lib/factQuery/topics/poverty.ts), which cannot import the pages
+ * (lib/pages/poverty.tsx) and the MCP snapshot build (lib/factQuery/topics/livingStandards.ts), which cannot import the pages
  * (they pull in `server-only` and React).
  */
 

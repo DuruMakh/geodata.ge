@@ -24,10 +24,10 @@ beforeAll(() => {
 
 const searchMatchOf = (response: ReturnType<typeof describeCoverage>) => (response as { data: { searchMatch?: string } }).data.searchMatch;
 
-/** A topic dataset's titles, which its series are searched under too. */
-const topicTitles = (datasetId: string | undefined) => {
-  const dataset = snapshot.topics.datasets.find((entry) => entry.page.datasetId === datasetId);
-  return dataset ? [dataset.titleKa, dataset.titleEn] : [];
+/** A topic dataset's search names, which its total series are searched under too (R26). */
+const topicTitles = (datasetId: string | undefined, level: string | undefined) => {
+  const dataset = level === "total" ? snapshot.topics.datasets.find((entry) => entry.page.datasetId === datasetId) : undefined;
+  return dataset ? [dataset.searchKa, dataset.searchEn] : [];
 };
 
 function search(query: string): Found {
@@ -35,11 +35,11 @@ function search(query: string): Found {
   if (response.kind !== "catalogue") throw new Error(`expected a catalogue for ${query}`);
   const data = response.data as {
     searchMatch?: string;
-    series?: { seriesId: string; labelKa: string; labelEn: string; headingKa?: string; headingEn?: string; datasetId?: string }[];
+    series?: { seriesId: string; labelKa: string; labelEn: string; headingKa?: string; headingEn?: string; datasetId?: string; level?: string }[];
     entities?: { entityId: string; labelKa: string; labelEn: string; entitySlug: string | null }[];
   };
   const hits: Hit[] = [
-    ...(data.series ?? []).map((s) => ({ key: s.seriesId, label: `${s.seriesId} | ${s.labelEn} | ${s.labelKa}`, fields: [s.seriesId, s.labelKa, s.labelEn, s.headingKa ?? null, s.headingEn ?? null, ...topicTitles(s.datasetId)] })),
+    ...(data.series ?? []).map((s) => ({ key: s.seriesId, label: `${s.seriesId} | ${s.labelEn} | ${s.labelKa}`, fields: [s.seriesId, s.labelKa, s.labelEn, s.headingKa ?? null, s.headingEn ?? null, ...topicTitles(s.datasetId, s.level)] })),
     ...(data.entities ?? []).map((e) => ({ key: `E:${e.entityId}`, label: `E:${e.entityId} | ${e.labelEn} | ${e.labelKa}`, fields: [e.entityId, e.labelKa, e.labelEn, e.entitySlug] })),
   ];
   return { status: response.status, searchMatch: data.searchMatch, hits };
@@ -289,6 +289,43 @@ describe("a some-words answer puts the subject first", () => {
     // The first of the tied words ("apple") is the one left out: "Pear drinks" goes ahead, "Apple orchard" does not.
     expect(found[0]).toBe("apple x");
     expect(found.indexOf("pear y")).toBeGreaterThan(0);
+  });
+});
+
+// Ruling R26: a topic dataset is searched under "<topic> — <page title>", not its one-word page title, so a budget
+// function's spending is not answered with a household's ("Living standards — Spending"); the topic's name alone
+// ("Education", "Health and social protection") neither lists its pages first nor puts them ahead of the budget's.
+describe("a topic dataset is searched under its topic's name and its page title", () => {
+  const firstOf = (query: string) => (describeCoverage(snapshot, { search: query }) as { data: { series: { seriesId: string; datasetId?: string }[] } }).data.series[0];
+
+  it.each([
+    ["ჯანდაცვის ხარჯები", "national-expenditure", "spending.health"],
+    ["განათლების ხარჯები", "national-expenditure", "spending.education"],
+    ["food prices", "inflation", "cpi.cat.01_1"],
+    ["education", "national-expenditure", "spending.education"],
+    ["health", "national-expenditure", "spending.health"],
+    ["social protection", "national-expenditure", "spending.social_protection"],
+    ["სოციალური დაცვა", "national-expenditure", "spending.social_protection"],
+  ])("lists the budget's or inflation's series first for %s", (query, datasetId, seriesId) => {
+    expect(firstOf(query)).toMatchObject({ datasetId, seriesId });
+  });
+
+  it.each([
+    ["spending", "living-standards-spending", "spending.consumption.per_household"],
+    ["income", "living-standards-income", "income.total.per_household"],
+    ["poverty", "living-standards-poverty", "poverty.absolute"],
+    ["home prices", "housing-prices", "housing.price_index.total"],
+    ["building permits", "housing-permits", "housing.permits_count.total"],
+    ["Gini", "living-standards-inequality", "gini.total_income"],
+  ])("still lists the page a query names first for %s", (query, datasetId, seriesId) => {
+    expect(firstOf(query)).toMatchObject({ datasetId, seriesId });
+  });
+
+  it("keeps the published title apart from the search name", () => {
+    const spending = snapshot.topics.datasets.find((dataset) => dataset.page.datasetId === "living-standards-spending")!;
+    expect(spending).toMatchObject({ titleEn: "Spending", searchEn: "Living standards — Spending", titleKa: "ხარჯები", searchKa: "ცხოვრების დონე — ხარჯები" });
+    const summary = (describeCoverage(snapshot, {}) as { data: { datasets: { datasetId: string; labelEn: string; labelKa: string }[] } }).data.datasets.find((dataset) => dataset.datasetId === "living-standards-spending");
+    expect(summary).toMatchObject({ labelEn: "Spending", labelKa: "ხარჯები" });
   });
 });
 

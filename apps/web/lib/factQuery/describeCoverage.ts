@@ -283,10 +283,21 @@ function entityTypesOf(snapshot: FactQuerySnapshot, datasetId: AnyDatasetId): re
 /** Datasets of one scope count as one where a search word meets their labels; each topic dataset is its own scope. */
 const scopeOf = (datasetId: AnyDatasetId): string => (isCoreDataset(datasetId) ? DATASET_META[datasetId].budgetScope : datasetId);
 
-function datasetLabelsOf(snapshot: FactQuerySnapshot, datasetId: AnyDatasetId): string[] {
+/**
+ * A dataset's names for search. A topic dataset's is its search name, "<topic> — <page title>" (R26), not the published
+ * title: "Spending" alone would meet "health spending" in full. With `page`, a topic dataset's page title alone: the
+ * topic's name ("Education", "Health and social protection") is a budget function's too.
+ */
+function datasetLabelsOf(snapshot: FactQuerySnapshot, datasetId: AnyDatasetId, page = false): string[] {
   if (isCoreDataset(datasetId)) return [DATASET_META[datasetId].labelKa, serviceLabelEn(snapshot, datasetId)];
   const topic = topicDatasetOf(snapshot, datasetId)!;
-  return [topic.titleKa, topic.titleEn];
+  return page ? [topic.titleKa, topic.titleEn] : [topic.searchKa, topic.searchEn];
+}
+
+/** The topic's name a topic dataset's search name starts with: "Living standards" of "Living standards — Spending". */
+function topicNamesOf(snapshot: FactQuerySnapshot, datasetId: AnyDatasetId): string[] {
+  const topic = topicDatasetOf(snapshot, datasetId)!;
+  return [topic.searchKa.slice(0, -` — ${topic.titleKa}`.length), topic.searchEn.slice(0, -` — ${topic.titleEn}`.length)];
 }
 
 function topicSummary(dataset: TopicDataset, cityScope: boolean): DatasetSummary {
@@ -1066,7 +1077,7 @@ export function searchCatalogue<T>(
 /**
  * One `searchCatalogue` over a response's series and entities together, so the all/some choice is made once for both.
  * `datasetLabel`, given for entries from several datasets, names each entry's dataset, to order a some-words answer.
- * `titleFields` adds words to a series' fields: a topic dataset's title for its total series, so a search for the
+ * `titleFields` adds words to a series' fields: a topic dataset's search name for its total series, so a search for the
  * dataset's name finds the dataset and its headline series.
  */
 function searchSeriesAndEntities<S extends SeriesEntry, E extends EntityEntry>(search: string, series: S[], entities: E[], datasetLabel?: (entry: S | E) => string[], titleFields?: (entry: S) => string[]) {
@@ -1305,13 +1316,20 @@ export function describeCoverage(snapshot: FactQuerySnapshot, rawInput: unknown)
     }
 
     const datasetLabels = new Map(eligibleDatasets.map((id) => [id, datasetLabelsOf(snapshot, id)]));
+    const pageLabels = new Map(eligibleDatasets.map((id) => [id, datasetLabelsOf(snapshot, id, true)]));
     const titleFields = (entry: SeriesEntry & { datasetId: AnyDatasetId }) => (entry.level === LEVEL_TOTAL && !isCoreDataset(entry.datasetId) ? datasetLabels.get(entry.datasetId)! : []);
-    const found = searchSeriesAndEntities(search, taggedSeries, taggedEntities, (entry) => datasetLabels.get(entry.datasetId)!, titleFields);
+    // A some-words answer puts ahead the entries whose dataset's page title meets a word: a word the topic's name meets
+    // ("education" of Education — Universities) would put every series of the topic ahead of the budget's.
+    const found = searchSeriesAndEntities(search, taggedSeries, taggedEntities, (entry) => pageLabels.get(entry.datasetId)!, titleFields);
     const { entities: foundEntities, searchMatch, words, wordMatches: matchesByWord } = found;
-    // A topic dataset whose title meets every word of the search, as typed (a whole-query alias names budget programmes,
-    // not a page: "pension" is still Pensions), comes first and is listed: its series are what was asked for.
-    const titled = searchMatch === "all_words" ? searchCatalogue(search, eligibleDatasets.filter((id) => !isCoreDataset(id)), (id) => datasetLabels.get(id)!, { aliases: false }) : undefined;
-    const titledIds = new Set<AnyDatasetId>(titled?.searchMatch === "all_words" ? titled.matches : []);
+    // A topic dataset whose search name meets every word of the search, as typed (a whole-query alias names budget
+    // programmes, not a page: "pension" is still Pensions), comes first and is listed: its series are what was asked for.
+    // Not when its topic's name alone meets every word: "education" and "social protection" name budget functions too.
+    const topicIds = eligibleDatasets.filter((id) => !isCoreDataset(id));
+    const titled = searchMatch === "all_words" ? searchCatalogue(search, topicIds, (id) => datasetLabels.get(id)!, { aliases: false }) : undefined;
+    const topicNamed = titled?.searchMatch === "all_words" ? searchCatalogue(search, titled.matches, (id) => topicNamesOf(snapshot, id), { aliases: false }) : undefined;
+    const topicOnly = new Set<AnyDatasetId>(topicNamed?.searchMatch === "all_words" ? topicNamed.matches : []);
+    const titledIds = new Set<AnyDatasetId>(titled?.searchMatch === "all_words" ? titled.matches.filter((id) => !topicOnly.has(id)) : []);
     const foundSeries = titledIds.size > 0 ? [...found.series.filter((entry) => titledIds.has(entry.datasetId)), ...found.series.filter((entry) => !titledIds.has(entry.datasetId))] : found.series;
 
     // A search is a lookup, so it answers with what matched: the datasets the

@@ -32,6 +32,11 @@ export type TopicAdapter = { family: TopicFamilyId; sourceArchive: MethodologyDa
 /** Facts as parallel columns: entity, series and year are indexes into the dataset's lists; basis, status and sources into the snapshot's. */
 export type TopicColumns = { entity: number[]; series: number[]; year: number[]; value: (number | null)[]; basis: number[]; status: number[]; sources: number[][]; periodEnd: Record<number, string>; monthsReported: Record<number, number> };
 
-export type TopicDataset = Omit<TopicDatasetBuild, "facts"> & { urlKa: string; urlEn: string; groupId: string; firstYear: number; lastYear: number; columns: TopicColumns };
+/**
+ * A dataset as the snapshot keeps it. `searchKa`/`searchEn` name it for search only, "<topic> — <page title>"
+ * ("Living standards — Spending"): a one-word page title alone would meet a budget word ("health spending") in full.
+ * The published title stays `titleKa`/`titleEn`.
+ */
+export type TopicDataset = Omit<TopicDatasetBuild, "facts"> & { urlKa: string; urlEn: string; groupId: string; searchKa: string; searchEn: string; firstYear: number; lastYear: number; columns: TopicColumns };
 
 export type TopicsSnapshot = { datasets: TopicDataset[]; sourceIds: string[]; basisCodes: Basis[]; statusCodes: TopicValueStatus[]; units: Record<string, { labelKa: string; labelEn: string }> };

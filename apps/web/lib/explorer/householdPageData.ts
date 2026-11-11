@@ -7,7 +7,7 @@ import { householdViewSeries, type HouseholdSectionId } from "./household";
 
 /*
  * What the household pages hand their explorers: the observations a page shows and the names of its lines and areas.
- * Shared by the pages (lib/pages/household-shared.tsx) and the MCP snapshot build (lib/factQuery/topics/household.ts),
+ * Shared by the pages (lib/pages/household-shared.tsx) and the MCP snapshot build (lib/factQuery/topics/livingStandards.ts),
  * which cannot import the pages (they pull in `server-only` and React).
  */
 

@@ -339,6 +339,8 @@
   "sources.source.treasury_consolidated_revenue_actual.name": "Treasury annual consolidated-revenue reports — transfers from autonomous republic",
   "supporting.populationTransformation": "Source sheet “{sheet}”, cell {cell}, year {year}; retained published thousands; persons = thousands × 1000; no estimates.",
   "supporting.populationUnit": "thousands",
+  "units.index": "index",
+  "units.thousandUnits": "thousand units",
   "sources.source.wb_gdp_real_usd_2015.name": "World Bank GDP Georgia",
   "sources.source.wb_gdp_real_growth_percent.name": "World Bank GDP Georgia",
   "sources.source.geostat_cpi_index_2010.name": "Geostat consumer price index, 2010 average = 100",
