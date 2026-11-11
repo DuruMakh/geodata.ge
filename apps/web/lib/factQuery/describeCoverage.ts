@@ -995,8 +995,8 @@ function idMatches(query: string, field: string): boolean {
  * all/some choice is made once, not per dataset. `aliases: false` reads a
  * whole-query alias as the word it is, for entries that are not series (website
  * pages). The answer also gives the query's own `words` and, for each, the
- * entries that meet it (`wordMatches`), for a caller to reuse instead of
- * searching again word by word.
+ * entries that meet it (`wordMatches`) and whether it names one of the `places`
+ * (`placeWords`), for a caller to reuse instead of searching again word by word.
  *
  * A word weighs by its rarity: one that few entries meet says more than one that most do. The answer comes in this
  * order (ties keep catalogue order):
@@ -1007,7 +1007,10 @@ function idMatches(query: string, field: string): boolean {
  *    phrase without joining words, names in full with its last word ("personal income tax" holds Income tax,
  *    "government debt" Total debt);
  * 3. by the weight of the words the entry or its dataset's name meets, so "food inflation" lists Food before Headline
- *    inflation; an all-words answer stops here;
+ *    inflation; an all-words answer stops here. A some-words answer without `firm` or `ahead` names (one dataset's
+ *    entries, whose fields alone say what they are) instead puts the entries that meet more of the query's words first
+ *    ("ministry of health programmes": a health programme before Solid waste management programme), then orders them by
+ *    that weight times step 6's share, so "red wine bottles" lists Wine before Lead oxides; red lead;
  * 4. by `prefer`, lower first;
  * 5. the entries the query names in full ("Hospitals" for "hospitals in Kutaisi"), then the `total` ones ("crime rate"
  *    lists All recorded crimes before Drug crimes);
@@ -1027,7 +1030,7 @@ export function searchCatalogue<T>(
     prefer?: (entry: T) => number;
     total?: (entry: T) => boolean;
   } = {},
-): { matches: T[]; searchMatch: "all_words" | "some_words"; words: string[]; wordMatches: T[][] } {
+): { matches: T[]; searchMatch: "all_words" | "some_words"; words: string[]; wordMatches: T[][]; placeWords: boolean[] } {
   const folded = fold(query.trim());
   const needle = aliases && Object.hasOwn(SEARCH_ALIASES, folded) ? SEARCH_ALIASES[folded]! : folded;
   const allWords = searchWords(needle);
@@ -1048,14 +1051,14 @@ export function searchCatalogue<T>(
   type Row = (typeof rows)[number];
   const byWord = queryWords.map((_, index) => rows.filter((row) => row.meets[index]).map((row) => row.entry));
   const counts = byWord.map((found) => found.length);
-  const answer = (matches: T[], searchMatch: "all_words" | "some_words") => ({ matches, searchMatch, words: queryWords, wordMatches: byWord });
+  // The words that name a place the catalogue holds ("Tbilisi", "შიდა ქართლის") are where, not what: they count for
+  // the place itself, not for a series whose label holds the name, and are never the commonest word.
+  const placeWords = places === undefined ? queryWords.map(() => false) : placeWordsIn(queryWords, entries.flatMap((entry) => places(entry) ?? []));
+  const answer = (matches: T[], searchMatch: "all_words" | "some_words") => ({ matches, searchMatch, words: queryWords, wordMatches: byWord, placeWords });
 
   const counted = queryWords.map((word, index) => (word.length >= 3 ? counts[index]! : -1));
   const weights = counted.map((count) => (count > 0 ? Math.log(1 + rows.length / count) : 0));
   const weigh = (met: boolean[]) => weights.reduce((sum, weight, index) => sum + (met[index] ? weight : 0), 0);
-  // The words that name a place the catalogue holds ("Tbilisi", "შიდა ქართლის") are where, not what: they count for
-  // the place itself, not for a series whose label holds the name, and are never the commonest word.
-  const placeWords = places === undefined ? queryWords.map(() => false) : placeWordsIn(queryWords, entries.flatMap((entry) => places(entry) ?? []));
   const known = weights.filter((weight, index) => weight > 0 && !placeWords[index]);
   // Of words tied as the commonest, only the first is left out, so a query of two equally common words still lets either count.
   const lightest = Math.min(...known);
@@ -1078,7 +1081,8 @@ export function searchCatalogue<T>(
   const ranked = (row: Row) => {
     const byName = nameMeets(row.entry);
     const place = places?.(row.entry) !== undefined;
-    return { row, name: weighNamed(byName), cover: weighNamed(row.meets.map((met, index) => (met && (place || !placeWords[index]!)) || byName[index]!)) };
+    const covered = row.meets.map((met, index) => ((met && (place || !placeWords[index]!)) || byName[index]!) && nameWeights[index]! > 0);
+    return { row, name: weighNamed(byName), words: covered.filter(Boolean).length, cover: weighNamed(covered) };
   };
   // A field the query names in full: each of its words (joining and closing "total" words aside) meets a query word.
   const namesField = (words: string[]) => {
@@ -1118,9 +1122,12 @@ export function searchCatalogue<T>(
         precision: Math.max(0, ...present.map(share)) * (present.some((words) => share([words.findLast((word) => !TOTAL_WORDS.has(word)) ?? words.at(-1)!]) > 0) ? 1 : 0.5),
       };
     });
+  // Without dataset names to read (one dataset's entries), an entry speaks only by its own fields.
+  const named = firm !== undefined || ahead !== undefined;
   // Array.prototype.sort is stable.
-  scored.sort((left, right) => right.name - left.name || right.cover - left.cover || left.prefer - right.prefer
-    || left.exact - right.exact || left.total - right.total || right.precision - left.precision);
+  scored.sort((left, right) => right.name - left.name
+    || (named ? right.cover - left.cover : right.words - left.words || right.cover * right.precision - left.cover * left.precision)
+    || left.prefer - right.prefer || left.exact - right.exact || left.total - right.total || right.precision - left.precision);
   return answer(scored.map(({ row }) => row.entry), scored.length > 0 ? "some_words" : "all_words");
 }
 
@@ -1138,7 +1145,7 @@ function searchSeriesAndEntities<S extends SeriesEntry, E extends EntityEntry>(
   order?: Pick<Parameters<typeof searchCatalogue<S | E>>[3] & object, "places" | "firm" | "ahead" | "joins" | "prefer" | "total">,
   titleFields?: (entry: S) => string[],
 ) {
-  const { matches, searchMatch, words, wordMatches } = searchCatalogue<S | E>(
+  const { matches, searchMatch, words, wordMatches, placeWords } = searchCatalogue<S | E>(
     search,
     [...series, ...entities],
     (entry) => ("seriesId" in entry ? [entry.seriesId, entry.labelKa, entry.labelEn, entry.headingKa ?? null, entry.headingEn ?? null, ...(titleFields?.(entry as S) ?? [])] : [entry.entityId, entry.labelKa, entry.labelEn, entry.entitySlug]),
@@ -1151,6 +1158,7 @@ function searchSeriesAndEntities<S extends SeriesEntry, E extends EntityEntry>(
     searchMatch,
     words,
     wordMatches,
+    placeWords,
   };
 }
 
@@ -1404,7 +1412,7 @@ export function describeCoverage(snapshot: FactQuerySnapshot, rawInput: unknown)
       prefer: (entry) => (isCoreDataset(entry.datasetId) ? 0 : 1),
       total: (entry) => "seriesId" in entry && entry.level === LEVEL_TOTAL,
     }, titleFields);
-    const { searchMatch, words, wordMatches: matchesByWord } = found;
+    const { searchMatch, words, wordMatches: matchesByWord, placeWords } = found;
     // A topic page the search is aimed at comes first and is listed: its series are what was asked for. The search is
     // aimed at the page when the dataset's search name meets every word of the search, as typed (a whole-query alias
     // names budget programmes, not a page: "pension" is still Pensions), and the page's title is needed for it: neither
@@ -1437,7 +1445,6 @@ export function describeCoverage(snapshot: FactQuerySnapshot, rawInput: unknown)
     // a link to its page instead of a dead end. Links only; the status stays the series' own. What each word is to
     // the page search comes from the search above, the entities' names and one small search of the datasets' labels
     // over the same words (the same query gives `searchCatalogue` the same words), not from a search per word.
-    const placeWords = placeWordsIn(words, taggedEntities.flatMap((entity) => [entity.labelKa, entity.labelEn]));
     const labelled = searchCatalogue(search, eligibleDatasets, (id) => datasetLabels.get(id)!).wordMatches;
     const kinds = words.map((_, index): PageWord => {
       const served = matchesByWord[index]!;

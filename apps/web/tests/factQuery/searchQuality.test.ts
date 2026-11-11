@@ -471,6 +471,18 @@ describe("the pinned fiscal query suite", () => {
   it("finds the place first among the City air quality entries for air quality Tbilisi", () => {
     expect(answerOf("air quality Tbilisi").entities?.[0]).toMatchObject({ datasetId: "environment-air-quality", entityId: "city.tbilisi" });
   });
+
+  // Inside one dataset an entry speaks only by its own label: the entries that meet more of the words come first, then
+  // the rarer words over a label that is mostly them ("red" of Lead oxides; red lead is rarer than "wine", but Wine is the subject).
+  it.each([
+    ["trade-products", "red wine bottles", "trade.exports.goods.hs4.2020-2025.2204"],
+    ["ministries", "education programmes", "admin_program.32_03.85c13dd5"],
+    ["ministries", "ministry of health programmes", "admin_program.27_01.985ee587"],
+    ["inflation", "Tbilisi food inflation", "cpi.cat.01_1"],
+  ])("answers the %s search %s with %s first", (datasetId, search, seriesId) => {
+    const found = (describeCoverage(snapshot, { datasetId, search }) as { data: Answer }).data;
+    expect(found.series?.[0]?.seriesId).toBe(seriesId);
+  });
 });
 
 describe("the labelled queries", () => {
