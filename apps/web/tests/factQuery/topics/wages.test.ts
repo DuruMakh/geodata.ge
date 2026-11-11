@@ -14,6 +14,8 @@ import { compare, type Comparison } from "../../../lib/factQuery/compare";
 import { TOPIC_PAGES } from "../../../lib/factQuery/topics/pages";
 import { TOPIC_ADAPTERS } from "../../../lib/factQuery/topics/registry";
 import type { TopicDatasetBuild, TopicFact } from "../../../lib/factQuery/topics/types";
+import type { Observation } from "../../../lib/factQuery/observations";
+import { queryIndicators } from "../../../lib/factQuery/queryIndicators";
 import { wagesTopicAdapter } from "../../../lib/factQuery/topics/wages";
 import { getPresentation } from "../../../lib/i18n/presentation.server";
 import type { Locale } from "../../../lib/i18n/types";
@@ -91,6 +93,25 @@ describe("wages topic adapter", () => {
     expect(factOf("wages-overview", GEORGIA_PLACE_ID, `${AVERAGE}.women`, first - 1)).toMatchObject({ value: null, sourceIds: [] });
     expect(dataset("wages-overview").series.map((series) => series.seriesId).filter((id) => id.includes("business"))).toEqual([]);
     for (const build of builds) expect(build.breaks).toEqual([]);
+  });
+
+  it("says a wage is a monthly amount where its name does not: the unit is GEL, the note says per month", () => {
+    const snapshot = testSnapshot({ releaseCommit: "test", generatedAt: "2026-11-11T00:00:00.000Z" });
+    const definition = (datasetId: string, entityId: string, seriesId: string) => {
+      const response = queryIndicators(snapshot, { datasetId, seriesIds: [seriesId], entityIds: [entityId], years: [2024] });
+      return (response as { data: { observations: Observation[] } }).data.observations[0]!;
+    };
+    expect(definition("wages-industries", GEORGIA_PLACE_ID, `${AVERAGE}.women.sector.f`)).toMatchObject({
+      valueDefinitionEn: expect.stringContaining("It is an amount for one month."), valueDefinition: expect.stringContaining("ეს არის ერთი თვის თანხა."),
+    });
+    expect(definition("wages-overview", GEORGIA_PLACE_ID, `${AVERAGE}.public`).valueDefinitionEn).toContain("It is an amount for one month.");
+    // "Average monthly wage" says so already.
+    expect(definition("wages-overview", GEORGIA_PLACE_ID, AVERAGE).valueDefinitionEn).not.toContain("one month");
+    expect(definition("wages-regions", ADJARA, AVERAGE).valueDefinitionEn).not.toContain("one month");
+    // Every served wage is monthly: its name says so, or its note does.
+    for (const build of builds) for (const series of build.series) {
+      expect(/month/i.test(`${series.headingEn ?? ""} ${series.labelEn}`) !== (series.note?.key === "definitions.topicMonthly"), `${build.page.datasetId} ${series.seriesId}`).toBe(true);
+    }
   });
 
   it("compares a wage in GEL: an absolute and a percentage change", () => {

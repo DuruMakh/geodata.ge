@@ -3,7 +3,8 @@
 // The Wages pages as topic datasets: the Overview and Industries (Georgia; Industries' rows under each group it compares)
 // and Regions (Georgia and the 11 regions: each region page's average beside Georgia's, and the index's latest national
 // average). Series, places, names and years come from the pages' own functions (lib/explorer/wagesPageData.ts,
-// wagesCrawlStates, buildWagesModel); values are Geostat's published figures the pages print, in GEL a month. A row the
+// wagesCrawlStates, buildWagesModel); values are Geostat's published figures the pages print, in GEL a month (the unit is
+// GEL; a series whose name does not say "monthly" carries the monthly note in its value definition). A row the
 // page prints only as unavailable (public-sector mining) has no value to serve and is not served. Build-time only:
 // runtime code never imports it (tests/factQuery/purity.test.ts).
 import { loadServedWagesData, toClientWagesFact } from "../../data/wages/importWages";
@@ -15,7 +16,7 @@ import { message } from "../../i18n/messages";
 import { getPresentation } from "../../i18n/presentation.server";
 import type { Presentation } from "../../i18n/types";
 import { collectTopicDataset, type Cell, type Names, type SeriesSpec } from "./collect";
-import type { TopicAdapter, TopicDatasetBuild, TopicEntity } from "./types";
+import type { TopicAdapter, TopicDatasetBuild, TopicEntity, TopicSeriesNote } from "./types";
 
 type Context = { rows: ReadonlyMap<string, WagesFact>; facts: readonly ClientWagesFact[]; ka: Presentation; en: Presentation };
 
@@ -32,6 +33,10 @@ function cellOf(context: Context, series: { indicatorId: string; dimension: stri
   return { value: Number(row.publishedValue), unit: row.unit, sourceIds: [row.sourceId], status: row.valueStatus === "survey_estimate" ? "survey_estimate" : "official" };
 }
 
+/** A monthly figure's note, for a series whose label and heading do not already say "monthly" ("Women — Construction"). */
+const MONTHLY: TopicSeriesNote = { key: "definitions.topicMonthly", values: {} };
+const monthlyNote = (label: Names, heading: Names | null) => (/month/i.test(`${heading?.en ?? ""} ${label.en}`) ? {} : { note: MONTHLY });
+
 function georgia(context: Context): TopicEntity {
   return { entityId: GEORGIA_PLACE_ID, entityType: "country", labelKa: message(context.ka.messages, "demography.georgia"), labelEn: message(context.en.messages, "demography.georgia"), parentEntityId: null };
 }
@@ -47,10 +52,11 @@ function buildNational(context: Context, section: Exclude<WagesSectionId, "regio
     for (const series of model.selected) {
       // A row Geostat publishes only as unavailable prints dashes in every year: nothing to serve.
       if (model.years.every((year) => !cellOf(context, series, year))) continue;
+      const label = { ka: ka[series.id]!, en: en[series.id]! };
+      const heading = state.view === "main" ? null : both(context, ({ messages }) => message(messages, `wages.group.${state.view}`));
       const spec: SeriesSpec = {
-        seriesId: ids.get(series.id)!, indicatorId: ids.get(series.id)!, label: { ka: ka[series.id]!, en: en[series.id]! },
-        heading: state.view === "main" ? null : both(context, ({ messages }) => message(messages, `wages.group.${state.view}`)),
-        parentSeriesId: series.parentId ? ids.get(series.parentId)! : null, isTotal: series.reference,
+        seriesId: ids.get(series.id)!, indicatorId: ids.get(series.id)!, label, heading,
+        parentSeriesId: series.parentId ? ids.get(series.parentId)! : null, isTotal: series.reference, ...monthlyNote(label, heading),
       };
       dataset.add(georgia(context), spec, model.years, (year) => cellOf(context, series, year));
     }
@@ -79,11 +85,11 @@ function buildRegions(context: Context): TopicDatasetBuild {
           for (const year of model.years) georgiaYears.add(year);
           continue;
         }
-        dataset.add(entity, { seriesId: series.indicatorId, indicatorId: series.indicatorId, label, heading: null, parentSeriesId: null, isTotal: false }, model.years, (year) => cellOf(context, series, year));
+        dataset.add(entity, { seriesId: series.indicatorId, indicatorId: series.indicatorId, label, heading: null, parentSeriesId: null, isTotal: false, ...monthlyNote(label, null) }, model.years, (year) => cellOf(context, series, year));
       }
     }
   }
-  dataset.add(georgia(context), { seriesId: georgiaSeries!.indicatorId, indicatorId: georgiaSeries!.indicatorId, label, heading: null, parentSeriesId: null, isTotal: false },
+  dataset.add(georgia(context), { seriesId: georgiaSeries!.indicatorId, indicatorId: georgiaSeries!.indicatorId, label, heading: null, parentSeriesId: null, isTotal: false, ...monthlyNote(label, null) },
     [...georgiaYears].sort((a, b) => a - b), (year) => cellOf(context, georgiaSeries!, year));
   return dataset.build([]);
 }
