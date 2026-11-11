@@ -15,6 +15,9 @@ import { SEARCH_FIELD_PROPS } from "../main-explorer/series-selector";
 import { RegionMap, regionalEconomyMapData, type RegionMapMetric } from "./regional-economy-map";
 import { useAppReady } from "../explorer-shell/use-app-ready";
 import { ChartShareButton } from "../explorer-shell/chart-share-button";
+import { IndexCrawlTables } from "../explorer-shell/index-crawl-tables";
+import { historyCaption, historyCrawlTable, type HistoryRow } from "../../lib/explorer/indexCrawlTables";
+import { workbookMessage } from "../../lib/i18n/workbook";
 
 export function RegionalEconomiesIndex({ model, sourceNote }: { model: RegionalEconomyMapModel; sourceNote: string }) {
   const { locale, messages, englishLabels } = useI18n();
@@ -36,13 +39,16 @@ export function RegionalEconomiesIndex({ model, sourceNote }: { model: RegionalE
  * leadRow is an unranked row above the ranked list, linked through hrefForRegion (a plain row without it).
  * headingLevel 3 nests the overview and list titles under a section title of the page's own.
  * title names the map's share picture; shareTestId tells its button apart on a page with another chart.
+ * crawl writes, on the server only, a hidden every-year table per entry (DESIGN.md §8.4): the entry's lead row, then its
+ * model's regions in rank order and those without a value; an entry's model needs a history.
  */
-export function RegionIndex({ title, model, sourceNote, metric, summary = [], leadRow, mapControls, headingLevel = 2, shareTestId }: {
+export function RegionIndex({ title, model, sourceNote, metric, summary = [], leadRow, mapControls, headingLevel = 2, shareTestId, crawl }: {
   title: string; model: RegionMapModel; sourceNote: string; metric: RegionMapMetric; summary?: Array<{ label: string; value: string; detail: string }>;
   leadRow?: { id: string; label: string; value: number };
   mapControls?: ReactNode;
   headingLevel?: 2 | 3;
   shareTestId?: string;
+  crawl?: ReadonlyArray<{ model: RegionMapModel; metric: Pick<RegionMapMetric, "formatValue" | "legend">; lead?: HistoryRow }>;
 }) {
   const Heading = headingLevel === 3 ? "h3" : "h2";
   const { locale, messages, englishLabels } = useI18n();
@@ -188,6 +194,20 @@ export function RegionIndex({ title, model, sourceNote, metric, summary = [], le
           <a href="https://www.geoboundaries.org/" target="_blank" rel="noreferrer" className="underline underline-offset-2">geoBoundaries</a> (CC BY 3.0).
         </SourceNote>
       </div>
+      {/* Built in the server render only; the browser keeps the server's tables (see IndexCrawlTables). */}
+      {crawl ? <IndexCrawlTables category={workbookMessage(locale, "workbook.category")} tables={typeof window === "undefined" ? crawl.map((entry) => {
+        const history = entry.model.history;
+        if (!history) throw new Error(`The ${entry.metric.legend} map has no history for its crawl table`);
+        const columns = history.years.map(String);
+        const label = (region: { regionId: string; nameKa: string }) => publicLabel(locale, region.regionId, region.nameKa, englishLabels);
+        return historyCrawlTable({
+          caption: historyCaption([title, entry.metric.legend], columns), years: history.years, columns, format: entry.metric.formatValue,
+          rows: [
+            ...(entry.lead ? [entry.lead] : []),
+            ...[...entry.model.regions, ...(entry.model.withoutValue ?? [])].map((region) => ({ label: label(region), valuesByYear: history.byRegion[region.regionId] ?? {} })),
+          ],
+        });
+      }) : []} /> : null}
     </>
   );
 }

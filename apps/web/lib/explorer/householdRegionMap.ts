@@ -1,7 +1,7 @@
 import type { ClientHouseholdFact, HouseholdMeasure } from "../data/household/types";
 import { REGIONAL_ECONOMY_REGIONS } from "../data/regionalEconomies/importRegionalEconomies";
 import { sectionTotal, type HouseholdSectionId } from "./household";
-import { regionalMapGeometry, quantileBucket, type RegionMapModel } from "./regionalEconomyMap";
+import { regionalMapGeometry, quantileBucket, regionMapHistory, type RegionMapModel } from "./regionalEconomyMap";
 
 /** The map that picks the page's area: the section total for each region in the latest year all eleven regions have, as published (one decimal). */
 export function buildHouseholdRegionMapModel(section: HouseholdSectionId, measure: HouseholdMeasure, facts: readonly ClientHouseholdFact[]): RegionMapModel {
@@ -22,5 +22,6 @@ export function buildHouseholdRegionMapModel(section: HouseholdSectionId, measur
     viewBox: geometry.viewBox, occupiedAreas: geometry.occupiedAreas, firstYear: Math.min(...regional.map(f => f.year)), year,
     regions: regions.sort((a, b) => b.value - a.value || a.sortOrder - b.sortOrder).map((region, index) => ({ regionId: region.regionId, nameKa: region.nameKa, value: region.value, pathD: region.pathD, rank: index + 1, bucket: bucketOf(region.value) })),
     legendMin: Math.min(...regions.map(region => region.value)), legendMax: Math.max(...regions.map(region => region.value)),
+    history: regionMapHistory(regional.map(f => ({ regionId: f.areaId, year: f.year, value: f.value }))),
   };
 }
