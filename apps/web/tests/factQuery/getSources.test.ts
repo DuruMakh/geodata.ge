@@ -281,4 +281,38 @@ describe("years only the newer datasets reach", () => {
       expect(response.kind, `${sourceId} ${year}`).toBe("sources");
     }
   });
+
+  describe("topic datasets", () => {
+    const schools = () => snapshot.topics.datasets.find((dataset) => dataset.page.datasetId === "education-schools")!;
+    const sourceId = () => snapshot.topics.sourceIds[schools().columns.sources.find((indexes) => indexes.length > 0)![0]!]!;
+    const withTopicYears = (firstYear: number, lastYear: number): FactQuerySnapshot => ({
+      ...snapshot,
+      topics: { ...snapshot.topics, datasets: snapshot.topics.datasets.map((dataset) => dataset === schools() ? { ...dataset, firstYear, lastYear } : dataset) },
+    });
+
+    it("rejects an unknown datasetId with the valid core and topic ids", () => {
+      const result = getSources(snapshot, { sourceIds: [sourceId()], datasetId: "education-schoolz" });
+      expect(result.kind).toBe("error");
+      expect(errorOf(result).code).toBe("invalid_parameters");
+      expect(errorOf(result).validChoices).toEqual(expect.arrayContaining(["national-revenue", "education-schools"]));
+    });
+
+    it("validates years against the topic dataset's own range, not the core range", () => {
+      const coreMax = 2030;
+      const patched = withTopicYears(2000, coreMax + 10);
+      expect(getSources(patched, { sourceIds: [sourceId()], datasetId: "education-schools", years: [coreMax + 5] }).kind).toBe("sources");
+      const narrow = withTopicYears(2000, 2025);
+      const rejected = getSources(narrow, { sourceIds: [sourceId()], datasetId: "education-schools", years: [1996] });
+      expect(errorOf(rejected).code).toBe("year_out_of_range");
+    });
+
+    it("validates entities against the topic dataset's entities", () => {
+      const own = schools().entities.find((entity) => entity.entityId.startsWith("region."))!.entityId;
+      expect(getSources(snapshot, { sourceIds: [sourceId()], datasetId: "education-schools", entityIds: [own] }).kind).toBe("sources");
+      const foreign = snapshot.inflation.cityEntities.map((city) => city.id).find((id) => !schools().entities.some((entity) => entity.entityId === id))!;
+      const rejected = getSources(snapshot, { sourceIds: [sourceId()], datasetId: "education-schools", entityIds: [foreign] });
+      expect(errorOf(rejected).code).toBe("unknown_entity");
+      expect(errorOf(rejected).validChoices).toContain(own);
+    });
+  });
 });

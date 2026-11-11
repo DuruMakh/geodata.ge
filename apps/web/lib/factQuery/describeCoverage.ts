@@ -270,7 +270,7 @@ function topicDatasetOf(snapshot: FactQuerySnapshot, datasetId: string): TopicDa
 }
 
 /** The core datasets, then the topic datasets the snapshot holds. */
-function allDatasetIds(snapshot: FactQuerySnapshot): AnyDatasetId[] {
+export function allDatasetIds(snapshot: FactQuerySnapshot): AnyDatasetId[] {
   return [...DATASET_IDS, ...snapshot.topics.datasets.map((dataset) => dataset.page.datasetId as AnyDatasetId)];
 }
 

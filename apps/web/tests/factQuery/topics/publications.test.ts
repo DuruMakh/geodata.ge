@@ -2,11 +2,11 @@
 //
 // The published topic files (spec §5.3): one CSV per topic dataset under /downloads/data/topics/, listed in the manifest
 // and the catalogue, and the same source documents in sources.json that get_sources returns.
+import { parse } from "csv-parse/sync";
 import { beforeAll, describe, expect, it } from "vitest";
 import { buildAllPublications, buildTopicCsvFiles, TOPIC_CSV_COLUMNS } from "../../../lib/factQuery/publications";
 import { getSources } from "../../../lib/factQuery/getSources";
 import type { GetSourcesData } from "../../../lib/factQuery/getSources";
-import { unpackTopicFacts } from "../../../lib/factQuery/topics/store";
 import type { FactQuerySnapshot } from "../../../lib/factQuery/types";
 import { testSnapshot } from "../../helpers/factQuerySnapshot";
 
@@ -35,24 +35,28 @@ describe("topic CSV files", () => {
     }
   });
 
-  it("has one row per served cell, and a missing cell is an empty value with no basis and no sources", () => {
+  it("has one row per served cell", () => {
     for (const dataset of snapshot.topics.datasets) {
       const file = files.find((entry) => entry.fileName === `topics/${dataset.page.datasetId}.csv`)!;
-      const lines = file.bytes.toString("utf8").trimEnd().split("\n");
-      expect(lines.length - 1, dataset.page.datasetId).toBe(dataset.columns.year.length);
-      expect(file.rowCount).toBe(dataset.columns.year.length);
-      const facts = unpackTopicFacts(dataset, snapshot.topics);
-      const missing = facts.findIndex((fact) => fact.value === null);
-      if (missing >= 0) {
-        const cells = lines[missing + 1]!.split(",");
-        const at = (name: string) => cells.length === TOPIC_CSV_COLUMNS.length ? cells[TOPIC_CSV_COLUMNS.indexOf(name as never)] : undefined;
-        if (at("value") !== undefined) {
-          expect(at("value")).toBe("");
-          expect(at("basis")).toBe("");
-          expect(at("source_ids")).toBe("");
-        }
-      }
+      const rows = parse(file.bytes.toString("utf8"), { bom: true, columns: true }) as Record<string, string>[];
+      expect(rows.length, dataset.page.datasetId).toBe(dataset.columns.year.length);
+      expect(file.rowCount).toBe(rows.length);
     }
+  });
+
+  it("writes a missing cell as an empty value with no basis and no sources", () => {
+    const base = snapshot.topics.datasets[0]!;
+    const row = base.columns.year.findIndex((_year, at) => base.columns.value[at] !== null && base.columns.sources[at]!.length > 0);
+    const value = base.columns.value.map((entry, at) => (at === row ? null : entry));
+    const patched: FactQuerySnapshot = { ...snapshot, topics: { ...snapshot.topics, datasets: [{ ...base, columns: { ...base.columns, value } }] } };
+    const rows = parse(buildTopicCsvFiles(patched)[0]!.bytes.toString("utf8"), { bom: true, columns: true }) as Record<string, string>[];
+    const missing = rows.filter((entry) => entry.value === "");
+    expect(missing.length).toBeGreaterThan(0);
+    for (const entry of missing) {
+      expect(entry.basis).toBe("");
+      expect(entry.source_ids).toBe("");
+    }
+    expect(rows.filter((entry) => entry.value !== "").every((entry) => entry.basis !== "" && entry.source_ids !== "")).toBe(true);
   });
 
   it("writes school years as 2015/16 and the series' own unit token", () => {
