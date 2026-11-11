@@ -43,6 +43,8 @@ export const TOPIC_CAVEAT_RULES: readonly CaveatRule[] = [
   topicRule("topic_survey_estimate", "note", "none", "caveats.topic_survey_estimate", (o) => o.status === "survey_estimate"),
   topicRule("topic_derived", "note", "none", "caveats.topic_derived", (o) => o.status === "derived"),
   topicRule("topic_partial_period", "severe", "limits", "caveats.topic_partial_period", (o) => o.status === "partial"),
+  // A dated point (a stock at a date inside the year, not at year end): a change to it spans less than a year (ruling R30).
+  topicRule("topic_dated_period", "severe", "limits", "caveats.topic_dated_period", (o) => o.periodEnd !== undefined),
   // planned_values' own wording, under a topic code: planned_values names series:year, which across several places
   // would mark every place's cell in that year planned.
   topicRule("topic_planned", "severe", "none", "caveats.planned_values", (o) => o.basis === "planned"),

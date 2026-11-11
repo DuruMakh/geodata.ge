@@ -55,6 +55,8 @@ export type CaveatContext = {
     valueDefinitionId: string;
     /** Topic observations only: the cell's value status. Absent on every core observation, which is what gates the topic rules. */
     status?: TopicValueStatus;
+    /** Topic observations only: the date of an amount dated other than the year's end (the latest Foreign debt and Reserves point). */
+    periodEnd?: string;
   }[];
   municipalTotalInputs: MunicipalTotalFact[];
   /**

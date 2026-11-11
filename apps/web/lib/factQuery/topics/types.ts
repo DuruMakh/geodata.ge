@@ -3,6 +3,7 @@
 // The shared topic format: what an adapter builds for one chart page (TopicDatasetBuild) and what the snapshot keeps
 // (TopicDataset, facts packed into parallel columns). Types only; store.ts packs and unpacks.
 import type { MethodologyDatasetId } from "../../methodology/types";
+import type { ServiceMessageKey } from "../localization";
 import type { Basis, DatasetId } from "../types";
 
 export type TopicFamilyId = "education" | "demography" | "health" | "social" | "unemployment" | "wages" | "business" | "money-banks" | "living-standards" | "housing" | "internet" | "transport" | "trade" | "external" | "budget-extras" | "crime" | "science-culture" | "environment" | "energy-food";
@@ -15,7 +16,10 @@ export type AnyDatasetId = DatasetId | TopicDatasetId;
 
 export type TopicPage = { datasetId: string; pagePath: `/explorer/${string}`; family: TopicFamilyId; periodKind: "year" | "school_year" };
 
-export type TopicSeries = { seriesId: string; labelKa: string; labelEn: string; headingKa: string | null; headingEn: string | null; parentSeriesId: string | null; isTotal: boolean; unit: string };
+/** `note`: a service message the series' value definition adds (what an "Other countries" line leaves out), read at query time. */
+export type TopicSeriesNote = { key: ServiceMessageKey; values: Record<string, string | number> };
+
+export type TopicSeries = { seriesId: string; labelKa: string; labelEn: string; headingKa: string | null; headingEn: string | null; parentSeriesId: string | null; isTotal: boolean; unit: string; note?: TopicSeriesNote };
 
 export type TopicEntity = { entityId: string; entityType: "country" | "region" | "municipality" | "city"; labelKa: string; labelEn: string; parentEntityId: string | null };
 

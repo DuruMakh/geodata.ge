@@ -98,11 +98,15 @@ export function queryIndicators(snapshot: FactQuerySnapshot, rawInput: unknown):
     const headed = (heading: string | null, label: string) => (heading !== null && heading !== label ? `${heading} — ${label}` : label);
     const missing = { year: periodLabel ?? year };
     // A partial year states its months in the definition the row carries; the caveat says only that it is partial.
+    // A dated point states its date the same way (ruling R30).
     const months = fact?.status === "partial" && fact.monthsReported !== undefined ? fact.monthsReported : undefined;
-    const definitionKey = months === undefined ? "definitions.topicValue" : "definitions.topicValuePartial";
-    const definition = (locale: "ka" | "en") => serviceMessage(snapshot, locale, definitionKey, {
-      page: locale === "ka" ? dataset.urlKa : dataset.urlEn, unit: locale === "ka" ? unit.labelKa : unit.labelEn, ...(months === undefined ? {} : { months }),
-    });
+    const date = fact?.periodEnd;
+    const definitionKey = months !== undefined ? "definitions.topicValuePartial" : date !== undefined ? "definitions.topicValueDated" : "definitions.topicValue";
+    // A series note (what an "Other countries" line leaves out) follows the value's own sentence.
+    const definition = (locale: "ka" | "en") => [serviceMessage(snapshot, locale, definitionKey, {
+      page: locale === "ka" ? dataset.urlKa : dataset.urlEn, unit: locale === "ka" ? unit.labelKa : unit.labelEn,
+      ...(months !== undefined ? { months } : date !== undefined ? { date } : {}),
+    }), ...(series.note === undefined ? [] : [serviceMessage(snapshot, locale, series.note.key, series.note.values)])].join(" ");
     const observation: Observation = {
       observationId: buildObservationId(dataset.page.datasetId as Observation["datasetId"], entityId, seriesId, year, "value"),
       datasetId: dataset.page.datasetId as Observation["datasetId"],

@@ -147,7 +147,7 @@ This field exists because `compare` previously consulted a hand-maintained list 
 
 ## The catalogue
 
-49 codes are registered.
+50 codes are registered.
 
 | Code | Severity | Comparison effect | Owner document |
 | --- | --- | --- | --- |
@@ -196,6 +196,7 @@ This field exists because `compare` previously consulted a hand-maintained list 
 | `topic_survey_estimate` | note | `none` | `ai-grounding-and-caveats.md#topic_survey_estimate` |
 | `topic_derived` | note | `none` | `ai-grounding-and-caveats.md#topic_derived` |
 | `topic_partial_period` | severe | `limits` | `ai-grounding-and-caveats.md#topic_partial_period` |
+| `topic_dated_period` | severe | `limits` | `ai-grounding-and-caveats.md#topic_dated_period` |
 | `topic_planned` | severe | `none` | `ai-grounding-and-caveats.md#topic_planned` |
 | `topic_preliminary` | note | `limits` | `ai-grounding-and-caveats.md#topic_preliminary` |
 | `topic_projection` | severe | `breaks` | `ai-grounding-and-caveats.md#topic_projection` |
@@ -783,6 +784,20 @@ Fiscal.ge publishes a few figures the source does not, such as a trade balance c
 **English.** A value covers only the months the source published, not the full year; its value definition gives the number of months.
 
 A partial year (for example a money-transfer year with months the source left blank) is still served, but it is not a full-year figure. The number of months stands in that row's own value definition, not in this shared message, so a request spanning several partial years states each one's months on its own row.
+
+### `topic_dated_period`
+
+**Severity:** severe  
+**Comparison effect:** `limits`  
+**Owner document:** `ai-grounding-and-caveats.md#topic_dated_period`
+
+**Trigger.** Any available topic cell that carries a `periodEnd` date, that is, a stock at a date inside the year rather than at year end. Topic cells only (`query_indicators`); a missing cell carries no disclosure.
+
+**Georgian.** მნიშვნელობა ასახავს მდგომარეობას წლის შიგნით არსებული თარიღისთვის და არა წლის ბოლოსთვის, ამიტომ მასთან დაკავშირებული ცვლილება წელზე მოკლე პერიოდს მოიცავს; თარიღი მის განმარტებაშია მითითებული.
+
+**English.** A value is the position on a date inside the year, not at year end, so a change to or from it spans less than a year; its value definition gives the date.
+
+The one dated latest-amount point on Foreign debt and Reserves (for example gross external debt on 30 June or reserves on 30 September of the latest year) is served under its calendar year, but a change from the previous year-end to it covers six or nine months, not a year. `compare_periods` therefore reports such a change as limited, and a change-type ranking entry carries this caveat. The date stands in that row's own value definition and in the observation's `periodEnd`.
 
 ### `topic_planned`
 

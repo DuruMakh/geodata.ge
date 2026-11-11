@@ -200,10 +200,11 @@ describe("queryIndicators caveats", () => {
     const rows = observations(response);
     const at = (index: number) => rows.find((row) => row.seriesId === cells[index]!.seriesId && row.year === cells[index]!.year)!;
     const codes = response.meta.caveats.map((caveat: Caveat) => `${caveat.code}:${caveat.severity}`);
-    expect(codes).toEqual(["topic_partial_period:severe", "topic_planned:severe", "topic_projection:severe", "topic_derived:note", "topic_preliminary:note", "topic_survey_estimate:note"]);
+    // The partial cell is also dated (periodEnd), so it carries the dated-point disclosure too (ruling R30).
+    expect(codes).toEqual(["topic_dated_period:severe", "topic_partial_period:severe", "topic_planned:severe", "topic_projection:severe", "topic_derived:note", "topic_preliminary:note", "topic_survey_estimate:note"]);
     expect(at(0).caveatIds).toEqual(["topic_survey_estimate"]);
     expect(at(1).caveatIds).toEqual(["topic_derived"]);
-    expect(at(2).caveatIds).toEqual(["topic_partial_period"]);
+    expect(at(2).caveatIds).toEqual(["topic_dated_period", "topic_partial_period"]);
     expect(at(2).periodEnd).toBe("2014-06-30");
     expect(at(3)).toMatchObject({ basis: "planned", caveatIds: ["topic_planned"] });
     expect(at(4)).toMatchObject({ basis: "preliminary", caveatIds: ["topic_preliminary"] });

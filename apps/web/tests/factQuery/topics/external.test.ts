@@ -165,6 +165,17 @@ describe("the dated point, the partial year and the sources over the tools", () 
     const change = comparison("external-foreign-debt", "ext_debt.total", 2025, 2026);
     expect(change.to).toMatchObject({ year: 2026, periodEnd: "2026-06-30" });
     expect(change.from).not.toHaveProperty("periodEnd");
+    // Ruling R30: a year-end to mid-year change is not an annual change; year end to year end stays comparable.
+    expect(latest).toMatchObject({ caveatIds: ["topic_dated_period"], valueDefinitionEn: expect.stringContaining("it is the position on 2026-06-30, not at year end"), valueDefinition: expect.stringContaining("2026-06-30") });
+    expect(december).toMatchObject({ caveatIds: [] });
+    expect(change).toMatchObject({ comparability: "limited", caveatIds: ["topic_dated_period"] });
+    expect(comparison("external-reserves", "reserves.total", 2025, 2026)).toMatchObject({ comparability: "limited", caveatIds: ["topic_dated_period"] });
+    expect(comparison("external-foreign-debt", "ext_debt.total", 2024, 2025)).toMatchObject({ comparability: "comparable", caveatIds: [] });
+    const changes = rank(snapshot, { datasetId: "external-foreign-debt", dimension: "series", parentSeriesId: "ext_debt.total", measure: "value", metric: "percentage_change", fromYear: 2025, toYear: 2026 });
+    if (changes.kind !== "ranking") throw new Error(JSON.stringify(changes));
+    const changeEntries = (changes.data as RankData).entries;
+    expect(changeEntries.length).toBeGreaterThan(0);
+    for (const entry of changeEntries) expect(entry.caveatIds, entry.seriesId).toContain("topic_dated_period");
     expect(toolResult(compare(snapshot, { target: { dataset: "topic", datasetId: "external-foreign-debt", seriesIds: ["ext_debt.total"] }, fromYear: 2025, toYear: 2026, measure: "value" })).content[0]!.text).toContain("2025→2026-06-30");
     const ranking = rank(snapshot, { datasetId: "external-foreign-debt", dimension: "series", parentSeriesId: "ext_debt.total", measure: "value", metric: "value", year: 2026 });
     if (ranking.kind !== "ranking") throw new Error(JSON.stringify(ranking));
@@ -178,6 +189,14 @@ describe("the dated point, the partial year and the sources over the tools", () 
     const [row] = observations(queryIndicators(snapshot, { datasetId: "external-money-from-abroad", seriesIds: ["transfer.others.received"], years: [2019] }));
     expect(row).toMatchObject({ caveatIds: ["topic_partial_period"], valueDefinitionEn: expect.stringContaining("it covers 5 months of the year") });
     expect(comparison("external-money-from-abroad", "transfer.others.received", 2018, 2019)).toMatchObject({ comparability: "limited", caveatIds: expect.arrayContaining(["topic_partial_period"]) });
+    // Other countries says what it leaves out: every country but the end year's top 10, each one in the reviewed import file.
+    for (const [datasetId, seriesId, file] of [["external-money-from-abroad", "transfer.others.sent", "money-transfers-annual.csv"], ["external-foreign-investment", "fdi.others", "foreign-investment-annual.csv"]] as const) {
+      const end = snapshot.topics.datasets.find((entry) => entry.page.datasetId === datasetId)!.lastYear;
+      const [other] = observations(queryIndicators(snapshot, { datasetId, seriesIds: [seriesId], years: [end] }));
+      expect(other!.valueDefinitionEn, seriesId).toContain(`Other countries are every country except the ${end} top 10 this dataset lists; each country's amount is in the reviewed import file data/imports/${file}.`);
+      expect(other!.valueDefinition, seriesId).toContain(`${end} წლის ათი უმსხვილესი ქვეყნისა`);
+    }
+    expect(observations(queryIndicators(snapshot, { datasetId: "external-money-from-abroad", seriesIds: ["transfer.total.sent"], years: [2025] }))[0]!.valueDefinitionEn).not.toContain("Other countries");
     // The total of 2019 is a full year.
     expect(comparison("external-money-from-abroad", "transfer.total.received", 2018, 2019)).toMatchObject({ comparability: "comparable", caveatIds: [] });
   });

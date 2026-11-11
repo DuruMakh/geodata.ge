@@ -5,7 +5,7 @@
 // it (tests/factQuery/purity.test.ts).
 import type { Basis } from "../types";
 import { TOPIC_PAGES } from "./pages";
-import type { TopicBreak, TopicDatasetBuild, TopicEntity, TopicFact, TopicPage, TopicSeries, TopicValueStatus } from "./types";
+import type { TopicBreak, TopicDatasetBuild, TopicEntity, TopicFact, TopicPage, TopicSeries, TopicSeriesNote, TopicValueStatus } from "./types";
 
 /** A name in both languages: a message key read in each, or text built from the page's own words in each. */
 export type Names = { ka: string; en: string };
@@ -14,7 +14,7 @@ export type Names = { ka: string; en: string };
  * months; for an amount dated other than the year's end (the latest Foreign debt and Reserves point), its date.
  */
 export type Cell = { value: number; unit: string; sourceIds: string[]; status: TopicValueStatus; monthsReported?: number; periodEnd?: string };
-export type SeriesSpec = { seriesId: string; indicatorId: string; label: Names; heading: Names | null; parentSeriesId: string | null; isTotal: boolean };
+export type SeriesSpec = { seriesId: string; indicatorId: string; label: Names; heading: Names | null; parentSeriesId: string | null; isTotal: boolean; note?: TopicSeriesNote };
 
 /**
  * Collects one page's dataset. `add` adds a series' cells for one place over the years the page prints them: missing
@@ -37,7 +37,7 @@ export function collectTopicDataset(datasetId: string, title: Names, basis: Basi
     if (!known) {
       series.set(spec.seriesId, {
         seriesId: spec.seriesId, labelKa: spec.label.ka, labelEn: spec.label.en, headingKa: spec.heading?.ka ?? null, headingEn: spec.heading?.en ?? null,
-        parentSeriesId: spec.parentSeriesId, isTotal: spec.isTotal, unit, indicatorId: spec.indicatorId,
+        parentSeriesId: spec.parentSeriesId, isTotal: spec.isTotal, unit, indicatorId: spec.indicatorId, ...(spec.note === undefined ? {} : { note: spec.note }),
       });
     }
     if (!entities.has(entity.entityId)) entities.set(entity.entityId, entity);
