@@ -156,7 +156,7 @@ describe("the measures over the tools", () => {
     expect(scope.messageEn).toContain("not the state budget's expenditure");
     expect(observations(response).every((observation) => observation.caveatIds.includes("topic_general_government_scope"))).toBe(true);
     const search = describeCoverage(snapshot, { search: "government spending" });
-    expect((search.data as { datasets: { datasetId: string }[] }).datasets.map((dataset) => dataset.datasetId)).toContain("expenditure-types");
+    expect((search as { data: { datasets: { datasetId: string }[] } }).data.datasets.map((dataset) => dataset.datasetId)).toContain("expenditure-types");
     expect(search.meta.caveats.map((caveat) => [caveat.code, caveat.severity])).toEqual([["topic_general_government_scope", "severe"]]);
     // Other datasets carry no such note, and a search that does not list Spending by type carries none.
     expect(queryIndicators(snapshot, { datasetId: "tax-breaks-refunds", seriesIds: ["tax_refunds.total"], years: [2025] }).meta.caveats).toEqual([]);
