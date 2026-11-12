@@ -229,7 +229,7 @@ export const TOOLS: readonly ToolDefinition[] = [
     name: "query_indicators",
     title: "თემატური მონაცემები / Topic data",
     describe: () =>
-      "Annual figures from every other Fiscal.ge chart page: population, education, health and pensions, jobs and wages, business, living standards, housing, internet, transport, money and banks, trade, external accounts, crime, environment, science and culture, energy and farming. " +
+      "Annual figures from every other Fiscal.ge chart page: spending by type, tax breaks and refunds, GDP by expenditure, population, education, health and pensions, jobs and wages, business, living standards, housing, internet, transport, money and banks, trade, external accounts, crime, environment, science and culture, energy and farming. " +
       "Take datasetId, seriesIds and entityIds from describe_coverage; never guess. Values are the page's own figures, in each series' own unit; a school year is its first year (year 2025 = 2025/26). Missing is not zero. Use compare and rank for changes.",
     schema: queryIndicatorsInput,
     run: queryIndicators,
