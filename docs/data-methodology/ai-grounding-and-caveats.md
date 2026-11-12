@@ -61,10 +61,10 @@ different words; when it leaves words out, `searchMatchNoteKa` and `searchMatchN
 say how many (after the some-words note, when there is one), so the client can search
 with fewer words. This bounds the cost of one search. A search without `datasetId` also returns the optional
 `websitePages` (at most five, with `websitePagesNoteKa` and `websitePagesNoteEn`) for
-Fiscal.ge navigation pages without a served dataset (today, Analysis): names and
-links in both languages, never a value. The note tells the assistant that the page's HTML
-can carry the text: quote from it with the link when the page can be opened, never from
-memory. A page is linked when every word of the search meets its names, topic or extra
+Fiscal.ge pages that are not datasets themselves (today, Year in review under Analysis,
+whose figures come from the served budget datasets): names and links in both languages,
+never a value. The note tells the assistant that such a page's figures come from the
+served datasets: take a figure from them, give the page's link, never quote from memory. A page is linked when every word of the search meets its names, topic or extra
 words by the same whole words, word beginnings of four letters or more, and Georgian
 stems; an id-like search links none. When the answer has entries with every word, only
 the pages that meet every word are linked. Otherwise, failing the whole search, the

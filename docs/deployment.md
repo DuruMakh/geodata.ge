@@ -26,7 +26,7 @@ and coverage are in `catalogue.json`. `manifest.json` lists every publication
 with row count, bytes and SHA-256; the manifest itself is one additional artifact,
 not one of its listed files. Derive changing inventories from these owners rather
 than retaining old fixed counts. Requests do not gain a language argument.
-Schema 1.8.0 adds `query_indicators` and the topic datasets: one dataset per Explorer chart page (every page that is not one of the core datasets' pages), annual, with one CSV per dataset at `/downloads/data/topics/<datasetId>.csv`; the 11 core datasets keep their tools. A search without `datasetId` now finds a page's data in its topic dataset and names in `websitePages` only the pages that hold no served figures. Schema 1.7.0 adds the optional `searchMatch` field (`all_words` or `some_words`) to
+Schema 1.8.0 adds `query_indicators` and the topic datasets: one dataset per Explorer chart page (every page that is not one of the core datasets' pages), annual, with one CSV per dataset at `/downloads/data/topics/<datasetId>.csv`; the 11 core datasets keep their tools. A search without `datasetId` now finds a page's data in its topic dataset and names in `websitePages` only the pages that are not datasets themselves (today Year in review, whose figures come from the served budget datasets). Schema 1.7.0 adds the optional `searchMatch` field (`all_words` or `some_words`) to
 catalogue searches, which now match whole words and Georgian stems, with
 `searchMatchNoteKa`/`searchMatchNoteEn` when only some words matched; a search without
 `datasetId` may also carry the optional `websitePages` links to website-only pages, with

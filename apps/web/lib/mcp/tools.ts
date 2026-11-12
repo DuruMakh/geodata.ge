@@ -157,7 +157,7 @@ export const TOOLS: readonly ToolDefinition[] = [
       "try the principal word or browse the named dataset. A failed phrase match is not proof that the data is absent. Georgian case endings " +
       "are handled: `ბათუმის` finds `ბათუმი`. searchMatch some_words means no entry has every word: the matches may be about " +
       "something else, so if none fits, retry the missing part before saying it is not served; all_words with no entries means nothing matched. " +
-      "A search without a datasetId also gives websitePages: Fiscal.ge pages on topics this connection does not serve. " +
+      "A search without a datasetId also gives websitePages: related Fiscal.ge pages that are not datasets; their figures come from served datasets. " +
       "Never guess a series or entity id; take it from here. " +
       "A product series omits yearsByMeasure and periodsByMeasure when they are the same as its years and periods.",
     schema: describeCoverageInput,

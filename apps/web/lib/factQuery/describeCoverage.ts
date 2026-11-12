@@ -126,7 +126,7 @@ export type CoverageData = {
   /** Only with `searchMatch: "some_words"`: these entries may be about another subject, and when none fits the data is not served here. */
   searchMatchNoteKa?: string;
   searchMatchNoteEn?: string;
-  /** Only on a search without `datasetId`: Fiscal.ge pages that show the topic but whose figures are not served here, best first, at most five. */
+  /** Only on a search without `datasetId`: Fiscal.ge pages that show the topic but are not datasets (their figures come from served datasets), best first, at most five. */
   websitePages?: {
     topicId: string; labelKa: string; labelEn: string; topicLabelKa: string; topicLabelEn: string; urlKa: string; urlEn: string;
   }[];
@@ -1542,8 +1542,8 @@ export function describeCoverage(snapshot: FactQuerySnapshot, rawInput: unknown)
     // in the order of their first entry, after the pages the search is aimed at.
     const datasetRank = new Map<AnyDatasetId, number>();
     for (const id of [...titledIds, ...ranked.map((entry) => entry.datasetId)]) if (!datasetRank.has(id)) datasetRank.set(id, datasetRank.size);
-    // The website's pages that this service does not serve: a topic the site shows and the catalogue does not hold gets
-    // a link to its page instead of a dead end. Links only; the status stays the series' own. What each word is to
+    // The website's pages that are not datasets (Year in review, whose figures come from the served budget datasets): a
+    // topic the site shows with no dataset of its own gets a link to its page instead of a dead end. Links only; the status stays the series' own. What each word is to
     // the page search comes from the search above, the entities' names and one small search of the datasets' labels
     // over the same words (the same query gives `searchCatalogue` the same words), not from a search per word.
     const labelled = searchCatalogue(search, eligibleDatasets, (id) => datasetLabels.get(id)!, { memo }).wordMatches;
