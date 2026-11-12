@@ -14,8 +14,9 @@ import type { TopicDatasetBuild } from "./types";
  * where the parent and all its parts are printed:
  * - "sum": the parts add up to the parent, within 0.01% (the rounding of printed parts);
  * - "between": the parent, a rate, share or average of the whole, lies between its parts, as an aggregate of them must;
- * - "label": nothing more to check: the parent is labelled the total and its amounts are a proven "sum" (the real
- *   growth of Total investment, whose only growth part is Buildings and equipment).
+ * - "label": the figures cannot be checked (the real growth of Total investment, whose only growth part is Buildings
+ *   and equipment), so the same total and parts must be a proven "sum" at another measure of the dataset (their amounts
+ *   in GEL), or the build stops.
  */
 export type TopicHierarchyLink = { datasetId: string; parentSeriesId: string; seriesIds: readonly string[]; breakdown?: string; proof: "sum" | "between" | "label" };
 
@@ -86,6 +87,10 @@ export const TOPIC_HIERARCHY: readonly TopicHierarchyLink[] = [
 
 const SUM_TOLERANCE = 1e-4;
 
+/** A series id's measure, its last part (`gdp_use.investment.real_growth` → `real_growth`), and the id without it. */
+const measureOf = (seriesId: string) => seriesId.slice(seriesId.lastIndexOf(".") + 1);
+const stemOf = (seriesId: string) => seriesId.slice(0, Math.max(seriesId.lastIndexOf("."), 0));
+
 /**
  * A dataset with its reviewed links applied. A link naming a series the dataset does not serve, a part in another unit,
  * a part linked twice, or figures that do not bear the link out stops the build.
@@ -108,7 +113,13 @@ export function applyTopicHierarchy(build: TopicDatasetBuild, links: readonly To
       if (linked.has(seriesId)) throw new Error(`${datasetId}: ${seriesId} is linked twice`);
       linked.set(seriesId, link);
     }
-    if (link.proof === "label") continue;
+    if (link.proof === "label") {
+      const provenBySum = own.some((other) => other.proof === "sum" && measureOf(other.parentSeriesId) !== measureOf(link.parentSeriesId)
+        && stemOf(other.parentSeriesId) === stemOf(link.parentSeriesId)
+        && link.seriesIds.every((seriesId) => other.seriesIds.some((part) => stemOf(part) === stemOf(seriesId))));
+      if (!provenBySum) throw new Error(`${datasetId}: ${link.parentSeriesId} is linked to ${link.seriesIds.join(", ")} by label only, and no sum link proves the same total and parts at another measure`);
+      continue;
+    }
     let checked = 0;
     for (const entity of build.entities) {
       for (const year of new Set(build.facts.map((fact) => fact.year))) {

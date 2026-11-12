@@ -39,6 +39,18 @@ describe("reviewed topic hierarchy", () => {
   it("checks an average or a rate of the whole lies between its parts", () => {
     expect(applyTopicHierarchy(build({ total: [5], women: [4], men: [6] }), [link({ proof: "between" })]).series[1]).toMatchObject({ parentSeriesId: "total" });
   });
+
+  it("links by label only a total and parts proven a sum at another measure", () => {
+    const measures = build({ "t.amount": [10], "a.amount": [4], "b.amount": [6], "t.growth": [5], "a.growth": [3], "c.growth": [1] });
+    const sum = link({ parentSeriesId: "t.amount", seriesIds: ["a.amount", "b.amount"], breakdown: undefined });
+    const label = (seriesIds: string[]) => link({ parentSeriesId: "t.growth", seriesIds, breakdown: undefined, proof: "label" });
+    expect(applyTopicHierarchy(measures, [sum, label(["a.growth"])]).series.find((entry) => entry.seriesId === "a.growth")).toMatchObject({ parentSeriesId: "t.growth" });
+    expect(() => applyTopicHierarchy(measures, [label(["a.growth"])])).toThrow(/t.growth is linked to a.growth by label only, and no sum link proves/);
+    expect(() => applyTopicHierarchy(measures, [sum, label(["c.growth"])])).toThrow(/by label only/);
+    // A "between" proof at the other measure is not enough: it does not show the parts make up the total.
+    const averages = build({ "t.amount": [5], "a.amount": [4], "b.amount": [6], "t.growth": [5], "a.growth": [3] });
+    expect(() => applyTopicHierarchy(averages, [{ ...sum, proof: "between" }, label(["a.growth"])])).toThrow(/by label only/);
+  });
 });
 
 describe("served topic hierarchy", () => {
