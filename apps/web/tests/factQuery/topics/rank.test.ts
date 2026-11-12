@@ -103,9 +103,29 @@ describe("rank topic datasets", () => {
     expect(ranking(rank(withBreak, { datasetId: "education-schools", dimension: "entities", entityType: "municipality", seriesId: "education.pupils.total", measure: "value", metric: "percentage_change", fromYear: 2020, toYear: 2025 })).entries.length).toBeGreaterThan(0);
   });
 
-  it("finds no peers for a heading that holds only a total", () => {
+  it("finds no peers for a heading that holds only a total, and says the series has nothing to rank against", () => {
     const response = rank(snapshot, { datasetId: "education-kindergartens", dimension: "series", seriesId: "education.kg_staff.total", measure: "value", metric: "value", year: 2025 });
-    expect(response).toMatchObject({ kind: "error", error: { code: "unknown_series" } });
+    expect(response).toMatchObject({ kind: "error", error: { code: "invalid_parameters" } });
+    if (response.kind !== "error") throw new Error("unreachable");
+    expect(response.error.messageEn).toContain("education.kg_staff.total exists, but in education-kindergartens it has no parts");
+    expect(response.error.messageEn).not.toContain("No rankable series");
+  });
+
+  // Re-review N2: a headline series with nothing beside it names the datasets that rank places by it.
+  it("names the dataset that ranks places by a headline rate with no peers", () => {
+    for (const datasetId of ["unemployment-overview", "unemployment-gender"]) {
+      const response = rank(snapshot, { datasetId, dimension: "series", seriesId: "unemployment_rate", measure: "value", metric: "value", year: 2025 });
+      expect(response).toMatchObject({ kind: "error", error: { code: "invalid_parameters", retryable: false } });
+      if (response.kind !== "error") throw new Error("unreachable");
+      expect(response.error.messageEn).toContain(`The series unemployment_rate exists, but in ${datasetId} it has no parts`);
+      expect(response.error.messageEn).toContain('dimension "entities" and one of these datasetIds: unemployment-regions.');
+      expect(response.error.messageKa).toContain("unemployment-regions");
+    }
+    const regions = ranking(rank(snapshot, { datasetId: "unemployment-regions", dimension: "entities", entityType: "region", seriesId: "unemployment_rate", measure: "value", metric: "value", year: 2025 }));
+    expect(regions.entries.length).toBeGreaterThan(1);
+    const alone = rank(snapshot, { datasetId: "tax-breaks-refunds", dimension: "series", seriesId: "tax_refunds.total", measure: "value", metric: "value", year: 2024 });
+    if (alone.kind !== "error") throw new Error("expected an error");
+    expect(alone.error.messageEn).toContain("no dataset lists it for more than one place");
   });
 
   it("names a place with a missing endpoint and one starting from zero instead of ranking them", () => {
@@ -337,6 +357,30 @@ describe("rank topic series peers", () => {
       "science_culture.rd_staff.not_specified", "science_culture.rd_staff.support", "science_culture.rd_staff.technicians", "science_culture.researchers.total",
     ]);
     expect(idsOf(seriesRanking("science-culture-research", { seriesId: "science_culture.researchers.total" }, 2023)).sort()).toEqual(["science_culture.researchers.men", "science_culture.researchers.women"]);
+  });
+
+  // Re-review N1: a total with no parent and no peer under its heading (or under no heading) ranks its own parts when
+  // named, as the universe text says, whether or not it is marked isTotal; one with heading peers (Households) still
+  // ranks among them.
+  it.each([
+    ["science-culture-museums", "science_culture.museums", 2024],
+    ["science-culture-museums", "science_culture.museum_staff.total", 2024],
+    ["science-culture-theatres", "science_culture.theatre_staff.total", 2024],
+    ["health-social-package", "social.social_package.total.amount", 2024],
+    ["health-social-package", "social.social_package.total.recipients", 2024],
+    ["unemployment-overview", "long_term_unemployed", 2025],
+    // A total under no heading, with parts: refused before as having no peers.
+    ["external-reserves", "reserves.total", 2025],
+    ["health-causes-of-death", "health.deaths.total", 2024],
+  ])("ranks %s's %s by its own parts when named", (datasetId, seriesId, year) => {
+    const named = idsOf(seriesRanking(datasetId, { seriesId }, year));
+    expect(named.length).toBeGreaterThan(1);
+    expect(named).not.toContain(seriesId);
+    expect(named.sort()).toEqual(idsOf(seriesRanking(datasetId, { parentSeriesId: seriesId }, year)).sort());
+  });
+
+  it("ranks a part-holding series with heading peers among them", () => {
+    expect(idsOf(seriesRanking("money-borrowers", { seriesId: "borrowers.households" }, 2025)).sort()).toEqual(["borrowers.businesses", "borrowers.households"]);
   });
 
   it("ranks the leading cause of death by its own seriesId", () => {

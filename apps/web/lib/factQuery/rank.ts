@@ -401,9 +401,11 @@ export function rank(snapshot: FactQuerySnapshot, rawInput: unknown): FactQueryR
       const anchor = topicDataset.series.find((entry) => entry.seriesId === input.seriesId);
       if (input.parentSeriesId === undefined) {
         if (input.seriesId === undefined) return invalid();
-        // A series under no heading and with no parent has no peers on its page (money-interest-rates lists its rates so):
-        // say that, not the input rule. One with a parent ranks among its parent's other parts (below).
-        if (anchor !== undefined && anchor.headingKa === null && anchor.parentSeriesId === null) {
+        // A series under no heading, with no parent and no parts has no peers on its page (money-interest-rates lists its
+        // rates so): say that, not the input rule. One with a parent ranks among its parent's other parts, and one with
+        // parts ranks them (below).
+        if (anchor !== undefined && anchor.headingKa === null && anchor.parentSeriesId === null
+          && !topicDataset.series.some((entry) => entry.parentSeriesId === anchor.seriesId)) {
           const values = { seriesId: anchor.seriesId };
           return errorResponse(snapshot, { code: "invalid_parameters", messageKa: serviceMessage(snapshot, "ka", "errors.rankTopicNoHeading", values), messageEn: serviceMessage(snapshot, "en", "errors.rankTopicNoHeading", values), retryable: false });
         }
@@ -419,10 +421,17 @@ export function rank(snapshot: FactQuerySnapshot, rawInput: unknown): FactQueryR
       }
       // A named total with parts ranks its parts, as by parentSeriesId; another named series with a parent ranks among
       // that parent's parts (a heading can hold several measures of one unit, each under its own parent: shares of GDP
-      // and real growth, the 60% and 40% poverty lines).
-      const parentId = input.parentSeriesId
-        ?? (anchor!.isTotal && topicDataset.series.some((entry) => entry.parentSeriesId === anchor!.seriesId) ? anchor!.seriesId : anchor!.parentSeriesId);
+      // and real growth, the 60% and 40% poverty lines). A parentless series with parts that has no parentless peer of
+      // its unit under its heading, or that is under no heading, is a total too (Museums, All staff, the social package's
+      // All recipients, linked in topics/hierarchy.ts; Total reserves) and ranks its parts; one with such peers
+      // (Households, beside Businesses) ranks among them.
       type Peer = (typeof topicDataset.series)[number];
+      const hasParts = (entry: Peer) => topicDataset.series.some((other) => other.parentSeriesId === entry.seriesId);
+      const headingPeerOf = (entry: Peer) => (other: Peer) => other !== entry && !other.isTotal && other.parentSeriesId === null
+        && other.headingKa === entry.headingKa && other.breakdown === entry.breakdown && other.unit === entry.unit;
+      const ranksOwnParts = (entry: Peer) => hasParts(entry)
+        && (entry.isTotal || (entry.parentSeriesId === null && (entry.headingKa === null || !topicDataset.series.some(headingPeerOf(entry)))));
+      const parentId = input.parentSeriesId ?? (ranksOwnParts(anchor!) ? anchor!.seriesId : anchor!.parentSeriesId);
       // A heading's total that is itself a part (All researchers, of All R&D staff) ranks among its parent's parts.
       let peers = topicDataset.series.filter((entry) => (parentId !== null
         ? entry.parentSeriesId === parentId
@@ -447,6 +456,20 @@ export function rank(snapshot: FactQuerySnapshot, rawInput: unknown): FactQueryR
         .filter((entry) => !peers.some((other) => other.parentSeriesId === entry.seriesId))
         .map((entry) => entry.seriesId)
         .sort();
+      // A named series with no parts and no peer of its unit (a dataset's headline rate, a heading's only total) has
+      // nothing to rank against here: say so, and name the datasets that list it for several places.
+      if (seriesIds.length === 0 && anchor !== undefined && input.parentSeriesId === undefined) {
+        const placed = snapshot.topics.datasets.filter((dataset) => {
+          const index = dataset.series.findIndex((entry) => entry.seriesId === anchor.seriesId);
+          if (index < 0) return false;
+          const places = new Set<number>();
+          dataset.columns.series.forEach((value, row) => { if (value === index && dataset.columns.value[row] !== null) places.add(dataset.columns.entity[row]!); });
+          return places.size > 1;
+        }).map((dataset) => dataset.page.datasetId);
+        const key = placed.length > 0 ? "errors.rankTopicSeriesAlone" : "errors.rankTopicSeriesAloneNoPlaces";
+        const values = { seriesId: anchor.seriesId, datasetId: topicDataset.page.datasetId, datasetIds: placed.join(", ") };
+        return errorResponse(snapshot, { code: "invalid_parameters", messageKa: serviceMessage(snapshot, "ka", key, values), messageEn: serviceMessage(snapshot, "en", key, values), retryable: false });
+      }
       universeKey = "ranking.topicSeries";
     }
     // A percent series (its unit says so) changes in percentage points only, as a core rate does.

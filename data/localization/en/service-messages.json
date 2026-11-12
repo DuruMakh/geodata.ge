@@ -187,6 +187,8 @@
   "errors.rankSingleEntity": "The \"{requestedDataset}\" dataset has a single entity (Georgia), so there is nothing to rank. Use query_debt or query_deficit for its values, or compare for a change between two years.",
   "errors.rankTopicInput": "A topic ranking by entities needs entityType and exactly one seriesId; by series it needs a seriesId (the series sharing its heading are ranked) or a parentSeriesId, and takes an optional entityId.",
   "errors.rankTopicNoHeading": "The series {seriesId} is listed under no heading and has no parent, so there are no peer series to rank it against. Read the series side by side with query_indicators instead.",
+  "errors.rankTopicSeriesAlone": "The series {seriesId} exists, but in {datasetId} it has no parts and no other series in its unit beside it, so there is nothing to rank it against there. Read it with query_indicators. To rank places by it, call rank with dimension \"entities\" and one of these datasetIds: {datasetIds}.",
+  "errors.rankTopicSeriesAloneNoPlaces": "The series {seriesId} exists, but in {datasetId} it has no parts and no other series in its unit beside it, and no dataset lists it for more than one place, so there is nothing to rank it against. Read it with query_indicators.",
   "errors.rankUnknownRegion": "Unknown withinRegionId. Use a region id from describe_coverage.",
   "errors.rankValueYearOnly": "A value ranking takes a single year, not a year range.",
   "errors.resultTooLargeBytes": "Result too large: {cells} cells, {kib} KiB. Narrow the request and ask again: fewer years first, then fewer entities, then fewer series. For a whole dataset, download the published file instead: {bulkUrl}",
