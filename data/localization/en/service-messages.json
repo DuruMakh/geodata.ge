@@ -94,7 +94,7 @@
   "caveats.revenue_internal_flows_netted": "The selected item uses the documented netting of internal flows.",
   "caveats.sectors_preliminary": "These sector observations are preliminary and subject to revision.",
   "caveats.topic_dated_period": "A value is the position on a date inside the year, not at year end, so a change to or from it spans less than a year; its value definition gives the date.",
-  "caveats.topic_derived": "Fiscal.ge calculates this figure from the source's published figures; the source does not publish it. The source entry states the derivation.",
+  "caveats.topic_derived": "Fiscal.ge calculates this figure from the source's published figures, as its page does (a sum or difference of published rows, a share of GDP, an average); the source does not publish it. The cited sources are its inputs.",
   "caveats.topic_general_government_scope": "Spending by type is general government: the state budget, the autonomous republics and the municipalities, consolidated (transfers between them counted once). It is not the state budget's expenditure: never add it to, subtract it from or compare it with the state budget's expenditure or receipts served here; their totals differ.",
   "caveats.topic_partial_period": "A value covers only the months the source published, not the full year; its value definition gives the number of months.",
   "caveats.topic_preliminary": "These observations are preliminary and subject to revision.",

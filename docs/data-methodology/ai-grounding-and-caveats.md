@@ -799,11 +799,11 @@ Survey figures (the Labour Force Survey and the like) are estimates from a sampl
 
 **Trigger.** Any available topic cell whose value status is `derived`. Topic cells only (`query_indicators`); a missing cell carries no status disclosure.
 
-**Georgian.** ამ მაჩვენებელს Fiscal.ge ითვლის წყაროს გამოქვეყნებული მონაცემებიდან; წყარო მას არ აქვეყნებს. გამოთვლის წესი წყაროს აღწერაშია მოცემული.
+**Georgian.** ამ მაჩვენებელს Fiscal.ge ითვლის წყაროს გამოქვეყნებული მონაცემებიდან ისე, როგორც მისი გვერდი (გამოქვეყნებული მწკრივების ჯამი ან სხვაობა, მშპ-ში წილი, საშუალო); წყარო მას არ აქვეყნებს. მითითებული წყაროები გამოთვლის საწყისი მონაცემებია.
 
-**English.** Fiscal.ge calculates this figure from the source's published figures; the source does not publish it. The source entry states the derivation.
+**English.** Fiscal.ge calculates this figure from the source's published figures, as its page does (a sum or difference of published rows, a share of GDP, an average); the source does not publish it. The cited sources are its inputs.
 
-Fiscal.ge publishes a few figures the source does not, such as a trade balance computed from exports and imports. The cited source entry carries the derivation and the upstream originals, as the existing derived sources do.
+Fiscal.ge publishes a few figures the source does not, such as a trade balance computed from exports and imports, a share of GDP, or a demography total that adds a city's separately printed row. The calculation is the page's own, the one its methodology page describes; the cited sources are the published inputs. A topic source records no `derivation` text, so the message does not send the assistant to look for one.
 
 ### `topic_partial_period`
 
