@@ -131,6 +131,7 @@ export const SERVICE_MESSAGE_KEYS = [
   "definitions.regionTotal",
   "definitions.reviewedAmount",
   "definitions.shareOfGdp",
+  "definitions.topicJanuaryStock",
   "definitions.topicOtherCountries",
   "definitions.topicValue",
   "definitions.topicValueDated",

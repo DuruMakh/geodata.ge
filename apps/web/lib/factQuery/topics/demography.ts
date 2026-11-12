@@ -26,7 +26,7 @@ import type { Messages } from "../../i18n/types";
 import { loadTopicBreaks } from "./breaks";
 import { collectTopicDataset, span, type Cell, type Names, type SeriesSpec } from "./collect";
 import { placeEntity } from "./education";
-import type { TopicAdapter, TopicBreak, TopicDatasetBuild, TopicEntity } from "./types";
+import type { TopicAdapter, TopicBreak, TopicDatasetBuild, TopicEntity, TopicSeriesNote } from "./types";
 
 /** The dimensions a reviewed demography row may carry besides its series, place and year. */
 type Dimensions = { sex?: string; ageGroup?: string; settlement?: string; citizenshipId?: string };
@@ -70,6 +70,8 @@ function names(context: Context, key: string): Names {
 }
 const joined = (...parts: Names[]): Names => ({ ka: parts.map((part) => part.ka).join(" · "), en: parts.map((part) => part.en).join(" · ") });
 const plain = (text: string): Names => ({ ka: text, en: text });
+/** A population count is the stock on 1 January of its year (2026 is 1 January 2026), as the pages say: its definition says so. */
+const JANUARY: TopicSeriesNote = { key: "definitions.topicJanuaryStock", values: {} };
 
 /** Population: each place's population over its page's years, and the density Georgia and the regions publish. */
 function buildPopulation(context: Context, clientFacts: Parameters<typeof placeYears>[0], breaks: readonly TopicBreak[]): TopicDatasetBuild {
@@ -77,7 +79,7 @@ function buildPopulation(context: Context, clientFacts: Parameters<typeof placeY
   // Municipality 04 and the region of Tbilisi carry the same number; the page keeps one place for it.
   const population = new Map(context.served.filter((fact) => fact.seriesId === SERIES.populationTotal).map((fact) => [`${placeIdForMunicipalityCode(fact.geographyId)}:${fact.year}`, fact]));
   const density = context.served.filter((fact) => fact.seriesId === SERIES.populationDensity);
-  const populationSpec: SeriesSpec = { seriesId: SERIES.populationTotal, indicatorId: SERIES.populationTotal, label: names(context, "measurePopulation"), heading: null, parentSeriesId: null, isTotal: true };
+  const populationSpec: SeriesSpec = { seriesId: SERIES.populationTotal, indicatorId: SERIES.populationTotal, label: names(context, "measurePopulation"), heading: null, parentSeriesId: null, isTotal: true, note: JANUARY };
   const densitySpec: SeriesSpec = { seriesId: SERIES.populationDensity, indicatorId: SERIES.populationDensity, label: names(context, "sideDensity"), heading: null, parentSeriesId: null, isTotal: false };
   for (const { place, entity } of context.places) {
     dataset.add(entity, populationSpec, span(placeYears(clientFacts, place)), (year) => context.index.published(population.get(`${place.id}:${year}`)));
@@ -192,10 +194,10 @@ function buildAgeSex(context: Context, breaks: readonly TopicBreak[]): TopicData
     const row = (year: number, ageGroup: string) => index.row(SERIES.populationByAgeSex, GEORGIA_PLACE_ID, year, { sex, ageGroup });
     for (const group of AGE_SEX_GROUPS) {
       // The pyramid's 0-4 is the annual table's 0 and 1-4 added up.
-      dataset.add(georgia, { seriesId: `${SERIES.populationByAgeSex}.${sex}.${group}`, indicatorId: SERIES.populationByAgeSex, label: plain(ageGroupLabel(group)), heading, parentSeriesId: totalId, isTotal: false }, annualYears,
+      dataset.add(georgia, { seriesId: `${SERIES.populationByAgeSex}.${sex}.${group}`, indicatorId: SERIES.populationByAgeSex, label: plain(ageGroupLabel(group)), heading, parentSeriesId: totalId, isTotal: false, note: JANUARY }, annualYears,
         (year) => (group === "age_0_4" ? index.summed([row(year, "age_0"), row(year, "age_1_4")]) : index.published(row(year, group))));
     }
-    dataset.add(georgia, { seriesId: totalId, indicatorId: SERIES.populationByAgeSex, label: total, heading, parentSeriesId: null, isTotal: true }, annualYears, (year) => index.published(row(year, "total")));
+    dataset.add(georgia, { seriesId: totalId, indicatorId: SERIES.populationByAgeSex, label: total, heading, parentSeriesId: null, isTotal: true, note: JANUARY }, annualYears, (year) => index.published(row(year, "total")));
   }
   const settlements = { total: "settlementAll", urban: "settlementUrban", rural: "settlementRural" } as const;
   for (const { place, entity } of context.places.filter(({ place }) => place.level !== "municipality")) {

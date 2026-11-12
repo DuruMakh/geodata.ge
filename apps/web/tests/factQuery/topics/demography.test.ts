@@ -22,6 +22,7 @@ import { buildVitalWorkbookExportModel } from "../../../lib/explorer/demographyV
 import { loadPopulationBasics } from "../../../lib/explorer/populationBasics.server";
 import type { WorkbookExportModel, WorkbookReadableRow } from "../../../lib/explorer/workbookModel";
 import { compare, type Comparison } from "../../../lib/factQuery/compare";
+import { queryIndicators } from "../../../lib/factQuery/queryIndicators";
 import { demographyTopicAdapter } from "../../../lib/factQuery/topics/demography";
 import { TOPIC_PAGES } from "../../../lib/factQuery/topics/pages";
 import { TOPIC_ADAPTERS } from "../../../lib/factQuery/topics/registry";
@@ -199,6 +200,18 @@ describe("compare across the census re-base", () => {
     }
     expect(pairs("demography-population", ["demography.population_total"], 2015, 2024)[0]!.comparability).toBe("comparable");
     expect(pairs("demography-population", ["demography.population_total"], 2025, 2026)[0]!.comparability).toBe("comparable");
+  });
+
+  // Full review data-accuracy M2: a population is the 1 January stock, and its definition says so.
+  it("says a population is the stock on 1 January of its year", () => {
+    const definitionOf = (datasetId: string, seriesId: string) => {
+      const response = queryIndicators(snapshot, { datasetId, seriesIds: [seriesId], years: [2025] });
+      return (response as { data: { observations: { valueDefinition: string; valueDefinitionEn: string }[] } }).data.observations[0]!;
+    };
+    for (const [datasetId, seriesId] of [["demography-population", "demography.population_total"], ["demography-age-sex", "demography.population_by_age_sex.total.age_0_4"], ["demography-age-sex", "demography.population_by_age_sex.female.total"]]) {
+      expect(definitionOf(datasetId!, seriesId!), seriesId).toMatchObject({ valueDefinitionEn: expect.stringContaining("the population on 1 January of the year"), valueDefinition: expect.stringContaining("1 იანვრის მდგომარეობით") });
+    }
+    expect(definitionOf("demography-births-deaths", "demography.live_births").valueDefinitionEn).not.toContain("1 January");
   });
 
   it("refuses the fertility rate and an age group across it, and compares births, which are counts of events", () => {
