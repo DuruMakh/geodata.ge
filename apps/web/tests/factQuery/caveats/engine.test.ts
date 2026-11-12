@@ -77,7 +77,7 @@ describe("CAVEAT_RULES registry", () => {
   // seven topic-dataset codes (rules.topics.ts) registered with query_indicators,
   // plus the dated-point code topic_dated_period (ruling R30).
   it("registers spec section 9.2's codes, less nominal_gel, plus the approved splits, new datasets and 2004 component guard", () => {
-    expect(CAVEAT_RULES).toHaveLength(50);
+    expect(CAVEAT_RULES).toHaveLength(51);
     const codes = CAVEAT_RULES.map((rule) => rule.code);
     expect(codes).toContain("admin_category_not_yet_established");
     expect(codes).toContain("program_parent_category_modern_grouping");
@@ -93,6 +93,6 @@ describe("CAVEAT_RULES registry", () => {
     expect(codes).toContain("inflation_product_cumulative_derived");
     expect(codes).toContain("inflation_product_history_limits");
     expect(codes).toContain("inflation_product_label_discrepancy");
-    for (const code of ["topic_survey_estimate", "topic_derived", "topic_partial_period", "topic_dated_period", "topic_planned", "topic_preliminary", "topic_projection", "topic_series_break"]) expect(codes).toContain(code);
+    for (const code of ["topic_survey_estimate", "topic_derived", "topic_partial_period", "topic_dated_period", "topic_planned", "topic_preliminary", "topic_projection", "topic_series_break", "topic_general_government_scope"]) expect(codes).toContain(code);
   });
 });

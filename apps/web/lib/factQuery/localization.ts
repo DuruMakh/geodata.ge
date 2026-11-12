@@ -88,6 +88,7 @@ export const SERVICE_MESSAGE_KEYS = [
   "caveats.sectors_preliminary",
   "caveats.topic_dated_period",
   "caveats.topic_derived",
+  "caveats.topic_general_government_scope",
   "caveats.topic_partial_period",
   "caveats.topic_preliminary",
   "caveats.topic_projection",

@@ -12,7 +12,7 @@ Each dataset is also one file, `/downloads/data/topics/<datasetId>.csv`, UTF-8 w
 
 ## Caveat codes added for topics
 
-`topic_survey_estimate` (note), `topic_derived` (note), `topic_partial_period` (severe, limits comparison), `topic_planned` (severe), `topic_preliminary` (note, limits comparison), `topic_projection` (severe, breaks comparison), `topic_series_break` (severe, breaks comparison: a reviewed break inside the requested years, with its reason) and `topic_dated_period` (severe, limits comparison: a value at a date inside the year). The codes and their wording are owned by `ai-grounding-and-caveats.md`.
+`topic_survey_estimate` (note), `topic_derived` (note), `topic_partial_period` (severe, limits comparison), `topic_planned` (severe), `topic_preliminary` (note, limits comparison), `topic_projection` (severe, breaks comparison), `topic_series_break` (severe, breaks comparison: a reviewed break inside the requested years, with its reason) `topic_dated_period` (severe, limits comparison: a value at a date inside the year) and `topic_general_government_scope` (severe, on every Spending by type answer: general government, not the state budget). The codes and their wording are owned by `ai-grounding-and-caveats.md`.
 
 ## Change between two periods
 

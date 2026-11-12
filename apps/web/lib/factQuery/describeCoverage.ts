@@ -16,7 +16,7 @@ import { MUNICIPAL_COUNTRY_ID } from "../data/municipal/types";
 import { stem } from "../explorer/search/georgian";
 import { searchExplorer } from "../explorer/search/searchExplorer";
 import { fold } from "../i18n/search";
-import { CAVEAT_RULES, evaluateCaveats } from "./caveats";
+import { CAVEAT_RULES, TOPIC_CAVEAT_RULES, evaluateCaveats, type CaveatContext } from "./caveats";
 import { buildResponseMeta } from "./meta";
 import { bulkUrlFor } from "../mcp/result";
 import { debtMeasure, deficitMeasure, describeCoverageInput, municipalMeasure, nationalMeasure } from "./schemas";
@@ -1402,16 +1402,16 @@ export function describeCoverage(snapshot: FactQuerySnapshot, rawInput: unknown)
   // A catalogue request carries no observations, entities, series selection
   // or comparison — describeCoverage never returns a figure, so this context
   // is fixed and empty regardless of which dataset (if any) was requested.
-  // Traced against all 24 rules (caveats/rules.*.ts): every one requires a
-  // non-empty seriesIds/entityIds/observations/comparison, or a measure other
-  // than amount_gel, to fire — so this call is provably inert, asserted by
-  // the "fires no data-shaped caveat" test below rather than left as an
-  // unverified claim. datasetId itself is required by CaveatContext but, for
-  // the same reason, cannot affect the outcome here: it falls back to an
-  // arbitrary fixed member of DatasetId when the request did not name one.
-  const caveats = evaluateCaveats(snapshot,
-    {
-      datasetId: (input.datasetId ?? "national-revenue") as AnyDatasetId,
+  // Every data-shaped rule (caveats/rules.*.ts) needs a non-empty
+  // seriesIds/entityIds/observations/comparison, or a measure other than
+  // amount_gel, to fire, as the "fires no data-shaped caveat" test below
+  // asserts. Only the scope disclosures that hold for a whole dataset
+  // (deficit_general_government_scope, topic_general_government_scope) fire
+  // here, when the request names their dataset; a search that lists
+  // Spending by type carries its scope too (below). datasetId falls back to
+  // an arbitrary fixed member of DatasetId when the request did not name one.
+  const catalogueContext = (datasetId: AnyDatasetId): CaveatContext => ({
+      datasetId: datasetId as CaveatContext["datasetId"],
       measure: "amount_gel",
       years: [],
       seriesIds: [],
@@ -1423,9 +1423,8 @@ export function describeCoverage(snapshot: FactQuerySnapshot, rawInput: unknown)
       comparison: null,
       historicalJoinSeriesYears: snapshot.ministries.historicalJoinSeriesYears,
       adminCategoryYears: [],
-    },
-    CAVEAT_RULES,
-  );
+  });
+  const caveats = evaluateCaveats(snapshot, catalogueContext((input.datasetId ?? "national-revenue") as AnyDatasetId), CAVEAT_RULES);
   const meta = buildResponseMeta(snapshot, { caveats });
 
   const exclusions = buildExclusions(snapshot);
@@ -1570,6 +1569,10 @@ export function describeCoverage(snapshot: FactQuerySnapshot, rawInput: unknown)
     })
       .slice(0, WEBSITE_PAGES_LIMIT)
       .map((page) => ({ topicId: page.topic, labelKa: page.name.ka, labelEn: page.name.en, topicLabelKa: page.topicName.ka, topicLabelEn: page.topicName.en, urlKa: page.urlKa, urlEn: page.urlEn }));
+    // A listed topic dataset's whole-dataset scope disclosure travels with the search: "government spending" lists
+    // Spending by type, which is general government, not the state budget.
+    const scopeCaveats = [...datasetRank.keys()].filter((id) => !isCoreDataset(id))
+      .flatMap((id) => evaluateCaveats(snapshot, catalogueContext(id), TOPIC_CAVEAT_RULES));
     return {
       kind: "catalogue",
       status: foundSeries.length === 0 && foundEntities.length === 0 ? "empty" : "ok",
@@ -1597,7 +1600,7 @@ export function describeCoverage(snapshot: FactQuerySnapshot, rawInput: unknown)
           }
           : {}),
       },
-      meta,
+      meta: scopeCaveats.length > 0 ? buildResponseMeta(snapshot, { caveats: [...caveats, ...scopeCaveats] }) : meta,
     };
   }
 

@@ -18,6 +18,7 @@ import { buildTaxBreaksRefundsModel, taxBreaksRefundsCrawlStates, taxBreaksRefun
 import { buildTaxBreaksRefundsWorkbookExportModel } from "../../../lib/explorer/taxBreaksRefundsWorkbook";
 import type { WorkbookExportModel, WorkbookReadableRow } from "../../../lib/explorer/workbookModel";
 import { compare, type Comparison } from "../../../lib/factQuery/compare";
+import { describeCoverage } from "../../../lib/factQuery/describeCoverage";
 import { getSources } from "../../../lib/factQuery/getSources";
 import type { Observation } from "../../../lib/factQuery/observations";
 import { queryIndicators } from "../../../lib/factQuery/queryIndicators";
@@ -136,14 +137,30 @@ describe("the measures over the tools", () => {
 
   it("marks a share of GDP as Fiscal.ge's calculation, its preliminary year preliminary, and compares shares in percentage points", () => {
     const [published, preliminary] = observations(queryIndicators(snapshot, { datasetId: "expenditure-types", seriesIds: ["spending_type.total.share_of_gdp"], years: [2024, 2025] }));
-    expect(published).toMatchObject({ year: 2024, unit: "percent", caveatIds: ["topic_derived"] });
+    expect(published).toMatchObject({ year: 2024, unit: "percent", caveatIds: ["topic_general_government_scope", "topic_derived"] });
     expect(preliminary).toMatchObject({ year: 2025, caveatIds: expect.arrayContaining(["topic_derived", "topic_preliminary"]) });
     expect(observations(queryIndicators(snapshot, { datasetId: "tax-breaks-refunds", seriesIds: ["tax_refunds.total"], years: [2025] }))[0]).toMatchObject({ unit: "gel_million", caveatIds: [] });
     const share = comparison("expenditure-types", "spending_type.total.share_of_gdp", 2023, 2024);
     expect(share).toMatchObject({ comparability: "comparable", percentageChange: null });
     expect(share.percentagePointChange).toBeCloseTo(share.to.value! - share.from.value!, 9);
     expect(comparison("expenditure-types", "spending_type.total.share_of_gdp", 2024, 2025)).toMatchObject({ comparability: "limited", caveatIds: expect.arrayContaining(["topic_preliminary"]) });
-    expect(comparison("expenditure-types", "spending_type.total.nominal", 2024, 2025)).toMatchObject({ comparability: "comparable", caveatIds: [] });
+    expect(comparison("expenditure-types", "spending_type.total.nominal", 2024, 2025)).toMatchObject({ comparability: "comparable", caveatIds: ["topic_general_government_scope"] });
+  });
+
+  // Full review I-1: Spending by type is general government, not the state budget, and every answer on it says so.
+  it("discloses Spending by type's general-government scope on every cell, and on a search that lists it", () => {
+    const response = queryIndicators(snapshot, { datasetId: "expenditure-types", seriesIds: ["spending_type.total.nominal", "spending_type.interest.nominal"], years: [2025] });
+    const scope = response.meta.caveats.find((caveat) => caveat.code === "topic_general_government_scope")!;
+    expect(scope).toMatchObject({ severity: "severe", affects: ["country.georgia:spending_type.total.nominal:2025", "country.georgia:spending_type.interest.nominal:2025"] });
+    expect(scope.messageEn).toContain("general government");
+    expect(scope.messageEn).toContain("not the state budget's expenditure");
+    expect(observations(response).every((observation) => observation.caveatIds.includes("topic_general_government_scope"))).toBe(true);
+    const search = describeCoverage(snapshot, { search: "government spending" });
+    expect((search.data as { datasets: { datasetId: string }[] }).datasets.map((dataset) => dataset.datasetId)).toContain("expenditure-types");
+    expect(search.meta.caveats.map((caveat) => [caveat.code, caveat.severity])).toEqual([["topic_general_government_scope", "severe"]]);
+    // Other datasets carry no such note, and a search that does not list Spending by type carries none.
+    expect(queryIndicators(snapshot, { datasetId: "tax-breaks-refunds", seriesIds: ["tax_refunds.total"], years: [2025] }).meta.caveats).toEqual([]);
+    expect(describeCoverage(snapshot, { search: "pension" }).meta.caveats).toEqual([]);
   });
 
   it("cites the Ministry, Treasury and Geostat files the values are read from, resolved through get_sources", () => {

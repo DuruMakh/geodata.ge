@@ -40,6 +40,7 @@ This file is used because:
 
 - **Spending page** (`/explorer/expenditure`): that page shows state-budget payments by purpose. It includes debt repayment and lending and leaves out the municipalities, so its total differs.
 - **Deficit page** (`/explorer/deficit`): this file's net lending/borrowing (−1,275.3 million GEL in 2025) is not served. The Deficit page keeps the IMF figure, so the site shows one balance per year.
+- **MCP and bulk file**: the page's data is served through `query_indicators` as the topic dataset `expenditure-types` and as `/downloads/data/topics/expenditure-types.csv`, the amounts and the shares of GDP the CSV stores. Every answer on it carries the severe `topic_general_government_scope` caveat (general government, not the state budget; never combined or compared with the state budget's expenditure or receipts), and so does a `describe_coverage` search that lists it.
 
 ## Calculations
 

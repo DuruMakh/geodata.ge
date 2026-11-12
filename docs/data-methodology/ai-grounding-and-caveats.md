@@ -180,7 +180,7 @@ This field exists because `compare` previously consulted a hand-maintained list 
 
 ## The catalogue
 
-50 codes are registered.
+51 codes are registered.
 
 | Code | Severity | Comparison effect | Owner document |
 | --- | --- | --- | --- |
@@ -234,6 +234,7 @@ This field exists because `compare` previously consulted a hand-maintained list 
 | `topic_preliminary` | note | `limits` | `ai-grounding-and-caveats.md#topic_preliminary` |
 | `topic_projection` | severe | `breaks` | `ai-grounding-and-caveats.md#topic_projection` |
 | `topic_series_break` | severe | `breaks` | `ai-grounding-and-caveats.md#topic_series_break` |
+| `topic_general_government_scope` | severe | `none` | `ai-grounding-and-caveats.md#topic_general_government_scope` |
 
 ### `planned_values`
 
@@ -887,6 +888,20 @@ A projection is not an outcome, so a change into a projected year is not a chang
 **English.** A reviewed series break falls inside the requested years ({detail}); no change is computed across this point.
 
 `{detail}` is each break's reference date and the register's English reason, joined with `; `. The registers are English-only, so the Georgian sentence carries the English reason rather than an invented translation. `compare` states the same fact as the reason a break makes a pair `not_comparable` (`comparison.seriesBreak`), and returns both endpoint values with no change.
+
+### `topic_general_government_scope`
+
+**Severity:** severe  
+**Comparison effect:** `none`  
+**Owner document:** `ai-grounding-and-caveats.md#topic_general_government_scope`
+
+**Trigger.** Any request on the `expenditure-types` dataset (Spending by type), unconditionally, as `deficit_general_government_scope` is on the balance; its `affects` lists the returned cells. A `describe_coverage` search that lists the dataset carries it too, so a search such as `government spending` brings the scope with the dataset.
+
+**Georgian.** ხარჯები ეკონომიკური კლასიფიკაციით ზოგადი მთავრობის მაჩვენებელია: სახელმწიფო ბიუჯეტი, ავტონომიური რესპუბლიკები და მუნიციპალიტეტები, კონსოლიდირებულად (მათ შორის ტრანსფერები ერთხელ ითვლება). ეს არ არის სახელმწიფო ბიუჯეტის ხარჯები: არასოდეს მიუმატოთ, გამოაკლოთ ან შეადაროთ ის აქ მოწოდებულ სახელმწიფო ბიუჯეტის ხარჯებს ან შემოსულობებს; მათი ჯამები განსხვავდება.
+
+**English.** Spending by type is general government: the state budget, the autonomous republics and the municipalities, consolidated (transfers between them counted once). It is not the state budget's expenditure: never add it to, subtract it from or compare it with the state budget's expenditure or receipts served here; their totals differ.
+
+Spending by type is the Ministry of Finance's general government statement (GFSM 2001): the state budget, the autonomous republics and the municipalities, consolidated (`expenditure-types.md`). Its total (29.7 billion GEL in 2025) is not the state budget's expenditure (27.7 billion GEL, `national-expenditure`), which includes debt repayment and lending and leaves out the municipalities. The page says so in its own subtitle; the caveat carries it to an assistant, which otherwise sees two "total government spending" figures for one year and only one of them with a scope.
 
 
 ## Published bulk files

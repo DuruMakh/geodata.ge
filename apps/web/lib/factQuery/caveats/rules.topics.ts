@@ -39,7 +39,22 @@ const breaksIn = (c: CaveatContext, snapshot: FactQuerySnapshot) => {
   });
 };
 
+/** Spending by type: general government, not the state budget (full review I-1). */
+export const GENERAL_GOVERNMENT_DATASET_ID = "expenditure-types";
+
 export const TOPIC_CAVEAT_RULES: readonly CaveatRule[] = [
+  // Unconditional within the dataset, as deficit_general_government_scope is: the error (reading it as the state budget's
+  // spending, or setting it against the state budget's figures) is available whatever is asked of it.
+  {
+    code: "topic_general_government_scope",
+    severity: "severe",
+    comparisonEffect: "none",
+    messageKey: "caveats.topic_general_government_scope",
+    methodologyRef: "ai-grounding-and-caveats.md#topic_general_government_scope",
+    methodologyRefEn: "/en/methodology",
+    applies: (c) => c.datasetId === GENERAL_GOVERNMENT_DATASET_ID,
+    affects: (c) => cells(c, () => true).map((o) => `${o.entityId}:${o.seriesId}:${o.year}`),
+  },
   topicRule("topic_survey_estimate", "note", "none", "caveats.topic_survey_estimate", (o) => o.status === "survey_estimate"),
   topicRule("topic_derived", "note", "none", "caveats.topic_derived", (o) => o.status === "derived"),
   topicRule("topic_partial_period", "severe", "limits", "caveats.topic_partial_period", (o) => o.status === "partial"),
