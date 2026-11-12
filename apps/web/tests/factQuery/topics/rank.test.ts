@@ -291,4 +291,22 @@ describe("rank topic series peers", () => {
     expect(response.error.messageEn).toContain("rates.policy is listed under no heading");
     expect(response.error.messageKa).toContain("rates.policy");
   });
+
+  // Full review tool-logic I1: a series under no heading that has a parent ranks among its parent's other parts, as it
+  // does when the parent is named; only a series with neither has no peers.
+  it.each([
+    ["health-causes-of-death", "health.deaths.circulatory", "health.deaths.total", 2024],
+    ["external-foreign-debt", "ext_debt.government", "ext_debt.total", 2025],
+    ["external-reserves", "reserves.gold", "reserves.total", 2025],
+    ["energy-food-energy-supply", "energy.supply.hydro", "energy.supply.total", 2024],
+  ])("ranks %s's %s among the parts of its parent", (datasetId, seriesId, parentSeriesId, year) => {
+    const named = seriesRanking(datasetId, { seriesId }, year);
+    expect(idsOf(named)).toContain(seriesId);
+    expect(idsOf(named)).not.toContain(parentSeriesId);
+    expect(idsOf(named).sort()).toEqual(idsOf(seriesRanking(datasetId, { parentSeriesId }, year)).sort());
+  });
+
+  it("ranks the leading cause of death by its own seriesId", () => {
+    expect(idsOf(seriesRanking("health-causes-of-death", { seriesId: "health.deaths.cancer" }, 2024))[0]).toBe("health.deaths.circulatory");
+  });
 });

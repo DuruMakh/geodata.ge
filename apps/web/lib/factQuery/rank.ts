@@ -400,8 +400,9 @@ export function rank(snapshot: FactQuerySnapshot, rawInput: unknown): FactQueryR
       const anchor = topicDataset.series.find((entry) => entry.seriesId === input.seriesId);
       if (input.parentSeriesId === undefined) {
         if (input.seriesId === undefined) return invalid();
-        // A series under no heading has no peers on its page (money-interest-rates lists its rates so): say that, not the input rule.
-        if (anchor !== undefined && anchor.headingKa === null) {
+        // A series under no heading and with no parent has no peers on its page (money-interest-rates lists its rates so):
+        // say that, not the input rule. One with a parent ranks among its parent's other parts (below).
+        if (anchor !== undefined && anchor.headingKa === null && anchor.parentSeriesId === null) {
           const values = { seriesId: anchor.seriesId };
           return errorResponse(snapshot, { code: "invalid_parameters", messageKa: serviceMessage(snapshot, "ka", "errors.rankTopicNoHeading", values), messageEn: serviceMessage(snapshot, "en", "errors.rankTopicNoHeading", values), retryable: false });
         }
