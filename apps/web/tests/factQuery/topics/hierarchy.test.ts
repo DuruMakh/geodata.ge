@@ -40,6 +40,24 @@ describe("reviewed topic hierarchy", () => {
     expect(applyTopicHierarchy(build({ total: [5], women: [4], men: [6] }), [link({ proof: "between" })]).series[1]).toMatchObject({ parentSeriesId: "total" });
   });
 
+  // Re-review 2, R2-2: a total its parts make up less a series it subtracts (GDP, less imports).
+  it("detaches a series the total subtracts, proving the total is its parts less it", () => {
+    const gdp = build({ total: [10], c: [8], x: [5], m: [3] });
+    const net = link({ seriesIds: ["c", "x"], subtracted: ["m"], breakdown: undefined });
+    const linked = applyTopicHierarchy(gdp, [net]);
+    expect(linked.series.find((entry) => entry.seriesId === "m")).toMatchObject({ parentSeriesId: null, subtractedFrom: "total" });
+    expect(linked.series.find((entry) => entry.seriesId === "c")).toMatchObject({ parentSeriesId: "total" });
+    expect(() => applyTopicHierarchy(build({ total: [10], c: [8], x: [5], m: [2] }), [net])).toThrow(/total is not the sum of c, x less m/);
+    expect(() => applyTopicHierarchy(gdp, [{ ...net, proof: "between" }])).toThrow(/only a "sum" proof checks/);
+  });
+
+  // Re-review 2, R2-1: a breakdown whose parts fall short of the total in some years (vocational students by field).
+  it("checks a breakdown with an unstated remainder adds up to no more than its total", () => {
+    const short = applyTopicHierarchy(build({ total: [10, 12], women: [4, 5], men: [6, 6] }), [link({ proof: "within" })]);
+    expect(short.series.find((entry) => entry.seriesId === "men")).toMatchObject({ parentSeriesId: "total", breakdown: "sex" });
+    expect(() => applyTopicHierarchy(build({ total: [10], women: [5], men: [6] }), [link({ proof: "within" })])).toThrow(/total is not the sum or more of women, men/);
+  });
+
   it("links by label only a total and parts proven a sum at another measure", () => {
     const measures = build({ "t.amount": [10], "a.amount": [4], "b.amount": [6], "t.growth": [5], "a.growth": [3], "c.growth": [1] });
     const sum = link({ parentSeriesId: "t.amount", seriesIds: ["a.amount", "b.amount"], breakdown: undefined });

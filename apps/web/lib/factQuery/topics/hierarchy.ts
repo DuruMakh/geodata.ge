@@ -12,13 +12,17 @@ import type { TopicDatasetBuild } from "./types";
  * page's breakdown they make up when the parent has several (it may span headings: All researchers, under its own,
  * is one occupation of All R&D staff). `proof` is what the build checks, at every place and year
  * where the parent and all its parts are printed:
- * - "sum": the parts add up to the parent, within 0.01% (the rounding of printed parts);
+ * - "sum": the parts add up to the parent, within 0.01% (the rounding of printed parts), less the `subtracted` series
+ *   (imports, which GDP subtracts: GDP = consumption + investment + exports - imports);
  * - "between": the parent, a rate, share or average of the whole, lies between its parts, as an aggregate of them must;
+ * - "within": the parts add up to no more than the parent (within 0.01%): a breakdown that leaves a remainder unstated
+ *   in some years (vocational students by field, where the source's fields fall short of the total in 2020-2022);
  * - "label": the figures cannot be checked (the real growth of Total investment, whose only growth part is Buildings
  *   and equipment), so the same total and parts must be a proven "sum" at another measure of the dataset (their amounts
  *   in GEL), or the build stops.
+ * A `subtracted` series loses its parent (it is no part of the total) and records the total it is subtracted from.
  */
-export type TopicHierarchyLink = { datasetId: string; parentSeriesId: string; seriesIds: readonly string[]; breakdown?: string; proof: "sum" | "between" | "label" };
+export type TopicHierarchyLink = { datasetId: string; parentSeriesId: string; seriesIds: readonly string[]; breakdown?: string; subtracted?: readonly string[]; proof: "sum" | "between" | "within" | "label" };
 
 const ids = (prefix: string, parts: readonly string[], suffix = "") => parts.map((part) => `${prefix}${part}${suffix}`);
 const RUNNING_COSTS = ["compensation", "goods_services", "interest", "subsidies", "grants", "social_benefits", "other"];
@@ -45,6 +49,11 @@ export const TOPIC_HIERARCHY: readonly TopicHierarchyLink[] = [
       { datasetId: "economy-expenditure", parentSeriesId: `gdp_use.imports.${measure}`, seriesIds: ids("gdp_use.", ["imports_goods", "imports_services"], `.${measure}`), proof },
     ];
   }),
+  // GDP by expenditure: GDP is consumption, investment and exports less imports, so imports is no part of it.
+  ...["nominal", "share_of_gdp", "real_growth"].map((measure): TopicHierarchyLink => ({
+    datasetId: "economy-expenditure", parentSeriesId: `economy.gdp_total.${measure}`, seriesIds: ids("gdp_use.", ["consumption", "investment", "exports"], `.${measure}`),
+    subtracted: [`gdp_use.imports.${measure}`], proof: measure === "real_growth" ? "label" : "sum",
+  })),
   { datasetId: "economy-expenditure", parentSeriesId: "gdp_use.consumption.real_growth", seriesIds: ["gdp_use.households_npish.real_growth", "gdp_use.government.real_growth"], proof: "between" },
   { datasetId: "economy-expenditure", parentSeriesId: "gdp_use.investment.real_growth", seriesIds: ["gdp_use.fixed_capital.real_growth"], proof: "label" },
   { datasetId: "money-borrowers", parentSeriesId: "borrowers.households", seriesIds: ["borrowers.people", "borrowers.individual_entrepreneurs"], proof: "sum" },
@@ -76,6 +85,18 @@ export const TOPIC_HIERARCHY: readonly TopicHierarchyLink[] = [
       { datasetId: "education-universities", parentSeriesId, seriesIds: ids(`${prefix}field_`, FIELDS), breakdown: "field", proof: "sum" },
     ];
   }),
+  // Two breakdowns of one total each, printed under one heading.
+  ...(["sex", "sector"] as const).map((breakdown): TopicHierarchyLink => ({
+    datasetId: "wages-overview", parentSeriesId: "average_monthly_nominal_earnings",
+    seriesIds: ids("average_monthly_nominal_earnings.", breakdown === "sex" ? ["women", "men"] : ["public", "non_public"]), breakdown, proof: "between",
+  })),
+  { datasetId: "education-schools", parentSeriesId: "education.teachers.total", seriesIds: ids("education.teachers.", ["public", "private"]), breakdown: "ownership", proof: "sum" },
+  { datasetId: "education-schools", parentSeriesId: "education.teachers.total", seriesIds: ids("education.teachers.", ["women", "men"]), breakdown: "sex", proof: "sum" },
+  ...["vet_admitted", "vet_graduates"].flatMap((group): TopicHierarchyLink[] => [
+    { datasetId: "education-vocational", parentSeriesId: `education.${group}.total`, seriesIds: ids(`education.${group}.`, ["women", "men"]), breakdown: "sex", proof: "sum" },
+    { datasetId: "education-vocational", parentSeriesId: `education.${group}.total`, breakdown: "field", proof: "within",
+      seriesIds: ids(`education.${group}.field_`, ["agriculture_vet", "arts_humanities", "business_law", "education", "engineering", "health_welfare", "ict", "services", "social_journalism"]) },
+  ]),
   { datasetId: "living-standards-poverty", parentSeriesId: "poverty.absolute", seriesIds: ids("poverty.absolute.settlement.", ["urban", "rural"]), breakdown: "settlement", proof: "between" },
   { datasetId: "living-standards-poverty", parentSeriesId: "poverty.absolute", seriesIds: ids("poverty.absolute.age.", ["0_17", "18_64", "65_plus"]), breakdown: "age", proof: "between" },
   { datasetId: "living-standards-poverty", parentSeriesId: "poverty.absolute", seriesIds: ids("poverty.absolute.sex.", ["female", "male"]), breakdown: "sex", proof: "between" },
@@ -106,17 +127,22 @@ export function applyTopicHierarchy(build: TopicDatasetBuild, links: readonly To
     return found;
   };
   const linked = new Map<string, TopicHierarchyLink>();
+  const subtractedFrom = new Map<string, string>();
   for (const link of own) {
     const parent = seriesOf(link.parentSeriesId);
-    for (const seriesId of link.seriesIds) {
+    const subtracted = link.subtracted ?? [];
+    if (subtracted.length && link.proof !== "sum" && link.proof !== "label") throw new Error(`${datasetId}: ${link.parentSeriesId} subtracts series, which only a "sum" proof checks`);
+    for (const seriesId of [...link.seriesIds, ...subtracted]) {
       if (seriesOf(seriesId).unit !== parent.unit) throw new Error(`${datasetId}: ${seriesId} is not in the unit of ${link.parentSeriesId}`);
-      if (linked.has(seriesId)) throw new Error(`${datasetId}: ${seriesId} is linked twice`);
-      linked.set(seriesId, link);
+      if (linked.has(seriesId) || subtractedFrom.has(seriesId)) throw new Error(`${datasetId}: ${seriesId} is linked twice`);
+      if (subtracted.includes(seriesId)) subtractedFrom.set(seriesId, link.parentSeriesId);
+      else linked.set(seriesId, link);
     }
     if (link.proof === "label") {
+      const sameStems = (mine: readonly string[], theirs: readonly string[]) => mine.every((seriesId) => theirs.some((part) => stemOf(part) === stemOf(seriesId)));
       const provenBySum = own.some((other) => other.proof === "sum" && measureOf(other.parentSeriesId) !== measureOf(link.parentSeriesId)
         && stemOf(other.parentSeriesId) === stemOf(link.parentSeriesId)
-        && link.seriesIds.every((seriesId) => other.seriesIds.some((part) => stemOf(part) === stemOf(seriesId))));
+        && sameStems(link.seriesIds, other.seriesIds) && sameStems(subtracted, other.subtracted ?? []));
       if (!provenBySum) throw new Error(`${datasetId}: ${link.parentSeriesId} is linked to ${link.seriesIds.join(", ")} by label only, and no sum link proves the same total and parts at another measure`);
       continue;
     }
@@ -124,13 +150,16 @@ export function applyTopicHierarchy(build: TopicDatasetBuild, links: readonly To
     for (const entity of build.entities) {
       for (const year of new Set(build.facts.map((fact) => fact.year))) {
         const at = (seriesId: string) => values.get(`${entity.entityId}\u0000${seriesId}\u0000${year}`);
-        const total = at(link.parentSeriesId), parts = link.seriesIds.map(at);
-        if (total === undefined || parts.some((part) => part === undefined)) continue;
+        const total = at(link.parentSeriesId), parts = link.seriesIds.map(at), less = subtracted.map(at);
+        if (total === undefined || [...parts, ...less].some((part) => part === undefined)) continue;
         const known = parts as number[];
+        const net = known.reduce((sum, part) => sum + part, 0) - (less as number[]).reduce((sum, part) => sum + part, 0);
         const holds = link.proof === "sum"
-          ? Math.abs(total - known.reduce((sum, part) => sum + part, 0)) <= SUM_TOLERANCE * Math.abs(total)
-          : total >= Math.min(...known) - 1e-9 && total <= Math.max(...known) + 1e-9;
-        if (!holds) throw new Error(`${datasetId}: ${link.parentSeriesId} is not the ${link.proof === "sum" ? "sum" : "aggregate"} of ${link.seriesIds.join(", ")} at ${entity.entityId} ${year}`);
+          ? Math.abs(total - net) <= SUM_TOLERANCE * Math.abs(total)
+          : link.proof === "within"
+            ? known.every((part) => part >= 0) && net <= total * (1 + SUM_TOLERANCE)
+            : total >= Math.min(...known) - 1e-9 && total <= Math.max(...known) + 1e-9;
+        if (!holds) throw new Error(`${datasetId}: ${link.parentSeriesId} is not the ${{ sum: "sum", within: "sum or more", between: "aggregate" }[link.proof]} of ${link.seriesIds.join(", ")}${subtracted.length ? ` less ${subtracted.join(", ")}` : ""} at ${entity.entityId} ${year}`);
         checked += 1;
       }
     }
@@ -139,7 +168,8 @@ export function applyTopicHierarchy(build: TopicDatasetBuild, links: readonly To
   return {
     ...build,
     series: build.series.map((series) => {
-      const link = linked.get(series.seriesId);
+      const link = linked.get(series.seriesId), total = subtractedFrom.get(series.seriesId);
+      if (total !== undefined) return { ...series, parentSeriesId: null, subtractedFrom: total };
       return link ? { ...series, parentSeriesId: link.parentSeriesId, ...(link.breakdown === undefined ? {} : { breakdown: link.breakdown }) } : series;
     }),
   };

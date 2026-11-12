@@ -22,9 +22,10 @@ export type TopicSeriesNote = { key: ServiceMessageKey; values: Record<string, s
 /**
  * `breakdown`: an internal key for the page's breakdown a series belongs to, where one parent's parts (or one heading's
  * series) make up several (students by level and by sex; the unemployment rate and the labour force by age): `rank`
- * ranks one breakdown at a time. Not served.
+ * ranks one breakdown at a time. `subtractedFrom`: the total this series enters with a minus sign (imports, of GDP): it is
+ * not ranked among that total's parts, and a ranking of them says so. Neither is served.
  */
-export type TopicSeries = { seriesId: string; labelKa: string; labelEn: string; headingKa: string | null; headingEn: string | null; parentSeriesId: string | null; isTotal: boolean; unit: string; note?: TopicSeriesNote; breakdown?: string };
+export type TopicSeries = { seriesId: string; labelKa: string; labelEn: string; headingKa: string | null; headingEn: string | null; parentSeriesId: string | null; isTotal: boolean; unit: string; note?: TopicSeriesNote; breakdown?: string; subtractedFrom?: string };
 
 export type TopicEntity = { entityId: string; entityType: "country" | "region" | "municipality" | "city"; labelKa: string; labelEn: string; parentEntityId: string | null };
 

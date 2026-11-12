@@ -128,7 +128,8 @@ describe("the snapshot's topics section", () => {
 });
 
 describe("buildTopicsSnapshot", () => {
-  const page = TOPIC_PAGES.find((entry) => entry.datasetId === "education-schools")!;
+  // A page with no reviewed hierarchy links (topics/hierarchy.ts), which would name series this one-series build lacks.
+  const page = TOPIC_PAGES.find((entry) => entry.datasetId === "education-kindergartens")!;
   const base = (): TopicDatasetBuild => ({
     page, titleKa: "სკოლები", titleEn: "Schools",
     series: [{ seriesId: "education.schools.total", labelKa: "სკოლები", labelEn: "Schools", headingKa: null, headingEn: null, parentSeriesId: null, isTotal: true, unit: "institutions" }],
@@ -142,7 +143,7 @@ describe("buildTopicsSnapshot", () => {
 
   it("packs a valid dataset and resolves its archive source", async () => {
     const { topics, sources } = await buildTopicsSnapshot([adapter(() => {})]);
-    expect(topics.datasets.map((dataset) => dataset.page.datasetId)).toEqual(["education-schools"]);
+    expect(topics.datasets.map((dataset) => dataset.page.datasetId)).toEqual(["education-kindergartens"]);
     expect(topics.sourceIds).toEqual(["source.geostat_education_schools_national"]);
     expect(topics.units).toEqual({ institutions: { labelKa: "დაწესებულება", labelEn: "institutions" } });
     expect(sources.map((source) => source.sourceId)).toEqual(["source.geostat_education_schools_national"]);
@@ -170,6 +171,6 @@ describe("buildTopicsSnapshot", () => {
   });
 
   it("fails on a page two adapters build", async () => {
-    await expect(buildTopicsSnapshot([adapter(() => {}), adapter(() => {})])).rejects.toThrow(/education-schools/);
+    await expect(buildTopicsSnapshot([adapter(() => {}), adapter(() => {})])).rejects.toThrow(/education-kindergartens/);
   });
 });

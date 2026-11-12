@@ -121,6 +121,14 @@ describe("rank topic datasets", () => {
       expect(response.error.messageEn).toContain('dimension "entities" and one of these datasetIds: unemployment-regions.');
       expect(response.error.messageKa).toContain("unemployment-regions");
     }
+    // Re-review 2, R2-3: its groups in the same dataset are named too, one per breakdown, and each ranks.
+    const overview = rank(snapshot, { datasetId: "unemployment-overview", dimension: "series", seriesId: "unemployment_rate", measure: "value", metric: "value", year: 2025 });
+    if (overview.kind !== "error") throw new Error("expected an error");
+    expect(overview.error.messageEn).toContain("Its groups in unemployment-overview rank among themselves when one of them is named as seriesId, one series per breakdown: unemployment_rate.urban, ");
+    expect(overview.error.messageEn).toContain("unemployment_rate.women");
+    expect(overview.error.messageKa).toContain("unemployment_rate.women");
+    expect(ranking(rank(snapshot, { datasetId: "unemployment-overview", dimension: "series", seriesId: "unemployment_rate.women", measure: "value", metric: "value", year: 2025 })).entries.map((entry) => entry.seriesId).sort()).toEqual(["unemployment_rate.men", "unemployment_rate.women"]);
+    expect(ranking(rank(snapshot, { datasetId: "unemployment-overview", dimension: "series", seriesId: "unemployment_rate.urban", measure: "value", metric: "value", year: 2025 })).entries.map((entry) => entry.seriesId).sort()).toEqual(["unemployment_rate.rural", "unemployment_rate.urban"]);
     const regions = ranking(rank(snapshot, { datasetId: "unemployment-regions", dimension: "entities", entityType: "region", seriesId: "unemployment_rate", measure: "value", metric: "value", year: 2025 }));
     expect(regions.entries.length).toBeGreaterThan(1);
     const alone = rank(snapshot, { datasetId: "tax-breaks-refunds", dimension: "series", seriesId: "tax_refunds.total", measure: "value", metric: "value", year: 2024 });
@@ -377,6 +385,37 @@ describe("rank topic series peers", () => {
     expect(named.length).toBeGreaterThan(1);
     expect(named).not.toContain(seriesId);
     expect(named.sort()).toEqual(idsOf(seriesRanking(datasetId, { parentSeriesId: seriesId }, year)).sort());
+  });
+
+  // Re-review 2, R2-1: one breakdown of a total at a time, and the answer says which and how to rank another.
+  it.each([
+    ["wages-overview", "average_monthly_nominal_earnings", "average_monthly_nominal_earnings.women", ["average_monthly_nominal_earnings.men", "average_monthly_nominal_earnings.women"], "average_monthly_nominal_earnings.public", 2024],
+    ["wages-overview", "average_monthly_nominal_earnings", "average_monthly_nominal_earnings.public", ["average_monthly_nominal_earnings.non_public", "average_monthly_nominal_earnings.public"], "average_monthly_nominal_earnings.women", 2024],
+    ["education-schools", "education.teachers.total", "education.teachers.women", ["education.teachers.men", "education.teachers.women"], "education.teachers.public", 2025],
+    ["education-vocational", "education.vet_admitted.total", "education.vet_admitted.men", ["education.vet_admitted.men", "education.vet_admitted.women"], "education.vet_admitted.field_", 2024],
+    ["education-vocational", "education.vet_graduates.total", "education.vet_graduates.women", ["education.vet_graduates.men", "education.vet_graduates.women"], "education.vet_graduates.field_", 2024],
+  ])("ranks %s's %s one breakdown at a time (%s)", (datasetId, total, seriesId, expected, other, year) => {
+    const named = seriesRanking(datasetId, { seriesId }, year);
+    expect(idsOf(named).sort()).toEqual(expected);
+    expect(named.universe.descriptionEn).toContain("make up 2 breakdowns, ranked one at a time: this ranking is the one");
+    expect(named.universe.descriptionEn).toContain(`name one of its series as seriesId: ${other}`);
+    expect(named.universe.description).toContain("ჭრილს ქმნის");
+    // The total named, or its parts by parentSeriesId, rank its first breakdown, never two in one list.
+    const byTotal = idsOf(seriesRanking(datasetId, { seriesId: total }, year));
+    expect(byTotal.sort()).toEqual(idsOf(seriesRanking(datasetId, { parentSeriesId: total }, year)).sort());
+    expect(new Set(byTotal.map((id) => /\.(women|men)$/.test(id))).size).toBe(1);
+  });
+
+  // Re-review 2, R2-2: GDP is consumption, investment and exports less imports; imports is no part of it.
+  it("ranks GDP's parts without the imports it subtracts, and says so", () => {
+    for (const measure of ["nominal", "share_of_gdp", "real_growth"]) {
+      const gdp = seriesRanking("economy-expenditure", { seriesId: `economy.gdp_total.${measure}` }, 2025);
+      expect(idsOf(gdp).sort()).toEqual([`gdp_use.consumption.${measure}`, `gdp_use.exports.${measure}`, `gdp_use.investment.${measure}`]);
+      expect(gdp.universe.descriptionEn).toContain(`Total GDP is its parts less Total imports (gdp_use.imports.${measure}), which it subtracts`);
+      expect(idsOf(seriesRanking("economy-expenditure", { seriesId: `gdp_use.imports.${measure}` }, 2025)).sort()).toEqual([`gdp_use.imports_goods.${measure}`, `gdp_use.imports_services.${measure}`]);
+    }
+    const exports = seriesRanking("economy-expenditure", { seriesId: "gdp_use.exports.nominal" }, 2025);
+    expect(idsOf(exports)).not.toContain("gdp_use.imports.nominal");
   });
 
   it("ranks a part-holding series with heading peers among them", () => {

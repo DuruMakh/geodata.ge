@@ -335,6 +335,9 @@ export function rank(snapshot: FactQuerySnapshot, rawInput: unknown): FactQueryR
   let universeKey: ServiceMessageKey;
   // The universe sentence names its region or parent in words, so the label is resolved per language.
   let universeValues: (locale: "ka" | "en") => Record<string, string> = () => ({});
+  // Sentences a topic series ranking adds after the universe: which of a total's breakdowns it ranks, and a series the
+  // total subtracts (imports, of GDP).
+  let universeNotes: (locale: "ka" | "en") => string[] = () => [];
 
   if (isMunicipal) {
     if (input.seriesId === undefined || input.entityType === undefined) {
@@ -424,13 +427,14 @@ export function rank(snapshot: FactQuerySnapshot, rawInput: unknown): FactQueryR
       // and real growth, the 60% and 40% poverty lines). A parentless series with parts that has no parentless peer of
       // its unit under its heading, or that is under no heading, is a total too (Museums, All staff, the social package's
       // All recipients, linked in topics/hierarchy.ts; Total reserves) and ranks its parts; one with such peers
-      // (Households, beside Businesses) ranks among them.
+      // (Households, beside Businesses) ranks among them. A series a total subtracts (imports, of GDP) ranks its own parts.
       type Peer = (typeof topicDataset.series)[number];
       const hasParts = (entry: Peer) => topicDataset.series.some((other) => other.parentSeriesId === entry.seriesId);
       const headingPeerOf = (entry: Peer) => (other: Peer) => other !== entry && !other.isTotal && other.parentSeriesId === null
         && other.headingKa === entry.headingKa && other.breakdown === entry.breakdown && other.unit === entry.unit;
       const ranksOwnParts = (entry: Peer) => hasParts(entry)
-        && (entry.isTotal || (entry.parentSeriesId === null && (entry.headingKa === null || !topicDataset.series.some(headingPeerOf(entry)))));
+        && (entry.isTotal || entry.subtractedFrom !== undefined
+          || (entry.parentSeriesId === null && (entry.headingKa === null || !topicDataset.series.some(headingPeerOf(entry)))));
       const parentId = input.parentSeriesId ?? (ranksOwnParts(anchor!) ? anchor!.seriesId : anchor!.parentSeriesId);
       // A heading's total that is itself a part (All researchers, of All R&D staff) ranks among its parent's parts.
       let peers = topicDataset.series.filter((entry) => (parentId !== null
@@ -440,11 +444,16 @@ export function rank(snapshot: FactQuerySnapshot, rawInput: unknown): FactQueryR
       // spans headings (trade partners by country and by country group; students by level, ownership, sex and field),
       // ranks one: that of the named series, else the first. Parts that each stand alone (the VAT and income-tax totals)
       // rank together.
+      let split: { chosen: Peer; count: number; others: string[] } | undefined;
       if (parentId !== null) {
         const breakdownOf = (entry: Peer) => (entry.breakdown === undefined ? `heading:${entry.headingKa ?? ""}` : `breakdown:${entry.breakdown}`);
         const perBreakdown = peers.reduce((counts, entry) => counts.set(breakdownOf(entry), (counts.get(breakdownOf(entry)) ?? 0) + 1), new Map<string, number>());
         if (perBreakdown.size > 1 && [...perBreakdown.values()].some((count) => count > 1)) {
-          const breakdown = breakdownOf((peers.find((entry) => entry.seriesId === input.seriesId) ?? peers[0])!);
+          const chosen = (peers.find((entry) => entry.seriesId === input.seriesId) ?? peers[0])!;
+          const breakdown = breakdownOf(chosen);
+          // One series of each other breakdown, for the answer to say how to rank it.
+          const others = peers.reduce((first, entry) => (breakdownOf(entry) === breakdown || first.has(breakdownOf(entry)) ? first : first.set(breakdownOf(entry), entry.seriesId)), new Map<string, string>());
+          split = { chosen, count: perBreakdown.size, others: [...others.values()] };
           peers = peers.filter((entry) => breakdownOf(entry) === breakdown);
         }
       }
@@ -466,11 +475,34 @@ export function rank(snapshot: FactQuerySnapshot, rawInput: unknown): FactQueryR
           dataset.columns.series.forEach((value, row) => { if (value === index && dataset.columns.value[row] !== null) places.add(dataset.columns.entity[row]!); });
           return places.size > 1;
         }).map((dataset) => dataset.page.datasetId);
+        // Its groups in this dataset (the unemployment rate by sex, by settlement, by education), one per heading.
+        const groups = topicDataset.series
+          .filter((entry) => entry !== anchor && entry.unit === anchor.unit
+            && ((anchor.breakdown !== undefined && entry.breakdown === anchor.breakdown) || entry.seriesId.startsWith(`${anchor.seriesId}.`)))
+          .reduce((first, entry) => (first.has(entry.headingKa ?? "") ? first : first.set(entry.headingKa ?? "", entry.seriesId)), new Map<string, string>());
         const key = placed.length > 0 ? "errors.rankTopicSeriesAlone" : "errors.rankTopicSeriesAloneNoPlaces";
-        const values = { seriesId: anchor.seriesId, datasetId: topicDataset.page.datasetId, datasetIds: placed.join(", ") };
-        return errorResponse(snapshot, { code: "invalid_parameters", messageKa: serviceMessage(snapshot, "ka", key, values), messageEn: serviceMessage(snapshot, "en", key, values), retryable: false });
+        const values = { seriesId: anchor.seriesId, datasetId: topicDataset.page.datasetId, datasetIds: placed.join(", "), groupSeriesIds: [...groups.values()].join(", ") };
+        const message = (locale: "ka" | "en") => serviceMessage(snapshot, locale, key, values)
+          + (groups.size > 0 ? ` ${serviceMessage(snapshot, locale, "errors.rankTopicSeriesGroups", values)}` : "");
+        return errorResponse(snapshot, { code: "invalid_parameters", messageKa: message("ka"), messageEn: message("en"), retryable: false });
       }
       universeKey = "ranking.topicSeries";
+      const parentEntry = parentId === null ? undefined : topicDataset.series.find((entry) => entry.seriesId === parentId);
+      const less = parentId === null ? [] : topicDataset.series.filter((entry) => entry.subtractedFrom === parentId);
+      const labelOf = (entry: Peer, locale: "ka" | "en") => (locale === "ka" ? entry.labelKa : entry.labelEn);
+      // A total's own label can be bare ("All", under Graduates): its heading then names it.
+      const totalLabel = (entry: Peer, locale: "ka" | "en") => {
+        const heading = locale === "ka" ? entry.headingKa : entry.headingEn;
+        return heading === null || labelOf(entry, locale).includes(heading) ? labelOf(entry, locale) : `${heading}: ${labelOf(entry, locale)}`;
+      };
+      universeNotes = (locale) => [
+        ...(split && parentEntry ? [serviceMessage(snapshot, locale, "ranking.topicBreakdowns", {
+          parentLabel: totalLabel(parentEntry, locale), count: split.count, seriesLabel: labelOf(split.chosen, locale), otherSeriesIds: split.others.join(", "),
+        })] : []),
+        ...(less.length > 0 && parentEntry ? [serviceMessage(snapshot, locale, "ranking.topicSubtracted", {
+          parentLabel: totalLabel(parentEntry, locale), subtractedLabels: less.map((entry) => labelOf(entry, locale)).join(", "), subtractedIds: less.map((entry) => entry.seriesId).join(", "),
+        })] : []),
+      ];
     }
     // A percent series (its unit says so) changes in percentage points only, as a core rate does.
     const units = topicDataset.series.filter((entry) => seriesIds.includes(entry.seriesId)).map((entry) => entry.unit);
@@ -810,8 +842,8 @@ export function rank(snapshot: FactQuerySnapshot, rawInput: unknown): FactQueryR
     entries,
     universe: {
       dimension: input.dimension,
-      description: serviceMessage(snapshot, "ka", universeKey, universeValues("ka")),
-      descriptionEn: serviceMessage(snapshot, "en", universeKey, universeValues("en")),
+      description: [serviceMessage(snapshot, "ka", universeKey, universeValues("ka")), ...universeNotes("ka")].join(" "),
+      descriptionEn: [serviceMessage(snapshot, "en", universeKey, universeValues("en")), ...universeNotes("en")].join(" "),
       candidateCount,
       eligibleCount: candidates.length,
       returnedCount: entries.length,
