@@ -378,7 +378,9 @@ export function compare(snapshot: FactQuerySnapshot, rawInput: unknown): FactQue
     // into a 64-row league table) and it VARIES when a ministries program is
     // merely renamed (so 48 of 48 programs were excluded and rankings came back
     // empty). It is wrong in both directions and must not decide this.
-    if (definitionChangeBreaks(from.valueDefinitionId, to.valueDefinitionId)) reasons.push(REASON_DEFINITION_CHANGED);
+    // A topic series keeps one definition over its years: its ids differ only by a partial year's months or a dated
+    // point's date, which topic_partial_period and topic_dated_period limit.
+    if (topicDataset === undefined && definitionChangeBreaks(from.valueDefinitionId, to.valueDefinitionId)) reasons.push(REASON_DEFINITION_CHANGED);
     // A reviewed series break between the two years: the series is not the same quantity across it.
     const seriesBreak = topicDataset && breakBetween(topicDataset.breaks, from.seriesId, fromYear, toYear, topicDataset.page.periodKind);
     if (seriesBreak) reasons.push(REASON_SERIES_BREAK);

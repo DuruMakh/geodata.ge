@@ -134,7 +134,8 @@ export function queryIndicators(snapshot: FactQuerySnapshot, rawInput: unknown):
       basis: fact ? fact.basis : null,
       valueDefinition: definition("ka"),
       valueDefinitionEn: definition("en"),
-      valueDefinitionId: `${dataset.page.datasetId}:${seriesId}:${series.unit}`,
+      // A partial year's or a dated point's definition names its months or its date, so its id does too: one id, one text.
+      valueDefinitionId: `${dataset.page.datasetId}:${seriesId}:${series.unit}${months !== undefined ? `:months=${months}` : date !== undefined ? `:date=${date}` : ""}`,
       sourceIds: fact ? fact.sourceIds : [],
       documentIds: fact ? resolveDocumentIds(sources, fact.sourceIds) : [],
       caveatIds: [],

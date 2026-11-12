@@ -168,6 +168,11 @@ describe("the dated point, the partial year and the sources over the tools", () 
     // Ruling R30: a year-end to mid-year change is not an annual change; year end to year end stays comparable.
     expect(latest).toMatchObject({ caveatIds: ["topic_dated_period"], valueDefinitionEn: expect.stringContaining("it is the position on 2026-06-30, not at year end"), valueDefinition: expect.stringContaining("2026-06-30") });
     expect(december).toMatchObject({ caveatIds: [] });
+    // Full review ai-client M1: the dated point's definition names its date, so its id does: one id, one text.
+    expect(latest!.valueDefinitionId).toBe("external-foreign-debt:ext_debt.total:usd_million:date=2026-06-30");
+    expect(december!.valueDefinitionId).toBe("external-foreign-debt:ext_debt.total:usd_million");
+    const legend = text.split("\n").filter((line) => line.startsWith("external-reserves:reserves.total:usd_million"));
+    expect(legend.map((line) => line.split("\t")[0])).toEqual(["external-reserves:reserves.total:usd_million", "external-reserves:reserves.total:usd_million:date=2026-09-30"]);
     expect(change).toMatchObject({ comparability: "limited", caveatIds: ["topic_dated_period"] });
     expect(comparison("external-reserves", "reserves.total", 2025, 2026)).toMatchObject({ comparability: "limited", caveatIds: ["topic_dated_period"] });
     expect(comparison("external-foreign-debt", "ext_debt.total", 2024, 2025)).toMatchObject({ comparability: "comparable", caveatIds: [] });
