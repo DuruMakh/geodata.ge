@@ -37,8 +37,10 @@ const rowKey = (seriesId: string, geographyId: string, year: number, { sex = "",
 function rowIndex(served: readonly ServedDemographyObservation[]) {
   const rows = new Map(served.map((fact) => [rowKey(fact.seriesId, fact.geographyId, fact.year, fact), fact]));
   const row = (seriesId: string, geographyId: string, year: number, dimensions: Dimensions = {}) => rows.get(rowKey(seriesId, geographyId, year, dimensions));
+  // A reviewed row whose locator adds cells ("1!W39+W35": a city's own row added to its municipality, 2014-2017; the
+  // migration group "Other countries") is a sum Fiscal.ge made from published cells, served as a derivation (spec 5.2).
   const published = (fact: ServedDemographyObservation | undefined): Cell | undefined =>
-    fact && { value: fact.value, unit: fact.unit, sourceIds: [fact.sourceId], status: "official" };
+    fact && { value: fact.value, unit: fact.unit, sourceIds: [fact.sourceId], status: isSummedLocator(fact.sourceLocator) ? "derived" : "official" };
   /** A row the page adds up from published rows: missing when any of them is. */
   const summed = (parts: readonly (ServedDemographyObservation | undefined)[], sign: readonly number[] = parts.map(() => 1)): Cell | undefined => {
     if (parts.some((part) => part === undefined)) return undefined;
@@ -48,6 +50,9 @@ function rowIndex(served: readonly ServedDemographyObservation[]) {
   };
   return { row, published, summed };
 }
+
+/** Whether a reviewed row's source locator adds several cells: its cells, before the bracketed date, hold a "+". */
+export const isSummedLocator = (locator: string) => locator.split(" [")[0]!.includes("+");
 
 const yearsOf = (facts: readonly { year: number }[]) => [...new Set(facts.map((fact) => fact.year))].sort((a, b) => a - b);
 

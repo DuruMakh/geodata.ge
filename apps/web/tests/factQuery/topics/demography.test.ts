@@ -121,8 +121,24 @@ describe("demography topic adapter", () => {
     expect(net).toMatchObject({ value: total("demography.immigrants") - total("demography.emigrants"), status: "derived", sourceIds: ["source.geostat_demography_migration_citizenship"] });
     // Geostat publishes the net of both sexes together, and that is served as published.
     expect(factOf("demography-migration", GEORGIA_PLACE_ID, "demography.net_migration.total", 2020)).toMatchObject({ status: "official", sourceIds: ["source.geostat_demography_net_migration"] });
-    const derived = builds.flatMap((build) => build.facts.filter((fact) => fact.status === "derived").map((fact) => fact.seriesId));
+    const derived = builds.flatMap((build) => build.facts.filter((fact) => fact.status === "derived" && fact.entityId === GEORGIA_PLACE_ID && !fact.seriesId.endsWith(".all_other_computed")).map((fact) => fact.seriesId));
     expect(new Set(derived.map((id) => id.replace(/\.(male|female|total)/, "")))).toEqual(new Set(["demography.population_by_age_sex.age_0_4", "demography.net_migration"]));
+  });
+
+  // Full review I2 (spec 5.2): a reviewed row whose locator adds published cells is Fiscal.ge's sum, not Geostat's figure.
+  it("serves the reviewed rows Fiscal.ge added up (Other countries, a city merged into its municipality) as derivations", () => {
+    const summed = served.filter((fact) => fact.sourceLocator.split(" [")[0]!.includes("+"));
+    const servedSummed = builds.flatMap((build) => build.facts.filter((fact) => fact.status === "derived" && (fact.seriesId.endsWith(".all_other_computed") || fact.entityId !== GEORGIA_PLACE_ID)));
+    expect(servedSummed).toHaveLength(188);
+    // Migration's "Other countries": 14 years, 3 sexes, 2 directions.
+    expect(servedSummed.filter((fact) => fact.seriesId.endsWith(".all_other_computed"))).toHaveLength(84);
+    const otherCountries = factOf("demography-migration", GEORGIA_PLACE_ID, "demography.immigrants_by_citizenship_group.total.all_other_computed", 2012)!;
+    expect(otherCountries).toMatchObject({ value: 21720, status: "derived" });
+    // Municipality 15 in 2015 adds its city's own row (1!W39+W35).
+    expect(factOf("demography-population", "15", "demography.population_total", 2015)).toMatchObject({ value: 58146, status: "derived" });
+    expect(factOf("demography-population", "15", "demography.population_total", 2018)).toMatchObject({ status: "official" });
+    // Every summed reviewed row a page serves is derived, and only those beside the page's own sums.
+    expect(summed.filter((fact) => fact.seriesId !== "demography.mid_year_population")).toHaveLength(188);
   });
 
   it("puts age and sex groups under the page's headings, each group under its heading's total", async () => {
