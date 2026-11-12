@@ -40,7 +40,7 @@ and in the published `inflation-products.json` and `catalogue.json`. Schema 1.6.
 caching output enums must refresh discovery; clients requiring schema 1.6.0 must
 update their validation. Request shapes stay unchanged. The one non-additive change is that
 when the per-measure maps are absent, readers fall back to the series' `years` and `periods`.
-Clients must accept additive fields and data schema 1.7.0; byte-identical response
+Clients must accept additive fields and data schema 1.8.0; byte-identical response
 compatibility is not promised. Transport revisions are a separate contract:
 modern `2026-07-28` and preserved legacy `2025-11-25` share the endpoint.
 Translation changes alter `dataVersion`, and so do the website page names and search words
@@ -486,7 +486,7 @@ and publications remain static. The endpoint exposes the read-only tools listed
 by `tools/list` through pinned server SDK 2.2.0. Stateless Streamable HTTP supports
 modern `2026-07-28` discovery and per-request metadata, and preserved legacy
 `2025-11-25` initialization. Both return finite JSON responses; neither creates
-sessions or subscriptions. GET and DELETE remain 405. The data schema is 1.7.0,
+sessions or subscriptions. GET and DELETE remain 405. The data schema is 1.8.0,
 independent of either protocol revision.
 The legacy adapter also retains `2025-06-18`, `2025-03-26`, `2024-11-05` and
 `2024-10-07`; the modern era is never proposed during legacy initialization.
@@ -842,7 +842,7 @@ actual alert/recovery delivery must be demonstrated before operations is verifie
 From `apps/web`, use an explicit target and independently reviewed release identity:
 
 ```text
-npx tsx scripts/smoke-mcp.ts --url <target-mcp-url> --expected-schema 1.7.0 --expected-data-version <reviewed-sha256> --output <existing-output-directory/report.json>
+npx tsx scripts/smoke-mcp.ts --url <target-mcp-url> --expected-schema 1.8.0 --expected-data-version <reviewed-sha256> --output <existing-output-directory/report.json>
 ```
 
 The operator command has no production default, authentication input, new secret
