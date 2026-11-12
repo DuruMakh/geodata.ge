@@ -56,7 +56,10 @@ search covers, halved when the search meets no label's last word (a closing `tot
 `გადასახადები თბილისში`). A `some_words` answer also carries `searchMatchNoteKa` and
 `searchMatchNoteEn`: only some words matched, so the entries may be about something
 else; before saying the data is not served, retry the missing part with another word or
-browse the dataset. A search without `datasetId` also returns the optional
+browse the dataset. A search reads a repeated word once and at most its first 16
+different words; when it leaves words out, `searchMatchNoteKa` and `searchMatchNoteEn`
+say how many (after the some-words note, when there is one), so the client can search
+with fewer words. This bounds the cost of one search. A search without `datasetId` also returns the optional
 `websitePages` (at most five, with `websitePagesNoteKa` and `websitePagesNoteEn`) for
 Fiscal.ge navigation pages without a served dataset (today, Analysis): names and
 links in both languages, never a value. The note tells the assistant that the page's HTML

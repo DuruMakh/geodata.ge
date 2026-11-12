@@ -33,6 +33,7 @@
   "ranking.valueDefinitionPeriod": "Ranked by {measure} for {period}, {order}.",
   "catalogue.websitePages": "These Fiscal.ge pages show this topic; this connection does not serve their figures. Each page's HTML carries its year-by-year table: if you can open it, quote from it with the link in the user's language; never quote a figure from memory.",
   "catalogue.someWords": "Only some words of this search matched, so these entries may be about something else. If none fits, retry with another word for the missing part or browse the dataset before saying it is not served; websitePages, when given, show the topic on Fiscal.ge.",
+  "catalogue.searchWordsLeftOut": "Only the first {limit} different words of this search were read; {omitted} more were left out. Search with fewer words.",
   "catalogue.searchSeriesOmitted": "This search matched {total} series; {omitted} are left out, because a search across all datasets lists at most {limit} series of one topic dataset. A dataset entry with seriesOmitted says how many of its series were left out: call describe_coverage again with that datasetId and the same or a narrower search to list them.",
   "catalogue.seriesOmitted": "This dataset lists {total} series, too many for one answer. Only the totals and the headings are shown; {omitted} series are left out. Call describe_coverage again with this datasetId and a `search` word (a series name, a heading or a place) to list the series you need, or download the whole dataset from bulkUrl.",
   "measures.amount_gel": "amount in GEL",

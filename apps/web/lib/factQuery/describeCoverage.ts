@@ -958,8 +958,11 @@ function singular(word: string): string {
  * word: საგარეო (foreign) is not საგარეჯო (Sagarejo), ფარში is not ფარდა.
  */
 function sharesStem(queryWord: string, fieldWord: string): boolean {
-  const queryStem = stem(queryWord);
-  const fieldStem = stem(fieldWord);
+  return stemsShared(queryWord, stem(queryWord), fieldWord, stem(fieldWord));
+}
+
+/** `sharesStem` on stems already read. */
+function stemsShared(queryWord: string, queryStem: string, fieldWord: string, fieldStem: string): boolean {
   const [shorter, longer, longerWord] = queryStem.length <= fieldStem.length ? [queryStem, fieldStem, fieldWord] : [fieldStem, queryStem, queryWord];
   if (shorter.length < 3 || !longer.startsWith(shorter)) return false;
   const rest = longer.slice(shorter.length);
@@ -981,14 +984,61 @@ function wordMatches(queryWord: string, fieldWord: string): boolean {
 }
 
 /**
+ * What a search reads once per snapshot (RS-1 of the full review): the words of a catalogue text and the stem and
+ * singular of a catalogue word, kept as searches meet them. Only the snapshot's own texts go in, never a query, so
+ * the memo is bounded by the catalogue.
+ */
+type WordMemo = { words: Map<string, string[]>; folded: Map<string, string>; stems: Map<string, string>; singulars: Map<string, string> };
+const wordMemos = new WeakMap<FactQuerySnapshot, WordMemo>();
+
+function wordMemoOf(snapshot: FactQuerySnapshot): WordMemo {
+  let memo = wordMemos.get(snapshot);
+  if (memo === undefined) {
+    memo = { words: new Map(), folded: new Map(), stems: new Map(), singulars: new Map() };
+    wordMemos.set(snapshot, memo);
+  }
+  return memo;
+}
+
+const remembered = <V>(cache: Map<string, V> | undefined, key: string, make: (key: string) => V): V => {
+  if (cache === undefined) return make(key);
+  let value = cache.get(key);
+  if (value === undefined) {
+    value = make(key);
+    cache.set(key, value);
+  }
+  return value;
+};
+
+/** `wordMatches(queryWord, …)` for one query word against many catalogue words: the query word is read once. */
+function wordMatcher(queryWord: string, memo: WordMemo | undefined): (fieldWord: string) => boolean {
+  const georgian = /\p{Script=Georgian}/u.test(queryWord);
+  const queryStem = georgian ? stem(queryWord) : "";
+  const querySingular = georgian ? "" : singular(queryWord);
+  return (fieldWord) => queryWord === fieldWord || (queryWord.length >= 4 && fieldWord.startsWith(queryWord))
+    || (georgian
+      ? stemsShared(queryWord, queryStem, fieldWord, remembered(memo?.stems, fieldWord, stem))
+      : querySingular === remembered(memo?.singulars, fieldWord, singular));
+}
+
+/**
+ * The most different words a search reads, in the order typed. A schema-valid search of 120 characters can hold 60
+ * one-letter words, and each word is matched against every catalogue word; the longest real questions run to 16.
+ */
+const SEARCH_WORD_LIMIT = 16;
+
+/** A search's words without repeats, at most `SEARCH_WORD_LIMIT` of them. */
+const distinctWords = (words: string[]) => [...new Set(words)].slice(0, SEARCH_WORD_LIMIT);
+
+/**
  * A folded query looks like an id when it is words joined by "." or "_" and nothing else ("revenue.vat", "57_11"):
  * "wages." and "U.S. dollar" are words with punctuation.
  */
 const looksLikeId = (folded: string) => /^[\p{L}\p{N}]+(?:[._][\p{L}\p{N}]+)+$/u.test(folded);
 
 /** A query that looks like an id ("revenue.vat", "57_11") also names it: the whole id, its beginning, or a segment after a ".". */
-function idMatches(query: string, field: string): boolean {
-  const id = fold(field);
+function idMatches(query: string, field: string, memo?: WordMemo): boolean {
+  const id = remembered(memo?.folded, field, fold);
   return id === query || id.startsWith(query) || id.includes(`.${query}`);
 }
 
@@ -1030,7 +1080,7 @@ export function searchCatalogue<T>(
   query: string,
   entries: T[],
   fields: (entry: T) => (string | null)[],
-  { aliases = true, places, firm, ahead, joins, prefer, total }: {
+  { aliases = true, places, firm, ahead, joins, prefer, total, memo }: {
     aliases?: boolean;
     places?: (entry: T) => string[] | undefined;
     firm?: (entry: T) => (string | null)[];
@@ -1038,23 +1088,39 @@ export function searchCatalogue<T>(
     joins?: (entry: T) => boolean;
     prefer?: (entry: T) => number;
     total?: (entry: T) => boolean;
+    /** The snapshot's `wordMemoOf`, when `fields` give its own texts. */
+    memo?: WordMemo;
   } = {},
-): { matches: T[]; searchMatch: "all_words" | "some_words"; words: string[]; wordMatches: T[][]; placeWords: boolean[] } {
+): { matches: T[]; searchMatch: "all_words" | "some_words"; words: string[]; wordMatches: T[][]; placeWords: boolean[]; wordsLeftOut: number } {
   const folded = fold(query.trim());
   const needle = aliases && Object.hasOwn(SEARCH_ALIASES, folded) ? SEARCH_ALIASES[folded]! : folded;
   const allWords = searchWords(needle);
-  const queryWords = allWords.some((word) => !JOINING_WORDS.has(word)) ? allWords.filter((word) => !JOINING_WORDS.has(word)) : allWords;
+  const contentWords = allWords.some((word) => !JOINING_WORDS.has(word)) ? allWords.filter((word) => !JOINING_WORDS.has(word)) : allWords;
+  // A repeated word is one word; past `SEARCH_WORD_LIMIT` different words the rest are left out, and the answer says so.
+  const queryWords = distinctWords(contentWords);
+  const wordsLeftOut = new Set(contentWords).size - queryWords.length;
   const idQuery = looksLikeId(needle);
-  const meetsWord = (words: string[]) => queryWords.map((queryWord) => words.some((word) => wordMatches(queryWord, word)));
+  const fieldWordsOf = (text: string) => remembered(memo?.words, text, searchWords);
+  // Which query words each catalogue word meets, read once per word in this search.
+  const matchers = queryWords.map((queryWord) => wordMatcher(queryWord, memo));
+  const metByWord = new Map<string, boolean[]>();
+  const metBy = (word: string) => remembered(metByWord, word, () => matchers.map((matches) => matches(word)));
+  const meetsWord = (words: string[]) => {
+    const met = queryWords.map(() => false);
+    for (const word of words) metBy(word).forEach((meets, index) => {
+      if (meets) met[index] = true;
+    });
+    return met;
+  };
 
   const rows = entries.map((entry) => {
     const present = fields(entry).filter((field): field is string => field !== null);
-    const fieldWords = present.map(searchWords);
+    const fieldWords = present.map(fieldWordsOf);
     return {
       entry,
       fieldWords,
       meets: meetsWord(fieldWords.flat()),
-      isId: idQuery && present.some((field) => idMatches(needle, field)),
+      isId: idQuery && present.some((field) => idMatches(needle, field, memo)),
     };
   });
   type Row = (typeof rows)[number];
@@ -1062,8 +1128,8 @@ export function searchCatalogue<T>(
   const counts = byWord.map((found) => found.length);
   // The words that name a place the catalogue holds ("Tbilisi", "შიდა ქართლის") are where, not what: they count for
   // the place itself, not for a series whose label holds the name, and are never the commonest word.
-  const placeWords = places === undefined ? queryWords.map(() => false) : placeWordsIn(queryWords, entries.flatMap((entry) => places(entry) ?? []));
-  const answer = (matches: T[], searchMatch: "all_words" | "some_words") => ({ matches, searchMatch, words: queryWords, wordMatches: byWord, placeWords });
+  const placeWords = places === undefined ? queryWords.map(() => false) : placeWordsIn(queryWords, entries.flatMap((entry) => places(entry) ?? []), { metBy, wordsOf: fieldWordsOf });
+  const answer = (matches: T[], searchMatch: "all_words" | "some_words") => ({ matches, searchMatch, words: queryWords, wordMatches: byWord, placeWords, wordsLeftOut });
 
   const counted = queryWords.map((word, index) => (word.length >= 3 ? counts[index]! : -1));
   const weights = counted.map((count) => (count > 0 ? Math.log(1 + rows.length / count) : 0));
@@ -1096,13 +1162,13 @@ export function searchCatalogue<T>(
   // A field the query names in full: each of its words (joining and closing "total" words aside) meets a query word.
   const namesField = (words: string[]) => {
     const naming = words.filter((word) => !JOINING_WORDS.has(word) && !TOTAL_WORDS.has(word));
-    return naming.length > 0 && naming.every((word) => queryWords.some((queryWord) => wordMatches(queryWord, word)));
+    return naming.length > 0 && naming.every((word) => metBy(word).some(Boolean));
   };
 
   const all = rows.filter((row) => row.isId || (queryWords.length > 0 && row.meets.every(Boolean)));
   if (all.length > 0 || queryWords.length === 0) {
     const full = new Set(all);
-    const joined = joins === undefined || queryWords.length === 0 || queryWords.length < allWords.length ? [] : rows.filter((row) =>
+    const joined = joins === undefined || queryWords.length === 0 || contentWords.length < allWords.length ? [] : rows.filter((row) =>
       !full.has(row) && row.meets.at(-1) === true && joins(row.entry) && row.fieldWords.some(namesField));
     // Array.prototype.sort is stable.
     const order = [...all, ...joined].map(ranked).sort((left, right) =>
@@ -1116,7 +1182,7 @@ export function searchCatalogue<T>(
   const candidates = counted.filter((count) => count >= 0);
   if (candidates.filter((count) => count > 0).length * 2 < candidates.length) return answer([], "all_words");
   // The share of a field's words that the query's counted words meet: "Income tax" is half tax.
-  const share = (words: string[]) => words.filter((word) => queryWords.some((queryWord, index) => weights[index]! > 0 && wordMatches(queryWord, word))).length / words.length;
+  const share = (words: string[]) => words.filter((word) => metBy(word).some((meets, index) => meets && weights[index]! > 0)).length / words.length;
   const scored = rows
     .filter((row) => weigh(row.meets) > 0)
     .map((row) => {
@@ -1151,10 +1217,10 @@ function searchSeriesAndEntities<S extends SeriesEntry, E extends EntityEntry>(
   search: string,
   series: S[],
   entities: E[],
-  order?: Pick<Parameters<typeof searchCatalogue<S | E>>[3] & object, "places" | "firm" | "ahead" | "joins" | "prefer" | "total">,
+  order?: Pick<Parameters<typeof searchCatalogue<S | E>>[3] & object, "places" | "firm" | "ahead" | "joins" | "prefer" | "total" | "memo">,
   titleFields?: (entry: S) => string[],
 ) {
-  const { matches, searchMatch, words, wordMatches, placeWords } = searchCatalogue<S | E>(
+  const { matches, searchMatch, words, wordMatches, placeWords, wordsLeftOut } = searchCatalogue<S | E>(
     search,
     [...series, ...entities],
     (entry) => ("seriesId" in entry ? [entry.seriesId, entry.labelKa, entry.labelEn, entry.headingKa ?? null, entry.headingEn ?? null, ...(titleFields?.(entry as S) ?? [])] : [entry.entityId, entry.labelKa, entry.labelEn, entry.entitySlug]),
@@ -1168,6 +1234,7 @@ function searchSeriesAndEntities<S extends SeriesEntry, E extends EntityEntry>(
     words,
     wordMatches,
     placeWords,
+    wordsLeftOut,
   };
 }
 
@@ -1182,7 +1249,7 @@ function websitePagesFor(snapshot: FactQuerySnapshot, search: string): WebsitePa
   return (searchExplorer(search, "en", snapshot.website.pages, [], null)?.groups ?? [])
     .flatMap((group) => group.rows.map(({ page }) => page as WebsitePage))
     .filter((page) => {
-      const found = searchCatalogue(search, [page], (entry) => [entry.name.ka, entry.name.en, entry.topicName.ka, entry.topicName.en, entry.words], { aliases: false });
+      const found = searchCatalogue(search, [page], (entry) => [entry.name.ka, entry.name.en, entry.topicName.ka, entry.topicName.en, entry.words], { aliases: false, memo: wordMemoOf(snapshot) });
       return found.searchMatch === "all_words" && found.matches.length > 0;
     });
 }
@@ -1200,11 +1267,15 @@ type PageWord = "place" | "dataset" | "datasetPage" | "unserved" | "programme" |
  * The words that together name a served place: every word of one of its names. "შიდა ქართლის" names Shida Kartli,
  * while "შიდა" (domestic) alone names nothing, so "შიდა ვალი" stays domestic debt.
  */
-function placeWordsIn(words: string[], names: Iterable<string>): boolean[] {
+function placeWordsIn(
+  words: string[],
+  names: Iterable<string>,
+  { metBy, wordsOf }: { metBy: (nameWord: string) => boolean[]; wordsOf: (name: string) => string[] },
+): boolean[] {
   const place = words.map(() => false);
   for (const name of new Set(names)) {
-    const nameWords = searchWords(name).filter((word) => !JOINING_WORDS.has(word));
-    const meeting = nameWords.map((nameWord) => words.flatMap((word, index) => (wordMatches(word, nameWord) ? [index] : [])));
+    const nameWords = wordsOf(name).filter((word) => !JOINING_WORDS.has(word));
+    const meeting = nameWords.map((nameWord) => words.flatMap((_, index) => (metBy(nameWord)[index] ? [index] : [])));
     if (nameWords.length > 0 && meeting.every((found) => found.length > 0)) for (const index of meeting.flat()) place[index] = true;
   }
   return place;
@@ -1273,11 +1344,16 @@ function websitePagesForSearch(
     .map(({ page }) => page);
 }
 
-/** The note every some-words answer carries: its entries may be about something else. */
-function someWordsNote(snapshot: FactQuerySnapshot, searchMatch: "all_words" | "some_words") {
-  return searchMatch === "some_words"
-    ? { searchMatchNoteKa: serviceMessage(snapshot, "ka", "catalogue.someWords"), searchMatchNoteEn: serviceMessage(snapshot, "en", "catalogue.someWords") }
-    : {};
+/**
+ * The note every some-words answer carries: its entries may be about something else. A search whose words past
+ * `SEARCH_WORD_LIMIT` were left out says so too.
+ */
+function someWordsNote(snapshot: FactQuerySnapshot, searchMatch: "all_words" | "some_words", wordsLeftOut = 0) {
+  const notes = (language: "ka" | "en") => [
+    ...(searchMatch === "some_words" ? [serviceMessage(snapshot, language, "catalogue.someWords")] : []),
+    ...(wordsLeftOut > 0 ? [serviceMessage(snapshot, language, "catalogue.searchWordsLeftOut", { limit: SEARCH_WORD_LIMIT, omitted: wordsLeftOut })] : []),
+  ].join(" ");
+  return searchMatch === "some_words" || wordsLeftOut > 0 ? { searchMatchNoteKa: notes("ka"), searchMatchNoteEn: notes("en") } : {};
 }
 
 function errorResponse(snapshot: FactQuerySnapshot, error: FactQueryError): FactQueryResponse {
@@ -1395,14 +1471,15 @@ export function describeCoverage(snapshot: FactQuerySnapshot, rawInput: unknown)
     const titleFields = (entry: SeriesEntry & { datasetId: AnyDatasetId }) => (entry.level === LEVEL_TOTAL && !isCoreDataset(entry.datasetId) ? datasetLabels.get(entry.datasetId)! : []);
     // A topic page the search names: every word of its title (joining words aside), in Georgian or English, meets a word
     // of the search. "tax" and "GDP" share a word with Tax breaks and refunds and GDP by expenditure; they do not name them.
-    const queryWords = searchWords(search).filter((word) => !JOINING_WORDS.has(word));
+    const memo = wordMemoOf(snapshot);
+    const queryWords = distinctWords(searchWords(search).filter((word) => !JOINING_WORDS.has(word)));
     const namesTitle = (title: string) => searchWords(title).filter((word) => !JOINING_WORDS.has(word)).every((word) => queryWords.some((queryWord) => wordMatches(queryWord, word)));
     const namesPage = (id: AnyDatasetId) => pageLabels.get(id)!.some(namesTitle);
     // A word a core entry is named by: the last word of its label or id, a closing "total" aside ("tax" of Income tax,
     // "spending" of admin_spending.total), not a word inside it ("air" of Electricity, gas, steam and air conditioning supply).
     const coreHeads = new Set([...taggedSeries, ...taggedEntities].filter((entry) => isCoreDataset(entry.datasetId)).flatMap((entry) =>
       ("seriesId" in entry ? [entry.seriesId, entry.labelKa, entry.labelEn] : [entry.entityId, entry.labelKa, entry.labelEn]).flatMap((name) => {
-        const nameWords = searchWords(name);
+        const nameWords = remembered(memo.words, name, searchWords);
         return nameWords.findLast((word) => !TOTAL_WORDS.has(word)) ?? [];
       })));
     const coreHeld = queryWords.filter((queryWord) => [...coreHeads].some((word) => wordMatches(queryWord, word)));
@@ -1420,8 +1497,9 @@ export function describeCoverage(snapshot: FactQuerySnapshot, rawInput: unknown)
       places: (entry) => ("entityId" in entry ? [entry.labelKa, entry.labelEn] : undefined),
       prefer: (entry) => (isCoreDataset(entry.datasetId) ? 0 : 1),
       total: (entry) => "seriesId" in entry && entry.level === LEVEL_TOTAL,
+      memo,
     }, titleFields);
-    const { searchMatch, words, wordMatches: matchesByWord, placeWords } = found;
+    const { searchMatch, words, wordMatches: matchesByWord, placeWords, wordsLeftOut } = found;
     // A topic page the search is aimed at comes first and is listed: its series are what was asked for. The search is
     // aimed at the page when the dataset's search name meets every word of the search, as typed (a whole-query alias
     // names budget programmes, not a page: "pension" is still Pensions), and the page's title is needed for it: neither
@@ -1429,9 +1507,9 @@ export function describeCoverage(snapshot: FactQuerySnapshot, rawInput: unknown)
     // unless the search names the title in full ("tax" and "GDP" are not Tax breaks and refunds or GDP by expenditure;
     // "external debt" needs External flows — Foreign debt whole).
     const topicIds = eligibleDatasets.filter((id) => !isCoreDataset(id));
-    const titled = searchMatch === "all_words" ? searchCatalogue(search, topicIds, (id) => datasetLabels.get(id)!, { aliases: false }) : undefined;
+    const titled = searchMatch === "all_words" ? searchCatalogue(search, topicIds, (id) => datasetLabels.get(id)!, { aliases: false, memo }) : undefined;
     const allOf = (names: (id: AnyDatasetId) => string[]) => {
-      const met = titled?.searchMatch === "all_words" ? searchCatalogue(search, titled.matches, names, { aliases: false }) : undefined;
+      const met = titled?.searchMatch === "all_words" ? searchCatalogue(search, titled.matches, names, { aliases: false, memo }) : undefined;
       return new Set<AnyDatasetId>(met?.searchMatch === "all_words" ? met.matches : []);
     };
     const [topicOnly, pageOnly] = [allOf((id) => topicNamesOf(snapshot, id)), allOf((id) => pageLabels.get(id)!)];
@@ -1469,7 +1547,7 @@ export function describeCoverage(snapshot: FactQuerySnapshot, rawInput: unknown)
     // a link to its page instead of a dead end. Links only; the status stays the series' own. What each word is to
     // the page search comes from the search above, the entities' names and one small search of the datasets' labels
     // over the same words (the same query gives `searchCatalogue` the same words), not from a search per word.
-    const labelled = searchCatalogue(search, eligibleDatasets, (id) => datasetLabels.get(id)!).wordMatches;
+    const labelled = searchCatalogue(search, eligibleDatasets, (id) => datasetLabels.get(id)!, { memo }).wordMatches;
     const kinds = words.map((_, index): PageWord => {
       const served = matchesByWord[index]!;
       if (placeWords[index]) return "place";
@@ -1503,7 +1581,7 @@ export function describeCoverage(snapshot: FactQuerySnapshot, rawInput: unknown)
         // A code names an exclusion exactly ("05"), never by a letter inside it.
         exclusions: exclusions.filter((exclusion) => exclusion.entityId === fold(search!.trim())),
         searchMatch,
-        ...someWordsNote(snapshot, searchMatch),
+        ...someWordsNote(snapshot, searchMatch, wordsLeftOut),
         ...(omittedBy.size > 0
           ? {
             seriesOmitted: omittedValues.omitted,
@@ -1530,7 +1608,7 @@ export function describeCoverage(snapshot: FactQuerySnapshot, rawInput: unknown)
   const typed = entitiesForDataset(snapshot, datasetId)?.filter(
     (entry) => input.entityType === undefined || entry.entityType === input.entityType,
   );
-  const searched = search === undefined ? undefined : searchSeriesAndEntities(search, levelled, typed ?? []);
+  const searched = search === undefined ? undefined : searchSeriesAndEntities(search, levelled, typed ?? [], { memo: wordMemoOf(snapshot) });
   const series = searched?.series ?? levelled;
   const entities = searched === undefined || typed === undefined ? typed : searched.entities;
 
@@ -1557,7 +1635,7 @@ export function describeCoverage(snapshot: FactQuerySnapshot, rawInput: unknown)
       series: shown,
       ...(entities !== undefined ? { entities } : {}),
       exclusions,
-      ...(searched !== undefined ? { searchMatch: searched.searchMatch, ...someWordsNote(snapshot, searched.searchMatch) } : {}),
+      ...(searched !== undefined ? { searchMatch: searched.searchMatch, ...someWordsNote(snapshot, searched.searchMatch, searched.wordsLeftOut) } : {}),
       ...(topic !== undefined ? { breaks: topic.breaks, bulkUrl: bulkUrlFor(snapshot, datasetId) } : {}),
       ...(headings !== undefined
         ? {
