@@ -34,7 +34,8 @@ describe("rank topic datasets", () => {
     expect(data.rankingDefinitionEn).toContain("2015/16→2025/26");
     expect(data.rankingDefinition).toContain("2015/16→2025/26");
     expect(data.universe).toMatchObject({ dimension: "entities", returnedCount: 5 });
-    expect(data.universe.candidateCount).toBe(63);
+    // The 63 municipalities and Tbilisi, which the page lists as a region.
+    expect(data.universe.candidateCount).toBe(64);
     expect(toolResult(response).content[0]!.text).toContain("2015/16→2025/26");
     expect(outputSchemaFor("rank").parse(toolResult(response).structuredContent)).toEqual(response);
   });
@@ -49,8 +50,8 @@ describe("rank topic datasets", () => {
     const response = rank(snapshot, { datasetId: "education-schools", dimension: "entities", entityType: "municipality", seriesId: "education.pupils.total", measure: "value", metric: "value", year: 2025, limit: 3 });
     const data = ranking(response);
     expect(data.entries).toHaveLength(3);
-    // Tbilisi is a region on this page, not one of its municipalities.
-    expect(data.entries[0]!.entityLabelEn).toBe("Batumi");
+    // Tbilisi, a region on this page, ranks among the municipalities, as on the page and in the core municipal rankings.
+    expect(data.entries.map((entry) => entry.entityLabelEn).slice(0, 2)).toEqual(["Tbilisi", "Batumi"]);
     expect(data.rankingDefinitionEn).toContain("2025/26");
     expect(data.entries[0]!.value!).toBeGreaterThanOrEqual(data.entries[1]!.value!);
   });
@@ -94,7 +95,7 @@ describe("rank topic datasets", () => {
     const across = ranking(rank(withBreak, { datasetId: "education-schools", dimension: "entities", entityType: "municipality", seriesId: "education.pupils.total", measure: "value", metric: "percentage_change", fromYear: 2015, toYear: 2025 }));
     expect(across.entries).toEqual([]);
     expect(across.exclusions).toHaveLength(1);
-    expect(across.exclusions[0]!.ids).toHaveLength(63);
+    expect(across.exclusions[0]!.ids).toHaveLength(64);
     expect(across.exclusions[0]!.reasonEn).toContain("2020-09-01: Counting rules changed.");
     expect(across.exclusions[0]!.reasonEn).toContain("no change is computed across this point");
     expect(across.exclusions[0]!.reason).toContain("2020-09-01: ");
@@ -120,7 +121,7 @@ describe("rank topic datasets", () => {
     }) } };
     const request = { datasetId: "education-schools", dimension: "entities", entityType: "municipality", seriesId: "education.pupils.total", measure: "value", metric: "percentage_change", fromYear: 2015, toYear: 2025, limit: 100 };
     const data = ranking(rank(patched, request));
-    expect(data.universe).toMatchObject({ candidateCount: 63, eligibleCount: 61 });
+    expect(data.universe).toMatchObject({ candidateCount: 64, eligibleCount: 62 });
     expect(data.entries.map((entry) => entry.entityId)).not.toEqual(expect.arrayContaining(["09"]));
     expect(data.exclusions.flatMap((group) => group.ids).sort()).toEqual(["09", "11"]);
     expect(data.exclusions.find((group) => group.ids.includes("11"))!.reasonEn.length).toBeGreaterThan(0);
@@ -130,7 +131,7 @@ describe("rank topic datasets", () => {
   });
 
   it("asks in chunks when a dataset lists more places than one query takes, and joins the answers", () => {
-    // 50 copies of Khulo's rows as extra municipalities: 113 places, over the 100-id cap of one query.
+    // 50 copies of Khulo's rows as extra municipalities: 114 places with Tbilisi, over the 100-id cap of one query.
     const extra = Array.from({ length: 50 }, (_unused, index) => `copy${String(index).padStart(2, "0")}`);
     const grown: FactQuerySnapshot = { ...snapshot, topics: { ...snapshot.topics, datasets: snapshot.topics.datasets.map((dataset) => {
       if (dataset.page.datasetId !== "education-schools") return dataset;
@@ -148,11 +149,11 @@ describe("rank topic datasets", () => {
     }) } };
     const request = { datasetId: "education-schools", dimension: "entities", entityType: "municipality", seriesId: "education.pupils.total", measure: "value", metric: "percentage_change", fromYear: 2015, toYear: 2025, order: "ascending", limit: 100 };
     const data = ranking(rank(grown, request));
-    expect(data.universe).toMatchObject({ candidateCount: 113, eligibleCount: 113 });
+    expect(data.universe).toMatchObject({ candidateCount: 114, eligibleCount: 114 });
     expect(data.entries.filter((entry) => entry.entityId.startsWith("copy"))).toHaveLength(50);
     expect(data.entries[0]!.entityLabelEn).toBe("Shuakhevi");
     const values = ranking(rank(grown, { ...request, metric: "value", fromYear: undefined, toYear: undefined, year: 2025 }));
-    expect(values.universe.eligibleCount).toBe(113);
+    expect(values.universe.eligibleCount).toBe(114);
   });
 
   it("states what the request is missing or has wrong", () => {
@@ -192,7 +193,7 @@ describe("rank topic datasets", () => {
     const population = (entityType: string, fromYear: number, toYear: number) => ranking(rank(snapshot, {
       datasetId: "demography-population", dimension: "entities", entityType, seriesId: "demography.population_total", measure: "value", metric: "percentage_change", fromYear, toYear, limit: 100,
     }));
-    for (const [entityType, count] of [["municipality", 63], ["region", 11]] as const) {
+    for (const [entityType, count] of [["municipality", 64], ["region", 11]] as const) {
       const across = population(entityType, 2024, 2025);
       expect(across.entries).toEqual([]);
       expect(across.exclusions).toHaveLength(1);
@@ -201,8 +202,23 @@ describe("rank topic datasets", () => {
       expect(across.exclusions[0]!.reason).toContain("2025-01-01: ");
     }
     // Either side of the re-base ranks every place.
-    expect(population("municipality", 2015, 2024).entries).toHaveLength(63);
-    expect(population("municipality", 2025, 2026).entries).toHaveLength(63);
+    expect(population("municipality", 2015, 2024).entries).toHaveLength(64);
+    expect(population("municipality", 2025, 2026).entries).toHaveLength(64);
+  });
+
+  // Full review I1: the topic pages list Tbilisi (municipality 04) as the region region.tbilisi; the page's own ranking
+  // and the core municipal rankings count it among the 64 municipalities.
+  it("ranks Tbilisi among the municipalities, first by population, and alone within its region", () => {
+    const byPopulation = (extra: object) => ranking(rank(snapshot, {
+      datasetId: "demography-population", dimension: "entities", entityType: "municipality", seriesId: "demography.population_total", measure: "value", metric: "value", year: 2026, limit: 3, ...extra,
+    }));
+    const data = byPopulation({});
+    expect(data.universe.candidateCount).toBe(64);
+    expect(data.entries.map((entry) => entry.entityId)).toEqual(["region.tbilisi", "06", expect.any(String)]);
+    expect(data.universe.descriptionEn).toContain("Tbilisi");
+    expect(byPopulation({ withinRegionId: "region.tbilisi" }).entries.map((entry) => entry.entityId)).toEqual(["region.tbilisi"]);
+    // Regions still rank as the 11 regions.
+    expect(byPopulation({ entityType: "region", limit: 11 }).universe.candidateCount).toBe(11);
   });
 });
 

@@ -226,6 +226,7 @@
   "ranking.regions": "Georgia's 11 regions; the country aggregate and individual municipalities are excluded.",
   "ranking.topicSeries": "Series of this dataset that share one heading (or one parent, under one heading) and the unit of the series named, for one place; a named series that has a parent ranks among that parent's other parts only; the heading's total and any series whose own parts are ranked are excluded.",
   "ranking.topicPlaces": "Places of the requested type that this dataset lists; the country aggregate and other place types are excluded.",
+  "ranking.topicMunicipalities": "The municipalities this dataset lists, Tbilisi among them: the page lists it as the region region.tbilisi (municipality code 04), and it ranks as a municipality; the country aggregate and the other regions are excluded.",
   "ranking.valueDefinition": "Ranked by {measure} for {year}, {order}.",
   "ranking.withinRegion": "Member municipalities of region {regionLabel}; aggregate-only codes are excluded.",
   "sources.source.adjara_consolidated_budget.derivation": "Reviewed consolidated Adjara calculation — municipalities plus republican payments minus internal transfers",

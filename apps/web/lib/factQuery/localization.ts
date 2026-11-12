@@ -208,6 +208,7 @@ export const SERVICE_MESSAGE_KEYS = [
   "ranking.publicFields",
   "ranking.regions",
   "ranking.topicPlaces",
+  "ranking.topicMunicipalities",
   "ranking.topicSeries",
   "ranking.valueDefinition",
   "ranking.valueDefinitionPeriod",

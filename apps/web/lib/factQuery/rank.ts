@@ -375,12 +375,17 @@ export function rank(snapshot: FactQuerySnapshot, rawInput: unknown): FactQueryR
     if (entityRanking) {
       if (input.seriesId === undefined || input.entityType === undefined) return invalid();
       seriesIds = [input.seriesId];
+      // Tbilisi is a municipality (code 04) that the topic pages list as the region region.tbilisi, with no member
+      // municipality: a region without members ranks among the municipalities, as the pages and the core municipal
+      // rankings rank Tbilisi.
+      const asMunicipality = input.entityType === "municipality" && topicDataset.entities.some((entity) => entity.entityType === "municipality");
+      const standsAlone = (entityId: string) => !topicDataset.entities.some((other) => other.parentEntityId === entityId);
       entityIds = topicDataset.entities
-        .filter((entity) => entity.entityType === input.entityType)
-        .filter((entity) => input.withinRegionId === undefined || entity.parentEntityId === input.withinRegionId)
+        .filter((entity) => entity.entityType === input.entityType || (asMunicipality && entity.entityType === "region" && standsAlone(entity.entityId)))
+        .filter((entity) => input.withinRegionId === undefined || entity.parentEntityId === input.withinRegionId || (asMunicipality && entity.entityId === input.withinRegionId))
         .map((entity) => entity.entityId)
         .sort();
-      universeKey = input.withinRegionId ? "ranking.withinRegion" : "ranking.topicPlaces";
+      universeKey = input.withinRegionId ? "ranking.withinRegion" : asMunicipality ? "ranking.topicMunicipalities" : "ranking.topicPlaces";
       if (input.withinRegionId) {
         const region = topicDataset.entities.find((entity) => entity.entityId === input.withinRegionId);
         universeValues = (locale) => ({ regionLabel: (locale === "ka" ? region?.labelKa : region?.labelEn) ?? input.withinRegionId! });
