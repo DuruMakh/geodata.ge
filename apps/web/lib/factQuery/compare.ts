@@ -409,7 +409,8 @@ export function compare(snapshot: FactQuerySnapshot, rawInput: unknown): FactQue
         if (topicDataset !== undefined && isTopicIntervalUnit(from.unit)) {
           percentageChange = null;
         } else if (from.value > 0) {
-          percentageChange = ((to.value - from.value) / from.value) * 100;
+          // A topic change is rounded to the 12 significant digits its values carry.
+          percentageChange = topicDataset ? topicNumber(((to.value - from.value) / from.value) * 100) : ((to.value - from.value) / from.value) * 100;
         } else {
           // Spec section 6.6: a zero or negative base makes percentage change
           // unavailable but does NOT invalidate the absolute difference.

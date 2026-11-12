@@ -69,6 +69,13 @@ describe("compare topic", () => {
 
   // A partial or preliminary endpoint limits the comparison. The education data are all official actuals, so the
   // synthetic case restates one vocational cell as partial.
+  // Full review docs M2: a percentage change is rounded to the 12 significant digits a topic value carries.
+  it("rounds a percentage change to 12 significant digits, as the values and the absolute change", () => {
+    const [pair] = comparisons(topicCompare("wages-overview", ["average_monthly_nominal_earnings"], 2015, 2025));
+    expect(pair!.percentageChange).toBe(140.470901821);
+    expect(pair!.percentageChange).toBe(Number(pair!.percentageChange!.toPrecision(12)));
+  });
+
   it("limits a comparison when an endpoint is partial", () => {
     const topics = structuredClone(snapshot.topics);
     const dataset: TopicDataset = topics.datasets.find((entry) => entry.page.datasetId === "education-vocational")!;
