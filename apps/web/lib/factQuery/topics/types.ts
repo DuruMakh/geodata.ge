@@ -19,7 +19,12 @@ export type TopicPage = { datasetId: string; pagePath: `/explorer/${string}`; fa
 /** `note`: a service message the series' value definition adds (what an "Other countries" line leaves out), read at query time. */
 export type TopicSeriesNote = { key: ServiceMessageKey; values: Record<string, string | number> };
 
-export type TopicSeries = { seriesId: string; labelKa: string; labelEn: string; headingKa: string | null; headingEn: string | null; parentSeriesId: string | null; isTotal: boolean; unit: string; note?: TopicSeriesNote };
+/**
+ * `breakdown`: an internal key for the page's breakdown a series belongs to, where one parent's parts (or one heading's
+ * series) make up several (students by level and by sex; the unemployment rate and the labour force by age): `rank`
+ * ranks one breakdown at a time. Not served.
+ */
+export type TopicSeries = { seriesId: string; labelKa: string; labelEn: string; headingKa: string | null; headingEn: string | null; parentSeriesId: string | null; isTotal: boolean; unit: string; note?: TopicSeriesNote; breakdown?: string };
 
 export type TopicEntity = { entityId: string; entityType: "country" | "region" | "municipality" | "city"; labelKa: string; labelEn: string; parentEntityId: string | null };
 

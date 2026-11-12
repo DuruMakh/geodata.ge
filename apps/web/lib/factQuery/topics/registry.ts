@@ -25,6 +25,7 @@ import { energyFoodTopicAdapter } from "./energyFood";
 import { environmentTopicAdapter } from "./environment";
 import { externalTopicAdapter } from "./external";
 import { healthTopicAdapter } from "./health";
+import { applyTopicHierarchy } from "./hierarchy";
 import { housingTopicAdapter } from "./housing";
 import { internetTopicAdapter } from "./internet";
 import { livingStandardsTopicAdapter } from "./livingStandards";
@@ -187,10 +188,11 @@ async function topicSources(sourceIds: readonly string[], archives: readonly Top
 
 /**
  * The snapshot's topics section and the sources its facts cite. Datasets follow TOPIC_PAGES; a page built twice, two
- * facts for one cell, a listed series with no value, a unit with no name or a source no archive resolves stops the build.
+ * facts for one cell, a listed series with no value, a unit with no name, a source no archive resolves or a reviewed
+ * total its figures do not bear out (topics/hierarchy.ts) stops the build.
  */
 export async function buildTopicsSnapshot(adapters: readonly TopicAdapter[] = TOPIC_ADAPTERS): Promise<{ topics: TopicsSnapshot; sources: RawResolvedSource[] }> {
-  const builds = (await Promise.all(adapters.map((adapter) => adapter.build()))).flat();
+  const builds = (await Promise.all(adapters.map((adapter) => adapter.build()))).flat().map((build) => applyTopicHierarchy(build));
   const seen = new Set<string>();
   for (const build of builds) {
     if (seen.has(build.page.datasetId)) throw new Error(`Topic dataset ${build.page.datasetId} is built twice`);

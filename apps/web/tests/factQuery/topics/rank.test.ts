@@ -229,14 +229,20 @@ describe("rank topic series peers", () => {
     ranking(rank(snapshot, { datasetId, dimension: "series", ...peers, measure: "value", metric: "value", year, limit: 100 }));
   const idsOf = (data: RankData) => data.entries.map((entry) => entry.seriesId);
 
-  it("ranks the National counts of unemployment-overview without the rates beside them, and without employed beside its parts", () => {
-    const data = seriesRanking("unemployment-overview", { seriesId: "unemployed" }, 2024);
-    expect(new Set(data.entries.map((entry) => entry.unit))).toEqual(new Set(["thousand_persons"]));
-    expect(idsOf(data)).toEqual(expect.arrayContaining(["unemployed", "self_employed", "hired", "labour_force"]));
-    expect(idsOf(data)).not.toContain("participation_rate");
-    expect(idsOf(data)).not.toContain("employed");
+  // Full review tool-logic I2 (R37): each measure of an unemployment heading is a breakdown of its own, so the labour
+  // force never ranks beside the unemployed it holds; a measure ranks across the heading's groups.
+  it("ranks one unemployment measure at a time: towns beside villages, ages beside ages, never the labour force beside the unemployed", () => {
+    expect(idsOf(seriesRanking("unemployment-overview", { seriesId: "unemployed" }, 2024))).toEqual(["unemployed"]);
+    expect(idsOf(seriesRanking("unemployment-overview", { seriesId: "unemployed.urban" }, 2024)).sort()).toEqual(["unemployed.rural", "unemployed.urban"]);
+    expect(idsOf(seriesRanking("unemployment-overview", { seriesId: "hired" }, 2024)).sort()).toEqual(["hired", "self_employed"]);
+    expect(idsOf(seriesRanking("unemployment-gender", { seriesId: "labour_force.men" }, 2024)).sort()).toEqual(["labour_force.men", "labour_force.women"]);
+    const ages = idsOf(seriesRanking("unemployment-age", { seriesId: "unemployed.age.25_29" }, 2024));
+    expect(ages).toHaveLength(11);
+    expect(ages.every((id) => id.startsWith("unemployed.age."))).toBe(true);
     // The rate ranks among the rates of its heading (the unemployment rate is the heading's total).
     expect(idsOf(seriesRanking("unemployment-overview", { seriesId: "participation_rate" }, 2024))).toEqual(["participation_rate"]);
+    // The long-term unemployed of Georgia are the men and the women: those two rank, Georgia's line does not.
+    expect(idsOf(seriesRanking("unemployment-overview", { seriesId: "long_term_unemployed_share.men" }, 2024)).sort()).toEqual(["long_term_unemployed_share.men", "long_term_unemployed_share.women"]);
   });
 
   it("ranks farming output in tonnes apart from litres and pieces, and farm-gate prices per kg apart from per litre", () => {
@@ -304,6 +310,33 @@ describe("rank topic series peers", () => {
     expect(idsOf(named)).toContain(seriesId);
     expect(idsOf(named)).not.toContain(parentSeriesId);
     expect(idsOf(named).sort()).toEqual(idsOf(seriesRanking(datasetId, { parentSeriesId }, year)).sort());
+  });
+
+  // Full review tool-logic I2 (R37): a total the page prints beside its parts (topics/hierarchy.ts) never ranks with them,
+  // and one breakdown of a parent ranks at a time.
+  it("ranks the running costs without their total, and the total beside investment", () => {
+    const parts = idsOf(seriesRanking("expenditure-types", { seriesId: "spending_type.compensation.nominal" }, 2024));
+    expect(parts).toHaveLength(7);
+    expect(parts).not.toContain("spending_type.expense.nominal");
+    expect(idsOf(seriesRanking("expenditure-types", { parentSeriesId: "spending_type.total.nominal" }, 2024)).sort()).toEqual(["spending_type.expense.nominal", "spending_type.investment.nominal"]);
+    expect(idsOf(seriesRanking("economy-expenditure", { seriesId: "gdp_use.exports_goods.nominal" }, 2024)).sort()).toEqual(["gdp_use.exports_goods.nominal", "gdp_use.exports_services.nominal"]);
+  });
+
+  it("ranks students by one breakdown at a time: sex, level, or by the total's first breakdown", () => {
+    expect(idsOf(seriesRanking("education-universities", { seriesId: "education.he_students.women" }, 2024)).sort()).toEqual(["education.he_students.men", "education.he_students.women"]);
+    const levels = ["education.he_students.level_bachelor", "education.he_students.level_master", "education.he_students.level_professional"];
+    expect(idsOf(seriesRanking("education-universities", { parentSeriesId: "education.he_students.total" }, 2024)).sort()).toEqual(levels);
+    expect(idsOf(seriesRanking("education-universities", { seriesId: "education.he_students.total" }, 2024)).sort()).toEqual(levels);
+    expect(idsOf(seriesRanking("education-universities", { parentSeriesId: "education.he_students.total", seriesId: "education.he_students.private" }, 2024)).sort()).toEqual(["education.he_students.private", "education.he_students.public"]);
+    expect(idsOf(seriesRanking("living-standards-poverty", { seriesId: "poverty.absolute.age.0_17" }, 2024)).sort()).toEqual(["poverty.absolute.age.0_17", "poverty.absolute.age.18_64", "poverty.absolute.age.65_plus"]);
+    expect(idsOf(seriesRanking("science-culture-museums", { seriesId: "science_culture.museum_staff.women" }, 2024)).sort()).toEqual(["science_culture.museum_staff.men", "science_culture.museum_staff.women"]);
+  });
+
+  it("ranks All researchers among the R&D staff it is part of, and its own parts when named", () => {
+    expect(idsOf(seriesRanking("science-culture-research", { seriesId: "science_culture.rd_staff.technicians" }, 2023)).sort()).toEqual([
+      "science_culture.rd_staff.not_specified", "science_culture.rd_staff.support", "science_culture.rd_staff.technicians", "science_culture.researchers.total",
+    ]);
+    expect(idsOf(seriesRanking("science-culture-research", { seriesId: "science_culture.researchers.total" }, 2023)).sort()).toEqual(["science_culture.researchers.men", "science_culture.researchers.women"]);
   });
 
   it("ranks the leading cause of death by its own seriesId", () => {

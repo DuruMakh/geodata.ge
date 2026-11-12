@@ -109,6 +109,9 @@ function buildUnemployment(context: Context, section: UnemploymentSectionId): To
             // Hired and self-employed people are parts of the employed; the list's other nesting is the page's, not a sum.
             parentSeriesId: ["hired", "self_employed"].includes(definition.indicatorId) ? servedAs(section, state, definition.groupId, "employed").seriesId : null,
             isTotal: section !== "regions" && definition.groupId === "georgia" && definition.id === model.referenceId,
+            // A heading lists each measure for every group (the unemployed, the labour force and the population by age):
+            // a measure is a breakdown of its own, so rank never puts the labour force beside the unemployed it holds.
+            ...(section === "regions" ? {} : { breakdown: definition.indicatorId }),
           },
           cells: new Map<number, Cell | undefined>(),
         };

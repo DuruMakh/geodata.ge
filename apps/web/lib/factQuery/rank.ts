@@ -396,7 +396,8 @@ export function rank(snapshot: FactQuerySnapshot, rawInput: unknown): FactQueryR
       const placeId = input.entityId ?? (defaults.length === 1 ? defaults : topicDataset.entities.length === 1 ? topicDataset.entities : [])[0]?.entityId;
       if (placeId === undefined) return invalid();
       entityIds = [placeId];
-      // Peers: the series under one heading (that of seriesId) or one parent, never a total.
+      // Peers: one place's series in one unit: the parts of one parent, or the series under one heading that have no
+      // parent, never a total.
       const anchor = topicDataset.series.find((entry) => entry.seriesId === input.seriesId);
       if (input.parentSeriesId === undefined) {
         if (input.seriesId === undefined) return invalid();
@@ -416,18 +417,26 @@ export function rank(snapshot: FactQuerySnapshot, rawInput: unknown): FactQueryR
           });
         }
       }
-      let peers = topicDataset.series.filter((entry) => !entry.isTotal && (input.parentSeriesId !== undefined ? entry.parentSeriesId === input.parentSeriesId : entry.headingKa === anchor!.headingKa));
-      // A heading can hold several measures of one unit, each under its own parent (shares of GDP and real growth, active
-      // and new firms, the 60% and 40% poverty lines): a named series with a parent ranks among its siblings only.
-      if (input.parentSeriesId === undefined && anchor!.parentSeriesId !== null) peers = peers.filter((entry) => entry.parentSeriesId === anchor!.parentSeriesId);
-      // A parent whose children the page lists under several headings, each a breakdown of its own (trade partners by
-      // country and by country group, investment by country and by sector), ranks one: the named series' heading, else
-      // the first. Children that each stand alone under their heading (the VAT and income-tax totals) rank together.
-      if (input.parentSeriesId !== undefined) {
-        const perHeading = peers.reduce((counts, entry) => counts.set(entry.headingKa, (counts.get(entry.headingKa) ?? 0) + 1), new Map<string | null, number>());
-        if (perHeading.size > 1 && [...perHeading.values()].some((count) => count > 1)) {
-          const heading = (peers.find((entry) => entry.seriesId === input.seriesId) ?? peers[0])!.headingKa;
-          peers = peers.filter((entry) => entry.headingKa === heading);
+      // A named total with parts ranks its parts, as by parentSeriesId; another named series with a parent ranks among
+      // that parent's parts (a heading can hold several measures of one unit, each under its own parent: shares of GDP
+      // and real growth, the 60% and 40% poverty lines).
+      const parentId = input.parentSeriesId
+        ?? (anchor!.isTotal && topicDataset.series.some((entry) => entry.parentSeriesId === anchor!.seriesId) ? anchor!.seriesId : anchor!.parentSeriesId);
+      type Peer = (typeof topicDataset.series)[number];
+      // A heading's total that is itself a part (All researchers, of All R&D staff) ranks among its parent's parts.
+      let peers = topicDataset.series.filter((entry) => (parentId !== null
+        ? entry.parentSeriesId === parentId
+        : !entry.isTotal && entry.parentSeriesId === null && entry.headingKa === anchor!.headingKa && entry.breakdown === anchor!.breakdown));
+      // A parent whose parts make up several breakdowns, each under a heading of its own or a reviewed breakdown, which
+      // spans headings (trade partners by country and by country group; students by level, ownership, sex and field),
+      // ranks one: that of the named series, else the first. Parts that each stand alone (the VAT and income-tax totals)
+      // rank together.
+      if (parentId !== null) {
+        const breakdownOf = (entry: Peer) => (entry.breakdown === undefined ? `heading:${entry.headingKa ?? ""}` : `breakdown:${entry.breakdown}`);
+        const perBreakdown = peers.reduce((counts, entry) => counts.set(breakdownOf(entry), (counts.get(breakdownOf(entry)) ?? 0) + 1), new Map<string, number>());
+        if (perBreakdown.size > 1 && [...perBreakdown.values()].some((count) => count > 1)) {
+          const breakdown = breakdownOf((peers.find((entry) => entry.seriesId === input.seriesId) ?? peers[0])!);
+          peers = peers.filter((entry) => breakdownOf(entry) === breakdown);
         }
       }
       // One unit, that of the series named (or of the parent): thousand persons never rank beside a rate.

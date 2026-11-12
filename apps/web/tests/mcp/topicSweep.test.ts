@@ -32,7 +32,7 @@ describe("rank over MCP in the series' own units (C1)", () => {
   };
 
   it("ranks thousand persons, persons, °C and USD", async () => {
-    expect((await rankOf({ datasetId: "unemployment-overview", dimension: "series", seriesId: "unemployed", metric: "value", year: 2024 })).map((entry) => entry.unit))
+    expect((await rankOf({ datasetId: "unemployment-age", dimension: "series", seriesId: "unemployed.age.25_29", metric: "value", year: 2024 })).map((entry) => entry.unit))
       .toEqual(Array(5).fill("thousand_persons"));
     const pupils = await rankOf({ datasetId: "education-schools", dimension: "entities", entityType: "municipality", seriesId: "education.pupils.total", metric: "absolute_change", fromYear: 2015, toYear: 2025, order: "ascending", limit: 2 });
     expect(pupils).toMatchObject([{ unit: "persons", value: -1861 }, { unit: "persons", value: -1273 }]);

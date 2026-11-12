@@ -18,7 +18,7 @@ export const both = (presentations: { ka: Presentation; en: Presentation }, read
  * cell whose basis is not the dataset's (a preliminary year), its own.
  */
 export type Cell = { value: number; unit: string; sourceIds: string[]; status: TopicValueStatus; monthsReported?: number; periodEnd?: string; basis?: Basis };
-export type SeriesSpec = { seriesId: string; indicatorId: string; label: Names; heading: Names | null; parentSeriesId: string | null; isTotal: boolean; note?: TopicSeriesNote };
+export type SeriesSpec = { seriesId: string; indicatorId: string; label: Names; heading: Names | null; parentSeriesId: string | null; isTotal: boolean; note?: TopicSeriesNote; breakdown?: string };
 
 /**
  * Collects one page's dataset. `add` adds a series' cells for one place over the years the page prints them: missing
@@ -43,6 +43,7 @@ export function collectTopicDataset(datasetId: string, title: Names, basis: Basi
       series.set(spec.seriesId, {
         seriesId: spec.seriesId, labelKa: spec.label.ka, labelEn: spec.label.en, headingKa: spec.heading?.ka ?? null, headingEn: spec.heading?.en ?? null,
         parentSeriesId: spec.parentSeriesId, isTotal: spec.isTotal, unit, indicatorId: spec.indicatorId, ...(spec.note === undefined ? {} : { note: spec.note }),
+        ...(spec.breakdown === undefined ? {} : { breakdown: spec.breakdown }),
       });
     }
     if (!entities.has(entity.entityId)) entities.set(entity.entityId, entity);
