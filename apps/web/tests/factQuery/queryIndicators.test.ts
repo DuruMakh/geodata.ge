@@ -214,7 +214,9 @@ describe("queryIndicators caveats", () => {
     // The months are the partial row's own: its definition states them, and no other row's definition changes.
     expect(at(2).valueDefinitionEn).toContain("6 months of the year");
     expect(at(2).valueDefinition).toContain("6 თვეს");
-    expect(at(2).valueDefinitionId).toBe(`education-vocational:${at(2).seriesId}:${at(2).unit}`);
+    // Its id names them too (full review ai-client M1): one id, one definition text.
+    expect(at(2).valueDefinitionId).toBe(`education-vocational:${at(2).seriesId}:${at(2).unit}:months=6`);
+    expect(at(0).valueDefinitionId).toBe(`education-vocational:${at(0).seriesId}:${at(0).unit}`);
     expect(at(0).valueDefinitionEn).not.toContain("months");
     expect(at(6).valueDefinitionEn).not.toContain("months");
     expect(caveat("topic_planned").messageEn).toBe("The result contains planned rather than actual values.");
