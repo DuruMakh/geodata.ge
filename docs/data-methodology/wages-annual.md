@@ -83,6 +83,8 @@ The pages show the published value: one decimal for averages and whole lari for 
 - **Industries** shows the 19 sections for a chosen group (all employees, women, men, public, non-public, business, non-business, or the median). A section a group's table does not publish is not offered for that group.
 - **Regions** maps and ranks the 11 regions, and each region has its own page beside the Georgia average. Some enterprises are counted at their head office, so a region's figure can reflect where firms are registered.
 
+Through `/mcp` (the topic datasets `wages-overview`, `wages-industries` and `wages-regions`), every wage's value definition carries the Excel subtitle's note in the page's words ("Gross wages before income tax, in current lari. They are not adjusted for inflation and do not show purchasing power."), after "It is an amount for one month." where the series name does not say monthly.
+
 Excel downloads hold Summary, Data and Sources sheets in the reader's language, with the selected series and years, empty cells for missing values, each value's status and validated links to the archived Geostat workbooks. Internal cell references are not exported.
 
 ## Statistical limitations and future use

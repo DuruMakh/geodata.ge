@@ -95,7 +95,7 @@ describe("wages topic adapter", () => {
     for (const build of builds) expect(build.breaks).toEqual([]);
   });
 
-  it("says a wage is a monthly amount where its name does not: the unit is GEL, the note says per month", () => {
+  it("says a wage is nominal, and a monthly amount where its name does not: the unit is GEL, the note says per month", () => {
     const snapshot = testSnapshot({ releaseCommit: "test", generatedAt: "2026-11-11T00:00:00.000Z" });
     const definition = (datasetId: string, entityId: string, seriesId: string) => {
       const response = queryIndicators(snapshot, { datasetId, seriesIds: [seriesId], entityIds: [entityId], years: [2024] });
@@ -108,9 +108,14 @@ describe("wages topic adapter", () => {
     // "Average monthly wage" says so already.
     expect(definition("wages-overview", GEORGIA_PLACE_ID, AVERAGE).valueDefinitionEn).not.toContain("one month");
     expect(definition("wages-regions", ADJARA, AVERAGE).valueDefinitionEn).not.toContain("one month");
+    // Full review ai-client M8: every wage says, in the page's own words, that it is nominal: gross, in current lari.
+    expect(definition("wages-overview", GEORGIA_PLACE_ID, AVERAGE)).toMatchObject({
+      valueDefinitionEn: expect.stringContaining("in current lari. They are not adjusted for inflation"), valueDefinition: expect.stringContaining("ინფლაციაზე არ არის კორექტირებული"),
+    });
+    expect(definition("wages-regions", ADJARA, AVERAGE).valueDefinitionEn).toContain("not adjusted for inflation");
     // Every served wage is monthly: its name says so, or its note does.
     for (const build of builds) for (const series of build.series) {
-      expect(/month/i.test(`${series.headingEn ?? ""} ${series.labelEn}`) !== (series.note?.key === "definitions.topicMonthly"), `${build.page.datasetId} ${series.seriesId}`).toBe(true);
+      expect(series.note?.key, `${build.page.datasetId} ${series.seriesId}`).toBe(/month/i.test(`${series.headingEn ?? ""} ${series.labelEn}`) ? "definitions.topicWage" : "definitions.topicWageMonthly");
     }
   });
 
