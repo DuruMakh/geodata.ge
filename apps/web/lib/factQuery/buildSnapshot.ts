@@ -53,20 +53,20 @@ import { EXPENDITURE_TYPES_SOURCE_ID } from "../data/expenditureTypes/types";
 
 export type BuildSnapshotOptions = { releaseCommit: string; generatedAt: string };
 
-/** Money and banks sources belong to a human explorer, outside the query/publication scope. */
+/** Money and banks sources are a topic family's: the topics section resolves them (topics/registry.ts), not the core source list. */
 const MONEY_BANKS_SOURCE_DOCUMENT_IDS: ReadonlySet<string> = new Set(MONEY_BANKS_PUBLIC_SOURCES.map(moneyBanksSourceDocumentId));
 const TAX_BREAKS_REFUNDS_SOURCE_DOCUMENT_IDS: ReadonlySet<string> = new Set(TAX_BREAKS_REFUNDS_PUBLIC_SOURCES.map(taxBreaksRefundsSourceDocumentId));
 
-/** Foreign debt and Reserves sources belong to a human explorer, outside the query/publication scope. */
+/** Foreign debt and Reserves sources are a topic family's: the topics section resolves them (topics/registry.ts), not the core source list. */
 const EXTERNAL_POSITION_SOURCE_DOCUMENT_IDS: ReadonlySet<string> = new Set(EXTERNAL_POSITION_PUBLIC_SOURCES.map(externalPositionSourceDocumentId));
 
-/** Business sources belong to a human explorer, outside the query/publication scope. */
+/** Business sources are a topic family's: the topics section resolves them (topics/registry.ts), not the core source list. */
 const BUSINESS_SOURCE_DOCUMENT_IDS: ReadonlySet<string> = new Set(BUSINESS_PUBLIC_SOURCES.map(businessSourceDocumentId));
 
-/** Education sources belong to a human explorer, outside the query/publication scope. */
+/** Education sources are a topic family's: the topics section resolves them (topics/registry.ts), not the core source list. */
 const EDUCATION_SOURCE_DOCUMENT_IDS: ReadonlySet<string> = new Set(EDUCATION_PUBLIC_SOURCES.map(educationSourceDocumentId));
 
-/** Science and culture sources belong to a human explorer, outside the query/publication scope. */
+/** Science and culture sources are a topic family's: the topics section resolves them (topics/registry.ts), not the core source list. */
 const SCIENCE_CULTURE_SOURCE_DOCUMENT_IDS: ReadonlySet<string> = new Set(SCIENCE_CULTURE_PUBLIC_SOURCES.map(scienceCultureSourceDocumentId));
 
 const GDP_SOURCE_MANIFEST_RELATIVE_PATH = ["docs", "Raw Data", "GDP", "national-nominal-gdp"] as const;
@@ -577,7 +577,7 @@ export async function buildFactQuerySnapshot(options: BuildSnapshotOptions): Pro
   // manifests' own source_id, unique across all four manifests — verified by
   // inspection, not just assumed).
   const coreSources: ResolvedSource[] = sortedBy(
-      // Unemployment, Trade, Services trade, Wages, Money from abroad, Foreign investment, Poverty, Household income and spending, Energy and food, Money and banks, Foreign debt and Reserves, Business, Health, Housing, Crime and justice, Education, Environment and climate, Science and culture, GDP by expenditure, Transport, Internet and technology and Social protection are human explorers, outside the query/publication scope.
+      // Unemployment, Trade, Services trade, Wages, Money from abroad, Foreign investment, Poverty, Household income and spending, Energy and food, Money and banks, Foreign debt and Reserves, Business, Health, Housing, Crime and justice, Education, Environment and climate, Science and culture, GDP by expenditure, Transport, Internet and technology and Social protection are topic families: their sources are resolved with the topics section below (topics/registry.ts), not in the core source list.
       enrichSourceTranslations(resolvePublicSources({ sourceDocuments: explorer.sourceDocuments.filter(source => !source.sourceId.startsWith("source.geostat_lfs_") && !source.sourceId.startsWith("source.geostat_transport_") && !source.sourceId.startsWith("source.geostat_trade_") && !source.sourceId.startsWith("source.geostat_services_") && !source.sourceId.startsWith("source.geostat_earnings_") && !source.sourceId.startsWith("source.geostat_fdi_") && !source.sourceId.startsWith("source.geostat_poverty_") && !source.sourceId.startsWith("source.geostat_household_") && !source.sourceId.startsWith("source.geostat_energy_") && !source.sourceId.startsWith("source.geostat_food_") && !source.sourceId.startsWith("source.geostat_farming_") && source.sourceId !== "source.geostat_agriculture_page" && !source.sourceId.startsWith("source.geostat_health_") && !source.sourceId.startsWith("source.geostat_housing_") && !source.sourceId.startsWith("source.geostat_ict_") && !source.sourceId.startsWith("source.geostat_death") && !source.sourceId.startsWith("source.geostat_crime_") && !source.sourceId.startsWith("source.geostat_env_") && !source.sourceId.startsWith("source.ssa_") && source.sourceId !== "source.geostat_gini" && source.sourceId !== "source.geostat_hies_metadata_2026" && source.sourceId !== "source.nbg_money_transfers_by_countries" && source.sourceId !== "source.nbg_balance_of_payments_bpm6" && !MONEY_BANKS_SOURCE_DOCUMENT_IDS.has(source.sourceId) && !EXTERNAL_POSITION_SOURCE_DOCUMENT_IDS.has(source.sourceId) && !BUSINESS_SOURCE_DOCUMENT_IDS.has(source.sourceId) && !source.sourceId.startsWith("source.geostat_gdp_use_") && !source.sourceId.startsWith("source.pension_fund_") && source.sourceId !== EXPENDITURE_TYPES_SOURCE_ID && !EDUCATION_SOURCE_DOCUMENT_IDS.has(source.sourceId) && !SCIENCE_CULTURE_SOURCE_DOCUMENT_IDS.has(source.sourceId) && !TAX_BREAKS_REFUNDS_SOURCE_DOCUMENT_IDS.has(source.sourceId)), manifestDocuments }), catalogue, serviceKa),
     (source) => source.sourceId,
   ).map((source) => ({
