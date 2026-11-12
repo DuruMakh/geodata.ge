@@ -831,7 +831,7 @@ A partial year (for example a money-transfer year with months the source left bl
 
 **English.** A value is the position on a date inside the year, not at year end, so a change to or from it spans less than a year; its value definition gives the date.
 
-The one dated latest-amount point on Foreign debt and Reserves (for example gross external debt on 30 June or reserves on 30 September of the latest year) is served under its calendar year, but a change from the previous year-end to it covers six or nine months, not a year. `compare_periods` therefore reports such a change as limited, and a change-type ranking entry carries this caveat. The date stands in that row's own value definition and in the observation's `periodEnd`.
+The one dated latest-amount point on Foreign debt and Reserves (for example gross external debt on 30 June or reserves on 30 September of the latest year) is served under its calendar year, but a change from the previous year-end to it covers six or nine months, not a year. `compare` therefore reports such a change as limited, and a change-type ranking entry carries this caveat. The date stands in that row's own value definition and in the observation's `periodEnd`.
 
 ### `topic_planned`
 
@@ -883,7 +883,7 @@ A projection is not an outcome, so a change into a projected year is not a chang
 
 **Trigger.** A reviewed series break (the `*-series-breaks.csv` registers under `data/imports/`) starts after the earliest and no later than the latest requested year, for a series the response returns. It marks that series' available cells (`entity:series:year`). Topic cells only (`query_indicators`).
 
-**Georgian.** მოთხოვნილ წლებში მწკრივს დადასტურებული წყვეტა აქვს ({detail}); ამ წერტილის გავლით ცვლილება არ ითვლება.
+**Georgian.** მოთხოვნილ წლებში მწკრივს გადამოწმებული წყვეტა აქვს ({detail}); ამ წერტილის გავლით ცვლილება არ გამოითვლება.
 
 **English.** A reviewed series break falls inside the requested years ({detail}); no change is computed across this point.
 
