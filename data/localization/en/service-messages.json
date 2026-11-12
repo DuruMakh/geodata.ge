@@ -138,6 +138,8 @@
   "definitions.reviewedAmount": "Reviewed value in GEL at full precision.",
   "definitions.shareOfGdp": "Share of the same year's GDP at current prices, on a 0–100 scale.",
   "definitions.topicJanuaryStock": "It is the population on 1 January of the year.",
+  "definitions.topicGdpLessImports": "GDP is consumption, investment and exports less imports (GDP = C + I + X − M): imports enters GDP with a minus sign and is not one of its parts.",
+  "definitions.topicVetOldFields": "Up to {lastYear} the source also counted students under its earlier list of fields, which the page does not show, so in those years the fields add up to less than the total.",
   "definitions.topicOtherCountries": "Other countries are every country except the {year} top 10 this dataset lists.",
   "definitions.topicValue": "The value as the Fiscal.ge page shows it ({page}), in {unit}.",
   "definitions.topicValueDated": "The value as the Fiscal.ge page shows it ({page}), in {unit}; it is the position on {date}, not at year end.",

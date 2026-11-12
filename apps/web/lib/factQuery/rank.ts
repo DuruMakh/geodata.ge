@@ -488,7 +488,8 @@ export function rank(snapshot: FactQuerySnapshot, rawInput: unknown): FactQueryR
       }
       universeKey = "ranking.topicSeries";
       const parentEntry = parentId === null ? undefined : topicDataset.series.find((entry) => entry.seriesId === parentId);
-      const less = parentId === null ? [] : topicDataset.series.filter((entry) => entry.subtractedFrom === parentId);
+      // Said only where the figures add up so (amounts and shares of GDP), never of growth rates.
+      const less = parentId === null ? [] : topicDataset.series.filter((entry) => entry.subtractedFrom?.seriesId === parentId && entry.subtractedFrom.sum);
       const labelOf = (entry: Peer, locale: "ka" | "en") => (locale === "ka" ? entry.labelKa : entry.labelEn);
       // A total's own label can be bare ("All", under Graduates): its heading then names it.
       const totalLabel = (entry: Peer, locale: "ka" | "en") => {

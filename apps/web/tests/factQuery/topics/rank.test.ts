@@ -411,7 +411,9 @@ describe("rank topic series peers", () => {
     for (const measure of ["nominal", "share_of_gdp", "real_growth"]) {
       const gdp = seriesRanking("economy-expenditure", { seriesId: `economy.gdp_total.${measure}` }, 2025);
       expect(idsOf(gdp).sort()).toEqual([`gdp_use.consumption.${measure}`, `gdp_use.exports.${measure}`, `gdp_use.investment.${measure}`]);
-      expect(gdp.universe.descriptionEn).toContain(`Total GDP is its parts less Total imports (gdp_use.imports.${measure}), which it subtracts`);
+      // Growth rates do not add up, so the real-growth ranking does not claim the identity (re-review 3, R3-1).
+      if (measure === "real_growth") expect(gdp.universe.descriptionEn).not.toContain("less Total imports");
+      else expect(gdp.universe.descriptionEn).toContain(`Total GDP is its parts less Total imports (gdp_use.imports.${measure}), which it subtracts`);
       expect(idsOf(seriesRanking("economy-expenditure", { seriesId: `gdp_use.imports.${measure}` }, 2025)).sort()).toEqual([`gdp_use.imports_goods.${measure}`, `gdp_use.imports_services.${measure}`]);
     }
     const exports = seriesRanking("economy-expenditure", { seriesId: "gdp_use.exports.nominal" }, 2025);

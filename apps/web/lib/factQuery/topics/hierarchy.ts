@@ -5,7 +5,7 @@
 // breakdowns (students by level, by ownership, by sex and by field). `rank` reads the links: a total never ranks beside
 // its own parts, and one breakdown of a parent ranks at a time. Every link is checked against the figures on each build.
 // Build-time only: runtime code never imports it (tests/factQuery/purity.test.ts).
-import type { TopicDatasetBuild } from "./types";
+import type { TopicDatasetBuild, TopicSeriesNote } from "./types";
 
 /**
  * One reviewed link: `parentSeriesId` becomes the parent of `seriesIds` (it may already be), and `breakdown` names the
@@ -16,13 +16,19 @@ import type { TopicDatasetBuild } from "./types";
  *   (imports, which GDP subtracts: GDP = consumption + investment + exports - imports);
  * - "between": the parent, a rate, share or average of the whole, lies between its parts, as an aggregate of them must;
  * - "within": the parts add up to no more than the parent (within 0.01%): a breakdown that leaves a remainder unstated
- *   in some years (vocational students by field, where the source's fields fall short of the total in 2020-2022);
+ *   in some years (vocational students by field: the source also counted its earlier list of fields, which no page
+ *   shows, so the fields fall short of the total for admissions 2016-2020 and graduates 2016-2022);
  * - "label": the figures cannot be checked (the real growth of Total investment, whose only growth part is Buildings
  *   and equipment), so the same total and parts must be a proven "sum" at another measure of the dataset (their amounts
  *   in GEL), or the build stops.
- * A `subtracted` series loses its parent (it is no part of the total) and records the total it is subtracted from.
+ * A `subtracted` series loses its parent (it is no part of the total) and records the total it is subtracted from, and
+ * whether the figures add up so (amounts and shares; a growth rate does not). `note` is a sentence the named series'
+ * value definition adds, saying what the link means for a client (GDP subtracts imports; the fields fall short).
  */
-export type TopicHierarchyLink = { datasetId: string; parentSeriesId: string; seriesIds: readonly string[]; breakdown?: string; subtracted?: readonly string[]; proof: "sum" | "between" | "within" | "label" };
+export type TopicHierarchyLink = {
+  datasetId: string; parentSeriesId: string; seriesIds: readonly string[]; breakdown?: string; subtracted?: readonly string[];
+  proof: "sum" | "between" | "within" | "label"; note?: TopicSeriesNote & { seriesIds: readonly string[] };
+};
 
 const ids = (prefix: string, parts: readonly string[], suffix = "") => parts.map((part) => `${prefix}${part}${suffix}`);
 const RUNNING_COSTS = ["compensation", "goods_services", "interest", "subsidies", "grants", "social_benefits", "other"];
@@ -53,6 +59,7 @@ export const TOPIC_HIERARCHY: readonly TopicHierarchyLink[] = [
   ...["nominal", "share_of_gdp", "real_growth"].map((measure): TopicHierarchyLink => ({
     datasetId: "economy-expenditure", parentSeriesId: `economy.gdp_total.${measure}`, seriesIds: ids("gdp_use.", ["consumption", "investment", "exports"], `.${measure}`),
     subtracted: [`gdp_use.imports.${measure}`], proof: measure === "real_growth" ? "label" : "sum",
+    note: { key: "definitions.topicGdpLessImports", values: {}, seriesIds: [`economy.gdp_total.${measure}`, `gdp_use.imports.${measure}`] },
   })),
   { datasetId: "economy-expenditure", parentSeriesId: "gdp_use.consumption.real_growth", seriesIds: ["gdp_use.households_npish.real_growth", "gdp_use.government.real_growth"], proof: "between" },
   { datasetId: "economy-expenditure", parentSeriesId: "gdp_use.investment.real_growth", seriesIds: ["gdp_use.fixed_capital.real_growth"], proof: "label" },
@@ -92,11 +99,16 @@ export const TOPIC_HIERARCHY: readonly TopicHierarchyLink[] = [
   })),
   { datasetId: "education-schools", parentSeriesId: "education.teachers.total", seriesIds: ids("education.teachers.", ["public", "private"]), breakdown: "ownership", proof: "sum" },
   { datasetId: "education-schools", parentSeriesId: "education.teachers.total", seriesIds: ids("education.teachers.", ["women", "men"]), breakdown: "sex", proof: "sum" },
-  ...["vet_admitted", "vet_graduates"].flatMap((group): TopicHierarchyLink[] => [
-    { datasetId: "education-vocational", parentSeriesId: `education.${group}.total`, seriesIds: ids(`education.${group}.`, ["women", "men"]), breakdown: "sex", proof: "sum" },
-    { datasetId: "education-vocational", parentSeriesId: `education.${group}.total`, breakdown: "field", proof: "within",
-      seriesIds: ids(`education.${group}.field_`, ["agriculture_vet", "arts_humanities", "business_law", "education", "engineering", "health_welfare", "ict", "services", "social_journalism"]) },
-  ]),
+  // The fields fall short of the total up to the last year the source counted its earlier list of fields
+  // (docs/data-methodology/education-annual.md, Vocational colleges): 2020 for admissions, 2022 for graduates.
+  ...([["vet_admitted", 2020], ["vet_graduates", 2022]] as const).flatMap(([group, lastYear]): TopicHierarchyLink[] => {
+    const fields = ids(`education.${group}.field_`, ["agriculture_vet", "arts_humanities", "business_law", "education", "engineering", "health_welfare", "ict", "services", "social_journalism"]);
+    return [
+      { datasetId: "education-vocational", parentSeriesId: `education.${group}.total`, seriesIds: ids(`education.${group}.`, ["women", "men"]), breakdown: "sex", proof: "sum" },
+      { datasetId: "education-vocational", parentSeriesId: `education.${group}.total`, breakdown: "field", proof: "within", seriesIds: fields,
+        note: { key: "definitions.topicVetOldFields", values: { lastYear }, seriesIds: fields } },
+    ];
+  }),
   { datasetId: "living-standards-poverty", parentSeriesId: "poverty.absolute", seriesIds: ids("poverty.absolute.settlement.", ["urban", "rural"]), breakdown: "settlement", proof: "between" },
   { datasetId: "living-standards-poverty", parentSeriesId: "poverty.absolute", seriesIds: ids("poverty.absolute.age.", ["0_17", "18_64", "65_plus"]), breakdown: "age", proof: "between" },
   { datasetId: "living-standards-poverty", parentSeriesId: "poverty.absolute", seriesIds: ids("poverty.absolute.sex.", ["female", "male"]), breakdown: "sex", proof: "between" },
@@ -127,7 +139,8 @@ export function applyTopicHierarchy(build: TopicDatasetBuild, links: readonly To
     return found;
   };
   const linked = new Map<string, TopicHierarchyLink>();
-  const subtractedFrom = new Map<string, string>();
+  const subtractedFrom = new Map<string, { seriesId: string; sum: boolean }>();
+  const notes = new Map<string, TopicSeriesNote>();
   for (const link of own) {
     const parent = seriesOf(link.parentSeriesId);
     const subtracted = link.subtracted ?? [];
@@ -135,8 +148,12 @@ export function applyTopicHierarchy(build: TopicDatasetBuild, links: readonly To
     for (const seriesId of [...link.seriesIds, ...subtracted]) {
       if (seriesOf(seriesId).unit !== parent.unit) throw new Error(`${datasetId}: ${seriesId} is not in the unit of ${link.parentSeriesId}`);
       if (linked.has(seriesId) || subtractedFrom.has(seriesId)) throw new Error(`${datasetId}: ${seriesId} is linked twice`);
-      if (subtracted.includes(seriesId)) subtractedFrom.set(seriesId, link.parentSeriesId);
+      if (subtracted.includes(seriesId)) subtractedFrom.set(seriesId, { seriesId: link.parentSeriesId, sum: link.proof === "sum" });
       else linked.set(seriesId, link);
+    }
+    for (const seriesId of link.note?.seriesIds ?? []) {
+      if (seriesOf(seriesId).note !== undefined || notes.has(seriesId)) throw new Error(`${datasetId}: ${seriesId} already has a note`);
+      notes.set(seriesId, { key: link.note!.key, values: link.note!.values });
     }
     if (link.proof === "label") {
       const sameStems = (mine: readonly string[], theirs: readonly string[]) => mine.every((seriesId) => theirs.some((part) => stemOf(part) === stemOf(seriesId)));
@@ -168,9 +185,10 @@ export function applyTopicHierarchy(build: TopicDatasetBuild, links: readonly To
   return {
     ...build,
     series: build.series.map((series) => {
-      const link = linked.get(series.seriesId), total = subtractedFrom.get(series.seriesId);
-      if (total !== undefined) return { ...series, parentSeriesId: null, subtractedFrom: total };
-      return link ? { ...series, parentSeriesId: link.parentSeriesId, ...(link.breakdown === undefined ? {} : { breakdown: link.breakdown }) } : series;
+      const link = linked.get(series.seriesId), total = subtractedFrom.get(series.seriesId), note = notes.get(series.seriesId);
+      const noted = note === undefined ? series : { ...series, note };
+      if (total !== undefined) return { ...noted, parentSeriesId: null, subtractedFrom: total };
+      return link ? { ...noted, parentSeriesId: link.parentSeriesId, ...(link.breakdown === undefined ? {} : { breakdown: link.breakdown }) } : noted;
     }),
   };
 }

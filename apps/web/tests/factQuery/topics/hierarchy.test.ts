@@ -7,6 +7,7 @@ import { applyTopicHierarchy, TOPIC_HIERARCHY, type TopicHierarchyLink } from ".
 import type { TopicDatasetBuild, TopicFact, TopicSeries } from "../../../lib/factQuery/topics/types";
 import type { FactQuerySnapshot } from "../../../lib/factQuery/types";
 import { testSnapshot } from "../../helpers/factQuerySnapshot";
+import { queryIndicators } from "../../../lib/factQuery/queryIndicators";
 
 const series = (seriesId: string, unit = "persons"): TopicSeries => ({ seriesId, labelKa: seriesId, labelEn: seriesId, headingKa: "h", headingEn: "h", parentSeriesId: null, isTotal: false, unit });
 const fact = (seriesId: string, year: number, value: number): TopicFact => ({ entityId: "country.georgia", seriesId, year, value, basis: "published", status: "official", sourceIds: [] });
@@ -45,7 +46,7 @@ describe("reviewed topic hierarchy", () => {
     const gdp = build({ total: [10], c: [8], x: [5], m: [3] });
     const net = link({ seriesIds: ["c", "x"], subtracted: ["m"], breakdown: undefined });
     const linked = applyTopicHierarchy(gdp, [net]);
-    expect(linked.series.find((entry) => entry.seriesId === "m")).toMatchObject({ parentSeriesId: null, subtractedFrom: "total" });
+    expect(linked.series.find((entry) => entry.seriesId === "m")).toMatchObject({ parentSeriesId: null, subtractedFrom: { seriesId: "total", sum: true } });
     expect(linked.series.find((entry) => entry.seriesId === "c")).toMatchObject({ parentSeriesId: "total" });
     expect(() => applyTopicHierarchy(build({ total: [10], c: [8], x: [5], m: [2] }), [net])).toThrow(/total is not the sum of c, x less m/);
     expect(() => applyTopicHierarchy(gdp, [{ ...net, proof: "between" }])).toThrow(/only a "sum" proof checks/);
@@ -56,6 +57,17 @@ describe("reviewed topic hierarchy", () => {
     const short = applyTopicHierarchy(build({ total: [10, 12], women: [4, 5], men: [6, 6] }), [link({ proof: "within" })]);
     expect(short.series.find((entry) => entry.seriesId === "men")).toMatchObject({ parentSeriesId: "total", breakdown: "sex" });
     expect(() => applyTopicHierarchy(build({ total: [10], women: [5], men: [6] }), [link({ proof: "within" })])).toThrow(/total is not the sum or more of women, men/);
+  });
+
+  // Re-review 3: a link's note goes into the value definition of the series it names, once.
+  it("adds a link's note to the series it names, and only once", () => {
+    const note = { key: "definitions.topicVetOldFields" as const, values: { lastYear: 2020 }, seriesIds: ["women", "men"] };
+    const noted = applyTopicHierarchy(build({ total: [10], women: [4], men: [6] }), [link({ note })]);
+    expect(noted.series.find((entry) => entry.seriesId === "men")!.note).toEqual({ key: "definitions.topicVetOldFields", values: { lastYear: 2020 } });
+    expect(noted.series.find((entry) => entry.seriesId === "total")!.note).toBeUndefined();
+    const already = build({ total: [10], women: [4], men: [6] });
+    already.series[1] = { ...already.series[1]!, note: { key: "definitions.topicJanuaryStock", values: {} } };
+    expect(() => applyTopicHierarchy(already, [link({ note })])).toThrow(/women already has a note/);
   });
 
   it("links by label only a total and parts proven a sum at another measure", () => {
@@ -75,6 +87,22 @@ describe("served topic hierarchy", () => {
   let snapshot: FactQuerySnapshot;
   beforeAll(() => {
     snapshot = testSnapshot({ releaseCommit: "test", generatedAt: "2026-08-29T00:00:00.000Z" });
+  });
+
+  it("serves the GDP and vocational-field notes in the value definitions", () => {
+    const definition = (datasetId: string, seriesId: string, year: number) => {
+      const response = queryIndicators(snapshot, { datasetId, seriesIds: [seriesId], fromYear: year, toYear: year });
+      if (response.kind === "error") throw new Error(response.error.messageEn);
+      return (response.data as { observations: { valueDefinitionEn: string; valueDefinition: string }[] }).observations[0]!;
+    };
+    for (const seriesId of ["economy.gdp_total.nominal", "economy.gdp_total.real_growth", "gdp_use.imports.share_of_gdp"]) {
+      expect(definition("economy-expenditure", seriesId, 2025).valueDefinitionEn).toContain("GDP is consumption, investment and exports less imports (GDP = C + I + X − M)");
+    }
+    expect(definition("economy-expenditure", "gdp_use.exports.nominal", 2025).valueDefinitionEn).not.toContain("less imports");
+    expect(definition("education-vocational", "education.vet_admitted.field_ict", 2024).valueDefinitionEn).toContain("Up to 2020 the source also counted students under its earlier list of fields");
+    expect(definition("education-vocational", "education.vet_graduates.field_ict", 2024).valueDefinitionEn).toContain("Up to 2022 the source also counted");
+    expect(definition("education-vocational", "education.vet_graduates.field_ict", 2024).valueDefinition).toContain("2022 წლის ჩათვლით");
+    expect(definition("education-vocational", "education.vet_graduates.women", 2024).valueDefinitionEn).not.toContain("earlier list of fields");
   });
 
   it("carries every reviewed link into the snapshot", () => {
