@@ -52,7 +52,7 @@ Printed totals that differ from their parts are served as printed, and validatio
 
 ## Funded pension
 
-The Funded pension page (`/explorer/health/funded-pension`) serves the Pension Fund of Georgia's (საქართველოს საპენსიო ფონდი, the Pension Agency until 1 May 2025) figures for the funded pension scheme, 2019–2025, in the same canonical file and `SocialFact` mirror. There is no new table or migration. Nothing from it is in the fact-query snapshot, MCP or the central publications.
+The Funded pension page (`/explorer/health/funded-pension`) serves the Pension Fund of Georgia's (საქართველოს საპენსიო ფონდი, the Pension Agency until 1 May 2025) figures for the funded pension scheme, 2019–2025, in the same canonical file and `SocialFact` mirror. There is no new table or migration. Its data is served through `/mcp` (`query_indicators`, topic dataset `health-funded-pension`) and as `/downloads/data/topics/health-funded-pension.csv`, citing the six `source.pension_fund_*` sources.
 
 **Research package.** `docs/Raw Data/Social/pension-fund/` holds the thirteen original PDFs from pensions.ge byte for byte (six served, seven kept only for cross-checks), `source-manifest.json` (source id, URL, bytes, SHA-256, retrieval date and `used_for` for each), `extract.py` (poppler's `pdftotext`; runs once, offline, never in CI), `test_extract.py`, `pension-fund-annual.csv` (the 99 values with document, page and printed line) and `validation-report.json`. `npm run data:prepare-social` reads the CSV, verifies every PDF it cites against the manifest (`readVerifiedPackageFile`) and adds the values to the canonical file in the same columns; `--check` reproduces the file byte for byte.
 
