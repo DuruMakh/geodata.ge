@@ -2,7 +2,7 @@
 
 ## Purpose and status
 
-This methodology governs the research package at `docs/Raw Data/Wages/geostat-earnings-annual/`, collected on 2026-10-09, the publication day of Geostat's 2025 annual earnings. The research captures are immutable. The 1,917 primary values and the 12 unavailable cells are served on the Wages pages under the approved design `docs/superpowers/specs/2026-10-09-wages-explorer-design.md`; see [Serving on the Wages pages](#serving-on-the-wages-pages). Nothing is published through MCP or included in central machine-readable publications.
+This methodology governs the research package at `docs/Raw Data/Wages/geostat-earnings-annual/`, collected on 2026-10-09, the publication day of Geostat's 2025 annual earnings. The research captures are immutable. The 1,917 primary values and the 12 unavailable cells are served on the Wages pages under the approved design `docs/superpowers/specs/2026-10-09-wages-explorer-design.md`; see [Serving on the Wages pages](#serving-on-the-wages-pages). The data of these pages is served through `query_indicators` and `/downloads/data/topics/<id>.csv`.
 
 The user approved annual data only, with these breakdowns: Georgia, economic activity, sex, public/non-public ownership, business/non-business sector, region and median earnings. Quarterly earnings, real (inflation-adjusted) wages, and the occupation, labour-cost and adjusted gender-pay-gap tables are excluded. Real wages are deferred by the user's decision. They would be a derived calculation against the CPI dataset and need their own review.
 
@@ -82,6 +82,8 @@ The pages show the published value: one decimal for averages and whole lari for 
 - **Wages overview** compares the Georgia average with the median, with public/non-public employers and with women and men; no pay gap is calculated. The median comes from tax records and the average from enterprise surveys; the page says so.
 - **Industries** shows the 19 sections for a chosen group (all employees, women, men, public, non-public, business, non-business, or the median). A section a group's table does not publish is not offered for that group.
 - **Regions** maps and ranks the 11 regions, and each region has its own page beside the Georgia average. Some enterprises are counted at their head office, so a region's figure can reflect where firms are registered.
+
+Through `/mcp` (the topic datasets `wages-overview`, `wages-industries` and `wages-regions`), every wage's value definition carries the Excel subtitle's note in the page's words ("Gross wages before income tax, in current lari. They are not adjusted for inflation and do not show purchasing power."), after "It is an amount for one month." where the series name does not say monthly.
 
 Excel downloads hold Summary, Data and Sources sheets in the reader's language, with the selected series and years, empty cells for missing values, each value's status and validated links to the archived Geostat workbooks. Internal cell references are not exported.
 

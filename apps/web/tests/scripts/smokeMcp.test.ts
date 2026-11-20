@@ -18,9 +18,9 @@ beforeAll(() => {
 afterAll(() => { process.env = { ...original }; vi.restoreAllMocks(); });
 
 // Independent release inventory: removing execution while retaining discovery must fail.
-const required = ["query_regional_economies", "query_economic_sectors", "query_gdp", "query_inflation", "query_inflation_products", "describe_coverage", "query_national", "query_ministries", "query_municipal", "query_debt", "query_deficit", "compare", "rank", "get_sources"];
+const required = ["query_regional_economies", "query_economic_sectors", "query_gdp", "query_inflation", "query_inflation_products", "describe_coverage", "query_national", "query_ministries", "query_municipal", "query_debt", "query_deficit", "query_indicators", "compare", "rank", "get_sources"];
 const snapshot = loadPackagedSnapshot();
-const identities = { expectedSchema: "1.7.0", expectedDataVersion: snapshot.dataVersion };
+const identities = { expectedSchema: "1.8.0", expectedDataVersion: snapshot.dataVersion };
 let key = 0;
 async function route(request: Request) {
   const headers = new Headers(request.headers);
@@ -43,7 +43,7 @@ it("executes every advertised required tool", async () => {
     const outputs: string[] = [];
     const signals: AbortSignal[] = [];
     const fetch: typeof globalThis.fetch = async (input, init) => { signals.push(init!.signal!); return globalThis.fetch(input, init); };
-    const exit = await main(["--url", bridge.url.href, "--expected-schema", "1.7.0", "--expected-data-version", snapshot.dataVersion, "--output", "ignored.json"], { fetch, paceMs: 0, write: text => { outputs.push(text); } });
+    const exit = await main(["--url", bridge.url.href, "--expected-schema", "1.8.0", "--expected-data-version", snapshot.dataVersion, "--output", "ignored.json"], { fetch, paceMs: 0, write: text => { outputs.push(text); } });
     const report = JSON.parse(outputs[0]!) as SmokeReport;
     expect(exit, JSON.stringify(report)).toBe(0);
     expect(report.ok, JSON.stringify(report)).toBe(true);
@@ -55,13 +55,13 @@ it("executes every advertised required tool", async () => {
     ]);
     const httpRequestCount = exchanges.length;
     expect(httpRequestCount).toBeLessThanOrEqual(30);
-    expect(httpRequestCount).toBe(29);
+    expect(httpRequestCount).toBe(30);
     expect(report.httpRequestCount).toBe(httpRequestCount);
-    expect(exchanges.filter(method => method === "tools/call")).toHaveLength(21);
+    expect(exchanges.filter(method => method === "tools/call")).toHaveLength(22);
     expect(exchanges).toContain("notifications/initialized");
     expect(exchanges).toContain("GET");
     expect(exchanges).not.toContain("DELETE");
-    expect(signals).toHaveLength(29);
+    expect(signals).toHaveLength(30);
     expect(signals.every(signal => signal.aborted)).toBe(true);
     expect(console.warn).toBe(warning);
   } finally { await bridge.close(); }
@@ -83,7 +83,7 @@ it("fails on an HTTP 200 tool error", async () => {
     return route(request);
   };
   const outputs: string[] = [];
-  const code = await main(["--url", "https://fiscal.ge/mcp", "--expected-schema", "1.7.0", "--expected-data-version", snapshot.dataVersion, "--output", "ignored.json"], { fetch, paceMs: 0, write: text => { outputs.push(text); } });
+  const code = await main(["--url", "https://fiscal.ge/mcp", "--expected-schema", "1.8.0", "--expected-data-version", snapshot.dataVersion, "--output", "ignored.json"], { fetch, paceMs: 0, write: text => { outputs.push(text); } });
   expect(code).toBe(1);
   const report = JSON.parse(outputs[0]!);
   expect(report.failure).toBe("tool_error");
@@ -298,7 +298,7 @@ it("contains untrusted SDK discovery warnings inside the operator process", asyn
   });
   try {
     const cli = path.join(process.cwd(), "node_modules", "tsx", "dist", "cli.mjs");
-    const child = spawn(process.execPath, [cli, "scripts/smoke-mcp.ts", "--url", bridge.url.href, "--expected-schema", "1.7.0", "--expected-data-version", snapshot.dataVersion, "--output", output], { cwd: process.cwd(), timeout: 10_000 });
+    const child = spawn(process.execPath, [cli, "scripts/smoke-mcp.ts", "--url", bridge.url.href, "--expected-schema", "1.8.0", "--expected-data-version", snapshot.dataVersion, "--output", output], { cwd: process.cwd(), timeout: 10_000 });
     let stdout = "";
     let stderr = "";
     child.stdout.setEncoding("utf8").on("data", chunk => { stdout += chunk; });

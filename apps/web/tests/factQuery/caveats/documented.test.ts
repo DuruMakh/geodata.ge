@@ -37,8 +37,10 @@ describe("caveat catalogue documentation", () => {
     // A paraphrase here would let the documented meaning drift away from what
     // a consumer actually receives.
     for (const rule of CAVEAT_RULES) {
-      expect(doc, `${rule.code} messageKa`).toContain(serviceMessage(snapshot, "ka", rule.messageKey));
-      expect(doc, `${rule.code} messageEn`).toContain(serviceMessage(snapshot, "en", rule.messageKey));
+      // A message with a request-specific {detail} is documented as its template.
+      const values: Record<string, string> = rule.messageValues ? { detail: "{detail}" } : {};
+      expect(doc, `${rule.code} messageKa`).toContain(serviceMessage(snapshot, "ka", rule.messageKey, values));
+      expect(doc, `${rule.code} messageEn`).toContain(serviceMessage(snapshot, "en", rule.messageKey, values));
     }
   });
 

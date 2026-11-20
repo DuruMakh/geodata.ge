@@ -9,14 +9,13 @@ import { MunicipalitiesIndex } from "../../components/municipalities/municipalit
 import { BreadcrumbJsonLd } from "../../components/seo/breadcrumb-json-ld";
 import { JsonLd } from "../../components/seo/json-ld";
 import { PageHeader } from "../../components/shell/page-header";
-import { loadServedEducationData, shownEducationFacts, toClientEducationFact } from "../data/education/importEducation";
 import { EDUCATION_GEORGIA, EDUCATION_SOURCES, educationIndicator, type ClientEducationFact } from "../data/education/types";
-import { loadServedMunicipalData } from "../data/servedData";
 import { coverageLabel } from "../explorer/coverageLabel";
-import { GEORGIA_PLACE_ID, TBILISI_PLACE_ID, buildDemographyPlaces, placeLabel, type DemographyPlace } from "../explorer/demographyAreas";
+import { GEORGIA_PLACE_ID, TBILISI_PLACE_ID, placeLabel, type DemographyPlace } from "../explorer/demographyAreas";
 import { placeHrefById, placeIdForRoute, placeNeighbours, placePageHref, type PlaceRoute } from "../explorer/demographyPlaceRoutes";
-import { educationCountLabel, educationPeriodLabel, educationSeriesLabel, educationTemporalCoverage } from "../explorer/education";
+import { educationCountLabel, educationPeriodLabel, educationTemporalCoverage } from "../explorer/education";
 import { buildEducationIndexModel } from "../explorer/educationIndex";
+import { educationPlaceListData, educationPlacePageData } from "../explorer/educationPageData";
 import { educationPlaceBase, educationPlaceCoverage, educationPlaceDefaultSelection, educationPlaceSeries, type EducationPlaceSet } from "../explorer/educationPlaces";
 import { formatInUnit, UNIT_PERSONS } from "../explorer/format";
 import { buildPickerCountry, pickerGroupsFromRows } from "../explorer/municipalData";
@@ -24,7 +23,7 @@ import { latestOf } from "../explorer/unitList";
 import { Message } from "../i18n/message";
 import { message } from "../i18n/messages";
 import { getMessages } from "../i18n/messages.server";
-import { clientPresentation, getPresentation } from "../i18n/presentation.server";
+import { clientPresentation } from "../i18n/presentation.server";
 import { I18nProvider } from "../i18n/provider";
 import { pageHref } from "../i18n/routes";
 import type { Locale, Messages, TemplateValues } from "../i18n/types";
@@ -39,20 +38,6 @@ import { topicSection, ALL_DATA_PATH } from "../navigation/navTree";
 /** The same three kinds of place page as Population, with the same 11 region ids and 63 municipality slugs. */
 export type EducationPlaceRoute = PlaceRoute;
 export { populationMunicipalityParams as educationMunicipalityParams, populationRegionParams as educationRegionParams } from "./demography-population-place";
-
-/** What the index and the place pages share: the shown facts, the registries, the language and the place list. */
-async function loadEducationPlaceBasics(locale: Locale) {
-  const [{ facts: served }, municipal, georgian] = await Promise.all([loadServedEducationData(), loadServedMunicipalData(), getMessages("ka", ["municipal"])]);
-  const shown = shownEducationFacts(served);
-  const ids = [GEORGIA_PLACE_ID, ...municipal.regions.map(region => region.id), ...municipal.municipalities.map(m => m.code)];
-  // `municipal` is loaded for the map's and the picker's words (tabs, search, boundaries, member counts).
-  const presentation = await getPresentation(locale, ["education", "format", "main", "workbook", "municipal"], ids, ids);
-  const places = buildDemographyPlaces({
-    regions: municipal.regions, municipalities: municipal.municipalities, englishLabels: presentation.englishLabels, georgiaNameKa: message(georgian, "municipal.georgia"),
-  });
-  const lastReviewedAt = shown.map(f => f.lastReviewedAt).sort().at(-1)!;
-  return { facts: shown.map(toClientEducationFact), municipal, presentation, places, lastReviewedAt };
-}
 
 /** Georgia's value of a series in one year (the index's map year), or a descriptive error. */
 function georgiaFactAt(facts: readonly ClientEducationFact[], indicatorId: string, year: number): ClientEducationFact {
@@ -88,7 +73,7 @@ export async function educationIndexMetadata(locale: Locale, set: EducationPlace
 
 /** A set's index: the one latest line, then the municipality map and the ranked list whose rows open the place pages. */
 export async function renderEducationIndexPage(locale: Locale, set: EducationPlaceSet) {
-  const { facts, municipal, presentation, places, lastReviewedAt } = await loadEducationPlaceBasics(locale);
+  const { facts, municipal, presentation, places, lastReviewedAt } = await educationPlacePageData(locale);
   const { messages } = presentation;
   const t = (key: string, values?: TemplateValues) => message(messages, `education.${key}`, values);
   const index = buildEducationIndexModel(set, facts, municipal.regions, municipal.municipalities);
@@ -161,7 +146,7 @@ export async function renderEducationIndexPage(locale: Locale, set: EducationPla
 }
 
 export async function educationPlaceMetadata(route: EducationPlaceRoute, locale: Locale, set: EducationPlaceSet) {
-  const { facts, presentation, places } = await loadEducationPlaceBasics(locale);
+  const { facts, presentation, places } = await educationPlacePageData(locale);
   const place = places.find(candidate => candidate.id === placeIdForRoute(route));
   if (!place) notFound();
   const values = { section: message(presentation.messages, `education.page.${set}.title`), place: placeLabel(place, locale) };
@@ -181,7 +166,7 @@ export async function educationPlaceMetadata(route: EducationPlaceRoute, locale:
 /** A place's page: the heading with the picker and its latest line, the chart workspace and, on a region's page, its municipalities. */
 export async function renderEducationPlacePage(route: EducationPlaceRoute, locale: Locale, set: EducationPlaceSet) {
   // The Sources sheet lists the archived Geostat workbooks (data/methodology/source-archives/education.csv) the values are read from.
-  const [{ facts, municipal, presentation, places, lastReviewedAt }, sources] = await Promise.all([loadEducationPlaceBasics(locale), loadSourcedWorkbookSources("education", locale, row => EDUCATION_SOURCES.includes(row.source_id))]);
+  const [{ facts, municipal, presentation, places, lastReviewedAt }, sources] = await Promise.all([educationPlacePageData(locale), loadSourcedWorkbookSources("education", locale, row => EDUCATION_SOURCES.includes(row.source_id))]);
   const place = places.find(candidate => candidate.id === placeIdForRoute(route));
   if (!place) notFound();
   const { messages } = presentation;
@@ -190,7 +175,8 @@ export async function renderEducationPlacePage(route: EducationPlaceRoute, local
   const period = educationPeriodLabel(set);
   const href = (target: DemographyPlace) => pageHref(placePageHref(base, target.id), locale);
   const index = buildEducationIndexModel(set, facts, municipal.regions, municipal.municipalities);
-  const series = educationPlaceSeries(set, place.id);
+  const list = educationPlaceListData(messages, set, place.id, facts);
+  const series = list.series;
   const headline = latestOf(facts, series[0].id, place.id);
   const name = placeLabel(place, locale);
   const { first, last } = placeCoverage(set, place.id, facts);
@@ -244,9 +230,9 @@ export async function renderEducationPlacePage(route: EducationPlaceRoute, local
           key={place.id}
           set={set}
           place={place}
-          facts={facts.filter(f => f.geographyId === place.id && series.some(({ id }) => id === f.indicatorId))}
-          labels={Object.fromEntries(series.map(({ id }) => [id, educationSeriesLabel(messages, id)]))}
-          headingLabels={Object.fromEntries(series.map(({ heading }) => [heading, t(`heading.${heading}`)]))}
+          facts={list.facts}
+          labels={list.labels}
+          headingLabels={list.headingLabels}
           title={t(`place.headingLead.${set}`)}
           metaLine={<Message messages={messages} id={`education.latest.place.${set}`} values={{ period: period(headline.year), value: <LatestFigure value={countLabel(messages, headline)} />, place: name }} />}
           navigation={navigation}

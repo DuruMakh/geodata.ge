@@ -13,7 +13,7 @@
 // union below supports validation of any response; registration narrows it to
 // the one kind of answer the selected tool returns.
 import { z } from "zod";
-import { observationSchema, periodKeySchema } from "../factQuery/schemas";
+import { observationSchema, periodKeySchema, topicObservationSchema } from "../factQuery/schemas";
 
 const caveat = z
   .object({
@@ -105,13 +105,15 @@ const coverage = z.object({
   excludedEntities: z.array(bilingualExcludedEntity), returnedCount: z.number().int(), expectedCount: z.number().int(),
   requestedPeriods: z.array(z.string()).optional(), availablePeriods: z.array(z.string()).length(2).nullable().optional(),
 });
-const endpoint = observationSchema.pick({ year: true, period: true, value: true, availability: true, missingReason: true, missingReasonEn: true, basis: true, valueDefinition: true, valueDefinitionEn: true, valueDefinitionId: true, sourceIds: true, documentIds: true });
+const endpoint = observationSchema.pick({ year: true, period: true, value: true, availability: true, missingReason: true, missingReasonEn: true, basis: true, valueDefinition: true, valueDefinitionEn: true, valueDefinitionId: true, sourceIds: true, documentIds: true }).extend({ periodLabel: z.string().optional(), periodEnd: z.string().optional() });
 const dataShapes = {
   observations: z.object({ observations: z.array(observationSchema), coverage }),
+  /** query_indicators: topic observations, years only. */
+  topicObservations: z.object({ observations: z.array(topicObservationSchema), coverage: coverage.omit({ requestedPeriods: true, availablePeriods: true }) }),
   comparisons: z.object({
     comparisons: z.array(z.object({
       comparisonId: z.string(), datasetId: z.string(), entityId: z.string(), entityLabelKa: z.string(), entityLabelEn: z.string().min(1), seriesId: z.string(), seriesLabelKa: z.string(), seriesLabelEn: z.string().min(1),
-      measure: z.string(), unit: observationSchema.shape.unit, from: endpoint, to: endpoint,
+      measure: z.string(), unit: topicObservationSchema.shape.unit, from: endpoint, to: endpoint,
       absoluteChange: z.number().nullable(), percentageChange: z.number().nullable(), percentagePointChange: z.number().nullable(),
       comparability: z.enum(["comparable", "limited", "not_comparable"]), reasons: z.array(z.string()), reasonsEn: z.array(z.string()), caveatIds: z.array(z.string()),
     })),
@@ -120,14 +122,15 @@ const dataShapes = {
   ranking: z.object({
     entries: z.array(z.object({
       position: z.number(), tied: z.boolean(), entityId: z.string(), entityLabelKa: z.string(), entityLabelEn: z.string().min(1), seriesId: z.string(), seriesLabelKa: z.string(), seriesLabelEn: z.string().min(1),
-      value: z.number().nullable(), unit: observationSchema.shape.unit, basis: observationSchema.shape.basis, caveatIds: z.array(z.string()), period: z.string().optional(), calculationBasePeriod: periodKeySchema.optional(),
+      value: z.number().nullable(), unit: topicObservationSchema.shape.unit, basis: observationSchema.shape.basis, caveatIds: z.array(z.string()), period: z.string().optional(), calculationBasePeriod: periodKeySchema.optional(), periodEnd: z.string().optional(),
     })),
     universe: z.object({ dimension: z.enum(["series", "entities"]), description: z.string(), descriptionEn: z.string().min(1), candidateCount: z.number(), eligibleCount: z.number(), returnedCount: z.number(), cutoffSplitsTie: z.boolean() }),
     exclusions: z.array(z.object({ reason: z.string(), reasonEn: z.string().min(1), ids: z.array(z.string()) })), rankingDefinition: z.string(), rankingDefinitionEn: z.string().min(1),
   }),
   catalogue: z.object({
-    datasets: z.array(z.object({ datasetId: z.string(), budgetScope: z.string(), labelKa: z.string(), labelEn: z.string().min(1), years: z.array(z.number()).length(2), entityTypes: z.array(z.string()), measures: z.array(z.string()), periods: z.array(z.string()).length(2).optional(), measureNotes: z.record(z.string(), z.string()).optional(), measureNotesEn: z.record(z.string(), z.string()).optional(), measureNotesKa: z.record(z.string(), z.string()).optional() })),
-    series: z.array(z.object({ seriesId: z.string(), labelKa: z.string(), labelEn: z.string().min(1), level: z.string(), parentSeriesId: z.string().nullable(), availability: z.enum(["served", "calculated_total", "taxonomy_only"]), years: z.array(z.number()), yearsByMeasure: z.record(z.string(), z.array(z.number())).optional(), periods: z.array(z.string()).length(2).optional(), periodsByMeasure: z.record(z.string(), z.array(z.string()).length(2)).optional(), datasetId: z.string().optional(),
+    datasets: z.array(z.object({ datasetId: z.string(), budgetScope: z.string(), labelKa: z.string(), labelEn: z.string().min(1), years: z.array(z.number()).length(2), entityTypes: z.array(z.string()), measures: z.array(z.string()), periods: z.array(z.string()).length(2).optional(), measureNotes: z.record(z.string(), z.string()).optional(), measureNotesEn: z.record(z.string(), z.string()).optional(), measureNotesKa: z.record(z.string(), z.string()).optional(),
+      pageUrlKa: z.string().optional(), pageUrlEn: z.string().optional(), periodKind: z.enum(["year", "school_year"]).optional(), seriesCount: z.number().int().optional(), entityCount: z.number().int().optional(), seriesOmitted: z.number().int().optional() })),
+    series: z.array(z.object({ seriesId: z.string(), labelKa: z.string(), labelEn: z.string().min(1), level: z.string(), parentSeriesId: z.string().nullable(), availability: z.enum(["served", "calculated_total", "taxonomy_only"]), years: z.array(z.number()), yearsByMeasure: z.record(z.string(), z.array(z.number())).optional(), periods: z.array(z.string()).length(2).optional(), periodsByMeasure: z.record(z.string(), z.array(z.string()).length(2)).optional(), datasetId: z.string().optional(), headingKa: z.string().optional(), headingEn: z.string().optional(), unit: z.string().optional(),
       coicopCode: z.string().optional(), firstPeriod: periodKeySchema.optional(), measures: z.array(z.enum(["yoy_pct", "cumulative_pct"])).optional(),
       historyNotes: z.array(z.object({ boundaryYear: z.number().int(), noteKa: z.string().min(1), noteEn: z.string().min(1) })).optional(),
     })).optional(),
@@ -139,6 +142,12 @@ const dataShapes = {
     websitePages: z.array(z.object({ topicId: z.string(), labelKa: z.string(), labelEn: z.string().min(1), topicLabelKa: z.string(), topicLabelEn: z.string().min(1), urlKa: z.string(), urlEn: z.string() })).optional(),
     websitePagesNoteKa: z.string().optional(),
     websitePagesNoteEn: z.string().optional(),
+    breaks: z.array(z.object({ breakId: z.string(), seriesIds: z.array(z.string()), referenceDate: z.string(), reasonEn: z.string().min(1) })).optional(),
+    bulkUrl: z.string().optional(),
+    headings: z.array(z.object({ headingKa: z.string().nullable(), headingEn: z.string().nullable(), seriesCount: z.number().int() })).optional(),
+    seriesOmitted: z.number().int().optional(),
+    seriesOmittedNoteKa: z.string().optional(),
+    seriesOmittedNoteEn: z.string().optional(),
   }),
   sources: z.object({
     sources: z.array(z.object({
@@ -156,7 +165,7 @@ export const toolOutput = z
     /** How complete the answer is, not whether the call worked. */
     status: z.enum(["ok", "partial", "empty"]),
     /** Present on every successful answer. Its shape is what differs between tools. */
-    data: z.union([dataShapes.observations, dataShapes.comparisons, dataShapes.ranking, dataShapes.catalogue, dataShapes.sources]),
+    data: z.union([dataShapes.observations, dataShapes.topicObservations, dataShapes.comparisons, dataShapes.ranking, dataShapes.catalogue, dataShapes.sources]),
     meta: responseMeta,
   })
   .loose();
@@ -181,5 +190,5 @@ const rankingMeta = responseMeta.extend({
 
 export function outputSchemaFor(tool: string) {
   const kind = tool === "describe_coverage" ? "catalogue" : tool === "get_sources" ? "sources" : tool === "compare" ? "comparisons" : tool === "rank" ? "ranking" : "observations";
-  return toolOutput.extend({ kind: z.literal(kind), data: dataShapes[kind], ...(kind === "ranking" ? { meta: rankingMeta } : {}) });
+  return toolOutput.extend({ kind: z.literal(kind), data: tool === "query_indicators" ? dataShapes.topicObservations : dataShapes[kind], ...(kind === "ranking" ? { meta: rankingMeta } : {}) });
 }

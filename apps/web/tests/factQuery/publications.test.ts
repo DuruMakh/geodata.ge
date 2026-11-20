@@ -77,7 +77,8 @@ describe("catalogue.json", () => {
       "national-expenditure",
       "national-revenue",
       "regional-economies",
-    ]);
+      ...snapshot.topics.datasets.map((dataset) => dataset.page.datasetId),
+    ].sort());
     for (const dataset of catalogue.datasets) {
       expect(dataset.series.length, `${dataset.datasetId} series`).toBeGreaterThan(0);
     }
@@ -318,6 +319,7 @@ describe("dataset publications", () => {
       "inflation-cities.json",
       "inflation-products.csv",
       "inflation-products.json",
+      ...snapshot.topics.datasets.map((dataset) => `topics/${dataset.page.datasetId}.csv`),
       "manifest.json",
     ]);
   });

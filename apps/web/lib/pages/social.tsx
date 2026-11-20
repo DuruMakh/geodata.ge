@@ -5,12 +5,12 @@ import { JsonLd } from "../../components/seo/json-ld";
 import { PageHeader } from "../../components/shell/page-header";
 import { SocialExplorer } from "../../components/social/social-explorer";
 import { loadServedExplorerData } from "../data/servedData";
-import { loadServedSocialData, toClientSocialFact } from "../data/social/importSocial";
-import { SOCIAL_GEORGIA } from "../data/social/types";
+import { loadServedSocialData } from "../data/social/importSocial";
 import { projectGdpFact } from "../explorer/clientData";
 import { coverageLabel } from "../explorer/coverageLabel";
 import { formatInUnit, UNIT_PERSONS } from "../explorer/format";
-import { SOCIAL_SECTIONS, socialCoverage, socialTopicSeries, socialViews, type SocialTopicId } from "../explorer/social";
+import { SOCIAL_SECTIONS, socialCoverage, socialViews, type SocialTopicId } from "../explorer/social";
+import { socialTopicPageData } from "../explorer/socialPageData";
 import { Message } from "../i18n/message";
 import { message } from "../i18n/messages";
 import { getMessages } from "../i18n/messages.server";
@@ -22,6 +22,8 @@ import { loadGdpWorkbookSources } from "../methodology/workbookSources";
 import { fiscalMetadata } from "../seo/metadata";
 import { explorerDatasetJsonLd } from "../seo/structuredData";
 import { resolveSiteUrl } from "../siteUrl";
+// Imported from the place pages' module, as before the MCP work: that import is what puts the place explorer in these
+// pages' client manifest, and importing it from socialPageData instead changed their shipped JS (out/ stays byte-identical).
 import { loadSocialWorkbookSources } from "./social-places";
 import { topicSection, ALL_DATA_PATH } from "../navigation/navTree";
 
@@ -47,16 +49,11 @@ export async function renderSocialTopicPage(locale: Locale, section: SocialTopic
   ]);
   const { messages } = presentation;
   const t = (key: string) => message(messages, `social.${key}`);
-  const series = socialTopicSeries(section);
-  // The page receives only Georgia's observations of the series its list shows.
-  const ids = new Set<string>(series.map(({ id }) => id));
-  const shown = served.filter(f => ids.has(f.indicatorId) && f.geographyId === SOCIAL_GEORGIA);
-  const facts = shown.map(toClientSocialFact);
+  const { series, shown, facts, labels, headingLabels } = socialTopicPageData(served, messages, section);
   const { min, max } = socialCoverage(section, "amount", facts, gdpFacts);
   const href = topicHref(section);
   const title = t(`page.${section}.title`), description = t(`page.${section}.summary`);
   const lastReviewedAt = shown.map(f => f.lastReviewedAt).sort().at(-1)!, origin = resolveSiteUrl();
-  const headingLabels = Object.fromEntries(series.map(({ heading }) => [heading, t(`heading.${heading}`)]));
   const latest = facts.filter(f => f.indicatorId === series[0].id).sort((a, b) => a.year - b.year).at(-1)!;
   const hubLabel = message(messages, "common.health");
   const crumbs = [
@@ -77,7 +74,7 @@ export async function renderSocialTopicPage(locale: Locale, section: SocialTopic
     <ExplorerPage containerQueries={false}>
       <PageHeader locale={locale} messages={messages} crumbs={crumbs} coverage={coverageLabel(messages, locale, min, max, lastReviewedAt)} />
       <SocialExplorer key={section} section={section} facts={facts} gdpFacts={gdpFacts} gdpSources={gdpSources} breaks={breaks}
-        labels={Object.fromEntries(series.map(({ id }) => [id, t(`series.${id}`)]))} headingLabels={headingLabels}
+        labels={labels} headingLabels={headingLabels}
         latestLine={<Message messages={messages} id={`social.latest.${section}`} values={{ period: latest.year, value: <LatestFigure value={latestFigure(section, latest.value)} /> }} />}
         sources={section === "funded-pension" ? sources.pensionFund : sources.ssa} lastReviewedAt={lastReviewedAt} siteOrigin={origin} />
     </ExplorerPage>

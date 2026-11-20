@@ -31,7 +31,8 @@ There is no REST query API, no write access, no accounts, and no datasets beyond
 
 /**
  * The three "Where the data is" lines. The bulk-file count is the manifest's (the publications built from the snapshot
- * plus the topic CSVs), and the MCP datasets are the catalogue's, so neither list drifts from what is published.
+ * plus the topic CSVs), and the MCP datasets are the catalogue's, so neither list drifts from what is published: the
+ * core datasets by name, the chart pages' topic datasets by their number (catalogue.json names each).
  */
 let where: string | undefined;
 
@@ -39,11 +40,12 @@ function whereTheDataIs(): string {
   if (where !== undefined) return where;
   const snapshot = loadPackagedSnapshot();
   const bulkFiles = buildAllPublications(snapshot).filter((file) => file.fileName !== "manifest.json").length + MANIFEST_SIDE_FILE_NAMES.length;
-  const datasets = catalogueData(snapshot).datasets.map((dataset) => dataset.labelEn);
+  const topics = new Set(snapshot.topics.datasets.map((dataset) => dataset.page.datasetId));
+  const core = catalogueData(snapshot).datasets.filter((dataset) => !topics.has(dataset.datasetId)).map((dataset) => dataset.labelEn);
   where = `**Where the data is:**
 - Each chart page's line below opens with its latest figure, where it has one.
-- Bulk files: \`${SITE}/downloads/data/manifest.json\` lists all ${bulkFiles} bulk files with their hashes.
-- The read-only MCP connection at \`${SITE}/mcp\` serves ${datasets.slice(0, -1).join(", ")} and ${datasets.at(-1)}.`;
+- Bulk files: \`${SITE}/downloads/data/manifest.json\` lists all ${bulkFiles} bulk files with their hashes; each topic dataset's CSV is at \`${SITE}/downloads/data/topics/<datasetId>.csv\`.
+- The read-only MCP connection at \`${SITE}/mcp\` serves ${core.join(", ")}, and the data of ${topics.size} Explorer chart pages (topic datasets, listed in \`${SITE}/downloads/data/catalogue.json\`).`;
   return where;
 }
 

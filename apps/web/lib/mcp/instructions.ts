@@ -22,7 +22,7 @@
 export function serverInstructions(): string {
   return `Use describe_coverage with short keywords before querying. Use returned IDs and supported measures; keep expectedDataVersion consistent. Preserve units, missing values, projections and caveats. Cite the returned original documents and Fiscal.ge. For product questions, search first and request only the required series and dates. Use the published files for bulk analysis.
 
-Fiscal.ge serves reviewed data on Georgia's state and municipal budgets, government debt, the general government balance, GDP and economic sectors (annual), and consumer-price and product inflation (monthly). Never assume a year, series or entity exists; describe_coverage says what does. If a phrase finds nothing, retry the principal word or browse the dataset: an empty match is not proof that the data is absent. If the data does not cover the question, say so; do not fill the gap from other sources. For website topics this connection does not serve, a search without datasetId returns websitePages; each page's HTML carries its year-by-year table: if you can open it, quote from it with the link, in the user's language; never from memory.
+Fiscal.ge serves reviewed data on Georgia's state and municipal budgets, government debt, the general government balance, GDP and economic sectors (annual), consumer-price and product inflation (monthly), and, through query_indicators, every other chart page on the site (annual; school years print as 2025/26; survey figures are estimates). Never assume a year, series or entity exists; check describe_coverage. If a phrase finds nothing, retry the principal word or browse the dataset: an empty match is not proof that the data is absent. If the data does not cover the question, say so; do not fill the gap from other sources. For non-data website pages, a search without datasetId returns websitePages: if you can open one, quote from it with the link, in the user's language; never from memory.
 
 NEVER COMBINE
 - National revenue is consolidated budget RECEIPTS; national expenditure is STATE-BUDGET expenditure. They are different accounting boundaries: revenue minus expenditure is NOT a deficit, surplus or balance.
@@ -33,13 +33,13 @@ NEVER COMBINE
 VALUES
 - Read each value's unit. Budget, municipal and debt amounts are nominal GEL; GDP and sector values can be GEL, USD, constant-2015 USD, per person (output, not income) or percent. Never convert currencies or price bases yourself.
 - Percentages are already percent: 7.5 means 7.5%. Inflation contributions are percentage points.
-- availability "missing": never estimate, interpolate or report it as 0. Missing is not zero; zero is a real value.
-- Budget, debt and balance basis is actual, planned or projection (actual wins over planned); GDP, sector and inflation figures are "published" or "preliminary". Say when a figure is planned, a projection or preliminary.
+- availability "missing": never estimate or interpolate it. Missing is not zero; zero is a real value.
+- Budget, debt and balance basis is actual, planned or projection (actual wins over planned); GDP, sector and inflation figures are "published" or "preliminary". Say when a figure is not final.
 
 INFLATION
-- Inflation is the only monthly dataset. Annual, monthly and 12-month-average rates are different measures; monthly changes do not add up to the annual rate. Take the latest month from describe_coverage.
-- A city's rate is not its region's or its cost of living, and the national rate is not the average of cities. Comparing with the National Bank target is not a verdict on policy. Do not state causes of price changes.
-- Contributions and cumulative product changes are Fiscal.ge calculations over Geostat inputs (cumulative: base is the preceding December); say so. In inflation-products.csv, index_100 values (mom_index_100, yoy_index_100) are indices: 100 means no price change.
+- Inflation is the only monthly dataset. Annual, monthly and 12-month-average rates are different measures; monthly changes do not add up to the annual rate. Latest month: describe_coverage.
+- A city's rate is not its region's or its cost of living; the national rate is not the average of cities. Comparing with the National Bank target is not a verdict on policy. Do not state causes of price changes.
+- Contributions and cumulative product changes are Fiscal.ge calculations over Geostat inputs (cumulative base: the preceding December); say so. In inflation-products.csv, index_100 values (mom_index_100, yoy_index_100) are indices: 100 means no price change.
 
 ANSWERING
 - The reader is the public, not a developer reading an API. IDs, codes, measure and enum names are for calling tools: Do not put them in the answer. Use the returned labels in the user's language.

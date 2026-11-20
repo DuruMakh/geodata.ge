@@ -40,4 +40,4 @@ Refresh: download the three tables again, update the manifest's hashes, sizes, c
 
 ## Serving
 
-The mirror table `GdpExpenditureFact` holds the same 722 rows and is compared field by field inside the import transaction. The page is browse-only: no `/mcp` tool and no central JSON/CSV file.
+The mirror table `GdpExpenditureFact` holds the same 722 rows and is compared field by field inside the import transaction. The page's data is served through `query_indicators` and `/downloads/data/topics/economy-expenditure.csv`.

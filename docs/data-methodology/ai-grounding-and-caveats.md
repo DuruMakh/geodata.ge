@@ -4,7 +4,7 @@ This document is the single owner of the caveat catalogue used by the fact-query
 
 **A code appearing in this document is not evidence that its trigger is correct.** The firing and non-firing tests under `apps/web/tests/factQuery/caveats/` are what establish that, and they have twice caught a rule attaching a warning to figures it did not describe. Read this document to learn what a code means; read the tests to learn when it fires.
 
-## Bilingual response contract, schema 1.7.0
+## Bilingual response contract, schema 1.8.0
 
 The shared `/mcp` endpoint and the manifest-listed `/downloads/data/` publications
 use one reviewed snapshot. The manifest also lists ten topic CSVs written earlier in
@@ -31,32 +31,64 @@ No language input is needed. Existing valid requests continue to work; catalogue
 search accepts either language. Schema 1.7.0 adds the optional `searchMatch` field
 (`all_words` or `some_words`) to catalogue searches, which match whole words, word
 beginnings of four letters or more, and Georgian stems rather than letters inside a
-word. `all_words` with no entries means nothing matched. A `some_words` answer lists
-first the entries whose dataset's own label a search word meets, then those meeting the
-rarer words over more of their label, ahead of those whose label's last word no search
-word meets (a closing `total`, `სულ` or `ჯამი` does not count as that last word, so
-Total taxes leads `გადასახადები თბილისში`), and also carries `searchMatchNoteKa` and
+word. `all_words` with no entries means nothing matched. Entries are ordered by rules that each
+only break the ties of the rule before (equal entries keep catalogue order). First by how
+much of the search the entry's dataset name meets, a word counting more the fewer entries
+meet it, so the subject comes first: `food prices` lists Consumer price inflation's series
+first. A topic dataset does not come first when its group's name alone meets every word
+of the search (the groups are named like the budget's functions: Education, Health and
+social protection, Housing and construction), so the budget datasets lead for words that name
+a budget function. When every word matched, an entry the search names in full with its last
+word comes before one it does not (`personal income tax` holds Income tax); then entries
+whose own or dataset name meets the rarer words come first, so `food inflation` lists Food
+before Headline inflation, and an all-words answer ends there. A `some_words` answer
+orders differently across datasets and within one, for a reason. Across datasets (no
+`datasetId`) the dataset's name still comes first, because entries of different datasets
+say little by their own labels. Within one dataset (`datasetId` given) there is no
+dataset name to tell entries apart, so the entries that meet more of the search's words
+come first (`ministry of health programmes` lists a health programme before Solid waste
+management programme), then those meeting the rarer words over more of their label.
+Both orders then use the dataset's stated preference, the entries the search names in
+full (`hospitals` for `hospitals in Kutaisi`), `total` entries (`crime rate` lists All
+recorded crimes before Drug crimes), and the share of the entry's best label that the
+search covers, halved when the search meets no label's last word (a closing `total`,
+`სულ` or `ჯამი` does not count as that last word, so Total taxes leads
+`გადასახადები თბილისში`). A `some_words` answer also carries `searchMatchNoteKa` and
 `searchMatchNoteEn`: only some words matched, so the entries may be about something
 else; before saying the data is not served, retry the missing part with another word or
-browse the dataset. A search without `datasetId` also returns the optional
+browse the dataset. A search reads a repeated word once and at most its first 16
+different words; when it leaves words out, `searchMatchNoteKa` and `searchMatchNoteEn`
+say how many (after the some-words note, when there is one), so the client can search
+with fewer words. This bounds the cost of one search. A search without `datasetId` also returns the optional
 `websitePages` (at most five, with `websitePagesNoteKa` and `websitePagesNoteEn`) for
-Fiscal.ge pages whose figures this service does not serve: names and links in both
-languages, never a value. The note tells the assistant that each page's HTML carries its
-year-by-year table: quote from it with the link when the page can be opened, never from memory. A page is linked when every word of the search meets its
-names, topic or extra words by the same whole words, word beginnings of four letters or
-more, and Georgian stems; an id-like search links none. When the answer has entries with
-every word, nothing else is tried. Otherwise, failing the whole search, the
+Fiscal.ge pages that are not datasets themselves (today, Year in review under Analysis,
+whose figures come from the served budget datasets): names and links in both languages,
+never a value. The note tells the assistant that such a page's figures come from the
+served datasets: take a figure from them, give the page's link, never quote from memory. A page is linked when every word of the search meets its names, topic or extra
+words by the same whole words, word beginnings of four letters or more, and Georgian
+stems; an id-like search links none. When the answer has entries with every word, only
+the pages that meet every word are linked. Otherwise, failing the whole search, the
 search is tried without the words that name a served place, all words of one of its
 names together (`შიდა ქართლის` names Shida Kartli; `შიდა` alone names nothing). Failing
 that too, each word looks for its own pages, best first by how many of the words they
 meet: a word that no served entry meets links all its pages, and a word that only budget
-programmes' names hold links a page it names in full (`pension` links Pensions). A word
-the served data holds otherwise looks for no page. Joining words (`of`, `from`, `with`, `or`,
-`მიხედვით` and the like) never count. A word that meets a dataset's own label (`prices`
-meets Consumer price inflation) looks for no page either, unless no served entry meets
-it and the other words reach beyond that dataset; it then links only the pages whose own
-name it meets, and only when those are all of one topic (`house prices` links Home
-prices; `bread prices`, `debt overview` and `consumer debt` link nothing).
+programmes' names hold links a page it names in full. A search that a served topic
+dataset answers (`hospitals in Kutaisi`, `average pension`, `home prices Tbilisi`) links no
+page of that topic: its dataset is the answer. A word the served data holds otherwise
+looks for no page but still counts in the order. Joining words (`of`, `from`, `with`,
+`or`, `მიხედვით` and the like) never count, and a word that meets a dataset's own label
+(`prices` meets Consumer price inflation) looks for no page either, unless no served
+entry meets it and the other words reach beyond that dataset; it then links only the
+pages whose own name it meets, and only when those are all of one topic.
+A page the search names whose rows hold none of its words, because it has no total row
+to carry its title (Interest rates lists the National Bank rate and the banks' rates side
+by side), answers with its top-level rows.
+A search without `datasetId` lists at most 20 series of one topic dataset, the first in
+the search's order; the core datasets' series are not cut. The dataset's entry then
+carries `seriesOmitted`, and the answer `seriesOmitted` with `seriesOmittedNoteKa` and
+`seriesOmittedNoteEn`, which point to the same or a narrower search with that
+`datasetId` (`exports` meets 1,937 series, most of them trade products, against about
+500 that fit one answer).
 `status` still describes the served series and entities only. A top-N ranking gives full
 source records for the returned rows and names the other documents read to fix the order
 by id in `inputDocumentIds`, resolved with `get_sources` and that source's `sourceId`; a
@@ -106,7 +138,7 @@ cumulative percentage is Fiscal.ge's calculation. Missing inputs stay unavailabl
 not zero, and annual/cumulative rankings preserve every exclusion.
 
 MCP modern `2026-07-28` and legacy `2025-11-25` are transport revisions, separate
-from schema 1.7.0. SDK tests prove protocol, serialization and response contracts;
+from schema 1.8.0. SDK tests prove protocol, serialization and response contracts;
 they do not prove an external AI client's menus, account eligibility or interpretation.
 Current official application guidance and the unverified human-flow boundary are
 recorded in `docs/deployment.md#human-application-guidance-and-evidence-boundary`.
@@ -114,8 +146,9 @@ recorded in `docs/deployment.md#human-application-guidance-and-evidence-boundary
 The server instructions (`apps/web/lib/mcp/instructions.ts`) are one static text of at
 most 4,096 characters, with an opening of at most 512. Claude Code cuts server
 instructions at 4,096 characters (2,048 before v2.1.296) and Codex and ChatGPT advise a
-self-contained first 512, so the rules that change an answer come first: what is not
-served, the boundaries never to combine, units and missing values, inflation, and how to
+self-contained first 512, so the rules that change an answer come first: what Fiscal.ge
+serves (the core datasets and, through `query_indicators`, every other chart page),
+the boundaries never to combine, units and missing values, inflation, and how to
 present and cite. Year ranges, entity counts and call mechanics live in the tool
 descriptions, which read them from the snapshot, and are not repeated. The per-schema
 history developers need is on `/connect` only. Tests pin the length limits and the
@@ -147,7 +180,7 @@ This field exists because `compare` previously consulted a hand-maintained list 
 
 ## The catalogue
 
-42 codes are registered.
+51 codes are registered.
 
 | Code | Severity | Comparison effect | Owner document |
 | --- | --- | --- | --- |
@@ -193,6 +226,15 @@ This field exists because `compare` previously consulted a hand-maintained list 
 | `debt_gdp_share_vintage` | note | `none` | `ai-grounding-and-caveats.md#debt_gdp_share_vintage` |
 | `deficit_general_government_scope` | severe | `none` | `ai-grounding-and-caveats.md#deficit_general_government_scope` |
 | `deficit_projection` | severe | `breaks` | `ai-grounding-and-caveats.md#deficit_projection` |
+| `topic_survey_estimate` | note | `none` | `ai-grounding-and-caveats.md#topic_survey_estimate` |
+| `topic_derived` | note | `none` | `ai-grounding-and-caveats.md#topic_derived` |
+| `topic_partial_period` | severe | `limits` | `ai-grounding-and-caveats.md#topic_partial_period` |
+| `topic_dated_period` | severe | `limits` | `ai-grounding-and-caveats.md#topic_dated_period` |
+| `topic_planned` | severe | `none` | `ai-grounding-and-caveats.md#topic_planned` |
+| `topic_preliminary` | note | `limits` | `ai-grounding-and-caveats.md#topic_preliminary` |
+| `topic_projection` | severe | `breaks` | `ai-grounding-and-caveats.md#topic_projection` |
+| `topic_series_break` | severe | `breaks` | `ai-grounding-and-caveats.md#topic_series_break` |
+| `topic_general_government_scope` | severe | `none` | `ai-grounding-and-caveats.md#topic_general_government_scope` |
 
 ### `planned_values`
 
@@ -733,6 +775,133 @@ The sibling of `budget_scopes_differ`, one boundary further out. General governm
 **English.** Future-year values are an IMF forecast, not a recorded outcome.
 
 A separate code from `debt_service_projection` rather than one shared projection rule, because the reason differs and the reason is what a reader needs. A debt-service projection is a schedule of obligations already incurred; this is a forecast of an economy, and the next WEO vintage can revise it. One message cannot say both truthfully.
+
+
+### `topic_survey_estimate`
+
+**Severity:** note  
+**Comparison effect:** `none`  
+**Owner document:** `ai-grounding-and-caveats.md#topic_survey_estimate`
+
+**Trigger.** Any available topic cell whose value status is `survey_estimate`. Topic cells only (`query_indicators`); a missing cell carries no status disclosure.
+
+**Georgian.** ეს მნიშვნელობები კვლევის შეფასებებია და არა აღწერის რაოდენობები; მათ შერჩევის ცდომილება ახლავს.
+
+**English.** These values are survey estimates, not census counts, and carry sampling error.
+
+Survey figures (the Labour Force Survey and the like) are estimates from a sample. The disclosure travels with the figure so an answer does not read it as a count.
+
+### `topic_derived`
+
+**Severity:** note  
+**Comparison effect:** `none`  
+**Owner document:** `ai-grounding-and-caveats.md#topic_derived`
+
+**Trigger.** Any available topic cell whose value status is `derived`. Topic cells only (`query_indicators`); a missing cell carries no status disclosure.
+
+**Georgian.** ამ მაჩვენებელს Fiscal.ge ითვლის წყაროს გამოქვეყნებული მონაცემებიდან ისე, როგორც მისი გვერდი (გამოქვეყნებული მწკრივების ჯამი ან სხვაობა, მშპ-ში წილი, საშუალო); წყარო მას არ აქვეყნებს. მითითებული წყაროები გამოთვლის საწყისი მონაცემებია.
+
+**English.** Fiscal.ge calculates this figure from the source's published figures, as its page does (a sum or difference of published rows, a share of GDP, an average); the source does not publish it. The cited sources are its inputs.
+
+Fiscal.ge publishes a few figures the source does not, such as a trade balance computed from exports and imports, a share of GDP, or a demography total that adds a city's separately printed row. The calculation is the page's own, the one its methodology page describes; the cited sources are the published inputs. A topic source records no `derivation` text, so the message does not send the assistant to look for one.
+
+### `topic_partial_period`
+
+**Severity:** severe  
+**Comparison effect:** `limits`  
+**Owner document:** `ai-grounding-and-caveats.md#topic_partial_period`
+
+**Trigger.** Any available topic cell whose value status is `partial`. Topic cells only (`query_indicators`); a missing cell carries no status disclosure.
+
+**Georgian.** მნიშვნელობა მხოლოდ წყაროს მიერ გამოქვეყნებულ თვეებს მოიცავს და არა მთელ წელს; თვეების რაოდენობა მის განმარტებაშია მითითებული.
+
+**English.** A value covers only the months the source published, not the full year; its value definition gives the number of months.
+
+A partial year (for example a money-transfer year with months the source left blank) is still served, but it is not a full-year figure. The number of months stands in that row's own value definition, not in this shared message, so a request spanning several partial years states each one's months on its own row.
+
+### `topic_dated_period`
+
+**Severity:** severe  
+**Comparison effect:** `limits`  
+**Owner document:** `ai-grounding-and-caveats.md#topic_dated_period`
+
+**Trigger.** Any available topic cell that carries a `periodEnd` date, that is, a stock at a date inside the year rather than at year end. Topic cells only (`query_indicators`); a missing cell carries no disclosure.
+
+**Georgian.** მნიშვნელობა ასახავს მდგომარეობას წლის შიგნით არსებული თარიღისთვის და არა წლის ბოლოსთვის, ამიტომ მასთან დაკავშირებული ცვლილება წელზე მოკლე პერიოდს მოიცავს; თარიღი მის განმარტებაშია მითითებული.
+
+**English.** A value is the position on a date inside the year, not at year end, so a change to or from it spans less than a year; its value definition gives the date.
+
+The one dated latest-amount point on Foreign debt and Reserves (for example gross external debt on 30 June or reserves on 30 September of the latest year) is served under its calendar year, but a change from the previous year-end to it covers six or nine months, not a year. `compare` therefore reports such a change as limited, and a change-type ranking entry carries this caveat. The date stands in that row's own value definition and in the observation's `periodEnd`.
+
+### `topic_planned`
+
+**Severity:** severe  
+**Comparison effect:** `none`  
+**Owner document:** `ai-grounding-and-caveats.md#topic_planned`
+
+**Trigger.** Any available topic cell whose `basis` is `planned`. Topic cells only (`query_indicators`); a missing cell carries no status disclosure.
+
+**Georgian.** შედეგი შეიცავს გეგმურ (და არა ფაქტობრივ) მაჩვენებელს.
+
+**English.** The result contains planned rather than actual values.
+
+The same sentence as `planned_values`, under a topic code. `planned_values` names `series:year`, which in a topic request across several places would mark every place's cell in that year planned; this code names the `entity:series:year` cell.
+
+### `topic_preliminary`
+
+**Severity:** note  
+**Comparison effect:** `limits`  
+**Owner document:** `ai-grounding-and-caveats.md#topic_preliminary`
+
+**Trigger.** Any available topic cell whose `basis` is `preliminary`. Topic cells only (`query_indicators`); a missing cell carries no status disclosure.
+
+**Georgian.** ეს მონაცემები წინასწარია და შეიძლება გადაიხედოს.
+
+**English.** These observations are preliminary and subject to revision.
+
+Scoped by status, never by year, like `sectors_preliminary`. A comparison with a preliminary end is limited, not refused.
+
+### `topic_projection`
+
+**Severity:** severe  
+**Comparison effect:** `breaks`  
+**Owner document:** `ai-grounding-and-caveats.md#topic_projection`
+
+**Trigger.** Any available topic cell whose `basis` is `projection`. Topic cells only (`query_indicators`); a missing cell carries no status disclosure.
+
+**Georgian.** ეს მნიშვნელობები პროგნოზია და არა დაფიქსირებული შედეგი.
+
+**English.** These values are a projection, not a recorded outcome.
+
+A projection is not an outcome, so a change into a projected year is not a change (as for `debt_service_projection` and `deficit_projection`).
+
+### `topic_series_break`
+
+**Severity:** severe  
+**Comparison effect:** `breaks`  
+**Owner document:** `ai-grounding-and-caveats.md#topic_series_break`
+
+**Trigger.** A reviewed series break (the `*-series-breaks.csv` registers under `data/imports/`) starts after the earliest and no later than the latest requested year, for a series the response returns. It marks that series' available cells (`entity:series:year`). Topic cells only (`query_indicators`).
+
+**Georgian.** მოთხოვნილ წლებში მწკრივს გადამოწმებული წყვეტა აქვს ({detail}); ამ წერტილის გავლით ცვლილება არ გამოითვლება.
+
+**English.** A reviewed series break falls inside the requested years ({detail}); no change is computed across this point.
+
+`{detail}` is each break's reference date and the register's English reason, joined with `; `. The registers are English-only, so the Georgian sentence carries the English reason rather than an invented translation. `compare` states the same fact as the reason a break makes a pair `not_comparable` (`comparison.seriesBreak`), and returns both endpoint values with no change.
+
+### `topic_general_government_scope`
+
+**Severity:** severe  
+**Comparison effect:** `none`  
+**Owner document:** `ai-grounding-and-caveats.md#topic_general_government_scope`
+
+**Trigger.** Any request on the `expenditure-types` dataset (Spending by type), unconditionally, as `deficit_general_government_scope` is on the balance; its `affects` lists the returned cells. A `describe_coverage` search that lists the dataset carries it too, so a search such as `government spending` brings the scope with the dataset.
+
+**Georgian.** ხარჯები ეკონომიკური კლასიფიკაციით ზოგადი მთავრობის მაჩვენებელია: სახელმწიფო ბიუჯეტი, ავტონომიური რესპუბლიკები და მუნიციპალიტეტები, კონსოლიდირებულად (მათ შორის ტრანსფერები ერთხელ ითვლება). ეს არ არის სახელმწიფო ბიუჯეტის ხარჯები: არასოდეს მიუმატოთ, გამოაკლოთ ან შეადაროთ ის აქ მოწოდებულ სახელმწიფო ბიუჯეტის ხარჯებს ან შემოსულობებს; მათი ჯამები განსხვავდება.
+
+**English.** Spending by type is general government: the state budget, the autonomous republics and the municipalities, consolidated (transfers between them counted once). It is not the state budget's expenditure: never add it to, subtract it from or compare it with the state budget's expenditure or receipts served here; their totals differ.
+
+Spending by type is the Ministry of Finance's general government statement (GFSM 2001): the state budget, the autonomous republics and the municipalities, consolidated (`expenditure-types.md`). Its total (29.7 billion GEL in 2025) is not the state budget's expenditure (27.7 billion GEL, `national-expenditure`), which includes debt repayment and lending and leaves out the municipalities. The page says so in its own subtitle; the caveat carries it to an assistant, which otherwise sees two "total government spending" figures for one year and only one of them with a scope.
 
 
 ## Published bulk files

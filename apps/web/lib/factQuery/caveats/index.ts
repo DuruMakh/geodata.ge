@@ -9,6 +9,7 @@ import { MINISTRIES_CAVEAT_RULES } from "./rules.ministries";
 import { MUNICIPAL_CAVEAT_RULES } from "./rules.municipal";
 import { NATIONAL_CAVEAT_RULES } from "./rules.national";
 import { SECTORS_CAVEAT_RULES } from "./rules.sectors";
+import { TOPIC_CAVEAT_RULES } from "./rules.topics";
 
 /**
  * The single ordered rule list. Spec section 9.2 is the contract (22 codes),
@@ -20,8 +21,9 @@ import { SECTORS_CAVEAT_RULES } from "./rules.sectors";
  * rules.national.ts), and the debt and general-government-balance datasets add
  * four and two codes of their own. The GDP overview and economic sectors add
  * two and one, registered on 2026-09-14 after shipping inline, and inflation
- * adds four; the GDP overview's preliminary cells share gdp_preliminary. The count is asserted
- * against ai-grounding-and-caveats.md rather than written here.
+ * adds four; the GDP overview's preliminary cells share gdp_preliminary. The topic datasets add eight
+ * (rules.topics.ts). The count is asserted against ai-grounding-and-caveats.md rather than
+ * written here.
  */
 export const CAVEAT_RULES: readonly CaveatRule[] = [
   ...NATIONAL_CAVEAT_RULES,
@@ -33,7 +35,11 @@ export const CAVEAT_RULES: readonly CaveatRule[] = [
   ...SECTORS_CAVEAT_RULES,
   ...INFLATION_CAVEAT_RULES,
   ...INFLATION_PRODUCT_CAVEAT_RULES,
+  ...TOPIC_CAVEAT_RULES,
 ];
+
+/** What query_indicators evaluates. The core rules are not run on topic cells: several gate on entity or series ids a topic dataset shares (region.adjara). */
+export { TOPIC_CAVEAT_RULES };
 
 export { evaluateCaveats } from "./engine";
 export type { CaveatContext, CaveatRule } from "./engine";

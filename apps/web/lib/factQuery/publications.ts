@@ -34,6 +34,8 @@ import { queryMunicipal } from "./queryMunicipal";
 import { queryNational } from "./queryNational";
 import { AGGREGATE_ONLY_MUNICIPAL_CODES } from "./types";
 import type { Caveat, Coverage, DatasetId, FactQueryResponse, FactQuerySnapshot, ResolvedSource } from "./types";
+import { topicPeriodLabel, unpackTopicFacts } from "./topics/store";
+import type { AnyDatasetId } from "./topics/types";
 
 export type PublicationHeader = {
   schemaVersion: string;
@@ -70,6 +72,11 @@ const DATASET_IDS: readonly DatasetId[] = [
   "inflation-products",
 ];
 
+/** The core datasets, then the topic datasets the snapshot holds, in page order: the ids the catalogue and the manifest describe. */
+function publishedDatasetIds(snapshot: FactQuerySnapshot): AnyDatasetId[] {
+  return [...DATASET_IDS, ...snapshot.topics.datasets.map((dataset) => dataset.page.datasetId as AnyDatasetId)];
+}
+
 /**
  * Repeated at the top of every published file so a download read on its own,
  * without llms.txt or the manifest, still states its version, licence and
@@ -103,7 +110,7 @@ function sha256(bytes: Buffer): string {
  * always carries CoverageData, and anything else is a build-stopping bug
  * rather than something to publish.
  */
-export function catalogueData(snapshot: FactQuerySnapshot, datasetId?: DatasetId): CoverageData {
+export function catalogueData(snapshot: FactQuerySnapshot, datasetId?: AnyDatasetId): CoverageData {
   const response = describeCoverage(snapshot, datasetId === undefined ? {} : { datasetId });
   if (response.kind !== "catalogue") {
     throw new Error(`describeCoverage(${datasetId ?? "all"}) returned ${response.kind}, expected catalogue`);
@@ -114,7 +121,7 @@ export function catalogueData(snapshot: FactQuerySnapshot, datasetId?: DatasetId
 export function buildCatalogueFile(snapshot: FactQuerySnapshot): PublicationArtifact {
   const overview = catalogueData(snapshot);
 
-  const datasets = DATASET_IDS.map((datasetId) => {
+  const datasets = publishedDatasetIds(snapshot).map((datasetId) => {
     const data = catalogueData(snapshot, datasetId);
     const summary = data.datasets.find((entry) => entry.datasetId === datasetId);
     if (summary === undefined) throw new Error(`No dataset summary for ${datasetId}`);
@@ -122,6 +129,11 @@ export function buildCatalogueFile(snapshot: FactQuerySnapshot): PublicationArti
       ...summary,
       series: data.series ?? [],
       ...(data.entities !== undefined ? { entities: data.entities } : {}),
+      // A topic dataset with too many series to list (Trade products) lists its totals, as describe_coverage does, and
+      // says how many it left out and where its CSV holds them all.
+      ...(data.seriesOmitted !== undefined
+        ? { headings: data.headings, seriesOmitted: data.seriesOmitted, seriesOmittedNoteKa: data.seriesOmittedNoteKa, seriesOmittedNoteEn: data.seriesOmittedNoteEn, bulkUrl: data.bulkUrl }
+        : {}),
     };
   });
 
@@ -165,7 +177,7 @@ export function buildManifestFile(
     ...publicationHeader(snapshot),
     // Spec 12.1 assigns coverage to the manifest. Without it a client had to
     // fetch 12 MB to learn which years the municipal file spans.
-    coverage: DATASET_IDS.map((datasetId) => {
+    coverage: publishedDatasetIds(snapshot).map((datasetId) => {
       const summary = catalogueData(snapshot, datasetId).datasets.find((entry) => entry.datasetId === datasetId);
       if (summary === undefined) throw new Error(`No dataset summary for ${datasetId}`);
       return { datasetId, firstYear: summary.years[0], lastYear: summary.years[1] };
@@ -468,6 +480,36 @@ export function buildGdpCsv(snapshot: FactQuerySnapshot): PublicationArtifact {
   return { fileName: "gdp-overview.csv", bytes: Buffer.from(text, "utf8"), rowCount: rows.length };
 }
 
+export const TOPIC_CSV_COLUMNS = [
+  "year", "period_label", "entity_id", "entity_label_ka", "entity_label_en", "series_id", "series_label_ka", "series_label_en",
+  "heading_ka", "heading_en", "value", "unit", "basis", "value_status", "period_end", "months_reported", "source_ids",
+] as const;
+
+/**
+ * One file per topic dataset, `topics/<datasetId>.csv`: a row for every cell the page shows, a missing cell as an empty
+ * value with no basis, no status and no sources (never 0). Units are the dataset's own tokens. The internal workbook-location
+ * columns of the reviewed CSVs are not part of the public file.
+ */
+export function buildTopicCsvFiles(snapshot: FactQuerySnapshot): PublicationArtifact[] {
+  return snapshot.topics.datasets.map((dataset) => {
+    const entityById = new Map(dataset.entities.map((entity) => [entity.entityId, entity]));
+    const seriesById = new Map(dataset.series.map((series) => [series.seriesId, series]));
+    const rows = unpackTopicFacts(dataset, snapshot.topics).map((fact) => {
+      const entity = entityById.get(fact.entityId)!;
+      const series = seriesById.get(fact.seriesId)!;
+      const present = fact.value !== null;
+      return [
+        fact.year, topicPeriodLabel(dataset, fact.year) ?? "", entity.entityId, entity.labelKa, entity.labelEn,
+        series.seriesId, series.labelKa, series.labelEn, series.headingKa ?? "", series.headingEn ?? "",
+        fact.value, series.unit, present ? fact.basis : "", present ? fact.status : "", fact.periodEnd ?? "", fact.monthsReported ?? "",
+        present ? fact.sourceIds.join(";") : "",
+      ].map(csvEscape).join(",");
+    });
+    const bytes = Buffer.from(`\uFEFF${TOPIC_CSV_COLUMNS.join(",")}\n${rows.join("\n")}\n`, "utf8");
+    return { fileName: `topics/${dataset.page.datasetId}.csv`, bytes, rowCount: rows.length };
+  });
+}
+
 /**
  * `sideFiles` are published files this module does not build (the topic CSVs
  * `prepare-public-datasets` and `prepare-inflation` write earlier in the
@@ -507,6 +549,7 @@ export function buildAllPublications(snapshot: FactQuerySnapshot, sideFiles: rea
     buildInflationCitiesJson(snapshot, inflationCities, inflationCitiesCsv),
     inflationProductsCsv,
     buildInflationProductsJson(snapshot, inflationProductsCsv),
+    ...buildTopicCsvFiles(snapshot),
   ];
   return [...artifacts, buildManifestFile(snapshot, [...artifacts, ...sideFiles])];
 }

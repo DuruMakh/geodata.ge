@@ -55,8 +55,8 @@ export const changeMuseumAreaSelection = (area: MuseumArea, state: TopicState, n
   changeScienceCultureSelection(state, museumAreaSeries(area), next, facts);
 
 /** The measures whose rows move between areas: Georgia's `total` is a region's own group. */
-const AREA_MEASURES: ReadonlySet<string> = new Set(["museum_visitors", "museum_tours", "museum_exhibitions", "museums"]);
-const isAreaGroup = (group: string) => group === "total" || (SCIENCE_CULTURE_REGIONS as readonly string[]).includes(group);
+export const AREA_MEASURES: ReadonlySet<string> = new Set(["museum_visitors", "museum_tours", "museum_exhibitions", "museums"]);
+export const isAreaGroup = (group: string) => group === "total" || (SCIENCE_CULTURE_REGIONS as readonly string[]).includes(group);
 
 /**
  * The hash a link to another area's page carries: this page's selection, moved to that area (Visitors stays Visitors, between

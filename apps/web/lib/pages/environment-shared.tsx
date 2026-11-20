@@ -8,10 +8,10 @@ import { loadServedEnvironmentData, toClientEnvironmentFact } from "../data/envi
 import { ENVIRONMENT_CITIES, ENVIRONMENT_SOURCES, type EnvironmentCity } from "../data/environment/types";
 import type { MunicipalRegion } from "../data/municipal/types";
 import { REGIONAL_ECONOMY_REGIONS } from "../data/regionalEconomies/importRegionalEconomies";
-import { environmentLabelKey } from "../explorer/environment";
 
 // The Environment pages take these from here, beside the page frame.
 export { environmentLatest, environmentTranslate } from "../explorer/environment";
+export { environmentLabels, environmentListFacts } from "../explorer/environmentPageData";
 import { ENVIRONMENT_AREAS, environmentAreaIndexHref, environmentAreaRoutes, type EnvironmentArea, type EnvironmentAreaTopic } from "../explorer/environmentAreas";
 import { coverageLabel } from "../explorer/coverageLabel";
 import { I18nProvider } from "../i18n/provider";
@@ -57,10 +57,6 @@ export function environmentAreaName(presentation: Presentation, area: Environmen
   const region = ENVIRONMENT_AREA_PAGES[ENVIRONMENT_AREAS.indexOf(area)]!;
   return publicLabel(presentation.locale, region.id, region.kaLabel, presentation.englishLabels);
 }
-
-/** The names of a list's series, without prefixes: the heading each row sits under names its measure and unit. */
-export const environmentLabels = (presentation: Presentation, ids: readonly string[]): Record<string, string> =>
-  Object.fromEntries(ids.map(id => [id, message(presentation.messages, `environment.${environmentLabelKey(id)}`)]));
 
 /** The served facts as the client gets them, the page's presentation, its last review date and the site's origin. */
 export async function loadEnvironmentPage(locale: Locale, scopes: readonly MessageScope[] = [], labelIds: readonly string[] = []) {

@@ -4,14 +4,12 @@ import { ExplorerPage } from "../../components/explorer-shell/explorer-page";
 import { PageHeader } from "../../components/shell/page-header";
 import { JsonLd } from "../../components/seo/json-ld";
 import { BreadcrumbJsonLd } from "../../components/seo/breadcrumb-json-ld";
-import type { MunicipalRegion } from "../data/municipal/types";
-import { REGIONAL_ECONOMY_REGIONS } from "../data/regionalEconomies/importRegionalEconomies";
 import { coverageLabel } from "../explorer/coverageLabel";
+import { regionAreaLabels, regionAreaPages } from "../explorer/regionAreaPages";
 import { I18nProvider } from "../i18n/provider";
 import { clientPresentation, getPresentation } from "../i18n/presentation.server";
 import { getMessages } from "../i18n/messages.server";
 import { message } from "../i18n/messages";
-import { publicLabel } from "../i18n/labels";
 import { pageHref } from "../i18n/routes";
 import type { Locale, Presentation } from "../i18n/types";
 import { loadSourcedWorkbookSources, type SourcedWorkbookPublicSource } from "../methodology/workbookSources";
@@ -54,7 +52,7 @@ export function regionAreaFrame<Area extends string, Fact extends { year: number
   const { hub, indexHref, indexKey, areas, areaSlug, areaHref, mapId } = config;
   const datasetId = hub === "moneyBanks" ? "money" : hub;
   /** Georgia and the eleven regions; Georgia's English name is the catalogue's `georgia` label. */
-  const areaPages: readonly MunicipalRegion[] = areas.map(area => area === "georgia" ? { id: area, kaLabel: "საქართველო", sortOrder: 0 } : REGIONAL_ECONOMY_REGIONS.find(region => region.id === mapId(area))!);
+  const areaPages = regionAreaPages(areas, mapId);
   const labelIds = areaPages.map(area => area.id);
 
   const areaStaticParams = () => areas.map(area => ({ id: areaSlug(area) }));
@@ -66,8 +64,7 @@ export function regionAreaFrame<Area extends string, Fact extends { year: number
 
   /** Names of Georgia and the regions, in the page's language; region names are the shared region labels. */
   function areaLabels(presentation: Presentation): Record<Area, string> {
-    return Object.fromEntries(areas.map((area, index) => [area, area === "georgia" ? message(presentation.messages, `${hub}.area.georgia`)
-      : publicLabel(presentation.locale, areaPages[index].id, areaPages[index].kaLabel, presentation.englishLabels)])) as Record<Area, string>;
+    return regionAreaLabels(presentation, hub, areas, areaPages);
   }
 
   async function indexPageMetadata(locale: Locale) {

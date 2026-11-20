@@ -7,9 +7,8 @@ import { BreadcrumbJsonLd } from "../../components/seo/breadcrumb-json-ld";
 import type { MunicipalRegion } from "../data/municipal/types";
 import { REGIONAL_ECONOMY_REGIONS } from "../data/regionalEconomies/importRegionalEconomies";
 import { loadServedScienceCultureData } from "../data/scienceCulture/importScienceCulture";
-import { SCIENCE_CULTURE_REGIONS, SCIENCE_CULTURE_SOURCES, type ScienceCultureFact } from "../data/scienceCulture/types";
+import { SCIENCE_CULTURE_SOURCES, type ScienceCultureFact } from "../data/scienceCulture/types";
 import { coverageLabel } from "../explorer/coverageLabel";
-import { type ScienceCultureSeriesDefinition } from "../explorer/scienceCulture";
 import { MUSEUMS_HREF, MUSEUM_AREAS, museumAreaHref, museumAreaSeries, museumAreaSlug, museumMapId, type MuseumArea } from "../explorer/scienceCultureMuseums";
 import { I18nProvider } from "../i18n/provider";
 import { clientPresentation, getPresentation } from "../i18n/presentation.server";
@@ -17,7 +16,7 @@ import { getMessages } from "../i18n/messages.server";
 import { message } from "../i18n/messages";
 import { publicLabel } from "../i18n/labels";
 import { pageHref } from "../i18n/routes";
-import type { Locale, Messages, Presentation } from "../i18n/types";
+import type { Locale, Presentation } from "../i18n/types";
 import { loadSourcedWorkbookSources, type SourcedWorkbookPublicSource } from "../methodology/workbookSources";
 import { fiscalMetadata } from "../seo/metadata";
 import { areaTitleForm, latestYearOf } from "../seo/placeTitleForms";
@@ -35,15 +34,6 @@ import { topicSection, ALL_DATA_PATH } from "../navigation/navTree";
  */
 export async function loadScienceCultureWorkbookSources(locale: Locale): Promise<SourcedWorkbookPublicSource[]> {
   return loadSourcedWorkbookSources("science-culture", locale, row => SCIENCE_CULTURE_SOURCES.includes(row.source_id));
-}
-
-/** Display names of the series a list shows; a region's row is named as Georgia's (the heading says what it counts, the page names the area). */
-export function scienceCultureLabels(messages: Messages, definitions: readonly ScienceCultureSeriesDefinition[]): Record<string, string> {
-  const regions: readonly string[] = SCIENCE_CULTURE_REGIONS;
-  return Object.fromEntries(definitions.map(({ id }) => {
-    const [, measure, group] = id.split(".");
-    return [id, message(messages, `scienceCulture.series.${measure}.${regions.includes(group) ? "total" : group}`)];
-  }));
 }
 
 /** Georgia and the eleven regions, in the picker's and previous/next order; Georgia's English name is the catalogue's `georgia` label. */

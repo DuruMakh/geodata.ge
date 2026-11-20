@@ -23,19 +23,26 @@ import { buildResponseMeta } from "./meta";
 import { queryMinistries } from "./queryMinistries";
 import { queryDebt } from "./queryDebt";
 import { queryDeficit } from "./queryDeficit";
+import { queryIndicators } from "./queryIndicators";
 import { inflationObservations } from "./queryInflation";
 import { queryInflationProducts } from "./queryInflationProducts";
 import { queryMunicipal } from "./queryMunicipal";
 import { queryNational } from "./queryNational";
 import { compareInput } from "./schemas";
 import { selectSources } from "./sources";
+import { breakBetween, isTopicIntervalUnit, isTopicPercentUnit, topicBreakDetail, topicNumber } from "./topics/store";
+import type { AnyDatasetId, TopicDatasetId } from "./topics/types";
 import type { Observation } from "./observations";
-import type { Basis, DatasetId, FactQueryError, FactQueryResponse, FactQuerySnapshot, Measure, Unit } from "./types";
+import type { Basis, FactQueryError, FactQueryResponse, FactQuerySnapshot, Measure } from "./types";
 
 export type ComparisonEndpoint = {
   year: number;
   /** Monthly endpoints only (inflation): YYYY-MM. */
   period?: string;
+  /** School-year periods only (topic datasets): `2015/16`. */
+  periodLabel?: string;
+  /** An amount dated other than its year's end (topic datasets: the latest Foreign debt and Reserves point): its date. */
+  periodEnd?: string;
   value: number | null;
   availability: "available" | "missing";
   missingReason: string | null;
@@ -51,7 +58,7 @@ export type ComparisonEndpoint = {
 
 export type Comparison = {
   comparisonId: string;
-  datasetId: DatasetId;
+  datasetId: AnyDatasetId;
   entityId: string;
   entityLabelKa: string;
   entityLabelEn: string;
@@ -59,7 +66,7 @@ export type Comparison = {
   seriesLabelKa: string;
   seriesLabelEn: string;
   measure: Measure;
-  unit: Unit;
+  unit: Observation["unit"];
   from: ComparisonEndpoint;
   to: ComparisonEndpoint;
   /** GEL (or GEL-per-resident) difference. Null for percentage measures. */
@@ -147,6 +154,7 @@ const REASON_NON_POSITIVE_BASE = "comparison.nonPositiveBase";
 const REASON_GDP_STANDARD_BREAK = "comparison.gdpStandardBreak";
 const REASON_HISTORICAL_JOIN = "comparison.historicalJoin";
 const REASON_BASKET_REWEIGHTED = "comparison.basketReweighted";
+const REASON_SERIES_BREAK = "comparison.seriesBreak";
 
 function errorResponse(snapshot: FactQuerySnapshot, error: FactQueryError): FactQueryResponse {
   return { kind: "error", status: "error", error, meta: buildResponseMeta(snapshot) };
@@ -156,6 +164,8 @@ function endpointOf(observation: Observation): ComparisonEndpoint {
   return {
     year: observation.year,
     ...(observation.period !== undefined ? { period: observation.period } : {}),
+    ...(observation.periodLabel !== undefined ? { periodLabel: observation.periodLabel } : {}),
+    ...(observation.periodEnd !== undefined ? { periodEnd: observation.periodEnd } : {}),
     value: observation.value,
     availability: observation.availability,
     missingReason: observation.missingReason,
@@ -221,7 +231,7 @@ export function compare(snapshot: FactQuerySnapshot, rawInput: unknown): FactQue
   // formula). Their own caveats are recomputed below with `comparison` set,
   // because two rules exist only for comparisons.
   let endpointResult: FactQueryResponse;
-  let datasetId: DatasetId;
+  let datasetId: AnyDatasetId;
 
   if (target.dataset === "national") {
     datasetId = target.side === "revenue" ? "national-revenue" : "national-expenditure";
@@ -293,6 +303,9 @@ export function compare(snapshot: FactQuerySnapshot, rawInput: unknown): FactQue
     datasetId = "general-government-balance";
     // No seriesIds: the dataset has exactly one series.
     endpointResult = queryDeficit(snapshot, { years, measure: input.measure }, comparisonWindow);
+  } else if (target.dataset === "topic") {
+    datasetId = target.datasetId as TopicDatasetId;
+    endpointResult = queryIndicators(snapshot, { datasetId, seriesIds: target.seriesIds, entityIds: target.entityIds, years, expectedDataVersion: input.expectedDataVersion });
   } else {
     datasetId = "municipal-expenditure";
     endpointResult = queryMunicipal(
@@ -342,6 +355,7 @@ export function compare(snapshot: FactQuerySnapshot, rawInput: unknown): FactQue
     byPair.set(key, pair);
   }
 
+  const topicDataset = target.dataset === "topic" ? snapshot.topics.datasets.find((entry) => entry.page.datasetId === datasetId) : undefined;
   const gdpStandardBreak = endpointCaveats.some((c) => c.code === "gdp_sna_break_2010");
 
   const comparisons: Comparison[] = [];
@@ -354,14 +368,22 @@ export function compare(snapshot: FactQuerySnapshot, rawInput: unknown): FactQue
     const reasons: ServiceMessageKey[] = [];
 
     if (from.value === null || to.value === null) reasons.push(REASON_ENDPOINT_MISSING);
-    if (from.basis !== null && to.basis !== null && from.basis !== to.basis) reasons.push(REASON_BASIS_DIFFERS);
+    // A topic's preliminary year is the same kind of figure as its recorded ones, still to be revised: topic_preliminary
+    // limits a change into it rather than refusing it, as a plan or a projection beside an outturn is refused.
+    const preliminaryBeside = topicDataset !== undefined && [from.basis, to.basis].includes("preliminary") && [from.basis, to.basis].every((basis) => basis === "preliminary" || basis === "published" || basis === "actual");
+    if (from.basis !== null && to.basis !== null && from.basis !== to.basis && !preliminaryBeside) reasons.push(REASON_BASIS_DIFFERS);
     // The STRUCTURED identity, never the display prose. valueDefinition is written
     // for a reader: it stays constant across the municipal 2015 portal-fallback
     // break (so a +572.1% education "growth" was published, and rank turned it
     // into a 64-row league table) and it VARIES when a ministries program is
     // merely renamed (so 48 of 48 programs were excluded and rankings came back
     // empty). It is wrong in both directions and must not decide this.
-    if (definitionChangeBreaks(from.valueDefinitionId, to.valueDefinitionId)) reasons.push(REASON_DEFINITION_CHANGED);
+    // A topic series keeps one definition over its years: its ids differ only by a partial year's months or a dated
+    // point's date, which topic_partial_period and topic_dated_period limit.
+    if (topicDataset === undefined && definitionChangeBreaks(from.valueDefinitionId, to.valueDefinitionId)) reasons.push(REASON_DEFINITION_CHANGED);
+    // A reviewed series break between the two years: the series is not the same quantity across it.
+    const seriesBreak = topicDataset && breakBetween(topicDataset.breaks, from.seriesId, fromYear, toYear, topicDataset.page.periodKind);
+    if (seriesBreak) reasons.push(REASON_SERIES_BREAK);
 
     // A coverage-changing caveat that describes one endpoint and not the other.
     const codes = Array.from(new Set([...from.caveatIds, ...to.caveatIds]));
@@ -378,12 +400,17 @@ export function compare(snapshot: FactQuerySnapshot, rawInput: unknown): FactQue
     let percentagePointChange: number | null = null;
 
     if (comparable && from.value !== null && to.value !== null) {
-      if (isPercentage) {
-        percentagePointChange = to.value - from.value;
+      // A topic series measured in percent (its unit token) changes in percentage points, as a percentage measure does.
+      if (isPercentage || (topicDataset !== undefined && isTopicPercentUnit(from.unit))) {
+        percentagePointChange = topicDataset ? topicNumber(to.value - from.value) : to.value - from.value;
       } else {
-        absoluteChange = to.value - from.value;
-        if (from.value > 0) {
-          percentageChange = ((to.value - from.value) / from.value) * 100;
+        absoluteChange = topicDataset ? topicNumber(to.value - from.value) : to.value - from.value;
+        // A temperature (an interval-scale unit token) changes by a difference only: no percentage of it means anything (R33).
+        if (topicDataset !== undefined && isTopicIntervalUnit(from.unit)) {
+          percentageChange = null;
+        } else if (from.value > 0) {
+          // A topic change is rounded to the 12 significant digits its values carry.
+          percentageChange = topicDataset ? topicNumber(((to.value - from.value) / from.value) * 100) : ((to.value - from.value) / from.value) * 100;
         } else {
           // Spec section 6.6: a zero or negative base makes percentage change
           // unavailable but does NOT invalidate the absolute difference.
@@ -424,8 +451,8 @@ export function compare(snapshot: FactQuerySnapshot, rawInput: unknown): FactQue
       percentageChange,
       percentagePointChange,
       comparability,
-      reasons: reasons.map(key => serviceMessage(snapshot, "ka", key)),
-      reasonsEn: reasons.map(key => serviceMessage(snapshot, "en", key)),
+      reasons: reasons.map(key => serviceMessage(snapshot, "ka", key, key === REASON_SERIES_BREAK && seriesBreak ? { detail: topicBreakDetail(seriesBreak) } : {})),
+      reasonsEn: reasons.map(key => serviceMessage(snapshot, "en", key, key === REASON_SERIES_BREAK && seriesBreak ? { detail: topicBreakDetail(seriesBreak) } : {})),
       caveatIds: Array.from(new Set([...from.caveatIds, ...to.caveatIds])).sort(),
     });
   }

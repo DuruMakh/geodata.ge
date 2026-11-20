@@ -20,13 +20,13 @@ The two social images at `/opengraph-image` and `/en/opengraph-image` use explic
 are generated at build time. All human pages remain prerendered and `/mcp` remains
 the sole request-time route.
 
-Data schema **1.7.0** includes current-product inflation and reviewed language
+Data schema **1.8.0** includes current-product inflation and reviewed language
 companions. The authoritative tool inventory is `tools/list`; dataset families
 and coverage are in `catalogue.json`. `manifest.json` lists every publication
 with row count, bytes and SHA-256; the manifest itself is one additional artifact,
 not one of its listed files. Derive changing inventories from these owners rather
 than retaining old fixed counts. Requests do not gain a language argument.
-Schema 1.7.0 adds the optional `searchMatch` field (`all_words` or `some_words`) to
+Schema 1.8.0 adds `query_indicators` and the topic datasets: one dataset per Explorer chart page (every page that is not one of the core datasets' pages), annual, with one CSV per dataset at `/downloads/data/topics/<datasetId>.csv`; the 11 core datasets keep their tools. A search without `datasetId` now finds a page's data in its topic dataset and names in `websitePages` only the pages that are not datasets themselves (today Year in review, whose figures come from the served budget datasets). Schema 1.7.0 adds the optional `searchMatch` field (`all_words` or `some_words`) to
 catalogue searches, which now match whole words and Georgian stems, with
 `searchMatchNoteKa`/`searchMatchNoteEn` when only some words matched; a search without
 `datasetId` may also carry the optional `websitePages` links to website-only pages, with
@@ -40,7 +40,7 @@ and in the published `inflation-products.json` and `catalogue.json`. Schema 1.6.
 caching output enums must refresh discovery; clients requiring schema 1.6.0 must
 update their validation. Request shapes stay unchanged. The one non-additive change is that
 when the per-measure maps are absent, readers fall back to the series' `years` and `periods`.
-Clients must accept additive fields and data schema 1.7.0; byte-identical response
+Clients must accept additive fields and data schema 1.8.0; byte-identical response
 compatibility is not promised. Transport revisions are a separate contract:
 modern `2026-07-28` and preserved legacy `2025-11-25` share the endpoint.
 Translation changes alter `dataVersion`, and so do the website page names and search words
@@ -119,7 +119,7 @@ function (see "The `/mcp` runtime" below).
   first; that mirror changed no published figure (every build proved it equal to
   the CSVs) and is retired (`docs/data-methodology/database-import.md`).
 - **Function size**: Vercel refuses any function over 250 MB. The only function
-  is `/mcp` (`apps/web/api/mcp.ts`), whose bundle holds the about 32 MB snapshot
+  is `/mcp` (`apps/web/api/mcp.ts`), whose bundle holds the about 39 MB snapshot
   named in `vercel.json` `includeFiles`; pages are static files and have no
   function.
 - **CI** (`.github/workflows/ci.yml`, every PR and every push to `main`):
@@ -486,7 +486,7 @@ and publications remain static. The endpoint exposes the read-only tools listed
 by `tools/list` through pinned server SDK 2.2.0. Stateless Streamable HTTP supports
 modern `2026-07-28` discovery and per-request metadata, and preserved legacy
 `2025-11-25` initialization. Both return finite JSON responses; neither creates
-sessions or subscriptions. GET and DELETE remain 405. The data schema is 1.7.0,
+sessions or subscriptions. GET and DELETE remain 405. The data schema is 1.8.0,
 independent of either protocol revision.
 The legacy adapter also retains `2025-06-18`, `2025-03-26`, `2024-11-05` and
 `2024-10-07`; the modern era is never proposed during legacy initialization.
@@ -496,8 +496,8 @@ There is no session store, model invocation, authentication, or write tool.
 
 All MCP data answers use `apps/web/lib/factQuery/generated/snapshot.json`, prepared
 at build time and cached once per function instance. It is written minified: 32.1 MB
-on 2026-10-13 (46.3 MB indented), about 0.2 s to read and 0.3 s to parse on the first
-request of each instance. The server text built from it (coverage and tool descriptions)
+on 2026-10-13, before the topic datasets (46.3 MB indented; about 0.2 s to read and 0.3 s to parse on the first
+request of each instance), and 38.9 MB with them. The server text built from it (coverage and tool descriptions)
 and the tools' JSON Schemas are also built once per instance; the server instructions are
 static text in `lib/mcp/instructions.ts` and are not built from the snapshot. The sole runtime
 network exception is `lib/mcp/upstashCounter.ts`, which sends fixed Redis rate-limit
@@ -842,7 +842,7 @@ actual alert/recovery delivery must be demonstrated before operations is verifie
 From `apps/web`, use an explicit target and independently reviewed release identity:
 
 ```text
-npx tsx scripts/smoke-mcp.ts --url <target-mcp-url> --expected-schema 1.7.0 --expected-data-version <reviewed-sha256> --output <existing-output-directory/report.json>
+npx tsx scripts/smoke-mcp.ts --url <target-mcp-url> --expected-schema 1.8.0 --expected-data-version <reviewed-sha256> --output <existing-output-directory/report.json>
 ```
 
 The operator command has no production default, authentication input, new secret

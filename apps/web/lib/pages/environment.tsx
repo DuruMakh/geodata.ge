@@ -4,7 +4,7 @@ import { getMessages } from "../i18n/messages.server";
 import { message } from "../i18n/messages";
 import type { Locale } from "../i18n/types";
 import { fiscalMetadata } from "../seo/metadata";
-import { environmentLabels, environmentLatest, environmentTranslate, loadEnvironmentPage, loadEnvironmentWorkbookSources, renderEnvironmentFrame } from "./environment-shared";
+import { environmentLabels, environmentLatest, environmentListFacts, environmentTranslate, loadEnvironmentPage, loadEnvironmentWorkbookSources, renderEnvironmentFrame } from "./environment-shared";
 
 const hrefOf = (section: EnvironmentTopicId) => ENVIRONMENT_SECTIONS.find(item => item.id === section)!.href;
 
@@ -19,8 +19,7 @@ export async function renderEnvironmentPage(locale: Locale, section: Environment
   const { presentation } = page;
   const series = environmentTopicSeries(section);
   // Each page receives only the observations its list can show.
-  const ids = new Set(series.map(item => item.id));
-  const facts = page.facts.filter(f => ids.has(f.indicatorId));
+  const facts = environmentListFacts(page.facts, series);
   const { min: firstYear, max: lastYear } = environmentCoverage(section, facts);
   const t = environmentTranslate(presentation);
   const title = t(`page.${section}.title`);
@@ -35,7 +34,7 @@ export async function renderEnvironmentPage(locale: Locale, section: Environment
   return renderEnvironmentFrame({
     ...page, href: hrefOf(section), title, description: t(`page.${section}.summary`), firstYear, lastYear,
     measures: [...new Set(series.map(item => t(`heading.${item.heading}`)))],
-    children: <EnvironmentExplorer key={section} scope={{ kind: "topic", section }} facts={facts} labels={environmentLabels(presentation, [...ids])} sources={sources}
+    children: <EnvironmentExplorer key={section} scope={{ kind: "topic", section }} facts={facts} labels={environmentLabels(presentation, series.map(item => item.id))} sources={sources}
       lastReviewedAt={page.lastReviewedAt} siteOrigin={page.origin} title={title} latest={line} />,
   });
 }

@@ -236,6 +236,27 @@ describe("MCP tool results", () => {
     expect(text).toContain("/downloads/data/");
   });
 
+  it("points an oversized topic answer at that dataset's CSV and a core answer at the manifest", () => {
+    const topic = `https://fiscal.ge/downloads/data/topics/education-schools.csv`;
+    const message = (datasetId: string | undefined, bytes: number) => {
+      const response = tooLargeResponse(snapshot, { returned: 600, bytes, datasetId });
+      if (response.kind !== "error") throw new Error("expected an error envelope");
+      return `${response.error.messageKa} ${response.error.messageEn}`;
+    };
+    for (const bytes of [0, 600_000]) {
+      expect(message("education-schools", bytes).split(topic)).toHaveLength(3);
+      expect(message("education-schools", bytes)).not.toContain("manifest.json");
+      expect(message("municipal-expenditure", bytes)).toContain("https://fiscal.ge/downloads/data/manifest.json");
+      expect(message(undefined, bytes)).toContain("https://fiscal.ge/downloads/data/manifest.json");
+    }
+    // A topic id the snapshot does not hold is no link.
+    expect(message("education-nowhere", 0)).toContain("https://fiscal.ge/downloads/data/manifest.json");
+
+    const response = queryNational(snapshot, { side: "expenditure", seriesIds: ["expenditure.total"], years: [2024], measure: "amount_gel" });
+    response.meta.generatedAt += "x".repeat(LIMITS.resultBytes);
+    expect(boundedToolResult(snapshot, response, "cells", "education-schools").content[0]!.text).toContain(topic);
+  });
+
   it("rejects a result over the cell cap before it is serialized", () => {
     const codes = snapshot.municipal.municipalities.map((m) => m.code);
     const years = Array.from({ length: 11 }, (_, i) => 2015 + i);

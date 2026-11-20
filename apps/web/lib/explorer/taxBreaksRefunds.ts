@@ -1,4 +1,6 @@
 import { TAX_BREAKS_REFUNDS_INDICATORS, type ClientTaxBreaksRefundsFact, type TaxBreaksRefundsIndicator } from "../data/taxBreaksRefunds/types";
+import { message } from "../i18n/messages";
+import type { Messages } from "../i18n/types";
 import type { ClientNationalGdpFact } from "./clientData";
 import { shareOfGdp } from "./debtExplorer";
 import type { ResolvedPeriodRange } from "./periodRange";
@@ -10,6 +12,7 @@ export type TaxBreaksRefundsView = "amount" | "gdp";
 const VIEWS: readonly TaxBreaksRefundsView[] = ["amount", "gdp"];
 /** The small headings of the series list. */
 export type TaxBreaksRefundsHeading = "breaks" | "vat" | "income" | "refunds";
+const HEADINGS: readonly TaxBreaksRefundsHeading[] = ["breaks", "vat", "income", "refunds"];
 export type TaxBreaksRefundsSeries = TopicSeriesDefinition & { id: TaxBreaksRefundsIndicator; heading: TaxBreaksRefundsHeading };
 
 const headingOf = (id: TaxBreaksRefundsIndicator): TaxBreaksRefundsHeading =>
@@ -18,6 +21,14 @@ const headingOf = (id: TaxBreaksRefundsIndicator): TaxBreaksRefundsHeading =>
 export const TAX_BREAKS_REFUNDS_SERIES: readonly TaxBreaksRefundsSeries[] = TAX_BREAKS_REFUNDS_INDICATORS.map(id => ({ id, reference: false, heading: headingOf(id) }));
 /** The page's two totals, both on at arrival (an approved exception to the one-total rule; Project_Definition §2). */
 export const TAX_BREAKS_REFUNDS_DEFAULT: readonly string[] = ["tax_breaks.total", "tax_refunds.total"];
+
+/** Each series' name and each heading of the list, in a locale's messages: the page's and its workbook's words. */
+export function taxBreaksRefundsNames(messages: Messages): { labels: Record<string, string>; headings: Record<TaxBreaksRefundsHeading, string> } {
+  const t = (key: string) => message(messages, `taxBreaksRefunds.${key}`);
+  const labels = Object.fromEntries(TAX_BREAKS_REFUNDS_INDICATORS.map(id => [id, t(`label.${id}`)]));
+  const headings = Object.fromEntries(HEADINGS.map(heading => [heading, t(`heading.${heading}`)])) as Record<TaxBreaksRefundsHeading, string>;
+  return { labels, headings };
+}
 
 export type TaxBreaksRefundsState = TopicState & { view: TaxBreaksRefundsView };
 

@@ -43,81 +43,36 @@ import { DEMOGRAPHY_RAW_ROOT, latestDemographyVintage } from "../data/demography
 import { pageHref } from "../i18n/routes";
 import { loadReviewedSourceManifest } from "../methodology/sourceManifest";
 import { hashDataVersion } from "./canonical";
-import { MCP_SERVED_PAGES } from "./servedPages";
+import { CORE_SERVED_PAGES } from "./servedPages";
+import { buildTopicsSnapshot } from "./topics/registry";
+import type { AnyDatasetId, TopicDatasetId } from "./topics/types";
+import { isCleanHttpsUrl, methodologyManifestDocument, PUBLIC_SITE_ORIGIN } from "./manifestDocuments";
 import { resolvePublicSources, type ManifestDocument } from "./sources";
 import { AGGREGATE_ONLY_MUNICIPAL_CODES, DEBT_SERIES_LABELS_KA, DEFICIT_SERIES_ID, SCHEMA_VERSION, type BudgetItemMeta, type FactQuerySnapshot, type RawResolvedSource, type ResolvedSource, type ServiceLocalization, type WebsitePage } from "./types";
 import { EXPENDITURE_TYPES_SOURCE_ID } from "../data/expenditureTypes/types";
 
 export type BuildSnapshotOptions = { releaseCommit: string; generatedAt: string };
 
-// Fixed, environment-independent production origin for the absolute public
-// URLs that go into `sources` (below). Deliberately NOT lib/siteUrl.ts's
-// resolveSiteUrl(): that falls back to http://localhost:3000 whenever
-// NEXT_PUBLIC_SITE_URL/VERCEL_PROJECT_PRODUCTION_URL are unset, which is true
-// both for a local `npm test` and for CI's `checks` job (only the separate
-// `build` and `e2e` jobs set NEXT_PUBLIC_SITE_URL — see .github/workflows/ci.yml).
-// `sources` is hash-significant content (§4.3 of the query-core spec: "an
-// unchanged snapshot rebuilt later has the same dataVersion"), so an
-// env-dependent origin would make dataVersion depend on where the build ran
-// rather than what data it serves, and would silently produce a non-https
-// archiveUrl exactly where "every link is https" most needs to hold.
-// docs/deployment.md pins this exact string for NEXT_PUBLIC_SITE_URL in
-// Production, so hardcoding it here matches the real deployed value.
-const PUBLIC_SITE_ORIGIN = "https://fiscal.ge";
-
-/** Money and banks sources belong to a human explorer, outside the query/publication scope. */
+/** Money and banks sources are a topic family's: the topics section resolves them (topics/registry.ts), not the core source list. */
 const MONEY_BANKS_SOURCE_DOCUMENT_IDS: ReadonlySet<string> = new Set(MONEY_BANKS_PUBLIC_SOURCES.map(moneyBanksSourceDocumentId));
 const TAX_BREAKS_REFUNDS_SOURCE_DOCUMENT_IDS: ReadonlySet<string> = new Set(TAX_BREAKS_REFUNDS_PUBLIC_SOURCES.map(taxBreaksRefundsSourceDocumentId));
 
-/** Foreign debt and Reserves sources belong to a human explorer, outside the query/publication scope. */
+/** Foreign debt and Reserves sources are a topic family's: the topics section resolves them (topics/registry.ts), not the core source list. */
 const EXTERNAL_POSITION_SOURCE_DOCUMENT_IDS: ReadonlySet<string> = new Set(EXTERNAL_POSITION_PUBLIC_SOURCES.map(externalPositionSourceDocumentId));
 
-/** Business sources belong to a human explorer, outside the query/publication scope. */
+/** Business sources are a topic family's: the topics section resolves them (topics/registry.ts), not the core source list. */
 const BUSINESS_SOURCE_DOCUMENT_IDS: ReadonlySet<string> = new Set(BUSINESS_PUBLIC_SOURCES.map(businessSourceDocumentId));
 
-/** Education sources belong to a human explorer, outside the query/publication scope. */
+/** Education sources are a topic family's: the topics section resolves them (topics/registry.ts), not the core source list. */
 const EDUCATION_SOURCE_DOCUMENT_IDS: ReadonlySet<string> = new Set(EDUCATION_PUBLIC_SOURCES.map(educationSourceDocumentId));
 
-/** Science and culture sources belong to a human explorer, outside the query/publication scope. */
+/** Science and culture sources are a topic family's: the topics section resolves them (topics/registry.ts), not the core source list. */
 const SCIENCE_CULTURE_SOURCE_DOCUMENT_IDS: ReadonlySet<string> = new Set(SCIENCE_CULTURE_PUBLIC_SOURCES.map(scienceCultureSourceDocumentId));
 
 const GDP_SOURCE_MANIFEST_RELATIVE_PATH = ["docs", "Raw Data", "GDP", "national-nominal-gdp"] as const;
 
-/**
- * True only when `value` is an https:// URL and nothing else — no leading or
- * trailing whitespace, no trailing prose, nothing the URL parser would
- * silently rewrite. `startsWith("https://")` alone is not enough: a manifest
- * row holding "https://mof.ge/5039 Repository archive: docs/Raw Data/x.pdf"
- * (a real URL followed by internal-path prose — this project reviews
- * documents by appending exactly this kind of note) passes that check and
- * would publish the whole string, prose included, as a public URL. Nor does
- * zod's `.url()` catch it: `new URL(value)` does not throw on trailing
- * garbage, it silently percent-encodes it into the parsed URL, so `.url()`
- * alone accepts the same bad string. Requiring the value to already equal
- * its own parsed `.href` closes both gaps, because percent-encoding
- * anything makes that equality fail.
- *
- * Verified empirically, not just argued: run against every one of the 81
- * `official_url_or_archive_url` values across expenditure.csv/revenue.csv/
- * municipalities.csv that start with "https://", plus both GDP
- * `retrieved_file_url` values — all 83 pass unchanged, including
- * already-percent-encoded Georgian filenames (mof.ge), a matsne.gov.ge
- * download link, and a web.archive.org URL with a second https:// URL
- * embedded in its path. The invariant test in tests/factQuery/sources.test.ts
- * is the durable enforcement of this property: it re-checks every resolved
- * document on each run, so a future manifest row carrying prose fails there.
- */
-function isCleanHttpsUrl(value: string): boolean {
-  if (!value.startsWith("https://")) return false;
-  try {
-    return value === new URL(value).href;
-  } catch {
-    return false;
-  }
-}
-
 // Kept separate from workbookSources.ts's gdpWorkbookSourceRowSchema to use
-// the tightened https check above in
+// the tightened https check (isCleanHttpsUrl, manifestDocuments.ts) in
 // place of zod's `.url()`, so this path and the officialUrl guard just below
 // cannot drift onto two different definitions of "a real URL". Not
 // `.strict()`: like its sibling, this only names the columns it needs out of
@@ -272,31 +227,7 @@ async function loadManifestDocumentsUncached(): Promise<ManifestDocument[]> {
   // twins (`_ka`) only prove identical values and are not registered sources.
   perDataset.push((await loadReviewedSourceManifest(repositoryRoot, "inflation")).filter(row => !row.source_id.endsWith("_ka")));
 
-  // official_url_or_archive_url is free text, not a validated URL column
-  // (sourceManifest.ts's schema only checks it's a non-empty string): most
-  // rows hold prose like "Repository archive: docs/Raw Data/..." (an internal
-  // path, never usable as a public link), but some genuinely hold the
-  // original https:// URL (e.g. https://mof.ge/5039, matsne.gov.ge,
-  // web.archive.org). Take it only when isCleanHttpsUrl confirms it's
-  // exactly a URL and nothing else — confirmed by inspection to recover 81
-  // of 180 rows across the three manifests — never when it's descriptive
-  // text, and never a URL with descriptive text trailing after it.
-  const documents: ManifestDocument[] = perDataset.flat().map((row) => ({
-    repositoryPath: row.repository_source_path,
-    documentId: row.source_id,
-    title: row.display_title_ka,
-    publisher: row.source_organization,
-    officialUrl: isCleanHttpsUrl(row.official_url_or_archive_url) ? row.official_url_or_archive_url : null,
-    archiveUrl: absoluteWorkbookSourceUrl(PUBLIC_SITE_ORIGIN, row.downloadHref),
-    years: row.years,
-    datasetId: row.dataset_id,
-    sha256: row.sha256,
-    byteSize: row.byte_size,
-    mediaType: row.media_type,
-    retrievedAt: row.retrieved_at,
-    licenceId: row.license_id,
-    attribution: row.attribution_text,
-  }));
+  const documents: ManifestDocument[] = perDataset.flat().map(methodologyManifestDocument);
 
   // These sources live in package manifests with their own schema (a
   // `local_file` relative to the manifest's own directory, no
@@ -554,11 +485,13 @@ export function enrichSourceTranslations(sources: readonly RawResolvedSource[], 
 /**
  * Every navigation page this service does not serve, as the website's own search sees it (`buildSearchPages` with no hub data,
  * so no value, period, caption or trend) and with its Georgian and English address, for the catalogue search to point to.
+ * `served` is the core pages and the topic pages whose dataset the snapshot holds: a topic page with no adapter yet stays
+ * website-only (ruling R11).
  */
-async function buildWebsitePages(): Promise<WebsitePage[]> {
+async function buildWebsitePages(served: Readonly<Record<string, readonly AnyDatasetId[]>>): Promise<WebsitePage[]> {
   const [ka, en] = await Promise.all([allDataMessages("ka"), allDataMessages("en")]);
   return buildSearchPages([], ka, en)
-    .filter((page) => !Object.hasOwn(MCP_SERVED_PAGES, page.href))
+    .filter((page) => !Object.hasOwn(served, page.href))
     .map((page) => ({ ...page, urlKa: `${PUBLIC_SITE_ORIGIN}${pageHref(page.href, "ka")}`, urlEn: `${PUBLIC_SITE_ORIGIN}${pageHref(page.href, "en")}` }));
 }
 
@@ -643,14 +576,21 @@ export async function buildFactQuerySnapshot(options: BuildSnapshotOptions): Pro
   // ids are asserted unique at load time; document ids come from the
   // manifests' own source_id, unique across all four manifests — verified by
   // inspection, not just assumed).
-  const sources: ResolvedSource[] = sortedBy(
-      // Unemployment, Trade, Services trade, Wages, Money from abroad, Foreign investment, Poverty, Household income and spending, Energy and food, Money and banks, Foreign debt and Reserves, Business, Health, Housing, Crime and justice, Education, Environment and climate, Science and culture, GDP by expenditure, Transport, Internet and technology and Social protection are human explorers, outside the query/publication scope.
+  const coreSources: ResolvedSource[] = sortedBy(
+      // Unemployment, Trade, Services trade, Wages, Money from abroad, Foreign investment, Poverty, Household income and spending, Energy and food, Money and banks, Foreign debt and Reserves, Business, Health, Housing, Crime and justice, Education, Environment and climate, Science and culture, GDP by expenditure, Transport, Internet and technology and Social protection are topic families: their sources are resolved with the topics section below (topics/registry.ts), not in the core source list.
       enrichSourceTranslations(resolvePublicSources({ sourceDocuments: explorer.sourceDocuments.filter(source => !source.sourceId.startsWith("source.geostat_lfs_") && !source.sourceId.startsWith("source.geostat_transport_") && !source.sourceId.startsWith("source.geostat_trade_") && !source.sourceId.startsWith("source.geostat_services_") && !source.sourceId.startsWith("source.geostat_earnings_") && !source.sourceId.startsWith("source.geostat_fdi_") && !source.sourceId.startsWith("source.geostat_poverty_") && !source.sourceId.startsWith("source.geostat_household_") && !source.sourceId.startsWith("source.geostat_energy_") && !source.sourceId.startsWith("source.geostat_food_") && !source.sourceId.startsWith("source.geostat_farming_") && source.sourceId !== "source.geostat_agriculture_page" && !source.sourceId.startsWith("source.geostat_health_") && !source.sourceId.startsWith("source.geostat_housing_") && !source.sourceId.startsWith("source.geostat_ict_") && !source.sourceId.startsWith("source.geostat_death") && !source.sourceId.startsWith("source.geostat_crime_") && !source.sourceId.startsWith("source.geostat_env_") && !source.sourceId.startsWith("source.ssa_") && source.sourceId !== "source.geostat_gini" && source.sourceId !== "source.geostat_hies_metadata_2026" && source.sourceId !== "source.nbg_money_transfers_by_countries" && source.sourceId !== "source.nbg_balance_of_payments_bpm6" && !MONEY_BANKS_SOURCE_DOCUMENT_IDS.has(source.sourceId) && !EXTERNAL_POSITION_SOURCE_DOCUMENT_IDS.has(source.sourceId) && !BUSINESS_SOURCE_DOCUMENT_IDS.has(source.sourceId) && !source.sourceId.startsWith("source.geostat_gdp_use_") && !source.sourceId.startsWith("source.pension_fund_") && source.sourceId !== EXPENDITURE_TYPES_SOURCE_ID && !EDUCATION_SOURCE_DOCUMENT_IDS.has(source.sourceId) && !SCIENCE_CULTURE_SOURCE_DOCUMENT_IDS.has(source.sourceId) && !TAX_BREAKS_REFUNDS_SOURCE_DOCUMENT_IDS.has(source.sourceId)), manifestDocuments }), catalogue, serviceKa),
     (source) => source.sourceId,
   ).map((source) => ({
     ...source,
     documents: sortedBy(source.documents, (document) => document.documentId),
   }));
+  // The topic pages' sources join them, translated the same way; one the core datasets already cite is kept once, as they resolve it.
+  const topics = await buildTopicsSnapshot();
+  const coreSourceIds = new Set(coreSources.map((source) => source.sourceId));
+  const sources: ResolvedSource[] = sortedBy(
+    [...coreSources, ...enrichSourceTranslations(topics.sources.filter((source) => !coreSourceIds.has(source.sourceId)), catalogue, serviceKa)],
+    (source) => source.sourceId,
+  );
 
   // GlossaryEntry (lib/data/glossary.ts) carries no sort/display-order column, so
   // sortOrder cannot come from the glossary itself — and it must NOT come from the
@@ -793,7 +733,8 @@ export async function buildFactQuerySnapshot(options: BuildSnapshotOptions): Pro
       historyNotes: sortedBy(productHistory, row => row.productId, row => row.boundaryYear),
     },
     gdpFacts: sortedBy(explorer.gdpFacts, (f) => f.year),
-    website: { pages: await buildWebsitePages() },
+    topics: topics.topics,
+    website: { pages: await buildWebsitePages({ ...CORE_SERVED_PAGES, ...Object.fromEntries(topics.topics.datasets.map(({ page }) => [page.pagePath, [page.datasetId as TopicDatasetId]])) }) },
     sources,
   };
 

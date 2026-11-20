@@ -155,8 +155,9 @@ test.describe("connection page", () => {
     // green - which is the exact drift this page exists to prevent.
     const servedLines = (await served.innerText()).split("\n").filter((line) => line.includes("—"));
     const catalogue = await (await page.request.get(`${BASE_URL}/downloads/data/catalogue.json`)).json();
-    // City coverage is a separate line within the inflation dataset.
-    expect(servedLines).toHaveLength(catalogue.datasets.length + 1);
+    // City coverage is a separate line within the inflation dataset; the topic datasets share one line.
+    const coreDatasets = catalogue.datasets.filter((dataset: { budgetScope: string }) => dataset.budgetScope !== "topic");
+    expect(servedLines).toHaveLength(coreDatasets.length + 2);
     expect(servedLines.find(line => line.startsWith("მშპ,"))).toContain("1960–2025");
 
     // Debt and the balance are served now, so the page must not still deny
@@ -168,7 +169,7 @@ test.describe("connection page", () => {
     // A range, optionally followed by the projection note the two forward-
     // looking datasets carry. The range itself must still be the last data on
     // the line, so a dataset silently losing its years is still caught.
-    for (const line of servedLines.filter(line => !line.startsWith("ეკონომიკური სექტორები") && !line.startsWith("სამომხმარებლო ფასების ინფლაცია") && !line.startsWith("ინფლაცია საქსტატის") && !line.startsWith("მოქმედი კალათის"))) expect(line).toMatch(/\d{4}–\d{4}(\s*\([^)]*\))?\.?\s*$/);
+    for (const line of servedLines.filter(line => !line.startsWith("ეკონომიკური სექტორები") && !line.startsWith("სამომხმარებლო ფასების ინფლაცია") && !line.startsWith("ინფლაცია საქსტატის") && !line.startsWith("მოქმედი კალათის") && !line.startsWith("საიტის ყველა დანარჩენი"))) expect(line).toMatch(/\d{4}–\d{4}(\s*\([^)]*\))?\.?\s*$/);
     // Inflation is monthly, so like the sector line it carries several ranges; its
     // month span and the contribution start must still be real data.
     const inflation = servedLines.find((line) => line.startsWith("სამომხმარებლო ფასების ინფლაცია"))!;

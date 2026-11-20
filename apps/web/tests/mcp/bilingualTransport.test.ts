@@ -62,7 +62,7 @@ describe("bilingual text-only transport", () => {
     try {
       await Promise.all([server.connect(serverTransport), client.connect(clientTransport)]);
       const { tools } = await client.listTools();
-      expect(tools).toHaveLength(14);
+      expect(tools).toHaveLength(15);
       for (const tool of tools) {
         const schema = JSON.stringify(tool.outputSchema);
         for (const field of ["nameEn", "titleEn", "publisherEn", "attributionEn", "documentLanguage", "methodologyRefEn"]) expect(schema, tool.name).toContain(`"${field}"`);

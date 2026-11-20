@@ -56,7 +56,7 @@ export const changeTransportAreaSelection = (area: TransportArea, state: Transpo
   changeTransportSelection(state, transportAreaSeries(area), next, facts);
 
 /** The area part of a listed id's group (`total` or `region_<id>`), longest first so `region_kvemo_kartli` is never read as a shorter id. */
-const AREA_GROUPS = ["total", ...TRANSPORT_REGIONS].sort((a, b) => b.length - a.length);
+export const AREA_GROUPS = ["total", ...TRANSPORT_REGIONS].sort((a, b) => b.length - a.length);
 
 /**
  * The hash a link to another area's page carries: this page's selection, moved to that area (a fuel row stays that fuel,

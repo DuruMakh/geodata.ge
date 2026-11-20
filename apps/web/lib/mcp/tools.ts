@@ -22,6 +22,8 @@ import { queryInflationInput } from "../factQuery/schemas";
 import { productQueryCellCount, queryInflationProducts } from "../factQuery/queryInflationProducts";
 import { queryInflationProductsInput } from "../factQuery/schemas";
 import { queryDeficit } from "../factQuery/queryDeficit";
+import { indicatorCellCount, queryIndicators } from "../factQuery/queryIndicators";
+import { queryIndicatorsInput } from "../factQuery/schemas";
 import { queryMunicipal } from "../factQuery/queryMunicipal";
 import { queryNational } from "../factQuery/queryNational";
 import { rank } from "../factQuery/rank";
@@ -155,7 +157,7 @@ export const TOOLS: readonly ToolDefinition[] = [
       "try the principal word or browse the named dataset. A failed phrase match is not proof that the data is absent. Georgian case endings " +
       "are handled: `ბათუმის` finds `ბათუმი`. searchMatch some_words means no entry has every word: the matches may be about " +
       "something else, so if none fits, retry the missing part before saying it is not served; all_words with no entries means nothing matched. " +
-      "A search without a datasetId also gives websitePages: Fiscal.ge pages on topics this connection does not serve. " +
+      "A search without a datasetId also gives websitePages: related Fiscal.ge pages that are not datasets; their figures come from served datasets. " +
       "Never guess a series or entity id; take it from here. " +
       "A product series omits yearsByMeasure and periodsByMeasure when they are the same as its years and periods.",
     schema: describeCoverageInput,
@@ -224,6 +226,15 @@ export const TOOLS: readonly ToolDefinition[] = [
     run: (snapshot, input) => queryDeficit(snapshot, input),
   },
   {
+    name: "query_indicators",
+    title: "თემატური მონაცემები / Topic data",
+    describe: () =>
+      "Annual figures from every other Fiscal.ge chart page: spending by type, tax breaks and refunds, GDP by expenditure, population, education, health and pensions, jobs and wages, business, living standards, housing, internet, transport, money and banks, trade, external accounts, crime, environment, science and culture, energy and farming. " +
+      "Take datasetId, seriesIds and entityIds from describe_coverage; never guess. Values are the page's own figures, in each series' own unit; a school year is its first year (year 2025 = 2025/26). Missing is not zero. Use compare and rank for changes.",
+    schema: queryIndicatorsInput,
+    run: queryIndicators,
+  },
+  {
     name: "compare",
     title: "შედარება ორ წელს შორის / Comparison between two years",
     describe: () =>
@@ -234,6 +245,7 @@ export const TOOLS: readonly ToolDefinition[] = [
       "percentage and percentage-point change as the measure allows, plus a comparability of " +
       "comparable, limited or not_comparable. Use this rather than subtracting two query results " +
       "yourself: it is what detects a definition change between the two years. " +
+      "Topic target { dataset: topic, datasetId, seriesIds, entityIds? } uses measure value and fromYear < toYear. " +
       "Product target { dataset: inflation-products, seriesIds } supports yoy_pct percentage-point change only. Cumulative comparison is refused; query_inflation_products with startYear returns accumulated price change.",
     schema: compareInput,
     run: (snapshot, input) => compare(snapshot, input),
@@ -250,6 +262,7 @@ export const TOOLS: readonly ToolDefinition[] = [
       "For inflation cities: dimension entities, entityType city, one seriesId, and the same period fields. " +
       "For inflation-products: dimension series, metric value, period, and yoy_pct or cumulative_pct (the latter requires startYear and states its previous-December base). " +
       "All current products are candidates; incomplete histories are explicitly excluded. No product entity/region/parent/level filters or change-ranking metrics. " +
+      "Topic datasets: measure value; entities (entityType, one seriesId, optional withinRegionId) or series (seriesId or parentSeriesId, optional entityId). " +
       "Sources give full records for the returned rows; other documents read to fix the order are listed by id in inputDocumentIds; to read them, call get_sources with that source's sourceId (narrow with years/entityIds). " +
       "A caveat whose affects is empty and that carries affectsOtherCount concerns only rows that were not returned; each entry's caveatIds is its per-row link; do not attach such a caveat to a returned figure.",
     schema: rankInput,
@@ -415,7 +428,9 @@ export function createMcpServer(): McpServer {
         try {
           // The SDK has validated and deduplicated these arrays. Reject the
           // requested product before calculating cells or resolving their sources.
-          const input = args as { years?: number[]; fromYear?: number; toYear?: number; seriesIds?: string[]; entityIds?: string[]; regionIds?: string[]; target?: { seriesIds?: string[]; entityIds?: string[] } };
+          const input = args as { datasetId?: string; years?: number[]; fromYear?: number; toYear?: number; seriesIds?: string[]; entityIds?: string[]; regionIds?: string[]; target?: { datasetId?: string; seriesIds?: string[]; entityIds?: string[] } };
+          // A topic refusal names the dataset's own CSV; compare names its dataset in the target.
+          const datasetId = input.datasetId ?? input.target?.datasetId;
           const regionalYears = input.years?.length ?? (
             input.fromYear !== undefined && input.toYear !== undefined
               ? input.toYear - input.fromYear + 1
@@ -431,12 +446,14 @@ export function createMcpServer(): McpServer {
               ? inflationCellCount(args as Parameters<typeof inflationCellCount>[0])
               : tool.name === "query_inflation_products"
                 ? productQueryCellCount(args as Parameters<typeof productQueryCellCount>[0])
+              : tool.name === "query_indicators"
+                ? indicatorCellCount(snapshot, args)
               : tool.name.startsWith("query_")
                 ? (input.entityIds?.length ?? 1) * (input.seriesIds?.length ?? 1) * (input.years?.length ?? 1)
                 : 0;
           const limit = tool.name === "compare" ? LIMITS.comparisonPairs : LIMITS.cells;
-          if (count > limit) return toolResult(tooLargeResponse(snapshot, { returned: count, bytes: 0 }));
-          const result = boundedToolResult(snapshot, tool.run(snapshot, args), resultSizeKind(tool.name));
+          if (count > limit) return toolResult(tooLargeResponse(snapshot, { returned: count, bytes: 0, datasetId }));
+          const result = boundedToolResult(snapshot, tool.run(snapshot, args), resultSizeKind(tool.name), datasetId);
           if (!result.isError && result.structuredContent === undefined) throw new Error(safeValidationError);
           return result;
         } catch {

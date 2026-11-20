@@ -1,7 +1,8 @@
 // apps/web/tests/factQuery/fixtures/searchQueries.ts
 //
-// The hand-labelled catalogue-search queries of the 29 Oct 2026 MCP audit (finding F08), ported unchanged from the
-// audit's eval-F08-search-quality/queries.mjs. `req` is what a correct search must return (recall); `ok` lists further
+// The hand-labelled catalogue-search queries of the 29 Oct 2026 MCP audit (finding F08), ported from the
+// audit's eval-F08-search-quality/queries.mjs unchanged, except that five "not served" labels became "topic-served" once the
+// topics were served (their expectations are unchanged). `req` is what a correct search must return (recall); `ok` lists further
 // results that are reasonable and not counted as false positives. Keys: a series id, or "E:" + an entity id. An `ok`
 // entry may be a RegExp, tested against "key | labelEn | labelKa".
 export type SearchQuery = { q: string; cat: string; req: string[]; ok?: (string | RegExp)[] };
@@ -152,10 +153,11 @@ export const QUERIES: SearchQuery[] = [
   { q: "educaton", cat: "typo", req: ["spending.education", "admin_spending.education_science_youth", "municipal.education"], ok: [EDU] },
   { q: "goverment debt", cat: "typo", req: ["debt.stock.total"], ok: [DEBT] },
   { q: "Tbilsi", cat: "typo", req: ["E:04", "E:region.tbilisi", "E:city.tbilisi"] },
-  // --- Not served: the correct answer is nothing
-  { q: "wages", cat: "not-served", req: [] },
-  { q: "salary", cat: "not-served", req: [] },
-  { q: "unemployment", cat: "not-served", req: [] },
-  { q: "population", cat: "not-served", req: [], ok: [/27_0[23]|24_15/] },
-  { q: "exports", cat: "not-served", req: [] },
+  // --- Served by topic datasets since the topic coverage: the audit labelled these "not served" (the correct answer was
+  // nothing). Their `req` stays empty, as ported: no core series is required for them.
+  { q: "wages", cat: "topic-served", req: [] },
+  { q: "salary", cat: "topic-served", req: [] },
+  { q: "unemployment", cat: "topic-served", req: [] },
+  { q: "population", cat: "topic-served", req: [], ok: [/27_0[23]|24_15/] },
+  { q: "exports", cat: "topic-served", req: [] },
 ];

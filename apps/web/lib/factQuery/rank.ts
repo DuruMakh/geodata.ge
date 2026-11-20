@@ -16,17 +16,20 @@ import { describeCoverage } from "./describeCoverage";
 import { buildResponseMeta } from "./meta";
 import { caveatIdsForObservation } from "./observations";
 import { inflationObservations } from "./queryInflation";
+import { queryIndicators } from "./queryIndicators";
 import { queryInflationProducts } from "./queryInflationProducts";
 import { inflationProductSources } from "./inflationProductData";
 import { queryMinistries } from "./queryMinistries";
 import { queryMunicipal } from "./queryMunicipal";
 import { queryNational } from "./queryNational";
-import { INPUT_LIMITS, rankInput } from "./schemas";
+import { INPUT_LIMITS, RANK_CORE_DATASETS, rankInput } from "./schemas";
 import { selectSources } from "./sources";
+import { isTopicIntervalUnit, isTopicPercentUnit, topicPeriodLabel } from "./topics/store";
 import { AGGREGATE_ONLY_MUNICIPAL_CODES } from "./types";
 import type { Comparison } from "./compare";
 import type { Observation } from "./observations";
-import type { Basis, Caveat, DatasetId, FactQueryError, FactQueryResponse, FactQuerySnapshot, Measure, ResolvedSource, Unit } from "./types";
+import type { TopicDataset } from "./topics/types";
+import type { Basis, Caveat, DatasetId, FactQueryError, FactQueryResponse, FactQuerySnapshot, Measure, ResolvedSource } from "./types";
 
 const EXCLUDED = new Set<string>(AGGREGATE_ONLY_MUNICIPAL_CODES);
 const TOTAL_LEVEL = "total";
@@ -43,12 +46,14 @@ export type RankEntry = {
   seriesLabelKa: string;
   seriesLabelEn: string;
   value: number | null;
-  unit: Unit;
+  unit: Observation["unit"];
   basis: Basis | null;
   caveatIds: string[];
   /** Inflation value rankings only: the month ranked. */
   period?: string;
   calculationBasePeriod?: string;
+  /** Topic value rankings only: the date of an amount dated other than its year's end (the latest Foreign debt and Reserves point). */
+  periodEnd?: string;
 };
 
 export type RankData = {
@@ -83,11 +88,12 @@ type Candidate = {
   seriesLabelEn: string;
   /** Never null: a row with no value is an exclusion, never a candidate. */
   value: number;
-  unit: Unit;
+  unit: Observation["unit"];
   basis: Basis | null;
   caveatIds: string[];
   period?: string;
   calculationBasePeriod?: string;
+  periodEnd?: string;
   /** Documents behind this row: the observation's, or both endpoints' of the comparison. */
   documentIds: string[];
   /** The cells the value was read from, to narrow caveat `affects` to the rows a ranking returns. */
@@ -149,6 +155,43 @@ function errorResponse(snapshot: FactQuerySnapshot, error: FactQueryError): Fact
   return { kind: "error", status: "error", error, meta: buildResponseMeta(snapshot) };
 }
 
+function chunks<T>(items: readonly T[], size: number): T[][] {
+  return Array.from({ length: Math.ceil(items.length / size) }, (_unused, index) => items.slice(index * size, (index + 1) * size));
+}
+
+/**
+ * Topic queries and comparisons take at most INPUT_LIMITS ids per call, and a dataset can list more places or
+ * series than that: ask in chunks and join the answers, as the product ranking does. One chunk returns its own answer.
+ */
+function topicBatches(
+  snapshot: FactQuerySnapshot,
+  entityIds: readonly string[],
+  seriesIds: readonly string[],
+  key: "observations" | "comparisons",
+  ask: (entityIds: string[], seriesIds: string[]) => FactQueryResponse,
+): FactQueryResponse {
+  const answers: Exclude<FactQueryResponse, { kind: "error" }>[] = [];
+  for (const entityChunk of chunks(entityIds, INPUT_LIMITS.entities)) {
+    for (const seriesChunk of chunks(seriesIds, INPUT_LIMITS.series)) {
+      const answer = ask(entityChunk, seriesChunk);
+      if (answer.kind === "error") return answer;
+      answers.push(answer);
+    }
+  }
+  if (answers.length === 1) return answers[0]!;
+  const caveats = new Map<string, Caveat>();
+  for (const caveat of answers.flatMap((answer) => answer.meta.caveats)) {
+    caveats.set(caveat.code, { ...caveat, affects: [...new Set([...(caveats.get(caveat.code)?.affects ?? []), ...caveat.affects])] });
+  }
+  const sourceIds = [...new Set(answers.flatMap((answer) => answer.meta.sources.map((source) => source.sourceId)))];
+  const meta = buildResponseMeta(snapshot, {
+    sources: selectSources(snapshot, sourceIds),
+    caveats: [...caveats.values()],
+    citedDocumentIds: [...new Set(answers.flatMap((answer) => answer.meta.sources.flatMap((source) => source.documents.map((document) => document.documentId))))],
+  });
+  return { kind: key, status: "ok", data: { [key]: answers.flatMap((answer) => (answer.data as Record<string, unknown[]>)[key]!) }, meta } as FactQueryResponse;
+}
+
 type CatalogueSeries = { seriesId: string; labelKa: string; level: string; parentSeriesId: string | null; availability: string };
 
 function catalogueSeries(snapshot: FactQuerySnapshot, datasetId: DatasetId): CatalogueSeries[] {
@@ -172,6 +215,17 @@ export function rank(snapshot: FactQuerySnapshot, rawInput: unknown): FactQueryR
       messageEn: serviceMessage(snapshot, "en", "errors.rankSingleEntity", { requestedDataset }),
       retryable: false,
       validChoices: ["national-revenue", "national-expenditure", "ministries", "municipal-expenditure", "inflation"],
+    });
+  }
+
+  const topicIds = snapshot.topics.datasets.map((dataset) => dataset.page.datasetId);
+  if (typeof requestedDataset === "string" && !(RANK_CORE_DATASETS as readonly string[]).includes(requestedDataset) && !topicIds.includes(requestedDataset)) {
+    return errorResponse(snapshot, {
+      code: "invalid_parameters",
+      messageKa: serviceMessage(snapshot, "ka", "errors.unknownDataset", { datasetId: requestedDataset }),
+      messageEn: serviceMessage(snapshot, "en", "errors.unknownDataset", { datasetId: requestedDataset }),
+      retryable: false,
+      validChoices: [...RANK_CORE_DATASETS, ...topicIds],
     });
   }
 
@@ -202,14 +256,19 @@ export function rank(snapshot: FactQuerySnapshot, rawInput: unknown): FactQueryR
   const isInflation = input.datasetId === "inflation";
   const isProduct = input.datasetId === "inflation-products";
   const isValueMetric = input.metric === "value";
+  // The dataset's own rows, for any id that is not one of the core rankable datasets (checked above).
+  const topicDataset: TopicDataset | undefined = snapshot.topics.datasets.find((dataset) => dataset.page.datasetId === input.datasetId);
+  const regionIds = topicDataset
+    ? topicDataset.entities.filter((entity) => entity.entityType === "region").map((entity) => entity.entityId)
+    : snapshot.municipal.regions.map((r) => r.id);
 
-  if (input.withinRegionId !== undefined && !snapshot.municipal.regions.some((r) => r.id === input.withinRegionId)) {
+  if (input.withinRegionId !== undefined && !regionIds.includes(input.withinRegionId)) {
     return errorResponse(snapshot, {
       code: "unknown_entity",
       messageKa: serviceMessage(snapshot, "ka", "errors.rankUnknownRegion"),
       messageEn: serviceMessage(snapshot, "en", "errors.rankUnknownRegion"),
       retryable: false,
-      validChoices: snapshot.municipal.regions.map((r) => r.id),
+      validChoices: regionIds,
     });
   }
 
@@ -234,7 +293,8 @@ export function rank(snapshot: FactQuerySnapshot, rawInput: unknown): FactQueryR
     });
   }
 
-  if (!isValueMetric) {
+  // A topic dataset ranks by value only; whether its series are percents waits for the series (below).
+  if (!isValueMetric && !topicDataset) {
     const wantsPercentagePoints = input.metric === "percentage_point_change";
     const measureIsPercentage = PERCENTAGE_MEASURES.has(input.measure);
     if (wantsPercentagePoints && !measureIsPercentage) {
@@ -257,7 +317,9 @@ export function rank(snapshot: FactQuerySnapshot, rawInput: unknown): FactQueryR
 
   const entityRanking = input.dimension === "entities";
   const inflationCities = isInflation && entityRanking;
-  if ((entityRanking && !isMunicipal && !isInflation) || (!entityRanking && isMunicipal)) {
+  // Rankings whose rows are places: the same read-out as municipal and inflation-city rankings.
+  const byEntity = isMunicipal || inflationCities || (topicDataset !== undefined && entityRanking);
+  if ((entityRanking && !isMunicipal && !isInflation && !topicDataset) || (!entityRanking && isMunicipal)) {
     return errorResponse(snapshot, {
       code: "invalid_parameters",
       messageKa: serviceMessage(snapshot, "ka", "errors.rankDimension"),
@@ -273,6 +335,9 @@ export function rank(snapshot: FactQuerySnapshot, rawInput: unknown): FactQueryR
   let universeKey: ServiceMessageKey;
   // The universe sentence names its region or parent in words, so the label is resolved per language.
   let universeValues: (locale: "ka" | "en") => Record<string, string> = () => ({});
+  // Sentences a topic series ranking adds after the universe: which of a total's breakdowns it ranks, and a series the
+  // total subtracts (imports, of GDP).
+  let universeNotes: (locale: "ka" | "en") => string[] = () => [];
 
   if (isMunicipal) {
     if (input.seriesId === undefined || input.entityType === undefined) {
@@ -303,8 +368,156 @@ export function rank(snapshot: FactQuerySnapshot, rawInput: unknown): FactQueryR
         universeValues = (locale) => ({ regionLabel: locale === "ka" ? region?.kaLabel ?? regionId : serviceLabelEn(snapshot, regionId) });
       }
     }
+  } else if (topicDataset) {
+    const invalid = () => errorResponse(snapshot, {
+      code: "invalid_parameters",
+      messageKa: serviceMessage(snapshot, "ka", "errors.rankTopicInput"),
+      messageEn: serviceMessage(snapshot, "en", "errors.rankTopicInput"),
+      retryable: false,
+    });
+    if (entityRanking) {
+      if (input.seriesId === undefined || input.entityType === undefined) return invalid();
+      seriesIds = [input.seriesId];
+      // Tbilisi is a municipality (code 04) that the topic pages list as the region region.tbilisi, with no member
+      // municipality: a region without members ranks among the municipalities, as the pages and the core municipal
+      // rankings rank Tbilisi.
+      const asMunicipality = input.entityType === "municipality" && topicDataset.entities.some((entity) => entity.entityType === "municipality");
+      const standsAlone = (entityId: string) => !topicDataset.entities.some((other) => other.parentEntityId === entityId);
+      entityIds = topicDataset.entities
+        .filter((entity) => entity.entityType === input.entityType || (asMunicipality && entity.entityType === "region" && standsAlone(entity.entityId)))
+        .filter((entity) => input.withinRegionId === undefined || entity.parentEntityId === input.withinRegionId || (asMunicipality && entity.entityId === input.withinRegionId))
+        .map((entity) => entity.entityId)
+        .sort();
+      universeKey = input.withinRegionId ? "ranking.withinRegion" : asMunicipality ? "ranking.topicMunicipalities" : "ranking.topicPlaces";
+      if (input.withinRegionId) {
+        const region = topicDataset.entities.find((entity) => entity.entityId === input.withinRegionId);
+        universeValues = (locale) => ({ regionLabel: (locale === "ka" ? region?.labelKa : region?.labelEn) ?? input.withinRegionId! });
+      }
+    } else {
+      // One place: the one named, else the dataset's country (or its only entity).
+      const defaults = topicDataset.entities.filter((entity) => entity.entityType === "country");
+      const placeId = input.entityId ?? (defaults.length === 1 ? defaults : topicDataset.entities.length === 1 ? topicDataset.entities : [])[0]?.entityId;
+      if (placeId === undefined) return invalid();
+      entityIds = [placeId];
+      // Peers: one place's series in one unit: the parts of one parent, or the series under one heading that have no
+      // parent, never a total.
+      const anchor = topicDataset.series.find((entry) => entry.seriesId === input.seriesId);
+      if (input.parentSeriesId === undefined) {
+        if (input.seriesId === undefined) return invalid();
+        // A series under no heading, with no parent and no parts has no peers on its page (money-interest-rates lists its
+        // rates so): say that, not the input rule. One with a parent ranks among its parent's other parts, and one with
+        // parts ranks them (below).
+        if (anchor !== undefined && anchor.headingKa === null && anchor.parentSeriesId === null
+          && !topicDataset.series.some((entry) => entry.parentSeriesId === anchor.seriesId)) {
+          const values = { seriesId: anchor.seriesId };
+          return errorResponse(snapshot, { code: "invalid_parameters", messageKa: serviceMessage(snapshot, "ka", "errors.rankTopicNoHeading", values), messageEn: serviceMessage(snapshot, "en", "errors.rankTopicNoHeading", values), retryable: false });
+        }
+        if (anchor === undefined) {
+          return errorResponse(snapshot, {
+            code: "unknown_series",
+            messageKa: serviceMessage(snapshot, "ka", "errors.unknownSeries", { unknownSeriesIds: input.seriesId }),
+            messageEn: serviceMessage(snapshot, "en", "errors.unknownSeries", { unknownSeriesIds: input.seriesId }),
+            retryable: false,
+            validChoices: topicDataset.series.map((entry) => entry.seriesId).slice(0, 50),
+          });
+        }
+      }
+      // A named total with parts ranks its parts, as by parentSeriesId; another named series with a parent ranks among
+      // that parent's parts (a heading can hold several measures of one unit, each under its own parent: shares of GDP
+      // and real growth, the 60% and 40% poverty lines). A parentless series with parts that has no parentless peer of
+      // its unit under its heading, or that is under no heading, is a total too (Museums, All staff, the social package's
+      // All recipients, linked in topics/hierarchy.ts; Total reserves) and ranks its parts; one with such peers
+      // (Households, beside Businesses) ranks among them. A series a total subtracts (imports, of GDP) ranks its own parts.
+      type Peer = (typeof topicDataset.series)[number];
+      const hasParts = (entry: Peer) => topicDataset.series.some((other) => other.parentSeriesId === entry.seriesId);
+      const headingPeerOf = (entry: Peer) => (other: Peer) => other !== entry && !other.isTotal && other.parentSeriesId === null
+        && other.headingKa === entry.headingKa && other.breakdown === entry.breakdown && other.unit === entry.unit;
+      const ranksOwnParts = (entry: Peer) => hasParts(entry)
+        && (entry.isTotal || entry.subtractedFrom !== undefined
+          || (entry.parentSeriesId === null && (entry.headingKa === null || !topicDataset.series.some(headingPeerOf(entry)))));
+      const parentId = input.parentSeriesId ?? (ranksOwnParts(anchor!) ? anchor!.seriesId : anchor!.parentSeriesId);
+      // A heading's total that is itself a part (All researchers, of All R&D staff) ranks among its parent's parts.
+      let peers = topicDataset.series.filter((entry) => (parentId !== null
+        ? entry.parentSeriesId === parentId
+        : !entry.isTotal && entry.parentSeriesId === null && entry.headingKa === anchor!.headingKa && entry.breakdown === anchor!.breakdown));
+      // A parent whose parts make up several breakdowns, each under a heading of its own or a reviewed breakdown, which
+      // spans headings (trade partners by country and by country group; students by level, ownership, sex and field),
+      // ranks one: that of the named series, else the first. Parts that each stand alone (the VAT and income-tax totals)
+      // rank together.
+      let split: { chosen: Peer; count: number; others: string[] } | undefined;
+      if (parentId !== null) {
+        const breakdownOf = (entry: Peer) => (entry.breakdown === undefined ? `heading:${entry.headingKa ?? ""}` : `breakdown:${entry.breakdown}`);
+        const perBreakdown = peers.reduce((counts, entry) => counts.set(breakdownOf(entry), (counts.get(breakdownOf(entry)) ?? 0) + 1), new Map<string, number>());
+        if (perBreakdown.size > 1 && [...perBreakdown.values()].some((count) => count > 1)) {
+          const chosen = (peers.find((entry) => entry.seriesId === input.seriesId) ?? peers[0])!;
+          const breakdown = breakdownOf(chosen);
+          // One series of each other breakdown, for the answer to say how to rank it.
+          const others = peers.reduce((first, entry) => (breakdownOf(entry) === breakdown || first.has(breakdownOf(entry)) ? first : first.set(breakdownOf(entry), entry.seriesId)), new Map<string, string>());
+          split = { chosen, count: perBreakdown.size, others: [...others.values()] };
+          peers = peers.filter((entry) => breakdownOf(entry) === breakdown);
+        }
+      }
+      // One unit, that of the series named (or of the parent): thousand persons never rank beside a rate.
+      const unit = (anchor ?? topicDataset.series.find((entry) => entry.seriesId === input.parentSeriesId) ?? peers[0])?.unit;
+      peers = peers.filter((entry) => entry.unit === unit);
+      // Never a series beside its own parts: one whose parts are ranked is left out, as a total is.
+      seriesIds = peers
+        .filter((entry) => !peers.some((other) => other.parentSeriesId === entry.seriesId))
+        .map((entry) => entry.seriesId)
+        .sort();
+      // A named series with no parts and no peer of its unit (a dataset's headline rate, a heading's only total) has
+      // nothing to rank against here: say so, and name the datasets that list it for several places.
+      if (seriesIds.length === 0 && anchor !== undefined && input.parentSeriesId === undefined) {
+        const placed = snapshot.topics.datasets.filter((dataset) => {
+          const index = dataset.series.findIndex((entry) => entry.seriesId === anchor.seriesId);
+          if (index < 0) return false;
+          const places = new Set<number>();
+          dataset.columns.series.forEach((value, row) => { if (value === index && dataset.columns.value[row] !== null) places.add(dataset.columns.entity[row]!); });
+          return places.size > 1;
+        }).map((dataset) => dataset.page.datasetId);
+        // Its groups in this dataset (the unemployment rate by sex, by settlement, by education), one per heading.
+        const groups = topicDataset.series
+          .filter((entry) => entry !== anchor && entry.unit === anchor.unit
+            && ((anchor.breakdown !== undefined && entry.breakdown === anchor.breakdown) || entry.seriesId.startsWith(`${anchor.seriesId}.`)))
+          .reduce((first, entry) => (first.has(entry.headingKa ?? "") ? first : first.set(entry.headingKa ?? "", entry.seriesId)), new Map<string, string>());
+        const key = placed.length > 0 ? "errors.rankTopicSeriesAlone" : "errors.rankTopicSeriesAloneNoPlaces";
+        const values = { seriesId: anchor.seriesId, datasetId: topicDataset.page.datasetId, datasetIds: placed.join(", "), groupSeriesIds: [...groups.values()].join(", ") };
+        const message = (locale: "ka" | "en") => serviceMessage(snapshot, locale, key, values)
+          + (groups.size > 0 ? ` ${serviceMessage(snapshot, locale, "errors.rankTopicSeriesGroups", values)}` : "");
+        return errorResponse(snapshot, { code: "invalid_parameters", messageKa: message("ka"), messageEn: message("en"), retryable: false });
+      }
+      universeKey = "ranking.topicSeries";
+      const parentEntry = parentId === null ? undefined : topicDataset.series.find((entry) => entry.seriesId === parentId);
+      // Said only where the figures add up so (amounts and shares of GDP), never of growth rates.
+      const less = parentId === null ? [] : topicDataset.series.filter((entry) => entry.subtractedFrom?.seriesId === parentId && entry.subtractedFrom.sum);
+      const labelOf = (entry: Peer, locale: "ka" | "en") => (locale === "ka" ? entry.labelKa : entry.labelEn);
+      // A total's own label can be bare ("All", under Graduates): its heading then names it.
+      const totalLabel = (entry: Peer, locale: "ka" | "en") => {
+        const heading = locale === "ka" ? entry.headingKa : entry.headingEn;
+        return heading === null || labelOf(entry, locale).includes(heading) ? labelOf(entry, locale) : `${heading}: ${labelOf(entry, locale)}`;
+      };
+      universeNotes = (locale) => [
+        ...(split && parentEntry ? [serviceMessage(snapshot, locale, "ranking.topicBreakdowns", {
+          parentLabel: totalLabel(parentEntry, locale), count: split.count, seriesLabel: labelOf(split.chosen, locale), otherSeriesIds: split.others.join(", "),
+        })] : []),
+        ...(less.length > 0 && parentEntry ? [serviceMessage(snapshot, locale, "ranking.topicSubtracted", {
+          parentLabel: totalLabel(parentEntry, locale), subtractedLabels: less.map((entry) => labelOf(entry, locale)).join(", "), subtractedIds: less.map((entry) => entry.seriesId).join(", "),
+        })] : []),
+      ];
+    }
+    // A percent series (its unit says so) changes in percentage points only, as a core rate does.
+    const units = topicDataset.series.filter((entry) => seriesIds.includes(entry.seriesId)).map((entry) => entry.unit);
+    const percent = units.length > 0 && units.every(isTopicPercentUnit);
+    if (!isValueMetric && (input.metric === "percentage_point_change") !== percent) {
+      const key = percent ? "errors.rankAmountChanges" : "errors.rankPercentagePoints";
+      return errorResponse(snapshot, { code: "unsupported_measure", messageKa: serviceMessage(snapshot, "ka", key), messageEn: serviceMessage(snapshot, "en", key), retryable: false });
+    }
+    // A temperature (an interval-scale unit) ranks by its difference only (R33).
+    if (input.metric === "percentage_change" && units.some(isTopicIntervalUnit)) {
+      return errorResponse(snapshot, { code: "unsupported_measure", messageKa: serviceMessage(snapshot, "ka", "errors.rankIntervalChanges"), messageEn: serviceMessage(snapshot, "en", "errors.rankIntervalChanges"), retryable: false });
+    }
   } else {
-    const series = isProduct ? [] : catalogueSeries(snapshot, input.datasetId);
+    const series = isProduct ? [] : catalogueSeries(snapshot, input.datasetId as DatasetId);
     if (inflationCities) {
       if (input.seriesId === undefined || input.entityType !== "city") {
         return errorResponse(snapshot, {
@@ -362,7 +575,7 @@ export function rank(snapshot: FactQuerySnapshot, rawInput: unknown): FactQueryR
     entityIds = inflationCities ? snapshot.inflation.cityEntities.map((city) => city.id) : ["country.georgia"];
   }
 
-  const candidateCount = isMunicipal || inflationCities ? entityIds.length : seriesIds.length;
+  const candidateCount = byEntity ? entityIds.length : seriesIds.length;
 
   if (candidateCount === 0) {
     return errorResponse(snapshot, {
@@ -401,7 +614,10 @@ export function rank(snapshot: FactQuerySnapshot, rawInput: unknown): FactQueryR
 
   if (isValueMetric) {
     let result: FactQueryResponse;
-    if (isProduct) {
+    if (topicDataset) {
+      result = topicBatches(snapshot, entityIds, seriesIds, "observations", (entityChunk, seriesChunk) =>
+        queryIndicators(snapshot, { datasetId: input.datasetId, seriesIds: seriesChunk, entityIds: entityChunk, years: [input.year as number] }));
+    } else if (isProduct) {
       const observations: Observation[] = [];
       const mergedCaveats = new Map<string, FactQueryResponse["meta"]["caveats"][number]>();
       // Keep each query within the public series cap, while covering the entire roster.
@@ -434,7 +650,7 @@ export function rank(snapshot: FactQuerySnapshot, rawInput: unknown): FactQueryR
 
 
     for (const observation of observations) {
-      const stableId = isMunicipal || inflationCities ? observation.entityId : observation.seriesId;
+      const stableId = byEntity ? observation.entityId : observation.seriesId;
       if (observation.value === null) {
         exclusions.push({ id: stableId, reason: observation.missingReason ?? serviceMessage(snapshot, "ka", REASON_NO_VALUE), reasonEn: observation.missingReasonEn ?? serviceMessage(snapshot, "en", REASON_NO_VALUE) });
         continue;
@@ -452,6 +668,7 @@ export function rank(snapshot: FactQuerySnapshot, rawInput: unknown): FactQueryR
         caveatIds: observation.caveatIds,
         ...(observation.period !== undefined ? { period: observation.period } : {}),
         ...(observation.calculationBasePeriod !== undefined ? { calculationBasePeriod: observation.calculationBasePeriod } : {}),
+        ...(observation.periodEnd !== undefined ? { periodEnd: observation.periodEnd } : {}),
         documentIds: observation.documentIds,
         cells: [{ year: observation.year, ...(observation.period !== undefined ? { period: observation.period } : {}) }],
         stableId,
@@ -466,12 +683,15 @@ export function rank(snapshot: FactQuerySnapshot, rawInput: unknown): FactQueryR
           ? ({ dataset: "ministries", level: input.level ?? "admin_category", seriesIds } as const)
           : ({ dataset: "national", side: input.datasetId === "national-revenue" ? "revenue" : "expenditure", seriesIds } as const);
 
-    const result = compare(
-      snapshot,
-      isInflation
-        ? { target, fromPeriod: input.fromPeriod, toPeriod: input.toPeriod, measure: input.measure }
-        : { target, fromYear: input.fromYear as number, toYear: input.toYear as number, measure: input.measure },
-    );
+    const result = topicDataset
+      ? topicBatches(snapshot, entityIds, seriesIds, "comparisons", (entityChunk, seriesChunk) =>
+        compare(snapshot, { target: { dataset: "topic", datasetId: input.datasetId, seriesIds: seriesChunk, entityIds: entityChunk }, fromYear: input.fromYear as number, toYear: input.toYear as number, measure: input.measure }))
+      : compare(
+        snapshot,
+        isInflation
+          ? { target, fromPeriod: input.fromPeriod, toPeriod: input.toPeriod, measure: input.measure }
+          : { target, fromYear: input.fromYear as number, toYear: input.toYear as number, measure: input.measure },
+      );
     if (result.kind === "error") return errorResponse(snapshot, result.error);
 
     const comparisons = (result.data as { comparisons: Comparison[] }).comparisons;
@@ -480,7 +700,7 @@ export function rank(snapshot: FactQuerySnapshot, rawInput: unknown): FactQueryR
     caveats = result.meta.caveats;
 
     for (const comparison of comparisons) {
-      const stableId = isMunicipal || inflationCities ? comparison.entityId : comparison.seriesId;
+      const stableId = byEntity ? comparison.entityId : comparison.seriesId;
 
       // Spec section 6.7: omit what is not comparable and report it. A
       // `limited` comparison may remain, carrying its caveat.
@@ -584,6 +804,7 @@ export function rank(snapshot: FactQuerySnapshot, rawInput: unknown): FactQueryR
     caveatIds: entry.caveatIds,
     ...(entry.period !== undefined ? { period: entry.period } : {}),
     ...(entry.calculationBasePeriod !== undefined ? { calculationBasePeriod: entry.calculationBasePeriod } : {}),
+    ...(entry.periodEnd !== undefined ? { periodEnd: entry.periodEnd } : {}),
   }));
 
   const rankingDefinitionFor = (locale: "ka" | "en") => {
@@ -596,9 +817,11 @@ export function rank(snapshot: FactQuerySnapshot, rawInput: unknown): FactQueryR
         ? serviceMessage(snapshot, locale, "ranking.valueDefinitionPeriod", { measure, period: input.period as string, order })
         : serviceMessage(snapshot, locale, "ranking.changeDefinitionPeriod", { metric, measure, fromPeriod: input.fromPeriod as string, toPeriod: input.toPeriod as string, order });
     }
+    // A school-year dataset prints 2015/16, as its page does.
+    const periodName = (year: number) => (topicDataset && topicPeriodLabel(topicDataset, year)) ?? year;
     return isValueMetric
-      ? serviceMessage(snapshot, locale, "ranking.valueDefinition", { measure, year: input.year as number, order })
-      : serviceMessage(snapshot, locale, "ranking.changeDefinition", { metric, measure, fromYear: input.fromYear as number, toYear: input.toYear as number, order });
+      ? serviceMessage(snapshot, locale, "ranking.valueDefinition", { measure, year: periodName(input.year as number), order })
+      : serviceMessage(snapshot, locale, "ranking.changeDefinition", { metric, measure, fromYear: periodName(input.fromYear as number), toYear: periodName(input.toYear as number), order });
   };
 
   const status: "ok" | "partial" | "empty" =
@@ -620,8 +843,8 @@ export function rank(snapshot: FactQuerySnapshot, rawInput: unknown): FactQueryR
     entries,
     universe: {
       dimension: input.dimension,
-      description: serviceMessage(snapshot, "ka", universeKey, universeValues("ka")),
-      descriptionEn: serviceMessage(snapshot, "en", universeKey, universeValues("en")),
+      description: [serviceMessage(snapshot, "ka", universeKey, universeValues("ka")), ...universeNotes("ka")].join(" "),
+      descriptionEn: [serviceMessage(snapshot, "en", universeKey, universeValues("en")), ...universeNotes("en")].join(" "),
       candidateCount,
       eligibleCount: candidates.length,
       returnedCount: entries.length,

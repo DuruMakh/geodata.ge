@@ -3,17 +3,18 @@ import { ExplorerPage } from "../../components/explorer-shell/explorer-page";
 import { PageHeader } from "../../components/shell/page-header";
 import { JsonLd } from "../../components/seo/json-ld";
 import { BreadcrumbJsonLd } from "../../components/seo/breadcrumb-json-ld";
-import { loadServedMoneyBanksData, toClientMoneyBanksFact } from "../data/moneyBanks/importMoneyBanks";
+import { loadServedMoneyBanksData } from "../data/moneyBanks/importMoneyBanks";
 import { loadServedExplorerData } from "../data/servedData";
 import { projectGdpFact } from "../explorer/clientData";
-import { MONEY_BANKS_SECTIONS, moneyBanksCoverage, moneyBanksViewSeries, moneyBanksViews, type MoneyBanksTopicId } from "../explorer/moneyBanks";
+import { MONEY_BANKS_SECTIONS, moneyBanksCoverage, moneyBanksViews, type MoneyBanksTopicId } from "../explorer/moneyBanks";
+import { moneyBanksLabels, moneyBanksPageFacts, moneyBanksSectionSeriesIds } from "../explorer/moneyBanksPageData";
 import { coverageLabel } from "../explorer/coverageLabel";
 import { I18nProvider } from "../i18n/provider";
 import { clientPresentation, getPresentation } from "../i18n/presentation.server";
 import { getMessages } from "../i18n/messages.server";
 import { message } from "../i18n/messages";
 import { pageHref } from "../i18n/routes";
-import type { Locale, Presentation } from "../i18n/types";
+import type { Locale } from "../i18n/types";
 import { loadGdpWorkbookSources, loadSourcedWorkbookSources } from "../methodology/workbookSources";
 import { fiscalMetadata } from "../seo/metadata";
 import { explorerDatasetJsonLd } from "../seo/structuredData";
@@ -23,16 +24,6 @@ import { topicSection, ALL_DATA_PATH } from "../navigation/navTree";
 export async function moneyBanksPageMetadata(locale: Locale, section: MoneyBanksTopicId) {
   const messages = await getMessages(locale, ["moneyBanks"]);
   return fiscalMetadata({ locale, path: MONEY_BANKS_SECTIONS.find(item => item.id === section)!.href, title: message(messages, `moneyBanks.page.${section}.metaTitle`), description: message(messages, `moneyBanks.page.${section}.summary`) });
-}
-
-/** The ids of every series a money and banks page can show (Money supply's two views share theirs). */
-function sectionSeriesIds(section: MoneyBanksTopicId): string[] {
-  return [...new Set(moneyBanksViews(section).flatMap(view => moneyBanksViewSeries(section, view).map(series => series.id)))];
-}
-
-/** Display names for every series a money and banks page can show, in the page's language. */
-function moneyBanksLabels(presentation: Presentation, section: MoneyBanksTopicId): Record<string, string> {
-  return Object.fromEntries(sectionSeriesIds(section).map(id => [id, message(presentation.messages, `moneyBanks.series.${id}`)]));
 }
 
 /** The archived NBG workbooks (data/methodology/source-archives/money.csv) with their public download links, for the Excel Sources sheet. */
@@ -48,8 +39,7 @@ export async function renderMoneyBanksPage(locale: Locale, section: MoneyBanksTo
     gdp ? loadServedExplorerData().then(explorer => explorer.gdpFacts.map(projectGdpFact)) : [], gdp ? loadGdpWorkbookSources(locale) : [],
   ]);
   // Each page receives only the observations its views can show.
-  const ids = new Set(sectionSeriesIds(section));
-  const facts = data.facts.map(toClientMoneyBanksFact).filter(f => ids.has(f.indicatorId));
+  const facts = moneyBanksPageFacts(data.facts, section);
   // The workbook cites only the files these observations come from.
   const sourceIds = new Set(facts.map(f => f.sourceId));
   const years = [...new Set(moneyBanksViews(section).flatMap(view => moneyBanksCoverage(section, view, facts, gdpFacts).years))];
@@ -63,7 +53,7 @@ export async function renderMoneyBanksPage(locale: Locale, section: MoneyBanksTo
   return <I18nProvider {...clientPresentation(presentation)}>
     <JsonLd testId="explorer-dataset-json-ld" data={explorerDatasetJsonLd({
       locale, origin, path: href, datasetId: "money", name: title, description, firstYear, lastYear, dateModified: lastReviewedAt,
-      variableMeasured: sectionSeriesIds(section).map(id => labels[id]),
+      variableMeasured: moneyBanksSectionSeriesIds(section).map(id => labels[id]),
       // The NBG's statistics; a % of GDP view divides by Geostat's GDP.
       ...(gdp ? { sources: ["nbg", "geostat"] as const } : {}),
     })} />

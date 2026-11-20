@@ -3,10 +3,11 @@
 // describe_coverage search quality (audit finding F08): the 139 hand-labelled queries of the audit, scored the way the
 // audit's score.mjs scored them. A query is "full recall" when every id in `req` is returned; a returned id is a false
 // positive when it is neither in `req` nor accepted by `ok`, and an inside-word one when no query word starts any word
-// of the entry's fields (the entry matched only on letters in the middle of a word).
+// of the entry's fields, a topic series' heading and dataset title among them (the entry matched only on letters in the
+// middle of a word).
 import { beforeAll, describe, expect, it } from "vitest";
 import { testSnapshot } from "../helpers/factQuerySnapshot";
-import { describeCoverage } from "../../lib/factQuery/describeCoverage";
+import { describeCoverage, searchCatalogue } from "../../lib/factQuery/describeCoverage";
 import { stem } from "../../lib/explorer/search/georgian";
 import type { FactQuerySnapshot } from "../../lib/factQuery/types";
 import { QUERIES, type SearchQuery } from "./fixtures/searchQueries";
@@ -23,16 +24,22 @@ beforeAll(() => {
 
 const searchMatchOf = (response: ReturnType<typeof describeCoverage>) => (response as { data: { searchMatch?: string } }).data.searchMatch;
 
+/** A topic dataset's search names, which its total series are searched under too (R26). */
+const topicTitles = (datasetId: string | undefined, level: string | undefined) => {
+  const dataset = level === "total" ? snapshot.topics.datasets.find((entry) => entry.page.datasetId === datasetId) : undefined;
+  return dataset ? [dataset.searchKa, dataset.searchEn] : [];
+};
+
 function search(query: string): Found {
   const response = describeCoverage(snapshot, { search: query });
   if (response.kind !== "catalogue") throw new Error(`expected a catalogue for ${query}`);
   const data = response.data as {
     searchMatch?: string;
-    series?: { seriesId: string; labelKa: string; labelEn: string }[];
+    series?: { seriesId: string; labelKa: string; labelEn: string; headingKa?: string; headingEn?: string; datasetId?: string; level?: string }[];
     entities?: { entityId: string; labelKa: string; labelEn: string; entitySlug: string | null }[];
   };
   const hits: Hit[] = [
-    ...(data.series ?? []).map((s) => ({ key: s.seriesId, label: `${s.seriesId} | ${s.labelEn} | ${s.labelKa}`, fields: [s.seriesId, s.labelKa, s.labelEn] })),
+    ...(data.series ?? []).map((s) => ({ key: s.seriesId, label: `${s.seriesId} | ${s.labelEn} | ${s.labelKa}`, fields: [s.seriesId, s.labelKa, s.labelEn, s.headingKa ?? null, s.headingEn ?? null, ...topicTitles(s.datasetId, s.level)] })),
     ...(data.entities ?? []).map((e) => ({ key: `E:${e.entityId}`, label: `E:${e.entityId} | ${e.labelEn} | ${e.labelKa}`, fields: [e.entityId, e.labelKa, e.labelEn, e.entitySlug] })),
   ];
   return { status: response.status, searchMatch: data.searchMatch, hits };
@@ -70,7 +77,7 @@ const singular = (word: string) => (word.length >= 5 ? word.replace(/(x|s|ch|sh)
 const insideWordHits = (query: string) => search(query).hits.filter((hit) => isInsideWord(query, hit)).map((hit) => hit.label);
 
 describe("catalogue search matches words, not letters inside words", () => {
-  it.each(["VAT", "grants", "oil", "Oni", "port", "ვალი", "ხორცი", "პური"])("%s returns nothing that matched only inside a word", (query) => {
+  it.each(["VAT", "grants", "oil", "Oni", "port", "exports", "ვალი", "ხორცი", "პური"])("%s returns nothing that matched only inside a word", (query) => {
     expect(insideWordHits(query)).toEqual([]);
   });
 
@@ -82,11 +89,13 @@ describe("catalogue search matches words, not letters inside words", () => {
     ["Batumi budget", "E:06"],
     ["განათლებისთვის", "spending.education"],
     ["pensions", "admin_program.57_11.c2eeef9e"],
+    ["wages", "average_monthly_nominal_earnings"],
+    ["unemployment", "unemployment_rate"],
   ])("%s finds %s", (query, target) => {
     expect(keysOf(query)).toContain(target);
   });
 
-  it.each(["wages", "salary", "unemployment", "exports", "zzz-no-such-series", "constructor", "__proto__"])("%s stays empty", (query) => {
+  it.each(["salary", "zzz-no-such-series", "constructor", "__proto__"])("%s stays empty", (query) => {
     const found = search(query);
     expect(found.status).toBe("empty");
     expect(found.hits).toEqual([]);
@@ -173,7 +182,7 @@ describe("catalogue search answers a phrase that no entry matches in full", () =
   });
 });
 
-// A some-words answer can be about another subject ("average wage" finds weighted-average debt rates), so it says so,
+// A some-words answer can be about another subject ("average salary" finds weighted-average debt rates), so it says so,
 // and a word the catalogue does not hold still looks for its own website page (audit F08 section 5.2, F01).
 describe("a some-words answer says that only some words matched", () => {
   // The note's wording is the service message's own; what it must say is pinned below.
@@ -182,7 +191,7 @@ describe("a some-words answer says that only some words matched", () => {
   type Noted = { searchMatch?: string; searchMatchNoteKa?: string; searchMatchNoteEn?: string; websitePages?: { topicId: string; labelEn: string; urlKa: string }[] };
   const dataOf = (response: ReturnType<typeof describeCoverage>) => (response as { data: Noted }).data;
 
-  it.each(["poverty rate", "average wage", "საშუალო ხელფასი", "trade balance"])("notes it on %s", (query) => {
+  it.each(["poverty rate", "average salary", "საშუალო ქირა", "trade deficit"])("notes it on %s", (query) => {
     const response = describeCoverage(snapshot, { search: query });
     expect(response.status).toBe("ok");
     expect(dataOf(response).searchMatch).toBe("some_words");
@@ -214,15 +223,15 @@ describe("a some-words answer says that only some words matched", () => {
     expect(found).not.toHaveProperty("searchMatchNoteKa");
   });
 
-  it("links the poverty page for poverty rate, whose word rate alone matched served series", () => {
-    const poverty = snapshot.website.pages.find((page) => page.name.en === "Poverty")!;
-    const pages = dataOf(describeCoverage(snapshot, { search: "poverty rate" })).websitePages ?? [];
-    expect(pages.map((page) => page.urlKa)).toContain(poverty.urlKa);
-    for (const page of pages) expect(page.topicId).toBe("living-standards");
+  // Spec §5.4: the Poverty page is served, so "poverty rate" answers with its dataset's rates, not a link to the page.
+  it("lists the served poverty rates first for poverty rate, and links no page of their topic", () => {
+    const found = describeCoverage(snapshot, { search: "poverty rate" }) as { data: Noted & { series: { seriesId: string; datasetId?: string }[] } };
+    expect(found.data.series[0]).toMatchObject({ datasetId: "living-standards-poverty", seriesId: "poverty.absolute" });
+    expect((found.data.websitePages ?? []).map((page) => page.topicId)).not.toContain("living-standards");
   });
 
   it("validates against the published describe_coverage output schema", () => {
-    for (const query of ["poverty rate", "average wage"]) {
+    for (const query of ["poverty rate", "average salary"]) {
       expect(outputSchemaFor("describe_coverage").safeParse(describeCoverage(snapshot, { search: query })).success, query).toBe(true);
     }
   });
@@ -258,6 +267,222 @@ describe("a some-words answer puts the subject first", () => {
     expect(found.series[0]?.datasetId).toBe("national-revenue");
     expect(found.series[0]?.seriesId).toMatch(/tax/);
   });
+
+  // The rule behind "tax rate" on a small catalogue: "pear" is the commonest word, "apple" the rarer one.
+  type Entry = { label: string; dataset: string };
+  const order = (query: string, entries: Entry[]) =>
+    searchCatalogue(query, entries, (entry) => [entry.label], { ahead: (entry) => [entry.dataset] }).matches.map((entry) => entry.label);
+
+  it("puts a dataset ahead on a rarer word its label meets, never on the commonest word alone", () => {
+    const found = order("apple pear", [
+      { label: "pear juice", dataset: "Pear drinks" }, { label: "apple pie", dataset: "Desserts" }, { label: "pear tart", dataset: "Apple orchard" },
+      { label: "pear cake", dataset: "Other" }, { label: "pear salad", dataset: "Other" },
+    ]);
+    expect(found[0]).toBe("pear tart");
+    expect(found.indexOf("apple pie")).toBeLessThan(found.indexOf("pear juice"));
+  });
+
+  it("leaves out only one of two equally common words, so the other still puts its dataset ahead", () => {
+    const found = order("apple pear", [
+      { label: "apple x", dataset: "Pear drinks" }, { label: "pear y", dataset: "Apple orchard" }, { label: "apple", dataset: "Other" }, { label: "pear", dataset: "Other" },
+    ]);
+    // The first of the tied words ("apple") is the one left out: "Pear drinks" goes ahead, "Apple orchard" does not.
+    expect(found[0]).toBe("apple x");
+    expect(found.indexOf("pear y")).toBeGreaterThan(0);
+  });
+
+  // "personal income tax" holds Income tax in full, with its last word; "Personal" lacks the tax, and a phrase with a
+  // joining word ("share of income tax") names what comes before it, so nothing joins it.
+  it("lets an entry the query names in full, with its last word, join an all-words answer after the full matches", () => {
+    const entries = [{ label: "Personal income tax", dataset: "Breaks" }, { label: "Income tax", dataset: "Revenue" }, { label: "Personal", dataset: "Revenue" }, { label: "Share of income tax", dataset: "Breaks" }];
+    const joined = (query: string) => searchCatalogue(query, entries, (entry) => [entry.label], { joins: (entry) => entry.dataset === "Revenue" });
+    expect(joined("personal income tax")).toMatchObject({ searchMatch: "all_words", matches: [entries[0], entries[1]] });
+    expect(joined("share of income tax").matches).toEqual([entries[3]]);
+  });
+});
+
+// Ruling R26: a topic dataset is searched under "<topic> — <page title>", not its one-word page title, so a budget
+// function's spending is not answered with a household's ("Living standards — Spending"); the topic's name alone
+// ("Education", "Health and social protection") neither lists its pages first nor puts them ahead of the budget's.
+describe("a topic dataset is searched under its topic's name and its page title", () => {
+  const firstOf = (query: string) => (describeCoverage(snapshot, { search: query }) as { data: { series: { seriesId: string; datasetId?: string }[] } }).data.series[0];
+
+  it.each([
+    ["ჯანდაცვის ხარჯები", "national-expenditure", "spending.health"],
+    ["განათლების ხარჯები", "national-expenditure", "spending.education"],
+    ["food prices", "inflation", "cpi.cat.01_1"],
+    ["education", "national-expenditure", "spending.education"],
+    ["health", "national-expenditure", "spending.health"],
+    ["social protection", "national-expenditure", "spending.social_protection"],
+    ["სოციალური დაცვა", "national-expenditure", "spending.social_protection"],
+    // The Trade pages' imports do not take the import tax's place.
+    ["import tax", "national-revenue", "revenue.import_tax"],
+    ["იმპორტის გადასახადი", "national-revenue", "revenue.import_tax"],
+  ])("lists the budget's or inflation's series first for %s", (query, datasetId, seriesId) => {
+    expect(firstOf(query)).toMatchObject({ datasetId, seriesId });
+  });
+
+  // A topic page whose title shares one word with a budget or economy query does not take its place: Tax breaks and
+  // refunds, Spending by type and GDP by expenditure are not the answer to "tax", "spending" in general or "GDP"; a Foreign
+  // debt title does not answer "debt" alone (the pinned fiscal suite below).
+  it.each([
+    ["GDP", "gdp-overview"], ["მშპ", "gdp-overview"], ["tax", "national-revenue"], ["taxes", "national-revenue"], ["tax revenue", "national-revenue"],
+    ["VAT", "national-revenue"], ["დღგ", "national-revenue"], ["health spending", "national-expenditure"],
+  ])("keeps the core answer first for %s", (query, datasetId) => {
+    expect(firstOf(query)?.datasetId).toBe(datasetId);
+  });
+
+  // After the core datasets, a topic whose search name meets every word comes before another topic's matching row.
+  it.each([
+    ["wages", "wages-overview", "average_monthly_nominal_earnings"],
+    ["investment", "business-investment-profit", "business.investment.total"],
+    ["exports", "trade-domestic-exports", "trade.exports"],
+  ])("lists the topic the query names before another topic's row for %s", (query, datasetId, seriesId) => {
+    expect(firstOf(query)).toMatchObject({ datasetId, seriesId });
+  });
+
+  // The country's foreign debt (NBG, External flows) is not the government's debt (the core Government debt dataset).
+  it.each([
+    ["public debt", "government-debt", "debt.stock.total"],
+    ["სახელმწიფო ვალი", "government-debt", "debt.stock.total"],
+  ])("keeps the government's debt first for %s, not the country's foreign debt", (query, datasetId, seriesId) => {
+    expect(firstOf(query)).toMatchObject({ datasetId, seriesId });
+  });
+
+  it.each(["external debt", "საგარეო ვალი"])("lists the country's foreign debt first for %s and still finds the government's external debt", (query) => {
+    expect(firstOf(query)).toMatchObject({ datasetId: "external-foreign-debt", seriesId: "ext_debt.total" });
+    expect(keysOf(query)).toContain("debt.stock.external");
+  });
+
+  it.each([
+    ["spending", "living-standards-spending", "spending.consumption.per_household"],
+    ["income", "living-standards-income", "income.total.per_household"],
+    ["poverty", "living-standards-poverty", "poverty.absolute"],
+    ["home prices", "housing-prices", "housing.price_index.total"],
+    ["building permits", "housing-permits", "housing.permits_count.total"],
+    ["Gini", "living-standards-inequality", "gini.total_income"],
+  ])("still lists the page a query names first for %s", (query, datasetId, seriesId) => {
+    expect(firstOf(query)).toMatchObject({ datasetId, seriesId });
+  });
+
+  it.each([
+    ["school pupils", "education-schools", "education.pupils_national.total"],
+    ["doctors", "health-doctors-hospitals", "health.staff.doctors"],
+    ["housing prices", "housing-prices", "housing.price_index.total"],
+    ["internet users", "internet-users", "internet.used_3m.total"],
+    ["registered vehicles", "transport-regions", "transport.registered"],
+    ["trade balance", "trade-overview", "trade.balance"],
+    ["imports from China", "trade-partners", "trade.imports.partner.1995-2025.156"],
+    ["wine exports", "trade-products", "trade.exports.goods.hs4.2020-2025.2204"],
+    ["current account", "external-current-account", "ca.balance.net"],
+    ["money transfers", "external-money-from-abroad", "transfer.total.received"],
+    ["foreign investment", "external-foreign-investment", "fdi.total"],
+    ["international reserves", "external-reserves", "reserves.total"],
+    ["tax breaks", "tax-breaks-refunds", "tax_breaks.total"],
+    ["საგადასახადო შეღავათები", "tax-breaks-refunds", "tax_breaks.total"],
+    ["spending by type", "expenditure-types", "spending_type.total.nominal"],
+    ["wages and salaries", "expenditure-types", "spending_type.compensation.nominal"],
+    ["შრომის ანაზღაურება", "expenditure-types", "spending_type.compensation.nominal"],
+    ["household consumption", "economy-expenditure", "gdp_use.households.nominal"],
+    ["GDP by expenditure", "economy-expenditure", "economy.gdp_total.nominal"],
+    ["მშპ დანახარჯების მიხედვით", "economy-expenditure", "economy.gdp_total.nominal"],
+  ])("keeps a topic's own answer first for %s", (query, datasetId, seriesId) => {
+    expect(firstOf(query)).toMatchObject({ datasetId, seriesId });
+  });
+
+  // A some-words answer puts ahead the series whose page title meets a word, not those whose topic's name does: by
+  // the topic's name ("Education — Universities") every Education series would come before the ministry's spending.
+  it("lists the budget's series first for ministry of education, not an Education page's", () => {
+    expect(firstOf("ministry of education")).toMatchObject({ datasetId: "national-expenditure", seriesId: "spending.education" });
+  });
+
+  it("names every topic dataset for search by its topic's name, then its published title", () => {
+    for (const dataset of snapshot.topics.datasets) {
+      expect(dataset.searchKa.endsWith(` — ${dataset.titleKa}`), dataset.page.datasetId).toBe(true);
+      expect(dataset.searchEn.endsWith(` — ${dataset.titleEn}`), dataset.page.datasetId).toBe(true);
+      expect(dataset.searchKa.length).toBeGreaterThan(` — ${dataset.titleKa}`.length);
+      expect(dataset.searchEn.length).toBeGreaterThan(` — ${dataset.titleEn}`.length);
+    }
+  });
+
+  it("keeps the published title apart from the search name", () => {
+    const spending = snapshot.topics.datasets.find((dataset) => dataset.page.datasetId === "living-standards-spending")!;
+    expect(spending).toMatchObject({ titleEn: "Spending", searchEn: "Living standards — Spending", titleKa: "ხარჯები", searchKa: "ცხოვრების დონე — ხარჯები" });
+    const summary = (describeCoverage(snapshot, {}) as { data: { datasets: { datasetId: string; labelEn: string; labelKa: string }[] } }).data.datasets.find((dataset) => dataset.datasetId === "living-standards-spending");
+    expect(summary).toMatchObject({ labelEn: "Spending", labelKa: "ხარჯები" });
+  });
+});
+
+// Ruling R31: Fiscal.ge is a fiscal site first, so a budget question finds the core budget data first, and a topic's own
+// question still finds its topic. Each query's first dataset and, where named, its first series.
+describe("the pinned fiscal query suite", () => {
+  type Answer = { datasets: { datasetId: string }[]; series?: { datasetId?: string; seriesId: string }[]; entities?: { datasetId?: string; entityId: string }[] };
+  const answerOf = (query: string) => (describeCoverage(snapshot, { search: query }) as { data: Answer }).data;
+
+  // "დეფიციტი" is in no served label (the deficit is General government balance, id `deficit.general_government.balance`),
+  // so it finds no series without an owner-approved alias. "debt" alone is the government's debt, not the budget's debt
+  // service or the country's foreign debt.
+  it.each([
+    ["personal income tax", "national-revenue", "revenue.income_tax"], ["საშემოსავლო გადასახადი", "national-revenue", "revenue.income_tax"],
+    ["government debt", "government-debt", "debt.stock.total"], ["public debt", "government-debt", "debt.stock.total"],
+    ["სახელმწიფო ვალი", "government-debt", "debt.stock.total"], ["debt", "government-debt", "debt.stock.total"], ["ვალი", "government-debt", "debt.stock.total"],
+    ["budget balance", "general-government-balance", "deficit.general_government.balance"], ["deficit", "general-government-balance", "deficit.general_government.balance"],
+    ["import duties", "national-revenue", "revenue.import_tax"], ["import tax", "national-revenue", "revenue.import_tax"], ["იმპორტის გადასახადი", "national-revenue", "revenue.import_tax"],
+    ["VAT", "national-revenue", "revenue.vat"], ["დღგ", "national-revenue", "revenue.vat"], ["tax revenue", "national-revenue", "revenue.taxes_total"],
+    ["health spending", "national-expenditure", "spending.health"], ["ჯანდაცვის ხარჯები", "national-expenditure", "spending.health"],
+    ["education spending", "national-expenditure", "spending.education"], ["განათლების ხარჯები", "national-expenditure", "spending.education"],
+    ["spending on culture", "national-expenditure", "spending.culture"], ["კულტურის ხარჯები", "national-expenditure", "spending.culture"],
+    ["agriculture spending", "national-expenditure", "spending.agriculture_environment"], ["agriculture", "national-expenditure", "spending.agriculture_environment"],
+    ["GDP", "gdp-overview"], ["მშპ", "gdp-overview"],
+  ])("answers the budget question %s with %s first", (query, datasetId, seriesId?: string) => {
+    const found = answerOf(query);
+    expect(found.datasets[0]?.datasetId).toBe(datasetId);
+    expect(found.series?.[0]?.datasetId).toBe(datasetId);
+    if (seriesId !== undefined) expect(found.series?.[0]?.seriesId).toBe(seriesId);
+  });
+
+  // A search that holds a topic page's title in full is aimed at the page: "პენსია" is Pensions and "სოფლის მეურნეობა"
+  // is Farming, whose Georgian title it is (the budget's Agriculture and environment comes next). "pension" is a reviewed
+  // alias for the funded pension programme's word, so its first series is that programme, but its first dataset is Pensions.
+  it.each([
+    ["school pupils", "education-schools", "education.pupils_national.total"], ["doctors", "health-doctors-hospitals", "health.staff.doctors"],
+    ["housing prices", "housing-prices", "housing.price_index.total"], ["unemployment rate", "unemployment-overview", "unemployment_rate"],
+    ["average wage", "wages-overview", "average_monthly_nominal_earnings"], ["pension", "health-pensions"], ["პენსია", "health-pensions", "social.pension.recipients"],
+    ["wine exports", "trade-products", "trade.exports.goods.hs4.2020-2025.2204"], ["remittances", "living-standards-income", "income.remittances.per_household"],
+    ["FDI", "external-foreign-investment", "fdi.total"], ["crime", "crime-recorded", "crime.recorded.total"], ["crime rate", "crime-recorded", "crime.recorded.total"],
+    ["museums", "science-culture-museums", "science_culture.museum_visitors"], ["air quality Tbilisi", "environment-air-quality"],
+    ["temperature", "environment-climate", "environment.climate.temperature.georgia"], ["სოფლის მეურნეობა", "energy-food-farming", "farming.output.total"],
+    ["waste Adjara", "environment-waste", "environment.waste.collected"],
+  ])("answers the topic question %s with %s first", (query, datasetId, seriesId?: string) => {
+    const found = answerOf(query);
+    expect(found.datasets[0]?.datasetId).toBe(datasetId);
+    if (seriesId !== undefined) expect(found.series?.[0]).toMatchObject({ datasetId, seriesId });
+  });
+
+  // A place's name is where, not what: the place leads, in the budget's municipalities first.
+  it.each([
+    ["Shuakhevi", "10"], ["შუახევი", "10"], ["Batumi", "06"], ["Kutaisi", "20"], ["Tbilisi", "region.tbilisi"],
+  ])("answers the place %s with the municipality first", (query, entityId) => {
+    const found = answerOf(query);
+    expect(found.datasets[0]?.datasetId).toBe("municipal-expenditure");
+    expect(found.entities?.[0]).toMatchObject({ datasetId: "municipal-expenditure", entityId });
+  });
+
+  it("finds the place first among the City air quality entries for air quality Tbilisi", () => {
+    expect(answerOf("air quality Tbilisi").entities?.[0]).toMatchObject({ datasetId: "environment-air-quality", entityId: "city.tbilisi" });
+  });
+
+  // Inside one dataset an entry speaks only by its own label: the entries that meet more of the words come first, then
+  // the rarer words over a label that is mostly them ("red" of Lead oxides; red lead is rarer than "wine", but Wine is the subject).
+  it.each([
+    ["trade-products", "red wine bottles", "trade.exports.goods.hs4.2020-2025.2204"],
+    ["ministries", "education programmes", "admin_program.32_03.85c13dd5"],
+    ["ministries", "ministry of health programmes", "admin_program.27_01.985ee587"],
+    ["inflation", "Tbilisi food inflation", "cpi.cat.01_1"],
+  ])("answers the %s search %s with %s first", (datasetId, search, seriesId) => {
+    const found = (describeCoverage(snapshot, { datasetId, search }) as { data: Answer }).data;
+    expect(found.series?.[0]?.seriesId).toBe(seriesId);
+  });
 });
 
 describe("the labelled queries", () => {
@@ -282,6 +507,8 @@ describe("the labelled queries", () => {
   // typos. Without a synonym list (spec section 33), the two reviewed aliases only, and no typo correction, the
   // 23 queries stay out of reach: `healthcare`, `defense`, `police`, `petrol`, `ჯანდაცვა`, `პენსია` and the rest
   // are different words for a label, not forms of it. Raising this number needs the owner's approval of those additions.
+  // `government debt` and `personal income tax` also meet every word of a topic row (the NBG's "Government" row of foreign
+  // debt, the "Personal income tax" break); the core series they name in full, Total debt and Income tax, join their answers.
   it("reaches full recall on at least 111 of 134", () => {
     const failing = rows.filter((row) => row.missing.length > 0).map((row) => `${row.q} -> missing ${row.missing.join(", ")}`);
     expect(rows.length - failing.length, failing.join("\n")).toBeGreaterThanOrEqual(111);

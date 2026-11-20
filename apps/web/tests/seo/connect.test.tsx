@@ -71,6 +71,7 @@ test.each(["ka", "en"] as const)("Connect includes real national, city and produ
   for (const name of ["inflation-products.csv", "inflation-products.json"]) expect(html).toContain(`href="/downloads/data/${name}"`);
   expect(item("products-cumulative")).toMatch(/December|დეკემბ/);
   expect(html).toContain("1.7.0");
+  expect(html).toContain("1.8.0");
   expect(html).toContain("2026-07-28");
   expect(html).toContain("2025-11-25");
   expect(html).not.toContain("Codex / ChatGPT");
@@ -99,7 +100,7 @@ test("Connect examples move with the loaded facts rather than retaining the rele
   expect(examples).toContain("2014-12");
 });
 
-test.each(["ka", "en"] as const)("Connect gives numbered steps for at least two clients and lists unemployment as not served in %s", async locale => {
+test.each(["ka", "en"] as const)("Connect gives numbered steps for at least two clients and no longer lists unemployment as not served in %s", async locale => {
   const html = await connectHtml(locale);
   const clients = html.split('data-testid="connect-client"').slice(1).map(chunk => chunk.slice(0, chunk.indexOf("</ol>") + "</ol>".length));
   expect(clients.length).toBeGreaterThanOrEqual(2);
@@ -109,5 +110,18 @@ test.each(["ka", "en"] as const)("Connect gives numbered steps for at least two 
     expect(client.replace(/<[^>]+>/g, "").trim().length).toBeGreaterThan(30);
   }
   const excluded = html.slice(html.indexOf('data-testid="connect-coverage-excluded"'));
-  expect(excluded.slice(0, excluded.indexOf("</ul>"))).toContain(locale === "en" ? "Unemployment data" : "უმუშევრობის მონაცემები");
+  expect(excluded.slice(0, excluded.indexOf("</ul>"))).not.toContain(locale === "en" ? "Unemployment data" : "უმუშევრობის მონაცემები");
+});
+
+test.each(["ka", "en"] as const)("Connect lists the topic groups of the other chart pages and their download folder in %s", async locale => {
+  const html = await connectHtml(locale);
+  const start = html.indexOf('data-testid="connect-topic-coverage"');
+  expect(start).toBeGreaterThan(-1);
+  const item = html.slice(start, html.indexOf("</li>", start)).replace(/<[^>]+>/g, "");
+  const names = locale === "en"
+    ? ["Budget", "Economy and business", "Prices and money", "Labour market", "Living standards and health", "External sector", "Demography", "Society and environment"]
+    : ["ბიუჯეტი", "ეკონომიკა და ბიზნესი", "ფასები და ფული", "შრომის ბაზარი", "ცხოვრების დონე და ჯანდაცვა", "საგარეო სექტორი", "დემოგრაფია", "საზოგადოება და გარემო"];
+  for (const name of names) expect(item).toContain(name);
+  expect(item).toContain("91");
+  expect(item).toContain("/downloads/data/topics/");
 });

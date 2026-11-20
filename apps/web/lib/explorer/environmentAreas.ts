@@ -16,7 +16,7 @@ export const environmentAreaIndexHref = (topic: EnvironmentAreaTopic) => ENVIRON
 export const environmentAreaRoutes = (topic: EnvironmentAreaTopic) => areaRoutes<EnvironmentArea>(environmentAreaIndexHref(topic));
 
 /** Rows that exist for Georgia and every region: the waste collected, timber cut and illegal logging found. */
-const AREA_MEASURES = ["environment.waste.collected", "environment.forest.timber_cut", "environment.forest.illegal_logging"];
+export const AREA_MEASURES = ["environment.waste.collected", "environment.forest.timber_cut", "environment.forest.illegal_logging"];
 
 /** An area's whole list, before rows without facts are dropped; its first row is the default and the ink reference. */
 function areaDefinitions(topic: EnvironmentAreaTopic, area: EnvironmentArea): EnvironmentSeriesDefinition[] {

@@ -1,0 +1,80 @@
+// apps/web/lib/factQuery/caveats/rules.topics.ts
+//
+// The topic datasets' value-status and basis disclosures (query_indicators). Each fires only on an AVAILABLE topic
+// cell: a topic observation is the only kind that carries `status`, and a missing cell carries no disclosure whatever
+// codes the store holds for it (ruling R8). Affects is the precise entity:series:year cell.
+import type { CaveatContext, CaveatRule } from "./engine";
+import type { ServiceMessageKey } from "../localization";
+import type { FactQuerySnapshot, Severity } from "../types";
+import { breakBetween, topicBreakDetail } from "../topics/store";
+
+type Cell = CaveatContext["observations"][number];
+
+const cells = (c: CaveatContext, test: (cell: Cell) => boolean) => c.observations.filter((o) => o.status !== undefined && o.value !== null && test(o));
+
+function topicRule(code: string, severity: Severity, comparisonEffect: CaveatRule["comparisonEffect"], messageKey: ServiceMessageKey, test: (cell: Cell) => boolean): CaveatRule {
+  return {
+    code,
+    severity,
+    comparisonEffect,
+    messageKey,
+    methodologyRef: `ai-grounding-and-caveats.md#${code}`,
+    methodologyRefEn: "/en/methodology",
+    applies: (c) => cells(c, test).length > 0,
+    affects: (c) => cells(c, test).map((o) => `${o.entityId}:${o.seriesId}:${o.year}`),
+  };
+}
+
+// A reviewed series break (the registers in data/imports) inside the requested years: the series' cells carry it, and a
+// change across it is refused by compare and rank. Wording is one generic bilingual sentence plus the register's English
+// reason (ruling R9).
+const breaksIn = (c: CaveatContext, snapshot: FactQuerySnapshot) => {
+  const dataset = snapshot.topics.datasets.find((entry) => entry.page.datasetId === c.datasetId);
+  if (!dataset || c.years.length === 0) return [];
+  const first = Math.min(...c.years);
+  const last = Math.max(...c.years);
+  return cells(c, () => true).flatMap((cell) => {
+    const found = breakBetween(dataset.breaks, cell.seriesId, first, last, dataset.page.periodKind);
+    return found ? [{ cell, found }] : [];
+  });
+};
+
+/** Spending by type: general government, not the state budget (full review I-1). */
+export const GENERAL_GOVERNMENT_DATASET_ID = "expenditure-types";
+
+export const TOPIC_CAVEAT_RULES: readonly CaveatRule[] = [
+  // Unconditional within the dataset, as deficit_general_government_scope is: the error (reading it as the state budget's
+  // spending, or setting it against the state budget's figures) is available whatever is asked of it.
+  {
+    code: "topic_general_government_scope",
+    severity: "severe",
+    comparisonEffect: "none",
+    messageKey: "caveats.topic_general_government_scope",
+    methodologyRef: "ai-grounding-and-caveats.md#topic_general_government_scope",
+    methodologyRefEn: "/en/methodology",
+    applies: (c) => c.datasetId === GENERAL_GOVERNMENT_DATASET_ID,
+    affects: (c) => cells(c, () => true).map((o) => `${o.entityId}:${o.seriesId}:${o.year}`),
+  },
+  topicRule("topic_survey_estimate", "note", "none", "caveats.topic_survey_estimate", (o) => o.status === "survey_estimate"),
+  topicRule("topic_derived", "note", "none", "caveats.topic_derived", (o) => o.status === "derived"),
+  topicRule("topic_partial_period", "severe", "limits", "caveats.topic_partial_period", (o) => o.status === "partial"),
+  // A dated point (a stock at a date inside the year, not at year end): a change to it spans less than a year (ruling R30).
+  topicRule("topic_dated_period", "severe", "limits", "caveats.topic_dated_period", (o) => o.periodEnd !== undefined),
+  // planned_values' own wording, under a topic code: planned_values names series:year, which across several places
+  // would mark every place's cell in that year planned.
+  topicRule("topic_planned", "severe", "none", "caveats.planned_values", (o) => o.basis === "planned"),
+  topicRule("topic_preliminary", "note", "limits", "caveats.topic_preliminary", (o) => o.basis === "preliminary"),
+  // A projection is not an outcome: like debt_service_projection and deficit_projection, a change into it is not a change.
+  topicRule("topic_projection", "severe", "breaks", "caveats.topic_projection", (o) => o.basis === "projection"),
+  {
+    code: "topic_series_break",
+    severity: "severe",
+    comparisonEffect: "breaks",
+    messageKey: "caveats.topic_series_break",
+    methodologyRef: "ai-grounding-and-caveats.md#topic_series_break",
+    methodologyRefEn: "/en/methodology",
+    applies: (c, snapshot) => breaksIn(c, snapshot).length > 0,
+    affects: (c, snapshot) => breaksIn(c, snapshot).map(({ cell }) => `${cell.entityId}:${cell.seriesId}:${cell.year}`),
+    messageValues: (c, snapshot) => ({ detail: [...new Set(breaksIn(c, snapshot).map(({ found }) => topicBreakDetail(found)))].join("; ") }),
+  },
+];

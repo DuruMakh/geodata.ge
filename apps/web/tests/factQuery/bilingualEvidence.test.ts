@@ -88,8 +88,8 @@ describe("bilingual comparisons and evidence", () => {
     if (response.kind !== "error") throw Error("Expected unknown source");
     expect(response.error.messageEn).toBe("Unrecognised source: unknown-source.");
     for (const rule of CAVEAT_RULES) {
-      expect(serviceMessage(snapshot, "en", rule.messageKey).trim()).not.toBe("");
-      expect(rule.methodologyRefEn).toMatch(/^\/en\/(methodology\/(expenditure|revenue|municipalities|debt|gdp|economic-sectors|inflation)|explorer\/deficit)$/);
+      expect(serviceMessage(snapshot, "en", rule.messageKey, rule.messageValues ? { detail: "date: reason" } : {}).trim()).not.toBe("");
+      expect(rule.methodologyRefEn).toMatch(/^\/en\/(methodology(\/(expenditure|revenue|municipalities|debt|gdp|economic-sectors|inflation))?|explorer\/deficit)$/);
     }
   });
 });

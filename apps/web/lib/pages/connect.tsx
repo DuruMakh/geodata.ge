@@ -14,6 +14,7 @@ import { inflationProductIndex } from "../factQuery/inflationProductData";
 import { productCumulative } from "../explorer/inflationProducts";
 import { periodFromKey } from "../data/inflation/periods";
 import { loadPackagedSnapshot } from "../mcp/snapshot";
+import { NAV_GROUPS } from "../navigation/navTree";
 import { loadServedLandingData } from "../data/servedData";
 import { buildLandingContext } from "../landing/landingData";
 import { fiscalMetadata } from "../seo/metadata";
@@ -58,7 +59,7 @@ function coverage(): {
 
   const { datasets, exclusions } = response.data as CoverageData;
   const ranges = {} as Record<DatasetId, string>;
-  for (const dataset of datasets) ranges[dataset.datasetId] = `${dataset.years[0]}–${dataset.years[1]}`;
+  for (const dataset of datasets) ranges[dataset.datasetId as DatasetId] = `${dataset.years[0]}–${dataset.years[1]}`;
 
   return {
     ranges,
@@ -145,9 +146,6 @@ const NOT_SERVED = [
   "connect.notServed1",
   "connect.notServed2",
   "connect.notServed3",
-  // The unemployment explorer is approved for people only; the query service does
-  // not serve it (lib/factQuery/buildSnapshot.ts).
-  "connect.notServed4",
 ] as const;
 
 // A developer-details line of file links. Below 768px each link is a 24px target
@@ -329,6 +327,8 @@ export async function renderConnectPage(locale: Locale) {
                   <li data-testid="connect-inflation-coverage">{message(messages, "connect.inflationCoverage", { nationalRange: inflation.nationalRange, groupCount: inflation.groupCount, weightRange: inflation.weightRange, contributionStart: inflation.contributionStart, targetStart: inflation.targetStart })}</li>
                   <li data-testid="connect-city-coverage">{message(messages, "connect.cityCoverage", { count: inflation.cityCount, range: inflation.cityRange })}</li>
                   <li data-testid="connect-product-coverage">{message(messages, "connect.productCoverage", { count: products.count, range: products.range })}</li>
+                  {/* The other chart pages: one topic dataset each, annual, found through query_indicators. */}
+                  <li data-testid="connect-topic-coverage">{message(messages, "connect.topicCoverage", { count: loadPackagedSnapshot().topics.datasets.length, groups: NAV_GROUPS.map((group) => message(messages, group.labelKey)).join(", ") })}</li>
                 </ul>
                 {/* Tool and field names (query_inflation, yoy_pct, entityIds...) answer a
                     developer's question; DESIGN.md §24 says the page is not written for

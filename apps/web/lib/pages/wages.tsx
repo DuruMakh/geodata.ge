@@ -21,7 +21,8 @@ import { fiscalMetadata } from "../seo/metadata";
 import { areaTitleForm, latestYearOf } from "../seo/placeTitleForms";
 import { explorerDatasetJsonLd } from "../seo/structuredData";
 import { resolveSiteUrl } from "../siteUrl";
-import { loadWagesPage, wagesLabels, wagesRegionsDataset } from "./wages-shared";
+import { loadWagesPage, wagesRegionsDataset } from "./wages-shared";
+import { wagesLabels, wagesRegionPageData } from "../explorer/wagesPageData";
 import { topicSection, ALL_DATA_PATH } from "../navigation/navTree";
 
 export const wagesRegionStaticParams = () => WAGES_REGIONS.map(id => ({ id: id.replace(/^region\./, "") }));
@@ -42,13 +43,13 @@ export const renderWagesRegionPage = (slug: string, locale: Locale) => renderWag
 export async function renderWagesPage(locale: Locale, section: WagesSectionId, regionId?: string) {
   const [{ data, presentation, facts }, sources] = await Promise.all([loadWagesPage(locale, section), loadSourcedWorkbookSources("wages", locale)]);
   // The Regions index (wages-regions-index.tsx) is the map and list; a region page serves its own region beside Georgia.
-  if (regionId) facts.splice(0, facts.length, ...facts.filter(f => f.dimension !== "region" || f.groupId === regionId));
+  const regionPage = regionId ? wagesRegionPageData(facts, presentation, regionId) : null;
+  if (regionPage) facts.splice(0, facts.length, ...regionPage.facts);
   const years = [...new Set(wagesViews(section).flatMap(view => wagesCoverage(section, view, facts).years))];
   const firstYear = Math.min(...years), lastYear = Math.max(...years);
   const href = regionId ? wagesRegionHref(regionId) : WAGES_SECTIONS.find(item => item.id === section)!.href;
-  const labels = wagesLabels(presentation), regionName = regionId ? labels[regionId] : "";
   // Beside a region, the national line is named as Georgia's.
-  if (regionId) labels.average = message(presentation.messages, "wages.series.georgiaAverage");
+  const labels = regionPage ? regionPage.labels : wagesLabels(presentation), regionName = regionId ? labels[regionId] : "";
   const t = (key: string) => message(presentation.messages, `wages.${key}`);
   const title = regionId ? message(presentation.messages, "wages.regionTitle", { region: regionName }) : t(`page.${section}.title`);
   const summaryValues = wagesSummaryValues(data.facts.map(toClientWagesFact));

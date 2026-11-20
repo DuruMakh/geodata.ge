@@ -3,15 +3,16 @@ import { ExplorerPage } from "../../components/explorer-shell/explorer-page";
 import { PageHeader } from "../../components/shell/page-header";
 import { JsonLd } from "../../components/seo/json-ld";
 import { BreadcrumbJsonLd } from "../../components/seo/breadcrumb-json-ld";
-import { loadServedInternetData, toClientInternetFact } from "../data/internet/importInternet";
+import { loadServedInternetData } from "../data/internet/importInternet";
 import { INTERNET_SECTIONS, internetCoverage, internetTopicSeries, type InternetTopicId } from "../explorer/internet";
+import { internetLabels, internetPageFacts } from "../explorer/internetPageData";
 import { coverageLabel } from "../explorer/coverageLabel";
 import { I18nProvider } from "../i18n/provider";
 import { clientPresentation, getPresentation } from "../i18n/presentation.server";
 import { getMessages } from "../i18n/messages.server";
 import { message } from "../i18n/messages";
 import { pageHref } from "../i18n/routes";
-import type { Locale, Presentation } from "../i18n/types";
+import type { Locale } from "../i18n/types";
 import { fiscalMetadata } from "../seo/metadata";
 import { explorerDatasetJsonLd } from "../seo/structuredData";
 import { resolveSiteUrl } from "../siteUrl";
@@ -23,27 +24,12 @@ export async function internetPageMetadata(locale: Locale, section: InternetTopi
   return fiscalMetadata({ locale, path: INTERNET_SECTIONS.find(item => item.id === section)!.href, title: message(messages, `internet.page.${section}.metaTitle`), description: message(messages, `internet.page.${section}.summary`) });
 }
 
-/**
- * Display names for every series a topic page can show: a group (Everyone, Towns, …), an online activity or a kind of
- * contact with public services. Names carry no prefix: the heading they sit under names the measure and who it counts.
- */
-function internetLabels(presentation: Presentation, section: InternetTopicId): Record<string, string> {
-  const t = (key: string) => message(presentation.messages, `internet.${key}`);
-  return Object.fromEntries(internetTopicSeries(section).map(({ id, heading }) => {
-    const [, measure, group] = id.split(".");
-    if (heading === "activities") return [id, t(`series.activity.${measure.slice("activity_".length)}`)];
-    if (heading === "egov") return [id, t(`series.egov.${measure.slice("egov_".length)}`)];
-    return [id, t(`series.group.${group}`)];
-  }));
-}
-
 export async function renderInternetPage(locale: Locale, section: InternetTopicId) {
   const [data, presentation, sources] = await Promise.all([
     loadServedInternetData(), getPresentation(locale, ["internet", "format", "main", "workbook"], []), loadInternetWorkbookSources(locale),
   ]);
   // Each page receives only the observations its list can show.
-  const ids = new Set<string>(internetTopicSeries(section).map(series => series.id));
-  const facts = data.facts.map(toClientInternetFact).filter(f => ids.has(f.indicatorId));
+  const facts = internetPageFacts(data.facts, section);
   const { min: firstYear, max: lastYear } = internetCoverage(section, facts);
   const href = INTERNET_SECTIONS.find(item => item.id === section)!.href;
   const labels = internetLabels(presentation, section);

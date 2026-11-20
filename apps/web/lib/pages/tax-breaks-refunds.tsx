@@ -7,7 +7,7 @@ import { loadServedTaxBreaksRefundsData, toClientTaxBreaksRefundsFact } from "..
 import { TAX_BREAKS_REFUNDS_INDICATORS } from "../data/taxBreaksRefunds/types";
 import { loadServedExplorerData } from "../data/servedData";
 import { projectGdpFact } from "../explorer/clientData";
-import { TAX_BREAKS_REFUNDS_PATH, type TaxBreaksRefundsHeading } from "../explorer/taxBreaksRefunds";
+import { TAX_BREAKS_REFUNDS_PATH, taxBreaksRefundsNames } from "../explorer/taxBreaksRefunds";
 import { coverageLabel } from "../explorer/coverageLabel";
 import { I18nProvider } from "../i18n/provider";
 import { clientPresentation, getPresentation } from "../i18n/presentation.server";
@@ -20,8 +20,6 @@ import { navGroup, ALL_DATA_PATH } from "../navigation/navTree";
 import { fiscalMetadata } from "../seo/metadata";
 import { explorerDatasetJsonLd } from "../seo/structuredData";
 import { resolveSiteUrl } from "../siteUrl";
-
-const HEADINGS: readonly TaxBreaksRefundsHeading[] = ["breaks", "vat", "income", "refunds"];
 
 export async function taxBreaksRefundsPageMetadata(locale: Locale) {
   const messages = await getMessages(locale, ["taxBreaksRefunds"]);
@@ -44,8 +42,7 @@ export async function renderTaxBreaksRefundsPage(locale: Locale) {
   const sourceIds = new Set(facts.map(f => f.sourceId));
   const years = facts.map(f => f.year), firstYear = Math.min(...years), lastYear = Math.max(...years);
   const t = (key: string) => message(presentation.messages, `taxBreaksRefunds.${key}`);
-  const labels = Object.fromEntries(TAX_BREAKS_REFUNDS_INDICATORS.map(id => [id, t(`label.${id}`)]));
-  const headings = Object.fromEntries(HEADINGS.map(heading => [heading, t(`heading.${heading}`)])) as Record<TaxBreaksRefundsHeading, string>;
+  const { labels, headings } = taxBreaksRefundsNames(presentation.messages);
   const title = t("title"), description = t("metaDescription");
   const lastReviewedAt = data.facts.map(f => f.lastReviewedAt).sort().at(-1)!, origin = resolveSiteUrl();
   const budget = message(presentation.messages, "common.budget");

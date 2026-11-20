@@ -8,9 +8,8 @@ import { JsonLd } from "../../components/seo/json-ld";
 import { BreadcrumbJsonLd } from "../../components/seo/breadcrumb-json-ld";
 import { loadServedBusinessData, toClientBusinessFact } from "../data/business/importBusiness";
 import type { BusinessFact } from "../data/business/types";
-import type { MunicipalRegion } from "../data/municipal/types";
-import { REGIONAL_ECONOMY_REGIONS } from "../data/regionalEconomies/importRegionalEconomies";
 import { BUSINESS_AREAS, BUSINESS_REGIONS_HREF, businessAreaCoverage, businessAreaHref, businessAreaSeries, businessAreaSlug, businessMapId, type BusinessArea, type BusinessMapMeasure } from "../explorer/businessAreas";
+import { BUSINESS_AREA_LABEL_IDS, BUSINESS_AREA_PAGES, businessAreaFacts, businessAreaLabels, businessAreaSeriesLabels } from "../explorer/businessPageData";
 import { buildBusinessRegionMapModel } from "../explorer/businessRegionMap";
 import { coverageLabel } from "../explorer/coverageLabel";
 import type { RegionMapModel } from "../explorer/regionalEconomyMap";
@@ -19,7 +18,6 @@ import { loadSourcedWorkbookSources } from "../methodology/workbookSources";
 import { clientPresentation, getPresentation } from "../i18n/presentation.server";
 import { getMessages } from "../i18n/messages.server";
 import { message } from "../i18n/messages";
-import { publicLabel } from "../i18n/labels";
 import { pageHref } from "../i18n/routes";
 import type { Locale, Presentation } from "../i18n/types";
 import { fiscalMetadata } from "../seo/metadata";
@@ -28,21 +26,11 @@ import { explorerDatasetJsonLd } from "../seo/structuredData";
 import { resolveSiteUrl } from "../siteUrl";
 import { topicSection, ALL_DATA_PATH } from "../navigation/navTree";
 
-/** Georgia and the eleven regions, in the picker's and previous/next order; Georgia's English name is the catalogue's `georgia` label. */
-const AREA_PAGES: readonly MunicipalRegion[] = BUSINESS_AREAS.map(area => area === "georgia" ? { id: area, kaLabel: "საქართველო", sortOrder: 0 } : REGIONAL_ECONOMY_REGIONS.find(region => region.id === businessMapId(area))!);
-const AREA_LABEL_IDS = AREA_PAGES.map(area => area.id);
-
 export const businessAreaStaticParams = () => BUSINESS_AREAS.map(area => ({ id: businessAreaSlug(area) }));
 function areaForSlug(slug: string): BusinessArea {
   const area = BUSINESS_AREAS.find(item => businessAreaSlug(item) === slug);
   if (!area) notFound();
   return area;
-}
-
-/** Names of Georgia and the regions, in the page's language; region names are the shared region labels. */
-function businessAreaLabels(presentation: Presentation): Record<BusinessArea, string> {
-  return Object.fromEntries(BUSINESS_AREAS.map((area, index) => [area, area === "georgia" ? message(presentation.messages, "business.area.georgia")
-    : publicLabel(presentation.locale, AREA_PAGES[index].id, AREA_PAGES[index].kaLabel, presentation.englishLabels)])) as Record<BusinessArea, string>;
 }
 
 export async function businessRegionsPageMetadata(locale: Locale) {
@@ -51,7 +39,7 @@ export async function businessRegionsPageMetadata(locale: Locale) {
 }
 
 export async function businessAreaPageMetadata(slug: string, locale: Locale) {
-  const area = areaForSlug(slug), [presentation, data] = await Promise.all([getPresentation(locale, ["business"], AREA_LABEL_IDS), loadServedBusinessData()]);
+  const area = areaForSlug(slug), [presentation, data] = await Promise.all([getPresentation(locale, ["business"], BUSINESS_AREA_LABEL_IDS), loadServedBusinessData()]);
   const name = businessAreaLabels(presentation)[area];
   // The title is worded the way people search it and ends in the area's latest year; the page's own heading and Dataset name keep regionTitle.
   const ids = new Set<string>(businessAreaSeries(area).map(series => series.id));
@@ -63,7 +51,7 @@ type BusinessRegionsBody = { facts: BusinessFact[]; presentation: Presentation; 
 
 /** The Regions index, or with `area` that area's page: the frame both share (crumbs, Dataset, header) around the page's own body. */
 async function renderBusinessRegionsFrame(locale: Locale, area: BusinessArea | undefined, years: (facts: BusinessFact[]) => number[], body: (page: BusinessRegionsBody) => ReactNode) {
-  const [data, presentation] = await Promise.all([loadServedBusinessData(), getPresentation(locale, ["business", "regionalEconomies", "format", "main", "workbook"], AREA_LABEL_IDS, AREA_LABEL_IDS)]);
+  const [data, presentation] = await Promise.all([loadServedBusinessData(), getPresentation(locale, ["business", "regionalEconomies", "format", "main", "workbook"], BUSINESS_AREA_LABEL_IDS, BUSINESS_AREA_LABEL_IDS)]);
   const t = (key: string, values?: Record<string, string>) => message(presentation.messages, `business.${key}`, values);
   const areaLabels = businessAreaLabels(presentation);
   const regionsTitle = t("page.regions.title"), regionName = area ? areaLabels[area] : "";
@@ -103,11 +91,7 @@ export async function renderBusinessAreaPage(locale: Locale, slug: string) {
   const area = areaForSlug(slug);
   // The Sources sheet lists the archived Geostat workbooks (data/methodology/source-archives/business.csv) behind the exported values.
   const sources = await loadSourcedWorkbookSources("business", locale);
-  const ids = new Set<string>(businessAreaSeries(area).map(series => series.id));
-  const areaFacts = (facts: BusinessFact[]) => facts.map(toClientBusinessFact).filter(f => ids.has(f.indicatorId));
-  return renderBusinessRegionsFrame(locale, area, facts => businessAreaCoverage(area, areaFacts(facts)).years, ({ facts, presentation, areaLabels, origin, lastReviewedAt }) => {
+  return renderBusinessRegionsFrame(locale, area, facts => businessAreaCoverage(area, businessAreaFacts(facts, area)).years, ({ facts, presentation, areaLabels, origin, lastReviewedAt }) =>
     // Every row is its measure's name: the area is the page's own.
-    const labels = Object.fromEntries([...ids].map(id => [id, message(presentation.messages, `business.series.${id.split(".")[1]}`)]));
-    return <BusinessAreaExplorer key={area} area={area} facts={areaFacts(facts)} labels={labels} areaLabels={areaLabels} sources={sources} lastReviewedAt={lastReviewedAt} siteOrigin={origin} areas={AREA_PAGES} />;
-  });
+    <BusinessAreaExplorer key={area} area={area} facts={businessAreaFacts(facts, area)} labels={businessAreaSeriesLabels(presentation.messages, area)} areaLabels={areaLabels} sources={sources} lastReviewedAt={lastReviewedAt} siteOrigin={origin} areas={BUSINESS_AREA_PAGES} />);
 }

@@ -60,6 +60,13 @@ export type ToolResult = {
 
 export const BULK_DATA_URL = "https://fiscal.ge/downloads/data/manifest.json";
 
+/** A topic dataset's own published file, when the snapshot holds that dataset; otherwise the manifest. */
+export function bulkUrlFor(snapshot: FactQuerySnapshot, datasetId: string | undefined): string {
+  return datasetId !== undefined && snapshot.topics.datasets.some((dataset) => dataset.page.datasetId === datasetId)
+    ? `https://fiscal.ge/downloads/data/topics/${datasetId}.csv`
+    : BULK_DATA_URL;
+}
+
 type ResultSizeKind = "cells" | "sources" | "catalogue";
 
 export function resultSizeKind(toolName: string): ResultSizeKind {
@@ -70,7 +77,7 @@ function line(...cells: (string | number | null)[]): string {
   return cells.map((cell) => (cell === null ? "" : String(cell))).join("\t");
 }
 
-function observationLine(observation: Observation, includeBase: boolean): string {
+function observationLine(observation: Observation, includeBase: boolean, includePeriodEnd: boolean): string {
   const value =
     observation.value === null ? `missing${observation.missingReason ? ` (${observation.missingReason})` : ""}` : observation.value;
   return line(
@@ -78,8 +85,8 @@ function observationLine(observation: Observation, includeBase: boolean): string
     observation.entityLabelEn,
     observation.seriesLabelKa,
     observation.seriesLabelEn,
-    // A monthly observation's month, or twelve months of one year read as twelve identical rows.
-    observation.period ?? observation.year,
+    // A monthly observation's month, or twelve months of one year read as twelve identical rows; a school year as the page prints it.
+    observation.period ?? observation.periodLabel ?? observation.year,
     observation.measure,
     value,
     observation.unit,
@@ -97,6 +104,7 @@ function observationLine(observation: Observation, includeBase: boolean): string
     observation.sourceIds.join(","),
     observation.documentIds.join(","),
     ...(includeBase ? [observation.calculationBasePeriod ?? null] : []),
+    ...(includePeriodEnd ? [observation.periodEnd ?? null] : []),
   );
 }
 
@@ -106,7 +114,8 @@ function comparisonLine(comparison: Comparison): string {
     comparison.entityLabelEn,
     comparison.seriesLabelKa,
     comparison.seriesLabelEn,
-    `${comparison.from.period ?? comparison.from.year}→${comparison.to.period ?? comparison.to.year}`,
+    // A dated endpoint (the latest Foreign debt or Reserves amount) reads as its date, never as a whole year.
+    `${comparison.from.period ?? comparison.from.periodLabel ?? comparison.from.periodEnd ?? comparison.from.year}→${comparison.to.period ?? comparison.to.periodLabel ?? comparison.to.periodEnd ?? comparison.to.year}`,
     comparison.measure,
     comparison.from.value,
     comparison.to.value,
@@ -179,9 +188,10 @@ function bodyOf(response: Extract<FactQueryResponse, { kind: Exclude<FactQueryRe
   if (response.kind === "observations") {
     const { observations, coverage } = data as { observations: Observation[]; coverage: { returnedCount: number; expectedCount: number; availableYears: number[]; availablePeriods?: [string, string] | null; excludedEntities: { entityId: string; reason: string; reasonEn: string }[] } };
     const includeBase = observations.some(observation => observation.calculationBasePeriod !== undefined);
+    const includePeriodEnd = observations.some(observation => observation.periodEnd !== undefined);
     return [
-      "# entityKa\tentityEn\tseriesKa\tseriesEn\tyearOrPeriod\tmeasure\tvalue\tunit\tbasis\tbudgetScope\tdefinitionId\tmissingReasonEn\tcaveats\tentityId\tseriesId\tsourceIds\tdocumentIds" + (includeBase ? "\tcalculationBasePeriod" : ""),
-      ...observations.map(observation => observationLine(observation, includeBase)),
+      "# entityKa\tentityEn\tseriesKa\tseriesEn\tyearOrPeriod\tmeasure\tvalue\tunit\tbasis\tbudgetScope\tdefinitionId\tmissingReasonEn\tcaveats\tentityId\tseriesId\tsourceIds\tdocumentIds" + (includeBase ? "\tcalculationBasePeriod" : "") + (includePeriodEnd ? "\tperiodEnd" : ""),
+      ...observations.map(observation => observationLine(observation, includeBase, includePeriodEnd)),
       `returned ${coverage.returnedCount} of ${coverage.expectedCount} requested cells`,
       ...(coverage.availablePeriods === undefined ? [] : [
         `ხელმისაწვდომი თვეების დიაპაზონი / availablePeriods ${JSON.stringify(coverage.availablePeriods)}`,
@@ -209,13 +219,14 @@ function bodyOf(response: Extract<FactQueryResponse, { kind: Exclude<FactQueryRe
     const { entries, universe, exclusions, rankingDefinition, rankingDefinitionEn } = data as RankData;
     const includePeriod = entries.some(entry => entry.period !== undefined);
     const includeBase = entries.some(entry => entry.calculationBasePeriod !== undefined);
+    const includePeriodEnd = entries.some(entry => entry.periodEnd !== undefined);
     return [
       rankingDefinition,
       rankingDefinitionEn,
       `${universe.description} | ${universe.descriptionEn}`,
-      "# position\tentityKa\tentityEn\tseriesKa\tseriesEn\tvalue\tunit\tbasis\ttied\tcaveats\tentityId\tseriesId" + (includePeriod ? "\tperiod" : "") + (includeBase ? "\tcalculationBasePeriod" : ""),
+      "# position\tentityKa\tentityEn\tseriesKa\tseriesEn\tvalue\tunit\tbasis\ttied\tcaveats\tentityId\tseriesId" + (includePeriod ? "\tperiod" : "") + (includeBase ? "\tcalculationBasePeriod" : "") + (includePeriodEnd ? "\tperiodEnd" : ""),
       ...entries.map((entry) =>
-        line(entry.position, entry.entityLabelKa, entry.entityLabelEn, entry.seriesLabelKa, entry.seriesLabelEn, entry.value, entry.unit, entry.basis, entry.tied ? "tied" : "", entry.caveatIds.join(","), entry.entityId, entry.seriesId, ...(includePeriod ? [entry.period ?? null] : []), ...(includeBase ? [entry.calculationBasePeriod ?? null] : [])),
+        line(entry.position, entry.entityLabelKa, entry.entityLabelEn, entry.seriesLabelKa, entry.seriesLabelEn, entry.value, entry.unit, entry.basis, entry.tied ? "tied" : "", entry.caveatIds.join(","), entry.entityId, entry.seriesId, ...(includePeriod ? [entry.period ?? null] : []), ...(includeBase ? [entry.calculationBasePeriod ?? null] : []), ...(includePeriodEnd ? [entry.periodEnd ?? null] : [])),
       ),
       `${universe.returnedCount} of ${universe.eligibleCount} eligible from ${universe.candidateCount} candidates` +
         (universe.cutoffSplitsTie ? " — the cutoff splits a tie, so the last place is arbitrary" : ""),
@@ -349,14 +360,14 @@ export function internalErrorResult(snapshot: FactQuerySnapshot): ToolResult {
 
 export function tooLargeResponse(
   snapshot: FactQuerySnapshot,
-  detail: { returned: number; bytes: number; kind?: ResultSizeKind },
+  detail: { returned: number; bytes: number; kind?: ResultSizeKind; datasetId?: string },
 ): FactQueryResponse {
   const key = detail.kind === "sources" ? "errors.resultTooLargeSources"
     : detail.kind === "catalogue" ? "errors.resultTooLargeCatalogue"
     : detail.bytes > 0 ? "errors.resultTooLargeBytes" : "errors.resultTooLargeCells";
   const values = detail.kind === "sources" || detail.kind === "catalogue"
     ? { bulkUrl: BULK_DATA_URL }
-    : { cells: detail.returned, ...(detail.bytes > 0 ? { kib: Math.round(detail.bytes / 1024) } : {}), bulkUrl: BULK_DATA_URL };
+    : { cells: detail.returned, ...(detail.bytes > 0 ? { kib: Math.round(detail.bytes / 1024) } : {}), bulkUrl: bulkUrlFor(snapshot, detail.datasetId) };
 
   return {
     kind: "error",
@@ -389,6 +400,8 @@ export function boundedToolResult(
   snapshot: FactQuerySnapshot,
   response: FactQueryResponse,
   kind: ResultSizeKind = response.kind === "sources" ? "sources" : response.kind === "catalogue" ? "catalogue" : "cells",
+  /** The requested dataset: a topic dataset's refusal names its own CSV. */
+  datasetId?: string,
 ): ToolResult {
   const returned = cellCount(response);
   // A comparison row is two endpoint cells, which is exactly why 11.3 gives it
@@ -396,9 +409,9 @@ export function boundedToolResult(
   // a thousand cells, double the declared limit.
   const cap = response.kind === "comparisons" ? LIMITS.comparisonPairs : LIMITS.cells;
   // Cheap pre-check, so an obviously oversized result is never serialized.
-  if (returned > cap) return toolResult(tooLargeResponse(snapshot, { returned, bytes: 0 }));
+  if (returned > cap) return toolResult(tooLargeResponse(snapshot, { returned, bytes: 0, datasetId }));
 
   const result = toolResult(response);
   const bytes = Buffer.byteLength(JSON.stringify(result), "utf8");
-  return bytes > LIMITS.resultBytes ? toolResult(tooLargeResponse(snapshot, { returned, bytes, kind })) : result;
+  return bytes > LIMITS.resultBytes ? toolResult(tooLargeResponse(snapshot, { returned, bytes, kind, datasetId })) : result;
 }

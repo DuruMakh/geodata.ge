@@ -30,6 +30,7 @@ const TOOL_NAMES = [
   "query_deficit",
   "query_economic_sectors",
   "query_gdp",
+  "query_indicators",
   "query_inflation",
   "query_inflation_products",
   "query_ministries",
@@ -56,15 +57,23 @@ describe("MCP tool surface", () => {
     expect(text).not.toMatch(/[Ss]chema 1\.\d/);
   });
 
-  // The pointer the instructions used to give for unemployment is now the search's to give.
+  it("says the topic tool serves every other chart page, with school years and survey estimates", () => {
+    const text = serverInstructions();
+    expect(text).toContain("through query_indicators, every other chart page on the site");
+    expect(text).toContain("school years print as 2025/26");
+    expect(text).toContain("survey figures are estimates");
+    expect(text).toContain("For non-data website pages");
+  });
+
+  // The pointer the instructions used to give for unemployment is now the search's to give: the served dataset and its page.
   it.each([
-    { search: "unemployment", url: "https://fiscal.ge/en/explorer/unemployment/overview", field: "urlEn" },
-    { search: "უმუშევრობა", url: "https://fiscal.ge/explorer/unemployment/overview", field: "urlKa" },
-  ])("answers a $search search with the unemployment page and no figure", ({ search, url, field }) => {
+    { search: "unemployment", url: "https://fiscal.ge/en/explorer/unemployment/overview", field: "pageUrlEn" },
+    { search: "უმუშევრობა", url: "https://fiscal.ge/explorer/unemployment/overview", field: "pageUrlKa" },
+  ])("answers a $search search with the unemployment overview dataset and its page", ({ search, url, field }) => {
     const response = describeCoverage(loadPackagedSnapshot(), { search });
     if (response.kind !== "catalogue") throw new Error("expected a catalogue");
-    const pages = (response.data as { websitePages?: Record<string, string>[] }).websitePages ?? [];
-    expect(pages.map((page) => page[field])).toContain(url);
+    const datasets = (response.data as { datasets: Record<string, unknown>[] }).datasets;
+    expect(datasets[0]).toMatchObject({ datasetId: "unemployment-overview", [field]: url });
   });
 
   it("puts the complete discovery-to-evidence workflow in the opening 512 characters", () => {
@@ -495,12 +504,13 @@ describe("MCP tool surface", () => {
   // 120 KB; the integer bounds and empty `additionalProperties` Zod emitted
   // carried nothing. Most of what remains is the evidence envelope each of the
   // 14 output schemas must declare in full, because MCP gives tools no way to
-  // share a definition.
-  it("tools/list stays under 115 KB", async () => {
+  // share a definition. query_indicators added a 15th tool, and its output schema
+  // must declare that envelope in full too, so it costs ~6 KB: the bound is 125 KiB.
+  it("tools/list stays under 125 KB", async () => {
     const client = await connected();
     try {
       const listed = await client.listTools();
-      expect(Buffer.byteLength(JSON.stringify(listed), "utf8")).toBeLessThan(115 * 1024);
+      expect(Buffer.byteLength(JSON.stringify(listed), "utf8")).toBeLessThan(125 * 1024);
       expect(JSON.stringify(listed)).not.toContain("9007199254740991");
     } finally { await client.close(); }
   });
@@ -566,6 +576,64 @@ describe("MCP tool surface", () => {
     expect(describe("query_municipal")).toContain(`gel_per_resident (${MUNICIPAL_PER_RESIDENT_YEAR} municipality/region totals only)`);
 
     expect(serverInstructions()).not.toMatch(/No 2025|Eleven regions|twenty NACE|six cities|12 divisions/i);
+  });
+
+  it("advertises query_indicators read-only, titled, and within its description budget", async () => {
+    const client = await connected();
+    try {
+      const { tools } = await client.listTools();
+      const tool = tools.find((entry) => entry.name === "query_indicators")!;
+      expect(tool.title).toBe("თემატური მონაცემები / Topic data");
+      expect(tool.annotations).toEqual({ readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false });
+      expect(tool.description!.length).toBeLessThanOrEqual(700);
+      expect(tool.description).toContain("a school year is its first year (year 2025 = 2025/26)");
+      expect(tool.description).toContain("Missing is not zero");
+    } finally { await client.close(); }
+  });
+
+  it("refuses 600 topic cells before running the query and names the dataset's CSV", async () => {
+    const run = vi.spyOn(TOOLS.find((tool) => tool.name === "query_indicators")!, "run");
+    const client = await connected();
+    try {
+      const dataset = loadPackagedSnapshot().topics.datasets.find((entry) => entry.page.datasetId === "education-schools")!;
+      const entityIds = dataset.entities.filter((entity) => entity.entityType === "municipality").slice(0, 60).map((entity) => entity.entityId);
+      expect(entityIds).toHaveLength(60);
+      const result = await client.callTool({ name: "query_indicators", arguments: {
+        datasetId: "education-schools", seriesIds: ["education.pupils.total"], entityIds, fromYear: 2016, toYear: 2025,
+      } });
+      const text = (result.content as { text: string }[])[0]!.text;
+      expect(result.isError).toBe(true);
+      expect(text).toContain("result_too_large");
+      expect(text).toContain("600 cells");
+      expect(text).toContain("https://fiscal.ge/downloads/data/topics/education-schools.csv");
+      expect(text).not.toContain("manifest.json");
+      expect(run).not.toHaveBeenCalled();
+
+      const answered = await client.callTool({ name: "query_indicators", arguments: { datasetId: "education-schools", seriesIds: ["education.pupils.total"], entityIds: ["10"], years: [2025] } });
+      expect(answered.isError).toBeFalsy();
+      expect(answered.structuredContent).toMatchObject({ kind: "observations", data: { observations: [{ entityId: "10", value: 1137, periodLabel: "2025/26" }] } });
+    } finally {
+      run.mockRestore();
+      await client.close();
+    }
+  });
+
+  // Final review Minor 2: compare names its dataset in target.datasetId, and its refusal pointed to the manifest.
+  it("refuses a topic comparison of 300 pairs with the dataset's CSV", async () => {
+    const client = await connected();
+    try {
+      const dataset = loadPackagedSnapshot().topics.datasets.find((entry) => entry.page.datasetId === "education-schools")!;
+      const entityIds = dataset.entities.filter((entity) => entity.entityType === "municipality").slice(0, 60).map((entity) => entity.entityId);
+      const seriesIds = dataset.series.slice(0, 5).map((series) => series.seriesId);
+      const result = await client.callTool({ name: "compare", arguments: {
+        target: { dataset: "topic", datasetId: "education-schools", seriesIds, entityIds }, fromYear: 2015, toYear: 2025, measure: "value",
+      } });
+      const text = (result.content as { text: string }[])[0]!.text;
+      expect(result.isError).toBe(true);
+      expect(text).toContain("result_too_large");
+      expect(text).toContain("https://fiscal.ge/downloads/data/topics/education-schools.csv");
+      expect(text).not.toContain("manifest.json");
+    } finally { await client.close(); }
   });
 
   it("keeps every tool name in the advertised set", () => {

@@ -8,8 +8,9 @@ import { PageHeader } from "../../components/shell/page-header";
 import { loadServedDemographyData } from "../data/demography/importDemography";
 import { SERIES, SOURCE_ID } from "../data/demography/series";
 import { GEORGIA_PLACE_ID } from "../explorer/demographyAreas";
-import { MARRIAGE_SERIES, marriageFactsForPlace, marriageSourceId } from "../explorer/demographyMarriage";
+import { marriageSourceId } from "../explorer/demographyMarriage";
 import { buildMarriageIndexModel } from "../explorer/demographyMarriageIndex";
+import { marriagePageData } from "../explorer/demographyPageData";
 import { populationHrefById } from "../explorer/demographyPlaceRoutes";
 import { DEMOGRAPHY_HUB_PATH, MARRIAGES_DIVORCES_ANCHOR, MARRIAGES_DIVORCES_PATH } from "../explorer/demographyRoutes";
 import { formatInUnit, UNIT_DENSITY, UNIT_PERSONS } from "../explorer/format";
@@ -49,9 +50,7 @@ export async function renderDemographyMarriagesDivorcesPage(locale: Locale) {
   ]);
   const { messages } = presentation;
   const t = (key: string, values?: TemplateValues) => message(messages, `demography.${key}`, values);
-  const ids = MARRIAGE_SERIES.map((series) => series.id);
-  // Only Georgia's nine series and its mid-year population go to the browser; the places block is drawn from server-built rows.
-  const georgia = marriageFactsForPlace(served, GEORGIA_PLACE_ID, ids);
+  const { ids, georgia, labels, listLabels } = marriagePageData(messages, served);
   const index = buildMarriageIndexModel({ facts: served, regions: municipal.regions, municipalities: municipal.municipalities });
   const cited = new Set<string>([...ids.map(marriageSourceId), SOURCE_ID.midYear]);
   const marriageSources = sources.filter((source) => cited.has(source.sourceId));
@@ -105,8 +104,8 @@ export async function renderDemographyMarriagesDivorcesPage(locale: Locale) {
         <PageHeader locale={locale} messages={presentation.messages} crumbs={crumbs} coverage={t("marriagesCoverage", { first, last })} />
         <MarriageExplorer
           place={georgia}
-          labels={Object.fromEntries(ids.map((id) => [id, t(`marriageSeries.${id}`)]))}
-          listLabels={Object.fromEntries(ids.map((id) => [id, t(`marriageList.${id}`)]))}
+          labels={labels}
+          listLabels={listLabels}
           sources={marriageSources}
           lastReviewedAt={lastReviewedAt}
           siteOrigin={resolveSiteUrl()}

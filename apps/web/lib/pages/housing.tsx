@@ -3,15 +3,16 @@ import { ExplorerPage } from "../../components/explorer-shell/explorer-page";
 import { PageHeader } from "../../components/shell/page-header";
 import { JsonLd } from "../../components/seo/json-ld";
 import { BreadcrumbJsonLd } from "../../components/seo/breadcrumb-json-ld";
-import { loadServedHousingData, toClientHousingFact } from "../data/housing/importHousing";
+import { loadServedHousingData } from "../data/housing/importHousing";
 import { HOUSING_SECTIONS, housingCoverage, housingTopicSeries, type HousingTopicId } from "../explorer/housing";
+import { housingLabels, housingPageFacts } from "../explorer/housingPageData";
 import { coverageLabel } from "../explorer/coverageLabel";
 import { I18nProvider } from "../i18n/provider";
 import { clientPresentation, getPresentation } from "../i18n/presentation.server";
 import { getMessages } from "../i18n/messages.server";
 import { message } from "../i18n/messages";
 import { pageHref } from "../i18n/routes";
-import type { Locale, Presentation } from "../i18n/types";
+import type { Locale } from "../i18n/types";
 import { fiscalMetadata } from "../seo/metadata";
 import { explorerDatasetJsonLd } from "../seo/structuredData";
 import { resolveSiteUrl } from "../siteUrl";
@@ -23,27 +24,12 @@ export async function housingPageMetadata(locale: Locale, section: HousingTopicI
   return fiscalMetadata({ locale, path: HOUSING_SECTIONS.find(item => item.id === section)!.href, title: message(messages, `housing.page.${section}.metaTitle`), description: message(messages, `housing.page.${section}.summary`) });
 }
 
-/**
- * Display names for every series a topic page can show: all buildings and the building types, or the price index's
- * three rows and the Tbilisi districts. Names carry no prefix: the heading they sit under names their measure and unit.
- */
-function housingLabels(presentation: Presentation, section: HousingTopicId): Record<string, string> {
-  const t = (key: string) => message(presentation.messages, `housing.${key}`);
-  return Object.fromEntries(housingTopicSeries(section).map(({ id }) => {
-    const [, measure, group] = id.split(".");
-    if (measure === "price_index") return [id, t(`series.index.${group}`)];
-    if (group.startsWith("district_")) return [id, t(`series.district.${group.slice("district_".length)}`)];
-    return [id, group === "total" ? t("series.total") : t(`series.type.${group.slice("type_".length)}`)];
-  }));
-}
-
 export async function renderHousingPage(locale: Locale, section: HousingTopicId) {
   const [data, presentation, sources] = await Promise.all([
     loadServedHousingData(), getPresentation(locale, ["housing", "format", "main", "workbook"], []), loadHousingWorkbookSources(locale),
   ]);
   // Each page receives only the observations its list can show.
-  const ids = new Set<string>(housingTopicSeries(section).map(series => series.id));
-  const facts = data.facts.map(toClientHousingFact).filter(f => ids.has(f.indicatorId));
+  const facts = housingPageFacts(data.facts, section);
   const { min: firstYear, max: lastYear } = housingCoverage(section, facts);
   const href = HOUSING_SECTIONS.find(item => item.id === section)!.href;
   const labels = housingLabels(presentation, section);

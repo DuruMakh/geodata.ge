@@ -11,9 +11,11 @@ import { serviceMessage } from "./localization";
 // documents at all is dropped rather than applied, because "here is the source
 // with nothing behind it" is a worse answer than an unfiltered list.
 import { MUNICIPAL_COUNTRY_ID } from "../data/municipal/types";
+import { allDatasetIds } from "./describeCoverage";
 import { buildResponseMeta } from "./meta";
 import { getSourcesInput } from "./schemas";
 import { selectSources } from "./sources";
+import type { AnyDatasetId } from "./topics/types";
 import type { FactQueryError, FactQueryResponse, FactQuerySnapshot, PublicDocument, ResolvedSource } from "./types";
 
 const MAX_SUGGESTIONS = 10;
@@ -110,6 +112,19 @@ export function getSources(snapshot: FactQuerySnapshot, rawInput: unknown): Fact
     });
   }
 
+  if (input.datasetId !== undefined && !allDatasetIds(snapshot).includes(input.datasetId as AnyDatasetId)) {
+    return errorResponse(snapshot, {
+      code: "invalid_parameters",
+      messageKa: serviceMessage(snapshot, "ka", "errors.unknownDataset", { datasetId: input.datasetId }),
+      messageEn: serviceMessage(snapshot, "en", "errors.unknownDataset", { datasetId: input.datasetId }),
+      retryable: false,
+      validChoices: allDatasetIds(snapshot),
+    });
+  }
+  // A topic dataset's sources are the ones its facts cite; its documents all carry the methodology dataset's id, which
+  // would not tell the topic pages apart. Its years and entities are its own, not the core datasets'.
+  const topicDataset = input.datasetId === undefined ? undefined : snapshot.topics.datasets.find((dataset) => dataset.page.datasetId === input.datasetId);
+
   const resolved = selectSources(snapshot, input.sourceIds);
   const resolvedIds = new Set(resolved.map((source) => source.sourceId));
   const unknownIds = input.sourceIds.filter((id) => !resolvedIds.has(id));
@@ -131,7 +146,7 @@ export function getSources(snapshot: FactQuerySnapshot, rawInput: unknown): Fact
   // impossible year used to return status "ok" with the full unnarrowed list,
   // so a caller asking about a municipality that does not exist got a
   // confident-looking answer about a different one.
-  const knownEntityIds = new Set<string>([
+  const knownEntityIds = new Set<string>(topicDataset ? topicDataset.entities.map((entity) => entity.entityId) : [
     ...snapshot.inflation.cityEntities.map((city) => city.id),
     MUNICIPAL_COUNTRY_ID,
     ...snapshot.municipal.regions.map((region) => region.id),
@@ -161,8 +176,8 @@ export function getSources(snapshot: FactQuerySnapshot, rawInput: unknown): Fact
     ...snapshot.gdpOverview.facts.map(f=>f.year),
     ...snapshot.inflationProducts.facts.map(fact => Number(fact.period.slice(0, 4))),
   ];
-  const minYear = Math.min(...coveredYears);
-  const maxYear = Math.max(...coveredYears);
+  const minYear = topicDataset ? topicDataset.firstYear : Math.min(...coveredYears);
+  const maxYear = topicDataset ? topicDataset.lastYear : Math.max(...coveredYears);
   const outOfRangeYears = (input.years ?? []).filter((year) => year < minYear || year > maxYear);
   if (outOfRangeYears.length > 0) {
     return errorResponse(snapshot, {
@@ -189,6 +204,7 @@ export function getSources(snapshot: FactQuerySnapshot, rawInput: unknown): Fact
     inflation: "inflation",
     "inflation-products": "inflation",
   }[input.datasetId];
+  const topicSourceIds = new Set(topicDataset?.columns.sources.flatMap((indexes) => indexes.map((index) => snapshot.topics.sourceIds[index]!)));
   const entityCodes = (input.entityIds ?? []).flatMap((id) => {
     if (id.startsWith("region.")) return snapshot.municipal.municipalities.filter((m) => m.regionId === id).map((m) => m.code);
     return [id];
@@ -224,6 +240,7 @@ export function getSources(snapshot: FactQuerySnapshot, rawInput: unknown): Fact
     if (hasNarrowing && source.derivation === null) {
       const filtered = source.documents.filter((document) => {
         if (input.datasetId === "inflation-products" && !["source.geostat_product_yoy", "source.geostat_product_mom"].includes(source.sourceId)) return false;
+        if (topicDataset !== undefined && !topicSourceIds.has(source.sourceId)) return false;
         // A document with no datasetId is NOT treated as matching every dataset.
         // Exempting it returned the Geostat municipal-population workbook as a
         // match for national-revenue; the honest outcome is that the filter
@@ -234,7 +251,8 @@ export function getSources(snapshot: FactQuerySnapshot, rawInput: unknown): Fact
         if (input.years !== undefined && input.years.length > 0) {
           if (!input.years.some((year) => document.years.includes(year))) return false;
         }
-        if (input.entityIds !== undefined && input.entityIds.length > 0) {
+        // A topic dataset's entities were validated above; its sources are narrowed by what the facts cite.
+        if (topicDataset === undefined && input.entityIds !== undefined && input.entityIds.length > 0) {
           // Every source in this catalogue concerns Georgia. A country filter
           // includes both national originals and the complete municipal panel.
           if (!input.entityIds.includes(MUNICIPAL_COUNTRY_ID) && !matchesEntity(document, entityCodes) && !citySourceIds.has(source.sourceId)) return false;

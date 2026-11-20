@@ -24,7 +24,7 @@ import type {
 export type { MunicipalTotalFact } from "../data/municipal/types";
 export type { ServedNationalGdpFact } from "../servedRows";
 
-export const SCHEMA_VERSION = "1.7.0" as const;
+export const SCHEMA_VERSION = "1.8.0" as const;
 
 /** Municipal codes whose budgets are not territorially attributable (spec section 5.4). */
 export const AGGREGATE_ONLY_MUNICIPAL_CODES = ["05", "42", "43", "46", "64"] as const;
@@ -289,6 +289,8 @@ export type FactQuerySnapshot = {
     historyNotes: import("./inflationProductSeries").ProductHistoryNote[];
   };
   gdpFacts: ServedNationalGdpFact[];
+  /** The topic chart pages' datasets (lib/factQuery/topics/), their facts packed column-wise. */
+  topics: import("./topics/types").TopicsSnapshot;
   /** The Fiscal.ge pages whose figures this service does not serve: names and links only, never a value. */
   website: { pages: WebsitePage[] };
   sources: ResolvedSource[];

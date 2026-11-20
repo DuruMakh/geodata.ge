@@ -16,12 +16,14 @@ import { MUNICIPAL_COUNTRY_ID } from "../data/municipal/types";
 import { stem } from "../explorer/search/georgian";
 import { searchExplorer } from "../explorer/search/searchExplorer";
 import { fold } from "../i18n/search";
-import { CAVEAT_RULES, evaluateCaveats } from "./caveats";
+import { CAVEAT_RULES, TOPIC_CAVEAT_RULES, evaluateCaveats, type CaveatContext } from "./caveats";
 import { buildResponseMeta } from "./meta";
+import { bulkUrlFor } from "../mcp/result";
 import { debtMeasure, deficitMeasure, describeCoverageInput, municipalMeasure, nationalMeasure } from "./schemas";
 import { AGGREGATE_ONLY_MUNICIPAL_CODES } from "./types";
 import { DEBT_SERIES_LABELS_KA, DEFICIT_SERIES_ID } from "./types";
 import type { DatasetId, FactQueryError, FactQueryResponse, FactQuerySnapshot, Measure, WebsitePage } from "./types";
+import type { AnyDatasetId, TopicBreak, TopicDataset } from "./topics/types";
 
 // Typed as DatasetId[] rather than derived from the union, so widening
 // DatasetId does NOT force an entry here - unlike DATASET_META below, which is
@@ -39,6 +41,8 @@ const DATASET_IDS: readonly DatasetId[] = [
   "inflation",
   "inflation-products",
 ];
+
+const isCoreDataset = (datasetId: string): datasetId is DatasetId => (DATASET_IDS as readonly string[]).includes(datasetId);
 
 type EntityType = "country" | "municipality" | "region" | "city";
 type Availability = "served" | "calculated_total" | "taxonomy_only";
@@ -72,6 +76,10 @@ type BaseSeriesEntry = {
   firstPeriod?: string;
   measures?: Measure[];
   historyNotes?: { boundaryYear: number; noteKa: string; noteEn: string }[];
+  /** Topic series only: the page's heading the series sits under, and its unit token. */
+  headingKa?: string;
+  headingEn?: string;
+  unit?: string;
 };
 
 type SeriesEntry = BaseSeriesEntry & { labelEn: string };
@@ -87,7 +95,7 @@ type BaseEntityEntry = {
 type EntityEntry = BaseEntityEntry & { labelEn: string };
 
 type DatasetSummary = {
-  datasetId: DatasetId;
+  datasetId: AnyDatasetId;
   budgetScope: string;
   labelKa: string;
   years: [number, number];
@@ -98,6 +106,14 @@ type DatasetSummary = {
   measureNotes?: Record<string, string>;
   measureNotesEn?: Record<string, string>;
   measureNotesKa?: Record<string, string>;
+  /** Topic datasets only: the chart page, the kind of period its years are, and what it lists. */
+  pageUrlKa?: string;
+  pageUrlEn?: string;
+  periodKind?: "year" | "school_year";
+  seriesCount?: number;
+  entityCount?: number;
+  /** A search without `datasetId` only: this topic dataset's matches left out of `series` (SEARCH_TOPIC_SERIES_LIMIT). */
+  seriesOmitted?: number;
 };
 
 export type CoverageData = {
@@ -110,13 +126,30 @@ export type CoverageData = {
   /** Only with `searchMatch: "some_words"`: these entries may be about another subject, and when none fits the data is not served here. */
   searchMatchNoteKa?: string;
   searchMatchNoteEn?: string;
-  /** Only on a search without `datasetId`: Fiscal.ge pages that show the topic but whose figures are not served here, best first, at most five. */
+  /** Only on a search without `datasetId`: Fiscal.ge pages that show the topic but are not datasets (their figures come from served datasets), best first, at most five. */
   websitePages?: {
     topicId: string; labelKa: string; labelEn: string; topicLabelKa: string; topicLabelEn: string; urlKa: string; urlEn: string;
   }[];
   websitePagesNoteKa?: string;
   websitePagesNoteEn?: string;
+  /** Only with a topic `datasetId`: the reviewed breaks in its series, the dataset's CSV, and a series list cut to its totals. */
+  breaks?: TopicBreak[];
+  bulkUrl?: string;
+  headings?: { headingKa: string | null; headingEn: string | null; seriesCount: number }[];
+  seriesOmitted?: number;
+  seriesOmittedNoteKa?: string;
+  seriesOmittedNoteEn?: string;
 };
+
+/** A topic series list longer than this returns its totals and headings only; `search` narrows it. */
+const TOPIC_SERIES_LIMIT = 300;
+
+/**
+ * A search without `datasetId` lists at most this many series of one topic dataset, the first in the search's order;
+ * the dataset's entry counts the rest. "exports" meets 1,937 series, most of them trade products, and one answer
+ * holds about 500 series.
+ */
+const SEARCH_TOPIC_SERIES_LIMIT = 20;
 
 /** How many website pages one search points to: a topic's name matches every one of its pages, so the list is capped. */
 const WEBSITE_PAGES_LIMIT = 5;
@@ -241,7 +274,95 @@ function buildExclusions(snapshot: FactQuerySnapshot): CoverageData["exclusions"
   return AGGREGATE_ONLY_MUNICIPAL_CODES.map((entityId) => ({ entityId, reason: serviceMessage(snapshot, "ka", "exclusions.catalogueMunicipality"), reasonEn: serviceMessage(snapshot, "en", "exclusions.catalogueMunicipality") }));
 }
 
-function buildDatasetSummary(snapshot: FactQuerySnapshot, datasetId: DatasetId, cityScope = false): DatasetSummary {
+function topicDatasetOf(snapshot: FactQuerySnapshot, datasetId: string): TopicDataset | undefined {
+  return snapshot.topics.datasets.find((dataset) => dataset.page.datasetId === datasetId);
+}
+
+/** The core datasets, then the topic datasets the snapshot holds. */
+export function allDatasetIds(snapshot: FactQuerySnapshot): AnyDatasetId[] {
+  return [...DATASET_IDS, ...snapshot.topics.datasets.map((dataset) => dataset.page.datasetId as AnyDatasetId)];
+}
+
+const topicEntityTypes = (dataset: TopicDataset): EntityType[] => [...new Set(dataset.entities.map((entity) => entity.entityType))];
+
+function entityTypesOf(snapshot: FactQuerySnapshot, datasetId: AnyDatasetId): readonly EntityType[] {
+  return isCoreDataset(datasetId) ? DATASET_META[datasetId].entityTypes : topicEntityTypes(topicDatasetOf(snapshot, datasetId)!);
+}
+
+/** Datasets of one scope count as one where a search word meets their labels; each topic dataset is its own scope. */
+const scopeOf = (datasetId: AnyDatasetId): string => (isCoreDataset(datasetId) ? DATASET_META[datasetId].budgetScope : datasetId);
+
+/**
+ * A dataset's names for search. A topic dataset's is its search name, "<topic> — <page title>" (R26), not the published
+ * title: "Spending" alone would meet "health spending" in full. With `page`, a topic dataset's page title alone: the
+ * topic's name ("Education", "Health and social protection") is a budget function's too.
+ */
+function datasetLabelsOf(snapshot: FactQuerySnapshot, datasetId: AnyDatasetId, page = false): string[] {
+  if (isCoreDataset(datasetId)) return [DATASET_META[datasetId].labelKa, serviceLabelEn(snapshot, datasetId)];
+  const topic = topicDatasetOf(snapshot, datasetId)!;
+  return page ? [topic.titleKa, topic.titleEn] : [topic.searchKa, topic.searchEn];
+}
+
+/** The topic's name a topic dataset's search name starts with: "Living standards" of "Living standards — Spending". */
+function topicNamesOf(snapshot: FactQuerySnapshot, datasetId: AnyDatasetId): string[] {
+  const topic = topicDatasetOf(snapshot, datasetId)!;
+  return [topic.searchKa.slice(0, -` — ${topic.titleKa}`.length), topic.searchEn.slice(0, -` — ${topic.titleEn}`.length)];
+}
+
+function topicSummary(dataset: TopicDataset, cityScope: boolean): DatasetSummary {
+  return {
+    datasetId: dataset.page.datasetId as AnyDatasetId,
+    budgetScope: "topic",
+    labelKa: dataset.titleKa,
+    labelEn: dataset.titleEn,
+    years: [dataset.firstYear, dataset.lastYear],
+    entityTypes: cityScope ? ["city"] : topicEntityTypes(dataset),
+    measures: ["value"],
+    pageUrlKa: dataset.urlKa,
+    pageUrlEn: dataset.urlEn,
+    periodKind: dataset.page.periodKind,
+    seriesCount: dataset.series.length,
+    entityCount: dataset.entities.length,
+  };
+}
+
+const topicSeriesCache = new WeakMap<TopicDataset, SeriesEntry[]>();
+
+/** A topic dataset's series as catalogue entries; `years` are the years the series has a value in. Built once per dataset. */
+function topicSeriesFor(dataset: TopicDataset): SeriesEntry[] {
+  let entries = topicSeriesCache.get(dataset);
+  if (entries === undefined) {
+    const { columns } = dataset;
+    const yearsOf = new Map<number, Set<number>>();
+    columns.series.forEach((seriesIndex, row) => {
+      if (columns.value[row] === null) return;
+      const years = yearsOf.get(seriesIndex) ?? new Set<number>();
+      years.add(columns.year[row]!);
+      yearsOf.set(seriesIndex, years);
+    });
+    entries = dataset.series.map((series, index) => ({
+      seriesId: series.seriesId,
+      labelKa: series.labelKa,
+      labelEn: series.labelEn,
+      level: series.isTotal ? LEVEL_TOTAL : "series",
+      parentSeriesId: series.parentSeriesId,
+      availability: "served",
+      years: sortedUniqueYears(yearsOf.get(index) ?? []),
+      unit: series.unit,
+      ...(series.headingKa !== null ? { headingKa: series.headingKa } : {}),
+      ...(series.headingEn !== null ? { headingEn: series.headingEn } : {}),
+    }));
+    topicSeriesCache.set(dataset, entries);
+  }
+  return entries;
+}
+
+function topicEntitiesFor(dataset: TopicDataset): EntityEntry[] {
+  return dataset.entities.map((entity) => ({ entityId: entity.entityId, entityType: entity.entityType, labelKa: entity.labelKa, labelEn: entity.labelEn, entitySlug: null }));
+}
+
+function buildDatasetSummary(snapshot: FactQuerySnapshot, datasetId: AnyDatasetId, cityScope = false): DatasetSummary {
+  if (!isCoreDataset(datasetId)) return topicSummary(topicDatasetOf(snapshot, datasetId)!, cityScope);
   const citySeries = cityScope ? inflationCatalogueSeries(snapshot, true) : undefined;
   let years: [number, number];
 
@@ -745,11 +866,13 @@ function municipalEntitiesFor(snapshot: FactQuerySnapshot): BaseEntityEntry[] {
   return [country, ...regions, ...municipalities];
 }
 
-function seriesForDataset(snapshot: FactQuerySnapshot, datasetId: DatasetId, cityScope = false): SeriesEntry[] {
+function seriesForDataset(snapshot: FactQuerySnapshot, datasetId: AnyDatasetId, cityScope = false): SeriesEntry[] {
+  if (!isCoreDataset(datasetId)) return topicSeriesFor(topicDatasetOf(snapshot, datasetId)!).map((entry) => ({ ...entry }));
   return baseSeriesForDataset(snapshot, datasetId, cityScope).map(series => ({ ...series, labelEn: series.labelEn ?? serviceLabelEn(snapshot, series.seriesId) }));
 }
 
-function entitiesForDataset(snapshot: FactQuerySnapshot, datasetId: DatasetId): EntityEntry[] | undefined {
+function entitiesForDataset(snapshot: FactQuerySnapshot, datasetId: AnyDatasetId): EntityEntry[] | undefined {
+  if (!isCoreDataset(datasetId)) return topicEntitiesFor(topicDatasetOf(snapshot, datasetId)!);
   if (datasetId === "inflation-products") return [{ entityId: "country.georgia", entityType: "country", labelKa: "საქართველო", labelEn: "Georgia", entitySlug: null }];
   if (datasetId === "municipal-expenditure") return municipalEntitiesFor(snapshot).map(entity => ({ ...entity, labelEn: serviceLabelEn(snapshot, entity.entityId) }));
   if (datasetId === "regional-economies")
@@ -787,7 +910,7 @@ function entitiesForDataset(snapshot: FactQuerySnapshot, datasetId: DatasetId): 
  * and admin_category/major_program are not their request levels — widening for
  * them would leak a national total into a ministries-shaped filter.
  */
-function matchesLevel(entry: BaseSeriesEntry, level: string | undefined, datasetId: DatasetId): boolean {
+function matchesLevel(entry: BaseSeriesEntry, level: string | undefined, datasetId: AnyDatasetId): boolean {
   if (level === undefined) return true;
   if (datasetId === "ministries" && entry.level === LEVEL_TOTAL) return level === LEVEL_ADMIN_CATEGORY;
   return entry.level === level;
@@ -795,21 +918,26 @@ function matchesLevel(entry: BaseSeriesEntry, level: string | undefined, dataset
 
 /**
  * Words that only join others ("budget of the state"): the explorer's set
- * (searchExplorer.ts) plus "to", "by", "from", "with", "or", "და" and
+ * (searchExplorer.ts) plus "on", "to", "by", "from", "with", "or", "და" and
  * "მიხედვით" (by), dropped while another word remains. "from" met a
  * programme's name and so linked "Money from abroad" for "imports from China";
- * "მიხედვით" linked "Jobs by industry" for "ხარჯები სექტორების მიხედვით".
+ * "მიხედვით" linked "Jobs by industry" for "ხარჯები სექტორების მიხედვით";
+ * "on" made "spending on culture" Science and culture's "Spending on research and development".
  */
-const JOINING_WORDS = new Set(["in", "of", "the", "for", "and", "at", "to", "by", "from", "with", "or", "და", "მიხედვით"]);
+const JOINING_WORDS = new Set(["in", "of", "the", "for", "and", "at", "on", "to", "by", "from", "with", "or", "და", "მიხედვით"]);
 
 /** Words that end a label without naming the entry: "Total taxes" is "გადასახადები სულ". */
 const TOTAL_WORDS = new Set(["total", "სულ", "ჯამი"]);
 
 /**
- * The two reviewed one-way aliases, applied when one is the whole query. Not a
+ * The reviewed one-way aliases, applied when one is the whole query. Not a
  * synonym catalogue: extending it needs the owner's say-so (spec section 33).
+ * "ბიზნესი" is the Business pages' topic, which no page title holds; "bank
+ * loans" and "საბანკო სესხები" are all loans on Loans and deposits.
  */
-const SEARCH_ALIASES: Record<string, string> = { "დღგ": "revenue.vat", pension: "საპენსიო" };
+const SEARCH_ALIASES: Record<string, string> = {
+  "დღგ": "revenue.vat", pension: "საპენსიო", "ბიზნესი": "business", "bank loans": "loans.total", "საბანკო სესხები": "loans.total",
+};
 
 /** The letters and digits of a text, folded: "მშპ-ის" gives ["მშპ", "ის"], an id splits at "." and "_". */
 const searchWords = (text: string): string[] => fold(text).split(/[^\p{L}\p{N}]+/u).filter(Boolean);
@@ -830,8 +958,11 @@ function singular(word: string): string {
  * word: საგარეო (foreign) is not საგარეჯო (Sagarejo), ფარში is not ფარდა.
  */
 function sharesStem(queryWord: string, fieldWord: string): boolean {
-  const queryStem = stem(queryWord);
-  const fieldStem = stem(fieldWord);
+  return stemsShared(queryWord, stem(queryWord), fieldWord, stem(fieldWord));
+}
+
+/** `sharesStem` on stems already read. */
+function stemsShared(queryWord: string, queryStem: string, fieldWord: string, fieldStem: string): boolean {
   const [shorter, longer, longerWord] = queryStem.length <= fieldStem.length ? [queryStem, fieldStem, fieldWord] : [fieldStem, queryStem, queryWord];
   if (shorter.length < 3 || !longer.startsWith(shorter)) return false;
   const rest = longer.slice(shorter.length);
@@ -853,14 +984,61 @@ function wordMatches(queryWord: string, fieldWord: string): boolean {
 }
 
 /**
+ * What a search reads once per snapshot (RS-1 of the full review): the words of a catalogue text and the stem and
+ * singular of a catalogue word, kept as searches meet them. Only the snapshot's own texts go in, never a query, so
+ * the memo is bounded by the catalogue.
+ */
+type WordMemo = { words: Map<string, string[]>; folded: Map<string, string>; stems: Map<string, string>; singulars: Map<string, string> };
+const wordMemos = new WeakMap<FactQuerySnapshot, WordMemo>();
+
+function wordMemoOf(snapshot: FactQuerySnapshot): WordMemo {
+  let memo = wordMemos.get(snapshot);
+  if (memo === undefined) {
+    memo = { words: new Map(), folded: new Map(), stems: new Map(), singulars: new Map() };
+    wordMemos.set(snapshot, memo);
+  }
+  return memo;
+}
+
+const remembered = <V>(cache: Map<string, V> | undefined, key: string, make: (key: string) => V): V => {
+  if (cache === undefined) return make(key);
+  let value = cache.get(key);
+  if (value === undefined) {
+    value = make(key);
+    cache.set(key, value);
+  }
+  return value;
+};
+
+/** `wordMatches(queryWord, …)` for one query word against many catalogue words: the query word is read once. */
+function wordMatcher(queryWord: string, memo: WordMemo | undefined): (fieldWord: string) => boolean {
+  const georgian = /\p{Script=Georgian}/u.test(queryWord);
+  const queryStem = georgian ? stem(queryWord) : "";
+  const querySingular = georgian ? "" : singular(queryWord);
+  return (fieldWord) => queryWord === fieldWord || (queryWord.length >= 4 && fieldWord.startsWith(queryWord))
+    || (georgian
+      ? stemsShared(queryWord, queryStem, fieldWord, remembered(memo?.stems, fieldWord, stem))
+      : querySingular === remembered(memo?.singulars, fieldWord, singular));
+}
+
+/**
+ * The most different words a search reads, in the order typed. A schema-valid search of 120 characters can hold 60
+ * one-letter words, and each word is matched against every catalogue word; the longest real questions run to 16.
+ */
+const SEARCH_WORD_LIMIT = 16;
+
+/** A search's words without repeats, at most `SEARCH_WORD_LIMIT` of them. */
+const distinctWords = (words: string[]) => [...new Set(words)].slice(0, SEARCH_WORD_LIMIT);
+
+/**
  * A folded query looks like an id when it is words joined by "." or "_" and nothing else ("revenue.vat", "57_11"):
  * "wages." and "U.S. dollar" are words with punctuation.
  */
 const looksLikeId = (folded: string) => /^[\p{L}\p{N}]+(?:[._][\p{L}\p{N}]+)+$/u.test(folded);
 
 /** A query that looks like an id ("revenue.vat", "57_11") also names it: the whole id, its beginning, or a segment after a ".". */
-function idMatches(query: string, field: string): boolean {
-  const id = fold(field);
+function idMatches(query: string, field: string, memo?: WordMemo): boolean {
+  const id = remembered(memo?.folded, field, fold);
   return id === query || id.startsWith(query) || id.includes(`.${query}`);
 }
 
@@ -869,104 +1047,194 @@ function idMatches(query: string, field: string): boolean {
  * has to meet a word of the entry's fields (`wordMatches`); entries that meet
  * all of them answer as `all_words`. When none does, the entries that meet any
  * word of three letters or more answer as `some_words`, so a phrase such as
- * "annual inflation" still finds its keyword rather than nothing. They come in
- * this order: first the entries whose `ahead` fields (a series' dataset label)
- * a query word meets, so "inflation rate" lists inflation before the debt
- * interest rates; then by the rarity of the words they meet, times the share
- * of the entry's best field that the query covers, so "tax rate" lists Income
- * tax before "Weighted-average interest rate — total", halved when the query
- * meets no field's last word (a closing "total" aside); ties keep catalogue order. `null` fields (e.g. a
- * region's entitySlug) are skipped, which is what makes "for municipalities"
- * (the brief's search contract) fall out of the data instead of needing a
- * special case. Pass every entry the response may hold at
- * once: the all/some choice is made once, not per dataset. `aliases: false`
- * reads a whole-query alias as the word it is, for entries that are not series
- * (website pages). The answer also gives the query's own `words` and, for each,
- * the entries that meet it (`wordMatches`), for a caller to reuse instead of
- * searching again word by word.
+ * "annual inflation" still finds its keyword rather than nothing. `null` fields
+ * (e.g. a region's entitySlug) are skipped, which is what makes "for
+ * municipalities" (the brief's search contract) fall out of the data instead of
+ * needing a special case. Pass every entry the response may hold at once: the
+ * all/some choice is made once, not per dataset. `aliases: false` reads a
+ * whole-query alias as the word it is, for entries that are not series (website
+ * pages). The answer also gives the query's own `words` and, for each, the
+ * entries that meet it (`wordMatches`) and whether it names one of the `places`
+ * (`placeWords`), for a caller to reuse instead of searching again word by word.
+ *
+ * A word weighs by its rarity: one that few entries meet says more than one that most do. The answer comes in this
+ * order (ties keep catalogue order):
+ * 1. by the weight of the words the entry's dataset's name meets (`firm` and `ahead` names; an `ahead` name not by the
+ *    commonest of two or more words: "rate" of "tax rate", which every rate and tax shares, does not put the Interest
+ *    rates page first), so the subject comes first: "food prices" lists Consumer price inflation's series first;
+ * 2. in an all-words answer, the entries that meet every word before those `joins` lets join: an entry the query, a
+ *    phrase without joining words, names in full with its last word ("personal income tax" holds Income tax,
+ *    "government debt" Total debt);
+ * 3. by the weight of the words the entry or its dataset's name meets, so "food inflation" lists Food before Headline
+ *    inflation; an all-words answer stops here. A some-words answer without `firm` or `ahead` names (one dataset's
+ *    entries, whose fields alone say what they are) instead puts the entries that meet more of the query's words first
+ *    ("ministry of health programmes": a health programme before Solid waste management programme), then orders them by
+ *    that weight times step 6's share, so "red wine bottles" lists Wine before Lead oxides; red lead;
+ * 4. by `prefer`, lower first;
+ * 5. the entries the query names in full ("Hospitals" for "hospitals in Kutaisi"), then the `total` ones ("crime rate"
+ *    lists All recorded crimes before Drug crimes);
+ * 6. by the share of the entry's best field that the query covers ("Income tax" is half tax), halved when the query
+ *    meets no field's last word (a closing "total" aside).
  */
 export function searchCatalogue<T>(
   query: string,
   entries: T[],
   fields: (entry: T) => (string | null)[],
-  { aliases = true, ahead }: { aliases?: boolean; ahead?: (entry: T) => (string | null)[] } = {},
-): { matches: T[]; searchMatch: "all_words" | "some_words"; words: string[]; wordMatches: T[][] } {
+  { aliases = true, places, firm, ahead, joins, prefer, total, memo }: {
+    aliases?: boolean;
+    places?: (entry: T) => string[] | undefined;
+    firm?: (entry: T) => (string | null)[];
+    ahead?: (entry: T) => (string | null)[];
+    joins?: (entry: T) => boolean;
+    prefer?: (entry: T) => number;
+    total?: (entry: T) => boolean;
+    /** The snapshot's `wordMemoOf`, when `fields` give its own texts. */
+    memo?: WordMemo;
+  } = {},
+): { matches: T[]; searchMatch: "all_words" | "some_words"; words: string[]; wordMatches: T[][]; placeWords: boolean[]; wordsLeftOut: number } {
   const folded = fold(query.trim());
   const needle = aliases && Object.hasOwn(SEARCH_ALIASES, folded) ? SEARCH_ALIASES[folded]! : folded;
   const allWords = searchWords(needle);
-  const queryWords = allWords.some((word) => !JOINING_WORDS.has(word)) ? allWords.filter((word) => !JOINING_WORDS.has(word)) : allWords;
+  const contentWords = allWords.some((word) => !JOINING_WORDS.has(word)) ? allWords.filter((word) => !JOINING_WORDS.has(word)) : allWords;
+  // A repeated word is one word; past `SEARCH_WORD_LIMIT` different words the rest are left out, and the answer says so.
+  const queryWords = distinctWords(contentWords);
+  const wordsLeftOut = new Set(contentWords).size - queryWords.length;
   const idQuery = looksLikeId(needle);
-  const meetsWord = (words: string[]) => queryWords.map((queryWord) => words.some((word) => wordMatches(queryWord, word)));
+  const fieldWordsOf = (text: string) => remembered(memo?.words, text, searchWords);
+  // Which query words each catalogue word meets, read once per word in this search.
+  const matchers = queryWords.map((queryWord) => wordMatcher(queryWord, memo));
+  const metByWord = new Map<string, boolean[]>();
+  const metBy = (word: string) => remembered(metByWord, word, () => matchers.map((matches) => matches(word)));
+  const meetsWord = (words: string[]) => {
+    const met = queryWords.map(() => false);
+    for (const word of words) metBy(word).forEach((meets, index) => {
+      if (meets) met[index] = true;
+    });
+    return met;
+  };
 
   const rows = entries.map((entry) => {
     const present = fields(entry).filter((field): field is string => field !== null);
-    const fieldWords = present.map(searchWords);
+    const fieldWords = present.map(fieldWordsOf);
     return {
       entry,
       fieldWords,
       meets: meetsWord(fieldWords.flat()),
-      isId: idQuery && present.some((field) => idMatches(needle, field)),
+      isId: idQuery && present.some((field) => idMatches(needle, field, memo)),
     };
   });
+  type Row = (typeof rows)[number];
   const byWord = queryWords.map((_, index) => rows.filter((row) => row.meets[index]).map((row) => row.entry));
   const counts = byWord.map((found) => found.length);
-  const answer = (matches: T[], searchMatch: "all_words" | "some_words") => ({ matches, searchMatch, words: queryWords, wordMatches: byWord });
+  // The words that name a place the catalogue holds ("Tbilisi", "შიდა ქართლის") are where, not what: they count for
+  // the place itself, not for a series whose label holds the name, and are never the commonest word.
+  const placeWords = places === undefined ? queryWords.map(() => false) : placeWordsIn(queryWords, entries.flatMap((entry) => places(entry) ?? []), { metBy, wordsOf: fieldWordsOf });
+  const answer = (matches: T[], searchMatch: "all_words" | "some_words") => ({ matches, searchMatch, words: queryWords, wordMatches: byWord, placeWords, wordsLeftOut });
+
+  const counted = queryWords.map((word, index) => (word.length >= 3 ? counts[index]! : -1));
+  const weights = counted.map((count) => (count > 0 ? Math.log(1 + rows.length / count) : 0));
+  const weigh = (met: boolean[]) => weights.reduce((sum, weight, index) => sum + (met[index] ? weight : 0), 0);
+  const known = weights.filter((weight, index) => weight > 0 && !placeWords[index]);
+  // Of words tied as the commonest, only the first is left out, so a query of two equally common words still lets either count.
+  const lightest = Math.min(...known);
+  const commonest = known.length < 2 ? -1 : weights.findIndex((weight, index) => weight === lightest && !placeWords[index]);
+  // A name shared by many entries (a dataset's) is read once: the query words it meets.
+  const namesMet = new Map<string, boolean[]>();
+  const nameMeets = (entry: T) => {
+    const names = (pick: ((entry: T) => (string | null)[]) | undefined) => (pick?.(entry) ?? []).filter((field): field is string => field !== null);
+    const [firmNames, aheadNames] = [names(firm), names(ahead)];
+    const key = `${firmNames.join("\n")}\n\n${aheadNames.join("\n")}`;
+    if (!namesMet.has(key)) {
+      const [byFirm, byAhead] = [firmNames, aheadNames].map((labels) => meetsWord(labels.flatMap(searchWords)));
+      namesMet.set(key, queryWords.map((_, index) => byFirm![index]! || (byAhead![index]! && index !== commonest)));
+    }
+    return namesMet.get(key)!;
+  };
+  // A word that only a dataset's name holds ("quality" of City air quality) is as rare as a word can be.
+  const nameWeights = counted.map((count, index) => (count === 0 ? Math.log(1 + rows.length) : weights[index]!));
+  const weighNamed = (met: boolean[]) => nameWeights.reduce((sum, weight, index) => sum + (met[index] ? weight : 0), 0);
+  const ranked = (row: Row) => {
+    const byName = nameMeets(row.entry);
+    const place = places?.(row.entry) !== undefined;
+    const covered = row.meets.map((met, index) => ((met && (place || !placeWords[index]!)) || byName[index]!) && nameWeights[index]! > 0);
+    return { row, name: weighNamed(byName), words: covered.filter(Boolean).length, cover: weighNamed(covered) };
+  };
+  // A field the query names in full: each of its words (joining and closing "total" words aside) meets a query word.
+  const namesField = (words: string[]) => {
+    const naming = words.filter((word) => !JOINING_WORDS.has(word) && !TOTAL_WORDS.has(word));
+    return naming.length > 0 && naming.every((word) => metBy(word).some(Boolean));
+  };
 
   const all = rows.filter((row) => row.isId || (queryWords.length > 0 && row.meets.every(Boolean)));
-  if (all.length > 0 || queryWords.length === 0) return answer(all.map((row) => row.entry), "all_words");
+  if (all.length > 0 || queryWords.length === 0) {
+    const full = new Set(all);
+    const joined = joins === undefined || queryWords.length === 0 || contentWords.length < allWords.length ? [] : rows.filter((row) =>
+      !full.has(row) && row.meets.at(-1) === true && joins(row.entry) && row.fieldWords.some(namesField));
+    // Array.prototype.sort is stable.
+    const order = [...all, ...joined].map(ranked).sort((left, right) =>
+      right.name - left.name || Number(!full.has(left.row)) - Number(!full.has(right.row)) || right.cover - left.cover);
+    return answer(order.map(({ row }) => row.entry), "all_words");
+  }
 
   // A phrase that is mostly words the catalogue has never met ("unreviewed-retired-product",
   // where only "product" is known) is another subject, not a partial match: the known
   // words must be at least half of the words that can count.
-  const counted = queryWords.map((word, index) => (word.length >= 3 ? counts[index]! : -1));
   const candidates = counted.filter((count) => count >= 0);
   if (candidates.filter((count) => count > 0).length * 2 < candidates.length) return answer([], "all_words");
-  // Rarity: a word that few entries meet says more than one that most do.
-  const weights = counted.map((count) => (count > 0 ? Math.log(1 + rows.length / count) : 0));
-  // A label shared by many entries (a dataset's) is read once.
-  const aheadByLabel = new Map<string, boolean>();
-  const isAhead = (entry: T) => {
-    if (ahead === undefined) return false;
-    const labels = ahead(entry).filter((field): field is string => field !== null);
-    const key = labels.join("\n");
-    if (!aheadByLabel.has(key)) aheadByLabel.set(key, meetsWord(labels.flatMap(searchWords)).some((meets, index) => meets && weights[index]! > 0));
-    return aheadByLabel.get(key)!;
-  };
   // The share of a field's words that the query's counted words meet: "Income tax" is half tax.
-  const share = (words: string[]) => words.filter((word) => queryWords.some((queryWord, index) => weights[index]! > 0 && wordMatches(queryWord, word))).length / words.length;
+  const share = (words: string[]) => words.filter((word) => metBy(word).some((meets, index) => meets && weights[index]! > 0)).length / words.length;
   const scored = rows
-    .map((row) => ({ row, rarity: weights.reduce((sum, weight, index) => sum + (row.meets[index] ? weight : 0), 0) }))
-    .filter(({ rarity }) => rarity > 0)
-    .map(({ row, rarity }) => ({ row, rarity, fields: row.fieldWords.filter((words) => words.length > 0) }))
-    .map(({ row, rarity, fields }) => ({
-      entry: row.entry,
-      ahead: isAhead(row.entry),
-      // A label's last word, before a closing "total", names what the entry is: "Annual real GDP growth" is a growth,
-      // "Economic affairs" are affairs, so "economic growth" lists real growth first.
-      score: rarity * Math.max(0, ...fields.map(share)) * (fields.some((words) => share([words.findLast((word) => !TOTAL_WORDS.has(word)) ?? words.at(-1)!]) > 0) ? 1 : 0.5),
-    }));
+    .filter((row) => weigh(row.meets) > 0)
+    .map((row) => {
+      const present = row.fieldWords.filter((words) => words.length > 0);
+      return {
+        ...ranked(row),
+        prefer: prefer?.(row.entry) ?? 0,
+        exact: present.some(namesField) ? 0 : 1,
+        total: total?.(row.entry) ? 0 : 1,
+        // A label's last word, before a closing "total", names what the entry is: "Annual real GDP growth" is a growth,
+        // "Economic affairs" are affairs, so "economic growth" lists real growth first.
+        precision: Math.max(0, ...present.map(share)) * (present.some((words) => share([words.findLast((word) => !TOTAL_WORDS.has(word)) ?? words.at(-1)!]) > 0) ? 1 : 0.5),
+      };
+    });
+  // Without dataset names to read (one dataset's entries), an entry speaks only by its own fields.
+  const named = firm !== undefined || ahead !== undefined;
   // Array.prototype.sort is stable.
-  scored.sort((left, right) => Number(right.ahead) - Number(left.ahead) || right.score - left.score);
-  return answer(scored.map((row) => row.entry), scored.length > 0 ? "some_words" : "all_words");
+  scored.sort((left, right) => right.name - left.name
+    || (named ? right.cover - left.cover : right.words - left.words || right.cover * right.precision - left.cover * left.precision)
+    || left.prefer - right.prefer || left.exact - right.exact || left.total - right.total || right.precision - left.precision);
+  return answer(scored.map(({ row }) => row.entry), scored.length > 0 ? "some_words" : "all_words");
 }
 
 /**
  * One `searchCatalogue` over a response's series and entities together, so the all/some choice is made once for both.
- * `datasetLabel`, given for entries from several datasets, names each entry's dataset, to order a some-words answer.
+ * `order`, given for entries from several datasets, orders the answer (`searchCatalogue`'s `firm`, `ahead`, `joins`,
+ * `prefer` and `total`). `titleFields` adds words to a series' fields: a topic dataset's search name for its total series, so a
+ * search for the dataset's name finds the dataset and its headline series. `matches` keeps series and entities in one
+ * order, which a caller ranks the datasets by.
  */
-function searchSeriesAndEntities<S extends SeriesEntry, E extends EntityEntry>(search: string, series: S[], entities: E[], datasetLabel?: (entry: S | E) => string[]) {
-  const { matches, searchMatch, words, wordMatches } = searchCatalogue<S | E>(
+function searchSeriesAndEntities<S extends SeriesEntry, E extends EntityEntry>(
+  search: string,
+  series: S[],
+  entities: E[],
+  order?: Pick<Parameters<typeof searchCatalogue<S | E>>[3] & object, "places" | "firm" | "ahead" | "joins" | "prefer" | "total" | "memo">,
+  titleFields?: (entry: S) => string[],
+) {
+  const { matches, searchMatch, words, wordMatches, placeWords, wordsLeftOut } = searchCatalogue<S | E>(
     search,
     [...series, ...entities],
-    (entry) => ("seriesId" in entry ? [entry.seriesId, entry.labelKa, entry.labelEn] : [entry.entityId, entry.labelKa, entry.labelEn, entry.entitySlug]),
-    { ahead: datasetLabel },
+    (entry) => ("seriesId" in entry ? [entry.seriesId, entry.labelKa, entry.labelEn, entry.headingKa ?? null, entry.headingEn ?? null, ...(titleFields?.(entry as S) ?? [])] : [entry.entityId, entry.labelKa, entry.labelEn, entry.entitySlug]),
+    order,
   );
   return {
+    matches,
     series: matches.filter((entry): entry is S => "seriesId" in entry),
     entities: matches.filter((entry): entry is E => !("seriesId" in entry)),
     searchMatch,
     words,
     wordMatches,
+    placeWords,
+    wordsLeftOut,
   };
 }
 
@@ -981,7 +1249,7 @@ function websitePagesFor(snapshot: FactQuerySnapshot, search: string): WebsitePa
   return (searchExplorer(search, "en", snapshot.website.pages, [], null)?.groups ?? [])
     .flatMap((group) => group.rows.map(({ page }) => page as WebsitePage))
     .filter((page) => {
-      const found = searchCatalogue(search, [page], (entry) => [entry.name.ka, entry.name.en, entry.topicName.ka, entry.topicName.en, entry.words], { aliases: false });
+      const found = searchCatalogue(search, [page], (entry) => [entry.name.ka, entry.name.en, entry.topicName.ka, entry.topicName.en, entry.words], { aliases: false, memo: wordMemoOf(snapshot) });
       return found.searchMatch === "all_words" && found.matches.length > 0;
     });
 }
@@ -999,11 +1267,15 @@ type PageWord = "place" | "dataset" | "datasetPage" | "unserved" | "programme" |
  * The words that together name a served place: every word of one of its names. "შიდა ქართლის" names Shida Kartli,
  * while "შიდა" (domestic) alone names nothing, so "შიდა ვალი" stays domestic debt.
  */
-function placeWordsIn(words: string[], entities: EntityEntry[]): boolean[] {
+function placeWordsIn(
+  words: string[],
+  names: Iterable<string>,
+  { metBy, wordsOf }: { metBy: (nameWord: string) => boolean[]; wordsOf: (name: string) => string[] },
+): boolean[] {
   const place = words.map(() => false);
-  for (const name of new Set(entities.flatMap((entity) => [entity.labelKa, entity.labelEn]))) {
-    const nameWords = searchWords(name).filter((word) => !JOINING_WORDS.has(word));
-    const meeting = nameWords.map((nameWord) => words.flatMap((word, index) => (wordMatches(word, nameWord) ? [index] : [])));
+  for (const name of new Set(names)) {
+    const nameWords = wordsOf(name).filter((word) => !JOINING_WORDS.has(word));
+    const meeting = nameWords.map((nameWord) => words.flatMap((_, index) => (metBy(nameWord)[index] ? [index] : [])));
     if (nameWords.length > 0 && meeting.every((found) => found.length > 0)) for (const index of meeting.flat()) place[index] = true;
   }
   return place;
@@ -1011,7 +1283,7 @@ function placeWordsIn(words: string[], entities: EntityEntry[]): boolean[] {
 
 /**
  * Whether `word` meets every word of a page's own name in either language ("pension" names Pensions, not Funded
- * pension), or with `some`, any word of it ("prices" meets Home prices).
+ * pension), or with `some`, any word of it ("road" meets Road accidents).
  */
 function namesPage(word: string, page: WebsitePage, some = false): boolean {
   return [page.name.ka, page.name.en].some((name) => {
@@ -1026,12 +1298,13 @@ function namesPage(word: string, page: WebsitePage, some = false): boolean {
  * 1. the pages of the whole search (`websitePagesFor`);
  * 2. failing that, when the answer is empty or only some words matched (`partial`), the pages of the search without
  *    its place words, which no page names; the website's own search sets a place apart the same way (`runWords`), so
- *    "hospitals in Kutaisi" links the hospitals page;
+ *    "year in review Tbilisi" links the Year in review page;
  * 3. failing that too, the pages of each word, best first by how many of the words they meet: all the pages of an
- *    `unserved` word ("unemployment among women"), and the page a `programme` word names in full ("average pension"
- *    links Pensions). A `served` word looks for no page, as it is the served data's own word ("spending", "city",
- *    "food"), but still counts in the order; a `datasetPage` word links only pages of one topic whose names hold it
- *    ("house prices" links Home prices); a `dataset` word neither looks nor counts.
+ *    `unserved` word (a word no served entry meets), and the page a `programme` word names in full. A search a served
+ *    topic dataset answers ("hospitals in Kutaisi", "average pension", "unemployment among women", "home prices
+ *    Tbilisi") links no page of that topic: its dataset is the answer. A `served` word looks for no page, as it is the
+ *    served data's own word ("spending", "city", "food"), but still counts in the order; a `datasetPage` word links only
+ *    pages of one topic whose names hold it; a `dataset` word neither looks nor counts.
  * A phrase answered in full, with every word, links only the pages of the whole search. `kinds` is aligned with `words`,
  * the search's words as `searchCatalogue` reads them.
  */
@@ -1051,8 +1324,8 @@ function websitePagesForSearch(
   if (content.length < 2) return [];
   const looking = content.filter((index) => words[index]!.length >= 3 && kinds[index] !== "dataset");
   const pagesOf = new Map(looking.map((index) => [index, websitePagesFor(snapshot, words[index]!)]));
-  // A `datasetPage` word links the pages its word is in the name of, when those are all one topic's: "prices" links
-  // Home prices, while "overview" (trade, unemployment, wages) and "consumer" (no page's name) link none.
+  // A `datasetPage` word links the pages its word is in the name of, when those are all one topic's: a word in two
+  // topics' page names, or "consumer" (no page's name), links none.
   const ownPages = (index: number) => {
     const named = pagesOf.get(index)!.filter((page) => namesPage(words[index]!, page, true));
     return new Set(named.map((page) => page.topic)).size === 1 ? named : [];
@@ -1071,11 +1344,16 @@ function websitePagesForSearch(
     .map(({ page }) => page);
 }
 
-/** The note every some-words answer carries: its entries may be about something else. */
-function someWordsNote(snapshot: FactQuerySnapshot, searchMatch: "all_words" | "some_words") {
-  return searchMatch === "some_words"
-    ? { searchMatchNoteKa: serviceMessage(snapshot, "ka", "catalogue.someWords"), searchMatchNoteEn: serviceMessage(snapshot, "en", "catalogue.someWords") }
-    : {};
+/**
+ * The note every some-words answer carries: its entries may be about something else. A search whose words past
+ * `SEARCH_WORD_LIMIT` were left out says so too.
+ */
+function someWordsNote(snapshot: FactQuerySnapshot, searchMatch: "all_words" | "some_words", wordsLeftOut = 0) {
+  const notes = (language: "ka" | "en") => [
+    ...(searchMatch === "some_words" ? [serviceMessage(snapshot, language, "catalogue.someWords")] : []),
+    ...(wordsLeftOut > 0 ? [serviceMessage(snapshot, language, "catalogue.searchWordsLeftOut", { limit: SEARCH_WORD_LIMIT, omitted: wordsLeftOut })] : []),
+  ].join(" ");
+  return searchMatch === "some_words" || wordsLeftOut > 0 ? { searchMatchNoteKa: notes("ka"), searchMatchNoteEn: notes("en") } : {};
 }
 
 function errorResponse(snapshot: FactQuerySnapshot, error: FactQueryError): FactQueryResponse {
@@ -1095,11 +1373,20 @@ export function describeCoverage(snapshot: FactQuerySnapshot, rawInput: unknown)
       // must change the request first, so this is not "retryable" in the
       // transient sense rate_limited/service_unavailable use.
       retryable: false,
-      validChoices: [...DATASET_IDS],
+      validChoices: allDatasetIds(snapshot),
     });
   }
 
   const input = parsed.data;
+  if (input.datasetId !== undefined && !allDatasetIds(snapshot).includes(input.datasetId as AnyDatasetId)) {
+    return errorResponse(snapshot, {
+      code: "invalid_parameters",
+      messageKa: serviceMessage(snapshot, "ka", "errors.unknownDataset", { datasetId: input.datasetId }),
+      messageEn: serviceMessage(snapshot, "en", "errors.unknownDataset", { datasetId: input.datasetId }),
+      retryable: false,
+      validChoices: allDatasetIds(snapshot),
+    });
+  }
   // A search with no letters or digits ("", "   ", "-") names nothing to look for: it is no search.
   const search = input.search !== undefined && searchWords(input.search).length > 0 ? input.search : undefined;
 
@@ -1115,16 +1402,16 @@ export function describeCoverage(snapshot: FactQuerySnapshot, rawInput: unknown)
   // A catalogue request carries no observations, entities, series selection
   // or comparison — describeCoverage never returns a figure, so this context
   // is fixed and empty regardless of which dataset (if any) was requested.
-  // Traced against all 24 rules (caveats/rules.*.ts): every one requires a
-  // non-empty seriesIds/entityIds/observations/comparison, or a measure other
-  // than amount_gel, to fire — so this call is provably inert, asserted by
-  // the "fires no data-shaped caveat" test below rather than left as an
-  // unverified claim. datasetId itself is required by CaveatContext but, for
-  // the same reason, cannot affect the outcome here: it falls back to an
-  // arbitrary fixed member of DatasetId when the request did not name one.
-  const caveats = evaluateCaveats(snapshot,
-    {
-      datasetId: input.datasetId ?? "national-revenue",
+  // Every data-shaped rule (caveats/rules.*.ts) needs a non-empty
+  // seriesIds/entityIds/observations/comparison, or a measure other than
+  // amount_gel, to fire, as the "fires no data-shaped caveat" test below
+  // asserts. Only the scope disclosures that hold for a whole dataset
+  // (deficit_general_government_scope, topic_general_government_scope) fire
+  // here, when the request names their dataset; a search that lists
+  // Spending by type carries its scope too (below). datasetId falls back to
+  // an arbitrary fixed member of DatasetId when the request did not name one.
+  const catalogueContext = (datasetId: AnyDatasetId): CaveatContext => ({
+      datasetId: datasetId as CaveatContext["datasetId"],
       measure: "amount_gel",
       years: [],
       seriesIds: [],
@@ -1136,9 +1423,8 @@ export function describeCoverage(snapshot: FactQuerySnapshot, rawInput: unknown)
       comparison: null,
       historicalJoinSeriesYears: snapshot.ministries.historicalJoinSeriesYears,
       adminCategoryYears: [],
-    },
-    CAVEAT_RULES,
-  );
+  });
+  const caveats = evaluateCaveats(snapshot, catalogueContext((input.datasetId ?? "national-revenue") as AnyDatasetId), CAVEAT_RULES);
   const meta = buildResponseMeta(snapshot, { caveats });
 
   const exclusions = buildExclusions(snapshot);
@@ -1150,7 +1436,7 @@ export function describeCoverage(snapshot: FactQuerySnapshot, rawInput: unknown)
   // just an implementation detail — asserted below by the
   // "narrows datasets to the requested one" test.
   const cityScope = input.entityType === "city";
-  const eligibleDatasets = DATASET_IDS.filter(id => !cityScope || DATASET_META[id].entityTypes.includes("city"));
+  const eligibleDatasets = allDatasetIds(snapshot).filter(id => !cityScope || entityTypesOf(snapshot, id).includes("city"));
   const datasets = eligibleDatasets.filter((id) => input.datasetId === undefined || id === input.datasetId).map((id) =>
     buildDatasetSummary(snapshot, id, cityScope),
   );
@@ -1165,8 +1451,8 @@ export function describeCoverage(snapshot: FactQuerySnapshot, rawInput: unknown)
       return { kind: "catalogue", status: "ok", data: { datasets, exclusions }, meta };
     }
 
-    const taggedSeries: (SeriesEntry & { datasetId: DatasetId })[] = [];
-    const taggedEntities: (EntityEntry & { datasetId: DatasetId })[] = [];
+    const taggedSeries: (SeriesEntry & { datasetId: AnyDatasetId })[] = [];
+    const taggedEntities: (EntityEntry & { datasetId: AnyDatasetId })[] = [];
 
     for (const id of eligibleDatasets) {
       for (const entry of seriesForDataset(snapshot, id, cityScope)) {
@@ -1179,29 +1465,98 @@ export function describeCoverage(snapshot: FactQuerySnapshot, rawInput: unknown)
       }
     }
 
-    const datasetLabels = new Map(eligibleDatasets.map((id) => [id, [DATASET_META[id].labelKa, serviceLabelEn(snapshot, id)]]));
-    const { series: foundSeries, entities: foundEntities, searchMatch, words, wordMatches: matchesByWord } = searchSeriesAndEntities(search, taggedSeries, taggedEntities, (entry) => datasetLabels.get(entry.datasetId)!);
+    const datasetLabels = new Map(eligibleDatasets.map((id) => [id, datasetLabelsOf(snapshot, id)]));
+    const pageLabels = new Map(eligibleDatasets.map((id) => [id, datasetLabelsOf(snapshot, id, true)]));
+    const titleFields = (entry: SeriesEntry & { datasetId: AnyDatasetId }) => (entry.level === LEVEL_TOTAL && !isCoreDataset(entry.datasetId) ? datasetLabels.get(entry.datasetId)! : []);
+    // A topic page the search names: every word of its title (joining words aside), in Georgian or English, meets a word
+    // of the search. "tax" and "GDP" share a word with Tax breaks and refunds and GDP by expenditure; they do not name them.
+    const memo = wordMemoOf(snapshot);
+    const queryWords = distinctWords(searchWords(search).filter((word) => !JOINING_WORDS.has(word)));
+    const namesTitle = (title: string) => searchWords(title).filter((word) => !JOINING_WORDS.has(word)).every((word) => queryWords.some((queryWord) => wordMatches(queryWord, word)));
+    const namesPage = (id: AnyDatasetId) => pageLabels.get(id)!.some(namesTitle);
+    // A word a core entry is named by: the last word of its label or id, a closing "total" aside ("tax" of Income tax,
+    // "spending" of admin_spending.total), not a word inside it ("air" of Electricity, gas, steam and air conditioning supply).
+    const coreHeads = new Set([...taggedSeries, ...taggedEntities].filter((entry) => isCoreDataset(entry.datasetId)).flatMap((entry) =>
+      ("seriesId" in entry ? [entry.seriesId, entry.labelKa, entry.labelEn] : [entry.entityId, entry.labelKa, entry.labelEn]).flatMap((name) => {
+        const nameWords = remembered(memo.words, name, searchWords);
+        return nameWords.findLast((word) => !TOTAL_WORDS.has(word)) ?? [];
+      })));
+    const coreHeld = queryWords.filter((queryWord) => [...coreHeads].some((word) => wordMatches(queryWord, word)));
+    // Fiscal first. A core dataset's own name puts its entries first on any word ("debt" lists Government debt before
+    // debt service, "budget balance" General government balance); a topic page's title (not its topic's name, which
+    // budget functions share: "education", "health") puts its entries next, but not by a word a core entry is named by
+    // ("tax rate" does not put Tax breaks and refunds ahead of the taxes). Of the entries that meet the same words, the
+    // core's come first, then totals ("import duties" lists Import tax before the Imports of GDP by expenditure, "crime
+    // rate" All recorded crimes before Drug crimes); and a core series the search names in full joins an all-words answer.
+    const topicAhead = new Map<AnyDatasetId, string[]>(eligibleDatasets.filter((id) => !isCoreDataset(id)).map((id) => [id, pageLabels.get(id)!.map((title) => searchWords(title).filter((word) => !coreHeld.some((queryWord) => wordMatches(queryWord, word))).join(" "))]));
+    const found = searchSeriesAndEntities(search, taggedSeries, taggedEntities, {
+      firm: (entry) => (isCoreDataset(entry.datasetId) ? datasetLabels.get(entry.datasetId)! : []),
+      ahead: (entry) => topicAhead.get(entry.datasetId) ?? [],
+      joins: (entry) => "seriesId" in entry && isCoreDataset(entry.datasetId),
+      places: (entry) => ("entityId" in entry ? [entry.labelKa, entry.labelEn] : undefined),
+      prefer: (entry) => (isCoreDataset(entry.datasetId) ? 0 : 1),
+      total: (entry) => "seriesId" in entry && entry.level === LEVEL_TOTAL,
+      memo,
+    }, titleFields);
+    const { searchMatch, words, wordMatches: matchesByWord, placeWords, wordsLeftOut } = found;
+    // A topic page the search is aimed at comes first and is listed: its series are what was asked for. The search is
+    // aimed at the page when the dataset's search name meets every word of the search, as typed (a whole-query alias
+    // names budget programmes, not a page: "pension" is still Pensions), and the page's title is needed for it: neither
+    // the topic's name alone ("education" and "social protection" name budget functions too) nor the page title alone,
+    // unless the search names the title in full ("tax" and "GDP" are not Tax breaks and refunds or GDP by expenditure;
+    // "external debt" needs External flows — Foreign debt whole).
+    const topicIds = eligibleDatasets.filter((id) => !isCoreDataset(id));
+    const titled = searchMatch === "all_words" ? searchCatalogue(search, topicIds, (id) => datasetLabels.get(id)!, { aliases: false, memo }) : undefined;
+    const allOf = (names: (id: AnyDatasetId) => string[]) => {
+      const met = titled?.searchMatch === "all_words" ? searchCatalogue(search, titled.matches, names, { aliases: false, memo }) : undefined;
+      return new Set<AnyDatasetId>(met?.searchMatch === "all_words" ? met.matches : []);
+    };
+    const [topicOnly, pageOnly] = [allOf((id) => topicNamesOf(snapshot, id)), allOf((id) => pageLabels.get(id)!)];
+    const titledIds = new Set<AnyDatasetId>(titled?.searchMatch === "all_words" ? titled.matches.filter((id) => !topicOnly.has(id) && (!pageOnly.has(id) || namesPage(id))) : []);
+    // In an all-words answer, the pages the search is aimed at come first, then the core datasets, then the other topics,
+    // each in the search's own order (a topic whose page title meets a word before another: "wages" lists the Wages
+    // pages before Spending by type's wages and salaries).
+    const tier = (entry: { datasetId: AnyDatasetId }) => (titledIds.has(entry.datasetId) ? 0 : isCoreDataset(entry.datasetId) ? 1 : 2);
+    // A page the search names whose rows hold none of its words, because it has no total to carry its title (Interest
+    // rates lists "National Bank rate" and six more side by side), answers with its top-level rows.
+    const untitledRows = taggedSeries.filter((entry) => titledIds.has(entry.datasetId) && entry.parentSeriesId === null
+      && !snapshot.topics.datasets.some((dataset) => dataset.page.datasetId === entry.datasetId && dataset.series.some((series) => series.isTotal))
+      && !found.matches.some((match) => match.datasetId === entry.datasetId));
+    const ranked = searchMatch === "all_words" ? [...found.matches, ...untitledRows].toSorted((left, right) => tier(left) - tier(right)) : found.matches;
+    const matchedSeries = ranked.filter((entry): entry is SeriesEntry & { datasetId: AnyDatasetId } => "seriesId" in entry);
+    // Bounded: a topic dataset lists its first matches, and its entry says how many more a search within it lists.
+    const perTopic = new Map<AnyDatasetId, number>();
+    const foundSeries = matchedSeries.filter((entry) => {
+      if (isCoreDataset(entry.datasetId)) return true;
+      const count = (perTopic.get(entry.datasetId) ?? 0) + 1;
+      perTopic.set(entry.datasetId, count);
+      return count <= SEARCH_TOPIC_SERIES_LIMIT;
+    });
+    const omittedBy = new Map([...perTopic].filter(([, count]) => count > SEARCH_TOPIC_SERIES_LIMIT).map(([id, count]) => [id, count - SEARCH_TOPIC_SERIES_LIMIT]));
+    const omittedValues = { omitted: matchedSeries.length - foundSeries.length, total: matchedSeries.length, limit: SEARCH_TOPIC_SERIES_LIMIT };
+    const foundEntities = ranked.filter((entry): entry is EntityEntry & { datasetId: AnyDatasetId } => !("seriesId" in entry));
 
     // A search is a lookup, so it answers with what matched: the datasets the
     // matches belong to and any excluded code it names, not the whole
-    // catalogue, which the no-argument call already returns.
-    const matchedDatasets = new Set<DatasetId>([...foundSeries, ...foundEntities].map((entry) => entry.datasetId));
-    // The website's pages that this service does not serve: a topic the site shows and the catalogue does not hold gets
-    // a link to its page instead of a dead end. Links only; the status stays the series' own. What each word is to
+    // catalogue, which the no-argument call already returns. The datasets come
+    // in the order of their first entry, after the pages the search is aimed at.
+    const datasetRank = new Map<AnyDatasetId, number>();
+    for (const id of [...titledIds, ...ranked.map((entry) => entry.datasetId)]) if (!datasetRank.has(id)) datasetRank.set(id, datasetRank.size);
+    // The website's pages that are not datasets (Year in review, whose figures come from the served budget datasets): a
+    // topic the site shows with no dataset of its own gets a link to its page instead of a dead end. Links only; the status stays the series' own. What each word is to
     // the page search comes from the search above, the entities' names and one small search of the datasets' labels
     // over the same words (the same query gives `searchCatalogue` the same words), not from a search per word.
-    const placeWords = placeWordsIn(words, taggedEntities);
-    const labelled = searchCatalogue(search, eligibleDatasets, (id) => datasetLabels.get(id)!).wordMatches;
+    const labelled = searchCatalogue(search, eligibleDatasets, (id) => datasetLabels.get(id)!, { memo }).wordMatches;
     const kinds = words.map((_, index): PageWord => {
       const served = matchesByWord[index]!;
       if (placeWords[index]) return "place";
       if (labelled[index]!.length > 0) {
         // A word that only a dataset's label holds ("prices") is that dataset's word beside one of its own entries
-        // ("bread prices", "fuel prices"), but may name a page beside a word the served data holds elsewhere too
-        // ("house prices" links Home prices). Datasets of one scope (consumer prices) count as one.
-        const scopes = new Set(labelled[index]!.map((id) => DATASET_META[id].budgetScope));
+        // ("bread prices", "fuel prices"), but may name a page beside a word the served data holds elsewhere too.
+        // Datasets of one scope (consumer prices) count as one.
+        const scopes = new Set(labelled[index]!.map(scopeOf));
         const others = words.flatMap((_, other) => (other !== index && !placeWords[other] && matchesByWord[other]!.length > 0 ? [matchesByWord[other]!] : []));
-        const besideOwnEntry = others.some((found) => found.every((entry) => scopes.has(DATASET_META[entry.datasetId].budgetScope)));
+        const besideOwnEntry = others.some((found) => found.every((entry) => scopes.has(scopeOf(entry.datasetId))));
         return served.length === 0 && others.length > 0 && !besideOwnEntry ? "datasetPage" : "dataset";
       }
       if (served.length === 0) return "unserved";
@@ -1214,17 +1569,29 @@ export function describeCoverage(snapshot: FactQuerySnapshot, rawInput: unknown)
     })
       .slice(0, WEBSITE_PAGES_LIMIT)
       .map((page) => ({ topicId: page.topic, labelKa: page.name.ka, labelEn: page.name.en, topicLabelKa: page.topicName.ka, topicLabelEn: page.topicName.en, urlKa: page.urlKa, urlEn: page.urlEn }));
+    // A listed topic dataset's whole-dataset scope disclosure travels with the search: "government spending" lists
+    // Spending by type, which is general government, not the state budget.
+    const scopeCaveats = [...datasetRank.keys()].filter((id) => !isCoreDataset(id))
+      .flatMap((id) => evaluateCaveats(snapshot, catalogueContext(id), TOPIC_CAVEAT_RULES));
     return {
       kind: "catalogue",
       status: foundSeries.length === 0 && foundEntities.length === 0 ? "empty" : "ok",
       data: {
-        datasets: datasets.filter((dataset) => matchedDatasets.has(dataset.datasetId)),
+        datasets: datasets.filter((dataset) => datasetRank.has(dataset.datasetId)).sort((left, right) => datasetRank.get(left.datasetId)! - datasetRank.get(right.datasetId)!)
+          .map((dataset) => (omittedBy.has(dataset.datasetId) ? { ...dataset, seriesOmitted: omittedBy.get(dataset.datasetId)! } : dataset)),
         series: foundSeries,
         entities: foundEntities,
         // A code names an exclusion exactly ("05"), never by a letter inside it.
         exclusions: exclusions.filter((exclusion) => exclusion.entityId === fold(search!.trim())),
         searchMatch,
-        ...someWordsNote(snapshot, searchMatch),
+        ...someWordsNote(snapshot, searchMatch, wordsLeftOut),
+        ...(omittedBy.size > 0
+          ? {
+            seriesOmitted: omittedValues.omitted,
+            seriesOmittedNoteKa: serviceMessage(snapshot, "ka", "catalogue.searchSeriesOmitted", omittedValues),
+            seriesOmittedNoteEn: serviceMessage(snapshot, "en", "catalogue.searchSeriesOmitted", omittedValues),
+          }
+          : {}),
         ...(websitePages.length > 0
           ? {
             websitePages,
@@ -1233,27 +1600,55 @@ export function describeCoverage(snapshot: FactQuerySnapshot, rawInput: unknown)
           }
           : {}),
       },
-      meta,
+      meta: scopeCaveats.length > 0 ? buildResponseMeta(snapshot, { caveats: [...caveats, ...scopeCaveats] }) : meta,
     };
   }
 
-  const datasetId = input.datasetId;
+  const datasetId = input.datasetId as AnyDatasetId;
   const levelled = (eligibleDatasets.includes(datasetId) ? seriesForDataset(snapshot, datasetId, cityScope) : []).filter((entry) =>
     matchesLevel(entry, input.level, datasetId),
   );
-  const typed = entitiesForDataset(snapshot, input.datasetId)?.filter(
+  const typed = entitiesForDataset(snapshot, datasetId)?.filter(
     (entry) => input.entityType === undefined || entry.entityType === input.entityType,
   );
-  const searched = search === undefined ? undefined : searchSeriesAndEntities(search, levelled, typed ?? []);
+  const searched = search === undefined ? undefined : searchSeriesAndEntities(search, levelled, typed ?? [], { memo: wordMemoOf(snapshot) });
   const series = searched?.series ?? levelled;
   const entities = searched === undefined || typed === undefined ? typed : searched.entities;
 
   const isEmpty = series.length === 0 && (entities === undefined || entities.length === 0);
 
+  // A topic dataset: its reviewed breaks and CSV, and, when its series list is too long for one answer, only the
+  // totals with the page's headings and how many series were left out, to be narrowed with `search`.
+  const topic = topicDatasetOf(snapshot, datasetId);
+  const truncated = topic !== undefined && series.length > TOPIC_SERIES_LIMIT;
+  const shown = truncated ? series.filter((entry) => entry.level === LEVEL_TOTAL).slice(0, TOPIC_SERIES_LIMIT) : series;
+  const omittedValues = { omitted: series.length - shown.length, total: series.length };
+  const headings = truncated ? [...series.reduce((found, entry) => {
+    const key = `${entry.headingKa ?? ""}\n${entry.headingEn ?? ""}`;
+    const heading = found.get(key) ?? { headingKa: entry.headingKa ?? null, headingEn: entry.headingEn ?? null, seriesCount: 0 };
+    heading.seriesCount += 1;
+    return found.set(key, heading);
+  }, new Map<string, { headingKa: string | null; headingEn: string | null; seriesCount: number }>()).values()] : undefined;
+
   return {
     kind: "catalogue",
     status: isEmpty ? "empty" : "ok",
-    data: { datasets, series, ...(entities !== undefined ? { entities } : {}), exclusions, ...(searched !== undefined ? { searchMatch: searched.searchMatch, ...someWordsNote(snapshot, searched.searchMatch) } : {}) },
+    data: {
+      datasets,
+      series: shown,
+      ...(entities !== undefined ? { entities } : {}),
+      exclusions,
+      ...(searched !== undefined ? { searchMatch: searched.searchMatch, ...someWordsNote(snapshot, searched.searchMatch, searched.wordsLeftOut) } : {}),
+      ...(topic !== undefined ? { breaks: topic.breaks, bulkUrl: bulkUrlFor(snapshot, datasetId) } : {}),
+      ...(headings !== undefined
+        ? {
+          headings,
+          seriesOmitted: omittedValues.omitted,
+          seriesOmittedNoteKa: serviceMessage(snapshot, "ka", "catalogue.seriesOmitted", omittedValues),
+          seriesOmittedNoteEn: serviceMessage(snapshot, "en", "catalogue.seriesOmitted", omittedValues),
+        }
+        : {}),
+    },
     meta,
   };
 }

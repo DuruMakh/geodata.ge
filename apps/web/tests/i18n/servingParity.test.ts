@@ -1,3 +1,5 @@
+import { loadDemographyFacts } from "../../lib/data/demography/importDemography";
+import { loadTradeCompositionData } from "../../lib/data/tradeComposition/importTradeComposition";
 import { loadGdpOverviewFacts } from "../../lib/data/gdpOverview/importGdpOverview";
 import { loadBasketWeights, loadCpiCategoryFacts, loadCpiCityFacts, loadCpiFacts, loadInflationTargets } from "../../lib/data/inflation/importInflation";
 import { loadEconomicSectorFacts } from "../../lib/data/economicSectors/importEconomicSectors";
@@ -13,7 +15,7 @@ import { getPresentation } from "../../lib/i18n/presentation.server";
 import { buildExplorerModel } from "../../lib/explorer/explorerData";
 import { projectAdminFact, projectBudgetFact, projectGdpFact } from "../../lib/explorer/clientData";
 
-const mirror = vi.hoisted(() => ({ loadLandingDataFromDb: vi.fn(), loadExplorerDataFromDb: vi.fn(), loadMunicipalDataFromDb: vi.fn(), loadGovernmentDebtFactsFromDb: vi.fn(), loadGeneralGovernmentBalanceFactsFromDb: vi.fn(), loadGdpOverviewFactsFromDb: vi.fn(), loadInflationDataFromDb: vi.fn(), loadEconomicSectorFactsFromDb: vi.fn(), loadRegionalEconomyFactsFromDb: vi.fn() }));
+const mirror = vi.hoisted(() => ({ loadLandingDataFromDb: vi.fn(), loadExplorerDataFromDb: vi.fn(), loadMunicipalDataFromDb: vi.fn(), loadGovernmentDebtFactsFromDb: vi.fn(), loadGeneralGovernmentBalanceFactsFromDb: vi.fn(), loadGdpOverviewFactsFromDb: vi.fn(), loadInflationDataFromDb: vi.fn(), loadEconomicSectorFactsFromDb: vi.fn(), loadRegionalEconomyFactsFromDb: vi.fn(), loadDemographyFactsFromDb: vi.fn(), loadTradeCompositionDataFromDb: vi.fn() }));
 vi.mock("../../lib/db/servedDataDb", () => mirror);
 afterEach(() => { resetServedDataCacheForTests(); vi.unstubAllEnvs(); vi.clearAllMocks(); });
 
@@ -36,6 +38,10 @@ describe("bilingual presentation on both serving paths", () => {
     mirror.loadGdpOverviewFactsFromDb.mockResolvedValue(await loadGdpOverviewFacts());
     mirror.loadEconomicSectorFactsFromDb.mockResolvedValue(await loadEconomicSectorFacts());
     mirror.loadRegionalEconomyFactsFromDb.mockResolvedValue(await loadRegionalEconomyFacts());
+    // The snapshot's demography topic datasets read the memoised served demography loader, which the reset reloads.
+    mirror.loadDemographyFactsFromDb.mockResolvedValue(await loadDemographyFacts());
+    // So do the Trade composition dataset's, through the composition loader the reset reloads.
+    mirror.loadTradeCompositionDataFromDb.mockResolvedValue(await loadTradeCompositionData());
     // The snapshot loads inflation through its memoised served loader, so in db
     // mode this mirror reader runs and its rows face the parity check.
     mirror.loadInflationDataFromDb.mockResolvedValue({
@@ -54,13 +60,15 @@ describe("bilingual presentation on both serving paths", () => {
     expect(mirror.loadMunicipalDataFromDb).toHaveBeenCalled();
     expect(mirror.loadGovernmentDebtFactsFromDb).toHaveBeenCalled();
     expect(mirror.loadGeneralGovernmentBalanceFactsFromDb).toHaveBeenCalled();
-    // Once each: the snapshot takes these four from the memoised served
+    // Once each: the snapshot takes these five from the memoised served
     // loaders, so in db mode they come from the mirror and each dataset's
     // parity check runs exactly once.
     expect(mirror.loadGdpOverviewFactsFromDb).toHaveBeenCalledTimes(1);
     expect(mirror.loadEconomicSectorFactsFromDb).toHaveBeenCalledTimes(1);
     expect(mirror.loadRegionalEconomyFactsFromDb).toHaveBeenCalledTimes(1);
     expect(mirror.loadInflationDataFromDb).toHaveBeenCalledTimes(1);
+    expect(mirror.loadDemographyFactsFromDb).toHaveBeenCalledTimes(1);
+    expect(mirror.loadTradeCompositionDataFromDb).toHaveBeenCalledTimes(1);
     expect(dbSnapshot).toEqual(csvSnapshot);
     for (const grouping of ["fields", "ministries"] as const) {
       const input = { facts: csv.facts.map(projectBudgetFact), adminFacts: csv.adminFacts.map(projectAdminFact), adminCategories: new Map(csv.adminCategories.map(row => [row.id, row])), glossary: csv.glossary, gdpFacts: csv.gdpFacts.map(projectGdpFact), side: "expenditure" as const, expenditureGrouping: grouping, selectedItemIds: [grouping === "fields" ? "spending.education" : "admin_spending.defence"], startYear: 2020, endYear: 2025, measure: "nominal" as const };

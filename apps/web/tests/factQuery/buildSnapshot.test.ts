@@ -5,6 +5,7 @@ import { AGGREGATE_ONLY_MUNICIPAL_CODES, type FactQuerySnapshot } from "../../li
 import { loadTaxonomyFiles } from "../../lib/data/taxonomy";
 import { loadSourceDocuments } from "../../lib/data/sources";
 import { CRIME_PUBLIC_SOURCES, crimeSourceDocumentId } from "../../lib/data/crime/types";
+import { ENERGY_FOOD_PUBLIC_SOURCES, energyFoodSourceDocumentId } from "../../lib/data/energyFood/types";
 import { ENVIRONMENT_PUBLIC_SOURCES, environmentSourceDocumentId } from "../../lib/data/environment/types";
 import { HEALTH_PUBLIC_SOURCES, healthSourceDocumentId } from "../../lib/data/health/types";
 import { MONEY_BANKS_PUBLIC_SOURCES, moneyBanksSourceDocumentId } from "../../lib/data/moneyBanks/types";
@@ -30,7 +31,7 @@ describe("buildFactQuerySnapshot", () => {
     const sources = await loadSourceDocuments("../../data/sources/source-documents.csv");
     // The nineteen demography canonical inputs (eighteen annual tables, six of them for marriages and divorces, and the census snapshot) supply new fact sources; the
     // package's validation inputs and definitions remain evidence.
-    // The seven Wages workbooks, the seven Poverty documents, the 21 Household income and spending documents, the 55 Energy and food sources, the twenty-three Money and banks documents, the 26 Business documents, the 21 Housing archived sources, the 36 Health archived sources, the 22 Crime and justice archived sources, the 14 Labour detail archived sources, the 46 Education documents, the 46 Environment and climate archived sources, the 33 Science and culture archived sources, the 25 Social Service Agency sources, the six Pension Fund sources, the 25 Transport archived sources, the 36 Internet and technology archived sources, the five Tax breaks and refunds originals, the four Services trade workbooks, the four Trade composition originals and the three Foreign debt and Reserves originals are registered sources of human explorers only.
+    // The seven Wages workbooks, the seven Poverty documents, the 21 Household income and spending documents, the 55 Energy and food sources, the twenty-three Money and banks documents, the 26 Business documents, the 21 Housing archived sources, the 36 Health archived sources, the 22 Crime and justice archived sources, the 14 Labour detail archived sources, the 46 Education documents, the 46 Environment and climate archived sources, the 33 Science and culture archived sources, the 25 Social Service Agency sources, the six Pension Fund sources, the 25 Transport archived sources, the 36 Internet and technology archived sources, the three Tax breaks and refunds originals the page does not read (the English workbook and both reports; the Georgian workbook and the Treasury chart are topic sources), the four Services trade workbooks, the four Trade composition originals and the NBG file listing that located the Foreign debt and Reserves workbooks (source.nbg_api_category_24; the workbooks themselves are topic sources) are registered sources of human explorers only.
     // The 2026 State Budget law (source.mof_2026_budget_law_planned) is the one planned-basis source behind the 2026 Spending plan.
     expect(sources).toHaveLength(649);
     expect(sources.filter(source => source.sourceId.startsWith("source.geostat_services_")).map(source => source.sourceId).sort()).toEqual([
@@ -39,42 +40,60 @@ describe("buildFactQuerySnapshot", () => {
       "source.geostat_services_georgian_imports_of_services_by_countries",
       "source.geostat_services_georgian_imports_of_services_by_types",
     ]);
-    expect(snapshot.sources.some(source => source.sourceId.startsWith("source.geostat_services_"))).toBe(false);
+    // Only the services workbooks the Services trade page's facts cite reach the snapshot.
+    expect(snapshot.sources.filter(source => source.sourceId.startsWith("source.geostat_services_")).map(source => source.sourceId)).toEqual(snapshot.topics.sourceIds.filter(id => id.startsWith("source.geostat_services_")));
     expect(sources.filter(source => source.sourceId.startsWith("source.geostat_trade_"))).toHaveLength(17);
     const compositionSources = ["source.geostat_trade_export_sitc_2000_2026", "source.geostat_trade_import_sitc_2000_2026", "source.geostat_trade_export_bec_2000_2026", "source.geostat_trade_import_bec_2000_2026"];
     expect(sources.filter(source => compositionSources.includes(source.sourceId)).map(source => source.sourceId).sort()).toEqual([...compositionSources].sort());
-    expect(snapshot.sources.filter(source => compositionSources.includes(source.sourceId))).toEqual([]);
-    expect(snapshot.sources.map(source => source.sourceId).sort()).toEqual(sources.filter(source => !source.sourceId.startsWith("source.geostat_lfs_") && !source.sourceId.startsWith("source.geostat_transport_") && !source.sourceId.startsWith("source.geostat_trade_") && !source.sourceId.startsWith("source.geostat_services_") && !source.sourceId.startsWith("source.geostat_earnings_") && !source.sourceId.startsWith("source.geostat_fdi_") && !source.sourceId.startsWith("source.geostat_poverty_") && !source.sourceId.startsWith("source.geostat_household_") && !source.sourceId.startsWith("source.geostat_energy_") && !source.sourceId.startsWith("source.geostat_housing_") && !source.sourceId.startsWith("source.geostat_ict_") && !source.sourceId.startsWith("source.geostat_food_") && !source.sourceId.startsWith("source.geostat_farming_") && !source.sourceId.startsWith("source.geostat_gdp_use_") && !["source.geostat_agriculture_page", "source.nbg_money_transfers_by_countries", "source.nbg_balance_of_payments_bpm6", "source.geostat_gini", "source.geostat_hies_metadata_2026", "source.mof_gfs_general_government_2002_2025", ...MONEY_BANKS_PUBLIC_SOURCES.map(moneyBanksSourceDocumentId), ...EXTERNAL_POSITION_PUBLIC_SOURCES.map(externalPositionSourceDocumentId), ...BUSINESS_PUBLIC_SOURCES.map(businessSourceDocumentId), ...HEALTH_PUBLIC_SOURCES.map(healthSourceDocumentId), ...CRIME_PUBLIC_SOURCES.map(crimeSourceDocumentId), ...ENVIRONMENT_PUBLIC_SOURCES.map(environmentSourceDocumentId), ...EDUCATION_PUBLIC_SOURCES.map(educationSourceDocumentId), ...SCIENCE_CULTURE_PUBLIC_SOURCES.map(scienceCultureSourceDocumentId), ...SOCIAL_PUBLIC_SOURCES.map(socialSourceDocumentId), ...TRANSPORT_PUBLIC_SOURCES.map(transportSourceDocumentId), ...TAX_BREAKS_REFUNDS_PUBLIC_SOURCES.map(taxBreaksRefundsSourceDocumentId)].includes(source.sourceId)).map(source => source.sourceId).sort());
-    expect(snapshot.sources.some(source => source.sourceId.startsWith("source.geostat_trade_"))).toBe(false);
-    // The 25 Social protection sources (24 SSA tables and the statistics page) are registered, and none of them reaches the snapshot.
+    expect(snapshot.sources.filter(source => compositionSources.includes(source.sourceId)).map(source => source.sourceId).sort()).toEqual([...compositionSources].sort());
+    // The sources the topic pages' facts cite join them (lib/factQuery/topics/registry.ts), once where they are core sources already.
+    expect(snapshot.sources.map(source => source.sourceId).sort()).toEqual([...new Set([...snapshot.topics.sourceIds, ...sources.filter(source => !source.sourceId.startsWith("source.geostat_lfs_") && !source.sourceId.startsWith("source.geostat_transport_") && !source.sourceId.startsWith("source.geostat_trade_") && !source.sourceId.startsWith("source.geostat_services_") && !source.sourceId.startsWith("source.geostat_earnings_") && !source.sourceId.startsWith("source.geostat_fdi_") && !source.sourceId.startsWith("source.geostat_poverty_") && !source.sourceId.startsWith("source.geostat_household_") && !source.sourceId.startsWith("source.geostat_energy_") && !source.sourceId.startsWith("source.geostat_housing_") && !source.sourceId.startsWith("source.geostat_ict_") && !source.sourceId.startsWith("source.geostat_food_") && !source.sourceId.startsWith("source.geostat_farming_") && !source.sourceId.startsWith("source.geostat_gdp_use_") && !["source.geostat_agriculture_page", "source.nbg_money_transfers_by_countries", "source.nbg_balance_of_payments_bpm6", "source.geostat_gini", "source.geostat_hies_metadata_2026", "source.mof_gfs_general_government_2002_2025", ...MONEY_BANKS_PUBLIC_SOURCES.map(moneyBanksSourceDocumentId), ...EXTERNAL_POSITION_PUBLIC_SOURCES.map(externalPositionSourceDocumentId), ...BUSINESS_PUBLIC_SOURCES.map(businessSourceDocumentId), ...HEALTH_PUBLIC_SOURCES.map(healthSourceDocumentId), ...CRIME_PUBLIC_SOURCES.map(crimeSourceDocumentId), ...ENVIRONMENT_PUBLIC_SOURCES.map(environmentSourceDocumentId), ...EDUCATION_PUBLIC_SOURCES.map(educationSourceDocumentId), ...SCIENCE_CULTURE_PUBLIC_SOURCES.map(scienceCultureSourceDocumentId), ...SOCIAL_PUBLIC_SOURCES.map(socialSourceDocumentId), ...TRANSPORT_PUBLIC_SOURCES.map(transportSourceDocumentId), ...TAX_BREAKS_REFUNDS_PUBLIC_SOURCES.map(taxBreaksRefundsSourceDocumentId)].includes(source.sourceId)).map(source => source.sourceId)])].sort());
+    // Only the trade workbooks a Trade page's facts cite reach the snapshot (the HS4 workbooks of 1995–2014 are not shown).
+    expect(snapshot.sources.filter(source => source.sourceId.startsWith("source.geostat_trade_")).map(source => source.sourceId)).toEqual(snapshot.topics.sourceIds.filter(id => id.startsWith("source.geostat_trade_")));
+    // The 25 Social protection sources (24 SSA tables and the statistics page) are registered, and only those a topic page's facts cite reach the snapshot.
     expect(sources.filter(source => source.sourceId.startsWith("source.ssa_"))).toHaveLength(25);
-    expect(snapshot.sources.some(source => source.sourceId.startsWith("source.ssa_"))).toBe(false);
+    const socialIds = SOCIAL_PUBLIC_SOURCES.map(socialSourceDocumentId);
+    expect(snapshot.sources.filter(source => socialIds.includes(source.sourceId)).map(source => source.sourceId)).toEqual(snapshot.topics.sourceIds.filter(id => socialIds.includes(id)));
     // The six Pension Fund sources of the funded pension are registered the same way.
     expect(sources.filter(source => source.sourceId.startsWith("source.pension_fund_"))).toHaveLength(6);
-    expect(snapshot.sources.some(source => source.sourceId.startsWith("source.pension_fund_"))).toBe(false);
-    // Nor does any document of the Social protection methodology archive (SSA's page captures and the Geostat files it repeats).
-    expect(snapshot.sources.some(source => source.documents.some(document => document.datasetId === "social-protection"))).toBe(false);
-    expect(snapshot.sources.some(source => MONEY_BANKS_PUBLIC_SOURCES.map(moneyBanksSourceDocumentId).includes(source.sourceId))).toBe(false);
-    expect(snapshot.sources.some(source => HEALTH_PUBLIC_SOURCES.map(healthSourceDocumentId).includes(source.sourceId))).toBe(false);
-    expect(snapshot.sources.some(source => CRIME_PUBLIC_SOURCES.map(crimeSourceDocumentId).includes(source.sourceId))).toBe(false);
-    expect(snapshot.sources.some(source => EXTERNAL_POSITION_PUBLIC_SOURCES.map(externalPositionSourceDocumentId).includes(source.sourceId))).toBe(false);
-    expect(snapshot.sources.some(source => source.sourceId.startsWith("source.geostat_housing_"))).toBe(false);
-    expect(snapshot.sources.some(source => source.sourceId.startsWith("source.geostat_gdp_use_"))).toBe(false);
-    // All 21 registered housing sources are in the registry, and none of them reaches the snapshot.
+    // A document of the Social protection methodology archive (SSA's page captures and the Pension Fund's documents) reaches it only through a cited source.
+    expect(snapshot.sources.filter(source => source.documents.some(document => document.datasetId === "social-protection")).every(source => snapshot.topics.sourceIds.includes(source.sourceId) && socialIds.includes(source.sourceId))).toBe(true);
+    // Only the Money and banks and the Business sources a topic page's facts cite reach the snapshot.
+    for (const ids of [MONEY_BANKS_PUBLIC_SOURCES.map(moneyBanksSourceDocumentId), BUSINESS_PUBLIC_SOURCES.map(businessSourceDocumentId)]) {
+      expect(snapshot.sources.filter(source => ids.includes(source.sourceId)).map(source => source.sourceId)).toEqual(snapshot.topics.sourceIds.filter(id => ids.includes(id)));
+    }
+    // Only the Health sources a topic page's facts cite reach the snapshot.
+    expect(snapshot.sources.filter(source => HEALTH_PUBLIC_SOURCES.map(healthSourceDocumentId).includes(source.sourceId)).map(source => source.sourceId)).toEqual(snapshot.topics.sourceIds.filter(id => HEALTH_PUBLIC_SOURCES.map(healthSourceDocumentId).includes(id)));
+    // Only the Crime and justice workbooks a topic page's facts cite reach the snapshot.
+    expect(snapshot.sources.filter(source => CRIME_PUBLIC_SOURCES.map(crimeSourceDocumentId).includes(source.sourceId)).map(source => source.sourceId)).toEqual(snapshot.topics.sourceIds.filter(id => CRIME_PUBLIC_SOURCES.map(crimeSourceDocumentId).includes(id)));
+    // Only the Environment and climate and the Energy and food workbooks a topic page's facts cite reach the snapshot.
+    expect(snapshot.sources.filter(source => ENVIRONMENT_PUBLIC_SOURCES.map(environmentSourceDocumentId).includes(source.sourceId)).map(source => source.sourceId)).toEqual(snapshot.topics.sourceIds.filter(id => ENVIRONMENT_PUBLIC_SOURCES.map(environmentSourceDocumentId).includes(id)));
+    expect(snapshot.sources.filter(source => ENERGY_FOOD_PUBLIC_SOURCES.map(energyFoodSourceDocumentId).includes(source.sourceId)).map(source => source.sourceId)).toEqual(snapshot.topics.sourceIds.filter(id => ENERGY_FOOD_PUBLIC_SOURCES.map(energyFoodSourceDocumentId).includes(id)));
+    // Only the Foreign debt and Reserves workbooks those pages' facts cite reach the snapshot (not the NBG file listing).
+    expect(snapshot.sources.filter(source => EXTERNAL_POSITION_PUBLIC_SOURCES.map(externalPositionSourceDocumentId).includes(source.sourceId)).map(source => source.sourceId)).toEqual(["source.nbg_gross_external_debt_bpm6", "source.nbg_official_reserve_assets"]);
+    // GDP by expenditure, Spending by type and Tax breaks and refunds cite these, and they reach the snapshot as topic sources
+    // (not Geostat's constant-price table, nor the Ministry's English workbook and PDF reports).
+    expect(snapshot.sources.filter(source => source.sourceId.startsWith("source.geostat_gdp_use_") || source.sourceId === "source.mof_gfs_general_government_2002_2025" || TAX_BREAKS_REFUNDS_PUBLIC_SOURCES.map(taxBreaksRefundsSourceDocumentId).includes(source.sourceId)).map(source => source.sourceId)).toEqual([
+      "source.geostat_gdp_use_current", "source.geostat_gdp_use_growth", "source.mof_gfs_general_government_2002_2025", "source.mof_tax_expenditure_report_2024_xlsx_ka", "source.treasury_tax_refunds_chart",
+    ]);
+    // All 21 registered housing sources are in the registry, and only those a topic page's facts cite reach the snapshot.
     expect(HOUSING_PUBLIC_SOURCES.map(housingSourceDocumentId).filter(id => !sources.some(source => source.sourceId === id))).toEqual([]);
-    expect(snapshot.sources.some(source => HOUSING_PUBLIC_SOURCES.map(housingSourceDocumentId).includes(source.sourceId))).toBe(false);
-    // All 36 registered internet sources are in the registry, and none of them reaches the snapshot.
+    expect(snapshot.sources.filter(source => HOUSING_PUBLIC_SOURCES.map(housingSourceDocumentId).includes(source.sourceId)).map(source => source.sourceId)).toEqual(snapshot.topics.sourceIds.filter(id => HOUSING_PUBLIC_SOURCES.map(housingSourceDocumentId).includes(id)));
+    // All 36 registered internet sources are in the registry, and only those a topic page's facts cite reach the snapshot.
     expect(INTERNET_PUBLIC_SOURCES.map(internetSourceDocumentId).filter(id => !sources.some(source => source.sourceId === id))).toEqual([]);
-    expect(snapshot.sources.some(source => INTERNET_PUBLIC_SOURCES.map(internetSourceDocumentId).includes(source.sourceId))).toBe(false);
-    expect(snapshot.sources.some(source => BUSINESS_PUBLIC_SOURCES.map(businessSourceDocumentId).includes(source.sourceId))).toBe(false);
-    expect(snapshot.sources.some(source => EDUCATION_PUBLIC_SOURCES.map(educationSourceDocumentId).includes(source.sourceId))).toBe(false);
-    // All 33 registered science and culture sources are in the registry, and none of them reaches the snapshot.
+    expect(snapshot.sources.filter(source => INTERNET_PUBLIC_SOURCES.map(internetSourceDocumentId).includes(source.sourceId)).map(source => source.sourceId)).toEqual(snapshot.topics.sourceIds.filter(id => INTERNET_PUBLIC_SOURCES.map(internetSourceDocumentId).includes(id)));
+    // Only the Education sources a topic page's facts cite reach the snapshot.
+    expect(snapshot.sources.filter(source => EDUCATION_PUBLIC_SOURCES.map(educationSourceDocumentId).includes(source.sourceId)).map(source => source.sourceId)).toEqual(snapshot.topics.sourceIds.filter(id => EDUCATION_PUBLIC_SOURCES.map(educationSourceDocumentId).includes(id)));
+    // All 33 registered science and culture sources are in the registry, and only those a topic page's facts cite reach the snapshot.
     expect(SCIENCE_CULTURE_PUBLIC_SOURCES.map(scienceCultureSourceDocumentId).filter(id => !sources.some(source => source.sourceId === id))).toEqual([]);
-    expect(snapshot.sources.some(source => SCIENCE_CULTURE_PUBLIC_SOURCES.map(scienceCultureSourceDocumentId).includes(source.sourceId))).toBe(false);
-    // All 25 registered transport sources are in the registry, and none of them reaches the snapshot.
+    expect(snapshot.sources.filter(source => SCIENCE_CULTURE_PUBLIC_SOURCES.map(scienceCultureSourceDocumentId).includes(source.sourceId)).map(source => source.sourceId)).toEqual(snapshot.topics.sourceIds.filter(id => SCIENCE_CULTURE_PUBLIC_SOURCES.map(scienceCultureSourceDocumentId).includes(id)));
+    // All 25 registered transport sources are in the registry, and only those a topic page's facts cite reach the snapshot.
     expect(TRANSPORT_PUBLIC_SOURCES.map(transportSourceDocumentId).filter(id => !sources.some(source => source.sourceId === id))).toEqual([]);
-    expect(snapshot.sources.some(source => TRANSPORT_PUBLIC_SOURCES.map(transportSourceDocumentId).includes(source.sourceId))).toBe(false);
-    expect(snapshot.sources.some(source => source.sourceId.startsWith("source.nbg_money_transfers_") || source.sourceId.startsWith("source.geostat_fdi_") || source.sourceId === "source.nbg_balance_of_payments_bpm6")).toBe(false);
+    expect(snapshot.sources.filter(source => TRANSPORT_PUBLIC_SOURCES.map(transportSourceDocumentId).includes(source.sourceId)).map(source => source.sourceId)).toEqual(snapshot.topics.sourceIds.filter(id => TRANSPORT_PUBLIC_SOURCES.map(transportSourceDocumentId).includes(id)));
+    // Money from abroad, Foreign investment and Current account cite these, and they reach the snapshot as topic sources.
+    expect(snapshot.sources.filter(source => source.sourceId.startsWith("source.nbg_money_transfers_") || source.sourceId.startsWith("source.geostat_fdi_") || source.sourceId === "source.nbg_balance_of_payments_bpm6").map(source => source.sourceId).sort()).toEqual([
+      "source.geostat_fdi_by_countries", "source.geostat_fdi_by_quarters", "source.geostat_fdi_by_regions", "source.geostat_fdi_by_sectors", "source.nbg_balance_of_payments_bpm6", "source.nbg_money_transfers_by_countries",
+    ]);
     expect(snapshot.sources.map(source => source.sourceId)).toEqual(expect.arrayContaining([
       "source.geostat_sector_growth", "source.geostat_sector_volume",
       "source.geostat_regional_gdp", "source.geostat_regional_gdp_by_activity", "source.fiscal_regional_economy_share",
