@@ -42,8 +42,8 @@ Goals
 3. The first 3,000 cells stay the most useful ones, so a short-window reader loses the least.
 4. A visitor who reaches a page by a link inside the site sees the same block as one who loads it directly.
 
-Non-goals: Product inflation and the category monthly change (their data loads after the page opens and is not in the
-HTML), a CSV or download link, new pages, changes to `/mcp` or `llms.txt` beyond wording that becomes untrue.
+Non-goals: Product inflation (Duru's named exception: its data loads after the page opens and is not in the HTML), a
+CSV or download link, new pages, changes to `/mcp` or `llms.txt` beyond wording that becomes untrue.
 
 Anti-goals: a block that makes chart pages feel heavier or longer to people, a second copy of the numbers in the page
 payload, a parallel table component beside `CrawlTables`.
@@ -98,7 +98,8 @@ at their earliest period.
 `crawlTables()` returns the window tables exactly as today (3,000 cells split across the views; a table over its share
 keeps its totals and largest series), then **rest tables**: for each table that was cut, its other series in workbook
 order, and after those the page's **earlier-period models** in full. A page holds at most `CRAWL_PAGE_CELL_CAP` =
-30,000 cells; past it the rest is cut from the end and its caption says so. A cut window table's caption changes from
+40,000 cells (30,000 until §5.5 put the largest page at about 30,300); past it the rest is cut from the end and its
+caption says so. A cut window table's caption changes from
 "all of them in the Excel download" to "the others follow below" when its rest table is complete. The note counts
 the series that have a figure, so "top 23 of 185" and the rest table's "the other 162" add up; a table that leaves out
 only series without any figure is complete and gets no note.
@@ -122,7 +123,24 @@ idle, and only then. It tells the two cases apart with `useSyncExternalStore`'s 
 receives its tables as props, so it writes the same string on both sides; `RegionIndex` stops guarding its tables with
 `typeof window`.
 
-### 5.4 Words (Georgian for Duru's proofread)
+### 5.4 The monthly change on Inflation by category
+
+The one dataset outside Duru's exceptions that was not in any page's HTML: every category's change on the previous
+month (55 categories, monthly since 2004, 14,229 values). The page fetched it from a file when its monthly tab opened
+(platform review item U13-03: the default tab never read it). A table needs the figures at build time, and a figure in
+the page's HTML is a figure that travels with the page, so the premise of U13-03 no longer holds: the runs go back
+into the page's own data, the fetch and its loading and error states go, and the monthly tab opens at once.
+
+Its tables go to the fold, not to the first tables: three views of 36 months would pass the first tables' cap and cut
+the annual rates. The fold opens with the monthly change over the same last 36 months, then the earlier months of the
+contributions, the annual rates and the monthly change. `categoryCrawlStates(index, "earlier")` returns those four.
+
+Considered and not built: keeping the fetch and writing the monthly tables from a server component (its HTML would
+sit in the page twice, once as markup and once in the framework's payload, more than the runs themselves); reading the
+file inside the client component during the build (works around the framework, and a silent break would only show as a
+missing table).
+
+### 5.5 Words (Georgian for Duru's proofread)
 
 | Key | English | Georgian |
 | --- | --- | --- |
@@ -159,26 +177,28 @@ and would rebuild 3,000 cells during hydration).
 
 ## 8. Left out, said plainly
 
-- **Product inflation** (the page loads its data after opening) and the **monthly change by category**: Duru's named
-  exception and the one similar case; both need the data in the page first.
-- Trade products and domestic exports by product are included as far as the 30,000-cell page cap allows; the cap note
-  names any remainder.
+- **Product inflation**: Duru's named exception, and now the only data the site charts that no page prints. The page
+  loads its 610 product runs after opening (about 250 KB compressed), so none are in the HTML.
+- Trade products and domestic exports by product, the other named exception, are on their pages whole: 1,079 export
+  and 1,185 import products for 2020 to 2025, most of them in the folded rest.
 - **A reader with a short window, on the five largest pages** (ten with both languages). Their folded rest runs past
   40,000 characters, so such a reader gets the first tables and stops: Trading partners (the 23 largest partners of
   each measure, every year; 185 to 210 partners have figures), Services trade (the 79 or 80 largest of 104 to 146
-  countries), Inflation by category (January 2024 onward; the months back to 2005 follow), Trade products and Domestic
-  exports (individual products, Duru's exception). A reader that takes the whole page gets all of it. Only more pages
+  countries), Inflation by category (contributions and annual rates from January 2024 and the first divisions' monthly
+  change; the other monthly changes and the months back to 2004 follow), Trade products and Domestic exports
+  (individual products, Duru's exception). A reader that takes the whole page gets all of it. Only more pages
   would close this for the partner countries (one page per country, as the regions have); that is a new page type and
   needs Duru's approval, so it is not in this change.
 - **Page weight.** The folded rest is paid for in HTML size on the pages that have one (compressed, live then built,
-  Georgian pages): Inflation by category 135 to 168 KB, Trading partners 173 to 203 KB, Trade products 194 to 258 KB,
-  Inflation overview 42 to 45 KB. The whole site grows 1.0%. The two inflation size limits in the browser specs rise
-  to match.
+  Georgian pages): Inflation by category 135 to 231 KB (167 before the monthly change joined it; of the last 64 KB,
+  36 are the monthly runs that used to load when their tab opened), Trading partners 173 to 203 KB, Trade products
+  194 to 258 KB, Inflation overview 42 to 45 KB. The whole site grows 1.2%. The two inflation size limits in the
+  browser specs rise to match.
 
 ## 9. Results (2026-11-21, production build of this branch)
 
 - `npm run crawl:check`: 1,466 pages carry a data table, none hidden or out of view; 294,734 cells in the first
-  tables and 417,410 in all; site gzip 54,904,051 bytes (1.0% over the build without the block, ceiling 62,535,000).
+  tables and 446,186 in all; site gzip 55,037,916 bytes (1.2% over the build without the block, ceiling 62,535,000).
 - Replay of the measured reader over all 1,556 built pages: the first tables end inside the 40,000-character window on
   1,466 of 1,466 pages, and 1,456 pages fit whole.
 - Fresh agents given only the replayed text of 24 pages (Georgian and English, heavy and light): the smallest model
@@ -188,7 +208,10 @@ and would rebuild 3,000 cells during hydration).
   2020 (30,318); both said exports to Japan in 2019 are not printed in the cut text and derived them from total trade
   less imports. On the final build three more answered 12 of 12, two of them reading whole pages of 190,000 and
   250,000 characters (exports to Japan in 2019: 0.012 billion USD, in the folded rest; transport inflation in March
-  2010: 13.2%).
+  2010: 13.2%). After §5.4, three more read Inflation by category (the whole English and Georgian pages, 330,000 and
+  350,000 characters, and the cut English text) and answered 11 of 11: the change on the previous month for transport
+  in March 2010 (−0.3%), education in September 2004 (2.0%) and food in May 2025 (1.6%, which the cut text also
+  holds), and "not in the text" for March 2010 in the cut text.
 - The real reader on today's live site keeps a visible table inside a `role="region"` scroller as a text table and
   prints its `<caption>` as a line above it. The block itself can only be fetched once it is live (criterion 6).
 - What the agents found hard, and what was done: the two notes of a cut table did not add up ("top 79 of 153" beside

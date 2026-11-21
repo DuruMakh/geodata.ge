@@ -14,7 +14,7 @@
 
 - All commands run in `apps/web`. While editing run only the named test file; the full gates run once, in Task 8.
 - The `<table>` markup `crawlTablesHtml` writes does not change, and nothing inside the wrapper carries a class or style.
-- `CRAWL_CELL_CAP` stays 3,000 (the window). `CRAWL_PAGE_CELL_CAP` = 30,000 (window plus rest).
+- `CRAWL_CELL_CAP` stays 3,000 (the window). `CRAWL_PAGE_CELL_CAP` = 30,000 (window plus rest); Task 9 raises it to 40,000.
 - Words, exactly: `controls.crawlHeading` "Data table" / "მონაცემთა ცხრილი"; `controls.crawlRest` "The rest of the data" / "დანარჩენი მონაცემები"; `controls.crawlTopMore` "top {kept} of {of}; the others follow below" / "უდიდესი {kept} {of}-დან; დანარჩენი — ქვემოთ"; `controls.crawlOthers` "the other {count}" / "დანარჩენი {count}".
 - No new component, no new dependency, no gradients, cards or shadows (DESIGN.md §17).
 - Hydration never rebuilds the tables.
@@ -112,3 +112,13 @@
 - [ ] Reader replay over every built page (40,000-character window) saved under `/mnt/project-files/ai-readable-tables/`; fresh agents answer the spec §7.3 questions from that text alone; fix what they miss and repeat for the affected pages.
 - [ ] Screenshots, desktop and phone, Georgian and English, for Duru; `llms.txt` and `docs/` wording that still says "hidden" corrected.
 - [ ] After release: the same questions through Claude's fetch and Gemini `url_context` on the live pages.
+
+### Task 9: The monthly change on Inflation by category (added after Task 8; spec §5.4)
+
+**Files:** Modify `lib/explorer/inflationCategories.ts`, `components/inflation/inflation-categories.tsx`, `lib/pages/inflation-categories.tsx`, `lib/pages/inflationPageData.ts`, `scripts/prepare-inflation.ts`, `lib/explorer/crawlTables.ts`, `scripts/check-crawl-tables.ts`, `lib/seo/llmsText.ts`. Test `tests/explorer/crawlStates.prices.test.ts`, `tests/explorer/inflationCategoriesRender.test.tsx`, `tests/explorer/inflationCategories.test.ts`, `tests/explorer/crawlTables.test.ts`, `tests/browser/inflation-categories.spec.ts`.
+
+- [ ] Test: `categoryCrawlStates(index, "earlier")` returns the tabs `["mom", "contrib", "yoy", "mom"]`: the monthly change of every category over the window, then each view from its first month to the December before its window; with both builders `crawlTables` cuts no table and prints one cell per `mom_pct` fact of `cpi-categories-monthly.csv`.
+- [ ] Implement `categoryCrawlStates`; `CRAWL_PAGE_CELL_CAP = 40_000` (the page holds about 30,300 cells); the page-cap test builds its page from the constant.
+- [ ] The page passes every category fact inline (`packCategoryFacts(categories.map(categoryFactInput))`); `monthlyUrl`, `usePageData`, the pending state, `categoryTabLoaded` and the `inflation-category-mom` page-data file go. Product inflation keeps its fetched file.
+- [ ] `crawl:check` spot check: the folded rest of Inflation by category holds a monthly-change row for 2004 with twelve figures. `llms.txt` names Product inflation as the one page whose data loads after it opens.
+- [ ] Browser spec: the monthly tab draws without a `/page-data/` request, the fold holds two monthly-change tables and the first tables none; the page's compressed size stays under its new limit. Build, serve, run the specs that open the page, then `npm run check` once. Commit.

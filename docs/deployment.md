@@ -911,7 +911,8 @@ no budget data and require no migration when a code release is rolled back.
   and reach Vercel through the generated `vercel.json`; Vercel adds HSTS itself.
 - Page data under `/page-data/` (`apps/web/lib/data/pageDataFiles.ts`): JSON a
   page fetches after load instead of carrying it in its HTML, today the
-  inflation products runs and the categories' monthly runs. Each name carries a
+  inflation products runs only (the categories' monthly runs travel with their
+  page, whose data table prints them: DESIGN.md §8.4). Each name carries a
   hash of its content, so the rule in `siteHeaders()` sends
   `Cache-Control: public, max-age=31536000, immutable` and
   `X-Robots-Tag: noindex`. `prebuild` writes the files and reads them back
