@@ -22,10 +22,20 @@ const NO_CRAWL_TABLES: Record<string, string> = {
   "explorer/inflation/products": "data fetched after page load; never in prerendered HTML",
 };
 
+// Map index pages: each carries every year of its figures for every place it lists (DESIGN.md §8.4), in ka and en.
+const MAP_INDEX_ROUTES = [
+  "explorer/education/schools", "explorer/education/kindergartens", "explorer/demography/population", "explorer/demography/births-deaths",
+  "explorer/demography/marriages-divorces", "explorer/health/pensions", "explorer/health/subsistence-allowance", "explorer/municipalities",
+  "explorer/business/regions", "explorer/economy/regions", "explorer/housing/regions", "explorer/money/regions", "explorer/transport/regions",
+  "explorer/wages/regions", "explorer/internet/homes", "explorer/living-standards/income", "explorer/living-standards/spending",
+  "explorer/science-culture/museums", "explorer/environment/forests", "explorer/environment/waste", "explorer/environment/air-quality",
+  "explorer/health/causes-of-death",
+];
+
 const WRAPPER = '<div hidden="" data-testid="crawl-tables">';
 const CHART_PANEL = /data-testid="(?:[\w-]*chart-panel|municipal-chart-controls)"/;
 
-type Page = { route: string; html: string; wrappers: string[]; cells: number; gzip: number };
+type Page = { route: string; html: string; wrappers: string[]; cells: number; gzip: number; payloadTables: boolean };
 
 const stripScripts = (html: string) => html.replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, " ");
 
@@ -64,7 +74,18 @@ type SpotCheck = { name: string; route: string; test: (inner: string, messages: 
 const rowsOf = (inner: string) => [...inner.matchAll(/<tr><th>([^<]*)<\/th>((?:<td>[^<]*<\/td>)+)<\/tr>/g)].map((match) => ({ label: match[1]!, cells: [...match[2]!.matchAll(/<td>([^<]*)<\/td>/g)].map((cell) => cell[1]!) }));
 const tablesOf = (inner: string) => inner.split("<table>").slice(1).map((table) => ({ caption: /<caption>([^<]*)<\/caption>/.exec(table)?.[1] ?? "", rows: rowsOf(table) }));
 
+/** A row named `label` (by its Georgian or English name) with every figure in `cells`. */
+const hasRow = (inner: string, labels: readonly string[], cells: readonly string[]) =>
+  rowsOf(inner).some((row) => labels.includes(row.label) && cells.every((cell) => row.cells.includes(cell)));
+
 const SPOT_CHECKS: SpotCheck[] = [
+  {
+    name: "Schools map: Khulo's pupils 3,936 and 2,075, Shuakhevi's 2,410 and 1,137",
+    route: "explorer/education/schools",
+    test: (inner) => hasRow(inner, ["ხულო", "Khulo"], ["3,936", "2,075"]) && hasRow(inner, ["შუახევი", "Shuakhevi"], ["2,410", "1,137"]),
+  },
+  { name: "Business regions map: sales and jobs tables", route: "explorer/business/regions", test: (inner) => tablesOf(inner).length === 2 },
+  { name: "Pensions map: pensioners and their share, for municipalities and regions", route: "explorer/health/pensions", test: (inner) => tablesOf(inner).length === 4 },
   {
     name: "Samegrelo-Zemo Svaneti: the employed row reads 118.9 and 118.5",
     route: "explorer/unemployment/regions/samegrelo_zemo_svaneti",
@@ -99,7 +120,9 @@ export async function checkCrawlTables(root = process.cwd(), { sizeReportOnly = 
     const raw = readFileSync(join(appDir, file));
     const html = stripScripts(raw.toString("utf8"));
     const wrappers = crawlWrappers(html);
-    return { route: file.replace(/\.html$/, ""), html, wrappers, cells: countCells(wrappers), gzip: gzipSync(raw, { level: 6 }).length };
+    // Table markup in the page's scripts means the tables travel twice: in the HTML and again in the data payload.
+    const payloadTables = /\\u003ctable\\u003e|<table>/.test(raw.toString("utf8").match(/<script\b[^>]*>[\s\S]*?<\/script>/gi)?.join("") ?? "");
+    return { route: file.replace(/\.html$/, ""), html, wrappers, cells: countCells(wrappers), gzip: gzipSync(raw, { level: 6 }).length, payloadTables };
   });
   const failures: string[] = [];
 
@@ -109,6 +132,13 @@ export async function checkCrawlTables(root = process.cwd(), { sizeReportOnly = 
     for (const prefix of ["", "en/"]) {
       const page = pages.find((entry) => entry.route === `${prefix}${route}`);
       if (!page || page.wrappers.length > 0) failures.push(`${prefix}${route}: no longer qualifies for the no-crawl-tables exemption`);
+    }
+  }
+  for (const route of MAP_INDEX_ROUTES) {
+    for (const prefix of ["", "en/"]) {
+      const page = pages.find((entry) => entry.route === `${prefix}${route}`);
+      if (!page || page.wrappers.length === 0) failures.push(`${prefix}${route}: a map index page without its every-year tables`);
+      else if (page.payloadTables) failures.push(`${prefix}${route}: its crawl tables' markup is repeated in the page's data payload`);
     }
   }
   const unwrappedTables = pages.filter((page) => page.wrappers.some((inner) => /<div\b/.test(inner)));
@@ -139,6 +169,10 @@ export async function checkCrawlTables(root = process.cwd(), { sizeReportOnly = 
   console.log(`Top 10 pages by crawl cells (cap ${bytes(CRAWL_CELL_CAP)}):`);
   for (const page of [...pages].sort((a, b) => b.cells - a.cells || a.route.localeCompare(b.route)).slice(0, 10)) {
     console.log(`  ${String(page.cells).padStart(5)} cells  ${page.wrappers.length} wrapper(s)  ${bytes(page.gzip).padStart(9)} gzip  /${page.route}`);
+  }
+  // A map index page within a year's growth of the cap: its tables will need room before the next data update fails this check.
+  for (const page of pages.filter((entry) => MAP_INDEX_ROUTES.includes(entry.route.replace(/^en\//, "")) && entry.cells > CRAWL_CELL_CAP - 250)) {
+    console.log(`WARNING: /${page.route} has ${bytes(page.cells)} crawl cells, within 250 of the ${bytes(CRAWL_CELL_CAP)} cap`);
   }
   console.log("Spot checks:");
   for (const line of spotResults) console.log(`  ${line}`);

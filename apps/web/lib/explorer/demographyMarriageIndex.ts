@@ -5,6 +5,7 @@ import { GEORGIA_PLACE_ID } from "./demographyAreas";
 import { perThousand } from "./demographyMarriage";
 import { placeIndexRows } from "./demographyPopulationIndex";
 import { formatInUnit, UNIT_DENSITY } from "./format";
+import { historyFromFacts, type IndexHistory } from "./indexCrawlTables";
 import type { MunicipalListRow } from "./municipalData";
 import { buildMunicipalityValueMapModel, type MunicipalityMapModel } from "./municipalityMapData";
 
@@ -18,6 +19,8 @@ export type MarriageIndexModel = {
   country: MunicipalListRow;
   /** Marriages and divorces of the latest year, by list row id (municipality code, region id, `country.georgia`). */
   countsById: Readonly<Record<string, { marriages: number; divorces: number }>>;
+  /** Every year of the marriage and divorce counts for every listed place (the per-1,000 rate is left out: with it the page would pass its crawl cell cap). */
+  history: IndexHistory;
 };
 
 const isMunicipality = (id: string) => /^\d{2}$/.test(id);
@@ -56,5 +59,9 @@ export function buildMarriageIndexModel({
     regions: regionRows,
     country,
     countsById,
+    history: historyFromFacts([
+      { id: "marriages", facts: facts.filter((fact) => fact.seriesId === SERIES.marriages) },
+      { id: "divorces", facts: facts.filter((fact) => fact.seriesId === SERIES.divorces) },
+    ]),
   };
 }

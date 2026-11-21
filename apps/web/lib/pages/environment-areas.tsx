@@ -48,7 +48,8 @@ export async function renderEnvironmentRegionIndex(locale: Locale, topic: Enviro
   return renderEnvironmentFrame({
     ...page, href: environmentAreaIndexHref(topic), title: t(`page.${topic}.title`), description: t(`page.${topic}.summary`), firstYear: Math.min(...years), lastYear: Math.max(...years),
     measures: [t(`mapLabel.${topic}`)],
-    children: <EnvironmentRegionIndex topic={topic} regionMap={regionMap} georgiaValue={georgia.find(f => f.year === regionMap.year)?.value} unit={latest.fact.unit}
+    children: <EnvironmentRegionIndex topic={topic} regionMap={regionMap} georgiaValue={georgia.find(f => f.year === regionMap.year)?.value}
+      georgiaByYear={Object.fromEntries(georgia.map(f => [f.year, f.value]))} unit={latest.fact.unit}
       decimals={Math.max(...regional.map(f => f.decimals))} latest={{ measure: t(`latest.${topic}`), year: latest.year, value }} />,
   });
 }

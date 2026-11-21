@@ -17,6 +17,7 @@ const NO_CRAWL_TABLES: Record<string, string> = {
 // Exported crawl-state helpers with no test of their own, each with a one-line reason.
 const UNTESTED_CRAWL_STATES: Record<string, string> = {
   unitListCrawlStates: "shared helper; tested through the explorers' own crawl states that call it",
+  historyCrawlTable: "a map index's every-year table builder, not a crawl state; tested in indexCrawlTables.test.ts",
 };
 // Components that carry the crawl tables of views their page opens only after a click, so the server never renders those explorers.
 const INDEX_CARRIERS = ["components/unemployment/unemployment-regions-index.tsx"];
@@ -59,6 +60,21 @@ describe("crawl table coverage", () => {
     expect(functions.length).toBeGreaterThanOrEqual(50);
     expect(functions).toEqual(expect.arrayContaining(["businessCrawlStates", "censusCrawlSettlements", "populationPlaceCrawlQueries"]));
     expect(functions.filter((name) => !(name in UNTESTED_CRAWL_STATES) && !tests.some((source) => new RegExp(`\\b${name}\\b`).test(source))), "These crawl-state functions have no test.").toEqual([]);
+  });
+
+  it("every map index page writes its every-year tables (IndexCrawlTables or RegionIndex crawl)", () => {
+    // DESIGN.md §8.4: map pages carry every year of their figures for every place they list.
+    const files = [
+      "lib/pages/education-places.tsx", "lib/pages/social-places.tsx",
+      "lib/pages/demography-population.tsx", "lib/pages/demography-births-deaths.tsx", "lib/pages/demography-marriages-divorces.tsx",
+      "lib/pages/municipal-index.tsx",
+      "components/business/business-index.tsx", "components/regional-economies/regional-economies-index.tsx", "components/housing/housing-index.tsx",
+      "components/money-banks/money-banks-index.tsx", "components/transport/transport-index.tsx", "components/wages/wages-regions-index.tsx",
+      "components/internet/internet-index.tsx", "components/household/household-index.tsx", "components/science-culture/museums-index.tsx",
+      "components/environment/environment-region-index.tsx", "components/health/health-deaths-index.tsx", "lib/pages/environment-air-quality.tsx",
+    ];
+    expect(files).toHaveLength(18);
+    expect(files.filter((file) => !/<IndexCrawlTables|\bcrawl=\{/.test(read(file))), "These map index files write no every-year tables.").toEqual([]);
   });
 
   it("the exemption list names only files that still build a workbook and render no crawl tables", () => {

@@ -1,5 +1,6 @@
 "use client";
-import type { ClientHouseholdFact, HouseholdMeasure } from "../../lib/data/household/types";
+import { formatCrawlCell } from "../../lib/explorer/crawlTables";
+import { HOUSEHOLD_MEASURES, type ClientHouseholdFact, type HouseholdMeasure } from "../../lib/data/household/types";
 import { householdMeasureHash, householdRegionHref, parseHouseholdMeasure, sectionTotal, serializeHouseholdMeasure, type HouseholdSectionId } from "../../lib/explorer/household";
 import { formatInUnit } from "../../lib/explorer/format";
 import type { RegionMapModel } from "../../lib/explorer/regionalEconomyMap";
@@ -21,7 +22,7 @@ export function HouseholdIndex({ section, facts, regionMaps }: {
   facts: ClientHouseholdFact[];
   regionMaps: Record<HouseholdMeasure, RegionMapModel>;
 }) {
-  const { messages } = useI18n();
+  const { locale, messages } = useI18n();
   const t = (key: string, values?: Record<string, string | number>) => message(messages, `household.${key}`, values);
   const { state: measure, update } = useHashState(section, parseHouseholdMeasure, serializeHouseholdMeasure);
   const unitLabel = t(`unitLong.${measure}`);
@@ -33,6 +34,11 @@ export function HouseholdIndex({ section, facts, regionMaps }: {
   const regionMap = regionMaps[measure];
   const totalLabel = t(`series.${sectionTotal(section)}`);
   const georgiaValue = georgia(measure).find(f => f.year === regionMap.year)?.value;
+  // The hidden every-year tables carry both measures, whichever the map shows.
+  const crawl = HOUSEHOLD_MEASURES.map(m => ({
+    model: regionMaps[m], lead: { label: t("area.georgia"), valuesByYear: Object.fromEntries(georgia(m).map(f => [f.year, f.value])) },
+    metric: { legend: `${totalLabel} · ${t(`unitLong.${m}`)}`, formatValue: (value: number) => formatCrawlCell(value, null, "#,##0.0", locale) },
+  }));
   return <div data-testid={`household-${section}`} className="@container">
     <ExplorerHeading>{t(`page.${section}.title`)}</ExplorerHeading>
     <LatestValueLine testId="household-latest" measure={t(`latest.${section}`)} period={latest.year} value={valueLabel(latest.value)} />
@@ -42,7 +48,7 @@ export function HouseholdIndex({ section, facts, regionMaps }: {
         leadRow={georgiaValue === undefined ? undefined : { id: "georgia", label: t("area.georgia"), value: georgiaValue }} metric={{
           hrefForRegion: id => `${householdRegionHref(section, id)}${householdMeasureHash(measure)}`, formatValue: valueLabel, legend: `${totalLabel} · ${unitLabel}`, testId: "household-region-map",
           mapAria: t("regionMapAria", { total: totalLabel, unit: unitLabel, year: regionMap.year }), entityAria: (name, value, year) => t("regionMapEntityAria", { name, amount: valueLabel(value), year }),
-        }} />
+        }} crawl={crawl} />
     </section>
   </div>;
 }

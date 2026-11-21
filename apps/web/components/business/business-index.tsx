@@ -2,6 +2,7 @@
 import { Users } from "lucide-react";
 import type { ClientBusinessFact } from "../../lib/data/business/types";
 import { businessAreaOfMapId, businessMapHash, businessRegionHref, parseBusinessMapMeasure, serializeBusinessMapMeasure, type BusinessMapMeasure } from "../../lib/explorer/businessAreas";
+import { formatCrawlCell } from "../../lib/explorer/crawlTables";
 import { formatInUnit, unitsFor } from "../../lib/explorer/format";
 import type { RegionMapModel } from "../../lib/explorer/regionalEconomyMap";
 import { publicLabel } from "../../lib/i18n/labels";
@@ -37,6 +38,14 @@ export function BusinessIndex({ facts, regionMaps }: {
   const largestName = publicLabel(locale, largest.regionId, largest.nameKa, englishLabels);
   const georgiaValue = facts.find(f => f.indicatorId === TOTAL_ID[measure] && f.year === regionMap.year)?.value;
   const mapLabel = t(`map.${measure}`);
+  // The hidden every-year tables print both measures as the region pages' own tables do: million GEL and persons.
+  const crawl = (["turnover", "employed"] as const).map(each => ({
+    model: regionMaps[each],
+    metric: each === "turnover"
+      ? { legend: `${t("map.turnover")} · ${t("unitMlnGel")}`, formatValue: (value: number) => formatCrawlCell(value / 1_000_000, null, "#,##0.0", locale) }
+      : { legend: `${t("map.employed")} · ${t("unitPersons")}`, formatValue: (value: number) => formatCrawlCell(value, null, "#,##0", locale) },
+    lead: { label: t("area.georgia"), valuesByYear: Object.fromEntries(facts.filter(f => f.indicatorId === TOTAL_ID[each]).map(f => [f.year, f.value])) },
+  }));
   return <div data-testid="business-regions" className="@container">
     <ExplorerHeading>{t("page.regions.title")}</ExplorerHeading>
     <LatestValueLine testId="business-latest" measure={t("latest.regions", { region: largestName })} period={regionMaps.turnover.year} value={`${formatInUnit(largest.value, bn)} ${message(messages, "format.bnGel")}`} />
@@ -49,7 +58,7 @@ export function BusinessIndex({ facts, regionMaps }: {
         leadRow={georgiaValue === undefined ? undefined : { id: "georgia", label: t("area.georgia"), value: georgiaValue }} metric={{
           hrefForRegion: id => `${businessRegionHref(id)}${businessMapHash(measure, businessAreaOfMapId(id))}`, formatValue: valueLabel, legend: `${mapLabel} · ${unitLabel}`, testId: "business-region-map",
           mapAria: t("regionMapAria", { total: mapLabel, unit: unitLabel, year: regionMap.year }), entityAria: (name, value, year) => t("regionMapEntityAria", { name, amount: valueLabel(value), year }),
-        }} />
+        }} crawl={crawl} />
     </section>
   </div>;
 }

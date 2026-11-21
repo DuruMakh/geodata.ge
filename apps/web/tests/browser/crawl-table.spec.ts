@@ -10,6 +10,11 @@ const PAGES = [
   { path: "/en/explorer/unemployment/regions/samegrelo_zemo_svaneti", figure: "118.9" },
   { path: "/en/explorer/trade/partners", figure: null },
   { path: "/explorer/demography/population/khashuri", figure: null },
+  // Map index pages carry every year for every place they list: Khulo's 2015/16 pupils on Schools; the region maps build theirs
+  // in RegionIndex, a client component, during the server render only.
+  { path: "/explorer/education/schools", figure: "3,936" },
+  { path: "/en/explorer/education/schools", figure: "3,936" },
+  { path: "/en/explorer/business/regions", figure: null },
 ] as const;
 
 for (const { path, figure } of PAGES) {

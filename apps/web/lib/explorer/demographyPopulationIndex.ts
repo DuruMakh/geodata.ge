@@ -3,6 +3,7 @@ import type { ServedDemographyObservation } from "../data/demography/types";
 import { MUNICIPAL_COUNTRY_ID, type Municipality, type MunicipalRegion } from "../data/municipal/types";
 import { GEORGIA_PLACE_ID } from "./demographyAreas";
 import { buildPopulationMunicipalityMap } from "./demographyPopulationMaps";
+import { historyFromFacts, type IndexHistory } from "./indexCrawlTables";
 import type { MunicipalListRow } from "./municipalData";
 import type { MunicipalityMapModel } from "./municipalityMapData";
 
@@ -22,6 +23,8 @@ export type PopulationIndexModel = {
   /** Persons per km² in the latest density year, for Georgia and the regions only. */
   densityByPlace: Readonly<Record<string, number>>;
   densityYear: number;
+  /** Every year of the index's figures for every listed place, for the page's hidden crawl tables. */
+  history: IndexHistory;
 };
 
 /** Rows ranked highest first, numbered from 1; equal values keep their input order. Shared with the births index. */
@@ -106,5 +109,6 @@ export function buildPopulationIndexModel({
     density.filter((fact) => fact.year === densityYear).map((fact) => [fact.geographyId, fact.value]),
   );
 
-  return { year, map, municipalities: municipalityRows, regions: regionRows, country, densityByPlace, densityYear };
+  const history = historyFromFacts([{ id: "population", facts: facts.filter((fact) => fact.seriesId === SERIES.populationTotal) }]);
+  return { year, map, municipalities: municipalityRows, regions: regionRows, country, densityByPlace, densityYear, history };
 }
