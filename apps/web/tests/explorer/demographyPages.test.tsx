@@ -404,8 +404,12 @@ describe("the place indexes' every-year tables", () => {
 
   it("Marriages and divorces carries both counts, not the rate, in the latest years that leave Georgia's tables room under the cap", async () => {
     const [inner] = indexTables(renderPageMarkup("en", await renderDemographyMarriagesDivorcesPage("en")));
-    expect(captions(inner!)).toHaveLength(4);
-    expect(captions(inner!)[0]).toMatch(/2010–2025 · Published$/);
-    expect((inner!.match(/<td>/g) ?? []).length).toBeLessThanOrEqual(2600);
+    const [first, rest] = inner!.split("<details>");
+    expect(captions(first!)).toHaveLength(4);
+    expect(captions(first!)[0]).toMatch(/2010–2025 · Published$/);
+    expect((first!.match(/<td>/g) ?? []).length).toBeLessThanOrEqual(2600);
+    // The year that did not fit follows, folded: the same four tables for 2009.
+    expect(captions(rest!)).toHaveLength(4);
+    expect(captions(rest!)[0]).toMatch(/ · 2009 · Published$/);
   });
 });

@@ -4,7 +4,7 @@ import type { ClientCpiFact, ClientInflationTargetRow } from "../servedRows";
 import { ACCENT, INK } from "./colors";
 import { CRAWL_MONTH_COLUMNS } from "./crawlTables";
 import { packMonthlyRuns, unpackMonthlyRuns, type PackedCategorySeries } from "./inflationCategories";
-import { lastPeriodsRange, periodBounds, rangeFromPatch, refitRange, resolveRange, type PeriodRange, type ResolvedPeriodRange } from "./periodRange";
+import { crawlPeriodsRange, periodBounds, rangeFromPatch, refitRange, resolveRange, type PeriodRange, type ResolvedPeriodRange } from "./periodRange";
 import { parseMonthRangeKey, writeMonthRangeKey } from "./urlState";
 
 // Pure state and data selection for the inflation overview. Components compose
@@ -108,14 +108,16 @@ export function drawableSelection(index: InflationIndex, state: InflationState):
 }
 
 /**
- * The hidden crawl tables' states (lib/explorer/crawlTables.ts): each tab with every row it draws, over its last three calendar years (at most 36 months).
- * The workbook writes a row per series and year, so the window is the range, not a column trim. A tab without data has none.
+ * The data-table block's states (lib/explorer/crawlTables.ts): each tab with every row it draws, over its last three calendar years (at most 36 months),
+ * or with `months` "earlier" over every month before those, which the block folds below. The workbook writes a row per series and
+ * year, so the window is the range, not a column trim. A tab without data has none.
  */
-export function inflationCrawlStates(index: InflationIndex): InflationState[] {
+export function inflationCrawlStates(index: InflationIndex, months: "latest" | "earlier" = "latest"): InflationState[] {
   return INFLATION_TABS.flatMap((tab) => {
     const selected = drawableKeys(index, tab);
     if (!selected.some((key) => key !== "target")) return [];
-    return [{ ...DEFAULT_INFLATION_STATE, tab, selected, range: lastPeriodsRange(tabCoverage(index, tab), CRAWL_MONTH_COLUMNS) }];
+    const range = crawlPeriodsRange(tabCoverage(index, tab), CRAWL_MONTH_COLUMNS, months);
+    return range ? [{ ...DEFAULT_INFLATION_STATE, tab, selected, range }] : [];
   });
 }
 

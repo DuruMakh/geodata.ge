@@ -75,6 +75,17 @@ describe("inflation overview", () => {
     const built = indexInflationFacts(withoutIndex, sourceIdBySeriesMeasure(withoutIndex));
     expect(inflationCrawlStates(built).map((state) => state.tab)).toEqual(["yoy", "mom"]);
   });
+
+  it("the earlier months: the same tabs and rows, from each tab's first month to the December before its window", () => {
+    const latest = inflationCrawlStates(index);
+    const earlier = inflationCrawlStates(index, "earlier");
+    expect(earlier.map((state) => [state.tab, state.selected])).toEqual(latest.map((state) => [state.tab, state.selected]));
+    earlier.forEach((state, at) => {
+      const range = resolveInflationRange(state, index);
+      expect(range.start).toBe(range.min);
+      expect(range.end).toBe(resolveInflationRange(latest[at]!, index).start - 1);
+    });
+  });
 });
 
 describe("inflation categories", () => {
@@ -101,6 +112,14 @@ describe("inflation categories", () => {
     expect(crawlTables(models, en.messages)[0]!.rows.some((row) => row.label.startsWith("The rest — "))).toBe(true);
   });
 
+  it("the earlier months: the same two views, up to the December before the window", () => {
+    const index = indexOf(["yoy_pct"]);
+    const latest = categoryCrawlStates(index);
+    const earlier = categoryCrawlStates(index, "earlier");
+    expect(earlier.map((state) => [state.tab, state.selected])).toEqual(latest.map((state) => [state.tab, state.selected]));
+    earlier.forEach((state, at) => expect(resolveCategoryRange(state, index).end).toBe(resolveCategoryRange(latest[at]!, index).start - 1));
+  });
+
   it("adds no monthly-change table once its runs, fetched after load, have arrived", () => {
     expect(categoryCrawlStates(indexOf(["yoy_pct", "mom_pct"])).map((state) => state.tab)).toEqual(["contrib", "yoy"]);
   });
@@ -124,6 +143,11 @@ describe("inflation cities", () => {
     expect(states[0]!.selected).toEqual([...cityViewLineIds(GEORGIA_VIEW)]);
     lastThirtySix(resolveCityRange(states[0]!, index, GEORGIA_VIEW));
     expect(rowsOf(build(facts, GEORGIA_VIEW)[0]!)).toBeGreaterThanOrEqual(1);
+    // The earlier months: the same lines, from the page's first month to the December before the window.
+    const [earlier] = cityCrawlStates(index, GEORGIA_VIEW, "earlier");
+    expect(earlier!.selected).toEqual(states[0]!.selected);
+    expect(resolveCityRange(earlier!, index, GEORGIA_VIEW).start).toBe(resolveCityRange(earlier!, index, GEORGIA_VIEW).min);
+    expect(resolveCityRange(earlier!, index, GEORGIA_VIEW).end).toBe(resolveCityRange(states[0]!, index, GEORGIA_VIEW).start - 1);
   });
 
   for (const cityId of CPI_CITY_IDS) {

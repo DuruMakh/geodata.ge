@@ -102,11 +102,12 @@ export function InflationCategories({ facts, monthlyUrl, weights, headline, head
     [facts, monthly, weights],
   );
   const headlineByPeriod = useMemo(() => new Map(headline.map((row) => [row.period, row.value])), [headline]);
-  // The divisions' contributions and every category's annual change over the last three calendar years (at most 36 months), for the hidden crawl tables:
-  // built from the props, never on a click (the monthly runs fetched after load add no table).
-  const crawlModels = useCrawlModels(() => categoryCrawlStates(index).map((crawl) => buildInflationCategoryWorkbookExportModel({
+  // The divisions' contributions and every category's annual change over the last three calendar years (at most 36 months), then over
+  // every earlier month, for the data-table block: built from the props, never on a click (the monthly runs fetched after load add no table).
+  const crawlModelsFor = (months: "latest" | "earlier") => () => categoryCrawlStates(index, months).map((crawl) => buildInflationCategoryWorkbookExportModel({
     index, state: crawl, range: resolveCategoryRange(crawl, index), headline: headlineByPeriod, presentation, sources, siteOrigin,
-  })));
+  }));
+  const crawlModels = useCrawlModels(crawlModelsFor("latest"), crawlModelsFor("earlier"));
   const { state, update } = useHashState(index, parseCategoriesHash, serializeCategoryHash);
   const [announcement, setAnnouncement] = useState("");
   if (state.tab === "mom" && !monthlyWanted) setMonthlyWanted(true);

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { makePeriod } from "../../lib/data/inflation/periods";
 import { CRAWL_CELL_CAP, CRAWL_MAX_DECIMALS, CRAWL_MONTH_COLUMNS, CRAWL_PAGE_CELL_CAP, crawlBlockHtml, crawlCaption, crawlTables, crawlTablesHtml, formatCrawlCell } from "../../lib/explorer/crawlTables";
-import { lastPeriodsRange } from "../../lib/explorer/periodRange";
+import { earlierPeriodsRange, lastPeriodsRange } from "../../lib/explorer/periodRange";
 import { readableRowLabel, type WorkbookExportModel, type WorkbookReadableRow } from "../../lib/explorer/workbookModel";
 import { workbookMessage } from "../../lib/i18n/workbook";
 import en from "../../lib/i18n/messages/en/controls.json";
@@ -310,5 +310,17 @@ describe("lastPeriodsRange (monthly crawl window)", () => {
   it("never starts before the coverage", () => {
     expect(lastPeriodsRange({ min: makePeriod(2025, 3), max: makePeriod(2026, 9) }, CRAWL_MONTH_COLUMNS))
       .toEqual({ kind: "manual", start: makePeriod(2025, 3), end: makePeriod(2026, 9) });
+  });
+});
+
+describe("earlierPeriodsRange (the months before the crawl window)", () => {
+  it("runs from the first month to the December before the window's January", () => {
+    const coverage = { min: makePeriod(2004, 1), max: makePeriod(2026, 9) };
+    expect(earlierPeriodsRange(coverage, CRAWL_MONTH_COLUMNS)).toEqual({ kind: "manual", start: makePeriod(2004, 1), end: makePeriod(2023, 12) });
+  });
+
+  it("is null when the window already starts at the first month", () => {
+    expect(earlierPeriodsRange({ min: makePeriod(2024, 1), max: makePeriod(2026, 9) }, CRAWL_MONTH_COLUMNS)).toBeNull();
+    expect(earlierPeriodsRange({ min: makePeriod(2025, 6), max: makePeriod(2026, 9) }, CRAWL_MONTH_COLUMNS)).toBeNull();
   });
 });

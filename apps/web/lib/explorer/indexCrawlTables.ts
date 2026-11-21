@@ -83,7 +83,8 @@ export function historyFromFacts(figures: ReadonlyArray<{ id: string; facts: Rea
 /**
  * A municipal index's tables: for each figure of its history named in `figures`, a municipalities table and a regions
  * table, Georgia first, the places in the list's order. Each figure's columns are the years any municipality or region has it.
- * `maxCells` leaves room under the page's cell cap for its other tables: past it, the earliest years go first, from every figure alike.
+ * `maxCells` leaves room among the page's first 3,000 cells for its other tables: past it, the earliest years leave the first
+ * tables, from every figure alike, and follow as `rest` tables, which the block folds (lib/explorer/crawlTables.ts).
  */
 export function indexHistoryTables({ history, rows, label, levels, column, figures, basis, maxCells = Infinity }: {
   history: IndexHistory;
@@ -108,8 +109,9 @@ export function indexHistoryTables({ history, rows, label, levels, column, figur
   let from = -Infinity;
   const cells = () => shownFigures.reduce((total, entry) => total + entry.years.filter((year) => year >= from).length * rowCount, 0);
   while (cells() > maxCells) from = Math.min(...shownFigures.flatMap((entry) => entry.years.filter((year) => year >= from))) + 1;
-  return shownFigures.flatMap(({ figure, shown, years: figureYears }) => {
-    const years = figureYears.filter((year) => year >= from);
+  const tables = (kept: (year: number) => boolean) => shownFigures.flatMap(({ figure, shown, years: figureYears }) => {
+    const years = figureYears.filter(kept);
+    if (years.length === 0) return [];
     const columns = years.map(column);
     const historyRow = (row: MunicipalListRow): HistoryRow => ({ label: label(row), valuesByYear: Object.fromEntries(years.map((year) => [year, figure.valueAt(row.id, year)])) });
     return municipalHistoryTables({
@@ -117,4 +119,5 @@ export function indexHistoryTables({ history, rows, label, levels, column, figur
       country: historyRow(rows.country), municipalities: rows.municipalities.map(historyRow), regions: rows.regions.map(historyRow), format: shown.format,
     });
   });
+  return [...tables((year) => year >= from), ...tables((year) => year < from).map((table) => ({ ...table, rest: true as const }))];
 }

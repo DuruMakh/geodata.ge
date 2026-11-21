@@ -70,10 +70,12 @@ export function InflationOverview({ facts, sourceIdBySeriesMeasure, lastReviewed
     [facts, sourceIdBySeriesMeasure],
   );
   const { state, update } = useHashState(index, parseOverviewHash, serializeInflationHash);
-  // Every tab's rows over its last three calendar years (at most 36 months), for the hidden crawl tables: built from the props alone, so a click never rebuilds them.
-  const crawlModels = useCrawlModels(() => inflationCrawlStates(index).map((crawl) => buildInflationWorkbookExportModel({
+  // Every tab's rows over its last three calendar years (at most 36 months), then over every earlier month, for the data-table block:
+  // built from the props alone, so a click never rebuilds them.
+  const crawlModelsFor = (months: "latest" | "earlier") => () => inflationCrawlStates(index, months).map((crawl) => buildInflationWorkbookExportModel({
     index, targets, state: crawl, range: resolveInflationRange(crawl, index), presentation, sources, siteOrigin,
-  })));
+  }));
+  const crawlModels = useCrawlModels(crawlModelsFor("latest"), crawlModelsFor("earlier"));
   const [announcement, setAnnouncement] = useState("");
 
   const range = resolveInflationRange(state, index);

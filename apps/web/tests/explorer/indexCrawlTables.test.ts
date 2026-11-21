@@ -101,8 +101,17 @@ describe("index crawl tables", () => {
     // Four tables of two rows: 24 cells over three years, 16 over two.
     expect(indexHistoryTables(input).flatMap((table) => table.columns)).toHaveLength(12);
     const trimmed = indexHistoryTables({ ...input, maxCells: 23 });
-    expect(trimmed.map((table) => table.columns)).toEqual([["2021", "2022"], ["2021", "2022"], ["2021", "2022"], ["2021", "2022"]]);
-    expect(trimmed[0]!.caption).toBe("A · M · 2021–2022 · P");
-    expect(indexHistoryTables({ ...input, maxCells: 24 })[0]!.columns).toEqual(["2020", "2021", "2022"]);
+    const first = trimmed.filter((table) => !table.rest);
+    expect(first.map((table) => table.columns)).toEqual([["2021", "2022"], ["2021", "2022"], ["2021", "2022"], ["2021", "2022"]]);
+    expect(first[0]!.caption).toBe("A · M · 2021–2022 · P");
+    // The years that did not fit follow as rest tables, which the block folds: the same figures and places, nothing lost.
+    const rest = trimmed.filter((table) => table.rest);
+    expect(trimmed.slice(4)).toEqual(rest);
+    expect(rest.map((table) => table.columns)).toEqual([["2020"], ["2020"], ["2020"], ["2020"]]);
+    expect(rest.map((table) => table.caption)).toEqual(["A · M · 2020 · P", "A · R · 2020 · P", "B · M · 2020 · P", "B · R · 2020 · P"]);
+    expect(rest[0]!.rows).toEqual([{ label: "country.georgia", cells: ["—"] }, { label: "11", cells: ["2,020"] }]);
+    const whole = indexHistoryTables({ ...input, maxCells: 24 });
+    expect(whole[0]!.columns).toEqual(["2020", "2021", "2022"]);
+    expect(whole.some((table) => table.rest)).toBe(false);
   });
 });

@@ -3,7 +3,7 @@ import { periodFromKey, periodKey } from "../data/inflation/periods";
 import type { CategoryFactInput } from "../data/inflation/types";
 import type { ClientBasketWeightRow } from "../servedRows";
 import { CRAWL_MONTH_COLUMNS } from "./crawlTables";
-import { lastPeriodsRange, periodBounds, rangeFromPatch, refitRange, resolveRange, type PeriodRange, type ResolvedPeriodRange } from "./periodRange";
+import { crawlPeriodsRange, periodBounds, rangeFromPatch, refitRange, resolveRange, type PeriodRange, type ResolvedPeriodRange } from "./periodRange";
 import { parseMonthRangeKey, writeMonthRangeKey } from "./urlState";
 
 // Pure state and data selection for the inflation categories section. The period
@@ -180,16 +180,18 @@ export function changeCategoryTab(state: CategoryState, tab: CategoryTab, index:
 export { rangeFromPatch };
 
 /**
- * The hidden crawl tables' states (lib/explorer/crawlTables.ts), each over its tab's last three calendar years (at most 36 months): the contributions of
- * the twelve divisions (what select all ticks; a division and its subgroups never stack together), then every category's
- * annual change. The monthly change has none: its runs are fetched after load, so they never reach the prerendered HTML.
+ * The data-table block's states (lib/explorer/crawlTables.ts), each over its tab's last three calendar years (at most 36 months), or
+ * with `months` "earlier" over every month before those, which the block folds below: the contributions of the twelve divisions
+ * (what select all ticks; a division and its subgroups never stack together), then every category's annual change. The
+ * monthly change has none: its runs are fetched after load, so they never reach the prerendered HTML.
  */
-export function categoryCrawlStates(index: CategoryIndex): CategoryState[] {
+export function categoryCrawlStates(index: CategoryIndex, months: "latest" | "earlier" = "latest"): CategoryState[] {
   const views: [CategoryTab, readonly string[]][] = [["contrib", DIVISION_IDS], ["yoy", index.order]];
   return views.flatMap(([tab, ids]) => {
     const selected = categoryTabLoaded(index, tab) ? ids.filter((categoryId) => categoryValues(index, categoryId, tab) !== undefined) : [];
     if (selected.length === 0) return [];
-    return [{ ...DEFAULT_CATEGORY_STATE, tab, selected, range: lastPeriodsRange(categoryCoverage(index, tab), CRAWL_MONTH_COLUMNS) }];
+    const range = crawlPeriodsRange(categoryCoverage(index, tab), CRAWL_MONTH_COLUMNS, months);
+    return range ? [{ ...DEFAULT_CATEGORY_STATE, tab, selected, range }] : [];
   });
 }
 
