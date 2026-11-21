@@ -26,9 +26,10 @@ and individual-product import/export data, because there are too many of them. B
 
 Claude's fetch in this environment also passes on only about the first 40,000 characters of a page word for word (a
 sitemap came back 39,956 of 81,512; a CSV 39,935 of 67,699). Replaying that on the 1,426 pages with their tables
-unhidden: all but six fit whole (the six are Trade products, Services trade and Trade partners, in both languages). The
-existing 3,000-cell page cap therefore already matches that window; what follows it on a page reaches only readers with
-a longer window.
+unhidden: all but six had their first 3,000 cells inside it (the six are Trade products, Services trade and Trade
+partners, in both languages, whose long labels make 3,000 cells run past it). The first tables are therefore held to a
+count of characters as well as of cells (§5.2); what follows them on a page reaches only readers with a longer window.
+Whether claude.ai's own fetch stops at the same point could not be measured from here.
 
 Readers that render the page first (in-browser assistants, screenshot agents) only see what a visitor sees.
 
@@ -70,8 +71,8 @@ keep it. C is rejected: it hides content from people on purpose, which is the pa
 still one server-built string, becomes:
 
 ```html
-<h2>Data table</h2>
-<div role="region" aria-label="Data table" tabindex="0">
+<p>Data table</p>
+<div role="region" aria-label="Data table: {first caption}" tabindex="0">
   <table>…</table> …                                    <!-- the first 3,000 cells, as today -->
   <details><summary>The rest of the data</summary>     <!-- only when something follows -->
     <table>…</table> …
@@ -80,13 +81,16 @@ still one server-built string, becomes:
 ```
 
 The `<table>` markup itself does not change. Nothing inside carries a class: `globals.css` styles the block through
-`.crawl-tables` descendant selectors, and `.crawl-tables:empty` takes no space (a section with nothing to show).
+`.crawl-tables` descendant selectors, and `.crawl-tables:empty` takes no space (a section with nothing to show). The
+label is a paragraph, not a heading, so a page with several blocks keeps its heading outline, and the region's name
+carries its first caption so two blocks on one page do not share a name (both decided while building).
 
 Look (DESIGN.md v4.1, no cards, shadows or gradients): the period-comparison rhythm (`36px` above, a hairline rule,
-`24px` padding), an overline heading (11px, 600, muted), then one scrolling region at most `26rem` tall that scrolls
+`24px` padding), an overline label (11px, 600, muted), then one scrolling region at most `26rem` tall that scrolls
 both ways and is a keyboard stop with a visible focus ring. Tables follow `ExplorerTable`'s anatomy: caption as a
 13px/600 ink line, header row with a 2px ink rule that stays in view, hairline-soft row rules, numerals in the numeric
-face, right-aligned, and a first column that stays in view on the paper background, capped at 40% on phones.
+face, right-aligned, and a first column that stays in view on the paper background, narrower on phones. The tables open
+at their earliest period.
 `content-visibility: auto` keeps the block from costing layout until it nears the viewport.
 
 ### 5.2 Two tiers
@@ -95,11 +99,18 @@ face, right-aligned, and a first column that stays in view on the paper backgrou
 keeps its totals and largest series), then **rest tables**: for each table that was cut, its other series in workbook
 order, and after those the page's **earlier-period models** in full. A page holds at most `CRAWL_PAGE_CELL_CAP` =
 30,000 cells; past it the rest is cut from the end and its caption says so. A cut window table's caption changes from
-"all of them in the Excel download" to "the others follow below" when its rest table is complete.
+"all of them in the Excel download" to "the others follow below" when its rest table is complete. The note counts
+the series that have a figure, so "top 23 of 185" and the rest table's "the other 162" add up; a table that leaves out
+only series without any figure is complete and gets no note.
+
+The first tables are also held to 30,000 characters of text as a reader prints them (`CRAWL_WINDOW_CHARS`,
+`crawlReaderChars`): the 40,000-character window of §2 less the 10,000 a page spends above its tables. Where the cell
+cap alone would run past that (the trade pages, with their long labels), the tables' share of cells shrinks until
+their text fits, and the series that no longer fit move to the rest tables.
 
 Monthly pages (Inflation overview, by category, by city, each city): `useCrawlModels` takes a second, optional builder
-for the earlier periods. Their crawl states gain an "earlier" set: the same views over everything before the 36-month
-window. The window tables do not change.
+for the earlier periods. Their crawl-state functions take a `months` argument (`"latest"` or `"earlier"`): the same
+views over everything before the 36-month window. The window tables do not change.
 
 Map pages: `indexHistoryTables` keeps its `maxCells` trim for the window and returns the years it cut as rest tables.
 
@@ -137,8 +148,8 @@ and would rebuild 3,000 cells during hydration).
 
 1. No crawl-tables wrapper, and no ancestor of one, carries `hidden`, `aria-hidden`, `inert` or `display:none`
    (`crawl:check` fails otherwise). Every page that had tables still has them, cell for cell, in the window.
-2. A replay of the measured reader (drop `hidden`, 40,000 characters) over every built page shows the window tables
-   whole on every page but the six named in §2; `crawl:check` prints the list.
+2. A replay of the measured reader (drop `hidden`, 40,000 characters) over every built page shows the first tables
+   whole on every page; `crawl:check` prints the count and names any page that fails it.
 3. Fresh agents given only that replayed text answer the test questions: education spending as % of GDP by year,
    Khulo's pupils 2015/16 and 2025/26, a trade partner outside the old top 23, a 2015 inflation month.
 4. In a browser: the block is visible, keyboard reachable, passes axe, fits a 390px phone with no page-level sideways
@@ -152,3 +163,37 @@ and would rebuild 3,000 cells during hydration).
   exception and the one similar case; both need the data in the page first.
 - Trade products and domestic exports by product are included as far as the 30,000-cell page cap allows; the cap note
   names any remainder.
+- **A reader with a short window, on the five largest pages** (ten with both languages). Their folded rest runs past
+  40,000 characters, so such a reader gets the first tables and stops: Trading partners (the 23 largest partners of
+  each measure, every year; 185 to 210 partners have figures), Services trade (the 79 or 80 largest of 104 to 146
+  countries), Inflation by category (January 2024 onward; the months back to 2005 follow), Trade products and Domestic
+  exports (individual products, Duru's exception). A reader that takes the whole page gets all of it. Only more pages
+  would close this for the partner countries (one page per country, as the regions have); that is a new page type and
+  needs Duru's approval, so it is not in this change.
+- **Page weight.** The folded rest is paid for in HTML size on the pages that have one (compressed, live then built,
+  Georgian pages): Inflation by category 135 to 168 KB, Trading partners 173 to 203 KB, Trade products 194 to 258 KB,
+  Inflation overview 42 to 45 KB. The whole site grows 1.0%. The two inflation size limits in the browser specs rise
+  to match.
+
+## 9. Results (2026-11-21, production build of this branch)
+
+- `npm run crawl:check`: 1,466 pages carry a data table, none hidden or out of view; 294,734 cells in the first
+  tables and 417,410 in all; site gzip 54,904,051 bytes (1.0% over the build without the block, ceiling 62,535,000).
+- Replay of the measured reader over all 1,556 built pages: the first tables end inside the 40,000-character window on
+  1,466 of 1,466 pages, and 1,456 pages fit whole.
+- Fresh agents given only the replayed text of 24 pages (Georgian and English, heavy and light): the smallest model
+  found 104 of 104 figures named by caption, row and column, and answered "not in the text" for the five that lie past
+  the cut. Two models answered 19 ordinary questions (38 of 38), among them education spending in 2017 (1,177.8 million
+  GEL, 2.8% of GDP), Khulo's pupils (3,936 and 2,075), annual inflation in June 2015 (4.5%) and Kvareli's population in
+  2020 (30,318); both said exports to Japan in 2019 are not printed in the cut text and derived them from total trade
+  less imports. On the final build three more answered 12 of 12, two of them reading whole pages of 190,000 and
+  250,000 characters (exports to Japan in 2019: 0.012 billion USD, in the folded rest; transport inflation in March
+  2010: 13.2%).
+- The real reader on today's live site keeps a visible table inside a `role="region"` scroller as a text table and
+  prints its `<caption>` as a line above it. The block itself can only be fetched once it is live (criterion 6).
+- What the agents found hard, and what was done: the two notes of a cut table did not add up ("top 79 of 153" beside
+  "the other 25"), fixed in §5.2; tables of 31 to 37 year columns need the columns counted, and sibling tables differ
+  by one word of their caption (left as is: every answer was right).
+- Found on the screenshots, now that people see the tables too: the rule that keeps a small amount from printing as
+  zero also gave rates a false precision (annual inflation of 0.0037% in January 2024, where the chart says 0.0%).
+  It now applies to amounts only; a percentage or a signed change keeps its format's decimals (DESIGN.md §8.4).

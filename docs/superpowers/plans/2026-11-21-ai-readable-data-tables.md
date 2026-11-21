@@ -43,7 +43,7 @@
   - a cut table is followed by a rest table holding exactly the dropped rows in workbook order, caption `<caption> · the other 7`; the window caption ends `top 3 of 10; the others follow below`
   - `earlier` models come last, whole, flagged `rest`, and take no share of the window
   - past `CRAWL_PAGE_CELL_CAP` the rest is cut from the end and the window caption keeps `controls.crawlTop`
-  - `crawlBlockHtml([])` is `""`; one window table gives `<h2>Data table</h2><div role="region" aria-label="Data table" tabindex="0"><table>…</table></div>`; a rest table adds `<details><summary>The rest of the data</summary><table>…</table></details>` before `</div>`; heading text is escaped
+  - `crawlBlockHtml([])` is `""`; one window table gives `<p>Data table</p><div role="region" aria-label="Data table: {caption}" tabindex="0"><table>…</table></div>`; a rest table adds `<details><summary>The rest of the data</summary><table>…</table></details>` before `</div>`; heading text is escaped
 - [ ] Run `npx vitest run tests/explorer/crawlTables.test.ts` — the new tests fail.
 - [ ] Implement. The window pass is today's loop, recording each cut table's dropped rows; the rest pass spends `CRAWL_PAGE_CELL_CAP` minus the window's cells in order (cut tables, then `earlier`).
 - [ ] Run the file — passes. Commit.
@@ -67,7 +67,7 @@
 
 **Files:** Modify `app/globals.css`, `DESIGN.md` §8.4.
 
-- [ ] Add one `.crawl-tables` block per spec §5.1 (`:empty` → `display: none`; rhythm; overline `h2`; region `max-height: 26rem; overflow: auto`, focus ring as the other scroll regions use; sticky `thead th` and first column on `var(--paper)`; `content-visibility: auto`; first column `max-width: 40%` below 768px).
+- [ ] Add one `.crawl-tables` block per spec §5.1 (`:empty` → `display: none`; rhythm; overline label; region `max-height: 26rem; overflow: auto`, focus ring as the other scroll regions use; sticky `thead th` and first column on `var(--paper)`; `content-visibility: auto`; first column `max-width: 40%` below 768px).
 - [ ] Rewrite the §8.4 paragraph: visible block, two tiers, page cap, browser build.
 - [ ] `npx vitest run tests/explorer/themeTokens.test.ts`. Start `npm run dev -- --port 3100`, screenshot `/explorer/expenditure`, `/en/explorer/trade/partners`, `/explorer/education/schools` at 1366×900 and 390×844; adjust until the block reads as part of the page. Commit.
 
@@ -77,9 +77,9 @@
 
 **Interfaces — produces:**
 - `earlierPeriodsRange(coverage: PeriodCoverage, count: number): PeriodRange | null` — coverage start to the month before `lastPeriodsRange`'s start; `null` when the window already covers everything
-- `inflationEarlierCrawlStates(index)`, `categoryEarlierCrawlStates(index)`, `cityEarlierCrawlStates(index, view)` — the same views and selections as the existing crawl states over that range
+- `crawlPeriodsRange(coverage, count, months: "latest" | "earlier")`, and a `months` argument (default `"latest"`) on `inflationCrawlStates`, `categoryCrawlStates` and `cityCrawlStates` — the same views and selections over that range
 
-- [ ] Tests: the earlier range ends the month before the window starts and is `null` for a short series; each earlier-state function returns one state per window state with the same tab and selection.
+- [ ] Tests: the earlier range ends the month before the window starts and is `null` for a short series; each crawl-state function called with `"earlier"` returns one state per window state with the same tab and selection.
 - [ ] Implement; each explorer passes its earlier builder as `useCrawlModels`'s second argument. Run the two test files. Commit.
 
 ### Task 5: The years the map pages cut
