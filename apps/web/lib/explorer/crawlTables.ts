@@ -12,8 +12,12 @@ export const CRAWL_CELL_CAP = 3000;
  * 2026-11-21), and the pages spend up to 10,000 of them above their tables.
  */
 export const CRAWL_WINDOW_CHARS = 30_000;
-/** The cells a page holds in all: the first tables, then the rest (the series and periods they leave out), folded below them. */
-export const CRAWL_PAGE_CELL_CAP = 30_000;
+/**
+ * The cells a page holds in all: the first tables, then the rest (the series and periods they leave out), folded below them.
+ * The largest page, Inflation by category, holds about 30,300 (three views of 55 categories, every month since 2004) and
+ * gains about 1,500 a year.
+ */
+export const CRAWL_PAGE_CELL_CAP = 40_000;
 /** The most months a monthly view's crawl tables carry; its crawl states choose the window (`lastPeriodsRange`). */
 export const CRAWL_MONTH_COLUMNS = 36;
 /** The most decimals a crawl cell prints: enough for any figure a reader quotes, whatever digits the workbook keeps. */

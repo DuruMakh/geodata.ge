@@ -7,7 +7,7 @@ import { MONEY_BANKS_LOAN_AREAS, type ClientMoneyBanksFact } from "../../lib/dat
 import { loadNationalGdpFacts } from "../../lib/data/nationalGdp/importNationalGdp";
 import { SERVED_DATA_FILES } from "../../lib/data/servedData";
 import { projectGdpFact, sourceIdBySeriesMeasure, type ClientNationalGdpFact } from "../../lib/explorer/clientData";
-import { CRAWL_CELL_CAP, crawlTables } from "../../lib/explorer/crawlTables";
+import { CRAWL_CELL_CAP, CRAWL_PAGE_CELL_CAP, crawlTables } from "../../lib/explorer/crawlTables";
 import { DIVISION_IDS, buildCategoryIndex, categoryCrawlStates, resolveCategoryRange, type CategoryIndex } from "../../lib/explorer/inflationCategories";
 import { buildInflationCategoryWorkbookExportModel } from "../../lib/explorer/inflationCategoryWorkbook";
 import { GEORGIA_LINE_ID, buildCityIndex, cityCrawlStates, cityViewLineIds, resolveCityRange } from "../../lib/explorer/inflationCities";
@@ -91,17 +91,16 @@ describe("inflation overview", () => {
 describe("inflation categories", () => {
   const headline = () => new Map(data.facts.filter((fact) => fact.seriesId === "cpi.headline" && fact.measure === "yoy_pct").map((fact) => [periodFromKey(fact.period), fact.value]));
   const indexOf = (measures: readonly string[]) => buildCategoryIndex(data.categories.filter((fact) => measures.includes(fact.measure)), data.weights);
-  const build = (index: CategoryIndex) => categoryCrawlStates(index).map((state) =>
+  const build = (index: CategoryIndex, months: "latest" | "earlier" = "latest") => categoryCrawlStates(index, months).map((state) =>
     buildInflationCategoryWorkbookExportModel({ index, state, range: resolveCategoryRange(state, index), headline: headline(), presentation: en, sources: [], siteOrigin: ORIGIN }));
 
-  it("as the page loads (annual changes only): the contributions of every division, then every category's annual change", () => {
-    const index = indexOf(["yoy_pct"]);
+  it("the first tables: the contributions of every division, then every category's annual change", () => {
+    const index = indexOf(["yoy_pct", "mom_pct"]);
     const states = categoryCrawlStates(index);
     expect(states.map((state) => state.tab)).toEqual(["contrib", "yoy"]);
     expect(states[0]!.selected).toEqual(DIVISION_IDS);
-    expect(new Set(states[1]!.selected)).toEqual(new Set(index.order));
-    expect(ids(states)).toEqual(new Set(index.order));
-    expect(index.order.length).toBeGreaterThan(DIVISION_IDS.length);
+    expect(states[1]!.selected.length).toBeGreaterThan(DIVISION_IDS.length);
+    expect(ids(states)).toEqual(new Set(states[1]!.selected));
     for (const state of states) {
       expect(state.mode).toBe("chart");
       lastThirtySix(resolveCategoryRange(state, index));
@@ -112,16 +111,38 @@ describe("inflation categories", () => {
     expect(crawlTables(models, en.messages)[0]!.rows.some((row) => row.label.startsWith("The rest — "))).toBe(true);
   });
 
-  it("the earlier months: the same two views, up to the December before the window", () => {
-    const index = indexOf(["yoy_pct"]);
+  it("folded below them: the monthly change over the same window, then every earlier month of the three views", () => {
+    const index = indexOf(["yoy_pct", "mom_pct"]);
     const latest = categoryCrawlStates(index);
-    const earlier = categoryCrawlStates(index, "earlier");
-    expect(earlier.map((state) => [state.tab, state.selected])).toEqual(latest.map((state) => [state.tab, state.selected]));
-    earlier.forEach((state, at) => expect(resolveCategoryRange(state, index).end).toBe(resolveCategoryRange(latest[at]!, index).start - 1));
+    const folded = categoryCrawlStates(index, "earlier");
+    expect(folded.map((state) => state.tab)).toEqual(["mom", "contrib", "yoy", "mom"]);
+    // The monthly change of every category: three views over 36 months would pass the first tables' cap.
+    expect(new Set(folded[0]!.selected)).toEqual(new Set(index.order));
+    lastThirtySix(resolveCategoryRange(folded[0]!, index));
+    const windows = [...latest, folded[0]!];
+    folded.slice(1).forEach((state, at) => {
+      expect(state.selected).toEqual(windows[at]!.selected);
+      const range = resolveCategoryRange(state, index);
+      expect(range.start).toBe(range.min);
+      expect(range.end).toBe(resolveCategoryRange(windows[at]!, index).start - 1);
+    });
   });
 
-  it("adds no monthly-change table once its runs, fetched after load, have arrived", () => {
-    expect(categoryCrawlStates(indexOf(["yoy_pct", "mom_pct"])).map((state) => state.tab)).toEqual(["contrib", "yoy"]);
+  it("the page holds all of it: no folded table is cut, and the monthly change has every month of every category", () => {
+    const index = indexOf(["yoy_pct", "mom_pct"]);
+    const tables = crawlTables(build(index), en.messages, build(index, "earlier"));
+    const folded = tables.filter((table) => table.rest);
+    expect(folded.map((table) => table.caption.split(" · ")[0])).toEqual(["Monthly inflation", "Contribution to inflation", "Annual inflation", "Monthly inflation"]);
+    expect(tables.some((table) => table.caption.includes("top "))).toBe(false);
+    expect(tables.reduce((sum, table) => sum + table.rows.length * table.columns.length, 0)).toBeLessThanOrEqual(CRAWL_PAGE_CELL_CAP);
+    const printed = [folded[0]!, folded[3]!].flatMap((table) => table.rows.flatMap((row) => row.cells)).filter((cell) => cell !== "—").length;
+    expect(printed).toBe(data.categories.filter((fact) => fact.measure === "mom_pct").length);
+  });
+
+  it("leaves out a view with no data", () => {
+    const index = indexOf(["yoy_pct"]);
+    expect(categoryCrawlStates(index).map((state) => state.tab)).toEqual(["contrib", "yoy"]);
+    expect(categoryCrawlStates(index, "earlier").map((state) => state.tab)).toEqual(["contrib", "yoy"]);
   });
 });
 

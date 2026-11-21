@@ -18,7 +18,6 @@ import {
   buildStackModel,
   categoryCoverage,
   categoryCrawlStates,
-  categoryTabLoaded,
   changeCategoryTab,
   parseCategoryHash,
   unpackCategoryFacts,
@@ -58,9 +57,7 @@ import { formatInflationValue } from "../../lib/explorer/inflationLabels";
 import { ChartSelectionAids } from "../explorer-shell/chart-selection-aids";
 import { ChartShareButton } from "../explorer-shell/chart-share-button";
 import { CrawlTables, useCrawlModels } from "../explorer-shell/crawl-tables";
-import { PageDataStatus } from "../explorer-shell/page-data-status";
 import { useHashState } from "../explorer-shell/use-hash-state";
-import { usePageData } from "../explorer-shell/use-page-data";
 import { topicSection, ALL_DATA_PATH } from "../../lib/navigation/navTree";
 
 // Inflation categories (spec §6): the overview's layout, with a stacked column
@@ -70,18 +67,18 @@ import { topicSection, ALL_DATA_PATH } from "../../lib/navigation/navTree";
 // with the source note (DESIGN §17).
 
 
-// A restored hash keeps its range only where the tab has data. While the monthly runs load, the
-// range waits as written; the hash is parsed again when they arrive (useHashState re-reads it).
+// A restored hash keeps its range only where the tab has data.
 function parseCategoriesHash(hash: string, index: CategoryIndex): CategoryState {
   const parsed = parseCategoryHash(hash);
-  return categoryTabLoaded(index, parsed.tab) ? changeCategoryTab(parsed, parsed.tab, index) : parsed;
+  return changeCategoryTab(parsed, parsed.tab, index);
 }
 
 export type InflationCategoriesProps = {
-  /** Packed on the server: 27,668 rows cross the wire, so they travel as dense runs. Annual changes only. */
+  /**
+   * Packed on the server: 27,668 rows cross the wire, so they travel as dense runs. The annual and the monthly changes: the
+   * data-table block prints both (DESIGN.md §8.4), so both travel with every page view.
+   */
   facts: PackedCategorySeries[];
-  /** The monthly-change runs (lib/pages/inflationPageData.ts), fetched only when the monthly tab opens (U13-03). */
-  monthlyUrl: string;
   weights: FactsInput<ClientBasketWeightRow>;
   headline: Array<{ period: number; value: number }>;
   /** The national monthly change, for the latest-value line on the monthly tab only. */
@@ -91,40 +88,30 @@ export type InflationCategoriesProps = {
   siteOrigin: string;
 };
 
-export function InflationCategories({ facts, monthlyUrl, weights, headline, headlineMom, lastReviewedAt, sources, siteOrigin }: InflationCategoriesProps) {
+export function InflationCategories({ facts, weights, headline, headlineMom, lastReviewedAt, sources, siteOrigin }: InflationCategoriesProps) {
   const presentation = useI18n();
   const { messages, locale } = presentation;
   const t = (key: string, values?: Record<string, string>) => message(messages, `inflation.${key}`, values);
-  const [monthlyWanted, setMonthlyWanted] = useState(false);
-  const monthly = usePageData<PackedCategorySeries[]>(monthlyUrl, monthlyWanted);
-  const index = useMemo(
-    () => buildCategoryIndex(unpackCategoryFacts(monthly.status === "ready" ? [...facts, ...monthly.data] : facts), unpackFacts(weights)),
-    [facts, monthly, weights],
-  );
+  const index = useMemo(() => buildCategoryIndex(unpackCategoryFacts(facts), unpackFacts(weights)), [facts, weights]);
   const headlineByPeriod = useMemo(() => new Map(headline.map((row) => [row.period, row.value])), [headline]);
-  // The divisions' contributions and every category's annual change over the last three calendar years (at most 36 months), then over
-  // every earlier month, for the data-table block: built from the props, never on a click (the monthly runs fetched after load add no table).
+  // For the data-table block: the divisions' contributions and every category's annual change over the last three calendar years
+  // (at most 36 months), then, folded below them, every category's monthly change over those months and every earlier month of all three.
   const crawlModelsFor = (months: "latest" | "earlier") => () => categoryCrawlStates(index, months).map((crawl) => buildInflationCategoryWorkbookExportModel({
     index, state: crawl, range: resolveCategoryRange(crawl, index), headline: headlineByPeriod, presentation, sources, siteOrigin,
   }));
   const crawlModels = useCrawlModels(crawlModelsFor("latest"), crawlModelsFor("earlier"));
   const { state, update } = useHashState(index, parseCategoriesHash, serializeCategoryHash);
   const [announcement, setAnnouncement] = useState("");
-  if (state.tab === "mom" && !monthlyWanted) setMonthlyWanted(true);
 
-  // Until the monthly runs arrive, the monthly tab shows their loading (or failure) status in place of the
-  // chart, and the rest of the page reads the annual tab, whose data is here.
-  const pending = !categoryTabLoaded(index, state.tab);
-  const view: CategoryState = pending ? { ...state, tab: "yoy" } : state;
-  const range = resolveCategoryRange(view, index);
+  const range = resolveCategoryRange(state, index);
   const tabPeriods = Array.from({ length: range.max - range.min + 1 }, (_, offset) => range.min + offset);
-  const coverage = categoryCoverage(index, view.tab);
+  const coverage = categoryCoverage(index, state.tab);
 
   const displayDate = updatedDate(lastReviewedAt, locale);
 
-  const stack = buildStackModel(index, view, range, headlineByPeriod);
-  const lines = buildCategoryLines(index, view, range);
-  const hasSeries = !pending && (state.tab === "contrib" ? stack.segments.length > 0 : lines.lines.length > 0);
+  const stack = buildStackModel(index, state, range, headlineByPeriod);
+  const lines = buildCategoryLines(index, state, range);
+  const hasSeries = state.tab === "contrib" ? stack.segments.length > 0 : lines.lines.length > 0;
 
   // The contribution tab decomposes the annual rate, so it states the annual headline.
   const latestTab = state.tab === "mom" ? "mom" : "yoy";
@@ -134,10 +121,6 @@ export function InflationCategories({ facts, monthlyUrl, weights, headline, head
   const unitLine = t(`categoryUnit.${state.tab}`);
 
   function selectTab(tab: CategoryTab) {
-    if (!categoryTabLoaded(index, tab)) {
-      update((current) => ({ ...current, tab }));
-      return;
-    }
     const next = changeCategoryTab(state, tab, index);
     const nextRange = resolveCategoryRange(next, index);
     update(() => next);
@@ -193,7 +176,7 @@ export function InflationCategories({ facts, monthlyUrl, weights, headline, head
       formatPeriod={(period, kind) => monthlyChartPeriod(messages, period, kind)}
     />
   );
-  const shareAction = !pending && hasSeries ? (
+  const shareAction = hasSeries ? (
     <ChartShareButton
       title={t("categoriesHeading")}
       caption={`${unitLine} · ${periodLabel(messages, range.start, "short")}–${periodLabel(messages, range.end, "short")}`}
@@ -267,9 +250,7 @@ export function InflationCategories({ facts, monthlyUrl, weights, headline, head
                 { value: "table", label: message(messages, "controls.table"), testId: "chart-mode-table" },
               ]}
             />
-            {pending ? (
-              <PageDataStatus status={monthly.status === "error" ? "error" : "loading"} />
-            ) : !hasSeries ? (
+            {!hasSeries ? (
               <div className="mt-5">
                 <Callout testId="no-selection-callout">{message(messages, "main.noSelection")}</Callout>
               </div>
@@ -283,17 +264,15 @@ export function InflationCategories({ facts, monthlyUrl, weights, headline, head
             ) : (
               <div className="mt-5">{chart}</div>
             )}
-            {pending ? null : <>
-              <ChartSelectionAids series={chartSeries} chartShown={state.mode === "chart"} share unit={PCT_UNIT} legendCap={DIVISION_IDS.length} formatValue={state.tab === "contrib" ? (value) => `${formatContribution(value)} ${t("pp")}` : undefined} />
-              <RangeStrip
-                years={tabPeriods}
-                range={range}
-                periodsPerYear={12}
-                formatPeriod={(period) => periodLabel(messages, period, "short")}
-                formatMonth={(month) => message(messages, `inflation.monthShort.${month}`)}
-                onChange={(patch) => update((current) => ({ ...current, range: rangeFromPatch(range, patch) }))}
-              />
-            </>}
+            <ChartSelectionAids series={chartSeries} chartShown={state.mode === "chart"} share unit={PCT_UNIT} legendCap={DIVISION_IDS.length} formatValue={state.tab === "contrib" ? (value) => `${formatContribution(value)} ${t("pp")}` : undefined} />
+            <RangeStrip
+              years={tabPeriods}
+              range={range}
+              periodsPerYear={12}
+              formatPeriod={(period) => periodLabel(messages, period, "short")}
+              formatMonth={(month) => message(messages, `inflation.monthShort.${month}`)}
+              onChange={(patch) => update((current) => ({ ...current, range: rangeFromPatch(range, patch) }))}
+            />
           </section>
           <div className="mt-[18px] space-y-2">
             <SourceNote testId="source-label" action={shareAction}>
@@ -319,7 +298,7 @@ export function InflationCategories({ facts, monthlyUrl, weights, headline, head
 
         <InflationCategoryPanel
           index={index}
-          state={view}
+          state={state}
           range={range}
           onToggle={(categoryId) => update((current) => toggleCategory(current, categoryId, index))}
           onToggleExpanded={(categoryId) => update((current) => toggleExpanded(current, categoryId))}

@@ -9,7 +9,6 @@ import { renderGeorgianMarkup } from "../helpers/render-localized";
 
 const props = {
   facts: packCategoryFacts(fixtureFacts),
-  monthlyUrl: "/page-data/inflation-category-mom.0123456789abcdef.json",
   weights: fixtureWeights,
   headline: [...fixtureHeadline].map(([period, value]) => ({ period, value })),
   headlineMom: [],
@@ -73,6 +72,13 @@ describe("InflationCategories", () => {
 
   it("says contributions are a Fiscal.ge calculation", () => {
     expect(block(markup, "inflation-derived-note")).toContain("Fiscal.ge");
+  });
+
+  it("prints the monthly change in the data-table block, folded below the first tables", () => {
+    const crawl = markup.slice(markup.indexOf('data-testid="crawl-tables"'));
+    const fold = crawl.indexOf("<details>");
+    expect(fold).toBeGreaterThan(0);
+    expect(crawl.indexOf("<caption>თვიური ინფლაცია · % · წინა თვესთან შედარებით")).toBeGreaterThan(fold);
   });
 
   it("draws a line chart and no residual on a rate tab", () => {

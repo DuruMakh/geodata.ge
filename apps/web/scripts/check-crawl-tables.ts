@@ -180,6 +180,13 @@ const SPOT_CHECKS: SpotCheck[] = [
     test: (inner) => rowsOf(inner.split("<details>")[1] ?? "").some((row) => row.label.endsWith("— 2015") && row.cells.filter((cell) => /\d/.test(cell)).length >= 12),
   },
   {
+    name: "Inflation by category: the folded rest carries the monthly change, back to every month of 2004",
+    route: "explorer/inflation/categories",
+    test: (inner, messages) => tablesOf(inner.split("<details>")[1] ?? "")
+      .filter((table) => table.caption.startsWith(`${message(messages, "inflation.categoryTab.mom")} · `))
+      .some((table) => table.rows.some((row) => row.label.endsWith("— 2004") && row.cells.filter((cell) => /\d/.test(cell)).length === 12)),
+  },
+  {
     name: "Marriages and divorces map: the folded rest carries 2009, the year the first tables leave out",
     route: "explorer/demography/marriages-divorces",
     test: (inner) => tablesOf(inner.split("<details>")[1] ?? "").some((table) => table.caption.includes(" · 2009 · ")),

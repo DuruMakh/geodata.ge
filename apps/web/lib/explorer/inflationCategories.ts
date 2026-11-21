@@ -161,13 +161,6 @@ export function categoryCoverage(index: CategoryIndex, tab: CategoryTab): { min:
   return periodBounds([...index.values].filter(([group]) => group.endsWith(`:${measure}`)).map(([, map]) => map), "Category data has no periods");
 }
 
-/** Whether the index holds the tab's data: the monthly runs arrive after load (U13-03). */
-export function categoryTabLoaded(index: CategoryIndex, tab: CategoryTab): boolean {
-  if (tab === "contrib") return index.contributions.size > 0;
-  const suffix = `:${TAB_MEASURE[tab]}`;
-  return [...index.values.keys()].some((group) => group.endsWith(suffix));
-}
-
 export function resolveCategoryRange(state: CategoryState, index: CategoryIndex): ResolvedPeriodRange {
   return resolveRange(state.range, categoryCoverage(index, state.tab));
 }
@@ -180,19 +173,23 @@ export function changeCategoryTab(state: CategoryState, tab: CategoryTab, index:
 export { rangeFromPatch };
 
 /**
- * The data-table block's states (lib/explorer/crawlTables.ts), each over its tab's last three calendar years (at most 36 months), or
- * with `months` "earlier" over every month before those, which the block folds below: the contributions of the twelve divisions
- * (what select all ticks; a division and its subgroups never stack together), then every category's annual change. The
- * monthly change has none: its runs are fetched after load, so they never reach the prerendered HTML.
+ * The data-table block's states (lib/explorer/crawlTables.ts). The first tables, each over its tab's last three calendar
+ * years (at most 36 months): the contributions of the twelve divisions (what select all ticks; a division and its subgroups
+ * never stack together), then every category's annual change. With `months` "earlier", what the block folds below them: every
+ * category's monthly change over the same window (a third view there would pass the first tables' cap), then every earlier
+ * month of the three views. A view without data has no state.
  */
 export function categoryCrawlStates(index: CategoryIndex, months: "latest" | "earlier" = "latest"): CategoryState[] {
-  const views: [CategoryTab, readonly string[]][] = [["contrib", DIVISION_IDS], ["yoy", index.order]];
-  return views.flatMap(([tab, ids]) => {
-    const selected = categoryTabLoaded(index, tab) ? ids.filter((categoryId) => categoryValues(index, categoryId, tab) !== undefined) : [];
+  const states = (tab: CategoryTab, ids: readonly string[], span: "latest" | "earlier"): CategoryState[] => {
+    const selected = ids.filter((categoryId) => categoryValues(index, categoryId, tab) !== undefined);
     if (selected.length === 0) return [];
-    const range = crawlPeriodsRange(categoryCoverage(index, tab), CRAWL_MONTH_COLUMNS, months);
+    const range = crawlPeriodsRange(categoryCoverage(index, tab), CRAWL_MONTH_COLUMNS, span);
     return range ? [{ ...DEFAULT_CATEGORY_STATE, tab, selected, range }] : [];
-  });
+  };
+  const first: [CategoryTab, readonly string[]][] = [["contrib", DIVISION_IDS], ["yoy", index.order]];
+  const monthly: [CategoryTab, readonly string[]] = ["mom", index.order];
+  if (months === "latest") return first.flatMap(([tab, ids]) => states(tab, ids, "latest"));
+  return [...states(...monthly, "latest"), ...[...first, monthly].flatMap(([tab, ids]) => states(tab, ids, "earlier"))];
 }
 
 /** `cpi.cat.01_1` → `cpi.cat.01`; a division is its own. */

@@ -143,15 +143,17 @@ describe("crawlTables", () => {
   it("stops at the page cap: a rest table that cannot be whole keeps its largest series and both captions say so", () => {
     const y = years(20);
     // Figures of three or four characters, so the cell caps and not the reader's window cut this page.
-    const items = Array.from({ length: 2000 }, (_, i) => row(`I${i}`, y.map(() => i / 100), y, { numberFormat: "0.00" }));
+    // 500 series more than the page holds.
+    const count = CRAWL_PAGE_CELL_CAP / 20 + 500;
+    const items = Array.from({ length: count }, (_, i) => row(`I${i}`, y.map(() => i / 100), y, { numberFormat: "0.00" }));
     const [first, rest, ...more] = crawlTables([model({ years: y, rows: items })], en);
     expect(more).toEqual([]);
     expect(first.rows).toHaveLength(CRAWL_CELL_CAP / 20);
-    expect(first.caption.endsWith("top 150 of 2000; all of them in the Excel download")).toBe(true);
+    expect(first.caption.endsWith(`top 150 of ${count}; all of them in the Excel download`)).toBe(true);
     const restRows = (CRAWL_PAGE_CELL_CAP - CRAWL_CELL_CAP) / 20;
     expect(rest.rows).toHaveLength(restRows);
-    expect(rest.rows[0].label).toBe(`I${2000 - 150 - restRows}`);
-    expect(rest.caption.endsWith(`top ${restRows} of 1850; all of them in the Excel download`)).toBe(true);
+    expect(rest.rows[0].label).toBe(`I${count - 150 - restRows}`);
+    expect(rest.caption.endsWith(`top ${restRows} of ${count - 150}; all of them in the Excel download`)).toBe(true);
   });
 
   it("keeps the first tables inside a short reader's window: long labels leave room for fewer rows, and the others follow", () => {
