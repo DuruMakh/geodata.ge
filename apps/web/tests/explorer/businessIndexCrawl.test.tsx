@@ -8,7 +8,7 @@ import { renderPageMarkup } from "../helpers/render-localized";
 describe("Business regions index every-year tables", () => {
   it("BusinessIndex renders tables for sales and jobs", async () => {
     const html = renderPageMarkup("en", await renderBusinessRegionsPage("en"));
-    const inner = [...html.matchAll(/<div hidden="" data-testid="crawl-tables">(.*?)<\/div>/g)].map((match) => match[1]!).find((text) => text.includes("Sales ·"))!;
+    const inner = [...html.matchAll(/<div data-testid="crawl-tables" class="crawl-tables">(.*?)<\/div><\/div>/g)].map((match) => match[1]!).find((text) => text.includes("Sales ·"))!;
     const captions = [...inner.matchAll(/<caption>([^<]*)<\/caption>/g)].map((match) => match[1]);
     expect(captions).toHaveLength(2);
     expect(captions[0]).toMatch(/^Regions · Sales · million GEL · \d{4}–\d{4} · Published$/);

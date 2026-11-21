@@ -197,8 +197,7 @@ export function RegionIndex({ title, model, sourceNote, metric, summary = [], le
           <a href="https://www.geoboundaries.org/" target="_blank" rel="noreferrer" className="underline underline-offset-2">geoBoundaries</a> (CC BY 3.0).
         </SourceNote>
       </div>
-      {/* Built in the server render only; the browser keeps the server's tables (see IndexCrawlTables). */}
-      {crawl ? <IndexCrawlTables category={workbookMessage(locale, "workbook.category")} tables={typeof window === "undefined" ? crawl.map((entry) => {
+      {crawl ? <IndexCrawlTables category={workbookMessage(locale, "workbook.category")} tables={crawl.map((entry) => {
         const history = entry.model.history;
         if (!history) throw new Error(`The ${entry.metric.legend} map has no history for its crawl table`);
         const columns = history.years.map(String);
@@ -210,7 +209,7 @@ export function RegionIndex({ title, model, sourceNote, metric, summary = [], le
             ...[...entry.model.regions, ...(entry.model.withoutValue ?? [])].map((region) => ({ label: label(region), valuesByYear: history.byRegion[region.regionId] ?? {} })),
           ],
         });
-      }) : []} /> : null}
+      })} /> : null}
     </>
   );
 }

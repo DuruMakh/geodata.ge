@@ -384,7 +384,7 @@ describe("every demography page's Dataset", () => {
 });
 
 describe("the place indexes' every-year tables", () => {
-  const indexTables = (html: string) => [...html.matchAll(/<div hidden="" data-testid="crawl-tables">(.*?)<\/div>/g)].map((match) => match[1]!).filter((inner) => inner.includes("Municipalities ·"));
+  const indexTables = (html: string) => [...html.matchAll(/<div data-testid="crawl-tables" class="crawl-tables">(.*?)<\/div><\/div>/g)].map((match) => match[1]!).filter((inner) => inner.includes("Municipalities ·"));
   const captions = (inner: string) => [...inner.matchAll(/<caption>([^<]*)<\/caption>/g)].map((match) => match[1]);
 
   it("Population carries every 1 January for every place", async () => {

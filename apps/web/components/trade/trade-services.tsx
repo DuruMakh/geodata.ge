@@ -8,20 +8,21 @@ import { useI18n } from "../../lib/i18n/provider";
 import { CrawlTables, useCrawlModels } from "../explorer-shell/crawl-tables";
 import { ExplorerHeading } from "../explorer-shell/explorer-heading";
 import { TextTab } from "../ui/editorial";
-import { TradeOverview, useTradeOverviewCrawlModels } from "./trade-overview";
-import { TradePartners, useTradePartnersCrawlModels } from "./trade-partners";
+import { TradeOverview, tradeOverviewCrawlModels } from "./trade-overview";
+import { TradePartners, tradePartnersCrawlModels } from "./trade-partners";
 import { useTradeSectionsState } from "./use-trade-sections-state";
 
 const sections = ["overview", "types", "countries"] as const;
 export function TradeServices({ data, sources, lastReviewedAt, siteOrigin }: { data: Omit<ReturnType<typeof toClientTradeServicesData>, "englishLabels">; sources: WorkbookPublicSource[]; lastReviewedAt: string; siteOrigin: string }) {
-  const { messages } = useI18n(), t = (key: string) => message(messages, `trade.services.${key}`);
+  const presentation = useI18n(), { messages } = presentation, t = (key: string) => message(messages, `trade.services.${key}`);
   const { section, changeSection } = useTradeSectionsState(sections, "overview", "trade-services-state");
   const pendingFocus = useRef<string | null>(null);
   // Every section's tables, whichever is open: only Overview renders on the server, the others open from the hash.
-  const overviewModels = useTradeOverviewCrawlModels(data.national, sources, siteOrigin, "services");
-  const typeModels = useTradePartnersCrawlModels(data.types, sources, siteOrigin);
-  const countryModels = useTradePartnersCrawlModels(data.countries, sources, siteOrigin);
-  const crawlModels = useCrawlModels(() => [...overviewModels, ...typeModels, ...countryModels]);
+  const crawlModels = useCrawlModels(() => [
+    ...tradeOverviewCrawlModels(data.national, sources, siteOrigin, presentation, "services"),
+    ...tradePartnersCrawlModels(data.types, sources, siteOrigin, presentation),
+    ...tradePartnersCrawlModels(data.countries, sources, siteOrigin, presentation),
+  ]);
   useEffect(() => {
     if (!pendingFocus.current) return;
     document.getElementById(pendingFocus.current)?.focus({ preventScroll: true });

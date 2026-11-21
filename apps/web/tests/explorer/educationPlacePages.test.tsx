@@ -44,7 +44,7 @@ describe("route parameters", () => {
 });
 
 describe("the indexes' every-year tables", () => {
-  const crawl = (html: string) => html.match(/<div hidden="" data-testid="crawl-tables">(.*?)<\/div>/)?.[1] ?? "";
+  const crawl = (html: string) => html.match(/<div data-testid="crawl-tables" class="crawl-tables">(.*?)<\/div><\/div>/)?.[1] ?? "";
   it("Schools carries every school year for every municipality and region, in both languages", async () => {
     const en = crawl(await index("schools"));
     expect(en).toContain("<caption>Schools · Pupils · persons · Municipalities · 2005/06–2025/26 · Published</caption>");

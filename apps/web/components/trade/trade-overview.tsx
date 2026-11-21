@@ -10,6 +10,7 @@ import { formatInUnit } from "../../lib/explorer/format";
 import { rangeFromPatch } from "../../lib/explorer/periodRange";
 import type { WorkbookExportModel, WorkbookPublicSource } from "../../lib/explorer/workbookModel";
 import { useI18n } from "../../lib/i18n/provider";
+import type { Presentation } from "../../lib/i18n/types";
 import { message } from "../../lib/i18n/messages";
 import { pageHref } from "../../lib/i18n/routes";
 import { matchesLabelQuery } from "../../lib/i18n/search";
@@ -36,15 +37,9 @@ const serializeOverview = (state: TradeOverviewState, facts: readonly ClientTrad
 const serializeServicesOverview = (state: TradeOverviewState) => `${serializeTradeOverviewHash(state)}&section=overview`;
 const OVERVIEW_OPTIONS: HashStateOptions<ClientTradeOverviewFact[], TradeOverviewState> = { afterWrite: facts => { if (isDomestic(facts)) window.dispatchEvent(new Event("trade-domestic-state")); } };
 const SERVICES_OVERVIEW_OPTIONS: HashStateOptions<ClientTradeOverviewFact[], TradeOverviewState> = { afterWrite: () => window.dispatchEvent(new Event("trade-services-state")) };
-const NO_MODELS: WorkbookExportModel[] = [];
-
-/**
- * Every indicator over its years, for the hidden crawl tables: built from the props alone, so a click never rebuilds them. Null
- * facts build none (inside Domestic exports and Services, whose page carries every section's tables).
- */
-export function useTradeOverviewCrawlModels(facts: readonly ClientTradeOverviewFact[] | null, sources: readonly WorkbookPublicSource[], siteOrigin: string, dataset?: "services"): readonly WorkbookExportModel[] {
-  const presentation = useI18n();
-  return useCrawlModels(() => facts ? tradeOverviewCrawlStates(facts).map(state => buildTradeOverviewWorkbookExportModel({ facts, state, sources, siteOrigin, dataset }, presentation)) : NO_MODELS);
+/** Every indicator over its years, for the data-table block (CrawlTables): built from the props alone, so a click never rebuilds them. */
+export function tradeOverviewCrawlModels(facts: readonly ClientTradeOverviewFact[], sources: readonly WorkbookPublicSource[], siteOrigin: string, presentation: Presentation, dataset?: "services"): WorkbookExportModel[] {
+  return tradeOverviewCrawlStates(facts).map(state => buildTradeOverviewWorkbookExportModel({ facts, state, sources, siteOrigin, dataset }, presentation));
 }
 
 export function TradeOverview({ facts, sources, lastReviewedAt, siteOrigin, dataset }: { dataset?: "services"; facts: ClientTradeOverviewFact[]; sources: WorkbookPublicSource[]; lastReviewedAt: string; siteOrigin: string }) {
@@ -55,7 +50,8 @@ export function TradeOverview({ facts, sources, lastReviewedAt, siteOrigin, data
   const title = t(services ? "services.title" : domestic ? "domestic.title" : "title");
   const { state, update } = useHashState(facts, parseTradeOverviewHash, services ? serializeServicesOverview : serializeOverview, services ? SERVICES_OVERVIEW_OPTIONS : OVERVIEW_OPTIONS);
   const [query, setQuery] = useState("");
-  const crawlModels = useTradeOverviewCrawlModels(domestic || services ? null : facts, sources, siteOrigin);
+  // Inside Domestic exports and Services the page carries every section's tables, so this section builds none.
+  const crawlModels = useCrawlModels(() => (domestic || services ? [] : tradeOverviewCrawlModels(facts, sources, siteOrigin, presentation)));
   const model = buildTradeOverviewModel(facts, state, presentation);
   const label = (id: TradeChartIndicator) => t(services ? `services.indicator.${id}` : domestic && id === "trade.exports" ? "domestic.totalExports" : `indicator.${id}`);
   const matches = (id: TradeChartIndicator) => matchesLabelQuery(query, [label(id)]);

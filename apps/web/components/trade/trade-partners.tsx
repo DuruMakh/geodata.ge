@@ -14,6 +14,7 @@ import { publicLabel } from "../../lib/i18n/labels";
 import { message } from "../../lib/i18n/messages";
 import { pageHref } from "../../lib/i18n/routes";
 import { useI18n } from "../../lib/i18n/provider";
+import type { Presentation } from "../../lib/i18n/types";
 import { ModeTabs } from "../explorer-shell/mode-tabs";
 import { ExplorerHeading } from "../explorer-shell/explorer-heading";
 import { ExplorerWorkspace } from "../explorer-shell/explorer-workspace";
@@ -31,16 +32,12 @@ import { TablePager, useTablePage } from "./table-pager";
 import { TradePartnersSeriesPanel } from "./trade-partners-series-panel";
 import { TradePartnersRanking } from "./trade-partners-ranking";
 
-const NO_MODELS: WorkbookExportModel[] = [];
-
 /**
- * Every measure with every country and group (or type, or category) over its years, for the hidden crawl tables: built from the
- * props alone, so a click never rebuilds them. Null data builds none (inside Domestic exports, Services and Composition, whose
- * page carries every section's tables).
+ * Every measure with every country and group (or type, or category) over its years, for the data-table block (CrawlTables):
+ * built from the props alone, so a click never rebuilds them.
  */
-export function useTradePartnersCrawlModels(data: ClientTradePartnersData | null, sources: readonly WorkbookPublicSource[], siteOrigin: string): readonly WorkbookExportModel[] {
-  const presentation = useI18n();
-  return useCrawlModels(() => data ? tradePartnersCrawlStates(data).map(state => buildTradePartnersWorkbookModel({ data, state, sources, siteOrigin }, presentation)) : NO_MODELS);
+export function tradePartnersCrawlModels(data: ClientTradePartnersData, sources: readonly WorkbookPublicSource[], siteOrigin: string, presentation: Presentation): WorkbookExportModel[] {
+  return tradePartnersCrawlStates(data).map(state => buildTradePartnersWorkbookModel({ data, state, sources, siteOrigin }, presentation));
 }
 
 export function TradePartners({ data, sources, lastReviewedAt, siteOrigin, navigation, seriesControls }: { data: ClientTradePartnersData; sources: WorkbookPublicSource[]; lastReviewedAt: string; siteOrigin: string; navigation?: (measure: TradeChartIndicator, changeMeasure: (next: TradeChartIndicator) => void) => ReactNode; seriesControls?: ReactNode }) {
@@ -54,7 +51,8 @@ export function TradePartners({ data, sources, lastReviewedAt, siteOrigin, navig
     return message(messages, `trade.${composition ? "composition" : serviceKey ? "services" : "partners"}.${key}`);
   };
   const { state, update } = useTradePartnersState(data), model = buildTradePartnersModel(data, state, presentation);
-  const crawlModels = useTradePartnersCrawlModels(embedded ? null : data, sources, siteOrigin);
+  // Inside Domestic exports, Services and Composition the page carries every section's tables, so this section builds none.
+  const crawlModels = useCrawlModels(() => (embedded ? [] : tradePartnersCrawlModels(data, sources, siteOrigin, presentation)));
   const entities = new Map(data.entities.map(entity => [entity.id, entity]));
   const label = (id: string) => id === totalId ? t("total") : publicLabel(locale, id, entities.get(id)!.labelKa, englishLabels);
   const measureLabel = message(messages, `trade.${composition ? "composition." : services ? "services." : ""}indicator.${state.measure}`);

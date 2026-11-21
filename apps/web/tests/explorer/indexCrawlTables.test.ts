@@ -1,9 +1,9 @@
 import React from "react";
-import { renderToStaticMarkup } from "react-dom/server";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { IndexCrawlTables } from "../../components/explorer-shell/index-crawl-tables";
 import { historyCaption, historyCrawlTable, historyFromFacts, indexHistoryTables, municipalHistoryTables } from "../../lib/explorer/indexCrawlTables";
 import type { MunicipalListRow } from "../../lib/explorer/municipalData";
+import { renderPageMarkup } from "../helpers/render-localized";
 
 const format = (value: number) => value.toLocaleString("en-US");
 
@@ -49,12 +49,16 @@ describe("index crawl tables", () => {
     expect(tables[1]!.caption).toContain("Regions");
   });
 
-  it("IndexCrawlTables writes the hidden wrapper", () => {
-    const html = renderToStaticMarkup(React.createElement(IndexCrawlTables, { tables: [table], category: "Place" }));
-    expect(html.startsWith('<div hidden="" data-testid="crawl-tables">')).toBe(true);
+  it("IndexCrawlTables writes the visible data-table block, on the server and in the browser alike", () => {
+    const html = renderPageMarkup("en", React.createElement(IndexCrawlTables, { tables: [table], category: "Place" }));
+    expect(html.startsWith('<div data-testid="crawl-tables" class="crawl-tables"><p>Data table</p><div role="region" aria-label="Data table: Schools · Pupils · 2015/16–2016/17" tabindex="0"><table>')).toBe(true);
     expect(html).toContain("<td>3,936</td>");
     expect(html).toContain("<th>Place</th>");
-    expect(renderToStaticMarkup(React.createElement(IndexCrawlTables, { tables: [], category: "Place" }))).toBe('<div hidden="" data-testid="crawl-tables"></div>');
+    expect(renderPageMarkup("en", React.createElement(IndexCrawlTables, { tables: [], category: "Place" }))).toBe('<div data-testid="crawl-tables" class="crawl-tables"></div>');
+    // A page opened by a link inside the site renders in the browser only: the tables are props, so the block is the same.
+    vi.stubGlobal("window", {});
+    expect(renderPageMarkup("en", React.createElement(IndexCrawlTables, { tables: [table], category: "Place" }))).toBe(html);
+    vi.unstubAllGlobals();
   });
 
   it("indexHistoryTables writes two tables per figure, each over the years its places have (not Georgia's longer series)", () => {

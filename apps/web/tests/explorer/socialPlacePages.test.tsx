@@ -32,7 +32,7 @@ const index = async (set: Set, locale: "ka" | "en" = "en") => renderPageMarkup(l
 
 describe("the indexes' every-year tables", () => {
   it("Pensions carries the count and the share for municipalities and regions", async () => {
-    const html = (await index("pensions")).match(/<div hidden="" data-testid="crawl-tables">(.*?)<\/div>/)?.[1] ?? "";
+    const html = (await index("pensions")).match(/<div data-testid="crawl-tables" class="crawl-tables">(.*?)<\/div><\/div>/)?.[1] ?? "";
     expect(html.match(/<table>/g)).toHaveLength(4);
     expect(html).toContain("Pensioners — State pension · persons · Municipalities · 2013–2025");
     expect(html).toMatch(/<tr><th>Georgia<\/th>.*?<td>888,518<\/td><\/tr>/);

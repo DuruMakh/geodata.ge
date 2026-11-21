@@ -8,7 +8,7 @@ import { renderPageMarkup } from "../helpers/render-localized";
 describe("City air quality index every-year tables", () => {
   it("carries every station's yearly PM10 average, and Zestaponi's dust apart", async () => {
     const html = renderPageMarkup("en", await renderEnvironmentAirQualityIndex("en"));
-    const inner = [...html.matchAll(/<div hidden="" data-testid="crawl-tables">(.*?)<\/div>/g)].map((match) => match[1]!).find((text) => text.includes("Varketili"))!;
+    const inner = [...html.matchAll(/<div data-testid="crawl-tables" class="crawl-tables">(.*?)<\/div><\/div>/g)].map((match) => match[1]!).find((text) => text.includes("Varketili"))!;
     const captions = [...inner.matchAll(/<caption>([^<]*)<\/caption>/g)].map((match) => match[1]);
     expect(captions).toHaveLength(2);
     expect(captions[0]).toMatch(/^City air quality · Fine dust PM10, yearly average · µg\/m³ · \d{4}–\d{4} · Published$/);

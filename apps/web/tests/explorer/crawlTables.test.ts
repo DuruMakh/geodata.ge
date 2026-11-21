@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { makePeriod } from "../../lib/data/inflation/periods";
-import { CRAWL_CELL_CAP, CRAWL_MAX_DECIMALS, CRAWL_MONTH_COLUMNS, crawlCaption, crawlTables, crawlTablesHtml, formatCrawlCell } from "../../lib/explorer/crawlTables";
+import { CRAWL_CELL_CAP, CRAWL_MAX_DECIMALS, CRAWL_MONTH_COLUMNS, CRAWL_PAGE_CELL_CAP, crawlBlockHtml, crawlCaption, crawlTables, crawlTablesHtml, formatCrawlCell } from "../../lib/explorer/crawlTables";
 import { lastPeriodsRange } from "../../lib/explorer/periodRange";
 import { readableRowLabel, type WorkbookExportModel, type WorkbookReadableRow } from "../../lib/explorer/workbookModel";
 import { workbookMessage } from "../../lib/i18n/workbook";
@@ -30,17 +30,24 @@ describe("formatCrawlCell", () => {
     [0.5, "actual", "0.0#", "0.5"],
     [null, null, "0.0", "—"],
     [5, "not_available", "0.0", "—"],
-    // A negative that rounds to zero digits carries no minus sign.
-    [-0.04, "actual", "#,##0.0", "0.0"],
-    [-0.00004, "actual", "0.0%", "0.0%"],
-    [-0.01, "actual", "+0.0;−0.0;0.0", "0.0"],
     [-0.05, "actual", "#,##0.0", "−0.1"],
+    // A figure too small for its format gains decimals until two significant digits show, so it never reads as zero.
+    [-0.04, "actual", "#,##0.0", "−0.04"],
+    [-0.00004, "actual", "0.0%", "−0.004%"],
+    [-0.01, "actual", "+0.0;−0.0;0.0", "−0.01"],
+    [0.0000412, "actual", "#,##0.000", "0.000041"],
+    [0.0004, "actual", "#,##0.000", "0.0004"],
+    [0.00049, "actual", "0.0", "0.00049"],
+    // Rounding noise stays zero, and a negative one carries no minus sign.
+    [2.7e-17, "actual", "#,##0.0", "0.0"],
+    [-2.7e-17, "actual", "#,##0.0", "0.0"],
+    [0, "actual", "#,##0.0", "0.0"],
   ] as const)("%s %s %s", (v, b, f, out) => expect(formatCrawlCell(v, b, f, "en")).toBe(out));
 
   it.each([
     // Signed trade amounts keep 9 decimals in Excel; a crawl cell prints at most three.
     [1.234567891, "#,##0.000000000;\"−\"#,##0.000000000", "1.235"],
-    [-0.00012, "#,##0.00000;\"−\"#,##0.00000", "0.000"],
+    [0.0012, "#,##0.00000;\"−\"#,##0.00000", "0.001"],
     [0.5, "0.0####", "0.5"],
     [2.71828, "0.00#####", "2.718"],
     [0.123456, "0.00000%", "12.346%"],
@@ -101,7 +108,46 @@ describe("crawlTables", () => {
     const min = Math.min(...keptItems.map((i) => (i * 7) % 300));
     const dropped = items.filter((r) => !t.rows.some((k) => k.label === r.label));
     expect(Math.max(...dropped.map((r) => r.valuesByYear[2000] as number))).toBeLessThanOrEqual(min);
-    expect(t.caption.endsWith(`top ${keptItems.length} of 300; all of them in the Excel download`)).toBe(true);
+    expect(t.caption.endsWith(`top ${keptItems.length} of 300; the others follow below`)).toBe(true);
+  });
+
+  it("follows a cut table with its other series, in workbook order, and tells the reader so", () => {
+    const y = years(20);
+    const total: WorkbookReadableRow = { ...row("Total", y.map(() => 1), y), kind: "total" };
+    const items = Array.from({ length: 300 }, (_, i) => row(`I${i}`, y.map(() => (i * 7) % 300), y));
+    const tables = crawlTables([model({ years: y, rows: [total, ...items] })], en);
+    expect(tables).toHaveLength(2);
+    const [first, rest] = tables;
+    expect(first.rest).toBeUndefined();
+    expect(rest.rest).toBe(true);
+    const kept = new Set(first.rows.map((r) => r.label));
+    expect(rest.rows.map((r) => r.label)).toEqual(items.map((r) => r.label).filter((label) => !kept.has(label)));
+    expect(rest.caption).toBe(`T · GEL · 2000–2019 · Actual · the other ${rest.rows.length}`);
+    expect(rest.columns).toEqual(first.columns);
+    expect(first.rows.length + rest.rows.length).toBe(301);
+  });
+
+  it("puts the earlier-period models last, whole, without a share of the first 3,000 cells", () => {
+    const y = years(10);
+    const big = () => model({ years: y, rows: Array.from({ length: 500 }, (_, i) => row(`R${i}`, y.map(() => i), y)) });
+    const earlier = model({ title: "Earlier", years: y, rows: Array.from({ length: 400 }, (_, i) => row(`E${i}`, y.map(() => i), y)) });
+    const tables = crawlTables([big(), big()], en, [earlier]);
+    expect(tables.map((t) => [t.rest ?? false, t.rows.length])).toEqual([[false, 150], [false, 150], [true, 350], [true, 350], [true, 400]]);
+    expect(tables[4].caption).toBe("Earlier · GEL · 2000–2009 · Actual");
+    expect(crawlTables([], en, [earlier]).map((t) => [t.rest, t.rows.length])).toEqual([[true, 400]]);
+  });
+
+  it("stops at the page cap: a rest table that cannot be whole keeps its largest series and both captions say so", () => {
+    const y = years(20);
+    const items = Array.from({ length: 2000 }, (_, i) => row(`I${i}`, y.map(() => i), y));
+    const [first, rest, ...more] = crawlTables([model({ years: y, rows: items })], en);
+    expect(more).toEqual([]);
+    expect(first.rows).toHaveLength(CRAWL_CELL_CAP / 20);
+    expect(first.caption.endsWith("top 150 of 2000; all of them in the Excel download")).toBe(true);
+    const restRows = (CRAWL_PAGE_CELL_CAP - CRAWL_CELL_CAP) / 20;
+    expect(rest.rows).toHaveLength(restRows);
+    expect(rest.rows[0].label).toBe(`I${2000 - 150 - restRows}`);
+    expect(rest.caption.endsWith(`top ${restRows} of 1850; all of them in the Excel download`)).toBe(true);
   });
 
   it("a capped table gives no slot to a series with no figure in any year; an uncapped one keeps it", () => {
@@ -113,6 +159,7 @@ describe("crawlTables", () => {
     const [t] = crawlTables([model({ years: y, rows })], en);
     expect(t.rows.map((r) => r.label)).toEqual(Array.from({ length: 100 }, (_, i) => `I${i}`));
     expect(t.caption.endsWith("top 100 of 250; all of them in the Excel download")).toBe(true);
+    expect(crawlTables([model({ years: y, rows })], en)).toHaveLength(1);
     // Beside a second table: 75 slots each, 50 series with figures here, so the next table gets the other 25 slots' cells.
     const [half, next] = crawlTables([model({ years: y, rows: rows.slice(0, 200) }), model({ years: y, rows: Array.from({ length: 200 }, (_, i) => row(`N${i}`, y.map(() => i), y)) })], en);
     expect(half.rows).toHaveLength(50);
@@ -217,8 +264,36 @@ describe("crawlTablesHtml", () => {
     const y = years(20);
     const items = Array.from({ length: 300 }, (_, i) => row(`I${i}`, y.map(() => i), y));
     const html = crawlTablesHtml(crawlTables([model({ years: y, rows: items })], en), "Category");
-    expect(html).toMatch(/<caption>T · GEL · 2000–2019 · Actual · top \d+ of 300; all of them in the Excel download<\/caption>/);
+    expect(html).toMatch(/<caption>T · GEL · 2000–2019 · Actual · top \d+ of 300; the others follow below<\/caption>/);
     expect(crawlTablesHtml([], "Category")).toBe("");
+  });
+});
+
+describe("crawlBlockHtml", () => {
+  const labels = { category: "Category", heading: "Data table", rest: "The rest of the data" };
+  const table = { caption: "C", columns: ["2024"], rows: [{ label: "A", cells: ["1"] }] };
+  const tableHtml = "<table><caption>C</caption><thead><tr><th>Category</th><th>2024</th></tr></thead><tbody><tr><th>A</th><td>1</td></tr></tbody></table>";
+
+  it("writes nothing for no tables", () => {
+    expect(crawlBlockHtml([], labels)).toBe("");
+  });
+
+  it("is a label and one named, focusable scrolling region around the tables", () => {
+    expect(crawlBlockHtml([table], labels)).toBe(`<p>Data table</p><div role="region" aria-label="Data table: C" tabindex="0">${tableHtml}</div>`);
+  });
+
+  it("folds the rest tables in a closed details element, after the first ones", () => {
+    const rest = { ...table, caption: "D", rest: true as const };
+    expect(crawlBlockHtml([table, rest, table], labels)).toBe(
+      `<p>Data table</p><div role="region" aria-label="Data table: C" tabindex="0">${tableHtml}${tableHtml}` +
+      `<details><summary>The rest of the data</summary>${tableHtml.replace("<caption>C", "<caption>D")}</details></div>`,
+    );
+  });
+
+  it("escapes its labels, and carries no class or style", () => {
+    const html = crawlBlockHtml([{ ...table, caption: `"A" & B` }], { category: "Category", heading: "<Data>", rest: "R" });
+    expect(html.startsWith(`<p>&lt;Data&gt;</p><div role="region" aria-label="&lt;Data&gt;: &quot;A&quot; &amp; B" tabindex="0">`)).toBe(true);
+    expect(html).not.toMatch(/class=|style=/);
   });
 });
 

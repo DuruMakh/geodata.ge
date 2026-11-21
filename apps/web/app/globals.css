@@ -189,6 +189,158 @@ summary:focus-visible {
   outline-color: var(--paper);
 }
 
+/* The data-table block (CrawlTables, DESIGN.md §8.4): every series of a page as plain tables, in view for visitors
+   and for every kind of reader. The server writes its markup as one string without classes, so the block is styled
+   from its wrapper. An empty wrapper (a section with nothing to list, or a page opened by a link inside the site
+   before its tables are built) takes no space. */
+.crawl-tables:empty {
+  display: none;
+}
+
+.crawl-tables {
+  margin-top: 36px;
+  border-top: 1px solid var(--hairline);
+  padding-top: 24px;
+  /* Up to 3,000 cells: the browser lays them out only as the block nears the viewport. */
+  content-visibility: auto;
+  contain-intrinsic-size: auto 480px;
+}
+
+.crawl-tables > p {
+  margin-bottom: 12px;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* The scrolling region: one keyboard stop for all the block's tables. The ring is drawn inside, because the
+   block's containment clips what leaves its box. */
+.crawl-tables > div {
+  max-height: 26rem;
+  overflow: auto;
+  /* A caption measures the region (`cqi`), not its own, wider table. */
+  container-type: inline-size;
+}
+
+.crawl-tables > div:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+.crawl-tables table {
+  margin-bottom: 28px;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 0.75rem;
+  line-height: 1.4;
+}
+
+.crawl-tables table:last-child {
+  margin-bottom: 0;
+}
+
+/* A caption wraps within the region and stays at its left edge while its table scrolls sideways. */
+.crawl-tables caption {
+  position: sticky;
+  left: 0;
+  max-width: 100cqi;
+  padding-bottom: 8px;
+  caption-side: top;
+  text-align: left;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.crawl-tables th,
+.crawl-tables td {
+  border-bottom: 1px solid var(--hairline-soft);
+  padding: 6px 12px;
+  text-align: right;
+  white-space: nowrap;
+  font-family: var(--font-numeric);
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
+  color: var(--body);
+}
+
+/* The header row and the label column stay in view while the region scrolls, on the page's own paper. */
+.crawl-tables thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  border-bottom: 2px solid var(--ink);
+  background: var(--paper);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+
+.crawl-tables th:first-child {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  min-width: 11rem;
+  max-width: 22rem;
+  background: var(--paper);
+  box-shadow: 1px 0 0 var(--hairline-soft);
+  padding-left: 0;
+  text-align: left;
+  white-space: normal;
+  font-family: var(--font-ui);
+  color: var(--ink);
+}
+
+.crawl-tables thead th:first-child {
+  z-index: 2;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.crawl-tables tbody tr:hover > * {
+  background: var(--tint);
+}
+
+/* The rest of a large page's data, folded: as wide as its widest table, so its label stays at the left edge. */
+.crawl-tables details {
+  width: max-content;
+  min-width: 100%;
+}
+
+.crawl-tables table + details {
+  margin-top: 16px;
+}
+
+.crawl-tables summary {
+  position: sticky;
+  left: 0;
+  width: fit-content;
+  cursor: pointer;
+  padding: 10px 0;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.crawl-tables details[open] > summary {
+  margin-bottom: 8px;
+}
+
+@media (max-width: 767px) {
+  .crawl-tables th:first-child {
+    min-width: 7.5rem;
+    max-width: 40vw;
+    overflow-wrap: anywhere;
+  }
+
+  .crawl-tables summary {
+    padding: 13px 0;
+  }
+}
+
 /* While the phone menu covers the page, the page is hidden and the skip link has nothing to skip to. */
 body:has([data-menu-open]) a[href="#content"] {
   display: none;

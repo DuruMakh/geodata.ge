@@ -4,6 +4,7 @@ import { loadServedMunicipalData } from "../../lib/data/servedData";
 import { loadRegionalEconomyFacts, REGIONAL_ECONOMY_REGIONS } from "../../lib/data/regionalEconomies/importRegionalEconomies";
 import { buildLatestValueRegionMapModel, buildRegionalEconomyMapModel } from "../../lib/explorer/regionalEconomyMap";
 import { I18nProvider } from "../../lib/i18n/provider";
+import controls from "../../lib/i18n/messages/en/controls.json";
 import { RegionalEconomiesIndex, RegionIndex } from "../../components/regional-economies/regional-economies-index";
 
 const regionNames: Record<string, string> = {
@@ -16,7 +17,9 @@ const regionNames: Record<string, string> = {
   "region.shida_kartli": "Shida Kartli",
 };
 
+// The explorer layout provides `controls` (the data-table block reads its label there); the rest are the page's own.
 const messages: Record<string, string> = {
+  ...controls,
   "regionalEconomies.mapAria": "Regional GDP map for {year}",
   "regionalEconomies.mapEntityAria": "{name}: {amount}, {year}",
   "regionalEconomies.legend": "Regional GDP",
@@ -76,7 +79,7 @@ describe("RegionIndex crawl tables", () => {
       { model, metric, lead: { label: "Georgia", valuesByYear: { 2023: 66, 2024: 1000 } } },
       { model, metric: { ...metric, legend: "Per person" } },
     ]);
-    const wrapper = html.match(/<div hidden="" data-testid="crawl-tables">(.*?)<\/div>/)![1]!;
+    const wrapper = html.match(/<div data-testid="crawl-tables" class="crawl-tables">(.*?)<\/div><\/div>/)![1]!;
     expect(wrapper.match(/<table>/g)).toHaveLength(2);
     expect(wrapper).toContain("<caption>Test index · Persons · 2023–2024 · Published</caption>");
     expect(wrapper).toContain("<caption>Test index · Per person · 2023–2024 · Published</caption>");

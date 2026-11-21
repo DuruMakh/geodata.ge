@@ -9,7 +9,7 @@ import { renderPageMarkup } from "../helpers/render-localized";
 describe("Municipal budgets index every-year tables", () => {
   it("carries every year's total and the per-resident year for every place", async () => {
     const html = renderPageMarkup("en", await renderMunicipalIndex("en"));
-    const inner = [...html.matchAll(/<div hidden="" data-testid="crawl-tables">(.*?)<\/div>/g)].map((match) => match[1]!).find((text) => text.includes("Municipalities ·"))!;
+    const inner = [...html.matchAll(/<div data-testid="crawl-tables" class="crawl-tables">(.*?)<\/div><\/div>/g)].map((match) => match[1]!).find((text) => text.includes("Municipalities ·"))!;
     const captions = [...inner.matchAll(/<caption>([^<]*)<\/caption>/g)].map((match) => match[1]);
     expect(captions).toHaveLength(4);
     expect(captions[0]).toMatch(/^How Georgia’s municipalities spend their budgets · Total budget · mln GEL · Municipalities · \d{4}–2025 · Actual$/);

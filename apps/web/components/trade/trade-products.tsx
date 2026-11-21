@@ -16,6 +16,7 @@ import { publicLabel } from "../../lib/i18n/labels";
 import { message } from "../../lib/i18n/messages";
 import { pageHref } from "../../lib/i18n/routes";
 import { useI18n } from "../../lib/i18n/provider";
+import type { Presentation } from "../../lib/i18n/types";
 import { ModeTabs } from "../explorer-shell/mode-tabs";
 import { ExplorerHeading } from "../explorer-shell/explorer-heading";
 import { ExcelDownloadButton } from "../explorer/excel-download-button";
@@ -31,16 +32,12 @@ import { TradePartnersRanking } from "./trade-partners-ranking";
 import { TradeProductsPicker } from "./trade-products-picker";
 import { useTradeProductsState } from "./use-trade-products-state";
 
-const NO_MODELS: WorkbookExportModel[] = [];
-
 /**
- * Each measure with every product over its years, for the hidden crawl tables (their cap keeps the largest): built from the
- * props alone, so a click never rebuilds them. Null data builds none (inside Domestic exports, whose page carries every
- * section's tables).
+ * Each measure with every product over its years, for the data-table block (CrawlTables; its first tables keep the largest):
+ * built from the props alone, so a click never rebuilds them.
  */
-export function useTradeProductsCrawlModels(data: ClientTradeProductsData | null, sources: readonly WorkbookPublicSource[], siteOrigin: string): readonly WorkbookExportModel[] {
-  const presentation = useI18n();
-  return useCrawlModels(() => data ? tradeProductsCrawlStates(data).map(state => buildTradeProductsWorkbookModel({ data, state, sources, siteOrigin }, presentation)) : NO_MODELS);
+export function tradeProductsCrawlModels(data: ClientTradeProductsData, sources: readonly WorkbookPublicSource[], siteOrigin: string, presentation: Presentation): WorkbookExportModel[] {
+  return tradeProductsCrawlStates(data).map(state => buildTradeProductsWorkbookModel({ data, state, sources, siteOrigin }, presentation));
 }
 
 export function TradeProducts({ data, sources, lastReviewedAt, siteOrigin }: { data: ClientTradeProductsData; sources: WorkbookPublicSource[]; lastReviewedAt: string; siteOrigin: string }) {
@@ -48,7 +45,8 @@ export function TradeProducts({ data, sources, lastReviewedAt, siteOrigin }: { d
   const presentation = useI18n(), { locale, messages, englishLabels } = presentation;
   const t = (key: string) => message(messages, `trade.products.${key}`);
   const { state, selectionReset, update } = useTradeProductsState(data);
-  const crawlModels = useTradeProductsCrawlModels(domestic ? null : data, sources, siteOrigin);
+  // Inside Domestic exports the page carries every section's tables, so this section builds none.
+  const crawlModels = useCrawlModels(() => (domestic ? [] : tradeProductsCrawlModels(data, sources, siteOrigin, presentation)));
   const model = useMemo(() => buildTradeProductsModel(data, state, presentation), [data, state, presentation]);
   const entities = useMemo(() => new Map(data.entities.map(entity => [entity.id, entity])), [data]);
   const labels = useMemo(() => new Map([[TRADE_PRODUCT_TOTAL_ID, message(messages, "trade.partners.total")], ...data.entities.map(entity => [entity.id, tradeProductLabel(entity, presentation, !data.sourceBlock)] as const)]), [data, presentation, messages]);
