@@ -333,7 +333,6 @@ summary:focus-visible {
   .crawl-tables th:first-child {
     min-width: 7.5rem;
     max-width: 40vw;
-    overflow-wrap: anywhere;
   }
 
   .crawl-tables summary {

@@ -4,8 +4,14 @@ import { workbookMessage } from "../i18n/workbook";
 import { MISSING } from "./format";
 import { readableBasisLabel, readableRowLabel, type WorkbookBasis, type WorkbookExportModel, type WorkbookReadableRow } from "./workbookModel";
 
-/** The cells a page's first, visible tables hold: about what a short-window AI reader keeps of one page (40,000 characters). */
+/** The most cells a page's first, visible tables hold. */
 export const CRAWL_CELL_CAP = 3000;
+/**
+ * The most text a page's first tables hold, as a reader prints them (`crawlReaderChars`): what a reader with a short window
+ * has left for them. Claude's web fetch passed on roughly the first 40,000 characters of a page (measured on production,
+ * 2026-11-21), and the pages spend up to 10,000 of them above their tables.
+ */
+export const CRAWL_WINDOW_CHARS = 30_000;
 /** The cells a page holds in all: the first tables, then the rest (the series and periods they leave out), folded below them. */
 export const CRAWL_PAGE_CELL_CAP = 30_000;
 /** The most months a monthly view's crawl tables carry; its crawl states choose the window (`lastPeriodsRange`). */
@@ -55,9 +61,11 @@ export function formatCrawlCell(value: number | null, basis: WorkbookBasis | nul
   const grouping = integerPart.includes(",");
   const magnitude = Math.abs(percent ? value * 100 : value);
   let digits = numberFormatter(minimum, maximum, grouping).format(magnitude);
-  // A figure that is not zero never reads as zero (a small trading partner in billions of dollars): it gains decimals
-  // until two significant digits show. Past CRAWL_SMALL_DECIMALS it is rounding noise and stays zero.
-  if (magnitude !== 0 && !/[1-9]/.test(digits)) {
+  // An amount that is not zero never reads as zero (a small trading partner in billions of dollars): it gains decimals
+  // until two significant digits show. Past CRAWL_SMALL_DECIMALS it is rounding noise and stays zero. A percentage or a
+  // signed change keeps its format's decimals, as the chart and the official release print it (inflation of 0.0%).
+  const signed = sections[0].trimStart().startsWith("+");
+  if (!percent && !signed && magnitude !== 0 && !/[1-9]/.test(digits)) {
     const small = numberFormatter(minimum, Math.min(CRAWL_SMALL_DECIMALS, Math.ceil(-Math.log10(magnitude)) + 1), grouping).format(magnitude);
     if (/[1-9]/.test(small)) digits = small;
   }
@@ -148,35 +156,59 @@ function crawlTable(model: WorkbookExportModel, rows: readonly WorkbookReadableR
   };
 }
 
+/** About the characters a reader that turns tables into text spends on these: a caption, a header and its rule, and a line of cells per row. */
+export function crawlReaderChars(tables: readonly CrawlTable[]): number {
+  const line = (cells: readonly string[]) => cells.reduce((sum, cell) => sum + cell.length + 3, 2);
+  return tables.reduce((sum, table) => sum + table.caption.length + 2 + 2 * line([table.category ?? "", ...table.columns])
+    + table.rows.reduce((rows, row) => rows + line([row.label, ...row.cells]), 0), 0);
+}
+
 /**
- * A page's tables. First the ones a visitor and every reader see: each model with rows, sharing `CRAWL_CELL_CAP` cells; a
- * table over its share keeps its totals and its largest series. Then the rest, marked `rest`: the other series of each cut
+ * A page's tables. First the ones a visitor and every reader see: each model with rows, sharing `CRAWL_CELL_CAP` cells and,
+ * as text, `CRAWL_WINDOW_CHARS`; a table over its share keeps its totals and its largest series. Then the rest, marked `rest`: the other series of each cut
  * table, in workbook order, and the `earlier` models (the periods before a monthly page's window) whole. The page stops at
  * `CRAWL_PAGE_CELL_CAP`: a rest table that cannot be whole keeps its largest series, and its caption says so.
  */
 export function crawlTables(models: readonly WorkbookExportModel[], messages: Messages, earlier: readonly WorkbookExportModel[] = []): CrawlTable[] {
   const withRows = models.filter((model) => model.readable.rows.length > 0);
-  const cuts: { model: WorkbookExportModel; at: number; others: WorkbookReadableRow[]; kept: number; of: number }[] = [];
-  const first: { model: WorkbookExportModel; rows: readonly WorkbookReadableRow[] }[] = [];
-  let remaining = CRAWL_CELL_CAP;
-  withRows.forEach((model, index) => {
-    const { years, rows: allRows } = model.readable;
-    const budget = Math.floor(remaining / (withRows.length - index));
-    const maxRows = Math.max(1, Math.floor(budget / Math.max(1, years.length)));
-    let kept: readonly WorkbookReadableRow[] = allRows;
-    if (allRows.length > maxRows) {
-      const items = allRows.filter((row) => row.kind !== "total");
-      const itemSlots = Math.max(0, maxRows - (allRows.length - items.length));
-      // A series with no figure in any year never takes a slot from one that has figures.
-      const top = largestRows(items, years, itemSlots);
-      kept = allRows.filter((row) => row.kind === "total" || top.kept.has(row));
-      cuts.push({ model, at: index, others: items.filter((row) => !top.kept.has(row) && hasFigure(row, years)), kept: Math.min(itemSlots, top.ranked), of: items.length });
-    }
-    remaining -= kept.length * years.length;
-    first.push({ model, rows: kept });
-  });
+  const firstWithin = (cellCap: number) => {
+    const cuts: { model: WorkbookExportModel; at: number; others: WorkbookReadableRow[]; kept: number; of: number }[] = [];
+    const first: { model: WorkbookExportModel; rows: readonly WorkbookReadableRow[] }[] = [];
+    let remaining = cellCap;
+    withRows.forEach((model, index) => {
+      const { years, rows: allRows } = model.readable;
+      const budget = Math.floor(remaining / (withRows.length - index));
+      const maxRows = Math.max(1, Math.floor(budget / Math.max(1, years.length)));
+      let kept: readonly WorkbookReadableRow[] = allRows;
+      if (allRows.length > maxRows) {
+        const items = allRows.filter((row) => row.kind !== "total");
+        const itemSlots = Math.max(0, maxRows - (allRows.length - items.length));
+        // A series with no figure in any year never takes a slot from one that has figures.
+        const top = largestRows(items, years, itemSlots);
+        kept = allRows.filter((row) => row.kind === "total" || top.kept.has(row));
+        // The note counts the series that have figures, so it and the rest table's "the other N" add up. A table that
+        // leaves out only series without any figure is complete, and gets no note.
+        const others = items.filter((row) => !top.kept.has(row) && hasFigure(row, years));
+        if (others.length > 0) cuts.push({ model, at: index, others, kept: Math.min(itemSlots, top.ranked), of: top.ranked });
+      }
+      remaining -= kept.length * years.length;
+      first.push({ model, rows: kept });
+    });
+    return { cuts, first, cells: cellCap - remaining };
+  };
+  let { cuts, first, cells } = firstWithin(CRAWL_CELL_CAP);
+  // A reader's window is counted in characters, and long labels fill it with fewer cells: the tables' share shrinks until
+  // their text fits, a tenth or more at a time. A cut table is measured with the longer of the two notes its caption may get.
+  for (let tries = 0; tries < 8; tries += 1) {
+    const chars = crawlReaderChars(first.map(({ model, rows }, index) => {
+      const cut = cuts.find((candidate) => candidate.at === index);
+      return crawlTable(model, rows, `${crawlCaption(model)}${cut ? ` · ${message(messages, "controls.crawlTop", { kept: cut.kept, of: cut.of })}` : ""}`, false);
+    }));
+    if (chars <= CRAWL_WINDOW_CHARS) break;
+    ({ cuts, first, cells } = firstWithin(Math.floor(cells * Math.min(0.9, CRAWL_WINDOW_CHARS / chars))));
+  }
 
-  let room = CRAWL_PAGE_CELL_CAP - (CRAWL_CELL_CAP - remaining);
+  let room = CRAWL_PAGE_CELL_CAP - cells;
   const captions = first.map(({ model }) => crawlCaption(model));
   const rest: CrawlTable[] = [];
   const fold = (model: WorkbookExportModel, rows: readonly WorkbookReadableRow[], caption: (whole: boolean, shown: number) => string): boolean => {
@@ -194,7 +226,7 @@ export function crawlTables(models: readonly WorkbookExportModel[], messages: Me
     const whole = fold(cut.model, cut.others, (complete, shown) => `${caption} · ${complete
       ? message(messages, "controls.crawlOthers", { count: shown })
       : message(messages, "controls.crawlTop", { kept: shown, of: cut.others.length })}`);
-    captions[cut.at] = `${caption} · ${message(messages, whole && cut.others.length > 0 ? "controls.crawlTopMore" : "controls.crawlTop", { kept: cut.kept, of: cut.of })}`;
+    captions[cut.at] = `${caption} · ${message(messages, whole ? "controls.crawlTopMore" : "controls.crawlTop", { kept: cut.kept, of: cut.of })}`;
   }
   for (const model of earlier) {
     const rows = model.readable.rows;

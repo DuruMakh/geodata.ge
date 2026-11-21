@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { makePeriod } from "../../lib/data/inflation/periods";
-import { CRAWL_CELL_CAP, CRAWL_MAX_DECIMALS, CRAWL_MONTH_COLUMNS, CRAWL_PAGE_CELL_CAP, crawlBlockHtml, crawlCaption, crawlTables, crawlTablesHtml, formatCrawlCell } from "../../lib/explorer/crawlTables";
+import { CRAWL_CELL_CAP, CRAWL_MAX_DECIMALS, CRAWL_MONTH_COLUMNS, CRAWL_PAGE_CELL_CAP, CRAWL_WINDOW_CHARS, crawlBlockHtml, crawlCaption, crawlReaderChars, crawlTables, crawlTablesHtml, formatCrawlCell } from "../../lib/explorer/crawlTables";
 import { earlierPeriodsRange, lastPeriodsRange } from "../../lib/explorer/periodRange";
 import { readableRowLabel, type WorkbookExportModel, type WorkbookReadableRow } from "../../lib/explorer/workbookModel";
 import { workbookMessage } from "../../lib/i18n/workbook";
@@ -31,13 +31,16 @@ describe("formatCrawlCell", () => {
     [null, null, "0.0", "—"],
     [5, "not_available", "0.0", "—"],
     [-0.05, "actual", "#,##0.0", "−0.1"],
-    // A figure too small for its format gains decimals until two significant digits show, so it never reads as zero.
+    // An amount too small for its format gains decimals until two significant digits show, so it never reads as zero.
     [-0.04, "actual", "#,##0.0", "−0.04"],
-    [-0.00004, "actual", "0.0%", "−0.004%"],
-    [-0.01, "actual", "+0.0;−0.0;0.0", "−0.01"],
     [0.0000412, "actual", "#,##0.000", "0.000041"],
     [0.0004, "actual", "#,##0.000", "0.0004"],
     [0.00049, "actual", "0.0", "0.00049"],
+    // A percentage and a signed change keep their format's decimals: annual inflation of 0.0037% reads 0.0%, as published.
+    [0.000037, "actual", "0.0%", "0.0%"],
+    [-0.00004, "actual", "0.0%", "0.0%"],
+    [0.00097, "actual", "+0.0;−0.0;0.0", "+0.0"],
+    [-0.01, "actual", "+0.0;−0.0;0.0", "0.0"],
     // Rounding noise stays zero, and a negative one carries no minus sign.
     [2.7e-17, "actual", "#,##0.0", "0.0"],
     [-2.7e-17, "actual", "#,##0.0", "0.0"],
@@ -139,7 +142,8 @@ describe("crawlTables", () => {
 
   it("stops at the page cap: a rest table that cannot be whole keeps its largest series and both captions say so", () => {
     const y = years(20);
-    const items = Array.from({ length: 2000 }, (_, i) => row(`I${i}`, y.map(() => i), y));
+    // Figures of three or four characters, so the cell caps and not the reader's window cut this page.
+    const items = Array.from({ length: 2000 }, (_, i) => row(`I${i}`, y.map(() => i / 100), y, { numberFormat: "0.00" }));
     const [first, rest, ...more] = crawlTables([model({ years: y, rows: items })], en);
     expect(more).toEqual([]);
     expect(first.rows).toHaveLength(CRAWL_CELL_CAP / 20);
@@ -150,6 +154,37 @@ describe("crawlTables", () => {
     expect(rest.caption.endsWith(`top ${restRows} of 1850; all of them in the Excel download`)).toBe(true);
   });
 
+  it("keeps the first tables inside a short reader's window: long labels leave room for fewer rows, and the others follow", () => {
+    const y = years(20);
+    // 140 series of 20 years are 2,800 cells, under the cell cap, yet with these names the table is 45,000 characters of text.
+    const name = (i: number) => `Series ${i} ${"with a long official name ".repeat(6)}`.trim();
+    const items = Array.from({ length: 140 }, (_, i) => row(name(i), y.map(() => 1000 + i), y));
+    expect(items.length * y.length).toBeLessThan(CRAWL_CELL_CAP);
+    const whole = crawlTables([model({ years: y, rows: items.slice(0, 60) })], en);
+    expect(whole.map((t) => t.rows.length)).toEqual([60]);
+    expect(crawlReaderChars(whole)).toBeLessThanOrEqual(CRAWL_WINDOW_CHARS);
+
+    const [first, rest, ...more] = crawlTables([model({ years: y, rows: items })], en);
+    expect(more).toEqual([]);
+    expect(crawlReaderChars([first])).toBeLessThanOrEqual(CRAWL_WINDOW_CHARS);
+    // The window is used, not merely respected: no more than a tenth of it stays empty.
+    expect(crawlReaderChars([first])).toBeGreaterThan(CRAWL_WINDOW_CHARS * 0.9);
+    // The largest series stay in view, in workbook order; the others follow, none lost.
+    expect(first.rows.map((r) => r.label)).toEqual(items.slice(140 - first.rows.length).map((r) => r.label));
+    expect(first.caption.endsWith(`top ${first.rows.length} of 140; the others follow below`)).toBe(true);
+    expect(rest.rest).toBe(true);
+    expect(rest.rows.map((r) => r.label)).toEqual(items.slice(0, 140 - first.rows.length).map((r) => r.label));
+  });
+
+  it("counts a table's text as a reader prints it: a caption, a header, a rule and a line of cells per row", () => {
+    const y = years(2);
+    const tables = crawlTables([model({ years: y, rows: [row("Ab", [1, 22], y)] })], en);
+    expect(tables[0].rows[0].cells).toEqual(["1.0", "22.0"]);
+    // "T · GEL · 2000–2001 · Actual" and a break; "|  | 2000 | 2001 |" twice (the header and its rule); "| Ab | 1.0 | 22.0 |".
+    expect(crawlReaderChars(tables)).toBe(tables[0].caption.length + 2 + 2 * (2 + 3 + 7 + 7) + (2 + 5 + 6 + 7));
+    expect(crawlReaderChars([])).toBe(0);
+  });
+
   it("a capped table gives no slot to a series with no figure in any year; an uncapped one keeps it", () => {
     const y = years(20);
     const empty = (i: number) => row(`E${i}`, y.map(() => null), y);
@@ -158,8 +193,13 @@ describe("crawlTables", () => {
     const rows = [...Array.from({ length: 100 }, (_, i) => empty(i)), ...Array.from({ length: 50 }, (_, i) => unavailable(i)), ...Array.from({ length: 100 }, (_, i) => row(`I${i}`, y.map(() => i), y))];
     const [t] = crawlTables([model({ years: y, rows })], en);
     expect(t.rows.map((r) => r.label)).toEqual(Array.from({ length: 100 }, (_, i) => `I${i}`));
-    expect(t.caption.endsWith("top 100 of 250; all of them in the Excel download")).toBe(true);
+    // Every series with a figure is there, so the table is complete: no "top" note, and nothing to follow.
+    expect(t.caption).not.toContain("top");
     expect(crawlTables([model({ years: y, rows })], en)).toHaveLength(1);
+    // A cut counts only the series that have figures, so its note and the rest table's add up: 150 + 150 of 300, not of 400.
+    const [cut, others] = crawlTables([model({ years: y, rows: [...rows.slice(0, 100), ...Array.from({ length: 300 }, (_, i) => row(`I${i}`, y.map(() => i), y))] })], en);
+    expect(cut.caption.endsWith("top 150 of 300; the others follow below")).toBe(true);
+    expect(others.caption.endsWith("the other 150")).toBe(true);
     // Beside a second table: 75 slots each, 50 series with figures here, so the next table gets the other 25 slots' cells.
     const [half, next] = crawlTables([model({ years: y, rows: rows.slice(0, 200) }), model({ years: y, rows: Array.from({ length: 200 }, (_, i) => row(`N${i}`, y.map(() => i), y)) })], en);
     expect(half.rows).toHaveLength(50);
