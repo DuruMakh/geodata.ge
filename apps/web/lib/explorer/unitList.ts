@@ -87,7 +87,7 @@ export function changeUnitListSelection(state: TopicState, definitions: readonly
 }
 
 /**
- * The hidden crawl tables' states of a list (lib/explorer/crawlTables.ts): one per unit group, in list order, each
+ * The crawl tables' states of a list (lib/explorer/crawlTables.ts): one per unit group, in list order, each
  * selecting every row of the group that has facts, over the group's every year. A group without facts has no state.
  */
 export function unitListCrawlStates(definitions: readonly { id: string }[], facts: readonly UnitFact[], groupOf?: GroupOf): TopicState[] {

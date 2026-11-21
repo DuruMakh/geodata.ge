@@ -20,7 +20,7 @@ export function EnvironmentRegionIndex({ topic, regionMap, georgiaValue, georgia
   topic: EnvironmentAreaTopic; regionMap: RegionMapModel;
   /** Georgia's figure in the map's year. */
   georgiaValue: number | undefined;
-  /** Georgia's figure in every year, for the hidden every-year table. */
+  /** Georgia's figure in every year, for the every-year table. */
   georgiaByYear: Readonly<Record<number, number>>;
   /** The map's unit and the most decimals its figures were published with. */
   unit: EnvironmentUnit; decimals: number;

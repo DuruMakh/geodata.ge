@@ -249,7 +249,7 @@ export function buildMunicipalWorkbookInput(
 }
 
 /**
- * The hidden crawl table's state (lib/explorer/crawlTables.ts), from the place's full-span model: the total and every
+ * The crawl table's state (lib/explorer/crawlTables.ts), from the place's full-span model: the total and every
  * function over every year, in GEL — the share of the budget only divides them. A place without years has none.
  */
 export function municipalCrawlStates(fullModel: MunicipalEntityModel): (MunicipalWorkbookState & { chartMode: "line" })[] {
@@ -426,7 +426,7 @@ export function buildCountryListRow(totalFacts: MunicipalTotalFact[], year: numb
 }
 
 /**
- * The index's figures in every year, for its hidden crawl tables: each year's totals as that year's list would rank them
+ * The index's figures in every year, for its crawl tables: each year's totals as that year's list would rank them
  * (Adjara with the republican budget), Georgia's from its own aggregate, and spending per resident in the one year with
  * population. A municipality with no total in a year has none there, not 0.
  */

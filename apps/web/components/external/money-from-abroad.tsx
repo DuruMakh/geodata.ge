@@ -37,7 +37,7 @@ export function MoneyFromAbroad({ data: input, sources, lastReviewedAt, siteOrig
   const t = (key: string, values?: Record<string, string | number>) => message(messages, `external.money.${key}`, values);
   const { state, update } = useHashState(data, parseMoneyTransfersHash, serializeMoneyTransfersHash), model = buildMoneyTransfersModel(data, state, presentation);
   const label = (id: string) => model.series.find(item => item.id === id)!.label;
-  // Received and sent, each list over its years, for the hidden crawl tables: built from the props alone, so a click never rebuilds them.
+  // Received and sent, each list over its years, for the crawl tables: built from the props alone, so a click never rebuilds them.
   const crawlModels = useCrawlModels(() => moneyTransfersCrawlStates(data).map(crawl =>
     buildMoneyTransfersWorkbookModel({ data, state: crawl, sources, siteOrigin }, presentation)));
   const measureLabel = message(messages, `external.measure.${state.measure}`);

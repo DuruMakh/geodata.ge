@@ -67,7 +67,7 @@ export function InternetAreaExplorer({ area, facts, labels, areaLabels, sources,
   const latest = internetAreaLatest(area, facts);
   const areaName = areaLabels[area];
   const title = t("page.area.regionTitle", { region: areaName });
-  // The area's every row over its years, for the hidden crawl tables: built from the props alone, so a click never rebuilds them.
+  // The area's every row over its years, for the crawl tables: built from the props alone, so a click never rebuilds them.
   const crawlModels = useCrawlModels(() => internetAreaCrawlStates(area, facts).map(crawl =>
     buildInternetWorkbookExportModel({ area, facts, state: crawl, labels, sources, siteOrigin, title }, presentation)));
   const chartLabel = `${t("heading.homes").split(" · ")[0]} · ${areaName}`;

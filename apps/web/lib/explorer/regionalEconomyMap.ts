@@ -112,7 +112,7 @@ export type RegionalEconomyMapModel = {
   history?: RegionMapHistory;
 };
 
-/** Every year of a region map's figure for each region (keys are the map's `region.<id>` ids), for the page's hidden crawl tables. */
+/** Every year of a region map's figure for each region (keys are the map's `region.<id>` ids), for the page's crawl tables. */
 export type RegionMapHistory = { years: number[]; byRegion: Readonly<Record<string, Readonly<Record<number, number>>>> };
 
 export function regionMapHistory(facts: readonly { regionId: string; year: number; value: number }[]): RegionMapHistory {

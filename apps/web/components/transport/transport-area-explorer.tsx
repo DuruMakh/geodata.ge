@@ -66,7 +66,7 @@ export function TransportAreaExplorer({ area, facts, labels, areaLabels, sources
   const latest = transportAreaLatest(area, facts);
   const areaName = areaLabels[area];
   const title = t("page.area.regionTitle", { region: areaName });
-  // Every unit of the area's list, every row of it over its years, for the hidden crawl tables: built from the props alone, so a click never rebuilds them.
+  // Every unit of the area's list, every row of it over its years, for the crawl tables: built from the props alone, so a click never rebuilds them.
   const crawlModels = useCrawlModels(() => transportAreaCrawlStates(area, facts).map(crawl =>
     buildTransportWorkbookExportModel({ area, facts, state: crawl, labels, sources, siteOrigin, title }, presentation)));
   // The chart is named after the heading of the selection's unit (its text before the unit).

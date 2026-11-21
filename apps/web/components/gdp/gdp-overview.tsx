@@ -80,7 +80,7 @@ export function GdpOverview({
     () => buildGdpOverviewModel(facts, state, sourceIdRanges),
     [facts, state, sourceIdRanges],
   );
-  // Every indicator and currency over every year, for the hidden crawl tables: built from the props alone, so a click
+  // Every indicator and currency over every year, for the crawl tables: built from the props alone, so a click
   // never rebuilds them.
   const crawlModels = useCrawlModels(() => gdpCrawlStates(facts).map((crawl) => buildGdpWorkbookExportModel(
     facts,

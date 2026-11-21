@@ -67,7 +67,7 @@ export function MoneyBanksAreaExplorer({ area, facts, labels, areaLabels, source
   const latest = facts.filter(f => f.indicatorId === model.series[0].id).sort((a, b) => a.year - b.year).at(-1)!;
   const areaName = areaLabels[area];
   const title = t("page.area.regionTitle", { region: areaName });
-  // The area's three loan rows over every year, for the hidden crawl tables: built from the props alone, so a click never rebuilds them.
+  // The area's three loan rows over every year, for the crawl tables: built from the props alone, so a click never rebuilds them.
   const crawlModels = useCrawlModels(() => moneyBanksAreaCrawlStates(area, facts).map(crawl =>
     buildMoneyBanksWorkbookExportModel({ area, facts, state: crawl, labels, sources, siteOrigin, title }, presentation)));
   const chartLabel = `${t("heading.area")} · ${areaName}`;

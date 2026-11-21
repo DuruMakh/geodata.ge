@@ -33,7 +33,7 @@ export function ForeignInvestment({ data, sources, lastReviewedAt, siteOrigin }:
   const t = (key: string, values?: Record<string, string | number>) => message(messages, `external.investment.${key}`, values);
   const { state, update } = useHashState(data, parseForeignInvestmentHash, serializeForeignInvestmentHash), model = buildForeignInvestmentModel(data, state, presentation);
   const label = (id: string) => model.series.find(item => item.id === id)!.label, color = (id: string) => model.series.find(item => item.id === id)!.color;
-  // Every tab's list over its years, for the hidden crawl tables: built from the props alone, so a click never rebuilds them.
+  // Every tab's list over its years, for the crawl tables: built from the props alone, so a click never rebuilds them.
   const crawlModels = useCrawlModels(() => foreignInvestmentCrawlStates(data).map(crawl =>
     buildForeignInvestmentWorkbookModel({ data, state: crawl, sources, siteOrigin }, presentation)));
   const tabLabel = t(`tab.${state.dimension}`);

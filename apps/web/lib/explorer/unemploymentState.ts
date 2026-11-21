@@ -46,7 +46,7 @@ export function changeUnemploymentEducationSex(state: UnemploymentState, educati
   return fit({ ...next, selectedIds: [unemploymentReferenceId(next)] }, facts);
 }
 /**
- * The hidden crawl tables' states (lib/explorer/crawlTables.ts): each view the page offers (the Overview's four tabs, each
+ * The crawl tables' states (lib/explorer/crawlTables.ts): each view the page offers (the Overview's four tabs, each
  * sex of Education, each indicator of Age), split where its list cannot mix units (rates apart from people), each selecting
  * every series that list offers over every year. A view without facts has no state.
  */

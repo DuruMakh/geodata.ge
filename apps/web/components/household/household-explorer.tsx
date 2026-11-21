@@ -69,7 +69,7 @@ export function HouseholdExplorer({ section, facts: shippedFacts, labels: lineLa
   const areaName = areaLabels[area];
   const title = t(`page.${section}.title`);
   const chartLabel = `${t(`tab.parts.${section}`)} · ${areaLabels[area]}`;
-  // Per household and per person, every series of the area over its years, for the hidden crawl tables: built from the props alone, so a click never rebuilds them.
+  // Per household and per person, every series of the area over its years, for the crawl tables: built from the props alone, so a click never rebuilds them.
   const crawlModels = useCrawlModels(() => householdCrawlStates(section, area, facts).map(crawl =>
     buildHouseholdWorkbookExportModel({ section, area, facts, state: crawl, labels, areaLabel: areaLabels[area], sources, siteOrigin, title }, presentation)));
   const pagePath = HOUSEHOLD_SECTIONS.find(item => item.id === section)!.href;

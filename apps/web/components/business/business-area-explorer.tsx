@@ -74,7 +74,7 @@ export function BusinessAreaExplorer({ area, facts, labels, areaLabels, sources,
   const latest = businessAreaLatest(area, facts);
   const areaName = areaLabels[area];
   const title = t("page.area.regionTitle", { region: areaName });
-  // The area's money, jobs and firm counts, every series over its years, for the hidden crawl tables: built from the props alone, so a click never rebuilds them.
+  // The area's money, jobs and firm counts, every series over its years, for the crawl tables: built from the props alone, so a click never rebuilds them.
   const crawlModels = useCrawlModels(() => businessAreaCrawlStates(area, facts).map(crawl =>
     buildBusinessWorkbookExportModel({ area, facts, state: crawl, labels, sources, siteOrigin, title }, presentation)));
   // The chart is named after the heading of the selection's unit group.

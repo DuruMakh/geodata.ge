@@ -44,7 +44,7 @@ export type TransportAreaState = TopicState;
 export const transportAreaCoverage = (area: TransportArea, facts: readonly ClientTransportFact[], selectedIds: readonly string[] = []) =>
   transportListCoverage(transportAreaSeries(area), selectedIds, facts);
 
-/** The hidden crawl tables' states: each unit of the area's list, every row of it with facts. */
+/** The crawl tables' states: each unit of the area's list, every row of it with facts. */
 export const transportAreaCrawlStates = (area: TransportArea, facts: readonly ClientTransportFact[]): TransportAreaState[] =>
   unitListCrawlStates(transportAreaSeries(area), facts);
 

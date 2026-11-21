@@ -33,7 +33,7 @@ export function defaultHealthDeathsState(): HealthDeathsState {
 
 const coverage = (area: HealthArea, facts: readonly ClientHealthFact[]) => healthSeriesCoverage(facts, area, healthDeathsSeries(), `No causes-of-death years for ${area}`);
 
-/** The hidden crawl tables' state (lib/explorer/crawlTables.ts): all deaths and every cause the area has, over every year; none for an area without deaths. */
+/** The crawl tables' state (lib/explorer/crawlTables.ts): all deaths and every cause the area has, over every year; none for an area without deaths. */
 export const healthDeathsCrawlStates = (area: HealthArea, facts: readonly ClientHealthFact[]): HealthDeathsState[] =>
   unitListCrawlStates(healthDeathsSeries(), facts.filter(f => f.areaId === area));
 

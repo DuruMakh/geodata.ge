@@ -83,7 +83,7 @@ export const internetCoverage = (section: InternetTopicId, facts: readonly Clien
   return unitListCoverage(definitions, selectedIds, facts, noInternetYears(definitions), headingOf(definitions));
 };
 
-/** The hidden crawl tables' states: each heading of the page's list (one group of people each), every row of it with facts. */
+/** The crawl tables' states: each heading of the page's list (one group of people each), every row of it with facts. */
 export const internetCrawlStates = (section: InternetTopicId, facts: readonly ClientInternetFact[]): InternetState[] => {
   const definitions = internetTopicSeries(section);
   return unitListCrawlStates(definitions, facts, headingOf(definitions));

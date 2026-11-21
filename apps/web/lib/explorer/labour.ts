@@ -110,7 +110,7 @@ export function changeLabourSelection(state: LabourState, section: LabourSection
   return { ...state, selectedIds: [...next], range: refitRange(state.range, labourCoverage(section, facts, next), { collapseToAll: false }) };
 }
 
-/** The hidden crawl tables' state (lib/explorer/crawlTables.ts): the page's one unit, every row with a published figure, over every year. */
+/** The crawl tables' state (lib/explorer/crawlTables.ts): the page's one unit, every row with a published figure, over every year. */
 export const labourCrawlStates = (section: LabourSectionId, facts: readonly ClientLabourFact[]): LabourState[] =>
   unitListCrawlStates(labourSeries(section), facts);
 

@@ -52,7 +52,7 @@ export function MarriageSection({
   const state = useMemo(() => ({ ...defaultMarriageState(), measure }), [measure]);
   const model = useMemo(() => buildMarriageModel(facts, state), [facts, state]);
   const name = placeLabel(place, locale);
-  // The counts as published and per 1,000 over every year, for the hidden crawl tables: built from the props alone, so a click never rebuilds them.
+  // The counts as published and per 1,000 over every year, for the crawl tables: built from the props alone, so a click never rebuilds them.
   const crawlModels = useCrawlModels(() => {
     const words = (key: string) => message(presentation.messages, `demography.${key}`);
     const labels = { marriages: words("marriageSeries.marriages"), divorces: words("marriageSeries.divorces") };

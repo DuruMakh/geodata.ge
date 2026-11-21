@@ -123,7 +123,7 @@ export function EnvironmentExplorer({ scope, facts, labels, sources, lastReviewe
   // a group whose newest figure is older (a station that closed) names its year in its heading.
   const listEnd = resolveRange(state.range, list.coverage(facts)).end;
   const listRows = listLatestByHeading(facts, model.series, listEnd);
-  // Every unit of the list, every row of it over its years, for the hidden crawl tables: built from the props alone, so a click never rebuilds them.
+  // Every unit of the list, every row of it over its years, for the crawl tables: built from the props alone, so a click never rebuilds them.
   const crawlModels = useCrawlModels(() => environmentListCrawlStates(list.series(facts), facts).map(crawl =>
     buildEnvironmentWorkbookExportModel({ ...workbookPage(scope), facts, state: crawl, labels, sources, siteOrigin, title }, presentation)));
   const downloadAction = <ExcelDownloadButton testId="environment-excel-download" disabled={!model.selected.length} onDownload={async () => {

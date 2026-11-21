@@ -183,7 +183,7 @@ export function getDefaultSelection(
 export type BudgetCrawlState = { scope: ExplorerScope; grouping: ExpenditureGrouping; selectedIds: string[]; startYear: number; endYear: number; share: boolean };
 
 /**
- * The hidden crawl tables of a route (lib/explorer/crawlTables.ts): per scope it offers, every series of that scope's list
+ * The crawl tables of a route (lib/explorer/crawlTables.ts): per scope it offers, every series of that scope's list
  * (a ministry's programmes too) from the first to the last year of the scope's rows, the years budgetYearsByScope
  * (components/main-explorer) offers it — in amounts, then as % of GDP, since the page lists no GDP to work the shares out
  * from. A scope without rows has no state; without a GDP year in the scope's span it has no % of GDP state.

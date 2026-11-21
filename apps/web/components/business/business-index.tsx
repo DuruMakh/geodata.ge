@@ -38,7 +38,7 @@ export function BusinessIndex({ facts, regionMaps }: {
   const largestName = publicLabel(locale, largest.regionId, largest.nameKa, englishLabels);
   const georgiaValue = facts.find(f => f.indicatorId === TOTAL_ID[measure] && f.year === regionMap.year)?.value;
   const mapLabel = t(`map.${measure}`);
-  // The hidden every-year tables print both measures as the region pages' own tables do: million GEL and persons.
+  // The every-year tables print both measures as the region pages' own tables do: million GEL and persons.
   const crawl = (["turnover", "employed"] as const).map(each => ({
     model: regionMaps[each],
     metric: each === "turnover"

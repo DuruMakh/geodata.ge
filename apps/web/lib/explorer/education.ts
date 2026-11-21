@@ -113,7 +113,7 @@ export function defaultEducationState(section: EducationTopicId): EducationState
   return { mode: "line", range: { kind: "all" }, selectedIds: educationDefaultSelection(section) };
 }
 
-/** The hidden crawl tables' states: every row counts persons, so one state with every row Georgia has facts for. */
+/** The crawl tables' states: every row counts persons, so one state with every row Georgia has facts for. */
 export function educationCrawlStates(section: EducationTopicId, facts: readonly ClientEducationFact[]): EducationState[] {
   return unitListCrawlStates(educationTopicSeries(section), facts.filter(f => f.geographyId === EDUCATION_GEORGIA), () => "persons");
 }

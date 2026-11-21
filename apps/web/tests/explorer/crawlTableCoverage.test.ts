@@ -2,7 +2,7 @@ import { readdirSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 
-// Every chart page carries every series of every view as hidden crawl tables, built by the page's own Excel workbook
+// Every chart page carries every series of every view as crawl tables, built by the page's own Excel workbook
 // builders, so crawlers and AI tools read the numbers (DESIGN.md §8.4 Table Mode).
 const RULE = "Every file under components/ that calls a workbook builder (build…Workbook…Model) renders <CrawlTables models={…} /> and passes no crawlCopy prop; see DESIGN.md §8.4 Table Mode.";
 const read = (file: string) => readFileSync(resolve(process.cwd(), file), "utf8");
@@ -32,7 +32,7 @@ describe("crawl table coverage", () => {
   });
 
   it("crawl models are built through useCrawlModels, never in a useMemo the browser would run", () => {
-    // The browser never builds them: a crawl useMemo cost Trading partners over half a second of hydration (DESIGN.md §8.4).
+    // Hydration never builds them: a crawl useMemo cost Trading partners over half a second of it (DESIGN.md §8.4).
     const crawlFiles = sourceFiles("components").filter((file) => file !== "components/explorer-shell/crawl-tables.tsx" && /<CrawlTables|export function use\w+CrawlModels\(/.test(read(file)));
     expect(crawlFiles.length).toBeGreaterThanOrEqual(47);
     expect(crawlFiles.filter((file) => /<CrawlTables/.test(read(file)) && !/\buse\w*CrawlModels\(/.test(read(file))), "These files render <CrawlTables without useCrawlModels.").toEqual([]);

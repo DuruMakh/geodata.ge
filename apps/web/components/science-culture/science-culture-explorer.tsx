@@ -66,7 +66,7 @@ export function ScienceCultureExplorer({ section, facts, breaks, labels, sources
   const headline = model.series.find(series => series.reference)!;
   const latest = facts.filter(f => f.indicatorId === headline.id).sort((a, b) => a.year - b.year).at(-1)!;
   const title = t(`page.${section}.title`);
-  // Every unit of the list, every row of it over its years, for the hidden crawl tables: built from the props alone, so a click never rebuilds them.
+  // Every unit of the list, every row of it over its years, for the crawl tables: built from the props alone, so a click never rebuilds them.
   const crawlModels = useCrawlModels(() => scienceCultureCrawlStates(section, facts).map(crawl =>
     buildScienceCultureWorkbookExportModel({ section, facts, state: crawl, labels, sources, siteOrigin, title }, presentation)));
   const downloadAction = <ExcelDownloadButton testId="science-culture-excel-download" disabled={!state.selectedIds.length} onDownload={async () => {

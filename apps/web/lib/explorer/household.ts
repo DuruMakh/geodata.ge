@@ -68,7 +68,7 @@ function householdYears(section: HouseholdSectionId, area: HouseholdArea, measur
 }
 
 /**
- * The hidden crawl tables' states (lib/explorer/crawlTables.ts): per household and per person (the page lists no household
+ * The crawl tables' states (lib/explorer/crawlTables.ts): per household and per person (the page lists no household
  * size, so the per-person figures appear nowhere else), every series the area lists, over every year; a measure without
  * years has none.
  */

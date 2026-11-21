@@ -24,7 +24,7 @@ export type EducationIndexModel = {
   /** The 11 regions ranked highest first. */
   regions: MunicipalListRow[];
   country: MunicipalListRow;
-  /** Every school year of the measure for every listed place, for the page's hidden crawl tables. */
+  /** Every school year of the measure for every listed place, for the page's crawl tables. */
   history: IndexHistory;
 };
 

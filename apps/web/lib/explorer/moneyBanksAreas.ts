@@ -23,7 +23,7 @@ export const moneyBanksAreaCoverage = (area: MoneyBanksArea, facts: readonly Cli
   return topicCoverage(facts.filter(f => ids.has(f.indicatorId)).map(f => f.year), `No loans by region years for ${area}`);
 };
 
-/** The hidden crawl tables' state (lib/explorer/crawlTables.ts): the area's three loan rows, over every year; none for an area without loans. */
+/** The crawl tables' state (lib/explorer/crawlTables.ts): the area's three loan rows, over every year; none for an area without loans. */
 export const moneyBanksAreaCrawlStates = (area: MoneyBanksArea, facts: readonly ClientMoneyBanksFact[]): TopicState[] =>
   unitListCrawlStates(moneyBanksAreaSeries(area), facts);
 

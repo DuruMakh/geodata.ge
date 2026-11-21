@@ -70,7 +70,7 @@ export function EnergyFoodExplorer({ section, facts, labels, sources, lastReview
   const note = section === "energy-supply" ? t("latestNote.energy-supply", { value: plain("energy.imports.total") })
     : section === "electricity" ? t("latestNote.electricity", { imports: plain("electricity.imports"), exports: plain("electricity.exports") }) : undefined;
   const title = t(`page.${section}.title`);
-  // Every group of the list a chart can hold, every row of it over its years, for the hidden crawl tables: built from the props alone, so a click never rebuilds them.
+  // Every group of the list a chart can hold, every row of it over its years, for the crawl tables: built from the props alone, so a click never rebuilds them.
   const crawlModels = useCrawlModels(() => energyFoodCrawlStates(section, facts).map(crawl =>
     buildEnergyFoodWorkbookExportModel({ section, facts, state: crawl, labels, sources, siteOrigin, title }, presentation)));
   const downloadAction = <ExcelDownloadButton testId="energy-food-excel-download" disabled={!model.selected.length} onDownload={async () => {

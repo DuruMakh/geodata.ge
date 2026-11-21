@@ -21,7 +21,7 @@ export type VitalIndexModel = {
   /** Municipalities (Tbilisi as 04) whose deaths exceeded births in the latest year. */
   deathsAhead: number;
   municipalityCount: number;
-  /** Every year of the index's figures for every listed place, for the page's hidden crawl tables. */
+  /** Every year of the index's figures for every listed place, for the page's crawl tables. */
   history: IndexHistory;
 };
 

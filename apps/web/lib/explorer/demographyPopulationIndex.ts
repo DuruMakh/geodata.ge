@@ -23,7 +23,7 @@ export type PopulationIndexModel = {
   /** Persons per km² in the latest density year, for Georgia and the regions only. */
   densityByPlace: Readonly<Record<string, number>>;
   densityYear: number;
-  /** Every year of the index's figures for every listed place, for the page's hidden crawl tables. */
+  /** Every year of the index's figures for every listed place, for the page's crawl tables. */
   history: IndexHistory;
 };
 

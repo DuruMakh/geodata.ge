@@ -137,7 +137,7 @@ export function defaultMoneyBanksState(section: MoneyBanksTopicId): MoneyBanksSt
 }
 
 /**
- * The hidden crawl tables' states (lib/explorer/crawlTables.ts): each view with every series it lists, over every year; a view
+ * The crawl tables' states (lib/explorer/crawlTables.ts): each view with every series it lists, over every year; a view
  * without facts (% of GDP without GDP) has none. The foreign-currency shares are a currency's loans or deposits over their
  * total, both listed on the amounts, so that switch has no state; % of GDP divides by a GDP the page does not list, so it keeps one.
  */

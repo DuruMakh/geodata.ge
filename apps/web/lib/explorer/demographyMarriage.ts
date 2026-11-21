@@ -114,7 +114,7 @@ export function changeMarriageSelection(state: MarriageState, next: readonly str
 }
 
 /**
- * The hidden crawl tables' states: the counts and the years (ages, length) the place has, as published, and the counts per
+ * The crawl tables' states: the counts and the years (ages, length) the place has, as published, and the counts per
  * 1,000 residents (kept: the page lists no population; the years read the same in both measures). Without a mid-year
  * population the rates have no state.
  */

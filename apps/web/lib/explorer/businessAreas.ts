@@ -38,7 +38,7 @@ export function businessAreaCoverage(area: BusinessArea, facts: readonly ClientB
   return businessListCoverage(businessAreaSeries(area), selectedIds, facts);
 }
 
-/** The hidden crawl tables' states: the area's money, jobs and firm counts, each group with every series it has facts for. */
+/** The crawl tables' states: the area's money, jobs and firm counts, each group with every series it has facts for. */
 export const businessAreaCrawlStates = (area: BusinessArea, facts: readonly ClientBusinessFact[]): BusinessAreaState[] =>
   unitListCrawlStates(businessAreaSeries(area), facts);
 

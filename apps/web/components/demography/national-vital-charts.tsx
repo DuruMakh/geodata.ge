@@ -38,7 +38,7 @@ export function NationalVitalCharts({
   const { messages } = presentation;
   const t = (key: string, values?: TemplateValues) => message(messages, `demography.${key}`, values);
   useAppReady();
-  // The fertility workbook (the total rate and the seven age rates) and the life expectancy one, for the hidden crawl tables:
+  // The fertility workbook (the total rate and the seven age rates) and the life expectancy one, for the crawl tables:
   // built from the props alone, so a click never rebuilds them.
   const crawlModels = useCrawlModels(() => [buildFertilityWorkbookExportModel({ facts, sources, siteOrigin }, presentation), buildLifeWorkbookExportModel({ facts, sources, siteOrigin }, presentation)]);
   const [tfrMode, setTfrMode] = useState<ChartMode>("line");

@@ -66,7 +66,7 @@ export function WagesExplorer({ section, facts: shippedFacts, labels, sources, l
   // The latest-value line states the page's own place: Georgia, or the region.
   const latest = wagesPlaceLatest(facts, regionId);
   const title = regionId ? t("regionTitle", { region: regionName }) : t(`page.${section}.title`);
-  // Every group's series over its years, for the hidden crawl tables: built from the props alone, so a click never rebuilds them.
+  // Every group's series over its years, for the crawl tables: built from the props alone, so a click never rebuilds them.
   const crawlModels = useCrawlModels(() => wagesCrawlStates(section, facts).map(crawl =>
     buildWagesWorkbookExportModel({ section, facts, state: crawl, labels, sources, siteOrigin, title, regionId }, presentation)));
   const changeView = (view: WagesView) => { if (view === state.view) return; setQuery(""); update(s => changeWagesView(s, section, view, facts), true); };

@@ -18,7 +18,7 @@ export function moneyTransfersBulkSelection(data: ClientMoneyTransfersData): str
   return [...data.entities.map(entity => entity.id), OTHER_COUNTRIES_ID];
 }
 /**
- * The hidden crawl tables' states (lib/explorer/crawlTables.ts): each measure with facts, everything a saved view may select
+ * The crawl tables' states (lib/explorer/crawlTables.ts): each measure with facts, everything a saved view may select
  * (the model keeps the rows its list offers: the total, the end year's top 10 and Other countries), over every year.
  */
 export function moneyTransfersCrawlStates(data: ClientMoneyTransfersData): MoneyTransfersState[] {

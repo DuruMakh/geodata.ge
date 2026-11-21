@@ -225,7 +225,7 @@ describe("compare across the census re-base", () => {
 });
 
 // Parity: the cells each dataset serves are the cells the pages' own workbook models print, the models their Excel files
-// and hidden crawl tables are built from, fed exactly as the pages feed them.
+// and crawl tables are built from, fed exactly as the pages feed them.
 
 /** Each model's rows, named: the place it is about and how a row's label names a served series. */
 type Reader = (row: WorkbookReadableRow) => ParityTarget | null;

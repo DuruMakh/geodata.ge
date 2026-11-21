@@ -76,7 +76,7 @@ export function HealthExplorer({ section, facts, breaks, labels, sources, lastRe
   const measureLabel = section === "illnesses" || state.view === views[0] ? t(`latest.${section}`) : labels[headline];
   const title = t(`page.${section}.title`);
   const chartLabel = views.length > 1 ? t(`view.${state.view}`) : title;
-  // Every view's series, one table per unit, over their years, for the hidden crawl tables: built from the props alone, so a click never rebuilds them.
+  // Every view's series, one table per unit, over their years, for the crawl tables: built from the props alone, so a click never rebuilds them.
   const crawlModels = useCrawlModels(() => healthCrawlStates(section, facts).map(crawl =>
     buildHealthWorkbookExportModel({ section, facts, state: crawl, labels, sources, siteOrigin, title }, presentation)));
   const changeView = (view: HealthView) => {

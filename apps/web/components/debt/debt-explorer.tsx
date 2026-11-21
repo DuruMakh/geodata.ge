@@ -82,7 +82,7 @@ export function DebtExplorerSurface(props: DebtExplorerSurfaceProps) {
     range: props.range,
     shareOfGdp: props.shareOfGdp,
   }, presentation), [props.facts, props.gdpFacts, props.family, props.selectedIds, props.range, props.shareOfGdp, presentation]);
-  // Every family's series over its whole span, for the hidden crawl tables: built from the props alone, so a click never
+  // Every family's series over its whole span, for the crawl tables: built from the props alone, so a click never
   // rebuilds them.
   const crawlModels = useCrawlModels(() => debtCrawlStates(props.facts, props.gdpFacts).map((crawl) => buildDebtWorkbookExportModel({
     facts: props.facts,

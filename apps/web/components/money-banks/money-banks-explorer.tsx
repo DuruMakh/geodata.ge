@@ -76,7 +76,7 @@ export function MoneyBanksExplorer({ section, facts, labels, sources, gdpFacts, 
   const preliminaryGdpYears = state.view === "gdp" ? model.years.filter(year => gdpFacts.some(f => f.year === year && f.status === "preliminary")) : [];
   const latestValue = latest.unit === "gel" ? formatAmount(latest.value, locale) : `${formatInUnit(latest.value, { divisor: 1, label: "", decimals: latest.decimals })}${t("unitPercent")}`;
   const title = t(`page.${section}.title`);
-  // Every series of each view over every year, for the hidden crawl tables: built from the props alone, so a click never rebuilds them.
+  // Every series of each view over every year, for the crawl tables: built from the props alone, so a click never rebuilds them.
   const crawlModels = useCrawlModels(() => moneyBanksCrawlStates(section, facts, gdpFacts).map(crawl =>
     buildMoneyBanksWorkbookExportModel({ section, facts, state: crawl, labels, sources, siteOrigin, title, gdpFacts, gdpSources }, presentation)));
   const tabLabel = state.view === "main" ? title : t(`tab.${state.view}`);

@@ -27,7 +27,7 @@ export function UnemploymentRegionsIndex({ model, explorer }: { model: RegionMap
     return () => { window.removeEventListener("hashchange", restore); window.removeEventListener("popstate", restore); };
   }, []);
   useAppReady();
-  // The comparison only opens in the browser, so the map view carries its hidden crawl tables for readers that run no page code.
+  // The comparison only opens in the browser, so the map view carries its crawl tables for readers that run no page code.
   const crawlModels = useUnemploymentCrawlModels(explorer);
   const t = (key: string) => message(messages, `unemployment.${key}`);
   // An in-app move to the same path drops the hash without a hashchange event, so the click leaves comparison itself.

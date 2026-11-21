@@ -36,7 +36,7 @@ export function CurrentAccount({ facts, gdp, sources, gdpSources = NO_SOURCES, l
   const presentation = useI18n(), { locale, messages } = presentation;
   const t = (key: string, values?: Record<string, string | number>) => message(messages, `external.account.${key}`, values);
   const { state, update } = useHashState(facts, parseCurrentAccountHash, serializeCurrentAccountHash), model = buildCurrentAccountModel(facts, gdp, state, presentation);
-  // Every tab in US dollars and as % of GDP, all five series over their years, for the hidden crawl tables: built from the props alone, so a click never rebuilds them.
+  // Every tab in US dollars and as % of GDP, all five series over their years, for the crawl tables: built from the props alone, so a click never rebuilds them.
   const crawlModels = useCrawlModels(() => currentAccountCrawlStates(facts, gdp).map(crawl =>
     buildCurrentAccountWorkbookModel({ facts, gdp, state: crawl, sources, gdpSources, siteOrigin }, presentation)));
   const balance = state.tab === "balance", percent = state.unit === "gdp";

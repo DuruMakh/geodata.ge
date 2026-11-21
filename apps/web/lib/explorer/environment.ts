@@ -114,7 +114,7 @@ export function parseEnvironmentListHash(hash: string, definitions: readonly Env
 export const changeEnvironmentListSelection = (state: TopicState, definitions: readonly EnvironmentSeriesDefinition[], next: readonly string[], facts: readonly ClientEnvironmentFact[]): TopicState =>
   changeUnitListSelection(state, withFacts(definitions, facts), next, facts, noYears(definitions));
 
-/** The hidden crawl tables' states of a topic, city or area list: each unit, every row of it with facts. */
+/** The crawl tables' states of a topic, city or area list: each unit, every row of it with facts. */
 export const environmentListCrawlStates = (definitions: readonly EnvironmentSeriesDefinition[], facts: readonly ClientEnvironmentFact[]): EnvironmentState[] =>
   unitListCrawlStates(withFacts(definitions, facts), facts);
 

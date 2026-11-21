@@ -20,7 +20,7 @@ export type CurrentAccountModel = {
 };
 
 /**
- * The hidden crawl tables' states (lib/explorer/crawlTables.ts): each tab whose flow has facts, in US dollars and, when there
+ * The crawl tables' states (lib/explorer/crawlTables.ts): each tab whose flow has facts, in US dollars and, when there
  * is GDP, as % of GDP (the page lists no GDP to work the shares out from), each with all five series over every year.
  */
 export function currentAccountCrawlStates(facts: readonly ClientCurrentAccountFact[], gdp: readonly CurrentAccountGdp[]): CurrentAccountState[] {

@@ -126,7 +126,7 @@ export function defaultBusinessState(section: BusinessTopicId): BusinessState {
   return { mode: "line", range: { kind: "all" }, selectedIds: businessDefaultSelection(section) };
 }
 
-/** The hidden crawl tables' states: each unit of the page's list (Firms' counts and rates apart), every series of it. */
+/** The crawl tables' states: each unit of the page's list (Firms' counts and rates apart), every series of it. */
 export const businessCrawlStates = (section: BusinessTopicId, facts: readonly ClientBusinessFact[]): BusinessState[] =>
   unitListCrawlStates(businessTopicSeries(section), facts);
 

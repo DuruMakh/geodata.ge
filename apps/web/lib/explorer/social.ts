@@ -237,7 +237,7 @@ export function socialCoverage(section: SocialTopicId, view: SocialPayView, fact
 }
 
 /**
- * The hidden crawl tables' states (lib/explorer/crawlTables.ts): each heading of each view, every row of it with facts, over
+ * The crawl tables' states (lib/explorer/crawlTables.ts): each heading of each view, every row of it with facts, over
  * every year. The % of GDP view is kept, as the page lists no GDP, for the headings that have it; without GDP facts it has none.
  */
 export function socialCrawlStates(section: SocialTopicId, facts: readonly ClientSocialFact[], gdpFacts: readonly ClientNationalGdpFact[]): SocialState[] {

@@ -92,7 +92,7 @@ export function EducationPlaceExplorer({
   const reference = model.series.find(series => series.reference);
   const placeName = placeLabel(place, locale);
   const chartLabel = `${headingLabels[model.heading]} · ${placeName}`;
-  // Every heading the place lists, every row of it over its years, for the hidden crawl tables: built from the props alone, so a click never rebuilds them.
+  // Every heading the place lists, every row of it over its years, for the crawl tables: built from the props alone, so a click never rebuilds them.
   const crawlModels = useCrawlModels(() => educationPlaceCrawlStates(set, place.id, facts).map(crawl => buildEducationWorkbookExportModel({
     set, placeId: place.id, scope: workbookScope, facts, state: crawl, labels, headingLabels, sources, siteOrigin, title: `${title} ${placeName}`,
   }, presentation)));

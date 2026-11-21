@@ -26,7 +26,7 @@ export function parseTradePartnersHash(hash: string, data: ClientTradePartnersDa
   return { mode: params.get("view") === "table" ? "table" : "line", measure: measures.some(id => id === measure) ? measure : measures[0], tab: data.dataset === "composition" ? "categories" : data.dataset === "services" ? data.dimension === "countries" ? "countries" : "types" : params.get("tab") === "groups" && data.entities.some(entity => entity.kind === "group") ? "groups" : "countries", range: refitRange(parseYearRangeKeys(params), tradePartnersCoverage(data), { collapseToAll: true }), selectedIds: tradePartnersBulkSelection(data).filter(id => requested.includes(id)) };
 }
 /**
- * The hidden crawl tables' states (lib/explorer/crawlTables.ts): each measure the page offers, with everything the bulk action
+ * The crawl tables' states (lib/explorer/crawlTables.ts): each measure the page offers, with everything the bulk action
  * ticks (the total, every country and every group), over every year. The Countries and Groups tabs only change the ranking
  * and the list shown, not the selection, so they are not states of their own. A measure without a published value has none.
  */

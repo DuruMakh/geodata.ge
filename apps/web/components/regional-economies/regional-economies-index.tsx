@@ -42,7 +42,7 @@ export function RegionalEconomiesIndex({ model, sourceNote }: { model: RegionalE
  * leadRow is an unranked row above the ranked list, linked through hrefForRegion (a plain row without it).
  * headingLevel 3 nests the overview and list titles under a section title of the page's own.
  * title names the map's share picture; shareTestId tells its button apart on a page with another chart.
- * crawl writes, on the server only, a hidden every-year table per entry (DESIGN.md §8.4): the entry's lead row, then its
+ * crawl writes an every-year table per entry (DESIGN.md §8.4): the entry's lead row, then its
  * model's regions in rank order and those without a value; an entry's model needs a history.
  */
 export function RegionIndex({ title, model, sourceNote, metric, summary = [], leadRow, mapControls, headingLevel = 2, shareTestId, crawl }: {

@@ -26,7 +26,7 @@ export function tradeProductsCoverage(data: ClientTradeProductsData, state?: Pic
   const min = available.size ? Math.min(...available) : years[0], max = available.size ? Math.max(...available) : years.at(-1)!;
   return { min, max, years: years.filter(year => year >= min && year <= max) };
 }
-/** The hidden crawl tables' states (lib/explorer/crawlTables.ts): each measure, every product the bulk action ticks, over every year; a measure without a published value has none. */
+/** The crawl tables' states (lib/explorer/crawlTables.ts): each measure, every product the bulk action ticks, over every year; a measure without a published value has none. */
 export function tradeProductsCrawlStates(data: ClientTradeProductsData): TradeProductsState[] {
   const published = new Set(data.facts.filter(fact => fact[3] !== null).map(fact => fact[2]));
   const selectedIds = tradeProductsBulkSelection(data);

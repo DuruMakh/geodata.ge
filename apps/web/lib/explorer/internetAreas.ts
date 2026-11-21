@@ -34,7 +34,7 @@ const noYears = (area: InternetArea) => `No internet years for ${area}`;
 export const internetAreaCoverage = (area: InternetArea, facts: readonly ClientInternetFact[], selectedIds: readonly string[] = []) =>
   unitListCoverage(internetAreaSeries(area), selectedIds, facts, noYears(area));
 
-/** The hidden crawl tables' states: the area's homes with internet and with a computer, every row with facts (all shares of homes, so one table). */
+/** The crawl tables' states: the area's homes with internet and with a computer, every row with facts (all shares of homes, so one table). */
 export const internetAreaCrawlStates = (area: InternetArea, facts: readonly ClientInternetFact[]): InternetAreaState[] =>
   unitListCrawlStates(internetAreaSeries(area), facts);
 

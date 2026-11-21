@@ -29,7 +29,7 @@ export function resolveRange(range: PeriodRange, { min, max }: PeriodCoverage): 
 }
 
 /**
- * The months a monthly page's hidden crawl tables carry (spec §3.4): whole calendar years up to `count` months, from
+ * The months a monthly page's crawl tables carry (spec §3.4): whole calendar years up to `count` months, from
  * January of (latest year − 2) through the latest month for 36, so a year row never shows a dash for a published month.
  * Periods here are month indices (year × 12 + month − 1).
  */

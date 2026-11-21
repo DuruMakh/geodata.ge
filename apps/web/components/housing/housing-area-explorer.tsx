@@ -67,7 +67,7 @@ export function HousingAreaExplorer({ area, facts, labels, areaLabels, sources, 
   const latest = housingAreaLatest(area, facts);
   const areaName = areaLabels[area];
   const title = t("page.area.regionTitle", { region: areaName });
-  // The area's numbers and floor areas, every series over its years, for the hidden crawl tables: built from the props alone, so a click never rebuilds them.
+  // The area's numbers and floor areas, every series over its years, for the crawl tables: built from the props alone, so a click never rebuilds them.
   const crawlModels = useCrawlModels(() => housingAreaCrawlStates(area, facts).map(crawl =>
     buildHousingWorkbookExportModel({ area, facts, state: crawl, labels, sources, siteOrigin, title }, presentation)));
   // The chart is named after the heading of the selection's unit (its text before the unit).

@@ -35,7 +35,7 @@ export function MoneyBanksIndex({ facts, regionMap }: {
   const largest = regionMap.regions[0];
   const largestName = publicLabel(locale, largest.regionId, largest.nameKa, englishLabels);
   const georgiaValue = facts.find(f => f.year === regionMap.year)?.value;
-  // The hidden every-year table prints million GEL to one decimal, finer than the map's billions.
+  // The every-year table prints million GEL to one decimal, finer than the map's billions.
   const crawl = [{ model: regionMap, lead: { label: t("area.georgia"), valuesByYear: Object.fromEntries(facts.map(f => [f.year, f.value])) }, metric: {
     legend: `${mapLabel} · ${message(messages, "format.mlnGel")}`, formatValue: (value: number) => formatCrawlCell(value / 1_000_000, null, "#,##0.0", locale),
   } }];

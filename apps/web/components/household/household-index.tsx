@@ -34,7 +34,7 @@ export function HouseholdIndex({ section, facts, regionMaps }: {
   const regionMap = regionMaps[measure];
   const totalLabel = t(`series.${sectionTotal(section)}`);
   const georgiaValue = georgia(measure).find(f => f.year === regionMap.year)?.value;
-  // The hidden every-year tables carry both measures, whichever the map shows.
+  // The every-year tables carry both measures, whichever the map shows.
   const crawl = HOUSEHOLD_MEASURES.map(m => ({
     model: regionMaps[m], lead: { label: t("area.georgia"), valuesByYear: Object.fromEntries(georgia(m).map(f => [f.year, f.value])) },
     metric: { legend: `${totalLabel} · ${t(`unitLong.${m}`)}`, formatValue: (value: number) => formatCrawlCell(value, null, "#,##0.0", locale) },

@@ -1,7 +1,7 @@
 // apps/web/tests/factQuery/topics/parity.ts
 //
 // The page-parity check every topic adapter's test runs (spec §7.1): the cells a dataset serves equal the cells the page's
-// own workbook models print, the models its Excel download and hidden crawl tables are built from. Only `match` is
+// own workbook models print, the models its Excel download and crawl tables are built from. Only `match` is
 // family-specific: it names the served entity and series a workbook row shows.
 import type { TopicDatasetBuild, TopicFact } from "../../../lib/factQuery/topics/types";
 import { readableRowLabel, type WorkbookExportModel, type WorkbookReadableRow } from "../../../lib/explorer/workbookModel";

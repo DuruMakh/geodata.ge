@@ -140,7 +140,7 @@ export function defaultEnergyFoodState(section: EnergyFoodSectionId): EnergyFood
   return { mode: "line", range: { kind: "all" }, selectedIds: [energyFoodSeries(section)[0].id] };
 }
 
-/** The hidden crawl tables' states: each group one chart can hold (`energyFoodGroup`), every row of it with facts. */
+/** The crawl tables' states: each group one chart can hold (`energyFoodGroup`), every row of it with facts. */
 export function energyFoodCrawlStates(section: EnergyFoodSectionId, facts: readonly ClientEnergyFoodFact[]): EnergyFoodState[] {
   return unitListCrawlStates(energyFoodSeries(section), facts, energyFoodGroup);
 }

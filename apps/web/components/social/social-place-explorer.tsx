@@ -103,7 +103,7 @@ export function SocialPlaceExplorer({
   const newCounting = t("break.newCounting");
   const placeName = placeLabel(place, locale);
   const chartLabel = `${headingLabels[model.heading]} · ${placeName}`;
-  // Every heading the place has, every row of it over its years, for the hidden crawl tables: built from the props alone, so a click never rebuilds them.
+  // Every heading the place has, every row of it over its years, for the crawl tables: built from the props alone, so a click never rebuilds them.
   const crawlModels = useCrawlModels(() => socialPlaceCrawlStates(set, shown).map(crawl => buildSocialWorkbookExportModel({
     set, placeId: place.id, scope: workbookScope, facts, state: crawl, extras: { population, cpi }, labels, headingLabels,
     sources, populationSources, cpiSources, gdpSources: [], siteOrigin, title: `${title} ${placeName}`,

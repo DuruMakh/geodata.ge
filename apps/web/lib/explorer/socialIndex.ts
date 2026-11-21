@@ -22,7 +22,7 @@ export type SocialIndexModel = {
   regions: MunicipalListRow[];
   /** Georgia, first and unranked. */
   country: MunicipalListRow;
-  /** Every year of the recipients count and of the share for every listed place, for the page's hidden crawl tables. */
+  /** Every year of the recipients count and of the share for every listed place, for the page's crawl tables. */
   history: IndexHistory;
 };
 

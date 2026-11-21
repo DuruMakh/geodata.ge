@@ -74,7 +74,7 @@ export function BusinessExplorer({ section, facts, labels, sources, lastReviewed
   const latestValue = section === "jobs" ? `${formatInUnit(latest.value, { divisor: 1_000, label: "", decimals: 1 })} ${t("unitThousandPersons")}` : section === "firms" ? count(latest.value) : formatAmount(latest.value, locale);
   const closed = section === "firms" ? facts.find(f => f.indicatorId === "business.deaths.total" && f.year === latest.year) : undefined;
   const title = t(`page.${section}.title`);
-  // Every unit's series over its years, for the hidden crawl tables: built from the props alone, so a click never rebuilds them.
+  // Every unit's series over its years, for the crawl tables: built from the props alone, so a click never rebuilds them.
   const crawlModels = useCrawlModels(() => businessCrawlStates(section, facts).map(crawl =>
     buildBusinessWorkbookExportModel({ section, facts, state: crawl, labels, sources, siteOrigin, title }, presentation)));
   const chartLabel = percent ? t("measure.rate") : title;

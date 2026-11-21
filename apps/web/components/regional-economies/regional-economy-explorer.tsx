@@ -67,7 +67,7 @@ export function RegionalEconomyExplorer({
   const t = (key: string) => message(messages, `regionalEconomies.${key}`);
   const { state, update } = useRegionalEconomyState(facts, registry);
   const model = useMemo(() => buildRegionalEconomyModel(facts, registry, state), [facts, registry, state]);
-  // The region's total and every sector over every year, for the hidden crawl tables: built from the props alone, so a
+  // The region's total and every sector over every year, for the crawl tables: built from the props alone, so a
   // click never rebuilds them (unpackFacts returns the same rows for the same props).
   const crawlModels = useCrawlModels(() => regionalEconomyCrawlStates(facts, registry).map((crawl) =>
     buildRegionalEconomyWorkbookExportModel(facts, registry, crawl, region, presentation, sources, siteOrigin)));
