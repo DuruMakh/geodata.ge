@@ -177,14 +177,14 @@ test("the table shows arrivals, departures and net with a total row", async ({ p
   await page.goto(`/en${PATH}`);
   await ready(page);
   await page.getByTestId("chart-mode-table").click();
-  await expect(page.getByRole("table")).toContainText("205,857");
+  await expect(page.getByTestId("explorer-table")).toContainText("205,857");
   const totalRow = page.getByTestId("explorer-table").locator("tbody tr").last();
   await expect(totalRow).toContainText("Total");
   await expect(totalRow).toContainText("205,857");
   await page.getByTestId("migration-direction-departures").click();
-  await expect(page.getByRole("table")).toContainText("245,064");
+  await expect(page.getByTestId("explorer-table")).toContainText("245,064");
   await page.getByTestId("migration-direction-net").click();
-  await expect(page.getByRole("table")).toContainText("−39,207");
+  await expect(page.getByTestId("explorer-table")).toContainText("−39,207");
   await expect(page).toHaveURL(/dir=net/);
 });
 

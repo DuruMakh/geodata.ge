@@ -16,8 +16,10 @@ test.describe("births and deaths on a place page", () => {
       const section = page.getByTestId("vital-section");
       await expect(section).not.toContainText("Births and deaths registered in");
       await section.getByTestId("vital-mode-table").click();
-      await expect(section.getByRole("table")).toContainText(caption);
-      await expect(section.getByRole("table")).toContainText("Natural increase");
+      // The section's own table, in its chart panel; its data-table block (DESIGN.md §8.4) follows the panel.
+      const table = section.getByTestId("vital-chart-panel").getByRole("table");
+      await expect(table).toContainText(caption);
+      await expect(table).toContainText("Natural increase");
     });
   }
 

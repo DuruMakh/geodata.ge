@@ -60,7 +60,7 @@ test.describe("marriages and divorces page", () => {
     await ready(page);
     await expect(page.getByTestId("marriage-section")).toBeInViewport();
     await page.getByTestId("marriage-mode-table").click();
-    await expect(page.getByTestId("marriage-section").getByRole("table")).toContainText("Marriages and divorces, Kazbegi, 2009–2025");
+    await expect(page.getByTestId("marriage-chart-panel").getByRole("table")).toContainText("Marriages and divorces, Kazbegi, 2009–2025");
   });
 });
 
