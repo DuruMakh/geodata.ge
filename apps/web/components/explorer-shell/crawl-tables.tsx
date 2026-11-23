@@ -51,7 +51,8 @@ export function CrawlTableBlock({ tables, category }: { tables: readonly CrawlTa
 }
 
 /**
- * Every series of a chart page as a visible data-table block, so visitors and every kind of reader get the numbers. Pass
+ * Every series of a chart page as a data-table block: in the page's HTML and its accessibility tree, so an AI reader, a
+ * search engine and a screen reader get the numbers, and off screen for a visitor (`globals.css`, DESIGN.md §8.4). Pass
  * models from useCrawlModels: the server writes the block as HTML; while the browser has no models the block's HTML is ""
  * and hydration keeps the server's.
  */

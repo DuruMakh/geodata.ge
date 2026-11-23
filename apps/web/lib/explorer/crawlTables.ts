@@ -4,7 +4,7 @@ import { workbookMessage } from "../i18n/workbook";
 import { MISSING } from "./format";
 import { readableBasisLabel, readableRowLabel, type WorkbookBasis, type WorkbookExportModel, type WorkbookReadableRow } from "./workbookModel";
 
-/** The most cells a page's first, visible tables hold. */
+/** The most cells a page's first tables hold: the ones before the block's fold. */
 export const CRAWL_CELL_CAP = 3000;
 /**
  * The most text a page's first tables hold, as a reader prints them (`crawlReaderChars`): what a reader with a short window
@@ -168,7 +168,7 @@ export function crawlReaderChars(tables: readonly CrawlTable[]): number {
 }
 
 /**
- * A page's tables. First the ones a visitor and every reader see: each model with rows, sharing `CRAWL_CELL_CAP` cells and,
+ * A page's tables. First the ones a reader with a short window still reaches: each model with rows, sharing `CRAWL_CELL_CAP` cells and,
  * as text, `CRAWL_WINDOW_CHARS`; a table over its share keeps its totals and its largest series. Then the rest, marked `rest`: the other series of each cut
  * table, in workbook order, and the `earlier` models (the periods before a monthly page's window) whole. The page stops at
  * `CRAWL_PAGE_CELL_CAP`: a rest table that cannot be whole keeps its largest series, and its caption says so.
@@ -255,10 +255,11 @@ export function crawlTablesHtml(tables: readonly CrawlTable[], category: string)
 }
 
 /**
- * A page's data-table block, the inner HTML of its crawl-tables wrapper (DESIGN.md §8.4): a label, then one scrolling region
- * a keyboard reaches, with the first tables in view and the `rest` tables folded in a closed <details>. A closed <details>
- * costs a visitor no rendering, and readers that take the page's HTML keep its content. Nothing here carries a class:
- * `globals.css` styles the block from its wrapper.
+ * A page's data-table block, the inner HTML of its crawl-tables wrapper (DESIGN.md §8.4): a label, then one named region with
+ * the first tables and the `rest` tables folded in a closed <details>. A closed <details> costs a visitor no rendering, and
+ * readers that take the page's HTML keep its content. The block is not on screen (`globals.css` hides its wrapper), so
+ * nothing in it is a keyboard stop: the region takes no tabindex and the summary leaves the tab order, while a screen
+ * reader still opens it. Nothing here carries a class.
  */
 export function crawlBlockHtml(tables: readonly CrawlTable[], labels: { category: string; heading: string; rest: string }): string {
   if (tables.length === 0) return "";
@@ -266,6 +267,6 @@ export function crawlBlockHtml(tables: readonly CrawlTable[], labels: { category
   const rest = tables.filter((table) => table.rest);
   const heading = escapeHtml(labels.heading);
   // The region's name carries its first caption, so two blocks on one page (a section each) are told apart.
-  return `<p>${heading}</p><div role="region" aria-label="${heading}: ${escapeHtml(tables[0]!.caption)}" tabindex="0">${crawlTablesHtml(first, labels.category)}` +
-    `${rest.length > 0 ? `<details><summary>${escapeHtml(labels.rest)}</summary>${crawlTablesHtml(rest, labels.category)}</details>` : ""}</div>`;
+  return `<p>${heading}</p><div role="region" aria-label="${heading}: ${escapeHtml(tables[0]!.caption)}">${crawlTablesHtml(first, labels.category)}` +
+    `${rest.length > 0 ? `<details><summary tabindex="-1">${escapeHtml(labels.rest)}</summary>${crawlTablesHtml(rest, labels.category)}</details>` : ""}</div>`;
 }

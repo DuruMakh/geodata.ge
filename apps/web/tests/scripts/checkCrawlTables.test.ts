@@ -2,12 +2,12 @@ import { describe, expect, it } from "vitest";
 import { crawlWrappers } from "../../scripts/check-crawl-tables";
 
 const table = (label: string) => `<table><caption>${label}</caption><thead><tr><th>Category</th><th>2024</th></tr></thead><tbody><tr><th>A</th><td>1</td></tr></tbody></table>`;
-const block = (inner: string) => `<div data-testid="crawl-tables" class="crawl-tables"><p>Data table</p><div role="region" aria-label="Data table: T" tabindex="0">${inner}</div></div>`;
+const block = (inner: string) => `<div data-testid="crawl-tables" class="crawl-tables"><p>Data table</p><div role="region" aria-label="Data table: T">${inner}</div></div>`;
 const page = (body: string) => `<html><head><title>T</title><style>p{color:red}</style></head><body>${body}</body></html>`;
 
 describe("crawlWrappers (npm run crawl:check)", () => {
   it("reads a block's first tables and its folded rest apart", () => {
-    const [wrapper, ...more] = crawlWrappers(page(`<main><h1>Title</h1>${block(`${table("First")}<details><summary>The rest of the data</summary>${table("Rest")}</details>`)}</main>`));
+    const [wrapper, ...more] = crawlWrappers(page(`<main><h1>Title</h1>${block(`${table("First")}<details><summary tabindex="-1">The rest of the data</summary>${table("Rest")}</details>`)}</main>`));
     expect(more).toEqual([]);
     expect(wrapper!.first).toContain("<caption>First</caption>");
     expect(wrapper!.first).not.toContain("Rest");
@@ -28,11 +28,11 @@ describe("crawlWrappers (npm run crawl:check)", () => {
     ["an inert ancestor", `<div inert="">${block(table("T"))}</div>`, "inert"],
     ["an ancestor styled display:none", `<div style="color:red;display:none">${block(table("T"))}</div>`, "display:none"],
     ["a closed details ancestor", `<details><summary>More</summary>${block(table("T"))}</details>`, "a closed <details>"],
-  ])("names what keeps a block out of view: %s", (_name, body, reason) => {
+  ])("names what keeps a block from a reader: %s", (_name, body, reason) => {
     expect(crawlWrappers(page(body)).map((wrapper) => wrapper.hiddenBy)).toEqual([reason]);
   });
 
-  it("is in view after a hidden sibling, inside an open details, and beside void and self-closed tags", () => {
+  it("is kept after a hidden sibling, inside an open details, and beside void and self-closed tags", () => {
     const html = page(`<div hidden="">gone</div><img src="a.png"><br/><svg><path d="M0 0"/></svg><details open=""><summary>S</summary>${block(table("T"))}</details>`);
     expect(crawlWrappers(html).map((wrapper) => wrapper.hiddenBy)).toEqual([null]);
   });

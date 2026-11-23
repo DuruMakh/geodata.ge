@@ -20,11 +20,11 @@ const model: WorkbookExportModel = {
 const models = (...list: WorkbookExportModel[]) => ({ models: list, earlier: [] });
 const block = (locale: "en" | "ka", inner: string) => {
   const heading = locale === "en" ? "Data table" : "მონაცემთა ცხრილი";
-  return `<div data-testid="crawl-tables" class="crawl-tables"><p>${heading}</p><div role="region" aria-label="${heading}: T · GEL · 2024–2025 · Actual" tabindex="0">${inner}</div></div>`;
+  return `<div data-testid="crawl-tables" class="crawl-tables"><p>${heading}</p><div role="region" aria-label="${heading}: T · GEL · 2024–2025 · Actual">${inner}</div></div>`;
 };
 
 describe("CrawlTables", () => {
-  it.each(["en", "ka"] as const)("renders one visible, plain table per model in %s, in a named scrolling region", (locale) => {
+  it.each(["en", "ka"] as const)("renders one plain table per model in %s, in a named region", (locale) => {
     expect(renderPageMarkup(locale, <CrawlTables models={models(model)} />)).toBe(block(locale,
       `<table><caption>T · GEL · 2024–2025 · Actual</caption><thead><tr><th>${workbookMessage(locale, "workbook.category")}</th><th>2024</th><th>2025</th></tr></thead>` +
       `<tbody><tr><th>Total</th><td>1.0</td><td>2.0</td></tr><tr><th>Other</th><td>3.0</td><td>—</td></tr></tbody></table>`,
@@ -48,7 +48,7 @@ describe("CrawlTables", () => {
   it("folds the earlier-period models below the first tables", () => {
     const earlier: WorkbookExportModel = { ...model, readable: { ...model.readable, title: "Earlier" } };
     const markup = renderPageMarkup("en", <CrawlTables models={{ models: [model], earlier: [earlier] }} />);
-    expect(markup).toContain("</table><details><summary>The rest of the data</summary><table><caption>Earlier · GEL · 2024–2025 · Actual</caption>");
+    expect(markup).toContain('</table><details><summary tabindex="-1">The rest of the data</summary><table><caption>Earlier · GEL · 2024–2025 · Actual</caption>');
     expect(markup.endsWith("</table></details></div></div>")).toBe(true);
   });
 

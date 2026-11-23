@@ -171,7 +171,7 @@ describe("crawlTables", () => {
     expect(crawlReaderChars([first])).toBeLessThanOrEqual(CRAWL_WINDOW_CHARS);
     // The window is used, not merely respected: no more than a tenth of it stays empty.
     expect(crawlReaderChars([first])).toBeGreaterThan(CRAWL_WINDOW_CHARS * 0.9);
-    // The largest series stay in view, in workbook order; the others follow, none lost.
+    // The largest series stay in the first table, in workbook order; the others follow, none lost.
     expect(first.rows.map((r) => r.label)).toEqual(items.slice(140 - first.rows.length).map((r) => r.label));
     expect(first.caption.endsWith(`top ${first.rows.length} of 140; the others follow below`)).toBe(true);
     expect(rest.rest).toBe(true);
@@ -320,21 +320,21 @@ describe("crawlBlockHtml", () => {
     expect(crawlBlockHtml([], labels)).toBe("");
   });
 
-  it("is a label and one named, focusable scrolling region around the tables", () => {
-    expect(crawlBlockHtml([table], labels)).toBe(`<p>Data table</p><div role="region" aria-label="Data table: C" tabindex="0">${tableHtml}</div>`);
+  it("is a label and one named region around the tables, with nothing a keyboard stops at", () => {
+    expect(crawlBlockHtml([table], labels)).toBe(`<p>Data table</p><div role="region" aria-label="Data table: C">${tableHtml}</div>`);
   });
 
-  it("folds the rest tables in a closed details element, after the first ones", () => {
+  it("folds the rest tables in a closed details element, after the first ones, with its summary out of the tab order", () => {
     const rest = { ...table, caption: "D", rest: true as const };
     expect(crawlBlockHtml([table, rest, table], labels)).toBe(
-      `<p>Data table</p><div role="region" aria-label="Data table: C" tabindex="0">${tableHtml}${tableHtml}` +
-      `<details><summary>The rest of the data</summary>${tableHtml.replace("<caption>C", "<caption>D")}</details></div>`,
+      `<p>Data table</p><div role="region" aria-label="Data table: C">${tableHtml}${tableHtml}` +
+      `<details><summary tabindex="-1">The rest of the data</summary>${tableHtml.replace("<caption>C", "<caption>D")}</details></div>`,
     );
   });
 
   it("escapes its labels, and carries no class or style", () => {
     const html = crawlBlockHtml([{ ...table, caption: `"A" & B` }], { category: "Category", heading: "<Data>", rest: "R" });
-    expect(html.startsWith(`<p>&lt;Data&gt;</p><div role="region" aria-label="&lt;Data&gt;: &quot;A&quot; &amp; B" tabindex="0">`)).toBe(true);
+    expect(html.startsWith(`<p>&lt;Data&gt;</p><div role="region" aria-label="&lt;Data&gt;: &quot;A&quot; &amp; B">`)).toBe(true);
     expect(html).not.toMatch(/class=|style=/);
   });
 });

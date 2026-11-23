@@ -49,9 +49,9 @@ describe("index crawl tables", () => {
     expect(tables[1]!.caption).toContain("Regions");
   });
 
-  it("IndexCrawlTables writes the visible data-table block, on the server and in the browser alike", () => {
+  it("IndexCrawlTables writes the data-table block, on the server and in the browser alike", () => {
     const html = renderPageMarkup("en", React.createElement(IndexCrawlTables, { tables: [table], category: "Place" }));
-    expect(html.startsWith('<div data-testid="crawl-tables" class="crawl-tables"><p>Data table</p><div role="region" aria-label="Data table: Schools · Pupils · 2015/16–2016/17" tabindex="0"><table>')).toBe(true);
+    expect(html.startsWith('<div data-testid="crawl-tables" class="crawl-tables"><p>Data table</p><div role="region" aria-label="Data table: Schools · Pupils · 2015/16–2016/17"><table>')).toBe(true);
     expect(html).toContain("<td>3,936</td>");
     expect(html).toContain("<th>Place</th>");
     expect(renderPageMarkup("en", React.createElement(IndexCrawlTables, { tables: [], category: "Place" }))).toBe('<div data-testid="crawl-tables" class="crawl-tables"></div>');

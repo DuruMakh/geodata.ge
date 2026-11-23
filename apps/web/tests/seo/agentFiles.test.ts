@@ -298,6 +298,11 @@ describe("Fiscal.ge agent instructions", () => {
     expect(content).toContain("Map pages (such as Population, Pensions, Schools and the by-region pages) have a year-by-year table of every place they list");
     expect(content).not.toContain("list the latest year");
   });
+  it("says a chart page's tables are in its HTML and not drawn on screen", async () => {
+    const content = await llmsText();
+    expect(content).toContain('Each chart page carries a "Data table" in its HTML, not drawn on screen: a year-by-year table of every series');
+    expect(content).not.toContain('shows a "Data table"');
+  });
   it("is at most half the size of the hand-written guide it replaced", async () => {
     expect(Buffer.byteLength(await llmsText())).toBeLessThanOrEqual(27_000);
   });

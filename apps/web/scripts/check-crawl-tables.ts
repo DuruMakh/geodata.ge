@@ -1,5 +1,6 @@
-// The data-table blocks on a production build (DESIGN.md §8.4): every chart page carries one, in view (nothing hides it or
-// an ancestor of it), its first tables hold no more than the cell cap and the whole block no more than the page cap, the
+// The data-table blocks on a production build (DESIGN.md §8.4): every chart page carries one that a reader of the HTML
+// keeps (no attribute on it or on an ancestor hides it: the stylesheet alone keeps it off screen), its first tables hold no
+// more than the cell cap and the whole block no more than the page cap, the
 // HTML stays within its size ceiling, and a few known figures reach the prerendered HTML. It also reports how much of each
 // page a short-window AI reader keeps (about 40,000 characters): where the first tables end.
 // Run after `NEXT_PUBLIC_SITE_URL=https://fiscal.ge npm run build`: `npm run crawl:check`. Not part of `npm run check`.
@@ -42,9 +43,9 @@ const CHART_PANEL = /data-testid="(?:[\w-]*chart-panel|municipal-chart-controls)
 export const READER_WINDOW_CHARS = 40_000;
 
 /**
- * One data-table block: `first` is its tables in view, `rest` the ones folded in its <details>. `hiddenBy` names what keeps
- * the block out of view (an attribute on it or an ancestor), and `readerEnd` is about how many characters a
- * markdown-converting reader has taken from the page when the first tables end.
+ * One data-table block: `first` is its tables before the fold, `rest` the ones folded in its <details>. `hiddenBy` names
+ * what keeps the block from a reader of the HTML (an attribute on it or an ancestor), and `readerEnd` is about how many
+ * characters a markdown-converting reader has taken from the page when the first tables end.
  */
 export type CrawlWrapper = { first: string; rest: string; hiddenBy: string | null; readerEnd: number };
 type Page = { route: string; html: string; wrappers: CrawlWrapper[]; firstCells: number; cells: number; gzip: number; payloadTables: boolean };
@@ -214,7 +215,7 @@ export async function checkCrawlTables(root = process.cwd(), { sizeReportOnly = 
   for (const page of missing) failures.push(`${page.route}: a chart panel but no data table`);
   for (const page of pages) {
     if (page.html.includes(HIDDEN_WRAPPER)) failures.push(`${page.route}: a crawl-tables wrapper with the hidden attribute, which AI readers drop`);
-    for (const wrapper of page.wrappers) if (wrapper.hiddenBy) failures.push(`${page.route}: a data table is out of view, under ${wrapper.hiddenBy}`);
+    for (const wrapper of page.wrappers) if (wrapper.hiddenBy) failures.push(`${page.route}: a data table is kept from readers of the HTML, under ${wrapper.hiddenBy}`);
   }
   for (const route of Object.keys(NO_CRAWL_TABLES)) {
     for (const prefix of ["", "en/"]) {
