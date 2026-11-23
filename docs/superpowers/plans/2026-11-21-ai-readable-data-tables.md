@@ -122,3 +122,18 @@
 - [ ] The page passes every category fact inline (`packCategoryFacts(categories.map(categoryFactInput))`); `monthlyUrl`, `usePageData`, the pending state, `categoryTabLoaded` and the `inflation-category-mom` page-data file go. Product inflation keeps its fetched file.
 - [ ] `crawl:check` spot check: the folded rest of Inflation by category holds a monthly-change row for 2004 with twelve figures. `llms.txt` names Product inflation as the one page whose data loads after it opens.
 - [ ] Browser spec: the monthly tab draws without a `/page-data/` request, the fold holds two monthly-change tables and the first tables none; the page's compressed size stays under its new limit. Build, serve, run the specs that open the page, then `npm run check` once. Commit.
+
+### Task 10: Off screen for visitors (added 2026-11-23; spec §10)
+
+**Files:** Modify `lib/explorer/crawlTables.ts` (`crawlBlockHtml`), `app/globals.css`, `lib/seo/llmsText.ts`, `scripts/check-crawl-tables.ts` (wording only), `components/explorer-shell/crawl-tables.tsx` and `index-crawl-tables.tsx` (comments), `DESIGN.md` §8.4 and its §17 line. Test `tests/explorer/crawlTables.test.ts`, `tests/explorer/indexCrawlTables.test.ts`, `tests/explorer/crawlTablesComponent.test.tsx`, `tests/scripts/checkCrawlTables.test.ts`, `tests/seo/agentFiles.test.ts`, `tests/browser/crawl-table.spec.ts`.
+
+- [ ] Unit tests first, red: `crawlBlockHtml` writes `<div role="region" aria-label="…">` with no `tabindex` and `<details><summary tabindex="-1">`. Then `crawlBlockHtml` to green; nothing else in the block's HTML changes.
+- [ ] Browser spec first, red on the old build: per wrapper `[width, height, position, overflow, clip-path]` is `[1, 1, "absolute", "hidden", "inset(50%)"]` and its region has a name; at 390 and 1366px no element inside a block has `tabIndex >= 0`, axe is clean, and `[scrollWidth, scrollHeight]` of the page is the same after the blocks are removed.
+- [ ] `globals.css`: one rule replaces every `.crawl-tables` rule: `position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap`. No `hidden`, `aria-hidden`, `inert` or `display: none` anywhere, and no `sr-only` class in the HTML.
+- [ ] Found by the test of the first build: under `content-visibility: auto` the page's `innerText` holds none of the tables. Browser spec first, red: each block's `innerText` contains its first caption and the page's figure, and its computed `content-visibility` is `visible`. Then the property goes.
+- [ ] Found by the test of the second build, which kept the property under `@media (pointer: coarse)`: a clipped 1px box is never near the viewport, so a touch device never lays the tables out. Browser spec first, red: with `hasTouch` and `isMobile` the block's `content-visibility` is `visible` and its `innerText` holds the page's figure. Then the media rule goes; measure what the layout costs a phone (spec §10.3).
+- [ ] `llms.txt`, test first: 'Each chart page carries a "Data table" in its HTML, not drawn on screen: …'; the 27,000-byte cap holds.
+- [ ] Build, serve, the spec to green; `npm run crawl:check`; replay every built page as the reader's text and compare it with the replay of 2026-11-21; screenshots of sampled pages with the blocks and with them removed, and against a build of `main`, compared pixel for pixel.
+- [ ] Fresh agents on the new build's replayed text; `npm run check`; the whole browser suite once. Commit.
+- [ ] Push, pull request; the real Claude reader on the Vercel preview if a share link admits it; after release the real reader and Gemini on live pages.
+

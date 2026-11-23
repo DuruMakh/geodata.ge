@@ -1,6 +1,6 @@
 # Every page's data readable by AI (design)
 
-Date: 2026-11-21 · Owner: Duru · Branch: `claude/project-thread-fywkfr`
+Date: 2026-11-21, revised 2026-11-23 (§10: the block is off screen for visitors) · Owner: Duru · Branch: `claude/project-thread-fywkfr`
 
 ## 1. Why
 
@@ -37,6 +37,7 @@ Readers that render the page first (in-browser assistants, screenshot agents) on
 
 Goals
 1. On every chart page and map page, the tables are ordinary visible content that every kind of reader keeps.
+   (Revised by §10: in the page's HTML and accessibility tree, and off screen for a visitor.)
 2. Nothing the page charts is left out of its HTML: series now cut by the cap and months now cut by the 36-month
    window follow in the same block.
 3. The first 3,000 cells stay the most useful ones, so a short-window reader loses the least.
@@ -62,6 +63,10 @@ it is what Duru described. The rest of a large page (the other trade partners, e
 closed `<details>` inside the same block: it costs a visitor no rendering until opened, and the readers measured in §2
 keep it. C is rejected: it hides content from people on purpose, which is the pattern that just failed in another form.
 
+Revised 2026-11-23: Duru saw A, had not expected the pages to change, and chose C for how the block looks. §10 has the
+decision, what was measured before building it, and what it gives up. The two tiers (§5.2) and everything about what
+the block holds stand.
+
 ## 5. Design
 
 ### 5.1 The block
@@ -84,6 +89,8 @@ The `<table>` markup itself does not change. Nothing inside carries a class: `gl
 `.crawl-tables` descendant selectors, and `.crawl-tables:empty` takes no space (a section with nothing to show). The
 label is a paragraph, not a heading, so a page with several blocks keeps its heading outline, and the region's name
 carries its first caption so two blocks on one page do not share a name (both decided while building).
+
+(The look below was built, shown to Duru and then replaced: §10. The block now has no visible styling.)
 
 Look (DESIGN.md v4.1, no cards, shadows or gradients): the period-comparison rhythm (`36px` above, a hairline rule,
 `24px` padding), an overline label (11px, 600, muted), then one scrolling region at most `26rem` tall that scrolls
@@ -171,7 +178,7 @@ and would rebuild 3,000 cells during hydration).
 3. Fresh agents given only that replayed text answer the test questions: education spending as % of GDP by year,
    Khulo's pupils 2015/16 and 2025/26, a trade partner outside the old top 23, a 2015 inflation month.
 4. In a browser: the block is visible, keyboard reachable, passes axe, fits a 390px phone with no page-level sideways
-   scroll, and appears after a client-side navigation with the new page's figures.
+   scroll, and appears after a client-side navigation with the new page's figures. (Replaced by §10.4.)
 5. `npm run check`, `npm run build`, the browser suite and `crawl:check` pass. Site gzip stays under its ceiling.
 6. After release: Claude's fetch and Gemini answer the same questions from the live pages.
 
@@ -220,3 +227,131 @@ and would rebuild 3,000 cells during hydration).
 - Found on the screenshots, now that people see the tables too: the rule that keeps a small amount from printing as
   zero also gave rates a false precision (annual inflation of 0.0037% in January 2024, where the chart says 0.0%).
   It now applies to amounts only; a percentage or a signed change keeps its format's decimals (DESIGN.md §8.4).
+
+## 10. Off screen for visitors (owner decision, 2026-11-23)
+
+Duru saw the visible block and had not expected the pages to change ("So UI is changing?", 2026-11-22). One card
+offered three looks: keep it visible; one closed line that a visitor opens; hidden from visitors by styling. On
+2026-11-23 16:41 Tbilisi Duru chose the third: "That styling option but please test that it's working". The card said
+what it costs: pages do not change, Claude and Gemini read the tables, an AI that looks at the screen does not, and
+screen readers read out every table.
+
+### 10.1 Measured before building
+
+The real Claude reader (web fetch) on the live Expenditure page, 2026-11-23: text that a stylesheet class hides came
+back (the chart's `sr-only` figcaption "Total expenditure, 2026: 30.9 bn (Planned)", the `sr-only` caption of the
+period comparison, the skip link), and the tables under the `hidden` attribute did not (1,177.8 and 2,626.5 absent).
+Hiding by stylesheet is safe for that reader; hiding by attribute is not (§2).
+
+### 10.2 Approaches
+
+| | 1. The `sr-only` class on the wrapper | 2. The same declarations on the block's own class | 3. `display: none` from the stylesheet |
+| --- | --- | --- | --- |
+| The HTML | gains a class that names the hiding | what was tested on 2026-11-21, but for two `tabindex` attributes | unchanged |
+| Readers of the HTML | keep it (measured), unless one drops known hiding class names | keep it | keep it |
+| Accessibility tree and the page's text in a browser (`innerText`) | kept | kept | dropped |
+| A visitor | sees nothing | sees nothing | sees nothing |
+
+**Chosen: 2.** The HTML the readers were tested on stays as it was, nothing in it says "hidden", and the tables stay in
+the accessibility tree and in the page's text, so a screen reader and an assistant that reads either of those still
+get them. 3 takes them away from both.
+
+### 10.3 Design
+
+- `globals.css`: the block's visible styling goes (151 lines). One rule on `.crawl-tables` carries the declarations of
+  Tailwind's `sr-only` (`position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden;
+  clip-path: inset(50%); white-space: nowrap`). A page is laid out as if its blocks were not there.
+- The tables are laid out, only clipped, on every device. The first build of this section kept the visible version's
+  `content-visibility: auto` on the block, and the test of 2026-11-23 found what that costs: the browser's own text of
+  the page (`document.body.innerText`) holds none of its tables (0 of 1,190 first cells on Expenditure; all 1,190
+  without it). An assistant built into a browser reads that text, so the property went. The second build kept it for
+  touch devices (`@media (pointer: coarse)`) to spare a phone the layout, on the belief that the tables are laid out
+  once the block nears the viewport. They are not: a clipped 1px box never counts as near, and after scrolling to the
+  block the page's text still held none of them (0 of 1,416 first cells on Trading partners). So the property is gone
+  on every device, and a phone's browser gives an assistant the same text as a computer's.
+- What laying the tables out costs a phone (phone viewport, touch, CPU slowed 4x, median of five loads, against a
+  block under `display: none`): main-thread work while the page loads +0.50 s on Inflation by category, +0.32 s on
+  Trading partners, +0.51 s on Marriages and divorces, +0.25 s on Expenditure, and under 0.1 s on a region page and on
+  Government debt; of that, time blocked by long tasks +0.06, +0.13, +0.14 and +0.06 s on the four heavy pages; first
+  paint unchanged. 20 pages hold 2,000 cells or more in their first tables, 40 hold 1,000 or more, and the median page
+  holds 186. A tap on a series afterwards costs the same either way (same phone, median of 12 taps, tap to second
+  frame: 242 and 257 ms laid out against 250 and 266 ms under `display: none` on Trading partners, 130 and 148 against
+  130 and 141 ms on Expenditure).
+- `crawlBlockHtml`: the region loses `tabindex="0"` (nobody scrolls it now) and the summary of the fold gets
+  `tabindex="-1"`, so no keyboard stop sits where a sighted visitor sees nothing. A screen reader still reads the
+  region, its tables, and opens the rest.
+- `llms.txt` says the "Data table" is in the page's HTML and not drawn on screen.
+- Everything else stands: the two tiers and their caps, the words, the block a page builds when it is opened by a link
+  inside the site, `crawl:check`'s failures (an attribute that hides the block or an ancestor).
+
+### 10.4 Success criteria (4 is replaced; 1 to 3, 5 and 6 stand)
+
+4. In a browser, every block is a clipped 1px box out of the page's flow; removing the blocks changes neither the
+   width nor the height of a page; nothing inside a block takes the Tab key; axe passes; each block's tables are in
+   the page's `innerText`, on a touch device too; a page opened by a link inside the site carries
+   the block the server writes for it.
+7. Sampled pages look the same, pixel for pixel, with the blocks and with them removed, and against a build of `main`.
+8. The reader's text of every built page is what it was on the build of 2026-11-21 (only `llms.txt` and the two
+   `tabindex` attributes changed), and fresh agents answer from it again.
+9. The real Claude reader on the Vercel preview, if a share link lets it in; after release, the real reader and Gemini
+   on live pages (criterion 6).
+
+### 10.5 What it gives up, said plainly
+
+- **An AI that reads the screen** (screenshots, computer use) sees no table. An assistant that takes the page's text
+  or its accessibility tree from a browser, on a computer or a phone, still gets the first tables, and the folded rest
+  only if it opens it.
+- **A slow phone** does 0.25 to 0.5 s more work while one of the 20 heaviest pages loads (§10.3). What it paints
+  first does not change.
+- **Screen reader users** meet a "Data table" region with every table on each chart page. It is a named region, so it
+  can be skipped, and it holds the chart's own data.
+- **Search engines.** Text kept for assistive technology is allowed, and these tables repeat what the chart draws. If
+  it were ever read as hidden text, the fallback is approach B of §4: one closed line that opens.
+
+### 10.6 Results (2026-11-23, production build of this branch)
+
+- **A visitor's page against `main`.** A full-page screenshot of each of the 1,466 pages with a block, at a phone
+  viewport with touch and at a computer viewport (2,932 page views), on this build and on a build of `main`: 2,929
+  pairs are byte-identical. The other three are computer views of pages with the wide heat map (Wages by industry in
+  both languages, the Georgian Age and sex), and the capture makes the difference, not the page: a full-page
+  screenshot in headless Chromium at times shrinks the window to 1x1 and back, and the heat map, which opens at its
+  newest years, then stands a few columns to the left (14 and 15 of 24 captures on this build, 0 and 1 of 24 on
+  `main`, 0 of 24 with the blocks removed). With a viewport as tall as the page and an ordinary screenshot, the six
+  heat-map pages equal `main` in 18 of 18 computer captures and 16 of 18 phone captures, and `main` against itself
+  differs as often on a phone (5 of 12). After a visitor's own resize (a narrower and a wider window, a phone turned
+  and back) the heat map stands at the same place on both builds.
+- **With the blocks and with them removed**, on the build before the last fix: 2,929 of 2,932 full-page screenshot
+  pairs identical at the first pass. One of the three was the tool (its second capture did not wait for a phone's
+  series list; identical in 3 of 3 runs once it did); two differ in one pixel by 1/255 of one colour channel, as two
+  captures of the unchanged page also do (7 of 12 on the English Wages by industry).
+- **Every block in a browser** (the same 2,932 page views): each of the 3,588 blocks is a clipped 1px box out of the
+  page's flow, no ancestor hides it, nothing inside takes the Tab key, its `content-visibility` is `visible`, and the
+  page's `innerText` holds its tables, on 1,466 of 1,466 phone views and 1,466 of 1,466 computer views.
+- **Readers of the HTML.** `npm run crawl:check` passes: 1,466 pages, 294,734 cells in the first tables and 446,186
+  in all, site gzip 55,031,659 bytes. The replayed reader text of all 1,557 built pages, whole and cut at 40,000
+  characters, is byte for byte that of the final build of 2026-11-21, so §9 stands for this build.
+- **Other kinds of reader, 20 pages** (10,689 distinct cells in their first tables, 2,469 in the folded rest). Two
+  HTML-to-text converters keep every cell of both. The browser's page text and its accessibility tree, on a computer
+  and on a touch phone, keep every first cell on 20 of 20 pages; of the folded rest they hold only what the page
+  prints elsewhere too (36%), because a closed `<details>` is in neither until it is opened. Find-in-page finds a
+  table's figure on 19 of 19 pages. Article extraction (Mozilla Readability) keeps every first cell on 18 of 20.
+- **Fresh agents, 8 readers and 190 answers, none wrong.** On the build before the last fix: the smallest model with
+  the cut reader text (23 of 23 figures named by caption, row and column), two with the browser's page text (31 of 31
+  and 29 of 29), one with the accessibility tree (33 of 33), and a larger model answering ordinary questions from the
+  page text (11 of 11). On this build, from a touch phone's page text: two of the smallest model (25 of 25 each, among
+  them "not in the text" for two figures that lie in the fold) and a larger one on ordinary questions (13 of 13: VAT
+  in 2019 was 5,239.0 million GEL and 10.5% of GDP, Batumi had 169,095 people at the start of 2020 and 2,952 births
+  in 2022, unemployment at 20 to 24 was 41.0% in 2021, exports to Azerbaijan in 2023 were 0.862 billion USD). With
+  §9, 24 readers and 355 answers.
+- **Gates.** `npm run check` passes (8,152 unit tests, 46 data checks, the translation check) and so does the build.
+  The whole browser suite against this build in a cloud session: 2,630 of 2,633 pass. Two fail there on `main` as well
+  and pass in CI (`mobile-fit-charts.spec.ts:345` on the English Kindergartens page, `seo.spec.ts:460`, the styled
+  sitemap view). One passed on its retry: `debt.spec.ts:326`, Back and Forward on the debt page. Its code path
+  (`use-hash-state.ts`) is `main`'s byte for byte, and repeated alone it passes 200 of 200 on this build and 200 of
+  200 on `main`, half of each with the machine kept busy.
+- **What the tests found, both fixed before release** (§10.3): `content-visibility: auto` on the block took its tables
+  out of the page's text, first everywhere and then, kept for touch devices only, on phones and tablets.
+- **Found, not fixed.** Article extraction keeps every first-table cell on 1,324 of the 1,386 chart pages measured and
+  almost none on 62, where it takes another part of the page for the article (the region pages of the regional
+  economy, Causes of death, Trading partners and a dozen others). It does the same with the block visible, so it is
+  not a cost of this section, and nothing in the page's HTML is missing for it.
