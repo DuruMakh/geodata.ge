@@ -129,7 +129,7 @@ function MainExplorerContent({ nav, facts: shippedFacts, adminFacts: shippedAdmi
     ? message(messages, "main.expenditureHeading")
     : message(messages, "main.revenueHeading");
 
-  // Every series of every scope the route offers, for the hidden crawl tables: built from the props alone, so a click
+  // Every series of every scope the route offers, for the crawl tables: built from the props alone, so a click
   // never rebuilds them.
   const crawlModels = useCrawlModels(() => budgetCrawlStates(nav, facts, adminFacts, gdpFacts).map((crawl) => buildWorkbookExportModel(buildBudgetWorkbookInput({
     model: buildExplorerModel({

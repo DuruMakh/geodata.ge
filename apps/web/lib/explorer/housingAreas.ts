@@ -45,7 +45,7 @@ export type HousingAreaState = TopicState;
 export const housingAreaCoverage = (area: HousingArea, facts: readonly ClientHousingFact[], selectedIds: readonly string[] = []) =>
   housingListCoverage(housingAreaSeries(area), selectedIds, facts);
 
-/** The hidden crawl tables' states: the area's numbers and floor areas, each group with every series it has facts for. */
+/** The crawl tables' states: the area's numbers and floor areas, each group with every series it has facts for. */
 export const housingAreaCrawlStates = (area: HousingArea, facts: readonly ClientHousingFact[]): HousingAreaState[] =>
   unitListCrawlStates(housingAreaSeries(area), facts);
 

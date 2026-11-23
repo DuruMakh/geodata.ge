@@ -60,7 +60,7 @@ export function PovertyExplorer({ section, facts, labels, sources, lastReviewedA
   const latestKey = state.view === "relative" || state.view === "international" ? state.view : section;
   const title = t(`page.${section}.title`);
   const tabLabel = state.view === "main" ? title : t(`tab.${state.view}`);
-  // Every tab's series over its years, for the hidden crawl tables: built from the props alone, so a click never rebuilds them.
+  // Every tab's series over its years, for the crawl tables: built from the props alone, so a click never rebuilds them.
   const crawlModels = useCrawlModels(() => povertyCrawlStates(section, facts).map(crawl =>
     buildPovertyWorkbookExportModel({ section, facts, state: crawl, labels, sources, siteOrigin, title }, presentation)));
   const changeView = (view: PovertyView) => { if (view === state.view) return; setQuery(""); setExpanded({}); update(s => changePovertyView(s, section, view, facts), true); };

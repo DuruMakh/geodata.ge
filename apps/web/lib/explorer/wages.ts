@@ -87,7 +87,7 @@ export function defaultWagesState(section: WagesSectionId, facts: readonly Clien
   return { mode: "line", range: { kind: "all" }, view, selectedIds: [wagesViewSeries(section, view, facts)[0].id] };
 }
 
-/** The hidden crawl tables' states (lib/explorer/crawlTables.ts): each view (Industries' eight groups), every series its list offers, over every year; a view without years has none. */
+/** The crawl tables' states (lib/explorer/crawlTables.ts): each view (Industries' eight groups), every series its list offers, over every year; a view without years has none. */
 export function wagesCrawlStates(section: WagesSectionId, facts: readonly ClientWagesFact[]): WagesState[] {
   return wagesViews(section).filter(view => comparedYears(section, view, facts).length > 0)
     .map(view => ({ mode: "line", range: { kind: "all" }, view, selectedIds: wagesViewSeries(section, view, facts).map(series => series.id) }));

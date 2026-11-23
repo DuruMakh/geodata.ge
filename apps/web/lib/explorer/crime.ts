@@ -109,7 +109,7 @@ export function changeCrimeMeasure(state: CrimeState, measure: CrimeMeasure): Cr
 }
 
 /**
- * The hidden crawl tables' states: each unit of the list (Road accidents' accidents and people apart), as published counts
+ * The crawl tables' states: each unit of the list (Road accidents' accidents and people apart), as published counts
  * and per 100,000 people (kept: the page lists no population). Without a population year the rates have no state.
  */
 export function crimeCrawlStates(section: CrimeSectionId, facts: readonly ClientCrimeFact[], population: CrimePopulation): CrimeState[] {

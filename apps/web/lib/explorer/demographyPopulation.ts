@@ -94,7 +94,7 @@ export function placeYears(facts: readonly ClientDemographyObservation[], place:
 }
 
 /**
- * The hidden crawl tables' query of a place page: the place and every part its list offers, over the place's years. A
+ * The crawl tables' query of a place page: the place and every part its list offers, over the place's years. A
  * place without a population year has none.
  */
 export function populationPlaceCrawlQueries(facts: readonly ClientDemographyObservation[], place: DemographyPlace, places: readonly DemographyPlace[]): PopulationQuery[] {

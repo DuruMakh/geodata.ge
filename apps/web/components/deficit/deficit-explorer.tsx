@@ -83,7 +83,7 @@ export function DeficitExplorer({ facts, workbookSources, edition, siteOrigin, l
     () => buildDeficitExplorerModel({ facts, range, percentage, selected }, presentation),
     [facts, range, percentage, selected, presentation],
   );
-  // The series over every year, as % of GDP and in GEL, for the hidden crawl tables: built from the props alone, so a
+  // The series over every year, as % of GDP and in GEL, for the crawl tables: built from the props alone, so a
   // click never rebuilds them.
   const crawlModels = useCrawlModels(() => deficitCrawlStates(facts).map((crawl) => buildDeficitWorkbookExportModel({
     facts,

@@ -69,7 +69,7 @@ export function EconomicSectorsExplorer({
     () => buildEconomicSectorsModel(facts, registry, state, sourceIdByMeasure, config),
     [facts, registry, state, sourceIdByMeasure, config],
   );
-  // Every measure's rows over every year, for the hidden crawl tables: built from the props alone, so a click never
+  // Every measure's rows over every year, for the crawl tables: built from the props alone, so a click never
   // rebuilds them (unpackFacts returns the same rows for the same props).
   const crawlModels = useCrawlModels(() => sectorCrawlStates(facts, registry, sourceIdByMeasure, config).map((crawl) =>
     buildEconomicSectorsWorkbookExportModel(facts, registry, crawl, presentation, sources, siteOrigin, sourceIdByMeasure, config)));

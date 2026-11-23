@@ -80,7 +80,7 @@ export function changeSocialPlaceSelection(state: TopicState, set: SocialPlaceSe
 }
 
 /**
- * The hidden crawl tables' states (lib/explorer/crawlTables.ts): each heading the place has facts for, every row of it with
+ * The crawl tables' states (lib/explorer/crawlTables.ts): each heading the place has facts for, every row of it with
  * facts, over every year. Shares of residents and 2025 prices are kept: the page lists no population or price index.
  */
 export function socialPlaceCrawlStates(set: SocialPlaceSet, facts: readonly SocialShownFact[]): TopicState[] {

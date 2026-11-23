@@ -58,7 +58,7 @@ export function AgeSexSection({
   const [mode, setMode] = useState<ChartMode>("line");
   const whole = useMemo(() => (facts.length === 0 ? null : censusPyramid(facts, "total")), [facts]);
   const pyramid = useMemo(() => (facts.length === 0 ? null : censusPyramid(facts, settlement)), [facts, settlement]);
-  // Each settlement's counts by age and sex (the shares divide them by the total row), for the hidden crawl tables: built from the props alone, so a click never rebuilds them.
+  // Each settlement's counts by age and sex (the shares divide them by the total row), for the crawl tables: built from the props alone, so a click never rebuilds them.
   const crawlModels = useCrawlModels(() => censusCrawlSettlements(facts).map((crawl) =>
     buildCensusPlaceWorkbookExportModel({ facts, sources, siteOrigin, place, settlement: crawl, scope: workbookScope }, presentation)));
   if (whole === null || pyramid === null) return null;

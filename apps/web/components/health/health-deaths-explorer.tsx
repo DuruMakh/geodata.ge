@@ -64,7 +64,7 @@ export function HealthDeathsExplorer({ area, areas, facts, labels, areaLabels, s
   const areaName = areaLabels[area];
   const title = t("page.area.regionTitle", { region: areaName });
   const chartLabel = `${t("page.causes-of-death.title")} · ${areaName}`;
-  // All deaths and every cause over the area's years, for the hidden crawl table: built from the props alone, so a click never rebuilds it.
+  // All deaths and every cause over the area's years, for the crawl table: built from the props alone, so a click never rebuilds it.
   const crawlModels = useCrawlModels(() => healthDeathsCrawlStates(area, facts).map(crawl =>
     buildHealthWorkbookExportModel({ section: "causes-of-death", area, facts, state: crawl, labels, sources, siteOrigin, title }, presentation)));
   const index = areas.findIndex(item => item.id === area);

@@ -70,7 +70,7 @@ export function LabourExplorer({ section, facts, labels, headingLabels, latestLi
   const reference = model.series.find(series => series.reference);
   const total = rows.find(row => row.itemId === reference?.id) ?? null;
   const title = t(`page.${section}.title`);
-  // Every row with a figure over the page's years, for the hidden crawl tables: built from the props alone, so a click never rebuilds them.
+  // Every row with a figure over the page's years, for the crawl tables: built from the props alone, so a click never rebuilds them.
   const crawlModels = useCrawlModels(() => labourCrawlStates(section, facts).map(crawl =>
     buildLabourWorkbookExportModel({ section, facts, state: crawl, labels, headingLabels, sources, siteOrigin, title }, presentation)));
   // Geostat publishes no figure for some rows (men in households as employers): such a selection alone has nothing to draw.

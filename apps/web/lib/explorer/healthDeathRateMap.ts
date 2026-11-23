@@ -1,6 +1,6 @@
 import type { ClientHealthFact } from "../data/health/types";
 import { REGIONAL_ECONOMY_REGIONS } from "../data/regionalEconomies/importRegionalEconomies";
-import { buildLatestValueRegionMapModel, type RegionMapModel } from "./regionalEconomyMap";
+import { buildLatestValueRegionMapModel, regionMapHistory, type RegionMapModel } from "./regionalEconomyMap";
 
 // Built on the server: the region list is read from the repository, so client code imports healthDeaths.ts, not this.
 
@@ -14,5 +14,5 @@ export function buildHealthDeathRateMapModel(facts: readonly ClientHealthFact[])
   if (!complete.length) throw new Error("No year has a death rate for every region");
   const year = Math.max(...complete);
   const latest = new Map(regional.filter(f => f.year === year).map(f => [f.areaId, f.value]));
-  return buildLatestValueRegionMapModel({ regions: REGIONAL_ECONOMY_REGIONS, latest, year, firstYear: Math.min(...regional.map(f => f.year)), measure: "death rate" });
+  return buildLatestValueRegionMapModel({ regions: REGIONAL_ECONOMY_REGIONS, latest, year, firstYear: Math.min(...regional.map(f => f.year)), measure: "death rate", history: regionMapHistory(regional.map(f => ({ regionId: f.areaId, year: f.year, value: f.value }))) });
 }

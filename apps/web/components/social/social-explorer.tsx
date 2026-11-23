@@ -86,7 +86,7 @@ export function SocialExplorer({ section, facts, gdpFacts, gdpSources, breaks, l
   const total = rows.find(row => row.itemId === reference?.id) ?? null;
   const title = t(`page.${section}.title`);
   const chartLabel = `${title} · ${headingLabels[model.heading]}`;
-  // Every heading of each view (money also as % of GDP) over its years, for the hidden crawl tables: built from the props alone, so a click never rebuilds them.
+  // Every heading of each view (money also as % of GDP) over its years, for the crawl tables: built from the props alone, so a click never rebuilds them.
   const crawlModels = useCrawlModels(() => socialCrawlStates(section, facts, gdpFacts).map(crawl => buildSocialWorkbookExportModel({
     section, facts, state: crawl, gdpFacts, labels, headingLabels, sources, populationSources: [], cpiSources: [], gdpSources, siteOrigin, title,
   }, presentation)));

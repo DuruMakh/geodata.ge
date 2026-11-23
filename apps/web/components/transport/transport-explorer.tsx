@@ -63,7 +63,7 @@ export function TransportExplorer({ section, facts, labels, sources, lastReviewe
   const latestOf = (id: string) => facts.filter(f => f.indicatorId === id).sort((a, b) => a.year - b.year).at(-1)!;
   const latest = latestOf(LATEST_ID[section]);
   const title = t(`page.${section}.title`);
-  // Every unit of the list, every row of it over its years, for the hidden crawl tables: built from the props alone, so a click never rebuilds them.
+  // Every unit of the list, every row of it over its years, for the crawl tables: built from the props alone, so a click never rebuilds them.
   const crawlModels = useCrawlModels(() => transportCrawlStates(section, facts).map(crawl =>
     buildTransportWorkbookExportModel({ section, facts, state: crawl, labels, sources, siteOrigin, title }, presentation)));
   const downloadAction = <ExcelDownloadButton testId="transport-excel-download" disabled={!model.selected.length} onDownload={async () => {

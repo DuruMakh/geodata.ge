@@ -53,5 +53,9 @@
   "controls.share.working": "Making the picture…",
   "controls.share.copied": "Picture copied",
   "controls.share.error": "The picture could not be made — try again.",
-  "controls.crawlTop": "top {kept} of {of}; all of them in the Excel download"
+  "controls.crawlTop": "top {kept} of {of}; all of them in the Excel download",
+  "controls.crawlTopMore": "top {kept} of {of}; the others follow below",
+  "controls.crawlOthers": "the other {count}",
+  "controls.crawlHeading": "Data table",
+  "controls.crawlRest": "The rest of the data"
 }

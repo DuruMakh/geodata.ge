@@ -92,7 +92,7 @@ export function PopulationPlaceExplorer({
     [facts, places, state.selectedIds, state.range.start, state.range.end, locale],
   );
   const highlights = useMemo(() => buildPopulationHighlights(model, facts, places, place.id), [model, facts, places, place.id]);
-  // The place and every part it lists over the place's years, for the hidden crawl tables: built from the props alone, so a click never rebuilds them.
+  // The place and every part it lists over the place's years, for the crawl tables: built from the props alone, so a click never rebuilds them.
   const crawlModels = useCrawlModels(() => populationPlaceCrawlQueries(facts, place, places).map((crawl) =>
     buildPopulationWorkbookExportModel(facts, places, crawl, presentation, sources, siteOrigin, workbookScope, place.id)));
   // The tick-list: the page's own place first whatever its value (the total stays first), then its parts in the order the model ranks them.

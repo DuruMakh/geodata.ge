@@ -100,7 +100,7 @@ export const changeTransportSelection = (state: TopicState, definitions: readonl
 export const transportCoverage = (section: TransportTopicId, facts: readonly ClientTransportFact[], selectedIds: readonly string[] = []) =>
   transportListCoverage(transportTopicSeries(section), selectedIds, facts);
 
-/** The hidden crawl tables' states: each unit of the page's list (per person kept: the page lists no population), every row of it with facts. */
+/** The crawl tables' states: each unit of the page's list (per person kept: the page lists no population), every row of it with facts. */
 export const transportCrawlStates = (section: TransportTopicId, facts: readonly ClientTransportFact[]): TransportState[] =>
   unitListCrawlStates(transportTopicSeries(section), facts);
 

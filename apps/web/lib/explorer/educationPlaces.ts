@@ -69,7 +69,7 @@ export function educationPlaceCoverage(set: EducationPlaceSet, placeId: string, 
   return unitListCoverage(definitions, selectedIds, placeFacts(facts, placeId), noEducationYears(placeId), headingOf(definitions));
 }
 
-/** The hidden crawl tables' states: each heading the place lists (one heading is charted at a time), every row of it with facts. */
+/** The crawl tables' states: each heading the place lists (one heading is charted at a time), every row of it with facts. */
 export function educationPlaceCrawlStates(set: EducationPlaceSet, placeId: string, facts: readonly ClientEducationFact[]): EducationState[] {
   const definitions = educationPlaceSeries(set, placeId);
   return unitListCrawlStates(definitions, placeFacts(facts, placeId), headingOf(definitions));

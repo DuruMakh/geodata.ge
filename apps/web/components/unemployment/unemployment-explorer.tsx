@@ -41,7 +41,7 @@ import { UnemploymentAgeHeatmap } from "./unemployment-age-heatmap";
 
 export type UnemploymentExplorerProps = { section: UnemploymentSectionId; regionId?: string; regionSplit?: boolean; regions?: MunicipalRegion[]; facts: ClientUnemploymentObservation[]; registry: UnemploymentGroupDefinition[]; sources: (WorkbookPublicSource & { sourceId: string })[]; lastReviewedAt: string; siteOrigin: string };
 /**
- * Every view and unit of the page, every series of its list over its years, for the hidden crawl tables: built from the props
+ * Every view and unit of the page, every series of its list over its years, for the crawl tables: built from the props
  * alone, so a click never rebuilds them. The Regions index's map view carries the same tables as its comparison.
  */
 export function useUnemploymentCrawlModels({ section, regionId, facts, registry, sources, siteOrigin }: Pick<UnemploymentExplorerProps, "section" | "regionId" | "facts" | "registry" | "sources" | "siteOrigin">) {

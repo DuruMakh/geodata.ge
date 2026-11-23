@@ -189,6 +189,26 @@ summary:focus-visible {
   outline-color: var(--paper);
 }
 
+/* The data-table block (CrawlTables, DESIGN.md §8.4): every series of a page as plain tables, in the page for a reader of
+   its HTML and for assistive technology, and off screen for a visitor (owner decision, 2026-11-23). This rule alone keeps
+   it off screen, with the declarations of Tailwind's `sr-only` on the block's own class, so nothing in the HTML marks it
+   as hidden: Claude's web reader drops every element with the `hidden` attribute, and `aria-hidden`, `inert` and an
+   inline `display: none` stay off it for the same reason. The tables are laid out, only clipped, so a browser's own text
+   of the page (`innerText`, what an assistant built into a browser reads) holds them, on a phone as on a computer.
+   `content-visibility: auto` would take them out of that text for good: a clipped box never counts as near the viewport,
+   so its tables would never be laid out. Laying them out costs a slow phone 0.25 to 0.5 s of work while one of the 20
+   heaviest pages loads (2,000 to 3,200 cells) and under 0.1 s on an ordinary page (190 cells), with first paint
+   unchanged (measured 2026-11-23, CPU slowed 4x). */
+.crawl-tables {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
 /* While the phone menu covers the page, the page is hidden and the skip link has nothing to skip to. */
 body:has([data-menu-open]) a[href="#content"] {
   display: none;

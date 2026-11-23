@@ -1,6 +1,10 @@
 import { EnvironmentCityIndex } from "../../components/environment/environment-city-index";
 import { EnvironmentExplorer } from "../../components/environment/environment-explorer";
 import { BudgetHub } from "../../components/hub/budget-hub";
+import { IndexCrawlTables } from "../../components/explorer-shell/index-crawl-tables";
+import { formatCrawlCell } from "../explorer/crawlTables";
+import { historyCaption, historyCrawlTable } from "../explorer/indexCrawlTables";
+import { workbookMessage } from "../i18n/workbook";
 import { ENVIRONMENT_STATIONS } from "../data/environment/types";
 import { buildEnvironmentCityCards } from "../explorer/environmentHubCards";
 import { AIR_QUALITY_PATH, environmentCityCoverage, environmentCityHeadline, environmentCityHref, environmentCitySeries, environmentHighestPm10 } from "../explorer/environmentCities";
@@ -31,11 +35,23 @@ export async function renderEnvironmentAirQualityIndex(locale: Locale) {
   const years = aq.map(f => f.year);
   const highest = environmentHighestPm10(aq);
   const latest = environmentLatest(aq.filter(f => f.year <= highest.year), highest.indicatorId, t);
+  // Every station's yearly average, for readers that run no page code (DESIGN.md §8.4): PM10, and Zestaponi's manual dust apart.
+  const stationTable = (measure: "pm10" | "tsp") => {
+    const rows = ENVIRONMENT_STATIONS.map(station => ({ station, facts: aq.filter(f => f.indicatorId === `environment.aq.${measure}_avg.${station.id}`) })).filter(row => row.facts.length);
+    const tableYears = [...new Set(rows.flatMap(row => row.facts.map(f => f.year)))].sort((a, b) => a - b);
+    const columns = tableYears.map(String);
+    return historyCrawlTable({
+      caption: historyCaption([t("page.air-quality.title"), t(`heading.${measure}Avg`)], columns, workbookMessage(locale, "workbook.published")), years: tableYears, columns,
+      rows: rows.map(({ station, facts }) => ({ label: `${t(`city.${station.city}`)} — ${t(`station.${station.id}`)}`, valuesByYear: Object.fromEntries(facts.map(f => [f.year, f.value])) })),
+      format: value => formatCrawlCell(value, null, "#,##0.##", locale),
+    });
+  };
   return renderEnvironmentFrame({
     ...page, href: AIR_QUALITY_PATH, title: t("page.air-quality.title"), description: t("page.air-quality.summary"), firstYear: Math.min(...years), lastYear: Math.max(...years),
     measures: [t("heading.pm10Avg")],
     children: <EnvironmentCityIndex latest={{ measure: `${t(`city.${highest.city}`)}, ${t("latest.pm10")}`, year: latest.year, value: latest.value }}>
       <BudgetHub cards={buildEnvironmentCityCards(aq, presentation)} locale={locale} testId="environment-city-cards" />
+      <IndexCrawlTables category={workbookMessage(locale, "workbook.category")} tables={[stationTable("pm10"), stationTable("tsp")]} />
     </EnvironmentCityIndex>,
   });
 }

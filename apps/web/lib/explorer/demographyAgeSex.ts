@@ -91,7 +91,7 @@ export function censusPyramid(facts: readonly ClientAgeFact[], settlement: Clien
 }
 
 /**
- * The hidden crawl tables' states of Georgia's age structure: every year's pyramid in persons (its shares and the heat
+ * The crawl tables' states of Georgia's age structure: every year's pyramid in persons (its shares and the heat
  * map divide those counts by the total row). A year missing a count has none.
  */
 export function ageSexCrawlStates(facts: readonly ClientAgeFact[]): AgeSexState[] {
@@ -99,7 +99,7 @@ export function ageSexCrawlStates(facts: readonly ClientAgeFact[]): AgeSexState[
   return ageYears(facts).filter((year) => complete(annualCount(cell, year))).map((year) => ({ year, compare: null, measure: "persons" }));
 }
 
-/** The hidden crawl tables' settlements of a place's census pyramid: each one with every count, in the page's tab order. */
+/** The crawl tables' settlements of a place's census pyramid: each one with every count, in the page's tab order. */
 export function censusCrawlSettlements(facts: readonly ClientAgeFact[]): ClientAgeFact["settlement"][] {
   return (["total", "urban", "rural"] as const).filter((settlement) => complete(censusCount(facts, settlement)));
 }

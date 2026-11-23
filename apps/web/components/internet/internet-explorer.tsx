@@ -57,7 +57,7 @@ export function InternetExplorer({ section, facts, labels, sources, lastReviewed
   // The latest-value line is the page's headline (its default series), whatever the list shows.
   const latest = facts.filter(f => f.indicatorId === model.series[0].id).sort((a, b) => a.year - b.year).at(-1)!;
   const unitLabel = t("unitPercent");
-  // Every heading of the list, every row of it over its years, for the hidden crawl tables: built from the props alone, so a click never rebuilds them.
+  // Every heading of the list, every row of it over its years, for the crawl tables: built from the props alone, so a click never rebuilds them.
   const crawlModels = useCrawlModels(() => internetCrawlStates(section, facts).map(crawl =>
     buildInternetWorkbookExportModel({ section, facts, state: crawl, labels, sources, siteOrigin, title }, presentation)));
   const downloadAction = <ExcelDownloadButton testId="internet-excel-download" disabled={!model.selected.length} onDownload={async () => {

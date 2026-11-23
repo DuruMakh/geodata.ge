@@ -29,13 +29,24 @@ export function resolveRange(range: PeriodRange, { min, max }: PeriodCoverage): 
 }
 
 /**
- * The months a monthly page's hidden crawl tables carry (spec §3.4): whole calendar years up to `count` months, from
+ * The months a monthly page's crawl tables carry (spec §3.4): whole calendar years up to `count` months, from
  * January of (latest year − 2) through the latest month for 36, so a year row never shows a dash for a published month.
  * Periods here are month indices (year × 12 + month − 1).
  */
 export function lastPeriodsRange({ min, max }: PeriodCoverage, count: number): PeriodRange {
   const firstYear = Math.floor(max / 12) - Math.floor(count / 12) + 1;
   return { kind: "manual", start: Math.max(min, firstYear * 12), end: max };
+}
+
+/** The months before that window, which a monthly page folds below its first tables; null when the window starts at the first month. */
+export function earlierPeriodsRange(coverage: PeriodCoverage, count: number): PeriodRange | null {
+  const window = lastPeriodsRange(coverage, count);
+  return window.kind === "manual" && window.start > coverage.min ? { kind: "manual", start: coverage.min, end: window.start - 1 } : null;
+}
+
+/** A monthly page's crawl range: its window of the latest months, or the earlier months before it (null when there are none). */
+export function crawlPeriodsRange(coverage: PeriodCoverage, count: number, months: "latest" | "earlier"): PeriodRange | null {
+  return months === "latest" ? lastPeriodsRange(coverage, count) : earlierPeriodsRange(coverage, count);
 }
 
 /** A range-strip change. A span that covers everything is stored as "all". */

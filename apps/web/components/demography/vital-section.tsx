@@ -48,7 +48,7 @@ export function VitalSection({
   const t = (key: string, values?: TemplateValues) => message(messages, `demography.${key}`, values);
   const [mode, setMode] = useState<ChartMode>("line");
   const model = useMemo(() => buildVitalPlaceModel(facts, place.id), [facts, place.id]);
-  // Births, deaths and natural increase over every year, for the hidden crawl tables: built from the props alone, so a click never rebuilds them.
+  // Births, deaths and natural increase over every year, for the crawl tables: built from the props alone, so a click never rebuilds them.
   const crawlModels = useCrawlModels(() => (model ? [buildVitalWorkbookExportModel({ facts, place, sources, siteOrigin, scope: workbookScope }, presentation)] : []));
   if (!model) return null;
   const name = placeLabel(place, locale);

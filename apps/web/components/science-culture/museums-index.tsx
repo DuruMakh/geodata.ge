@@ -29,6 +29,8 @@ export function MuseumsIndex({ facts, regionMap }: {
   const unitLabel = t("unit.thousand"), mapLabel = t("mapLabel");
   const latest = facts.filter(f => f.indicatorId === "science_culture.museum_visitors.total").sort((a, b) => a.year - b.year).at(-1)!;
   const georgiaValue = facts.find(f => f.indicatorId === "science_culture.museum_visitors.total" && f.year === regionMap.year)?.value;
+  const shown = { formatValue: (value: number) => formatInUnit(value, scienceCultureValueUnit("thousand")), legend: `${mapLabel} · ${unitLabel}` };
+  const lead = { label: t("area.georgia"), valuesByYear: Object.fromEntries(facts.filter(f => f.indicatorId === "science_culture.museum_visitors.total").map(f => [f.year, f.value])) };
   return <div data-testid="science-culture-museums" className="@container">
     <ExplorerHeading>{t("page.museums.title")}</ExplorerHeading>
     <LatestValueLine testId="science-culture-latest" sentence={<Message messages={messages} id="scienceCulture.latest.museumsIndex"
@@ -36,10 +38,10 @@ export function MuseumsIndex({ facts, regionMap }: {
     <section data-testid="science-culture-region-index" className="mt-4">
       <RegionIndex title={t("page.museums.title")} model={regionMap} summary={[]} sourceNote={`${t("sourceNoteMuseums")} · ${unitLabel} · ${regionMap.year}.`}
         leadRow={georgiaValue === undefined ? undefined : { id: "georgia", label: t("area.georgia"), value: georgiaValue }} metric={{
-          hrefForRegion: museumRegionHref, formatValue: value => formatInUnit(value, scienceCultureValueUnit("thousand")), legend: `${mapLabel} · ${unitLabel}`, testId: "science-culture-region-map",
+          ...shown, hrefForRegion: museumRegionHref, testId: "science-culture-region-map",
           mapAria: t("regionMapAria", { total: mapLabel, unit: unitLabel, year: regionMap.year }),
           entityAria: (name, value, year) => t("regionMapEntityAria", { name, amount: scienceCultureValueLabel(value, "thousand", t), year }),
-        }} />
+        }} crawl={[{ model: regionMap, metric: shown, lead }]} />
     </section>
   </div>;
 }

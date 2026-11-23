@@ -121,7 +121,7 @@ export function debtRangeForFamily(
 export type DebtCrawlState = { family: DebtFamily; chartMode: "line"; shareOfGdp: boolean; range: { start: number; end: number }; selectedIds: DebtSeriesId[] };
 
 /**
- * The hidden crawl tables' states (lib/explorer/crawlTables.ts): each family with facts, all three of its series, over
+ * The crawl tables' states (lib/explorer/crawlTables.ts): each family with facts, all three of its series, over
  * the family's whole span. Stock also keeps its % of GDP view after the amounts: the page lists no GDP to divide by, so
  * those shares exist nowhere else on it. Without a GDP year in stock's span that view has no state.
  */

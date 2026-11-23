@@ -17,47 +17,65 @@ const model: WorkbookExportModel = {
   analysis: { headers: [], rows: [] }, sources: [],
 };
 
+const models = (...list: WorkbookExportModel[]) => ({ models: list, earlier: [] });
+const block = (locale: "en" | "ka", inner: string) => {
+  const heading = locale === "en" ? "Data table" : "მონაცემთა ცხრილი";
+  return `<div data-testid="crawl-tables" class="crawl-tables"><p>${heading}</p><div role="region" aria-label="${heading}: T · GEL · 2024–2025 · Actual">${inner}</div></div>`;
+};
+
 describe("CrawlTables", () => {
-  it.each(["en", "ka"] as const)("renders one minimal hidden table per model in %s", (locale) => {
-    expect(renderPageMarkup(locale, <CrawlTables models={[model]} />)).toBe(
-      `<div hidden="" data-testid="crawl-tables"><table><caption>T · GEL · 2024–2025 · Actual</caption><thead><tr><th>${workbookMessage(locale, "workbook.category")}</th><th>2024</th><th>2025</th></tr></thead>` +
-      `<tbody><tr><th>Total</th><td>1.0</td><td>2.0</td></tr><tr><th>Other</th><td>3.0</td><td>—</td></tr></tbody></table></div>`,
-    );
+  it.each(["en", "ka"] as const)("renders one plain table per model in %s, in a named region", (locale) => {
+    expect(renderPageMarkup(locale, <CrawlTables models={models(model)} />)).toBe(block(locale,
+      `<table><caption>T · GEL · 2024–2025 · Actual</caption><thead><tr><th>${workbookMessage(locale, "workbook.category")}</th><th>2024</th><th>2025</th></tr></thead>` +
+      `<tbody><tr><th>Total</th><td>1.0</td><td>2.0</td></tr><tr><th>Other</th><td>3.0</td><td>—</td></tr></tbody></table>`,
+    ));
+  });
+
+  it("is never hidden from a reader: no hidden, aria-hidden or inert on the wrapper", () => {
+    expect(renderPageMarkup("en", <CrawlTables models={models(model)} />)).not.toMatch(/\bhidden\b|aria-hidden|\binert\b/);
   });
 
   it("heads the label column with the workbook's own label when it has one", () => {
     const named: WorkbookExportModel = { ...model, readable: { ...model.readable, headerLabels: { category: "Region", columns: ["2024", "2025"] } } };
-    expect(renderPageMarkup("en", <CrawlTables models={[named]} />)).toContain("<thead><tr><th>Region</th><th>2024</th><th>2025</th></tr></thead>");
+    expect(renderPageMarkup("en", <CrawlTables models={models(named)} />)).toContain("<thead><tr><th>Region</th><th>2024</th><th>2025</th></tr></thead>");
   });
 
   it("carries no class or style inside the wrapper", () => {
-    const markup = renderPageMarkup("en", <CrawlTables models={[model]} />);
-    expect(markup.slice(markup.indexOf("<table"))).not.toMatch(/class=|style=/);
+    const markup = renderPageMarkup("en", <CrawlTables models={models(model)} />);
+    expect(markup.slice(markup.indexOf("<p>"))).not.toMatch(/class=|style=/);
   });
 
-  it("renders the empty hidden wrapper without models, as the browser does", () => {
-    expect(renderPageMarkup("en", <CrawlTables models={[]} />)).toBe('<div hidden="" data-testid="crawl-tables"></div>');
+  it("folds the earlier-period models below the first tables", () => {
+    const earlier: WorkbookExportModel = { ...model, readable: { ...model.readable, title: "Earlier" } };
+    const markup = renderPageMarkup("en", <CrawlTables models={{ models: [model], earlier: [earlier] }} />);
+    expect(markup).toContain('</table><details><summary tabindex="-1">The rest of the data</summary><table><caption>Earlier · GEL · 2024–2025 · Actual</caption>');
+    expect(markup.endsWith("</table></details></div></div>")).toBe(true);
+  });
+
+  it("renders the empty wrapper without models, as the browser first does", () => {
+    expect(renderPageMarkup("en", <CrawlTables models={models()} />)).toBe('<div data-testid="crawl-tables" class="crawl-tables"></div>');
   });
 });
 
-// Tests run in Node, where there is no window: the server render. Stubbing window makes it the browser's.
+// Tests run in Node, where there is no window: the server render. Stubbing window makes it the browser's first render.
 describe("useCrawlModels", () => {
   afterEach(() => vi.unstubAllGlobals());
-  const Page = ({ build }: { build: () => readonly WorkbookExportModel[] }) => <CrawlTables models={useCrawlModels(build)} />;
+  const Page = ({ build, buildEarlier }: { build: () => readonly WorkbookExportModel[]; buildEarlier?: () => readonly WorkbookExportModel[] }) => <CrawlTables models={useCrawlModels(build, buildEarlier)} />;
 
-  it("builds the models during the server render", () => {
+  it("builds the models, and the earlier ones, during the server render", () => {
     const build = vi.fn(() => [model]);
-    expect(useCrawlModels(build)).toEqual([model]);
-    expect(renderPageMarkup("en", <Page build={build} />)).toContain("<table><caption>T · GEL · 2024–2025 · Actual</caption>");
-    expect(build).toHaveBeenCalledTimes(2);
+    const buildEarlier = vi.fn(() => [model]);
+    const markup = renderPageMarkup("en", <Page build={build} buildEarlier={buildEarlier} />);
+    expect(markup).toContain("<table><caption>T · GEL · 2024–2025 · Actual</caption>");
+    expect(markup).toContain("<details>");
+    expect(build).toHaveBeenCalledTimes(1);
+    expect(buildEarlier).toHaveBeenCalledTimes(1);
   });
 
-  it("never builds them in the browser, which renders the same wrapper empty for hydration to keep the server's tables", () => {
+  it("never builds them while the browser renders: the wrapper is empty, for hydration to keep the server's tables", () => {
     vi.stubGlobal("window", {});
     const build = vi.fn(() => [model]);
-    expect(useCrawlModels(build)).toEqual([]);
-    expect(useCrawlModels(build)).toBe(useCrawlModels(build));
-    expect(renderPageMarkup("en", <Page build={build} />)).toBe('<div hidden="" data-testid="crawl-tables"></div>');
+    expect(renderPageMarkup("en", <Page build={build} />)).toBe('<div data-testid="crawl-tables" class="crawl-tables"></div>');
     expect(build).not.toHaveBeenCalled();
   });
 });

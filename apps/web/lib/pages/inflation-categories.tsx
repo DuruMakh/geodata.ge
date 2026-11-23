@@ -19,7 +19,6 @@ import { fiscalMetadata } from "../seo/metadata";
 import { explorerDatasetJsonLd } from "../seo/structuredData";
 import { resolveSiteUrl } from "../siteUrl";
 import { inflationRepositoryRoot, inflationWorkbookSources } from "./inflation-shared";
-import { loadInflationPageData } from "./inflationPageData";
 import { ALL_DATA_PATH, topicSection } from "../navigation/navTree";
 
 const CATEGORIES_PATH = "/explorer/inflation/categories";
@@ -37,9 +36,8 @@ export async function inflationCategoriesMetadata(locale: Locale) {
 
 export async function renderInflationCategories(locale: Locale) {
   const root = inflationRepositoryRoot();
-  const [{ facts, categories, weights }, pageData, presentation, manifest, catalogue] = await Promise.all([
+  const [{ facts, categories, weights }, presentation, manifest, catalogue] = await Promise.all([
     loadServedInflationData(),
-    loadInflationPageData(),
     getPresentation(locale, ["inflation", "format", "main"], []),
     loadReviewedSourceManifest(root, "inflation"),
     loadEnglishCatalogue(root),
@@ -71,8 +69,7 @@ export async function renderInflationCategories(locale: Locale) {
         ]}
       />
       <InflationCategories
-        facts={packCategoryFacts(categories.filter((fact) => fact.measure === "yoy_pct").map(categoryFactInput))}
-        monthlyUrl={pageData.categoryMonthly.url}
+        facts={packCategoryFacts(categories.map(categoryFactInput))}
         weights={packFacts(weights.map(projectBasketWeight))}
         headline={headline}
         headlineMom={headlineMom}

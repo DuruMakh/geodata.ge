@@ -63,7 +63,7 @@ export function HousingExplorer({ section, facts, labels, sources, lastReviewedA
   const latest = latestOf(LATEST_ID[section]);
   const latestValue = section === "prices" ? formatInUnit(latest.value, housingValueUnit("index")) : housingCount(latest.value);
   const title = t(`page.${section}.title`);
-  // Every unit's series over its years, for the hidden crawl tables: built from the props alone, so a click never rebuilds them.
+  // Every unit's series over its years, for the crawl tables: built from the props alone, so a click never rebuilds them.
   const crawlModels = useCrawlModels(() => housingCrawlStates(section, facts).map(crawl =>
     buildHousingWorkbookExportModel({ section, facts, state: crawl, labels, sources, siteOrigin, title }, presentation)));
   const downloadAction = <ExcelDownloadButton testId="housing-excel-download" disabled={!model.selected.length} onDownload={async () => {

@@ -75,7 +75,7 @@ export function parseMigrationHash(hash: string, facts: readonly ClientMigration
 }
 
 /**
- * The hidden crawl tables' states: each sex (its workbook holds every group's arrivals and departures and the net), over
+ * The crawl tables' states: each sex (its workbook holds every group's arrivals and departures and the net), over
  * every year. The table's direction tab is not a view: the workbook has both directions. A sex without arrivals has none.
  */
 export function migrationCrawlStates(facts: readonly ClientMigrationFact[]): MigrationState[] {

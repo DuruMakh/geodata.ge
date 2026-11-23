@@ -106,9 +106,10 @@ test("language switch keeps the state", async ({ page }) => {
 
 
 // U13-05: the facts travelled as 1,960 verbose objects (46.7 KB gzip Georgian page); they now use the categories page's
-// run-length form. The English limit rose 37,000 -> 39,000 when the hidden crawl tables (last 36 months) joined the HTML.
+// run-length form. The English limit rose 37,000 -> 39,000 when the crawl tables (last 36 months) joined the HTML, and both
+// limits rose (42,000 -> 47,000, 39,000 -> 43,000) when every earlier month followed them in the data-table block (DESIGN.md §8.4).
 test("the overview facts travel as run-length runs", async ({ request }) => {
-  for (const [prefix, limit] of [["", 42_000], ["/en", 39_000]] as const) {
+  for (const [prefix, limit] of [["", 47_000], ["/en", 43_000]] as const) {
     const html = await (await request.get(`${prefix}/explorer/inflation/overview`)).text();
     expect(html.includes('\\"seriesId\\"'), "a verbose fact object in the HTML").toBe(false);
     expect(gzipSync(html).length).toBeLessThan(limit);

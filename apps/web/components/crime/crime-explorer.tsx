@@ -73,7 +73,7 @@ export function CrimeExplorer({ section, facts, population, breaks, labels, sour
   const latest = latestOf(crimeDefaultSelection(section)[0]);
   const killed = section === "road-accidents" ? latestOf(ROAD_KILLED) : null;
   const title = t(`page.${section}.title`);
-  // Every unit of the list as counts and per 100,000, every series over its years, for the hidden crawl tables: built from the props alone, so a click never rebuilds them.
+  // Every unit of the list as counts and per 100,000, every series over its years, for the crawl tables: built from the props alone, so a click never rebuilds them.
   const crawlModels = useCrawlModels(() => crimeCrawlStates(section, facts, population).map(crawl =>
     buildCrimeWorkbookExportModel({ section, facts, population, state: crawl, labels, sources, siteOrigin, title }, presentation)));
   const changeMeasure = (measure: CrimeMeasure) => {

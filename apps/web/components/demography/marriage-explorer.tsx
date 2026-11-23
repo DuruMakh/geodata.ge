@@ -75,7 +75,7 @@ export function MarriageExplorer({ place, labels, listLabels, sources, lastRevie
   const latestOf = (id: string) => place.facts.filter((fact) => fact.indicatorId === id).sort((a, b) => a.year - b.year).at(-1)!;
   const [marriages, divorces] = [latestOf("marriages"), latestOf("divorces")];
   const title = t("marriagesTitle");
-  // Counts and years as published, counts per 1,000, every row over its years, for the hidden crawl tables: built from the props alone, so a click never rebuilds them.
+  // Counts and years as published, counts per 1,000, every row over its years, for the crawl tables: built from the props alone, so a click never rebuilds them.
   const crawlModels = useCrawlModels(() => marriageCrawlStates(place).map((crawl) =>
     buildMarriageWorkbookExportModel({ place, state: crawl, labels, sources, siteOrigin, title, scope: "georgia" }, presentation)));
   const changeMeasure = (measure: MarriageMeasure) => {

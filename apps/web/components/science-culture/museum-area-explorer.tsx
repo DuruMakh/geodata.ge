@@ -73,7 +73,7 @@ export function MuseumAreaExplorer({ area, facts, labels, areaLabels, sources, l
   const latest = museumAreaLatest(area, facts);
   const areaName = areaLabels[area];
   const title = t("page.area.regionTitle", { region: areaName });
-  // Every unit of the area's list, every row of it over its years, for the hidden crawl tables: built from the props alone, so a click never rebuilds them.
+  // Every unit of the area's list, every row of it over its years, for the crawl tables: built from the props alone, so a click never rebuilds them.
   const crawlModels = useCrawlModels(() => museumAreaCrawlStates(area, facts).map(crawl =>
     buildScienceCultureWorkbookExportModel({ area, facts, state: crawl, labels, sources, siteOrigin, title }, presentation)));
   // The chart is named after the heading of the selection's first row (its text before the unit) and the area.

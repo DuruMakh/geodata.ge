@@ -136,7 +136,7 @@ export function latestRegionalGdpTotal<Fact extends Pick<ClientRegionalEconomyOb
 }
 
 /**
- * The hidden crawl tables' state (lib/explorer/crawlTables.ts): a region's GEL amounts, the total and every sector, over
+ * The crawl tables' state (lib/explorer/crawlTables.ts): a region's GEL amounts, the total and every sector, over
  * every year; none for a region without them. The share of the region's GDP only divides them by the listed total.
  */
 export function regionalEconomyCrawlStates(

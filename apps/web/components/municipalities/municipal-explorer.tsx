@@ -204,7 +204,7 @@ function MunicipalExplorerContent(props: MunicipalExplorerProps) {
     supplementalWorkbookSources: props.supplementalWorkbookSources,
     siteOrigin: props.siteOrigin,
   }), [allYears, locale, props.entityId, metrics.kind, props.pickerCountry.nameKa, props.triggerLabel, englishLabels, props.workbookBasename, props.workbookSources, props.functionalWorkbookSources, props.supplementalWorkbookSources, props.siteOrigin]);
-  // The total and every function over the whole span, for the hidden crawl table: built from the full-span model, which
+  // The total and every function over the whole span, for the crawl table: built from the full-span model, which
   // only the props change, so a click never rebuilds it.
   const crawlModels = useCrawlModels(() => municipalCrawlStates(fullModel).map((crawl) => buildWorkbookExportModel(buildMunicipalWorkbookInput(fullModel, crawl, workbookContext, i18n))));
 

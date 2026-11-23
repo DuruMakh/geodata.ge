@@ -113,7 +113,7 @@ export const changeScienceCultureSelection = (state: TopicState, definitions: re
 export const scienceCultureCoverage = (section: ScienceCultureTopicId, facts: readonly ClientScienceCultureFact[], selectedIds: readonly string[] = []) =>
   scienceCultureListCoverage(scienceCultureTopicSeries(section), selectedIds, facts);
 
-/** The hidden crawl tables' states (lib/explorer/crawlTables.ts): each unit of the page's list, every row of it with facts. */
+/** The crawl tables' states (lib/explorer/crawlTables.ts): each unit of the page's list, every row of it with facts. */
 export const scienceCultureCrawlStates = (section: ScienceCultureTopicId, facts: readonly ClientScienceCultureFact[]): ScienceCultureState[] =>
   unitListCrawlStates(scienceCultureTopicSeries(section), facts);
 

@@ -118,7 +118,7 @@ export function defaultHealthState(section: HealthNationalSectionId, facts: read
 }
 
 /**
- * The hidden crawl tables' states (lib/explorer/crawlTables.ts): each view (staff, hospitals), split by the units its list
+ * The crawl tables' states (lib/explorer/crawlTables.ts): each view (staff, hospitals), split by the units its list
  * cannot mix (hospitals and clinics, beds, visits), each with every row of the unit that has facts, over every year.
  */
 export function healthCrawlStates(section: HealthNationalSectionId, facts: readonly ClientHealthFact[]): HealthState[] {

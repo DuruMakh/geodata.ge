@@ -7,8 +7,8 @@ import { runAsCli } from "../lib/runAsCli";
 // beside the public CSV. "public" reads back what it wrote; "check-public" is that read on its own.
 async function pageData(mode: InflationArtifactMode) {
   if (mode !== "public" && mode !== "check-public") return;
-  const { products, categoryMonthly } = await loadInflationPageData();
-  const files = [products, categoryMonthly];
+  const { products } = await loadInflationPageData();
+  const files = [products];
   if (mode === "public") await writePageDataFiles(INFLATION_PAGE_DATA_PREFIX, files);
   await checkPageDataFiles(INFLATION_PAGE_DATA_PREFIX, files);
   console.log(`Inflation page data ${mode === "public" ? "written" : "matches"}: ${files.map((file) => file.fileName).join(", ")}`);

@@ -76,10 +76,12 @@ export function InflationCities({ view, facts, lastReviewedAt, sources, siteOrig
   const index = useMemo(() => buildCityIndex(unpackCityFacts(facts)), [facts]);
   const hashData = useMemo(() => ({ index, view }), [index, view]);
   const { state, update } = useHashState(hashData, parseCityState, serializeCityState);
-  // Every line of the page over its last three calendar years (at most 36 months), for the hidden crawl tables: built from the props alone, so a click never rebuilds them.
-  const crawlModels = useCrawlModels(() => cityCrawlStates(index, view).map((crawl) => buildInflationCityWorkbookExportModel({
+  // Every line of the page over its last three calendar years (at most 36 months), then over every earlier month, for the data-table
+  // block: built from the props alone, so a click never rebuilds them.
+  const crawlModelsFor = (months: "latest" | "earlier") => () => cityCrawlStates(index, view, months).map((crawl) => buildInflationCityWorkbookExportModel({
     index, view, state: crawl, range: resolveCityRange(crawl, index, view), presentation, sources, siteOrigin,
-  })));
+  }));
+  const crawlModels = useCrawlModels(crawlModelsFor("latest"), crawlModelsFor("earlier"));
 
   const range = resolveCityRange(state, index, view);
   const coverage = cityCoverage(index, view);

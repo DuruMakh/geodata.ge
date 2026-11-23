@@ -6,6 +6,7 @@ import {
   type MunicipalFunction,
   type MunicipalFunctionFact,
   type MunicipalPopulationFact,
+  type MunicipalRegion,
   type MunicipalTotalFact,
 } from "../data/municipal/types";
 import { aggregateFactsForEntity, applyAdjaraBudgetAdjustment } from "../data/municipal/aggregateMunicipalFacts";
@@ -15,6 +16,7 @@ import { message } from "../i18n/messages";
 import { publicLabel } from "../i18n/labels";
 import type { Presentation, TemplateValues } from "../i18n/types";
 import { workbookMessage } from "../i18n/workbook";
+import type { IndexHistory } from "./indexCrawlTables";
 import type { ExplorerTableRow } from "./types";
 import type { WorkbookExportInput, WorkbookPublicSource, WorkbookSeries } from "./workbookModel";
 import { colorForItem, INK } from "./colors";
@@ -247,7 +249,7 @@ export function buildMunicipalWorkbookInput(
 }
 
 /**
- * The hidden crawl table's state (lib/explorer/crawlTables.ts), from the place's full-span model: the total and every
+ * The crawl table's state (lib/explorer/crawlTables.ts), from the place's full-span model: the total and every
  * function over every year, in GEL — the share of the budget only divides them. A place without years has none.
  */
 export function municipalCrawlStates(fullModel: MunicipalEntityModel): (MunicipalWorkbookState & { chartMode: "line" })[] {
@@ -420,6 +422,40 @@ export function buildCountryListRow(totalFacts: MunicipalTotalFact[], year: numb
     valueGel: totalByYear[year] ?? 0,
     budgetPerResidentGel: null,
     rank: null,
+  };
+}
+
+/**
+ * The index's figures in every year, for its crawl tables: each year's totals as that year's list would rank them
+ * (Adjara with the republican budget), Georgia's from its own aggregate, and spending per resident in the one year with
+ * population. A municipality with no total in a year has none there, not 0.
+ */
+export function municipalIndexHistory(
+  data: Omit<MunicipalListInput, "regionLabels" | "year"> & { regions: MunicipalRegion[]; countryTotalFacts: MunicipalTotalFact[] },
+  years: readonly number[],
+): IndexHistory {
+  const regionLabels = new Map(data.regions.map((region) => [region.id, region.kaLabel]));
+  const reported = new Set(data.totalFacts.map((row) => `${row.municipalityCode}|${row.year}`));
+  const totals = new Map<string, number>();
+  for (const year of years) {
+    const list = buildMunicipalListRows({ ...data, regionLabels, populationFacts: undefined, year });
+    for (const row of list.municipalities) if (reported.has(`${row.id}|${year}`)) totals.set(`${row.id}|${year}`, row.valueGel);
+    for (const row of list.regions) totals.set(`${row.id}|${year}`, row.valueGel);
+  }
+  const countryByYear = buildCountryTotalByYear(data.countryTotalFacts);
+  for (const year of years) if (countryByYear[year] !== undefined) totals.set(`${MUNICIPAL_COUNTRY_ID}|${year}`, countryByYear[year]);
+
+  const perResident = new Map<string, number>();
+  const comparison = buildMunicipalListRows({ ...data, regionLabels, year: MUNICIPAL_PER_RESIDENT_YEAR });
+  for (const row of [...comparison.municipalities, ...comparison.regions]) {
+    if (row.budgetPerResidentGel !== null) perResident.set(`${row.id}|${MUNICIPAL_PER_RESIDENT_YEAR}`, row.budgetPerResidentGel);
+  }
+  return {
+    years: [...years],
+    figures: [
+      { id: "total", valueAt: (id, year) => totals.get(`${id}|${year}`) ?? null },
+      { id: "perResident", valueAt: (id, year) => perResident.get(`${id}|${year}`) ?? null },
+    ],
   };
 }
 

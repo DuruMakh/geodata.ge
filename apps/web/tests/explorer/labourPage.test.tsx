@@ -54,7 +54,7 @@ describe("the Labour pages", () => {
     const facts = (await loadLabourFacts()).map(toClientLabourFact).filter(f => f.indicatorId.startsWith("labour.hours.") && f.indicatorId !== "labour.hours.all.total");
     const series = labourSeries("hours");
     for (const [locale, messages] of [["ka", ka], ["en", en]] as const) {
-      // The page's own Sources sheet rows, as renderLabourPage passes them: the hidden crawl tables build the workbook at render.
+      // The page's own Sources sheet rows, as renderLabourPage passes them: the crawl tables build the workbook at render.
       const sources = await loadSourcedWorkbookSources("unemployment", locale, row => LABOUR_SOURCES.includes(row.source_id));
       const html = renderPageMarkup(locale, <LabourExplorer section="hours" facts={facts}
         labels={Object.fromEntries(series.map(({ id, item }) => [id, messages[`labour.row.${item}` as keyof typeof messages]]))}

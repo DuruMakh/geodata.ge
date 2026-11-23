@@ -72,7 +72,7 @@ export function EducationExplorer({ section, facts, labels, headingLabels, lates
   const reference = model.series.find(series => series.reference);
   const total = rows.find(row => row.itemId === reference?.id) ?? null;
   const title = t(`page.${section}.title`);
-  // Every row of the list over its years, for the hidden crawl tables: built from the props alone, so a click never rebuilds them.
+  // Every row of the list over its years, for the crawl tables: built from the props alone, so a click never rebuilds them.
   const crawlModels = useCrawlModels(() => educationCrawlStates(section, facts).map(crawl =>
     buildEducationWorkbookExportModel({ section, facts, state: crawl, labels, headingLabels, sources, siteOrigin, title }, presentation)));
   const downloadAction = <ExcelDownloadButton testId="education-excel-download" disabled={!model.selected.length} onDownload={async () => {

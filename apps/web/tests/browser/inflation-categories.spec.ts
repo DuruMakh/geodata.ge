@@ -182,39 +182,27 @@ test("the contribution chart fits phones, hovers without moving the page and ans
   await expect(page.getByTestId("stack-chart-tooltip")).toHaveCount(0);
 });
 
-// U13-03: the monthly-change runs (about half the facts) shipped with every page view although only the monthly tab
-// reads them; they now load from a long-cached file when that tab opens. The limit rose 135,000 -> 140,000 when the
-// hidden crawl tables (last 36 months of contributions and annual rates) joined the HTML.
-test("the monthly runs load only for the monthly tab", async ({ page, request }) => {
+// The monthly-change runs travel with the page: the data-table block prints them, so every page view reads them (DESIGN.md
+// §8.4). Until then they loaded from a file when the monthly tab opened (U13-03). The limit was 135,000, rose to 140,000
+// when the crawl tables (last 36 months of contributions and annual rates) joined the HTML, to 172,000 when every earlier
+// month followed them in the data-table block, and to 240,000 with the monthly change of every category.
+test("the monthly change comes with the page: in the data-table block, and its tab asks for no file", async ({ page, request }) => {
   for (const prefix of ["", "/en"]) {
     const html = await (await request.get(`${prefix}${CATEGORIES}`)).text();
-    expect(html.includes("mom_pct"), "a monthly run in the HTML").toBe(false);
-    expect(gzipSync(html).length).toBeLessThan(140_000);
+    expect(gzipSync(html).length).toBeLessThan(240_000);
   }
   const requested: string[] = [];
   page.on("request", (sent) => { if (sent.url().includes("/page-data/")) requested.push(new URL(sent.url()).pathname); });
   await page.goto(`/en${CATEGORIES}`);
   await ready(page);
-  await page.getByTestId("inflation-category-tab-yoy").click();
-  await expect(page.locator("path[data-overlay]")).toHaveCount(0);
-  expect(requested).toEqual([]);
   await page.getByTestId("inflation-category-tab-mom").click();
   await expect(page.getByTestId("chart-panel")).toHaveAttribute("data-tab", "mom");
   await expect(page.getByTestId("year-range-strip")).toBeVisible();
-  expect(requested).toHaveLength(1);
-  expect(requested[0]).toMatch(/^\/page-data\/inflation-category-mom\.[0-9a-f]{16}\.json$/);
-  const data = await request.get(requested[0]!);
-  expect(data.headers()["cache-control"]).toBe("public, max-age=31536000, immutable");
-});
-
-test("a failed monthly load shows the error in place of the chart and keeps the other tabs", async ({ page }) => {
-  await page.route("**/page-data/inflation-category-mom.*.json", (route) => route.fulfill({ status: 500, body: "" }));
-  await page.goto(`/en${CATEGORIES}#i=mom`);
-  await ready(page);
-  await expect(page.getByRole("alert").getByTestId("page-data-error")).toHaveText("The data could not be loaded. Reload the page to try again.");
-  await expect(page.getByTestId("inflation-category-download")).toBeDisabled();
-  await page.getByTestId("inflation-category-tab-contrib").click();
-  await expect(page.getByTestId("page-data-error")).toHaveCount(0);
-  await expect(page.locator("path[data-overlay]")).toHaveCount(1);
+  await expect(page.getByTestId("chart-panel").locator("svg[data-geometry]").first()).toBeAttached();
+  expect(requested).toEqual([]);
+  const block = page.getByTestId("crawl-tables");
+  // Folded below the first tables: the monthly change over the last three calendar years, then over every earlier month.
+  await expect(block.locator("details caption").filter({ hasText: /^Monthly inflation · % · compared with the previous month · / })).toHaveCount(2);
+  await expect(block.locator("div > table > caption").filter({ hasText: /^Monthly inflation/ })).toHaveCount(0);
 });
 

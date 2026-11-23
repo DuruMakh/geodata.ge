@@ -56,7 +56,7 @@ export function AgeSexExplorer({
   const { locale, messages } = presentation;
   const t = (key: string, values?: TemplateValues) => message(messages, `demography.${key}`, values);
   const years = useMemo(() => ageYears(facts), [facts]);
-  // Every year's counts by age and sex (the shares and the heat map divide them by the total row), for the hidden crawl tables:
+  // Every year's counts by age and sex (the shares and the heat map divide them by the total row), for the crawl tables:
   // built from the props alone, so a click never rebuilds them.
   const crawlModels = useCrawlModels(() => ageSexCrawlStates(facts).map((crawl) =>
     buildPyramidWorkbookExportModel({ facts, sources, siteOrigin, year: crawl.year, compare: crawl.compare }, presentation)));

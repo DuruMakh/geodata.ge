@@ -43,7 +43,7 @@ export const museumAreaDefaultSelection = (area: MuseumArea): string[] => [museu
 export const museumAreaCoverage = (area: MuseumArea, facts: readonly ClientScienceCultureFact[], selectedIds: readonly string[] = []) =>
   scienceCultureListCoverage(museumAreaSeries(area), selectedIds, facts);
 
-/** The hidden crawl tables' states: each unit of the area's list (visitors in thousands, the counts), every row of it with facts. */
+/** The crawl tables' states: each unit of the area's list (visitors in thousands, the counts), every row of it with facts. */
 export const museumAreaCrawlStates = (area: MuseumArea, facts: readonly ClientScienceCultureFact[]): TopicState[] =>
   unitListCrawlStates(museumAreaSeries(area), facts);
 

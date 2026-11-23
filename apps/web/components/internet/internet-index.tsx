@@ -29,15 +29,17 @@ export function InternetIndex({ facts, regionMap }: {
   const unitLabel = t("unitPercent"), mapLabel = t("mapLabel");
   const latest = facts.filter(f => f.indicatorId === "internet.homes_internet.total").sort((a, b) => a.year - b.year).at(-1)!;
   const georgiaValue = facts.find(f => f.indicatorId === "internet.homes_internet.total" && f.year === regionMap.year)?.value;
+  const shown = { formatValue: (value: number) => formatInUnit(value, INTERNET_PERCENT), legend: `${mapLabel} · ${unitLabel}` };
+  const lead = { label: t("area.georgia"), valuesByYear: Object.fromEntries(facts.filter(f => f.indicatorId === "internet.homes_internet.total").map(f => [f.year, f.value])) };
   return <div data-testid="internet-homes" className="@container">
     <ExplorerHeading>{t("page.homes.title")}</ExplorerHeading>
     <LatestValueLine testId="internet-latest" sentence={<Message messages={messages} id="internet.latest.homes" values={{ year: latest.year, value: <LatestFigure value={internetPercent(latest.value)} /> }} />} />
     <section data-testid="internet-region-index" className="mt-4">
       <RegionIndex title={t("page.homes.title")} model={regionMap} summary={[]} sourceNote={`${t("sourceNoteHomes")} · ${unitLabel} · ${regionMap.year}.`}
         leadRow={georgiaValue === undefined ? undefined : { id: "georgia", label: t("area.georgia"), value: georgiaValue }} metric={{
-          hrefForRegion: internetRegionHref, formatValue: value => formatInUnit(value, INTERNET_PERCENT), legend: `${mapLabel} · ${unitLabel}`, testId: "internet-region-map",
+          ...shown, hrefForRegion: internetRegionHref, testId: "internet-region-map",
           mapAria: t("regionMapAria", { total: mapLabel, unit: unitLabel, year: regionMap.year }), entityAria: (name, value, year) => t("regionMapEntityAria", { name, amount: internetPercent(value), year }),
-        }} />
+        }} crawl={[{ model: regionMap, metric: shown, lead }]} />
     </section>
   </div>;
 }

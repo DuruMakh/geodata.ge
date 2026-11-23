@@ -81,7 +81,7 @@ export function buildTaxBreaksRefundsModel(allFacts: readonly ClientTaxBreaksRef
 }
 
 /**
- * The hidden crawl tables' states (lib/explorer/crawlTables.ts): every series of the list over all its years, in amounts
+ * The crawl tables' states (lib/explorer/crawlTables.ts): every series of the list over all its years, in amounts
  * and as % of GDP — the page lists no GDP, so those shares exist nowhere else on it. A view without values (no facts, or
  * % of GDP without a GDP year) has no state.
  */

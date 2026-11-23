@@ -126,7 +126,7 @@ export function changeSectorMeasure(state: SectorState, measure: SectorMeasure, 
 }
 
 /**
- * The hidden crawl tables' states (lib/explorer/crawlTables.ts): each measure the page offers and has facts for, as it
+ * The crawl tables' states (lib/explorer/crawlTables.ts): each measure the page offers and has facts for, as it
  * opens, with every row its list shows, over every year. A share of GDP only divides the amounts by the GDP row, so it is
  * left out where the list carries that row (Sectors, GDP by expenditure) and kept where it does not (Spending by type).
  */

@@ -62,7 +62,7 @@ export function buildDeficitExplorerModel(input: {
 export type DeficitCrawlState = { chartMode: "line"; percentage: boolean; selected: true; range: { start: number; end: number } };
 
 /**
- * The hidden crawl tables' states (lib/explorer/crawlTables.ts): the one series over every year, as % of GDP — the view
+ * The crawl tables' states (lib/explorer/crawlTables.ts): the one series over every year, as % of GDP — the view
  * the page opens with, and the IMF's own figure rather than a division by GDP — and in GEL.
  */
 export function deficitCrawlStates(facts: readonly Pick<ClientGeneralGovernmentBalanceFact, "year">[]): DeficitCrawlState[] {

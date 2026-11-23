@@ -41,7 +41,7 @@ export function changeGdpIndicator(
   return { ...next, range: refitRange(state.range, { min, max }, { collapseToAll: true }) };
 }
 /**
- * The hidden crawl tables' states (lib/explorer/crawlTables.ts): each indicator the tabs offer, nominal and per-person GDP
+ * The crawl tables' states (lib/explorer/crawlTables.ts): each indicator the tabs offer, nominal and per-person GDP
  * in GEL and in US dollars (neither the exchange rate nor the population is on the page), every year, the series each has.
  */
 export function gdpCrawlStates(facts: readonly Pick<ClientGdpObservation, "seriesId">[]): GdpState[] {

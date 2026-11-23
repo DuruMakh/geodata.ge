@@ -23,7 +23,7 @@ function foreignInvestmentTabIds(data: ClientForeignInvestmentData, dimension: F
   return [FOREIGN_INVESTMENT_TOTAL_ID, ...data.entities.filter(entity => entity.dimension === dimension).map(entity => entity.id), ...(dimension === "country" ? [FOREIGN_INVESTMENT_OTHERS_ID] : [])];
 }
 /**
- * The hidden crawl tables' states (lib/explorer/crawlTables.ts): each tab with years, everything a saved view on it may select
+ * The crawl tables' states (lib/explorer/crawlTables.ts): each tab with years, everything a saved view on it may select
  * (the model keeps the rows its list offers: the total, the end year's top 10 and Other countries, or every sector or region),
  * over every year.
  */

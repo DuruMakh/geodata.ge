@@ -91,7 +91,7 @@ export function MigrationExplorer({
   useReplaceHash(serializeMigrationHash(state), ready);
 
   const update = (change: (previous: MigrationState) => MigrationState) => setState(change);
-  // Each sex, every group's arrivals and departures and the net over every year, for the hidden crawl tables: built from the props alone, so a click never rebuilds them.
+  // Each sex, every group's arrivals and departures and the net over every year, for the crawl tables: built from the props alone, so a click never rebuilds them.
   const crawlModels = useCrawlModels(() => migrationCrawlStates(facts).map((crawl) =>
     buildMigrationWorkbookExportModel({ facts, state: crawl, sources, siteOrigin }, presentation)));
   const model = buildMigrationModel(facts, state);

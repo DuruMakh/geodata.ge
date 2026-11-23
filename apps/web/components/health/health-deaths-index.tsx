@@ -27,15 +27,17 @@ export function HealthDeathsIndex({ georgiaRates, regionMap }: {
   const rate = (value: number) => formatInUnit(value, { divisor: 1, label: "", decimals: latest.decimals });
   const unitLabel = t("unitPerThousand"), rateLabel = t("series.health.death_rate.total");
   const georgiaValue = georgiaRates.find(f => f.year === regionMap.year)?.value;
+  const shown = { formatValue: rate, legend: `${rateLabel} · ${unitLabel}` };
+  const lead = { label: t("area.georgia"), valuesByYear: Object.fromEntries(georgiaRates.map(f => [f.year, f.value])) };
   return <div data-testid="health-causes-of-death" className="@container">
     <ExplorerHeading>{t("page.causes-of-death.title")}</ExplorerHeading>
     <LatestValueLine testId="health-latest" measure={t("latest.causes-of-death")} period={latest.year} value={rate(latest.value)} />
     <section data-testid="health-regions" className="mt-4">
       <RegionIndex title={t("page.causes-of-death.title")} model={regionMap} summary={[]} sourceNote={`${t("sourceNoteDeaths")} · ${unitLabel} · ${regionMap.year}.`}
         leadRow={georgiaValue === undefined ? undefined : { id: "georgia", label: t("area.georgia"), value: georgiaValue }} metric={{
-          hrefForRegion: id => healthDeathsAreaHref(id as HealthArea), formatValue: rate, legend: `${rateLabel} · ${unitLabel}`, testId: "health-region-map",
+          ...shown, hrefForRegion: id => healthDeathsAreaHref(id as HealthArea), testId: "health-region-map",
           mapAria: t("regionMapAria", { unit: unitLabel, year: regionMap.year }), entityAria: (name, value, year) => t("regionMapEntityAria", { name, amount: rate(value), year }),
-        }} />
+        }} crawl={[{ model: regionMap, metric: shown, lead }]} />
     </section>
   </div>;
 }

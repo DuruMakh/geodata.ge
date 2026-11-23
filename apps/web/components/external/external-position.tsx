@@ -75,7 +75,7 @@ export function ExternalPositionExplorer({ section, facts, labels, sources, gdp,
   // The line under the heading must stay one line at 375px (DESIGN §17), so it uses the short unit (`მლრდ $` in Georgian).
   const latestValue = percent ? valueLabel(model.latest.value) : `${format(model.latest.value)} ${t("unitBnUsdShort")}`;
   const title = message(messages, `external.${key}.title`);
-  // The amounts and % of GDP, every series over its years, for the hidden crawl tables: built from the props alone, so a click never rebuilds them.
+  // The amounts and % of GDP, every series over its years, for the crawl tables: built from the props alone, so a click never rebuilds them.
   const crawlModels = useCrawlModels(() => externalPositionCrawlStates(section, facts, gdp).map(crawl => {
     const { latest } = buildExternalPositionModel(section, facts, crawl, gdp);
     return buildExternalPositionWorkbookExportModel({ section, facts, state: crawl, labels, sources, siteOrigin, title, gdp, gdpSources,

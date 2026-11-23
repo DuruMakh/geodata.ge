@@ -45,6 +45,8 @@ it("the index rows are unchanged by the shared row builder (fingerprint recorded
   // The map's touch targets are left out: since Task 23 they are target bounds the
   // map sizes into disks at its drawn width, not index row data. Everything else
   // is pinned; the hash below equals the pre-refactor model minus that one field.
+  // The every-year history (crawl tables) is new beside the rows and is left out too.
   const { touchTargets: _touchTargets, ...map } = index.map;
-  expect(createHash("sha256").update(JSON.stringify({ ...index, map })).digest("hex")).toBe("17e33bbb06d3af18e46d5927babd2165990ad7e0cab901e01bf94da3b3d16a18");
+  const { history: _history, ...rows } = index;
+  expect(createHash("sha256").update(JSON.stringify({ ...rows, map })).digest("hex")).toBe("17e33bbb06d3af18e46d5927babd2165990ad7e0cab901e01bf94da3b3d16a18");
 });

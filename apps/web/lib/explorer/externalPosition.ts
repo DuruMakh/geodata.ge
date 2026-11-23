@@ -68,7 +68,7 @@ export function defaultExternalPositionState(section: ExternalPositionSectionId)
 }
 
 /**
- * The hidden crawl tables' states (lib/explorer/crawlTables.ts): the amounts and, when there is GDP, % of GDP (the page lists
+ * The crawl tables' states (lib/explorer/crawlTables.ts): the amounts and, when there is GDP, % of GDP (the page lists
  * no GDP to work the shares out from), each with every series over every year. A view without the total has none.
  */
 export function externalPositionCrawlStates(section: ExternalPositionSectionId, facts: readonly ClientExternalPositionFact[], gdp: readonly CurrentAccountGdp[]): ExternalPositionState[] {
