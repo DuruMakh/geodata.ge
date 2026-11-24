@@ -137,3 +137,15 @@
 - [ ] Fresh agents on the new build's replayed text; `npm run check`; the whole browser suite once. Commit.
 - [ ] Push, pull request; the real Claude reader on the Vercel preview if a share link admits it; after release the real reader and Gemini on live pages.
 
+### Task 11: The release's date in the sitemap (added 2026-11-25; spec §11)
+
+**Files:** Modify `lib/seo/sitemap.ts`, `app/sitemap.xml/route.ts`, `docs/deployment.md` (SEO and headers). Test `tests/seo/sitemapDataTablesRelease.test.ts` (new).
+
+**Interfaces:** `export const DATA_TABLES_LIVE_AT: Date` (`2026-11-23T16:20:00Z`) and `export function withDataTablesRelease(entries: MetadataRoute.Sitemap): MetadataRoute.Sitemap`, both in `lib/seo/sitemap.ts`.
+
+- [ ] Unit tests first, red: `withDataTablesRelease` gives `/explorer/education/schools` and its `/en` twin, both reviewed 2026-10-16, `DATA_TABLES_LIVE_AT`; returns an entry reviewed 2027-02-01 as it is; returns unchanged the home page, About, Connect, All data, every `NAV_GROUPS` page, Analysis, Product inflation, Methodology and one of its articles, in both languages; keeps an entry's `url` and `alternates`.
+- [ ] The published file, red: the XML of `GET()` in `app/sitemap.xml/route.ts` is `serializeSitemapXml(withDataTablesRelease(await sitemap()))`; in it Schools and its `/en` twin are not older than the release, and the Budget group page and the Debt methodology article carry `sitemap()`'s date.
+- [ ] Implement the constant and the function, and call it in the route. `sitemap()` and its tests do not change. Run the new file, the four sitemap test files and `npm run typecheck`.
+- [ ] `docs/deployment.md`: the rule, and when the date moves.
+- [ ] Write the published XML from the route and compare it with the live sitemap: the same URLs in the same order with the same language links, 1,466 dates at the release, 90 unchanged.
+- [ ] After Duru's go: sync with `main`, `npm run check` and `npm run build` once, push, pull request, merge when CI is green and no other release is on its way; then `https://fiscal.ge/sitemap.xml`.

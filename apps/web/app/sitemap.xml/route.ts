@@ -1,9 +1,9 @@
-import sitemap, { serializeSitemapXml } from "../../lib/seo/sitemap";
+import sitemap, { serializeSitemapXml, withDataTablesRelease } from "../../lib/seo/sitemap";
 
 export const dynamic = "force-static";
 
 export async function GET(): Promise<Response> {
-  const xml = serializeSitemapXml(await sitemap());
+  const xml = serializeSitemapXml(withDataTablesRelease(await sitemap()));
 
   return new Response(xml, {
     headers: {

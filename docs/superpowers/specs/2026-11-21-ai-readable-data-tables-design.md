@@ -355,3 +355,96 @@ get them. 3 takes them away from both.
   almost none on 62, where it takes another part of the page for the article (the region pages of the regional
   economy, Causes of death, Trading partners and a dozen others). It does the same with the block visible, so it is
   not a cost of this section, and nothing in the page's HTML is missing for it.
+
+## 11. The release's date in the page list (owner decision, 2026-11-25)
+
+A day after the release Gemini's page tool still answered for some pages from a copy saved before it: Schools came
+back with the latest year only and Khashuri as the old page, while Trading partners, Expenditure and Debt came back
+current (2026-11-24). The tool reads Google's saved copy of a page before it fetches the live one (its documentation:
+it "first attempts to fetch the content from an internal index cache"). The sitemap is how a site tells Google that a
+page has changed, and its `lastmod` was each page's data review date (`docs/deployment.md`, SEO and headers). The
+release changed 1,466 pages and no figure, so no date moved. One card asked Duru whether the changed pages should
+carry the release's date, and on 2026-11-25 00:46 Tbilisi the answer was "Okay do it". What the card promised: the
+page list gets the 23 November date for the changed pages, visitors see no difference, one small release.
+
+### 11.1 Measured before building
+
+The live site on 2026-11-24 against the copy of it saved on 2026-11-20:
+
+- The sitemap lists 1,556 URLs, one for each HTML page. Its newest `lastmod` is 2026-10-24: every date in it is older
+  than the release.
+- 1,466 pages carry the block, and the text of every one differs from its copy of 2026-11-20. The other 90 are word
+  for word the same, with the same title, description, structured data and links: the home page, About, Connect,
+  All data, the eight group pages, Analysis, Product inflation, Methodology and its 31 articles, in both languages.
+- "Under `/explorer/`, but not a group page, Analysis or Product inflation" names exactly the 1,466: the rule and the
+  HTML agree on 1,556 of 1,556 URLs.
+- The release's production deployment became ready on 2026-11-23 at 16:19:19 UTC (Vercel).
+- Google's rule for `lastmod` (Search Central, "Build and submit a sitemap"): it uses the value when it is
+  consistently and verifiably accurate, the value is the date and time of the last significant update to the page,
+  and a change to the main content is one. It ignores `changefreq` and `priority`.
+
+### 11.2 Approaches
+
+| | 1. The release's moment on the pages it changed | 2. The build's date on every URL | 3. Each page's date from a stored hash of its HTML |
+| --- | --- | --- | --- |
+| What a search engine is told | 1,466 pages changed on 23 November; a later review of a page's data overtakes it | every page changes at every release | the pages whose HTML changed, at every release |
+| True | yes | no: most releases change a few pages, and Google sets aside a `lastmod` it finds unreliable | yes |
+| Cost | one date and one rule, moved by hand when a release again rewrites every chart page | none | a committed file of 1,556 hashes that every data import and every layout change rewrites, and a build step that keeps it |
+
+**Chosen: 1**, the card's option. 3 is the general answer to a question that has come up once.
+
+Not built: asking Google page by page in Search Console, which is done by hand, a few pages a day.
+
+### 11.3 Design
+
+- `lib/seo/sitemap.ts` gains `DATA_TABLES_LIVE_AT`, 2026-11-23 16:20 UTC: the minute after the deployment was
+  ready, so a copy fetched before it is older than the page. It also gains `withDataTablesRelease(entries)`: an entry
+  whose page carries the data tables gets the later of its own `lastModified` and that moment, and every other entry
+  passes through untouched. The page's Georgian address decides (`splitLanguagePath`), so a language pair keeps one
+  date.
+- `app/sitemap.xml/route.ts` publishes `withDataTablesRelease(await sitemap())`.
+- `sitemap()` does not change. It still dates each URL by the data the page shows, and the tests that pin those dates
+  (each municipality, each region, each topic, each group page) stay as they are. Applied inside `sitemap()`, the
+  release date would make every one of those tests read the same date until the data is next reviewed.
+- Nothing on a page changes. The "Updated" date in a page's header and its `dateModified` keep saying when the
+  figures were last reviewed: that is the dataset's date, and the sitemap's is the page's.
+- The date fades by itself: a page whose data is reviewed after the release carries that review's date again.
+
+### 11.4 Reuse
+
+As is: `sitemap()`, `serializeSitemapXml`, `splitLanguagePath`, `NAV_GROUPS`. Small addition: one constant and one
+function in `sitemap.ts`, one call in the route. New: nothing.
+
+### 11.5 Success criteria
+
+1. The published sitemap gives each of the 1,466 pages `2026-11-23T16:20:00.000Z` and leaves the other 90 on the
+   dates they have today. Both languages of a page carry one date. The URLs, their order and their language links do
+   not change.
+2. A page whose data is reviewed after the release keeps that later date.
+3. No page's HTML changes.
+4. `npm run check` and `npm run build` pass.
+5. After release `https://fiscal.ge/sitemap.xml` shows the dates, and the one check already set for 2026-12-01 asks
+   Gemini for Schools by its ordinary address.
+
+### 11.6 What it does not do
+
+- It does not make Google read anything. `lastmod` is a hint: Google fetches the sitemap, and then the pages, when it
+  chooses to.
+- It changes nothing for a reader that fetches the live page each time, as Claude's does.
+- It does not move the point, about 50,000 characters into a page, at which Gemini stops reading (§8).
+
+### 11.7 Results (2026-11-25, before release)
+
+- **The file the route writes against the live sitemap.** 1,556 URLs in both, in the same order, and everything but
+  the dates is identical, language links included. 1,466 dates read `2026-11-23T16:20:00.000Z` and 90 are unchanged:
+  the 45 addresses of §11.1 in both languages. No date is earlier than before, and each English URL carries its
+  Georgian twin's date. The group pages now carry an older date than the pages they list, which is true of them: the
+  release did not change a group page.
+- **Tests.** Six new ones in `tests/seo/sitemapDataTablesRelease.test.ts`, one of them on the XML the route returns.
+  Each of four deliberate breaks of the rule fails at least one: the date on every page, the date over a later
+  review, an English address not recognised, the group pages not excepted. The 31 tests of the four existing
+  sitemap files pass unchanged.
+- **Pages.** `lib/seo/sitemap.ts` is imported by the sitemap route and by tests only, so no page is built from it.
+- **Gates (2026-11-26).** `npm run check` passes (8,158 unit tests, 46 data checks, the translation check) and so
+  does the build. Its `out/sitemap.xml` is byte for byte the file compared above, and `npm run crawl:check` passes on
+  it.

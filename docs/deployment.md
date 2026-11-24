@@ -900,6 +900,14 @@ no budget data and require no migration when a code release is rolled back.
   serializer live in `apps/web/lib/seo/sitemap.ts`. Each URL's `lastModified`
   is the newest `lastReviewedAt` of the data that page shows (a hub: of every
   dataset its cards read), and a page's Georgian and English URLs share it.
+  The published file adds one thing to those dates, `withDataTablesRelease`:
+  a page that carries the data tables (DESIGN.md §8.4) is never dated before
+  `DATA_TABLES_LIVE_AT`, the moment the release of 2026-11-23 put them into
+  its HTML. That release changed 1,466 pages and no review date, so the
+  sitemap gave a search engine no sign of it. An ordinary release moves
+  nothing here. A release that again changes what all of those pages say,
+  with no new data, moves the constant to the minute after its own production
+  deployment is ready; a later review of a page's data overtakes it by itself.
 - Both pages set Georgian titles/descriptions, Open Graph tags, and canonical
   URLs; `metadataBase` comes from `resolveSiteUrl()`.
 - `/llms.txt` is built at build time by `apps/web/app/llms.txt/route.ts` from
