@@ -80,7 +80,7 @@ import { MUNICIPALITY_ROUTES } from "../explorer/municipalityRoutes";
 import { resolveSiteUrl } from "../siteUrl";
 import { awaitNamed } from "../awaitNamed";
 import { DEBT_EXPLORER_PATH, DEFICIT_EXPLORER_PATH } from "./internalLinks";
-import { pageHref } from "../i18n/routes";
+import { pageHref, splitLanguagePath } from "../i18n/routes";
 import { NAV_GROUPS, type TopicId } from "../navigation/navTree";
 import { UNEMPLOYMENT_SECTIONS } from "../explorer/unemploymentSections";
 import { LABOUR_SECTIONS } from "../explorer/labour";
@@ -413,6 +413,25 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       { ...entry, alternates: { languages } },
       { url: en, lastModified: entry.lastModified, alternates: { languages } },
     ];
+  });
+}
+
+// The release of 2026-11-23 (PR #237) put the data tables (DESIGN.md §8.4) into the HTML of every chart page and changed no
+// figure, so none of the dates above moved, and a day later Gemini still read some pages from the copy Google had saved
+// before it. A page that carries the tables is therefore never dated before the minute after that release's deployment
+// was ready (16:19:19 UTC): a copy fetched earlier is older than the page. A later review of the page's data overtakes it.
+// Move it only for a release that again changes what all of these pages say (docs/deployment.md, SEO and headers).
+export const DATA_TABLES_LIVE_AT = new Date("2026-11-23T16:20:00Z");
+
+// The pages under /explorer/ that carry no data tables: the group pages, Analysis and Product inflation.
+const WITHOUT_DATA_TABLES: ReadonlySet<string> = new Set([...NAV_GROUPS.map((group) => group.href), "/explorer/analysis", "/explorer/inflation/products"]);
+
+/** What /sitemap.xml publishes: `sitemap()`'s dates, and the data tables' release on the pages it changed. */
+export function withDataTablesRelease(entries: MetadataRoute.Sitemap): MetadataRoute.Sitemap {
+  return entries.map((entry) => {
+    const { pathname } = splitLanguagePath(new URL(entry.url).pathname);
+    if (!pathname.startsWith("/explorer/") || WITHOUT_DATA_TABLES.has(pathname)) return entry;
+    return entry.lastModified && new Date(entry.lastModified) >= DATA_TABLES_LIVE_AT ? entry : { ...entry, lastModified: DATA_TABLES_LIVE_AT };
   });
 }
 
